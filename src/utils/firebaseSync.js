@@ -192,8 +192,8 @@ class FirebaseSync {
       const activityData = {
         id: Date.now().toString(),
         type: 'data_save',
-        userName: currentUser.userName,
-        userColor: currentUser.userColor,
+        userName: currentUser?.userName || 'Anonymous',
+        userColor: currentUser?.userColor || '#a855f7',
         timestamp: new Date().toISOString(),
         details: {
           envelopeCount: data.envelopes?.length || 0,
@@ -210,9 +210,9 @@ class FirebaseSync {
         {
           ...encryptedData,
           currentUser: {
-            id: currentUser.id || encryptionUtils.generateDeviceFingerprint(),
-            userName: currentUser.userName,
-            userColor: currentUser.userColor,
+            id: currentUser?.id || encryptionUtils.generateDeviceFingerprint(),
+            userName: currentUser?.userName || 'Anonymous',
+            userColor: currentUser?.userColor || '#a855f7',
             deviceFingerprint: encryptionUtils.generateDeviceFingerprint(),
             lastSeen: new Date().toISOString(),
           },

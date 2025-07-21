@@ -287,7 +287,7 @@ const EnvelopeSystem = () => {
       payerName,
       mode,
       date,
-      processedBy: currentUser.userName,
+      processedBy: currentUser?.userName || 'Anonymous',
       allocations: {},
       totalAllocated: 0,
       leftoverAmount: 0,
@@ -347,7 +347,7 @@ const EnvelopeSystem = () => {
             amount,
             description,
             date: new Date().toISOString(),
-            spentBy: currentUser.userName,
+            spentBy: currentUser?.userName || 'Anonymous',
           };
 
           return {
@@ -385,7 +385,7 @@ const EnvelopeSystem = () => {
     const newBill = {
       id: Date.now(),
       ...billData,
-      createdBy: currentUser.userName,
+      createdBy: currentUser?.userName || 'Anonymous',
       createdAt: new Date().toISOString(),
     };
 
@@ -399,7 +399,7 @@ const EnvelopeSystem = () => {
           ? {
               ...bill,
               ...updates,
-              lastModifiedBy: currentUser.userName,
+              lastModifiedBy: currentUser?.userName || 'Anonymous',
               lastModifiedAt: new Date().toISOString(),
             }
           : bill
@@ -421,7 +421,7 @@ const EnvelopeSystem = () => {
       ...goalData,
       currentAmount: parseFloat(goalData.currentAmount) || 0,
       targetAmount: parseFloat(goalData.targetAmount),
-      createdBy: currentUser.userName,
+      createdBy: currentUser?.userName || 'Anonymous',
       createdAt: new Date().toISOString(),
     };
 
@@ -435,7 +435,7 @@ const EnvelopeSystem = () => {
           ? {
               ...goal,
               ...updates,
-              lastModifiedBy: currentUser.userName,
+              lastModifiedBy: currentUser?.userName || 'Anonymous',
               lastModifiedAt: new Date().toISOString(),
             }
           : goal
@@ -472,7 +472,7 @@ const EnvelopeSystem = () => {
       type: "savings_distribution",
       amount: totalAmount,
       distribution,
-      distributedBy: currentUser.userName,
+      distributedBy: currentUser?.userName || 'Anonymous',
       date: new Date().toISOString(),
     };
 
@@ -528,9 +528,9 @@ const EnvelopeSystem = () => {
     }
   };
 
-  const createActivitySignature = () => ({
-    userName: currentUser.userName,
-    userColor: currentUser.userColor,
+  const createActivitySignature = (user = currentUser) => ({
+    userName: user?.userName || 'Anonymous',
+    userColor: user?.userColor || '#a855f7',
     timestamp: new Date().toISOString(),
     deviceFingerprint: encryptionUtils.generateDeviceFingerprint(),
     deviceInfo: getDeviceInfo(),
@@ -548,7 +548,15 @@ const EnvelopeSystem = () => {
 
   const handleSetup = async ({ password, userName, userColor }) => {
     try {
-      const user = { userName, userColor };
+      // Validate required fields
+      if (!password || !userName) {
+        throw new Error('Password and username are required');
+      }
+
+      const user = { 
+        userName: userName.trim(),
+        userColor: userColor || '#a855f7'
+      };
       const generatedBudgetId = encryptionUtils.generateBudgetId(password);
       setBudgetId(generatedBudgetId);
 
@@ -602,7 +610,7 @@ const EnvelopeSystem = () => {
         setSalt(salt);
         setCurrentUser(user);
         setIsUnlocked(true);
-        setLastActivity(createActivitySignature());
+        setLastActivity(createActivitySignature(user));
       }
     } catch (error) {
       alert("Invalid password or corrupted data");
@@ -620,7 +628,7 @@ const EnvelopeSystem = () => {
       actualBalance,
       transactions,
       lastActivity,
-      exportedBy: currentUser.userName,
+      exportedBy: currentUser?.userName || 'Anonymous',
       exportedAt: new Date().toISOString(),
     };
 
