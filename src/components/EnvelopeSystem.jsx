@@ -1,0 +1,994 @@
+// src/components/EnvelopeSystem.jsx - Complete System with Modern Purple Design
+import React, { useState, useEffect } from "react";
+import { encryptionUtils } from "../utils/encryption";
+import FirebaseSync from "../utils/firebaseSync";
+import UserSetup from "./UserSetup";
+import Header from "./Header";
+import ActivityBanner from "./ActivityBanner";
+import SyncIndicator from "./SyncIndicator";
+import PaycheckProcessor from "./PaycheckProcessor";
+import EnvelopeGrid from "./EnvelopeGrid";
+import BillManager from "./BillManager";
+import SavingsGoals from "./SavingsGoals";
+import Dashboard from "./Dashboard";
+import {
+  DollarSign,
+  Wallet,
+  TrendingUp,
+  Calendar,
+  Target,
+  CreditCard,
+  Sparkles,
+} from "lucide-react";
+
+const EnvelopeSystem = () => {
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [encryptionKey, setEncryptionKey] = useState(null);
+  const [_salt, setSalt] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [lastActivity, setLastActivity] = useState(null);
+  const [activeView, setActiveView] = useState("dashboard");
+
+  // Core budget data
+  const [envelopes, setEnvelopes] = useState([]);
+  const [bills, setBills] = useState([]);
+  const [savingsGoals, setSavingsGoals] = useState([]);
+  const [unassignedCash, setUnassignedCash] = useState(0);
+  const [_totalBudgetNeeded, setTotalBudgetNeeded] = useState(0);
+  const [biweeklyAllocation, setBiweeklyAllocation] = useState(0);
+
+  // Paycheck tracking
+  const [paycheckHistory, setPaycheckHistory] = useState([]);
+
+  // Dashboard and reconciliation state
+  const [actualBalance, setActualBalance] = useState(0);
+  const [transactions, setTransactions] = useState([]);
+
+  // Firebase sync state
+  const [firebaseSync] = useState(new FirebaseSync());
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [lastSyncTime, setLastSyncTime] = useState(null);
+  const [activeUsers, setActiveUsers] = useState([]);
+  const [syncConflicts, setSyncConflicts] = useState(null);
+  const [syncError, setSyncError] = useState(null);
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [budgetId, setBudgetId] = useState(null);
+
+  // Monitor online status
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
+  // Initialize Firebase sync when user logs in
+  useEffect(() => {
+    if (isUnlocked && encryptionKey && currentUser && budgetId) {
+      firebaseSync.initialize(budgetId, encryptionKey);
+
+      // Setup enhanced sync listeners
+      const syncListener = (event) => {
+        switch (event.type) {
+          case 'sync_start':
+            setIsSyncing(true);
+            setSyncError(null);
+            break;
+          case 'sync_success':
+            setIsSyncing(false);
+            setLastSyncTime(Date.now());
+            break;
+          case 'realtime_update':
+            console.log('📡 Real-time update received');
+            break;
+          default:
+            break;
+        }
+      };
+
+      const errorListener = (error) => {
+        setIsSyncing(false);
+        setSyncError(error.error || 'Sync error occurred');
+        console.error('🔥 Sync error:', error);
+      };
+
+      firebaseSync.addSyncListener(syncListener);
+      firebaseSync.addErrorListener(errorListener);
+
+      if (isOnline) {
+        setupRealtimeSync();
+        loadFromCloud();
+      }
+
+      return () => {
+        firebaseSync.removeSyncListener(syncListener);
+        firebaseSync.removeErrorListener(errorListener);
+      };
+    }
+
+    return () => {
+      firebaseSync.stopRealtimeSync();
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isUnlocked, encryptionKey, currentUser, budgetId, isOnline]);
+
+  // Auto-sync when data changes
+  useEffect(() => {
+    if (isUnlocked && encryptionKey && currentUser && isOnline && !isSyncing) {
+      const syncData = {
+        envelopes,
+        bills,
+        savingsGoals,
+        unassignedCash,
+        paycheckHistory,
+        actualBalance,
+        transactions,
+        lastActivity,
+      };
+
+      // Debounce syncing to avoid too many requests
+      const timeoutId = setTimeout(async () => {
+        await syncToCloud(syncData);
+      }, 1000);
+
+      return () => clearTimeout(timeoutId);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [envelopes, bills, savingsGoals, unassignedCash, paycheckHistory, actualBalance, transactions, lastActivity]);
+
+  const setupRealtimeSync = () => {
+    firebaseSync.setupRealtimeSync(async (cloudUpdate) => {
+      console.log("📥 Receiving real-time update from Firebase");
+
+      // Check for conflicts
+      const conflicts = await firebaseSync.checkForConflicts(Date.now());
+      if (conflicts.hasConflict) {
+        setSyncConflicts(conflicts);
+        return;
+      }
+
+      // Apply the update
+      const { data, metadata } = cloudUpdate;
+      if (data) {
+        setEnvelopes(data.envelopes || []);
+        setBills(data.bills || []);
+        setSavingsGoals(data.savingsGoals || []);
+        setUnassignedCash(data.unassignedCash || 0);
+        setPaycheckHistory(data.paycheckHistory || []);
+        setActualBalance(data.actualBalance || 0);
+        setTransactions(data.transactions || []);
+        setLastActivity(data.lastActivity || null);
+
+        // Update enhanced sync state
+        if (metadata) {
+          setActiveUsers(metadata.activeUsers || []);
+          setRecentActivity(metadata.recentActivity || []);
+        }
+
+        setLastSyncTime(Date.now());
+      }
+    });
+  };
+
+  const syncToCloud = async (data) => {
+    if (!isOnline || isSyncing) return;
+
+    setIsSyncing(true);
+    try {
+      await firebaseSync.saveToCloud(data, currentUser);
+      setLastSyncTime(Date.now());
+
+      // Update active users
+      const users = await firebaseSync.getActiveUsers();
+      setActiveUsers(users);
+    } catch (error) {
+      console.error("❌ Sync to cloud failed:", error);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const loadFromCloud = async () => {
+    if (!isOnline) return;
+
+    setIsSyncing(true);
+    try {
+      const cloudData = await firebaseSync.loadFromCloud();
+
+      if (cloudData) {
+        console.log("📥 Loading data from Firebase");
+        const { data, metadata } = cloudData;
+
+        setEnvelopes(data.envelopes || []);
+        setBills(data.bills || []);
+        setSavingsGoals(data.savingsGoals || []);
+        setUnassignedCash(data.unassignedCash || 0);
+        setPaycheckHistory(data.paycheckHistory || []);
+        setActualBalance(data.actualBalance || 0);
+        setTransactions(data.transactions || []);
+        setLastActivity(data.lastActivity || null);
+
+        // Update enhanced sync state
+        if (metadata) {
+          setActiveUsers(metadata.activeUsers || []);
+          setRecentActivity(metadata.recentActivity || []);
+        }
+
+        setLastSyncTime(Date.now());
+      } else {
+        console.log(
+          "📤 No cloud data found - this device will create the initial data"
+        );
+      }
+    } catch (error) {
+      console.error("❌ Failed to load from cloud:", error);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const resolveConflict = async () => {
+    await loadFromCloud();
+    setSyncConflicts(null);
+  };
+
+  const calculateBiweeklyNeeds = () => {
+    const monthlyTotal = bills.reduce(
+      (sum, bill) => sum + (bill.monthlyAmount || 0),
+      0
+    );
+    const biweeklyTotal = bills.reduce(
+      (sum, bill) => sum + (bill.biweeklyAmount || 0),
+      0
+    );
+
+    setBiweeklyAllocation(biweeklyTotal);
+    setTotalBudgetNeeded(monthlyTotal);
+
+    // Update envelopes with biweekly allocations
+    const updatedEnvelopes = bills.map((bill) => {
+      const existingEnvelope = envelopes.find((env) => env.billId === bill.id);
+      return {
+        id: existingEnvelope?.id || Date.now() + Math.random(),
+        billId: bill.id,
+        name: bill.name,
+        amount: bill.amount,
+        frequency: bill.frequency,
+        monthlyAmount: bill.monthlyAmount || 0,
+        biweeklyAllocation: bill.biweeklyAmount || 0,
+        currentBalance: existingEnvelope?.currentBalance || 0,
+        dueDate: bill.dueDate,
+        nextDueDate: bill.nextDueDate,
+        category: bill.category || "Bills",
+        color: bill.color || "#a855f7",
+        spendingHistory: existingEnvelope?.spendingHistory || [],
+      };
+    });
+
+    setEnvelopes(updatedEnvelopes);
+  };
+
+  useEffect(() => {
+    calculateBiweeklyNeeds();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bills]);
+
+  const processPaycheck = ({ amount, payerName, mode, date }) => {
+    const paycheck = {
+      id: Date.now(),
+      amount,
+      payerName,
+      mode,
+      date,
+      processedBy: currentUser.userName,
+      allocations: {},
+      totalAllocated: 0,
+      leftoverAmount: 0,
+    };
+
+    if (mode === "leftover") {
+      // All money goes to unassigned cash
+      setUnassignedCash((prev) => prev + amount);
+      paycheck.leftoverAmount = amount;
+      paycheck.allocations.unassigned = amount;
+    } else {
+      // Auto-allocate to envelopes based on their needs
+      let remainingAmount = amount;
+      let totalAllocated = 0;
+
+      const updatedEnvelopes = envelopes.map((envelope) => {
+        // Calculate how much this envelope needs (up to its biweekly allocation)
+        const currentNeed = Math.max(
+          0,
+          envelope.biweeklyAllocation - envelope.currentBalance
+        );
+        const allocation = Math.min(currentNeed, remainingAmount);
+
+        if (allocation > 0) {
+          remainingAmount -= allocation;
+          totalAllocated += allocation;
+          paycheck.allocations[envelope.id] = allocation;
+        }
+
+        return {
+          ...envelope,
+          currentBalance: envelope.currentBalance + allocation,
+        };
+      });
+
+      // Remaining goes to unassigned cash
+      setUnassignedCash((prev) => prev + remainingAmount);
+      paycheck.allocations.unassigned = remainingAmount;
+      paycheck.totalAllocated = totalAllocated;
+      paycheck.leftoverAmount = remainingAmount;
+
+      setEnvelopes(updatedEnvelopes);
+    }
+
+    setPaycheckHistory((prev) => [paycheck, ...prev]);
+    return paycheck;
+  };
+
+  const spendFromEnvelope = (envelopeId, amount, description = "") => {
+    setEnvelopes((prev) =>
+      prev.map((envelope) => {
+        if (envelope.id === envelopeId) {
+          const newBalance = Math.max(0, envelope.currentBalance - amount);
+
+          const spending = {
+            id: Date.now(),
+            amount,
+            description,
+            date: new Date().toISOString(),
+            spentBy: currentUser.userName,
+          };
+
+          return {
+            ...envelope,
+            currentBalance: newBalance,
+            spendingHistory: [...(envelope.spendingHistory || []), spending],
+          };
+        }
+        return envelope;
+      })
+    );
+  };
+
+  const transferBetweenEnvelopes = (fromId, toId, amount) => {
+    setEnvelopes((prev) =>
+      prev.map((envelope) => {
+        if (envelope.id === fromId) {
+          return {
+            ...envelope,
+            currentBalance: Math.max(0, envelope.currentBalance - amount),
+          };
+        }
+        if (envelope.id === toId) {
+          return {
+            ...envelope,
+            currentBalance: envelope.currentBalance + amount,
+          };
+        }
+        return envelope;
+      })
+    );
+  };
+
+  const addBill = (billData) => {
+    const newBill = {
+      id: Date.now(),
+      ...billData,
+      createdBy: currentUser.userName,
+      createdAt: new Date().toISOString(),
+    };
+
+    setBills((prev) => [...prev, newBill]);
+  };
+
+  const updateBill = (billId, updates) => {
+    setBills((prev) =>
+      prev.map((bill) =>
+        bill.id === billId
+          ? {
+              ...bill,
+              ...updates,
+              lastModifiedBy: currentUser.userName,
+              lastModifiedAt: new Date().toISOString(),
+            }
+          : bill
+      )
+    );
+  };
+
+  const deleteBill = (billId) => {
+    setBills((prev) => prev.filter((bill) => bill.id !== billId));
+    setEnvelopes((prev) =>
+      prev.filter((envelope) => envelope.billId !== billId)
+    );
+  };
+
+  // Savings goals functions
+  const addSavingsGoal = (goalData) => {
+    const newGoal = {
+      id: Date.now(),
+      ...goalData,
+      currentAmount: parseFloat(goalData.currentAmount) || 0,
+      targetAmount: parseFloat(goalData.targetAmount),
+      createdBy: currentUser.userName,
+      createdAt: new Date().toISOString(),
+    };
+
+    setSavingsGoals((prev) => [...prev, newGoal]);
+  };
+
+  const updateSavingsGoal = (goalId, updates) => {
+    setSavingsGoals((prev) =>
+      prev.map((goal) =>
+        goal.id === goalId
+          ? {
+              ...goal,
+              ...updates,
+              lastModifiedBy: currentUser.userName,
+              lastModifiedAt: new Date().toISOString(),
+            }
+          : goal
+      )
+    );
+  };
+
+  const deleteSavingsGoal = (goalId) => {
+    setSavingsGoals((prev) => prev.filter((goal) => goal.id !== goalId));
+  };
+
+  const distributeToGoals = (distribution, totalAmount) => {
+    // Update savings goals with distributed amounts
+    setSavingsGoals((prev) =>
+      prev.map((goal) => {
+        const allocation = parseFloat(distribution[goal.id]) || 0;
+        if (allocation > 0) {
+          const newAmount = goal.currentAmount + allocation;
+          return {
+            ...goal,
+            currentAmount: Math.min(newAmount, goal.targetAmount), // Don't exceed target
+          };
+        }
+        return goal;
+      })
+    );
+
+    // Reduce unassigned cash
+    setUnassignedCash((prev) => Math.max(0, prev - totalAmount));
+
+    // Record the distribution in history
+    const distributionRecord = {
+      id: Date.now(),
+      type: "savings_distribution",
+      amount: totalAmount,
+      distribution,
+      distributedBy: currentUser.userName,
+      date: new Date().toISOString(),
+    };
+
+    setPaycheckHistory((prev) => [distributionRecord, ...prev]);
+  };
+
+  // Dashboard functions
+  const updateActualBalance = (newBalance) => {
+    setActualBalance(newBalance);
+  };
+
+  const reconcileTransaction = (transaction) => {
+    // Add transaction to history
+    setTransactions((prev) => [transaction, ...prev]);
+
+    // Update envelope or savings goal based on transaction
+    if (transaction.envelopeId) {
+      if (transaction.envelopeId === "unassigned") {
+        // Update unassigned cash
+        setUnassignedCash((prev) => prev + transaction.amount);
+      } else if (transaction.envelopeId.startsWith("savings_")) {
+        // Update savings goal
+        const goalId = transaction.envelopeId.replace("savings_", "");
+        setSavingsGoals((prev) =>
+          prev.map((goal) =>
+            goal.id === goalId
+              ? {
+                  ...goal,
+                  currentAmount: Math.max(
+                    0,
+                    goal.currentAmount + transaction.amount
+                  ),
+                }
+              : goal
+          )
+        );
+      } else {
+        // Update envelope
+        setEnvelopes((prev) =>
+          prev.map((envelope) =>
+            envelope.id === transaction.envelopeId
+              ? {
+                  ...envelope,
+                  currentBalance: Math.max(
+                    0,
+                    envelope.currentBalance + transaction.amount
+                  ),
+                }
+              : envelope
+          )
+        );
+      }
+    }
+  };
+
+  const createActivitySignature = () => ({
+    userName: currentUser.userName,
+    userColor: currentUser.userColor,
+    timestamp: new Date().toISOString(),
+    deviceFingerprint: encryptionUtils.generateDeviceFingerprint(),
+    deviceInfo: getDeviceInfo(),
+  });
+
+  const getDeviceInfo = () => {
+    const ua = navigator.userAgent;
+    if (ua.includes("Chrome")) return "Chrome Browser";
+    if (ua.includes("Firefox")) return "Firefox Browser";
+    if (ua.includes("Safari")) return "Safari Browser";
+    if (ua.includes("Edge")) return "Edge Browser";
+    if (ua.includes("Mobile")) return "Mobile Device";
+    return "Desktop Browser";
+  };
+
+  const handleSetup = async ({ password, userName, userColor }) => {
+    try {
+      const user = { userName, userColor };
+      const generatedBudgetId = encryptionUtils.generateBudgetId(password);
+      setBudgetId(generatedBudgetId);
+
+      const savedData = localStorage.getItem("envelopeBudgetData");
+
+      if (savedData) {
+        const { encryptedData, salt, iv } = JSON.parse(savedData);
+
+        const encoder = new TextEncoder();
+        const keyMaterial = await crypto.subtle.importKey(
+          "raw",
+          encoder.encode(password),
+          { name: "PBKDF2" },
+          false,
+          ["deriveBits", "deriveKey"]
+        );
+
+        const key = await crypto.subtle.deriveKey(
+          {
+            name: "PBKDF2",
+            salt: new Uint8Array(salt),
+            iterations: 100000,
+            hash: "SHA-256",
+          },
+          keyMaterial,
+          { name: "AES-GCM", length: 256 },
+          true,
+          ["encrypt", "decrypt"]
+        );
+
+        const decryptedData = await encryptionUtils.decrypt(
+          encryptedData,
+          key,
+          iv
+        );
+        setEnvelopes(decryptedData.envelopes || []);
+        setBills(decryptedData.bills || []);
+        setSavingsGoals(decryptedData.savingsGoals || []);
+        setUnassignedCash(decryptedData.unassignedCash || 0);
+        setPaycheckHistory(decryptedData.paycheckHistory || []);
+        setActualBalance(decryptedData.actualBalance || 0);
+        setTransactions(decryptedData.transactions || []);
+        setLastActivity(decryptedData.lastActivity || null);
+        setEncryptionKey(key);
+        setSalt(new Uint8Array(salt));
+        setCurrentUser(user);
+        setIsUnlocked(true);
+      } else {
+        const { key, salt } = await encryptionUtils.generateKey(password);
+        setEncryptionKey(key);
+        setSalt(salt);
+        setCurrentUser(user);
+        setIsUnlocked(true);
+        setLastActivity(createActivitySignature());
+      }
+    } catch (error) {
+      alert("Invalid password or corrupted data");
+      throw error;
+    }
+  };
+
+  const exportData = () => {
+    const exportData = {
+      envelopes,
+      bills,
+      savingsGoals,
+      unassignedCash,
+      paycheckHistory,
+      actualBalance,
+      transactions,
+      lastActivity,
+      exportedBy: currentUser.userName,
+      exportedAt: new Date().toISOString(),
+    };
+
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `envelope-budget-backup-${
+      new Date().toISOString().split("T")[0]
+    }.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const importData = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const importedData = JSON.parse(e.target.result);
+          if (importedData.envelopes && importedData.bills) {
+            setEnvelopes(importedData.envelopes || []);
+            setBills(importedData.bills || []);
+            setSavingsGoals(importedData.savingsGoals || []);
+            setUnassignedCash(importedData.unassignedCash || 0);
+            setPaycheckHistory(importedData.paycheckHistory || []);
+            setActualBalance(importedData.actualBalance || 0);
+            setTransactions(importedData.transactions || []);
+            alert("Data imported successfully!");
+          } else {
+            alert("Invalid file format - missing required data structure");
+          }
+        } catch (error) {
+          console.error("File parsing error:", error);
+          alert("Invalid file format - not valid JSON");
+        }
+      };
+      reader.readAsText(file);
+    }
+    event.target.value = "";
+  };
+
+  const logout = () => {
+    if (
+      confirm(
+        "Are you sure you want to logout? Your data is automatically saved."
+      )
+    ) {
+      setIsUnlocked(false);
+      setEncryptionKey(null);
+      setSalt(null);
+      setCurrentUser(null);
+      setBudgetId(null);
+      setBills([]);
+      setEnvelopes([]);
+      setSavingsGoals([]);
+      setUnassignedCash(0);
+      setPaycheckHistory([]);
+      setActualBalance(0);
+      setTransactions([]);
+      setLastActivity(null);
+      firebaseSync.stopRealtimeSync();
+    }
+  };
+
+  if (!currentUser) {
+    return <UserSetup onSetupComplete={handleSetup} />;
+  }
+
+  const totalEnvelopeBalance = envelopes.reduce(
+    (sum, env) => sum + env.currentBalance,
+    0
+  );
+  const totalSavingsBalance = savingsGoals.reduce(
+    (sum, goal) => sum + goal.currentAmount,
+    0
+  );
+  const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
+
+  return (
+    <div className="min-h-screen p-4">
+      <div className="max-w-7xl mx-auto">
+        <Header
+          currentUser={currentUser}
+          onUserChange={() => setCurrentUser(null)}
+          onExport={exportData}
+          onImport={importData}
+          onLogout={logout}
+        />
+
+        {/* Activity Banner */}
+        <ActivityBanner 
+          activeUsers={activeUsers}
+          recentActivity={recentActivity}
+          currentUser={currentUser}
+        />
+
+        {/* Sync Indicator */}
+        <SyncIndicator
+          isOnline={isOnline}
+          isSyncing={isSyncing}
+          lastSyncTime={lastSyncTime}
+          activeUsers={activeUsers}
+          syncError={syncError}
+          currentUser={currentUser}
+        />
+
+        {/* Navigation Tabs */}
+        <div className="glassmorphism rounded-3xl mb-6">
+          <nav className="flex border-b border-white/20">
+            <button
+              onClick={() => setActiveView("dashboard")}
+              className={`px-8 py-5 text-sm font-semibold border-b-2 transition-all ${
+                activeView === "dashboard"
+                  ? "border-purple-500 text-purple-600 bg-purple-50/50"
+                  : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30"
+              }`}
+            >
+              <CreditCard className="h-5 w-5 inline mr-3" />
+              Dashboard
+            </button>
+            <button
+              onClick={() => setActiveView("envelopes")}
+              className={`px-8 py-5 text-sm font-semibold border-b-2 transition-all ${
+                activeView === "envelopes"
+                  ? "border-purple-500 text-purple-600 bg-purple-50/50"
+                  : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30"
+              }`}
+            >
+              <Wallet className="h-5 w-5 inline mr-3" />
+              Envelopes
+            </button>
+            <button
+              onClick={() => setActiveView("savings")}
+              className={`px-8 py-5 text-sm font-semibold border-b-2 transition-all ${
+                activeView === "savings"
+                  ? "border-purple-500 text-purple-600 bg-purple-50/50"
+                  : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30"
+              }`}
+            >
+              <Target className="h-5 w-5 inline mr-3" />
+              Savings Goals
+            </button>
+            <button
+              onClick={() => setActiveView("paycheck")}
+              className={`px-8 py-5 text-sm font-semibold border-b-2 transition-all ${
+                activeView === "paycheck"
+                  ? "border-purple-500 text-purple-600 bg-purple-50/50"
+                  : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30"
+              }`}
+            >
+              <DollarSign className="h-5 w-5 inline mr-3" />
+              Add Paycheck
+            </button>
+            <button
+              onClick={() => setActiveView("bills")}
+              className={`px-8 py-5 text-sm font-semibold border-b-2 transition-all ${
+                activeView === "bills"
+                  ? "border-purple-500 text-purple-600 bg-purple-50/50"
+                  : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30"
+              }`}
+            >
+              <Calendar className="h-5 w-5 inline mr-3" />
+              Manage Bills
+            </button>
+          </nav>
+        </div>
+
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="glassmorphism rounded-3xl p-6">
+            <div className="flex items-center">
+              <div className="relative mr-4">
+                <div className="absolute inset-0 bg-purple-500 rounded-2xl blur-lg opacity-30"></div>
+                <div className="relative bg-purple-500 p-3 rounded-2xl">
+                  <Wallet className="h-6 w-6 text-white" />
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-600 mb-1">
+                  Total Cash
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  ${totalCash.toFixed(2)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="glassmorphism rounded-3xl p-6">
+            <div className="flex items-center">
+              <div className="relative mr-4">
+                <div className="absolute inset-0 bg-emerald-500 rounded-2xl blur-lg opacity-30"></div>
+                <div className="relative bg-emerald-500 p-3 rounded-2xl">
+                  <TrendingUp className="h-6 w-6 text-white" />
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-600 mb-1">
+                  Unassigned Cash
+                </p>
+                <p className="text-2xl font-bold text-emerald-600">
+                  ${unassignedCash.toFixed(2)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="glassmorphism rounded-3xl p-6">
+            <div className="flex items-center">
+              <div className="relative mr-4">
+                <div className="absolute inset-0 bg-cyan-500 rounded-2xl blur-lg opacity-30"></div>
+                <div className="relative bg-cyan-500 p-3 rounded-2xl">
+                  <Target className="h-6 w-6 text-white" />
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-600 mb-1">
+                  Savings Total
+                </p>
+                <p className="text-2xl font-bold text-cyan-600">
+                  ${totalSavingsBalance.toFixed(2)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="glassmorphism rounded-3xl p-6">
+            <div className="flex items-center">
+              <div className="relative mr-4">
+                <div className="absolute inset-0 bg-amber-500 rounded-2xl blur-lg opacity-30"></div>
+                <div className="relative bg-amber-500 p-3 rounded-2xl">
+                  <DollarSign className="h-6 w-6 text-white" />
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-600 mb-1">
+                  Biweekly Need
+                </p>
+                <p className="text-2xl font-bold text-amber-600">
+                  ${biweeklyAllocation.toFixed(2)}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        {activeView === "dashboard" && (
+          <Dashboard
+            envelopes={envelopes}
+            savingsGoals={savingsGoals}
+            unassignedCash={unassignedCash}
+            actualBalance={actualBalance}
+            onUpdateActualBalance={updateActualBalance}
+            onReconcileTransaction={reconcileTransaction}
+            transactions={transactions}
+          />
+        )}
+
+        {activeView === "envelopes" && (
+          <EnvelopeGrid
+            envelopes={envelopes}
+            unassignedCash={unassignedCash}
+            onSpend={spendFromEnvelope}
+            onTransfer={transferBetweenEnvelopes}
+            onUpdateUnassigned={setUnassignedCash}
+          />
+        )}
+
+        {activeView === "savings" && (
+          <SavingsGoals
+            savingsGoals={savingsGoals}
+            unassignedCash={unassignedCash}
+            onAddGoal={addSavingsGoal}
+            onUpdateGoal={updateSavingsGoal}
+            onDeleteGoal={deleteSavingsGoal}
+            onDistributeToGoals={distributeToGoals}
+          />
+        )}
+
+        {activeView === "paycheck" && (
+          <PaycheckProcessor
+            biweeklyAllocation={biweeklyAllocation}
+            envelopes={envelopes}
+            paycheckHistory={paycheckHistory}
+            onProcessPaycheck={processPaycheck}
+            currentUser={currentUser}
+          />
+        )}
+
+        {activeView === "bills" && (
+          <BillManager
+            bills={bills}
+            onAddBill={addBill}
+            onUpdateBill={updateBill}
+            onDeleteBill={deleteBill}
+          />
+        )}
+
+        {/* Loading/Syncing Overlay */}
+        {isSyncing && (
+          <div className="fixed bottom-4 right-4 glassmorphism rounded-2xl p-4 z-50">
+            <div className="flex items-center space-x-3">
+              <div className="animate-spin h-5 w-5 border-2 border-purple-500/30 border-t-purple-500 rounded-full"></div>
+              <span className="text-sm font-medium text-gray-700">
+                Syncing...
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Offline Indicator */}
+        {!isOnline && (
+          <div className="fixed bottom-4 left-4 bg-amber-500 text-white rounded-2xl p-4 z-50">
+            <div className="flex items-center space-x-3">
+              <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium">
+                Offline - Changes saved locally
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Conflict Resolution Modal */}
+        {syncConflicts?.hasConflict && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="glassmorphism rounded-3xl p-8 w-full max-w-md">
+              <div className="text-center">
+                <div className="relative mx-auto mb-6 w-16 h-16">
+                  <div className="absolute inset-0 bg-amber-500 rounded-2xl blur-lg opacity-30"></div>
+                  <div className="relative bg-amber-500 p-4 rounded-2xl">
+                    <Sparkles className="h-8 w-8 text-white" />
+                  </div>
+                </div>
+
+                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                  Sync Conflict Detected
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  <strong>{syncConflicts.cloudUser?.userName}</strong> made
+                  changes on another device. Would you like to load their latest
+                  changes?
+                </p>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setSyncConflicts(null)}
+                    className="flex-1 btn btn-secondary rounded-2xl py-3"
+                  >
+                    Keep Mine
+                  </button>
+                  <button
+                    onClick={resolveConflict}
+                    className="flex-1 btn btn-primary rounded-2xl py-3"
+                  >
+                    Load Theirs
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default EnvelopeSystem;
