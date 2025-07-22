@@ -38,7 +38,13 @@ const SyncIndicator = ({
   };
 
   const getSyncStatus = () => {
-    if (syncError) return { status: 'error', color: 'rose', message: 'Sync error' };
+    if (syncError) {
+      // Check if it's a network blocking error
+      if (syncError.includes('blocked') || syncError.includes('ad blocker')) {
+        return { status: 'blocked', color: 'orange', message: 'Sync blocked' };
+      }
+      return { status: 'error', color: 'rose', message: 'Sync error' };
+    }
     if (!isOnline) return { status: 'offline', color: 'amber', message: 'Offline' };
     if (isSyncing) return { status: 'syncing', color: 'cyan', message: 'Syncing...' };
     return { status: 'synced', color: 'emerald', message: 'Synced' };
@@ -141,17 +147,54 @@ const SyncIndicator = ({
 
       {/* Error Details */}
       {syncError && (
-        <div className="mt-3 p-3 bg-rose-50 rounded-lg border border-rose-200">
+        <div className={`mt-3 p-3 rounded-lg border ${
+          (syncError.includes('blocked') || syncError.includes('ad blocker'))
+            ? 'bg-orange-50 border-orange-200' 
+            : 'bg-rose-50 border-rose-200'
+        }`}>
           <div className="flex items-start space-x-2">
-            <AlertTriangle className="h-4 w-4 text-rose-600 mt-0.5 flex-shrink-0" />
+            <AlertTriangle className={`h-4 w-4 mt-0.5 flex-shrink-0 ${
+              (syncError.includes('blocked') || syncError.includes('ad blocker'))
+                ? 'text-orange-600' 
+                : 'text-rose-600'
+            }`} />
             <div>
-              <div className="font-medium text-rose-800">Sync Error</div>
-              <div className="text-sm text-rose-600 mt-1">
+              <div className={`font-medium ${
+                (syncError.includes('blocked') || syncError.includes('ad blocker'))
+                  ? 'text-orange-800' 
+                  : 'text-rose-800'
+              }`}>
+                {(syncError.includes('blocked') || syncError.includes('ad blocker'))
+                  ? 'Sync Blocked by Browser' 
+                  : 'Sync Error'
+                }
+              </div>
+              <div className={`text-sm mt-1 ${
+                (syncError.includes('blocked') || syncError.includes('ad blocker'))
+                  ? 'text-orange-600' 
+                  : 'text-rose-600'
+              }`}>
                 {typeof syncError === 'string' ? syncError : 'Failed to sync with cloud'}
               </div>
-              <button className="text-sm text-rose-700 underline mt-2 hover:text-rose-800">
-                Retry sync
-              </button>
+              
+              {/* Show specific help for blocking errors */}
+              {(syncError.includes('blocked') || syncError.includes('ad blocker')) && (
+                <div className="mt-2 text-xs text-orange-700">
+                  <div className="font-medium mb-1">To fix this:</div>
+                  <ul className="list-disc list-inside space-y-1">
+                    <li>Disable ad blocker for this site</li>
+                    <li>Allow requests to firebase.google.com</li>
+                    <li>Check browser extensions blocking requests</li>
+                  </ul>
+                </div>
+              )}
+              
+              {/* Regular retry button for non-blocking errors */}
+              {!(syncError.includes('blocked') || syncError.includes('ad blocker')) && (
+                <button className="text-sm text-rose-700 underline mt-2 hover:text-rose-800">
+                  Retry sync
+                </button>
+              )}
             </div>
           </div>
         </div>

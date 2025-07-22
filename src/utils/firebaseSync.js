@@ -150,25 +150,53 @@ class FirebaseSync {
 
   async decryptFromCloud(cloudData) {
     if (!cloudData.encryptedData || !cloudData.iv) {
+      console.log('⚠️ No encrypted data found in cloud document');
       return null;
     }
 
-    const decryptedData = await encryptionUtils.decrypt(
-      cloudData.encryptedData,
-      this.encryptionKey,
-      cloudData.iv
-    );
+    try {
+      console.log('🔓 Attempting to decrypt cloud data...');
+      
+      // Validate encryption key
+      if (!this.encryptionKey) {
+        throw new Error('No encryption key available');
+      }
+      
+      // Check data format
+      if (!Array.isArray(cloudData.encryptedData) || !Array.isArray(cloudData.iv)) {
+        throw new Error('Invalid encrypted data format');
+      }
+      
+      const decryptedData = await encryptionUtils.decrypt(
+        cloudData.encryptedData,
+        this.encryptionKey,
+        cloudData.iv
+      );
 
-    // Reconstruct full lastActivity
-    if (cloudData.lastActivity && decryptedData.activityData) {
-      decryptedData.lastActivity = {
-        userName: cloudData.lastActivity.userName,
-        ...decryptedData.activityData,
-      };
-      delete decryptedData.activityData;
+      console.log('✅ Successfully decrypted cloud data');
+
+      // Reconstruct full lastActivity
+      if (cloudData.lastActivity && decryptedData.activityData) {
+        decryptedData.lastActivity = {
+          userName: cloudData.lastActivity.userName,
+          ...decryptedData.activityData,
+        };
+        delete decryptedData.activityData;
+      }
+
+      return decryptedData;
+    } catch (error) {
+      console.error('❌ Failed to decrypt cloud data:', error);
+      
+      // Check for common decryption issues
+      if (error.name === 'OperationError') {
+        console.error('🔑 Encryption key mismatch - data may be from different password');
+      } else if (error.name === 'InvalidAccessError') {
+        console.error('🚫 Invalid encryption key format');
+      }
+      
+      throw error;
     }
-
-    return decryptedData;
   }
 
   async saveToCloud(data, currentUser, options = {}) {
@@ -230,7 +258,21 @@ class FirebaseSync {
     } catch (error) {
       console.error('❌ Failed to save to cloud:', error);
       
-      // Handle retry logic
+      // Handle network blocking errors
+      if (this.isNetworkBlockingError(error)) {
+        console.warn('🚫 Firebase requests are being blocked by browser extension/ad blocker');
+        this.notifyErrorListeners({
+          type: 'network_blocked',
+          operation: 'save',
+          error: 'Firebase requests blocked by browser extension or ad blocker',
+          userMessage: 'Please disable ad blockers for this app or allow Firebase requests',
+          timestamp: new Date().toISOString()
+        });
+        // Don't retry blocked requests
+        return;
+      }
+      
+      // Handle retry logic for other errors
       if (this.retryAttempts < this.maxRetryAttempts) {
         this.retryAttempts++;
         const delay = this.retryDelay * Math.pow(2, this.retryAttempts - 1); // Exponential backoff
@@ -269,6 +311,8 @@ class FirebaseSync {
 
       if (docSnap.exists()) {
         const cloudData = docSnap.data();
+        console.log('📄 Cloud document exists, attempting decryption...');
+        
         const decryptedData = await this.decryptFromCloud(cloudData);
         
         // Update active users
@@ -301,6 +345,27 @@ class FirebaseSync {
       return null;
     } catch (error) {
       console.error('❌ Failed to load from cloud:', error);
+      
+      // Handle specific decryption errors
+      if (error.name === 'OperationError' && error.message.includes('decrypt')) {
+        console.log('🔄 Attempting to clear corrupted cloud data...');
+        // Don't throw error, just return null to allow fresh start
+        return null;
+      }
+      
+      // Handle network blocking errors
+      if (this.isNetworkBlockingError(error)) {
+        console.warn('🚫 Firebase requests are being blocked by browser extension/ad blocker');
+        this.notifyErrorListeners({
+          type: 'network_blocked',
+          operation: 'load',
+          error: 'Firebase requests blocked by browser extension or ad blocker',
+          userMessage: 'Please disable ad blockers for this app or allow Firebase requests',
+          timestamp: new Date().toISOString()
+        });
+        return null; // Return null instead of throwing
+      }
+      
       this.notifyErrorListeners({
         type: 'sync_error',
         operation: 'load',
@@ -325,6 +390,7 @@ class FirebaseSync {
         const cloudTimestamp = cloudData.lastUpdated?.toMillis() || 0;
         if (cloudTimestamp > (this.lastSyncTimestamp || 0)) {
           try {
+            console.log('📡 Processing real-time update from Firebase...');
             const decryptedData = await this.decryptFromCloud(cloudData);
             if (decryptedData) {
               onDataChanged({
@@ -335,9 +401,20 @@ class FirebaseSync {
                   lastActivity: cloudData.lastActivity,
                 },
               });
+              this.lastSyncTimestamp = cloudTimestamp;
             }
           } catch (error) {
             console.error("❌ Failed to decrypt incoming data:", error);
+            
+            // Handle decryption errors gracefully
+            if (error.name === 'OperationError') {
+              console.log('🔐 Real-time sync encryption key mismatch - ignoring update');
+              this.notifyErrorListeners({
+                type: 'realtime_decrypt_error',
+                error: 'Encryption key mismatch in real-time sync',
+                timestamp: new Date().toISOString()
+              });
+            }
           }
         }
       }
@@ -503,6 +580,46 @@ class FirebaseSync {
         message: error.message,
         timestamp: new Date().toISOString()
       };
+    }
+  }
+  
+  isNetworkBlockingError(error) {
+    // Check for common network blocking patterns
+    return (
+      error.code === 'unavailable' ||
+      error.message?.includes('ERR_BLOCKED_BY_CLIENT') ||
+      error.message?.includes('net::ERR_BLOCKED_BY_CLIENT') ||
+      error.message?.includes('blocked') ||
+      error.message?.includes('Failed to fetch') ||
+      (error.name === 'TypeError' && error.message?.includes('fetch'))
+    );
+  }
+  
+  async clearCorruptedData() {
+    if (!this.budgetId) {
+      throw new Error('Budget ID not set');
+    }
+    
+    console.log('🧹 Clearing potentially corrupted cloud data...');
+    
+    try {
+      const docRef = doc(db, "budgets", this.budgetId);
+      await setDoc(docRef, {
+        cleared: true,
+        clearedAt: new Date().toISOString(),
+        version: 1
+      });
+      
+      console.log('✅ Successfully cleared corrupted cloud data');
+      return true;
+    } catch (error) {
+      console.error('❌ Failed to clear corrupted data:', error);
+      
+      if (this.isNetworkBlockingError(error)) {
+        console.warn('🚫 Cannot clear data - Firebase requests blocked');
+      }
+      
+      return false;
     }
   }
 }

@@ -95,8 +95,15 @@ const EnvelopeSystem = () => {
 
       const errorListener = (error) => {
         setIsSyncing(false);
-        setSyncError(error.error || 'Sync error occurred');
-        console.error('🔥 Sync error:', error);
+        
+        // Handle network blocking errors with user-friendly message
+        if (error.type === 'network_blocked') {
+          setSyncError('Firebase sync is blocked by your browser or ad blocker. Please allow Firebase requests for full functionality.');
+          console.warn('🚫 Firebase blocked:', error);
+        } else {
+          setSyncError(error.error || 'Sync error occurred');
+          console.error('🔥 Sync error:', error);
+        }
       };
 
       firebaseSync.addSyncListener(syncListener);
@@ -229,6 +236,21 @@ const EnvelopeSystem = () => {
       }
     } catch (error) {
       console.error("❌ Failed to load from cloud:", error);
+      
+      // Handle decryption errors by allowing fresh start
+      if (error.name === 'OperationError') {
+        console.log('🔄 Decryption failed - starting fresh');
+        setSyncError('Encryption key mismatch. Starting with fresh data.');
+        
+        // Optionally clear corrupted cloud data
+        try {
+          await firebaseSync.clearCorruptedData();
+        } catch (clearError) {
+          console.error('❌ Failed to clear corrupted data:', clearError);
+        }
+      } else {
+        setSyncError(error.message);
+      }
     } finally {
       setIsSyncing(false);
     }
