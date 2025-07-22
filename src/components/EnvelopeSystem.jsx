@@ -11,6 +11,7 @@ import EnvelopeGrid from "./EnvelopeGrid";
 import BillManager from "./BillManager";
 import SavingsGoals from "./SavingsGoals";
 import Dashboard from "./Dashboard";
+import TransactionLedger from "./TransactionLedger";
 import {
   DollarSign,
   Wallet,
@@ -19,6 +20,7 @@ import {
   Target,
   CreditCard,
   Sparkles,
+  BookOpen,
 } from "lucide-react";
 
 const EnvelopeSystem = () => {
@@ -43,6 +45,9 @@ const EnvelopeSystem = () => {
   // Dashboard and reconciliation state
   const [actualBalance, setActualBalance] = useState(0);
   const [transactions, setTransactions] = useState([]);
+  
+  // Transaction Ledger state
+  const [allTransactions, setAllTransactions] = useState([]);
 
   // Firebase sync state
   const [firebaseSync] = useState(new FirebaseSync());
@@ -137,6 +142,7 @@ const EnvelopeSystem = () => {
         paycheckHistory,
         actualBalance,
         transactions,
+        allTransactions,
         lastActivity,
       };
 
@@ -148,7 +154,7 @@ const EnvelopeSystem = () => {
       return () => clearTimeout(timeoutId);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [envelopes, bills, savingsGoals, unassignedCash, paycheckHistory, actualBalance, transactions, lastActivity]);
+  }, [envelopes, bills, savingsGoals, unassignedCash, paycheckHistory, actualBalance, transactions, allTransactions, lastActivity]);
 
   const setupRealtimeSync = () => {
     firebaseSync.setupRealtimeSync(async (cloudUpdate) => {
@@ -171,6 +177,7 @@ const EnvelopeSystem = () => {
         setPaycheckHistory(data.paycheckHistory || []);
         setActualBalance(data.actualBalance || 0);
         setTransactions(data.transactions || []);
+        setAllTransactions(data.allTransactions || []);
         setLastActivity(data.lastActivity || null);
 
         // Update enhanced sync state
@@ -220,6 +227,7 @@ const EnvelopeSystem = () => {
         setPaycheckHistory(data.paycheckHistory || []);
         setActualBalance(data.actualBalance || 0);
         setTransactions(data.transactions || []);
+        setAllTransactions(data.allTransactions || []);
         setLastActivity(data.lastActivity || null);
 
         // Update enhanced sync state
@@ -509,6 +517,7 @@ const EnvelopeSystem = () => {
   const reconcileTransaction = (transaction) => {
     // Add transaction to history
     setTransactions((prev) => [transaction, ...prev]);
+    setAllTransactions((prev) => [transaction, ...prev]);
 
     // Update envelope or savings goal based on transaction
     if (transaction.envelopeId) {
@@ -548,6 +557,119 @@ const EnvelopeSystem = () => {
         );
       }
     }
+  };
+  
+  // Transaction Ledger functions
+  const addTransaction = (transaction) => {
+    setAllTransactions((prev) => [transaction, ...prev]);
+    
+    // Apply transaction to envelope if assigned
+    if (transaction.envelopeId) {
+      if (transaction.envelopeId === "unassigned") {
+        setUnassignedCash((prev) => prev + transaction.amount);
+      } else {
+        setEnvelopes((prev) =>
+          prev.map((envelope) =>
+            envelope.id === transaction.envelopeId
+              ? {
+                  ...envelope,
+                  currentBalance: Math.max(
+                    0,
+                    envelope.currentBalance + transaction.amount
+                  ),
+                }
+              : envelope
+          )
+        );
+      }
+    }
+  };
+  
+  const updateTransaction = (transactionId, updatedTransaction) => {
+    const oldTransaction = allTransactions.find(t => t.id === transactionId);
+    
+    setAllTransactions((prev) =>
+      prev.map((transaction) =>
+        transaction.id === transactionId
+          ? { ...transaction, ...updatedTransaction }
+          : transaction
+      )
+    );
+    
+    // Reverse old transaction effects
+    if (oldTransaction && oldTransaction.envelopeId) {
+      if (oldTransaction.envelopeId === "unassigned") {
+        setUnassignedCash((prev) => prev - oldTransaction.amount);
+      } else {
+        setEnvelopes((prev) =>
+          prev.map((envelope) =>
+            envelope.id === oldTransaction.envelopeId
+              ? {
+                  ...envelope,
+                  currentBalance: Math.max(
+                    0,
+                    envelope.currentBalance - oldTransaction.amount
+                  ),
+                }
+              : envelope
+          )
+        );
+      }
+    }
+    
+    // Apply new transaction effects
+    if (updatedTransaction.envelopeId) {
+      if (updatedTransaction.envelopeId === "unassigned") {
+        setUnassignedCash((prev) => prev + updatedTransaction.amount);
+      } else {
+        setEnvelopes((prev) =>
+          prev.map((envelope) =>
+            envelope.id === updatedTransaction.envelopeId
+              ? {
+                  ...envelope,
+                  currentBalance: Math.max(
+                    0,
+                    envelope.currentBalance + updatedTransaction.amount
+                  ),
+                }
+              : envelope
+          )
+        );
+      }
+    }
+  };
+  
+  const deleteTransaction = (transactionId) => {
+    const transaction = allTransactions.find(t => t.id === transactionId);
+    
+    setAllTransactions((prev) => prev.filter((t) => t.id !== transactionId));
+    
+    // Reverse transaction effects
+    if (transaction && transaction.envelopeId) {
+      if (transaction.envelopeId === "unassigned") {
+        setUnassignedCash((prev) => prev - transaction.amount);
+      } else {
+        setEnvelopes((prev) =>
+          prev.map((envelope) =>
+            envelope.id === transaction.envelopeId
+              ? {
+                  ...envelope,
+                  currentBalance: Math.max(
+                    0,
+                    envelope.currentBalance - transaction.amount
+                  ),
+                }
+              : envelope
+          )
+        );
+      }
+    }
+  };
+  
+  const bulkImportTransactions = (transactions) => {
+    transactions.forEach(transaction => {
+      addTransaction(transaction);
+    });
   };
 
   const createActivitySignature = (user = currentUser) => ({
@@ -649,6 +771,7 @@ const EnvelopeSystem = () => {
       paycheckHistory,
       actualBalance,
       transactions,
+      allTransactions,
       lastActivity,
       exportedBy: currentUser?.userName || 'Anonymous',
       exportedAt: new Date().toISOString(),
@@ -681,6 +804,7 @@ const EnvelopeSystem = () => {
             setPaycheckHistory(importedData.paycheckHistory || []);
             setActualBalance(importedData.actualBalance || 0);
             setTransactions(importedData.transactions || []);
+            setAllTransactions(importedData.allTransactions || []);
             alert("Data imported successfully!");
           } else {
             alert("Invalid file format - missing required data structure");
@@ -713,6 +837,7 @@ const EnvelopeSystem = () => {
       setPaycheckHistory([]);
       setActualBalance(0);
       setTransactions([]);
+      setAllTransactions([]);
       setLastActivity(null);
       firebaseSync.stopRealtimeSync();
     }
@@ -817,6 +942,17 @@ const EnvelopeSystem = () => {
             >
               <Calendar className="h-5 w-5 inline mr-3" />
               Manage Bills
+            </button>
+            <button
+              onClick={() => setActiveView("transactions")}
+              className={`px-8 py-5 text-sm font-semibold border-b-2 transition-all ${
+                activeView === "transactions"
+                  ? "border-purple-500 text-purple-600 bg-purple-50/50"
+                  : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30"
+              }`}
+            >
+              <BookOpen className="h-5 w-5 inline mr-3" />
+              Transactions
             </button>
           </nav>
         </div>
@@ -950,6 +1086,18 @@ const EnvelopeSystem = () => {
             onAddBill={addBill}
             onUpdateBill={updateBill}
             onDeleteBill={deleteBill}
+          />
+        )}
+        
+        {activeView === "transactions" && (
+          <TransactionLedger
+            transactions={allTransactions}
+            envelopes={envelopes}
+            onAddTransaction={addTransaction}
+            onUpdateTransaction={updateTransaction}
+            onDeleteTransaction={deleteTransaction}
+            onBulkImport={bulkImportTransactions}
+            currentUser={currentUser}
           />
         )}
 
