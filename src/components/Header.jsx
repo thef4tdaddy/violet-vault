@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Shield, Upload, Download, LogOut, Sparkles, AlertTriangle, RefreshCw } from "lucide-react";
+import { Upload, Download, LogOut, AlertTriangle, RefreshCw } from "lucide-react";
 import UserIndicator from "./UserIndicator";
+import logoWithName from "../assets/Logo-With-Name.png";
 
 const Header = ({
   onExport,
@@ -27,16 +28,13 @@ const Header = ({
     <div className="glassmorphism rounded-3xl p-6 mb-6">
       <div className="flex items-center justify-between min-h-[80px]">
         <div>
-          <h1 className="text-4xl font-bold text-gray-900 flex items-center">
-            <div className="relative mr-4">
-              <div className="absolute inset-0 bg-purple-500 rounded-2xl blur-lg opacity-30"></div>
-              <div className="relative bg-purple-500 p-3 rounded-2xl">
-                <Shield className="h-8 w-8 text-white" />
-              </div>
-            </div>
-            Envelope Budget
-            <Sparkles className="h-6 w-6 text-purple-500 ml-2" />
-          </h1>
+          <div className="flex items-center">
+            <img 
+              src={logoWithName} 
+              alt="VioletVault Logo" 
+              className="h-16 w-auto mr-4"
+            />
+          </div>
           <p className="text-gray-600 mt-2 text-lg">
             Encrypted family financial management
           </p>
