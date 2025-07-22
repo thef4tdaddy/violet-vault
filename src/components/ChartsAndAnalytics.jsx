@@ -308,7 +308,7 @@ const ChartsAnalytics = ({
     URL.revokeObjectURL(url);
   }, [dateRange, metrics, monthlyTrends, envelopeSpending, categoryBreakdown, currentUser?.userName]);
 
-  const MetricCard = useMemo(() => ({
+  const MetricCard = ({
     title,
     value,
     subtitle,
@@ -345,7 +345,7 @@ const ChartsAnalytics = ({
         </div>
       )}
     </div>
-  ), []);
+  );
 
   const CustomTooltip = useCallback(({ active, payload, label }) => {
     if (active && payload && payload.length) {

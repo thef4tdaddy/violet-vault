@@ -315,8 +315,7 @@ const EnvelopeSystem = () => {
     setSyncConflicts(null);
   };
 
-  // Memoized calculations for better performance
-  const biweeklyCalculations = useMemo(() => {
+  const calculateBiweeklyNeeds = () => {
     const monthlyTotal = bills.reduce(
       (sum, bill) => sum + (bill.monthlyAmount || 0),
       0
@@ -326,41 +325,36 @@ const EnvelopeSystem = () => {
       0
     );
 
-    return { monthlyTotal, biweeklyTotal };
-  }, [bills]);
-
-  const calculateBiweeklyNeeds = useCallback(() => {
-    const { monthlyTotal, biweeklyTotal } = biweeklyCalculations;
-    
     setBiweeklyAllocation(biweeklyTotal);
     setTotalBudgetNeeded(monthlyTotal);
 
-    // Update envelopes with biweekly allocations using functional update to avoid dependency
-    setEnvelopes(currentEnvelopes => {
-      return bills.map((bill) => {
-        const existingEnvelope = currentEnvelopes.find((env) => env.billId === bill.id);
-        return {
-          id: existingEnvelope?.id || Date.now() + Math.random(),
-          billId: bill.id,
-          name: bill.name,
-          amount: bill.amount,
-          frequency: bill.frequency,
-          monthlyAmount: bill.monthlyAmount || 0,
-          biweeklyAllocation: bill.biweeklyAmount || 0,
-          currentBalance: existingEnvelope?.currentBalance || 0,
-          dueDate: bill.dueDate,
-          nextDueDate: bill.nextDueDate,
-          category: bill.category || "Bills",
-          color: bill.color || "#a855f7",
-          spendingHistory: existingEnvelope?.spendingHistory || [],
-        };
-      });
+    // Update envelopes with biweekly allocations
+    const updatedEnvelopes = bills.map((bill) => {
+      const existingEnvelope = envelopes.find((env) => env.billId === bill.id);
+      return {
+        id: existingEnvelope?.id || Date.now() + Math.random(),
+        billId: bill.id,
+        name: bill.name,
+        amount: bill.amount,
+        frequency: bill.frequency,
+        monthlyAmount: bill.monthlyAmount || 0,
+        biweeklyAllocation: bill.biweeklyAmount || 0,
+        currentBalance: existingEnvelope?.currentBalance || 0,
+        dueDate: bill.dueDate,
+        nextDueDate: bill.nextDueDate,
+        category: bill.category || "Bills",
+        color: bill.color || "#a855f7",
+        spendingHistory: existingEnvelope?.spendingHistory || [],
+      };
     });
-  }, [biweeklyCalculations, bills]);
+
+    setEnvelopes(updatedEnvelopes);
+  };
 
   useEffect(() => {
     calculateBiweeklyNeeds();
-  }, [calculateBiweeklyNeeds]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bills]);
 
   const processPaycheck = ({ amount, payerName, mode, date }) => {
     const paycheck = {
@@ -1178,20 +1172,15 @@ const EnvelopeSystem = () => {
     return <UserSetup onSetupComplete={handleSetup} />;
   }
 
-  // Memoized totals calculations
-  const totals = useMemo(() => {
-    const totalEnvelopeBalance = envelopes.reduce(
-      (sum, env) => sum + env.currentBalance,
-      0
-    );
-    const totalSavingsBalance = savingsGoals.reduce(
-      (sum, goal) => sum + goal.currentAmount,
-      0
-    );
-    const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
-    
-    return { totalEnvelopeBalance, totalSavingsBalance, totalCash };
-  }, [envelopes, savingsGoals, unassignedCash]);
+  const totalEnvelopeBalance = envelopes.reduce(
+    (sum, env) => sum + env.currentBalance,
+    0
+  );
+  const totalSavingsBalance = savingsGoals.reduce(
+    (sum, goal) => sum + goal.currentAmount,
+    0
+  );
+  const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 overflow-x-hidden">
@@ -1320,7 +1309,7 @@ const EnvelopeSystem = () => {
                   Total Cash
                 </p>
                 <p className="text-2xl font-bold text-gray-900">
-                  ${totals.totalCash.toFixed(2)}
+                  ${totalCash.toFixed(2)}
                 </p>
               </div>
             </div>
@@ -1358,7 +1347,7 @@ const EnvelopeSystem = () => {
                   Savings Total
                 </p>
                 <p className="text-2xl font-bold text-cyan-600">
-                  ${totals.totalSavingsBalance.toFixed(2)}
+                  ${totalSavingsBalance.toFixed(2)}
                 </p>
               </div>
             </div>
