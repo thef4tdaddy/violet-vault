@@ -48,7 +48,7 @@ const UserSetup = ({ onSetupComplete }) => {
               <img 
                 src={logoOnly} 
                 alt="VioletVault Logo" 
-                className="w-16 h-16 object-contain"
+                className="w-16 h-16"
               />
             </div>
           </div>

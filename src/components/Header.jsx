@@ -32,7 +32,7 @@ const Header = ({
             <img 
               src={logoWithName} 
               alt="VioletVault Logo" 
-              className="h-10 w-auto mr-4 max-w-[200px]"
+              className="h-8 w-auto mr-4 max-w-[150px]"
             />
           </div>
           <p className="text-gray-600 mt-2 text-lg">
@@ -40,13 +40,13 @@ const Header = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-6 pr-4">
+        <div className="flex items-center gap-6 px-6">
           <UserIndicator
             currentUser={currentUser}
             onUserChange={onUserChange}
           />
 
-          <div className="flex gap-3 justify-center">
+          <div className="flex gap-3 items-center justify-center">
             <input
               type="file"
               accept=".json"
