@@ -335,33 +335,32 @@ const EnvelopeSystem = () => {
     setBiweeklyAllocation(biweeklyTotal);
     setTotalBudgetNeeded(monthlyTotal);
 
-    // Update envelopes with biweekly allocations
-    const updatedEnvelopes = bills.map((bill) => {
-      const existingEnvelope = envelopes.find((env) => env.billId === bill.id);
-      return {
-        id: existingEnvelope?.id || Date.now() + Math.random(),
-        billId: bill.id,
-        name: bill.name,
-        amount: bill.amount,
-        frequency: bill.frequency,
-        monthlyAmount: bill.monthlyAmount || 0,
-        biweeklyAllocation: bill.biweeklyAmount || 0,
-        currentBalance: existingEnvelope?.currentBalance || 0,
-        dueDate: bill.dueDate,
-        nextDueDate: bill.nextDueDate,
-        category: bill.category || "Bills",
-        color: bill.color || "#a855f7",
-        spendingHistory: existingEnvelope?.spendingHistory || [],
-      };
+    // Update envelopes with biweekly allocations using functional update to avoid dependency
+    setEnvelopes(currentEnvelopes => {
+      return bills.map((bill) => {
+        const existingEnvelope = currentEnvelopes.find((env) => env.billId === bill.id);
+        return {
+          id: existingEnvelope?.id || Date.now() + Math.random(),
+          billId: bill.id,
+          name: bill.name,
+          amount: bill.amount,
+          frequency: bill.frequency,
+          monthlyAmount: bill.monthlyAmount || 0,
+          biweeklyAllocation: bill.biweeklyAmount || 0,
+          currentBalance: existingEnvelope?.currentBalance || 0,
+          dueDate: bill.dueDate,
+          nextDueDate: bill.nextDueDate,
+          category: bill.category || "Bills",
+          color: bill.color || "#a855f7",
+          spendingHistory: existingEnvelope?.spendingHistory || [],
+        };
+      });
     });
-
-    setEnvelopes(updatedEnvelopes);
-  }, [biweeklyCalculations, bills, envelopes]);
+  }, [biweeklyCalculations, bills]);
 
   useEffect(() => {
     calculateBiweeklyNeeds();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bills]);
+  }, [calculateBiweeklyNeeds]);
 
   const processPaycheck = ({ amount, payerName, mode, date }) => {
     const paycheck = {

@@ -13,6 +13,15 @@ class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
+    
+    // Additional debugging info
+    if (process.env.NODE_ENV === 'development') {
+      console.group('🔍 Error Boundary Debug Info');
+      console.log('Error:', error);
+      console.log('Error Info:', errorInfo);
+      console.log('Component Stack:', errorInfo.componentStack);
+      console.groupEnd();
+    }
   }
 
   handleReset = () => {
