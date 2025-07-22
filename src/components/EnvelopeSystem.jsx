@@ -4,8 +4,7 @@ import { encryptionUtils } from "../utils/encryption";
 import FirebaseSync from "../utils/firebaseSync";
 import UserSetup from "./UserSetup";
 import Header from "./Header";
-import ActivityBanner from "./ActivityBanner";
-import SyncIndicator from "./SyncIndicator";
+import TeamActivitySync from "./TeamActivitySync";
 
 // Lazy load heavy components for better performance
 const PaycheckProcessor = lazy(() => import("./PaycheckProcessor"));
@@ -1194,21 +1193,15 @@ const EnvelopeSystem = () => {
           onResetEncryption={resetEncryptionAndStartFresh}
         />
 
-        {/* Activity Banner */}
-        <ActivityBanner 
+        {/* Team Activity & Sync */}
+        <TeamActivitySync
           activeUsers={activeUsers}
           recentActivity={recentActivity}
           currentUser={currentUser}
-        />
-
-        {/* Sync Indicator */}
-        <SyncIndicator
           isOnline={isOnline}
           isSyncing={isSyncing}
           lastSyncTime={lastSyncTime}
-          activeUsers={activeUsers}
           syncError={syncError}
-          currentUser={currentUser}
         />
 
         {/* Navigation Tabs */}

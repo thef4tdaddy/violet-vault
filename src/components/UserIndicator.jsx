@@ -22,7 +22,7 @@ const UserIndicator = memo(({ currentUser, onUserChange }) => {
 
       <button
         onClick={onUserChange}
-        className="px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white text-sm font-medium rounded-xl shadow-lg hover:shadow-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 border border-purple-400/30"
+        className="glassmorphism px-6 py-3 text-purple-700 text-sm font-semibold rounded-2xl shadow-lg hover:shadow-xl border border-purple-200/50 hover:border-purple-300/70 transition-all duration-200 transform hover:scale-105 backdrop-blur-sm"
       >
         Switch User
       </button>

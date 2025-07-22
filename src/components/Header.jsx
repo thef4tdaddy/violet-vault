@@ -30,13 +30,13 @@ const Header = memo(({
   }, [showResetMenu]);
   return (
     <div className="glassmorphism rounded-3xl p-6 mb-6">
-      <div className="flex items-center justify-between min-h-[100px]">
+      <div className="flex items-center justify-between min-h-[260px]">
         <div>
           <div className="flex items-center">
             <img 
               src={logoWithName} 
               alt="VioletVault Logo" 
-              style={{ height: '80px', width: 'auto', marginRight: '1rem', maxWidth: '300px', objectFit: 'contain' }}
+              style={{ height: '240px', width: 'auto', marginRight: '1rem', maxWidth: '600px', objectFit: 'contain' }}
             />
           </div>
           <p className="text-gray-600 mt-2 text-lg">
