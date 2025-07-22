@@ -1,18 +1,21 @@
 // src/components/EnvelopeSystem.jsx - Complete System with Modern Purple Design
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense, lazy, useMemo, useCallback } from "react";
 import { encryptionUtils } from "../utils/encryption";
 import FirebaseSync from "../utils/firebaseSync";
 import UserSetup from "./UserSetup";
 import Header from "./Header";
 import ActivityBanner from "./ActivityBanner";
 import SyncIndicator from "./SyncIndicator";
-import PaycheckProcessor from "./PaycheckProcessor";
-import EnvelopeGrid from "./EnvelopeGrid";
-import BillManager from "./BillManager";
-import SavingsGoals from "./SavingsGoals";
-import Dashboard from "./Dashboard";
-import TransactionLedger from "./TransactionLedger";
-import ChartsAndAnalytics from "./ChartsAndAnalytics";
+
+// Lazy load heavy components for better performance
+const PaycheckProcessor = lazy(() => import("./PaycheckProcessor"));
+const EnvelopeGrid = lazy(() => import("./EnvelopeGrid"));
+const BillManager = lazy(() => import("./BillManager"));
+const SavingsGoals = lazy(() => import("./SavingsGoals"));
+const Dashboard = lazy(() => import("./Dashboard"));
+const TransactionLedger = lazy(() => import("./TransactionLedger"));
+const ChartsAndAnalytics = lazy(() => import("./ChartsAndAnalytics"));
+import LoadingSpinner from "./LoadingSpinner";
 import {
   DollarSign,
   Wallet,
@@ -312,7 +315,8 @@ const EnvelopeSystem = () => {
     setSyncConflicts(null);
   };
 
-  const calculateBiweeklyNeeds = () => {
+  // Memoized calculations for better performance
+  const biweeklyCalculations = useMemo(() => {
     const monthlyTotal = bills.reduce(
       (sum, bill) => sum + (bill.monthlyAmount || 0),
       0
@@ -322,6 +326,12 @@ const EnvelopeSystem = () => {
       0
     );
 
+    return { monthlyTotal, biweeklyTotal };
+  }, [bills]);
+
+  const calculateBiweeklyNeeds = useCallback(() => {
+    const { monthlyTotal, biweeklyTotal } = biweeklyCalculations;
+    
     setBiweeklyAllocation(biweeklyTotal);
     setTotalBudgetNeeded(monthlyTotal);
 
@@ -346,7 +356,7 @@ const EnvelopeSystem = () => {
     });
 
     setEnvelopes(updatedEnvelopes);
-  };
+  }, [biweeklyCalculations, bills, envelopes]);
 
   useEffect(() => {
     calculateBiweeklyNeeds();
@@ -1169,15 +1179,20 @@ const EnvelopeSystem = () => {
     return <UserSetup onSetupComplete={handleSetup} />;
   }
 
-  const totalEnvelopeBalance = envelopes.reduce(
-    (sum, env) => sum + env.currentBalance,
-    0
-  );
-  const totalSavingsBalance = savingsGoals.reduce(
-    (sum, goal) => sum + goal.currentAmount,
-    0
-  );
-  const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
+  // Memoized totals calculations
+  const totals = useMemo(() => {
+    const totalEnvelopeBalance = envelopes.reduce(
+      (sum, env) => sum + env.currentBalance,
+      0
+    );
+    const totalSavingsBalance = savingsGoals.reduce(
+      (sum, goal) => sum + goal.currentAmount,
+      0
+    );
+    const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
+    
+    return { totalEnvelopeBalance, totalSavingsBalance, totalCash };
+  }, [envelopes, savingsGoals, unassignedCash]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 overflow-x-hidden">
@@ -1306,7 +1321,7 @@ const EnvelopeSystem = () => {
                   Total Cash
                 </p>
                 <p className="text-2xl font-bold text-gray-900">
-                  ${totalCash.toFixed(2)}
+                  ${totals.totalCash.toFixed(2)}
                 </p>
               </div>
             </div>
@@ -1344,7 +1359,7 @@ const EnvelopeSystem = () => {
                   Savings Total
                 </p>
                 <p className="text-2xl font-bold text-cyan-600">
-                  ${totalSavingsBalance.toFixed(2)}
+                  ${totals.totalSavingsBalance.toFixed(2)}
                 </p>
               </div>
             </div>
@@ -1371,80 +1386,94 @@ const EnvelopeSystem = () => {
         </div>
 
         {/* Main Content */}
-        {activeView === "dashboard" && (
-          <Dashboard
-            envelopes={envelopes}
-            savingsGoals={savingsGoals}
-            unassignedCash={unassignedCash}
-            actualBalance={actualBalance}
-            onUpdateActualBalance={updateActualBalance}
-            onReconcileTransaction={reconcileTransaction}
-            transactions={transactions}
-          />
-        )}
+        <Suspense fallback={<LoadingSpinner message="Loading dashboard..." />}>
+          {activeView === "dashboard" && (
+            <Dashboard
+              envelopes={envelopes}
+              savingsGoals={savingsGoals}
+              unassignedCash={unassignedCash}
+              actualBalance={actualBalance}
+              onUpdateActualBalance={updateActualBalance}
+              onReconcileTransaction={reconcileTransaction}
+              transactions={transactions}
+            />
+          )}
+        </Suspense>
 
-        {activeView === "envelopes" && (
-          <EnvelopeGrid
-            envelopes={envelopes}
-            unassignedCash={unassignedCash}
-            onSpend={spendFromEnvelope}
-            onTransfer={transferBetweenEnvelopes}
-            onUpdateUnassigned={setUnassignedCash}
-          />
-        )}
+        <Suspense fallback={<LoadingSpinner message="Loading envelopes..." />}>
+          {activeView === "envelopes" && (
+            <EnvelopeGrid
+              envelopes={envelopes}
+              unassignedCash={unassignedCash}
+              onSpend={spendFromEnvelope}
+              onTransfer={transferBetweenEnvelopes}
+              onUpdateUnassigned={setUnassignedCash}
+            />
+          )}
+        </Suspense>
 
-        {activeView === "savings" && (
-          <SavingsGoals
-            savingsGoals={savingsGoals}
-            unassignedCash={unassignedCash}
-            onAddGoal={addSavingsGoal}
-            onUpdateGoal={updateSavingsGoal}
-            onDeleteGoal={deleteSavingsGoal}
-            onDistributeToGoals={distributeToGoals}
-          />
-        )}
+        <Suspense fallback={<LoadingSpinner message="Loading savings goals..." />}>
+          {activeView === "savings" && (
+            <SavingsGoals
+              savingsGoals={savingsGoals}
+              unassignedCash={unassignedCash}
+              onAddGoal={addSavingsGoal}
+              onUpdateGoal={updateSavingsGoal}
+              onDeleteGoal={deleteSavingsGoal}
+              onDistributeToGoals={distributeToGoals}
+            />
+          )}
+        </Suspense>
 
-        {activeView === "paycheck" && (
-          <PaycheckProcessor
-            biweeklyAllocation={biweeklyAllocation}
-            envelopes={envelopes}
-            paycheckHistory={paycheckHistory}
-            onProcessPaycheck={processPaycheck}
-            currentUser={currentUser}
-          />
-        )}
+        <Suspense fallback={<LoadingSpinner message="Loading paycheck processor..." />}>
+          {activeView === "paycheck" && (
+            <PaycheckProcessor
+              biweeklyAllocation={biweeklyAllocation}
+              envelopes={envelopes}
+              paycheckHistory={paycheckHistory}
+              onProcessPaycheck={processPaycheck}
+              currentUser={currentUser}
+            />
+          )}
+        </Suspense>
 
-        {activeView === "bills" && (
-          <BillManager
-            bills={bills}
-            onAddBill={addBill}
-            onUpdateBill={updateBill}
-            onDeleteBill={deleteBill}
-          />
-        )}
+        <Suspense fallback={<LoadingSpinner message="Loading bill manager..." />}>
+          {activeView === "bills" && (
+            <BillManager
+              bills={bills}
+              onAddBill={addBill}
+              onUpdateBill={updateBill}
+              onDeleteBill={deleteBill}
+            />
+          )}
+        </Suspense>
         
-        {activeView === "transactions" && (
-          <TransactionLedger
-            transactions={allTransactions}
-            envelopes={envelopes}
-            onAddTransaction={addTransaction}
-            onUpdateTransaction={updateTransaction}
-            onDeleteTransaction={deleteTransaction}
-            onBulkImport={bulkImportTransactions}
-            currentUser={currentUser}
-          />
-        )}
+        <Suspense fallback={<LoadingSpinner message="Loading transactions..." />}>
+          {activeView === "transactions" && (
+            <TransactionLedger
+              transactions={allTransactions}
+              envelopes={envelopes}
+              onAddTransaction={addTransaction}
+              onUpdateTransaction={updateTransaction}
+              onDeleteTransaction={deleteTransaction}
+              onBulkImport={bulkImportTransactions}
+              currentUser={currentUser}
+            />
+          )}
+        </Suspense>
 
-        {activeView === "analytics" && (
-          <ChartsAndAnalytics
-            transactions={allTransactions}
-            envelopes={envelopes}
-            bills={bills}
-            paycheckHistory={paycheckHistory}
-            savingsGoals={savingsGoals}
-            currentUser={currentUser}
-          />
-        )}
+        <Suspense fallback={<LoadingSpinner message="Loading analytics..." />}>
+          {activeView === "analytics" && (
+            <ChartsAndAnalytics
+              transactions={allTransactions}
+              envelopes={envelopes}
+              bills={bills}
+              paycheckHistory={paycheckHistory}
+              savingsGoals={savingsGoals}
+              currentUser={currentUser}
+            />
+          )}
+        </Suspense>
 
         {/* Loading/Syncing Overlay */}
         {isSyncing && (

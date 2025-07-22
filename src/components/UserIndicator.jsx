@@ -1,7 +1,7 @@
-import React from "react";
+import React, { memo } from "react";
 import { User, ChevronDown } from "lucide-react";
 
-const UserIndicator = ({ currentUser, onUserChange }) => {
+const UserIndicator = memo(({ currentUser, onUserChange }) => {
   if (!currentUser) {
     return null;
   }
@@ -28,6 +28,6 @@ const UserIndicator = ({ currentUser, onUserChange }) => {
       </button>
     </div>
   );
-};
+});
 
 export default UserIndicator;

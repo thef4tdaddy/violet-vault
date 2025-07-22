@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, memo, useCallback } from "react";
 import { Upload, Download, LogOut, AlertTriangle, RefreshCw } from "lucide-react";
 import UserIndicator from "./UserIndicator";
 import logoWithName from "../assets/Logo-With-Name.png";
 
-const Header = ({
+const Header = memo(({
   onExport,
   onImport,
   onLogout,
@@ -12,6 +12,10 @@ const Header = ({
   onUserChange,
 }) => {
   const [showResetMenu, setShowResetMenu] = useState(false);
+  
+  const handleToggleResetMenu = useCallback(() => {
+    setShowResetMenu(prev => !prev);
+  }, []);
   
   // Close menu when clicking outside
   React.useEffect(() => {
@@ -72,7 +76,7 @@ const Header = ({
 
             <div className="relative reset-menu-container">
               <button
-                onClick={() => setShowResetMenu(!showResetMenu)}
+                onClick={handleToggleResetMenu}
                 className="btn text-amber-600 bg-amber-50 border border-amber-200 hover:bg-amber-100 flex items-center rounded-xl"
               >
                 <RefreshCw className="h-4 w-4 mr-2" />
@@ -124,6 +128,6 @@ const Header = ({
       </div>
     </div>
   );
-};
+});
 
 export default Header;
