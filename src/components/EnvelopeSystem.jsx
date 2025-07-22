@@ -1104,6 +1104,14 @@ const EnvelopeSystem = () => {
         setAllTransactions([]);
         setLastActivity(null);
         setSyncError(null);
+        
+        // Clear sync-related state
+        setActiveUsers([]);
+        setRecentActivity([]);
+        setSyncConflicts(null);
+        setIsSyncing(false);
+        setLastSyncTime(null);
+        
         firebaseSync.stopRealtimeSync();
         
         alert('All data has been cleared. You can now set up a new budget with a fresh password.');

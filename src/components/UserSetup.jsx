@@ -44,11 +44,11 @@ const UserSetup = ({ onSetupComplete }) => {
       <div className="glassmorphism rounded-3xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16">
+            <div className="w-20 h-20">
               <img 
                 src={logoOnly} 
                 alt="VioletVault Logo" 
-                className="w-16 h-16"
+                className="w-20 h-20 object-contain"
               />
             </div>
           </div>

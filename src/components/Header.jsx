@@ -32,7 +32,7 @@ const Header = ({
             <img 
               src={logoWithName} 
               alt="VioletVault Logo" 
-              className="h-8 w-auto mr-4 max-w-[150px]"
+              className="h-12 w-auto mr-4 max-w-[200px] object-contain"
             />
           </div>
           <p className="text-gray-600 mt-2 text-lg">
@@ -40,7 +40,7 @@ const Header = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-6 px-6">
+        <div className="flex items-center gap-6">
           <UserIndicator
             currentUser={currentUser}
             onUserChange={onUserChange}
@@ -80,7 +80,7 @@ const Header = ({
               </button>
               
               {showResetMenu && (
-                <div className="absolute right-0 top-full mt-2 w-64 glassmorphism rounded-xl border border-white/20 shadow-2xl z-50">
+                <div className="absolute right-0 top-full mt-2 w-64 glassmorphism rounded-xl border border-white/20 shadow-2xl z-[60]">
                   <div className="p-4">
                     <div className="flex items-start space-x-2 mb-3">
                       <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
