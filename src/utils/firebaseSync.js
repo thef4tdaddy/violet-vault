@@ -149,6 +149,11 @@ class FirebaseSync {
   }
 
   async decryptFromCloud(cloudData) {
+    if (!cloudData || typeof cloudData !== 'object') {
+      console.log('⚠️ Invalid cloud data format');
+      return null;
+    }
+    
     if (!cloudData.encryptedData || !cloudData.iv) {
       console.log('⚠️ No encrypted data found in cloud document');
       return null;
@@ -164,6 +169,12 @@ class FirebaseSync {
       
       // Check data format
       if (!Array.isArray(cloudData.encryptedData) || !Array.isArray(cloudData.iv)) {
+        console.error('❌ Invalid encrypted data format:', {
+          encryptedDataType: typeof cloudData.encryptedData,
+          ivType: typeof cloudData.iv,
+          encryptedDataLength: cloudData.encryptedData?.length,
+          ivLength: cloudData.iv?.length
+        });
         throw new Error('Invalid encrypted data format');
       }
       
@@ -174,6 +185,11 @@ class FirebaseSync {
       );
 
       console.log('✅ Successfully decrypted cloud data');
+
+      // Validate decrypted data structure
+      if (!decryptedData || typeof decryptedData !== 'object') {
+        throw new Error('Decrypted data is invalid');
+      }
 
       // Reconstruct full lastActivity
       if (cloudData.lastActivity && decryptedData.activityData) {
@@ -191,8 +207,16 @@ class FirebaseSync {
       // Check for common decryption issues
       if (error.name === 'OperationError') {
         console.error('🔑 Encryption key mismatch - data may be from different password');
+        // Clear the corrupted data automatically
+        setTimeout(() => {
+          this.clearCorruptedData().catch(clearError => {
+            console.error('❌ Failed to auto-clear corrupted data:', clearError);
+          });
+        }, 1000);
       } else if (error.name === 'InvalidAccessError') {
         console.error('🚫 Invalid encryption key format');
+      } else if (error.message?.includes('JSON')) {
+        console.error('📄 JSON parsing error in decrypted data');
       }
       
       throw error;
@@ -391,6 +415,13 @@ class FirebaseSync {
         if (cloudTimestamp > (this.lastSyncTimestamp || 0)) {
           try {
             console.log('📡 Processing real-time update from Firebase...');
+            
+            // Check if this is a cleared data marker
+            if (cloudData.cleared) {
+              console.log('🧹 Cloud data was cleared - ignoring cleared marker');
+              return;
+            }
+            
             const decryptedData = await this.decryptFromCloud(cloudData);
             if (decryptedData) {
               onDataChanged({
@@ -412,6 +443,14 @@ class FirebaseSync {
               this.notifyErrorListeners({
                 type: 'realtime_decrypt_error',
                 error: 'Encryption key mismatch in real-time sync',
+                timestamp: new Date().toISOString(),
+                suggestion: 'Data may be from a different password or device'
+              });
+            } else if (error.message?.includes('JSON')) {
+              console.error('📄 JSON parsing error in real-time sync');
+              this.notifyErrorListeners({
+                type: 'realtime_parse_error',
+                error: 'Failed to parse real-time sync data',
                 timestamp: new Date().toISOString()
               });
             }
@@ -604,19 +643,30 @@ class FirebaseSync {
     
     try {
       const docRef = doc(db, "budgets", this.budgetId);
+      
+      // Create a minimal valid structure to replace corrupted data
       await setDoc(docRef, {
         cleared: true,
         clearedAt: new Date().toISOString(),
-        version: 1
-      });
+        clearedReason: 'Encryption key mismatch - data corruption detected',
+        version: 1,
+        lastUpdated: new Date()
+      }, { merge: false }); // Force complete replacement
       
       console.log('✅ Successfully cleared corrupted cloud data');
+      
+      // Reset local sync state
+      this.lastSyncTimestamp = null;
+      this.activeUsers.clear();
+      this.recentActivity = [];
+      
       return true;
     } catch (error) {
       console.error('❌ Failed to clear corrupted data:', error);
       
       if (this.isNetworkBlockingError(error)) {
         console.warn('🚫 Cannot clear data - Firebase requests blocked');
+        return 'blocked';
       }
       
       return false;

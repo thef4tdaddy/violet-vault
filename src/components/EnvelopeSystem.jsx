@@ -248,11 +248,14 @@ const EnvelopeSystem = () => {
       // Handle decryption errors by allowing fresh start
       if (error.name === 'OperationError') {
         console.log('🔄 Decryption failed - starting fresh');
-        setSyncError('Encryption key mismatch. Starting with fresh data.');
+        setSyncError('Encryption key mismatch detected. Your data appears to be encrypted with a different password. You can continue with fresh data, or try logging in with the correct password.');
         
         // Optionally clear corrupted cloud data
         try {
-          await firebaseSync.clearCorruptedData();
+          const clearResult = await firebaseSync.clearCorruptedData();
+          if (clearResult === 'blocked') {
+            setSyncError('Encryption key mismatch detected. Firebase requests are being blocked by your browser. Please disable ad blockers and refresh the page.');
+          }
         } catch (clearError) {
           console.error('❌ Failed to clear corrupted data:', clearError);
         }
@@ -689,6 +692,186 @@ const EnvelopeSystem = () => {
     if (ua.includes("Mobile")) return "Mobile Device";
     return "Desktop Browser";
   };
+  
+  const normalizeImportData = (importedData) => {
+    console.log('🔧 Normalizing import data...');
+    
+    // Helper function to normalize date format
+    const normalizeDate = (dateStr) => {
+      if (!dateStr) return '';
+      
+      try {
+        // Handle various date formats
+        let date;
+        if (dateStr.includes('T')) {
+          // ISO format: 2025-07-21T21:58:09.927Z
+          date = new Date(dateStr);
+        } else if (dateStr.includes(',')) {
+          // Format: "July 14, 2025" or "Jul 10, 2025"
+          date = new Date(dateStr);
+        } else {
+          // Try as-is
+          date = new Date(dateStr);
+        }
+        
+        // Return in YYYY-MM-DD format
+        return date.toISOString().split('T')[0];
+      } catch (error) {
+        console.warn('Failed to normalize date:', dateStr, error);
+        return new Date().toISOString().split('T')[0]; // fallback to today
+      }
+    };
+    
+    // Helper to calculate next due date
+    const calculateNextDueDate = (frequency, currentDue) => {
+      if (!currentDue) return '';
+      
+      try {
+        const date = new Date(currentDue);
+        
+        switch (frequency) {
+          case 'weekly':
+            date.setDate(date.getDate() + 7);
+            break;
+          case 'biweekly':
+            date.setDate(date.getDate() + 14);
+            break;
+          case 'monthly':
+            date.setMonth(date.getMonth() + 1);
+            break;
+          case 'quarterly':
+            date.setMonth(date.getMonth() + 3);
+            break;
+          case 'semiannual':
+            date.setMonth(date.getMonth() + 6);
+            break;
+          case 'yearly':
+            date.setFullYear(date.getFullYear() + 1);
+            break;
+          default:
+            return currentDue;
+        }
+        
+        return date.toISOString().split('T')[0];
+      } catch (error) {
+        console.warn('Failed to calculate next due date:', frequency, currentDue, error);
+        return currentDue;
+      }
+    };
+    
+    // Normalize bills
+    const normalizedBills = (importedData.bills || []).map(bill => {
+      const normalizedDueDate = normalizeDate(bill.dueDate);
+      const nextDueDate = bill.nextDueDate || calculateNextDueDate(bill.frequency, normalizedDueDate);
+      
+      return {
+        ...bill,
+        dueDate: normalizedDueDate,
+        nextDueDate: nextDueDate,
+        // Ensure all required fields exist
+        category: bill.category || 'Bills',
+        color: bill.color || '#3B82F6',
+        notes: bill.notes || '',
+        priority: bill.priority || 'medium',
+        createdBy: bill.createdBy || currentUser?.userName || 'Import',
+        createdAt: bill.createdAt || new Date().toISOString()
+      };
+    });
+    
+    // Normalize envelopes
+    const normalizedEnvelopes = (importedData.envelopes || []).map(envelope => {
+      return {
+        ...envelope,
+        dueDate: normalizeDate(envelope.dueDate),
+        nextDueDate: envelope.nextDueDate || calculateNextDueDate(envelope.frequency, normalizeDate(envelope.dueDate)),
+        // Ensure all required fields
+        category: envelope.category || 'Bills',
+        color: envelope.color || '#3B82F6',
+        spendingHistory: envelope.spendingHistory || []
+      };
+    });
+    
+    // Normalize transactions
+    const normalizedTransactions = (importedData.transactions || []).map(transaction => {
+      return {
+        ...transaction,
+        date: normalizeDate(transaction.date),
+        // Ensure required fields
+        category: transaction.category || 'Other',
+        notes: transaction.notes || '',
+        reconciled: transaction.reconciled || false,
+        createdBy: transaction.createdBy || currentUser?.userName || 'Import',
+        createdAt: transaction.createdAt || new Date().toISOString(),
+        importSource: transaction.importSource || 'file'
+      };
+    });
+    
+    // Handle allTransactions - if missing, use transactions data
+    const allTransactions = importedData.allTransactions || normalizedTransactions;
+    const normalizedAllTransactions = allTransactions.map(transaction => {
+      return {
+        ...transaction,
+        date: normalizeDate(transaction.date),
+        category: transaction.category || 'Other',
+        notes: transaction.notes || '',
+        reconciled: transaction.reconciled || false,
+        createdBy: transaction.createdBy || currentUser?.userName || 'Import',
+        createdAt: transaction.createdAt || new Date().toISOString(),
+        importSource: transaction.importSource || 'file'
+      };
+    });
+    
+    // Normalize paycheck history
+    const normalizedPaycheckHistory = (importedData.paycheckHistory || []).map(paycheck => {
+      return {
+        ...paycheck,
+        date: normalizeDate(paycheck.date),
+        // Ensure required fields
+        processedBy: paycheck.processedBy || currentUser?.userName || 'Import',
+        allocations: paycheck.allocations || {},
+        totalAllocated: paycheck.totalAllocated || 0,
+        leftoverAmount: paycheck.leftoverAmount || 0
+      };
+    });
+    
+    // Normalize savings goals
+    const normalizedSavingsGoals = (importedData.savingsGoals || []).map(goal => {
+      return {
+        ...goal,
+        targetDate: goal.targetDate ? normalizeDate(goal.targetDate) : '',
+        // Ensure required fields
+        category: goal.category || 'General',
+        color: goal.color || '#3B82F6',
+        description: goal.description || '',
+        priority: goal.priority || 'medium',
+        createdBy: goal.createdBy || currentUser?.userName || 'Import',
+        createdAt: goal.createdAt || new Date().toISOString()
+      };
+    });
+    
+    // Normalize last activity
+    const normalizedLastActivity = importedData.lastActivity ? {
+      ...importedData.lastActivity,
+      timestamp: normalizeDate(importedData.lastActivity.timestamp) || new Date().toISOString(),
+      userName: importedData.lastActivity.userName || currentUser?.userName || 'Import',
+      userColor: importedData.lastActivity.userColor || currentUser?.userColor || '#a855f7'
+    } : createActivitySignature();
+    
+    const result = {
+      envelopes: normalizedEnvelopes,
+      bills: normalizedBills,
+      savingsGoals: normalizedSavingsGoals,
+      unassignedCash: importedData.unassignedCash || 0,
+      paycheckHistory: normalizedPaycheckHistory,
+      actualBalance: importedData.actualBalance || 0,
+      transactions: normalizedTransactions,
+      allTransactions: normalizedAllTransactions,
+      lastActivity: normalizedLastActivity
+    };
+    
+    console.log('✅ Import data normalization complete');
+    return result;
+  };
 
   const handleSetup = async ({ password, userName, userColor }) => {
     try {
@@ -795,23 +978,62 @@ const EnvelopeSystem = () => {
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
-          const importedData = JSON.parse(e.target.result);
+          // Validate file content first
+          const content = e.target.result;
+          if (!content || content.trim().length === 0) {
+            alert("File appears to be empty");
+            return;
+          }
+          
+          // Check if it looks like JSON
+          const trimmedContent = content.trim();
+          if (!trimmedContent.startsWith('{') && !trimmedContent.startsWith('[')) {
+            alert("File does not appear to be valid JSON format");
+            return;
+          }
+          
+          const importedData = JSON.parse(content);
+          
+          // Validate imported data structure
+          if (!importedData || typeof importedData !== 'object') {
+            alert("Invalid file format - not a valid data structure");
+            return;
+          }
+          
           if (importedData.envelopes && importedData.bills) {
-            setEnvelopes(importedData.envelopes || []);
-            setBills(importedData.bills || []);
-            setSavingsGoals(importedData.savingsGoals || []);
-            setUnassignedCash(importedData.unassignedCash || 0);
-            setPaycheckHistory(importedData.paycheckHistory || []);
-            setActualBalance(importedData.actualBalance || 0);
-            setTransactions(importedData.transactions || []);
-            setAllTransactions(importedData.allTransactions || []);
-            alert("Data imported successfully!");
+            // Normalize and fix imported data
+            const normalizedData = normalizeImportData(importedData);
+            
+            setEnvelopes(normalizedData.envelopes);
+            setBills(normalizedData.bills);
+            setSavingsGoals(normalizedData.savingsGoals);
+            setUnassignedCash(normalizedData.unassignedCash);
+            setPaycheckHistory(normalizedData.paycheckHistory);
+            setActualBalance(normalizedData.actualBalance);
+            setTransactions(normalizedData.transactions);
+            setAllTransactions(normalizedData.allTransactions);
+            setLastActivity(normalizedData.lastActivity);
+            
+            console.log('✅ Import data normalized and loaded:', {
+              envelopes: normalizedData.envelopes.length,
+              bills: normalizedData.bills.length,
+              savingsGoals: normalizedData.savingsGoals.length,
+              transactions: normalizedData.transactions.length,
+              allTransactions: normalizedData.allTransactions.length
+            });
+            
+            alert(`Data imported successfully!\n\nImported:\n• ${normalizedData.bills.length} bills\n• ${normalizedData.envelopes.length} envelopes\n• ${normalizedData.savingsGoals.length} savings goals\n• $${normalizedData.unassignedCash.toFixed(2)} unassigned cash`);
           } else {
-            alert("Invalid file format - missing required data structure");
+            alert("Invalid file format - missing required data structure (envelopes and bills)");
           }
         } catch (error) {
           console.error("File parsing error:", error);
-          alert("Invalid file format - not valid JSON");
+          
+          if (error instanceof SyntaxError) {
+            alert(`Invalid JSON format: ${error.message}\n\nPlease ensure the file is a valid JSON export from this app.`);
+          } else {
+            alert(`Error reading file: ${error.message}`);
+          }
         }
       };
       reader.readAsText(file);
@@ -839,7 +1061,49 @@ const EnvelopeSystem = () => {
       setTransactions([]);
       setAllTransactions([]);
       setLastActivity(null);
+      setSyncError(null);
       firebaseSync.stopRealtimeSync();
+    }
+  };
+  
+  const resetEncryptionAndStartFresh = async () => {
+    if (
+      confirm(
+        "This will clear ALL your encrypted data and start fresh. This action cannot be undone. Are you sure?"
+      )
+    ) {
+      try {
+        // Clear local data
+        localStorage.removeItem('envelopeBudgetData');
+        
+        // Clear cloud data
+        if (firebaseSync && budgetId) {
+          await firebaseSync.clearCorruptedData();
+        }
+        
+        // Reset all state
+        setIsUnlocked(false);
+        setEncryptionKey(null);
+        setSalt(null);
+        setCurrentUser(null);
+        setBudgetId(null);
+        setBills([]);
+        setEnvelopes([]);
+        setSavingsGoals([]);
+        setUnassignedCash(0);
+        setPaycheckHistory([]);
+        setActualBalance(0);
+        setTransactions([]);
+        setAllTransactions([]);
+        setLastActivity(null);
+        setSyncError(null);
+        firebaseSync.stopRealtimeSync();
+        
+        alert('All data has been cleared. You can now set up a new budget with a fresh password.');
+      } catch (error) {
+        console.error('Failed to reset encryption:', error);
+        alert('Failed to clear all data. Please try refreshing the page.');
+      }
     }
   };
 
@@ -866,6 +1130,7 @@ const EnvelopeSystem = () => {
           onExport={exportData}
           onImport={importData}
           onLogout={logout}
+          onResetEncryption={resetEncryptionAndStartFresh}
         />
 
         {/* Activity Banner */}
