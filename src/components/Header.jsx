@@ -32,7 +32,7 @@ const Header = ({
             <img 
               src={logoWithName} 
               alt="VioletVault Logo" 
-              className="h-16 w-auto mr-4"
+              className="h-10 w-auto mr-4 max-w-[200px]"
             />
           </div>
           <p className="text-gray-600 mt-2 text-lg">
