@@ -25,7 +25,7 @@ const Header = ({
   }, [showResetMenu]);
   return (
     <div className="glassmorphism rounded-3xl p-6 mb-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between min-h-[80px]">
         <div>
           <h1 className="text-4xl font-bold text-gray-900 flex items-center">
             <div className="relative mr-4">
@@ -42,13 +42,13 @@ const Header = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-6 pr-4">
           <UserIndicator
             currentUser={currentUser}
             onUserChange={onUserChange}
           />
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 justify-center">
             <input
               type="file"
               accept=".json"
