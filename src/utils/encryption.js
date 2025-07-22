@@ -9,7 +9,11 @@ export const encryptionUtils = {
       ["deriveBits", "deriveKey"]
     );
 
-    const salt = crypto.getRandomValues(new Uint8Array(16));
+    // Generate deterministic salt from password to ensure same password = same key
+    const passwordBytes = encoder.encode(password + "VioletVault_Salt");
+    const saltHash = await crypto.subtle.digest("SHA-256", passwordBytes);
+    const salt = new Uint8Array(saltHash.slice(0, 16));
+    
     const key = await crypto.subtle.deriveKey(
       {
         name: "PBKDF2",
