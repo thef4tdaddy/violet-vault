@@ -1213,7 +1213,7 @@ const EnvelopeSystem = () => {
 
         {/* Navigation Tabs */}
         <div className="glassmorphism rounded-3xl mb-6 shadow-xl border border-white/20">
-          <nav className="flex border-b border-white/20 overflow-x-auto">
+          <nav className="flex justify-center border-b border-white/20 overflow-x-auto">
             <button
               onClick={() => setActiveView("dashboard")}
               className={`px-8 py-5 text-sm font-semibold border-b-2 transition-all ${

@@ -18,6 +18,8 @@ const UserSetup = ({ onSetupComplete }) => {
         const profile = JSON.parse(savedProfile);
         setUserName(profile.userName || "");
         setUserColor(profile.userColor || "#a855f7");
+        // If we have a saved profile, skip to step 2 (profile confirmation) by default
+        // User can still edit their profile but doesn't have to re-enter everything
       } catch (error) {
         console.warn("Failed to load saved profile:", error);
       }
@@ -67,12 +69,23 @@ const UserSetup = ({ onSetupComplete }) => {
             </div>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {step === 1 ? "🔐 Welcome Back" : "✨ Set Up Profile"}
+            {step === 1 ? "🔐 Welcome Back" : userName ? `✨ Welcome Back, ${userName}!` : "✨ Set Up Profile"}
           </h1>
+          {step === 1 && userName && (
+            <div className="flex items-center justify-center mb-4">
+              <div
+                className="w-4 h-4 rounded-full mr-2 ring-2 ring-white shadow-sm"
+                style={{ backgroundColor: userColor }}
+              />
+              <span className="text-sm font-medium text-gray-700">{userName}'s Profile</span>
+            </div>
+          )}
           <p className="text-gray-600">
             {step === 1
               ? "Enter your family's master password"
-              : "Choose your name and color for tracking"}
+              : userName 
+                ? "Confirm your profile details or make changes"
+                : "Choose your name and color for tracking"}
           </p>
         </div>
 
@@ -112,13 +125,33 @@ const UserSetup = ({ onSetupComplete }) => {
                 </button>
               </div>
 
-              <button
-                type="submit"
-                disabled={!masterPassword || isLoading}
-                className="w-full btn btn-primary py-4 text-lg font-semibold rounded-2xl"
-              >
-                {isLoading ? "Unlocking..." : "Continue →"}
-              </button>
+              {userName ? (
+                <div className="space-y-3">
+                  <button
+                    type="submit"
+                    disabled={!masterPassword || isLoading}
+                    className="w-full btn btn-primary py-4 text-lg font-semibold rounded-2xl"
+                  >
+                    {isLoading ? "Unlocking..." : `Continue as ${userName} →`}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setStep(2)}
+                    disabled={isLoading}
+                    className="w-full btn btn-secondary py-3 text-sm font-medium rounded-2xl"
+                  >
+                    Change Profile Details
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={!masterPassword || isLoading}
+                  className="w-full btn btn-primary py-4 text-lg font-semibold rounded-2xl"
+                >
+                  {isLoading ? "Unlocking..." : "Continue →"}
+                </button>
+              )}
             </>
           )}
 
