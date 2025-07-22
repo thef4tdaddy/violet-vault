@@ -12,6 +12,7 @@ import BillManager from "./BillManager";
 import SavingsGoals from "./SavingsGoals";
 import Dashboard from "./Dashboard";
 import TransactionLedger from "./TransactionLedger";
+import ChartsAndAnalytics from "./ChartsAndAnalytics";
 import {
   DollarSign,
   Wallet,
@@ -21,6 +22,7 @@ import {
   CreditCard,
   Sparkles,
   BookOpen,
+  BarChart3,
 } from "lucide-react";
 
 const EnvelopeSystem = () => {
@@ -1275,6 +1277,17 @@ const EnvelopeSystem = () => {
               <BookOpen className="h-5 w-5 inline mr-3" />
               Transactions
             </button>
+            <button
+              onClick={() => setActiveView("analytics")}
+              className={`px-8 py-5 text-sm font-semibold border-b-2 transition-all ${
+                activeView === "analytics"
+                  ? "border-purple-500 text-purple-600 bg-purple-50/50"
+                  : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30"
+              }`}
+            >
+              <BarChart3 className="h-5 w-5 inline mr-3" />
+              Analytics
+            </button>
           </nav>
         </div>
 
@@ -1418,6 +1431,17 @@ const EnvelopeSystem = () => {
             onUpdateTransaction={updateTransaction}
             onDeleteTransaction={deleteTransaction}
             onBulkImport={bulkImportTransactions}
+            currentUser={currentUser}
+          />
+        )}
+
+        {activeView === "analytics" && (
+          <ChartsAndAnalytics
+            transactions={allTransactions}
+            envelopes={envelopes}
+            bills={bills}
+            paycheckHistory={paycheckHistory}
+            savingsGoals={savingsGoals}
             currentUser={currentUser}
           />
         )}
