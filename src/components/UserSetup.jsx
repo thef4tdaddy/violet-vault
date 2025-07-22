@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Shield, Users, Eye, EyeOff } from "lucide-react";
+import logoOnly from "../assets/Logo Only 1024x1024.png";
 
 const UserSetup = ({ onSetupComplete }) => {
   const [step, setStep] = useState(1);
@@ -43,12 +44,12 @@ const UserSetup = ({ onSetupComplete }) => {
       <div className="glassmorphism rounded-3xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
-            <div className="relative">
-              <div className="absolute inset-0 bg-purple-500 rounded-2xl blur-lg opacity-30"></div>
-              <div className="relative bg-purple-500 p-4 rounded-2xl flex">
-                <Shield className="h-8 w-8 text-white mr-2" />
-                <Users className="h-8 w-8 text-white" />
-              </div>
+            <div className="w-16 h-16">
+              <img 
+                src={logoOnly} 
+                alt="VioletVault Logo" 
+                className="w-16 h-16 object-contain"
+              />
             </div>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
