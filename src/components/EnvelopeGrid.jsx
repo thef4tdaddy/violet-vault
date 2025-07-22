@@ -114,7 +114,7 @@ const EnvelopeGrid = ({
       {/* Action Modal */}
       {selectedEnvelope && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+          <div className="glassmorphism rounded-2xl p-6 w-full max-w-md border border-white/30 shadow-2xl">
             <h3 className="text-xl font-semibold mb-4">
               {selectedEnvelope.name}
             </h3>

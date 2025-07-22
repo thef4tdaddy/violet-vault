@@ -99,7 +99,7 @@ const Dashboard = ({
   return (
     <div className="space-y-6">
       {/* Account Balance Overview */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
+      <div className="glassmorphism rounded-2xl p-6 border border-white/20">
         <h2 className="text-xl font-semibold mb-6 flex items-center">
           <CreditCard className="h-5 w-5 mr-2 text-blue-600" />
           Checking Account Dashboard
@@ -259,7 +259,7 @@ const Dashboard = ({
 
       {/* Recent Transactions */}
       {recentTransactions.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="glassmorphism rounded-2xl p-6 border border-white/20">
           <h3 className="text-lg font-semibold mb-4">Recent Transactions</h3>
           <div className="space-y-3">
             {recentTransactions.map((transaction) => (
@@ -311,8 +311,8 @@ const Dashboard = ({
 
       {/* Reconcile Transaction Modal */}
       {showReconcileModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="glassmorphism rounded-2xl p-6 w-full max-w-md border border-white/30 shadow-2xl">
             <h3 className="text-xl font-semibold mb-4">
               Reconcile Transaction
             </h3>

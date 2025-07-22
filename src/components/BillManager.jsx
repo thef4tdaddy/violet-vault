@@ -249,7 +249,7 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill }) => {
             setEditingBill(null);
             resetForm();
           }}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+          className="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-6 py-3 rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-purple-400/30"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Bill
@@ -257,7 +257,7 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill }) => {
       </div>
 
       {/* Bills List */}
-      <div className="bg-white rounded-xl shadow-sm">
+      <div className="glassmorphism rounded-2xl border border-white/20 shadow-xl">
         {bills.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
             <Calendar className="h-12 w-12 mx-auto mb-3 opacity-50" />
@@ -335,8 +335,8 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill }) => {
 
       {/* Add/Edit Form Modal */}
       {(showAddForm || editingBill) && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="glassmorphism rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-white/30 shadow-2xl">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-semibold">
                 {editingBill ? "Edit Bill" : "Add New Bill"}
@@ -542,7 +542,7 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill }) => {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center"
+                  className="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 text-white py-3 rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-purple-400/30 font-medium"
                 >
                   <Save className="h-4 w-4 mr-2" />
                   {editingBill ? "Update Bill" : "Add Bill"}

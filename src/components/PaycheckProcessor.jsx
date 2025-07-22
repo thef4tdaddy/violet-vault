@@ -125,7 +125,7 @@ const PaycheckProcessor = ({
                   setPaycheckAmount(e.target.value);
                   setShowPreview(false);
                 }}
-                className="w-full px-6 py-4 text-xl font-semibold border border-purple-200 rounded-2xl focus:ring-2 focus:ring-purple-500 bg-white/80 backdrop-blur-lg"
+                className="glassmorphism w-full px-6 py-4 text-xl font-semibold border border-white/20 rounded-2xl focus:ring-2 focus:ring-purple-500"
                 placeholder="0.00"
                 disabled={isProcessing}
               />
@@ -140,7 +140,7 @@ const PaycheckProcessor = ({
                 type="text"
                 value={payerName}
                 onChange={(e) => setPayerName(e.target.value)}
-                className="w-full px-6 py-4 border border-purple-200 rounded-2xl focus:ring-2 focus:ring-purple-500 bg-white/80 backdrop-blur-lg"
+                className="glassmorphism w-full px-6 py-4 border border-white/20 rounded-2xl focus:ring-2 focus:ring-purple-500"
                 placeholder="e.g., Sarah, John, etc."
                 disabled={isProcessing}
               />
@@ -152,7 +152,7 @@ const PaycheckProcessor = ({
                 How should this be allocated?
               </label>
               <div className="space-y-4">
-                <label className="flex items-start space-x-4 p-6 border-2 border-purple-200 rounded-2xl cursor-pointer hover:border-purple-300 transition-all bg-white/50 backdrop-blur-lg">
+                <label className="glassmorphism flex items-start space-x-4 p-6 border-2 border-white/20 rounded-2xl cursor-pointer hover:border-purple-300 transition-all">
                   <input
                     type="radio"
                     value="allocate"
@@ -175,7 +175,7 @@ const PaycheckProcessor = ({
                   </div>
                 </label>
 
-                <label className="flex items-start space-x-4 p-6 border-2 border-emerald-200 rounded-2xl cursor-pointer hover:border-emerald-300 transition-all bg-white/50 backdrop-blur-lg">
+                <label className="glassmorphism flex items-start space-x-4 p-6 border-2 border-white/20 rounded-2xl cursor-pointer hover:border-emerald-300 transition-all">
                   <input
                     type="radio"
                     value="leftover"
@@ -233,7 +233,7 @@ const PaycheckProcessor = ({
           </div>
 
           {/* Preview Panel */}
-          <div className="bg-white/60 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+          <div className="glassmorphism rounded-2xl p-6 border border-white/20">
             <h3 className="font-bold text-gray-900 mb-4 flex items-center text-lg">
               <Calculator className="h-5 w-5 mr-2 text-purple-600" />
               Allocation Preview
@@ -251,7 +251,7 @@ const PaycheckProcessor = ({
               </div>
             ) : (
               <div className="space-y-6">
-                <div className="bg-white/80 rounded-2xl p-6 border border-emerald-200">
+                <div className="glassmorphism rounded-2xl p-6 border border-white/20">
                   <div className="flex justify-between items-center mb-3">
                     <span className="font-semibold text-gray-700">
                       Total Paycheck:
@@ -267,7 +267,7 @@ const PaycheckProcessor = ({
 
                 {preview.mode === "allocate" &&
                   Object.keys(preview.allocations).length > 0 && (
-                    <div className="bg-white/80 rounded-2xl p-6 border border-purple-200">
+                    <div className="glassmorphism rounded-2xl p-6 border border-white/20">
                       <h4 className="font-semibold mb-4 text-purple-900">
                         Envelope Allocations:
                       </h4>
@@ -333,7 +333,7 @@ const PaycheckProcessor = ({
             {paycheckHistory.slice(0, 5).map((paycheck) => (
               <div
                 key={paycheck.id}
-                className="flex items-center justify-between p-6 bg-white/60 backdrop-blur-lg rounded-2xl border border-white/20 hover:bg-white/80 transition-all"
+                className="glassmorphism flex items-center justify-between p-6 rounded-2xl border border-white/20 hover:shadow-xl transition-all"
               >
                 <div className="flex items-center space-x-4">
                   <div

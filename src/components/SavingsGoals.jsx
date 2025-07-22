@@ -286,7 +286,7 @@ const SavingsGoals = ({
           {unassignedCash > 0 && savingsGoals.length > 0 && (
             <button
               onClick={handleDistributeModalOpen}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center"
+              className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-3 rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-emerald-400/30"
             >
               <TrendingUp className="h-4 w-4 mr-2" />
               Distribute Cash
@@ -298,7 +298,7 @@ const SavingsGoals = ({
               setEditingGoal(null);
               resetForm();
             }}
-            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center"
+            className="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-6 py-3 rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-purple-400/30"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Goal
@@ -308,7 +308,7 @@ const SavingsGoals = ({
 
       {/* Goals Grid */}
       {savingsGoals.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm p-8 text-center text-gray-500">
+        <div className="glassmorphism rounded-2xl p-8 text-center text-gray-500 border border-white/20">
           <Target className="h-12 w-12 mx-auto mb-3 opacity-50" />
           <p>
             No savings goals yet. Click "Add Goal" to start saving for something
@@ -329,7 +329,7 @@ const SavingsGoals = ({
             return (
               <div
                 key={goal.id}
-                className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
+                className="glassmorphism rounded-2xl p-6 hover:shadow-xl transition-all border border-white/20"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-3">
@@ -425,8 +425,8 @@ const SavingsGoals = ({
 
       {/* Add/Edit Goal Modal */}
       {(showAddForm || editingGoal) && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="glassmorphism rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-white/30 shadow-2xl">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-semibold">
                 {editingGoal ? "Edit Savings Goal" : "Add New Savings Goal"}
@@ -600,7 +600,7 @@ const SavingsGoals = ({
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 flex items-center justify-center"
+                  className="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 text-white py-3 rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-purple-400/30 font-medium"
                 >
                   <Save className="h-4 w-4 mr-2" />
                   {editingGoal ? "Update Goal" : "Add Goal"}
@@ -613,8 +613,8 @@ const SavingsGoals = ({
 
       {/* Distribute Cash Modal */}
       {showDistributeModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="glassmorphism rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-white/30 shadow-2xl">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-semibold">
                 Distribute Unassigned Cash
@@ -739,7 +739,7 @@ const SavingsGoals = ({
                   calculateDistributionTotal() <= 0 ||
                   calculateDistributionTotal() > unassignedCash
                 }
-                className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400"
+                className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white py-3 rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 disabled:from-gray-400 disabled:to-gray-400 disabled:transform-none font-medium"
               >
                 Distribute ${calculateDistributionTotal().toFixed(2)}
               </button>
