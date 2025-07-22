@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Shield, Users, Eye, EyeOff } from "lucide-react";
 import logoOnly from "../assets/Logo Only 1024x1024.png";
 
@@ -9,6 +9,20 @@ const UserSetup = ({ onSetupComplete }) => {
   const [userColor, setUserColor] = useState("#a855f7");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Load saved user profile on component mount
+  useEffect(() => {
+    const savedProfile = localStorage.getItem("userProfile");
+    if (savedProfile) {
+      try {
+        const profile = JSON.parse(savedProfile);
+        setUserName(profile.userName || "");
+        setUserColor(profile.userColor || "#a855f7");
+      } catch (error) {
+        console.warn("Failed to load saved profile:", error);
+      }
+    }
+  }, []);
 
   const colors = [
     { name: "Purple", value: "#a855f7" },
@@ -44,11 +58,11 @@ const UserSetup = ({ onSetupComplete }) => {
       <div className="glassmorphism rounded-3xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
-            <div className="w-20 h-20">
+            <div style={{ width: '64px', height: '64px' }}>
               <img 
                 src={logoOnly} 
                 alt="VioletVault Logo" 
-                className="w-20 h-20 object-contain"
+                style={{ width: '64px', height: '64px', objectFit: 'contain' }}
               />
             </div>
           </div>

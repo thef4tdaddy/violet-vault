@@ -32,7 +32,7 @@ const Header = ({
             <img 
               src={logoWithName} 
               alt="VioletVault Logo" 
-              className="h-12 w-auto mr-4 max-w-[200px] object-contain"
+              style={{ height: '48px', width: 'auto', marginRight: '1rem', maxWidth: '200px', objectFit: 'contain' }}
             />
           </div>
           <p className="text-gray-600 mt-2 text-lg">
@@ -40,7 +40,7 @@ const Header = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center" style={{ gap: '1.5rem' }}>
           <UserIndicator
             currentUser={currentUser}
             onUserChange={onUserChange}
@@ -80,7 +80,7 @@ const Header = ({
               </button>
               
               {showResetMenu && (
-                <div className="absolute right-0 top-full mt-2 w-64 glassmorphism rounded-xl border border-white/20 shadow-2xl z-[60]">
+                <div className="absolute glassmorphism rounded-xl border shadow-xl" style={{ right: '0', top: '100%', marginTop: '0.5rem', width: '256px', zIndex: 1000, borderColor: 'rgba(255, 255, 255, 0.2)' }}>
                   <div className="p-4">
                     <div className="flex items-start space-x-2 mb-3">
                       <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />

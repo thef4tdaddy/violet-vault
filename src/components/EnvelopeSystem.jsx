@@ -157,6 +157,43 @@ const EnvelopeSystem = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [envelopes, bills, savingsGoals, unassignedCash, paycheckHistory, actualBalance, transactions, allTransactions, lastActivity]);
 
+  // Auto-save to localStorage when data changes
+  useEffect(() => {
+    if (isUnlocked && encryptionKey && currentUser) {
+      const saveData = async () => {
+        try {
+          const dataToSave = {
+            envelopes,
+            bills,
+            savingsGoals,
+            unassignedCash,
+            paycheckHistory,
+            actualBalance,
+            transactions,
+            allTransactions,
+            lastActivity,
+            currentUser,
+          };
+
+          const encrypted = await encryptionUtils.encrypt(dataToSave, encryptionKey);
+          const saltArray = Array.from(_salt || []);
+          
+          localStorage.setItem("envelopeBudgetData", JSON.stringify({
+            encryptedData: encrypted.data,
+            salt: saltArray,
+            iv: encrypted.iv,
+          }));
+        } catch (error) {
+          console.error("Failed to save data to localStorage:", error);
+        }
+      };
+
+      // Debounce saving to avoid too many writes
+      const timeoutId = setTimeout(saveData, 500);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [envelopes, bills, savingsGoals, unassignedCash, paycheckHistory, actualBalance, transactions, allTransactions, lastActivity, currentUser, isUnlocked, encryptionKey, _salt]);
+
   const setupRealtimeSync = () => {
     firebaseSync.setupRealtimeSync(async (cloudUpdate) => {
       console.log("📥 Receiving real-time update from Firebase");
@@ -888,6 +925,9 @@ const EnvelopeSystem = () => {
       const generatedBudgetId = encryptionUtils.generateBudgetId(password);
       setBudgetId(generatedBudgetId);
 
+      // Save user profile to localStorage separately for persistence
+      localStorage.setItem("userProfile", JSON.stringify(user));
+
       const savedData = localStorage.getItem("envelopeBudgetData");
 
       if (savedData) {
@@ -927,16 +967,14 @@ const EnvelopeSystem = () => {
         setPaycheckHistory(decryptedData.paycheckHistory || []);
         setActualBalance(decryptedData.actualBalance || 0);
         setTransactions(decryptedData.transactions || []);
+        setAllTransactions(decryptedData.allTransactions || []);
         setLastActivity(decryptedData.lastActivity || null);
         setEncryptionKey(key);
         setSalt(new Uint8Array(salt));
         
-        // Use saved user data if it exists, otherwise use new user data
-        if (decryptedData.currentUser && decryptedData.currentUser.userName) {
-          setCurrentUser(decryptedData.currentUser);
-        } else {
-          setCurrentUser(user);
-        }
+        // Always use the new user data from the login form
+        // This allows multiple family members to access the same encrypted data
+        setCurrentUser(user);
         setIsUnlocked(true);
       } else {
         const { key, salt } = await encryptionUtils.generateKey(password);
@@ -1054,6 +1092,8 @@ const EnvelopeSystem = () => {
         "Are you sure you want to logout? Your data is automatically saved."
       )
     ) {
+      // Note: We intentionally DO NOT clear the "userProfile" from localStorage
+      // This allows the user profile to persist across sessions
       setIsUnlocked(false);
       setEncryptionKey(null);
       setSalt(null);
@@ -1082,6 +1122,7 @@ const EnvelopeSystem = () => {
       try {
         // Clear local data
         localStorage.removeItem('envelopeBudgetData');
+        localStorage.removeItem('userProfile'); // Also clear saved user profile
         
         // Clear cloud data
         if (firebaseSync && budgetId) {
