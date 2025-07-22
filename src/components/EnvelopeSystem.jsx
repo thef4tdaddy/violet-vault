@@ -144,6 +144,7 @@ const EnvelopeSystem = () => {
         transactions,
         allTransactions,
         lastActivity,
+        currentUser,
       };
 
       // Debounce syncing to avoid too many requests
@@ -929,7 +930,13 @@ const EnvelopeSystem = () => {
         setLastActivity(decryptedData.lastActivity || null);
         setEncryptionKey(key);
         setSalt(new Uint8Array(salt));
-        setCurrentUser(user);
+        
+        // Use saved user data if it exists, otherwise use new user data
+        if (decryptedData.currentUser && decryptedData.currentUser.userName) {
+          setCurrentUser(decryptedData.currentUser);
+        } else {
+          setCurrentUser(user);
+        }
         setIsUnlocked(true);
       } else {
         const { key, salt } = await encryptionUtils.generateKey(password);
