@@ -128,9 +128,26 @@ const UserSetup = ({ onSetupComplete }) => {
               {userName ? (
                 <div className="space-y-3">
                   <button
-                    type="submit"
+                    type="button"
                     disabled={!masterPassword || isLoading}
                     className="w-full btn btn-primary py-4 text-lg font-semibold rounded-2xl"
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      if (!masterPassword || !userName.trim()) return;
+                      
+                      setIsLoading(true);
+                      try {
+                        await onSetupComplete({
+                          password: masterPassword,
+                          userName: userName.trim(),
+                          userColor,
+                        });
+                      } catch (error) {
+                        console.error("Setup failed:", error);
+                      } finally {
+                        setIsLoading(false);
+                      }
+                    }}
                   >
                     {isLoading ? "Unlocking..." : `Continue as ${userName} →`}
                   </button>
