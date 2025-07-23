@@ -378,7 +378,7 @@ const ChartsAnalytics = ({
             </div>
             Analytics & Reports
           </h2>
-          <p className="text-gray-600 mt-1">
+          <p className="text-gray-800 mt-1">
             Financial insights and spending patterns
           </p>
         </div>

@@ -249,7 +249,7 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill }) => {
             setEditingBill(null);
             resetForm();
           }}
-          className="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-6 py-3 rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-purple-400/30 w-full md:w-auto"
+          className="bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold px-4 py-2 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-purple-400/30 w-auto"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Bill
@@ -542,7 +542,7 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill }) => {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 text-white py-3 rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-purple-400/30 font-medium w-full sm:w-auto"
+                  className="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold px-4 py-2 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-purple-400/30 w-auto"
                 >
                   <Save className="h-4 w-4 mr-2" />
                   {editingBill ? "Update Bill" : "Add Bill"}
