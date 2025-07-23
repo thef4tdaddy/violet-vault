@@ -53,17 +53,42 @@ const TeamActivitySync = ({
     return syncTime.toLocaleDateString();
   };
 
-  // Get sync status
+  // Get sync status with proper CSS classes
   const getSyncStatus = () => {
     if (syncError) {
       if (syncError.includes('blocked') || syncError.includes('ad blocker')) {
-        return { status: 'blocked', color: 'orange', message: 'Sync blocked' };
+        return { 
+          status: 'blocked', 
+          iconClass: 'h-4 w-4 text-orange-600', 
+          textClass: 'text-sm font-medium text-orange-700',
+          message: 'Sync blocked' 
+        };
       }
-      return { status: 'error', color: 'rose', message: 'Sync error' };
+      return { 
+        status: 'error', 
+        iconClass: 'h-4 w-4 text-rose-600', 
+        textClass: 'text-sm font-medium text-rose-700',
+        message: 'Sync error' 
+      };
     }
-    if (!isOnline) return { status: 'offline', color: 'amber', message: 'Offline' };
-    if (isSyncing) return { status: 'syncing', color: 'cyan', message: 'Syncing...' };
-    return { status: 'synced', color: 'emerald', message: 'Synced' };
+    if (!isOnline) return { 
+      status: 'offline', 
+      iconClass: 'h-4 w-4 text-amber-600', 
+      textClass: 'text-sm font-medium text-amber-700',
+      message: 'Offline' 
+    };
+    if (isSyncing) return { 
+      status: 'syncing', 
+      iconClass: 'h-4 w-4 text-cyan-600 animate-spin', 
+      textClass: 'text-sm font-medium text-cyan-700',
+      message: 'Syncing...' 
+    };
+    return { 
+      status: 'synced', 
+      iconClass: 'h-4 w-4 text-emerald-600', 
+      textClass: 'text-sm font-medium text-emerald-700',
+      message: 'Synced' 
+    };
   };
 
   // Process activity into Git-like changes
@@ -201,7 +226,7 @@ const TeamActivitySync = ({
   const syncStatus = getSyncStatus();
 
   const otherActiveUsers = activeUsers.filter(user => 
-    user.userName !== currentUser?.userName
+    currentUser && user.id !== currentUser.id
   );
 
   if (otherActiveUsers.length === 0 && processedActivities.length === 0) {
@@ -219,15 +244,15 @@ const TeamActivitySync = ({
           {/* Sync Status */}
           <div className="flex items-center space-x-2">
             {syncStatus.status === 'syncing' ? (
-              <RefreshCw className={`h-4 w-4 text-${syncStatus.color}-600 animate-spin`} />
+              <RefreshCw className={syncStatus.iconClass} />
             ) : syncStatus.status === 'offline' ? (
-              <WifiOff className={`h-4 w-4 text-${syncStatus.color}-600`} />
+              <WifiOff className={syncStatus.iconClass} />
             ) : syncStatus.status === 'error' || syncStatus.status === 'blocked' ? (
-              <AlertTriangle className={`h-4 w-4 text-${syncStatus.color}-600`} />
+              <AlertTriangle className={syncStatus.iconClass} />
             ) : (
-              <CheckCircle className={`h-4 w-4 text-${syncStatus.color}-600`} />
+              <CheckCircle className={syncStatus.iconClass} />
             )}
-            <span className={`text-sm font-medium text-${syncStatus.color}-700`}>
+            <span className={syncStatus.textClass}>
               {syncStatus.message}
             </span>
             {lastSyncTime && (
@@ -244,12 +269,12 @@ const TeamActivitySync = ({
               <div className="flex -space-x-1">
                 {otherActiveUsers.slice(0, 3).map((user, index) => (
                   <div
-                    key={index}
+                    key={user.id || index}
                     className="w-6 h-6 rounded-full border-2 border-white shadow-sm flex items-center justify-center text-xs font-medium text-white"
-                    style={{ backgroundColor: user.userColor }}
+                    style={{ backgroundColor: user.color || user.userColor || '#a855f7' }}
                     title={user.userName}
                   >
-                    {user.userName.charAt(0).toUpperCase()}
+                    {user.userName?.charAt(0)?.toUpperCase() || '?'}
                   </div>
                 ))}
                 {otherActiveUsers.length > 3 && (
@@ -290,9 +315,9 @@ const TeamActivitySync = ({
                   {/* User Avatar */}
                   <div
                     className="w-8 h-8 rounded-full border border-white/30 flex items-center justify-center text-sm font-medium text-white flex-shrink-0"
-                    style={{ backgroundColor: activity.userColor }}
+                    style={{ backgroundColor: activity.userColor || activity.color || '#a855f7' }}
                   >
-                    {activity.userName.charAt(0).toUpperCase()}
+                    {activity.userName?.charAt(0)?.toUpperCase() || '?'}
                   </div>
                   
                   {/* Change Details */}
