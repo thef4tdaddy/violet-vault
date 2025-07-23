@@ -34,6 +34,19 @@ const TeamActivitySync = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  // Debug logging
+  useEffect(() => {
+    console.log('🔧 TeamActivitySync Debug:', {
+      activeUsers: activeUsers?.length || 0,
+      recentActivity: recentActivity?.length || 0,
+      currentUser: currentUser?.userName || 'none',
+      isOnline,
+      isSyncing,
+      lastSyncTime,
+      syncError
+    });
+  }, [activeUsers, recentActivity, currentUser, isOnline, isSyncing, lastSyncTime, syncError]);
+
   // Format last sync time
   const formatLastSync = (timestamp) => {
     if (!timestamp) return 'Never synced';
@@ -93,19 +106,48 @@ const TeamActivitySync = ({
 
   // Process activity into Git-like changes
   const processedActivities = useMemo(() => {
-    return [...recentActivity]
-      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-      .slice(0, 15)
-      .map(activity => {
-        // Generate Git-like change descriptions
-        const changes = generateChangeDescription(activity);
-        return {
-          ...activity,
-          changes,
-          commitId: generateCommitId(activity),
-          timeAgo: formatTimeAgo(activity.timestamp)
-        };
-      });
+    try {
+      if (!Array.isArray(recentActivity)) {
+        console.warn('recentActivity is not an array:', recentActivity);
+        return [];
+      }
+
+      return [...recentActivity]
+        .sort((a, b) => {
+          try {
+            const aTime = new Date(a.timestamp || 0).getTime();
+            const bTime = new Date(b.timestamp || 0).getTime();
+            return bTime - aTime;
+          } catch (error) {
+            console.error('Error sorting activities:', error, a, b);
+            return 0;
+          }
+        })
+        .slice(0, 15)
+        .map(activity => {
+          try {
+            // Generate Git-like change descriptions
+            const changes = generateChangeDescription(activity);
+            return {
+              ...activity,
+              changes,
+              commitId: generateCommitId(activity),
+              timeAgo: formatTimeAgo(activity.timestamp)
+            };
+          } catch (error) {
+            console.error('Error processing activity:', error, activity);
+            return {
+              ...activity,
+              changes: [],
+              commitId: 'error',
+              timeAgo: 'unknown'
+            };
+          }
+        });
+    } catch (error) {
+      console.error('Error processing activities:', error);
+      return [];
+    }
   }, [recentActivity]);
 
   const generateChangeDescription = (activity) => {
@@ -200,34 +242,64 @@ const TeamActivitySync = ({
   };
 
   const generateCommitId = (activity) => {
-    // Generate a short hash-like ID from timestamp and user
-    const hash = (activity.timestamp + activity.userName).split('').reduce((a, b) => {
-      a = ((a << 5) - a) + b.charCodeAt(0);
-      return a & a;
-    }, 0);
-    return Math.abs(hash).toString(16).substring(0, 7);
+    try {
+      // Generate a short hash-like ID from timestamp and user
+      const input = (activity.timestamp || Date.now()) + (activity.userName || 'anonymous');
+      const hash = input.split('').reduce((a, b) => {
+        a = ((a << 5) - a) + b.charCodeAt(0);
+        return a & a;
+      }, 0);
+      return Math.abs(hash).toString(16).substring(0, 7);
+    } catch (error) {
+      console.error('Error generating commit ID:', error, activity);
+      return 'unknown';
+    }
   };
 
   const formatTimeAgo = (timestamp) => {
-    const now = new Date();
-    const time = new Date(timestamp);
-    const diffInMinutes = Math.floor((now - time) / (1000 * 60));
-    
-    if (diffInMinutes < 1) return 'now';
-    if (diffInMinutes < 60) return `${diffInMinutes}m`;
-    
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `${diffInHours}h`;
-    
-    const diffInDays = Math.floor(diffInHours / 24);
-    return `${diffInDays}d`;
+    try {
+      if (!timestamp) return 'unknown';
+      
+      const now = new Date();
+      const time = new Date(timestamp);
+      
+      // Check for invalid dates
+      if (isNaN(time.getTime()) || isNaN(now.getTime())) {
+        return 'unknown';
+      }
+      
+      const diffInMinutes = Math.floor((now - time) / (1000 * 60));
+      
+      if (diffInMinutes < 1) return 'now';
+      if (diffInMinutes < 60) return `${diffInMinutes}m`;
+      
+      const diffInHours = Math.floor(diffInMinutes / 60);
+      if (diffInHours < 24) return `${diffInHours}h`;
+      
+      const diffInDays = Math.floor(diffInHours / 24);
+      return `${diffInDays}d`;
+    } catch (error) {
+      console.error('Error formatting time ago:', error, timestamp);
+      return 'unknown';
+    }
   };
 
   const syncStatus = getSyncStatus();
 
-  const otherActiveUsers = activeUsers.filter(user => 
-    currentUser && user.id !== currentUser.id
-  );
+  const otherActiveUsers = useMemo(() => {
+    try {
+      if (!Array.isArray(activeUsers)) {
+        console.warn('activeUsers is not an array:', activeUsers);
+        return [];
+      }
+      return activeUsers.filter(user => 
+        currentUser && user && user.id !== currentUser.id
+      );
+    } catch (error) {
+      console.error('Error filtering active users:', error);
+      return [];
+    }
+  }, [activeUsers, currentUser]);
 
   if (otherActiveUsers.length === 0 && processedActivities.length === 0) {
     return null;
