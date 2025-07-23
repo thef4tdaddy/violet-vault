@@ -1,11 +1,14 @@
 import React from "react";
-import EnvelopeSystem from "./components/EnvelopeSystem";
+import { AuthProvider } from "./contexts/AuthContext";
+import Layout from "./components/Layout";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 function App() {
   return (
     <ErrorBoundary>
-      <EnvelopeSystem />
+      <AuthProvider>
+        <Layout />
+      </AuthProvider>
     </ErrorBoundary>
   );
 }

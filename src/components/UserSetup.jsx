@@ -69,7 +69,7 @@ const UserSetup = ({ onSetupComplete }) => {
             </div>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {step === 1 ? "🔐 Welcome Back" : userName ? `✨ Welcome Back, ${userName}!` : "✨ Set Up Profile"}
+            {step === 1 ? "Welcome Back" : userName ? `Welcome Back, ${userName}!` : "Set Up Profile"}
           </h1>
           {step === 1 && userName && (
             <div className="flex items-center justify-center mb-4">
@@ -149,7 +149,7 @@ const UserSetup = ({ onSetupComplete }) => {
                       }
                     }}
                   >
-                    {isLoading ? "Unlocking..." : `Continue as ${userName} →`}
+                    {isLoading ? "Unlocking..." : `Continue as ${userName}`}
                   </button>
                   <button
                     type="button"
@@ -166,7 +166,7 @@ const UserSetup = ({ onSetupComplete }) => {
                   disabled={!masterPassword || isLoading}
                   className="w-full btn btn-primary py-4 text-lg font-semibold rounded-2xl"
                 >
-                  {isLoading ? "Unlocking..." : "Continue →"}
+                  {isLoading ? "Unlocking..." : "Continue"}
                 </button>
               )}
             </>
@@ -218,14 +218,14 @@ const UserSetup = ({ onSetupComplete }) => {
                   className="flex-1 btn btn-secondary py-3 rounded-2xl"
                   disabled={isLoading}
                 >
-                  ← Back
+                  Back
                 </button>
                 <button
                   type="submit"
                   disabled={!userName.trim() || isLoading}
                   className="flex-1 btn btn-primary py-3 rounded-2xl"
                 >
-                  {isLoading ? "Setting up..." : "Start Tracking ✨"}
+                  {isLoading ? "Setting up..." : "Start Tracking"}
                 </button>
               </div>
             </>
@@ -234,7 +234,7 @@ const UserSetup = ({ onSetupComplete }) => {
 
         <div className="text-center mt-6">
           <p className="text-sm text-gray-500">
-            🔒 Your data is encrypted client-side for maximum security
+            Your data is encrypted client-side for maximum security
           </p>
         </div>
       </div>

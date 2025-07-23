@@ -1,4 +1,34 @@
 export const encryptionUtils = {
+  async deriveKey(password) {
+    return this.generateKey(password);
+  },
+
+  async deriveKeyFromSalt(password, salt) {
+    const encoder = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey(
+      "raw",
+      encoder.encode(password),
+      { name: "PBKDF2" },
+      false,
+      ["deriveBits", "deriveKey"]
+    );
+    
+    const key = await crypto.subtle.deriveKey(
+      {
+        name: "PBKDF2",
+        salt: salt,
+        iterations: 100000,
+        hash: "SHA-256",
+      },
+      keyMaterial,
+      { name: "AES-GCM", length: 256 },
+      true,
+      ["encrypt", "decrypt"]
+    );
+
+    return key;
+  },
+
   async generateKey(password) {
     const encoder = new TextEncoder();
     const keyMaterial = await crypto.subtle.importKey(
