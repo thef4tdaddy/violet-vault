@@ -277,7 +277,7 @@ const SavingsGoals = ({
             <Target className="h-5 w-5 mr-2 text-purple-600" />
             Savings Goals ({savingsGoals.length})
           </h2>
-          <p className="text-sm text-gray-600 mt-1">
+          <p className="text-sm text-gray-800 mt-1">
             ${totalSaved.toFixed(2)} of ${totalTargets.toFixed(2)} saved (
             {overallProgress.toFixed(1)}%)
           </p>
