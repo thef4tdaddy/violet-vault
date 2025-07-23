@@ -286,7 +286,7 @@ const SavingsGoals = ({
           {unassignedCash > 0 && savingsGoals.length > 0 && (
             <button
               onClick={handleDistributeModalOpen}
-              className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-6 py-3 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-emerald-500/50 font-semibold"
+              className="btn btn-primary flex items-center"
             >
               <TrendingUp className="h-4 w-4 mr-2" />
               Distribute Cash

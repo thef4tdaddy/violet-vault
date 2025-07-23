@@ -42,7 +42,7 @@ const Header = memo(({
             <img 
               src={logoWithTextBlackBorder} 
               alt="VioletVault Logo" 
-              style={{ height: '120px', width: 'auto', marginRight: '1rem', maxWidth: '300px', objectFit: 'contain' }}
+              style={{ height: '240px', width: 'auto', marginRight: '1rem', maxWidth: '600px', objectFit: 'contain' }}
             />
           </div>
           <p className="text-gray-600 mt-2 text-lg">

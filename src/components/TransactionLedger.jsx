@@ -446,14 +446,14 @@ const TransactionLedger = ({
         <div className="flex flex-row gap-3">
           <button
             onClick={() => setShowImportModal(true)}
-            className="bg-gradient-to-r from-cyan-600 to-cyan-700 text-white px-6 py-3 rounded-xl hover:from-cyan-700 hover:to-cyan-800 transition-all duration-200 flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-cyan-500/50 font-semibold"
+            className="btn btn-primary flex items-center"
           >
             <Upload className="h-4 w-4 mr-2" />
             Import File
           </button>
           <button
             onClick={() => setShowAddModal(true)}
-            className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-3 rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-emerald-400/30"
+            className="btn btn-primary flex items-center"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Transaction
@@ -991,7 +991,7 @@ const TransactionLedger = ({
               </button>
               <button
                 onClick={handleAddTransaction}
-                className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white py-3 rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 font-medium"
+                className="flex-1 btn btn-primary"
               >
                 {editingTransaction ? "Update Transaction" : "Add Transaction"}
               </button>
@@ -1195,7 +1195,7 @@ const TransactionLedger = ({
                       !fieldMapping.description ||
                       !fieldMapping.amount
                     }
-                    className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-xl hover:from-emerald-700 hover:to-emerald-800 disabled:from-gray-400 disabled:to-gray-400 font-semibold"
+                    className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Import Transactions
                   </button>
