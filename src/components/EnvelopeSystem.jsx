@@ -14,6 +14,7 @@ const SavingsGoals = lazy(() => import("./SavingsGoals"));
 const Dashboard = lazy(() => import("./Dashboard"));
 const TransactionLedger = lazy(() => import("./TransactionLedger"));
 const ChartsAndAnalytics = lazy(() => import("./ChartsAndAnalytics"));
+const SupplementalAccounts = lazy(() => import("./SupplementalAccounts"));
 import LoadingSpinner from "./LoadingSpinner";
 import {
   DollarSign,
@@ -39,6 +40,7 @@ const EnvelopeSystem = () => {
   const [envelopes, setEnvelopes] = useState([]);
   const [bills, setBills] = useState([]);
   const [savingsGoals, setSavingsGoals] = useState([]);
+  const [supplementalAccounts, setSupplementalAccounts] = useState([]);
   const [unassignedCash, setUnassignedCash] = useState(0);
   const [_totalBudgetNeeded, setTotalBudgetNeeded] = useState(0);
   const [biweeklyAllocation, setBiweeklyAllocation] = useState(0);
@@ -159,7 +161,7 @@ const EnvelopeSystem = () => {
       return () => clearTimeout(timeoutId);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [envelopes, bills, savingsGoals, unassignedCash, paycheckHistory, actualBalance, transactions, allTransactions, lastActivity]);
+  }, [envelopes, bills, savingsGoals, supplementalAccounts, unassignedCash, paycheckHistory, actualBalance, transactions, allTransactions, lastActivity]);
 
   // Auto-save to localStorage when data changes
   useEffect(() => {
@@ -170,6 +172,7 @@ const EnvelopeSystem = () => {
             envelopes,
             bills,
             savingsGoals,
+            supplementalAccounts,
             unassignedCash,
             paycheckHistory,
             actualBalance,
@@ -552,6 +555,42 @@ const EnvelopeSystem = () => {
     };
 
     setPaycheckHistory((prev) => [distributionRecord, ...prev]);
+  };
+
+  // Supplemental accounts functions
+  const addSupplementalAccount = (accountData) => {
+    const newAccount = {
+      id: Date.now(),
+      ...accountData,
+      currentBalance: parseFloat(accountData.currentBalance) || 0,
+      annualContribution: parseFloat(accountData.annualContribution) || 0,
+      createdBy: currentUser.userName,
+      createdAt: new Date().toISOString(),
+      lastUpdated: new Date().toISOString(),
+      transactions: [],
+    };
+
+    setSupplementalAccounts((prev) => [...prev, newAccount]);
+  };
+
+  const updateSupplementalAccount = (accountId, updatedData) => {
+    setSupplementalAccounts((prev) =>
+      prev.map((account) =>
+        account.id === accountId
+          ? {
+              ...account,
+              ...updatedData,
+              currentBalance: parseFloat(updatedData.currentBalance) || 0,
+              annualContribution: parseFloat(updatedData.annualContribution) || 0,
+              lastUpdated: new Date().toISOString(),
+            }
+          : account
+      )
+    );
+  };
+
+  const deleteSupplementalAccount = (accountId) => {
+    setSupplementalAccounts((prev) => prev.filter((account) => account.id !== accountId));
   };
 
   // Dashboard functions
@@ -967,6 +1006,7 @@ const EnvelopeSystem = () => {
         setEnvelopes(decryptedData.envelopes || []);
         setBills(decryptedData.bills || []);
         setSavingsGoals(decryptedData.savingsGoals || []);
+        setSupplementalAccounts(decryptedData.supplementalAccounts || []);
         setUnassignedCash(decryptedData.unassignedCash || 0);
         setPaycheckHistory(decryptedData.paycheckHistory || []);
         setActualBalance(decryptedData.actualBalance || 0);
@@ -1241,6 +1281,17 @@ const EnvelopeSystem = () => {
               Savings Goals
             </button>
             <button
+              onClick={() => setActiveView("supplemental")}
+              className={`px-8 py-5 text-sm font-semibold border-b-2 transition-all ${
+                activeView === "supplemental"
+                  ? "border-purple-500 text-purple-600 bg-purple-50/50"
+                  : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30"
+              }`}
+            >
+              <CreditCard className="h-5 w-5 inline mr-3" />
+              Supplemental
+            </button>
+            <button
               onClick={() => setActiveView("paycheck")}
               className={`px-8 py-5 text-sm font-semibold border-b-2 transition-all ${
                 activeView === "paycheck"
@@ -1402,6 +1453,18 @@ const EnvelopeSystem = () => {
               onUpdateGoal={updateSavingsGoal}
               onDeleteGoal={deleteSavingsGoal}
               onDistributeToGoals={distributeToGoals}
+            />
+          )}
+        </Suspense>
+
+        <Suspense fallback={<LoadingSpinner message="Loading supplemental accounts..." />}>
+          {activeView === "supplemental" && (
+            <SupplementalAccounts
+              supplementalAccounts={supplementalAccounts}
+              onAddAccount={addSupplementalAccount}
+              onUpdateAccount={updateSupplementalAccount}
+              onDeleteAccount={deleteSupplementalAccount}
+              currentUser={currentUser}
             />
           )}
         </Suspense>
