@@ -30,13 +30,13 @@ const Header = memo(({
   }, [showResetMenu]);
   return (
     <div className="glassmorphism rounded-3xl p-6 mb-6">
-      <div className="flex items-center justify-between min-h-[260px]">
+      <div className="flex flex-col md:flex-row items-center justify-between min-h-[200px] md:min-h-[260px] text-center md:text-left space-y-4 md:space-y-0">
         <div>
           <div className="flex items-center">
-            <img 
-              src={logoWithName} 
-              alt="VioletVault Logo" 
-              style={{ height: '240px', width: 'auto', marginRight: '1rem', maxWidth: '600px', objectFit: 'contain' }}
+            <img
+              src={logoWithName}
+              alt="VioletVault Logo"
+              className="h-40 md:h-60 w-auto mr-4 max-w-full object-contain"
             />
           </div>
           <p className="text-gray-600 mt-2 text-lg">

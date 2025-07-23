@@ -386,7 +386,7 @@ const TransactionLedger = ({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold flex items-center text-gray-900">
             <div className="relative mr-4">
@@ -402,17 +402,17 @@ const TransactionLedger = ({
           </p>
         </div>
         
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={() => setShowImportModal(true)}
-            className="bg-gradient-to-r from-cyan-500 to-cyan-600 text-white px-6 py-3 rounded-xl hover:from-cyan-600 hover:to-cyan-700 transition-all duration-200 flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-cyan-400/30"
+            className="bg-gradient-to-r from-cyan-500 to-cyan-600 text-white px-6 py-3 rounded-xl hover:from-cyan-600 hover:to-cyan-700 transition-all duration-200 flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-cyan-400/30 w-full sm:w-auto"
           >
             <Upload className="h-4 w-4 mr-2" />
             Import File
           </button>
           <button
             onClick={() => setShowAddModal(true)}
-            className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-3 rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-emerald-400/30"
+            className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-3 rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-emerald-400/30 w-full sm:w-auto"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Transaction
@@ -828,20 +828,20 @@ const TransactionLedger = ({
               </div>
             </div>
 
-            <div className="flex gap-3 mt-6">
+            <div className="flex flex-col sm:flex-row gap-3 mt-6">
               <button
                 onClick={() => {
                   setShowAddModal(false);
                   setEditingTransaction(null);
                   resetTransactionForm();
                 }}
-                className="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 w-full sm:w-auto"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddTransaction}
-                className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white py-3 rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 font-medium"
+                className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white py-3 rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 font-medium w-full sm:w-auto"
               >
                 {editingTransaction ? 'Update Transaction' : 'Add Transaction'}
               </button>

@@ -1182,7 +1182,7 @@ const EnvelopeSystem = () => {
   const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden">
       <div className="max-w-7xl mx-auto relative z-10">
         <Header
           currentUser={currentUser}
@@ -1206,7 +1206,7 @@ const EnvelopeSystem = () => {
 
         {/* Navigation Tabs */}
         <div className="glassmorphism rounded-3xl mb-6 shadow-xl border border-white/20">
-          <nav className="flex justify-center border-b border-white/20 overflow-x-auto">
+          <nav className="flex justify-center overflow-x-auto flex-wrap">
             <button
               onClick={() => setActiveView("dashboard")}
               className={`px-8 py-5 text-sm font-semibold border-b-2 transition-all ${
