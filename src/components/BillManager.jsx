@@ -249,7 +249,7 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill }) => {
             setEditingBill(null);
             resetForm();
           }}
-          className="bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold px-4 py-2 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-purple-400/30 w-auto"
+          className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-xl hover:from-purple-700 hover:to-purple-800 transition-all duration-200 flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-purple-500/50 font-semibold"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Bill

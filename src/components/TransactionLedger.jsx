@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   BookOpen,
   Plus,
@@ -20,8 +20,8 @@ import {
   AlertCircle,
   ChevronDown,
   ChevronUp,
-  Zap
-} from 'lucide-react';
+  Zap,
+} from "lucide-react";
 
 const TransactionLedger = ({
   transactions = [],
@@ -30,30 +30,30 @@ const TransactionLedger = ({
   onUpdateTransaction,
   onDeleteTransaction,
   onBulkImport,
-  currentUser = { userName: 'User', userColor: '#a855f7' }
+  currentUser = { userName: "User", userColor: "#a855f7" },
 }) => {
-  const [activeTab, setActiveTab] = useState('ledger');
+  const [activeTab, setActiveTab] = useState("ledger");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [dateFilter, setDateFilter] = useState('all');
-  const [typeFilter, setTypeFilter] = useState('all');
-  const [envelopeFilter, setEnvelopeFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('date');
-  const [sortOrder, setSortOrder] = useState('desc');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [dateFilter, setDateFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [envelopeFilter, setEnvelopeFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("date");
+  const [sortOrder, setSortOrder] = useState("desc");
   const [selectedTransactions, setSelectedTransactions] = useState(new Set());
 
   // Transaction form state
   const [transactionForm, setTransactionForm] = useState({
-    date: new Date().toISOString().split('T')[0],
-    description: '',
-    amount: '',
-    type: 'expense', // expense, income, transfer
-    envelopeId: '',
-    category: '',
-    notes: '',
-    reconciled: false
+    date: new Date().toISOString().split("T")[0],
+    description: "",
+    amount: "",
+    type: "expense", // expense, income, transfer
+    envelopeId: "",
+    category: "",
+    notes: "",
+    reconciled: false,
   });
 
   // Import state
@@ -63,39 +63,49 @@ const TransactionLedger = ({
   const [importProgress, setImportProgress] = useState(0);
 
   const categories = [
-    'Food & Dining', 'Shopping', 'Entertainment', 'Bills & Utilities',
-    'Transportation', 'Travel', 'Health & Medical', 'Education',
-    'Personal Care', 'Gifts & Donations', 'Business', 'Other'
+    "Food & Dining",
+    "Shopping",
+    "Entertainment",
+    "Bills & Utilities",
+    "Transportation",
+    "Travel",
+    "Health & Medical",
+    "Education",
+    "Personal Care",
+    "Gifts & Donations",
+    "Business",
+    "Other",
   ];
 
   const resetTransactionForm = () => {
     setTransactionForm({
-      date: new Date().toISOString().split('T')[0],
-      description: '',
-      amount: '',
-      type: 'expense',
-      envelopeId: '',
-      category: '',
-      notes: '',
-      reconciled: false
+      date: new Date().toISOString().split("T")[0],
+      description: "",
+      amount: "",
+      type: "expense",
+      envelopeId: "",
+      category: "",
+      notes: "",
+      reconciled: false,
     });
   };
 
   const handleAddTransaction = () => {
     if (!transactionForm.description.trim() || !transactionForm.amount) {
-      alert('Please fill in description and amount');
+      alert("Please fill in description and amount");
       return;
     }
 
     const newTransaction = {
       id: Date.now(),
       ...transactionForm,
-      amount: transactionForm.type === 'expense' ? 
-        -Math.abs(parseFloat(transactionForm.amount)) : 
-        Math.abs(parseFloat(transactionForm.amount)),
+      amount:
+        transactionForm.type === "expense"
+          ? -Math.abs(parseFloat(transactionForm.amount))
+          : Math.abs(parseFloat(transactionForm.amount)),
       createdBy: currentUser.userName,
       createdAt: new Date().toISOString(),
-      importSource: 'manual'
+      importSource: "manual",
     };
 
     if (editingTransaction) {
@@ -114,32 +124,32 @@ const TransactionLedger = ({
       date: transaction.date,
       description: transaction.description,
       amount: Math.abs(transaction.amount).toString(),
-      type: transaction.amount >= 0 ? 'income' : 'expense',
-      envelopeId: transaction.envelopeId || '',
-      category: transaction.category || '',
-      notes: transaction.notes || '',
-      reconciled: transaction.reconciled || false
+      type: transaction.amount >= 0 ? "income" : "expense",
+      envelopeId: transaction.envelopeId || "",
+      category: transaction.category || "",
+      notes: transaction.notes || "",
+      reconciled: transaction.reconciled || false,
     });
     setEditingTransaction(transaction);
     setShowAddModal(true);
   };
 
   const handleDelete = (transactionId) => {
-    if (confirm('Are you sure you want to delete this transaction?')) {
+    if (confirm("Are you sure you want to delete this transaction?")) {
       onDeleteTransaction(transactionId);
     }
   };
 
   // File parsing functions
   const parseCSV = (csvText) => {
-    const lines = csvText.trim().split('\n');
-    const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-    
+    const lines = csvText.trim().split("\n");
+    const headers = lines[0].split(",").map((h) => h.trim().replace(/"/g, ""));
+
     return lines.slice(1).map((line, index) => {
-      const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+      const values = line.split(",").map((v) => v.trim().replace(/"/g, ""));
       const row = {};
       headers.forEach((header, i) => {
-        row[header] = values[i] || '';
+        row[header] = values[i] || "";
       });
       row._index = index;
       return row;
@@ -151,39 +161,42 @@ const TransactionLedger = ({
     const transactions = [];
     const stmtTrnRegex = /<STMTTRN>(.*?)<\/STMTTRN>/gs;
     const matches = ofxText.match(stmtTrnRegex);
-    
+
     if (matches) {
       matches.forEach((match, index) => {
         const transaction = { _index: index };
-        
+
         // Extract common OFX fields
         const fields = {
-          'TRNTYPE': 'type',
-          'DTPOSTED': 'date',
-          'TRNAMT': 'amount',
-          'FITID': 'id',
-          'NAME': 'description',
-          'MEMO': 'notes'
+          TRNTYPE: "type",
+          DTPOSTED: "date",
+          TRNAMT: "amount",
+          FITID: "id",
+          NAME: "description",
+          MEMO: "notes",
         };
-        
+
         Object.entries(fields).forEach(([ofxField, ourField]) => {
-          const regex = new RegExp(`<${ofxField}>(.*?)<\/${ofxField}>`, 'i');
+          const regex = new RegExp(`<${ofxField}>(.*?)<\/${ofxField}>`, "i");
           const fieldMatch = match.match(regex);
           if (fieldMatch) {
             transaction[ourField] = fieldMatch[1].trim();
           }
         });
-        
+
         // Format date if found
         if (transaction.date && transaction.date.length >= 8) {
           const dateStr = transaction.date;
-          transaction.date = `${dateStr.slice(0,4)}-${dateStr.slice(4,6)}-${dateStr.slice(6,8)}`;
+          transaction.date = `${dateStr.slice(0, 4)}-${dateStr.slice(
+            4,
+            6
+          )}-${dateStr.slice(6, 8)}`;
         }
-        
+
         transactions.push(transaction);
       });
     }
-    
+
     return transactions;
   };
 
@@ -197,43 +210,57 @@ const TransactionLedger = ({
       let parsedData = [];
 
       try {
-        if (file.name.toLowerCase().endsWith('.csv')) {
+        if (file.name.toLowerCase().endsWith(".csv")) {
           parsedData = parseCSV(content);
-        } else if (file.name.toLowerCase().endsWith('.ofx')) {
+        } else if (file.name.toLowerCase().endsWith(".ofx")) {
           parsedData = parseOFX(content);
         } else {
-          alert('Unsupported file type. Please use CSV or OFX files.');
+          alert("Unsupported file type. Please use CSV or OFX files.");
           return;
         }
 
         setImportData(parsedData);
         setImportStep(2);
-        
+
         // Auto-detect common field mappings
         const headers = Object.keys(parsedData[0] || {});
         const mapping = {};
-        
-        headers.forEach(header => {
+
+        headers.forEach((header) => {
           const lower = header.toLowerCase();
-          if (lower.includes('date')) mapping.date = header;
-          if (lower.includes('description') || lower.includes('name') || lower.includes('memo')) mapping.description = header;
-          if (lower.includes('amount') || lower.includes('debit') || lower.includes('credit')) mapping.amount = header;
-          if (lower.includes('category')) mapping.category = header;
+          if (lower.includes("date")) mapping.date = header;
+          if (
+            lower.includes("description") ||
+            lower.includes("name") ||
+            lower.includes("memo")
+          )
+            mapping.description = header;
+          if (
+            lower.includes("amount") ||
+            lower.includes("debit") ||
+            lower.includes("credit")
+          )
+            mapping.amount = header;
+          if (lower.includes("category")) mapping.category = header;
         });
-        
+
         setFieldMapping(mapping);
       } catch (error) {
-        alert('Error parsing file: ' + error.message);
+        alert("Error parsing file: " + error.message);
       }
     };
 
     reader.readAsText(file);
-    event.target.value = '';
+    event.target.value = "";
   };
 
   const handleImport = async () => {
-    if (!fieldMapping.date || !fieldMapping.description || !fieldMapping.amount) {
-      alert('Please map at least Date, Description, and Amount fields');
+    if (
+      !fieldMapping.date ||
+      !fieldMapping.description ||
+      !fieldMapping.amount
+    ) {
+      alert("Please map at least Date, Description, and Amount fields");
       return;
     }
 
@@ -247,16 +274,19 @@ const TransactionLedger = ({
       try {
         const transaction = {
           id: Date.now() + i,
-          date: row[fieldMapping.date] || new Date().toISOString().split('T')[0],
-          description: row[fieldMapping.description] || 'Imported Transaction',
-          amount: parseFloat(row[fieldMapping.amount]?.replace(/[$,]/g, '') || '0'),
-          category: row[fieldMapping.category] || 'Other',
-          notes: row[fieldMapping.notes] || '',
-          envelopeId: '', // Will be assigned manually or via smart matching
+          date:
+            row[fieldMapping.date] || new Date().toISOString().split("T")[0],
+          description: row[fieldMapping.description] || "Imported Transaction",
+          amount: parseFloat(
+            row[fieldMapping.amount]?.replace(/[$,]/g, "") || "0"
+          ),
+          category: row[fieldMapping.category] || "Other",
+          notes: row[fieldMapping.notes] || "",
+          envelopeId: "", // Will be assigned manually or via smart matching
           reconciled: false,
           createdBy: currentUser.userName,
           createdAt: new Date().toISOString(),
-          importSource: 'file'
+          importSource: "file",
         };
 
         processedTransactions.push(transaction);
@@ -266,7 +296,7 @@ const TransactionLedger = ({
 
       // Small delay to show progress
       if (i % 10 === 0) {
-        await new Promise(resolve => setTimeout(resolve, 10));
+        await new Promise((resolve) => setTimeout(resolve, 10));
       }
     }
 
@@ -275,34 +305,35 @@ const TransactionLedger = ({
     setImportStep(1);
     setImportData([]);
     setImportProgress(0);
-    alert(`Successfully imported ${processedTransactions.length} transactions!`);
+    alert(
+      `Successfully imported ${processedTransactions.length} transactions!`
+    );
   };
 
   // Smart envelope matching
   const suggestEnvelope = (description) => {
     const desc = description.toLowerCase();
-    
+
     // Find envelope by exact name match first
-    let match = envelopes.find(env => 
-      desc.includes(env.name.toLowerCase())
-    );
-    
+    let match = envelopes.find((env) => desc.includes(env.name.toLowerCase()));
+
     if (match) return match;
 
     // Common merchant/category mappings
     const mappings = {
-      'grocery': ['food', 'kroger', 'walmart', 'safeway', 'whole foods'],
-      'gas': ['shell', 'exxon', 'chevron', 'bp', 'gas station'],
-      'restaurant': ['restaurant', 'cafe', 'pizza', 'mcdonalds', 'starbucks'],
-      'utilities': ['electric', 'water', 'gas bill', 'internet', 'phone'],
-      'entertainment': ['netflix', 'spotify', 'movie', 'theater', 'game']
+      grocery: ["food", "kroger", "walmart", "safeway", "whole foods"],
+      gas: ["shell", "exxon", "chevron", "bp", "gas station"],
+      restaurant: ["restaurant", "cafe", "pizza", "mcdonalds", "starbucks"],
+      utilities: ["electric", "water", "gas bill", "internet", "phone"],
+      entertainment: ["netflix", "spotify", "movie", "theater", "game"],
     };
 
     for (const [category, keywords] of Object.entries(mappings)) {
-      if (keywords.some(keyword => desc.includes(keyword))) {
-        match = envelopes.find(env => 
-          env.category?.toLowerCase().includes(category) ||
-          env.name.toLowerCase().includes(category)
+      if (keywords.some((keyword) => desc.includes(keyword))) {
+        match = envelopes.find(
+          (env) =>
+            env.category?.toLowerCase().includes(category) ||
+            env.name.toLowerCase().includes(category)
         );
         if (match) return match;
       }
@@ -313,59 +344,69 @@ const TransactionLedger = ({
 
   // Filter and sort transactions
   const filteredTransactions = transactions
-    .filter(transaction => {
-      if (searchTerm && !transaction.description.toLowerCase().includes(searchTerm.toLowerCase())) {
+    .filter((transaction) => {
+      if (
+        searchTerm &&
+        !transaction.description
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+      ) {
         return false;
       }
-      
-      if (typeFilter !== 'all') {
-        if (typeFilter === 'income' && transaction.amount <= 0) return false;
-        if (typeFilter === 'expense' && transaction.amount >= 0) return false;
+
+      if (typeFilter !== "all") {
+        if (typeFilter === "income" && transaction.amount <= 0) return false;
+        if (typeFilter === "expense" && transaction.amount >= 0) return false;
       }
-      
-      if (envelopeFilter !== 'all' && transaction.envelopeId !== envelopeFilter) {
+
+      if (
+        envelopeFilter !== "all" &&
+        transaction.envelopeId !== envelopeFilter
+      ) {
         return false;
       }
-      
-      if (dateFilter !== 'all') {
+
+      if (dateFilter !== "all") {
         const transactionDate = new Date(transaction.date);
         const now = new Date();
-        
+
         switch (dateFilter) {
-          case 'today':
+          case "today":
             return transactionDate.toDateString() === now.toDateString();
-          case 'week':
+          case "week":
             const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
             return transactionDate >= weekAgo;
-          case 'month':
-            return transactionDate.getMonth() === now.getMonth() && 
-                   transactionDate.getFullYear() === now.getFullYear();
+          case "month":
+            return (
+              transactionDate.getMonth() === now.getMonth() &&
+              transactionDate.getFullYear() === now.getFullYear()
+            );
         }
       }
-      
+
       return true;
     })
     .sort((a, b) => {
       let aVal, bVal;
-      
+
       switch (sortBy) {
-        case 'date':
+        case "date":
           aVal = new Date(a.date);
           bVal = new Date(b.date);
           break;
-        case 'amount':
+        case "amount":
           aVal = Math.abs(a.amount);
           bVal = Math.abs(b.amount);
           break;
-        case 'description':
+        case "description":
           aVal = a.description.toLowerCase();
           bVal = b.description.toLowerCase();
           break;
         default:
           return 0;
       }
-      
-      if (sortOrder === 'asc') {
+
+      if (sortOrder === "asc") {
         return aVal > bVal ? 1 : -1;
       } else {
         return aVal < bVal ? 1 : -1;
@@ -374,13 +415,13 @@ const TransactionLedger = ({
 
   // Calculate summary stats
   const totalIncome = transactions
-    .filter(t => t.amount > 0)
+    .filter((t) => t.amount > 0)
     .reduce((sum, t) => sum + t.amount, 0);
-  
+
   const totalExpenses = transactions
-    .filter(t => t.amount < 0)
+    .filter((t) => t.amount < 0)
     .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-  
+
   const netCashFlow = totalIncome - totalExpenses;
 
   return (
@@ -401,18 +442,18 @@ const TransactionLedger = ({
             {transactions.length} transactions • Net: ${netCashFlow.toFixed(2)}
           </p>
         </div>
-        
+
         <div className="flex flex-row gap-3">
           <button
             onClick={() => setShowImportModal(true)}
-            className="bg-gradient-to-r from-cyan-500 to-cyan-600 text-white font-semibold px-4 py-2 rounded-lg hover:from-cyan-600 hover:to-cyan-700 transition-all duration-200 flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-cyan-400/30 w-auto"
+            className="bg-gradient-to-r from-cyan-600 to-cyan-700 text-white px-6 py-3 rounded-xl hover:from-cyan-700 hover:to-cyan-800 transition-all duration-200 flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-cyan-500/50 font-semibold"
           >
             <Upload className="h-4 w-4 mr-2" />
             Import File
           </button>
           <button
             onClick={() => setShowAddModal(true)}
-            className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold px-4 py-2 rounded-lg hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-emerald-400/30 w-auto"
+            className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-3 rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-emerald-400/30"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Transaction
@@ -431,7 +472,9 @@ const TransactionLedger = ({
               </div>
             </div>
             <div>
-              <p className="text-sm font-semibold text-gray-600 mb-1">Total Income</p>
+              <p className="text-sm font-semibold text-gray-600 mb-1">
+                Total Income
+              </p>
               <p className="text-2xl font-bold text-emerald-600">
                 ${totalIncome.toFixed(2)}
               </p>
@@ -448,7 +491,9 @@ const TransactionLedger = ({
               </div>
             </div>
             <div>
-              <p className="text-sm font-semibold text-gray-600 mb-1">Total Expenses</p>
+              <p className="text-sm font-semibold text-gray-600 mb-1">
+                Total Expenses
+              </p>
               <p className="text-2xl font-bold text-red-600">
                 ${totalExpenses.toFixed(2)}
               </p>
@@ -459,15 +504,29 @@ const TransactionLedger = ({
         <div className="glassmorphism rounded-xl p-6">
           <div className="flex items-center">
             <div className="relative mr-4">
-              <div className={`absolute inset-0 ${netCashFlow >= 0 ? 'bg-cyan-500' : 'bg-amber-500'} rounded-2xl blur-lg opacity-30`}></div>
-              <div className={`relative ${netCashFlow >= 0 ? 'bg-cyan-500' : 'bg-amber-500'} p-3 rounded-2xl`}>
+              <div
+                className={`absolute inset-0 ${
+                  netCashFlow >= 0 ? "bg-cyan-500" : "bg-amber-500"
+                } rounded-2xl blur-lg opacity-30`}
+              ></div>
+              <div
+                className={`relative ${
+                  netCashFlow >= 0 ? "bg-cyan-500" : "bg-amber-500"
+                } p-3 rounded-2xl`}
+              >
                 <DollarSign className="h-5 w-5 text-white" />
               </div>
             </div>
             <div>
-              <p className="text-sm font-semibold text-gray-600 mb-1">Net Cash Flow</p>
-              <p className={`text-2xl font-bold ${netCashFlow >= 0 ? 'text-cyan-600' : 'text-amber-600'}`}>
-                {netCashFlow >= 0 ? '+' : ''}${netCashFlow.toFixed(2)}
+              <p className="text-sm font-semibold text-gray-600 mb-1">
+                Net Cash Flow
+              </p>
+              <p
+                className={`text-2xl font-bold ${
+                  netCashFlow >= 0 ? "text-cyan-600" : "text-amber-600"
+                }`}
+              >
+                {netCashFlow >= 0 ? "+" : ""}${netCashFlow.toFixed(2)}
               </p>
             </div>
           </div>
@@ -478,7 +537,9 @@ const TransactionLedger = ({
       <div className="glassmorphism rounded-xl p-6 border border-white/20">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Search
+            </label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
@@ -492,7 +553,9 @@ const TransactionLedger = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Date Filter</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Date Filter
+            </label>
             <select
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value)}
@@ -506,7 +569,9 @@ const TransactionLedger = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Type
+            </label>
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
@@ -519,7 +584,9 @@ const TransactionLedger = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Envelope</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Envelope
+            </label>
             <select
               value={envelopeFilter}
               onChange={(e) => setEnvelopeFilter(e.target.value)}
@@ -527,7 +594,7 @@ const TransactionLedger = ({
             >
               <option value="all">All Envelopes</option>
               <option value="">Unassigned</option>
-              {envelopes.map(envelope => (
+              {envelopes.map((envelope) => (
                 <option key={envelope.id} value={envelope.id}>
                   {envelope.name}
                 </option>
@@ -536,7 +603,9 @@ const TransactionLedger = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Sort By
+            </label>
             <div className="flex gap-2">
               <select
                 value={sortBy}
@@ -548,10 +617,16 @@ const TransactionLedger = ({
                 <option value="description">Description</option>
               </select>
               <button
-                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                onClick={() =>
+                  setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                }
                 className="glassmorphism px-3 py-2 border border-white/20 rounded-lg hover:shadow-lg"
               >
-                {sortOrder === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                {sortOrder === "asc" ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
               </button>
             </div>
           </div>
@@ -587,31 +662,40 @@ const TransactionLedger = ({
             <tbody className="divide-y divide-gray-200">
               {filteredTransactions.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
+                  <td
+                    colSpan="6"
+                    className="px-6 py-8 text-center text-gray-500"
+                  >
                     No transactions found
                   </td>
                 </tr>
               ) : (
                 filteredTransactions.map((transaction) => {
-                  const envelope = envelopes.find(e => e.id === transaction.envelopeId);
+                  const envelope = envelopes.find(
+                    (e) => e.id === transaction.envelopeId
+                  );
                   return (
                     <tr key={transaction.id} className="hover:bg-white/30">
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {new Date(transaction.date).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        <div className="font-medium">{transaction.description}</div>
+                        <div className="font-medium">
+                          {transaction.description}
+                        </div>
                         {transaction.notes && (
-                          <div className="text-xs text-gray-500">{transaction.notes}</div>
+                          <div className="text-xs text-gray-500">
+                            {transaction.notes}
+                          </div>
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {transaction.category || 'Uncategorized'}
+                        {transaction.category || "Uncategorized"}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         {envelope ? (
                           <div className="flex items-center">
-                            <div 
+                            <div
                               className="w-3 h-3 rounded-full mr-2"
                               style={{ backgroundColor: envelope.color }}
                             />
@@ -622,8 +706,15 @@ const TransactionLedger = ({
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <span className={transaction.amount >= 0 ? 'text-emerald-600' : 'text-red-600'}>
-                          {transaction.amount >= 0 ? '+' : ''}${Math.abs(transaction.amount).toFixed(2)}
+                        <span
+                          className={
+                            transaction.amount >= 0
+                              ? "text-emerald-600"
+                              : "text-red-600"
+                          }
+                        >
+                          {transaction.amount >= 0 ? "+" : ""}$
+                          {Math.abs(transaction.amount).toFixed(2)}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
@@ -657,7 +748,9 @@ const TransactionLedger = ({
           <div className="glassmorphism rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-white/30 shadow-2xl">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-semibold">
-                {editingTransaction ? 'Edit Transaction' : 'Add New Transaction'}
+                {editingTransaction
+                  ? "Edit Transaction"
+                  : "Add New Transaction"}
               </h3>
               <button
                 onClick={() => {
@@ -680,7 +773,12 @@ const TransactionLedger = ({
                   <input
                     type="date"
                     value={transactionForm.date}
-                    onChange={(e) => setTransactionForm({...transactionForm, date: e.target.value})}
+                    onChange={(e) =>
+                      setTransactionForm({
+                        ...transactionForm,
+                        date: e.target.value,
+                      })
+                    }
                     className="glassmorphism w-full px-3 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-emerald-500"
                     required
                   />
@@ -693,11 +791,16 @@ const TransactionLedger = ({
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
-                      onClick={() => setTransactionForm({...transactionForm, type: 'expense'})}
+                      onClick={() =>
+                        setTransactionForm({
+                          ...transactionForm,
+                          type: "expense",
+                        })
+                      }
                       className={`p-2 rounded-lg border-2 transition-all ${
-                        transactionForm.type === 'expense'
-                          ? 'border-red-500 bg-red-50 text-red-700'
-                          : 'border-gray-200 hover:border-red-300'
+                        transactionForm.type === "expense"
+                          ? "border-red-500 bg-red-50 text-red-700"
+                          : "border-gray-200 hover:border-red-300"
                       }`}
                     >
                       <TrendingDown className="h-4 w-4 mx-auto mb-1" />
@@ -705,11 +808,16 @@ const TransactionLedger = ({
                     </button>
                     <button
                       type="button"
-                      onClick={() => setTransactionForm({...transactionForm, type: 'income'})}
+                      onClick={() =>
+                        setTransactionForm({
+                          ...transactionForm,
+                          type: "income",
+                        })
+                      }
                       className={`p-2 rounded-lg border-2 transition-all ${
-                        transactionForm.type === 'income'
-                          ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                          : 'border-gray-200 hover:border-emerald-300'
+                        transactionForm.type === "income"
+                          ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                          : "border-gray-200 hover:border-emerald-300"
                       }`}
                     >
                       <TrendingUp className="h-4 w-4 mx-auto mb-1" />
@@ -726,7 +834,12 @@ const TransactionLedger = ({
                 <input
                   type="text"
                   value={transactionForm.description}
-                  onChange={(e) => setTransactionForm({...transactionForm, description: e.target.value})}
+                  onChange={(e) =>
+                    setTransactionForm({
+                      ...transactionForm,
+                      description: e.target.value,
+                    })
+                  }
                   className="glassmorphism w-full px-3 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-emerald-500"
                   placeholder="e.g., Grocery shopping at Walmart"
                   required
@@ -742,7 +855,12 @@ const TransactionLedger = ({
                     type="number"
                     step="0.01"
                     value={transactionForm.amount}
-                    onChange={(e) => setTransactionForm({...transactionForm, amount: e.target.value})}
+                    onChange={(e) =>
+                      setTransactionForm({
+                        ...transactionForm,
+                        amount: e.target.value,
+                      })
+                    }
                     className="glassmorphism w-full px-3 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-emerald-500"
                     placeholder="0.00"
                     required
@@ -755,12 +873,19 @@ const TransactionLedger = ({
                   </label>
                   <select
                     value={transactionForm.category}
-                    onChange={(e) => setTransactionForm({...transactionForm, category: e.target.value})}
+                    onChange={(e) =>
+                      setTransactionForm({
+                        ...transactionForm,
+                        category: e.target.value,
+                      })
+                    }
                     className="glassmorphism w-full px-3 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-emerald-500"
                   >
                     <option value="">Select category...</option>
-                    {categories.map(category => (
-                      <option key={category} value={category}>{category}</option>
+                    {categories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -772,11 +897,16 @@ const TransactionLedger = ({
                 </label>
                 <select
                   value={transactionForm.envelopeId}
-                  onChange={(e) => setTransactionForm({...transactionForm, envelopeId: e.target.value})}
+                  onChange={(e) =>
+                    setTransactionForm({
+                      ...transactionForm,
+                      envelopeId: e.target.value,
+                    })
+                  }
                   className="glassmorphism w-full px-3 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-emerald-500"
                 >
                   <option value="">Leave unassigned</option>
-                  {envelopes.map(envelope => (
+                  {envelopes.map((envelope) => (
                     <option key={envelope.id} value={envelope.id}>
                       {envelope.name}
                     </option>
@@ -785,11 +915,18 @@ const TransactionLedger = ({
                 {transactionForm.description && (
                   <div className="mt-2">
                     {(() => {
-                      const suggested = suggestEnvelope(transactionForm.description);
+                      const suggested = suggestEnvelope(
+                        transactionForm.description
+                      );
                       return suggested ? (
                         <button
                           type="button"
-                          onClick={() => setTransactionForm({...transactionForm, envelopeId: suggested.id})}
+                          onClick={() =>
+                            setTransactionForm({
+                              ...transactionForm,
+                              envelopeId: suggested.id,
+                            })
+                          }
                           className="text-sm text-emerald-600 hover:text-emerald-700 flex items-center"
                         >
                           <Zap className="h-3 w-3 mr-1" />
@@ -807,7 +944,12 @@ const TransactionLedger = ({
                 </label>
                 <textarea
                   value={transactionForm.notes}
-                  onChange={(e) => setTransactionForm({...transactionForm, notes: e.target.value})}
+                  onChange={(e) =>
+                    setTransactionForm({
+                      ...transactionForm,
+                      notes: e.target.value,
+                    })
+                  }
                   rows={3}
                   className="glassmorphism w-full px-3 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-emerald-500"
                   placeholder="Additional notes about this transaction..."
@@ -819,10 +961,18 @@ const TransactionLedger = ({
                   type="checkbox"
                   id="reconciled"
                   checked={transactionForm.reconciled}
-                  onChange={(e) => setTransactionForm({...transactionForm, reconciled: e.target.checked})}
+                  onChange={(e) =>
+                    setTransactionForm({
+                      ...transactionForm,
+                      reconciled: e.target.checked,
+                    })
+                  }
                   className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
                 />
-                <label htmlFor="reconciled" className="ml-2 block text-sm text-gray-900">
+                <label
+                  htmlFor="reconciled"
+                  className="ml-2 block text-sm text-gray-900"
+                >
                   Mark as reconciled
                 </label>
               </div>
@@ -841,9 +991,9 @@ const TransactionLedger = ({
               </button>
               <button
                 onClick={handleAddTransaction}
-                className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white py-3 rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 font-medium w-full sm:w-auto"
+                className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white py-3 rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 font-medium"
               >
-                {editingTransaction ? 'Update Transaction' : 'Add Transaction'}
+                {editingTransaction ? "Update Transaction" : "Add Transaction"}
               </button>
             </div>
           </div>
@@ -913,9 +1063,17 @@ const TransactionLedger = ({
                       </h5>
                       <div className="mt-2 text-sm text-blue-700">
                         <ul className="list-disc list-inside space-y-1">
-                          <li><strong>CSV:</strong> Exported from banks like Chase, Wells Fargo, etc.</li>
-                          <li><strong>OFX:</strong> Open Financial Exchange format</li>
-                          <li>Files should include Date, Description, and Amount columns</li>
+                          <li>
+                            <strong>CSV:</strong> Exported from banks like
+                            Chase, Wells Fargo, etc.
+                          </li>
+                          <li>
+                            <strong>OFX:</strong> Open Financial Exchange format
+                          </li>
+                          <li>
+                            Files should include Date, Description, and Amount
+                            columns
+                          </li>
                         </ul>
                       </div>
                     </div>
@@ -932,28 +1090,46 @@ const TransactionLedger = ({
                     Map Your File Fields
                   </h4>
                   <p className="text-sm text-gray-600">
-                    Match your file columns to transaction fields. Preview shows data from your file.
+                    Match your file columns to transaction fields. Preview shows
+                    data from your file.
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <h5 className="font-medium text-gray-900 mb-3">Field Mapping</h5>
+                    <h5 className="font-medium text-gray-900 mb-3">
+                      Field Mapping
+                    </h5>
                     <div className="space-y-4">
-                      {['date', 'description', 'amount', 'category', 'notes'].map(field => (
+                      {[
+                        "date",
+                        "description",
+                        "amount",
+                        "category",
+                        "notes",
+                      ].map((field) => (
                         <div key={field}>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            {field.charAt(0).toUpperCase() + field.slice(1)} 
-                            {['date', 'description', 'amount'].includes(field) && ' *'}
+                            {field.charAt(0).toUpperCase() + field.slice(1)}
+                            {["date", "description", "amount"].includes(
+                              field
+                            ) && " *"}
                           </label>
                           <select
-                            value={fieldMapping[field] || ''}
-                            onChange={(e) => setFieldMapping({...fieldMapping, [field]: e.target.value})}
+                            value={fieldMapping[field] || ""}
+                            onChange={(e) =>
+                              setFieldMapping({
+                                ...fieldMapping,
+                                [field]: e.target.value,
+                              })
+                            }
                             className="glassmorphism w-full px-3 py-2 border border-white/20 rounded-lg"
                           >
                             <option value="">Skip this field</option>
-                            {Object.keys(importData[0] || {}).map(header => (
-                              <option key={header} value={header}>{header}</option>
+                            {Object.keys(importData[0] || {}).map((header) => (
+                              <option key={header} value={header}>
+                                {header}
+                              </option>
                             ))}
                           </select>
                         </div>
@@ -970,22 +1146,32 @@ const TransactionLedger = ({
                         <table className="min-w-full text-sm">
                           <thead className="bg-white/50">
                             <tr>
-                              {Object.keys(importData[0] || {}).slice(0, 4).map(header => (
-                                <th key={header} className="px-3 py-2 text-left font-medium text-gray-900">
-                                  {header}
-                                </th>
-                              ))}
+                              {Object.keys(importData[0] || {})
+                                .slice(0, 4)
+                                .map((header) => (
+                                  <th
+                                    key={header}
+                                    className="px-3 py-2 text-left font-medium text-gray-900"
+                                  >
+                                    {header}
+                                  </th>
+                                ))}
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-200">
                             {importData.slice(0, 5).map((row, index) => (
                               <tr key={index}>
-                                {Object.values(row).slice(0, 4).map((value, i) => (
-                                  <td key={i} className="px-3 py-2 text-gray-900">
-                                    {String(value).substring(0, 20)}
-                                    {String(value).length > 20 && '...'}
-                                  </td>
-                                ))}
+                                {Object.values(row)
+                                  .slice(0, 4)
+                                  .map((value, i) => (
+                                    <td
+                                      key={i}
+                                      className="px-3 py-2 text-gray-900"
+                                    >
+                                      {String(value).substring(0, 20)}
+                                      {String(value).length > 20 && "..."}
+                                    </td>
+                                  ))}
                               </tr>
                             ))}
                           </tbody>
@@ -1004,8 +1190,12 @@ const TransactionLedger = ({
                   </button>
                   <button
                     onClick={handleImport}
-                    disabled={!fieldMapping.date || !fieldMapping.description || !fieldMapping.amount}
-                    className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:from-emerald-600 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-400"
+                    disabled={
+                      !fieldMapping.date ||
+                      !fieldMapping.description ||
+                      !fieldMapping.amount
+                    }
+                    className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-xl hover:from-emerald-700 hover:to-emerald-800 disabled:from-gray-400 disabled:to-gray-400 font-semibold"
                   >
                     Import Transactions
                   </button>
@@ -1027,7 +1217,7 @@ const TransactionLedger = ({
                 </div>
 
                 <div className="bg-gray-200 rounded-full h-3">
-                  <div 
+                  <div
                     className="bg-emerald-600 h-3 rounded-full transition-all duration-300"
                     style={{ width: `${importProgress}%` }}
                   />
