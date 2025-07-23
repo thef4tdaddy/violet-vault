@@ -556,4 +556,4 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill }) => {
   );
 };
 
-export default BillManager;
+export default React.memo(BillManager);

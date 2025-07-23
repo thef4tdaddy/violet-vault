@@ -268,4 +268,4 @@ const EnvelopeGrid = ({
   );
 };
 
-export default EnvelopeGrid;
+export default React.memo(EnvelopeGrid);

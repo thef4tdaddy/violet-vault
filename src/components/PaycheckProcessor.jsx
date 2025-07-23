@@ -388,4 +388,4 @@ const PaycheckProcessor = ({
   );
 };
 
-export default PaycheckProcessor;
+export default React.memo(PaycheckProcessor);
