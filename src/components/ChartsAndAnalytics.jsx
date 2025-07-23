@@ -36,6 +36,24 @@ const ChartsAnalytics = ({
   savingsGoals = [],
   currentUser = { userName: "User", userColor: "#a855f7" },
 }) => {
+  // Validate and sanitize props to prevent runtime errors
+  const safeTransactions = Array.isArray(transactions) ? transactions : [];
+  const safeEnvelopes = Array.isArray(envelopes) ? envelopes : [];
+  const safeBills = Array.isArray(bills) ? bills : [];
+  const safePaycheckHistory = Array.isArray(paycheckHistory) ? paycheckHistory : [];
+  const safeSavingsGoals = Array.isArray(savingsGoals) ? savingsGoals : [];
+
+  // Date validation helper
+  const isValidDate = (dateString) => {
+    if (!dateString) return false;
+    const date = new Date(dateString);
+    return date instanceof Date && !isNaN(date) && date.getFullYear() > 1900;
+  };
+
+  // Safe division helper
+  const safeDivision = (numerator, denominator, fallback = 0) => {
+    return denominator === 0 ? fallback : numerator / denominator;
+  };
   const [activeTab, setActiveTab] = useState("overview");
   const [dateRange, setDateRange] = useState("6months"); // 1month, 3months, 6months, 1year, all
   const [chartType, setChartType] = useState("line"); // line, bar, area
@@ -55,27 +73,44 @@ const ChartsAnalytics = ({
 
   // Filter transactions by date range
   const filteredTransactions = useMemo(() => {
-    return transactions.filter((t) => new Date(t.date) >= getDateRange);
-  }, [transactions, getDateRange]);
+    return safeTransactions.filter((t) => {
+      if (!t || !isValidDate(t.date)) return false;
+      try {
+        return new Date(t.date) >= getDateRange;
+      } catch (error) {
+        console.warn('Invalid date in transaction:', t.date);
+        return false;
+      }
+    });
+  }, [safeTransactions, getDateRange, isValidDate]);
 
   // Monthly spending trends
   const monthlyTrends = useMemo(() => {
     const grouped = {};
 
     filteredTransactions.forEach((transaction) => {
-      const date = new Date(transaction.date);
-      const monthKey = `${date.getFullYear()}-${String(
-        date.getMonth() + 1
-      ).padStart(2, "0")}`;
+      if (!transaction || !isValidDate(transaction.date) || typeof transaction.amount !== 'number') {
+        return; // Skip invalid transactions
+      }
+      
+      try {
+        const date = new Date(transaction.date);
+        const monthKey = `${date.getFullYear()}-${String(
+          date.getMonth() + 1
+        ).padStart(2, "0")}`;
 
-      if (!grouped[monthKey]) {
-        grouped[monthKey] = {
-          month: monthKey,
-          income: 0,
-          expenses: 0,
-          net: 0,
-          transactionCount: 0,
-        };
+        if (!grouped[monthKey]) {
+          grouped[monthKey] = {
+            month: monthKey,
+            income: 0,
+            expenses: 0,
+            net: 0,
+            transactionCount: 0,
+          };
+        }
+      } catch (error) {
+        console.warn('Error processing transaction in monthlyTrends:', transaction);
+        return;
       }
 
       if (transaction.amount > 0) {
@@ -100,7 +135,7 @@ const ChartsAnalytics = ({
 
     filteredTransactions.forEach((transaction) => {
       if (transaction.amount < 0 && transaction.envelopeId) {
-        const envelope = envelopes.find((e) => e.id === transaction.envelopeId);
+        const envelope = safeEnvelopes.find((e) => e.id === transaction.envelopeId);
         const envelopeName = envelope ? envelope.name : "Unknown Envelope";
 
         if (!spending[envelopeName]) {
@@ -118,7 +153,7 @@ const ChartsAnalytics = ({
     });
 
     return Object.values(spending).sort((a, b) => b.amount - a.amount);
-  }, [filteredTransactions, envelopes]);
+  }, [filteredTransactions, safeEnvelopes]);
 
   // Category breakdown
   const categoryBreakdown = useMemo(() => {
@@ -170,14 +205,13 @@ const ChartsAnalytics = ({
 
   // Envelope health analysis
   const envelopeHealth = useMemo(() => {
-    return envelopes.map((envelope) => {
+    return safeEnvelopes.map((envelope) => {
       const monthlyBudget = envelope.monthlyAmount || 0;
       const currentBalance = envelope.currentBalance || 0;
       const spent =
         envelope.spendingHistory?.reduce((sum, s) => sum + s.amount, 0) || 0;
 
-      const healthScore =
-        monthlyBudget > 0 ? (currentBalance / monthlyBudget) * 100 : 100;
+      const healthScore = safeDivision(currentBalance, monthlyBudget, 1) * 100;
       let status = "healthy";
 
       if (healthScore < 20) status = "critical";
@@ -194,7 +228,7 @@ const ChartsAnalytics = ({
         color: envelope.color,
       };
     });
-  }, [envelopes]);
+  }, [safeEnvelopes]);
 
   // Budget vs actual analysis
   const budgetVsActual = useMemo(() => {
@@ -211,7 +245,7 @@ const ChartsAnalytics = ({
 
     filteredTransactions.forEach((transaction) => {
       if (transaction.amount < 0 && transaction.envelopeId) {
-        const envelope = envelopes.find((e) => e.id === transaction.envelopeId);
+        const envelope = safeEnvelopes.find((e) => e.id === transaction.envelopeId);
         if (envelope && analysis[envelope.name]) {
           analysis[envelope.name].actual += Math.abs(transaction.amount);
         }
@@ -221,7 +255,7 @@ const ChartsAnalytics = ({
     return Object.values(analysis).filter(
       (item) => item.budgeted > 0 || item.actual > 0
     );
-  }, [filteredTransactions, envelopes]);
+  }, [filteredTransactions, safeEnvelopes]);
 
   // Financial metrics
   const metrics = useMemo(() => {
@@ -233,20 +267,23 @@ const ChartsAnalytics = ({
       .filter((t) => t.amount < 0)
       .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
-    const savingsRate =
-      totalIncome > 0 ? ((totalIncome - totalExpenses) / totalIncome) * 100 : 0;
+    const savingsRate = safeDivision((totalIncome - totalExpenses), totalIncome, 0) * 100;
 
-    const avgMonthlyIncome =
-      monthlyTrends.length > 0
-        ? monthlyTrends.reduce((sum, m) => sum + m.income, 0) /
-          monthlyTrends.length
-        : 0;
+    const avgMonthlyIncome = monthlyTrends.length > 0
+      ? safeDivision(
+          monthlyTrends.reduce((sum, m) => sum + m.income, 0),
+          monthlyTrends.length,
+          0
+        )
+      : 0;
 
-    const avgMonthlyExpenses =
-      monthlyTrends.length > 0
-        ? monthlyTrends.reduce((sum, m) => sum + m.expenses, 0) /
-          monthlyTrends.length
-        : 0;
+    const avgMonthlyExpenses = monthlyTrends.length > 0
+      ? safeDivision(
+          monthlyTrends.reduce((sum, m) => sum + m.expenses, 0),
+          monthlyTrends.length,
+          0
+        )
+      : 0;
 
     return {
       totalIncome,
