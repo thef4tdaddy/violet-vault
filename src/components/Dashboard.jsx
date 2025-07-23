@@ -214,7 +214,7 @@ const Dashboard = ({
         <div className="flex gap-3 mt-6">
           <button
             onClick={() => setShowReconcileModal(true)}
-            className="glassmorphism px-6 py-3 text-blue-700 font-semibold rounded-2xl border border-blue-200/50 hover:border-blue-300/70 transition-all duration-200 transform hover:scale-105 backdrop-blur-sm shadow-lg hover:shadow-xl flex items-center"
+            className="btn btn-secondary flex items-center"
           >
             <RefreshCw className="h-4 w-4 mr-2" />
             Reconcile Transaction
@@ -248,7 +248,7 @@ const Dashboard = ({
                   });
                 }
               }}
-              className="glassmorphism px-6 py-3 text-orange-700 font-semibold rounded-2xl border border-orange-200/50 hover:border-orange-300/70 transition-all duration-200 transform hover:scale-105 backdrop-blur-sm shadow-lg hover:shadow-xl flex items-center"
+              className="btn btn-secondary flex items-center"
             >
               <CheckCircle className="h-4 w-4 mr-2" />
               Auto-Reconcile Difference

@@ -1,6 +1,6 @@
 // components/EnvelopeGrid.jsx
 import React, { useState } from "react";
-import { Wallet, Plus, Minus, ArrowRightLeft, DollarSign } from "lucide-react";
+import { Wallet, Plus, Minus, ArrowRightLeft, DollarSign, X } from "lucide-react";
 
 const EnvelopeGrid = ({
   envelopes,
@@ -57,7 +57,11 @@ const EnvelopeGrid = ({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
         {/* Unassigned Cash Envelope */}
         <div
-          className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white cursor-pointer hover:shadow-xl transition-all"
+          className="bg-gradient-to-br from-emerald-400 via-emerald-500 to-emerald-600 rounded-xl shadow-2xl p-6 text-white cursor-pointer hover:shadow-emerald-500/25 hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-emerald-300/20"
+          style={{ 
+            background: 'linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%)',
+            boxShadow: '0 20px 40px -15px rgba(16, 185, 129, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) inset'
+          }}
           onClick={() =>
             setSelectedEnvelope({
               id: "unassigned",
@@ -82,13 +86,25 @@ const EnvelopeGrid = ({
           return (
             <div
               key={envelope.id}
-              className={`rounded-xl shadow-lg p-6 text-white cursor-pointer hover:shadow-xl transition-all ${
+              className={`rounded-xl shadow-2xl p-6 text-white cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border ${
                 isLow
-                  ? "bg-gradient-to-br from-red-500 to-red-600"
+                  ? "hover:shadow-red-500/25 border-red-300/20"
                   : isOverfunded
-                  ? "bg-gradient-to-br from-blue-500 to-blue-600"
-                  : "bg-gradient-to-br from-gray-500 to-gray-600"
+                  ? "hover:shadow-blue-500/25 border-blue-300/20"
+                  : "hover:shadow-indigo-500/25 border-indigo-300/20"
               }`}
+              style={{
+                background: isLow
+                  ? 'linear-gradient(135deg, #f87171 0%, #ef4444 50%, #dc2626 100%)'
+                  : isOverfunded
+                  ? 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%)'
+                  : 'linear-gradient(135deg, #818cf8 0%, #6366f1 50%, #4f46e5 100%)',
+                boxShadow: isLow
+                  ? '0 20px 40px -15px rgba(239, 68, 68, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) inset'
+                  : isOverfunded
+                  ? '0 20px 40px -15px rgba(59, 130, 246, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) inset'
+                  : '0 20px 40px -15px rgba(99, 102, 241, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) inset'
+              }}
               onClick={() => setSelectedEnvelope(envelope)}
             >
               <div className="flex items-center justify-between mb-4">
@@ -115,9 +131,17 @@ const EnvelopeGrid = ({
       {selectedEnvelope && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="glassmorphism rounded-2xl p-6 w-full max-w-md border border-white/30 shadow-2xl">
-            <h3 className="text-xl font-semibold mb-4">
-              {selectedEnvelope.name}
-            </h3>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold">
+                {selectedEnvelope.name}
+              </h3>
+              <button
+                onClick={() => setSelectedEnvelope(null)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
             <p className="text-lg mb-4">
               Current Balance:{" "}
               <span className="font-bold">

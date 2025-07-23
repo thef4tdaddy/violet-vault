@@ -338,21 +338,24 @@ const TeamActivitySync = ({
           {otherActiveUsers.length > 0 && (
             <div className="flex items-center space-x-2">
               <Users className="h-4 w-4 text-purple-600" />
-              <div className="flex -space-x-1">
-                {otherActiveUsers.slice(0, 3).map((user, index) => (
-                  <div
-                    key={user.id || index}
-                    className="w-6 h-6 rounded-full border-2 border-white shadow-sm flex items-center justify-center text-xs font-medium text-white"
-                    style={{ backgroundColor: user.color || user.userColor || '#a855f7' }}
-                    title={user.userName}
-                  >
-                    {user.userName?.charAt(0)?.toUpperCase() || '?'}
+              <div className="flex items-center space-x-2">
+                {otherActiveUsers.slice(0, 2).map((user, index) => (
+                  <div key={user.id || index} className="flex items-center space-x-1">
+                    <div
+                      className="w-5 h-5 rounded-full border border-white shadow-sm flex items-center justify-center text-xs font-medium text-white"
+                      style={{ backgroundColor: user.color || user.userColor || '#a855f7' }}
+                    >
+                      {user.userName?.charAt(0)?.toUpperCase() || '?'}
+                    </div>
+                    <span className="text-xs font-medium text-gray-700">
+                      {user.userName || 'Anonymous'}
+                    </span>
                   </div>
                 ))}
-                {otherActiveUsers.length > 3 && (
-                  <div className="w-6 h-6 rounded-full border-2 border-white bg-gray-400 shadow-sm flex items-center justify-center text-xs font-medium text-white">
-                    +{otherActiveUsers.length - 3}
-                  </div>
+                {otherActiveUsers.length > 2 && (
+                  <span className="text-xs text-gray-500">
+                    +{otherActiveUsers.length - 2} more
+                  </span>
                 )}
               </div>
             </div>

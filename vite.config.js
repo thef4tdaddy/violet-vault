@@ -8,8 +8,16 @@ export default defineConfig({
     // Fix for some Firebase compatibility issues
     global: "globalThis",
   },
+  resolve: {
+    alias: {
+      // Ensure proper Firebase resolution
+      'firebase/app': 'firebase/app',
+      'firebase/firestore': 'firebase/firestore',
+    },
+  },
   optimizeDeps: {
     include: ["firebase/app", "firebase/firestore", "recharts"],
+    exclude: [],
   },
   build: {
     rollupOptions: {
@@ -17,8 +25,6 @@ export default defineConfig({
         manualChunks: {
           // Vendor chunk for core React libraries
           react: ['react', 'react-dom'],
-          // Firebase chunk for Firebase related code
-          firebase: ['firebase/app', 'firebase/firestore'],
           // Charts chunk for recharts and analytics
           charts: ['recharts'],
           // Icons chunk for lucide-react
