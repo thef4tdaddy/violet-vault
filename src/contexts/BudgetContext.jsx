@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { encryptionUtils } from "../utils/encryption";
 import FirebaseSync from "../utils/firebaseSync";
+import { Sentry } from "../utils/sentry";
 
 const BudgetContext = createContext();
 
@@ -311,10 +312,37 @@ export const BudgetProvider = ({
   // Firebase sync setup
   useEffect(() => {
     if (encryptionKey && currentUser && budgetId) {
+      // Log sync initialization to Sentry
+      Sentry.captureMessage("Firebase sync initializing", {
+        level: 'info',
+        tags: { component: 'BudgetContext', operation: 'sync_init' },
+        extra: {
+          userName: currentUser?.userName,
+          budgetId,
+          hasEncryptionKey: !!encryptionKey
+        }
+      });
+
       firebaseSync.initialize(budgetId, encryptionKey);
 
       const syncListener = (event) => {
         console.log("🔄 Sync event received:", event);
+        
+        // Send sync events to Sentry for debugging
+        Sentry.captureMessage(`Sync event: ${event.type}`, {
+          level: event.type.includes('error') ? 'error' : 'info',
+          tags: {
+            component: 'BudgetContext',
+            syncOperation: event.operation || 'unknown'
+          },
+          extra: {
+            event,
+            currentUser: currentUser?.userName,
+            budgetId,
+            hasEncryptionKey: !!encryptionKey
+          }
+        });
+
         switch (event.type) {
           case "sync_start":
             setIsSyncing(true);
@@ -322,6 +350,11 @@ export const BudgetProvider = ({
             // Failsafe: automatically reset syncing state after 30 seconds
             setTimeout(() => {
               console.warn("⏰ Sync timeout - resetting syncing state");
+              Sentry.captureMessage("Sync timeout - operation took longer than 30 seconds", {
+                level: 'warning',
+                tags: { component: 'BudgetContext', issue: 'sync_timeout' },
+                extra: { operation: event.operation, currentUser: currentUser?.userName }
+              });
               setIsSyncing(false);
               setSyncError("Sync timeout - please try again");
             }, 30000);
@@ -386,6 +419,19 @@ export const BudgetProvider = ({
   // Auto-save and sync
   useEffect(() => {
     if (encryptionKey && currentUser && !isSyncing) {
+      // Log sync trigger conditions to Sentry
+      Sentry.captureMessage("Auto-save and sync triggered", {
+        level: 'info',
+        tags: { component: 'BudgetContext', operation: 'auto_sync' },
+        extra: {
+          hasEncryptionKey: !!encryptionKey,
+          hasCurrentUser: !!currentUser,
+          isSyncing,
+          userName: currentUser?.userName,
+          budgetId
+        }
+      });
+
       // Auto-save to localStorage
       const saveToLocal = async () => {
         try {

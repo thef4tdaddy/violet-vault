@@ -46,6 +46,17 @@ class FirebaseSync {
 
     // Clear any existing queued operations for a fresh start
     this.syncQueue = [];
+
+    // Log initialization to Sentry
+    Sentry.captureMessage("FirebaseSync initialized", {
+      level: 'info',
+      tags: { component: 'FirebaseSync', operation: 'initialize' },
+      extra: {
+        budgetId,
+        hasEncryptionKey: !!encryptionKey,
+        queueLength: this.syncQueue.length
+      }
+    });
   }
 
   setupNetworkMonitoring() {
@@ -255,13 +266,39 @@ class FirebaseSync {
 
   async saveToCloud(data, currentUser, options = {}) {
     if (!this.budgetId || !this.encryptionKey) {
+      Sentry.captureMessage("SaveToCloud failed - not initialized", {
+        level: 'error',
+        tags: { component: 'FirebaseSync', operation: 'saveToCloud', issue: 'not_initialized' },
+        extra: {
+          hasBudgetId: !!this.budgetId,
+          hasEncryptionKey: !!this.encryptionKey,
+          userName: currentUser?.userName
+        }
+      });
       throw new Error("Firebase sync not initialized");
     }
+
+    // Log save attempt to Sentry
+    Sentry.captureMessage("SaveToCloud attempt started", {
+      level: 'info',
+      tags: { component: 'FirebaseSync', operation: 'saveToCloud' },
+      extra: {
+        budgetId: this.budgetId,
+        userName: currentUser?.userName,
+        dataSize: JSON.stringify(data).length,
+        isOnline: this.isOnline,
+        options
+      }
+    });
 
     // If offline, queue the operation
     if (!this.isOnline && !options.skipQueue) {
       this.queueSyncOperation("save", { data, currentUser });
       console.log("📴 Queued save operation for when online");
+      Sentry.captureMessage("SaveToCloud queued - offline", {
+        level: 'info',
+        tags: { component: 'FirebaseSync', operation: 'saveToCloud', status: 'queued' }
+      });
       return;
     }
 
