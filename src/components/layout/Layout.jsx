@@ -143,7 +143,7 @@ const Layout = () => {
     }
   };
 
-  const importData = async (event, setDebugInfo) => {
+const importData = async (event, setDebugInfo) => {
     const file = event.target.files[0];
     if (!file) return;
 
@@ -385,6 +385,8 @@ const Layout = () => {
       alert(
         `Successfully imported data!\n\nEnvelopes: ${dataToLoad.envelopes.length}\nBills: ${dataToLoad.bills.length}\nTransactions: ${dataToLoad.allTransactions.length}\n\nData saved to localStorage. If it doesn't appear, try the Force Load Data button.`
       );
+
+      return dataToLoad;
     } catch (error) {
       console.error("❌ Import failed:", error);
       console.error("❌ Import error details:", {
@@ -518,6 +520,14 @@ const MainContent = ({
   const [activeView, setActiveView] = useState("dashboard");
   const [debugInfo, setDebugInfo] = useState(null);
   const [forceLoadDebug, setForceLoadDebug] = useState(null);
+
+  // Handle import by saving data then loading into context
+  const handleImport = async (event) => {
+    const data = await onImport(event, setDebugInfo);
+    if (data) {
+      budget.loadData(data);
+    }
+  };
 
   // Debug panel for live site
   const forceLoadData = async () => {
@@ -1005,7 +1015,7 @@ const MainContent = ({
           currentUser={currentUser}
           onUserChange={onUserChange}
           onExport={onExport}
-          onImport={(event) => onImport(event, setDebugInfo)}
+          onImport={handleImport}
           onLogout={onLogout}
           onResetEncryption={onResetEncryption}
         />
