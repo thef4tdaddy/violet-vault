@@ -143,7 +143,7 @@ const Layout = () => {
     }
   };
 
-  const importData = async (event, setDebugInfo) => {
+  const importData = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
@@ -167,36 +167,6 @@ const Layout = () => {
         allTransactions: importedData.allTransactions?.length || 0,
       });
 
-      // Add debug info to UI for import process
-      if (setDebugInfo) {
-        setDebugInfo({
-          success: true,
-          stage: "import_parsed",
-          topLevelKeys: Object.keys(importedData),
-          envelopesLength: importedData.envelopes?.length || 0,
-          billsLength: importedData.bills?.length || 0,
-          savingsGoalsLength: importedData.savingsGoals?.length || 0,
-          allTransactionsLength: importedData.allTransactions?.length || 0,
-          unassignedCash: importedData.unassignedCash || 0,
-          hasCurrentUser: !!importedData.currentUser,
-          userName: importedData.currentUser?.userName || "None",
-          firstEnvelope: importedData.envelopes?.[0]
-            ? {
-                id: importedData.envelopes[0].id,
-                name: importedData.envelopes[0].name,
-                amount: importedData.envelopes[0].amount,
-                currentBalance: importedData.envelopes[0].currentBalance,
-              }
-            : null,
-          firstBill: importedData.bills?.[0]
-            ? {
-                id: importedData.bills[0].id,
-                name: importedData.bills[0].name,
-                amount: importedData.bills[0].amount,
-              }
-            : null,
-        });
-      }
 
       // Validate the data structure
       if (!importedData.envelopes || !Array.isArray(importedData.envelopes)) {
@@ -297,41 +267,6 @@ const Layout = () => {
             : "created",
       });
 
-      // Update debug info to show the processed data (not raw imported data)
-      if (setDebugInfo) {
-        setDebugInfo({
-          success: true,
-          stage: "import_processed",
-          topLevelKeys: Object.keys(dataToLoad),
-          envelopesLength: dataToLoad.envelopes?.length || 0,
-          billsLength: dataToLoad.bills?.length || 0,
-          savingsGoalsLength: dataToLoad.savingsGoals?.length || 0,
-          allTransactionsLength: dataToLoad.allTransactions?.length || 0,
-          unassignedCash: dataToLoad.unassignedCash || 0,
-          hasCurrentUser: !!dataToLoad.currentUser,
-          userName: dataToLoad.currentUser?.userName || "None",
-          userSource: importedData.currentUser
-            ? "imported"
-            : currentUser
-              ? "session"
-              : "created",
-          firstEnvelope: dataToLoad.envelopes?.[0]
-            ? {
-                id: dataToLoad.envelopes[0].id,
-                name: dataToLoad.envelopes[0].name,
-                amount: dataToLoad.envelopes[0].amount,
-                currentBalance: dataToLoad.envelopes[0].currentBalance,
-              }
-            : null,
-          firstBill: dataToLoad.bills?.[0]
-            ? {
-                id: dataToLoad.bills[0].id,
-                name: dataToLoad.bills[0].name,
-                amount: dataToLoad.bills[0].amount,
-              }
-            : null,
-        });
-      }
 
       // Encrypt and save the imported data
       console.log("🔐 Encrypting and saving imported data...");
@@ -395,17 +330,8 @@ const Layout = () => {
         name: error.name,
       });
 
-      if (setDebugInfo) {
-        setDebugInfo({
-          success: false,
-          error: `${error.name}: ${error.message}`,
-          stage: "import_error",
-        });
-      }
 
-      alert(
-        `Import failed: ${error.message}\n\nCheck debug panel for details. Please ensure you're uploading a valid VioletVault backup file.`
-      );
+      alert(`Import failed: ${error.message}`);
     }
 
     // Clear the file input
@@ -440,31 +366,6 @@ const Layout = () => {
     return <UserSetup onSetupComplete={handleSetup} />;
   }
 
-  // Debug info - show in UI for live site debugging
-  const debugInfo = (
-    <div
-      style={{
-        position: "fixed",
-        top: "10px",
-        right: "10px",
-        background: "rgba(0,0,0,0.8)",
-        color: "white",
-        padding: "10px",
-        borderRadius: "8px",
-        fontSize: "12px",
-        zIndex: 9999,
-        maxWidth: "300px",
-      }}
-    >
-      <div>
-        <strong>Debug Info:</strong>
-      </div>
-      <div>✅ Layout rendered</div>
-      <div>User: {currentUser?.userName || "None"}</div>
-      <div>BudgetId: {budgetId ? "✅" : "❌"}</div>
-      <div>EncryptionKey: {encryptionKey ? "✅" : "❌"}</div>
-    </div>
-  );
 
   console.log("🏗️ Layout: Rendering BudgetProvider with props", {
     hasEncryptionKey: !!encryptionKey,
@@ -476,7 +377,6 @@ const Layout = () => {
 
   return (
     <>
-      {debugInfo}
       <BudgetProvider
         encryptionKey={encryptionKey}
         currentUser={currentUser}
@@ -489,7 +389,7 @@ const Layout = () => {
           budgetId={budgetId}
           onUserChange={handleLogout}
           onExport={exportData}
-          onImport={(event, setDebugInfo) => importData(event, setDebugInfo)}
+          onImport={importData}
           onLogout={handleLogout}
           onResetEncryption={resetEncryptionAndStartFresh}
           activeUsers={activeUsers}
@@ -518,376 +418,15 @@ const MainContent = ({
 }) => {
   const budget = useBudget();
   const [activeView, setActiveView] = useState("dashboard");
-  const [debugInfo, setDebugInfo] = useState(null);
-  const [forceLoadDebug, setForceLoadDebug] = useState(null);
 
   // Handle import by saving data then loading into context
   const handleImport = async (event) => {
-    const data = await onImport(event, setDebugInfo);
+    const data = await onImport(event);
     if (data) {
       budget.loadData(data);
     }
   };
 
-  // Debug panel for live site
-  const forceLoadData = async () => {
-    try {
-      console.log("🔄 Force loading data from localStorage...");
-      const savedData = localStorage.getItem("envelopeBudgetData");
-
-      if (!savedData) {
-        alert("No data found in localStorage");
-        return;
-      }
-
-      if (!encryptionKey || !currentUser || !budgetId) {
-        alert("Missing authentication data");
-        return;
-      }
-
-      const parsedData = JSON.parse(savedData);
-      const { salt: savedSalt, encryptedData, iv } = parsedData;
-
-      // Debug localStorage structure
-      setForceLoadDebug({
-        step: 0,
-        message: "🔍 Checking localStorage structure",
-        localStorageData: {
-          hasEncryptedData: !!encryptedData,
-          hasSalt: !!savedSalt,
-          hasIv: !!iv,
-          encryptedDataLength: encryptedData?.length || 0,
-          encryptedDataType: typeof encryptedData,
-          encryptedDataPreview:
-            typeof encryptedData === "string"
-              ? encryptedData.substring(0, 50) + "..."
-              : "Not a string",
-        },
-      });
-
-      // Wait a moment then decrypt
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const decryptedData = await encryptionUtils.decrypt(
-        encryptedData,
-        encryptionKey,
-        iv
-      );
-
-      // Set debug info for visual display
-      setForceLoadDebug((prev) => ({
-        ...prev,
-        step: 1,
-        message: "✅ Data decrypted successfully",
-        decryptedData: {
-          envelopes: decryptedData.envelopes?.length || 0,
-          bills: decryptedData.bills?.length || 0,
-          savingsGoals: decryptedData.savingsGoals?.length || 0,
-          topLevelKeys: Object.keys(decryptedData),
-          hasCurrentUser: !!decryptedData.currentUser,
-        },
-      }));
-
-      // Use the loadData action to force load the data
-      budget.loadData(decryptedData);
-
-      // Wait a bit and check state
-      setTimeout(() => {
-        setForceLoadDebug((prev) => ({
-          ...prev,
-          step: 2,
-          message: "📊 loadData() called - checking result",
-          afterLoadData: {
-            envelopes: budget.envelopes?.length || 0,
-            bills: budget.bills?.length || 0,
-            debug: budget._debug,
-          },
-        }));
-      }, 100);
-
-      alert("Data load attempted! Check the debug panel below for details.");
-    } catch (error) {
-      console.error("❌ Force load failed:", error);
-      alert("Failed to load data: " + error.message);
-    }
-  };
-
-  // Check localStorage on component mount
-  React.useEffect(() => {
-    const savedData = localStorage.getItem("envelopeBudgetData");
-    console.log("🗄️ MainContent: localStorage check:", {
-      hasData: !!savedData,
-      dataLength: savedData?.length || 0,
-      timestamp: new Date().toISOString(),
-    });
-  }, []);
-
-  const budgetDebugInfo = (
-    <div
-      style={{
-        position: "fixed",
-        top: "10px",
-        left: "10px",
-        background: "rgba(0,0,0,0.8)",
-        color: "white",
-        padding: "10px",
-        borderRadius: "8px",
-        fontSize: "12px",
-        zIndex: 9999,
-        maxWidth: "300px",
-      }}
-    >
-      <div>
-        <strong>Budget Debug:</strong>
-      </div>
-      <div>Envelopes: {budget.envelopes?.length || 0}</div>
-      <div>Bills: {budget.bills?.length || 0}</div>
-      <div>Savings: {budget.savingsGoals?.length || 0}</div>
-      <div>Unassigned: ${budget.unassignedCash || 0}</div>
-      <div>Debug: {JSON.stringify(budget._debug || {})}</div>
-      <div
-        style={{
-          marginTop: "10px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "5px",
-        }}
-      >
-        <button
-          onClick={forceLoadData}
-          style={{
-            padding: "8px 12px",
-            backgroundColor: "#ef4444",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-            fontSize: "11px",
-          }}
-        >
-          Force Load Data
-        </button>
-        <button
-          onClick={() => {
-            const data = localStorage.getItem("envelopeBudgetData");
-            if (data) {
-              const parsed = JSON.parse(data);
-              console.log("🔍 localStorage contents:", {
-                hasEncryptedData: !!parsed.encryptedData,
-                hasSalt: !!parsed.salt,
-                hasIv: !!parsed.iv,
-                encryptedDataLength: parsed.encryptedData?.length || 0,
-              });
-              alert(
-                `localStorage data found:\nEncrypted: ${!!parsed.encryptedData}\nSalt: ${!!parsed.salt}\nIV: ${!!parsed.iv}\nData length: ${parsed.encryptedData?.length || 0}`
-              );
-            } else {
-              console.log("❌ No data in localStorage");
-              alert("No data found in localStorage");
-            }
-          }}
-          style={{
-            padding: "8px 12px",
-            backgroundColor: "#3b82f6",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-            fontSize: "11px",
-          }}
-        >
-          Check Storage
-        </button>
-        <button
-          onClick={async () => {
-            try {
-              const data = localStorage.getItem("envelopeBudgetData");
-              if (!data) {
-                setDebugInfo("No localStorage data found");
-                return;
-              }
-
-              const { encryptedData, iv } = JSON.parse(data);
-              const decrypted = await encryptionUtils.decrypt(
-                encryptedData,
-                encryptionKey,
-                iv
-              );
-
-              // Set debug info to display in UI
-              setDebugInfo({
-                success: true,
-                topLevelKeys: Object.keys(decrypted),
-                envelopesLength: decrypted.envelopes?.length || 0,
-                billsLength: decrypted.bills?.length || 0,
-                savingsGoalsLength: decrypted.savingsGoals?.length || 0,
-                allTransactionsLength: decrypted.allTransactions?.length || 0,
-                unassignedCash: decrypted.unassignedCash || 0,
-                hasCurrentUser: !!decrypted.currentUser,
-                userName: decrypted.currentUser?.userName || "None",
-                firstEnvelope: decrypted.envelopes?.[0]
-                  ? {
-                      id: decrypted.envelopes[0].id,
-                      name: decrypted.envelopes[0].name,
-                      amount: decrypted.envelopes[0].amount,
-                      currentBalance: decrypted.envelopes[0].currentBalance,
-                    }
-                  : null,
-                firstBill: decrypted.bills?.[0]
-                  ? {
-                      id: decrypted.bills[0].id,
-                      name: decrypted.bills[0].name,
-                      amount: decrypted.bills[0].amount,
-                    }
-                  : null,
-              });
-
-              alert(
-                `Manual decrypt worked!\nEnvelopes: ${decrypted.envelopes?.length || 0}\nBills: ${decrypted.bills?.length || 0}\nUser: ${decrypted.currentUser?.userName || "None"}\n\nCheck debug panel for details`
-              );
-            } catch (error) {
-              setDebugInfo({
-                success: false,
-                error: error.message,
-              });
-              alert("Manual decrypt failed: " + error.message);
-            }
-          }}
-          style={{
-            padding: "8px 12px",
-            backgroundColor: "#10b981",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-            fontSize: "11px",
-          }}
-        >
-          Test Decrypt
-        </button>
-        <button
-          onClick={() => {
-            console.log("🔍 BudgetContext Debug Info:", {
-              hasEncryptionKey: !!encryptionKey,
-              hasCurrentUser: !!currentUser,
-              hasBudgetId: !!budgetId,
-              currentUser: currentUser,
-              budgetDebug: budget._debug,
-              envelopeCount: budget.envelopes?.length || 0,
-              billCount: budget.bills?.length || 0,
-            });
-            alert(
-              `Debug info logged to console!\n\nBudget State:\nEnvelopes: ${budget.envelopes?.length || 0}\nBills: ${budget.bills?.length || 0}\nLoaded: ${budget._debug?.dataLoaded || false}`
-            );
-          }}
-          style={{
-            padding: "8px 12px",
-            backgroundColor: "#3b82f6",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-            fontSize: "11px",
-          }}
-        >
-          Debug Context
-        </button>
-      </div>
-    </div>
-  );
-
-  // Force Load Debug Panel
-  const forceLoadDebugPanel = forceLoadDebug && (
-    <div
-      style={{
-        position: "fixed",
-        bottom: "10px",
-        left: "10px",
-        background: "rgba(0,0,0,0.9)",
-        color: "white",
-        padding: "15px",
-        borderRadius: "8px",
-        fontSize: "12px",
-        zIndex: 9999,
-        maxWidth: "400px",
-        maxHeight: "300px",
-        overflow: "auto",
-      }}
-    >
-      <div style={{ marginBottom: "10px", fontWeight: "bold" }}>
-        🔍 Force Load Debug (Step {forceLoadDebug.step}/
-        {forceLoadDebug.step === 0 ? "3" : "2"})
-      </div>
-      <div style={{ marginBottom: "8px" }}>{forceLoadDebug.message}</div>
-
-      {forceLoadDebug.localStorageData && (
-        <div style={{ marginBottom: "10px" }}>
-          <strong>localStorage Structure:</strong>
-          <div>
-            Has Encrypted:{" "}
-            {forceLoadDebug.localStorageData.hasEncryptedData ? "✅" : "❌"}
-          </div>
-          <div>
-            Has Salt: {forceLoadDebug.localStorageData.hasSalt ? "✅" : "❌"}
-          </div>
-          <div>
-            Has IV: {forceLoadDebug.localStorageData.hasIv ? "✅" : "❌"}
-          </div>
-          <div>
-            Data Length: {forceLoadDebug.localStorageData.encryptedDataLength}
-          </div>
-          <div>
-            Data Type: {forceLoadDebug.localStorageData.encryptedDataType}
-          </div>
-          <div style={{ fontSize: "10px", wordBreak: "break-all" }}>
-            Preview: {forceLoadDebug.localStorageData.encryptedDataPreview}
-          </div>
-        </div>
-      )}
-
-      {forceLoadDebug.decryptedData && (
-        <div style={{ marginBottom: "10px" }}>
-          <strong>Decrypted Data:</strong>
-          <div>Envelopes: {forceLoadDebug.decryptedData.envelopes}</div>
-          <div>Bills: {forceLoadDebug.decryptedData.bills}</div>
-          <div>
-            Has User:{" "}
-            {forceLoadDebug.decryptedData.hasCurrentUser ? "✅" : "❌"}
-          </div>
-          <div>
-            Keys: {forceLoadDebug.decryptedData.topLevelKeys.join(", ")}
-          </div>
-        </div>
-      )}
-
-      {forceLoadDebug.afterLoadData && (
-        <div style={{ marginBottom: "10px" }}>
-          <strong>After loadData():</strong>
-          <div>Budget Envelopes: {forceLoadDebug.afterLoadData.envelopes}</div>
-          <div>Budget Bills: {forceLoadDebug.afterLoadData.bills}</div>
-          <div>
-            Data Loaded:{" "}
-            {forceLoadDebug.afterLoadData.debug?.dataLoaded ? "✅" : "❌"}
-          </div>
-        </div>
-      )}
-
-      <button
-        onClick={() => setForceLoadDebug(null)}
-        style={{
-          padding: "4px 8px",
-          backgroundColor: "#ef4444",
-          color: "white",
-          border: "none",
-          borderRadius: "4px",
-          cursor: "pointer",
-          fontSize: "10px",
-        }}
-      >
-        Close Debug
-      </button>
-    </div>
-  );
 
   const {
     envelopes,
@@ -917,99 +456,9 @@ const MainContent = ({
   );
   const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
 
-  // Debug display panel
-  const debugDisplay = debugInfo && (
-    <div
-      style={{
-        position: "fixed",
-        bottom: "10px",
-        left: "10px",
-        background: "rgba(0,0,0,0.9)",
-        color: "white",
-        padding: "15px",
-        borderRadius: "8px",
-        fontSize: "11px",
-        zIndex: 9999,
-        maxWidth: "400px",
-        maxHeight: "300px",
-        overflow: "auto",
-      }}
-    >
-      <div style={{ marginBottom: "10px" }}>
-        <strong>
-          {debugInfo.stage === "import_parsed"
-            ? "Import Parse Results:"
-            : debugInfo.stage === "import_processed"
-              ? "Import Processed Results:"
-              : "Decrypt Test Results:"}
-        </strong>
-        <button
-          onClick={() => setDebugInfo(null)}
-          style={{
-            float: "right",
-            background: "red",
-            color: "white",
-            border: "none",
-            borderRadius: "3px",
-            padding: "2px 6px",
-            cursor: "pointer",
-          }}
-        >
-          ✕
-        </button>
-      </div>
-      {typeof debugInfo === "string" ? (
-        <div>{debugInfo}</div>
-      ) : debugInfo.success ? (
-        <div>
-          <div>
-            <strong>Top Level Keys:</strong> {debugInfo.topLevelKeys.join(", ")}
-          </div>
-          <div>
-            <strong>Envelopes:</strong> {debugInfo.envelopesLength}
-          </div>
-          <div>
-            <strong>Bills:</strong> {debugInfo.billsLength}
-          </div>
-          <div>
-            <strong>Savings Goals:</strong> {debugInfo.savingsGoalsLength}
-          </div>
-          <div>
-            <strong>Transactions:</strong> {debugInfo.allTransactionsLength}
-          </div>
-          <div>
-            <strong>Unassigned Cash:</strong> ${debugInfo.unassignedCash}
-          </div>
-          <div>
-            <strong>User:</strong> {debugInfo.userName}{" "}
-            {debugInfo.userSource ? `(${debugInfo.userSource})` : ""}
-          </div>
-          {debugInfo.firstEnvelope && (
-            <div>
-              <strong>First Envelope:</strong> {debugInfo.firstEnvelope.name} -
-              ${debugInfo.firstEnvelope.currentBalance}
-            </div>
-          )}
-          {debugInfo.firstBill && (
-            <div>
-              <strong>First Bill:</strong> {debugInfo.firstBill.name} - $
-              {debugInfo.firstBill.amount}
-            </div>
-          )}
-        </div>
-      ) : (
-        <div style={{ color: "red" }}>
-          <strong>Error:</strong> {debugInfo.error}
-        </div>
-      )}
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden">
-      {budgetDebugInfo}
-      {forceLoadDebugPanel}
-      {debugDisplay}
       <div className="max-w-7xl mx-auto relative z-10">
         <Header
           currentUser={currentUser}
