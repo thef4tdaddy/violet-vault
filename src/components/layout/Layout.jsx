@@ -114,6 +114,14 @@ const Layout = () => {
     return <UserSetup onSetupComplete={handleSetup} />;
   }
 
+  console.log("🏗️ Layout: Rendering BudgetProvider with props", {
+    hasEncryptionKey: !!encryptionKey,
+    hasCurrentUser: !!currentUser,
+    hasBudgetId: !!budgetId,
+    hasSalt: !!salt,
+    currentUser: currentUser
+  });
+
   return (
     <BudgetProvider
       encryptionKey={encryptionKey}

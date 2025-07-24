@@ -129,12 +129,22 @@ export const AuthProvider = ({ children }) => {
           }
         }
 
+        console.log("🔑 AuthContext: Setting auth state after login", {
+          hasKey: !!key,
+          hasCurrentUser: !!currentUserData,
+          hasBudgetId: !!currentUserData.budgetId,
+          userName: currentUserData.userName,
+          budgetId: currentUserData.budgetId
+        });
+
         setSalt(saltArray);
         setEncryptionKey(key);
         setCurrentUser(currentUserData);
         setBudgetId(currentUserData.budgetId);
         setIsUnlocked(true);
         setLastActivity(Date.now());
+
+        console.log("✅ AuthContext: Auth state set successfully");
 
         return { success: true, data: migratedData };
       }
