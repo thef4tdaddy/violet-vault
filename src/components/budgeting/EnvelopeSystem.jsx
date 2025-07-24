@@ -70,32 +70,32 @@ const useEnvelopeSystem = () => {
   // Spend money from an envelope
   const spendFromEnvelope = useCallback(
     (envelopeId, amount, description = "Spending") => {
-      const updatedEnvelopes = envelopes.map((envelope) => {
-        if (envelope.id === envelopeId) {
-          const newBalance = Math.max(0, envelope.currentBalance - amount);
-          const spendingRecord = {
-            id: Date.now(),
-            amount: amount,
-            description: description,
-            date: new Date().toISOString(),
-            balanceAfter: newBalance,
-          };
+      setEnvelopes((currentEnvelopes) =>
+        currentEnvelopes.map((envelope) => {
+          if (envelope.id === envelopeId) {
+            const newBalance = Math.max(0, envelope.currentBalance - amount);
+            const spendingRecord = {
+              id: Date.now(),
+              amount: amount,
+              description: description,
+              date: new Date().toISOString(),
+              balanceAfter: newBalance,
+            };
 
-          return {
-            ...envelope,
-            currentBalance: newBalance,
-            spendingHistory: [
-              ...(envelope.spendingHistory || []),
-              spendingRecord,
-            ],
-          };
-        }
-        return envelope;
-      });
-
-      setEnvelopes(updatedEnvelopes);
+            return {
+              ...envelope,
+              currentBalance: newBalance,
+              spendingHistory: [
+                ...(envelope.spendingHistory || []),
+                spendingRecord,
+              ],
+            };
+          }
+          return envelope;
+        })
+      );
     },
-    [envelopes, setEnvelopes]
+    [setEnvelopes]
   );
 
   // Transfer money between envelopes
@@ -103,69 +103,72 @@ const useEnvelopeSystem = () => {
     (fromEnvelopeId, toEnvelopeId, amount) => {
       if (fromEnvelopeId === "unassigned") {
         // Transfer from unassigned cash to envelope
-        if (unassignedCash >= amount) {
-          setUnassignedCash(unassignedCash - amount);
-
-          const updatedEnvelopes = envelopes.map((envelope) => {
-            if (envelope.id === toEnvelopeId) {
-              return {
-                ...envelope,
-                currentBalance: envelope.currentBalance + amount,
-              };
-            }
-            return envelope;
-          });
-
-          setEnvelopes(updatedEnvelopes);
-        }
+        setUnassignedCash((currentUnassigned) => {
+          if (currentUnassigned >= amount) {
+            setEnvelopes((currentEnvelopes) =>
+              currentEnvelopes.map((envelope) => {
+                if (envelope.id === toEnvelopeId) {
+                  return {
+                    ...envelope,
+                    currentBalance: envelope.currentBalance + amount,
+                  };
+                }
+                return envelope;
+              })
+            );
+            return currentUnassigned - amount;
+          }
+          return currentUnassigned;
+        });
         return;
       }
 
       if (toEnvelopeId === "unassigned") {
         // Transfer from envelope to unassigned cash
-        const fromEnvelope = envelopes.find((env) => env.id === fromEnvelopeId);
-        if (fromEnvelope && fromEnvelope.currentBalance >= amount) {
-          setUnassignedCash(unassignedCash + amount);
-          spendFromEnvelope(
-            fromEnvelopeId,
-            amount,
-            "Transfer to unassigned cash"
+        setEnvelopes((currentEnvelopes) => {
+          const fromEnvelope = currentEnvelopes.find(
+            (env) => env.id === fromEnvelopeId
           );
-        }
+          if (fromEnvelope && fromEnvelope.currentBalance >= amount) {
+            setUnassignedCash((current) => current + amount);
+            spendFromEnvelope(
+              fromEnvelopeId,
+              amount,
+              "Transfer to unassigned cash"
+            );
+          }
+          return currentEnvelopes;
+        });
         return;
       }
 
       // Transfer between two envelopes
-      const fromEnvelope = envelopes.find((env) => env.id === fromEnvelopeId);
-      if (!fromEnvelope || fromEnvelope.currentBalance < amount) {
-        return; // Insufficient funds
-      }
+      setEnvelopes((currentEnvelopes) => {
+        const fromEnvelope = currentEnvelopes.find(
+          (env) => env.id === fromEnvelopeId
+        );
+        if (!fromEnvelope || fromEnvelope.currentBalance < amount) {
+          return currentEnvelopes; // Insufficient funds
+        }
 
-      const updatedEnvelopes = envelopes.map((envelope) => {
-        if (envelope.id === fromEnvelopeId) {
-          return {
-            ...envelope,
-            currentBalance: envelope.currentBalance - amount,
-          };
-        }
-        if (envelope.id === toEnvelopeId) {
-          return {
-            ...envelope,
-            currentBalance: envelope.currentBalance + amount,
-          };
-        }
-        return envelope;
+        return currentEnvelopes.map((envelope) => {
+          if (envelope.id === fromEnvelopeId) {
+            return {
+              ...envelope,
+              currentBalance: envelope.currentBalance - amount,
+            };
+          }
+          if (envelope.id === toEnvelopeId) {
+            return {
+              ...envelope,
+              currentBalance: envelope.currentBalance + amount,
+            };
+          }
+          return envelope;
+        });
       });
-
-      setEnvelopes(updatedEnvelopes);
     },
-    [
-      envelopes,
-      unassignedCash,
-      setEnvelopes,
-      setUnassignedCash,
-      spendFromEnvelope,
-    ]
+    [setEnvelopes, setUnassignedCash, spendFromEnvelope]
   );
 
   // Process paycheck allocation to envelopes
@@ -173,7 +176,7 @@ const useEnvelopeSystem = () => {
     (paycheckAmount, allocationMode = "allocate") => {
       if (allocationMode === "leftover") {
         // All money goes to unassigned cash
-        setUnassignedCash(unassignedCash + paycheckAmount);
+        setUnassignedCash((current) => current + paycheckAmount);
         return {
           allocations: {},
           leftoverAmount: paycheckAmount,
@@ -183,46 +186,50 @@ const useEnvelopeSystem = () => {
       // Smart allocation based on envelope needs
       let remainingAmount = paycheckAmount;
       const allocations = {};
-      const updatedEnvelopes = [...envelopes];
 
-      // First pass: Fill envelopes that are below their biweekly allocation
-      envelopes.forEach((envelope) => {
-        if (remainingAmount <= 0) return;
+      setEnvelopes((currentEnvelopes) => {
+        const updatedEnvelopes = [...currentEnvelopes];
 
-        const needed = Math.max(
-          0,
-          envelope.biweeklyAllocation - envelope.currentBalance
-        );
-        const allocation = Math.min(needed, remainingAmount);
+        // First pass: Fill envelopes that are below their biweekly allocation
+        currentEnvelopes.forEach((envelope) => {
+          if (remainingAmount <= 0) return;
 
-        if (allocation > 0) {
-          allocations[envelope.id] = allocation;
-          remainingAmount -= allocation;
-
-          // Update envelope balance
-          const envelopeIndex = updatedEnvelopes.findIndex(
-            (env) => env.id === envelope.id
+          const needed = Math.max(
+            0,
+            envelope.biweeklyAllocation - envelope.currentBalance
           );
-          if (envelopeIndex !== -1) {
-            updatedEnvelopes[envelopeIndex] = {
-              ...updatedEnvelopes[envelopeIndex],
-              currentBalance:
-                updatedEnvelopes[envelopeIndex].currentBalance + allocation,
-            };
+          const allocation = Math.min(needed, remainingAmount);
+
+          if (allocation > 0) {
+            allocations[envelope.id] = allocation;
+            remainingAmount -= allocation;
+
+            // Update envelope balance
+            const envelopeIndex = updatedEnvelopes.findIndex(
+              (env) => env.id === envelope.id
+            );
+            if (envelopeIndex !== -1) {
+              updatedEnvelopes[envelopeIndex] = {
+                ...updatedEnvelopes[envelopeIndex],
+                currentBalance:
+                  updatedEnvelopes[envelopeIndex].currentBalance + allocation,
+              };
+            }
           }
-        }
+        });
+
+        return updatedEnvelopes;
       });
 
       // Remaining amount goes to unassigned cash
-      setUnassignedCash(unassignedCash + remainingAmount);
-      setEnvelopes(updatedEnvelopes);
+      setUnassignedCash((current) => current + remainingAmount);
 
       return {
         allocations,
         leftoverAmount: remainingAmount,
       };
     },
-    [envelopes, unassignedCash, setEnvelopes, setUnassignedCash]
+    [setEnvelopes, setUnassignedCash]
   );
 
   // Auto-calculate biweekly needs when bills change
