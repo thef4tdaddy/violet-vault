@@ -167,7 +167,6 @@ const Layout = () => {
         allTransactions: importedData.allTransactions?.length || 0,
       });
 
-
       // Validate the data structure
       if (!importedData.envelopes || !Array.isArray(importedData.envelopes)) {
         throw new Error(
@@ -267,7 +266,6 @@ const Layout = () => {
             : "created",
       });
 
-
       // Encrypt and save the imported data
       console.log("🔐 Encrypting and saving imported data...");
       const encrypted = await encryptionUtils.encrypt(
@@ -330,7 +328,6 @@ const Layout = () => {
         name: error.name,
       });
 
-
       alert(`Import failed: ${error.message}`);
     }
 
@@ -365,7 +362,6 @@ const Layout = () => {
   if (!isUnlocked || !currentUser) {
     return <UserSetup onSetupComplete={handleSetup} />;
   }
-
 
   console.log("🏗️ Layout: Rendering BudgetProvider with props", {
     hasEncryptionKey: !!encryptionKey,
@@ -427,7 +423,6 @@ const MainContent = ({
     }
   };
 
-
   const {
     envelopes,
     bills,
@@ -455,7 +450,6 @@ const MainContent = ({
     0
   );
   const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden">
