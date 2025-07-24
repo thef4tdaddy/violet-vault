@@ -60,12 +60,12 @@ const Layout = () => {
   const [syncConflicts, setSyncConflicts] = useState(null);
   const handleSetup = async (userData, password) => {
     try {
-      // Generate budgetId if not present
+      // Generate budgetId from password for cross-device sync
+      const { encryptionUtils } = await import("../../utils/encryption");
       const userDataWithId = {
         ...userData,
         budgetId:
-          userData.budgetId ||
-          `budget_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          userData.budgetId || encryptionUtils.generateBudgetId(password),
       };
 
       const result = await login(password, userDataWithId);
