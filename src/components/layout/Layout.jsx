@@ -201,9 +201,7 @@ const Layout = () => {
 
       // Prepare the data for loading - ensure user information is preserved
       const dataToLoad = {
-        ...importedData,
-        currentUser: currentUser, // Keep current user info
-        // Preserve essential fields
+        // Budget data from import
         envelopes: importedData.envelopes || [],
         bills: importedData.bills || [],
         savingsGoals: importedData.savingsGoals || [],
@@ -214,22 +212,55 @@ const Layout = () => {
         actualBalance: importedData.actualBalance || 0,
         transactions: importedData.transactions || [],
         allTransactions: importedData.allTransactions || [],
+        // Preserve current user info (critical for login)
+        currentUser: currentUser,
+        // Add any other imported metadata
+        ...(importedData.exportMetadata && { importMetadata: {
+          ...importedData.exportMetadata,
+          importedAt: new Date().toISOString(),
+          importedBy: currentUser?.userName
+        }})
       };
+
+      console.log("📋 Prepared data for saving:", {
+        envelopes: dataToLoad.envelopes.length,
+        bills: dataToLoad.bills.length,
+        savingsGoals: dataToLoad.savingsGoals.length,
+        transactions: dataToLoad.allTransactions.length,
+        hasCurrentUser: !!dataToLoad.currentUser,
+        currentUserBudgetId: dataToLoad.currentUser?.budgetId
+      });
 
       // Encrypt and save the imported data
       console.log("🔐 Encrypting and saving imported data...");
-      const encrypted = await encryptionUtils.encrypt(
-        dataToLoad,
-        encryptionKey
-      );
-      localStorage.setItem(
-        "envelopeBudgetData",
-        JSON.stringify({
-          encryptedData: encrypted.data,
-          salt: Array.from(salt),
-          iv: encrypted.iv,
-        })
-      );
+      const encrypted = await encryptionUtils.encrypt(dataToLoad, encryptionKey);
+      
+      const saveData = {
+        encryptedData: encrypted.data,
+        salt: Array.from(salt),
+        iv: encrypted.iv,
+      };
+      
+      localStorage.setItem("envelopeBudgetData", JSON.stringify(saveData));
+
+      // Verify the save worked
+      const verification = localStorage.getItem("envelopeBudgetData");
+      if (!verification) {
+        throw new Error("Failed to save data to localStorage");
+      }
+      
+      // Test decryption to ensure data integrity
+      console.log("🔍 Verifying data integrity...");
+      const { encryptedData: testEncrypted, iv: testIv } = JSON.parse(verification);
+      const testDecrypted = await encryptionUtils.decrypt(testEncrypted, encryptionKey, testIv);
+      
+      console.log("✅ Data integrity verified:", {
+        envelopes: testDecrypted.envelopes?.length || 0,
+        bills: testDecrypted.bills?.length || 0,
+        savingsGoals: testDecrypted.savingsGoals?.length || 0,
+        hasCurrentUser: !!testDecrypted.currentUser,
+        budgetId: testDecrypted.currentUser?.budgetId
+      });
 
       console.log("✅ Data imported and saved successfully!");
 
@@ -427,21 +458,51 @@ const MainContent = ({
       <div>Savings: {budget.savingsGoals?.length || 0}</div>
       <div>Unassigned: ${budget.unassignedCash || 0}</div>
       <div>Debug: {JSON.stringify(budget._debug || {})}</div>
-      <button
-        onClick={forceLoadData}
-        style={{
-          marginTop: "10px",
-          padding: "8px 12px",
-          backgroundColor: "#ef4444",
-          color: "white",
-          border: "none",
-          borderRadius: "4px",
-          cursor: "pointer",
-          fontSize: "11px",
-        }}
-      >
-        Force Load Data
-      </button>
+      <div style={{ marginTop: "10px", display: "flex", flexDirection: "column", gap: "5px" }}>
+        <button
+          onClick={forceLoadData}
+          style={{
+            padding: "8px 12px",
+            backgroundColor: "#ef4444",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontSize: "11px",
+          }}
+        >
+          Force Load Data
+        </button>
+        <button 
+          onClick={() => {
+            const data = localStorage.getItem("envelopeBudgetData");
+            if (data) {
+              const parsed = JSON.parse(data);
+              console.log("🔍 localStorage contents:", { 
+                hasEncryptedData: !!parsed.encryptedData,
+                hasSalt: !!parsed.salt,
+                hasIv: !!parsed.iv,
+                encryptedDataLength: parsed.encryptedData?.length || 0
+              });
+              alert(`localStorage data found:\nEncrypted: ${!!parsed.encryptedData}\nSalt: ${!!parsed.salt}\nIV: ${!!parsed.iv}\nData length: ${parsed.encryptedData?.length || 0}`);
+            } else {
+              console.log("❌ No data in localStorage");
+              alert("No data found in localStorage");
+            }
+          }}
+          style={{
+            padding: "8px 12px",
+            backgroundColor: "#3b82f6",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontSize: "11px",
+          }}
+        >
+          Check Storage
+        </button>
+      </div>
     </div>
   );
 
