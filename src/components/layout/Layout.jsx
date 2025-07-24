@@ -374,9 +374,15 @@ const Layout = () => {
 
       console.log("✅ Data imported and saved successfully!");
 
-      // Show success message but don't auto-refresh
+      // Load the data immediately into the budget context
+      console.log("📝 Loading imported data into budget context...");
+      budget.loadData(dataToLoad);
+      
+      console.log("🎉 Data loaded into context successfully!");
+
+      // Show success message
       alert(
-        `Successfully imported data!\n\nEnvelopes: ${dataToLoad.envelopes.length}\nBills: ${dataToLoad.bills.length}\nTransactions: ${dataToLoad.allTransactions.length}\n\nData saved! You can manually refresh or use Force Load Data button.`
+        `Successfully imported data!\n\nEnvelopes: ${dataToLoad.envelopes.length}\nBills: ${dataToLoad.bills.length}\nTransactions: ${dataToLoad.allTransactions.length}\n\nData is now active in your budget!`
       );
     } catch (error) {
       console.error("❌ Import failed:", error);
