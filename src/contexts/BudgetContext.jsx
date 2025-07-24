@@ -173,37 +173,47 @@ export const BudgetProvider = ({
         hasEncryptionKey: !!encryptionKey,
         hasCurrentUser: !!currentUser,
         hasBudgetId: !!budgetId,
-        currentUser: currentUser
+        currentUser: currentUser,
       });
 
       if (encryptionKey && currentUser && budgetId) {
         try {
           console.log("🔄 Attempting to load data from localStorage...");
           const savedData = localStorage.getItem("envelopeBudgetData");
-          
+
           if (savedData) {
             console.log("✅ Found saved data in localStorage");
-            const { salt: savedSalt, encryptedData, iv } = JSON.parse(savedData);
-            
+            const {
+              salt: savedSalt,
+              encryptedData,
+              iv,
+            } = JSON.parse(savedData);
+
             console.log("🔐 Decrypting data with provided encryptionKey...");
             // Use the provided encryptionKey directly (it's already derived)
             const { encryptionUtils } = await import("../utils/encryption");
-            const decryptedData = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
-            
+            const decryptedData = await encryptionUtils.decrypt(
+              encryptedData,
+              encryptionKey,
+              iv
+            );
+
             console.log("✅ Data decrypted successfully!", {
               envelopes: decryptedData.envelopes?.length || 0,
               bills: decryptedData.bills?.length || 0,
               savingsGoals: decryptedData.savingsGoals?.length || 0,
               allTransactions: decryptedData.allTransactions?.length || 0,
               transactions: decryptedData.transactions?.length || 0,
-              unassignedCash: decryptedData.unassignedCash || 0
+              unassignedCash: decryptedData.unassignedCash || 0,
             });
 
             // Load all the data into the state
             console.log("📝 Dispatching LOAD_DATA action...");
             dispatch({ type: actionTypes.LOAD_DATA, payload: decryptedData });
-            
-            console.log("🎉 Initial budget data loaded successfully into state!");
+
+            console.log(
+              "🎉 Initial budget data loaded successfully into state!"
+            );
           } else {
             console.warn("⚠️ No saved data found in localStorage");
           }
@@ -214,14 +224,14 @@ export const BudgetProvider = ({
             stack: error.stack,
             encryptionKey: !!encryptionKey,
             currentUser: currentUser,
-            budgetId: budgetId
+            budgetId: budgetId,
           });
         }
       } else {
         console.log("⏳ Waiting for required props...", {
           encryptionKey: !!encryptionKey,
           currentUser: !!currentUser,
-          budgetId: !!budgetId
+          budgetId: !!budgetId,
         });
       }
     };
