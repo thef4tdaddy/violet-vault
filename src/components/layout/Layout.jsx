@@ -731,7 +731,9 @@ const MainContent = ({
               envelopeCount: budget.envelopes?.length || 0,
               billCount: budget.bills?.length || 0,
             });
-            alert(`Debug info logged to console!\n\nBudget State:\nEnvelopes: ${budget.envelopes?.length || 0}\nBills: ${budget.bills?.length || 0}\nLoaded: ${budget._debug?.dataLoaded || false}`);
+            alert(
+              `Debug info logged to console!\n\nBudget State:\nEnvelopes: ${budget.envelopes?.length || 0}\nBills: ${budget.bills?.length || 0}\nLoaded: ${budget._debug?.dataLoaded || false}`
+            );
           }}
           style={{
             padding: "8px 12px",
