@@ -219,55 +219,19 @@ export const BudgetProvider = ({
               hasCurrentUser: !!decryptedData.currentUser,
             });
 
-            // Validate and clean the decrypted data before loading
-            const cleanedData = {
-              envelopes: Array.isArray(decryptedData.envelopes)
-                ? decryptedData.envelopes
-                : [],
-              bills: Array.isArray(decryptedData.bills)
-                ? decryptedData.bills
-                : [],
-              savingsGoals: Array.isArray(decryptedData.savingsGoals)
-                ? decryptedData.savingsGoals
-                : [],
-              supplementalAccounts: Array.isArray(
-                decryptedData.supplementalAccounts
-              )
-                ? decryptedData.supplementalAccounts
-                : [],
-              unassignedCash:
-                typeof decryptedData.unassignedCash === "number"
-                  ? decryptedData.unassignedCash
-                  : 0,
-              biweeklyAllocation:
-                typeof decryptedData.biweeklyAllocation === "number"
-                  ? decryptedData.biweeklyAllocation
-                  : 0,
-              paycheckHistory: Array.isArray(decryptedData.paycheckHistory)
-                ? decryptedData.paycheckHistory
-                : [],
-              actualBalance:
-                typeof decryptedData.actualBalance === "number"
-                  ? decryptedData.actualBalance
-                  : 0,
-              transactions: Array.isArray(decryptedData.transactions)
-                ? decryptedData.transactions
-                : [],
-              allTransactions: Array.isArray(decryptedData.allTransactions)
-                ? decryptedData.allTransactions
-                : [],
-            };
+            // Load all the data directly without stripping fields
+            // The reducer should handle any validation needed
 
-            console.log("🧹 Cleaned data for loading:", {
-              envelopes: cleanedData.envelopes.length,
-              bills: cleanedData.bills.length,
-              savingsGoals: cleanedData.savingsGoals.length,
-              allTransactions: cleanedData.allTransactions.length,
+            console.log("🧹 Data ready for loading:", {
+              envelopes: decryptedData.envelopes?.length || 0,
+              bills: decryptedData.bills?.length || 0,
+              savingsGoals: decryptedData.savingsGoals?.length || 0,
+              allTransactions: decryptedData.allTransactions?.length || 0,
             });
 
             // Load all the data into the state
             console.log("📝 Dispatching LOAD_DATA action...");
-            dispatch({ type: actionTypes.LOAD_DATA, payload: cleanedData });
+            dispatch({ type: actionTypes.LOAD_DATA, payload: decryptedData });
 
             console.log(
               "🎉 Initial budget data loaded successfully into state!"
