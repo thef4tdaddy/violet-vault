@@ -333,7 +333,10 @@ const TeamActivitySync = ({
   }, [activeUsers, currentUser]);
 
   // Always show the sync indicator, even without activity
-  const shouldShow = otherActiveUsers.length > 0 || processedActivities.length > 0 || isOnline !== undefined;
+  const shouldShow =
+    otherActiveUsers.length > 0 ||
+    processedActivities.length > 0 ||
+    isOnline !== undefined;
 
   return (
     <div className="glassmorphism rounded-2xl mb-6 border border-white/20 overflow-hidden">
