@@ -3,12 +3,24 @@ import { Shield, Users, Eye, EyeOff } from "lucide-react";
 import logoOnly from "../../assets/Logo Only 1024x1024.png";
 
 const UserSetup = ({ onSetupComplete }) => {
+  console.log("🏗️ UserSetup component rendered", { onSetupComplete: !!onSetupComplete });
+  
   const [step, setStep] = useState(1);
   const [masterPassword, setMasterPassword] = useState("");
   const [userName, setUserName] = useState("");
   const [userColor, setUserColor] = useState("#a855f7");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Add quick timeout to prevent hanging
+  const handleWithTimeout = async (asyncFn, timeoutMs = 5000) => {
+    return Promise.race([
+      asyncFn(),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error(`Operation timed out after ${timeoutMs}ms`)), timeoutMs)
+      )
+    ]);
+  };
 
   // Load saved user profile on component mount
   useEffect(() => {
@@ -97,20 +109,27 @@ const UserSetup = ({ onSetupComplete }) => {
         masterPassword: !!masterPassword,
         userName: userName.trim(),
       });
+      alert("Please fill in both password and name");
       return;
     }
 
     setIsLoading(true);
     try {
       console.log("🚀 Calling onSetupComplete from Start Tracking...");
-      await onSetupComplete({
-        password: masterPassword,
-        userName: userName.trim(),
-        userColor,
-      });
+      
+      // Add timeout protection
+      await handleWithTimeout(async () => {
+        await onSetupComplete({
+          password: masterPassword,
+          userName: userName.trim(),
+          userColor,
+        });
+      }, 10000);
+      
       console.log("✅ onSetupComplete succeeded from Start Tracking");
     } catch (error) {
       console.error("❌ Setup failed from Start Tracking:", error);
+      alert(`Setup failed: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -178,7 +197,10 @@ const UserSetup = ({ onSetupComplete }) => {
                 <input
                   type={showPassword ? "text" : "password"}
                   value={masterPassword}
-                  onChange={(e) => setMasterPassword(e.target.value)}
+                  onChange={(e) => {
+                    console.log("🔐 Password input changed");
+                    setMasterPassword(e.target.value);
+                  }}
                   placeholder="Master password"
                   className="w-full px-4 py-4 text-lg border border-purple-200 rounded-2xl focus:ring-2 focus:ring-purple-500"
                   disabled={isLoading}
@@ -263,7 +285,10 @@ const UserSetup = ({ onSetupComplete }) => {
                 <input
                   type="text"
                   value={userName}
-                  onChange={(e) => setUserName(e.target.value)}
+                  onChange={(e) => {
+                    console.log("👤 Name input changed:", e.target.value);
+                    setUserName(e.target.value);
+                  }}
                   placeholder="e.g., Sarah, John, etc."
                   className="w-full px-4 py-3 border border-purple-200 rounded-2xl focus:ring-2 focus:ring-purple-500"
                   disabled={isLoading}
