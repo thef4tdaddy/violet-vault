@@ -244,12 +244,13 @@ const Layout = () => {
         transactions: importedData.transactions || [],
         allTransactions: importedData.allTransactions || [],
         // Use imported currentUser if it exists, otherwise use current session user
-        currentUser: importedData.currentUser || currentUser || {
-          id: `user_${Date.now()}`,
-          userName: importedData.exportedBy || "Imported User",
-          userColor: "#a855f7",
-          budgetId: budgetId
-        },
+        currentUser: importedData.currentUser ||
+          currentUser || {
+            id: `user_${Date.now()}`,
+            userName: importedData.exportedBy || "Imported User",
+            userColor: "#a855f7",
+            budgetId: budgetId,
+          },
         // Add any other imported metadata
         ...(importedData.exportMetadata && {
           importMetadata: {
