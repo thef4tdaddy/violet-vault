@@ -143,7 +143,7 @@ const Layout = () => {
     }
   };
 
-  const importData = async (event) => {
+  const importData = async (event, setDebugInfo) => {
     const file = event.target.files[0];
     if (!file) return;
 
@@ -168,29 +168,31 @@ const Layout = () => {
       });
 
       // Add debug info to UI for import process
-      setDebugInfo({
-        success: true,
-        stage: "import_parsed",
-        topLevelKeys: Object.keys(importedData),
-        envelopesLength: importedData.envelopes?.length || 0,
-        billsLength: importedData.bills?.length || 0,
-        savingsGoalsLength: importedData.savingsGoals?.length || 0,
-        allTransactionsLength: importedData.allTransactions?.length || 0,
-        unassignedCash: importedData.unassignedCash || 0,
-        hasCurrentUser: !!importedData.currentUser,
-        userName: importedData.currentUser?.userName || 'None',
-        firstEnvelope: importedData.envelopes?.[0] ? {
-          id: importedData.envelopes[0].id,
-          name: importedData.envelopes[0].name,
-          amount: importedData.envelopes[0].amount,
-          currentBalance: importedData.envelopes[0].currentBalance
-        } : null,
-        firstBill: importedData.bills?.[0] ? {
-          id: importedData.bills[0].id,
-          name: importedData.bills[0].name,
-          amount: importedData.bills[0].amount
-        } : null
-      });
+      if (setDebugInfo) {
+        setDebugInfo({
+          success: true,
+          stage: "import_parsed",
+          topLevelKeys: Object.keys(importedData),
+          envelopesLength: importedData.envelopes?.length || 0,
+          billsLength: importedData.bills?.length || 0,
+          savingsGoalsLength: importedData.savingsGoals?.length || 0,
+          allTransactionsLength: importedData.allTransactions?.length || 0,
+          unassignedCash: importedData.unassignedCash || 0,
+          hasCurrentUser: !!importedData.currentUser,
+          userName: importedData.currentUser?.userName || 'None',
+          firstEnvelope: importedData.envelopes?.[0] ? {
+            id: importedData.envelopes[0].id,
+            name: importedData.envelopes[0].name,
+            amount: importedData.envelopes[0].amount,
+            currentBalance: importedData.envelopes[0].currentBalance
+          } : null,
+          firstBill: importedData.bills?.[0] ? {
+            id: importedData.bills[0].id,
+            name: importedData.bills[0].name,
+            amount: importedData.bills[0].amount
+          } : null
+        });
+      }
 
       // Validate the data structure
       if (!importedData.envelopes || !Array.isArray(importedData.envelopes)) {
@@ -396,7 +398,7 @@ const Layout = () => {
           budgetId={budgetId}
           onUserChange={handleLogout}
           onExport={exportData}
-          onImport={importData}
+          onImport={(event, setDebugInfo) => importData(event, setDebugInfo)}
           onLogout={handleLogout}
           onResetEncryption={resetEncryptionAndStartFresh}
           activeUsers={activeUsers}
@@ -714,7 +716,7 @@ const MainContent = ({
           currentUser={currentUser}
           onUserChange={onUserChange}
           onExport={onExport}
-          onImport={onImport}
+          onImport={(event) => onImport(event, setDebugInfo)}
           onLogout={onLogout}
           onResetEncryption={onResetEncryption}
         />
