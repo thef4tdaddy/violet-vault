@@ -1323,12 +1323,21 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
         onUpdateTransaction={() => {}} // Will be implemented
         onDeleteTransaction={() => {}} // Will be implemented
         onBulkImport={(newTransactions) => {
-          console.log("🔄 onBulkImport called with transactions:", newTransactions.length);
-          const updatedAllTransactions = [...allTransactions, ...newTransactions];
+          console.log(
+            "🔄 onBulkImport called with transactions:",
+            newTransactions.length
+          );
+          const updatedAllTransactions = [
+            ...allTransactions,
+            ...newTransactions,
+          ];
           const updatedTransactions = [...transactions, ...newTransactions];
           setAllTransactions(updatedAllTransactions);
           setTransactions(updatedTransactions);
-          console.log("💾 Bulk import complete. Total transactions:", updatedAllTransactions.length);
+          console.log(
+            "💾 Bulk import complete. Total transactions:",
+            updatedAllTransactions.length
+          );
         }}
         currentUser={currentUser}
       />

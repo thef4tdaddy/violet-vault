@@ -413,7 +413,16 @@ export const BudgetProvider = ({
         clearTimeout(syncTimeout);
       };
     }
-  }, [state.bills.length, state.envelopes.length, state.transactions.length, state.allTransactions.length, encryptionKey, isOnline, isSyncing, firebaseSync]); // Trigger on actual data changes
+  }, [
+    state.bills.length,
+    state.envelopes.length,
+    state.transactions.length,
+    state.allTransactions.length,
+    encryptionKey,
+    isOnline,
+    isSyncing,
+    firebaseSync,
+  ]); // Trigger on actual data changes
 
   // Action creators
   const actions = {
