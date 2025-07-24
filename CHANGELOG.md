@@ -1,5 +1,82 @@
 # Changelog
 
+## [1.1.0](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.0.0...violet-vault-v1.1.0) (2025-07-24)
+
+
+### Features
+
+* add automatic data migration for legacy budget data ([60d712e](https://github.com/thef4tdaddy/violet-vault/commit/60d712e76bc3d7684bd7da4383e6b133e11ded37))
+* add comprehensive logging and debugging tools for data loading ([c0e8c5f](https://github.com/thef4tdaddy/violet-vault/commit/c0e8c5fec86bcf81d87418e2f664b1e06e689a87))
+* add detailed debugging for import processing and user creation ([9a9ce2d](https://github.com/thef4tdaddy/violet-vault/commit/9a9ce2d40634992e3274eb248123875119d1e83e))
+* add detailed structure logging to debug decrypt ([06c15f3](https://github.com/thef4tdaddy/violet-vault/commit/06c15f3ac3f5caf9da0a2d96d744700399e550df))
+* add development tooling and branch creation workflow ([b25c2ef](https://github.com/thef4tdaddy/violet-vault/commit/b25c2efaebb86f3eebefa81183635f19375fe0a3))
+* add Force Load Data button for manual data restoration ([524e106](https://github.com/thef4tdaddy/violet-vault/commit/524e106fd5fdc66658824c73b6d3830b4fa9ad72))
+* add import parse debugging to track data during import process ([682f9c9](https://github.com/thef4tdaddy/violet-vault/commit/682f9c9b7ae3b5d918fa4cee91dfdf19bddf16ee))
+* add visual debug display for decrypted data structure ([1959008](https://github.com/thef4tdaddy/violet-vault/commit/1959008a3841002d526b011f73bca155fcbe34da))
+* add visual debug panels for live site debugging ([c57a928](https://github.com/thef4tdaddy/violet-vault/commit/c57a928f555422da0d5b9f7357b63ac3a7415ceb))
+* charts and analytics ([3eeaf00](https://github.com/thef4tdaddy/violet-vault/commit/3eeaf0086fa726e3c14380f95b63fe6bb10b6640))
+* fixing css, tailwind is back ([205d058](https://github.com/thef4tdaddy/violet-vault/commit/205d058f15f25ba02d325154bb62a384c4571e51))
+* git like activity tracker ([c9be081](https://github.com/thef4tdaddy/violet-vault/commit/c9be081ad11c92573206c4a9f45235200832b638))
+* implement complete JSON import/export functionality ([44b9cea](https://github.com/thef4tdaddy/violet-vault/commit/44b9cea4bbcc25302f93359c7b436f866ec2bd85))
+* Ledger system ([68e90d6](https://github.com/thef4tdaddy/violet-vault/commit/68e90d67e605bd27c8b1b79fff3040c39fa93d4b))
+* logos and icons ([fccc21f](https://github.com/thef4tdaddy/violet-vault/commit/fccc21f4e0526ffeb79a0b72b30615d443a65aa4))
+* optimizations ([47591f5](https://github.com/thef4tdaddy/violet-vault/commit/47591f5bad924352ef800e4fbe160479acf6b9bf))
+* readme and update package.json ([350a2b0](https://github.com/thef4tdaddy/violet-vault/commit/350a2b002fb23ee5da261f23183d93a0a1cdd17d))
+* refactoring out envelope ([d2c0dfb](https://github.com/thef4tdaddy/violet-vault/commit/d2c0dfb9e67cb05b1fb33d105300e73a4cc5440d))
+* supplemental accounts ([b203067](https://github.com/thef4tdaddy/violet-vault/commit/b203067cbc7a3ddb8856a6808e4f8734e9a95416))
+* welcome to violetvault ([5b586c3](https://github.com/thef4tdaddy/violet-vault/commit/5b586c36e6b00053bc4353fdfe7321f4721226cf))
+
+
+### Bug Fixes
+
+* fix:  ([e21a2aa](https://github.com/thef4tdaddy/violet-vault/commit/e21a2aaa01c46e5c315c1da5c6d6ba6c67960efa))
+* add basic app startup logging to debug JavaScript execution ([7925b90](https://github.com/thef4tdaddy/violet-vault/commit/7925b905c5cca228f1cb2d87ce8fbf3d8ac28139))
+* add better error handling and debugging for import failures ([1be1177](https://github.com/thef4tdaddy/violet-vault/commit/1be11779b463846f271a133160b2f01dea36c0ea))
+* add comprehensive logging to trace data loading flow ([d5e5a23](https://github.com/thef4tdaddy/violet-vault/commit/d5e5a23db4bba07cceeba37a1b4cb83a7a98adf6))
+* add comprehensive validation to prevent undefined values in Firebase sync ([e90cbf5](https://github.com/thef4tdaddy/violet-vault/commit/e90cbf5dfa846a69917b5f99374a3b05737e317c))
+* add data validation and error handling to prevent login crashes ([d0d8d17](https://github.com/thef4tdaddy/violet-vault/commit/d0d8d173c877a502f0a17ccea40f2d592dc0b582))
+* add initial data loading to BudgetProvider from localStorage ([492adaf](https://github.com/thef4tdaddy/violet-vault/commit/492adaf41065b5b03be27f647700ad44c4e543d1))
+* ensure currentUser exists in imported data for proper loading ([8ce4094](https://github.com/thef4tdaddy/violet-vault/commit/8ce40949897d1e072914c0c461789aeeeda2643b))
+* error handling ([e9643f3](https://github.com/thef4tdaddy/violet-vault/commit/e9643f364d9d04002ee55dd01909f767995a1c98))
+* erroring out trends ([feec8a2](https://github.com/thef4tdaddy/violet-vault/commit/feec8a294a43fae0f2e5c4151c9e480dbdbe8383))
+* firebase issues ([71dc1ac](https://github.com/thef4tdaddy/violet-vault/commit/71dc1ac2d7312ebf30a51fa726d9894f91e188e3))
+* github action issues ([21be620](https://github.com/thef4tdaddy/violet-vault/commit/21be6202b1c453cea3f62f7afcdfc57b28ff576c))
+* icon fixes ([01bbe04](https://github.com/thef4tdaddy/violet-vault/commit/01bbe0490832c3fce83f1720e9cb76da2ca27c61))
+* import function now properly loads data into budget context ([6196277](https://github.com/thef4tdaddy/violet-vault/commit/61962776fc1b3e9f517639d174f2be4402274d8e))
+* import now triggers page refresh to load data properly ([177762b](https://github.com/thef4tdaddy/violet-vault/commit/177762b6a3bc1fcf1fef9ec06b22541918a5390e))
+* improve import data persistence and add debugging tools ([a1b8f14](https://github.com/thef4tdaddy/violet-vault/commit/a1b8f1457e97732d49da5593b505d687cb311267))
+* infinite loop error again ([d04c36f](https://github.com/thef4tdaddy/violet-vault/commit/d04c36f569ae32c2e9f2d59b327da1bec72a454b))
+* infinite loop on login ([72b0ebe](https://github.com/thef4tdaddy/violet-vault/commit/72b0ebe1bdddfe0fea51076e987221e03d7b04ff))
+* infinite looping ([86529b3](https://github.com/thef4tdaddy/violet-vault/commit/86529b3d981d5643a2c4390f56646fcfd0967851))
+* json import issues ([f574a3e](https://github.com/thef4tdaddy/violet-vault/commit/f574a3e36ae3e4f16442f2c5da6335e1581e05b7))
+* login persistence ([951542a](https://github.com/thef4tdaddy/violet-vault/commit/951542a0e611c44904c3162988e186a599dd3147))
+* logo added elsewhere ([d981810](https://github.com/thef4tdaddy/violet-vault/commit/d9818105182b7e8217d1dd98c84ab7f1d094be71))
+* logo problems ([4871288](https://github.com/thef4tdaddy/violet-vault/commit/4871288dc3dd7de54b96bd52178515a973c3eb24))
+* logos, profiles, and navigation ([b905ea9](https://github.com/thef4tdaddy/violet-vault/commit/b905ea9e1f1346eebac40958645958aec0779f2e))
+* pass setDebugInfo to import function for debugging ([d3b5da0](https://github.com/thef4tdaddy/violet-vault/commit/d3b5da03a731725dd85b38a794f134706e93a426))
+* prettier and eslint errors ([c86c502](https://github.com/thef4tdaddy/violet-vault/commit/c86c5028e08d94e202231e020691e1a40a3ffa2c))
+* profile wasnt being saved ([ea3ea14](https://github.com/thef4tdaddy/violet-vault/commit/ea3ea143327d4b9ada257a7ce5291e8ee2e97ec9))
+* remove auto-refresh after import to debug data persistence ([8ec1ec9](https://github.com/thef4tdaddy/violet-vault/commit/8ec1ec9d02c8718bb28bae6b904d33edbbc8d433))
+* resolve budgetId null reference error after refactor ([ca40a8a](https://github.com/thef4tdaddy/violet-vault/commit/ca40a8a8085794cd6da39401fe5bc9a010c4a949))
+* resolve Firebase undefined field error in lastActivity.userName ([7961ab4](https://github.com/thef4tdaddy/violet-vault/commit/7961ab47877b8d85f3c556b1a025387f091f260e))
+* resolve merge conflict in debug display header ([1fb219a](https://github.com/thef4tdaddy/violet-vault/commit/1fb219a2605ba941778843eaaa15142a9a37df11))
+* resolve merge conflicts in BudgetContext data loading ([f917298](https://github.com/thef4tdaddy/violet-vault/commit/f917298533d80eb2f1c7c879f533f5a095b74bf1))
+* resolve undefined cleanedData variable in BudgetContext ([0283de9](https://github.com/thef4tdaddy/violet-vault/commit/0283de967756e8028862de5aa956abc799ac98d9))
+* runtime errors ([db35b2a](https://github.com/thef4tdaddy/violet-vault/commit/db35b2a1ad97660022c5d7dac79d78aed0e44629))
+* some buttons ([07ac9eb](https://github.com/thef4tdaddy/violet-vault/commit/07ac9eb8a0d3fa2367b0e2f0e51d5d585fb62ed1))
+* some more visual fixes ([f039619](https://github.com/thef4tdaddy/violet-vault/commit/f039619ad15717c743075217e9e8d2f39b9ad163))
+* spacing on the header ([6d87722](https://github.com/thef4tdaddy/violet-vault/commit/6d877228b9630a6a8e06ccecad342767267fcb49))
+* still erroring ([7d734df](https://github.com/thef4tdaddy/violet-vault/commit/7d734dfa4c54b600e81bea45fd25b77af50185f4))
+* unencryption issues ([dbf4b05](https://github.com/thef4tdaddy/violet-vault/commit/dbf4b050916608c0d413352fa37f848a431a1049))
+* update import paths in App.jsx to use new component structure ([e037c00](https://github.com/thef4tdaddy/violet-vault/commit/e037c009fe8ace6bc10425b66aa54aabcee1739f))
+* update release-please package name from encrypted-envelope-budget to violet-vault ([635ccd3](https://github.com/thef4tdaddy/violet-vault/commit/635ccd375158c51059adfeb536fcc3db169ad0df))
+* visual errors and improve UI ([b80f4c3](https://github.com/thef4tdaddy/violet-vault/commit/b80f4c3cc109f4ee6c7ede51f73a271987820443))
+
+
+### Code Refactoring
+
+* reorganize components into feature-based directories ([85778b8](https://github.com/thef4tdaddy/violet-vault/commit/85778b82e4b0db1ea68ff33587d34149cda999bd))
+
 ## 1.0.0 (2025-07-24)
 
 
