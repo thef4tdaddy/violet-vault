@@ -432,8 +432,8 @@ export const BudgetProvider = ({
       hasBudgetId: !!budgetId,
       dataLoaded: state.envelopes.length > 0 || state.bills.length > 0,
       envelopeCount: state.envelopes.length,
-      billCount: state.bills.length
-    }
+      billCount: state.bills.length,
+    },
   };
 
   return (

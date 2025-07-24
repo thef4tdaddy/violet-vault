@@ -124,23 +124,27 @@ const Layout = () => {
 
   // Debug info - show in UI for live site debugging
   const debugInfo = (
-    <div style={{
-      position: 'fixed',
-      top: '10px',
-      right: '10px',
-      background: 'rgba(0,0,0,0.8)',
-      color: 'white',
-      padding: '10px',
-      borderRadius: '8px',
-      fontSize: '12px',
-      zIndex: 9999,
-      maxWidth: '300px'
-    }}>
-      <div><strong>Debug Info:</strong></div>
+    <div
+      style={{
+        position: "fixed",
+        top: "10px",
+        right: "10px",
+        background: "rgba(0,0,0,0.8)",
+        color: "white",
+        padding: "10px",
+        borderRadius: "8px",
+        fontSize: "12px",
+        zIndex: 9999,
+        maxWidth: "300px",
+      }}
+    >
+      <div>
+        <strong>Debug Info:</strong>
+      </div>
       <div>✅ Layout rendered</div>
-      <div>User: {currentUser?.userName || 'None'}</div>
-      <div>BudgetId: {budgetId ? '✅' : '❌'}</div>
-      <div>EncryptionKey: {encryptionKey ? '✅' : '❌'}</div>
+      <div>User: {currentUser?.userName || "None"}</div>
+      <div>BudgetId: {budgetId ? "✅" : "❌"}</div>
+      <div>EncryptionKey: {encryptionKey ? "✅" : "❌"}</div>
     </div>
   );
 
@@ -195,19 +199,23 @@ const MainContent = ({
 
   // Debug panel for live site
   const budgetDebugInfo = (
-    <div style={{
-      position: 'fixed',
-      top: '10px',
-      left: '10px',
-      background: 'rgba(0,0,0,0.8)',
-      color: 'white',
-      padding: '10px',
-      borderRadius: '8px',
-      fontSize: '12px',
-      zIndex: 9999,
-      maxWidth: '300px'
-    }}>
-      <div><strong>Budget Debug:</strong></div>
+    <div
+      style={{
+        position: "fixed",
+        top: "10px",
+        left: "10px",
+        background: "rgba(0,0,0,0.8)",
+        color: "white",
+        padding: "10px",
+        borderRadius: "8px",
+        fontSize: "12px",
+        zIndex: 9999,
+        maxWidth: "300px",
+      }}
+    >
+      <div>
+        <strong>Budget Debug:</strong>
+      </div>
       <div>Envelopes: {budget.envelopes?.length || 0}</div>
       <div>Bills: {budget.bills?.length || 0}</div>
       <div>Savings: {budget.savingsGoals?.length || 0}</div>
