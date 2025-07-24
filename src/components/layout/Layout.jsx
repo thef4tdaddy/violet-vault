@@ -122,6 +122,28 @@ const Layout = () => {
     return <UserSetup onSetupComplete={handleSetup} />;
   }
 
+  // Debug info - show in UI for live site debugging
+  const debugInfo = (
+    <div style={{
+      position: 'fixed',
+      top: '10px',
+      right: '10px',
+      background: 'rgba(0,0,0,0.8)',
+      color: 'white',
+      padding: '10px',
+      borderRadius: '8px',
+      fontSize: '12px',
+      zIndex: 9999,
+      maxWidth: '300px'
+    }}>
+      <div><strong>Debug Info:</strong></div>
+      <div>✅ Layout rendered</div>
+      <div>User: {currentUser?.userName || 'None'}</div>
+      <div>BudgetId: {budgetId ? '✅' : '❌'}</div>
+      <div>EncryptionKey: {encryptionKey ? '✅' : '❌'}</div>
+    </div>
+  );
+
   console.log("🏗️ Layout: Rendering BudgetProvider with props", {
     hasEncryptionKey: !!encryptionKey,
     hasCurrentUser: !!currentUser,
@@ -131,25 +153,28 @@ const Layout = () => {
   });
 
   return (
-    <BudgetProvider
-      encryptionKey={encryptionKey}
-      currentUser={currentUser}
-      budgetId={budgetId}
-      salt={salt}
-    >
-      <MainContent
+    <>
+      {debugInfo}
+      <BudgetProvider
+        encryptionKey={encryptionKey}
         currentUser={currentUser}
-        onUserChange={handleLogout}
-        onExport={exportData}
-        onImport={importData}
-        onLogout={handleLogout}
-        onResetEncryption={resetEncryptionAndStartFresh}
-        activeUsers={activeUsers}
-        recentActivity={recentActivity}
-        syncConflicts={syncConflicts}
-        onResolveConflict={resolveConflict}
-      />
-    </BudgetProvider>
+        budgetId={budgetId}
+        salt={salt}
+      >
+        <MainContent
+          currentUser={currentUser}
+          onUserChange={handleLogout}
+          onExport={exportData}
+          onImport={importData}
+          onLogout={handleLogout}
+          onResetEncryption={resetEncryptionAndStartFresh}
+          activeUsers={activeUsers}
+          recentActivity={recentActivity}
+          syncConflicts={syncConflicts}
+          onResolveConflict={resolveConflict}
+        />
+      </BudgetProvider>
+    </>
   );
 };
 
@@ -167,6 +192,29 @@ const MainContent = ({
 }) => {
   const budget = useBudget();
   const [activeView, setActiveView] = useState("dashboard");
+
+  // Debug panel for live site
+  const budgetDebugInfo = (
+    <div style={{
+      position: 'fixed',
+      top: '10px',
+      left: '10px',
+      background: 'rgba(0,0,0,0.8)',
+      color: 'white',
+      padding: '10px',
+      borderRadius: '8px',
+      fontSize: '12px',
+      zIndex: 9999,
+      maxWidth: '300px'
+    }}>
+      <div><strong>Budget Debug:</strong></div>
+      <div>Envelopes: {budget.envelopes?.length || 0}</div>
+      <div>Bills: {budget.bills?.length || 0}</div>
+      <div>Savings: {budget.savingsGoals?.length || 0}</div>
+      <div>Unassigned: ${budget.unassignedCash || 0}</div>
+      <div>Debug: {JSON.stringify(budget._debug || {})}</div>
+    </div>
+  );
 
   const {
     envelopes,
@@ -198,6 +246,7 @@ const MainContent = ({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden">
+      {budgetDebugInfo}
       <div className="max-w-7xl mx-auto relative z-10">
         <Header
           currentUser={currentUser}

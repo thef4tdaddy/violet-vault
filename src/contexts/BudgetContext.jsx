@@ -425,6 +425,15 @@ export const BudgetProvider = ({
     isSyncing,
     lastSyncTime,
     syncError,
+    // Debug info
+    _debug: {
+      hasEncryptionKey: !!encryptionKey,
+      hasCurrentUser: !!currentUser,
+      hasBudgetId: !!budgetId,
+      dataLoaded: state.envelopes.length > 0 || state.bills.length > 0,
+      envelopeCount: state.envelopes.length,
+      billCount: state.bills.length
+    }
   };
 
   return (
