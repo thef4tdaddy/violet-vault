@@ -34,6 +34,31 @@ const TeamActivitySync = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  // Helper functions for sync status
+  const getSyncStatusIcon = () => {
+    if (syncError) return <AlertTriangle className="h-4 w-4 text-red-500" />;
+    if (isSyncing) return <RefreshCw className="h-4 w-4 text-blue-500 animate-spin" />;
+    if (isOnline === false) return <WifiOff className="h-4 w-4 text-gray-400" />;
+    if (isOnline) return <CheckCircle className="h-4 w-4 text-green-500" />;
+    return <Clock className="h-4 w-4 text-gray-400" />;
+  };
+
+  const getSyncStatusText = () => {
+    if (syncError) return "Sync Error";
+    if (isSyncing) return "Syncing...";
+    if (isOnline === false) return "Offline";
+    if (isOnline && lastSyncTime) {
+      const syncTime = new Date(lastSyncTime);
+      const now = new Date();
+      const diffMinutes = Math.floor((now - syncTime) / (1000 * 60));
+      if (diffMinutes < 1) return "Just synced";
+      if (diffMinutes < 60) return `Synced ${diffMinutes}m ago`;
+      const diffHours = Math.floor(diffMinutes / 60);
+      return `Synced ${diffHours}h ago`;
+    }
+    return "Ready to sync";
+  };
+
   // Debug logging
   useEffect(() => {
     console.log("🔧 TeamActivitySync Debug:", {
@@ -337,6 +362,11 @@ const TeamActivitySync = ({
     otherActiveUsers.length > 0 ||
     processedActivities.length > 0 ||
     isOnline !== undefined;
+
+  // Don't render if there's nothing to show
+  if (!shouldShow) {
+    return null;
+  }
 
   return (
     <div className="glassmorphism rounded-2xl mb-6 border border-white/20 overflow-hidden">
