@@ -236,12 +236,12 @@ const Layout = () => {
         currentUserName: currentUser?.userName,
         hasBudgetId: !!budgetId,
         importedUser: importedData.currentUser,
-        exportedBy: importedData.exportedBy
+        exportedBy: importedData.exportedBy,
       });
 
       let processedCurrentUser;
       try {
-        processedCurrentUser = importedData.currentUser || 
+        processedCurrentUser = importedData.currentUser ||
           currentUser || {
             id: `user_${Date.now()}`,
             userName: importedData.exportedBy || "Imported User",
@@ -383,17 +383,17 @@ const Layout = () => {
       console.error("❌ Import error details:", {
         message: error.message,
         stack: error.stack,
-        name: error.name
+        name: error.name,
       });
-      
+
       if (setDebugInfo) {
         setDebugInfo({
           success: false,
           error: `${error.name}: ${error.message}`,
-          stage: "import_error"
+          stage: "import_error",
         });
       }
-      
+
       alert(
         `Import failed: ${error.message}\n\nCheck debug panel for details. Please ensure you're uploading a valid VioletVault backup file.`
       );
