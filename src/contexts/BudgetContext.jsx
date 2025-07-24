@@ -145,7 +145,20 @@ const budgetReducer = (state, action) => {
       };
 
     case actionTypes.LOAD_DATA:
-      return { ...state, ...action.payload };
+      console.log("📥 LOAD_DATA reducer called with payload:", {
+        envelopes: action.payload.envelopes?.length || 0,
+        bills: action.payload.bills?.length || 0,
+        savingsGoals: action.payload.savingsGoals?.length || 0,
+        topLevelKeys: Object.keys(action.payload),
+        hasCurrentUser: !!action.payload.currentUser,
+      });
+      const newState = { ...state, ...action.payload };
+      console.log("📤 LOAD_DATA new state:", {
+        envelopes: newState.envelopes?.length || 0,
+        bills: newState.bills?.length || 0,
+        savingsGoals: newState.savingsGoals?.length || 0,
+      });
+      return newState;
 
     default:
       return state;

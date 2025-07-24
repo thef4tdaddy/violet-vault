@@ -545,10 +545,25 @@ const MainContent = ({
         envelopes: decryptedData.envelopes?.length || 0,
         bills: decryptedData.bills?.length || 0,
         savingsGoals: decryptedData.savingsGoals?.length || 0,
+        topLevelKeys: Object.keys(decryptedData),
+        hasCurrentUser: !!decryptedData.currentUser,
       });
+
+      console.log("📝 About to call budget.loadData() with:", decryptedData);
 
       // Use the loadData action to force load the data
       budget.loadData(decryptedData);
+
+      console.log("🎯 loadData() called. Budget state should now be updated.");
+
+      // Wait a bit and check state
+      setTimeout(() => {
+        console.log("📊 Budget state after loadData:", {
+          envelopes: budget.envelopes?.length || 0,
+          bills: budget.bills?.length || 0,
+          debug: budget._debug,
+        });
+      }, 100);
 
       alert("Data loaded from localStorage! Check the debug panel to verify.");
     } catch (error) {
