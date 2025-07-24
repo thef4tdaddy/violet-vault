@@ -530,27 +530,33 @@ const MainContent = ({
                 hasCurrentUser: !!currentUser,
                 hasBudgetId: !!budgetId,
                 currentUserName: currentUser?.userName,
-                budgetId: budgetId
+                budgetId: budgetId,
               });
-              
+
               const data = localStorage.getItem("envelopeBudgetData");
               if (!data) {
                 alert("No localStorage data found");
                 return;
               }
-              
+
               const { encryptedData, iv } = JSON.parse(data);
-              const decrypted = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
-              
+              const decrypted = await encryptionUtils.decrypt(
+                encryptedData,
+                encryptionKey,
+                iv
+              );
+
               console.log("✅ Manual decrypt successful:", {
                 envelopes: decrypted.envelopes?.length || 0,
                 bills: decrypted.bills?.length || 0,
                 savingsGoals: decrypted.savingsGoals?.length || 0,
                 hasCurrentUser: !!decrypted.currentUser,
-                decryptedUserName: decrypted.currentUser?.userName
+                decryptedUserName: decrypted.currentUser?.userName,
               });
-              
-              alert(`Manual decrypt worked!\nEnvelopes: ${decrypted.envelopes?.length || 0}\nBills: ${decrypted.bills?.length || 0}\nUser: ${decrypted.currentUser?.userName || 'None'}`);
+
+              alert(
+                `Manual decrypt worked!\nEnvelopes: ${decrypted.envelopes?.length || 0}\nBills: ${decrypted.bills?.length || 0}\nUser: ${decrypted.currentUser?.userName || "None"}`
+              );
             } catch (error) {
               console.error("❌ Manual decrypt failed:", error);
               alert("Manual decrypt failed: " + error.message);

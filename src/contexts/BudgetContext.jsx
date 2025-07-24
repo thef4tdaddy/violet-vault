@@ -174,14 +174,14 @@ export const BudgetProvider = ({
         hasCurrentUser: !!currentUser,
         hasBudgetId: !!budgetId,
         currentUser: currentUser,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       // Always check localStorage first to see what's there
       const savedData = localStorage.getItem("envelopeBudgetData");
       console.log("🗄️ localStorage check:", {
         hasData: !!savedData,
-        dataLength: savedData?.length || 0
+        dataLength: savedData?.length || 0,
       });
 
       if (encryptionKey && currentUser && budgetId) {
@@ -195,14 +195,10 @@ export const BudgetProvider = ({
               hasEncryptedData: !!parsed.encryptedData,
               hasSalt: !!parsed.salt,
               hasIv: !!parsed.iv,
-              encryptedDataLength: parsed.encryptedData?.length || 0
+              encryptedDataLength: parsed.encryptedData?.length || 0,
             });
 
-            const {
-              salt: savedSalt,
-              encryptedData,
-              iv,
-            } = parsed;
+            const { salt: savedSalt, encryptedData, iv } = parsed;
 
             console.log("🔐 Decrypting data with provided encryptionKey...");
             // Use the provided encryptionKey directly (it's already derived)
@@ -220,7 +216,7 @@ export const BudgetProvider = ({
               allTransactions: decryptedData.allTransactions?.length || 0,
               transactions: decryptedData.transactions?.length || 0,
               unassignedCash: decryptedData.unassignedCash || 0,
-              hasCurrentUser: !!decryptedData.currentUser
+              hasCurrentUser: !!decryptedData.currentUser,
             });
 
             // Load all the data into the state
