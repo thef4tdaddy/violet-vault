@@ -175,6 +175,8 @@ export const BudgetProvider = ({
         hasBudgetId: !!budgetId,
         currentUser: currentUser,
         timestamp: new Date().toISOString(),
+        existingEnvelopes: state.envelopes.length,
+        existingBills: state.bills.length,
       });
 
       // Always check localStorage first to see what's there

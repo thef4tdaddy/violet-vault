@@ -381,15 +381,10 @@ const Layout = () => {
 
       console.log("🎉 Data import completed successfully!");
 
-      // Show success message and refresh to load the data
+      // Show success message - data should load automatically
       alert(
-        `Successfully imported data!\n\nEnvelopes: ${dataToLoad.envelopes.length}\nBills: ${dataToLoad.bills.length}\nTransactions: ${dataToLoad.allTransactions.length}\n\nPage will refresh to load your data...`
+        `Successfully imported data!\n\nEnvelopes: ${dataToLoad.envelopes.length}\nBills: ${dataToLoad.bills.length}\nTransactions: ${dataToLoad.allTransactions.length}\n\nData saved to localStorage. If it doesn't appear, try the Force Load Data button.`
       );
-
-      // Refresh page to trigger BudgetContext to load the new data
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
     } catch (error) {
       console.error("❌ Import failed:", error);
       console.error("❌ Import error details:", {
@@ -555,12 +550,7 @@ const MainContent = ({
       // Use the loadData action to force load the data
       budget.loadData(decryptedData);
 
-      // Refresh the page to ensure clean state
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
-
-      alert("Data loaded! Page will refresh...");
+      alert("Data loaded from localStorage! Check the debug panel to verify.");
     } catch (error) {
       console.error("❌ Force load failed:", error);
       alert("Failed to load data: " + error.message);
