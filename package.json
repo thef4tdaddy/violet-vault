@@ -6,8 +6,14 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "lint": "eslint . --max-warnings 50",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "preview": "vite preview",
+    "prepare": "husky",
+    "commit": "git add . && git commit",
+    "check-commit": "commitlint --from HEAD~1 --to HEAD --verbose"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.11",
@@ -19,6 +25,8 @@
     "tailwindcss": "^4.1.11"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
     "@vitejs/plugin-react": "^4.1.1",
@@ -26,6 +34,8 @@
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.4",
+    "husky": "^9.1.7",
+    "prettier": "^3.6.2",
     "vite": "^5.0.0"
   }
 }
