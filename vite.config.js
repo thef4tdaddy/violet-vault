@@ -1,9 +1,18 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(), 
+    tailwindcss(),
+    sentryVitePlugin({
+      org: "f4tdaddy",
+      project: "violet-vault",
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+    }),
+  ],
   define: {
     // Fix for some Firebase compatibility issues
     global: "globalThis",
