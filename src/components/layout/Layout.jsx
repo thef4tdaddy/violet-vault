@@ -535,7 +535,29 @@ const MainContent = ({
         return;
       }
 
-      const { salt: savedSalt, encryptedData, iv } = JSON.parse(savedData);
+      const parsedData = JSON.parse(savedData);
+      const { salt: savedSalt, encryptedData, iv } = parsedData;
+
+      // Debug localStorage structure
+      setForceLoadDebug({
+        step: 0,
+        message: "🔍 Checking localStorage structure",
+        localStorageData: {
+          hasEncryptedData: !!encryptedData,
+          hasSalt: !!savedSalt,
+          hasIv: !!iv,
+          encryptedDataLength: encryptedData?.length || 0,
+          encryptedDataType: typeof encryptedData,
+          encryptedDataPreview:
+            typeof encryptedData === "string"
+              ? encryptedData.substring(0, 50) + "..."
+              : "Not a string",
+        },
+      });
+
+      // Wait a moment then decrypt
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       const decryptedData = await encryptionUtils.decrypt(
         encryptedData,
         encryptionKey,
@@ -543,7 +565,8 @@ const MainContent = ({
       );
 
       // Set debug info for visual display
-      setForceLoadDebug({
+      setForceLoadDebug((prev) => ({
+        ...prev,
         step: 1,
         message: "✅ Data decrypted successfully",
         decryptedData: {
@@ -553,7 +576,7 @@ const MainContent = ({
           topLevelKeys: Object.keys(decryptedData),
           hasCurrentUser: !!decryptedData.currentUser,
         },
-      });
+      }));
 
       // Use the loadData action to force load the data
       budget.loadData(decryptedData);
@@ -782,9 +805,35 @@ const MainContent = ({
       }}
     >
       <div style={{ marginBottom: "10px", fontWeight: "bold" }}>
-        🔍 Force Load Debug (Step {forceLoadDebug.step}/2)
+        🔍 Force Load Debug (Step {forceLoadDebug.step}/
+        {forceLoadDebug.step === 0 ? "3" : "2"})
       </div>
       <div style={{ marginBottom: "8px" }}>{forceLoadDebug.message}</div>
+
+      {forceLoadDebug.localStorageData && (
+        <div style={{ marginBottom: "10px" }}>
+          <strong>localStorage Structure:</strong>
+          <div>
+            Has Encrypted:{" "}
+            {forceLoadDebug.localStorageData.hasEncryptedData ? "✅" : "❌"}
+          </div>
+          <div>
+            Has Salt: {forceLoadDebug.localStorageData.hasSalt ? "✅" : "❌"}
+          </div>
+          <div>
+            Has IV: {forceLoadDebug.localStorageData.hasIv ? "✅" : "❌"}
+          </div>
+          <div>
+            Data Length: {forceLoadDebug.localStorageData.encryptedDataLength}
+          </div>
+          <div>
+            Data Type: {forceLoadDebug.localStorageData.encryptedDataType}
+          </div>
+          <div style={{ fontSize: "10px", wordBreak: "break-all" }}>
+            Preview: {forceLoadDebug.localStorageData.encryptedDataPreview}
+          </div>
+        </div>
+      )}
 
       {forceLoadDebug.decryptedData && (
         <div style={{ marginBottom: "10px" }}>
