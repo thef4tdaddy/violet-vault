@@ -179,18 +179,22 @@ const Layout = () => {
           allTransactionsLength: importedData.allTransactions?.length || 0,
           unassignedCash: importedData.unassignedCash || 0,
           hasCurrentUser: !!importedData.currentUser,
-          userName: importedData.currentUser?.userName || 'None',
-          firstEnvelope: importedData.envelopes?.[0] ? {
-            id: importedData.envelopes[0].id,
-            name: importedData.envelopes[0].name,
-            amount: importedData.envelopes[0].amount,
-            currentBalance: importedData.envelopes[0].currentBalance
-          } : null,
-          firstBill: importedData.bills?.[0] ? {
-            id: importedData.bills[0].id,
-            name: importedData.bills[0].name,
-            amount: importedData.bills[0].amount
-          } : null
+          userName: importedData.currentUser?.userName || "None",
+          firstEnvelope: importedData.envelopes?.[0]
+            ? {
+                id: importedData.envelopes[0].id,
+                name: importedData.envelopes[0].name,
+                amount: importedData.envelopes[0].amount,
+                currentBalance: importedData.envelopes[0].currentBalance,
+              }
+            : null,
+          firstBill: importedData.bills?.[0]
+            ? {
+                id: importedData.bills[0].id,
+                name: importedData.bills[0].name,
+                amount: importedData.bills[0].amount,
+              }
+            : null,
         });
       }
 
@@ -667,7 +671,11 @@ const MainContent = ({
       }}
     >
       <div style={{ marginBottom: "10px" }}>
-        <strong>{debugInfo.stage === 'import_parsed' ? 'Import Parse Results:' : 'Decrypt Test Results:'}</strong>
+        <strong>
+          {debugInfo.stage === "import_parsed"
+            ? "Import Parse Results:"
+            : "Decrypt Test Results:"}
+        </strong>
         <button
           onClick={() => setDebugInfo(null)}
           style={{
