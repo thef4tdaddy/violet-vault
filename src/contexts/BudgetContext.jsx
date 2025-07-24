@@ -145,7 +145,29 @@ const budgetReducer = (state, action) => {
       };
 
     case actionTypes.LOAD_DATA:
-      return { ...state, ...action.payload };
+      const validatedPayload = {
+        ...action.payload,
+        envelopes: Array.isArray(action.payload.envelopes)
+          ? action.payload.envelopes
+          : [],
+        bills: Array.isArray(action.payload.bills) ? action.payload.bills : [],
+        savingsGoals: Array.isArray(action.payload.savingsGoals)
+          ? action.payload.savingsGoals
+          : [],
+        supplementalAccounts: Array.isArray(action.payload.supplementalAccounts)
+          ? action.payload.supplementalAccounts
+          : [],
+        transactions: Array.isArray(action.payload.transactions)
+          ? action.payload.transactions
+          : [],
+        allTransactions: Array.isArray(action.payload.allTransactions)
+          ? action.payload.allTransactions
+          : [],
+        paycheckHistory: Array.isArray(action.payload.paycheckHistory)
+          ? action.payload.paycheckHistory
+          : [],
+      };
+      return { ...state, ...validatedPayload, dataLoaded: true };
 
     default:
       return state;
@@ -463,7 +485,7 @@ export const BudgetProvider = ({
       hasEncryptionKey: !!encryptionKey,
       hasCurrentUser: !!currentUser,
       hasBudgetId: !!budgetId,
-      dataLoaded: state.envelopes.length > 0 || state.bills.length > 0,
+      dataLoaded: state.dataLoaded || false,
       envelopeCount: state.envelopes.length,
       billCount: state.bills.length,
     },
