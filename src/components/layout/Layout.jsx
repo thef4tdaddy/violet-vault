@@ -59,6 +59,30 @@ const Layout = () => {
   const [recentActivity, setRecentActivity] = useState([]);
   const [syncConflicts, setSyncConflicts] = useState(null);
 
+  // Update activity data from Firebase sync
+  useEffect(() => {
+    if (getActiveUsers && getRecentActivity) {
+      const updateActivityData = () => {
+        try {
+          const users = getActiveUsers();
+          const activity = getRecentActivity();
+          console.log("🔄 Updating activity data:", { users: users?.length || 0, activity: activity?.length || 0 });
+          setActiveUsers(users || []);
+          setRecentActivity(activity || []);
+        } catch (error) {
+          console.error("Failed to get activity data:", error);
+        }
+      };
+
+      // Update immediately
+      updateActivityData();
+
+      // Update periodically to catch changes
+      const interval = setInterval(updateActivityData, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [getActiveUsers, getRecentActivity, isSyncing]);
+
   const handleSetup = async (userData, password) => {
     try {
       // Generate budgetId if not present
@@ -438,6 +462,8 @@ const MainContent = ({
     isSyncing,
     lastSyncTime,
     syncError,
+    getActiveUsers,
+    getRecentActivity,
   } = budget;
 
   // Calculate totals
