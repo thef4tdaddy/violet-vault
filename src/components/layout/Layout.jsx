@@ -45,6 +45,7 @@ const Layout = () => {
     logout,
     updateUser,
     budgetId,
+    salt,
   } = useAuth();
   const [activeUsers, setActiveUsers] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
@@ -52,7 +53,13 @@ const Layout = () => {
 
   const handleSetup = async (userData, password) => {
     try {
-      const result = await login(password, userData);
+      // Generate budgetId if not present
+      const userDataWithId = {
+        ...userData,
+        budgetId: userData.budgetId || `budget_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      };
+      
+      const result = await login(password, userDataWithId);
       if (result.success) {
         console.log("✅ Setup completed successfully");
       } else {
@@ -110,10 +117,11 @@ const Layout = () => {
       encryptionKey={encryptionKey}
       currentUser={currentUser}
       budgetId={budgetId}
+      salt={salt}
     >
       <MainContent
         currentUser={currentUser}
-        onUserChange={() => updateUser(null)}
+        onUserChange={handleLogout}
         onExport={exportData}
         onImport={importData}
         onLogout={handleLogout}

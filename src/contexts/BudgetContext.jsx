@@ -157,6 +157,7 @@ export const BudgetProvider = ({
   encryptionKey,
   currentUser,
   budgetId,
+  salt,
 }) => {
   const [state, dispatch] = useReducer(budgetReducer, initialState);
   const [firebaseSync] = useState(new FirebaseSync());
@@ -245,7 +246,7 @@ export const BudgetProvider = ({
             "envelopeBudgetData",
             JSON.stringify({
               encryptedData: encrypted.data,
-              salt: Array.from(new Uint8Array()), // Will be set from auth
+              salt: Array.from(salt || new Uint8Array()), // Use salt from auth context
               iv: encrypted.iv,
             })
           );

@@ -111,6 +111,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updateUser = (updatedUser) => {
+    if (!updatedUser) {
+      console.warn("updateUser called with null/undefined user");
+      return;
+    }
     setCurrentUser(updatedUser);
     if (updatedUser.budgetId !== budgetId) {
       setBudgetId(updatedUser.budgetId);
