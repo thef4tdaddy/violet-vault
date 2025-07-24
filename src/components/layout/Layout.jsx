@@ -56,9 +56,11 @@ const Layout = () => {
       // Generate budgetId if not present
       const userDataWithId = {
         ...userData,
-        budgetId: userData.budgetId || `budget_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        budgetId:
+          userData.budgetId ||
+          `budget_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       };
-      
+
       const result = await login(password, userDataWithId);
       if (result.success) {
         console.log("✅ Setup completed successfully");
