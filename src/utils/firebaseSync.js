@@ -135,16 +135,17 @@ class FirebaseSync {
     );
 
     // Ensure lastActivity has all required fields and no undefined values
-    const validLastActivity = lastActivity && 
-                             lastActivity.userName && 
-                             lastActivity.userName !== undefined &&
-                             lastActivity.userName !== null &&
-                             lastActivity.userName.trim() !== ''
-      ? {
-          userName: String(lastActivity.userName).trim(),
-          timestamp: lastActivity.timestamp || Date.now(),
-        }
-      : null;
+    const validLastActivity =
+      lastActivity &&
+      lastActivity.userName &&
+      lastActivity.userName !== undefined &&
+      lastActivity.userName !== null &&
+      lastActivity.userName.trim() !== ""
+        ? {
+            userName: String(lastActivity.userName).trim(),
+            timestamp: lastActivity.timestamp || Date.now(),
+          }
+        : null;
 
     return {
       encryptedData: encryptedPayload.data,
@@ -672,12 +673,14 @@ class FirebaseSync {
     if (obj === null || obj === undefined) {
       return null;
     }
-    
+
     if (Array.isArray(obj)) {
-      return obj.map(item => this.removeUndefinedValues(item)).filter(item => item !== undefined);
+      return obj
+        .map((item) => this.removeUndefinedValues(item))
+        .filter((item) => item !== undefined);
     }
-    
-    if (typeof obj === 'object') {
+
+    if (typeof obj === "object") {
       const cleaned = {};
       for (const [key, value] of Object.entries(obj)) {
         if (value !== undefined) {
@@ -689,7 +692,7 @@ class FirebaseSync {
       }
       return cleaned;
     }
-    
+
     return obj;
   }
 
