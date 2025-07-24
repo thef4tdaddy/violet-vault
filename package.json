@@ -16,6 +16,8 @@
     "check-commit": "commitlint --from HEAD~1 --to HEAD --verbose"
   },
   "dependencies": {
+    "@sentry/react": "^9.41.0",
+    "@sentry/vite-plugin": "^4.0.0",
     "@tailwindcss/vite": "^4.1.11",
     "firebase": "^10.14.1",
     "lucide-react": "^0.263.1",

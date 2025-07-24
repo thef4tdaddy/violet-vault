@@ -8,6 +8,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { encryptionUtils } from "./encryption";
+import { Sentry } from "./sentry.js";
 import { firebaseConfig } from "./firebaseConfig";
 
 const app = initializeApp(firebaseConfig);
@@ -214,6 +215,19 @@ class FirebaseSync {
       return decryptedData;
     } catch (error) {
       console.error("❌ Failed to decrypt cloud data:", error);
+      
+      // Send error to Sentry with context
+      Sentry.captureException(error, {
+        tags: {
+          component: "firebaseSync",
+          operation: "decryptData",
+        },
+        extra: {
+          hasEncryptionKey: !!this.encryptionKey,
+          errorName: error.name,
+          errorMessage: error.message,
+        },
+      });
 
       // Check for common decryption issues
       if (error.name === "OperationError") {
@@ -296,6 +310,19 @@ class FirebaseSync {
       console.log("✅ Successfully saved to cloud");
     } catch (error) {
       console.error("❌ Failed to save to cloud:", error);
+      
+      // Send error to Sentry with context
+      Sentry.captureException(error, {
+        tags: {
+          component: "firebaseSync",
+          operation: "saveToCloud",
+        },
+        extra: {
+          budgetId: this.budgetId,
+          isNetworkBlocked: this.isNetworkBlockingError(error),
+          retryAttempts: this.retryAttempts,
+        },
+      });
 
       // Handle network blocking errors
       if (this.isNetworkBlockingError(error)) {
