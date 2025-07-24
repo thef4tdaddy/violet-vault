@@ -219,9 +219,30 @@ export const BudgetProvider = ({
               hasCurrentUser: !!decryptedData.currentUser,
             });
 
+            // Validate and clean the decrypted data before loading
+            const cleanedData = {
+              envelopes: Array.isArray(decryptedData.envelopes) ? decryptedData.envelopes : [],
+              bills: Array.isArray(decryptedData.bills) ? decryptedData.bills : [],
+              savingsGoals: Array.isArray(decryptedData.savingsGoals) ? decryptedData.savingsGoals : [],
+              supplementalAccounts: Array.isArray(decryptedData.supplementalAccounts) ? decryptedData.supplementalAccounts : [],
+              unassignedCash: typeof decryptedData.unassignedCash === 'number' ? decryptedData.unassignedCash : 0,
+              biweeklyAllocation: typeof decryptedData.biweeklyAllocation === 'number' ? decryptedData.biweeklyAllocation : 0,
+              paycheckHistory: Array.isArray(decryptedData.paycheckHistory) ? decryptedData.paycheckHistory : [],
+              actualBalance: typeof decryptedData.actualBalance === 'number' ? decryptedData.actualBalance : 0,
+              transactions: Array.isArray(decryptedData.transactions) ? decryptedData.transactions : [],
+              allTransactions: Array.isArray(decryptedData.allTransactions) ? decryptedData.allTransactions : [],
+            };
+
+            console.log("🧹 Cleaned data for loading:", {
+              envelopes: cleanedData.envelopes.length,
+              bills: cleanedData.bills.length,
+              savingsGoals: cleanedData.savingsGoals.length,
+              allTransactions: cleanedData.allTransactions.length,
+            });
+
             // Load all the data into the state
             console.log("📝 Dispatching LOAD_DATA action...");
-            dispatch({ type: actionTypes.LOAD_DATA, payload: decryptedData });
+            dispatch({ type: actionTypes.LOAD_DATA, payload: cleanedData });
 
             console.log(
               "🎉 Initial budget data loaded successfully into state!"
@@ -238,6 +259,12 @@ export const BudgetProvider = ({
             currentUser: currentUser,
             budgetId: budgetId,
           });
+          
+          // Clear corrupted data if loading fails
+          if (error.message.includes('decrypt') || error.message.includes('parse')) {
+            console.warn("🗑️ Clearing potentially corrupted localStorage data");
+            localStorage.removeItem("envelopeBudgetData");
+          }
         }
       } else {
         console.log("⏳ Waiting for required props...", {
