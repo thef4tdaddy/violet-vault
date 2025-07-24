@@ -548,25 +548,31 @@ const MainContent = ({
                 allTransactionsLength: decrypted.allTransactions?.length || 0,
                 unassignedCash: decrypted.unassignedCash || 0,
                 hasCurrentUser: !!decrypted.currentUser,
-                userName: decrypted.currentUser?.userName || 'None',
-                firstEnvelope: decrypted.envelopes?.[0] ? {
-                  id: decrypted.envelopes[0].id,
-                  name: decrypted.envelopes[0].name,
-                  amount: decrypted.envelopes[0].amount,
-                  currentBalance: decrypted.envelopes[0].currentBalance
-                } : null,
-                firstBill: decrypted.bills?.[0] ? {
-                  id: decrypted.bills[0].id,
-                  name: decrypted.bills[0].name,
-                  amount: decrypted.bills[0].amount
-                } : null
+                userName: decrypted.currentUser?.userName || "None",
+                firstEnvelope: decrypted.envelopes?.[0]
+                  ? {
+                      id: decrypted.envelopes[0].id,
+                      name: decrypted.envelopes[0].name,
+                      amount: decrypted.envelopes[0].amount,
+                      currentBalance: decrypted.envelopes[0].currentBalance,
+                    }
+                  : null,
+                firstBill: decrypted.bills?.[0]
+                  ? {
+                      id: decrypted.bills[0].id,
+                      name: decrypted.bills[0].name,
+                      amount: decrypted.bills[0].amount,
+                    }
+                  : null,
               });
 
-              alert(`Manual decrypt worked!\nEnvelopes: ${decrypted.envelopes?.length || 0}\nBills: ${decrypted.bills?.length || 0}\nUser: ${decrypted.currentUser?.userName || 'None'}\n\nCheck debug panel for details`);
+              alert(
+                `Manual decrypt worked!\nEnvelopes: ${decrypted.envelopes?.length || 0}\nBills: ${decrypted.bills?.length || 0}\nUser: ${decrypted.currentUser?.userName || "None"}\n\nCheck debug panel for details`
+              );
             } catch (error) {
               setDebugInfo({
                 success: false,
-                error: error.message
+                error: error.message,
               });
               alert("Manual decrypt failed: " + error.message);
             }
@@ -630,12 +636,12 @@ const MainContent = ({
         zIndex: 9999,
         maxWidth: "400px",
         maxHeight: "300px",
-        overflow: "auto"
+        overflow: "auto",
       }}
     >
       <div style={{ marginBottom: "10px" }}>
         <strong>Decrypt Test Results:</strong>
-        <button 
+        <button
           onClick={() => setDebugInfo(null)}
           style={{
             float: "right",
@@ -644,31 +650,47 @@ const MainContent = ({
             border: "none",
             borderRadius: "3px",
             padding: "2px 6px",
-            cursor: "pointer"
+            cursor: "pointer",
           }}
         >
           ✕
         </button>
       </div>
-      {typeof debugInfo === 'string' ? (
+      {typeof debugInfo === "string" ? (
         <div>{debugInfo}</div>
       ) : debugInfo.success ? (
         <div>
-          <div><strong>Top Level Keys:</strong> {debugInfo.topLevelKeys.join(', ')}</div>
-          <div><strong>Envelopes:</strong> {debugInfo.envelopesLength}</div>
-          <div><strong>Bills:</strong> {debugInfo.billsLength}</div>
-          <div><strong>Savings Goals:</strong> {debugInfo.savingsGoalsLength}</div>
-          <div><strong>Transactions:</strong> {debugInfo.allTransactionsLength}</div>
-          <div><strong>Unassigned Cash:</strong> ${debugInfo.unassignedCash}</div>
-          <div><strong>User:</strong> {debugInfo.userName}</div>
+          <div>
+            <strong>Top Level Keys:</strong> {debugInfo.topLevelKeys.join(", ")}
+          </div>
+          <div>
+            <strong>Envelopes:</strong> {debugInfo.envelopesLength}
+          </div>
+          <div>
+            <strong>Bills:</strong> {debugInfo.billsLength}
+          </div>
+          <div>
+            <strong>Savings Goals:</strong> {debugInfo.savingsGoalsLength}
+          </div>
+          <div>
+            <strong>Transactions:</strong> {debugInfo.allTransactionsLength}
+          </div>
+          <div>
+            <strong>Unassigned Cash:</strong> ${debugInfo.unassignedCash}
+          </div>
+          <div>
+            <strong>User:</strong> {debugInfo.userName}
+          </div>
           {debugInfo.firstEnvelope && (
             <div>
-              <strong>First Envelope:</strong> {debugInfo.firstEnvelope.name} - ${debugInfo.firstEnvelope.currentBalance}
+              <strong>First Envelope:</strong> {debugInfo.firstEnvelope.name} -
+              ${debugInfo.firstEnvelope.currentBalance}
             </div>
           )}
           {debugInfo.firstBill && (
             <div>
-              <strong>First Bill:</strong> {debugInfo.firstBill.name} - ${debugInfo.firstBill.amount}
+              <strong>First Bill:</strong> {debugInfo.firstBill.name} - $
+              {debugInfo.firstBill.amount}
             </div>
           )}
         </div>
