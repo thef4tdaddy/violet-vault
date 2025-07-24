@@ -58,24 +58,30 @@ const Layout = () => {
   const [activeUsers, setActiveUsers] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
   const [syncConflicts, setSyncConflicts] = useState(null);
-  const handleSetup = async (userData, password) => {
+  const handleSetup = async (userData) => {
+    console.log("🎯 Layout handleSetup called with:", userData);
     try {
       // Generate budgetId from password for cross-device sync
       const { encryptionUtils } = await import("../../utils/encryption");
       const userDataWithId = {
         ...userData,
         budgetId:
-          userData.budgetId || encryptionUtils.generateBudgetId(password),
+          userData.budgetId || encryptionUtils.generateBudgetId(userData.password),
       };
 
-      const result = await login(password, userDataWithId);
+      console.log("🚀 Calling login with:", { userDataWithId, password: !!userData.password });
+      const result = await login(userData.password, userDataWithId);
+      console.log("📋 Login result:", result);
+      
       if (result.success) {
         console.log("✅ Setup completed successfully");
       } else {
         console.error("❌ Setup failed:", result.error);
+        alert(`Setup failed: ${result.error}`);
       }
     } catch (error) {
       console.error("❌ Setup error:", error);
+      alert(`Setup error: ${error.message}`);
     }
   };
 
