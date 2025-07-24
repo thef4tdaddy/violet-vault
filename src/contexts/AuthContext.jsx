@@ -54,19 +54,33 @@ export const AuthProvider = ({ children }) => {
   }, [isUnlocked]);
 
   const login = async (password, userData = null) => {
-    try {
-      if (userData) {
-        // New user setup
-        const { salt: newSalt, key } =
-          await encryptionUtils.deriveKey(password);
-        setSalt(newSalt);
-        setEncryptionKey(key);
-        setCurrentUser(userData);
-        setBudgetId(userData.budgetId);
-        setIsUnlocked(true);
-        setLastActivity(Date.now());
-        return { success: true };
-      } else {
+    console.log("🔐 AuthContext login called:", { hasPassword: !!password, hasUserData: !!userData });
+    
+    // Add timeout wrapper
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Login timeout after 10 seconds")), 10000)
+    );
+    
+    const loginPromise = (async () => {
+      try {
+        if (userData) {
+          console.log("🆕 New user setup path", userData);
+          console.log("🔄 About to derive key...");
+          
+          // New user setup
+          const { salt: newSalt, key } = await encryptionUtils.deriveKey(password);
+          console.log("🔑 Generated key and salt");
+          
+          console.log("🔄 Setting auth state...");
+          setSalt(newSalt);
+          setEncryptionKey(key);
+          setCurrentUser(userData);
+          setBudgetId(userData.budgetId);
+          setIsUnlocked(true);
+          setLastActivity(Date.now());
+          console.log("✅ New user auth state set");
+          return { success: true };
+        } else {
         // Existing user login
         const savedData = localStorage.getItem("envelopeBudgetData");
         if (!savedData) {
@@ -148,10 +162,13 @@ export const AuthProvider = ({ children }) => {
 
         return { success: true, data: migratedData };
       }
-    } catch (error) {
-      console.error("Login failed:", error);
-      return { success: false, error: "Invalid password or corrupted data" };
-    }
+      } catch (error) {
+        console.error("Login failed:", error);
+        return { success: false, error: "Invalid password or corrupted data" };
+      }
+    })();
+    
+    return Promise.race([loginPromise, timeoutPromise]);
   };
 
   const logout = () => {
