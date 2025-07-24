@@ -332,9 +332,8 @@ const TeamActivitySync = ({
     }
   }, [activeUsers, currentUser]);
 
-  if (otherActiveUsers.length === 0 && processedActivities.length === 0) {
-    return null;
-  }
+  // Always show the sync indicator, even without activity
+  const shouldShow = otherActiveUsers.length > 0 || processedActivities.length > 0 || isOnline !== undefined;
 
   return (
     <div className="glassmorphism rounded-2xl mb-6 border border-white/20 overflow-hidden">
@@ -479,6 +478,10 @@ const TeamActivitySync = ({
               <div className="text-center py-8 text-gray-500">
                 <GitBranch className="h-8 w-8 mx-auto mb-2 opacity-50" />
                 <p>No recent team activity</p>
+                <div className="mt-4 flex justify-center items-center">
+                  {getSyncStatusIcon()}
+                  <span className="ml-2 text-sm">{getSyncStatusText()}</span>
+                </div>
               </div>
             )}
           </div>
