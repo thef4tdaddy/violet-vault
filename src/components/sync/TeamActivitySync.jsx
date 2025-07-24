@@ -37,8 +37,10 @@ const TeamActivitySync = ({
   // Helper functions for sync status
   const getSyncStatusIcon = () => {
     if (syncError) return <AlertTriangle className="h-4 w-4 text-red-500" />;
-    if (isSyncing) return <RefreshCw className="h-4 w-4 text-blue-500 animate-spin" />;
-    if (isOnline === false) return <WifiOff className="h-4 w-4 text-gray-400" />;
+    if (isSyncing)
+      return <RefreshCw className="h-4 w-4 text-blue-500 animate-spin" />;
+    if (isOnline === false)
+      return <WifiOff className="h-4 w-4 text-gray-400" />;
     if (isOnline) return <CheckCircle className="h-4 w-4 text-green-500" />;
     return <Clock className="h-4 w-4 text-gray-400" />;
   };
