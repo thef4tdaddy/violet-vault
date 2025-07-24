@@ -143,7 +143,7 @@ const Layout = () => {
     }
   };
 
-const importData = async (event, setDebugInfo) => {
+  const importData = async (event, setDebugInfo) => {
     const file = event.target.files[0];
     if (!file) return;
 
