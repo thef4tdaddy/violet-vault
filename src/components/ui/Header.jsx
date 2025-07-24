@@ -6,8 +6,8 @@ import {
   AlertTriangle,
   RefreshCw,
 } from "lucide-react";
-import UserIndicator from "./UserIndicator";
-import logoWithTextBlackBorder from "../assets/Logo and Text with Black Border.png";
+import UserIndicator from "../auth/UserIndicator";
+import logoWithTextBlackBorder from "../../assets/Logo and Text with Black Border.png";
 
 const Header = memo(
   ({

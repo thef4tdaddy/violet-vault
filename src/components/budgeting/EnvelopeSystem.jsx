@@ -1,6 +1,6 @@
 // src/components/EnvelopeSystem.jsx - Focused Envelope Operations
 import React, { useEffect, useMemo, useCallback } from "react";
-import { useBudget } from "../contexts/BudgetContext";
+import { useBudget } from "../../contexts/BudgetContext";
 
 const useEnvelopeSystem = () => {
   const {

@@ -1,13 +1,13 @@
 // src/components/Layout.jsx
 import React, { useState, useEffect, Suspense, lazy } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { BudgetProvider, useBudget } from "../contexts/BudgetContext";
-import UserSetup from "./UserSetup";
-import Header from "./Header";
-import TeamActivitySync from "./TeamActivitySync";
-import LoadingSpinner from "./LoadingSpinner";
-import useEnvelopeSystem from "./EnvelopeSystem";
-import { encryptionUtils } from "../utils/encryption";
+import { useAuth } from "../../contexts/AuthContext";
+import { BudgetProvider, useBudget } from "../../contexts/BudgetContext";
+import UserSetup from "../auth/UserSetup";
+import Header from "../ui/Header";
+import TeamActivitySync from "../sync/TeamActivitySync";
+import LoadingSpinner from "../ui/LoadingSpinner";
+import useEnvelopeSystem from "../budgeting/EnvelopeSystem";
+import { encryptionUtils } from "../../utils/encryption";
 import {
   DollarSign,
   Wallet,
@@ -21,14 +21,14 @@ import {
 } from "lucide-react";
 
 // Lazy load heavy components for better performance
-const PaycheckProcessor = lazy(() => import("./PaycheckProcessor"));
-const EnvelopeGrid = lazy(() => import("./EnvelopeGrid"));
-const BillManager = lazy(() => import("./BillManager"));
-const SavingsGoals = lazy(() => import("./SavingsGoals"));
+const PaycheckProcessor = lazy(() => import("../budgeting/PaycheckProcessor"));
+const EnvelopeGrid = lazy(() => import("../budgeting/EnvelopeGrid"));
+const BillManager = lazy(() => import("../bills/BillManager"));
+const SavingsGoals = lazy(() => import("../savings/SavingsGoals"));
 const Dashboard = lazy(() => import("./Dashboard"));
-const TransactionLedger = lazy(() => import("./TransactionLedger"));
-const ChartsAndAnalytics = lazy(() => import("./ChartsAndAnalytics"));
-const SupplementalAccounts = lazy(() => import("./SupplementalAccounts"));
+const TransactionLedger = lazy(() => import("../transactions/TransactionLedger"));
+const ChartsAndAnalytics = lazy(() => import("../analytics/ChartsAndAnalytics"));
+const SupplementalAccounts = lazy(() => import("../accounts/SupplementalAccounts"));
 
 const Layout = () => {
   const {
