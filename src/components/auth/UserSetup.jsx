@@ -12,10 +12,12 @@ const UserSetup = ({ onSetupComplete }) => {
 
   // Load saved user profile on component mount
   useEffect(() => {
+    console.log("🔍 UserSetup mounted, checking for saved profile");
     const savedProfile = localStorage.getItem("userProfile");
     if (savedProfile) {
       try {
         const profile = JSON.parse(savedProfile);
+        console.log("📋 Found saved profile:", profile);
         setUserName(profile.userName || "");
         setUserColor(profile.userColor || "#a855f7");
         // If we have a saved profile, skip to step 2 (profile confirmation) by default
@@ -23,6 +25,8 @@ const UserSetup = ({ onSetupComplete }) => {
       } catch (error) {
         console.warn("Failed to load saved profile:", error);
       }
+    } else {
+      console.log("📋 No saved profile found");
     }
   }, []);
 
@@ -39,7 +43,8 @@ const UserSetup = ({ onSetupComplete }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("🔄 Form submitted:", {
+    console.log("🔄 Form submitted - STEP 2 HANDLER:", {
+      step,
       masterPassword: !!masterPassword,
       userName: userName.trim(),
       userColor,
@@ -69,6 +74,56 @@ const UserSetup = ({ onSetupComplete }) => {
     }
   };
 
+  const handleStep1Continue = (e) => {
+    e.preventDefault();
+    console.log("🔄 Step 1 continue clicked:", {
+      step,
+      masterPassword: !!masterPassword,
+    });
+    setStep(2);
+  };
+
+  const handleStartTrackingClick = async (e) => {
+    e.preventDefault();
+    console.log("🎯 Start Tracking button clicked:", {
+      step,
+      masterPassword: !!masterPassword,
+      userName: userName.trim(),
+      userColor,
+    });
+
+    if (!masterPassword || !userName.trim()) {
+      console.warn("⚠️ Validation failed on Start Tracking:", {
+        masterPassword: !!masterPassword,
+        userName: userName.trim(),
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      console.log("🚀 Calling onSetupComplete from Start Tracking...");
+      await onSetupComplete({
+        password: masterPassword,
+        userName: userName.trim(),
+        userColor,
+      });
+      console.log("✅ onSetupComplete succeeded from Start Tracking");
+    } catch (error) {
+      console.error("❌ Setup failed from Start Tracking:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const clearSavedProfile = () => {
+    console.log("🗑️ Clearing saved profile");
+    localStorage.removeItem("userProfile");
+    setUserName("");
+    setUserColor("#a855f7");
+    setStep(1);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="glassmorphism rounded-3xl p-8 w-full max-w-md">
@@ -84,9 +139,13 @@ const UserSetup = ({ onSetupComplete }) => {
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             {step === 1
-              ? "Enter Password"
-              : userName && step === 2
-                ? `Welcome Back, ${userName}!`
+              ? userName
+                ? "Enter Password"
+                : "Get Started"
+              : step === 2
+                ? userName
+                  ? `Welcome Back, ${userName}!`
+                  : "Set Up Profile"
                 : "Set Up Profile"}
           </h1>
           {step === 1 && userName && (
@@ -110,14 +169,7 @@ const UserSetup = ({ onSetupComplete }) => {
         </div>
 
         <form
-          onSubmit={
-            step === 2
-              ? handleSubmit
-              : (e) => {
-                  e.preventDefault();
-                  setStep(2);
-                }
-          }
+          onSubmit={step === 2 ? handleSubmit : handleStep1Continue}
           className="space-y-6"
         >
           {step === 1 && (
@@ -171,14 +223,24 @@ const UserSetup = ({ onSetupComplete }) => {
                   >
                     {isLoading ? "Unlocking..." : `Continue as ${userName}`}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setStep(2)}
-                    disabled={isLoading}
-                    className="w-full btn btn-secondary py-3 text-sm font-medium rounded-2xl"
-                  >
-                    Change Profile Details
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setStep(2)}
+                      disabled={isLoading}
+                      className="flex-1 btn btn-secondary py-3 text-sm font-medium rounded-2xl"
+                    >
+                      Change Profile
+                    </button>
+                    <button
+                      type="button"
+                      onClick={clearSavedProfile}
+                      disabled={isLoading}
+                      className="flex-1 btn btn-secondary py-3 text-sm font-medium rounded-2xl"
+                    >
+                      Start Fresh
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <button
@@ -241,7 +303,8 @@ const UserSetup = ({ onSetupComplete }) => {
                   Back
                 </button>
                 <button
-                  type="submit"
+                  type="button"
+                  onClick={handleStartTrackingClick}
                   disabled={!userName.trim() || isLoading}
                   className="flex-1 btn btn-primary py-3 rounded-2xl"
                 >
