@@ -86,14 +86,54 @@ export const AuthProvider = ({ children }) => {
           iv
         );
 
+        // Handle data migration for pre-refactor data
+        let migratedData = decryptedData;
+        let currentUserData = decryptedData.currentUser;
+        
+        // If currentUser doesn't exist or doesn't have budgetId, create/migrate it
+        if (!currentUserData || !currentUserData.budgetId) {
+          console.log("🔄 Migrating pre-refactor data...");
+          
+          // Generate budgetId if missing
+          const budgetId = `budget_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          
+          // Create or update currentUser
+          currentUserData = {
+            ...currentUserData,
+            budgetId,
+            userName: currentUserData?.userName || "Legacy User",
+            userColor: currentUserData?.userColor || "#a855f7",
+            id: currentUserData?.id || `user_${Date.now()}`
+          };
+          
+          // Update the data structure
+          migratedData = {
+            ...decryptedData,
+            currentUser: currentUserData
+          };
+          
+          // Save the migrated data back to localStorage
+          try {
+            const encrypted = await encryptionUtils.encrypt(migratedData, key);
+            localStorage.setItem("envelopeBudgetData", JSON.stringify({
+              encryptedData: encrypted.data,
+              salt: Array.from(saltArray),
+              iv: encrypted.iv,
+            }));
+            console.log("✅ Data migration completed and saved");
+          } catch (saveError) {
+            console.warn("⚠️ Failed to save migrated data:", saveError);
+          }
+        }
+
         setSalt(saltArray);
         setEncryptionKey(key);
-        setCurrentUser(decryptedData.currentUser);
-        setBudgetId(decryptedData.currentUser?.budgetId);
+        setCurrentUser(currentUserData);
+        setBudgetId(currentUserData.budgetId);
         setIsUnlocked(true);
         setLastActivity(Date.now());
 
-        return { success: true, data: decryptedData };
+        return { success: true, data: migratedData };
       }
     } catch (error) {
       console.error("Login failed:", error);
