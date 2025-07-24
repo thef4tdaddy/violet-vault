@@ -167,6 +167,8 @@ const Layout = () => {
       >
         <MainContent
           currentUser={currentUser}
+          encryptionKey={encryptionKey}
+          budgetId={budgetId}
           onUserChange={handleLogout}
           onExport={exportData}
           onImport={importData}
@@ -184,6 +186,8 @@ const Layout = () => {
 
 const MainContent = ({
   currentUser,
+  encryptionKey,
+  budgetId,
   onUserChange,
   onExport,
   onImport,
@@ -198,6 +202,49 @@ const MainContent = ({
   const [activeView, setActiveView] = useState("dashboard");
 
   // Debug panel for live site
+  const forceLoadData = async () => {
+    try {
+      console.log("🔄 Force loading data from localStorage...");
+      const savedData = localStorage.getItem("envelopeBudgetData");
+      
+      if (!savedData) {
+        alert("No data found in localStorage");
+        return;
+      }
+
+      if (!encryptionKey || !currentUser || !budgetId) {
+        alert("Missing authentication data");
+        return;
+      }
+
+      const { salt: savedSalt, encryptedData, iv } = JSON.parse(savedData);
+      const decryptedData = await encryptionUtils.decrypt(
+        encryptedData,
+        encryptionKey,
+        iv
+      );
+
+      console.log("✅ Force load decrypted data:", {
+        envelopes: decryptedData.envelopes?.length || 0,
+        bills: decryptedData.bills?.length || 0,
+        savingsGoals: decryptedData.savingsGoals?.length || 0,
+      });
+
+      // Use the loadData action to force load the data
+      budget.loadData(decryptedData);
+      
+      // Refresh the page to ensure clean state
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+      
+      alert("Data loaded! Page will refresh...");
+    } catch (error) {
+      console.error("❌ Force load failed:", error);
+      alert("Failed to load data: " + error.message);
+    }
+  };
+
   const budgetDebugInfo = (
     <div
       style={{
@@ -221,6 +268,21 @@ const MainContent = ({
       <div>Savings: {budget.savingsGoals?.length || 0}</div>
       <div>Unassigned: ${budget.unassignedCash || 0}</div>
       <div>Debug: {JSON.stringify(budget._debug || {})}</div>
+      <button 
+        onClick={forceLoadData}
+        style={{
+          marginTop: "10px",
+          padding: "8px 12px",
+          backgroundColor: "#ef4444",
+          color: "white",
+          border: "none",
+          borderRadius: "4px",
+          cursor: "pointer",
+          fontSize: "11px"
+        }}
+      >
+        Force Load Data
+      </button>
     </div>
   );
 
