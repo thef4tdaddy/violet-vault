@@ -1251,6 +1251,8 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
     updateBill,
     deleteBill,
     processPaycheck,
+    setAllTransactions,
+    setTransactions,
   } = budget;
 
   // Use the envelope system hook for envelope operations
@@ -1320,7 +1322,14 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
         onAddTransaction={() => {}} // Will be implemented
         onUpdateTransaction={() => {}} // Will be implemented
         onDeleteTransaction={() => {}} // Will be implemented
-        onBulkImport={() => {}} // Will be implemented
+        onBulkImport={(newTransactions) => {
+          console.log("🔄 onBulkImport called with transactions:", newTransactions.length);
+          const updatedAllTransactions = [...allTransactions, ...newTransactions];
+          const updatedTransactions = [...transactions, ...newTransactions];
+          setAllTransactions(updatedAllTransactions);
+          setTransactions(updatedTransactions);
+          console.log("💾 Bulk import complete. Total transactions:", updatedAllTransactions.length);
+        }}
         currentUser={currentUser}
       />
     ),

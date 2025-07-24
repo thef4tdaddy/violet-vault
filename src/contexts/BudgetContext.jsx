@@ -351,25 +351,25 @@ export const BudgetProvider = ({
   }, [encryptionKey, currentUser, budgetId, firebaseSync]);
 
   // Memoize sync data to prevent unnecessary re-computations
-  const syncData = useMemo(
-    () => ({
+  const syncData = useMemo(() => {
+    const timestamp = Date.now();
+    return {
       ...state,
       currentUser,
       lastActivity: currentUser
         ? {
             userName: currentUser.userName,
             userColor: currentUser.userColor,
-            timestamp: Date.now(),
-            deviceFingerprint: `${navigator.userAgent}_${Date.now()}`,
+            timestamp,
+            deviceFingerprint: `${navigator.userAgent}_${timestamp}`,
             deviceInfo: {
               platform: navigator.platform,
               userAgent: navigator.userAgent.substring(0, 100), // Truncate for storage
             },
           }
         : null,
-    }),
-    [state, currentUser]
-  );
+    };
+  }, [state, currentUser]);
 
   // Auto-save and sync
   useEffect(() => {
@@ -413,7 +413,7 @@ export const BudgetProvider = ({
         clearTimeout(syncTimeout);
       };
     }
-  }, [syncData, encryptionKey, isOnline, isSyncing, firebaseSync]); // Use syncData instead of state to reduce re-renders
+  }, [state.bills.length, state.envelopes.length, state.transactions.length, state.allTransactions.length, encryptionKey, isOnline, isSyncing, firebaseSync]); // Trigger on actual data changes
 
   // Action creators
   const actions = {
