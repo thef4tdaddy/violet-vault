@@ -1,12 +1,180 @@
-# React + Vite
+# VioletVault 💜
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**A secure, encrypted envelope budgeting application** that brings the traditional cash envelope budgeting method into the digital age with end-to-end encryption and real-time collaboration.
 
-Currently, two official plugins are available:
+[![CI](https://github.com/thef4tdaddy/violet-vault/workflows/CI/badge.svg)](https://github.com/thef4tdaddy/violet-vault/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Features
 
-## Expanding the ESLint configuration
+### 💰 Core Budgeting
+- **Envelope System** - Allocate money into virtual envelopes for different expense categories
+- **Bill Management** - Track recurring bills and automatically create budget envelopes
+- **Savings Goals** - Set and monitor progress toward financial objectives
+- **Paycheck Processing** - Automated biweekly allocation based on your bills and goals
+- **Transaction Ledger** - Complete transaction history with reconciliation tools
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 🔒 Security & Privacy
+- **Client-Side Encryption** - All data encrypted using AES-GCM with PBKDF2 key derivation
+- **Password Protection** - Master password required to access your budget
+- **Device Fingerprinting** - Additional security layer for multi-device access
+- **Privacy First** - Your financial data never leaves your device unencrypted
+
+### 👥 Collaboration
+- **Multi-User Support** - Share budgets with family members or partners
+- **Real-Time Sync** - See changes instantly across all devices
+- **Conflict Resolution** - Smart handling of simultaneous edits
+- **Activity Tracking** - Monitor who made what changes and when
+
+### 📊 Analytics & Insights
+- **Visual Charts** - Spending trends and budget performance analytics
+- **Cash Flow Summary** - Overview of your financial health
+- **Smart Bill Matching** - Automatically categorize transactions
+- **Spending Analysis** - Detailed breakdowns by category and time period
+
+### ⚡ Technical Features
+- **Offline Support** - Works without internet, syncs when reconnected
+- **Performance Optimized** - Virtual scrolling and React optimizations for large datasets
+- **Responsive Design** - Works seamlessly on desktop and mobile devices
+
+## 🛠️ Tech Stack
+
+**Frontend:**
+- React 18 with modern hooks and context
+- Vite for fast development and building
+- Tailwind CSS for responsive styling
+- Recharts for data visualization
+- Lucide React for icons
+
+**Backend & Storage:**
+- Firebase for cloud storage and real-time sync
+- Web Crypto API for client-side encryption
+- Local Storage for offline functionality
+
+**Development:**
+- ESLint + Prettier for code quality
+- Husky + Commitlint for git hooks
+- Release Please for automated releases
+
+## 🚦 Getting Started
+
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/thef4tdaddy/violet-vault.git
+   cd violet-vault
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up Firebase** (optional for cloud sync)
+   - Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
+   - Copy your config to `src/utils/firebaseConfig.js`
+
+4. **Start development server**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open your browser** to `http://localhost:5173`
+
+## 📝 Available Scripts
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run lint         # Run ESLint
+npm run lint:fix     # Fix ESLint issues
+npm run format       # Format code with Prettier
+npm run format:check # Check code formatting
+```
+
+## 🏗️ Project Structure
+
+```
+src/
+├── components/              # React components
+│   ├── Dashboard.jsx           # Main dashboard view
+│   ├── EnvelopeSystem.jsx      # Envelope management
+│   ├── BillManager.jsx         # Bill tracking
+│   ├── PaycheckProcessor.jsx   # Paycheck allocation
+│   ├── SavingsGoals.jsx        # Savings goal tracking
+│   ├── TransactionLedger.jsx   # Transaction history
+│   ├── ChartsAndAnalytics.jsx  # Financial analytics
+│   └── TeamActivitySync.jsx    # Collaboration features
+├── contexts/               # React Context providers
+│   ├── AuthContext.jsx        # Authentication & encryption
+│   └── BudgetContext.jsx      # Budget data management
+├── utils/                  # Utility functions
+│   ├── encryption.js          # Client-side encryption
+│   ├── firebaseConfig.js      # Firebase setup
+│   └── firebaseSync.js        # Cloud synchronization
+└── App.jsx                 # Main application
+```
+
+## 🔐 Security
+
+VioletVault takes your financial privacy seriously:
+
+- **End-to-End Encryption**: All sensitive data is encrypted client-side before storage
+- **Password-Based Encryption**: Uses PBKDF2 with 100,000 iterations for key derivation
+- **No Server-Side Decryption**: Your master password never leaves your device
+- **Device Fingerprinting**: Additional protection against unauthorized access
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### Development Workflow
+
+1. **Create a new branch**
+   ```bash
+   npm run create-branch  # Uses our automated branch creation script
+   # Or manually: git checkout -b feature/your-feature
+   ```
+
+2. **Make your changes**
+   - Write code following our ESLint/Prettier configuration
+   - Add tests if applicable
+   - Update documentation as needed
+
+3. **Commit your changes**
+   ```bash
+   git add .
+   git commit -m "feat: your feature description"
+   ```
+   
+   We use [Conventional Commits](https://www.conventionalcommits.org/) format.
+
+4. **Push and create a PR**
+   ```bash
+   git push origin your-branch
+   ```
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+- 📧 **Issues**: [GitHub Issues](https://github.com/thef4tdaddy/violet-vault/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/thef4tdaddy/violet-vault/discussions)
+
+## 🙏 Acknowledgments
+
+- Built with ❤️ for people who want to take control of their finances
+- Inspired by the time-tested envelope budgeting method
+- Designed with privacy and security as core principles
+
+---
+
+**VioletVault** - Your money, your privacy, your control. 💜
