@@ -119,7 +119,7 @@ const Layout = () => {
     hasCurrentUser: !!currentUser,
     hasBudgetId: !!budgetId,
     hasSalt: !!salt,
-    currentUser: currentUser
+    currentUser: currentUser,
   });
 
   return (

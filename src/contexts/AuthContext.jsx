@@ -134,7 +134,7 @@ export const AuthProvider = ({ children }) => {
           hasCurrentUser: !!currentUserData,
           hasBudgetId: !!currentUserData.budgetId,
           userName: currentUserData.userName,
-          budgetId: currentUserData.budgetId
+          budgetId: currentUserData.budgetId,
         });
 
         setSalt(saltArray);
