@@ -305,15 +305,10 @@ const Layout = () => {
 
       console.log("✅ Data imported and saved successfully!");
 
-      // Show success message and reload
+      // Show success message but don't auto-refresh
       alert(
-        `Successfully imported data!\n\nEnvelopes: ${dataToLoad.envelopes.length}\nBills: ${dataToLoad.bills.length}\nTransactions: ${dataToLoad.allTransactions.length}\n\nPage will refresh to load the imported data.`
+        `Successfully imported data!\n\nEnvelopes: ${dataToLoad.envelopes.length}\nBills: ${dataToLoad.bills.length}\nTransactions: ${dataToLoad.allTransactions.length}\n\nData saved! You can manually refresh or use Force Load Data button.`
       );
-
-      // Refresh the page to load the new data
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
     } catch (error) {
       console.error("❌ Import failed:", error);
       alert(
