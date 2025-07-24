@@ -94,8 +94,8 @@ export const AuthProvider = ({ children }) => {
         if (!currentUserData || !currentUserData.budgetId) {
           console.log("🔄 Migrating pre-refactor data...");
 
-          // Generate budgetId if missing
-          const budgetId = `budget_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          // Generate budgetId from password for cross-device sync
+          const budgetId = encryptionUtils.generateBudgetId(password);
 
           // Create or update currentUser
           currentUserData = {
