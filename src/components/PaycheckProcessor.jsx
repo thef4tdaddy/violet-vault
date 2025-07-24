@@ -80,7 +80,7 @@ const PaycheckProcessor = ({
         mode: allocationMode,
         date: new Date().toISOString(),
       });
-      
+
       console.log("Paycheck processed:", result);
 
       setPaycheckAmount("");

@@ -8,6 +8,7 @@
 ## 🚀 Features
 
 ### 💰 Core Budgeting
+
 - **Envelope System** - Allocate money into virtual envelopes for different expense categories
 - **Bill Management** - Track recurring bills and automatically create budget envelopes
 - **Savings Goals** - Set and monitor progress toward financial objectives
@@ -15,24 +16,28 @@
 - **Transaction Ledger** - Complete transaction history with reconciliation tools
 
 ### 🔒 Security & Privacy
+
 - **Client-Side Encryption** - All data encrypted using AES-GCM with PBKDF2 key derivation
 - **Password Protection** - Master password required to access your budget
 - **Device Fingerprinting** - Additional security layer for multi-device access
 - **Privacy First** - Your financial data never leaves your device unencrypted
 
 ### 👥 Collaboration
+
 - **Multi-User Support** - Share budgets with family members or partners
 - **Real-Time Sync** - See changes instantly across all devices
 - **Conflict Resolution** - Smart handling of simultaneous edits
 - **Activity Tracking** - Monitor who made what changes and when
 
 ### 📊 Analytics & Insights
+
 - **Visual Charts** - Spending trends and budget performance analytics
 - **Cash Flow Summary** - Overview of your financial health
 - **Smart Bill Matching** - Automatically categorize transactions
 - **Spending Analysis** - Detailed breakdowns by category and time period
 
 ### ⚡ Technical Features
+
 - **Offline Support** - Works without internet, syncs when reconnected
 - **Performance Optimized** - Virtual scrolling and React optimizations for large datasets
 - **Responsive Design** - Works seamlessly on desktop and mobile devices
@@ -40,6 +45,7 @@
 ## 🛠️ Tech Stack
 
 **Frontend:**
+
 - React 18 with modern hooks and context
 - Vite for fast development and building
 - Tailwind CSS for responsive styling
@@ -47,11 +53,13 @@
 - Lucide React for icons
 
 **Backend & Storage:**
+
 - Firebase for cloud storage and real-time sync
 - Web Crypto API for client-side encryption
 - Local Storage for offline functionality
 
 **Development:**
+
 - ESLint + Prettier for code quality
 - Husky + Commitlint for git hooks
 - Release Please for automated releases
@@ -59,18 +67,21 @@
 ## 🚦 Getting Started
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - npm or yarn
 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/thef4tdaddy/violet-vault.git
    cd violet-vault
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
@@ -80,6 +91,7 @@
    - Copy your config to `src/utils/firebaseConfig.js`
 
 4. **Start development server**
+
    ```bash
    npm run dev
    ```
@@ -137,6 +149,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 ### Development Workflow
 
 1. **Create a new branch**
+
    ```bash
    npm run create-branch  # Uses our automated branch creation script
    # Or manually: git checkout -b feature/your-feature
@@ -148,11 +161,12 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
    - Update documentation as needed
 
 3. **Commit your changes**
+
    ```bash
    git add .
    git commit -m "feat: your feature description"
    ```
-   
+
    We use [Conventional Commits](https://www.conventionalcommits.org/) format.
 
 4. **Push and create a PR**

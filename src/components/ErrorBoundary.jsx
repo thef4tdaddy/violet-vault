@@ -12,14 +12,14 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
-    
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
+
     // Additional debugging info
-    if (process.env.NODE_ENV === 'development') {
-      console.group('🔍 Error Boundary Debug Info');
-      console.log('Error:', error);
-      console.log('Error Info:', errorInfo);
-      console.log('Component Stack:', errorInfo.componentStack);
+    if (process.env.NODE_ENV === "development") {
+      console.group("🔍 Error Boundary Debug Info");
+      console.log("Error:", error);
+      console.log("Error Info:", errorInfo);
+      console.log("Component Stack:", errorInfo.componentStack);
       console.groupEnd();
     }
   }
@@ -39,15 +39,16 @@ class ErrorBoundary extends React.Component {
                 <AlertTriangle className="h-8 w-8 text-white" />
               </div>
             </div>
-            
+
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               Something went wrong
             </h2>
-            
+
             <p className="text-gray-600 mb-6">
-              An unexpected error occurred. Your data is safe and automatically saved.
+              An unexpected error occurred. Your data is safe and automatically
+              saved.
             </p>
-            
+
             <div className="space-y-3">
               <button
                 onClick={this.handleReset}
@@ -56,7 +57,7 @@ class ErrorBoundary extends React.Component {
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Try Again
               </button>
-              
+
               <button
                 onClick={() => window.location.reload()}
                 className="w-full btn btn-secondary py-3 rounded-2xl"
@@ -64,8 +65,8 @@ class ErrorBoundary extends React.Component {
                 Reload Page
               </button>
             </div>
-            
-            {process.env.NODE_ENV === 'development' && (
+
+            {process.env.NODE_ENV === "development" && (
               <details className="mt-6 text-left">
                 <summary className="cursor-pointer text-sm font-medium text-gray-700 mb-2">
                   Error Details (Development)

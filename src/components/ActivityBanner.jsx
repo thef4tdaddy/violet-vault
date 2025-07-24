@@ -1,22 +1,22 @@
 // components/ActivityBanner.jsx
-import React, { useState, useEffect } from 'react';
-import { 
-  Activity, 
-  Eye, 
-  Edit3, 
-  DollarSign, 
-  Trash2, 
+import React, { useState, useEffect } from "react";
+import {
+  Activity,
+  Eye,
+  Edit3,
+  DollarSign,
+  Trash2,
   ArrowRightLeft,
   Clock,
   ChevronDown,
   ChevronUp,
-  Users
-} from 'lucide-react';
+  Users,
+} from "lucide-react";
 
-const ActivityBanner = ({ 
-  activeUsers = [], 
-  recentActivity = [], 
-  currentUser = null 
+const ActivityBanner = ({
+  activeUsers = [],
+  recentActivity = [],
+  currentUser = null,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [displayedActivities, setDisplayedActivities] = useState([]);
@@ -26,23 +26,23 @@ const ActivityBanner = ({
     const sortedActivities = [...recentActivity]
       .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
       .slice(0, 10);
-    
+
     setDisplayedActivities(sortedActivities);
   }, [recentActivity]);
 
   const getActivityIcon = (type) => {
     switch (type) {
-      case 'envelope_update':
-      case 'envelope_create':
+      case "envelope_update":
+      case "envelope_create":
         return <DollarSign className="h-3 w-3" />;
-      case 'envelope_delete':
+      case "envelope_delete":
         return <Trash2 className="h-3 w-3" />;
-      case 'bill_create':
-      case 'bill_update':
+      case "bill_create":
+      case "bill_update":
         return <Edit3 className="h-3 w-3" />;
-      case 'transfer':
+      case "transfer":
         return <ArrowRightLeft className="h-3 w-3" />;
-      case 'view':
+      case "view":
         return <Eye className="h-3 w-3" />;
       default:
         return <Activity className="h-3 w-3" />;
@@ -51,41 +51,41 @@ const ActivityBanner = ({
 
   const getActivityColor = (type) => {
     switch (type) {
-      case 'envelope_create':
-      case 'bill_create':
-        return 'emerald';
-      case 'envelope_update':
-      case 'bill_update':
-        return 'cyan';
-      case 'envelope_delete':
-      case 'bill_delete':
-        return 'rose';
-      case 'transfer':
-        return 'purple';
-      case 'view':
-        return 'gray';
+      case "envelope_create":
+      case "bill_create":
+        return "emerald";
+      case "envelope_update":
+      case "bill_update":
+        return "cyan";
+      case "envelope_delete":
+      case "bill_delete":
+        return "rose";
+      case "transfer":
+        return "purple";
+      case "view":
+        return "gray";
       default:
-        return 'purple';
+        return "purple";
     }
   };
 
   const formatActivityDescription = (activity) => {
-    const userName = activity.userName || 'Someone';
-    
+    const userName = activity.userName || "Someone";
+
     switch (activity.type) {
-      case 'envelope_create':
-        return `${userName} created envelope "${activity.details?.name || 'Unknown'}"`;
-      case 'envelope_update':
-        return `${userName} updated envelope "${activity.details?.name || 'Unknown'}"`;
-      case 'envelope_delete':
-        return `${userName} deleted envelope "${activity.details?.name || 'Unknown'}"`;
-      case 'bill_create':
-        return `${userName} added bill "${activity.details?.name || 'Unknown'}"`;
-      case 'bill_update':
-        return `${userName} updated bill "${activity.details?.name || 'Unknown'}"`;
-      case 'transfer':
-        return `${userName} transferred $${activity.details?.amount || '0'} between envelopes`;
-      case 'view':
+      case "envelope_create":
+        return `${userName} created envelope "${activity.details?.name || "Unknown"}"`;
+      case "envelope_update":
+        return `${userName} updated envelope "${activity.details?.name || "Unknown"}"`;
+      case "envelope_delete":
+        return `${userName} deleted envelope "${activity.details?.name || "Unknown"}"`;
+      case "bill_create":
+        return `${userName} added bill "${activity.details?.name || "Unknown"}"`;
+      case "bill_update":
+        return `${userName} updated bill "${activity.details?.name || "Unknown"}"`;
+      case "transfer":
+        return `${userName} transferred $${activity.details?.amount || "0"} between envelopes`;
+      case "view":
         return `${userName} is viewing the budget`;
       default:
         return `${userName} made changes to the budget`;
@@ -96,21 +96,21 @@ const ActivityBanner = ({
     const now = new Date();
     const time = new Date(timestamp);
     const diffInSeconds = Math.floor((now - time) / 1000);
-    
-    if (diffInSeconds < 10) return 'just now';
+
+    if (diffInSeconds < 10) return "just now";
     if (diffInSeconds < 60) return `${diffInSeconds}s ago`;
-    
+
     const diffInMinutes = Math.floor(diffInSeconds / 60);
     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-    
+
     const diffInHours = Math.floor(diffInMinutes / 60);
     if (diffInHours < 24) return `${diffInHours}h ago`;
-    
+
     return time.toLocaleDateString();
   };
 
-  const otherActiveUsers = activeUsers.filter(user => 
-    currentUser && user.id !== currentUser.id
+  const otherActiveUsers = activeUsers.filter(
+    (user) => currentUser && user.id !== currentUser.id
   );
 
   if (otherActiveUsers.length === 0 && displayedActivities.length === 0) {
@@ -120,7 +120,7 @@ const ActivityBanner = ({
   return (
     <div className="glassmorphism rounded-xl mb-6 overflow-hidden">
       {/* Header */}
-      <div 
+      <div
         className="p-4 cursor-pointer hover:bg-white hover:bg-opacity-30 transition-all duration-200"
         onClick={() => setIsExpanded(!isExpanded)}
       >
@@ -129,16 +129,18 @@ const ActivityBanner = ({
             <div className="p-2 bg-purple-100 rounded-lg">
               <Activity className="h-5 w-5 text-purple-600" />
             </div>
-            
+
             <div>
-              <div className="font-semibold text-gray-900">
-                Team Activity
-              </div>
+              <div className="font-semibold text-gray-900">Team Activity</div>
               <div className="text-sm text-gray-600">
                 {otherActiveUsers.length > 0 && (
-                  <span>{otherActiveUsers.length} user{otherActiveUsers.length === 1 ? '' : 's'} active " </span>
+                  <span>
+                    {otherActiveUsers.length} user
+                    {otherActiveUsers.length === 1 ? "" : "s"} active "{" "}
+                  </span>
                 )}
-                {displayedActivities.length} recent change{displayedActivities.length === 1 ? '' : 's'}
+                {displayedActivities.length} recent change
+                {displayedActivities.length === 1 ? "" : "s"}
               </div>
             </div>
           </div>
@@ -150,7 +152,9 @@ const ActivityBanner = ({
                 <div className="h-2 w-2 bg-emerald-500 rounded-full">
                   <div className="absolute h-2 w-2 bg-emerald-500 rounded-full animate-ping" />
                 </div>
-                <span className="text-xs font-medium text-emerald-700">Live</span>
+                <span className="text-xs font-medium text-emerald-700">
+                  Live
+                </span>
               </div>
             )}
 
@@ -172,9 +176,11 @@ const ActivityBanner = ({
             <div className="p-4 bg-gradient-to-r from-purple-50 to-cyan-50">
               <div className="flex items-center mb-3">
                 <Users className="h-4 w-4 text-purple-600 mr-2" />
-                <span className="font-medium text-purple-900">Currently Online</span>
+                <span className="font-medium text-purple-900">
+                  Currently Online
+                </span>
               </div>
-              
+
               <div className="flex flex-wrap gap-2">
                 {otherActiveUsers.map((user) => (
                   <div
@@ -183,14 +189,14 @@ const ActivityBanner = ({
                   >
                     <div
                       className="h-6 w-6 rounded-full border-2 border-white flex items-center justify-center"
-                      style={{ backgroundColor: user.color || '#a855f7' }}
+                      style={{ backgroundColor: user.color || "#a855f7" }}
                     >
                       <span className="text-xs font-bold text-white">
-                        {user.userName?.charAt(0)?.toUpperCase() || '?'}
+                        {user.userName?.charAt(0)?.toUpperCase() || "?"}
                       </span>
                     </div>
                     <span className="text-sm font-medium text-gray-700">
-                      {user.userName || 'Anonymous'}
+                      {user.userName || "Anonymous"}
                     </span>
                     <div className="h-2 w-2 bg-emerald-500 rounded-full" />
                   </div>
@@ -204,21 +210,28 @@ const ActivityBanner = ({
             <div className="p-4">
               <div className="flex items-center mb-3">
                 <Clock className="h-4 w-4 text-gray-600 mr-2" />
-                <span className="font-medium text-gray-900">Recent Activity</span>
+                <span className="font-medium text-gray-900">
+                  Recent Activity
+                </span>
               </div>
 
               <div className="space-y-3 max-h-64 overflow-y-auto">
                 {displayedActivities.map((activity, index) => {
                   const color = getActivityColor(activity.type);
-                  
+
                   return (
-                    <div key={activity.id || index} className="flex items-start space-x-3">
-                      <div className={`p-1.5 bg-${color}-100 rounded-lg flex-shrink-0`}>
+                    <div
+                      key={activity.id || index}
+                      className="flex items-start space-x-3"
+                    >
+                      <div
+                        className={`p-1.5 bg-${color}-100 rounded-lg flex-shrink-0`}
+                      >
                         <div className={`text-${color}-600`}>
                           {getActivityIcon(activity.type)}
                         </div>
                       </div>
-                      
+
                       <div className="flex-1 min-w-0">
                         <div className="text-sm text-gray-900">
                           {formatActivityDescription(activity)}
@@ -235,7 +248,7 @@ const ActivityBanner = ({
                           style={{ backgroundColor: activity.userColor }}
                         >
                           <span className="text-xs font-bold text-white">
-                            {activity.userName?.charAt(0)?.toUpperCase() || '?'}
+                            {activity.userName?.charAt(0)?.toUpperCase() || "?"}
                           </span>
                         </div>
                       )}

@@ -151,8 +151,8 @@ const Dashboard = ({
               isBalanced
                 ? "bg-green-50"
                 : Math.abs(difference) > 10
-                ? "bg-red-50"
-                : "bg-yellow-50"
+                  ? "bg-red-50"
+                  : "bg-yellow-50"
             }`}
           >
             <div className="flex items-center justify-between mb-4">
@@ -161,8 +161,8 @@ const Dashboard = ({
                   isBalanced
                     ? "text-green-900"
                     : Math.abs(difference) > 10
-                    ? "text-red-900"
-                    : "text-yellow-900"
+                      ? "text-red-900"
+                      : "text-yellow-900"
                 }`}
               >
                 Difference
@@ -185,8 +185,8 @@ const Dashboard = ({
                   isBalanced
                     ? "text-green-900"
                     : difference > 0
-                    ? "text-green-900"
-                    : "text-red-900"
+                      ? "text-green-900"
+                      : "text-red-900"
                 }`}
               >
                 {difference > 0 ? "+" : ""}${difference.toFixed(2)}
@@ -196,15 +196,15 @@ const Dashboard = ({
                   isBalanced
                     ? "text-green-700"
                     : Math.abs(difference) > 10
-                    ? "text-red-700"
-                    : "text-yellow-700"
+                      ? "text-red-700"
+                      : "text-yellow-700"
                 }`}
               >
                 {isBalanced
                   ? "Accounts are balanced!"
                   : difference > 0
-                  ? "Extra money available"
-                  : "Virtual balance exceeds actual"}
+                    ? "Extra money available"
+                    : "Virtual balance exceeds actual"}
               </p>
             </div>
           </div>

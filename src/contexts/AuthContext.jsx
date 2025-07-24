@@ -1,6 +1,6 @@
 // src/contexts/AuthContext.jsx
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { encryptionUtils } from '../utils/encryption';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { encryptionUtils } from "../utils/encryption";
 
 const AuthContext = createContext();
 
@@ -31,8 +31,14 @@ export const AuthProvider = ({ children }) => {
       };
 
       // Listen for user activity
-      const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
-      events.forEach(event => {
+      const events = [
+        "mousedown",
+        "mousemove",
+        "keypress",
+        "scroll",
+        "touchstart",
+      ];
+      events.forEach((event) => {
         document.addEventListener(event, handleActivity, true);
       });
 
@@ -40,7 +46,7 @@ export const AuthProvider = ({ children }) => {
 
       return () => {
         clearTimeout(timeoutId);
-        events.forEach(event => {
+        events.forEach((event) => {
           document.removeEventListener(event, handleActivity, true);
         });
       };
@@ -51,7 +57,8 @@ export const AuthProvider = ({ children }) => {
     try {
       if (userData) {
         // New user setup
-        const { salt: newSalt, key } = await encryptionUtils.deriveKey(password);
+        const { salt: newSalt, key } =
+          await encryptionUtils.deriveKey(password);
         setSalt(newSalt);
         setEncryptionKey(key);
         setCurrentUser(userData);
@@ -61,29 +68,36 @@ export const AuthProvider = ({ children }) => {
         return { success: true };
       } else {
         // Existing user login
-        const savedData = localStorage.getItem('envelopeBudgetData');
+        const savedData = localStorage.getItem("envelopeBudgetData");
         if (!savedData) {
-          return { success: false, error: 'No saved data found' };
+          return { success: false, error: "No saved data found" };
         }
 
         const { salt: savedSalt, encryptedData, iv } = JSON.parse(savedData);
         const saltArray = new Uint8Array(savedSalt);
-        const key = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
-        
-        const decryptedData = await encryptionUtils.decrypt(encryptedData, key, iv);
-        
+        const key = await encryptionUtils.deriveKeyFromSalt(
+          password,
+          saltArray
+        );
+
+        const decryptedData = await encryptionUtils.decrypt(
+          encryptedData,
+          key,
+          iv
+        );
+
         setSalt(saltArray);
         setEncryptionKey(key);
         setCurrentUser(decryptedData.currentUser);
         setBudgetId(decryptedData.currentUser?.budgetId);
         setIsUnlocked(true);
         setLastActivity(Date.now());
-        
+
         return { success: true, data: decryptedData };
       }
     } catch (error) {
-      console.error('Login failed:', error);
-      return { success: false, error: 'Invalid password or corrupted data' };
+      console.error("Login failed:", error);
+      return { success: false, error: "Invalid password or corrupted data" };
     }
   };
 
@@ -116,16 +130,14 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

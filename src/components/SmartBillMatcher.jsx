@@ -58,7 +58,7 @@ const SmartBillMatcher = ({
     } else {
       setSuggestions([]);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery, envelopes, bills]);
 
   const generateSuggestions = (query) => {

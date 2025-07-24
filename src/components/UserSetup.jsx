@@ -60,16 +60,20 @@ const UserSetup = ({ onSetupComplete }) => {
       <div className="glassmorphism rounded-3xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
-            <div style={{ width: '64px', height: '64px' }}>
-              <img 
-                src={logoOnly} 
-                alt="VioletVault Logo" 
-                style={{ width: '64px', height: '64px', objectFit: 'contain' }}
+            <div style={{ width: "64px", height: "64px" }}>
+              <img
+                src={logoOnly}
+                alt="VioletVault Logo"
+                style={{ width: "64px", height: "64px", objectFit: "contain" }}
               />
             </div>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {step === 1 ? "Welcome Back" : userName ? `Welcome Back, ${userName}!` : "Set Up Profile"}
+            {step === 1
+              ? "Welcome Back"
+              : userName
+                ? `Welcome Back, ${userName}!`
+                : "Set Up Profile"}
           </h1>
           {step === 1 && userName && (
             <div className="flex items-center justify-center mb-4">
@@ -77,13 +81,15 @@ const UserSetup = ({ onSetupComplete }) => {
                 className="w-4 h-4 rounded-full mr-2 ring-2 ring-white shadow-sm"
                 style={{ backgroundColor: userColor }}
               />
-              <span className="text-sm font-medium text-gray-700">{userName}'s Profile</span>
+              <span className="text-sm font-medium text-gray-700">
+                {userName}'s Profile
+              </span>
             </div>
           )}
           <p className="text-gray-600">
             {step === 1
               ? "Enter your family's master password"
-              : userName 
+              : userName
                 ? "Confirm your profile details or make changes"
                 : "Choose your name and color for tracking"}
           </p>
@@ -134,7 +140,7 @@ const UserSetup = ({ onSetupComplete }) => {
                     onClick={async (e) => {
                       e.preventDefault();
                       if (!masterPassword || !userName.trim()) return;
-                      
+
                       setIsLoading(true);
                       try {
                         await onSetupComplete({

@@ -31,24 +31,24 @@ import {
 const ChartsAnalytics = ({
   transactions = [],
   envelopes = [],
-  bills = [],
-  paycheckHistory = [],
-  savingsGoals = [],
   currentUser = { userName: "User", userColor: "#a855f7" },
 }) => {
   // Validate and sanitize props to prevent runtime errors
-  const safeTransactions = Array.isArray(transactions) ? transactions : [];
-  const safeEnvelopes = Array.isArray(envelopes) ? envelopes : [];
-  const safeBills = Array.isArray(bills) ? bills : [];
-  const safePaycheckHistory = Array.isArray(paycheckHistory) ? paycheckHistory : [];
-  const safeSavingsGoals = Array.isArray(savingsGoals) ? savingsGoals : [];
+  const safeTransactions = useMemo(
+    () => (Array.isArray(transactions) ? transactions : []),
+    [transactions]
+  );
+  const safeEnvelopes = useMemo(
+    () => (Array.isArray(envelopes) ? envelopes : []),
+    [envelopes]
+  );
 
   // Date validation helper
-  const isValidDate = (dateString) => {
+  const isValidDate = useCallback((dateString) => {
     if (!dateString) return false;
     const date = new Date(dateString);
     return date instanceof Date && !isNaN(date) && date.getFullYear() > 1900;
-  };
+  }, []);
 
   // Safe division helper
   const safeDivision = (numerator, denominator, fallback = 0) => {
@@ -78,7 +78,7 @@ const ChartsAnalytics = ({
       try {
         return new Date(t.date) >= getDateRange;
       } catch (error) {
-        console.warn('Invalid date in transaction:', t.date);
+        console.warn("Invalid date in transaction:", t.date);
         return false;
       }
     });
@@ -89,10 +89,14 @@ const ChartsAnalytics = ({
     const grouped = {};
 
     filteredTransactions.forEach((transaction) => {
-      if (!transaction || !isValidDate(transaction.date) || typeof transaction.amount !== 'number') {
+      if (
+        !transaction ||
+        !isValidDate(transaction.date) ||
+        typeof transaction.amount !== "number"
+      ) {
         return; // Skip invalid transactions
       }
-      
+
       try {
         const date = new Date(transaction.date);
         const monthKey = `${date.getFullYear()}-${String(
@@ -108,26 +112,29 @@ const ChartsAnalytics = ({
             transactionCount: 0,
           };
         }
+
+        if (transaction.amount > 0) {
+          grouped[monthKey].income += transaction.amount;
+        } else {
+          grouped[monthKey].expenses += Math.abs(transaction.amount);
+        }
+
+        grouped[monthKey].net =
+          grouped[monthKey].income - grouped[monthKey].expenses;
+        grouped[monthKey].transactionCount++;
       } catch (error) {
-        console.warn('Error processing transaction in monthlyTrends:', transaction);
+        console.warn(
+          "Error processing transaction in monthlyTrends:",
+          transaction
+        );
         return;
       }
-
-      if (transaction.amount > 0) {
-        grouped[monthKey].income += transaction.amount;
-      } else {
-        grouped[monthKey].expenses += Math.abs(transaction.amount);
-      }
-
-      grouped[monthKey].net =
-        grouped[monthKey].income - grouped[monthKey].expenses;
-      grouped[monthKey].transactionCount++;
     });
 
     return Object.values(grouped).sort((a, b) =>
       a.month.localeCompare(b.month)
     );
-  }, [filteredTransactions]);
+  }, [filteredTransactions, isValidDate]);
 
   // Envelope spending breakdown
   const envelopeSpending = useMemo(() => {
@@ -135,7 +142,9 @@ const ChartsAnalytics = ({
 
     filteredTransactions.forEach((transaction) => {
       if (transaction.amount < 0 && transaction.envelopeId) {
-        const envelope = safeEnvelopes.find((e) => e.id === transaction.envelopeId);
+        const envelope = safeEnvelopes.find(
+          (e) => e.id === transaction.envelopeId
+        );
         const envelopeName = envelope ? envelope.name : "Unknown Envelope";
 
         if (!spending[envelopeName]) {
@@ -245,7 +254,9 @@ const ChartsAnalytics = ({
 
     filteredTransactions.forEach((transaction) => {
       if (transaction.amount < 0 && transaction.envelopeId) {
-        const envelope = safeEnvelopes.find((e) => e.id === transaction.envelopeId);
+        const envelope = safeEnvelopes.find(
+          (e) => e.id === transaction.envelopeId
+        );
         if (envelope && analysis[envelope.name]) {
           analysis[envelope.name].actual += Math.abs(transaction.amount);
         }
@@ -255,7 +266,7 @@ const ChartsAnalytics = ({
     return Object.values(analysis).filter(
       (item) => item.budgeted > 0 || item.actual > 0
     );
-  }, [filteredTransactions, safeEnvelopes]);
+  }, [filteredTransactions, safeEnvelopes, envelopes]);
 
   // Financial metrics
   const metrics = useMemo(() => {
@@ -267,23 +278,26 @@ const ChartsAnalytics = ({
       .filter((t) => t.amount < 0)
       .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
-    const savingsRate = safeDivision((totalIncome - totalExpenses), totalIncome, 0) * 100;
+    const savingsRate =
+      safeDivision(totalIncome - totalExpenses, totalIncome, 0) * 100;
 
-    const avgMonthlyIncome = monthlyTrends.length > 0
-      ? safeDivision(
-          monthlyTrends.reduce((sum, m) => sum + m.income, 0),
-          monthlyTrends.length,
-          0
-        )
-      : 0;
+    const avgMonthlyIncome =
+      monthlyTrends.length > 0
+        ? safeDivision(
+            monthlyTrends.reduce((sum, m) => sum + m.income, 0),
+            monthlyTrends.length,
+            0
+          )
+        : 0;
 
-    const avgMonthlyExpenses = monthlyTrends.length > 0
-      ? safeDivision(
-          monthlyTrends.reduce((sum, m) => sum + m.expenses, 0),
-          monthlyTrends.length,
-          0
-        )
-      : 0;
+    const avgMonthlyExpenses =
+      monthlyTrends.length > 0
+        ? safeDivision(
+            monthlyTrends.reduce((sum, m) => sum + m.expenses, 0),
+            monthlyTrends.length,
+            0
+          )
+        : 0;
 
     return {
       totalIncome,
@@ -297,18 +311,21 @@ const ChartsAnalytics = ({
   }, [filteredTransactions, monthlyTrends]);
 
   // Memoized chart colors
-  const chartColors = useMemo(() => [
-    "#a855f7",
-    "#06b6d4", 
-    "#10b981",
-    "#f59e0b",
-    "#ef4444",
-    "#8b5cf6",
-    "#14b8a6",
-    "#f97316",
-    "#84cc16",
-    "#6366f1",
-  ], []);
+  const chartColors = useMemo(
+    () => [
+      "#a855f7",
+      "#06b6d4",
+      "#10b981",
+      "#f59e0b",
+      "#ef4444",
+      "#8b5cf6",
+      "#14b8a6",
+      "#f97316",
+      "#84cc16",
+      "#6366f1",
+    ],
+    []
+  );
 
   // Optimized event handlers
   const handleDateRangeChange = useCallback((e) => {
@@ -332,9 +349,9 @@ const ChartsAnalytics = ({
       envelopeSpending,
       categoryBreakdown,
       exportedAt: new Date().toISOString(),
-      exportedBy: currentUser?.userName || 'Anonymous'
+      exportedBy: currentUser?.userName || "Anonymous",
     };
-    
+
     const dataStr = JSON.stringify(dataToExport, null, 2);
     const dataBlob = new Blob([dataStr], { type: "application/json" });
     const url = URL.createObjectURL(dataBlob);
@@ -343,46 +360,58 @@ const ChartsAnalytics = ({
     link.download = `analytics-export-${new Date().toISOString().split("T")[0]}.json`;
     link.click();
     URL.revokeObjectURL(url);
-  }, [dateRange, metrics, monthlyTrends, envelopeSpending, categoryBreakdown, currentUser?.userName]);
+  }, [
+    dateRange,
+    metrics,
+    monthlyTrends,
+    envelopeSpending,
+    categoryBreakdown,
+    currentUser?.userName,
+  ]);
 
   const MetricCard = ({
     title,
     value,
     subtitle,
-    icon: Icon,
+    icon,
     trend,
     color = "purple",
-  }) => (
-    <div className="glassmorphism rounded-xl p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-semibold text-gray-600 mb-1">{title}</p>
-          <p className={`text-2xl font-bold text-${color}-600`}>{value}</p>
-          {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
-        </div>
-        <div className="relative">
-          <div
-            className={`absolute inset-0 bg-${color}-500 rounded-2xl blur-lg opacity-30`}
-          ></div>
-          <div className={`relative bg-${color}-500 p-3 rounded-2xl`}>
-            <Icon className="h-6 w-6 text-white" />
+  }) => {
+    const Icon = icon;
+    return (
+      <div className="glassmorphism rounded-xl p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-semibold text-gray-600 mb-1">{title}</p>
+            <p className={`text-2xl font-bold text-${color}-600`}>{value}</p>
+            {subtitle && (
+              <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
+            )}
+          </div>
+          <div className="relative">
+            <div
+              className={`absolute inset-0 bg-${color}-500 rounded-2xl blur-lg opacity-30`}
+            ></div>
+            <div className={`relative bg-${color}-500 p-3 rounded-2xl`}>
+              <Icon className="h-6 w-6 text-white" />
+            </div>
           </div>
         </div>
+        {trend && (
+          <div className="mt-3 flex items-center text-sm">
+            {trend > 0 ? (
+              <ArrowUpRight className="h-4 w-4 text-emerald-500 mr-1" />
+            ) : (
+              <ArrowDownRight className="h-4 w-4 text-red-500 mr-1" />
+            )}
+            <span className={trend > 0 ? "text-emerald-600" : "text-red-600"}>
+              {Math.abs(trend).toFixed(1)}% vs last period
+            </span>
+          </div>
+        )}
       </div>
-      {trend && (
-        <div className="mt-3 flex items-center text-sm">
-          {trend > 0 ? (
-            <ArrowUpRight className="h-4 w-4 text-emerald-500 mr-1" />
-          ) : (
-            <ArrowDownRight className="h-4 w-4 text-red-500 mr-1" />
-          )}
-          <span className={trend > 0 ? "text-emerald-600" : "text-red-600"}>
-            {Math.abs(trend).toFixed(1)}% vs last period
-          </span>
-        </div>
-      )}
-    </div>
-  );
+    );
+  };
 
   const CustomTooltip = useCallback(({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -399,7 +428,6 @@ const ChartsAnalytics = ({
     }
     return null;
   }, []);
-
 
   return (
     <div className="space-y-6">
@@ -433,7 +461,7 @@ const ChartsAnalytics = ({
             <option value="all">All Time</option>
           </select>
 
-          <button 
+          <button
             onClick={handleExport}
             className="btn btn-secondary flex items-center rounded-xl px-4 py-2"
           >
@@ -702,10 +730,10 @@ const ChartsAnalytics = ({
                         envelope.status === "critical"
                           ? "bg-red-100 text-red-800"
                           : envelope.status === "warning"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : envelope.status === "overfunded"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-green-100 text-green-800"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : envelope.status === "overfunded"
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-green-100 text-green-800"
                       }`}
                     >
                       {envelope.status}
@@ -732,10 +760,10 @@ const ChartsAnalytics = ({
                           envelope.status === "critical"
                             ? "bg-red-500"
                             : envelope.status === "warning"
-                            ? "bg-yellow-500"
-                            : envelope.status === "overfunded"
-                            ? "bg-blue-500"
-                            : "bg-green-500"
+                              ? "bg-yellow-500"
+                              : envelope.status === "overfunded"
+                                ? "bg-blue-500"
+                                : "bg-green-500"
                         }`}
                         style={{
                           width: `${Math.min(100, envelope.healthScore)}%`,

@@ -19,7 +19,7 @@ class FirebaseSync {
     this.encryptionKey = null;
     this.unsubscribe = null;
     this.lastSyncTimestamp = null;
-    
+
     // Enhanced state management
     this.isOnline = navigator.onLine;
     this.syncQueue = [];
@@ -29,11 +29,11 @@ class FirebaseSync {
     this.activeUsers = new Map();
     this.syncListeners = new Set();
     this.errorListeners = new Set();
-    
+
     // Activity tracking
     this.recentActivity = [];
     this.maxActivityItems = 50;
-    
+
     // Setup network monitoring
     this.setupNetworkMonitoring();
   }
@@ -42,56 +42,56 @@ class FirebaseSync {
     this.budgetId = budgetId;
     this.encryptionKey = encryptionKey;
     this.retryAttempts = 0;
-    
+
     // Clear any existing queued operations for a fresh start
     this.syncQueue = [];
   }
-  
+
   setupNetworkMonitoring() {
-    window.addEventListener('online', () => {
-      console.log('📶 Network connection restored');
+    window.addEventListener("online", () => {
+      console.log("📶 Network connection restored");
       this.isOnline = true;
       this.processSyncQueue();
     });
-    
-    window.addEventListener('offline', () => {
-      console.log('📵 Network connection lost');
+
+    window.addEventListener("offline", () => {
+      console.log("📵 Network connection lost");
       this.isOnline = false;
     });
   }
-  
+
   addSyncListener(callback) {
     this.syncListeners.add(callback);
   }
-  
+
   removeSyncListener(callback) {
     this.syncListeners.delete(callback);
   }
-  
+
   addErrorListener(callback) {
     this.errorListeners.add(callback);
   }
-  
+
   removeErrorListener(callback) {
     this.errorListeners.delete(callback);
   }
-  
+
   notifySyncListeners(event) {
-    this.syncListeners.forEach(callback => {
+    this.syncListeners.forEach((callback) => {
       try {
         callback(event);
       } catch (error) {
-        console.error('❌ Error in sync listener:', error);
+        console.error("❌ Error in sync listener:", error);
       }
     });
   }
-  
+
   notifyErrorListeners(error) {
-    this.errorListeners.forEach(callback => {
+    this.errorListeners.forEach((callback) => {
       try {
         callback(error);
       } catch (err) {
-        console.error('❌ Error in error listener:', err);
+        console.error("❌ Error in error listener:", err);
       }
     });
   }
@@ -149,46 +149,49 @@ class FirebaseSync {
   }
 
   async decryptFromCloud(cloudData) {
-    if (!cloudData || typeof cloudData !== 'object') {
-      console.log('⚠️ Invalid cloud data format');
+    if (!cloudData || typeof cloudData !== "object") {
+      console.log("⚠️ Invalid cloud data format");
       return null;
     }
-    
+
     if (!cloudData.encryptedData || !cloudData.iv) {
-      console.log('⚠️ No encrypted data found in cloud document');
+      console.log("⚠️ No encrypted data found in cloud document");
       return null;
     }
 
     try {
-      console.log('🔓 Attempting to decrypt cloud data...');
-      
+      console.log("🔓 Attempting to decrypt cloud data...");
+
       // Validate encryption key
       if (!this.encryptionKey) {
-        throw new Error('No encryption key available');
+        throw new Error("No encryption key available");
       }
-      
+
       // Check data format
-      if (!Array.isArray(cloudData.encryptedData) || !Array.isArray(cloudData.iv)) {
-        console.error('❌ Invalid encrypted data format:', {
+      if (
+        !Array.isArray(cloudData.encryptedData) ||
+        !Array.isArray(cloudData.iv)
+      ) {
+        console.error("❌ Invalid encrypted data format:", {
           encryptedDataType: typeof cloudData.encryptedData,
           ivType: typeof cloudData.iv,
           encryptedDataLength: cloudData.encryptedData?.length,
-          ivLength: cloudData.iv?.length
+          ivLength: cloudData.iv?.length,
         });
-        throw new Error('Invalid encrypted data format');
+        throw new Error("Invalid encrypted data format");
       }
-      
+
       const decryptedData = await encryptionUtils.decrypt(
         cloudData.encryptedData,
         this.encryptionKey,
         cloudData.iv
       );
 
-      console.log('✅ Successfully decrypted cloud data');
+      console.log("✅ Successfully decrypted cloud data");
 
       // Validate decrypted data structure
-      if (!decryptedData || typeof decryptedData !== 'object') {
-        throw new Error('Decrypted data is invalid');
+      if (!decryptedData || typeof decryptedData !== "object") {
+        throw new Error("Decrypted data is invalid");
       }
 
       // Reconstruct full lastActivity
@@ -202,23 +205,28 @@ class FirebaseSync {
 
       return decryptedData;
     } catch (error) {
-      console.error('❌ Failed to decrypt cloud data:', error);
-      
+      console.error("❌ Failed to decrypt cloud data:", error);
+
       // Check for common decryption issues
-      if (error.name === 'OperationError') {
-        console.error('🔑 Encryption key mismatch - data may be from different password');
+      if (error.name === "OperationError") {
+        console.error(
+          "🔑 Encryption key mismatch - data may be from different password"
+        );
         // Clear the corrupted data automatically
         setTimeout(() => {
-          this.clearCorruptedData().catch(clearError => {
-            console.error('❌ Failed to auto-clear corrupted data:', clearError);
+          this.clearCorruptedData().catch((clearError) => {
+            console.error(
+              "❌ Failed to auto-clear corrupted data:",
+              clearError
+            );
           });
         }, 1000);
-      } else if (error.name === 'InvalidAccessError') {
-        console.error('🚫 Invalid encryption key format');
-      } else if (error.message?.includes('JSON')) {
-        console.error('📄 JSON parsing error in decrypted data');
+      } else if (error.name === "InvalidAccessError") {
+        console.error("🚫 Invalid encryption key format");
+      } else if (error.message?.includes("JSON")) {
+        console.error("📄 JSON parsing error in decrypted data");
       }
-      
+
       throw error;
     }
   }
@@ -230,30 +238,30 @@ class FirebaseSync {
 
     // If offline, queue the operation
     if (!this.isOnline && !options.skipQueue) {
-      this.queueSyncOperation('save', { data, currentUser });
-      console.log('📴 Queued save operation for when online');
+      this.queueSyncOperation("save", { data, currentUser });
+      console.log("📴 Queued save operation for when online");
       return;
     }
 
     try {
-      this.notifySyncListeners({ type: 'sync_start', operation: 'save' });
-      
+      this.notifySyncListeners({ type: "sync_start", operation: "save" });
+
       const encryptedData = await this.encryptForCloud(data);
-      
+
       // Add activity tracking
       const activityData = {
         id: Date.now().toString(),
-        type: 'data_save',
-        userName: currentUser?.userName || 'Anonymous',
-        userColor: currentUser?.userColor || '#a855f7',
+        type: "data_save",
+        userName: currentUser?.userName || "Anonymous",
+        userColor: currentUser?.userColor || "#a855f7",
         timestamp: new Date().toISOString(),
         details: {
           envelopeCount: data.envelopes?.length || 0,
           billCount: data.bills?.length || 0,
-          savingsGoalCount: data.savingsGoals?.length || 0
-        }
+          savingsGoalCount: data.savingsGoals?.length || 0,
+        },
       };
-      
+
       this.addActivity(activityData);
 
       const docRef = doc(db, "budgets", this.budgetId);
@@ -263,8 +271,8 @@ class FirebaseSync {
           ...encryptedData,
           currentUser: {
             id: currentUser?.id || encryptionUtils.generateDeviceFingerprint(),
-            userName: currentUser?.userName || 'Anonymous',
-            userColor: currentUser?.userColor || '#a855f7',
+            userName: currentUser?.userName || "Anonymous",
+            userColor: currentUser?.userColor || "#a855f7",
             deviceFingerprint: encryptionUtils.generateDeviceFingerprint(),
             lastSeen: new Date().toISOString(),
           },
@@ -275,43 +283,47 @@ class FirebaseSync {
 
       this.lastSyncTimestamp = Date.now();
       this.retryAttempts = 0; // Reset retry counter on success
-      
-      this.notifySyncListeners({ type: 'sync_success', operation: 'save' });
-      console.log('✅ Successfully saved to cloud');
-      
+
+      this.notifySyncListeners({ type: "sync_success", operation: "save" });
+      console.log("✅ Successfully saved to cloud");
     } catch (error) {
-      console.error('❌ Failed to save to cloud:', error);
-      
+      console.error("❌ Failed to save to cloud:", error);
+
       // Handle network blocking errors
       if (this.isNetworkBlockingError(error)) {
-        console.warn('🚫 Firebase requests are being blocked by browser extension/ad blocker');
+        console.warn(
+          "🚫 Firebase requests are being blocked by browser extension/ad blocker"
+        );
         this.notifyErrorListeners({
-          type: 'network_blocked',
-          operation: 'save',
-          error: 'Firebase requests blocked by browser extension or ad blocker',
-          userMessage: 'Please disable ad blockers for this app or allow Firebase requests',
-          timestamp: new Date().toISOString()
+          type: "network_blocked",
+          operation: "save",
+          error: "Firebase requests blocked by browser extension or ad blocker",
+          userMessage:
+            "Please disable ad blockers for this app or allow Firebase requests",
+          timestamp: new Date().toISOString(),
         });
         // Don't retry blocked requests
         return;
       }
-      
+
       // Handle retry logic for other errors
       if (this.retryAttempts < this.maxRetryAttempts) {
         this.retryAttempts++;
         const delay = this.retryDelay * Math.pow(2, this.retryAttempts - 1); // Exponential backoff
-        
-        console.log(`🔄 Retrying save operation in ${delay}ms (attempt ${this.retryAttempts}/${this.maxRetryAttempts})`);
-        
+
+        console.log(
+          `🔄 Retrying save operation in ${delay}ms (attempt ${this.retryAttempts}/${this.maxRetryAttempts})`
+        );
+
         setTimeout(() => {
           this.saveToCloud(data, currentUser, { skipQueue: true });
         }, delay);
       } else {
         this.notifyErrorListeners({
-          type: 'sync_error',
-          operation: 'save',
+          type: "sync_error",
+          operation: "save",
           error: error.message,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
         throw error;
       }
@@ -328,32 +340,32 @@ class FirebaseSync {
     }
 
     try {
-      this.notifySyncListeners({ type: 'sync_start', operation: 'load' });
-      
+      this.notifySyncListeners({ type: "sync_start", operation: "load" });
+
       const docRef = doc(db, "budgets", this.budgetId);
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
         const cloudData = docSnap.data();
-        console.log('📄 Cloud document exists, attempting decryption...');
-        
+        console.log("📄 Cloud document exists, attempting decryption...");
+
         const decryptedData = await this.decryptFromCloud(cloudData);
-        
+
         // Update active users
         if (cloudData.currentUser) {
           this.activeUsers.set(cloudData.currentUser.id, {
             ...cloudData.currentUser,
-            lastSeen: new Date(cloudData.currentUser.lastSeen || Date.now())
+            lastSeen: new Date(cloudData.currentUser.lastSeen || Date.now()),
           });
         }
-        
+
         // Merge remote activity with local activity
         if (cloudData.activity && Array.isArray(cloudData.activity)) {
           this.mergeActivity(cloudData.activity);
         }
 
-        this.notifySyncListeners({ type: 'sync_success', operation: 'load' });
-        
+        this.notifySyncListeners({ type: "sync_success", operation: "load" });
+
         return {
           data: decryptedData,
           metadata: {
@@ -361,40 +373,46 @@ class FirebaseSync {
             currentUser: cloudData.currentUser,
             lastActivity: cloudData.lastActivity,
             activeUsers: Array.from(this.activeUsers.values()),
-            recentActivity: this.recentActivity
+            recentActivity: this.recentActivity,
           },
         };
       }
 
       return null;
     } catch (error) {
-      console.error('❌ Failed to load from cloud:', error);
-      
+      console.error("❌ Failed to load from cloud:", error);
+
       // Handle specific decryption errors
-      if (error.name === 'OperationError' && error.message.includes('decrypt')) {
-        console.log('🔄 Attempting to clear corrupted cloud data...');
+      if (
+        error.name === "OperationError" &&
+        error.message.includes("decrypt")
+      ) {
+        console.log("🔄 Attempting to clear corrupted cloud data...");
         // Don't throw error, just return null to allow fresh start
         return null;
       }
-      
+
       // Handle network blocking errors
       if (this.isNetworkBlockingError(error)) {
-        console.warn('🚫 Firebase requests are being blocked by browser extension/ad blocker');
+        console.warn(
+          "🚫 Firebase requests are being blocked by browser extension/ad blocker"
+        );
         this.notifyErrorListeners({
-          type: 'network_blocked',
-          operation: 'load',
-          error: 'Firebase requests blocked by browser extension or ad blocker',
-          userMessage: 'Please disable ad blockers for this app or allow Firebase requests',
-          timestamp: new Date().toISOString()
+          type: "network_blocked",
+          operation: "load",
+          error: "Firebase requests blocked by browser extension or ad blocker",
+          userMessage:
+            "Please disable ad blockers for this app or allow Firebase requests",
+          timestamp: new Date().toISOString(),
         });
         return null; // Return null instead of throwing
       }
-      
+
       this.notifyErrorListeners({
-        type: 'sync_error',
-        operation: 'load',
+        type: "sync_error",
+        operation: "load",
         error: error.message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       throw error;
     }
@@ -414,14 +432,16 @@ class FirebaseSync {
         const cloudTimestamp = cloudData.lastUpdated?.toMillis() || 0;
         if (cloudTimestamp > (this.lastSyncTimestamp || 0)) {
           try {
-            console.log('📡 Processing real-time update from Firebase...');
-            
+            console.log("📡 Processing real-time update from Firebase...");
+
             // Check if this is a cleared data marker
             if (cloudData.cleared) {
-              console.log('🧹 Cloud data was cleared - ignoring cleared marker');
+              console.log(
+                "🧹 Cloud data was cleared - ignoring cleared marker"
+              );
               return;
             }
-            
+
             const decryptedData = await this.decryptFromCloud(cloudData);
             if (decryptedData) {
               onDataChanged({
@@ -436,22 +456,24 @@ class FirebaseSync {
             }
           } catch (error) {
             console.error("❌ Failed to decrypt incoming data:", error);
-            
+
             // Handle decryption errors gracefully
-            if (error.name === 'OperationError') {
-              console.log('🔐 Real-time sync encryption key mismatch - ignoring update');
+            if (error.name === "OperationError") {
+              console.log(
+                "🔐 Real-time sync encryption key mismatch - ignoring update"
+              );
               this.notifyErrorListeners({
-                type: 'realtime_decrypt_error',
-                error: 'Encryption key mismatch in real-time sync',
+                type: "realtime_decrypt_error",
+                error: "Encryption key mismatch in real-time sync",
                 timestamp: new Date().toISOString(),
-                suggestion: 'Data may be from a different password or device'
+                suggestion: "Data may be from a different password or device",
               });
-            } else if (error.message?.includes('JSON')) {
-              console.error('📄 JSON parsing error in real-time sync');
+            } else if (error.message?.includes("JSON")) {
+              console.error("📄 JSON parsing error in real-time sync");
               this.notifyErrorListeners({
-                type: 'realtime_parse_error',
-                error: 'Failed to parse real-time sync data',
-                timestamp: new Date().toISOString()
+                type: "realtime_parse_error",
+                error: "Failed to parse real-time sync data",
+                timestamp: new Date().toISOString(),
               });
             }
           }
@@ -506,26 +528,26 @@ class FirebaseSync {
       this.recentActivity = this.recentActivity.slice(0, this.maxActivityItems);
     }
   }
-  
+
   mergeActivity(remoteActivity) {
     // Merge remote activities with local ones, avoiding duplicates
-    const existingIds = new Set(this.recentActivity.map(a => a.id));
-    
-    const newActivities = remoteActivity.filter(activity => 
-      !existingIds.has(activity.id)
+    const existingIds = new Set(this.recentActivity.map((a) => a.id));
+
+    const newActivities = remoteActivity.filter(
+      (activity) => !existingIds.has(activity.id)
     );
-    
+
     if (newActivities.length > 0) {
       this.recentActivity = [...newActivities, ...this.recentActivity]
         .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
         .slice(0, this.maxActivityItems);
     }
   }
-  
+
   getRecentActivity() {
     return [...this.recentActivity];
   }
-  
+
   // Offline sync queue management
   queueSyncOperation(type, data) {
     this.syncQueue.push({
@@ -533,29 +555,31 @@ class FirebaseSync {
       type,
       data,
       timestamp: new Date().toISOString(),
-      retries: 0
+      retries: 0,
     });
-    
+
     // Limit queue size to prevent memory issues
     if (this.syncQueue.length > 100) {
       this.syncQueue = this.syncQueue.slice(-100);
     }
   }
-  
+
   async processSyncQueue() {
     if (!this.isOnline || this.syncQueue.length === 0) {
       return;
     }
-    
-    console.log(`🔄 Processing ${this.syncQueue.length} queued sync operations`);
-    
+
+    console.log(
+      `🔄 Processing ${this.syncQueue.length} queued sync operations`
+    );
+
     const operations = [...this.syncQueue];
     this.syncQueue = [];
-    
+
     for (const operation of operations) {
       try {
         switch (operation.type) {
-          case 'save':
+          case "save":
             await this.saveToCloud(
               operation.data.data,
               operation.data.currentUser,
@@ -563,11 +587,11 @@ class FirebaseSync {
             );
             break;
           default:
-            console.warn('❓ Unknown queued operation type:', operation.type);
+            console.warn("❓ Unknown queued operation type:", operation.type);
         }
       } catch (error) {
-        console.error('❌ Failed to process queued operation:', error);
-        
+        console.error("❌ Failed to process queued operation:", error);
+
         // Re-queue if retries available
         if (operation.retries < 2) {
           operation.retries++;
@@ -576,99 +600,105 @@ class FirebaseSync {
       }
     }
   }
-  
+
   getSyncQueueLength() {
     return this.syncQueue.length;
   }
-  
+
   clearSyncQueue() {
     this.syncQueue = [];
   }
-  
+
   // Enhanced error handling
   getConnectionStatus() {
     return {
       isOnline: this.isOnline,
-      lastSync: this.lastSyncTimestamp ? new Date(this.lastSyncTimestamp) : null,
+      lastSync: this.lastSyncTimestamp
+        ? new Date(this.lastSyncTimestamp)
+        : null,
       queuedOperations: this.syncQueue.length,
       activeUsers: this.activeUsers.size,
       retryAttempts: this.retryAttempts,
-      maxRetryAttempts: this.maxRetryAttempts
+      maxRetryAttempts: this.maxRetryAttempts,
     };
   }
-  
+
   // Health check method
   async performHealthCheck() {
     try {
       if (!this.isOnline) {
-        return { status: 'offline', message: 'Device is offline' };
+        return { status: "offline", message: "Device is offline" };
       }
-      
+
       if (!this.budgetId || !this.encryptionKey) {
-        return { status: 'not_initialized', message: 'Sync not initialized' };
+        return { status: "not_initialized", message: "Sync not initialized" };
       }
-      
+
       // Try to read from Firestore to test connection
       const docRef = doc(db, "budgets", this.budgetId);
       await getDoc(docRef);
-      
-      return { status: 'healthy', message: 'All systems operational' };
+
+      return { status: "healthy", message: "All systems operational" };
     } catch (error) {
-      return { 
-        status: 'error', 
+      return {
+        status: "error",
         message: error.message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }
-  
+
   isNetworkBlockingError(error) {
     // Check for common network blocking patterns
     return (
-      error.code === 'unavailable' ||
-      error.message?.includes('ERR_BLOCKED_BY_CLIENT') ||
-      error.message?.includes('net::ERR_BLOCKED_BY_CLIENT') ||
-      error.message?.includes('blocked') ||
-      error.message?.includes('Failed to fetch') ||
-      (error.name === 'TypeError' && error.message?.includes('fetch'))
+      error.code === "unavailable" ||
+      error.message?.includes("ERR_BLOCKED_BY_CLIENT") ||
+      error.message?.includes("net::ERR_BLOCKED_BY_CLIENT") ||
+      error.message?.includes("blocked") ||
+      error.message?.includes("Failed to fetch") ||
+      (error.name === "TypeError" && error.message?.includes("fetch"))
     );
   }
-  
+
   async clearCorruptedData() {
     if (!this.budgetId) {
-      throw new Error('Budget ID not set');
+      throw new Error("Budget ID not set");
     }
-    
-    console.log('🧹 Clearing potentially corrupted cloud data...');
-    
+
+    console.log("🧹 Clearing potentially corrupted cloud data...");
+
     try {
       const docRef = doc(db, "budgets", this.budgetId);
-      
+
       // Create a minimal valid structure to replace corrupted data
-      await setDoc(docRef, {
-        cleared: true,
-        clearedAt: new Date().toISOString(),
-        clearedReason: 'Encryption key mismatch - data corruption detected',
-        version: 1,
-        lastUpdated: new Date()
-      }, { merge: false }); // Force complete replacement
-      
-      console.log('✅ Successfully cleared corrupted cloud data');
-      
+      await setDoc(
+        docRef,
+        {
+          cleared: true,
+          clearedAt: new Date().toISOString(),
+          clearedReason: "Encryption key mismatch - data corruption detected",
+          version: 1,
+          lastUpdated: new Date(),
+        },
+        { merge: false }
+      ); // Force complete replacement
+
+      console.log("✅ Successfully cleared corrupted cloud data");
+
       // Reset local sync state
       this.lastSyncTimestamp = null;
       this.activeUsers.clear();
       this.recentActivity = [];
-      
+
       return true;
     } catch (error) {
-      console.error('❌ Failed to clear corrupted data:', error);
-      
+      console.error("❌ Failed to clear corrupted data:", error);
+
       if (this.isNetworkBlockingError(error)) {
-        console.warn('🚫 Cannot clear data - Firebase requests blocked');
-        return 'blocked';
+        console.warn("🚫 Cannot clear data - Firebase requests blocked");
+        return "blocked";
       }
-      
+
       return false;
     }
   }

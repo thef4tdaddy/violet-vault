@@ -1,13 +1,13 @@
 // src/components/Layout.jsx
-import React, { useState, useEffect, Suspense, lazy } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { BudgetProvider, useBudget } from '../contexts/BudgetContext';
-import UserSetup from './UserSetup';
-import Header from './Header';
-import TeamActivitySync from './TeamActivitySync';
-import LoadingSpinner from './LoadingSpinner';
-import useEnvelopeSystem from './EnvelopeSystem';
-import { encryptionUtils } from '../utils/encryption';
+import React, { useState, useEffect, Suspense, lazy } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { BudgetProvider, useBudget } from "../contexts/BudgetContext";
+import UserSetup from "./UserSetup";
+import Header from "./Header";
+import TeamActivitySync from "./TeamActivitySync";
+import LoadingSpinner from "./LoadingSpinner";
+import useEnvelopeSystem from "./EnvelopeSystem";
+import { encryptionUtils } from "../utils/encryption";
 import {
   DollarSign,
   Wallet,
@@ -18,20 +18,28 @@ import {
   Sparkles,
   BookOpen,
   BarChart3,
-} from 'lucide-react';
+} from "lucide-react";
 
 // Lazy load heavy components for better performance
-const PaycheckProcessor = lazy(() => import('./PaycheckProcessor'));
-const EnvelopeGrid = lazy(() => import('./EnvelopeGrid'));
-const BillManager = lazy(() => import('./BillManager'));
-const SavingsGoals = lazy(() => import('./SavingsGoals'));
-const Dashboard = lazy(() => import('./Dashboard'));
-const TransactionLedger = lazy(() => import('./TransactionLedger'));
-const ChartsAndAnalytics = lazy(() => import('./ChartsAndAnalytics'));
-const SupplementalAccounts = lazy(() => import('./SupplementalAccounts'));
+const PaycheckProcessor = lazy(() => import("./PaycheckProcessor"));
+const EnvelopeGrid = lazy(() => import("./EnvelopeGrid"));
+const BillManager = lazy(() => import("./BillManager"));
+const SavingsGoals = lazy(() => import("./SavingsGoals"));
+const Dashboard = lazy(() => import("./Dashboard"));
+const TransactionLedger = lazy(() => import("./TransactionLedger"));
+const ChartsAndAnalytics = lazy(() => import("./ChartsAndAnalytics"));
+const SupplementalAccounts = lazy(() => import("./SupplementalAccounts"));
 
 const Layout = () => {
-  const { isUnlocked, encryptionKey, currentUser, login, logout, updateUser, budgetId } = useAuth();
+  const {
+    isUnlocked,
+    encryptionKey,
+    currentUser,
+    login,
+    logout,
+    updateUser,
+    budgetId,
+  } = useAuth();
   const [activeUsers, setActiveUsers] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
   const [syncConflicts, setSyncConflicts] = useState(null);
@@ -40,12 +48,12 @@ const Layout = () => {
     try {
       const result = await login(password, userData);
       if (result.success) {
-        console.log('✅ Setup completed successfully');
+        console.log("✅ Setup completed successfully");
       } else {
-        console.error('❌ Setup failed:', result.error);
+        console.error("❌ Setup failed:", result.error);
       }
     } catch (error) {
-      console.error('❌ Setup error:', error);
+      console.error("❌ Setup error:", error);
     }
   };
 
@@ -55,23 +63,29 @@ const Layout = () => {
 
   const exportData = async () => {
     // Implementation would use context data
-    console.log('Export data functionality');
+    console.log("Export data functionality");
   };
 
   const importData = async (file) => {
     // Implementation would update context data
-    console.log('Import data functionality');
+    console.log("Import data functionality");
   };
 
   const resetEncryptionAndStartFresh = async () => {
-    if (confirm('This will permanently delete all your budget data and cannot be undone. Continue?')) {
+    if (
+      confirm(
+        "This will permanently delete all your budget data and cannot be undone. Continue?"
+      )
+    ) {
       try {
-        localStorage.removeItem('envelopeBudgetData');
+        localStorage.removeItem("envelopeBudgetData");
         logout();
-        alert('All data has been cleared. You can now set up a new budget with a fresh password.');
+        alert(
+          "All data has been cleared. You can now set up a new budget with a fresh password."
+        );
       } catch (error) {
-        console.error('Failed to reset encryption:', error);
-        alert('Failed to clear all data. Please try refreshing the page.');
+        console.error("Failed to reset encryption:", error);
+        alert("Failed to clear all data. Please try refreshing the page.");
       }
     }
   };
@@ -86,7 +100,11 @@ const Layout = () => {
   }
 
   return (
-    <BudgetProvider encryptionKey={encryptionKey} currentUser={currentUser} budgetId={budgetId}>
+    <BudgetProvider
+      encryptionKey={encryptionKey}
+      currentUser={currentUser}
+      budgetId={budgetId}
+    >
       <MainContent
         currentUser={currentUser}
         onUserChange={() => updateUser(null)}
@@ -116,7 +134,7 @@ const MainContent = ({
   onResolveConflict,
 }) => {
   const budget = useBudget();
-  const [activeView, setActiveView] = useState('dashboard');
+  const [activeView, setActiveView] = useState("dashboard");
 
   const {
     envelopes,
@@ -136,8 +154,14 @@ const MainContent = ({
   } = budget;
 
   // Calculate totals
-  const totalEnvelopeBalance = envelopes.reduce((sum, env) => sum + env.currentBalance, 0);
-  const totalSavingsBalance = savingsGoals.reduce((sum, goal) => sum + goal.currentAmount, 0);
+  const totalEnvelopeBalance = envelopes.reduce(
+    (sum, env) => sum + env.currentBalance,
+    0
+  );
+  const totalSavingsBalance = savingsGoals.reduce(
+    (sum, goal) => sum + goal.currentAmount,
+    0
+  );
   const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
 
   return (
@@ -167,50 +191,50 @@ const MainContent = ({
         <div className="glassmorphism rounded-3xl mb-6 shadow-xl border border-white/20">
           <nav className="flex justify-center overflow-x-auto flex-wrap">
             <NavButton
-              active={activeView === 'dashboard'}
-              onClick={() => setActiveView('dashboard')}
+              active={activeView === "dashboard"}
+              onClick={() => setActiveView("dashboard")}
               icon={CreditCard}
               label="Dashboard"
             />
             <NavButton
-              active={activeView === 'envelopes'}
-              onClick={() => setActiveView('envelopes')}
+              active={activeView === "envelopes"}
+              onClick={() => setActiveView("envelopes")}
               icon={Wallet}
               label="Envelopes"
             />
             <NavButton
-              active={activeView === 'savings'}
-              onClick={() => setActiveView('savings')}
+              active={activeView === "savings"}
+              onClick={() => setActiveView("savings")}
               icon={Target}
               label="Savings Goals"
             />
             <NavButton
-              active={activeView === 'supplemental'}
-              onClick={() => setActiveView('supplemental')}
+              active={activeView === "supplemental"}
+              onClick={() => setActiveView("supplemental")}
               icon={CreditCard}
               label="Supplemental"
             />
             <NavButton
-              active={activeView === 'paycheck'}
-              onClick={() => setActiveView('paycheck')}
+              active={activeView === "paycheck"}
+              onClick={() => setActiveView("paycheck")}
               icon={DollarSign}
               label="Add Paycheck"
             />
             <NavButton
-              active={activeView === 'bills'}
-              onClick={() => setActiveView('bills')}
+              active={activeView === "bills"}
+              onClick={() => setActiveView("bills")}
               icon={Calendar}
               label="Manage Bills"
             />
             <NavButton
-              active={activeView === 'transactions'}
-              onClick={() => setActiveView('transactions')}
+              active={activeView === "transactions"}
+              onClick={() => setActiveView("transactions")}
               icon={BookOpen}
               label="Transactions"
             />
             <NavButton
-              active={activeView === 'analytics'}
-              onClick={() => setActiveView('analytics')}
+              active={activeView === "analytics"}
+              onClick={() => setActiveView("analytics")}
               icon={BarChart3}
               label="Analytics"
             />
@@ -246,14 +270,20 @@ const MainContent = ({
         </div>
 
         {/* Main Content */}
-        <ViewRenderer activeView={activeView} budget={budget} currentUser={currentUser} />
+        <ViewRenderer
+          activeView={activeView}
+          budget={budget}
+          currentUser={currentUser}
+        />
 
         {/* Loading/Syncing Overlay */}
         {isSyncing && (
           <div className="fixed bottom-4 right-4 glassmorphism rounded-2xl p-4 z-50">
             <div className="flex items-center space-x-3">
               <div className="animate-spin h-5 w-5 border-2 border-purple-500/30 border-t-purple-500 rounded-full"></div>
-              <span className="text-sm font-medium text-gray-700">Syncing...</span>
+              <span className="text-sm font-medium text-gray-700">
+                Syncing...
+              </span>
             </div>
           </div>
         )}
@@ -263,7 +293,9 @@ const MainContent = ({
           <div className="fixed bottom-4 left-4 bg-amber-500 text-white rounded-2xl p-4 z-50">
             <div className="flex items-center space-x-3">
               <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium">Offline - Changes saved locally</span>
+              <span className="text-sm font-medium">
+                Offline - Changes saved locally
+              </span>
             </div>
           </div>
         )}
@@ -280,10 +312,13 @@ const MainContent = ({
                   </div>
                 </div>
 
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Sync Conflict Detected</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                  Sync Conflict Detected
+                </h3>
                 <p className="text-gray-600 mb-6">
-                  <strong>{syncConflicts.cloudUser?.userName}</strong> made changes on another
-                  device. Would you like to load their latest changes?
+                  <strong>{syncConflicts.cloudUser?.userName}</strong> made
+                  changes on another device. Would you like to load their latest
+                  changes?
                 </p>
 
                 <div className="flex gap-3">
@@ -293,7 +328,10 @@ const MainContent = ({
                   >
                     Keep Mine
                   </button>
-                  <button onClick={onResolveConflict} className="flex-1 btn btn-primary rounded-2xl py-3">
+                  <button
+                    onClick={onResolveConflict}
+                    className="flex-1 btn btn-primary rounded-2xl py-3"
+                  >
                     Load Theirs
                   </button>
                 </div>
@@ -311,8 +349,8 @@ const NavButton = ({ active, onClick, icon: Icon, label }) => (
     onClick={onClick}
     className={`px-8 py-5 text-sm font-semibold border-b-2 transition-all ${
       active
-        ? 'border-purple-500 text-purple-600 bg-purple-50/50'
-        : 'border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30'
+        ? "border-purple-500 text-purple-600 bg-purple-50/50"
+        : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30"
     }`}
   >
     <Icon className="h-5 w-5 inline mr-3" />
@@ -322,24 +360,26 @@ const NavButton = ({ active, onClick, icon: Icon, label }) => (
 
 const SummaryCard = ({ icon: Icon, label, value, color }) => {
   const colorClasses = {
-    purple: 'bg-purple-500',
-    emerald: 'bg-emerald-500',
-    cyan: 'bg-cyan-500',
-    amber: 'bg-amber-500',
+    purple: "bg-purple-500",
+    emerald: "bg-emerald-500",
+    cyan: "bg-cyan-500",
+    amber: "bg-amber-500",
   };
 
   const textColorClasses = {
-    purple: 'text-gray-900',
-    emerald: 'text-emerald-600',
-    cyan: 'text-cyan-600',
-    amber: 'text-amber-600',
+    purple: "text-gray-900",
+    emerald: "text-emerald-600",
+    cyan: "text-cyan-600",
+    amber: "text-amber-600",
   };
 
   return (
     <div className="glassmorphism rounded-3xl p-6">
       <div className="flex items-center">
         <div className="relative mr-4">
-          <div className={`absolute inset-0 ${colorClasses[color]} rounded-2xl blur-lg opacity-30`}></div>
+          <div
+            className={`absolute inset-0 ${colorClasses[color]} rounded-2xl blur-lg opacity-30`}
+          ></div>
           <div className={`relative ${colorClasses[color]} p-3 rounded-2xl`}>
             <Icon className="h-6 w-6 text-white" />
           </div>
@@ -463,7 +503,9 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
   };
 
   return (
-    <Suspense fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}>
+    <Suspense
+      fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}
+    >
       {views[activeView]}
     </Suspense>
   );

@@ -11,6 +11,7 @@ We use [Conventional Commits](https://conventionalcommits.org/) for automated ch
 Format: `<type>(<scope>): <description>`
 
 #### Types:
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation changes
@@ -23,6 +24,7 @@ Format: `<type>(<scope>): <description>`
 - `chore`: Other changes
 
 #### Examples:
+
 ```bash
 feat: add dark mode toggle to settings
 fix: resolve infinite loop in envelope calculations
@@ -71,6 +73,7 @@ Releases are automated using Release Please:
 ### Code Quality
 
 Before committing:
+
 1. Code must pass ESLint with no warnings
 2. Build must complete successfully
 3. Commit messages must follow conventional format

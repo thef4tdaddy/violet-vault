@@ -12,7 +12,7 @@ export const encryptionUtils = {
       false,
       ["deriveBits", "deriveKey"]
     );
-    
+
     const key = await crypto.subtle.deriveKey(
       {
         name: "PBKDF2",
@@ -43,7 +43,7 @@ export const encryptionUtils = {
     const passwordBytes = encoder.encode(password + "VioletVault_Salt");
     const saltHash = await crypto.subtle.digest("SHA-256", passwordBytes);
     const salt = new Uint8Array(saltHash.slice(0, 16));
-    
+
     const key = await crypto.subtle.deriveKey(
       {
         name: "PBKDF2",
