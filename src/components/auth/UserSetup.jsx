@@ -39,17 +39,31 @@ const UserSetup = ({ onSetupComplete }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!masterPassword || !userName.trim()) return;
+    console.log("🔄 Form submitted:", {
+      masterPassword: !!masterPassword,
+      userName: userName.trim(),
+      userColor,
+    });
+
+    if (!masterPassword || !userName.trim()) {
+      console.warn("⚠️ Form validation failed:", {
+        masterPassword: !!masterPassword,
+        userName: userName.trim(),
+      });
+      return;
+    }
 
     setIsLoading(true);
     try {
+      console.log("🚀 Calling onSetupComplete...");
       await onSetupComplete({
         password: masterPassword,
         userName: userName.trim(),
         userColor,
       });
+      console.log("✅ onSetupComplete succeeded");
     } catch (error) {
-      console.error("Setup failed:", error);
+      console.error("❌ Setup failed:", error);
     } finally {
       setIsLoading(false);
     }
@@ -70,8 +84,8 @@ const UserSetup = ({ onSetupComplete }) => {
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             {step === 1
-              ? "Welcome Back"
-              : userName
+              ? "Enter Password"
+              : userName && step === 2
                 ? `Welcome Back, ${userName}!`
                 : "Set Up Profile"}
           </h1>
@@ -88,8 +102,8 @@ const UserSetup = ({ onSetupComplete }) => {
           )}
           <p className="text-gray-600">
             {step === 1
-              ? "Enter your family's master password"
-              : userName
+              ? "Enter your master password to continue"
+              : userName && step === 2
                 ? "Confirm your profile details or make changes"
                 : "Choose your name and color for tracking"}
           </p>
