@@ -37,6 +37,8 @@ const SupplementalAccounts = lazy(
 );
 
 const Layout = () => {
+  console.log("🚀 Layout component is running");
+  
   const {
     isUnlocked,
     encryptionKey,
@@ -47,6 +49,12 @@ const Layout = () => {
     budgetId,
     salt,
   } = useAuth();
+  
+  console.log("🔍 Layout: Auth hook values", {
+    isUnlocked,
+    hasCurrentUser: !!currentUser,
+    hasBudgetId: !!budgetId
+  });
   const [activeUsers, setActiveUsers] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
   const [syncConflicts, setSyncConflicts] = useState(null);
