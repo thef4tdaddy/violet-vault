@@ -66,7 +66,10 @@ const Layout = () => {
         try {
           const users = getActiveUsers();
           const activity = getRecentActivity();
-          console.log("🔄 Updating activity data:", { users: users?.length || 0, activity: activity?.length || 0 });
+          console.log("🔄 Updating activity data:", {
+            users: users?.length || 0,
+            activity: activity?.length || 0,
+          });
           setActiveUsers(users || []);
           setRecentActivity(activity || []);
         } catch (error) {
