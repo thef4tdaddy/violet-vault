@@ -137,7 +137,7 @@ class FirebaseSync {
     return {
       encryptedData: encryptedPayload.data,
       iv: encryptedPayload.iv,
-      lastActivity: lastActivity
+      lastActivity: lastActivity && lastActivity.userName
         ? {
             userName: lastActivity.userName, // Only username visible
             timestamp: lastActivity.timestamp,
@@ -248,7 +248,7 @@ class FirebaseSync {
 
       const encryptedData = await this.encryptForCloud(data);
 
-      // Add activity tracking
+      // Add activity tracking - ensure all required fields are present
       const activityData = {
         id: Date.now().toString(),
         type: "data_save",
@@ -275,6 +275,7 @@ class FirebaseSync {
             userColor: currentUser?.userColor || "#a855f7",
             deviceFingerprint: encryptionUtils.generateDeviceFingerprint(),
             lastSeen: new Date().toISOString(),
+            ...(currentUser?.budgetId && { budgetId: currentUser.budgetId }), // Only include if present
           },
           activity: this.recentActivity.slice(-10), // Include recent activity
         },

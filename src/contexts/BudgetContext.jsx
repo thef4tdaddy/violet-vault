@@ -227,7 +227,16 @@ export const BudgetProvider = ({
     () => ({
       ...state,
       currentUser,
-      lastActivity: Date.now(),
+      lastActivity: currentUser ? {
+        userName: currentUser.userName,
+        userColor: currentUser.userColor,
+        timestamp: Date.now(),
+        deviceFingerprint: `${navigator.userAgent}_${Date.now()}`,
+        deviceInfo: {
+          platform: navigator.platform,
+          userAgent: navigator.userAgent.substring(0, 100), // Truncate for storage
+        }
+      } : null,
     }),
     [state, currentUser]
   );
