@@ -42,10 +42,7 @@ const TransactionTable = ({
           <tbody className="divide-y divide-gray-200">
             {transactions.length === 0 ? (
               <tr>
-                <td
-                  colSpan="6"
-                  className="px-6 py-8 text-center text-gray-500"
-                >
+                <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
                   No transactions found
                 </td>
               </tr>

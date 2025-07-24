@@ -38,9 +38,7 @@ const ImportModal = ({
           </button>
         </div>
 
-        {importStep === 1 && (
-          <FileUploader onFileUpload={onFileUpload} />
-        )}
+        {importStep === 1 && <FileUploader onFileUpload={onFileUpload} />}
 
         {importStep === 2 && (
           <FieldMapper

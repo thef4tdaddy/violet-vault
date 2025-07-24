@@ -193,7 +193,9 @@ const TransactionForm = ({
             {transactionForm.description && suggestEnvelope && (
               <div className="mt-2">
                 {(() => {
-                  const suggested = suggestEnvelope(transactionForm.description);
+                  const suggested = suggestEnvelope(
+                    transactionForm.description
+                  );
                   return suggested ? (
                     <button
                       type="button"
@@ -261,10 +263,7 @@ const TransactionForm = ({
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              className="flex-1 btn btn-primary"
-            >
+            <button type="submit" className="flex-1 btn btn-primary">
               {editingTransaction ? "Update Transaction" : "Add Transaction"}
             </button>
           </div>

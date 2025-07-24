@@ -46,15 +46,14 @@ const FileUploader = ({ onFileUpload }) => {
             <div className="mt-2 text-sm text-blue-700">
               <ul className="list-disc list-inside space-y-1">
                 <li>
-                  <strong>CSV:</strong> Exported from banks like
-                  Chase, Wells Fargo, etc.
+                  <strong>CSV:</strong> Exported from banks like Chase, Wells
+                  Fargo, etc.
                 </li>
                 <li>
                   <strong>OFX:</strong> Open Financial Exchange format
                 </li>
                 <li>
-                  Files should include Date, Description, and Amount
-                  columns
+                  Files should include Date, Description, and Amount columns
                 </li>
               </ul>
             </div>

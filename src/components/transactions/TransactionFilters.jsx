@@ -100,9 +100,7 @@ const TransactionFilters = ({
               <option value="description">Description</option>
             </select>
             <button
-              onClick={() =>
-                setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-              }
+              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
               className="glassmorphism px-3 py-2 border border-white/20 rounded-lg hover:shadow-lg"
             >
               {sortOrder === "asc" ? (

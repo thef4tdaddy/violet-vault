@@ -79,7 +79,15 @@ export const useTransactionFilters = (
           return aVal < bVal ? 1 : -1;
         }
       });
-  }, [transactions, searchTerm, dateFilter, typeFilter, envelopeFilter, sortBy, sortOrder]);
+  }, [
+    transactions,
+    searchTerm,
+    dateFilter,
+    typeFilter,
+    envelopeFilter,
+    sortBy,
+    sortOrder,
+  ]);
 
   return filteredTransactions;
 };

@@ -26,9 +26,15 @@ const EnvelopeGrid = lazy(() => import("../budgeting/EnvelopeGrid"));
 const BillManager = lazy(() => import("../bills/BillManager"));
 const SavingsGoals = lazy(() => import("../savings/SavingsGoals"));
 const Dashboard = lazy(() => import("./Dashboard"));
-const TransactionLedger = lazy(() => import("../transactions/TransactionLedger"));
-const ChartsAndAnalytics = lazy(() => import("../analytics/ChartsAndAnalytics"));
-const SupplementalAccounts = lazy(() => import("../accounts/SupplementalAccounts"));
+const TransactionLedger = lazy(
+  () => import("../transactions/TransactionLedger")
+);
+const ChartsAndAnalytics = lazy(
+  () => import("../analytics/ChartsAndAnalytics")
+);
+const SupplementalAccounts = lazy(
+  () => import("../accounts/SupplementalAccounts")
+);
 
 const Layout = () => {
   const {

@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { parseCSV, parseOFX, autoDetectFieldMapping } from "../utils/fileParser";
+import {
+  parseCSV,
+  parseOFX,
+  autoDetectFieldMapping,
+} from "../utils/fileParser";
 
 export const useTransactionImport = (currentUser, onBulkImport) => {
   const [importData, setImportData] = useState([]);
