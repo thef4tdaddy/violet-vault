@@ -517,6 +517,7 @@ const MainContent = ({
   const budget = useBudget();
   const [activeView, setActiveView] = useState("dashboard");
   const [debugInfo, setDebugInfo] = useState(null);
+  const [forceLoadDebug, setForceLoadDebug] = useState(null);
 
   // Debug panel for live site
   const forceLoadData = async () => {
@@ -541,31 +542,37 @@ const MainContent = ({
         iv
       );
 
-      console.log("✅ Force load decrypted data:", {
-        envelopes: decryptedData.envelopes?.length || 0,
-        bills: decryptedData.bills?.length || 0,
-        savingsGoals: decryptedData.savingsGoals?.length || 0,
-        topLevelKeys: Object.keys(decryptedData),
-        hasCurrentUser: !!decryptedData.currentUser,
+      // Set debug info for visual display
+      setForceLoadDebug({
+        step: 1,
+        message: "✅ Data decrypted successfully",
+        decryptedData: {
+          envelopes: decryptedData.envelopes?.length || 0,
+          bills: decryptedData.bills?.length || 0,
+          savingsGoals: decryptedData.savingsGoals?.length || 0,
+          topLevelKeys: Object.keys(decryptedData),
+          hasCurrentUser: !!decryptedData.currentUser,
+        },
       });
-
-      console.log("📝 About to call budget.loadData() with:", decryptedData);
 
       // Use the loadData action to force load the data
       budget.loadData(decryptedData);
 
-      console.log("🎯 loadData() called. Budget state should now be updated.");
-
       // Wait a bit and check state
       setTimeout(() => {
-        console.log("📊 Budget state after loadData:", {
-          envelopes: budget.envelopes?.length || 0,
-          bills: budget.bills?.length || 0,
-          debug: budget._debug,
-        });
+        setForceLoadDebug((prev) => ({
+          ...prev,
+          step: 2,
+          message: "📊 loadData() called - checking result",
+          afterLoadData: {
+            envelopes: budget.envelopes?.length || 0,
+            bills: budget.bills?.length || 0,
+            debug: budget._debug,
+          },
+        }));
       }, 100);
 
-      alert("Data loaded from localStorage! Check the debug panel to verify.");
+      alert("Data load attempted! Check the debug panel below for details.");
     } catch (error) {
       console.error("❌ Force load failed:", error);
       alert("Failed to load data: " + error.message);
@@ -756,6 +763,73 @@ const MainContent = ({
     </div>
   );
 
+  // Force Load Debug Panel
+  const forceLoadDebugPanel = forceLoadDebug && (
+    <div
+      style={{
+        position: "fixed",
+        bottom: "10px",
+        left: "10px",
+        background: "rgba(0,0,0,0.9)",
+        color: "white",
+        padding: "15px",
+        borderRadius: "8px",
+        fontSize: "12px",
+        zIndex: 9999,
+        maxWidth: "400px",
+        maxHeight: "300px",
+        overflow: "auto",
+      }}
+    >
+      <div style={{ marginBottom: "10px", fontWeight: "bold" }}>
+        🔍 Force Load Debug (Step {forceLoadDebug.step}/2)
+      </div>
+      <div style={{ marginBottom: "8px" }}>{forceLoadDebug.message}</div>
+
+      {forceLoadDebug.decryptedData && (
+        <div style={{ marginBottom: "10px" }}>
+          <strong>Decrypted Data:</strong>
+          <div>Envelopes: {forceLoadDebug.decryptedData.envelopes}</div>
+          <div>Bills: {forceLoadDebug.decryptedData.bills}</div>
+          <div>
+            Has User:{" "}
+            {forceLoadDebug.decryptedData.hasCurrentUser ? "✅" : "❌"}
+          </div>
+          <div>
+            Keys: {forceLoadDebug.decryptedData.topLevelKeys.join(", ")}
+          </div>
+        </div>
+      )}
+
+      {forceLoadDebug.afterLoadData && (
+        <div style={{ marginBottom: "10px" }}>
+          <strong>After loadData():</strong>
+          <div>Budget Envelopes: {forceLoadDebug.afterLoadData.envelopes}</div>
+          <div>Budget Bills: {forceLoadDebug.afterLoadData.bills}</div>
+          <div>
+            Data Loaded:{" "}
+            {forceLoadDebug.afterLoadData.debug?.dataLoaded ? "✅" : "❌"}
+          </div>
+        </div>
+      )}
+
+      <button
+        onClick={() => setForceLoadDebug(null)}
+        style={{
+          padding: "4px 8px",
+          backgroundColor: "#ef4444",
+          color: "white",
+          border: "none",
+          borderRadius: "4px",
+          cursor: "pointer",
+          fontSize: "10px",
+        }}
+      >
+        Close Debug
+      </button>
+    </div>
+  );
+
   const {
     envelopes,
     bills,
@@ -875,6 +949,7 @@ const MainContent = ({
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden">
       {budgetDebugInfo}
+      {forceLoadDebugPanel}
       {debugDisplay}
       <div className="max-w-7xl mx-auto relative z-10">
         <Header
