@@ -553,9 +553,12 @@ const MainContent = ({
                 hasCurrentUser: !!decrypted.currentUser,
                 decryptedUserName: decrypted.currentUser?.userName,
               });
-              
+
               // Log the full structure for debugging
-              console.log("🔍 Full decrypted data structure:", Object.keys(decrypted));
+              console.log(
+                "🔍 Full decrypted data structure:",
+                Object.keys(decrypted)
+              );
               console.log("🔍 Decrypted data sample:", {
                 topLevelKeys: Object.keys(decrypted),
                 envelopesLength: decrypted.envelopes?.length,
@@ -566,10 +569,12 @@ const MainContent = ({
                 currentUser: decrypted.currentUser,
                 // Show first few items
                 firstEnvelope: decrypted.envelopes?.[0],
-                firstBill: decrypted.bills?.[0]
+                firstBill: decrypted.bills?.[0],
               });
-              
-              alert(`Manual decrypt worked!\nEnvelopes: ${decrypted.envelopes?.length || 0}\nBills: ${decrypted.bills?.length || 0}\nUser: ${decrypted.currentUser?.userName || 'None'}\n\nCheck console for full structure`);
+
+              alert(
+                `Manual decrypt worked!\nEnvelopes: ${decrypted.envelopes?.length || 0}\nBills: ${decrypted.bills?.length || 0}\nUser: ${decrypted.currentUser?.userName || "None"}\n\nCheck console for full structure`
+              );
             } catch (error) {
               console.error("❌ Manual decrypt failed:", error);
               alert("Manual decrypt failed: " + error.message);
