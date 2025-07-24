@@ -206,7 +206,7 @@ const MainContent = ({
     try {
       console.log("🔄 Force loading data from localStorage...");
       const savedData = localStorage.getItem("envelopeBudgetData");
-      
+
       if (!savedData) {
         alert("No data found in localStorage");
         return;
@@ -232,12 +232,12 @@ const MainContent = ({
 
       // Use the loadData action to force load the data
       budget.loadData(decryptedData);
-      
+
       // Refresh the page to ensure clean state
       setTimeout(() => {
         window.location.reload();
       }, 1000);
-      
+
       alert("Data loaded! Page will refresh...");
     } catch (error) {
       console.error("❌ Force load failed:", error);
@@ -268,7 +268,7 @@ const MainContent = ({
       <div>Savings: {budget.savingsGoals?.length || 0}</div>
       <div>Unassigned: ${budget.unassignedCash || 0}</div>
       <div>Debug: {JSON.stringify(budget._debug || {})}</div>
-      <button 
+      <button
         onClick={forceLoadData}
         style={{
           marginTop: "10px",
@@ -278,7 +278,7 @@ const MainContent = ({
           border: "none",
           borderRadius: "4px",
           cursor: "pointer",
-          fontSize: "11px"
+          fontSize: "11px",
         }}
       >
         Force Load Data
