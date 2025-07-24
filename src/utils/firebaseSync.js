@@ -360,6 +360,11 @@ class FirebaseSync {
           error: error.message,
           timestamp: new Date().toISOString(),
         });
+        this.notifySyncListeners({
+          type: "sync_error",
+          operation: "save",
+          error: error.message,
+        });
         throw error;
       }
     }
@@ -448,6 +453,11 @@ class FirebaseSync {
         operation: "load",
         error: error.message,
         timestamp: new Date().toISOString(),
+      });
+      this.notifySyncListeners({
+        type: "sync_error",
+        operation: "load",
+        error: error.message,
       });
       throw error;
     }

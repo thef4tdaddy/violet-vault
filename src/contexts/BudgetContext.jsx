@@ -314,14 +314,26 @@ export const BudgetProvider = ({
       firebaseSync.initialize(budgetId, encryptionKey);
 
       const syncListener = (event) => {
+        console.log("🔄 Sync event received:", event);
         switch (event.type) {
           case "sync_start":
             setIsSyncing(true);
             setSyncError(null);
+            // Failsafe: automatically reset syncing state after 30 seconds
+            setTimeout(() => {
+              console.warn("⏰ Sync timeout - resetting syncing state");
+              setIsSyncing(false);
+              setSyncError("Sync timeout - please try again");
+            }, 30000);
             break;
           case "sync_success":
             setIsSyncing(false);
             setLastSyncTime(Date.now());
+            setSyncError(null);
+            break;
+          case "sync_error":
+            setIsSyncing(false);
+            setSyncError(event.error || "Sync failed");
             break;
           default:
             break;
@@ -489,6 +501,9 @@ export const BudgetProvider = ({
     isSyncing,
     lastSyncTime,
     syncError,
+    // Firebase sync data access
+    getActiveUsers: () => firebaseSync.getActiveUsers ? Array.from(firebaseSync.activeUsers?.values() || []) : [],
+    getRecentActivity: () => firebaseSync.getActivity ? firebaseSync.getActivity() : [],
     // Debug info
     _debug: {
       hasEncryptionKey: !!encryptionKey,
