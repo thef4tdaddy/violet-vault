@@ -231,6 +231,33 @@ const Layout = () => {
       }
 
       // Prepare the data for loading - ensure user information is preserved
+      console.log("🔍 Current auth state during import:", {
+        hasCurrentUser: !!currentUser,
+        currentUserName: currentUser?.userName,
+        hasBudgetId: !!budgetId,
+        importedUser: importedData.currentUser,
+        exportedBy: importedData.exportedBy
+      });
+
+      let processedCurrentUser;
+      try {
+        processedCurrentUser = importedData.currentUser || 
+          currentUser || {
+            id: `user_${Date.now()}`,
+            userName: importedData.exportedBy || "Imported User",
+            userColor: "#a855f7",
+            budgetId: budgetId,
+          };
+      } catch (userError) {
+        console.error("❌ Error creating user:", userError);
+        processedCurrentUser = {
+          id: `user_${Date.now()}`,
+          userName: "Imported User",
+          userColor: "#a855f7",
+          budgetId: budgetId,
+        };
+      }
+
       const dataToLoad = {
         // Budget data from import
         envelopes: importedData.envelopes || [],
@@ -243,14 +270,8 @@ const Layout = () => {
         actualBalance: importedData.actualBalance || 0,
         transactions: importedData.transactions || [],
         allTransactions: importedData.allTransactions || [],
-        // Use imported currentUser if it exists, otherwise use current session user
-        currentUser: importedData.currentUser ||
-          currentUser || {
-            id: `user_${Date.now()}`,
-            userName: importedData.exportedBy || "Imported User",
-            userColor: "#a855f7",
-            budgetId: budgetId,
-          },
+        // Use the processed currentUser
+        currentUser: processedCurrentUser,
         // Add any other imported metadata
         ...(importedData.exportMetadata && {
           importMetadata: {
@@ -347,8 +368,22 @@ const Layout = () => {
       );
     } catch (error) {
       console.error("❌ Import failed:", error);
+      console.error("❌ Import error details:", {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+      
+      if (setDebugInfo) {
+        setDebugInfo({
+          success: false,
+          error: `${error.name}: ${error.message}`,
+          stage: "import_error"
+        });
+      }
+      
       alert(
-        `Import failed: ${error.message}\n\nPlease ensure you're uploading a valid VioletVault backup file.`
+        `Import failed: ${error.message}\n\nCheck debug panel for details. Please ensure you're uploading a valid VioletVault backup file.`
       );
     }
 
