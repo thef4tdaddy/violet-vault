@@ -521,6 +521,53 @@ const MainContent = ({
         >
           Check Storage
         </button>
+        <button
+          onClick={async () => {
+            try {
+              console.log("🧪 Test Decrypt with current auth state:");
+              console.log("Auth state:", {
+                hasEncryptionKey: !!encryptionKey,
+                hasCurrentUser: !!currentUser,
+                hasBudgetId: !!budgetId,
+                currentUserName: currentUser?.userName,
+                budgetId: budgetId
+              });
+              
+              const data = localStorage.getItem("envelopeBudgetData");
+              if (!data) {
+                alert("No localStorage data found");
+                return;
+              }
+              
+              const { encryptedData, iv } = JSON.parse(data);
+              const decrypted = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
+              
+              console.log("✅ Manual decrypt successful:", {
+                envelopes: decrypted.envelopes?.length || 0,
+                bills: decrypted.bills?.length || 0,
+                savingsGoals: decrypted.savingsGoals?.length || 0,
+                hasCurrentUser: !!decrypted.currentUser,
+                decryptedUserName: decrypted.currentUser?.userName
+              });
+              
+              alert(`Manual decrypt worked!\nEnvelopes: ${decrypted.envelopes?.length || 0}\nBills: ${decrypted.bills?.length || 0}\nUser: ${decrypted.currentUser?.userName || 'None'}`);
+            } catch (error) {
+              console.error("❌ Manual decrypt failed:", error);
+              alert("Manual decrypt failed: " + error.message);
+            }
+          }}
+          style={{
+            padding: "8px 12px",
+            backgroundColor: "#10b981",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontSize: "11px",
+          }}
+        >
+          Test Decrypt
+        </button>
       </div>
     </div>
   );

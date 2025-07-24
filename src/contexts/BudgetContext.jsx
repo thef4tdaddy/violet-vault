@@ -174,20 +174,35 @@ export const BudgetProvider = ({
         hasCurrentUser: !!currentUser,
         hasBudgetId: !!budgetId,
         currentUser: currentUser,
+        timestamp: new Date().toISOString()
+      });
+
+      // Always check localStorage first to see what's there
+      const savedData = localStorage.getItem("envelopeBudgetData");
+      console.log("🗄️ localStorage check:", {
+        hasData: !!savedData,
+        dataLength: savedData?.length || 0
       });
 
       if (encryptionKey && currentUser && budgetId) {
         try {
           console.log("🔄 Attempting to load data from localStorage...");
-          const savedData = localStorage.getItem("envelopeBudgetData");
 
           if (savedData) {
             console.log("✅ Found saved data in localStorage");
+            const parsed = JSON.parse(savedData);
+            console.log("📦 Parsed localStorage data:", {
+              hasEncryptedData: !!parsed.encryptedData,
+              hasSalt: !!parsed.salt,
+              hasIv: !!parsed.iv,
+              encryptedDataLength: parsed.encryptedData?.length || 0
+            });
+
             const {
               salt: savedSalt,
               encryptedData,
               iv,
-            } = JSON.parse(savedData);
+            } = parsed;
 
             console.log("🔐 Decrypting data with provided encryptionKey...");
             // Use the provided encryptionKey directly (it's already derived)
@@ -205,6 +220,7 @@ export const BudgetProvider = ({
               allTransactions: decryptedData.allTransactions?.length || 0,
               transactions: decryptedData.transactions?.length || 0,
               unassignedCash: decryptedData.unassignedCash || 0,
+              hasCurrentUser: !!decryptedData.currentUser
             });
 
             // Load all the data into the state
