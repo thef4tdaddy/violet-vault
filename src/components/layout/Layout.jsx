@@ -85,13 +85,153 @@ const Layout = () => {
   };
 
   const exportData = async () => {
-    // Implementation would use context data
-    console.log("Export data functionality");
+    try {
+      console.log("📁 Starting export process...");
+      
+      // Get current data from localStorage
+      const savedData = localStorage.getItem("envelopeBudgetData");
+      if (!savedData) {
+        alert("No data found to export");
+        return;
+      }
+
+      // Decrypt the data
+      const { encryptedData, iv } = JSON.parse(savedData);
+      const decryptedData = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
+
+      // Prepare export data with metadata
+      const exportData = {
+        ...decryptedData,
+        exportMetadata: {
+          exportedBy: currentUser?.userName || "Unknown User",
+          exportDate: new Date().toISOString(),
+          appVersion: "1.0.0",
+          dataVersion: "1.0"
+        }
+      };
+
+      // Create and download the file
+      const dataStr = JSON.stringify(exportData, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+      link.download = `VioletVault Budget Backup ${timestamp}.json`;
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      console.log("✅ Data exported successfully!");
+      alert(`Successfully exported your budget data!\n\nEnvelopes: ${exportData.envelopes?.length || 0}\nBills: ${exportData.bills?.length || 0}\nTransactions: ${exportData.allTransactions?.length || 0}`);
+      
+    } catch (error) {
+      console.error("❌ Export failed:", error);
+      alert(`Export failed: ${error.message}`);
+    }
   };
 
-  const importData = async (file) => {
-    // Implementation would update context data
-    console.log("Import data functionality");
+  const importData = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      console.log("📁 Starting import process...");
+      
+      // Read the file
+      const fileContent = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = reject;
+        reader.readAsText(file);
+      });
+
+      // Parse JSON
+      const importedData = JSON.parse(fileContent);
+      console.log("✅ File parsed successfully:", {
+        envelopes: importedData.envelopes?.length || 0,
+        bills: importedData.bills?.length || 0,
+        savingsGoals: importedData.savingsGoals?.length || 0,
+        allTransactions: importedData.allTransactions?.length || 0,
+      });
+
+      // Validate the data structure
+      if (!importedData.envelopes || !Array.isArray(importedData.envelopes)) {
+        throw new Error("Invalid backup file: missing or invalid envelopes data");
+      }
+
+      // Confirm import with user
+      const confirmed = confirm(
+        `Import ${importedData.envelopes?.length || 0} envelopes, ${importedData.bills?.length || 0} bills, and ${importedData.allTransactions?.length || 0} transactions?\n\nThis will replace your current data.`
+      );
+
+      if (!confirmed) {
+        console.log("Import cancelled by user");
+        return;
+      }
+
+      // Create backup of current data before import
+      try {
+        const currentData = localStorage.getItem("envelopeBudgetData");
+        if (currentData) {
+          const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+          localStorage.setItem(`envelopeBudgetData_backup_${timestamp}`, currentData);
+          console.log("✅ Current data backed up");
+        }
+      } catch (backupError) {
+        console.warn("⚠️ Failed to create backup:", backupError);
+      }
+
+      // Prepare the data for loading - ensure user information is preserved
+      const dataToLoad = {
+        ...importedData,
+        currentUser: currentUser, // Keep current user info
+        // Preserve essential fields
+        envelopes: importedData.envelopes || [],
+        bills: importedData.bills || [],
+        savingsGoals: importedData.savingsGoals || [],
+        supplementalAccounts: importedData.supplementalAccounts || [],
+        unassignedCash: importedData.unassignedCash || 0,
+        biweeklyAllocation: importedData.biweeklyAllocation || 0,
+        paycheckHistory: importedData.paycheckHistory || [],
+        actualBalance: importedData.actualBalance || 0,
+        transactions: importedData.transactions || [],
+        allTransactions: importedData.allTransactions || [],
+      };
+
+      // Encrypt and save the imported data
+      console.log("🔐 Encrypting and saving imported data...");
+      const encrypted = await encryptionUtils.encrypt(dataToLoad, encryptionKey);
+      localStorage.setItem(
+        "envelopeBudgetData",
+        JSON.stringify({
+          encryptedData: encrypted.data,
+          salt: Array.from(salt),
+          iv: encrypted.iv,
+        })
+      );
+
+      console.log("✅ Data imported and saved successfully!");
+      
+      // Show success message and reload
+      alert(`Successfully imported data!\n\nEnvelopes: ${dataToLoad.envelopes.length}\nBills: ${dataToLoad.bills.length}\nTransactions: ${dataToLoad.allTransactions.length}\n\nPage will refresh to load the imported data.`);
+      
+      // Refresh the page to load the new data
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+
+    } catch (error) {
+      console.error("❌ Import failed:", error);
+      alert(`Import failed: ${error.message}\n\nPlease ensure you're uploading a valid VioletVault backup file.`);
+    }
+
+    // Clear the file input
+    event.target.value = '';
   };
 
   const resetEncryptionAndStartFresh = async () => {
