@@ -173,26 +173,37 @@ export const BudgetProvider = ({
         try {
           const savedData = localStorage.getItem("envelopeBudgetData");
           if (savedData) {
-            const { salt: savedSalt, encryptedData, iv } = JSON.parse(savedData);
+            const {
+              salt: savedSalt,
+              encryptedData,
+              iv,
+            } = JSON.parse(savedData);
             const saltArray = new Uint8Array(savedSalt);
-            
+
             // Use the existing encryptionUtils to decrypt
             const { encryptionUtils } = await import("../utils/encryption");
-            const key = await encryptionUtils.deriveKeyFromSalt(currentUser.password || '', saltArray);
-            
+            const key = await encryptionUtils.deriveKeyFromSalt(
+              currentUser.password || "",
+              saltArray
+            );
+
             // If we don't have the password, use the provided encryptionKey
-            const decryptedData = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
-            
+            const decryptedData = await encryptionUtils.decrypt(
+              encryptedData,
+              encryptionKey,
+              iv
+            );
+
             console.log("🔄 Loading initial budget data...", {
               envelopes: decryptedData.envelopes?.length || 0,
               bills: decryptedData.bills?.length || 0,
               savingsGoals: decryptedData.savingsGoals?.length || 0,
-              transactions: decryptedData.allTransactions?.length || 0
+              transactions: decryptedData.allTransactions?.length || 0,
             });
-            
+
             // Load all the data into the state
             dispatch({ type: actionTypes.LOAD_DATA, payload: decryptedData });
-            
+
             console.log("✅ Initial budget data loaded successfully");
           }
         } catch (error) {
