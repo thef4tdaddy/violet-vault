@@ -375,15 +375,17 @@ const Layout = () => {
       console.log("✅ Data imported and saved successfully!");
 
       // Data is saved to localStorage - BudgetContext will load it automatically
-      console.log("📝 Data saved to localStorage - BudgetContext should load it automatically");
-      
+      console.log(
+        "📝 Data saved to localStorage - BudgetContext should load it automatically"
+      );
+
       console.log("🎉 Data import completed successfully!");
 
       // Show success message and refresh to load the data
       alert(
         `Successfully imported data!\n\nEnvelopes: ${dataToLoad.envelopes.length}\nBills: ${dataToLoad.bills.length}\nTransactions: ${dataToLoad.allTransactions.length}\n\nPage will refresh to load your data...`
       );
-      
+
       // Refresh page to trigger BudgetContext to load the new data
       setTimeout(() => {
         window.location.reload();
