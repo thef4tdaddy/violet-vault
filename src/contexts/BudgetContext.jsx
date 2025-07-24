@@ -213,8 +213,45 @@ export const BudgetProvider = ({
         try {
           console.log("🔄 Attempting to load data from localStorage...");
 
-          if (savedData) {
-            console.log("✅ Found saved data in localStorage");
+          // Try to load from cloud first, then fallback to localStorage
+          let loadedFromCloud = false;
+
+          try {
+            console.log("☁️ Attempting to load data from cloud...");
+            const cloudResult = await firebaseSync.loadFromCloud();
+
+            if (cloudResult && cloudResult.data) {
+              console.log("✅ Found data in cloud!", {
+                envelopes: cloudResult.data.envelopes?.length || 0,
+                bills: cloudResult.data.bills?.length || 0,
+                savingsGoals: cloudResult.data.savingsGoals?.length || 0,
+                allTransactions: cloudResult.data.allTransactions?.length || 0,
+                lastUpdated: cloudResult.metadata?.lastUpdated
+                  ?.toDate?.()
+                  ?.toISOString(),
+              });
+
+              dispatch({
+                type: actionTypes.LOAD_DATA,
+                payload: cloudResult.data,
+              });
+              loadedFromCloud = true;
+              console.log("🎉 Data loaded from cloud successfully!");
+            } else {
+              console.log("📄 No cloud data found, will try localStorage");
+            }
+          } catch (error) {
+            console.warn(
+              "⚠️ Failed to load from cloud, will try localStorage:",
+              error.message
+            );
+          }
+
+          // Only load from localStorage if cloud loading failed or returned no data
+          if (!loadedFromCloud && savedData) {
+            console.log(
+              "✅ Found saved data in localStorage, loading as fallback"
+            );
             const parsed = JSON.parse(savedData);
             console.log("📦 Parsed localStorage data:", {
               hasEncryptedData: !!parsed.encryptedData,
@@ -244,25 +281,15 @@ export const BudgetProvider = ({
               hasCurrentUser: !!decryptedData.currentUser,
             });
 
-            // Load all the data directly without stripping fields
-            // The reducer should handle any validation needed
-
-            console.log("🧹 Data ready for loading:", {
-              envelopes: decryptedData.envelopes?.length || 0,
-              bills: decryptedData.bills?.length || 0,
-              savingsGoals: decryptedData.savingsGoals?.length || 0,
-              allTransactions: decryptedData.allTransactions?.length || 0,
-            });
-
             // Load all the data into the state
             console.log("📝 Dispatching LOAD_DATA action...");
             dispatch({ type: actionTypes.LOAD_DATA, payload: decryptedData });
 
             console.log(
-              "🎉 Initial budget data loaded successfully into state!"
+              "🎉 Initial budget data loaded successfully from localStorage!"
             );
-          } else {
-            console.warn("⚠️ No saved data found in localStorage");
+          } else if (!loadedFromCloud) {
+            console.warn("⚠️ No saved data found in localStorage or cloud");
           }
         } catch (error) {
           console.error("❌ Failed to load initial data:", error);
@@ -565,6 +592,15 @@ export const BudgetProvider = ({
       firebaseSync.debugSyncInfo
         ? firebaseSync.debugSyncInfo()
         : Promise.resolve({}),
+    debugStorageInfo: () => {
+      const localData = localStorage.getItem("violetvault_budget_data");
+      return {
+        hasLocalData: !!localData,
+        localDataSize: localData?.length || 0,
+        localDataKeys: localData ? Object.keys(JSON.parse(localData)) : [],
+        timestamp: new Date().toISOString(),
+      };
+    },
     // Debug info
     _debug: {
       hasEncryptionKey: !!encryptionKey,
