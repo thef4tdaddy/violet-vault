@@ -468,7 +468,6 @@ const MainContent = ({
     getRecentActivity,
   } = budget;
 
-
   // Calculate totals
   const totalEnvelopeBalance = envelopes.reduce(
     (sum, env) => sum + env.currentBalance,

@@ -560,11 +560,17 @@ export const BudgetProvider = ({
         : [],
     getRecentActivity: () =>
       firebaseSync.getActivity ? firebaseSync.getActivity() : [],
+    // Debug functions
+    debugSyncInfo: () =>
+      firebaseSync.debugSyncInfo
+        ? firebaseSync.debugSyncInfo()
+        : Promise.resolve({}),
     // Debug info
     _debug: {
       hasEncryptionKey: !!encryptionKey,
       hasCurrentUser: !!currentUser,
       hasBudgetId: !!budgetId,
+      budgetId: budgetId,
       dataLoaded: state.dataLoaded || false,
       envelopeCount: state.envelopes.length,
       billCount: state.bills.length,

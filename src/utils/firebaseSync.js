@@ -47,6 +47,14 @@ class FirebaseSync {
     // Clear any existing queued operations for a fresh start
     this.syncQueue = [];
 
+    // Debug logging for sync issues
+    console.log("🔧 FirebaseSync Debug Info:", {
+      budgetId,
+      budgetIdLength: budgetId?.length,
+      hasEncryptionKey: !!encryptionKey,
+      timestamp: new Date().toISOString(),
+    });
+
     // Log initialization to Sentry
     Sentry.captureMessage("FirebaseSync initialized", {
       level: "info",
@@ -427,12 +435,19 @@ class FirebaseSync {
     try {
       this.notifySyncListeners({ type: "sync_start", operation: "load" });
 
+      console.log("🔍 Loading from cloud with budgetId:", this.budgetId);
       const docRef = doc(db, "budgets", this.budgetId);
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
         const cloudData = docSnap.data();
         console.log("📄 Cloud document exists, attempting decryption...");
+        console.log("🔧 Cloud data keys:", Object.keys(cloudData));
+        console.log("🔧 Has encrypted data:", !!cloudData.encryptedData);
+        console.log(
+          "🔧 Last updated:",
+          cloudData.lastUpdated?.toDate?.()?.toISOString()
+        );
 
         const decryptedData = await this.decryptFromCloud(cloudData);
 
@@ -461,6 +476,12 @@ class FirebaseSync {
             recentActivity: this.recentActivity,
           },
         };
+      } else {
+        console.log("📄 No cloud document found for budgetId:", this.budgetId);
+        console.log("🔍 This could mean:");
+        console.log("  - Different password was used on other device");
+        console.log("  - Data hasn't been saved to cloud yet");
+        console.log("  - Network/permissions issue");
       }
 
       return null;
@@ -819,6 +840,42 @@ class FirebaseSync {
 
       return false;
     }
+  }
+
+  // Debug function to help users verify their sync configuration
+  async debugSyncInfo() {
+    const info = {
+      budgetId: this.budgetId,
+      hasEncryptionKey: !!this.encryptionKey,
+      isOnline: this.isOnline,
+      connectionStatus: this.getConnectionStatus(),
+      timestamp: new Date().toISOString(),
+    };
+
+    console.log("🔧 Sync Debug Info:", info);
+
+    // Try to check if document exists without decryption
+    if (this.budgetId) {
+      try {
+        const docRef = doc(db, "budgets", this.budgetId);
+        const docSnap = await getDoc(docRef);
+
+        info.documentExists = docSnap.exists();
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          info.documentInfo = {
+            hasEncryptedData: !!data.encryptedData,
+            hasLastActivity: !!data.lastActivity,
+            lastUpdated: data.lastUpdated?.toDate?.()?.toISOString(),
+            keysInDocument: Object.keys(data),
+          };
+        }
+      } catch (error) {
+        info.documentCheckError = error.message;
+      }
+    }
+
+    return info;
   }
 }
 
