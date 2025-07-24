@@ -85,7 +85,6 @@ const Layout = () => {
       return () => clearInterval(interval);
     }
   }, [getActiveUsers, getRecentActivity, isSyncing]);
-
   const handleSetup = async (userData, password) => {
     try {
       // Generate budgetId if not present
@@ -468,6 +467,7 @@ const MainContent = ({
     getActiveUsers,
     getRecentActivity,
   } = budget;
+
 
   // Calculate totals
   const totalEnvelopeBalance = envelopes.reduce(
