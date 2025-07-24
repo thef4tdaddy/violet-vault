@@ -567,6 +567,16 @@ const MainContent = ({
     }
   };
 
+  // Check localStorage on component mount
+  React.useEffect(() => {
+    const savedData = localStorage.getItem("envelopeBudgetData");
+    console.log("🗄️ MainContent: localStorage check:", {
+      hasData: !!savedData,
+      dataLength: savedData?.length || 0,
+      timestamp: new Date().toISOString(),
+    });
+  }, []);
+
   const budgetDebugInfo = (
     <div
       style={{
@@ -709,6 +719,31 @@ const MainContent = ({
           }}
         >
           Test Decrypt
+        </button>
+        <button
+          onClick={() => {
+            console.log("🔍 BudgetContext Debug Info:", {
+              hasEncryptionKey: !!encryptionKey,
+              hasCurrentUser: !!currentUser,
+              hasBudgetId: !!budgetId,
+              currentUser: currentUser,
+              budgetDebug: budget._debug,
+              envelopeCount: budget.envelopes?.length || 0,
+              billCount: budget.bills?.length || 0,
+            });
+            alert(`Debug info logged to console!\n\nBudget State:\nEnvelopes: ${budget.envelopes?.length || 0}\nBills: ${budget.bills?.length || 0}\nLoaded: ${budget._debug?.dataLoaded || false}`);
+          }}
+          style={{
+            padding: "8px 12px",
+            backgroundColor: "#3b82f6",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontSize: "11px",
+          }}
+        >
+          Debug Context
         </button>
       </div>
     </div>
