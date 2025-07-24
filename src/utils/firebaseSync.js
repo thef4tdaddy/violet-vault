@@ -134,15 +134,22 @@ class FirebaseSync {
       this.encryptionKey
     );
 
+    // Ensure lastActivity has all required fields and no undefined values
+    const validLastActivity = lastActivity && 
+                             lastActivity.userName && 
+                             lastActivity.userName !== undefined &&
+                             lastActivity.userName !== null &&
+                             lastActivity.userName.trim() !== ''
+      ? {
+          userName: String(lastActivity.userName).trim(),
+          timestamp: lastActivity.timestamp || Date.now(),
+        }
+      : null;
+
     return {
       encryptedData: encryptedPayload.data,
       iv: encryptedPayload.iv,
-      lastActivity: lastActivity && lastActivity.userName
-        ? {
-            userName: lastActivity.userName, // Only username visible
-            timestamp: lastActivity.timestamp,
-          }
-        : null,
+      lastActivity: validLastActivity,
       version: 1,
       lastUpdated: serverTimestamp(),
     };
@@ -264,23 +271,22 @@ class FirebaseSync {
 
       this.addActivity(activityData);
 
-      const docRef = doc(db, "budgets", this.budgetId);
-      await setDoc(
-        docRef,
-        {
-          ...encryptedData,
-          currentUser: {
-            id: currentUser?.id || encryptionUtils.generateDeviceFingerprint(),
-            userName: currentUser?.userName || "Anonymous",
-            userColor: currentUser?.userColor || "#a855f7",
-            deviceFingerprint: encryptionUtils.generateDeviceFingerprint(),
-            lastSeen: new Date().toISOString(),
-            ...(currentUser?.budgetId && { budgetId: currentUser.budgetId }), // Only include if present
-          },
-          activity: this.recentActivity.slice(-10), // Include recent activity
+      // Clean the data to ensure no undefined values
+      const cleanedData = this.removeUndefinedValues({
+        ...encryptedData,
+        currentUser: {
+          id: currentUser?.id || encryptionUtils.generateDeviceFingerprint(),
+          userName: currentUser?.userName || "Anonymous",
+          userColor: currentUser?.userColor || "#a855f7",
+          deviceFingerprint: encryptionUtils.generateDeviceFingerprint(),
+          lastSeen: new Date().toISOString(),
+          ...(currentUser?.budgetId && { budgetId: currentUser.budgetId }), // Only include if present
         },
-        { merge: true }
-      );
+        activity: this.recentActivity.slice(-10), // Include recent activity
+      });
+
+      const docRef = doc(db, "budgets", this.budgetId);
+      await setDoc(docRef, cleanedData, { merge: true });
 
       this.lastSyncTimestamp = Date.now();
       this.retryAttempts = 0; // Reset retry counter on success
@@ -659,6 +665,32 @@ class FirebaseSync {
       error.message?.includes("Failed to fetch") ||
       (error.name === "TypeError" && error.message?.includes("fetch"))
     );
+  }
+
+  // Helper method to recursively remove undefined values from objects
+  removeUndefinedValues(obj) {
+    if (obj === null || obj === undefined) {
+      return null;
+    }
+    
+    if (Array.isArray(obj)) {
+      return obj.map(item => this.removeUndefinedValues(item)).filter(item => item !== undefined);
+    }
+    
+    if (typeof obj === 'object') {
+      const cleaned = {};
+      for (const [key, value] of Object.entries(obj)) {
+        if (value !== undefined) {
+          const cleanedValue = this.removeUndefinedValues(value);
+          if (cleanedValue !== undefined) {
+            cleaned[key] = cleanedValue;
+          }
+        }
+      }
+      return cleaned;
+    }
+    
+    return obj;
   }
 
   async clearCorruptedData() {
