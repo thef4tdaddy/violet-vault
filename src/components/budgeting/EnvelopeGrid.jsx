@@ -89,8 +89,17 @@ const EnvelopeGrid = ({
 
         {/* Bill Envelopes */}
         {envelopes.map((envelope) => {
+          // Some imported data may not contain a monthlyAmount field. Fallback
+          // to a value derived from the biweekly allocation (approximate
+          // monthly amount) or 0 to avoid runtime errors when calling toFixed.
+          const monthlyAmount =
+            envelope.monthlyAmount ??
+            (envelope.biweeklyAllocation
+              ? (envelope.biweeklyAllocation * 26) / 12
+              : 0);
+
           const isLow = envelope.currentBalance < envelope.biweeklyAllocation;
-          const isOverfunded = envelope.currentBalance > envelope.monthlyAmount;
+          const isOverfunded = envelope.currentBalance > monthlyAmount;
 
           return (
             <div
@@ -128,7 +137,7 @@ const EnvelopeGrid = ({
                 ${envelope.currentBalance.toFixed(2)}
               </p>
               <div className="text-sm opacity-90">
-                <p>Monthly: ${envelope.monthlyAmount.toFixed(2)}</p>
+                <p>Monthly: ${monthlyAmount.toFixed(2)}</p>
                 <p>Biweekly: ${envelope.biweeklyAllocation.toFixed(2)}</p>
               </div>
             </div>
