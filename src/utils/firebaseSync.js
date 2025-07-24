@@ -215,7 +215,7 @@ class FirebaseSync {
       return decryptedData;
     } catch (error) {
       console.error("❌ Failed to decrypt cloud data:", error);
-      
+
       // Send error to Sentry with context
       Sentry.captureException(error, {
         tags: {
@@ -310,7 +310,7 @@ class FirebaseSync {
       console.log("✅ Successfully saved to cloud");
     } catch (error) {
       console.error("❌ Failed to save to cloud:", error);
-      
+
       // Send error to Sentry with context
       Sentry.captureException(error, {
         tags: {
