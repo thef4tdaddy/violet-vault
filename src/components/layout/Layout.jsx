@@ -215,11 +215,13 @@ const Layout = () => {
         // Preserve current user info (critical for login)
         currentUser: currentUser,
         // Add any other imported metadata
-        ...(importedData.exportMetadata && { importMetadata: {
-          ...importedData.exportMetadata,
-          importedAt: new Date().toISOString(),
-          importedBy: currentUser?.userName
-        }})
+        ...(importedData.exportMetadata && {
+          importMetadata: {
+            ...importedData.exportMetadata,
+            importedAt: new Date().toISOString(),
+            importedBy: currentUser?.userName,
+          },
+        }),
       };
 
       console.log("📋 Prepared data for saving:", {
@@ -228,19 +230,22 @@ const Layout = () => {
         savingsGoals: dataToLoad.savingsGoals.length,
         transactions: dataToLoad.allTransactions.length,
         hasCurrentUser: !!dataToLoad.currentUser,
-        currentUserBudgetId: dataToLoad.currentUser?.budgetId
+        currentUserBudgetId: dataToLoad.currentUser?.budgetId,
       });
 
       // Encrypt and save the imported data
       console.log("🔐 Encrypting and saving imported data...");
-      const encrypted = await encryptionUtils.encrypt(dataToLoad, encryptionKey);
-      
+      const encrypted = await encryptionUtils.encrypt(
+        dataToLoad,
+        encryptionKey
+      );
+
       const saveData = {
         encryptedData: encrypted.data,
         salt: Array.from(salt),
         iv: encrypted.iv,
       };
-      
+
       localStorage.setItem("envelopeBudgetData", JSON.stringify(saveData));
 
       // Verify the save worked
@@ -248,18 +253,23 @@ const Layout = () => {
       if (!verification) {
         throw new Error("Failed to save data to localStorage");
       }
-      
+
       // Test decryption to ensure data integrity
       console.log("🔍 Verifying data integrity...");
-      const { encryptedData: testEncrypted, iv: testIv } = JSON.parse(verification);
-      const testDecrypted = await encryptionUtils.decrypt(testEncrypted, encryptionKey, testIv);
-      
+      const { encryptedData: testEncrypted, iv: testIv } =
+        JSON.parse(verification);
+      const testDecrypted = await encryptionUtils.decrypt(
+        testEncrypted,
+        encryptionKey,
+        testIv
+      );
+
       console.log("✅ Data integrity verified:", {
         envelopes: testDecrypted.envelopes?.length || 0,
         bills: testDecrypted.bills?.length || 0,
         savingsGoals: testDecrypted.savingsGoals?.length || 0,
         hasCurrentUser: !!testDecrypted.currentUser,
-        budgetId: testDecrypted.currentUser?.budgetId
+        budgetId: testDecrypted.currentUser?.budgetId,
       });
 
       console.log("✅ Data imported and saved successfully!");
@@ -458,7 +468,14 @@ const MainContent = ({
       <div>Savings: {budget.savingsGoals?.length || 0}</div>
       <div>Unassigned: ${budget.unassignedCash || 0}</div>
       <div>Debug: {JSON.stringify(budget._debug || {})}</div>
-      <div style={{ marginTop: "10px", display: "flex", flexDirection: "column", gap: "5px" }}>
+      <div
+        style={{
+          marginTop: "10px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "5px",
+        }}
+      >
         <button
           onClick={forceLoadData}
           style={{
@@ -473,18 +490,20 @@ const MainContent = ({
         >
           Force Load Data
         </button>
-        <button 
+        <button
           onClick={() => {
             const data = localStorage.getItem("envelopeBudgetData");
             if (data) {
               const parsed = JSON.parse(data);
-              console.log("🔍 localStorage contents:", { 
+              console.log("🔍 localStorage contents:", {
                 hasEncryptedData: !!parsed.encryptedData,
                 hasSalt: !!parsed.salt,
                 hasIv: !!parsed.iv,
-                encryptedDataLength: parsed.encryptedData?.length || 0
+                encryptedDataLength: parsed.encryptedData?.length || 0,
               });
-              alert(`localStorage data found:\nEncrypted: ${!!parsed.encryptedData}\nSalt: ${!!parsed.salt}\nIV: ${!!parsed.iv}\nData length: ${parsed.encryptedData?.length || 0}`);
+              alert(
+                `localStorage data found:\nEncrypted: ${!!parsed.encryptedData}\nSalt: ${!!parsed.salt}\nIV: ${!!parsed.iv}\nData length: ${parsed.encryptedData?.length || 0}`
+              );
             } else {
               console.log("❌ No data in localStorage");
               alert("No data found in localStorage");
