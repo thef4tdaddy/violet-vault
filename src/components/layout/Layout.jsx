@@ -267,7 +267,37 @@ const Layout = () => {
         transactions: dataToLoad.allTransactions.length,
         hasCurrentUser: !!dataToLoad.currentUser,
         currentUserBudgetId: dataToLoad.currentUser?.budgetId,
+        currentUserName: dataToLoad.currentUser?.userName,
+        currentUserSource: importedData.currentUser ? 'imported' : currentUser ? 'session' : 'created'
       });
+
+      // Update debug info to show the processed data (not raw imported data)
+      if (setDebugInfo) {
+        setDebugInfo({
+          success: true,
+          stage: "import_processed",
+          topLevelKeys: Object.keys(dataToLoad),
+          envelopesLength: dataToLoad.envelopes?.length || 0,
+          billsLength: dataToLoad.bills?.length || 0,
+          savingsGoalsLength: dataToLoad.savingsGoals?.length || 0,
+          allTransactionsLength: dataToLoad.allTransactions?.length || 0,
+          unassignedCash: dataToLoad.unassignedCash || 0,
+          hasCurrentUser: !!dataToLoad.currentUser,
+          userName: dataToLoad.currentUser?.userName || 'None',
+          userSource: importedData.currentUser ? 'imported' : currentUser ? 'session' : 'created',
+          firstEnvelope: dataToLoad.envelopes?.[0] ? {
+            id: dataToLoad.envelopes[0].id,
+            name: dataToLoad.envelopes[0].name,
+            amount: dataToLoad.envelopes[0].amount,
+            currentBalance: dataToLoad.envelopes[0].currentBalance
+          } : null,
+          firstBill: dataToLoad.bills?.[0] ? {
+            id: dataToLoad.bills[0].id,
+            name: dataToLoad.bills[0].name,
+            amount: dataToLoad.bills[0].amount
+          } : null
+        });
+      }
 
       // Encrypt and save the imported data
       console.log("🔐 Encrypting and saving imported data...");
@@ -674,6 +704,8 @@ const MainContent = ({
         <strong>
           {debugInfo.stage === "import_parsed"
             ? "Import Parse Results:"
+            : debugInfo.stage === "import_processed" 
+            ? "Import Processed Results:"
             : "Decrypt Test Results:"}
         </strong>
         <button
@@ -714,7 +746,7 @@ const MainContent = ({
             <strong>Unassigned Cash:</strong> ${debugInfo.unassignedCash}
           </div>
           <div>
-            <strong>User:</strong> {debugInfo.userName}
+            <strong>User:</strong> {debugInfo.userName} {debugInfo.userSource ? `(${debugInfo.userSource})` : ''}
           </div>
           {debugInfo.firstEnvelope && (
             <div>
