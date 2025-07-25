@@ -1,12 +1,5 @@
 // src/contexts/BudgetContext.jsx
-import React, {
-  createContext,
-  useContext,
-  useReducer,
-  useEffect,
-  useState,
-  useMemo,
-} from "react";
+import React, { createContext, useContext, useReducer, useEffect, useState, useMemo } from "react";
 import { encryptionUtils } from "../utils/encryption";
 import FirebaseSync from "../utils/firebaseSync";
 import { Sentry } from "../utils/sentry";
@@ -93,7 +86,7 @@ const budgetReducer = (state, action) => {
       return {
         ...state,
         envelopes: state.envelopes.map((env) =>
-          env.id === action.payload.id ? action.payload : env,
+          env.id === action.payload.id ? action.payload : env
         ),
       };
     case actionTypes.DELETE_ENVELOPE:
@@ -107,9 +100,7 @@ const budgetReducer = (state, action) => {
     case actionTypes.UPDATE_BILL:
       return {
         ...state,
-        bills: state.bills.map((bill) =>
-          bill.id === action.payload.id ? action.payload : bill,
-        ),
+        bills: state.bills.map((bill) => (bill.id === action.payload.id ? action.payload : bill)),
       };
     case actionTypes.DELETE_BILL:
       return {
@@ -126,15 +117,13 @@ const budgetReducer = (state, action) => {
       return {
         ...state,
         savingsGoals: state.savingsGoals.map((goal) =>
-          goal.id === action.payload.id ? action.payload : goal,
+          goal.id === action.payload.id ? action.payload : goal
         ),
       };
     case actionTypes.DELETE_SAVINGS_GOAL:
       return {
         ...state,
-        savingsGoals: state.savingsGoals.filter(
-          (goal) => goal.id !== action.payload,
-        ),
+        savingsGoals: state.savingsGoals.filter((goal) => goal.id !== action.payload),
       };
 
     case actionTypes.PROCESS_PAYCHECK:
@@ -151,26 +140,19 @@ const budgetReducer = (state, action) => {
         transactions: [...state.transactions, action.payload.transaction],
         allTransactions: [...state.allTransactions, action.payload.transaction],
         envelopes: action.payload.updatedEnvelopes || state.envelopes,
-        unassignedCash:
-          action.payload.newUnassignedCash ?? state.unassignedCash,
+        unassignedCash: action.payload.newUnassignedCash ?? state.unassignedCash,
       };
 
     case actionTypes.LOAD_DATA: {
       const validatedPayload = {
         ...action.payload,
-        envelopes: Array.isArray(action.payload.envelopes)
-          ? action.payload.envelopes
-          : [],
+        envelopes: Array.isArray(action.payload.envelopes) ? action.payload.envelopes : [],
         bills: Array.isArray(action.payload.bills) ? action.payload.bills : [],
-        savingsGoals: Array.isArray(action.payload.savingsGoals)
-          ? action.payload.savingsGoals
-          : [],
+        savingsGoals: Array.isArray(action.payload.savingsGoals) ? action.payload.savingsGoals : [],
         supplementalAccounts: Array.isArray(action.payload.supplementalAccounts)
           ? action.payload.supplementalAccounts
           : [],
-        transactions: Array.isArray(action.payload.transactions)
-          ? action.payload.transactions
-          : [],
+        transactions: Array.isArray(action.payload.transactions) ? action.payload.transactions : [],
         allTransactions: Array.isArray(action.payload.allTransactions)
           ? action.payload.allTransactions
           : [],
@@ -186,13 +168,7 @@ const budgetReducer = (state, action) => {
   }
 };
 
-export const BudgetProvider = ({
-  children,
-  encryptionKey,
-  currentUser,
-  budgetId,
-  salt,
-}) => {
+export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId, salt }) => {
   const [state, dispatch] = useReducer(budgetReducer, initialState);
   const [firebaseSync] = useState(new FirebaseSync());
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -249,9 +225,7 @@ export const BudgetProvider = ({
                 bills: cloudResult.data.bills?.length || 0,
                 savingsGoals: cloudResult.data.savingsGoals?.length || 0,
                 allTransactions: cloudResult.data.allTransactions?.length || 0,
-                lastUpdated: cloudResult.metadata?.lastUpdated
-                  ?.toDate?.()
-                  ?.toISOString(),
+                lastUpdated: cloudResult.metadata?.lastUpdated?.toDate?.()?.toISOString(),
               });
 
               dispatch({
@@ -264,17 +238,12 @@ export const BudgetProvider = ({
               console.log("📄 No cloud data found, will try localStorage");
             }
           } catch (error) {
-            console.warn(
-              "⚠️ Failed to load from cloud, will try localStorage:",
-              error.message,
-            );
+            console.warn("⚠️ Failed to load from cloud, will try localStorage:", error.message);
           }
 
           // Only load from localStorage if cloud loading failed or returned no data
           if (!loadedFromCloud && savedData) {
-            console.log(
-              "✅ Found saved data in localStorage, loading as fallback",
-            );
+            console.log("✅ Found saved data in localStorage, loading as fallback");
             const parsed = JSON.parse(savedData);
             console.log("📦 Parsed localStorage data:", {
               hasEncryptedData: !!parsed.encryptedData,
@@ -288,11 +257,7 @@ export const BudgetProvider = ({
             console.log("🔐 Decrypting data with provided encryptionKey...");
             // Use the provided encryptionKey directly (it's already derived)
             const { encryptionUtils } = await import("../utils/encryption");
-            const decryptedData = await encryptionUtils.decrypt(
-              encryptedData,
-              encryptionKey,
-              iv,
-            );
+            const decryptedData = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
 
             console.log("✅ Data decrypted successfully!", {
               envelopes: decryptedData.envelopes?.length || 0,
@@ -308,9 +273,7 @@ export const BudgetProvider = ({
             console.log("📝 Dispatching LOAD_DATA action...");
             dispatch({ type: actionTypes.LOAD_DATA, payload: decryptedData });
 
-            console.log(
-              "🎉 Initial budget data loaded successfully from localStorage!",
-            );
+            console.log("🎉 Initial budget data loaded successfully from localStorage!");
           } else if (!loadedFromCloud) {
             console.warn("⚠️ No saved data found in localStorage or cloud");
           }
@@ -325,10 +288,7 @@ export const BudgetProvider = ({
           });
 
           // Clear corrupted data if loading fails
-          if (
-            error.message.includes("decrypt") ||
-            error.message.includes("parse")
-          ) {
+          if (error.message.includes("decrypt") || error.message.includes("parse")) {
             console.warn("🗑️ Clearing potentially corrupted localStorage data");
             localStorage.removeItem("envelopeBudgetData");
           }
@@ -408,17 +368,14 @@ export const BudgetProvider = ({
             // Failsafe: automatically reset syncing state after 30 seconds
             setTimeout(() => {
               console.warn("⏰ Sync timeout - resetting syncing state");
-              Sentry.captureMessage(
-                "Sync timeout - operation took longer than 30 seconds",
-                {
-                  level: "warning",
-                  tags: { component: "BudgetContext", issue: "sync_timeout" },
-                  extra: {
-                    operation: event.operation,
-                    currentUser: currentUser?.userName,
-                  },
+              Sentry.captureMessage("Sync timeout - operation took longer than 30 seconds", {
+                level: "warning",
+                tags: { component: "BudgetContext", issue: "sync_timeout" },
+                extra: {
+                  operation: event.operation,
+                  currentUser: currentUser?.userName,
                 },
-              );
+              });
               setIsSyncing(false);
               setSyncError("Sync timeout - please try again");
             }, 30000);
@@ -440,9 +397,7 @@ export const BudgetProvider = ({
       const errorListener = (error) => {
         setIsSyncing(false);
         if (error.type === "network_blocked") {
-          setSyncError(
-            "Firebase sync is blocked. Please allow Firebase requests.",
-          );
+          setSyncError("Firebase sync is blocked. Please allow Firebase requests.");
         } else {
           setSyncError(error.error || "Sync error occurred");
         }
@@ -507,17 +462,14 @@ export const BudgetProvider = ({
       // Auto-save to localStorage
       const saveToLocal = async () => {
         try {
-          const encrypted = await encryptionUtils.encrypt(
-            syncData,
-            encryptionKey,
-          );
+          const encrypted = await encryptionUtils.encrypt(syncData, encryptionKey);
           localStorage.setItem(
             "envelopeBudgetData",
             JSON.stringify({
               encryptedData: encrypted.data,
               salt: Array.from(salt || new Uint8Array()), // Use salt from auth context
               iv: encrypted.iv,
-            }),
+            })
           );
         } catch (error) {
           console.error("Failed to save to localStorage:", error);
@@ -572,12 +524,9 @@ export const BudgetProvider = ({
 
   // Action creators
   const actions = {
-    setEnvelopes: (envelopes) =>
-      dispatch({ type: actionTypes.SET_ENVELOPES, payload: envelopes }),
-    setBills: (bills) =>
-      dispatch({ type: actionTypes.SET_BILLS, payload: bills }),
-    setSavingsGoals: (goals) =>
-      dispatch({ type: actionTypes.SET_SAVINGS_GOALS, payload: goals }),
+    setEnvelopes: (envelopes) => dispatch({ type: actionTypes.SET_ENVELOPES, payload: envelopes }),
+    setBills: (bills) => dispatch({ type: actionTypes.SET_BILLS, payload: bills }),
+    setSavingsGoals: (goals) => dispatch({ type: actionTypes.SET_SAVINGS_GOALS, payload: goals }),
     setSupplementalAccounts: (accounts) =>
       dispatch({
         type: actionTypes.SET_SUPPLEMENTAL_ACCOUNTS,
@@ -599,33 +548,24 @@ export const BudgetProvider = ({
     setBiweeklyAllocation: (amount) =>
       dispatch({ type: actionTypes.SET_BIWEEKLY_ALLOCATION, payload: amount }),
 
-    addEnvelope: (envelope) =>
-      dispatch({ type: actionTypes.ADD_ENVELOPE, payload: envelope }),
+    addEnvelope: (envelope) => dispatch({ type: actionTypes.ADD_ENVELOPE, payload: envelope }),
     updateEnvelope: (envelope) =>
       dispatch({ type: actionTypes.UPDATE_ENVELOPE, payload: envelope }),
-    deleteEnvelope: (id) =>
-      dispatch({ type: actionTypes.DELETE_ENVELOPE, payload: id }),
+    deleteEnvelope: (id) => dispatch({ type: actionTypes.DELETE_ENVELOPE, payload: id }),
 
     addBill: (bill) => dispatch({ type: actionTypes.ADD_BILL, payload: bill }),
-    updateBill: (bill) =>
-      dispatch({ type: actionTypes.UPDATE_BILL, payload: bill }),
-    deleteBill: (id) =>
-      dispatch({ type: actionTypes.DELETE_BILL, payload: id }),
+    updateBill: (bill) => dispatch({ type: actionTypes.UPDATE_BILL, payload: bill }),
+    deleteBill: (id) => dispatch({ type: actionTypes.DELETE_BILL, payload: id }),
 
-    addSavingsGoal: (goal) =>
-      dispatch({ type: actionTypes.ADD_SAVINGS_GOAL, payload: goal }),
-    updateSavingsGoal: (goal) =>
-      dispatch({ type: actionTypes.UPDATE_SAVINGS_GOAL, payload: goal }),
-    deleteSavingsGoal: (id) =>
-      dispatch({ type: actionTypes.DELETE_SAVINGS_GOAL, payload: id }),
+    addSavingsGoal: (goal) => dispatch({ type: actionTypes.ADD_SAVINGS_GOAL, payload: goal }),
+    updateSavingsGoal: (goal) => dispatch({ type: actionTypes.UPDATE_SAVINGS_GOAL, payload: goal }),
+    deleteSavingsGoal: (id) => dispatch({ type: actionTypes.DELETE_SAVINGS_GOAL, payload: id }),
 
-    processPaycheck: (data) =>
-      dispatch({ type: actionTypes.PROCESS_PAYCHECK, payload: data }),
+    processPaycheck: (data) => dispatch({ type: actionTypes.PROCESS_PAYCHECK, payload: data }),
     reconcileTransaction: (data) =>
       dispatch({ type: actionTypes.RECONCILE_TRANSACTION, payload: data }),
 
-    loadData: (data) =>
-      dispatch({ type: actionTypes.LOAD_DATA, payload: data }),
+    loadData: (data) => dispatch({ type: actionTypes.LOAD_DATA, payload: data }),
   };
 
   const contextValue = {
@@ -637,16 +577,12 @@ export const BudgetProvider = ({
     syncError,
     // Firebase sync data access
     getActiveUsers: () =>
-      firebaseSync.getActiveUsers
-        ? Array.from(firebaseSync.activeUsers?.values() || [])
-        : [],
+      firebaseSync.getActiveUsers ? Array.from(firebaseSync.activeUsers?.values() || []) : [],
     getRecentActivity: () =>
       firebaseSync.getRecentActivity ? firebaseSync.getRecentActivity() : [],
     // Debug functions
     debugSyncInfo: () =>
-      firebaseSync.debugSyncInfo
-        ? firebaseSync.debugSyncInfo()
-        : Promise.resolve({}),
+      firebaseSync.debugSyncInfo ? firebaseSync.debugSyncInfo() : Promise.resolve({}),
     debugStorageInfo: () => {
       const localData = localStorage.getItem("violetvault_budget_data");
       return {
@@ -668,11 +604,7 @@ export const BudgetProvider = ({
     },
   };
 
-  return (
-    <BudgetContext.Provider value={contextValue}>
-      {children}
-    </BudgetContext.Provider>
-  );
+  return <BudgetContext.Provider value={contextValue}>{children}</BudgetContext.Provider>;
 };
 
 export const useBudget = () => {
