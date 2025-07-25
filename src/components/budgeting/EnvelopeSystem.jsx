@@ -1,4 +1,4 @@
-// src/components/EnvelopeSystem.jsx - Focused Envelope Operations
+// src/components/EnvelopeSystem.jsx - Focused Envelope Operations with infinite loop fixes
 import React, { useEffect, useMemo, useCallback } from "react";
 import { useBudget } from "../../contexts/BudgetContext";
 
