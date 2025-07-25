@@ -28,44 +28,47 @@ const useEnvelopeSystem = () => {
     };
 
     let totalBiweeklyNeed = 0;
-    const updatedEnvelopes = [...envelopes];
 
-    bills.forEach((bill) => {
-      const multiplier = frequencyMultipliers[bill.frequency] || 12;
-      const annualAmount = bill.amount * multiplier;
-      const biweeklyAmount = annualAmount / 26;
-      totalBiweeklyNeed += biweeklyAmount;
+    setEnvelopes((currentEnvelopes) => {
+      const updatedEnvelopes = [...currentEnvelopes];
 
-      // Find or create envelope for this bill
-      let envelope = updatedEnvelopes.find(
-        (env) => env.linkedBillId === bill.id
-      );
+      bills.forEach((bill) => {
+        const multiplier = frequencyMultipliers[bill.frequency] || 12;
+        const annualAmount = bill.amount * multiplier;
+        const biweeklyAmount = annualAmount / 26;
+        totalBiweeklyNeed += biweeklyAmount;
 
-      if (!envelope) {
-        // Create new envelope for this bill
-        const newEnvelope = {
-          id: `bill_${bill.id}`,
-          name: bill.name,
-          biweeklyAllocation: biweeklyAmount,
-          currentBalance: 0,
-          color: bill.color,
-          linkedBillId: bill.id,
-          spendingHistory: [],
-          category: bill.category,
-          isFromBill: true,
-          targetAmount: biweeklyAmount * 2, // Two weeks buffer
-        };
-        updatedEnvelopes.push(newEnvelope);
-      } else {
-        // Update existing envelope
-        envelope.biweeklyAllocation = biweeklyAmount;
-        envelope.targetAmount = biweeklyAmount * 2;
-      }
+        // Find or create envelope for this bill
+        let envelope = updatedEnvelopes.find(
+          (env) => env.linkedBillId === bill.id
+        );
+
+        if (!envelope) {
+          // Create new envelope for this bill
+          const newEnvelope = {
+            id: `bill_${bill.id}`,
+            name: bill.name,
+            biweeklyAllocation: biweeklyAmount,
+            currentBalance: 0,
+            color: bill.color,
+            linkedBillId: bill.id,
+            spendingHistory: [],
+            category: bill.category,
+            isFromBill: true,
+            targetAmount: biweeklyAmount * 2, // Two weeks buffer
+          };
+          updatedEnvelopes.push(newEnvelope);
+        } else {
+          // Update existing envelope
+          envelope.biweeklyAllocation = biweeklyAmount;
+          envelope.targetAmount = biweeklyAmount * 2;
+        }
+      });
+
+      setBiweeklyAllocation(totalBiweeklyNeed);
+      return updatedEnvelopes;
     });
-
-    setEnvelopes(updatedEnvelopes);
-    setBiweeklyAllocation(totalBiweeklyNeed);
-  }, [bills, setEnvelopes, setBiweeklyAllocation]); // Removed envelopes dependency to prevent infinite loop
+  }, [bills, setEnvelopes, setBiweeklyAllocation]);
 
   // Spend money from an envelope
   const spendFromEnvelope = useCallback(
