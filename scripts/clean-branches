@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Ensure we are in the root of the git repository
+cd "$(git rev-parse --show-toplevel)"
+
+# Update references
+git fetch --prune
+
+# List all merged branches except main
+echo "🔍 Finding local branches merged into main..."
+if git show-ref --verify --quiet refs/heads/main; then
+  merged=$(git branch --merged main | grep -v 'main' | grep -v '\*')
+
+  if [ -z "$merged" ]; then
+    echo "✅ No merged branches to delete."
+  else
+    echo "🗑️ Deleting merged local branches:"
+    echo "$merged"
+    echo "$merged" | xargs -n 1 git branch -d
+  fi
+else
+  echo "⚠️ 'main' branch not found locally. Skipping local cleanup."
+fi
+
+# Clean up remote-tracking branches that no longer exist on the remote
+echo "🧹 Pruning remote-tracking branches..."
+git remote prune origin
+
+echo "✨ Branch cleanup complete."

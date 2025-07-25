@@ -1,0 +1,78 @@
+#!/bin/bash
+
+set -e
+
+CURRENT_BRANCH=$(git branch --show-current)
+
+echo "🔍 Current branch: $CURRENT_BRANCH"
+read -p "❓ Do you want to rebase this branch onto main? (y/n) " CONFIRM
+
+if [[ "$CONFIRM" != "y" ]]; then
+  echo "❌ Rebase canceled."
+  exit 0
+fi
+
+echo "🧹 Running Prettier and ESLint fix..."
+npm run format
+npm run lint:fix
+
+echo "📦 Checking for newly modified files (e.g. .vscode/tasks.json)..."
+if ! git diff --quiet; then
+  git add .
+  git commit -m "chore: commit updated dev environment or remaining changes"
+fi
+
+echo "🔗 Staging changes..."
+if ! git diff --quiet; then
+  git add .
+  git commit -m "chore: apply Prettier/ESLint and local edits"
+else
+  echo "→ No changes to commit after Prettier/ESLint."
+fi
+
+echo "📥 Fetching latest main..."
+git fetch origin main
+
+echo "🧼 Final check for unstaged changes before rebase..."
+if ! git diff --quiet; then
+  echo "❌ Unstaged changes detected. Please commit or stash them manually."
+  git status
+  exit 1
+fi
+
+echo "🧬 Rebasing $CURRENT_BRANCH onto origin/main..."
+git rebase origin/main
+
+echo "🔍 Checking for local commits on $CURRENT_BRANCH..."
+LOCAL_COMMITS=$(git log origin/$CURRENT_BRANCH..HEAD --oneline)
+
+if [ -z "$LOCAL_COMMITS" ]; then
+  echo "✅ No local commits to squash. Skipping."
+else
+  echo "📝 Found local commits:"
+  echo "$LOCAL_COMMITS"
+
+  echo "🔎 Validating Conventional Commit messages..."
+  INVALID_COMMITS=$(git log origin/$CURRENT_BRANCH..HEAD --pretty=format:"%h %s" | grep -vE "^[0-9a-f]{7,} (feat|fix|chore|docs|style|refactor|perf|test)(\(.+\))?: .+" || true)
+
+  if [ -n "$INVALID_COMMITS" ]; then
+    echo "❌ Some commits do not follow Conventional Commits:"
+    echo ""
+    echo "$INVALID_COMMITS"
+    echo ""
+    echo "💡 Please reword these commits manually using:"
+    echo "   git rebase -i origin/$CURRENT_BRANCH"
+    echo "🛑 Aborting script to let you fix the commit messages."
+    exit 1
+  fi
+
+  echo "🔧 Squashing local commits..."
+  LAST_MESSAGE=$(git log -1 --pretty=%B)
+  git reset --soft origin/$CURRENT_BRANCH
+  git commit -m "$LAST_MESSAGE"
+  echo "✅ Commits squashed."
+fi
+
+echo "🚀 Pushing branch with --force-with-lease..."
+git push --force-with-lease
+echo "✅ Branch pushed successfully."
