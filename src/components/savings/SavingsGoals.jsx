@@ -148,11 +148,7 @@ const SavingsGoals = ({
   };
 
   const handleDelete = (goal) => {
-    if (
-      confirm(
-        `Are you sure you want to delete the savings goal "${goal.name}"?`
-      )
-    ) {
+    if (confirm(`Are you sure you want to delete the savings goal "${goal.name}"?`)) {
       onDeleteGoal(goal.id);
     }
   };
@@ -172,8 +168,7 @@ const SavingsGoals = ({
     if (diffDays < 0) return { text: "Past due", color: "text-red-600" };
     if (diffDays === 0) return { text: "Today", color: "text-orange-600" };
     if (diffDays === 1) return { text: "1 day left", color: "text-orange-600" };
-    if (diffDays <= 30)
-      return { text: `${diffDays} days`, color: "text-blue-600" };
+    if (diffDays <= 30) return { text: `${diffDays} days`, color: "text-blue-600" };
 
     const months = Math.floor(diffDays / 30);
     return {
@@ -228,10 +223,7 @@ const SavingsGoals = ({
       const allocation = Math.min(needed, remainingAmount / sortedGoals.length);
 
       if (allocation > 0 && remainingAmount > 0) {
-        newDistribution[goal.id] = Math.min(
-          allocation,
-          remainingAmount
-        ).toFixed(2);
+        newDistribution[goal.id] = Math.min(allocation, remainingAmount).toFixed(2);
         remainingAmount -= allocation;
       }
     });
@@ -257,16 +249,9 @@ const SavingsGoals = ({
     initializeDistribution();
   };
 
-  const totalSaved = savingsGoals.reduce(
-    (sum, goal) => sum + goal.currentAmount,
-    0
-  );
-  const totalTargets = savingsGoals.reduce(
-    (sum, goal) => sum + goal.targetAmount,
-    0
-  );
-  const overallProgress =
-    totalTargets > 0 ? (totalSaved / totalTargets) * 100 : 0;
+  const totalSaved = savingsGoals.reduce((sum, goal) => sum + goal.currentAmount, 0);
+  const totalTargets = savingsGoals.reduce((sum, goal) => sum + goal.targetAmount, 0);
+  const overallProgress = totalTargets > 0 ? (totalSaved / totalTargets) * 100 : 0;
 
   return (
     <div className="space-y-6">
@@ -310,18 +295,12 @@ const SavingsGoals = ({
       {savingsGoals.length === 0 ? (
         <div className="glassmorphism rounded-2xl p-8 text-center text-gray-500 border border-white/20">
           <Target className="h-12 w-12 mx-auto mb-3 opacity-50" />
-          <p>
-            No savings goals yet. Click "Add Goal" to start saving for something
-            special!
-          </p>
+          <p>No savings goals yet. Click "Add Goal" to start saving for something special!</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {savingsGoals.map((goal) => {
-            const progress = getProgressPercentage(
-              goal.currentAmount,
-              goal.targetAmount
-            );
+            const progress = getProgressPercentage(goal.currentAmount, goal.targetAmount);
             const remaining = goal.targetAmount - goal.currentAmount;
             const timeInfo = getTimeRemaining(goal.targetDate);
             const priority = priorities.find((p) => p.value === goal.priority);
@@ -333,17 +312,10 @@ const SavingsGoals = ({
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-3">
-                    <div
-                      className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: goal.color }}
-                    />
+                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: goal.color }} />
                     <div>
-                      <h3 className="font-semibold text-gray-900">
-                        {goal.name}
-                      </h3>
-                      <span
-                        className={`text-xs px-2 py-1 rounded-full ${priority.color}`}
-                      >
+                      <h3 className="font-semibold text-gray-900">{goal.name}</h3>
+                      <span className={`text-xs px-2 py-1 rounded-full ${priority.color}`}>
                         {priority.label}
                       </span>
                     </div>
@@ -369,9 +341,7 @@ const SavingsGoals = ({
                   <div>
                     <div className="flex justify-between text-sm mb-1">
                       <span className="text-gray-600">Progress</span>
-                      <span className="font-medium">
-                        {progress.toFixed(1)}%
-                      </span>
+                      <span className="font-medium">{progress.toFixed(1)}%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
@@ -393,28 +363,20 @@ const SavingsGoals = ({
                     </div>
                     <div>
                       <span className="text-gray-600">Target:</span>
-                      <div className="font-bold">
-                        ${goal.targetAmount.toFixed(2)}
-                      </div>
+                      <div className="font-bold">${goal.targetAmount.toFixed(2)}</div>
                     </div>
                   </div>
 
                   <div className="flex justify-between items-center text-sm">
                     <div>
                       <span className="text-gray-600">Remaining:</span>
-                      <span className="font-medium ml-1">
-                        ${remaining.toFixed(2)}
-                      </span>
+                      <span className="font-medium ml-1">${remaining.toFixed(2)}</span>
                     </div>
-                    {timeInfo && (
-                      <span className={timeInfo.color}>{timeInfo.text}</span>
-                    )}
+                    {timeInfo && <span className={timeInfo.color}>{timeInfo.text}</span>}
                   </div>
 
                   {goal.description && (
-                    <p className="text-sm text-gray-600 border-t pt-2">
-                      {goal.description}
-                    </p>
+                    <p className="text-sm text-gray-600 border-t pt-2">{goal.description}</p>
                   )}
                 </div>
               </div>
@@ -452,9 +414,7 @@ const SavingsGoals = ({
                   <input
                     type="text"
                     value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                     placeholder="e.g., Emergency Fund, Vacation, New Car"
                     required
@@ -469,9 +429,7 @@ const SavingsGoals = ({
                     type="number"
                     step="0.01"
                     value={formData.targetAmount}
-                    onChange={(e) =>
-                      setFormData({ ...formData, targetAmount: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, targetAmount: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                     placeholder="0.00"
                     required
@@ -504,22 +462,16 @@ const SavingsGoals = ({
                   <input
                     type="date"
                     value={formData.targetDate}
-                    onChange={(e) =>
-                      setFormData({ ...formData, targetDate: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, targetDate: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Priority
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
                   <select
                     value={formData.priority}
-                    onChange={(e) =>
-                      setFormData({ ...formData, priority: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                   >
                     {priorities.map((priority) => (
@@ -531,14 +483,10 @@ const SavingsGoals = ({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Category
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
                   <select
                     value={formData.category}
-                    onChange={(e) =>
-                      setFormData({ ...formData, category: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                   >
                     {categories.map((category) => (
@@ -550,9 +498,7 @@ const SavingsGoals = ({
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Color
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
                   <div className="flex gap-2 flex-wrap">
                     {colors.map((color) => (
                       <button
@@ -576,9 +522,7 @@ const SavingsGoals = ({
                   </label>
                   <textarea
                     value={formData.description}
-                    onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                     placeholder="What are you saving for and why?"
@@ -616,9 +560,7 @@ const SavingsGoals = ({
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="glassmorphism rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-white/30 shadow-2xl">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-semibold">
-                Distribute Unassigned Cash
-              </h3>
+              <h3 className="text-xl font-semibold">Distribute Unassigned Cash</h3>
               <button
                 onClick={() => setShowDistributeModal(false)}
                 className="text-gray-400 hover:text-gray-600"
@@ -629,9 +571,7 @@ const SavingsGoals = ({
 
             <div className="mb-6 p-4 bg-green-50 rounded-lg">
               <div className="flex items-center justify-between">
-                <span className="font-medium text-green-800">
-                  Available Unassigned Cash:
-                </span>
+                <span className="font-medium text-green-800">Available Unassigned Cash:</span>
                 <span className="text-xl font-bold text-green-600">
                   ${unassignedCash.toFixed(2)}
                 </span>
@@ -667,9 +607,7 @@ const SavingsGoals = ({
 
               {savingsGoals.map((goal) => {
                 const remaining = goal.targetAmount - goal.currentAmount;
-                const priority = priorities.find(
-                  (p) => p.value === goal.priority
-                );
+                const priority = priorities.find((p) => p.value === goal.priority);
 
                 return (
                   <div key={goal.id} className="border rounded-lg p-4">
@@ -681,16 +619,12 @@ const SavingsGoals = ({
                         />
                         <div>
                           <span className="font-medium">{goal.name}</span>
-                          <span
-                            className={`ml-2 text-xs px-2 py-1 rounded-full ${priority.color}`}
-                          >
+                          <span className={`ml-2 text-xs px-2 py-1 rounded-full ${priority.color}`}>
                             {priority.label}
                           </span>
                         </div>
                       </div>
-                      <span className="text-sm text-gray-600">
-                        Need: ${remaining.toFixed(2)}
-                      </span>
+                      <span className="text-sm text-gray-600">Need: ${remaining.toFixed(2)}</span>
                     </div>
                     <input
                       type="number"
@@ -736,8 +670,7 @@ const SavingsGoals = ({
               <button
                 onClick={handleDistribute}
                 disabled={
-                  calculateDistributionTotal() <= 0 ||
-                  calculateDistributionTotal() > unassignedCash
+                  calculateDistributionTotal() <= 0 || calculateDistributionTotal() > unassignedCash
                 }
                 className="flex-1 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-3 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 disabled:from-gray-400 disabled:to-gray-400 disabled:transform-none font-semibold"
               >

@@ -58,9 +58,7 @@ const useEnvelopeSystem = () => {
         const biweeklyAmount = annualAmount / 26;
 
         // Find or create envelope for this bill
-        let envelope = updatedEnvelopes.find(
-          (env) => env.linkedBillId === bill.id
-        );
+        let envelope = updatedEnvelopes.find((env) => env.linkedBillId === bill.id);
 
         if (!envelope) {
           // Create new envelope for this bill
@@ -110,10 +108,7 @@ const useEnvelopeSystem = () => {
             return {
               ...envelope,
               currentBalance: newBalance,
-              spendingHistory: [
-                ...(envelope.spendingHistory || []),
-                spendingRecord,
-              ],
+              spendingHistory: [...(envelope.spendingHistory || []), spendingRecord],
             };
           }
           return envelope;
@@ -151,16 +146,10 @@ const useEnvelopeSystem = () => {
       if (toEnvelopeId === "unassigned") {
         // Transfer from envelope to unassigned cash
         setEnvelopes((currentEnvelopes) => {
-          const fromEnvelope = currentEnvelopes.find(
-            (env) => env.id === fromEnvelopeId
-          );
+          const fromEnvelope = currentEnvelopes.find((env) => env.id === fromEnvelopeId);
           if (fromEnvelope && fromEnvelope.currentBalance >= amount) {
             setUnassignedCash((current) => current + amount);
-            spendFromEnvelope(
-              fromEnvelopeId,
-              amount,
-              "Transfer to unassigned cash"
-            );
+            spendFromEnvelope(fromEnvelopeId, amount, "Transfer to unassigned cash");
           }
           return currentEnvelopes;
         });
@@ -169,9 +158,7 @@ const useEnvelopeSystem = () => {
 
       // Transfer between two envelopes
       setEnvelopes((currentEnvelopes) => {
-        const fromEnvelope = currentEnvelopes.find(
-          (env) => env.id === fromEnvelopeId
-        );
+        const fromEnvelope = currentEnvelopes.find((env) => env.id === fromEnvelopeId);
         if (!fromEnvelope || fromEnvelope.currentBalance < amount) {
           return currentEnvelopes; // Insufficient funds
         }
@@ -219,10 +206,7 @@ const useEnvelopeSystem = () => {
         currentEnvelopes.forEach((envelope) => {
           if (remainingAmount <= 0) return;
 
-          const needed = Math.max(
-            0,
-            envelope.biweeklyAllocation - envelope.currentBalance
-          );
+          const needed = Math.max(0, envelope.biweeklyAllocation - envelope.currentBalance);
           const allocation = Math.min(needed, remainingAmount);
 
           if (allocation > 0) {
@@ -230,14 +214,11 @@ const useEnvelopeSystem = () => {
             remainingAmount -= allocation;
 
             // Update envelope balance
-            const envelopeIndex = updatedEnvelopes.findIndex(
-              (env) => env.id === envelope.id
-            );
+            const envelopeIndex = updatedEnvelopes.findIndex((env) => env.id === envelope.id);
             if (envelopeIndex !== -1) {
               updatedEnvelopes[envelopeIndex] = {
                 ...updatedEnvelopes[envelopeIndex],
-                currentBalance:
-                  updatedEnvelopes[envelopeIndex].currentBalance + allocation,
+                currentBalance: updatedEnvelopes[envelopeIndex].currentBalance + allocation,
               };
             }
           }
@@ -314,14 +295,8 @@ const useEnvelopeSystem = () => {
         isUnderfunded: envelope.currentBalance < envelope.biweeklyAllocation,
         isOverfunded: envelope.currentBalance > envelope.biweeklyAllocation,
         percentFilled,
-        amountNeeded: Math.max(
-          0,
-          envelope.biweeklyAllocation - envelope.currentBalance
-        ),
-        amountOver: Math.max(
-          0,
-          envelope.currentBalance - envelope.biweeklyAllocation
-        ),
+        amountNeeded: Math.max(0, envelope.biweeklyAllocation - envelope.currentBalance),
+        amountOver: Math.max(0, envelope.currentBalance - envelope.biweeklyAllocation),
       };
     },
     [getEnvelopeById]

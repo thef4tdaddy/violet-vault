@@ -1,12 +1,7 @@
 import React from "react";
 import { Edit3, Trash2 } from "lucide-react";
 
-const TransactionTable = ({
-  transactions = [],
-  envelopes = [],
-  onEdit,
-  onDelete,
-}) => {
+const TransactionTable = ({ transactions = [], envelopes = [], onEdit, onDelete }) => {
   const handleDelete = (transactionId) => {
     if (confirm("Are you sure you want to delete this transaction?")) {
       onDelete(transactionId);
@@ -48,22 +43,16 @@ const TransactionTable = ({
               </tr>
             ) : (
               transactions.map((transaction) => {
-                const envelope = envelopes.find(
-                  (e) => e.id === transaction.envelopeId
-                );
+                const envelope = envelopes.find((e) => e.id === transaction.envelopeId);
                 return (
                   <tr key={transaction.id} className="hover:bg-white/30">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {new Date(transaction.date).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
-                      <div className="font-medium">
-                        {transaction.description}
-                      </div>
+                      <div className="font-medium">{transaction.description}</div>
                       {transaction.notes && (
-                        <div className="text-xs text-gray-500">
-                          {transaction.notes}
-                        </div>
+                        <div className="text-xs text-gray-500">{transaction.notes}</div>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -84,11 +73,7 @@ const TransactionTable = ({
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <span
-                        className={
-                          transaction.amount >= 0
-                            ? "text-emerald-600"
-                            : "text-red-600"
-                        }
+                        className={transaction.amount >= 0 ? "text-emerald-600" : "text-red-600"}
                       >
                         {transaction.amount >= 0 ? "+" : ""}$
                         {Math.abs(transaction.amount).toFixed(2)}
