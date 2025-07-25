@@ -17,7 +17,7 @@
       "source": "/(.*)\\.js",
       "headers": [
         {
-          "key": "Content-Type", 
+          "key": "Content-Type",
           "value": "application/javascript; charset=utf-8"
         }
       ]

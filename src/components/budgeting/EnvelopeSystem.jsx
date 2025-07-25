@@ -1,5 +1,5 @@
 // src/components/EnvelopeSystem.jsx - Focused Envelope Operations with infinite loop fixes
-import React, { useEffect, useMemo, useCallback } from "react";
+import React, { useEffect, useMemo, useCallback, useRef } from "react";
 import { useBudget } from "../../contexts/BudgetContext";
 
 const useEnvelopeSystem = () => {
@@ -15,8 +15,17 @@ const useEnvelopeSystem = () => {
     deleteEnvelope,
   } = useBudget();
 
+  const lastBillsRef = useRef(null);
+  const isCalculatingRef = useRef(false);
+
   // Calculate biweekly allocation needs from bills
   const calculateBiweeklyNeeds = useCallback(() => {
+    if (isCalculatingRef.current) {
+      return; // Prevent recursive calls
+    }
+
+    isCalculatingRef.current = true;
+
     const frequencyMultipliers = {
       weekly: 52,
       biweekly: 26,
@@ -77,6 +86,10 @@ const useEnvelopeSystem = () => {
 
       return updatedEnvelopes;
     });
+
+    setTimeout(() => {
+      isCalculatingRef.current = false;
+    }, 100);
   }, [bills, setEnvelopes, setBiweeklyAllocation]);
 
   // Spend money from an envelope
@@ -246,10 +259,12 @@ const useEnvelopeSystem = () => {
 
   // Auto-calculate biweekly needs when bills change
   useEffect(() => {
-    if (bills.length > 0) {
+    const billsStr = JSON.stringify(bills);
+    if (bills.length > 0 && lastBillsRef.current !== billsStr) {
+      lastBillsRef.current = billsStr;
       calculateBiweeklyNeeds();
     }
-  }, [bills, calculateBiweeklyNeeds]);
+  }, [bills]);
 
   // Calculate total envelope balance
   const totalEnvelopeBalance = useMemo(() => {

@@ -11,7 +11,13 @@ import {
   X,
 } from "lucide-react";
 
-const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill }) => {
+const BillManager = ({
+  bills,
+  onAddBill,
+  onUpdateBill,
+  onDeleteBill,
+  onAddEnvelope,
+}) => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingBill, setEditingBill] = useState(null);
   const [formData, setFormData] = useState({
@@ -123,6 +129,7 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill }) => {
       color: "#3B82F6",
       notes: "",
       customFrequency: "",
+      createEnvelope: true,
     });
   };
 
@@ -142,6 +149,9 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill }) => {
 
     const billData = {
       ...formData,
+      id: editingBill
+        ? editingBill.id
+        : `bill_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       amount,
       customFrequency:
         formData.frequency === "custom"
@@ -165,6 +175,24 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill }) => {
       setEditingBill(null);
     } else {
       onAddBill(billData);
+
+      // Create envelope if requested
+      if (formData.createEnvelope && onAddEnvelope) {
+        const envelopeData = {
+          id: `envelope_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          name: formData.name,
+          targetAmount: billData.biweeklyAmount,
+          currentBalance: 0,
+          category: formData.category,
+          color: formData.color,
+          priority: "medium",
+          dueDate: formData.dueDate,
+          billId: billData.id,
+          notes: `Auto-created for ${formData.name} bill`,
+        };
+        onAddEnvelope(envelopeData);
+      }
+
       setShowAddForm(false);
     }
 
@@ -181,6 +209,7 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill }) => {
       color: bill.color,
       notes: bill.notes || "",
       customFrequency: bill.customFrequency || "",
+      createEnvelope: false, // Don't show toggle for editing
     });
     setEditingBill(bill);
     setShowAddForm(false);
@@ -257,7 +286,7 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill }) => {
       </div>
 
       {/* Bills List */}
-      <div className="glassmorphism rounded-2xl border border-white/20 shadow-xl">
+      <div className="glassmorphism rounded-2xl border border-white/20 shadow-xl overflow-hidden">
         {bills.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
             <Calendar className="h-12 w-12 mx-auto mb-3 opacity-50" />
@@ -265,11 +294,14 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill }) => {
           </div>
         ) : (
           <div className="divide-y divide-gray-200">
-            {bills.map((bill) => {
+            {bills.map((bill, index) => {
               const dueInfo = getDaysUntilDue(bill.dueDate);
 
               return (
-                <div key={bill.id} className="p-6 hover:bg-gray-50">
+                <div
+                  key={bill.id || `bill-${index}`}
+                  className="p-6 hover:bg-gray-50"
+                >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
                       <div
@@ -497,6 +529,33 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill }) => {
                     placeholder="Any additional notes about this bill..."
                   />
                 </div>
+
+                {!editingBill && (
+                  <div className="md:col-span-2">
+                    <div className="flex items-start space-x-3">
+                      <input
+                        type="checkbox"
+                        checked={formData.createEnvelope}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            createEnvelope: e.target.checked,
+                          })
+                        }
+                        className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded mt-0.5 flex-shrink-0"
+                      />
+                      <div className="flex-1">
+                        <label className="text-sm font-medium text-gray-700 block">
+                          Create associated envelope for budgeting
+                        </label>
+                        <p className="text-xs text-gray-500 mt-1">
+                          This will create an envelope to help you save for this
+                          bill
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Preview */}
