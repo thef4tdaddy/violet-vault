@@ -460,7 +460,8 @@ const MainContent = ({
           onResetEncryption={onResetEncryption}
         />
 
-        {/* Team Activity & Sync */}
+        {/* Team Activity & Sync - Temporarily disabled to prevent browser crashes */}
+        {/* 
         <TeamActivitySync
           activeUsers={activeUsers}
           recentActivity={recentActivity}
@@ -470,6 +471,7 @@ const MainContent = ({
           lastSyncTime={lastSyncTime}
           syncError={syncError}
         />
+        */}
 
         {/* Navigation Tabs */}
         <div className="glassmorphism rounded-3xl mb-6 shadow-xl border border-white/20">
