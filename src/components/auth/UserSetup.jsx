@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Shield, Users, Eye, EyeOff } from "lucide-react";
-import logoWithText from "../../assets/Logo with Text Final.png";
+import logoOnly from "../../assets/Logo Only 1024x1024.png";
 
 const UserSetup = ({ onSetupComplete }) => {
   console.log("🏗️ UserSetup component rendered", {
@@ -27,23 +27,28 @@ const UserSetup = ({ onSetupComplete }) => {
     ]);
   };
 
+  const [isReturningUser, setIsReturningUser] = useState(false);
+
   // Load saved user profile on component mount
   useEffect(() => {
     console.log("🔍 UserSetup mounted, checking for saved profile");
     const savedProfile = localStorage.getItem("userProfile");
-    if (savedProfile) {
+    const savedData = localStorage.getItem("envelopeBudgetData");
+
+    if (savedProfile && savedData) {
       try {
         const profile = JSON.parse(savedProfile);
         console.log("📋 Found saved profile:", profile);
         setUserName(profile.userName || "");
         setUserColor(profile.userColor || "#a855f7");
-        // If we have a saved profile, skip to step 2 (profile confirmation) by default
-        // User can still edit their profile but doesn't have to re-enter everything
+        setIsReturningUser(true);
+        console.log("👋 Returning user detected");
       } catch (error) {
         console.warn("Failed to load saved profile:", error);
       }
     } else {
-      console.log("📋 No saved profile found");
+      console.log("📋 No saved profile found, new user");
+      setIsReturningUser(false);
     }
   }, []);
 
@@ -91,13 +96,40 @@ const UserSetup = ({ onSetupComplete }) => {
     }
   };
 
-  const handleStep1Continue = (e) => {
+  const handleStep1Continue = async (e) => {
     e.preventDefault();
     console.log("🔄 Step 1 continue clicked:", {
       step,
       masterPassword: !!masterPassword,
+      isReturningUser,
     });
-    setStep(2);
+
+    if (isReturningUser) {
+      // For returning users, try to login directly
+      if (!masterPassword) {
+        alert("Please enter your password");
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        console.log("🚀 Attempting login for returning user...");
+        await onSetupComplete({
+          password: masterPassword,
+          userName,
+          userColor,
+        });
+        console.log("✅ Returning user login succeeded");
+      } catch (error) {
+        console.error("❌ Login failed:", error);
+        alert("Incorrect password. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      // For new users, proceed to step 2
+      setStep(2);
+    }
   };
 
   const handleStartTrackingClick = async (e) => {
@@ -152,51 +184,48 @@ const UserSetup = ({ onSetupComplete }) => {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="glassmorphism rounded-3xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="flex justify-center mb-6">
-            <div style={{ width: "200px", height: "64px" }}>
-              <img
-                src={logoWithText}
-                alt="VioletVault Logo"
-                style={{ width: "200px", height: "64px", objectFit: "contain" }}
-              />
-            </div>
+          <div className="flex justify-center mb-8">
+            <img
+              src={logoOnly}
+              alt="VioletVault Logo"
+              style={{ width: "96px", height: "96px", objectFit: "contain" }}
+              className="mx-auto"
+            />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {step === 1
-              ? userName
-                ? "Enter Password"
-                : "Get Started"
-              : step === 2
-                ? userName
-                  ? `Welcome Back, ${userName}!`
-                  : "Set Up Profile"
-                : "Set Up Profile"}
-          </h1>
-          {step === 1 && userName && (
-            <div className="flex items-center justify-center mb-4">
-              <div
-                className="w-4 h-4 rounded-full mr-2 ring-2 ring-white shadow-sm"
-                style={{ backgroundColor: userColor }}
-              />
-              <span className="text-sm font-medium text-gray-700">
-                {userName}'s Profile
+            {isReturningUser ? (
+              <span>
+                Welcome Back,{" "}
+                <span
+                  className="inline-flex items-center"
+                  style={{ color: userColor }}
+                >
+                  {userName}
+                </span>
+                !
               </span>
-            </div>
-          )}
+            ) : step === 1 ? (
+              "Get Started"
+            ) : (
+              "Set Up Profile"
+            )}
+          </h1>
           <p className="text-gray-600">
-            {step === 1
-              ? "Enter your master password to continue"
-              : userName && step === 2
-                ? "Confirm your profile details or make changes"
+            {isReturningUser
+              ? "Enter your password to continue"
+              : step === 1
+                ? "Create a secure master password to protect your data"
                 : "Choose your name and color for tracking"}
           </p>
         </div>
 
         <form
-          onSubmit={step === 2 ? handleSubmit : handleStep1Continue}
+          onSubmit={
+            isReturningUser || step === 1 ? handleStep1Continue : handleSubmit
+          }
           className="space-y-6"
         >
-          {step === 1 && (
+          {(step === 1 || isReturningUser) && (
             <>
               <div className="relative">
                 <input
@@ -224,36 +253,22 @@ const UserSetup = ({ onSetupComplete }) => {
                 </button>
               </div>
 
-              {userName ? (
+              {isReturningUser ? (
                 <div className="space-y-3">
                   <button
-                    type="button"
+                    type="submit"
                     disabled={!masterPassword || isLoading}
                     className="w-full btn btn-primary py-4 text-lg font-semibold rounded-2xl"
-                    onClick={async (e) => {
-                      e.preventDefault();
-                      if (!masterPassword || !userName.trim()) return;
-
-                      setIsLoading(true);
-                      try {
-                        await onSetupComplete({
-                          password: masterPassword,
-                          userName: userName.trim(),
-                          userColor,
-                        });
-                      } catch (error) {
-                        console.error("Setup failed:", error);
-                      } finally {
-                        setIsLoading(false);
-                      }
-                    }}
                   >
-                    {isLoading ? "Unlocking..." : `Continue as ${userName}`}
+                    {isLoading ? "Unlocking..." : "Login"}
                   </button>
                   <div className="flex gap-2">
                     <button
                       type="button"
-                      onClick={() => setStep(2)}
+                      onClick={() => {
+                        setIsReturningUser(false);
+                        setStep(2);
+                      }}
                       disabled={isLoading}
                       className="flex-1 btn btn-secondary py-3 text-sm font-medium rounded-2xl"
                     >
@@ -275,13 +290,13 @@ const UserSetup = ({ onSetupComplete }) => {
                   disabled={!masterPassword || isLoading}
                   className="w-full btn btn-primary py-4 text-lg font-semibold rounded-2xl"
                 >
-                  {isLoading ? "Unlocking..." : "Continue"}
+                  {isLoading ? "Creating..." : "Continue"}
                 </button>
               )}
             </>
           )}
 
-          {step === 2 && (
+          {step === 2 && !isReturningUser && (
             <>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-3">

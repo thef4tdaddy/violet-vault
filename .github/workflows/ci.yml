@@ -28,7 +28,7 @@ jobs:
 
       - name: Auto-fix formatting
         run: npm run format
-      
+
       - name: Check for formatting changes
         run: |
           if [ -n "$(git status --porcelain)" ]; then

@@ -479,14 +479,12 @@ const MainContent = ({
   }, [getActiveUsers, getRecentActivity, isSyncing]);
 
   // Calculate totals
-  const totalEnvelopeBalance = envelopes.reduce(
-    (sum, env) => sum + env.currentBalance,
-    0
-  );
-  const totalSavingsBalance = savingsGoals.reduce(
-    (sum, goal) => sum + goal.currentAmount,
-    0
-  );
+  const totalEnvelopeBalance = Array.isArray(envelopes)
+    ? envelopes.reduce((sum, env) => sum + env.currentBalance, 0)
+    : 0;
+  const totalSavingsBalance = Array.isArray(savingsGoals)
+    ? savingsGoals.reduce((sum, goal) => sum + goal.currentAmount, 0)
+    : 0;
   const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
 
   return (
@@ -516,48 +514,56 @@ const MainContent = ({
         <div className="glassmorphism rounded-3xl mb-6 shadow-xl border border-white/20">
           <nav className="flex justify-center overflow-x-auto flex-wrap">
             <NavButton
+              key="dashboard"
               active={activeView === "dashboard"}
               onClick={() => setActiveView("dashboard")}
               icon={CreditCard}
               label="Dashboard"
             />
             <NavButton
+              key="envelopes"
               active={activeView === "envelopes"}
               onClick={() => setActiveView("envelopes")}
               icon={Wallet}
               label="Envelopes"
             />
             <NavButton
+              key="savings"
               active={activeView === "savings"}
               onClick={() => setActiveView("savings")}
               icon={Target}
               label="Savings Goals"
             />
             <NavButton
+              key="supplemental"
               active={activeView === "supplemental"}
               onClick={() => setActiveView("supplemental")}
               icon={CreditCard}
               label="Supplemental"
             />
             <NavButton
+              key="paycheck"
               active={activeView === "paycheck"}
               onClick={() => setActiveView("paycheck")}
               icon={DollarSign}
               label="Add Paycheck"
             />
             <NavButton
+              key="bills"
               active={activeView === "bills"}
               onClick={() => setActiveView("bills")}
               icon={Calendar}
               label="Manage Bills"
             />
             <NavButton
+              key="transactions"
               active={activeView === "transactions"}
               onClick={() => setActiveView("transactions")}
               icon={BookOpen}
               label="Transactions"
             />
             <NavButton
+              key="analytics"
               active={activeView === "analytics"}
               onClick={() => setActiveView("analytics")}
               icon={BarChart3}
@@ -569,24 +575,28 @@ const MainContent = ({
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <SummaryCard
+            key="total-cash"
             icon={Wallet}
             label="Total Cash"
             value={totalCash}
             color="purple"
           />
           <SummaryCard
+            key="unassigned-cash"
             icon={TrendingUp}
             label="Unassigned Cash"
             value={unassignedCash}
             color="emerald"
           />
           <SummaryCard
+            key="savings-total"
             icon={Target}
             label="Savings Total"
             value={totalSavingsBalance}
             color="cyan"
           />
           <SummaryCard
+            key="biweekly-need"
             icon={DollarSign}
             label="Biweekly Need"
             value={biweeklyAllocation}
@@ -804,6 +814,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
         onAddBill={addBill}
         onUpdateBill={updateBill}
         onDeleteBill={deleteBill}
+        onAddEnvelope={envelopeSystem.addEnvelope}
       />
     ),
     transactions: (

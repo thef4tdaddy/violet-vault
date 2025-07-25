@@ -85,6 +85,15 @@ export const AuthProvider = ({ children }) => {
           setBudgetId(userData.budgetId);
           setIsUnlocked(true);
           setLastActivity(Date.now());
+
+          // Save user profile to localStorage for future logins
+          const profileData = {
+            userName: userData.userName,
+            userColor: userData.userColor,
+          };
+          localStorage.setItem("userProfile", JSON.stringify(profileData));
+          console.log("💾 Saved user profile to localStorage");
+
           console.log("✅ New user auth state set");
           return { success: true };
         } else {
