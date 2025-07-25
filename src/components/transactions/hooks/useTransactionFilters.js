@@ -35,9 +35,10 @@ export const useTransactionFilters = (
           switch (dateFilter) {
             case "today":
               return transactionDate.toDateString() === now.toDateString();
-            case "week":
+            case "week": {
               const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
               return transactionDate >= weekAgo;
+            }
             case "month":
               return (
                 transactionDate.getMonth() === now.getMonth() &&
