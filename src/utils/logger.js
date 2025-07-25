@@ -7,44 +7,43 @@ class Logger {
 
   // Debug-level logging for development and sync issues
   debug(message, data = {}) {
-    const logData = {
-      level: "debug",
-      message,
-      data,
-      timestamp: new Date().toISOString(),
-    };
-
+    // Always log to console in development, but also use original console.log to bypass capture
     if (this.isDevelopment) {
-      console.log(`🔍 ${message}`, data);
+      // Use window.originalConsoleLog if available, otherwise regular console.log
+      const consoleLog = window.originalConsoleLog || console.log;
+      consoleLog(`🔍 ${message}`, data);
     }
 
-    Sentry.addBreadcrumb({
-      message: `DEBUG: ${message}`,
-      level: "info",
-      category: "debug",
-      data,
-    });
+    try {
+      Sentry.addBreadcrumb({
+        message: `DEBUG: ${message}`,
+        level: "info",
+        category: "debug",
+        data,
+      });
+    } catch (error) {
+      // Fallback if Sentry fails
+      console.error("Sentry logging failed:", error);
+    }
   }
 
   // Info-level logging for important events
   info(message, data = {}) {
-    const logData = {
-      level: "info",
-      message,
-      data,
-      timestamp: new Date().toISOString(),
-    };
-
     if (this.isDevelopment) {
-      console.log(`ℹ️ ${message}`, data);
+      const consoleLog = window.originalConsoleLog || console.log;
+      consoleLog(`ℹ️ ${message}`, data);
     }
 
-    Sentry.addBreadcrumb({
-      message: `INFO: ${message}`,
-      level: "info",
-      category: "app",
-      data,
-    });
+    try {
+      Sentry.addBreadcrumb({
+        message: `INFO: ${message}`,
+        level: "info",
+        category: "app",
+        data,
+      });
+    } catch (error) {
+      console.error("Sentry logging failed:", error);
+    }
   }
 
   // Warning-level logging
@@ -75,10 +74,28 @@ class Logger {
 
   // Specific methods for common debugging scenarios
   budgetSync(message, data = {}) {
-    this.debug(`[BUDGET-SYNC] ${message}`, {
-      ...data,
-      category: "budget-sync",
-    });
+    // Always log budget sync issues to console for immediate visibility
+    console.log(`💰 [BUDGET-SYNC] ${message}`, data);
+
+    // Also send to Sentry
+    try {
+      Sentry.addBreadcrumb({
+        message: `BUDGET-SYNC: ${message}`,
+        level: "info",
+        category: "budget-sync",
+        data,
+      });
+
+      // For critical budget sync issues, also send as message to ensure visibility
+      if (
+        message.includes("budgetId value") ||
+        message.includes("sync issue")
+      ) {
+        Sentry.captureMessage(`Budget Sync: ${message}`, "info");
+      }
+    } catch (error) {
+      console.error("Failed to log to Sentry:", error);
+    }
   }
 
   auth(message, data = {}) {
@@ -117,7 +134,38 @@ class Logger {
       ...data,
     });
   }
+
+  // Test Sentry connectivity
+  testSentry() {
+    console.log("🧪 Testing Sentry connectivity...");
+
+    // Send a test breadcrumb
+    Sentry.addBreadcrumb({
+      message: "Test breadcrumb from logger",
+      level: "info",
+      category: "test",
+    });
+
+    // Send a test message
+    Sentry.captureMessage("Test message from logger", "info");
+
+    // Send a test error
+    try {
+      throw new Error("Test error from logger - this is intentional");
+    } catch (error) {
+      Sentry.captureException(error);
+    }
+
+    console.log("✅ Sentry test messages sent - check your Sentry dashboard");
+  }
 }
 
 export const logger = new Logger();
+
+// Make logger available globally for testing
+if (typeof window !== "undefined") {
+  window.logger = logger;
+  window.testSentry = () => logger.testSentry();
+}
+
 export default logger;
