@@ -186,6 +186,7 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
 
   // Force mount logging
   useEffect(() => {
+    console.log("🚀 USEEFFECT MOUNT FIRING - DIRECT CONSOLE LOG");
     try {
       logger.budgetSync("BudgetProvider MOUNTED - this should always fire", {
         timestamp: new Date().toISOString(),
