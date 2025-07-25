@@ -6,6 +6,4 @@ import { initSentry } from "./utils/sentry.js";
 
 initSentry();
 
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <App />
-);
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
