@@ -1,5 +1,4 @@
 {
-  "ignoreCommand": "git diff HEAD^ HEAD --quiet --exit-code -- . ':(exclude)*.md' || [[ \"$VERCEL_GIT_COMMIT_MESSAGE\" =~ ^(feat|fix|breaking|deploy): ]]",
   "headers": [
     {
       "source": "/assets/(.*)\\.js",
