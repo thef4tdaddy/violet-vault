@@ -13,7 +13,11 @@ export default [
       ecmaVersion: 2020,
       globals: {
         ...globals.browser,
+        ...globals.node,
         process: "readonly",
+        module: "readonly",
+        require: "readonly",
+        __dirname: "readonly",
       },
       parserOptions: {
         ecmaVersion: "latest",
