@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Shield, Users, Eye, EyeOff } from "lucide-react";
-import logoOnly from "../../assets/Logo Only 1024x1024.png";
+import logoWithText from "../../assets/Logo with Text Final.png";
 
 const UserSetup = ({ onSetupComplete }) => {
   console.log("🏗️ UserSetup component rendered", { onSetupComplete: !!onSetupComplete });
@@ -148,11 +148,11 @@ const UserSetup = ({ onSetupComplete }) => {
       <div className="glassmorphism rounded-3xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
-            <div style={{ width: "64px", height: "64px" }}>
+            <div style={{ width: "200px", height: "64px" }}>
               <img
-                src={logoOnly}
+                src={logoWithText}
                 alt="VioletVault Logo"
-                style={{ width: "64px", height: "64px", objectFit: "contain" }}
+                style={{ width: "200px", height: "64px", objectFit: "contain" }}
               />
             </div>
           </div>
