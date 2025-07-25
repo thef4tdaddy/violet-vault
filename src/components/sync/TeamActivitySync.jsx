@@ -142,9 +142,9 @@ const TeamActivitySync = ({
       return [...recentActivity]
         .sort((activityA, activityB) => {
           try {
-            const aTime = new Date(activityA.timestamp || 0).getTime();
-            const bTime = new Date(activityB.timestamp || 0).getTime();
-            return bTime - aTime;
+            const timeA = new Date(activityA.timestamp || 0).getTime();
+            const timeB = new Date(activityB.timestamp || 0).getTime();
+            return timeB - timeA;
           } catch (error) {
             console.error("Error sorting activities:", error, activityA, activityB);
             return 0;
@@ -241,7 +241,7 @@ const TeamActivitySync = ({
         });
         break;
 
-      case "transaction_create":
+      case "transaction_create": {
         const isExpense = activity.details?.amount < 0;
         changes.push({
           type: isExpense ? "modified" : "added",
@@ -256,6 +256,7 @@ const TeamActivitySync = ({
             : null,
         });
         break;
+      }
 
       case "savings_goal_create":
         changes.push({
