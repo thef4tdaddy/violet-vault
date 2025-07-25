@@ -3,8 +3,10 @@ import { Shield, Users, Eye, EyeOff } from "lucide-react";
 import logoWithText from "../../assets/Logo with Text Final.png";
 
 const UserSetup = ({ onSetupComplete }) => {
-  console.log("🏗️ UserSetup component rendered", { onSetupComplete: !!onSetupComplete });
-  
+  console.log("🏗️ UserSetup component rendered", {
+    onSetupComplete: !!onSetupComplete,
+  });
+
   const [step, setStep] = useState(1);
   const [masterPassword, setMasterPassword] = useState("");
   const [userName, setUserName] = useState("");
@@ -16,9 +18,12 @@ const UserSetup = ({ onSetupComplete }) => {
   const handleWithTimeout = async (asyncFn, timeoutMs = 5000) => {
     return Promise.race([
       asyncFn(),
-      new Promise((_, reject) => 
-        setTimeout(() => reject(new Error(`Operation timed out after ${timeoutMs}ms`)), timeoutMs)
-      )
+      new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error(`Operation timed out after ${timeoutMs}ms`)),
+          timeoutMs
+        )
+      ),
     ]);
   };
 
@@ -116,7 +121,7 @@ const UserSetup = ({ onSetupComplete }) => {
     setIsLoading(true);
     try {
       console.log("🚀 Calling onSetupComplete from Start Tracking...");
-      
+
       // Add timeout protection
       await handleWithTimeout(async () => {
         await onSetupComplete({
@@ -125,7 +130,7 @@ const UserSetup = ({ onSetupComplete }) => {
           userColor,
         });
       }, 10000);
-      
+
       console.log("✅ onSetupComplete succeeded from Start Tracking");
     } catch (error) {
       console.error("❌ Setup failed from Start Tracking:", error);
