@@ -430,7 +430,7 @@ export const BudgetProvider = ({
 
   // Memoize sync data to prevent unnecessary re-computations
   const syncData = useMemo(() => {
-    const timestamp = Date.now();
+    const now = Date.now();
     return {
       ...state,
       currentUser,
@@ -438,8 +438,8 @@ export const BudgetProvider = ({
         ? {
             userName: currentUser.userName,
             userColor: currentUser.userColor,
-            timestamp,
-            deviceFingerprint: `${navigator.userAgent}_${timestamp}`,
+            timestamp: now,
+            deviceFingerprint: `${navigator.userAgent}_${now}`,
             deviceInfo: {
               platform: navigator.platform,
               userAgent: navigator.userAgent.substring(0, 100), // Truncate for storage
@@ -447,7 +447,15 @@ export const BudgetProvider = ({
           }
         : null,
     };
-  }, [state, currentUser]);
+  }, [
+    state.bills,
+    state.envelopes,
+    state.transactions,
+    state.allTransactions,
+    state.biweeklyAllocation,
+    state.unassignedCash,
+    currentUser,
+  ]); // Only update when actual data changes
 
   // Auto-save and sync
   useEffect(() => {
@@ -505,13 +513,15 @@ export const BudgetProvider = ({
       };
     }
   }, [
-    state.bills.length,
-    state.envelopes.length,
-    state.transactions.length,
-    state.allTransactions.length,
+    JSON.stringify(state.bills),
+    JSON.stringify(state.envelopes),
+    JSON.stringify(state.transactions),
+    JSON.stringify(state.allTransactions),
+    state.biweeklyAllocation,
+    state.unassignedCash,
     encryptionKey,
     isOnline,
-    isSyncing,
+    currentUser,
     firebaseSync,
   ]); // Trigger on actual data changes
 
