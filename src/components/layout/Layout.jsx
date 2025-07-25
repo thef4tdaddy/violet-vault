@@ -8,6 +8,7 @@ import TeamActivitySync from "../sync/TeamActivitySync";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import useEnvelopeSystem from "../budgeting/EnvelopeSystem";
 import { encryptionUtils } from "../../utils/encryption";
+import logger from "../../utils/logger";
 import {
   DollarSign,
   Wallet,
@@ -37,7 +38,7 @@ const SupplementalAccounts = lazy(
 );
 
 const Layout = () => {
-  console.log("🚀 Layout component is running");
+  logger.debug("Layout component is running");
 
   const {
     isUnlocked,
@@ -49,7 +50,7 @@ const Layout = () => {
     salt,
   } = useAuth();
 
-  console.log("🔍 Layout: Auth hook values", {
+  logger.auth("Auth hook values", {
     isUnlocked,
     hasCurrentUser: !!currentUser,
     hasBudgetId: !!budgetId,
@@ -64,7 +65,7 @@ const Layout = () => {
     setRecentActivity(activity);
   };
   const handleSetup = async (userData) => {
-    console.log("🎯 Layout handleSetup called with:", userData);
+    logger.auth("Layout handleSetup called", { hasUserData: !!userData });
     try {
       // Generate budgetId from password for cross-device sync
       const { encryptionUtils } = await import("../../utils/encryption");
@@ -75,12 +76,13 @@ const Layout = () => {
           encryptionUtils.generateBudgetId(userData.password),
       };
 
-      console.log("🚀 Calling login with:", {
-        userDataWithId,
-        password: !!userData.password,
+      logger.auth("Calling login", {
+        hasUserData: !!userDataWithId,
+        hasPassword: !!userData.password,
+        budgetId: userDataWithId.budgetId,
       });
       const result = await login(userData.password, userDataWithId);
-      console.log("📋 Login result:", result);
+      logger.auth("Login result", { success: !!result });
 
       if (result.success) {
         console.log("✅ Setup completed successfully");
@@ -377,14 +379,14 @@ const Layout = () => {
     return <UserSetup onSetupComplete={handleSetup} />;
   }
 
-  console.log("🏗️ Layout: Rendering BudgetProvider with props", {
+  logger.budgetSync("Rendering BudgetProvider with props", {
     hasEncryptionKey: !!encryptionKey,
     hasCurrentUser: !!currentUser,
     hasBudgetId: !!budgetId,
     hasSalt: !!salt,
     currentUser: currentUser,
   });
-  console.log("💰 Layout: budgetId value:", budgetId);
+  logger.budgetSync("budgetId value", { budgetId });
 
   return (
     <>

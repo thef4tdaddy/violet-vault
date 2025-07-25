@@ -33,6 +33,55 @@ export const initSentry = () => {
       return event;
     },
   });
+
+  // Capture console logs as breadcrumbs to reduce excessive logging
+  setupConsoleCapture();
+};
+
+const setupConsoleCapture = () => {
+  const originalConsoleLog = console.log;
+  const originalConsoleError = console.error;
+  const originalConsoleWarn = console.warn;
+
+  console.log = (...args) => {
+    // Only log to console in development
+    if (import.meta.env.MODE === "development") {
+      originalConsoleLog(...args);
+    }
+
+    // Send to Sentry as breadcrumb
+    Sentry.addBreadcrumb({
+      message: args
+        .map((arg) =>
+          typeof arg === "object" ? JSON.stringify(arg) : String(arg),
+        )
+        .join(" "),
+      level: "info",
+      category: "console",
+    });
+  };
+
+  console.error = (...args) => {
+    originalConsoleError(...args);
+
+    // Send errors to Sentry
+    Sentry.captureException(new Error(args.join(" ")));
+  };
+
+  console.warn = (...args) => {
+    originalConsoleWarn(...args);
+
+    // Send warnings as breadcrumbs
+    Sentry.addBreadcrumb({
+      message: args
+        .map((arg) =>
+          typeof arg === "object" ? JSON.stringify(arg) : String(arg),
+        )
+        .join(" "),
+      level: "warning",
+      category: "console",
+    });
+  };
 };
 
 export { Sentry };
