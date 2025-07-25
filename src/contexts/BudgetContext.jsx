@@ -359,7 +359,15 @@ export const BudgetProvider = ({
         },
       });
 
+      console.log("🔥 Initializing Firebase sync", {
+        budgetId,
+        hasEncryptionKey: !!encryptionKey,
+        currentUserName: currentUser?.userName,
+      });
+
       firebaseSync.initialize(budgetId, encryptionKey);
+
+      console.log("✅ Firebase sync initialized successfully");
 
       const syncListener = (event) => {
         console.log("🔄 Sync event received:", event);
@@ -504,12 +512,26 @@ export const BudgetProvider = ({
 
       // Auto-sync to cloud
       const syncToCloud = async () => {
+        console.log("🔄 syncToCloud called", {
+          isOnline,
+          hasCurrentUser: !!currentUser,
+          hasSyncData: !!syncData,
+          hasFirebaseSync: !!firebaseSync,
+          currentUserName: currentUser?.userName,
+          syncDataSize: JSON.stringify(syncData).length,
+        });
+
         if (isOnline) {
           try {
+            console.log("☁️ Attempting to save to cloud...");
             await firebaseSync.saveToCloud(syncData, currentUser);
+            console.log("✅ Successfully synced to cloud");
           } catch (error) {
-            console.error("Failed to sync to cloud:", error);
+            console.error("❌ Failed to sync to cloud:", error);
+            setSyncError(error.message);
           }
+        } else {
+          console.log("📴 Not syncing - device is offline");
         }
       };
 
