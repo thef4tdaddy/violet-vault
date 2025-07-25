@@ -140,13 +140,13 @@ const TeamActivitySync = ({
       }
 
       return [...recentActivity]
-        .sort((a, b) => {
+        .sort((activityA, activityB) => {
           try {
-            const aTime = new Date(a.timestamp || 0).getTime();
-            const bTime = new Date(b.timestamp || 0).getTime();
+            const aTime = new Date(activityA.timestamp || 0).getTime();
+            const bTime = new Date(activityB.timestamp || 0).getTime();
             return bTime - aTime;
           } catch (error) {
-            console.error("Error sorting activities:", error, a, b);
+            console.error("Error sorting activities:", error, activityA, activityB);
             return 0;
           }
         })

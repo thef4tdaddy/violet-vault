@@ -617,7 +617,9 @@ class FirebaseSync {
 
     if (newActivities.length > 0) {
       this.recentActivity = [...newActivities, ...this.recentActivity]
-        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .sort(
+          (activityA, activityB) => new Date(activityB.timestamp) - new Date(activityA.timestamp)
+        )
         .slice(0, this.maxActivityItems);
     }
   }
