@@ -57,11 +57,20 @@ const initialState = {
 const budgetReducer = (state, action) => {
   switch (action.type) {
     case actionTypes.SET_ENVELOPES:
-      return { ...state, envelopes: action.payload };
+      return {
+        ...state,
+        envelopes: Array.isArray(action.payload) ? action.payload : [],
+      };
     case actionTypes.SET_BILLS:
-      return { ...state, bills: action.payload };
+      return {
+        ...state,
+        bills: Array.isArray(action.payload) ? action.payload : [],
+      };
     case actionTypes.SET_SAVINGS_GOALS:
-      return { ...state, savingsGoals: action.payload };
+      return {
+        ...state,
+        savingsGoals: Array.isArray(action.payload) ? action.payload : [],
+      };
     case actionTypes.SET_SUPPLEMENTAL_ACCOUNTS:
       return { ...state, supplementalAccounts: action.payload };
     case actionTypes.SET_UNASSIGNED_CASH:
@@ -596,7 +605,7 @@ export const BudgetProvider = ({
         ? Array.from(firebaseSync.activeUsers?.values() || [])
         : [],
     getRecentActivity: () =>
-      firebaseSync.getActivity ? firebaseSync.getActivity() : [],
+      firebaseSync.getRecentActivity ? firebaseSync.getRecentActivity() : [],
     // Debug functions
     debugSyncInfo: () =>
       firebaseSync.debugSyncInfo

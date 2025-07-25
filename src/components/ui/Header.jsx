@@ -7,7 +7,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import UserIndicator from "../auth/UserIndicator";
-import logoWithTextBlackBorder from "../../assets/Logo and Text with Black Border.png";
+import logoWithText from "../../assets/Logo with Text Final.png";
 
 const Header = memo(
   ({
@@ -38,27 +38,26 @@ const Header = memo(
     }, [showResetMenu]);
     return (
       <div className="glassmorphism rounded-3xl p-6 mb-6">
-        <div className="flex flex-col md:flex-row items-center justify-between min-h-[200px] md:min-h-[260px] text-center md:text-left space-y-4 md:space-y-0">
-          <div>
-            <div className="flex items-center justify-center md:justify-start">
-              <img
-                src={logoWithTextBlackBorder}
-                alt="VioletVault Logo"
-                style={{
-                  height: "240px",
-                  width: "auto",
-                  marginRight: "1rem",
-                  maxWidth: "600px",
-                  objectFit: "contain",
-                }}
-              />
-            </div>
-            <p className="text-gray-600 mt-2 text-lg">
-              Encrypted family financial management
+        <div className="flex flex-col items-center text-center space-y-6">
+          {/* Logo and tagline */}
+          <div className="flex flex-col items-center">
+            <img
+              src={logoWithText}
+              alt="VioletVault Logo"
+              style={{
+                height: "180px",
+                width: "auto",
+                maxWidth: "450px",
+                objectFit: "contain",
+              }}
+            />
+            <p className="text-gray-600 text-sm mt-3 font-medium">
+              Encryption First, Family Budgeting Management
             </p>
           </div>
 
-          <div className="flex items-center" style={{ gap: "1.5rem" }}>
+          {/* Buttons row */}
+          <div className="flex items-center justify-center flex-wrap gap-4">
             <UserIndicator
               currentUser={currentUser}
               onUserChange={onUserChange}
@@ -105,7 +104,7 @@ const Header = memo(
                       top: "100%",
                       marginTop: "0.5rem",
                       width: "256px",
-                      zIndex: 1000,
+                      zIndex: 9999,
                       borderColor: "rgba(255, 255, 255, 0.2)",
                     }}
                   >

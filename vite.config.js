@@ -5,7 +5,7 @@ import { sentryVitePlugin } from "@sentry/vite-plugin";
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    react(), 
+    react(),
     tailwindcss(),
     sentryVitePlugin({
       org: "f4tdaddy",
