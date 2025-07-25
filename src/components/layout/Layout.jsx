@@ -66,13 +66,17 @@ const Layout = () => {
       const userDataWithId = {
         ...userData,
         budgetId:
-          userData.budgetId || encryptionUtils.generateBudgetId(userData.password),
+          userData.budgetId ||
+          encryptionUtils.generateBudgetId(userData.password),
       };
 
-      console.log("🚀 Calling login with:", { userDataWithId, password: !!userData.password });
+      console.log("🚀 Calling login with:", {
+        userDataWithId,
+        password: !!userData.password,
+      });
       const result = await login(userData.password, userDataWithId);
       console.log("📋 Login result:", result);
-      
+
       if (result.success) {
         console.log("✅ Setup completed successfully");
       } else {
