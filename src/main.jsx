@@ -7,7 +7,5 @@ import { initSentry } from "./utils/sentry.js";
 initSentry();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+  <App />
 );

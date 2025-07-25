@@ -186,9 +186,13 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
 
   // Force mount logging
   useEffect(() => {
-    logger.budgetSync("BudgetProvider MOUNTED - this should always fire", {
-      timestamp: new Date().toISOString(),
-    });
+    try {
+      logger.budgetSync("BudgetProvider MOUNTED - this should always fire", {
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("Error in mount useEffect:", error);
+    }
   }, []);
 
   // Load initial data from localStorage when BudgetProvider mounts
