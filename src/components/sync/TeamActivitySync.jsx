@@ -284,9 +284,9 @@ const TeamActivitySync = ({
     try {
       // Generate a short hash-like ID from timestamp and user
       const input = (activity.timestamp || Date.now()) + (activity.userName || "anonymous");
-      const hash = input.split("").reduce((a, b) => {
-        a = (a << 5) - a + b.charCodeAt(0);
-        return a & a;
+      const hash = input.split("").reduce((accumulator, char) => {
+        accumulator = (accumulator << 5) - accumulator + char.charCodeAt(0);
+        return accumulator & accumulator;
       }, 0);
       return Math.abs(hash).toString(16).substring(0, 7);
     } catch (error) {
