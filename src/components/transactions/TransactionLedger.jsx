@@ -32,13 +32,8 @@ const TransactionLedger = ({
   const [sortOrder, setSortOrder] = useState("desc");
 
   // Custom hooks
-  const {
-    transactionForm,
-    setTransactionForm,
-    resetForm,
-    populateForm,
-    createTransaction,
-  } = useTransactionForm();
+  const { transactionForm, setTransactionForm, resetForm, populateForm, createTransaction } =
+    useTransactionForm();
 
   const {
     importData,

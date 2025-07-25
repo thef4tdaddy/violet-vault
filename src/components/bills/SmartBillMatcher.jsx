@@ -2,12 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Search, Target, Zap, CheckCircle } from "lucide-react";
 
-const SmartBillMatcher = ({
-  bills,
-  envelopes,
-  onSuggestEnvelope,
-  searchQuery,
-}) => {
+const SmartBillMatcher = ({ bills, envelopes, onSuggestEnvelope, searchQuery }) => {
   const [suggestions, setSuggestions] = useState([]);
 
   // Common company mappings for smart suggestions
@@ -80,9 +75,7 @@ const SmartBillMatcher = ({
     // Find bill-based matches
     bills.forEach((bill) => {
       if (bill.name.toLowerCase().includes(normalizedQuery)) {
-        const matchingEnvelope = envelopes.find(
-          (env) => env.billId === bill.id
-        );
+        const matchingEnvelope = envelopes.find((env) => env.billId === bill.id);
         if (matchingEnvelope) {
           suggestions.push({
             type: "bill",
@@ -107,10 +100,7 @@ const SmartBillMatcher = ({
           const envelopeCategory = envelope.category?.toLowerCase() || "";
 
           if (
-            categories.some(
-              (cat) =>
-                envelopeName.includes(cat) || envelopeCategory.includes(cat)
-            )
+            categories.some((cat) => envelopeName.includes(cat) || envelopeCategory.includes(cat))
           ) {
             // Avoid duplicates
             if (!suggestions.find((s) => s.envelope.id === envelope.id)) {
@@ -135,10 +125,7 @@ const SmartBillMatcher = ({
         (word) => word.length > 2 && envelopeName.includes(word)
       );
 
-      if (
-        matchingWords.length > 0 &&
-        !suggestions.find((s) => s.envelope.id === envelope.id)
-      ) {
+      if (matchingWords.length > 0 && !suggestions.find((s) => s.envelope.id === envelope.id)) {
         const confidence = (matchingWords.length / queryWords.length) * 70;
         suggestions.push({
           type: "partial",
@@ -153,8 +140,7 @@ const SmartBillMatcher = ({
     const uniqueSuggestions = suggestions
       .filter(
         (suggestion, index, self) =>
-          index ===
-          self.findIndex((s) => s.envelope.id === suggestion.envelope.id)
+          index === self.findIndex((s) => s.envelope.id === suggestion.envelope.id)
       )
       .sort((a, b) => b.confidence - a.confidence)
       .slice(0, 5); // Top 5 suggestions
@@ -204,12 +190,8 @@ const SmartBillMatcher = ({
                   style={{ backgroundColor: suggestion.envelope.color }}
                 />
                 <div>
-                  <div className="font-medium text-gray-900">
-                    {suggestion.envelope.name}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    {suggestion.reason}
-                  </div>
+                  <div className="font-medium text-gray-900">{suggestion.envelope.name}</div>
+                  <div className="text-sm text-gray-600">{suggestion.reason}</div>
                 </div>
               </div>
 

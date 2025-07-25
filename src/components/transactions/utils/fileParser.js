@@ -41,10 +41,7 @@ export const parseOFX = (ofxText) => {
 
       if (transaction.date && transaction.date.length >= 8) {
         const dateStr = transaction.date;
-        transaction.date = `${dateStr.slice(0, 4)}-${dateStr.slice(
-          4,
-          6
-        )}-${dateStr.slice(6, 8)}`;
+        transaction.date = `${dateStr.slice(0, 4)}-${dateStr.slice(4, 6)}-${dateStr.slice(6, 8)}`;
       }
 
       transactions.push(transaction);
@@ -61,17 +58,9 @@ export const autoDetectFieldMapping = (data) => {
   headers.forEach((header) => {
     const lower = header.toLowerCase();
     if (lower.includes("date")) mapping.date = header;
-    if (
-      lower.includes("description") ||
-      lower.includes("name") ||
-      lower.includes("memo")
-    )
+    if (lower.includes("description") || lower.includes("name") || lower.includes("memo"))
       mapping.description = header;
-    if (
-      lower.includes("amount") ||
-      lower.includes("debit") ||
-      lower.includes("credit")
-    )
+    if (lower.includes("amount") || lower.includes("debit") || lower.includes("credit"))
       mapping.amount = header;
     if (lower.includes("category")) mapping.category = header;
   });

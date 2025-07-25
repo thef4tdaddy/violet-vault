@@ -34,10 +34,7 @@ const TransactionForm = ({
           <h3 className="text-xl font-semibold">
             {editingTransaction ? "Edit Transaction" : "Add New Transaction"}
           </h3>
-          <button
-            onClick={resetAndClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
+          <button onClick={resetAndClose} className="text-gray-400 hover:text-gray-600">
             <X className="h-6 w-6" />
           </button>
         </div>
@@ -45,9 +42,7 @@ const TransactionForm = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Date *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Date *</label>
               <input
                 type="date"
                 value={transactionForm.date}
@@ -63,9 +58,7 @@ const TransactionForm = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Type *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Type *</label>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
@@ -106,9 +99,7 @@ const TransactionForm = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
             <input
               type="text"
               value={transactionForm.description}
@@ -126,9 +117,7 @@ const TransactionForm = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Amount *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Amount *</label>
               <input
                 type="number"
                 step="0.01"
@@ -146,9 +135,7 @@ const TransactionForm = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Category
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
               <select
                 value={transactionForm.category}
                 onChange={(e) =>
@@ -193,9 +180,7 @@ const TransactionForm = ({
             {transactionForm.description && suggestEnvelope && (
               <div className="mt-2">
                 {(() => {
-                  const suggested = suggestEnvelope(
-                    transactionForm.description
-                  );
+                  const suggested = suggestEnvelope(transactionForm.description);
                   return suggested ? (
                     <button
                       type="button"
@@ -217,9 +202,7 @@ const TransactionForm = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Notes (Optional)
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
             <textarea
               value={transactionForm.notes}
               onChange={(e) =>
@@ -247,10 +230,7 @@ const TransactionForm = ({
               }
               className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
             />
-            <label
-              htmlFor="reconciled"
-              className="ml-2 block text-sm text-gray-900"
-            >
+            <label htmlFor="reconciled" className="ml-2 block text-sm text-gray-900">
               Mark as reconciled
             </label>
           </div>
