@@ -131,7 +131,7 @@ const TeamActivitySync = ({
     };
   };
 
-  // Process activity into Git-like changes
+  // Process activity into simple list (temporarily disabled git-like processing to prevent crashes)
   const processedActivities = useMemo(() => {
     try {
       if (!Array.isArray(recentActivity)) {
@@ -139,6 +139,7 @@ const TeamActivitySync = ({
         return [];
       }
 
+      // Simple processing without complex git-like features to prevent crashes
       return [...recentActivity]
         .sort((activityA, activityB) => {
           try {
@@ -153,19 +154,34 @@ const TeamActivitySync = ({
         .slice(0, 15)
         .map((activity) => {
           try {
-            // Generate Git-like change descriptions
-            const changes = generateChangeDescription(activity);
+            // Simple activity processing without complex git-like features
             return {
               ...activity,
-              changes,
-              commitId: generateCommitId(activity),
+              changes: [
+                {
+                  type: "modified",
+                  icon: <ActivityIcon className="h-3 w-3 text-gray-600" />,
+                  description:
+                    activity.action ||
+                    `${activity.type || "Updated"} by ${activity.userName || "User"}`,
+                  value: null,
+                },
+              ],
+              commitId: (activity.id || Date.now()).toString().substring(0, 7),
               timeAgo: formatTimeAgo(activity.timestamp),
             };
           } catch (error) {
             console.error("Error processing activity:", error, activity);
             return {
               ...activity,
-              changes: [],
+              changes: [
+                {
+                  type: "modified",
+                  icon: <ActivityIcon className="h-3 w-3 text-gray-600" />,
+                  description: "Activity update",
+                  value: null,
+                },
+              ],
               commitId: "error",
               timeAgo: "unknown",
             };
