@@ -1,1 +1,2 @@
 - Main has branch protection
+- Always run prettier and commit when done
