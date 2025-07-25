@@ -1,5 +1,39 @@
 # Changelog
 
+## [1.2.0](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.1.0...violet-vault-v1.2.0) (2025-07-25)
+
+
+### Features
+
+* add comprehensive logging to trace loadData flow ([1840632](https://github.com/thef4tdaddy/violet-vault/commit/1840632a917acabefb0a983b50a53099312b2962))
+* add comprehensive Sentry logging for sync debugging ([60eb0b9](https://github.com/thef4tdaddy/violet-vault/commit/60eb0b9cb34bf17030e6fb3aeec900d6a6a4b1a5))
+* add debug tools to investigate data loading issues ([1e396e9](https://github.com/thef4tdaddy/violet-vault/commit/1e396e9cce1423b2e50adaa846ebaf99ae1ad618))
+* add localStorage structure inspection to debug panel ([2079bdf](https://github.com/thef4tdaddy/violet-vault/commit/2079bdf5def6f7d2e1a8ec74b8648ca258e71bd0))
+* add selective deployment rules to prevent hitting Vercel limits ([bfbbf8f](https://github.com/thef4tdaddy/violet-vault/commit/bfbbf8ffe02ed54e1ac2cce0bc3386b2264d60d0))
+* add visual debug panel for live production debugging ([0e53c88](https://github.com/thef4tdaddy/violet-vault/commit/0e53c884ec6a9b7af87b649f17ad06724d26d31d))
+* sentry init ([dc7526c](https://github.com/thef4tdaddy/violet-vault/commit/dc7526caced192701a0f7e25d485bd770c3db084))
+
+
+### Bug Fixes
+
+* bill saving ([e7e9096](https://github.com/thef4tdaddy/violet-vault/commit/e7e909674896cbfbe1daa9a8b23eee530d06471f))
+* data arrays ([2a19314](https://github.com/thef4tdaddy/violet-vault/commit/2a193146fcdaee469bd595b5001e31f5d4e71255))
+* enhance sync debugging - add console logging and debug functions ([e50dbe8](https://github.com/thef4tdaddy/violet-vault/commit/e50dbe862d78d43aab2fc1dd42866a4c27e087df))
+* implement cloud data loading to resolve cross-device sync ([4c34ecb](https://github.com/thef4tdaddy/violet-vault/commit/4c34ecb675f4cb8811dbee25afdf2b410e048beb))
+* implement missing sync status functions and visibility logic ([df2afb7](https://github.com/thef4tdaddy/violet-vault/commit/df2afb7081eafee5d22a9545335343d474d62aba))
+* improve UserSetup UI clarity and add debug logging ([91cf9f3](https://github.com/thef4tdaddy/violet-vault/commit/91cf9f3087b4b0ff28bbecce373b54175fb6b89c))
+* load imported data into context ([ee30f64](https://github.com/thef4tdaddy/violet-vault/commit/ee30f64cf9a4cbb1a7a9309ab6db50a19f8115c2))
+* move useEffect after budget context destructuring to resolve getActiveUsers error ([10766fb](https://github.com/thef4tdaddy/violet-vault/commit/10766fb6d88c507f38ee8978db8b51448a76bae8))
+* remove auto-refresh from import and add debug logging ([ec6f87c](https://github.com/thef4tdaddy/violet-vault/commit/ec6f87cbf29dd80aa6e5662e8d4cb13393568c4c))
+* resolve getActiveUsers undefined error in Layout.jsx ([8f6b127](https://github.com/thef4tdaddy/violet-vault/commit/8f6b127d2ad5127a1397f4e42e7214dfdb72ce8c))
+* resolve infinite React update loops in EnvelopeSystem ([6533999](https://github.com/thef4tdaddy/violet-vault/commit/653399983ce528c6925b0bb0f8942da172fda9fe))
+* resolve production deployment issues with MIME types and routing ([9facab4](https://github.com/thef4tdaddy/violet-vault/commit/9facab4a778adf87e027b45153ce42bd50ddfec2))
+* resolve sync bar endless syncing and connect activity data ([a3e23b9](https://github.com/thef4tdaddy/violet-vault/commit/a3e23b92de9b56aeb9e335d240ed41bea60aa267))
+* resolve UserSetup form submission issues and improve UX ([c3821c8](https://github.com/thef4tdaddy/violet-vault/commit/c3821c8f27ae5474cb1afd36492c396c6240d630))
+* resolve UserSetup hanging issues with timeout protection ([0cbb7b7](https://github.com/thef4tdaddy/violet-vault/commit/0cbb7b765da4e2850a708cefc0f923db06bb7288))
+* sync bar missing ([d1dfe79](https://github.com/thef4tdaddy/violet-vault/commit/d1dfe798905ecb9279bc120e9b3188565f36552d))
+* use password-based budgetId generation for cross-device sync ([133b54a](https://github.com/thef4tdaddy/violet-vault/commit/133b54a216fade9f7b5ad99b112790a28a759105))
+
 ## [1.1.0](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.0.0...violet-vault-v1.1.0) (2025-07-24)
 
 
