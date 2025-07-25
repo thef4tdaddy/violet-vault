@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import {
-  Activity,
+  Activity as ActivityIcon,
   Users,
   Wifi,
   WifiOff,
@@ -272,7 +272,7 @@ const TeamActivitySync = ({
       default:
         changes.push({
           type: "modified",
-          icon: <Activity className="h-3 w-3 text-gray-600" />,
+          icon: <ActivityIcon className="h-3 w-3 text-gray-600" />,
           description: activity.action || "Updated data",
           value: null,
         });
