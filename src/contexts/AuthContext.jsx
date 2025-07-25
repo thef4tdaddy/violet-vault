@@ -54,23 +54,30 @@ export const AuthProvider = ({ children }) => {
   }, [isUnlocked]);
 
   const login = async (password, userData = null) => {
-    console.log("🔐 AuthContext login called:", { hasPassword: !!password, hasUserData: !!userData });
-    
+    console.log("🔐 AuthContext login called:", {
+      hasPassword: !!password,
+      hasUserData: !!userData,
+    });
+
     // Add timeout wrapper
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("Login timeout after 10 seconds")), 10000)
+      setTimeout(
+        () => reject(new Error("Login timeout after 10 seconds")),
+        10000
+      )
     );
-    
+
     const loginPromise = (async () => {
       try {
         if (userData) {
           console.log("🆕 New user setup path", userData);
           console.log("🔄 About to derive key...");
-          
+
           // New user setup
-          const { salt: newSalt, key } = await encryptionUtils.deriveKey(password);
+          const { salt: newSalt, key } =
+            await encryptionUtils.deriveKey(password);
           console.log("🔑 Generated key and salt");
-          
+
           console.log("🔄 Setting auth state...");
           setSalt(newSalt);
           setEncryptionKey(key);
@@ -81,93 +88,96 @@ export const AuthProvider = ({ children }) => {
           console.log("✅ New user auth state set");
           return { success: true };
         } else {
-        // Existing user login
-        const savedData = localStorage.getItem("envelopeBudgetData");
-        if (!savedData) {
-          return { success: false, error: "No saved data found" };
-        }
-
-        const { salt: savedSalt, encryptedData, iv } = JSON.parse(savedData);
-        const saltArray = new Uint8Array(savedSalt);
-        const key = await encryptionUtils.deriveKeyFromSalt(
-          password,
-          saltArray
-        );
-
-        const decryptedData = await encryptionUtils.decrypt(
-          encryptedData,
-          key,
-          iv
-        );
-
-        // Handle data migration for pre-refactor data
-        let migratedData = decryptedData;
-        let currentUserData = decryptedData.currentUser;
-
-        // If currentUser doesn't exist or doesn't have budgetId, create/migrate it
-        if (!currentUserData || !currentUserData.budgetId) {
-          console.log("🔄 Migrating pre-refactor data...");
-
-          // Generate budgetId from password for cross-device sync
-          const budgetId = encryptionUtils.generateBudgetId(password);
-
-          // Create or update currentUser
-          currentUserData = {
-            ...currentUserData,
-            budgetId,
-            userName: currentUserData?.userName || "Legacy User",
-            userColor: currentUserData?.userColor || "#a855f7",
-            id: currentUserData?.id || `user_${Date.now()}`,
-          };
-
-          // Update the data structure
-          migratedData = {
-            ...decryptedData,
-            currentUser: currentUserData,
-          };
-
-          // Save the migrated data back to localStorage
-          try {
-            const encrypted = await encryptionUtils.encrypt(migratedData, key);
-            localStorage.setItem(
-              "envelopeBudgetData",
-              JSON.stringify({
-                encryptedData: encrypted.data,
-                salt: Array.from(saltArray),
-                iv: encrypted.iv,
-              })
-            );
-            console.log("✅ Data migration completed and saved");
-          } catch (saveError) {
-            console.warn("⚠️ Failed to save migrated data:", saveError);
+          // Existing user login
+          const savedData = localStorage.getItem("envelopeBudgetData");
+          if (!savedData) {
+            return { success: false, error: "No saved data found" };
           }
+
+          const { salt: savedSalt, encryptedData, iv } = JSON.parse(savedData);
+          const saltArray = new Uint8Array(savedSalt);
+          const key = await encryptionUtils.deriveKeyFromSalt(
+            password,
+            saltArray
+          );
+
+          const decryptedData = await encryptionUtils.decrypt(
+            encryptedData,
+            key,
+            iv
+          );
+
+          // Handle data migration for pre-refactor data
+          let migratedData = decryptedData;
+          let currentUserData = decryptedData.currentUser;
+
+          // If currentUser doesn't exist or doesn't have budgetId, create/migrate it
+          if (!currentUserData || !currentUserData.budgetId) {
+            console.log("🔄 Migrating pre-refactor data...");
+
+            // Generate budgetId from password for cross-device sync
+            const budgetId = encryptionUtils.generateBudgetId(password);
+
+            // Create or update currentUser
+            currentUserData = {
+              ...currentUserData,
+              budgetId,
+              userName: currentUserData?.userName || "Legacy User",
+              userColor: currentUserData?.userColor || "#a855f7",
+              id: currentUserData?.id || `user_${Date.now()}`,
+            };
+
+            // Update the data structure
+            migratedData = {
+              ...decryptedData,
+              currentUser: currentUserData,
+            };
+
+            // Save the migrated data back to localStorage
+            try {
+              const encrypted = await encryptionUtils.encrypt(
+                migratedData,
+                key
+              );
+              localStorage.setItem(
+                "envelopeBudgetData",
+                JSON.stringify({
+                  encryptedData: encrypted.data,
+                  salt: Array.from(saltArray),
+                  iv: encrypted.iv,
+                })
+              );
+              console.log("✅ Data migration completed and saved");
+            } catch (saveError) {
+              console.warn("⚠️ Failed to save migrated data:", saveError);
+            }
+          }
+
+          console.log("🔑 AuthContext: Setting auth state after login", {
+            hasKey: !!key,
+            hasCurrentUser: !!currentUserData,
+            hasBudgetId: !!currentUserData.budgetId,
+            userName: currentUserData.userName,
+            budgetId: currentUserData.budgetId,
+          });
+
+          setSalt(saltArray);
+          setEncryptionKey(key);
+          setCurrentUser(currentUserData);
+          setBudgetId(currentUserData.budgetId);
+          setIsUnlocked(true);
+          setLastActivity(Date.now());
+
+          console.log("✅ AuthContext: Auth state set successfully");
+
+          return { success: true, data: migratedData };
         }
-
-        console.log("🔑 AuthContext: Setting auth state after login", {
-          hasKey: !!key,
-          hasCurrentUser: !!currentUserData,
-          hasBudgetId: !!currentUserData.budgetId,
-          userName: currentUserData.userName,
-          budgetId: currentUserData.budgetId,
-        });
-
-        setSalt(saltArray);
-        setEncryptionKey(key);
-        setCurrentUser(currentUserData);
-        setBudgetId(currentUserData.budgetId);
-        setIsUnlocked(true);
-        setLastActivity(Date.now());
-
-        console.log("✅ AuthContext: Auth state set successfully");
-
-        return { success: true, data: migratedData };
-      }
       } catch (error) {
         console.error("Login failed:", error);
         return { success: false, error: "Invalid password or corrupted data" };
       }
     })();
-    
+
     return Promise.race([loginPromise, timeoutPromise]);
   };
 
