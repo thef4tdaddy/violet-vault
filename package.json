@@ -6,14 +6,14 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint . --max-warnings 50",
-    "lint:fix": "eslint . --fix",
-    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,md}\"",
-    "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "lint": "eslint . --config ./configs/eslint.config.js --max-warnings 50",
+    "lint:fix": "eslint . --config ./configs/eslint.config.js --fix",
+    "format": "prettier --config ./configs/prettier.config.js --write \"src/**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "format:check": "prettier --config ./configs/prettier.config.js --check \"src/**/*.{js,jsx,ts,tsx,json,css,md}\"",
     "preview": "vite preview",
     "prepare": "husky",
     "commit": "git add . && git commit",
-    "check-commit": "commitlint --from HEAD~1 --to HEAD --verbose"
+    "check-commit": "commitlint --config ./configs/commitlint.config.cjs --from HEAD~1 --to HEAD --verbose"
   },
   "dependencies": {
     "@sentry/react": "^9.41.0",
