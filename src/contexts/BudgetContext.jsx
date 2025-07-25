@@ -142,7 +142,7 @@ const budgetReducer = (state, action) => {
         unassignedCash: action.payload.newUnassignedCash ?? state.unassignedCash,
       };
 
-    case actionTypes.LOAD_DATA:
+    case actionTypes.LOAD_DATA: {
       const validatedPayload = {
         ...action.payload,
         envelopes: Array.isArray(action.payload.envelopes) ? action.payload.envelopes : [],
@@ -160,6 +160,7 @@ const budgetReducer = (state, action) => {
           : [],
       };
       return { ...state, ...validatedPayload, dataLoaded: true };
+    }
 
     default:
       return state;

@@ -33,8 +33,7 @@ const SupplementalAccounts = lazy(() => import("../accounts/SupplementalAccounts
 const Layout = () => {
   console.log("🚀 Layout component is running");
 
-  const { isUnlocked, encryptionKey, currentUser, login, logout, updateUser, budgetId, salt } =
-    useAuth();
+  const { isUnlocked, encryptionKey, currentUser, login, logout, budgetId, salt } = useAuth();
 
   console.log("🔍 Layout: Auth hook values", {
     isUnlocked,
@@ -366,6 +365,7 @@ const Layout = () => {
           recentActivity={recentActivity}
           syncConflicts={syncConflicts}
           onResolveConflict={resolveConflict}
+          setSyncConflicts={setSyncConflicts}
         />
       </BudgetProvider>
     </>
@@ -374,8 +374,6 @@ const Layout = () => {
 
 const MainContent = ({
   currentUser,
-  encryptionKey,
-  budgetId,
   onUserChange,
   onExport,
   onActivityUpdate,
@@ -386,6 +384,7 @@ const MainContent = ({
   recentActivity,
   syncConflicts,
   onResolveConflict,
+  setSyncConflicts,
 }) => {
   const budget = useBudget();
   const [activeView, setActiveView] = useState("dashboard");
@@ -400,15 +399,9 @@ const MainContent = ({
 
   const {
     envelopes,
-    bills,
     savingsGoals,
-    supplementalAccounts,
     unassignedCash,
     biweeklyAllocation,
-    paycheckHistory,
-    actualBalance,
-    transactions,
-    allTransactions,
     isOnline,
     isSyncing,
     lastSyncTime,
