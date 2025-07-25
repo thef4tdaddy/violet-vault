@@ -29,6 +29,17 @@ const useEnvelopeSystem = () => {
 
     let totalBiweeklyNeed = 0;
 
+    // Calculate total first
+    bills.forEach((bill) => {
+      const multiplier = frequencyMultipliers[bill.frequency] || 12;
+      const annualAmount = bill.amount * multiplier;
+      const biweeklyAmount = annualAmount / 26;
+      totalBiweeklyNeed += biweeklyAmount;
+    });
+
+    // Set the allocation outside of setEnvelopes
+    setBiweeklyAllocation(totalBiweeklyNeed);
+
     setEnvelopes((currentEnvelopes) => {
       const updatedEnvelopes = [...currentEnvelopes];
 
@@ -36,7 +47,6 @@ const useEnvelopeSystem = () => {
         const multiplier = frequencyMultipliers[bill.frequency] || 12;
         const annualAmount = bill.amount * multiplier;
         const biweeklyAmount = annualAmount / 26;
-        totalBiweeklyNeed += biweeklyAmount;
 
         // Find or create envelope for this bill
         let envelope = updatedEnvelopes.find(
@@ -65,7 +75,6 @@ const useEnvelopeSystem = () => {
         }
       });
 
-      setBiweeklyAllocation(totalBiweeklyNeed);
       return updatedEnvelopes;
     });
   }, [bills, setEnvelopes, setBiweeklyAllocation]);
