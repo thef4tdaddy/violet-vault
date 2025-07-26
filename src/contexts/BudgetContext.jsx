@@ -238,6 +238,51 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
     loadInitialData();
   }, [encryptionKey, currentUser, budgetId, firebaseSync]);
 
+  // Setup real-time sync and event listeners when initialized
+  useEffect(() => {
+    if (encryptionKey && currentUser && budgetId) {
+      const handleRealtimeUpdate = ({ data, metadata }) => {
+        if (data) {
+          dispatch({ type: actionTypes.LOAD_DATA, payload: data });
+        }
+        if (metadata?.lastUpdated) {
+          const lastUpdatedDate = metadata.lastUpdated.toDate?.() || new Date(metadata.lastUpdated);
+          setLastSyncTime(lastUpdatedDate);
+        }
+      };
+
+      const handleSyncEvent = (event) => {
+        if (event.type === "sync_start") {
+          setIsSyncing(true);
+        } else if (event.type === "sync_success") {
+          setIsSyncing(false);
+          if (event.lastUpdated) {
+            const last = event.lastUpdated.toDate?.() || new Date(event.lastUpdated);
+            setLastSyncTime(last);
+          }
+        } else if (event.type === "sync_error") {
+          setIsSyncing(false);
+          setSyncError(event.error);
+        }
+      };
+
+      const handleError = (error) => {
+        setSyncError(error.error || error.message);
+        setIsSyncing(false);
+      };
+
+      firebaseSync.setupRealtimeSync(handleRealtimeUpdate);
+      firebaseSync.addSyncListener(handleSyncEvent);
+      firebaseSync.addErrorListener(handleError);
+
+      return () => {
+        firebaseSync.stopRealtimeSync();
+        firebaseSync.removeSyncListener(handleSyncEvent);
+        firebaseSync.removeErrorListener(handleError);
+      };
+    }
+  }, [encryptionKey, currentUser, budgetId, firebaseSync]);
+
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
