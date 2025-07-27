@@ -1,8 +1,23 @@
 // components/BillManager.jsx
 import React, { useState } from "react";
-import { Plus, Edit3, Trash2, Calendar, DollarSign, Clock, Save, X } from "lucide-react";
+import {
+  Plus,
+  Edit3,
+  Trash2,
+  Calendar,
+  DollarSign,
+  Clock,
+  Save,
+  X,
+} from "lucide-react";
 
-const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill, onAddEnvelope }) => {
+const BillManager = ({
+  bills,
+  onAddBill,
+  onUpdateBill,
+  onDeleteBill,
+  onAddEnvelope,
+}) => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingBill, setEditingBill] = useState(null);
   const [formData, setFormData] = useState({
@@ -58,7 +73,8 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill, onAddEnvelo
     const yearlyAmount =
       frequency === "custom"
         ? amount * customFrequency
-        : amount * frequencies.find((f) => f.value === frequency)?.multiplier || 12;
+        : amount * frequencies.find((f) => f.value === frequency)?.multiplier ||
+          12;
 
     return yearlyAmount / 26; // 26 biweekly periods per year
   };
@@ -67,7 +83,8 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill, onAddEnvelo
     const yearlyAmount =
       frequency === "custom"
         ? amount * customFrequency
-        : amount * frequencies.find((f) => f.value === frequency)?.multiplier || 12;
+        : amount * frequencies.find((f) => f.value === frequency)?.multiplier ||
+          12;
 
     return yearlyAmount / 12; // 12 months per year
   };
@@ -138,9 +155,19 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill, onAddEnvelo
         : `bill_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       amount,
       customFrequency:
-        formData.frequency === "custom" ? parseFloat(formData.customFrequency) || 1 : undefined,
-      biweeklyAmount: calculateBiweeklyAmount(amount, formData.frequency, formData.customFrequency),
-      monthlyAmount: calculateMonthlyAmount(amount, formData.frequency, formData.customFrequency),
+        formData.frequency === "custom"
+          ? parseFloat(formData.customFrequency) || 1
+          : undefined,
+      biweeklyAmount: calculateBiweeklyAmount(
+        amount,
+        formData.frequency,
+        formData.customFrequency
+      ),
+      monthlyAmount: calculateMonthlyAmount(
+        amount,
+        formData.frequency,
+        formData.customFrequency
+      ),
       nextDueDate: getNextDueDate(formData.frequency, formData.dueDate),
     };
 
@@ -197,7 +224,9 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill, onAddEnvelo
 
   const handleDelete = (bill) => {
     if (
-      confirm(`Are you sure you want to delete "${bill.name}"? This will also remove its envelope.`)
+      confirm(
+        `Are you sure you want to delete "${bill.name}"? This will also remove its envelope.`
+      )
     ) {
       onDeleteBill(bill.id);
     }
@@ -207,7 +236,10 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill, onAddEnvelo
     if (bill.frequency === "custom") {
       return `${bill.customFrequency}x per year`;
     }
-    return frequencies.find((f) => f.value === bill.frequency)?.label || bill.frequency;
+    return (
+      frequencies.find((f) => f.value === bill.frequency)?.label ||
+      bill.frequency
+    );
   };
 
   const getDaysUntilDue = (dueDate) => {
@@ -220,9 +252,12 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill, onAddEnvelo
 
     if (diffDays < 0) return { text: "Overdue", color: "text-red-600" };
     if (diffDays === 0) return { text: "Due Today", color: "text-red-600" };
-    if (diffDays === 1) return { text: "Due Tomorrow", color: "text-orange-600" };
-    if (diffDays <= 7) return { text: `${diffDays} days`, color: "text-orange-600" };
-    if (diffDays <= 30) return { text: `${diffDays} days`, color: "text-blue-600" };
+    if (diffDays === 1)
+      return { text: "Due Tomorrow", color: "text-orange-600" };
+    if (diffDays <= 7)
+      return { text: `${diffDays} days`, color: "text-orange-600" };
+    if (diffDays <= 30)
+      return { text: `${diffDays} days`, color: "text-blue-600" };
 
     return {
       text: `${Math.floor(diffDays / 30)} months`,
@@ -264,7 +299,10 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill, onAddEnvelo
               const dueInfo = getDaysUntilDue(bill.dueDate);
 
               return (
-                <div key={bill.id || `bill-${index}`} className="p-6 hover:bg-gray-50">
+                <div
+                  key={bill.id || `bill-${index}`}
+                  className="p-6 hover:bg-gray-50"
+                >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
                       <div
@@ -273,28 +311,36 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill, onAddEnvelo
                       />
                       <div className="flex-1">
                         <div className="flex items-center space-x-3">
-                          <h3 className="text-lg font-semibold text-gray-900">{bill.name}</h3>
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            {bill.name}
+                          </h3>
                           <span className="text-sm px-2 py-1 bg-gray-100 rounded-full text-gray-600">
                             {bill.category}
                           </span>
                         </div>
                         <div className="flex items-center space-x-6 mt-2 text-sm text-gray-600">
                           <div className="flex items-center">
-                            <DollarSign className="h-4 w-4 mr-1" />${bill.amount.toFixed(2)}{" "}
-                            {getFrequencyLabel(bill)}
+                            <DollarSign className="h-4 w-4 mr-1" />$
+                            {bill.amount.toFixed(2)} {getFrequencyLabel(bill)}
                           </div>
                           <div className="flex items-center">
-                            <Clock className="h-4 w-4 mr-1" />${bill.biweeklyAmount.toFixed(2)}{" "}
-                            biweekly
+                            <Clock className="h-4 w-4 mr-1" />$
+                            {bill.biweeklyAmount.toFixed(2)} biweekly
                           </div>
                           {dueInfo && (
-                            <div className={`flex items-center ${dueInfo.color}`}>
+                            <div
+                              className={`flex items-center ${dueInfo.color}`}
+                            >
                               <Calendar className="h-4 w-4 mr-1" />
                               {dueInfo.text}
                             </div>
                           )}
                         </div>
-                        {bill.notes && <p className="text-sm text-gray-500 mt-1">{bill.notes}</p>}
+                        {bill.notes && (
+                          <p className="text-sm text-gray-500 mt-1">
+                            {bill.notes}
+                          </p>
+                        )}
                       </div>
                     </div>
 
@@ -349,7 +395,9 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill, onAddEnvelo
                   <input
                     type="text"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     placeholder="e.g., Car Insurance, Netflix, Property Tax"
                     required
@@ -357,12 +405,16 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill, onAddEnvelo
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Amount *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Amount *
+                  </label>
                   <input
                     type="number"
                     step="0.01"
                     value={formData.amount}
-                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, amount: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     placeholder="0.00"
                     required
@@ -375,7 +427,9 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill, onAddEnvelo
                   </label>
                   <select
                     value={formData.frequency}
-                    onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, frequency: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   >
                     {frequencies.map((freq) => (
@@ -415,16 +469,22 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill, onAddEnvelo
                   <input
                     type="date"
                     value={formData.dueDate}
-                    onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, dueDate: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Category
+                  </label>
                   <select
                     value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, category: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   >
                     {categories.map((category) => (
@@ -436,7 +496,9 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill, onAddEnvelo
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Color
+                  </label>
                   <div className="flex gap-2 flex-wrap">
                     {colors.map((color) => (
                       <button
@@ -460,7 +522,9 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill, onAddEnvelo
                   </label>
                   <textarea
                     value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, notes: e.target.value })
+                    }
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     placeholder="Any additional notes about this bill..."
@@ -469,7 +533,7 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill, onAddEnvelo
 
                 {!editingBill && (
                   <div className="md:col-span-2">
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-start space-x-3">
                       <input
                         id="create-envelope-checkbox"
                         type="checkbox"
@@ -480,14 +544,18 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill, onAddEnvelo
                             createEnvelope: e.target.checked,
                           })
                         }
-                        className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded flex-shrink-0"
+                        className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded mt-1 flex-shrink-0"
                       />
-                      <label htmlFor="create-envelope-checkbox" className="flex-1">
+                      <label
+                        htmlFor="create-envelope-checkbox"
+                        className="flex-1"
+                      >
                         <span className="text-sm font-medium text-gray-700 block">
                           Create associated envelope for budgeting
                         </span>
                         <p className="text-xs text-gray-500 mt-1">
-                          This will create an envelope to help you save for this bill
+                          This will create an envelope to help you save for this
+                          bill
                         </p>
                       </label>
                     </div>
@@ -498,7 +566,9 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill, onAddEnvelo
               {/* Preview */}
               {formData.amount && (
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-medium text-gray-900 mb-2">Savings Preview:</h4>
+                  <h4 className="font-medium text-gray-900 mb-2">
+                    Savings Preview:
+                  </h4>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <span className="text-gray-600">Monthly equivalent:</span>
