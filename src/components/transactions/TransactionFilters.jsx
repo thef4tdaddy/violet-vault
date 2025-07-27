@@ -20,7 +20,9 @@ const TransactionFilters = ({
     <div className="glassmorphism rounded-xl p-6 border border-white/20">
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Search
+          </label>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
@@ -34,7 +36,9 @@ const TransactionFilters = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Date Filter</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Date Filter
+          </label>
           <select
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
@@ -48,7 +52,9 @@ const TransactionFilters = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Type
+          </label>
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
@@ -61,7 +67,9 @@ const TransactionFilters = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Envelope</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Envelope
+          </label>
           <select
             value={envelopeFilter}
             onChange={(e) => setEnvelopeFilter(e.target.value)}
@@ -78,7 +86,9 @@ const TransactionFilters = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Sort By
+          </label>
           <div className="flex gap-2">
             <select
               value={sortBy}

@@ -68,7 +68,9 @@ const setupConsoleCapture = () => {
     // Send to Sentry as breadcrumb
     Sentry.addBreadcrumb({
       message: args
-        .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
+        .map((arg) =>
+          typeof arg === "object" ? JSON.stringify(arg) : String(arg),
+        )
         .join(" "),
       level: "info",
       category: "console",
@@ -88,7 +90,9 @@ const setupConsoleCapture = () => {
     // Send warnings as breadcrumbs
     Sentry.addBreadcrumb({
       message: args
-        .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
+        .map((arg) =>
+          typeof arg === "object" ? JSON.stringify(arg) : String(arg),
+        )
         .join(" "),
       level: "warning",
       category: "console",
