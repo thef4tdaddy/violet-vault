@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { parseCSV, parseOFX, autoDetectFieldMapping } from "../utils/fileParser";
+import {
+  parseCSV,
+  parseOFX,
+  autoDetectFieldMapping,
+} from "../utils/fileParser";
 
 export const useTransactionImport = (currentUser, onBulkImport) => {
   const [importData, setImportData] = useState([]);
@@ -39,7 +43,11 @@ export const useTransactionImport = (currentUser, onBulkImport) => {
   };
 
   const handleImport = async () => {
-    if (!fieldMapping.date || !fieldMapping.description || !fieldMapping.amount) {
+    if (
+      !fieldMapping.date ||
+      !fieldMapping.description ||
+      !fieldMapping.amount
+    ) {
       alert("Please map at least Date, Description, and Amount fields");
       return;
     }
@@ -54,9 +62,12 @@ export const useTransactionImport = (currentUser, onBulkImport) => {
       try {
         const transaction = {
           id: Date.now() + i,
-          date: row[fieldMapping.date] || new Date().toISOString().split("T")[0],
+          date:
+            row[fieldMapping.date] || new Date().toISOString().split("T")[0],
           description: row[fieldMapping.description] || "Imported Transaction",
-          amount: parseFloat(row[fieldMapping.amount]?.replace(/[$,]/g, "") || "0"),
+          amount: parseFloat(
+            row[fieldMapping.amount]?.replace(/[$,]/g, "") || "0",
+          ),
           category: row[fieldMapping.category] || "Other",
           notes: row[fieldMapping.notes] || "",
           envelopeId: "",
@@ -78,7 +89,9 @@ export const useTransactionImport = (currentUser, onBulkImport) => {
 
     onBulkImport(processedTransactions);
     resetImport();
-    alert(`Successfully imported ${processedTransactions.length} transactions!`);
+    alert(
+      `Successfully imported ${processedTransactions.length} transactions!`,
+    );
   };
 
   const resetImport = () => {
