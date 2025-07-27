@@ -35,6 +35,8 @@
 - **Cash Flow Summary** - Overview of your financial health
 - **Smart Bill Matching** - Automatically categorize transactions
 - **Spending Analysis** - Detailed breakdowns by category and time period
+- **Smart Envelope Suggestions** - AI-powered recommendations based on spending patterns
+- **Transaction Splitting** - Split complex transactions across multiple envelopes
 
 ### ⚡ Technical Features
 
@@ -115,14 +117,28 @@ npm run format:check # Check code formatting
 ```
 src/
 ├── components/              # React components
-│   ├── Dashboard.jsx           # Main dashboard view
-│   ├── EnvelopeSystem.jsx      # Envelope management
-│   ├── BillManager.jsx         # Bill tracking
-│   ├── PaycheckProcessor.jsx   # Paycheck allocation
-│   ├── SavingsGoals.jsx        # Savings goal tracking
-│   ├── TransactionLedger.jsx   # Transaction history
-│   ├── ChartsAndAnalytics.jsx  # Financial analytics
-│   └── TeamActivitySync.jsx    # Collaboration features
+│   ├── analytics/              # Analytics & insights
+│   │   ├── ChartsAndAnalytics.jsx  # Financial analytics dashboard
+│   │   └── SmartCategoryManager.jsx # AI category optimization
+│   ├── budgeting/              # Budget management
+│   │   ├── CreateEnvelopeModal.jsx  # Advanced envelope creation
+│   │   ├── EnvelopeGrid.jsx         # Envelope visualization
+│   │   ├── PaycheckProcessor.jsx    # Paycheck allocation
+│   │   └── SmartEnvelopeSuggestions.jsx # AI envelope recommendations
+│   ├── bills/                  # Bill management
+│   │   └── BillManager.jsx         # Bill tracking & automation
+│   ├── layout/                 # Core layout components
+│   │   ├── Dashboard.jsx           # Main dashboard view
+│   │   └── Layout.jsx              # Application shell
+│   ├── savings/                # Savings management
+│   │   └── SavingsGoals.jsx        # Goal tracking & progress
+│   ├── sync/                   # Collaboration features
+│   │   └── TeamActivitySync.jsx    # Real-time collaboration
+│   └── transactions/           # Transaction management
+│       ├── TransactionLedger.jsx   # Transaction history
+│       ├── TransactionSplitter.jsx # Split transaction tool
+│       └── import/             # Import utilities
+│           └── AmazonReceiptParser.jsx # Email receipt parsing
 ├── contexts/               # React Context providers
 │   ├── AuthContext.jsx        # Authentication & encryption
 │   └── BudgetContext.jsx      # Budget data management
@@ -141,6 +157,10 @@ VioletVault takes your financial privacy seriously:
 - **Password-Based Encryption**: Uses PBKDF2 with 100,000 iterations for key derivation
 - **No Server-Side Decryption**: Your master password never leaves your device
 - **Device Fingerprinting**: Additional protection against unauthorized access
+
+## 🗺️ Roadmap
+
+Check out our [Roadmap](ROADMAP.md) to see what's coming next and how you can help shape VioletVault's future!
 
 ## 🤝 Contributing
 
