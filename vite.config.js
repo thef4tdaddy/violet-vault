@@ -21,15 +21,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: [
-            "react",
-            "react-dom",
-            "recharts",
-            "lucide-react",
-            "firebase/app",
-            "firebase/firestore",
-            "firebase/auth",
-          ],
+          vendor: ["react", "react-dom", "recharts", "lucide-react"],
         },
       },
     },
@@ -38,7 +30,7 @@ export default defineConfig({
     minify: "esbuild",
   },
   esbuild: {
-    // In production, drop console logs and debuggers
-    drop: process.env.NODE_ENV === "production" ? ["console", "debugger"] : [],
+    // In production, you'll want to drop console logs and debuggers
+    // drop: ["console", "debugger"],
   },
 });
