@@ -453,7 +453,7 @@ const MainContent = ({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden">
-      <div className="max-w-7xl mx-auto relative z-10">
+      <div className="max-w-7xl mx-auto relative z-50">
         <Header
           currentUser={currentUser}
           onUserChange={onUserChange}
