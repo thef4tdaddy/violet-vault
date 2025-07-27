@@ -193,6 +193,7 @@ const TeamActivitySync = ({
     }
   }, [recentActivity]);
 
+  // eslint-disable-next-line no-unused-vars
   const generateChangeDescription = (activity) => {
     const changes = [];
 
@@ -297,6 +298,7 @@ const TeamActivitySync = ({
     return changes;
   };
 
+  // eslint-disable-next-line no-unused-vars
   const generateCommitId = (activity) => {
     try {
       // Generate a short hash-like ID from timestamp and user
