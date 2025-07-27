@@ -67,7 +67,7 @@ const Header = memo(
                 Export
               </button>
 
-              <div className="relative reset-menu-container">
+              <div className="relative reset-menu-container" style={{ zIndex: 50 }}>
                 <button
                   onClick={handleToggleResetMenu}
                   className="btn text-amber-600 bg-amber-50 border border-amber-200 hover:bg-amber-100 flex items-center rounded-xl"
@@ -84,7 +84,7 @@ const Header = memo(
                       top: "100%",
                       marginTop: "0.5rem",
                       width: "256px",
-                      zIndex: 9999,
+                      zIndex: 99999,
                       borderColor: "rgba(255, 255, 255, 0.2)",
                     }}
                   >
