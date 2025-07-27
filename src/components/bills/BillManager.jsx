@@ -153,16 +153,19 @@ const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill, onAddEnvelo
       // Create envelope if requested
       if (formData.createEnvelope && onAddEnvelope) {
         const envelopeData = {
-          id: `envelope_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          id: `bill_${billData.id}`,
           name: formData.name,
-          targetAmount: billData.biweeklyAmount,
+          biweeklyAllocation: billData.biweeklyAmount,
           currentBalance: 0,
           category: formData.category,
           color: formData.color,
           priority: "medium",
           dueDate: formData.dueDate,
-          billId: billData.id,
+          linkedBillId: billData.id,
           notes: `Auto-created for ${formData.name} bill`,
+          targetAmount: billData.biweeklyAmount * 2,
+          spendingHistory: [],
+          isFromBill: true,
         };
         onAddEnvelope(envelopeData);
       }
