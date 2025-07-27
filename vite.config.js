@@ -17,16 +17,19 @@ export default defineConfig({
     "process.env": {},
     global: {},
   },
-  optimizeDeps: {
-    include: ["firebase/app", "firebase/firestore", "recharts"],
-  },
   build: {
     rollupOptions: {
       output: {
         manualChunks: {
-          react: ["react", "react-dom"],
-          charts: ["recharts"],
-          icons: ["lucide-react"],
+          vendor: [
+            "react",
+            "react-dom",
+            "recharts",
+            "lucide-react",
+            "firebase/app",
+            "firebase/firestore",
+            "firebase/auth",
+          ],
         },
       },
     },
@@ -35,7 +38,7 @@ export default defineConfig({
     minify: "esbuild",
   },
   esbuild: {
-    // Temporarily enable console logs in production for debugging
-    // drop: ["console", "debugger"],
+    // In production, drop console logs and debuggers
+    drop: process.env.NODE_ENV === "production" ? ["console", "debugger"] : [],
   },
 });
