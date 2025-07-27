@@ -245,7 +245,7 @@ const useEnvelopeSystem = () => {
       lastBillsRef.current = billsStr;
       calculateBiweeklyNeeds();
     }
-  }, [bills]);
+  }, [bills, calculateBiweeklyNeeds]);
 
   // Calculate total envelope balance
   const totalEnvelopeBalance = useMemo(() => {

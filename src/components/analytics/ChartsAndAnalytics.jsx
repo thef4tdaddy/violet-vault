@@ -74,7 +74,7 @@ const ChartsAnalytics = ({
       if (!t || !isValidDate(t.date)) return false;
       try {
         return new Date(t.date) >= getDateRange;
-      } catch (error) {
+      } catch {
         console.warn("Invalid date in transaction:", t.date);
         return false;
       }
@@ -116,7 +116,7 @@ const ChartsAnalytics = ({
 
         grouped[monthKey].net = grouped[monthKey].income - grouped[monthKey].expenses;
         grouped[monthKey].transactionCount++;
-      } catch (error) {
+      } catch {
         console.warn("Error processing transaction in monthlyTrends:", transaction);
         return;
       }
