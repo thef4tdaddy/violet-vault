@@ -109,9 +109,7 @@ const budgetReducer = (state, action) => {
       return {
         ...state,
         bills: state.bills.map((bill) =>
-          bill.id === action.payload.id
-            ? { ...bill, ...action.payload.data }
-            : bill,
+          bill.id === action.payload.id ? action.payload : bill,
         ),
       };
     case actionTypes.DELETE_BILL:
@@ -393,8 +391,8 @@ export const BudgetProvider = ({
         dispatch({ type: actionTypes.DELETE_ENVELOPE, payload: id }),
       addBill: (bill) =>
         dispatch({ type: actionTypes.ADD_BILL, payload: bill }),
-      updateBill: (id, data) =>
-        dispatch({ type: actionTypes.UPDATE_BILL, payload: { id, data } }),
+      updateBill: (bill) =>
+        dispatch({ type: actionTypes.UPDATE_BILL, payload: bill }),
       deleteBill: (id) =>
         dispatch({ type: actionTypes.DELETE_BILL, payload: id }),
       addSavingsGoal: (goal) =>
