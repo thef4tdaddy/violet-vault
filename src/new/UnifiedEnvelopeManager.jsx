@@ -102,8 +102,13 @@ const UnifiedEnvelopeManager = ({
       );
 
       const allocated = envelope.budget || 0;
+      const currentBalance = envelope.currentBalance || 0;
       const committed = totalUpcoming + totalOverdue;
-      const available = allocated - totalSpent - committed;
+
+      // Use actual current balance instead of budget allocation for availability
+      const available = currentBalance - committed;
+
+      // Calculate utilization rate based on budget vs actual spending
       const utilizationRate =
         allocated > 0 ? (totalSpent + committed) / allocated : 0;
 
@@ -120,6 +125,7 @@ const UnifiedEnvelopeManager = ({
         totalOverdue,
         available,
         allocated,
+        currentBalance,
         committed,
         utilizationRate,
         status,
@@ -200,11 +206,20 @@ const UnifiedEnvelopeManager = ({
     return envelopeData.reduce(
       (acc, env) => ({
         allocated: acc.allocated + env.allocated,
+        currentBalance: acc.currentBalance + env.currentBalance,
         spent: acc.spent + env.totalSpent,
         upcoming: acc.upcoming + env.totalUpcoming,
         overdue: acc.overdue + env.totalOverdue,
+        available: acc.available + env.available,
       }),
-      { allocated: 0, spent: 0, upcoming: 0, overdue: 0 },
+      {
+        allocated: 0,
+        currentBalance: 0,
+        spent: 0,
+        upcoming: 0,
+        overdue: 0,
+        available: 0,
+      },
     );
   }, [envelopeData]);
 
@@ -262,16 +277,28 @@ const UnifiedEnvelopeManager = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
         <div className="bg-white/60 backdrop-blur-sm p-4 rounded-lg border border-white/20">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Total Allocated</p>
+              <p className="text-sm text-gray-600">Budget Allocated</p>
               <p className="text-2xl font-bold text-gray-900">
                 ${totals.allocated.toFixed(2)}
               </p>
             </div>
-            <Wallet className="h-8 w-8 text-gray-400" />
+            <Target className="h-8 w-8 text-gray-400" />
+          </div>
+        </div>
+
+        <div className="bg-white/60 backdrop-blur-sm p-4 rounded-lg border border-white/20">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Current Balance</p>
+              <p className="text-2xl font-bold text-blue-600">
+                ${totals.currentBalance.toFixed(2)}
+              </p>
+            </div>
+            <Wallet className="h-8 w-8 text-blue-400" />
           </div>
         </div>
 
@@ -330,6 +357,20 @@ const UnifiedEnvelopeManager = ({
               </p>
             </div>
             <AlertTriangle className="h-8 w-8 text-red-400" />
+          </div>
+        </div>
+
+        <div className="bg-white/60 backdrop-blur-sm p-4 rounded-lg border border-white/20">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Available After Bills</p>
+              <p
+                className={`text-2xl font-bold ${totals.available >= 0 ? "text-green-600" : "text-red-600"}`}
+              >
+                ${totals.available.toFixed(2)}
+              </p>
+            </div>
+            <CheckCircle className="h-8 w-8 text-green-400" />
           </div>
         </div>
       </div>
@@ -446,9 +487,15 @@ const UnifiedEnvelopeManager = ({
 
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Allocated:</span>
+                <span className="text-sm text-gray-600">Budget Allocated:</span>
                 <span className="text-sm font-medium">
                   ${envelope.allocated.toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">Current Balance:</span>
+                <span className="text-sm font-medium text-blue-600">
+                  ${envelope.currentBalance.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -475,7 +522,7 @@ const UnifiedEnvelopeManager = ({
               )}
               <div className="flex justify-between pt-2 border-t border-gray-200">
                 <span className="text-sm font-medium text-gray-900">
-                  Available:
+                  Available After Bills:
                 </span>
                 <span
                   className={`text-sm font-bold ${
