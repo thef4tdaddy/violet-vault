@@ -2,17 +2,39 @@
 import React, { useState } from "react";
 import { X, Save } from "lucide-react";
 
-const AddBillModal = ({ isOpen, onClose, onAddBill, onAddEnvelope }) => {
-  const [formData, setFormData] = useState({
-    name: "",
-    amount: "",
-    frequency: "monthly",
-    dueDate: "",
-    category: "Bills",
-    color: "#3B82F6",
-    notes: "",
-    createEnvelope: true,
-    customFrequency: "",
+const AddBillModal = ({ 
+  isOpen, 
+  onClose, 
+  onAddBill, 
+  onAddEnvelope, 
+  editingBill = null,
+  onUpdateBill 
+}) => {
+  const [formData, setFormData] = useState(() => {
+    if (editingBill) {
+      return {
+        name: editingBill.name || editingBill.provider || "",
+        amount: editingBill.amount || "",
+        frequency: editingBill.frequency || "monthly",
+        dueDate: editingBill.dueDate || "",
+        category: editingBill.category || "Bills",
+        color: editingBill.color || "#3B82F6",
+        notes: editingBill.notes || "",
+        createEnvelope: false, // Don't show checkbox for editing
+        customFrequency: editingBill.customFrequency || "",
+      };
+    }
+    return {
+      name: "",
+      amount: "",
+      frequency: "monthly",
+      dueDate: "",
+      category: "Bills",
+      color: "#3B82F6",
+      notes: "",
+      createEnvelope: true,
+      customFrequency: "",
+    };
   });
 
   const frequencies = [
@@ -107,17 +129,31 @@ const AddBillModal = ({ isOpen, onClose, onAddBill, onAddEnvelope }) => {
   };
 
   const resetForm = () => {
-    setFormData({
-      name: "",
-      amount: "",
-      frequency: "monthly",
-      dueDate: "",
-      category: "Bills",
-      color: "#3B82F6",
-      notes: "",
-      createEnvelope: true,
-      customFrequency: "",
-    });
+    if (editingBill) {
+      setFormData({
+        name: editingBill.name || editingBill.provider || "",
+        amount: editingBill.amount || "",
+        frequency: editingBill.frequency || "monthly",
+        dueDate: editingBill.dueDate || "",
+        category: editingBill.category || "Bills",
+        color: editingBill.color || "#3B82F6",
+        notes: editingBill.notes || "",
+        createEnvelope: false,
+        customFrequency: editingBill.customFrequency || "",
+      });
+    } else {
+      setFormData({
+        name: "",
+        amount: "",
+        frequency: "monthly",
+        dueDate: "",
+        category: "Bills",
+        color: "#3B82F6",
+        notes: "",
+        createEnvelope: true,
+        customFrequency: "",
+      });
+    }
   };
 
   const handleSubmit = (e) => {
@@ -129,7 +165,7 @@ const AddBillModal = ({ isOpen, onClose, onAddBill, onAddEnvelope }) => {
     const amount = parseFloat(formData.amount);
 
     const billData = {
-      id: `bill_${Date.now()}`,
+      id: editingBill ? editingBill.id : `bill_${Date.now()}`,
       name: formData.name.trim(),
       amount,
       frequency: formData.frequency,
@@ -143,19 +179,27 @@ const AddBillModal = ({ isOpen, onClose, onAddBill, onAddEnvelope }) => {
       monthlyAmount: calculateMonthlyAmount(amount, formData.frequency, formData.customFrequency),
       nextDueDate: getNextDueDate(formData.frequency, formData.dueDate),
       // For unified system compatibility
-      type: "recurring_bill",
-      isPaid: false,
-      source: "manual",
+      type: editingBill ? editingBill.type : "recurring_bill",
+      isPaid: editingBill ? editingBill.isPaid : false,
+      source: editingBill ? editingBill.source : "manual",
       provider: formData.name.trim(),
       description: formData.name.trim(),
-      createdAt: new Date().toISOString(),
+      createdAt: editingBill ? editingBill.createdAt : new Date().toISOString(),
       date: formData.dueDate || new Date().toISOString().split("T")[0],
+      // Preserve any other properties from the original bill
+      ...(editingBill && {
+        lastUpdated: new Date().toISOString(),
+      }),
     };
 
-    onAddBill?.(billData);
+    if (editingBill) {
+      onUpdateBill?.(billData);
+    } else {
+      onAddBill?.(billData);
+    }
 
-    // Create associated envelope if requested
-    if (formData.createEnvelope && onAddEnvelope) {
+    // Create associated envelope if requested (only for new bills)
+    if (!editingBill && formData.createEnvelope && onAddEnvelope) {
       const envelopeData = {
         id: `envelope_${Date.now()}`,
         name: formData.name.trim(),
@@ -181,7 +225,7 @@ const AddBillModal = ({ isOpen, onClose, onAddBill, onAddEnvelope }) => {
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="glassmorphism rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-white/30 shadow-2xl">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-semibold">Add New Bill</h3>
+          <h3 className="text-xl font-semibold">{editingBill ? "Edit Bill" : "Add New Bill"}</h3>
           <button onClick={cancelEdit} className="text-gray-400 hover:text-gray-600">
             <X className="h-6 w-6" />
           </button>
@@ -310,30 +354,32 @@ const AddBillModal = ({ isOpen, onClose, onAddBill, onAddEnvelope }) => {
               />
             </div>
 
-            <div className="md:col-span-2">
-              <div className="flex items-start space-x-3">
-                <input
-                  id="create-envelope-checkbox"
-                  type="checkbox"
-                  checked={formData.createEnvelope}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      createEnvelope: e.target.checked,
-                    })
-                  }
-                  className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded mt-1 flex-shrink-0"
-                />
-                <label htmlFor="create-envelope-checkbox" className="flex-1">
-                  <span className="text-sm font-medium text-gray-700 block">
-                    Create associated envelope for budgeting
-                  </span>
-                  <p className="text-xs text-gray-500 mt-1">
-                    This will create an envelope to help you save for this bill
-                  </p>
-                </label>
+            {!editingBill && (
+              <div className="md:col-span-2">
+                <div className="flex items-start space-x-3">
+                  <input
+                    id="create-envelope-checkbox"
+                    type="checkbox"
+                    checked={formData.createEnvelope}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        createEnvelope: e.target.checked,
+                      })
+                    }
+                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded mt-1 flex-shrink-0"
+                  />
+                  <label htmlFor="create-envelope-checkbox" className="flex-1">
+                    <span className="text-sm font-medium text-gray-700 block">
+                      Create associated envelope for budgeting
+                    </span>
+                    <p className="text-xs text-gray-500 mt-1">
+                      This will create an envelope to help you save for this bill
+                    </p>
+                  </label>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Preview */}
@@ -380,7 +426,7 @@ const AddBillModal = ({ isOpen, onClose, onAddBill, onAddEnvelope }) => {
               className="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold px-4 py-2 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-purple-400/30 w-auto"
             >
               <Save className="h-4 w-4 mr-2" />
-              Add Bill
+              {editingBill ? "Update Bill" : "Add Bill"}
             </button>
           </div>
         </form>
