@@ -1,5 +1,12 @@
 // src/components/layout/Layout.jsx
-import React, { useState, useEffect, useCallback, Suspense, lazy } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  Suspense,
+  lazy,
+} from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { BudgetProvider, useBudget } from "../../contexts/BudgetContext";
 import UserSetup from "../auth/UserSetup";
@@ -8,6 +15,7 @@ import TeamActivitySync from "../sync/TeamActivitySync";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import useEnvelopeSystem from "../budgeting/EnvelopeSystem";
 import { encryptionUtils } from "../../utils/encryption";
+import FirebaseSync from "../../utils/firebaseSync";
 import logger from "../../utils/logger";
 import {
   DollarSign,
@@ -36,6 +44,8 @@ const Layout = () => {
   logger.debug("Layout component is running");
 
   const { isUnlocked, encryptionKey, currentUser, login, logout, budgetId, salt } = useAuth();
+
+  const firebaseSync = useMemo(() => new FirebaseSync(), []);
 
   logger.auth("Auth hook values", {
     isUnlocked,
@@ -319,7 +329,26 @@ const Layout = () => {
       confirm("This will permanently delete all your budget data and cannot be undone. Continue?")
     ) {
       try {
+        // Clear all localStorage data
         localStorage.removeItem("envelopeBudgetData");
+
+        // Clear any backup data that might exist
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.includes("envelopeBudgetData")) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach((key) => localStorage.removeItem(key));
+
+        // Clear any cached Firebase data
+        try {
+          await firebaseSync?.clearAllData?.();
+        } catch (syncError) {
+          console.warn("Could not clear cloud data:", syncError);
+        }
+
         logout();
         alert("All data has been cleared. You can now set up a new budget with a fresh password.");
       } catch (error) {
@@ -370,6 +399,7 @@ const Layout = () => {
           syncConflicts={syncConflicts}
           onResolveConflict={resolveConflict}
           setSyncConflicts={setSyncConflicts}
+          firebaseSync={firebaseSync}
         />
       </BudgetProvider>
     </>
@@ -389,6 +419,7 @@ const MainContent = ({
   syncConflicts,
   onResolveConflict,
   setSyncConflicts,
+  firebaseSync,
 }) => {
   const budget = useBudget();
   const [activeView, setActiveView] = useState("dashboard");
@@ -462,7 +493,12 @@ const MainContent = ({
             onExport={onExport}
             onImport={handleImport}
             onLogout={onLogout}
-            onResetEncryption={onResetEncryption}
+            onResetEncryption={() => {
+              // Reset the budget context data
+              budget.resetAllData();
+              // Call the original reset function
+              onResetEncryption();
+            }}
           />
         </div>
 

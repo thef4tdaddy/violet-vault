@@ -31,6 +31,7 @@ const actionTypes = {
   PROCESS_PAYCHECK: "PROCESS_PAYCHECK",
   RECONCILE_TRANSACTION: "RECONCILE_TRANSACTION",
   LOAD_DATA: "LOAD_DATA",
+  RESET_ALL_DATA: "RESET_ALL_DATA",
 };
 
 // Initial state
@@ -226,6 +227,12 @@ const budgetReducer = (state, action) => {
       return { ...state, ...validatedPayload, dataLoaded: true };
     }
 
+    case actionTypes.RESET_ALL_DATA:
+      return {
+        ...initialState,
+        dataLoaded: false,
+      };
+
     default:
       return state;
   }
@@ -407,6 +414,7 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
       reconcileTransaction: (data) =>
         dispatch({ type: actionTypes.RECONCILE_TRANSACTION, payload: data }),
       loadData: (data) => dispatch({ type: actionTypes.LOAD_DATA, payload: data }),
+      resetAllData: () => dispatch({ type: actionTypes.RESET_ALL_DATA }),
     }),
     []
   );
