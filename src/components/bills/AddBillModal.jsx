@@ -59,7 +59,8 @@ const AddBillModal = ({ isOpen, onClose, onAddBill, onAddEnvelope }) => {
     const yearlyAmount =
       frequency === "custom"
         ? amount * customFrequency
-        : amount * (frequencies.find((f) => f.value === frequency)?.multiplier || 1);
+        : amount *
+          (frequencies.find((f) => f.value === frequency)?.multiplier || 1);
     return yearlyAmount / 26; // 26 biweekly periods per year
   };
 
@@ -67,7 +68,8 @@ const AddBillModal = ({ isOpen, onClose, onAddBill, onAddEnvelope }) => {
     const yearlyAmount =
       frequency === "custom"
         ? amount * customFrequency
-        : amount * (frequencies.find((f) => f.value === frequency)?.multiplier || 1);
+        : amount *
+          (frequencies.find((f) => f.value === frequency)?.multiplier || 1);
     return yearlyAmount / 12; // 12 months per year
   };
 
@@ -138,9 +140,19 @@ const AddBillModal = ({ isOpen, onClose, onAddBill, onAddEnvelope }) => {
       notes: formData.notes,
       dueDate: formData.dueDate,
       customFrequency:
-        formData.frequency === "custom" ? parseFloat(formData.customFrequency) || 1 : undefined,
-      biweeklyAmount: calculateBiweeklyAmount(amount, formData.frequency, formData.customFrequency),
-      monthlyAmount: calculateMonthlyAmount(amount, formData.frequency, formData.customFrequency),
+        formData.frequency === "custom"
+          ? parseFloat(formData.customFrequency) || 1
+          : undefined,
+      biweeklyAmount: calculateBiweeklyAmount(
+        amount,
+        formData.frequency,
+        formData.customFrequency,
+      ),
+      monthlyAmount: calculateMonthlyAmount(
+        amount,
+        formData.frequency,
+        formData.customFrequency,
+      ),
       nextDueDate: getNextDueDate(formData.frequency, formData.dueDate),
       // For unified system compatibility
       type: "recurring_bill",
@@ -159,7 +171,11 @@ const AddBillModal = ({ isOpen, onClose, onAddBill, onAddEnvelope }) => {
       const envelopeData = {
         id: `envelope_${Date.now()}`,
         name: formData.name.trim(),
-        budget: calculateMonthlyAmount(amount, formData.frequency, formData.customFrequency),
+        budget: calculateMonthlyAmount(
+          amount,
+          formData.frequency,
+          formData.customFrequency,
+        ),
         currentBalance: 0,
         color: formData.color,
         category: formData.category,
@@ -182,7 +198,10 @@ const AddBillModal = ({ isOpen, onClose, onAddBill, onAddEnvelope }) => {
       <div className="glassmorphism rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-white/30 shadow-2xl">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xl font-semibold">Add New Bill</h3>
-          <button onClick={cancelEdit} className="text-gray-400 hover:text-gray-600">
+          <button
+            onClick={cancelEdit}
+            className="text-gray-400 hover:text-gray-600"
+          >
             <X className="h-6 w-6" />
           </button>
         </div>
@@ -196,7 +215,9 @@ const AddBillModal = ({ isOpen, onClose, onAddBill, onAddEnvelope }) => {
               <input
                 type="text"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g., Car Insurance, Netflix, Property Tax"
                 required
@@ -204,12 +225,16 @@ const AddBillModal = ({ isOpen, onClose, onAddBill, onAddEnvelope }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Amount *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Amount *
+              </label>
               <input
                 type="number"
                 step="0.01"
                 value={formData.amount}
-                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, amount: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="0.00"
                 required
@@ -222,7 +247,9 @@ const AddBillModal = ({ isOpen, onClose, onAddBill, onAddEnvelope }) => {
               </label>
               <select
                 value={formData.frequency}
-                onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, frequency: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 {frequencies.map((freq) => (
@@ -262,16 +289,22 @@ const AddBillModal = ({ isOpen, onClose, onAddBill, onAddEnvelope }) => {
               <input
                 type="date"
                 value={formData.dueDate}
-                onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, dueDate: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Category
+              </label>
               <select
                 value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, category: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 {categories.map((category) => (
@@ -283,7 +316,9 @@ const AddBillModal = ({ isOpen, onClose, onAddBill, onAddEnvelope }) => {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Color
+              </label>
               <div className="flex gap-2 flex-wrap">
                 {colors.map((color) => (
                   <button
@@ -307,7 +342,9 @@ const AddBillModal = ({ isOpen, onClose, onAddBill, onAddEnvelope }) => {
               </label>
               <textarea
                 value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, notes: e.target.value })
+                }
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="Any additional notes about this bill..."
@@ -343,7 +380,9 @@ const AddBillModal = ({ isOpen, onClose, onAddBill, onAddEnvelope }) => {
           {/* Preview */}
           {formData.amount && (
             <div className="bg-gray-50 rounded-lg p-4">
-              <h4 className="font-medium text-gray-900 mb-2">Savings Preview:</h4>
+              <h4 className="font-medium text-gray-900 mb-2">
+                Savings Preview:
+              </h4>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="text-gray-600">Monthly equivalent:</span>
@@ -352,7 +391,7 @@ const AddBillModal = ({ isOpen, onClose, onAddBill, onAddEnvelope }) => {
                     {calculateMonthlyAmount(
                       parseFloat(formData.amount) || 0,
                       formData.frequency,
-                      formData.customFrequency
+                      formData.customFrequency,
                     ).toFixed(2)}
                   </span>
                 </div>
@@ -363,7 +402,7 @@ const AddBillModal = ({ isOpen, onClose, onAddBill, onAddEnvelope }) => {
                     {calculateBiweeklyAmount(
                       parseFloat(formData.amount) || 0,
                       formData.frequency,
-                      formData.customFrequency
+                      formData.customFrequency,
                     ).toFixed(2)}
                   </span>
                 </div>
