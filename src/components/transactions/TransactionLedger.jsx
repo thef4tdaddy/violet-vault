@@ -6,6 +6,7 @@ import TransactionFilters from "./TransactionFilters";
 import TransactionTable from "./TransactionTable";
 import TransactionForm from "./TransactionForm";
 import ImportModal from "./import/ImportModal";
+import TransactionSplitter from "./TransactionSplitter";
 
 import { useTransactionFilters } from "./hooks/useTransactionFilters";
 import { useTransactionForm } from "./hooks/useTransactionForm";
@@ -24,6 +25,7 @@ const TransactionLedger = ({
   const [showAddModal, setShowAddModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
+  const [splittingTransaction, setSplittingTransaction] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [dateFilter, setDateFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -32,8 +34,13 @@ const TransactionLedger = ({
   const [sortOrder, setSortOrder] = useState("desc");
 
   // Custom hooks
-  const { transactionForm, setTransactionForm, resetForm, populateForm, createTransaction } =
-    useTransactionForm();
+  const {
+    transactionForm,
+    setTransactionForm,
+    resetForm,
+    populateForm,
+    createTransaction,
+  } = useTransactionForm();
 
   const {
     importData,
@@ -54,7 +61,7 @@ const TransactionLedger = ({
     typeFilter,
     envelopeFilter,
     sortBy,
-    sortOrder
+    sortOrder,
   );
 
   const categories = [
@@ -105,6 +112,27 @@ const TransactionLedger = ({
 
   const handleSuggestEnvelope = (description) => {
     return suggestEnvelope(description, envelopes);
+  };
+
+  const handleSplitTransaction = async (
+    originalTransaction,
+    splitTransactions,
+  ) => {
+    try {
+      // Delete the original transaction
+      await onDeleteTransaction(originalTransaction.id);
+
+      // Add each split transaction
+      for (const splitTransaction of splitTransactions) {
+        await onAddTransaction(splitTransaction);
+      }
+
+      // Close the modal
+      setSplittingTransaction(null);
+    } catch (error) {
+      console.error("Error splitting transaction:", error);
+      // You could add error handling here if needed
+    }
   };
 
   const totalIncome = transactions
@@ -180,6 +208,7 @@ const TransactionLedger = ({
         envelopes={envelopes}
         onEdit={startEdit}
         onDelete={onDeleteTransaction}
+        onSplit={(transaction) => setSplittingTransaction(transaction)}
       />
 
       {/* Transaction Form Modal */}
@@ -207,6 +236,16 @@ const TransactionLedger = ({
         importProgress={importProgress}
         onImport={handleImport}
         onFileUpload={handleFileUpload}
+      />
+
+      {/* Transaction Splitter Modal */}
+      <TransactionSplitter
+        isOpen={!!splittingTransaction}
+        onClose={() => setSplittingTransaction(null)}
+        transaction={splittingTransaction}
+        envelopes={envelopes}
+        availableCategories={categories}
+        onSplitTransaction={handleSplitTransaction}
       />
     </div>
   );
