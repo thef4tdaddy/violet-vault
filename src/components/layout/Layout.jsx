@@ -1,12 +1,5 @@
 // src/components/layout/Layout.jsx
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-  Suspense,
-  lazy,
-} from "react";
+import React, { useState, useEffect, useCallback, useMemo, Suspense, lazy } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { BudgetProvider, useBudget } from "../../contexts/BudgetContext";
 import UserSetup from "../auth/UserSetup";
