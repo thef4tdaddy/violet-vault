@@ -21,7 +21,7 @@ jobs:
         uses: googleapis/release-please-action@v4
         id: release
         with:
-          config-file: release-please-config.json
+          config-file: configs/release-please-config.json
           manifest-file: .release-please-manifest.json
 
   # Build and deploy when a release is created
