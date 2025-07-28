@@ -1,5 +1,12 @@
 // src/contexts/BudgetContext.jsx
-import React, { createContext, useContext, useReducer, useEffect, useState, useMemo } from "react";
+import React, {
+  createContext,
+  useContext,
+  useReducer,
+  useEffect,
+  useState,
+  useMemo,
+} from "react";
 import { encryptionUtils } from "../utils/encryption";
 import FirebaseSync from "../utils/firebaseSync";
 import { Sentry } from "../utils/sentry";
@@ -86,7 +93,7 @@ const budgetReducer = (state, action) => {
       return {
         ...state,
         envelopes: state.envelopes.map((env) =>
-          env.id === action.payload.id ? action.payload : env
+          env.id === action.payload.id ? action.payload : env,
         ),
       };
     case actionTypes.DELETE_ENVELOPE:
@@ -100,7 +107,9 @@ const budgetReducer = (state, action) => {
     case actionTypes.UPDATE_BILL:
       return {
         ...state,
-        bills: state.bills.map((bill) => (bill.id === action.payload.id ? action.payload : bill)),
+        bills: state.bills.map((bill) =>
+          bill.id === action.payload.id ? action.payload : bill,
+        ),
       };
     case actionTypes.DELETE_BILL:
       return {
@@ -117,13 +126,15 @@ const budgetReducer = (state, action) => {
       return {
         ...state,
         savingsGoals: state.savingsGoals.map((goal) =>
-          goal.id === action.payload.id ? action.payload : goal
+          goal.id === action.payload.id ? action.payload : goal,
         ),
       };
     case actionTypes.DELETE_SAVINGS_GOAL:
       return {
         ...state,
-        savingsGoals: state.savingsGoals.filter((goal) => goal.id !== action.payload),
+        savingsGoals: state.savingsGoals.filter(
+          (goal) => goal.id !== action.payload,
+        ),
       };
 
     case actionTypes.PROCESS_PAYCHECK:
@@ -140,19 +151,26 @@ const budgetReducer = (state, action) => {
         transactions: [...state.transactions, action.payload.transaction],
         allTransactions: [...state.allTransactions, action.payload.transaction],
         envelopes: action.payload.updatedEnvelopes || state.envelopes,
-        unassignedCash: action.payload.newUnassignedCash ?? state.unassignedCash,
+        unassignedCash:
+          action.payload.newUnassignedCash ?? state.unassignedCash,
       };
 
     case actionTypes.LOAD_DATA: {
       const validatedPayload = {
         ...action.payload,
-        envelopes: Array.isArray(action.payload.envelopes) ? action.payload.envelopes : [],
+        envelopes: Array.isArray(action.payload.envelopes)
+          ? action.payload.envelopes
+          : [],
         bills: Array.isArray(action.payload.bills) ? action.payload.bills : [],
-        savingsGoals: Array.isArray(action.payload.savingsGoals) ? action.payload.savingsGoals : [],
+        savingsGoals: Array.isArray(action.payload.savingsGoals)
+          ? action.payload.savingsGoals
+          : [],
         supplementalAccounts: Array.isArray(action.payload.supplementalAccounts)
           ? action.payload.supplementalAccounts
           : [],
-        transactions: Array.isArray(action.payload.transactions) ? action.payload.transactions : [],
+        transactions: Array.isArray(action.payload.transactions)
+          ? action.payload.transactions
+          : [],
         allTransactions: Array.isArray(action.payload.allTransactions)
           ? action.payload.allTransactions
           : [],
@@ -160,6 +178,45 @@ const budgetReducer = (state, action) => {
           ? action.payload.paycheckHistory
           : [],
       };
+
+      // Data migration: Move bills to allTransactions if they're not already there
+      if (validatedPayload.bills.length > 0) {
+        const existingBillIds = new Set(
+          validatedPayload.allTransactions
+            .filter((t) => t.type === "bill" || t.type === "recurring_bill")
+            .map((t) => t.id),
+        );
+
+        const billsToMigrate = validatedPayload.bills.filter(
+          (bill) => !existingBillIds.has(bill.id),
+        );
+
+        if (billsToMigrate.length > 0) {
+          console.log(
+            `🔄 Migrating ${billsToMigrate.length} bills to unified structure`,
+          );
+
+          const migratedBills = billsToMigrate.map((bill) => ({
+            ...bill,
+            type: bill.type || "bill",
+            // Ensure required fields exist
+            date:
+              bill.date ||
+              bill.createdAt ||
+              new Date().toISOString().split("T")[0],
+            amount: bill.amount || 0,
+            description: bill.description || bill.provider || "Bill",
+            isPaid: bill.isPaid || false,
+            source: bill.source || "migrated",
+          }));
+
+          validatedPayload.allTransactions = [
+            ...validatedPayload.allTransactions,
+            ...migratedBills,
+          ];
+        }
+      }
+
       return { ...state, ...validatedPayload, dataLoaded: true };
     }
 
@@ -168,7 +225,13 @@ const budgetReducer = (state, action) => {
   }
 };
 
-export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId, salt }) => {
+export const BudgetProvider = ({
+  children,
+  encryptionKey,
+  currentUser,
+  budgetId,
+  salt,
+}) => {
   const [state, dispatch] = useReducer(budgetReducer, initialState);
   const firebaseSync = useMemo(() => new FirebaseSync(), []);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -192,10 +255,13 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
   useEffect(() => {
     const loadInitialData = async () => {
       if (encryptionKey && currentUser && budgetId) {
-        logger.budgetSync("All dependencies present - proceeding with data load", {
-          budgetId,
-          userName: currentUser.userName,
-        });
+        logger.budgetSync(
+          "All dependencies present - proceeding with data load",
+          {
+            budgetId,
+            userName: currentUser.userName,
+          },
+        );
 
         try {
           const cloudResult = await firebaseSync.loadFromCloud();
@@ -207,7 +273,10 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
             return;
           }
         } catch (error) {
-          console.warn("⚠️ Failed to load from cloud, will try localStorage:", error.message);
+          console.warn(
+            "⚠️ Failed to load from cloud, will try localStorage:",
+            error.message,
+          );
         }
 
         const savedData = localStorage.getItem("envelopeBudgetData");
@@ -215,11 +284,21 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
           try {
             const parsed = JSON.parse(savedData);
             const { encryptedData, iv } = parsed;
-            const decryptedData = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
+            const decryptedData = await encryptionUtils.decrypt(
+              encryptedData,
+              encryptionKey,
+              iv,
+            );
             dispatch({ type: actionTypes.LOAD_DATA, payload: decryptedData });
           } catch (error) {
-            console.error("❌ Failed to load initial data from localStorage:", error);
-            if (error.message.includes("decrypt") || error.message.includes("parse")) {
+            console.error(
+              "❌ Failed to load initial data from localStorage:",
+              error,
+            );
+            if (
+              error.message.includes("decrypt") ||
+              error.message.includes("parse")
+            ) {
               localStorage.removeItem("envelopeBudgetData");
             }
           }
@@ -265,14 +344,17 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
     if (encryptionKey && currentUser && !isSyncing) {
       const saveToLocal = async () => {
         try {
-          const encrypted = await encryptionUtils.encrypt(syncData, encryptionKey);
+          const encrypted = await encryptionUtils.encrypt(
+            syncData,
+            encryptionKey,
+          );
           localStorage.setItem(
             "envelopeBudgetData",
             JSON.stringify({
               encryptedData: encrypted.data,
               salt: Array.from(salt || new Uint8Array()),
               iv: encrypted.iv,
-            })
+            }),
           );
         } catch (error) {
           console.error("Failed to save to localStorage:", error);
@@ -298,14 +380,24 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
         clearTimeout(syncTimeout);
       };
     }
-  }, [syncData, encryptionKey, currentUser, isOnline, isSyncing, salt, firebaseSync]);
+  }, [
+    syncData,
+    encryptionKey,
+    currentUser,
+    isOnline,
+    isSyncing,
+    salt,
+    firebaseSync,
+  ]);
 
   const actions = useMemo(
     () => ({
       setEnvelopes: (envelopes) =>
         dispatch({ type: actionTypes.SET_ENVELOPES, payload: envelopes }),
-      setBills: (bills) => dispatch({ type: actionTypes.SET_BILLS, payload: bills }),
-      setSavingsGoals: (goals) => dispatch({ type: actionTypes.SET_SAVINGS_GOALS, payload: goals }),
+      setBills: (bills) =>
+        dispatch({ type: actionTypes.SET_BILLS, payload: bills }),
+      setSavingsGoals: (goals) =>
+        dispatch({ type: actionTypes.SET_SAVINGS_GOALS, payload: goals }),
       setSupplementalAccounts: (accounts) =>
         dispatch({
           type: actionTypes.SET_SUPPLEMENTAL_ACCOUNTS,
@@ -329,23 +421,32 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
           type: actionTypes.SET_BIWEEKLY_ALLOCATION,
           payload: amount,
         }),
-      addEnvelope: (envelope) => dispatch({ type: actionTypes.ADD_ENVELOPE, payload: envelope }),
+      addEnvelope: (envelope) =>
+        dispatch({ type: actionTypes.ADD_ENVELOPE, payload: envelope }),
       updateEnvelope: (envelope) =>
         dispatch({ type: actionTypes.UPDATE_ENVELOPE, payload: envelope }),
-      deleteEnvelope: (id) => dispatch({ type: actionTypes.DELETE_ENVELOPE, payload: id }),
-      addBill: (bill) => dispatch({ type: actionTypes.ADD_BILL, payload: bill }),
-      updateBill: (bill) => dispatch({ type: actionTypes.UPDATE_BILL, payload: bill }),
-      deleteBill: (id) => dispatch({ type: actionTypes.DELETE_BILL, payload: id }),
-      addSavingsGoal: (goal) => dispatch({ type: actionTypes.ADD_SAVINGS_GOAL, payload: goal }),
+      deleteEnvelope: (id) =>
+        dispatch({ type: actionTypes.DELETE_ENVELOPE, payload: id }),
+      addBill: (bill) =>
+        dispatch({ type: actionTypes.ADD_BILL, payload: bill }),
+      updateBill: (bill) =>
+        dispatch({ type: actionTypes.UPDATE_BILL, payload: bill }),
+      deleteBill: (id) =>
+        dispatch({ type: actionTypes.DELETE_BILL, payload: id }),
+      addSavingsGoal: (goal) =>
+        dispatch({ type: actionTypes.ADD_SAVINGS_GOAL, payload: goal }),
       updateSavingsGoal: (goal) =>
         dispatch({ type: actionTypes.UPDATE_SAVINGS_GOAL, payload: goal }),
-      deleteSavingsGoal: (id) => dispatch({ type: actionTypes.DELETE_SAVINGS_GOAL, payload: id }),
-      processPaycheck: (data) => dispatch({ type: actionTypes.PROCESS_PAYCHECK, payload: data }),
+      deleteSavingsGoal: (id) =>
+        dispatch({ type: actionTypes.DELETE_SAVINGS_GOAL, payload: id }),
+      processPaycheck: (data) =>
+        dispatch({ type: actionTypes.PROCESS_PAYCHECK, payload: data }),
       reconcileTransaction: (data) =>
         dispatch({ type: actionTypes.RECONCILE_TRANSACTION, payload: data }),
-      loadData: (data) => dispatch({ type: actionTypes.LOAD_DATA, payload: data }),
+      loadData: (data) =>
+        dispatch({ type: actionTypes.LOAD_DATA, payload: data }),
     }),
-    []
+    [],
   );
 
   const contextValue = useMemo(
@@ -357,14 +458,28 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
       lastSyncTime,
       syncError,
       getActiveUsers: () =>
-        firebaseSync.getActiveUsers ? Array.from(firebaseSync.activeUsers?.values() || []) : [],
+        firebaseSync.getActiveUsers
+          ? Array.from(firebaseSync.activeUsers?.values() || [])
+          : [],
       getRecentActivity: () =>
         firebaseSync.getRecentActivity ? firebaseSync.getRecentActivity() : [],
     }),
-    [state, actions, isOnline, isSyncing, lastSyncTime, syncError, firebaseSync]
+    [
+      state,
+      actions,
+      isOnline,
+      isSyncing,
+      lastSyncTime,
+      syncError,
+      firebaseSync,
+    ],
   );
 
-  return <BudgetContext.Provider value={contextValue}>{children}</BudgetContext.Provider>;
+  return (
+    <BudgetContext.Provider value={contextValue}>
+      {children}
+    </BudgetContext.Provider>
+  );
 };
 
 export const useBudget = () => {

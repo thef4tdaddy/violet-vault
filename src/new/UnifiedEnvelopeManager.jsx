@@ -37,15 +37,23 @@ const UnifiedEnvelopeManager = ({
   const budget = useBudget();
   const { currentUser } = useAuth();
 
-  const envelopes = propEnvelopes && propEnvelopes.length ? propEnvelopes : budget.envelopes || [];
+  const envelopes =
+    propEnvelopes && propEnvelopes.length
+      ? propEnvelopes
+      : budget.envelopes || [];
   const transactions =
-    propTransactions && propTransactions.length ? propTransactions : budget.transactions || [];
+    propTransactions && propTransactions.length
+      ? propTransactions
+      : budget.transactions || [];
   const unassignedCash =
-    propUnassignedCash !== undefined ? propUnassignedCash : budget.unassignedCash || 0;
+    propUnassignedCash !== undefined
+      ? propUnassignedCash
+      : budget.unassignedCash || 0;
 
   const handleUpdateEnvelope = onUpdateEnvelope || budget.updateEnvelope;
   const handleCreateEnvelope = onCreateEnvelope || budget.addEnvelope;
-  const handleAssignTransaction = onAssignTransaction || budget.reconcileTransaction;
+  const handleAssignTransaction =
+    onAssignTransaction || budget.reconcileTransaction;
   const [selectedEnvelopeId, setSelectedEnvelopeId] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [viewMode, setViewMode] = useState("overview");
@@ -58,32 +66,46 @@ const UnifiedEnvelopeManager = ({
   // Calculate envelope data with unified transactions
   const envelopeData = useMemo(() => {
     return envelopes.map((envelope) => {
-      const envelopeTransactions = transactions.filter((t) => t.envelopeId === envelope.id);
+      const envelopeTransactions = transactions.filter(
+        (t) => t.envelopeId === envelope.id,
+      );
 
       const paidTransactions = envelopeTransactions.filter(
-        (t) => t.type === "transaction" || (t.type === "bill" && t.isPaid)
+        (t) => t.type === "transaction" || (t.type === "bill" && t.isPaid),
       );
 
       const unpaidBills = envelopeTransactions.filter(
-        (t) => (t.type === "bill" || t.type === "recurring_bill") && !t.isPaid
+        (t) => (t.type === "bill" || t.type === "recurring_bill") && !t.isPaid,
       );
 
       const upcomingBills = unpaidBills.filter(
-        (t) => t.dueDate && new Date(t.dueDate) > new Date()
+        (t) => t.dueDate && new Date(t.dueDate) > new Date(),
       );
 
-      const overdueBills = unpaidBills.filter((t) => t.dueDate && new Date(t.dueDate) < new Date());
+      const overdueBills = unpaidBills.filter(
+        (t) => t.dueDate && new Date(t.dueDate) < new Date(),
+      );
 
-      const totalSpent = paidTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+      const totalSpent = paidTransactions.reduce(
+        (sum, t) => sum + Math.abs(t.amount),
+        0,
+      );
 
-      const totalUpcoming = upcomingBills.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+      const totalUpcoming = upcomingBills.reduce(
+        (sum, t) => sum + Math.abs(t.amount),
+        0,
+      );
 
-      const totalOverdue = overdueBills.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+      const totalOverdue = overdueBills.reduce(
+        (sum, t) => sum + Math.abs(t.amount),
+        0,
+      );
 
       const allocated = envelope.budget || 0;
       const committed = totalUpcoming + totalOverdue;
       const available = allocated - totalSpent - committed;
-      const utilizationRate = allocated > 0 ? (totalSpent + committed) / allocated : 0;
+      const utilizationRate =
+        allocated > 0 ? (totalSpent + committed) / allocated : 0;
 
       let status = "healthy";
       if (totalOverdue > 0) status = "overdue";
@@ -182,7 +204,7 @@ const UnifiedEnvelopeManager = ({
         upcoming: acc.upcoming + env.totalUpcoming,
         overdue: acc.overdue + env.totalOverdue,
       }),
-      { allocated: 0, spent: 0, upcoming: 0, overdue: 0 }
+      { allocated: 0, spent: 0, upcoming: 0, overdue: 0 },
     );
   }, [envelopeData]);
 
@@ -214,7 +236,9 @@ const UnifiedEnvelopeManager = ({
             </div>
             Envelope Manager
           </h2>
-          <p className="text-gray-600 mt-1">Budget allocation with real-time bill tracking</p>
+          <p className="text-gray-600 mt-1">
+            Budget allocation with real-time bill tracking
+          </p>
         </div>
 
         <div className="flex gap-3">
@@ -243,7 +267,9 @@ const UnifiedEnvelopeManager = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Total Allocated</p>
-              <p className="text-2xl font-bold text-gray-900">${totals.allocated.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                ${totals.allocated.toFixed(2)}
+              </p>
             </div>
             <Wallet className="h-8 w-8 text-gray-400" />
           </div>
@@ -253,7 +279,9 @@ const UnifiedEnvelopeManager = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Spent This Period</p>
-              <p className="text-2xl font-bold text-gray-900">${totals.spent.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                ${totals.spent.toFixed(2)}
+              </p>
             </div>
             <Receipt className="h-8 w-8 text-gray-400" />
           </div>
@@ -273,7 +301,9 @@ const UnifiedEnvelopeManager = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Unassigned Cash</p>
-              <p className="text-2xl font-bold text-gray-900">${unassignedCash.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                ${unassignedCash.toFixed(2)}
+              </p>
             </div>
             <Wallet className="h-8 w-8 text-gray-400" />
           </div>
@@ -283,7 +313,9 @@ const UnifiedEnvelopeManager = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Bills Due</p>
-              <p className="text-2xl font-bold text-orange-600">${totals.upcoming.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-orange-600">
+                ${totals.upcoming.toFixed(2)}
+              </p>
             </div>
             <FileText className="h-8 w-8 text-orange-400" />
           </div>
@@ -293,7 +325,9 @@ const UnifiedEnvelopeManager = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Overdue</p>
-              <p className="text-2xl font-bold text-red-600">${totals.overdue.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-red-600">
+                ${totals.overdue.toFixed(2)}
+              </p>
             </div>
             <AlertTriangle className="h-8 w-8 text-red-400" />
           </div>
@@ -310,7 +344,12 @@ const UnifiedEnvelopeManager = ({
           <div className="flex gap-3">
             <select
               value={filterOptions.sortBy}
-              onChange={(e) => setFilterOptions((prev) => ({ ...prev, sortBy: e.target.value }))}
+              onChange={(e) =>
+                setFilterOptions((prev) => ({
+                  ...prev,
+                  sortBy: e.target.value,
+                }))
+              }
               className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
             >
               <option value="usage_desc">Highest Usage First</option>
@@ -325,7 +364,10 @@ const UnifiedEnvelopeManager = ({
                 type="checkbox"
                 checked={filterOptions.showEmpty}
                 onChange={(e) =>
-                  setFilterOptions((prev) => ({ ...prev, showEmpty: e.target.checked }))
+                  setFilterOptions((prev) => ({
+                    ...prev,
+                    showEmpty: e.target.checked,
+                  }))
                 }
                 className="mr-2"
               />
@@ -405,7 +447,9 @@ const UnifiedEnvelopeManager = ({
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Allocated:</span>
-                <span className="text-sm font-medium">${envelope.allocated.toFixed(2)}</span>
+                <span className="text-sm font-medium">
+                  ${envelope.allocated.toFixed(2)}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Spent:</span>
@@ -430,7 +474,9 @@ const UnifiedEnvelopeManager = ({
                 </div>
               )}
               <div className="flex justify-between pt-2 border-t border-gray-200">
-                <span className="text-sm font-medium text-gray-900">Available:</span>
+                <span className="text-sm font-medium text-gray-900">
+                  Available:
+                </span>
                 <span
                   className={`text-sm font-bold ${
                     envelope.available < 0 ? "text-red-600" : "text-green-600"
@@ -472,22 +518,26 @@ const UnifiedEnvelopeManager = ({
                 Recent Transactions ({selectedEnvelope.paidTransactions.length})
               </h4>
               <div className="space-y-2 max-h-60 overflow-y-auto">
-                {selectedEnvelope.paidTransactions.slice(0, 10).map((transaction) => (
-                  <div
-                    key={transaction.id}
-                    className="flex justify-between items-center p-3 bg-white/50 rounded-lg"
-                  >
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">{transaction.description}</p>
-                      <p className="text-xs text-gray-500">
-                        {new Date(transaction.date).toLocaleDateString()}
-                      </p>
+                {selectedEnvelope.paidTransactions
+                  .slice(0, 10)
+                  .map((transaction) => (
+                    <div
+                      key={transaction.id}
+                      className="flex justify-between items-center p-3 bg-white/50 rounded-lg"
+                    >
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">
+                          {transaction.description}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(transaction.date).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <span className="text-sm font-medium text-red-600">
+                        ${Math.abs(transaction.amount).toFixed(2)}
+                      </span>
                     </div>
-                    <span className="text-sm font-medium text-red-600">
-                      ${Math.abs(transaction.amount).toFixed(2)}
-                    </span>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
 

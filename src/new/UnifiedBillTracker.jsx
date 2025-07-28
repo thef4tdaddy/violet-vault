@@ -33,8 +33,13 @@ const UnifiedBillTracker = ({
   const { currentUser } = useAuth();
 
   const transactions =
-    propTransactions && propTransactions.length ? propTransactions : budget.allTransactions || [];
-  const envelopes = propEnvelopes && propEnvelopes.length ? propEnvelopes : budget.envelopes || [];
+    propTransactions && propTransactions.length
+      ? propTransactions
+      : budget.allTransactions || [];
+  const envelopes =
+    propEnvelopes && propEnvelopes.length
+      ? propEnvelopes
+      : budget.envelopes || [];
 
   const reconcileTransaction = budget.reconcileTransaction;
   const handleUpdateBill = onUpdateBill || budget.updateBill;
@@ -82,20 +87,34 @@ const UnifiedBillTracker = ({
     const paidBills = bills.filter((b) => b.isPaid);
 
     return {
-      upcoming: upcomingBills.sort((a, b) => (a.daysUntilDue || 999) - (b.daysUntilDue || 999)),
-      overdue: overdueBills.sort((a, b) => (a.daysUntilDue || 0) - (b.daysUntilDue || 0)),
+      upcoming: upcomingBills.sort(
+        (a, b) => (a.daysUntilDue || 999) - (b.daysUntilDue || 999),
+      ),
+      overdue: overdueBills.sort(
+        (a, b) => (a.daysUntilDue || 0) - (b.daysUntilDue || 0),
+      ),
       paid: paidBills.sort(
-        (a, b) => new Date(b.paidDate || b.date) - new Date(a.paidDate || a.date)
+        (a, b) =>
+          new Date(b.paidDate || b.date) - new Date(a.paidDate || a.date),
       ),
       all: bills,
     };
   }, [bills]);
 
   const totals = useMemo(() => {
-    const upcomingTotal = categorizedBills.upcoming.reduce((sum, b) => sum + Math.abs(b.amount), 0);
-    const overdueTotal = categorizedBills.overdue.reduce((sum, b) => sum + Math.abs(b.amount), 0);
+    const upcomingTotal = categorizedBills.upcoming.reduce(
+      (sum, b) => sum + Math.abs(b.amount),
+      0,
+    );
+    const overdueTotal = categorizedBills.overdue.reduce(
+      (sum, b) => sum + Math.abs(b.amount),
+      0,
+    );
     const paidThisMonth = categorizedBills.paid
-      .filter((b) => new Date(b.paidDate || b.date).getMonth() === new Date().getMonth())
+      .filter(
+        (b) =>
+          new Date(b.paidDate || b.date).getMonth() === new Date().getMonth(),
+      )
       .reduce((sum, b) => sum + Math.abs(b.amount), 0);
 
     return {
@@ -109,23 +128,35 @@ const UnifiedBillTracker = ({
   const displayBills = useMemo(() => {
     let billsToShow = categorizedBills[viewMode] || [];
 
-    if (filterOptions.billTypes.length > 0 && !filterOptions.billTypes.includes("all")) {
+    if (
+      filterOptions.billTypes.length > 0 &&
+      !filterOptions.billTypes.includes("all")
+    ) {
       billsToShow = billsToShow.filter((bill) =>
-        filterOptions.billTypes.includes(bill.metadata?.type || bill.category?.toLowerCase())
+        filterOptions.billTypes.includes(
+          bill.metadata?.type || bill.category?.toLowerCase(),
+        ),
       );
     }
 
     if (filterOptions.providers.length > 0) {
-      billsToShow = billsToShow.filter((bill) => filterOptions.providers.includes(bill.provider));
+      billsToShow = billsToShow.filter((bill) =>
+        filterOptions.providers.includes(bill.provider),
+      );
     }
 
     if (filterOptions.envelopes.length > 0) {
-      billsToShow = billsToShow.filter((bill) => filterOptions.envelopes.includes(bill.envelopeId));
+      billsToShow = billsToShow.filter((bill) =>
+        filterOptions.envelopes.includes(bill.envelopeId),
+      );
     }
 
     switch (filterOptions.sortBy) {
       case "due_date":
-        billsToShow.sort((a, b) => new Date(a.dueDate || a.date) - new Date(b.dueDate || b.date));
+        billsToShow.sort(
+          (a, b) =>
+            new Date(a.dueDate || a.date) - new Date(b.dueDate || b.date),
+        );
         break;
       case "amount_desc":
         billsToShow.sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount));
@@ -134,11 +165,15 @@ const UnifiedBillTracker = ({
         billsToShow.sort((a, b) => Math.abs(a.amount) - Math.abs(b.amount));
         break;
       case "provider":
-        billsToShow.sort((a, b) => (a.provider || "").localeCompare(b.provider || ""));
+        billsToShow.sort((a, b) =>
+          (a.provider || "").localeCompare(b.provider || ""),
+        );
         break;
       case "urgency":
         const urgencyOrder = { overdue: 0, urgent: 1, soon: 2, normal: 3 };
-        billsToShow.sort((a, b) => urgencyOrder[a.urgency] - urgencyOrder[b.urgency]);
+        billsToShow.sort(
+          (a, b) => urgencyOrder[a.urgency] - urgencyOrder[b.urgency],
+        );
         break;
     }
 
@@ -179,7 +214,8 @@ const UnifiedBillTracker = ({
     if (bill.metadata?.categoryIcon) return bill.metadata.categoryIcon;
 
     const category = bill.category?.toLowerCase() || "";
-    if (category.includes("electric") || category.includes("power")) return "⚡";
+    if (category.includes("electric") || category.includes("power"))
+      return "⚡";
     if (category.includes("gas")) return "🔥";
     if (category.includes("water")) return "💧";
     if (category.includes("internet") || category.includes("wifi")) return "🌐";
@@ -191,44 +227,108 @@ const UnifiedBillTracker = ({
   };
 
   const handlePayBill = (billId) => {
-    const bill = bills.find((b) => b.id === billId);
-    if (!bill) return;
+    try {
+      const bill = bills.find((b) => b.id === billId);
+      if (!bill) {
+        onError?.("Bill not found");
+        return;
+      }
 
-    const updatedBill = {
-      ...bill,
-      isPaid: true,
-      paidDate: new Date().toISOString().split("T")[0],
-    };
-    handlePayBillAction?.(updatedBill);
+      if (bill.isPaid) {
+        onError?.("Bill is already paid");
+        return;
+      }
 
-    // Create transaction record and update balances
-    const paymentTxn = {
-      id: `${bill.id}_payment_${Date.now()}`,
-      date: updatedBill.paidDate,
-      description: bill.provider || bill.description || "Bill Payment",
-      amount: -Math.abs(bill.amount),
-      envelopeId: bill.envelopeId || "unassigned",
-      category: bill.category,
-      type: "transaction",
-      source: "bill_payment",
-    };
+      // Check if there are sufficient funds
+      if (bill.envelopeId) {
+        const envelope = envelopes.find((env) => env.id === bill.envelopeId);
+        if (!envelope) {
+          onError?.("Assigned envelope not found");
+          return;
+        }
 
-    if (bill.envelopeId) {
-      const updatedEnvelopes = envelopes.map((env) =>
-        env.id === bill.envelopeId
-          ? { ...env, currentBalance: env.currentBalance - Math.abs(bill.amount) }
-          : env
-      );
-      reconcileTransaction({
-        transaction: paymentTxn,
-        updatedEnvelopes,
-      });
-    } else {
-      const newUnassigned = (budget.unassignedCash || 0) - Math.abs(bill.amount);
-      reconcileTransaction({
-        transaction: paymentTxn,
-        newUnassignedCash: newUnassigned,
-      });
+        // Allow envelopes to have more money than their budget
+        // Only check if the envelope has any balance at all (currentBalance can exceed budget)
+        const availableBalance = envelope.currentBalance || 0;
+        const billAmount = Math.abs(bill.amount);
+
+        if (availableBalance < billAmount) {
+          onError?.(
+            `Insufficient funds in envelope "${envelope.name}". Available: $${availableBalance.toFixed(2)}, Required: $${billAmount.toFixed(2)}`,
+          );
+          return;
+        }
+      } else {
+        const unassignedCash = budget.unassignedCash || 0;
+        const billAmount = Math.abs(bill.amount);
+
+        if (unassignedCash < billAmount) {
+          onError?.(
+            `Insufficient unassigned cash. Available: $${unassignedCash.toFixed(2)}, Required: $${billAmount.toFixed(2)}`,
+          );
+          return;
+        }
+      }
+
+      const updatedBill = {
+        ...bill,
+        isPaid: true,
+        paidDate: new Date().toISOString().split("T")[0],
+      };
+
+      handlePayBillAction?.(updatedBill);
+
+      // Create transaction record and update balances
+      const paymentTxn = {
+        id: `${bill.id}_payment_${Date.now()}`,
+        date: updatedBill.paidDate,
+        description: bill.provider || bill.description || "Bill Payment",
+        amount: -Math.abs(bill.amount),
+        envelopeId: bill.envelopeId || "unassigned",
+        category: bill.category,
+        type: "transaction",
+        source: "bill_payment",
+      };
+
+      if (bill.envelopeId) {
+        const billAmount = Math.abs(bill.amount);
+        const updatedEnvelopes = envelopes.map((env) => {
+          if (env.id === bill.envelopeId) {
+            const currentBalance = env.currentBalance || 0;
+            const newBalance = currentBalance - billAmount; // Allow negative balances if needed
+
+            return {
+              ...env,
+              currentBalance: newBalance,
+              // Track last transaction for debugging
+              lastTransaction: {
+                type: "bill_payment",
+                amount: -billAmount,
+                date: paymentTxn.date,
+                billId: bill.id,
+              },
+            };
+          }
+          return env;
+        });
+
+        reconcileTransaction({
+          transaction: paymentTxn,
+          updatedEnvelopes,
+        });
+      } else {
+        const billAmount = Math.abs(bill.amount);
+        const currentUnassigned = budget.unassignedCash || 0;
+        const newUnassigned = currentUnassigned - billAmount; // Allow negative unassigned cash if needed
+
+        reconcileTransaction({
+          transaction: paymentTxn,
+          newUnassignedCash: newUnassigned,
+        });
+      }
+    } catch (error) {
+      console.error("Error paying bill:", error);
+      onError?.(error.message || "Failed to pay bill");
     }
   };
 
@@ -256,16 +356,60 @@ const UnifiedBillTracker = ({
   };
 
   const paySelectedBills = () => {
-    if (selectedBills.size === 0) return;
+    if (selectedBills.size === 0) {
+      onError?.("No bills selected");
+      return;
+    }
 
-    selectedBills.forEach((billId) => handlePayBill(billId));
-    setSelectedBills(new Set());
+    try {
+      let successCount = 0;
+      let errorCount = 0;
+      const errors = [];
+
+      selectedBills.forEach((billId) => {
+        try {
+          handlePayBill(billId);
+          successCount++;
+        } catch (error) {
+          errorCount++;
+          errors.push(`Bill ${billId}: ${error.message}`);
+        }
+      });
+
+      setSelectedBills(new Set());
+
+      if (errorCount > 0) {
+        onError?.(
+          `${successCount} bills paid successfully, ${errorCount} failed:\n${errors.join("\n")}`,
+        );
+      } else {
+        console.log(`Successfully paid ${successCount} bills`);
+      }
+    } catch (error) {
+      console.error("Error paying selected bills:", error);
+      onError?.(error.message || "Failed to pay selected bills");
+    }
   };
 
   const viewModes = [
-    { id: "upcoming", label: "Upcoming", count: categorizedBills.upcoming.length, color: "blue" },
-    { id: "overdue", label: "Overdue", count: categorizedBills.overdue.length, color: "red" },
-    { id: "paid", label: "Paid", count: categorizedBills.paid.length, color: "green" },
+    {
+      id: "upcoming",
+      label: "Upcoming",
+      count: categorizedBills.upcoming.length,
+      color: "blue",
+    },
+    {
+      id: "overdue",
+      label: "Overdue",
+      count: categorizedBills.overdue.length,
+      color: "red",
+    },
+    {
+      id: "paid",
+      label: "Paid",
+      count: categorizedBills.paid.length,
+      color: "green",
+    },
     { id: "all", label: "All Bills", count: bills.length, color: "gray" },
   ];
 
@@ -282,7 +426,9 @@ const UnifiedBillTracker = ({
             </div>
             Bill Tracker
           </h2>
-          <p className="text-gray-600 mt-1">Manage bills, due dates, and payments</p>
+          <p className="text-gray-600 mt-1">
+            Manage bills, due dates, and payments
+          </p>
         </div>
 
         <div className="flex gap-3">
@@ -329,7 +475,9 @@ const UnifiedBillTracker = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-orange-100 text-sm">Due Soon</p>
-              <p className="text-2xl font-bold">${totals.upcoming.toFixed(2)}</p>
+              <p className="text-2xl font-bold">
+                ${totals.upcoming.toFixed(2)}
+              </p>
             </div>
             <Clock className="h-8 w-8 text-orange-200" />
           </div>
@@ -342,11 +490,15 @@ const UnifiedBillTracker = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-green-100 text-sm">Paid This Month</p>
-              <p className="text-2xl font-bold">${totals.paidThisMonth.toFixed(2)}</p>
+              <p className="text-2xl font-bold">
+                ${totals.paidThisMonth.toFixed(2)}
+              </p>
             </div>
             <CheckCircle className="h-8 w-8 text-green-200" />
           </div>
-          <p className="text-xs text-green-100 mt-2">{categorizedBills.paid.length} bills paid</p>
+          <p className="text-xs text-green-100 mt-2">
+            {categorizedBills.paid.length} bills paid
+          </p>
         </div>
 
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-4 rounded-lg text-white">
@@ -393,7 +545,12 @@ const UnifiedBillTracker = ({
           <div className="flex gap-3">
             <select
               value={filterOptions.sortBy}
-              onChange={(e) => setFilterOptions((prev) => ({ ...prev, sortBy: e.target.value }))}
+              onChange={(e) =>
+                setFilterOptions((prev) => ({
+                  ...prev,
+                  sortBy: e.target.value,
+                }))
+              }
               className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
             >
               <option value="due_date">Due Date</option>
@@ -408,7 +565,8 @@ const UnifiedBillTracker = ({
                 onClick={paySelectedBills}
                 className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center text-sm"
               >
-                <CheckCircle className="h-4 w-4 mr-2" /> Pay {selectedBills.size} Selected
+                <CheckCircle className="h-4 w-4 mr-2" /> Pay{" "}
+                {selectedBills.size} Selected
               </button>
             )}
           </div>
@@ -432,7 +590,9 @@ const UnifiedBillTracker = ({
           </div>
         ) : (
           displayBills.map((bill) => {
-            const envelope = envelopes.find((env) => env.id === bill.envelopeId);
+            const envelope = envelopes.find(
+              (env) => env.id === bill.envelopeId,
+            );
             const urgencyStyle = getUrgencyStyle(bill.urgency, bill.isPaid);
 
             return (
@@ -491,7 +651,9 @@ const UnifiedBillTracker = ({
                         )}
                       </div>
                       {bill.accountNumber && (
-                        <p className="text-xs text-gray-500 mt-1">Account: {bill.accountNumber}</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Account: {bill.accountNumber}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -502,7 +664,8 @@ const UnifiedBillTracker = ({
                         ${Math.abs(bill.amount).toFixed(2)}
                       </p>
                       {bill.metadata?.minimumPayment &&
-                        bill.metadata.minimumPayment !== Math.abs(bill.amount) && (
+                        bill.metadata.minimumPayment !==
+                          Math.abs(bill.amount) && (
                           <p className="text-xs text-gray-500">
                             Min: ${bill.metadata.minimumPayment.toFixed(2)}
                           </p>
@@ -543,7 +706,8 @@ const UnifiedBillTracker = ({
                   </div>
                 </div>
 
-                {(bill.metadata?.statementPeriod || bill.metadata?.serviceAddress) && (
+                {(bill.metadata?.statementPeriod ||
+                  bill.metadata?.serviceAddress) && (
                   <div className="mt-3 pt-3 border-t border-gray-200">
                     <div className="text-sm text-gray-600 space-y-1">
                       {bill.metadata.statementPeriod && (
@@ -588,12 +752,16 @@ const UnifiedBillTracker = ({
 
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="text-3xl">{getCategoryIcon(showBillDetail)}</div>
+                  <div className="text-3xl">
+                    {getCategoryIcon(showBillDetail)}
+                  </div>
                   <div>
                     <p className="font-medium text-lg">
                       {showBillDetail.provider || showBillDetail.description}
                     </p>
-                    <p className="text-sm text-gray-600">{showBillDetail.category}</p>
+                    <p className="text-sm text-gray-600">
+                      {showBillDetail.category}
+                    </p>
                   </div>
                 </div>
 
@@ -607,7 +775,9 @@ const UnifiedBillTracker = ({
                     </p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Due Date
+                    </label>
                     <p className="text-sm">
                       {showBillDetail.dueDate
                         ? new Date(showBillDetail.dueDate).toLocaleDateString()
@@ -621,7 +791,9 @@ const UnifiedBillTracker = ({
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Account Number
                     </label>
-                    <p className="text-sm font-mono">{showBillDetail.accountNumber}</p>
+                    <p className="text-sm font-mono">
+                      {showBillDetail.accountNumber}
+                    </p>
                   </div>
                 )}
 
@@ -630,7 +802,10 @@ const UnifiedBillTracker = ({
                     Status & Urgency
                   </label>
                   <div className="flex items-center gap-2">
-                    {getUrgencyIcon(showBillDetail.urgency, showBillDetail.isPaid)}
+                    {getUrgencyIcon(
+                      showBillDetail.urgency,
+                      showBillDetail.isPaid,
+                    )}
                     <span
                       className={`px-3 py-1 rounded-full text-sm ${
                         showBillDetail.isPaid
@@ -663,16 +838,21 @@ const UnifiedBillTracker = ({
                       Assigned Envelope
                     </label>
                     <p className="text-sm">
-                      {envelopes.find((env) => env.id === showBillDetail.envelopeId)?.name ||
-                        "Unknown"}
+                      {envelopes.find(
+                        (env) => env.id === showBillDetail.envelopeId,
+                      )?.name || "Unknown"}
                     </p>
                   </div>
                 )}
 
                 {showBillDetail.notes && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                    <p className="text-sm text-gray-600">{showBillDetail.notes}</p>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Notes
+                    </label>
+                    <p className="text-sm text-gray-600">
+                      {showBillDetail.notes}
+                    </p>
                   </div>
                 )}
 

@@ -34,8 +34,13 @@ const TransactionLedger = ({
   const [sortOrder, setSortOrder] = useState("desc");
 
   // Custom hooks
-  const { transactionForm, setTransactionForm, resetForm, populateForm, createTransaction } =
-    useTransactionForm();
+  const {
+    transactionForm,
+    setTransactionForm,
+    resetForm,
+    populateForm,
+    createTransaction,
+  } = useTransactionForm();
 
   const {
     importData,
@@ -56,7 +61,7 @@ const TransactionLedger = ({
     typeFilter,
     envelopeFilter,
     sortBy,
-    sortOrder
+    sortOrder,
   );
 
   const categories = [
@@ -109,7 +114,10 @@ const TransactionLedger = ({
     return suggestEnvelope(description, envelopes);
   };
 
-  const handleSplitTransaction = async (originalTransaction, splitTransactions) => {
+  const handleSplitTransaction = async (
+    originalTransaction,
+    splitTransactions,
+  ) => {
     try {
       // Delete the original transaction
       await onDeleteTransaction(originalTransaction.id);
