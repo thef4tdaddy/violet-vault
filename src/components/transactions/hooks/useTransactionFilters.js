@@ -7,7 +7,7 @@ export const useTransactionFilters = (
   typeFilter,
   envelopeFilter,
   sortBy,
-  sortOrder,
+  sortOrder
 ) => {
   const filteredTransactions = useMemo(() => {
     return transactions
@@ -15,9 +15,7 @@ export const useTransactionFilters = (
         if (!transaction) return false;
         if (
           searchTerm &&
-          !transaction.description
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase())
+          !transaction.description.toLowerCase().includes(searchTerm.toLowerCase())
         ) {
           return false;
         }
@@ -27,10 +25,7 @@ export const useTransactionFilters = (
           if (typeFilter === "expense" && transaction.amount >= 0) return false;
         }
 
-        if (
-          envelopeFilter !== "all" &&
-          transaction.envelopeId !== envelopeFilter
-        ) {
+        if (envelopeFilter !== "all" && transaction.envelopeId !== envelopeFilter) {
           return false;
         }
 
@@ -81,15 +76,7 @@ export const useTransactionFilters = (
           return aVal < bVal ? 1 : -1;
         }
       });
-  }, [
-    transactions,
-    searchTerm,
-    dateFilter,
-    typeFilter,
-    envelopeFilter,
-    sortBy,
-    sortOrder,
-  ]);
+  }, [transactions, searchTerm, dateFilter, typeFilter, envelopeFilter, sortBy, sortOrder]);
 
   return filteredTransactions;
 };

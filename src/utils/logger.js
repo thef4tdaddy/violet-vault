@@ -87,10 +87,7 @@ class Logger {
       });
 
       // For critical budget sync issues, also send as message to ensure visibility
-      if (
-        message.includes("budgetId value") ||
-        message.includes("sync issue")
-      ) {
+      if (message.includes("budgetId value") || message.includes("sync issue")) {
         Sentry.captureMessage(`Budget Sync: ${message}`, "info");
       }
     } catch (error) {

@@ -67,16 +67,12 @@ const SmartCategoryManager = ({
   // Analyze transaction patterns for category suggestions
   const transactionAnalysis = useMemo(() => {
     const suggestions = [];
-    const {
-      minTransactionCount,
-      minAmount,
-      similarityThreshold,
-      unusedCategoryThreshold,
-    } = analysisSettings;
+    const { minTransactionCount, minAmount, similarityThreshold, unusedCategoryThreshold } =
+      analysisSettings;
 
     // 1. UNCATEGORIZED TRANSACTION ANALYSIS
     const uncategorizedTransactions = filteredTransactions.filter(
-      (t) => !t.category || t.category === "Uncategorized" || t.category === "",
+      (t) => !t.category || t.category === "Uncategorized" || t.category === ""
     );
 
     // Group by merchant/description patterns
@@ -104,19 +100,13 @@ const SmartCategoryManager = ({
 
     // Calculate averages and suggest categories
     Object.values(merchantPatterns).forEach((pattern) => {
-      if (
-        pattern.transactions.length >= minTransactionCount &&
-        pattern.totalAmount >= minAmount
-      ) {
+      if (pattern.transactions.length >= minTransactionCount && pattern.totalAmount >= minAmount) {
         pattern.avgAmount = pattern.totalAmount / pattern.transactions.length;
 
         // Suggest category based on merchant patterns
         const suggestedCategory = suggestCategoryFromMerchant(pattern.merchant);
 
-        if (
-          suggestedCategory &&
-          !currentCategories.includes(suggestedCategory)
-        ) {
+        if (suggestedCategory && !currentCategories.includes(suggestedCategory)) {
           suggestions.push({
             id: `new_category_${pattern.merchant}`,
             type: "add_category",
@@ -151,9 +141,7 @@ const SmartCategoryManager = ({
           };
         }
         categoryUsage[transaction.category].count++;
-        categoryUsage[transaction.category].amount += Math.abs(
-          transaction.amount,
-        );
+        categoryUsage[transaction.category].amount += Math.abs(transaction.amount);
         categoryUsage[transaction.category].transactions.push(transaction);
       }
     });
@@ -187,10 +175,7 @@ const SmartCategoryManager = ({
             data: {
               primaryCategory,
               secondaryCategory,
-              transactionIds: [
-                ...usage1.transactions,
-                ...usage2.transactions,
-              ].map((t) => t.id),
+              transactionIds: [...usage1.transactions, ...usage2.transactions].map((t) => t.id),
             },
           });
         }
@@ -202,17 +187,15 @@ const SmartCategoryManager = ({
     const thresholdDate = new Date(
       now.getFullYear(),
       now.getMonth() - unusedCategoryThreshold,
-      now.getDate(),
+      now.getDate()
     );
 
     currentCategories.forEach((category) => {
       const recentUsage = filteredTransactions.filter(
-        (t) => t.category === category && new Date(t.date) >= thresholdDate,
+        (t) => t.category === category && new Date(t.date) >= thresholdDate
       );
 
-      const totalUsage = filteredTransactions.filter(
-        (t) => t.category === category,
-      );
+      const totalUsage = filteredTransactions.filter((t) => t.category === category);
 
       if (recentUsage.length === 0 && totalUsage.length < 3) {
         suggestions.push({
@@ -260,10 +243,7 @@ const SmartCategoryManager = ({
     });
 
     // Suggest specific bill categories if many bills are uncategorized
-    if (
-      billsByCategory["Uncategorized"] &&
-      billsByCategory["Uncategorized"].count >= 3
-    ) {
+    if (billsByCategory["Uncategorized"] && billsByCategory["Uncategorized"].count >= 3) {
       const uncategorizedBills = billsByCategory["Uncategorized"].bills;
 
       // Analyze bill types
@@ -278,43 +258,34 @@ const SmartCategoryManager = ({
         }
       });
 
-      Object.entries(billTypePatterns).forEach(
-        ([categoryType, billsInType]) => {
-          if (billsInType.length >= 2) {
-            const totalAmount = billsInType.reduce(
-              (sum, bill) => sum + (bill.amount || 0),
-              0,
-            );
+      Object.entries(billTypePatterns).forEach(([categoryType, billsInType]) => {
+        if (billsInType.length >= 2) {
+          const totalAmount = billsInType.reduce((sum, bill) => sum + (bill.amount || 0), 0);
 
-            suggestions.push({
-              id: `bill_category_${categoryType}`,
-              type: "add_category",
-              priority: totalAmount > 100 ? "high" : "medium",
-              category: "bill",
-              title: `Add "${categoryType}" Bill Category`,
-              description: `${billsInType.length} bills need this category`,
-              reasoning: `Bills: ${billsInType.map((b) => b.name).join(", ")}`,
-              suggestedCategory: categoryType,
-              affectedTransactions: billsInType.length,
-              impact: totalAmount,
-              action: "add_bill_category",
-              data: {
-                categoryName: categoryType,
-                billIds: billsInType.map((b) => b.id),
-              },
-            });
-          }
-        },
-      );
+          suggestions.push({
+            id: `bill_category_${categoryType}`,
+            type: "add_category",
+            priority: totalAmount > 100 ? "high" : "medium",
+            category: "bill",
+            title: `Add "${categoryType}" Bill Category`,
+            description: `${billsInType.length} bills need this category`,
+            reasoning: `Bills: ${billsInType.map((b) => b.name).join(", ")}`,
+            suggestedCategory: categoryType,
+            affectedTransactions: billsInType.length,
+            impact: totalAmount,
+            action: "add_bill_category",
+            data: {
+              categoryName: categoryType,
+              billIds: billsInType.map((b) => b.id),
+            },
+          });
+        }
+      });
     }
 
     // 2. BILL CATEGORY OPTIMIZATION
     Object.entries(billsByCategory).forEach(([category, data]) => {
-      if (
-        category !== "Uncategorized" &&
-        data.count === 1 &&
-        data.totalAmount < minAmount
-      ) {
+      if (category !== "Uncategorized" && data.count === 1 && data.totalAmount < minAmount) {
         suggestions.push({
           id: `optimize_bill_category_${category}`,
           type: "remove_category",
@@ -375,10 +346,7 @@ const SmartCategoryManager = ({
       stats[category].totalAmount += Math.abs(transaction.amount);
 
       const transactionDate = new Date(transaction.date);
-      if (
-        !stats[category].lastUsed ||
-        transactionDate > stats[category].lastUsed
-      ) {
+      if (!stats[category].lastUsed || transactionDate > stats[category].lastUsed) {
         stats[category].lastUsed = transactionDate;
       }
     });
@@ -390,8 +358,7 @@ const SmartCategoryManager = ({
 
         // Calculate frequency (transactions per month)
         if (stat.lastUsed) {
-          const monthsAgo =
-            (new Date() - stat.lastUsed) / (1000 * 60 * 60 * 24 * 30);
+          const monthsAgo = (new Date() - stat.lastUsed) / (1000 * 60 * 60 * 24 * 30);
           stat.frequency = stat.transactionCount / Math.max(1, monthsAgo);
         }
       }
@@ -403,17 +370,12 @@ const SmartCategoryManager = ({
   // Utility functions
   const suggestCategoryFromMerchant = (merchant) => {
     const patterns = {
-      Groceries:
-        /grocery|market|food|kroger|safeway|walmart|target|costco|whole foods/i,
-      "Gas & Transportation":
-        /gas|fuel|shell|exxon|chevron|bp|mobil|uber|lyft|taxi/i,
-      "Dining Out":
-        /restaurant|cafe|coffee|pizza|burger|taco|starbucks|mcdonalds/i,
-      Entertainment:
-        /movie|theater|netflix|spotify|game|entertainment|concert/i,
+      Groceries: /grocery|market|food|kroger|safeway|walmart|target|costco|whole foods/i,
+      "Gas & Transportation": /gas|fuel|shell|exxon|chevron|bp|mobil|uber|lyft|taxi/i,
+      "Dining Out": /restaurant|cafe|coffee|pizza|burger|taco|starbucks|mcdonalds/i,
+      Entertainment: /movie|theater|netflix|spotify|game|entertainment|concert/i,
       Shopping: /amazon|store|shop|mall|online|retail|ebay/i,
-      "Health & Medical":
-        /pharmacy|medical|doctor|hospital|cvs|walgreens|clinic/i,
+      "Health & Medical": /pharmacy|medical|doctor|hospital|cvs|walgreens|clinic/i,
       Utilities: /electric|water|internet|phone|cable|utility|bill/i,
       Insurance: /insurance|allstate|geico|progressive|state farm/i,
       Banking: /bank|atm|fee|transfer|interest/i,
@@ -453,10 +415,7 @@ const SmartCategoryManager = ({
 
     if (longer.length === 0) return 1.0;
 
-    const editDistance = levenshteinDistance(
-      longer.toLowerCase(),
-      shorter.toLowerCase(),
-    );
+    const editDistance = levenshteinDistance(longer.toLowerCase(), shorter.toLowerCase());
     return (longer.length - editDistance) / longer.length;
   };
 
@@ -474,7 +433,7 @@ const SmartCategoryManager = ({
         matrix[j][i] = Math.min(
           matrix[j][i - 1] + 1,
           matrix[j - 1][i] + 1,
-          matrix[j - 1][i - 1] + substitutionCost,
+          matrix[j - 1][i - 1] + substitutionCost
         );
       }
     }
@@ -487,10 +446,7 @@ const SmartCategoryManager = ({
       case "add_transaction_category":
         onAddCategory?.(suggestion.data.categoryName, "transaction");
         if (onApplyToTransactions) {
-          onApplyToTransactions(
-            suggestion.data.transactionIds,
-            suggestion.data.categoryName,
-          );
+          onApplyToTransactions(suggestion.data.transactionIds, suggestion.data.categoryName);
         }
         break;
       case "add_bill_category":
@@ -501,10 +457,7 @@ const SmartCategoryManager = ({
         break;
       case "consolidate_transaction_categories":
         if (onApplyToTransactions) {
-          onApplyToTransactions(
-            suggestion.data.transactionIds,
-            suggestion.data.primaryCategory,
-          );
+          onApplyToTransactions(suggestion.data.transactionIds, suggestion.data.primaryCategory);
         }
         onRemoveCategory?.(suggestion.data.secondaryCategory, "transaction");
         break;
@@ -567,9 +520,7 @@ const SmartCategoryManager = ({
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">
-            {allSuggestions.length} suggestions
-          </span>
+          <span className="text-sm text-gray-600">{allSuggestions.length} suggestions</span>
           <button
             onClick={() => setShowSettings(!showSettings)}
             className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
@@ -585,9 +536,7 @@ const SmartCategoryManager = ({
           <h4 className="font-medium text-gray-900 mb-4">Analysis Settings</h4>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
             <div>
-              <label className="block text-gray-700 mb-1">
-                Min Transactions
-              </label>
+              <label className="block text-gray-700 mb-1">Min Transactions</label>
               <input
                 type="number"
                 value={analysisSettings.minTransactionCount}
@@ -619,9 +568,7 @@ const SmartCategoryManager = ({
               />
             </div>
             <div>
-              <label className="block text-gray-700 mb-1">
-                Similarity Threshold
-              </label>
+              <label className="block text-gray-700 mb-1">Similarity Threshold</label>
               <input
                 type="range"
                 min="0.5"
@@ -672,9 +619,7 @@ const SmartCategoryManager = ({
             <div className="text-center py-8 text-gray-500">
               <CheckCircle className="h-12 w-12 mx-auto mb-3 text-green-400" />
               <p className="font-medium">No optimization suggestions</p>
-              <p className="text-sm mt-1">
-                Your categories look well-organized!
-              </p>
+              <p className="text-sm mt-1">Your categories look well-organized!</p>
               {dismissedSuggestions.size > 0 && (
                 <button
                   onClick={() => setDismissedSuggestions(new Set())}
@@ -726,17 +671,11 @@ const SmartCategoryManager = ({
                         </span>
                       </div>
 
-                      <p className="text-sm text-gray-600 mb-1">
-                        {suggestion.description}
-                      </p>
-                      <p className="text-xs text-gray-500 italic">
-                        {suggestion.reasoning}
-                      </p>
+                      <p className="text-sm text-gray-600 mb-1">{suggestion.description}</p>
+                      <p className="text-xs text-gray-500 italic">{suggestion.reasoning}</p>
 
                       <div className="mt-2 flex items-center text-xs text-gray-500">
-                        <span>
-                          Impact: {suggestion.affectedTransactions} items
-                        </span>
+                        <span>Impact: {suggestion.affectedTransactions} items</span>
                         <span className="mx-2">•</span>
                         <span>${suggestion.impact.toFixed(2)} total</span>
                       </div>
@@ -754,9 +693,7 @@ const SmartCategoryManager = ({
                   <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200">
                     <div className="flex items-center text-xs text-gray-500">
                       {getActionIcon(suggestion.type)}
-                      <span className="ml-1 capitalize">
-                        {suggestion.type.replace(/_/g, " ")}
-                      </span>
+                      <span className="ml-1 capitalize">{suggestion.type.replace(/_/g, " ")}</span>
                     </div>
 
                     <div className="flex gap-2">
@@ -791,10 +728,7 @@ const SmartCategoryManager = ({
         <div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {categoryStats.map((stat, index) => (
-              <div
-                key={index}
-                className="bg-white/60 rounded-lg p-4 border border-white/20"
-              >
+              <div key={index} className="bg-white/60 rounded-lg p-4 border border-white/20">
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-medium text-gray-900">{stat.name}</h4>
                   <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
@@ -809,15 +743,11 @@ const SmartCategoryManager = ({
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Total Amount:</span>
-                    <span className="font-medium">
-                      ${stat.totalAmount.toFixed(2)}
-                    </span>
+                    <span className="font-medium">${stat.totalAmount.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Avg Amount:</span>
-                    <span className="font-medium">
-                      ${stat.avgAmount.toFixed(2)}
-                    </span>
+                    <span className="font-medium">${stat.avgAmount.toFixed(2)}</span>
                   </div>
                   {stat.lastUsed && (
                     <div className="flex justify-between">
@@ -829,9 +759,7 @@ const SmartCategoryManager = ({
                   )}
                   <div className="flex justify-between">
                     <span className="text-gray-600">Frequency:</span>
-                    <span className="font-medium text-xs">
-                      {stat.frequency.toFixed(1)}/month
-                    </span>
+                    <span className="font-medium text-xs">{stat.frequency.toFixed(1)}/month</span>
                   </div>
                 </div>
 
@@ -840,11 +768,7 @@ const SmartCategoryManager = ({
                   <div className="flex justify-between items-center mb-1">
                     <span className="text-xs text-gray-500">Usage</span>
                     <span className="text-xs text-gray-500">
-                      {stat.frequency > 2
-                        ? "Active"
-                        : stat.frequency > 0.5
-                          ? "Moderate"
-                          : "Low"}
+                      {stat.frequency > 2 ? "Active" : stat.frequency > 0.5 ? "Moderate" : "Low"}
                     </span>
                   </div>
                   <div className="bg-gray-200 rounded-full h-2">
@@ -870,9 +794,7 @@ const SmartCategoryManager = ({
             <div className="text-center py-8 text-gray-500">
               <BarChart3 className="h-12 w-12 mx-auto mb-3 opacity-50" />
               <p className="font-medium">No category data available</p>
-              <p className="text-sm mt-1">
-                Add some transactions to see analysis
-              </p>
+              <p className="text-sm mt-1">Add some transactions to see analysis</p>
             </div>
           )}
         </div>
