@@ -31,7 +31,13 @@ export const AuthProvider = ({ children }) => {
       };
 
       // Listen for user activity
-      const events = ["mousedown", "mousemove", "keypress", "scroll", "touchstart"];
+      const events = [
+        "mousedown",
+        "mousemove",
+        "keypress",
+        "scroll",
+        "touchstart",
+      ];
       events.forEach((event) => {
         document.addEventListener(event, handleActivity, true);
       });
@@ -55,7 +61,10 @@ export const AuthProvider = ({ children }) => {
 
     // Add timeout wrapper
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("Login timeout after 10 seconds")), 10000)
+      setTimeout(
+        () => reject(new Error("Login timeout after 10 seconds")),
+        10000,
+      ),
     );
 
     const loginPromise = (async () => {
@@ -65,7 +74,8 @@ export const AuthProvider = ({ children }) => {
           console.log("🔄 About to derive key...");
 
           // New user setup
-          const { salt: newSalt, key } = await encryptionUtils.deriveKey(password);
+          const { salt: newSalt, key } =
+            await encryptionUtils.deriveKey(password);
           console.log("🔑 Generated key and salt");
 
           console.log("🔄 Setting auth state...");
@@ -95,9 +105,16 @@ export const AuthProvider = ({ children }) => {
 
           const { salt: savedSalt, encryptedData, iv } = JSON.parse(savedData);
           const saltArray = new Uint8Array(savedSalt);
-          const key = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
+          const key = await encryptionUtils.deriveKeyFromSalt(
+            password,
+            saltArray,
+          );
 
-          const decryptedData = await encryptionUtils.decrypt(encryptedData, key, iv);
+          const decryptedData = await encryptionUtils.decrypt(
+            encryptedData,
+            key,
+            iv,
+          );
 
           // Handle data migration for pre-refactor data
           let migratedData = decryptedData;
@@ -127,14 +144,17 @@ export const AuthProvider = ({ children }) => {
 
             // Save the migrated data back to localStorage
             try {
-              const encrypted = await encryptionUtils.encrypt(migratedData, key);
+              const encrypted = await encryptionUtils.encrypt(
+                migratedData,
+                key,
+              );
               localStorage.setItem(
                 "envelopeBudgetData",
                 JSON.stringify({
                   encryptedData: encrypted.data,
                   salt: Array.from(saltArray),
                   iv: encrypted.iv,
-                })
+                }),
               );
               console.log("✅ Data migration completed and saved");
             } catch (saveError) {
@@ -202,7 +222,9 @@ export const AuthProvider = ({ children }) => {
     updateUser,
   };
 
-  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {
