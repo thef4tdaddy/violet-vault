@@ -1,5 +1,5 @@
 // src/components/layout/Layout.jsx
-import React, { useState, useEffect, Suspense, lazy } from "react";
+import React, { useState, useEffect, useCallback, Suspense, lazy } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { BudgetProvider, useBudget } from "../../contexts/BudgetContext";
 import UserSetup from "../auth/UserSetup";
@@ -63,10 +63,10 @@ const Layout = () => {
   const [syncConflicts, setSyncConflicts] = useState(null);
 
   // Handle activity updates from MainContent
-  const handleActivityUpdate = ({ users, activity }) => {
+  const handleActivityUpdate = useCallback(({ users, activity }) => {
     setActiveUsers(users);
     setRecentActivity(activity);
-  };
+  }, []);
   const handleSetup = async (userData) => {
     logger.auth("Layout handleSetup called", { hasUserData: !!userData });
     try {
