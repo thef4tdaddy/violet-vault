@@ -36,6 +36,9 @@ const AmazonReceiptParser = ({
     includeReturns: false,
     folders: ["INBOX"], // Default to INBOX
   });
+  const [splittingReceipt, setSplittingReceipt] = useState(null);
+  const [showSplitModal, setShowSplitModal] = useState(false);
+  const [splitAllocations, setSplitAllocations] = useState([]);
 
   // Available categories from envelopes + general categories
   const availableCategories = [
@@ -442,6 +445,26 @@ const AmazonReceiptParser = ({
   const editReceiptCategory = (receipt) => {
     setEditingReceipt(receipt);
     setShowCategoryEditor(true);
+  };
+
+  const updateReceiptCategory = (selectedCategory, envelopeId) => {
+    if (editingReceipt) {
+      setSearchResults((prev) =>
+        prev.map((receipt) =>
+          receipt.id === editingReceipt.id
+            ? {
+                ...receipt,
+                primaryCategory: selectedCategory,
+                categoryIcon: amazonCategories[selectedCategory]?.icon || "🛍️",
+                categoryColor:
+                  amazonCategories[selectedCategory]?.color || "#64748b",
+              }
+            : receipt,
+        ),
+      );
+      setShowCategoryEditor(false);
+      setEditingReceipt(null);
+    }
   };
 
   // Start transaction splitting
