@@ -876,19 +876,14 @@ const UnifiedBillTracker = ({
               onCreateRecurringBill(newBill);
             } else {
               // Fallback to budget context
-              const billTransaction = {
-                ...newBill,
-                id: `bill_${Date.now()}`,
-                type: "recurring_bill",
-                date: new Date().toISOString().split("T")[0],
-                isPaid: false,
-                source: "manual",
-              };
-              budget.setAllTransactions([...transactions, billTransaction]);
+              budget.setAllTransactions([...transactions, newBill]);
             }
             setShowAddBillModal(false);
           }}
-          envelopes={envelopes}
+          onAddEnvelope={(envelopeData) => {
+            // Add envelope to budget context
+            budget.addEnvelope(envelopeData);
+          }}
         />
       )}
     </div>
