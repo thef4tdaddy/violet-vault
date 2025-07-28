@@ -764,6 +764,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
     updateBill,
     deleteBill,
     addEnvelope,
+    updateEnvelope,
     processPaycheck,
     setAllTransactions,
     setTransactions,
