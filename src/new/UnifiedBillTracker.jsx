@@ -30,19 +30,24 @@ const UnifiedBillTracker = ({
   className = "",
 }) => {
   const budget = useBudget();
-  const { currentUser } = useAuth();
 
-  const transactions =
-    propTransactions && propTransactions.length
-      ? propTransactions
-      : budget.allTransactions || [];
-  const envelopes =
-    propEnvelopes && propEnvelopes.length
-      ? propEnvelopes
-      : budget.envelopes || [];
+  const transactions = useMemo(
+    () =>
+      propTransactions && propTransactions.length
+        ? propTransactions
+        : budget.allTransactions || [],
+    [propTransactions, budget.allTransactions],
+  );
+
+  const envelopes = useMemo(
+    () =>
+      propEnvelopes && propEnvelopes.length
+        ? propEnvelopes
+        : budget.envelopes || [],
+    [propEnvelopes, budget.envelopes],
+  );
 
   const reconcileTransaction = budget.reconcileTransaction;
-  const handleUpdateBill = onUpdateBill || budget.updateBill;
   const handlePayBillAction = onPayBill || budget.updateBill;
   const [selectedBills, setSelectedBills] = useState(new Set());
   const [viewMode, setViewMode] = useState("upcoming");
@@ -58,23 +63,35 @@ const UnifiedBillTracker = ({
 
   const bills = useMemo(() => {
     return transactions
-      .filter((t) => t.type === "bill" || t.type === "recurring_bill")
+      .filter((t) => t && (t.type === "bill" || t.type === "recurring_bill"))
       .map((bill) => {
         let daysUntilDue = null;
         let urgency = "normal";
 
         if (bill.dueDate) {
-          const today = new Date();
-          const due = new Date(bill.dueDate);
-          daysUntilDue = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+          try {
+            const today = new Date();
+            const due = new Date(bill.dueDate);
 
-          if (daysUntilDue < 0) urgency = "overdue";
-          else if (daysUntilDue <= 3) urgency = "urgent";
-          else if (daysUntilDue <= 7) urgency = "soon";
+            // Validate date is valid
+            if (!isNaN(due.getTime())) {
+              daysUntilDue = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+
+              if (daysUntilDue < 0) urgency = "overdue";
+              else if (daysUntilDue <= 3) urgency = "urgent";
+              else if (daysUntilDue <= 7) urgency = "soon";
+            }
+          } catch (error) {
+            console.warn(`Invalid due date for bill ${bill.id}:`, bill.dueDate);
+          }
         }
 
         return {
           ...bill,
+          // Ensure required fields have valid values
+          amount: typeof bill.amount === "number" ? bill.amount : 0,
+          description: bill.description || bill.provider || `Bill ${bill.id}`,
+          isPaid: Boolean(bill.isPaid),
           daysUntilDue,
           urgency,
         };
@@ -169,12 +186,13 @@ const UnifiedBillTracker = ({
           (a.provider || "").localeCompare(b.provider || ""),
         );
         break;
-      case "urgency":
+      case "urgency": {
         const urgencyOrder = { overdue: 0, urgent: 1, soon: 2, normal: 3 };
         billsToShow.sort(
           (a, b) => urgencyOrder[a.urgency] - urgencyOrder[b.urgency],
         );
         break;
+      }
     }
 
     return billsToShow;

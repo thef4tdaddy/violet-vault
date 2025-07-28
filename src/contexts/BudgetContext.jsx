@@ -196,26 +196,63 @@ const budgetReducer = (state, action) => {
             `🔄 Migrating ${billsToMigrate.length} bills to unified structure`,
           );
 
-          const migratedBills = billsToMigrate.map((bill) => ({
-            ...bill,
-            type: bill.type || "bill",
-            // Ensure required fields exist
-            date:
-              bill.date ||
-              bill.createdAt ||
-              new Date().toISOString().split("T")[0],
-            amount: bill.amount || 0,
-            description: bill.description || bill.provider || "Bill",
-            isPaid: bill.isPaid || false,
-            source: bill.source || "migrated",
-          }));
+          const migratedBills = billsToMigrate
+            .filter((bill) => bill && bill.id) // Ensure bill has valid structure
+            .map((bill) => ({
+              ...bill,
+              type: bill.type || "bill",
+              // Ensure required fields exist
+              date:
+                bill.date ||
+                bill.createdAt ||
+                new Date().toISOString().split("T")[0],
+              amount: typeof bill.amount === "number" ? bill.amount : 0,
+              description:
+                bill.description || bill.provider || `Bill ${bill.id}`,
+              isPaid: Boolean(bill.isPaid),
+              source: bill.source || "migrated",
+              // Ensure envelope ID is valid if present
+              envelopeId: bill.envelopeId || null,
+            }));
 
           validatedPayload.allTransactions = [
             ...validatedPayload.allTransactions,
             ...migratedBills,
           ];
+
+          console.log(
+            `✅ Successfully migrated ${migratedBills.length} bills to unified structure`,
+          );
         }
       }
+
+      // Data consistency check: Remove duplicates and validate structure
+      const seen = new Set();
+      validatedPayload.allTransactions =
+        validatedPayload.allTransactions.filter((transaction) => {
+          if (!transaction || !transaction.id) return false;
+          if (seen.has(transaction.id)) {
+            console.warn(
+              `Duplicate transaction found and removed: ${transaction.id}`,
+            );
+            return false;
+          }
+          seen.add(transaction.id);
+          return true;
+        });
+
+      // Ensure all transactions have required fields
+      validatedPayload.allTransactions = validatedPayload.allTransactions.map(
+        (transaction) => ({
+          ...transaction,
+          amount:
+            typeof transaction.amount === "number" ? transaction.amount : 0,
+          description:
+            transaction.description || `Transaction ${transaction.id}`,
+          date: transaction.date || new Date().toISOString().split("T")[0],
+          type: transaction.type || "transaction",
+        }),
+      );
 
       return { ...state, ...validatedPayload, dataLoaded: true };
     }

@@ -35,27 +35,28 @@ const UnifiedEnvelopeManager = ({
   className = "",
 }) => {
   const budget = useBudget();
-  const { currentUser } = useAuth();
 
-  const envelopes =
-    propEnvelopes && propEnvelopes.length
-      ? propEnvelopes
-      : budget.envelopes || [];
-  const transactions =
-    propTransactions && propTransactions.length
-      ? propTransactions
-      : budget.transactions || [];
+  const envelopes = useMemo(
+    () =>
+      propEnvelopes && propEnvelopes.length
+        ? propEnvelopes
+        : budget.envelopes || [],
+    [propEnvelopes, budget.envelopes],
+  );
+
+  const transactions = useMemo(
+    () =>
+      propTransactions && propTransactions.length
+        ? propTransactions
+        : budget.transactions || [],
+    [propTransactions, budget.transactions],
+  );
   const unassignedCash =
     propUnassignedCash !== undefined
       ? propUnassignedCash
       : budget.unassignedCash || 0;
 
-  const handleUpdateEnvelope = onUpdateEnvelope || budget.updateEnvelope;
-  const handleCreateEnvelope = onCreateEnvelope || budget.addEnvelope;
-  const handleAssignTransaction =
-    onAssignTransaction || budget.reconcileTransaction;
   const [selectedEnvelopeId, setSelectedEnvelopeId] = useState(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const [viewMode, setViewMode] = useState("overview");
   const [filterOptions, setFilterOptions] = useState({
     timeRange: "current_month",
@@ -183,7 +184,7 @@ const UnifiedEnvelopeManager = ({
       case "name":
         sorted.sort((a, b) => a.name.localeCompare(b.name));
         break;
-      case "status":
+      case "status": {
         const statusOrder = {
           overdue: 0,
           overspent: 1,
@@ -193,6 +194,7 @@ const UnifiedEnvelopeManager = ({
         };
         sorted.sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
         break;
+      }
     }
 
     if (!filterOptions.showEmpty) {
