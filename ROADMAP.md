@@ -151,6 +151,7 @@ This roadmap outlines the planned development phases for VioletVault, our secure
   - Standardize component patterns and props
   - Implement comprehensive TypeScript migration
   - Add unit and integration test coverage
+  - Fix React Fast Refresh warnings by separating context definitions from provider components
 
 - [ ] **State Management Optimization**
   - Evaluate Redux or Zustand for complex state

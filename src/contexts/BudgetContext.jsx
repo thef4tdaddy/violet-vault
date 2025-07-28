@@ -6,7 +6,6 @@ import React, {
   useEffect,
   useState,
   useMemo,
-  useCallback,
 } from "react";
 import { encryptionUtils } from "../utils/encryption";
 import FirebaseSync from "../utils/firebaseSync";
@@ -180,8 +179,8 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
   const [state, dispatch] = useReducer(budgetReducer, initialState);
   const firebaseSync = useMemo(() => new FirebaseSync(), []);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [lastSyncTime, setLastSyncTime] = useState(null);
+  const [isSyncing] = useState(false);
+  const [lastSyncTime] = useState(null);
   const [syncError, setSyncError] = useState(null);
 
   useEffect(() => {
