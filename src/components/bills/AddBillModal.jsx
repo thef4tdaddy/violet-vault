@@ -2,13 +2,13 @@
 import React, { useState } from "react";
 import { X, Save } from "lucide-react";
 
-const AddBillModal = ({ 
-  isOpen, 
-  onClose, 
-  onAddBill, 
-  onAddEnvelope, 
+const AddBillModal = ({
+  isOpen,
+  onClose,
+  onAddBill,
+  onAddEnvelope,
   editingBill = null,
-  onUpdateBill 
+  onUpdateBill,
 }) => {
   const [formData, setFormData] = useState(() => {
     if (editingBill) {
@@ -369,7 +369,10 @@ const AddBillModal = ({
                     }
                     className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                   />
-                  <label htmlFor="create-envelope-checkbox" className="text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="create-envelope-checkbox"
+                    className="text-sm font-medium text-gray-700"
+                  >
                     Create associated envelope for budgeting
                   </label>
                 </div>
