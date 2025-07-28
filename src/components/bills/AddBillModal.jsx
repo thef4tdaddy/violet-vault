@@ -356,7 +356,7 @@ const AddBillModal = ({
 
             {!editingBill && (
               <div className="md:col-span-2">
-                <div className="flex items-start space-x-3">
+                <div className="flex items-center space-x-2">
                   <input
                     id="create-envelope-checkbox"
                     type="checkbox"
@@ -367,17 +367,15 @@ const AddBillModal = ({
                         createEnvelope: e.target.checked,
                       })
                     }
-                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded mt-1 flex-shrink-0"
+                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                   />
-                  <label htmlFor="create-envelope-checkbox" className="flex-1">
-                    <span className="text-sm font-medium text-gray-700 block">
-                      Create associated envelope for budgeting
-                    </span>
-                    <p className="text-xs text-gray-500 mt-1">
-                      This will create an envelope to help you save for this bill
-                    </p>
+                  <label htmlFor="create-envelope-checkbox" className="text-sm font-medium text-gray-700">
+                    Create associated envelope for budgeting
                   </label>
                 </div>
+                <p className="text-xs text-gray-500 mt-1 ml-6">
+                  This will create an envelope to help you save for this bill
+                </p>
               </div>
             )}
           </div>
