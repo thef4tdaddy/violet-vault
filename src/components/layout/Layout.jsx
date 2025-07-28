@@ -1,5 +1,12 @@
 // src/components/layout/Layout.jsx
-import React, { useState, useEffect, useCallback, useMemo, Suspense, lazy } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  Suspense,
+  lazy,
+} from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { BudgetProvider, useBudget } from "../../contexts/BudgetContext";
 import UserSetup from "../auth/UserSetup";
@@ -25,18 +32,34 @@ import {
 // Lazy load heavy components for better performance
 const PaycheckProcessor = lazy(() => import("../budgeting/PaycheckProcessor"));
 const EnvelopeGrid = lazy(() => import("../../new/UnifiedEnvelopeManager"));
-const SmartEnvelopeSuggestions = lazy(() => import("../budgeting/SmartEnvelopeSuggestions"));
+const SmartEnvelopeSuggestions = lazy(
+  () => import("../budgeting/SmartEnvelopeSuggestions"),
+);
 const BillManager = lazy(() => import("../../new/UnifiedBillTracker"));
 const SavingsGoals = lazy(() => import("../savings/SavingsGoals"));
 const Dashboard = lazy(() => import("./Dashboard"));
-const TransactionLedger = lazy(() => import("../transactions/TransactionLedger"));
-const ChartsAndAnalytics = lazy(() => import("../analytics/ChartsAndAnalytics"));
-const SupplementalAccounts = lazy(() => import("../accounts/SupplementalAccounts"));
+const TransactionLedger = lazy(
+  () => import("../transactions/TransactionLedger"),
+);
+const ChartsAndAnalytics = lazy(
+  () => import("../analytics/ChartsAndAnalytics"),
+);
+const SupplementalAccounts = lazy(
+  () => import("../accounts/SupplementalAccounts"),
+);
 
 const Layout = () => {
   logger.debug("Layout component is running");
 
-  const { isUnlocked, encryptionKey, currentUser, login, logout, budgetId, salt } = useAuth();
+  const {
+    isUnlocked,
+    encryptionKey,
+    currentUser,
+    login,
+    logout,
+    budgetId,
+    salt,
+  } = useAuth();
 
   const firebaseSync = useMemo(() => new FirebaseSync(), []);
 
@@ -61,7 +84,9 @@ const Layout = () => {
       const { encryptionUtils } = await import("../../utils/encryption");
       const userDataWithId = {
         ...userData,
-        budgetId: userData.budgetId || encryptionUtils.generateBudgetId(userData.password),
+        budgetId:
+          userData.budgetId ||
+          encryptionUtils.generateBudgetId(userData.password),
       };
 
       logger.auth("Calling login", {
@@ -101,7 +126,11 @@ const Layout = () => {
 
       // Decrypt the data
       const { encryptedData, iv } = JSON.parse(savedData);
-      const decryptedData = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
+      const decryptedData = await encryptionUtils.decrypt(
+        encryptedData,
+        encryptionKey,
+        iv,
+      );
 
       // Prepare export data with metadata
       const exportData = {
@@ -122,7 +151,10 @@ const Layout = () => {
       const link = document.createElement("a");
       link.href = url;
 
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+      const timestamp = new Date()
+        .toISOString()
+        .replace(/[:.]/g, "-")
+        .slice(0, 19);
       link.download = `VioletVault Budget Backup ${timestamp}.json`;
 
       document.body.appendChild(link);
@@ -132,7 +164,7 @@ const Layout = () => {
 
       console.log("✅ Data exported successfully!");
       alert(
-        `Successfully exported your budget data!\n\nEnvelopes: ${exportData.envelopes?.length || 0}\nBills: ${exportData.bills?.length || 0}\nTransactions: ${exportData.allTransactions?.length || 0}`
+        `Successfully exported your budget data!\n\nEnvelopes: ${exportData.envelopes?.length || 0}\nBills: ${exportData.bills?.length || 0}\nTransactions: ${exportData.allTransactions?.length || 0}`,
       );
     } catch (error) {
       console.error("❌ Export failed:", error);
@@ -166,12 +198,14 @@ const Layout = () => {
 
       // Validate the data structure
       if (!importedData.envelopes || !Array.isArray(importedData.envelopes)) {
-        throw new Error("Invalid backup file: missing or invalid envelopes data");
+        throw new Error(
+          "Invalid backup file: missing or invalid envelopes data",
+        );
       }
 
       // Confirm import with user
       const confirmed = confirm(
-        `Import ${importedData.envelopes?.length || 0} envelopes, ${importedData.bills?.length || 0} bills, and ${importedData.allTransactions?.length || 0} transactions?\n\nThis will replace your current data.`
+        `Import ${importedData.envelopes?.length || 0} envelopes, ${importedData.bills?.length || 0} bills, and ${importedData.allTransactions?.length || 0} transactions?\n\nThis will replace your current data.`,
       );
 
       if (!confirmed) {
@@ -184,7 +218,10 @@ const Layout = () => {
         const currentData = localStorage.getItem("envelopeBudgetData");
         if (currentData) {
           const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-          localStorage.setItem(`envelopeBudgetData_backup_${timestamp}`, currentData);
+          localStorage.setItem(
+            `envelopeBudgetData_backup_${timestamp}`,
+            currentData,
+          );
           console.log("✅ Current data backed up");
         }
       } catch (backupError) {
@@ -260,7 +297,10 @@ const Layout = () => {
 
       // Encrypt and save the imported data
       console.log("🔐 Encrypting and saving imported data...");
-      const encrypted = await encryptionUtils.encrypt(dataToLoad, encryptionKey);
+      const encrypted = await encryptionUtils.encrypt(
+        dataToLoad,
+        encryptionKey,
+      );
 
       const saveData = {
         encryptedData: encrypted.data,
@@ -278,8 +318,13 @@ const Layout = () => {
 
       // Test decryption to ensure data integrity
       console.log("🔍 Verifying data integrity...");
-      const { encryptedData: testEncrypted, iv: testIv } = JSON.parse(verification);
-      const testDecrypted = await encryptionUtils.decrypt(testEncrypted, encryptionKey, testIv);
+      const { encryptedData: testEncrypted, iv: testIv } =
+        JSON.parse(verification);
+      const testDecrypted = await encryptionUtils.decrypt(
+        testEncrypted,
+        encryptionKey,
+        testIv,
+      );
 
       console.log("✅ Data integrity verified:", {
         envelopes: testDecrypted.envelopes?.length || 0,
@@ -292,13 +337,15 @@ const Layout = () => {
       console.log("✅ Data imported and saved successfully!");
 
       // Data is saved to localStorage - BudgetContext will load it automatically
-      console.log("📝 Data saved to localStorage - BudgetContext should load it automatically");
+      console.log(
+        "📝 Data saved to localStorage - BudgetContext should load it automatically",
+      );
 
       console.log("🎉 Data import completed successfully!");
 
       // Show success message - data should load automatically
       alert(
-        `Successfully imported data!\n\nEnvelopes: ${dataToLoad.envelopes.length}\nBills: ${dataToLoad.bills.length}\nTransactions: ${dataToLoad.allTransactions.length}\n\nData saved to localStorage. If it doesn't appear, try the Force Load Data button.`
+        `Successfully imported data!\n\nEnvelopes: ${dataToLoad.envelopes.length}\nBills: ${dataToLoad.bills.length}\nTransactions: ${dataToLoad.allTransactions.length}\n\nData saved to localStorage. If it doesn't appear, try the Force Load Data button.`,
       );
 
       return dataToLoad;
@@ -319,7 +366,9 @@ const Layout = () => {
 
   const resetEncryptionAndStartFresh = async () => {
     if (
-      confirm("This will permanently delete all your budget data and cannot be undone. Continue?")
+      confirm(
+        "This will permanently delete all your budget data and cannot be undone. Continue?",
+      )
     ) {
       try {
         // Clear all localStorage data
@@ -343,7 +392,9 @@ const Layout = () => {
         }
 
         logout();
-        alert("All data has been cleared. You can now set up a new budget with a fresh password.");
+        alert(
+          "All data has been cleared. You can now set up a new budget with a fresh password.",
+        );
       } catch (error) {
         console.error("Failed to reset encryption:", error);
         alert("Failed to clear all data. Please try refreshing the page.");
@@ -487,9 +538,9 @@ const MainContent = ({
             onImport={handleImport}
             onLogout={onLogout}
             onResetEncryption={() => {
-              // Reset the budget context data
+              // Reset the budget context data first
               budget.resetAllData();
-              // Call the original reset function
+              // Then call the original reset function (clears localStorage and calls logout)
               onResetEncryption();
             }}
           />
@@ -602,14 +653,20 @@ const MainContent = ({
         </div>
 
         {/* Main Content */}
-        <ViewRenderer activeView={activeView} budget={budget} currentUser={currentUser} />
+        <ViewRenderer
+          activeView={activeView}
+          budget={budget}
+          currentUser={currentUser}
+        />
 
         {/* Loading/Syncing Overlay */}
         {isSyncing && (
           <div className="fixed bottom-4 right-4 glassmorphism rounded-2xl p-4 z-50">
             <div className="flex items-center space-x-3">
               <div className="animate-spin h-5 w-5 border-2 border-purple-500/30 border-t-purple-500 rounded-full"></div>
-              <span className="text-sm font-medium text-gray-700">Syncing...</span>
+              <span className="text-sm font-medium text-gray-700">
+                Syncing...
+              </span>
             </div>
           </div>
         )}
@@ -619,7 +676,9 @@ const MainContent = ({
           <div className="fixed bottom-4 left-4 bg-amber-500 text-white rounded-2xl p-4 z-50">
             <div className="flex items-center space-x-3">
               <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium">Offline - Changes saved locally</span>
+              <span className="text-sm font-medium">
+                Offline - Changes saved locally
+              </span>
             </div>
           </div>
         )}
@@ -636,10 +695,13 @@ const MainContent = ({
                   </div>
                 </div>
 
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Sync Conflict Detected</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                  Sync Conflict Detected
+                </h3>
                 <p className="text-gray-600 mb-6">
-                  <strong>{syncConflicts.cloudUser?.userName}</strong> made changes on another
-                  device. Would you like to load their latest changes?
+                  <strong>{syncConflicts.cloudUser?.userName}</strong> made
+                  changes on another device. Would you like to load their latest
+                  changes?
                 </p>
 
                 <div className="flex gap-3">
@@ -707,7 +769,9 @@ const SummaryCard = ({ icon: Icon, label, value, color }) => {
         </div>
         <div>
           <p className="text-sm font-semibold text-gray-600 mb-1">{label}</p>
-          <p className={`text-2xl font-bold ${textColorClasses[color]}`}>${value.toFixed(2)}</p>
+          <p className={`text-2xl font-bold ${textColorClasses[color]}`}>
+            ${value.toFixed(2)}
+          </p>
         </div>
       </div>
     </div>
@@ -803,14 +867,14 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
         onPayBill={(updatedBill) => {
           // Update the bill in allTransactions
           const updatedTransactions = allTransactions.map((t) =>
-            t.id === updatedBill.id ? updatedBill : t
+            t.id === updatedBill.id ? updatedBill : t,
           );
           setAllTransactions(updatedTransactions);
         }}
         onUpdateBill={(updatedBill) => {
           // Update the bill in allTransactions
           const updatedTransactions = allTransactions.map((t) =>
-            t.id === updatedBill.id ? updatedBill : t
+            t.id === updatedBill.id ? updatedBill : t,
           );
           setAllTransactions(updatedTransactions);
         }}
@@ -831,7 +895,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
             // This would integrate with email parsing or other bill detection services
             // For now, we'll show a placeholder notification
             alert(
-              "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox."
+              "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox.",
             );
           } catch (error) {
             console.error("Failed to search for new bills:", error);
@@ -852,14 +916,20 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
         onUpdateTransaction={() => {}} // Will be implemented
         onDeleteTransaction={() => {}} // Will be implemented
         onBulkImport={(newTransactions) => {
-          console.log("🔄 onBulkImport called with transactions:", newTransactions.length);
-          const updatedAllTransactions = [...allTransactions, ...newTransactions];
+          console.log(
+            "🔄 onBulkImport called with transactions:",
+            newTransactions.length,
+          );
+          const updatedAllTransactions = [
+            ...allTransactions,
+            ...newTransactions,
+          ];
           const updatedTransactions = [...transactions, ...newTransactions];
           setAllTransactions(updatedAllTransactions);
           setTransactions(updatedTransactions);
           console.log(
             "💾 Bulk import complete. Total transactions:",
-            updatedAllTransactions.length
+            updatedAllTransactions.length,
           );
         }}
         currentUser={currentUser}
@@ -878,7 +948,9 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
   };
 
   return (
-    <Suspense fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}>
+    <Suspense
+      fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}
+    >
       {views[activeView]}
     </Suspense>
   );
