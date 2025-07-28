@@ -50,6 +50,7 @@ const UnifiedBillTracker = ({
   const [isSearching, setIsSearching] = useState(false);
   const [showBillDetail, setShowBillDetail] = useState(null);
   const [showAddBillModal, setShowAddBillModal] = useState(false);
+  const [editingBill, setEditingBill] = useState(null);
   const [filterOptions, setFilterOptions] = useState({
     billTypes: ["all"],
     providers: [],
@@ -666,7 +667,7 @@ const UnifiedBillTracker = ({
                       </button>
 
                       <button
-                        onClick={() => onUpdateBill?.(bill)}
+                        onClick={() => setEditingBill(bill)}
                         className="text-gray-400 hover:text-gray-600 p-1 rounded"
                         title="Edit bill"
                       >
@@ -839,7 +840,7 @@ const UnifiedBillTracker = ({
                     </button>
                     <button
                       onClick={() => {
-                        onUpdateBill?.(showBillDetail);
+                        setEditingBill(showBillDetail);
                         setShowBillDetail(null);
                       }}
                       className="flex-1 bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 flex items-center justify-center"
@@ -879,6 +880,31 @@ const UnifiedBillTracker = ({
               budget.setAllTransactions([...transactions, newBill]);
             }
             setShowAddBillModal(false);
+          }}
+          onAddEnvelope={(envelopeData) => {
+            // Add envelope to budget context
+            budget.addEnvelope(envelopeData);
+          }}
+        />
+      )}
+
+      {/* Edit Bill Modal */}
+      {editingBill && (
+        <AddBillModal
+          isOpen={!!editingBill}
+          onClose={() => setEditingBill(null)}
+          editingBill={editingBill}
+          onUpdateBill={(updatedBill) => {
+            if (onUpdateBill) {
+              onUpdateBill(updatedBill);
+            } else {
+              // Fallback to budget context
+              const updatedTransactions = transactions.map((t) =>
+                t.id === updatedBill.id ? updatedBill : t
+              );
+              budget.setAllTransactions(updatedTransactions);
+            }
+            setEditingBill(null);
           }}
           onAddEnvelope={(envelopeData) => {
             // Add envelope to budget context
