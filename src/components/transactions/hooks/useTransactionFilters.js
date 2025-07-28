@@ -12,6 +12,7 @@ export const useTransactionFilters = (
   const filteredTransactions = useMemo(() => {
     return transactions
       .filter((transaction) => {
+        if (!transaction) return false;
         if (
           searchTerm &&
           !transaction.description

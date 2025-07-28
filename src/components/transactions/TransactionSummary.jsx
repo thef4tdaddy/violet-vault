@@ -3,11 +3,11 @@ import { TrendingUp, TrendingDown, DollarSign } from "lucide-react";
 
 const TransactionSummary = ({ transactions = [] }) => {
   const totalIncome = transactions
-    .filter((t) => t.amount > 0)
+    .filter((t) => t && t.amount > 0)
     .reduce((sum, t) => sum + t.amount, 0);
 
   const totalExpenses = transactions
-    .filter((t) => t.amount < 0)
+    .filter((t) => t && t.amount < 0)
     .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
   const netCashFlow = totalIncome - totalExpenses;
