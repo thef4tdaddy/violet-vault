@@ -23,9 +23,9 @@ import {
 
 // Lazy load heavy components for better performance
 const PaycheckProcessor = lazy(() => import("../budgeting/PaycheckProcessor"));
-const EnvelopeGrid = lazy(() => import("../budgeting/EnvelopeGrid"));
+const EnvelopeGrid = lazy(() => import("../../new/UnifiedEnvelopeManager"));
 const SmartEnvelopeSuggestions = lazy(() => import("../budgeting/SmartEnvelopeSuggestions"));
-const BillManager = lazy(() => import("../bills/BillManager"));
+const BillManager = lazy(() => import("../../new/UnifiedBillTracker"));
 const SavingsGoals = lazy(() => import("../savings/SavingsGoals"));
 const Dashboard = lazy(() => import("./Dashboard"));
 const TransactionLedger = lazy(() => import("../transactions/TransactionLedger"));
@@ -736,15 +736,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
           minAmount={50}
           minTransactions={3}
         />
-        <EnvelopeGrid
-          envelopes={envelopes}
-          unassignedCash={unassignedCash}
-          onSpend={useEnvelopeSystem().spendFromEnvelope}
-          onTransfer={useEnvelopeSystem().transferBetweenEnvelopes}
-          onUpdateUnassigned={setUnassignedCash}
-          onAddEnvelope={addEnvelope}
-          currentUser={currentUser}
-        />
+        <EnvelopeGrid />
       </div>
     ),
     savings: (
@@ -775,15 +767,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
         currentUser={currentUser}
       />
     ),
-    bills: (
-      <BillManager
-        bills={bills}
-        onAddBill={addBill}
-        onUpdateBill={updateBill}
-        onDeleteBill={deleteBill}
-        onAddEnvelope={addEnvelope}
-      />
-    ),
+    bills: <BillManager />,
     transactions: (
       <TransactionLedger
         transactions={allTransactions}
