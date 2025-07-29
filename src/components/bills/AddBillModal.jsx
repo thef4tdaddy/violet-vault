@@ -2,9 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { X, Save, Sparkles } from "lucide-react";
 import {
-  getSmartIcon,
-  suggestBillCategoryAndIcon,
-  getIconSuggestions,
+  getBillIcon,
+  getBillIconOptions,
   getIconName,
 } from "../../utils/billIcons";
 
@@ -180,9 +179,10 @@ const AddBillModal = ({
         icon:
           editingBill.icon ||
           getSmartIcon(
-            editingBill.name || editingBill.provider || "",
-            editingBill.notes || "",
             editingBill.category || "",
+            editingBill.notes || "",
+            editingBill.name || editingBill.provider || "",
+            "bill",
           ),
       });
     } else {
@@ -196,7 +196,7 @@ const AddBillModal = ({
         notes: "",
         createEnvelope: true,
         customFrequency: "",
-        icon: getSmartIcon("", "", "Bills"),
+        icon: getSmartIcon("Bills", "", "", "bill"),
       });
     }
   };
