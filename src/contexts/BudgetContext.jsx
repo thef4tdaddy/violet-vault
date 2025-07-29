@@ -10,7 +10,13 @@ import { getEncryptedData, setEncryptedData, clearEncryptedData } from "../db";
 
 export const BudgetContext = createContext();
 
-export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId, salt }) => {
+export const BudgetProvider = ({
+  children,
+  encryptionKey,
+  currentUser,
+  budgetId,
+  salt,
+}) => {
   const store = useBudgetStore();
   const { dispatch, ...state } = store;
   const firebaseSync = useMemo(() => new FirebaseSync(), []);
@@ -32,10 +38,13 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
       if (encryptionKey && currentUser && budgetId) {
         setIsSyncing(true);
         setSyncError(null);
-        logger.budgetSync("✅ Auth details present. Proceeding with data load.", {
-          budgetId,
-          userName: currentUser.userName,
-        });
+        logger.budgetSync(
+          "✅ Auth details present. Proceeding with data load.",
+          {
+            budgetId,
+            userName: currentUser.userName,
+          },
+        );
 
         try {
           // Initialize FirebaseSync with valid credentials, just before use.
@@ -43,7 +52,10 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
 
           const cloudResult = await firebaseSync.loadFromCloud();
           if (cloudResult && cloudResult.data) {
-            logger.info("☁️ Successfully loaded data from cloud.", cloudResult.data);
+            logger.info(
+              "☁️ Successfully loaded data from cloud.",
+              cloudResult.data,
+            );
             dispatch({
               type: actionTypes.LOAD_DATA,
               payload: cloudResult.data,
@@ -56,7 +68,9 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
           logger.warn("⚠️ Failed to load from cloud. Will try localStorage.", {
             error: error.message,
           });
-          setSyncError("Failed to load cloud data. Check password or connection.");
+          setSyncError(
+            "Failed to load cloud data. Check password or connection.",
+          );
         }
 
         // Fallback to IndexedDB (Dexie) or localStorage if cloud load fails
@@ -71,11 +85,20 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
         if (localEntry) {
           try {
             const { encryptedData, iv } = localEntry;
-            const decryptedData = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
+            const decryptedData = await encryptionUtils.decrypt(
+              encryptedData,
+              encryptionKey,
+              iv,
+            );
             dispatch({ type: actionTypes.LOAD_DATA, payload: decryptedData });
-            logger.info("💾 Successfully loaded data from IndexedDB/localStorage.");
+            logger.info(
+              "💾 Successfully loaded data from IndexedDB/localStorage.",
+            );
           } catch (error) {
-            logger.error("❌ Failed to load/decrypt data from local cache.", error);
+            logger.error(
+              "❌ Failed to load/decrypt data from local cache.",
+              error,
+            );
             localStorage.removeItem("envelopeBudgetData");
             await clearEncryptedData?.();
             setSyncError("Failed to decrypt local data. It may be corrupted.");
@@ -83,11 +106,14 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
         }
         setIsSyncing(false);
       } else {
-        logger.warn("⏳ Skipping data load: Authentication details not yet available.", {
-          hasEncryptionKey: !!encryptionKey,
-          hasCurrentUser: !!currentUser,
-          hasBudgetId: !!budgetId,
-        });
+        logger.warn(
+          "⏳ Skipping data load: Authentication details not yet available.",
+          {
+            hasEncryptionKey: !!encryptionKey,
+            hasCurrentUser: !!currentUser,
+            hasBudgetId: !!budgetId,
+          },
+        );
       }
     };
 
@@ -132,13 +158,19 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
         setIsSyncing(true);
         try {
           // Local save is fast, do it first. Save to both Dexie and localStorage
-          const encrypted = await encryptionUtils.encrypt(syncData, encryptionKey);
+          const encrypted = await encryptionUtils.encrypt(
+            syncData,
+            encryptionKey,
+          );
           const cacheEntry = {
             encryptedData: encrypted.data,
             salt: Array.from(salt || new Uint8Array()),
             iv: encrypted.iv,
           };
-          localStorage.setItem("envelopeBudgetData", JSON.stringify(cacheEntry));
+          localStorage.setItem(
+            "envelopeBudgetData",
+            JSON.stringify(cacheEntry),
+          );
           await setEncryptedData(cacheEntry);
           logger.info("💾 Data saved to local cache.");
 
@@ -166,14 +198,24 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
         clearTimeout(handler);
       };
     }
-  }, [syncData, encryptionKey, currentUser, budgetId, salt, isOnline, state.dataLoaded]);
+  }, [
+    syncData,
+    encryptionKey,
+    currentUser,
+    budgetId,
+    salt,
+    isOnline,
+    state.dataLoaded,
+  ]);
 
   const actions = useMemo(
     () => ({
       setEnvelopes: (envelopes) =>
         dispatch({ type: actionTypes.SET_ENVELOPES, payload: envelopes }),
-      setBills: (bills) => dispatch({ type: actionTypes.SET_BILLS, payload: bills }),
-      setSavingsGoals: (goals) => dispatch({ type: actionTypes.SET_SAVINGS_GOALS, payload: goals }),
+      setBills: (bills) =>
+        dispatch({ type: actionTypes.SET_BILLS, payload: bills }),
+      setSavingsGoals: (goals) =>
+        dispatch({ type: actionTypes.SET_SAVINGS_GOALS, payload: goals }),
       setSupplementalAccounts: (accounts) =>
         dispatch({
           type: actionTypes.SET_SUPPLEMENTAL_ACCOUNTS,
@@ -197,24 +239,33 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
           type: actionTypes.SET_BIWEEKLY_ALLOCATION,
           payload: amount,
         }),
-      addEnvelope: (envelope) => dispatch({ type: actionTypes.ADD_ENVELOPE, payload: envelope }),
+      addEnvelope: (envelope) =>
+        dispatch({ type: actionTypes.ADD_ENVELOPE, payload: envelope }),
       updateEnvelope: (envelope) =>
         dispatch({ type: actionTypes.UPDATE_ENVELOPE, payload: envelope }),
-      deleteEnvelope: (id) => dispatch({ type: actionTypes.DELETE_ENVELOPE, payload: id }),
-      addBill: (bill) => dispatch({ type: actionTypes.ADD_BILL, payload: bill }),
-      updateBill: (bill) => dispatch({ type: actionTypes.UPDATE_BILL, payload: bill }),
-      deleteBill: (id) => dispatch({ type: actionTypes.DELETE_BILL, payload: id }),
-      addSavingsGoal: (goal) => dispatch({ type: actionTypes.ADD_SAVINGS_GOAL, payload: goal }),
+      deleteEnvelope: (id) =>
+        dispatch({ type: actionTypes.DELETE_ENVELOPE, payload: id }),
+      addBill: (bill) =>
+        dispatch({ type: actionTypes.ADD_BILL, payload: bill }),
+      updateBill: (bill) =>
+        dispatch({ type: actionTypes.UPDATE_BILL, payload: bill }),
+      deleteBill: (id) =>
+        dispatch({ type: actionTypes.DELETE_BILL, payload: id }),
+      addSavingsGoal: (goal) =>
+        dispatch({ type: actionTypes.ADD_SAVINGS_GOAL, payload: goal }),
       updateSavingsGoal: (goal) =>
         dispatch({ type: actionTypes.UPDATE_SAVINGS_GOAL, payload: goal }),
-      deleteSavingsGoal: (id) => dispatch({ type: actionTypes.DELETE_SAVINGS_GOAL, payload: id }),
-      processPaycheck: (data) => dispatch({ type: actionTypes.PROCESS_PAYCHECK, payload: data }),
+      deleteSavingsGoal: (id) =>
+        dispatch({ type: actionTypes.DELETE_SAVINGS_GOAL, payload: id }),
+      processPaycheck: (data) =>
+        dispatch({ type: actionTypes.PROCESS_PAYCHECK, payload: data }),
       reconcileTransaction: (data) =>
         dispatch({ type: actionTypes.RECONCILE_TRANSACTION, payload: data }),
-      loadData: (data) => dispatch({ type: actionTypes.LOAD_DATA, payload: data }),
+      loadData: (data) =>
+        dispatch({ type: actionTypes.LOAD_DATA, payload: data }),
       resetAllData: () => dispatch({ type: actionTypes.RESET_ALL_DATA }),
     }),
-    []
+    [dispatch, state, store],
   );
 
   const contextValue = useMemo(
@@ -227,8 +278,8 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
             !key.startsWith("update") &&
             !key.startsWith("delete") &&
             !key.startsWith("set") &&
-            key !== "dispatch"
-        )
+            key !== "dispatch",
+        ),
       ),
       // Then spread BudgetContext actions which handle persistence
       ...actions,
@@ -237,14 +288,29 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
       lastSyncTime,
       syncError,
       getActiveUsers: () =>
-        firebaseSync.getActiveUsers ? Array.from(firebaseSync.activeUsers?.values() || []) : [],
+        firebaseSync.getActiveUsers
+          ? Array.from(firebaseSync.activeUsers?.values() || [])
+          : [],
       getRecentActivity: () =>
         firebaseSync.getRecentActivity ? firebaseSync.getRecentActivity() : [],
     }),
-    [state, actions, isOnline, isSyncing, lastSyncTime, syncError, firebaseSync, dispatch]
+    [
+      state,
+      actions,
+      isOnline,
+      isSyncing,
+      lastSyncTime,
+      syncError,
+      firebaseSync,
+      dispatch,
+    ],
   );
 
-  return <BudgetContext.Provider value={contextValue}>{children}</BudgetContext.Provider>;
+  return (
+    <BudgetContext.Provider value={contextValue}>
+      {children}
+    </BudgetContext.Provider>
+  );
 };
 
 export { actionTypes };
