@@ -53,7 +53,7 @@ This roadmap outlines the planned development phases for VioletVault, our secure
 
 - [ ] **Performance Optimization**
   - Implement lazy loading for large transaction lists
-  - Add data pagination for better performance
+  - [x] Add data pagination for better performance
   - Optimize bundle size with code splitting
 
 ---
