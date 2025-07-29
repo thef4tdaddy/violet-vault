@@ -102,18 +102,14 @@ const EditEnvelopeModal = ({
         description: envelope.description || "",
         priority: envelope.priority || "medium",
         autoAllocate: envelope.autoAllocate ?? true,
-        icon: envelope.icon || getSmartIcon(envelope.category || "", envelope.description || "", envelope.name || ""),
+        icon: envelope.icon || Tag, // Default icon for envelopes
       });
     }
   }, [envelope]);
 
   // Get smart icon suggestions based on current form data
-  const iconSuggestions = getIconSuggestions(
-    formData.category,
-    formData.description,
-    formData.name,
-    "envelope"
-  );
+  // Simple icon suggestions for envelopes - to be enhanced later
+  const iconSuggestions = [Target, DollarSign, Save, Tag, Settings];
 
   const resetForm = () => {
     setFormData({
