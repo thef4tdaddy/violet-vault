@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Edit3, Trash2, Scissors } from "lucide-react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 
 const TransactionTable = ({ transactions = [], envelopes = [], onEdit, onDelete, onSplit }) => {
   const handleDelete = (transactionId) => {
@@ -8,10 +9,19 @@ const TransactionTable = ({ transactions = [], envelopes = [], onEdit, onDelete,
     }
   };
 
+  const parentRef = useRef(null);
+
+  const rowVirtualizer = useVirtualizer({
+    count: transactions.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 72,
+    overscan: 10,
+  });
+
   return (
     <div className="glassmorphism rounded-xl overflow-hidden border border-white/20">
-      <div className="overflow-x-auto">
-        <table className="w-full">
+      <div ref={parentRef} className="overflow-auto max-h-[70vh]">
+        <table className="w-full relative">
           <thead className="bg-white/50">
             <tr>
               <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -34,7 +44,13 @@ const TransactionTable = ({ transactions = [], envelopes = [], onEdit, onDelete,
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody
+            className="divide-y divide-gray-200"
+            style={{
+              height: `${rowVirtualizer.getTotalSize()}px`,
+              position: "relative",
+            }}
+          >
             {transactions.length === 0 ? (
               <tr>
                 <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
@@ -42,10 +58,21 @@ const TransactionTable = ({ transactions = [], envelopes = [], onEdit, onDelete,
                 </td>
               </tr>
             ) : (
-              transactions.map((transaction) => {
+              rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                const transaction = transactions[virtualRow.index];
                 const envelope = envelopes.find((e) => e.id === transaction.envelopeId);
                 return (
-                  <tr key={transaction.id} className="hover:bg-white/30">
+                  <tr
+                    key={transaction.id}
+                    className="hover:bg-white/30"
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      transform: `translateY(${virtualRow.start}px)`,
+                    }}
+                  >
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {new Date(transaction.date).toLocaleDateString()}
                     </td>
