@@ -219,7 +219,18 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
 
   const contextValue = useMemo(
     () => ({
-      ...state,
+      // Spread state first, but exclude action methods to avoid conflicts
+      ...Object.fromEntries(
+        Object.entries(state).filter(
+          ([key]) =>
+            !key.startsWith("add") &&
+            !key.startsWith("update") &&
+            !key.startsWith("delete") &&
+            !key.startsWith("set") &&
+            key !== "dispatch"
+        )
+      ),
+      // Then spread BudgetContext actions which handle persistence
       ...actions,
       isOnline,
       isSyncing,
