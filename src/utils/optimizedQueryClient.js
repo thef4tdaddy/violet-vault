@@ -87,22 +87,13 @@ export const queryKeys = {
   envelopes: ["envelopes"],
   envelopesList: () => [...queryKeys.envelopes, "list"],
   envelopeById: (id) => [...queryKeys.envelopes, "detail", id],
-  envelopesByCategory: (category) => [
-    ...queryKeys.envelopes,
-    "category",
-    category,
-  ],
+  envelopesByCategory: (category) => [...queryKeys.envelopes, "category", category],
 
   // Transactions
   transactions: ["transactions"],
   transactionsList: (filters) => [...queryKeys.transactions, "list", filters],
   transactionById: (id) => [...queryKeys.transactions, "detail", id],
-  transactionsByDateRange: (start, end) => [
-    ...queryKeys.transactions,
-    "dateRange",
-    start,
-    end,
-  ],
+  transactionsByDateRange: (start, end) => [...queryKeys.transactions, "dateRange", start, end],
 
   // Bills
   bills: ["bills"],
@@ -145,16 +136,16 @@ export const prefetchHelpers = {
 // Optimistic update helpers
 export const optimisticHelpers = {
   updateEnvelope: (envelopeId, updates) => {
-    optimizedQueryClient.setQueryData(
-      queryKeys.envelopeById(envelopeId),
-      (old) => ({ ...old, ...updates }),
-    );
+    optimizedQueryClient.setQueryData(queryKeys.envelopeById(envelopeId), (old) => ({
+      ...old,
+      ...updates,
+    }));
 
     // Also update the list if it exists
     optimizedQueryClient.setQueryData(queryKeys.envelopesList(), (old) => {
       if (!old) return old;
       return old.map((envelope) =>
-        envelope.id === envelopeId ? { ...envelope, ...updates } : envelope,
+        envelope.id === envelopeId ? { ...envelope, ...updates } : envelope
       );
     });
   },
@@ -190,9 +181,7 @@ export const backgroundSync = {
     ];
 
     return Promise.allSettled(
-      queries.map((queryKey) =>
-        optimizedQueryClient.refetchQueries({ queryKey }),
-      ),
+      queries.map((queryKey) => optimizedQueryClient.refetchQueries({ queryKey }))
     );
   },
 
