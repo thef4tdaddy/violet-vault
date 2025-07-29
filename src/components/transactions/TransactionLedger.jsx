@@ -12,6 +12,7 @@ import { useTransactionFilters } from "./hooks/useTransactionFilters";
 import { useTransactionForm } from "./hooks/useTransactionForm";
 import { useTransactionImport } from "./hooks/useTransactionImport";
 import { suggestEnvelope } from "./utils/envelopeMatching";
+import { TRANSACTION_CATEGORIES } from "../../constants/categories";
 
 const TransactionLedger = ({
   transactions = [],
@@ -71,21 +72,6 @@ const TransactionLedger = ({
   useEffect(() => {
     setCurrentPage(1);
   }, [filteredTransactions.length]);
-
-  const categories = [
-    "Food & Dining",
-    "Shopping",
-    "Entertainment",
-    "Bills & Utilities",
-    "Transportation",
-    "Travel",
-    "Health & Medical",
-    "Education",
-    "Personal Care",
-    "Gifts & Donations",
-    "Business",
-    "Other",
-  ];
 
   const handleSubmitTransaction = () => {
     const newTransaction = createTransaction(currentUser);
@@ -244,7 +230,7 @@ const TransactionLedger = ({
         transactionForm={transactionForm}
         setTransactionForm={setTransactionForm}
         envelopes={envelopes}
-        categories={categories}
+        categories={TRANSACTION_CATEGORIES}
         onSubmit={handleSubmitTransaction}
         suggestEnvelope={handleSuggestEnvelope}
       />
@@ -269,7 +255,7 @@ const TransactionLedger = ({
         onClose={() => setSplittingTransaction(null)}
         transaction={splittingTransaction}
         envelopes={envelopes}
-        availableCategories={categories}
+        availableCategories={TRANSACTION_CATEGORIES}
         onSplitTransaction={handleSplitTransaction}
       />
     </div>

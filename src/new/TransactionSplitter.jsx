@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { TRANSACTION_CATEGORIES } from "../constants/categories";
 import {
   Zap,
   Plus,
@@ -286,17 +287,7 @@ const TransactionSplitter = ({
       ...availableCategories,
       ...envelopes.map((env) => env.name),
       ...envelopes.map((env) => env.category).filter(Boolean),
-      "Food & Dining",
-      "Transportation",
-      "Entertainment",
-      "Shopping",
-      "Bills & Utilities",
-      "Health & Medical",
-      "Personal Care",
-      "Education",
-      "Travel",
-      "Gifts & Donations",
-      "Other",
+      ...TRANSACTION_CATEGORIES,
     ]),
   ].sort();
 
