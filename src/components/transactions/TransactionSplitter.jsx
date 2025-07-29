@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Zap,
   Plus,
@@ -22,7 +22,7 @@ const TransactionSplitter = ({
   onSplitTransaction,
   envelopes = [],
   availableCategories = [],
-  className = "",
+  className = "", // eslint-disable-line no-unused-vars
 }) => {
   const [splitAllocations, setSplitAllocations] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -32,9 +32,9 @@ const TransactionSplitter = ({
     if (isOpen && transaction) {
       initializeSplits();
     }
-  }, [isOpen, transaction]);
+  }, [isOpen, transaction, initializeSplits]);
 
-  const initializeSplits = () => {
+  const initializeSplits = useCallback(() => {
     // Check if transaction has itemized metadata (like Amazon orders)
     if (transaction.metadata?.items && transaction.metadata.items.length > 1) {
       // Initialize with individual items
@@ -87,7 +87,7 @@ const TransactionSplitter = ({
         },
       ]);
     }
-  };
+  }, [transaction]);
 
   // Add new split allocation
   const addSplitAllocation = () => {

@@ -1,7 +1,6 @@
 // src/new/UnifiedBillTracker.jsx
 import React, { useState, useMemo } from "react";
-import { useBudget } from "../contexts/BudgetContext";
-import { useAuth } from "../contexts/AuthContext";
+import { useBudget } from "../hooks/useBudget";
 import {
   FileText,
   Calendar,
@@ -80,6 +79,7 @@ const UnifiedBillTracker = ({
               else if (daysUntilDue <= 7) urgency = "soon";
             }
           } catch (error) {
+            // eslint-disable-line no-unused-vars
             console.warn(`Invalid due date for bill ${bill.id}:`, bill.dueDate);
           }
         }
