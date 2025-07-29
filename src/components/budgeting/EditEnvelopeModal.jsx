@@ -11,7 +11,9 @@ import {
   AlertCircle,
   Trash2,
   Settings,
+  Sparkles,
 } from "lucide-react";
+// Smart icons for envelopes - to be implemented later
 
 const EditEnvelopeModal = ({
   isOpen = false,
@@ -32,6 +34,7 @@ const EditEnvelopeModal = ({
     description: "",
     priority: "medium",
     autoAllocate: true,
+    icon: Target,
   });
 
   const [errors, setErrors] = useState({});
@@ -99,9 +102,18 @@ const EditEnvelopeModal = ({
         description: envelope.description || "",
         priority: envelope.priority || "medium",
         autoAllocate: envelope.autoAllocate ?? true,
+        icon: envelope.icon || getSmartIcon(envelope.category || "", envelope.description || "", envelope.name || ""),
       });
     }
   }, [envelope]);
+
+  // Get smart icon suggestions based on current form data
+  const iconSuggestions = getIconSuggestions(
+    formData.category,
+    formData.description,
+    formData.name,
+    "envelope"
+  );
 
   const resetForm = () => {
     setFormData({
@@ -114,6 +126,7 @@ const EditEnvelopeModal = ({
       description: "",
       priority: "medium",
       autoAllocate: true,
+      icon: Target,
     });
     setErrors({});
     setIsSubmitting(false);
