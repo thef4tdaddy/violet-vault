@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BookOpen, Plus, Upload } from "lucide-react";
 
 import TransactionSummary from "./TransactionSummary";
@@ -33,6 +33,9 @@ const TransactionLedger = ({
   const [sortBy, setSortBy] = useState("date");
   const [sortOrder, setSortOrder] = useState("desc");
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+
   // Custom hooks
   const { transactionForm, setTransactionForm, resetForm, populateForm, createTransaction } =
     useTransactionForm();
@@ -58,6 +61,16 @@ const TransactionLedger = ({
     sortBy,
     sortOrder
   );
+
+  const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / pageSize));
+  const paginatedTransactions = filteredTransactions.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filteredTransactions.length]);
 
   const categories = [
     "Food & Dining",
@@ -196,12 +209,32 @@ const TransactionLedger = ({
 
       {/* Transactions Table */}
       <TransactionTable
-        transactions={filteredTransactions}
+        transactions={paginatedTransactions}
         envelopes={envelopes}
         onEdit={startEdit}
         onDelete={onDeleteTransaction}
         onSplit={(transaction) => setSplittingTransaction(transaction)}
       />
+
+      <div className="flex items-center justify-between mt-4">
+        <button
+          className="btn btn-secondary"
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+        >
+          Previous
+        </button>
+        <span className="text-sm text-gray-700">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          className="btn btn-secondary"
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+        >
+          Next
+        </button>
+      </div>
 
       {/* Transaction Form Modal */}
       <TransactionForm
