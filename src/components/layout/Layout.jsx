@@ -102,11 +102,28 @@ const Layout = () => {
 
       // Decrypt the data
       const { encryptedData, iv } = JSON.parse(savedData);
-      const decryptedData = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
+      const decryptedData = await encryptionUtils.decrypt(
+        encryptedData,
+        encryptionKey,
+        iv
+      );
+
+      // Normalize transactions for unified structure
+      const allTransactions = Array.isArray(decryptedData.allTransactions)
+        ? decryptedData.allTransactions
+        : [
+            ...(decryptedData.transactions || []),
+            ...(decryptedData.bills || []),
+          ];
+      const transactions = allTransactions.filter(
+        (t) => !t.type || t.type === "transaction"
+      );
 
       // Prepare export data with metadata
       const exportData = {
         ...decryptedData,
+        transactions,
+        allTransactions,
         exportMetadata: {
           exportedBy: currentUser?.userName || "Unknown User",
           exportDate: new Date().toISOString(),
@@ -164,6 +181,17 @@ const Layout = () => {
         savingsGoals: importedData.savingsGoals?.length || 0,
         allTransactions: importedData.allTransactions?.length || 0,
       });
+
+      // Build unified transaction list if missing
+      const unifiedAllTransactions = Array.isArray(importedData.allTransactions)
+        ? importedData.allTransactions
+        : [
+            ...(importedData.transactions || []),
+            ...(importedData.bills || []),
+          ];
+      const unifiedTransactions = unifiedAllTransactions.filter(
+        (t) => !t.type || t.type === "transaction"
+      );
 
       // Validate the data structure
       if (!importedData.envelopes || !Array.isArray(importedData.envelopes)) {
@@ -230,8 +258,8 @@ const Layout = () => {
         biweeklyAllocation: importedData.biweeklyAllocation || 0,
         paycheckHistory: importedData.paycheckHistory || [],
         actualBalance: importedData.actualBalance || 0,
-        transactions: importedData.transactions || [],
-        allTransactions: importedData.allTransactions || [],
+        transactions: unifiedTransactions,
+        allTransactions: unifiedAllTransactions,
         // Use the processed currentUser
         currentUser: processedCurrentUser,
         // Add any other imported metadata
@@ -286,6 +314,7 @@ const Layout = () => {
         envelopes: testDecrypted.envelopes?.length || 0,
         bills: testDecrypted.bills?.length || 0,
         savingsGoals: testDecrypted.savingsGoals?.length || 0,
+        allTransactions: testDecrypted.allTransactions?.length || 0,
         hasCurrentUser: !!testDecrypted.currentUser,
         budgetId: testDecrypted.currentUser?.budgetId,
       });
