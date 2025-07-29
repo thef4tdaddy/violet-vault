@@ -1,4 +1,5 @@
 #!/bin/bash
+echo "🐐 Running Baby Billy Freeman... (because it be misbehavin')"
 echo "🟢 Script started"
 
 
@@ -15,25 +16,15 @@ if [[ -z "$PROJECT_ID" ]]; then
   exit 1
 fi
 
-ISSUES_KEYS=("24:In Progress" "25:To Do" "26:In Progress" "27:To Do" "28:To Do" "29:To Do" "30:To Do" "31:To Do" "32:To Do" "33:In Progress" "34:In Progress" "35:To Do" "36:To Do" "37:To Do" "38:To Do" "39:To Do" "40:To Do" "41:To Do" "42:To Do" "43:To Do" "44:To Do" "45:To Do" "46:To Do")
+ISSUES_KEYS=("24:In Progress:🟠 High" "25:To Do:🟡 Medium" "26:In Progress:🟠 High" "27:To Do:🟡 Medium" "28:To Do:🟡 Medium" "29:To Do:🟠 High" "30:To Do:🟠 High" "31:To Do:🟡 Medium" "32:To Do:🟡 Medium" "33:In Progress:🟠 High" "34:In Progress:🟠 High" "35:To Do:🟡 Medium" "36:To Do:🟡 Medium" "37:To Do:🟡 Medium" "38:To Do:🟡 Medium" "39:To Do:🟡 Medium" "40:To Do:🟡 Medium" "41:To Do:🟠 High" "42:To Do:⚪ Low" "43:To Do:⚪ Low" "44:To Do:🟠 High" "45:To Do:🟠 High" "46:To Do:🟠 High" "49:To Do:🟠 High" "50:To Do:🟠 High" "51:To Do:🟡 Medium" "52:To Do:🟠 High" "53:To Do:🟠 High" "54:To Do:🟠 High" "55:To Do:🟠 High" "56:To Do:🟠 High" "57:To Do:🟠 High" "58:To Do:🟡 Medium" "59:To Do:🟠 High" "60:To Do:🟠 High" "61:To Do:🟠 High" "62:To Do:🟠 High" "63:To Do:🟠 High" "64:To Do:🟠 High" "65:To Do:🟠 High" "66:To Do:🟠 High" "67:To Do:🟠 High" "68:To Do:🟠 High" "69:To Do:🟠 High" "70:To Do:🟠 High" "71:To Do:🟡 Medium" "72:To Do:🟡 Medium" "73:To Do:🟡 Medium" "74:To Do:🟡 Medium")
 
 echo "📌 Adding issues to project $PROJECT_ID..."
 
 for entry in "${ISSUES_KEYS[@]}"; do
-  IFS=":" read -r ISSUE STATUS <<< "$entry"
-  echo "🔗 Adding issue #$ISSUE to project with status '$STATUS'..."
-  gh project item-add "$PROJECT_ID" --owner thef4tdaddy --url "https://github.com/thef4tdaddy/violet-vault/issues/$ISSUE" > /dev/null
-
-  FIELDS_JSON=$(gh project field-list "$PROJECT_ID" --owner thef4tdaddy --format json)
-  COLUMN_ID=$(echo "$FIELDS_JSON" | jq -r '.[] | select(.name=="Status") | .id')
-  STATUS_ID=$(echo "$FIELDS_JSON" | jq -r '.[] | select(.name=="Status") | .options[] | select(.name=="'"$STATUS"'") | .id')
-
-  if [[ -n "$COLUMN_ID" && -n "$STATUS_ID" ]]; then
-    ITEM_ID=$(gh project item-list "$PROJECT_ID" --owner thef4tdaddy --format json | jq -r ".[] | select(.content.url | contains(\"$ISSUE\")) | .id")
-    gh project item-edit "$PROJECT_ID" --owner thef4tdaddy --id "$ITEM_ID" --field-id "$COLUMN_ID" --value-id "$STATUS_ID" > /dev/null
-  else
-    echo "⚠️  Could not set status for issue #$ISSUE"
-  fi
+  IFS=":" read -r ISSUE STATUS PRIORITY <<< "$entry"
+  echo "🔗 Adding issue #$ISSUE to project..."
+  gh project item-add "$PROJECT_ID" --owner thef4tdaddy --url "https://github.com/thef4tdaddy/violet-vault/issues/$ISSUE"
 done
 
-echo "✅ All issues added to project!"
+echo "✅ All issues added to project (without status/priority)!"
+echo "🎤 Baby Billy out."
