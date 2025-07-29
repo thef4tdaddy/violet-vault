@@ -85,6 +85,7 @@ export const AuthProvider = ({ children }) => {
           const profileData = {
             userName: finalUserData.userName,
             userColor: finalUserData.userColor,
+            avatar: finalUserData.avatar || "",
           };
           localStorage.setItem("userProfile", JSON.stringify(profileData));
           logger.auth("Saved user profile to localStorage.");
@@ -159,6 +160,13 @@ export const AuthProvider = ({ children }) => {
           setBudgetId(currentUserData.budgetId);
           setIsUnlocked(true);
           setLastActivity(Date.now());
+
+          const existingProfile = {
+            userName: currentUserData.userName,
+            userColor: currentUserData.userColor,
+            avatar: currentUserData.avatar || "",
+          };
+          localStorage.setItem("userProfile", JSON.stringify(existingProfile));
 
           return { success: true, data: migratedData };
         }

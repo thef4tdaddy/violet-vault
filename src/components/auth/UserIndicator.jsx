@@ -1,19 +1,33 @@
-import React, { memo } from "react";
+import React, { memo, useState } from "react";
 import { User, ChevronDown } from "lucide-react";
+import ProfileModal from "./ProfileModal";
 
 const UserIndicator = memo(({ currentUser, onUserChange }) => {
+  const [showProfile, setShowProfile] = useState(false);
+
   if (!currentUser) {
     return null;
   }
 
   return (
     <div className="flex items-center gap-3">
-      <div className="flex items-center glassmorphism rounded-2xl px-5 py-3 shadow-xl border border-white/30 backdrop-blur-sm">
+      <div
+        className="flex items-center glassmorphism rounded-2xl px-5 py-3 shadow-xl border border-white/30 backdrop-blur-sm cursor-pointer"
+        onClick={() => setShowProfile(true)}
+      >
         <div
           className="w-3 h-3 rounded-full mr-3 shadow-sm ring-2 ring-white/50"
           style={{ backgroundColor: currentUser?.userColor || "#a855f7" }}
         />
-        <User className="h-4 w-4 text-gray-700 mr-2" />
+        {currentUser.avatar ? (
+          <img
+            src={currentUser.avatar}
+            alt="avatar"
+            className="h-5 w-5 rounded-full mr-2 object-cover"
+          />
+        ) : (
+          <User className="h-4 w-4 text-gray-700 mr-2" />
+        )}
         <span className="font-semibold text-gray-900 text-sm">
           {currentUser?.userName || "Anonymous"}
         </span>
@@ -23,6 +37,7 @@ const UserIndicator = memo(({ currentUser, onUserChange }) => {
       <button onClick={onUserChange} className="btn btn-secondary">
         Switch User
       </button>
+      {showProfile && <ProfileModal onClose={() => setShowProfile(false)} />}
     </div>
   );
 });

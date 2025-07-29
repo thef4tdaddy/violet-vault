@@ -11,6 +11,7 @@ const UserSetup = ({ onSetupComplete }) => {
   const [masterPassword, setMasterPassword] = useState("");
   const [userName, setUserName] = useState("");
   const [userColor, setUserColor] = useState("#a855f7");
+  const [avatar, setAvatar] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -22,6 +23,15 @@ const UserSetup = ({ onSetupComplete }) => {
         setTimeout(() => reject(new Error(`Operation timed out after ${timeoutMs}ms`)), timeoutMs)
       ),
     ]);
+  };
+
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => setAvatar(ev.target.result);
+      reader.readAsDataURL(file);
+    }
   };
 
   const [isReturningUser, setIsReturningUser] = useState(false);
@@ -38,6 +48,7 @@ const UserSetup = ({ onSetupComplete }) => {
         console.log("📋 Found saved profile:", profile);
         setUserName(profile.userName || "");
         setUserColor(profile.userColor || "#a855f7");
+        setAvatar(profile.avatar || "");
         setIsReturningUser(true);
         console.log("👋 Returning user detected");
       } catch (error) {
@@ -84,6 +95,7 @@ const UserSetup = ({ onSetupComplete }) => {
         password: masterPassword,
         userName: userName.trim(),
         userColor,
+        avatar,
       });
       console.log("✅ onSetupComplete succeeded");
     } catch (error) {
@@ -115,6 +127,7 @@ const UserSetup = ({ onSetupComplete }) => {
           password: masterPassword,
           userName,
           userColor,
+          avatar,
         });
         console.log("✅ Returning user login succeeded");
       } catch (error) {
@@ -157,6 +170,7 @@ const UserSetup = ({ onSetupComplete }) => {
           password: masterPassword,
           userName: userName.trim(),
           userColor,
+          avatar,
         });
       }, 10000);
 
@@ -174,6 +188,7 @@ const UserSetup = ({ onSetupComplete }) => {
     localStorage.removeItem("userProfile");
     setUserName("");
     setUserColor("#a855f7");
+    setAvatar("");
     setStep(1);
   };
 
@@ -320,6 +335,23 @@ const UserSetup = ({ onSetupComplete }) => {
                     />
                   ))}
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-3">Avatar (optional)</label>
+                {avatar && (
+                  <img
+                    src={avatar}
+                    alt="avatar preview"
+                    className="w-20 h-20 rounded-full object-cover mb-2"
+                  />
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  disabled={isLoading}
+                />
               </div>
 
               <div className="flex gap-3">
