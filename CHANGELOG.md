@@ -1,5 +1,29 @@
 # Changelog
 
+## [1.5.0](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.4.0...violet-vault-v1.5.0) (2025-07-29)
+
+
+### Features
+
+* add edit bill functionality to UnifiedBillTracker ([dfa5b4e](https://github.com/thef4tdaddy/violet-vault/commit/dfa5b4ed973da214564e08a01f7c5e648cdbf9c9))
+* add envelope editing modal with delete functionality ([102b47e](https://github.com/thef4tdaddy/violet-vault/commit/102b47ed2ba0c312c7015571736f204087f46471))
+* add icon editing capability to existing bills ([ccbe26f](https://github.com/thef4tdaddy/violet-vault/commit/ccbe26f3509056f21f92e6bb1ce3bc49745f9b59))
+* add paginated transactions ([#20](https://github.com/thef4tdaddy/violet-vault/issues/20)) ([b3787fe](https://github.com/thef4tdaddy/violet-vault/commit/b3787feeb18eb53159a29c61b479543267848bfd))
+* add smart bill icon system with contextual suggestions ([2c5d903](https://github.com/thef4tdaddy/violet-vault/commit/2c5d90328c6d4eca228d6d73865c1379dc7ef1df))
+* add version display footer to main layout ([7d1e137](https://github.com/thef4tdaddy/violet-vault/commit/7d1e137082ec23086b6cdd722c38d6ec05485373))
+* integrate dexie and tanstack ([#19](https://github.com/thef4tdaddy/violet-vault/issues/19)) ([170252c](https://github.com/thef4tdaddy/violet-vault/commit/170252c0bfda137268ef6ec2b4bf78c2e7135346))
+
+
+### Bug Fixes
+
+* add null checks to prevent transaction amount errors ([7558f7a](https://github.com/thef4tdaddy/violet-vault/commit/7558f7ae5f88d21ba1aa5e45931a513c53357b96))
+* complete AddBillModal integration with unified dataset ([fca0f70](https://github.com/thef4tdaddy/violet-vault/commit/fca0f7015600327954d62038ee35b31b116fb062))
+* improve checkbox layout in AddBillModal ([ecf0c19](https://github.com/thef4tdaddy/violet-vault/commit/ecf0c195635e0f2a7fa3d3bc016b6263f4cb7634))
+* resolve critical UI issues in unified components ([2d567cc](https://github.com/thef4tdaddy/violet-vault/commit/2d567cce789ee252b79e10ea08b022927edce4bb))
+* resolve data persistence issues after unification ([288b833](https://github.com/thef4tdaddy/violet-vault/commit/288b8335d9d354af3b4745e2513570a631f59125))
+* resolve smart icons implementation issues ([02190a9](https://github.com/thef4tdaddy/violet-vault/commit/02190a9271cae8ce84c11a0b45e6345a14c5e7ac))
+* support unified transactions in import/export ([#21](https://github.com/thef4tdaddy/violet-vault/issues/21)) ([742e3b5](https://github.com/thef4tdaddy/violet-vault/commit/742e3b56039b0096d8421f1e5614239d49d568b8))
+
 ## [1.4.0](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.3.0...violet-vault-v1.4.0) (2025-07-28)
 
 
