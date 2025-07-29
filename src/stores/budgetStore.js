@@ -1,9 +1,12 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import { actionTypes, budgetReducer, initialState } from "../contexts/budgetState";
 
-const useBudgetStore = create((set, get) => ({
-  ...initialState,
-  dispatch: (action) => set((state) => budgetReducer(state, action)),
+const useBudgetStore = create(
+  persist(
+    (set, get) => ({
+      ...initialState,
+      dispatch: (action) => set((state) => budgetReducer(state, action)),
 
   setEnvelopes: (envelopes) =>
     get().dispatch({ type: actionTypes.SET_ENVELOPES, payload: envelopes }),
@@ -38,7 +41,12 @@ const useBudgetStore = create((set, get) => ({
   reconcileTransaction: (data) =>
     get().dispatch({ type: actionTypes.RECONCILE_TRANSACTION, payload: data }),
   loadData: (data) => get().dispatch({ type: actionTypes.LOAD_DATA, payload: data }),
-  resetAllData: () => get().dispatch({ type: actionTypes.RESET_ALL_DATA }),
-}));
+      resetAllData: () => get().dispatch({ type: actionTypes.RESET_ALL_DATA }),
+    }),
+    {
+      name: "budget-store",
+    }
+  )
+);
 
 export default useBudgetStore;
