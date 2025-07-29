@@ -1,14 +1,35 @@
 import React, { useState, memo, useCallback } from "react";
-import { Upload, Download, LogOut, AlertTriangle, RefreshCw } from "lucide-react";
+import {
+  Upload,
+  Download,
+  LogOut,
+  AlertTriangle,
+  RefreshCw,
+  Key,
+} from "lucide-react";
 import UserIndicator from "../auth/UserIndicator";
 import logoWithText from "../../assets/Logo with Text Final.png";
+import ChangePasswordModal from "../auth/ChangePasswordModal";
 
 const Header = memo(
-  ({ onExport, onImport, onLogout, onResetEncryption, currentUser, onUserChange }) => {
+  ({
+    onExport,
+    onImport,
+    onLogout,
+    onResetEncryption,
+    onChangePassword,
+    currentUser,
+    onUserChange,
+  }) => {
     const [showResetModal, setShowResetModal] = useState(false);
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
 
     const handleToggleResetModal = useCallback(() => {
       setShowResetModal((prev) => !prev);
+    }, []);
+
+    const handleTogglePasswordModal = useCallback(() => {
+      setShowPasswordModal((prev) => !prev);
     }, []);
     return (
       <div className="glassmorphism rounded-3xl p-6 mb-6">
@@ -53,6 +74,14 @@ const Header = memo(
               <button onClick={onExport} className="btn btn-secondary flex items-center rounded-xl">
                 <Download className="h-4 w-4 mr-2" />
                 Export
+              </button>
+
+              <button
+                onClick={handleTogglePasswordModal}
+                className="btn btn-secondary flex items-center rounded-xl"
+              >
+                <Key className="h-4 w-4 mr-2" />
+                Change Password
               </button>
 
               <div className="relative" style={{ zIndex: 50 }}>
@@ -109,6 +138,13 @@ const Header = memo(
               </div>
             </div>
           </div>
+        )}
+        {showPasswordModal && (
+          <ChangePasswordModal
+            isOpen={showPasswordModal}
+            onClose={handleTogglePasswordModal}
+            onChangePassword={onChangePassword}
+          />
         )}
       </div>
     );

@@ -19,6 +19,7 @@
 
 - **Client-Side Encryption** - All data encrypted using AES-GCM with PBKDF2 key derivation
 - **Password Protection** - Master password required to access your budget
+- **Password Change** - Update your master password without losing data
 - **Device Fingerprinting** - Additional security layer for multi-device access
 - **Privacy First** - Your financial data never leaves your device unencrypted
 

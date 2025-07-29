@@ -197,6 +197,43 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const changePassword = async (oldPassword, newPassword) => {
+    try {
+      const savedData = localStorage.getItem("envelopeBudgetData");
+      if (!savedData) {
+        return { success: false, error: "No saved data found." };
+      }
+
+      const { salt: savedSalt, encryptedData, iv } = JSON.parse(savedData);
+      const saltArray = new Uint8Array(savedSalt);
+      const oldKey = await encryptionUtils.deriveKeyFromSalt(oldPassword, saltArray);
+
+      const decryptedData = await encryptionUtils.decrypt(encryptedData, oldKey, iv);
+
+      const { key: newKey, salt: newSalt } = await encryptionUtils.generateKey(newPassword);
+      const encrypted = await encryptionUtils.encrypt(decryptedData, newKey);
+
+      localStorage.setItem(
+        "envelopeBudgetData",
+        JSON.stringify({
+          encryptedData: encrypted.data,
+          salt: Array.from(newSalt),
+          iv: encrypted.iv,
+        })
+      );
+
+      setSalt(newSalt);
+      setEncryptionKey(newKey);
+      return { success: true };
+    } catch (error) {
+      logger.error("Password change failed.", error);
+      if (error.name === "OperationError" || error.message.toLowerCase().includes("decrypt")) {
+        return { success: false, error: "Invalid current password." };
+      }
+      return { success: false, error: error.message };
+    }
+  };
+
   const contextValue = {
     isUnlocked,
     encryptionKey,
@@ -207,6 +244,7 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     updateUser,
+    changePassword,
   };
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
