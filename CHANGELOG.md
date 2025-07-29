@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.5.1](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.5.0...violet-vault-v1.5.1) (2025-07-29)
+
+
+### Bug Fixes
+
+* add defensive filtering for null transactions ([91666aa](https://github.com/thef4tdaddy/violet-vault/commit/91666aa2ef879b31f547668910d8664730089bff))
+* add duplicate error filtering to reduce Sentry notification spam ([e4757be](https://github.com/thef4tdaddy/violet-vault/commit/e4757be15d2bd2c13e21b81e93b2b60871b18b46))
+* add missing @tanstack/react-virtual dependency ([ba06339](https://github.com/thef4tdaddy/violet-vault/commit/ba06339b1d3d9fd8e9bd84aa861d583179e0b3bc))
+
+
+### Code Refactoring
+
+* clean up ESLint warnings and improve code quality ([363d778](https://github.com/thef4tdaddy/violet-vault/commit/363d7788d01dc9289654f22f01b71a7e992617bc))
+
 ## [1.5.0](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.4.0...violet-vault-v1.5.0) (2025-07-29)
 
 
