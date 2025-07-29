@@ -33,13 +33,7 @@ export const AuthProvider = ({ children }) => {
       };
 
       // Listen for user activity
-      const events = [
-        "mousedown",
-        "mousemove",
-        "keypress",
-        "scroll",
-        "touchstart",
-      ];
+      const events = ["mousedown", "mousemove", "keypress", "scroll", "touchstart"];
       events.forEach((event) => {
         document.addEventListener(event, handleActivity, true);
       });
@@ -62,25 +56,20 @@ export const AuthProvider = ({ children }) => {
     });
 
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(
-        () => reject(new Error("Login timeout after 10 seconds")),
-        10000,
-      ),
+      setTimeout(() => reject(new Error("Login timeout after 10 seconds")), 10000)
     );
 
     const loginPromise = (async () => {
       try {
         if (userData) {
           logger.auth("New user setup path.", userData);
-          const { salt: newSalt, key } =
-            await encryptionUtils.deriveKey(password);
+          const { salt: newSalt, key } = await encryptionUtils.deriveKey(password);
           logger.auth("Generated key and salt for new user.");
 
           // Ensure budgetId is present, generate if not.
           const finalUserData = {
             ...userData,
-            budgetId:
-              userData.budgetId || encryptionUtils.generateBudgetId(password),
+            budgetId: userData.budgetId || encryptionUtils.generateBudgetId(password),
           };
 
           logger.auth("Setting auth state for new user.", {
@@ -105,9 +94,7 @@ export const AuthProvider = ({ children }) => {
           logger.auth("Existing user login path.");
           const savedData = localStorage.getItem("envelopeBudgetData");
           if (!savedData) {
-            logger.warn(
-              "No saved data found in localStorage for existing user.",
-            );
+            logger.warn("No saved data found in localStorage for existing user.");
             return {
               success: false,
               error: "No saved data found. Try creating a new budget.",
@@ -123,21 +110,13 @@ export const AuthProvider = ({ children }) => {
             });
             return {
               success: false,
-              error:
-                "Local data is corrupted. Please clear data and start fresh.",
+              error: "Local data is corrupted. Please clear data and start fresh.",
             };
           }
           const saltArray = new Uint8Array(savedSalt);
-          const key = await encryptionUtils.deriveKeyFromSalt(
-            password,
-            saltArray,
-          );
+          const key = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
 
-          const decryptedData = await encryptionUtils.decrypt(
-            encryptedData,
-            key,
-            iv,
-          );
+          const decryptedData = await encryptionUtils.decrypt(encryptedData, key, iv);
           logger.auth("Successfully decrypted local data.");
 
           let migratedData = decryptedData;
@@ -163,7 +142,7 @@ export const AuthProvider = ({ children }) => {
                 encryptedData: encrypted.data,
                 salt: Array.from(saltArray),
                 iv: encrypted.iv,
-              }),
+              })
             );
             logger.auth("Data migration complete and saved.", { newBudgetId });
           }
@@ -186,10 +165,7 @@ export const AuthProvider = ({ children }) => {
       } catch (error) {
         logger.error("Login failed.", error);
         // Provide a more specific error for decryption failures
-        if (
-          error.name === "OperationError" ||
-          error.message.toLowerCase().includes("decrypt")
-        ) {
+        if (error.name === "OperationError" || error.message.toLowerCase().includes("decrypt")) {
           return { success: false, error: "Invalid password." };
         }
         return { success: false, error: "Invalid password or corrupted data." };
@@ -233,9 +209,7 @@ export const AuthProvider = ({ children }) => {
     updateUser,
   };
 
-  return (
-    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
