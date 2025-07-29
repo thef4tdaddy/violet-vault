@@ -22,7 +22,7 @@ const EditEnvelopeModal = ({
   onUpdateEnvelope,
   onDeleteEnvelope,
   existingEnvelopes = [],
-  currentUser = { userName: "User", userColor: "#a855f7" },
+  currentUser = { userName: "User", userColor: "#a855f7" }, // eslint-disable-line no-unused-vars
 }) => {
   const [formData, setFormData] = useState({
     name: "",
@@ -109,7 +109,7 @@ const EditEnvelopeModal = ({
 
   // Get smart icon suggestions based on current form data
   // Simple icon suggestions for envelopes - to be enhanced later
-  const iconSuggestions = [Target, DollarSign, Save, Tag, Settings];
+  const iconSuggestions = [Target, DollarSign, Save, Tag, Settings]; // eslint-disable-line no-unused-vars
 
   const resetForm = () => {
     setFormData({

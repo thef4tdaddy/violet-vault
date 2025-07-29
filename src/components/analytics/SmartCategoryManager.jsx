@@ -28,7 +28,7 @@ const SmartCategoryManager = ({
   currentCategories = [],
   onAddCategory,
   onRemoveCategory,
-  onUpdateCategory,
+  onUpdateCategory, // eslint-disable-line no-unused-vars
   onApplyToTransactions,
   onApplyToBills,
   dateRange = "6months",
@@ -67,7 +67,12 @@ const SmartCategoryManager = ({
   // Analyze transaction patterns for category suggestions
   const transactionAnalysis = useMemo(() => {
     const suggestions = [];
-    const { minTransactionCount, minAmount, similarityThreshold, unusedCategoryThreshold } =
+    const {
+      minTransactionCount,
+      minAmount,
+      similarityThreshold,
+      unusedCategoryThreshold,
+    } = // eslint-disable-line no-unused-vars
       analysisSettings;
 
     // 1. UNCATEGORIZED TRANSACTION ANALYSIS

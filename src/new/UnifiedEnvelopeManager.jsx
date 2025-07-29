@@ -1,7 +1,6 @@
 // src/new/UnifiedEnvelopeManager.jsx
 import React, { useState, useMemo } from "react";
-import { useBudget } from "../contexts/BudgetContext";
-import { useAuth } from "../contexts/AuthContext";
+import { useBudget } from "../hooks/useBudget";
 import {
   Target,
   DollarSign,
@@ -31,9 +30,6 @@ const UnifiedEnvelopeManager = ({
   envelopes: propEnvelopes = [],
   transactions: propTransactions = [], // Unified transactions including bills
   unassignedCash: propUnassignedCash,
-  onUpdateEnvelope,
-  onCreateEnvelope,
-  onAssignTransaction,
   className = "",
 }) => {
   const budget = useBudget();

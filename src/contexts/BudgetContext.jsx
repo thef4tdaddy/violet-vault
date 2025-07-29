@@ -1,5 +1,5 @@
 // src/contexts/BudgetContext.jsx
-import React, { createContext, useContext, useEffect, useState, useMemo } from "react";
+import React, { createContext, useEffect, useState, useMemo } from "react";
 import { encryptionUtils } from "../utils/encryption";
 import FirebaseSync from "../utils/firebaseSync";
 import { Sentry } from "../utils/sentry";
@@ -8,7 +8,7 @@ import useBudgetStore from "../stores/budgetStore";
 import { actionTypes } from "./budgetState";
 import { getEncryptedData, setEncryptedData, clearEncryptedData } from "../db";
 
-const BudgetContext = createContext();
+export const BudgetContext = createContext();
 
 export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId, salt }) => {
   const store = useBudgetStore();
@@ -71,11 +71,7 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
         if (localEntry) {
           try {
             const { encryptedData, iv } = localEntry;
-            const decryptedData = await encryptionUtils.decrypt(
-              encryptedData,
-              encryptionKey,
-              iv
-            );
+            const decryptedData = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
             dispatch({ type: actionTypes.LOAD_DATA, payload: decryptedData });
             logger.info("💾 Successfully loaded data from IndexedDB/localStorage.");
           } catch (error) {
@@ -234,18 +230,10 @@ export const BudgetProvider = ({ children, encryptionKey, currentUser, budgetId,
       getRecentActivity: () =>
         firebaseSync.getRecentActivity ? firebaseSync.getRecentActivity() : [],
     }),
-    [state, actions, isOnline, isSyncing, lastSyncTime, syncError, firebaseSync]
+    [state, actions, isOnline, isSyncing, lastSyncTime, syncError, firebaseSync, dispatch]
   );
 
   return <BudgetContext.Provider value={contextValue}>{children}</BudgetContext.Provider>;
-};
-
-export const useBudget = () => {
-  const context = useContext(BudgetContext);
-  if (!context) {
-    throw new Error("useBudget must be used within a BudgetProvider");
-  }
-  return context;
 };
 
 export { actionTypes };
