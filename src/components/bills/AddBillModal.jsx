@@ -1,11 +1,7 @@
 // Extracted from old BillManager - proper bill creation modal
 import React, { useState, useEffect } from "react";
 import { X, Save, Sparkles } from "lucide-react";
-import {
-  getBillIcon,
-  getBillIconOptions,
-  getIconName,
-} from "../../utils/billIcons";
+import { getBillIcon, getBillIconOptions, getIconName } from "../../utils/billIcons";
 
 const AddBillModal = ({
   isOpen,
@@ -32,7 +28,7 @@ const AddBillModal = ({
           getSmartIcon(
             editingBill.name || editingBill.provider || "",
             editingBill.notes || "",
-            editingBill.category || "",
+            editingBill.category || ""
           ),
       };
     }
@@ -53,12 +49,7 @@ const AddBillModal = ({
   // Update icon when name or category changes
   useEffect(() => {
     if (formData.name || formData.category) {
-      const suggestedIcon = getSmartIcon(
-        formData.category,
-        formData.notes,
-        formData.name,
-        "bill",
-      );
+      const suggestedIcon = getSmartIcon(formData.category, formData.notes, formData.name, "bill");
       setFormData((prev) => ({ ...prev, icon: suggestedIcon }));
     }
   }, [formData.name, formData.category, formData.notes]);
@@ -68,7 +59,7 @@ const AddBillModal = ({
     formData.category,
     formData.notes,
     formData.name,
-    "bill",
+    "bill"
   );
 
   const frequencies = [
@@ -115,8 +106,7 @@ const AddBillModal = ({
     const yearlyAmount =
       frequency === "custom"
         ? amount * customFrequency
-        : amount *
-          (frequencies.find((f) => f.value === frequency)?.multiplier || 1);
+        : amount * (frequencies.find((f) => f.value === frequency)?.multiplier || 1);
     return yearlyAmount / 26; // 26 biweekly periods per year
   };
 
@@ -124,8 +114,7 @@ const AddBillModal = ({
     const yearlyAmount =
       frequency === "custom"
         ? amount * customFrequency
-        : amount *
-          (frequencies.find((f) => f.value === frequency)?.multiplier || 1);
+        : amount * (frequencies.find((f) => f.value === frequency)?.multiplier || 1);
     return yearlyAmount / 12; // 12 months per year
   };
 
@@ -182,7 +171,7 @@ const AddBillModal = ({
             editingBill.category || "",
             editingBill.notes || "",
             editingBill.name || editingBill.provider || "",
-            "bill",
+            "bill"
           ),
       });
     } else {
@@ -219,19 +208,9 @@ const AddBillModal = ({
       notes: formData.notes,
       dueDate: formData.dueDate,
       customFrequency:
-        formData.frequency === "custom"
-          ? parseFloat(formData.customFrequency) || 1
-          : undefined,
-      biweeklyAmount: calculateBiweeklyAmount(
-        amount,
-        formData.frequency,
-        formData.customFrequency,
-      ),
-      monthlyAmount: calculateMonthlyAmount(
-        amount,
-        formData.frequency,
-        formData.customFrequency,
-      ),
+        formData.frequency === "custom" ? parseFloat(formData.customFrequency) || 1 : undefined,
+      biweeklyAmount: calculateBiweeklyAmount(amount, formData.frequency, formData.customFrequency),
+      monthlyAmount: calculateMonthlyAmount(amount, formData.frequency, formData.customFrequency),
       nextDueDate: getNextDueDate(formData.frequency, formData.dueDate),
       icon: formData.icon,
       // For unified system compatibility
@@ -259,11 +238,7 @@ const AddBillModal = ({
       const envelopeData = {
         id: `envelope_${Date.now()}`,
         name: formData.name.trim(),
-        budget: calculateMonthlyAmount(
-          amount,
-          formData.frequency,
-          formData.customFrequency,
-        ),
+        budget: calculateMonthlyAmount(amount, formData.frequency, formData.customFrequency),
         currentBalance: 0,
         color: formData.color,
         category: formData.category,
@@ -285,13 +260,8 @@ const AddBillModal = ({
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="glassmorphism rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-white/30 shadow-2xl">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-semibold">
-            {editingBill ? "Edit Bill" : "Add New Bill"}
-          </h3>
-          <button
-            onClick={cancelEdit}
-            className="text-gray-400 hover:text-gray-600"
-          >
+          <h3 className="text-xl font-semibold">{editingBill ? "Edit Bill" : "Add New Bill"}</h3>
+          <button onClick={cancelEdit} className="text-gray-400 hover:text-gray-600">
             <X className="h-6 w-6" />
           </button>
         </div>
@@ -299,15 +269,11 @@ const AddBillModal = ({
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Bill Name *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Bill Name *</label>
               <input
                 type="text"
                 value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g., Car Insurance, Netflix, Property Tax"
                 required
@@ -315,16 +281,12 @@ const AddBillModal = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Amount *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Amount *</label>
               <input
                 type="number"
                 step="0.01"
                 value={formData.amount}
-                onChange={(e) =>
-                  setFormData({ ...formData, amount: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="0.00"
                 required
@@ -337,9 +299,7 @@ const AddBillModal = ({
               </label>
               <select
                 value={formData.frequency}
-                onChange={(e) =>
-                  setFormData({ ...formData, frequency: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 {frequencies.map((freq) => (
@@ -373,28 +333,20 @@ const AddBillModal = ({
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Next Due Date
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Next Due Date</label>
               <input
                 type="date"
                 value={formData.dueDate}
-                onChange={(e) =>
-                  setFormData({ ...formData, dueDate: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Category
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
               <select
                 value={formData.category}
-                onChange={(e) =>
-                  setFormData({ ...formData, category: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 {categories.map((category) => (
@@ -406,9 +358,7 @@ const AddBillModal = ({
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Color
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
               <div className="flex gap-2 flex-wrap">
                 {colors.map((color) => (
                   <button
@@ -431,9 +381,7 @@ const AddBillModal = ({
                 <div className="flex items-center">
                   Icon
                   <Sparkles className="h-4 w-4 ml-2 text-purple-500" />
-                  <span className="text-xs text-purple-600 ml-1">
-                    Smart suggestions
-                  </span>
+                  <span className="text-xs text-purple-600 ml-1">Smart suggestions</span>
                 </div>
               </label>
               <div className="flex gap-2 flex-wrap">
@@ -443,9 +391,7 @@ const AddBillModal = ({
                     <button
                       key={index}
                       type="button"
-                      onClick={() =>
-                        setFormData({ ...formData, icon: IconComponent })
-                      }
+                      onClick={() => setFormData({ ...formData, icon: IconComponent })}
                       className={`p-3 rounded-lg border-2 transition-all hover:scale-105 ${
                         isSelected
                           ? "border-purple-500 bg-purple-50 text-purple-700"
@@ -459,8 +405,7 @@ const AddBillModal = ({
                 })}
               </div>
               <p className="text-xs text-gray-500 mt-1">
-                Icons are automatically suggested based on your bill name and
-                category
+                Icons are automatically suggested based on your bill name and category
               </p>
             </div>
 
@@ -470,9 +415,7 @@ const AddBillModal = ({
               </label>
               <textarea
                 value={formData.notes}
-                onChange={(e) =>
-                  setFormData({ ...formData, notes: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="Any additional notes about this bill..."
@@ -533,7 +476,7 @@ const AddBillModal = ({
                     {calculateMonthlyAmount(
                       parseFloat(formData.amount) || 0,
                       formData.frequency,
-                      formData.customFrequency,
+                      formData.customFrequency
                     ).toFixed(2)}
                   </span>
                 </div>
@@ -544,7 +487,7 @@ const AddBillModal = ({
                     {calculateBiweeklyAmount(
                       parseFloat(formData.amount) || 0,
                       formData.frequency,
-                      formData.customFrequency,
+                      formData.customFrequency
                     ).toFixed(2)}
                   </span>
                 </div>

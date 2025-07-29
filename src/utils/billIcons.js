@@ -322,10 +322,7 @@ export const getBillIcon = (provider = "", description = "", category = "") => {
 
   // Third priority: Check if category partially matches any fallback
   for (const [categoryKey, icon] of Object.entries(CATEGORY_FALLBACK_ICONS)) {
-    if (
-      normalizedCategory.includes(categoryKey) ||
-      categoryKey.includes(normalizedCategory)
-    ) {
+    if (normalizedCategory.includes(categoryKey) || categoryKey.includes(normalizedCategory)) {
       return icon;
     }
   }
@@ -487,10 +484,7 @@ export const getBillIconOptions = (category = "") => {
 
   // Find matching icon set
   for (const [categoryKey, icons] of Object.entries(categoryIconSets)) {
-    if (
-      normalizedCategory.includes(categoryKey) ||
-      categoryKey.includes(normalizedCategory)
-    ) {
+    if (normalizedCategory.includes(categoryKey) || categoryKey.includes(normalizedCategory)) {
       return icons;
     }
   }
