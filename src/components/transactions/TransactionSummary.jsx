@@ -3,11 +3,11 @@ import { TrendingUp, TrendingDown, DollarSign } from "lucide-react";
 
 const TransactionSummary = ({ transactions = [] }) => {
   const totalIncome = transactions
-    .filter((t) => t && t.amount > 0)
+    .filter((t) => t && typeof t.amount === "number" && t.amount > 0)
     .reduce((sum, t) => sum + t.amount, 0);
 
   const totalExpenses = transactions
-    .filter((t) => t && t.amount < 0)
+    .filter((t) => t && typeof t.amount === "number" && t.amount < 0)
     .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
   const netCashFlow = totalIncome - totalExpenses;
@@ -23,8 +23,12 @@ const TransactionSummary = ({ transactions = [] }) => {
             </div>
           </div>
           <div>
-            <p className="text-sm font-semibold text-gray-600 mb-1">Total Income</p>
-            <p className="text-2xl font-bold text-emerald-600">${totalIncome.toFixed(2)}</p>
+            <p className="text-sm font-semibold text-gray-600 mb-1">
+              Total Income
+            </p>
+            <p className="text-2xl font-bold text-emerald-600">
+              ${totalIncome.toFixed(2)}
+            </p>
           </div>
         </div>
       </div>
@@ -38,8 +42,12 @@ const TransactionSummary = ({ transactions = [] }) => {
             </div>
           </div>
           <div>
-            <p className="text-sm font-semibold text-gray-600 mb-1">Total Expenses</p>
-            <p className="text-2xl font-bold text-red-600">${totalExpenses.toFixed(2)}</p>
+            <p className="text-sm font-semibold text-gray-600 mb-1">
+              Total Expenses
+            </p>
+            <p className="text-2xl font-bold text-red-600">
+              ${totalExpenses.toFixed(2)}
+            </p>
           </div>
         </div>
       </div>
@@ -61,7 +69,9 @@ const TransactionSummary = ({ transactions = [] }) => {
             </div>
           </div>
           <div>
-            <p className="text-sm font-semibold text-gray-600 mb-1">Net Cash Flow</p>
+            <p className="text-sm font-semibold text-gray-600 mb-1">
+              Net Cash Flow
+            </p>
             <p
               className={`text-2xl font-bold ${
                 netCashFlow >= 0 ? "text-cyan-600" : "text-amber-600"
