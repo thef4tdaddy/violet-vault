@@ -20,6 +20,24 @@ export const initSentry = () => {
     beforeSend(event) {
       console.log("📤 Sentry sending event:", event.level, event.message);
 
+      // Filter out duplicate errors to reduce notification spam
+      const errorMessage = event.exception?.values?.[0]?.value || event.message;
+
+      // Check for the specific null amount error and throttle it
+      if (errorMessage?.includes("Cannot read properties of null (reading 'amount')")) {
+        // Only send this error once every 5 minutes
+        const errorKey = "null_amount_error";
+        const lastSent = window.sessionStorage.getItem(`sentry_${errorKey}`);
+        const now = Date.now();
+
+        if (lastSent && now - parseInt(lastSent) < 300000) {
+          // 5 minutes
+          return null; // Don't send duplicate
+        }
+
+        window.sessionStorage.setItem(`sentry_${errorKey}`, now.toString());
+      }
+
       // Filter out sensitive data
       if (event.exception) {
         event.exception.values?.forEach((exception) => {
