@@ -1,7 +1,6 @@
 // src/new/UnifiedEnvelopeManager.jsx
 import React, { useState, useMemo } from "react";
 import { useBudget } from "../contexts/BudgetContext";
-import { useAuth } from "../contexts/AuthContext";
 import {
   Target,
   DollarSign,

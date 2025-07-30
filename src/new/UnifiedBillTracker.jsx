@@ -1,7 +1,6 @@
 // src/new/UnifiedBillTracker.jsx
 import React, { useState, useMemo } from "react";
 import { useBudget } from "../contexts/BudgetContext";
-import { useAuth } from "../contexts/AuthContext";
 import {
   FileText,
   Calendar,
