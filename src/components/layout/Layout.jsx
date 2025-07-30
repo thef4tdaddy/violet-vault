@@ -1,12 +1,13 @@
 // src/components/layout/Layout.jsx
 import React, { useState, useEffect, useCallback, useMemo, Suspense, lazy } from "react";
-import { useAuth } from "../../contexts/AuthContext";
-import { BudgetProvider, useBudget } from "../../contexts/BudgetContext";
+import useAuthStore from "../../stores/authStore";
+import useOptimizedBudgetStore from "../../stores/optimizedBudgetStore"; // Import optimized store
+import { BudgetProvider } from "../../contexts/BudgetContext";
+import { useBudget } from "../../hooks/useBudget";
 import UserSetup from "../auth/UserSetup";
 import Header from "../ui/Header";
 import TeamActivitySync from "../sync/TeamActivitySync";
 import LoadingSpinner from "../ui/LoadingSpinner";
-import useEnvelopeSystem from "../budgeting/EnvelopeSystem";
 import { encryptionUtils } from "../../utils/encryption";
 import FirebaseSync from "../../utils/firebaseSync";
 import logger from "../../utils/logger";
@@ -37,16 +38,38 @@ const SupplementalAccounts = lazy(() => import("../accounts/SupplementalAccounts
 const Layout = () => {
   logger.debug("Layout component is running");
 
-  const {
-    isUnlocked,
-    encryptionKey,
-    currentUser,
-    login,
-    logout,
-    budgetId,
-    salt,
-    changePassword,
-  } = useAuth();
+  const { isUnlocked, encryptionKey, currentUser, login, logout, budgetId, salt, changePassword } = useAuthStore();
+
+  // Add online/offline status detection
+  useEffect(() => {
+    // Get the action from the store
+    const { setOnlineStatus } = useOptimizedBudgetStore.getState();
+
+    // Handler for when the browser goes online
+    const handleOnline = () => {
+      logger.info("Network status: Online");
+      setOnlineStatus(true);
+    };
+
+    // Handler for when the browser goes offline
+    const handleOffline = () => {
+      logger.info("Network status: Offline");
+      setOnlineStatus(false);
+    };
+
+    // Add the event listeners
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    // Set the initial status when the component mounts
+    setOnlineStatus(navigator.onLine);
+
+    // Cleanup function to remove listeners when the component unmounts
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
 
   const firebaseSync = useMemo(() => new FirebaseSync(), []);
 
@@ -122,9 +145,17 @@ const Layout = () => {
       const { encryptedData, iv } = JSON.parse(savedData);
       const decryptedData = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
 
+      // Normalize transactions for unified structure
+      const allTransactions = Array.isArray(decryptedData.allTransactions)
+        ? decryptedData.allTransactions
+        : [...(decryptedData.transactions || []), ...(decryptedData.bills || [])];
+      const transactions = allTransactions.filter((t) => !t.type || t.type === "transaction");
+
       // Prepare export data with metadata
       const exportData = {
         ...decryptedData,
+        transactions,
+        allTransactions,
         exportMetadata: {
           exportedBy: currentUser?.userName || "Unknown User",
           exportDate: new Date().toISOString(),
@@ -182,6 +213,14 @@ const Layout = () => {
         savingsGoals: importedData.savingsGoals?.length || 0,
         allTransactions: importedData.allTransactions?.length || 0,
       });
+
+      // Build unified transaction list if missing
+      const unifiedAllTransactions = Array.isArray(importedData.allTransactions)
+        ? importedData.allTransactions
+        : [...(importedData.transactions || []), ...(importedData.bills || [])];
+      const unifiedTransactions = unifiedAllTransactions.filter(
+        (t) => !t.type || t.type === "transaction"
+      );
 
       // Validate the data structure
       if (!importedData.envelopes || !Array.isArray(importedData.envelopes)) {
@@ -248,8 +287,8 @@ const Layout = () => {
         biweeklyAllocation: importedData.biweeklyAllocation || 0,
         paycheckHistory: importedData.paycheckHistory || [],
         actualBalance: importedData.actualBalance || 0,
-        transactions: importedData.transactions || [],
-        allTransactions: importedData.allTransactions || [],
+        transactions: unifiedTransactions,
+        allTransactions: unifiedAllTransactions,
         // Use the processed currentUser
         currentUser: processedCurrentUser,
         // Add any other imported metadata
@@ -304,6 +343,7 @@ const Layout = () => {
         envelopes: testDecrypted.envelopes?.length || 0,
         bills: testDecrypted.bills?.length || 0,
         savingsGoals: testDecrypted.savingsGoals?.length || 0,
+        allTransactions: testDecrypted.allTransactions?.length || 0,
         hasCurrentUser: !!testDecrypted.currentUser,
         budgetId: testDecrypted.currentUser?.budgetId,
       });
@@ -426,12 +466,11 @@ const MainContent = ({
   onImport,
   onLogout,
   onResetEncryption,
-  activeUsers: _activeUsers,
-  recentActivity: _recentActivity,
+  activeUsers: _activeUsers, // eslint-disable-line no-unused-vars
+  recentActivity: _recentActivity, // eslint-disable-line no-unused-vars
   syncConflicts,
   onResolveConflict,
   setSyncConflicts,
-  firebaseSync,
 }) => {
   const budget = useBudget();
   const [activeView, setActiveView] = useState("dashboard");
@@ -696,7 +735,9 @@ const MainContent = ({
   );
 };
 
-const NavButton = ({ active, onClick, icon: Icon, label }) => (
+const NavButton = (
+  { active, onClick, icon: Icon, label } // eslint-disable-line no-unused-vars
+) => (
   <button
     onClick={onClick}
     className={`px-8 py-5 text-sm font-semibold border-b-2 transition-all ${
@@ -711,6 +752,7 @@ const NavButton = ({ active, onClick, icon: Icon, label }) => (
 );
 
 const SummaryCard = ({ icon: Icon, label, value, color }) => {
+  // eslint-disable-line no-unused-vars
   const colorClasses = {
     purple: "bg-purple-500",
     emerald: "bg-emerald-500",
@@ -756,22 +798,24 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
     paycheckHistory,
     actualBalance,
     transactions,
-    allTransactions,
+    allTransactions: rawAllTransactions,
     setActualBalance,
     reconcileTransaction,
     addSavingsGoal,
     updateSavingsGoal,
     deleteSavingsGoal,
-    setUnassignedCash,
-    addBill,
-    updateBill,
-    deleteBill,
     addEnvelope,
     updateEnvelope,
     processPaycheck,
     setAllTransactions,
     setTransactions,
   } = budget;
+
+  // Filter out null/undefined transactions to prevent runtime errors
+  const allTransactions = (rawAllTransactions || []).filter((t) => t && typeof t === "object");
+  const safeTransactions = (transactions || []).filter(
+    (t) => t && typeof t === "object" && typeof t.amount === "number"
+  );
 
   const views = {
     dashboard: (
@@ -782,13 +826,13 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
         actualBalance={actualBalance}
         onUpdateActualBalance={setActualBalance}
         onReconcileTransaction={reconcileTransaction}
-        transactions={transactions}
+        transactions={safeTransactions}
       />
     ),
     envelopes: (
       <div className="space-y-6">
         <SmartEnvelopeSuggestions
-          transactions={transactions}
+          transactions={safeTransactions}
           envelopes={envelopes}
           onCreateEnvelope={addEnvelope}
           onUpdateEnvelope={updateEnvelope}
@@ -885,7 +929,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
         onBulkImport={(newTransactions) => {
           console.log("🔄 onBulkImport called with transactions:", newTransactions.length);
           const updatedAllTransactions = [...allTransactions, ...newTransactions];
-          const updatedTransactions = [...transactions, ...newTransactions];
+          const updatedTransactions = [...safeTransactions, ...newTransactions];
           setAllTransactions(updatedAllTransactions);
           setTransactions(updatedTransactions);
           console.log(

@@ -42,7 +42,8 @@
 ### ⚡ Technical Features
 
 - **Offline Support** - Works without internet, syncs when reconnected
-- **Performance Optimized** - Virtual scrolling and React optimizations for large datasets
+- **Performance Optimized** - Transaction ledger now uses virtual scrolling via `@tanstack/react-virtual` for large datasets
+- **Data Pagination** - Displays transactions 10 per page to keep memory usage low
 - **Responsive Design** - Works seamlessly on desktop and mobile devices
 
 ## 🛠️ Tech Stack

@@ -1,6 +1,6 @@
 // src/new/UnifiedBillTracker.jsx
 import React, { useState, useMemo } from "react";
-import { useBudget } from "../contexts/BudgetContext";
+import { useBudget } from "../hooks/useBudget";
 import {
   FileText,
   Calendar,
@@ -17,6 +17,7 @@ import {
   Filter,
   Eye,
 } from "lucide-react";
+import { getBillIcon } from "../utils/billIcons";
 import AddBillModal from "../components/bills/AddBillModal";
 
 const UnifiedBillTracker = ({
@@ -79,6 +80,7 @@ const UnifiedBillTracker = ({
               else if (daysUntilDue <= 7) urgency = "soon";
             }
           } catch (error) {
+            // eslint-disable-line no-unused-vars
             console.warn(`Invalid due date for bill ${bill.id}:`, bill.dueDate);
           }
         }
@@ -196,18 +198,33 @@ const UnifiedBillTracker = ({
   };
 
   const getCategoryIcon = (bill) => {
-    if (bill.metadata?.categoryIcon) return bill.metadata.categoryIcon;
+    // First priority: Check if bill has a stored icon component
+    if (bill.icon) {
+      const IconComponent = bill.icon;
+      return <IconComponent className="h-6 w-6" />;
+    }
 
-    const category = bill.category?.toLowerCase() || "";
-    if (category.includes("electric") || category.includes("power")) return "⚡";
-    if (category.includes("gas")) return "🔥";
-    if (category.includes("water")) return "💧";
-    if (category.includes("internet") || category.includes("wifi")) return "🌐";
-    if (category.includes("phone") || category.includes("mobile")) return "📱";
-    if (category.includes("insurance")) return "🛡️";
-    if (category.includes("mortgage") || category.includes("rent")) return "🏠";
-    if (category.includes("credit")) return "💳";
-    return "📄";
+    // Second priority: Check metadata for legacy icon reference
+    if (bill.metadata?.categoryIcon) {
+      // If it's a string emoji, return it
+      if (typeof bill.metadata.categoryIcon === "string") {
+        return bill.metadata.categoryIcon;
+      }
+      // If it's a component, render it
+      if (typeof bill.metadata.categoryIcon === "function") {
+        const IconComponent = bill.metadata.categoryIcon;
+        return <IconComponent className="h-6 w-6" />;
+      }
+    }
+
+    // Third priority: Use smart icon detection from billIcons utility
+    const IconComponent = getBillIcon(
+      bill.provider || "",
+      bill.description || "",
+      bill.category || ""
+    );
+
+    return <IconComponent className="h-6 w-6" />;
   };
 
   const handlePayBill = (billId) => {
@@ -853,18 +870,6 @@ const UnifiedBillTracker = ({
           </div>
         </div>
       )}
-
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h4 className="font-medium text-blue-800 mb-2 flex items-center">
-          <FileText className="h-4 w-4 mr-2" /> Unified Data Source
-        </h4>
-        <div className="text-sm text-blue-700 space-y-1">
-          <p>✅ Bills and transactions share the same data structure</p>
-          <p>✅ Real-time envelope balance updates when bills are paid</p>
-          <p>✅ No duplicate entries - bills become transactions when paid</p>
-          <p>✅ Smart categorization with envelope auto-assignment</p>
-        </div>
-      </div>
 
       {/* Add Bill Modal */}
       {showAddBillModal && (

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BookOpen, Plus, Upload } from "lucide-react";
 
 import TransactionSummary from "./TransactionSummary";
@@ -12,6 +12,7 @@ import { useTransactionFilters } from "./hooks/useTransactionFilters";
 import { useTransactionForm } from "./hooks/useTransactionForm";
 import { useTransactionImport } from "./hooks/useTransactionImport";
 import { suggestEnvelope } from "./utils/envelopeMatching";
+import { TRANSACTION_CATEGORIES } from "../../constants/categories";
 
 const TransactionLedger = ({
   transactions = [],
@@ -32,6 +33,9 @@ const TransactionLedger = ({
   const [envelopeFilter, setEnvelopeFilter] = useState("all");
   const [sortBy, setSortBy] = useState("date");
   const [sortOrder, setSortOrder] = useState("desc");
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
   // Custom hooks
   const { transactionForm, setTransactionForm, resetForm, populateForm, createTransaction } =
@@ -59,20 +63,15 @@ const TransactionLedger = ({
     sortOrder
   );
 
-  const categories = [
-    "Food & Dining",
-    "Shopping",
-    "Entertainment",
-    "Bills & Utilities",
-    "Transportation",
-    "Travel",
-    "Health & Medical",
-    "Education",
-    "Personal Care",
-    "Gifts & Donations",
-    "Business",
-    "Other",
-  ];
+  const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / pageSize));
+  const paginatedTransactions = filteredTransactions.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filteredTransactions.length]);
 
   const handleSubmitTransaction = () => {
     const newTransaction = createTransaction(currentUser);
@@ -196,12 +195,32 @@ const TransactionLedger = ({
 
       {/* Transactions Table */}
       <TransactionTable
-        transactions={filteredTransactions}
+        transactions={paginatedTransactions}
         envelopes={envelopes}
         onEdit={startEdit}
         onDelete={onDeleteTransaction}
         onSplit={(transaction) => setSplittingTransaction(transaction)}
       />
+
+      <div className="flex items-center justify-between mt-4">
+        <button
+          className="btn btn-secondary"
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+        >
+          Previous
+        </button>
+        <span className="text-sm text-gray-700">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          className="btn btn-secondary"
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+        >
+          Next
+        </button>
+      </div>
 
       {/* Transaction Form Modal */}
       <TransactionForm
@@ -211,7 +230,7 @@ const TransactionLedger = ({
         transactionForm={transactionForm}
         setTransactionForm={setTransactionForm}
         envelopes={envelopes}
-        categories={categories}
+        categories={TRANSACTION_CATEGORIES}
         onSubmit={handleSubmitTransaction}
         suggestEnvelope={handleSuggestEnvelope}
       />
@@ -236,7 +255,7 @@ const TransactionLedger = ({
         onClose={() => setSplittingTransaction(null)}
         transaction={splittingTransaction}
         envelopes={envelopes}
-        availableCategories={categories}
+        availableCategories={TRANSACTION_CATEGORIES}
         onSplitTransaction={handleSplitTransaction}
       />
     </div>

@@ -1,5 +1,10 @@
 import React, { useState, useMemo } from "react";
 import {
+  TRANSACTION_CATEGORIES,
+  DEFAULT_CATEGORY,
+  MERCHANT_CATEGORY_PATTERNS,
+} from "../constants/categories";
+import {
   Zap,
   Plus,
   Minus,
@@ -25,10 +30,10 @@ import {
 const SmartCategoryManager = ({
   transactions = [],
   bills = [],
-  currentCategories = [],
+  currentCategories = TRANSACTION_CATEGORIES,
   onAddCategory,
   onRemoveCategory,
-  onUpdateCategory,
+  onUpdateCategory, // eslint-disable-line no-unused-vars
   onApplyToTransactions,
   onApplyToBills,
   dateRange = "6months",
@@ -67,7 +72,12 @@ const SmartCategoryManager = ({
   // Analyze transaction patterns for category suggestions
   const transactionAnalysis = useMemo(() => {
     const suggestions = [];
-    const { minTransactionCount, minAmount, similarityThreshold, unusedCategoryThreshold } =
+    const {
+      minTransactionCount,
+      minAmount,
+      similarityThreshold,
+      unusedCategoryThreshold,
+    } = // eslint-disable-line no-unused-vars
       analysisSettings;
 
     // 1. UNCATEGORIZED TRANSACTION ANALYSIS
@@ -369,44 +379,21 @@ const SmartCategoryManager = ({
 
   // Utility functions
   const suggestCategoryFromMerchant = (merchant) => {
-    const patterns = {
-      Groceries: /grocery|market|food|kroger|safeway|walmart|target|costco|whole foods/i,
-      "Gas & Transportation": /gas|fuel|shell|exxon|chevron|bp|mobil|uber|lyft|taxi/i,
-      "Dining Out": /restaurant|cafe|coffee|pizza|burger|taco|starbucks|mcdonalds/i,
-      Entertainment: /movie|theater|netflix|spotify|game|entertainment|concert/i,
-      Shopping: /amazon|store|shop|mall|online|retail|ebay/i,
-      "Health & Medical": /pharmacy|medical|doctor|hospital|cvs|walgreens|clinic/i,
-      Utilities: /electric|water|internet|phone|cable|utility|bill/i,
-      Insurance: /insurance|allstate|geico|progressive|state farm/i,
-      Banking: /bank|atm|fee|transfer|interest/i,
-      Subscriptions: /subscription|monthly|annual|membership/i,
-    };
-
-    for (const [category, regex] of Object.entries(patterns)) {
+    for (const [category, regex] of Object.entries(MERCHANT_CATEGORY_PATTERNS)) {
       if (regex.test(merchant)) {
         return category;
       }
     }
-    return null;
+    return DEFAULT_CATEGORY;
   };
 
   const suggestBillCategory = (billName) => {
-    const patterns = {
-      Utilities: /electric|water|gas|sewer|internet|cable|phone|utility/i,
-      Insurance: /insurance|health|auto|home|life/i,
-      Housing: /rent|mortgage|hoa|property/i,
-      Transportation: /car|auto|registration|license|parking/i,
-      Subscriptions: /netflix|spotify|gym|membership|subscription/i,
-      Financial: /loan|credit|bank|finance/i,
-      Healthcare: /medical|dental|vision|health/i,
-    };
-
-    for (const [category, regex] of Object.entries(patterns)) {
+    for (const [category, regex] of Object.entries(MERCHANT_CATEGORY_PATTERNS)) {
       if (regex.test(billName)) {
         return category;
       }
     }
-    return "General";
+    return DEFAULT_CATEGORY;
   };
 
   const calculateStringSimilarity = (str1, str2) => {

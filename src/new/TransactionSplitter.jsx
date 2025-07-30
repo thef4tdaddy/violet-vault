@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { TRANSACTION_CATEGORIES } from "../constants/categories";
 import {
   Zap,
   Plus,
@@ -22,7 +23,7 @@ const TransactionSplitter = ({
   onSplitTransaction,
   envelopes = [],
   availableCategories = [],
-  className = "",
+  className = "", // eslint-disable-line no-unused-vars
 }) => {
   const [splitAllocations, setSplitAllocations] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -32,9 +33,9 @@ const TransactionSplitter = ({
     if (isOpen && transaction) {
       initializeSplits();
     }
-  }, [isOpen, transaction]);
+  }, [isOpen, transaction, initializeSplits]);
 
-  const initializeSplits = () => {
+  const initializeSplits = useCallback(() => {
     // Check if transaction has itemized metadata (like Amazon orders)
     if (transaction.metadata?.items && transaction.metadata.items.length > 1) {
       // Initialize with individual items
@@ -87,7 +88,7 @@ const TransactionSplitter = ({
         },
       ]);
     }
-  };
+  }, [transaction]);
 
   // Add new split allocation
   const addSplitAllocation = () => {
@@ -286,17 +287,7 @@ const TransactionSplitter = ({
       ...availableCategories,
       ...envelopes.map((env) => env.name),
       ...envelopes.map((env) => env.category).filter(Boolean),
-      "Food & Dining",
-      "Transportation",
-      "Entertainment",
-      "Shopping",
-      "Bills & Utilities",
-      "Health & Medical",
-      "Personal Care",
-      "Education",
-      "Travel",
-      "Gifts & Donations",
-      "Other",
+      ...TRANSACTION_CATEGORIES,
     ]),
   ].sort();
 
