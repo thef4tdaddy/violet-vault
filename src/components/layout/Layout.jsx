@@ -38,7 +38,8 @@ const SupplementalAccounts = lazy(() => import("../accounts/SupplementalAccounts
 const Layout = () => {
   logger.debug("Layout component is running");
 
-  const { isUnlocked, encryptionKey, currentUser, login, logout, budgetId, salt } = useAuthStore();
+  const { isUnlocked, encryptionKey, currentUser, login, logout, budgetId, salt, changePassword } =
+    useAuthStore();
 
   // Add online/offline status detection
   useEffect(() => {
@@ -69,7 +70,7 @@ const Layout = () => {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
-  }, []); // Empty dependency array ensures this runs only once
+  }, []);
 
   const firebaseSync = useMemo(() => new FirebaseSync(), []);
 
@@ -119,6 +120,15 @@ const Layout = () => {
 
   const handleLogout = () => {
     logout();
+  };
+
+  const handleChangePassword = async (oldPass, newPass) => {
+    const result = await changePassword(oldPass, newPass);
+    if (!result.success) {
+      alert(`Password change failed: ${result.error}`);
+    } else {
+      alert("Password updated successfully.");
+    }
   };
 
   const exportData = async () => {
@@ -535,6 +545,7 @@ const MainContent = ({
             onExport={onExport}
             onImport={handleImport}
             onLogout={onLogout}
+            onChangePassword={handleChangePassword}
             onResetEncryption={() => {
               // Reset the budget context data first
               budget.resetAllData();
