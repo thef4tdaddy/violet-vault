@@ -1,5 +1,5 @@
 // components/Dashboard.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   CreditCard,
   CheckCircle,
@@ -14,6 +14,8 @@ import {
   Minus,
   RefreshCw,
 } from "lucide-react";
+import Toast from "../ui/Toast";
+import { isTodayPredictedPayday } from "../../utils/paydayPredictor";
 
 const Dashboard = ({
   envelopes,
@@ -23,8 +25,10 @@ const Dashboard = ({
   onUpdateActualBalance,
   onReconcileTransaction,
   transactions,
+  paycheckHistory,
 }) => {
   const [showReconcileModal, setShowReconcileModal] = useState(false);
+  const [showPaydayToast, setShowPaydayToast] = useState(false);
   const [newTransaction, setNewTransaction] = useState({
     amount: "",
     description: "",
@@ -32,6 +36,12 @@ const Dashboard = ({
     envelopeId: "",
     date: new Date().toISOString().split("T")[0],
   });
+
+  useEffect(() => {
+    if (isTodayPredictedPayday(paycheckHistory)) {
+      setShowPaydayToast(true);
+    }
+  }, [paycheckHistory]);
 
   // Calculate totals
   const totalEnvelopeBalance = envelopes.reduce((sum, env) => sum + env.currentBalance, 0);
@@ -88,6 +98,18 @@ const Dashboard = ({
 
   return (
     <div className="space-y-6">
+      {isTodayPredictedPayday(paycheckHistory) && (
+        <div className="bg-purple-50 border border-purple-200 p-4 rounded-lg flex items-center space-x-3">
+          <Calendar className="h-5 w-5 text-purple-600" />
+          <span className="font-medium text-purple-800">Payday? Time to apply it to your budget!</span>
+        </div>
+      )}
+      {showPaydayToast && (
+        <Toast
+          message="Looks like today might be payday!"
+          onClose={() => setShowPaydayToast(false)}
+        />
+      )}
       {/* Account Balance Overview */}
       <div className="glassmorphism rounded-2xl p-6 border border-white/20">
         <h2 className="text-xl font-semibold mb-6 flex items-center">

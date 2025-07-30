@@ -817,6 +817,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
         onUpdateActualBalance={setActualBalance}
         onReconcileTransaction={reconcileTransaction}
         transactions={safeTransactions}
+        paycheckHistory={paycheckHistory}
       />
     ),
     envelopes: (
