@@ -33,9 +33,7 @@ const useOptimizedBudgetStore = create(
 
           updateEnvelope: (envelope) =>
             set((state) => {
-              const index = state.envelopes.findIndex(
-                (e) => e.id === envelope.id,
-              );
+              const index = state.envelopes.findIndex((e) => e.id === envelope.id);
               if (index !== -1) {
                 state.envelopes[index] = envelope;
               }
@@ -50,9 +48,7 @@ const useOptimizedBudgetStore = create(
           bulkUpdateEnvelopes: (updates) =>
             set((state) => {
               updates.forEach((update) => {
-                const index = state.envelopes.findIndex(
-                  (e) => e.id === update.id,
-                );
+                const index = state.envelopes.findIndex((e) => e.id === update.id);
                 if (index !== -1) {
                   Object.assign(state.envelopes[index], update);
                 }
@@ -69,10 +65,7 @@ const useOptimizedBudgetStore = create(
           },
 
           getTotalEnvelopeBalance: () => {
-            return get().envelopes.reduce(
-              (sum, e) => sum + (e.currentBalance || 0),
-              0,
-            );
+            return get().envelopes.reduce((sum, e) => sum + (e.currentBalance || 0), 0);
           },
 
           // Transaction management actions
@@ -94,12 +87,8 @@ const useOptimizedBudgetStore = create(
 
           updateTransaction: (transaction) =>
             set((state) => {
-              const transIndex = state.transactions.findIndex(
-                (t) => t.id === transaction.id,
-              );
-              const allTransIndex = state.allTransactions.findIndex(
-                (t) => t.id === transaction.id,
-              );
+              const transIndex = state.transactions.findIndex((t) => t.id === transaction.id);
+              const allTransIndex = state.allTransactions.findIndex((t) => t.id === transaction.id);
 
               if (transIndex !== -1) {
                 state.transactions[transIndex] = transaction;
@@ -111,12 +100,8 @@ const useOptimizedBudgetStore = create(
 
           deleteTransaction: (id) =>
             set((state) => {
-              state.transactions = state.transactions.filter(
-                (t) => t.id !== id,
-              );
-              state.allTransactions = state.allTransactions.filter(
-                (t) => t.id !== id,
-              );
+              state.transactions = state.transactions.filter((t) => t.id !== id);
+              state.allTransactions = state.allTransactions.filter((t) => t.id !== id);
             }),
 
           // Bills management actions
@@ -134,9 +119,7 @@ const useOptimizedBudgetStore = create(
           updateBill: (bill) =>
             set((state) => {
               const billIndex = state.bills.findIndex((b) => b.id === bill.id);
-              const allTransIndex = state.allTransactions.findIndex(
-                (t) => t.id === bill.id,
-              );
+              const allTransIndex = state.allTransactions.findIndex((t) => t.id === bill.id);
 
               if (billIndex !== -1) {
                 state.bills[billIndex] = bill;
@@ -149,9 +132,7 @@ const useOptimizedBudgetStore = create(
           deleteBill: (id) =>
             set((state) => {
               state.bills = state.bills.filter((b) => b.id !== id);
-              state.allTransactions = state.allTransactions.filter(
-                (t) => t.id !== id,
-              );
+              state.allTransactions = state.allTransactions.filter((t) => t.id !== id);
             }),
 
           // Savings goals management
@@ -167,9 +148,7 @@ const useOptimizedBudgetStore = create(
 
           updateSavingsGoal: (goal) =>
             set((state) => {
-              const index = state.savingsGoals.findIndex(
-                (g) => g.id === goal.id,
-              );
+              const index = state.savingsGoals.findIndex((g) => g.id === goal.id);
               if (index !== -1) {
                 state.savingsGoals[index] = goal;
               }
@@ -177,9 +156,7 @@ const useOptimizedBudgetStore = create(
 
           deleteSavingsGoal: (id) =>
             set((state) => {
-              state.savingsGoals = state.savingsGoals.filter(
-                (g) => g.id !== id,
-              );
+              state.savingsGoals = state.savingsGoals.filter((g) => g.id !== id);
             }),
 
           // Unassigned cash and allocation management
@@ -217,7 +194,7 @@ const useOptimizedBudgetStore = create(
               state.isOnline = true; // Also reset isOnline status
               state.dataLoaded = false;
             }),
-        })),
+        }))
       ),
       {
         name: "violet-vault-store", // localStorage key
@@ -233,12 +210,12 @@ const useOptimizedBudgetStore = create(
           // IMPORTANT: Do NOT persist the isOnline flag or dataLoaded
           // They should be determined at runtime
         }),
-      },
+      }
     ),
     {
       name: "violet-vault-devtools",
-    },
-  ),
+    }
+  )
 );
 
 export default useOptimizedBudgetStore;
