@@ -937,18 +937,6 @@ const UnifiedBillTracker = ({
         </div>
       )}
 
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h4 className="font-medium text-blue-800 mb-2 flex items-center">
-          <FileText className="h-4 w-4 mr-2" /> Unified Data Source
-        </h4>
-        <div className="text-sm text-blue-700 space-y-1">
-          <p>✅ Bills and transactions share the same data structure</p>
-          <p>✅ Real-time envelope balance updates when bills are paid</p>
-          <p>✅ No duplicate entries - bills become transactions when paid</p>
-          <p>✅ Smart categorization with envelope auto-assignment</p>
-        </div>
-      </div>
-
       {/* Add Bill Modal */}
       {showAddBillModal && (
         <AddBillModal
