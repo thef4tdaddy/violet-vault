@@ -11,7 +11,10 @@ const useAuthStore = create((set) => ({
 
   login: async (password, userData = null) => {
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("Login timeout after 10 seconds")), 10000)
+      setTimeout(
+        () => reject(new Error("Login timeout after 10 seconds")),
+        10000,
+      ),
     );
 
     const loginPromise = (async () => {
@@ -20,7 +23,8 @@ const useAuthStore = create((set) => ({
           const { salt, key } = await encryptionUtils.deriveKey(password);
           const finalUserData = {
             ...userData,
-            budgetId: userData.budgetId || encryptionUtils.generateBudgetId(password),
+            budgetId:
+              userData.budgetId || encryptionUtils.generateBudgetId(password),
           };
           set({
             salt,
@@ -39,18 +43,29 @@ const useAuthStore = create((set) => ({
         }
         const savedData = localStorage.getItem("envelopeBudgetData");
         if (!savedData) {
-          return { success: false, error: "No saved data found. Try creating a new budget." };
+          return {
+            success: false,
+            error: "No saved data found. Try creating a new budget.",
+          };
         }
         const { salt: savedSalt, encryptedData, iv } = JSON.parse(savedData);
         if (!savedSalt || !encryptedData || !iv) {
           return {
             success: false,
-            error: "Local data is corrupted. Please clear data and start fresh.",
+            error:
+              "Local data is corrupted. Please clear data and start fresh.",
           };
         }
         const saltArray = new Uint8Array(savedSalt);
-        const key = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
-        const decryptedData = await encryptionUtils.decrypt(encryptedData, key, iv);
+        const key = await encryptionUtils.deriveKeyFromSalt(
+          password,
+          saltArray,
+        );
+        const decryptedData = await encryptionUtils.decrypt(
+          encryptedData,
+          key,
+          iv,
+        );
         const currentUserData = decryptedData.currentUser;
         set({
           salt: saltArray,
@@ -62,7 +77,10 @@ const useAuthStore = create((set) => ({
         });
         return { success: true, data: decryptedData };
       } catch (error) {
-        if (error.name === "OperationError" || error.message.toLowerCase().includes("decrypt")) {
+        if (
+          error.name === "OperationError" ||
+          error.message.toLowerCase().includes("decrypt")
+        ) {
           return { success: false, error: "Invalid password." };
         }
         return { success: false, error: "Invalid password or corrupted data." };

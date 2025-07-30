@@ -24,7 +24,11 @@ export const initSentry = () => {
       const errorMessage = event.exception?.values?.[0]?.value || event.message;
 
       // Check for the specific null amount error and throttle it
-      if (errorMessage?.includes("Cannot read properties of null (reading 'amount')")) {
+      if (
+        errorMessage?.includes(
+          "Cannot read properties of null (reading 'amount')",
+        )
+      ) {
         // Only send this error once every 5 minutes
         const errorKey = "null_amount_error";
         const lastSent = window.sessionStorage.getItem(`sentry_${errorKey}`);
@@ -86,7 +90,9 @@ const setupConsoleCapture = () => {
     // Send to Sentry as breadcrumb
     Sentry.addBreadcrumb({
       message: args
-        .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
+        .map((arg) =>
+          typeof arg === "object" ? JSON.stringify(arg) : String(arg),
+        )
         .join(" "),
       level: "info",
       category: "console",
@@ -106,7 +112,9 @@ const setupConsoleCapture = () => {
     // Send warnings as breadcrumbs
     Sentry.addBreadcrumb({
       message: args
-        .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
+        .map((arg) =>
+          typeof arg === "object" ? JSON.stringify(arg) : String(arg),
+        )
         .join(" "),
       level: "warning",
       category: "console",
