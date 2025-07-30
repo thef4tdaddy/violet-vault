@@ -77,9 +77,7 @@ export const useOptimizedBudget = () => {
       });
 
       // Get previous value for rollback
-      const previousEnvelope = queryClient.getQueryData(
-        queryKeys.envelopeById(updatedEnvelope.id),
-      );
+      const previousEnvelope = queryClient.getQueryData(queryKeys.envelopeById(updatedEnvelope.id));
 
       // Optimistic update
       optimisticHelpers.updateEnvelope(updatedEnvelope.id, updatedEnvelope);
@@ -89,10 +87,7 @@ export const useOptimizedBudget = () => {
     onError: (err, updatedEnvelope, context) => {
       // Rollback to previous value
       if (context?.previousEnvelope) {
-        optimisticHelpers.updateEnvelope(
-          updatedEnvelope.id,
-          context.previousEnvelope,
-        );
+        optimisticHelpers.updateEnvelope(updatedEnvelope.id, context.previousEnvelope);
       }
     },
   });
@@ -112,9 +107,7 @@ export const useOptimizedBudget = () => {
       await queryClient.cancelQueries({ queryKey: queryKeys.envelopesList() });
 
       // Get previous data for rollback
-      const previousEnvelopes = queryClient.getQueryData(
-        queryKeys.envelopesList(),
-      );
+      const previousEnvelopes = queryClient.getQueryData(queryKeys.envelopesList());
 
       // Optimistic update
       optimisticHelpers.removeEnvelope(envelopeId);
@@ -124,10 +117,7 @@ export const useOptimizedBudget = () => {
     onError: (err, envelopeId, context) => {
       // Rollback
       if (context?.previousEnvelopes) {
-        queryClient.setQueryData(
-          queryKeys.envelopesList(),
-          context.previousEnvelopes,
-        );
+        queryClient.setQueryData(queryKeys.envelopesList(), context.previousEnvelopes);
       }
     },
   });
@@ -137,14 +127,14 @@ export const useOptimizedBudget = () => {
     (id) => {
       return envelopes.find((e) => e.id === id);
     },
-    [envelopes],
+    [envelopes]
   );
 
   const getEnvelopesByCategory = useCallback(
     (category) => {
       return envelopes.filter((e) => e.category === category);
     },
-    [envelopes],
+    [envelopes]
   );
 
   const getTotalBalance = useCallback(() => {
@@ -155,13 +145,11 @@ export const useOptimizedBudget = () => {
   const syncData = useCallback(async () => {
     try {
       // Sync from Dexie to React Query cache
-      const [dexieEnvelopes, dexieTransactions, dexieBills] = await Promise.all(
-        [
-          optimizedDb.envelopes.toArray(),
-          optimizedDb.transactions.toArray(),
-          optimizedDb.bills.toArray(),
-        ],
-      );
+      const [dexieEnvelopes, dexieTransactions, dexieBills] = await Promise.all([
+        optimizedDb.envelopes.toArray(),
+        optimizedDb.transactions.toArray(),
+        optimizedDb.bills.toArray(),
+      ]);
 
       // Update React Query cache
       queryClient.setQueryData(queryKeys.envelopesList(), dexieEnvelopes);
