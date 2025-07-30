@@ -1,0 +1,5 @@
+# Run linting before commit
+npm run lint
+
+# Run build to make sure everything compiles
+npm run build
