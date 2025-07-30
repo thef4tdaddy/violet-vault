@@ -1,0 +1,82 @@
+import React from "react";
+import { Calendar, TrendingUp, Clock, AlertCircle } from "lucide-react";
+import { formatPaydayPrediction, getDaysUntilPayday } from "../../utils/paydayPredictor";
+
+const PaydayPrediction = ({ prediction, className = "" }) => {
+  if (!prediction || !prediction.nextPayday) {
+    return null;
+  }
+
+  const formattedPrediction = formatPaydayPrediction(prediction);
+  const daysUntil = getDaysUntilPayday(prediction);
+  
+  // Determine the style based on confidence and time until payday
+  const getConfidenceColor = () => {
+    if (prediction.confidence >= 80) return "emerald";
+    if (prediction.confidence >= 60) return "amber";
+    return "gray";
+  };
+
+  const getUrgencyStyle = () => {
+    if (daysUntil === 0) return "bg-purple-50 border-purple-200";
+    if (daysUntil === 1) return "bg-emerald-50 border-emerald-200";
+    if (daysUntil >= 2 && daysUntil <= 3) return "bg-amber-50 border-amber-200";
+    return "bg-gray-50 border-gray-200";
+  };
+
+  const getIcon = () => {
+    if (daysUntil === 0) return <Calendar className="h-5 w-5 text-purple-600" />;
+    if (daysUntil === 1) return <TrendingUp className="h-5 w-5 text-emerald-600" />;
+    if (daysUntil >= 2 && daysUntil <= 7) return <Clock className="h-5 w-5 text-amber-600" />;
+    return <Calendar className="h-5 w-5 text-gray-600" />;
+  };
+
+  const confidenceColor = getConfidenceColor();
+
+  return (
+    <div className={`glassmorphism rounded-2xl p-4 border ${getUrgencyStyle()} ${className}`}>
+      <div className="flex items-start justify-between">
+        <div className="flex items-start space-x-3">
+          <div className="flex-shrink-0 mt-0.5">
+            {getIcon()}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className="font-semibold text-gray-900 text-sm">
+              Next Payday Prediction
+            </h4>
+            <p className="text-sm text-gray-700 mt-1">
+              {formattedPrediction.displayText}
+            </p>
+            <div className="flex items-center space-x-4 mt-2">
+              <div className="flex items-center text-xs text-gray-600">
+                <span className="font-medium">Pattern:</span>
+                <span className="ml-1">{prediction.pattern}</span>
+              </div>
+              <div className="flex items-center text-xs">
+                <span className="font-medium text-gray-600">Confidence:</span>
+                <div className="ml-2 flex items-center">
+                  <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full bg-${confidenceColor}-500 transition-all duration-300`}
+                      style={{ width: `${prediction.confidence}%` }}
+                    />
+                  </div>
+                  <span className={`ml-1 text-${confidenceColor}-600 font-medium`}>
+                    {prediction.confidence}%
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {prediction.confidence < 60 && (
+          <div className="flex-shrink-0 ml-2">
+            <AlertCircle className="h-4 w-4 text-amber-500" title="Low confidence prediction" />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default PaydayPrediction;

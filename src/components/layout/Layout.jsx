@@ -8,10 +8,13 @@ import UserSetup from "../auth/UserSetup";
 import Header from "../ui/Header";
 import TeamActivitySync from "../sync/TeamActivitySync";
 import LoadingSpinner from "../ui/LoadingSpinner";
+import { ToastContainer } from "../ui/Toast";
+import useToast from "../../hooks/useToast";
 import { encryptionUtils } from "../../utils/encryption";
 import FirebaseSync from "../../utils/firebaseSync";
 import logger from "../../utils/logger";
 import { getVersionInfo } from "../../utils/version";
+import { predictNextPayday, isPaydayToday, checkRecentPayday } from "../../utils/paydayPredictor";
 import {
   DollarSign,
   Wallet,
@@ -38,7 +41,7 @@ const SupplementalAccounts = lazy(() => import("../accounts/SupplementalAccounts
 const Layout = () => {
   logger.debug("Layout component is running");
 
-  const { isUnlocked, encryptionKey, currentUser, login, logout, budgetId, salt, changePassword } =
+  const { isUnlocked, encryptionKey, currentUser, login, logout, budgetId, salt, changePassword, updateProfile } =
     useAuthStore();
 
   // Add online/offline status detection
@@ -88,6 +91,14 @@ const Layout = () => {
     }
   }, [isUnlocked]);
 
+  // Check for payday predictions and notifications
+  useEffect(() => {
+    if (!isUnlocked) return;
+
+    // We need to access the budget data to get paycheck history
+    // This will be handled in the MainContent component where we have access to the budget
+  }, [isUnlocked]);
+
   const firebaseSync = useMemo(() => new FirebaseSync(), []);
 
   logger.auth("Auth hook values", {
@@ -102,6 +113,9 @@ const Layout = () => {
   const [showRotationModal, setShowRotationModal] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  // Toast notifications
+  const { toasts, removeToast, showPayday } = useToast();
 
   // Handle activity updates from MainContent
   const handleActivityUpdate = useCallback(({ users, activity }) => {
@@ -151,6 +165,13 @@ const Layout = () => {
       alert(`Password change failed: ${result.error}`);
     } else {
       alert("Password updated successfully.");
+    }
+  };
+
+  const handleUpdateProfile = async (updatedProfile) => {
+    const result = await updateProfile(updatedProfile);
+    if (!result.success) {
+      throw new Error(result.error);
     }
   };
 
@@ -514,6 +535,8 @@ const Layout = () => {
           setSyncConflicts={setSyncConflicts}
           firebaseSync={firebaseSync}
           rotationDue={rotationDue}
+          onUpdateProfile={handleUpdateProfile}
+          showPayday={showPayday}
         />
       </BudgetProvider>
       {showRotationModal && (
@@ -546,6 +569,9 @@ const Layout = () => {
           </div>
         </div>
       )}
+      
+      {/* Toast Container */}
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </>
   );
 };
@@ -567,6 +593,8 @@ const MainContent = ({
   onResolveConflict,
   setSyncConflicts,
   rotationDue,
+  onUpdateProfile,
+  showPayday,
 }) => {
   const budget = useBudget();
   const [activeView, setActiveView] = useState("dashboard");
@@ -607,6 +635,7 @@ const MainContent = ({
     savingsGoals,
     unassignedCash,
     biweeklyAllocation,
+    paycheckHistory,
     isOnline,
     isSyncing,
     lastSyncTime: _lastSyncTime,
@@ -644,6 +673,57 @@ const MainContent = ({
     }
   }, [getActiveUsers, getRecentActivity, isSyncing, onActivityUpdate]);
 
+  // Check for payday predictions and show notifications
+  useEffect(() => {
+    if (!paycheckHistory || paycheckHistory.length < 2) return;
+    
+    const checkPayday = () => {
+      try {
+        const prediction = predictNextPayday(paycheckHistory);
+        if (!prediction.nextPayday) return;
+
+        const recentPayday = checkRecentPayday(prediction);
+        
+        // Check if we should show a payday notification
+        const lastNotification = localStorage.getItem("lastPaydayNotification");
+        const today = new Date().toDateString();
+        
+        // Show notification if:
+        // 1. Today is predicted payday OR
+        // 2. Payday was yesterday and we haven't shown notification yet
+        if (recentPayday.occurred && (!lastNotification || lastNotification !== today)) {
+          let title, message;
+          
+          if (recentPayday.wasToday) {
+            title = "🎉 Payday Today!";
+            message = `Based on your ${prediction.pattern} paycheck pattern, today should be payday! Consider processing your paycheck.`;
+          } else if (recentPayday.wasYesterday) {
+            title = "💰 Payday Was Yesterday";
+            message = `Based on your ${prediction.pattern} pattern, payday was yesterday. Don't forget to process your paycheck!`;
+          } else if (recentPayday.daysAgo === 2) {
+            title = "📅 Recent Payday";
+            message = `Based on your ${prediction.pattern} pattern, payday was ${recentPayday.daysAgo} days ago.`;
+          }
+          
+          if (title && message) {
+            showPayday(title, message, 10000); // Show for 10 seconds
+            localStorage.setItem("lastPaydayNotification", today);
+          }
+        }
+      } catch (error) {
+        console.error("Error checking payday prediction:", error);
+      }
+    };
+
+    // Check immediately
+    checkPayday();
+    
+    // Check daily at midnight and every few hours
+    const interval = setInterval(checkPayday, 4 * 60 * 60 * 1000); // Every 4 hours
+    
+    return () => clearInterval(interval);
+  }, [paycheckHistory, showPayday]);
+
   // Calculate totals
   const totalEnvelopeBalance = Array.isArray(envelopes)
     ? envelopes.reduce((sum, env) => sum + env.currentBalance, 0)
@@ -671,6 +751,7 @@ const MainContent = ({
               onResetEncryption();
             }}
             onSync={handleManualSync}
+            onUpdateProfile={onUpdateProfile}
           />
         </div>
         {rotationDue && (
@@ -952,6 +1033,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
         onUpdateActualBalance={setActualBalance}
         onReconcileTransaction={reconcileTransaction}
         transactions={safeTransactions}
+        paycheckHistory={paycheckHistory}
       />
     ),
     envelopes: (

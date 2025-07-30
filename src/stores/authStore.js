@@ -133,6 +133,56 @@ const useAuthStore = create((set) => ({
       return { success: false, error: error.message };
     }
   },
+
+  updateProfile: async (updatedProfile) => {
+    try {
+      const { encryptionKey, salt: currentSalt } = useAuthStore.getState();
+      
+      if (!encryptionKey || !currentSalt) {
+        return { success: false, error: "Not authenticated." };
+      }
+
+      // Update the current user in the store
+      set((state) => ({
+        currentUser: updatedProfile,
+      }));
+
+      // Update localStorage profile
+      const profileData = {
+        userName: updatedProfile.userName,
+        userColor: updatedProfile.userColor,
+      };
+      localStorage.setItem("userProfile", JSON.stringify(profileData));
+
+      // Update the encrypted budget data to include the updated user profile
+      const savedData = localStorage.getItem("envelopeBudgetData");
+      if (savedData) {
+        const { encryptedData, iv } = JSON.parse(savedData);
+        const decryptedData = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
+        
+        // Update the currentUser in the encrypted data
+        const updatedData = {
+          ...decryptedData,
+          currentUser: updatedProfile,
+        };
+
+        const encrypted = await encryptionUtils.encrypt(updatedData, encryptionKey);
+        localStorage.setItem(
+          "envelopeBudgetData",
+          JSON.stringify({
+            encryptedData: encrypted.data,
+            salt: Array.from(currentSalt),
+            iv: encrypted.iv,
+          })
+        );
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      return { success: false, error: error.message };
+    }
+  },
 }));
 
 export default useAuthStore;

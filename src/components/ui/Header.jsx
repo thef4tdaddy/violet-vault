@@ -16,6 +16,7 @@ const Header = memo(
     onChangePassword,
     currentUser,
     onUserChange,
+    onUpdateProfile,
   }) => {
     const [showResetModal, setShowResetModal] = useState(false);
     const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -49,7 +50,11 @@ const Header = memo(
 
           {/* Buttons row */}
           <div className="flex items-center justify-center flex-wrap gap-4">
-            <UserIndicator currentUser={currentUser} onUserChange={onUserChange} />
+            <UserIndicator 
+              currentUser={currentUser} 
+              onUserChange={onUserChange}
+              onUpdateProfile={onUpdateProfile}
+            />
 
             <div className="flex gap-3 items-center justify-center">
               <input
