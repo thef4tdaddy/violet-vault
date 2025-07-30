@@ -92,6 +92,12 @@ const useAuthStore = create((set) => ({
     })),
 
   setLastActivity: (timestamp) => set({ lastActivity: timestamp }),
+
+  setEncryption: ({ key, salt }) =>
+    set({
+      encryptionKey: key,
+      salt,
+    }),
 }));
 
 export default useAuthStore;
