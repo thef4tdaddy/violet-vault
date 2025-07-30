@@ -255,3 +255,20 @@ tbody tr:hover {
   outline: 2px solid #a855f7;
   outline-offset: 2px;
 }
+
+/* Chat window styles */
+.chat-window {
+  @apply fixed bottom-4 right-4 bg-white border rounded shadow-md w-64 flex flex-col max-h-80 z-40;
+}
+.chat-window .messages {
+  @apply overflow-y-auto p-2 text-sm flex-1;
+}
+.chat-window .input-area {
+  @apply p-2 border-t flex;
+}
+.chat-window input {
+  @apply flex-1 border rounded px-2;
+}
+.chat-window button {
+  @apply ml-2 px-3 py-1 bg-purple-500 text-white rounded;
+}

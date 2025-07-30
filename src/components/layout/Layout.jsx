@@ -12,6 +12,7 @@ import { encryptionUtils } from "../../utils/encryption";
 import FirebaseSync from "../../utils/firebaseSync";
 import logger from "../../utils/logger";
 import { getVersionInfo } from "../../utils/version";
+import ChatWindow from "../chat/ChatWindow";
 import {
   DollarSign,
   Wallet,
@@ -672,6 +673,9 @@ const MainContent = ({
             </div>
           </div>
         )}
+
+        {/* Chat Window */}
+        {isUnlocked && budgetId && <ChatWindow budgetId={budgetId} />}
 
         {/* Conflict Resolution Modal */}
         {syncConflicts?.hasConflict && (
