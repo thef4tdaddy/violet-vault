@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.6.0](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.5.1...violet-vault-v1.6.0) (2025-07-30)
+
+
+### Features
+
+* consolidate state management to use optimizedBudgetStore ([f4113f5](https://github.com/thef4tdaddy/violet-vault/commit/f4113f5b56ab3494bb7289f6402db69739abf7c9))
+* optimize TanStack Query, Zustand, and Dexie performance ([896aebf](https://github.com/thef4tdaddy/violet-vault/commit/896aebfb443582699264b3cc2e61d58c0bafe257))
+* re-implement online/offline status detection in optimized store ([8120f4d](https://github.com/thef4tdaddy/violet-vault/commit/8120f4d8911777f72a47bfc4390a82d31bf19f62))
+
+
+### Bug Fixes
+
+* add missing transaction and bill management functions to optimized store ([0974e18](https://github.com/thef4tdaddy/violet-vault/commit/0974e18adc58acbaba75f401787c2e49e4cfe80d))
+* env got exposed ([9a33a9f](https://github.com/thef4tdaddy/violet-vault/commit/9a33a9fd5c25c212b19295354a1936b26e0a2e5b))
+* implement proper bill icon display using billIcons utility ([e304e2d](https://github.com/thef4tdaddy/violet-vault/commit/e304e2d4c174c54931a4afc4e7b0ae98329dd2ce))
+* resolve envelope deletion persistence issue ([10e53b6](https://github.com/thef4tdaddy/violet-vault/commit/10e53b62ec52baab453f2c50c4f4973bf35ee582))
+* resolve envelope deletion persistence issue ([d4f11b5](https://github.com/thef4tdaddy/violet-vault/commit/d4f11b5a8a51015404af0bc4f577610f1a5734f7))
+* resolve production build ReferenceError with constants extraction ([bb53483](https://github.com/thef4tdaddy/violet-vault/commit/bb53483c4b290458c4ff316c4236b6f9685ba222))
+* restore project files after git index corruption ([3422ed5](https://github.com/thef4tdaddy/violet-vault/commit/3422ed57d06db6cf401a3de7e0661ced67d682ee))
+
+
+### Code Refactoring
+
+* connect SmartCategoryManager to centralized category constants ([7586ef9](https://github.com/thef4tdaddy/violet-vault/commit/7586ef9d888c7d88db4d5fa0fefccce55ec6ded3))
+
 ## [1.5.1](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.5.0...violet-vault-v1.5.1) (2025-07-29)
 
 ### Bug Fixes

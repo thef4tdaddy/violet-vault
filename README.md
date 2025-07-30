@@ -19,6 +19,7 @@
 
 - **Client-Side Encryption** - All data encrypted using AES-GCM with PBKDF2 key derivation
 - **Password Protection** - Master password required to access your budget
+- **Password Change** - Update your master password without losing data
 - **Device Fingerprinting** - Additional security layer for multi-device access
 - **Privacy First** - Your financial data never leaves your device unencrypted
 
@@ -49,7 +50,7 @@
 
 **Frontend:**
 
-- React 18 with modern hooks and context
+ - React 18 with Zustand for state management
 - Vite for fast development and building
 - Tailwind CSS for responsive styling
 - Recharts for data visualization
@@ -140,7 +141,7 @@ src/
 │       ├── TransactionSplitter.jsx # Split transaction tool
 │       └── import/             # Import utilities
 │           └── AmazonReceiptParser.jsx # Email receipt parsing
-├── contexts/               # React Context providers
+├── contexts/               # State management stores (Zustand)
 │   ├── AuthContext.jsx        # Authentication & encryption
 │   └── BudgetContext.jsx      # Budget data management
 ├── utils/                  # Utility functions

@@ -38,7 +38,8 @@ const SupplementalAccounts = lazy(() => import("../accounts/SupplementalAccounts
 const Layout = () => {
   logger.debug("Layout component is running");
 
-  const { isUnlocked, encryptionKey, currentUser, login, logout, budgetId, salt } = useAuthStore();
+  const { isUnlocked, encryptionKey, currentUser, login, logout, budgetId, salt, changePassword } =
+    useAuthStore();
 
   // Add online/offline status detection
   useEffect(() => {
@@ -69,7 +70,7 @@ const Layout = () => {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
-  }, []); // Empty dependency array ensures this runs only once
+  }, []);
 
   const firebaseSync = useMemo(() => new FirebaseSync(), []);
 
@@ -119,6 +120,15 @@ const Layout = () => {
 
   const handleLogout = () => {
     logout();
+  };
+
+  const handleChangePassword = async (oldPass, newPass) => {
+    const result = await changePassword(oldPass, newPass);
+    if (!result.success) {
+      alert(`Password change failed: ${result.error}`);
+    } else {
+      alert("Password updated successfully.");
+    }
   };
 
   const exportData = async () => {
@@ -552,7 +562,7 @@ const MainContent = ({
   const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden pb-24 sm:pb-0">
       <div className="max-w-7xl mx-auto relative">
         <div className="relative z-50">
           <Header
@@ -561,6 +571,7 @@ const MainContent = ({
             onExport={onExport}
             onImport={handleImport}
             onLogout={onLogout}
+            onChangePassword={handleChangePassword}
             onResetEncryption={() => {
               // Reset the budget context data first
               budget.resetAllData();
@@ -584,8 +595,8 @@ const MainContent = ({
         */}
 
         {/* Navigation Tabs */}
-        <div className="glassmorphism rounded-3xl mb-6 shadow-xl border border-white/20">
-          <nav className="flex justify-center overflow-x-auto flex-wrap">
+        <div className="glassmorphism rounded-t-3xl sm:rounded-3xl mb-6 sm:shadow-xl border border-white/20 fixed bottom-0 left-0 right-0 sm:static z-40">
+          <nav className="flex justify-around overflow-x-auto">
             <NavButton
               key="dashboard"
               active={activeView === "dashboard"}
@@ -757,14 +768,14 @@ const NavButton = (
 ) => (
   <button
     onClick={onClick}
-    className={`px-8 py-5 text-sm font-semibold border-b-2 transition-all ${
+    className={`flex-1 flex flex-col items-center sm:flex-row sm:px-6 px-2 py-3 text-xs sm:text-sm font-semibold border-t-2 sm:border-b-2 transition-all ${
       active
         ? "border-purple-500 text-purple-600 bg-purple-50/50"
         : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30"
     }`}
   >
-    <Icon className="h-5 w-5 inline mr-3" />
-    {label}
+    <Icon className="h-5 w-5 mb-1 sm:mb-0 sm:mr-3" />
+    <span>{label}</span>
   </button>
 );
 
