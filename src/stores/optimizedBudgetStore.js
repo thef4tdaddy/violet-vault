@@ -32,7 +32,9 @@ const useOptimizedBudgetStore = create(
 
           updateEnvelope: (envelope) =>
             set((state) => {
-              const index = state.envelopes.findIndex((e) => e.id === envelope.id);
+              const index = state.envelopes.findIndex(
+                (e) => e.id === envelope.id,
+              );
               if (index !== -1) {
                 state.envelopes[index] = envelope;
               }
@@ -47,7 +49,9 @@ const useOptimizedBudgetStore = create(
           bulkUpdateEnvelopes: (updates) =>
             set((state) => {
               updates.forEach((update) => {
-                const index = state.envelopes.findIndex((e) => e.id === update.id);
+                const index = state.envelopes.findIndex(
+                  (e) => e.id === update.id,
+                );
                 if (index !== -1) {
                   Object.assign(state.envelopes[index], update);
                 }
@@ -64,7 +68,10 @@ const useOptimizedBudgetStore = create(
           },
 
           getTotalEnvelopeBalance: () => {
-            return get().envelopes.reduce((sum, e) => sum + (e.currentBalance || 0), 0);
+            return get().envelopes.reduce(
+              (sum, e) => sum + (e.currentBalance || 0),
+              0,
+            );
           },
 
           // Reset functionality
@@ -78,7 +85,7 @@ const useOptimizedBudgetStore = create(
               state.unassignedCash = 0;
               state.dataLoaded = false;
             }),
-        }))
+        })),
       ),
       {
         name: "violet-vault-store", // localStorage key
@@ -89,12 +96,12 @@ const useOptimizedBudgetStore = create(
           unassignedCash: state.unassignedCash,
           biweeklyAllocation: state.biweeklyAllocation,
         }),
-      }
+      },
     ),
     {
       name: "violet-vault-devtools",
-    }
-  )
+    },
+  ),
 );
 
 export default useOptimizedBudgetStore;

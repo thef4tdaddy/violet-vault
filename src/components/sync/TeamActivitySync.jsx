@@ -37,8 +37,10 @@ const TeamActivitySync = ({
   // Helper functions for sync status
   const getSyncStatusIcon = () => {
     if (syncError) return <AlertTriangle className="h-4 w-4 text-red-500" />;
-    if (isSyncing) return <RefreshCw className="h-4 w-4 text-blue-500 animate-spin" />;
-    if (isOnline === false) return <WifiOff className="h-4 w-4 text-gray-400" />;
+    if (isSyncing)
+      return <RefreshCw className="h-4 w-4 text-blue-500 animate-spin" />;
+    if (isOnline === false)
+      return <WifiOff className="h-4 w-4 text-gray-400" />;
     if (isOnline) return <CheckCircle className="h-4 w-4 text-green-500" />;
     return <Clock className="h-4 w-4 text-gray-400" />;
   };
@@ -70,7 +72,15 @@ const TeamActivitySync = ({
       lastSyncTime,
       syncError,
     });
-  }, [activeUsers, recentActivity, currentUser, isOnline, isSyncing, lastSyncTime, syncError]);
+  }, [
+    activeUsers,
+    recentActivity,
+    currentUser,
+    isOnline,
+    isSyncing,
+    lastSyncTime,
+    syncError,
+  ]);
 
   // Format last sync time
   const formatLastSync = (timestamp) => {
@@ -147,7 +157,12 @@ const TeamActivitySync = ({
             const timeB = new Date(activityB.timestamp || 0).getTime();
             return timeB - timeA;
           } catch (error) {
-            console.error("Error sorting activities:", error, activityA, activityB);
+            console.error(
+              "Error sorting activities:",
+              error,
+              activityA,
+              activityB,
+            );
             return 0;
           }
         })
@@ -203,7 +218,9 @@ const TeamActivitySync = ({
           type: "added",
           icon: <Plus className="h-3 w-3 text-emerald-600" />,
           description: `Created envelope "${activity.details?.name || "Unknown"}"`,
-          value: activity.details?.amount ? `$${activity.details.amount.toFixed(2)}` : null,
+          value: activity.details?.amount
+            ? `$${activity.details.amount.toFixed(2)}`
+            : null,
         });
         break;
 
@@ -225,7 +242,9 @@ const TeamActivitySync = ({
           type: "deleted",
           icon: <Minus className="h-3 w-3 text-red-600" />,
           description: `Deleted envelope "${activity.details?.name || "Unknown"}"`,
-          value: activity.details?.amount ? `-$${activity.details.amount.toFixed(2)}` : null,
+          value: activity.details?.amount
+            ? `-$${activity.details.amount.toFixed(2)}`
+            : null,
         });
         break;
 
@@ -245,7 +264,9 @@ const TeamActivitySync = ({
           type: "modified",
           icon: <Edit3 className="h-3 w-3 text-blue-600" />,
           description: `Modified bill "${activity.details?.name || "Unknown"}"`,
-          value: activity.details?.amount ? `$${activity.details.amount.toFixed(2)}` : null,
+          value: activity.details?.amount
+            ? `$${activity.details.amount.toFixed(2)}`
+            : null,
         });
         break;
 
@@ -254,7 +275,9 @@ const TeamActivitySync = ({
           type: "added",
           icon: <Plus className="h-3 w-3 text-emerald-600" />,
           description: `Processed paycheck from ${activity.details?.payer || "Unknown"}`,
-          value: activity.details?.amount ? `+$${activity.details.amount.toFixed(2)}` : null,
+          value: activity.details?.amount
+            ? `+$${activity.details.amount.toFixed(2)}`
+            : null,
         });
         break;
 
@@ -302,7 +325,8 @@ const TeamActivitySync = ({
   const generateCommitId = (activity) => {
     try {
       // Generate a short hash-like ID from timestamp and user
-      const input = (activity.timestamp || Date.now()) + (activity.userName || "anonymous");
+      const input =
+        (activity.timestamp || Date.now()) + (activity.userName || "anonymous");
       const hash = input.split("").reduce((accumulator, char) => {
         accumulator = (accumulator << 5) - accumulator + char.charCodeAt(0);
         return accumulator & accumulator;
@@ -350,7 +374,9 @@ const TeamActivitySync = ({
         console.warn("activeUsers is not an array:", activeUsers);
         return [];
       }
-      return activeUsers.filter((user) => currentUser && user && user.id !== currentUser.id);
+      return activeUsers.filter(
+        (user) => currentUser && user && user.id !== currentUser.id,
+      );
     } catch (error) {
       console.error("Error filtering active users:", error);
       return [];
@@ -359,7 +385,9 @@ const TeamActivitySync = ({
 
   // Always show the sync indicator, even without activity
   const shouldShow =
-    otherActiveUsers.length > 0 || processedActivities.length > 0 || isOnline !== undefined;
+    otherActiveUsers.length > 0 ||
+    processedActivities.length > 0 ||
+    isOnline !== undefined;
 
   // Don't render if there's nothing to show
   if (!shouldShow) {
@@ -380,14 +408,17 @@ const TeamActivitySync = ({
               <RefreshCw className={syncStatus.iconClass} />
             ) : syncStatus.status === "offline" ? (
               <WifiOff className={syncStatus.iconClass} />
-            ) : syncStatus.status === "error" || syncStatus.status === "blocked" ? (
+            ) : syncStatus.status === "error" ||
+              syncStatus.status === "blocked" ? (
               <AlertTriangle className={syncStatus.iconClass} />
             ) : (
               <CheckCircle className={syncStatus.iconClass} />
             )}
             <span className={syncStatus.textClass}>{syncStatus.message}</span>
             {lastSyncTime && (
-              <span className="text-xs text-gray-500">• {formatLastSync(lastSyncTime)}</span>
+              <span className="text-xs text-gray-500">
+                • {formatLastSync(lastSyncTime)}
+              </span>
             )}
           </div>
 
@@ -397,11 +428,15 @@ const TeamActivitySync = ({
               <Users className="h-4 w-4 text-purple-600" />
               <div className="flex items-center space-x-2">
                 {otherActiveUsers.slice(0, 2).map((user, index) => (
-                  <div key={user.id || index} className="flex items-center space-x-1">
+                  <div
+                    key={user.id || index}
+                    className="flex items-center space-x-1"
+                  >
                     <div
                       className="w-5 h-5 rounded-full border border-white shadow-sm flex items-center justify-center text-xs font-medium text-white"
                       style={{
-                        backgroundColor: user.color || user.userColor || "#a855f7",
+                        backgroundColor:
+                          user.color || user.userColor || "#a855f7",
                       }}
                     >
                       {user.userName?.charAt(0)?.toUpperCase() || "?"}
@@ -412,7 +447,9 @@ const TeamActivitySync = ({
                   </div>
                 ))}
                 {otherActiveUsers.length > 2 && (
-                  <span className="text-xs text-gray-500">+{otherActiveUsers.length - 2} more</span>
+                  <span className="text-xs text-gray-500">
+                    +{otherActiveUsers.length - 2} more
+                  </span>
                 )}
               </div>
             </div>
@@ -451,7 +488,8 @@ const TeamActivitySync = ({
                   <div
                     className="w-8 h-8 rounded-full border border-white/30 flex items-center justify-center text-sm font-medium text-white flex-shrink-0"
                     style={{
-                      backgroundColor: activity.userColor || activity.color || "#a855f7",
+                      backgroundColor:
+                        activity.userColor || activity.color || "#a855f7",
                     }}
                   >
                     {activity.userName?.charAt(0)?.toUpperCase() || "?"}
@@ -460,17 +498,28 @@ const TeamActivitySync = ({
                   {/* Change Details */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-2 mb-1">
-                      <span className="font-medium text-gray-900 text-sm">{activity.userName}</span>
-                      <span className="text-xs text-gray-500 font-mono">{activity.commitId}</span>
-                      <span className="text-xs text-gray-500">{activity.timeAgo}</span>
+                      <span className="font-medium text-gray-900 text-sm">
+                        {activity.userName}
+                      </span>
+                      <span className="text-xs text-gray-500 font-mono">
+                        {activity.commitId}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {activity.timeAgo}
+                      </span>
                     </div>
 
                     {/* Git-like Changes */}
                     <div className="space-y-1">
                       {activity.changes.map((change, changeIndex) => (
-                        <div key={changeIndex} className="flex items-center space-x-2 text-sm">
+                        <div
+                          key={changeIndex}
+                          className="flex items-center space-x-2 text-sm"
+                        >
                           {change.icon}
-                          <span className="text-gray-700">{change.description}</span>
+                          <span className="text-gray-700">
+                            {change.description}
+                          </span>
                           {change.value && (
                             <span className="text-xs font-mono text-gray-600 bg-gray-100 px-2 py-1 rounded">
                               {change.value}
