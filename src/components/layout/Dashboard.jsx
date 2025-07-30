@@ -47,9 +47,8 @@ const Dashboard = ({
   const recentTransactions = (transactions || []).slice(0, 10);
 
   // Get payday prediction
-  const paydayPrediction = paycheckHistory && paycheckHistory.length >= 2 
-    ? predictNextPayday(paycheckHistory) 
-    : null;
+  const paydayPrediction =
+    paycheckHistory && paycheckHistory.length >= 2 ? predictNextPayday(paycheckHistory) : null;
 
   const handleUpdateBalance = (newBalance) => {
     onUpdateActualBalance(parseFloat(newBalance) || 0);
@@ -97,13 +96,8 @@ const Dashboard = ({
   return (
     <div className="space-y-6">
       {/* Payday Prediction */}
-      {paydayPrediction && (
-        <PaydayPrediction 
-          prediction={paydayPrediction}
-          className="mb-6"
-        />
-      )}
-      
+      {paydayPrediction && <PaydayPrediction prediction={paydayPrediction} className="mb-6" />}
+
       {/* Account Balance Overview */}
       <div className="glassmorphism rounded-2xl p-6 border border-white/20">
         <h2 className="text-xl font-semibold mb-6 flex items-center">

@@ -41,8 +41,17 @@ const SupplementalAccounts = lazy(() => import("../accounts/SupplementalAccounts
 const Layout = () => {
   logger.debug("Layout component is running");
 
-  const { isUnlocked, encryptionKey, currentUser, login, logout, budgetId, salt, changePassword, updateProfile } =
-    useAuthStore();
+  const {
+    isUnlocked,
+    encryptionKey,
+    currentUser,
+    login,
+    logout,
+    budgetId,
+    salt,
+    changePassword,
+    updateProfile,
+  } = useAuthStore();
 
   // Add online/offline status detection
   useEffect(() => {
@@ -195,11 +204,11 @@ const Layout = () => {
         iv: reencrypted.iv,
       };
       localStorage.setItem("envelopeBudgetData", JSON.stringify(saveData));
-      
+
       // Update the auth store with new encryption details
       const { setEncryption } = useAuthStore.getState();
       setEncryption({ key, salt: newSalt });
-      
+
       localStorage.setItem("passwordLastChanged", Date.now().toString());
       setShowRotationModal(false);
       setRotationDue(false);
@@ -569,7 +578,7 @@ const Layout = () => {
           </div>
         </div>
       )}
-      
+
       {/* Toast Container */}
       <ToastContainer toasts={toasts} removeToast={removeToast} />
     </>
@@ -676,24 +685,24 @@ const MainContent = ({
   // Check for payday predictions and show notifications
   useEffect(() => {
     if (!paycheckHistory || paycheckHistory.length < 2) return;
-    
+
     const checkPayday = () => {
       try {
         const prediction = predictNextPayday(paycheckHistory);
         if (!prediction.nextPayday) return;
 
         const recentPayday = checkRecentPayday(prediction);
-        
+
         // Check if we should show a payday notification
         const lastNotification = localStorage.getItem("lastPaydayNotification");
         const today = new Date().toDateString();
-        
+
         // Show notification if:
         // 1. Today is predicted payday OR
         // 2. Payday was yesterday and we haven't shown notification yet
         if (recentPayday.occurred && (!lastNotification || lastNotification !== today)) {
           let title, message;
-          
+
           if (recentPayday.wasToday) {
             title = "🎉 Payday Today!";
             message = `Based on your ${prediction.pattern} paycheck pattern, today should be payday! Consider processing your paycheck.`;
@@ -704,7 +713,7 @@ const MainContent = ({
             title = "📅 Recent Payday";
             message = `Based on your ${prediction.pattern} pattern, payday was ${recentPayday.daysAgo} days ago.`;
           }
-          
+
           if (title && message) {
             showPayday(title, message, 10000); // Show for 10 seconds
             localStorage.setItem("lastPaydayNotification", today);
@@ -717,10 +726,10 @@ const MainContent = ({
 
     // Check immediately
     checkPayday();
-    
+
     // Check daily at midnight and every few hours
     const interval = setInterval(checkPayday, 4 * 60 * 60 * 1000); // Every 4 hours
-    
+
     return () => clearInterval(interval);
   }, [paycheckHistory, showPayday]);
 

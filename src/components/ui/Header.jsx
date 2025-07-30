@@ -50,8 +50,8 @@ const Header = memo(
 
           {/* Buttons row */}
           <div className="flex items-center justify-center flex-wrap gap-4">
-            <UserIndicator 
-              currentUser={currentUser} 
+            <UserIndicator
+              currentUser={currentUser}
               onUserChange={onUserChange}
               onUpdateProfile={onUpdateProfile}
             />

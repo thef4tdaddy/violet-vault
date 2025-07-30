@@ -137,7 +137,7 @@ const useAuthStore = create((set) => ({
   updateProfile: async (updatedProfile) => {
     try {
       const { encryptionKey, salt: currentSalt } = useAuthStore.getState();
-      
+
       if (!encryptionKey || !currentSalt) {
         return { success: false, error: "Not authenticated." };
       }
@@ -159,7 +159,7 @@ const useAuthStore = create((set) => ({
       if (savedData) {
         const { encryptedData, iv } = JSON.parse(savedData);
         const decryptedData = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
-        
+
         // Update the currentUser in the encrypted data
         const updatedData = {
           ...decryptedData,

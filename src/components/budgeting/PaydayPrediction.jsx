@@ -9,7 +9,7 @@ const PaydayPrediction = ({ prediction, className = "" }) => {
 
   const formattedPrediction = formatPaydayPrediction(prediction);
   const daysUntil = getDaysUntilPayday(prediction);
-  
+
   // Determine the style based on confidence and time until payday
   const getConfidenceColor = () => {
     if (prediction.confidence >= 80) return "emerald";
@@ -37,16 +37,10 @@ const PaydayPrediction = ({ prediction, className = "" }) => {
     <div className={`glassmorphism rounded-2xl p-4 border ${getUrgencyStyle()} ${className}`}>
       <div className="flex items-start justify-between">
         <div className="flex items-start space-x-3">
-          <div className="flex-shrink-0 mt-0.5">
-            {getIcon()}
-          </div>
+          <div className="flex-shrink-0 mt-0.5">{getIcon()}</div>
           <div className="flex-1 min-w-0">
-            <h4 className="font-semibold text-gray-900 text-sm">
-              Next Payday Prediction
-            </h4>
-            <p className="text-sm text-gray-700 mt-1">
-              {formattedPrediction.displayText}
-            </p>
+            <h4 className="font-semibold text-gray-900 text-sm">Next Payday Prediction</h4>
+            <p className="text-sm text-gray-700 mt-1">{formattedPrediction.displayText}</p>
             <div className="flex items-center space-x-4 mt-2">
               <div className="flex items-center text-xs text-gray-600">
                 <span className="font-medium">Pattern:</span>
