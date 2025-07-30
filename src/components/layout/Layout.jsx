@@ -457,6 +457,9 @@ const MainContent = ({
   onImport,
   onLogout,
   onResetEncryption,
+  encryptionKey,
+  budgetId,
+  firebaseSync,
   activeUsers: _activeUsers, // eslint-disable-line no-unused-vars
   recentActivity: _recentActivity, // eslint-disable-line no-unused-vars
   syncConflicts,
@@ -471,6 +474,29 @@ const MainContent = ({
     const data = await onImport(event);
     if (data) {
       budget.loadData(data);
+    }
+  };
+
+  const handleManualSync = async () => {
+    try {
+      if (!firebaseSync) return;
+      firebaseSync.initialize(budgetId, encryptionKey);
+      await firebaseSync.saveToCloud(
+        {
+          envelopes: budget.envelopes,
+          bills: budget.bills,
+          savingsGoals: budget.savingsGoals,
+          unassignedCash: budget.unassignedCash,
+          biweeklyAllocation: budget.biweeklyAllocation,
+          transactions: budget.allTransactions,
+          allTransactions: budget.allTransactions,
+        },
+        currentUser
+      );
+      alert("Data synced to cloud");
+    } catch (err) {
+      console.error("Manual sync failed", err);
+      alert(`Sync failed: ${err.message}`);
     }
   };
 
@@ -541,6 +567,7 @@ const MainContent = ({
               // Then call the original reset function (clears localStorage and calls logout)
               onResetEncryption();
             }}
+            onSync={handleManualSync}
           />
         </div>
 

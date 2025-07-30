@@ -3,203 +3,210 @@ import { subscribeWithSelector } from "zustand/middleware";
 import { persist, devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 
-// Optimized Zustand store with middleware
-const useOptimizedBudgetStore = create(
-  devtools(
-    persist(
-      subscribeWithSelector(
-        immer((set, get) => ({
-          // State
-          envelopes: [],
-          bills: [],
-          transactions: [],
-          allTransactions: [],
-          savingsGoals: [],
-          unassignedCash: 0,
-          biweeklyAllocation: 0,
-          isOnline: true, // Add isOnline state, default to true
-          dataLoaded: false,
+const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
-          // Optimized actions - direct state mutations with Immer
-          setEnvelopes: (envelopes) =>
-            set((state) => {
-              state.envelopes = envelopes;
-            }),
+// Base store configuration
+const storeInitializer = (set, get) => ({
+  // State
+  envelopes: [],
+  bills: [],
+  transactions: [],
+  allTransactions: [],
+  savingsGoals: [],
+  unassignedCash: 0,
+  biweeklyAllocation: 0,
+  isOnline: true, // Add isOnline state, default to true
+  dataLoaded: false,
 
-          addEnvelope: (envelope) =>
-            set((state) => {
-              state.envelopes.push(envelope);
-            }),
+  // Optimized actions - direct state mutations with Immer
+  setEnvelopes: (envelopes) =>
+    set((state) => {
+      state.envelopes = envelopes;
+    }),
 
-          updateEnvelope: (envelope) =>
-            set((state) => {
-              const index = state.envelopes.findIndex((e) => e.id === envelope.id);
-              if (index !== -1) {
-                state.envelopes[index] = envelope;
-              }
-            }),
+  addEnvelope: (envelope) =>
+    set((state) => {
+      state.envelopes.push(envelope);
+    }),
 
-          deleteEnvelope: (id) =>
-            set((state) => {
-              state.envelopes = state.envelopes.filter((e) => e.id !== id);
-            }),
+  updateEnvelope: (envelope) =>
+    set((state) => {
+      const index = state.envelopes.findIndex((e) => e.id === envelope.id);
+      if (index !== -1) {
+        state.envelopes[index] = envelope;
+      }
+    }),
 
-          // Optimized bulk operations
-          bulkUpdateEnvelopes: (updates) =>
-            set((state) => {
-              updates.forEach((update) => {
-                const index = state.envelopes.findIndex((e) => e.id === update.id);
-                if (index !== -1) {
-                  Object.assign(state.envelopes[index], update);
-                }
-              });
-            }),
+  deleteEnvelope: (id) =>
+    set((state) => {
+      state.envelopes = state.envelopes.filter((e) => e.id !== id);
+    }),
 
-          // Computed selectors for better performance
-          getEnvelopeById: (id) => {
-            return get().envelopes.find((e) => e.id === id);
-          },
+  // Optimized bulk operations
+  bulkUpdateEnvelopes: (updates) =>
+    set((state) => {
+      updates.forEach((update) => {
+        const index = state.envelopes.findIndex((e) => e.id === update.id);
+        if (index !== -1) {
+          Object.assign(state.envelopes[index], update);
+        }
+      });
+    }),
 
-          getEnvelopesByCategory: (category) => {
-            return get().envelopes.filter((e) => e.category === category);
-          },
+  // Computed selectors for better performance
+  getEnvelopeById: (id) => {
+    return get().envelopes.find((e) => e.id === id);
+  },
 
-          getTotalEnvelopeBalance: () => {
-            return get().envelopes.reduce((sum, e) => sum + (e.currentBalance || 0), 0);
-          },
+  getEnvelopesByCategory: (category) => {
+    return get().envelopes.filter((e) => e.category === category);
+  },
 
-          // Transaction management actions
-          setTransactions: (transactions) =>
-            set((state) => {
-              state.transactions = transactions;
-            }),
+  getTotalEnvelopeBalance: () => {
+    return get().envelopes.reduce((sum, e) => sum + (e.currentBalance || 0), 0);
+  },
 
-          setAllTransactions: (allTransactions) =>
-            set((state) => {
-              state.allTransactions = allTransactions;
-            }),
+  // Transaction management actions
+  setTransactions: (transactions) =>
+    set((state) => {
+      state.transactions = transactions;
+    }),
 
-          addTransaction: (transaction) =>
-            set((state) => {
-              state.transactions.push(transaction);
-              state.allTransactions.push(transaction);
-            }),
+  setAllTransactions: (allTransactions) =>
+    set((state) => {
+      state.allTransactions = allTransactions;
+    }),
 
-          updateTransaction: (transaction) =>
-            set((state) => {
-              const transIndex = state.transactions.findIndex((t) => t.id === transaction.id);
-              const allTransIndex = state.allTransactions.findIndex((t) => t.id === transaction.id);
+  addTransaction: (transaction) =>
+    set((state) => {
+      state.transactions.push(transaction);
+      state.allTransactions.push(transaction);
+    }),
 
-              if (transIndex !== -1) {
-                state.transactions[transIndex] = transaction;
-              }
-              if (allTransIndex !== -1) {
-                state.allTransactions[allTransIndex] = transaction;
-              }
-            }),
+  updateTransaction: (transaction) =>
+    set((state) => {
+      const transIndex = state.transactions.findIndex((t) => t.id === transaction.id);
+      const allTransIndex = state.allTransactions.findIndex((t) => t.id === transaction.id);
 
-          deleteTransaction: (id) =>
-            set((state) => {
-              state.transactions = state.transactions.filter((t) => t.id !== id);
-              state.allTransactions = state.allTransactions.filter((t) => t.id !== id);
-            }),
+      if (transIndex !== -1) {
+        state.transactions[transIndex] = transaction;
+      }
+      if (allTransIndex !== -1) {
+        state.allTransactions[allTransIndex] = transaction;
+      }
+    }),
 
-          // Bills management actions
-          setBills: (bills) =>
-            set((state) => {
-              state.bills = bills;
-            }),
+  deleteTransaction: (id) =>
+    set((state) => {
+      state.transactions = state.transactions.filter((t) => t.id !== id);
+      state.allTransactions = state.allTransactions.filter((t) => t.id !== id);
+    }),
 
-          addBill: (bill) =>
-            set((state) => {
-              state.bills.push(bill);
-              state.allTransactions.push(bill);
-            }),
+  // Bills management actions
+  setBills: (bills) =>
+    set((state) => {
+      state.bills = bills;
+    }),
 
-          updateBill: (bill) =>
-            set((state) => {
-              const billIndex = state.bills.findIndex((b) => b.id === bill.id);
-              const allTransIndex = state.allTransactions.findIndex((t) => t.id === bill.id);
+  addBill: (bill) =>
+    set((state) => {
+      state.bills.push(bill);
+      state.allTransactions.push(bill);
+    }),
 
-              if (billIndex !== -1) {
-                state.bills[billIndex] = bill;
-              }
-              if (allTransIndex !== -1) {
-                state.allTransactions[allTransIndex] = bill;
-              }
-            }),
+  updateBill: (bill) =>
+    set((state) => {
+      const billIndex = state.bills.findIndex((b) => b.id === bill.id);
+      const allTransIndex = state.allTransactions.findIndex((t) => t.id === bill.id);
 
-          deleteBill: (id) =>
-            set((state) => {
-              state.bills = state.bills.filter((b) => b.id !== id);
-              state.allTransactions = state.allTransactions.filter((t) => t.id !== id);
-            }),
+      if (billIndex !== -1) {
+        state.bills[billIndex] = bill;
+      }
+      if (allTransIndex !== -1) {
+        state.allTransactions[allTransIndex] = bill;
+      }
+    }),
 
-          // Savings goals management
-          setSavingsGoals: (savingsGoals) =>
-            set((state) => {
-              state.savingsGoals = savingsGoals;
-            }),
+  deleteBill: (id) =>
+    set((state) => {
+      state.bills = state.bills.filter((b) => b.id !== id);
+      state.allTransactions = state.allTransactions.filter((t) => t.id !== id);
+    }),
 
-          addSavingsGoal: (goal) =>
-            set((state) => {
-              state.savingsGoals.push(goal);
-            }),
+  // Savings goals management
+  setSavingsGoals: (savingsGoals) =>
+    set((state) => {
+      state.savingsGoals = savingsGoals;
+    }),
 
-          updateSavingsGoal: (goal) =>
-            set((state) => {
-              const index = state.savingsGoals.findIndex((g) => g.id === goal.id);
-              if (index !== -1) {
-                state.savingsGoals[index] = goal;
-              }
-            }),
+  addSavingsGoal: (goal) =>
+    set((state) => {
+      state.savingsGoals.push(goal);
+    }),
 
-          deleteSavingsGoal: (id) =>
-            set((state) => {
-              state.savingsGoals = state.savingsGoals.filter((g) => g.id !== id);
-            }),
+  updateSavingsGoal: (goal) =>
+    set((state) => {
+      const index = state.savingsGoals.findIndex((g) => g.id === goal.id);
+      if (index !== -1) {
+        state.savingsGoals[index] = goal;
+      }
+    }),
 
-          // Unassigned cash and allocation management
-          setUnassignedCash: (amount) =>
-            set((state) => {
-              state.unassignedCash = amount;
-            }),
+  deleteSavingsGoal: (id) =>
+    set((state) => {
+      state.savingsGoals = state.savingsGoals.filter((g) => g.id !== id);
+    }),
 
-          setBiweeklyAllocation: (amount) =>
-            set((state) => {
-              state.biweeklyAllocation = amount;
-            }),
+  // Unassigned cash and allocation management
+  setUnassignedCash: (amount) =>
+    set((state) => {
+      state.unassignedCash = amount;
+    }),
 
-          // Data loading state
-          setDataLoaded: (loaded) =>
-            set((state) => {
-              state.dataLoaded = loaded;
-            }),
+  setBiweeklyAllocation: (amount) =>
+    set((state) => {
+      state.biweeklyAllocation = amount;
+    }),
 
-          // Add an action to set the online status
-          setOnlineStatus: (status) =>
-            set((state) => {
-              state.isOnline = status;
-            }),
+  // Data loading state
+  setDataLoaded: (loaded) =>
+    set((state) => {
+      state.dataLoaded = loaded;
+    }),
 
-          // Reset functionality
-          resetStore: () =>
-            set((state) => {
-              state.envelopes = [];
-              state.bills = [];
-              state.transactions = [];
-              state.allTransactions = [];
-              state.savingsGoals = [];
-              state.unassignedCash = 0;
-              state.isOnline = true; // Also reset isOnline status
-              state.dataLoaded = false;
-            }),
-        }))
-      ),
-      {
-        name: "violet-vault-store", // localStorage key
+  // Add an action to set the online status
+  setOnlineStatus: (status) =>
+    set((state) => {
+      state.isOnline = status;
+    }),
+
+  // Reset functionality
+  resetStore: () =>
+    set((state) => {
+      state.envelopes = [];
+      state.bills = [];
+      state.transactions = [];
+      state.allTransactions = [];
+      state.savingsGoals = [];
+      state.unassignedCash = 0;
+      state.isOnline = true; // Also reset isOnline status
+      state.dataLoaded = false;
+    }),
+});
+
+const base = subscribeWithSelector(immer(storeInitializer));
+
+let useOptimizedBudgetStore;
+
+if (LOCAL_ONLY_MODE) {
+  // No persistence when running in local-only mode
+  useOptimizedBudgetStore = create(base);
+} else {
+  useOptimizedBudgetStore = create(
+    devtools(
+      persist(base, {
+        name: "violet-vault-store",
         partialize: (state) => ({
-          // Only persist essential data
           envelopes: state.envelopes,
           bills: state.bills,
           transactions: state.transactions,
@@ -207,15 +214,11 @@ const useOptimizedBudgetStore = create(
           savingsGoals: state.savingsGoals,
           unassignedCash: state.unassignedCash,
           biweeklyAllocation: state.biweeklyAllocation,
-          // IMPORTANT: Do NOT persist the isOnline flag or dataLoaded
-          // They should be determined at runtime
         }),
-      }
-    ),
-    {
-      name: "violet-vault-devtools",
-    }
-  )
-);
+      }),
+      { name: "violet-vault-devtools" }
+    )
+  );
+}
 
 export default useOptimizedBudgetStore;

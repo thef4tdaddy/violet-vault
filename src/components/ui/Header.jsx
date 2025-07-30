@@ -1,10 +1,12 @@
 import React, { useState, memo, useCallback } from "react";
-import { Upload, Download, LogOut, AlertTriangle, RefreshCw } from "lucide-react";
+import { Upload, Download, LogOut, AlertTriangle, RefreshCw, Cloud } from "lucide-react";
 import UserIndicator from "../auth/UserIndicator";
 import logoWithText from "../../assets/Logo with Text Final.png";
 
+const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
+
 const Header = memo(
-  ({ onExport, onImport, onLogout, onResetEncryption, currentUser, onUserChange }) => {
+  ({ onExport, onImport, onLogout, onResetEncryption, onSync, currentUser, onUserChange }) => {
     const [showResetModal, setShowResetModal] = useState(false);
 
     const handleToggleResetModal = useCallback(() => {
@@ -54,6 +56,13 @@ const Header = memo(
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </button>
+
+              {LOCAL_ONLY_MODE && (
+                <button onClick={onSync} className="btn btn-primary flex items-center rounded-xl">
+                  <Cloud className="h-4 w-4 mr-2" />
+                  Sync to Cloud
+                </button>
+              )}
 
               <div className="relative" style={{ zIndex: 50 }}>
                 <button
