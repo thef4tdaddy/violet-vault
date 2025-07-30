@@ -93,6 +93,12 @@ const useAuthStore = create((set) => ({
 
   setLastActivity: (timestamp) => set({ lastActivity: timestamp }),
 
+  setEncryption: ({ key, salt }) =>
+    set({
+      encryptionKey: key,
+      salt,
+    }),
+
   changePassword: async (oldPassword, newPassword) => {
     try {
       const savedData = localStorage.getItem("envelopeBudgetData");

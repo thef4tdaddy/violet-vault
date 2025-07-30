@@ -72,6 +72,22 @@ const Layout = () => {
     };
   }, []);
 
+  // Check password age on unlock
+  useEffect(() => {
+    if (isUnlocked) {
+      const stored = localStorage.getItem("passwordLastChanged");
+      if (!stored) {
+        localStorage.setItem("passwordLastChanged", Date.now().toString());
+      } else {
+        const age = Date.now() - parseInt(stored, 10);
+        if (age >= 90 * 24 * 60 * 60 * 1000) {
+          setRotationDue(true);
+          setShowRotationModal(true);
+        }
+      }
+    }
+  }, [isUnlocked]);
+
   const firebaseSync = useMemo(() => new FirebaseSync(), []);
 
   logger.auth("Auth hook values", {
@@ -82,6 +98,10 @@ const Layout = () => {
   const [activeUsers, setActiveUsers] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
   const [syncConflicts, setSyncConflicts] = useState(null);
+  const [rotationDue, setRotationDue] = useState(false);
+  const [showRotationModal, setShowRotationModal] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   // Handle activity updates from MainContent
   const handleActivityUpdate = useCallback(({ users, activity }) => {
@@ -108,6 +128,9 @@ const Layout = () => {
 
       if (result.success) {
         console.log("✅ Setup completed successfully");
+        if (!localStorage.getItem("passwordLastChanged")) {
+          localStorage.setItem("passwordLastChanged", Date.now().toString());
+        }
       } else {
         console.error("❌ Setup failed:", result.error);
         alert(`Setup failed: ${result.error}`);
@@ -128,6 +151,43 @@ const Layout = () => {
       alert(`Password change failed: ${result.error}`);
     } else {
       alert("Password updated successfully.");
+    }
+  };
+
+  const handleRotationPasswordChange = async () => {
+    if (!newPassword || newPassword !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+    try {
+      const savedData = localStorage.getItem("envelopeBudgetData");
+      if (!savedData) {
+        throw new Error("No data found");
+      }
+      const { encryptedData, iv } = JSON.parse(savedData);
+      const decrypted = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
+      const { key, salt: newSalt } = await encryptionUtils.generateKey(newPassword);
+      const reencrypted = await encryptionUtils.encrypt(decrypted, key);
+      const saveData = {
+        encryptedData: reencrypted.data,
+        salt: Array.from(newSalt),
+        iv: reencrypted.iv,
+      };
+      localStorage.setItem("envelopeBudgetData", JSON.stringify(saveData));
+      
+      // Update the auth store with new encryption details
+      const { setEncryption } = useAuthStore.getState();
+      setEncryption({ key, salt: newSalt });
+      
+      localStorage.setItem("passwordLastChanged", Date.now().toString());
+      setShowRotationModal(false);
+      setRotationDue(false);
+      setNewPassword("");
+      setConfirmPassword("");
+      alert("Password updated successfully");
+    } catch (error) {
+      console.error("Failed to change password:", error);
+      alert(`Failed to change password: ${error.message}`);
     }
   };
 
@@ -453,8 +513,39 @@ const Layout = () => {
           onResolveConflict={resolveConflict}
           setSyncConflicts={setSyncConflicts}
           firebaseSync={firebaseSync}
+          rotationDue={rotationDue}
         />
       </BudgetProvider>
+      {showRotationModal && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="glassmorphism rounded-2xl p-6 w-full max-w-md border border-white/30 shadow-2xl">
+            <h3 className="text-xl font-semibold mb-4">Password Expired</h3>
+            <p className="text-gray-700 mb-4">For security, please set a new password.</p>
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="New password"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-3"
+            />
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm password"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+            />
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={handleRotationPasswordChange}
+                className="flex-1 bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700"
+              >
+                Update Password
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
@@ -475,6 +566,7 @@ const MainContent = ({
   syncConflicts,
   onResolveConflict,
   setSyncConflicts,
+  rotationDue,
 }) => {
   const budget = useBudget();
   const [activeView, setActiveView] = useState("dashboard");
@@ -581,6 +673,11 @@ const MainContent = ({
             onSync={handleManualSync}
           />
         </div>
+        {rotationDue && (
+          <div className="mb-4 bg-amber-100 border border-amber-300 text-amber-700 rounded-lg p-4 text-center">
+            Your password is over 90 days old. Please change it.
+          </div>
+        )}
 
         {/* Team Activity & Sync - Temporarily disabled to prevent browser crashes */}
         {/* <TeamActivitySync
