@@ -33,7 +33,9 @@ const useOptimizedBudgetStore = create(
 
           updateEnvelope: (envelope) =>
             set((state) => {
-              const index = state.envelopes.findIndex((e) => e.id === envelope.id);
+              const index = state.envelopes.findIndex(
+                (e) => e.id === envelope.id,
+              );
               if (index !== -1) {
                 state.envelopes[index] = envelope;
               }
@@ -48,7 +50,9 @@ const useOptimizedBudgetStore = create(
           bulkUpdateEnvelopes: (updates) =>
             set((state) => {
               updates.forEach((update) => {
-                const index = state.envelopes.findIndex((e) => e.id === update.id);
+                const index = state.envelopes.findIndex(
+                  (e) => e.id === update.id,
+                );
                 if (index !== -1) {
                   Object.assign(state.envelopes[index], update);
                 }
@@ -65,8 +69,135 @@ const useOptimizedBudgetStore = create(
           },
 
           getTotalEnvelopeBalance: () => {
-            return get().envelopes.reduce((sum, e) => sum + (e.currentBalance || 0), 0);
+            return get().envelopes.reduce(
+              (sum, e) => sum + (e.currentBalance || 0),
+              0,
+            );
           },
+
+          // Transaction management actions
+          setTransactions: (transactions) =>
+            set((state) => {
+              state.transactions = transactions;
+            }),
+
+          setAllTransactions: (allTransactions) =>
+            set((state) => {
+              state.allTransactions = allTransactions;
+            }),
+
+          addTransaction: (transaction) =>
+            set((state) => {
+              state.transactions.push(transaction);
+              state.allTransactions.push(transaction);
+            }),
+
+          updateTransaction: (transaction) =>
+            set((state) => {
+              const transIndex = state.transactions.findIndex(
+                (t) => t.id === transaction.id,
+              );
+              const allTransIndex = state.allTransactions.findIndex(
+                (t) => t.id === transaction.id,
+              );
+
+              if (transIndex !== -1) {
+                state.transactions[transIndex] = transaction;
+              }
+              if (allTransIndex !== -1) {
+                state.allTransactions[allTransIndex] = transaction;
+              }
+            }),
+
+          deleteTransaction: (id) =>
+            set((state) => {
+              state.transactions = state.transactions.filter(
+                (t) => t.id !== id,
+              );
+              state.allTransactions = state.allTransactions.filter(
+                (t) => t.id !== id,
+              );
+            }),
+
+          // Bills management actions
+          setBills: (bills) =>
+            set((state) => {
+              state.bills = bills;
+            }),
+
+          addBill: (bill) =>
+            set((state) => {
+              state.bills.push(bill);
+              state.allTransactions.push(bill);
+            }),
+
+          updateBill: (bill) =>
+            set((state) => {
+              const billIndex = state.bills.findIndex((b) => b.id === bill.id);
+              const allTransIndex = state.allTransactions.findIndex(
+                (t) => t.id === bill.id,
+              );
+
+              if (billIndex !== -1) {
+                state.bills[billIndex] = bill;
+              }
+              if (allTransIndex !== -1) {
+                state.allTransactions[allTransIndex] = bill;
+              }
+            }),
+
+          deleteBill: (id) =>
+            set((state) => {
+              state.bills = state.bills.filter((b) => b.id !== id);
+              state.allTransactions = state.allTransactions.filter(
+                (t) => t.id !== id,
+              );
+            }),
+
+          // Savings goals management
+          setSavingsGoals: (savingsGoals) =>
+            set((state) => {
+              state.savingsGoals = savingsGoals;
+            }),
+
+          addSavingsGoal: (goal) =>
+            set((state) => {
+              state.savingsGoals.push(goal);
+            }),
+
+          updateSavingsGoal: (goal) =>
+            set((state) => {
+              const index = state.savingsGoals.findIndex(
+                (g) => g.id === goal.id,
+              );
+              if (index !== -1) {
+                state.savingsGoals[index] = goal;
+              }
+            }),
+
+          deleteSavingsGoal: (id) =>
+            set((state) => {
+              state.savingsGoals = state.savingsGoals.filter(
+                (g) => g.id !== id,
+              );
+            }),
+
+          // Unassigned cash and allocation management
+          setUnassignedCash: (amount) =>
+            set((state) => {
+              state.unassignedCash = amount;
+            }),
+
+          setBiweeklyAllocation: (amount) =>
+            set((state) => {
+              state.biweeklyAllocation = amount;
+            }),
+
+          // Data loading state
+          setDataLoaded: (loaded) =>
+            set((state) => {
+              state.dataLoaded = loaded;
+            }),
 
           // Add an action to set the online status
           setOnlineStatus: (status) =>
@@ -86,7 +217,7 @@ const useOptimizedBudgetStore = create(
               state.isOnline = true; // Also reset isOnline status
               state.dataLoaded = false;
             }),
-        }))
+        })),
       ),
       {
         name: "violet-vault-store", // localStorage key
@@ -94,15 +225,20 @@ const useOptimizedBudgetStore = create(
           // Only persist essential data
           envelopes: state.envelopes,
           bills: state.bills,
+          transactions: state.transactions,
+          allTransactions: state.allTransactions,
+          savingsGoals: state.savingsGoals,
           unassignedCash: state.unassignedCash,
           biweeklyAllocation: state.biweeklyAllocation,
+          // IMPORTANT: Do NOT persist the isOnline flag or dataLoaded
+          // They should be determined at runtime
         }),
-      }
+      },
     ),
     {
       name: "violet-vault-devtools",
-    }
-  )
+    },
+  ),
 );
 
 export default useOptimizedBudgetStore;

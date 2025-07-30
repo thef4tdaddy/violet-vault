@@ -27,7 +27,7 @@ export default defineConfig({
     },
     chunkSizeWarningLimit: 1000,
     reportCompressedSize: true,
-    minify: "esbuild",
+    minify: false, // Disable minification for debugging
   },
   esbuild: {
     // In production, you'll want to drop console logs and debuggers
