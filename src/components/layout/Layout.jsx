@@ -8,6 +8,7 @@ import UserSetup from "../auth/UserSetup";
 import Header from "../ui/Header";
 import TeamActivitySync from "../sync/TeamActivitySync";
 import LoadingSpinner from "../ui/LoadingSpinner";
+import ProfileSettings from "../auth/ProfileSettings";
 import { encryptionUtils } from "../../utils/encryption";
 import FirebaseSync from "../../utils/firebaseSync";
 import logger from "../../utils/logger";
@@ -465,6 +466,7 @@ const MainContent = ({
 }) => {
   const budget = useBudget();
   const [activeView, setActiveView] = useState("dashboard");
+  const [showProfileSettings, setShowProfileSettings] = useState(false);
 
   // Handle import by saving data then loading into context
   const handleImport = async (event) => {
@@ -532,6 +534,7 @@ const MainContent = ({
           <Header
             currentUser={currentUser}
             onUserChange={onUserChange}
+            onEditProfile={() => setShowProfileSettings(true)}
             onExport={onExport}
             onImport={handleImport}
             onLogout={onLogout}
@@ -721,6 +724,12 @@ const MainContent = ({
           </div>
         </div>
       </div>
+      {showProfileSettings && (
+        <ProfileSettings
+          isOpen={showProfileSettings}
+          onClose={() => setShowProfileSettings(false)}
+        />
+      )}
     </div>
   );
 };

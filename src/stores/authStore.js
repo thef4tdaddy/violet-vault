@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { encryptionUtils } from "../utils/encryption";
 
-const useAuthStore = create((set) => ({
+const useAuthStore = create((set, get) => ({
   isUnlocked: false,
   encryptionKey: null,
   salt: null,
@@ -33,6 +33,7 @@ const useAuthStore = create((set) => ({
           const profileData = {
             userName: finalUserData.userName,
             userColor: finalUserData.userColor,
+            userAvatar: finalUserData.userAvatar || null,
           };
           localStorage.setItem("userProfile", JSON.stringify(profileData));
           return { success: true };
@@ -63,6 +64,12 @@ const useAuthStore = create((set) => ({
           isUnlocked: true,
           lastActivity: Date.now(),
         });
+        const profileData = {
+          userName: currentUserData.userName,
+          userColor: currentUserData.userColor,
+          userAvatar: currentUserData.userAvatar || null,
+        };
+        localStorage.setItem("userProfile", JSON.stringify(profileData));
         return { success: true, data: decryptedData };
       } catch (error) {
         if (error.name === "OperationError" || error.message.toLowerCase().includes("decrypt")) {
@@ -85,11 +92,36 @@ const useAuthStore = create((set) => ({
       budgetId: null,
     }),
 
-  updateUser: (updatedUser) =>
+  updateUser: async (updatedUser) => {
     set((state) => ({
       currentUser: updatedUser,
       budgetId: updatedUser?.budgetId || state.budgetId,
-    })),
+    }));
+
+    try {
+      const profileData = {
+        userName: updatedUser.userName,
+        userColor: updatedUser.userColor,
+        userAvatar: updatedUser.userAvatar || null,
+      };
+      localStorage.setItem("userProfile", JSON.stringify(profileData));
+
+      const saved = localStorage.getItem("envelopeBudgetData");
+      const { encryptionKey, salt } = get();
+      if (saved && encryptionKey) {
+        const { encryptedData, iv } = JSON.parse(saved);
+        const decrypted = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
+        decrypted.currentUser = updatedUser;
+        const reEncrypted = await encryptionUtils.encrypt(decrypted, encryptionKey);
+        localStorage.setItem(
+          "envelopeBudgetData",
+          JSON.stringify({ encryptedData: reEncrypted.data, iv: reEncrypted.iv, salt: Array.from(salt) })
+        );
+      }
+    } catch (err) {
+      console.error("Failed to persist updated profile", err);
+    }
+  },
 
   setLastActivity: (timestamp) => set({ lastActivity: timestamp }),
 }));

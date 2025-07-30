@@ -11,6 +11,7 @@ const UserSetup = ({ onSetupComplete }) => {
   const [masterPassword, setMasterPassword] = useState("");
   const [userName, setUserName] = useState("");
   const [userColor, setUserColor] = useState("#a855f7");
+  const [userAvatar, setUserAvatar] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -38,6 +39,7 @@ const UserSetup = ({ onSetupComplete }) => {
         console.log("📋 Found saved profile:", profile);
         setUserName(profile.userName || "");
         setUserColor(profile.userColor || "#a855f7");
+        setUserAvatar(profile.userAvatar || null);
         setIsReturningUser(true);
         console.log("👋 Returning user detected");
       } catch (error) {
@@ -84,6 +86,7 @@ const UserSetup = ({ onSetupComplete }) => {
         password: masterPassword,
         userName: userName.trim(),
         userColor,
+        userAvatar,
       });
       console.log("✅ onSetupComplete succeeded");
     } catch (error) {
@@ -115,6 +118,7 @@ const UserSetup = ({ onSetupComplete }) => {
           password: masterPassword,
           userName,
           userColor,
+          userAvatar,
         });
         console.log("✅ Returning user login succeeded");
       } catch (error) {
@@ -126,6 +130,17 @@ const UserSetup = ({ onSetupComplete }) => {
     } else {
       // For new users, proceed to step 2
       setStep(2);
+    }
+  };
+
+  const handleAvatarInput = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setUserAvatar(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -157,6 +172,7 @@ const UserSetup = ({ onSetupComplete }) => {
           password: masterPassword,
           userName: userName.trim(),
           userColor,
+          userAvatar,
         });
       }, 10000);
 
@@ -174,6 +190,7 @@ const UserSetup = ({ onSetupComplete }) => {
     localStorage.removeItem("userProfile");
     setUserName("");
     setUserColor("#a855f7");
+    setUserAvatar(null);
     setStep(1);
   };
 
@@ -286,21 +303,35 @@ const UserSetup = ({ onSetupComplete }) => {
 
           {step === 2 && !isReturningUser && (
             <>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">Your Name</label>
-                <input
-                  type="text"
-                  value={userName}
-                  onChange={(e) => {
-                    console.log("👤 Name input changed:", e.target.value);
-                    setUserName(e.target.value);
-                  }}
-                  placeholder="e.g., Sarah, John, etc."
-                  className="w-full px-4 py-3 border border-purple-200 rounded-2xl focus:ring-2 focus:ring-purple-500"
-                  disabled={isLoading}
-                  required
-                />
-              </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-3">Your Name</label>
+            <input
+              type="text"
+              value={userName}
+              onChange={(e) => {
+                console.log("👤 Name input changed:", e.target.value);
+                setUserName(e.target.value);
+              }}
+              placeholder="e.g., Sarah, John, etc."
+              className="w-full px-4 py-3 border border-purple-200 rounded-2xl focus:ring-2 focus:ring-purple-500"
+              disabled={isLoading}
+              required
+            />
+          </div>
+
+          <div className="mt-4">
+            <label className="block text-sm font-semibold text-gray-700 mb-3">Avatar</label>
+            <div className="flex items-center gap-3">
+              {userAvatar ? (
+                <img src={userAvatar} alt="Avatar" className="h-12 w-12 rounded-full object-cover" />
+              ) : (
+                <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center">
+                  <Users className="h-6 w-6 text-gray-500" />
+                </div>
+              )}
+              <input type="file" accept="image/*" onChange={handleAvatarInput} />
+            </div>
+          </div>
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-3">Your Color</label>

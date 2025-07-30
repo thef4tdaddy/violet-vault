@@ -4,7 +4,7 @@ import UserIndicator from "../auth/UserIndicator";
 import logoWithText from "../../assets/Logo with Text Final.png";
 
 const Header = memo(
-  ({ onExport, onImport, onLogout, onResetEncryption, currentUser, onUserChange }) => {
+  ({ onExport, onImport, onLogout, onResetEncryption, currentUser, onUserChange, onEditProfile }) => {
     const [showResetModal, setShowResetModal] = useState(false);
 
     const handleToggleResetModal = useCallback(() => {
@@ -32,7 +32,11 @@ const Header = memo(
 
           {/* Buttons row */}
           <div className="flex items-center justify-center flex-wrap gap-4">
-            <UserIndicator currentUser={currentUser} onUserChange={onUserChange} />
+            <UserIndicator
+              currentUser={currentUser}
+              onUserChange={onUserChange}
+              onEditProfile={onEditProfile}
+            />
 
             <div className="flex gap-3 items-center justify-center">
               <input
