@@ -38,7 +38,8 @@ const SupplementalAccounts = lazy(() => import("../accounts/SupplementalAccounts
 const Layout = () => {
   logger.debug("Layout component is running");
 
-  const { isUnlocked, encryptionKey, currentUser, login, logout, budgetId, salt, changePassword } = useAuthStore();
+  const { isUnlocked, encryptionKey, currentUser, login, logout, budgetId, salt, changePassword } =
+    useAuthStore();
 
   // Add online/offline status detection
   useEffect(() => {

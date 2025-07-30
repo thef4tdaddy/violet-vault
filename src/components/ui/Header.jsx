@@ -1,12 +1,5 @@
 import React, { useState, memo, useCallback } from "react";
-import {
-  Upload,
-  Download,
-  LogOut,
-  AlertTriangle,
-  RefreshCw,
-  Key,
-} from "lucide-react";
+import { Upload, Download, LogOut, AlertTriangle, RefreshCw, Key } from "lucide-react";
 import UserIndicator from "../auth/UserIndicator";
 import logoWithText from "../../assets/Logo with Text Final.png";
 import ChangePasswordModal from "../auth/ChangePasswordModal";

@@ -34,8 +34,14 @@ const ChangePasswordModal = ({ isOpen, onClose, onChangePassword }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50" onClick={onClose}>
-      <div className="glassmorphism rounded-2xl p-6 w-full max-w-sm border border-white/30 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+      onClick={onClose}
+    >
+      <div
+        className="glassmorphism rounded-2xl p-6 w-full max-w-sm border border-white/30 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold">Change Password</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
@@ -69,7 +75,12 @@ const ChangePasswordModal = ({ isOpen, onClose, onChangePassword }) => {
           />
           {error && <div className="text-red-600 text-sm">{error}</div>}
           <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={onClose} className="btn btn-secondary" disabled={isLoading}>
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn btn-secondary"
+              disabled={isLoading}
+            >
               Cancel
             </button>
             <button type="submit" className="btn btn-primary" disabled={isLoading}>
