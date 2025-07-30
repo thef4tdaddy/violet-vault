@@ -1,5 +1,6 @@
 // src/components/layout/Layout.jsx
-import React, { useState, useEffect, useCallback, useMemo, Suspense, lazy } from "react";
+import React, { useState, useEffect, useCallback, useMemo, Suspense } from "react";
+import lazyImport from "../../utils/lazyImport";
 import useAuthStore from "../../stores/authStore";
 import useOptimizedBudgetStore from "../../stores/optimizedBudgetStore"; // Import optimized store
 import { BudgetProvider } from "../../contexts/BudgetContext";
@@ -25,15 +26,15 @@ import {
 } from "lucide-react";
 
 // Lazy load heavy components for better performance
-const PaycheckProcessor = lazy(() => import("../budgeting/PaycheckProcessor"));
-const EnvelopeGrid = lazy(() => import("../../new/UnifiedEnvelopeManager"));
-const SmartEnvelopeSuggestions = lazy(() => import("../budgeting/SmartEnvelopeSuggestions"));
-const BillManager = lazy(() => import("../../new/UnifiedBillTracker"));
-const SavingsGoals = lazy(() => import("../savings/SavingsGoals"));
-const Dashboard = lazy(() => import("./Dashboard"));
-const TransactionLedger = lazy(() => import("../transactions/TransactionLedger"));
-const ChartsAndAnalytics = lazy(() => import("../analytics/ChartsAndAnalytics"));
-const SupplementalAccounts = lazy(() => import("../accounts/SupplementalAccounts"));
+const PaycheckProcessor = lazyImport(() => import("../budgeting/PaycheckProcessor.jsx"));
+const EnvelopeGrid = lazyImport(() => import("../../new/UnifiedEnvelopeManager.jsx"));
+const SmartEnvelopeSuggestions = lazyImport(() => import("../budgeting/SmartEnvelopeSuggestions.jsx"));
+const BillManager = lazyImport(() => import("../../new/UnifiedBillTracker.jsx"));
+const SavingsGoals = lazyImport(() => import("../savings/SavingsGoals.jsx"));
+const Dashboard = lazyImport(() => import("./Dashboard.jsx"));
+const TransactionLedger = lazyImport(() => import("../transactions/TransactionLedger.jsx"));
+const ChartsAndAnalytics = lazyImport(() => import("../analytics/ChartsAndAnalytics.jsx"));
+const SupplementalAccounts = lazyImport(() => import("../accounts/SupplementalAccounts.jsx"));
 
 const Layout = () => {
   logger.debug("Layout component is running");
