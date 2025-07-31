@@ -1,20 +1,21 @@
-// src/components/layout/Layout.jsx
-import React, { useState, useEffect, useCallback, useMemo, Suspense, lazy } from "react";
-import useAuthStore from "../../stores/authStore";
-import useBudgetStore from "../../stores/budgetStore";
+// src/components/layout/MainLayout.jsx
+import React, { useState, useMemo, Suspense, lazy } from "react";
 import { BudgetProvider } from "../../contexts/BudgetContext";
 import { useBudget } from "../../hooks/useBudget";
+import useAuthFlow from "../../hooks/useAuthFlow";
+import useDataManagement from "../../hooks/useDataManagement";
+import usePasswordRotation from "../../hooks/usePasswordRotation";
+import useNetworkStatus from "../../hooks/useNetworkStatus";
+import useFirebaseSync from "../../hooks/useFirebaseSync";
+import usePaydayPrediction from "../../hooks/usePaydayPrediction";
 import UserSetup from "../auth/UserSetup";
 import Header from "../ui/Header";
-import TeamActivitySync from "../sync/TeamActivitySync";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ToastContainer } from "../ui/Toast";
 import useToast from "../../hooks/useToast";
-import { encryptionUtils } from "../../utils/encryption";
 import FirebaseSync from "../../utils/firebaseSync";
 import logger from "../../utils/logger";
 import { getVersionInfo } from "../../utils/version";
-import { predictNextPayday, checkRecentPayday } from "../../utils/paydayPredictor";
 import {
   DollarSign,
   Wallet,
@@ -42,470 +43,50 @@ const SupplementalAccounts = lazy(() => import("../accounts/SupplementalAccounts
 const Layout = () => {
   logger.debug("Layout component is running");
 
+  // Custom hooks for business logic
   const {
     isUnlocked,
     encryptionKey,
     currentUser,
-    login,
-    logout,
     budgetId,
     salt,
-    changePassword,
-    updateProfile,
-  } = useAuthStore();
+    handleSetup,
+    handleLogout,
+    handleChangePassword,
+    handleUpdateProfile,
+  } = useAuthFlow();
 
-  // Add online/offline status detection
-  useEffect(() => {
-    // Get the action from the store
-    const { setOnlineStatus } = useBudgetStore.getState();
+  const { exportData, importData, resetEncryptionAndStartFresh } = useDataManagement();
 
-    // Handler for when the browser goes online
-    const handleOnline = () => {
-      logger.info("Network status: Online");
-      setOnlineStatus(true);
-    };
+  const {
+    rotationDue,
+    showRotationModal,
+    newPassword,
+    confirmPassword,
+    setNewPassword,
+    setConfirmPassword,
+    handleRotationPasswordChange,
+  } = usePasswordRotation();
 
-    // Handler for when the browser goes offline
-    const handleOffline = () => {
-      logger.info("Network status: Offline");
-      setOnlineStatus(false);
-    };
-
-    // Add the event listeners
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
-
-    // Set the initial status when the component mounts
-    setOnlineStatus(navigator.onLine);
-
-    // Cleanup function to remove listeners when the component unmounts
-    return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
-    };
-  }, []);
-
-  // Check password age on unlock
-  useEffect(() => {
-    if (isUnlocked) {
-      const stored = localStorage.getItem("passwordLastChanged");
-      if (!stored) {
-        localStorage.setItem("passwordLastChanged", Date.now().toString());
-      } else {
-        const age = Date.now() - parseInt(stored, 10);
-        if (age >= 90 * 24 * 60 * 60 * 1000) {
-          setRotationDue(true);
-          setShowRotationModal(true);
-        }
-      }
-    }
-  }, [isUnlocked]);
-
-  // Check for payday predictions and notifications
-  useEffect(() => {
-    if (!isUnlocked) return;
-
-    // We need to access the budget data to get paycheck history
-    // This will be handled in the MainContent component where we have access to the budget
-  }, [isUnlocked]);
+  // Network status detection
+  useNetworkStatus();
 
   const firebaseSync = useMemo(() => new FirebaseSync(), []);
+  const [syncConflicts, setSyncConflicts] = useState(null);
+
+  // Toast notifications
+  const { toasts, removeToast } = useToast();
 
   logger.auth("Auth hook values", {
     isUnlocked,
     hasCurrentUser: !!currentUser,
     hasBudgetId: !!budgetId,
   });
-  const [activeUsers, setActiveUsers] = useState([]);
-  const [recentActivity, setRecentActivity] = useState([]);
-  const [syncConflicts, setSyncConflicts] = useState(null);
-  const [rotationDue, setRotationDue] = useState(false);
-  const [showRotationModal, setShowRotationModal] = useState(false);
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
-  // Toast notifications
-  const { toasts, removeToast, showPayday } = useToast();
-
-  // Handle activity updates from MainContent
-  const handleActivityUpdate = useCallback(({ users, activity }) => {
-    setActiveUsers(users);
-    setRecentActivity(activity);
-  }, []);
-  const handleSetup = async (userData) => {
-    logger.auth("Layout handleSetup called", { hasUserData: !!userData });
-    try {
-      // Generate budgetId from password for cross-device sync
-      const { encryptionUtils } = await import("../../utils/encryption");
-      const userDataWithId = {
-        ...userData,
-        budgetId: userData.budgetId || encryptionUtils.generateBudgetId(userData.password),
-      };
-
-      logger.auth("Calling login", {
-        hasUserData: !!userDataWithId,
-        hasPassword: !!userData.password,
-        budgetId: userDataWithId.budgetId,
-      });
-      const result = await login(userData.password, userDataWithId);
-      logger.auth("Login result", { success: !!result });
-
-      if (result.success) {
-        console.log("✅ Setup completed successfully");
-        if (!localStorage.getItem("passwordLastChanged")) {
-          localStorage.setItem("passwordLastChanged", Date.now().toString());
-        }
-      } else {
-        console.error("❌ Setup failed:", result.error);
-        alert(`Setup failed: ${result.error}`);
-      }
-    } catch (error) {
-      console.error("❌ Setup error:", error);
-      alert(`Setup error: ${error.message}`);
-    }
-  };
-
-  const handleLogout = () => {
-    logout();
-  };
-
-  const handleChangePassword = async (oldPass, newPass) => {
-    const result = await changePassword(oldPass, newPass);
-    if (!result.success) {
-      alert(`Password change failed: ${result.error}`);
-    } else {
-      alert("Password updated successfully.");
-    }
-  };
-
-  const handleUpdateProfile = async (updatedProfile) => {
-    const result = await updateProfile(updatedProfile);
-    if (!result.success) {
-      throw new Error(result.error);
-    }
-  };
-
-  const handleRotationPasswordChange = async () => {
-    if (!newPassword || newPassword !== confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
-    try {
-      const savedData = localStorage.getItem("envelopeBudgetData");
-      if (!savedData) {
-        throw new Error("No data found");
-      }
-      const { encryptedData, iv } = JSON.parse(savedData);
-      const decrypted = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
-      const { key, salt: newSalt } = await encryptionUtils.generateKey(newPassword);
-      const reencrypted = await encryptionUtils.encrypt(decrypted, key);
-      const saveData = {
-        encryptedData: reencrypted.data,
-        salt: Array.from(newSalt),
-        iv: reencrypted.iv,
-      };
-      localStorage.setItem("envelopeBudgetData", JSON.stringify(saveData));
-
-      // Update the auth store with new encryption details
-      const { setEncryption } = useAuthStore.getState();
-      setEncryption({ key, salt: newSalt });
-
-      localStorage.setItem("passwordLastChanged", Date.now().toString());
-      setShowRotationModal(false);
-      setRotationDue(false);
-      setNewPassword("");
-      setConfirmPassword("");
-      alert("Password updated successfully");
-    } catch (error) {
-      console.error("Failed to change password:", error);
-      alert(`Failed to change password: ${error.message}`);
-    }
-  };
-
-  const exportData = async () => {
-    try {
-      console.log("📁 Starting export process...");
-
-      // Get current data from localStorage
-      const savedData = localStorage.getItem("envelopeBudgetData");
-      if (!savedData) {
-        alert("No data found to export");
-        return;
-      }
-
-      // Decrypt the data
-      const { encryptedData, iv } = JSON.parse(savedData);
-      const decryptedData = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
-
-      // Normalize transactions for unified structure
-      const allTransactions = Array.isArray(decryptedData.allTransactions)
-        ? decryptedData.allTransactions
-        : [...(decryptedData.transactions || []), ...(decryptedData.bills || [])];
-      const transactions = allTransactions.filter((t) => !t.type || t.type === "transaction");
-
-      // Prepare export data with metadata
-      const exportData = {
-        ...decryptedData,
-        transactions,
-        allTransactions,
-        exportMetadata: {
-          exportedBy: currentUser?.userName || "Unknown User",
-          exportDate: new Date().toISOString(),
-          appVersion: "1.0.0",
-          dataVersion: "1.0",
-        },
-      };
-
-      // Create and download the file
-      const dataStr = JSON.stringify(exportData, null, 2);
-      const dataBlob = new Blob([dataStr], { type: "application/json" });
-
-      const url = URL.createObjectURL(dataBlob);
-      const link = document.createElement("a");
-      link.href = url;
-
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-      link.download = `VioletVault Budget Backup ${timestamp}.json`;
-
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
-      console.log("✅ Data exported successfully!");
-      alert(
-        `Successfully exported your budget data!\n\nEnvelopes: ${exportData.envelopes?.length || 0}\nBills: ${exportData.bills?.length || 0}\nTransactions: ${exportData.allTransactions?.length || 0}`
-      );
-    } catch (error) {
-      console.error("❌ Export failed:", error);
-      alert(`Export failed: ${error.message}`);
-    }
-  };
-
-  const importData = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    try {
-      console.log("📁 Starting import process...");
-
-      // Read the file
-      const fileContent = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target.result);
-        reader.onerror = reject;
-        reader.readAsText(file);
-      });
-
-      // Parse JSON
-      const importedData = JSON.parse(fileContent);
-      console.log("✅ File parsed successfully:", {
-        envelopes: importedData.envelopes?.length || 0,
-        bills: importedData.bills?.length || 0,
-        savingsGoals: importedData.savingsGoals?.length || 0,
-        allTransactions: importedData.allTransactions?.length || 0,
-      });
-
-      // Build unified transaction list if missing
-      const unifiedAllTransactions = Array.isArray(importedData.allTransactions)
-        ? importedData.allTransactions
-        : [...(importedData.transactions || []), ...(importedData.bills || [])];
-      const unifiedTransactions = unifiedAllTransactions.filter(
-        (t) => !t.type || t.type === "transaction"
-      );
-
-      // Validate the data structure
-      if (!importedData.envelopes || !Array.isArray(importedData.envelopes)) {
-        throw new Error("Invalid backup file: missing or invalid envelopes data");
-      }
-
-      // Confirm import with user
-      const confirmed = confirm(
-        `Import ${importedData.envelopes?.length || 0} envelopes, ${importedData.bills?.length || 0} bills, and ${importedData.allTransactions?.length || 0} transactions?\n\nThis will replace your current data.`
-      );
-
-      if (!confirmed) {
-        console.log("Import cancelled by user");
-        return;
-      }
-
-      // Create backup of current data before import
-      try {
-        const currentData = localStorage.getItem("envelopeBudgetData");
-        if (currentData) {
-          const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-          localStorage.setItem(`envelopeBudgetData_backup_${timestamp}`, currentData);
-          console.log("✅ Current data backed up");
-        }
-      } catch (backupError) {
-        console.warn("⚠️ Failed to create backup:", backupError);
-      }
-
-      // Prepare the data for loading - ensure user information is preserved
-      console.log("🔍 Current auth state during import:", {
-        hasCurrentUser: !!currentUser,
-        currentUserName: currentUser?.userName,
-        hasBudgetId: !!budgetId,
-        importedUser: importedData.currentUser,
-        exportedBy: importedData.exportedBy,
-      });
-
-      let processedCurrentUser;
-      try {
-        processedCurrentUser = importedData.currentUser ||
-          currentUser || {
-            id: `user_${Date.now()}`,
-            userName: importedData.exportedBy || "Imported User",
-            userColor: "#a855f7",
-            budgetId: budgetId,
-          };
-      } catch (userError) {
-        console.error("❌ Error creating user:", userError);
-        processedCurrentUser = {
-          id: `user_${Date.now()}`,
-          userName: "Imported User",
-          userColor: "#a855f7",
-          budgetId: budgetId,
-        };
-      }
-
-      const dataToLoad = {
-        // Budget data from import
-        envelopes: importedData.envelopes || [],
-        bills: importedData.bills || [],
-        savingsGoals: importedData.savingsGoals || [],
-        supplementalAccounts: importedData.supplementalAccounts || [],
-        unassignedCash: importedData.unassignedCash || 0,
-        biweeklyAllocation: importedData.biweeklyAllocation || 0,
-        paycheckHistory: importedData.paycheckHistory || [],
-        actualBalance: importedData.actualBalance || 0,
-        transactions: unifiedTransactions,
-        allTransactions: unifiedAllTransactions,
-        // Use the processed currentUser
-        currentUser: processedCurrentUser,
-        // Add any other imported metadata
-        ...(importedData.exportMetadata && {
-          importMetadata: {
-            ...importedData.exportMetadata,
-            importedAt: new Date().toISOString(),
-            importedBy: currentUser?.userName,
-          },
-        }),
-      };
-
-      console.log("📋 Prepared data for saving:", {
-        envelopes: dataToLoad.envelopes.length,
-        bills: dataToLoad.bills.length,
-        savingsGoals: dataToLoad.savingsGoals.length,
-        transactions: dataToLoad.allTransactions.length,
-        hasCurrentUser: !!dataToLoad.currentUser,
-        currentUserBudgetId: dataToLoad.currentUser?.budgetId,
-        currentUserName: dataToLoad.currentUser?.userName,
-        currentUserSource: importedData.currentUser
-          ? "imported"
-          : currentUser
-            ? "session"
-            : "created",
-      });
-
-      // Encrypt and save the imported data
-      console.log("🔐 Encrypting and saving imported data...");
-      const encrypted = await encryptionUtils.encrypt(dataToLoad, encryptionKey);
-
-      const saveData = {
-        encryptedData: encrypted.data,
-        salt: Array.from(salt),
-        iv: encrypted.iv,
-      };
-
-      localStorage.setItem("envelopeBudgetData", JSON.stringify(saveData));
-
-      // Verify the save worked
-      const verification = localStorage.getItem("envelopeBudgetData");
-      if (!verification) {
-        throw new Error("Failed to save data to localStorage");
-      }
-
-      // Test decryption to ensure data integrity
-      console.log("🔍 Verifying data integrity...");
-      const { encryptedData: testEncrypted, iv: testIv } = JSON.parse(verification);
-      const testDecrypted = await encryptionUtils.decrypt(testEncrypted, encryptionKey, testIv);
-
-      console.log("✅ Data integrity verified:", {
-        envelopes: testDecrypted.envelopes?.length || 0,
-        bills: testDecrypted.bills?.length || 0,
-        savingsGoals: testDecrypted.savingsGoals?.length || 0,
-        allTransactions: testDecrypted.allTransactions?.length || 0,
-        hasCurrentUser: !!testDecrypted.currentUser,
-        budgetId: testDecrypted.currentUser?.budgetId,
-      });
-
-      console.log("✅ Data imported and saved successfully!");
-
-      // Data is saved to localStorage - BudgetContext will load it automatically
-      console.log("📝 Data saved to localStorage - BudgetContext should load it automatically");
-
-      console.log("🎉 Data import completed successfully!");
-
-      // Show success message - data should load automatically
-      alert(
-        `Successfully imported data!\n\nEnvelopes: ${dataToLoad.envelopes.length}\nBills: ${dataToLoad.bills.length}\nTransactions: ${dataToLoad.allTransactions.length}\n\nData saved to localStorage. If it doesn't appear, try the Force Load Data button.`
-      );
-
-      return dataToLoad;
-    } catch (error) {
-      console.error("❌ Import failed:", error);
-      console.error("❌ Import error details:", {
-        message: error.message,
-        stack: error.stack,
-        name: error.name,
-      });
-
-      alert(`Import failed: ${error.message}`);
-    }
-
-    // Clear the file input
-    event.target.value = "";
-  };
-
-  const resetEncryptionAndStartFresh = async () => {
-    if (
-      confirm("This will permanently delete all your budget data and cannot be undone. Continue?")
-    ) {
-      try {
-        // Clear all localStorage data
-        localStorage.removeItem("envelopeBudgetData");
-
-        // Clear any backup data that might exist
-        const keysToRemove = [];
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (key && key.includes("envelopeBudgetData")) {
-            keysToRemove.push(key);
-          }
-        }
-        keysToRemove.forEach((key) => localStorage.removeItem(key));
-
-        // Clear any cached Firebase data
-        try {
-          await firebaseSync?.clearAllData?.();
-        } catch (syncError) {
-          console.warn("Could not clear cloud data:", syncError);
-        }
-
-        logout();
-        alert("All data has been cleared. You can now set up a new budget with a fresh password.");
-      } catch (error) {
-        console.error("Failed to reset encryption:", error);
-        alert("Failed to clear all data. Please try refreshing the page.");
-      }
-    }
-  };
-
+  // Conflict resolution function
   const resolveConflict = () => {
-    // Implementation for conflict resolution
     setSyncConflicts(null);
   };
+
 
   if (!isUnlocked || !currentUser) {
     return <UserSetup onSetupComplete={handleSetup} />;
@@ -538,16 +119,12 @@ const Layout = () => {
           onLogout={handleLogout}
           onChangePassword={handleChangePassword}
           onResetEncryption={resetEncryptionAndStartFresh}
-          onActivityUpdate={handleActivityUpdate}
-          activeUsers={activeUsers}
-          recentActivity={recentActivity}
           syncConflicts={syncConflicts}
           onResolveConflict={resolveConflict}
           setSyncConflicts={setSyncConflicts}
           firebaseSync={firebaseSync}
           rotationDue={rotationDue}
           onUpdateProfile={handleUpdateProfile}
-          showPayday={showPayday}
         />
       </BudgetProvider>
       {showRotationModal && (
@@ -591,7 +168,6 @@ const MainContent = ({
   currentUser,
   onUserChange,
   onExport,
-  onActivityUpdate,
   onImport,
   onLogout,
   onResetEncryption,
@@ -599,46 +175,31 @@ const MainContent = ({
   encryptionKey,
   budgetId,
   firebaseSync,
-  activeUsers: _activeUsers, // eslint-disable-line no-unused-vars
-  recentActivity: _recentActivity, // eslint-disable-line no-unused-vars
   syncConflicts,
   onResolveConflict,
   setSyncConflicts,
   rotationDue,
   onUpdateProfile,
-  showPayday,
 }) => {
   const budget = useBudget();
   const [activeView, setActiveView] = useState("dashboard");
+
+  // Custom hooks for MainContent business logic
+  const { activeUsers, recentActivity, handleManualSync } = useFirebaseSync(
+    firebaseSync,
+    encryptionKey,
+    budgetId,
+    currentUser
+  );
+
+  // Payday prediction notifications
+  usePaydayPrediction(paycheckHistory, !!currentUser);
 
   // Handle import by saving data then loading into context
   const handleImport = async (event) => {
     const data = await onImport(event);
     if (data) {
       budget.loadData(data);
-    }
-  };
-
-  const handleManualSync = async () => {
-    try {
-      if (!firebaseSync) return;
-      firebaseSync.initialize(budgetId, encryptionKey);
-      await firebaseSync.saveToCloud(
-        {
-          envelopes: budget.envelopes,
-          bills: budget.bills,
-          savingsGoals: budget.savingsGoals,
-          unassignedCash: budget.unassignedCash,
-          biweeklyAllocation: budget.biweeklyAllocation,
-          transactions: budget.allTransactions,
-          allTransactions: budget.allTransactions,
-        },
-        currentUser
-      );
-      alert("Data synced to cloud");
-    } catch (err) {
-      console.error("Manual sync failed", err);
-      alert(`Sync failed: ${err.message}`);
     }
   };
 
@@ -650,91 +211,7 @@ const MainContent = ({
     paycheckHistory,
     isOnline,
     isSyncing,
-    lastSyncTime: _lastSyncTime,
-    syncError: _syncError,
-    getActiveUsers,
-    getRecentActivity,
   } = budget;
-
-  // Update activity data from Firebase sync
-  useEffect(() => {
-    if (getActiveUsers && getRecentActivity) {
-      const updateActivityData = () => {
-        try {
-          const users = getActiveUsers();
-          const activity = getRecentActivity();
-          console.log("🔄 Updating activity data:", {
-            users: users?.length || 0,
-            activity: activity?.length || 0,
-          });
-          // Pass activity data up to Layout component via props
-          if (onActivityUpdate) {
-            onActivityUpdate({ users: users || [], activity: activity || [] });
-          }
-        } catch (error) {
-          console.error("Failed to get activity data:", error);
-        }
-      };
-
-      // Update immediately
-      updateActivityData();
-
-      // Update periodically to catch changes
-      const interval = setInterval(updateActivityData, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [getActiveUsers, getRecentActivity, isSyncing, onActivityUpdate]);
-
-  // Check for payday predictions and show notifications
-  useEffect(() => {
-    if (!paycheckHistory || paycheckHistory.length < 2) return;
-
-    const checkPayday = () => {
-      try {
-        const prediction = predictNextPayday(paycheckHistory);
-        if (!prediction.nextPayday) return;
-
-        const recentPayday = checkRecentPayday(prediction);
-
-        // Check if we should show a payday notification
-        const lastNotification = localStorage.getItem("lastPaydayNotification");
-        const today = new Date().toDateString();
-
-        // Show notification if:
-        // 1. Today is predicted payday OR
-        // 2. Payday was yesterday and we haven't shown notification yet
-        if (recentPayday.occurred && (!lastNotification || lastNotification !== today)) {
-          let title, message;
-
-          if (recentPayday.wasToday) {
-            title = "🎉 Payday Today!";
-            message = `Based on your ${prediction.pattern} paycheck pattern, today should be payday! Consider processing your paycheck.`;
-          } else if (recentPayday.wasYesterday) {
-            title = "💰 Payday Was Yesterday";
-            message = `Based on your ${prediction.pattern} pattern, payday was yesterday. Don't forget to process your paycheck!`;
-          } else if (recentPayday.daysAgo === 2) {
-            title = "📅 Recent Payday";
-            message = `Based on your ${prediction.pattern} pattern, payday was ${recentPayday.daysAgo} days ago.`;
-          }
-
-          if (title && message) {
-            showPayday(title, message, 10000); // Show for 10 seconds
-            localStorage.setItem("lastPaydayNotification", today);
-          }
-        }
-      } catch (error) {
-        console.error("Error checking payday prediction:", error);
-      }
-    };
-
-    // Check immediately
-    checkPayday();
-
-    // Check daily at midnight and every few hours
-    const interval = setInterval(checkPayday, 4 * 60 * 60 * 1000); // Every 4 hours
-
-    return () => clearInterval(interval);
-  }, [paycheckHistory, showPayday]);
 
   // Calculate totals
   const totalEnvelopeBalance = Array.isArray(envelopes)

@@ -180,7 +180,10 @@ This document provides a comprehensive overview of the `/src/` directory structu
 | `useBudget.js` | Simple budget data access (wrapper around budgetStore) |
 | `useBudgetQuery.js` | Advanced budget operations with React Query + Dexie |
 | `useDataManagement.js` | Import/export operations |
+| `useFirebaseSync.js` | Firebase synchronization and activity management |
+| `useNetworkStatus.js` | Network status management (online/offline detection) |
 | `usePasswordRotation.js` | Password security and rotation |
+| `usePaydayPrediction.js` | Payday prediction and notifications |
 | `useToast.js` | Toast notification management |
 
 ## 🏪 Stores Directory (`/stores/`)
@@ -265,7 +268,18 @@ This document provides a comprehensive overview of the `/src/` directory structu
 ### **Completed Refactoring**
 ✅ **Phase 1:** Custom hooks extraction (`useAuthFlow`, `useDataManagement`, `usePasswordRotation`)  
 ✅ **Phase 2:** UI component extraction (NavigationTabs, SummaryCards, ViewRenderer, etc.)  
-✅ **Folder Reorganization:** Better structure with `pages/`, `sync/`, and clearer naming
+✅ **Phase 2.1:** File system cleanup and optimization  
+✅ **Phase 2.2:** MainLayout.jsx business logic extraction - **COMPLETED!**
+- Extracted all business logic into custom hooks:
+  - `useAuthFlow.js` - Authentication operations
+  - `useDataManagement.js` - Import/export operations  
+  - `usePasswordRotation.js` - Password rotation logic
+  - `useNetworkStatus.js` - Network status detection
+  - `useFirebaseSync.js` - Sync operations and activity management
+  - `usePaydayPrediction.js` - Payday notifications
+- MainLayout.jsx is now a **pure UI component** as intended
+- Reduced MainLayout from ~1,100+ lines to ~390 lines (65% reduction)
+- Business logic properly separated and reusable
 
 ### **Next Steps**
 - **Phase 3:** Provider hierarchy (AuthProvider, DataProvider, NotificationProvider)
