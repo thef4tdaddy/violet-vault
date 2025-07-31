@@ -2,8 +2,15 @@ import React, { useState, useEffect } from "react";
 import { Shield, Users, Eye, EyeOff } from "lucide-react";
 import logoOnly from "../../assets/icon-512x512.png";
 
+// Helper to log only in development
+const devLog = (...args) => {
+  if (import.meta.env.MODE === "development") {
+    devLog(...args);
+  }
+};
+
 const UserSetup = ({ onSetupComplete }) => {
-  console.log("🏗️ UserSetup component rendered", {
+  devLog("🏗️ UserSetup component rendered", {
     onSetupComplete: !!onSetupComplete,
   });
 
@@ -19,7 +26,10 @@ const UserSetup = ({ onSetupComplete }) => {
     return Promise.race([
       asyncFn(),
       new Promise((_, reject) =>
-        setTimeout(() => reject(new Error(`Operation timed out after ${timeoutMs}ms`)), timeoutMs)
+        setTimeout(
+          () => reject(new Error(`Operation timed out after ${timeoutMs}ms`)),
+          timeoutMs,
+        ),
       ),
     ]);
   };
@@ -28,23 +38,23 @@ const UserSetup = ({ onSetupComplete }) => {
 
   // Load saved user profile on component mount
   useEffect(() => {
-    console.log("🔍 UserSetup mounted, checking for saved profile");
+    devLog("🔍 UserSetup mounted, checking for saved profile");
     const savedProfile = localStorage.getItem("userProfile");
     const savedData = localStorage.getItem("envelopeBudgetData");
 
     if (savedProfile && savedData) {
       try {
         const profile = JSON.parse(savedProfile);
-        console.log("📋 Found saved profile:", profile);
+        devLog("📋 Found saved profile:", profile);
         setUserName(profile.userName || "");
         setUserColor(profile.userColor || "#a855f7");
         setIsReturningUser(true);
-        console.log("👋 Returning user detected");
+        devLog("👋 Returning user detected");
       } catch (error) {
         console.warn("Failed to load saved profile:", error);
       }
     } else {
-      console.log("📋 No saved profile found, new user");
+      devLog("📋 No saved profile found, new user");
       setIsReturningUser(false);
     }
   }, []);
@@ -62,7 +72,7 @@ const UserSetup = ({ onSetupComplete }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("🔄 Form submitted - STEP 2 HANDLER:", {
+    devLog("🔄 Form submitted - STEP 2 HANDLER:", {
       step,
       masterPassword: !!masterPassword,
       userName: userName.trim(),
@@ -79,13 +89,13 @@ const UserSetup = ({ onSetupComplete }) => {
 
     setIsLoading(true);
     try {
-      console.log("🚀 Calling onSetupComplete...");
+      devLog("🚀 Calling onSetupComplete...");
       await onSetupComplete({
         password: masterPassword,
         userName: userName.trim(),
         userColor,
       });
-      console.log("✅ onSetupComplete succeeded");
+      devLog("✅ onSetupComplete succeeded");
     } catch (error) {
       console.error("❌ Setup failed:", error);
     } finally {
@@ -95,7 +105,7 @@ const UserSetup = ({ onSetupComplete }) => {
 
   const handleStep1Continue = async (e) => {
     e.preventDefault();
-    console.log("🔄 Step 1 continue clicked:", {
+    devLog("🔄 Step 1 continue clicked:", {
       step,
       masterPassword: !!masterPassword,
       isReturningUser,
@@ -110,13 +120,13 @@ const UserSetup = ({ onSetupComplete }) => {
 
       setIsLoading(true);
       try {
-        console.log("🚀 Attempting login for returning user...");
+        devLog("🚀 Attempting login for returning user...");
         await onSetupComplete({
           password: masterPassword,
           userName,
           userColor,
         });
-        console.log("✅ Returning user login succeeded");
+        devLog("✅ Returning user login succeeded");
       } catch (error) {
         console.error("❌ Login failed:", error);
         alert("Incorrect password. Please try again.");
@@ -131,7 +141,7 @@ const UserSetup = ({ onSetupComplete }) => {
 
   const handleStartTrackingClick = async (e) => {
     e.preventDefault();
-    console.log("🎯 Start Tracking button clicked:", {
+    devLog("🎯 Start Tracking button clicked:", {
       step,
       masterPassword: !!masterPassword,
       userName: userName.trim(),
@@ -149,7 +159,7 @@ const UserSetup = ({ onSetupComplete }) => {
 
     setIsLoading(true);
     try {
-      console.log("🚀 Calling onSetupComplete from Start Tracking...");
+      devLog("🚀 Calling onSetupComplete from Start Tracking...");
 
       // Add timeout protection
       await handleWithTimeout(async () => {
@@ -160,7 +170,7 @@ const UserSetup = ({ onSetupComplete }) => {
         });
       }, 10000);
 
-      console.log("✅ onSetupComplete succeeded from Start Tracking");
+      devLog("✅ onSetupComplete succeeded from Start Tracking");
     } catch (error) {
       console.error("❌ Setup failed from Start Tracking:", error);
       alert(`Setup failed: ${error.message}`);
@@ -170,7 +180,7 @@ const UserSetup = ({ onSetupComplete }) => {
   };
 
   const clearSavedProfile = () => {
-    console.log("🗑️ Clearing saved profile");
+    devLog("🗑️ Clearing saved profile");
     localStorage.removeItem("userProfile");
     setUserName("");
     setUserColor("#a855f7");
@@ -193,7 +203,10 @@ const UserSetup = ({ onSetupComplete }) => {
             {isReturningUser ? (
               <span>
                 Welcome Back,{" "}
-                <span className="inline-flex items-center" style={{ color: userColor }}>
+                <span
+                  className="inline-flex items-center"
+                  style={{ color: userColor }}
+                >
                   {userName}
                 </span>
                 !
@@ -214,7 +227,9 @@ const UserSetup = ({ onSetupComplete }) => {
         </div>
 
         <form
-          onSubmit={isReturningUser || step === 1 ? handleStep1Continue : handleSubmit}
+          onSubmit={
+            isReturningUser || step === 1 ? handleStep1Continue : handleSubmit
+          }
           className="space-y-6"
         >
           {(step === 1 || isReturningUser) && (
@@ -224,7 +239,7 @@ const UserSetup = ({ onSetupComplete }) => {
                   type={showPassword ? "text" : "password"}
                   value={masterPassword}
                   onChange={(e) => {
-                    console.log("🔐 Password input changed");
+                    devLog("🔐 Password input changed");
                     setMasterPassword(e.target.value);
                   }}
                   placeholder="Master password"
@@ -237,7 +252,11 @@ const UserSetup = ({ onSetupComplete }) => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-purple-600"
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
                 </button>
               </div>
 
@@ -287,12 +306,14 @@ const UserSetup = ({ onSetupComplete }) => {
           {step === 2 && !isReturningUser && (
             <>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">Your Name</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Your Name
+                </label>
                 <input
                   type="text"
                   value={userName}
                   onChange={(e) => {
-                    console.log("👤 Name input changed:", e.target.value);
+                    devLog("👤 Name input changed:", e.target.value);
                     setUserName(e.target.value);
                   }}
                   placeholder="e.g., Sarah, John, etc."
@@ -303,7 +324,9 @@ const UserSetup = ({ onSetupComplete }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">Your Color</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Your Color
+                </label>
                 <div className="grid grid-cols-4 gap-3">
                   {colors.map((color) => (
                     <button

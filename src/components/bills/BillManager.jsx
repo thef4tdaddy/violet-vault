@@ -17,7 +17,7 @@ import {
   Filter,
   Eye,
 } from "lucide-react";
-import { getBillIcon } from "../../utils/billIcons";
+import { getBillIcon, getIconByName } from "../../utils/billIcons";
 import AddBillModal from "./AddBillModal";
 
 const BillManager = ({
@@ -34,13 +34,18 @@ const BillManager = ({
 
   const transactions = useMemo(
     () =>
-      propTransactions && propTransactions.length ? propTransactions : budget.allTransactions || [],
-    [propTransactions, budget.allTransactions]
+      propTransactions && propTransactions.length
+        ? propTransactions
+        : budget.allTransactions || [],
+    [propTransactions, budget.allTransactions],
   );
 
   const envelopes = useMemo(
-    () => (propEnvelopes && propEnvelopes.length ? propEnvelopes : budget.envelopes || []),
-    [propEnvelopes, budget.envelopes]
+    () =>
+      propEnvelopes && propEnvelopes.length
+        ? propEnvelopes
+        : budget.envelopes || [],
+    [propEnvelopes, budget.envelopes],
   );
 
   const reconcileTransaction = budget.reconcileTransaction;
@@ -80,7 +85,11 @@ const BillManager = ({
               else if (daysUntilDue <= 7) urgency = "soon";
             }
           } catch (error) {
-            console.warn(`Invalid due date for bill ${bill.id}:`, bill.dueDate, error);
+            console.warn(
+              `Invalid due date for bill ${bill.id}:`,
+              bill.dueDate,
+              error,
+            );
           }
         }
 
@@ -102,20 +111,34 @@ const BillManager = ({
     const paidBills = bills.filter((b) => b.isPaid);
 
     return {
-      upcoming: upcomingBills.sort((a, b) => (a.daysUntilDue || 999) - (b.daysUntilDue || 999)),
-      overdue: overdueBills.sort((a, b) => (a.daysUntilDue || 0) - (b.daysUntilDue || 0)),
+      upcoming: upcomingBills.sort(
+        (a, b) => (a.daysUntilDue || 999) - (b.daysUntilDue || 999),
+      ),
+      overdue: overdueBills.sort(
+        (a, b) => (a.daysUntilDue || 0) - (b.daysUntilDue || 0),
+      ),
       paid: paidBills.sort(
-        (a, b) => new Date(b.paidDate || b.date) - new Date(a.paidDate || a.date)
+        (a, b) =>
+          new Date(b.paidDate || b.date) - new Date(a.paidDate || a.date),
       ),
       all: bills,
     };
   }, [bills]);
 
   const totals = useMemo(() => {
-    const upcomingTotal = categorizedBills.upcoming.reduce((sum, b) => sum + Math.abs(b.amount), 0);
-    const overdueTotal = categorizedBills.overdue.reduce((sum, b) => sum + Math.abs(b.amount), 0);
+    const upcomingTotal = categorizedBills.upcoming.reduce(
+      (sum, b) => sum + Math.abs(b.amount),
+      0,
+    );
+    const overdueTotal = categorizedBills.overdue.reduce(
+      (sum, b) => sum + Math.abs(b.amount),
+      0,
+    );
     const paidThisMonth = categorizedBills.paid
-      .filter((b) => new Date(b.paidDate || b.date).getMonth() === new Date().getMonth())
+      .filter(
+        (b) =>
+          new Date(b.paidDate || b.date).getMonth() === new Date().getMonth(),
+      )
       .reduce((sum, b) => sum + Math.abs(b.amount), 0);
 
     return {
@@ -129,23 +152,35 @@ const BillManager = ({
   const displayBills = useMemo(() => {
     let billsToShow = categorizedBills[viewMode] || [];
 
-    if (filterOptions.billTypes.length > 0 && !filterOptions.billTypes.includes("all")) {
+    if (
+      filterOptions.billTypes.length > 0 &&
+      !filterOptions.billTypes.includes("all")
+    ) {
       billsToShow = billsToShow.filter((bill) =>
-        filterOptions.billTypes.includes(bill.metadata?.type || bill.category?.toLowerCase())
+        filterOptions.billTypes.includes(
+          bill.metadata?.type || bill.category?.toLowerCase(),
+        ),
       );
     }
 
     if (filterOptions.providers.length > 0) {
-      billsToShow = billsToShow.filter((bill) => filterOptions.providers.includes(bill.provider));
+      billsToShow = billsToShow.filter((bill) =>
+        filterOptions.providers.includes(bill.provider),
+      );
     }
 
     if (filterOptions.envelopes.length > 0) {
-      billsToShow = billsToShow.filter((bill) => filterOptions.envelopes.includes(bill.envelopeId));
+      billsToShow = billsToShow.filter((bill) =>
+        filterOptions.envelopes.includes(bill.envelopeId),
+      );
     }
 
     switch (filterOptions.sortBy) {
       case "due_date":
-        billsToShow.sort((a, b) => new Date(a.dueDate || a.date) - new Date(b.dueDate || b.date));
+        billsToShow.sort(
+          (a, b) =>
+            new Date(a.dueDate || a.date) - new Date(b.dueDate || b.date),
+        );
         break;
       case "amount_desc":
         billsToShow.sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount));
@@ -154,11 +189,15 @@ const BillManager = ({
         billsToShow.sort((a, b) => Math.abs(a.amount) - Math.abs(b.amount));
         break;
       case "provider":
-        billsToShow.sort((a, b) => (a.provider || "").localeCompare(b.provider || ""));
+        billsToShow.sort((a, b) =>
+          (a.provider || "").localeCompare(b.provider || ""),
+        );
         break;
       case "urgency": {
         const urgencyOrder = { overdue: 0, urgent: 1, soon: 2, normal: 3 };
-        billsToShow.sort((a, b) => urgencyOrder[a.urgency] - urgencyOrder[b.urgency]);
+        billsToShow.sort(
+          (a, b) => urgencyOrder[a.urgency] - urgencyOrder[b.urgency],
+        );
         break;
       }
     }
@@ -197,13 +236,19 @@ const BillManager = ({
   };
 
   const getCategoryIcon = (bill) => {
-    // First priority: Check if bill has a stored icon component
+    // First priority: Check if bill has a stored iconName
+    if (bill.iconName && typeof bill.iconName === "string") {
+      const IconComponent = getIconByName(bill.iconName);
+      return <IconComponent className="h-6 w-6" />;
+    }
+
+    // Second priority: Check if bill has a stored icon component (legacy)
     if (bill.icon && typeof bill.icon === "function") {
       const IconComponent = bill.icon;
       return <IconComponent className="h-6 w-6" />;
     }
 
-    // Second priority: Check metadata for legacy icon reference
+    // Third priority: Check metadata for legacy icon reference
     if (bill.metadata?.categoryIcon) {
       // If it's a string emoji, return it
       if (typeof bill.metadata.categoryIcon === "string") {
@@ -216,11 +261,11 @@ const BillManager = ({
       }
     }
 
-    // Third priority: Use smart icon detection from billIcons utility
+    // Fourth priority: Use smart icon detection from billIcons utility
     const IconComponent = getBillIcon(
       bill.provider || "",
       bill.description || "",
-      bill.category || ""
+      bill.category || "",
     );
 
     // Ensure we have a valid React component
@@ -260,7 +305,7 @@ const BillManager = ({
 
         if (availableBalance < billAmount) {
           onError?.(
-            `Insufficient funds in envelope "${envelope.name}". Available: $${availableBalance.toFixed(2)}, Required: $${billAmount.toFixed(2)}`
+            `Insufficient funds in envelope "${envelope.name}". Available: $${availableBalance.toFixed(2)}, Required: $${billAmount.toFixed(2)}`,
           );
           return;
         }
@@ -270,7 +315,7 @@ const BillManager = ({
 
         if (unassignedCash < billAmount) {
           onError?.(
-            `Insufficient unassigned cash. Available: $${unassignedCash.toFixed(2)}, Required: $${billAmount.toFixed(2)}`
+            `Insufficient unassigned cash. Available: $${unassignedCash.toFixed(2)}, Required: $${billAmount.toFixed(2)}`,
           );
           return;
         }
@@ -386,7 +431,7 @@ const BillManager = ({
 
       if (errorCount > 0) {
         onError?.(
-          `${successCount} bills paid successfully, ${errorCount} failed:\n${errors.join("\n")}`
+          `${successCount} bills paid successfully, ${errorCount} failed:\n${errors.join("\n")}`,
         );
       } else {
         console.log(`Successfully paid ${successCount} bills`);
@@ -432,7 +477,9 @@ const BillManager = ({
             </div>
             Bill Tracker
           </h2>
-          <p className="text-gray-600 mt-1">Manage bills, due dates, and payments</p>
+          <p className="text-gray-600 mt-1">
+            Manage bills, due dates, and payments
+          </p>
         </div>
 
         <div className="flex gap-3">
@@ -479,7 +526,9 @@ const BillManager = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-orange-100 text-sm">Due Soon</p>
-              <p className="text-2xl font-bold">${totals.upcoming.toFixed(2)}</p>
+              <p className="text-2xl font-bold">
+                ${totals.upcoming.toFixed(2)}
+              </p>
             </div>
             <Clock className="h-8 w-8 text-orange-200" />
           </div>
@@ -492,11 +541,15 @@ const BillManager = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-green-100 text-sm">Paid This Month</p>
-              <p className="text-2xl font-bold">${totals.paidThisMonth.toFixed(2)}</p>
+              <p className="text-2xl font-bold">
+                ${totals.paidThisMonth.toFixed(2)}
+              </p>
             </div>
             <CheckCircle className="h-8 w-8 text-green-200" />
           </div>
-          <p className="text-xs text-green-100 mt-2">{categorizedBills.paid.length} bills paid</p>
+          <p className="text-xs text-green-100 mt-2">
+            {categorizedBills.paid.length} bills paid
+          </p>
         </div>
 
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-4 rounded-lg text-white">
@@ -563,7 +616,8 @@ const BillManager = ({
                 onClick={paySelectedBills}
                 className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center text-sm"
               >
-                <CheckCircle className="h-4 w-4 mr-2" /> Pay {selectedBills.size} Selected
+                <CheckCircle className="h-4 w-4 mr-2" /> Pay{" "}
+                {selectedBills.size} Selected
               </button>
             )}
           </div>
@@ -587,7 +641,9 @@ const BillManager = ({
           </div>
         ) : (
           displayBills.map((bill) => {
-            const envelope = envelopes.find((env) => env.id === bill.envelopeId);
+            const envelope = envelopes.find(
+              (env) => env.id === bill.envelopeId,
+            );
             const urgencyStyle = getUrgencyStyle(bill.urgency, bill.isPaid);
 
             return (
@@ -646,7 +702,9 @@ const BillManager = ({
                         )}
                       </div>
                       {bill.accountNumber && (
-                        <p className="text-xs text-gray-500 mt-1">Account: {bill.accountNumber}</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Account: {bill.accountNumber}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -657,7 +715,8 @@ const BillManager = ({
                         ${Math.abs(bill.amount).toFixed(2)}
                       </p>
                       {bill.metadata?.minimumPayment &&
-                        bill.metadata.minimumPayment !== Math.abs(bill.amount) && (
+                        bill.metadata.minimumPayment !==
+                          Math.abs(bill.amount) && (
                           <p className="text-xs text-gray-500">
                             Min: ${bill.metadata.minimumPayment.toFixed(2)}
                           </p>
@@ -698,7 +757,8 @@ const BillManager = ({
                   </div>
                 </div>
 
-                {(bill.metadata?.statementPeriod || bill.metadata?.serviceAddress) && (
+                {(bill.metadata?.statementPeriod ||
+                  bill.metadata?.serviceAddress) && (
                   <div className="mt-3 pt-3 border-t border-gray-200">
                     <div className="text-sm text-gray-600 space-y-1">
                       {bill.metadata.statementPeriod && (
@@ -743,12 +803,16 @@ const BillManager = ({
 
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="text-3xl">{getCategoryIcon(showBillDetail)}</div>
+                  <div className="text-3xl">
+                    {getCategoryIcon(showBillDetail)}
+                  </div>
                   <div>
                     <p className="font-medium text-lg">
                       {showBillDetail.provider || showBillDetail.description}
                     </p>
-                    <p className="text-sm text-gray-600">{showBillDetail.category}</p>
+                    <p className="text-sm text-gray-600">
+                      {showBillDetail.category}
+                    </p>
                   </div>
                 </div>
 
@@ -762,7 +826,9 @@ const BillManager = ({
                     </p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Due Date
+                    </label>
                     <p className="text-sm">
                       {showBillDetail.dueDate
                         ? new Date(showBillDetail.dueDate).toLocaleDateString()
@@ -776,7 +842,9 @@ const BillManager = ({
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Account Number
                     </label>
-                    <p className="text-sm font-mono">{showBillDetail.accountNumber}</p>
+                    <p className="text-sm font-mono">
+                      {showBillDetail.accountNumber}
+                    </p>
                   </div>
                 )}
 
@@ -785,7 +853,10 @@ const BillManager = ({
                     Status & Urgency
                   </label>
                   <div className="flex items-center gap-2">
-                    {getUrgencyIcon(showBillDetail.urgency, showBillDetail.isPaid)}
+                    {getUrgencyIcon(
+                      showBillDetail.urgency,
+                      showBillDetail.isPaid,
+                    )}
                     <span
                       className={`px-3 py-1 rounded-full text-sm ${
                         showBillDetail.isPaid
@@ -818,16 +889,21 @@ const BillManager = ({
                       Assigned Envelope
                     </label>
                     <p className="text-sm">
-                      {envelopes.find((env) => env.id === showBillDetail.envelopeId)?.name ||
-                        "Unknown"}
+                      {envelopes.find(
+                        (env) => env.id === showBillDetail.envelopeId,
+                      )?.name || "Unknown"}
                     </p>
                   </div>
                 )}
 
                 {showBillDetail.notes && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                    <p className="text-sm text-gray-600">{showBillDetail.notes}</p>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Notes
+                    </label>
+                    <p className="text-sm text-gray-600">
+                      {showBillDetail.notes}
+                    </p>
                   </div>
                 )}
 
@@ -886,7 +962,7 @@ const BillManager = ({
               onCreateRecurringBill(newBill);
             } else {
               // Fallback to budget context
-              budget.setAllTransactions([...transactions, newBill]);
+              budget.addTransaction(newBill);
             }
             setShowAddBillModal(false);
           }}
@@ -908,10 +984,7 @@ const BillManager = ({
               onUpdateBill(updatedBill);
             } else {
               // Fallback to budget context
-              const updatedTransactions = transactions.map((t) =>
-                t.id === updatedBill.id ? updatedBill : t
-              );
-              budget.setAllTransactions(updatedTransactions);
+              budget.updateTransaction(updatedBill);
             }
             setEditingBill(null);
           }}
