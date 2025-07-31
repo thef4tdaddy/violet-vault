@@ -21,21 +21,15 @@ const ConflictResolutionModal = ({ syncConflicts, onResolveConflict, onDismiss }
 
           <h3 className="text-xl font-bold text-gray-900 mb-4">Sync Conflict Detected</h3>
           <p className="text-gray-600 mb-6">
-            <strong>{syncConflicts.cloudUser?.userName}</strong> made changes on another
-            device. Would you like to load their latest changes?
+            <strong>{syncConflicts.cloudUser?.userName}</strong> made changes on another device.
+            Would you like to load their latest changes?
           </p>
 
           <div className="flex gap-3">
-            <button
-              onClick={onDismiss}
-              className="flex-1 btn btn-secondary rounded-2xl py-3"
-            >
+            <button onClick={onDismiss} className="flex-1 btn btn-secondary rounded-2xl py-3">
               Keep Mine
             </button>
-            <button
-              onClick={onResolveConflict}
-              className="flex-1 btn btn-primary rounded-2xl py-3"
-            >
+            <button onClick={onResolveConflict} className="flex-1 btn btn-primary rounded-2xl py-3">
               Load Theirs
             </button>
           </div>

@@ -87,7 +87,6 @@ const Layout = () => {
     setSyncConflicts(null);
   };
 
-
   if (!isUnlocked || !currentUser) {
     return <UserSetup onSetupComplete={handleSetup} />;
   }
@@ -359,10 +358,10 @@ const MainContent = ({
         <ViewRenderer activeView={activeView} budget={budget} currentUser={currentUser} />
 
         <SyncStatusIndicators isOnline={isOnline} isSyncing={isSyncing} />
-        <ConflictResolutionModal 
-          syncConflicts={syncConflicts} 
-          onResolveConflict={onResolveConflict} 
-          onDismiss={() => setSyncConflicts(null)} 
+        <ConflictResolutionModal
+          syncConflicts={syncConflicts}
+          onResolveConflict={onResolveConflict}
+          onDismiss={() => setSyncConflicts(null)}
         />
 
         {/* Version Footer */}

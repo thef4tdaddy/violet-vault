@@ -5,12 +5,7 @@ import { DollarSign, Wallet, Target, TrendingUp } from "lucide-react";
  * Summary cards component showing financial overview
  * Extracted from Layout.jsx for better organization
  */
-const SummaryCards = ({ 
-  totalCash, 
-  unassignedCash, 
-  totalSavingsBalance, 
-  biweeklyAllocation 
-}) => {
+const SummaryCards = ({ totalCash, unassignedCash, totalSavingsBalance, biweeklyAllocation }) => {
   const cards = [
     {
       key: "total-cash",
@@ -85,9 +80,7 @@ const SummaryCard = ({ icon: Icon, label, value, color }) => {
         </div>
         <div>
           <p className="text-sm font-semibold text-gray-600 mb-1">{label}</p>
-          <p className={`text-2xl font-bold ${textColorClasses[color]}`}>
-            ${value.toFixed(2)}
-          </p>
+          <p className={`text-2xl font-bold ${textColorClasses[color]}`}>${value.toFixed(2)}</p>
         </div>
       </div>
     </div>
