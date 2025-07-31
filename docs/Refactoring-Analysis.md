@@ -65,6 +65,65 @@ export const useActivitySync = (getActiveUsers, getRecentActivity) => {
 
 **Expected Result:** Layout.jsx reduces from 813 → ~400 lines
 
+#### **Phase 4 - UI-First Architecture (Future Enhancement - Next Week's Project)**
+
+> **Extended Layout Refactoring Plan**: Transform Layout from functional to purely UI orchestration
+
+**Current State**: Layout component handles authentication, data management, sync, navigation, and UI rendering in ~1000+ lines.
+
+**Target State**: Clean UI orchestration layer (~100 lines) with business logic extracted to hooks and providers.
+
+##### **Custom Hooks Extraction**
+```javascript
+// hooks/useAuth.js - Authentication flow management
+// hooks/useDataManagement.js - Import/export operations
+// hooks/usePasswordRotation.js - Security and rotation logic  
+// hooks/usePaydayPredictions.js - Payday notification system
+// hooks/useSyncManager.js - Firebase sync and conflict resolution
+```
+
+##### **Provider Hierarchy** 
+```javascript
+// providers/AuthProvider.jsx - Auth state and user management
+// providers/DataProvider.jsx - Data operations and sync
+// providers/NotificationProvider.jsx - Toast and alert system
+```
+
+##### **UI Component Extraction**
+```javascript
+// components/layout/AppShell.jsx - Main layout structure
+// components/layout/NavigationTabs.jsx - Tab navigation system
+// components/layout/UserMenu.jsx - User dropdown and settings
+// components/modals/PasswordRotationModal.jsx - Security modal
+```
+
+##### **Route-Based Architecture** (Optional)
+```javascript
+// routes/DashboardRoute.jsx - Dashboard view with data fetching
+// routes/EnvelopesRoute.jsx - Envelope management with state
+// routes/TransactionsRoute.jsx - Transaction handling with logic
+```
+
+**Expected Benefits**:
+- **Testability**: UI components become pure and easily testable
+- **Reusability**: Business logic hooks can be reused across views
+- **Maintainability**: Clear separation of concerns and focused responsibilities
+- **Performance**: Better memoization and reduced re-renders
+- **Developer Experience**: Smaller, focused files with clear purposes
+
+**Implementation Timeline**: 
+- Week 1: Extract custom hooks (authentication, data management)
+- Week 2: Create UI component hierarchy and provider pattern
+- Week 3: Implement route-based structure (optional)
+- Week 4: Performance optimization and comprehensive testing
+
+**Success Metrics**:
+- Layout.jsx reduced from 1000+ → ~100 lines
+- All business logic extracted to reusable hooks
+- UI components are purely presentational
+- Test coverage improved by 30%+
+- Maintained build performance
+
 ---
 
 ## 🔥 Priority 2: ChartsAndAnalytics.jsx (785 lines) - CHART COMPONENT FACTORY
