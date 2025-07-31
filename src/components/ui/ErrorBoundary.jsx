@@ -22,10 +22,19 @@ class ErrorBoundary extends React.Component {
     const errorMessage = error?.message || "";
     const errorName = error?.name || "Error";
 
+    // Check if error is an empty object or has empty/minimal content
+    const isEmptyError =
+      !errorMessage ||
+      errorMessage === "{}" ||
+      errorMessage.trim() === "" ||
+      (typeof error === "object" && Object.keys(error).length === 0) ||
+      JSON.stringify(error) === "{}";
+
     // Skip logging empty or minimal error objects to reduce noise
-    if (!errorMessage || errorMessage === "{}" || errorMessage.trim() === "") {
+    if (isEmptyError) {
       console.warn("Skipping empty error object:", error);
       // Don't send to Sentry or show error UI for empty errors
+      this.setState({ hasError: false, error: null });
       return;
     }
 
@@ -41,7 +50,11 @@ class ErrorBoundary extends React.Component {
     // 1. Error type and message
     // 2. Failing component name
     // 3. Top few lines of component stack for context
-    const stackContext = componentStack.split("\n").slice(0, 3).join("\n").trim();
+    const stackContext = componentStack
+      .split("\n")
+      .slice(0, 3)
+      .join("\n")
+      .trim();
 
     const errorSignature = `${errorName}:${errorMessage}:${failingComponent}:${stackContext}`;
 
@@ -79,26 +92,35 @@ class ErrorBoundary extends React.Component {
       console.log("📤 Sent error to Sentry:", errorSignature);
     } else {
       this.errorCount++;
-      console.log(`🔄 Skipping duplicate error #${this.errorCount} in burst:`, errorSignature);
+      console.log(
+        `🔄 Skipping duplicate error #${this.errorCount} in burst:`,
+        errorSignature,
+      );
 
       // If we're in a long error burst, send a summary after 10 seconds
-      if (currentTime - this.errorBurstStartTime > 10000 && this.errorCount > 1) {
-        Sentry.captureMessage(`Error burst detected: ${this.errorCount} similar errors`, {
-          level: "warning",
-          contexts: {
-            errorBurst: {
-              originalError: this.lastErrorMessage,
-              errorCount: this.errorCount,
-              burstDuration: currentTime - this.errorBurstStartTime,
-              componentStack: this.lastComponentStack,
+      if (
+        currentTime - this.errorBurstStartTime > 10000 &&
+        this.errorCount > 1
+      ) {
+        Sentry.captureMessage(
+          `Error burst detected: ${this.errorCount} similar errors`,
+          {
+            level: "warning",
+            contexts: {
+              errorBurst: {
+                originalError: this.lastErrorMessage,
+                errorCount: this.errorCount,
+                burstDuration: currentTime - this.errorBurstStartTime,
+                componentStack: this.lastComponentStack,
+              },
+            },
+            tags: {
+              errorBoundary: true,
+              errorBurst: true,
+              failingComponent,
             },
           },
-          tags: {
-            errorBoundary: true,
-            errorBurst: true,
-            failingComponent,
-          },
-        });
+        );
 
         // Reset burst tracking after sending summary
         this.errorCount = 0;
@@ -157,10 +179,13 @@ class ErrorBoundary extends React.Component {
               </div>
             </div>
 
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Something went wrong</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              Something went wrong
+            </h2>
 
             <p className="text-gray-600 mb-6">
-              An unexpected error occurred. Your data is safe and automatically saved.
+              An unexpected error occurred. Your data is safe and automatically
+              saved.
             </p>
 
             <div className="space-y-3">

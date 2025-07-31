@@ -57,6 +57,11 @@ import {
   Scissors, // Personal Care
   Activity, // Gym/Fitness
 
+  // Food & Dining
+  UtensilsCrossed, // Restaurants/Food
+  Coffee, // Coffee/Beverages
+  ShoppingCart, // Grocery/Shopping
+
   // Business & Professional
   Briefcase, // Business Services
   FileText, // Professional Services
