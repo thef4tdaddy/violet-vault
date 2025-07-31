@@ -1,618 +1,922 @@
-// components/BillManager.jsx
-import React, { useState, useEffect } from "react";
-import { Plus, Edit3, Trash2, Calendar, DollarSign, Clock, Save, X, Sparkles } from "lucide-react";
-import { getBillIcon, getBillIconOptions, getIconName } from "../../utils/billIcons";
+// src/new/UnifiedBillTracker.jsx
+import React, { useState, useMemo } from "react";
+import { useBudget } from "../../hooks/useBudget";
+import {
+  FileText,
+  Calendar,
+  DollarSign,
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  Bell,
+  Search,
+  RefreshCw,
+  Plus,
+  Settings,
+  Target,
+  Filter,
+  Eye,
+} from "lucide-react";
+import { getBillIcon } from "../../utils/billIcons";
+import AddBillModal from "./AddBillModal";
 
-const BillManager = ({ bills, onAddBill, onUpdateBill, onDeleteBill, onAddEnvelope }) => {
-  const [showAddForm, setShowAddForm] = useState(false);
+const UnifiedBillTracker = ({
+  transactions: propTransactions = [], // Unified data source - filters for bills
+  envelopes: propEnvelopes = [],
+  onPayBill,
+  onUpdateBill,
+  onCreateRecurringBill,
+  onSearchNewBills,
+  onError,
+  className = "",
+}) => {
+  const budget = useBudget();
+
+  const transactions = useMemo(
+    () =>
+      propTransactions && propTransactions.length ? propTransactions : budget.allTransactions || [],
+    [propTransactions, budget.allTransactions]
+  );
+
+  const envelopes = useMemo(
+    () => (propEnvelopes && propEnvelopes.length ? propEnvelopes : budget.envelopes || []),
+    [propEnvelopes, budget.envelopes]
+  );
+
+  const reconcileTransaction = budget.reconcileTransaction;
+  const handlePayBillAction = onPayBill || budget.updateBill;
+  const [selectedBills, setSelectedBills] = useState(new Set());
+  const [viewMode, setViewMode] = useState("upcoming");
+  const [isSearching, setIsSearching] = useState(false);
+  const [showBillDetail, setShowBillDetail] = useState(null);
+  const [showAddBillModal, setShowAddBillModal] = useState(false);
   const [editingBill, setEditingBill] = useState(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    amount: "",
-    frequency: "monthly",
-    dueDate: "",
-    category: "Bills",
-    color: "#3B82F6",
-    notes: "",
-    createEnvelope: true,
-    icon: getBillIcon("", "", "Bills"),
+  const [filterOptions, setFilterOptions] = useState({
+    billTypes: ["all"],
+    providers: [],
+    envelopes: [],
+    sortBy: "due_date",
+    showPaid: false,
   });
 
-  const frequencies = [
-    { value: "weekly", label: "Weekly", multiplier: 52 },
-    { value: "biweekly", label: "Bi-weekly", multiplier: 26 },
-    { value: "monthly", label: "Monthly", multiplier: 12 },
-    { value: "quarterly", label: "Quarterly", multiplier: 4 },
-    { value: "semiannual", label: "Semi-annual", multiplier: 2 },
-    { value: "yearly", label: "Yearly", multiplier: 1 },
-    { value: "custom", label: "Custom", multiplier: 1 },
-  ];
+  const bills = useMemo(() => {
+    return transactions
+      .filter((t) => t && (t.type === "bill" || t.type === "recurring_bill"))
+      .map((bill) => {
+        let daysUntilDue = null;
+        let urgency = "normal";
 
-  const categories = [
-    "Bills",
-    "Housing",
-    "Transportation",
-    "Insurance",
-    "Subscriptions",
-    "Healthcare",
-    "Debt",
-    "Savings",
-    "Other",
-  ];
+        if (bill.dueDate) {
+          try {
+            const today = new Date();
+            const due = new Date(bill.dueDate);
 
-  const colors = [
-    "#3B82F6",
-    "#10B981",
-    "#8B5CF6",
-    "#EC4899",
-    "#F59E0B",
-    "#EF4444",
-    "#14B8A6",
-    "#6366F1",
-    "#84CC16",
-    "#F97316",
-    "#06B6D4",
-    "#8B5A2B",
-  ];
+            // Validate date is valid
+            if (!isNaN(due.getTime())) {
+              daysUntilDue = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
 
-  // Calculate how much needs to be saved biweekly for any bill frequency
-  const calculateBiweeklyAmount = (amount, frequency, customFrequency = 1) => {
-    const yearlyAmount =
-      frequency === "custom"
-        ? amount * customFrequency
-        : amount * frequencies.find((f) => f.value === frequency)?.multiplier || 12;
+              if (daysUntilDue < 0) urgency = "overdue";
+              else if (daysUntilDue <= 3) urgency = "urgent";
+              else if (daysUntilDue <= 7) urgency = "soon";
+            }
+          } catch (error) {
+            console.warn(`Invalid due date for bill ${bill.id}:`, bill.dueDate, error);
+          }
+        }
 
-    return yearlyAmount / 26; // 26 biweekly periods per year
-  };
-
-  const calculateMonthlyAmount = (amount, frequency, customFrequency = 1) => {
-    const yearlyAmount =
-      frequency === "custom"
-        ? amount * customFrequency
-        : amount * frequencies.find((f) => f.value === frequency)?.multiplier || 12;
-
-    return yearlyAmount / 12; // 12 months per year
-  };
-
-  const getNextDueDate = (frequency, currentDue) => {
-    if (!currentDue) return "";
-
-    const date = new Date(currentDue);
-
-    switch (frequency) {
-      case "weekly":
-        date.setDate(date.getDate() + 7);
-        break;
-      case "biweekly":
-        date.setDate(date.getDate() + 14);
-        break;
-      case "monthly":
-        date.setMonth(date.getMonth() + 1);
-        break;
-      case "quarterly":
-        date.setMonth(date.getMonth() + 3);
-        break;
-      case "semiannual":
-        date.setMonth(date.getMonth() + 6);
-        break;
-      case "yearly":
-        date.setFullYear(date.getFullYear() + 1);
-        break;
-      default:
-        return currentDue;
-    }
-
-    return date.toISOString().split("T")[0];
-  };
-
-  const resetForm = () => {
-    setFormData({
-      name: "",
-      amount: "",
-      frequency: "monthly",
-      dueDate: "",
-      category: "Bills",
-      color: "#3B82F6",
-      notes: "",
-      customFrequency: "",
-      createEnvelope: true,
-      icon: getBillIcon("", "", "Bills"),
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    if (!formData.name.trim() || !formData.amount) {
-      alert("Please fill in bill name and amount");
-      return;
-    }
-
-    const amount = parseFloat(formData.amount);
-    if (amount <= 0) {
-      alert("Amount must be greater than 0");
-      return;
-    }
-
-    const billData = {
-      ...formData,
-      id: editingBill
-        ? editingBill.id
-        : `bill_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
-      amount,
-      customFrequency:
-        formData.frequency === "custom" ? parseFloat(formData.customFrequency) || 1 : undefined,
-      biweeklyAmount: calculateBiweeklyAmount(amount, formData.frequency, formData.customFrequency),
-      monthlyAmount: calculateMonthlyAmount(amount, formData.frequency, formData.customFrequency),
-      nextDueDate: getNextDueDate(formData.frequency, formData.dueDate),
-    };
-
-    if (editingBill) {
-      onUpdateBill(editingBill.id, billData);
-      setEditingBill(null);
-    } else {
-      onAddBill(billData);
-
-      // Create envelope if requested
-      if (formData.createEnvelope && onAddEnvelope) {
-        const envelopeData = {
-          id: `bill_${billData.id}`,
-          name: formData.name,
-          biweeklyAllocation: billData.biweeklyAmount,
-          currentBalance: 0,
-          category: formData.category,
-          color: formData.color,
-          priority: "medium",
-          dueDate: formData.dueDate,
-          linkedBillId: billData.id,
-          notes: `Auto-created for ${formData.name} bill`,
-          targetAmount: billData.biweeklyAmount * 2,
-          spendingHistory: [],
-          isFromBill: true,
+        return {
+          ...bill,
+          // Ensure required fields have valid values
+          amount: typeof bill.amount === "number" ? bill.amount : 0,
+          description: bill.description || bill.provider || `Bill ${bill.id}`,
+          isPaid: Boolean(bill.isPaid),
+          daysUntilDue,
+          urgency,
         };
-        onAddEnvelope(envelopeData);
-      }
+      });
+  }, [transactions]);
 
-      setShowAddForm(false);
-    }
-
-    resetForm();
-  };
-
-  const startEdit = (bill) => {
-    setFormData({
-      name: bill.name,
-      amount: bill.amount,
-      frequency: bill.frequency,
-      dueDate: bill.dueDate,
-      category: bill.category,
-      color: bill.color,
-      notes: bill.notes || "",
-      customFrequency: bill.customFrequency || "",
-      createEnvelope: false, // Don't show toggle for editing
-      icon: bill.icon || getBillIcon(bill.name || "", bill.notes || "", bill.category || "Bills"),
-    });
-    setEditingBill(bill);
-    setShowAddForm(false);
-  };
-
-  const cancelEdit = () => {
-    setShowAddForm(false);
-    setEditingBill(null);
-    resetForm();
-  };
-
-  const handleDelete = (bill) => {
-    if (
-      confirm(`Are you sure you want to delete "${bill.name}"? This will also remove its envelope.`)
-    ) {
-      onDeleteBill(bill.id);
-    }
-  };
-
-  const getFrequencyLabel = (bill) => {
-    if (bill.frequency === "custom") {
-      return `${bill.customFrequency}x per year`;
-    }
-    return frequencies.find((f) => f.value === bill.frequency)?.label || bill.frequency;
-  };
-
-  // Update icon when form data changes
-  useEffect(() => {
-    if (!editingBill && (formData.name || formData.category)) {
-      const suggestedIcon = getBillIcon(
-        formData.name || "",
-        formData.notes || "",
-        formData.category || "Bills"
-      );
-      setFormData((prev) => ({ ...prev, icon: suggestedIcon }));
-    }
-  }, [formData.name, formData.category, formData.notes, editingBill]);
-
-  const getDaysUntilDue = (dueDate) => {
-    if (!dueDate) return null;
-
-    const today = new Date();
-    const due = new Date(dueDate);
-    const diffTime = due - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays < 0) return { text: "Overdue", color: "text-red-600" };
-    if (diffDays === 0) return { text: "Due Today", color: "text-red-600" };
-    if (diffDays === 1) return { text: "Due Tomorrow", color: "text-orange-600" };
-    if (diffDays <= 7) return { text: `${diffDays} days`, color: "text-orange-600" };
-    if (diffDays <= 30) return { text: `${diffDays} days`, color: "text-blue-600" };
+  const categorizedBills = useMemo(() => {
+    const upcomingBills = bills.filter((b) => !b.isPaid && b.daysUntilDue >= 0);
+    const overdueBills = bills.filter((b) => !b.isPaid && b.daysUntilDue < 0);
+    const paidBills = bills.filter((b) => b.isPaid);
 
     return {
-      text: `${Math.floor(diffDays / 30)} months`,
-      color: "text-gray-600",
+      upcoming: upcomingBills.sort((a, b) => (a.daysUntilDue || 999) - (b.daysUntilDue || 999)),
+      overdue: overdueBills.sort((a, b) => (a.daysUntilDue || 0) - (b.daysUntilDue || 0)),
+      paid: paidBills.sort(
+        (a, b) => new Date(b.paidDate || b.date) - new Date(a.paidDate || a.date)
+      ),
+      all: bills,
     };
+  }, [bills]);
+
+  const totals = useMemo(() => {
+    const upcomingTotal = categorizedBills.upcoming.reduce((sum, b) => sum + Math.abs(b.amount), 0);
+    const overdueTotal = categorizedBills.overdue.reduce((sum, b) => sum + Math.abs(b.amount), 0);
+    const paidThisMonth = categorizedBills.paid
+      .filter((b) => new Date(b.paidDate || b.date).getMonth() === new Date().getMonth())
+      .reduce((sum, b) => sum + Math.abs(b.amount), 0);
+
+    return {
+      upcoming: upcomingTotal,
+      overdue: overdueTotal,
+      paidThisMonth,
+      totalBills: bills.length,
+    };
+  }, [categorizedBills, bills]);
+
+  const displayBills = useMemo(() => {
+    let billsToShow = categorizedBills[viewMode] || [];
+
+    if (filterOptions.billTypes.length > 0 && !filterOptions.billTypes.includes("all")) {
+      billsToShow = billsToShow.filter((bill) =>
+        filterOptions.billTypes.includes(bill.metadata?.type || bill.category?.toLowerCase())
+      );
+    }
+
+    if (filterOptions.providers.length > 0) {
+      billsToShow = billsToShow.filter((bill) => filterOptions.providers.includes(bill.provider));
+    }
+
+    if (filterOptions.envelopes.length > 0) {
+      billsToShow = billsToShow.filter((bill) => filterOptions.envelopes.includes(bill.envelopeId));
+    }
+
+    switch (filterOptions.sortBy) {
+      case "due_date":
+        billsToShow.sort((a, b) => new Date(a.dueDate || a.date) - new Date(b.dueDate || b.date));
+        break;
+      case "amount_desc":
+        billsToShow.sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount));
+        break;
+      case "amount_asc":
+        billsToShow.sort((a, b) => Math.abs(a.amount) - Math.abs(b.amount));
+        break;
+      case "provider":
+        billsToShow.sort((a, b) => (a.provider || "").localeCompare(b.provider || ""));
+        break;
+      case "urgency": {
+        const urgencyOrder = { overdue: 0, urgent: 1, soon: 2, normal: 3 };
+        billsToShow.sort((a, b) => urgencyOrder[a.urgency] - urgencyOrder[b.urgency]);
+        break;
+      }
+    }
+
+    return billsToShow;
+  }, [categorizedBills, viewMode, filterOptions]);
+
+  const getUrgencyStyle = (urgency, isPaid = false) => {
+    if (isPaid) return "border-green-200 bg-green-50";
+
+    switch (urgency) {
+      case "overdue":
+        return "border-red-500 bg-red-50";
+      case "urgent":
+        return "border-orange-500 bg-orange-50";
+      case "soon":
+        return "border-yellow-500 bg-yellow-50";
+      default:
+        return "border-gray-200 bg-white/60";
+    }
   };
 
+  const getUrgencyIcon = (urgency, isPaid = false) => {
+    if (isPaid) return <CheckCircle className="h-4 w-4 text-green-600" />;
+
+    switch (urgency) {
+      case "overdue":
+        return <AlertTriangle className="h-4 w-4 text-red-600" />;
+      case "urgent":
+        return <Clock className="h-4 w-4 text-orange-600" />;
+      case "soon":
+        return <Bell className="h-4 w-4 text-yellow-600" />;
+      default:
+        return <Calendar className="h-4 w-4 text-gray-600" />;
+    }
+  };
+
+  const getCategoryIcon = (bill) => {
+    // First priority: Check if bill has a stored icon component
+    if (bill.icon) {
+      const IconComponent = bill.icon;
+      return <IconComponent className="h-6 w-6" />;
+    }
+
+    // Second priority: Check metadata for legacy icon reference
+    if (bill.metadata?.categoryIcon) {
+      // If it's a string emoji, return it
+      if (typeof bill.metadata.categoryIcon === "string") {
+        return bill.metadata.categoryIcon;
+      }
+      // If it's a component, render it
+      if (typeof bill.metadata.categoryIcon === "function") {
+        const IconComponent = bill.metadata.categoryIcon;
+        return <IconComponent className="h-6 w-6" />;
+      }
+    }
+
+    // Third priority: Use smart icon detection from billIcons utility
+    const IconComponent = getBillIcon(
+      bill.provider || "",
+      bill.description || "",
+      bill.category || ""
+    );
+
+    return <IconComponent className="h-6 w-6" />;
+  };
+
+  const handlePayBill = (billId) => {
+    try {
+      const bill = bills.find((b) => b.id === billId);
+      if (!bill) {
+        onError?.("Bill not found");
+        return;
+      }
+
+      if (bill.isPaid) {
+        onError?.("Bill is already paid");
+        return;
+      }
+
+      // Check if there are sufficient funds
+      if (bill.envelopeId) {
+        const envelope = envelopes.find((env) => env.id === bill.envelopeId);
+        if (!envelope) {
+          onError?.("Assigned envelope not found");
+          return;
+        }
+
+        // Allow envelopes to have more money than their budget
+        // Only check if the envelope has any balance at all (currentBalance can exceed budget)
+        const availableBalance = envelope.currentBalance || 0;
+        const billAmount = Math.abs(bill.amount);
+
+        if (availableBalance < billAmount) {
+          onError?.(
+            `Insufficient funds in envelope "${envelope.name}". Available: $${availableBalance.toFixed(2)}, Required: $${billAmount.toFixed(2)}`
+          );
+          return;
+        }
+      } else {
+        const unassignedCash = budget.unassignedCash || 0;
+        const billAmount = Math.abs(bill.amount);
+
+        if (unassignedCash < billAmount) {
+          onError?.(
+            `Insufficient unassigned cash. Available: $${unassignedCash.toFixed(2)}, Required: $${billAmount.toFixed(2)}`
+          );
+          return;
+        }
+      }
+
+      const updatedBill = {
+        ...bill,
+        isPaid: true,
+        paidDate: new Date().toISOString().split("T")[0],
+      };
+
+      handlePayBillAction?.(updatedBill);
+
+      // Create transaction record and update balances
+      const paymentTxn = {
+        id: `${bill.id}_payment_${Date.now()}`,
+        date: updatedBill.paidDate,
+        description: bill.provider || bill.description || "Bill Payment",
+        amount: -Math.abs(bill.amount),
+        envelopeId: bill.envelopeId || "unassigned",
+        category: bill.category,
+        type: "transaction",
+        source: "bill_payment",
+      };
+
+      if (bill.envelopeId) {
+        const billAmount = Math.abs(bill.amount);
+        const updatedEnvelopes = envelopes.map((env) => {
+          if (env.id === bill.envelopeId) {
+            const currentBalance = env.currentBalance || 0;
+            const newBalance = currentBalance - billAmount; // Allow negative balances if needed
+
+            return {
+              ...env,
+              currentBalance: newBalance,
+              // Track last transaction for debugging
+              lastTransaction: {
+                type: "bill_payment",
+                amount: -billAmount,
+                date: paymentTxn.date,
+                billId: bill.id,
+              },
+            };
+          }
+          return env;
+        });
+
+        reconcileTransaction({
+          transaction: paymentTxn,
+          updatedEnvelopes,
+        });
+      } else {
+        const billAmount = Math.abs(bill.amount);
+        const currentUnassigned = budget.unassignedCash || 0;
+        const newUnassigned = currentUnassigned - billAmount; // Allow negative unassigned cash if needed
+
+        reconcileTransaction({
+          transaction: paymentTxn,
+          newUnassignedCash: newUnassigned,
+        });
+      }
+    } catch (error) {
+      console.error("Error paying bill:", error);
+      onError?.(error.message || "Failed to pay bill");
+    }
+  };
+
+  const searchNewBills = async () => {
+    setIsSearching(true);
+    try {
+      await onSearchNewBills?.();
+    } catch (error) {
+      onError?.(error);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const toggleBillSelection = (billId) => {
+    setSelectedBills((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(billId)) {
+        newSet.delete(billId);
+      } else {
+        newSet.add(billId);
+      }
+      return newSet;
+    });
+  };
+
+  const paySelectedBills = () => {
+    if (selectedBills.size === 0) {
+      onError?.("No bills selected");
+      return;
+    }
+
+    try {
+      let successCount = 0;
+      let errorCount = 0;
+      const errors = [];
+
+      selectedBills.forEach((billId) => {
+        try {
+          handlePayBill(billId);
+          successCount++;
+        } catch (error) {
+          errorCount++;
+          errors.push(`Bill ${billId}: ${error.message}`);
+        }
+      });
+
+      setSelectedBills(new Set());
+
+      if (errorCount > 0) {
+        onError?.(
+          `${successCount} bills paid successfully, ${errorCount} failed:\n${errors.join("\n")}`
+        );
+      } else {
+        console.log(`Successfully paid ${successCount} bills`);
+      }
+    } catch (error) {
+      console.error("Error paying selected bills:", error);
+      onError?.(error.message || "Failed to pay selected bills");
+    }
+  };
+
+  const viewModes = [
+    {
+      id: "upcoming",
+      label: "Upcoming",
+      count: categorizedBills.upcoming.length,
+      color: "blue",
+    },
+    {
+      id: "overdue",
+      label: "Overdue",
+      count: categorizedBills.overdue.length,
+      color: "red",
+    },
+    {
+      id: "paid",
+      label: "Paid",
+      count: categorizedBills.paid.length,
+      color: "green",
+    },
+    { id: "all", label: "All Bills", count: bills.length, color: "gray" },
+  ];
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold flex items-center">
-          <Calendar className="h-5 w-5 mr-2 text-blue-600" />
-          Manage Bills ({bills.length})
-        </h2>
-        <button
-          onClick={() => {
-            setShowAddForm(true);
-            setEditingBill(null);
-            resetForm();
-          }}
-          className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-xl hover:from-purple-700 hover:to-purple-800 transition-all duration-200 flex items-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-purple-500/50 font-semibold"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Bill
-        </button>
+    <div className={`space-y-6 ${className}`}>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+            <div className="relative mr-3">
+              <div className="absolute inset-0 bg-blue-500 rounded-xl blur-lg opacity-30"></div>
+              <div className="relative bg-blue-500 p-2 rounded-xl">
+                <FileText className="h-6 w-6 text-white" />
+              </div>
+            </div>
+            Bill Tracker
+          </h2>
+          <p className="text-gray-600 mt-1">Manage bills, due dates, and payments</p>
+        </div>
+
+        <div className="flex gap-3">
+          <button
+            onClick={searchNewBills}
+            disabled={isSearching}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 flex items-center"
+          >
+            {isSearching ? (
+              <>
+                <RefreshCw className="h-4 w-4 mr-2 animate-spin" /> Searching...
+              </>
+            ) : (
+              <>
+                <Search className="h-4 w-4 mr-2" /> Find New Bills
+              </>
+            )}
+          </button>
+
+          <button
+            onClick={() => setShowAddBillModal(true)}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center"
+          >
+            <Plus className="h-4 w-4 mr-2" /> Add Bill
+          </button>
+        </div>
       </div>
 
-      {/* Bills List */}
-      <div className="glassmorphism rounded-2xl border border-white/20 shadow-xl overflow-hidden">
-        {bills.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            <Calendar className="h-12 w-12 mx-auto mb-3 opacity-50" />
-            <p>No bills added yet. Click "Add Bill" to get started.</p>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-gradient-to-br from-red-500 to-red-600 p-4 rounded-lg text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-red-100 text-sm">Overdue</p>
+              <p className="text-2xl font-bold">${totals.overdue.toFixed(2)}</p>
+            </div>
+            <AlertTriangle className="h-8 w-8 text-red-200" />
+          </div>
+          <p className="text-xs text-red-100 mt-2">
+            {categorizedBills.overdue.length} bills overdue
+          </p>
+        </div>
+
+        <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-4 rounded-lg text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-orange-100 text-sm">Due Soon</p>
+              <p className="text-2xl font-bold">${totals.upcoming.toFixed(2)}</p>
+            </div>
+            <Clock className="h-8 w-8 text-orange-200" />
+          </div>
+          <p className="text-xs text-orange-100 mt-2">
+            {categorizedBills.upcoming.length} bills upcoming
+          </p>
+        </div>
+
+        <div className="bg-gradient-to-br from-green-500 to-green-600 p-4 rounded-lg text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-green-100 text-sm">Paid This Month</p>
+              <p className="text-2xl font-bold">${totals.paidThisMonth.toFixed(2)}</p>
+            </div>
+            <CheckCircle className="h-8 w-8 text-green-200" />
+          </div>
+          <p className="text-xs text-green-100 mt-2">{categorizedBills.paid.length} bills paid</p>
+        </div>
+
+        <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-4 rounded-lg text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-blue-100 text-sm">Total Bills</p>
+              <p className="text-2xl font-bold">{totals.totalBills}</p>
+            </div>
+            <FileText className="h-8 w-8 text-blue-200" />
+          </div>
+          <p className="text-xs text-blue-100 mt-2">All tracked bills</p>
+        </div>
+      </div>
+
+      <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+        <div className="flex flex-wrap gap-2 mb-4">
+          {viewModes.map((mode) => (
+            <button
+              key={mode.id}
+              onClick={() => setViewMode(mode.id)}
+              className={`px-4 py-2 rounded-lg flex items-center transition-all ${
+                viewMode === mode.id
+                  ? `bg-${mode.color}-600 text-white`
+                  : `text-${mode.color}-700 hover:bg-${mode.color}-50`
+              }`}
+            >
+              <span className="font-medium">{mode.label}</span>
+              <span
+                className={`ml-2 px-2 py-1 rounded-full text-xs ${
+                  viewMode === mode.id ? "bg-white/20" : `bg-${mode.color}-100`
+                }`}
+              >
+                {mode.count}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        <div className="flex items-center justify-between">
+          <h4 className="font-medium text-gray-900 flex items-center">
+            <Filter className="h-4 w-4 mr-2" /> Filters
+          </h4>
+
+          <div className="flex gap-3">
+            <select
+              value={filterOptions.sortBy}
+              onChange={(e) =>
+                setFilterOptions((prev) => ({
+                  ...prev,
+                  sortBy: e.target.value,
+                }))
+              }
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            >
+              <option value="due_date">Due Date</option>
+              <option value="amount_desc">Highest Amount</option>
+              <option value="amount_asc">Lowest Amount</option>
+              <option value="provider">Provider Name</option>
+              <option value="urgency">Urgency</option>
+            </select>
+
+            {selectedBills.size > 0 && (
+              <button
+                onClick={paySelectedBills}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center text-sm"
+              >
+                <CheckCircle className="h-4 w-4 mr-2" /> Pay {selectedBills.size} Selected
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        {displayBills.length === 0 ? (
+          <div className="text-center py-12 text-gray-500">
+            <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
+            <p className="font-medium">No bills found</p>
+            <p className="text-sm mt-1">
+              {viewMode === "upcoming"
+                ? "All caught up! No upcoming bills."
+                : viewMode === "overdue"
+                  ? "Great! No overdue bills."
+                  : viewMode === "paid"
+                    ? "No paid bills in this period."
+                    : "No bills match your current filters."}
+            </p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-200">
-            {bills.map((bill, index) => {
-              const dueInfo = getDaysUntilDue(bill.dueDate);
+          displayBills.map((bill) => {
+            const envelope = envelopes.find((env) => env.id === bill.envelopeId);
+            const urgencyStyle = getUrgencyStyle(bill.urgency, bill.isPaid);
 
-              return (
-                <div key={bill.id || `bill-${index}`} className="p-6 hover:bg-gray-50">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center space-x-3">
-                        <div
-                          className="w-4 h-4 rounded-full"
-                          style={{ backgroundColor: bill.color }}
-                        />
-                        {React.createElement(
-                          bill.icon ||
-                            getBillIcon(
-                              bill.name || "",
-                              bill.notes || "",
-                              bill.category || "Bills"
-                            ),
-                          {
-                            className: "h-5 w-5 text-gray-600",
-                            title: getIconName(bill.icon),
-                          }
+            return (
+              <div
+                key={bill.id}
+                className={`p-4 rounded-lg border-2 transition-all hover:shadow-lg ${urgencyStyle} ${
+                  selectedBills.has(bill.id) ? "ring-2 ring-blue-500" : ""
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={selectedBills.has(bill.id)}
+                      onChange={() => toggleBillSelection(bill.id)}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mr-3"
+                    />
+
+                    <div className="text-2xl mr-3">{getCategoryIcon(bill)}</div>
+
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-gray-900">
+                          {bill.provider || bill.description}
+                        </p>
+                        {getUrgencyIcon(bill.urgency, bill.isPaid)}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm text-gray-600">{bill.category}</p>
+                        {envelope && (
+                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                            → {envelope.name}
+                          </span>
                         )}
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-3">
-                          <h3 className="text-lg font-semibold text-gray-900">{bill.name}</h3>
-                          <span className="text-sm px-2 py-1 bg-gray-100 rounded-full text-gray-600">
-                            {bill.category}
-                          </span>
-                        </div>
-                        <div className="flex items-center space-x-6 mt-2 text-sm text-gray-600">
-                          <div className="flex items-center">
-                            <DollarSign className="h-4 w-4 mr-1" />${bill.amount.toFixed(2)}{" "}
-                            {getFrequencyLabel(bill)}
-                          </div>
-                          <div className="flex items-center">
-                            <Clock className="h-4 w-4 mr-1" />${bill.biweeklyAmount.toFixed(2)}{" "}
-                            biweekly
-                          </div>
-                          {dueInfo && (
-                            <div className={`flex items-center ${dueInfo.color}`}>
-                              <Calendar className="h-4 w-4 mr-1" />
-                              {dueInfo.text}
-                            </div>
-                          )}
-                        </div>
-                        {bill.notes && <p className="text-sm text-gray-500 mt-1">{bill.notes}</p>}
+                      <div className="flex items-center gap-4 mt-1">
+                        {bill.dueDate && (
+                          <p className="text-xs text-gray-500 flex items-center">
+                            <Calendar className="h-3 w-3 mr-1" /> Due:{" "}
+                            {new Date(bill.dueDate).toLocaleDateString()}
+                          </p>
+                        )}
+                        {bill.daysUntilDue !== null && !bill.isPaid && (
+                          <p className="text-xs text-gray-500">
+                            {bill.daysUntilDue < 0
+                              ? `${Math.abs(bill.daysUntilDue)} days overdue`
+                              : bill.daysUntilDue === 0
+                                ? "Due today"
+                                : `${bill.daysUntilDue} days remaining`}
+                          </p>
+                        )}
+                        {bill.isPaid && bill.paidDate && (
+                          <p className="text-xs text-green-600">
+                            Paid: {new Date(bill.paidDate).toLocaleDateString()}
+                          </p>
+                        )}
                       </div>
+                      {bill.accountNumber && (
+                        <p className="text-xs text-gray-500 mt-1">Account: {bill.accountNumber}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <p className="font-bold text-gray-900 text-lg">
+                        ${Math.abs(bill.amount).toFixed(2)}
+                      </p>
+                      {bill.metadata?.minimumPayment &&
+                        bill.metadata.minimumPayment !== Math.abs(bill.amount) && (
+                          <p className="text-xs text-gray-500">
+                            Min: ${bill.metadata.minimumPayment.toFixed(2)}
+                          </p>
+                        )}
+                      {bill.metadata?.previousBalance && (
+                        <p className="text-xs text-gray-500">
+                          Prev: ${bill.metadata.previousBalance.toFixed(2)}
+                        </p>
+                      )}
                     </div>
 
-                    <div className="flex items-center space-x-2">
+                    <div className="flex flex-col gap-1">
+                      {!bill.isPaid && (
+                        <button
+                          onClick={() => handlePayBill(bill.id)}
+                          className="bg-green-600 text-white px-3 py-1 text-xs rounded hover:bg-green-700 flex items-center"
+                        >
+                          <CheckCircle className="h-3 w-3 mr-1" /> Pay
+                        </button>
+                      )}
+
                       <button
-                        onClick={() => startEdit(bill)}
-                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        onClick={() => setShowBillDetail(bill)}
+                        className="text-gray-400 hover:text-blue-600 p-1 rounded"
+                        title="View details"
                       >
-                        <Edit3 className="h-4 w-4" />
+                        <Eye className="h-4 w-4" />
                       </button>
+
                       <button
-                        onClick={() => handleDelete(bill)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        onClick={() => setEditingBill(bill)}
+                        className="text-gray-400 hover:text-gray-600 p-1 rounded"
+                        title="Edit bill"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Settings className="h-4 w-4" />
                       </button>
                     </div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
+
+                {(bill.metadata?.statementPeriod || bill.metadata?.serviceAddress) && (
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <div className="text-sm text-gray-600 space-y-1">
+                      {bill.metadata.statementPeriod && (
+                        <div className="flex justify-between">
+                          <span>Statement Period:</span>
+                          <span>
+                            {bill.metadata.statementPeriod.start} -{" "}
+                            {bill.metadata.statementPeriod.end}
+                          </span>
+                        </div>
+                      )}
+                      {bill.metadata.serviceAddress && (
+                        <div className="flex justify-between">
+                          <span>Service Address:</span>
+                          <span className="text-right max-w-xs truncate">
+                            {bill.metadata.serviceAddress}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })
         )}
       </div>
 
-      {/* Add/Edit Form Modal */}
-      {(showAddForm || editingBill) && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="glassmorphism rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-white/30 shadow-2xl">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-semibold">
-                {editingBill ? "Edit Bill" : "Add New Bill"}
-              </h3>
-              <button
-                onClick={() => {
-                  setShowAddForm(false);
-                  setEditingBill(null);
-                  resetForm();
-                }}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
+      {showBillDetail && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl w-full max-w-lg max-h-96 overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Bill Details</h3>
+                <button
+                  onClick={() => setShowBillDetail(null)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ✕
+                </button>
+              </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Bill Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g., Car Insurance, Netflix, Property Tax"
-                    required
-                  />
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="text-3xl">{getCategoryIcon(showBillDetail)}</div>
+                  <div>
+                    <p className="font-medium text-lg">
+                      {showBillDetail.provider || showBillDetail.description}
+                    </p>
+                    <p className="text-sm text-gray-600">{showBillDetail.category}</p>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Amount *</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={formData.amount}
-                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="0.00"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Payment Frequency *
-                  </label>
-                  <select
-                    value={formData.frequency}
-                    onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  >
-                    {frequencies.map((freq) => (
-                      <option key={freq.value} value={freq.value}>
-                        {freq.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {formData.frequency === "custom" && (
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Times per Year
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Amount Due
                     </label>
-                    <input
-                      type="number"
-                      min="1"
-                      max="365"
-                      value={formData.customFrequency}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          customFrequency: e.target.value,
-                        })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      placeholder="e.g., 3 for every 4 months"
-                    />
+                    <p className="text-2xl font-bold text-gray-900">
+                      ${Math.abs(showBillDetail.amount).toFixed(2)}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+                    <p className="text-sm">
+                      {showBillDetail.dueDate
+                        ? new Date(showBillDetail.dueDate).toLocaleDateString()
+                        : "Not specified"}
+                    </p>
+                  </div>
+                </div>
+
+                {showBillDetail.accountNumber && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Account Number
+                    </label>
+                    <p className="text-sm font-mono">{showBillDetail.accountNumber}</p>
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Next Due Date
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Status & Urgency
                   </label>
-                  <input
-                    type="date"
-                    value={formData.dueDate}
-                    onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  >
-                    {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
-                  <div className="flex gap-2 flex-wrap">
-                    {colors.map((color) => (
-                      <button
-                        key={color}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, color })}
-                        className={`w-8 h-8 rounded-lg border-2 transition-all ${
-                          formData.color === color
-                            ? "border-gray-800 scale-110"
-                            : "border-gray-200 hover:border-gray-400"
-                        }`}
-                        style={{ backgroundColor: color }}
-                      />
-                    ))}
+                  <div className="flex items-center gap-2">
+                    {getUrgencyIcon(showBillDetail.urgency, showBillDetail.isPaid)}
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm ${
+                        showBillDetail.isPaid
+                          ? "bg-green-100 text-green-700"
+                          : showBillDetail.urgency === "overdue"
+                            ? "bg-red-100 text-red-700"
+                            : showBillDetail.urgency === "urgent"
+                              ? "bg-orange-100 text-orange-700"
+                              : showBillDetail.urgency === "soon"
+                                ? "bg-yellow-100 text-yellow-700"
+                                : "bg-gray-100 text-gray-700"
+                      }`}
+                    >
+                      {showBillDetail.isPaid
+                        ? "Paid"
+                        : showBillDetail.urgency === "overdue"
+                          ? "Overdue"
+                          : showBillDetail.urgency === "urgent"
+                            ? "Due Soon"
+                            : showBillDetail.urgency === "soon"
+                              ? "Due This Week"
+                              : "Upcoming"}
+                    </span>
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Sparkles className="h-4 w-4 inline mr-1" />
-                    Icon
-                  </label>
-                  <div className="flex gap-2 flex-wrap">
-                    {getBillIconOptions(formData.category).map((IconComponent, index) => {
-                      const isSelected = formData.icon === IconComponent;
-                      return (
-                        <button
-                          key={index}
-                          type="button"
-                          onClick={() => setFormData({ ...formData, icon: IconComponent })}
-                          className={`p-2 rounded-lg border-2 transition-all hover:bg-gray-50 ${
-                            isSelected
-                              ? "border-blue-500 bg-blue-50 scale-110"
-                              : "border-gray-200 hover:border-gray-400"
-                          }`}
-                          title={getIconName(IconComponent)}
-                        >
-                          {React.createElement(IconComponent, {
-                            className: "h-5 w-5 text-gray-600",
-                          })}
-                        </button>
-                      );
-                    })}
+                {showBillDetail.envelopeId && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Assigned Envelope
+                    </label>
+                    <p className="text-sm">
+                      {envelopes.find((env) => env.id === showBillDetail.envelopeId)?.name ||
+                        "Unknown"}
+                    </p>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Icons are automatically suggested based on bill name and category
+                )}
+
+                {showBillDetail.notes && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                    <p className="text-sm text-gray-600">{showBillDetail.notes}</p>
+                  </div>
+                )}
+
+                <div className="bg-blue-50 p-3 rounded-lg">
+                  <p className="text-sm text-blue-700">
+                    <strong>Source:</strong>{" "}
+                    {showBillDetail.source === "bill_tracker"
+                      ? "Email Detection"
+                      : showBillDetail.source === "manual"
+                        ? "Manual Entry"
+                        : "Imported"}
                   </p>
+                  {showBillDetail.metadata?.confidence && (
+                    <p className="text-sm text-blue-700 mt-1">
+                      <strong>Detection Confidence:</strong>{" "}
+                      {Math.round(showBillDetail.metadata.confidence * 100)}%
+                    </p>
+                  )}
                 </div>
 
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Notes (Optional)
-                  </label>
-                  <textarea
-                    value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="Any additional notes about this bill..."
-                  />
-                </div>
-
-                {!editingBill && (
-                  <div className="md:col-span-2">
-                    <div className="flex items-start space-x-3">
-                      <input
-                        id="create-envelope-checkbox"
-                        type="checkbox"
-                        checked={formData.createEnvelope}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            createEnvelope: e.target.checked,
-                          })
-                        }
-                        className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded mt-1 flex-shrink-0"
-                      />
-                      <label htmlFor="create-envelope-checkbox" className="flex-1">
-                        <span className="text-sm font-medium text-gray-700 block">
-                          Create associated envelope for budgeting
-                        </span>
-                        <p className="text-xs text-gray-500 mt-1">
-                          This will create an envelope to help you save for this bill
-                        </p>
-                      </label>
-                    </div>
+                {!showBillDetail.isPaid && (
+                  <div className="flex gap-3 pt-4 border-t">
+                    <button
+                      onClick={() => {
+                        handlePayBill(showBillDetail.id);
+                        setShowBillDetail(null);
+                      }}
+                      className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 flex items-center justify-center"
+                    >
+                      <CheckCircle className="h-4 w-4 mr-2" /> Mark as Paid
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditingBill(showBillDetail);
+                        setShowBillDetail(null);
+                      }}
+                      className="flex-1 bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 flex items-center justify-center"
+                    >
+                      <Settings className="h-4 w-4 mr-2" /> Edit Bill
+                    </button>
                   </div>
                 )}
               </div>
-
-              {/* Preview */}
-              {formData.amount && (
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-medium text-gray-900 mb-2">Savings Preview:</h4>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-gray-600">Monthly equivalent:</span>
-                      <span className="font-medium ml-2">
-                        $
-                        {calculateMonthlyAmount(
-                          parseFloat(formData.amount) || 0,
-                          formData.frequency,
-                          formData.customFrequency
-                        ).toFixed(2)}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-gray-600">Biweekly needed:</span>
-                      <span className="font-medium ml-2">
-                        $
-                        {calculateBiweeklyAmount(
-                          parseFloat(formData.amount) || 0,
-                          formData.frequency,
-                          formData.customFrequency
-                        ).toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex flex-col sm:flex-row gap-3">
-                <button
-                  type="button"
-                  onClick={cancelEdit}
-                  className="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 w-full sm:w-auto"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold px-4 py-2 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-purple-400/30 w-auto"
-                >
-                  <Save className="h-4 w-4 mr-2" />
-                  {editingBill ? "Update Bill" : "Add Bill"}
-                </button>
-              </div>
-            </form>
+            </div>
           </div>
         </div>
+      )}
+
+      {/* Add Bill Modal */}
+      {showAddBillModal && (
+        <AddBillModal
+          isOpen={showAddBillModal}
+          onClose={() => setShowAddBillModal(false)}
+          onAddBill={(newBill) => {
+            if (onCreateRecurringBill) {
+              onCreateRecurringBill(newBill);
+            } else {
+              // Fallback to budget context
+              budget.setAllTransactions([...transactions, newBill]);
+            }
+            setShowAddBillModal(false);
+          }}
+          onAddEnvelope={(envelopeData) => {
+            // Add envelope to budget context
+            budget.addEnvelope(envelopeData);
+          }}
+        />
+      )}
+
+      {/* Edit Bill Modal */}
+      {editingBill && (
+        <AddBillModal
+          isOpen={!!editingBill}
+          onClose={() => setEditingBill(null)}
+          editingBill={editingBill}
+          onUpdateBill={(updatedBill) => {
+            if (onUpdateBill) {
+              onUpdateBill(updatedBill);
+            } else {
+              // Fallback to budget context
+              const updatedTransactions = transactions.map((t) =>
+                t.id === updatedBill.id ? updatedBill : t
+              );
+              budget.setAllTransactions(updatedTransactions);
+            }
+            setEditingBill(null);
+          }}
+          onAddEnvelope={(envelopeData) => {
+            // Add envelope to budget context
+            budget.addEnvelope(envelopeData);
+          }}
+        />
       )}
     </div>
   );
 };
 
-export default React.memo(BillManager);
+export default UnifiedBillTracker;

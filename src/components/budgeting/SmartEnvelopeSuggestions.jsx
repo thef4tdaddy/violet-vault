@@ -36,35 +36,14 @@ const SmartEnvelopeSuggestions = ({
     bufferPercentage: 1.1, // 110% for suggestions
   });
 
-  // Chart colors for new envelope suggestions
-  const chartColors = [
-    "#a855f7",
-    "#06b6d4",
-    "#10b981",
-    "#f59e0b",
-    "#ef4444",
-    "#8b5cf6",
-    "#14b8a6",
-    "#f97316",
-    "#84cc16",
-    "#6366f1",
-  ];
-
-  // Filter transactions by date range
-  const getDateRange = () => {
+  const filteredTransactions = useMemo(() => {
     const now = new Date();
     const ranges = {
-      "1month": new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()),
-      "3months": new Date(now.getFullYear(), now.getMonth() - 3, now.getDate()),
-      "6months": new Date(now.getFullYear(), now.getMonth() - 6, now.getDate()),
-      "1year": new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()),
-      all: new Date(2020, 0, 1),
+      7: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000),
+      30: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000),
+      90: new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000),
     };
-    return ranges[dateRange];
-  };
-
-  const filteredTransactions = useMemo(() => {
-    const startDate = getDateRange();
+    const startDate = ranges[dateRange];
     return transactions.filter((t) => new Date(t.date) >= startDate);
   }, [transactions, dateRange]);
 
@@ -94,6 +73,20 @@ const SmartEnvelopeSuggestions = ({
       overfundingThreshold,
       bufferPercentage,
     } = analysisSettings;
+
+    // Chart colors for new envelope suggestions
+    const chartColors = [
+      "#a855f7",
+      "#06b6d4",
+      "#10b981",
+      "#f59e0b",
+      "#ef4444",
+      "#8b5cf6",
+      "#14b8a6",
+      "#f97316",
+      "#84cc16",
+      "#6366f1",
+    ];
 
     // 1. UNASSIGNED TRANSACTION ANALYSIS
     const unassignedTransactions = filteredTransactions.filter(
@@ -293,7 +286,6 @@ const SmartEnvelopeSuggestions = ({
     analysisSettings,
     dismissedSuggestions,
     showDismissed,
-    chartColors,
   ]);
 
   const handleApplySuggestion = (suggestion) => {

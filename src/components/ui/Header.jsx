@@ -1,14 +1,32 @@
 import React, { useState, memo, useCallback } from "react";
-import { Upload, Download, LogOut, AlertTriangle, RefreshCw } from "lucide-react";
+import { Upload, Download, LogOut, AlertTriangle, RefreshCw, Cloud, Key } from "lucide-react";
 import UserIndicator from "../auth/UserIndicator";
 import logoWithText from "../../assets/Shield Text Logo.png";
+import ChangePasswordModal from "../auth/ChangePasswordModal";
+
+const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
 const Header = memo(
-  ({ onExport, onImport, onLogout, onResetEncryption, currentUser, onUserChange }) => {
+  ({
+    onExport,
+    onImport,
+    onLogout,
+    onResetEncryption,
+    onSync,
+    onChangePassword,
+    currentUser,
+    onUserChange,
+    onUpdateProfile,
+  }) => {
     const [showResetModal, setShowResetModal] = useState(false);
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
 
     const handleToggleResetModal = useCallback(() => {
       setShowResetModal((prev) => !prev);
+    }, []);
+
+    const handleTogglePasswordModal = useCallback(() => {
+      setShowPasswordModal((prev) => !prev);
     }, []);
     return (
       <div className="glassmorphism rounded-3xl p-6 mb-6">
@@ -32,7 +50,11 @@ const Header = memo(
 
           {/* Buttons row */}
           <div className="flex items-center justify-center flex-wrap gap-4">
-            <UserIndicator currentUser={currentUser} onUserChange={onUserChange} />
+            <UserIndicator
+              currentUser={currentUser}
+              onUserChange={onUserChange}
+              onUpdateProfile={onUpdateProfile}
+            />
 
             <div className="flex gap-3 items-center justify-center">
               <input
@@ -54,6 +76,21 @@ const Header = memo(
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </button>
+
+              <button
+                onClick={handleTogglePasswordModal}
+                className="btn btn-secondary flex items-center rounded-xl"
+              >
+                <Key className="h-4 w-4 mr-2" />
+                Change Password
+              </button>
+
+              {LOCAL_ONLY_MODE && (
+                <button onClick={onSync} className="btn btn-primary flex items-center rounded-xl">
+                  <Cloud className="h-4 w-4 mr-2" />
+                  Sync to Cloud
+                </button>
+              )}
 
               <div className="relative" style={{ zIndex: 50 }}>
                 <button
@@ -109,6 +146,13 @@ const Header = memo(
               </div>
             </div>
           </div>
+        )}
+        {showPasswordModal && (
+          <ChangePasswordModal
+            isOpen={showPasswordModal}
+            onClose={handleTogglePasswordModal}
+            onChangePassword={onChangePassword}
+          />
         )}
       </div>
     );

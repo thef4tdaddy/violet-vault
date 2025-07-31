@@ -1,6 +1,5 @@
 // src/components/layout/Layout.jsx
-import React, { useState, useEffect, useCallback, useMemo, Suspense } from "react";
-import lazyImport from "../../utils/lazyImport";
+import React, { useState, useEffect, useCallback, useMemo, Suspense, lazy } from "react";
 import useAuthStore from "../../stores/authStore";
 import useOptimizedBudgetStore from "../../stores/optimizedBudgetStore"; // Import optimized store
 import { BudgetProvider } from "../../contexts/BudgetContext";
@@ -9,10 +8,13 @@ import UserSetup from "../auth/UserSetup";
 import Header from "../ui/Header";
 import TeamActivitySync from "../sync/TeamActivitySync";
 import LoadingSpinner from "../ui/LoadingSpinner";
+import { ToastContainer } from "../ui/Toast";
+import useToast from "../../hooks/useToast";
 import { encryptionUtils } from "../../utils/encryption";
 import FirebaseSync from "../../utils/firebaseSync";
 import logger from "../../utils/logger";
 import { getVersionInfo } from "../../utils/version";
+import { predictNextPayday, checkRecentPayday } from "../../utils/paydayPredictor";
 import {
   DollarSign,
   Wallet,
@@ -25,23 +27,68 @@ import {
   BarChart3,
 } from "lucide-react";
 
-// Lazy load heavy components for better performance
-const PaycheckProcessor = lazyImport(() => import("../budgeting/PaycheckProcessor.jsx"));
-const EnvelopeGrid = lazyImport(() => import("../../new/UnifiedEnvelopeManager.jsx"));
-const SmartEnvelopeSuggestions = lazyImport(
-  () => import("../budgeting/SmartEnvelopeSuggestions.jsx")
+// Lazy load heavy components for better performance with retry on failure
+const createLazyComponentWithRetry = (importFunc, componentName) => {
+  return lazy(() =>
+    importFunc().catch((error) => {
+      console.warn(`Failed to load ${componentName}, retrying...`, error);
+      // Force refresh on chunk loading failure
+      if (error.message?.includes("Failed to fetch dynamically imported module")) {
+        window.location.reload();
+      }
+      throw error;
+    })
+  );
+};
+
+const PaycheckProcessor = createLazyComponentWithRetry(
+  () => import("../budgeting/PaycheckProcessor.jsx"),
+  "PaycheckProcessor"
 );
-const BillManager = lazyImport(() => import("../../new/UnifiedBillTracker.jsx"));
-const SavingsGoals = lazyImport(() => import("../savings/SavingsGoals.jsx"));
-const Dashboard = lazyImport(() => import("./Dashboard.jsx"));
-const TransactionLedger = lazyImport(() => import("../transactions/TransactionLedger.jsx"));
-const ChartsAndAnalytics = lazyImport(() => import("../analytics/ChartsAndAnalytics.jsx"));
-const SupplementalAccounts = lazyImport(() => import("../accounts/SupplementalAccounts.jsx"));
+const EnvelopeGrid = createLazyComponentWithRetry(
+  () => import("../budgeting/EnvelopeGrid.jsx"),
+  "EnvelopeGrid"
+);
+const SmartEnvelopeSuggestions = createLazyComponentWithRetry(
+  () => import("../budgeting/SmartEnvelopeSuggestions.jsx"),
+  "SmartEnvelopeSuggestions"
+);
+const BillManager = createLazyComponentWithRetry(
+  () => import("../bills/BillManager.jsx"),
+  "BillManager"
+);
+const SavingsGoals = createLazyComponentWithRetry(
+  () => import("../savings/SavingsGoals.jsx"),
+  "SavingsGoals"
+);
+const Dashboard = createLazyComponentWithRetry(() => import("./Dashboard.jsx"), "Dashboard");
+const TransactionLedger = createLazyComponentWithRetry(
+  () => import("../transactions/TransactionLedger.jsx"),
+  "TransactionLedger"
+);
+const ChartsAndAnalytics = createLazyComponentWithRetry(
+  () => import("../analytics/ChartsAndAnalytics.jsx"),
+  "ChartsAndAnalytics"
+);
+const SupplementalAccounts = createLazyComponentWithRetry(
+  () => import("../accounts/SupplementalAccounts.jsx"),
+  "SupplementalAccounts"
+);
 
 const Layout = () => {
   logger.debug("Layout component is running");
 
-  const { isUnlocked, encryptionKey, currentUser, login, logout, budgetId, salt } = useAuthStore();
+  const {
+    isUnlocked,
+    encryptionKey,
+    currentUser,
+    login,
+    logout,
+    budgetId,
+    salt,
+    changePassword,
+    updateProfile,
+  } = useAuthStore();
 
   // Add online/offline status detection
   useEffect(() => {
@@ -72,7 +119,31 @@ const Layout = () => {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
-  }, []); // Empty dependency array ensures this runs only once
+  }, []);
+
+  // Check password age on unlock
+  useEffect(() => {
+    if (isUnlocked) {
+      const stored = localStorage.getItem("passwordLastChanged");
+      if (!stored) {
+        localStorage.setItem("passwordLastChanged", Date.now().toString());
+      } else {
+        const age = Date.now() - parseInt(stored, 10);
+        if (age >= 90 * 24 * 60 * 60 * 1000) {
+          setRotationDue(true);
+          setShowRotationModal(true);
+        }
+      }
+    }
+  }, [isUnlocked]);
+
+  // Check for payday predictions and notifications
+  useEffect(() => {
+    if (!isUnlocked) return;
+
+    // We need to access the budget data to get paycheck history
+    // This will be handled in the MainContent component where we have access to the budget
+  }, [isUnlocked]);
 
   const firebaseSync = useMemo(() => new FirebaseSync(), []);
 
@@ -84,6 +155,13 @@ const Layout = () => {
   const [activeUsers, setActiveUsers] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
   const [syncConflicts, setSyncConflicts] = useState(null);
+  const [rotationDue, setRotationDue] = useState(false);
+  const [showRotationModal, setShowRotationModal] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  // Toast notifications
+  const { toasts, removeToast, showPayday } = useToast();
 
   // Handle activity updates from MainContent
   const handleActivityUpdate = useCallback(({ users, activity }) => {
@@ -110,6 +188,9 @@ const Layout = () => {
 
       if (result.success) {
         console.log("✅ Setup completed successfully");
+        if (!localStorage.getItem("passwordLastChanged")) {
+          localStorage.setItem("passwordLastChanged", Date.now().toString());
+        }
       } else {
         console.error("❌ Setup failed:", result.error);
         alert(`Setup failed: ${result.error}`);
@@ -122,6 +203,59 @@ const Layout = () => {
 
   const handleLogout = () => {
     logout();
+  };
+
+  const handleChangePassword = async (oldPass, newPass) => {
+    const result = await changePassword(oldPass, newPass);
+    if (!result.success) {
+      alert(`Password change failed: ${result.error}`);
+    } else {
+      alert("Password updated successfully.");
+    }
+  };
+
+  const handleUpdateProfile = async (updatedProfile) => {
+    const result = await updateProfile(updatedProfile);
+    if (!result.success) {
+      throw new Error(result.error);
+    }
+  };
+
+  const handleRotationPasswordChange = async () => {
+    if (!newPassword || newPassword !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+    try {
+      const savedData = localStorage.getItem("envelopeBudgetData");
+      if (!savedData) {
+        throw new Error("No data found");
+      }
+      const { encryptedData, iv } = JSON.parse(savedData);
+      const decrypted = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
+      const { key, salt: newSalt } = await encryptionUtils.generateKey(newPassword);
+      const reencrypted = await encryptionUtils.encrypt(decrypted, key);
+      const saveData = {
+        encryptedData: reencrypted.data,
+        salt: Array.from(newSalt),
+        iv: reencrypted.iv,
+      };
+      localStorage.setItem("envelopeBudgetData", JSON.stringify(saveData));
+
+      // Update the auth store with new encryption details
+      const { setEncryption } = useAuthStore.getState();
+      setEncryption({ key, salt: newSalt });
+
+      localStorage.setItem("passwordLastChanged", Date.now().toString());
+      setShowRotationModal(false);
+      setRotationDue(false);
+      setNewPassword("");
+      setConfirmPassword("");
+      alert("Password updated successfully");
+    } catch (error) {
+      console.error("Failed to change password:", error);
+      alert(`Failed to change password: ${error.message}`);
+    }
   };
 
   const exportData = async () => {
@@ -438,6 +572,7 @@ const Layout = () => {
           onExport={exportData}
           onImport={importData}
           onLogout={handleLogout}
+          onChangePassword={handleChangePassword}
           onResetEncryption={resetEncryptionAndStartFresh}
           onActivityUpdate={handleActivityUpdate}
           activeUsers={activeUsers}
@@ -446,8 +581,44 @@ const Layout = () => {
           onResolveConflict={resolveConflict}
           setSyncConflicts={setSyncConflicts}
           firebaseSync={firebaseSync}
+          rotationDue={rotationDue}
+          onUpdateProfile={handleUpdateProfile}
+          showPayday={showPayday}
         />
       </BudgetProvider>
+      {showRotationModal && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="glassmorphism rounded-2xl p-6 w-full max-w-md border border-white/30 shadow-2xl">
+            <h3 className="text-xl font-semibold mb-4">Password Expired</h3>
+            <p className="text-gray-700 mb-4">For security, please set a new password.</p>
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="New password"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-3"
+            />
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm password"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+            />
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={handleRotationPasswordChange}
+                className="flex-1 bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700"
+              >
+                Update Password
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Container */}
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </>
   );
 };
@@ -460,11 +631,18 @@ const MainContent = ({
   onImport,
   onLogout,
   onResetEncryption,
+  onChangePassword, // eslint-disable-line no-unused-vars
+  encryptionKey,
+  budgetId,
+  firebaseSync,
   activeUsers: _activeUsers, // eslint-disable-line no-unused-vars
   recentActivity: _recentActivity, // eslint-disable-line no-unused-vars
   syncConflicts,
   onResolveConflict,
   setSyncConflicts,
+  rotationDue,
+  onUpdateProfile,
+  showPayday,
 }) => {
   const budget = useBudget();
   const [activeView, setActiveView] = useState("dashboard");
@@ -477,11 +655,35 @@ const MainContent = ({
     }
   };
 
+  const handleManualSync = async () => {
+    try {
+      if (!firebaseSync) return;
+      firebaseSync.initialize(budgetId, encryptionKey);
+      await firebaseSync.saveToCloud(
+        {
+          envelopes: budget.envelopes,
+          bills: budget.bills,
+          savingsGoals: budget.savingsGoals,
+          unassignedCash: budget.unassignedCash,
+          biweeklyAllocation: budget.biweeklyAllocation,
+          transactions: budget.allTransactions,
+          allTransactions: budget.allTransactions,
+        },
+        currentUser
+      );
+      alert("Data synced to cloud");
+    } catch (err) {
+      console.error("Manual sync failed", err);
+      alert(`Sync failed: ${err.message}`);
+    }
+  };
+
   const {
     envelopes,
     savingsGoals,
     unassignedCash,
     biweeklyAllocation,
+    paycheckHistory,
     isOnline,
     isSyncing,
     lastSyncTime: _lastSyncTime,
@@ -519,6 +721,57 @@ const MainContent = ({
     }
   }, [getActiveUsers, getRecentActivity, isSyncing, onActivityUpdate]);
 
+  // Check for payday predictions and show notifications
+  useEffect(() => {
+    if (!paycheckHistory || paycheckHistory.length < 2) return;
+
+    const checkPayday = () => {
+      try {
+        const prediction = predictNextPayday(paycheckHistory);
+        if (!prediction.nextPayday) return;
+
+        const recentPayday = checkRecentPayday(prediction);
+
+        // Check if we should show a payday notification
+        const lastNotification = localStorage.getItem("lastPaydayNotification");
+        const today = new Date().toDateString();
+
+        // Show notification if:
+        // 1. Today is predicted payday OR
+        // 2. Payday was yesterday and we haven't shown notification yet
+        if (recentPayday.occurred && (!lastNotification || lastNotification !== today)) {
+          let title, message;
+
+          if (recentPayday.wasToday) {
+            title = "🎉 Payday Today!";
+            message = `Based on your ${prediction.pattern} paycheck pattern, today should be payday! Consider processing your paycheck.`;
+          } else if (recentPayday.wasYesterday) {
+            title = "💰 Payday Was Yesterday";
+            message = `Based on your ${prediction.pattern} pattern, payday was yesterday. Don't forget to process your paycheck!`;
+          } else if (recentPayday.daysAgo === 2) {
+            title = "📅 Recent Payday";
+            message = `Based on your ${prediction.pattern} pattern, payday was ${recentPayday.daysAgo} days ago.`;
+          }
+
+          if (title && message) {
+            showPayday(title, message, 10000); // Show for 10 seconds
+            localStorage.setItem("lastPaydayNotification", today);
+          }
+        }
+      } catch (error) {
+        console.error("Error checking payday prediction:", error);
+      }
+    };
+
+    // Check immediately
+    checkPayday();
+
+    // Check daily at midnight and every few hours
+    const interval = setInterval(checkPayday, 4 * 60 * 60 * 1000); // Every 4 hours
+
+    return () => clearInterval(interval);
+  }, [paycheckHistory, showPayday]);
+
   // Calculate totals
   const totalEnvelopeBalance = Array.isArray(envelopes)
     ? envelopes.reduce((sum, env) => sum + env.currentBalance, 0)
@@ -529,7 +782,7 @@ const MainContent = ({
   const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden pb-24 sm:pb-0">
       <div className="max-w-7xl mx-auto relative">
         <div className="relative z-50">
           <Header
@@ -538,14 +791,22 @@ const MainContent = ({
             onExport={onExport}
             onImport={handleImport}
             onLogout={onLogout}
+            onChangePassword={handleChangePassword}
             onResetEncryption={() => {
               // Reset the budget context data first
               budget.resetAllData();
               // Then call the original reset function (clears localStorage and calls logout)
               onResetEncryption();
             }}
+            onSync={handleManualSync}
+            onUpdateProfile={onUpdateProfile}
           />
         </div>
+        {rotationDue && (
+          <div className="mb-4 bg-amber-100 border border-amber-300 text-amber-700 rounded-lg p-4 text-center">
+            Your password is over 90 days old. Please change it.
+          </div>
+        )}
 
         {/* Team Activity & Sync - Temporarily disabled to prevent browser crashes */}
         {/* <TeamActivitySync
@@ -560,8 +821,8 @@ const MainContent = ({
         */}
 
         {/* Navigation Tabs */}
-        <div className="glassmorphism rounded-3xl mb-6 shadow-xl border border-white/20">
-          <nav className="flex justify-center overflow-x-auto flex-wrap">
+        <div className="glassmorphism rounded-t-3xl sm:rounded-3xl mb-6 sm:shadow-xl border border-white/20 fixed bottom-0 left-0 right-0 sm:static z-40">
+          <nav className="flex justify-around overflow-x-auto">
             <NavButton
               key="dashboard"
               active={activeView === "dashboard"}
@@ -728,24 +989,21 @@ const MainContent = ({
   );
 };
 
-const NavButton = (
-  { active, onClick, icon: Icon, label } // eslint-disable-line no-unused-vars
-) => (
+const NavButton = ({ active, onClick, icon: Icon, label }) => (
   <button
     onClick={onClick}
-    className={`px-8 py-5 text-sm font-semibold border-b-2 transition-all ${
+    className={`flex-1 flex flex-col items-center sm:flex-row sm:px-6 px-2 py-3 text-xs sm:text-sm font-semibold border-t-2 sm:border-b-2 transition-all ${
       active
         ? "border-purple-500 text-purple-600 bg-purple-50/50"
         : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30"
     }`}
   >
-    <Icon className="h-5 w-5 inline mr-3" />
-    {label}
+    <Icon className="h-5 w-5 mb-1 sm:mb-0 sm:mr-3" />
+    <span>{label}</span>
   </button>
 );
 
 const SummaryCard = ({ icon: Icon, label, value, color }) => {
-  // eslint-disable-line no-unused-vars
   const colorClasses = {
     purple: "bg-purple-500",
     emerald: "bg-emerald-500",
@@ -820,6 +1078,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
         onUpdateActualBalance={setActualBalance}
         onReconcileTransaction={reconcileTransaction}
         transactions={safeTransactions}
+        paycheckHistory={paycheckHistory}
       />
     ),
     envelopes: (
