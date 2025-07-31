@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Shield, Users, Eye, EyeOff } from "lucide-react";
-import logoOnly from "../../assets/Logo Only 1024x1024.png";
+import logoOnly from "../../assets/icon-512x512.png";
 
 const UserSetup = ({ onSetupComplete }) => {
   console.log("🏗️ UserSetup component rendered", {

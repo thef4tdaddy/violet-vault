@@ -42,36 +42,36 @@ const createLazyComponentWithRetry = (importFunc, componentName) => {
 };
 
 const PaycheckProcessor = createLazyComponentWithRetry(
-  () => import("../budgeting/PaycheckProcessor"),
+  () => import("../budgeting/PaycheckProcessor.jsx"),
   "PaycheckProcessor"
 );
 const EnvelopeGrid = createLazyComponentWithRetry(
-  () => import("../budgeting/EnvelopeGrid"),
+  () => import("../budgeting/EnvelopeGrid.jsx"),
   "EnvelopeGrid"
 );
 const SmartEnvelopeSuggestions = createLazyComponentWithRetry(
-  () => import("../budgeting/SmartEnvelopeSuggestions"),
+  () => import("../budgeting/SmartEnvelopeSuggestions.jsx"),
   "SmartEnvelopeSuggestions"
 );
 const BillManager = createLazyComponentWithRetry(
-  () => import("../bills/BillManager"),
+  () => import("../bills/BillManager.jsx"),
   "BillManager"
 );
 const SavingsGoals = createLazyComponentWithRetry(
-  () => import("../savings/SavingsGoals"),
+  () => import("../savings/SavingsGoals.jsx"),
   "SavingsGoals"
 );
-const Dashboard = createLazyComponentWithRetry(() => import("./Dashboard"), "Dashboard");
+const Dashboard = createLazyComponentWithRetry(() => import("./Dashboard.jsx"), "Dashboard");
 const TransactionLedger = createLazyComponentWithRetry(
-  () => import("../transactions/TransactionLedger"),
+  () => import("../transactions/TransactionLedger.jsx"),
   "TransactionLedger"
 );
 const ChartsAndAnalytics = createLazyComponentWithRetry(
-  () => import("../analytics/ChartsAndAnalytics"),
+  () => import("../analytics/ChartsAndAnalytics.jsx"),
   "ChartsAndAnalytics"
 );
 const SupplementalAccounts = createLazyComponentWithRetry(
-  () => import("../accounts/SupplementalAccounts"),
+  () => import("../accounts/SupplementalAccounts.jsx"),
   "SupplementalAccounts"
 );
 

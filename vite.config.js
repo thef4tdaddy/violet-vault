@@ -13,6 +13,11 @@ export default defineConfig({
       authToken: process.env.SENTRY_AUTH_TOKEN,
     }),
   ],
+  // Avoid multiple copies of React which can cause
+  // "Invalid hook call" errors during development
+  resolve: {
+    dedupe: ["react", "react-dom"],
+  },
   define: {
     "process.env": {},
     global: {},

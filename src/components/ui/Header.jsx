@@ -1,7 +1,7 @@
 import React, { useState, memo, useCallback } from "react";
 import { Upload, Download, LogOut, AlertTriangle, RefreshCw, Cloud, Key } from "lucide-react";
 import UserIndicator from "../auth/UserIndicator";
-import logoWithText from "../../assets/Logo with Text Final.png";
+import logoWithText from "../../assets/Shield Text Logo.png";
 import ChangePasswordModal from "../auth/ChangePasswordModal";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
