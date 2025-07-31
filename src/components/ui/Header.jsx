@@ -37,9 +37,9 @@ const Header = memo(
               src={logoWithText}
               alt="VioletVault Logo"
               style={{
-                height: "180px",
+                height: "360px",
                 width: "auto",
-                maxWidth: "450px",
+                maxWidth: "900px",
                 objectFit: "contain",
               }}
             />
