@@ -17,6 +17,7 @@ const useOptimizedBudgetStore = create(
           savingsGoals: [],
           unassignedCash: 0,
           biweeklyAllocation: 0,
+          actualBalance: 0,
           isOnline: true, // Add isOnline state, default to true
           dataLoaded: false,
 
@@ -159,6 +160,12 @@ const useOptimizedBudgetStore = create(
               state.savingsGoals = state.savingsGoals.filter((g) => g.id !== id);
             }),
 
+          // Unassigned cash, actual balance and allocation management
+          setActualBalance: (amount) =>
+            set((state) => {
+              state.actualBalance = amount;
+            }),
+
           // Unassigned cash and allocation management
           setUnassignedCash: (amount) =>
             set((state) => {
@@ -191,6 +198,7 @@ const useOptimizedBudgetStore = create(
               state.allTransactions = [];
               state.savingsGoals = [];
               state.unassignedCash = 0;
+              state.actualBalance = 0;
               state.isOnline = true; // Also reset isOnline status
               state.dataLoaded = false;
             }),
@@ -207,6 +215,7 @@ const useOptimizedBudgetStore = create(
           savingsGoals: state.savingsGoals,
           unassignedCash: state.unassignedCash,
           biweeklyAllocation: state.biweeklyAllocation,
+          actualBalance: state.actualBalance,
           // IMPORTANT: Do NOT persist the isOnline flag or dataLoaded
           // They should be determined at runtime
         }),
