@@ -1,7 +1,10 @@
 import * as Sentry from "@sentry/react";
 
 export const initSentry = () => {
-  console.log("🔧 Initializing Sentry in", import.meta.env.MODE, "mode");
+  // Only log in development mode
+  if (import.meta.env.MODE === "development") {
+    console.log("🔧 Initializing Sentry in", import.meta.env.MODE, "mode");
+  }
 
   Sentry.init({
     dsn: "https://ac4d3e11c63ed8d0379b9a7f98740d01@o4509435944108032.ingest.us.sentry.io/4509725353967616",
@@ -39,7 +42,10 @@ export const initSentry = () => {
       }
 
       // Filter out navigation breadcrumbs for same-page changes
-      if (breadcrumb.category === "navigation" && breadcrumb.data?.from === breadcrumb.data?.to) {
+      if (
+        breadcrumb.category === "navigation" &&
+        breadcrumb.data?.from === breadcrumb.data?.to
+      ) {
         return null;
       }
 
@@ -59,13 +65,32 @@ export const initSentry = () => {
       return breadcrumb;
     },
     beforeSend(event) {
-      console.log("📤 Sentry sending event:", event.level, event.message);
-
       // Filter out duplicate errors to reduce notification spam
       const errorMessage = event.exception?.values?.[0]?.value || event.message;
 
+      // Filter out empty error objects and React element type errors caused by icon issues
+      if (
+        !errorMessage ||
+        errorMessage === "{}" ||
+        errorMessage.trim() === "" ||
+        errorMessage.includes(
+          "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object",
+        )
+      ) {
+        return null; // Don't send these to Sentry
+      }
+
+      // Only log in development mode to reduce production noise
+      if (import.meta.env.MODE === "development") {
+        console.log("📤 Sentry sending event:", event.level, event.message);
+      }
+
       // Check for the specific null amount error and throttle it
-      if (errorMessage?.includes("Cannot read properties of null (reading 'amount')")) {
+      if (
+        errorMessage?.includes(
+          "Cannot read properties of null (reading 'amount')",
+        )
+      ) {
         // Only send this error once every 5 minutes
         const errorKey = "null_amount_error";
         const lastSent = window.sessionStorage.getItem(`sentry_${errorKey}`);
@@ -105,7 +130,10 @@ export const initSentry = () => {
     category: "init",
   });
 
-  console.log("✅ Sentry initialized");
+  // Only log in development mode
+  if (import.meta.env.MODE === "development") {
+    console.log("✅ Sentry initialized");
+  }
 
   // Only setup console capture in production to avoid dev log spam
   if (import.meta.env.MODE === "production") {
@@ -123,7 +151,9 @@ const setupConsoleCapture = () => {
     originalConsoleError(...args);
 
     const message = args
-      .map((arg) => (typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)))
+      .map((arg) =>
+        typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg),
+      )
       .join(" ");
 
     // Skip frequent or expected errors that create noise
@@ -143,7 +173,9 @@ const setupConsoleCapture = () => {
     originalConsoleWarn(...args);
 
     const message = args
-      .map((arg) => (typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)))
+      .map((arg) =>
+        typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg),
+      )
       .join(" ");
 
     // Skip common development warnings that don't need tracking
