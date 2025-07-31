@@ -24,12 +24,12 @@ class ErrorBoundary extends React.Component {
 
     // Check if error is an empty object or has empty/minimal content
     // Only skip errors that are truly empty (no meaningful information)
-    const isEmptyError = 
-      !error || 
-      (typeof error === "object" && 
-       Object.keys(error).length === 0 && 
-       !errorMessage && 
-       (!errorName || errorName === "Error"));
+    const isEmptyError =
+      !error ||
+      (typeof error === "object" &&
+        Object.keys(error).length === 0 &&
+        !errorMessage &&
+        (!errorName || errorName === "Error"));
 
     // Skip logging empty or minimal error objects to reduce noise
     if (isEmptyError) {
