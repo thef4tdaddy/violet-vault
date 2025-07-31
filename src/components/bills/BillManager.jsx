@@ -80,8 +80,7 @@ const UnifiedBillTracker = ({
               else if (daysUntilDue <= 7) urgency = "soon";
             }
           } catch (error) {
-            // eslint-disable-line no-unused-vars
-            console.warn(`Invalid due date for bill ${bill.id}:`, bill.dueDate);
+            console.warn(`Invalid due date for bill ${bill.id}:`, bill.dueDate, error);
           }
         }
 

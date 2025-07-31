@@ -3,7 +3,7 @@ import { create } from "zustand";
 import { encryptionUtils } from "../utils/encryption";
 import logger from "../utils/logger";
 
-export const useAuth = create((set, get) => ({
+export const useAuth = create((set) => ({
   isUnlocked: false,
   encryptionKey: null,
   salt: null,

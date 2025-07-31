@@ -14,7 +14,7 @@ import { encryptionUtils } from "../../utils/encryption";
 import FirebaseSync from "../../utils/firebaseSync";
 import logger from "../../utils/logger";
 import { getVersionInfo } from "../../utils/version";
-import { predictNextPayday, isPaydayToday, checkRecentPayday } from "../../utils/paydayPredictor";
+import { predictNextPayday, checkRecentPayday } from "../../utils/paydayPredictor";
 import {
   DollarSign,
   Wallet,
@@ -535,6 +535,7 @@ const Layout = () => {
           onExport={exportData}
           onImport={importData}
           onLogout={handleLogout}
+          onChangePassword={handleChangePassword}
           onResetEncryption={resetEncryptionAndStartFresh}
           onActivityUpdate={handleActivityUpdate}
           activeUsers={activeUsers}
@@ -593,6 +594,7 @@ const MainContent = ({
   onImport,
   onLogout,
   onResetEncryption,
+  onChangePassword,
   encryptionKey,
   budgetId,
   firebaseSync,
@@ -950,9 +952,7 @@ const MainContent = ({
   );
 };
 
-const NavButton = (
-  { active, onClick, icon: Icon, label } // eslint-disable-line no-unused-vars
-) => (
+const NavButton = ({ active, onClick, icon: Icon, label }) => (
   <button
     onClick={onClick}
     className={`flex-1 flex flex-col items-center sm:flex-row sm:px-6 px-2 py-3 text-xs sm:text-sm font-semibold border-t-2 sm:border-b-2 transition-all ${
@@ -967,7 +967,6 @@ const NavButton = (
 );
 
 const SummaryCard = ({ icon: Icon, label, value, color }) => {
-  // eslint-disable-line no-unused-vars
   const colorClasses = {
     purple: "bg-purple-500",
     emerald: "bg-emerald-500",

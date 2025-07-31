@@ -143,7 +143,7 @@ const useAuthStore = create((set) => ({
       }
 
       // Update the current user in the store
-      set((state) => ({
+      set(() => ({
         currentUser: updatedProfile,
       }));
 

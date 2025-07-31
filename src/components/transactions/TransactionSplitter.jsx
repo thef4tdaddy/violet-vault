@@ -88,7 +88,7 @@ const TransactionSplitter = ({
         },
       ]);
     }
-  }, [transaction]);
+  }, [transaction, findEnvelopeForCategory]);
 
   // Add new split allocation
   const addSplitAllocation = () => {
@@ -139,14 +139,17 @@ const TransactionSplitter = ({
   };
 
   // Find envelope by category name
-  const findEnvelopeForCategory = (categoryName) => {
-    if (!categoryName) return null;
-    return envelopes.find(
-      (env) =>
-        env.name.toLowerCase() === categoryName.toLowerCase() ||
-        env.category?.toLowerCase() === categoryName.toLowerCase()
-    );
-  };
+  const findEnvelopeForCategory = useCallback(
+    (categoryName) => {
+      if (!categoryName) return null;
+      return envelopes.find(
+        (env) =>
+          env.name.toLowerCase() === categoryName.toLowerCase() ||
+          env.category?.toLowerCase() === categoryName.toLowerCase()
+      );
+    },
+    [envelopes]
+  );
 
   // Calculate split totals and validation
   const calculateSplitTotals = () => {

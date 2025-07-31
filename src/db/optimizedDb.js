@@ -22,19 +22,19 @@ export class OptimizedVioletVaultDB extends Dexie {
     });
 
     // Add hooks for automatic timestamping
-    this.envelopes.hook("creating", (primKey, obj, trans) => {
+    this.envelopes.hook("creating", (_primKey, obj, _trans) => {
       obj.lastModified = Date.now();
     });
 
-    this.envelopes.hook("updating", (modifications, primKey, obj, trans) => {
+    this.envelopes.hook("updating", (modifications, _primKey, _obj, _trans) => {
       modifications.lastModified = Date.now();
     });
 
-    this.transactions.hook("creating", (primKey, obj, trans) => {
+    this.transactions.hook("creating", (_primKey, obj, _trans) => {
       obj.lastModified = Date.now();
     });
 
-    this.transactions.hook("updating", (modifications, primKey, obj, trans) => {
+    this.transactions.hook("updating", (modifications, _primKey, _obj, _trans) => {
       modifications.lastModified = Date.now();
     });
   }
@@ -52,7 +52,8 @@ export class OptimizedVioletVaultDB extends Dexie {
   async getCachedValue(key, maxAge = 300000) {
     // 5 minutes default
     const cached = await this.cache.get(key);
-    if (cached && cached.expiresAt > Date.now()) {
+    const now = Date.now();
+    if (cached && cached.expiresAt > now && now - (cached.expiresAt - maxAge) < maxAge) {
       return cached.value;
     }
     return null;
