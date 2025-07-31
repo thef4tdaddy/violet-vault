@@ -1061,6 +1061,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
     addTransaction,
     addTransactions,
     updateTransaction,
+    deleteTransaction,
     setTransactions,
   } = budget;
 
@@ -1171,9 +1172,18 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
       <TransactionLedger
         transactions={allTransactions}
         envelopes={envelopes}
-        onAddTransaction={() => {}} // Will be implemented
-        onUpdateTransaction={() => {}} // Will be implemented
-        onDeleteTransaction={() => {}} // Will be implemented
+        onAddTransaction={(newTransaction) => {
+          console.log("🔄 Adding new transaction:", newTransaction);
+          addTransaction(newTransaction);
+        }}
+        onUpdateTransaction={(updatedTransaction) => {
+          console.log("🔄 Updating transaction:", updatedTransaction);
+          updateTransaction(updatedTransaction);
+        }}
+        onDeleteTransaction={(transactionId) => {
+          console.log("🔄 Deleting transaction:", transactionId);
+          deleteTransaction(transactionId);
+        }}
         onBulkImport={(newTransactions) => {
           console.log("🔄 onBulkImport called with transactions:", newTransactions.length);
           // Add transactions using budget store method
