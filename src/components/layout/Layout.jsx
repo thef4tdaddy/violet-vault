@@ -27,16 +27,53 @@ import {
   BarChart3,
 } from "lucide-react";
 
-// Lazy load heavy components for better performance
-const PaycheckProcessor = lazy(() => import("../budgeting/PaycheckProcessor"));
-const EnvelopeGrid = lazy(() => import("../budgeting/EnvelopeGrid"));
-const SmartEnvelopeSuggestions = lazy(() => import("../budgeting/SmartEnvelopeSuggestions"));
-const BillManager = lazy(() => import("../bills/BillManager"));
-const SavingsGoals = lazy(() => import("../savings/SavingsGoals"));
-const Dashboard = lazy(() => import("./Dashboard"));
-const TransactionLedger = lazy(() => import("../transactions/TransactionLedger"));
-const ChartsAndAnalytics = lazy(() => import("../analytics/ChartsAndAnalytics"));
-const SupplementalAccounts = lazy(() => import("../accounts/SupplementalAccounts"));
+// Lazy load heavy components for better performance with retry on failure
+const createLazyComponentWithRetry = (importFunc, componentName) => {
+  return lazy(() =>
+    importFunc().catch((error) => {
+      console.warn(`Failed to load ${componentName}, retrying...`, error);
+      // Force refresh on chunk loading failure
+      if (error.message?.includes("Failed to fetch dynamically imported module")) {
+        window.location.reload();
+      }
+      throw error;
+    })
+  );
+};
+
+const PaycheckProcessor = createLazyComponentWithRetry(
+  () => import("../budgeting/PaycheckProcessor"),
+  "PaycheckProcessor"
+);
+const EnvelopeGrid = createLazyComponentWithRetry(
+  () => import("../budgeting/EnvelopeGrid"),
+  "EnvelopeGrid"
+);
+const SmartEnvelopeSuggestions = createLazyComponentWithRetry(
+  () => import("../budgeting/SmartEnvelopeSuggestions"),
+  "SmartEnvelopeSuggestions"
+);
+const BillManager = createLazyComponentWithRetry(
+  () => import("../bills/BillManager"),
+  "BillManager"
+);
+const SavingsGoals = createLazyComponentWithRetry(
+  () => import("../savings/SavingsGoals"),
+  "SavingsGoals"
+);
+const Dashboard = createLazyComponentWithRetry(() => import("./Dashboard"), "Dashboard");
+const TransactionLedger = createLazyComponentWithRetry(
+  () => import("../transactions/TransactionLedger"),
+  "TransactionLedger"
+);
+const ChartsAndAnalytics = createLazyComponentWithRetry(
+  () => import("../analytics/ChartsAndAnalytics"),
+  "ChartsAndAnalytics"
+);
+const SupplementalAccounts = createLazyComponentWithRetry(
+  () => import("../accounts/SupplementalAccounts"),
+  "SupplementalAccounts"
+);
 
 const Layout = () => {
   logger.debug("Layout component is running");
@@ -594,7 +631,7 @@ const MainContent = ({
   onImport,
   onLogout,
   onResetEncryption,
-  onChangePassword,
+  onChangePassword, // eslint-disable-line no-unused-vars
   encryptionKey,
   budgetId,
   firebaseSync,
