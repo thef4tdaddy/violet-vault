@@ -70,13 +70,10 @@ class ErrorBoundary extends React.Component {
               </div>
             </div>
 
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Something went wrong
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Something went wrong</h2>
 
             <p className="text-gray-600 mb-6">
-              An unexpected error occurred. Your data is safe and automatically
-              saved.
+              An unexpected error occurred. Your data is safe and automatically saved.
             </p>
 
             <div className="space-y-3">
