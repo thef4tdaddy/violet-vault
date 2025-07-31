@@ -1,7 +1,7 @@
 import React, { useState, memo, useCallback } from "react";
 import { Upload, Download, LogOut, AlertTriangle, RefreshCw } from "lucide-react";
 import UserIndicator from "../auth/UserIndicator";
-import logoWithText from "../../assets/Logo with Text Final.png";
+import logoWithText from "../../assets/Shield Text Logo.png";
 
 const Header = memo(
   ({ onExport, onImport, onLogout, onResetEncryption, currentUser, onUserChange }) => {
