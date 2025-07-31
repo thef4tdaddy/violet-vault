@@ -22,10 +22,11 @@ import {
   Calendar,
   Target,
   CreditCard,
-  Sparkles,
   BookOpen,
   BarChart3,
 } from "lucide-react";
+import SyncStatusIndicators from "../sync/SyncStatusIndicators";
+import ConflictResolutionModal from "../sync/ConflictResolutionModal";
 
 // Lazy load heavy components for better performance
 const PaycheckProcessor = lazy(() => import("../budgeting/PaycheckProcessor"));
@@ -33,7 +34,7 @@ const EnvelopeGrid = lazy(() => import("../budgeting/EnvelopeGrid"));
 const SmartEnvelopeSuggestions = lazy(() => import("../budgeting/SmartEnvelopeSuggestions"));
 const BillManager = lazy(() => import("../bills/BillManager"));
 const SavingsGoals = lazy(() => import("../savings/SavingsGoals"));
-const Dashboard = lazy(() => import("./Dashboard"));
+const Dashboard = lazy(() => import("../pages/MainDashboard"));
 const TransactionLedger = lazy(() => import("../transactions/TransactionLedger"));
 const ChartsAndAnalytics = lazy(() => import("../analytics/ChartsAndAnalytics"));
 const SupplementalAccounts = lazy(() => import("../accounts/SupplementalAccounts"));
@@ -880,62 +881,12 @@ const MainContent = ({
         {/* Main Content */}
         <ViewRenderer activeView={activeView} budget={budget} currentUser={currentUser} />
 
-        {/* Loading/Syncing Overlay */}
-        {isSyncing && (
-          <div className="fixed bottom-4 right-4 glassmorphism rounded-2xl p-4 z-50">
-            <div className="flex items-center space-x-3">
-              <div className="animate-spin h-5 w-5 border-2 border-purple-500/30 border-t-purple-500 rounded-full"></div>
-              <span className="text-sm font-medium text-gray-700">Syncing...</span>
-            </div>
-          </div>
-        )}
-
-        {/* Offline Indicator */}
-        {!isOnline && (
-          <div className="fixed bottom-4 left-4 bg-amber-500 text-white rounded-2xl p-4 z-50">
-            <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium">Offline - Changes saved locally</span>
-            </div>
-          </div>
-        )}
-
-        {/* Conflict Resolution Modal */}
-        {syncConflicts?.hasConflict && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="glassmorphism rounded-3xl p-8 w-full max-w-md">
-              <div className="text-center">
-                <div className="relative mx-auto mb-6 w-16 h-16">
-                  <div className="absolute inset-0 bg-amber-500 rounded-2xl blur-lg opacity-30"></div>
-                  <div className="relative bg-amber-500 p-4 rounded-2xl">
-                    <Sparkles className="h-8 w-8 text-white" />
-                  </div>
-                </div>
-
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Sync Conflict Detected</h3>
-                <p className="text-gray-600 mb-6">
-                  <strong>{syncConflicts.cloudUser?.userName}</strong> made changes on another
-                  device. Would you like to load their latest changes?
-                </p>
-
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setSyncConflicts(null)}
-                    className="flex-1 btn btn-secondary rounded-2xl py-3"
-                  >
-                    Keep Mine
-                  </button>
-                  <button
-                    onClick={onResolveConflict}
-                    className="flex-1 btn btn-primary rounded-2xl py-3"
-                  >
-                    Load Theirs
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        <SyncStatusIndicators isOnline={isOnline} isSyncing={isSyncing} />
+        <ConflictResolutionModal 
+          syncConflicts={syncConflicts} 
+          onResolveConflict={onResolveConflict} 
+          onDismiss={() => setSyncConflicts(null)} 
+        />
 
         {/* Version Footer */}
         <div className="mt-8 text-center">

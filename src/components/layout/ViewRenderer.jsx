@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import Dashboard from "../Dashboard";
+import Dashboard from "../pages/MainDashboard";
 import SmartEnvelopeSuggestions from "../SmartEnvelopeSuggestions";
 import EnvelopeGrid from "../EnvelopeGrid";
 import SavingsGoals from "../SavingsGoals";
