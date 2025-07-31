@@ -13,10 +13,51 @@ export const initSentry = () => {
         blockAllMedia: false,
       }),
     ],
-    tracesSampleRate: 1.0,
-    replaysSessionSampleRate: 0.1,
-    replaysOnErrorSampleRate: 1.0,
-    debug: import.meta.env.MODE === "development", // Enable debug logging in dev
+    // Reduce sampling to minimize noise while maintaining coverage
+    tracesSampleRate: import.meta.env.MODE === "production" ? 0.1 : 1.0,
+    replaysSessionSampleRate: 0.05, // Reduced from 0.1
+    replaysOnErrorSampleRate: 0.5, // Reduced from 1.0
+    debug: import.meta.env.MODE === "development",
+    // Limit breadcrumbs to reduce noise
+    maxBreadcrumbs: 50, // Default is 100
+    beforeBreadcrumb(breadcrumb) {
+      // Filter out noisy breadcrumbs
+      if (breadcrumb.category === "console") {
+        // Only keep error/warn console messages, skip debug/info logs
+        if (breadcrumb.level !== "error" && breadcrumb.level !== "warning") {
+          return null;
+        }
+        // Skip frequent recurring messages
+        if (
+          breadcrumb.message?.includes("🔧") ||
+          breadcrumb.message?.includes("✅") ||
+          breadcrumb.message?.includes("Layout component is running") ||
+          breadcrumb.message?.includes("Network status:")
+        ) {
+          return null;
+        }
+      }
+
+      // Filter out navigation breadcrumbs for same-page changes
+      if (breadcrumb.category === "navigation" && breadcrumb.data?.from === breadcrumb.data?.to) {
+        return null;
+      }
+
+      // Filter out fetch requests to common endpoints that create noise
+      if (breadcrumb.category === "fetch" && breadcrumb.data?.url) {
+        const url = breadcrumb.data.url;
+        if (
+          url.includes("/assets/") ||
+          url.includes(".js") ||
+          url.includes(".css") ||
+          url.includes("sentry.io")
+        ) {
+          return null;
+        }
+      }
+
+      return breadcrumb;
+    },
     beforeSend(event) {
       console.log("📤 Sentry sending event:", event.level, event.message);
 
@@ -73,41 +114,51 @@ export const initSentry = () => {
 };
 
 const setupConsoleCapture = () => {
-  const originalConsoleLog = console.log;
   const originalConsoleError = console.error;
   const originalConsoleWarn = console.warn;
 
-  console.log = (...args) => {
-    // Only log to console in development
-    if (import.meta.env.MODE === "development") {
-      originalConsoleLog(...args);
-    }
-
-    // Send to Sentry as breadcrumb
-    Sentry.addBreadcrumb({
-      message: args
-        .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
-        .join(" "),
-      level: "info",
-      category: "console",
-    });
-  };
+  // Remove console.log capture to reduce noise - only capture errors and warnings
 
   console.error = (...args) => {
     originalConsoleError(...args);
 
+    const message = args
+      .map((arg) => (typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)))
+      .join(" ");
+
+    // Skip frequent or expected errors that create noise
+    if (
+      message.includes("Failed to fetch dynamically imported module") ||
+      message.includes("ResizeObserver loop limit exceeded") ||
+      message.includes("Non-Error promise rejection captured")
+    ) {
+      return;
+    }
+
     // Send errors to Sentry
-    Sentry.captureException(new Error(args.join(" ")));
+    Sentry.captureException(new Error(message));
   };
 
   console.warn = (...args) => {
     originalConsoleWarn(...args);
 
-    // Send warnings as breadcrumbs
+    const message = args
+      .map((arg) => (typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)))
+      .join(" ");
+
+    // Skip common development warnings that don't need tracking
+    if (
+      message.includes("React does not recognize") ||
+      message.includes("validateDOMNesting") ||
+      message.includes("componentWillReceiveProps") ||
+      message.includes("Legacy context API")
+    ) {
+      return;
+    }
+
+    // Send warnings as breadcrumbs (filtered by beforeBreadcrumb)
     Sentry.addBreadcrumb({
-      message: args
-        .map((arg) => (typeof arg === "object" ? JSON.stringify(arg) : String(arg)))
-        .join(" "),
+      message,
       level: "warning",
       category: "console",
     });
