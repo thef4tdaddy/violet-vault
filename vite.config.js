@@ -33,10 +33,10 @@ export default defineConfig({
     },
     chunkSizeWarningLimit: 1000,
     reportCompressedSize: false, // Disable verbose size reporting
-    minify: true, // Enable minification for production
+    minify: false, // Keep disabled for faster builds
   },
   esbuild: {
-    // Drop console logs and debuggers in production
-    drop: process.env.NODE_ENV === "production" ? ["console", "debugger"] : [],
+    // Only drop debugger statements in production, keep console for Sentry
+    drop: process.env.NODE_ENV === "production" ? ["debugger"] : [],
   },
 });

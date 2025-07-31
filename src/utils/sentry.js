@@ -135,10 +135,8 @@ export const initSentry = () => {
     console.log("✅ Sentry initialized");
   }
 
-  // Only setup console capture in production to avoid dev log spam
-  if (import.meta.env.MODE === "production") {
-    setupConsoleCapture();
-  }
+  // Setup console capture in both environments
+  setupConsoleCapture();
 };
 
 const setupConsoleCapture = () => {
