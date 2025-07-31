@@ -177,9 +177,9 @@ This document provides a comprehensive overview of the `/src/` directory structu
 | Hook | Purpose |
 |------|---------|
 | `useAuthFlow.js` | Authentication flow management |
-| `useBudget.js` | Budget data management |
+| `useBudget.js` | Simple budget data access (wrapper around budgetStore) |
+| `useBudgetQuery.js` | Advanced budget operations with React Query + Dexie |
 | `useDataManagement.js` | Import/export operations |
-| `useOptimizedBudget.js` | Performance-optimized budget operations |
 | `usePasswordRotation.js` | Password security and rotation |
 | `useToast.js` | Toast notification management |
 
@@ -190,8 +190,7 @@ This document provides a comprehensive overview of the `/src/` directory structu
 | Store | Purpose |
 |-------|---------|
 | `authStore.js` | Authentication state management |
-| `budgetStore.js` | Budget data state management |
-| `optimizedBudgetStore.js` | Performance-optimized budget state |
+| `budgetStore.js` | Main budget data state management (Zustand store) |
 
 ## 🌐 Contexts Directory (`/contexts/`)
 
@@ -209,14 +208,14 @@ This document provides a comprehensive overview of the `/src/` directory structu
 | Utility | Purpose |
 |---------|---------|
 | `billIcons.js` | Bill categorization icons |
+| `budgetQueryClient.js` | Budget-specific React Query client with optimistic updates |
 | `encryption.js` | Data encryption/decryption utilities |
 | `firebaseConfig.js` | Firebase configuration |
 | `firebaseSync.js` | Firebase synchronization service |
 | `logger.js` | Application logging utilities |
-| `optimizedQueryClient.js` | Optimized data fetching client |
 | `paydayPredictor.js` | Payday prediction algorithms |
 | `performance.js` | Performance monitoring utilities |
-| `queryClient.js` | Data fetching client |
+| `queryClient.js` | Global React Query client (used in main.jsx) |
 | `sentry.js` | Error monitoring and reporting |
 | `version.js` | Application version management |
 
@@ -226,8 +225,7 @@ This document provides a comprehensive overview of the `/src/` directory structu
 
 | File | Purpose |
 |------|---------|
-| `index.js` | Database initialization and setup |
-| `optimizedDb.js` | Performance-optimized database operations |
+| `budgetDb.js` | Dexie database setup with budget tables and operations |
 
 ## 📚 Constants Directory (`/constants/`)
 
@@ -242,15 +240,23 @@ This document provides a comprehensive overview of the `/src/` directory structu
 ## 🚨 Cleanup Tasks
 
 ### **Assets Directory**
-- [ ] Remove deleted logo files from git history
-- [ ] Update all references to old logo files
-- [ ] Verify new assets (`Shield Text Logo.png`, `icon-512x512.png`) are properly used
+- [✅] Remove unused logo files (completed)
 - [ ] Consider organizing assets into subdirectories (logos/, icons/, etc.)
 
 ### **General Cleanup**
+- [✅] Remove duplicate/dead files (`budgetStore.js`, `db/index.js`) - **COMPLETED**
+- [✅] Remove "optimized" naming from main system files - **COMPLETED**
+- [✅] Consolidate duplicate query clients - **COMPLETED**  
 - [ ] Remove `styles-backup.css` if no longer needed
 - [ ] Enable or remove `AmazonReceiptParser.jsx.disabled`
 - [ ] Consolidate `styles.css` and `index.css` if possible
+
+### **Completed File Reorganization**
+- [✅] `optimizedBudgetStore.js` → `budgetStore.js`
+- [✅] `useOptimizedBudget.js` → `useBudgetQuery.js`
+- [✅] `optimizedDb.js` → `budgetDb.js`
+- [✅] `optimizedQueryClient.js` → `budgetQueryClient.js`
+- [✅] Removed dead files: `stores/budgetStore.js` (old), `db/index.js`
 
 ---
 

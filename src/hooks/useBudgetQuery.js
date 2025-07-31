@@ -1,24 +1,24 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
-import useOptimizedBudgetStore from "../stores/optimizedBudgetStore";
-import { optimizedDb } from "../db/optimizedDb";
-import { queryKeys, optimisticHelpers } from "../utils/optimizedQueryClient";
+import useBudgetStore from "../stores/budgetStore";
+import { budgetDb } from "../db/budgetDb";
+import { queryKeys, optimisticHelpers } from "../utils/budgetQueryClient";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
 // Unified hook that combines Zustand, Dexie, and TanStack Query
-export const useOptimizedBudget = () => {
+export const useBudgetQuery = () => {
   const queryClient = useQueryClient();
 
   // Zustand store
-  const store = useOptimizedBudgetStore();
+  const store = useBudgetStore();
 
   // Query for envelopes with Dexie integration
   const { data: envelopes = [], isLoading: envelopesLoading } = useQuery({
     queryKey: queryKeys.envelopesList(),
     queryFn: async () => {
       if (!LOCAL_ONLY_MODE) {
-        const localEnvelopes = await optimizedDb.envelopes.toArray();
+        const localEnvelopes = await budgetDb.envelopes.toArray();
         if (localEnvelopes.length > 0) {
           return localEnvelopes;
         }
@@ -34,7 +34,7 @@ export const useOptimizedBudget = () => {
     mutationKey: ["envelopes", "add"],
     mutationFn: async (envelope) => {
       if (!LOCAL_ONLY_MODE) {
-        await optimizedDb.envelopes.add(envelope);
+        await budgetDb.envelopes.add(envelope);
       }
 
       store.addEnvelope(envelope);
@@ -66,7 +66,7 @@ export const useOptimizedBudget = () => {
     mutationKey: ["envelopes", "update"],
     mutationFn: async (envelope) => {
       if (!LOCAL_ONLY_MODE) {
-        await optimizedDb.envelopes.put(envelope);
+        await budgetDb.envelopes.put(envelope);
       }
 
       store.updateEnvelope(envelope);
@@ -98,7 +98,7 @@ export const useOptimizedBudget = () => {
     mutationKey: ["envelopes", "delete"],
     mutationFn: async (envelopeId) => {
       if (!LOCAL_ONLY_MODE) {
-        await optimizedDb.envelopes.delete(envelopeId);
+        await budgetDb.envelopes.delete(envelopeId);
       }
 
       store.deleteEnvelope(envelopeId);
@@ -151,9 +151,9 @@ export const useOptimizedBudget = () => {
 
     try {
       const [dexieEnvelopes, dexieTransactions, dexieBills] = await Promise.all([
-        optimizedDb.envelopes.toArray(),
-        optimizedDb.transactions.toArray(),
-        optimizedDb.bills.toArray(),
+        budgetDb.envelopes.toArray(),
+        budgetDb.transactions.toArray(),
+        budgetDb.bills.toArray(),
       ]);
 
       queryClient.setQueryData(queryKeys.envelopesList(), dexieEnvelopes);

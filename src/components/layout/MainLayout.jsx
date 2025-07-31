@@ -1,7 +1,7 @@
 // src/components/layout/Layout.jsx
 import React, { useState, useEffect, useCallback, useMemo, Suspense, lazy } from "react";
 import useAuthStore from "../../stores/authStore";
-import useOptimizedBudgetStore from "../../stores/optimizedBudgetStore"; // Import optimized store
+import useBudgetStore from "../../stores/budgetStore";
 import { BudgetProvider } from "../../contexts/BudgetContext";
 import { useBudget } from "../../hooks/useBudget";
 import UserSetup from "../auth/UserSetup";
@@ -57,7 +57,7 @@ const Layout = () => {
   // Add online/offline status detection
   useEffect(() => {
     // Get the action from the store
-    const { setOnlineStatus } = useOptimizedBudgetStore.getState();
+    const { setOnlineStatus } = useBudgetStore.getState();
 
     // Handler for when the browser goes online
     const handleOnline = () => {

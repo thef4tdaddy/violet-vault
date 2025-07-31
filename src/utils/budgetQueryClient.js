@@ -2,7 +2,7 @@ import { QueryClient, MutationCache, QueryCache } from "@tanstack/react-query";
 import { Sentry } from "./sentry";
 
 // Optimized TanStack Query configuration
-const optimizedQueryClient = new QueryClient({
+const budgetQueryClient = new QueryClient({
   defaultOptions: {
     queries: {
       // Performance optimizations
@@ -62,7 +62,7 @@ const optimizedQueryClient = new QueryClient({
   mutationCache: new MutationCache({
     onSuccess: (data, variables, context, mutation) => {
       // Optimistic updates and invalidations
-      const queryClient = mutation.options.queryClient || optimizedQueryClient;
+      const queryClient = mutation.options.queryClient || budgetQueryClient;
 
       // Invalidate related queries based on mutation type
       if (mutation.options.mutationKey?.[0]) {
@@ -113,7 +113,7 @@ export const queryKeys = {
 // Prefetch utilities
 export const prefetchHelpers = {
   prefetchEnvelopes: () => {
-    return optimizedQueryClient.prefetchQuery({
+    return budgetQueryClient.prefetchQuery({
       queryKey: queryKeys.envelopesList(),
       queryFn: () => {
         /* fetch envelopes */
@@ -123,7 +123,7 @@ export const prefetchHelpers = {
   },
 
   prefetchDashboard: () => {
-    return optimizedQueryClient.prefetchQuery({
+    return budgetQueryClient.prefetchQuery({
       queryKey: queryKeys.dashboardSummary(),
       queryFn: () => {
         /* fetch dashboard data */
@@ -136,13 +136,13 @@ export const prefetchHelpers = {
 // Optimistic update helpers
 export const optimisticHelpers = {
   updateEnvelope: (envelopeId, updates) => {
-    optimizedQueryClient.setQueryData(queryKeys.envelopeById(envelopeId), (old) => ({
+    budgetQueryClient.setQueryData(queryKeys.envelopeById(envelopeId), (old) => ({
       ...old,
       ...updates,
     }));
 
     // Also update the list if it exists
-    optimizedQueryClient.setQueryData(queryKeys.envelopesList(), (old) => {
+    budgetQueryClient.setQueryData(queryKeys.envelopesList(), (old) => {
       if (!old) return old;
       return old.map((envelope) =>
         envelope.id === envelopeId ? { ...envelope, ...updates } : envelope
@@ -151,20 +151,20 @@ export const optimisticHelpers = {
   },
 
   addEnvelope: (newEnvelope) => {
-    optimizedQueryClient.setQueryData(queryKeys.envelopesList(), (old) => {
+    budgetQueryClient.setQueryData(queryKeys.envelopesList(), (old) => {
       if (!old) return [newEnvelope];
       return [...old, newEnvelope];
     });
   },
 
   removeEnvelope: (envelopeId) => {
-    optimizedQueryClient.setQueryData(queryKeys.envelopesList(), (old) => {
+    budgetQueryClient.setQueryData(queryKeys.envelopesList(), (old) => {
       if (!old) return old;
       return old.filter((envelope) => envelope.id !== envelopeId);
     });
 
     // Remove individual query
-    optimizedQueryClient.removeQueries({
+    budgetQueryClient.removeQueries({
       queryKey: queryKeys.envelopeById(envelopeId),
     });
   },
@@ -181,14 +181,14 @@ export const backgroundSync = {
     ];
 
     return Promise.allSettled(
-      queries.map((queryKey) => optimizedQueryClient.refetchQueries({ queryKey }))
+      queries.map((queryKey) => budgetQueryClient.refetchQueries({ queryKey }))
     );
   },
 
   invalidateStaleData: () => {
     // Mark all data as stale to trigger background refetch
-    optimizedQueryClient.invalidateQueries();
+    budgetQueryClient.invalidateQueries();
   },
 };
 
-export default optimizedQueryClient;
+export default budgetQueryClient;
