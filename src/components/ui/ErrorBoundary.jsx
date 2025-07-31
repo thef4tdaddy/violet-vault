@@ -30,11 +30,7 @@ class ErrorBoundary extends React.Component {
     // 1. Error type and message
     // 2. Failing component name
     // 3. Top few lines of component stack for context
-    const stackContext = componentStack
-      .split("\n")
-      .slice(0, 3)
-      .join("\n")
-      .trim();
+    const stackContext = componentStack.split("\n").slice(0, 3).join("\n").trim();
 
     const errorSignature = `${error.name}:${error.message}:${failingComponent}:${stackContext}`;
 
@@ -72,35 +68,26 @@ class ErrorBoundary extends React.Component {
       console.log("📤 Sent error to Sentry:", errorSignature);
     } else {
       this.errorCount++;
-      console.log(
-        `🔄 Skipping duplicate error #${this.errorCount} in burst:`,
-        errorSignature,
-      );
+      console.log(`🔄 Skipping duplicate error #${this.errorCount} in burst:`, errorSignature);
 
       // If we're in a long error burst, send a summary after 10 seconds
-      if (
-        currentTime - this.errorBurstStartTime > 10000 &&
-        this.errorCount > 1
-      ) {
-        Sentry.captureMessage(
-          `Error burst detected: ${this.errorCount} similar errors`,
-          {
-            level: "warning",
-            contexts: {
-              errorBurst: {
-                originalError: this.lastErrorMessage,
-                errorCount: this.errorCount,
-                burstDuration: currentTime - this.errorBurstStartTime,
-                componentStack: this.lastComponentStack,
-              },
-            },
-            tags: {
-              errorBoundary: true,
-              errorBurst: true,
-              failingComponent,
+      if (currentTime - this.errorBurstStartTime > 10000 && this.errorCount > 1) {
+        Sentry.captureMessage(`Error burst detected: ${this.errorCount} similar errors`, {
+          level: "warning",
+          contexts: {
+            errorBurst: {
+              originalError: this.lastErrorMessage,
+              errorCount: this.errorCount,
+              burstDuration: currentTime - this.errorBurstStartTime,
+              componentStack: this.lastComponentStack,
             },
           },
-        );
+          tags: {
+            errorBoundary: true,
+            errorBurst: true,
+            failingComponent,
+          },
+        });
 
         // Reset burst tracking after sending summary
         this.errorCount = 0;
