@@ -510,7 +510,7 @@ export const getBillIconOptions = (category = "") => {
  * @returns {string} Display name
  */
 export const getIconName = (IconComponent) => {
-  if (!IconComponent || !IconComponent.name) return "Icon";
+  if (!IconComponent || !IconComponent.displayName) return "Icon";
 
   // Convert component name to readable format
   // e.g., "Zap" -> "Electric", "Droplets" -> "Water"
@@ -539,7 +539,9 @@ export const getIconName = (IconComponent) => {
     Briefcase: "Business",
   };
 
-  return nameMap[IconComponent.name] || IconComponent.name || "Icon";
+  return (
+    nameMap[IconComponent.displayName] || IconComponent.displayName || "Icon"
+  );
 };
 
 // Create a map of all available icons by name for serialization
@@ -613,7 +615,7 @@ export const getIconByName = (iconName) => {
 // Get icon name from component (for serializing to storage)
 export const getIconNameForStorage = (IconComponent) => {
   if (!IconComponent) return "FileText";
-  return IconComponent.name || "FileText";
+  return IconComponent.displayName || "FileText";
 };
 
 export default {
