@@ -28,7 +28,9 @@ import {
 // Lazy load heavy components for better performance
 const PaycheckProcessor = lazyImport(() => import("../budgeting/PaycheckProcessor.jsx"));
 const EnvelopeGrid = lazyImport(() => import("../../new/UnifiedEnvelopeManager.jsx"));
-const SmartEnvelopeSuggestions = lazyImport(() => import("../budgeting/SmartEnvelopeSuggestions.jsx"));
+const SmartEnvelopeSuggestions = lazyImport(
+  () => import("../budgeting/SmartEnvelopeSuggestions.jsx")
+);
 const BillManager = lazyImport(() => import("../../new/UnifiedBillTracker.jsx"));
 const SavingsGoals = lazyImport(() => import("../savings/SavingsGoals.jsx"));
 const Dashboard = lazyImport(() => import("./Dashboard.jsx"));
