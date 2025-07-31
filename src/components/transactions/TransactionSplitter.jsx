@@ -28,12 +28,18 @@ const TransactionSplitter = ({
   const [splitAllocations, setSplitAllocations] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Initialize split allocations when modal opens
-  useEffect(() => {
-    if (isOpen && transaction) {
-      initializeSplits();
-    }
-  }, [isOpen, transaction, initializeSplits]);
+  // Find envelope by category name
+  const findEnvelopeForCategory = useCallback(
+    (categoryName) => {
+      if (!categoryName) return null;
+      return envelopes.find(
+        (env) =>
+          env.name.toLowerCase() === categoryName.toLowerCase() ||
+          env.category?.toLowerCase() === categoryName.toLowerCase()
+      );
+    },
+    [envelopes]
+  );
 
   const initializeSplits = useCallback(() => {
     // Check if transaction has itemized metadata (like Amazon orders)
@@ -90,6 +96,13 @@ const TransactionSplitter = ({
     }
   }, [transaction, findEnvelopeForCategory]);
 
+  // Initialize split allocations when modal opens
+  useEffect(() => {
+    if (isOpen && transaction) {
+      initializeSplits();
+    }
+  }, [isOpen, transaction, initializeSplits]);
+
   // Add new split allocation
   const addSplitAllocation = () => {
     const totalAmount = Math.abs(transaction.amount);
@@ -137,19 +150,6 @@ const TransactionSplitter = ({
     if (splitAllocations.length <= 1) return;
     setSplitAllocations((prev) => prev.filter((split) => split.id !== id));
   };
-
-  // Find envelope by category name
-  const findEnvelopeForCategory = useCallback(
-    (categoryName) => {
-      if (!categoryName) return null;
-      return envelopes.find(
-        (env) =>
-          env.name.toLowerCase() === categoryName.toLowerCase() ||
-          env.category?.toLowerCase() === categoryName.toLowerCase()
-      );
-    },
-    [envelopes]
-  );
 
   // Calculate split totals and validation
   const calculateSplitTotals = () => {
