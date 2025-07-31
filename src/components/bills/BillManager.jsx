@@ -198,7 +198,7 @@ const BillManager = ({
 
   const getCategoryIcon = (bill) => {
     // First priority: Check if bill has a stored icon component
-    if (bill.icon) {
+    if (bill.icon && typeof bill.icon === "function") {
       const IconComponent = bill.icon;
       return <IconComponent className="h-6 w-6" />;
     }
@@ -223,7 +223,13 @@ const BillManager = ({
       bill.category || ""
     );
 
-    return <IconComponent className="h-6 w-6" />;
+    // Ensure we have a valid React component
+    if (typeof IconComponent === "function") {
+      return <IconComponent className="h-6 w-6" />;
+    }
+
+    // Fallback to a default icon if getBillIcon returns something unexpected
+    return <FileText className="h-6 w-6" />;
   };
 
   const handlePayBill = (billId) => {
