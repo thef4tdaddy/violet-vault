@@ -8,6 +8,9 @@ class ErrorBoundary extends React.Component {
     this.state = { hasError: false, error: null };
     this.lastErrorMessage = null;
     this.lastErrorTime = null;
+    this.lastComponentStack = null;
+    this.errorBurstStartTime = null;
+    this.errorCount = 0;
   }
 
   static getDerivedStateFromError(error) {
@@ -17,31 +20,92 @@ class ErrorBoundary extends React.Component {
   componentDidCatch(error, errorInfo) {
     console.error("ErrorBoundary caught an error:", error, errorInfo);
 
-    // Deduplicate errors - only send to Sentry if it's a new error or more than 5 seconds since last
     const currentTime = Date.now();
-    const errorKey = `${error.name}: ${error.message}`;
-    const shouldSendToSentry =
-      this.lastErrorMessage !== errorKey ||
-      !this.lastErrorTime ||
-      currentTime - this.lastErrorTime > 5000;
+    const componentStack = errorInfo.componentStack;
+
+    // Extract the top-level failing component from the stack
+    const failingComponent = this.extractFailingComponent(componentStack);
+
+    // Create a more comprehensive error signature that includes:
+    // 1. Error type and message
+    // 2. Failing component name
+    // 3. Top few lines of component stack for context
+    const stackContext = componentStack
+      .split("\n")
+      .slice(0, 3)
+      .join("\n")
+      .trim();
+
+    const errorSignature = `${error.name}:${error.message}:${failingComponent}:${stackContext}`;
+
+    // Enhanced deduplication logic
+    const isSameErrorBurst = this.isSameErrorBurst(errorSignature, currentTime);
+    const shouldSendToSentry = !isSameErrorBurst;
 
     if (shouldSendToSentry) {
-      this.lastErrorMessage = errorKey;
+      // Reset or initialize error burst tracking
+      this.lastErrorMessage = errorSignature;
       this.lastErrorTime = currentTime;
+      this.lastComponentStack = componentStack;
+      this.errorBurstStartTime = currentTime;
+      this.errorCount = 1;
 
-      // Send error to Sentry
+      // Send error to Sentry with enhanced context
       Sentry.captureException(error, {
         contexts: {
           react: {
             componentStack: errorInfo.componentStack,
+            failingComponent,
+          },
+          errorBoundary: {
+            errorCount: this.errorCount,
+            burstDuration: 0,
           },
         },
         tags: {
           errorBoundary: true,
+          failingComponent,
         },
+        fingerprint: [errorSignature],
       });
+
+      console.log("📤 Sent error to Sentry:", errorSignature);
     } else {
-      console.log("🔄 Skipping duplicate Sentry report for:", errorKey);
+      this.errorCount++;
+      console.log(
+        `🔄 Skipping duplicate error #${this.errorCount} in burst:`,
+        errorSignature,
+      );
+
+      // If we're in a long error burst, send a summary after 10 seconds
+      if (
+        currentTime - this.errorBurstStartTime > 10000 &&
+        this.errorCount > 1
+      ) {
+        Sentry.captureMessage(
+          `Error burst detected: ${this.errorCount} similar errors`,
+          {
+            level: "warning",
+            contexts: {
+              errorBurst: {
+                originalError: this.lastErrorMessage,
+                errorCount: this.errorCount,
+                burstDuration: currentTime - this.errorBurstStartTime,
+                componentStack: this.lastComponentStack,
+              },
+            },
+            tags: {
+              errorBoundary: true,
+              errorBurst: true,
+              failingComponent,
+            },
+          },
+        );
+
+        // Reset burst tracking after sending summary
+        this.errorCount = 0;
+        this.errorBurstStartTime = currentTime;
+      }
     }
 
     // Additional debugging info
@@ -53,6 +117,31 @@ class ErrorBoundary extends React.Component {
       console.groupEnd();
     }
   }
+
+  extractFailingComponent = (componentStack) => {
+    if (!componentStack) return "Unknown";
+
+    // Extract the first meaningful component from the stack
+    const lines = componentStack.split("\n").filter((line) => line.trim());
+    for (const line of lines) {
+      const match = line.match(/at (\w+)/);
+      if (match && match[1] !== "div" && match[1] !== "ErrorBoundary") {
+        return match[1];
+      }
+    }
+    return "Unknown";
+  };
+
+  isSameErrorBurst = (errorSignature, currentTime) => {
+    // Consider it the same error burst if:
+    // 1. Same error signature AND
+    // 2. Within 30 seconds of the last error
+    return (
+      this.lastErrorMessage === errorSignature &&
+      this.lastErrorTime &&
+      currentTime - this.lastErrorTime < 30000
+    );
+  };
 
   handleReset = () => {
     this.setState({ hasError: false, error: null });
