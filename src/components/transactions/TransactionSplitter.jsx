@@ -153,6 +153,16 @@ const TransactionSplitter = ({
 
   // Calculate split totals and validation
   const calculateSplitTotals = () => {
+    if (!transaction || transaction.amount === null || transaction.amount === undefined) {
+      return {
+        original: 0,
+        allocated: 0,
+        remaining: 0,
+        isValid: true,
+        isOverAllocated: false,
+        isUnderAllocated: false
+      };
+    }
     const originalAmount = Math.abs(transaction.amount);
     const allocated = splitAllocations.reduce(
       (sum, split) => sum + (parseFloat(split.amount) || 0),
@@ -294,9 +304,9 @@ const TransactionSplitter = ({
     ]),
   ].sort();
 
-  const totals = calculateSplitTotals();
-
   if (!isOpen || !transaction) return null;
+
+  const totals = calculateSplitTotals();
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
