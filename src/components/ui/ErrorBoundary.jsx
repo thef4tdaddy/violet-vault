@@ -6,6 +6,8 @@ class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
     this.state = { hasError: false, error: null };
+    this.lastErrorMessage = null;
+    this.lastErrorTime = null;
   }
 
   static getDerivedStateFromError(error) {
@@ -15,14 +17,32 @@ class ErrorBoundary extends React.Component {
   componentDidCatch(error, errorInfo) {
     console.error("ErrorBoundary caught an error:", error, errorInfo);
 
-    // Send error to Sentry
-    Sentry.captureException(error, {
-      contexts: {
-        react: {
-          componentStack: errorInfo.componentStack,
+    // Deduplicate errors - only send to Sentry if it's a new error or more than 5 seconds since last
+    const currentTime = Date.now();
+    const errorKey = `${error.name}: ${error.message}`;
+    const shouldSendToSentry =
+      this.lastErrorMessage !== errorKey ||
+      !this.lastErrorTime ||
+      currentTime - this.lastErrorTime > 5000;
+
+    if (shouldSendToSentry) {
+      this.lastErrorMessage = errorKey;
+      this.lastErrorTime = currentTime;
+
+      // Send error to Sentry
+      Sentry.captureException(error, {
+        contexts: {
+          react: {
+            componentStack: errorInfo.componentStack,
+          },
         },
-      },
-    });
+        tags: {
+          errorBoundary: true,
+        },
+      });
+    } else {
+      console.log("🔄 Skipping duplicate Sentry report for:", errorKey);
+    }
 
     // Additional debugging info
     if (process.env.NODE_ENV === "development") {
@@ -50,10 +70,13 @@ class ErrorBoundary extends React.Component {
               </div>
             </div>
 
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Something went wrong</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              Something went wrong
+            </h2>
 
             <p className="text-gray-600 mb-6">
-              An unexpected error occurred. Your data is safe and automatically saved.
+              An unexpected error occurred. Your data is safe and automatically
+              saved.
             </p>
 
             <div className="space-y-3">
