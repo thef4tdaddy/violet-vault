@@ -1144,6 +1144,8 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
             ...newBill,
             id: `bill_${Date.now()}`,
             type: "recurring_bill",
+            // Ensure bill amounts are negative (expenses)
+            amount: -Math.abs(newBill.amount),
             date: new Date().toISOString().split("T")[0],
             isPaid: false,
             source: "manual",
