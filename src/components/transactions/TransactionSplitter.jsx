@@ -160,7 +160,7 @@ const TransactionSplitter = ({
         remaining: 0,
         isValid: true,
         isOverAllocated: false,
-        isUnderAllocated: false
+        isUnderAllocated: false,
       };
     }
     const originalAmount = Math.abs(transaction.amount);
