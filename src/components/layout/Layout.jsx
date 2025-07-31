@@ -1063,6 +1063,9 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
     updateTransaction,
     deleteTransaction,
     setTransactions,
+    addBill,
+    updateBill,
+    deleteBill,
   } = budget;
 
   // Filter out null/undefined transactions to prevent runtime errors
@@ -1139,18 +1142,18 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
           updateTransaction(updatedBill);
         }}
         onCreateRecurringBill={(newBill) => {
-          // Add new bill using budget store method
-          const billTransaction = {
+          // Store bill properly using budget store - no transaction created until paid
+          console.log("📋 Creating new bill:", newBill);
+          const bill = {
             ...newBill,
-            id: `bill_${Date.now()}`,
+            id: newBill.id || `bill_${Date.now()}`,
             type: "recurring_bill",
-            // Ensure bill amounts are negative (expenses)
-            amount: -Math.abs(newBill.amount),
-            date: new Date().toISOString().split("T")[0],
             isPaid: false,
             source: "manual",
+            createdAt: new Date().toISOString(),
           };
-          addTransaction(billTransaction);
+          addBill(bill);
+          console.log("✅ Bill stored successfully - no transaction created until paid");
         }}
         onSearchNewBills={async () => {
           try {
