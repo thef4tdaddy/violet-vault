@@ -467,8 +467,110 @@ export const FormField = ({
 
 ---
 
-**Next Steps:** Review priorities with team and begin Phase 1 implementation with Layout.jsx service extraction.
+---
 
-**Estimated Total Effort:** 4-6 weeks  
-**Risk Level:** Medium (managed through phased approach)  
-**Expected ROI:** High (significant maintainability and velocity improvements)
+## 📁 Folder Structure Reorganization Plan
+
+### **Current Issues with Organization**
+
+**Problems identified during Phase 2 component extraction:**
+
+1. **Mixed Concerns in `/layout/` folder**:
+   - True layout components (NavigationTabs, ViewRenderer) mixed with page components (Dashboard)
+   - Generic names don't explain component purpose (Layout.jsx, Dashboard.jsx)
+
+2. **Misplaced Components**:
+   - `SyncStatusIndicators.jsx` in `/ui/` but should be in `/sync/`
+   - Modal components scattered between `/layout/` and `/modals/`
+
+3. **Unclear Component Categories**:
+   - No distinction between pages, layout, and pure UI components
+   - Difficult to find components when debugging or developing
+
+### **Proposed Folder Structure**
+
+```
+src/components/
+├── layout/                    # TRUE LAYOUT COMPONENTS ONLY
+│   ├── AppShell.jsx          # Renamed from Layout.jsx - Main app container
+│   ├── MainLayout.jsx        # Layout orchestration and shell
+│   ├── NavigationTabs.jsx    # Tab navigation system
+│   └── ViewRenderer.jsx      # Route/view content switcher
+├── pages/                    # PAGE/VIEW COMPONENTS
+│   ├── MainDashboard.jsx     # Renamed from Dashboard.jsx - Dashboard page
+│   ├── EnvelopesPage.jsx     # Envelopes management page
+│   ├── SavingsPage.jsx       # Savings goals page
+│   ├── BillsPage.jsx         # Bills management page
+│   ├── TransactionsPage.jsx  # Transaction ledger page
+│   └── AnalyticsPage.jsx     # Charts and analytics page
+├── sync/                     # SYNC-RELATED COMPONENTS
+│   ├── SyncStatusIndicators.jsx     # Moved from ui/ - Offline/syncing indicators
+│   ├── ConflictResolutionModal.jsx  # Moved from modals/ - Sync conflict handling
+│   ├── ActivityBanner.jsx           # User activity display
+│   └── TeamActivitySync.jsx         # Collaborative features
+├── ui/                       # PURE UI COMPONENTS
+│   ├── SummaryCards.jsx      # Financial summary cards
+│   ├── VersionFooter.jsx     # App version display
+│   ├── LoadingSpinner.jsx    # Loading states
+│   ├── Toast.jsx             # Notifications
+│   └── Header.jsx            # App header
+└── modals/                   # MODAL COMPONENTS
+    ├── PasswordRotationModal.jsx    # Security modals
+    ├── ChangePasswordModal.jsx      # Existing auth modal
+    └── ProfileSettings.jsx          # User settings modal
+```
+
+### **File Renaming for Clarity**
+
+| Current Name | New Name | Reason |
+|-------------|----------|---------|
+| `Layout.jsx` | `MainLayout.jsx` | Clarifies this is the primary app layout |
+| `Dashboard.jsx` | `MainDashboard.jsx` | Indicates this is the main dashboard page |
+| `SyncStatusIndicators.jsx` | → Move to `sync/` | Better categorization |
+| `ConflictResolutionModal.jsx` | → Move to `sync/` | Sync-specific modal |
+
+### **Benefits of New Structure**
+
+1. **Self-Documenting**: Folder names clearly indicate component purpose
+2. **Easier Navigation**: Developers know exactly where to find/add components
+3. **Better Separation**: True layout vs pages vs UI components are distinct
+4. **Scalability**: Easy to add new pages or UI components in correct location
+5. **Maintenance**: Related components are grouped together
+
+### **Implementation Plan**
+
+#### **Phase 2.1: Folder Structure Reorganization**
+```bash
+# 1. Create new folders
+mkdir -p src/components/pages
+mkdir -p src/components/sync
+
+# 2. Move and rename files
+mv src/components/layout/Dashboard.jsx src/components/pages/MainDashboard.jsx
+mv src/components/layout/Layout.jsx src/components/layout/MainLayout.jsx
+mv src/components/ui/SyncStatusIndicators.jsx src/components/sync/
+mv src/components/modals/ConflictResolutionModal.jsx src/components/sync/
+
+# 3. Update all import statements across codebase
+# 4. Update component export names for clarity
+```
+
+#### **Phase 2.2: Update Import References**
+- Update all files that import these moved components
+- Ensure build continues to work without errors
+- Update any route definitions or lazy loading
+
+### **Success Criteria**
+- [ ] All components are in logically organized folders
+- [ ] Component names clearly indicate their purpose
+- [ ] No build errors after reorganization
+- [ ] Import paths are updated throughout codebase
+- [ ] Documentation reflects new structure
+
+---
+
+**Next Steps:** Complete folder reorganization before proceeding with Phase 3 (Provider hierarchy), then begin Phase 1 implementation with Layout.jsx service extraction.
+
+**Estimated Reorganization Effort:** 2-3 hours  
+**Risk Level:** Low (file moves with import updates)  
+**Expected ROI:** High (significant developer experience improvement)
