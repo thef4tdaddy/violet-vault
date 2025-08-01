@@ -682,7 +682,6 @@ const MainContent = ({
     envelopes,
     savingsGoals,
     unassignedCash,
-    biweeklyAllocation,
     paycheckHistory,
     isOnline,
     isSyncing,
@@ -780,6 +779,11 @@ const MainContent = ({
     ? savingsGoals.reduce((sum, goal) => sum + goal.currentAmount, 0)
     : 0;
   const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
+
+  // Calculate total biweekly need from all envelopes
+  const totalBiweeklyNeed = Array.isArray(envelopes)
+    ? envelopes.reduce((sum, envelope) => sum + (envelope.biweeklyAllocation || 0), 0)
+    : 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden pb-24 sm:pb-0">
@@ -909,13 +913,18 @@ const MainContent = ({
             key="biweekly-need"
             icon={DollarSign}
             label="Biweekly Need"
-            value={biweeklyAllocation}
+            value={totalBiweeklyNeed}
             color="amber"
           />
         </div>
 
         {/* Main Content */}
-        <ViewRenderer activeView={activeView} budget={budget} currentUser={currentUser} />
+        <ViewRenderer
+          activeView={activeView}
+          budget={budget}
+          currentUser={currentUser}
+          totalBiweeklyNeed={totalBiweeklyNeed}
+        />
 
         {/* Loading/Syncing Overlay */}
         {isSyncing && (
@@ -1018,6 +1027,9 @@ const SummaryCard = ({ icon: Icon, label, value, color }) => {
     amber: "text-amber-600",
   };
 
+  // Ensure value is always a valid number
+  const displayValue = typeof value === "number" && !isNaN(value) ? value : 0;
+
   return (
     <div className="glassmorphism rounded-3xl p-6">
       <div className="flex items-center">
@@ -1031,21 +1043,22 @@ const SummaryCard = ({ icon: Icon, label, value, color }) => {
         </div>
         <div>
           <p className="text-sm font-semibold text-gray-600 mb-1">{label}</p>
-          <p className={`text-2xl font-bold ${textColorClasses[color]}`}>${value.toFixed(2)}</p>
+          <p className={`text-2xl font-bold ${textColorClasses[color]}`}>
+            ${displayValue.toFixed(2)}
+          </p>
         </div>
       </div>
     </div>
   );
 };
 
-const ViewRenderer = ({ activeView, budget, currentUser }) => {
+const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed }) => {
   const {
     envelopes,
     bills,
     savingsGoals,
     supplementalAccounts,
     unassignedCash,
-    biweeklyAllocation,
     paycheckHistory,
     actualBalance,
     transactions,
@@ -1122,7 +1135,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
     ),
     paycheck: (
       <PaycheckProcessor
-        biweeklyAllocation={biweeklyAllocation}
+        biweeklyAllocation={totalBiweeklyNeed}
         envelopes={envelopes}
         paycheckHistory={paycheckHistory}
         onProcessPaycheck={processPaycheck}
@@ -1139,7 +1152,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
         }}
         onUpdateBill={(updatedBill) => {
           // Update the bill using budget store method
-          updateTransaction(updatedBill);
+          updateBill(updatedBill);
         }}
         onCreateRecurringBill={(newBill) => {
           // Store bill properly using budget store - no transaction created until paid

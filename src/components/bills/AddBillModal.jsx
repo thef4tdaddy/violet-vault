@@ -206,6 +206,39 @@ const AddBillModal = ({
     }
   };
 
+  // Helper function to normalize date format to ensure 4-digit years
+  const normalizeDateFormat = (dateString) => {
+    if (!dateString) return dateString;
+
+    // If it's already in YYYY-MM-DD format, return as is
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      return dateString;
+    }
+
+    // Handle various formats and convert 2-digit years to 4-digit
+    if (typeof dateString === "string") {
+      // Convert MM/DD/YY or MM-DD-YY to YYYY-MM-DD
+      const dateMatch = dateString.match(/(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})/);
+      if (dateMatch) {
+        const [, month, day, year] = dateMatch;
+        let fullYear = year;
+
+        // Convert 2-digit year to 4-digit (assumes 00-30 = 2000-2030, 31-99 = 1931-1999)
+        if (year.length === 2) {
+          fullYear = parseInt(year) <= 30 ? `20${year}` : `19${year}`;
+        }
+
+        // Ensure proper formatting with leading zeros
+        const paddedMonth = month.padStart(2, "0");
+        const paddedDay = day.padStart(2, "0");
+
+        return `${fullYear}-${paddedMonth}-${paddedDay}`;
+      }
+    }
+
+    return dateString;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.amount) {
@@ -213,6 +246,9 @@ const AddBillModal = ({
     }
 
     const amount = parseFloat(formData.amount);
+
+    // Normalize the due date to ensure proper format
+    const normalizedDueDate = normalizeDateFormat(formData.dueDate);
 
     const billData = {
       id: editingBill ? editingBill.id : `bill_${Date.now()}`,
@@ -222,12 +258,12 @@ const AddBillModal = ({
       category: formData.category,
       color: formData.color,
       notes: formData.notes,
-      dueDate: formData.dueDate,
+      dueDate: normalizedDueDate,
       customFrequency:
         formData.frequency === "custom" ? parseFloat(formData.customFrequency) || 1 : undefined,
       biweeklyAmount: calculateBiweeklyAmount(amount, formData.frequency, formData.customFrequency),
       monthlyAmount: calculateMonthlyAmount(amount, formData.frequency, formData.customFrequency),
-      nextDueDate: getNextDueDate(formData.frequency, formData.dueDate),
+      nextDueDate: getNextDueDate(formData.frequency, normalizedDueDate),
       icon: getIconByName(formData.iconName),
       iconName: formData.iconName,
       // For unified system compatibility
@@ -237,7 +273,7 @@ const AddBillModal = ({
       provider: formData.name.trim(),
       description: formData.name.trim(),
       createdAt: editingBill ? editingBill.createdAt : new Date().toISOString(),
-      date: formData.dueDate || new Date().toISOString().split("T")[0],
+      date: normalizedDueDate || new Date().toISOString().split("T")[0],
       // Preserve any other properties from the original bill
       ...(editingBill && {
         lastUpdated: new Date().toISOString(),
