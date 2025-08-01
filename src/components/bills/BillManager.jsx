@@ -61,50 +61,51 @@ const BillManager = ({
 
   const bills = useMemo(() => {
     // Combine bills from transactions and the dedicated bills store
-    const billsFromTransactions = transactions.filter((t) => t && (t.type === "bill" || t.type === "recurring_bill"));
+    const billsFromTransactions = transactions.filter(
+      (t) => t && (t.type === "bill" || t.type === "recurring_bill")
+    );
     const billsFromStore = budget.bills || [];
-    
+
     // Merge both sources, prioritizing store bills over transaction bills with same ID
     const combinedBills = [...billsFromStore];
-    billsFromTransactions.forEach(bill => {
-      if (!combinedBills.find(b => b.id === bill.id)) {
+    billsFromTransactions.forEach((bill) => {
+      if (!combinedBills.find((b) => b.id === bill.id)) {
         combinedBills.push(bill);
       }
     });
-    
-    return combinedBills
-      .map((bill) => {
-        let daysUntilDue = null;
-        let urgency = "normal";
 
-        if (bill.dueDate) {
-          try {
-            const today = new Date();
-            const due = new Date(bill.dueDate);
+    return combinedBills.map((bill) => {
+      let daysUntilDue = null;
+      let urgency = "normal";
 
-            // Validate date is valid
-            if (!isNaN(due.getTime())) {
-              daysUntilDue = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+      if (bill.dueDate) {
+        try {
+          const today = new Date();
+          const due = new Date(bill.dueDate);
 
-              if (daysUntilDue < 0) urgency = "overdue";
-              else if (daysUntilDue <= 3) urgency = "urgent";
-              else if (daysUntilDue <= 7) urgency = "soon";
-            }
-          } catch (error) {
-            console.warn(`Invalid due date for bill ${bill.id}:`, bill.dueDate, error);
+          // Validate date is valid
+          if (!isNaN(due.getTime())) {
+            daysUntilDue = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+
+            if (daysUntilDue < 0) urgency = "overdue";
+            else if (daysUntilDue <= 3) urgency = "urgent";
+            else if (daysUntilDue <= 7) urgency = "soon";
           }
+        } catch (error) {
+          console.warn(`Invalid due date for bill ${bill.id}:`, bill.dueDate, error);
         }
+      }
 
-        return {
-          ...bill,
-          // Ensure required fields have valid values
-          amount: typeof bill.amount === "number" ? bill.amount : 0,
-          description: bill.description || bill.provider || `Bill ${bill.id}`,
-          isPaid: Boolean(bill.isPaid),
-          daysUntilDue,
-          urgency,
-        };
-      });
+      return {
+        ...bill,
+        // Ensure required fields have valid values
+        amount: typeof bill.amount === "number" ? bill.amount : 0,
+        description: bill.description || bill.provider || `Bill ${bill.id}`,
+        isPaid: Boolean(bill.isPaid),
+        daysUntilDue,
+        urgency,
+      };
+    });
   }, [transactions, budget.bills]);
 
   const categorizedBills = useMemo(() => {
