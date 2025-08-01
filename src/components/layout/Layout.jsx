@@ -919,7 +919,12 @@ const MainContent = ({
         </div>
 
         {/* Main Content */}
-        <ViewRenderer activeView={activeView} budget={budget} currentUser={currentUser} />
+        <ViewRenderer 
+          activeView={activeView} 
+          budget={budget} 
+          currentUser={currentUser}
+          totalBiweeklyNeed={totalBiweeklyNeed}
+        />
 
         {/* Loading/Syncing Overlay */}
         {isSyncing && (
@@ -1045,14 +1050,13 @@ const SummaryCard = ({ icon: Icon, label, value, color }) => {
   );
 };
 
-const ViewRenderer = ({ activeView, budget, currentUser }) => {
+const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed }) => {
   const {
     envelopes,
     bills,
     savingsGoals,
     supplementalAccounts,
     unassignedCash,
-    biweeklyAllocation,
     paycheckHistory,
     actualBalance,
     transactions,
