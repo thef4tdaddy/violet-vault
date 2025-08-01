@@ -571,12 +571,12 @@ const AddBillModal = ({
                 <p className="text-sm text-gray-600">This action cannot be undone</p>
               </div>
             </div>
-            
+
             <p className="text-gray-700 mb-6">
-              Are you sure you want to delete "{editingBill?.name || editingBill?.provider}"? 
-              This will permanently remove the bill from your tracker.
+              Are you sure you want to delete "{editingBill?.name || editingBill?.provider}"? This
+              will permanently remove the bill from your tracker.
             </p>
-            
+
             <div className="flex gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
