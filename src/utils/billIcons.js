@@ -57,6 +57,11 @@ import {
   Scissors, // Personal Care
   Activity, // Gym/Fitness
 
+  // Food & Dining
+  UtensilsCrossed, // Restaurants/Food
+  Coffee, // Coffee/Beverages
+  ShoppingCart, // Grocery/Shopping
+
   // Business & Professional
   Briefcase, // Business Services
   FileText, // Professional Services
@@ -499,7 +504,7 @@ export const getBillIconOptions = (category = "") => {
  * @returns {string} Display name
  */
 export const getIconName = (IconComponent) => {
-  if (!IconComponent || !IconComponent.name) return "Icon";
+  if (!IconComponent || !IconComponent.displayName) return "Icon";
 
   // Convert component name to readable format
   // e.g., "Zap" -> "Electric", "Droplets" -> "Water"
@@ -528,7 +533,81 @@ export const getIconName = (IconComponent) => {
     Briefcase: "Business",
   };
 
-  return nameMap[IconComponent.name] || IconComponent.name || "Icon";
+  return nameMap[IconComponent.displayName] || IconComponent.displayName || "Icon";
+};
+
+// Create a map of all available icons by name for serialization
+const ALL_ICONS = {
+  // Utilities
+  Zap,
+  Droplets,
+  Flame,
+  Wifi,
+  Phone,
+  Cable,
+  Radio,
+  // Housing & Property
+  Home,
+  Building,
+  Wrench,
+  Lock,
+  // Transportation
+  Car,
+  Fuel,
+  ParkingCircle,
+  // Insurance & Protection
+  Shield,
+  Heart,
+  Umbrella,
+  // Financial Services
+  CreditCard,
+  Building2,
+  PiggyBank,
+  Calculator,
+  // Health & Medical
+  Cross,
+  Pill,
+  Stethoscope,
+  Eye,
+  Smile,
+  // Entertainment & Media
+  Film,
+  Music,
+  Gamepad2,
+  Newspaper,
+  // Education & Development
+  GraduationCap,
+  Book,
+  Laptop,
+  // Personal Care & Services
+  Scissors,
+  Activity,
+  Baby,
+  Users,
+  // Food & Dining
+  UtensilsCrossed,
+  Coffee,
+  ShoppingCart,
+  // Professional & Business
+  Briefcase,
+  FileText,
+  Printer,
+  // Default fallback
+  Receipt,
+};
+
+// Get icon component by name (for deserializing stored data)
+export const getIconByName = (iconName) => {
+  if (!iconName || typeof iconName !== "string") {
+    return FileText; // Default fallback
+  }
+  return ALL_ICONS[iconName] || FileText;
+};
+
+// Get icon name from component (for serializing to storage)
+export const getIconNameForStorage = (IconComponent) => {
+  if (!IconComponent) return "FileText";
+  return IconComponent.displayName || "FileText";
 };
 
 export default {
@@ -536,4 +615,6 @@ export default {
   suggestBillCategoryAndIcon,
   getBillIconOptions,
   getIconName,
+  getIconByName,
+  getIconNameForStorage,
 };

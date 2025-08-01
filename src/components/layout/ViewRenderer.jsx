@@ -34,6 +34,12 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
     addEnvelope,
     updateEnvelope,
     processPaycheck,
+    addTransaction,
+    updateTransaction,
+    deleteTransaction,
+    addBill,
+    updateBill,
+    deleteBill,
     setAllTransactions,
     setTransactions,
   } = budget;
@@ -118,16 +124,18 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
           setAllTransactions(updatedTransactions);
         }}
         onCreateRecurringBill={(newBill) => {
-          // Add new bill to allTransactions
-          const billTransaction = {
+          // Store bill properly using budget store - no transaction created until paid
+          console.log("📋 Creating new bill:", newBill);
+          const bill = {
             ...newBill,
-            id: `bill_${Date.now()}`,
+            id: newBill.id || `bill_${Date.now()}`,
             type: "recurring_bill",
-            date: new Date().toISOString().split("T")[0],
             isPaid: false,
             source: "manual",
+            createdAt: new Date().toISOString(),
           };
-          setAllTransactions([...allTransactions, billTransaction]);
+          addBill(bill);
+          console.log("✅ Bill stored successfully - no transaction created until paid");
         }}
         onSearchNewBills={async () => {
           try {
@@ -151,9 +159,18 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
       <TransactionLedger
         transactions={allTransactions}
         envelopes={envelopes}
-        onAddTransaction={() => {}} // Will be implemented
-        onUpdateTransaction={() => {}} // Will be implemented
-        onDeleteTransaction={() => {}} // Will be implemented
+        onAddTransaction={(newTransaction) => {
+          console.log("🔄 Adding new transaction:", newTransaction);
+          addTransaction(newTransaction);
+        }}
+        onUpdateTransaction={(updatedTransaction) => {
+          console.log("🔄 Updating transaction:", updatedTransaction);
+          updateTransaction(updatedTransaction);
+        }}
+        onDeleteTransaction={(transactionId) => {
+          console.log("🔄 Deleting transaction:", transactionId);
+          deleteTransaction(transactionId);
+        }}
         onBulkImport={(newTransactions) => {
           console.log("🔄 onBulkImport called with transactions:", newTransactions.length);
           const updatedAllTransactions = [...allTransactions, ...newTransactions];

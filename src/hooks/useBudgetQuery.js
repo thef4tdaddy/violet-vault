@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import useBudgetStore from "../stores/budgetStore";
-import { budgetDb } from "../db/budgetDb";
+import { optimizedDb } from "../db/budgetDb";
 import { queryKeys, optimisticHelpers } from "../utils/budgetQueryClient";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
@@ -18,7 +18,7 @@ export const useBudgetQuery = () => {
     queryKey: queryKeys.envelopesList(),
     queryFn: async () => {
       if (!LOCAL_ONLY_MODE) {
-        const localEnvelopes = await budgetDb.envelopes.toArray();
+        const localEnvelopes = await optimizedDb.envelopes.toArray();
         if (localEnvelopes.length > 0) {
           return localEnvelopes;
         }
@@ -34,7 +34,7 @@ export const useBudgetQuery = () => {
     mutationKey: ["envelopes", "add"],
     mutationFn: async (envelope) => {
       if (!LOCAL_ONLY_MODE) {
-        await budgetDb.envelopes.add(envelope);
+        await optimizedDb.envelopes.add(envelope);
       }
 
       store.addEnvelope(envelope);
@@ -66,7 +66,7 @@ export const useBudgetQuery = () => {
     mutationKey: ["envelopes", "update"],
     mutationFn: async (envelope) => {
       if (!LOCAL_ONLY_MODE) {
-        await budgetDb.envelopes.put(envelope);
+        await optimizedDb.envelopes.put(envelope);
       }
 
       store.updateEnvelope(envelope);
@@ -98,7 +98,7 @@ export const useBudgetQuery = () => {
     mutationKey: ["envelopes", "delete"],
     mutationFn: async (envelopeId) => {
       if (!LOCAL_ONLY_MODE) {
-        await budgetDb.envelopes.delete(envelopeId);
+        await optimizedDb.envelopes.delete(envelopeId);
       }
 
       store.deleteEnvelope(envelopeId);
@@ -151,9 +151,9 @@ export const useBudgetQuery = () => {
 
     try {
       const [dexieEnvelopes, dexieTransactions, dexieBills] = await Promise.all([
-        budgetDb.envelopes.toArray(),
-        budgetDb.transactions.toArray(),
-        budgetDb.bills.toArray(),
+        optimizedDb.envelopes.toArray(),
+        optimizedDb.transactions.toArray(),
+        optimizedDb.bills.toArray(),
       ]);
 
       queryClient.setQueryData(queryKeys.envelopesList(), dexieEnvelopes);

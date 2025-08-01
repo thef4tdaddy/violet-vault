@@ -2,7 +2,12 @@
 import React, { useState } from "react";
 import { DollarSign, User, Wallet, Calculator, TrendingUp, Clock, CheckCircle } from "lucide-react";
 
-const PaycheckProcessor = ({ envelopes, paycheckHistory, onProcessPaycheck, currentUser }) => {
+const PaycheckProcessor = ({
+  envelopes = [],
+  paycheckHistory = [],
+  onProcessPaycheck,
+  currentUser,
+}) => {
   const [paycheckAmount, setPaycheckAmount] = useState("");
   const [payerName, setPayerName] = useState(currentUser?.userName || "");
   const [allocationMode, setAllocationMode] = useState("allocate"); // 'allocate' or 'leftover'

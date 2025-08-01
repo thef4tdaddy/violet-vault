@@ -28,12 +28,18 @@ const TransactionSplitter = ({
   const [splitAllocations, setSplitAllocations] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Initialize split allocations when modal opens
-  useEffect(() => {
-    if (isOpen && transaction) {
-      initializeSplits();
-    }
-  }, [isOpen, transaction, initializeSplits]);
+  // Find envelope by category name
+  const findEnvelopeForCategory = useCallback(
+    (categoryName) => {
+      if (!categoryName) return null;
+      return envelopes.find(
+        (env) =>
+          env.name.toLowerCase() === categoryName.toLowerCase() ||
+          env.category?.toLowerCase() === categoryName.toLowerCase()
+      );
+    },
+    [envelopes]
+  );
 
   const initializeSplits = useCallback(() => {
     // Check if transaction has itemized metadata (like Amazon orders)
@@ -90,6 +96,13 @@ const TransactionSplitter = ({
     }
   }, [transaction, findEnvelopeForCategory]);
 
+  // Initialize split allocations when modal opens
+  useEffect(() => {
+    if (isOpen && transaction) {
+      initializeSplits();
+    }
+  }, [isOpen, transaction, initializeSplits]);
+
   // Add new split allocation
   const addSplitAllocation = () => {
     const totalAmount = Math.abs(transaction.amount);
@@ -138,21 +151,18 @@ const TransactionSplitter = ({
     setSplitAllocations((prev) => prev.filter((split) => split.id !== id));
   };
 
-  // Find envelope by category name
-  const findEnvelopeForCategory = useCallback(
-    (categoryName) => {
-      if (!categoryName) return null;
-      return envelopes.find(
-        (env) =>
-          env.name.toLowerCase() === categoryName.toLowerCase() ||
-          env.category?.toLowerCase() === categoryName.toLowerCase()
-      );
-    },
-    [envelopes]
-  );
-
   // Calculate split totals and validation
   const calculateSplitTotals = () => {
+    if (!transaction || transaction.amount === null || transaction.amount === undefined) {
+      return {
+        original: 0,
+        allocated: 0,
+        remaining: 0,
+        isValid: true,
+        isOverAllocated: false,
+        isUnderAllocated: false,
+      };
+    }
     const originalAmount = Math.abs(transaction.amount);
     const allocated = splitAllocations.reduce(
       (sum, split) => sum + (parseFloat(split.amount) || 0),
@@ -294,9 +304,9 @@ const TransactionSplitter = ({
     ]),
   ].sort();
 
-  const totals = calculateSplitTotals();
-
   if (!isOpen || !transaction) return null;
+
+  const totals = calculateSplitTotals();
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">

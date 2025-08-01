@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.6.1](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.6.0...violet-vault-v1.6.1) (2025-07-31)
+
+
+### Bug Fixes
+
+* add actualBalance action ([#85](https://github.com/thef4tdaddy/violet-vault/issues/85)) ([3fd41dc](https://github.com/thef4tdaddy/violet-vault/commit/3fd41dcb439f293fffb22ee2dd7e33488dd194ba))
+* ensure dynamic imports return valid components ([#86](https://github.com/thef4tdaddy/violet-vault/issues/86)) ([c1ead31](https://github.com/thef4tdaddy/violet-vault/commit/c1ead313602f05e07bb9f48dfd3b4ca0722acb5a))
+* update logo reference to use existing icon file ([47b67ec](https://github.com/thef4tdaddy/violet-vault/commit/47b67ec7b072eff4e1cd13f85b8dcda7dff41137))
+
 ## [1.6.0](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.5.1...violet-vault-v1.6.0) (2025-07-30)
 
 

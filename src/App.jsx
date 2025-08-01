@@ -3,7 +3,9 @@ import Layout from "./components/layout/MainLayout";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
 
 function App() {
-  console.log("🌟 App component is running - VioletVault starting up");
+  if (import.meta.env.MODE === "development") {
+    console.log("🌟 App component is running - VioletVault starting up");
+  }
 
   return (
     <ErrorBoundary>

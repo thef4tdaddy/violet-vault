@@ -74,8 +74,10 @@ class Logger {
 
   // Specific methods for common debugging scenarios
   budgetSync(message, data = {}) {
-    // Always log budget sync issues to console for immediate visibility
-    console.log(`💰 [BUDGET-SYNC] ${message}`, data);
+    // Only log budget sync in development mode to reduce production noise
+    if (this.isDevelopment) {
+      console.log(`💰 [BUDGET-SYNC] ${message}`, data);
+    }
 
     // Also send to Sentry
     try {

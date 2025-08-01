@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Shield, Users, Eye, EyeOff } from "lucide-react";
-import logoOnly from "../../assets/Logo Only 1024x1024.png";
+import logoOnly from "../../assets/icon-512x512.png";
+
+// Helper to log only in development
+const devLog = (...args) => {
+  if (import.meta.env.MODE === "development") {
+    devLog(...args);
+  }
+};
 
 const UserSetup = ({ onSetupComplete }) => {
-  console.log("🏗️ UserSetup component rendered", {
+  devLog("🏗️ UserSetup component rendered", {
     onSetupComplete: !!onSetupComplete,
   });
 
@@ -28,23 +35,23 @@ const UserSetup = ({ onSetupComplete }) => {
 
   // Load saved user profile on component mount
   useEffect(() => {
-    console.log("🔍 UserSetup mounted, checking for saved profile");
+    devLog("🔍 UserSetup mounted, checking for saved profile");
     const savedProfile = localStorage.getItem("userProfile");
     const savedData = localStorage.getItem("envelopeBudgetData");
 
     if (savedProfile && savedData) {
       try {
         const profile = JSON.parse(savedProfile);
-        console.log("📋 Found saved profile:", profile);
+        devLog("📋 Found saved profile:", profile);
         setUserName(profile.userName || "");
         setUserColor(profile.userColor || "#a855f7");
         setIsReturningUser(true);
-        console.log("👋 Returning user detected");
+        devLog("👋 Returning user detected");
       } catch (error) {
         console.warn("Failed to load saved profile:", error);
       }
     } else {
-      console.log("📋 No saved profile found, new user");
+      devLog("📋 No saved profile found, new user");
       setIsReturningUser(false);
     }
   }, []);
@@ -62,7 +69,7 @@ const UserSetup = ({ onSetupComplete }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("🔄 Form submitted - STEP 2 HANDLER:", {
+    devLog("🔄 Form submitted - STEP 2 HANDLER:", {
       step,
       masterPassword: !!masterPassword,
       userName: userName.trim(),
@@ -79,13 +86,13 @@ const UserSetup = ({ onSetupComplete }) => {
 
     setIsLoading(true);
     try {
-      console.log("🚀 Calling onSetupComplete...");
+      devLog("🚀 Calling onSetupComplete...");
       await onSetupComplete({
         password: masterPassword,
         userName: userName.trim(),
         userColor,
       });
-      console.log("✅ onSetupComplete succeeded");
+      devLog("✅ onSetupComplete succeeded");
     } catch (error) {
       console.error("❌ Setup failed:", error);
     } finally {
@@ -95,7 +102,7 @@ const UserSetup = ({ onSetupComplete }) => {
 
   const handleStep1Continue = async (e) => {
     e.preventDefault();
-    console.log("🔄 Step 1 continue clicked:", {
+    devLog("🔄 Step 1 continue clicked:", {
       step,
       masterPassword: !!masterPassword,
       isReturningUser,
@@ -110,13 +117,13 @@ const UserSetup = ({ onSetupComplete }) => {
 
       setIsLoading(true);
       try {
-        console.log("🚀 Attempting login for returning user...");
+        devLog("🚀 Attempting login for returning user...");
         await onSetupComplete({
           password: masterPassword,
           userName,
           userColor,
         });
-        console.log("✅ Returning user login succeeded");
+        devLog("✅ Returning user login succeeded");
       } catch (error) {
         console.error("❌ Login failed:", error);
         alert("Incorrect password. Please try again.");
@@ -131,7 +138,7 @@ const UserSetup = ({ onSetupComplete }) => {
 
   const handleStartTrackingClick = async (e) => {
     e.preventDefault();
-    console.log("🎯 Start Tracking button clicked:", {
+    devLog("🎯 Start Tracking button clicked:", {
       step,
       masterPassword: !!masterPassword,
       userName: userName.trim(),
@@ -149,7 +156,7 @@ const UserSetup = ({ onSetupComplete }) => {
 
     setIsLoading(true);
     try {
-      console.log("🚀 Calling onSetupComplete from Start Tracking...");
+      devLog("🚀 Calling onSetupComplete from Start Tracking...");
 
       // Add timeout protection
       await handleWithTimeout(async () => {
@@ -160,7 +167,7 @@ const UserSetup = ({ onSetupComplete }) => {
         });
       }, 10000);
 
-      console.log("✅ onSetupComplete succeeded from Start Tracking");
+      devLog("✅ onSetupComplete succeeded from Start Tracking");
     } catch (error) {
       console.error("❌ Setup failed from Start Tracking:", error);
       alert(`Setup failed: ${error.message}`);
@@ -170,7 +177,7 @@ const UserSetup = ({ onSetupComplete }) => {
   };
 
   const clearSavedProfile = () => {
-    console.log("🗑️ Clearing saved profile");
+    devLog("🗑️ Clearing saved profile");
     localStorage.removeItem("userProfile");
     setUserName("");
     setUserColor("#a855f7");
@@ -224,7 +231,7 @@ const UserSetup = ({ onSetupComplete }) => {
                   type={showPassword ? "text" : "password"}
                   value={masterPassword}
                   onChange={(e) => {
-                    console.log("🔐 Password input changed");
+                    devLog("🔐 Password input changed");
                     setMasterPassword(e.target.value);
                   }}
                   placeholder="Master password"
@@ -292,7 +299,7 @@ const UserSetup = ({ onSetupComplete }) => {
                   type="text"
                   value={userName}
                   onChange={(e) => {
-                    console.log("👤 Name input changed:", e.target.value);
+                    devLog("👤 Name input changed:", e.target.value);
                     setUserName(e.target.value);
                   }}
                   placeholder="e.g., Sarah, John, etc."

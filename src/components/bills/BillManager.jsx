@@ -17,10 +17,10 @@ import {
   Filter,
   Eye,
 } from "lucide-react";
-import { getBillIcon } from "../../utils/billIcons";
+import { getBillIcon, getIconByName } from "../../utils/billIcons";
 import AddBillModal from "./AddBillModal";
 
-const UnifiedBillTracker = ({
+const BillManager = ({
   transactions: propTransactions = [], // Unified data source - filters for bills
   envelopes: propEnvelopes = [],
   onPayBill,
@@ -197,13 +197,19 @@ const UnifiedBillTracker = ({
   };
 
   const getCategoryIcon = (bill) => {
-    // First priority: Check if bill has a stored icon component
-    if (bill.icon) {
+    // First priority: Check if bill has a stored iconName
+    if (bill.iconName && typeof bill.iconName === "string") {
+      const IconComponent = getIconByName(bill.iconName);
+      return <IconComponent className="h-6 w-6" />;
+    }
+
+    // Second priority: Check if bill has a stored icon component (legacy)
+    if (bill.icon && typeof bill.icon === "function") {
       const IconComponent = bill.icon;
       return <IconComponent className="h-6 w-6" />;
     }
 
-    // Second priority: Check metadata for legacy icon reference
+    // Third priority: Check metadata for legacy icon reference
     if (bill.metadata?.categoryIcon) {
       // If it's a string emoji, return it
       if (typeof bill.metadata.categoryIcon === "string") {
@@ -216,14 +222,20 @@ const UnifiedBillTracker = ({
       }
     }
 
-    // Third priority: Use smart icon detection from billIcons utility
+    // Fourth priority: Use smart icon detection from billIcons utility
     const IconComponent = getBillIcon(
       bill.provider || "",
       bill.description || "",
       bill.category || ""
     );
 
-    return <IconComponent className="h-6 w-6" />;
+    // Ensure we have a valid React component
+    if (typeof IconComponent === "function") {
+      return <IconComponent className="h-6 w-6" />;
+    }
+
+    // Fallback to a default icon if getBillIcon returns something unexpected
+    return <FileText className="h-6 w-6" />;
   };
 
   const handlePayBill = (billId) => {
@@ -880,7 +892,7 @@ const UnifiedBillTracker = ({
               onCreateRecurringBill(newBill);
             } else {
               // Fallback to budget context
-              budget.setAllTransactions([...transactions, newBill]);
+              budget.addTransaction(newBill);
             }
             setShowAddBillModal(false);
           }}
@@ -902,10 +914,7 @@ const UnifiedBillTracker = ({
               onUpdateBill(updatedBill);
             } else {
               // Fallback to budget context
-              const updatedTransactions = transactions.map((t) =>
-                t.id === updatedBill.id ? updatedBill : t
-              );
-              budget.setAllTransactions(updatedTransactions);
+              budget.updateTransaction(updatedBill);
             }
             setEditingBill(null);
           }}
@@ -919,4 +928,4 @@ const UnifiedBillTracker = ({
   );
 };
 
-export default UnifiedBillTracker;
+export default BillManager;

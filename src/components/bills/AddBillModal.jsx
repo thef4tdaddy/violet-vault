@@ -1,7 +1,13 @@
 // Extracted from old BillManager - proper bill creation modal
 import React, { useState, useEffect } from "react";
 import { X, Save, Sparkles } from "lucide-react";
-import { getBillIcon, getBillIconOptions, getIconName } from "../../utils/billIcons";
+import {
+  getBillIcon,
+  getBillIconOptions,
+  getIconName,
+  getIconByName,
+  getIconNameForStorage,
+} from "../../utils/billIcons";
 
 const AddBillModal = ({
   isOpen,
@@ -23,12 +29,15 @@ const AddBillModal = ({
         notes: editingBill.notes || "",
         createEnvelope: false, // Don't show checkbox for editing
         customFrequency: editingBill.customFrequency || "",
-        icon:
-          editingBill.icon ||
-          getBillIcon(
-            editingBill.name || editingBill.provider || "",
-            editingBill.notes || "",
-            editingBill.category || ""
+        iconName:
+          editingBill.iconName ||
+          getIconNameForStorage(
+            editingBill.icon ||
+              getBillIcon(
+                editingBill.name || editingBill.provider || "",
+                editingBill.notes || "",
+                editingBill.category || ""
+              )
           ),
       };
     }
@@ -42,7 +51,7 @@ const AddBillModal = ({
       notes: "",
       createEnvelope: true,
       customFrequency: "",
-      icon: getBillIcon("", "", "Bills"),
+      iconName: getIconNameForStorage(getBillIcon("", "", "Bills")),
     };
   });
 
@@ -54,7 +63,10 @@ const AddBillModal = ({
         formData.notes || "",
         formData.category || "Bills"
       );
-      setFormData((prev) => ({ ...prev, icon: suggestedIcon }));
+      setFormData((prev) => ({
+        ...prev,
+        iconName: getIconNameForStorage(suggestedIcon),
+      }));
     }
   }, [formData.name, formData.category, formData.notes]);
 
@@ -164,12 +176,15 @@ const AddBillModal = ({
         notes: editingBill.notes || "",
         createEnvelope: false,
         customFrequency: editingBill.customFrequency || "",
-        icon:
-          editingBill.icon ||
-          getBillIcon(
-            editingBill.name || editingBill.provider || "",
-            editingBill.notes || "",
-            editingBill.category || ""
+        iconName:
+          editingBill.iconName ||
+          getIconNameForStorage(
+            editingBill.icon ||
+              getBillIcon(
+                editingBill.name || editingBill.provider || "",
+                editingBill.notes || "",
+                editingBill.category || ""
+              )
           ),
       });
     } else {
@@ -183,7 +198,7 @@ const AddBillModal = ({
         notes: "",
         createEnvelope: true,
         customFrequency: "",
-        icon: getBillIcon("", "", "Bills"),
+        iconName: getIconNameForStorage(getBillIcon("", "", "Bills")),
       });
     }
   };
@@ -210,7 +225,8 @@ const AddBillModal = ({
       biweeklyAmount: calculateBiweeklyAmount(amount, formData.frequency, formData.customFrequency),
       monthlyAmount: calculateMonthlyAmount(amount, formData.frequency, formData.customFrequency),
       nextDueDate: getNextDueDate(formData.frequency, formData.dueDate),
-      icon: formData.icon,
+      icon: getIconByName(formData.iconName),
+      iconName: formData.iconName,
       // For unified system compatibility
       type: editingBill ? editingBill.type : "recurring_bill",
       isPaid: editingBill ? editingBill.isPaid : false,
@@ -384,12 +400,17 @@ const AddBillModal = ({
               </label>
               <div className="flex gap-2 flex-wrap">
                 {iconSuggestions.map((IconComponent, index) => {
-                  const isSelected = formData.icon === IconComponent;
+                  const isSelected = formData.iconName === IconComponent.displayName;
                   return (
                     <button
                       key={index}
                       type="button"
-                      onClick={() => setFormData({ ...formData, icon: IconComponent })}
+                      onClick={() =>
+                        setFormData({
+                          ...formData,
+                          iconName: IconComponent.displayName,
+                        })
+                      }
                       className={`p-3 rounded-lg border-2 transition-all hover:scale-105 ${
                         isSelected
                           ? "border-purple-500 bg-purple-50 text-purple-700"
@@ -459,7 +480,9 @@ const AddBillModal = ({
                     className="w-8 h-8 rounded-lg flex items-center justify-center"
                     style={{ backgroundColor: formData.color }}
                   >
-                    <formData.icon className="h-4 w-4 text-white" />
+                    {React.createElement(getIconByName(formData.iconName), {
+                      className: "h-4 w-4 text-white",
+                    })}
                   </div>
                   <span className="text-sm font-medium text-gray-700">
                     {formData.name || "New Bill"}

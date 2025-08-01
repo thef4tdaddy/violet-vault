@@ -11,8 +11,14 @@ export default defineConfig({
       org: "f4tdaddy",
       project: "violet-vault",
       authToken: process.env.SENTRY_AUTH_TOKEN,
+      silent: true, // Reduce Sentry plugin verbosity
     }),
   ],
+  // Avoid multiple copies of React which can cause
+  // "Invalid hook call" errors during development
+  resolve: {
+    dedupe: ["react", "react-dom"],
+  },
   define: {
     "process.env": {},
     global: {},
@@ -26,11 +32,11 @@ export default defineConfig({
       },
     },
     chunkSizeWarningLimit: 1000,
-    reportCompressedSize: true,
-    minify: false, // Disable minification for debugging
+    reportCompressedSize: false, // Disable verbose size reporting
+    minify: false, // Keep disabled for faster builds
   },
   esbuild: {
-    // In production, you'll want to drop console logs and debuggers
-    // drop: ["console", "debugger"],
+    // Only drop debugger statements in production, keep console for Sentry
+    drop: process.env.NODE_ENV === "production" ? ["debugger"] : [],
   },
 });
