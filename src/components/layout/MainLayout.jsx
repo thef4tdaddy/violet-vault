@@ -184,7 +184,7 @@ const MainContent = ({
   const [activeView, setActiveView] = useState("dashboard");
 
   // Custom hooks for MainContent business logic
-  const { activeUsers, recentActivity, handleManualSync } = useFirebaseSync(
+  const { handleManualSync } = useFirebaseSync(
     firebaseSync,
     encryptionKey,
     budgetId,
@@ -201,6 +201,9 @@ const MainContent = ({
       budget.loadData(data);
     }
   };
+
+  // Handle change password - delegate to parent component
+  const handleChangePassword = onChangePassword;
 
   const {
     envelopes,

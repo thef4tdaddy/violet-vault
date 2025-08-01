@@ -59,7 +59,7 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
     // Update periodically to catch changes
     const interval = setInterval(updateActivityData, 5000);
     return () => clearInterval(interval);
-  }, [budget.getActiveUsers, budget.getRecentActivity, budget.isSyncing]);
+  }, [budget, budget.getActiveUsers, budget.getRecentActivity, budget.isSyncing]);
 
   return {
     activeUsers,
