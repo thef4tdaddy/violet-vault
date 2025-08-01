@@ -9,7 +9,7 @@ import BillManager from "../BillManager";
 import TransactionLedger from "../TransactionLedger";
 import ChartsAndAnalytics from "../ChartsAndAnalytics";
 import LoadingSpinner from "../ui/LoadingSpinner";
-import ErrorBoundary from "../ui/ErrorBoundary";
+import { ErrorBoundary } from "@highlight-run/react";
 
 /**
  * ViewRenderer component for handling main content switching

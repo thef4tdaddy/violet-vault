@@ -1,6 +1,6 @@
 import React from "react";
 import MainLayout from "./components/layout/MainLayout";
-import ErrorBoundary from "./components/ui/ErrorBoundary";
+import { ErrorBoundary } from "@highlight-run/react";
 
 function App() {
   if (import.meta.env.MODE === "development") {

@@ -1,5 +1,5 @@
 import { QueryClient, MutationCache, QueryCache } from "@tanstack/react-query";
-import { Sentry } from "./sentry";
+import { H } from "./highlight";
 
 // Optimized TanStack Query configuration
 const budgetQueryClient = new QueryClient({
@@ -33,9 +33,9 @@ const budgetQueryClient = new QueryClient({
       // Global error handling
       onError: (error, variables, context) => {
         console.error("Mutation error:", error);
-        Sentry.captureException(error, {
+        H.consumeError(error, {
+          metadata: { variables, context },
           tags: { type: "mutation_error" },
-          extra: { variables, context },
         });
       },
     },
@@ -45,9 +45,9 @@ const budgetQueryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error, query) => {
       console.error("Query error:", error);
-      Sentry.captureException(error, {
+      H.consumeError(error, {
+        metadata: { queryKey: query.queryKey },
         tags: { type: "query_error" },
-        extra: { queryKey: query.queryKey },
       });
     },
     onSuccess: (data, query) => {
