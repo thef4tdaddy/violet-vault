@@ -1,6 +1,7 @@
 # VioletVault Testing Checklist
 
 ## Pre-Development Testing
+
 Before starting any new work:
 
 - [ ] Current build works on local machine
@@ -11,6 +12,7 @@ Before starting any new work:
 ## Feature Development Testing
 
 ### During Development
+
 - [ ] Feature works as expected in development mode
 - [ ] No console errors or warnings
 - [ ] Code follows project conventions
@@ -18,6 +20,7 @@ Before starting any new work:
 - [ ] Prettier formatting applied
 
 ### Core Functionality Testing
+
 - [ ] **Authentication**
   - [ ] New user creation works
   - [ ] Existing user login works
@@ -60,6 +63,7 @@ Before starting any new work:
 ## Pre-Merge Testing (Develop Branch)
 
 ### Build Testing
+
 - [ ] Development build succeeds (`npm run build:dev`)
 - [ ] Staging build succeeds (`npm run build:staging`)
 - [ ] Production build succeeds (`npm run build`)
@@ -67,12 +71,14 @@ Before starting any new work:
 - [ ] Bundle size reasonable
 
 ### Code Quality
+
 - [ ] ESLint passes (`npm run lint`)
 - [ ] Prettier formatting applied (`npm run format`)
 - [ ] No new TypeScript errors
 - [ ] Code comments adequate
 
 ### Functionality Testing
+
 - [ ] All existing features still work
 - [ ] New feature works as expected
 - [ ] No regression in core functionality
@@ -82,6 +88,7 @@ Before starting any new work:
 ## Pre-Production Testing (Main Branch)
 
 ### Comprehensive Testing
+
 - [ ] Full user journey from signup to daily use
 - [ ] All critical paths tested
 - [ ] Edge cases considered and tested
@@ -89,18 +96,21 @@ Before starting any new work:
 - [ ] Recovery from errors works
 
 ### Data Safety
+
 - [ ] No data loss scenarios
 - [ ] Backup functionality works
 - [ ] Export/import preserves data integrity
 - [ ] Encryption/decryption stable
 
 ### Performance Testing
+
 - [ ] Application loads quickly
 - [ ] Large datasets handle well
 - [ ] Memory usage stable over time
 - [ ] No memory leaks detected
 
 ### Browser Compatibility
+
 - [ ] Works in Chrome
 - [ ] Works in Firefox
 - [ ] Works in Safari
@@ -110,6 +120,7 @@ Before starting any new work:
 ## Post-Deployment Testing
 
 ### Immediate (within 1 hour)
+
 - [ ] Application loads correctly
 - [ ] User can log in
 - [ ] Core features accessible
@@ -117,12 +128,14 @@ Before starting any new work:
 - [ ] Error monitoring shows no spikes
 
 ### Short-term (within 24 hours)
+
 - [ ] No user-reported issues
 - [ ] Error rates normal
 - [ ] Performance metrics good
 - [ ] Data integrity maintained
 
 ### Long-term (within 1 week)
+
 - [ ] No degradation in performance
 - [ ] Error rates remain low
 - [ ] User satisfaction maintained
@@ -131,6 +144,7 @@ Before starting any new work:
 ## Manual Testing Scenarios
 
 ### New User Flow
+
 1. Create new account
 2. Set up first budget
 3. Create envelopes
@@ -140,6 +154,7 @@ Before starting any new work:
 7. Verify all data persists
 
 ### Existing User Flow
+
 1. Log in with existing account
 2. Verify all data loads correctly
 3. Add new transaction
@@ -149,6 +164,7 @@ Before starting any new work:
 7. Export data
 
 ### Error Recovery
+
 1. Test with invalid password
 2. Test with corrupted data
 3. Test network offline scenarios
@@ -158,18 +174,21 @@ Before starting any new work:
 ## Critical Bug Categories
 
 ### Severity 1 (Hotfix Required)
+
 - Data loss or corruption
 - Cannot access application
 - Cannot perform financial transactions
 - Security vulnerabilities
 
 ### Severity 2 (Next Release)
+
 - Feature not working as expected
 - Performance issues
 - UI/UX problems
 - Non-critical errors
 
 ### Severity 3 (Future Release)
+
 - Minor UI issues
 - Enhancement requests
 - Nice-to-have features
@@ -178,26 +197,30 @@ Before starting any new work:
 ## Testing Tools
 
 ### Automated
+
 - ESLint for code quality
 - Prettier for formatting
 - Build process for compilation errors
 
 ### Manual
+
 - Browser developer tools
 - Error monitoring (Highlight.io/Sentry)
 - Performance profiling
 - Network throttling
 
 ### User Testing
+
 - Wife as primary user feedback
 - Real-world usage scenarios
 - Long-term stability testing
 
 ## Documentation
+
 - [ ] Update user documentation if needed
 - [ ] Update developer documentation
 - [ ] Create release notes
 - [ ] Document any known issues
 
-Last Updated: 2025-01-31
+Last Updated: 2025-08-01
 Version: 1.0.0
