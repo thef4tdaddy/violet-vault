@@ -81,7 +81,23 @@ const BillManager = ({
       if (bill.dueDate) {
         try {
           const today = new Date();
-          const due = new Date(bill.dueDate);
+
+          // Fix 2-digit year parsing by converting to 4-digit years
+          let normalizedDate = bill.dueDate;
+
+          // Handle various date formats and convert 2-digit years to 4-digit
+          if (typeof normalizedDate === "string") {
+            // Match patterns like MM/DD/YY, MM-DD-YY, etc.
+            normalizedDate = normalizedDate.replace(
+              /(\d{1,2})[/-](\d{1,2})[/-](\d{2})$/,
+              (match, month, day, year) => {
+                const fullYear = parseInt(year) <= 30 ? `20${year}` : `19${year}`;
+                return `${month}/${day}/${fullYear}`;
+              }
+            );
+          }
+
+          const due = new Date(normalizedDate);
 
           // Validate date is valid
           if (!isNaN(due.getTime())) {
@@ -931,7 +947,7 @@ const BillManager = ({
               onUpdateBill(updatedBill);
             } else {
               // Fallback to budget context
-              budget.updateTransaction(updatedBill);
+              budget.updateBill(updatedBill);
             }
             setEditingBill(null);
           }}
