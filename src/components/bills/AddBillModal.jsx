@@ -1,6 +1,6 @@
 // Extracted from old BillManager - proper bill creation modal
 import React, { useState, useEffect } from "react";
-import { X, Save, Sparkles } from "lucide-react";
+import { X, Save, Sparkles, Trash2 } from "lucide-react";
 import {
   getBillIcon,
   getBillIconOptions,
@@ -16,6 +16,7 @@ const AddBillModal = ({
   onAddEnvelope,
   editingBill = null,
   onUpdateBill,
+  onDeleteBill,
 }) => {
   const [formData, setFormData] = useState(() => {
     if (editingBill) {
@@ -54,6 +55,8 @@ const AddBillModal = ({
       iconName: getIconNameForStorage(getBillIcon("", "", "Bills")),
     };
   });
+
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Update icon when name or category changes
   useEffect(() => {
@@ -266,8 +269,18 @@ const AddBillModal = ({
   };
 
   const cancelEdit = () => {
+    setShowDeleteConfirm(false);
     resetForm();
     onClose();
+  };
+
+  const handleDelete = () => {
+    if (editingBill && onDeleteBill) {
+      onDeleteBill(editingBill.id);
+      setShowDeleteConfirm(false);
+      resetForm();
+      onClose();
+    }
   };
 
   return (
@@ -524,6 +537,16 @@ const AddBillModal = ({
             >
               Cancel
             </button>
+            {editingBill && onDeleteBill && (
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(true)}
+                className="px-4 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50 flex items-center justify-center"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete
+              </button>
+            )}
             <button
               type="submit"
               className="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold px-4 py-2 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-purple-400/30 w-auto"
@@ -534,6 +557,44 @@ const AddBillModal = ({
           </div>
         </form>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                <Trash2 className="h-6 w-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Delete Bill</h3>
+                <p className="text-sm text-gray-600">This action cannot be undone</p>
+              </div>
+            </div>
+            
+            <p className="text-gray-700 mb-6">
+              Are you sure you want to delete "{editingBill?.name || editingBill?.provider}"? 
+              This will permanently remove the bill from your tracker.
+            </p>
+            
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="flex-1 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center justify-center"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete Bill
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

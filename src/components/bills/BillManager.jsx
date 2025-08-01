@@ -930,6 +930,11 @@ const BillManager = ({
             }
             setEditingBill(null);
           }}
+          onDeleteBill={(billId) => {
+            // Use budget store's deleteBill function
+            budget.deleteBill(billId);
+            setEditingBill(null);
+          }}
           onAddEnvelope={(envelopeData) => {
             // Add envelope to budget context
             budget.addEnvelope(envelopeData);
