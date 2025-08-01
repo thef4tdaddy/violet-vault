@@ -9,6 +9,7 @@ import BillManager from "../BillManager";
 import TransactionLedger from "../TransactionLedger";
 import ChartsAndAnalytics from "../ChartsAndAnalytics";
 import LoadingSpinner from "../ui/LoadingSpinner";
+import ErrorBoundary from "../ui/ErrorBoundary";
 
 /**
  * ViewRenderer component for handling main content switching
@@ -196,9 +197,11 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
   };
 
   return (
-    <Suspense fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}>
-      {views[activeView]}
-    </Suspense>
+    <ErrorBoundary>
+      <Suspense fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}>
+        {views[activeView]}
+      </Suspense>
+    </ErrorBoundary>
   );
 };
 
