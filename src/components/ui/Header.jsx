@@ -36,12 +36,7 @@ const Header = memo(
             <img
               src={logoWithText}
               alt="VioletVault Logo"
-              style={{
-                height: "360px",
-                width: "auto",
-                maxWidth: "900px",
-                objectFit: "contain",
-              }}
+              className="h-48 sm:h-64 md:h-80 lg:h-96 xl:h-[28rem] 2xl:h-[32rem] w-auto max-w-full object-contain"
             />
             <p className="text-gray-600 text-sm mt-3 font-medium">
               Encryption First, Family Budgeting Management
