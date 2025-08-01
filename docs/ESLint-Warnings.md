@@ -5,7 +5,7 @@ This document explains the expected ESLint warnings in the VioletVault codebase 
 ## Current Status
 - **Total Warnings**: 14
 - **Status**: Expected and non-blocking
-- **Last Updated**: January 2025
+- **Last Updated**: August 2025
 
 ## Warning Categories
 
@@ -87,7 +87,7 @@ this.envelopes.hook("creating", (_primKey, obj, _trans) => {
 
 ## Resolution History
 
-### January 2025 - Major Cleanup
+### August 2025 - Major Cleanup
 - **Reduced from 21 to 14 warnings** (33% improvement)
 - **Fixed functional issues:**
   - Missing `handleChangePassword` function in MainLayout
