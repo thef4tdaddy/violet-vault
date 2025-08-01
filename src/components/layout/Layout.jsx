@@ -682,7 +682,6 @@ const MainContent = ({
     envelopes,
     savingsGoals,
     unassignedCash,
-    biweeklyAllocation,
     paycheckHistory,
     isOnline,
     isSyncing,
@@ -1130,7 +1129,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
     ),
     paycheck: (
       <PaycheckProcessor
-        biweeklyAllocation={biweeklyAllocation}
+        biweeklyAllocation={totalBiweeklyNeed}
         envelopes={envelopes}
         paycheckHistory={paycheckHistory}
         onProcessPaycheck={processPaycheck}
