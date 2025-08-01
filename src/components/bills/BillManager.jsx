@@ -60,8 +60,19 @@ const BillManager = ({
   });
 
   const bills = useMemo(() => {
-    return transactions
-      .filter((t) => t && (t.type === "bill" || t.type === "recurring_bill"))
+    // Combine bills from transactions and the dedicated bills store
+    const billsFromTransactions = transactions.filter((t) => t && (t.type === "bill" || t.type === "recurring_bill"));
+    const billsFromStore = budget.bills || [];
+    
+    // Merge both sources, prioritizing store bills over transaction bills with same ID
+    const combinedBills = [...billsFromStore];
+    billsFromTransactions.forEach(bill => {
+      if (!combinedBills.find(b => b.id === bill.id)) {
+        combinedBills.push(bill);
+      }
+    });
+    
+    return combinedBills
       .map((bill) => {
         let daysUntilDue = null;
         let urgency = "normal";
@@ -94,7 +105,7 @@ const BillManager = ({
           urgency,
         };
       });
-  }, [transactions]);
+  }, [transactions, budget.bills]);
 
   const categorizedBills = useMemo(() => {
     const upcomingBills = bills.filter((b) => !b.isPaid && b.daysUntilDue >= 0);
