@@ -139,6 +139,33 @@ const storeInitializer = (set, _get) => ({
       state.isOnline = status;
     }),
 
+  // Reconcile transaction - adds a transaction and updates balances appropriately
+  reconcileTransaction: (transactionData) =>
+    set((state) => {
+      const transaction = {
+        ...transactionData,
+        id: transactionData.id || Date.now(),
+        date: transactionData.date || new Date().toISOString().split("T")[0],
+        reconciledAt: transactionData.reconciledAt || new Date().toISOString(),
+      };
+
+      // Add transaction to both arrays
+      state.transactions.push(transaction);
+      state.allTransactions.push(transaction);
+
+      // Update balances based on envelope assignment
+      if (transaction.envelopeId && transaction.envelopeId !== "unassigned") {
+        // Update specific envelope balance
+        const envelope = state.envelopes.find((env) => env.id === transaction.envelopeId);
+        if (envelope) {
+          envelope.currentBalance = (envelope.currentBalance || 0) + transaction.amount;
+        }
+      } else {
+        // Update unassigned cash
+        state.unassignedCash = (state.unassignedCash || 0) + transaction.amount;
+      }
+    }),
+
   // Reset functionality
   resetStore: () =>
     set((state) => {
