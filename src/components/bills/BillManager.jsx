@@ -647,7 +647,7 @@ const BillManager = ({
                     />
                     <div className="text-xl">{getCategoryIcon(bill)}</div>
                   </div>
-                  
+
                   <div className="flex items-center gap-1">
                     {getUrgencyIcon(bill.urgency, bill.isPaid)}
                     <button
@@ -703,9 +703,7 @@ const BillManager = ({
                         Paid: {new Date(bill.paidDate).toLocaleDateString()}
                       </p>
                     )}
-                    {bill.accountNumber && (
-                      <p>Account: {bill.accountNumber}</p>
-                    )}
+                    {bill.accountNumber && <p>Account: {bill.accountNumber}</p>}
                   </div>
                 </div>
 
@@ -723,7 +721,7 @@ const BillManager = ({
                           </p>
                         )}
                     </div>
-                    
+
                     {!bill.isPaid && (
                       <button
                         onClick={() => handlePayBill(bill.id)}
@@ -743,7 +741,8 @@ const BillManager = ({
                         <div className="flex justify-between">
                           <span>Period:</span>
                           <span className="text-right">
-                            {bill.metadata.statementPeriod.start} - {bill.metadata.statementPeriod.end}
+                            {bill.metadata.statementPeriod.start} -{" "}
+                            {bill.metadata.statementPeriod.end}
                           </span>
                         </div>
                       )}
