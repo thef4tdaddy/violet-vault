@@ -125,13 +125,13 @@ const BillManager = ({
 
   const totals = useMemo(() => {
     const overdueTotal = categorizedBills.overdue.reduce((sum, b) => sum + Math.abs(b.amount), 0);
-    
+
     // Calculate "due soon" as bills due within 7 days (urgent + soon)
     const dueSoonBills = categorizedBills.upcoming.filter(
       (b) => b.urgency === "urgent" || b.urgency === "soon"
     );
     const dueSoonTotal = dueSoonBills.reduce((sum, b) => sum + Math.abs(b.amount), 0);
-    
+
     const paidThisMonth = categorizedBills.paid
       .filter((b) => new Date(b.paidDate || b.date).getMonth() === new Date().getMonth())
       .reduce((sum, b) => sum + Math.abs(b.amount), 0);
@@ -508,9 +508,7 @@ const BillManager = ({
             </div>
             <Clock className="h-8 w-8 text-orange-200" />
           </div>
-          <p className="text-xs text-orange-100 mt-2">
-            {totals.dueSoonCount} bills due soon
-          </p>
+          <p className="text-xs text-orange-100 mt-2">{totals.dueSoonCount} bills due soon</p>
         </div>
 
         <div className="bg-gradient-to-br from-green-500 to-green-600 p-4 rounded-lg text-white">
