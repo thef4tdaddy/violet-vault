@@ -50,51 +50,41 @@ This roadmap outlines the planned development phases for VioletVault, our secure
 - [ ] **Predictive Analytics** - Spending trend predictions and budget recommendations
 - [ ] **Goal Tracking Enhancements** - Visual progress tracking with milestone-based savings
 
-### 📱 v2.0.0 – Mobile & PWA (Oct 15, 2025)
+### 📱 v2.0.0 – Multi-Platform & PWA (Oct 15, 2025)
 
-- [ ] **Mobile Applications** ([#61](https://github.com/thef4tdaddy/violet-vault/issues/61)) - Native iOS and Android apps
+- [ ] **Mobile Applications** ([#61](https://github.com/thef4tdaddy/violet-vault/issues/61)) - Native iOS and Android apps  
+- [ ] **Desktop Applications** ([#62](https://github.com/thef4tdaddy/violet-vault/issues/62)) - Electron-based apps for Windows/Mac/Linux
 - [ ] **Progressive Web App** - Full PWA support with offline functionality
 - [ ] **Mobile Layout Optimization** - Responsive design for all screen sizes
 - [ ] **Touch-Optimized Interactions** - Mobile-first navigation and gesture support
 - [ ] **Push Notifications** - Budget alerts and transaction notifications
 - [ ] **Offline-First Architecture** - Local data sync and connectivity handling
 
-### 🌙 v2.1.0 - Dark Mode Foundation (Nov 30, 2025)
+### 🌙 v2.1.0 - Dark Mode Complete (Nov 30, 2025)
 
 - [ ] **Theme System Architecture** ([#121](https://github.com/thef4tdaddy/violet-vault/issues/121)) - CSS custom properties and theme context
+- [ ] **Complete Interface Implementation** ([#122](https://github.com/thef4tdaddy/violet-vault/issues/122)) - All components with dark mode support
 - [ ] **Color Palette Development** - Light/dark color schemes with accessibility compliance
 - [ ] **Theme Switching Logic** - User preference storage and system detection
-- [ ] **Component Theme Support** - Foundation styling for all major components
-- [ ] **Performance Optimization** - Efficient theme switching without re-renders
-
-### 🎨 v2.2.0 - Dark Mode UI Components (Dec 31, 2025)
-
-- [ ] **Complete Interface Implementation** ([#122](https://github.com/thef4tdaddy/violet-vault/issues/122)) - All components with dark mode support
-- [ ] **Visual Polish & Consistency** - Unified dark mode experience across all screens
 - [ ] **Chart & Visualization Themes** - Dark mode support for analytics and reports
 - [ ] **Accessibility Compliance** - WCAG contrast standards for both themes
-- [ ] **User Experience Testing** - Theme consistency and usability validation
 
 ---
 
 ## 🏢 2026 Major Enhancements
 
-### 💼 v3.0.0 - Small Business Foundations (Apr 30, 2026)
+### 💼 v3.0.0 - Small Business Complete (Apr 30, 2026)
 
 - [ ] **Multi-Entity Management** ([#124](https://github.com/thef4tdaddy/violet-vault/issues/124)) - Support for multiple business entities
+- [ ] **Tax & Compliance Integration** ([#125](https://github.com/thef4tdaddy/violet-vault/issues/125)) - IRS-compliant expense categorization
 - [ ] **Business-Specific Features** - Advanced categorization and expense tracking
 - [ ] **Entity Switching Interface** - Quick context switching between personal/business budgets
-- [ ] **Client & Vendor Management** - Invoice and payment tracking systems
-- [ ] **Business Analytics Dashboard** - Profit & loss statements and cash flow projections
-- [ ] **Multi-Entity Data Architecture** - Secure data separation and cross-entity reporting
-
-### 📊 v3.1.0 - Tax & Compliance Integration (Jul 31, 2026)
-
-- [ ] **Tax Category System** ([#125](https://github.com/thef4tdaddy/violet-vault/issues/125)) - IRS-compliant expense categorization
 - [ ] **Receipt Management** - OCR-powered receipt capture and storage
 - [ ] **Mileage & Time Tracking** - GPS-based business expense tracking
 - [ ] **Tax Software Integration** - TurboTax and H&R Block export compatibility
 - [ ] **Accountant Collaboration** - Secure data sharing and professional export packages
+- [ ] **Client & Vendor Management** - Invoice and payment tracking systems
+- [ ] **Business Analytics Dashboard** - Profit & loss statements and cash flow projections
 - [ ] **Compliance Dashboard** - Automated regulatory checking and audit trail documentation
 
 ---
