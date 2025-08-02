@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, setDoc, getDoc, onSnapshot, serverTimestamp } from "firebase/firestore";
 import { encryptionUtils } from "./encryption";
-import { Sentry } from "./sentry.js";
+import { H } from "./highlight.js";
 import { firebaseConfig } from "./firebaseConfig";
 
 const app = initializeApp(firebaseConfig);
@@ -48,15 +48,13 @@ class FirebaseSync {
       timestamp: new Date().toISOString(),
     });
 
-    // Log initialization to Sentry
-    Sentry.captureMessage("FirebaseSync initialized", {
-      level: "info",
-      tags: { component: "FirebaseSync", operation: "initialize" },
-      extra: {
-        budgetId,
-        hasEncryptionKey: !!encryptionKey,
-        queueLength: this.syncQueue.length,
-      },
+    // Log initialization to Highlight.io
+    H.track("firebase-sync-initialized", {
+      component: "FirebaseSync",
+      operation: "initialize",
+      budgetId,
+      hasEncryptionKey: !!encryptionKey,
+      queueLength: this.syncQueue.length,
     });
   }
 
@@ -225,13 +223,9 @@ class FirebaseSync {
     } catch (error) {
       console.error("❌ Failed to decrypt cloud data:", error);
 
-      // Send error to Sentry with context
-      Sentry.captureException(error, {
-        tags: {
-          component: "firebaseSync",
-          operation: "decryptData",
-        },
-        extra: {
+      // Send error to Highlight.io with context
+      H.consumeError(error, {
+        metadata: {
           hasEncryptionKey: !!this.encryptionKey,
           errorName: error.name,
           errorMessage: error.message,
@@ -259,46 +253,40 @@ class FirebaseSync {
 
   async saveToCloud(data, currentUser, options = {}) {
     if (!this.budgetId || !this.encryptionKey) {
-      Sentry.captureMessage("SaveToCloud failed - not initialized", {
-        level: "error",
+      H.consumeError(new Error("SaveToCloud failed - not initialized"), {
+        metadata: {
+          hasBudgetId: !!this.budgetId,
+          hasEncryptionKey: !!this.encryptionKey,
+          userName: currentUser?.userName,
+        },
         tags: {
           component: "FirebaseSync",
           operation: "saveToCloud",
           issue: "not_initialized",
         },
-        extra: {
-          hasBudgetId: !!this.budgetId,
-          hasEncryptionKey: !!this.encryptionKey,
-          userName: currentUser?.userName,
-        },
       });
       throw new Error("Firebase sync not initialized");
     }
 
-    // Log save attempt to Sentry
-    Sentry.captureMessage("SaveToCloud attempt started", {
-      level: "info",
-      tags: { component: "FirebaseSync", operation: "saveToCloud" },
-      extra: {
-        budgetId: this.budgetId,
-        userName: currentUser?.userName,
-        dataSize: JSON.stringify(data).length,
-        isOnline: this.isOnline,
-        options,
-      },
+    // Log save attempt to Highlight.io
+    H.track("save-to-cloud-started", {
+      component: "FirebaseSync",
+      operation: "saveToCloud",
+      budgetId: this.budgetId,
+      userName: currentUser?.userName,
+      dataSize: JSON.stringify(data).length,
+      isOnline: this.isOnline,
+      ...options,
     });
 
     // If offline, queue the operation
     if (!this.isOnline && !options.skipQueue) {
       this.queueSyncOperation("save", { data, currentUser });
       console.log("📴 Queued save operation for when online");
-      Sentry.captureMessage("SaveToCloud queued - offline", {
-        level: "info",
-        tags: {
-          component: "FirebaseSync",
-          operation: "saveToCloud",
-          status: "queued",
-        },
+      H.track("save-to-cloud-queued", {
+        component: "FirebaseSync",
+        operation: "saveToCloud",
+        status: "queued",
       });
       return;
     }
@@ -349,13 +337,9 @@ class FirebaseSync {
     } catch (error) {
       console.error("❌ Failed to save to cloud:", error);
 
-      // Send error to Sentry with context
-      Sentry.captureException(error, {
-        tags: {
-          component: "firebaseSync",
-          operation: "saveToCloud",
-        },
-        extra: {
+      // Send error to Highlight.io with context
+      H.consumeError(error, {
+        metadata: {
           budgetId: this.budgetId,
           isNetworkBlocked: this.isNetworkBlockingError(error),
           retryAttempts: this.retryAttempts,

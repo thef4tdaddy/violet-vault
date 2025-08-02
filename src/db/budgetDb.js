@@ -1,8 +1,8 @@
 import Dexie from "dexie";
 
-export class OptimizedVioletVaultDB extends Dexie {
+export class VioletVaultDB extends Dexie {
   constructor() {
-    super("VioletVaultOptimized");
+    super("VioletVault");
 
     // Optimized schema with indexes
     this.version(1).stores({
@@ -110,36 +110,36 @@ export class OptimizedVioletVaultDB extends Dexie {
   }
 }
 
-export const optimizedDb = new OptimizedVioletVaultDB();
+export const budgetDb = new VioletVaultDB();
 
 // Utility functions
-export const getOptimizedEncryptedData = async () => {
+export const getEncryptedData = async () => {
   try {
-    return await optimizedDb.budget.get("budgetData");
+    return await budgetDb.budget.get("budgetData");
   } catch {
     return null;
   }
 };
 
-export const setOptimizedEncryptedData = async (data) => {
+export const setEncryptedData = async (data) => {
   try {
-    await optimizedDb.budget.put({
+    await budgetDb.budget.put({
       id: "budgetData",
       lastModified: Date.now(),
       version: data.version || 1,
       ...data,
     });
   } catch (err) {
-    console.error("Optimized Dexie save error", err);
+    console.error("Budget Dexie save error", err);
   }
 };
 
-export const clearOptimizedData = async () => {
+export const clearData = async () => {
   await Promise.all([
-    optimizedDb.budget.clear(),
-    optimizedDb.envelopes.clear(),
-    optimizedDb.transactions.clear(),
-    optimizedDb.bills.clear(),
-    optimizedDb.cache.clear(),
+    budgetDb.budget.clear(),
+    budgetDb.envelopes.clear(),
+    budgetDb.transactions.clear(),
+    budgetDb.bills.clear(),
+    budgetDb.cache.clear(),
   ]);
 };

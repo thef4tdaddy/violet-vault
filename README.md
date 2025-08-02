@@ -50,7 +50,7 @@
 
 **Frontend:**
 
- - React 18 with Zustand for state management
+- React 18 with Zustand for state management
 - Vite for fast development and building
 - Tailwind CSS for responsive styling
 - Recharts for data visualization

@@ -1,6 +1,6 @@
 import React from "react";
 import { AlertTriangle, RefreshCw } from "lucide-react";
-import { Sentry } from "../../utils/sentry.js";
+import { H } from "../../utils/highlight.js";
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -67,45 +67,40 @@ class ErrorBoundary extends React.Component {
       this.errorBurstStartTime = currentTime;
       this.errorCount = 1;
 
-      // Send error to Sentry with enhanced context
-      Sentry.captureException(error, {
-        contexts: {
-          react: {
-            componentStack: errorInfo.componentStack,
-            failingComponent,
-          },
-          errorBoundary: {
-            errorCount: this.errorCount,
-            burstDuration: 0,
-          },
+      // Send error to Highlight.io with enhanced context
+      H.consumeError(error, {
+        metadata: {
+          componentStack: errorInfo.componentStack,
+          failingComponent,
+          errorCount: this.errorCount,
+          burstDuration: 0,
+          errorBoundary: true,
         },
         tags: {
-          errorBoundary: true,
+          errorBoundary: "true",
           failingComponent,
+          errorSignature,
         },
-        fingerprint: [errorSignature],
       });
 
-      console.log("📤 Sent error to Sentry:", errorSignature);
+      console.log("📤 Sent error to Highlight.io:", errorSignature);
     } else {
       this.errorCount++;
       console.log(`🔄 Skipping duplicate error #${this.errorCount} in burst:`, errorSignature);
 
       // If we're in a long error burst, send a summary after 10 seconds
       if (currentTime - this.errorBurstStartTime > 10000 && this.errorCount > 1) {
-        Sentry.captureMessage(`Error burst detected: ${this.errorCount} similar errors`, {
-          level: "warning",
-          contexts: {
-            errorBurst: {
-              originalError: this.lastErrorMessage,
-              errorCount: this.errorCount,
-              burstDuration: currentTime - this.errorBurstStartTime,
-              componentStack: this.lastComponentStack,
-            },
+        H.consumeError(new Error(`Error burst detected: ${this.errorCount} similar errors`), {
+          metadata: {
+            originalError: this.lastErrorMessage,
+            errorCount: this.errorCount,
+            burstDuration: currentTime - this.errorBurstStartTime,
+            componentStack: this.lastComponentStack,
+            errorBurst: true,
           },
           tags: {
-            errorBoundary: true,
-            errorBurst: true,
+            errorBoundary: "true",
+            errorBurst: "true",
             failingComponent,
           },
         });
