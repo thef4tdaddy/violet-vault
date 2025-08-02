@@ -1068,6 +1068,10 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed }) =>
     addSavingsGoal,
     updateSavingsGoal,
     deleteSavingsGoal,
+    addSupplementalAccount,
+    updateSupplementalAccount,
+    deleteSupplementalAccount,
+    transferFromSupplementalAccount,
     addEnvelope,
     updateEnvelope,
     processPaycheck,
@@ -1127,9 +1131,11 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed }) =>
     supplemental: (
       <SupplementalAccounts
         supplementalAccounts={supplementalAccounts}
-        onAddAccount={() => {}} // Will be implemented
-        onUpdateAccount={() => {}} // Will be implemented
-        onDeleteAccount={() => {}} // Will be implemented
+        onAddAccount={addSupplementalAccount}
+        onUpdateAccount={updateSupplementalAccount}
+        onDeleteAccount={deleteSupplementalAccount}
+        onTransferToEnvelope={transferFromSupplementalAccount}
+        envelopes={envelopes}
         currentUser={currentUser}
       />
     ),
