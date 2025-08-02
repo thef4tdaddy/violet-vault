@@ -2,8 +2,9 @@
 module.exports = {
   extends: ["@commitlint/config-conventional"],
   rules: {
+    // Local linting allows all types; enforcement is handled by CI
     "type-enum": [
-      2,
+      0,
       "always",
       [
         "feat", // A new feature

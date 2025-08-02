@@ -90,7 +90,7 @@ const SmartEnvelopeSuggestions = ({
 
     // 1. UNASSIGNED TRANSACTION ANALYSIS
     const unassignedTransactions = filteredTransactions.filter(
-      (t) => t.amount < 0 && (!t.envelopeId || t.envelopeId === ""),
+      (t) => t.amount < 0 && (!t.envelopeId || t.envelopeId === "")
     );
 
     // Group by category
@@ -112,10 +112,7 @@ const SmartEnvelopeSuggestions = ({
 
     // Suggest envelopes for significant unassigned categories
     Object.values(unassignedByCategory).forEach((categoryData) => {
-      if (
-        categoryData.amount >= minAmount &&
-        categoryData.count >= minTransactions
-      ) {
+      if (categoryData.amount >= minAmount && categoryData.count >= minTransactions) {
         const monthlyAverage = categoryData.amount / monthsOfData;
         const suggestedAmount = Math.ceil(monthlyAverage * bufferPercentage);
 
@@ -183,7 +180,7 @@ const SmartEnvelopeSuggestions = ({
         const existingEnvelope = envelopes.find(
           (e) =>
             e.name.toLowerCase().includes(category.toLowerCase()) ||
-            e.category?.toLowerCase().includes(category.toLowerCase()),
+            e.category?.toLowerCase().includes(category.toLowerCase())
         );
 
         if (!existingEnvelope) {
@@ -211,23 +208,17 @@ const SmartEnvelopeSuggestions = ({
     // 3. ENVELOPE OPTIMIZATION ANALYSIS
     envelopes.forEach((envelope) => {
       const envelopeTransactions = filteredTransactions.filter(
-        (t) => t.amount < 0 && t.envelopeId === envelope.id,
+        (t) => t.amount < 0 && t.envelopeId === envelope.id
       );
 
       if (envelopeTransactions.length === 0) return;
 
-      const totalSpent = envelopeTransactions.reduce(
-        (sum, t) => sum + Math.abs(t.amount),
-        0,
-      );
+      const totalSpent = envelopeTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0);
       const monthlySpent = totalSpent / monthsOfData;
       const monthlyBudget = envelope.monthlyAmount || 0;
 
       // Overspending detection
-      if (
-        monthlySpent > monthlyBudget * overspendingThreshold &&
-        monthlyBudget > 0
-      ) {
+      if (monthlySpent > monthlyBudget * overspendingThreshold && monthlyBudget > 0) {
         const overage = monthlySpent - monthlyBudget;
         const suggestedAmount = Math.ceil(monthlySpent * bufferPercentage);
 
@@ -400,9 +391,7 @@ const SmartEnvelopeSuggestions = ({
               />
             </div>
             <div>
-              <label className="block text-gray-700 mb-1">
-                Min Transactions
-              </label>
+              <label className="block text-gray-700 mb-1">Min Transactions</label>
               <input
                 type="number"
                 value={analysisSettings.minTransactions}
@@ -454,9 +443,7 @@ const SmartEnvelopeSuggestions = ({
                 <div className="flex-1">
                   <div className="flex items-center mb-2">
                     {getPriorityIcon(suggestion.priority)}
-                    <h4 className="font-medium text-gray-900 text-sm ml-2">
-                      {suggestion.title}
-                    </h4>
+                    <h4 className="font-medium text-gray-900 text-sm ml-2">{suggestion.title}</h4>
                     <span
                       className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
                         suggestion.priority === "high"
@@ -470,12 +457,8 @@ const SmartEnvelopeSuggestions = ({
                     </span>
                   </div>
 
-                  <p className="text-sm text-gray-600 mb-1">
-                    {suggestion.description}
-                  </p>
-                  <p className="text-xs text-gray-500 italic">
-                    {suggestion.reasoning}
-                  </p>
+                  <p className="text-sm text-gray-600 mb-1">{suggestion.description}</p>
+                  <p className="text-xs text-gray-500 italic">{suggestion.reasoning}</p>
                 </div>
 
                 <div className="text-right ml-4">
@@ -490,9 +473,7 @@ const SmartEnvelopeSuggestions = ({
               <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200">
                 <div className="flex items-center text-xs text-gray-500">
                   {getTypeIcon(suggestion.type)}
-                  <span className="ml-1 capitalize">
-                    {suggestion.action.replace("_", " ")}
-                  </span>
+                  <span className="ml-1 capitalize">{suggestion.action.replace("_", " ")}</span>
                   <span className="mx-2">•</span>
                   <span className="capitalize">{suggestion.impact} impact</span>
                 </div>

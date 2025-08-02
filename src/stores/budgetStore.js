@@ -1,10 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import {
-  actionTypes,
-  budgetReducer,
-  initialState,
-} from "../contexts/budgetState";
+import { actionTypes, budgetReducer, initialState } from "../contexts/budgetState";
 
 const useBudgetStore = create(
   persist(
@@ -14,8 +10,7 @@ const useBudgetStore = create(
 
       setEnvelopes: (envelopes) =>
         get().dispatch({ type: actionTypes.SET_ENVELOPES, payload: envelopes }),
-      setBills: (bills) =>
-        get().dispatch({ type: actionTypes.SET_BILLS, payload: bills }),
+      setBills: (bills) => get().dispatch({ type: actionTypes.SET_BILLS, payload: bills }),
       setSavingsGoals: (goals) =>
         get().dispatch({ type: actionTypes.SET_SAVINGS_GOALS, payload: goals }),
       setSupplementalAccounts: (accounts) =>
@@ -53,18 +48,12 @@ const useBudgetStore = create(
           type: actionTypes.SET_BIWEEKLY_ALLOCATION,
           payload: amount,
         }),
-      addEnvelope: (env) =>
-        get().dispatch({ type: actionTypes.ADD_ENVELOPE, payload: env }),
-      updateEnvelope: (env) =>
-        get().dispatch({ type: actionTypes.UPDATE_ENVELOPE, payload: env }),
-      deleteEnvelope: (id) =>
-        get().dispatch({ type: actionTypes.DELETE_ENVELOPE, payload: id }),
-      addBill: (bill) =>
-        get().dispatch({ type: actionTypes.ADD_BILL, payload: bill }),
-      updateBill: (bill) =>
-        get().dispatch({ type: actionTypes.UPDATE_BILL, payload: bill }),
-      deleteBill: (id) =>
-        get().dispatch({ type: actionTypes.DELETE_BILL, payload: id }),
+      addEnvelope: (env) => get().dispatch({ type: actionTypes.ADD_ENVELOPE, payload: env }),
+      updateEnvelope: (env) => get().dispatch({ type: actionTypes.UPDATE_ENVELOPE, payload: env }),
+      deleteEnvelope: (id) => get().dispatch({ type: actionTypes.DELETE_ENVELOPE, payload: id }),
+      addBill: (bill) => get().dispatch({ type: actionTypes.ADD_BILL, payload: bill }),
+      updateBill: (bill) => get().dispatch({ type: actionTypes.UPDATE_BILL, payload: bill }),
+      deleteBill: (id) => get().dispatch({ type: actionTypes.DELETE_BILL, payload: id }),
       addSavingsGoal: (goal) =>
         get().dispatch({ type: actionTypes.ADD_SAVINGS_GOAL, payload: goal }),
       updateSavingsGoal: (goal) =>
@@ -81,14 +70,13 @@ const useBudgetStore = create(
           type: actionTypes.RECONCILE_TRANSACTION,
           payload: data,
         }),
-      loadData: (data) =>
-        get().dispatch({ type: actionTypes.LOAD_DATA, payload: data }),
+      loadData: (data) => get().dispatch({ type: actionTypes.LOAD_DATA, payload: data }),
       resetAllData: () => get().dispatch({ type: actionTypes.RESET_ALL_DATA }),
     }),
     {
       name: "budget-store",
-    },
-  ),
+    }
+  )
 );
 
 export default useBudgetStore;

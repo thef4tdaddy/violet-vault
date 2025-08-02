@@ -1,14 +1,6 @@
 // src/components/PaycheckProcessor.jsx - Complete Component
 import React, { useState } from "react";
-import {
-  DollarSign,
-  User,
-  Wallet,
-  Calculator,
-  TrendingUp,
-  Clock,
-  CheckCircle,
-} from "lucide-react";
+import { DollarSign, User, Wallet, Calculator, TrendingUp, Clock, CheckCircle } from "lucide-react";
 
 const PaycheckProcessor = ({
   envelopes = [],
@@ -42,10 +34,7 @@ const PaycheckProcessor = ({
     let totalAllocated = 0;
 
     envelopes.forEach((envelope) => {
-      const needed = Math.max(
-        0,
-        envelope.biweeklyAllocation - envelope.currentBalance,
-      );
+      const needed = Math.max(0, envelope.biweeklyAllocation - envelope.currentBalance);
       const allocation = Math.min(needed, remainingAmount);
 
       if (allocation > 0) {
@@ -62,7 +51,7 @@ const PaycheckProcessor = ({
       totalAllocated,
       leftoverAmount: remainingAmount,
       summary: `$${totalAllocated.toFixed(
-        2,
+        2
       )} to envelopes, $${remainingAmount.toFixed(2)} to unassigned`,
     };
   };
@@ -169,8 +158,8 @@ const PaycheckProcessor = ({
                       </span>
                     </div>
                     <p className="text-sm text-gray-600">
-                      Fill up bill envelopes based on their biweekly needs, then
-                      put leftovers in unassigned cash
+                      Fill up bill envelopes based on their biweekly needs, then put leftovers in
+                      unassigned cash
                     </p>
                   </div>
                 </label>
@@ -187,13 +176,10 @@ const PaycheckProcessor = ({
                   <div className="flex-1">
                     <div className="flex items-center mb-2">
                       <TrendingUp className="h-5 w-5 mr-3 text-emerald-600" />
-                      <span className="font-semibold text-gray-900">
-                        All to Unassigned Cash
-                      </span>
+                      <span className="font-semibold text-gray-900">All to Unassigned Cash</span>
                     </div>
                     <p className="text-sm text-gray-600">
-                      Put the entire paycheck into unassigned cash for manual
-                      allocation later
+                      Put the entire paycheck into unassigned cash for manual allocation later
                     </p>
                   </div>
                 </label>
@@ -242,20 +228,14 @@ const PaycheckProcessor = ({
             {!showPreview || !preview ? (
               <div className="text-center py-12 text-gray-500">
                 <Calculator className="h-16 w-16 mx-auto mb-4 opacity-30" />
-                <p className="text-lg font-medium">
-                  Enter amount and click "Preview Allocation"
-                </p>
-                <p className="text-sm mt-2">
-                  See exactly where your money will go
-                </p>
+                <p className="text-lg font-medium">Enter amount and click "Preview Allocation"</p>
+                <p className="text-sm mt-2">See exactly where your money will go</p>
               </div>
             ) : (
               <div className="space-y-6">
                 <div className="glassmorphism rounded-2xl p-6 border border-white/20">
                   <div className="flex justify-between items-center mb-3">
-                    <span className="font-semibold text-gray-700">
-                      Total Paycheck:
-                    </span>
+                    <span className="font-semibold text-gray-700">Total Paycheck:</span>
                     <span className="text-2xl font-bold text-emerald-600">
                       ${preview.totalAmount.toFixed(2)}
                     </span>
@@ -265,51 +245,41 @@ const PaycheckProcessor = ({
                   </p>
                 </div>
 
-                {preview.mode === "allocate" &&
-                  Object.keys(preview.allocations).length > 0 && (
-                    <div className="glassmorphism rounded-2xl p-6 border border-white/20">
-                      <h4 className="font-semibold mb-4 text-purple-900">
-                        Envelope Allocations:
-                      </h4>
-                      <div className="space-y-3">
-                        {envelopes.map((envelope) => {
-                          const allocation =
-                            preview.allocations[envelope.id] || 0;
-                          if (allocation === 0) return null;
+                {preview.mode === "allocate" && Object.keys(preview.allocations).length > 0 && (
+                  <div className="glassmorphism rounded-2xl p-6 border border-white/20">
+                    <h4 className="font-semibold mb-4 text-purple-900">Envelope Allocations:</h4>
+                    <div className="space-y-3">
+                      {envelopes.map((envelope) => {
+                        const allocation = preview.allocations[envelope.id] || 0;
+                        if (allocation === 0) return null;
 
-                          return (
-                            <div
-                              key={envelope.id}
-                              className="flex justify-between items-center p-3 bg-purple-50 rounded-xl"
-                            >
-                              <div className="flex items-center">
-                                <div
-                                  className="w-3 h-3 rounded-full mr-3"
-                                  style={{ backgroundColor: envelope.color }}
-                                />
-                                <span className="font-medium text-gray-900">
-                                  {envelope.name}
-                                </span>
-                              </div>
-                              <span className="font-bold text-purple-600">
-                                ${allocation.toFixed(2)}
-                              </span>
+                        return (
+                          <div
+                            key={envelope.id}
+                            className="flex justify-between items-center p-3 bg-purple-50 rounded-xl"
+                          >
+                            <div className="flex items-center">
+                              <div
+                                className="w-3 h-3 rounded-full mr-3"
+                                style={{ backgroundColor: envelope.color }}
+                              />
+                              <span className="font-medium text-gray-900">{envelope.name}</span>
                             </div>
-                          );
-                        })}
-                      </div>
+                            <span className="font-bold text-purple-600">
+                              ${allocation.toFixed(2)}
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
-                  )}
+                  </div>
+                )}
 
                 <div className="bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-2xl p-6 text-white">
                   <div className="flex justify-between items-center">
                     <div>
-                      <span className="font-medium opacity-90">
-                        Unassigned Cash:
-                      </span>
-                      <div className="text-sm opacity-75 mt-1">
-                        Available for manual allocation
-                      </div>
+                      <span className="font-medium opacity-90">Unassigned Cash:</span>
+                      <div className="text-sm opacity-75 mt-1">Available for manual allocation</div>
                     </div>
                     <span className="text-2xl font-bold">
                       +${preview.leftoverAmount.toFixed(2)}
@@ -348,15 +318,11 @@ const PaycheckProcessor = ({
                     {paycheck.payerName.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <div className="font-semibold text-gray-900 text-lg">
-                      {paycheck.payerName}
-                    </div>
+                    <div className="font-semibold text-gray-900 text-lg">{paycheck.payerName}</div>
                     <div className="text-sm text-gray-600">
                       {new Date(paycheck.date).toLocaleDateString()} •
                       <span className="ml-1 font-medium">
-                        {paycheck.mode === "allocate"
-                          ? "Auto-allocated"
-                          : "To unassigned"}
+                        {paycheck.mode === "allocate" ? "Auto-allocated" : "To unassigned"}
                       </span>
                     </div>
                   </div>

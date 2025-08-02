@@ -34,12 +34,9 @@ export class OptimizedVioletVaultDB extends Dexie {
       obj.lastModified = Date.now();
     });
 
-    this.transactions.hook(
-      "updating",
-      (modifications, _primKey, _obj, _trans) => {
-        modifications.lastModified = Date.now();
-      },
-    );
+    this.transactions.hook("updating", (modifications, _primKey, _obj, _trans) => {
+      modifications.lastModified = Date.now();
+    });
   }
 
   // Optimized bulk operations
@@ -56,11 +53,7 @@ export class OptimizedVioletVaultDB extends Dexie {
     // 5 minutes default
     const cached = await this.cache.get(key);
     const now = Date.now();
-    if (
-      cached &&
-      cached.expiresAt > now &&
-      now - (cached.expiresAt - maxAge) < maxAge
-    ) {
+    if (cached && cached.expiresAt > now && now - (cached.expiresAt - maxAge) < maxAge) {
       return cached.value;
     }
     return null;
@@ -80,10 +73,7 @@ export class OptimizedVioletVaultDB extends Dexie {
     let result = await this.getCachedValue(cacheKey);
 
     if (!result) {
-      result = await this.envelopes
-        .where("category")
-        .equals(category)
-        .toArray();
+      result = await this.envelopes.where("category").equals(category).toArray();
       await this.setCachedValue(cacheKey, result, 60000); // 1 minute cache
     }
 
@@ -91,33 +81,26 @@ export class OptimizedVioletVaultDB extends Dexie {
   }
 
   async getTransactionsByDateRange(startDate, endDate) {
-    return this.transactions
-      .where("date")
-      .between(startDate, endDate, true, true)
-      .toArray();
+    return this.transactions.where("date").between(startDate, endDate, true, true).toArray();
   }
 
   // Batch operations for better performance
   async batchUpdate(updates) {
-    return this.transaction(
-      "rw",
-      [this.envelopes, this.transactions, this.bills],
-      async () => {
-        const promises = updates.map((update) => {
-          switch (update.type) {
-            case "envelope":
-              return this.envelopes.put(update.data);
-            case "transaction":
-              return this.transactions.put(update.data);
-            case "bill":
-              return this.bills.put(update.data);
-            default:
-              return Promise.resolve();
-          }
-        });
-        return Promise.all(promises);
-      },
-    );
+    return this.transaction("rw", [this.envelopes, this.transactions, this.bills], async () => {
+      const promises = updates.map((update) => {
+        switch (update.type) {
+          case "envelope":
+            return this.envelopes.put(update.data);
+          case "transaction":
+            return this.transactions.put(update.data);
+          case "bill":
+            return this.bills.put(update.data);
+          default:
+            return Promise.resolve();
+        }
+      });
+      return Promise.all(promises);
+    });
   }
 
   // Cleanup old cache entries

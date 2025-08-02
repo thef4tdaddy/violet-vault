@@ -1,0 +1,50 @@
+name: Enforce Commit Types on Main Branch
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  check-commits:
+    if: github.base_ref == 'main' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Install GitHub CLI
+        run: |
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+          sudo apt-add-repository https://cli.github.com/packages
+          sudo apt-get update
+          sudo apt-get install gh -y
+
+      - name: Validate commit types (fix/docs/ci/revert only)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ALLOWED="^(fix|docs|style|ci|revert):"
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          REPO=${{ github.repository }}
+          gh pr view "$PR_NUMBER" --repo "$REPO" --json commits -q '.commits[].message' > commits.txt
+
+          DISALLOWED=0
+          while read -r msg; do
+            echo "🔎 Checking commit: $msg"
+            if ! echo "$msg" | grep -Eq "$ALLOWED"; then
+              echo "❌ Disallowed commit message:"
+              echo "   \"$msg\""
+              echo "🔒 Only fix:, docs:, ci:, and revert: commit types are allowed directly on main."
+              echo "👉 Please open a PR to develop instead for feature, style, or other changes."
+              DISALLOWED=1
+            fi
+          done < commits.txt
+
+          if [ "$DISALLOWED" -eq 1 ]; then
+            echo "🚫 Commit check failed. See above for invalid messages."
+            exit 1
+          fi
+
+      - name: Success
+        run: echo "✅ All commits use allowed types."
