@@ -36,8 +36,9 @@
 - **Cash Flow Summary** - Overview of your financial health
 - **Smart Bill Matching** - Automatically categorize transactions
 - **Spending Analysis** - Detailed breakdowns by category and time period
-- **Smart Envelope Suggestions** - AI-powered recommendations based on spending patterns
+- **Smart Envelope Suggestions** - AI-powered recommendations based on spending patterns (collapsible interface)
 - **Transaction Splitting** - Split complex transactions across multiple envelopes
+- **Smart Bill Matching** - Automatically categorize and assign bills to appropriate envelopes
 
 ### ⚡ Technical Features
 
@@ -45,6 +46,8 @@
 - **Performance Optimized** - Transaction ledger now uses virtual scrolling via `@tanstack/react-virtual` for large datasets
 - **Data Pagination** - Displays transactions 10 per page to keep memory usage low
 - **Responsive Design** - Works seamlessly on desktop and mobile devices
+- **Modular Architecture** - Recently refactored for better maintainability and performance
+- **Collapsible UI Elements** - Smart suggestions panel can be collapsed for better space utilization
 
 ## 🛠️ Tech Stack
 
@@ -126,12 +129,16 @@ src/
 │   │   ├── CreateEnvelopeModal.jsx  # Advanced envelope creation
 │   │   ├── EnvelopeGrid.jsx         # Envelope visualization
 │   │   ├── PaycheckProcessor.jsx    # Paycheck allocation
-│   │   └── SmartEnvelopeSuggestions.jsx # AI envelope recommendations
+│   │   └── SmartEnvelopeSuggestions.jsx # AI envelope recommendations (collapsible)
 │   ├── bills/                  # Bill management
+│   │   ├── AddBillModal.jsx        # Bill creation/editing modal
 │   │   └── BillManager.jsx         # Bill tracking & automation
 │   ├── layout/                 # Core layout components
-│   │   ├── Dashboard.jsx           # Main dashboard view
-│   │   └── Layout.jsx              # Application shell
+│   │   ├── MainLayout.jsx          # Refactored main layout
+│   │   ├── NavigationTabs.jsx      # Tab navigation system
+│   │   ├── SummaryCards.jsx        # Summary card components
+│   │   ├── ViewRenderer.jsx        # View rendering logic
+│   │   └── Layout.jsx              # Legacy layout (being phased out)
 │   ├── savings/                # Savings management
 │   │   └── SavingsGoals.jsx        # Goal tracking & progress
 │   ├── sync/                   # Collaboration features
@@ -140,10 +147,14 @@ src/
 │       ├── TransactionLedger.jsx   # Transaction history
 │       ├── TransactionSplitter.jsx # Split transaction tool
 │       └── import/             # Import utilities
-│           └── AmazonReceiptParser.jsx # Email receipt parsing
-├── contexts/               # State management stores (Zustand)
+│           └── FileUploader.jsx    # Import functionality
+├── contexts/               # React contexts
 │   ├── AuthContext.jsx        # Authentication & encryption
 │   └── BudgetContext.jsx      # Budget data management
+├── stores/                 # Zustand state management
+│   ├── authStore.js           # Authentication state
+│   ├── budgetStore.js         # Modern budget store
+│   └── optimizedBudgetStore.js # Performance-optimized store
 ├── utils/                  # Utility functions
 │   ├── encryption.js          # Client-side encryption
 │   ├── firebaseConfig.js      # Firebase setup
