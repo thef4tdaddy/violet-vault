@@ -171,9 +171,27 @@ VioletVault takes your financial privacy seriously:
 - **No Server-Side Decryption**: Your master password never leaves your device
 - **Device Fingerprinting**: Additional protection against unauthorized access
 
+## 📚 Documentation
+
+### Core Documentation
+- **[📋 Roadmap](ROADMAP.md)** - See what's coming next and help shape VioletVault's future
+- **[🤝 Contributing Guide](CONTRIBUTING.md)** - How to contribute to the project
+- **[📝 Changelog](CHANGELOG.md)** - Complete version history and changes
+
+### Technical Documentation  
+- **[🏗️ Milestones](docs/MILESTONES.md)** - Release planning and milestone tracking
+- **[🧪 Testing Strategy](docs/Testing-Strategy.md)** - Comprehensive testing approach
+- **[🔄 Refactoring Analysis](docs/Refactoring-Analysis.md)** - Architecture improvement plans
+- **[🛠️ New Utilities Analysis](docs/New-Utilities-Analysis.md)** - Feature analysis and utilities
+
 ## 🗺️ Roadmap
 
-Check out our [Roadmap](ROADMAP.md) to see what's coming next and how you can help shape VioletVault's future!
+Check out our development progress:
+- **[📋 Roadmap Document](ROADMAP.md)** - Detailed feature roadmap and vision
+- **[📊 GitHub Project](https://github.com/thef4tdaddy/violet-vault/projects)** - Live project board with current development status
+- **[🏗️ Milestones](docs/MILESTONES.md)** - Weekly release planning and milestone tracking
+
+See what's coming next and help shape VioletVault's future!
 
 ## 🤝 Contributing
 
@@ -211,10 +229,23 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## 📖 Quick Reference
+
+| Topic | Link | Description |
+|-------|------|-------------|
+| **Getting Started** | [Installation](#-getting-started) | Set up VioletVault locally |
+| **Features** | [Feature List](#-features) | Complete feature overview |
+| **Development** | [Contributing Guide](CONTRIBUTING.md) | Development workflow |
+| **Architecture** | [Project Structure](#-project-structure) | Codebase organization |
+| **Roadmap** | [GitHub Project](https://github.com/thef4tdaddy/violet-vault/projects) | Live development board |
+| **Planning** | [Milestones](docs/MILESTONES.md) | Weekly release planning |
+| **Testing** | [Testing Strategy](docs/Testing-Strategy.md) | QA approach |
+
 ## 🆘 Support
 
 - 📧 **Issues**: [GitHub Issues](https://github.com/thef4tdaddy/violet-vault/issues)
 - 💬 **Discussions**: [GitHub Discussions](https://github.com/thef4tdaddy/violet-vault/discussions)
+- 📚 **Documentation**: See our [Documentation Section](#-documentation) above
 
 ## 🙏 Acknowledgments
 
