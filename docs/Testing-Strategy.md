@@ -19,6 +19,7 @@ npm install --save-dev playwright
 ### Test Configuration
 
 Add to `package.json`:
+
 ```json
 {
   "scripts": {
@@ -35,6 +36,7 @@ Add to `package.json`:
 ### 1. Unit Tests (Priority: Critical)
 
 #### Encryption & Security
+
 - **`src/utils/encryption.js`**
   - AES-GCM encryption/decryption accuracy
   - PBKDF2 key derivation with 100,000 iterations
@@ -42,6 +44,7 @@ Add to `package.json`:
   - Device fingerprinting functionality
 
 #### Budget Logic
+
 - **Envelope calculations**
   - Allocation percentages and rounding
   - Budget vs actual spending comparisons
@@ -52,6 +55,7 @@ Add to `package.json`:
   - Balance calculations and reconciliation
 
 #### Data Validation
+
 - **Input sanitization**
   - Currency formatting and validation
   - Date parsing and validation
@@ -60,6 +64,7 @@ Add to `package.json`:
 ### 2. Integration Tests (Priority: High)
 
 #### Firebase Operations
+
 - **`src/utils/firebaseSync.js`**
   - Cloud sync functionality
   - Conflict resolution during simultaneous edits
@@ -67,6 +72,7 @@ Add to `package.json`:
   - Data encryption before cloud storage
 
 #### Local Storage
+
 - **`src/db/index.js` and `src/db/optimizedDb.js`**
   - IndexedDB operations via Dexie
   - Data persistence and retrieval
@@ -74,6 +80,7 @@ Add to `package.json`:
   - Storage quota management
 
 #### Authentication Flow
+
 - **`src/contexts/AuthContext.jsx`**
   - Master password verification
   - Password change without data loss
@@ -83,22 +90,24 @@ Add to `package.json`:
 ### 3. Component Tests (Priority: Medium)
 
 #### Core Components
+
 - **Dashboard (`src/components/layout/Dashboard.jsx`)**
   - Data loading and error states
   - Real-time updates from sync
   - Performance with large datasets
-  
+
 - **Transaction Ledger (`src/components/transactions/TransactionLedger.jsx`)**
   - Virtual scrolling with large transaction lists
   - Filtering and search functionality
   - Pagination performance
-  
+
 - **Envelope Grid (`src/components/budgeting/EnvelopeGrid.jsx`)**
   - Budget allocation displays
   - Drag-and-drop interactions
   - Responsive layout behavior
 
 #### Form Components
+
 - **Transaction Form (`src/components/transactions/TransactionForm.jsx`)**
   - Input validation and error handling
   - Auto-complete functionality
@@ -107,27 +116,29 @@ Add to `package.json`:
 ### 4. End-to-End Tests (Priority: Medium)
 
 #### Critical User Flows
+
 1. **New User Setup**
    - Account creation with master password
    - Initial budget envelope creation
    - First transaction entry
-   
+
 2. **Multi-Device Sync**
    - Changes on Device A appear on Device B
    - Conflict resolution when editing simultaneously
    - Offline changes sync when reconnected
-   
+
 3. **Password Security**
    - Master password change without data loss
    - Account lockout after failed attempts
    - Data remains encrypted during password change
 
 #### Financial Workflows
+
 1. **Complete Budget Cycle**
    - Paycheck processing and allocation
    - Bill payment and envelope deduction
    - Month-end reconciliation
-   
+
 2. **Import/Export**
    - CSV transaction import
    - Data export functionality
@@ -138,16 +149,19 @@ Add to `package.json`:
 Given VioletVault handles sensitive financial data, security testing is **critical**:
 
 ### Encryption Verification
+
 - Verify all sensitive data is encrypted before storage
 - Test key derivation consistency across sessions
 - Validate encryption strength and algorithm implementation
 
 ### Data Privacy
+
 - Ensure no plaintext financial data in logs
 - Verify Firebase data is encrypted client-side
 - Test device fingerprinting doesn't leak sensitive info
 
 ### Input Security
+
 - XSS prevention in all user inputs
 - SQL injection prevention (though using NoSQL)
 - File upload security for transaction imports
@@ -155,12 +169,14 @@ Given VioletVault handles sensitive financial data, security testing is **critic
 ## Test Data Strategy
 
 ### Realistic Test Data
+
 - Sample budgets with various envelope structures
 - Transaction histories of different sizes (10, 100, 1000+ transactions)
 - Multi-user scenarios with shared budgets
 - Edge cases: negative balances, large amounts, special characters
 
 ### Performance Benchmarks
+
 - Transaction ledger rendering with 10,000+ transactions
 - Sync performance with large datasets
 - Memory usage during extended sessions
@@ -169,21 +185,25 @@ Given VioletVault handles sensitive financial data, security testing is **critic
 ## Implementation Timeline
 
 ### Phase 1: Critical Security (Week 1)
+
 - Encryption/decryption unit tests
 - Authentication flow integration tests
 - Basic component smoke tests
 
 ### Phase 2: Core Functionality (Week 2)
+
 - Budget calculation unit tests
 - Transaction processing tests
 - Local storage integration tests
 
 ### Phase 3: User Experience (Week 3)
+
 - Component interaction tests
 - Form validation tests
 - Error boundary tests
 
 ### Phase 4: End-to-End (Week 4)
+
 - Complete user workflow tests
 - Multi-device sync scenarios
 - Performance and security audits
@@ -191,11 +211,13 @@ Given VioletVault handles sensitive financial data, security testing is **critic
 ## Continuous Integration
 
 ### Pre-commit Hooks
+
 - Run unit tests before commits
 - Lint and format code
 - Check test coverage thresholds
 
 ### CI Pipeline
+
 - Run full test suite on pull requests
 - Performance regression testing
 - Security vulnerability scanning
@@ -203,12 +225,14 @@ Given VioletVault handles sensitive financial data, security testing is **critic
 ## Success Metrics
 
 ### Coverage Targets
+
 - **Unit Tests**: 90%+ coverage for utils and business logic
 - **Integration Tests**: 80%+ coverage for data operations
 - **Component Tests**: 70%+ coverage for UI components
 - **E2E Tests**: 100% coverage of critical user paths
 
 ### Performance Benchmarks
+
 - Transaction ledger renders <100ms for 1000 transactions
 - Sync operations complete <2s for typical datasets
 - App startup time <1s on typical devices
