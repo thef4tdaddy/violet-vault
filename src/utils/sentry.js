@@ -42,7 +42,10 @@ export const initSentry = () => {
       }
 
       // Filter out navigation breadcrumbs for same-page changes
-      if (breadcrumb.category === "navigation" && breadcrumb.data?.from === breadcrumb.data?.to) {
+      if (
+        breadcrumb.category === "navigation" &&
+        breadcrumb.data?.from === breadcrumb.data?.to
+      ) {
         return null;
       }
 
@@ -71,7 +74,7 @@ export const initSentry = () => {
         errorMessage === "{}" ||
         errorMessage.trim() === "" ||
         errorMessage.includes(
-          "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object"
+          "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: object",
         )
       ) {
         return null; // Don't send these to Sentry
@@ -83,7 +86,11 @@ export const initSentry = () => {
       }
 
       // Check for the specific null amount error and throttle it
-      if (errorMessage?.includes("Cannot read properties of null (reading 'amount')")) {
+      if (
+        errorMessage?.includes(
+          "Cannot read properties of null (reading 'amount')",
+        )
+      ) {
         // Only send this error once every 5 minutes
         const errorKey = "null_amount_error";
         const lastSent = window.sessionStorage.getItem(`sentry_${errorKey}`);
@@ -142,7 +149,9 @@ const setupConsoleCapture = () => {
     originalConsoleError(...args);
 
     const message = args
-      .map((arg) => (typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)))
+      .map((arg) =>
+        typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg),
+      )
       .join(" ");
 
     // Skip frequent or expected errors that create noise
@@ -162,7 +171,9 @@ const setupConsoleCapture = () => {
     originalConsoleWarn(...args);
 
     const message = args
-      .map((arg) => (typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)))
+      .map((arg) =>
+        typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg),
+      )
       .join(" ");
 
     // Skip common development warnings that don't need tracking
