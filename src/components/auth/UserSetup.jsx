@@ -26,10 +26,7 @@ const UserSetup = ({ onSetupComplete }) => {
     return Promise.race([
       asyncFn(),
       new Promise((_, reject) =>
-        setTimeout(
-          () => reject(new Error(`Operation timed out after ${timeoutMs}ms`)),
-          timeoutMs,
-        ),
+        setTimeout(() => reject(new Error(`Operation timed out after ${timeoutMs}ms`)), timeoutMs)
       ),
     ]);
   };
@@ -203,10 +200,7 @@ const UserSetup = ({ onSetupComplete }) => {
             {isReturningUser ? (
               <span>
                 Welcome Back,{" "}
-                <span
-                  className="inline-flex items-center"
-                  style={{ color: userColor }}
-                >
+                <span className="inline-flex items-center" style={{ color: userColor }}>
                   {userName}
                 </span>
                 !
@@ -227,9 +221,7 @@ const UserSetup = ({ onSetupComplete }) => {
         </div>
 
         <form
-          onSubmit={
-            isReturningUser || step === 1 ? handleStep1Continue : handleSubmit
-          }
+          onSubmit={isReturningUser || step === 1 ? handleStep1Continue : handleSubmit}
           className="space-y-6"
         >
           {(step === 1 || isReturningUser) && (
@@ -252,11 +244,7 @@ const UserSetup = ({ onSetupComplete }) => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-purple-600"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
 
@@ -306,9 +294,7 @@ const UserSetup = ({ onSetupComplete }) => {
           {step === 2 && !isReturningUser && (
             <>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
-                  Your Name
-                </label>
+                <label className="block text-sm font-semibold text-gray-700 mb-3">Your Name</label>
                 <input
                   type="text"
                   value={userName}
@@ -324,9 +310,7 @@ const UserSetup = ({ onSetupComplete }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
-                  Your Color
-                </label>
+                <label className="block text-sm font-semibold text-gray-700 mb-3">Your Color</label>
                 <div className="grid grid-cols-4 gap-3">
                   {colors.map((color) => (
                     <button

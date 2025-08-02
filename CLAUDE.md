@@ -1,2 +1,4 @@
 - When creating issues, if its a GH issue for a bug use label "bug" , if its a new feature / enhancement use the label "enhancement" on the issue
-- Only fix: docs: and style: CI: and revert: commits are allowed on main, GH action will deny others. must create a new branch for feat/refactor/perf commits and PR
+- Only fix: docs: CI: and revert: commits are allowed on main, GH action will deny others. must create a new branch for feat:, style: perf: can be done directly to develop branch, main branch only allows PRs from develop so all features branches have to first be merged into developed
+- Always Commit Changes Frequently so changes can be easily reverted
+- Always run prettier before committing. don't prettier seperately as it will be denied by the GH Action.
