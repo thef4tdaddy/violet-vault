@@ -44,7 +44,10 @@ const ChangePasswordModal = ({ isOpen, onClose, onChangePassword }) => {
       >
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold">Change Password</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600"
+          >
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -83,7 +86,11 @@ const ChangePasswordModal = ({ isOpen, onClose, onChangePassword }) => {
             >
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary" disabled={isLoading}>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={isLoading}
+            >
               {isLoading ? "Saving..." : "Save"}
             </button>
           </div>

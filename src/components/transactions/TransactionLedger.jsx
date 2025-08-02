@@ -38,8 +38,13 @@ const TransactionLedger = ({
   const pageSize = 10;
 
   // Custom hooks
-  const { transactionForm, setTransactionForm, resetForm, populateForm, createTransaction } =
-    useTransactionForm();
+  const {
+    transactionForm,
+    setTransactionForm,
+    resetForm,
+    populateForm,
+    createTransaction,
+  } = useTransactionForm();
 
   const {
     importData,
@@ -60,13 +65,16 @@ const TransactionLedger = ({
     typeFilter,
     envelopeFilter,
     sortBy,
-    sortOrder
+    sortOrder,
   );
 
-  const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / pageSize));
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredTransactions.length / pageSize),
+  );
   const paginatedTransactions = filteredTransactions.slice(
     (currentPage - 1) * pageSize,
-    currentPage * pageSize
+    currentPage * pageSize,
   );
 
   useEffect(() => {
@@ -108,7 +116,10 @@ const TransactionLedger = ({
     return suggestEnvelope(description, envelopes);
   };
 
-  const handleSplitTransaction = async (originalTransaction, splitTransactions) => {
+  const handleSplitTransaction = async (
+    originalTransaction,
+    splitTransactions,
+  ) => {
     try {
       // Delete the original transaction
       await onDeleteTransaction(originalTransaction.id);

@@ -73,13 +73,17 @@ const storeInitializer = (set, _get) => ({
   updateTransaction: (transaction) =>
     set((state) => {
       // Update in transactions array
-      const transIndex = state.transactions.findIndex((t) => t.id === transaction.id);
+      const transIndex = state.transactions.findIndex(
+        (t) => t.id === transaction.id,
+      );
       if (transIndex !== -1) {
         state.transactions[transIndex] = transaction;
       }
 
       // Update in allTransactions array
-      const allTransIndex = state.allTransactions.findIndex((t) => t.id === transaction.id);
+      const allTransIndex = state.allTransactions.findIndex(
+        (t) => t.id === transaction.id,
+      );
       if (allTransIndex !== -1) {
         state.allTransactions[allTransIndex] = transaction;
       }
@@ -156,9 +160,12 @@ const storeInitializer = (set, _get) => ({
       // Update balances based on envelope assignment
       if (transaction.envelopeId && transaction.envelopeId !== "unassigned") {
         // Update specific envelope balance
-        const envelope = state.envelopes.find((env) => env.id === transaction.envelopeId);
+        const envelope = state.envelopes.find(
+          (env) => env.id === transaction.envelopeId,
+        );
         if (envelope) {
-          envelope.currentBalance = (envelope.currentBalance || 0) + transaction.amount;
+          envelope.currentBalance =
+            (envelope.currentBalance || 0) + transaction.amount;
         }
       } else {
         // Update unassigned cash
@@ -206,8 +213,8 @@ if (LOCAL_ONLY_MODE) {
           // They should be determined at runtime
         }),
       }),
-      { name: "violet-vault-devtools" }
-    )
+      { name: "violet-vault-devtools" },
+    ),
   );
 }
 
