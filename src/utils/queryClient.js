@@ -87,22 +87,13 @@ export const queryKeys = {
   envelopes: ["envelopes"],
   envelopesList: () => [...queryKeys.envelopes, "list"],
   envelopeById: (id) => [...queryKeys.envelopes, "detail", id],
-  envelopesByCategory: (category) => [
-    ...queryKeys.envelopes,
-    "category",
-    category,
-  ],
+  envelopesByCategory: (category) => [...queryKeys.envelopes, "category", category],
 
   // Transactions
   transactions: ["transactions"],
   transactionsList: (filters) => [...queryKeys.transactions, "list", filters],
   transactionById: (id) => [...queryKeys.transactions, "detail", id],
-  transactionsByDateRange: (start, end) => [
-    ...queryKeys.transactions,
-    "dateRange",
-    start,
-    end,
-  ],
+  transactionsByDateRange: (start, end) => [...queryKeys.transactions, "dateRange", start, end],
 
   // Bills
   bills: ["bills"],

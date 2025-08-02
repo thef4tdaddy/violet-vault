@@ -42,7 +42,7 @@ export const predictNextPayday = (paycheckHistory) => {
 
   // Get the most frequent interval
   const mostCommonInterval = Object.keys(intervalCounts).reduce((a, b) =>
-    intervalCounts[a] > intervalCounts[b] ? a : b,
+    intervalCounts[a] > intervalCounts[b] ? a : b
   );
 
   const intervalFrequency = intervalCounts[mostCommonInterval];
