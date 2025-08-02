@@ -3,7 +3,7 @@
 **A secure, encrypted envelope budgeting application** that brings the traditional cash envelope budgeting method into the digital age with end-to-end encryption and real-time collaboration.
 
 [![CI](https://github.com/thef4tdaddy/violet-vault/workflows/CI/badge.svg)](https://github.com/thef4tdaddy/violet-vault/actions)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 ## 🚀 Features
 
@@ -227,7 +227,26 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License**.
+
+### 🎯 What This Means:
+
+**✅ You CAN:**
+- Use VioletVault for personal budgeting and self-hosting
+- Use it internally within your organization (non-commercially)
+- Modify and improve the software
+- Share it with others (non-commercially)
+- Learn from the code and use it for education
+
+**❌ You CANNOT (without permission):**
+- Use VioletVault to build commercial services or products
+- Sell access to VioletVault or derivatives
+- Keep your improvements private (must share back)
+
+**💡 Commercial Use:**
+For commercial licensing options, please [contact us](https://github.com/thef4tdaddy/violet-vault/issues) to discuss terms.
+
+See the [LICENSE](LICENSE) file for complete details.
 
 ## 📖 Quick Reference
 
