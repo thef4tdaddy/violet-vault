@@ -451,7 +451,9 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
     addEnvelope,
     updateEnvelope,
     processPaycheck,
-    setAllTransactions,
+    addTransaction,
+    addTransactions,
+    updateTransaction,
     setTransactions,
   } = budget;
 
@@ -521,18 +523,12 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
         transactions={allTransactions}
         envelopes={envelopes}
         onPayBill={(updatedBill) => {
-          // Update the bill in allTransactions
-          const updatedTransactions = allTransactions.map((t) =>
-            t.id === updatedBill.id ? updatedBill : t
-          );
-          setAllTransactions(updatedTransactions);
+          // Update the bill using budget store method
+          updateTransaction(updatedBill);
         }}
         onUpdateBill={(updatedBill) => {
-          // Update the bill in allTransactions
-          const updatedTransactions = allTransactions.map((t) =>
-            t.id === updatedBill.id ? updatedBill : t
-          );
-          setAllTransactions(updatedTransactions);
+          // Update the bill using budget store method
+          updateTransaction(updatedBill);
         }}
         onCreateRecurringBill={(newBill) => {
           // Add new bill to allTransactions
@@ -544,7 +540,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
             isPaid: false,
             source: "manual",
           };
-          setAllTransactions([...allTransactions, billTransaction]);
+          addTransaction(billTransaction);
         }}
         onSearchNewBills={async () => {
           try {
@@ -573,13 +569,13 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
         onDeleteTransaction={() => {}} // Will be implemented
         onBulkImport={(newTransactions) => {
           console.log("🔄 onBulkImport called with transactions:", newTransactions.length);
-          const updatedAllTransactions = [...allTransactions, ...newTransactions];
+          // Add transactions using budget store method
+          addTransactions(newTransactions);
           const updatedTransactions = [...safeTransactions, ...newTransactions];
-          setAllTransactions(updatedAllTransactions);
           setTransactions(updatedTransactions);
           console.log(
-            "💾 Bulk import complete. Total transactions:",
-            updatedAllTransactions.length
+            "💾 Bulk import complete. Added transactions:",
+            newTransactions.length
           );
         }}
         currentUser={currentUser}

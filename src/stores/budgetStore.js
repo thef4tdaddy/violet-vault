@@ -83,6 +83,12 @@ const storeInitializer = (set, get) => ({
       state.allTransactions.push(transaction);
     }),
 
+  addTransactions: (transactions) =>
+    set((state) => {
+      state.transactions.push(...transactions);
+      state.allTransactions.push(...transactions);
+    }),
+
   updateTransaction: (transaction) =>
     set((state) => {
       const transIndex = state.transactions.findIndex((t) => t.id === transaction.id);
