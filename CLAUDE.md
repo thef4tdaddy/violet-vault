@@ -1,1 +1,2 @@
 - When creating issues, if its a GH issue for a bug use label "bug" , if its a new feature / enhancement use the label "enhancement" on the issue
+- Only fix: docs: and style: CI: and revert: commits are allowed on main, GH action will deny others. must create a new branch for feat/refactor/perf commits and PR
