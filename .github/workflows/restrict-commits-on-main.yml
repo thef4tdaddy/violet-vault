@@ -24,6 +24,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Skip commit checks for trusted automation actors
+          if [[ "${{ github.actor }}" == "github-actions[bot]" || "${{ github.actor }}" == "actions-user" ]]; then
+            echo "✅ Skipping commit check for trusted automation actor: ${{ github.actor }}"
+            exit 0
+          fi
           ALLOWED="^(fix|docs|style|ci|revert):"
           PR_NUMBER=${{ github.event.pull_request.number }}
           REPO=${{ github.repository }}
