@@ -60,41 +60,69 @@ const BillManager = ({
   });
 
   const bills = useMemo(() => {
-    return transactions
-      .filter((t) => t && (t.type === "bill" || t.type === "recurring_bill"))
-      .map((bill) => {
-        let daysUntilDue = null;
-        let urgency = "normal";
+    // Combine bills from transactions and the dedicated bills store
+    const billsFromTransactions = transactions.filter(
+      (t) => t && (t.type === "bill" || t.type === "recurring_bill")
+    );
+    const billsFromStore = budget.bills || [];
 
-        if (bill.dueDate) {
-          try {
-            const today = new Date();
-            const due = new Date(bill.dueDate);
+    // Merge both sources, prioritizing store bills over transaction bills with same ID
+    const combinedBills = [...billsFromStore];
+    billsFromTransactions.forEach((bill) => {
+      if (!combinedBills.find((b) => b.id === bill.id)) {
+        combinedBills.push(bill);
+      }
+    });
 
-            // Validate date is valid
-            if (!isNaN(due.getTime())) {
-              daysUntilDue = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+    return combinedBills.map((bill) => {
+      let daysUntilDue = null;
+      let urgency = "normal";
 
-              if (daysUntilDue < 0) urgency = "overdue";
-              else if (daysUntilDue <= 3) urgency = "urgent";
-              else if (daysUntilDue <= 7) urgency = "soon";
-            }
-          } catch (error) {
-            console.warn(`Invalid due date for bill ${bill.id}:`, bill.dueDate, error);
+      if (bill.dueDate) {
+        try {
+          const today = new Date();
+
+          // Fix 2-digit year parsing by converting to 4-digit years
+          let normalizedDate = bill.dueDate;
+
+          // Handle various date formats and convert 2-digit years to 4-digit
+          if (typeof normalizedDate === "string") {
+            // Match patterns like MM/DD/YY, MM-DD-YY, etc.
+            normalizedDate = normalizedDate.replace(
+              /(\d{1,2})[/-](\d{1,2})[/-](\d{2})$/,
+              (match, month, day, year) => {
+                const fullYear = parseInt(year) <= 30 ? `20${year}` : `19${year}`;
+                return `${month}/${day}/${fullYear}`;
+              }
+            );
           }
-        }
 
-        return {
-          ...bill,
-          // Ensure required fields have valid values
-          amount: typeof bill.amount === "number" ? bill.amount : 0,
-          description: bill.description || bill.provider || `Bill ${bill.id}`,
-          isPaid: Boolean(bill.isPaid),
-          daysUntilDue,
-          urgency,
-        };
-      });
-  }, [transactions]);
+          const due = new Date(normalizedDate);
+
+          // Validate date is valid
+          if (!isNaN(due.getTime())) {
+            daysUntilDue = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+
+            if (daysUntilDue < 0) urgency = "overdue";
+            else if (daysUntilDue <= 3) urgency = "urgent";
+            else if (daysUntilDue <= 7) urgency = "soon";
+          }
+        } catch (error) {
+          console.warn(`Invalid due date for bill ${bill.id}:`, bill.dueDate, error);
+        }
+      }
+
+      return {
+        ...bill,
+        // Ensure required fields have valid values
+        amount: typeof bill.amount === "number" ? bill.amount : 0,
+        description: bill.description || bill.provider || `Bill ${bill.id}`,
+        isPaid: Boolean(bill.isPaid),
+        daysUntilDue,
+        urgency,
+      };
+    });
+  }, [transactions, budget.bills]);
 
   const categorizedBills = useMemo(() => {
     const upcomingBills = bills.filter((b) => !b.isPaid && b.daysUntilDue >= 0);
@@ -112,14 +140,21 @@ const BillManager = ({
   }, [bills]);
 
   const totals = useMemo(() => {
-    const upcomingTotal = categorizedBills.upcoming.reduce((sum, b) => sum + Math.abs(b.amount), 0);
     const overdueTotal = categorizedBills.overdue.reduce((sum, b) => sum + Math.abs(b.amount), 0);
+
+    // Calculate "due soon" as bills due within 7 days (urgent + soon)
+    const dueSoonBills = categorizedBills.upcoming.filter(
+      (b) => b.urgency === "urgent" || b.urgency === "soon"
+    );
+    const dueSoonTotal = dueSoonBills.reduce((sum, b) => sum + Math.abs(b.amount), 0);
+
     const paidThisMonth = categorizedBills.paid
       .filter((b) => new Date(b.paidDate || b.date).getMonth() === new Date().getMonth())
       .reduce((sum, b) => sum + Math.abs(b.amount), 0);
 
     return {
-      upcoming: upcomingTotal,
+      upcoming: dueSoonTotal, // Changed to only include bills due within 7 days
+      dueSoonCount: dueSoonBills.length,
       overdue: overdueTotal,
       paidThisMonth,
       totalBills: bills.length,
@@ -489,9 +524,7 @@ const BillManager = ({
             </div>
             <Clock className="h-8 w-8 text-orange-200" />
           </div>
-          <p className="text-xs text-orange-100 mt-2">
-            {categorizedBills.upcoming.length} bills upcoming
-          </p>
+          <p className="text-xs text-orange-100 mt-2">{totals.dueSoonCount} bills due soon</p>
         </div>
 
         <div className="bg-gradient-to-br from-green-500 to-green-600 p-4 rounded-lg text-white">
@@ -576,23 +609,23 @@ const BillManager = ({
         </div>
       </div>
 
-      <div className="space-y-3">
-        {displayBills.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
-            <p className="font-medium">No bills found</p>
-            <p className="text-sm mt-1">
-              {viewMode === "upcoming"
-                ? "All caught up! No upcoming bills."
-                : viewMode === "overdue"
-                  ? "Great! No overdue bills."
-                  : viewMode === "paid"
-                    ? "No paid bills in this period."
-                    : "No bills match your current filters."}
-            </p>
-          </div>
-        ) : (
-          displayBills.map((bill) => {
+      {displayBills.length === 0 ? (
+        <div className="text-center py-12 text-gray-500">
+          <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
+          <p className="font-medium">No bills found</p>
+          <p className="text-sm mt-1">
+            {viewMode === "upcoming"
+              ? "All caught up! No upcoming bills."
+              : viewMode === "overdue"
+                ? "Great! No overdue bills."
+                : viewMode === "paid"
+                  ? "No paid bills in this period."
+                  : "No bills match your current filters."}
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {displayBills.map((bill) => {
             const envelope = envelopes.find((env) => env.id === bill.envelopeId);
             const urgencyStyle = getUrgencyStyle(bill.urgency, bill.isPaid);
 
@@ -601,64 +634,83 @@ const BillManager = ({
                 key={bill.id}
                 className={`p-4 rounded-lg border-2 transition-all hover:shadow-lg ${urgencyStyle} ${
                   selectedBills.has(bill.id) ? "ring-2 ring-blue-500" : ""
-                }`}
+                } flex flex-col`}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
+                {/* Header with checkbox, icon, and actions */}
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-start gap-3">
                     <input
                       type="checkbox"
                       checked={selectedBills.has(bill.id)}
                       onChange={() => toggleBillSelection(bill.id)}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mr-3"
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
                     />
-
-                    <div className="text-2xl mr-3">{getCategoryIcon(bill)}</div>
-
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium text-gray-900">
-                          {bill.provider || bill.description}
-                        </p>
-                        {getUrgencyIcon(bill.urgency, bill.isPaid)}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm text-gray-600">{bill.category}</p>
-                        {envelope && (
-                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
-                            → {envelope.name}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-4 mt-1">
-                        {bill.dueDate && (
-                          <p className="text-xs text-gray-500 flex items-center">
-                            <Calendar className="h-3 w-3 mr-1" /> Due:{" "}
-                            {new Date(bill.dueDate).toLocaleDateString()}
-                          </p>
-                        )}
-                        {bill.daysUntilDue !== null && !bill.isPaid && (
-                          <p className="text-xs text-gray-500">
-                            {bill.daysUntilDue < 0
-                              ? `${Math.abs(bill.daysUntilDue)} days overdue`
-                              : bill.daysUntilDue === 0
-                                ? "Due today"
-                                : `${bill.daysUntilDue} days remaining`}
-                          </p>
-                        )}
-                        {bill.isPaid && bill.paidDate && (
-                          <p className="text-xs text-green-600">
-                            Paid: {new Date(bill.paidDate).toLocaleDateString()}
-                          </p>
-                        )}
-                      </div>
-                      {bill.accountNumber && (
-                        <p className="text-xs text-gray-500 mt-1">Account: {bill.accountNumber}</p>
-                      )}
-                    </div>
+                    <div className="text-xl">{getCategoryIcon(bill)}</div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <div className="text-right">
+                  <div className="flex items-center gap-1">
+                    {getUrgencyIcon(bill.urgency, bill.isPaid)}
+                    <button
+                      onClick={() => setShowBillDetail(bill)}
+                      className="text-gray-400 hover:text-blue-600 p-1 rounded"
+                      title="View details"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setEditingBill(bill)}
+                      className="text-gray-400 hover:text-gray-600 p-1 rounded"
+                      title="Edit bill"
+                    >
+                      <Settings className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Bill info */}
+                <div className="flex-1">
+                  <div className="mb-2">
+                    <h3 className="font-medium text-gray-900 text-sm leading-tight">
+                      {bill.provider || bill.description}
+                    </h3>
+                    <p className="text-xs text-gray-600">{bill.category}</p>
+                  </div>
+
+                  {envelope && (
+                    <span className="inline-block text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full mb-2">
+                      → {envelope.name}
+                    </span>
+                  )}
+
+                  <div className="space-y-1 text-xs text-gray-500">
+                    {bill.dueDate && (
+                      <p className="flex items-center">
+                        <Calendar className="h-3 w-3 mr-1" />
+                        Due: {new Date(bill.dueDate).toLocaleDateString()}
+                      </p>
+                    )}
+                    {bill.daysUntilDue !== null && !bill.isPaid && (
+                      <p>
+                        {bill.daysUntilDue < 0
+                          ? `${Math.abs(bill.daysUntilDue)} days overdue`
+                          : bill.daysUntilDue === 0
+                            ? "Due today"
+                            : `${bill.daysUntilDue} days remaining`}
+                      </p>
+                    )}
+                    {bill.isPaid && bill.paidDate && (
+                      <p className="text-green-600">
+                        Paid: {new Date(bill.paidDate).toLocaleDateString()}
+                      </p>
+                    )}
+                    {bill.accountNumber && <p>Account: {bill.accountNumber}</p>}
+                  </div>
+                </div>
+
+                {/* Amount and actions */}
+                <div className="mt-3 pt-3 border-t border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <div>
                       <p className="font-bold text-gray-900 text-lg">
                         ${Math.abs(bill.amount).toFixed(2)}
                       </p>
@@ -668,58 +720,36 @@ const BillManager = ({
                             Min: ${bill.metadata.minimumPayment.toFixed(2)}
                           </p>
                         )}
-                      {bill.metadata?.previousBalance && (
-                        <p className="text-xs text-gray-500">
-                          Prev: ${bill.metadata.previousBalance.toFixed(2)}
-                        </p>
-                      )}
                     </div>
 
-                    <div className="flex flex-col gap-1">
-                      {!bill.isPaid && (
-                        <button
-                          onClick={() => handlePayBill(bill.id)}
-                          className="bg-green-600 text-white px-3 py-1 text-xs rounded hover:bg-green-700 flex items-center"
-                        >
-                          <CheckCircle className="h-3 w-3 mr-1" /> Pay
-                        </button>
-                      )}
-
+                    {!bill.isPaid && (
                       <button
-                        onClick={() => setShowBillDetail(bill)}
-                        className="text-gray-400 hover:text-blue-600 p-1 rounded"
-                        title="View details"
+                        onClick={() => handlePayBill(bill.id)}
+                        className="bg-green-600 text-white px-3 py-1 text-xs rounded hover:bg-green-700 flex items-center"
                       >
-                        <Eye className="h-4 w-4" />
+                        <CheckCircle className="h-3 w-3 mr-1" /> Pay
                       </button>
-
-                      <button
-                        onClick={() => setEditingBill(bill)}
-                        className="text-gray-400 hover:text-gray-600 p-1 rounded"
-                        title="Edit bill"
-                      >
-                        <Settings className="h-4 w-4" />
-                      </button>
-                    </div>
+                    )}
                   </div>
                 </div>
 
+                {/* Additional metadata - only show if present */}
                 {(bill.metadata?.statementPeriod || bill.metadata?.serviceAddress) && (
                   <div className="mt-3 pt-3 border-t border-gray-200">
-                    <div className="text-sm text-gray-600 space-y-1">
+                    <div className="text-xs text-gray-600 space-y-1">
                       {bill.metadata.statementPeriod && (
                         <div className="flex justify-between">
-                          <span>Statement Period:</span>
-                          <span>
+                          <span>Period:</span>
+                          <span className="text-right">
                             {bill.metadata.statementPeriod.start} -{" "}
                             {bill.metadata.statementPeriod.end}
                           </span>
                         </div>
                       )}
                       {bill.metadata.serviceAddress && (
-                        <div className="flex justify-between">
-                          <span>Service Address:</span>
-                          <span className="text-right max-w-xs truncate">
+                        <div>
+                          <span>Address:</span>
+                          <span className="block text-right text-xs truncate">
                             {bill.metadata.serviceAddress}
                           </span>
                         </div>
@@ -729,9 +759,9 @@ const BillManager = ({
                 )}
               </div>
             );
-          })
-        )}
-      </div>
+          })}
+        </div>
+      )}
 
       {showBillDetail && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -914,8 +944,13 @@ const BillManager = ({
               onUpdateBill(updatedBill);
             } else {
               // Fallback to budget context
-              budget.updateTransaction(updatedBill);
+              budget.updateBill(updatedBill);
             }
+            setEditingBill(null);
+          }}
+          onDeleteBill={(billId) => {
+            // Use budget store's deleteBill function
+            budget.deleteBill(billId);
             setEditingBill(null);
           }}
           onAddEnvelope={(envelopeData) => {
