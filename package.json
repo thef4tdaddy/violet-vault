@@ -4,7 +4,7 @@
   "version": "1.6.1",
   "type": "module",
   "description": "A secure, encrypted envelope budgeting application with end-to-end encryption and real-time collaboration",
-  "license": "MIT",
+  "license": "CC-BY-NC-SA-4.0",
   "author": "VioletVault Contributors",
   "repository": {
     "type": "git",
