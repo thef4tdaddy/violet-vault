@@ -41,11 +41,7 @@ const useDataManagement = () => {
         if (legacyData) {
           const { encryptedData, iv } = JSON.parse(legacyData);
           rawData = {
-            state: await encryptionUtils.decrypt(
-              encryptedData,
-              encryptionKey,
-              iv,
-            ),
+            state: await encryptionUtils.decrypt(encryptedData, encryptionKey, iv),
           };
           dataSource = "envelopeBudgetData";
           console.log("📁 Found encrypted data in envelopeBudgetData");
@@ -70,23 +66,13 @@ const useDataManagement = () => {
         decryptedData = rawData.state;
       }
 
-      console.log(
-        "📁 Data extracted from",
-        dataSource,
-        "- Keys:",
-        Object.keys(decryptedData),
-      );
+      console.log("📁 Data extracted from", dataSource, "- Keys:", Object.keys(decryptedData));
 
       // Normalize transactions for unified structure
       const allTransactions = Array.isArray(decryptedData.allTransactions)
         ? decryptedData.allTransactions
-        : [
-            ...(decryptedData.transactions || []),
-            ...(decryptedData.bills || []),
-          ];
-      const transactions = allTransactions.filter(
-        (t) => !t.type || t.type === "transaction",
-      );
+        : [...(decryptedData.transactions || []), ...(decryptedData.bills || [])];
+      const transactions = allTransactions.filter((t) => !t.type || t.type === "transaction");
 
       // Prepare export data with metadata
       const exportData = {
@@ -111,10 +97,7 @@ const useDataManagement = () => {
       const link = document.createElement("a");
       link.href = url;
 
-      const timestamp = new Date()
-        .toISOString()
-        .replace(/[:.]/g, "-")
-        .slice(0, 19);
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
       link.download = `VioletVault Budget Backup ${timestamp}.json`;
 
       document.body.appendChild(link);
@@ -156,28 +139,21 @@ const useDataManagement = () => {
         });
 
         // Build unified transaction list if missing
-        const unifiedAllTransactions = Array.isArray(
-          importedData.allTransactions,
-        )
+        const unifiedAllTransactions = Array.isArray(importedData.allTransactions)
           ? importedData.allTransactions
-          : [
-              ...(importedData.transactions || []),
-              ...(importedData.bills || []),
-            ];
+          : [...(importedData.transactions || []), ...(importedData.bills || [])];
         const unifiedTransactions = unifiedAllTransactions.filter(
-          (t) => !t.type || t.type === "transaction",
+          (t) => !t.type || t.type === "transaction"
         );
 
         // Validate the data structure
         if (!importedData.envelopes || !Array.isArray(importedData.envelopes)) {
-          throw new Error(
-            "Invalid backup file: missing or invalid envelopes data",
-          );
+          throw new Error("Invalid backup file: missing or invalid envelopes data");
         }
 
         // Confirm import with user
         const confirmed = confirm(
-          `Import ${importedData.envelopes?.length || 0} envelopes, ${importedData.bills?.length || 0} bills, and ${importedData.allTransactions?.length || 0} transactions?\n\nThis will replace your current data.`,
+          `Import ${importedData.envelopes?.length || 0} envelopes, ${importedData.bills?.length || 0} bills, and ${importedData.allTransactions?.length || 0} transactions?\n\nThis will replace your current data.`
         );
 
         if (!confirmed) {
@@ -195,24 +171,15 @@ const useDataManagement = () => {
           const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
 
           if (currentVioletData) {
-            localStorage.setItem(
-              `violet-vault-store_backup_${timestamp}`,
-              currentVioletData,
-            );
+            localStorage.setItem(`violet-vault-store_backup_${timestamp}`, currentVioletData);
             console.log("✅ Current violet-vault-store data backed up");
           }
           if (currentBudgetData) {
-            localStorage.setItem(
-              `budget-store_backup_${timestamp}`,
-              currentBudgetData,
-            );
+            localStorage.setItem(`budget-store_backup_${timestamp}`, currentBudgetData);
             console.log("✅ Current budget-store data backed up");
           }
           if (currentLegacyData) {
-            localStorage.setItem(
-              `envelopeBudgetData_backup_${timestamp}`,
-              currentLegacyData,
-            );
+            localStorage.setItem(`envelopeBudgetData_backup_${timestamp}`, currentLegacyData);
             console.log("✅ Current legacy data backed up");
           }
         } catch (backupError) {
@@ -238,18 +205,14 @@ const useDataManagement = () => {
         throw error;
       }
     },
-    [currentUser],
+    [currentUser]
   );
 
   const resetEncryptionAndStartFresh = useCallback(() => {
     console.log("🔄 Resetting encryption and starting fresh...");
 
     // Clear all stored data
-    const keysToRemove = [
-      "envelopeBudgetData",
-      "userProfile",
-      "passwordLastChanged",
-    ];
+    const keysToRemove = ["envelopeBudgetData", "userProfile", "passwordLastChanged"];
 
     keysToRemove.forEach((key) => {
       localStorage.removeItem(key);
