@@ -67,23 +67,28 @@ class ErrorBoundary extends React.Component {
       this.errorBurstStartTime = currentTime;
       this.errorCount = 1;
 
-      // Send error to Highlight.io with enhanced context
-      H.consumeError(error, {
-        metadata: {
-          componentStack: errorInfo.componentStack,
-          failingComponent,
-          errorCount: this.errorCount,
-          burstDuration: 0,
-          errorBoundary: true,
-        },
-        tags: {
-          errorBoundary: "true",
-          failingComponent,
-          errorSignature,
-        },
-      });
-
-      console.log("📤 Sent error to Highlight.io:", errorSignature);
+      // Try to send error to Highlight.io with fallback to local storage
+      try {
+        H.consumeError(error, {
+          metadata: {
+            componentStack: errorInfo.componentStack,
+            failingComponent,
+            errorCount: this.errorCount,
+            burstDuration: 0,
+            errorBoundary: true,
+          },
+          tags: {
+            errorBoundary: "true",
+            failingComponent,
+            errorSignature,
+          },
+        });
+        console.log("📤 Sent error to Highlight.io:", errorSignature);
+      } catch (highlightError) {
+        // Fallback: Store errors locally when Highlight.io is blocked
+        this.storeErrorLocally(error, errorInfo, failingComponent, errorSignature);
+        console.warn("⚠️ Highlight.io blocked, storing error locally:", errorSignature);
+      }
     } else {
       this.errorCount++;
       console.log(`🔄 Skipping duplicate error #${this.errorCount} in burst:`, errorSignature);
@@ -144,6 +149,41 @@ class ErrorBoundary extends React.Component {
       this.lastErrorTime &&
       currentTime - this.lastErrorTime < 30000
     );
+  };
+
+  storeErrorLocally = (error, errorInfo, failingComponent, errorSignature) => {
+    try {
+      const errorData = {
+        timestamp: new Date().toISOString(),
+        message: error?.message || "Unknown error",
+        name: error?.name || "Error",
+        stack: error?.stack || "No stack trace",
+        componentStack: errorInfo?.componentStack || "No component stack",
+        failingComponent,
+        errorSignature,
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        errorBoundary: true,
+      };
+
+      // Store in localStorage with rotation (keep last 50 errors)
+      const stored = JSON.parse(localStorage.getItem("violet-vault-errors") || "[]");
+      stored.unshift(errorData);
+
+      // Keep only last 50 errors to prevent storage bloat
+      const trimmed = stored.slice(0, 50);
+      localStorage.setItem("violet-vault-errors", JSON.stringify(trimmed));
+
+      // Also log to console with rich formatting
+      console.group("🚨 VioletVault Error (Stored Locally)");
+      console.error("Error:", error);
+      console.error("Component:", failingComponent);
+      console.error("Stack:", errorInfo?.componentStack);
+      console.error("Signature:", errorSignature);
+      console.groupEnd();
+    } catch (storageError) {
+      console.error("Failed to store error locally:", storageError);
+    }
   };
 
   handleReset = () => {
