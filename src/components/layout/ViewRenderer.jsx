@@ -22,7 +22,6 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed }) =>
     savingsGoals,
     supplementalAccounts,
     unassignedCash,
-    biweeklyAllocation,
     paycheckHistory,
     actualBalance,
     transactions,
