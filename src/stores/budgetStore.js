@@ -340,7 +340,7 @@ const storeInitializer = (set, get) => ({
         savingsGoals: importedData.savingsGoals?.length || 0,
         transactions: importedData.allTransactions?.length || 0,
       });
-      
+
       // Replace all data with imported data
       state.envelopes = importedData.envelopes || [];
       state.bills = importedData.bills || [];
@@ -353,7 +353,7 @@ const storeInitializer = (set, get) => ({
       state.paycheckHistory = importedData.paycheckHistory || [];
       state.actualBalance = importedData.actualBalance || 0;
       state.dataLoaded = true;
-      
+
       console.log("✅ Data loaded successfully into store");
     }),
 
