@@ -22,11 +22,15 @@ const SupplementalAccounts = ({
   onAddAccount,
   onUpdateAccount,
   onDeleteAccount,
+  onTransferToEnvelope,
+  envelopes = [],
   currentUser = { userName: "User", userColor: "#a855f7" },
 }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingAccount, setEditingAccount] = useState(null);
   const [showBalances, setShowBalances] = useState(true);
+  const [showTransferModal, setShowTransferModal] = useState(false);
+  const [transferringAccount, setTransferringAccount] = useState(null);
 
   const [accountForm, setAccountForm] = useState({
     name: "",
@@ -37,6 +41,12 @@ const SupplementalAccounts = ({
     description: "",
     color: "#06b6d4",
     isActive: true,
+  });
+
+  const [transferForm, setTransferForm] = useState({
+    envelopeId: "",
+    amount: "",
+    description: "",
   });
 
   const accountTypes = [
@@ -123,6 +133,40 @@ const SupplementalAccounts = ({
     if (confirm("Are you sure you want to delete this account?")) {
       onDeleteAccount(accountId);
     }
+  };
+
+  const startTransfer = (account) => {
+    setTransferringAccount(account);
+    setTransferForm({
+      envelopeId: "",
+      amount: "",
+      description: `Transfer from ${account.name}`,
+    });
+    setShowTransferModal(true);
+  };
+
+  const handleTransfer = () => {
+    if (!transferForm.envelopeId || !transferForm.amount || transferForm.amount <= 0) {
+      alert("Please select an envelope and enter a valid amount");
+      return;
+    }
+
+    const amount = parseFloat(transferForm.amount);
+    if (amount > transferringAccount.currentBalance) {
+      alert("Insufficient balance in account");
+      return;
+    }
+
+    onTransferToEnvelope(
+      transferringAccount.id,
+      transferForm.envelopeId,
+      amount,
+      transferForm.description
+    );
+
+    setShowTransferModal(false);
+    setTransferringAccount(null);
+    setTransferForm({ envelopeId: "", amount: "", description: "" });
   };
 
   const getAccountTypeInfo = (type) => {
@@ -306,7 +350,20 @@ const SupplementalAccounts = ({
                   <p className="text-xs text-gray-500 mt-2 italic">{account.description}</p>
                 )}
 
-                <div className="mt-3 pt-3 border-t border-gray-200 text-xs text-gray-500">
+                {/* Transfer Button */}
+                {account.currentBalance > 0 && (
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <button
+                      onClick={() => startTransfer(account)}
+                      className="w-full btn btn-sm btn-primary flex items-center justify-center"
+                    >
+                      <Zap className="h-3 w-3 mr-1" />
+                      Transfer to Budget
+                    </button>
+                  </div>
+                )}
+
+                <div className="mt-2 text-xs text-gray-500">
                   Last updated: {new Date(account.lastUpdated).toLocaleDateString()}
                 </div>
               </div>
@@ -494,6 +551,117 @@ const SupplementalAccounts = ({
               </button>
               <button onClick={handleAddAccount} className="flex-1 btn btn-primary">
                 {editingAccount ? "Update Account" : "Add Account"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Transfer Modal */}
+      {showTransferModal && transferringAccount && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-semibold">Transfer from {transferringAccount.name}</h3>
+              <button
+                onClick={() => {
+                  setShowTransferModal(false);
+                  setTransferringAccount(null);
+                  setTransferForm({
+                    envelopeId: "",
+                    amount: "",
+                    description: "",
+                  });
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="bg-gray-50 p-3 rounded-lg">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-600">Available Balance:</span>
+                  <span className="font-bold text-green-600">
+                    ${transferringAccount.currentBalance.toFixed(2)}
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Transfer to Envelope *
+                </label>
+                <select
+                  value={transferForm.envelopeId}
+                  onChange={(e) =>
+                    setTransferForm({
+                      ...transferForm,
+                      envelopeId: e.target.value,
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500"
+                  required
+                >
+                  <option value="">Select an envelope...</option>
+                  {envelopes.map((envelope) => (
+                    <option key={envelope.id} value={envelope.id}>
+                      {envelope.name} ($
+                      {envelope.currentAmount?.toFixed(2) || "0.00"})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Amount *</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  max={transferringAccount.currentBalance}
+                  value={transferForm.amount}
+                  onChange={(e) => setTransferForm({ ...transferForm, amount: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500"
+                  placeholder="0.00"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <input
+                  type="text"
+                  value={transferForm.description}
+                  onChange={(e) =>
+                    setTransferForm({
+                      ...transferForm,
+                      description: e.target.value,
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500"
+                  placeholder={`Transfer from ${transferringAccount.name}`}
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => {
+                  setShowTransferModal(false);
+                  setTransferringAccount(null);
+                  setTransferForm({
+                    envelopeId: "",
+                    amount: "",
+                    description: "",
+                  });
+                }}
+                className="flex-1 btn btn-secondary"
+              >
+                Cancel
+              </button>
+              <button onClick={handleTransfer} className="flex-1 btn btn-primary">
+                Transfer ${transferForm.amount || "0.00"}
               </button>
             </div>
           </div>

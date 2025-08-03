@@ -1,17 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
-import useOptimizedBudgetStore from "../stores/optimizedBudgetStore";
-import { optimizedDb } from "../db/optimizedDb";
-import { queryKeys, optimisticHelpers } from "../utils/optimizedQueryClient";
+import useBudgetStore from "../stores/budgetStore";
+import { optimizedDb } from "../db/budgetDb";
+import { queryKeys, optimisticHelpers } from "../utils/budgetQueryClient";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
 // Unified hook that combines Zustand, Dexie, and TanStack Query
-export const useOptimizedBudget = () => {
+export const useBudgetQuery = () => {
   const queryClient = useQueryClient();
 
   // Zustand store
-  const store = useOptimizedBudgetStore();
+  const store = useBudgetStore();
 
   // Query for envelopes with Dexie integration
   const { data: envelopes = [], isLoading: envelopesLoading } = useQuery({
