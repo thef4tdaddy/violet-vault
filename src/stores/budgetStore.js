@@ -5,6 +5,60 @@ import { immer } from "zustand/middleware/immer";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
+// Migration function to handle old localStorage format
+const migrateOldData = () => {
+  try {
+    const oldData = localStorage.getItem("budget-store");
+    const newData = localStorage.getItem("violet-vault-store");
+
+    // Migrate if old data exists (always replace new data)
+    if (oldData) {
+      console.log(
+        "🔄 Migrating data from old budget-store to violet-vault-store...",
+      );
+
+      const parsedOldData = JSON.parse(oldData);
+
+      // Transform old reducer-based format to new direct format
+      if (parsedOldData?.state) {
+        const transformedData = {
+          state: {
+            envelopes: parsedOldData.state.envelopes || [],
+            bills: parsedOldData.state.bills || [],
+            transactions: parsedOldData.state.transactions || [],
+            allTransactions: parsedOldData.state.allTransactions || [],
+            savingsGoals: parsedOldData.state.savingsGoals || [],
+            supplementalAccounts:
+              parsedOldData.state.supplementalAccounts || [],
+            unassignedCash: parsedOldData.state.unassignedCash || 0,
+            biweeklyAllocation: parsedOldData.state.biweeklyAllocation || 0,
+            paycheckHistory: parsedOldData.state.paycheckHistory || [],
+            actualBalance: parsedOldData.state.actualBalance || 0,
+          },
+          version: 0,
+        };
+
+        localStorage.setItem(
+          "violet-vault-store",
+          JSON.stringify(transformedData),
+        );
+        console.log(
+          "✅ Data migration completed successfully - replaced existing data",
+        );
+
+        // Remove old data after successful migration
+        localStorage.removeItem("budget-store");
+        console.log("🧹 Cleaned up old budget-store data");
+      }
+    }
+  } catch (error) {
+    console.warn("⚠️ Failed to migrate old data:", error);
+  }
+};
+
+// Run migration before creating store
+migrateOldData();
+
 // Base store configuration
 const storeInitializer = (set, get) => ({
   // State
