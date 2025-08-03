@@ -435,24 +435,48 @@ class FirebaseSync {
 
         if (docSnap.exists()) {
           const cloudData = docSnap.data();
-          console.log("✅ Cloud document found for budgetId:", this.budgetId);
-          console.log("🔧 Cloud data keys:", Object.keys(cloudData));
-          console.log("🔧 Has encrypted data:", !!cloudData.encryptedData);
-          console.log(
-            "🔧 Encrypted data length:",
-            cloudData.encryptedData?.length || 0,
-          );
-          console.log(
-            "🔧 Last updated:",
-            cloudData.lastUpdated?.toDate?.()?.toISOString(),
-          );
-          console.log(
-            "🔧 Document size estimate:",
-            JSON.stringify(cloudData).length,
-            "chars",
-          );
+
+          // Only log in development/preview
+          if (
+            import.meta.env.MODE === "development" ||
+            window.location.hostname.includes("vercel.app") ||
+            window.location.hostname.includes("f4tdaddy.com")
+          ) {
+            console.log("✅ Cloud document found for budgetId:", this.budgetId);
+            console.log("🔧 Cloud data keys:", Object.keys(cloudData));
+            console.log("🔧 Has encrypted data:", !!cloudData.encryptedData);
+            console.log(
+              "🔧 Encrypted data length:",
+              cloudData.encryptedData?.length || 0,
+            );
+            console.log(
+              "🔧 Last updated:",
+              cloudData.lastUpdated?.toDate?.()?.toISOString(),
+            );
+            console.log(
+              "🔧 Document size estimate:",
+              JSON.stringify(cloudData).length,
+              "chars",
+            );
+          }
 
           const decryptedData = await this.decryptFromCloud(cloudData);
+
+          // Debug decryption results
+          if (
+            import.meta.env.MODE === "development" ||
+            window.location.hostname.includes("vercel.app") ||
+            window.location.hostname.includes("f4tdaddy.com")
+          ) {
+            console.log("🔐 Decryption result:", {
+              success: !!decryptedData,
+              hasEnvelopes: !!decryptedData?.envelopes?.length,
+              envelopeCount: decryptedData?.envelopes?.length || 0,
+              hasTransactions: !!decryptedData?.transactions?.length,
+              transactionCount: decryptedData?.transactions?.length || 0,
+              dataKeys: decryptedData ? Object.keys(decryptedData) : [],
+            });
+          }
 
           // Update active users
           if (cloudData.currentUser) {
