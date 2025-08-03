@@ -207,6 +207,11 @@ const MainContent = ({
     isSyncing,
   } = budget;
 
+  // Calculate total biweekly need from all envelopes
+  const totalBiweeklyNeed = envelopes.reduce((total, envelope) => {
+    return total + (envelope.biweeklyAllocation || 0);
+  }, 0);
+
   // Payday prediction notifications (after destructuring)
   usePaydayPrediction(paycheckHistory, !!currentUser);
 
@@ -347,13 +352,18 @@ const MainContent = ({
             key="biweekly-need"
             icon={DollarSign}
             label="Biweekly Need"
-            value={biweeklyAllocation}
+            value={totalBiweeklyNeed}
             color="amber"
           />
         </div>
 
         {/* Main Content */}
-        <ViewRenderer activeView={activeView} budget={budget} currentUser={currentUser} />
+        <ViewRenderer
+          activeView={activeView}
+          budget={budget}
+          currentUser={currentUser}
+          totalBiweeklyNeed={totalBiweeklyNeed}
+        />
 
         <SyncStatusIndicators isOnline={isOnline} isSyncing={isSyncing} />
         <ConflictResolutionModal
@@ -512,7 +522,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
     ),
     paycheck: (
       <PaycheckProcessor
-        biweeklyAllocation={biweeklyAllocation}
+        biweeklyAllocation={totalBiweeklyNeed}
         envelopes={envelopes}
         paycheckHistory={paycheckHistory}
         onProcessPaycheck={processPaycheck}
