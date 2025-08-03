@@ -331,6 +331,32 @@ const storeInitializer = (set, get) => ({
       state.isOnline = status;
     }),
 
+  // Load imported data into the store
+  loadData: (importedData) =>
+    set((state) => {
+      console.log("📥 Loading imported data into store:", {
+        envelopes: importedData.envelopes?.length || 0,
+        bills: importedData.bills?.length || 0,
+        savingsGoals: importedData.savingsGoals?.length || 0,
+        transactions: importedData.allTransactions?.length || 0,
+      });
+      
+      // Replace all data with imported data
+      state.envelopes = importedData.envelopes || [];
+      state.bills = importedData.bills || [];
+      state.transactions = importedData.transactions || [];
+      state.allTransactions = importedData.allTransactions || [];
+      state.savingsGoals = importedData.savingsGoals || [];
+      state.supplementalAccounts = importedData.supplementalAccounts || [];
+      state.unassignedCash = importedData.unassignedCash || 0;
+      state.biweeklyAllocation = importedData.biweeklyAllocation || 0;
+      state.paycheckHistory = importedData.paycheckHistory || [];
+      state.actualBalance = importedData.actualBalance || 0;
+      state.dataLoaded = true;
+      
+      console.log("✅ Data loaded successfully into store");
+    }),
+
   // Reset functionality
   resetStore: () =>
     set((state) => {
