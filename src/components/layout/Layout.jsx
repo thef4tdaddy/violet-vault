@@ -13,7 +13,6 @@ import { BudgetProvider } from "../../contexts/BudgetContext";
 import { useBudget } from "../../hooks/useBudget";
 import UserSetup from "../auth/UserSetup";
 import Header from "../ui/Header";
-import TeamActivitySync from "../sync/TeamActivitySync"; // eslint-disable-line no-unused-vars
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ToastContainer } from "../ui/Toast";
 import useToast from "../../hooks/useToast";
@@ -1086,8 +1085,7 @@ const NavButton = (
   </button>
 );
 
-const SummaryCard = ({ icon: Icon, label, value, color }) => {
-  // eslint-disable-line no-unused-vars
+const SummaryCard = ({ icon: Icon, label, value, color }) => { // eslint-disable-line no-unused-vars
   const colorClasses = {
     purple: "bg-purple-500",
     emerald: "bg-emerald-500",
