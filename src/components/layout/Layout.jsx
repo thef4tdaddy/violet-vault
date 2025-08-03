@@ -1,12 +1,5 @@
 // src/components/layout/Layout.jsx
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-  Suspense,
-  lazy,
-} from "react";
+import React, { useState, useEffect, useCallback, useMemo, Suspense, lazy } from "react";
 import useAuthStore from "../../stores/authStore";
 import useOptimizedBudgetStore from "../../stores/optimizedBudgetStore"; // Import optimized store
 import { BudgetProvider } from "../../contexts/BudgetContext";
@@ -21,10 +14,7 @@ import { encryptionUtils } from "../../utils/encryption";
 import FirebaseSync from "../../utils/firebaseSync";
 import logger from "../../utils/logger";
 import { getVersionInfo } from "../../utils/version";
-import {
-  predictNextPayday,
-  checkRecentPayday,
-} from "../../utils/paydayPredictor";
+import { predictNextPayday, checkRecentPayday } from "../../utils/paydayPredictor";
 import {
   DollarSign,
   Wallet,
@@ -43,51 +33,46 @@ const createLazyComponentWithRetry = (importFunc, componentName) => {
     importFunc().catch((error) => {
       console.warn(`Failed to load ${componentName}, retrying...`, error);
       // Force refresh on chunk loading failure
-      if (
-        error.message?.includes("Failed to fetch dynamically imported module")
-      ) {
+      if (error.message?.includes("Failed to fetch dynamically imported module")) {
         window.location.reload();
       }
       throw error;
-    }),
+    })
   );
 };
 
 const PaycheckProcessor = createLazyComponentWithRetry(
   () => import("../budgeting/PaycheckProcessor.jsx"),
-  "PaycheckProcessor",
+  "PaycheckProcessor"
 );
 const EnvelopeGrid = createLazyComponentWithRetry(
   () => import("../budgeting/EnvelopeGrid.jsx"),
-  "EnvelopeGrid",
+  "EnvelopeGrid"
 );
 const SmartEnvelopeSuggestions = createLazyComponentWithRetry(
   () => import("../budgeting/SmartEnvelopeSuggestions.jsx"),
-  "SmartEnvelopeSuggestions",
+  "SmartEnvelopeSuggestions"
 );
 const BillManager = createLazyComponentWithRetry(
   () => import("../bills/BillManager.jsx"),
-  "BillManager",
+  "BillManager"
 );
 const SavingsGoals = createLazyComponentWithRetry(
   () => import("../savings/SavingsGoals.jsx"),
-  "SavingsGoals",
+  "SavingsGoals"
 );
-const Dashboard = createLazyComponentWithRetry(
-  () => import("./Dashboard.jsx"),
-  "Dashboard",
-);
+const Dashboard = createLazyComponentWithRetry(() => import("./Dashboard.jsx"), "Dashboard");
 const TransactionLedger = createLazyComponentWithRetry(
   () => import("../transactions/TransactionLedger.jsx"),
-  "TransactionLedger",
+  "TransactionLedger"
 );
 const ChartsAndAnalytics = createLazyComponentWithRetry(
   () => import("../analytics/ChartsAndAnalytics.jsx"),
-  "ChartsAndAnalytics",
+  "ChartsAndAnalytics"
 );
 const SupplementalAccounts = createLazyComponentWithRetry(
   () => import("../accounts/SupplementalAccounts.jsx"),
-  "SupplementalAccounts",
+  "SupplementalAccounts"
 );
 
 const Layout = () => {
@@ -190,9 +175,7 @@ const Layout = () => {
       const { encryptionUtils } = await import("../../utils/encryption");
       const userDataWithId = {
         ...userData,
-        budgetId:
-          userData.budgetId ||
-          encryptionUtils.generateBudgetId(userData.password),
+        budgetId: userData.budgetId || encryptionUtils.generateBudgetId(userData.password),
       };
 
       logger.auth("Calling login", {
@@ -249,13 +232,8 @@ const Layout = () => {
         throw new Error("No data found");
       }
       const { encryptedData, iv } = JSON.parse(savedData);
-      const decrypted = await encryptionUtils.decrypt(
-        encryptedData,
-        encryptionKey,
-        iv,
-      );
-      const { key, salt: newSalt } =
-        await encryptionUtils.generateKey(newPassword);
+      const decrypted = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
+      const { key, salt: newSalt } = await encryptionUtils.generateKey(newPassword);
       const reencrypted = await encryptionUtils.encrypt(decrypted, key);
       const saveData = {
         encryptedData: reencrypted.data,
@@ -298,13 +276,8 @@ const Layout = () => {
       // Normalize transactions for unified structure
       const allTransactions = Array.isArray(decryptedData.allTransactions)
         ? decryptedData.allTransactions
-        : [
-            ...(decryptedData.transactions || []),
-            ...(decryptedData.bills || []),
-          ];
-      const transactions = allTransactions.filter(
-        (t) => !t.type || t.type === "transaction",
-      );
+        : [...(decryptedData.transactions || []), ...(decryptedData.bills || [])];
+      const transactions = allTransactions.filter((t) => !t.type || t.type === "transaction");
 
       // Prepare export data with metadata
       const exportData = {
@@ -327,10 +300,7 @@ const Layout = () => {
       const link = document.createElement("a");
       link.href = url;
 
-      const timestamp = new Date()
-        .toISOString()
-        .replace(/[:.]/g, "-")
-        .slice(0, 19);
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
       link.download = `VioletVault Budget Backup ${timestamp}.json`;
 
       document.body.appendChild(link);
@@ -340,7 +310,7 @@ const Layout = () => {
 
       console.log("✅ Data exported successfully!");
       alert(
-        `Successfully exported your budget data!\n\nEnvelopes: ${exportData.envelopes?.length || 0}\nBills: ${exportData.bills?.length || 0}\nTransactions: ${exportData.allTransactions?.length || 0}`,
+        `Successfully exported your budget data!\n\nEnvelopes: ${exportData.envelopes?.length || 0}\nBills: ${exportData.bills?.length || 0}\nTransactions: ${exportData.allTransactions?.length || 0}`
       );
     } catch (error) {
       console.error("❌ Export failed:", error);
@@ -377,19 +347,17 @@ const Layout = () => {
         ? importedData.allTransactions
         : [...(importedData.transactions || []), ...(importedData.bills || [])];
       const unifiedTransactions = unifiedAllTransactions.filter(
-        (t) => !t.type || t.type === "transaction",
+        (t) => !t.type || t.type === "transaction"
       );
 
       // Validate the data structure
       if (!importedData.envelopes || !Array.isArray(importedData.envelopes)) {
-        throw new Error(
-          "Invalid backup file: missing or invalid envelopes data",
-        );
+        throw new Error("Invalid backup file: missing or invalid envelopes data");
       }
 
       // Confirm import with user
       const confirmed = confirm(
-        `Import ${importedData.envelopes?.length || 0} envelopes, ${importedData.bills?.length || 0} bills, and ${importedData.allTransactions?.length || 0} transactions?\n\nThis will replace your current data.`,
+        `Import ${importedData.envelopes?.length || 0} envelopes, ${importedData.bills?.length || 0} bills, and ${importedData.allTransactions?.length || 0} transactions?\n\nThis will replace your current data.`
       );
 
       if (!confirmed) {
@@ -402,10 +370,7 @@ const Layout = () => {
         const currentData = localStorage.getItem("envelopeBudgetData");
         if (currentData) {
           const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-          localStorage.setItem(
-            `envelopeBudgetData_backup_${timestamp}`,
-            currentData,
-          );
+          localStorage.setItem(`envelopeBudgetData_backup_${timestamp}`, currentData);
           console.log("✅ Current data backed up");
         }
       } catch (backupError) {
@@ -481,10 +446,7 @@ const Layout = () => {
 
       // Encrypt and save the imported data
       console.log("🔐 Encrypting and saving imported data...");
-      const encrypted = await encryptionUtils.encrypt(
-        dataToLoad,
-        encryptionKey,
-      );
+      const encrypted = await encryptionUtils.encrypt(dataToLoad, encryptionKey);
 
       const saveData = {
         encryptedData: encrypted.data,
@@ -502,13 +464,8 @@ const Layout = () => {
 
       // Test decryption to ensure data integrity
       console.log("🔍 Verifying data integrity...");
-      const { encryptedData: testEncrypted, iv: testIv } =
-        JSON.parse(verification);
-      const testDecrypted = await encryptionUtils.decrypt(
-        testEncrypted,
-        encryptionKey,
-        testIv,
-      );
+      const { encryptedData: testEncrypted, iv: testIv } = JSON.parse(verification);
+      const testDecrypted = await encryptionUtils.decrypt(testEncrypted, encryptionKey, testIv);
 
       console.log("✅ Data integrity verified:", {
         envelopes: testDecrypted.envelopes?.length || 0,
@@ -522,15 +479,13 @@ const Layout = () => {
       console.log("✅ Data imported and saved successfully!");
 
       // Data is saved to localStorage - BudgetContext will load it automatically
-      console.log(
-        "📝 Data saved to localStorage - BudgetContext should load it automatically",
-      );
+      console.log("📝 Data saved to localStorage - BudgetContext should load it automatically");
 
       console.log("🎉 Data import completed successfully!");
 
       // Show success message - data should load automatically
       alert(
-        `Successfully imported data!\n\nEnvelopes: ${dataToLoad.envelopes.length}\nBills: ${dataToLoad.bills.length}\nTransactions: ${dataToLoad.allTransactions.length}\n\nData saved to localStorage. If it doesn't appear, try the Force Load Data button.`,
+        `Successfully imported data!\n\nEnvelopes: ${dataToLoad.envelopes.length}\nBills: ${dataToLoad.bills.length}\nTransactions: ${dataToLoad.allTransactions.length}\n\nData saved to localStorage. If it doesn't appear, try the Force Load Data button.`
       );
 
       return dataToLoad;
@@ -551,9 +506,7 @@ const Layout = () => {
 
   const resetEncryptionAndStartFresh = async () => {
     if (
-      confirm(
-        "This will permanently delete all your budget data and cannot be undone. Continue?",
-      )
+      confirm("This will permanently delete all your budget data and cannot be undone. Continue?")
     ) {
       try {
         // Clear all localStorage data
@@ -577,9 +530,7 @@ const Layout = () => {
         }
 
         logout();
-        alert(
-          "All data has been cleared. You can now set up a new budget with a fresh password.",
-        );
+        alert("All data has been cleared. You can now set up a new budget with a fresh password.");
       } catch (error) {
         console.error("Failed to reset encryption:", error);
         alert("Failed to clear all data. Please try refreshing the page.");
@@ -639,9 +590,7 @@ const Layout = () => {
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="glassmorphism rounded-2xl p-6 w-full max-w-md border border-white/30 shadow-2xl">
             <h3 className="text-xl font-semibold mb-4">Password Expired</h3>
-            <p className="text-gray-700 mb-4">
-              For security, please set a new password.
-            </p>
+            <p className="text-gray-700 mb-4">For security, please set a new password.</p>
             <input
               type="password"
               value={newPassword}
@@ -720,7 +669,7 @@ const MainContent = ({
           transactions: budget.allTransactions,
           allTransactions: budget.allTransactions,
         },
-        currentUser,
+        currentUser
       );
       alert("Data synced to cloud");
     } catch (err) {
@@ -789,10 +738,7 @@ const MainContent = ({
         // Show notification if:
         // 1. Today is predicted payday OR
         // 2. Payday was yesterday and we haven't shown notification yet
-        if (
-          recentPayday.occurred &&
-          (!lastNotification || lastNotification !== today)
-        ) {
+        if (recentPayday.occurred && (!lastNotification || lastNotification !== today)) {
           let title, message;
 
           if (recentPayday.wasToday) {
@@ -836,10 +782,7 @@ const MainContent = ({
 
   // Calculate total biweekly need from all envelopes
   const totalBiweeklyNeed = Array.isArray(envelopes)
-    ? envelopes.reduce(
-        (sum, envelope) => sum + (envelope.biweeklyAllocation || 0),
-        0,
-      )
+    ? envelopes.reduce((sum, envelope) => sum + (envelope.biweeklyAllocation || 0), 0)
     : 0;
 
   return (
@@ -988,9 +931,7 @@ const MainContent = ({
           <div className="fixed bottom-4 right-4 glassmorphism rounded-2xl p-4 z-50">
             <div className="flex items-center space-x-3">
               <div className="animate-spin h-5 w-5 border-2 border-purple-500/30 border-t-purple-500 rounded-full"></div>
-              <span className="text-sm font-medium text-gray-700">
-                Syncing...
-              </span>
+              <span className="text-sm font-medium text-gray-700">Syncing...</span>
             </div>
           </div>
         )}
@@ -1000,9 +941,7 @@ const MainContent = ({
           <div className="fixed bottom-4 left-4 bg-amber-500 text-white rounded-2xl p-4 z-50">
             <div className="flex items-center space-x-3">
               <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium">
-                Offline - Changes saved locally
-              </span>
+              <span className="text-sm font-medium">Offline - Changes saved locally</span>
             </div>
           </div>
         )}
@@ -1019,13 +958,10 @@ const MainContent = ({
                   </div>
                 </div>
 
-                <h3 className="text-xl font-bold text-gray-900 mb-4">
-                  Sync Conflict Detected
-                </h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Sync Conflict Detected</h3>
                 <p className="text-gray-600 mb-6">
-                  <strong>{syncConflicts.cloudUser?.userName}</strong> made
-                  changes on another device. Would you like to load their latest
-                  changes?
+                  <strong>{syncConflicts.cloudUser?.userName}</strong> made changes on another
+                  device. Would you like to load their latest changes?
                 </p>
 
                 <div className="flex gap-3">
@@ -1051,14 +987,10 @@ const MainContent = ({
         <div className="mt-8 text-center">
           <div className="glassmorphism rounded-2xl p-4 max-w-md mx-auto">
             <p className="text-sm text-gray-600">
-              <span className="font-semibold text-purple-600">
-                {getVersionInfo().displayName}
-              </span>{" "}
+              <span className="font-semibold text-purple-600">{getVersionInfo().displayName}</span>{" "}
               v{getVersionInfo().version}
             </p>
-            <p className="text-xs text-gray-500 mt-1">
-              Built with ❤️ for secure budgeting
-            </p>
+            <p className="text-xs text-gray-500 mt-1">Built with ❤️ for secure budgeting</p>
           </div>
         </div>
       </div>
@@ -1120,12 +1052,7 @@ const SummaryCard = ({ icon: Icon, label, value, color }) => {
   );
 };
 
-const ViewRenderer = ({
-  activeView,
-  budget,
-  currentUser,
-  totalBiweeklyNeed,
-}) => {
+const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed }) => {
   const {
     envelopes,
     bills,
@@ -1155,11 +1082,9 @@ const ViewRenderer = ({
   } = budget;
 
   // Filter out null/undefined transactions to prevent runtime errors
-  const allTransactions = (rawAllTransactions || []).filter(
-    (t) => t && typeof t === "object",
-  );
+  const allTransactions = (rawAllTransactions || []).filter((t) => t && typeof t === "object");
   const safeTransactions = (transactions || []).filter(
-    (t) => t && typeof t === "object" && typeof t.amount === "number",
+    (t) => t && typeof t === "object" && typeof t.amount === "number"
   );
 
   const views = {
@@ -1241,16 +1166,14 @@ const ViewRenderer = ({
             createdAt: new Date().toISOString(),
           };
           addBill(bill);
-          console.log(
-            "✅ Bill stored successfully - no transaction created until paid",
-          );
+          console.log("✅ Bill stored successfully - no transaction created until paid");
         }}
         onSearchNewBills={async () => {
           try {
             // This would integrate with email parsing or other bill detection services
             // For now, we'll show a placeholder notification
             alert(
-              "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox.",
+              "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox."
             );
           } catch (error) {
             console.error("Failed to search for new bills:", error);
@@ -1280,16 +1203,10 @@ const ViewRenderer = ({
           deleteTransaction(transactionId);
         }}
         onBulkImport={(newTransactions) => {
-          console.log(
-            "🔄 onBulkImport called with transactions:",
-            newTransactions.length,
-          );
+          console.log("🔄 onBulkImport called with transactions:", newTransactions.length);
           // Add transactions using budget store method
           addTransactions(newTransactions);
-          console.log(
-            "💾 Bulk import complete. Added transactions:",
-            newTransactions.length,
-          );
+          console.log("💾 Bulk import complete. Added transactions:", newTransactions.length);
         }}
         currentUser={currentUser}
       />
@@ -1307,9 +1224,7 @@ const ViewRenderer = ({
   };
 
   return (
-    <Suspense
-      fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}
-    >
+    <Suspense fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}>
       {views[activeView]}
     </Suspense>
   );
