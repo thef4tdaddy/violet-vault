@@ -22,11 +22,17 @@ if (missingKeys.length > 0) {
   );
 }
 
-// Debug: Log what Firebase project we're connecting to (dev only)
-if (import.meta.env.MODE === "development") {
+// Debug: Log what Firebase project we're connecting to (dev/preview only)
+if (
+  import.meta.env.MODE === "development" ||
+  window.location.hostname.includes("vercel.app") ||
+  window.location.hostname.includes("f4tdaddy.com")
+) {
   console.log("🔥 Firebase Config Debug:", {
     projectId: firebaseConfig.projectId,
     authDomain: firebaseConfig.authDomain,
     usingDemo: firebaseConfig.projectId === "demo-project",
+    environment: import.meta.env.MODE,
+    hostname: window.location.hostname,
   });
 }
