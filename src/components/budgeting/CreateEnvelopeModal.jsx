@@ -29,6 +29,7 @@ const CreateEnvelopeModal = ({
     description: "",
     priority: "medium",
     autoAllocate: true,
+    envelopeType: "bill", // Default to bill type
   });
 
   const [errors, setErrors] = useState({});
@@ -82,6 +83,34 @@ const CreateEnvelopeModal = ({
     { value: "low", label: "Low Priority", color: "text-blue-600" },
   ];
 
+  // Envelope type options
+  const envelopeTypes = [
+    {
+      value: "bill",
+      label: "Bill Envelope",
+      description: "Fixed recurring amounts (rent, insurance, phone)",
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
+      borderColor: "border-blue-200",
+    },
+    {
+      value: "variable",
+      label: "Variable Expense",
+      description: "Regular but flexible spending (gas, groceries, medical)",
+      color: "text-amber-600",
+      bgColor: "bg-amber-50",
+      borderColor: "border-amber-200",
+    },
+    {
+      value: "savings",
+      label: "Savings Goal",
+      description: "Long-term savings targets",
+      color: "text-green-600",
+      bgColor: "bg-green-50",
+      borderColor: "border-green-200",
+    },
+  ];
+
   const resetForm = () => {
     setFormData({
       name: "",
@@ -93,6 +122,7 @@ const CreateEnvelopeModal = ({
       description: "",
       priority: "medium",
       autoAllocate: true,
+      envelopeType: "bill",
     });
     setErrors({});
     setIsSubmitting(false);
@@ -110,7 +140,8 @@ const CreateEnvelopeModal = ({
 
     // Check for duplicate names
     const duplicateName = existingEnvelopes.find(
-      (envelope) => envelope.name.toLowerCase() === formData.name.trim().toLowerCase()
+      (envelope) =>
+        envelope.name.toLowerCase() === formData.name.trim().toLowerCase(),
     );
     if (duplicateName) {
       newErrors.name = "An envelope with this name already exists";
@@ -161,6 +192,11 @@ const CreateEnvelopeModal = ({
         priority: formData.priority,
         autoAllocate: formData.autoAllocate,
         biweeklyAllocation: parseFloat(calculateBiweeklyAmount()),
+        envelopeType: formData.envelopeType,
+        monthlyBudget:
+          formData.envelopeType === "variable"
+            ? parseFloat(formData.monthlyAmount)
+            : null,
         createdBy: currentUser.userName,
         createdAt: new Date().toISOString(),
         spendingHistory: [],
@@ -199,8 +235,12 @@ const CreateEnvelopeModal = ({
                 <Plus className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">Create New Envelope</h2>
-                <p className="text-purple-100 text-sm">Set up a new budget envelope</p>
+                <h2 className="text-xl font-bold text-white">
+                  Create New Envelope
+                </h2>
+                <p className="text-purple-100 text-sm">
+                  Set up a new budget envelope
+                </p>
               </div>
             </div>
             <button
@@ -230,7 +270,9 @@ const CreateEnvelopeModal = ({
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
                     errors.name ? "border-red-300 bg-red-50" : "border-gray-300"
                   }`}
@@ -247,10 +289,14 @@ const CreateEnvelopeModal = ({
 
               {/* Category */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Category
+                </label>
                 <select
                   value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, category: e.target.value })
+                  }
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 >
                   <option value="">Select a category...</option>
@@ -260,6 +306,47 @@ const CreateEnvelopeModal = ({
                     </option>
                   ))}
                 </select>
+              </div>
+
+              {/* Envelope Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Envelope Type *
+                </label>
+                <div className="space-y-3">
+                  {envelopeTypes.map((type) => (
+                    <label
+                      key={type.value}
+                      className={`flex items-start p-4 border-2 rounded-xl cursor-pointer transition-all hover:shadow-md ${
+                        formData.envelopeType === type.value
+                          ? `${type.borderColor} ${type.bgColor}`
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="envelopeType"
+                        value={type.value}
+                        checked={formData.envelopeType === type.value}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            envelopeType: e.target.value,
+                          })
+                        }
+                        className="mt-1 w-4 h-4 text-purple-600 focus:ring-purple-500 border-gray-300"
+                      />
+                      <div className="ml-3 flex-1">
+                        <div className={`font-medium ${type.color}`}>
+                          {type.label}
+                        </div>
+                        <div className="text-sm text-gray-600 mt-1">
+                          {type.description}
+                        </div>
+                      </div>
+                    </label>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -274,7 +361,11 @@ const CreateEnvelopeModal = ({
                 {/* Monthly Amount */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Monthly Budget Amount *
+                    {formData.envelopeType === "variable"
+                      ? "Monthly Budget Amount *"
+                      : formData.envelopeType === "savings"
+                        ? "Target Savings Amount *"
+                        : "Monthly Budget Amount *"}
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -292,7 +383,9 @@ const CreateEnvelopeModal = ({
                         })
                       }
                       className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
-                        errors.monthlyAmount ? "border-red-300 bg-red-50" : "border-gray-300"
+                        errors.monthlyAmount
+                          ? "border-red-300 bg-red-50"
+                          : "border-gray-300"
                       }`}
                       placeholder="0.00"
                     />
@@ -304,9 +397,29 @@ const CreateEnvelopeModal = ({
                     </p>
                   )}
                   {formData.monthlyAmount && (
-                    <p className="mt-1 text-xs text-gray-500">
-                      Bi-weekly allocation: ${calculateBiweeklyAmount()}
-                    </p>
+                    <div className="mt-1 space-y-1">
+                      <p className="text-xs text-gray-500">
+                        Bi-weekly allocation: ${calculateBiweeklyAmount()}
+                      </p>
+                      {formData.envelopeType === "variable" && (
+                        <p className="text-xs text-blue-600">
+                          Variable expense: Auto-funded from paychecks based on
+                          monthly budget
+                        </p>
+                      )}
+                      {formData.envelopeType === "savings" && (
+                        <p className="text-xs text-green-600">
+                          Savings goal: Funds allocated manually or from
+                          leftover paycheck amounts
+                        </p>
+                      )}
+                      {formData.envelopeType === "bill" && (
+                        <p className="text-xs text-blue-600">
+                          Fixed bill: Auto-funded from paychecks using biweekly
+                          allocation
+                        </p>
+                      )}
+                    </div>
                   )}
                 </div>
 
@@ -331,7 +444,9 @@ const CreateEnvelopeModal = ({
                         })
                       }
                       className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
-                        errors.currentBalance ? "border-red-300 bg-red-50" : "border-gray-300"
+                        errors.currentBalance
+                          ? "border-red-300 bg-red-50"
+                          : "border-gray-300"
                       }`}
                       placeholder="0.00"
                     />
@@ -348,10 +463,14 @@ const CreateEnvelopeModal = ({
               {/* Frequency and Priority */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Frequency</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Frequency
+                  </label>
                   <select
                     value={formData.frequency}
-                    onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, frequency: e.target.value })
+                    }
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   >
                     {frequencies.map((freq) => (
@@ -368,7 +487,9 @@ const CreateEnvelopeModal = ({
                   </label>
                   <select
                     value={formData.priority}
-                    onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, priority: e.target.value })
+                    }
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   >
                     {priorities.map((priority) => (
@@ -417,7 +538,9 @@ const CreateEnvelopeModal = ({
                 </label>
                 <textarea
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
                   rows={3}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
                   placeholder="Notes about this envelope..."
@@ -434,10 +557,15 @@ const CreateEnvelopeModal = ({
                   type="checkbox"
                   id="autoAllocate"
                   checked={formData.autoAllocate}
-                  onChange={(e) => setFormData({ ...formData, autoAllocate: e.target.checked })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, autoAllocate: e.target.checked })
+                  }
                   className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                 />
-                <label htmlFor="autoAllocate" className="ml-3 text-sm text-gray-700">
+                <label
+                  htmlFor="autoAllocate"
+                  className="ml-3 text-sm text-gray-700"
+                >
                   Auto-allocate funds from paychecks
                 </label>
               </div>
@@ -464,8 +592,24 @@ const CreateEnvelopeModal = ({
                   className="w-4 h-4 rounded-lg mr-2"
                   style={{ backgroundColor: formData.color }}
                 />
+                <span
+                  className={`px-2 py-1 text-xs font-medium rounded-full mr-2 ${
+                    formData.envelopeType === "variable"
+                      ? "bg-amber-100 text-amber-800"
+                      : formData.envelopeType === "savings"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-blue-100 text-blue-800"
+                  }`}
+                >
+                  {formData.envelopeType === "variable"
+                    ? "Variable"
+                    : formData.envelopeType === "savings"
+                      ? "Savings"
+                      : "Bill"}
+                </span>
                 Preview: {formData.name}
-                {formData.monthlyAmount && ` • $${formData.monthlyAmount}/month`}
+                {formData.monthlyAmount &&
+                  ` • $${formData.monthlyAmount}/month`}
               </div>
             )}
           </div>
@@ -481,7 +625,9 @@ const CreateEnvelopeModal = ({
             </button>
             <button
               onClick={handleSubmit}
-              disabled={isSubmitting || !formData.name.trim() || !formData.monthlyAmount}
+              disabled={
+                isSubmitting || !formData.name.trim() || !formData.monthlyAmount
+              }
               className="px-6 py-2 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center"
             >
               {isSubmitting ? (
