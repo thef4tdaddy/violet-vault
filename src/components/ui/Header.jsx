@@ -1,7 +1,8 @@
-import { useState, memo, useCallback } from "react";
+import React, { useState, memo, useCallback } from "react";
 import {
   Upload,
   Download,
+  LogOut,
   AlertTriangle,
   RefreshCw,
   Cloud,
@@ -50,7 +51,7 @@ const Header = memo(
               src={logoWithText}
               alt="VioletVault Logo"
               loading="lazy"
-              className="h-40 sm:h-52 md:h-64 lg:h-72 xl:h-80 2xl:h-96 w-auto max-w-full object-contain"
+              className="h-64 sm:h-80 md:h-96 lg:h-[32rem] xl:h-[40rem] 2xl:h-[48rem] w-auto max-w-full object-contain px-4"
               style={{
                 imageRendering: "high-quality",
               }}
@@ -86,7 +87,7 @@ const Header = memo(
 
               <button
                 onClick={onExport}
-                className="btn btn-secondary flex items-center rounded-2xl px-4 py-2 font-medium hover:shadow-lg transition-all"
+                className="btn btn-secondary flex items-center rounded-xl"
               >
                 <Download className="h-4 w-4 mr-2" />
                 Export
@@ -103,7 +104,7 @@ const Header = memo(
               {LOCAL_ONLY_MODE && (
                 <button
                   onClick={onSync}
-                  className="btn btn-primary flex items-center rounded-2xl px-4 py-2 font-medium hover:shadow-lg transition-all"
+                  className="btn btn-primary flex items-center rounded-xl"
                 >
                   <Cloud className="h-4 w-4 mr-2" />
                   Sync to Cloud
@@ -182,7 +183,7 @@ const Header = memo(
         )}
       </div>
     );
-  },
+  }
 );
 
 export default Header;
