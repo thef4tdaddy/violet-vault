@@ -265,18 +265,22 @@ const Layout = () => {
       // First try to get data from the encrypted source (where the real data is)
       let decryptedData = null;
       const encryptedData = localStorage.getItem("envelopeBudgetData");
-      
+
       if (encryptedData && encryptionKey) {
         console.log("🔐 Found encrypted data, attempting decryption...");
         try {
           const parsed = JSON.parse(encryptedData);
-          decryptedData = await encryptionUtils.decrypt(parsed.encryptedData, encryptionKey, parsed.iv);
+          decryptedData = await encryptionUtils.decrypt(
+            parsed.encryptedData,
+            encryptionKey,
+            parsed.iv
+          );
           console.log("✅ Successfully decrypted data for export");
         } catch (decryptError) {
           console.warn("⚠️ Failed to decrypt envelopeBudgetData, falling back to budget-store");
         }
       }
-      
+
       // Fallback to budget-store if decryption failed or no encrypted data
       if (!decryptedData) {
         console.log("📁 Using budget-store as data source...");
