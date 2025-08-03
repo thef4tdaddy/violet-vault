@@ -3,7 +3,11 @@ import { H } from "highlight.run";
 export const initHighlight = () => {
   // Only log in development mode
   if (import.meta.env.MODE === "development") {
-    console.log("🔧 Initializing Highlight.io in", import.meta.env.MODE, "mode");
+    console.log(
+      "🔧 Initializing Highlight.io in",
+      import.meta.env.MODE,
+      "mode",
+    );
   }
 
   H.init(import.meta.env.VITE_HIGHLIGHT_PROJECT_ID || "your-project-id-here", {
@@ -29,8 +33,8 @@ export const initHighlight = () => {
     console.log("✅ Highlight.io initialized");
   }
 
-  // Setup console capture for enhanced error tracking
-  setupConsoleCapture();
+  // Setup console capture for enhanced error tracking (commented out to avoid conflicts)
+  // setupConsoleCapture();
 };
 
 const setupConsoleCapture = () => {
@@ -42,7 +46,9 @@ const setupConsoleCapture = () => {
     originalConsoleError(...args);
 
     const message = args
-      .map((arg) => (typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)))
+      .map((arg) =>
+        typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg),
+      )
       .join(" ");
 
     // Skip frequent or expected errors that create noise
@@ -66,7 +72,9 @@ const setupConsoleCapture = () => {
     originalConsoleWarn(...args);
 
     const message = args
-      .map((arg) => (typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)))
+      .map((arg) =>
+        typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg),
+      )
       .join(" ");
 
     // Skip common development warnings that don't need tracking
