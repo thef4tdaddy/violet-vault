@@ -364,6 +364,8 @@ const SmartEnvelopeSuggestions = ({
         <button
           onClick={toggleCollapse}
           className="flex items-center text-lg font-semibold text-gray-900 hover:text-gray-700 transition-colors group"
+          title={isCollapsed ? "Expand suggestions" : "Collapse suggestions"}
+          aria-expanded={!isCollapsed}
         >
           <div className="relative mr-3">
             <div className="absolute inset-0 bg-amber-500 rounded-xl blur-lg opacity-30"></div>
