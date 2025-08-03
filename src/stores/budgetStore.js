@@ -16,6 +16,7 @@ const storeInitializer = (set, get) => ({
   supplementalAccounts: [],
   unassignedCash: 0,
   biweeklyAllocation: 0,
+  actualBalance: 0, // Actual bank balance
   isOnline: true, // Add isOnline state, default to true
   dataLoaded: false,
 
@@ -232,6 +233,12 @@ const storeInitializer = (set, get) => ({
       state.biweeklyAllocation = amount;
     }),
 
+  // Actual balance management
+  setActualBalance: (amount) =>
+    set((state) => {
+      state.actualBalance = amount;
+    }),
+
   // Data loading state
   setDataLoaded: (loaded) =>
     set((state) => {
@@ -254,6 +261,7 @@ const storeInitializer = (set, get) => ({
       state.savingsGoals = [];
       state.supplementalAccounts = [];
       state.unassignedCash = 0;
+      state.actualBalance = 0;
       state.isOnline = true; // Also reset isOnline status
       state.dataLoaded = false;
     }),
@@ -280,6 +288,7 @@ if (LOCAL_ONLY_MODE) {
           supplementalAccounts: state.supplementalAccounts,
           unassignedCash: state.unassignedCash,
           biweeklyAllocation: state.biweeklyAllocation,
+          actualBalance: state.actualBalance,
         }),
       }),
       { name: "violet-vault-devtools" }

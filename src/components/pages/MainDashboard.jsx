@@ -15,6 +15,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import PaydayPrediction from "../budgeting/PaydayPrediction";
+import VirtualBalanceDisplay from "../budget/VirtualBalanceDisplay";
 import { predictNextPayday } from "../../utils/paydayPredictor";
 
 const Dashboard = ({
@@ -126,22 +127,7 @@ const Dashboard = ({
           </div>
 
           {/* Virtual Balance */}
-          <div className="bg-green-50 rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-medium text-green-900">Virtual Balance</h3>
-              <Wallet className="h-5 w-5 text-green-600" />
-            </div>
-            <div className="space-y-3">
-              <div className="text-2xl font-bold text-green-900">
-                ${totalVirtualBalance.toFixed(2)}
-              </div>
-              <div className="text-sm text-green-700 space-y-1">
-                <div>Envelopes: ${totalEnvelopeBalance.toFixed(2)}</div>
-                <div>Savings: ${totalSavingsBalance.toFixed(2)}</div>
-                <div>Unassigned: ${unassignedCash.toFixed(2)}</div>
-              </div>
-            </div>
-          </div>
+          <VirtualBalanceDisplay />
 
           {/* Difference */}
           <div
