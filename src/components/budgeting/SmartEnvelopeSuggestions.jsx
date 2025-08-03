@@ -32,7 +32,7 @@ const SmartEnvelopeSuggestions = ({
   const [showSettings, setShowSettings] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(() => {
     // Initialize from localStorage, default to expanded (false)
-    const saved = localStorage.getItem('smartSuggestions_collapsed');
+    const saved = localStorage.getItem("smartSuggestions_collapsed");
     return saved ? JSON.parse(saved) : false;
   });
   const [analysisSettings, setAnalysisSettings] = useState({
@@ -45,7 +45,7 @@ const SmartEnvelopeSuggestions = ({
 
   // Persist collapse state to localStorage
   useEffect(() => {
-    localStorage.setItem('smartSuggestions_collapsed', JSON.stringify(isCollapsed));
+    localStorage.setItem("smartSuggestions_collapsed", JSON.stringify(isCollapsed));
   }, [isCollapsed]);
 
   const toggleCollapse = () => {
@@ -398,9 +398,11 @@ const SmartEnvelopeSuggestions = ({
       </div>
 
       {/* Collapsible Content */}
-      <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
-        isCollapsed ? 'max-h-0 opacity-0' : 'max-h-[800px] opacity-100'
-      }`}>
+      <div
+        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+          isCollapsed ? "max-h-0 opacity-0" : "max-h-[800px] opacity-100"
+        }`}
+      >
         {/* Settings Panel */}
         {showSettings && (
           <div className="mb-4 p-4 bg-gray-50 rounded-lg border">

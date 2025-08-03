@@ -1,4 +1,4 @@
-import { Sentry } from "./sentry.js";
+import { H } from "./highlight.js";
 
 class Logger {
   constructor() {
@@ -14,16 +14,16 @@ class Logger {
       consoleLog(`🔍 ${message}`, data);
     }
 
+    // Highlight.io automatically captures console logs, so just ensure it's tracked
     try {
-      Sentry.addBreadcrumb({
+      H.track("debug", {
         message: `DEBUG: ${message}`,
-        level: "info",
         category: "debug",
-        data,
+        ...data,
       });
     } catch (error) {
-      // Fallback if Sentry fails
-      console.error("Sentry logging failed:", error);
+      // Fallback if Highlight.io fails
+      console.error("Highlight.io logging failed:", error);
     }
   }
 
@@ -35,14 +35,13 @@ class Logger {
     }
 
     try {
-      Sentry.addBreadcrumb({
+      H.track("info", {
         message: `INFO: ${message}`,
-        level: "info",
         category: "app",
-        data,
+        ...data,
       });
     } catch (error) {
-      console.error("Sentry logging failed:", error);
+      console.error("Highlight.io logging failed:", error);
     }
   }
 
@@ -50,11 +49,10 @@ class Logger {
   warn(message, data = {}) {
     console.warn(`⚠️ ${message}`, data);
 
-    Sentry.addBreadcrumb({
+    H.track("warning", {
       message: `WARN: ${message}`,
-      level: "warning",
       category: "app",
-      data,
+      ...data,
     });
   }
 
@@ -63,12 +61,15 @@ class Logger {
     console.error(`❌ ${message}`, error, data);
 
     if (error instanceof Error) {
-      Sentry.captureException(error, {
+      H.consumeError(error, {
+        metadata: { message, ...data },
         tags: { component: "app" },
-        extra: { message, data },
       });
     } else {
-      Sentry.captureMessage(message, "error");
+      H.consumeError(new Error(message), {
+        metadata: data,
+        tags: { component: "app" },
+      });
     }
   }
 
@@ -79,21 +80,23 @@ class Logger {
       console.log(`💰 [BUDGET-SYNC] ${message}`, data);
     }
 
-    // Also send to Sentry
+    // Also send to Highlight.io
     try {
-      Sentry.addBreadcrumb({
+      H.track("budget-sync", {
         message: `BUDGET-SYNC: ${message}`,
-        level: "info",
         category: "budget-sync",
-        data,
+        ...data,
       });
 
-      // For critical budget sync issues, also send as message to ensure visibility
+      // For critical budget sync issues, also send as error to ensure visibility
       if (message.includes("budgetId value") || message.includes("sync issue")) {
-        Sentry.captureMessage(`Budget Sync: ${message}`, "info");
+        H.consumeError(new Error(`Budget Sync: ${message}`), {
+          metadata: data,
+          tags: { category: "budget-sync", critical: "true" },
+        });
       }
     } catch (error) {
-      console.error("Failed to log to Sentry:", error);
+      console.error("Failed to log to Highlight.io:", error);
     }
   }
 
@@ -134,28 +137,28 @@ class Logger {
     });
   }
 
-  // Test Sentry connectivity
-  testSentry() {
-    console.log("🧪 Testing Sentry connectivity...");
+  // Test Highlight.io connectivity
+  testHighlight() {
+    console.log("🧪 Testing Highlight.io connectivity...");
 
-    // Send a test breadcrumb
-    Sentry.addBreadcrumb({
-      message: "Test breadcrumb from logger",
-      level: "info",
+    // Send a test event
+    H.track("test-event", {
+      message: "Test event from logger",
       category: "test",
+      timestamp: new Date().toISOString(),
     });
-
-    // Send a test message
-    Sentry.captureMessage("Test message from logger", "info");
 
     // Send a test error
     try {
       throw new Error("Test error from logger - this is intentional");
     } catch (error) {
-      Sentry.captureException(error);
+      H.consumeError(error, {
+        metadata: { test: true, source: "logger" },
+        tags: { category: "test" },
+      });
     }
 
-    console.log("✅ Sentry test messages sent - check your Sentry dashboard");
+    console.log("✅ Highlight.io test messages sent - check your Highlight.io dashboard");
   }
 }
 
@@ -164,7 +167,7 @@ export const logger = new Logger();
 // Make logger available globally for testing
 if (typeof window !== "undefined") {
   window.logger = logger;
-  window.testSentry = () => logger.testSentry();
+  window.testHighlight = () => logger.testHighlight();
 }
 
 export default logger;
