@@ -36,10 +36,10 @@ const useVirtualBalanceOverride = () => {
     return Math.abs(difference) < 0.01;
   }, [difference]);
 
-  // Validate input value
+  // Validate input value (now allows negative values for overspending scenarios)
   const isValidValue = useCallback((value) => {
     const numValue = parseFloat(value);
-    return !isNaN(numValue) && isFinite(numValue) && numValue >= 0;
+    return !isNaN(numValue) && isFinite(numValue);
   }, []);
 
   // Check if change is large (>$100 difference)
@@ -148,14 +148,42 @@ const useVirtualBalanceOverride = () => {
     }).format(value);
   }, []);
 
-  // Get status information
+  // Get status information (enhanced for negative balance support)
   const getBalanceStatus = useCallback(() => {
+    // Check for negative virtual balance (overspending scenario)
+    if (virtualBalance < 0) {
+      return {
+        status: "overspending",
+        message: "⚠️ Overspending detected",
+        color: "text-red-700",
+        bgColor: "bg-red-100",
+        textColor: "text-red-900",
+        borderColor: "border-red-200",
+        isNegative: true,
+      };
+    }
+
+    // Check for negative unassigned cash (budget deficit)
+    if (unassignedCash < 0) {
+      return {
+        status: "deficit",
+        message: "Budget deficit",
+        color: "text-orange-700",
+        bgColor: "bg-orange-100",
+        textColor: "text-orange-900",
+        borderColor: "border-orange-200",
+        isDeficit: true,
+      };
+    }
+
     if (isReconciled) {
       return {
         status: "reconciled",
         message: "Balances match",
         color: "text-green-600",
         bgColor: "bg-green-50",
+        textColor: "text-green-900",
+        borderColor: "border-green-200",
       };
     } else if (Math.abs(difference) <= 10) {
       return {
@@ -163,6 +191,8 @@ const useVirtualBalanceOverride = () => {
         message: `Difference: ${formatCurrency(Math.abs(difference))}`,
         color: "text-yellow-600",
         bgColor: "bg-yellow-50",
+        textColor: "text-yellow-900",
+        borderColor: "border-yellow-200",
       };
     } else {
       return {
@@ -170,9 +200,11 @@ const useVirtualBalanceOverride = () => {
         message: `Difference: ${formatCurrency(Math.abs(difference))}`,
         color: "text-red-600",
         bgColor: "bg-red-50",
+        textColor: "text-red-900",
+        borderColor: "border-red-200",
       };
     }
-  }, [isReconciled, difference, formatCurrency]);
+  }, [isReconciled, difference, formatCurrency, virtualBalance, unassignedCash]);
 
   return {
     // State

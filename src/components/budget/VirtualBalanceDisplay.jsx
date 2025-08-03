@@ -1,5 +1,15 @@
 import React from "react";
-import { Wallet, Edit3, Check, X, AlertTriangle, ArrowUpDown, Plus, Minus } from "lucide-react";
+import {
+  Wallet,
+  Edit3,
+  Check,
+  X,
+  AlertTriangle,
+  ArrowUpDown,
+  Plus,
+  Minus,
+  TrendingDown,
+} from "lucide-react";
 import useVirtualBalanceOverride from "../../hooks/useVirtualBalanceOverride";
 
 /**
@@ -95,11 +105,27 @@ const VirtualBalanceDisplay = ({ className = "" }) => {
     );
   }
 
+  // Determine icon and header styling based on balance status
+  const getHeaderIcon = () => {
+    if (balanceStatus.isNegative) {
+      return <TrendingDown className="h-5 w-5 text-red-600" />;
+    }
+    return <Wallet className="h-5 w-5 text-green-600" />;
+  };
+
   return (
-    <div className={`${balanceStatus.bgColor} rounded-lg p-6 ${className}`}>
+    <div
+      className={`${balanceStatus.bgColor} border-2 ${balanceStatus.borderColor} rounded-lg p-6 ${className}`}
+    >
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-medium text-green-900">Virtual Balance</h3>
-        <Wallet className="h-5 w-5 text-green-600" />
+        <h3 className={`font-medium ${balanceStatus.textColor}`}>
+          Virtual Balance
+          {balanceStatus.isNegative && (
+            <span className="ml-2 text-xs font-normal">(Overspending)</span>
+          )}
+          {balanceStatus.isDeficit && <span className="ml-2 text-xs font-normal">(Deficit)</span>}
+        </h3>
+        {getHeaderIcon()}
       </div>
 
       <div className="space-y-3">
@@ -145,7 +171,7 @@ const VirtualBalanceDisplay = ({ className = "" }) => {
               className="group flex items-center space-x-2 hover:bg-green-100 rounded p-1 -m-1 transition-colors"
               title="Click to edit virtual balance"
             >
-              <div className="text-2xl font-bold text-green-900">
+              <div className={`text-2xl font-bold ${balanceStatus.textColor}`}>
                 {formatCurrency(virtualBalance)}
               </div>
               <Edit3 className="h-4 w-4 text-green-600 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -154,20 +180,56 @@ const VirtualBalanceDisplay = ({ className = "" }) => {
         )}
 
         {/* Breakdown */}
-        <div className="text-sm text-green-700 space-y-1">
+        <div className={`text-sm ${balanceStatus.color} space-y-1`}>
           <div>Envelopes: {formatCurrency(totalEnvelopeBalance || 0)}</div>
           <div>Savings: {formatCurrency(totalSavingsBalance || 0)}</div>
-          <div>Unassigned: {formatCurrency(unassignedCash || 0)}</div>
+          <div className={unassignedCash < 0 ? "font-semibold text-red-700" : ""}>
+            Unassigned: {formatCurrency(unassignedCash || 0)}
+            {unassignedCash < 0 && <span className="ml-1">⚠️</span>}
+          </div>
         </div>
 
         {/* Quick Actions */}
         {!isEditing && (
-          <div className="pt-3 border-t border-green-200 space-y-2">
-            <div className="flex items-center justify-between text-xs text-green-700">
+          <div className={`pt-3 border-t ${balanceStatus.borderColor} space-y-2`}>
+            <div className={`flex items-center justify-between text-xs ${balanceStatus.color}`}>
               <span>Quick Actions:</span>
               <span className={balanceStatus.color}>{balanceStatus.message}</span>
             </div>
 
+            {/* Recovery Actions for Negative Balances */}
+            {(virtualBalance < 0 || unassignedCash < 0) && (
+              <div className="bg-red-50 border border-red-200 rounded p-3 space-y-2">
+                <div className="text-xs font-medium text-red-800">💡 Recovery Suggestions:</div>
+                <div className="flex gap-2 flex-wrap">
+                  <button
+                    onClick={() =>
+                      adjustVirtualBalance(
+                        Math.abs(virtualBalance < 0 ? virtualBalance : unassignedCash)
+                      )
+                    }
+                    className="btn btn-xs bg-red-100 text-red-700 border-red-300 hover:bg-red-200 flex items-center"
+                    title="Add enough to balance budget"
+                  >
+                    <Plus className="h-3 w-3 mr-1" />
+                    Balance Budget
+                  </button>
+                  <button
+                    onClick={matchActualBalance}
+                    className="btn btn-xs bg-red-100 text-red-700 border-red-300 hover:bg-red-200 flex items-center"
+                    title="Set virtual balance to match actual balance"
+                  >
+                    <ArrowUpDown className="h-3 w-3 mr-1" />
+                    Match Bank
+                  </button>
+                </div>
+                <div className="text-xs text-red-700">
+                  Consider reducing spending or adding income to resolve the deficit.
+                </div>
+              </div>
+            )}
+
+            {/* Standard Actions */}
             <div className="flex gap-2 flex-wrap">
               <button
                 onClick={matchActualBalance}
