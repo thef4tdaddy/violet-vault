@@ -1,6 +1,7 @@
 import React from "react";
-import Layout from "./components/layout/Layout";
-import ErrorBoundary from "./components/ui/ErrorBoundary";
+import MainLayout from "./components/layout/MainLayout";
+import { ErrorBoundary } from "@highlight-run/react";
+import "./utils/errorViewer"; // Initialize local error viewer for dev debugging
 
 function App() {
   if (import.meta.env.MODE === "development") {
@@ -9,7 +10,7 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <Layout />
+      <MainLayout />
     </ErrorBoundary>
   );
 }

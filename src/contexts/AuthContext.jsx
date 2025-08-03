@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { create } from "zustand";
 import { encryptionUtils } from "../utils/encryption";
 import logger from "../utils/logger";
+import { identifyUser } from "../utils/highlight";
 
 export const useAuth = create((set) => ({
   isUnlocked: false,
@@ -44,6 +45,13 @@ export const useAuth = create((set) => ({
             budgetId: finalUserData.budgetId,
             isUnlocked: true,
             lastActivity: Date.now(),
+          });
+
+          // Identify user in Highlight.io for session tracking
+          identifyUser(finalUserData.budgetId, {
+            userName: finalUserData.userName,
+            userColor: finalUserData.userColor,
+            accountType: "new_user",
           });
 
           const profileData = {
@@ -123,6 +131,13 @@ export const useAuth = create((set) => ({
             budgetId: currentUserData.budgetId,
             isUnlocked: true,
             lastActivity: Date.now(),
+          });
+
+          // Identify returning user in Highlight.io for session tracking
+          identifyUser(currentUserData.budgetId, {
+            userName: currentUserData.userName,
+            userColor: currentUserData.userColor,
+            accountType: "returning_user",
           });
 
           return { success: true, data: migratedData };

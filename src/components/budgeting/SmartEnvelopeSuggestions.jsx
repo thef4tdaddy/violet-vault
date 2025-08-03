@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   Zap,
   Plus,
@@ -12,6 +12,8 @@ import {
   Lightbulb,
   Settings,
   RefreshCw,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 
 const SmartEnvelopeSuggestions = ({
@@ -28,6 +30,11 @@ const SmartEnvelopeSuggestions = ({
 }) => {
   const [dismissedSuggestions, setDismissedSuggestions] = useState(new Set());
   const [showSettings, setShowSettings] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    // Initialize from localStorage, default to expanded (false)
+    const saved = localStorage.getItem("smartSuggestions_collapsed");
+    return saved ? JSON.parse(saved) : false;
+  });
   const [analysisSettings, setAnalysisSettings] = useState({
     minAmount: minAmount,
     minTransactions: minTransactions,
@@ -35,6 +42,15 @@ const SmartEnvelopeSuggestions = ({
     overfundingThreshold: 3.0, // 3x monthly budget in balance
     bufferPercentage: 1.1, // 110% for suggestions
   });
+
+  // Persist collapse state to localStorage
+  useEffect(() => {
+    localStorage.setItem("smartSuggestions_collapsed", JSON.stringify(isCollapsed));
+  }, [isCollapsed]);
+
+  const toggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+  };
 
   const filteredTransactions = useMemo(() => {
     const now = new Date();
@@ -345,7 +361,10 @@ const SmartEnvelopeSuggestions = ({
     <div className={`glassmorphism rounded-xl p-6 ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+        <button
+          onClick={toggleCollapse}
+          className="flex items-center text-lg font-semibold text-gray-900 hover:text-gray-700 transition-colors group"
+        >
           <div className="relative mr-3">
             <div className="absolute inset-0 bg-amber-500 rounded-xl blur-lg opacity-30"></div>
             <div className="relative bg-amber-500 p-2 rounded-xl">
@@ -353,156 +372,172 @@ const SmartEnvelopeSuggestions = ({
             </div>
           </div>
           Smart Suggestions
-        </h3>
+          <div className="ml-2 transition-transform duration-200 group-hover:scale-110">
+            {isCollapsed ? (
+              <ChevronDown className="h-5 w-5 text-gray-400" />
+            ) : (
+              <ChevronUp className="h-5 w-5 text-gray-400" />
+            )}
+          </div>
+        </button>
 
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-600">
             {suggestions.length} recommendation
             {suggestions.length !== 1 ? "s" : ""}
           </span>
-          <button
-            onClick={() => setShowSettings(!showSettings)}
-            className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
-          >
-            <Settings className="h-4 w-4" />
-          </button>
-        </div>
-      </div>
-
-      {/* Settings Panel */}
-      {showSettings && (
-        <div className="mb-4 p-4 bg-gray-50 rounded-lg border">
-          <h4 className="font-medium text-gray-900 mb-3">Analysis Settings</h4>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <label className="block text-gray-700 mb-1">Min Amount ($)</label>
-              <input
-                type="number"
-                value={analysisSettings.minAmount}
-                onChange={(e) =>
-                  setAnalysisSettings((prev) => ({
-                    ...prev,
-                    minAmount: parseInt(e.target.value) || 50,
-                  }))
-                }
-                className="w-full px-2 py-1 border rounded"
-                min="10"
-                max="500"
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 mb-1">Min Transactions</label>
-              <input
-                type="number"
-                value={analysisSettings.minTransactions}
-                onChange={(e) =>
-                  setAnalysisSettings((prev) => ({
-                    ...prev,
-                    minTransactions: parseInt(e.target.value) || 3,
-                  }))
-                }
-                className="w-full px-2 py-1 border rounded"
-                min="1"
-                max="20"
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Suggestions List */}
-      {suggestions.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
-          <CheckCircle className="h-12 w-12 mx-auto mb-3 text-green-400" />
-          <p className="font-medium">No suggestions right now</p>
-          <p className="text-sm mt-1">Your budget looks well-optimized!</p>
-          {dismissedSuggestions.size > 0 && (
+          {!isCollapsed && (
             <button
-              onClick={() => setDismissedSuggestions(new Set())}
-              className="text-xs text-blue-600 hover:text-blue-700 mt-2 flex items-center mx-auto"
+              onClick={() => setShowSettings(!showSettings)}
+              className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
             >
-              <RefreshCw className="h-3 w-3 mr-1" />
-              Show dismissed suggestions
+              <Settings className="h-4 w-4" />
             </button>
           )}
         </div>
-      ) : (
-        <div className="space-y-3 max-h-96 overflow-y-auto">
-          {suggestions.map((suggestion) => (
-            <div
-              key={suggestion.id}
-              className={`p-4 rounded-lg border-l-4 transition-all hover:shadow-sm ${
-                suggestion.priority === "high"
-                  ? "bg-red-50 border-red-400"
-                  : suggestion.priority === "medium"
-                    ? "bg-amber-50 border-amber-400"
-                    : "bg-blue-50 border-blue-400"
-              }`}
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center mb-2">
-                    {getPriorityIcon(suggestion.priority)}
-                    <h4 className="font-medium text-gray-900 text-sm ml-2">{suggestion.title}</h4>
-                    <span
-                      className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
-                        suggestion.priority === "high"
-                          ? "bg-red-100 text-red-800"
-                          : suggestion.priority === "medium"
-                            ? "bg-amber-100 text-amber-800"
-                            : "bg-blue-100 text-blue-800"
-                      }`}
-                    >
-                      {suggestion.priority}
-                    </span>
-                  </div>
+      </div>
 
-                  <p className="text-sm text-gray-600 mb-1">{suggestion.description}</p>
-                  <p className="text-xs text-gray-500 italic">{suggestion.reasoning}</p>
-                </div>
-
-                <div className="text-right ml-4">
-                  <div className="font-bold text-lg text-gray-900">
-                    ${suggestion.suggestedAmount}
-                  </div>
-                  <div className="text-xs text-gray-500">per month</div>
-                </div>
+      {/* Collapsible Content */}
+      <div
+        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+          isCollapsed ? "max-h-0 opacity-0" : "max-h-[800px] opacity-100"
+        }`}
+      >
+        {/* Settings Panel */}
+        {showSettings && (
+          <div className="mb-4 p-4 bg-gray-50 rounded-lg border">
+            <h4 className="font-medium text-gray-900 mb-3">Analysis Settings</h4>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <label className="block text-gray-700 mb-1">Min Amount ($)</label>
+                <input
+                  type="number"
+                  value={analysisSettings.minAmount}
+                  onChange={(e) =>
+                    setAnalysisSettings((prev) => ({
+                      ...prev,
+                      minAmount: parseInt(e.target.value) || 50,
+                    }))
+                  }
+                  className="w-full px-2 py-1 border rounded"
+                  min="10"
+                  max="500"
+                />
               </div>
-
-              {/* Action Buttons */}
-              <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200">
-                <div className="flex items-center text-xs text-gray-500">
-                  {getTypeIcon(suggestion.type)}
-                  <span className="ml-1 capitalize">{suggestion.action.replace("_", " ")}</span>
-                  <span className="mx-2">•</span>
-                  <span className="capitalize">{suggestion.impact} impact</span>
-                </div>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleDismissSuggestion(suggestion.id)}
-                    className="text-xs px-3 py-1 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    Dismiss
-                  </button>
-                  <button
-                    onClick={() => handleApplySuggestion(suggestion)}
-                    className={`text-xs px-3 py-1 rounded-lg text-white transition-colors ${
-                      suggestion.priority === "high"
-                        ? "bg-red-500 hover:bg-red-600"
-                        : suggestion.priority === "medium"
-                          ? "bg-amber-500 hover:bg-amber-600"
-                          : "bg-blue-500 hover:bg-blue-600"
-                    }`}
-                  >
-                    Apply
-                  </button>
-                </div>
+              <div>
+                <label className="block text-gray-700 mb-1">Min Transactions</label>
+                <input
+                  type="number"
+                  value={analysisSettings.minTransactions}
+                  onChange={(e) =>
+                    setAnalysisSettings((prev) => ({
+                      ...prev,
+                      minTransactions: parseInt(e.target.value) || 3,
+                    }))
+                  }
+                  className="w-full px-2 py-1 border rounded"
+                  min="1"
+                  max="20"
+                />
               </div>
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        )}
+
+        {/* Suggestions List */}
+        {suggestions.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            <CheckCircle className="h-12 w-12 mx-auto mb-3 text-green-400" />
+            <p className="font-medium">No suggestions right now</p>
+            <p className="text-sm mt-1">Your budget looks well-optimized!</p>
+            {dismissedSuggestions.size > 0 && (
+              <button
+                onClick={() => setDismissedSuggestions(new Set())}
+                className="text-xs text-blue-600 hover:text-blue-700 mt-2 flex items-center mx-auto"
+              >
+                <RefreshCw className="h-3 w-3 mr-1" />
+                Show dismissed suggestions
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-3 max-h-96 overflow-y-auto">
+            {suggestions.map((suggestion) => (
+              <div
+                key={suggestion.id}
+                className={`p-4 rounded-lg border-l-4 transition-all hover:shadow-sm ${
+                  suggestion.priority === "high"
+                    ? "bg-red-50 border-red-400"
+                    : suggestion.priority === "medium"
+                      ? "bg-amber-50 border-amber-400"
+                      : "bg-blue-50 border-blue-400"
+                }`}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center mb-2">
+                      {getPriorityIcon(suggestion.priority)}
+                      <h4 className="font-medium text-gray-900 text-sm ml-2">{suggestion.title}</h4>
+                      <span
+                        className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
+                          suggestion.priority === "high"
+                            ? "bg-red-100 text-red-800"
+                            : suggestion.priority === "medium"
+                              ? "bg-amber-100 text-amber-800"
+                              : "bg-blue-100 text-blue-800"
+                        }`}
+                      >
+                        {suggestion.priority}
+                      </span>
+                    </div>
+
+                    <p className="text-sm text-gray-600 mb-1">{suggestion.description}</p>
+                    <p className="text-xs text-gray-500 italic">{suggestion.reasoning}</p>
+                  </div>
+
+                  <div className="text-right ml-4">
+                    <div className="font-bold text-lg text-gray-900">
+                      ${suggestion.suggestedAmount}
+                    </div>
+                    <div className="text-xs text-gray-500">per month</div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200">
+                  <div className="flex items-center text-xs text-gray-500">
+                    {getTypeIcon(suggestion.type)}
+                    <span className="ml-1 capitalize">{suggestion.action.replace("_", " ")}</span>
+                    <span className="mx-2">•</span>
+                    <span className="capitalize">{suggestion.impact} impact</span>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleDismissSuggestion(suggestion.id)}
+                      className="text-xs px-3 py-1 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      Dismiss
+                    </button>
+                    <button
+                      onClick={() => handleApplySuggestion(suggestion)}
+                      className={`text-xs px-3 py-1 rounded-lg text-white transition-colors ${
+                        suggestion.priority === "high"
+                          ? "bg-red-500 hover:bg-red-600"
+                          : suggestion.priority === "medium"
+                            ? "bg-amber-500 hover:bg-amber-600"
+                            : "bg-blue-500 hover:bg-blue-600"
+                      }`}
+                    >
+                      Apply
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
