@@ -88,13 +88,14 @@ Successfully completed major refactoring of Layout.jsx component, reducing compl
 
 ## 📊 File Analysis
 
-| File                                              | Lines | Status             | Priority |
-| ------------------------------------------------- | ----- | ------------------ | -------- |
-| `src/components/layout/MainLayout.jsx`            | ~600  | ✅ **Refactored**  | Complete |
-| `src/utils/firebaseSync.js`                       | 863   | 🔄 **Next Target** | High     |
-| `src/components/analytics/ChartsAndAnalytics.jsx` | 785   | 📋 **Future**      | Medium   |
-| `src/components/savings/SavingsGoals.jsx`         | 687   | 📋 **Future**      | Medium   |
-| `src/components/bills/BillManager.jsx`            | 553   | 📋 **Future**      | Medium   |
+| File                                               | Lines | Status             | Priority |
+| -------------------------------------------------- | ----- | ------------------ | -------- |
+| `src/components/layout/MainLayout.jsx`             | ~600  | ✅ **Refactored**  | Complete |
+| `src/utils/firebaseSync.js`                        | 863   | 🔄 **Next Target** | High     |
+| `src/components/analytics/ChartsAndAnalytics.jsx`  | 785   | 📋 **Future**      | Medium   |
+| `src/components/accounts/SupplementalAccounts.jsx` | 720   | 🔄 **Ready**       | Medium   |
+| `src/components/savings/SavingsGoals.jsx`          | 687   | 📋 **Future**      | Medium   |
+| `src/components/bills/BillManager.jsx`             | 553   | 📋 **Future**      | Medium   |
 
 const envelopeSpending = useMemo(() => {
 // Move envelope spending calculation (lines 129-168)
@@ -140,7 +141,46 @@ export const getDefaultChartConfig = () => ({
 
 **Expected Result:** ChartsAndAnalytics.jsx reduces from 785 → ~200 lines, individual charts become reusable
 
-> > > > > > > origin/develop
+### **SupplementalAccounts.jsx Analysis ([#127](https://github.com/thef4tdaddy/violet-vault/issues/127))**
+
+**Current State:** Monolithic component (~720 lines) mixing business logic with UI rendering  
+**Target State:** Separated business logic hooks + focused UI components
+
+#### **Problems:**
+
+- **Business Logic Mixed with UI:** Form state, validation, transfer logic embedded in component
+- **Large Component Size:** ~720 lines with multiple responsibilities
+- **Complex State Management:** Multiple useState hooks for different concerns
+- **Modal Management:** UI state tightly coupled with business operations
+
+#### **Refactoring Plan:**
+
+**Phase 1 - Extract Business Logic (Effort: Medium, Impact: High)**
+
+```javascript
+// hooks/useSupplementalAccountForm.js
+export const useSupplementalAccountForm = (onSubmit, editingAccount) => {
+  // Form state, validation, submission logic
+  // Returns: { accountForm, setAccountForm, handleSubmit, resetForm, errors }
+};
+
+// hooks/useSupplementalAccountTransfer.js
+export const useSupplementalAccountTransfer = (onTransfer, envelopes) => {
+  // Transfer state, validation, execution logic
+  // Returns: { transferForm, setTransferForm, handleTransfer, validateTransfer }
+};
+```
+
+**Phase 2 - UI Component Extraction (Effort: Medium, Impact: High)**
+
+```javascript
+// components/accounts/ui/AccountCard.jsx - Individual account display
+// components/accounts/ui/AccountForm.jsx - Add/edit form modal
+// components/accounts/ui/TransferModal.jsx - Transfer functionality
+// components/accounts/ui/AccountTypeSelector.jsx - Reusable type picker
+```
+
+**Expected Result:** SupplementalAccounts.jsx reduces from 720 → ~200 lines (72% reduction)
 
 ---
 
@@ -182,15 +222,21 @@ src/components/
 
 ## 🔄 Next Phases
 
-### **Phase 3: Provider Hierarchy** (Ready to Start)
+### **Phase 3: Component Refactoring** (Ready to Start)
 
-Create centralized state management:
+Apply proven refactoring patterns to remaining complex components:
+
+#### **3A: SupplementalAccounts.jsx ([#127](https://github.com/thef4tdaddy/violet-vault/issues/127))**
+
+- Extract form management hooks
+- Create reusable modal components
+- **Target:** 720 → ~200 lines (72% reduction)
+
+#### **3B: Provider Hierarchy**
 
 - `AuthProvider.jsx` - Authentication state
 - `DataProvider.jsx` - Data operations
 - `NotificationProvider.jsx` - Toast system
-
-**Target:** Reduce Layout.jsx to ~400 lines
 
 ### **Phase 4: Service Layer** (Future)
 
