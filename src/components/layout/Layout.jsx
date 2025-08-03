@@ -262,44 +262,46 @@ const Layout = () => {
     try {
       console.log("📁 Starting export process...");
 
-      // First try to get data from the encrypted source (where the real data is)
+      // Try data sources in order of preference
       let decryptedData = null;
-      const encryptedData = localStorage.getItem("envelopeBudgetData");
-
-      // Get encryption key from auth store
-      const authStoreKey = encryptionKey; // From Layout component props
-      console.log("🔑 Checking for encryption key:", !!authStoreKey);
-
-      if (encryptedData && authStoreKey) {
-        console.log("🔐 Found encrypted data, attempting decryption...");
+      let dataSource = null;
+      
+      // 1. First try violet-vault-store (develop branch format with real data)
+      const vaultData = localStorage.getItem("violet-vault-store");
+      if (vaultData) {
         try {
-          const parsed = JSON.parse(encryptedData);
-          decryptedData = await encryptionUtils.decrypt(
-            parsed.encryptedData,
-            authStoreKey,
-            parsed.iv
-          );
-          console.log(
-            "✅ Successfully decrypted data for export - found",
-            decryptedData.envelopes?.length || 0,
-            "envelopes"
-          );
-        } catch (decryptError) {
-          console.warn(
-            "⚠️ Failed to decrypt envelopeBudgetData, falling back to budget-store",
-            decryptError
-          );
+          const parsed = JSON.parse(vaultData);
+          if (parsed.state && parsed.state.envelopes) {
+            decryptedData = parsed.state;
+            dataSource = "violet-vault-store";
+            console.log("✅ Using violet-vault-store data - found", decryptedData.envelopes?.length || 0, "envelopes");
+          }
+        } catch (e) {
+          console.warn("⚠️ Failed to parse violet-vault-store");
         }
-      } else {
-        console.log("⚠️ Missing requirements:", {
-          hasEncryptedData: !!encryptedData,
-          hasKey: !!authStoreKey,
-        });
       }
-
-      // Fallback to budget-store if decryption failed or no encrypted data
+      
+      // 2. Try encrypted data if no violet-vault-store
       if (!decryptedData) {
-        console.log("📁 Using budget-store as data source...");
+        const encryptedData = localStorage.getItem("envelopeBudgetData");
+        const authStoreKey = encryptionKey;
+        
+        if (encryptedData && authStoreKey) {
+          console.log("🔐 Trying encrypted data...");
+          try {
+            const parsed = JSON.parse(encryptedData);
+            decryptedData = await encryptionUtils.decrypt(parsed.encryptedData, authStoreKey, parsed.iv);
+            dataSource = "envelopeBudgetData";
+            console.log("✅ Successfully decrypted data - found", decryptedData.envelopes?.length || 0, "envelopes");
+          } catch (decryptError) {
+            console.warn("⚠️ Failed to decrypt envelopeBudgetData");
+          }
+        }
+      }
+      
+      // 3. Fallback to budget-store
+      if (!decryptedData) {
+        console.log("📁 Using budget-store as fallback...");
         const savedData = localStorage.getItem("budget-store");
         if (!savedData) {
           alert("No data found to export");
@@ -307,7 +309,10 @@ const Layout = () => {
         }
         const parsedData = JSON.parse(savedData);
         decryptedData = parsedData.state || parsedData;
+        dataSource = "budget-store";
       }
+      
+      console.log("📊 Export data source:", dataSource, "- Envelopes:", decryptedData.envelopes?.length || 0);
 
       // Normalize transactions for unified structure
       const allTransactions = Array.isArray(decryptedData.allTransactions)
