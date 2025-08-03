@@ -11,6 +11,16 @@ const migrateOldData = () => {
     const oldData = localStorage.getItem("budget-store");
     const newData = localStorage.getItem("violet-vault-store");
 
+    // Only show migration debug in development/preview
+    if (import.meta.env.MODE === "development" || window.location.hostname.includes("vercel.app") || window.location.hostname.includes("f4tdaddy.com")) {
+      console.log("🔍 Migration Debug:", {
+        hasOldData: !!oldData,
+        hasNewData: !!newData,
+        oldDataLength: oldData?.length || 0,
+        newDataLength: newData?.length || 0,
+      });
+    }
+
     // Migrate if old data exists (always replace new data)
     if (oldData) {
       console.log(
