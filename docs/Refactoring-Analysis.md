@@ -95,6 +95,50 @@ Successfully completed major refactoring of Layout.jsx component, reducing compl
 | `src/components/savings/SavingsGoals.jsx` | 687 | 📋 **Future** | Medium |
 | `src/components/bills/BillManager.jsx` | 553 | 📋 **Future** | Medium |
 
+  const envelopeSpending = useMemo(() => {
+    // Move envelope spending calculation (lines 129-168)
+  }, [filteredTransactions]);
+
+  const categoryBreakdown = useMemo(() => {
+    // Move category breakdown calculation (lines 171-210)
+  }, [filteredTransactions]);
+
+  return { monthlyTrends, envelopeSpending, categoryBreakdown };
+};
+```
+
+#### **Phase 2 - Individual Chart Components (Effort: Medium, Impact: High)**
+
+```javascript
+// components/analytics/charts/MonthlyTrendsChart.jsx
+export const MonthlyTrendsChart = ({ data, height = 300 }) => {
+  // Extract lines 450-550
+};
+
+// components/analytics/charts/EnvelopeSpendingChart.jsx
+export const EnvelopeSpendingChart = ({ data, height = 300 }) => {
+  // Extract lines 580-650
+};
+
+// components/analytics/charts/CategoryBreakdownChart.jsx
+// components/analytics/charts/WeeklyPatternsChart.jsx
+```
+
+#### **Phase 3 - Shared Configuration (Effort: Low, Impact: Medium)**
+
+```javascript
+// utils/chartConfig.js
+export const CHART_COLORS = ["#a855f7", "#06b6d4", "#10b981", "#f59e0b", "#ef4444"];
+
+export const getDefaultChartConfig = () => ({
+  margin: { top: 20, right: 30, left: 20, bottom: 5 },
+  animationDuration: 300,
+});
+```
+
+**Expected Result:** ChartsAndAnalytics.jsx reduces from 785 → ~200 lines, individual charts become reusable
+>>>>>>> origin/develop
+
 ---
 
 ## ✅ Completed Work
