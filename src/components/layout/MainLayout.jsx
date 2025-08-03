@@ -197,14 +197,7 @@ const MainContent = ({
   // Handle change password - delegate to parent component
   const handleChangePassword = onChangePassword;
 
-  const {
-    envelopes,
-    savingsGoals,
-    unassignedCash,
-    paycheckHistory,
-    isOnline,
-    isSyncing,
-  } = budget;
+  const { envelopes, savingsGoals, unassignedCash, paycheckHistory, isOnline, isSyncing } = budget;
 
   // Calculate total biweekly need from all envelopes
   const totalBiweeklyNeed = envelopes.reduce((total, envelope) => {
@@ -520,7 +513,10 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
     ),
     paycheck: (
       <PaycheckProcessor
-        biweeklyAllocation={envelopes.reduce((total, envelope) => total + (envelope.biweeklyAllocation || 0), 0)}
+        biweeklyAllocation={envelopes.reduce(
+          (total, envelope) => total + (envelope.biweeklyAllocation || 0),
+          0
+        )}
         envelopes={envelopes}
         paycheckHistory={paycheckHistory}
         onProcessPaycheck={processPaycheck}
