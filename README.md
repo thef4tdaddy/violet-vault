@@ -3,7 +3,7 @@
 **A secure, encrypted envelope budgeting application** that brings the traditional cash envelope budgeting method into the digital age with end-to-end encryption and real-time collaboration.
 
 [![CI](https://github.com/thef4tdaddy/violet-vault/workflows/CI/badge.svg)](https://github.com/thef4tdaddy/violet-vault/actions)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 ## 🚀 Features
 
@@ -36,8 +36,9 @@
 - **Cash Flow Summary** - Overview of your financial health
 - **Smart Bill Matching** - Automatically categorize transactions
 - **Spending Analysis** - Detailed breakdowns by category and time period
-- **Smart Envelope Suggestions** - AI-powered recommendations based on spending patterns
+- **Smart Envelope Suggestions** - AI-powered recommendations based on spending patterns (collapsible interface)
 - **Transaction Splitting** - Split complex transactions across multiple envelopes
+- **Smart Bill Matching** - Automatically categorize and assign bills to appropriate envelopes
 
 ### ⚡ Technical Features
 
@@ -45,6 +46,8 @@
 - **Performance Optimized** - Transaction ledger now uses virtual scrolling via `@tanstack/react-virtual` for large datasets
 - **Data Pagination** - Displays transactions 10 per page to keep memory usage low
 - **Responsive Design** - Works seamlessly on desktop and mobile devices
+- **Modular Architecture** - Recently refactored for better maintainability and performance
+- **Collapsible UI Elements** - Smart suggestions panel can be collapsed for better space utilization
 
 ## 🛠️ Tech Stack
 
@@ -126,12 +129,16 @@ src/
 │   │   ├── CreateEnvelopeModal.jsx  # Advanced envelope creation
 │   │   ├── EnvelopeGrid.jsx         # Envelope visualization
 │   │   ├── PaycheckProcessor.jsx    # Paycheck allocation
-│   │   └── SmartEnvelopeSuggestions.jsx # AI envelope recommendations
+│   │   └── SmartEnvelopeSuggestions.jsx # AI envelope recommendations (collapsible)
 │   ├── bills/                  # Bill management
+│   │   ├── AddBillModal.jsx        # Bill creation/editing modal
 │   │   └── BillManager.jsx         # Bill tracking & automation
 │   ├── layout/                 # Core layout components
-│   │   ├── Dashboard.jsx           # Main dashboard view
-│   │   └── Layout.jsx              # Application shell
+│   │   ├── MainLayout.jsx          # Refactored main layout
+│   │   ├── NavigationTabs.jsx      # Tab navigation system
+│   │   ├── SummaryCards.jsx        # Summary card components
+│   │   ├── ViewRenderer.jsx        # View rendering logic
+│   │   └── Layout.jsx              # Legacy layout (being phased out)
 │   ├── savings/                # Savings management
 │   │   └── SavingsGoals.jsx        # Goal tracking & progress
 │   ├── sync/                   # Collaboration features
@@ -140,10 +147,14 @@ src/
 │       ├── TransactionLedger.jsx   # Transaction history
 │       ├── TransactionSplitter.jsx # Split transaction tool
 │       └── import/             # Import utilities
-│           └── AmazonReceiptParser.jsx # Email receipt parsing
-├── contexts/               # State management stores (Zustand)
+│           └── FileUploader.jsx    # Import functionality
+├── contexts/               # React contexts
 │   ├── AuthContext.jsx        # Authentication & encryption
 │   └── BudgetContext.jsx      # Budget data management
+├── stores/                 # Zustand state management
+│   ├── authStore.js           # Authentication state
+│   ├── budgetStore.js         # Modern budget store
+│   └── optimizedBudgetStore.js # Performance-optimized store
 ├── utils/                  # Utility functions
 │   ├── encryption.js          # Client-side encryption
 │   ├── firebaseConfig.js      # Firebase setup
@@ -160,9 +171,27 @@ VioletVault takes your financial privacy seriously:
 - **No Server-Side Decryption**: Your master password never leaves your device
 - **Device Fingerprinting**: Additional protection against unauthorized access
 
+## 📚 Documentation
+
+### Core Documentation
+- **[📋 Roadmap](ROADMAP.md)** - See what's coming next and help shape VioletVault's future
+- **[🤝 Contributing Guide](CONTRIBUTING.md)** - How to contribute to the project
+- **[📝 Changelog](CHANGELOG.md)** - Complete version history and changes
+
+### Technical Documentation  
+- **[🏗️ Milestones](docs/MILESTONES.md)** - Release planning and milestone tracking
+- **[🧪 Testing Strategy](docs/Testing-Strategy.md)** - Comprehensive testing approach
+- **[🔄 Refactoring Analysis](docs/Refactoring-Analysis.md)** - Architecture improvement plans
+- **[🛠️ New Utilities Analysis](docs/New-Utilities-Analysis.md)** - Feature analysis and utilities
+
 ## 🗺️ Roadmap
 
-Check out our [Roadmap](ROADMAP.md) to see what's coming next and how you can help shape VioletVault's future!
+Check out our development progress:
+- **[📋 Roadmap Document](ROADMAP.md)** - Detailed feature roadmap and vision
+- **[📊 GitHub Project](https://github.com/thef4tdaddy/violet-vault/projects)** - Live project board with current development status
+- **[🏗️ Milestones](docs/MILESTONES.md)** - Weekly release planning and milestone tracking
+
+See what's coming next and help shape VioletVault's future!
 
 ## 🤝 Contributing
 
@@ -198,12 +227,44 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License**.
+
+### 🎯 What This Means:
+
+**✅ You CAN:**
+- Use VioletVault for personal budgeting and self-hosting
+- Use it internally within your organization (non-commercially)
+- Modify and improve the software
+- Share it with others (non-commercially)
+- Learn from the code and use it for education
+
+**❌ You CANNOT (without permission):**
+- Use VioletVault to build commercial services or products
+- Sell access to VioletVault or derivatives
+- Keep your improvements private (must share back)
+
+**💡 Commercial Use:**
+For commercial licensing options, please [contact us](https://github.com/thef4tdaddy/violet-vault/issues) to discuss terms.
+
+See the [LICENSE](LICENSE) file for complete details.
+
+## 📖 Quick Reference
+
+| Topic | Link | Description |
+|-------|------|-------------|
+| **Getting Started** | [Installation](#-getting-started) | Set up VioletVault locally |
+| **Features** | [Feature List](#-features) | Complete feature overview |
+| **Development** | [Contributing Guide](CONTRIBUTING.md) | Development workflow |
+| **Architecture** | [Project Structure](#-project-structure) | Codebase organization |
+| **Roadmap** | [GitHub Project](https://github.com/thef4tdaddy/violet-vault/projects) | Live development board |
+| **Planning** | [Milestones](docs/MILESTONES.md) | Weekly release planning |
+| **Testing** | [Testing Strategy](docs/Testing-Strategy.md) | QA approach |
 
 ## 🆘 Support
 
 - 📧 **Issues**: [GitHub Issues](https://github.com/thef4tdaddy/violet-vault/issues)
 - 💬 **Discussions**: [GitHub Discussions](https://github.com/thef4tdaddy/violet-vault/discussions)
+- 📚 **Documentation**: See our [Documentation Section](#-documentation) above
 
 ## 🙏 Acknowledgments
 

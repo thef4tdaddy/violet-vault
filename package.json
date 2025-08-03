@@ -3,6 +3,26 @@
   "private": true,
   "version": "1.6.1",
   "type": "module",
+  "description": "A secure, encrypted envelope budgeting application with end-to-end encryption and real-time collaboration",
+  "license": "CC-BY-NC-SA-4.0",
+  "author": "VioletVault Contributors",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thef4tdaddy/violet-vault.git"
+  },
+  "bugs": {
+    "url": "https://github.com/thef4tdaddy/violet-vault/issues"
+  },
+  "homepage": "https://github.com/thef4tdaddy/violet-vault#readme",
+  "keywords": [
+    "budgeting",
+    "envelope-system",
+    "personal-finance",
+    "encryption",
+    "privacy",
+    "react",
+    "pwa"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
