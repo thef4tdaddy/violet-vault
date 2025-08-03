@@ -201,7 +201,6 @@ const MainContent = ({
     envelopes,
     savingsGoals,
     unassignedCash,
-    biweeklyAllocation,
     paycheckHistory,
     isOnline,
     isSyncing,
@@ -443,7 +442,6 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
     savingsGoals,
     supplementalAccounts,
     unassignedCash,
-    biweeklyAllocation,
     paycheckHistory,
     actualBalance,
     transactions,
@@ -522,7 +520,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
     ),
     paycheck: (
       <PaycheckProcessor
-        biweeklyAllocation={totalBiweeklyNeed}
+        biweeklyAllocation={envelopes.reduce((total, envelope) => total + (envelope.biweeklyAllocation || 0), 0)}
         envelopes={envelopes}
         paycheckHistory={paycheckHistory}
         onProcessPaycheck={processPaycheck}
