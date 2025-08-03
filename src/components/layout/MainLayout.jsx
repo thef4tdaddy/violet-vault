@@ -184,12 +184,7 @@ const MainContent = ({
   const [activeView, setActiveView] = useState("dashboard");
 
   // Custom hooks for MainContent business logic
-  const { handleManualSync } = useFirebaseSync(
-    firebaseSync,
-    encryptionKey,
-    budgetId,
-    currentUser
-  );
+  const { handleManualSync } = useFirebaseSync(firebaseSync, encryptionKey, budgetId, currentUser);
 
   // Payday prediction notifications
   usePaydayPrediction(paycheckHistory, !!currentUser);
@@ -448,6 +443,10 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
     addSavingsGoal,
     updateSavingsGoal,
     deleteSavingsGoal,
+    addSupplementalAccount,
+    updateSupplementalAccount,
+    deleteSupplementalAccount,
+    transferFromSupplementalAccount,
     addEnvelope,
     updateEnvelope,
     processPaycheck,
@@ -503,9 +502,11 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
     supplemental: (
       <SupplementalAccounts
         supplementalAccounts={supplementalAccounts}
-        onAddAccount={() => {}} // Will be implemented
-        onUpdateAccount={() => {}} // Will be implemented
-        onDeleteAccount={() => {}} // Will be implemented
+        onAddAccount={addSupplementalAccount}
+        onUpdateAccount={updateSupplementalAccount}
+        onDeleteAccount={deleteSupplementalAccount}
+        onTransferToEnvelope={transferFromSupplementalAccount}
+        envelopes={envelopes}
         currentUser={currentUser}
       />
     ),
@@ -573,10 +574,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
           addTransactions(newTransactions);
           const updatedTransactions = [...safeTransactions, ...newTransactions];
           setTransactions(updatedTransactions);
-          console.log(
-            "💾 Bulk import complete. Added transactions:",
-            newTransactions.length
-          );
+          console.log("💾 Bulk import complete. Added transactions:", newTransactions.length);
         }}
         currentUser={currentUser}
       />

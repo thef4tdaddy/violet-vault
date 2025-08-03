@@ -13,6 +13,7 @@ const storeInitializer = (set, get) => ({
   transactions: [],
   allTransactions: [],
   savingsGoals: [],
+  supplementalAccounts: [],
   unassignedCash: 0,
   biweeklyAllocation: 0,
   isOnline: true, // Add isOnline state, default to true
@@ -163,6 +164,63 @@ const storeInitializer = (set, get) => ({
       state.savingsGoals = state.savingsGoals.filter((g) => g.id !== id);
     }),
 
+  // Supplemental accounts management
+  setSupplementalAccounts: (accounts) =>
+    set((state) => {
+      state.supplementalAccounts = accounts;
+    }),
+
+  addSupplementalAccount: (account) =>
+    set((state) => {
+      state.supplementalAccounts.push(account);
+    }),
+
+  updateSupplementalAccount: (id, account) =>
+    set((state) => {
+      const index = state.supplementalAccounts.findIndex((a) => a.id === id);
+      if (index !== -1) {
+        state.supplementalAccounts[index] = account;
+      }
+    }),
+
+  deleteSupplementalAccount: (id) =>
+    set((state) => {
+      state.supplementalAccounts = state.supplementalAccounts.filter((a) => a.id !== id);
+    }),
+
+  transferFromSupplementalAccount: (accountId, envelopeId, amount, description) =>
+    set((state) => {
+      // Find and update supplemental account
+      const accountIndex = state.supplementalAccounts.findIndex((a) => a.id === accountId);
+      if (accountIndex === -1) return;
+
+      const account = state.supplementalAccounts[accountIndex];
+      if (account.currentBalance < amount) return;
+
+      // Find and update envelope
+      const envelopeIndex = state.envelopes.findIndex((e) => e.id === envelopeId);
+      if (envelopeIndex === -1) return;
+
+      // Update balances
+      state.supplementalAccounts[accountIndex].currentBalance -= amount;
+      state.envelopes[envelopeIndex].currentAmount += amount;
+
+      // Create transaction record
+      const transaction = {
+        id: Date.now(),
+        amount: amount,
+        description: description || `Transfer from ${account.name}`,
+        source: "supplemental",
+        sourceAccountId: accountId,
+        targetEnvelopeId: envelopeId,
+        date: new Date().toISOString(),
+        type: "transfer",
+      };
+
+      state.transactions.push(transaction);
+      state.allTransactions.push(transaction);
+    }),
+
   // Unassigned cash and allocation management
   setUnassignedCash: (amount) =>
     set((state) => {
@@ -194,6 +252,7 @@ const storeInitializer = (set, get) => ({
       state.transactions = [];
       state.allTransactions = [];
       state.savingsGoals = [];
+      state.supplementalAccounts = [];
       state.unassignedCash = 0;
       state.isOnline = true; // Also reset isOnline status
       state.dataLoaded = false;
@@ -218,6 +277,7 @@ if (LOCAL_ONLY_MODE) {
           transactions: state.transactions,
           allTransactions: state.allTransactions,
           savingsGoals: state.savingsGoals,
+          supplementalAccounts: state.supplementalAccounts,
           unassignedCash: state.unassignedCash,
           biweeklyAllocation: state.biweeklyAllocation,
         }),
