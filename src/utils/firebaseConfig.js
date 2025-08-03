@@ -1,9 +1,12 @@
 export const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "demo-api-key",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "demo-project.firebaseapp.com",
+  authDomain:
+    import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "demo-project.firebaseapp.com",
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "demo-project",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "demo-project.appspot.com",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "123456789",
+  storageBucket:
+    import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "demo-project.appspot.com",
+  messagingSenderId:
+    import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "123456789",
   appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:123456789:web:abcdef",
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-ABCDEF",
 };
@@ -15,6 +18,15 @@ const missingKeys = requiredKeys.filter((key) => !import.meta.env[key]);
 if (missingKeys.length > 0) {
   console.warn(
     "⚠️ Using demo Firebase config. Set environment variables for production:",
-    missingKeys
+    missingKeys,
   );
+}
+
+// Debug: Log what Firebase project we're connecting to (dev only)
+if (import.meta.env.MODE === "development") {
+  console.log("🔥 Firebase Config Debug:", {
+    projectId: firebaseConfig.projectId,
+    authDomain: firebaseConfig.authDomain,
+    usingDemo: firebaseConfig.projectId === "demo-project",
+  });
 }
