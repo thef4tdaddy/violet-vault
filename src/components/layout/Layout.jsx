@@ -262,16 +262,32 @@ const Layout = () => {
     try {
       console.log("📁 Starting export process...");
 
-      // Get current data from localStorage (main branch uses budget-store)
-      const savedData = localStorage.getItem("budget-store");
-      if (!savedData) {
-        alert("No data found to export");
-        return;
+      // First try to get data from the encrypted source (where the real data is)
+      let decryptedData = null;
+      const encryptedData = localStorage.getItem("envelopeBudgetData");
+      
+      if (encryptedData && encryptionKey) {
+        console.log("🔐 Found encrypted data, attempting decryption...");
+        try {
+          const parsed = JSON.parse(encryptedData);
+          decryptedData = await encryptionUtils.decrypt(parsed.encryptedData, encryptionKey, parsed.iv);
+          console.log("✅ Successfully decrypted data for export");
+        } catch (decryptError) {
+          console.warn("⚠️ Failed to decrypt envelopeBudgetData, falling back to budget-store");
+        }
       }
-
-      // Parse the Zustand store data (no decryption needed)
-      const parsedData = JSON.parse(savedData);
-      const decryptedData = parsedData.state || parsedData;
+      
+      // Fallback to budget-store if decryption failed or no encrypted data
+      if (!decryptedData) {
+        console.log("📁 Using budget-store as data source...");
+        const savedData = localStorage.getItem("budget-store");
+        if (!savedData) {
+          alert("No data found to export");
+          return;
+        }
+        const parsedData = JSON.parse(savedData);
+        decryptedData = parsedData.state || parsedData;
+      }
 
       // Normalize transactions for unified structure
       const allTransactions = Array.isArray(decryptedData.allTransactions)
