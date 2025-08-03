@@ -265,20 +265,22 @@ const Layout = () => {
       // First try to get data from the encrypted source (where the real data is)
       let decryptedData = null;
       const encryptedData = localStorage.getItem("envelopeBudgetData");
-
-      if (encryptedData && encryptionKey) {
+      
+      // Get encryption key from auth store
+      const authStoreKey = encryptionKey; // From Layout component props
+      console.log("🔑 Checking for encryption key:", !!authStoreKey);
+      
+      if (encryptedData && authStoreKey) {
         console.log("🔐 Found encrypted data, attempting decryption...");
         try {
           const parsed = JSON.parse(encryptedData);
-          decryptedData = await encryptionUtils.decrypt(
-            parsed.encryptedData,
-            encryptionKey,
-            parsed.iv
-          );
-          console.log("✅ Successfully decrypted data for export");
+          decryptedData = await encryptionUtils.decrypt(parsed.encryptedData, authStoreKey, parsed.iv);
+          console.log("✅ Successfully decrypted data for export - found", decryptedData.envelopes?.length || 0, "envelopes");
         } catch (decryptError) {
-          console.warn("⚠️ Failed to decrypt envelopeBudgetData, falling back to budget-store");
+          console.warn("⚠️ Failed to decrypt envelopeBudgetData, falling back to budget-store", decryptError);
         }
+      } else {
+        console.log("⚠️ Missing requirements:", { hasEncryptedData: !!encryptedData, hasKey: !!authStoreKey });
       }
 
       // Fallback to budget-store if decryption failed or no encrypted data
