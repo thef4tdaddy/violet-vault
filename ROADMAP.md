@@ -2,192 +2,189 @@
 
 This roadmap outlines the planned development phases for VioletVault, our secure envelope budgeting application.
 
-## 📍 Current Status (v1.5.0)
+## 📍 Current Status (v1.6.1)
 
 ### ✅ Recently Completed
 
-- **Smart Utility Integration** - Added AI-powered envelope suggestions, transaction splitting, and advanced envelope creation
+- **Component Refactoring** - Major refactoring with improved MainLayout and modern Zustand stores
+- **Smart Envelope Suggestions** - AI-powered recommendations with collapsible interface and localStorage persistence
 - **Enhanced UI/UX** - Improved envelope grid with visual status indicators and intuitive interactions
 - **Real-time Collaboration** - Multi-user support with conflict resolution and activity tracking
 - **Security Enhancements** - End-to-end encryption with device fingerprinting
-- **Performance Optimizations** - Virtual scrolling and React optimizations for large datasets
+- **Performance Optimizations** - Virtual scrolling via @tanstack/react-virtual for large datasets
+- **Creative Commons Licensing** - Non-commercial license protecting community interests
 
-### 🚧 In Progress
+### 🚧 In Progress (v1.7.0 - Aug 11, 2025)
 
-- **Transaction Management** - Implementing CRUD operations for transaction ledger
-- **Backend Integration** - Setting up IMAP support for Amazon receipt parsing
-- **Code Quality** - Addressing linting warnings and improving component architecture
-
----
-
-## 🎯 Short Term (Next 1-2 Months)
-
-### Priority 1: Core Transaction Features
-
-- [ ] [Transaction CRUD](https://github.com/thef4tdaddy/violet-vault/issues/29) _(In Progress)_
-  - Implement add, edit, delete transaction functionality
-  - Connect TransactionLedger to budget context
-  - Add transaction validation and error handling
-- [ ] [Amazon receipt import](https://github.com/thef4tdaddy/violet-vault/issues/34) _(In Progress)_
-  - Integrate AmazonReceiptParser into import workflow
-  - Add support for bank CSV imports
-  - Implement duplicate transaction detection
-- [ ] [Smart category system](https://github.com/thef4tdaddy/violet-vault/issues/35)
-  - <!-- TODO: add detailed sub-tasks -->
-- [ ] [Zustand state management](https://github.com/thef4tdaddy/violet-vault/issues/24)
-  - <!-- TODO: add detailed sub-tasks -->
-- [ ] [Dexie.js for offline cache](https://github.com/thef4tdaddy/violet-vault/issues/26)
-  - <!-- TODO: add detailed sub-tasks -->
-- [ ] [TanStack Query integration](https://github.com/thef4tdaddy/violet-vault/issues/33)
-  - <!-- TODO: add detailed sub-tasks -->
-
-[-] [Smart Category Management](https://github.com/thef4tdaddy/violet-vault/issues/50)
-
-- Integrate SmartCategoryManager into analytics dashboard
-- Add category optimization suggestions
-- Implement bulk category updates
-- [ ] [Encrypted edit history log](https://github.com/thef4tdaddy/violet-vault/issues/25)
-  - <!-- TODO: add detailed sub-tasks -->
-- [ ] [Expected payday support](https://github.com/thef4tdaddy/violet-vault/issues/28)
-  - <!-- TODO: add detailed sub-tasks -->
-- [ ] [Push notification (FCM)](https://github.com/thef4tdaddy/violet-vault/issues/27)
-  - <!-- TODO: add detailed sub-tasks -->
-
-### Priority 2: User Experience Improvements
-
-- [ ] [Mobile layout optimization](https://github.com/thef4tdaddy/violet-vault/issues/36)
-  - Optimize envelope grid for mobile devices
-  - Improve touch interactions for transaction splitting
-  - Add mobile-first navigation patterns
-- [ ] **Accessibility Enhancements** ([#40](https://github.com/thef4tdaddy/violet-vault/issues/40))
-  - Add ARIA labels and keyboard navigation
-  - Implement screen reader support
-  - Ensure color contrast compliance
-- [ ] [Performance tuning](https://github.com/thef4tdaddy/violet-vault/issues/41)
-  - Implement lazy loading for large transaction lists
-  - [x] Add data pagination for better performance
-  - Optimize bundle size with code splitting
-- [ ] [Customizable profiles](https://github.com/thef4tdaddy/violet-vault/issues/31)
-  - <!-- TODO: add detailed sub-tasks -->
-- [ ] [Password rotation](https://github.com/thef4tdaddy/violet-vault/issues/30)
-  - <!-- TODO: add detailed sub-tasks -->
-- [ ] [PWA support (vite-plugin-pwa)](https://github.com/thef4tdaddy/violet-vault/issues/32)
-  - <!-- TODO: add detailed sub-tasks -->
-
-## 🚀 Medium Term (3-6 Months)
-
-### Advanced Ledger & History
-
-- [ ] [Transaction log archiving](https://github.com/thef4tdaddy/violet-vault/issues/37)
-  - <!-- TODO: add detailed sub-tasks -->
-- [ ] [Edit history viewer](https://github.com/thef4tdaddy/violet-vault/issues/38)
-  - <!-- TODO: add detailed sub-tasks -->
-
-### Advanced Analytics & Insights
-
-[-] [Predictive Analytics](https://github.com/thef4tdaddy/violet-vault/issues/52)
-
-- Spending trend predictions using historical data
-- Budget variance alerts and recommendations
-- Seasonal spending pattern recognition
-- [ ] [Analytics improvements](https://github.com/thef4tdaddy/violet-vault/issues/39)
-  - <!-- TODO: add detailed sub-tasks -->
-
-[-] [Advanced Reporting](https://github.com/thef4tdaddy/violet-vault/issues/53)
-
-- Custom date range reports
-- Export functionality (PDF, CSV, Excel)
-- Scheduled report generation
-
-[-] [Goal Tracking Enhancements](https://github.com/thef4tdaddy/violet-vault/issues/54)
-
-- Milestone-based savings goals
-- Automatic goal adjustments based on spending
-- Visual progress tracking with charts
-
-### Enhanced Collaboration
-
-[-] [Role-Based Access Control](https://github.com/thef4tdaddy/violet-vault/issues/55)
-
-- Admin/viewer/editor roles for shared budgets
-- Permission-based feature access
-- Audit logs for security compliance
-
-[-] [Team Communication](https://github.com/thef4tdaddy/violet-vault/issues/56)
-
-- In-app messaging for budget discussions
-- Comment system for transactions and envelopes
-- Notification system for important changes
-
-### Banking Integration
-
-[-] [Open Banking API](https://github.com/thef4tdaddy/violet-vault/issues/57)
-
-- Automatic transaction import from banks
-- Real-time balance synchronization
-- Account reconciliation tools
-- [ ] [Local-only mode](https://github.com/thef4tdaddy/violet-vault/issues/42)
-  - <!-- TODO: add detailed sub-tasks -->
-- [ ] [Exportable encryption key](https://github.com/thef4tdaddy/violet-vault/issues/43)
-  - <!-- TODO: add detailed sub-tasks -->
-
-[-] [Receipt Scanning](https://github.com/thef4tdaddy/violet-vault/issues/58)
-
-- OCR-powered receipt processing
-- Automatic expense categorization
-- Digital receipt storage
+- [ ] **Unassigned Cash Management** ([#111](https://github.com/thef4tdaddy/violet-vault/issues/111)) - Click-to-distribute modal
+- [ ] **Manual Virtual Balance Override** ([#113](https://github.com/thef4tdaddy/violet-vault/issues/113)) - Dashboard balance controls
+- [ ] **Negative Balance Handling** ([#114](https://github.com/thef4tdaddy/violet-vault/issues/114)) - Overspending support
+- [x] **Collapsible Smart Envelope Suggestions** ([#112](https://github.com/thef4tdaddy/violet-vault/issues/112)) - ✅ Completed
+- [ ] **Mobile Layout Improvements** ([#95](https://github.com/thef4tdaddy/violet-vault/issues/95)) - Unified budgeting UX
+- [ ] **Component Refactoring** ([#65](https://github.com/thef4tdaddy/violet-vault/issues/65)) - Architecture improvements
+- [ ] **State Management Optimization** ([#66](https://github.com/thef4tdaddy/violet-vault/issues/66)) - Enhanced performance
+- [ ] **Encryption Password Rotation** ([#88](https://github.com/thef4tdaddy/violet-vault/issues/88), [#89](https://github.com/thef4tdaddy/violet-vault/issues/89)) - Secure password changes
 
 ---
 
-## 🔮 Long Term (6+ Months)
+## 🎯 2025 Release Schedule
 
-### Advanced AI Features
+### 🚀 v1.8.0 – Security & Compliance (Aug 25, 2025)
 
-[-] [Intelligent Budgeting Assistant](https://github.com/thef4tdaddy/violet-vault/issues/59)
+- [ ] **Bill Discovery & Auto-Update System** ([#117](https://github.com/thef4tdaddy/violet-vault/issues/117)) - Automated bill detection
+- [ ] **Comprehensive Debt Tracking System** ([#115](https://github.com/thef4tdaddy/violet-vault/issues/115)) - Complete debt management
+- [ ] **Advanced Security Features** ([#69](https://github.com/thef4tdaddy/violet-vault/issues/69)) - Multi-factor authentication and session management
+- [ ] **Compliance & Privacy** ([#70](https://github.com/thef4tdaddy/violet-vault/issues/70)) - GDPR compliance and data governance
+- [ ] **CI/CD Pipeline Enhancement** ([#67](https://github.com/thef4tdaddy/violet-vault/issues/67)) - Security scanning and monitoring
+- [ ] **Infrastructure Scaling** ([#68](https://github.com/thef4tdaddy/violet-vault/issues/68)) - Performance and security optimization
+- [ ] **ViewRenderer Integration** ([#97](https://github.com/thef4tdaddy/violet-vault/issues/97)) - Dynamic content system
+- [ ] **Business Logic Extraction** ([#119](https://github.com/thef4tdaddy/violet-vault/issues/119)) - Custom hooks and providers
 
-- AI-powered budget recommendations
-- Spending habit analysis and suggestions
-- Automated envelope rebalancing
-- [ ] [Auto-funding rules](https://github.com/thef4tdaddy/violet-vault/issues/44)
-  - <!-- TODO: add detailed sub-tasks -->
-- [ ] [Predictive analytics](https://github.com/thef4tdaddy/violet-vault/issues/45)
-  - <!-- TODO: add detailed sub-tasks -->
-- [ ] [Advanced reporting](https://github.com/thef4tdaddy/violet-vault/issues/46)
-  - <!-- TODO: add detailed sub-tasks -->
+### 📊 v1.9.0 – Visualization & Reports (Sep 30, 2025)
 
-[-] [Financial Health Scoring](https://github.com/thef4tdaddy/violet-vault/issues/60)
+- [ ] **Universal OCR System** ([#116](https://github.com/thef4tdaddy/violet-vault/issues/116)) - Document processing & data extraction
+- [ ] **Advanced Visualizations** ([#72](https://github.com/thef4tdaddy/violet-vault/issues/72)) - Interactive charts and dashboards
+- [ ] **User Testing Program** ([#73](https://github.com/thef4tdaddy/violet-vault/issues/73)) - Usability testing and feedback
+- [ ] **API Platform** ([#64](https://github.com/thef4tdaddy/violet-vault/issues/64)) - Third-party integrations and webhooks
+- [ ] **Custom Report Generation** - PDF/CSV exports with custom date ranges
+- [ ] **Predictive Analytics** - Spending trend predictions and budget recommendations
+- [ ] **Goal Tracking Enhancements** - Visual progress tracking with milestone-based savings
 
-- Credit score integration
-- Debt management recommendations
-- Investment opportunity suggestions
+### 📱 v2.0.0 – Multi-Platform & PWA (Oct 15, 2025)
 
-### Platform Expansion
+- [ ] **Mobile Applications** ([#61](https://github.com/thef4tdaddy/violet-vault/issues/61)) - Native iOS and Android apps  
+- [ ] **Desktop Applications** ([#62](https://github.com/thef4tdaddy/violet-vault/issues/62)) - Electron-based apps for Windows/Mac/Linux
+- [ ] **Progressive Web App** - Full PWA support with offline functionality
+- [ ] **Mobile Layout Optimization** - Responsive design for all screen sizes
+- [ ] **Touch-Optimized Interactions** - Mobile-first navigation and gesture support
+- [ ] **Push Notifications** - Budget alerts and transaction notifications
+- [ ] **Offline-First Architecture** - Local data sync and connectivity handling
 
-[-] [Mobile Applications](https://github.com/thef4tdaddy/violet-vault/issues/61)
+### 🌙 v2.1.0 - Dark Mode Complete (Nov 30, 2025)
 
-- Native iOS and Android apps
-- Offline-first architecture
-- Push notifications for budget alerts
+- [ ] **Theme System Architecture** ([#121](https://github.com/thef4tdaddy/violet-vault/issues/121)) - CSS custom properties and theme context
+- [ ] **Complete Interface Implementation** ([#122](https://github.com/thef4tdaddy/violet-vault/issues/122)) - All components with dark mode support
+- [ ] **Color Palette Development** - Light/dark color schemes with accessibility compliance
+- [ ] **Theme Switching Logic** - User preference storage and system detection
+- [ ] **Chart & Visualization Themes** - Dark mode support for analytics and reports
+- [ ] **Accessibility Compliance** - WCAG contrast standards for both themes
 
-[-] [Desktop Applications](https://github.com/thef4tdaddy/violet-vault/issues/62)
+---
 
-- Electron-based desktop apps for Windows/Mac/Linux
-- Enhanced keyboard shortcuts
-- Local file system integration
+## 🔍 2026 Advanced Features
 
-### Enterprise Features
+### 📊 v2.2.0 - Advanced Analytics & Integrations (Feb 28, 2026)
 
-[-] [Business Budgeting](https://github.com/thef4tdaddy/violet-vault/issues/63)
+- [ ] **Financial Health Scoring** ([#60](https://github.com/thef4tdaddy/violet-vault/issues/60)) - Credit score integration and investment suggestions
+- [ ] **Intelligent Budgeting Assistant** ([#59](https://github.com/thef4tdaddy/violet-vault/issues/59)) - AI-powered budget recommendations
+- [ ] **API Platform** ([#64](https://github.com/thef4tdaddy/violet-vault/issues/64)) - Third-party integrations and webhooks
+- [ ] **Advanced Visualizations** ([#72](https://github.com/thef4tdaddy/violet-vault/issues/72)) - Interactive charts and dashboards
+- [ ] **Banking Integrations** - Open Banking API connections for automatic transaction import
+- [ ] **Advanced Reporting** - Custom report builder with PDF/CSV exports
+- [ ] **Predictive Analytics** - Machine learning insights and spending predictions
 
-- Multi-department budget management
-- Expense approval workflows
-- Corporate reporting tools
+### 💼 v3.0.0 - Small Business Complete (Apr 30, 2026)
 
-[-] [API Platform](https://github.com/thef4tdaddy/violet-vault/issues/64)
+- [ ] **Multi-Entity Management** ([#124](https://github.com/thef4tdaddy/violet-vault/issues/124)) - Support for multiple business entities
+- [ ] **Tax & Compliance Integration** ([#125](https://github.com/thef4tdaddy/violet-vault/issues/125)) - IRS-compliant expense categorization
+- [ ] **Business-Specific Features** - Advanced categorization and expense tracking
+- [ ] **Entity Switching Interface** - Quick context switching between personal/business budgets
+- [ ] **Receipt Management** - OCR-powered receipt capture and storage
+- [ ] **Mileage & Time Tracking** - GPS-based business expense tracking
+- [ ] **Tax Software Integration** - TurboTax and H&R Block export compatibility
+- [ ] **Accountant Collaboration** - Secure data sharing and professional export packages
+- [ ] **Client & Vendor Management** - Invoice and payment tracking systems
+- [ ] **Business Analytics Dashboard** - Profit & loss statements and cash flow projections
+- [ ] **Compliance Dashboard** - Automated regulatory checking and audit trail documentation
 
-- Public API for third-party integrations
-- Webhook support for real-time events
-- Developer documentation and SDKs
+---
+
+## 🔮 Future Enhancements & Backlog
+
+### Advanced Features (vFuture - Dec 31, 2026)
+
+- [ ] **Intelligent Budgeting Assistant** ([#59](https://github.com/thef4tdaddy/violet-vault/issues/59)) - AI-powered budget recommendations
+- [ ] **Financial Health Scoring** ([#60](https://github.com/thef4tdaddy/violet-vault/issues/60)) - Credit score integration and investment suggestions  
+- [ ] **Desktop Applications** ([#62](https://github.com/thef4tdaddy/violet-vault/issues/62)) - Electron-based apps for Windows/Mac/Linux
+
+### Historical Development Features
+*These features were part of earlier roadmap iterations and may be reconsidered for future releases:*
+
+- [ ] **Transaction Log Archiving** ([#37](https://github.com/thef4tdaddy/violet-vault/issues/37)) - Historical data management
+- [ ] **Edit History Viewer** ([#38](https://github.com/thef4tdaddy/violet-vault/issues/38)) - Comprehensive change tracking
+- [ ] **Analytics Improvements** ([#39](https://github.com/thef4tdaddy/violet-vault/issues/39)) - Enhanced reporting capabilities
+- [ ] **Local-Only Mode** ([#42](https://github.com/thef4tdaddy/violet-vault/issues/42)) - Offline-first architecture
+- [ ] **Exportable Encryption Key** ([#43](https://github.com/thef4tdaddy/violet-vault/issues/43)) - Key management features
+- [ ] **Auto-Funding Rules** ([#44](https://github.com/thef4tdaddy/violet-vault/issues/44)) - Automated budget allocation
+- [ ] **Advanced Predictive Analytics** ([#45](https://github.com/thef4tdaddy/violet-vault/issues/45)) - Machine learning insights
+- [ ] **Advanced Reporting Platform** ([#46](https://github.com/thef4tdaddy/violet-vault/issues/46)) - Custom report builder
+- [ ] **Predictive Analytics** ([#52](https://github.com/thef4tdaddy/violet-vault/issues/52)) - Spending trend predictions
+- [ ] **Advanced Reporting** ([#53](https://github.com/thef4tdaddy/violet-vault/issues/53)) - Export functionality (PDF, CSV, Excel)
+- [ ] **Goal Tracking Enhancements** ([#54](https://github.com/thef4tdaddy/violet-vault/issues/54)) - Milestone-based savings goals
+- [ ] **Role-Based Access Control** ([#55](https://github.com/thef4tdaddy/violet-vault/issues/55)) - Admin/viewer/editor roles
+- [ ] **Team Communication** ([#56](https://github.com/thef4tdaddy/violet-vault/issues/56)) - In-app messaging system
+- [ ] **Open Banking API** ([#57](https://github.com/thef4tdaddy/violet-vault/issues/57)) - Automatic transaction import
+- [ ] **Receipt Scanning** ([#58](https://github.com/thef4tdaddy/violet-vault/issues/58)) - OCR-powered receipt processing
+- [ ] **Business Budgeting** ([#63](https://github.com/thef4tdaddy/violet-vault/issues/63)) - Multi-department management
+
+---
+
+## 📋 Complete Issue Reference
+
+All GitHub issues have been organized by milestone and properly linked above. For a complete view of development progress:
+
+- **🔗 Live Project Board:** [VioletVault Roadmap](https://github.com/users/thef4tdaddy/projects/3)
+- **📊 Milestone View:** [Repository Milestones](https://github.com/thef4tdaddy/violet-vault/milestones)
+- **🐛 All Issues:** [GitHub Issues](https://github.com/thef4tdaddy/violet-vault/issues)
+
+### Issue Count by Milestone
+
+| Milestone | Open Issues | Target Date |
+|-----------|------------|-------------|
+| v1.7.0 - Cash Management | 4 issues | Aug 11, 2025 |
+| v1.8.0 - Security & Compliance | 11 issues | Aug 25, 2025 |
+| v1.9.0 - Visualization & Reports | 5 issues | Sep 30, 2025 |
+| v2.0.0 - Multi-Platform & PWA | 10 issues | Oct 15, 2025 |
+| v2.1.0 - Dark Mode Complete | 2 issues | Nov 30, 2025 |
+| v2.2.0 - Advanced Analytics & Integrations | 4 issues | Feb 28, 2026 |
+| v3.0.0 - Small Business Complete | 3 issues | Apr 30, 2026 |
+| vFuture - Backlog & Exploration | 0 issues | Dec 31, 2026 |
+
+---
+
+## 🤝 Contributing to the Roadmap
+
+We welcome community input on our roadmap! Here's how you can contribute:
+
+1. **Feature Requests** - Submit ideas via GitHub Issues with the `feature-request` label
+2. **User Feedback** - Share your experience and suggestions in GitHub Discussions
+3. **Technical Proposals** - Create detailed RFC documents for significant changes
+4. **Community Voting** - Participate in feature prioritization polls
+
+### Roadmap Review Process
+
+- **Monthly Reviews** - Core team evaluates progress and adjusts priorities
+- **Quarterly Planning** - Community input incorporated into next quarter's goals
+- **Annual Strategy** - Major platform decisions and long-term vision updates
+
+---
+
+**Last Updated:** August 2025
+**Next Review:** September 2025
+
+## 📅 **Complete Release Timeline**
+
+| Version | Focus Area | Target Date | Status |
+|---------|------------|-------------|---------|
+| v1.7.0 | Cash Management | Aug 11, 2025 | 🚧 In Progress |
+| v1.8.0 | Security & Compliance | Aug 25, 2025 | 📋 Planned |
+| v1.9.0 | Visualization & Reports | Sep 30, 2025 | 📋 Planned |
+| v2.0.0 | Multi-Platform & PWA | Oct 15, 2025 | 📋 Planned |
+| v2.1.0 | Dark Mode Complete | Nov 30, 2025 | 📋 Planned |
+| v2.2.0 | Advanced Analytics & Integrations | Feb 28, 2026 | 🔮 Future |
+| v3.0.0 | Small Business Complete | Apr 30, 2026 | 🔮 Future |
+
+🔗 **Live Progress:** [GitHub Project Board](https://github.com/users/thef4tdaddy/projects/3)
 
 ---
 
@@ -280,26 +277,4 @@ This roadmap outlines the planned development phases for VioletVault, our secure
 
 ---
 
-## 🤝 Contributing to the Roadmap
-
-We welcome community input on our roadmap! Here's how you can contribute:
-
-1. **Feature Requests** - Submit ideas via GitHub Issues with the `feature-request` label
-2. **User Feedback** - Share your experience and suggestions in GitHub Discussions
-3. **Technical Proposals** - Create detailed RFC documents for significant changes
-4. **Community Voting** - Participate in feature prioritization polls
-
-### Roadmap Review Process
-
-- **Monthly Reviews** - Core team evaluates progress and adjusts priorities
-- **Quarterly Planning** - Community input incorporated into next quarter's goals
-- **Annual Strategy** - Major platform decisions and long-term vision updates
-
----
-
-**Last Updated:** July 2025
-**Next Review:** August 2025
-
----
-
-_This roadmap is a living document and may change based on user feedback, technical constraints, and business priorities. All dates are estimates and subject to change._
+*This roadmap is a living document and may change based on user feedback, technical constraints, and business priorities. All dates are estimates and subject to change.*
