@@ -10,12 +10,15 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
   const budget = useBudget();
   const [activeUsers, setActiveUsers] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Auto-initialize Firebase sync when dependencies are ready
   useEffect(() => {
-    if (!firebaseSync || !budgetId || !encryptionKey) return;
+    if (!firebaseSync || !budgetId || !encryptionKey || isInitialized) return;
 
     console.log("🔄 Auto-initializing Firebase sync...");
+    setIsInitialized(true);
+
     firebaseSync.initialize(budgetId, encryptionKey);
 
     // Auto-load data from cloud
@@ -46,7 +49,7 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
     };
 
     loadCloudData();
-  }, [firebaseSync, budgetId, encryptionKey, budget]);
+  }, [firebaseSync, budgetId, encryptionKey, isInitialized]);
 
   // Auto-save data when it changes
   useEffect(() => {
