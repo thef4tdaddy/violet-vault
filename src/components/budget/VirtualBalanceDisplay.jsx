@@ -9,10 +9,7 @@ import useVirtualBalanceOverride from "../../hooks/useVirtualBalanceOverride";
 const VirtualBalanceDisplay = ({ className = "" }) => {
   const {
     // State
-    actualBalance,
     virtualBalance,
-    difference,
-    isReconciled,
     isEditing,
     editValue,
     showConfirmDialog,
