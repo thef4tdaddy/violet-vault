@@ -17,6 +17,7 @@ const storeInitializer = (set, get) => ({
   unassignedCash: 0,
   biweeklyAllocation: 0,
   paycheckHistory: [], // Paycheck history for payday predictions
+  actualBalance: 0, // Real bank account balance
   isOnline: true, // Add isOnline state, default to true
   dataLoaded: false,
 
@@ -93,8 +94,12 @@ const storeInitializer = (set, get) => ({
 
   updateTransaction: (transaction) =>
     set((state) => {
-      const transIndex = state.transactions.findIndex((t) => t.id === transaction.id);
-      const allTransIndex = state.allTransactions.findIndex((t) => t.id === transaction.id);
+      const transIndex = state.transactions.findIndex(
+        (t) => t.id === transaction.id,
+      );
+      const allTransIndex = state.allTransactions.findIndex(
+        (t) => t.id === transaction.id,
+      );
 
       if (transIndex !== -1) {
         state.transactions[transIndex] = transaction;
@@ -125,7 +130,9 @@ const storeInitializer = (set, get) => ({
   updateBill: (bill) =>
     set((state) => {
       const billIndex = state.bills.findIndex((b) => b.id === bill.id);
-      const allTransIndex = state.allTransactions.findIndex((t) => t.id === bill.id);
+      const allTransIndex = state.allTransactions.findIndex(
+        (t) => t.id === bill.id,
+      );
 
       if (billIndex !== -1) {
         state.bills[billIndex] = bill;
@@ -186,20 +193,31 @@ const storeInitializer = (set, get) => ({
 
   deleteSupplementalAccount: (id) =>
     set((state) => {
-      state.supplementalAccounts = state.supplementalAccounts.filter((a) => a.id !== id);
+      state.supplementalAccounts = state.supplementalAccounts.filter(
+        (a) => a.id !== id,
+      );
     }),
 
-  transferFromSupplementalAccount: (accountId, envelopeId, amount, description) =>
+  transferFromSupplementalAccount: (
+    accountId,
+    envelopeId,
+    amount,
+    description,
+  ) =>
     set((state) => {
       // Find and update supplemental account
-      const accountIndex = state.supplementalAccounts.findIndex((a) => a.id === accountId);
+      const accountIndex = state.supplementalAccounts.findIndex(
+        (a) => a.id === accountId,
+      );
       if (accountIndex === -1) return;
 
       const account = state.supplementalAccounts[accountIndex];
       if (account.currentBalance < amount) return;
 
       // Find and update envelope
-      const envelopeIndex = state.envelopes.findIndex((e) => e.id === envelopeId);
+      const envelopeIndex = state.envelopes.findIndex(
+        (e) => e.id === envelopeId,
+      );
       if (envelopeIndex === -1) return;
 
       // Update balances
@@ -231,6 +249,20 @@ const storeInitializer = (set, get) => ({
   setBiweeklyAllocation: (amount) =>
     set((state) => {
       state.biweeklyAllocation = amount;
+    }),
+
+  // Actual balance management
+  setActualBalance: (balance) =>
+    set((state) => {
+      state.actualBalance = balance;
+    }),
+
+  // Reconcile transaction (placeholder - implement based on your needs)
+  reconcileTransaction: (transaction) =>
+    set((state) => {
+      // Add reconcile logic here
+      state.transactions.push(transaction);
+      state.allTransactions.push(transaction);
     }),
 
   // Paycheck history management
@@ -268,6 +300,7 @@ const storeInitializer = (set, get) => ({
       state.unassignedCash = 0;
       state.biweeklyAllocation = 0;
       state.paycheckHistory = [];
+      state.actualBalance = 0;
       state.isOnline = true; // Also reset isOnline status
       state.dataLoaded = false;
     }),
@@ -295,10 +328,11 @@ if (LOCAL_ONLY_MODE) {
           unassignedCash: state.unassignedCash,
           biweeklyAllocation: state.biweeklyAllocation,
           paycheckHistory: state.paycheckHistory,
+          actualBalance: state.actualBalance,
         }),
       }),
-      { name: "violet-vault-devtools" }
-    )
+      { name: "violet-vault-devtools" },
+    ),
   );
 }
 
