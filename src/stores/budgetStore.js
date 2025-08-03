@@ -16,6 +16,7 @@ const storeInitializer = (set, get) => ({
   supplementalAccounts: [],
   unassignedCash: 0,
   biweeklyAllocation: 0,
+  paycheckHistory: [], // Paycheck history for payday predictions
   isOnline: true, // Add isOnline state, default to true
   dataLoaded: false,
 
@@ -232,6 +233,17 @@ const storeInitializer = (set, get) => ({
       state.biweeklyAllocation = amount;
     }),
 
+  // Paycheck history management
+  setPaycheckHistory: (history) =>
+    set((state) => {
+      state.paycheckHistory = history;
+    }),
+
+  processPaycheck: (paycheck) =>
+    set((state) => {
+      state.paycheckHistory.push(paycheck);
+    }),
+
   // Data loading state
   setDataLoaded: (loaded) =>
     set((state) => {
@@ -254,6 +266,8 @@ const storeInitializer = (set, get) => ({
       state.savingsGoals = [];
       state.supplementalAccounts = [];
       state.unassignedCash = 0;
+      state.biweeklyAllocation = 0;
+      state.paycheckHistory = [];
       state.isOnline = true; // Also reset isOnline status
       state.dataLoaded = false;
     }),
@@ -280,6 +294,7 @@ if (LOCAL_ONLY_MODE) {
           supplementalAccounts: state.supplementalAccounts,
           unassignedCash: state.unassignedCash,
           biweeklyAllocation: state.biweeklyAllocation,
+          paycheckHistory: state.paycheckHistory,
         }),
       }),
       { name: "violet-vault-devtools" }
