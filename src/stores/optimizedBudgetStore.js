@@ -13,6 +13,7 @@ const storeInitializer = (set, _get) => ({
   transactions: [],
   allTransactions: [],
   savingsGoals: [],
+  supplementalAccounts: [],
   unassignedCash: 0,
   biweeklyAllocation: 0,
   actualBalance: 0,
@@ -73,13 +74,17 @@ const storeInitializer = (set, _get) => ({
   updateTransaction: (transaction) =>
     set((state) => {
       // Update in transactions array
-      const transIndex = state.transactions.findIndex((t) => t.id === transaction.id);
+      const transIndex = state.transactions.findIndex(
+        (t) => t.id === transaction.id,
+      );
       if (transIndex !== -1) {
         state.transactions[transIndex] = transaction;
       }
 
       // Update in allTransactions array
-      const allTransIndex = state.allTransactions.findIndex((t) => t.id === transaction.id);
+      const allTransIndex = state.allTransactions.findIndex(
+        (t) => t.id === transaction.id,
+      );
       if (allTransIndex !== -1) {
         state.allTransactions[allTransIndex] = transaction;
       }
@@ -108,6 +113,81 @@ const storeInitializer = (set, _get) => ({
   deleteSavingsGoal: (id) =>
     set((state) => {
       state.savingsGoals = state.savingsGoals.filter((g) => g.id !== id);
+    }),
+
+  // Supplemental accounts management
+  addSupplementalAccount: (account) =>
+    set((state) => {
+      state.supplementalAccounts.push(account);
+    }),
+
+  updateSupplementalAccount: (accountId, account) =>
+    set((state) => {
+      const index = state.supplementalAccounts.findIndex(
+        (a) => a.id === accountId,
+      );
+      if (index !== -1) {
+        state.supplementalAccounts[index] = { ...account, id: accountId };
+      }
+    }),
+
+  deleteSupplementalAccount: (id) =>
+    set((state) => {
+      state.supplementalAccounts = state.supplementalAccounts.filter(
+        (a) => a.id !== id,
+      );
+    }),
+
+  // Transfer from supplemental account to budget envelope
+  transferFromSupplementalAccount: (
+    accountId,
+    envelopeId,
+    amount,
+    description,
+  ) =>
+    set((state) => {
+      // Find the supplemental account
+      const accountIndex = state.supplementalAccounts.findIndex(
+        (a) => a.id === accountId,
+      );
+      if (accountIndex === -1) return;
+
+      const account = state.supplementalAccounts[accountIndex];
+      if (account.currentBalance < amount) return; // Insufficient funds
+
+      // Find the target envelope
+      const envelopeIndex = state.envelopes.findIndex(
+        (e) => e.id === envelopeId,
+      );
+      if (envelopeIndex === -1) return;
+
+      // Update supplemental account balance
+      state.supplementalAccounts[accountIndex].currentBalance -= amount;
+      state.supplementalAccounts[accountIndex].lastUpdated =
+        new Date().toISOString();
+
+      // Update envelope balance
+      state.envelopes[envelopeIndex].currentAmount += amount;
+
+      // Create transaction record
+      const transaction = {
+        id: Date.now(),
+        date: new Date().toISOString(),
+        amount: amount,
+        description: description || `Transfer from ${account.name}`,
+        envelope: state.envelopes[envelopeIndex].name,
+        envelopeId: envelopeId,
+        category: "Transfer",
+        type: "income",
+        source: "supplemental",
+        sourceAccountId: accountId,
+        sourceAccountName: account.name,
+        createdAt: new Date().toISOString(),
+      };
+
+      // Add to transactions
+      state.transactions.push(transaction);
+      state.allTransactions.push(transaction);
     }),
 
   // Unassigned cash and allocation management
@@ -139,6 +219,36 @@ const storeInitializer = (set, _get) => ({
       state.isOnline = status;
     }),
 
+  // Reconcile transaction - adds a transaction and updates balances appropriately
+  reconcileTransaction: (transactionData) =>
+    set((state) => {
+      const transaction = {
+        ...transactionData,
+        id: transactionData.id || Date.now(),
+        date: transactionData.date || new Date().toISOString().split("T")[0],
+        reconciledAt: transactionData.reconciledAt || new Date().toISOString(),
+      };
+
+      // Add transaction to both arrays
+      state.transactions.push(transaction);
+      state.allTransactions.push(transaction);
+
+      // Update balances based on envelope assignment
+      if (transaction.envelopeId && transaction.envelopeId !== "unassigned") {
+        // Update specific envelope balance
+        const envelope = state.envelopes.find(
+          (env) => env.id === transaction.envelopeId,
+        );
+        if (envelope) {
+          envelope.currentBalance =
+            (envelope.currentBalance || 0) + transaction.amount;
+        }
+      } else {
+        // Update unassigned cash
+        state.unassignedCash = (state.unassignedCash || 0) + transaction.amount;
+      }
+    }),
+
   // Reset functionality
   resetStore: () =>
     set((state) => {
@@ -147,6 +257,7 @@ const storeInitializer = (set, _get) => ({
       state.transactions = [];
       state.allTransactions = [];
       state.savingsGoals = [];
+      state.supplementalAccounts = [];
       state.unassignedCash = 0;
       state.actualBalance = 0;
       state.isOnline = true; // Also reset isOnline status
@@ -172,6 +283,7 @@ if (LOCAL_ONLY_MODE) {
           transactions: state.transactions,
           allTransactions: state.allTransactions,
           savingsGoals: state.savingsGoals,
+          supplementalAccounts: state.supplementalAccounts,
           unassignedCash: state.unassignedCash,
           biweeklyAllocation: state.biweeklyAllocation,
           actualBalance: state.actualBalance,
@@ -179,8 +291,8 @@ if (LOCAL_ONLY_MODE) {
           // They should be determined at runtime
         }),
       }),
-      { name: "violet-vault-devtools" }
-    )
+      { name: "violet-vault-devtools" },
+    ),
   );
 }
 

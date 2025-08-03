@@ -1,7 +1,7 @@
 import React, { useState, memo, useCallback } from "react";
 import { Upload, Download, LogOut, AlertTriangle, RefreshCw, Cloud, Key } from "lucide-react";
 import UserIndicator from "../auth/UserIndicator";
-import logoWithText from "../../assets/Shield Text Logo.png";
+import logoWithText from "../../assets/Shield Text Logo.webp";
 import ChangePasswordModal from "../auth/ChangePasswordModal";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
@@ -36,11 +36,10 @@ const Header = memo(
             <img
               src={logoWithText}
               alt="VioletVault Logo"
+              loading="lazy"
+              className="w-full h-auto object-contain max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-2xl"
               style={{
-                height: "360px",
-                width: "auto",
-                maxWidth: "900px",
-                objectFit: "contain",
+                imageRendering: "high-quality",
               }}
             />
             <p className="text-gray-600 text-sm mt-3 font-medium">

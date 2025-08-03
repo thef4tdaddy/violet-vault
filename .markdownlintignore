@@ -1,0 +1,5 @@
+# Only lint Markdown files
+
+!\*.md
+
+-
