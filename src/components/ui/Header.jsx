@@ -1,5 +1,13 @@
 import React, { useState, memo, useCallback } from "react";
-import { Upload, Download, LogOut, AlertTriangle, RefreshCw, Cloud, Key } from "lucide-react";
+import {
+  Upload,
+  Download,
+  LogOut,
+  AlertTriangle,
+  RefreshCw,
+  Cloud,
+  Key,
+} from "lucide-react";
 import UserIndicator from "../auth/UserIndicator";
 import logoWithText from "../../assets/Shield Text Logo.webp";
 import ChangePasswordModal from "../auth/ChangePasswordModal";
@@ -29,26 +37,20 @@ const Header = memo(
       setShowPasswordModal((prev) => !prev);
     }, []);
     return (
-      <div
-        className="rounded-3xl mb-6 py-2 backdrop-blur-md border border-white/20 shadow-2xl"
-        style={{
-          background: "rgba(255, 254, 255, 0.95)", // Using your logo's white #fffeff
-          boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
-        }}
-      >
-        <div className="flex flex-col items-center text-center">
+      <div className="glassmorphism rounded-3xl p-4 mb-6">
+        <div className="flex flex-col items-center text-center space-y-4">
           {/* Logo and tagline */}
-          <div className="flex flex-col items-center w-full -my-2">
+          <div className="flex flex-col items-center w-full">
             <img
               src={logoWithText}
               alt="VioletVault Logo"
               loading="lazy"
-              className="h-64 sm:h-80 md:h-96 lg:h-[32rem] xl:h-[40rem] 2xl:h-[48rem] w-auto max-w-full object-contain px-4"
+              className="h-72 sm:h-96 md:h-[28rem] lg:h-[36rem] xl:h-[44rem] 2xl:h-[52rem] w-auto max-w-full object-contain px-2"
               style={{
                 imageRendering: "high-quality",
               }}
             />
-            <p className="text-gray-600 text-sm font-medium -mt-6">
+            <p className="text-gray-600 text-sm mt-2 font-medium">
               Encryption First, Family Budgeting Management
             </p>
           </div>
@@ -77,7 +79,10 @@ const Header = memo(
                 Import
               </label>
 
-              <button onClick={onExport} className="btn btn-secondary flex items-center rounded-xl">
+              <button
+                onClick={onExport}
+                className="btn btn-secondary flex items-center rounded-2xl px-4 py-2 font-medium hover:shadow-lg transition-all"
+              >
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </button>
@@ -91,7 +96,10 @@ const Header = memo(
               </button>
 
               {LOCAL_ONLY_MODE && (
-                <button onClick={onSync} className="btn btn-primary flex items-center rounded-xl">
+                <button
+                  onClick={onSync}
+                  className="btn btn-primary flex items-center rounded-2xl px-4 py-2 font-medium hover:shadow-lg transition-all"
+                >
                   <Cloud className="h-4 w-4 mr-2" />
                   Sync to Cloud
                 </button>
@@ -109,6 +117,7 @@ const Header = memo(
             </div>
           </div>
         </div>
+
         {showResetModal && (
           <div
             className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
@@ -121,8 +130,12 @@ const Header = memo(
               <div className="flex items-start space-x-2 mb-4">
                 <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
                 <div>
-                  <div className="font-medium text-amber-800">Reset Options</div>
-                  <div className="text-sm text-amber-600 mt-1">Choose your reset option</div>
+                  <div className="font-medium text-amber-800">
+                    Reset Options
+                  </div>
+                  <div className="text-sm text-amber-600 mt-1">
+                    Choose your reset option
+                  </div>
                 </div>
               </div>
 
@@ -135,7 +148,9 @@ const Header = memo(
                   className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-gray-50 border border-gray-200"
                 >
                   <div className="font-medium">Logout Only</div>
-                  <div className="text-xs text-gray-500">Keep your data, just logout</div>
+                  <div className="text-xs text-gray-500">
+                    Keep your data, just logout
+                  </div>
                 </button>
 
                 <button
@@ -146,12 +161,15 @@ const Header = memo(
                   className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-red-50 border border-red-200 text-red-600"
                 >
                   <div className="font-medium">Clear All Data</div>
-                  <div className="text-xs text-red-500">Delete everything and start fresh</div>
+                  <div className="text-xs text-red-500">
+                    Delete everything and start fresh
+                  </div>
                 </button>
               </div>
             </div>
           </div>
         )}
+
         {showPasswordModal && (
           <ChangePasswordModal
             isOpen={showPasswordModal}
