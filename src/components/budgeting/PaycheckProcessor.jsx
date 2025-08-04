@@ -161,44 +161,53 @@ const PaycheckProcessor = ({
                 How should this be allocated?
               </label>
               <div className="space-y-2">
-                <label className="glassmorphism flex items-center p-2 border-2 border-white/20 rounded-xl cursor-pointer hover:border-purple-300 transition-all">
-                  <input
-                    type="radio"
-                    value="allocate"
-                    checked={allocationMode === "allocate"}
-                    onChange={(e) => setAllocationMode(e.target.value)}
-                    className="w-4 h-4 text-purple-600 mr-3"
-                    disabled={isProcessing}
-                  />
-                  <Wallet className="h-4 w-4 text-purple-600 mr-2" />
-                  <div className="flex-1">
-                    <div className="font-medium text-gray-900 text-sm">
-                      Auto-allocate to Bill Envelopes
+                <label className="glassmorphism border-2 border-white/20 rounded-xl cursor-pointer hover:border-purple-300 transition-all">
+                  <div className="flex items-center p-2">
+                    <input
+                      type="radio"
+                      value="allocate"
+                      checked={allocationMode === "allocate"}
+                      onChange={(e) => setAllocationMode(e.target.value)}
+                      className="w-4 h-4 text-purple-600"
+                      disabled={isProcessing}
+                    />
+                    <div className="ml-3 flex items-center flex-1">
+                      <Wallet className="h-4 w-4 text-purple-600 mr-2" />
+                      <div className="flex-1">
+                        <div className="font-medium text-gray-900 text-sm">
+                          Auto-allocate to Bill Envelopes
+                        </div>
+                        <p className="text-xs text-gray-600 leading-tight">
+                          Fill bill envelopes by biweekly needs, leftover to
+                          unassigned
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-xs text-gray-600 leading-tight">
-                      Fill bill envelopes by biweekly needs, leftover to
-                      unassigned
-                    </p>
                   </div>
                 </label>
 
-                <label className="glassmorphism flex items-center p-2 border-2 border-white/20 rounded-xl cursor-pointer hover:border-emerald-300 transition-all">
-                  <input
-                    type="radio"
-                    value="leftover"
-                    checked={allocationMode === "leftover"}
-                    onChange={(e) => setAllocationMode(e.target.value)}
-                    className="w-4 h-4 text-emerald-600 mr-3"
-                    disabled={isProcessing}
-                  />
-                  <TrendingUp className="h-4 w-4 text-emerald-600 mr-2" />
-                  <div className="flex-1">
-                    <div className="font-medium text-gray-900 text-sm">
-                      All to Unassigned Cash
+                <label className="glassmorphism border-2 border-white/20 rounded-xl cursor-pointer hover:border-emerald-300 transition-all">
+                  <div className="flex items-center p-2">
+                    <input
+                      type="radio"
+                      value="leftover"
+                      checked={allocationMode === "leftover"}
+                      onChange={(e) => setAllocationMode(e.target.value)}
+                      className="w-4 h-4 text-emerald-600"
+                      disabled={isProcessing}
+                    />
+                    <div className="ml-3 flex items-center flex-1">
+                      <TrendingUp className="h-4 w-4 text-emerald-600 mr-2" />
+                      <div className="flex-1">
+                        <div className="font-medium text-gray-900 text-sm">
+                          All to Unassigned Cash
+                        </div>
+                        <p className="text-xs text-gray-600 leading-tight">
+                          Put entire paycheck into unassigned for manual
+                          allocation
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-xs text-gray-600 leading-tight">
-                      Put entire paycheck into unassigned for manual allocation
-                    </p>
                   </div>
                 </label>
               </div>
