@@ -1,7 +1,10 @@
 name: Enforce Commit Types on Main Branch
 
 on:
+  push:
+    branches: [main]
   pull_request:
+    branches: [main]
     types: [opened, synchronize, reopened]
 
 jobs:
@@ -41,7 +44,7 @@ jobs:
             if ! echo "$msg" | grep -Eq "$ALLOWED"; then
               echo "❌ Disallowed commit message:"
               echo "   \"$msg\""
-              echo "🔒 Only fix:, docs:, ci:, and revert: commit types are allowed directly on main."
+              echo "🔒 Only fix:, docs:, ci:, and revert: commit types are allowed to be pushed directly to main."
               echo "👉 Please open a PR to develop instead for feature, style, or other changes."
               DISALLOWED=1
             fi
