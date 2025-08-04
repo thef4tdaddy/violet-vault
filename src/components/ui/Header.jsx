@@ -1,5 +1,12 @@
 import { useState, memo, useCallback } from "react";
-import { Upload, Download, AlertTriangle, RefreshCw, Cloud, Key } from "lucide-react";
+import {
+  Upload,
+  Download,
+  AlertTriangle,
+  RefreshCw,
+  Cloud,
+  Key,
+} from "lucide-react";
 import UserIndicator from "../auth/UserIndicator";
 import logoWithText from "../../assets/Shield Text Logo.webp";
 import ChangePasswordModal from "../auth/ChangePasswordModal";
@@ -43,7 +50,7 @@ const Header = memo(
               src={logoWithText}
               alt="VioletVault Logo"
               loading="lazy"
-              className="h-64 sm:h-80 md:h-[24rem] lg:h-[28rem] xl:h-[32rem] 2xl:h-[36rem] w-auto max-w-full object-contain"
+              className="h-48 sm:h-60 md:h-72 lg:h-84 xl:h-96 2xl:h-[27rem] w-auto max-w-full object-contain"
               style={{
                 imageRendering: "high-quality",
               }}
@@ -178,7 +185,7 @@ const Header = memo(
         )}
       </div>
     );
-  }
+  },
 );
 
 export default Header;
