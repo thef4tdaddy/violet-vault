@@ -29,20 +29,20 @@ const Header = memo(
       setShowPasswordModal((prev) => !prev);
     }, []);
     return (
-      <div className="glassmorphism rounded-3xl p-6 mb-6">
-        <div className="flex flex-col items-center text-center space-y-6">
+      <div className="glassmorphism rounded-3xl p-4 mb-6">
+        <div className="flex flex-col items-center text-center space-y-4">
           {/* Logo and tagline */}
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center w-full">
             <img
               src={logoWithText}
               alt="VioletVault Logo"
               loading="lazy"
-              className="h-64 sm:h-80 md:h-96 lg:h-[32rem] xl:h-[40rem] 2xl:h-[48rem] w-auto max-w-full object-contain px-4"
+              className="h-72 sm:h-96 md:h-[28rem] lg:h-[36rem] xl:h-[44rem] 2xl:h-[52rem] w-auto max-w-full object-contain px-2"
               style={{
                 imageRendering: "high-quality",
               }}
             />
-            <p className="text-gray-600 text-sm mt-3 font-medium">
+            <p className="text-gray-600 text-sm mt-2 font-medium">
               Encryption First, Family Budgeting Management
             </p>
           </div>
@@ -65,27 +65,33 @@ const Header = memo(
               />
               <label
                 htmlFor="import-data"
-                className="btn btn-secondary flex items-center cursor-pointer rounded-xl"
+                className="btn btn-secondary flex items-center cursor-pointer rounded-2xl px-4 py-2 font-medium hover:shadow-lg transition-all"
               >
                 <Upload className="h-4 w-4 mr-2" />
                 Import
               </label>
 
-              <button onClick={onExport} className="btn btn-secondary flex items-center rounded-xl">
+              <button
+                onClick={onExport}
+                className="btn btn-secondary flex items-center rounded-2xl px-4 py-2 font-medium hover:shadow-lg transition-all"
+              >
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </button>
 
               <button
                 onClick={handleTogglePasswordModal}
-                className="btn btn-secondary flex items-center rounded-xl"
+                className="btn btn-secondary flex items-center rounded-2xl px-4 py-2 font-medium hover:shadow-lg transition-all"
               >
                 <Key className="h-4 w-4 mr-2" />
                 Change Password
               </button>
 
               {LOCAL_ONLY_MODE && (
-                <button onClick={onSync} className="btn btn-primary flex items-center rounded-xl">
+                <button
+                  onClick={onSync}
+                  className="btn btn-primary flex items-center rounded-2xl px-4 py-2 font-medium hover:shadow-lg transition-all"
+                >
                   <Cloud className="h-4 w-4 mr-2" />
                   Sync to Cloud
                 </button>
@@ -94,7 +100,7 @@ const Header = memo(
               <div className="relative" style={{ zIndex: 50 }}>
                 <button
                   onClick={handleToggleResetModal}
-                  className="btn text-amber-600 bg-amber-50 border border-amber-200 hover:bg-amber-100 flex items-center rounded-xl"
+                  className="btn text-amber-600 bg-amber-50 border border-amber-200 hover:bg-amber-100 hover:shadow-lg flex items-center rounded-2xl px-4 py-2 font-medium transition-all"
                 >
                   <RefreshCw className="h-4 w-4 mr-2" />
                   Reset
