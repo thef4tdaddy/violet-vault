@@ -1,5 +1,5 @@
-import React, { useState, memo, useCallback } from "react";
-import { Upload, Download, LogOut, AlertTriangle, RefreshCw, Cloud, Key } from "lucide-react";
+import { useState, memo, useCallback } from "react";
+import { Upload, Download, AlertTriangle, RefreshCw, Cloud, Key } from "lucide-react";
 import UserIndicator from "../auth/UserIndicator";
 import logoWithText from "../../assets/Shield Text Logo.webp";
 import ChangePasswordModal from "../auth/ChangePasswordModal";
@@ -29,26 +29,26 @@ const Header = memo(
       setShowPasswordModal((prev) => !prev);
     }, []);
     return (
-      <div className="glassmorphism rounded-3xl mb-6">
+      <div className="glassmorphism rounded-3xl mb-6 py-2">
         <div className="flex flex-col items-center text-center">
           {/* Logo and tagline */}
-          <div className="flex flex-col items-center w-full">
+          <div className="flex flex-col items-center w-full -my-2">
             <img
               src={logoWithText}
               alt="VioletVault Logo"
               loading="lazy"
-              className="h-72 sm:h-96 md:h-[28rem] lg:h-[36rem] xl:h-[44rem] 2xl:h-[52rem] w-auto max-w-full object-contain"
+              className="h-64 sm:h-80 md:h-[24rem] lg:h-[28rem] xl:h-[32rem] 2xl:h-[36rem] w-auto max-w-full object-contain"
               style={{
                 imageRendering: "high-quality",
               }}
             />
-            <p className="text-gray-600 text-sm font-medium -mt-4">
+            <p className="text-gray-600 text-sm font-medium -mt-6">
               Encryption First, Family Budgeting Management
             </p>
           </div>
 
           {/* Buttons row */}
-          <div className="flex items-center justify-center flex-wrap gap-4 p-4">
+          <div className="flex items-center justify-center flex-wrap gap-4 pt-2 pb-4 px-4">
             <UserIndicator
               currentUser={currentUser}
               onUserChange={onUserChange}
