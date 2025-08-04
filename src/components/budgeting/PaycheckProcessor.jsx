@@ -152,17 +152,17 @@ const PaycheckProcessor = ({
                 How should this be allocated?
               </label>
               <div className="space-y-2">
-                <div className="glassmorphism border-2 border-white/20 rounded-xl hover:border-purple-300 transition-all">
-                  <label className="flex p-2 cursor-pointer">
+                <div className="glassmorphism border-2 border-white/20 rounded-xl hover:border-purple-300 transition-all p-2">
+                  <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
                     <input
                       type="radio"
                       value="allocate"
                       checked={allocationMode === "allocate"}
                       onChange={(e) => setAllocationMode(e.target.value)}
-                      className="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0"
+                      className="w-4 h-4 text-purple-600 mt-0.5 justify-self-start"
                       disabled={isProcessing}
                     />
-                    <div className="ml-3 flex-1">
+                    <div>
                       <div className="flex items-center mb-1">
                         <Wallet className="h-4 w-4 text-purple-600 mr-2" />
                         <span className="font-medium text-gray-900 text-sm">
@@ -174,20 +174,20 @@ const PaycheckProcessor = ({
                         unassigned
                       </p>
                     </div>
-                  </label>
+                  </div>
                 </div>
 
-                <div className="glassmorphism border-2 border-white/20 rounded-xl hover:border-emerald-300 transition-all">
-                  <label className="flex p-2 cursor-pointer">
+                <div className="glassmorphism border-2 border-white/20 rounded-xl hover:border-emerald-300 transition-all p-2">
+                  <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
                     <input
                       type="radio"
                       value="leftover"
                       checked={allocationMode === "leftover"}
                       onChange={(e) => setAllocationMode(e.target.value)}
-                      className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0"
+                      className="w-4 h-4 text-emerald-600 mt-0.5 justify-self-start"
                       disabled={isProcessing}
                     />
-                    <div className="ml-3 flex-1">
+                    <div>
                       <div className="flex items-center mb-1">
                         <TrendingUp className="h-4 w-4 text-emerald-600 mr-2" />
                         <span className="font-medium text-gray-900 text-sm">
@@ -199,7 +199,7 @@ const PaycheckProcessor = ({
                         allocation
                       </p>
                     </div>
-                  </label>
+                  </div>
                 </div>
               </div>
             </div>
