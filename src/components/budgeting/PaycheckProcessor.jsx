@@ -152,55 +152,55 @@ const PaycheckProcessor = ({
                 How should this be allocated?
               </label>
               <div className="space-y-2">
-                <label className="glassmorphism border-2 border-white/20 rounded-xl cursor-pointer hover:border-purple-300 transition-all">
-                  <div className="flex items-center p-2">
+                <div className="glassmorphism border-2 border-white/20 rounded-xl hover:border-purple-300 transition-all">
+                  <label className="flex p-2 cursor-pointer">
                     <input
                       type="radio"
                       value="allocate"
                       checked={allocationMode === "allocate"}
                       onChange={(e) => setAllocationMode(e.target.value)}
-                      className="w-4 h-4 text-purple-600"
+                      className="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0"
                       disabled={isProcessing}
                     />
-                    <div className="ml-3 flex items-center flex-1">
-                      <Wallet className="h-4 w-4 text-purple-600 mr-2" />
-                      <div className="flex-1">
-                        <div className="font-medium text-gray-900 text-sm">
+                    <div className="ml-3 flex-1">
+                      <div className="flex items-center mb-1">
+                        <Wallet className="h-4 w-4 text-purple-600 mr-2" />
+                        <span className="font-medium text-gray-900 text-sm">
                           Auto-allocate to Bill Envelopes
-                        </div>
-                        <p className="text-xs text-gray-600 leading-tight">
-                          Fill bill envelopes by biweekly needs, leftover to
-                          unassigned
-                        </p>
+                        </span>
                       </div>
+                      <p className="text-xs text-gray-600 leading-tight ml-6">
+                        Fill bill envelopes by biweekly needs, leftover to
+                        unassigned
+                      </p>
                     </div>
-                  </div>
-                </label>
+                  </label>
+                </div>
 
-                <label className="glassmorphism border-2 border-white/20 rounded-xl cursor-pointer hover:border-emerald-300 transition-all">
-                  <div className="flex items-center p-2">
+                <div className="glassmorphism border-2 border-white/20 rounded-xl hover:border-emerald-300 transition-all">
+                  <label className="flex p-2 cursor-pointer">
                     <input
                       type="radio"
                       value="leftover"
                       checked={allocationMode === "leftover"}
                       onChange={(e) => setAllocationMode(e.target.value)}
-                      className="w-4 h-4 text-emerald-600"
+                      className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0"
                       disabled={isProcessing}
                     />
-                    <div className="ml-3 flex items-center flex-1">
-                      <TrendingUp className="h-4 w-4 text-emerald-600 mr-2" />
-                      <div className="flex-1">
-                        <div className="font-medium text-gray-900 text-sm">
+                    <div className="ml-3 flex-1">
+                      <div className="flex items-center mb-1">
+                        <TrendingUp className="h-4 w-4 text-emerald-600 mr-2" />
+                        <span className="font-medium text-gray-900 text-sm">
                           All to Unassigned Cash
-                        </div>
-                        <p className="text-xs text-gray-600 leading-tight">
-                          Put entire paycheck into unassigned for manual
-                          allocation
-                        </p>
+                        </span>
                       </div>
+                      <p className="text-xs text-gray-600 leading-tight ml-6">
+                        Put entire paycheck into unassigned for manual
+                        allocation
+                      </p>
                     </div>
-                  </div>
-                </label>
+                  </label>
+                </div>
               </div>
             </div>
 
