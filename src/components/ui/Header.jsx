@@ -29,7 +29,13 @@ const Header = memo(
       setShowPasswordModal((prev) => !prev);
     }, []);
     return (
-      <div className="glassmorphism rounded-3xl mb-6 py-2">
+      <div
+        className="rounded-3xl mb-6 py-2 backdrop-blur-md border border-white/20 shadow-2xl"
+        style={{
+          background: "rgba(255, 254, 255, 0.95)", // Using your logo's white #fffeff
+          boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+        }}
+      >
         <div className="flex flex-col items-center text-center">
           {/* Logo and tagline */}
           <div className="flex flex-col items-center w-full -my-2">
