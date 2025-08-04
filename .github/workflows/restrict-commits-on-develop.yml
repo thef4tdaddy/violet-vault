@@ -1,6 +1,8 @@
 name: Enforce Commit Types on Develop Branch
 
 on:
+  push:
+    branches: [develop]
   pull_request:
     branches: [develop]
     types: [opened, synchronize, reopened]
