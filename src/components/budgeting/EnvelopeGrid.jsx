@@ -344,14 +344,14 @@ const UnifiedEnvelopeManager = ({
         </div>
       </div>
 
-      <div className="bg-white/60 backdrop-blur-sm p-4 rounded-lg border border-white/20">
+      <div className="bg-white/60 backdrop-blur-sm p-3 rounded-lg border border-white/20">
         <div className="flex items-center justify-between">
-          <h4 className="font-medium text-gray-900 flex items-center">
-            <Filter className="h-4 w-4 mr-2" />
+          <h4 className="font-medium text-gray-900 flex items-center text-sm">
+            <Filter className="h-3 w-3 mr-2" />
             Filters & Sorting
           </h4>
 
-          <div className="flex gap-3">
+          <div className="flex gap-2">
             <select
               value={filterOptions.sortBy}
               onChange={(e) =>
@@ -360,7 +360,7 @@ const UnifiedEnvelopeManager = ({
                   sortBy: e.target.value,
                 }))
               }
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              className="px-2 py-1 border border-gray-300 rounded text-xs"
             >
               <option value="usage_desc">Highest Usage First</option>
               <option value="usage_asc">Lowest Usage First</option>
@@ -369,7 +369,7 @@ const UnifiedEnvelopeManager = ({
               <option value="status">Status Priority</option>
             </select>
 
-            <label className="flex items-center text-sm">
+            <label className="flex items-center text-xs">
               <input
                 type="checkbox"
                 checked={filterOptions.showEmpty}
@@ -379,7 +379,7 @@ const UnifiedEnvelopeManager = ({
                     showEmpty: e.target.checked,
                   }))
                 }
-                className="mr-2"
+                className="mr-1"
               />
               Show Empty
             </label>
