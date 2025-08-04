@@ -44,7 +44,7 @@ const PaycheckProcessor = ({
     envelopes.forEach((envelope) => {
       const needed = Math.max(
         0,
-        envelope.biweeklyAllocation - envelope.currentBalance,
+        envelope.biweeklyAllocation - envelope.currentBalance
       );
       const allocation = Math.min(needed, remainingAmount);
 
@@ -62,7 +62,7 @@ const PaycheckProcessor = ({
       totalAllocated,
       leftoverAmount: remainingAmount,
       summary: `$${totalAllocated.toFixed(
-        2,
+        2
       )} to envelopes, $${remainingAmount.toFixed(2)} to unassigned`,
     };
   };
