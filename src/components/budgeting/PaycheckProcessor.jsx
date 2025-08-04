@@ -9,15 +9,7 @@ import {
   Clock,
   CheckCircle,
 } from "lucide-react";
-import {
-  DollarSign,
-  User,
-  Wallet,
-  Calculator,
-  TrendingUp,
-  Clock,
-  CheckCircle,
-} from "lucide-react";
+import { BILL_CATEGORIES } from "../../constants/categories";
 
 const PaycheckProcessor = ({
   envelopes = [],
@@ -45,12 +37,18 @@ const PaycheckProcessor = ({
       };
     }
 
-    // Calculate how much each envelope needs
+    // Calculate how much each BILL envelope needs (only bill envelopes with auto-allocate enabled)
     let remainingAmount = amount;
     const allocations = {};
     let totalAllocated = 0;
 
-    envelopes.forEach((envelope) => {
+    // Filter to only bill envelopes that have auto-allocate enabled
+    const billEnvelopes = envelopes.filter(
+      (envelope) =>
+        envelope.autoAllocate && BILL_CATEGORIES.includes(envelope.category)
+    );
+
+    billEnvelopes.forEach((envelope) => {
       const needed = Math.max(
         0,
         envelope.biweeklyAllocation - envelope.currentBalance
@@ -72,7 +70,7 @@ const PaycheckProcessor = ({
       leftoverAmount: remainingAmount,
       summary: `$${totalAllocated.toFixed(
         2
-      )} to envelopes, $${remainingAmount.toFixed(2)} to unassigned`,
+      )} to bill envelopes, $${remainingAmount.toFixed(2)} to unassigned`,
     };
   };
 
@@ -160,56 +158,52 @@ const PaycheckProcessor = ({
                 <Calculator className="h-4 w-4 inline mr-2" />
                 How should this be allocated?
               </label>
-              <div className="space-y-2">
-                <div className="glassmorphism border-2 border-white/20 rounded-xl hover:border-purple-300 transition-all p-2">
-                  <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
-                    <input
-                      type="radio"
-                      value="allocate"
-                      checked={allocationMode === "allocate"}
-                      onChange={(e) => setAllocationMode(e.target.value)}
-                      className="w-4 h-4 text-purple-600 mt-0.5 justify-self-start"
-                      disabled={isProcessing}
-                    />
-                    <div>
-                      <div className="flex items-center mb-1">
-                        <Wallet className="h-4 w-4 text-purple-600 mr-2" />
-                        <span className="font-medium text-gray-900 text-sm">
-                          Auto-allocate to Bill Envelopes
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-600 leading-tight ml-6">
-                        Fill bill envelopes by biweekly needs, leftover to
-                        unassigned
-                      </p>
+              <div className="space-y-4">
+                <label className="glassmorphism flex items-start space-x-4 p-6 border-2 border-white/20 rounded-2xl cursor-pointer hover:border-purple-300 transition-all">
+                  <input
+                    type="radio"
+                    value="allocate"
+                    checked={allocationMode === "allocate"}
+                    onChange={(e) => setAllocationMode(e.target.value)}
+                    className="mt-1 w-5 h-5 text-purple-600"
+                    disabled={isProcessing}
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center mb-2">
+                      <Wallet className="h-5 w-5 mr-3 text-purple-600" />
+                      <span className="font-semibold text-gray-900">
+                        Auto-allocate to Bill Envelopes
+                      </span>
                     </div>
+                    <p className="text-sm text-gray-600">
+                      Fill up bill envelopes based on their biweekly needs, then
+                      put leftovers in unassigned cash
+                    </p>
                   </div>
-                </div>
+                </label>
 
-                <div className="glassmorphism border-2 border-white/20 rounded-xl hover:border-emerald-300 transition-all p-2">
-                  <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
-                    <input
-                      type="radio"
-                      value="leftover"
-                      checked={allocationMode === "leftover"}
-                      onChange={(e) => setAllocationMode(e.target.value)}
-                      className="w-4 h-4 text-emerald-600 mt-0.5 justify-self-start"
-                      disabled={isProcessing}
-                    />
-                    <div>
-                      <div className="flex items-center mb-1">
-                        <TrendingUp className="h-4 w-4 text-emerald-600 mr-2" />
-                        <span className="font-medium text-gray-900 text-sm">
-                          All to Unassigned Cash
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-600 leading-tight ml-6">
-                        Put entire paycheck into unassigned for manual
-                        allocation
-                      </p>
+                <label className="glassmorphism flex items-start space-x-4 p-6 border-2 border-white/20 rounded-2xl cursor-pointer hover:border-emerald-300 transition-all">
+                  <input
+                    type="radio"
+                    value="leftover"
+                    checked={allocationMode === "leftover"}
+                    onChange={(e) => setAllocationMode(e.target.value)}
+                    className="mt-1 w-5 h-5 text-emerald-600"
+                    disabled={isProcessing}
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center mb-2">
+                      <TrendingUp className="h-5 w-5 mr-3 text-emerald-600" />
+                      <span className="font-semibold text-gray-900">
+                        All to Unassigned Cash
+                      </span>
                     </div>
+                    <p className="text-sm text-gray-600">
+                      Put the entire paycheck into unassigned cash for manual
+                      allocation later
+                    </p>
                   </div>
-                </div>
+                </label>
               </div>
             </div>
 
