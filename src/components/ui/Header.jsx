@@ -50,7 +50,7 @@ const Header = memo(
               src={logoWithText}
               alt="VioletVault Logo"
               loading="lazy"
-              className="h-48 sm:h-60 md:h-72 lg:h-84 xl:h-96 2xl:h-[27rem] w-auto max-w-full object-contain"
+              className="h-40 sm:h-52 md:h-64 lg:h-72 xl:h-80 2xl:h-96 w-auto max-w-full object-contain"
               style={{
                 imageRendering: "high-quality",
               }}
