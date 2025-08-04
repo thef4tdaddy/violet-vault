@@ -140,46 +140,49 @@ const PaycheckProcessor = ({
                 <Calculator className="h-4 w-4 inline mr-2" />
                 How should this be allocated?
               </label>
-              <div className="space-y-4">
-                <label className="glassmorphism flex items-start space-x-4 p-6 border-2 border-white/20 rounded-2xl cursor-pointer hover:border-purple-300 transition-all">
+              <div className="space-y-3">
+                <label className="glassmorphism flex items-start space-x-3 p-4 border-2 border-white/20 rounded-xl cursor-pointer hover:border-purple-300 transition-all">
                   <input
                     type="radio"
                     value="allocate"
                     checked={allocationMode === "allocate"}
                     onChange={(e) => setAllocationMode(e.target.value)}
-                    className="mt-1 w-5 h-5 text-purple-600"
+                    className="mt-0.5 w-4 h-4 text-purple-600"
                     disabled={isProcessing}
                   />
                   <div className="flex-1">
-                    <div className="flex items-center mb-2">
-                      <Wallet className="h-5 w-5 mr-3 text-purple-600" />
-                      <span className="font-semibold text-gray-900">
+                    <div className="flex items-center mb-1">
+                      <Wallet className="h-4 w-4 mr-2 text-purple-600" />
+                      <span className="font-medium text-gray-900">
                         Auto-allocate to Bill Envelopes
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600">
-                      Fill up bill envelopes based on their biweekly needs, then put leftovers in
-                      unassigned cash
+                    <p className="text-xs text-gray-600 leading-tight">
+                      Fill up bill envelopes based on biweekly needs,
+                      <br />
+                      then put leftovers in unassigned cash
                     </p>
                   </div>
                 </label>
 
-                <label className="glassmorphism flex items-start space-x-4 p-6 border-2 border-white/20 rounded-2xl cursor-pointer hover:border-emerald-300 transition-all">
+                <label className="glassmorphism flex items-start space-x-3 p-4 border-2 border-white/20 rounded-xl cursor-pointer hover:border-emerald-300 transition-all">
                   <input
                     type="radio"
                     value="leftover"
                     checked={allocationMode === "leftover"}
                     onChange={(e) => setAllocationMode(e.target.value)}
-                    className="mt-1 w-5 h-5 text-emerald-600"
+                    className="mt-0.5 w-4 h-4 text-emerald-600"
                     disabled={isProcessing}
                   />
                   <div className="flex-1">
-                    <div className="flex items-center mb-2">
-                      <TrendingUp className="h-5 w-5 mr-3 text-emerald-600" />
-                      <span className="font-semibold text-gray-900">All to Unassigned Cash</span>
+                    <div className="flex items-center mb-1">
+                      <TrendingUp className="h-4 w-4 mr-2 text-emerald-600" />
+                      <span className="font-medium text-gray-900">All to Unassigned Cash</span>
                     </div>
-                    <p className="text-sm text-gray-600">
-                      Put the entire paycheck into unassigned cash for manual allocation later
+                    <p className="text-xs text-gray-600 leading-tight">
+                      Put entire paycheck into unassigned cash
+                      <br />
+                      for manual allocation later
                     </p>
                   </div>
                 </label>
