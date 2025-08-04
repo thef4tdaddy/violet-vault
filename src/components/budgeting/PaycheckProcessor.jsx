@@ -9,6 +9,15 @@ import {
   Clock,
   CheckCircle,
 } from "lucide-react";
+import {
+  DollarSign,
+  User,
+  Wallet,
+  Calculator,
+  TrendingUp,
+  Clock,
+  CheckCircle,
+} from "lucide-react";
 
 const PaycheckProcessor = ({
   envelopes = [],
@@ -152,55 +161,46 @@ const PaycheckProcessor = ({
                 How should this be allocated?
               </label>
               <div className="space-y-2">
-                <div className="glassmorphism border-2 border-white/20 rounded-xl hover:border-purple-300 transition-all p-2">
-                  <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
-                    <input
-                      type="radio"
-                      value="allocate"
-                      checked={allocationMode === "allocate"}
-                      onChange={(e) => setAllocationMode(e.target.value)}
-                      className="w-4 h-4 text-purple-600 mt-0.5 justify-self-start"
-                      disabled={isProcessing}
-                    />
-                    <div>
-                      <div className="flex items-center mb-1">
-                        <Wallet className="h-4 w-4 text-purple-600 mr-2" />
-                        <span className="font-medium text-gray-900 text-sm">
-                          Auto-allocate to Bill Envelopes
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-600 leading-tight ml-6">
-                        Fill bill envelopes by biweekly needs, leftover to
-                        unassigned
-                      </p>
+                <label className="glassmorphism flex items-center p-2 border-2 border-white/20 rounded-xl cursor-pointer hover:border-purple-300 transition-all">
+                  <input
+                    type="radio"
+                    value="allocate"
+                    checked={allocationMode === "allocate"}
+                    onChange={(e) => setAllocationMode(e.target.value)}
+                    className="w-4 h-4 text-purple-600 mr-3"
+                    disabled={isProcessing}
+                  />
+                  <Wallet className="h-4 w-4 text-purple-600 mr-2" />
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900 text-sm">
+                      Auto-allocate to Bill Envelopes
                     </div>
+                    <p className="text-xs text-gray-600 leading-tight">
+                      Fill bill envelopes by biweekly needs, leftover to
+                      unassigned
+                    </p>
                   </div>
-                </div>
+                </label>
 
-                <div className="glassmorphism border-2 border-white/20 rounded-xl hover:border-emerald-300 transition-all p-2">
-                  <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
-                    <input
-                      type="radio"
-                      value="leftover"
-                      checked={allocationMode === "leftover"}
-                      onChange={(e) => setAllocationMode(e.target.value)}
-                      className="w-4 h-4 text-emerald-600 mt-0.5 justify-self-start"
-                      disabled={isProcessing}
-                    />
-                    <div>
-                      <div className="flex items-center mb-1">
-                        <TrendingUp className="h-4 w-4 text-emerald-600 mr-2" />
-                        <span className="font-medium text-gray-900 text-sm">
-                          All to Unassigned Cash
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-600 leading-tight ml-6">
-                        Put entire paycheck into unassigned for manual
-                        allocation
-                      </p>
+                <label className="glassmorphism flex items-center p-2 border-2 border-white/20 rounded-xl cursor-pointer hover:border-emerald-300 transition-all">
+                  <input
+                    type="radio"
+                    value="leftover"
+                    checked={allocationMode === "leftover"}
+                    onChange={(e) => setAllocationMode(e.target.value)}
+                    className="w-4 h-4 text-emerald-600 mr-3"
+                    disabled={isProcessing}
+                  />
+                  <TrendingUp className="h-4 w-4 text-emerald-600 mr-2" />
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900 text-sm">
+                      All to Unassigned Cash
                     </div>
+                    <p className="text-xs text-gray-600 leading-tight">
+                      Put entire paycheck into unassigned for manual allocation
+                    </p>
                   </div>
-                </div>
+                </label>
               </div>
             </div>
 
@@ -252,11 +252,20 @@ const PaycheckProcessor = ({
                 <p className="text-sm mt-2">
                   See exactly where your money will go
                 </p>
+                <p className="text-lg font-medium">
+                  Enter amount and click "Preview Allocation"
+                </p>
+                <p className="text-sm mt-2">
+                  See exactly where your money will go
+                </p>
               </div>
             ) : (
               <div className="space-y-6">
                 <div className="glassmorphism rounded-2xl p-6 border border-white/20">
                   <div className="flex justify-between items-center mb-3">
+                    <span className="font-semibold text-gray-700">
+                      Total Paycheck:
+                    </span>
                     <span className="font-semibold text-gray-700">
                       Total Paycheck:
                     </span>
@@ -280,7 +289,45 @@ const PaycheckProcessor = ({
                           const allocation =
                             preview.allocations[envelope.id] || 0;
                           if (allocation === 0) return null;
+                          {
+                            preview.mode === "allocate" &&
+                              Object.keys(preview.allocations).length > 0 && (
+                                <div className="glassmorphism rounded-2xl p-6 border border-white/20">
+                                  <h4 className="font-semibold mb-4 text-purple-900">
+                                    Envelope Allocations:
+                                  </h4>
+                                  <div className="space-y-3">
+                                    {envelopes.map((envelope) => {
+                                      const allocation =
+                                        preview.allocations[envelope.id] || 0;
+                                      if (allocation === 0) return null;
 
+                                      return (
+                                        <div
+                                          key={envelope.id}
+                                          className="flex justify-between items-center p-3 bg-purple-50 rounded-xl"
+                                        >
+                                          <div className="flex items-center">
+                                            <div
+                                              className="w-3 h-3 rounded-full mr-3"
+                                              style={{
+                                                backgroundColor: envelope.color,
+                                              }}
+                                            />
+                                            <span className="font-medium text-gray-900">
+                                              {envelope.name}
+                                            </span>
+                                          </div>
+                                          <span className="font-bold text-purple-600">
+                                            ${allocation.toFixed(2)}
+                                          </span>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              );
+                          }
                           return (
                             <div
                               key={envelope.id}
@@ -308,6 +355,12 @@ const PaycheckProcessor = ({
                 <div className="bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-2xl p-6 text-white">
                   <div className="flex justify-between items-center">
                     <div>
+                      <span className="font-medium opacity-90">
+                        Unassigned Cash:
+                      </span>
+                      <div className="text-sm opacity-75 mt-1">
+                        Available for manual allocation
+                      </div>
                       <span className="font-medium opacity-90">
                         Unassigned Cash:
                       </span>
@@ -355,9 +408,15 @@ const PaycheckProcessor = ({
                     <div className="font-semibold text-gray-900 text-lg">
                       {paycheck.payerName}
                     </div>
+                    <div className="font-semibold text-gray-900 text-lg">
+                      {paycheck.payerName}
+                    </div>
                     <div className="text-sm text-gray-600">
                       {new Date(paycheck.date).toLocaleDateString()} •
                       <span className="ml-1 font-medium">
+                        {paycheck.mode === "allocate"
+                          ? "Auto-allocated"
+                          : "To unassigned"}
                         {paycheck.mode === "allocate"
                           ? "Auto-allocated"
                           : "To unassigned"}
