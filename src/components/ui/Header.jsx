@@ -29,26 +29,26 @@ const Header = memo(
       setShowPasswordModal((prev) => !prev);
     }, []);
     return (
-      <div className="glassmorphism rounded-3xl p-4 mb-6">
-        <div className="flex flex-col items-center text-center space-y-4">
+      <div className="glassmorphism rounded-3xl mb-6">
+        <div className="flex flex-col items-center text-center">
           {/* Logo and tagline */}
           <div className="flex flex-col items-center w-full">
             <img
               src={logoWithText}
               alt="VioletVault Logo"
               loading="lazy"
-              className="h-72 sm:h-96 md:h-[28rem] lg:h-[36rem] xl:h-[44rem] 2xl:h-[52rem] w-auto max-w-full object-contain px-2"
+              className="h-72 sm:h-96 md:h-[28rem] lg:h-[36rem] xl:h-[44rem] 2xl:h-[52rem] w-auto max-w-full object-contain"
               style={{
                 imageRendering: "high-quality",
               }}
             />
-            <p className="text-gray-600 text-sm mt-2 font-medium">
+            <p className="text-gray-600 text-sm font-medium -mt-4">
               Encryption First, Family Budgeting Management
             </p>
           </div>
 
           {/* Buttons row */}
-          <div className="flex items-center justify-center flex-wrap gap-4">
+          <div className="flex items-center justify-center flex-wrap gap-4 p-4">
             <UserIndicator
               currentUser={currentUser}
               onUserChange={onUserChange}
