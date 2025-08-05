@@ -78,6 +78,7 @@ const storeInitializer = (set, get) => ({
   biweeklyAllocation: 0,
   paycheckHistory: [], // Paycheck history for payday predictions
   actualBalance: 0, // Real bank account balance
+  isActualBalanceManual: false, // Track if balance was manually set
   isOnline: true, // Add isOnline state, default to true
   dataLoaded: false,
 
@@ -295,9 +296,10 @@ const storeInitializer = (set, get) => ({
     }),
 
   // Actual balance management
-  setActualBalance: (balance) =>
+  setActualBalance: (balance, isManual = true) =>
     set((state) => {
       state.actualBalance = balance;
+      state.isActualBalanceManual = isManual;
     }),
 
   // Reconcile transaction (placeholder - implement based on your needs)
@@ -344,6 +346,7 @@ const storeInitializer = (set, get) => ({
       state.biweeklyAllocation = 0;
       state.paycheckHistory = [];
       state.actualBalance = 0;
+      state.isActualBalanceManual = false;
       state.isOnline = true; // Also reset isOnline status
       state.dataLoaded = false;
     }),
@@ -372,6 +375,7 @@ if (LOCAL_ONLY_MODE) {
           biweeklyAllocation: state.biweeklyAllocation,
           paycheckHistory: state.paycheckHistory,
           actualBalance: state.actualBalance,
+          isActualBalanceManual: state.isActualBalanceManual,
         }),
       }),
       { name: "violet-vault-devtools" }
