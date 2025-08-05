@@ -6,14 +6,14 @@ This document outlines the branch protection rules, workflow configurations, and
 
 ## 📋 Table of Contents
 
-- [Branch Structure](#branch-structure)
-- [Branch Protection Rules](#branch-protection-rules)
-- [Commit Message Conventions](#commit-message-conventions)
-- [Pull Request Rules](#pull-request-rules)
-- [Workflow Automation](#workflow-automation)
-- [Development Workflow](#development-workflow)
-- [Troubleshooting](#troubleshooting)
-- [Examples](#examples)
+- [Branch Structure](#-branch-structure)
+- [Branch Protection Rules](#️-branch-protection-rules)
+- [Commit Message Conventions](#-commit-message-conventions)
+- [Pull Request Rules](#-pull-request-rules)
+- [Workflow Automation](#️-workflow-automation)
+- [Development Workflow](#-development-workflow)
+- [Troubleshooting](#-troubleshooting)
+- [Examples](#-examples)
 
 ---
 
@@ -38,7 +38,7 @@ This document outlines the branch protection rules, workflow configurations, and
 
 ### **Main Branch (`main`)**
 
-#### **Protection Settings:**
+#### **Main Branch Protection Settings:**
 
 - ✅ **Branch protection enabled**
 - ✅ **Require status checks before merging**
@@ -73,7 +73,7 @@ revert:    # Reverting previous commits
 
 ### **Develop Branch (`develop`)**
 
-#### **Protection Settings:**
+#### **Develop Branch Protection Settings:**
 
 - ✅ **Branch protection enabled**
 - ✅ **Require status checks before merging**
@@ -104,7 +104,7 @@ We follow **Conventional Commits** specification with specific prefixes:
 
 ### **Format:**
 
-```
+```text
 <type>: <description>
 
 [optional body]
@@ -271,7 +271,7 @@ git merge fix/critical-bug
 
 #### **"Branch protection rule violations" Error**
 
-```
+```text
 remote: error: GH013: Repository rule violations found for refs/heads/main
 remote: - Required status check "check-commits" is expected
 ```
@@ -290,7 +290,7 @@ remote: - Required status check "check-commits" is expected
 
 #### **"Pull request blocked" Error**
 
-```
+```text
 🚫 Only pull requests from the 'develop' branch are allowed to merge into 'main'
 ```
 
