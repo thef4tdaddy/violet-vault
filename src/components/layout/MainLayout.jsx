@@ -28,17 +28,26 @@ import {
 } from "lucide-react";
 import SyncStatusIndicators from "../sync/SyncStatusIndicators";
 import ConflictResolutionModal from "../sync/ConflictResolutionModal";
+import SummaryCards from "./SummaryCards";
 
 // Lazy load heavy components for better performance
 const PaycheckProcessor = lazy(() => import("../budgeting/PaycheckProcessor"));
 const EnvelopeGrid = lazy(() => import("../budgeting/EnvelopeGrid"));
-const SmartEnvelopeSuggestions = lazy(() => import("../budgeting/SmartEnvelopeSuggestions"));
+const SmartEnvelopeSuggestions = lazy(
+  () => import("../budgeting/SmartEnvelopeSuggestions"),
+);
 const BillManager = lazy(() => import("../bills/BillManager"));
 const SavingsGoals = lazy(() => import("../savings/SavingsGoals"));
 const Dashboard = lazy(() => import("../pages/MainDashboard"));
-const TransactionLedger = lazy(() => import("../transactions/TransactionLedger"));
-const ChartsAndAnalytics = lazy(() => import("../analytics/ChartsAndAnalytics"));
-const SupplementalAccounts = lazy(() => import("../accounts/SupplementalAccounts"));
+const TransactionLedger = lazy(
+  () => import("../transactions/TransactionLedger"),
+);
+const ChartsAndAnalytics = lazy(
+  () => import("../analytics/ChartsAndAnalytics"),
+);
+const SupplementalAccounts = lazy(
+  () => import("../accounts/SupplementalAccounts"),
+);
 
 const Layout = () => {
   logger.debug("Layout component is running");
@@ -56,7 +65,8 @@ const Layout = () => {
     handleUpdateProfile,
   } = useAuthFlow();
 
-  const { exportData, importData, resetEncryptionAndStartFresh } = useDataManagement();
+  const { exportData, importData, resetEncryptionAndStartFresh } =
+    useDataManagement();
 
   const {
     rotationDue,
@@ -130,7 +140,9 @@ const Layout = () => {
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="glassmorphism rounded-2xl p-6 w-full max-w-md border border-white/30 shadow-2xl">
             <h3 className="text-xl font-semibold mb-4">Password Expired</h3>
-            <p className="text-gray-700 mb-4">For security, please set a new password.</p>
+            <p className="text-gray-700 mb-4">
+              For security, please set a new password.
+            </p>
             <input
               type="password"
               value={newPassword}
@@ -184,7 +196,12 @@ const MainContent = ({
   const [activeView, setActiveView] = useState("dashboard");
 
   // Custom hooks for MainContent business logic
-  const { handleManualSync } = useFirebaseSync(firebaseSync, encryptionKey, budgetId, currentUser);
+  const { handleManualSync } = useFirebaseSync(
+    firebaseSync,
+    encryptionKey,
+    budgetId,
+    currentUser,
+  );
 
   // Handle import by saving data then loading into context
   const handleImport = async (event) => {
@@ -220,22 +237,41 @@ const MainContent = ({
   const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
 
   // Calculate total biweekly funding need across all envelope types
-  const totalBiweeklyNeed = Array.isArray(envelopes) 
+  const totalBiweeklyNeed = Array.isArray(envelopes)
     ? envelopes.reduce((sum, env) => {
         // Auto-classify envelope type if not set
-        const envelopeType = env.envelopeType || (env.category && ['Bills & Utilities', 'Health & Medical', 'Transportation', 'Education'].includes(env.category) ? 'bill' : 'variable');
-        
+        const envelopeType =
+          env.envelopeType ||
+          (env.category &&
+          [
+            "Bills & Utilities",
+            "Health & Medical",
+            "Transportation",
+            "Education",
+          ].includes(env.category)
+            ? "bill"
+            : "variable");
+
         let biweeklyNeed = 0;
-        if (envelopeType === 'bill' && env.biweeklyAllocation) {
-          biweeklyNeed = Math.max(0, env.biweeklyAllocation - env.currentBalance);
-        } else if (envelopeType === 'variable' && env.monthlyBudget) {
+        if (envelopeType === "bill" && env.biweeklyAllocation) {
+          biweeklyNeed = Math.max(
+            0,
+            env.biweeklyAllocation - env.currentBalance,
+          );
+        } else if (envelopeType === "variable" && env.monthlyBudget) {
           const biweeklyTarget = env.monthlyBudget / 2;
           biweeklyNeed = Math.max(0, biweeklyTarget - env.currentBalance);
-        } else if (envelopeType === 'savings' && env.targetAmount) {
-          const remainingToTarget = Math.max(0, env.targetAmount - env.currentBalance);
-          biweeklyNeed = Math.min(remainingToTarget, env.biweeklyAllocation || 0);
+        } else if (envelopeType === "savings" && env.targetAmount) {
+          const remainingToTarget = Math.max(
+            0,
+            env.targetAmount - env.currentBalance,
+          );
+          biweeklyNeed = Math.min(
+            remainingToTarget,
+            env.biweeklyAllocation || 0,
+          );
         }
-        
+
         return sum + biweeklyNeed;
       }, 0)
     : 0;
@@ -341,40 +377,20 @@ const MainContent = ({
           </nav>
         </div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <SummaryCard
-            key="total-cash"
-            icon={Wallet}
-            label="Total Cash"
-            value={totalCash}
-            color="purple"
-          />
-          <SummaryCard
-            key="unassigned-cash"
-            icon={TrendingUp}
-            label="Unassigned Cash"
-            value={unassignedCash}
-            color="emerald"
-          />
-          <SummaryCard
-            key="savings-total"
-            icon={Target}
-            label="Savings Total"
-            value={totalSavingsBalance}
-            color="cyan"
-          />
-          <SummaryCard
-            key="biweekly-need"
-            icon={DollarSign}
-            label="Biweekly Need"
-            value={totalBiweeklyNeed}
-            color="amber"
-          />
-        </div>
+        {/* Summary Cards - Enhanced with clickable unassigned cash distribution */}
+        <SummaryCards
+          totalCash={totalCash}
+          unassignedCash={unassignedCash}
+          totalSavingsBalance={totalSavingsBalance}
+          biweeklyAllocation={totalBiweeklyNeed}
+        />
 
         {/* Main Content */}
-        <ViewRenderer activeView={activeView} budget={budget} currentUser={currentUser} />
+        <ViewRenderer
+          activeView={activeView}
+          budget={budget}
+          currentUser={currentUser}
+        />
 
         <SyncStatusIndicators isOnline={isOnline} isSyncing={isSyncing} />
         <ConflictResolutionModal
@@ -387,10 +403,14 @@ const MainContent = ({
         <div className="mt-8 text-center">
           <div className="glassmorphism rounded-2xl p-4 max-w-md mx-auto">
             <p className="text-sm text-gray-600">
-              <span className="font-semibold text-purple-600">{getVersionInfo().displayName}</span>{" "}
+              <span className="font-semibold text-purple-600">
+                {getVersionInfo().displayName}
+              </span>{" "}
               v{getVersionInfo().version}
             </p>
-            <p className="text-xs text-gray-500 mt-1">Built with ❤️ for secure budgeting</p>
+            <p className="text-xs text-gray-500 mt-1">
+              Built with ❤️ for secure budgeting
+            </p>
           </div>
         </div>
       </div>
@@ -412,40 +432,7 @@ const NavButton = ({ active, onClick, icon: Icon, label }) => (
   </button>
 );
 
-const SummaryCard = ({ icon: Icon, label, value, color }) => {
-  const colorClasses = {
-    purple: "bg-purple-500",
-    emerald: "bg-emerald-500",
-    cyan: "bg-cyan-500",
-    amber: "bg-amber-500",
-  };
-
-  const textColorClasses = {
-    purple: "text-gray-900",
-    emerald: "text-emerald-600",
-    cyan: "text-cyan-600",
-    amber: "text-amber-600",
-  };
-
-  return (
-    <div className="glassmorphism rounded-3xl p-6">
-      <div className="flex items-center">
-        <div className="relative mr-4">
-          <div
-            className={`absolute inset-0 ${colorClasses[color]} rounded-2xl blur-lg opacity-30`}
-          ></div>
-          <div className={`relative ${colorClasses[color]} p-3 rounded-2xl`}>
-            <Icon className="h-6 w-6 text-white" />
-          </div>
-        </div>
-        <div>
-          <p className="text-sm font-semibold text-gray-600 mb-1">{label}</p>
-          <p className={`text-2xl font-bold ${textColorClasses[color]}`}>${value.toFixed(2)}</p>
-        </div>
-      </div>
-    </div>
-  );
-};
+// SummaryCard component removed - now using enhanced SummaryCards component with clickable functionality
 
 const ViewRenderer = ({ activeView, budget, currentUser }) => {
   const {
@@ -478,9 +465,11 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
   } = budget;
 
   // Filter out null/undefined transactions to prevent runtime errors
-  const allTransactions = (rawAllTransactions || []).filter((t) => t && typeof t === "object");
+  const allTransactions = (rawAllTransactions || []).filter(
+    (t) => t && typeof t === "object",
+  );
   const safeTransactions = (transactions || []).filter(
-    (t) => t && typeof t === "object" && typeof t.amount === "number"
+    (t) => t && typeof t === "object" && typeof t.amount === "number",
   );
 
   const views = {
@@ -569,7 +558,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
             // This would integrate with email parsing or other bill detection services
             // For now, we'll show a placeholder notification
             alert(
-              "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox."
+              "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox.",
             );
           } catch (error) {
             console.error("Failed to search for new bills:", error);
@@ -590,12 +579,18 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
         onUpdateTransaction={() => {}} // Will be implemented
         onDeleteTransaction={() => {}} // Will be implemented
         onBulkImport={(newTransactions) => {
-          console.log("🔄 onBulkImport called with transactions:", newTransactions.length);
+          console.log(
+            "🔄 onBulkImport called with transactions:",
+            newTransactions.length,
+          );
           // Add transactions using budget store method
           addTransactions(newTransactions);
           const updatedTransactions = [...safeTransactions, ...newTransactions];
           setTransactions(updatedTransactions);
-          console.log("💾 Bulk import complete. Added transactions:", newTransactions.length);
+          console.log(
+            "💾 Bulk import complete. Added transactions:",
+            newTransactions.length,
+          );
         }}
         currentUser={currentUser}
       />
@@ -613,7 +608,9 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
   };
 
   return (
-    <Suspense fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}>
+    <Suspense
+      fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}
+    >
       {views[activeView]}
     </Suspense>
   );
