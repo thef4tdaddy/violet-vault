@@ -358,31 +358,33 @@ const SmartEnvelopeSuggestions = ({
   };
 
   return (
-    <div className={`glassmorphism rounded-xl p-6 ${className}`}>
+    <div
+      className={`glassmorphism rounded-xl transition-all duration-200 ${isCollapsed ? "p-3" : "p-6"} ${className}`}
+    >
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className={`flex items-center justify-between ${isCollapsed ? "mb-0" : "mb-4"}`}>
         <button
           onClick={toggleCollapse}
-          className="flex items-center text-lg font-semibold text-gray-900 hover:text-gray-700 transition-colors group"
+          className={`flex items-center font-semibold text-gray-900 hover:text-gray-700 transition-colors group ${isCollapsed ? "text-base" : "text-lg"}`}
         >
-          <div className="relative mr-3">
-            <div className="absolute inset-0 bg-amber-500 rounded-xl blur-lg opacity-30"></div>
-            <div className="relative bg-amber-500 p-2 rounded-xl">
-              <Zap className="h-4 w-4 text-white" />
+          <div className={`relative ${isCollapsed ? "mr-2" : "mr-3"}`}>
+            <div className={`absolute inset-0 bg-amber-500 rounded-xl blur-lg opacity-30`}></div>
+            <div className={`relative bg-amber-500 rounded-xl ${isCollapsed ? "p-1.5" : "p-2"}`}>
+              <Zap className={`text-white ${isCollapsed ? "h-3 w-3" : "h-4 w-4"}`} />
             </div>
           </div>
           Smart Suggestions
           <div className="ml-2 transition-transform duration-200 group-hover:scale-110">
             {isCollapsed ? (
-              <ChevronDown className="h-5 w-5 text-gray-400" />
+              <ChevronDown className={`text-gray-400 ${isCollapsed ? "h-4 w-4" : "h-5 w-5"}`} />
             ) : (
-              <ChevronUp className="h-5 w-5 text-gray-400" />
+              <ChevronUp className={`text-gray-400 ${isCollapsed ? "h-4 w-4" : "h-5 w-5"}`} />
             )}
           </div>
         </button>
 
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">
+          <span className={`text-gray-600 ${isCollapsed ? "text-xs" : "text-sm"}`}>
             {suggestions.length} recommendation
             {suggestions.length !== 1 ? "s" : ""}
           </span>
@@ -461,11 +463,11 @@ const SmartEnvelopeSuggestions = ({
             )}
           </div>
         ) : (
-          <div className="space-y-3 max-h-96 overflow-y-auto">
+          <div className="space-y-2 max-h-72 overflow-y-auto">
             {suggestions.map((suggestion) => (
               <div
                 key={suggestion.id}
-                className={`p-4 rounded-lg border-l-4 transition-all hover:shadow-sm ${
+                className={`p-3 rounded-lg border-l-3 transition-all hover:shadow-sm ${
                   suggestion.priority === "high"
                     ? "bg-red-50 border-red-400"
                     : suggestion.priority === "medium"

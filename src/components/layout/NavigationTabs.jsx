@@ -59,7 +59,7 @@ const NavigationTabs = ({ activeView, onViewChange }) => {
   ];
 
   return (
-    <div className="glassmorphism rounded-t-3xl sm:rounded-3xl mb-6 sm:shadow-xl border border-white/20 fixed bottom-0 left-0 right-0 sm:static z-40">
+    <div className="glassmorphism rounded-t-3xl sm:rounded-3xl mb-6 sm:shadow-xl border border-white/20 fixed bottom-0 left-0 right-0 sm:static z-40 overflow-hidden">
       <nav className="flex justify-around overflow-x-auto">
         {tabs.map((tab) => (
           <NavButton
@@ -78,14 +78,14 @@ const NavigationTabs = ({ activeView, onViewChange }) => {
 const NavButton = ({ active, onClick, icon: Icon, label }) => (
   <button
     onClick={onClick}
-    className={`flex-1 flex flex-col items-center sm:flex-row sm:px-6 px-2 py-3 text-xs sm:text-sm font-semibold border-t-2 sm:border-b-2 transition-all ${
+    className={`flex-1 flex flex-col items-center sm:flex-row sm:px-4 px-2 py-2 text-xs sm:text-sm font-medium border-t-2 sm:border-b-2 transition-colors relative ${
       active
         ? "border-purple-500 text-purple-600 bg-purple-50/50"
         : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30"
     }`}
   >
-    <Icon className="h-5 w-5 mb-1 sm:mb-0 sm:mr-3" />
-    <span>{label}</span>
+    <Icon className="h-4 w-4 mb-1 sm:mb-0 sm:mr-2" />
+    <span className="truncate">{label}</span>
   </button>
 );
 
