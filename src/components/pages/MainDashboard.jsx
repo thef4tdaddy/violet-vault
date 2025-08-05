@@ -53,12 +53,12 @@ const Dashboard = ({
     paycheckHistory && paycheckHistory.length >= 2 ? predictNextPayday(paycheckHistory) : null;
 
   // Use the separated business logic hook
-  const { updateActualBalance, formatCurrency, validateBalance } = useActualBalance();
+  const { updateActualBalance } = useActualBalance();
 
   const handleUpdateBalance = (newBalance) => {
-    const result = updateActualBalance(newBalance, { source: 'manual_dashboard' });
-    if (result.success) {
-      onUpdateActualBalance(result.balance);
+    const success = updateActualBalance(newBalance, { source: "manual_dashboard" });
+    if (success) {
+      onUpdateActualBalance(newBalance);
     }
   };
 

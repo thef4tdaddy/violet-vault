@@ -38,7 +38,10 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
           if (cloudData.data.paycheckHistory)
             budget.setPaycheckHistory(cloudData.data.paycheckHistory);
           if (typeof cloudData.data.actualBalance === "number")
-            budget.setActualBalance(cloudData.data.actualBalance, cloudData.data.isActualBalanceManual);
+            budget.setActualBalance(
+              cloudData.data.actualBalance,
+              cloudData.data.isActualBalanceManual
+            );
         }
       } catch (error) {
         console.warn("Failed to load cloud data:", error.message);

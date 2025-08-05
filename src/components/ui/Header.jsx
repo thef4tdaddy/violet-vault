@@ -1,12 +1,5 @@
 import { useState, memo, useCallback } from "react";
-import {
-  Upload,
-  Download,
-  AlertTriangle,
-  RefreshCw,
-  Cloud,
-  Key,
-} from "lucide-react";
+import { Upload, Download, AlertTriangle, RefreshCw, Cloud, Key } from "lucide-react";
 import UserIndicator from "../auth/UserIndicator";
 import logoWithText from "../../assets/Shield Text Logo.webp";
 import ChangePasswordModal from "../auth/ChangePasswordModal";
@@ -134,12 +127,8 @@ const Header = memo(
               <div className="flex items-start space-x-2 mb-4">
                 <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
                 <div>
-                  <div className="font-medium text-amber-800">
-                    Reset Options
-                  </div>
-                  <div className="text-sm text-amber-600 mt-1">
-                    Choose your reset option
-                  </div>
+                  <div className="font-medium text-amber-800">Reset Options</div>
+                  <div className="text-sm text-amber-600 mt-1">Choose your reset option</div>
                 </div>
               </div>
 
@@ -152,9 +141,7 @@ const Header = memo(
                   className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-gray-50 border border-gray-200"
                 >
                   <div className="font-medium">Logout Only</div>
-                  <div className="text-xs text-gray-500">
-                    Keep your data, just logout
-                  </div>
+                  <div className="text-xs text-gray-500">Keep your data, just logout</div>
                 </button>
 
                 <button
@@ -165,9 +152,7 @@ const Header = memo(
                   className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-red-50 border border-red-200 text-red-600"
                 >
                   <div className="font-medium">Clear All Data</div>
-                  <div className="text-xs text-red-500">
-                    Delete everything and start fresh
-                  </div>
+                  <div className="text-xs text-red-500">Delete everything and start fresh</div>
                 </button>
               </div>
             </div>
@@ -182,7 +167,7 @@ const Header = memo(
         )}
       </div>
     );
-  },
+  }
 );
 
 export default Header;

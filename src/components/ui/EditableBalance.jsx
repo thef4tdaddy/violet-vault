@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Edit3, Check, X, AlertTriangle } from 'lucide-react';
+import React, { useState, useRef, useEffect } from "react";
+import { Edit3, Check, X, AlertTriangle } from "lucide-react";
 
 const EditableBalance = ({
   value,
@@ -12,16 +12,16 @@ const EditableBalance = ({
   hoverClass = "hover:bg-blue-100",
   isManuallySet = false,
   confirmThreshold = 1000, // Show confirmation for changes > $1000
-  formatCurrency = true
+  formatCurrency = true,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editValue, setEditValue] = useState(value?.toString() || '0');
+  const [editValue, setEditValue] = useState(value?.toString() || "0");
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [pendingValue, setPendingValue] = useState(null);
   const inputRef = useRef(null);
 
   useEffect(() => {
-    setEditValue(value?.toString() || '0');
+    setEditValue(value?.toString() || "0");
   }, [value]);
 
   useEffect(() => {
@@ -32,21 +32,21 @@ const EditableBalance = ({
   }, [isEditing]);
 
   const formatNumber = (num) => {
-    if (!formatCurrency) return num?.toFixed(2) || '0.00';
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
+    if (!formatCurrency) return num?.toFixed(2) || "0.00";
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
     }).format(num || 0);
   };
 
   const handleStartEdit = () => {
     setIsEditing(true);
-    setEditValue(value?.toString() || '0');
+    setEditValue(value?.toString() || "0");
   };
 
   const handleCancel = () => {
     setIsEditing(false);
-    setEditValue(value?.toString() || '0');
+    setEditValue(value?.toString() || "0");
     setShowConfirmation(false);
     setPendingValue(null);
   };
@@ -75,9 +75,9 @@ const EditableBalance = ({
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleSave();
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       handleCancel();
     }
   };
@@ -85,7 +85,7 @@ const EditableBalance = ({
   const handleInputChange = (e) => {
     const inputValue = e.target.value;
     // Allow numbers, decimal point, and negative sign
-    if (inputValue === '' || /^-?\d*\.?\d*$/.test(inputValue)) {
+    if (inputValue === "" || /^-?\d*\.?\d*$/.test(inputValue)) {
       setEditValue(inputValue);
     }
   };
@@ -103,18 +103,19 @@ const EditableBalance = ({
             Confirm Large Change
           </h3>
         </div>
-        
+
         <div className="space-y-4">
           <div className="text-sm text-yellow-700">
-            <p>You're about to {isIncrease ? 'increase' : 'decrease'} your balance by:</p>
+            <p>You're about to {isIncrease ? "increase" : "decrease"} your balance by:</p>
             <p className="font-bold text-lg">
-              {isIncrease ? '+' : ''}{formatNumber(changeAmount)}
+              {isIncrease ? "+" : ""}
+              {formatNumber(changeAmount)}
             </p>
             <p className="mt-2">
               From: {formatNumber(currentValue)} → To: {formatNumber(pendingValue)}
             </p>
           </div>
-          
+
           <div className="flex gap-2">
             <button
               onClick={() => confirmSave(pendingValue)}
@@ -144,7 +145,7 @@ const EditableBalance = ({
             {title} {isManuallySet && <span className="text-xs text-gray-500">(Manual)</span>}
           </h3>
         </div>
-        
+
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <input
@@ -173,14 +174,16 @@ const EditableBalance = ({
               </button>
             </div>
           </div>
-          <p className="text-sm text-gray-600">Enter amount and press Enter to save, or Escape to cancel</p>
+          <p className="text-sm text-gray-600">
+            Enter amount and press Enter to save, or Escape to cancel
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div 
+    <div
       className={`${bgClass} rounded-lg p-6 cursor-pointer transition-colors ${hoverClass} group ${className}`}
       onClick={handleStartEdit}
     >
@@ -191,7 +194,7 @@ const EditableBalance = ({
           <Edit3 className="h-4 w-4 opacity-0 group-hover:opacity-50 transition-opacity" />
         </h3>
       </div>
-      
+
       <div className="space-y-3">
         <div className={`text-2xl font-bold ${colorClass} flex items-center justify-between`}>
           {formatNumber(value)}
@@ -199,9 +202,7 @@ const EditableBalance = ({
             <Edit3 className="h-5 w-5" />
           </div>
         </div>
-        <p className="text-sm text-gray-600 group-hover:text-gray-800">
-          {subtitle}
-        </p>
+        <p className="text-sm text-gray-600 group-hover:text-gray-800">{subtitle}</p>
       </div>
     </div>
   );
