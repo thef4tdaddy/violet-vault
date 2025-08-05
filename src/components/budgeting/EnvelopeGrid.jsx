@@ -22,6 +22,7 @@ import {
   Eye,
   Settings,
   Filter,
+  Calculator,
 } from "lucide-react";
 import CreateEnvelopeModal from "./CreateEnvelopeModal";
 import EditEnvelopeModal from "./EditEnvelopeModal";
@@ -201,14 +202,32 @@ const UnifiedEnvelopeManager = ({
 
   const totals = useMemo(() => {
     return envelopeData.reduce(
-      (acc, env) => ({
-        allocated: acc.allocated + env.allocated,
-        currentBalance: acc.currentBalance + env.currentBalance,
-        spent: acc.spent + env.totalSpent,
-        upcoming: acc.upcoming + env.totalUpcoming,
-        overdue: acc.overdue + env.totalOverdue,
-        available: acc.available + env.available,
-      }),
+      (acc, env) => {
+        const envelopeType = env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
+        
+        // Calculate biweekly funding need for each envelope type
+        let biweeklyNeed = 0;
+        if (envelopeType === ENVELOPE_TYPES.BILL && env.biweeklyAllocation) {
+          biweeklyNeed = Math.max(0, env.biweeklyAllocation - env.currentBalance);
+        } else if (envelopeType === ENVELOPE_TYPES.VARIABLE && env.monthlyBudget) {
+          const biweeklyTarget = env.monthlyBudget / 2;
+          biweeklyNeed = Math.max(0, biweeklyTarget - env.currentBalance);
+        } else if (envelopeType === ENVELOPE_TYPES.SAVINGS && env.targetAmount) {
+          // For savings, calculate a reasonable biweekly contribution (could be customizable)
+          const remainingToTarget = Math.max(0, env.targetAmount - env.currentBalance);
+          biweeklyNeed = Math.min(remainingToTarget, env.biweeklyAllocation || 0);
+        }
+
+        return {
+          allocated: acc.allocated + env.allocated,
+          currentBalance: acc.currentBalance + env.currentBalance,
+          spent: acc.spent + env.totalSpent,
+          upcoming: acc.upcoming + env.totalUpcoming,
+          overdue: acc.overdue + env.totalOverdue,
+          available: acc.available + env.available,
+          biweeklyNeed: acc.biweeklyNeed + biweeklyNeed,
+        };
+      },
       {
         allocated: 0,
         currentBalance: 0,
@@ -216,6 +235,7 @@ const UnifiedEnvelopeManager = ({
         upcoming: 0,
         overdue: 0,
         available: 0,
+        biweeklyNeed: 0,
       }
     );
   }, [envelopeData]);
@@ -276,10 +296,13 @@ const UnifiedEnvelopeManager = ({
         <div className="bg-white/60 backdrop-blur-sm p-4 rounded-lg border border-white/20">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Budget Allocated</p>
-              <p className="text-2xl font-bold text-gray-900">${totals.allocated.toFixed(2)}</p>
+              <p className="text-sm text-gray-600">Biweekly Funding Need</p>
+              <p className="text-2xl font-bold text-purple-600">${totals.biweeklyNeed.toFixed(2)}</p>
             </div>
-            <Target className="h-8 w-8 text-gray-400" />
+            <Calculator className="h-8 w-8 text-purple-400" />
+          </div>
+          <div className="mt-2">
+            <p className="text-xs text-gray-500">Total needed for all envelope types</p>
           </div>
         </div>
 
