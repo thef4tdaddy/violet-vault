@@ -38,15 +38,23 @@ Flexbox's `items-center` and centering behaviors override attempts to position r
         <Icon className="h-4 w-4 mr-2" />
         <span className="font-medium text-sm">Option Label</span>
       </div>
+<<<<<<< HEAD
+      <p className="text-xs text-gray-600 leading-tight ml-6">Description text</p>
+=======
       <p className="text-xs text-gray-600 leading-tight ml-6">
         Description text
       </p>
+>>>>>>> origin/develop
     </div>
   </div>
 </div>
 ```
 
 ### Key CSS Grid Properties
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/develop
 - `grid-cols-[auto_1fr]`: Auto-sized first column for radio, remaining space for content
 - `justify-self-start`: Forces radio button to absolute left of its grid cell
 - `gap-3`: Consistent spacing between radio and content
@@ -54,12 +62,27 @@ Flexbox's `items-center` and centering behaviors override attempts to position r
 - `mt-0.5`: Aligns radio button with first line of text
 
 ### When to Use This Pattern
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/develop
 - Radio button groups
 - Checkbox lists
 - Any form input that needs to be positioned at the absolute left edge
 - Components where flexbox centering is causing layout issues
 
 ### Components Using This Pattern
+<<<<<<< HEAD
+
+- `PaycheckProcessor.jsx` - Allocation mode selection (commit: 658c91a)
+
+### Notes
+
+- This pattern eliminates the recurring radio button centering issue
+- CSS Grid provides absolute positioning control that flexbox lacks
+- Use `justify-self-start` to ensure elements stick to the left edge
+- Always test with different content lengths to ensure consistency
+=======
 - `PaycheckProcessor.jsx` - Allocation mode selection (commit: 658c91a)
 
 ### Notes
@@ -67,3 +90,4 @@ Flexbox's `items-center` and centering behaviors override attempts to position r
 - CSS Grid provides absolute positioning control that flexbox lacks
 - Use `justify-self-start` to ensure elements stick to the left edge
 - Always test with different content lengths to ensure consistency
+>>>>>>> origin/develop

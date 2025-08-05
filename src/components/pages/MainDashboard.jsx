@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import PaydayPrediction from "../budgeting/PaydayPrediction";
 import { predictNextPayday } from "../../utils/paydayPredictor";
+import EditableBalance from "../ui/EditableBalance";
+import { useActualBalance } from "../../hooks/useActualBalance";
 
 const Dashboard = ({
   envelopes,
@@ -50,8 +52,14 @@ const Dashboard = ({
   const paydayPrediction =
     paycheckHistory && paycheckHistory.length >= 2 ? predictNextPayday(paycheckHistory) : null;
 
+  // Use the separated business logic hook
+  const { updateActualBalance } = useActualBalance();
+
   const handleUpdateBalance = (newBalance) => {
-    onUpdateActualBalance(parseFloat(newBalance) || 0);
+    const success = updateActualBalance(newBalance, { source: "manual_dashboard" });
+    if (success) {
+      onUpdateActualBalance(newBalance);
+    }
   };
 
   const handleReconcileTransaction = () => {
@@ -112,17 +120,15 @@ const Dashboard = ({
               <h3 className="font-medium text-blue-900">Actual Bank Balance</h3>
               <CreditCard className="h-5 w-5 text-blue-600" />
             </div>
-            <div className="space-y-3">
-              <input
-                type="number"
-                step="0.01"
-                value={actualBalance}
-                onChange={(e) => handleUpdateBalance(e.target.value)}
-                className="w-full text-2xl font-bold bg-transparent border-none text-blue-900 focus:outline-none"
-                placeholder="0.00"
-              />
-              <p className="text-sm text-blue-700">Enter your current checking account balance</p>
-            </div>
+            <EditableBalance
+              value={actualBalance}
+              onChange={handleUpdateBalance}
+              title="Bank Balance"
+              subtitle="Click to edit your current checking account balance"
+              className="text-blue-900"
+              currencyClassName="text-2xl font-bold text-blue-900"
+              subtitleClassName="text-sm text-blue-700"
+            />
           </div>
 
           {/* Virtual Balance */}
