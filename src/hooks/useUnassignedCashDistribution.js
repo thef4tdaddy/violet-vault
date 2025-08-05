@@ -1,0 +1,191 @@
+import { useState, useCallback, useMemo } from "react";
+import { useBudget } from "./useBudget";
+
+/**
+ * Custom hook for managing unassigned cash distribution logic
+ * Handles distribution calculations, validation, and envelope updates
+ */
+const useUnassignedCashDistribution = () => {
+  const budget = useBudget();
+  const { envelopes, unassignedCash, bulkUpdateEnvelopes, setUnassignedCash } =
+    budget;
+
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [distributions, setDistributions] = useState({});
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Calculate total being distributed
+  const totalDistributed = useMemo(() => {
+    return Object.values(distributions).reduce(
+      (sum, amount) => sum + (parseFloat(amount) || 0),
+      0,
+    );
+  }, [distributions]);
+
+  // Calculate remaining unassigned cash
+  const remainingCash = useMemo(() => {
+    return unassignedCash - totalDistributed;
+  }, [unassignedCash, totalDistributed]);
+
+  // Validation
+  const isValidDistribution = useMemo(() => {
+    return totalDistributed > 0 && totalDistributed <= unassignedCash;
+  }, [totalDistributed, unassignedCash]);
+
+  // Open modal and reset distributions
+  const openModal = useCallback(() => {
+    setDistributions({});
+    setIsModalOpen(true);
+  }, []);
+
+  // Close modal
+  const closeModal = useCallback(() => {
+    setIsModalOpen(false);
+    setDistributions({});
+    setIsProcessing(false);
+  }, []);
+
+  // Update distribution amount for a specific envelope
+  const updateDistribution = useCallback((envelopeId, amount) => {
+    const numericAmount = parseFloat(amount) || 0;
+    setDistributions((prev) => ({
+      ...prev,
+      [envelopeId]: Math.max(0, numericAmount),
+    }));
+  }, []);
+
+  // Clear all distributions
+  const clearDistributions = useCallback(() => {
+    setDistributions({});
+  }, []);
+
+  // Distribute equally among all envelopes
+  const distributeEqually = useCallback(() => {
+    if (envelopes.length === 0) return;
+
+    const amountPerEnvelope =
+      Math.floor((unassignedCash * 100) / envelopes.length) / 100;
+    const newDistributions = {};
+
+    envelopes.forEach((envelope) => {
+      newDistributions[envelope.id] = amountPerEnvelope;
+    });
+
+    setDistributions(newDistributions);
+  }, [envelopes, unassignedCash]);
+
+  // Distribute proportionally based on monthly budgets
+  const distributeProportionally = useCallback(() => {
+    if (envelopes.length === 0) return;
+
+    const totalMonthlyBudget = envelopes.reduce(
+      (sum, env) => sum + (env.monthlyAmount || 0),
+      0,
+    );
+
+    if (totalMonthlyBudget === 0) {
+      // Fallback to equal distribution if no monthly budgets set
+      distributeEqually();
+      return;
+    }
+
+    const newDistributions = {};
+
+    envelopes.forEach((envelope) => {
+      const monthlyBudget = envelope.monthlyAmount || 0;
+      const proportion = monthlyBudget / totalMonthlyBudget;
+      const amount = Math.floor(unassignedCash * proportion * 100) / 100;
+      newDistributions[envelope.id] = amount;
+    });
+
+    setDistributions(newDistributions);
+  }, [envelopes, unassignedCash, distributeEqually]);
+
+  // Apply the distribution to envelopes
+  const applyDistribution = useCallback(async () => {
+    if (!isValidDistribution) return;
+
+    setIsProcessing(true);
+
+    try {
+      // Prepare envelope updates
+      const envelopeUpdates = [];
+
+      Object.entries(distributions).forEach(([envelopeId, amount]) => {
+        const distributionAmount = parseFloat(amount) || 0;
+        if (distributionAmount > 0) {
+          const envelope = envelopes.find((env) => env.id === envelopeId);
+          if (envelope) {
+            envelopeUpdates.push({
+              id: envelopeId,
+              currentAmount: (envelope.currentAmount || 0) + distributionAmount,
+            });
+          }
+        }
+      });
+
+      // Apply updates
+      if (envelopeUpdates.length > 0) {
+        bulkUpdateEnvelopes(envelopeUpdates);
+        setUnassignedCash(remainingCash);
+      }
+
+      // Close modal
+      closeModal();
+    } catch (error) {
+      console.error("Error applying distribution:", error);
+      setIsProcessing(false);
+    }
+  }, [
+    isValidDistribution,
+    distributions,
+    envelopes,
+    bulkUpdateEnvelopes,
+    setUnassignedCash,
+    remainingCash,
+    closeModal,
+  ]);
+
+  // Get distribution preview data
+  const getDistributionPreview = useCallback(() => {
+    return envelopes
+      .map((envelope) => {
+        const distributionAmount = distributions[envelope.id] || 0;
+        return {
+          ...envelope,
+          distributionAmount,
+          newBalance: (envelope.currentAmount || 0) + distributionAmount,
+        };
+      })
+      .filter((envelope) => envelope.distributionAmount > 0);
+  }, [envelopes, distributions]);
+
+  return {
+    // State
+    isModalOpen,
+    distributions,
+    isProcessing,
+
+    // Calculations
+    totalDistributed,
+    remainingCash,
+    isValidDistribution,
+
+    // Actions
+    openModal,
+    closeModal,
+    updateDistribution,
+    clearDistributions,
+    distributeEqually,
+    distributeProportionally,
+    applyDistribution,
+
+    // Data
+    envelopes,
+    unassignedCash,
+    getDistributionPreview,
+  };
+};
+
+export default useUnassignedCashDistribution;
