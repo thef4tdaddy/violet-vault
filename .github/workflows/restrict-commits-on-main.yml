@@ -33,7 +33,7 @@ jobs:
             echo "✅ Skipping commit check for trusted automation actor: ${{ github.actor }}"
             exit 0
           fi
-          ALLOWED="^(fix|docs|style|ci|revert):"
+          ALLOWED="^(fix|docs|chore\(main\)|ci|revert):"
           PR_NUMBER=${{ github.event.pull_request.number }}
           REPO=${{ github.repository }}
           gh pr view "$PR_NUMBER" --repo "$REPO" --json commits -q '.commits[].message' > commits.txt
@@ -44,7 +44,7 @@ jobs:
             if ! echo "$msg" | grep -Eq "$ALLOWED"; then
               echo "❌ Disallowed commit message:"
               echo "   \"$msg\""
-              echo "🔒 Only fix:, docs:, ci:, and revert: commit types are allowed to be pushed directly to main."
+              echo "🔒 Only fix:, docs:, chore(main):, ci:, and revert: commit types are allowed to be pushed directly to main."
               echo "👉 Please open a PR to develop instead for feature, style, or other changes."
               DISALLOWED=1
             fi
