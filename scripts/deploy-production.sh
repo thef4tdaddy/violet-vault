@@ -19,9 +19,12 @@ echo -e "${BLUE}====================================${NC}"
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 if [ "$current_branch" != "main" ]; then
   echo -e "${RED}❌ Production deployments must be from 'main' branch. Current: '$current_branch'${NC}"
-  echo -e "${YELLOW}💡 Switch to main or use staging deployment instead${NC}"
+  echo -e "${YELLOW}💡 Use: git checkout main && git pull origin main${NC}"
+  echo -e "${YELLOW}💡 Or use staging deployment from develop instead${NC}"
   exit 1
 fi
+
+echo -e "${GREEN}✅ Deploying from main branch${NC}"
 
 # Check for uncommitted changes
 if [[ -n $(git status --porcelain) ]]; then
