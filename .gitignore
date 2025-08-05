@@ -12,9 +12,12 @@ dist
 dist-ssr
 *.local
 
-# Editor directories and files
+# Editor directories and files - keep essential VS Code configs for team consistency
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
 .idea
 .DS_Store
 *.suo
