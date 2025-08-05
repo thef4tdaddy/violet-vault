@@ -38,7 +38,10 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
           if (cloudData.data.paycheckHistory)
             budget.setPaycheckHistory(cloudData.data.paycheckHistory);
           if (typeof cloudData.data.actualBalance === "number")
-            budget.setActualBalance(cloudData.data.actualBalance);
+            budget.setActualBalance(
+              cloudData.data.actualBalance,
+              cloudData.data.isActualBalanceManual
+            );
         }
       } catch (error) {
         console.warn("Failed to load cloud data:", error.message);
@@ -67,6 +70,7 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
             allTransactions: budget.allTransactions,
             paycheckHistory: budget.paycheckHistory,
             actualBalance: budget.actualBalance,
+            isActualBalanceManual: budget.isActualBalanceManual,
           },
           currentUser
         );
@@ -89,6 +93,7 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
     budget.allTransactions,
     budget.paycheckHistory,
     budget.actualBalance,
+    budget.isActualBalanceManual,
   ]);
 
   const handleManualSync = useCallback(async () => {
@@ -105,6 +110,7 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
           allTransactions: budget.allTransactions,
           paycheckHistory: budget.paycheckHistory,
           actualBalance: budget.actualBalance,
+          isActualBalanceManual: budget.isActualBalanceManual,
         },
         currentUser
       );
