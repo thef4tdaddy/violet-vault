@@ -62,7 +62,6 @@ const Header = memo(
 
           {/* Buttons row */}
           <div className="flex items-center justify-center flex-wrap gap-4 pt-2 pb-4 px-4">
-          <div className="flex items-center justify-center flex-wrap gap-4 pt-2 pb-4 px-4">
             <UserIndicator
               currentUser={currentUser}
               onUserChange={onUserChange}

@@ -219,6 +219,27 @@ const MainContent = ({
     : 0;
   const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
 
+  // Calculate total biweekly funding need across all envelope types
+  const totalBiweeklyNeed = Array.isArray(envelopes) 
+    ? envelopes.reduce((sum, env) => {
+        // Auto-classify envelope type if not set
+        const envelopeType = env.envelopeType || (env.category && ['Bills & Utilities', 'Health & Medical', 'Transportation', 'Education'].includes(env.category) ? 'bill' : 'variable');
+        
+        let biweeklyNeed = 0;
+        if (envelopeType === 'bill' && env.biweeklyAllocation) {
+          biweeklyNeed = Math.max(0, env.biweeklyAllocation - env.currentBalance);
+        } else if (envelopeType === 'variable' && env.monthlyBudget) {
+          const biweeklyTarget = env.monthlyBudget / 2;
+          biweeklyNeed = Math.max(0, biweeklyTarget - env.currentBalance);
+        } else if (envelopeType === 'savings' && env.targetAmount) {
+          const remainingToTarget = Math.max(0, env.targetAmount - env.currentBalance);
+          biweeklyNeed = Math.min(remainingToTarget, env.biweeklyAllocation || 0);
+        }
+        
+        return sum + biweeklyNeed;
+      }, 0)
+    : 0;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden pb-24 sm:pb-0">
       <div className="max-w-7xl mx-auto relative">
@@ -347,7 +368,7 @@ const MainContent = ({
             key="biweekly-need"
             icon={DollarSign}
             label="Biweekly Need"
-            value={biweeklyAllocation}
+            value={totalBiweeklyNeed}
             color="amber"
           />
         </div>

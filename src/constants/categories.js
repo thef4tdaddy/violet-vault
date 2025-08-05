@@ -28,6 +28,69 @@ export const BILL_CATEGORIES = [
   "Education",
 ];
 
+// Envelope types for classification
+export const ENVELOPE_TYPES = {
+  BILL: "bill",
+  VARIABLE: "variable", 
+  SAVINGS: "savings"
+};
+
+// Default envelope type for new envelopes
+export const DEFAULT_ENVELOPE_TYPE = ENVELOPE_TYPES.VARIABLE;
+
+// Envelope type definitions with properties
+export const ENVELOPE_TYPE_CONFIG = {
+  [ENVELOPE_TYPES.BILL]: {
+    name: "Bill Envelope",
+    description: "Fixed recurring amounts (rent, insurance, phone bills)",
+    color: "blue",
+    borderColor: "border-blue-500",
+    bgColor: "bg-blue-50",
+    textColor: "text-blue-700",
+    icon: "FileText",
+    fundingMethod: "biweekly", // Uses biweeklyAllocation
+    displayFormat: "Due: ${amount}/biweekly"
+  },
+  [ENVELOPE_TYPES.VARIABLE]: {
+    name: "Variable Expense Envelope",
+    description: "Regular but flexible spending (gas, groceries, medical, pet expenses)",
+    color: "orange",
+    borderColor: "border-orange-500", 
+    bgColor: "bg-orange-50",
+    textColor: "text-orange-700",
+    icon: "TrendingUp",
+    fundingMethod: "monthly", // Uses monthlyBudget
+    displayFormat: "Budget: ${amount}/month"
+  },
+  [ENVELOPE_TYPES.SAVINGS]: {
+    name: "Savings Goal Envelope",
+    description: "Long-term savings targets",
+    color: "green",
+    borderColor: "border-green-500",
+    bgColor: "bg-green-50", 
+    textColor: "text-green-700",
+    icon: "Target",
+    fundingMethod: "target", // Uses targetAmount
+    displayFormat: "Target: ${amount}"
+  }
+};
+
+// Auto-classify envelope type based on category
+export const AUTO_CLASSIFY_ENVELOPE_TYPE = (category) => {
+  if (BILL_CATEGORIES.includes(category)) {
+    return ENVELOPE_TYPES.BILL;
+  }
+  
+  // Categories that are typically variable expenses
+  const variableCategories = ["Food & Dining", "Transportation", "Health & Medical", "Personal Care"];
+  if (variableCategories.includes(category)) {
+    return ENVELOPE_TYPES.VARIABLE;
+  }
+  
+  // Default to variable for unknown categories
+  return ENVELOPE_TYPES.VARIABLE;
+};
+
 // Merchant pattern mapping to categories for smart suggestions
 export const MERCHANT_CATEGORY_PATTERNS = {
   "Food & Dining":
