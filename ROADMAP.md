@@ -17,7 +17,7 @@ This roadmap outlines the planned development phases for VioletVault, our secure
 ### 🚧 In Progress (v1.7.0 - Aug 11, 2025)
 
 - [ ] **Unassigned Cash Management** ([#111](https://github.com/thef4tdaddy/violet-vault/issues/111)) - Click-to-distribute modal
-- [ ] **Manual Virtual Balance Override** ([#113](https://github.com/thef4tdaddy/violet-vault/issues/113)) - Dashboard balance controls
+- [x] **Manual Virtual Balance Override** ([#113](https://github.com/thef4tdaddy/violet-vault/issues/113)) - ✅ **COMPLETED** (PR #155)
 - [ ] **Negative Balance Handling** ([#114](https://github.com/thef4tdaddy/violet-vault/issues/114)) - Overspending support
 - [x] **Collapsible Smart Envelope Suggestions** ([#112](https://github.com/thef4tdaddy/violet-vault/issues/112)) - ✅ Completed
 - [ ] **Mobile Layout Improvements** ([#95](https://github.com/thef4tdaddy/violet-vault/issues/95)) - Unified budgeting UX
@@ -27,7 +27,171 @@ This roadmap outlines the planned development phases for VioletVault, our secure
 
 ---
 
-## 🎯 2025 Release Schedule
+## 🎯 Bi-Weekly Release Schedule (Q3 2025)
+
+**Release Strategy**: 2-week overlapping development windows allow for better planning and feature development. Teams can start working on the next milestone while finalizing the current one.
+
+### 🚀 v1.8.0 - Paycheck Flow Enhancement (Aug 10-17, 2025)
+**Status: Ready to Start** | **Theme: Human-Centered Paycheck Processing**
+
+Improving the paycheck processing experience with intuitive flows and success feedback.
+
+#### GitHub Issues:
+- [#156 - Add Paycheck converted to human centered flow](https://github.com/thef4tdaddy/violet-vault/issues/156) 🔥 **High Priority**
+- [#157 - Update "Add Paycheck" Button to Trigger New Flow](https://github.com/thef4tdaddy/violet-vault/issues/157)
+- [#161 - Add Success Modal After Paycheck Confirmation](https://github.com/thef4tdaddy/violet-vault/issues/161)
+- [#162 - Add Default Allocation Buttons to Paycheck Flow](https://github.com/thef4tdaddy/violet-vault/issues/162)
+
+#### Completed:
+- ✅ [#113 - Manual Virtual Balance Override](https://github.com/thef4tdaddy/violet-vault/issues/113) - PR #155 Merged
+
+### 📱 v1.9.0 - Mobile UX Enhancements (Aug 17-31, 2025)
+**Status: Planned** | **Theme: Native-Like Mobile Experience**
+
+Comprehensive mobile experience improvements focusing on touch interactions and modern mobile patterns.
+
+#### Parent Epic:
+- [#158 - Mobile UI/UX Enhancements](https://github.com/thef4tdaddy/violet-vault/issues/158) 🔥 **High Priority**
+
+#### Child Issues:
+- [#159 - Touch Feedback and Animations to Buttons and Cards](https://github.com/thef4tdaddy/violet-vault/issues/159)
+- [#160 - Swipe Gestures](https://github.com/thef4tdaddy/violet-vault/issues/160)
+- [#163 - Support Dark Mode Detection for PWA](https://github.com/thef4tdaddy/violet-vault/issues/163)
+
+#### Additional Child Issues:
+Based on `docs/roadmap/mobile_ux_child_issues.md`:
+- [#164 - Implement Slide-Up Modals for Mobile Flows](https://github.com/thef4tdaddy/violet-vault/issues/164)
+- [#165 - Add Floating Action Button (FAB) with Contextual Actions](https://github.com/thef4tdaddy/violet-vault/issues/165)
+- [#166 - Add Pull-to-Refresh for Dashboard and Envelope Views](https://github.com/thef4tdaddy/violet-vault/issues/166)
+- [#167 - Design Onboarding Hints and First-Time Tutorial for Mobile](https://github.com/thef4tdaddy/violet-vault/issues/167)
+- [#168 - Reposition Critical UI into Thumb Zones](https://github.com/thef4tdaddy/violet-vault/issues/168)
+- [#169 - Add Haptic Feedback for Key Interactions](https://github.com/thef4tdaddy/violet-vault/issues/169)
+
+### 🏗️ v1.10.0 - Code Architecture & Refactoring (Aug 24 - Sep 7, 2025)
+**Status: Planned** | **Theme: Technical Debt Reduction**
+
+Systematic refactoring of major components and technical debt reduction.
+
+#### GitHub Issues:
+- [#151 - Refactor ChartsAndAnalytics.jsx](https://github.com/thef4tdaddy/violet-vault/issues/151)
+- [#152 - Refactor BillManager.jsx](https://github.com/thef4tdaddy/violet-vault/issues/152)
+- [#153 - Refactor SavingsGoals.jsx](https://github.com/thef4tdaddy/violet-vault/issues/153)
+- [#154 - Refactor firebaseSync.js](https://github.com/thef4tdaddy/violet-vault/issues/154)
+
+---
+
+## 🎯 Major Version Roadmap (Q4 2025 - 2026)
+
+### 🖥️ v2.0.0 - Desktop & Landing Page Experience (Q4 2025)
+**Status: Future Planning** | **Theme: Cross-Platform & Marketing**
+
+Transform VioletVault into a full-featured cross-platform application with marketing presence.
+
+#### 🌐 Marketing & Landing
+Based on `docs/roadmap/landing_page_issue.md` and related roadmap docs:
+- **Landing Page Conversion**: Transform initial page from login screen to marketing landing
+- **Demo Mode**: Interactive sandbox for new users  
+- **Full Marketing Site**: Comprehensive product information and documentation
+- **DevOps Integration**: Enhanced CI/CD and deployment automation
+
+#### 🖥️ Desktop Experience  
+Based on `docs/roadmap/desktop_ux_child_issues.md`:
+- **Responsive Large Screen Layout**: Optimized for desktop, iPad landscape, and Electron
+- **Component Enhancements**: Side-by-side layouts, drawers instead of modals
+- **Keyboard Navigation**: Full keyboard support with shortcuts and command palette
+- **Electron Integration**: Native desktop app features and system integration
+
+#### 🎯 Planned Features (Need GitHub Issues):
+- Convert initial page to marketing landing page
+- Responsive layout for desktop and large screens  
+- Keyboard navigation and power features
+- Electron desktop integration enhancements
+- Desktop/tablet view QA and breakpoint testing
+
+### 🧠 v3.0.0 - Progressive Polish & Intelligence Epic (Q1 2026)
+**Status: Long-term Vision** | **Theme: Intelligence & Delight**
+
+Based on `docs/roadmap/violetvault_progressive_polish_epic.md`:
+
+Advanced features that make VioletVault intelligent and delightful to use daily.
+
+#### 🧠 Personalization & User Memory
+- Show Recently Used Envelopes
+- Save and reuse last paycheck split patterns
+- Support custom emoji or labels for envelopes
+- Add support for recurring income/budgeting reminders
+
+#### 💡 Intent-Aware Nudges (Smart Prompts)
+- "You skipped Rent this cycle" notifications
+- "Groceries trending 20% higher than usual" insights  
+- "Move unassigned to cover overages?" suggestions
+
+#### 📦 Presentation & Professional Packaging
+- Branded splash screen (PWA and native)
+- In-app changelog modal for "What's new"
+- Feedback button (GitHub/Discord integration)
+- About/Privacy modal with encryption summary
+
+#### 📊 Reporting & Power User Tools
+- Advanced reports: trendlines, burn rate, category tracking
+- Export to PDF/CSV functionality
+- Track envelope progress over time
+
+#### ⚡ Performance & Delight
+- Optimistic UI updates for all money actions
+- Instant sync indicator ("Just now", "Syncing…")
+- Auto-animate modals, cards, lists
+- Page prefetch with TanStack Query
+
+#### 🔐 Trust & Security Features
+- App lock (PIN, Face ID)
+- Export encrypted backup
+- Encrypted audit trail (who/what/when)
+- Offline failsafe mode (show last synced budget)
+
+### 💎 v4.0.0 - Premium Features & Sustainability (TBD)
+**Status: Future Exploration** | **Theme: Sustainability & Advanced Features**
+
+Based on `docs/roadmap/violetvault_premium_features_epic.md`:
+
+Optional premium features to support long-term sustainability while maintaining free core functionality.
+
+#### 🧠 Philosophy
+- No ads, no tracking, no freemium lockouts
+- Privacy-first, with encrypted local and cloud options
+- Optional payments to offset infrastructure and dev time
+- Core budgeting and security will always remain free
+
+#### 🔐 Security & Control (Premium)
+- Encrypted app lock (Face ID, PIN)
+- Offline vaults with cloud auto-backup (Dropbox, Drive)
+- Session handoff/reconnect across devices
+
+#### 📊 Power Tools & Reports (Premium)
+- Advanced spending reports (burn rate, envelopes over time)
+- Envelope forecasting/projections
+- Custom report exports (PDF, CSV, Excel)
+- AI-powered budgeting suggestions
+
+#### 👥 Shared Budgeting (Premium)
+- Invite partner or team member to budget together
+- Role-based permissions (view/comment/edit)
+- Notifications for key changes
+
+#### 💼 Business Use (Premium)
+- Multiple vaults (business vs personal)
+- Tagged expenses + receipts for tax time
+- Quarterly P&L and export bundles
+
+#### 🎨 Supporter Perks (Premium)
+- Early access to beta features
+- Custom envelope themes/labels
+- Supporter badge in settings or footer
+- Monthly dev updates
+
+---
+
+## 🎯 Legacy Release Schedule (Reorganized from Quarterly to Weekly)
 
 ### 🚀 v1.8.0 – Security & Compliance (Aug 25, 2025)
 
@@ -169,20 +333,45 @@ We welcome community input on our roadmap! Here's how you can contribute:
 
 ---
 
-**Last Updated:** August 2025
-**Next Review:** September 2025
+## 📚 Related Documentation
+
+### Cross-References
+- **[docs/MILESTONES.md](./docs/MILESTONES.md)** - Detailed weekly milestone planning and tracking
+- **[docs/roadmap/](./docs/roadmap/)** - Individual feature specifications and technical details
+- **[GitHub Issues](https://github.com/thef4tdaddy/violet-vault/issues)** - Active development tracking
+- **[GitHub Milestones](https://github.com/thef4tdaddy/violet-vault/milestones)** - Release planning and progress
+- **[GitHub Project Board](https://github.com/users/thef4tdaddy/projects/3)** - Live development board
+
+### Epic Documentation
+- **Progressive Polish**: [violetvault_progressive_polish_epic.md](./docs/roadmap/violetvault_progressive_polish_epic.md) - v3.0.0 intelligence features
+- **Premium Features**: [violetvault_premium_features_epic.md](./docs/roadmap/violetvault_premium_features_epic.md) - v4.0.0 sustainability model
+- **Mobile UX**: [mobile_ux_child_issues.md](./docs/roadmap/mobile_ux_child_issues.md) - Native mobile experience
+- **Desktop UX**: [desktop_ux_child_issues.md](./docs/roadmap/desktop_ux_child_issues.md) - Large screen optimization  
+- **Landing Page**: [landing_page_issue.md](./docs/roadmap/landing_page_issue.md) - Marketing conversion
+
+### Development Workflow
+1. **Epic Planning** → Document in `docs/roadmap/`
+2. **Issue Creation** → Link to roadmap documents  
+3. **Milestone Assignment** → Weekly release planning
+4. **Feature Development** → Branch creation and implementation
+5. **Release** → Automated via release-please and conventional commits
+
+---
+
+**Last Updated:** August 5, 2025
+**Next Review:** August 11, 2025 (v1.8.0 planning)
 
 ## 📅 **Complete Release Timeline**
 
-| Version | Focus Area | Target Date | Status |
-|---------|------------|-------------|---------|
-| v1.7.0 | Cash Management | Aug 11, 2025 | 🚧 In Progress |
-| v1.8.0 | Security & Compliance | Aug 25, 2025 | 📋 Planned |
-| v1.9.0 | Visualization & Reports | Sep 30, 2025 | 📋 Planned |
-| v2.0.0 | Multi-Platform & PWA | Oct 15, 2025 | 📋 Planned |
-| v2.1.0 | Dark Mode Complete | Nov 30, 2025 | 📋 Planned |
-| v2.2.0 | Advanced Analytics & Integrations | Feb 28, 2026 | 🔮 Future |
-| v3.0.0 | Small Business Complete | Apr 30, 2026 | 🔮 Future |
+| Version | Focus Area | Development Window | Target Date | Status |
+|---------|------------|-------------------|-------------|---------|
+| v1.7.0 | Cash Management | Aug 5-11 | Aug 11, 2025 | 🚧 In Progress |
+| v1.8.0 | Paycheck Flow Enhancement | Aug 10-17 | Aug 17, 2025 | 📋 Ready to Start |
+| v1.9.0 | Mobile UX Enhancements | Aug 17-31 | Aug 31, 2025 | 📋 Planned |
+| v1.10.0 | Code Architecture & Refactoring | Aug 24 - Sep 7 | Sep 7, 2025 | 📋 Planned |
+| v2.0.0 | Desktop & Landing Page Experience | Q4 2025 | Dec 31, 2025 | 🔮 Future Planning |
+| v3.0.0 | Progressive Polish & Intelligence | Q1 2026 | Mar 31, 2026 | 🔮 Long-term Vision |
+| v4.0.0 | Premium Features & Sustainability | TBD | TBD | 🔮 Future Exploration |
 
 🔗 **Live Progress:** [GitHub Project Board](https://github.com/users/thef4tdaddy/projects/3)
 

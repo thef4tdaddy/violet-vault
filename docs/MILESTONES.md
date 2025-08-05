@@ -2,7 +2,7 @@
 
 ## 📋 Overview
 
-This document tracks VioletVault's milestone-based development using **weekly release cycles** with semantic versioning handled by **release-please**.
+This document tracks VioletVault's milestone-based development using **bi-weekly overlapping release cycles** with semantic versioning handled by **release-please**.
 
 ## 🎯 Versioning Strategy
 
@@ -67,35 +67,120 @@ git commit -m "refactor: improve layout architecture and error tracking"
 
 ## 📅 Planned Future Milestones
 
-### v1.8.0 - Balance & UI Polish (Week of Aug 12)
+### v1.8.0 - Paycheck Flow Enhancement (Aug 10-17)
 
-**Due: August 18, 2025**
+**Due: August 17, 2025**
+**Status: Ready to Start**
 **Planned Features**:
 
-- **#113** - Manual Virtual Balance Override
-- Performance improvements
-- Mobile UX enhancements
-- Testing framework setup
+- **#113** - Manual Virtual Balance Override ✅ **COMPLETED** (PR #155)
+- **#156** - Add Paycheck converted to human centered flow
+- **#157** - Update "Add Paycheck" Button to Trigger New Flow
+- **#161** - Add Success Modal After Paycheck Confirmation
+- **#162** - Add Default Allocation Buttons to Paycheck Flow
 
-### v1.9.0 - Debt Tracking Foundation (Week of Aug 19)
+### v1.9.0 - Mobile UX Enhancements (Aug 17-31)  
 
-**Due: August 25, 2025**
+**Due: August 31, 2025**
 **Planned Features**:
 
-- **#115** - Comprehensive Debt Tracking System (Phase 1)
-- Basic debt entry and tracking
-- Interest calculations
-- Payment history
+- **#158** - Mobile UI/UX Enhancements (Parent Epic)
+- **#159** - Touch Feedback and Animations to Buttons and Cards
+- **#160** - Swipe Gestures
+- **#163** - Support Dark Mode Detection for PWA
+- **#164** - Implement Slide-Up Modals for Mobile Flows
+- **#165** - Add Floating Action Button (FAB) with Contextual Actions
+- **#166** - Add Pull-to-Refresh for Dashboard and Envelope Views
+- **#167** - Design Onboarding Hints and First-Time Tutorial for Mobile
+- **#168** - Reposition Critical UI into Thumb Zones
+- **#169** - Add Haptic Feedback for Key Interactions
 
-### v1.10.0 - OCR System Phase 1 (Week of Aug 26)
+### v1.10.0 - Code Architecture & Refactoring (Aug 24 - Sep 7)
 
-**Due: September 1, 2025**
+**Due: September 7, 2025**
 **Planned Features**:
 
-- **#116** - Universal OCR System (Foundation)
-- Receipt scanning basics
-- Document processing pipeline
-- Integration with transactions
+- **#151** - Refactor ChartsAndAnalytics.jsx
+- **#152** - Refactor BillManager.jsx  
+- **#153** - Refactor SavingsGoals.jsx
+- **#154** - Refactor firebaseSync.js
+
+### v2.0.0 - Landing Page & Marketing (Future Major Release)
+
+**Planned Features**:
+- Convert initial page to marketing landing page
+- Demo mode implementation
+- Full marketing site integration
+- DevOps integration improvements
+
+---
+
+## 🚀 Long-Term Epic Roadmap
+
+### 📱 v3.0.0 - Progressive Polish & Intelligence Epic
+**Target: Q1 2026** | **Labels:** `epic`, `UX`, `enhancement`, `v3.0.0`
+
+Based on `violetvault_progressive_polish_epic.md`:
+
+#### 🧠 Personalization & User Memory
+- Show Recently Used Envelopes
+- Save and reuse last paycheck split pattern  
+- Support custom emoji or labels for envelopes
+- Add support for recurring income / budgeting reminders
+
+#### 💡 Intent-Aware Nudges (Smart Prompts)
+- Nudge: "You skipped Rent this cycle"
+- Nudge: "Groceries trending 20% higher than usual"
+- Nudge: "Move unassigned to cover overages?"
+
+#### 📦 Presentation & Professional Packaging
+- Add branded splash screen (PWA and native)
+- In-app changelog modal for "What's new"
+- Add feedback button (GitHub/Discord integration)
+- About/Privacy modal with encryption summary
+
+#### 📊 Reporting & Power User Tools
+- Add advanced reports: trendlines, burn rate, category tracking
+- Support export to PDF/CSV
+- Track envelope progress over time
+
+#### ⚡ Performance & Delight
+- Add optimistic UI updates to all money actions
+- Instant sync indicator ("Just now", "Syncing…")
+- Auto-animate modals, cards, lists
+- Page prefetch with TanStack Query
+
+#### 🔐 Trust & Security Features
+- App lock (PIN, Face ID)
+- Export encrypted backup
+- Encrypted audit trail (who/what/when)
+- Offline failsafe mode (show last synced budget)
+
+### 💎 v4.0.0 - Premium Features & Sustainability Epic  
+**Target: TBD** | **Labels:** `epic`, `premium`, `future`, `sustainability`
+
+Based on `violetvault_premium_features_epic.md`:
+
+#### 🔐 Security & Control (Premium)
+- Encrypted app lock (Face ID, PIN)
+- Offline vaults with cloud auto-backup (e.g., Dropbox, Drive)
+- Session handoff / reconnect across devices
+
+#### 📊 Power Tools & Reports (Premium)
+- Advanced spending reports (burn rate, envelopes over time)
+- Envelope forecasting / projections
+- Custom report exports (PDF, CSV, Excel)
+- AI-powered budgeting suggestions
+
+#### 👥 Shared Budgeting (Premium)
+- Invite partner or team member to budget together
+- Role-based permissions (view/comment/edit)
+- Notifications for key changes
+
+#### 💼 Business Use (Premium)
+- Multiple vaults (e.g. business vs personal)
+- Tagged expenses + receipts for tax time
+- Quarterly P&L and export bundles
 
 ---
 
@@ -120,14 +205,15 @@ git commit -m "refactor: improve layout architecture and error tracking"
 
 ---
 
-## 📊 Weekly Milestone Guidelines
+## 📊 Bi-Weekly Milestone Guidelines
 
 ### Milestone Rules
 
-- **3-5 issues maximum** per weekly milestone
-- **1 week duration** (Sunday deadline)
-- **Thematic focus** (cash management, UI polish, etc.)
-- **Clear deliverables** that can be completed in a week
+- **5-10 issues maximum** per bi-weekly milestone
+- **2-week duration** with overlapping development windows
+- **Thematic focus** (paycheck flows, mobile UX, code architecture, etc.)
+- **Clear deliverables** that can be completed within the timeframe
+- **Overlapping development** allows teams to start next milestone before current one ends
 
 ### Issue Assignment Strategy
 
@@ -165,12 +251,13 @@ git commit -m "refactor: improve layout architecture and error tracking"
 
 ## 📈 Success Metrics
 
-### Weekly Release Goals
+### Bi-Weekly Release Goals
 
-- **Consistent delivery** of 3-5 features per week
+- **Consistent delivery** of 5-10 features per 2-week cycle
 - **High-quality releases** with minimal hotfixes needed
-- **User feedback incorporation** within 1-2 weeks
+- **User feedback incorporation** within 2-4 weeks
 - **Technical debt reduction** included in each milestone
+- **Overlapping development** for smoother feature transitions
 
 ### Quality Gates
 
@@ -216,7 +303,28 @@ git commit -m "refactor: improve layout architecture and error tracking"
 - [ ] Plan testing framework integration
 - [ ] Review and triage unassigned issues
 
+## 📚 Related Documentation
+
+### Cross-References
+- **[ROADMAP.md](../ROADMAP.md)** - Consolidated product roadmap with full epic details
+- **[docs/roadmap/](./roadmap/)** - Individual feature specifications and technical details
+- **[GitHub Issues](https://github.com/thef4tdaddy/violet-vault/issues)** - Active development tracking
+- **[GitHub Milestones](https://github.com/thef4tdaddy/violet-vault/milestones)** - Release planning and progress
+
+### Epic Documentation Links
+- **Progressive Polish Epic**: [violetvault_progressive_polish_epic.md](./roadmap/violetvault_progressive_polish_epic.md)
+- **Premium Features Epic**: [violetvault_premium_features_epic.md](./roadmap/violetvault_premium_features_epic.md)
+- **Mobile UX Child Issues**: [mobile_ux_child_issues.md](./roadmap/mobile_ux_child_issues.md)
+- **Desktop UX Child Issues**: [desktop_ux_child_issues.md](./roadmap/desktop_ux_child_issues.md)
+- **Landing Page Specification**: [landing_page_issue.md](./roadmap/landing_page_issue.md)
+
+### Issue Organization
+- **Weekly Milestones**: 3-5 issues per week, theme-based grouping
+- **Epic Issues**: Large multi-milestone initiatives with child issues
+- **Parent-Child Relationships**: Epic → Milestone → Individual Issues
+- **Label System**: `epic`, `enhancement`, `UX`, `Mobile`, `Desktop`, `Refactor`
+
 ---
 
-_Last Updated: August 2, 2025_
-_Next Review: August 11, 2025 (v1.7.0 release)_
+_Last Updated: August 5, 2025_
+_Next Review: August 11, 2025 (v1.7.0 release completion)_
