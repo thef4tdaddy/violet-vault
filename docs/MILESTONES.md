@@ -25,32 +25,27 @@ This document tracks VioletVault's milestone-based development using **bi-weekly
 ### v1.7.0 - Cash Management (Week of Aug 5)
 
 **Due: August 11, 2025**
-**Status: In Progress**
+**Status: ✅ Deployed**
 
-#### ✅ Already Completed
+#### ✅ Successfully Deployed
 
 - **#106** - Compact Bill Layout (**COMPLETED** in PR #110)
   - **Status**: Merged and deployed
   - **Description**: Responsive grid layout for bills (1/2/3 columns)
+- **#113** - Manual Virtual Balance Override (**COMPLETED** in PR #155)
+  - **Status**: Merged and deployed 
+  - **Description**: Inline editing with click-to-edit functionality, confirmation dialogs, and business logic separation
+- **#112** - Collapsible Smart Suggestions (**COMPLETED**)
+  - **Status**: Merged and deployed
+  - **Description**: Collapse/expand Smart Envelope Suggestions panel with persistent state
 
-#### In Progress Branches
+#### Moved to Future Releases
 
-- **#96** - Layout Architecture Refactor
-  - **Branch**: `refactor/layout-ui-architecture-2025-08-04`
-  - **Status**: Contains error tracking migration and ESLint cleanup
-  - **Last Commit**: "feat: migrate error tracking from Sentry to Highlight.io"
-
-#### New Features to Build
-
-- **#111** - Unassigned Cash Distribution Modal
-  - **Description**: Click-to-distribute modal for unassigned cash
-  - **Includes**: Manual/auto distribution, negative balance handling
-- **#114** - Negative Virtual Balance Support
-  - **Description**: Handle and display negative balances properly
-  - **Includes**: Visual warnings, recovery suggestions
-- **#112** - Collapsible Smart Suggestions
-  - **Description**: Collapse/expand Smart Envelope Suggestions panel
-  - **Includes**: Persistent state, smooth animations
+- **#111** - Unassigned Cash Distribution Modal → **Moved to v1.11.0**
+- **#114** - Negative Virtual Balance Support → **Moved to v1.11.0**
+- **#95** - Mobile Layout Improvements → **Integrated into v1.9.0 Mobile UX**
+- **#65** - Component Refactoring → **Integrated into v1.10.0 Architecture**
+- **#66** - State Management Optimization → **Integrated into v1.10.0 Architecture**
 
 #### Commit Strategy for v1.7.0
 
@@ -70,7 +65,7 @@ git commit -m "refactor: improve layout architecture and error tracking"
 ### v1.8.0 - Paycheck Flow Enhancement (Aug 10-17)
 
 **Due: August 17, 2025**
-**Status: Ready to Start**
+**Status: 🚧 In Progress**
 **Planned Features**:
 
 - **#113** - Manual Virtual Balance Override ✅ **COMPLETED** (PR #155)
@@ -317,6 +312,11 @@ Based on `violetvault_premium_features_epic.md`:
 - **Mobile UX Child Issues**: [mobile_ux_child_issues.md](./roadmap/mobile_ux_child_issues.md)
 - **Desktop UX Child Issues**: [desktop_ux_child_issues.md](./roadmap/desktop_ux_child_issues.md)
 - **Landing Page Specification**: [landing_page_issue.md](./roadmap/landing_page_issue.md)
+- **Demo Mode Feature**: [demo_mode_issue.md](./roadmap/demo_mode_issue.md)
+- **Full Marketing Site**: [full_marketing_site_issue.md](./roadmap/full_marketing_site_issue.md)
+- **Dev.to Blog Integration**: [devto_integration_issue.md](./roadmap/devto_integration_issue.md)
+- **Highlight.io Privacy Config**: [highlight_privacy_config_issue.md](./roadmap/highlight_privacy_config_issue.md)
+- **Dexie Usage Logging**: [dexie_usage_logging_issue.md](./roadmap/dexie_usage_logging_issue.md)
 
 ### Issue Organization
 - **Weekly Milestones**: 3-5 issues per week, theme-based grouping

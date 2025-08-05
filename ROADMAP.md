@@ -14,16 +14,19 @@ This roadmap outlines the planned development phases for VioletVault, our secure
 - **Performance Optimizations** - Virtual scrolling via @tanstack/react-virtual for large datasets
 - **Creative Commons Licensing** - Non-commercial license protecting community interests
 
-### 🚧 In Progress (v1.7.0 - Aug 11, 2025)
+### ✅ Recently Deployed (v1.7.0 - Released Aug 11, 2025)
 
-- [ ] **Unassigned Cash Management** ([#111](https://github.com/thef4tdaddy/violet-vault/issues/111)) - Click-to-distribute modal
 - [x] **Manual Virtual Balance Override** ([#113](https://github.com/thef4tdaddy/violet-vault/issues/113)) - ✅ **COMPLETED** (PR #155)
-- [ ] **Negative Balance Handling** ([#114](https://github.com/thef4tdaddy/violet-vault/issues/114)) - Overspending support
 - [x] **Collapsible Smart Envelope Suggestions** ([#112](https://github.com/thef4tdaddy/violet-vault/issues/112)) - ✅ Completed
-- [ ] **Mobile Layout Improvements** ([#95](https://github.com/thef4tdaddy/violet-vault/issues/95)) - Unified budgeting UX
-- [ ] **Component Refactoring** ([#65](https://github.com/thef4tdaddy/violet-vault/issues/65)) - Architecture improvements
-- [ ] **State Management Optimization** ([#66](https://github.com/thef4tdaddy/violet-vault/issues/66)) - Enhanced performance
-- [ ] **Encryption Password Rotation** ([#88](https://github.com/thef4tdaddy/violet-vault/issues/88), [#89](https://github.com/thef4tdaddy/violet-vault/issues/89)) - Secure password changes
+
+### 🚧 Remaining v1.7.0 Items (Moved to Future Releases)
+
+- [ ] **Unassigned Cash Management** ([#111](https://github.com/thef4tdaddy/violet-vault/issues/111)) - Moved to v1.11.0
+- [ ] **Negative Balance Handling** ([#114](https://github.com/thef4tdaddy/violet-vault/issues/114)) - Moved to v1.11.0
+- [ ] **Mobile Layout Improvements** ([#95](https://github.com/thef4tdaddy/violet-vault/issues/95)) - Integrated into v1.9.0 Mobile UX
+- [ ] **Component Refactoring** ([#65](https://github.com/thef4tdaddy/violet-vault/issues/65)) - Integrated into v1.10.0 Architecture
+- [ ] **State Management Optimization** ([#66](https://github.com/thef4tdaddy/violet-vault/issues/66)) - Integrated into v1.10.0 Architecture
+- [ ] **Encryption Password Rotation** ([#88](https://github.com/thef4tdaddy/violet-vault/issues/88), [#89](https://github.com/thef4tdaddy/violet-vault/issues/89)) - Moved to v2.0.0 Security
 
 ---
 
@@ -32,7 +35,7 @@ This roadmap outlines the planned development phases for VioletVault, our secure
 **Release Strategy**: 2-week overlapping development windows allow for better planning and feature development. Teams can start working on the next milestone while finalizing the current one.
 
 ### 🚀 v1.8.0 - Paycheck Flow Enhancement (Aug 10-17, 2025)
-**Status: Ready to Start** | **Theme: Human-Centered Paycheck Processing**
+**Status: 🚧 In Progress** | **Theme: Human-Centered Paycheck Processing**
 
 Improving the paycheck processing experience with intuitive flows and success feedback.
 
@@ -88,10 +91,17 @@ Systematic refactoring of major components and technical debt reduction.
 Transform VioletVault into a full-featured cross-platform application with marketing presence.
 
 #### 🌐 Marketing & Landing
-Based on `docs/roadmap/landing_page_issue.md` and related roadmap docs:
+Based on `docs/roadmap/landing_page_issue.md`, `full_marketing_site_issue.md`, `demo_mode_issue.md`, and `devto_integration_issue.md`:
+
 - **Landing Page Conversion**: Transform initial page from login screen to marketing landing
-- **Demo Mode**: Interactive sandbox for new users  
-- **Full Marketing Site**: Comprehensive product information and documentation
+- **Demo Mode**: Interactive sandbox for new users with pre-filled sample data
+- **Full Marketing Site**: Complete public site with custom domain (violetvault.app)
+  - Homepage with clear messaging and CTAs
+  - Key routes: `/why`, `/privacy`, `/roadmap`, `/blog`, `/demo`
+  - SEO optimization and social sharing support
+- **Dev.to Blog Integration**: Connect developer articles to marketing site
+  - `/blog` route fetching Dev.to RSS feed
+  - Cross-post key articles with canonical URLs
 - **DevOps Integration**: Enhanced CI/CD and deployment automation
 
 #### 🖥️ Desktop Experience  
@@ -148,6 +158,18 @@ Advanced features that make VioletVault intelligent and delightful to use daily.
 - Export encrypted backup
 - Encrypted audit trail (who/what/when)
 - Offline failsafe mode (show last synced budget)
+
+#### 🛡️ Privacy & Analytics Features
+Based on `docs/roadmap/highlight_privacy_config_issue.md` and `dexie_usage_logging_issue.md`:
+- **Highlight.io Privacy Audit**: Ensure error monitoring respects user privacy
+  - `maskAllInputs: true` configuration
+  - Disable in Local-Only Mode
+  - User toggle to disable session collection
+- **Dexie-Based Usage Logging**: Local analytics with opt-in upload
+  - Store usage events in local Dexie database
+  - Anonymized aggregated data with user opt-in
+  - No user ID, IP, or fingerprinting
+  - Clear privacy disclosure and controls
 
 ### 💎 v4.0.0 - Premium Features & Sustainability (TBD)
 **Status: Future Exploration** | **Theme: Sustainability & Advanced Features**
@@ -348,6 +370,10 @@ We welcome community input on our roadmap! Here's how you can contribute:
 - **Mobile UX**: [mobile_ux_child_issues.md](./docs/roadmap/mobile_ux_child_issues.md) - Native mobile experience
 - **Desktop UX**: [desktop_ux_child_issues.md](./docs/roadmap/desktop_ux_child_issues.md) - Large screen optimization  
 - **Landing Page**: [landing_page_issue.md](./docs/roadmap/landing_page_issue.md) - Marketing conversion
+- **Demo Mode**: [demo_mode_issue.md](./docs/roadmap/demo_mode_issue.md) - Instant trial experience
+- **Full Marketing Site**: [full_marketing_site_issue.md](./docs/roadmap/full_marketing_site_issue.md) - Complete public site
+- **Dev.to Integration**: [devto_integration_issue.md](./docs/roadmap/devto_integration_issue.md) - Blog integration
+- **Privacy & Analytics**: [highlight_privacy_config_issue.md](./docs/roadmap/highlight_privacy_config_issue.md) & [dexie_usage_logging_issue.md](./docs/roadmap/dexie_usage_logging_issue.md)
 
 ### Development Workflow
 1. **Epic Planning** → Document in `docs/roadmap/`
@@ -365,8 +391,8 @@ We welcome community input on our roadmap! Here's how you can contribute:
 
 | Version | Focus Area | Development Window | Target Date | Status |
 |---------|------------|-------------------|-------------|---------|
-| v1.7.0 | Cash Management | Aug 5-11 | Aug 11, 2025 | 🚧 In Progress |
-| v1.8.0 | Paycheck Flow Enhancement | Aug 10-17 | Aug 17, 2025 | 📋 Ready to Start |
+| v1.7.0 | Cash Management | Aug 5-11 | Aug 11, 2025 | ✅ Deployed |
+| v1.8.0 | Paycheck Flow Enhancement | Aug 10-17 | Aug 17, 2025 | 🚧 In Progress |
 | v1.9.0 | Mobile UX Enhancements | Aug 17-31 | Aug 31, 2025 | 📋 Planned |
 | v1.10.0 | Code Architecture & Refactoring | Aug 24 - Sep 7 | Sep 7, 2025 | 📋 Planned |
 | v2.0.0 | Desktop & Landing Page Experience | Q4 2025 | Dec 31, 2025 | 🔮 Future Planning |
