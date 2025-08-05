@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import CreateEnvelopeModal from "./CreateEnvelopeModal";
 import EditEnvelopeModal from "./EditEnvelopeModal";
+import { ENVELOPE_TYPES, ENVELOPE_TYPE_CONFIG, AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/categories";
 
 const UnifiedEnvelopeManager = ({
   envelopes: propEnvelopes = [],
@@ -118,7 +119,21 @@ const UnifiedEnvelopeManager = ({
     });
   }, [envelopes, transactions]);
 
-  const getStatusStyle = (status) => {
+  const getEnvelopeTypeStyle = (envelope) => {
+    const envelopeType = envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+    const config = ENVELOPE_TYPE_CONFIG[envelopeType];
+    
+    if (!config) {
+      return "border-gray-200 bg-white/60";
+    }
+    
+    return `${config.borderColor} ${config.bgColor}`;
+  };
+
+  const getStatusStyle = (envelope) => {
+    const { status } = envelope;
+    
+    // Status overrides envelope type styling for critical states
     switch (status) {
       case "overdue":
         return "border-red-500 bg-red-50";
@@ -129,7 +144,8 @@ const UnifiedEnvelopeManager = ({
       case "caution":
         return "border-yellow-400 bg-yellow-50";
       default:
-        return "border-gray-200 bg-white/60";
+        // Use envelope type styling for healthy envelopes
+        return getEnvelopeTypeStyle(envelope);
     }
   };
 
@@ -406,7 +422,7 @@ const UnifiedEnvelopeManager = ({
         {sortedEnvelopes.map((envelope) => (
           <div
             key={envelope.id}
-            className={`p-6 rounded-lg border-2 transition-all cursor-pointer hover:shadow-lg ${getStatusStyle(envelope.status)} ${
+            className={`p-6 rounded-lg border-2 transition-all cursor-pointer hover:shadow-lg ${getStatusStyle(envelope)} ${
               selectedEnvelopeId === envelope.id ? "ring-2 ring-green-500" : ""
             }`}
             onClick={() => setSelectedEnvelopeId(envelope.id)}
@@ -415,6 +431,21 @@ const UnifiedEnvelopeManager = ({
               <div>
                 <h3 className="font-semibold text-gray-900">{envelope.name}</h3>
                 <p className="text-sm text-gray-600">{envelope.category}</p>
+                {(() => {
+                  const envelopeType = envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+                  const config = ENVELOPE_TYPE_CONFIG[envelopeType];
+                  if (config) {
+                    return (
+                      <div className="flex items-center gap-1 mt-1">
+                        <div className={`w-2 h-2 rounded-full bg-${config.color}-500`}></div>
+                        <span className={`text-xs font-medium ${config.textColor}`}>
+                          {config.name.replace(' Envelope', '')}
+                        </span>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
               <div className="flex items-center gap-2">
                 {getStatusIcon(envelope.status)}
@@ -456,10 +487,33 @@ const UnifiedEnvelopeManager = ({
             </div>
 
             <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Budget Allocated:</span>
-                <span className="text-sm font-medium">${envelope.allocated.toFixed(2)}</span>
-              </div>
+              {(() => {
+                const envelopeType = envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+                const config = ENVELOPE_TYPE_CONFIG[envelopeType];
+                
+                if (envelopeType === ENVELOPE_TYPES.BILL && envelope.biweeklyAllocation) {
+                  return (
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Due Biweekly:</span>
+                      <span className="text-sm font-medium">${envelope.biweeklyAllocation.toFixed(2)}</span>
+                    </div>
+                  );
+                } else if (envelopeType === ENVELOPE_TYPES.VARIABLE && envelope.monthlyBudget) {
+                  return (
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Monthly Budget:</span>
+                      <span className="text-sm font-medium">${envelope.monthlyBudget.toFixed(2)}</span>
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Budget Allocated:</span>
+                      <span className="text-sm font-medium">${envelope.allocated.toFixed(2)}</span>
+                    </div>
+                  );
+                }
+              })()}
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Current Balance:</span>
                 <span className="text-sm font-medium text-blue-600">

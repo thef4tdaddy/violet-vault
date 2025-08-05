@@ -125,8 +125,18 @@ const storeInitializer = (set, get) => ({
     return get().envelopes.filter((e) => e.category === category);
   },
 
+  getEnvelopesByType: (envelopeType) => {
+    return get().envelopes.filter((e) => e.envelopeType === envelopeType);
+  },
+
   getTotalEnvelopeBalance: () => {
     return get().envelopes.reduce((sum, e) => sum + (e.currentBalance || 0), 0);
+  },
+
+  getTotalEnvelopeBalanceByType: (envelopeType) => {
+    return get().envelopes
+      .filter((e) => e.envelopeType === envelopeType)
+      .reduce((sum, e) => sum + (e.currentBalance || 0), 0);
   },
 
   // Transaction management actions
