@@ -342,7 +342,7 @@ const EditEnvelopeModal = ({
                           : "border-gray-200 hover:border-gray-300"
                       }`}
                     >
-                      <div className="flex items-start space-x-3">
+                      <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
                         <input
                           type="radio"
                           name="envelopeType"
@@ -354,9 +354,9 @@ const EditEnvelopeModal = ({
                               envelopeType: e.target.value,
                             })
                           }
-                          className="mt-1 w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                          className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mt-0.5 justify-self-start"
                         />
-                        <div className="flex-1">
+                        <div>
                           <div className="flex items-center mb-1">
                             <IconComponent
                               className={`h-4 w-4 mr-2 ${config.textColor}`}
