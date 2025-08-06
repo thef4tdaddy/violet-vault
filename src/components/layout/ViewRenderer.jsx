@@ -143,36 +143,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
         }}
       />
     ),
-    transactions: (
-      <TransactionLedger
-        transactions={allTransactions}
-        envelopes={envelopes}
-        onAddTransaction={(newTransaction) => {
-          console.log("🔄 Adding new transaction:", newTransaction);
-          addTransaction(newTransaction);
-        }}
-        onUpdateTransaction={(updatedTransaction) => {
-          console.log("🔄 Updating transaction:", updatedTransaction);
-          updateTransaction(updatedTransaction);
-        }}
-        onDeleteTransaction={(transactionId) => {
-          console.log("🔄 Deleting transaction:", transactionId);
-          deleteTransaction(transactionId);
-        }}
-        onBulkImport={(newTransactions) => {
-          console.log("🔄 onBulkImport called with transactions:", newTransactions.length);
-          const updatedAllTransactions = [...allTransactions, ...newTransactions];
-          const updatedTransactions = [...safeTransactions, ...newTransactions];
-          setAllTransactions(updatedAllTransactions);
-          setTransactions(updatedTransactions);
-          console.log(
-            "💾 Bulk import complete. Total transactions:",
-            updatedAllTransactions.length
-          );
-        }}
-        currentUser={currentUser}
-      />
-    ),
+    transactions: <TransactionLedger currentUser={currentUser} />,
     analytics: (
       <ChartsAndAnalytics
         transactions={allTransactions}
