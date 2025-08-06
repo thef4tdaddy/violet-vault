@@ -36,8 +36,8 @@ const getInitialFormData = (bill = null) => {
             getBillIcon(
               bill.name || bill.provider || "",
               bill.notes || "",
-              bill.category || ""
-            )
+              bill.category || "",
+            ),
         ),
     };
   }
@@ -73,7 +73,7 @@ const AddBillModal = ({
     if (isOpen) {
       const initialData = getInitialFormData(editingBill);
       const billEnvelopes = availableEnvelopes.filter(
-        (env) => env.envelopeType === "bill" || !env.envelopeType
+        (env) => env.envelopeType === "bill" || !env.envelopeType,
       );
       logger.debug("Initializing bill modal form data", {
         editingBill: editingBill?.id,
@@ -96,7 +96,7 @@ const AddBillModal = ({
     const suggestedIcon = getBillIcon(
       formData.name || "",
       formData.notes || "",
-      formData.category || "Bills"
+      formData.category || "Bills",
     );
     setFormData((prev) => ({
       ...prev,
@@ -233,12 +233,12 @@ const AddBillModal = ({
       biweeklyAmount: calculateBiweeklyAmount(
         amount,
         formData.frequency,
-        formData.customFrequency
+        formData.customFrequency,
       ),
       monthlyAmount: calculateMonthlyAmount(
         amount,
         formData.frequency,
-        formData.customFrequency
+        formData.customFrequency,
       ),
       nextDueDate: getNextDueDate(formData.frequency, normalizedDueDate),
       icon: getIconByName(formData.iconName),
@@ -262,14 +262,33 @@ const AddBillModal = ({
       isEditing: !!editingBill,
       hasOnUpdateBill: !!onUpdateBill,
       hasOnAddBill: !!onAddBill,
+      fullBillData: billData,
+    });
+
+    // Additional logging for envelope assignment debugging
+    logger.debug("Envelope assignment details", {
+      formDataSelectedEnvelope: formData.selectedEnvelope,
+      billDataEnvelopeId: billData.envelopeId,
+      availableEnvelopesIds: availableEnvelopes.map((e) => e.id),
+      envelopeFound: availableEnvelopes.find(
+        (e) => e.id === formData.selectedEnvelope,
+      ),
     });
 
     if (editingBill) {
       logger.debug("Updating existing bill", {
         billId: billData.id,
         envelopeId: billData.envelopeId,
+        originalBill: editingBill,
+        updatedBill: billData,
       });
-      onUpdateBill?.(billData);
+      try {
+        onUpdateBill?.(billData);
+        logger.debug("Bill update completed successfully");
+      } catch (error) {
+        logger.error("Error during bill update", error);
+        throw error;
+      }
     } else {
       logger.debug("Adding new bill", {
         billId: billData.id,
@@ -283,7 +302,7 @@ const AddBillModal = ({
           budget: calculateMonthlyAmount(
             amount,
             formData.frequency,
-            formData.customFrequency
+            formData.customFrequency,
           ),
           currentBalance: 0,
           color: formData.color,
@@ -293,6 +312,8 @@ const AddBillModal = ({
         onAddEnvelope(envelopeData);
       }
     }
+
+    logger.debug("Closing modal after bill save");
     onClose();
   };
 
@@ -534,20 +555,28 @@ const AddBillModal = ({
                 <option value="">No envelope (use unassigned cash)</option>
                 {availableEnvelopes
                   .filter(
-                    (env) => env.envelopeType === "bill" || !env.envelopeType
+                    (env) => env.envelopeType === "bill" || !env.envelopeType,
                   )
-                  .map((envelope) => (
-                    <option key={envelope.id} value={envelope.id}>
-                      {envelope.name} ($
-                      {(envelope.currentBalance || 0).toFixed(2)} available)
-                    </option>
-                  ))}
+                  .map((envelope) => {
+                    logger.debug("Rendering envelope option", {
+                      envelopeId: envelope.id,
+                      envelopeName: envelope.name,
+                      envelopeType: envelope.envelopeType,
+                      isSelected: envelope.id === formData.selectedEnvelope,
+                    });
+                    return (
+                      <option key={envelope.id} value={envelope.id}>
+                        {envelope.name} ($
+                        {(envelope.currentBalance || 0).toFixed(2)} available)
+                      </option>
+                    );
+                  })}
               </select>
               {formData.selectedEnvelope && (
                 <p className="text-xs text-green-600 mt-1">
                   Selected:{" "}
                   {availableEnvelopes.find(
-                    (e) => e.id === formData.selectedEnvelope
+                    (e) => e.id === formData.selectedEnvelope,
                   )?.name || "Unknown"}
                 </p>
               )}
@@ -615,7 +644,7 @@ const AddBillModal = ({
                     {calculateMonthlyAmount(
                       parseFloat(formData.amount) || 0,
                       formData.frequency,
-                      formData.customFrequency
+                      formData.customFrequency,
                     ).toFixed(2)}
                   </span>
                 </div>
@@ -626,7 +655,7 @@ const AddBillModal = ({
                     {calculateBiweeklyAmount(
                       parseFloat(formData.amount) || 0,
                       formData.frequency,
-                      formData.customFrequency
+                      formData.customFrequency,
                     ).toFixed(2)}
                   </span>
                 </div>
