@@ -207,6 +207,17 @@ const MainContent = ({
     paycheckHistory,
     isOnline,
     isSyncing,
+    bills,
+    allTransactions,
+    setAllTransactions,
+    updateBill,
+    updateTransaction,
+    addBill,
+    processPaycheck,
+    addSupplementalAccount,
+    updateSupplementalAccount,
+    deleteSupplementalAccount,
+    transferFromSupplementalAccount,
   } = budget;
 
   // Payday prediction notifications (after destructuring)
@@ -497,21 +508,14 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
           console.log("🔄 [DIRECT] MainLayout onUpdateBill called", {
             billId: updatedBill.id,
             envelopeId: updatedBill.envelopeId,
-            hasUpdateBill: !!budget.updateBill,
+            hasUpdateBill: !!updateBill,
             timestamp: new Date().toISOString(),
           });
           
           try {
-            // Update both allTransactions AND the budget store bill
-            const updatedTransactions = allTransactions.map((t) =>
-              t.id === updatedBill.id ? updatedBill : t
-            );
-            budget.setAllTransactions(updatedTransactions);
-            console.log("🔄 [DIRECT] MainLayout updated allTransactions");
-
-            // Use updateBill instead of updateTransaction for proper bill persistence
-            budget.updateBill(updatedBill);
-            console.log("🔄 [DIRECT] MainLayout called updateBill");
+            // Use updateBill for proper bill persistence with envelope assignment
+            updateBill(updatedBill);
+            console.log("🔄 [DIRECT] MainLayout called updateBill successfully");
           } catch (error) {
             console.error("❌ [DIRECT] Error in MainLayout onUpdateBill", error);
           }
