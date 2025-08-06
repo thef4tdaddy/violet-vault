@@ -44,7 +44,9 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
   } = budget;
 
   // Filter out null/undefined transactions to prevent runtime errors
-  const allTransactions = (rawAllTransactions || []).filter((t) => t && typeof t === "object");
+  const allTransactions = (rawAllTransactions || []).filter(
+    (t) => t && typeof t === "object"
+  );
   const safeTransactions = (transactions || []).filter(
     (t) => t && typeof t === "object" && typeof t.amount === "number"
   );
@@ -105,11 +107,18 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
           setAllTransactions(updatedTransactions);
         }}
         onUpdateBill={(updatedBill) => {
+          console.log("🔄 ViewRenderer onUpdateBill called", {
+            billId: updatedBill.id,
+            envelopeId: updatedBill.envelopeId,
+          });
           // Update the bill in allTransactions
           const updatedTransactions = allTransactions.map((t) =>
             t.id === updatedBill.id ? updatedBill : t
           );
           setAllTransactions(updatedTransactions);
+
+          // Also update the bill in the budget store
+          updateBill(updatedBill);
         }}
         onCreateRecurringBill={(newBill) => {
           // Store bill properly using budget store - no transaction created until paid
@@ -123,7 +132,9 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
             createdAt: new Date().toISOString(),
           };
           addBill(bill);
-          console.log("✅ Bill stored successfully - no transaction created until paid");
+          console.log(
+            "✅ Bill stored successfully - no transaction created until paid"
+          );
         }}
         onSearchNewBills={async () => {
           try {
@@ -158,7 +169,9 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
 
   return (
     <ErrorBoundary>
-      <Suspense fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}>
+      <Suspense
+        fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}
+      >
         {views[activeView]}
       </Suspense>
     </ErrorBoundary>
