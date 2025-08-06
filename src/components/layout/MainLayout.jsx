@@ -13,6 +13,7 @@ import Header from "../ui/Header";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ToastContainer } from "../ui/Toast";
 import useToast from "../../hooks/useToast";
+import ViewRendererComponent from "./ViewRenderer";
 import FirebaseSync from "../../utils/firebaseSync";
 import logger from "../../utils/logger";
 import { getVersionInfo } from "../../utils/version";
@@ -31,16 +32,7 @@ import SyncStatusIndicators from "../sync/SyncStatusIndicators";
 import ConflictResolutionModal from "../sync/ConflictResolutionModal";
 import SummaryCards from "./SummaryCards";
 
-// Lazy load heavy components for better performance
-const PaycheckProcessor = lazy(() => import("../budgeting/PaycheckProcessor"));
-const EnvelopeGrid = lazy(() => import("../budgeting/EnvelopeGrid"));
-const SmartEnvelopeSuggestions = lazy(() => import("../budgeting/SmartEnvelopeSuggestions"));
-const BillManager = lazy(() => import("../bills/BillManager"));
-const SavingsGoals = lazy(() => import("../savings/SavingsGoals"));
-const Dashboard = lazy(() => import("../pages/MainDashboard"));
-const TransactionLedger = lazy(() => import("../transactions/TransactionLedger"));
-const ChartsAndAnalytics = lazy(() => import("../analytics/ChartsAndAnalytics"));
-const SupplementalAccounts = lazy(() => import("../accounts/SupplementalAccounts"));
+// Heavy components now lazy loaded in ViewRenderer
 
 const Layout = () => {
   logger.debug("Layout component is running");
@@ -381,7 +373,7 @@ const MainContent = ({
         />
 
         {/* Main Content */}
-        <ViewRenderer activeView={activeView} budget={budget} currentUser={currentUser} />
+        <ViewRendererComponent activeView={activeView} budget={budget} currentUser={currentUser} />
 
         <SyncStatusIndicators isOnline={isOnline} isSyncing={isSyncing} />
         <ConflictResolutionModal
