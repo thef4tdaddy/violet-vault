@@ -198,6 +198,24 @@ const MainContent = ({
 
   // Handle change password - delegate to parent component
   const handleChangePassword = onChangePassword;
+  
+  // Handle bill updates
+  const handleBillUpdate = (updatedBill) => {
+    console.log("🔄 [DIRECT] MainLayout handleBillUpdate called", {
+      billId: updatedBill.id,
+      envelopeId: updatedBill.envelopeId,
+      hasUpdateBill: typeof budget.updateBill === 'function',
+      timestamp: new Date().toISOString(),
+    });
+    
+    try {
+      // Use updateBill for proper bill persistence with envelope assignment
+      budget.updateBill(updatedBill);
+      console.log("🔄 [DIRECT] MainLayout called budget.updateBill successfully");
+    } catch (error) {
+      console.error("❌ [DIRECT] Error in MainLayout handleBillUpdate", error);
+    }
+  };
 
   const {
     envelopes,
@@ -504,22 +522,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
           // Update the bill using budget store method
           updateTransaction(updatedBill);
         }}
-        onUpdateBill={(updatedBill) => {
-          console.log("🔄 [DIRECT] MainLayout onUpdateBill called", {
-            billId: updatedBill.id,
-            envelopeId: updatedBill.envelopeId,
-            hasUpdateBill: !!updateBill,
-            timestamp: new Date().toISOString(),
-          });
-          
-          try {
-            // Use updateBill for proper bill persistence with envelope assignment
-            updateBill(updatedBill);
-            console.log("🔄 [DIRECT] MainLayout called updateBill successfully");
-          } catch (error) {
-            console.error("❌ [DIRECT] Error in MainLayout onUpdateBill", error);
-          }
-        }}
+        onUpdateBill={handleBillUpdate}
         onCreateRecurringBill={(newBill) => {
           // Add new bill to allTransactions
           const billTransaction = {
