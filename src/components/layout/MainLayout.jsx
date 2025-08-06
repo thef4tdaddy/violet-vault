@@ -494,8 +494,27 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
           updateTransaction(updatedBill);
         }}
         onUpdateBill={(updatedBill) => {
-          // Update the bill using budget store method
-          updateTransaction(updatedBill);
+          console.log("🔄 [DIRECT] MainLayout onUpdateBill called", {
+            billId: updatedBill.id,
+            envelopeId: updatedBill.envelopeId,
+            hasUpdateBill: !!updateBill,
+            timestamp: new Date().toISOString(),
+          });
+          
+          try {
+            // Update both allTransactions AND the budget store bill
+            const updatedTransactions = allTransactions.map((t) =>
+              t.id === updatedBill.id ? updatedBill : t
+            );
+            setAllTransactions(updatedTransactions);
+            console.log("🔄 [DIRECT] MainLayout updated allTransactions");
+
+            // Use updateBill instead of updateTransaction for proper bill persistence
+            updateBill(updatedBill);
+            console.log("🔄 [DIRECT] MainLayout called updateBill");
+          } catch (error) {
+            console.error("❌ [DIRECT] Error in MainLayout onUpdateBill", error);
+          }
         }}
         onCreateRecurringBill={(newBill) => {
           // Add new bill to allTransactions
