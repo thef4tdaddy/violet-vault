@@ -18,17 +18,21 @@ import PaydayPrediction from "../budgeting/PaydayPrediction";
 import { predictNextPayday } from "../../utils/paydayPredictor";
 import EditableBalance from "../ui/EditableBalance";
 import { useActualBalance } from "../../hooks/useActualBalance";
+import { useBudget } from "../../hooks/useBudget";
 
-const Dashboard = ({
-  envelopes,
-  savingsGoals,
-  unassignedCash,
-  actualBalance,
-  onUpdateActualBalance,
-  onReconcileTransaction,
-  transactions,
-  paycheckHistory,
-}) => {
+const Dashboard = () => {
+  // Get live data from budget store instead of props
+  const budget = useBudget();
+  const {
+    envelopes,
+    savingsGoals,
+    unassignedCash,
+    actualBalance,
+    setActualBalance,
+    reconcileTransaction,
+    transactions,
+    paycheckHistory,
+  } = budget;
   const [showReconcileModal, setShowReconcileModal] = useState(false);
   const [newTransaction, setNewTransaction] = useState({
     amount: "",
@@ -58,7 +62,7 @@ const Dashboard = ({
   const handleUpdateBalance = (newBalance) => {
     const success = updateActualBalance(newBalance, { source: "manual_dashboard" });
     if (success) {
-      onUpdateActualBalance(newBalance);
+      setActualBalance(newBalance);
     }
   };
 
@@ -76,7 +80,7 @@ const Dashboard = ({
       reconciledAt: new Date().toISOString(),
     };
 
-    onReconcileTransaction(transaction);
+    reconcileTransaction(transaction);
 
     // Reset form
     setNewTransaction({
@@ -219,7 +223,7 @@ const Dashboard = ({
               onClick={() => {
                 if (difference > 0) {
                   // Add difference to unassigned cash
-                  onReconcileTransaction({
+                  reconcileTransaction({
                     id: Date.now(),
                     amount: difference,
                     description: "Balance reconciliation - added extra funds",
@@ -230,7 +234,7 @@ const Dashboard = ({
                   });
                 } else {
                   // Subtract difference from unassigned cash
-                  onReconcileTransaction({
+                  reconcileTransaction({
                     id: Date.now(),
                     amount: difference,
                     description: "Balance reconciliation - adjusted for discrepancy",
