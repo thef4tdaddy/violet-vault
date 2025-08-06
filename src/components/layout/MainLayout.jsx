@@ -497,7 +497,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
           console.log("🔄 [DIRECT] MainLayout onUpdateBill called", {
             billId: updatedBill.id,
             envelopeId: updatedBill.envelopeId,
-            hasUpdateBill: !!updateBill,
+            hasUpdateBill: !!budget.updateBill,
             timestamp: new Date().toISOString(),
           });
           
@@ -506,11 +506,11 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
             const updatedTransactions = allTransactions.map((t) =>
               t.id === updatedBill.id ? updatedBill : t
             );
-            setAllTransactions(updatedTransactions);
+            budget.setAllTransactions(updatedTransactions);
             console.log("🔄 [DIRECT] MainLayout updated allTransactions");
 
             // Use updateBill instead of updateTransaction for proper bill persistence
-            updateBill(updatedBill);
+            budget.updateBill(updatedBill);
             console.log("🔄 [DIRECT] MainLayout called updateBill");
           } catch (error) {
             console.error("❌ [DIRECT] Error in MainLayout onUpdateBill", error);
