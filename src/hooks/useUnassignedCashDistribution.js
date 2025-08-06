@@ -123,8 +123,8 @@ const useUnassignedCashDistribution = () => {
         setUnassignedCash(remainingCash);
       }
 
-      // Close modal
-      closeModal();
+      // Reset distributions after successful application
+      setDistributions({});
     } catch (error) {
       console.error("Error applying distribution:", error);
       setIsProcessing(false);
@@ -136,7 +136,6 @@ const useUnassignedCashDistribution = () => {
     bulkUpdateEnvelopes,
     setUnassignedCash,
     remainingCash,
-    closeModal,
   ]);
 
   // Get distribution preview data
