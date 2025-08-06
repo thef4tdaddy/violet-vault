@@ -67,15 +67,21 @@ const AddBillModal = ({
   onDeleteBill,
   availableEnvelopes = [],
 }) => {
+  // LOGGING STEP 1: Log props on every render to see what the component is receiving.
+  logger.debug("AddBillModal rendering with props:", { isOpen, editingBill });
+
   const [formData, setFormData] = useState(getInitialFormData());
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
+      // LOGGING STEP 2: Log when the effect runs and what data it's using.
+      logger.info("AddBillModal is open. Resetting form state.");
       const initialData = getInitialFormData(editingBill);
-      logger.info("AddBillModal opened for bill:", editingBill);
-      logger.debug("Initial form data set:", initialData);
+      logger.debug("Initial form data being set:", initialData);
       setFormData(initialData);
+    } else {
+      logger.debug("AddBillModal is closed.");
     }
   }, [isOpen, editingBill]);
 
@@ -222,7 +228,8 @@ const AddBillModal = ({
       ...(editingBill && { lastUpdated: new Date().toISOString() }),
     };
 
-    logger.info("Submitting bill data:", billData);
+    // LOGGING STEP 4: Log the final data object right before submission.
+    logger.info("Submitting final bill data:", billData);
 
     if (editingBill) {
       onUpdateBill?.(billData);
@@ -250,7 +257,8 @@ const AddBillModal = ({
 
   const handleEnvelopeChange = (e) => {
     const newEnvelopeId = e.target.value;
-    logger.debug("Envelope selected:", newEnvelopeId);
+    // LOGGING STEP 3: Log every change to the envelope dropdown.
+    logger.debug(`Envelope selection changed to: '${newEnvelopeId}'`);
     setFormData({ ...formData, selectedEnvelope: newEnvelopeId });
   };
 
