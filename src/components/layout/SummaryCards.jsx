@@ -1,6 +1,6 @@
 import React from "react";
 import { DollarSign, Wallet, Target, TrendingUp } from "lucide-react";
-import useUnassignedCashDistribution from "../../hooks/useUnassignedCashDistribution";
+import { useBudget } from "../../hooks/useBudget";
 import UnassignedCashModal from "../modals/UnassignedCashModal";
 
 /**
@@ -13,7 +13,7 @@ const SummaryCards = ({
   totalSavingsBalance,
   biweeklyAllocation,
 }) => {
-  const { openModal } = useUnassignedCashDistribution();
+  const { openUnassignedCashModal } = useBudget();
 
   const cards = [
     {
@@ -29,7 +29,7 @@ const SummaryCards = ({
       label: "Unassigned Cash",
       value: unassignedCash,
       color: "emerald",
-      onClick: unassignedCash > 0 ? openModal : undefined,
+      onClick: unassignedCash > 0 ? openUnassignedCashModal : undefined,
       clickable: unassignedCash > 0,
     },
     {

@@ -9,6 +9,7 @@ import {
   AlertTriangle,
   Loader2,
 } from "lucide-react";
+import { useBudget } from "../../hooks/useBudget";
 import useUnassignedCashDistribution from "../../hooks/useUnassignedCashDistribution";
 
 /**
@@ -16,9 +17,9 @@ import useUnassignedCashDistribution from "../../hooks/useUnassignedCashDistribu
  * Pure UI component - all logic handled by useUnassignedCashDistribution hook
  */
 const UnassignedCashModal = () => {
+  const { isUnassignedCashModalOpen, closeUnassignedCashModal } = useBudget();
   const {
-    // State
-    isModalOpen,
+    // State (except modal state)
     distributions,
     isProcessing,
 
@@ -28,7 +29,6 @@ const UnassignedCashModal = () => {
     isValidDistribution,
 
     // Actions
-    closeModal,
     updateDistribution,
     clearDistributions,
     distributeEqually,
@@ -41,7 +41,7 @@ const UnassignedCashModal = () => {
     getDistributionPreview,
   } = useUnassignedCashDistribution();
 
-  if (!isModalOpen) return null;
+  if (!isUnassignedCashModalOpen) return null;
 
   const preview = getDistributionPreview();
   const hasDistributions = totalDistributed > 0;
@@ -64,7 +64,7 @@ const UnassignedCashModal = () => {
             </p>
           </div>
           <button
-            onClick={closeModal}
+            onClick={closeUnassignedCashModal}
             disabled={isProcessing}
             className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
           >
@@ -243,7 +243,7 @@ const UnassignedCashModal = () => {
         {/* Footer Actions */}
         <div className="flex gap-3 mt-6 pt-4 border-t border-gray-200">
           <button
-            onClick={closeModal}
+            onClick={closeUnassignedCashModal}
             disabled={isProcessing}
             className="flex-1 btn btn-secondary disabled:opacity-50"
           >

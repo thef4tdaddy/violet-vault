@@ -10,8 +10,7 @@ const useUnassignedCashDistribution = () => {
   const { envelopes, unassignedCash, bulkUpdateEnvelopes, setUnassignedCash } =
     budget;
 
-  // Modal state
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // Distribution state (modal state now handled by budget store)
   const [distributions, setDistributions] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -33,15 +32,8 @@ const useUnassignedCashDistribution = () => {
     return totalDistributed > 0 && totalDistributed <= unassignedCash;
   }, [totalDistributed, unassignedCash]);
 
-  // Open modal and reset distributions
-  const openModal = useCallback(() => {
-    setDistributions({});
-    setIsModalOpen(true);
-  }, []);
-
-  // Close modal
-  const closeModal = useCallback(() => {
-    setIsModalOpen(false);
+  // Reset distributions (called when modal opens)
+  const resetDistributions = useCallback(() => {
     setDistributions({});
     setIsProcessing(false);
   }, []);
@@ -163,7 +155,6 @@ const useUnassignedCashDistribution = () => {
 
   return {
     // State
-    isModalOpen,
     distributions,
     isProcessing,
 
@@ -173,8 +164,7 @@ const useUnassignedCashDistribution = () => {
     isValidDistribution,
 
     // Actions
-    openModal,
-    closeModal,
+    resetDistributions,
     updateDistribution,
     clearDistributions,
     distributeEqually,

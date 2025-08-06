@@ -27,7 +27,9 @@ const migrateOldData = () => {
 
     // Migrate if old data exists (always replace new data)
     if (oldData) {
-      console.log("🔄 Migrating data from old budget-store to violet-vault-store...");
+      console.log(
+        "🔄 Migrating data from old budget-store to violet-vault-store...",
+      );
 
       const parsedOldData = JSON.parse(oldData);
 
@@ -40,7 +42,8 @@ const migrateOldData = () => {
             transactions: parsedOldData.state.transactions || [],
             allTransactions: parsedOldData.state.allTransactions || [],
             savingsGoals: parsedOldData.state.savingsGoals || [],
-            supplementalAccounts: parsedOldData.state.supplementalAccounts || [],
+            supplementalAccounts:
+              parsedOldData.state.supplementalAccounts || [],
             unassignedCash: parsedOldData.state.unassignedCash || 0,
             biweeklyAllocation: parsedOldData.state.biweeklyAllocation || 0,
             paycheckHistory: parsedOldData.state.paycheckHistory || [],
@@ -49,8 +52,13 @@ const migrateOldData = () => {
           version: 0,
         };
 
-        localStorage.setItem("violet-vault-store", JSON.stringify(transformedData));
-        console.log("✅ Data migration completed successfully - replaced existing data");
+        localStorage.setItem(
+          "violet-vault-store",
+          JSON.stringify(transformedData),
+        );
+        console.log(
+          "✅ Data migration completed successfully - replaced existing data",
+        );
 
         // Remove old data after successful migration
         localStorage.removeItem("budget-store");
@@ -76,6 +84,8 @@ const storeInitializer = (set, get) => ({
   supplementalAccounts: [],
   unassignedCash: 0,
   biweeklyAllocation: 0,
+  // Unassigned cash modal state
+  isUnassignedCashModalOpen: false,
   paycheckHistory: [], // Paycheck history for payday predictions
   actualBalance: 0, // Real bank account balance
   isActualBalanceManual: false, // Track if balance was manually set
@@ -135,8 +145,8 @@ const storeInitializer = (set, get) => ({
   },
 
   getTotalEnvelopeBalanceByType: (envelopeType) => {
-    return get().envelopes
-      .filter((e) => e.envelopeType === envelopeType)
+    return get()
+      .envelopes.filter((e) => e.envelopeType === envelopeType)
       .reduce((sum, e) => sum + (e.currentBalance || 0), 0);
   },
 
@@ -165,8 +175,12 @@ const storeInitializer = (set, get) => ({
 
   updateTransaction: (transaction) =>
     set((state) => {
-      const transIndex = state.transactions.findIndex((t) => t.id === transaction.id);
-      const allTransIndex = state.allTransactions.findIndex((t) => t.id === transaction.id);
+      const transIndex = state.transactions.findIndex(
+        (t) => t.id === transaction.id,
+      );
+      const allTransIndex = state.allTransactions.findIndex(
+        (t) => t.id === transaction.id,
+      );
 
       if (transIndex !== -1) {
         state.transactions[transIndex] = transaction;
@@ -197,7 +211,9 @@ const storeInitializer = (set, get) => ({
   updateBill: (bill) =>
     set((state) => {
       const billIndex = state.bills.findIndex((b) => b.id === bill.id);
-      const allTransIndex = state.allTransactions.findIndex((t) => t.id === bill.id);
+      const allTransIndex = state.allTransactions.findIndex(
+        (t) => t.id === bill.id,
+      );
 
       if (billIndex !== -1) {
         state.bills[billIndex] = bill;
@@ -258,20 +274,31 @@ const storeInitializer = (set, get) => ({
 
   deleteSupplementalAccount: (id) =>
     set((state) => {
-      state.supplementalAccounts = state.supplementalAccounts.filter((a) => a.id !== id);
+      state.supplementalAccounts = state.supplementalAccounts.filter(
+        (a) => a.id !== id,
+      );
     }),
 
-  transferFromSupplementalAccount: (accountId, envelopeId, amount, description) =>
+  transferFromSupplementalAccount: (
+    accountId,
+    envelopeId,
+    amount,
+    description,
+  ) =>
     set((state) => {
       // Find and update supplemental account
-      const accountIndex = state.supplementalAccounts.findIndex((a) => a.id === accountId);
+      const accountIndex = state.supplementalAccounts.findIndex(
+        (a) => a.id === accountId,
+      );
       if (accountIndex === -1) return;
 
       const account = state.supplementalAccounts[accountIndex];
       if (account.currentBalance < amount) return;
 
       // Find and update envelope
-      const envelopeIndex = state.envelopes.findIndex((e) => e.id === envelopeId);
+      const envelopeIndex = state.envelopes.findIndex(
+        (e) => e.id === envelopeId,
+      );
       if (envelopeIndex === -1) return;
 
       // Update balances
@@ -303,6 +330,17 @@ const storeInitializer = (set, get) => ({
   setBiweeklyAllocation: (amount) =>
     set((state) => {
       state.biweeklyAllocation = amount;
+    }),
+
+  // Unassigned cash modal management
+  openUnassignedCashModal: () =>
+    set((state) => {
+      state.isUnassignedCashModalOpen = true;
+    }),
+
+  closeUnassignedCashModal: () =>
+    set((state) => {
+      state.isUnassignedCashModalOpen = false;
     }),
 
   // Actual balance management
@@ -354,6 +392,7 @@ const storeInitializer = (set, get) => ({
       state.supplementalAccounts = [];
       state.unassignedCash = 0;
       state.biweeklyAllocation = 0;
+      state.isUnassignedCashModalOpen = false;
       state.paycheckHistory = [];
       state.actualBalance = 0;
       state.isActualBalanceManual = false;
@@ -388,8 +427,8 @@ if (LOCAL_ONLY_MODE) {
           isActualBalanceManual: state.isActualBalanceManual,
         }),
       }),
-      { name: "violet-vault-devtools" }
-    )
+      { name: "violet-vault-devtools" },
+    ),
   );
 }
 
