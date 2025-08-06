@@ -78,6 +78,14 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
     }
   }, [allTransactions, setAllTransactions, updateBill]);
 
+  // Debug log to verify function creation
+  console.log("🔧 [DIRECT] ViewRenderer handleUpdateBill created", {
+    functionExists: !!handleUpdateBill,
+    functionType: typeof handleUpdateBill,
+    timestamp: new Date().toISOString(),
+    activeView,
+  });
+
   const views = {
     dashboard: <Dashboard />,
     envelopes: (
@@ -122,52 +130,61 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
         currentUser={currentUser}
       />
     ),
-    bills: (
-      <BillManager
-        transactions={allTransactions}
-        envelopes={envelopes}
-        onPayBill={(updatedBill) => {
-          // Update the bill in allTransactions
-          const updatedTransactions = allTransactions.map((t) =>
-            t.id === updatedBill.id ? updatedBill : t
-          );
-          setAllTransactions(updatedTransactions);
-        }}
-        onUpdateBill={handleUpdateBill}
-        onCreateRecurringBill={(newBill) => {
-          // Store bill properly using budget store - no transaction created until paid
-          console.log("📋 Creating new bill:", newBill);
-          const bill = {
-            ...newBill,
-            id: newBill.id || `bill_${Date.now()}`,
-            type: "recurring_bill",
-            isPaid: false,
-            source: "manual",
-            createdAt: new Date().toISOString(),
-          };
-          addBill(bill);
-          console.log(
-            "✅ Bill stored successfully - no transaction created until paid"
-          );
-        }}
-        onSearchNewBills={async () => {
-          try {
-            // This would integrate with email parsing or other bill detection services
-            // For now, we'll show a placeholder notification
-            alert(
-              "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox."
+    bills: (() => {
+      console.log("🔧 [DIRECT] Rendering BillManager with props", {
+        hasHandleUpdateBill: !!handleUpdateBill,
+        handleUpdateBillType: typeof handleUpdateBill,
+        activeView,
+        timestamp: new Date().toISOString(),
+      });
+      
+      return (
+        <BillManager
+          transactions={allTransactions}
+          envelopes={envelopes}
+          onPayBill={(updatedBill) => {
+            // Update the bill in allTransactions
+            const updatedTransactions = allTransactions.map((t) =>
+              t.id === updatedBill.id ? updatedBill : t
             );
-          } catch (error) {
-            console.error("Failed to search for new bills:", error);
-            alert("Failed to search for new bills. Please try again.");
-          }
-        }}
-        onError={(error) => {
-          console.error("Bill management error:", error);
-          alert(`Error: ${error.message || error}`);
-        }}
-      />
-    ),
+            setAllTransactions(updatedTransactions);
+          }}
+          onUpdateBill={handleUpdateBill}
+          onCreateRecurringBill={(newBill) => {
+            // Store bill properly using budget store - no transaction created until paid
+            console.log("📋 Creating new bill:", newBill);
+            const bill = {
+              ...newBill,
+              id: newBill.id || `bill_${Date.now()}`,
+              type: "recurring_bill",
+              isPaid: false,
+              source: "manual",
+              createdAt: new Date().toISOString(),
+            };
+            addBill(bill);
+            console.log(
+              "✅ Bill stored successfully - no transaction created until paid"
+            );
+          }}
+          onSearchNewBills={async () => {
+            try {
+              // This would integrate with email parsing or other bill detection services
+              // For now, we'll show a placeholder notification
+              alert(
+                "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox."
+              );
+            } catch (error) {
+              console.error("Failed to search for new bills:", error);
+              alert("Failed to search for new bills. Please try again.");
+            }
+          }}
+          onError={(error) => {
+            console.error("Bill management error:", error);
+            alert(`Error: ${error.message || error}`);
+          }}
+        />
+      );
+    })(),
     transactions: <TransactionLedger currentUser={currentUser} />,
     analytics: (
       <ChartsAndAnalytics
