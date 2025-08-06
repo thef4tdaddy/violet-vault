@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { useBudget } from "./useBudget";
+import { ENVELOPE_TYPES, AUTO_CLASSIFY_ENVELOPE_TYPE } from "../constants/categories";
 
 /**
  * Custom hook for managing unassigned cash distribution logic
@@ -62,14 +63,29 @@ const useUnassignedCashDistribution = () => {
     setDistributions(newDistributions);
   }, [envelopes, unassignedCash]);
 
-  // Distribute proportionally based on monthly budgets
+  // Distribute proportionally based on envelope type-specific budgets
   const distributeProportionally = useCallback(() => {
     if (envelopes.length === 0) return;
 
-    const totalMonthlyBudget = envelopes.reduce((sum, env) => sum + (env.monthlyAmount || 0), 0);
+    // Calculate total budget across all envelope types
+    const totalBudget = envelopes.reduce((sum, env) => {
+      const envelopeType = env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
 
-    if (totalMonthlyBudget === 0) {
-      // Fallback to equal distribution if no monthly budgets set
+      if (envelopeType === ENVELOPE_TYPES.BILL) {
+        // For bills, use biweeklyAllocation (convert to monthly equivalent)
+        return sum + (env.biweeklyAllocation ? env.biweeklyAllocation * 2.165 : 0);
+      } else if (envelopeType === ENVELOPE_TYPES.VARIABLE) {
+        // For variables, use monthlyBudget
+        return sum + (env.monthlyBudget || env.monthlyAmount || 0);
+      } else if (envelopeType === ENVELOPE_TYPES.SAVINGS) {
+        // For savings, use biweeklyAllocation or a reasonable monthly contribution
+        return sum + (env.biweeklyAllocation ? env.biweeklyAllocation * 2.165 : 50);
+      }
+      return sum;
+    }, 0);
+
+    if (totalBudget === 0) {
+      // Fallback to equal distribution if no budgets set
       distributeEqually();
       return;
     }
@@ -77,10 +93,26 @@ const useUnassignedCashDistribution = () => {
     const newDistributions = {};
 
     envelopes.forEach((envelope) => {
-      const monthlyBudget = envelope.monthlyAmount || 0;
-      const proportion = monthlyBudget / totalMonthlyBudget;
+      const envelopeType = envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+      let monthlyBudget = 0;
+
+      if (envelopeType === ENVELOPE_TYPES.BILL) {
+        // For bills, convert biweekly to monthly
+        monthlyBudget = envelope.biweeklyAllocation ? envelope.biweeklyAllocation * 2.165 : 0;
+      } else if (envelopeType === ENVELOPE_TYPES.VARIABLE) {
+        // For variables, use monthlyBudget
+        monthlyBudget = envelope.monthlyBudget || envelope.monthlyAmount || 0;
+      } else if (envelopeType === ENVELOPE_TYPES.SAVINGS) {
+        // For savings, use biweeklyAllocation or default
+        monthlyBudget = envelope.biweeklyAllocation ? envelope.biweeklyAllocation * 2.165 : 50;
+      }
+
+      const proportion = monthlyBudget / totalBudget;
       const amount = Math.floor(unassignedCash * proportion * 100) / 100;
-      newDistributions[envelope.id] = amount;
+
+      if (amount > 0) {
+        newDistributions[envelope.id] = amount;
+      }
     });
 
     setDistributions(newDistributions);

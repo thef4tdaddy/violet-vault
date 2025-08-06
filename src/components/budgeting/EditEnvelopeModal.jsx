@@ -149,21 +149,6 @@ const EditEnvelopeModal = ({
       newErrors.name = "Name must be at least 2 characters";
     }
 
-    // Envelope type specific validation
-    if (formData.envelopeType === ENVELOPE_TYPES.BILL) {
-      if (!formData.biweeklyAllocation || parseFloat(formData.biweeklyAllocation) <= 0) {
-        newErrors.biweeklyAllocation = "Biweekly allocation must be greater than 0";
-      }
-    } else if (formData.envelopeType === ENVELOPE_TYPES.VARIABLE) {
-      if (!formData.monthlyBudget || parseFloat(formData.monthlyBudget) <= 0) {
-        newErrors.monthlyBudget = "Monthly budget must be greater than 0";
-      }
-    } else if (formData.envelopeType === ENVELOPE_TYPES.SAVINGS) {
-      if (!formData.targetAmount || parseFloat(formData.targetAmount) <= 0) {
-        newErrors.targetAmount = "Target amount must be greater than 0";
-      }
-    }
-
     // Check for duplicate names (excluding current envelope)
     const duplicateName = existingEnvelopes.find(
       (env) =>
@@ -173,10 +158,29 @@ const EditEnvelopeModal = ({
       newErrors.name = "An envelope with this name already exists";
     }
 
-    // Amount validation
-    if (!formData.monthlyAmount || parseFloat(formData.monthlyAmount) <= 0) {
-      newErrors.monthlyAmount = "Monthly amount must be greater than 0";
-    } else if (parseFloat(formData.monthlyAmount) > 50000) {
+    // Envelope type specific validation (replaces generic monthlyAmount validation)
+    if (formData.envelopeType === ENVELOPE_TYPES.BILL) {
+      if (!formData.biweeklyAllocation || parseFloat(formData.biweeklyAllocation) <= 0) {
+        newErrors.biweeklyAllocation = "Biweekly allocation must be greater than 0";
+      } else if (parseFloat(formData.biweeklyAllocation) > 25000) {
+        newErrors.biweeklyAllocation = "Biweekly allocation seems unusually high";
+      }
+    } else if (formData.envelopeType === ENVELOPE_TYPES.VARIABLE) {
+      if (!formData.monthlyBudget || parseFloat(formData.monthlyBudget) <= 0) {
+        newErrors.monthlyBudget = "Monthly budget must be greater than 0";
+      } else if (parseFloat(formData.monthlyBudget) > 50000) {
+        newErrors.monthlyBudget = "Monthly budget seems unusually high";
+      }
+    } else if (formData.envelopeType === ENVELOPE_TYPES.SAVINGS) {
+      if (!formData.targetAmount || parseFloat(formData.targetAmount) <= 0) {
+        newErrors.targetAmount = "Target amount must be greater than 0";
+      } else if (parseFloat(formData.targetAmount) > 1000000) {
+        newErrors.targetAmount = "Target amount seems unusually high";
+      }
+    }
+
+    // Legacy monthlyAmount validation (only if still present and no type-specific amount is set)
+    if (formData.monthlyAmount && parseFloat(formData.monthlyAmount) > 50000) {
       newErrors.monthlyAmount = "Monthly amount seems unusually high";
     }
 
