@@ -14,7 +14,6 @@ import {
   getFrequencyOptions,
 } from "../../utils/frequencyCalculations";
 import { getBillCategories } from "../../constants/categories";
-import logger from "../../utils/logger";
 
 const getInitialFormData = (bill = null) => {
   if (bill) {
@@ -66,11 +65,6 @@ const AddBillModal = ({
   onDeleteBill,
   availableEnvelopes = [],
 }) => {
-  // --- DEBUGGING STEP ---
-  // If the new code is running and dev tools are open,
-  // the browser will pause execution on this line.
-  debugger;
-
   const [formData, setFormData] = useState(getInitialFormData(editingBill));
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -269,7 +263,7 @@ const AddBillModal = ({
       <div className="glassmorphism rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-white/30 shadow-2xl">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xl font-semibold">
-            {editingBill ? "EDIT BILL - DEBUG" : "Add New Bill"}
+            {editingBill ? "Edit Bill" : "Add New Bill"}
           </h3>
           <button
             onClick={cancelEdit}
