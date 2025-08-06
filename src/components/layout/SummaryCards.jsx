@@ -7,12 +7,7 @@ import UnassignedCashModal from "../modals/UnassignedCashModal";
  * Summary cards component showing financial overview
  * Extracted from Layout.jsx for better organization
  */
-const SummaryCards = ({
-  totalCash,
-  unassignedCash,
-  totalSavingsBalance,
-  biweeklyAllocation,
-}) => {
+const SummaryCards = ({ totalCash, unassignedCash, totalSavingsBalance, biweeklyAllocation }) => {
   const { openUnassignedCashModal } = useBudget();
 
   const cards = [
@@ -68,14 +63,7 @@ const SummaryCards = ({
   );
 };
 
-const SummaryCard = ({
-  icon: Icon,
-  label,
-  value,
-  color,
-  onClick,
-  clickable,
-}) => {
+const SummaryCard = ({ icon: Icon, label, value, color, onClick, clickable }) => {
   const colorClasses = {
     purple: "bg-purple-500",
     emerald: "bg-emerald-500",
@@ -90,8 +78,7 @@ const SummaryCard = ({
     amber: "text-amber-600",
   };
 
-  const baseClasses =
-    "glassmorphism rounded-3xl p-6 transition-all duration-200";
+  const baseClasses = "glassmorphism rounded-3xl p-6 transition-all duration-200";
   const clickableClasses = clickable
     ? "cursor-pointer hover:shadow-lg hover:scale-105 active:scale-95"
     : "";
@@ -109,15 +96,9 @@ const SummaryCard = ({
       <div>
         <p className="text-sm font-semibold text-gray-600 mb-1">
           {label}
-          {clickable && (
-            <span className="ml-1 text-xs text-gray-400">
-              (click to distribute)
-            </span>
-          )}
+          {clickable && <span className="ml-1 text-xs text-gray-400">(click to distribute)</span>}
         </p>
-        <p className={`text-2xl font-bold ${textColorClasses[color]}`}>
-          ${value.toFixed(2)}
-        </p>
+        <p className={`text-2xl font-bold ${textColorClasses[color]}`}>${value.toFixed(2)}</p>
       </div>
     </div>
   );

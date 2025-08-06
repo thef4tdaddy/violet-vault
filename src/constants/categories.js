@@ -31,8 +31,8 @@ export const BILL_CATEGORIES = [
 // Envelope types for classification
 export const ENVELOPE_TYPES = {
   BILL: "bill",
-  VARIABLE: "variable", 
-  SAVINGS: "savings"
+  VARIABLE: "variable",
+  SAVINGS: "savings",
 };
 
 // Default envelope type for new envelopes
@@ -49,30 +49,30 @@ export const ENVELOPE_TYPE_CONFIG = {
     textColor: "text-blue-700",
     icon: "FileText",
     fundingMethod: "biweekly", // Uses biweeklyAllocation
-    displayFormat: "Due: ${amount}/biweekly"
+    displayFormat: "Due: ${amount}/biweekly",
   },
   [ENVELOPE_TYPES.VARIABLE]: {
     name: "Variable Expense Envelope",
     description: "Regular but flexible spending (gas, groceries, medical, pet expenses)",
     color: "orange",
-    borderColor: "border-orange-500", 
+    borderColor: "border-orange-500",
     bgColor: "bg-orange-50",
     textColor: "text-orange-700",
     icon: "TrendingUp",
     fundingMethod: "monthly", // Uses monthlyBudget
-    displayFormat: "Budget: ${amount}/month"
+    displayFormat: "Budget: ${amount}/month",
   },
   [ENVELOPE_TYPES.SAVINGS]: {
     name: "Savings Goal Envelope",
     description: "Long-term savings targets",
     color: "green",
     borderColor: "border-green-500",
-    bgColor: "bg-green-50", 
+    bgColor: "bg-green-50",
     textColor: "text-green-700",
     icon: "Target",
     fundingMethod: "target", // Uses targetAmount
-    displayFormat: "Target: ${amount}"
-  }
+    displayFormat: "Target: ${amount}",
+  },
 };
 
 // Auto-classify envelope type based on category
@@ -80,13 +80,18 @@ export const AUTO_CLASSIFY_ENVELOPE_TYPE = (category) => {
   if (BILL_CATEGORIES.includes(category)) {
     return ENVELOPE_TYPES.BILL;
   }
-  
+
   // Categories that are typically variable expenses
-  const variableCategories = ["Food & Dining", "Transportation", "Health & Medical", "Personal Care"];
+  const variableCategories = [
+    "Food & Dining",
+    "Transportation",
+    "Health & Medical",
+    "Personal Care",
+  ];
   if (variableCategories.includes(category)) {
     return ENVELOPE_TYPES.VARIABLE;
   }
-  
+
   // Default to variable for unknown categories
   return ENVELOPE_TYPES.VARIABLE;
 };

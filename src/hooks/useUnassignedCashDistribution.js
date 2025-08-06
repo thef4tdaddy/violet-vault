@@ -7,8 +7,7 @@ import { useBudget } from "./useBudget";
  */
 const useUnassignedCashDistribution = () => {
   const budget = useBudget();
-  const { envelopes, unassignedCash, bulkUpdateEnvelopes, setUnassignedCash } =
-    budget;
+  const { envelopes, unassignedCash, bulkUpdateEnvelopes, setUnassignedCash } = budget;
 
   // Distribution state (modal state now handled by budget store)
   const [distributions, setDistributions] = useState({});
@@ -16,10 +15,7 @@ const useUnassignedCashDistribution = () => {
 
   // Calculate total being distributed
   const totalDistributed = useMemo(() => {
-    return Object.values(distributions).reduce(
-      (sum, amount) => sum + (parseFloat(amount) || 0),
-      0,
-    );
+    return Object.values(distributions).reduce((sum, amount) => sum + (parseFloat(amount) || 0), 0);
   }, [distributions]);
 
   // Calculate remaining unassigned cash
@@ -56,8 +52,7 @@ const useUnassignedCashDistribution = () => {
   const distributeEqually = useCallback(() => {
     if (envelopes.length === 0) return;
 
-    const amountPerEnvelope =
-      Math.floor((unassignedCash * 100) / envelopes.length) / 100;
+    const amountPerEnvelope = Math.floor((unassignedCash * 100) / envelopes.length) / 100;
     const newDistributions = {};
 
     envelopes.forEach((envelope) => {
@@ -71,10 +66,7 @@ const useUnassignedCashDistribution = () => {
   const distributeProportionally = useCallback(() => {
     if (envelopes.length === 0) return;
 
-    const totalMonthlyBudget = envelopes.reduce(
-      (sum, env) => sum + (env.monthlyAmount || 0),
-      0,
-    );
+    const totalMonthlyBudget = envelopes.reduce((sum, env) => sum + (env.monthlyAmount || 0), 0);
 
     if (totalMonthlyBudget === 0) {
       // Fallback to equal distribution if no monthly budgets set
