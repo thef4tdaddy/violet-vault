@@ -3,12 +3,17 @@ import { H } from "./highlight.js";
 class Logger {
   constructor() {
     this.isDevelopment = import.meta.env.MODE === "development";
+    this.isDevSite =
+      window.location.hostname === "dev.f4tdaddy.com" ||
+      window.location.hostname === "localhost" ||
+      window.location.hostname.includes("preview") ||
+      window.location.hostname.includes("vercel");
   }
 
   // Debug-level logging for development and sync issues
   debug(message, data = {}) {
-    // Always log to console in development, but also use original console.log to bypass capture
-    // Temporarily also log bill-related debug messages in production for debugging
+    // Always log to console in development or on dev sites
+    // Also log bill-related debug messages on dev site for debugging
     const isBillRelated =
       message.includes("Bill") ||
       message.includes("Envelope") ||
@@ -18,7 +23,7 @@ class Logger {
       data.envelopeId ||
       data.selectedEnvelope;
 
-    if (this.isDevelopment || isBillRelated) {
+    if (this.isDevelopment || (this.isDevSite && isBillRelated)) {
       // Use window.originalConsoleLog if available, otherwise regular console.log
       const consoleLog = window.originalConsoleLog || console.log;
       consoleLog(`🔍 ${message}`, data);
