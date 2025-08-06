@@ -3,11 +3,17 @@ import { H } from "./highlight.js";
 class Logger {
   constructor() {
     this.isDevelopment = import.meta.env.MODE === "development";
-    this.isDevSite =
+    this.isDevSite = this.getIsDevSite();
+  }
+
+  getIsDevSite() {
+    if (typeof window === "undefined") return false;
+    return (
       window.location.hostname === "dev.f4tdaddy.com" ||
       window.location.hostname === "localhost" ||
       window.location.hostname.includes("preview") ||
-      window.location.hostname.includes("vercel");
+      window.location.hostname.includes("vercel")
+    );
   }
 
   // Debug-level logging for development and sync issues
