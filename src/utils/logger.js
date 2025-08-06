@@ -23,10 +23,18 @@ class Logger {
       data.envelopeId ||
       data.selectedEnvelope;
 
-    if (this.isDevelopment || (this.isDevSite && isBillRelated)) {
+    // Temporarily force all bill-related logs to show for debugging
+    if (
+      this.isDevelopment ||
+      (this.isDevSite && isBillRelated) ||
+      isBillRelated
+    ) {
       // Use window.originalConsoleLog if available, otherwise regular console.log
       const consoleLog = window.originalConsoleLog || console.log;
-      consoleLog(`🔍 ${message}`, data);
+      consoleLog(
+        `🔍 [${this.isDevelopment ? "DEV" : this.isDevSite ? "DEV-SITE" : "PROD"}] ${message}`,
+        data,
+      );
     }
 
     // Highlight.io automatically captures console logs, so just ensure it's tracked

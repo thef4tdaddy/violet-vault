@@ -75,6 +75,16 @@ const AddBillModal = ({
       const billEnvelopes = availableEnvelopes.filter(
         (env) => env.envelopeType === "bill" || !env.envelopeType,
       );
+
+      console.log("🔄 [DIRECT] Initializing bill modal form data", {
+        editingBill: editingBill?.id,
+        envelopeId: editingBill?.envelopeId,
+        selectedEnvelope: initialData.selectedEnvelope,
+        availableEnvelopes: availableEnvelopes.length,
+        billEnvelopes: billEnvelopes.length,
+        hostname: window.location.hostname,
+      });
+
       logger.debug("Initializing bill modal form data", {
         editingBill: editingBill?.id,
         envelopeId: editingBill?.envelopeId,
@@ -269,6 +279,13 @@ const AddBillModal = ({
     });
 
     if (editingBill) {
+      console.log("🔄 [DIRECT] Updating existing bill", {
+        billId: billData.id,
+        envelopeId: billData.envelopeId,
+        originalEnvelopeId: editingBill.envelopeId,
+        envelopeChanged: editingBill.envelopeId !== billData.envelopeId,
+      });
+
       logger.debug("Updating existing bill", {
         billId: billData.id,
         envelopeId: billData.envelopeId,
@@ -277,8 +294,10 @@ const AddBillModal = ({
       });
       try {
         onUpdateBill?.(billData);
+        console.log("🔄 [DIRECT] Bill update completed successfully");
         logger.debug("Bill update completed successfully");
       } catch (error) {
+        console.error("❌ [DIRECT] Error during bill update", error);
         logger.error("Error during bill update", error);
         throw error;
       }
@@ -312,6 +331,13 @@ const AddBillModal = ({
 
   const handleEnvelopeChange = (e) => {
     const newEnvelopeId = e.target.value;
+
+    console.log("🔄 [DIRECT] Envelope selection changed", {
+      newEnvelopeId,
+      oldSelectedEnvelope: formData.selectedEnvelope,
+      availableEnvelopes: availableEnvelopes.length,
+    });
+
     logger.debug("Envelope selection changed", {
       newEnvelopeId,
       availableEnvelopes: availableEnvelopes.length,
