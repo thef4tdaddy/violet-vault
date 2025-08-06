@@ -108,18 +108,27 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
           setAllTransactions(updatedTransactions);
         }}
         onUpdateBill={(updatedBill) => {
-          console.log("🔄 ViewRenderer onUpdateBill called", {
+          console.log("🔄 [DIRECT] ViewRenderer onUpdateBill called", {
             billId: updatedBill.id,
             envelopeId: updatedBill.envelopeId,
+            hasUpdateBillFunction: !!updateBill,
           });
-          // Update the bill in allTransactions
-          const updatedTransactions = allTransactions.map((t) =>
-            t.id === updatedBill.id ? updatedBill : t
-          );
-          setAllTransactions(updatedTransactions);
+          
+          try {
+            // Update the bill in allTransactions
+            const updatedTransactions = allTransactions.map((t) =>
+              t.id === updatedBill.id ? updatedBill : t
+            );
+            setAllTransactions(updatedTransactions);
+            console.log("🔄 [DIRECT] Updated allTransactions");
 
-          // Also update the bill in the budget store
-          updateBill(updatedBill);
+            // Also update the bill in the budget store
+            console.log("🔄 [DIRECT] Calling budget store updateBill");
+            updateBill(updatedBill);
+            console.log("🔄 [DIRECT] Budget store updateBill completed");
+          } catch (error) {
+            console.error("❌ [DIRECT] Error in ViewRenderer onUpdateBill", error);
+          }
         }}
         onCreateRecurringBill={(newBill) => {
           // Store bill properly using budget store - no transaction created until paid
