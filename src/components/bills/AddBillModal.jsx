@@ -104,14 +104,7 @@ const AddBillModal = ({
     }));
   }, [formData.name, formData.category, formData.notes]);
 
-  // Debug formData changes
-  useEffect(() => {
-    logger.debug("Form data updated", {
-      selectedEnvelope: formData.selectedEnvelope,
-      name: formData.name,
-      amount: formData.amount,
-    });
-  }, [formData.selectedEnvelope, formData.name, formData.amount]);
+  // Debug formData changes (removed to reduce noise)
 
   const iconSuggestions = getBillIconOptions(formData.category);
   const frequencies = [
@@ -557,20 +550,12 @@ const AddBillModal = ({
                   .filter(
                     (env) => env.envelopeType === "bill" || !env.envelopeType,
                   )
-                  .map((envelope) => {
-                    logger.debug("Rendering envelope option", {
-                      envelopeId: envelope.id,
-                      envelopeName: envelope.name,
-                      envelopeType: envelope.envelopeType,
-                      isSelected: envelope.id === formData.selectedEnvelope,
-                    });
-                    return (
-                      <option key={envelope.id} value={envelope.id}>
-                        {envelope.name} ($
-                        {(envelope.currentBalance || 0).toFixed(2)} available)
-                      </option>
-                    );
-                  })}
+                  .map((envelope) => (
+                    <option key={envelope.id} value={envelope.id}>
+                      {envelope.name} ($
+                      {(envelope.currentBalance || 0).toFixed(2)} available)
+                    </option>
+                  ))}
               </select>
               {formData.selectedEnvelope && (
                 <p className="text-xs text-green-600 mt-1">
