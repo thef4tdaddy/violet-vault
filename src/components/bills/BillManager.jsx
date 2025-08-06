@@ -1021,7 +1021,17 @@ const BillManager = ({
 
             if (onUpdateBill) {
               console.log("🔄 [DIRECT] Using prop onUpdateBill");
-              onUpdateBill(updatedBillData);
+              try {
+                console.log("🔄 [DIRECT] About to call onUpdateBill prop", {
+                  propType: typeof onUpdateBill,
+                  billData: updatedBillData
+                });
+                onUpdateBill(updatedBillData);
+                console.log("🔄 [DIRECT] onUpdateBill prop call completed successfully");
+              } catch (error) {
+                console.error("❌ [DIRECT] Error calling onUpdateBill prop", error);
+                throw error;
+              }
             } else {
               console.log("🔄 [DIRECT] Using budget.updateBill fallback");
               // Fallback to budget context
