@@ -14,9 +14,8 @@ import {
   getFrequencyOptions,
 } from "../../utils/frequencyCalculations";
 import { getBillCategories } from "../../constants/categories";
-import logger from "../../utils/logger"; // Using your custom logger
+import logger from "../../utils/logger";
 
-// Helper function to define the initial state for the form
 const getInitialFormData = (bill = null) => {
   if (bill) {
     return {
@@ -67,27 +66,22 @@ const AddBillModal = ({
   onDeleteBill,
   availableEnvelopes = [],
 }) => {
-  // LOGGING STEP 1: Log props on every render to see what the component is receiving.
-  logger.debug("AddBillModal rendering with props:", { isOpen, editingBill });
+  // --- DEBUGGING STEP ---
+  // If the new code is running and dev tools are open,
+  // the browser will pause execution on this line.
+  debugger;
 
-  const [formData, setFormData] = useState(getInitialFormData());
+  const [formData, setFormData] = useState(getInitialFormData(editingBill));
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
-      // LOGGING STEP 2: Log when the effect runs and what data it's using.
-      logger.info("AddBillModal is open. Resetting form state.");
-      const initialData = getInitialFormData(editingBill);
-      logger.debug("Initial form data being set:", initialData);
-      setFormData(initialData);
-    } else {
-      logger.debug("AddBillModal is closed.");
+      setFormData(getInitialFormData(editingBill));
     }
   }, [isOpen, editingBill]);
 
   useEffect(() => {
     if (!formData.name && !formData.category) return;
-
     const suggestedIcon = getBillIcon(
       formData.name || "",
       formData.notes || "",
@@ -228,9 +222,6 @@ const AddBillModal = ({
       ...(editingBill && { lastUpdated: new Date().toISOString() }),
     };
 
-    // LOGGING STEP 4: Log the final data object right before submission.
-    logger.info("Submitting final bill data:", billData);
-
     if (editingBill) {
       onUpdateBill?.(billData);
     } else {
@@ -257,8 +248,6 @@ const AddBillModal = ({
 
   const handleEnvelopeChange = (e) => {
     const newEnvelopeId = e.target.value;
-    // LOGGING STEP 3: Log every change to the envelope dropdown.
-    logger.debug(`Envelope selection changed to: '${newEnvelopeId}'`);
     setFormData({ ...formData, selectedEnvelope: newEnvelopeId });
   };
 
@@ -280,7 +269,7 @@ const AddBillModal = ({
       <div className="glassmorphism rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-white/30 shadow-2xl">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xl font-semibold">
-            {editingBill ? "Edit Bill" : "Add New Bill"}
+            {editingBill ? "EDIT BILL - DEBUG" : "Add New Bill"}
           </h3>
           <button
             onClick={cancelEdit}
@@ -292,7 +281,6 @@ const AddBillModal = ({
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Form fields remain the same */}
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Bill Name *
