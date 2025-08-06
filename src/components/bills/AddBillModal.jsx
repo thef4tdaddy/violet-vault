@@ -32,7 +32,7 @@ const AddBillModal = ({
         color: editingBill.color || "#3B82F6",
         notes: editingBill.notes || "",
         createEnvelope: false, // Don't show checkbox for editing
-        selectedEnvelope: editingBill.envelopeId || "", // Add envelope selection
+        selectedEnvelope: editingBill.envelopeId ? String(editingBill.envelopeId) : "", // Add envelope selection
         customFrequency: editingBill.customFrequency || "",
         iconName:
           editingBill.iconName ||
@@ -263,8 +263,8 @@ const AddBillModal = ({
       description: formData.name.trim(),
       createdAt: editingBill ? editingBill.createdAt : new Date().toISOString(),
       date: normalizedDueDate || new Date().toISOString().split("T")[0],
-      // Add envelope assignment
-      envelopeId: formData.selectedEnvelope || null,
+      // Add envelope assignment, ensuring numeric ID for consistent matching
+      envelopeId: formData.selectedEnvelope ? Number(formData.selectedEnvelope) : null,
       // Preserve any other properties from the original bill
       ...(editingBill && {
         lastUpdated: new Date().toISOString(),
