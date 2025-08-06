@@ -14,6 +14,7 @@ import {
   getFrequencyOptions,
 } from "../../utils/frequencyCalculations";
 import { getBillCategories } from "../../constants/categories";
+import logger from "../../utils/logger";
 
 const getInitialFormData = (bill = null) => {
   if (bill) {
@@ -70,9 +71,25 @@ const AddBillModal = ({
 
   useEffect(() => {
     if (isOpen) {
-      setFormData(getInitialFormData(editingBill));
+      const initialData = getInitialFormData(editingBill);
+      const billEnvelopes = availableEnvelopes.filter(
+        (env) => env.envelopeType === "bill" || !env.envelopeType
+      );
+      logger.debug("Initializing bill modal form data", {
+        editingBill: editingBill?.id,
+        envelopeId: editingBill?.envelopeId,
+        selectedEnvelope: initialData.selectedEnvelope,
+        availableEnvelopes: availableEnvelopes.length,
+        billEnvelopes: billEnvelopes.length,
+        envelopeTypes: availableEnvelopes.map((e) => ({
+          id: e.id,
+          name: e.name,
+          type: e.envelopeType,
+        })),
+      });
+      setFormData(initialData);
     }
-  }, [isOpen, editingBill]);
+  }, [isOpen, editingBill, availableEnvelopes]);
 
   useEffect(() => {
     if (!formData.name && !formData.category) return;
@@ -86,6 +103,15 @@ const AddBillModal = ({
       iconName: getIconNameForStorage(suggestedIcon),
     }));
   }, [formData.name, formData.category, formData.notes]);
+
+  // Debug formData changes
+  useEffect(() => {
+    logger.debug("Form data updated", {
+      selectedEnvelope: formData.selectedEnvelope,
+      name: formData.name,
+      amount: formData.amount,
+    });
+  }, [formData.selectedEnvelope, formData.name, formData.amount]);
 
   const iconSuggestions = getBillIconOptions(formData.category);
   const frequencies = [
@@ -174,7 +200,19 @@ const AddBillModal = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.amount) return;
+    logger.debug("Form submission started", {
+      name: formData.name.trim(),
+      amount: formData.amount,
+      selectedEnvelope: formData.selectedEnvelope,
+    });
+
+    if (!formData.name.trim() || !formData.amount) {
+      logger.warn("Form validation failed", {
+        nameValid: !!formData.name.trim(),
+        amountValid: !!formData.amount,
+      });
+      return;
+    }
 
     const amount = parseFloat(formData.amount);
     const normalizedDueDate = normalizeDateFormat(formData.dueDate);
@@ -216,9 +254,27 @@ const AddBillModal = ({
       ...(editingBill && { lastUpdated: new Date().toISOString() }),
     };
 
+    logger.debug("Bill data being saved", {
+      billId: billData.id,
+      envelopeId: billData.envelopeId,
+      selectedEnvelope: formData.selectedEnvelope,
+      availableEnvelopes: availableEnvelopes.length,
+      isEditing: !!editingBill,
+      hasOnUpdateBill: !!onUpdateBill,
+      hasOnAddBill: !!onAddBill,
+    });
+
     if (editingBill) {
+      logger.debug("Updating existing bill", {
+        billId: billData.id,
+        envelopeId: billData.envelopeId,
+      });
       onUpdateBill?.(billData);
     } else {
+      logger.debug("Adding new bill", {
+        billId: billData.id,
+        envelopeId: billData.envelopeId,
+      });
       onAddBill?.(billData);
       if (formData.createEnvelope && onAddEnvelope) {
         const envelopeData = {
@@ -242,11 +298,17 @@ const AddBillModal = ({
 
   const handleEnvelopeChange = (e) => {
     const newEnvelopeId = e.target.value;
+    logger.debug("Envelope selection changed", {
+      newEnvelopeId,
+      availableEnvelopes: availableEnvelopes.length,
+      selectedEnvelope: formData.selectedEnvelope,
+    });
     setFormData({ ...formData, selectedEnvelope: newEnvelopeId });
   };
 
   const cancelEdit = () => {
     setShowDeleteConfirm(false);
+    setFormData(getInitialFormData(null)); // Reset form data
     onClose();
   };
 
@@ -481,6 +543,18 @@ const AddBillModal = ({
                     </option>
                   ))}
               </select>
+              {formData.selectedEnvelope && (
+                <p className="text-xs text-green-600 mt-1">
+                  Selected:{" "}
+                  {availableEnvelopes.find(
+                    (e) => e.id === formData.selectedEnvelope
+                  )?.name || "Unknown"}
+                </p>
+              )}
+              <p className="text-xs text-blue-600 mt-1">
+                Only bill envelopes are available for bill assignment to prevent
+                conflicts with variable spending
+              </p>
               <p className="text-xs text-gray-500 mt-1">
                 Choose which envelope will be used to pay this bill
               </p>
