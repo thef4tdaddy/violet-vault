@@ -137,6 +137,13 @@ const AddBillModal = ({
 
   if (!isOpen) return null;
 
+  // Basic debugging to verify modal is rendering
+  console.log("🔍 AddBillModal rendering", {
+    isOpen,
+    editingBill: editingBill?.id,
+    availableEnvelopes: availableEnvelopes.length,
+  });
+
   const calculateBiweeklyAmount = (amount, frequency, customFrequency = 1) => {
     if (frequency === "custom")
       return toBiweekly(amount, "yearly") * customFrequency;
@@ -200,6 +207,11 @@ const AddBillModal = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log("🚀 FORM SUBMITTED!", {
+      name: formData.name.trim(),
+      amount: formData.amount,
+      selectedEnvelope: formData.selectedEnvelope,
+    });
     logger.debug("Form submission started", {
       name: formData.name.trim(),
       amount: formData.amount,
@@ -298,6 +310,10 @@ const AddBillModal = ({
 
   const handleEnvelopeChange = (e) => {
     const newEnvelopeId = e.target.value;
+    console.log("🔗 ENVELOPE CHANGED!", {
+      newEnvelopeId,
+      oldValue: formData.selectedEnvelope,
+    });
     logger.debug("Envelope selection changed", {
       newEnvelopeId,
       availableEnvelopes: availableEnvelopes.length,
