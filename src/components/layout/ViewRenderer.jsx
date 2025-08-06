@@ -54,36 +54,22 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
 
   // Stable callback for bill updates
   const handleUpdateBill = useCallback((updatedBill) => {
-    // Force this log to appear at window level
-    window.console.log("🔄 [DIRECT] ViewRenderer onUpdateBill called", {
+    console.log("🔄 [DIRECT] ViewRenderer handleUpdateBill called", {
       billId: updatedBill.id,
       envelopeId: updatedBill.envelopeId,
-      hasUpdateBillFunction: !!updateBill,
-      timestamp: new Date().toISOString(),
-    });
-    console.log("🔄 [DIRECT] ViewRenderer onUpdateBill called", {
-      billId: updatedBill.id,
-      envelopeId: updatedBill.envelopeId,
-      hasUpdateBillFunction: !!updateBill,
+      hasUpdateBill: !!updateBill,
       timestamp: new Date().toISOString(),
     });
     
     try {
-      // Update the bill in allTransactions
-      const updatedTransactions = allTransactions.map((t) =>
-        t.id === updatedBill.id ? updatedBill : t
-      );
-      setAllTransactions(updatedTransactions);
-      console.log("🔄 [DIRECT] Updated allTransactions");
-
-      // Also update the bill in the budget store
-      console.log("🔄 [DIRECT] Calling budget store updateBill");
+      // Use updateBill for proper bill persistence with envelope assignment
+      // The budget store's updateBill handles both bills and allTransactions internally
       updateBill(updatedBill);
-      console.log("🔄 [DIRECT] Budget store updateBill completed");
+      console.log("🔄 [DIRECT] ViewRenderer called updateBill successfully");
     } catch (error) {
-      console.error("❌ [DIRECT] Error in ViewRenderer onUpdateBill", error);
+      console.error("❌ [DIRECT] Error in ViewRenderer handleUpdateBill", error);
     }
-  }, [allTransactions, setAllTransactions, updateBill]);
+  }, [updateBill]);
 
   // Debug log to verify function creation
   window.console.log("🔧 [DIRECT] ViewRenderer handleUpdateBill created", {
@@ -159,14 +145,11 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
       
       return (
         <BillManager
-          transactions={allTransactions}
+          transactions={bills}
           envelopes={envelopes}
           onPayBill={(updatedBill) => {
-            // Update the bill in allTransactions
-            const updatedTransactions = allTransactions.map((t) =>
-              t.id === updatedBill.id ? updatedBill : t
-            );
-            setAllTransactions(updatedTransactions);
+            // Update the bill using budget store method
+            updateTransaction(updatedBill);
           }}
           onUpdateBill={handleUpdateBill}
           onCreateRecurringBill={(newBill) => {
