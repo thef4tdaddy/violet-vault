@@ -4,6 +4,7 @@
 
 ```markdown
 ### 🧠 Integrate Dev.to Blog with VioletVault Marketing Site
+
 **Labels:** marketing, content, seo
 
 Connect your developer-focused articles from Dev.to to your public site. This builds trust, improves SEO, and gives users insight into the product philosophy and development.
@@ -11,6 +12,7 @@ Connect your developer-focused articles from Dev.to to your public site. This bu
 ---
 
 ### ✅ Tasks:
+
 - [ ] Add `/blog` route to marketing site
 - [ ] Fetch Dev.to RSS feed (https://dev.to/api/articles?username=yourusername)
 - [ ] Display article titles, dates, and link out to Dev.to
@@ -24,7 +26,7 @@ Connect your developer-focused articles from Dev.to to your public site. This bu
 ---
 
 ### 🧩 Optional:
+
 - [ ] Copy posts into Markdown and host them directly (hybrid setup)
 - [ ] Add tags, filters, and article summaries
-
 ```

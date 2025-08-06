@@ -4,6 +4,7 @@
 
 ```markdown
 ### 🟣 Convert Initial Page to Marketing Landing Page
+
 **Labels:** frontend, marketing, UX, priority: high
 
 Update the default entry point (`/`) of the VioletVault app to function as a public-facing landing page. This page should explain the product's value, build trust, and drive signups — not just show a login screen.
@@ -11,6 +12,7 @@ Update the default entry point (`/`) of the VioletVault app to function as a pub
 ---
 
 ### 🧩 Goals:
+
 - Replace login screen with public landing content
 - Communicate VioletVault’s core benefits (privacy-first, encrypted, envelope-style)
 - Link to login/signup and optionally demo
@@ -18,6 +20,7 @@ Update the default entry point (`/`) of the VioletVault app to function as a pub
 ---
 
 ### ✅ Tasks:
+
 - [ ] Create a `LandingPage.tsx` component for unauthenticated users
 - [ ] Add headline and description text
 - [ ] Add primary CTA: “Start Budgeting — It’s Free”
@@ -31,14 +34,15 @@ Update the default entry point (`/`) of the VioletVault app to function as a pub
 ---
 
 ### 🧭 Example Headline:
+
 > **Private, Powerful Budgeting — On Your Terms**
 > VioletVault is a local-first budgeting app that puts you in control. No tracking. No cloud lock-in. Just smart envelopes and encrypted data.
 
 ---
 
 ### 📈 Benefits:
+
 - Improves onboarding and first impression
 - Communicates values clearly before login
 - Enables SEO and sharing even without an account
-
 ```

@@ -4,6 +4,7 @@
 
 ```markdown
 ### 📊 Implement Dexie-Based Usage Logging with Opt-In Upload
+
 **Labels:** analytics, privacy, feature
 
 Log key user actions using Dexie locally and optionally allow the user to upload anonymized summaries to a backend or Discord webhook.
@@ -11,6 +12,7 @@ Log key user actions using Dexie locally and optionally allow the user to upload
 ---
 
 ### ✅ Tasks:
+
 - [ ] Create `analyticsEvents` table in Dexie
 - [ ] Define event schema: `{ type, timestamp, payload? }`
 - [ ] Build `logEvent()` utility to record actions like:
@@ -26,7 +28,7 @@ Log key user actions using Dexie locally and optionally allow the user to upload
 ---
 
 ### ⚠️ Notes:
+
 - No user ID, no IP, no fingerprinting
 - Must clearly disclose and require opt-in
-
 ```

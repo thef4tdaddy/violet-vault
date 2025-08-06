@@ -33,7 +33,7 @@ This document tracks VioletVault's milestone-based development using **bi-weekly
   - **Status**: Merged and deployed
   - **Description**: Responsive grid layout for bills (1/2/3 columns)
 - **#113** - Manual Virtual Balance Override (**COMPLETED** in PR #155)
-  - **Status**: Merged and deployed 
+  - **Status**: Merged and deployed
   - **Description**: Inline editing with click-to-edit functionality, confirmation dialogs, and business logic separation
 - **#112** - Collapsible Smart Suggestions (**COMPLETED**)
   - **Status**: Merged and deployed
@@ -74,7 +74,7 @@ git commit -m "refactor: improve layout architecture and error tracking"
 - **#161** - Add Success Modal After Paycheck Confirmation
 - **#162** - Add Default Allocation Buttons to Paycheck Flow
 
-### v1.9.0 - Mobile UX Enhancements (Aug 17-31)  
+### v1.9.0 - Mobile UX Enhancements (Aug 17-31)
 
 **Due: August 31, 2025**
 **Planned Features**:
@@ -96,13 +96,14 @@ git commit -m "refactor: improve layout architecture and error tracking"
 **Planned Features**:
 
 - **#151** - Refactor ChartsAndAnalytics.jsx
-- **#152** - Refactor BillManager.jsx  
+- **#152** - Refactor BillManager.jsx
 - **#153** - Refactor SavingsGoals.jsx
 - **#154** - Refactor firebaseSync.js
 
 ### v2.0.0 - Landing Page & Marketing (Future Major Release)
 
 **Planned Features**:
+
 - Convert initial page to marketing landing page
 - Demo mode implementation
 - Full marketing site integration
@@ -113,66 +114,78 @@ git commit -m "refactor: improve layout architecture and error tracking"
 ## 🚀 Long-Term Epic Roadmap
 
 ### 📱 v3.0.0 - Progressive Polish & Intelligence Epic
+
 **Target: Q1 2026** | **Labels:** `epic`, `UX`, `enhancement`, `v3.0.0`
 
 Based on `violetvault_progressive_polish_epic.md`:
 
 #### 🧠 Personalization & User Memory
+
 - Show Recently Used Envelopes
-- Save and reuse last paycheck split pattern  
+- Save and reuse last paycheck split pattern
 - Support custom emoji or labels for envelopes
 - Add support for recurring income / budgeting reminders
 
 #### 💡 Intent-Aware Nudges (Smart Prompts)
+
 - Nudge: "You skipped Rent this cycle"
 - Nudge: "Groceries trending 20% higher than usual"
 - Nudge: "Move unassigned to cover overages?"
 
 #### 📦 Presentation & Professional Packaging
+
 - Add branded splash screen (PWA and native)
 - In-app changelog modal for "What's new"
 - Add feedback button (GitHub/Discord integration)
 - About/Privacy modal with encryption summary
 
 #### 📊 Reporting & Power User Tools
+
 - Add advanced reports: trendlines, burn rate, category tracking
 - Support export to PDF/CSV
 - Track envelope progress over time
 
 #### ⚡ Performance & Delight
+
 - Add optimistic UI updates to all money actions
 - Instant sync indicator ("Just now", "Syncing…")
 - Auto-animate modals, cards, lists
 - Page prefetch with TanStack Query
 
 #### 🔐 Trust & Security Features
+
 - App lock (PIN, Face ID)
 - Export encrypted backup
 - Encrypted audit trail (who/what/when)
 - Offline failsafe mode (show last synced budget)
 
-### 💎 v4.0.0 - Premium Features & Sustainability Epic  
+### 💎 v4.0.0 - Premium Features & Sustainability Epic
+
 **Target: TBD** | **Labels:** `epic`, `premium`, `future`, `sustainability`
 
 Based on `violetvault_premium_features_epic.md`:
 
 #### 🔐 Security & Control (Premium)
+
 - Encrypted app lock (Face ID, PIN)
 - Offline vaults with cloud auto-backup (e.g., Dropbox, Drive)
 - Session handoff / reconnect across devices
 
 #### 📊 Power Tools & Reports (Premium)
+
 - Advanced spending reports (burn rate, envelopes over time)
 - Envelope forecasting / projections
 - Custom report exports (PDF, CSV, Excel)
 - AI-powered budgeting suggestions
 
 #### 👥 Shared Budgeting (Premium)
+
 - Invite partner or team member to budget together
 - Role-based permissions (view/comment/edit)
 - Notifications for key changes
 
 #### 💼 Business Use (Premium)
+
 - Multiple vaults (e.g. business vs personal)
 - Tagged expenses + receipts for tax time
 - Quarterly P&L and export bundles
@@ -301,12 +314,14 @@ Based on `violetvault_premium_features_epic.md`:
 ## 📚 Related Documentation
 
 ### Cross-References
+
 - **[ROADMAP.md](../ROADMAP.md)** - Consolidated product roadmap with full epic details
 - **[docs/roadmap/](./roadmap/)** - Individual feature specifications and technical details
 - **[GitHub Issues](https://github.com/thef4tdaddy/violet-vault/issues)** - Active development tracking
 - **[GitHub Milestones](https://github.com/thef4tdaddy/violet-vault/milestones)** - Release planning and progress
 
 ### Epic Documentation Links
+
 - **Progressive Polish Epic**: [violetvault_progressive_polish_epic.md](./roadmap/violetvault_progressive_polish_epic.md)
 - **Premium Features Epic**: [violetvault_premium_features_epic.md](./roadmap/violetvault_premium_features_epic.md)
 - **Mobile UX Child Issues**: [mobile_ux_child_issues.md](./roadmap/mobile_ux_child_issues.md)
@@ -319,6 +334,7 @@ Based on `violetvault_premium_features_epic.md`:
 - **Dexie Usage Logging**: [dexie_usage_logging_issue.md](./roadmap/dexie_usage_logging_issue.md)
 
 ### Issue Organization
+
 - **Weekly Milestones**: 3-5 issues per week, theme-based grouping
 - **Epic Issues**: Large multi-milestone initiatives with child issues
 - **Parent-Child Relationships**: Epic → Milestone → Individual Issues
