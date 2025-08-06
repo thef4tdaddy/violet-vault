@@ -8,6 +8,8 @@ import {
   getIconByName,
   getIconNameForStorage,
 } from "../../utils/billIcons";
+import { toBiweekly, toMonthly, getFrequencyOptions } from "../../utils/frequencyCalculations";
+import { getBillCategories } from "../../constants/categories";
 
 const AddBillModal = ({
   isOpen,
@@ -80,26 +82,12 @@ const AddBillModal = ({
   const iconSuggestions = getBillIconOptions(formData.category);
 
   const frequencies = [
-    { value: "weekly", label: "Weekly", multiplier: 52 },
-    { value: "biweekly", label: "Bi-weekly", multiplier: 26 },
-    { value: "monthly", label: "Monthly", multiplier: 12 },
-    { value: "quarterly", label: "Quarterly", multiplier: 4 },
+    ...getFrequencyOptions(),
     { value: "semiannual", label: "Semi-annual", multiplier: 2 },
-    { value: "yearly", label: "Yearly", multiplier: 1 },
     { value: "custom", label: "Custom", multiplier: 1 },
   ];
 
-  const categories = [
-    "Bills",
-    "Housing",
-    "Transportation",
-    "Insurance",
-    "Subscriptions",
-    "Healthcare",
-    "Debt",
-    "Savings",
-    "Other",
-  ];
+  const categories = getBillCategories();
 
   const colors = [
     "#3B82F6",
@@ -120,19 +108,17 @@ const AddBillModal = ({
 
   // Calculate how much needs to be saved biweekly for any bill frequency
   const calculateBiweeklyAmount = (amount, frequency, customFrequency = 1) => {
-    const yearlyAmount =
-      frequency === "custom"
-        ? amount * customFrequency
-        : amount * (frequencies.find((f) => f.value === frequency)?.multiplier || 1);
-    return yearlyAmount / 26; // 26 biweekly periods per year
+    if (frequency === "custom") {
+      return toBiweekly(amount, "yearly") * customFrequency;
+    }
+    return toBiweekly(amount, frequency);
   };
 
   const calculateMonthlyAmount = (amount, frequency, customFrequency = 1) => {
-    const yearlyAmount =
-      frequency === "custom"
-        ? amount * customFrequency
-        : amount * (frequencies.find((f) => f.value === frequency)?.multiplier || 1);
-    return yearlyAmount / 12; // 12 months per year
+    if (frequency === "custom") {
+      return toMonthly(amount, "yearly") * customFrequency;
+    }
+    return toMonthly(amount, frequency);
   };
 
   const getNextDueDate = (frequency, dueDate) => {

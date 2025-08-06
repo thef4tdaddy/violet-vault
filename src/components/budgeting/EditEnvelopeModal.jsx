@@ -15,7 +15,17 @@ import {
   FileText,
   TrendingUp,
 } from "lucide-react";
-import { ENVELOPE_TYPES, ENVELOPE_TYPE_CONFIG } from "../../constants/categories";
+import {
+  ENVELOPE_TYPES,
+  ENVELOPE_TYPE_CONFIG,
+  getEnvelopeCategories,
+} from "../../constants/categories";
+import {
+  convertFrequency,
+  toMonthly,
+  toBiweekly,
+  getFrequencyOptions,
+} from "../../utils/frequencyCalculations";
 
 const EditEnvelopeModal = ({
   isOpen = false,
@@ -48,22 +58,8 @@ const EditEnvelopeModal = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  // Predefined categories for quick selection
-  const categories = [
-    "Bills & Utilities",
-    "Food & Dining",
-    "Transportation",
-    "Entertainment",
-    "Shopping",
-    "Health & Medical",
-    "Personal Care",
-    "Education",
-    "Travel",
-    "Gifts & Donations",
-    "Savings",
-    "Emergency",
-    "Other",
-  ];
+  // Predefined categories for quick selection using standardized categories
+  const categories = getEnvelopeCategories();
 
   // Color palette for envelope customization
   const colors = [
@@ -81,14 +77,8 @@ const EditEnvelopeModal = ({
     "#64748b", // Slate
   ];
 
-  // Frequency options
-  const frequencies = [
-    { value: "weekly", label: "Weekly", multiplier: 52 },
-    { value: "biweekly", label: "Bi-weekly", multiplier: 26 },
-    { value: "monthly", label: "Monthly", multiplier: 12 },
-    { value: "quarterly", label: "Quarterly", multiplier: 4 },
-    { value: "yearly", label: "Yearly", multiplier: 1 },
-  ];
+  // Frequency options using standardized calculations
+  const frequencies = getFrequencyOptions();
 
   const priorities = [
     { value: "high", label: "High Priority", color: "text-red-600" },
@@ -186,7 +176,8 @@ const EditEnvelopeModal = ({
     }
 
     // Current balance validation (optional but if provided, must be valid)
-    if (formData.currentBalance && parseFloat(formData.currentBalance) < 0) {
+    // Allow negative values for unassigned cash
+    if (formData.currentBalance && !isUnassignedCash && parseFloat(formData.currentBalance) < 0) {
       newErrors.currentBalance = "Current balance cannot be negative";
     }
 
@@ -196,11 +187,9 @@ const EditEnvelopeModal = ({
 
   const calculateBiweeklyAmount = () => {
     const monthlyAmount = parseFloat(formData.monthlyAmount) || 0;
-    const frequency = frequencies.find((f) => f.value === formData.frequency);
-    if (!frequency) return 0;
+    if (!monthlyAmount) return 0;
 
-    const yearlyAmount = monthlyAmount * 12;
-    return (yearlyAmount / 26).toFixed(2);
+    return toBiweekly(monthlyAmount, "monthly").toFixed(2);
   };
 
   const handleSubmit = async (e) => {
@@ -211,37 +200,50 @@ const EditEnvelopeModal = ({
     setIsSubmitting(true);
 
     try {
-      const updatedEnvelope = {
-        ...envelope,
-        name: formData.name.trim(),
-        monthlyAmount: parseFloat(formData.monthlyAmount),
-        currentBalance: parseFloat(formData.currentBalance) || envelope.currentBalance || 0,
-        category: formData.category || "Other",
-        color: formData.color,
-        frequency: formData.frequency,
-        description: formData.description.trim(),
-        priority: formData.priority,
-        autoAllocate: formData.autoAllocate,
-        biweeklyAllocation: parseFloat(calculateBiweeklyAmount()),
-        lastUpdated: new Date().toISOString(),
-        // Envelope type specific fields
-        envelopeType: formData.envelopeType,
-        monthlyBudget:
-          formData.envelopeType === ENVELOPE_TYPES.VARIABLE
-            ? parseFloat(formData.monthlyBudget) || null
-            : null,
-        targetAmount:
-          formData.envelopeType === ENVELOPE_TYPES.SAVINGS
-            ? parseFloat(formData.targetAmount) || null
-            : null,
-      };
+      // Handle unassigned cash specially
+      if (isUnassignedCash) {
+        // Update unassigned cash amount directly
+        const newUnassignedCashAmount = parseFloat(formData.currentBalance) || 0;
 
-      // Override biweeklyAllocation for bill envelopes
-      if (formData.envelopeType === ENVELOPE_TYPES.BILL && formData.biweeklyAllocation) {
-        updatedEnvelope.biweeklyAllocation = parseFloat(formData.biweeklyAllocation);
+        await onUpdateEnvelope({
+          ...envelope,
+          currentBalance: newUnassignedCashAmount,
+          description: formData.description.trim(),
+          lastUpdated: new Date().toISOString(),
+        });
+      } else {
+        const updatedEnvelope = {
+          ...envelope,
+          name: formData.name.trim(),
+          monthlyAmount: parseFloat(formData.monthlyAmount),
+          currentBalance: parseFloat(formData.currentBalance) || envelope.currentBalance || 0,
+          category: formData.category || "Other",
+          color: formData.color,
+          frequency: formData.frequency,
+          description: formData.description.trim(),
+          priority: formData.priority,
+          autoAllocate: formData.autoAllocate,
+          biweeklyAllocation: parseFloat(calculateBiweeklyAmount()),
+          lastUpdated: new Date().toISOString(),
+          // Envelope type specific fields
+          envelopeType: formData.envelopeType,
+          monthlyBudget:
+            formData.envelopeType === ENVELOPE_TYPES.VARIABLE
+              ? parseFloat(formData.monthlyBudget) || null
+              : null,
+          targetAmount:
+            formData.envelopeType === ENVELOPE_TYPES.SAVINGS
+              ? parseFloat(formData.targetAmount) || null
+              : null,
+        };
+
+        // Override biweeklyAllocation for bill envelopes
+        if (formData.envelopeType === ENVELOPE_TYPES.BILL && formData.biweeklyAllocation) {
+          updatedEnvelope.biweeklyAllocation = parseFloat(formData.biweeklyAllocation);
+        }
+
+        await onUpdateEnvelope(updatedEnvelope);
       }
-
-      await onUpdateEnvelope(updatedEnvelope);
 
       // Reset and close
       resetForm();
@@ -279,6 +281,8 @@ const EditEnvelopeModal = ({
   };
 
   if (!isOpen || !envelope) return null;
+
+  const isUnassignedCash = envelope.id === "unassigned";
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -422,80 +426,184 @@ const EditEnvelopeModal = ({
 
               {/* Type-specific fields */}
               {formData.envelopeType === ENVELOPE_TYPES.BILL && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Biweekly Payment Amount *
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <DollarSign className="h-4 w-4 text-gray-400" />
-                    </div>
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={formData.biweeklyAllocation}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          biweeklyAllocation: e.target.value,
-                        })
-                      }
-                      className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                        errors.biweeklyAllocation ? "border-red-300 bg-red-50" : "border-gray-300"
-                      }`}
-                      placeholder="0.00"
-                    />
+                <div className="space-y-4">
+                  {/* Payment Frequency Selection */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Payment Frequency
+                    </label>
+                    <select
+                      value={formData.frequency}
+                      onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      {frequencies.map((freq) => (
+                        <option key={freq.value} value={freq.value}>
+                          {freq.label}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                  {errors.biweeklyAllocation && (
-                    <p className="mt-1 text-sm text-red-600 flex items-center">
-                      <AlertCircle className="h-3 w-3 mr-1" />
-                      {errors.biweeklyAllocation}
-                    </p>
-                  )}
-                  <p className="mt-1 text-xs text-gray-500">
-                    Amount needed every two weeks for this bill
-                  </p>
+
+                  {/* Payment Amount Input */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {formData.frequency === "yearly"
+                        ? "Yearly Payment Amount *"
+                        : formData.frequency === "quarterly"
+                          ? "Quarterly Payment Amount *"
+                          : formData.frequency === "monthly"
+                            ? "Monthly Payment Amount *"
+                            : formData.frequency === "biweekly"
+                              ? "Biweekly Payment Amount *"
+                              : formData.frequency === "weekly"
+                                ? "Weekly Payment Amount *"
+                                : "Payment Amount *"}
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <DollarSign className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.biweeklyAllocation}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            biweeklyAllocation: e.target.value,
+                          })
+                        }
+                        className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                          errors.biweeklyAllocation ? "border-red-300 bg-red-50" : "border-gray-300"
+                        }`}
+                        placeholder="0.00"
+                      />
+                    </div>
+                    {errors.biweeklyAllocation && (
+                      <p className="mt-1 text-sm text-red-600 flex items-center">
+                        <AlertCircle className="h-3 w-3 mr-1" />
+                        {errors.biweeklyAllocation}
+                      </p>
+                    )}
+
+                    {/* Calculated amounts display */}
+                    {formData.biweeklyAllocation && (
+                      <div className="mt-2 p-3 bg-gray-50 rounded-lg">
+                        <p className="text-xs font-medium text-gray-700 mb-2">
+                          Calculated amounts:
+                        </p>
+                        <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                          <div>
+                            Monthly: $
+                            {toMonthly(
+                              parseFloat(formData.biweeklyAllocation),
+                              formData.frequency
+                            ).toFixed(2)}
+                          </div>
+                          <div>
+                            Biweekly: $
+                            {toBiweekly(
+                              parseFloat(formData.biweeklyAllocation),
+                              formData.frequency
+                            ).toFixed(2)}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
               {formData.envelopeType === ENVELOPE_TYPES.VARIABLE && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Monthly Budget *
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <DollarSign className="h-4 w-4 text-gray-400" />
-                    </div>
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={formData.monthlyBudget}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          monthlyBudget: e.target.value,
-                        })
-                      }
-                      className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                        errors.monthlyBudget ? "border-red-300 bg-red-50" : "border-gray-300"
-                      }`}
-                      placeholder="0.00"
-                    />
+                <div className="space-y-4">
+                  {/* Budget Frequency Selection */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Budget Frequency
+                    </label>
+                    <select
+                      value={formData.frequency}
+                      onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      {frequencies.map((freq) => (
+                        <option key={freq.value} value={freq.value}>
+                          {freq.label}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                  {errors.monthlyBudget && (
-                    <p className="mt-1 text-sm text-red-600 flex items-center">
-                      <AlertCircle className="h-3 w-3 mr-1" />
-                      {errors.monthlyBudget}
-                    </p>
-                  )}
-                  {formData.monthlyBudget && (
-                    <p className="mt-1 text-xs text-gray-500">
-                      Biweekly funding: ${(parseFloat(formData.monthlyBudget) / 2).toFixed(2)}
-                    </p>
-                  )}
+
+                  {/* Budget Amount Input */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {formData.frequency === "yearly"
+                        ? "Yearly Budget *"
+                        : formData.frequency === "quarterly"
+                          ? "Quarterly Budget *"
+                          : formData.frequency === "monthly"
+                            ? "Monthly Budget *"
+                            : formData.frequency === "biweekly"
+                              ? "Biweekly Budget *"
+                              : formData.frequency === "weekly"
+                                ? "Weekly Budget *"
+                                : "Budget Amount *"}
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <DollarSign className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.monthlyBudget}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            monthlyBudget: e.target.value,
+                          })
+                        }
+                        className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                          errors.monthlyBudget ? "border-red-300 bg-red-50" : "border-gray-300"
+                        }`}
+                        placeholder="0.00"
+                      />
+                    </div>
+                    {errors.monthlyBudget && (
+                      <p className="mt-1 text-sm text-red-600 flex items-center">
+                        <AlertCircle className="h-3 w-3 mr-1" />
+                        {errors.monthlyBudget}
+                      </p>
+                    )}
+
+                    {/* Calculated amounts display */}
+                    {formData.monthlyBudget && (
+                      <div className="mt-2 p-3 bg-gray-50 rounded-lg">
+                        <p className="text-xs font-medium text-gray-700 mb-2">
+                          Calculated amounts:
+                        </p>
+                        <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                          <div>
+                            Monthly: $
+                            {toMonthly(
+                              parseFloat(formData.monthlyBudget),
+                              formData.frequency
+                            ).toFixed(2)}
+                          </div>
+                          <div>
+                            Biweekly: $
+                            {toBiweekly(
+                              parseFloat(formData.monthlyBudget),
+                              formData.frequency
+                            ).toFixed(2)}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 

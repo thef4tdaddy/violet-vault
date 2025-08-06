@@ -26,6 +26,7 @@ import {
   BookOpen,
   BarChart3,
 } from "lucide-react";
+import { AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/categories";
 import SyncStatusIndicators from "../sync/SyncStatusIndicators";
 import ConflictResolutionModal from "../sync/ConflictResolutionModal";
 import SummaryCards from "./SummaryCards";
@@ -224,14 +225,7 @@ const MainContent = ({
   const totalBiweeklyNeed = Array.isArray(envelopes)
     ? envelopes.reduce((sum, env) => {
         // Auto-classify envelope type if not set
-        const envelopeType =
-          env.envelopeType ||
-          (env.category &&
-          ["Bills & Utilities", "Health & Medical", "Transportation", "Education"].includes(
-            env.category
-          )
-            ? "bill"
-            : "variable");
+        const envelopeType = env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
 
         let biweeklyNeed = 0;
         if (envelopeType === "bill" && env.biweeklyAllocation) {

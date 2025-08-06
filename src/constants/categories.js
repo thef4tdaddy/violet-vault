@@ -1,24 +1,52 @@
-// Transaction categories used across the application
-export const TRANSACTION_CATEGORIES = [
-  "Food & Dining",
-  "Shopping",
-  "Entertainment",
-  "Bills & Utilities",
+// Standardized categories used across the entire application
+// Used for envelopes, bills, transactions, and all other categorized items
+export const STANDARD_CATEGORIES = [
+  // Essential/Fixed Categories
+  "Housing",
   "Transportation",
-  "Travel",
+  "Insurance",
+  "Bills & Utilities",
+
+  // Variable/Lifestyle Categories
+  "Food & Dining",
+  "Entertainment",
+  "Shopping",
   "Health & Medical",
-  "Education",
   "Personal Care",
+
+  // Growth/Future Categories
+  "Education",
+  "Savings",
+  "Emergency",
+
+  // Social/Business/Other
+  "Travel",
   "Gifts & Donations",
   "Business",
   "Other",
 ];
 
+// Legacy transaction categories - kept for backwards compatibility
+export const TRANSACTION_CATEGORIES = STANDARD_CATEGORIES;
+
 // Default category for uncategorized transactions
 export const DEFAULT_CATEGORY = "Other";
 
 // Categories specifically for expenses
-export const EXPENSE_CATEGORIES = TRANSACTION_CATEGORIES;
+export const EXPENSE_CATEGORIES = STANDARD_CATEGORIES;
+
+// Categories specifically for envelope creation
+export const ENVELOPE_CATEGORIES = STANDARD_CATEGORIES;
+
+// Categories specifically for bills
+export const BILL_CATEGORIES_EXTENDED = [
+  "Housing",
+  "Bills & Utilities",
+  "Insurance",
+  "Transportation",
+  "Health & Medical",
+  "Education",
+];
 
 // Categories that are typically bills/recurring expenses
 export const BILL_CATEGORIES = [
@@ -77,8 +105,20 @@ export const ENVELOPE_TYPE_CONFIG = {
 
 // Auto-classify envelope type based on category
 export const AUTO_CLASSIFY_ENVELOPE_TYPE = (category) => {
-  if (BILL_CATEGORIES.includes(category)) {
+  // Categories that are typically bills/recurring expenses
+  const billCategories = ["Housing", "Bills & Utilities", "Insurance"];
+  if (billCategories.includes(category)) {
     return ENVELOPE_TYPES.BILL;
+  }
+
+  // Categories that are typically savings goals
+  const savingsCategories = [
+    "Savings",
+    "Emergency",
+    "Travel", // Often saved for over time
+  ];
+  if (savingsCategories.includes(category)) {
+    return ENVELOPE_TYPES.SAVINGS;
   }
 
   // Categories that are typically variable expenses
@@ -87,6 +127,11 @@ export const AUTO_CLASSIFY_ENVELOPE_TYPE = (category) => {
     "Transportation",
     "Health & Medical",
     "Personal Care",
+    "Entertainment",
+    "Shopping",
+    "Education",
+    "Gifts & Donations",
+    "Business",
   ];
   if (variableCategories.includes(category)) {
     return ENVELOPE_TYPES.VARIABLE;
@@ -110,4 +155,32 @@ export const MERCHANT_CATEGORY_PATTERNS = {
     /electric|water|gas|sewer|internet|cable|phone|utility|bill|subscription|monthly|annual|membership/i,
   Business: /bank|atm|fee|transfer|interest|loan|credit|finance/i,
   Travel: /hotel|flight|airline|travel|vacation/i,
+  Housing: /rent|mortgage|property|hoa|maintenance|repair|utilities/i,
+  Insurance: /insurance|premium|policy|coverage/i,
+  Emergency: /emergency|urgent|unexpected/i,
+  Savings: /saving|investment|retirement|401k|ira/i,
 };
+
+/**
+ * Get all standard categories for use in UI components
+ * @returns {Array<string>} Array of category names
+ */
+export function getStandardCategories() {
+  return [...STANDARD_CATEGORIES];
+}
+
+/**
+ * Get categories appropriate for bills
+ * @returns {Array<string>} Array of bill-appropriate category names
+ */
+export function getBillCategories() {
+  return [...BILL_CATEGORIES_EXTENDED];
+}
+
+/**
+ * Get categories appropriate for envelopes
+ * @returns {Array<string>} Array of envelope-appropriate category names
+ */
+export function getEnvelopeCategories() {
+  return [...ENVELOPE_CATEGORIES];
+}

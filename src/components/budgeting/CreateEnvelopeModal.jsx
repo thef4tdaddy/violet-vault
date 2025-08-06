@@ -13,7 +13,11 @@ import {
   FileText,
   TrendingUp,
 } from "lucide-react";
-import { ENVELOPE_TYPES, ENVELOPE_TYPE_CONFIG } from "../../constants/categories";
+import {
+  ENVELOPE_TYPES,
+  ENVELOPE_TYPE_CONFIG,
+  getEnvelopeCategories,
+} from "../../constants/categories";
 
 const CreateEnvelopeModal = ({
   isOpen = false,
@@ -41,22 +45,8 @@ const CreateEnvelopeModal = ({
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Predefined categories for quick selection
-  const categories = [
-    "Bills & Utilities",
-    "Food & Dining",
-    "Transportation",
-    "Entertainment",
-    "Shopping",
-    "Health & Medical",
-    "Personal Care",
-    "Education",
-    "Travel",
-    "Gifts & Donations",
-    "Savings",
-    "Emergency",
-    "Other",
-  ];
+  // Use standardized categories for quick selection
+  const categories = getEnvelopeCategories();
 
   // Color palette for envelope customization
   const colors = [
