@@ -54,6 +54,13 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
 
   // Stable callback for bill updates
   const handleUpdateBill = useCallback((updatedBill) => {
+    // Force this log to appear at window level
+    window.console.log("🔄 [DIRECT] ViewRenderer onUpdateBill called", {
+      billId: updatedBill.id,
+      envelopeId: updatedBill.envelopeId,
+      hasUpdateBillFunction: !!updateBill,
+      timestamp: new Date().toISOString(),
+    });
     console.log("🔄 [DIRECT] ViewRenderer onUpdateBill called", {
       billId: updatedBill.id,
       envelopeId: updatedBill.envelopeId,
@@ -79,6 +86,12 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
   }, [allTransactions, setAllTransactions, updateBill]);
 
   // Debug log to verify function creation
+  window.console.log("🔧 [DIRECT] ViewRenderer handleUpdateBill created", {
+    functionExists: !!handleUpdateBill,
+    functionType: typeof handleUpdateBill,
+    timestamp: new Date().toISOString(),
+    activeView,
+  });
   console.log("🔧 [DIRECT] ViewRenderer handleUpdateBill created", {
     functionExists: !!handleUpdateBill,
     functionType: typeof handleUpdateBill,
@@ -131,6 +144,12 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
       />
     ),
     bills: (() => {
+      window.console.log("🔧 [DIRECT] Rendering BillManager with props", {
+        hasHandleUpdateBill: !!handleUpdateBill,
+        handleUpdateBillType: typeof handleUpdateBill,
+        activeView,
+        timestamp: new Date().toISOString(),
+      });
       console.log("🔧 [DIRECT] Rendering BillManager with props", {
         hasHandleUpdateBill: !!handleUpdateBill,
         handleUpdateBillType: typeof handleUpdateBill,
