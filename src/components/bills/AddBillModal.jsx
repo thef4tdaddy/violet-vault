@@ -277,12 +277,22 @@ const AddBillModal = ({
     });
 
     if (editingBill) {
+      console.log("📝 CALLING onUpdateBill", {
+        billId: billData.id,
+        envelopeId: billData.envelopeId,
+        hasCallback: !!onUpdateBill,
+      });
       logger.debug("Updating existing bill", {
         billId: billData.id,
         envelopeId: billData.envelopeId,
       });
       onUpdateBill?.(billData);
     } else {
+      console.log("📝 CALLING onAddBill", {
+        billId: billData.id,
+        envelopeId: billData.envelopeId,
+        hasCallback: !!onAddBill,
+      });
       logger.debug("Adding new bill", {
         billId: billData.id,
         envelopeId: billData.envelopeId,
