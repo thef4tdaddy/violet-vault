@@ -14,6 +14,7 @@ import {
   getFrequencyOptions,
 } from "../../utils/frequencyCalculations";
 import { getBillCategories } from "../../constants/categories";
+import logger from "../../utils/logger"; // Using your custom logger
 
 // Helper function to define the initial state for the form
 const getInitialFormData = (bill = null) => {
@@ -69,17 +70,16 @@ const AddBillModal = ({
   const [formData, setFormData] = useState(getInitialFormData());
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  // *** FIX: This useEffect correctly resets the form state whenever the modal is opened,
-  // whether for a new bill or for editing an existing one. This is the key change.
   useEffect(() => {
     if (isOpen) {
-      setFormData(getInitialFormData(editingBill));
+      const initialData = getInitialFormData(editingBill);
+      logger.info("AddBillModal opened for bill:", editingBill);
+      logger.debug("Initial form data set:", initialData);
+      setFormData(initialData);
     }
   }, [isOpen, editingBill]);
 
-  // Update icon when name or category changes
   useEffect(() => {
-    // This effect should only run if the form data is already initialized
     if (!formData.name && !formData.category) return;
 
     const suggestedIcon = getBillIcon(
@@ -222,6 +222,8 @@ const AddBillModal = ({
       ...(editingBill && { lastUpdated: new Date().toISOString() }),
     };
 
+    logger.info("Submitting bill data:", billData);
+
     if (editingBill) {
       onUpdateBill?.(billData);
     } else {
@@ -244,6 +246,12 @@ const AddBillModal = ({
       }
     }
     onClose();
+  };
+
+  const handleEnvelopeChange = (e) => {
+    const newEnvelopeId = e.target.value;
+    logger.debug("Envelope selected:", newEnvelopeId);
+    setFormData({ ...formData, selectedEnvelope: newEnvelopeId });
   };
 
   const cancelEdit = () => {
@@ -276,6 +284,7 @@ const AddBillModal = ({
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Form fields remain the same */}
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Bill Name *
@@ -467,9 +476,7 @@ const AddBillModal = ({
               </label>
               <select
                 value={formData.selectedEnvelope}
-                onChange={(e) =>
-                  setFormData({ ...formData, selectedEnvelope: e.target.value })
-                }
+                onChange={handleEnvelopeChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">No envelope (use unassigned cash)</option>
