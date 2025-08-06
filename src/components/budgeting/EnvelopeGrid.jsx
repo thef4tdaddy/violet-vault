@@ -53,6 +53,9 @@ const UnifiedEnvelopeManager = ({
   const unassignedCash =
     propUnassignedCash !== undefined ? propUnassignedCash : budget.unassignedCash || 0;
 
+  // Get bills for envelope linking
+  const bills = budget.bills || [];
+
   const [selectedEnvelopeId, setSelectedEnvelopeId] = useState(null);
   const [viewMode, setViewMode] = useState("overview");
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -705,6 +708,7 @@ const UnifiedEnvelopeManager = ({
             setEditingEnvelope(null);
           }}
           existingEnvelopes={envelopes}
+          allBills={bills}
           currentUser={budget.currentUser}
         />
       )}

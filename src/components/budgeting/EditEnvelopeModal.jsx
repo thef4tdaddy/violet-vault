@@ -24,6 +24,7 @@ const EditEnvelopeModal = ({
   onUpdateEnvelope,
   onDeleteEnvelope,
   existingEnvelopes = [],
+  allBills = [], // Add bills prop to show linked bills
   currentUser = { userName: "User", userColor: "#a855f7" }, // eslint-disable-line no-unused-vars
 }) => {
   const [formData, setFormData] = useState({
@@ -713,6 +714,62 @@ const EditEnvelopeModal = ({
                 </label>
               </div>
             </div>
+
+            {/* Linked Bills Section */}
+            {envelope && formData.envelopeType === ENVELOPE_TYPES.BILL && (
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <h4 className="text-sm font-medium text-blue-900 mb-3 flex items-center">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Bills Using This Envelope
+                </h4>
+                {(() => {
+                  const linkedBills = allBills.filter((bill) => bill.envelopeId === envelope.id);
+                  if (linkedBills.length === 0) {
+                    return (
+                      <p className="text-sm text-blue-700">
+                        No bills are currently assigned to this envelope.
+                        <br />
+                        <span className="text-xs text-blue-600">
+                          Assign bills in the Bills tab to automatically deduct payments from this
+                          envelope.
+                        </span>
+                      </p>
+                    );
+                  }
+                  return (
+                    <div className="space-y-2">
+                      {linkedBills.map((bill) => (
+                        <div
+                          key={bill.id}
+                          className="flex items-center justify-between bg-white p-2 rounded-lg"
+                        >
+                          <div className="flex items-center">
+                            <div className="text-blue-600 mr-2">
+                              <FileText className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">
+                                {bill.provider || bill.name || bill.description}
+                              </p>
+                              <p className="text-xs text-gray-600">
+                                Due: {bill.frequency} • ${Math.abs(bill.amount || 0).toFixed(2)}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-xs text-blue-600">
+                            {bill.isPaid ? "✓ Paid" : "Pending"}
+                          </div>
+                        </div>
+                      ))}
+                      <p className="text-xs text-blue-600 mt-2">
+                        💡 When these bills are paid, the amount will be automatically deducted from
+                        this envelope
+                      </p>
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
 
             {/* Form Errors */}
             {errors.submit && (

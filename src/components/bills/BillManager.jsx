@@ -917,6 +917,7 @@ const BillManager = ({
         <AddBillModal
           isOpen={showAddBillModal}
           onClose={() => setShowAddBillModal(false)}
+          availableEnvelopes={envelopes}
           onAddBill={(newBill) => {
             if (onCreateRecurringBill) {
               onCreateRecurringBill(newBill);
@@ -939,6 +940,7 @@ const BillManager = ({
           isOpen={!!editingBill}
           onClose={() => setEditingBill(null)}
           editingBill={editingBill}
+          availableEnvelopes={envelopes}
           onUpdateBill={(updatedBill) => {
             if (onUpdateBill) {
               onUpdateBill(updatedBill);
