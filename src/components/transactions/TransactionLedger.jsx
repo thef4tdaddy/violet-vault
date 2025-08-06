@@ -13,16 +13,27 @@ import { useTransactionForm } from "./hooks/useTransactionForm";
 import { useTransactionImport } from "./hooks/useTransactionImport";
 import { suggestEnvelope } from "./utils/envelopeMatching";
 import { TRANSACTION_CATEGORIES } from "../../constants/categories";
+import { useBudget } from "../../hooks/useBudget";
 
-const TransactionLedger = ({
-  transactions = [],
-  envelopes = [],
-  onAddTransaction,
-  onUpdateTransaction,
-  onDeleteTransaction,
-  onBulkImport,
-  currentUser = { userName: "User", userColor: "#a855f7" },
-}) => {
+const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855f7" } }) => {
+  // Get live data from budget store instead of props
+  const budget = useBudget();
+  const {
+    allTransactions: transactions = [],
+    envelopes = [],
+    addTransaction,
+    updateTransaction,
+    deleteTransaction,
+    setAllTransactions,
+  } = budget;
+
+  // Handle bulk import by updating both store arrays
+  const handleBulkImport = (newTransactions) => {
+    console.log("🔄 Bulk import called with transactions:", newTransactions.length);
+    const updatedAllTransactions = [...transactions, ...newTransactions];
+    setAllTransactions(updatedAllTransactions);
+    console.log("💾 Bulk import complete. Total transactions:", updatedAllTransactions.length);
+  };
   const [showAddModal, setShowAddModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
@@ -51,7 +62,7 @@ const TransactionLedger = ({
     handleFileUpload,
     handleImport,
     resetImport,
-  } = useTransactionImport(currentUser, onBulkImport);
+  } = useTransactionImport(currentUser, handleBulkImport);
 
   const filteredTransactions = useTransactionFilters(
     transactions,
@@ -77,10 +88,12 @@ const TransactionLedger = ({
     const newTransaction = createTransaction(currentUser);
 
     if (editingTransaction) {
-      onUpdateTransaction(editingTransaction.id, newTransaction);
+      // Budget store updateTransaction expects the full transaction object with id
+      const transactionWithId = { ...newTransaction, id: editingTransaction.id };
+      updateTransaction(transactionWithId);
       setEditingTransaction(null);
     } else {
-      onAddTransaction(newTransaction);
+      addTransaction(newTransaction);
     }
 
     setShowAddModal(false);
@@ -111,11 +124,11 @@ const TransactionLedger = ({
   const handleSplitTransaction = async (originalTransaction, splitTransactions) => {
     try {
       // Delete the original transaction
-      await onDeleteTransaction(originalTransaction.id);
+      deleteTransaction(originalTransaction.id);
 
       // Add each split transaction
       for (const splitTransaction of splitTransactions) {
-        await onAddTransaction(splitTransaction);
+        addTransaction(splitTransaction);
       }
 
       // Close the modal
@@ -198,7 +211,7 @@ const TransactionLedger = ({
         transactions={paginatedTransactions}
         envelopes={envelopes}
         onEdit={startEdit}
-        onDelete={onDeleteTransaction}
+        onDelete={deleteTransaction}
         onSplit={(transaction) => setSplittingTransaction(transaction)}
       />
 
