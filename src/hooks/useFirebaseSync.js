@@ -6,10 +6,16 @@ import logger from "../utils/logger";
  * Custom hook for Firebase synchronization management
  * Extracts sync logic from MainLayout component
  */
-const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => {
+const useFirebaseSync = (
+  firebaseSync,
+  encryptionKey,
+  budgetId,
+  currentUser,
+) => {
   const budget = useBudget();
   const [activeUsers, setActiveUsers] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Auto-initialize Firebase sync when dependencies are ready
   useEffect(() => {
@@ -21,14 +27,21 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
     // Auto-load data from cloud
     const loadCloudData = async () => {
       try {
+        setIsLoading(true);
         const cloudData = await firebaseSync.loadFromCloud();
         if (cloudData && cloudData.data) {
-          console.log("📥 Loading data from cloud:", Object.keys(cloudData.data));
+          console.log(
+            "📥 Loading data from cloud:",
+            Object.keys(cloudData.data),
+          );
           // Update budget store with cloud data
-          if (cloudData.data.envelopes) budget.setEnvelopes(cloudData.data.envelopes);
+          if (cloudData.data.envelopes)
+            budget.setEnvelopes(cloudData.data.envelopes);
           if (cloudData.data.bills) budget.setBills(cloudData.data.bills);
-          if (cloudData.data.savingsGoals) budget.setSavingsGoals(cloudData.data.savingsGoals);
-          if (cloudData.data.transactions) budget.setTransactions(cloudData.data.transactions);
+          if (cloudData.data.savingsGoals)
+            budget.setSavingsGoals(cloudData.data.savingsGoals);
+          if (cloudData.data.transactions)
+            budget.setTransactions(cloudData.data.transactions);
           if (cloudData.data.allTransactions)
             budget.setAllTransactions(cloudData.data.allTransactions);
           if (typeof cloudData.data.unassignedCash === "number")
@@ -40,20 +53,22 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
           if (typeof cloudData.data.actualBalance === "number")
             budget.setActualBalance(
               cloudData.data.actualBalance,
-              cloudData.data.isActualBalanceManual
+              cloudData.data.isActualBalanceManual,
             );
         }
       } catch (error) {
         console.warn("Failed to load cloud data:", error.message);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     loadCloudData();
-  }, [firebaseSync, budgetId, encryptionKey, budget]);
+  }, [firebaseSync, budgetId, encryptionKey]); // Remove budget from deps to prevent load loop
 
   // Auto-save data when it changes
   useEffect(() => {
-    if (!firebaseSync || !currentUser || !budgetId) return;
+    if (!firebaseSync || !currentUser || !budgetId || isLoading) return;
 
     // Debounce saves to avoid excessive syncing
     const timeoutId = setTimeout(async () => {
@@ -72,7 +87,7 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
             actualBalance: budget.actualBalance,
             isActualBalanceManual: budget.isActualBalanceManual,
           },
-          currentUser
+          currentUser,
         );
         console.log("✅ Data auto-saved to cloud");
       } catch (error) {
@@ -85,6 +100,7 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
     firebaseSync,
     currentUser,
     budgetId,
+    isLoading, // Prevent saves during loads
     budget.envelopes,
     budget.bills,
     budget.savingsGoals,
@@ -112,7 +128,7 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
           actualBalance: budget.actualBalance,
           isActualBalanceManual: budget.isActualBalanceManual,
         },
-        currentUser
+        currentUser,
       );
       alert("Data synced to cloud");
     } catch (err) {
@@ -146,7 +162,12 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
     // Update periodically to catch changes
     const interval = setInterval(updateActivityData, 5000);
     return () => clearInterval(interval);
-  }, [budget, budget.getActiveUsers, budget.getRecentActivity, budget.isSyncing]);
+  }, [
+    budget,
+    budget.getActiveUsers,
+    budget.getRecentActivity,
+    budget.isSyncing,
+  ]);
 
   return {
     activeUsers,
