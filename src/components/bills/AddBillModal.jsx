@@ -17,6 +17,7 @@ const AddBillModal = ({
   editingBill = null,
   onUpdateBill,
   onDeleteBill,
+  availableEnvelopes = [], // Add available envelopes prop
 }) => {
   const [formData, setFormData] = useState(() => {
     if (editingBill) {
@@ -29,6 +30,7 @@ const AddBillModal = ({
         color: editingBill.color || "#3B82F6",
         notes: editingBill.notes || "",
         createEnvelope: false, // Don't show checkbox for editing
+        selectedEnvelope: editingBill.envelopeId || "", // Add envelope selection
         customFrequency: editingBill.customFrequency || "",
         iconName:
           editingBill.iconName ||
@@ -51,6 +53,7 @@ const AddBillModal = ({
       color: "#3B82F6",
       notes: "",
       createEnvelope: true,
+      selectedEnvelope: "", // Add envelope selection for new bills
       customFrequency: "",
       iconName: getIconNameForStorage(getBillIcon("", "", "Bills")),
     };
@@ -274,6 +277,8 @@ const AddBillModal = ({
       description: formData.name.trim(),
       createdAt: editingBill ? editingBill.createdAt : new Date().toISOString(),
       date: normalizedDueDate || new Date().toISOString().split("T")[0],
+      // Add envelope assignment
+      envelopeId: formData.selectedEnvelope || null,
       // Preserve any other properties from the original bill
       ...(editingBill && {
         lastUpdated: new Date().toISOString(),
@@ -488,6 +493,29 @@ const AddBillModal = ({
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="Any additional notes about this bill..."
               />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Envelope Assignment
+              </label>
+              <select
+                value={formData.selectedEnvelope}
+                onChange={(e) => setFormData({ ...formData, selectedEnvelope: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">No envelope (use unassigned cash)</option>
+                {availableEnvelopes
+                  .filter((env) => env.envelopeType === "bill" || !env.envelopeType) // Prefer bill envelopes
+                  .map((envelope) => (
+                    <option key={envelope.id} value={envelope.id}>
+                      {envelope.name} (${(envelope.currentBalance || 0).toFixed(2)} available)
+                    </option>
+                  ))}
+              </select>
+              <p className="text-xs text-gray-500 mt-1">
+                Choose which envelope will be used to pay this bill
+              </p>
             </div>
 
             {!editingBill && (
