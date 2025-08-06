@@ -8,7 +8,17 @@ class Logger {
   // Debug-level logging for development and sync issues
   debug(message, data = {}) {
     // Always log to console in development, but also use original console.log to bypass capture
-    if (this.isDevelopment) {
+    // Temporarily also log bill-related debug messages in production for debugging
+    const isBillRelated =
+      message.includes("Bill") ||
+      message.includes("Envelope") ||
+      message.includes("Form") ||
+      message.includes("Modal") ||
+      data.billId ||
+      data.envelopeId ||
+      data.selectedEnvelope;
+
+    if (this.isDevelopment || isBillRelated) {
       // Use window.originalConsoleLog if available, otherwise regular console.log
       const consoleLog = window.originalConsoleLog || console.log;
       consoleLog(`🔍 ${message}`, data);
@@ -89,7 +99,10 @@ class Logger {
       });
 
       // For critical budget sync issues, also send as error to ensure visibility
-      if (message.includes("budgetId value") || message.includes("sync issue")) {
+      if (
+        message.includes("budgetId value") ||
+        message.includes("sync issue")
+      ) {
         H.consumeError(new Error(`Budget Sync: ${message}`), {
           metadata: data,
           tags: { category: "budget-sync", critical: "true" },
@@ -158,7 +171,9 @@ class Logger {
       });
     }
 
-    console.log("✅ Highlight.io test messages sent - check your Highlight.io dashboard");
+    console.log(
+      "✅ Highlight.io test messages sent - check your Highlight.io dashboard",
+    );
   }
 }
 
