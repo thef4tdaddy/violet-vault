@@ -31,6 +31,7 @@ import {
   ENVELOPE_TYPE_CONFIG,
   AUTO_CLASSIFY_ENVELOPE_TYPE,
 } from "../../constants/categories";
+import { toBiweekly, toMonthly } from "../../utils/frequencyCalculations";
 
 const UnifiedEnvelopeManager = ({
   envelopes: propEnvelopes = [],
@@ -98,14 +99,53 @@ const UnifiedEnvelopeManager = ({
       // Use actual current balance instead of budget allocation for availability
       const available = currentBalance - committed;
 
-      // Calculate utilization rate based on budget vs actual spending
-      const utilizationRate = allocated > 0 ? (totalSpent + committed) / allocated : 0;
+      // Calculate utilization rate based on envelope type and purpose
+      let utilizationRate = 0;
+      const envelopeType = envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+
+      if (envelopeType === ENVELOPE_TYPES.BILL && envelope.biweeklyAllocation) {
+        // For bill envelopes, show progress toward next bill payment
+        // Progress = current balance / amount needed for next bill
+        const nextBillAmount =
+          upcomingBills.length > 0
+            ? Math.abs(upcomingBills[0].amount)
+            : toMonthly(envelope.biweeklyAllocation, "biweekly"); // Convert biweekly to monthly equivalent
+
+        utilizationRate = nextBillAmount > 0 ? currentBalance / nextBillAmount : 0;
+      } else if (envelopeType === ENVELOPE_TYPES.SAVINGS && envelope.targetAmount) {
+        // For savings envelopes, show progress toward target
+        utilizationRate = envelope.targetAmount > 0 ? currentBalance / envelope.targetAmount : 0;
+      } else {
+        // For variable envelopes, use traditional spending-based calculation
+        const budgetAmount = envelope.monthlyBudget || allocated || envelope.monthlyAmount || 0;
+        utilizationRate = budgetAmount > 0 ? (totalSpent + committed) / budgetAmount : 0;
+      }
 
       let status = "healthy";
       if (totalOverdue > 0) status = "overdue";
       else if (available < 0) status = "overspent";
-      else if (utilizationRate > 0.9) status = "warning";
-      else if (utilizationRate > 0.75) status = "caution";
+      else if (envelopeType === ENVELOPE_TYPES.BILL) {
+        // For bill envelopes, status based on readiness for next payment
+        if (utilizationRate >= 1.0)
+          status = "healthy"; // Fully funded
+        else if (utilizationRate >= 0.75)
+          status = "caution"; // Mostly funded
+        else if (utilizationRate >= 0.5)
+          status = "warning"; // Partially funded
+        else status = "overspent"; // Significantly underfunded
+      } else if (envelopeType === ENVELOPE_TYPES.SAVINGS) {
+        // For savings envelopes, status based on progress toward goal
+        if (utilizationRate >= 0.9)
+          status = "healthy"; // Close to goal
+        else if (utilizationRate >= 0.75)
+          status = "caution"; // Good progress
+        else if (utilizationRate >= 0.5) status = "warning"; // Some progress
+        // else remains "healthy" for early savings
+      } else {
+        // Traditional spending-based status for variable envelopes
+        if (utilizationRate > 0.9) status = "warning";
+        else if (utilizationRate > 0.75) status = "caution";
+      }
 
       return {
         ...envelope,
@@ -436,7 +476,26 @@ const UnifiedEnvelopeManager = ({
             <div>
               <h3 className="font-semibold text-gray-900">Unassigned Cash</h3>
             </div>
-            <Wallet className="h-6 w-6 text-gray-400" />
+            <div className="flex items-center gap-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditingEnvelope({
+                    id: "unassigned",
+                    name: "Unassigned Cash",
+                    currentBalance: unassignedCash,
+                    category: "Cash Management",
+                    color: "#6b7280",
+                    description: "Available cash not allocated to any specific envelope",
+                    envelopeType: "cash",
+                  });
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <Settings className="h-4 w-4" />
+              </button>
+              <Wallet className="h-6 w-6 text-gray-400" />
+            </div>
           </div>
           <p className="text-3xl font-bold">${unassignedCash.toFixed(2)}</p>
         </div>
@@ -486,7 +545,15 @@ const UnifiedEnvelopeManager = ({
 
             <div className="mb-4">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-gray-600">Budget Progress</span>
+                <span className="text-sm text-gray-600">
+                  {(() => {
+                    const envelopeType =
+                      envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+                    if (envelopeType === ENVELOPE_TYPES.BILL) return "Payment Readiness";
+                    if (envelopeType === ENVELOPE_TYPES.SAVINGS) return "Goal Progress";
+                    return "Budget Progress";
+                  })()}
+                </span>
                 <span className="text-sm font-medium">
                   {Math.round(envelope.utilizationRate * 100)}%
                 </span>
@@ -700,7 +767,12 @@ const UnifiedEnvelopeManager = ({
           onClose={() => setEditingEnvelope(null)}
           envelope={editingEnvelope}
           onUpdateEnvelope={(envelope) => {
-            budget.updateEnvelope(envelope);
+            if (envelope.id === "unassigned") {
+              // Handle unassigned cash update
+              budget.setUnassignedCash(envelope.currentBalance);
+            } else {
+              budget.updateEnvelope(envelope);
+            }
             setEditingEnvelope(null);
           }}
           onDeleteEnvelope={(envelopeId) => {
