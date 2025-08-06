@@ -219,8 +219,8 @@ const MainContent = ({
     deleteSupplementalAccount,
     transferFromSupplementalAccount,
   } = budget;
-  
-  // Handle bill updates - after budget destructuring
+
+  // Handle bill updates - must be before views object
   const handleBillUpdate = (updatedBill) => {
     console.log("🔄 [DIRECT] MainLayout handleBillUpdate called", {
       billId: updatedBill.id,
@@ -516,7 +516,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
     ),
     bills: (
       <BillManager
-        transactions={allTransactions}
+        transactions={bills}
         envelopes={envelopes}
         onPayBill={(updatedBill) => {
           // Update the bill using budget store method
