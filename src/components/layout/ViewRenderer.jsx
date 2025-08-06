@@ -39,6 +39,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
     updateTransaction,
     deleteTransaction,
     addBill,
+    updateBill,
     setAllTransactions,
     setTransactions,
   } = budget;
