@@ -15,6 +15,47 @@ import {
 } from "../../utils/frequencyCalculations";
 import { getBillCategories } from "../../constants/categories";
 
+// Helper function to define the initial state for the form
+const getInitialFormData = (bill = null) => {
+  if (bill) {
+    return {
+      name: bill.name || bill.provider || "",
+      amount: bill.amount || "",
+      frequency: bill.frequency || "monthly",
+      dueDate: bill.dueDate || "",
+      category: bill.category || "Bills",
+      color: bill.color || "#3B82F6",
+      notes: bill.notes || "",
+      createEnvelope: false,
+      selectedEnvelope: bill.envelopeId || "",
+      customFrequency: bill.customFrequency || "",
+      iconName:
+        bill.iconName ||
+        getIconNameForStorage(
+          bill.icon ||
+            getBillIcon(
+              bill.name || bill.provider || "",
+              bill.notes || "",
+              bill.category || ""
+            )
+        ),
+    };
+  }
+  return {
+    name: "",
+    amount: "",
+    frequency: "monthly",
+    dueDate: "",
+    category: "Bills",
+    color: "#3B82F6",
+    notes: "",
+    createEnvelope: true,
+    selectedEnvelope: "",
+    customFrequency: "",
+    iconName: getIconNameForStorage(getBillIcon("", "", "Bills")),
+  };
+};
+
 const AddBillModal = ({
   isOpen,
   onClose,
@@ -23,76 +64,42 @@ const AddBillModal = ({
   editingBill = null,
   onUpdateBill,
   onDeleteBill,
-  availableEnvelopes = [], // Add available envelopes prop
+  availableEnvelopes = [],
 }) => {
-  const [formData, setFormData] = useState(() => {
-    if (editingBill) {
-      return {
-        name: editingBill.name || editingBill.provider || "",
-        amount: editingBill.amount || "",
-        frequency: editingBill.frequency || "monthly",
-        dueDate: editingBill.dueDate || "",
-        category: editingBill.category || "Bills",
-        color: editingBill.color || "#3B82F6",
-        notes: editingBill.notes || "",
-        createEnvelope: false, // Don't show checkbox for editing
-        selectedEnvelope: editingBill.envelopeId || "", // Add envelope selection
-        customFrequency: editingBill.customFrequency || "",
-        iconName:
-          editingBill.iconName ||
-          getIconNameForStorage(
-            editingBill.icon ||
-              getBillIcon(
-                editingBill.name || editingBill.provider || "",
-                editingBill.notes || "",
-                editingBill.category || ""
-              )
-          ),
-      };
-    }
-    return {
-      name: "",
-      amount: "",
-      frequency: "monthly",
-      dueDate: "",
-      category: "Bills",
-      color: "#3B82F6",
-      notes: "",
-      createEnvelope: true,
-      selectedEnvelope: "", // Add envelope selection for new bills
-      customFrequency: "",
-      iconName: getIconNameForStorage(getBillIcon("", "", "Bills")),
-    };
-  });
-
+  const [formData, setFormData] = useState(getInitialFormData());
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  // *** FIX: This useEffect correctly resets the form state whenever the modal is opened,
+  // whether for a new bill or for editing an existing one. This is the key change.
+  useEffect(() => {
+    if (isOpen) {
+      setFormData(getInitialFormData(editingBill));
+    }
+  }, [isOpen, editingBill]);
 
   // Update icon when name or category changes
   useEffect(() => {
-    if (formData.name || formData.category) {
-      const suggestedIcon = getBillIcon(
-        formData.name || "",
-        formData.notes || "",
-        formData.category || "Bills"
-      );
-      setFormData((prev) => ({
-        ...prev,
-        iconName: getIconNameForStorage(suggestedIcon),
-      }));
-    }
+    // This effect should only run if the form data is already initialized
+    if (!formData.name && !formData.category) return;
+
+    const suggestedIcon = getBillIcon(
+      formData.name || "",
+      formData.notes || "",
+      formData.category || "Bills"
+    );
+    setFormData((prev) => ({
+      ...prev,
+      iconName: getIconNameForStorage(suggestedIcon),
+    }));
   }, [formData.name, formData.category, formData.notes]);
 
-  // Get smart icon suggestions based on current form data
   const iconSuggestions = getBillIconOptions(formData.category);
-
   const frequencies = [
     ...getFrequencyOptions(),
     { value: "semiannual", label: "Semi-annual", multiplier: 2 },
     { value: "custom", label: "Custom", multiplier: 1 },
   ];
-
   const categories = getBillCategories();
-
   const colors = [
     "#3B82F6",
     "#10B981",
@@ -110,18 +117,15 @@ const AddBillModal = ({
 
   if (!isOpen) return null;
 
-  // Calculate how much needs to be saved biweekly for any bill frequency
   const calculateBiweeklyAmount = (amount, frequency, customFrequency = 1) => {
-    if (frequency === "custom") {
+    if (frequency === "custom")
       return toBiweekly(amount, "yearly") * customFrequency;
-    }
     return toBiweekly(amount, frequency);
   };
 
   const calculateMonthlyAmount = (amount, frequency, customFrequency = 1) => {
-    if (frequency === "custom") {
+    if (frequency === "custom")
       return toMonthly(amount, "yearly") * customFrequency;
-    }
     return toMonthly(amount, frequency);
   };
 
@@ -129,11 +133,7 @@ const AddBillModal = ({
     if (!dueDate) return null;
     const date = new Date(dueDate);
     const now = new Date();
-
-    // If the due date is in the future, return as is
     if (date > now) return dueDate;
-
-    // Calculate next occurrence based on frequency
     switch (frequency) {
       case "weekly":
         date.setDate(date.getDate() + 7);
@@ -156,93 +156,33 @@ const AddBillModal = ({
       default:
         return dueDate;
     }
-
     return date.toISOString().split("T")[0];
   };
 
-  const resetForm = () => {
-    if (editingBill) {
-      setFormData({
-        name: editingBill.name || editingBill.provider || "",
-        amount: editingBill.amount || "",
-        frequency: editingBill.frequency || "monthly",
-        dueDate: editingBill.dueDate || "",
-        category: editingBill.category || "Bills",
-        color: editingBill.color || "#3B82F6",
-        notes: editingBill.notes || "",
-        createEnvelope: false,
-        selectedEnvelope: editingBill.envelopeId || "", // *** FIX: Added this line to reset the envelope selection
-        customFrequency: editingBill.customFrequency || "",
-        iconName:
-          editingBill.iconName ||
-          getIconNameForStorage(
-            editingBill.icon ||
-              getBillIcon(
-                editingBill.name || editingBill.provider || "",
-                editingBill.notes || "",
-                editingBill.category || ""
-              )
-          ),
-      });
-    } else {
-      setFormData({
-        name: "",
-        amount: "",
-        frequency: "monthly",
-        dueDate: "",
-        category: "Bills",
-        color: "#3B82F6",
-        notes: "",
-        createEnvelope: true,
-        selectedEnvelope: "",
-        customFrequency: "",
-        iconName: getIconNameForStorage(getBillIcon("", "", "Bills")),
-      });
-    }
-  };
-
-  // Helper function to normalize date format to ensure 4-digit years
   const normalizeDateFormat = (dateString) => {
-    if (!dateString) return dateString;
-
-    // If it's already in YYYY-MM-DD format, return as is
-    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+    if (!dateString || /^\d{4}-\d{2}-\d{2}$/.test(dateString))
       return dateString;
-    }
-
-    // Handle various formats and convert 2-digit years to 4-digit
     if (typeof dateString === "string") {
-      // Convert MM/DD/YY or MM-DD-YY to YYYY-MM-DD
       const dateMatch = dateString.match(/(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})/);
       if (dateMatch) {
         const [, month, day, year] = dateMatch;
-        let fullYear = year;
-
-        // Convert 2-digit year to 4-digit (assumes 00-30 = 2000-2030, 31-99 = 1931-1999)
-        if (year.length === 2) {
-          fullYear = parseInt(year) <= 30 ? `20${year}` : `19${year}`;
-        }
-
-        // Ensure proper formatting with leading zeros
-        const paddedMonth = month.padStart(2, "0");
-        const paddedDay = day.padStart(2, "0");
-
-        return `${fullYear}-${paddedMonth}-${paddedDay}`;
+        let fullYear =
+          year.length === 2
+            ? parseInt(year) <= 30
+              ? `20${year}`
+              : `19${year}`
+            : year;
+        return `${fullYear}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
       }
     }
-
     return dateString;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.amount) {
-      return;
-    }
+    if (!formData.name.trim() || !formData.amount) return;
 
     const amount = parseFloat(formData.amount);
-
-    // Normalize the due date to ensure proper format
     const normalizedDueDate = normalizeDateFormat(formData.dueDate);
 
     const billData = {
@@ -271,7 +211,6 @@ const AddBillModal = ({
       nextDueDate: getNextDueDate(formData.frequency, normalizedDueDate),
       icon: getIconByName(formData.iconName),
       iconName: formData.iconName,
-      // For unified system compatibility
       type: editingBill ? editingBill.type : "recurring_bill",
       isPaid: editingBill ? editingBill.isPaid : false,
       source: editingBill ? editingBill.source : "manual",
@@ -279,45 +218,36 @@ const AddBillModal = ({
       description: formData.name.trim(),
       createdAt: editingBill ? editingBill.createdAt : new Date().toISOString(),
       date: normalizedDueDate || new Date().toISOString().split("T")[0],
-      // Add envelope assignment
       envelopeId: formData.selectedEnvelope || null,
-      // Preserve any other properties from the original bill
-      ...(editingBill && {
-        lastUpdated: new Date().toISOString(),
-      }),
+      ...(editingBill && { lastUpdated: new Date().toISOString() }),
     };
 
     if (editingBill) {
       onUpdateBill?.(billData);
     } else {
       onAddBill?.(billData);
+      if (formData.createEnvelope && onAddEnvelope) {
+        const envelopeData = {
+          id: `envelope_${Date.now()}`,
+          name: formData.name.trim(),
+          budget: calculateMonthlyAmount(
+            amount,
+            formData.frequency,
+            formData.customFrequency
+          ),
+          currentBalance: 0,
+          color: formData.color,
+          category: formData.category,
+          notes: `Auto-created for ${formData.name} bill`,
+        };
+        onAddEnvelope(envelopeData);
+      }
     }
-
-    // Create associated envelope if requested (only for new bills)
-    if (!editingBill && formData.createEnvelope && onAddEnvelope) {
-      const envelopeData = {
-        id: `envelope_${Date.now()}`,
-        name: formData.name.trim(),
-        budget: calculateMonthlyAmount(
-          amount,
-          formData.frequency,
-          formData.customFrequency
-        ),
-        currentBalance: 0,
-        color: formData.color,
-        category: formData.category,
-        notes: `Auto-created for ${formData.name} bill`,
-      };
-      onAddEnvelope(envelopeData);
-    }
-
-    resetForm();
     onClose();
   };
 
   const cancelEdit = () => {
     setShowDeleteConfirm(false);
-    resetForm();
     onClose();
   };
 
@@ -325,7 +255,6 @@ const AddBillModal = ({
     if (editingBill && onDeleteBill) {
       onDeleteBill(editingBill.id);
       setShowDeleteConfirm(false);
-      resetForm();
       onClose();
     }
   };
@@ -547,7 +476,7 @@ const AddBillModal = ({
                 {availableEnvelopes
                   .filter(
                     (env) => env.envelopeType === "bill" || !env.envelopeType
-                  ) // Prefer bill envelopes
+                  )
                   .map((envelope) => (
                     <option key={envelope.id} value={envelope.id}>
                       {envelope.name} ($
@@ -589,7 +518,6 @@ const AddBillModal = ({
             )}
           </div>
 
-          {/* Preview */}
           {formData.amount && (
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
@@ -664,7 +592,6 @@ const AddBillModal = ({
         </form>
       </div>
 
-      {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
