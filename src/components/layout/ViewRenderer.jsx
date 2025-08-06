@@ -1,13 +1,13 @@
 import React, { Suspense, useCallback } from "react";
 import Dashboard from "../pages/MainDashboard";
-import SmartEnvelopeSuggestions from "../SmartEnvelopeSuggestions";
-import EnvelopeGrid from "../EnvelopeGrid";
-import SavingsGoals from "../SavingsGoals";
-import SupplementalAccounts from "../SupplementalAccounts";
-import PaycheckProcessor from "../PaycheckProcessor";
-import BillManager from "../BillManager";
-import TransactionLedger from "../TransactionLedger";
-import ChartsAndAnalytics from "../ChartsAndAnalytics";
+import SmartEnvelopeSuggestions from "../budgeting/SmartEnvelopeSuggestions";
+import EnvelopeGrid from "../budgeting/EnvelopeGrid";
+import SavingsGoals from "../savings/SavingsGoals";
+import SupplementalAccounts from "../accounts/SupplementalAccounts";
+import PaycheckProcessor from "../budgeting/PaycheckProcessor";
+import BillManager from "../bills/BillManager";
+import TransactionLedger from "../transactions/TransactionLedger";
+import ChartsAndAnalytics from "../analytics/ChartsAndAnalytics";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ErrorBoundary } from "@highlight-run/react";
 
