@@ -114,7 +114,7 @@ Based on recent work, we've successfully addressed several warnings:
 The project now includes an automated lint warning tracker that:
 
 - **Runs on every PR and push** to main/develop branches
-- **Parses ESLint output** and updates `lint-warnings.json` automatically
+- **Parses ESLint output** and updates `.github/data/lint-warnings.json` automatically
 - **Enforces 20% increase threshold** - PRs that increase warnings by more than 20% will be blocked
 - **Posts PR comments** with warning analysis and trends
 - **Updates tracking data** automatically on main/develop pushes
@@ -123,7 +123,7 @@ The project now includes an automated lint warning tracker that:
 
 - **Workflow:** `.github/workflows/lint-warnings-tracker.yml`
 - **Parser Script:** `scripts/parse-eslint-warnings.js`
-- **Data File:** `lint-warnings.json` (auto-updated)
+- **Data File:** `.github/data/lint-warnings.json` (auto-updated)
 - **Threshold:** 20% increase limit
 - **Actions:** Blocks PRs exceeding threshold, comments on all PRs with analysis
 
