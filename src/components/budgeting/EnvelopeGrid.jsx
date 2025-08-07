@@ -72,6 +72,7 @@ const UnifiedEnvelopeManager = ({
     timeRange: "current_month",
     showEmpty: true,
     sortBy: "usage_desc",
+    envelopeType: "all", // all, bill, variable, savings
   });
 
   // Calculate envelope data with unified transactions
@@ -304,6 +305,15 @@ const UnifiedEnvelopeManager = ({
       sorted = sorted.filter((env) => env.allocated > 0);
     }
 
+    // Filter by envelope type
+    if (filterOptions.envelopeType !== "all") {
+      sorted = sorted.filter((env) => {
+        const envelopeType =
+          env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
+        return envelopeType === filterOptions.envelopeType;
+      });
+    }
+
     return sorted;
   }, [envelopeData, filterOptions]);
 
@@ -516,6 +526,22 @@ const UnifiedEnvelopeManager = ({
           </h4>
 
           <div className="flex gap-2">
+            <select
+              value={filterOptions.envelopeType}
+              onChange={(e) =>
+                setFilterOptions((prev) => ({
+                  ...prev,
+                  envelopeType: e.target.value,
+                }))
+              }
+              className="px-2 py-1 border border-gray-300 rounded text-xs"
+            >
+              <option value="all">All Types</option>
+              <option value={ENVELOPE_TYPES.BILL}>📝 Bills</option>
+              <option value={ENVELOPE_TYPES.VARIABLE}>🔄 Variable</option>
+              <option value={ENVELOPE_TYPES.SAVINGS}>💰 Savings</option>
+            </select>
+
             <select
               value={filterOptions.sortBy}
               onChange={(e) =>
