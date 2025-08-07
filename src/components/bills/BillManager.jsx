@@ -1,6 +1,6 @@
 // src/new/UnifiedBillTracker.jsx
 import React, { useState, useMemo } from "react";
-import { useBudget } from "../../hooks/useBudget";
+import { useBudgetStore } from "../../stores/budgetStore";
 import {
   FileText,
   Calendar,
@@ -31,7 +31,7 @@ const BillManager = ({
   onError,
   className = "",
 }) => {
-  const budget = useBudget();
+  const budget = useBudgetStore();
 
   const transactions = useMemo(
     () =>

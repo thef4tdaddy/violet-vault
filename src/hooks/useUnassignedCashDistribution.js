@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
-import { useBudget } from "./useBudget";
+import { useBudgetStore } from "../stores/budgetStore";
 import {
   ENVELOPE_TYPES,
   AUTO_CLASSIFY_ENVELOPE_TYPE,
@@ -11,7 +11,7 @@ import { BIWEEKLY_MULTIPLIER } from "../constants/frequency";
  * Handles distribution calculations, validation, and envelope updates
  */
 const useUnassignedCashDistribution = () => {
-  const budget = useBudget();
+  const budget = useBudgetStore();
   const { envelopes, unassignedCash, bulkUpdateEnvelopes, setUnassignedCash } =
     budget;
 
