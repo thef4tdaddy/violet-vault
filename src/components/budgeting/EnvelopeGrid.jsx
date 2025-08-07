@@ -566,20 +566,21 @@ const UnifiedEnvelopeManager = ({
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  setEditingEnvelope({
-                    id: "unassigned",
-                    name: "Unassigned Cash",
-                    currentBalance: unassignedCash,
-                    category: "Cash Management",
-                    color: "#6b7280",
-                    description:
-                      "Available cash not allocated to any specific envelope",
-                    envelopeType: "cash",
-                  });
+                  if (unassignedCash > 0) {
+                    budget.openUnassignedCashModal();
+                  }
                 }}
-                className="text-gray-400 hover:text-gray-600"
+                className={`text-gray-400 hover:text-gray-600 ${
+                  unassignedCash <= 0 ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                disabled={unassignedCash <= 0}
+                title={
+                  unassignedCash > 0
+                    ? "Distribute cash to envelopes"
+                    : "No cash available to distribute"
+                }
               >
-                <Settings className="h-4 w-4" />
+                <DollarSign className="h-4 w-4" />
               </button>
               <Wallet className="h-6 w-6 text-gray-400" />
             </div>
