@@ -1011,6 +1011,9 @@ const UnifiedEnvelopeManager = ({
             budget.deleteEnvelope(envelopeId);
             setEditingEnvelope(null);
           }}
+          onUpdateBill={(bill) => {
+            budget.updateBill(bill);
+          }}
           existingEnvelopes={envelopes}
           allBills={bills}
           currentUser={budget.currentUser}
