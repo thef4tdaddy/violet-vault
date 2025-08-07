@@ -6,6 +6,7 @@ export const STANDARD_CATEGORIES = [
   "Transportation",
   "Insurance",
   "Bills & Utilities",
+  "Subscriptions",
 
   // Variable/Lifestyle Categories
   "Food & Dining",
@@ -46,6 +47,7 @@ export const BILL_CATEGORIES_EXTENDED = [
   "Transportation",
   "Health & Medical",
   "Education",
+  "Subscriptions",
 ];
 
 // Categories that are typically bills/recurring expenses
@@ -54,6 +56,7 @@ export const BILL_CATEGORIES = [
   "Health & Medical",
   "Transportation",
   "Education",
+  "Subscriptions",
 ];
 
 // Envelope types for classification
@@ -81,7 +84,8 @@ export const ENVELOPE_TYPE_CONFIG = {
   },
   [ENVELOPE_TYPES.VARIABLE]: {
     name: "Variable Expense Envelope",
-    description: "Regular but flexible spending (gas, groceries, medical, pet expenses)",
+    description:
+      "Regular but flexible spending (gas, groceries, medical, pet expenses)",
     color: "orange",
     borderColor: "border-orange-500",
     bgColor: "bg-orange-50",

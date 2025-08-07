@@ -15,7 +15,7 @@
 // Precise frequency multipliers (periods per year)
 export const FREQUENCY_MULTIPLIERS = {
   weekly: 52.1775, // More precise than 52
-  biweekly: 26.0875, // More precise than 26 (365.25 / 14)
+  biweekly: 26, // Use simple 26 for consistency across app
   monthly: 12,
   quarterly: 4,
   yearly: 1,
@@ -38,7 +38,12 @@ export const LEGACY_MULTIPLIERS = {
  * @param {boolean} usePrecise - Use precise multipliers (default: true)
  * @returns {number} Converted amount
  */
-export function convertFrequency(amount, fromFrequency, toFrequency, usePrecise = true) {
+export function convertFrequency(
+  amount,
+  fromFrequency,
+  toFrequency,
+  usePrecise = true
+) {
   if (!amount || fromFrequency === toFrequency) return amount;
 
   const multipliers = usePrecise ? FREQUENCY_MULTIPLIERS : LEGACY_MULTIPLIERS;
@@ -114,7 +119,12 @@ export function calculatePaycheckAmount(
   paycheckFrequency = "biweekly",
   usePrecise = true
 ) {
-  return convertFrequency(targetAmount, targetFrequency, paycheckFrequency, usePrecise);
+  return convertFrequency(
+    targetAmount,
+    targetFrequency,
+    paycheckFrequency,
+    usePrecise
+  );
 }
 
 /**
@@ -137,7 +147,11 @@ export function getFrequencyOptions(usePrecise = true) {
     { value: "weekly", label: "Weekly", multiplier: multipliers.weekly },
     { value: "biweekly", label: "Bi-weekly", multiplier: multipliers.biweekly },
     { value: "monthly", label: "Monthly", multiplier: multipliers.monthly },
-    { value: "quarterly", label: "Quarterly", multiplier: multipliers.quarterly },
+    {
+      value: "quarterly",
+      label: "Quarterly",
+      multiplier: multipliers.quarterly,
+    },
     { value: "yearly", label: "Yearly", multiplier: multipliers.yearly },
   ];
 }

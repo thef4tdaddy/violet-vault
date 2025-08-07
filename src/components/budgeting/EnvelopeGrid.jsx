@@ -42,17 +42,24 @@ const UnifiedEnvelopeManager = ({
   const budget = useBudget();
 
   const envelopes = useMemo(
-    () => (propEnvelopes && propEnvelopes.length ? propEnvelopes : budget.envelopes || []),
+    () =>
+      propEnvelopes && propEnvelopes.length
+        ? propEnvelopes
+        : budget.envelopes || [],
     [propEnvelopes, budget.envelopes]
   );
 
   const transactions = useMemo(
     () =>
-      propTransactions && propTransactions.length ? propTransactions : budget.transactions || [],
+      propTransactions && propTransactions.length
+        ? propTransactions
+        : budget.transactions || [],
     [propTransactions, budget.transactions]
   );
   const unassignedCash =
-    propUnassignedCash !== undefined ? propUnassignedCash : budget.unassignedCash || 0;
+    propUnassignedCash !== undefined
+      ? propUnassignedCash
+      : budget.unassignedCash || 0;
 
   // Get bills for envelope linking
   const bills = budget.bills || [];
@@ -70,27 +77,47 @@ const UnifiedEnvelopeManager = ({
   // Calculate envelope data with unified transactions
   const envelopeData = useMemo(() => {
     return envelopes.map((envelope) => {
-      const envelopeTransactions = transactions.filter((t) => t.envelopeId === envelope.id);
+      const envelopeTransactions = transactions.filter(
+        (t) => t.envelopeId === envelope.id
+      );
+
+      // Also get bills assigned to this envelope
+      const envelopeBills = bills.filter((b) => b.envelopeId === envelope.id);
 
       const paidTransactions = envelopeTransactions.filter(
         (t) => t.type === "transaction" || (t.type === "bill" && t.isPaid)
       );
 
-      const unpaidBills = envelopeTransactions.filter(
-        (t) => (t.type === "bill" || t.type === "recurring_bill") && !t.isPaid
-      );
+      // Combine bills from transactions and the bills array
+      const unpaidBills = [
+        ...envelopeTransactions.filter(
+          (t) => (t.type === "bill" || t.type === "recurring_bill") && !t.isPaid
+        ),
+        ...envelopeBills.filter((b) => !b.isPaid),
+      ];
 
       const upcomingBills = unpaidBills.filter(
         (t) => t.dueDate && new Date(t.dueDate) > new Date()
       );
 
-      const overdueBills = unpaidBills.filter((t) => t.dueDate && new Date(t.dueDate) < new Date());
+      const overdueBills = unpaidBills.filter(
+        (t) => t.dueDate && new Date(t.dueDate) < new Date()
+      );
 
-      const totalSpent = paidTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+      const totalSpent = paidTransactions.reduce(
+        (sum, t) => sum + Math.abs(t.amount),
+        0
+      );
 
-      const totalUpcoming = upcomingBills.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+      const totalUpcoming = upcomingBills.reduce(
+        (sum, t) => sum + Math.abs(t.amount),
+        0
+      );
 
-      const totalOverdue = overdueBills.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+      const totalOverdue = overdueBills.reduce(
+        (sum, t) => sum + Math.abs(t.amount),
+        0
+      );
 
       const allocated = envelope.budget || 0;
       const currentBalance = envelope.currentBalance || 0;
@@ -101,7 +128,8 @@ const UnifiedEnvelopeManager = ({
 
       // Calculate utilization rate based on envelope type and purpose
       let utilizationRate = 0;
-      const envelopeType = envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+      const envelopeType =
+        envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
 
       if (envelopeType === ENVELOPE_TYPES.BILL && envelope.biweeklyAllocation) {
         // For bill envelopes, show progress toward next bill payment
@@ -109,16 +137,25 @@ const UnifiedEnvelopeManager = ({
         const nextBillAmount =
           upcomingBills.length > 0
             ? Math.abs(upcomingBills[0].amount)
-            : toMonthly(envelope.biweeklyAllocation, "biweekly"); // Convert biweekly to monthly equivalent
+            : envelope.biweeklyAllocation * 2; // Simple monthly equivalent (biweekly * 2)
 
-        utilizationRate = nextBillAmount > 0 ? currentBalance / nextBillAmount : 0;
-      } else if (envelopeType === ENVELOPE_TYPES.SAVINGS && envelope.targetAmount) {
+        utilizationRate =
+          nextBillAmount > 0 ? currentBalance / nextBillAmount : 0;
+      } else if (
+        envelopeType === ENVELOPE_TYPES.SAVINGS &&
+        envelope.targetAmount
+      ) {
         // For savings envelopes, show progress toward target
-        utilizationRate = envelope.targetAmount > 0 ? currentBalance / envelope.targetAmount : 0;
+        utilizationRate =
+          envelope.targetAmount > 0
+            ? currentBalance / envelope.targetAmount
+            : 0;
       } else {
         // For variable envelopes, use traditional spending-based calculation
-        const budgetAmount = envelope.monthlyBudget || allocated || envelope.monthlyAmount || 0;
-        utilizationRate = budgetAmount > 0 ? (totalSpent + committed) / budgetAmount : 0;
+        const budgetAmount =
+          envelope.monthlyBudget || allocated || envelope.monthlyAmount || 0;
+        utilizationRate =
+          budgetAmount > 0 ? (totalSpent + committed) / budgetAmount : 0;
       }
 
       let status = "healthy";
@@ -165,10 +202,11 @@ const UnifiedEnvelopeManager = ({
         overdueBills,
       };
     });
-  }, [envelopes, transactions]);
+  }, [envelopes, transactions, bills]);
 
   const getEnvelopeTypeStyle = (envelope) => {
-    const envelopeType = envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+    const envelopeType =
+      envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
     const config = ENVELOPE_TYPE_CONFIG[envelopeType];
 
     if (!config) {
@@ -250,19 +288,35 @@ const UnifiedEnvelopeManager = ({
   const totals = useMemo(() => {
     return envelopeData.reduce(
       (acc, env) => {
-        const envelopeType = env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
+        const envelopeType =
+          env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
 
         // Calculate biweekly funding need for each envelope type
         let biweeklyNeed = 0;
         if (envelopeType === ENVELOPE_TYPES.BILL && env.biweeklyAllocation) {
-          biweeklyNeed = Math.max(0, env.biweeklyAllocation - env.currentBalance);
-        } else if (envelopeType === ENVELOPE_TYPES.VARIABLE && env.monthlyBudget) {
+          biweeklyNeed = Math.max(
+            0,
+            env.biweeklyAllocation - env.currentBalance
+          );
+        } else if (
+          envelopeType === ENVELOPE_TYPES.VARIABLE &&
+          env.monthlyBudget
+        ) {
           const biweeklyTarget = env.monthlyBudget / 2;
           biweeklyNeed = Math.max(0, biweeklyTarget - env.currentBalance);
-        } else if (envelopeType === ENVELOPE_TYPES.SAVINGS && env.targetAmount) {
+        } else if (
+          envelopeType === ENVELOPE_TYPES.SAVINGS &&
+          env.targetAmount
+        ) {
           // For savings, calculate a reasonable biweekly contribution (could be customizable)
-          const remainingToTarget = Math.max(0, env.targetAmount - env.currentBalance);
-          biweeklyNeed = Math.min(remainingToTarget, env.biweeklyAllocation || 0);
+          const remainingToTarget = Math.max(
+            0,
+            env.targetAmount - env.currentBalance
+          );
+          biweeklyNeed = Math.min(
+            remainingToTarget,
+            env.biweeklyAllocation || 0
+          );
         }
 
         return {
@@ -315,7 +369,9 @@ const UnifiedEnvelopeManager = ({
             </div>
             Envelope Manager
           </h2>
-          <p className="text-gray-600 mt-1">Budget allocation with real-time bill tracking</p>
+          <p className="text-gray-600 mt-1">
+            Budget allocation with real-time bill tracking
+          </p>
         </div>
 
         <div className="flex gap-3">
@@ -351,7 +407,9 @@ const UnifiedEnvelopeManager = ({
             <Calculator className="h-8 w-8 text-purple-400" />
           </div>
           <div className="mt-2">
-            <p className="text-xs text-gray-500">Total needed for all envelope types</p>
+            <p className="text-xs text-gray-500">
+              Total needed for all envelope types
+            </p>
           </div>
         </div>
 
@@ -371,7 +429,9 @@ const UnifiedEnvelopeManager = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Spent This Period</p>
-              <p className="text-2xl font-bold text-gray-900">${totals.spent.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                ${totals.spent.toFixed(2)}
+              </p>
             </div>
             <Receipt className="h-8 w-8 text-gray-400" />
           </div>
@@ -391,7 +451,9 @@ const UnifiedEnvelopeManager = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Bills Due</p>
-              <p className="text-2xl font-bold text-orange-600">${totals.upcoming.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-orange-600">
+                ${totals.upcoming.toFixed(2)}
+              </p>
             </div>
             <FileText className="h-8 w-8 text-orange-400" />
           </div>
@@ -401,7 +463,9 @@ const UnifiedEnvelopeManager = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Overdue</p>
-              <p className="text-2xl font-bold text-red-600">${totals.overdue.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-red-600">
+                ${totals.overdue.toFixed(2)}
+              </p>
             </div>
             <AlertTriangle className="h-8 w-8 text-red-400" />
           </div>
@@ -486,7 +550,8 @@ const UnifiedEnvelopeManager = ({
                     currentBalance: unassignedCash,
                     category: "Cash Management",
                     color: "#6b7280",
-                    description: "Available cash not allocated to any specific envelope",
+                    description:
+                      "Available cash not allocated to any specific envelope",
                     envelopeType: "cash",
                   });
                 }}
@@ -514,13 +579,18 @@ const UnifiedEnvelopeManager = ({
                 <p className="text-sm text-gray-600">{envelope.category}</p>
                 {(() => {
                   const envelopeType =
-                    envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+                    envelope.envelopeType ||
+                    AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
                   const config = ENVELOPE_TYPE_CONFIG[envelopeType];
                   if (config) {
                     return (
                       <div className="flex items-center gap-1 mt-1">
-                        <div className={`w-2 h-2 rounded-full bg-${config.color}-500`}></div>
-                        <span className={`text-xs font-medium ${config.textColor}`}>
+                        <div
+                          className={`w-2 h-2 rounded-full bg-${config.color}-500`}
+                        ></div>
+                        <span
+                          className={`text-xs font-medium ${config.textColor}`}
+                        >
                           {config.name.replace(" Envelope", "")}
                         </span>
                       </div>
@@ -548,9 +618,12 @@ const UnifiedEnvelopeManager = ({
                 <span className="text-sm text-gray-600">
                   {(() => {
                     const envelopeType =
-                      envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
-                    if (envelopeType === ENVELOPE_TYPES.BILL) return "Payment Readiness";
-                    if (envelopeType === ENVELOPE_TYPES.SAVINGS) return "Goal Progress";
+                      envelope.envelopeType ||
+                      AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+                    if (envelopeType === ENVELOPE_TYPES.BILL)
+                      return "Payment Readiness";
+                    if (envelopeType === ENVELOPE_TYPES.SAVINGS)
+                      return "Goal Progress";
                     return "Budget Progress";
                   })()}
                 </span>
@@ -579,22 +652,33 @@ const UnifiedEnvelopeManager = ({
             <div className="space-y-2">
               {(() => {
                 const envelopeType =
-                  envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+                  envelope.envelopeType ||
+                  AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
                 const config = ENVELOPE_TYPE_CONFIG[envelopeType];
 
-                if (envelopeType === ENVELOPE_TYPES.BILL && envelope.biweeklyAllocation) {
+                if (
+                  envelopeType === ENVELOPE_TYPES.BILL &&
+                  envelope.biweeklyAllocation
+                ) {
                   return (
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Due Biweekly:</span>
+                      <span className="text-sm text-gray-600">
+                        Due Biweekly:
+                      </span>
                       <span className="text-sm font-medium">
                         ${envelope.biweeklyAllocation.toFixed(2)}
                       </span>
                     </div>
                   );
-                } else if (envelopeType === ENVELOPE_TYPES.VARIABLE && envelope.monthlyBudget) {
+                } else if (
+                  envelopeType === ENVELOPE_TYPES.VARIABLE &&
+                  envelope.monthlyBudget
+                ) {
                   return (
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Monthly Budget:</span>
+                      <span className="text-sm text-gray-600">
+                        Monthly Budget:
+                      </span>
                       <span className="text-sm font-medium">
                         ${envelope.monthlyBudget.toFixed(2)}
                       </span>
@@ -603,8 +687,12 @@ const UnifiedEnvelopeManager = ({
                 } else {
                   return (
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Budget Allocated:</span>
-                      <span className="text-sm font-medium">${envelope.allocated.toFixed(2)}</span>
+                      <span className="text-sm text-gray-600">
+                        Budget Allocated:
+                      </span>
+                      <span className="text-sm font-medium">
+                        ${envelope.allocated.toFixed(2)}
+                      </span>
                     </div>
                   );
                 }
@@ -638,7 +726,9 @@ const UnifiedEnvelopeManager = ({
                 </div>
               )}
               <div className="flex justify-between pt-2 border-t border-gray-200">
-                <span className="text-sm font-medium text-gray-900">Available After Bills:</span>
+                <span className="text-sm font-medium text-gray-900">
+                  Available After Bills:
+                </span>
                 <span
                   className={`text-sm font-bold ${
                     envelope.available < 0 ? "text-red-600" : "text-green-600"
@@ -651,8 +741,17 @@ const UnifiedEnvelopeManager = ({
 
             <div className="mt-4 pt-4 border-t border-gray-200">
               <div className="flex justify-between text-xs text-gray-500">
-                <span>{envelope.paidTransactions.length} transactions</span>
-                <span>{envelope.unpaidBills.length} pending bills</span>
+                {envelope.envelopeType === ENVELOPE_TYPES.BILL ? (
+                  <>
+                    <span>{envelope.unpaidBills.length} pending bills</span>
+                    <span>{envelope.paidTransactions.length} payments</span>
+                  </>
+                ) : (
+                  <>
+                    <span>{envelope.paidTransactions.length} transactions</span>
+                    <span>{envelope.unpaidBills.length} pending bills</span>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -680,67 +779,91 @@ const UnifiedEnvelopeManager = ({
                 Recent Transactions ({selectedEnvelope.paidTransactions.length})
               </h4>
               <div className="space-y-2 max-h-60 overflow-y-auto">
-                {selectedEnvelope.paidTransactions.slice(0, 10).map((transaction) => (
-                  <div
-                    key={transaction.id}
-                    className="flex justify-between items-center p-3 bg-white/50 rounded-lg"
-                  >
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">{transaction.description}</p>
-                      <p className="text-xs text-gray-500">
-                        {new Date(transaction.date).toLocaleDateString()}
-                      </p>
+                {selectedEnvelope.paidTransactions
+                  .slice(0, 10)
+                  .map((transaction) => (
+                    <div
+                      key={transaction.id}
+                      className="flex justify-between items-center p-3 bg-white/50 rounded-lg"
+                    >
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">
+                          {transaction.description}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(transaction.date).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <span className="text-sm font-medium text-red-600">
+                        ${Math.abs(transaction.amount).toFixed(2)}
+                      </span>
                     </div>
-                    <span className="text-sm font-medium text-red-600">
-                      ${Math.abs(transaction.amount).toFixed(2)}
-                    </span>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
 
             <div>
               <h4 className="font-medium text-gray-900 mb-3 flex items-center">
                 <FileText className="h-4 w-4 mr-2" />
-                Upcoming Bills ({selectedEnvelope.unpaidBills.length})
+                {selectedEnvelope.envelopeType === ENVELOPE_TYPES.BILL
+                  ? "Next Bills"
+                  : "Upcoming Bills"}{" "}
+                ({selectedEnvelope.unpaidBills.length})
               </h4>
               <div className="space-y-2 max-h-60 overflow-y-auto">
-                {selectedEnvelope.unpaidBills.map((bill) => (
-                  <div
-                    key={bill.id}
-                    className={`flex justify-between items-center p-3 rounded-lg ${
-                      bill.urgency === "overdue"
-                        ? "bg-red-50"
-                        : bill.urgency === "urgent"
-                          ? "bg-orange-50"
-                          : "bg-white/50"
-                    }`}
-                  >
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">
-                        {bill.provider || bill.description}
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <p className="text-xs text-gray-500">
-                          Due: {new Date(bill.dueDate).toLocaleDateString()}
-                        </p>
-                        {bill.urgency === "overdue" && (
-                          <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
-                            Overdue
-                          </span>
-                        )}
-                        {bill.urgency === "urgent" && (
-                          <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
-                            Due Soon
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <span className="text-sm font-medium text-orange-600">
-                      ${Math.abs(bill.amount).toFixed(2)}
-                    </span>
+                {selectedEnvelope.unpaidBills.length === 0 ? (
+                  <div className="text-center py-4 text-gray-500">
+                    <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">No upcoming bills</p>
                   </div>
-                ))}
+                ) : (
+                  selectedEnvelope.unpaidBills.map((bill, index) => (
+                    <div
+                      key={bill.id}
+                      className={`flex justify-between items-center p-3 rounded-lg ${
+                        index === 0 &&
+                        selectedEnvelope.envelopeType === ENVELOPE_TYPES.BILL
+                          ? "bg-blue-50 border border-blue-200"
+                          : bill.urgency === "overdue"
+                            ? "bg-red-50"
+                            : bill.urgency === "urgent"
+                              ? "bg-orange-50"
+                              : "bg-white/50"
+                      }`}
+                    >
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">
+                          {bill.provider || bill.description}
+                          {index === 0 &&
+                            selectedEnvelope.envelopeType ===
+                              ENVELOPE_TYPES.BILL && (
+                              <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                                Next
+                              </span>
+                            )}
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-xs text-gray-500">
+                            Due: {new Date(bill.dueDate).toLocaleDateString()}
+                          </p>
+                          {bill.urgency === "overdue" && (
+                            <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
+                              Overdue
+                            </span>
+                          )}
+                          {bill.urgency === "urgent" && (
+                            <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
+                              Due Soon
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <span className="text-sm font-medium text-orange-600">
+                        ${Math.abs(bill.amount).toFixed(2)}
+                      </span>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>
