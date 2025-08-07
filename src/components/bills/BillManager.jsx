@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { getBillIcon, getIconByName } from "../../utils/billIcons";
 import AddBillModal from "./AddBillModal";
+import logger from "../../utils/logger";
 
 const BillManager = ({
   transactions: propTransactions = [], // Unified data source - filters for bills
@@ -37,7 +38,7 @@ const BillManager = ({
       propTransactions && propTransactions.length
         ? propTransactions
         : budget.allTransactions || [],
-    [propTransactions, budget.allTransactions]
+    [propTransactions, budget.allTransactions],
   );
 
   const envelopes = useMemo(
@@ -45,7 +46,7 @@ const BillManager = ({
       propEnvelopes && propEnvelopes.length
         ? propEnvelopes
         : budget.envelopes || [],
-    [propEnvelopes, budget.envelopes]
+    [propEnvelopes, budget.envelopes],
   );
 
   const reconcileTransaction = budget.reconcileTransaction;
@@ -67,7 +68,7 @@ const BillManager = ({
   const bills = useMemo(() => {
     // Combine bills from transactions and the dedicated bills store
     const billsFromTransactions = transactions.filter(
-      (t) => t && (t.type === "bill" || t.type === "recurring_bill")
+      (t) => t && (t.type === "bill" || t.type === "recurring_bill"),
     );
     const billsFromStore = budget.bills || [];
 
@@ -99,7 +100,7 @@ const BillManager = ({
                 const fullYear =
                   parseInt(year) <= 30 ? `20${year}` : `19${year}`;
                 return `${month}/${day}/${fullYear}`;
-              }
+              },
             );
           }
 
@@ -117,7 +118,7 @@ const BillManager = ({
           console.warn(
             `Invalid due date for bill ${bill.id}:`,
             bill.dueDate,
-            error
+            error,
           );
         }
       }
@@ -141,14 +142,14 @@ const BillManager = ({
 
     return {
       upcoming: upcomingBills.sort(
-        (a, b) => (a.daysUntilDue || 999) - (b.daysUntilDue || 999)
+        (a, b) => (a.daysUntilDue || 999) - (b.daysUntilDue || 999),
       ),
       overdue: overdueBills.sort(
-        (a, b) => (a.daysUntilDue || 0) - (b.daysUntilDue || 0)
+        (a, b) => (a.daysUntilDue || 0) - (b.daysUntilDue || 0),
       ),
       paid: paidBills.sort(
         (a, b) =>
-          new Date(b.paidDate || b.date) - new Date(a.paidDate || a.date)
+          new Date(b.paidDate || b.date) - new Date(a.paidDate || a.date),
       ),
       all: bills,
     };
@@ -157,22 +158,22 @@ const BillManager = ({
   const totals = useMemo(() => {
     const overdueTotal = categorizedBills.overdue.reduce(
       (sum, b) => sum + Math.abs(b.amount),
-      0
+      0,
     );
 
     // Calculate "due soon" as bills due within 7 days (urgent + soon)
     const dueSoonBills = categorizedBills.upcoming.filter(
-      (b) => b.urgency === "urgent" || b.urgency === "soon"
+      (b) => b.urgency === "urgent" || b.urgency === "soon",
     );
     const dueSoonTotal = dueSoonBills.reduce(
       (sum, b) => sum + Math.abs(b.amount),
-      0
+      0,
     );
 
     const paidThisMonth = categorizedBills.paid
       .filter(
         (b) =>
-          new Date(b.paidDate || b.date).getMonth() === new Date().getMonth()
+          new Date(b.paidDate || b.date).getMonth() === new Date().getMonth(),
       )
       .reduce((sum, b) => sum + Math.abs(b.amount), 0);
 
@@ -194,20 +195,20 @@ const BillManager = ({
     ) {
       billsToShow = billsToShow.filter((bill) =>
         filterOptions.billTypes.includes(
-          bill.metadata?.type || bill.category?.toLowerCase()
-        )
+          bill.metadata?.type || bill.category?.toLowerCase(),
+        ),
       );
     }
 
     if (filterOptions.providers.length > 0) {
       billsToShow = billsToShow.filter((bill) =>
-        filterOptions.providers.includes(bill.provider)
+        filterOptions.providers.includes(bill.provider),
       );
     }
 
     if (filterOptions.envelopes.length > 0) {
       billsToShow = billsToShow.filter((bill) =>
-        filterOptions.envelopes.includes(bill.envelopeId)
+        filterOptions.envelopes.includes(bill.envelopeId),
       );
     }
 
@@ -215,7 +216,7 @@ const BillManager = ({
       case "due_date":
         billsToShow.sort(
           (a, b) =>
-            new Date(a.dueDate || a.date) - new Date(b.dueDate || b.date)
+            new Date(a.dueDate || a.date) - new Date(b.dueDate || b.date),
         );
         break;
       case "amount_desc":
@@ -226,13 +227,13 @@ const BillManager = ({
         break;
       case "provider":
         billsToShow.sort((a, b) =>
-          (a.provider || "").localeCompare(b.provider || "")
+          (a.provider || "").localeCompare(b.provider || ""),
         );
         break;
       case "urgency": {
         const urgencyOrder = { overdue: 0, urgent: 1, soon: 2, normal: 3 };
         billsToShow.sort(
-          (a, b) => urgencyOrder[a.urgency] - urgencyOrder[b.urgency]
+          (a, b) => urgencyOrder[a.urgency] - urgencyOrder[b.urgency],
         );
         break;
       }
@@ -301,7 +302,7 @@ const BillManager = ({
     const IconComponent = getBillIcon(
       bill.provider || "",
       bill.description || "",
-      bill.category || ""
+      bill.category || "",
     );
 
     // Ensure we have a valid React component
@@ -341,7 +342,7 @@ const BillManager = ({
 
         if (availableBalance < billAmount) {
           onError?.(
-            `Insufficient funds in envelope "${envelope.name}". Available: $${availableBalance.toFixed(2)}, Required: $${billAmount.toFixed(2)}`
+            `Insufficient funds in envelope "${envelope.name}". Available: $${availableBalance.toFixed(2)}, Required: $${billAmount.toFixed(2)}`,
           );
           return;
         }
@@ -351,7 +352,7 @@ const BillManager = ({
 
         if (unassignedCash < billAmount) {
           onError?.(
-            `Insufficient unassigned cash. Available: $${unassignedCash.toFixed(2)}, Required: $${billAmount.toFixed(2)}`
+            `Insufficient unassigned cash. Available: $${unassignedCash.toFixed(2)}, Required: $${billAmount.toFixed(2)}`,
           );
           return;
         }
@@ -467,7 +468,7 @@ const BillManager = ({
 
       if (errorCount > 0) {
         onError?.(
-          `${successCount} bills paid successfully, ${errorCount} failed:\n${errors.join("\n")}`
+          `${successCount} bills paid successfully, ${errorCount} failed:\n${errors.join("\n")}`,
         );
       } else {
         console.log(`Successfully paid ${successCount} bills`);
@@ -678,7 +679,7 @@ const BillManager = ({
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {displayBills.map((bill) => {
             const envelope = envelopes.find(
-              (env) => env.id === bill.envelopeId
+              (env) => env.id === bill.envelopeId,
             );
             const urgencyStyle = getUrgencyStyle(bill.urgency, bill.isPaid);
 
@@ -886,7 +887,7 @@ const BillManager = ({
                   <div className="flex items-center gap-2">
                     {getUrgencyIcon(
                       showBillDetail.urgency,
-                      showBillDetail.isPaid
+                      showBillDetail.isPaid,
                     )}
                     <span
                       className={`px-3 py-1 rounded-full text-sm ${
@@ -921,7 +922,7 @@ const BillManager = ({
                     </label>
                     <p className="text-sm">
                       {envelopes.find(
-                        (env) => env.id === showBillDetail.envelopeId
+                        (env) => env.id === showBillDetail.envelopeId,
                       )?.name || "Unknown"}
                     </p>
                   </div>
@@ -1020,11 +1021,13 @@ const BillManager = ({
             });
 
             if (onUpdateBill) {
-              logger.debug("Using prop onUpdateBill", { billId: updatedBillData.id });
+              logger.debug("Using prop onUpdateBill", {
+                billId: updatedBillData.id,
+              });
               try {
                 onUpdateBill(updatedBillData);
-                logger.debug("onUpdateBill prop call completed successfully", { 
-                  billId: updatedBillData.id 
+                logger.debug("onUpdateBill prop call completed successfully", {
+                  billId: updatedBillData.id,
                 });
               } catch (error) {
                 logger.error("Error calling onUpdateBill prop", error, {
@@ -1033,7 +1036,9 @@ const BillManager = ({
                 throw error;
               }
             } else {
-              logger.debug("Using budget.updateBill fallback", { billId: updatedBillData.id });
+              logger.debug("Using budget.updateBill fallback", {
+                billId: updatedBillData.id,
+              });
               // Fallback to budget context
               budget.updateBill(updatedBillData);
             }

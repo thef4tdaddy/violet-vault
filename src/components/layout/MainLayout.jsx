@@ -1,5 +1,5 @@
 // src/components/layout/MainLayout.jsx
-import React, { useState, useMemo, Suspense, lazy } from "react";
+import React, { useState, useMemo, Suspense } from "react";
 import { BudgetProvider } from "../../contexts/BudgetContext";
 import { useBudget } from "../../hooks/useBudget";
 import useAuthFlow from "../../hooks/useAuthFlow";
@@ -204,21 +204,9 @@ const MainContent = ({
     envelopes,
     savingsGoals,
     unassignedCash,
-    biweeklyAllocation,
     paycheckHistory,
     isOnline,
     isSyncing,
-    bills,
-    allTransactions,
-    setAllTransactions,
-    updateBill,
-    updateTransaction,
-    addBill,
-    processPaycheck,
-    addSupplementalAccount,
-    updateSupplementalAccount,
-    deleteSupplementalAccount,
-    transferFromSupplementalAccount,
   } = budget;
 
   // Payday prediction notifications (after destructuring)
