@@ -107,7 +107,25 @@ Based on recent work, we've successfully addressed several warnings:
 
 - **Target:** Maintain ≤ 17 warnings
 - **Review Frequency:** After significant changes or weekly
-- **Auto-check:** Consider adding lint warning count to CI/CD
+- **Auto-check:** ✅ Automated via GitHub Actions (see below)
+
+### Automated Tracking via GitHub Actions
+
+The project now includes an automated lint warning tracker that:
+
+- **Runs on every PR and push** to main/develop branches
+- **Parses ESLint output** and updates `lint-warnings.json` automatically
+- **Enforces 20% increase threshold** - PRs that increase warnings by more than 20% will be blocked
+- **Posts PR comments** with warning analysis and trends
+- **Updates tracking data** automatically on main/develop pushes
+
+#### Workflow Details
+
+- **Workflow:** `.github/workflows/lint-warnings-tracker.yml`
+- **Parser Script:** `scripts/parse-eslint-warnings.js`
+- **Data File:** `lint-warnings.json` (auto-updated)
+- **Threshold:** 20% increase limit
+- **Actions:** Blocks PRs exceeding threshold, comments on all PRs with analysis
 
 ## Commands
 
