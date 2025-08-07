@@ -10,6 +10,7 @@ import TransactionLedger from "../transactions/TransactionLedger";
 import ChartsAndAnalytics from "../analytics/ChartsAndAnalytics";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ErrorBoundary } from "@highlight-run/react";
+import logger from "../../utils/logger";
 
 /**
  * ViewRenderer component for handling main content switching
@@ -32,6 +33,10 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
     addSavingsGoal,
     updateSavingsGoal,
     deleteSavingsGoal,
+    addSupplementalAccount,
+    updateSupplementalAccount,
+    deleteSupplementalAccount,
+    transferFromSupplementalAccount,
     addEnvelope,
     updateEnvelope,
     processPaycheck,
@@ -46,47 +51,61 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
 
   // Filter out null/undefined transactions to prevent runtime errors
   const allTransactions = (rawAllTransactions || []).filter(
-    (t) => t && typeof t === "object"
+    (t) => t && typeof t === "object",
   );
   const safeTransactions = (transactions || []).filter(
-    (t) => t && typeof t === "object" && typeof t.amount === "number"
+    (t) => t && typeof t === "object" && typeof t.amount === "number",
   );
 
   // Stable callback for bill updates
-  const handleUpdateBill = useCallback((updatedBill) => {
-    console.log("🔄 [DIRECT] ViewRenderer handleUpdateBill called", {
-      billId: updatedBill.id,
-      envelopeId: updatedBill.envelopeId,
-      hasUpdateBill: !!updateBill,
-      timestamp: new Date().toISOString(),
-    });
-    
-    try {
-      // Use updateBill for proper bill persistence with envelope assignment
-      // The budget store's updateBill handles both bills and allTransactions internally
-      updateBill(updatedBill);
-      console.log("🔄 [DIRECT] ViewRenderer called updateBill successfully");
-    } catch (error) {
-      console.error("❌ [DIRECT] Error in ViewRenderer handleUpdateBill", error);
-    }
-  }, [updateBill]);
+  const handleUpdateBill = useCallback(
+    (updatedBill) => {
+      logger.debug("ViewRenderer handleUpdateBill called", {
+        billId: updatedBill.id,
+        envelopeId: updatedBill.envelopeId,
+        hasUpdateBill: !!updateBill,
+      });
 
-  // Debug log to verify function creation
-  window.console.log("🔧 [DIRECT] ViewRenderer handleUpdateBill created", {
-    functionExists: !!handleUpdateBill,
-    functionType: typeof handleUpdateBill,
-    timestamp: new Date().toISOString(),
-    activeView,
-  });
-  console.log("🔧 [DIRECT] ViewRenderer handleUpdateBill created", {
-    functionExists: !!handleUpdateBill,
-    functionType: typeof handleUpdateBill,
-    timestamp: new Date().toISOString(),
-    activeView,
-  });
+      try {
+        // Use updateBill for proper bill persistence with envelope assignment
+        // The budget store's updateBill handles both bills and allTransactions internally
+        updateBill(updatedBill);
+        logger.debug("ViewRenderer updateBill completed successfully", {
+          billId: updatedBill.id,
+          envelopeId: updatedBill.envelopeId,
+        });
+      } catch (error) {
+        logger.error("Error in ViewRenderer handleUpdateBill", error, {
+          billId: updatedBill.id,
+          envelopeId: updatedBill.envelopeId,
+        });
+      }
+    },
+    [updateBill],
+  );
+
+  // Debug log to verify function creation - only on dev sites
+  if (activeView === "bills") {
+    logger.debug("ViewRenderer handleUpdateBill created for bills view", {
+      functionExists: !!handleUpdateBill,
+      functionType: typeof handleUpdateBill,
+      activeView,
+    });
+  }
 
   const views = {
-    dashboard: <Dashboard />,
+    dashboard: (
+      <Dashboard
+        envelopes={envelopes}
+        savingsGoals={savingsGoals}
+        unassignedCash={unassignedCash}
+        actualBalance={actualBalance}
+        onUpdateActualBalance={setActualBalance}
+        onReconcileTransaction={reconcileTransaction}
+        transactions={safeTransactions}
+        paycheckHistory={paycheckHistory}
+      />
+    ),
     envelopes: (
       <div className="space-y-6">
         <SmartEnvelopeSuggestions
@@ -114,9 +133,11 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
     supplemental: (
       <SupplementalAccounts
         supplementalAccounts={supplementalAccounts}
-        onAddAccount={() => {}} // Will be implemented
-        onUpdateAccount={() => {}} // Will be implemented
-        onDeleteAccount={() => {}} // Will be implemented
+        onAddAccount={addSupplementalAccount}
+        onUpdateAccount={updateSupplementalAccount}
+        onDeleteAccount={deleteSupplementalAccount}
+        onTransferToEnvelope={transferFromSupplementalAccount}
+        envelopes={envelopes}
         currentUser={currentUser}
       />
     ),
@@ -129,65 +150,71 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
         currentUser={currentUser}
       />
     ),
-    bills: (() => {
-      window.console.log("🔧 [DIRECT] Rendering BillManager with props", {
-        hasHandleUpdateBill: !!handleUpdateBill,
-        handleUpdateBillType: typeof handleUpdateBill,
-        activeView,
-        timestamp: new Date().toISOString(),
-      });
-      console.log("🔧 [DIRECT] Rendering BillManager with props", {
-        hasHandleUpdateBill: !!handleUpdateBill,
-        handleUpdateBillType: typeof handleUpdateBill,
-        activeView,
-        timestamp: new Date().toISOString(),
-      });
-      
-      return (
-        <BillManager
-          transactions={bills}
-          envelopes={envelopes}
-          onPayBill={(updatedBill) => {
-            // Update the bill using budget store method
-            updateTransaction(updatedBill);
-          }}
-          onUpdateBill={handleUpdateBill}
-          onCreateRecurringBill={(newBill) => {
-            // Store bill properly using budget store - no transaction created until paid
-            console.log("📋 Creating new bill:", newBill);
-            const bill = {
-              ...newBill,
-              id: newBill.id || `bill_${Date.now()}`,
-              type: "recurring_bill",
-              isPaid: false,
-              source: "manual",
-              createdAt: new Date().toISOString(),
-            };
-            addBill(bill);
-            console.log(
-              "✅ Bill stored successfully - no transaction created until paid"
+    bills: (
+      <BillManager
+        transactions={bills}
+        envelopes={envelopes}
+        onPayBill={(updatedBill) => {
+          // Update the bill using budget store method
+          updateTransaction(updatedBill);
+        }}
+        onUpdateBill={handleUpdateBill}
+        onCreateRecurringBill={(newBill) => {
+          // Store bill properly using budget store - no transaction created until paid
+          console.log("📋 Creating new bill:", newBill);
+          const bill = {
+            ...newBill,
+            id: newBill.id || `bill_${Date.now()}`,
+            type: "recurring_bill",
+            isPaid: false,
+            source: "manual",
+            createdAt: new Date().toISOString(),
+          };
+          addBill(bill);
+          console.log(
+            "✅ Bill stored successfully - no transaction created until paid",
+          );
+        }}
+        onSearchNewBills={async () => {
+          try {
+            // This would integrate with email parsing or other bill detection services
+            // For now, we'll show a placeholder notification
+            alert(
+              "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox.",
             );
-          }}
-          onSearchNewBills={async () => {
-            try {
-              // This would integrate with email parsing or other bill detection services
-              // For now, we'll show a placeholder notification
-              alert(
-                "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox."
-              );
-            } catch (error) {
-              console.error("Failed to search for new bills:", error);
-              alert("Failed to search for new bills. Please try again.");
-            }
-          }}
-          onError={(error) => {
-            console.error("Bill management error:", error);
-            alert(`Error: ${error.message || error}`);
-          }}
-        />
-      );
-    })(),
-    transactions: <TransactionLedger currentUser={currentUser} />,
+          } catch (error) {
+            console.error("Failed to search for new bills:", error);
+            alert("Failed to search for new bills. Please try again.");
+          }
+        }}
+        onError={(error) => {
+          console.error("Bill management error:", error);
+          alert(`Error: ${error.message || error}`);
+        }}
+      />
+    ),
+    transactions: (
+      <TransactionLedger
+        transactions={allTransactions}
+        envelopes={envelopes}
+        onAddTransaction={() => {}} // Will be implemented
+        onUpdateTransaction={() => {}} // Will be implemented
+        onDeleteTransaction={() => {}} // Will be implemented
+        onBulkImport={(newTransactions) => {
+          console.log(
+            "🔄 onBulkImport called with transactions:",
+            newTransactions.length,
+          );
+          // Add transactions using budget store method - need to loop through individual transactions
+          newTransactions.forEach((transaction) => addTransaction(transaction));
+          console.log(
+            "💾 Bulk import complete. Added transactions:",
+            newTransactions.length,
+          );
+        }}
+        currentUser={currentUser}
+      />
+    ),
     analytics: (
       <ChartsAndAnalytics
         transactions={allTransactions}
