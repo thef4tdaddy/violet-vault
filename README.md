@@ -174,19 +174,23 @@ VioletVault takes your financial privacy seriously:
 ## 📚 Documentation
 
 ### Core Documentation
+
 - **[📋 Roadmap](ROADMAP.md)** - See what's coming next and help shape VioletVault's future
 - **[🤝 Contributing Guide](CONTRIBUTING.md)** - How to contribute to the project
 - **[📝 Changelog](CHANGELOG.md)** - Complete version history and changes
 
-### Technical Documentation  
+### Technical Documentation
+
 - **[🏗️ Milestones](docs/MILESTONES.md)** - Release planning and milestone tracking
 - **[🧪 Testing Strategy](docs/Testing-Strategy.md)** - Comprehensive testing approach
+- **[⚠️ Lint Warnings](docs/LINT_WARNINGS.md)** - ESLint warning tracking and resolution
 - **[🔄 Refactoring Analysis](docs/Refactoring-Analysis.md)** - Architecture improvement plans
 - **[🛠️ New Utilities Analysis](docs/New-Utilities-Analysis.md)** - Feature analysis and utilities
 
 ## 🗺️ Roadmap
 
 Check out our development progress:
+
 - **[📋 Roadmap Document](ROADMAP.md)** - Detailed feature roadmap and vision
 - **[📊 GitHub Project](https://github.com/thef4tdaddy/violet-vault/projects)** - Live project board with current development status
 - **[🏗️ Milestones](docs/MILESTONES.md)** - Weekly release planning and milestone tracking
@@ -232,6 +236,7 @@ This project is licensed under the **Creative Commons Attribution-NonCommercial-
 ### 🎯 What This Means:
 
 **✅ You CAN:**
+
 - Use VioletVault for personal budgeting and self-hosting
 - Use it internally within your organization (non-commercially)
 - Modify and improve the software
@@ -239,6 +244,7 @@ This project is licensed under the **Creative Commons Attribution-NonCommercial-
 - Learn from the code and use it for education
 
 **❌ You CANNOT (without permission):**
+
 - Use VioletVault to build commercial services or products
 - Sell access to VioletVault or derivatives
 - Keep your improvements private (must share back)
@@ -250,15 +256,15 @@ See the [LICENSE](LICENSE) file for complete details.
 
 ## 📖 Quick Reference
 
-| Topic | Link | Description |
-|-------|------|-------------|
-| **Getting Started** | [Installation](#-getting-started) | Set up VioletVault locally |
-| **Features** | [Feature List](#-features) | Complete feature overview |
-| **Development** | [Contributing Guide](CONTRIBUTING.md) | Development workflow |
-| **Architecture** | [Project Structure](#-project-structure) | Codebase organization |
-| **Roadmap** | [GitHub Project](https://github.com/thef4tdaddy/violet-vault/projects) | Live development board |
-| **Planning** | [Milestones](docs/MILESTONES.md) | Weekly release planning |
-| **Testing** | [Testing Strategy](docs/Testing-Strategy.md) | QA approach |
+| Topic               | Link                                                                   | Description                |
+| ------------------- | ---------------------------------------------------------------------- | -------------------------- |
+| **Getting Started** | [Installation](#-getting-started)                                      | Set up VioletVault locally |
+| **Features**        | [Feature List](#-features)                                             | Complete feature overview  |
+| **Development**     | [Contributing Guide](CONTRIBUTING.md)                                  | Development workflow       |
+| **Architecture**    | [Project Structure](#-project-structure)                               | Codebase organization      |
+| **Roadmap**         | [GitHub Project](https://github.com/thef4tdaddy/violet-vault/projects) | Live development board     |
+| **Planning**        | [Milestones](docs/MILESTONES.md)                                       | Weekly release planning    |
+| **Testing**         | [Testing Strategy](docs/Testing-Strategy.md)                           | QA approach                |
 
 ## 🆘 Support
 
