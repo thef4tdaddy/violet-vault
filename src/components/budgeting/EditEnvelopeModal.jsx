@@ -14,6 +14,7 @@ import {
   Sparkles,
   FileText,
   TrendingUp,
+  CheckCircle,
 } from "lucide-react";
 import {
   ENVELOPE_TYPES,
@@ -32,6 +33,7 @@ const EditEnvelopeModal = ({
   envelope,
   onUpdateEnvelope,
   onDeleteEnvelope,
+  onUpdateBill, // Add bill update function
   existingEnvelopes = [],
   allBills = [], // Add bills prop to show linked bills
   currentUser = { userName: "User", userColor: "#a855f7" }, // eslint-disable-line no-unused-vars
@@ -56,6 +58,7 @@ const EditEnvelopeModal = ({
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [selectedBillId, setSelectedBillId] = useState("");
 
   // Predefined categories for quick selection using standardized categories
   const categories = getEnvelopeCategories();
@@ -201,6 +204,45 @@ const EditEnvelopeModal = ({
     return toBiweekly(monthlyAmount, "monthly").toFixed(2);
   };
 
+  // Handle bill selection and auto-populate envelope data
+  const handleBillSelection = (billId) => {
+    setSelectedBillId(billId);
+
+    if (!billId) return;
+
+    const selectedBill = allBills.find((bill) => bill.id === billId);
+    if (!selectedBill) return;
+
+    // Auto-populate envelope fields from the selected bill
+    setFormData((prevData) => ({
+      ...prevData,
+      name: selectedBill.name || selectedBill.provider || prevData.name,
+      category: selectedBill.category || prevData.category,
+      color: selectedBill.color || prevData.color,
+      frequency: selectedBill.frequency || prevData.frequency,
+      description:
+        selectedBill.description ||
+        selectedBill.notes ||
+        `Auto-created for ${selectedBill.name} bill`,
+      biweeklyAllocation:
+        selectedBill.biweeklyAmount?.toString() ||
+        (selectedBill.amount
+          ? toBiweekly(
+              selectedBill.amount,
+              selectedBill.frequency || "monthly",
+            ).toFixed(2)
+          : ""),
+      monthlyAmount:
+        selectedBill.monthlyAmount?.toString() ||
+        (selectedBill.amount
+          ? toMonthly(
+              selectedBill.amount,
+              selectedBill.frequency || "monthly",
+            ).toFixed(2)
+          : ""),
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -259,6 +301,21 @@ const EditEnvelopeModal = ({
         }
 
         await onUpdateEnvelope(updatedEnvelope);
+
+        // If a bill was selected, establish the bidirectional relationship
+        if (selectedBillId && onUpdateBill) {
+          const selectedBill = allBills.find(
+            (bill) => bill.id === selectedBillId,
+          );
+          if (selectedBill) {
+            // Update the bill to reference this envelope
+            await onUpdateBill({
+              ...selectedBill,
+              envelopeId: envelope.id,
+              lastUpdated: new Date().toISOString(),
+            });
+          }
+        }
       }
 
       // Reset and close
@@ -457,6 +514,47 @@ const EditEnvelopeModal = ({
               {/* Type-specific fields */}
               {formData.envelopeType === ENVELOPE_TYPES.BILL && (
                 <div className="space-y-4">
+                  {/* Bill Connection */}
+                  <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
+                    <label className="block text-sm font-medium text-purple-800 mb-2 flex items-center">
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Connect to Existing Bill (Optional)
+                    </label>
+                    <select
+                      value={selectedBillId}
+                      onChange={(e) => handleBillSelection(e.target.value)}
+                      className="w-full px-4 py-3 border border-purple-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                    >
+                      <option value="">
+                        Choose a bill to auto-populate settings...
+                      </option>
+                      {allBills
+                        .filter(
+                          (bill) =>
+                            !bill.envelopeId ||
+                            bill.envelopeId === envelope?.id,
+                        ) // Only show unassigned bills or bills assigned to this envelope
+                        .map((bill) => (
+                          <option key={bill.id} value={bill.id}>
+                            {bill.name || bill.provider} - $
+                            {parseFloat(bill.amount || 0).toFixed(2)} (
+                            {bill.frequency || "monthly"})
+                          </option>
+                        ))}
+                    </select>
+                    {selectedBillId && (
+                      <p className="text-xs text-purple-600 mt-2 flex items-center">
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                        Envelope settings have been populated from the selected
+                        bill. You can edit them below.
+                      </p>
+                    )}
+                    <p className="text-xs text-purple-700 mt-2">
+                      Select a bill to automatically fill in the envelope name,
+                      amount, frequency, and category based on the bill details.
+                    </p>
+                  </div>
+
                   {/* Payment Frequency Selection */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
