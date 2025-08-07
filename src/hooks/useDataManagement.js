@@ -1,13 +1,13 @@
 import { useCallback } from "react";
 import { encryptionUtils } from "../utils/encryption";
-import useAuthStore from "../stores/authStore";
+import { useAuth } from "../contexts/AuthContext";
 
 /**
  * Custom hook for data import/export operations
  * Extracts data management logic from Layout component
  */
 const useDataManagement = () => {
-  const { encryptionKey, currentUser } = useAuthStore();
+  const { encryptionKey, currentUser } = useAuth();
 
   const exportData = useCallback(async () => {
     try {
