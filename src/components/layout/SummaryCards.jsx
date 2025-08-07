@@ -7,7 +7,12 @@ import UnassignedCashModal from "../modals/UnassignedCashModal";
  * Summary cards component showing financial overview
  * Extracted from Layout.jsx for better organization
  */
-const SummaryCards = ({ totalCash, unassignedCash, totalSavingsBalance, biweeklyAllocation }) => {
+const SummaryCards = ({
+  totalCash,
+  unassignedCash,
+  totalSavingsBalance,
+  biweeklyAllocation,
+}) => {
   const { openUnassignedCashModal } = useBudget();
 
   const cards = [
@@ -23,9 +28,10 @@ const SummaryCards = ({ totalCash, unassignedCash, totalSavingsBalance, biweekly
       icon: TrendingUp,
       label: "Unassigned Cash",
       value: unassignedCash,
-      color: "emerald",
-      onClick: unassignedCash > 0 ? openUnassignedCashModal : undefined,
-      clickable: unassignedCash > 0,
+      color: unassignedCash < 0 ? "red" : "emerald",
+      onClick: openUnassignedCashModal, // Always allow clicking to distribute/address negative balance
+      clickable: true,
+      isNegative: unassignedCash < 0,
     },
     {
       key: "savings-total",
@@ -55,6 +61,7 @@ const SummaryCards = ({ totalCash, unassignedCash, totalSavingsBalance, biweekly
             color={card.color}
             onClick={card.onClick}
             clickable={card.clickable}
+            isNegative={card.isNegative}
           />
         ))}
       </div>
@@ -63,12 +70,21 @@ const SummaryCards = ({ totalCash, unassignedCash, totalSavingsBalance, biweekly
   );
 };
 
-const SummaryCard = ({ icon: Icon, label, value, color, onClick, clickable }) => {
+const SummaryCard = ({
+  icon: Icon,
+  label,
+  value,
+  color,
+  onClick,
+  clickable,
+  isNegative,
+}) => {
   const colorClasses = {
     purple: "bg-purple-500",
     emerald: "bg-emerald-500",
     cyan: "bg-cyan-500",
     amber: "bg-amber-500",
+    red: "bg-red-500",
   };
 
   const textColorClasses = {
@@ -76,9 +92,11 @@ const SummaryCard = ({ icon: Icon, label, value, color, onClick, clickable }) =>
     emerald: "text-emerald-600",
     cyan: "text-cyan-600",
     amber: "text-amber-600",
+    red: "text-red-600",
   };
 
-  const baseClasses = "glassmorphism rounded-3xl p-6 transition-all duration-200";
+  const baseClasses =
+    "glassmorphism rounded-3xl p-6 transition-all duration-200";
   const clickableClasses = clickable
     ? "cursor-pointer hover:shadow-lg hover:scale-105 active:scale-95"
     : "";
@@ -96,9 +114,23 @@ const SummaryCard = ({ icon: Icon, label, value, color, onClick, clickable }) =>
       <div>
         <p className="text-sm font-semibold text-gray-600 mb-1">
           {label}
-          {clickable && <span className="ml-1 text-xs text-gray-400">(click to distribute)</span>}
+          {clickable && !isNegative && (
+            <span className="ml-1 text-xs text-gray-400">
+              (click to distribute)
+            </span>
+          )}
+          {isNegative && (
+            <span className="ml-1 text-xs text-red-500">
+              (overspending - click to address)
+            </span>
+          )}
         </p>
-        <p className={`text-2xl font-bold ${textColorClasses[color]}`}>${value.toFixed(2)}</p>
+        <p
+          className={`text-2xl font-bold ${textColorClasses[color]} ${isNegative ? "animate-pulse" : ""}`}
+        >
+          ${value.toFixed(2)}
+          {isNegative && <span className="ml-2 text-sm">⚠️</span>}
+        </p>
       </div>
     </div>
   );
