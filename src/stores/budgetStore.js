@@ -559,3 +559,6 @@ if (LOCAL_ONLY_MODE) {
 }
 
 export default useOptimizedBudgetStore;
+
+// Provide a more intuitive export alias
+export { useOptimizedBudgetStore as useBudgetStore };

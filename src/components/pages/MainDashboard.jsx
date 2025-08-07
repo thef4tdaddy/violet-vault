@@ -18,11 +18,11 @@ import PaydayPrediction from "../budgeting/PaydayPrediction";
 import { predictNextPayday } from "../../utils/paydayPredictor";
 import EditableBalance from "../ui/EditableBalance";
 import { useActualBalance } from "../../hooks/useActualBalance";
-import { useBudget } from "../../hooks/useBudget";
+import { useBudgetStore } from "../../stores/budgetStore";
 
 const Dashboard = () => {
   // Get live data from budget store instead of props
-  const budget = useBudget();
+  const budget = useBudgetStore();
   const {
     envelopes,
     savingsGoals,

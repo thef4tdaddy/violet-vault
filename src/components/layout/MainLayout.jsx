@@ -1,7 +1,6 @@
 // src/components/layout/MainLayout.jsx
 import React, { useState, useMemo, Suspense } from "react";
-import { BudgetProvider } from "../../contexts/BudgetContext";
-import { useBudget } from "../../hooks/useBudget";
+import { useBudgetStore } from "../../stores/budgetStore";
 import useAuthFlow from "../../hooks/useAuthFlow";
 import useDataManagement from "../../hooks/useDataManagement";
 import usePasswordRotation from "../../hooks/usePasswordRotation";
@@ -98,13 +97,7 @@ const Layout = () => {
 
   return (
     <>
-      <BudgetProvider
-        encryptionKey={encryptionKey}
-        currentUser={currentUser}
-        budgetId={budgetId}
-        salt={salt}
-      >
-        <MainContent
+      <MainContent
           currentUser={currentUser}
           encryptionKey={encryptionKey}
           budgetId={budgetId}
@@ -121,7 +114,6 @@ const Layout = () => {
           rotationDue={rotationDue}
           onUpdateProfile={handleUpdateProfile}
         />
-      </BudgetProvider>
       {showRotationModal && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="glassmorphism rounded-2xl p-6 w-full max-w-md border border-white/30 shadow-2xl">
@@ -178,7 +170,7 @@ const MainContent = ({
   rotationDue,
   onUpdateProfile,
 }) => {
-  const budget = useBudget();
+  const budget = useBudgetStore();
   const [activeView, setActiveView] = useState("dashboard");
 
   // Custom hooks for MainContent business logic
