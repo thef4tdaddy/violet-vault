@@ -636,41 +636,47 @@ const UnifiedEnvelopeManager = ({
               </div>
             </div>
 
-            <div className="mb-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-gray-600">
-                  {(() => {
-                    const envelopeType =
-                      envelope.envelopeType ||
-                      AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
-                    if (envelopeType === ENVELOPE_TYPES.BILL)
-                      return "Payment Readiness";
-                    if (envelopeType === ENVELOPE_TYPES.SAVINGS)
-                      return "Goal Progress";
-                    return "Budget Progress";
-                  })()}
-                </span>
-                <span className="text-sm font-medium">
-                  {Math.round(envelope.utilizationRate * 100)}%
-                </span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-3">
-                <div
-                  className={`h-3 rounded-full transition-all ${
-                    envelope.status === "overspent"
-                      ? "bg-red-500"
-                      : envelope.status === "warning"
-                        ? "bg-orange-500"
-                        : envelope.status === "caution"
-                          ? "bg-yellow-500"
-                          : "bg-green-500"
-                  }`}
-                  style={{
-                    width: `${Math.min(envelope.utilizationRate * 100, 100)}%`,
-                  }}
-                />
-              </div>
-            </div>
+            {(() => {
+              const envelopeType =
+                envelope.envelopeType ||
+                AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+
+              // Only show progress bar for bill and savings envelopes
+              if (envelopeType === ENVELOPE_TYPES.VARIABLE) {
+                return null; // No progress bar for variable envelopes
+              }
+
+              return (
+                <div className="mb-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm text-gray-600">
+                      {envelopeType === ENVELOPE_TYPES.BILL
+                        ? "Payment Readiness"
+                        : "Goal Progress"}
+                    </span>
+                    <span className="text-sm font-medium">
+                      {Math.round(envelope.utilizationRate * 100)}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div
+                      className={`h-3 rounded-full transition-all ${
+                        envelope.status === "overspent"
+                          ? "bg-red-500"
+                          : envelope.status === "warning"
+                            ? "bg-orange-500"
+                            : envelope.status === "caution"
+                              ? "bg-yellow-500"
+                              : "bg-green-500"
+                      }`}
+                      style={{
+                        width: `${Math.min(envelope.utilizationRate * 100, 100)}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            })()}
 
             <div className="space-y-2">
               {(() => {
@@ -720,12 +726,36 @@ const UnifiedEnvelopeManager = ({
                   );
                 }
               })()}
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Current Balance:</span>
-                <span className="text-sm font-medium text-blue-600">
-                  ${envelope.currentBalance.toFixed(2)}
-                </span>
-              </div>
+              {(() => {
+                const envelopeType =
+                  envelope.envelopeType ||
+                  AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+
+                // For variable envelopes, make current balance more prominent
+                if (envelopeType === ENVELOPE_TYPES.VARIABLE) {
+                  return (
+                    <div className="flex justify-between items-center py-2 bg-blue-50 rounded-lg px-3 mb-2">
+                      <span className="text-base font-semibold text-gray-900">
+                        Available Balance:
+                      </span>
+                      <span className="text-xl font-bold text-blue-600">
+                        ${envelope.currentBalance.toFixed(2)}
+                      </span>
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">
+                        Current Balance:
+                      </span>
+                      <span className="text-sm font-medium text-blue-600">
+                        ${envelope.currentBalance.toFixed(2)}
+                      </span>
+                    </div>
+                  );
+                }
+              })()}
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Spent:</span>
                 <span className="text-sm font-medium text-red-600">
