@@ -1013,14 +1013,27 @@ const BillManager = ({
           editingBill={editingBill}
           availableEnvelopes={envelopes}
           onUpdateBill={(updatedBillData) => {
+            logger.debug("BillManager onUpdateBill called", {
+              billId: updatedBillData.id,
+              envelopeId: updatedBillData.envelopeId,
+              hasOnUpdateBillProp: !!onUpdateBill,
+            });
+
             if (onUpdateBill) {
+              logger.debug("Using prop onUpdateBill", { billId: updatedBillData.id });
               try {
                 onUpdateBill(updatedBillData);
+                logger.debug("onUpdateBill prop call completed successfully", { 
+                  billId: updatedBillData.id 
+                });
               } catch (error) {
-                console.error("Error calling onUpdateBill prop", error);
+                logger.error("Error calling onUpdateBill prop", error, {
+                  billId: updatedBillData.id,
+                });
                 throw error;
               }
             } else {
+              logger.debug("Using budget.updateBill fallback", { billId: updatedBillData.id });
               // Fallback to budget context
               budget.updateBill(updatedBillData);
             }

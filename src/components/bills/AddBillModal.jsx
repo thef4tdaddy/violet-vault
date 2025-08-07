@@ -273,14 +273,15 @@ const AddBillModal = ({
       logger.debug("Updating existing bill", {
         billId: billData.id,
         envelopeId: billData.envelopeId,
-        originalBill: editingBill,
-        updatedBill: billData,
+        originalEnvelopeId: editingBill.envelopeId,
+        envelopeChanged: editingBill.envelopeId !== billData.envelopeId,
       });
+      
       try {
         onUpdateBill?.(billData);
-        logger.debug("Bill update completed successfully");
+        logger.debug("Bill update completed successfully", { billId: billData.id });
       } catch (error) {
-        logger.error("Error during bill update", error);
+        logger.error("Error during bill update", error, { billId: billData.id });
         throw error;
       }
     } else {
