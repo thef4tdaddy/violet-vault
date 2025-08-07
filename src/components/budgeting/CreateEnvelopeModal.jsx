@@ -283,7 +283,7 @@ const CreateEnvelopeModal = ({
                           : "border-gray-200 hover:border-gray-300"
                       }`}
                     >
-                      <div className="flex items-start space-x-3">
+                      <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
                         <input
                           type="radio"
                           name="envelopeType"
@@ -295,9 +295,9 @@ const CreateEnvelopeModal = ({
                               envelopeType: e.target.value,
                             })
                           }
-                          className="mt-1 w-4 h-4 text-purple-600 focus:ring-purple-500 border-gray-300"
+                          className="w-4 h-4 text-purple-600 focus:ring-purple-500 border-gray-300 mt-0.5 justify-self-start"
                         />
-                        <div className="flex-1">
+                        <div>
                           <div className="flex items-center mb-1">
                             <IconComponent
                               className={`h-4 w-4 mr-2 ${config.textColor}`}
@@ -511,7 +511,7 @@ const CreateEnvelopeModal = ({
               )}
             </div>
 
-            {/* Legacy Budget Settings (keeping for compatibility) */}
+            {/* Additional Settings */}
             <div className="space-y-4">
               <h3 className="font-semibold text-gray-900 flex items-center">
                 <DollarSign className="h-4 w-4 mr-2 text-purple-600" />
@@ -519,48 +519,7 @@ const CreateEnvelopeModal = ({
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Monthly Amount */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Monthly Budget Amount *
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <DollarSign className="h-4 w-4 text-gray-400" />
-                    </div>
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={formData.monthlyAmount}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          monthlyAmount: e.target.value,
-                        })
-                      }
-                      className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
-                        errors.monthlyAmount
-                          ? "border-red-300 bg-red-50"
-                          : "border-gray-300"
-                      }`}
-                      placeholder="0.00"
-                    />
-                  </div>
-                  {errors.monthlyAmount && (
-                    <p className="mt-1 text-sm text-red-600 flex items-center">
-                      <AlertCircle className="h-3 w-3 mr-1" />
-                      {errors.monthlyAmount}
-                    </p>
-                  )}
-                  {formData.monthlyAmount && (
-                    <p className="mt-1 text-xs text-gray-500">
-                      Bi-weekly allocation: ${calculateBiweeklyAmount()}
-                    </p>
-                  )}
-                </div>
-
-                {/* Current Balance */}
+                {/* Starting Balance */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Starting Balance (Optional)
@@ -595,29 +554,8 @@ const CreateEnvelopeModal = ({
                     </p>
                   )}
                 </div>
-              </div>
 
-              {/* Frequency and Priority */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Frequency
-                  </label>
-                  <select
-                    value={formData.frequency}
-                    onChange={(e) =>
-                      setFormData({ ...formData, frequency: e.target.value })
-                    }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  >
-                    {frequencies.map((freq) => (
-                      <option key={freq.value} value={freq.value}>
-                        {freq.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
+                {/* Priority Level */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Priority Level
