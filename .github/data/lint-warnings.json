@@ -1,0 +1,193 @@
+{
+  "project": "violet-vault",
+  "lastUpdated": "2025-08-07",
+  "currentStatus": {
+    "totalWarnings": 21,
+    "targetWarnings": 17,
+    "errors": 0
+  },
+  "warningCategories": [
+    {
+      "type": "no-unused-vars",
+      "count": 15,
+      "severity": "warning",
+      "files": [
+        {
+          "path": "scripts/rollback.js",
+          "warnings": 3,
+          "details": [
+            { "line": 200, "message": "'error' parameter unused" },
+            { "line": 214, "message": "'error' parameter unused" },
+            { "line": 251, "message": "'error' parameter unused" }
+          ]
+        },
+        {
+          "path": "src/components/layout/MainLayout.jsx",
+          "warnings": 1,
+          "details": [
+            {
+              "line": 397,
+              "message": "'Icon' parameter unused in NavButton component"
+            }
+          ]
+        },
+        {
+          "path": "src/components/layout/NavigationTabs.jsx",
+          "warnings": 1,
+          "details": [{ "line": 78, "message": "'Icon' parameter unused" }]
+        },
+        {
+          "path": "src/components/layout/SummaryCards.jsx",
+          "warnings": 1,
+          "details": [{ "line": 66, "message": "'Icon' parameter unused" }]
+        },
+        {
+          "path": "src/components/layout/ViewRenderer.jsx",
+          "warnings": 3,
+          "details": [
+            {
+              "line": 45,
+              "message": "'deleteTransaction' assigned but never used"
+            },
+            {
+              "line": 48,
+              "message": "'setAllTransactions' assigned but never used"
+            },
+            {
+              "line": 49,
+              "message": "'setTransactions' assigned but never used"
+            }
+          ]
+        },
+        {
+          "path": "src/db/budgetDb.js",
+          "warnings": 6,
+          "details": [
+            { "line": 25, "message": "'_trans' parameter unused" },
+            { "line": 29, "message": "'_primKey' parameter unused" },
+            { "line": 29, "message": "'_obj' parameter unused" },
+            { "line": 29, "message": "'_trans' parameter unused" },
+            { "line": 33, "message": "'_trans' parameter unused" },
+            { "line": 37, "message": "'_primKey' parameter unused" },
+            { "line": 37, "message": "'_obj' parameter unused" },
+            { "line": 37, "message": "'_trans' parameter unused" }
+          ]
+        },
+        {
+          "path": "src/utils/highlight.js",
+          "warnings": 1,
+          "details": [
+            {
+              "line": 36,
+              "message": "'setupConsoleCapture' assigned but never used"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "react-hooks/exhaustive-deps",
+      "count": 1,
+      "severity": "warning",
+      "files": [
+        {
+          "path": "src/hooks/useFirebaseSync.js",
+          "warnings": 1,
+          "details": [
+            {
+              "line": 56,
+              "message": "Missing dependency 'budget' in useEffect"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "react-refresh/only-export-components",
+      "count": 2,
+      "severity": "warning",
+      "files": [
+        {
+          "path": "src/contexts/AuthContext.jsx",
+          "warnings": 1,
+          "details": [
+            {
+              "line": 7,
+              "message": "Fast refresh issue - move constants/functions to separate file"
+            }
+          ]
+        },
+        {
+          "path": "src/contexts/BudgetContext.jsx",
+          "warnings": 1,
+          "details": [
+            {
+              "line": 7,
+              "message": "Fast refresh issue - move React context to separate file"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "actionPlan": {
+    "highPriority": [
+      {
+        "task": "Fix unused Icon parameters",
+        "warningsAffected": 4,
+        "files": ["MainLayout.jsx", "NavigationTabs.jsx", "SummaryCards.jsx"],
+        "action": "Update NavButton components to use Icon parameter or rename with underscore"
+      },
+      {
+        "task": "Clean up ViewRenderer unused variables",
+        "warningsAffected": 3,
+        "files": ["ViewRenderer.jsx"],
+        "action": "Remove or properly use deleteTransaction, setAllTransactions, setTransactions"
+      }
+    ],
+    "mediumPriority": [
+      {
+        "task": "Database parameter cleanup",
+        "warningsAffected": 6,
+        "files": ["budgetDb.js"],
+        "action": "Prefix unused parameters with underscore"
+      },
+      {
+        "task": "Utility function cleanup",
+        "warningsAffected": 1,
+        "files": ["highlight.js"],
+        "action": "Remove or use setupConsoleCapture"
+      }
+    ],
+    "lowPriority": [
+      {
+        "task": "React context organization",
+        "warningsAffected": 2,
+        "files": ["AuthContext.jsx", "BudgetContext.jsx"],
+        "action": "Refactor to separate files"
+      },
+      {
+        "task": "Hook dependency fix",
+        "warningsAffected": 1,
+        "files": ["useFirebaseSync.js"],
+        "action": "Add missing 'budget' dependency"
+      },
+      {
+        "task": "Script error handling",
+        "warningsAffected": 3,
+        "files": ["rollback.js"],
+        "action": "Add proper error handling or prefix with underscore"
+      }
+    ]
+  },
+  "commands": {
+    "checkWarnings": "npm run lint",
+    "countWarnings": "npm run lint 2>&1 | grep -c \"warning\"",
+    "checkSpecificFile": "npx eslint src/path/to/file.js"
+  },
+  "monitoring": {
+    "target": "≤ 17 warnings",
+    "reviewFrequency": "After significant changes or weekly",
+    "autoCheck": "Consider adding lint warning count to CI/CD"
+  }
+}

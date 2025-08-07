@@ -50,8 +50,8 @@ jobs:
           node scripts/parse-eslint-warnings.js eslint-output.txt > new-warnings.json
 
           # Get current warning count from existing file
-          CURRENT_COUNT=$(if [ -f "./lint-warnings.json" ]; then 
-            cat lint-warnings.json | jq -r '.currentStatus.totalWarnings // 0'
+          CURRENT_COUNT=$(if [ -f "./.github/data/lint-warnings.json" ]; then 
+            cat .github/data/lint-warnings.json | jq -r '.currentStatus.totalWarnings // 0'
           else 
             echo 0
           fi)
@@ -114,17 +114,17 @@ jobs:
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
         run: |
           # Replace the existing lint-warnings.json with the new data
-          cp new-warnings.json lint-warnings.json
+          cp new-warnings.json .github/data/lint-warnings.json
 
           # Configure git
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
           # Check if there are changes
-          if git diff --quiet lint-warnings.json; then
+          if git diff --quiet .github/data/lint-warnings.json; then
             echo "No changes to lint-warnings.json"
           else
-            git add lint-warnings.json
+            git add .github/data/lint-warnings.json
             git commit -m "chore: update lint warnings tracking data [skip ci]
             
             Updated by GitHub Action after lint analysis
@@ -175,7 +175,7 @@ jobs:
             <summary>View detailed warning breakdown</summary>
 
             The full warning analysis is available in the workflow summary.
-            You can also check the \`lint-warnings.json\` file for detailed breakdown by category and file.
+            You can also check the \`.github/data/lint-warnings.json\` file for detailed breakdown by category and file.
 
             </details>`;
 
