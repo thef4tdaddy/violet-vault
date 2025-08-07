@@ -1,6 +1,6 @@
 import React from "react";
 import { DollarSign, Wallet, Target, TrendingUp } from "lucide-react";
-import { useBudget } from "../../hooks/useBudget";
+import { useBudgetStore } from "../../stores/budgetStore";
 import UnassignedCashModal from "../modals/UnassignedCashModal";
 
 /**
@@ -13,7 +13,7 @@ const SummaryCards = ({
   totalSavingsBalance,
   biweeklyAllocation,
 }) => {
-  const { openUnassignedCashModal } = useBudget();
+  const { openUnassignedCashModal } = useBudgetStore();
 
   const cards = [
     {

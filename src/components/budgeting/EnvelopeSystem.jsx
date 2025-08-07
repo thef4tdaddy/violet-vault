@@ -1,6 +1,6 @@
 // src/components/EnvelopeSystem.jsx - Focused Envelope Operations with infinite loop fixes
 import React, { useEffect, useMemo, useCallback, useRef } from "react";
-import { useBudget } from "../../contexts/BudgetContext";
+import { useBudgetStore } from "../../stores/budgetStore";
 import {
   BIWEEKLY_MULTIPLIER,
   FREQUENCY_MULTIPLIERS,
@@ -17,7 +17,7 @@ const useEnvelopeSystem = () => {
     addEnvelope,
     updateEnvelope,
     deleteEnvelope,
-  } = useBudget();
+  } = useBudgetStore();
 
   const lastBillsRef = useRef(null);
   const isCalculatingRef = useRef(false);

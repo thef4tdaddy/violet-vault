@@ -9,7 +9,7 @@ import {
   AlertTriangle,
   Loader2,
 } from "lucide-react";
-import { useBudget } from "../../hooks/useBudget";
+import { useBudgetStore } from "../../stores/budgetStore";
 import useUnassignedCashDistribution from "../../hooks/useUnassignedCashDistribution";
 
 /**
@@ -17,7 +17,8 @@ import useUnassignedCashDistribution from "../../hooks/useUnassignedCashDistribu
  * Pure UI component - all logic handled by useUnassignedCashDistribution hook
  */
 const UnassignedCashModal = () => {
-  const { isUnassignedCashModalOpen, closeUnassignedCashModal } = useBudget();
+  const { isUnassignedCashModalOpen, closeUnassignedCashModal } =
+    useBudgetStore();
   const {
     // State (except modal state)
     distributions,
