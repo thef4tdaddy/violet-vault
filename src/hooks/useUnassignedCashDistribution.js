@@ -32,10 +32,10 @@ const useUnassignedCashDistribution = () => {
     return unassignedCash - totalDistributed;
   }, [unassignedCash, totalDistributed]);
 
-  // Validation
+  // Validation - Allow distributions that would make unassigned cash negative
   const isValidDistribution = useMemo(() => {
-    return totalDistributed > 0 && totalDistributed <= unassignedCash;
-  }, [totalDistributed, unassignedCash]);
+    return totalDistributed > 0; // Remove restriction against going negative
+  }, [totalDistributed]);
 
   // Reset distributions (called when modal opens)
   const resetDistributions = useCallback(() => {
