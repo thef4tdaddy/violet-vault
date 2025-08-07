@@ -14,6 +14,7 @@ export const STANDARD_CATEGORIES = [
   "Shopping",
   "Health & Medical",
   "Personal Care",
+  "Pets",
 
   // Growth/Future Categories
   "Education",
@@ -131,6 +132,7 @@ export const AUTO_CLASSIFY_ENVELOPE_TYPE = (category) => {
     "Transportation",
     "Health & Medical",
     "Personal Care",
+    "Pets",
     "Entertainment",
     "Shopping",
     "Education",
@@ -163,6 +165,7 @@ export const MERCHANT_CATEGORY_PATTERNS = {
   Insurance: /insurance|premium|policy|coverage/i,
   Emergency: /emergency|urgent|unexpected/i,
   Savings: /saving|investment|retirement|401k|ira/i,
+  Pets: /pet|vet|veterinary|dog|cat|animal|petco|petsmart|grooming/i,
 };
 
 /**
