@@ -3,6 +3,7 @@ import {
   DollarSign,
   Wallet,
   TrendingUp,
+  TrendingDown,
   Calendar,
   Target,
   CreditCard,
@@ -50,6 +51,11 @@ const NavigationTabs = ({ activeView, onViewChange }) => {
       key: "transactions",
       icon: BookOpen,
       label: "Transactions",
+    },
+    {
+      key: "debts",
+      icon: TrendingDown,
+      label: "Debt Tracking",
     },
     {
       key: "analytics",

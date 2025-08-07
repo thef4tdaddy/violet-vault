@@ -44,6 +44,7 @@ const migrateOldData = () => {
             savingsGoals: parsedOldData.state.savingsGoals || [],
             supplementalAccounts:
               parsedOldData.state.supplementalAccounts || [],
+            debts: parsedOldData.state.debts || [],
             unassignedCash: parsedOldData.state.unassignedCash || 0,
             biweeklyAllocation: parsedOldData.state.biweeklyAllocation || 0,
             paycheckHistory: parsedOldData.state.paycheckHistory || [],
@@ -82,6 +83,7 @@ const storeInitializer = (set, get) => ({
   allTransactions: [],
   savingsGoals: [],
   supplementalAccounts: [],
+  debts: [], // Debt tracking array
   unassignedCash: 0,
   biweeklyAllocation: 0,
   // Unassigned cash modal state
@@ -282,6 +284,74 @@ const storeInitializer = (set, get) => ({
     set((state) => {
       state.bills = state.bills.filter((b) => b.id !== id);
       state.allTransactions = state.allTransactions.filter((t) => t.id !== id);
+    }),
+
+  // Debt tracking management
+  setDebts: (debts) =>
+    set((state) => {
+      state.debts = debts;
+    }),
+
+  addDebt: (debt) =>
+    set((state) => {
+      console.log("💳 BudgetStore.addDebt called", {
+        debtId: debt.id,
+        debtName: debt.name,
+        debtType: debt.type,
+        balance: debt.currentBalance,
+      });
+      state.debts.push({
+        ...debt,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+    }),
+
+  updateDebt: (debt) =>
+    set((state) => {
+      console.log("🔄 BudgetStore.updateDebt called", {
+        debtId: debt.id,
+        debtName: debt.name,
+        balance: debt.currentBalance,
+      });
+      const index = state.debts.findIndex((d) => d.id === debt.id);
+      if (index !== -1) {
+        state.debts[index] = {
+          ...debt,
+          updatedAt: new Date().toISOString(),
+        };
+      }
+    }),
+
+  deleteDebt: (id) =>
+    set((state) => {
+      console.log("🗑️ BudgetStore.deleteDebt called", { debtId: id });
+      state.debts = state.debts.filter((d) => d.id !== id);
+    }),
+
+  // Record debt payment
+  recordDebtPayment: (debtId, payment) =>
+    set((state) => {
+      const debt = state.debts.find((d) => d.id === debtId);
+      if (debt) {
+        // Add payment to history
+        if (!debt.paymentHistory) debt.paymentHistory = [];
+        debt.paymentHistory.push({
+          ...payment,
+          id: crypto.randomUUID(),
+          date: payment.date || new Date().toISOString(),
+        });
+
+        // Update current balance
+        debt.currentBalance = Math.max(0, debt.currentBalance - payment.amount);
+        debt.updatedAt = new Date().toISOString();
+
+        console.log("💰 Debt payment recorded", {
+          debtId,
+          paymentAmount: payment.amount,
+          newBalance: debt.currentBalance,
+        });
+      }
     }),
 
   // Savings goals management
@@ -516,6 +586,7 @@ const storeInitializer = (set, get) => ({
       state.allTransactions = [];
       state.savingsGoals = [];
       state.supplementalAccounts = [];
+      state.debts = [];
       state.unassignedCash = 0;
       state.biweeklyAllocation = 0;
       state.isUnassignedCashModalOpen = false;
@@ -546,6 +617,7 @@ if (LOCAL_ONLY_MODE) {
           allTransactions: state.allTransactions,
           savingsGoals: state.savingsGoals,
           supplementalAccounts: state.supplementalAccounts,
+          debts: state.debts,
           unassignedCash: state.unassignedCash,
           biweeklyAllocation: state.biweeklyAllocation,
           paycheckHistory: state.paycheckHistory,
