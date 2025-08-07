@@ -793,17 +793,39 @@ const UnifiedEnvelopeManager = ({
 
             <div className="mt-4 pt-4 border-t border-gray-200">
               <div className="flex justify-between text-xs text-gray-500">
-                {envelope.envelopeType === ENVELOPE_TYPES.BILL ? (
-                  <>
-                    <span>{envelope.unpaidBills.length} pending bills</span>
-                    <span>{envelope.paidTransactions.length} payments</span>
-                  </>
-                ) : (
-                  <>
-                    <span>{envelope.paidTransactions.length} transactions</span>
-                    <span>{envelope.unpaidBills.length} pending bills</span>
-                  </>
-                )}
+                {(() => {
+                  const envelopeType =
+                    envelope.envelopeType ||
+                    AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+
+                  if (envelopeType === ENVELOPE_TYPES.BILL) {
+                    return (
+                      <>
+                        <span>{envelope.unpaidBills.length} pending bills</span>
+                        <span>{envelope.paidTransactions.length} payments</span>
+                      </>
+                    );
+                  } else if (envelopeType === ENVELOPE_TYPES.VARIABLE) {
+                    return (
+                      <>
+                        <span>
+                          {envelope.paidTransactions.length} transactions
+                        </span>
+                        <span>${envelope.totalSpent.toFixed(2)} spent</span>
+                      </>
+                    );
+                  } else {
+                    // Savings envelopes might have some bills
+                    return (
+                      <>
+                        <span>
+                          {envelope.paidTransactions.length} transactions
+                        </span>
+                        <span>{envelope.unpaidBills.length} pending bills</span>
+                      </>
+                    );
+                  }
+                })()}
               </div>
             </div>
           </div>
@@ -866,79 +888,93 @@ const UnifiedEnvelopeManager = ({
               </div>
             )}
 
-            <div>
-              <h4 className="font-medium text-gray-900 mb-3 flex items-center">
-                <FileText className="h-4 w-4 mr-2" />
-                {selectedEnvelope.envelopeType === ENVELOPE_TYPES.BILL
-                  ? "Next Bills"
-                  : "Upcoming Bills"}{" "}
-                ({selectedEnvelope.unpaidBills.length})
-              </h4>
-              <div className="space-y-2 max-h-60 overflow-y-auto">
-                {selectedEnvelope.unpaidBills.length === 0 ? (
-                  <div className="text-center py-4 text-gray-500">
-                    <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">No upcoming bills</p>
-                  </div>
-                ) : (
-                  selectedEnvelope.unpaidBills.map((bill, index) => (
-                    <div
-                      key={bill.id}
-                      className={`flex justify-between items-center p-3 rounded-lg ${
-                        index === 0 &&
-                        selectedEnvelope.envelopeType === ENVELOPE_TYPES.BILL
-                          ? "bg-blue-50 border border-blue-200"
-                          : bill.urgency === "overdue"
-                            ? "bg-red-50"
-                            : bill.urgency === "urgent"
-                              ? "bg-orange-50"
-                              : "bg-white/50"
-                      }`}
-                    >
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {bill.provider ||
-                            bill.description ||
-                            bill.name ||
-                            `Bill #${bill.id}`}
-                          {index === 0 &&
-                            selectedEnvelope.envelopeType ===
-                              ENVELOPE_TYPES.BILL && (
-                              <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
-                                Next Due
-                              </span>
-                            )}
-                        </p>
-                        <div className="flex items-center gap-2">
-                          <p className="text-xs text-gray-500">
-                            Due:{" "}
-                            {bill.dueDate
-                              ? new Date(bill.dueDate).toLocaleDateString()
-                              : "No date set"}
-                          </p>
-                          {bill.urgency === "overdue" && (
-                            <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
-                              Overdue
-                            </span>
-                          )}
-                          {bill.urgency === "urgent" && (
-                            <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
-                              Due Soon
-                            </span>
-                          )}
-                        </div>
+            {(() => {
+              const envelopeType =
+                selectedEnvelope.envelopeType ||
+                AUTO_CLASSIFY_ENVELOPE_TYPE(selectedEnvelope.category);
+
+              // Don't show bills section for variable envelopes
+              if (envelopeType === ENVELOPE_TYPES.VARIABLE) {
+                return null;
+              }
+
+              return (
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-3 flex items-center">
+                    <FileText className="h-4 w-4 mr-2" />
+                    {envelopeType === ENVELOPE_TYPES.BILL
+                      ? "Next Bills"
+                      : "Upcoming Bills"}{" "}
+                    ({selectedEnvelope.unpaidBills.length})
+                  </h4>
+                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                    {selectedEnvelope.unpaidBills.length === 0 ? (
+                      <div className="text-center py-4 text-gray-500">
+                        <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                        <p className="text-sm">No upcoming bills</p>
                       </div>
-                      <span className="text-sm font-medium text-orange-600">
-                        $
-                        {bill.amount
-                          ? Math.abs(bill.amount).toFixed(2)
-                          : "0.00"}
-                      </span>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
+                    ) : (
+                      selectedEnvelope.unpaidBills.map((bill, index) => (
+                        <div
+                          key={bill.id}
+                          className={`flex justify-between items-center p-3 rounded-lg ${
+                            index === 0 &&
+                            selectedEnvelope.envelopeType ===
+                              ENVELOPE_TYPES.BILL
+                              ? "bg-blue-50 border border-blue-200"
+                              : bill.urgency === "overdue"
+                                ? "bg-red-50"
+                                : bill.urgency === "urgent"
+                                  ? "bg-orange-50"
+                                  : "bg-white/50"
+                          }`}
+                        >
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">
+                              {bill.provider ||
+                                bill.description ||
+                                bill.name ||
+                                `Bill #${bill.id}`}
+                              {index === 0 &&
+                                selectedEnvelope.envelopeType ===
+                                  ENVELOPE_TYPES.BILL && (
+                                  <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                                    Next Due
+                                  </span>
+                                )}
+                            </p>
+                            <div className="flex items-center gap-2">
+                              <p className="text-xs text-gray-500">
+                                Due:{" "}
+                                {bill.dueDate
+                                  ? new Date(bill.dueDate).toLocaleDateString()
+                                  : "No date set"}
+                              </p>
+                              {bill.urgency === "overdue" && (
+                                <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
+                                  Overdue
+                                </span>
+                              )}
+                              {bill.urgency === "urgent" && (
+                                <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
+                                  Due Soon
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <span className="text-sm font-medium text-orange-600">
+                            $
+                            {bill.amount
+                              ? Math.abs(bill.amount).toFixed(2)
+                              : "0.00"}
+                          </span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
       )}
