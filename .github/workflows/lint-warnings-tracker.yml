@@ -50,24 +50,18 @@ jobs:
           node scripts/parse-eslint-warnings.js eslint-output.txt > new-warnings.json
 
           # Get current warning count from existing file
-          CURRENT_COUNT=$(node -e "
-            try {
-              const data = require('./lint-warnings.json');
-              console.log(data.currentStatus.totalWarnings);
-            } catch (e) {
-              console.log(0);
-            }
-          ")
+          CURRENT_COUNT=$(if [ -f "./lint-warnings.json" ]; then 
+            cat lint-warnings.json | jq -r '.currentStatus.totalWarnings // 0'
+          else 
+            echo 0
+          fi)
 
           # Get new warning count
-          NEW_COUNT=$(node -e "
-            try {
-              const data = require('./new-warnings.json');
-              console.log(data.currentStatus.totalWarnings);
-            } catch (e) {
-              console.log(0);
-            }
-          ")
+          NEW_COUNT=$(if [ -f "./new-warnings.json" ]; then 
+            cat new-warnings.json | jq -r '.currentStatus.totalWarnings // 0'
+          else 
+            echo 0
+          fi)
 
           echo "current_count=$CURRENT_COUNT" >> $GITHUB_OUTPUT
           echo "new_count=$NEW_COUNT" >> $GITHUB_OUTPUT
