@@ -96,7 +96,12 @@ const UnifiedEnvelopeManager = ({
             (t.type === "bill" || t.type === "recurring_bill") && !t.isPaid,
         ),
         ...envelopeBills.filter((b) => !b.isPaid),
-      ];
+      ].sort((a, b) => {
+        // Sort by due date (earliest first)
+        const dateA = a.dueDate ? new Date(a.dueDate) : new Date("9999-12-31");
+        const dateB = b.dueDate ? new Date(b.dueDate) : new Date("9999-12-31");
+        return dateA - dateB;
+      });
 
       const upcomingBills = unpaidBills.filter(
         (t) => t.dueDate && new Date(t.dueDate) > new Date(),
@@ -790,35 +795,47 @@ const UnifiedEnvelopeManager = ({
             </button>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div>
-              <h4 className="font-medium text-gray-900 mb-3 flex items-center">
-                <Receipt className="h-4 w-4 mr-2" />
-                Recent Transactions ({selectedEnvelope.paidTransactions.length})
-              </h4>
-              <div className="space-y-2 max-h-60 overflow-y-auto">
-                {selectedEnvelope.paidTransactions
-                  .slice(0, 10)
-                  .map((transaction) => (
-                    <div
-                      key={transaction.id}
-                      className="flex justify-between items-center p-3 bg-white/50 rounded-lg"
-                    >
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {transaction.description}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {new Date(transaction.date).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <span className="text-sm font-medium text-red-600">
-                        ${Math.abs(transaction.amount).toFixed(2)}
-                      </span>
+          <div
+            className={`grid grid-cols-1 ${selectedEnvelope.envelopeType === ENVELOPE_TYPES.BILL ? "lg:grid-cols-1" : "lg:grid-cols-2"} gap-6`}
+          >
+            {selectedEnvelope.envelopeType !== ENVELOPE_TYPES.BILL && (
+              <div>
+                <h4 className="font-medium text-gray-900 mb-3 flex items-center">
+                  <Receipt className="h-4 w-4 mr-2" />
+                  Recent Transactions (
+                  {selectedEnvelope.paidTransactions.length})
+                </h4>
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  {selectedEnvelope.paidTransactions.length === 0 ? (
+                    <div className="text-center py-4 text-gray-500">
+                      <Receipt className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">No recent transactions</p>
                     </div>
-                  ))}
+                  ) : (
+                    selectedEnvelope.paidTransactions
+                      .slice(0, 10)
+                      .map((transaction) => (
+                        <div
+                          key={transaction.id}
+                          className="flex justify-between items-center p-3 bg-white/50 rounded-lg"
+                        >
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">
+                              {transaction.description}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {new Date(transaction.date).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <span className="text-sm font-medium text-red-600">
+                            ${Math.abs(transaction.amount).toFixed(2)}
+                          </span>
+                        </div>
+                      ))
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             <div>
               <h4 className="font-medium text-gray-900 mb-3 flex items-center">
@@ -851,18 +868,24 @@ const UnifiedEnvelopeManager = ({
                     >
                       <div>
                         <p className="text-sm font-medium text-gray-900">
-                          {bill.provider || bill.description}
+                          {bill.provider ||
+                            bill.description ||
+                            bill.name ||
+                            `Bill #${bill.id}`}
                           {index === 0 &&
                             selectedEnvelope.envelopeType ===
                               ENVELOPE_TYPES.BILL && (
                               <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
-                                Next
+                                Next Due
                               </span>
                             )}
                         </p>
                         <div className="flex items-center gap-2">
                           <p className="text-xs text-gray-500">
-                            Due: {new Date(bill.dueDate).toLocaleDateString()}
+                            Due:{" "}
+                            {bill.dueDate
+                              ? new Date(bill.dueDate).toLocaleDateString()
+                              : "No date set"}
                           </p>
                           {bill.urgency === "overdue" && (
                             <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
@@ -877,7 +900,10 @@ const UnifiedEnvelopeManager = ({
                         </div>
                       </div>
                       <span className="text-sm font-medium text-orange-600">
-                        ${Math.abs(bill.amount).toFixed(2)}
+                        $
+                        {bill.amount
+                          ? Math.abs(bill.amount).toFixed(2)
+                          : "0.00"}
                       </span>
                     </div>
                   ))
