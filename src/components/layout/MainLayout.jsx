@@ -28,6 +28,7 @@ import {
   BarChart3,
 } from "lucide-react";
 import { AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/categories";
+import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
 import SyncStatusIndicators from "../sync/SyncStatusIndicators";
 import ConflictResolutionModal from "../sync/ConflictResolutionModal";
 import SummaryCards from "./SummaryCards";
@@ -246,7 +247,7 @@ const MainContent = ({
             env.biweeklyAllocation - env.currentBalance,
           );
         } else if (envelopeType === "variable" && env.monthlyBudget) {
-          const biweeklyTarget = env.monthlyBudget / 2;
+          const biweeklyTarget = env.monthlyBudget / BIWEEKLY_MULTIPLIER;
           biweeklyNeed = Math.max(0, biweeklyTarget - env.currentBalance);
         } else if (envelopeType === "savings" && env.targetAmount) {
           const remainingToTarget = Math.max(

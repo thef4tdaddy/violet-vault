@@ -31,6 +31,7 @@ import {
   ENVELOPE_TYPE_CONFIG,
   AUTO_CLASSIFY_ENVELOPE_TYPE,
 } from "../../constants/categories";
+import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
 import { toBiweekly, toMonthly } from "../../utils/frequencyCalculations";
 
 const UnifiedEnvelopeManager = ({
@@ -46,7 +47,7 @@ const UnifiedEnvelopeManager = ({
       propEnvelopes && propEnvelopes.length
         ? propEnvelopes
         : budget.envelopes || [],
-    [propEnvelopes, budget.envelopes]
+    [propEnvelopes, budget.envelopes],
   );
 
   const transactions = useMemo(
@@ -54,7 +55,7 @@ const UnifiedEnvelopeManager = ({
       propTransactions && propTransactions.length
         ? propTransactions
         : budget.transactions || [],
-    [propTransactions, budget.transactions]
+    [propTransactions, budget.transactions],
   );
   const unassignedCash =
     propUnassignedCash !== undefined
@@ -78,45 +79,46 @@ const UnifiedEnvelopeManager = ({
   const envelopeData = useMemo(() => {
     return envelopes.map((envelope) => {
       const envelopeTransactions = transactions.filter(
-        (t) => t.envelopeId === envelope.id
+        (t) => t.envelopeId === envelope.id,
       );
 
       // Also get bills assigned to this envelope
       const envelopeBills = bills.filter((b) => b.envelopeId === envelope.id);
 
       const paidTransactions = envelopeTransactions.filter(
-        (t) => t.type === "transaction" || (t.type === "bill" && t.isPaid)
+        (t) => t.type === "transaction" || (t.type === "bill" && t.isPaid),
       );
 
       // Combine bills from transactions and the bills array
       const unpaidBills = [
         ...envelopeTransactions.filter(
-          (t) => (t.type === "bill" || t.type === "recurring_bill") && !t.isPaid
+          (t) =>
+            (t.type === "bill" || t.type === "recurring_bill") && !t.isPaid,
         ),
         ...envelopeBills.filter((b) => !b.isPaid),
       ];
 
       const upcomingBills = unpaidBills.filter(
-        (t) => t.dueDate && new Date(t.dueDate) > new Date()
+        (t) => t.dueDate && new Date(t.dueDate) > new Date(),
       );
 
       const overdueBills = unpaidBills.filter(
-        (t) => t.dueDate && new Date(t.dueDate) < new Date()
+        (t) => t.dueDate && new Date(t.dueDate) < new Date(),
       );
 
       const totalSpent = paidTransactions.reduce(
         (sum, t) => sum + Math.abs(t.amount),
-        0
+        0,
       );
 
       const totalUpcoming = upcomingBills.reduce(
         (sum, t) => sum + Math.abs(t.amount),
-        0
+        0,
       );
 
       const totalOverdue = overdueBills.reduce(
         (sum, t) => sum + Math.abs(t.amount),
-        0
+        0,
       );
 
       const allocated = envelope.budget || 0;
@@ -134,10 +136,26 @@ const UnifiedEnvelopeManager = ({
       if (envelopeType === ENVELOPE_TYPES.BILL && envelope.biweeklyAllocation) {
         // For bill envelopes, show progress toward next bill payment
         // Progress = current balance / amount needed for next bill
-        const nextBillAmount =
-          upcomingBills.length > 0
-            ? Math.abs(upcomingBills[0].amount)
-            : envelope.biweeklyAllocation * 2; // Simple monthly equivalent (biweekly * 2)
+        let nextBillAmount = 0;
+
+        if (upcomingBills.length > 0) {
+          // Use the actual upcoming bill amount
+          nextBillAmount = Math.abs(upcomingBills[0].amount);
+        } else {
+          // No upcoming bills, check if there are ANY bills for this envelope
+          const allEnvelopeBills = unpaidBills.concat(paidTransactions);
+          if (allEnvelopeBills.length > 0) {
+            // Use the most recent bill amount as reference
+            const mostRecentBill = allEnvelopeBills.sort(
+              (a, b) =>
+                new Date(b.date || b.dueDate) - new Date(a.date || a.dueDate),
+            )[0];
+            nextBillAmount = Math.abs(mostRecentBill.amount);
+          } else {
+            // Fallback to biweekly calculation (monthly equivalent)
+            nextBillAmount = envelope.biweeklyAllocation * 2;
+          }
+        }
 
         utilizationRate =
           nextBillAmount > 0 ? currentBalance / nextBillAmount : 0;
@@ -296,13 +314,13 @@ const UnifiedEnvelopeManager = ({
         if (envelopeType === ENVELOPE_TYPES.BILL && env.biweeklyAllocation) {
           biweeklyNeed = Math.max(
             0,
-            env.biweeklyAllocation - env.currentBalance
+            env.biweeklyAllocation - env.currentBalance,
           );
         } else if (
           envelopeType === ENVELOPE_TYPES.VARIABLE &&
           env.monthlyBudget
         ) {
-          const biweeklyTarget = env.monthlyBudget / 2;
+          const biweeklyTarget = env.monthlyBudget / BIWEEKLY_MULTIPLIER;
           biweeklyNeed = Math.max(0, biweeklyTarget - env.currentBalance);
         } else if (
           envelopeType === ENVELOPE_TYPES.SAVINGS &&
@@ -311,11 +329,11 @@ const UnifiedEnvelopeManager = ({
           // For savings, calculate a reasonable biweekly contribution (could be customizable)
           const remainingToTarget = Math.max(
             0,
-            env.targetAmount - env.currentBalance
+            env.targetAmount - env.currentBalance,
           );
           biweeklyNeed = Math.min(
             remainingToTarget,
-            env.biweeklyAllocation || 0
+            env.biweeklyAllocation || 0,
           );
         }
 
@@ -337,7 +355,7 @@ const UnifiedEnvelopeManager = ({
         overdue: 0,
         available: 0,
         biweeklyNeed: 0,
-      }
+      },
     );
   }, [envelopeData]);
 
