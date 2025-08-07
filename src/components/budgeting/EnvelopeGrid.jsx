@@ -32,7 +32,6 @@ import {
   AUTO_CLASSIFY_ENVELOPE_TYPE,
 } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
-import { toBiweekly, toMonthly } from "../../utils/frequencyCalculations";
 
 const UnifiedEnvelopeManager = ({
   envelopes: propEnvelopes = [],
@@ -63,7 +62,7 @@ const UnifiedEnvelopeManager = ({
       : budget.unassignedCash || 0;
 
   // Get bills for envelope linking
-  const bills = budget.bills || [];
+  const bills = useMemo(() => budget.bills || [], [budget.bills]);
 
   const [selectedEnvelopeId, setSelectedEnvelopeId] = useState(null);
   const [viewMode, setViewMode] = useState("overview");
@@ -683,7 +682,6 @@ const UnifiedEnvelopeManager = ({
                 const envelopeType =
                   envelope.envelopeType ||
                   AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
-                const config = ENVELOPE_TYPE_CONFIG[envelopeType];
 
                 if (
                   envelopeType === ENVELOPE_TYPES.BILL &&

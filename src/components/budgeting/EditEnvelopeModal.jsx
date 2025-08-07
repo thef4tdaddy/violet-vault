@@ -21,7 +21,6 @@ import {
   getEnvelopeCategories,
 } from "../../constants/categories";
 import {
-  convertFrequency,
   toMonthly,
   toBiweekly,
   getFrequencyOptions,
@@ -144,7 +143,7 @@ const EditEnvelopeModal = ({
     const duplicateName = existingEnvelopes.find(
       (env) =>
         env.id !== envelope?.id &&
-        env.name.toLowerCase() === formData.name.trim().toLowerCase()
+        env.name.toLowerCase() === formData.name.trim().toLowerCase(),
     );
     if (duplicateName) {
       newErrors.name = "An envelope with this name already exists";
@@ -255,7 +254,7 @@ const EditEnvelopeModal = ({
           formData.biweeklyAllocation
         ) {
           updatedEnvelope.biweeklyAllocation = parseFloat(
-            formData.biweeklyAllocation
+            formData.biweeklyAllocation,
           );
         }
 
@@ -534,14 +533,14 @@ const EditEnvelopeModal = ({
                             Monthly: $
                             {toMonthly(
                               parseFloat(formData.biweeklyAllocation),
-                              formData.frequency
+                              formData.frequency,
                             ).toFixed(2)}
                           </div>
                           <div>
                             Biweekly: $
                             {toBiweekly(
                               parseFloat(formData.biweeklyAllocation),
-                              formData.frequency
+                              formData.frequency,
                             ).toFixed(2)}
                           </div>
                         </div>
@@ -629,14 +628,14 @@ const EditEnvelopeModal = ({
                             Monthly: $
                             {toMonthly(
                               parseFloat(formData.monthlyBudget),
-                              formData.frequency
+                              formData.frequency,
                             ).toFixed(2)}
                           </div>
                           <div>
                             Biweekly: $
                             {toBiweekly(
                               parseFloat(formData.monthlyBudget),
-                              formData.frequency
+                              formData.frequency,
                             ).toFixed(2)}
                           </div>
                         </div>
@@ -829,7 +828,7 @@ const EditEnvelopeModal = ({
                 </h4>
                 {(() => {
                   const linkedBills = allBills.filter(
-                    (bill) => bill.envelopeId === envelope.id
+                    (bill) => bill.envelopeId === envelope.id,
                   );
                   if (linkedBills.length === 0) {
                     return (
