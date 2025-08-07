@@ -9,10 +9,15 @@ class Logger {
   getIsDevSite() {
     if (typeof window === "undefined") return false;
     return (
-      window.location.hostname === "dev.f4tdaddy.com" ||
       window.location.hostname === "localhost" ||
+      window.location.hostname.startsWith("dev.") ||
       window.location.hostname.includes("preview") ||
-      window.location.hostname.includes("vercel")
+      window.location.hostname.includes("vercel") ||
+      window.location.hostname.includes("127.0.0.1") ||
+      window.location.hostname.includes("192.168.") ||
+      // Include Vercel preview deployments
+      window.location.hostname.includes("-git-") ||
+      window.location.hostname.includes(".vercel.app")
     );
   }
 
@@ -29,11 +34,10 @@ class Logger {
       data.envelopeId ||
       data.selectedEnvelope;
 
-    // Temporarily force all bill-related logs to show for debugging
+    // Show logs in development or on dev/preview sites, and bill-related logs only on dev sites
     if (
       this.isDevelopment ||
-      (this.isDevSite && isBillRelated) ||
-      isBillRelated
+      (this.isDevSite && isBillRelated)
     ) {
       // Use window.originalConsoleLog if available, otherwise regular console.log
       const consoleLog = window.originalConsoleLog || console.log;
