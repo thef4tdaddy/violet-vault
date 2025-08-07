@@ -42,25 +42,15 @@ Flexbox's `items-center` and centering behaviors override attempts to position r
         <Icon className="h-4 w-4 mr-2" />
         <span className="font-medium text-sm">Option Label</span>
       </div>
-<<<<<<< HEAD
-      <p className="text-xs text-gray-600 leading-tight ml-6">Description text</p>
-=======
       <p className="text-xs text-gray-600 leading-tight ml-6">
         Description text
       </p>
->>>>>>> origin/develop
     </div>
   </div>
 </div>
 ```
 
 ### Key CSS Grid Properties
-
-<<<<<<< HEAD
-
-=======
-
-> > > > > > > origin/develop
 
 - `grid-cols-[auto_1fr]`: Auto-sized first column for radio, remaining space for content
 - `justify-self-start`: Forces radio button to absolute left of its grid cell
@@ -70,12 +60,6 @@ Flexbox's `items-center` and centering behaviors override attempts to position r
 
 ### When to Use This Pattern
 
-<<<<<<< HEAD
-
-=======
-
-> > > > > > > origin/develop
-
 - Radio button groups
 - Checkbox lists
 - Any form input that needs to be positioned at the absolute left edge
@@ -83,16 +67,6 @@ Flexbox's `items-center` and centering behaviors override attempts to position r
 
 ### Components Using This Pattern
 
-<<<<<<< HEAD
-
-- `PaycheckProcessor.jsx` - Allocation mode selection (commit: 658c91a)
-
-### Notes
-
-- This pattern eliminates the recurring radio button centering issue
-- CSS Grid provides absolute positioning control that flexbox lacks
-- Use `justify-self-start` to ensure elements stick to the left edge
-- # Always test with different content lengths to ensure consistency
 - `PaycheckProcessor.jsx` - Allocation mode selection (commit: 658c91a)
 
 ### Notes
@@ -101,4 +75,30 @@ Flexbox's `items-center` and centering behaviors override attempts to position r
 - CSS Grid provides absolute positioning control that flexbox lacks
 - Use `justify-self-start` to ensure elements stick to the left edge
 - Always test with different content lengths to ensure consistency
-  > > > > > > > origin/develop
+
+## Checkbox Patterns
+
+### Standard Checkbox Styling
+
+Use consistent styling across the application:
+
+```jsx
+<input
+  type="checkbox"
+  id="checkboxId"
+  className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+  checked={value}
+  onChange={handleChange}
+/>
+<label htmlFor="checkboxId" className="ml-3 text-sm text-gray-700">
+  Label text
+</label>
+```
+
+### Key Properties
+
+- `h-4 w-4`: Standard size
+- `text-purple-600`: Primary brand color for checked state
+- `focus:ring-purple-500`: Focus ring color
+- `border-gray-300`: Border color
+- `rounded`: Rounded corners

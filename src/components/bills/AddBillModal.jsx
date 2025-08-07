@@ -36,8 +36,8 @@ const getInitialFormData = (bill = null) => {
             getBillIcon(
               bill.name || bill.provider || "",
               bill.notes || "",
-              bill.category || ""
-            )
+              bill.category || "",
+            ),
         ),
     };
   }
@@ -73,7 +73,7 @@ const AddBillModal = ({
     if (isOpen) {
       const initialData = getInitialFormData(editingBill);
       const billEnvelopes = availableEnvelopes.filter(
-        (env) => env.envelopeType === "bill" || !env.envelopeType
+        (env) => env.envelopeType === "bill" || !env.envelopeType,
       );
 
       logger.debug("Initializing bill modal form data", {
@@ -97,7 +97,7 @@ const AddBillModal = ({
     const suggestedIcon = getBillIcon(
       formData.name || "",
       formData.notes || "",
-      formData.category || "Bills"
+      formData.category || "Bills",
     );
     setFormData((prev) => ({
       ...prev,
@@ -227,12 +227,12 @@ const AddBillModal = ({
       biweeklyAmount: calculateBiweeklyAmount(
         amount,
         formData.frequency,
-        formData.customFrequency
+        formData.customFrequency,
       ),
       monthlyAmount: calculateMonthlyAmount(
         amount,
         formData.frequency,
-        formData.customFrequency
+        formData.customFrequency,
       ),
       nextDueDate: getNextDueDate(formData.frequency, normalizedDueDate),
       icon: getIconByName(formData.iconName),
@@ -265,7 +265,7 @@ const AddBillModal = ({
       billDataEnvelopeId: billData.envelopeId,
       availableEnvelopesIds: availableEnvelopes.map((e) => e.id),
       envelopeFound: availableEnvelopes.find(
-        (e) => e.id === formData.selectedEnvelope
+        (e) => e.id === formData.selectedEnvelope,
       ),
     });
 
@@ -276,12 +276,16 @@ const AddBillModal = ({
         originalEnvelopeId: editingBill.envelopeId,
         envelopeChanged: editingBill.envelopeId !== billData.envelopeId,
       });
-      
+
       try {
         onUpdateBill?.(billData);
-        logger.debug("Bill update completed successfully", { billId: billData.id });
+        logger.debug("Bill update completed successfully", {
+          billId: billData.id,
+        });
       } catch (error) {
-        logger.error("Error during bill update", error, { billId: billData.id });
+        logger.error("Error during bill update", error, {
+          billId: billData.id,
+        });
         throw error;
       }
     } else {
@@ -297,7 +301,7 @@ const AddBillModal = ({
           budget: calculateMonthlyAmount(
             amount,
             formData.frequency,
-            formData.customFrequency
+            formData.customFrequency,
           ),
           currentBalance: 0,
           color: formData.color,
@@ -551,7 +555,7 @@ const AddBillModal = ({
                 <option value="">No envelope (use unassigned cash)</option>
                 {availableEnvelopes
                   .filter(
-                    (env) => env.envelopeType === "bill" || !env.envelopeType
+                    (env) => env.envelopeType === "bill" || !env.envelopeType,
                   )
                   .map((envelope) => (
                     <option key={envelope.id} value={envelope.id}>
@@ -564,16 +568,13 @@ const AddBillModal = ({
                 <p className="text-xs text-green-600 mt-1">
                   Selected:{" "}
                   {availableEnvelopes.find(
-                    (e) => e.id === formData.selectedEnvelope
+                    (e) => e.id === formData.selectedEnvelope,
                   )?.name || "Unknown"}
                 </p>
               )}
               <p className="text-xs text-blue-600 mt-1">
-                Only bill envelopes are available for bill assignment to prevent
-                conflicts with variable spending
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                Choose which envelope will be used to pay this bill
+                Only bill envelopes are available for assignment. Choose which
+                envelope will be used to pay this bill.
               </p>
             </div>
 
@@ -632,7 +633,7 @@ const AddBillModal = ({
                     {calculateMonthlyAmount(
                       parseFloat(formData.amount) || 0,
                       formData.frequency,
-                      formData.customFrequency
+                      formData.customFrequency,
                     ).toFixed(2)}
                   </span>
                 </div>
@@ -643,7 +644,7 @@ const AddBillModal = ({
                     {calculateBiweeklyAmount(
                       parseFloat(formData.amount) || 0,
                       formData.frequency,
-                      formData.customFrequency
+                      formData.customFrequency,
                     ).toFixed(2)}
                   </span>
                 </div>

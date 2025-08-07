@@ -808,7 +808,7 @@ const EditEnvelopeModal = ({
                   onChange={(e) =>
                     setFormData({ ...formData, autoAllocate: e.target.checked })
                   }
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                 />
                 <label
                   htmlFor="autoAllocate"
