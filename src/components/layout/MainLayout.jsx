@@ -31,6 +31,7 @@ import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
 import SyncStatusIndicators from "../sync/SyncStatusIndicators";
 import ConflictResolutionModal from "../sync/ConflictResolutionModal";
 import SummaryCards from "./SummaryCards";
+import BugReportButton from "../feedback/BugReportButton";
 
 // Heavy components now lazy loaded in ViewRenderer
 
@@ -98,22 +99,22 @@ const Layout = () => {
   return (
     <>
       <MainContent
-          currentUser={currentUser}
-          encryptionKey={encryptionKey}
-          budgetId={budgetId}
-          onUserChange={handleLogout}
-          onExport={exportData}
-          onImport={importData}
-          onLogout={handleLogout}
-          onChangePassword={handleChangePassword}
-          onResetEncryption={resetEncryptionAndStartFresh}
-          syncConflicts={syncConflicts}
-          onResolveConflict={resolveConflict}
-          setSyncConflicts={setSyncConflicts}
-          firebaseSync={firebaseSync}
-          rotationDue={rotationDue}
-          onUpdateProfile={handleUpdateProfile}
-        />
+        currentUser={currentUser}
+        encryptionKey={encryptionKey}
+        budgetId={budgetId}
+        onUserChange={handleLogout}
+        onExport={exportData}
+        onImport={importData}
+        onLogout={handleLogout}
+        onChangePassword={handleChangePassword}
+        onResetEncryption={resetEncryptionAndStartFresh}
+        syncConflicts={syncConflicts}
+        onResolveConflict={resolveConflict}
+        setSyncConflicts={setSyncConflicts}
+        firebaseSync={firebaseSync}
+        rotationDue={rotationDue}
+        onUpdateProfile={handleUpdateProfile}
+      />
       {showRotationModal && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="glassmorphism rounded-2xl p-6 w-full max-w-md border border-white/30 shadow-2xl">
@@ -366,6 +367,9 @@ const MainContent = ({
           onResolveConflict={onResolveConflict}
           onDismiss={() => setSyncConflicts(null)}
         />
+
+        {/* Bug Report Button */}
+        <BugReportButton />
 
         {/* Version Footer */}
         <div className="mt-8 text-center">
