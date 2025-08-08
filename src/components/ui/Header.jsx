@@ -45,8 +45,8 @@ const Header = memo(
       >
         <div className="flex flex-col items-center text-center">
           {/* Logo and tagline */}
-          <div className="flex flex-col items-center w-full -my-2">
-            <div className="rounded-2xl border-4 border-purple-600 p-6 bg-white/95">
+          <div className="flex flex-col items-center w-full px-6 py-8">
+            <div className="rounded-2xl border-4 border-purple-600 p-6 bg-white/95 flex flex-col items-center">
               <img
                 src={logoWithText}
                 alt="VioletVault Logo"
@@ -56,10 +56,10 @@ const Header = memo(
                   imageRendering: "high-quality",
                 }}
               />
+              <p className="text-gray-600 text-sm font-medium mt-4">
+                Encryption First, Family Budgeting Management
+              </p>
             </div>
-            <p className="text-gray-600 text-sm font-medium -mt-6">
-              Encryption First, Family Budgeting Management
-            </p>
           </div>
 
           {/* Buttons row */}
