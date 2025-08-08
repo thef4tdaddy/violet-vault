@@ -1,28 +1,44 @@
 import React, { useState, useEffect } from "react";
-import { getVersionInfo, getVersionInfoAsync } from "../../utils/version";
+import { getVersionInfo, getVersionInfoAsync, getCacheStatus } from "../../utils/version";
 
 /**
  * Version footer component with branch differentiation
  * Shows different styling and info for dev/staging/production builds
- * Fetches target version from GitHub milestones API when in development
+ * Fetches target version from GitHub milestones API when in development (with smart caching)
  */
 const VersionFooter = () => {
   const [versionInfo, setVersionInfo] = useState(() => getVersionInfo());
   const [isLoadingMilestone, setIsLoadingMilestone] = useState(false);
+  const [cacheInfo, setCacheInfo] = useState(() => getCacheStatus());
 
   useEffect(() => {
-    // Only fetch from API if we're in development
+    // Only fetch from API if we're in development and don't have valid cache
     if (versionInfo.isDevelopment) {
-      setIsLoadingMilestone(true);
-      getVersionInfoAsync()
-        .then(updatedInfo => {
-          setVersionInfo(updatedInfo);
-          setIsLoadingMilestone(false);
-        })
-        .catch(error => {
-          console.warn('Failed to fetch milestone info:', error);
-          setIsLoadingMilestone(false);
-        });
+      const currentCache = getCacheStatus();
+      setCacheInfo(currentCache);
+      
+      // Only fetch if we don't have valid cached data
+      if (!currentCache.isValid) {
+        console.log('🔄 No valid cache, fetching milestone data...');
+        setIsLoadingMilestone(true);
+        getVersionInfoAsync()
+          .then(updatedInfo => {
+            setVersionInfo(updatedInfo);
+            setCacheInfo(getCacheStatus()); // Update cache status
+            setIsLoadingMilestone(false);
+          })
+          .catch(error => {
+            console.warn('Failed to fetch milestone info:', error);
+            setIsLoadingMilestone(false);
+          });
+      } else {
+        console.log(`🎯 Using cached milestone (expires in ${currentCache.minutesUntilExpiry} minutes)`);
+        // Use cached version
+        getVersionInfoAsync()
+          .then(updatedInfo => {
+            setVersionInfo(updatedInfo);
+          });
+      }
     }
   }, [versionInfo.isDevelopment]);
 
@@ -76,9 +92,21 @@ const VersionFooter = () => {
         </p>
         
         {versionInfo.isDevelopment && (
-          <p className="text-xs text-orange-600 mt-1 font-medium">
-            Development build from {versionInfo.branch} branch
-          </p>
+          <div className="mt-1">
+            <p className="text-xs text-orange-600 font-medium">
+              Development build from {versionInfo.branch} branch
+            </p>
+            {cacheInfo.isValid && (
+              <p className="text-xs text-orange-400 mt-1">
+                📦 Cached milestone (expires in {cacheInfo.minutesUntilExpiry}m)
+              </p>
+            )}
+            {isLoadingMilestone && (
+              <p className="text-xs text-orange-500 mt-1 animate-pulse">
+                🔄 Fetching milestone data...
+              </p>
+            )}
+          </div>
         )}
       </div>
     </div>
