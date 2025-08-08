@@ -1,27 +1,32 @@
 # VioletVault 💜
 
-**A secure, encrypted envelope budgeting application** that brings the traditional cash envelope budgeting method into the digital age with end-to-end encryption and real-time collaboration.
+**A comprehensive cash management system** with advanced envelope budgeting, intelligent automation, and professional-grade infrastructure. Bringing the traditional cash envelope method into the digital age with end-to-end encryption, smart distribution, and real-time collaboration.
 
 [![CI](https://github.com/thef4tdaddy/violet-vault/workflows/CI/badge.svg)](https://github.com/thef4tdaddy/violet-vault/actions)
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 ## 🚀 Features
 
-### 💰 Core Budgeting
+### 💰 Advanced Cash Management
 
-- **Envelope System** - Allocate money into virtual envelopes for different expense categories
-- **Bill Management** - Track recurring bills and automatically create budget envelopes
-- **Savings Goals** - Set and monitor progress toward financial objectives
-- **Paycheck Processing** - Automated biweekly allocation based on your bills and goals
-- **Transaction Ledger** - Complete transaction history with reconciliation tools
+- **Smart Envelope System** - Advanced envelope budgeting with auto-funding and intelligent classification
+- **Unassigned Cash Distribution** - One-click distribution modal for efficient cash allocation
+- **Manual Balance Override** - Real-time balance editing directly on the dashboard
+- **Negative Balance Support** - Handle overspending scenarios with smart recovery suggestions
+- **Variable Expense Envelopes** - Automatic categorization and funding for irregular expenses
+- **Expected Payday Prediction** - Intelligent paycheck forecasting and automated allocation
+- **Bill Management** - Enhanced bill tracking with compact multi-row layouts
+- **Savings Goals** - Advanced goal tracking with progress monitoring and automation
+- **Transaction Ledger** - Complete transaction history with enhanced reconciliation tools
 
 ### 🔒 Security & Privacy
 
 - **Client-Side Encryption** - All data encrypted using AES-GCM with PBKDF2 key derivation
 - **Password Protection** - Master password required to access your budget
-- **Password Change** - Update your master password without losing data
+- **Enhanced Password Rotation** - Secure password updates with improved encryption handling
 - **Device Fingerprinting** - Additional security layer for multi-device access
 - **Privacy First** - Your financial data never leaves your device unencrypted
+- **Professional Bug Reporting** - Secure issue reporting with screenshot capture and privacy protection
 
 ### 👥 Collaboration
 
@@ -40,13 +45,24 @@
 - **Transaction Splitting** - Split complex transactions across multiple envelopes
 - **Smart Bill Matching** - Automatically categorize and assign bills to appropriate envelopes
 
-### ⚡ Technical Features
+### 🐛 Professional Bug Reporting & Monitoring
+
+- **Integrated Bug Reporter** - One-click bug reporting with automatic environment capture
+- **Cloudflare Worker Backend** - Professional-grade issue processing and GitHub integration
+- **Screenshot Capture** - Automatic screenshot attachment with privacy-safe R2 storage
+- **Usage Analytics** - Built-in monitoring with cost protection and automated cleanup
+- **Smart Environment Detection** - Automatic detection of development, preview, and production builds
+- **Issue Tracking Integration** - Direct GitHub issue creation with comprehensive metadata
+
+### ⚡ Advanced Technical Features
 
 - **Offline Support** - Works without internet, syncs when reconnected
-- **Performance Optimized** - Transaction ledger now uses virtual scrolling via `@tanstack/react-virtual` for large datasets
-- **Data Pagination** - Displays transactions 10 per page to keep memory usage low
+- **Performance Optimized** - Virtual scrolling and intelligent caching for large datasets
+- **Smart Caching System** - 7-day localStorage cache with automatic invalidation
+- **Multi-Environment Support** - Local development, Vercel preview, and production detection
+- **Version Management** - Release-please integration with dynamic version targeting
 - **Responsive Design** - Works seamlessly on desktop and mobile devices
-- **Modular Architecture** - Recently refactored for better maintainability and performance
+- **Modern Architecture** - Zustand state management with custom hooks and providers
 - **Collapsible UI Elements** - Smart suggestions panel can be collapsed for better space utilization
 
 ## 🛠️ Tech Stack
@@ -59,11 +75,13 @@
 - Recharts for data visualization
 - Lucide React for icons
 
-**Backend & Storage:**
+**Backend & Infrastructure:**
 
 - Firebase for cloud storage and real-time sync
+- Cloudflare Workers for bug reporting and API services
+- Cloudflare R2 for secure screenshot storage with cost protection
 - Web Crypto API for client-side encryption
-- Local Storage for offline functionality
+- Local Storage for offline functionality and intelligent caching
 
 **Development:**
 
@@ -121,45 +139,58 @@ npm run format:check # Check code formatting
 
 ```
 src/
-├── components/              # React components
-│   ├── analytics/              # Analytics & insights
-│   │   ├── ChartsAndAnalytics.jsx  # Financial analytics dashboard
-│   │   └── SmartCategoryManager.jsx # AI category optimization
-│   ├── budgeting/              # Budget management
-│   │   ├── CreateEnvelopeModal.jsx  # Advanced envelope creation
-│   │   ├── EnvelopeGrid.jsx         # Envelope visualization
-│   │   ├── PaycheckProcessor.jsx    # Paycheck allocation
-│   │   └── SmartEnvelopeSuggestions.jsx # AI envelope recommendations (collapsible)
-│   ├── bills/                  # Bill management
-│   │   ├── AddBillModal.jsx        # Bill creation/editing modal
-│   │   └── BillManager.jsx         # Bill tracking & automation
-│   ├── layout/                 # Core layout components
-│   │   ├── MainLayout.jsx          # Refactored main layout
-│   │   ├── NavigationTabs.jsx      # Tab navigation system
-│   │   ├── SummaryCards.jsx        # Summary card components
-│   │   ├── ViewRenderer.jsx        # View rendering logic
-│   │   └── Layout.jsx              # Legacy layout (being phased out)
-│   ├── savings/                # Savings management
-│   │   └── SavingsGoals.jsx        # Goal tracking & progress
-│   ├── sync/                   # Collaboration features
-│   │   └── TeamActivitySync.jsx    # Real-time collaboration
-│   └── transactions/           # Transaction management
-│       ├── TransactionLedger.jsx   # Transaction history
-│       ├── TransactionSplitter.jsx # Split transaction tool
-│       └── import/             # Import utilities
-│           └── FileUploader.jsx    # Import functionality
-├── contexts/               # React contexts
-│   ├── AuthContext.jsx        # Authentication & encryption
-│   └── BudgetContext.jsx      # Budget data management
-├── stores/                 # Zustand state management
-│   ├── authStore.js           # Authentication state
-│   ├── budgetStore.js         # Modern budget store
-│   └── optimizedBudgetStore.js # Performance-optimized store
-├── utils/                  # Utility functions
-│   ├── encryption.js          # Client-side encryption
-│   ├── firebaseConfig.js      # Firebase setup
-│   └── firebaseSync.js        # Cloud synchronization
-└── App.jsx                 # Main application
+├── components/                     # React components
+│   ├── analytics/                     # Analytics & insights
+│   │   ├── ChartsAndAnalytics.jsx        # Financial analytics dashboard
+│   │   └── SmartCategoryManager.jsx      # AI category optimization
+│   ├── budgeting/                     # Advanced budget management
+│   │   ├── CreateEnvelopeModal.jsx       # Advanced envelope creation with auto-funding
+│   │   ├── EditEnvelopeModal.jsx         # Enhanced envelope editing
+│   │   ├── EnvelopeGrid.jsx              # Smart envelope visualization
+│   │   ├── PaycheckProcessor.jsx         # Intelligent paycheck allocation
+│   │   ├── PaydayPrediction.jsx          # Expected payday forecasting
+│   │   └── SmartEnvelopeSuggestions.jsx  # AI recommendations (collapsible)
+│   ├── bills/                         # Enhanced bill management
+│   │   ├── AddBillModal.jsx             # Redesigned bill creation modal
+│   │   └── BillManager.jsx              # Bill tracking with compact layouts
+│   ├── feedback/                      # Professional bug reporting
+│   │   └── BugReportButton.jsx          # Integrated bug reporter with screenshots
+│   ├── layout/                        # Modern layout architecture
+│   │   ├── MainLayout.jsx               # Refactored responsive layout
+│   │   ├── NavigationTabs.jsx           # Enhanced tab navigation
+│   │   ├── SummaryCards.jsx             # Improved summary displays
+│   │   └── ViewRenderer.jsx             # Smart view rendering logic
+│   ├── modals/                        # Smart modal system
+│   │   └── UnassignedCashModal.jsx      # One-click cash distribution
+│   ├── savings/                       # Advanced savings management
+│   │   └── SavingsGoals.jsx             # Goal tracking with automation
+│   ├── transactions/                  # Enhanced transaction system
+│   │   ├── TransactionLedger.jsx        # Optimized transaction history
+│   │   └── TransactionSplitter.jsx      # Advanced transaction splitting
+│   └── ui/                           # Enhanced UI components
+│       ├── EditableBalance.jsx          # Real-time balance editing
+│       ├── Header.jsx                   # Improved header with better spacing
+│       └── VersionFooter.jsx            # Smart environment detection
+├── hooks/                          # Custom React hooks
+│   ├── useActualBalance.js             # Balance calculation logic
+│   ├── useBugReport.js                 # Bug reporting functionality
+│   └── useUnassignedCashDistribution.js # Cash distribution logic
+├── stores/                         # Modern Zustand state management
+│   ├── authStore.jsx                   # Unified authentication store
+│   └── budgetStore.js                  # Enhanced budget state management
+├── utils/                          # Advanced utility functions
+│   ├── encryption.js                   # Client-side encryption
+│   ├── firebaseConfig.js              # Firebase configuration
+│   ├── firebaseSync.js                # Enhanced cloud synchronization
+│   ├── frequencyCalculations.js       # Payment frequency utilities
+│   ├── paydayPredictor.js             # Paycheck prediction algorithms
+│   └── version.js                     # Smart version management with caching
+└── App.jsx                         # Main application entry point
+
+cloudflare-worker/                  # Professional bug reporting backend
+├── bug-report-worker.js               # Main worker with GitHub integration
+├── wrangler.toml                      # Cloudflare configuration
+└── README.md                          # Worker setup and deployment guide
 ```
 
 ## 🔐 Security
