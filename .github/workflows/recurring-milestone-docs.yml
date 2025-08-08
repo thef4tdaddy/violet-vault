@@ -1,0 +1,26 @@
+name: Recurring milestone docs & roadmap issue
+
+on:
+  milestone:
+    types: [created]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  create-recurring-issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create the recurring milestone issue
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: "📋 Update docs & roadmap for milestone: ${{ github.event.milestone.title }}"
+          content-filepath: .github/data/milestone-docs-checklist.md
+          milestone: ${{ github.event.milestone.number }}
+          labels: "recurring,docs,maintenance"
+          search-existing: open
+          search-terms: "Update docs & roadmap for milestone: ${{ github.event.milestone.title }}"
