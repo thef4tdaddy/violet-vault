@@ -41,6 +41,14 @@ export default {
       });
     }
 
+    if (url.pathname === '/milestones' && request.method === 'GET') {
+      const result = await getMilestones(env);
+      return new Response(JSON.stringify(result), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     // Default route: bug report submission
     if (url.pathname === '/report-issue' || url.pathname === '/') {
       if (request.method !== 'POST') {
@@ -301,6 +309,106 @@ async function getUsageStats(env) {
     };
   } catch (error) {
     return { error: error.message };
+  }
+}
+
+/**
+ * Fetch GitHub milestones for version targeting
+ */
+async function getMilestones(env) {
+  if (!env.GITHUB_TOKEN || !env.GITHUB_REPO) {
+    return { 
+      error: 'GitHub configuration not found',
+      fallback: { version: '1.8.0', title: 'v1.8.0 - Cash Management (Fallback)' }
+    };
+  }
+  
+  try {
+    const response = await fetch(`https://api.github.com/repos/${env.GITHUB_REPO}/milestones?state=open&sort=due_on&direction=asc`, {
+      headers: {
+        'Authorization': `token ${env.GITHUB_TOKEN}`,
+        'User-Agent': 'VioletVault-BugReporter/1.0',
+        'Accept': 'application/vnd.github.v3+json',
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error(`GitHub API error: ${response.status}`);
+    }
+    
+    const milestones = await response.json();
+    
+    if (!milestones.length) {
+      return { 
+        milestones: [],
+        current: { version: '1.8.0', title: 'v1.8.0 - Cash Management (Fallback)' }
+      };
+    }
+    
+    // Extract version from milestone titles and sort by version number
+    const processedMilestones = milestones
+      .map(milestone => {
+        const versionMatch = milestone.title.match(/v?(\d+\.\d+\.\d+)/);
+        return {
+          ...milestone,
+          version: versionMatch ? versionMatch[1] : null,
+        };
+      })
+      .filter(m => m.version) // Only keep milestones with valid versions
+      .sort((a, b) => {
+        // Sort by version number (lowest first)
+        const aVersion = a.version.split('.').map(Number);
+        const bVersion = b.version.split('.').map(Number);
+        
+        for (let i = 0; i < Math.max(aVersion.length, bVersion.length); i++) {
+          const aPart = aVersion[i] || 0;
+          const bPart = bVersion[i] || 0;
+          if (aPart !== bPart) return aPart - bPart;
+        }
+        return 0;
+      });
+    
+    // Current milestone is the lowest numbered open one
+    const currentMilestone = processedMilestones[0];
+    
+    return {
+      success: true,
+      milestones: processedMilestones.map(m => ({
+        version: m.version,
+        title: m.title,
+        description: m.description,
+        dueDate: m.due_on,
+        state: m.state,
+        progress: {
+          openIssues: m.open_issues,
+          closedIssues: m.closed_issues,
+          total: m.open_issues + m.closed_issues,
+          percentComplete: m.open_issues + m.closed_issues > 0 
+            ? Math.round((m.closed_issues / (m.open_issues + m.closed_issues)) * 100) 
+            : 0
+        }
+      })),
+      current: {
+        version: currentMilestone.version,
+        title: currentMilestone.title,
+        description: currentMilestone.description,
+        dueDate: currentMilestone.due_on,
+        progress: {
+          openIssues: currentMilestone.open_issues,
+          closedIssues: currentMilestone.closed_issues,
+          total: currentMilestone.open_issues + currentMilestone.closed_issues,
+          percentComplete: currentMilestone.open_issues + currentMilestone.closed_issues > 0 
+            ? Math.round((currentMilestone.closed_issues / (currentMilestone.open_issues + currentMilestone.closed_issues)) * 100) 
+            : 0
+        }
+      }
+    };
+  } catch (error) {
+    console.error('Failed to fetch milestones:', error);
+    return { 
+      error: error.message,
+      fallback: { version: '1.8.0', title: 'v1.8.0 - Cash Management (Fallback)' }
+    };
   }
 }
 
