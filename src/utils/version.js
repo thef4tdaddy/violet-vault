@@ -4,46 +4,104 @@ import packageJson from "../../package.json";
 export const APP_VERSION = packageJson.version;
 export const APP_NAME = packageJson.name;
 
-// Cache for milestone data
+// Enhanced cache for milestone data with localStorage persistence
 let milestoneCache = {
   data: null,
   timestamp: null,
-  ttl: 10 * 60 * 1000, // 10 minutes cache
+  ttl: 2 * 60 * 60 * 1000, // 2 hours cache (longer for fewer API calls)
 };
 
-// Fetch target version from GitHub milestones API
+// Cache key for localStorage
+const CACHE_KEY = 'violet-vault-milestone-cache';
+
+// Initialize cache from localStorage on load
+const initializeCache = () => {
+  try {
+    const stored = localStorage.getItem(CACHE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      const now = Date.now();
+      
+      // Only use cached data if it's still valid
+      if (parsed.timestamp && (now - parsed.timestamp) < milestoneCache.ttl) {
+        milestoneCache = parsed;
+        console.log('📦 Loaded milestone cache from localStorage:', milestoneCache.data);
+        return true;
+      } else {
+        // Cache expired, remove it
+        localStorage.removeItem(CACHE_KEY);
+      }
+    }
+  } catch (error) {
+    console.warn('Failed to load milestone cache:', error);
+  }
+  return false;
+};
+
+// Save cache to localStorage
+const saveCache = (data) => {
+  try {
+    milestoneCache = {
+      data,
+      timestamp: Date.now(),
+    };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(milestoneCache));
+    console.log('💾 Cached milestone data:', data);
+  } catch (error) {
+    console.warn('Failed to save milestone cache:', error);
+  }
+};
+
+// Fetch target version from GitHub milestones API with smart caching
 export const fetchTargetVersion = async () => {
-  // Check cache first
+  // Initialize cache from localStorage if not already done
+  if (!milestoneCache.timestamp) {
+    initializeCache();
+  }
+
+  // Check in-memory cache first
   const now = Date.now();
   if (milestoneCache.data && milestoneCache.timestamp && 
       (now - milestoneCache.timestamp) < milestoneCache.ttl) {
+    console.log('🎯 Using cached milestone version:', milestoneCache.data);
     return milestoneCache.data;
   }
+
+  console.log('🔄 Fetching fresh milestone data from API...');
 
   try {
     // Use our Cloudflare Worker endpoint to fetch milestones
     const endpoint = import.meta.env.VITE_BUG_REPORT_ENDPOINT?.replace('/report-issue', '/milestones') 
                   || 'https://violet-vault-bug-reporter.fragrant-fog-c708.workers.dev/milestones';
     
-    const response = await fetch(endpoint);
+    const response = await fetch(endpoint, {
+      // Add cache-control headers to prevent browser caching
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+      },
+    });
+    
     const data = await response.json();
     
     if (data.success && data.current?.version) {
-      // Cache the result
-      milestoneCache = {
-        data: data.current.version,
-        timestamp: now,
-      };
+      // Save to cache
+      saveCache(data.current.version);
+      console.log('✅ Fetched milestone version from API:', data.current.version);
       return data.current.version;
     } else if (data.fallback?.version) {
+      // Use fallback but don't cache it (so we retry next time)
+      console.log('⚠️ Using fallback version:', data.fallback.version);
       return data.fallback.version;
     }
   } catch (error) {
-    console.warn('Failed to fetch milestone data:', error);
+    console.warn('❌ Failed to fetch milestone data:', error);
   }
   
   // Fallback logic if API fails
-  return getTargetVersionFallback();
+  const fallbackVersion = getTargetVersionFallback();
+  console.log('🔄 Using local fallback version:', fallbackVersion);
+  return fallbackVersion;
 };
 
 // Fallback target version detection (used when API is unavailable)
@@ -135,4 +193,30 @@ export const getVersionInfoAsync = async () => {
     console.warn('Failed to fetch async version info, using fallback:', error);
     return getVersionInfo();
   }
+};
+
+// Utility functions for cache management
+export const clearVersionCache = () => {
+  try {
+    localStorage.removeItem(CACHE_KEY);
+    milestoneCache = { data: null, timestamp: null, ttl: 2 * 60 * 60 * 1000 };
+    console.log('🗑️ Milestone cache cleared');
+  } catch (error) {
+    console.warn('Failed to clear cache:', error);
+  }
+};
+
+export const getCacheStatus = () => {
+  const now = Date.now();
+  const isValid = milestoneCache.data && milestoneCache.timestamp && 
+                  (now - milestoneCache.timestamp) < milestoneCache.ttl;
+  
+  return {
+    hasData: !!milestoneCache.data,
+    isValid,
+    version: milestoneCache.data,
+    cachedAt: milestoneCache.timestamp ? new Date(milestoneCache.timestamp) : null,
+    expiresAt: milestoneCache.timestamp ? new Date(milestoneCache.timestamp + milestoneCache.ttl) : null,
+    minutesUntilExpiry: isValid ? Math.round((milestoneCache.timestamp + milestoneCache.ttl - now) / (60 * 1000)) : 0,
+  };
 };
