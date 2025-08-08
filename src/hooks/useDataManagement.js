@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { encryptionUtils } from "../utils/encryption";
-import { useAuth } from "../stores/authStore";
+import { useAuth } from "../stores/authStore.jsx";
 
 /**
  * Custom hook for data import/export operations

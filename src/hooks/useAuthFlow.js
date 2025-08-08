@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useAuth } from "../stores/authStore";
+import { useAuth } from "../stores/authStore.jsx";
 import logger from "../utils/logger";
 
 /**
