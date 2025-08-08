@@ -21,6 +21,6 @@ jobs:
           title: "📋 Update docs & roadmap for milestone: ${{ github.event.milestone.title }}"
           content-filepath: .github/data/milestone-docs-checklist.md
           milestone: ${{ github.event.milestone.number }}
-          labels: "recurring,docs,maintenance"
+          labels: "recurring,docs,maintenance,roadmap"
           search-existing: open
           search-terms: "Update docs & roadmap for milestone: ${{ github.event.milestone.title }}"
