@@ -46,7 +46,7 @@ const Header = memo(
         <div className="flex flex-col items-center text-center">
           {/* Logo and tagline */}
           <div className="flex flex-col items-center w-full -my-2">
-            <div className="rounded-2xl border-4 border-purple-600 p-2 bg-white/95">
+            <div className="rounded-2xl border-4 border-purple-600 p-6 bg-white/95">
               <img
                 src={logoWithText}
                 alt="VioletVault Logo"
