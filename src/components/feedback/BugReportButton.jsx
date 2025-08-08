@@ -22,11 +22,17 @@ const BugReportButton = () => {
   } = useBugReport();
 
   const handleSubmit = async () => {
-    const success = await submitReport();
-    if (success) {
-      alert(
-        "Thanks! Your bug report has been submitted. Check the console for details.",
-      );
+    const result = await submitReport();
+    if (result) {
+      // Show success message with GitHub issue link if available
+      if (result.issueUrl) {
+        const message = `Thanks! Your bug report has been submitted.\n\nGitHub Issue: ${result.issueUrl}\n\nClick OK to view the issue.`;
+        if (confirm(message)) {
+          window.open(result.issueUrl, '_blank');
+        }
+      } else {
+        alert("Thanks! Your bug report has been submitted. Check the console for details.");
+      }
     } else {
       alert("Failed to submit bug report. Please try again.");
     }
