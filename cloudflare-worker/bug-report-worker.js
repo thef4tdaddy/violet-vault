@@ -14,6 +14,8 @@ const corsHeaders = {
 
 export default {
   async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+    
     // Handle CORS preflight requests
     if (request.method === 'OPTIONS') {
       return new Response(null, {
@@ -22,45 +24,81 @@ export default {
       });
     }
 
-    // Only allow POST requests
-    if (request.method !== 'POST') {
-      return new Response('Method not allowed', {
-        status: 405,
-        headers: corsHeaders,
-      });
-    }
-
-    try {
-      // Parse the bug report data
-      const bugReport = await request.json();
-      
-      // Validate required fields
-      if (!bugReport.description) {
-        return new Response(JSON.stringify({ 
-          error: 'Description is required' 
-        }), {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-
-      // Process the bug report
-      const result = await processBugReport(bugReport, env);
-      
+    // Route handling
+    if (url.pathname === '/cleanup' && request.method === 'POST') {
+      const result = await cleanupOldScreenshots(env);
       return new Response(JSON.stringify(result), {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
-    } catch (error) {
-      console.error('Bug report processing failed:', error);
-      
-      return new Response(JSON.stringify({ 
-        error: 'Internal server error',
-        message: error.message 
-      }), {
-        status: 500,
+    }
+
+    if (url.pathname === '/stats' && request.method === 'GET') {
+      const result = await getUsageStats(env);
+      return new Response(JSON.stringify(result), {
+        status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
+    }
+
+    // Default route: bug report submission
+    if (url.pathname === '/report-issue' || url.pathname === '/') {
+      if (request.method !== 'POST') {
+        return new Response('Method not allowed', {
+          status: 405,
+          headers: corsHeaders,
+        });
+      }
+
+      try {
+        // Parse the bug report data
+        const bugReport = await request.json();
+        
+        // Validate required fields
+        if (!bugReport.description) {
+          return new Response(JSON.stringify({ 
+            error: 'Description is required' 
+          }), {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Process the bug report
+        const result = await processBugReport(bugReport, env);
+        
+        return new Response(JSON.stringify(result), {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      } catch (error) {
+        console.error('Bug report processing failed:', error);
+        
+        return new Response(JSON.stringify({ 
+          error: 'Internal server error',
+          message: error.message 
+        }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
+    // Route not found
+    return new Response('Not found', {
+      status: 404,
+      headers: corsHeaders,
+    });
+  },
+
+  // Handle scheduled events (cron triggers)
+  async scheduled(controller, env, ctx) {
+    console.log('Running scheduled cleanup...');
+    try {
+      const result = await cleanupOldScreenshots(env);
+      console.log('Cleanup result:', result);
+    } catch (error) {
+      console.error('Scheduled cleanup failed:', error);
     }
   },
 };
@@ -104,7 +142,7 @@ async function processBugReport(bugReport, env) {
 }
 
 /**
- * Store screenshot in Cloudflare R2
+ * Store screenshot in Cloudflare R2 with cost protection
  */
 async function storeScreenshot(screenshotDataUrl, env) {
   if (!env.R2_BUCKET) {
@@ -117,22 +155,152 @@ async function storeScreenshot(screenshotDataUrl, env) {
     const base64Data = screenshotDataUrl.replace(/^data:image\/png;base64,/, '');
     const imageBuffer = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
     
-    // Generate unique filename
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const filename = `bug-reports/screenshot-${timestamp}-${Math.random().toString(36).substring(7)}.png`;
+    // 🛡️ COST PROTECTION: Check file size (max 5MB to stay well under free tier)
+    const maxSizeBytes = 5 * 1024 * 1024; // 5MB
+    if (imageBuffer.length > maxSizeBytes) {
+      console.warn(`Screenshot too large: ${imageBuffer.length} bytes (max: ${maxSizeBytes})`);
+      return null;
+    }
     
-    // Store in R2
+    // 🛡️ COST PROTECTION: Check monthly usage (basic check - you can enhance this)
+    const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+    const usageKey = `usage-${currentMonth}`;
+    
+    try {
+      // Get current month's usage count
+      const usageData = await env.R2_BUCKET.head(usageKey);
+      const currentCount = usageData ? parseInt(usageData.customMetadata?.count || '0') : 0;
+      
+      // 🛡️ LIMIT: Max 1000 screenshots per month (well under 1M operations limit)
+      const maxScreenshotsPerMonth = 1000;
+      if (currentCount >= maxScreenshotsPerMonth) {
+        console.warn(`Monthly screenshot limit reached: ${currentCount}/${maxScreenshotsPerMonth}`);
+        return null;
+      }
+      
+      // Update usage counter
+      await env.R2_BUCKET.put(usageKey, JSON.stringify({ 
+        count: currentCount + 1, 
+        month: currentMonth 
+      }), {
+        customMetadata: { count: (currentCount + 1).toString() },
+      });
+    } catch (usageError) {
+      // If usage tracking fails, still allow upload but log warning
+      console.warn('Usage tracking failed:', usageError);
+    }
+    
+    // Generate unique filename with size info for monitoring
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const sizeKB = Math.round(imageBuffer.length / 1024);
+    const filename = `bug-reports/screenshot-${timestamp}-${sizeKB}kb-${Math.random().toString(36).substring(7)}.png`;
+    
+    // Store in R2 with automatic cleanup metadata
     await env.R2_BUCKET.put(filename, imageBuffer, {
       httpMetadata: {
         contentType: 'image/png',
+        cacheControl: 'public, max-age=2592000', // 30 days
+      },
+      customMetadata: {
+        uploadDate: new Date().toISOString(),
+        sizeBytes: imageBuffer.length.toString(),
+        autoDelete: (new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)).toISOString(), // 90 days
       },
     });
     
+    console.log(`Screenshot stored: ${filename} (${sizeKB}KB)`);
+    
     // Return public URL (adjust based on your R2 setup)
-    return `https://${env.R2_PUBLIC_DOMAIN}/${filename}`;
+    return env.R2_PUBLIC_DOMAIN ? `https://${env.R2_PUBLIC_DOMAIN}/${filename}` : null;
   } catch (error) {
     console.error('Failed to store screenshot:', error);
     return null;
+  }
+}
+
+/**
+ * 🛡️ COST PROTECTION: Cleanup old screenshots (call this periodically)
+ * This should be called from a cron trigger or manually
+ */
+async function cleanupOldScreenshots(env) {
+  if (!env.R2_BUCKET) {
+    return { error: 'R2_BUCKET not configured' };
+  }
+  
+  try {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - 90); // 90 days ago
+    
+    let deletedCount = 0;
+    let totalSize = 0;
+    
+    // List all objects in bug-reports folder
+    const objects = await env.R2_BUCKET.list({ prefix: 'bug-reports/' });
+    
+    for (const object of objects.objects) {
+      try {
+        const objectDetails = await env.R2_BUCKET.head(object.key);
+        const uploadDate = objectDetails.customMetadata?.uploadDate;
+        
+        if (uploadDate) {
+          const fileDate = new Date(uploadDate);
+          if (fileDate < cutoffDate) {
+            await env.R2_BUCKET.delete(object.key);
+            deletedCount++;
+            totalSize += object.size || 0;
+            console.log(`Deleted old screenshot: ${object.key}`);
+          }
+        }
+      } catch (error) {
+        console.warn(`Failed to process ${object.key}:`, error);
+      }
+    }
+    
+    return {
+      success: true,
+      deletedCount,
+      totalSizeFreed: Math.round(totalSize / (1024 * 1024)), // MB
+      message: `Cleaned up ${deletedCount} screenshots, freed ${Math.round(totalSize / (1024 * 1024))}MB`
+    };
+  } catch (error) {
+    console.error('Cleanup failed:', error);
+    return { error: error.message };
+  }
+}
+
+/**
+ * Get usage statistics for monitoring
+ */
+async function getUsageStats(env) {
+  if (!env.R2_BUCKET) {
+    return { error: 'R2_BUCKET not configured' };
+  }
+  
+  try {
+    const currentMonth = new Date().toISOString().slice(0, 7);
+    const usageKey = `usage-${currentMonth}`;
+    
+    // Get current month usage
+    const usageData = await env.R2_BUCKET.head(usageKey);
+    const currentCount = usageData ? parseInt(usageData.customMetadata?.count || '0') : 0;
+    
+    // List objects to get storage stats
+    const objects = await env.R2_BUCKET.list({ prefix: 'bug-reports/' });
+    const totalObjects = objects.objects.length;
+    const totalSize = objects.objects.reduce((sum, obj) => sum + (obj.size || 0), 0);
+    
+    return {
+      success: true,
+      currentMonth,
+      uploadsThisMonth: currentCount,
+      maxUploadsPerMonth: 1000,
+      percentageUsed: Math.round((currentCount / 1000) * 100),
+      totalStoredScreenshots: totalObjects,
+      totalStorageUsed: Math.round(totalSize / (1024 * 1024)), // MB
+      freeStorageLimit: 10 * 1024, // 10GB in MB
+    };
+  } catch (error) {
+    return { error: error.message };
   }
 }
 
