@@ -49,6 +49,14 @@ export default {
       });
     }
 
+    if (url.pathname === '/releases' && request.method === 'GET') {
+      const result = await getReleasePleaseInfo(env);
+      return new Response(JSON.stringify(result), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     // Default route: bug report submission
     if (url.pathname === '/report-issue' || url.pathname === '/') {
       if (request.method !== 'POST') {
@@ -309,6 +317,97 @@ async function getUsageStats(env) {
     };
   } catch (error) {
     return { error: error.message };
+  }
+}
+
+/**
+ * Get release-please information for next version targeting
+ */
+async function getReleasePleaseInfo(env) {
+  if (!env.GITHUB_TOKEN || !env.GITHUB_REPO) {
+    return { 
+      error: 'GitHub configuration not found',
+      fallback: { nextVersion: '1.9.0', currentVersion: '1.8.0' }
+    };
+  }
+  
+  try {
+    // Get the latest releases
+    const releasesResponse = await fetch(`https://api.github.com/repos/${env.GITHUB_REPO}/releases?per_page=10`, {
+      headers: {
+        'Authorization': `token ${env.GITHUB_TOKEN}`,
+        'User-Agent': 'VioletVault-BugReporter/1.0',
+        'Accept': 'application/vnd.github.v3+json',
+      },
+    });
+    
+    if (!releasesResponse.ok) {
+      throw new Error(`GitHub API error: ${releasesResponse.status}`);
+    }
+    
+    const releases = await releasesResponse.json();
+    
+    // Get release-please PRs (these contain the next version)
+    const prsResponse = await fetch(`https://api.github.com/repos/${env.GITHUB_REPO}/pulls?state=open&per_page=10`, {
+      headers: {
+        'Authorization': `token ${env.GITHUB_TOKEN}`,
+        'User-Agent': 'VioletVault-BugReporter/1.0',
+        'Accept': 'application/vnd.github.v3+json',
+      },
+    });
+    
+    if (!prsResponse.ok) {
+      throw new Error(`GitHub API error: ${prsResponse.status}`);
+    }
+    
+    const prs = await prsResponse.json();
+    
+    // Find release-please PR (contains "chore(main): release" in title)
+    const releasePR = prs.find(pr => 
+      pr.title.includes('chore(main): release') && 
+      pr.head.ref.includes('release-please')
+    );
+    
+    // Extract version from release PR title: "chore(main): release violet-vault 1.8.0"
+    let nextVersion = null;
+    if (releasePR) {
+      const versionMatch = releasePR.title.match(/release\s+\S+\s+(\d+\.\d+\.\d+)/);
+      nextVersion = versionMatch ? versionMatch[1] : null;
+    }
+    
+    // Get current/latest version from releases
+    const latestRelease = releases.find(release => !release.prerelease);
+    const currentVersion = latestRelease ? latestRelease.tag_name.replace(/^v/, '') : '1.6.1';
+    
+    // If no release PR found, increment the current version
+    if (!nextVersion) {
+      const [major, minor, patch] = currentVersion.split('.').map(Number);
+      nextVersion = `${major}.${minor + 1}.0`;
+    }
+    
+    return {
+      success: true,
+      nextVersion,
+      currentVersion,
+      latestRelease: {
+        version: currentVersion,
+        name: latestRelease?.name,
+        publishedAt: latestRelease?.published_at,
+        htmlUrl: latestRelease?.html_url,
+      },
+      releasePR: releasePR ? {
+        number: releasePR.number,
+        title: releasePR.title,
+        htmlUrl: releasePR.html_url,
+        createdAt: releasePR.created_at,
+      } : null,
+    };
+  } catch (error) {
+    console.error('Failed to fetch release-please info:', error);
+    return { 
+      error: error.message,
+      fallback: { nextVersion: '1.9.0', currentVersion: '1.8.0' }
+    };
   }
 }
 
