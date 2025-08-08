@@ -8,11 +8,15 @@ compatibility_date = "2024-01-01"
 # R2_PUBLIC_DOMAIN = "your-r2-domain.com" (optional, for screenshot hosting)
 # NOTIFICATION_WEBHOOK = "https://hooks.slack.com/..." (optional, for notifications)
 
-# R2 bucket binding for screenshot storage (optional)
+# R2 bucket binding for screenshot storage
 [[r2_buckets]]
 binding = "R2_BUCKET"
-bucket_name = "violet-vault-screenshots"
-preview_bucket_name = "violet-vault-screenshots-preview"
+bucket_name = "violetvault"
+preview_bucket_name = "violetvault-preview"
+
+# Cron triggers for automated cleanup
+[triggers]
+crons = ["0 2 * * 1"] # Every Monday at 2 AM UTC
 
 # Routes - adjust based on your domain setup
 [env.production]
