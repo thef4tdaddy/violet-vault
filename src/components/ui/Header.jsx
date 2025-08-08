@@ -12,6 +12,9 @@ import logoWithText from "../../assets/Shield Text Logo.webp";
 import ChangePasswordModal from "../auth/ChangePasswordModal";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
+const APP_VERSION = import.meta.env.VITE_APP_VERSION || "1.6.1";
+const APP_ENV = import.meta.env.VITE_APP_ENV || "production";
+const IS_DEV = APP_ENV === "development";
 
 const Header = memo(
   ({
@@ -57,9 +60,24 @@ const Header = memo(
                 }}
               />
             </div>
-            <p className="text-gray-600 text-sm font-medium">
+            <p className="text-gray-600 text-sm font-medium mb-2">
               Encryption First, Family Budgeting Management
             </p>
+            {/* Version and environment indicator */}
+            <div className="flex items-center justify-center gap-2">
+              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                IS_DEV 
+                  ? "bg-orange-100 text-orange-800 border border-orange-200"
+                  : "bg-green-100 text-green-800 border border-green-200"
+              }`}>
+                v{APP_VERSION}
+              </span>
+              {IS_DEV && (
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-800 border border-purple-200">
+                  DEV → v1.9.0
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Buttons row */}
