@@ -75,30 +75,46 @@ const useBugReport = () => {
         },
       };
 
-      // For now, just log the report data - in production this would go to Cloudflare Worker
-      console.log("Bug report submitted:", {
-        ...reportData,
-        screenshot: screenshotData ? "[Screenshot captured]" : null,
-        sessionUrl: sessionUrl || "[No session replay URL available]",
-      });
+      // Submit to Cloudflare Worker if endpoint is configured
+      const bugReportEndpoint = import.meta.env.VITE_BUG_REPORT_ENDPOINT;
+      
+      if (bugReportEndpoint) {
+        console.log("Submitting bug report to:", bugReportEndpoint);
+        
+        const response = await fetch(bugReportEndpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(reportData),
+        });
 
-      // TODO: Send to Cloudflare Worker endpoint
-      // const response = await fetch("https://your-worker.workers.dev/report-issue", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(reportData),
-      // });
-      //
-      // if (!response.ok) {
-      //   throw new Error(`HTTP error! status: ${response.status}`);
-      // }
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+        }
+
+        const result = await response.json();
+        console.log("Bug report submitted successfully:", result);
+        
+        // Store the issue URL for user feedback
+        if (result.issueUrl) {
+          reportData.issueUrl = result.issueUrl;
+        }
+      } else {
+        // Fallback: log the report data if no endpoint is configured
+        console.log("No bug report endpoint configured. Report data:", {
+          ...reportData,
+          screenshot: screenshotData ? "[Screenshot captured]" : null,
+          sessionUrl: sessionUrl || "[No session replay URL available]",
+        });
+      }
 
       // Reset form on success
       setDescription("");
       setScreenshot(null);
       setIsModalOpen(false);
 
-      return true;
+      // Return result data for UI feedback
+      return reportData;
     } catch (error) {
       console.error("Failed to submit bug report:", error);
       return false;
