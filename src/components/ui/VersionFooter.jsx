@@ -32,7 +32,7 @@ const VersionFooter = () => {
             setIsLoadingMilestone(false);
           });
       } else {
-        console.log(`🎯 Using cached milestone (expires in ${currentCache.minutesUntilExpiry} minutes)`);
+        console.log(`🎯 Using cached milestone (expires in ${currentCache.daysUntilExpiry > 0 ? currentCache.daysUntilExpiry + ' days' : currentCache.hoursUntilExpiry + ' hours'})`);
         // Use cached version
         getVersionInfoAsync()
           .then(updatedInfo => {
@@ -98,7 +98,7 @@ const VersionFooter = () => {
             </p>
             {cacheInfo.isValid && (
               <p className="text-xs text-orange-400 mt-1">
-                📦 Cached milestone (expires in {cacheInfo.minutesUntilExpiry}m)
+                📦 Cached milestone (expires in {cacheInfo.daysUntilExpiry > 0 ? `${cacheInfo.daysUntilExpiry}d` : `${cacheInfo.hoursUntilExpiry}h`})
               </p>
             )}
             {isLoadingMilestone && (
