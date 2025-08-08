@@ -8,7 +8,7 @@ export const APP_NAME = packageJson.name;
 let milestoneCache = {
   data: null,
   timestamp: null,
-  ttl: 2 * 60 * 60 * 1000, // 2 hours cache (longer for fewer API calls)
+  ttl: 5 * 24 * 60 * 60 * 1000, // 5 days cache (milestones rarely change)
 };
 
 // Cache key for localStorage
@@ -199,7 +199,7 @@ export const getVersionInfoAsync = async () => {
 export const clearVersionCache = () => {
   try {
     localStorage.removeItem(CACHE_KEY);
-    milestoneCache = { data: null, timestamp: null, ttl: 2 * 60 * 60 * 1000 };
+    milestoneCache = { data: null, timestamp: null, ttl: 5 * 24 * 60 * 60 * 1000 };
     console.log('🗑️ Milestone cache cleared');
   } catch (error) {
     console.warn('Failed to clear cache:', error);
@@ -211,12 +211,19 @@ export const getCacheStatus = () => {
   const isValid = milestoneCache.data && milestoneCache.timestamp && 
                   (now - milestoneCache.timestamp) < milestoneCache.ttl;
   
+  const timeUntilExpiry = isValid ? (milestoneCache.timestamp + milestoneCache.ttl - now) : 0;
+  const daysUntilExpiry = Math.round(timeUntilExpiry / (24 * 60 * 60 * 1000));
+  const hoursUntilExpiry = Math.round(timeUntilExpiry / (60 * 60 * 1000));
+  
   return {
     hasData: !!milestoneCache.data,
     isValid,
     version: milestoneCache.data,
     cachedAt: milestoneCache.timestamp ? new Date(milestoneCache.timestamp) : null,
     expiresAt: milestoneCache.timestamp ? new Date(milestoneCache.timestamp + milestoneCache.ttl) : null,
-    minutesUntilExpiry: isValid ? Math.round((milestoneCache.timestamp + milestoneCache.ttl - now) / (60 * 1000)) : 0,
+    daysUntilExpiry: isValid ? daysUntilExpiry : 0,
+    hoursUntilExpiry: isValid ? hoursUntilExpiry : 0,
+    // Legacy support
+    minutesUntilExpiry: isValid ? Math.round(timeUntilExpiry / (60 * 1000)) : 0,
   };
 };
