@@ -105,10 +105,30 @@ const Dashboard = () => {
     return options;
   };
 
+  // Handle payday actions
+  const handleProcessPaycheck = () => {
+    // Navigate to paycheck processor or trigger paycheck modal
+    alert("Navigate to paycheck processor for payday processing!");
+    // TODO: Integrate with actual paycheck processing flow
+  };
+
+  const handlePrepareEnvelopes = () => {
+    // Navigate to envelope management or show planning interface
+    alert("Navigate to envelope management for funding planning!");
+    // TODO: Integrate with envelope planning interface
+  };
+
   return (
     <div className="space-y-6">
       {/* Payday Prediction */}
-      {paydayPrediction && <PaydayPrediction prediction={paydayPrediction} className="mb-6" />}
+      {paydayPrediction && (
+        <PaydayPrediction 
+          prediction={paydayPrediction} 
+          className="mb-6"
+          onProcessPaycheck={handleProcessPaycheck}
+          onPrepareEnvelopes={handlePrepareEnvelopes}
+        />
+      )}
 
       {/* Account Balance Overview */}
       <div className="glassmorphism rounded-2xl p-6 border border-white/20">
