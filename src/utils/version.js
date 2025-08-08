@@ -5,10 +5,11 @@ export const APP_VERSION = packageJson.version;
 export const APP_NAME = packageJson.name;
 
 // Enhanced cache for milestone data with localStorage persistence
+// Optimized for Saturday milestone updates - cache expires Sunday to catch new milestones
 let milestoneCache = {
   data: null,
   timestamp: null,
-  ttl: 5 * 24 * 60 * 60 * 1000, // 5 days cache (milestones rarely change)
+  ttl: 7 * 24 * 60 * 60 * 1000, // 7 days cache (milestones updated Saturdays)
 };
 
 // Cache key for localStorage
@@ -199,7 +200,7 @@ export const getVersionInfoAsync = async () => {
 export const clearVersionCache = () => {
   try {
     localStorage.removeItem(CACHE_KEY);
-    milestoneCache = { data: null, timestamp: null, ttl: 5 * 24 * 60 * 60 * 1000 };
+    milestoneCache = { data: null, timestamp: null, ttl: 7 * 24 * 60 * 60 * 1000 };
     console.log('🗑️ Milestone cache cleared');
   } catch (error) {
     console.warn('Failed to clear cache:', error);

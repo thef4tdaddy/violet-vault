@@ -11,6 +11,11 @@ compatibility_date = "2024-01-01"
 # R2_PUBLIC_DOMAIN = "your-r2-domain.com" (for screenshot hosting with custom domain)  
 # NOTIFICATION_WEBHOOK = "https://hooks.slack.com/..." (for Slack/Discord notifications)
 #
+# MILESTONE WORKFLOW:
+# - Milestones are updated on Saturdays
+# - Frontend caches milestone data for 7 days (expires Sunday)
+# - This minimizes API calls to ~1 per week per user
+#
 # REMINDER: After adding/changing variables in Cloudflare Dashboard, redeploy with:
 # npx wrangler deploy
 
