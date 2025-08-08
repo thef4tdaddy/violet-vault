@@ -44,14 +44,14 @@ const VersionFooter = () => {
 
   // Dynamic styling based on environment
   const getEnvironmentStyles = () => {
-    if (versionInfo.isDevelopment) {
+    if (versionInfo.environment === 'development') {
       return {
         container: "glassmorphism rounded-2xl p-4 max-w-md mx-auto border-l-4 border-orange-400",
         title: "font-semibold text-orange-600",
         version: "text-orange-700 font-mono",
         label: "text-orange-600 text-xs font-medium",
       };
-    } else if (versionInfo.environment === 'staging') {
+    } else if (versionInfo.environment === 'preview') {
       return {
         container: "glassmorphism rounded-2xl p-4 max-w-md mx-auto border-l-4 border-blue-400",
         title: "font-semibold text-blue-600",
@@ -80,9 +80,14 @@ const VersionFooter = () => {
         
         <div className="flex items-center justify-center gap-2 mb-2">
           <span className={styles.label}>{versionInfo.environmentLabel}</span>
-          {versionInfo.isDevelopment && (
+          {versionInfo.isDevelopment && versionInfo.futureVersion && (
             <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
-              → v{versionInfo.baseVersion} targeting v1.8.0
+              → v{versionInfo.baseVersion} targeting v{versionInfo.futureVersion}
+            </span>
+          )}
+          {versionInfo.environment === 'production' && (
+            <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+              v{versionInfo.packageVersion} (package.json)
             </span>
           )}
         </div>
