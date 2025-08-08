@@ -1,0 +1,26 @@
+name = "violet-vault-bug-reporter"
+main = "bug-report-worker.js"
+compatibility_date = "2024-01-01"
+
+# Environment variables (set these in Cloudflare dashboard)
+# GITHUB_TOKEN = "your-github-personal-access-token"
+# GITHUB_REPO = "your-username/violet-vault"
+# R2_PUBLIC_DOMAIN = "your-r2-domain.com" (optional, for screenshot hosting)
+# NOTIFICATION_WEBHOOK = "https://hooks.slack.com/..." (optional, for notifications)
+
+# R2 bucket binding for screenshot storage (optional)
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "violet-vault-screenshots"
+preview_bucket_name = "violet-vault-screenshots-preview"
+
+# Routes - adjust based on your domain setup
+[env.production]
+routes = [
+  "https://api.your-domain.com/bug-report/*"
+]
+
+[env.staging]
+routes = [
+  "https://api-staging.your-domain.com/bug-report/*"
+]
