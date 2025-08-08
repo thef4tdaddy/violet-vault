@@ -89,14 +89,26 @@ const UnifiedEnvelopeManager = ({
         (t) => t.type === "transaction" || (t.type === "bill" && t.isPaid),
       );
 
-      // Combine bills from transactions and the bills array
-      const unpaidBills = [
+      // Combine bills from transactions and the bills array, removing duplicates
+      const allUnpaidBills = [
         ...envelopeTransactions.filter(
           (t) =>
             (t.type === "bill" || t.type === "recurring_bill") && !t.isPaid,
         ),
         ...envelopeBills.filter((b) => !b.isPaid),
-      ].sort((a, b) => {
+      ];
+      
+      // Deduplicate bills based on provider/name and due date to prevent showing same bill twice
+      const unpaidBillsMap = new Map();
+      allUnpaidBills.forEach(bill => {
+        const key = `${bill.provider || bill.name || bill.description}-${bill.dueDate}`;
+        // Keep the first occurrence, or prefer bills array over transaction bills
+        if (!unpaidBillsMap.has(key) || !bill.type) {
+          unpaidBillsMap.set(key, bill);
+        }
+      });
+      
+      const unpaidBills = Array.from(unpaidBillsMap.values()).sort((a, b) => {
         // Sort by due date (earliest first)
         const dateA = a.dueDate ? new Date(a.dueDate) : new Date("9999-12-31");
         const dateB = b.dueDate ? new Date(b.dueDate) : new Date("9999-12-31");
@@ -858,8 +870,9 @@ const UnifiedEnvelopeManager = ({
         ))}
       </div>
 
+      {/* Detailed view moved up - appears right below the envelope grid */}
       {selectedEnvelope && (
-        <div className="bg-white/60 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+        <div className="bg-white/60 backdrop-blur-sm rounded-lg p-6 border border-white/20 mt-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">
               {selectedEnvelope.name} - Detailed View
