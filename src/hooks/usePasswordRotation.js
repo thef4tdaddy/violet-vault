@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { encryptionUtils } from "../utils/encryption";
-import { useAuth } from "../stores/authStore";
+import { useAuth } from "../stores/authStore.jsx";
 
 /**
  * Custom hook for password rotation management
