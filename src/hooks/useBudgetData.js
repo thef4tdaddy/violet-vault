@@ -181,7 +181,7 @@ const useBudgetData = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
-    onError: (error, newEnvelope, context) => {
+    onError: (error) => {
       console.error("Failed to add envelope:", error);
       // TODO: Implement rollback logic
     },

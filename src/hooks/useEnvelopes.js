@@ -109,12 +109,12 @@ const useEnvelopes = (options = {}) => {
 
       return newEnvelope;
     },
-    onSuccess: (newEnvelope) => {
+    onSuccess: () => {
       // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
-    onError: (error, variables, context) => {
+    onError: (error) => {
       console.error("Failed to add envelope:", error);
       // TODO: Implement rollback logic
     },
@@ -136,7 +136,7 @@ const useEnvelopes = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
-    onError: (error, variables, context) => {
+    onError: (error) => {
       console.error("Failed to update envelope:", error);
       // TODO: Implement rollback logic
     },
@@ -158,7 +158,7 @@ const useEnvelopes = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
-    onError: (error, variables, context) => {
+    onError: (error) => {
       console.error("Failed to delete envelope:", error);
       // TODO: Implement rollback logic
     },
@@ -194,7 +194,7 @@ const useEnvelopes = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
-    onError: (error, variables, context) => {
+    onError: (error) => {
       console.error("Failed to transfer funds:", error);
       // TODO: Implement rollback logic
     },

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useBudgetStore } from "../stores/budgetStore";
 import { queryKeys } from "../utils/queryClient";
-import { budgetDb } from "../db/budgetDb";
+// import { budgetDb } from "../db/budgetDb"; // TODO: Use for offline fallback
 
 /**
  * Specialized hook for savings goals management
@@ -210,7 +210,7 @@ const useSavingsGoals = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
-    onError: (error, variables, context) => {
+    onError: (error) => {
       console.error("Failed to add savings goal:", error);
       // TODO: Implement rollback logic
     },
@@ -236,7 +236,7 @@ const useSavingsGoals = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
-    onError: (error, variables, context) => {
+    onError: (error) => {
       console.error("Failed to update savings goal:", error);
       // TODO: Implement rollback logic
     },
@@ -262,7 +262,7 @@ const useSavingsGoals = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
-    onError: (error, variables, context) => {
+    onError: (error) => {
       console.error("Failed to delete savings goal:", error);
       // TODO: Implement rollback logic
     },
@@ -285,7 +285,7 @@ const useSavingsGoals = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
-    onError: (error, variables, context) => {
+    onError: (error) => {
       console.error("Failed to contribute to savings goal:", error);
       // TODO: Implement rollback logic
     },

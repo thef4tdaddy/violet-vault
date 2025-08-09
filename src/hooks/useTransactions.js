@@ -23,8 +23,6 @@ const useTransactions = (options = {}) => {
   const {
     transactions: zustandTransactions,
     addTransaction: zustandAddTransaction,
-    updateTransaction: zustandUpdateTransaction,
-    deleteTransaction: zustandDeleteTransaction,
     reconcileTransaction: zustandReconcileTransaction,
   } = useBudgetStore();
 
@@ -135,14 +133,14 @@ const useTransactions = (options = {}) => {
 
       return newTransaction;
     },
-    onSuccess: (newTransaction) => {
+    onSuccess: () => {
       // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.analytics });
     },
-    onError: (error, variables, context) => {
+    onError: (error) => {
       console.error("Failed to add transaction:", error);
       // TODO: Implement rollback logic
     },
@@ -171,7 +169,7 @@ const useTransactions = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
-    onError: (error, variables, context) => {
+    onError: (error) => {
       console.error("Failed to reconcile transaction:", error);
     },
   });

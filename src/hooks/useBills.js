@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useBudgetStore } from "../stores/budgetStore";
-import { queryKeys, optimisticHelpers } from "../utils/queryClient";
+import { queryKeys } from "../utils/queryClient";
 import { budgetDb } from "../db/budgetDb";
 
 /**
@@ -164,7 +164,7 @@ const useBills = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
-    onError: (error, variables, context) => {
+    onError: (error) => {
       console.error("Failed to add bill:", error);
       // TODO: Implement rollback logic
     },
@@ -193,7 +193,7 @@ const useBills = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
-    onError: (error, variables, context) => {
+    onError: (error) => {
       console.error("Failed to update bill:", error);
       // TODO: Implement rollback logic
     },
@@ -219,7 +219,7 @@ const useBills = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
-    onError: (error, variables, context) => {
+    onError: (error) => {
       console.error("Failed to delete bill:", error);
       // TODO: Implement rollback logic
     },
@@ -258,7 +258,7 @@ const useBills = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
-    onError: (error, variables, context) => {
+    onError: (error) => {
       console.error("Failed to mark bill paid:", error);
       // TODO: Implement rollback logic
     },

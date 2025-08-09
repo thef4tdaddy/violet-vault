@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useBudgetStore } from "../stores/budgetStore";
 import { queryKeys } from "../utils/queryClient";
-import { budgetDb } from "../db/budgetDb";
+// import { budgetDb } from "../db/budgetDb"; // TODO: Use for offline fallback
 
 /**
  * Specialized hook for analytics and reporting
@@ -20,7 +20,6 @@ const useAnalytics = (options = {}) => {
   const {
     envelopes,
     transactions,
-    bills,
     savingsGoals,
     unassignedCash,
     actualBalance,
@@ -209,14 +208,14 @@ const useAnalytics = (options = {}) => {
       // Spending trends and insights
       const insights = {
         topSpendingCategories: Object.entries(categoryBreakdown)
-          .filter(([_, data]) => data.expenses > 0)
-          .sort(([_, a], [__, b]) => b.expenses - a.expenses)
+          .filter(([, data]) => data.expenses > 0)
+          .sort(([, a], [, b]) => b.expenses - a.expenses)
           .slice(0, 5)
           .map(([category, data]) => ({ category, ...data })),
 
         topIncomeCategories: Object.entries(categoryBreakdown)
-          .filter(([_, data]) => data.income > 0)
-          .sort(([_, a], [__, b]) => b.income - a.income)
+          .filter(([, data]) => data.income > 0)
+          .sort(([, a], [, b]) => b.income - a.income)
           .slice(0, 5)
           .map(([category, data]) => ({ category, ...data })),
 
@@ -427,7 +426,7 @@ const useAnalytics = (options = {}) => {
     switch (type) {
       case "categoryPie":
         return Object.entries(data.categoryBreakdown)
-          .filter(([_, categoryData]) => categoryData.expenses > 0)
+          .filter(([, categoryData]) => categoryData.expenses > 0)
           .map(([category, categoryData]) => ({
             name: category,
             value: categoryData.expenses,
