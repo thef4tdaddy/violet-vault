@@ -1,5 +1,152 @@
 # Changelog
 
+## [1.8.0](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.7.0...violet-vault-v1.8.0) (2025-08-09)
+
+
+### Features
+
+* add automated lint warning tracking with GitHub Actions ([cf090a5](https://github.com/thef4tdaddy/violet-vault/commit/cf090a5e428193d3f4e022cdf05ae81cdc43253a))
+* add comprehensive Firebase sync debugging ([ef445ee](https://github.com/thef4tdaddy/violet-vault/commit/ef445eed790a94dda9f68868ecdbefcab83a221c))
+* add conditional Firebase config debug logging ([005c221](https://github.com/thef4tdaddy/violet-vault/commit/005c221e8ba7157d94e6db27d46a0076b3979017))
+* add conditional Firebase sync debug logging ([60bf32f](https://github.com/thef4tdaddy/violet-vault/commit/60bf32fc61605892ca19e6ece318f0badd6fc278))
+* add envelope type filtering to EnvelopeGrid ([#137](https://github.com/thef4tdaddy/violet-vault/issues/137)) ([90b4617](https://github.com/thef4tdaddy/violet-vault/commit/90b4617e1e0bfa5844499fc7e1a9ac1880751467))
+* add envelope type selector UI to Create and Edit envelope modals ([8dbb762](https://github.com/thef4tdaddy/violet-vault/commit/8dbb7620315110b521da734c429e15def7f8b97a))
+* add local error monitoring fallback when Highlight.io is blocked ([733e5e8](https://github.com/thef4tdaddy/violet-vault/commit/733e5e82948d06ce2b563a3300398a91ee88250b))
+* add localStorage migration from budget-store to violet-vault-store ([689ce1a](https://github.com/thef4tdaddy/violet-vault/commit/689ce1ac0b4e6da228365e023ddaafac85173f0e))
+* add onUpdateBill prop to EditEnvelopeModal in EnvelopeGrid ([bbbe9a4](https://github.com/thef4tdaddy/violet-vault/commit/bbbe9a4799cf19c9d23290dc5206d3f5ec351e75))
+* add Pets category to standard categories list ([3e9ce89](https://github.com/thef4tdaddy/violet-vault/commit/3e9ce890f2c5a4ce9898606043792913c298b946))
+* add Vercel environment detection for production/preview builds ([bc3d219](https://github.com/thef4tdaddy/violet-vault/commit/bc3d2199a100fe4a3ab66b29926e96d598dea719))
+* Complete v1.8.0 milestone - Enhanced cash management and production deployment ([35d1039](https://github.com/thef4tdaddy/violet-vault/commit/35d1039dcfb2a1925ce0cc67f4e7a70108fe1dff))
+* complete ViewRenderer/MainLayout refactoring and fix debug logging ([4e002dd](https://github.com/thef4tdaddy/violet-vault/commit/4e002dd9703e1bcd4925d78d20bcfdd105054d99))
+* enhance payday prediction with proactive funding suggestions ([252331c](https://github.com/thef4tdaddy/violet-vault/commit/252331c4885b9809eeb5adb2829864d495261579))
+* implement automatic Firebase sync initialization and data syncing ([e542385](https://github.com/thef4tdaddy/violet-vault/commit/e5423855987285e49405e9a9d4dc7cf48ba97d95))
+* implement bill-to-envelope connection in EditEnvelopeModal ([e103345](https://github.com/thef4tdaddy/violet-vault/commit/e103345218e3b50771a453f74c99ecdd0fdab554))
+* implement bug report button with Highlight.io session replay integration ([#241](https://github.com/thef4tdaddy/violet-vault/issues/241)) ([485bb2f](https://github.com/thef4tdaddy/violet-vault/commit/485bb2f487a96400440e720001d2c1a8940a95df))
+* implement comprehensive bill-envelope linking system ([52664eb](https://github.com/thef4tdaddy/violet-vault/commit/52664ebf1d8736262ac0f8f8c18dc1897aa1921b))
+* implement comprehensive bug reporting system with Cloudflare Worker ([95a1b94](https://github.com/thef4tdaddy/violet-vault/commit/95a1b94b5f701b7b987638df06a29a06ce70a252))
+* implement dynamic dev branch version differentiation ([#240](https://github.com/thef4tdaddy/violet-vault/issues/240)) ([827b449](https://github.com/thef4tdaddy/violet-vault/commit/827b4493ee3730a0481867189d70d7e3931786c4))
+* implement full negative balance support for unassigned cash ([#114](https://github.com/thef4tdaddy/violet-vault/issues/114)) ([cd0938f](https://github.com/thef4tdaddy/violet-vault/commit/cd0938ffa1cee423c58211ff4533b36879bffe75))
+* implement unassigned cash distribution modal ([#111](https://github.com/thef4tdaddy/violet-vault/issues/111)) ([#129](https://github.com/thef4tdaddy/violet-vault/issues/129)) ([037ab27](https://github.com/thef4tdaddy/violet-vault/commit/037ab2714e4edb8a6e57f9c9858735409ca97fe9))
+* Implement Variable Expense Envelope Classification and Auto-funding ([#137](https://github.com/thef4tdaddy/violet-vault/issues/137)) ([#170](https://github.com/thef4tdaddy/violet-vault/issues/170)) ([db7f8ba](https://github.com/thef4tdaddy/violet-vault/commit/db7f8ba718c32ef53acb1b8cc4aa33bb29762001))
+* improve variable envelope display by removing progress bar and emphasizing balance ([5bcb3a8](https://github.com/thef4tdaddy/violet-vault/commit/5bcb3a820af3893688f4cf2014e160955f39f0d5))
+* Manual Virtual Balance Override on Dashboard ([#113](https://github.com/thef4tdaddy/violet-vault/issues/113)) ([#155](https://github.com/thef4tdaddy/violet-vault/issues/155)) ([dc56357](https://github.com/thef4tdaddy/violet-vault/commit/dc56357132781323833ad64dac5894ee38203802))
+* migrate from milestones to release-please for version targeting ([1fe0e10](https://github.com/thef4tdaddy/violet-vault/commit/1fe0e1081a434a7ab76266a33d2c2747427e4b32))
+* optimize milestone cache for Saturday update workflow ([338433c](https://github.com/thef4tdaddy/violet-vault/commit/338433cc1523298a2b2daed1565ac0cbc2dbd96c))
+* remove inappropriate bills section from variable envelopes ([9c77718](https://github.com/thef4tdaddy/violet-vault/commit/9c777183004473f1ca8729fa85ec3f10405cb801))
+* replace unassigned cash edit button with distribution modal trigger ([b8f7f2a](https://github.com/thef4tdaddy/violet-vault/commit/b8f7f2ae40ed741dd7a4b2f835bc1411262918cb))
+* stage remaining files from ViewRenderer refactoring ([1232d76](https://github.com/thef4tdaddy/violet-vault/commit/1232d7602ce270a103f753c157ef268b99a18f62))
+* standardize biweekly calculations across app and fix payment readiness ([242f8d7](https://github.com/thef4tdaddy/violet-vault/commit/242f8d7120f58eba75fbaa589a3a31d34245a6a1))
+* standardize categories across application (issue [#208](https://github.com/thef4tdaddy/violet-vault/issues/208)) ([fc2d171](https://github.com/thef4tdaddy/violet-vault/commit/fc2d1712ddc94f3d60f1c90913be0104a7e507f3))
+
+
+### Bug Fixes
+
+* add dev branch differentiation and version display ([#240](https://github.com/thef4tdaddy/violet-vault/issues/240)) ([97daa82](https://github.com/thef4tdaddy/violet-vault/commit/97daa822dc2fb74f86f4b0049043970e5eae13de))
+* add encryption key logging and error handling to export ([f3c2f17](https://github.com/thef4tdaddy/violet-vault/commit/f3c2f1785b62314863056e0c7392fa826e794765))
+* add missing actualBalance and reconcileTransaction to Zustand store ([d001f45](https://github.com/thef4tdaddy/violet-vault/commit/d001f451a18307232e43931dc51e6db800e452ba))
+* add missing paycheckHistory to budget store to resolve ReferenceError ([57581c0](https://github.com/thef4tdaddy/violet-vault/commit/57581c026ac28e4f125e3067c6a2c8693debe8b5))
+* add purple border around header logo to hide white differences (Issue [#209](https://github.com/thef4tdaddy/violet-vault/issues/209)) ([bb5b452](https://github.com/thef4tdaddy/violet-vault/commit/bb5b45266473fa2ebe6f85bb407aec7c4594dbab))
+* adding console logging and a potential fix number 2 ([07612ef](https://github.com/thef4tdaddy/violet-vault/commit/07612ef41bb0676babb789adde57699ba1f51e76))
+* adding debug tools ([3717460](https://github.com/thef4tdaddy/violet-vault/commit/3717460f89b0f545bb6bab75fba627caea47e164))
+* adding more logging ([ca1c7c4](https://github.com/thef4tdaddy/violet-vault/commit/ca1c7c4140c8fabcd0dc465215c73261404b8b4f))
+* allow saving when only envelope type is changed in edit modal ([1283904](https://github.com/thef4tdaddy/violet-vault/commit/128390467605af2c577c42caf1b2629a2d3925ce))
+* apply CSS Grid pattern to EditEnvelopeModal radio buttons ([b7e3ae1](https://github.com/thef4tdaddy/violet-vault/commit/b7e3ae12d75370400a8c631edf551def4b903369))
+* attempt fix again with the persistence between linking ([02572fc](https://github.com/thef4tdaddy/violet-vault/commit/02572fc02a95d728a4d6c7af74d3f329356e1cdd))
+* bill changes hopefully getting pushed to budgetStore ([9b4e035](https://github.com/thef4tdaddy/violet-vault/commit/9b4e03519b1edd8c0e9b5eca869a2b813b88a694))
+* border only around logo, catchphrase outside with spacing ([#222](https://github.com/thef4tdaddy/violet-vault/issues/222)) ([fc1c985](https://github.com/thef4tdaddy/violet-vault/commit/fc1c9859cdf4832759211ad56320d2f79da0de1f))
+* calculate biweekly need from envelope allocations instead of using static value ([bd21749](https://github.com/thef4tdaddy/violet-vault/commit/bd21749e5998087924ad45de27b54d1e57036769))
+* changing useEffect to potentially fix the connection ([9776fbe](https://github.com/thef4tdaddy/violet-vault/commit/9776fbe44effd70035aca5f63303134c204e08a3))
+* clean up unused biweeklyAllocation variables and scoping issues ([8b4e7a4](https://github.com/thef4tdaddy/violet-vault/commit/8b4e7a4220c6ec3fc4abdc8c211b9f174e28d3e1))
+* close GitHub issues for style improvements ([ab807ab](https://github.com/thef4tdaddy/violet-vault/commit/ab807ab51411621d6ea713bc6c270b9d17659751))
+* correct import paths in ViewRenderer to fix build error ([1dbdc18](https://github.com/thef4tdaddy/violet-vault/commit/1dbdc181298b900b976da8d8d3e7494b5761fa81))
+* correct logo border to include catchphrase with proper spacing ([#222](https://github.com/thef4tdaddy/violet-vault/issues/222)) ([221adc7](https://github.com/thef4tdaddy/violet-vault/commit/221adc7c4fe66dae1af6f3053c6691c6d4ff452a))
+* correct MainLayout BillManager onUpdateBill to use updateBill() instead of updateTransaction() ([4c4cbd6](https://github.com/thef4tdaddy/violet-vault/commit/4c4cbd6e261dbd76628d446c93cf1b20994b5547))
+* create separate handleBillUpdate function to fix scope issues ([e9f4396](https://github.com/thef4tdaddy/violet-vault/commit/e9f439630a1206a43492cd4bd10b8f6209d02877))
+* debug tools ([d416e8f](https://github.com/thef4tdaddy/violet-vault/commit/d416e8ff1fa10ec179be3ab8160087a52446350e))
+* enable bill debugging only on dev sites, not production ([3de99b9](https://github.com/thef4tdaddy/violet-vault/commit/3de99b9f54cc6a4ceb6a71026a3c24ea3a010525))
+* enable bill-related debug logging in production mode ([e5125d4](https://github.com/thef4tdaddy/violet-vault/commit/e5125d4fde92abaf782d41b4a7953c034d663849))
+* expanded logging to track why envelope &lt;--&gt; bill connection isnt happening ([ffc14f5](https://github.com/thef4tdaddy/violet-vault/commit/ffc14f53140f2f16b75cf62b96f9819303091b22))
+* export function now reads from violet-vault-store first ([5957885](https://github.com/thef4tdaddy/violet-vault/commit/59578854a7610d16ede88c0c5bc000d37c88b1d5))
+* force PaycheckProcessor radio buttons to absolute far left ([ab3ced5](https://github.com/thef4tdaddy/violet-vault/commit/ab3ced5c1b3c48046f68a237bab5726d5dc13d36))
+* import still using old data store ([f41b372](https://github.com/thef4tdaddy/violet-vault/commit/f41b3722d318dc57ece71f12935298b5dd8da1a4))
+* improve bill envelope detailed view and pending bills display ([c1be27e](https://github.com/thef4tdaddy/violet-vault/commit/c1be27e55128c879dd15116a7e60f550ebe88cbf))
+* improve mobile layout for header controls and navigation tabs ([#205](https://github.com/thef4tdaddy/violet-vault/issues/205)) ([2bfef5a](https://github.com/thef4tdaddy/violet-vault/commit/2bfef5a22a8f5f463ede98540ee872317972dd58))
+* increase logo padding for better visual balance ([#222](https://github.com/thef4tdaddy/violet-vault/issues/222)) ([1f66308](https://github.com/thef4tdaddy/violet-vault/commit/1f663083a7036d91f898d40a5e8479c8a06f2431))
+* integrate PR [#129](https://github.com/thef4tdaddy/violet-vault/issues/129) unassigned cash distribution modal functionality ([083c10c](https://github.com/thef4tdaddy/violet-vault/commit/083c10c6922ff2496c557fac90910d412b4636f9))
+* main branch export reads from encrypted data source ([aa4ff3e](https://github.com/thef4tdaddy/violet-vault/commit/aa4ff3ef8899765e7617228ad223a922bf260237))
+* make Dashboard component reactive to budget store changes ([85fd183](https://github.com/thef4tdaddy/violet-vault/commit/85fd183f6696bff700323f4e714d0774dcb9b75f))
+* make TransactionLedger reactive to budget store changes ([0c69a26](https://github.com/thef4tdaddy/violet-vault/commit/0c69a266fb92882e9e8493efd61fba273d808a6f))
+* more changes ([95790fa](https://github.com/thef4tdaddy/violet-vault/commit/95790fa86305e5a2fa2fe0590a5a2f05533b4998))
+* move handleBillUpdate after budget destructuring to fix scope issue ([4082b6f](https://github.com/thef4tdaddy/violet-vault/commit/4082b6f32000b98a3d51958318355f6eac3e7fa7))
+* move handleBillUpdate before views object and pass bills array to BillManager ([348ac9e](https://github.com/thef4tdaddy/violet-vault/commit/348ac9eed20a2073820c5f3bccf0b94cd90bd8ab))
+* optimize PaycheckProcessor checkbox layout to save space ([1b83b50](https://github.com/thef4tdaddy/violet-vault/commit/1b83b503574bf92520ed05095088101cf11478e1))
+* paycheck processor now only allocates to bill envelopes with auto-allocate ([ca441a8](https://github.com/thef4tdaddy/violet-vault/commit/ca441a83f5e0daa2d385e9563311c6e8a94863b0))
+* persistence of connection of bill and envelope ([336f74c](https://github.com/thef4tdaddy/violet-vault/commit/336f74cd88696afc428d24d641d95a3affd9b08e))
+* prevent infinite Firebase sync loop causing excessive API calls ([6997622](https://github.com/thef4tdaddy/violet-vault/commit/699762203b8ceab279c9d9b28f3c46104a581ba0))
+* properly destructure budget functions and simplify MainLayout bill handling ([fdf5fe0](https://github.com/thef4tdaddy/violet-vault/commit/fdf5fe0b9eabc5e4c62511ec370c2d086a0941a1))
+* properly handle reconcile transactions and deletion ([17f0862](https://github.com/thef4tdaddy/violet-vault/commit/17f0862f3ecbc919e7ba68a76046500083b9a71b))
+* properly position PaycheckProcessor radio buttons to far left ([1148704](https://github.com/thef4tdaddy/violet-vault/commit/114870443c91a71f40a1265a8616053b1f116d63))
+* reduce border radius to prevent logo corner clipping ([#222](https://github.com/thef4tdaddy/violet-vault/issues/222)) ([26335ff](https://github.com/thef4tdaddy/violet-vault/commit/26335ff8bc21bba8d7d8f9e55f52912577372344))
+* remove conflicting error handling to enable Highlight.io errors ([65a2a38](https://github.com/thef4tdaddy/violet-vault/commit/65a2a384da957f127dd19a6eccb0ddf55963cb25))
+* remove padding inside logo border for seamless color matching ([#222](https://github.com/thef4tdaddy/violet-vault/issues/222)) ([593aba4](https://github.com/thef4tdaddy/violet-vault/commit/593aba4f709fd403a135574362432535f1fdb58a))
+* remove undefined closeModal references from useUnassignedCashDistribution hook ([9ba5ec0](https://github.com/thef4tdaddy/violet-vault/commit/9ba5ec087133bfc36736f7034e9262d0f1da7d2c))
+* rename authStore.js to authStore.jsx to resolve JSX syntax error ([e8c40a7](https://github.com/thef4tdaddy/violet-vault/commit/e8c40a714d82661a8231dff0ac1f105bb7e2a38b))
+* resolve envelope bills display issues ([#223](https://github.com/thef4tdaddy/violet-vault/issues/223)) ([38391c8](https://github.com/thef4tdaddy/violet-vault/commit/38391c88671923ecd4a6e64e6a3dbd2c916e709e))
+* resolve Firebase sync loop and unassigned cash modal issues ([2cd2730](https://github.com/thef4tdaddy/violet-vault/commit/2cd2730f04b3ff5f8c8b596c0451805dc2bd506c))
+* resolve infinite recursion in UserSetup devLog function ([90fad13](https://github.com/thef4tdaddy/violet-vault/commit/90fad1319e456e3a10406655526d4477d6c199d4))
+* resolve paycheckHistory initialization error in MainLayout ([f2a27cd](https://github.com/thef4tdaddy/violet-vault/commit/f2a27cd2bea7b345f2f53bfa387b24eedfd750ae))
+* resolve UI/UX issues in envelope and bill modals (Issues [#216](https://github.com/thef4tdaddy/violet-vault/issues/216)-219) ([fbe777f](https://github.com/thef4tdaddy/violet-vault/commit/fbe777fc23b0c51c81fd197506cf690ead3549c6))
+* resolve ViewRenderer naming conflict ([1d32153](https://github.com/thef4tdaddy/violet-vault/commit/1d32153b1fc1af4abe92126d81130e1d40a919d5))
+* restore radio button CSS Grid positioning and complete envelope type functionality ([cada407](https://github.com/thef4tdaddy/violet-vault/commit/cada407d42d1eee67fcc70499bca183ebd1ead1a))
+* reverting the bill manager somehow got that messed up. hopefully this clears up logging errors ([40ee487](https://github.com/thef4tdaddy/violet-vault/commit/40ee4875b40757414f10c76bfe774a6ebdb73aec))
+* show Firebase debug info for Vercel preview deployments ([00d3791](https://github.com/thef4tdaddy/violet-vault/commit/00d3791a3421fbe97112107be7f42e004535dac5))
+* significantly reduce white space in PaycheckProcessor layout ([a47d70a](https://github.com/thef4tdaddy/violet-vault/commit/a47d70ad4126f534b315d2c3fff4b4970b0c749b))
+* standardize calculations and improve bill envelope UX ([c0d912e](https://github.com/thef4tdaddy/violet-vault/commit/c0d912e5efbfff63db7b4a6eaa6d8f979ed37b06))
+* update export/import to work with new Zustand store formats ([3e5ad37](https://github.com/thef4tdaddy/violet-vault/commit/3e5ad37a867ae5150d9d00d8c5b10af053e02fbc))
+* update main branch export to use budget-store localStorage key ([986b809](https://github.com/thef4tdaddy/violet-vault/commit/986b8097ae852748f3ad344a950d97c386b15444))
+* use budget.updateBill and budget.setAllTransactions in MainLayout ([f0f5cd5](https://github.com/thef4tdaddy/violet-vault/commit/f0f5cd59c05d78b0edadb336513822afe8518763))
+* use CSS Grid to force radio buttons to absolute left position ([c8b6cf3](https://github.com/thef4tdaddy/violet-vault/commit/c8b6cf35252d0fd925f383cbe6fb32a7f7c43946))
+* use jq instead of require() for JSON parsing in GitHub Action ([8b07e8c](https://github.com/thef4tdaddy/violet-vault/commit/8b07e8cf78ad21c7c549821ad02e11a922dccf3c))
+* use minimal border radius to preserve logo corners ([#222](https://github.com/thef4tdaddy/violet-vault/issues/222)) ([f38c692](https://github.com/thef4tdaddy/violet-vault/commit/f38c692a9166474c683e05f11003001b2723f1d3))
+* use stable useCallback for ViewRenderer onUpdateBill to fix prop connection ([cce3c15](https://github.com/thef4tdaddy/violet-vault/commit/cce3c157605b2063b91d5e68fe3a4cff429eaca2))
+
+
+### Performance Improvements
+
+* add intelligent caching for milestone version fetching ([88ca5be](https://github.com/thef4tdaddy/violet-vault/commit/88ca5be19f5dcfc9dab5189a1e7d31e2a3b6200a))
+* extend milestone cache to 5 days for minimal API usage ([c4b8de0](https://github.com/thef4tdaddy/violet-vault/commit/c4b8de0d4aa1838653a9adc245c720e056cdf4cd))
+
+
+### Code Refactoring
+
+* clean up lint warnings across envelope and layout components ([d1b436d](https://github.com/thef4tdaddy/violet-vault/commit/d1b436d035c803050fff83a8f387084d9ae969f5))
+* migrate from useBudget hook to useBudgetStore ([408c92a](https://github.com/thef4tdaddy/violet-vault/commit/408c92a5f089609e811e795137c4da3c6efba438))
+* organize tracking files into .github/data/ folder ([52b6567](https://github.com/thef4tdaddy/violet-vault/commit/52b65672e40a8bc9077d242fb20c6ec2b7717cbf))
+* remove duplicate unassigned cash card from envelope page ([4ff8c6d](https://github.com/thef4tdaddy/violet-vault/commit/4ff8c6d01aed4fe3a72ff3fd9dc400f20e1039f9))
+* rename AuthContext.jsx to authStore.js for consistent architecture ([#221](https://github.com/thef4tdaddy/violet-vault/issues/221)) ([2dde081](https://github.com/thef4tdaddy/violet-vault/commit/2dde08164d343eb06a0f4cbf1e1f814018c89d0f))
+* **state:** cleanup store/context logic for budget and auth ([#211](https://github.com/thef4tdaddy/violet-vault/issues/211)) ([1a6a7bf](https://github.com/thef4tdaddy/violet-vault/commit/1a6a7bf8f707e6d6ee3f6032bef3239fe9ed4e18))
+
+
+### Documentation
+
+* add comprehensive branch protection and workflow rules documentation ([ce92583](https://github.com/thef4tdaddy/violet-vault/commit/ce925837ed63fb123b9eafe76cef2aece0eb5bdd))
+* add comprehensive scripts guide and VS Code workspace setup ([3089098](https://github.com/thef4tdaddy/violet-vault/commit/308909836d18c69bc9706c30b70956ecc223fc06))
+* add LINT_WARNINGS.md to track ESLint warnings ([5deff6d](https://github.com/thef4tdaddy/violet-vault/commit/5deff6d2da0aef5eac6c460f4e08fcfdbc51c538))
+* claude code updates ([ecfc934](https://github.com/thef4tdaddy/violet-vault/commit/ecfc93476c05ef367a45e0eb65c59c61bf24e5bb))
+* comprehensive v1.8.0 milestone documentation update ([#224](https://github.com/thef4tdaddy/violet-vault/issues/224)) ([04b5a5a](https://github.com/thef4tdaddy/violet-vault/commit/04b5a5a13c1d8ec14f2bb774877cd81b6d3df486))
+* consolidate lint warning documentation and add JSON for GH actions ([63d545e](https://github.com/thef4tdaddy/violet-vault/commit/63d545e042ca6f07ba02269a9e572fd343534c5c))
+* getting rid of extra files ([e298c36](https://github.com/thef4tdaddy/violet-vault/commit/e298c36635e43783ba5293069717820174f94c24))
+* remove outdated branch protection setup and fix markdown linting ([6beb788](https://github.com/thef4tdaddy/violet-vault/commit/6beb78860cd160dd42ba03de26e4eff7bc356cb4))
+* update README with comprehensive v1.8.0 features and capabilities ([30fa87f](https://github.com/thef4tdaddy/violet-vault/commit/30fa87ff60f8bae63e0fd0231edc729aa7351677))
+* update the milestone workflow, also update claude's learning ([bff2064](https://github.com/thef4tdaddy/violet-vault/commit/bff20648f73d4cfc6b66bf46aefa1f648420bab6))
+
+
+### CI/CD
+
+* recurring milestone issue creation workflow ([7d5f1ad](https://github.com/thef4tdaddy/violet-vault/commit/7d5f1adda8946ca6dfa7ca6e73d2f2e6f331b8cb))
+* workflow edits 2 ([367d4e4](https://github.com/thef4tdaddy/violet-vault/commit/367d4e42c227d1e94cedc08e9662ca2d4a9f3e87))
+* workflow edits so they actually work ([963f28e](https://github.com/thef4tdaddy/violet-vault/commit/963f28e710a5ecdec596bf34af091d8bd182702f))
+
 ## [1.7.0](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.6.1...violet-vault-v1.7.0) (2025-08-03)
 
 
