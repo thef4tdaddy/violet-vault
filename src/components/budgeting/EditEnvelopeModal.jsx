@@ -246,7 +246,10 @@ const EditEnvelopeModal = ({
         const updatedEnvelope = {
           ...envelope,
           name: formData.name.trim(),
-          monthlyAmount: parseFloat(formData.monthlyAmount),
+          monthlyAmount:
+            formData.envelopeType === ENVELOPE_TYPES.VARIABLE
+              ? parseFloat(formData.monthlyBudget)
+              : parseFloat(formData.monthlyAmount),
           currentBalance: parseFloat(formData.currentBalance) || envelope.currentBalance || 0,
           category: formData.category || "Other",
           color: formData.color,

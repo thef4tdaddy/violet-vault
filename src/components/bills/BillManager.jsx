@@ -334,46 +334,33 @@ const BillManager = ({
         amount: -Math.abs(bill.amount),
         envelopeId: bill.envelopeId || "unassigned",
         category: bill.category,
-        type: "transaction",
+        type: "expense",
         source: "bill_payment",
       };
 
       if (bill.envelopeId) {
         const billAmount = Math.abs(bill.amount);
-        const updatedEnvelopes = envelopes.map((env) => {
-          if (env.id === bill.envelopeId) {
-            const currentBalance = env.currentBalance || 0;
-            const newBalance = currentBalance - billAmount; // Allow negative balances if needed
+        const envelope = envelopes.find((env) => env.id === bill.envelopeId);
+        if (envelope) {
+          const currentBalance = envelope.currentBalance || 0;
+          const newBalance = currentBalance - billAmount; // Allow negative balances if needed
 
-            return {
-              ...env,
-              currentBalance: newBalance,
-              // Track last transaction for debugging
-              lastTransaction: {
-                type: "bill_payment",
-                amount: -billAmount,
-                date: paymentTxn.date,
-                billId: bill.id,
-              },
-            };
-          }
-          return env;
-        });
-
-        reconcileTransaction({
-          transaction: paymentTxn,
-          updatedEnvelopes,
-        });
-      } else {
-        const billAmount = Math.abs(bill.amount);
-        const currentUnassigned = budget.unassignedCash || 0;
-        const newUnassigned = currentUnassigned - billAmount; // Allow negative unassigned cash if needed
-
-        reconcileTransaction({
-          transaction: paymentTxn,
-          newUnassignedCash: newUnassigned,
-        });
+          budget.updateEnvelope({
+            ...envelope,
+            currentBalance: newBalance,
+            // Track last transaction for debugging
+            lastTransaction: {
+              type: "bill_payment",
+              amount: -billAmount,
+              date: paymentTxn.date,
+              billId: bill.id,
+            },
+          });
+        }
       }
+
+      // Record the transaction and update unassigned cash if needed
+      reconcileTransaction(paymentTxn);
     } catch (error) {
       console.error("Error paying bill:", error);
       onError?.(error.message || "Failed to pay bill");
