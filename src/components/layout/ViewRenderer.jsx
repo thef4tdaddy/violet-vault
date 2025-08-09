@@ -1,15 +1,16 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useCallback } from "react";
 import Dashboard from "../pages/MainDashboard";
-import SmartEnvelopeSuggestions from "../SmartEnvelopeSuggestions";
-import EnvelopeGrid from "../EnvelopeGrid";
-import SavingsGoals from "../SavingsGoals";
-import SupplementalAccounts from "../SupplementalAccounts";
-import PaycheckProcessor from "../PaycheckProcessor";
-import BillManager from "../BillManager";
-import TransactionLedger from "../TransactionLedger";
-import ChartsAndAnalytics from "../ChartsAndAnalytics";
+import SmartEnvelopeSuggestions from "../budgeting/SmartEnvelopeSuggestions";
+import EnvelopeGrid from "../budgeting/EnvelopeGrid";
+import SavingsGoals from "../savings/SavingsGoals";
+import SupplementalAccounts from "../accounts/SupplementalAccounts";
+import PaycheckProcessor from "../budgeting/PaycheckProcessor";
+import BillManager from "../bills/BillManager";
+import TransactionLedger from "../transactions/TransactionLedger";
+import ChartsAndAnalytics from "../analytics/ChartsAndAnalytics";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ErrorBoundary } from "@highlight-run/react";
+import logger from "../../utils/logger";
 
 /**
  * ViewRenderer component for handling main content switching
@@ -31,6 +32,10 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed }) =>
     addSavingsGoal,
     updateSavingsGoal,
     deleteSavingsGoal,
+    addSupplementalAccount,
+    updateSupplementalAccount,
+    deleteSupplementalAccount,
+    transferFromSupplementalAccount,
     addEnvelope,
     updateEnvelope,
     processPaycheck,
@@ -38,15 +43,54 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed }) =>
     updateTransaction,
     deleteTransaction,
     addBill,
+    updateBill,
     setAllTransactions,
     setTransactions,
   } = budget;
 
   // Filter out null/undefined transactions to prevent runtime errors
-  const allTransactions = (rawAllTransactions || []).filter((t) => t && typeof t === "object");
-  const safeTransactions = (transactions || []).filter(
-    (t) => t && typeof t === "object" && typeof t.amount === "number"
+  const allTransactions = (rawAllTransactions || []).filter(
+    (t) => t && typeof t === "object",
   );
+  const safeTransactions = (transactions || []).filter(
+    (t) => t && typeof t === "object" && typeof t.amount === "number",
+  );
+
+  // Stable callback for bill updates
+  const handleUpdateBill = useCallback(
+    (updatedBill) => {
+      logger.debug("ViewRenderer handleUpdateBill called", {
+        billId: updatedBill.id,
+        envelopeId: updatedBill.envelopeId,
+        hasUpdateBill: !!updateBill,
+      });
+
+      try {
+        // Use updateBill for proper bill persistence with envelope assignment
+        // The budget store's updateBill handles both bills and allTransactions internally
+        updateBill(updatedBill);
+        logger.debug("ViewRenderer updateBill completed successfully", {
+          billId: updatedBill.id,
+          envelopeId: updatedBill.envelopeId,
+        });
+      } catch (error) {
+        logger.error("Error in ViewRenderer handleUpdateBill", error, {
+          billId: updatedBill.id,
+          envelopeId: updatedBill.envelopeId,
+        });
+      }
+    },
+    [updateBill],
+  );
+
+  // Debug log to verify function creation - only on dev sites
+  if (activeView === "bills") {
+    logger.debug("ViewRenderer handleUpdateBill created for bills view", {
+      functionExists: !!handleUpdateBill,
+      functionType: typeof handleUpdateBill,
+      activeView,
+    });
+  }
 
   const views = {
     dashboard: (
@@ -88,9 +132,11 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed }) =>
     supplemental: (
       <SupplementalAccounts
         supplementalAccounts={supplementalAccounts}
-        onAddAccount={() => {}} // Will be implemented
-        onUpdateAccount={() => {}} // Will be implemented
-        onDeleteAccount={() => {}} // Will be implemented
+        onAddAccount={addSupplementalAccount}
+        onUpdateAccount={updateSupplementalAccount}
+        onDeleteAccount={deleteSupplementalAccount}
+        onTransferToEnvelope={transferFromSupplementalAccount}
+        envelopes={envelopes}
         currentUser={currentUser}
       />
     ),
@@ -105,22 +151,13 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed }) =>
     ),
     bills: (
       <BillManager
-        transactions={allTransactions}
+        transactions={bills}
         envelopes={envelopes}
         onPayBill={(updatedBill) => {
-          // Update the bill in allTransactions
-          const updatedTransactions = allTransactions.map((t) =>
-            t.id === updatedBill.id ? updatedBill : t
-          );
-          setAllTransactions(updatedTransactions);
+          // Update the bill using budget store method
+          updateTransaction(updatedBill);
         }}
-        onUpdateBill={(updatedBill) => {
-          // Update the bill in allTransactions
-          const updatedTransactions = allTransactions.map((t) =>
-            t.id === updatedBill.id ? updatedBill : t
-          );
-          setAllTransactions(updatedTransactions);
-        }}
+        onUpdateBill={handleUpdateBill}
         onCreateRecurringBill={(newBill) => {
           // Store bill properly using budget store - no transaction created until paid
           console.log("📋 Creating new bill:", newBill);
@@ -133,14 +170,16 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed }) =>
             createdAt: new Date().toISOString(),
           };
           addBill(bill);
-          console.log("✅ Bill stored successfully - no transaction created until paid");
+          console.log(
+            "✅ Bill stored successfully - no transaction created until paid",
+          );
         }}
         onSearchNewBills={async () => {
           try {
             // This would integrate with email parsing or other bill detection services
             // For now, we'll show a placeholder notification
             alert(
-              "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox."
+              "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox.",
             );
           } catch (error) {
             console.error("Failed to search for new bills:", error);
@@ -157,27 +196,19 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed }) =>
       <TransactionLedger
         transactions={allTransactions}
         envelopes={envelopes}
-        onAddTransaction={(newTransaction) => {
-          console.log("🔄 Adding new transaction:", newTransaction);
-          addTransaction(newTransaction);
-        }}
-        onUpdateTransaction={(updatedTransaction) => {
-          console.log("🔄 Updating transaction:", updatedTransaction);
-          updateTransaction(updatedTransaction);
-        }}
-        onDeleteTransaction={(transactionId) => {
-          console.log("🔄 Deleting transaction:", transactionId);
-          deleteTransaction(transactionId);
-        }}
+        onAddTransaction={() => {}} // Will be implemented
+        onUpdateTransaction={() => {}} // Will be implemented
+        onDeleteTransaction={() => {}} // Will be implemented
         onBulkImport={(newTransactions) => {
-          console.log("🔄 onBulkImport called with transactions:", newTransactions.length);
-          const updatedAllTransactions = [...allTransactions, ...newTransactions];
-          const updatedTransactions = [...safeTransactions, ...newTransactions];
-          setAllTransactions(updatedAllTransactions);
-          setTransactions(updatedTransactions);
           console.log(
-            "💾 Bulk import complete. Total transactions:",
-            updatedAllTransactions.length
+            "🔄 onBulkImport called with transactions:",
+            newTransactions.length,
+          );
+          // Add transactions using budget store method - need to loop through individual transactions
+          newTransactions.forEach((transaction) => addTransaction(transaction));
+          console.log(
+            "💾 Bulk import complete. Added transactions:",
+            newTransactions.length,
           );
         }}
         currentUser={currentUser}
@@ -197,7 +228,9 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed }) =>
 
   return (
     <ErrorBoundary>
-      <Suspense fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}>
+      <Suspense
+        fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}
+      >
         {views[activeView]}
       </Suspense>
     </ErrorBoundary>
