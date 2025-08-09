@@ -27,6 +27,28 @@ const useBugReport = () => {
         ignoreElements: (element) => {
           return element.getAttribute("data-bug-report") === "true";
         },
+        // Skip problematic CSS properties that html2canvas can't parse
+        onclone: (clonedDoc) => {
+          // Remove any elements with problematic CSS like oklch() colors
+          const elements = clonedDoc.querySelectorAll("*");
+          elements.forEach((el) => {
+            try {
+              const style = window.getComputedStyle(el);
+              // Convert oklch() and other modern color functions to RGB
+              if (
+                style.backgroundColor?.includes("oklch") ||
+                style.color?.includes("oklch") ||
+                style.borderColor?.includes("oklch")
+              ) {
+                el.style.backgroundColor = "#ffffff";
+                el.style.color = "#000000";
+                el.style.borderColor = "#cccccc";
+              }
+            } catch (e) {
+              // Ignore style access errors
+            }
+          });
+        },
       });
 
       const screenshotDataUrl = canvas.toDataURL("image/png", 0.7);
@@ -53,9 +75,17 @@ const useBugReport = () => {
       // Get Highlight.io session URL for the bug report
       let sessionUrl = null;
       try {
-        const sessionMetadata = H.getSessionMetadata();
-        if (sessionMetadata?.sessionUrl) {
-          sessionUrl = sessionMetadata.sessionUrl;
+        // Try different methods to get session URL based on Highlight.io SDK version
+        if (typeof H.getSessionMetadata === "function") {
+          const sessionMetadata = H.getSessionMetadata();
+          if (sessionMetadata?.sessionUrl) {
+            sessionUrl = sessionMetadata.sessionUrl;
+          }
+        } else if (typeof H.getSessionURL === "function") {
+          sessionUrl = H.getSessionURL();
+        } else if (typeof H.getSession === "function") {
+          const session = H.getSession();
+          sessionUrl = session?.url || session?.sessionUrl;
         }
       } catch (error) {
         console.warn("Failed to get Highlight.io session metadata:", error);
@@ -89,7 +119,9 @@ const useBugReport = () => {
 
         if (!response.ok) {
           const errorText = await response.text();
-          throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+          throw new Error(
+            `HTTP error! status: ${response.status} - ${errorText}`,
+          );
         }
 
         const result = await response.json();
@@ -124,14 +156,29 @@ const useBugReport = () => {
   };
 
   const openModal = () => {
-    // Force start a Highlight.io session when opening bug report modal
+    // Ensure Highlight.io session is active when opening bug report modal
     try {
-      H.start();
-      if (import.meta.env.MODE === "development") {
-        console.log("🔧 Forced Highlight.io session start for bug report");
+      // Check if Highlight is already recording before attempting to start
+      if (typeof H.isRecording === "function" && !H.isRecording()) {
+        H.start();
+        if (import.meta.env.MODE === "development") {
+          console.log("🔧 Started Highlight.io session for bug report");
+        }
+      } else if (
+        typeof H.start === "function" &&
+        typeof H.isRecording !== "function"
+      ) {
+        // Fallback for older SDK versions that don't have isRecording
+        H.start();
+        if (import.meta.env.MODE === "development") {
+          console.log("🔧 Attempted Highlight.io session start for bug report");
+        }
       }
     } catch (error) {
-      console.error("Failed to start Highlight.io session:", error);
+      // Don't throw error if Highlight is already recording
+      if (!error.message?.includes("already recording")) {
+        console.error("Failed to start Highlight.io session:", error);
+      }
     }
     setIsModalOpen(true);
   };
