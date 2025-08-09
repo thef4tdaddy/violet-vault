@@ -1,6 +1,9 @@
 // src/new/UnifiedBillTracker.jsx
 import React, { useState, useMemo } from "react";
 import { useBudgetStore } from "../../stores/budgetStore";
+import { useTransactions } from "../../hooks/useTransactions";
+import { useEnvelopes } from "../../hooks/useEnvelopes";
+import { useBills } from "../../hooks/useBills";
 import {
   FileText,
   Calendar,
@@ -31,21 +34,51 @@ const BillManager = ({
   onError,
   className = "",
 }) => {
+  // Enhanced TanStack Query integration with loading states
+  const { 
+    data: tanStackTransactions = [], 
+    isLoading: transactionsLoading 
+  } = useTransactions();
+  
+  const { 
+    data: tanStackEnvelopes = [], 
+    addEnvelope,
+    isLoading: envelopesLoading 
+  } = useEnvelopes();
+  
+  const { 
+    data: tanStackBills = [], 
+    addBill,
+    updateBill,
+    deleteBill,
+    isLoading: billsLoading 
+  } = useBills();
+
+  // Keep Zustand for non-migrated operations and fallbacks
   const budget = useBudgetStore();
 
   const transactions = useMemo(
     () =>
-      propTransactions && propTransactions.length ? propTransactions : budget.allTransactions || [],
-    [propTransactions, budget.allTransactions]
+      propTransactions && propTransactions.length 
+        ? propTransactions 
+        : tanStackTransactions.length 
+          ? tanStackTransactions 
+          : budget.allTransactions || [],
+    [propTransactions, tanStackTransactions, budget.allTransactions]
   );
 
   const envelopes = useMemo(
-    () => (propEnvelopes && propEnvelopes.length ? propEnvelopes : budget.envelopes || []),
-    [propEnvelopes, budget.envelopes]
+    () => 
+      propEnvelopes && propEnvelopes.length 
+        ? propEnvelopes 
+        : tanStackEnvelopes.length
+          ? tanStackEnvelopes
+          : budget.envelopes || [],
+    [propEnvelopes, tanStackEnvelopes, budget.envelopes]
   );
 
   const reconcileTransaction = budget.reconcileTransaction;
-  const handlePayBillAction = onPayBill || budget.updateBill;
+  const handlePayBillAction = onPayBill || updateBill;
   const [selectedBills, setSelectedBills] = useState(new Set());
   const [viewMode, setViewMode] = useState("upcoming");
   const [isSearching, setIsSearching] = useState(false);
@@ -65,7 +98,7 @@ const BillManager = ({
     const billsFromTransactions = transactions.filter(
       (t) => t && (t.type === "bill" || t.type === "recurring_bill")
     );
-    const billsFromStore = budget.bills || [];
+    const billsFromStore = tanStackBills.length ? tanStackBills : budget.bills || [];
 
     // Merge both sources, prioritizing store bills over transaction bills with same ID
     const combinedBills = [...billsFromStore];
@@ -123,7 +156,7 @@ const BillManager = ({
         urgency,
       };
     });
-  }, [transactions, budget.bills]);
+  }, [transactions, tanStackBills, budget.bills]);
 
   const categorizedBills = useMemo(() => {
     const upcomingBills = bills.filter((b) => !b.isPaid && b.daysUntilDue >= 0);
@@ -460,6 +493,24 @@ const BillManager = ({
     },
     { id: "all", label: "All Bills", count: bills.length, color: "gray" },
   ];
+
+  // Show loading state while TanStack queries are fetching
+  const isLoading = transactionsLoading || envelopesLoading || billsLoading;
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="h-24 bg-gray-200 rounded"></div>
+            <div className="h-24 bg-gray-200 rounded"></div>
+            <div className="h-24 bg-gray-200 rounded"></div>
+          </div>
+          <div className="h-64 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`space-y-6 ${className}`}>
@@ -923,14 +974,24 @@ const BillManager = ({
             if (onCreateRecurringBill) {
               onCreateRecurringBill(newBill);
             } else {
-              // Fallback to budget context
-              budget.addTransaction(newBill);
+              // Use TanStack mutation with Zustand fallback
+              try {
+                addBill(newBill);
+              } catch (error) {
+                console.warn("TanStack addBill failed, using Zustand fallback", error);
+                budget.addTransaction(newBill);
+              }
             }
             setShowAddBillModal(false);
           }}
           onAddEnvelope={(envelopeData) => {
-            // Add envelope to budget context
-            budget.addEnvelope(envelopeData);
+            // Use TanStack mutation with Zustand fallback
+            try {
+              addEnvelope(envelopeData);
+            } catch (error) {
+              console.warn("TanStack addEnvelope failed, using Zustand fallback", error);
+              budget.addEnvelope(envelopeData);
+            }
           }}
         />
       )}
@@ -965,22 +1026,37 @@ const BillManager = ({
                 throw error;
               }
             } else {
-              logger.debug("Using budget.updateBill fallback", {
+              logger.debug("Using TanStack updateBill with fallback", {
                 billId: updatedBillData.id,
               });
-              // Fallback to budget context
-              budget.updateBill(updatedBillData);
+              // Use TanStack mutation with Zustand fallback
+              try {
+                updateBill({ id: updatedBillData.id, updates: updatedBillData });
+              } catch (error) {
+                logger.warn("TanStack updateBill failed, using Zustand fallback", error);
+                budget.updateBill(updatedBillData);
+              }
             }
             setEditingBill(null);
           }}
           onDeleteBill={(billId) => {
-            // Use budget store's deleteBill function
-            budget.deleteBill(billId);
+            // Use TanStack mutation with Zustand fallback
+            try {
+              deleteBill(billId);
+            } catch (error) {
+              console.warn("TanStack deleteBill failed, using Zustand fallback", error);
+              budget.deleteBill(billId);
+            }
             setEditingBill(null);
           }}
           onAddEnvelope={(envelopeData) => {
-            // Add envelope to budget context
-            budget.addEnvelope(envelopeData);
+            // Use TanStack mutation with Zustand fallback
+            try {
+              addEnvelope(envelopeData);
+            } catch (error) {
+              console.warn("TanStack addEnvelope failed, using Zustand fallback", error);
+              budget.addEnvelope(envelopeData);
+            }
           }}
         />
       )}
