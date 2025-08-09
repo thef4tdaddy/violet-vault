@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useBudget } from "./useBudget";
+import { useBudgetStore } from "../stores/budgetStore";
 import {
   DEBT_TYPES,
   DEBT_STATUS,
@@ -14,7 +14,7 @@ import {
  * Handles relationships between debts, bills, envelopes, and transactions
  */
 export const useDebtManagement = () => {
-  const budget = useBudget();
+  const budget = useBudgetStore();
   const {
     debts = [],
     bills = [],

@@ -39,6 +39,7 @@ jobs:
               echo "❌ Disallowed commit message:"
               echo "   \"$msg\""
               echo "🔒 Only fix:, docs:, style:, perf:, ci:, and revert: commit types are allowed on develop."
+              echo "💡 feat: commits should come via PR from feature branches to enforce proper review process."
               echo "👉 Please adjust your commit message or target a different branch."
               DISALLOWED=1
             fi
