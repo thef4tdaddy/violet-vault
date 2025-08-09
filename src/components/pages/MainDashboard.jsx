@@ -16,17 +16,23 @@ import {
 } from "lucide-react";
 import PaydayPrediction from "../budgeting/PaydayPrediction";
 import { predictNextPayday } from "../../utils/paydayPredictor";
+import EditableBalance from "../ui/EditableBalance";
+import { useActualBalance } from "../../hooks/useActualBalance";
+import { useBudgetStore } from "../../stores/budgetStore";
 
-const Dashboard = ({
-  envelopes,
-  savingsGoals,
-  unassignedCash,
-  actualBalance,
-  onUpdateActualBalance,
-  onReconcileTransaction,
-  transactions,
-  paycheckHistory,
-}) => {
+const Dashboard = () => {
+  // Get live data from budget store instead of props
+  const budget = useBudgetStore();
+  const {
+    envelopes,
+    savingsGoals,
+    unassignedCash,
+    actualBalance,
+    setActualBalance,
+    reconcileTransaction,
+    transactions,
+    paycheckHistory,
+  } = budget;
   const [showReconcileModal, setShowReconcileModal] = useState(false);
   const [newTransaction, setNewTransaction] = useState({
     amount: "",
@@ -50,8 +56,14 @@ const Dashboard = ({
   const paydayPrediction =
     paycheckHistory && paycheckHistory.length >= 2 ? predictNextPayday(paycheckHistory) : null;
 
+  // Use the separated business logic hook
+  const { updateActualBalance } = useActualBalance();
+
   const handleUpdateBalance = (newBalance) => {
-    onUpdateActualBalance(parseFloat(newBalance) || 0);
+    const success = updateActualBalance(newBalance, { source: "manual_dashboard" });
+    if (success) {
+      setActualBalance(newBalance);
+    }
   };
 
   const handleReconcileTransaction = () => {
@@ -68,7 +80,7 @@ const Dashboard = ({
       reconciledAt: new Date().toISOString(),
     };
 
-    onReconcileTransaction(transaction);
+    reconcileTransaction(transaction);
 
     // Reset form
     setNewTransaction({
@@ -93,10 +105,30 @@ const Dashboard = ({
     return options;
   };
 
+  // Handle payday actions
+  const handleProcessPaycheck = () => {
+    // Navigate to paycheck processor or trigger paycheck modal
+    alert("Navigate to paycheck processor for payday processing!");
+    // TODO: Integrate with actual paycheck processing flow
+  };
+
+  const handlePrepareEnvelopes = () => {
+    // Navigate to envelope management or show planning interface
+    alert("Navigate to envelope management for funding planning!");
+    // TODO: Integrate with envelope planning interface
+  };
+
   return (
     <div className="space-y-6">
       {/* Payday Prediction */}
-      {paydayPrediction && <PaydayPrediction prediction={paydayPrediction} className="mb-6" />}
+      {paydayPrediction && (
+        <PaydayPrediction 
+          prediction={paydayPrediction} 
+          className="mb-6"
+          onProcessPaycheck={handleProcessPaycheck}
+          onPrepareEnvelopes={handlePrepareEnvelopes}
+        />
+      )}
 
       {/* Account Balance Overview */}
       <div className="glassmorphism rounded-2xl p-6 border border-white/20">
@@ -112,17 +144,15 @@ const Dashboard = ({
               <h3 className="font-medium text-blue-900">Actual Bank Balance</h3>
               <CreditCard className="h-5 w-5 text-blue-600" />
             </div>
-            <div className="space-y-3">
-              <input
-                type="number"
-                step="0.01"
-                value={actualBalance}
-                onChange={(e) => handleUpdateBalance(e.target.value)}
-                className="w-full text-2xl font-bold bg-transparent border-none text-blue-900 focus:outline-none"
-                placeholder="0.00"
-              />
-              <p className="text-sm text-blue-700">Enter your current checking account balance</p>
-            </div>
+            <EditableBalance
+              value={actualBalance}
+              onChange={handleUpdateBalance}
+              title="Bank Balance"
+              subtitle="Click to edit your current checking account balance"
+              className="text-blue-900"
+              currencyClassName="text-2xl font-bold text-blue-900"
+              subtitleClassName="text-sm text-blue-700"
+            />
           </div>
 
           {/* Virtual Balance */}
@@ -213,7 +243,7 @@ const Dashboard = ({
               onClick={() => {
                 if (difference > 0) {
                   // Add difference to unassigned cash
-                  onReconcileTransaction({
+                  reconcileTransaction({
                     id: Date.now(),
                     amount: difference,
                     description: "Balance reconciliation - added extra funds",
@@ -224,7 +254,7 @@ const Dashboard = ({
                   });
                 } else {
                   // Subtract difference from unassigned cash
-                  onReconcileTransaction({
+                  reconcileTransaction({
                     id: Date.now(),
                     amount: difference,
                     description: "Balance reconciliation - adjusted for discrepancy",
@@ -378,7 +408,7 @@ const Dashboard = ({
                       envelopeId: e.target.value,
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select envelope...</option>
                   {getEnvelopeOptions().map((option) => (

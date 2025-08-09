@@ -3,15 +3,48 @@ import { H } from "./highlight.js";
 class Logger {
   constructor() {
     this.isDevelopment = import.meta.env.MODE === "development";
+    this.isDevSite = this.getIsDevSite();
+  }
+
+  getIsDevSite() {
+    if (typeof window === "undefined") return false;
+    return (
+      window.location.hostname === "localhost" ||
+      window.location.hostname.startsWith("dev.") ||
+      window.location.hostname.includes("preview") ||
+      window.location.hostname.includes("vercel") ||
+      window.location.hostname.includes("127.0.0.1") ||
+      window.location.hostname.includes("192.168.") ||
+      // Include Vercel preview deployments
+      window.location.hostname.includes("-git-") ||
+      window.location.hostname.includes(".vercel.app")
+    );
   }
 
   // Debug-level logging for development and sync issues
   debug(message, data = {}) {
-    // Always log to console in development, but also use original console.log to bypass capture
-    if (this.isDevelopment) {
+    // Always log to console in development or on dev sites
+    // Also log bill-related debug messages on dev site for debugging
+    const isBillRelated =
+      message.includes("Bill") ||
+      message.includes("Envelope") ||
+      message.includes("Form") ||
+      message.includes("Modal") ||
+      data.billId ||
+      data.envelopeId ||
+      data.selectedEnvelope;
+
+    // Show logs in development or on dev/preview sites, and bill-related logs only on dev sites
+    if (
+      this.isDevelopment ||
+      (this.isDevSite && isBillRelated)
+    ) {
       // Use window.originalConsoleLog if available, otherwise regular console.log
       const consoleLog = window.originalConsoleLog || console.log;
-      consoleLog(`🔍 ${message}`, data);
+      consoleLog(
+        `🔍 [${this.isDevelopment ? "DEV" : this.isDevSite ? "DEV-SITE" : "PROD"}] ${message}`,
+        data,
+      );
     }
 
     // Highlight.io automatically captures console logs, so just ensure it's tracked
@@ -89,7 +122,10 @@ class Logger {
       });
 
       // For critical budget sync issues, also send as error to ensure visibility
-      if (message.includes("budgetId value") || message.includes("sync issue")) {
+      if (
+        message.includes("budgetId value") ||
+        message.includes("sync issue")
+      ) {
         H.consumeError(new Error(`Budget Sync: ${message}`), {
           metadata: data,
           tags: { category: "budget-sync", critical: "true" },
@@ -158,7 +194,9 @@ class Logger {
       });
     }
 
-    console.log("✅ Highlight.io test messages sent - check your Highlight.io dashboard");
+    console.log(
+      "✅ Highlight.io test messages sent - check your Highlight.io dashboard",
+    );
   }
 }
 

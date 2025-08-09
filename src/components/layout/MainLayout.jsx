@@ -1,7 +1,6 @@
 // src/components/layout/MainLayout.jsx
-import React, { useState, useMemo, Suspense, lazy } from "react";
-import { BudgetProvider } from "../../contexts/BudgetContext";
-import { useBudget } from "../../hooks/useBudget";
+import React, { useState, useMemo, Suspense } from "react";
+import { useBudgetStore } from "../../stores/budgetStore";
 import useAuthFlow from "../../hooks/useAuthFlow";
 import useDataManagement from "../../hooks/useDataManagement";
 import usePasswordRotation from "../../hooks/usePasswordRotation";
@@ -13,6 +12,7 @@ import Header from "../ui/Header";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ToastContainer } from "../ui/Toast";
 import useToast from "../../hooks/useToast";
+import ViewRendererComponent from "./ViewRenderer";
 import FirebaseSync from "../../utils/firebaseSync";
 import logger from "../../utils/logger";
 import { getVersionInfo } from "../../utils/version";
@@ -26,19 +26,14 @@ import {
   BookOpen,
   BarChart3,
 } from "lucide-react";
+import { AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/categories";
+import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
 import SyncStatusIndicators from "../sync/SyncStatusIndicators";
 import ConflictResolutionModal from "../sync/ConflictResolutionModal";
+import SummaryCards from "./SummaryCards";
+import BugReportButton from "../feedback/BugReportButton";
 
-// Lazy load heavy components for better performance
-const PaycheckProcessor = lazy(() => import("../budgeting/PaycheckProcessor"));
-const EnvelopeGrid = lazy(() => import("../budgeting/EnvelopeGrid"));
-const SmartEnvelopeSuggestions = lazy(() => import("../budgeting/SmartEnvelopeSuggestions"));
-const BillManager = lazy(() => import("../bills/BillManager"));
-const SavingsGoals = lazy(() => import("../savings/SavingsGoals"));
-const Dashboard = lazy(() => import("../pages/MainDashboard"));
-const TransactionLedger = lazy(() => import("../transactions/TransactionLedger"));
-const ChartsAndAnalytics = lazy(() => import("../analytics/ChartsAndAnalytics"));
-const SupplementalAccounts = lazy(() => import("../accounts/SupplementalAccounts"));
+// Heavy components now lazy loaded in ViewRenderer for better architecture
 
 const Layout = () => {
   logger.debug("Layout component is running");
@@ -102,30 +97,23 @@ const Layout = () => {
 
   return (
     <>
-      <BudgetProvider
-        encryptionKey={encryptionKey}
+      <MainContent
         currentUser={currentUser}
+        encryptionKey={encryptionKey}
         budgetId={budgetId}
-        salt={salt}
-      >
-        <MainContent
-          currentUser={currentUser}
-          encryptionKey={encryptionKey}
-          budgetId={budgetId}
-          onUserChange={handleLogout}
-          onExport={exportData}
-          onImport={importData}
-          onLogout={handleLogout}
-          onChangePassword={handleChangePassword}
-          onResetEncryption={resetEncryptionAndStartFresh}
-          syncConflicts={syncConflicts}
-          onResolveConflict={resolveConflict}
-          setSyncConflicts={setSyncConflicts}
-          firebaseSync={firebaseSync}
-          rotationDue={rotationDue}
-          onUpdateProfile={handleUpdateProfile}
-        />
-      </BudgetProvider>
+        onUserChange={handleLogout}
+        onExport={exportData}
+        onImport={importData}
+        onLogout={handleLogout}
+        onChangePassword={handleChangePassword}
+        onResetEncryption={resetEncryptionAndStartFresh}
+        syncConflicts={syncConflicts}
+        onResolveConflict={resolveConflict}
+        setSyncConflicts={setSyncConflicts}
+        firebaseSync={firebaseSync}
+        rotationDue={rotationDue}
+        onUpdateProfile={handleUpdateProfile}
+      />
       {showRotationModal && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="glassmorphism rounded-2xl p-6 w-full max-w-md border border-white/30 shadow-2xl">
@@ -180,7 +168,7 @@ const MainContent = ({
   rotationDue,
   onUpdateProfile,
 }) => {
-  const budget = useBudget();
+  const budget = useBudgetStore();
   const [activeView, setActiveView] = useState("dashboard");
 
   // Custom hooks for MainContent business logic
@@ -197,12 +185,23 @@ const MainContent = ({
   // Handle change password - delegate to parent component
   const handleChangePassword = onChangePassword;
 
+<<<<<<< HEAD
+  const {
+    envelopes,
+    savingsGoals,
+    unassignedCash,
+    paycheckHistory,
+    isOnline,
+    isSyncing,
+  } = budget;
+=======
   const { envelopes, savingsGoals, unassignedCash, paycheckHistory, isOnline, isSyncing } = budget;
 
   // Calculate total biweekly need from all envelopes
   const totalBiweeklyNeed = envelopes.reduce((total, envelope) => {
     return total + (envelope.biweeklyAllocation || 0);
   }, 0);
+>>>>>>> origin/main
 
   // Payday prediction notifications (after destructuring)
   usePaydayPrediction(paycheckHistory, !!currentUser);
@@ -215,6 +214,37 @@ const MainContent = ({
     ? savingsGoals.reduce((sum, goal) => sum + goal.currentAmount, 0)
     : 0;
   const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
+
+  // Calculate total biweekly funding need across all envelope types
+  const totalBiweeklyNeed = Array.isArray(envelopes)
+    ? envelopes.reduce((sum, env) => {
+        // Auto-classify envelope type if not set
+        const envelopeType =
+          env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
+
+        let biweeklyNeed = 0;
+        if (envelopeType === "bill" && env.biweeklyAllocation) {
+          biweeklyNeed = Math.max(
+            0,
+            env.biweeklyAllocation - env.currentBalance,
+          );
+        } else if (envelopeType === "variable" && env.monthlyBudget) {
+          const biweeklyTarget = env.monthlyBudget / BIWEEKLY_MULTIPLIER;
+          biweeklyNeed = Math.max(0, biweeklyTarget - env.currentBalance);
+        } else if (envelopeType === "savings" && env.targetAmount) {
+          const remainingToTarget = Math.max(
+            0,
+            env.targetAmount - env.currentBalance,
+          );
+          biweeklyNeed = Math.min(
+            remainingToTarget,
+            env.biweeklyAllocation || 0,
+          );
+        }
+
+        return sum + biweeklyNeed;
+      }, 0)
+    : 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden pb-24 sm:pb-0">
@@ -317,6 +347,15 @@ const MainContent = ({
           </nav>
         </div>
 
+<<<<<<< HEAD
+        {/* Summary Cards - Enhanced with clickable unassigned cash distribution */}
+        <SummaryCards
+          totalCash={totalCash}
+          unassignedCash={unassignedCash}
+          totalSavingsBalance={totalSavingsBalance}
+          biweeklyAllocation={totalBiweeklyNeed}
+        />
+=======
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <SummaryCard
@@ -348,9 +387,10 @@ const MainContent = ({
             color="amber"
           />
         </div>
+>>>>>>> origin/main
 
         {/* Main Content */}
-        <ViewRenderer
+        <ViewRendererComponent
           activeView={activeView}
           budget={budget}
           currentUser={currentUser}
@@ -363,6 +403,9 @@ const MainContent = ({
           onResolveConflict={onResolveConflict}
           onDismiss={() => setSyncConflicts(null)}
         />
+
+        {/* Bug Report Button */}
+        <BugReportButton />
 
         {/* Version Footer */}
         <div className="mt-8 text-center">
@@ -393,6 +436,9 @@ const NavButton = ({ active, onClick, icon: Icon, label }) => (
   </button>
 );
 
+<<<<<<< HEAD
+// SummaryCard component removed - now using enhanced SummaryCards component with clickable functionality
+=======
 const SummaryCard = ({ icon: Icon, label, value, color }) => {
   const colorClasses = {
     purple: "bg-purple-500",
@@ -601,5 +647,6 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
     </Suspense>
   );
 };
+>>>>>>> origin/main
 
 export default Layout;
