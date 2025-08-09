@@ -53,12 +53,9 @@ const useBugReport = () => {
       // Get Highlight.io session URL for the bug report
       let sessionUrl = null;
       try {
-        const sessionMetadata = H.getSessionMetadata();
-        if (sessionMetadata?.sessionUrl) {
-          sessionUrl = sessionMetadata.sessionUrl;
-        }
+        sessionUrl = await H.getSessionURL();
       } catch (error) {
-        console.warn("Failed to get Highlight.io session metadata:", error);
+        console.warn("Failed to get Highlight.io session URL:", error);
       }
 
       const reportData = {
@@ -126,7 +123,7 @@ const useBugReport = () => {
   const openModal = () => {
     // Force start a Highlight.io session when opening bug report modal
     try {
-      H.start();
+      H.start({ silent: true });
       if (import.meta.env.MODE === "development") {
         console.log("🔧 Forced Highlight.io session start for bug report");
       }
