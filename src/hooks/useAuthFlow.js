@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import useAuthStore from "../stores/authStore";
+import { useAuth } from "../stores/authStore.jsx";
 import logger from "../utils/logger";
 
 /**
@@ -17,7 +17,7 @@ const useAuthFlow = () => {
     salt,
     changePassword,
     updateProfile,
-  } = useAuthStore();
+  } = useAuth();
 
   const handleSetup = useCallback(
     async (userData) => {

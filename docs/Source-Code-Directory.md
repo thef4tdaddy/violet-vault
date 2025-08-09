@@ -1,7 +1,7 @@
 # VioletVault Source Code Directory
 
-**Last Updated:** July 31, 2025  
-**Branch:** refactor/layout-ui-architecture-2025-08-04
+**Last Updated:** August 8, 2025  
+**Branch:** develop (v1.8.0 completed, v1.9.0 in progress)
 
 This document provides a comprehensive overview of the `/src/` directory structure and the purpose of each file and folder.
 
@@ -189,17 +189,19 @@ _Modal dialog components_
 
 _Custom React hooks for business logic_
 
-| Hook                     | Purpose                                                |
-| ------------------------ | ------------------------------------------------------ |
-| `useAuthFlow.js`         | Authentication flow management                         |
-| `useBudget.js`           | Simple budget data access (wrapper around budgetStore) |
-| `useBudgetQuery.js`      | Advanced budget operations with React Query + Dexie    |
-| `useDataManagement.js`   | Import/export operations                               |
-| `useFirebaseSync.js`     | Firebase synchronization and activity management       |
-| `useNetworkStatus.js`    | Network status management (online/offline detection)   |
-| `usePasswordRotation.js` | Password security and rotation                         |
-| `usePaydayPrediction.js` | Payday prediction and notifications                    |
-| `useToast.js`            | Toast notification management                          |
+| Hook                     | Purpose                                                             |
+| ------------------------ | ------------------------------------------------------------------- |
+| `useActualBalance.js`    | Bank account balance management and reconciliation                  |
+| `useAuthFlow.js`         | Authentication flow management                                      |
+| `useBudgetData.js`       | **NEW v1.9** - Unified TanStack Query + Zustand + Dexie hook        |
+| `useDataManagement.js`   | Import/export operations                                            |
+| `useEnvelopes.js`        | **NEW v1.9** - Specialized envelope management with smart filtering |
+| `useFirebaseSync.js`     | Firebase synchronization and activity management                    |
+| `useNetworkStatus.js`    | Network status management (online/offline detection)                |
+| `usePasswordRotation.js` | Password security and rotation                                      |
+| `usePaydayPrediction.js` | Payday prediction and notifications                                 |
+| `useToast.js`            | Toast notification management                                       |
+| `useTransactions.js`     | **NEW v1.9** - Advanced transaction queries with analytics          |
 
 ## 🏪 Stores Directory (`/stores/`)
 
@@ -207,7 +209,7 @@ _Zustand state management stores_
 
 | Store            | Purpose                                           |
 | ---------------- | ------------------------------------------------- |
-| `authStore.js`   | Authentication state management                   |
+| `authStore.jsx`  | Authentication state management (renamed for JSX) |
 | `budgetStore.js` | Main budget data state management (Zustand store) |
 
 ## 🌐 Contexts Directory (`/contexts/`)
@@ -223,19 +225,19 @@ _React context providers_
 
 _Utility functions and services_
 
-| Utility                | Purpose                                                    |
-| ---------------------- | ---------------------------------------------------------- |
-| `billIcons.js`         | Bill categorization icons                                  |
-| `budgetQueryClient.js` | Budget-specific React Query client with optimistic updates |
-| `encryption.js`        | Data encryption/decryption utilities                       |
-| `firebaseConfig.js`    | Firebase configuration                                     |
-| `firebaseSync.js`      | Firebase synchronization service                           |
-| `logger.js`            | Application logging utilities                              |
-| `paydayPredictor.js`   | Payday prediction algorithms                               |
-| `performance.js`       | Performance monitoring utilities                           |
-| `queryClient.js`       | Global React Query client (used in main.jsx)               |
-| `sentry.js`            | Error monitoring and reporting                             |
-| `version.js`           | Application version management                             |
+| Utility              | Purpose                                                                     |
+| -------------------- | --------------------------------------------------------------------------- |
+| `billIcons.js`       | Bill categorization icons                                                   |
+| `encryption.js`      | Data encryption/decryption utilities                                        |
+| `firebaseConfig.js`  | Firebase configuration                                                      |
+| `firebaseSync.js`    | Firebase synchronization service                                            |
+| `highlight.js`       | Error highlighting and debugging utilities                                  |
+| `logger.js`          | Application logging utilities                                               |
+| `paydayPredictor.js` | Payday prediction algorithms with enhanced recommendations                  |
+| `performance.js`     | Performance monitoring utilities                                            |
+| `queryClient.js`     | **Enhanced v1.9** - TanStack Query + Dexie integration with offline support |
+| `sentry.js`          | Error monitoring and reporting                                              |
+| `version.js`         | Application version management                                              |
 
 ## 💾 Database Directory (`/db/`)
 
@@ -288,7 +290,29 @@ _Application constants and configurations_
 ✅ **Phase 1:** Custom hooks extraction (`useAuthFlow`, `useDataManagement`, `usePasswordRotation`)  
 ✅ **Phase 2:** UI component extraction (NavigationTabs, SummaryCards, ViewRenderer, etc.)  
 ✅ **Phase 2.1:** File system cleanup and optimization  
-✅ **Phase 2.2:** MainLayout.jsx business logic extraction - **COMPLETED!**
+✅ **Phase 2.2:** MainLayout.jsx business logic extraction - **COMPLETED!**  
+✅ **v1.8.0:** Cash management enhancements and state cleanup - **COMPLETED!**
+
+#### **v1.8.0 Milestone Achievements:**
+
+- ✅ Enhanced payday prediction with proactive funding suggestions (#28)
+- ✅ Comprehensive state management cleanup (#211) - Zustand consolidation
+- ✅ Logo styling fixes for glassmorphic design (#222)
+- ✅ AuthContext renamed to authStore.jsx for consistency (#221)
+- ✅ Password rotation security system fully connected to Zustand (#88)
+- ✅ Debt tracking Phase 1 foundation (#115)
+
+#### **v1.9.0 In Progress - Enhanced Data Layer:**
+
+- ✅ **Phase 1 Complete:** TanStack Query + Dexie integration foundation
+  - Consolidated duplicate query clients into unified enhanced version
+  - Created `useBudgetData` - unified data access hook
+  - Built specialized hooks: `useEnvelopes`, `useTransactions`
+  - Implemented automatic cache persistence with Dexie
+  - Added network-aware sync with offline support
+  - Smart query invalidation and optimistic updates
+
+#### **Business Logic Extraction:**
 
 - Extracted all business logic into custom hooks:
   - `useAuthFlow.js` - Authentication operations
@@ -297,6 +321,9 @@ _Application constants and configurations_
   - `useNetworkStatus.js` - Network status detection
   - `useFirebaseSync.js` - Sync operations and activity management
   - `usePaydayPrediction.js` - Payday notifications
+  - `useBudgetData.js` - **NEW** Unified data layer
+  - `useEnvelopes.js` - **NEW** Specialized envelope management
+  - `useTransactions.js` - **NEW** Advanced transaction queries
 - MainLayout.jsx is now a **pure UI component** as intended
 - Reduced MainLayout from ~1,100+ lines to ~390 lines (65% reduction)
 - Business logic properly separated and reusable

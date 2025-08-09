@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useBudget } from "./useBudget";
+import { useBudgetStore } from "../stores/budgetStore";
 import logger from "../utils/logger";
 
 /**
@@ -7,7 +7,7 @@ import logger from "../utils/logger";
  * Extracts sync logic from MainLayout component
  */
 const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => {
-  const budget = useBudget();
+  const budget = useBudgetStore();
   const [activeUsers, setActiveUsers] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
   const [isLoading, setIsLoading] = useState(false);

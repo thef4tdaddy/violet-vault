@@ -27,9 +27,7 @@ const migrateOldData = () => {
 
     // Migrate if old data exists (always replace new data)
     if (oldData) {
-      console.log(
-        "🔄 Migrating data from old budget-store to violet-vault-store...",
-      );
+      console.log("🔄 Migrating data from old budget-store to violet-vault-store...");
 
       const parsedOldData = JSON.parse(oldData);
 
@@ -42,8 +40,7 @@ const migrateOldData = () => {
             transactions: parsedOldData.state.transactions || [],
             allTransactions: parsedOldData.state.allTransactions || [],
             savingsGoals: parsedOldData.state.savingsGoals || [],
-            supplementalAccounts:
-              parsedOldData.state.supplementalAccounts || [],
+            supplementalAccounts: parsedOldData.state.supplementalAccounts || [],
             debts: parsedOldData.state.debts || [],
             unassignedCash: parsedOldData.state.unassignedCash || 0,
             biweeklyAllocation: parsedOldData.state.biweeklyAllocation || 0,
@@ -53,13 +50,8 @@ const migrateOldData = () => {
           version: 0,
         };
 
-        localStorage.setItem(
-          "violet-vault-store",
-          JSON.stringify(transformedData),
-        );
-        console.log(
-          "✅ Data migration completed successfully - replaced existing data",
-        );
+        localStorage.setItem("violet-vault-store", JSON.stringify(transformedData));
+        console.log("✅ Data migration completed successfully - replaced existing data");
 
         // Remove old data after successful migration
         localStorage.removeItem("budget-store");
@@ -177,12 +169,8 @@ const storeInitializer = (set, get) => ({
 
   updateTransaction: (transaction) =>
     set((state) => {
-      const transIndex = state.transactions.findIndex(
-        (t) => t.id === transaction.id,
-      );
-      const allTransIndex = state.allTransactions.findIndex(
-        (t) => t.id === transaction.id,
-      );
+      const transIndex = state.transactions.findIndex((t) => t.id === transaction.id);
+      const allTransIndex = state.allTransactions.findIndex((t) => t.id === transaction.id);
 
       if (transIndex !== -1) {
         state.transactions[transIndex] = transaction;
@@ -237,9 +225,7 @@ const storeInitializer = (set, get) => ({
       });
 
       const billIndex = state.bills.findIndex((b) => b.id === bill.id);
-      const allTransIndex = state.allTransactions.findIndex(
-        (t) => t.id === bill.id,
-      );
+      const allTransIndex = state.allTransactions.findIndex((t) => t.id === bill.id);
 
       console.log("🔄 Update bill indices", {
         billIndex,
@@ -399,31 +385,20 @@ const storeInitializer = (set, get) => ({
 
   deleteSupplementalAccount: (id) =>
     set((state) => {
-      state.supplementalAccounts = state.supplementalAccounts.filter(
-        (a) => a.id !== id,
-      );
+      state.supplementalAccounts = state.supplementalAccounts.filter((a) => a.id !== id);
     }),
 
-  transferFromSupplementalAccount: (
-    accountId,
-    envelopeId,
-    amount,
-    description,
-  ) =>
+  transferFromSupplementalAccount: (accountId, envelopeId, amount, description) =>
     set((state) => {
       // Find and update supplemental account
-      const accountIndex = state.supplementalAccounts.findIndex(
-        (a) => a.id === accountId,
-      );
+      const accountIndex = state.supplementalAccounts.findIndex((a) => a.id === accountId);
       if (accountIndex === -1) return;
 
       const account = state.supplementalAccounts[accountIndex];
       if (account.currentBalance < amount) return;
 
       // Find and update envelope
-      const envelopeIndex = state.envelopes.findIndex(
-        (e) => e.id === envelopeId,
-      );
+      const envelopeIndex = state.envelopes.findIndex((e) => e.id === envelopeId);
       if (envelopeIndex === -1) return;
 
       // Update balances
@@ -527,16 +502,12 @@ const storeInitializer = (set, get) => ({
   // Remove duplicate reconcile transactions
   removeDuplicateReconcileTransactions: () =>
     set((state) => {
-      const reconcilePatterns = [
-        "Balance reconciliation",
-        "reconciliation",
-        "Auto-Reconcile",
-      ];
+      const reconcilePatterns = ["Balance reconciliation", "reconciliation", "Auto-Reconcile"];
 
       // Filter out duplicate reconcile transactions
       state.transactions = state.transactions.filter((t, index, array) => {
         const isReconcile = reconcilePatterns.some((pattern) =>
-          t.description?.toLowerCase().includes(pattern.toLowerCase()),
+          t.description?.toLowerCase().includes(pattern.toLowerCase())
         );
 
         if (!isReconcile) return true;
@@ -547,34 +518,28 @@ const storeInitializer = (set, get) => ({
             (other) =>
               other.description === t.description &&
               other.amount === t.amount &&
-              Math.abs(
-                new Date(other.date).getTime() - new Date(t.date).getTime(),
-              ) < 60000, // Within 1 minute
+              Math.abs(new Date(other.date).getTime() - new Date(t.date).getTime()) < 60000 // Within 1 minute
           ) === index
         );
       });
 
-      state.allTransactions = state.allTransactions.filter(
-        (t, index, array) => {
-          const isReconcile = reconcilePatterns.some((pattern) =>
-            t.description?.toLowerCase().includes(pattern.toLowerCase()),
-          );
+      state.allTransactions = state.allTransactions.filter((t, index, array) => {
+        const isReconcile = reconcilePatterns.some((pattern) =>
+          t.description?.toLowerCase().includes(pattern.toLowerCase())
+        );
 
-          if (!isReconcile) return true;
+        if (!isReconcile) return true;
 
-          // Keep only the first occurrence of each reconcile transaction
-          return (
-            array.findIndex(
-              (other) =>
-                other.description === t.description &&
-                other.amount === t.amount &&
-                Math.abs(
-                  new Date(other.date).getTime() - new Date(t.date).getTime(),
-                ) < 60000, // Within 1 minute
-            ) === index
-          );
-        },
-      );
+        // Keep only the first occurrence of each reconcile transaction
+        return (
+          array.findIndex(
+            (other) =>
+              other.description === t.description &&
+              other.amount === t.amount &&
+              Math.abs(new Date(other.date).getTime() - new Date(t.date).getTime()) < 60000 // Within 1 minute
+          ) === index
+        );
+      });
     }),
 
   // Reset functionality
@@ -625,9 +590,12 @@ if (LOCAL_ONLY_MODE) {
           isActualBalanceManual: state.isActualBalanceManual,
         }),
       }),
-      { name: "violet-vault-devtools" },
-    ),
+      { name: "violet-vault-devtools" }
+    )
   );
 }
 
 export default useOptimizedBudgetStore;
+
+// Provide a more intuitive export alias
+export { useOptimizedBudgetStore as useBudgetStore };

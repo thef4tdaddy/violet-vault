@@ -1,13 +1,13 @@
 import { useState, useCallback, useEffect } from "react";
 import { encryptionUtils } from "../utils/encryption";
-import useAuthStore from "../stores/authStore";
+import { useAuth } from "../stores/authStore.jsx";
 
 /**
  * Custom hook for password rotation management
  * Extracts password rotation logic from Layout component
  */
 const usePasswordRotation = () => {
-  const { encryptionKey } = useAuthStore();
+  const { encryptionKey } = useAuth();
   const [rotationDue, setRotationDue] = useState(false);
   const [showRotationModal, setShowRotationModal] = useState(false);
   const [newPassword, setNewPassword] = useState("");
@@ -60,7 +60,7 @@ const usePasswordRotation = () => {
       localStorage.setItem("envelopeBudgetData", JSON.stringify(saveData));
 
       // Update the auth store with new encryption details
-      const { setEncryption } = useAuthStore.getState();
+      const { setEncryption } = useAuth.getState();
       setEncryption({ key, salt: newSalt });
 
       localStorage.setItem("passwordLastChanged", Date.now().toString());

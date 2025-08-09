@@ -13,11 +13,11 @@ import { useTransactionForm } from "./hooks/useTransactionForm";
 import { useTransactionImport } from "./hooks/useTransactionImport";
 import { suggestEnvelope } from "./utils/envelopeMatching";
 import { TRANSACTION_CATEGORIES } from "../../constants/categories";
-import { useBudget } from "../../hooks/useBudget";
+import { useBudgetStore } from "../../stores/budgetStore";
 
 const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855f7" } }) => {
   // Get live data from budget store instead of props
-  const budget = useBudget();
+  const budget = useBudgetStore();
   const {
     allTransactions: transactions = [],
     envelopes = [],
@@ -89,7 +89,10 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
 
     if (editingTransaction) {
       // Budget store updateTransaction expects the full transaction object with id
-      const transactionWithId = { ...newTransaction, id: editingTransaction.id };
+      const transactionWithId = {
+        ...newTransaction,
+        id: editingTransaction.id,
+      };
       updateTransaction(transactionWithId);
       setEditingTransaction(null);
     } else {

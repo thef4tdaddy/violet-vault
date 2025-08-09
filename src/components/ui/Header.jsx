@@ -45,8 +45,8 @@ const Header = memo(
       >
         <div className="flex flex-col items-center text-center">
           {/* Logo and tagline */}
-          <div className="flex flex-col items-center w-full -my-2">
-            <div className="rounded-2xl border-4 border-purple-600 p-2 bg-white/95">
+          <div className="flex flex-col items-center w-full px-6 py-8">
+            <div className="rounded border-4 border-purple-600 bg-white/95 mb-4">
               <img
                 src={logoWithText}
                 alt="VioletVault Logo"
@@ -57,20 +57,20 @@ const Header = memo(
                 }}
               />
             </div>
-            <p className="text-gray-600 text-sm font-medium -mt-6">
+            <p className="text-gray-600 text-sm font-medium">
               Encryption First, Family Budgeting Management
             </p>
           </div>
 
           {/* Buttons row */}
-          <div className="flex items-center justify-center flex-wrap gap-4 pt-2 pb-4 px-4">
+          <div className="flex items-center justify-center flex-wrap gap-2 sm:gap-4 pt-2 pb-4 px-2 sm:px-4">
             <UserIndicator
               currentUser={currentUser}
               onUserChange={onUserChange}
               onUpdateProfile={onUpdateProfile}
             />
 
-            <div className="flex gap-3 items-center justify-center">
+            <div className="flex gap-2 sm:gap-3 items-center justify-center flex-wrap">
               <input
                 type="file"
                 accept=".json"
@@ -80,45 +80,45 @@ const Header = memo(
               />
               <label
                 htmlFor="import-data"
-                className="btn btn-secondary flex items-center cursor-pointer rounded-2xl px-4 py-2 font-medium hover:shadow-lg transition-all"
+                className="btn btn-secondary flex items-center cursor-pointer rounded-2xl px-3 sm:px-4 py-2 text-sm font-medium hover:shadow-lg transition-all"
               >
-                <Upload className="h-4 w-4 mr-2" />
-                Import
+                <Upload className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Import</span>
               </label>
 
               <button
                 onClick={onExport}
-                className="btn btn-secondary flex items-center rounded-2xl px-4 py-2 font-medium hover:shadow-lg transition-all"
+                className="btn btn-secondary flex items-center rounded-2xl px-3 sm:px-4 py-2 text-sm font-medium hover:shadow-lg transition-all"
               >
-                <Download className="h-4 w-4 mr-2" />
-                Export
+                <Download className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Export</span>
               </button>
 
               <button
                 onClick={handleTogglePasswordModal}
-                className="btn btn-secondary flex items-center rounded-2xl px-4 py-2 font-medium hover:shadow-lg transition-all"
+                className="btn btn-secondary flex items-center rounded-2xl px-3 sm:px-4 py-2 text-sm font-medium hover:shadow-lg transition-all"
               >
-                <Key className="h-4 w-4 mr-2" />
-                Change Password
+                <Key className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Change Password</span>
               </button>
 
               {LOCAL_ONLY_MODE && (
                 <button
                   onClick={onSync}
-                  className="btn btn-primary flex items-center rounded-2xl px-4 py-2 font-medium hover:shadow-lg transition-all"
+                  className="btn btn-primary flex items-center rounded-2xl px-3 sm:px-4 py-2 text-sm font-medium hover:shadow-lg transition-all"
                 >
-                  <Cloud className="h-4 w-4 mr-2" />
-                  Sync to Cloud
+                  <Cloud className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Sync to Cloud</span>
                 </button>
               )}
 
               <div className="relative" style={{ zIndex: 50 }}>
                 <button
                   onClick={handleToggleResetModal}
-                  className="btn text-amber-600 bg-amber-50 border border-amber-200 hover:bg-amber-100 hover:shadow-lg flex items-center rounded-2xl px-4 py-2 font-medium transition-all"
+                  className="btn text-amber-600 bg-amber-50 border border-amber-200 hover:bg-amber-100 hover:shadow-lg flex items-center rounded-2xl px-3 sm:px-4 py-2 text-sm font-medium transition-all"
                 >
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Reset
+                  <RefreshCw className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Reset</span>
                 </button>
               </div>
             </div>

@@ -134,6 +134,70 @@ export const getDaysUntilPayday = (prediction, today = new Date()) => {
 };
 
 /**
+ * Get proactive funding recommendations based on payday timing
+ * @param {Object} prediction - Prediction object from predictNextPayday
+ * @param {Date} today - Today's date (optional, defaults to new Date())
+ * @returns {Object} Funding recommendations
+ */
+export const getPaydayRecommendations = (prediction, today = new Date()) => {
+  const daysUntil = getDaysUntilPayday(prediction, today);
+
+  if (!prediction.nextPayday || daysUntil < 0 || daysUntil > 7) {
+    return {
+      showRecommendations: false,
+      actions: [],
+    };
+  }
+
+  const actions = [];
+
+  if (daysUntil === 0) {
+    actions.push({
+      type: "process_paycheck",
+      priority: "high",
+      title: "Process Today's Paycheck",
+      description: "Add your paycheck and distribute to envelopes",
+      actionText: "Process Now",
+      color: "purple",
+    });
+  } else if (daysUntil === 1) {
+    actions.push({
+      type: "prepare_tomorrow",
+      priority: "medium",
+      title: "Payday Tomorrow!",
+      description: "Review your envelope allocation plan",
+      actionText: "Review Plan",
+      color: "emerald",
+    });
+  } else if (daysUntil >= 2 && daysUntil <= 3) {
+    actions.push({
+      type: "plan_ahead",
+      priority: "low",
+      title: `Payday in ${daysUntil} days`,
+      description: "Plan your envelope funding strategy",
+      actionText: "Plan Ahead",
+      color: "amber",
+    });
+  } else if (daysUntil >= 4 && daysUntil <= 7) {
+    actions.push({
+      type: "early_planning",
+      priority: "low",
+      title: `Payday in ${daysUntil} days`,
+      description: "Consider reviewing your budget allocation",
+      actionText: "Review Budget",
+      color: "blue",
+    });
+  }
+
+  return {
+    showRecommendations: actions.length > 0,
+    actions,
+    daysUntil,
+    confidence: prediction.confidence,
+  };
+};
+
+/**
  * Format payday prediction for display
  * @param {Object} prediction - Prediction object from predictNextPayday
  * @returns {Object} Formatted display information

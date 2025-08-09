@@ -18,12 +18,12 @@ import PaydayPrediction from "../budgeting/PaydayPrediction";
 import { predictNextPayday } from "../../utils/paydayPredictor";
 import EditableBalance from "../ui/EditableBalance";
 import { useActualBalance } from "../../hooks/useActualBalance";
-import { useBudget } from "../../hooks/useBudget";
+import { useBudgetStore } from "../../stores/budgetStore";
 import DebtSummaryWidget from "../debt/ui/DebtSummaryWidget";
 
 const Dashboard = () => {
   // Get live data from budget store instead of props
-  const budget = useBudget();
+  const budget = useBudgetStore();
   const {
     envelopes,
     savingsGoals,
@@ -120,11 +120,29 @@ const Dashboard = () => {
     return options;
   };
 
+  // Handle payday actions
+  const handleProcessPaycheck = () => {
+    // Navigate to paycheck processor or trigger paycheck modal
+    alert("Navigate to paycheck processor for payday processing!");
+    // TODO: Integrate with actual paycheck processing flow
+  };
+
+  const handlePrepareEnvelopes = () => {
+    // Navigate to envelope management or show planning interface
+    alert("Navigate to envelope management for funding planning!");
+    // TODO: Integrate with envelope planning interface
+  };
+
   return (
     <div className="space-y-6">
       {/* Payday Prediction */}
       {paydayPrediction && (
-        <PaydayPrediction prediction={paydayPrediction} className="mb-6" />
+        <PaydayPrediction
+          prediction={paydayPrediction}
+          className="mb-6"
+          onProcessPaycheck={handleProcessPaycheck}
+          onPrepareEnvelopes={handlePrepareEnvelopes}
+        />
       )}
 
       {/* Debt Summary Widget */}
