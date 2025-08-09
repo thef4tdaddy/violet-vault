@@ -21,7 +21,7 @@
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}",
-      "runtimeExecutable": "npm", 
+      "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "build"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
@@ -35,7 +35,7 @@
       "runtimeArgs": ["run", "preview"],
       "serverReadyAction": {
         "pattern": "Local:\\s+(https?://localhost:\\d+)",
-        "uriFormat": "%s", 
+        "uriFormat": "%s",
         "action": "openExternally"
       },
       "console": "integratedTerminal",

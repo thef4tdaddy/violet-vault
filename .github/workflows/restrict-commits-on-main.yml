@@ -36,14 +36,14 @@ jobs:
           ALLOWED="^(fix|docs|chore\(main\)|ci|revert):"
           PR_NUMBER=${{ github.event.pull_request.number }}
           REPO=${{ github.repository }}
-          
+
           # Debug information
           echo "🔍 Debug Info:"
           echo "  - PR Number: $PR_NUMBER" 
           echo "  - Repository: $REPO"
           echo "  - Actor: ${{ github.actor }}"
           echo "  - Event: ${{ github.event_name }}"
-          
+
           # Handle different event types
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             if [ -z "$PR_NUMBER" ]; then
@@ -57,13 +57,13 @@ jobs:
             # For push events, get the recent commits
             git log --format=%s -n 10 > commits.txt
           fi
-          
+
           # Check if commits.txt has content
           if [ ! -s commits.txt ]; then
             echo "⚠️  No commit messages found, skipping validation"
             exit 0
           fi
-          
+
           echo "📋 Found commits to validate:"
           cat -n commits.txt
           echo ""

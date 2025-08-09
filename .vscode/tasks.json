@@ -176,7 +176,7 @@
     {
       "label": "🚀 Deploy Production",
       "type": "shell",
-      "command": "${workspaceFolder}/scripts/deploy-production.sh", 
+      "command": "${workspaceFolder}/scripts/deploy-production.sh",
       "group": "build",
       "presentation": {
         "echo": true,
@@ -204,7 +204,10 @@
       "label": "🎯 Deploy Manager",
       "type": "shell",
       "command": "node",
-      "args": ["${workspaceFolder}/scripts/deploy.js", "${input:deployEnvironment}"],
+      "args": [
+        "${workspaceFolder}/scripts/deploy.js",
+        "${input:deployEnvironment}"
+      ],
       "group": "build",
       "presentation": {
         "echo": true,
@@ -218,7 +221,10 @@
       "label": "🔄 Rollback Manager",
       "type": "shell",
       "command": "node",
-      "args": ["${workspaceFolder}/scripts/rollback.js", "${input:rollbackTarget}"],
+      "args": [
+        "${workspaceFolder}/scripts/rollback.js",
+        "${input:rollbackTarget}"
+      ],
       "group": "build",
       "presentation": {
         "echo": true,
@@ -244,7 +250,7 @@
     },
     {
       "label": "🌳 Git Branch Info",
-      "type": "shell", 
+      "type": "shell",
       "command": "git",
       "args": ["branch", "-vv"],
       "group": "build",
@@ -261,7 +267,7 @@
       "type": "shell",
       "command": "git",
       "args": ["log", "--oneline", "-10"],
-      "group": "build", 
+      "group": "build",
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -273,10 +279,7 @@
     {
       "label": "✨ Format & Lint",
       "dependsOrder": "sequence",
-      "dependsOn": [
-        "🎨 Format Code",
-        "🔍 Lint Code"
-      ],
+      "dependsOn": ["🎨 Format Code", "🔍 Lint Code"],
       "group": {
         "kind": "build",
         "isDefault": false
@@ -290,12 +293,8 @@
     },
     {
       "label": "🚢 Full Deploy Staging",
-      "dependsOrder": "sequence", 
-      "dependsOn": [
-        "✨ Format & Lint",
-        "🔨 Build",
-        "🧪 Deploy Staging"
-      ],
+      "dependsOrder": "sequence",
+      "dependsOn": ["✨ Format & Lint", "🔨 Build", "🧪 Deploy Staging"],
       "group": "build",
       "presentation": {
         "echo": true,
@@ -307,11 +306,7 @@
     {
       "label": "🎯 Full Deploy Production",
       "dependsOrder": "sequence",
-      "dependsOn": [
-        "✨ Format & Lint", 
-        "🔨 Build",
-        "🚀 Deploy Production"
-      ],
+      "dependsOn": ["✨ Format & Lint", "🔨 Build", "🚀 Deploy Production"],
       "group": "build",
       "presentation": {
         "echo": true,
@@ -323,11 +318,7 @@
     {
       "label": "🔧 Pre-commit Checks",
       "dependsOrder": "sequence",
-      "dependsOn": [
-        "🎨 Format Code",
-        "🔧 Lint Fix",
-        "🔨 Build"
-      ],
+      "dependsOn": ["🎨 Format Code", "🔧 Lint Fix", "🔨 Build"],
       "group": {
         "kind": "test",
         "isDefault": true
@@ -345,22 +336,14 @@
       "id": "deployEnvironment",
       "description": "Deployment Environment",
       "type": "pickString",
-      "options": [
-        "development",
-        "staging", 
-        "production"
-      ],
+      "options": ["development", "staging", "production"],
       "default": "staging"
     },
     {
       "id": "rollbackTarget",
       "description": "Rollback Target",
-      "type": "pickString", 
-      "options": [
-        "commit",
-        "tag",
-        "backup"
-      ],
+      "type": "pickString",
+      "options": ["commit", "tag", "backup"],
       "default": "commit"
     }
   ]

@@ -5,12 +5,14 @@ This Cloudflare Worker handles bug reports submitted from the VioletVault applic
 ## Quick Start
 
 1. **Install Wrangler CLI:**
+
 ```bash
 npm install -g wrangler
 wrangler login
 ```
 
 2. **Deploy the worker:**
+
 ```bash
 npm run deploy
 ```
@@ -31,16 +33,18 @@ npm run deploy
 ## Environment Variables
 
 ### Required
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `GITHUB_TOKEN` | GitHub personal access token | `ghp_xxxxxxxxxxxx` |
-| `GITHUB_REPO` | Repository name | `username/violet-vault` |
+
+| Variable       | Description                  | Example                 |
+| -------------- | ---------------------------- | ----------------------- |
+| `GITHUB_TOKEN` | GitHub personal access token | `ghp_xxxxxxxxxxxx`      |
+| `GITHUB_REPO`  | Repository name              | `username/violet-vault` |
 
 ### Optional
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `R2_PUBLIC_DOMAIN` | Custom domain for screenshots | `cdn.your-domain.com` |
-| `NOTIFICATION_WEBHOOK` | Webhook for notifications | `https://hooks.slack.com/...` |
+
+| Variable               | Description                   | Example                       |
+| ---------------------- | ----------------------------- | ----------------------------- |
+| `R2_PUBLIC_DOMAIN`     | Custom domain for screenshots | `cdn.your-domain.com`         |
+| `NOTIFICATION_WEBHOOK` | Webhook for notifications     | `https://hooks.slack.com/...` |
 
 ## API Endpoints
 
@@ -49,6 +53,7 @@ npm run deploy
 Accepts bug reports and creates GitHub issues.
 
 **Request Body:**
+
 ```json
 {
   "description": "Bug description",
@@ -66,6 +71,7 @@ Accepts bug reports and creates GitHub issues.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -78,11 +84,13 @@ Accepts bug reports and creates GitHub issues.
 ## Development
 
 ### Local Development
+
 ```bash
 npm run dev
 ```
 
 ### Testing
+
 ```bash
 curl -X POST http://localhost:8787/report-issue \
   -H "Content-Type: application/json" \
@@ -90,6 +98,7 @@ curl -X POST http://localhost:8787/report-issue \
 ```
 
 ### View Logs
+
 ```bash
 npm run tail
 ```
@@ -97,17 +106,21 @@ npm run tail
 ## Deployment
 
 ### Staging
+
 ```bash
 npm run deploy
 ```
 
 ### Production
+
 ```bash
 npm run deploy:production
 ```
 
 ### Using Deployment Script
+
 From the project root:
+
 ```bash
 ./scripts/deploy-bug-reporter.sh production
 ```
@@ -117,6 +130,7 @@ From the project root:
 ### Custom Domains
 
 Update `wrangler.toml` routes section:
+
 ```toml
 [env.production]
 routes = [
@@ -127,6 +141,7 @@ routes = [
 ### R2 Storage
 
 Configure R2 bucket for screenshot storage:
+
 ```toml
 [[r2_buckets]]
 binding = "R2_BUCKET"
@@ -151,15 +166,18 @@ bucket_name = "violet-vault-screenshots"
 ### Common Issues
 
 **1. CORS Errors**
+
 - Check CORS headers in worker response
 - Verify frontend domain is allowed
 
 **2. GitHub API Errors**
+
 - Verify token permissions
 - Check API rate limits
 - Ensure repository exists and is accessible
 
 **3. R2 Upload Failures**
+
 - Check R2 bucket permissions
 - Verify R2_PUBLIC_DOMAIN configuration
 - Check file size limits

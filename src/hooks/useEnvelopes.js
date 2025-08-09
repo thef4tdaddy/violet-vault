@@ -9,11 +9,11 @@ import { budgetDb } from "../db/budgetDb";
  */
 const useEnvelopes = (options = {}) => {
   const queryClient = useQueryClient();
-  const { 
-    category, 
-    includeArchived = false, 
-    sortBy = 'name',
-    sortOrder = 'asc' 
+  const {
+    category,
+    includeArchived = false,
+    sortBy = "name",
+    sortOrder = "asc",
   } = options;
 
   // Get Zustand store for mutations
@@ -45,11 +45,13 @@ const useEnvelopes = (options = {}) => {
     let filteredEnvelopes = envelopes;
 
     if (category) {
-      filteredEnvelopes = filteredEnvelopes.filter(env => env.category === category);
+      filteredEnvelopes = filteredEnvelopes.filter(
+        (env) => env.category === category,
+      );
     }
 
     if (!includeArchived) {
-      filteredEnvelopes = filteredEnvelopes.filter(env => !env.archived);
+      filteredEnvelopes = filteredEnvelopes.filter((env) => !env.archived);
     }
 
     // Apply sorting
@@ -58,18 +60,18 @@ const useEnvelopes = (options = {}) => {
       let bVal = b[sortBy];
 
       // Handle numeric fields
-      if (sortBy === 'currentBalance' || sortBy === 'targetAmount') {
+      if (sortBy === "currentBalance" || sortBy === "targetAmount") {
         aVal = parseFloat(aVal) || 0;
         bVal = parseFloat(bVal) || 0;
       }
 
       // Handle string fields
-      if (typeof aVal === 'string') {
+      if (typeof aVal === "string") {
         aVal = aVal.toLowerCase();
         bVal = bVal.toLowerCase();
       }
 
-      if (sortOrder === 'desc') {
+      if (sortOrder === "desc") {
         return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
       } else {
         return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
@@ -81,7 +83,12 @@ const useEnvelopes = (options = {}) => {
 
   // Main envelopes query
   const envelopesQuery = useQuery({
-    queryKey: queryKeys.envelopesList({ category, includeArchived, sortBy, sortOrder }),
+    queryKey: queryKeys.envelopesList({
+      category,
+      includeArchived,
+      sortBy,
+      sortOrder,
+    }),
     queryFn: queryFunction,
     staleTime: 2 * 60 * 1000, // 2 minutes
     enabled: true,
@@ -95,7 +102,7 @@ const useEnvelopes = (options = {}) => {
         id: Date.now().toString(),
         currentBalance: 0,
         targetAmount: 0,
-        category: 'expenses',
+        category: "expenses",
         archived: false,
         createdAt: new Date().toISOString(),
         ...envelopeData,
@@ -103,7 +110,7 @@ const useEnvelopes = (options = {}) => {
 
       // Optimistic update
       await optimisticHelpers.addEnvelope(newEnvelope);
-      
+
       // Call Zustand mutation
       zustandAddEnvelope(newEnvelope);
 
@@ -126,7 +133,7 @@ const useEnvelopes = (options = {}) => {
     mutationFn: async ({ id, updates }) => {
       // Apply optimistic update
       await optimisticHelpers.updateEnvelope(id, updates);
-      
+
       // Call Zustand mutation
       zustandUpdateEnvelope(id, updates);
 
@@ -148,7 +155,7 @@ const useEnvelopes = (options = {}) => {
     mutationFn: async (envelopeId) => {
       // Apply optimistic update
       await optimisticHelpers.removeEnvelope(envelopeId);
-      
+
       // Call Zustand mutation
       zustandDeleteEnvelope(envelopeId);
 
@@ -167,23 +174,37 @@ const useEnvelopes = (options = {}) => {
   // Fund transfer mutation
   const transferFundsMutation = useMutation({
     mutationKey: ["envelopes", "transfer"],
-    mutationFn: async ({ fromEnvelopeId, toEnvelopeId, amount, description }) => {
+    mutationFn: async ({
+      fromEnvelopeId,
+      toEnvelopeId,
+      amount,
+      description,
+    }) => {
       // Call Zustand mutation
-      const result = zustandTransferFunds(fromEnvelopeId, toEnvelopeId, amount, description);
-      
+      const result = zustandTransferFunds(
+        fromEnvelopeId,
+        toEnvelopeId,
+        amount,
+        description,
+      );
+
       // Update both envelopes in cache and Dexie
-      const fromEnvelope = zustandEnvelopes.find(env => env.id === fromEnvelopeId);
-      const toEnvelope = zustandEnvelopes.find(env => env.id === toEnvelopeId);
-      
+      const fromEnvelope = zustandEnvelopes.find(
+        (env) => env.id === fromEnvelopeId,
+      );
+      const toEnvelope = zustandEnvelopes.find(
+        (env) => env.id === toEnvelopeId,
+      );
+
       if (fromEnvelope) {
         await optimisticHelpers.updateEnvelope(fromEnvelopeId, {
-          currentBalance: fromEnvelope.currentBalance - amount
+          currentBalance: fromEnvelope.currentBalance - amount,
         });
       }
-      
+
       if (toEnvelope) {
         await optimisticHelpers.updateEnvelope(toEnvelopeId, {
-          currentBalance: toEnvelope.currentBalance + amount
+          currentBalance: toEnvelope.currentBalance + amount,
         });
       }
 
@@ -202,22 +223,29 @@ const useEnvelopes = (options = {}) => {
 
   // Computed values
   const envelopes = envelopesQuery.data || [];
-  const totalBalance = envelopes.reduce((sum, env) => sum + (env.currentBalance || 0), 0);
-  const totalTargetAmount = envelopes.reduce((sum, env) => sum + (env.targetAmount || 0), 0);
-  const underfundedEnvelopes = envelopes.filter(env => 
-    (env.currentBalance || 0) < (env.targetAmount || 0)
+  const totalBalance = envelopes.reduce(
+    (sum, env) => sum + (env.currentBalance || 0),
+    0,
   );
-  const overfundedEnvelopes = envelopes.filter(env => 
-    (env.currentBalance || 0) > (env.targetAmount || 0)
+  const totalTargetAmount = envelopes.reduce(
+    (sum, env) => sum + (env.targetAmount || 0),
+    0,
+  );
+  const underfundedEnvelopes = envelopes.filter(
+    (env) => (env.currentBalance || 0) < (env.targetAmount || 0),
+  );
+  const overfundedEnvelopes = envelopes.filter(
+    (env) => (env.currentBalance || 0) > (env.targetAmount || 0),
   );
 
   // Utility functions
-  const getEnvelopeById = (id) => envelopes.find(env => env.id === id);
-  
-  const getEnvelopesByCategory = (cat) => envelopes.filter(env => env.category === cat);
-  
+  const getEnvelopeById = (id) => envelopes.find((env) => env.id === id);
+
+  const getEnvelopesByCategory = (cat) =>
+    envelopes.filter((env) => env.category === cat);
+
   const getAvailableCategories = () => {
-    const categories = new Set(envelopes.map(env => env.category));
+    const categories = new Set(envelopes.map((env) => env.category));
     return Array.from(categories).sort();
   };
 
@@ -229,13 +257,13 @@ const useEnvelopes = (options = {}) => {
     underfundedEnvelopes,
     overfundedEnvelopes,
     availableCategories: getAvailableCategories(),
-    
+
     // Loading states
     isLoading: envelopesQuery.isLoading,
     isFetching: envelopesQuery.isFetching,
     isError: envelopesQuery.isError,
     error: envelopesQuery.error,
-    
+
     // Mutation functions
     addEnvelope: addEnvelopeMutation.mutate,
     addEnvelopeAsync: addEnvelopeMutation.mutateAsync,
@@ -245,20 +273,21 @@ const useEnvelopes = (options = {}) => {
     deleteEnvelopeAsync: deleteEnvelopeMutation.mutateAsync,
     transferFunds: transferFundsMutation.mutate,
     transferFundsAsync: transferFundsMutation.mutateAsync,
-    
+
     // Mutation states
     isAdding: addEnvelopeMutation.isPending,
     isUpdating: updateEnvelopeMutation.isPending,
     isDeleting: deleteEnvelopeMutation.isPending,
     isTransferring: transferFundsMutation.isPending,
-    
+
     // Utility functions
     getEnvelopeById,
     getEnvelopesByCategory,
-    
+
     // Query controls
     refetch: envelopesQuery.refetch,
-    invalidate: () => queryClient.invalidateQueries({ queryKey: queryKeys.envelopes }),
+    invalidate: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.envelopes }),
   };
 };
 

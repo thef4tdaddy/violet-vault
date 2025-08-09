@@ -35,23 +35,21 @@ const BillManager = ({
   className = "",
 }) => {
   // Enhanced TanStack Query integration with loading states
-  const { 
-    data: tanStackTransactions = [], 
-    isLoading: transactionsLoading 
-  } = useTransactions();
-  
-  const { 
-    data: tanStackEnvelopes = [], 
+  const { data: tanStackTransactions = [], isLoading: transactionsLoading } =
+    useTransactions();
+
+  const {
+    data: tanStackEnvelopes = [],
     addEnvelope,
-    isLoading: envelopesLoading 
+    isLoading: envelopesLoading,
   } = useEnvelopes();
-  
-  const { 
-    data: tanStackBills = [], 
+
+  const {
+    data: tanStackBills = [],
     addBill,
     updateBill,
     deleteBill,
-    isLoading: billsLoading 
+    isLoading: billsLoading,
   } = useBills();
 
   // Keep Zustand for non-migrated operations and fallbacks
@@ -59,22 +57,22 @@ const BillManager = ({
 
   const transactions = useMemo(
     () =>
-      propTransactions && propTransactions.length 
-        ? propTransactions 
-        : tanStackTransactions.length 
-          ? tanStackTransactions 
+      propTransactions && propTransactions.length
+        ? propTransactions
+        : tanStackTransactions.length
+          ? tanStackTransactions
           : budget.allTransactions || [],
-    [propTransactions, tanStackTransactions, budget.allTransactions]
+    [propTransactions, tanStackTransactions, budget.allTransactions],
   );
 
   const envelopes = useMemo(
-    () => 
-      propEnvelopes && propEnvelopes.length 
-        ? propEnvelopes 
+    () =>
+      propEnvelopes && propEnvelopes.length
+        ? propEnvelopes
         : tanStackEnvelopes.length
           ? tanStackEnvelopes
           : budget.envelopes || [],
-    [propEnvelopes, tanStackEnvelopes, budget.envelopes]
+    [propEnvelopes, tanStackEnvelopes, budget.envelopes],
   );
 
   const reconcileTransaction = budget.reconcileTransaction;
@@ -98,7 +96,9 @@ const BillManager = ({
     const billsFromTransactions = transactions.filter(
       (t) => t && (t.type === "bill" || t.type === "recurring_bill"),
     );
-    const billsFromStore = tanStackBills.length ? tanStackBills : budget.bills || [];
+    const billsFromStore = tanStackBills.length
+      ? tanStackBills
+      : budget.bills || [];
 
     // Merge both sources, prioritizing store bills over transaction bills with same ID
     const combinedBills = [...billsFromStore];
@@ -1060,7 +1060,10 @@ const BillManager = ({
               try {
                 addBill(newBill);
               } catch (error) {
-                console.warn("TanStack addBill failed, using Zustand fallback", error);
+                console.warn(
+                  "TanStack addBill failed, using Zustand fallback",
+                  error,
+                );
                 budget.addTransaction(newBill);
               }
             }
@@ -1071,7 +1074,10 @@ const BillManager = ({
             try {
               addEnvelope(envelopeData);
             } catch (error) {
-              console.warn("TanStack addEnvelope failed, using Zustand fallback", error);
+              console.warn(
+                "TanStack addEnvelope failed, using Zustand fallback",
+                error,
+              );
               budget.addEnvelope(envelopeData);
             }
           }}
@@ -1113,9 +1119,15 @@ const BillManager = ({
               });
               // Use TanStack mutation with Zustand fallback
               try {
-                updateBill({ id: updatedBillData.id, updates: updatedBillData });
+                updateBill({
+                  id: updatedBillData.id,
+                  updates: updatedBillData,
+                });
               } catch (error) {
-                logger.warn("TanStack updateBill failed, using Zustand fallback", error);
+                logger.warn(
+                  "TanStack updateBill failed, using Zustand fallback",
+                  error,
+                );
                 budget.updateBill(updatedBillData);
               }
             }
@@ -1126,7 +1138,10 @@ const BillManager = ({
             try {
               deleteBill(billId);
             } catch (error) {
-              console.warn("TanStack deleteBill failed, using Zustand fallback", error);
+              console.warn(
+                "TanStack deleteBill failed, using Zustand fallback",
+                error,
+              );
               budget.deleteBill(billId);
             }
             setEditingBill(null);
@@ -1136,7 +1151,10 @@ const BillManager = ({
             try {
               addEnvelope(envelopeData);
             } catch (error) {
-              console.warn("TanStack addEnvelope failed, using Zustand fallback", error);
+              console.warn(
+                "TanStack addEnvelope failed, using Zustand fallback",
+                error,
+              );
               budget.addEnvelope(envelopeData);
             }
           }}

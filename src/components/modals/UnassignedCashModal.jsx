@@ -17,7 +17,8 @@ import useUnassignedCashDistribution from "../../hooks/useUnassignedCashDistribu
  * Pure UI component - all logic handled by useUnassignedCashDistribution hook
  */
 const UnassignedCashModal = () => {
-  const { isUnassignedCashModalOpen, closeUnassignedCashModal } = useBudgetStore();
+  const { isUnassignedCashModalOpen, closeUnassignedCashModal } =
+    useBudgetStore();
   const {
     // State (except modal state)
     distributions,
@@ -54,7 +55,9 @@ const UnassignedCashModal = () => {
         <div className="flex justify-between items-center mb-6">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">
-              {unassignedCash < 0 ? "Address Budget Deficit" : "Distribute Unassigned Cash"}
+              {unassignedCash < 0
+                ? "Address Budget Deficit"
+                : "Distribute Unassigned Cash"}
             </h3>
             <p className="text-sm text-gray-600 mt-1">
               {unassignedCash < 0 ? "Deficit:" : "Available:"}{" "}
@@ -105,7 +108,9 @@ const UnassignedCashModal = () => {
                   <div className="flex items-center text-red-600">
                     <AlertTriangle className="h-4 w-4 mr-1" />
                     <span className="text-sm font-medium">
-                      {unassignedCash < 0 ? "Increasing Deficit" : "Over Budget"}
+                      {unassignedCash < 0
+                        ? "Increasing Deficit"
+                        : "Over Budget"}
                     </span>
                   </div>
                 ) : hasDistributions ? (
@@ -165,7 +170,8 @@ const UnassignedCashModal = () => {
             <div className="overflow-y-auto max-h-64 space-y-3">
               {envelopes.map((envelope) => {
                 const distributionAmount = distributions[envelope.id] || 0;
-                const newBalance = (envelope.currentAmount || 0) + distributionAmount;
+                const newBalance =
+                  (envelope.currentAmount || 0) + distributionAmount;
 
                 return (
                   <div
@@ -179,7 +185,9 @@ const UnassignedCashModal = () => {
                           style={{ backgroundColor: envelope.color }}
                         />
                         <div className="flex-1">
-                          <h5 className="font-medium text-gray-900 text-sm">{envelope.name}</h5>
+                          <h5 className="font-medium text-gray-900 text-sm">
+                            {envelope.name}
+                          </h5>
                           <p className="text-xs text-gray-600">
                             Current: ${(envelope.currentAmount || 0).toFixed(2)}
                             {envelope.monthlyAmount && (
@@ -199,7 +207,9 @@ const UnassignedCashModal = () => {
                             step="0.01"
                             min="0"
                             value={distributionAmount || ""}
-                            onChange={(e) => updateDistribution(envelope.id, e.target.value)}
+                            onChange={(e) =>
+                              updateDistribution(envelope.id, e.target.value)
+                            }
                             disabled={isProcessing}
                             className="w-24 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                             placeholder="0.00"
@@ -222,11 +232,16 @@ const UnassignedCashModal = () => {
         {/* Preview Section */}
         {preview.length > 0 && (
           <div className="mt-6 pt-4 border-t border-gray-200">
-            <h4 className="font-medium text-gray-900 mb-3">Distribution Preview</h4>
+            <h4 className="font-medium text-gray-900 mb-3">
+              Distribution Preview
+            </h4>
             <div className="bg-blue-50 rounded-lg p-3 max-h-32 overflow-y-auto">
               <div className="space-y-1">
                 {preview.map((envelope) => (
-                  <div key={envelope.id} className="flex justify-between text-sm">
+                  <div
+                    key={envelope.id}
+                    className="flex justify-between text-sm"
+                  >
                     <span className="text-gray-700">{envelope.name}</span>
                     <span className="text-blue-600 font-medium">
                       +${envelope.distributionAmount.toFixed(2)}

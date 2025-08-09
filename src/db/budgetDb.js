@@ -10,22 +10,28 @@ export class VioletVaultDB extends Dexie {
       budget: "id, lastModified, version",
 
       // Envelopes table with compound indexes for common queries
-      envelopes: "id, name, category, archived, lastModified, [category+archived], [category+name]",
+      envelopes:
+        "id, name, category, archived, lastModified, [category+archived], [category+name]",
 
       // Transactions table with comprehensive indexing for analytics and filtering
-      transactions: "id, date, amount, envelopeId, category, type, lastModified, [date+category], [date+envelopeId], [envelopeId+date], [category+date], [type+date]",
+      transactions:
+        "id, date, amount, envelopeId, category, type, lastModified, [date+category], [date+envelopeId], [envelopeId+date], [category+date], [type+date]",
 
       // Bills table with indexes for due date and payment status queries
-      bills: "id, name, dueDate, amount, category, isPaid, isRecurring, frequency, lastModified, [dueDate+isPaid], [category+isPaid], [isRecurring+frequency], [isPaid+dueDate]",
+      bills:
+        "id, name, dueDate, amount, category, isPaid, isRecurring, frequency, lastModified, [dueDate+isPaid], [category+isPaid], [isRecurring+frequency], [isPaid+dueDate]",
 
       // Savings Goals table for goal tracking and progress monitoring
-      savingsGoals: "id, name, category, priority, targetAmount, currentAmount, targetDate, isPaused, isCompleted, lastModified, [category+isCompleted], [priority+targetDate], [targetDate+isCompleted], [isCompleted+isPaused]",
+      savingsGoals:
+        "id, name, category, priority, targetAmount, currentAmount, targetDate, isPaused, isCompleted, lastModified, [category+isCompleted], [priority+targetDate], [targetDate+isCompleted], [isCompleted+isPaused]",
 
       // Paycheck History table for trend analysis and predictions
-      paycheckHistory: "id, date, amount, source, allocations, lastModified, [date+amount], [source+date]",
+      paycheckHistory:
+        "id, date, amount, source, allocations, lastModified, [date+amount], [source+date]",
 
       // Audit log for changes tracking
-      auditLog: "++id, timestamp, action, entityType, entityId, [entityType+timestamp], [entityId+timestamp]",
+      auditLog:
+        "++id, timestamp, action, entityType, entityId, [entityType+timestamp], [entityId+timestamp]",
 
       // Enhanced cache with TTL and category support
       cache: "key, value, expiresAt, category, [category+expiresAt]",
@@ -86,14 +92,18 @@ export class VioletVaultDB extends Dexie {
     // 5 minutes default
     const cached = await this.cache.get(key);
     const now = Date.now();
-    if (cached && cached.expiresAt > now && now - (cached.expiresAt - maxAge) < maxAge) {
+    if (
+      cached &&
+      cached.expiresAt > now &&
+      now - (cached.expiresAt - maxAge) < maxAge
+    ) {
       return cached.value;
     }
     return null;
   }
 
   // Enhanced query optimizations with compound indexes
-  
+
   // Envelope queries
   async getEnvelopesByCategory(category, includeArchived = false) {
     const cacheKey = `envelopes_${category}_${includeArchived}`;
@@ -101,9 +111,15 @@ export class VioletVaultDB extends Dexie {
 
     if (!result) {
       if (includeArchived) {
-        result = await this.envelopes.where("category").equals(category).toArray();
+        result = await this.envelopes
+          .where("category")
+          .equals(category)
+          .toArray();
       } else {
-        result = await this.envelopes.where("[category+archived]").equals([category, false]).toArray();
+        result = await this.envelopes
+          .where("[category+archived]")
+          .equals([category, false])
+          .toArray();
       }
       await this.setCachedValue(cacheKey, result, 60000); // 1 minute cache
     }
@@ -117,29 +133,51 @@ export class VioletVaultDB extends Dexie {
 
   // Transaction queries with compound indexes
   async getTransactionsByDateRange(startDate, endDate) {
-    return this.transactions.where("date").between(startDate, endDate, true, true).reverse().toArray();
+    return this.transactions
+      .where("date")
+      .between(startDate, endDate, true, true)
+      .reverse()
+      .toArray();
   }
 
   async getTransactionsByEnvelope(envelopeId, dateRange = null) {
     if (dateRange) {
       return this.transactions
         .where("[envelopeId+date]")
-        .between([envelopeId, dateRange.start], [envelopeId, dateRange.end], true, true)
+        .between(
+          [envelopeId, dateRange.start],
+          [envelopeId, dateRange.end],
+          true,
+          true,
+        )
         .reverse()
         .toArray();
     }
-    return this.transactions.where("envelopeId").equals(envelopeId).reverse().toArray();
+    return this.transactions
+      .where("envelopeId")
+      .equals(envelopeId)
+      .reverse()
+      .toArray();
   }
 
   async getTransactionsByCategory(category, dateRange = null) {
     if (dateRange) {
       return this.transactions
         .where("[category+date]")
-        .between([category, dateRange.start], [category, dateRange.end], true, true)
+        .between(
+          [category, dateRange.start],
+          [category, dateRange.end],
+          true,
+          true,
+        )
         .reverse()
         .toArray();
     }
-    return this.transactions.where("category").equals(category).reverse().toArray();
+    return this.transactions
+      .where("category")
+      .equals(category)
+      .reverse()
+      .toArray();
   }
 
   async getTransactionsByType(type, dateRange = null) {
@@ -226,7 +264,11 @@ export class VioletVaultDB extends Dexie {
 
   // Paycheck History queries for trend analysis
   async getPaycheckHistory(limit = 50) {
-    return this.paycheckHistory.orderBy("date").reverse().limit(limit).toArray();
+    return this.paycheckHistory
+      .orderBy("date")
+      .reverse()
+      .limit(limit)
+      .toArray();
   }
 
   async getPaychecksByDateRange(startDate, endDate) {
@@ -244,7 +286,13 @@ export class VioletVaultDB extends Dexie {
   async batchUpdate(updates) {
     return this.transaction(
       "rw",
-      [this.envelopes, this.transactions, this.bills, this.savingsGoals, this.paycheckHistory],
+      [
+        this.envelopes,
+        this.transactions,
+        this.bills,
+        this.savingsGoals,
+        this.paycheckHistory,
+      ],
       async () => {
         const promises = updates.map((update) => {
           switch (update.type) {
@@ -263,7 +311,7 @@ export class VioletVaultDB extends Dexie {
           }
         });
         return Promise.all(promises);
-      }
+      },
     );
   }
 
@@ -288,12 +336,12 @@ export class VioletVaultDB extends Dexie {
   async getAnalyticsData(dateRange, includeTransfers = false) {
     const transactions = await this.getTransactionsByDateRange(
       dateRange.start,
-      dateRange.end
+      dateRange.end,
     );
-    
-    return includeTransfers 
-      ? transactions 
-      : transactions.filter(t => t.type !== "transfer");
+
+    return includeTransfers
+      ? transactions
+      : transactions.filter((t) => t.type !== "transfer");
   }
 
   async getCategorySpending(category, dateRange) {
@@ -334,7 +382,7 @@ export class VioletVaultDB extends Dexie {
   async optimizeDatabase() {
     // Clean up expired cache entries
     await this.cleanupCache();
-    
+
     // Clean up old audit log entries (keep last 1000)
     const auditCount = await this.auditLog.count();
     if (auditCount > 1000) {
@@ -342,22 +390,28 @@ export class VioletVaultDB extends Dexie {
         .orderBy("timestamp")
         .limit(auditCount - 1000)
         .toArray();
-      const oldIds = oldEntries.map(entry => entry.id);
+      const oldIds = oldEntries.map((entry) => entry.id);
       await this.auditLog.bulkDelete(oldIds);
     }
   }
 
   // Data integrity and statistics
   async getDatabaseStats() {
-    const [envelopeCount, transactionCount, billCount, goalCount, paycheckCount, cacheCount] =
-      await Promise.all([
-        this.envelopes.count(),
-        this.transactions.count(),
-        this.bills.count(),
-        this.savingsGoals.count(),
-        this.paycheckHistory.count(),
-        this.cache.count(),
-      ]);
+    const [
+      envelopeCount,
+      transactionCount,
+      billCount,
+      goalCount,
+      paycheckCount,
+      cacheCount,
+    ] = await Promise.all([
+      this.envelopes.count(),
+      this.transactions.count(),
+      this.bills.count(),
+      this.savingsGoals.count(),
+      this.paycheckHistory.count(),
+      this.cache.count(),
+    ]);
 
     return {
       envelopes: envelopeCount,
@@ -425,7 +479,7 @@ export const migrateData = async () => {
 export const queryHelpers = {
   // Envelope helpers
   getActiveEnvelopes: () => budgetDb.getActiveEnvelopes(),
-  getEnvelopesByCategory: (category, includeArchived) => 
+  getEnvelopesByCategory: (category, includeArchived) =>
     budgetDb.getEnvelopesByCategory(category, includeArchived),
 
   // Transaction helpers
@@ -434,16 +488,16 @@ export const queryHelpers = {
     startDate.setDate(startDate.getDate() - days);
     return budgetDb.getTransactionsByDateRange(startDate, new Date());
   },
-  
+
   // Bill helpers
   getUpcomingBills: (days) => budgetDb.getUpcomingBills(days),
   getOverdueBills: () => budgetDb.getOverdueBills(),
-  
+
   // Savings goal helpers
   getActiveSavingsGoals: () => budgetDb.getActiveSavingsGoals(),
   getUpcomingDeadlines: (days) => budgetDb.getUpcomingDeadlines(days),
-  
+
   // Analytics helpers
-  getAnalyticsData: (dateRange, includeTransfers) => 
+  getAnalyticsData: (dateRange, includeTransfers) =>
     budgetDb.getAnalyticsData(dateRange, includeTransfers),
 };
