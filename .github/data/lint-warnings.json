@@ -2,14 +2,14 @@
   "project": "violet-vault",
   "lastUpdated": "2025-08-09",
   "currentStatus": {
-    "totalWarnings": 25,
+    "totalWarnings": 26,
     "targetWarnings": 17,
     "errors": 0
   },
   "warningCategories": [
     {
       "type": "no-unused-vars",
-      "count": 23,
+      "count": 24,
       "severity": "warning",
       "files": [
         {
@@ -135,6 +135,16 @@
           ]
         },
         {
+          "path": "src/hooks/useBugReport.js",
+          "warnings": 1,
+          "details": [
+            {
+              "line": 47,
+              "message": "'e' is defined but never used"
+            }
+          ]
+        },
+        {
           "path": "src/utils/highlight.js",
           "warnings": 1,
           "details": [
@@ -199,7 +209,7 @@
     "highPriority": [
       {
         "task": "Fix no-unused-vars warnings",
-        "warningsAffected": 23,
+        "warningsAffected": 24,
         "files": [
           "bug-report-worker.js",
           "rollback.js",
@@ -208,6 +218,7 @@
           "SummaryCards.jsx",
           "ViewRenderer.jsx",
           "budgetDb.js",
+          "useBugReport.js",
           "highlight.js",
           "version.js"
         ],
