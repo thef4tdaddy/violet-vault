@@ -227,9 +227,7 @@
       {
         "task": "Fix react-hooks/exhaustive-deps warnings",
         "warningsAffected": 1,
-        "files": [
-          "useFirebaseSync.js"
-        ],
+        "files": ["useFirebaseSync.js"],
         "action": "Add missing dependencies to useEffect dependency array"
       }
     ],
@@ -238,9 +236,7 @@
       {
         "task": "Fix react-refresh/only-export-components warnings",
         "warningsAffected": 1,
-        "files": [
-          "authStore.jsx"
-        ],
+        "files": ["authStore.jsx"],
         "action": "Refactor to separate component and non-component exports"
       }
     ]

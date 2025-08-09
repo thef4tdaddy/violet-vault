@@ -15,8 +15,8 @@ const useTransactions = (options = {}) => {
     category,
     type, // 'income' | 'expense' | 'transfer'
     limit = 100,
-    sortBy = 'date',
-    sortOrder = 'desc',
+    sortBy = "date",
+    sortOrder = "desc",
   } = options;
 
   // Get Zustand store for mutations
@@ -36,9 +36,15 @@ const useTransactions = (options = {}) => {
     } else {
       // Fallback to Dexie for offline support
       if (dateRange) {
-        transactions = await budgetDb.getTransactionsByDateRange(dateRange.start, dateRange.end);
+        transactions = await budgetDb.getTransactionsByDateRange(
+          dateRange.start,
+          dateRange.end,
+        );
       } else {
-        transactions = await budgetDb.transactions.orderBy('date').reverse().toArray();
+        transactions = await budgetDb.transactions
+          .orderBy("date")
+          .reverse()
+          .toArray();
       }
     }
 
@@ -47,27 +53,33 @@ const useTransactions = (options = {}) => {
 
     if (dateRange) {
       const { start, end } = dateRange;
-      filteredTransactions = filteredTransactions.filter(t => {
+      filteredTransactions = filteredTransactions.filter((t) => {
         const transactionDate = new Date(t.date);
         return transactionDate >= start && transactionDate <= end;
       });
     }
 
     if (envelopeId) {
-      filteredTransactions = filteredTransactions.filter(t => t.envelopeId === envelopeId);
+      filteredTransactions = filteredTransactions.filter(
+        (t) => t.envelopeId === envelopeId,
+      );
     }
 
     if (category) {
-      filteredTransactions = filteredTransactions.filter(t => t.category === category);
+      filteredTransactions = filteredTransactions.filter(
+        (t) => t.category === category,
+      );
     }
 
     if (type) {
-      if (type === 'income') {
-        filteredTransactions = filteredTransactions.filter(t => t.amount > 0);
-      } else if (type === 'expense') {
-        filteredTransactions = filteredTransactions.filter(t => t.amount < 0);
-      } else if (type === 'transfer') {
-        filteredTransactions = filteredTransactions.filter(t => t.type === 'transfer');
+      if (type === "income") {
+        filteredTransactions = filteredTransactions.filter((t) => t.amount > 0);
+      } else if (type === "expense") {
+        filteredTransactions = filteredTransactions.filter((t) => t.amount < 0);
+      } else if (type === "transfer") {
+        filteredTransactions = filteredTransactions.filter(
+          (t) => t.type === "transfer",
+        );
       }
     }
 
@@ -77,18 +89,18 @@ const useTransactions = (options = {}) => {
       let bVal = b[sortBy];
 
       // Handle date fields
-      if (sortBy === 'date') {
+      if (sortBy === "date") {
         aVal = new Date(aVal);
         bVal = new Date(bVal);
       }
 
       // Handle numeric fields
-      if (sortBy === 'amount') {
+      if (sortBy === "amount") {
         aVal = parseFloat(aVal) || 0;
         bVal = parseFloat(bVal) || 0;
       }
 
-      if (sortOrder === 'desc') {
+      if (sortOrder === "desc") {
         return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
       } else {
         return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
@@ -105,7 +117,15 @@ const useTransactions = (options = {}) => {
 
   // Main transactions query
   const transactionsQuery = useQuery({
-    queryKey: queryKeys.transactionsList({ dateRange, envelopeId, category, type, limit, sortBy, sortOrder }),
+    queryKey: queryKeys.transactionsList({
+      dateRange,
+      envelopeId,
+      category,
+      type,
+      limit,
+      sortBy,
+      sortOrder,
+    }),
     queryFn: queryFunction,
     staleTime: 60 * 1000, // 1 minute
     enabled: true,
@@ -117,9 +137,9 @@ const useTransactions = (options = {}) => {
     mutationFn: async (transactionData) => {
       const newTransaction = {
         id: Date.now().toString(),
-        date: new Date().toISOString().split('T')[0],
-        type: 'expense',
-        category: 'other',
+        date: new Date().toISOString().split("T")[0],
+        type: "expense",
+        category: "other",
         createdAt: new Date().toISOString(),
         ...transactionData,
         amount: transactionData.amount || 0,
@@ -127,7 +147,7 @@ const useTransactions = (options = {}) => {
 
       // Apply optimistic update
       await optimisticHelpers.addTransaction(newTransaction);
-      
+
       // Call Zustand mutation
       zustandAddTransaction(newTransaction);
 
@@ -158,7 +178,7 @@ const useTransactions = (options = {}) => {
 
       // Call Zustand mutation
       zustandReconcileTransaction(reconciledTransaction);
-      
+
       // Apply optimistic update
       await optimisticHelpers.addTransaction(reconciledTransaction);
 
@@ -176,65 +196,73 @@ const useTransactions = (options = {}) => {
 
   // Analytics computation
   const transactions = transactionsQuery.data || [];
-  
+
   const analytics = {
-    totalIncome: transactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0),
-    totalExpenses: Math.abs(transactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0)),
+    totalIncome: transactions
+      .filter((t) => t.amount > 0)
+      .reduce((sum, t) => sum + t.amount, 0),
+    totalExpenses: Math.abs(
+      transactions
+        .filter((t) => t.amount < 0)
+        .reduce((sum, t) => sum + t.amount, 0),
+    ),
     netAmount: transactions.reduce((sum, t) => sum + t.amount, 0),
     transactionCount: transactions.length,
-    
+
     // Category breakdown
     categoryBreakdown: transactions.reduce((acc, t) => {
-      const category = t.category || 'uncategorized';
+      const category = t.category || "uncategorized";
       if (!acc[category]) {
         acc[category] = { income: 0, expenses: 0, count: 0 };
       }
-      
+
       if (t.amount > 0) {
         acc[category].income += t.amount;
       } else {
         acc[category].expenses += Math.abs(t.amount);
       }
       acc[category].count += 1;
-      
+
       return acc;
     }, {}),
-    
+
     // Daily breakdown (for charts)
     dailyBreakdown: transactions.reduce((acc, t) => {
       const date = t.date;
       if (!acc[date]) {
         acc[date] = { income: 0, expenses: 0, count: 0 };
       }
-      
+
       if (t.amount > 0) {
         acc[date].income += t.amount;
       } else {
         acc[date].expenses += Math.abs(t.amount);
       }
       acc[date].count += 1;
-      
+
       return acc;
     }, {}),
-    
+
     // Recent transactions (last 7 days)
     recentTransactions: (() => {
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-      
-      return transactions.filter(t => new Date(t.date) >= sevenDaysAgo);
+
+      return transactions.filter((t) => new Date(t.date) >= sevenDaysAgo);
     })(),
   };
 
   // Utility functions
-  const getTransactionById = (id) => transactions.find(t => t.id === id);
-  
-  const getTransactionsByEnvelope = (envId) => transactions.filter(t => t.envelopeId === envId);
-  
-  const getTransactionsByCategory = (cat) => transactions.filter(t => t.category === cat);
-  
+  const getTransactionById = (id) => transactions.find((t) => t.id === id);
+
+  const getTransactionsByEnvelope = (envId) =>
+    transactions.filter((t) => t.envelopeId === envId);
+
+  const getTransactionsByCategory = (cat) =>
+    transactions.filter((t) => t.category === cat);
+
   const getAvailableCategories = () => {
-    const categories = new Set(transactions.map(t => t.category));
+    const categories = new Set(transactions.map((t) => t.category));
     return Array.from(categories).filter(Boolean).sort();
   };
 
@@ -265,36 +293,37 @@ const useTransactions = (options = {}) => {
     transactions,
     ...analytics,
     availableCategories: getAvailableCategories(),
-    
+
     // Loading states
     isLoading: transactionsQuery.isLoading,
     isFetching: transactionsQuery.isFetching,
     isError: transactionsQuery.isError,
     error: transactionsQuery.error,
-    
+
     // Mutation functions
     addTransaction: addTransactionMutation.mutate,
     addTransactionAsync: addTransactionMutation.mutateAsync,
     reconcileTransaction: reconcileTransactionMutation.mutate,
     reconcileTransactionAsync: reconcileTransactionMutation.mutateAsync,
-    
+
     // Mutation states
     isAdding: addTransactionMutation.isPending,
     isReconciling: reconcileTransactionMutation.isPending,
-    
+
     // Utility functions
     getTransactionById,
     getTransactionsByEnvelope,
     getTransactionsByCategory,
-    
+
     // Date range helpers
     getThisMonth,
     getLastMonth,
     getLast30Days,
-    
+
     // Query controls
     refetch: transactionsQuery.refetch,
-    invalidate: () => queryClient.invalidateQueries({ queryKey: queryKeys.transactions }),
+    invalidate: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions }),
   };
 };
 

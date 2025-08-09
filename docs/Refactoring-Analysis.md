@@ -131,7 +131,13 @@ export const EnvelopeSpendingChart = ({ data, height = 300 }) => {
 
 ```javascript
 // utils/chartConfig.js
-export const CHART_COLORS = ["#a855f7", "#06b6d4", "#10b981", "#f59e0b", "#ef4444"];
+export const CHART_COLORS = [
+  "#a855f7",
+  "#06b6d4",
+  "#10b981",
+  "#f59e0b",
+  "#ef4444",
+];
 
 export const getDefaultChartConfig = () => ({
   margin: { top: 20, right: 30, left: 20, bottom: 5 },

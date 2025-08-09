@@ -26,20 +26,13 @@ import DebtSummaryWidget from "../debt/ui/DebtSummaryWidget";
 
 const Dashboard = () => {
   // Enhanced TanStack Query integration with optimistic updates
-  const { 
-    data: envelopes = [], 
-    isLoading: envelopesLoading 
-  } = useEnvelopes();
-  
-  const { 
-    data: savingsGoals = [], 
-    isLoading: savingsLoading 
-  } = useSavingsGoals();
-  
-  const { 
-    data: transactions = [], 
-    isLoading: transactionsLoading 
-  } = useTransactions();
+  const { data: envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
+
+  const { data: savingsGoals = [], isLoading: savingsLoading } =
+    useSavingsGoals();
+
+  const { data: transactions = [], isLoading: transactionsLoading } =
+    useTransactions();
 
   // Keep Zustand for non-migrated operations
   const budget = useBudgetStore();

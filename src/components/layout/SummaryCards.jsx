@@ -7,7 +7,12 @@ import UnassignedCashModal from "../modals/UnassignedCashModal";
  * Summary cards component showing financial overview
  * Extracted from Layout.jsx for better organization
  */
-const SummaryCards = ({ totalCash, unassignedCash, totalSavingsBalance, biweeklyAllocation }) => {
+const SummaryCards = ({
+  totalCash,
+  unassignedCash,
+  totalSavingsBalance,
+  biweeklyAllocation,
+}) => {
   const { openUnassignedCashModal } = useBudgetStore();
 
   const cards = [
@@ -65,7 +70,15 @@ const SummaryCards = ({ totalCash, unassignedCash, totalSavingsBalance, biweekly
   );
 };
 
-const SummaryCard = ({ icon: Icon, label, value, color, onClick, clickable, isNegative }) => {
+const SummaryCard = ({
+  icon: Icon,
+  label,
+  value,
+  color,
+  onClick,
+  clickable,
+  isNegative,
+}) => {
   const colorClasses = {
     purple: "bg-purple-500",
     emerald: "bg-emerald-500",
@@ -82,7 +95,8 @@ const SummaryCard = ({ icon: Icon, label, value, color, onClick, clickable, isNe
     red: "text-red-600",
   };
 
-  const baseClasses = "glassmorphism rounded-3xl p-6 transition-all duration-200";
+  const baseClasses =
+    "glassmorphism rounded-3xl p-6 transition-all duration-200";
   const clickableClasses = clickable
     ? "cursor-pointer hover:shadow-lg hover:scale-105 active:scale-95"
     : "";
@@ -101,10 +115,14 @@ const SummaryCard = ({ icon: Icon, label, value, color, onClick, clickable, isNe
         <p className="text-sm font-semibold text-gray-600 mb-1">
           {label}
           {clickable && !isNegative && (
-            <span className="ml-1 text-xs text-gray-400">(click to distribute)</span>
+            <span className="ml-1 text-xs text-gray-400">
+              (click to distribute)
+            </span>
           )}
           {isNegative && (
-            <span className="ml-1 text-xs text-red-500">(overspending - click to address)</span>
+            <span className="ml-1 text-xs text-red-500">
+              (overspending - click to address)
+            </span>
           )}
         </p>
         <p

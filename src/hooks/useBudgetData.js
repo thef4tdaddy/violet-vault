@@ -1,6 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useBudgetStore } from "../stores/budgetStore";
-import { queryKeys, optimisticHelpers, prefetchHelpers } from "../utils/queryClient";
+import {
+  queryKeys,
+  optimisticHelpers,
+  prefetchHelpers,
+} from "../utils/queryClient";
 import { budgetDb } from "../db/budgetDb";
 
 /**
@@ -13,7 +17,7 @@ import { budgetDb } from "../db/budgetDb";
  */
 const useBudgetData = () => {
   const queryClient = useQueryClient();
-  
+
   // Get Zustand store for real-time state and mutations
   const budgetStore = useBudgetStore();
   const {
@@ -25,7 +29,7 @@ const useBudgetData = () => {
     paycheckHistory,
     unassignedCash,
     actualBalance,
-    
+
     // Mutations
     addEnvelope: zustandAddEnvelope,
     updateEnvelope: zustandUpdateEnvelope,
@@ -42,13 +46,13 @@ const useBudgetData = () => {
       if (envelopes && envelopes.length > 0) {
         return envelopes;
       }
-      
+
       // Fallback to Dexie for offline support
       const cachedEnvelopes = await budgetDb.envelopes.toArray();
       if (cachedEnvelopes.length > 0) {
         return cachedEnvelopes;
       }
-      
+
       // Return empty array as final fallback
       return [];
     },
@@ -56,31 +60,34 @@ const useBudgetData = () => {
     transactions: async (filters = {}) => {
       // Try Zustand first
       let result = transactions || [];
-      
+
       // Apply filters if provided
       if (filters.dateRange) {
         const { start, end } = filters.dateRange;
-        result = result.filter(t => {
+        result = result.filter((t) => {
           const transactionDate = new Date(t.date);
           return transactionDate >= start && transactionDate <= end;
         });
       }
-      
+
       if (filters.envelopeId) {
-        result = result.filter(t => t.envelopeId === filters.envelopeId);
+        result = result.filter((t) => t.envelopeId === filters.envelopeId);
       }
-      
+
       if (result.length > 0) {
         return result;
       }
-      
+
       // Fallback to Dexie
       if (filters.dateRange) {
         const { start, end } = filters.dateRange;
         return await budgetDb.getTransactionsByDateRange(start, end);
       }
-      
-      const cachedTransactions = await budgetDb.transactions.orderBy('date').reverse().toArray();
+
+      const cachedTransactions = await budgetDb.transactions
+        .orderBy("date")
+        .reverse()
+        .toArray();
       return cachedTransactions;
     },
 
@@ -88,7 +95,7 @@ const useBudgetData = () => {
       if (bills && bills.length > 0) {
         return bills;
       }
-      
+
       const cachedBills = await budgetDb.bills.toArray();
       return cachedBills;
     },
@@ -97,7 +104,7 @@ const useBudgetData = () => {
       if (savingsGoals && savingsGoals.length > 0) {
         return savingsGoals;
       }
-      
+
       // Note: Need to add savingsGoals to Dexie schema in future enhancement
       return [];
     },
@@ -106,31 +113,37 @@ const useBudgetData = () => {
       if (paycheckHistory && paycheckHistory.length > 0) {
         return paycheckHistory;
       }
-      
+
       // Note: Need to add paycheckHistory to Dexie schema in future enhancement
       return [];
     },
 
     dashboardSummary: async () => {
       const summary = {
-        totalEnvelopeBalance: envelopes?.reduce((sum, env) => sum + env.currentBalance, 0) || 0,
-        totalSavingsBalance: savingsGoals?.reduce((sum, goal) => sum + goal.currentAmount, 0) || 0,
+        totalEnvelopeBalance:
+          envelopes?.reduce((sum, env) => sum + env.currentBalance, 0) || 0,
+        totalSavingsBalance:
+          savingsGoals?.reduce((sum, goal) => sum + goal.currentAmount, 0) || 0,
         unassignedCash: unassignedCash || 0,
         actualBalance: actualBalance || 0,
         recentTransactions: transactions?.slice(0, 10) || [],
-        upcomingBills: bills?.filter(bill => {
-          const dueDate = new Date(bill.dueDate);
-          const thirtyDaysFromNow = new Date();
-          thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
-          return dueDate <= thirtyDaysFromNow;
-        }) || [],
+        upcomingBills:
+          bills?.filter((bill) => {
+            const dueDate = new Date(bill.dueDate);
+            const thirtyDaysFromNow = new Date();
+            thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+            return dueDate <= thirtyDaysFromNow;
+          }) || [],
       };
-      
+
       // Calculate difference for balance reconciliation
-      summary.virtualBalance = summary.totalEnvelopeBalance + summary.totalSavingsBalance + summary.unassignedCash;
+      summary.virtualBalance =
+        summary.totalEnvelopeBalance +
+        summary.totalSavingsBalance +
+        summary.unassignedCash;
       summary.difference = summary.actualBalance - summary.virtualBalance;
       summary.isBalanced = Math.abs(summary.difference) < 0.01;
-      
+
       return summary;
     },
   };
@@ -170,10 +183,10 @@ const useBudgetData = () => {
     mutationFn: async (newEnvelope) => {
       // Call Zustand mutation
       zustandAddEnvelope(newEnvelope);
-      
+
       // Persist to Dexie
       await optimisticHelpers.addEnvelope(newEnvelope);
-      
+
       return newEnvelope;
     },
     onSuccess: () => {
@@ -192,10 +205,10 @@ const useBudgetData = () => {
     mutationFn: async ({ envelopeId, updates }) => {
       // Call Zustand mutation
       zustandUpdateEnvelope(envelopeId, updates);
-      
+
       // Apply optimistic update with Dexie persistence
       await optimisticHelpers.updateEnvelope(envelopeId, updates);
-      
+
       return { envelopeId, updates };
     },
     onSuccess: () => {
@@ -209,10 +222,10 @@ const useBudgetData = () => {
     mutationFn: async (envelopeId) => {
       // Call Zustand mutation
       zustandDeleteEnvelope(envelopeId);
-      
+
       // Remove from cache and Dexie
       await optimisticHelpers.removeEnvelope(envelopeId);
-      
+
       return envelopeId;
     },
     onSuccess: () => {
@@ -226,10 +239,10 @@ const useBudgetData = () => {
     mutationFn: async (newTransaction) => {
       // Call Zustand mutation
       zustandAddTransaction(newTransaction);
-      
+
       // Apply optimistic update with Dexie persistence
       await optimisticHelpers.addTransaction(newTransaction);
-      
+
       return newTransaction;
     },
     onSuccess: () => {
@@ -244,10 +257,10 @@ const useBudgetData = () => {
     mutationFn: async (paycheckData) => {
       // Call Zustand mutation
       const result = zustandProcessPaycheck(paycheckData);
-      
+
       // Persist paycheck history to Dexie
       // TODO: Add paycheck table to Dexie schema
-      
+
       return result;
     },
     onSuccess: () => {
@@ -263,12 +276,13 @@ const useBudgetData = () => {
   const prefetchData = {
     envelopes: (filters) => prefetchHelpers.prefetchEnvelopes(filters),
     dashboard: () => prefetchHelpers.prefetchDashboard(),
-    transactions: (dateRange) => prefetchHelpers.prefetchTransactions(dateRange),
+    transactions: (dateRange) =>
+      prefetchHelpers.prefetchTransactions(dateRange),
   };
 
   const syncStatus = {
     isOnline: navigator.onLine,
-    lastSyncTime: localStorage.getItem('lastSyncTime'),
+    lastSyncTime: localStorage.getItem("lastSyncTime"),
     hasPendingChanges: false, // TODO: Implement pending changes tracking
   };
 
@@ -276,10 +290,10 @@ const useBudgetData = () => {
   const forceSync = async () => {
     try {
       await queryClient.refetchQueries();
-      localStorage.setItem('lastSyncTime', new Date().toISOString());
-      console.log('Force sync completed');
+      localStorage.setItem("lastSyncTime", new Date().toISOString());
+      console.log("Force sync completed");
     } catch (error) {
-      console.error('Force sync failed:', error);
+      console.error("Force sync failed:", error);
       throw error;
     }
   };
@@ -289,9 +303,9 @@ const useBudgetData = () => {
     try {
       await queryClient.clear();
       await budgetDb.cache.clear();
-      console.log('Cache cleared successfully');
+      console.log("Cache cleared successfully");
     } catch (error) {
-      console.error('Failed to clear cache:', error);
+      console.error("Failed to clear cache:", error);
       throw error;
     }
   };
@@ -304,22 +318,28 @@ const useBudgetData = () => {
     savingsGoals: savingsGoals || [],
     paycheckHistory: paycheckHistory || [],
     dashboardSummary: dashboardQuery.data,
-    
+
     // Computed values
     unassignedCash,
     actualBalance,
-    
+
     // Loading states
-    isLoading: envelopesQuery.isLoading || transactionsQuery.isLoading || billsQuery.isLoading,
-    isFetching: envelopesQuery.isFetching || transactionsQuery.isFetching || billsQuery.isFetching,
+    isLoading:
+      envelopesQuery.isLoading ||
+      transactionsQuery.isLoading ||
+      billsQuery.isLoading,
+    isFetching:
+      envelopesQuery.isFetching ||
+      transactionsQuery.isFetching ||
+      billsQuery.isFetching,
     isOffline: !navigator.onLine,
-    
+
     // Individual query states for fine-grained loading
     envelopesLoading: envelopesQuery.isLoading,
     transactionsLoading: transactionsQuery.isLoading,
     billsLoading: billsQuery.isLoading,
     dashboardLoading: dashboardQuery.isLoading,
-    
+
     // Mutations
     addEnvelope: addEnvelopeMutation.mutate,
     updateEnvelope: updateEnvelopeMutation.mutate,
@@ -327,20 +347,20 @@ const useBudgetData = () => {
     addTransaction: addTransactionMutation.mutate,
     processPaycheck: processPaycheckMutation.mutate,
     reconcileTransaction: zustandReconcileTransaction, // Direct Zustand call for now
-    
+
     // Mutation states
     isAddingEnvelope: addEnvelopeMutation.isPending,
     isUpdatingEnvelope: updateEnvelopeMutation.isPending,
     isDeletingEnvelope: deleteEnvelopeMutation.isPending,
     isAddingTransaction: addTransactionMutation.isPending,
     isProcessingPaycheck: processPaycheckMutation.isPending,
-    
+
     // Sync utilities
     syncStatus,
     forceSync,
     clearCache,
     prefetchData,
-    
+
     // Error states
     envelopesError: envelopesQuery.error,
     transactionsError: transactionsQuery.error,

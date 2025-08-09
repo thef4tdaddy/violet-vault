@@ -27,7 +27,9 @@ const useAuthFlow = () => {
         const { encryptionUtils } = await import("../utils/encryption");
         const userDataWithId = {
           ...userData,
-          budgetId: userData.budgetId || encryptionUtils.generateBudgetId(userData.password),
+          budgetId:
+            userData.budgetId ||
+            encryptionUtils.generateBudgetId(userData.password),
         };
 
         logger.auth("Calling login", {
@@ -53,7 +55,7 @@ const useAuthFlow = () => {
         alert(`Setup error: ${error.message}`);
       }
     },
-    [login]
+    [login],
   );
 
   const handleLogout = useCallback(() => {
@@ -69,7 +71,7 @@ const useAuthFlow = () => {
         alert("Password updated successfully.");
       }
     },
-    [changePassword]
+    [changePassword],
   );
 
   const handleUpdateProfile = useCallback(
@@ -79,7 +81,7 @@ const useAuthFlow = () => {
         throw new Error(result.error);
       }
     },
-    [updateProfile]
+    [updateProfile],
   );
 
   return {

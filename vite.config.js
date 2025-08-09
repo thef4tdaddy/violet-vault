@@ -3,10 +3,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  plugins: [
-    react(),
-    tailwindcss(),
-  ],
+  plugins: [react(), tailwindcss()],
   // Avoid multiple copies of React which can cause
   // "Invalid hook call" errors during development
   resolve: {

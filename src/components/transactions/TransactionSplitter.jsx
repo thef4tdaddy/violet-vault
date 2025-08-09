@@ -35,10 +35,10 @@ const TransactionSplitter = ({
       return envelopes.find(
         (env) =>
           env.name.toLowerCase() === categoryName.toLowerCase() ||
-          env.category?.toLowerCase() === categoryName.toLowerCase()
+          env.category?.toLowerCase() === categoryName.toLowerCase(),
       );
     },
-    [envelopes]
+    [envelopes],
   );
 
   const initializeSplits = useCallback(() => {
@@ -51,7 +51,9 @@ const TransactionSplitter = ({
         amount: Math.abs(item.totalPrice || item.price || 0),
         category: item.category?.name || transaction.category || "",
         envelopeId:
-          findEnvelopeForCategory(item.category?.name || transaction.category || "")?.id || "",
+          findEnvelopeForCategory(
+            item.category?.name || transaction.category || "",
+          )?.id || "",
         isOriginalItem: true,
         originalItem: item,
       }));
@@ -108,7 +110,7 @@ const TransactionSplitter = ({
     const totalAmount = Math.abs(transaction.amount);
     const allocated = splitAllocations.reduce(
       (sum, split) => sum + (parseFloat(split.amount) || 0),
-      0
+      0,
     );
     const remaining = totalAmount - allocated;
 
@@ -141,7 +143,7 @@ const TransactionSplitter = ({
           return updated;
         }
         return split;
-      })
+      }),
     );
   };
 
@@ -153,7 +155,11 @@ const TransactionSplitter = ({
 
   // Calculate split totals and validation
   const calculateSplitTotals = () => {
-    if (!transaction || transaction.amount === null || transaction.amount === undefined) {
+    if (
+      !transaction ||
+      transaction.amount === null ||
+      transaction.amount === undefined
+    ) {
       return {
         original: 0,
         allocated: 0,
@@ -166,7 +172,7 @@ const TransactionSplitter = ({
     const originalAmount = Math.abs(transaction.amount);
     const allocated = splitAllocations.reduce(
       (sum, split) => sum + (parseFloat(split.amount) || 0),
-      0
+      0,
     );
     const remaining = originalAmount - allocated;
 
@@ -200,11 +206,11 @@ const TransactionSplitter = ({
     if (!totals.isValid) {
       if (totals.isOverAllocated) {
         errors.push(
-          `Total splits ($${totals.allocated.toFixed(2)}) exceed original amount ($${totals.original.toFixed(2)})`
+          `Total splits ($${totals.allocated.toFixed(2)}) exceed original amount ($${totals.original.toFixed(2)})`,
         );
       } else {
         errors.push(
-          `Total splits ($${totals.allocated.toFixed(2)}) are less than original amount ($${totals.original.toFixed(2)})`
+          `Total splits ($${totals.allocated.toFixed(2)}) are less than original amount ($${totals.original.toFixed(2)})`,
         );
       }
     }
@@ -224,7 +230,7 @@ const TransactionSplitter = ({
       prev.map((split) => ({
         ...split,
         amount: Math.round((split.amount + adjustmentPerSplit) * 100) / 100,
-      }))
+      })),
     );
   };
 
@@ -233,7 +239,8 @@ const TransactionSplitter = ({
     if (splitAllocations.length === 0) return;
 
     const originalAmount = Math.abs(transaction.amount);
-    const amountPerSplit = Math.round((originalAmount / splitAllocations.length) * 100) / 100;
+    const amountPerSplit =
+      Math.round((originalAmount / splitAllocations.length) * 100) / 100;
 
     setSplitAllocations((prev) =>
       prev.map((split, index) => ({
@@ -242,7 +249,7 @@ const TransactionSplitter = ({
           index === 0
             ? originalAmount - amountPerSplit * (splitAllocations.length - 1) // First split gets remainder
             : amountPerSplit,
-      }))
+      })),
     );
   };
 
@@ -262,11 +269,16 @@ const TransactionSplitter = ({
         id: `${transaction.id}_split_${index}_${Date.now()}`,
         date: transaction.date,
         description: split.description.trim(),
-        amount: transaction.amount < 0 ? -Math.abs(split.amount) : Math.abs(split.amount), // Preserve original sign
+        amount:
+          transaction.amount < 0
+            ? -Math.abs(split.amount)
+            : Math.abs(split.amount), // Preserve original sign
         category: split.category.trim(),
         envelopeId: split.envelopeId || null,
         notes: `Split ${index + 1}/${splitAllocations.length} from: ${transaction.description}`,
-        source: transaction.source ? `${transaction.source}_split` : "manual_split",
+        source: transaction.source
+          ? `${transaction.source}_split`
+          : "manual_split",
         reconciled: transaction.reconciled || false,
         createdBy: transaction.createdBy || "User",
         createdAt: new Date().toISOString(),
@@ -319,7 +331,9 @@ const TransactionSplitter = ({
                 <Scissors className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">Split Transaction</h2>
+                <h2 className="text-xl font-bold text-white">
+                  Split Transaction
+                </h2>
                 <p className="text-blue-100 text-sm">
                   Break down this transaction into multiple categories
                 </p>
@@ -349,12 +363,15 @@ const TransactionSplitter = ({
               <div>
                 <span className="text-gray-600">Amount:</span>
                 <p className="font-medium text-lg">
-                  {transaction.amount >= 0 ? "+" : ""}${Math.abs(transaction.amount).toFixed(2)}
+                  {transaction.amount >= 0 ? "+" : ""}$
+                  {Math.abs(transaction.amount).toFixed(2)}
                 </p>
               </div>
               <div>
                 <span className="text-gray-600">Category:</span>
-                <p className="font-medium">{transaction.category || "Uncategorized"}</p>
+                <p className="font-medium">
+                  {transaction.category || "Uncategorized"}
+                </p>
               </div>
             </div>
           </div>
@@ -391,8 +408,12 @@ const TransactionSplitter = ({
 
             {/* Split Summary */}
             <div className="text-right">
-              <div className="text-sm text-gray-600">Original: ${totals.original.toFixed(2)}</div>
-              <div className="text-sm text-gray-600">Allocated: ${totals.allocated.toFixed(2)}</div>
+              <div className="text-sm text-gray-600">
+                Original: ${totals.original.toFixed(2)}
+              </div>
+              <div className="text-sm text-gray-600">
+                Allocated: ${totals.allocated.toFixed(2)}
+              </div>
               <div
                 className={`text-sm font-bold ${
                   totals.isValid
@@ -428,7 +449,11 @@ const TransactionSplitter = ({
                       type="text"
                       value={split.description}
                       onChange={(e) =>
-                        updateSplitAllocation(split.id, "description", e.target.value)
+                        updateSplitAllocation(
+                          split.id,
+                          "description",
+                          e.target.value,
+                        )
                       }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="What is this split for?"
@@ -437,7 +462,9 @@ const TransactionSplitter = ({
 
                   {/* Amount */}
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Amount *</label>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      Amount *
+                    </label>
                     <div className="relative">
                       <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <input
@@ -446,7 +473,11 @@ const TransactionSplitter = ({
                         min="0"
                         value={split.amount}
                         onChange={(e) =>
-                          updateSplitAllocation(split.id, "amount", parseFloat(e.target.value) || 0)
+                          updateSplitAllocation(
+                            split.id,
+                            "amount",
+                            parseFloat(e.target.value) || 0,
+                          )
                         }
                         className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
@@ -460,7 +491,13 @@ const TransactionSplitter = ({
                     </label>
                     <select
                       value={split.category}
-                      onChange={(e) => updateSplitAllocation(split.id, "category", e.target.value)}
+                      onChange={(e) =>
+                        updateSplitAllocation(
+                          split.id,
+                          "category",
+                          e.target.value,
+                        )
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="">Select category...</option>
@@ -474,11 +511,17 @@ const TransactionSplitter = ({
 
                   {/* Envelope */}
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Envelope</label>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      Envelope
+                    </label>
                     <select
                       value={split.envelopeId}
                       onChange={(e) =>
-                        updateSplitAllocation(split.id, "envelopeId", e.target.value)
+                        updateSplitAllocation(
+                          split.id,
+                          "envelopeId",
+                          e.target.value,
+                        )
                       }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
@@ -505,7 +548,8 @@ const TransactionSplitter = ({
                     )}
                     {split.envelopeId && (
                       <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                        → {envelopes.find((e) => e.id === split.envelopeId)?.name}
+                        →{" "}
+                        {envelopes.find((e) => e.id === split.envelopeId)?.name}
                       </span>
                     )}
                   </div>
@@ -527,7 +571,9 @@ const TransactionSplitter = ({
           {!totals.isValid && (
             <div
               className={`mb-4 p-3 rounded-lg border ${
-                totals.isOverAllocated ? "bg-red-50 border-red-200" : "bg-amber-50 border-amber-200"
+                totals.isOverAllocated
+                  ? "bg-red-50 border-red-200"
+                  : "bg-amber-50 border-amber-200"
               }`}
             >
               <div className="flex items-center">
@@ -559,7 +605,9 @@ const TransactionSplitter = ({
             </button>
             <button
               onClick={applySplitTransaction}
-              disabled={isProcessing || !totals.isValid || splitAllocations.length === 0}
+              disabled={
+                isProcessing || !totals.isValid || splitAllocations.length === 0
+              }
               className="flex-1 bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
             >
               {isProcessing ? (

@@ -1,6 +1,9 @@
 import { useState, useCallback, useMemo } from "react";
 import { useBudgetStore } from "../stores/budgetStore";
-import { ENVELOPE_TYPES, AUTO_CLASSIFY_ENVELOPE_TYPE } from "../constants/categories";
+import {
+  ENVELOPE_TYPES,
+  AUTO_CLASSIFY_ENVELOPE_TYPE,
+} from "../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../constants/frequency";
 
 /**
@@ -9,7 +12,8 @@ import { BIWEEKLY_MULTIPLIER } from "../constants/frequency";
  */
 const useUnassignedCashDistribution = () => {
   const budget = useBudgetStore();
-  const { envelopes, unassignedCash, bulkUpdateEnvelopes, setUnassignedCash } = budget;
+  const { envelopes, unassignedCash, bulkUpdateEnvelopes, setUnassignedCash } =
+    budget;
 
   // Distribution state (modal state now handled by budget store)
   const [distributions, setDistributions] = useState({});
@@ -17,7 +21,10 @@ const useUnassignedCashDistribution = () => {
 
   // Calculate total being distributed
   const totalDistributed = useMemo(() => {
-    return Object.values(distributions).reduce((sum, amount) => sum + (parseFloat(amount) || 0), 0);
+    return Object.values(distributions).reduce(
+      (sum, amount) => sum + (parseFloat(amount) || 0),
+      0,
+    );
   }, [distributions]);
 
   // Calculate remaining unassigned cash
@@ -54,7 +61,8 @@ const useUnassignedCashDistribution = () => {
   const distributeEqually = useCallback(() => {
     if (envelopes.length === 0) return;
 
-    const amountPerEnvelope = Math.floor((unassignedCash * 100) / envelopes.length) / 100;
+    const amountPerEnvelope =
+      Math.floor((unassignedCash * 100) / envelopes.length) / 100;
     const newDistributions = {};
 
     envelopes.forEach((envelope) => {
@@ -70,17 +78,28 @@ const useUnassignedCashDistribution = () => {
 
     // Calculate total budget across all envelope types
     const totalBudget = envelopes.reduce((sum, env) => {
-      const envelopeType = env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
+      const envelopeType =
+        env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
 
       if (envelopeType === ENVELOPE_TYPES.BILL) {
         // For bills, use biweeklyAllocation (convert to monthly equivalent)
-        return sum + (env.biweeklyAllocation ? env.biweeklyAllocation * BIWEEKLY_MULTIPLIER : 0);
+        return (
+          sum +
+          (env.biweeklyAllocation
+            ? env.biweeklyAllocation * BIWEEKLY_MULTIPLIER
+            : 0)
+        );
       } else if (envelopeType === ENVELOPE_TYPES.VARIABLE) {
         // For variables, use monthlyBudget
         return sum + (env.monthlyBudget || env.monthlyAmount || 0);
       } else if (envelopeType === ENVELOPE_TYPES.SAVINGS) {
         // For savings, use biweeklyAllocation or a reasonable monthly contribution
-        return sum + (env.biweeklyAllocation ? env.biweeklyAllocation * BIWEEKLY_MULTIPLIER : 50);
+        return (
+          sum +
+          (env.biweeklyAllocation
+            ? env.biweeklyAllocation * BIWEEKLY_MULTIPLIER
+            : 50)
+        );
       }
       return sum;
     }, 0);
@@ -94,7 +113,8 @@ const useUnassignedCashDistribution = () => {
     const newDistributions = {};
 
     envelopes.forEach((envelope) => {
-      const envelopeType = envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+      const envelopeType =
+        envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
       let monthlyBudget = 0;
 
       if (envelopeType === ENVELOPE_TYPES.BILL) {
