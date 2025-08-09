@@ -10,13 +10,13 @@ export const initHighlight = () => {
     serviceName: "violet-vault",
     environment: import.meta.env.MODE,
     tracingOrigins: true,
-    
+
     // Session replay configuration
     sessionShortcut: false, // Don't show session replay shortcut in UI
     inlineImages: false, // Don't inline images for privacy
     sessionSamplingRate: import.meta.env.MODE === "development" ? 1.0 : 0.1, // 10% sampling in prod, 100% in dev
     errorSamplingRate: 1.0, // Always capture errors
-    
+
     networkRecording: {
       enabled: true,
       recordHeadersAndBody: false, // Don't record sensitive data for privacy
@@ -29,7 +29,7 @@ export const initHighlight = () => {
         "https://firebase.googleapis.com",
       ],
     },
-    
+
     // Privacy settings for financial app
     maskAllInputs: true, // Mask all input fields by default
     maskAllText: false, // Don't mask all text, just inputs
