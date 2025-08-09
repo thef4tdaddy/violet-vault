@@ -15,11 +15,22 @@ NC="\033[0m" # No Color
 echo -e "${BLUE}🧪 VioletVault Staging Deployment${NC}"
 echo -e "${BLUE}==================================${NC}"
 
-# Check if we're on develop branch (preferred) or allow main
+# Check if we're on develop branch (preferred) or allow other branches for testing
 current_branch=$(git rev-parse --abbrev-ref HEAD)
-if [ "$current_branch" != "develop" ] && [ "$current_branch" != "main" ]; then
-  echo -e "${YELLOW}⚠️  Staging deployment from branch: '$current_branch'${NC}"
-  read -p "🔹 Continue? (y/n): " continue_anyway
+if [ "$current_branch" == "develop" ]; then
+  echo -e "${GREEN}✅ Staging deployment from develop branch${NC}"
+elif [ "$current_branch" == "main" ]; then
+  echo -e "${YELLOW}⚠️  Staging deployment from main branch${NC}"
+  echo -e "${YELLOW}💡 Consider using production deployment script instead${NC}"
+  read -p "🔹 Continue with staging deployment from main? (y/n): " continue_anyway
+  if [ "$continue_anyway" != "y" ]; then
+    echo -e "${RED}❌ Deployment canceled${NC}"
+    exit 1
+  fi
+else
+  echo -e "${YELLOW}⚠️  Staging deployment from feature branch: '$current_branch'${NC}"
+  echo -e "${YELLOW}💡 Recommended: Deploy from develop branch${NC}"
+  read -p "🔹 Continue with feature branch deployment? (y/n): " continue_anyway
   if [ "$continue_anyway" != "y" ]; then
     echo -e "${RED}❌ Deployment canceled${NC}"
     exit 1

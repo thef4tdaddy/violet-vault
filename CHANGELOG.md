@@ -1,5 +1,98 @@
 # Changelog
 
+## [1.7.0](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.6.1...violet-vault-v1.7.0) (2025-08-03)
+
+
+### Features
+
+* add collapsible functionality to Smart Envelope Suggestions ([b298a91](https://github.com/thef4tdaddy/violet-vault/commit/b298a9122650bbcc5ee0e16d498b0c36253be7d8))
+* add collapsible Smart Envelope Suggestions ([6743160](https://github.com/thef4tdaddy/violet-vault/commit/67431609f54eb7282817f5c0116ff53ad4ebcbfa))
+* add comprehensive Firebase sync debugging ([ef445ee](https://github.com/thef4tdaddy/violet-vault/commit/ef445eed790a94dda9f68868ecdbefcab83a221c))
+* add conditional Firebase config debug logging ([005c221](https://github.com/thef4tdaddy/violet-vault/commit/005c221e8ba7157d94e6db27d46a0076b3979017))
+* add conditional Firebase sync debug logging ([60bf32f](https://github.com/thef4tdaddy/violet-vault/commit/60bf32fc61605892ca19e6ece318f0badd6fc278))
+* add delete functionality to bill editing modal ([cdf300a](https://github.com/thef4tdaddy/violet-vault/commit/cdf300aae2af5359904f0341f22828bb7fef0ff7))
+* add delete functionality to bill editing modal ([902b84a](https://github.com/thef4tdaddy/violet-vault/commit/902b84ad1611d4b6bd2fd06deb3216413678386e))
+* add local error monitoring fallback when Highlight.io is blocked ([733e5e8](https://github.com/thef4tdaddy/violet-vault/commit/733e5e82948d06ce2b563a3300398a91ee88250b))
+* add localStorage migration from budget-store to violet-vault-store ([689ce1a](https://github.com/thef4tdaddy/violet-vault/commit/689ce1ac0b4e6da228365e023ddaafac85173f0e))
+* add milestone documentation and optimize logo assets ([3731af4](https://github.com/thef4tdaddy/violet-vault/commit/3731af4046f8c726895eff801df5acaab216ce8d))
+* add milestone documentation and optimize logo assets ([46005be](https://github.com/thef4tdaddy/violet-vault/commit/46005be18ced77bf5648d4d50a7df9270d1dd8bf))
+* complete production deployment workflow setup ([387ccdc](https://github.com/thef4tdaddy/violet-vault/commit/387ccdca367f38e9492483af0eea97b9118ae7b8))
+* comprehensive feature update - week of July 30th ([#84](https://github.com/thef4tdaddy/violet-vault/issues/84)) ([60f3588](https://github.com/thef4tdaddy/violet-vault/commit/60f358887922f55759cf8a4b807f24071dc06f5f))
+* double the size of the logo in the header ([c766769](https://github.com/thef4tdaddy/violet-vault/commit/c7667692efa7302ed09917d0a3c811bcb9fb4b48))
+* enhance ErrorBoundary deduplication to prevent cascading error reports ([63ab6d5](https://github.com/thef4tdaddy/violet-vault/commit/63ab6d5d6656b4f5c4e4b314e2d7c0808b0acdbe))
+* enhance favicon and metadata setup to prevent 1Password icon errors - connects to issue [#32](https://github.com/thef4tdaddy/violet-vault/issues/32) ([a46a249](https://github.com/thef4tdaddy/violet-vault/commit/a46a249b9ddfa3a42b6ef0e824c53545cec162eb))
+* implement automatic Firebase sync initialization and data syncing ([e542385](https://github.com/thef4tdaddy/violet-vault/commit/e5423855987285e49405e9a9d4dc7cf48ba97d95))
+* implement complete supplemental accounts transfer functionality ([51fbb62](https://github.com/thef4tdaddy/violet-vault/commit/51fbb62ff30ea0340b2f2605e9cd73726c4cbab9))
+* implement complete supplemental accounts transfer functionality ([1929e7c](https://github.com/thef4tdaddy/violet-vault/commit/1929e7c0df6751f6c1a22fe3947a7b3603c7e01e))
+
+
+### Bug Fixes
+
+* add encryption key logging and error handling to export ([f3c2f17](https://github.com/thef4tdaddy/violet-vault/commit/f3c2f1785b62314863056e0c7392fa826e794765))
+* add missing actualBalance and reconcileTransaction to Zustand store ([d001f45](https://github.com/thef4tdaddy/violet-vault/commit/d001f451a18307232e43931dc51e6db800e452ba))
+* add missing paycheckHistory to budget store to resolve ReferenceError ([57581c0](https://github.com/thef4tdaddy/violet-vault/commit/57581c026ac28e4f125e3067c6a2c8693debe8b5))
+* billManager now displays bills from budget.bills array ([f3539d6](https://github.com/thef4tdaddy/violet-vault/commit/f3539d6f393811332a7987aa7b21057d5fc0378b))
+* comprehensive bill management and UI improvements ([#110](https://github.com/thef4tdaddy/violet-vault/issues/110)) ([06bd8e5](https://github.com/thef4tdaddy/violet-vault/commit/06bd8e5559208c07992777b32f994485e82c2229))
+* comprehensive bill management and UI improvements ([#110](https://github.com/thef4tdaddy/violet-vault/issues/110)) ([262f1f8](https://github.com/thef4tdaddy/violet-vault/commit/262f1f8f8c0bdc057b0b6046860f00229ebad66b))
+* connect TransactionLedger edit and delete functionality to budget store ([9b22674](https://github.com/thef4tdaddy/violet-vault/commit/9b22674960a32f2bd81ba3242d2a661c7a40930f))
+* correct 'Due Soon' bills calculation to only include bills due within 7 days ([104dfff](https://github.com/thef4tdaddy/violet-vault/commit/104dfff57886371279d92c2c418faa6eeafc84d6))
+* correct 'Due Soon' bills calculation to only include bills due within 7 days ([3ab6432](https://github.com/thef4tdaddy/violet-vault/commit/3ab6432fcd33bf9ea1fbcf2c99b2a8f2a4c135f8))
+* correct documentation dates and markdown formatting ([29d2e91](https://github.com/thef4tdaddy/violet-vault/commit/29d2e9146b5e3653700a8b767e7b9b804c7cef36))
+* correct icon selection logic using displayName instead of name property ([a1e3410](https://github.com/thef4tdaddy/violet-vault/commit/a1e341053249d5e8d91d279c5d89ff797d6d7481))
+* ensure bill amounts are negative when converted to transactions ([d0c4597](https://github.com/thef4tdaddy/violet-vault/commit/d0c4597644ba3ecd1b389d393ede44a80124a4bb))
+* export function now reads from violet-vault-store first ([5957885](https://github.com/thef4tdaddy/violet-vault/commit/59578854a7610d16ede88c0c5bc000d37c88b1d5))
+* implement proper icon persistence and reduce console noise in production ([3b74750](https://github.com/thef4tdaddy/violet-vault/commit/3b74750be70d828676b48616ffb9c91d9af8d4ee))
+* import still using old data store ([f41b372](https://github.com/thef4tdaddy/violet-vault/commit/f41b3722d318dc57ece71f12935298b5dd8da1a4))
+* main branch export reads from encrypted data source ([aa4ff3e](https://github.com/thef4tdaddy/violet-vault/commit/aa4ff3ef8899765e7617228ad223a922bf260237))
+* prevent duplicate Sentry error reports from ErrorBoundary - connects to issue [#101](https://github.com/thef4tdaddy/violet-vault/issues/101) ([01e02ee](https://github.com/thef4tdaddy/violet-vault/commit/01e02ee894591f30d1314b4481970dda746bb565))
+* prevent empty error objects and invalid React element type errors from spamming Sentry - connects to issue [#105](https://github.com/thef4tdaddy/violet-vault/issues/105) ([d70093f](https://github.com/thef4tdaddy/violet-vault/commit/d70093fac27371c692b88326d1e21c2fcab98034))
+* prevent invalid element type error in BillManager getCategoryIcon function - connects to issue [#104](https://github.com/thef4tdaddy/violet-vault/issues/104) ([cf20833](https://github.com/thef4tdaddy/violet-vault/commit/cf208333bd5dc328a1756ce0d5dcd63f4a7d496e))
+* prevent unpaid bills from creating transactions and affecting balance ([d328e1b](https://github.com/thef4tdaddy/violet-vault/commit/d328e1bcf1469a9dc6dd68646c8a61809329e722))
+* re-enable Sentry error capture in production and speed up builds ([6285f47](https://github.com/thef4tdaddy/violet-vault/commit/6285f47b1334e4b148da9702a9e324dd03c19934))
+* remove conflicting error handling to enable Highlight.io errors ([65a2a38](https://github.com/thef4tdaddy/violet-vault/commit/65a2a384da957f127dd19a6eccb0ddf55963cb25))
+* rename UnifiedBillTracker to BillManager to match lazy import - connects to issue [#102](https://github.com/thef4tdaddy/violet-vault/issues/102) ([d711a96](https://github.com/thef4tdaddy/violet-vault/commit/d711a96cc2eaba993f69f6495541cebbfd653f99))
+* replace setAllTransactions with proper budget store methods in Layout ([f0559c8](https://github.com/thef4tdaddy/violet-vault/commit/f0559c8e1d0fb26a3c289d4b8a676d1a2f82783f))
+* resolve duplicate key error in billIcons.js and apply prettier formatting ([0411e3f](https://github.com/thef4tdaddy/violet-vault/commit/0411e3fe611eb5797a3f5ceb3c6bdf6a41f56124))
+* resolve handleChangePassword undefined error in MainContent component - connects to issue [#101](https://github.com/thef4tdaddy/violet-vault/issues/101) ([783cfbd](https://github.com/thef4tdaddy/violet-vault/commit/783cfbd12fa3071a0febecd465df63408d15088d))
+* resolve null transaction error in TransactionSplitter and improve ErrorBoundary logic ([5185e99](https://github.com/thef4tdaddy/violet-vault/commit/5185e9964f96c694ef6f59f90843c2e57c8d9b45))
+* resolve paycheckHistory initialization error in MainLayout ([f2a27cd](https://github.com/thef4tdaddy/violet-vault/commit/f2a27cd2bea7b345f2f53bfa387b24eedfd750ae))
+* resolve PaycheckProcessor undefined length error and improve ErrorBoundary filtering ([d5a74f2](https://github.com/thef4tdaddy/violet-vault/commit/d5a74f266fe95186dc130d8d24d52b14145ca826))
+* resolve Temporal Dead Zone error in TransactionSplitter initializeSplits function ([5703593](https://github.com/thef4tdaddy/violet-vault/commit/5703593422ea93259e0c412f9bb313b764e3df1b))
+* resolve UtensilsCrossed import error and improve empty error filtering ([82a4de5](https://github.com/thef4tdaddy/violet-vault/commit/82a4de5b9b100f8b7a310b6f8fc0341b7c5e7f07))
+* show Firebase debug info for Vercel preview deployments ([00d3791](https://github.com/thef4tdaddy/violet-vault/commit/00d3791a3421fbe97112107be7f42e004535dac5))
+* temporarily disable build in pre-commit hook due to local Vite freeze issue ([60de816](https://github.com/thef4tdaddy/violet-vault/commit/60de81638096a5c6004ebc26a51c92d13d7b325e))
+* update export/import to work with new Zustand store formats ([3e5ad37](https://github.com/thef4tdaddy/violet-vault/commit/3e5ad37a867ae5150d9d00d8c5b10af053e02fbc))
+* update main branch export to use budget-store localStorage key ([986b809](https://github.com/thef4tdaddy/violet-vault/commit/986b8097ae852748f3ad344a950d97c386b15444))
+
+
+### Documentation
+
+* add comprehensive testing strategy documentation ([e438122](https://github.com/thef4tdaddy/violet-vault/commit/e438122eb494c22c661df47c7af5f0817459d2bf))
+* add comprehensive testing strategy documentation ([f81d2d6](https://github.com/thef4tdaddy/violet-vault/commit/f81d2d6f1cb8e1db495b8a5225582efcd4b29f40))
+* add MIT license and update project documentation ([b8441d7](https://github.com/thef4tdaddy/violet-vault/commit/b8441d758d1e750443ca0a95a4ff60f9c48bf3f9))
+* add MIT license and update project documentation ([c43c45b](https://github.com/thef4tdaddy/violet-vault/commit/c43c45bbe45ef797c696afeb4ec6ab0ca33a4659))
+* add v2.2.0 Advanced Analytics & Integrations milestone ([007eb81](https://github.com/thef4tdaddy/violet-vault/commit/007eb81d8b3694f7b35ff359f9d2d1d7c6cef1e4))
+* claude memory addition ([003ab68](https://github.com/thef4tdaddy/violet-vault/commit/003ab680cee6f0e710df69d80d71877edb450985))
+* claude memory addition ([ac2d1b0](https://github.com/thef4tdaddy/violet-vault/commit/ac2d1b0101056294e4b83caf90f968e4e86ed57f))
+* complete roadmap linking with all GitHub issues ([19a1076](https://github.com/thef4tdaddy/violet-vault/commit/19a1076b68ff153010b393917c61ae6348952f11))
+* complete roadmap linking with all GitHub issues ([439d72a](https://github.com/thef4tdaddy/violet-vault/commit/439d72a9f74f34793b8b0dd732fce65242df7721))
+* enhance README with comprehensive documentation links ([05e9398](https://github.com/thef4tdaddy/violet-vault/commit/05e9398bda14466d17b6bdd5c10d7c4ef6595509))
+* enhance README with comprehensive documentation links ([b178e25](https://github.com/thef4tdaddy/violet-vault/commit/b178e25bab5853c1fe9bf9bd1eaa3f93e17c6646))
+* sync roadmap with consolidated GitHub milestones ([c6ea3e8](https://github.com/thef4tdaddy/violet-vault/commit/c6ea3e812ca1e5dd728e7bd87ce4f5636d6d1385))
+* sync roadmap with consolidated GitHub milestones ([da39ea7](https://github.com/thef4tdaddy/violet-vault/commit/da39ea722314751f6f024e81e81bd24da1622f41))
+* update branch protection rules in CLAUDE.md ([d43bd78](https://github.com/thef4tdaddy/violet-vault/commit/d43bd7898fcb6f93974acecb36a45bc8b67d378d))
+* update branch protection rules in CLAUDE.md ([389b336](https://github.com/thef4tdaddy/violet-vault/commit/389b336669b35b0ac7fea7f4b9546c4d0017f623))
+* update ROADMAP.md with 2025-2026 milestone timeline ([532306f](https://github.com/thef4tdaddy/violet-vault/commit/532306f3f632e83b37fa05b560d20df8a76c5e74))
+* update ROADMAP.md with 2025-2026 milestone timeline ([db88ac3](https://github.com/thef4tdaddy/violet-vault/commit/db88ac3c9966ee24b25128805c769dac9fcda48a))
+* update testing strategy documentation ([fb596d8](https://github.com/thef4tdaddy/violet-vault/commit/fb596d8a522cd09dd02aad6d7e5ad95c4c6c371e))
+* update testing strategy documentation ([229867e](https://github.com/thef4tdaddy/violet-vault/commit/229867e8aaae6d67aadab0025750975049062339))
+
+
+### CI/CD
+
+* restrict-commits finale ([b793217](https://github.com/thef4tdaddy/violet-vault/commit/b793217d7f9f4e81fcb7a01be1cadc1414145adb))
+* restrict-commits finale ([a082be5](https://github.com/thef4tdaddy/violet-vault/commit/a082be53c2c9e0364dd2a9072accca8d81ee1a56))
+
 ## [1.6.1](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.6.0...violet-vault-v1.6.1) (2025-07-31)
 
 ### Bug Fixes
