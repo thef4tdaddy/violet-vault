@@ -1,0 +1,187 @@
+name: Lint Warnings Tracker
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "src/**"
+      - "scripts/**"
+      - "*.js"
+      - "*.jsx"
+      - "*.ts"
+      - "*.tsx"
+  push:
+    branches: [main, develop]
+    paths:
+      - "src/**"
+      - "scripts/**"
+      - "*.js"
+      - "*.jsx"
+      - "*.ts"
+      - "*.tsx"
+
+jobs:
+  lint-warnings:
+    runs-on: ubuntu-latest
+    name: Track Lint Warnings
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint and capture warnings
+        id: lint
+        run: |
+          # Run ESLint and capture both stdout and stderr
+          npm run lint --silent > eslint-output.txt 2>&1 || true
+
+          # Parse the output to extract warnings
+          node scripts/parse-eslint-warnings.js eslint-output.txt > new-warnings.json
+
+          # Get current warning count from existing file
+          CURRENT_COUNT=$(if [ -f "./.github/data/lint-warnings.json" ]; then 
+            cat .github/data/lint-warnings.json | jq -r '.currentStatus.totalWarnings // 0'
+          else 
+            echo 0
+          fi)
+
+          # Get new warning count
+          NEW_COUNT=$(if [ -f "./new-warnings.json" ]; then 
+            cat new-warnings.json | jq -r '.currentStatus.totalWarnings // 0'
+          else 
+            echo 0
+          fi)
+
+          echo "current_count=$CURRENT_COUNT" >> $GITHUB_OUTPUT
+          echo "new_count=$NEW_COUNT" >> $GITHUB_OUTPUT
+
+          # Calculate percentage increase
+          PERCENTAGE_INCREASE=$(node -e "
+            const current = $CURRENT_COUNT;
+            const newCount = $NEW_COUNT;
+            if (current === 0) {
+              console.log(newCount > 0 ? 100 : 0);
+            } else {
+              const increase = ((newCount - current) / current) * 100;
+              console.log(Math.round(increase * 100) / 100);
+            }
+          ")
+
+          echo "percentage_increase=$PERCENTAGE_INCREASE" >> $GITHUB_OUTPUT
+
+      - name: Check warning increase threshold
+        id: check_threshold
+        run: |
+          PERCENTAGE_INCREASE="${{ steps.lint.outputs.percentage_increase }}"
+          CURRENT_COUNT="${{ steps.lint.outputs.current_count }}"
+          NEW_COUNT="${{ steps.lint.outputs.new_count }}"
+
+          echo "📊 **Lint Warning Analysis**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Previous warnings:** $CURRENT_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "- **Current warnings:** $NEW_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "- **Change:** $PERCENTAGE_INCREASE%" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Check if increase is over 20%
+          if (( $(echo "$PERCENTAGE_INCREASE > 20" | bc -l) )); then
+            echo "❌ **FAILED:** Warning count increased by $PERCENTAGE_INCREASE% (over 20% threshold)" >> $GITHUB_STEP_SUMMARY
+            echo "threshold_exceeded=true" >> $GITHUB_OUTPUT
+            exit 1
+          elif (( $(echo "$PERCENTAGE_INCREASE > 0" | bc -l) )); then
+            echo "⚠️ **WARNING:** Warning count increased by $PERCENTAGE_INCREASE% (within 20% threshold)" >> $GITHUB_STEP_SUMMARY
+            echo "threshold_exceeded=false" >> $GITHUB_OUTPUT
+          elif (( $(echo "$PERCENTAGE_INCREASE < 0" | bc -l) )); then
+            echo "✅ **IMPROVED:** Warning count decreased by $(echo "$PERCENTAGE_INCREASE * -1" | bc -l)%" >> $GITHUB_STEP_SUMMARY
+            echo "threshold_exceeded=false" >> $GITHUB_OUTPUT
+          else
+            echo "✅ **STABLE:** No change in warning count" >> $GITHUB_STEP_SUMMARY
+            echo "threshold_exceeded=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update lint-warnings.json on main/develop push
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+        run: |
+          # Replace the existing lint-warnings.json with the new data
+          cp new-warnings.json .github/data/lint-warnings.json
+
+          # Configure git
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          # Check if there are changes
+          if git diff --quiet .github/data/lint-warnings.json; then
+            echo "No changes to lint-warnings.json"
+          else
+            git add .github/data/lint-warnings.json
+            git commit -m "chore: update lint warnings tracking data [skip ci]
+            
+            Updated by GitHub Action after lint analysis
+            
+            🤖 Generated with GitHub Actions"
+            git push
+          fi
+
+      - name: Comment on PR with results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const currentCount = '${{ steps.lint.outputs.current_count }}';
+            const newCount = '${{ steps.lint.outputs.new_count }}';
+            const percentageIncrease = '${{ steps.lint.outputs.percentage_increase }}';
+            const thresholdExceeded = '${{ steps.check_threshold.outputs.threshold_exceeded }}' === 'true';
+
+            let emoji = '✅';
+            let status = 'PASSED';
+            let color = 'green';
+
+            if (thresholdExceeded) {
+              emoji = '❌';
+              status = 'FAILED';
+              color = 'red';
+            } else if (parseFloat(percentageIncrease) > 0) {
+              emoji = '⚠️';
+              status = 'WARNING';
+              color = 'orange';
+            }
+
+            const body = `## ${emoji} Lint Warning Analysis - ${status}
+
+            | Metric | Value |
+            |--------|-------|
+            | **Previous Warnings** | ${currentCount} |
+            | **Current Warnings** | ${newCount} |
+            | **Change** | ${percentageIncrease}% |
+            | **Threshold** | 20% increase |
+
+            ${thresholdExceeded 
+              ? '🚨 **This PR exceeds the 20% warning increase threshold and will be blocked.**' 
+              : '✅ **This PR is within the acceptable warning increase threshold.**'
+            }
+
+            <details>
+            <summary>View detailed warning breakdown</summary>
+
+            The full warning analysis is available in the workflow summary.
+            You can also check the \`.github/data/lint-warnings.json\` file for detailed breakdown by category and file.
+
+            </details>`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });

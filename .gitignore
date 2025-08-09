@@ -30,3 +30,4 @@ dist-ssr
 .vercel
 .env*.local
 CLAUDE.local.md
+.env.development

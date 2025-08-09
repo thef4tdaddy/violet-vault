@@ -1,7 +1,6 @@
 // src/components/layout/MainLayout.jsx
-import React, { useState, useMemo, Suspense, lazy } from "react";
-import { BudgetProvider } from "../../contexts/BudgetContext";
-import { useBudget } from "../../hooks/useBudget";
+import React, { useState, useMemo, Suspense } from "react";
+import { useBudgetStore } from "../../stores/budgetStore";
 import useAuthFlow from "../../hooks/useAuthFlow";
 import useDataManagement from "../../hooks/useDataManagement";
 import usePasswordRotation from "../../hooks/usePasswordRotation";
@@ -13,6 +12,7 @@ import Header from "../ui/Header";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ToastContainer } from "../ui/Toast";
 import useToast from "../../hooks/useToast";
+import ViewRendererComponent from "./ViewRenderer";
 import FirebaseSync from "../../utils/firebaseSync";
 import logger from "../../utils/logger";
 import { getVersionInfo } from "../../utils/version";
@@ -26,19 +26,14 @@ import {
   BookOpen,
   BarChart3,
 } from "lucide-react";
+import { AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/categories";
+import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
 import SyncStatusIndicators from "../sync/SyncStatusIndicators";
 import ConflictResolutionModal from "../sync/ConflictResolutionModal";
+import SummaryCards from "./SummaryCards";
+import BugReportButton from "../feedback/BugReportButton";
 
-// Lazy load heavy components for better performance
-const PaycheckProcessor = lazy(() => import("../budgeting/PaycheckProcessor"));
-const EnvelopeGrid = lazy(() => import("../budgeting/EnvelopeGrid"));
-const SmartEnvelopeSuggestions = lazy(() => import("../budgeting/SmartEnvelopeSuggestions"));
-const BillManager = lazy(() => import("../bills/BillManager"));
-const SavingsGoals = lazy(() => import("../savings/SavingsGoals"));
-const Dashboard = lazy(() => import("../pages/MainDashboard"));
-const TransactionLedger = lazy(() => import("../transactions/TransactionLedger"));
-const ChartsAndAnalytics = lazy(() => import("../analytics/ChartsAndAnalytics"));
-const SupplementalAccounts = lazy(() => import("../accounts/SupplementalAccounts"));
+// Heavy components now lazy loaded in ViewRenderer
 
 const Layout = () => {
   logger.debug("Layout component is running");
@@ -56,7 +51,8 @@ const Layout = () => {
     handleUpdateProfile,
   } = useAuthFlow();
 
-  const { exportData, importData, resetEncryptionAndStartFresh } = useDataManagement();
+  const { exportData, importData, resetEncryptionAndStartFresh } =
+    useDataManagement();
 
   const {
     rotationDue,
@@ -102,35 +98,30 @@ const Layout = () => {
 
   return (
     <>
-      <BudgetProvider
-        encryptionKey={encryptionKey}
+      <MainContent
         currentUser={currentUser}
+        encryptionKey={encryptionKey}
         budgetId={budgetId}
-        salt={salt}
-      >
-        <MainContent
-          currentUser={currentUser}
-          encryptionKey={encryptionKey}
-          budgetId={budgetId}
-          onUserChange={handleLogout}
-          onExport={exportData}
-          onImport={importData}
-          onLogout={handleLogout}
-          onChangePassword={handleChangePassword}
-          onResetEncryption={resetEncryptionAndStartFresh}
-          syncConflicts={syncConflicts}
-          onResolveConflict={resolveConflict}
-          setSyncConflicts={setSyncConflicts}
-          firebaseSync={firebaseSync}
-          rotationDue={rotationDue}
-          onUpdateProfile={handleUpdateProfile}
-        />
-      </BudgetProvider>
+        onUserChange={handleLogout}
+        onExport={exportData}
+        onImport={importData}
+        onLogout={handleLogout}
+        onChangePassword={handleChangePassword}
+        onResetEncryption={resetEncryptionAndStartFresh}
+        syncConflicts={syncConflicts}
+        onResolveConflict={resolveConflict}
+        setSyncConflicts={setSyncConflicts}
+        firebaseSync={firebaseSync}
+        rotationDue={rotationDue}
+        onUpdateProfile={handleUpdateProfile}
+      />
       {showRotationModal && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="glassmorphism rounded-2xl p-6 w-full max-w-md border border-white/30 shadow-2xl">
             <h3 className="text-xl font-semibold mb-4">Password Expired</h3>
-            <p className="text-gray-700 mb-4">For security, please set a new password.</p>
+            <p className="text-gray-700 mb-4">
+              For security, please set a new password.
+            </p>
             <input
               type="password"
               value={newPassword}
@@ -180,11 +171,16 @@ const MainContent = ({
   rotationDue,
   onUpdateProfile,
 }) => {
-  const budget = useBudget();
+  const budget = useBudgetStore();
   const [activeView, setActiveView] = useState("dashboard");
 
   // Custom hooks for MainContent business logic
-  const { handleManualSync } = useFirebaseSync(firebaseSync, encryptionKey, budgetId, currentUser);
+  const { handleManualSync } = useFirebaseSync(
+    firebaseSync,
+    encryptionKey,
+    budgetId,
+    currentUser,
+  );
 
   // Handle import by saving data then loading into context
   const handleImport = async (event) => {
@@ -197,12 +193,14 @@ const MainContent = ({
   // Handle change password - delegate to parent component
   const handleChangePassword = onChangePassword;
 
-  const { envelopes, savingsGoals, unassignedCash, paycheckHistory, isOnline, isSyncing } = budget;
-
-  // Calculate total biweekly need from all envelopes
-  const totalBiweeklyNeed = envelopes.reduce((total, envelope) => {
-    return total + (envelope.biweeklyAllocation || 0);
-  }, 0);
+  const {
+    envelopes,
+    savingsGoals,
+    unassignedCash,
+    paycheckHistory,
+    isOnline,
+    isSyncing,
+  } = budget;
 
   // Payday prediction notifications (after destructuring)
   usePaydayPrediction(paycheckHistory, !!currentUser);
@@ -215,6 +213,37 @@ const MainContent = ({
     ? savingsGoals.reduce((sum, goal) => sum + goal.currentAmount, 0)
     : 0;
   const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
+
+  // Calculate total biweekly funding need across all envelope types
+  const totalBiweeklyNeed = Array.isArray(envelopes)
+    ? envelopes.reduce((sum, env) => {
+        // Auto-classify envelope type if not set
+        const envelopeType =
+          env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
+
+        let biweeklyNeed = 0;
+        if (envelopeType === "bill" && env.biweeklyAllocation) {
+          biweeklyNeed = Math.max(
+            0,
+            env.biweeklyAllocation - env.currentBalance,
+          );
+        } else if (envelopeType === "variable" && env.monthlyBudget) {
+          const biweeklyTarget = env.monthlyBudget / BIWEEKLY_MULTIPLIER;
+          biweeklyNeed = Math.max(0, biweeklyTarget - env.currentBalance);
+        } else if (envelopeType === "savings" && env.targetAmount) {
+          const remainingToTarget = Math.max(
+            0,
+            env.targetAmount - env.currentBalance,
+          );
+          biweeklyNeed = Math.min(
+            remainingToTarget,
+            env.biweeklyAllocation || 0,
+          );
+        }
+
+        return sum + biweeklyNeed;
+      }, 0)
+    : 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden pb-24 sm:pb-0">
@@ -317,44 +346,19 @@ const MainContent = ({
           </nav>
         </div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <SummaryCard
-            key="total-cash"
-            icon={Wallet}
-            label="Total Cash"
-            value={totalCash}
-            color="purple"
-          />
-          <SummaryCard
-            key="unassigned-cash"
-            icon={TrendingUp}
-            label="Unassigned Cash"
-            value={unassignedCash}
-            color="emerald"
-          />
-          <SummaryCard
-            key="savings-total"
-            icon={Target}
-            label="Savings Total"
-            value={totalSavingsBalance}
-            color="cyan"
-          />
-          <SummaryCard
-            key="biweekly-need"
-            icon={DollarSign}
-            label="Biweekly Need"
-            value={totalBiweeklyNeed}
-            color="amber"
-          />
-        </div>
+        {/* Summary Cards - Enhanced with clickable unassigned cash distribution */}
+        <SummaryCards
+          totalCash={totalCash}
+          unassignedCash={unassignedCash}
+          totalSavingsBalance={totalSavingsBalance}
+          biweeklyAllocation={totalBiweeklyNeed}
+        />
 
         {/* Main Content */}
-        <ViewRenderer
+        <ViewRendererComponent
           activeView={activeView}
           budget={budget}
           currentUser={currentUser}
-          totalBiweeklyNeed={totalBiweeklyNeed}
         />
 
         <SyncStatusIndicators isOnline={isOnline} isSyncing={isSyncing} />
@@ -364,14 +368,21 @@ const MainContent = ({
           onDismiss={() => setSyncConflicts(null)}
         />
 
+        {/* Bug Report Button */}
+        <BugReportButton />
+
         {/* Version Footer */}
         <div className="mt-8 text-center">
           <div className="glassmorphism rounded-2xl p-4 max-w-md mx-auto">
             <p className="text-sm text-gray-600">
-              <span className="font-semibold text-purple-600">{getVersionInfo().displayName}</span>{" "}
+              <span className="font-semibold text-purple-600">
+                {getVersionInfo().displayName}
+              </span>{" "}
               v{getVersionInfo().version}
             </p>
-            <p className="text-xs text-gray-500 mt-1">Built with ❤️ for secure budgeting</p>
+            <p className="text-xs text-gray-500 mt-1">
+              Built with ❤️ for secure budgeting
+            </p>
           </div>
         </div>
       </div>
@@ -393,213 +404,6 @@ const NavButton = ({ active, onClick, icon: Icon, label }) => (
   </button>
 );
 
-const SummaryCard = ({ icon: Icon, label, value, color }) => {
-  const colorClasses = {
-    purple: "bg-purple-500",
-    emerald: "bg-emerald-500",
-    cyan: "bg-cyan-500",
-    amber: "bg-amber-500",
-  };
-
-  const textColorClasses = {
-    purple: "text-gray-900",
-    emerald: "text-emerald-600",
-    cyan: "text-cyan-600",
-    amber: "text-amber-600",
-  };
-
-  return (
-    <div className="glassmorphism rounded-3xl p-6">
-      <div className="flex items-center">
-        <div className="relative mr-4">
-          <div
-            className={`absolute inset-0 ${colorClasses[color]} rounded-2xl blur-lg opacity-30`}
-          ></div>
-          <div className={`relative ${colorClasses[color]} p-3 rounded-2xl`}>
-            <Icon className="h-6 w-6 text-white" />
-          </div>
-        </div>
-        <div>
-          <p className="text-sm font-semibold text-gray-600 mb-1">{label}</p>
-          <p className={`text-2xl font-bold ${textColorClasses[color]}`}>${value.toFixed(2)}</p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const ViewRenderer = ({ activeView, budget, currentUser }) => {
-  const {
-    envelopes,
-    bills,
-    savingsGoals,
-    supplementalAccounts,
-    unassignedCash,
-    paycheckHistory,
-    actualBalance,
-    transactions,
-    allTransactions: rawAllTransactions,
-    setActualBalance,
-    reconcileTransaction,
-    addSavingsGoal,
-    updateSavingsGoal,
-    deleteSavingsGoal,
-    addSupplementalAccount,
-    updateSupplementalAccount,
-    deleteSupplementalAccount,
-    transferFromSupplementalAccount,
-    addEnvelope,
-    updateEnvelope,
-    processPaycheck,
-    addTransaction,
-    addTransactions,
-    updateTransaction,
-    setTransactions,
-  } = budget;
-
-  // Filter out null/undefined transactions to prevent runtime errors
-  const allTransactions = (rawAllTransactions || []).filter((t) => t && typeof t === "object");
-  const safeTransactions = (transactions || []).filter(
-    (t) => t && typeof t === "object" && typeof t.amount === "number"
-  );
-
-  const views = {
-    dashboard: (
-      <Dashboard
-        envelopes={envelopes}
-        savingsGoals={savingsGoals}
-        unassignedCash={unassignedCash}
-        actualBalance={actualBalance}
-        onUpdateActualBalance={setActualBalance}
-        onReconcileTransaction={reconcileTransaction}
-        transactions={safeTransactions}
-        paycheckHistory={paycheckHistory}
-      />
-    ),
-    envelopes: (
-      <div className="space-y-6">
-        <SmartEnvelopeSuggestions
-          transactions={safeTransactions}
-          envelopes={envelopes}
-          onCreateEnvelope={addEnvelope}
-          onUpdateEnvelope={updateEnvelope}
-          dateRange="6months"
-          minAmount={50}
-          minTransactions={3}
-        />
-        <EnvelopeGrid />
-      </div>
-    ),
-    savings: (
-      <SavingsGoals
-        savingsGoals={savingsGoals}
-        unassignedCash={unassignedCash}
-        onAddGoal={addSavingsGoal}
-        onUpdateGoal={updateSavingsGoal}
-        onDeleteGoal={deleteSavingsGoal}
-        onDistributeToGoals={() => {}} // Will be implemented
-      />
-    ),
-    supplemental: (
-      <SupplementalAccounts
-        supplementalAccounts={supplementalAccounts}
-        onAddAccount={addSupplementalAccount}
-        onUpdateAccount={updateSupplementalAccount}
-        onDeleteAccount={deleteSupplementalAccount}
-        onTransferToEnvelope={transferFromSupplementalAccount}
-        envelopes={envelopes}
-        currentUser={currentUser}
-      />
-    ),
-    paycheck: (
-      <PaycheckProcessor
-        biweeklyAllocation={envelopes.reduce(
-          (total, envelope) => total + (envelope.biweeklyAllocation || 0),
-          0
-        )}
-        envelopes={envelopes}
-        paycheckHistory={paycheckHistory}
-        onProcessPaycheck={processPaycheck}
-        currentUser={currentUser}
-      />
-    ),
-    bills: (
-      <BillManager
-        transactions={allTransactions}
-        envelopes={envelopes}
-        onPayBill={(updatedBill) => {
-          // Update the bill using budget store method
-          updateTransaction(updatedBill);
-        }}
-        onUpdateBill={(updatedBill) => {
-          // Update the bill using budget store method
-          updateTransaction(updatedBill);
-        }}
-        onCreateRecurringBill={(newBill) => {
-          // Add new bill to allTransactions
-          const billTransaction = {
-            ...newBill,
-            id: `bill_${Date.now()}`,
-            type: "recurring_bill",
-            date: new Date().toISOString().split("T")[0],
-            isPaid: false,
-            source: "manual",
-          };
-          addTransaction(billTransaction);
-        }}
-        onSearchNewBills={async () => {
-          try {
-            // This would integrate with email parsing or other bill detection services
-            // For now, we'll show a placeholder notification
-            alert(
-              "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox."
-            );
-          } catch (error) {
-            console.error("Failed to search for new bills:", error);
-            alert("Failed to search for new bills. Please try again.");
-          }
-        }}
-        onError={(error) => {
-          console.error("Bill management error:", error);
-          alert(`Error: ${error.message || error}`);
-        }}
-      />
-    ),
-    transactions: (
-      <TransactionLedger
-        transactions={allTransactions}
-        envelopes={envelopes}
-        onAddTransaction={() => {}} // Will be implemented
-        onUpdateTransaction={() => {}} // Will be implemented
-        onDeleteTransaction={() => {}} // Will be implemented
-        onBulkImport={(newTransactions) => {
-          console.log("🔄 onBulkImport called with transactions:", newTransactions.length);
-          // Add transactions using budget store method
-          addTransactions(newTransactions);
-          const updatedTransactions = [...safeTransactions, ...newTransactions];
-          setTransactions(updatedTransactions);
-          console.log("💾 Bulk import complete. Added transactions:", newTransactions.length);
-        }}
-        currentUser={currentUser}
-      />
-    ),
-    analytics: (
-      <ChartsAndAnalytics
-        transactions={allTransactions}
-        envelopes={envelopes}
-        bills={bills}
-        paycheckHistory={paycheckHistory}
-        savingsGoals={savingsGoals}
-        currentUser={currentUser}
-      />
-    ),
-  };
-
-  return (
-    <Suspense fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}>
-      {views[activeView]}
-    </Suspense>
-  );
-};
+// SummaryCard component removed - now using enhanced SummaryCards component with clickable functionality
 
 export default Layout;
