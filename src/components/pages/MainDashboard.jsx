@@ -122,8 +122,8 @@ const Dashboard = () => {
     <div className="space-y-6">
       {/* Payday Prediction */}
       {paydayPrediction && (
-        <PaydayPrediction 
-          prediction={paydayPrediction} 
+        <PaydayPrediction
+          prediction={paydayPrediction}
           className="mb-6"
           onProcessPaycheck={handleProcessPaycheck}
           onPrepareEnvelopes={handlePrepareEnvelopes}

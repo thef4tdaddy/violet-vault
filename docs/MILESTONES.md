@@ -47,12 +47,13 @@ This document tracks VioletVault's milestone-based development using **bi-weekly
 #### ✅ Successfully Completed Features
 
 **🎯 Core Cash Management Features:**
+
 - **#114** - Full Negative Balance Support for Unassigned Cash (**COMPLETED**)
   - **Status**: Merged and deployed
   - **Description**: Complete overspending support with visual indicators and handling logic
   - **Impact**: Users can now handle overspending scenarios gracefully
 - **#111** - Unassigned Cash Distribution Modal (**COMPLETED**)
-  - **Status**: Merged and deployed  
+  - **Status**: Merged and deployed
   - **Description**: Click-to-distribute modal for allocating unassigned cash to envelopes
   - **Impact**: Streamlined cash allocation workflow
 - **#113** - Manual Virtual Balance Override on Dashboard (**COMPLETED**)
@@ -61,6 +62,7 @@ This document tracks VioletVault's milestone-based development using **bi-weekly
   - **Impact**: Better balance reconciliation capabilities
 
 **🏷️ Envelope System Enhancements:**
+
 - **#137** - Variable Expense Envelope Classification and Auto-funding (**COMPLETED**)
   - **Status**: Merged and deployed
   - **Description**: Smart envelope types with automated funding logic for variable expenses
@@ -71,6 +73,7 @@ This document tracks VioletVault's milestone-based development using **bi-weekly
   - **Impact**: Better integration between bills and envelope budgeting
 
 **🏗️ Architecture & Code Quality:**
+
 - **#211** - Comprehensive State Management Cleanup (**COMPLETED**)
   - **Status**: Merged and deployed
   - **Description**: Week-long refactoring focus consolidating duplicate stores/contexts
@@ -89,6 +92,7 @@ This document tracks VioletVault's milestone-based development using **bi-weekly
   - **Impact**: More maintainable and scalable component architecture
 
 **🎨 UI/UX Improvements:**
+
 - **#222** - Logo Styling Fixes for Glassmorphic Design (**COMPLETED**)
   - **Status**: Merged and deployed
   - **Description**: Fixed logo border placement and styling for visual consistency
@@ -99,13 +103,15 @@ This document tracks VioletVault's milestone-based development using **bi-weekly
   - **Impact**: Consistent file naming across the codebase
 
 **📊 System Improvements:**
+
 - **Envelope Type Filtering** - Added filtering capabilities to EnvelopeGrid
-- **Standardized Categories** - Unified categories across the entire application  
+- **Standardized Categories** - Unified categories across the entire application
 - **Biweekly Payment Calculations** - Fixed and standardized payment readiness logic
 - **Automated Lint Warning Tracking** - GitHub Actions integration for code quality
 - **Bill-to-Envelope Connection System** - Complete integration between bills and envelopes
 
 **🔐 Security & User Experience:**
+
 - **#28** - Enhanced Payday Prediction with Proactive Funding Suggestions (**COMPLETED & CLOSED**)
   - **Status**: Fully implemented and deployed, issue closed
   - **Description**: Complete payday prediction system with proactive action buttons, conditional UI, and smart contextual guidance
@@ -118,6 +124,7 @@ This document tracks VioletVault's milestone-based development using **bi-weekly
 #### Notes on Major Scope Changes
 
 **Originally planned for future but completed in v1.8.0:**
+
 - **#111** - Unassigned Cash Distribution Modal (originally scheduled for v1.11.0) ✅ **COMPLETED IN v1.8.0**
 - **#114** - Negative Virtual Balance Support (originally scheduled for v1.11.0) ✅ **COMPLETED IN v1.8.0**
 - **#137** - Variable Envelope Classification (major new feature) ✅ **COMPLETED IN v1.8.0**
@@ -145,9 +152,10 @@ git commit -m "refactor: improve layout architecture and error tracking"
 **Status: 🚧 In Progress**
 
 #### 🎯 Phase 1 Complete - Enhanced Data Layer Foundation
+
 - **#220** - TanStack Query + Dexie Integration **Phase 1 COMPLETED** ✅
   - **Status**: Foundation implemented in `feature/tanstack-dexie-integration`
-  - **Achievements**: 
+  - **Achievements**:
     - Consolidated duplicate query clients into unified enhanced version
     - Created `useBudgetData` - unified TanStack Query + Zustand + Dexie hook
     - Built specialized hooks: `useEnvelopes`, `useTransactions`
@@ -157,10 +165,11 @@ git commit -m "refactor: improve layout architecture and error tracking"
   - **Impact**: 70% reduced network requests, sub-100ms data loading, offline-first functionality
 
 #### 🚧 Phase 2 In Progress - Core Data Layer
+
 **Remaining Features**:
 
 - **#153** - Refactor SavingsGoals.jsx - Extract savings goal business logic and UI components
-- **#152** - Refactor BillManager.jsx - Extract bill management business logic and UI components  
+- **#152** - Refactor BillManager.jsx - Extract bill management business logic and UI components
 - **#151** - Refactor ChartsAndAnalytics.jsx - Extract visualization business logic and UI components
 - **#150** - Master: VioletVault Refactoring Initiative (Long-term coordination)
 - **#127** - Refactor SupplementalAccounts component - separate business logic from UI
@@ -170,6 +179,7 @@ git commit -m "refactor: improve layout architecture and error tracking"
 - **#70** - Compliance & Privacy
 
 #### 📋 Documentation Tasks
+
 - **#224** - Update docs & roadmap for milestone: v1.8.0 🚧 **IN PROGRESS**
 
 ### v1.10.0 - Visualization & Reports (Sep 1 - Oct 15)

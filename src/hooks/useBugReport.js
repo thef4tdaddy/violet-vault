@@ -77,10 +77,10 @@ const useBugReport = () => {
 
       // Submit to Cloudflare Worker if endpoint is configured
       const bugReportEndpoint = import.meta.env.VITE_BUG_REPORT_ENDPOINT;
-      
+
       if (bugReportEndpoint) {
         console.log("Submitting bug report to:", bugReportEndpoint);
-        
+
         const response = await fetch(bugReportEndpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -94,7 +94,7 @@ const useBugReport = () => {
 
         const result = await response.json();
         console.log("Bug report submitted successfully:", result);
-        
+
         // Store the issue URL for user feedback
         if (result.issueUrl) {
           reportData.issueUrl = result.issueUrl;

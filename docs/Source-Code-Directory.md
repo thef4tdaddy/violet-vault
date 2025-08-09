@@ -189,28 +189,28 @@ _Modal dialog components_
 
 _Custom React hooks for business logic_
 
-| Hook                     | Purpose                                                |
-| ------------------------ | ------------------------------------------------------ |
-| `useActualBalance.js`    | Bank account balance management and reconciliation     |
-| `useAuthFlow.js`         | Authentication flow management                         |
-| `useBudgetData.js`       | **NEW v1.9** - Unified TanStack Query + Zustand + Dexie hook |
-| `useDataManagement.js`   | Import/export operations                               |
+| Hook                     | Purpose                                                             |
+| ------------------------ | ------------------------------------------------------------------- |
+| `useActualBalance.js`    | Bank account balance management and reconciliation                  |
+| `useAuthFlow.js`         | Authentication flow management                                      |
+| `useBudgetData.js`       | **NEW v1.9** - Unified TanStack Query + Zustand + Dexie hook        |
+| `useDataManagement.js`   | Import/export operations                                            |
 | `useEnvelopes.js`        | **NEW v1.9** - Specialized envelope management with smart filtering |
-| `useFirebaseSync.js`     | Firebase synchronization and activity management       |
-| `useNetworkStatus.js`    | Network status management (online/offline detection)   |
-| `usePasswordRotation.js` | Password security and rotation                         |
-| `usePaydayPrediction.js` | Payday prediction and notifications                    |
-| `useToast.js`            | Toast notification management                          |
-| `useTransactions.js`     | **NEW v1.9** - Advanced transaction queries with analytics |
+| `useFirebaseSync.js`     | Firebase synchronization and activity management                    |
+| `useNetworkStatus.js`    | Network status management (online/offline detection)                |
+| `usePasswordRotation.js` | Password security and rotation                                      |
+| `usePaydayPrediction.js` | Payday prediction and notifications                                 |
+| `useToast.js`            | Toast notification management                                       |
+| `useTransactions.js`     | **NEW v1.9** - Advanced transaction queries with analytics          |
 
 ## 🏪 Stores Directory (`/stores/`)
 
 _Zustand state management stores_
 
-| Store             | Purpose                                           |
-| ----------------- | ------------------------------------------------- |
-| `authStore.jsx`   | Authentication state management (renamed for JSX) |
-| `budgetStore.js`  | Main budget data state management (Zustand store) |
+| Store            | Purpose                                           |
+| ---------------- | ------------------------------------------------- |
+| `authStore.jsx`  | Authentication state management (renamed for JSX) |
+| `budgetStore.js` | Main budget data state management (Zustand store) |
 
 ## 🌐 Contexts Directory (`/contexts/`)
 
@@ -225,19 +225,19 @@ _React context providers_
 
 _Utility functions and services_
 
-| Utility                | Purpose                                                    |
-| ---------------------- | ---------------------------------------------------------- |
-| `billIcons.js`         | Bill categorization icons                                  |
-| `encryption.js`        | Data encryption/decryption utilities                       |
-| `firebaseConfig.js`    | Firebase configuration                                     |
-| `firebaseSync.js`      | Firebase synchronization service                           |
-| `highlight.js`         | Error highlighting and debugging utilities                 |
-| `logger.js`            | Application logging utilities                              |
-| `paydayPredictor.js`   | Payday prediction algorithms with enhanced recommendations |
-| `performance.js`       | Performance monitoring utilities                           |
-| `queryClient.js`       | **Enhanced v1.9** - TanStack Query + Dexie integration with offline support |
-| `sentry.js`            | Error monitoring and reporting                             |
-| `version.js`           | Application version management                             |
+| Utility              | Purpose                                                                     |
+| -------------------- | --------------------------------------------------------------------------- |
+| `billIcons.js`       | Bill categorization icons                                                   |
+| `encryption.js`      | Data encryption/decryption utilities                                        |
+| `firebaseConfig.js`  | Firebase configuration                                                      |
+| `firebaseSync.js`    | Firebase synchronization service                                            |
+| `highlight.js`       | Error highlighting and debugging utilities                                  |
+| `logger.js`          | Application logging utilities                                               |
+| `paydayPredictor.js` | Payday prediction algorithms with enhanced recommendations                  |
+| `performance.js`     | Performance monitoring utilities                                            |
+| `queryClient.js`     | **Enhanced v1.9** - TanStack Query + Dexie integration with offline support |
+| `sentry.js`          | Error monitoring and reporting                                              |
+| `version.js`         | Application version management                                              |
 
 ## 💾 Database Directory (`/db/`)
 
@@ -294,6 +294,7 @@ _Application constants and configurations_
 ✅ **v1.8.0:** Cash management enhancements and state cleanup - **COMPLETED!**
 
 #### **v1.8.0 Milestone Achievements:**
+
 - ✅ Enhanced payday prediction with proactive funding suggestions (#28)
 - ✅ Comprehensive state management cleanup (#211) - Zustand consolidation
 - ✅ Logo styling fixes for glassmorphic design (#222)
@@ -302,6 +303,7 @@ _Application constants and configurations_
 - ✅ Debt tracking Phase 1 foundation (#115)
 
 #### **v1.9.0 In Progress - Enhanced Data Layer:**
+
 - ✅ **Phase 1 Complete:** TanStack Query + Dexie integration foundation
   - Consolidated duplicate query clients into unified enhanced version
   - Created `useBudgetData` - unified data access hook
@@ -311,6 +313,7 @@ _Application constants and configurations_
   - Smart query invalidation and optimistic updates
 
 #### **Business Logic Extraction:**
+
 - Extracted all business logic into custom hooks:
   - `useAuthFlow.js` - Authentication operations
   - `useDataManagement.js` - Import/export operations

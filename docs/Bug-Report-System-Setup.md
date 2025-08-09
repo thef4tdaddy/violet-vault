@@ -5,6 +5,7 @@ This guide covers the complete setup of the VioletVault bug report system with C
 ## Overview
 
 The bug report system consists of:
+
 - **Frontend**: Floating bug report button with screenshot capability
 - **Backend**: Cloudflare Worker for processing reports
 - **Storage**: Cloudflare R2 for screenshot hosting (optional)
@@ -33,6 +34,7 @@ The bug report system consists of:
 ### 1.2 Verify Repository Settings
 
 Ensure your repository has Issues enabled:
+
 1. Go to your repository
 2. Settings → General → Features
 3. Ensure "Issues" is checked
@@ -65,6 +67,7 @@ wrangler login
 ### 3.2 Deploy Worker
 
 1. Copy the worker files to your project:
+
 ```bash
 # From your project root
 mkdir -p cloudflare-worker
@@ -72,6 +75,7 @@ mkdir -p cloudflare-worker
 ```
 
 2. Update `wrangler.toml` with your settings:
+
 ```toml
 name = "violet-vault-bug-reporter"
 # Update routes for your domain
@@ -79,6 +83,7 @@ name = "violet-vault-bug-reporter"
 ```
 
 3. Deploy the worker:
+
 ```bash
 cd cloudflare-worker
 wrangler deploy
@@ -89,14 +94,17 @@ wrangler deploy
 In Cloudflare Dashboard → Workers → Your Worker → Settings → Variables:
 
 **Required Variables:**
+
 - `GITHUB_TOKEN`: Your GitHub personal access token
 - `GITHUB_REPO`: Your repository in format "username/repo-name"
 
 **Optional Variables:**
+
 - `R2_PUBLIC_DOMAIN`: Your R2 custom domain (if using screenshots)
 - `NOTIFICATION_WEBHOOK`: Slack/Discord webhook for notifications
 
 **Example Configuration:**
+
 ```
 GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 GITHUB_REPO=yourusername/violet-vault
@@ -111,16 +119,19 @@ NOTIFICATION_WEBHOOK=https://hooks.slack.com/services/...
 Update your environment files with the worker endpoints:
 
 **`.env.development`:**
+
 ```env
 VITE_BUG_REPORT_ENDPOINT=https://violet-vault-bug-reporter.your-username.workers.dev/report-issue
 ```
 
 **`.env.production`:**
+
 ```env
 VITE_BUG_REPORT_ENDPOINT=https://violet-vault-bug-reporter.your-domain.workers.dev/report-issue
 ```
 
 **`.env.staging`:**
+
 ```env
 VITE_BUG_REPORT_ENDPOINT=https://violet-vault-bug-reporter-staging.your-domain.workers.dev/report-issue
 ```
@@ -137,6 +148,7 @@ routes = [
 ```
 
 Then update production environment:
+
 ```env
 VITE_BUG_REPORT_ENDPOINT=https://api.your-domain.com/bug-report/report-issue
 ```
@@ -146,6 +158,7 @@ VITE_BUG_REPORT_ENDPOINT=https://api.your-domain.com/bug-report/report-issue
 ### 5.1 Local Testing
 
 1. Start your development server:
+
 ```bash
 npm run dev
 ```
@@ -157,6 +170,7 @@ npm run dev
 ### 5.2 Worker Testing
 
 Test the worker directly:
+
 ```bash
 curl -X POST https://your-worker.workers.dev/report-issue \
   -H "Content-Type: application/json" \
@@ -195,6 +209,7 @@ wrangler deploy --env production
 ### 6.3 Configure DNS (If Using Custom Domain)
 
 Add CNAME record pointing to your worker:
+
 ```
 api.your-domain.com CNAME violet-vault-bug-reporter.your-username.workers.dev
 ```
@@ -220,19 +235,23 @@ GitHub tokens expire. Update in Cloudflare Dashboard when needed.
 ### Common Issues
 
 **1. CORS Errors**
+
 - Ensure worker includes proper CORS headers
 - Check if frontend URL is whitelisted
 
 **2. GitHub API Rate Limits**
+
 - Monitor GitHub API rate limits
 - Consider using GitHub App instead of personal token for higher limits
 
 **3. Screenshot Upload Failures**
+
 - Check R2 bucket permissions
 - Verify R2_PUBLIC_DOMAIN is correctly configured
 - Consider implementing retry logic
 
 **4. Worker Deployment Issues**
+
 - Verify wrangler.toml configuration
 - Check account permissions
 - Ensure all required environment variables are set
@@ -240,11 +259,13 @@ GitHub tokens expire. Update in Cloudflare Dashboard when needed.
 ### Debug Steps
 
 1. **Check Worker Logs:**
+
 ```bash
 wrangler tail
 ```
 
 2. **Test Worker Directly:**
+
 ```bash
 curl -X POST https://your-worker.workers.dev/report-issue \
   -H "Content-Type: application/json" \
@@ -252,9 +273,10 @@ curl -X POST https://your-worker.workers.dev/report-issue \
 ```
 
 3. **Verify Environment Variables:**
-Check in Cloudflare Dashboard that all variables are set
+   Check in Cloudflare Dashboard that all variables are set
 
 4. **Test GitHub Token:**
+
 ```bash
 curl -H "Authorization: token YOUR_TOKEN" \
   https://api.github.com/repos/username/repo/issues
@@ -263,28 +285,33 @@ curl -H "Authorization: token YOUR_TOKEN" \
 ## Security Considerations
 
 ### 1. GitHub Token Security
+
 - Use fine-grained tokens with minimal permissions
 - Rotate tokens regularly
 - Store securely in Cloudflare environment variables
 
 ### 2. Screenshot Privacy
+
 - Screenshots may contain sensitive financial data
 - Consider implementing screenshot sanitization
 - Use private R2 buckets with signed URLs
 
 ### 3. Rate Limiting
+
 - Implement rate limiting to prevent abuse
 - Consider implementing authentication for production
 
 ### 4. CORS Configuration
+
 - Restrict CORS to your domain in production
-- Avoid using wildcard (*) in production
+- Avoid using wildcard (\*) in production
 
 ## Advanced Configuration
 
 ### Slack/Discord Notifications
 
 Add webhook URL to environment variables:
+
 ```env
 NOTIFICATION_WEBHOOK=https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX
 ```
@@ -298,6 +325,7 @@ Modify the `createGitHubIssue` function in `bug-report-worker.js` to customize t
 ### Screenshot Processing
 
 Implement image optimization in the worker:
+
 - Resize large screenshots
 - Convert to optimal formats
 - Add watermarks or privacy blurring
@@ -305,27 +333,32 @@ Implement image optimization in the worker:
 ## Cost Considerations
 
 ### Cloudflare Workers
+
 - 100,000 requests/day on free tier
 - $0.50 per million requests above free tier
 
 ### Cloudflare R2
+
 - 10GB storage free
 - $0.015/GB-month above free tier
 - No egress charges
 
 ### GitHub API
+
 - 5,000 requests/hour for authenticated requests
 - Consider GitHub Apps for higher limits
 
 ## Maintenance Checklist
 
 **Monthly:**
+
 - [ ] Review worker analytics
 - [ ] Check GitHub API rate limit usage
 - [ ] Verify screenshot storage costs
 - [ ] Test bug report functionality
 
 **Quarterly:**
+
 - [ ] Rotate GitHub tokens
 - [ ] Review and clean old screenshots
 - [ ] Update worker dependencies
@@ -341,6 +374,7 @@ If you encounter issues:
 4. Review environment variable configuration
 
 For additional support, refer to:
+
 - [Cloudflare Workers Documentation](https://developers.cloudflare.com/workers/)
 - [GitHub API Documentation](https://docs.github.com/en/rest)
 - [Highlight.io Documentation](https://www.highlight.io/docs)
