@@ -14,18 +14,25 @@ import { useTransactionImport } from "./hooks/useTransactionImport";
 import { suggestEnvelope } from "./utils/envelopeMatching";
 import { TRANSACTION_CATEGORIES } from "../../constants/categories";
 import { useBudgetStore } from "../../stores/budgetStore";
+import { useTransactions } from "../../hooks/useTransactions";
+import { useEnvelopes } from "../../hooks/useEnvelopes";
 
 const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855f7" } }) => {
-  // Get live data from budget store instead of props
+  // Enhanced TanStack Query integration with caching and optimistic updates
+  const { 
+    data: transactions = [], 
+    addTransaction, 
+    isLoading: transactionsLoading 
+  } = useTransactions();
+  
+  const { 
+    data: envelopes = [], 
+    isLoading: envelopesLoading 
+  } = useEnvelopes();
+
+  // Keep Zustand for legacy operations not yet migrated
   const budget = useBudgetStore();
-  const {
-    allTransactions: transactions = [],
-    envelopes = [],
-    addTransaction,
-    updateTransaction,
-    deleteTransaction,
-    setAllTransactions,
-  } = budget;
+  const { updateTransaction, deleteTransaction, setAllTransactions } = budget;
 
   // Handle bulk import by updating both store arrays
   const handleBulkImport = (newTransactions) => {
@@ -151,6 +158,18 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
     .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
   const netCashFlow = totalIncome - totalExpenses;
+
+  // Show loading state while data is fetching
+  if (transactionsLoading || envelopesLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
+          <div className="h-64 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
