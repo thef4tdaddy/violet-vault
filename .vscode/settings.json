@@ -18,7 +18,7 @@
   },
   "git.autofetch": true,
   "git.enableCommitSigning": false,
-  "terminal.integrated.defaultProfile.osx": "bash",
+  "terminal.integrated.defaultProfile.osx": "zsh",
   "files.exclude": {
     "**/node_modules": true,
     "**/dist": true,
