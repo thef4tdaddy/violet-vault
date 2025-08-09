@@ -498,4 +498,5 @@ const useSavingsGoals = (options = {}) => {
   };
 };
 
+export { useSavingsGoals };
 export default useSavingsGoals;
