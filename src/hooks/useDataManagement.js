@@ -77,6 +77,35 @@ const useDataManagement = () => {
         Object.keys(decryptedData),
       );
 
+      // Log what old data we're filtering out
+      const deprecatedFields = Object.keys(decryptedData).filter((key) =>
+        [
+          "updatedEnvelopes",
+          "oldTransactions",
+          "oldBills",
+          "oldSavingsGoals",
+        ].includes(key),
+      );
+
+      if (deprecatedFields.length > 0) {
+        console.log("🧹 Filtering out deprecated fields:", deprecatedFields);
+      }
+
+      // Check for nested deprecated data in envelopes
+      const envelopesWithOldData = (decryptedData.envelopes || []).filter(
+        (env) =>
+          env.transactions ||
+          env.paidTransactions ||
+          env.upcomingBills ||
+          env.overdueBills,
+      );
+
+      if (envelopesWithOldData.length > 0) {
+        console.log(
+          `🧹 Cleaning nested transaction arrays from ${envelopesWithOldData.length} envelopes`,
+        );
+      }
+
       // Normalize transactions for unified structure
       const allTransactions = Array.isArray(decryptedData.allTransactions)
         ? decryptedData.allTransactions
@@ -88,11 +117,70 @@ const useDataManagement = () => {
         (t) => !t.type || t.type === "transaction",
       );
 
-      // Prepare export data with metadata
+      // Clean up envelopes - remove old nested transaction arrays
+      const cleanEnvelopes = (decryptedData.envelopes || []).map(
+        (envelope) => ({
+          id: envelope.id,
+          name: envelope.name,
+          currentBalance: envelope.currentBalance || 0,
+          targetAmount: envelope.targetAmount,
+          monthlyAmount: envelope.monthlyAmount,
+          biweeklyAllocation: envelope.biweeklyAllocation,
+          color: envelope.color || "#a855f7",
+          category: envelope.category || "Other",
+          description: envelope.description || "",
+          frequency: envelope.frequency || "monthly",
+          priority: envelope.priority || "medium",
+          autoAllocate: envelope.autoAllocate !== false,
+          envelopeType: envelope.envelopeType || "variable",
+          monthlyBudget: envelope.monthlyBudget,
+          lastUpdated: envelope.lastUpdated,
+          // Exclude all old nested arrays: transactions, paidTransactions, upcomingBills, etc.
+        }),
+      );
+
+      // Clean up bills - keep only essential fields
+      const cleanBills = (decryptedData.bills || []).map((bill) => ({
+        id: bill.id,
+        name: bill.name || bill.provider,
+        provider: bill.provider,
+        amount: bill.amount || 0,
+        dueDate: bill.dueDate,
+        frequency: bill.frequency || "monthly",
+        category: bill.category,
+        envelopeId: bill.envelopeId,
+        isPaid: bill.isPaid || false,
+        paidDate: bill.paidDate,
+        description: bill.description,
+        notes: bill.notes,
+        accountNumber: bill.accountNumber,
+        lastUpdated: bill.lastUpdated,
+        type: bill.type || "bill",
+      }));
+
+      // Prepare clean export data - only include current, relevant fields
       const exportData = {
-        ...decryptedData,
+        // Core data arrays (cleaned)
+        envelopes: cleanEnvelopes,
+        bills: cleanBills,
         transactions,
         allTransactions,
+
+        // Other current data
+        savingsGoals: decryptedData.savingsGoals || [],
+        supplementalAccounts: decryptedData.supplementalAccounts || [],
+        debts: decryptedData.debts || [],
+        paycheckHistory: decryptedData.paycheckHistory || [],
+
+        // Financial state
+        unassignedCash: decryptedData.unassignedCash || 0,
+        biweeklyAllocation: decryptedData.biweeklyAllocation || 0,
+        actualBalance: decryptedData.actualBalance || 0,
+        isActualBalanceManual: decryptedData.isActualBalanceManual || false,
+
+        // Exclude deprecated fields like: updatedEnvelopes, oldTransactions, etc.
+
+        // Metadata
         exportMetadata: {
           exportedBy: currentUser?.userName || "Unknown User",
           exportDate: new Date().toISOString(),
@@ -142,7 +230,25 @@ const useDataManagement = () => {
       URL.revokeObjectURL(url);
 
       console.log("✅ Export completed successfully");
-      alert("Backup exported successfully!");
+      console.log(`📊 Clean export summary:
+        - ${cleanEnvelopes.length} envelopes (old nested arrays removed)
+        - ${cleanBills.length} bills (cleaned structure)
+        - ${transactions.length} pure transactions
+        - ${allTransactions.length} total transactions (auto-generated)
+        - ${exportData.savingsGoals.length} savings goals
+        - Deprecated fields excluded: ${deprecatedFields.join(", ") || "none found"}
+        - File size: ${Math.round(dataStr.length / 1024)}KB`);
+
+      alert(`Export completed! 
+        
+🧹 Clean export created with:
+• ${cleanEnvelopes.length} envelopes (old nested data removed)
+• ${cleanBills.length} bills 
+• ${transactions.length} transactions
+• No deprecated arrays (updatedEnvelopes, etc.)
+• File size: ${Math.round(dataStr.length / 1024)}KB
+
+Check console for detailed filtering log.`);
     } catch (error) {
       console.error("❌ Export failed:", error);
       alert(`Export failed: ${error.message}`);
