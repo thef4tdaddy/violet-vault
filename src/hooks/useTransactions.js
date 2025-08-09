@@ -298,4 +298,5 @@ const useTransactions = (options = {}) => {
   };
 };
 
+export { useTransactions };
 export default useTransactions;
