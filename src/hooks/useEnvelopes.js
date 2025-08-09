@@ -262,4 +262,5 @@ const useEnvelopes = (options = {}) => {
   };
 };
 
+export { useEnvelopes };
 export default useEnvelopes;
