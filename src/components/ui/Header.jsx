@@ -10,8 +10,18 @@ import {
 import UserIndicator from "../auth/UserIndicator";
 import logoWithText from "../../assets/Shield Text Logo.webp";
 import ChangePasswordModal from "../auth/ChangePasswordModal";
+import { getVersionInfo } from "../../utils/version";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
+
+const { environment } = getVersionInfo();
+
+const logoBorderClass =
+  environment === "development"
+    ? "border-orange-500"
+    : environment === "preview"
+      ? "border-red-500"
+      : "border-purple-600";
 
 const Header = memo(
   ({
@@ -46,7 +56,7 @@ const Header = memo(
         <div className="flex flex-col items-center text-center">
           {/* Logo and tagline */}
           <div className="flex flex-col items-center w-full px-6 py-8">
-            <div className="rounded border-4 border-purple-600 bg-white/95 mb-4">
+            <div className={`rounded border-4 ${logoBorderClass} bg-white/95 mb-4`}>
               <img
                 src={logoWithText}
                 alt="VioletVault Logo"
