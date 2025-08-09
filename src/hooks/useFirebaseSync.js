@@ -6,12 +6,7 @@ import logger from "../utils/logger";
  * Custom hook for Firebase synchronization management
  * Extracts sync logic from MainLayout component
  */
-const useFirebaseSync = (
-  firebaseSync,
-  encryptionKey,
-  budgetId,
-  currentUser,
-) => {
+const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => {
   const budget = useBudgetStore();
   const [activeUsers, setActiveUsers] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
@@ -30,18 +25,12 @@ const useFirebaseSync = (
         setIsLoading(true);
         const cloudData = await firebaseSync.loadFromCloud();
         if (cloudData && cloudData.data) {
-          console.log(
-            "📥 Loading data from cloud:",
-            Object.keys(cloudData.data),
-          );
+          console.log("📥 Loading data from cloud:", Object.keys(cloudData.data));
           // Update budget store with cloud data
-          if (cloudData.data.envelopes)
-            budget.setEnvelopes(cloudData.data.envelopes);
+          if (cloudData.data.envelopes) budget.setEnvelopes(cloudData.data.envelopes);
           if (cloudData.data.bills) budget.setBills(cloudData.data.bills);
-          if (cloudData.data.savingsGoals)
-            budget.setSavingsGoals(cloudData.data.savingsGoals);
-          if (cloudData.data.transactions)
-            budget.setTransactions(cloudData.data.transactions);
+          if (cloudData.data.savingsGoals) budget.setSavingsGoals(cloudData.data.savingsGoals);
+          if (cloudData.data.transactions) budget.setTransactions(cloudData.data.transactions);
           if (cloudData.data.allTransactions)
             budget.setAllTransactions(cloudData.data.allTransactions);
           if (typeof cloudData.data.unassignedCash === "number")
@@ -53,7 +42,7 @@ const useFirebaseSync = (
           if (typeof cloudData.data.actualBalance === "number")
             budget.setActualBalance(
               cloudData.data.actualBalance,
-              cloudData.data.isActualBalanceManual,
+              cloudData.data.isActualBalanceManual
             );
         }
       } catch (error) {
@@ -87,7 +76,7 @@ const useFirebaseSync = (
             actualBalance: budget.actualBalance,
             isActualBalanceManual: budget.isActualBalanceManual,
           },
-          currentUser,
+          currentUser
         );
         console.log("✅ Data auto-saved to cloud");
       } catch (error) {
@@ -128,7 +117,7 @@ const useFirebaseSync = (
           actualBalance: budget.actualBalance,
           isActualBalanceManual: budget.isActualBalanceManual,
         },
-        currentUser,
+        currentUser
       );
       alert("Data synced to cloud");
     } catch (err) {
@@ -162,12 +151,7 @@ const useFirebaseSync = (
     // Update periodically to catch changes
     const interval = setInterval(updateActivityData, 5000);
     return () => clearInterval(interval);
-  }, [
-    budget,
-    budget.getActiveUsers,
-    budget.getRecentActivity,
-    budget.isSyncing,
-  ]);
+  }, [budget, budget.getActiveUsers, budget.getRecentActivity, budget.isSyncing]);
 
   return {
     activeUsers,

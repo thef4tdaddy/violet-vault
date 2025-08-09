@@ -1,24 +1,51 @@
 {
   "project": "violet-vault",
-  "lastUpdated": "2025-08-07",
+  "lastUpdated": "2025-08-09",
   "currentStatus": {
-    "totalWarnings": 21,
+    "totalWarnings": 25,
     "targetWarnings": 17,
     "errors": 0
   },
   "warningCategories": [
     {
       "type": "no-unused-vars",
-      "count": 15,
+      "count": 23,
       "severity": "warning",
       "files": [
+        {
+          "path": "cloudflare-worker/bug-report-worker.js",
+          "warnings": 3,
+          "details": [
+            {
+              "line": 16,
+              "message": "'ctx' is defined but never used"
+            },
+            {
+              "line": 111,
+              "message": "'ctx' is defined but never used"
+            },
+            {
+              "line": 384,
+              "message": "'patch' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
+            }
+          ]
+        },
         {
           "path": "scripts/rollback.js",
           "warnings": 3,
           "details": [
-            { "line": 200, "message": "'error' parameter unused" },
-            { "line": 214, "message": "'error' parameter unused" },
-            { "line": 251, "message": "'error' parameter unused" }
+            {
+              "line": 200,
+              "message": "'error' is defined but never used"
+            },
+            {
+              "line": 214,
+              "message": "'error' is defined but never used"
+            },
+            {
+              "line": 251,
+              "message": "'error' is defined but never used"
+            }
           ]
         },
         {
@@ -26,51 +53,85 @@
           "warnings": 1,
           "details": [
             {
-              "line": 397,
-              "message": "'Icon' parameter unused in NavButton component"
+              "line": 360,
+              "message": "'Icon' is defined but never used"
             }
           ]
         },
         {
           "path": "src/components/layout/NavigationTabs.jsx",
           "warnings": 1,
-          "details": [{ "line": 78, "message": "'Icon' parameter unused" }]
+          "details": [
+            {
+              "line": 78,
+              "message": "'Icon' is defined but never used"
+            }
+          ]
         },
         {
           "path": "src/components/layout/SummaryCards.jsx",
           "warnings": 1,
-          "details": [{ "line": 66, "message": "'Icon' parameter unused" }]
+          "details": [
+            {
+              "line": 68,
+              "message": "'Icon' is defined but never used"
+            }
+          ]
         },
         {
           "path": "src/components/layout/ViewRenderer.jsx",
           "warnings": 3,
           "details": [
             {
-              "line": 45,
-              "message": "'deleteTransaction' assigned but never used"
+              "line": 44,
+              "message": "'deleteTransaction' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
+            },
+            {
+              "line": 47,
+              "message": "'setAllTransactions' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
             },
             {
               "line": 48,
-              "message": "'setAllTransactions' assigned but never used"
-            },
-            {
-              "line": 49,
-              "message": "'setTransactions' assigned but never used"
+              "message": "'setTransactions' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
             }
           ]
         },
         {
           "path": "src/db/budgetDb.js",
-          "warnings": 6,
+          "warnings": 8,
           "details": [
-            { "line": 25, "message": "'_trans' parameter unused" },
-            { "line": 29, "message": "'_primKey' parameter unused" },
-            { "line": 29, "message": "'_obj' parameter unused" },
-            { "line": 29, "message": "'_trans' parameter unused" },
-            { "line": 33, "message": "'_trans' parameter unused" },
-            { "line": 37, "message": "'_primKey' parameter unused" },
-            { "line": 37, "message": "'_obj' parameter unused" },
-            { "line": 37, "message": "'_trans' parameter unused" }
+            {
+              "line": 25,
+              "message": "'_trans' is defined but never used"
+            },
+            {
+              "line": 29,
+              "message": "'_primKey' is defined but never used"
+            },
+            {
+              "line": 29,
+              "message": "'_obj' is defined but never used"
+            },
+            {
+              "line": 29,
+              "message": "'_trans' is defined but never used"
+            },
+            {
+              "line": 33,
+              "message": "'_trans' is defined but never used"
+            },
+            {
+              "line": 37,
+              "message": "'_primKey' is defined but never used"
+            },
+            {
+              "line": 37,
+              "message": "'_obj' is defined but never used"
+            },
+            {
+              "line": 37,
+              "message": "'_trans' is defined but never used"
+            }
           ]
         },
         {
@@ -78,8 +139,22 @@
           "warnings": 1,
           "details": [
             {
-              "line": 36,
-              "message": "'setupConsoleCapture' assigned but never used"
+              "line": 47,
+              "message": "'setupConsoleCapture' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
+            }
+          ]
+        },
+        {
+          "path": "src/utils/version.js",
+          "warnings": 2,
+          "details": [
+            {
+              "line": 124,
+              "message": "'patch' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
+            },
+            {
+              "line": 167,
+              "message": "'mode' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
             }
           ]
         }
@@ -96,7 +171,7 @@
           "details": [
             {
               "line": 56,
-              "message": "Missing dependency 'budget' in useEffect"
+              "message": "React Hook useEffect has a missing dependency: 'budget'. Either include it or remove the dependency array"
             }
           ]
         }
@@ -104,26 +179,16 @@
     },
     {
       "type": "react-refresh/only-export-components",
-      "count": 2,
+      "count": 1,
       "severity": "warning",
       "files": [
         {
-          "path": "src/contexts/AuthContext.jsx",
+          "path": "src/stores/authStore.jsx",
           "warnings": 1,
           "details": [
             {
               "line": 7,
-              "message": "Fast refresh issue - move constants/functions to separate file"
-            }
-          ]
-        },
-        {
-          "path": "src/contexts/BudgetContext.jsx",
-          "warnings": 1,
-          "details": [
-            {
-              "line": 7,
-              "message": "Fast refresh issue - move React context to separate file"
+              "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components"
             }
           ]
         }
@@ -133,50 +198,39 @@
   "actionPlan": {
     "highPriority": [
       {
-        "task": "Fix unused Icon parameters",
-        "warningsAffected": 4,
-        "files": ["MainLayout.jsx", "NavigationTabs.jsx", "SummaryCards.jsx"],
-        "action": "Update NavButton components to use Icon parameter or rename with underscore"
+        "task": "Fix no-unused-vars warnings",
+        "warningsAffected": 23,
+        "files": [
+          "bug-report-worker.js",
+          "rollback.js",
+          "MainLayout.jsx",
+          "NavigationTabs.jsx",
+          "SummaryCards.jsx",
+          "ViewRenderer.jsx",
+          "budgetDb.js",
+          "highlight.js",
+          "version.js"
+        ],
+        "action": "Remove unused variables or prefix with underscore if intentionally unused"
       },
       {
-        "task": "Clean up ViewRenderer unused variables",
-        "warningsAffected": 3,
-        "files": ["ViewRenderer.jsx"],
-        "action": "Remove or properly use deleteTransaction, setAllTransactions, setTransactions"
-      }
-    ],
-    "mediumPriority": [
-      {
-        "task": "Database parameter cleanup",
-        "warningsAffected": 6,
-        "files": ["budgetDb.js"],
-        "action": "Prefix unused parameters with underscore"
-      },
-      {
-        "task": "Utility function cleanup",
+        "task": "Fix react-hooks/exhaustive-deps warnings",
         "warningsAffected": 1,
-        "files": ["highlight.js"],
-        "action": "Remove or use setupConsoleCapture"
+        "files": [
+          "useFirebaseSync.js"
+        ],
+        "action": "Add missing dependencies to useEffect dependency array"
       }
     ],
+    "mediumPriority": [],
     "lowPriority": [
       {
-        "task": "React context organization",
-        "warningsAffected": 2,
-        "files": ["AuthContext.jsx", "BudgetContext.jsx"],
-        "action": "Refactor to separate files"
-      },
-      {
-        "task": "Hook dependency fix",
+        "task": "Fix react-refresh/only-export-components warnings",
         "warningsAffected": 1,
-        "files": ["useFirebaseSync.js"],
-        "action": "Add missing 'budget' dependency"
-      },
-      {
-        "task": "Script error handling",
-        "warningsAffected": 3,
-        "files": ["rollback.js"],
-        "action": "Add proper error handling or prefix with underscore"
+        "files": [
+          "authStore.jsx"
+        ],
+        "action": "Refactor to separate component and non-component exports"
       }
     ]
   },
@@ -188,6 +242,6 @@
   "monitoring": {
     "target": "≤ 17 warnings",
     "reviewFrequency": "After significant changes or weekly",
-    "autoCheck": "Consider adding lint warning count to CI/CD"
+    "autoCheck": "Automated via GitHub Actions"
   }
 }

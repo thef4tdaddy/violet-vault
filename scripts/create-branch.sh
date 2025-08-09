@@ -1,17 +1,34 @@
 #!/usr/bin/env bash
 
+# VioletVault Branch Creation Script
+# Updated for new branch protection workflow: feature branches → develop → main
+
 # Colors
 GREEN="\033[0;32m"
 RED="\033[0;31m"
 YELLOW="\033[1;33m"
+BLUE="\033[0;34m"
 NC="\033[0m" # No Color
 
-# Verify you're on main
+echo -e "${BLUE}🌿 VioletVault Branch Creation${NC}"
+echo -e "${BLUE}==============================${NC}"
+
+# Check if we're on develop (recommended) or main
 current_branch=$(git rev-parse --abbrev-ref HEAD)
-if [ "$current_branch" != "main" ]; then
-  echo -e "${RED}❌ You must be on 'main' to run this script. Current branch: '$current_branch'${NC}"
-  exit 1
+if [ "$current_branch" != "develop" ] && [ "$current_branch" != "main" ]; then
+  echo -e "${YELLOW}⚠️  Creating branch from: '$current_branch'${NC}"
+  echo -e "${YELLOW}💡 Recommended: Create feature branches from 'develop'${NC}"
+  read -p "🔹 Continue anyway? (y/n): " continue_anyway
+  if [ "$continue_anyway" != "y" ]; then
+    echo -e "${RED}❌ Branch creation canceled${NC}"
+    exit 1
+  fi
+elif [ "$current_branch" == "main" ]; then
+  echo -e "${YELLOW}⚠️  Creating branch from 'main' - consider using 'develop' instead${NC}"
+  echo -e "${YELLOW}💡 New workflow: develop → main (PRs only)${NC}"
 fi
+
+echo -e "${GREEN}✅ Source branch: $current_branch${NC}"
 
 # Check for any changes in working directory (staged, unstaged, or untracked)
 if [[ -n $(git status --porcelain) ]]; then
@@ -56,15 +73,20 @@ if ! git diff --quiet origin/main..HEAD; then
   git fetch origin
   git reset --hard origin/main
 
-  # Ask for new branch name
-  echo -e "${YELLOW}🔹 Enter new branch name:${NC}"
-  read branch
+  # Ask for branch type and name
+  echo -e "${YELLOW}🔹 Branch type (feat/fix/style/perf/docs/chore):${NC}"
+  read branch_type
+  echo -e "${YELLOW}🔹 Enter branch description (kebab-case):${NC}"
+  read branch_desc
 
-  if [ -z "$branch" ]; then
-    echo -e "${RED}❌ No branch name provided.${NC}"
+  if [ -z "$branch_type" ] || [ -z "$branch_desc" ]; then
+    echo -e "${RED}❌ Branch type and description required.${NC}"
     git branch -D _temp_branch_with_commits
     exit 1
   fi
+
+  branch="${branch_type}/${branch_desc}"
+  echo -e "${BLUE}📝 Creating branch: $branch${NC}"
 
   # Create the new branch and rebase commits onto it
   git checkout -b "$branch"
@@ -94,14 +116,19 @@ if ! git diff --quiet origin/main..HEAD; then
 else
   echo -e "${GREEN}✅ No local commits to rebase.${NC}"
 
-  # Ask for new branch name
-  echo -e "${YELLOW}🔹 Enter new branch name:${NC}"
-  read branch
+  # Ask for branch type and name  
+  echo -e "${YELLOW}🔹 Branch type (feat/fix/style/perf/docs/chore):${NC}"
+  read branch_type
+  echo -e "${YELLOW}🔹 Enter branch description (kebab-case):${NC}"
+  read branch_desc
 
-  if [ -z "$branch" ]; then
-    echo -e "${RED}❌ No branch name provided.${NC}"
+  if [ -z "$branch_type" ] || [ -z "$branch_desc" ]; then
+    echo -e "${RED}❌ Branch type and description required.${NC}"
     exit 1
   fi
+
+  branch="${branch_type}/${branch_desc}"
+  echo -e "${BLUE}📝 Creating branch: $branch${NC}"
 
   git checkout -b "$branch"
   git push -u origin "$branch"
@@ -117,3 +144,12 @@ else
 
   echo -e "${GREEN}✅ Empty branch '$branch' created and pushed.${NC}"
 fi
+
+echo ""
+echo -e "${BLUE}📋 Next Steps:${NC}"
+echo -e "${YELLOW}1. Work on your feature in branch: $branch${NC}"
+echo -e "${YELLOW}2. When ready, create PR: $branch → develop${NC}"
+echo -e "${YELLOW}3. After review and merge to develop${NC}"
+echo -e "${YELLOW}4. For release: create PR: develop → main${NC}"
+echo ""
+echo -e "${BLUE}💡 Remember: Only develop can PR to main!${NC}"

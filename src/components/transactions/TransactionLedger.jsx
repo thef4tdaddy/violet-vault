@@ -15,9 +15,7 @@ import { suggestEnvelope } from "./utils/envelopeMatching";
 import { TRANSACTION_CATEGORIES } from "../../constants/categories";
 import { useBudgetStore } from "../../stores/budgetStore";
 
-const TransactionLedger = ({
-  currentUser = { userName: "User", userColor: "#a855f7" },
-}) => {
+const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855f7" } }) => {
   // Get live data from budget store instead of props
   const budget = useBudgetStore();
   const {
@@ -31,16 +29,10 @@ const TransactionLedger = ({
 
   // Handle bulk import by updating both store arrays
   const handleBulkImport = (newTransactions) => {
-    console.log(
-      "🔄 Bulk import called with transactions:",
-      newTransactions.length,
-    );
+    console.log("🔄 Bulk import called with transactions:", newTransactions.length);
     const updatedAllTransactions = [...transactions, ...newTransactions];
     setAllTransactions(updatedAllTransactions);
-    console.log(
-      "💾 Bulk import complete. Total transactions:",
-      updatedAllTransactions.length,
-    );
+    console.log("💾 Bulk import complete. Total transactions:", updatedAllTransactions.length);
   };
   const [showAddModal, setShowAddModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
@@ -57,13 +49,8 @@ const TransactionLedger = ({
   const pageSize = 10;
 
   // Custom hooks
-  const {
-    transactionForm,
-    setTransactionForm,
-    resetForm,
-    populateForm,
-    createTransaction,
-  } = useTransactionForm();
+  const { transactionForm, setTransactionForm, resetForm, populateForm, createTransaction } =
+    useTransactionForm();
 
   const {
     importData,
@@ -84,16 +71,13 @@ const TransactionLedger = ({
     typeFilter,
     envelopeFilter,
     sortBy,
-    sortOrder,
+    sortOrder
   );
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredTransactions.length / pageSize),
-  );
+  const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / pageSize));
   const paginatedTransactions = filteredTransactions.slice(
     (currentPage - 1) * pageSize,
-    currentPage * pageSize,
+    currentPage * pageSize
   );
 
   useEffect(() => {
@@ -140,10 +124,7 @@ const TransactionLedger = ({
     return suggestEnvelope(description, envelopes);
   };
 
-  const handleSplitTransaction = async (
-    originalTransaction,
-    splitTransactions,
-  ) => {
+  const handleSplitTransaction = async (originalTransaction, splitTransactions) => {
     try {
       // Delete the original transaction
       deleteTransaction(originalTransaction.id);

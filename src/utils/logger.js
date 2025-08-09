@@ -35,15 +35,12 @@ class Logger {
       data.selectedEnvelope;
 
     // Show logs in development or on dev/preview sites, and bill-related logs only on dev sites
-    if (
-      this.isDevelopment ||
-      (this.isDevSite && isBillRelated)
-    ) {
+    if (this.isDevelopment || (this.isDevSite && isBillRelated)) {
       // Use window.originalConsoleLog if available, otherwise regular console.log
       const consoleLog = window.originalConsoleLog || console.log;
       consoleLog(
         `🔍 [${this.isDevelopment ? "DEV" : this.isDevSite ? "DEV-SITE" : "PROD"}] ${message}`,
-        data,
+        data
       );
     }
 
@@ -122,10 +119,7 @@ class Logger {
       });
 
       // For critical budget sync issues, also send as error to ensure visibility
-      if (
-        message.includes("budgetId value") ||
-        message.includes("sync issue")
-      ) {
+      if (message.includes("budgetId value") || message.includes("sync issue")) {
         H.consumeError(new Error(`Budget Sync: ${message}`), {
           metadata: data,
           tags: { category: "budget-sync", critical: "true" },
@@ -194,9 +188,7 @@ class Logger {
       });
     }
 
-    console.log(
-      "✅ Highlight.io test messages sent - check your Highlight.io dashboard",
-    );
+    console.log("✅ Highlight.io test messages sent - check your Highlight.io dashboard");
   }
 }
 

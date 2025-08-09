@@ -2,14 +2,19 @@ import React from "react";
 import { Calendar, TrendingUp, Clock, AlertCircle, DollarSign, Zap } from "lucide-react";
 import { formatPaydayPrediction, getDaysUntilPayday } from "../../utils/paydayPredictor";
 
-const PaydayPrediction = ({ prediction, className = "", onProcessPaycheck, onPrepareEnvelopes }) => {
+const PaydayPrediction = ({
+  prediction,
+  className = "",
+  onProcessPaycheck,
+  onPrepareEnvelopes,
+}) => {
   if (!prediction || !prediction.nextPayday) {
     return null;
   }
 
   const formattedPrediction = formatPaydayPrediction(prediction);
   const daysUntil = getDaysUntilPayday(prediction);
-  
+
   // Determine if we should show proactive suggestions
   const showProactiveSuggestions = daysUntil <= 3 && daysUntil >= 0;
 
@@ -72,7 +77,7 @@ const PaydayPrediction = ({ prediction, className = "", onProcessPaycheck, onPre
           </div>
         )}
       </div>
-      
+
       {/* Proactive Funding Suggestions */}
       {showProactiveSuggestions && (
         <div className="mt-4 pt-4 border-t border-gray-200">
@@ -84,14 +89,16 @@ const PaydayPrediction = ({ prediction, className = "", onProcessPaycheck, onPre
               </span>
             </div>
           </div>
-          
+
           <div className="space-y-2">
             {daysUntil === 0 && (
               <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <DollarSign className="h-4 w-4 text-purple-600 mr-2" />
-                    <span className="text-sm font-medium text-purple-800">Process Today's Paycheck</span>
+                    <span className="text-sm font-medium text-purple-800">
+                      Process Today's Paycheck
+                    </span>
                   </div>
                   {onProcessPaycheck && (
                     <button
@@ -107,7 +114,7 @@ const PaydayPrediction = ({ prediction, className = "", onProcessPaycheck, onPre
                 </p>
               </div>
             )}
-            
+
             {daysUntil === 1 && (
               <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-200">
                 <div className="flex items-center justify-between">
@@ -129,7 +136,7 @@ const PaydayPrediction = ({ prediction, className = "", onProcessPaycheck, onPre
                 </p>
               </div>
             )}
-            
+
             {daysUntil >= 2 && daysUntil <= 3 && (
               <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
                 <div className="flex items-center justify-between">
@@ -148,9 +155,7 @@ const PaydayPrediction = ({ prediction, className = "", onProcessPaycheck, onPre
                     </button>
                   )}
                 </div>
-                <p className="text-xs text-amber-600 mt-1">
-                  Plan your envelope funding strategy
-                </p>
+                <p className="text-xs text-amber-600 mt-1">Plan your envelope funding strategy</p>
               </div>
             )}
           </div>

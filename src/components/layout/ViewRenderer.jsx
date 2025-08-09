@@ -8,6 +8,7 @@ import PaycheckProcessor from "../budgeting/PaycheckProcessor";
 import BillManager from "../bills/BillManager";
 import TransactionLedger from "../transactions/TransactionLedger";
 import ChartsAndAnalytics from "../analytics/ChartsAndAnalytics";
+import DebtDashboard from "../debt/DebtDashboard";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ErrorBoundary } from "@highlight-run/react";
 import logger from "../../utils/logger";
@@ -16,14 +17,13 @@ import logger from "../../utils/logger";
  * ViewRenderer component for handling main content switching
  * Extracted from Layout.jsx for better organization
  */
-const ViewRenderer = ({ activeView, budget, currentUser }) => {
+const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed }) => {
   const {
     envelopes,
     bills,
     savingsGoals,
     supplementalAccounts,
     unassignedCash,
-    biweeklyAllocation,
     paycheckHistory,
     actualBalance,
     transactions,
@@ -50,11 +50,9 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
   } = budget;
 
   // Filter out null/undefined transactions to prevent runtime errors
-  const allTransactions = (rawAllTransactions || []).filter(
-    (t) => t && typeof t === "object",
-  );
+  const allTransactions = (rawAllTransactions || []).filter((t) => t && typeof t === "object");
   const safeTransactions = (transactions || []).filter(
-    (t) => t && typeof t === "object" && typeof t.amount === "number",
+    (t) => t && typeof t === "object" && typeof t.amount === "number"
   );
 
   // Stable callback for bill updates
@@ -81,7 +79,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
         });
       }
     },
-    [updateBill],
+    [updateBill]
   );
 
   // Debug log to verify function creation - only on dev sites
@@ -143,7 +141,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
     ),
     paycheck: (
       <PaycheckProcessor
-        biweeklyAllocation={biweeklyAllocation}
+        biweeklyAllocation={totalBiweeklyNeed}
         envelopes={envelopes}
         paycheckHistory={paycheckHistory}
         onProcessPaycheck={processPaycheck}
@@ -171,16 +169,14 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
             createdAt: new Date().toISOString(),
           };
           addBill(bill);
-          console.log(
-            "✅ Bill stored successfully - no transaction created until paid",
-          );
+          console.log("✅ Bill stored successfully - no transaction created until paid");
         }}
         onSearchNewBills={async () => {
           try {
             // This would integrate with email parsing or other bill detection services
             // For now, we'll show a placeholder notification
             alert(
-              "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox.",
+              "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox."
             );
           } catch (error) {
             console.error("Failed to search for new bills:", error);
@@ -201,16 +197,10 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
         onUpdateTransaction={() => {}} // Will be implemented
         onDeleteTransaction={() => {}} // Will be implemented
         onBulkImport={(newTransactions) => {
-          console.log(
-            "🔄 onBulkImport called with transactions:",
-            newTransactions.length,
-          );
+          console.log("🔄 onBulkImport called with transactions:", newTransactions.length);
           // Add transactions using budget store method - need to loop through individual transactions
           newTransactions.forEach((transaction) => addTransaction(transaction));
-          console.log(
-            "💾 Bulk import complete. Added transactions:",
-            newTransactions.length,
-          );
+          console.log("💾 Bulk import complete. Added transactions:", newTransactions.length);
         }}
         currentUser={currentUser}
       />
@@ -225,13 +215,12 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
         currentUser={currentUser}
       />
     ),
+    debts: <DebtDashboard />,
   };
 
   return (
     <ErrorBoundary>
-      <Suspense
-        fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}
-      >
+      <Suspense fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}>
         {views[activeView]}
       </Suspense>
     </ErrorBoundary>
