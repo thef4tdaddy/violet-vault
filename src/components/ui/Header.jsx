@@ -6,10 +6,12 @@ import {
   RefreshCw,
   Cloud,
   Key,
+  History,
 } from "lucide-react";
 import UserIndicator from "../auth/UserIndicator";
 import logoWithText from "../../assets/Shield Text Logo.webp";
 import ChangePasswordModal from "../auth/ChangePasswordModal";
+import BudgetHistoryViewer from "../history/BudgetHistoryViewer";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
@@ -27,6 +29,7 @@ const Header = memo(
   }) => {
     const [showResetModal, setShowResetModal] = useState(false);
     const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [showHistoryModal, setShowHistoryModal] = useState(false);
 
     const handleToggleResetModal = useCallback(() => {
       setShowResetModal((prev) => !prev);
@@ -34,6 +37,10 @@ const Header = memo(
 
     const handleTogglePasswordModal = useCallback(() => {
       setShowPasswordModal((prev) => !prev);
+    }, []);
+
+    const handleToggleHistoryModal = useCallback(() => {
+      setShowHistoryModal((prev) => !prev);
     }, []);
     return (
       <div
@@ -112,6 +119,14 @@ const Header = memo(
               >
                 <Key className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Change Password</span>
+              </button>
+
+              <button
+                onClick={handleToggleHistoryModal}
+                className="btn btn-secondary flex items-center rounded-2xl px-3 sm:px-4 py-2 text-sm font-medium hover:shadow-lg transition-all"
+              >
+                <History className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">History</span>
               </button>
 
               {LOCAL_ONLY_MODE && (
@@ -195,6 +210,10 @@ const Header = memo(
             onClose={handleTogglePasswordModal}
             onChangePassword={onChangePassword}
           />
+        )}
+
+        {showHistoryModal && (
+          <BudgetHistoryViewer onClose={handleToggleHistoryModal} />
         )}
       </div>
     );
