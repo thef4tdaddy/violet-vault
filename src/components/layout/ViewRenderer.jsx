@@ -8,6 +8,7 @@ import PaycheckProcessor from "../budgeting/PaycheckProcessor";
 import BillManager from "../bills/BillManager";
 import TransactionLedger from "../transactions/TransactionLedger";
 import ChartsAndAnalytics from "../analytics/ChartsAndAnalytics";
+import DebtDashboard from "../debt/DebtDashboard";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ErrorBoundary } from "@highlight-run/react";
 import logger from "../../utils/logger";
@@ -214,6 +215,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed }) =>
         currentUser={currentUser}
       />
     ),
+    debts: <DebtDashboard />,
   };
 
   return (
