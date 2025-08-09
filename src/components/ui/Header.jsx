@@ -46,7 +46,19 @@ const Header = memo(
         <div className="flex flex-col items-center text-center">
           {/* Logo and tagline */}
           <div className="flex flex-col items-center w-full px-6 py-8">
-            <div className="rounded border-4 border-purple-600 bg-white/95 mb-4">
+            <div
+              className={`rounded border-4 bg-white/95 mb-4 ${
+                // Environment-specific border colors for better differentiation
+                import.meta.env.MODE === "development"
+                  ? "border-orange-500"
+                  : window.location.hostname.includes("vercel.app") &&
+                      !window.location.hostname.includes(
+                        "violet-vault-production",
+                      )
+                    ? "border-red-500" // Preview environments
+                    : "border-purple-600" // Production
+              }`}
+            >
               <img
                 src={logoWithText}
                 alt="VioletVault Logo"
