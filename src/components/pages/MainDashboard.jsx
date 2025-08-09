@@ -19,19 +19,35 @@ import { predictNextPayday } from "../../utils/paydayPredictor";
 import EditableBalance from "../ui/EditableBalance";
 import { useActualBalance } from "../../hooks/useActualBalance";
 import { useBudgetStore } from "../../stores/budgetStore";
+import { useEnvelopes } from "../../hooks/useEnvelopes";
+import { useSavingsGoals } from "../../hooks/useSavingsGoals";
+import { useTransactions } from "../../hooks/useTransactions";
 import DebtSummaryWidget from "../debt/ui/DebtSummaryWidget";
 
 const Dashboard = () => {
-  // Get live data from budget store instead of props
+  // Enhanced TanStack Query integration with optimistic updates
+  const { 
+    data: envelopes = [], 
+    isLoading: envelopesLoading 
+  } = useEnvelopes();
+  
+  const { 
+    data: savingsGoals = [], 
+    isLoading: savingsLoading 
+  } = useSavingsGoals();
+  
+  const { 
+    data: transactions = [], 
+    isLoading: transactionsLoading 
+  } = useTransactions();
+
+  // Keep Zustand for non-migrated operations
   const budget = useBudgetStore();
   const {
-    envelopes,
-    savingsGoals,
     unassignedCash,
     actualBalance,
     setActualBalance,
     reconcileTransaction,
-    transactions,
     paycheckHistory,
   } = budget;
   const [showReconcileModal, setShowReconcileModal] = useState(false);
@@ -132,6 +148,23 @@ const Dashboard = () => {
     alert("Navigate to envelope management for funding planning!");
     // TODO: Integrate with envelope planning interface
   };
+
+  // Show loading state while TanStack queries are fetching
+  if (envelopesLoading || savingsLoading || transactionsLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/2 mb-6"></div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="h-32 bg-gray-200 rounded"></div>
+            <div className="h-32 bg-gray-200 rounded"></div>
+            <div className="h-32 bg-gray-200 rounded"></div>
+          </div>
+          <div className="h-96 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

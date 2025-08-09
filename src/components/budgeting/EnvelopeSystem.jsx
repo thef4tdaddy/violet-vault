@@ -1,19 +1,31 @@
-// src/components/EnvelopeSystem.jsx - Focused Envelope Operations with infinite loop fixes
+// src/components/EnvelopeSystem.jsx - Enhanced Envelope Operations with TanStack Query
 import React, { useEffect, useMemo, useCallback, useRef } from "react";
 import { useBudgetStore } from "../../stores/budgetStore";
+import { useEnvelopes } from "../../hooks/useEnvelopes";
+import { useBills } from "../../hooks/useBills";
 import { BIWEEKLY_MULTIPLIER, FREQUENCY_MULTIPLIERS } from "../../constants/frequency";
 
 const useEnvelopeSystem = () => {
+  // Enhanced TanStack Query integration
+  const { 
+    data: envelopes = [], 
+    addEnvelope, 
+    updateEnvelope, 
+    deleteEnvelope,
+    isLoading: envelopesLoading
+  } = useEnvelopes();
+  
+  const { 
+    data: bills = [], 
+    isLoading: billsLoading 
+  } = useBills();
+
+  // Keep Zustand for non-migrated operations
   const {
-    envelopes,
-    bills,
     unassignedCash,
     setEnvelopes,
     setBiweeklyAllocation,
     setUnassignedCash,
-    addEnvelope,
-    updateEnvelope,
-    deleteEnvelope,
   } = useBudgetStore();
 
   const lastBillsRef = useRef(null);
@@ -296,16 +308,19 @@ const useEnvelopeSystem = () => {
   );
 
   return {
-    // Data
+    // Data with enhanced TanStack Query integration
     envelopes,
     totalEnvelopeBalance,
+    isLoading: envelopesLoading || billsLoading,
+    isEnvelopesLoading: envelopesLoading,
+    isBillsLoading: billsLoading,
 
     // Core operations
     spendFromEnvelope,
     transferBetweenEnvelopes,
     allocatePaycheckToEnvelopes,
 
-    // CRUD operations
+    // Enhanced CRUD operations with optimistic updates
     addEnvelope,
     updateEnvelope,
     deleteEnvelope,
