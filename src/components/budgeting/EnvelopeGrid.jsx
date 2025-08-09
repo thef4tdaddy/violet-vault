@@ -1,6 +1,9 @@
 // src/new/UnifiedEnvelopeManager.jsx
 import React, { useState, useMemo } from "react";
 import { useBudgetStore } from "../../stores/budgetStore";
+import { useEnvelopes } from "../../hooks/useEnvelopes";
+import { useTransactions } from "../../hooks/useTransactions";
+import { useBills } from "../../hooks/useBills";
 import {
   Target,
   DollarSign,
@@ -39,23 +42,56 @@ const UnifiedEnvelopeManager = ({
   unassignedCash: propUnassignedCash,
   className = "",
 }) => {
+  // Enhanced TanStack Query integration with loading states
+  const { 
+    data: tanStackEnvelopes = [], 
+    addEnvelope,
+    updateEnvelope,
+    deleteEnvelope,
+    isLoading: envelopesLoading 
+  } = useEnvelopes();
+  
+  const { 
+    data: tanStackTransactions = [], 
+    isLoading: transactionsLoading 
+  } = useTransactions();
+  
+  const { 
+    data: tanStackBills = [], 
+    updateBill,
+    isLoading: billsLoading 
+  } = useBills();
+
+  // Keep Zustand for non-migrated operations and fallbacks
   const budget = useBudgetStore();
 
   const envelopes = useMemo(
-    () => (propEnvelopes && propEnvelopes.length ? propEnvelopes : budget.envelopes || []),
-    [propEnvelopes, budget.envelopes]
+    () => 
+      propEnvelopes && propEnvelopes.length 
+        ? propEnvelopes 
+        : tanStackEnvelopes.length
+          ? tanStackEnvelopes
+          : budget.envelopes || [],
+    [propEnvelopes, tanStackEnvelopes, budget.envelopes]
   );
 
   const transactions = useMemo(
     () =>
-      propTransactions && propTransactions.length ? propTransactions : budget.transactions || [],
-    [propTransactions, budget.transactions]
+      propTransactions && propTransactions.length 
+        ? propTransactions 
+        : tanStackTransactions.length
+          ? tanStackTransactions
+          : budget.transactions || [],
+    [propTransactions, tanStackTransactions, budget.transactions]
   );
   const unassignedCash =
     propUnassignedCash !== undefined ? propUnassignedCash : budget.unassignedCash || 0;
 
   // Get bills for envelope linking
-  const bills = useMemo(() => budget.bills || [], [budget.bills]);
+  const bills = useMemo(() => 
+    tanStackBills.length ? tanStackBills : budget.bills || [], 
+    [tanStackBills, budget.bills]
+  );
 
   const [selectedEnvelopeId, setSelectedEnvelopeId] = useState(null);
   const [viewMode, setViewMode] = useState("overview");
@@ -349,6 +385,26 @@ const UnifiedEnvelopeManager = ({
           unpaidBills: [],
         }
       : envelopeData.find((env) => env.id === selectedEnvelopeId);
+
+  // Show loading state while TanStack queries are fetching
+  const isLoading = envelopesLoading || transactionsLoading || billsLoading;
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="h-48 bg-gray-200 rounded"></div>
+            <div className="h-48 bg-gray-200 rounded"></div>
+            <div className="h-48 bg-gray-200 rounded"></div>
+            <div className="h-48 bg-gray-200 rounded"></div>
+            <div className="h-48 bg-gray-200 rounded"></div>
+            <div className="h-48 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`space-y-6 ${className}`}>
@@ -917,7 +973,13 @@ const UnifiedEnvelopeManager = ({
           isOpen={showCreateModal}
           onClose={() => setShowCreateModal(false)}
           onCreateEnvelope={(envelope) => {
-            budget.addEnvelope(envelope);
+            // Use TanStack mutation with Zustand fallback
+            try {
+              addEnvelope(envelope);
+            } catch (error) {
+              console.warn("TanStack addEnvelope failed, using Zustand fallback", error);
+              budget.addEnvelope(envelope);
+            }
             setShowCreateModal(false);
           }}
           unassignedCash={unassignedCash}
@@ -932,19 +994,37 @@ const UnifiedEnvelopeManager = ({
           envelope={editingEnvelope}
           onUpdateEnvelope={(envelope) => {
             if (envelope.id === "unassigned") {
-              // Handle unassigned cash update
+              // Handle unassigned cash update - keep using Zustand for UI state
               budget.setUnassignedCash(envelope.currentBalance);
             } else {
-              budget.updateEnvelope(envelope);
+              // Use TanStack mutation with Zustand fallback
+              try {
+                updateEnvelope({ id: envelope.id, updates: envelope });
+              } catch (error) {
+                console.warn("TanStack updateEnvelope failed, using Zustand fallback", error);
+                budget.updateEnvelope(envelope);
+              }
             }
             setEditingEnvelope(null);
           }}
           onDeleteEnvelope={(envelopeId) => {
-            budget.deleteEnvelope(envelopeId);
+            // Use TanStack mutation with Zustand fallback
+            try {
+              deleteEnvelope(envelopeId);
+            } catch (error) {
+              console.warn("TanStack deleteEnvelope failed, using Zustand fallback", error);
+              budget.deleteEnvelope(envelopeId);
+            }
             setEditingEnvelope(null);
           }}
           onUpdateBill={(bill) => {
-            budget.updateBill(bill);
+            // Use TanStack mutation with Zustand fallback
+            try {
+              updateBill({ id: bill.id, updates: bill });
+            } catch (error) {
+              console.warn("TanStack updateBill failed, using Zustand fallback", error);
+              budget.updateBill(bill);
+            }
           }}
           existingEnvelopes={envelopes}
           allBills={bills}
