@@ -16,14 +16,13 @@ import logger from "../../utils/logger";
  * ViewRenderer component for handling main content switching
  * Extracted from Layout.jsx for better organization
  */
-const ViewRenderer = ({ activeView, budget, currentUser }) => {
+const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed }) => {
   const {
     envelopes,
     bills,
     savingsGoals,
     supplementalAccounts,
     unassignedCash,
-    biweeklyAllocation,
     paycheckHistory,
     actualBalance,
     transactions,
@@ -143,7 +142,7 @@ const ViewRenderer = ({ activeView, budget, currentUser }) => {
     ),
     paycheck: (
       <PaycheckProcessor
-        biweeklyAllocation={biweeklyAllocation}
+        biweeklyAllocation={totalBiweeklyNeed}
         envelopes={envelopes}
         paycheckHistory={paycheckHistory}
         onProcessPaycheck={processPaycheck}

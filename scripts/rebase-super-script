@@ -1,11 +1,29 @@
 #!/bin/bash
 
+# VioletVault Rebase Script
+# Updated for new workflow: feature branches → develop → main
+
 set -e
 
 CURRENT_BRANCH=$(git branch --show-current)
 
+echo "🌿 VioletVault Rebase Script"
+echo "============================="
 echo "🔍 Current branch: $CURRENT_BRANCH"
-read -p "❓ Do you want to rebase this branch onto main? (y/n) " CONFIRM
+
+# Determine target branch based on current branch
+if [[ "$CURRENT_BRANCH" == "develop" ]]; then
+  TARGET_BRANCH="main"
+  echo "💡 Rebasing develop branch onto main"
+elif [[ "$CURRENT_BRANCH" == "main" ]]; then
+  echo "❌ Cannot rebase main branch onto itself"
+  exit 1
+else
+  TARGET_BRANCH="develop" 
+  echo "💡 Rebasing feature branch onto develop"
+fi
+
+read -p "❓ Do you want to rebase this branch onto $TARGET_BRANCH? (y/n) " CONFIRM
 
 if [[ "$CONFIRM" != "y" ]]; then
   echo "❌ Rebase canceled."
@@ -30,8 +48,8 @@ else
   echo "→ No changes to commit after Prettier/ESLint."
 fi
 
-echo "📥 Fetching latest main..."
-git fetch origin main
+echo "📥 Fetching latest $TARGET_BRANCH..."
+git fetch origin $TARGET_BRANCH
 
 echo "🧼 Final check for unstaged changes before rebase..."
 if ! git diff --quiet; then
@@ -40,8 +58,8 @@ if ! git diff --quiet; then
   exit 1
 fi
 
-echo "🧬 Rebasing $CURRENT_BRANCH onto origin/main..."
-git rebase origin/main
+echo "🧬 Rebasing $CURRENT_BRANCH onto origin/$TARGET_BRANCH..."
+git rebase origin/$TARGET_BRANCH
 
 echo "🔍 Checking for local commits on $CURRENT_BRANCH..."
 LOCAL_COMMITS=$(git log origin/$CURRENT_BRANCH..HEAD --oneline)
