@@ -53,7 +53,7 @@
           "warnings": 1,
           "details": [
             {
-              "line": 393,
+              "line": 360,
               "message": "'Icon' is defined but never used"
             }
           ]
@@ -73,7 +73,7 @@
           "warnings": 1,
           "details": [
             {
-              "line": 74,
+              "line": 68,
               "message": "'Icon' is defined but never used"
             }
           ]
@@ -153,7 +153,7 @@
               "message": "'patch' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
             },
             {
-              "line": 152,
+              "line": 167,
               "message": "'mode' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
             }
           ]
@@ -170,7 +170,7 @@
           "warnings": 1,
           "details": [
             {
-              "line": 67,
+              "line": 56,
               "message": "React Hook useEffect has a missing dependency: 'budget'. Either include it or remove the dependency array"
             }
           ]
