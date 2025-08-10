@@ -26,9 +26,11 @@ import {
   Settings,
   Filter,
   Calculator,
+  History,
 } from "lucide-react";
 import CreateEnvelopeModal from "./CreateEnvelopeModal";
 import EditEnvelopeModal from "./EditEnvelopeModal";
+import ObjectHistoryViewer from "../history/ObjectHistoryViewer";
 import {
   ENVELOPE_TYPES,
   ENVELOPE_TYPE_CONFIG,
@@ -95,6 +97,7 @@ const UnifiedEnvelopeManager = ({
 
   const [selectedEnvelopeId, setSelectedEnvelopeId] = useState(null);
   const [viewMode, setViewMode] = useState("overview");
+  const [historyEnvelope, setHistoryEnvelope] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingEnvelope, setEditingEnvelope] = useState(null);
   const [filterOptions, setFilterOptions] = useState({
@@ -714,6 +717,16 @@ const UnifiedEnvelopeManager = ({
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
+                    setHistoryEnvelope(envelope);
+                  }}
+                  className="text-gray-400 hover:text-blue-600"
+                  title="View History"
+                >
+                  <History className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setEditingEnvelope(envelope);
                   }}
                   className="text-gray-400 hover:text-gray-600"
@@ -1086,6 +1099,16 @@ const UnifiedEnvelopeManager = ({
             setShowCreateModal(false);
           }}
           unassignedCash={unassignedCash}
+        />
+      )}
+
+      {/* Envelope History Modal */}
+      {historyEnvelope && (
+        <ObjectHistoryViewer
+          objectId={historyEnvelope.id}
+          objectType="Envelope"
+          objectName={historyEnvelope.name}
+          onClose={() => setHistoryEnvelope(null)}
         />
       )}
 
