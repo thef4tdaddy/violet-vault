@@ -317,6 +317,7 @@ export const useLocalOnlyMode = () => {
     enterLocalOnlyMode,
     exitLocalOnlyModeAndClear,
     updateProfile,
+    checkLocalOnlyMode,
 
     // Data management
     exportData,
