@@ -7,11 +7,14 @@ import {
   Cloud,
   Key,
   History,
+  ShieldOff,
+  Monitor,
 } from "lucide-react";
 import UserIndicator from "../auth/UserIndicator";
 import logoWithText from "../../assets/Shield Text Logo.webp";
 import ChangePasswordModal from "../auth/ChangePasswordModal";
 import BudgetHistoryViewer from "../history/BudgetHistoryViewer";
+import LocalOnlyModeSettings from "../auth/LocalOnlyModeSettings";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
@@ -26,10 +29,12 @@ const Header = memo(
     currentUser,
     onUserChange,
     onUpdateProfile,
+    isLocalOnlyMode = false,
   }) => {
     const [showResetModal, setShowResetModal] = useState(false);
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [showHistoryModal, setShowHistoryModal] = useState(false);
+    const [showLocalOnlySettings, setShowLocalOnlySettings] = useState(false);
 
     const handleToggleResetModal = useCallback(() => {
       setShowResetModal((prev) => !prev);
@@ -41,6 +46,10 @@ const Header = memo(
 
     const handleToggleHistoryModal = useCallback(() => {
       setShowHistoryModal((prev) => !prev);
+    }, []);
+
+    const handleToggleLocalOnlySettings = useCallback(() => {
+      setShowLocalOnlySettings((prev) => !prev);
     }, []);
     return (
       <div
@@ -76,9 +85,23 @@ const Header = memo(
                 }}
               />
             </div>
-            <p className="text-gray-600 text-sm font-medium">
-              Encryption First, Family Budgeting Management
-            </p>
+            <div className="text-center">
+              <p className="text-gray-600 text-sm font-medium">
+                Encryption First, Family Budgeting Management
+              </p>
+              {isLocalOnlyMode && (
+                <button
+                  onClick={handleToggleLocalOnlySettings}
+                  className="mt-2 inline-flex items-center px-3 py-1 rounded-full bg-blue-100 border border-blue-300 hover:bg-blue-200 hover:border-blue-400 transition-colors"
+                  title="Click to manage Local-Only Mode settings"
+                >
+                  <Monitor className="h-3 w-3 text-blue-600 mr-1" />
+                  <span className="text-xs font-medium text-blue-800">
+                    Local-Only Mode
+                  </span>
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Buttons row */}
@@ -214,6 +237,19 @@ const Header = memo(
 
         {showHistoryModal && (
           <BudgetHistoryViewer onClose={handleToggleHistoryModal} />
+        )}
+
+        {showLocalOnlySettings && (
+          <LocalOnlyModeSettings
+            isOpen={showLocalOnlySettings}
+            onClose={handleToggleLocalOnlySettings}
+            onModeSwitch={(mode) => {
+              if (mode === "standard") {
+                // Redirect to standard authentication
+                window.location.reload();
+              }
+            }}
+          />
         )}
       </div>
     );
