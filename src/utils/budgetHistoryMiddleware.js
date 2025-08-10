@@ -209,6 +209,14 @@ export const budgetHistoryMiddleware = (config) => (set, get, api) => {
       lastCommittedState = null;
     },
 
+    // Verify budget history integrity
+    verifyBudgetHistoryIntegrity: async () => {
+      if (!isInitialized) {
+        throw new Error("Budget history not initialized");
+      }
+      return budgetHistory.verifyIntegrity();
+    },
+
     // Enhanced action methods that include history metadata
     addEnvelopeWithHistory: (envelope) =>
       enhancedSet(

@@ -516,6 +516,121 @@ class BudgetHistory {
   }
 
   /**
+   * Verify the integrity of the commit history chain
+   * @returns {Promise<Object>} - Verification result
+   */
+  async verifyIntegrity() {
+    if (!this.initialized) {
+      throw new Error("Budget history not initialized");
+    }
+
+    try {
+      const history = await this.getHistory({ limit: -1 }); // Get all commits
+
+      if (history.length === 0) {
+        return {
+          valid: true,
+          totalCommits: 0,
+          message: "No commits to verify",
+        };
+      }
+
+      // Sort commits chronologically (oldest first) for chain verification
+      history.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+      let validChain = true;
+      let brokenAt = null;
+      let previousHash = "";
+      const verifiedCommits = [];
+
+      for (let i = 0; i < history.length; i++) {
+        const commitSummary = history[i];
+
+        try {
+          // Get full commit details
+          const commit = await this.getCommit(commitSummary.hash);
+
+          // Verify parent hash matches expected previous hash
+          if (commit.parentHash !== previousHash) {
+            validChain = false;
+            brokenAt = i;
+            logger.warn("Hash chain broken", {
+              commitIndex: i,
+              commitHash: commit.hash,
+              expectedParent: previousHash,
+              actualParent: commit.parentHash,
+            });
+            break;
+          }
+
+          // Verify commit hash integrity
+          const expectedHash = await this.generateCommitHash({
+            timestamp: commit.timestamp,
+            message: commit.message,
+            author: commit.author,
+            parentHash: commit.parentHash,
+            changes: commit.changes,
+          });
+
+          if (expectedHash !== commit.hash) {
+            validChain = false;
+            brokenAt = i;
+            logger.warn("Commit hash verification failed", {
+              commitIndex: i,
+              expected: expectedHash,
+              actual: commit.hash,
+            });
+            break;
+          }
+
+          verifiedCommits.push({
+            hash: commit.hash,
+            timestamp: commit.timestamp,
+            message: commit.message,
+            verified: true,
+          });
+
+          previousHash = commit.hash;
+        } catch (error) {
+          logger.error("Failed to verify commit", error, {
+            commitIndex: i,
+            commitHash: commitSummary.hash,
+          });
+          validChain = false;
+          brokenAt = i;
+          break;
+        }
+      }
+
+      return {
+        valid: validChain,
+        totalCommits: history.length,
+        verifiedCommits: verifiedCommits.length,
+        brokenAt,
+        message: validChain
+          ? `All ${history.length} commits verified successfully`
+          : `Chain integrity compromised at commit ${brokenAt}`,
+        details: validChain
+          ? null
+          : {
+              lastValidCommit:
+                brokenAt > 0 ? verifiedCommits[brokenAt - 1] : null,
+              suspiciousCommit:
+                brokenAt < history.length ? history[brokenAt] : null,
+            },
+      };
+    } catch (error) {
+      logger.error("Failed to verify history integrity", error);
+      return {
+        valid: false,
+        totalCommits: 0,
+        error: error.message,
+        message: "Integrity verification failed due to error",
+      };
+    }
+  }
+
+  /**
    * Export budget history for backup
    * @param {Object} options - Export options
    * @returns {Promise<Object>} - Exported history data
