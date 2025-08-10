@@ -516,25 +516,26 @@ const storeInitializer = (set, get) => ({
   initializeFromDexie: async () => {
     try {
       console.log("🔄 Initializing Zustand store from Dexie...");
-      
+
       // Import budgetDb inside the function to avoid circular imports
       const { budgetDb } = await import("../db/budgetDb");
-      
+
       // Load all data from Dexie
-      const [envelopes, transactions, bills, savingsGoals, paycheckHistory] = await Promise.all([
-        budgetDb.envelopes.toArray(),
-        budgetDb.transactions.toArray(),
-        budgetDb.bills.toArray(),
-        budgetDb.savingsGoals.toArray(),
-        budgetDb.paycheckHistory.toArray()
-      ]);
+      const [envelopes, transactions, bills, savingsGoals, paycheckHistory] =
+        await Promise.all([
+          budgetDb.envelopes.toArray(),
+          budgetDb.transactions.toArray(),
+          budgetDb.bills.toArray(),
+          budgetDb.savingsGoals.toArray(),
+          budgetDb.paycheckHistory.toArray(),
+        ]);
 
       console.log("📦 Loaded data from Dexie:", {
         envelopes: envelopes.length,
         transactions: transactions.length,
         bills: bills.length,
         savingsGoals: savingsGoals.length,
-        paycheckHistory: paycheckHistory.length
+        paycheckHistory: paycheckHistory.length,
       });
 
       // Update Zustand store with loaded data
@@ -549,7 +550,14 @@ const storeInitializer = (set, get) => ({
       });
 
       console.log("✅ Successfully initialized Zustand store from Dexie");
-      return { success: true, counts: { envelopes: envelopes.length, transactions: transactions.length, bills: bills.length } };
+      return {
+        success: true,
+        counts: {
+          envelopes: envelopes.length,
+          transactions: transactions.length,
+          bills: bills.length,
+        },
+      };
     } catch (error) {
       console.error("❌ Failed to initialize Zustand store from Dexie:", error);
       set((state) => {

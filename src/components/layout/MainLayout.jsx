@@ -57,7 +57,11 @@ const Layout = () => {
   const { isLocalOnlyMode, localOnlyUser } = useLocalOnlyMode();
 
   // Initialize data from Dexie to Zustand on app startup
-  const { isInitialized: dataInitialized, initError, dataLoaded } = useDataInitialization();
+  const {
+    isInitialized: dataInitialized,
+    initError,
+    dataLoaded,
+  } = useDataInitialization();
 
   const { exportData, importData, resetEncryptionAndStartFresh } =
     useDataManagement();
@@ -100,7 +104,7 @@ const Layout = () => {
   // Show authentication gateway if neither standard nor local-only mode is ready
   if (!isLocalOnlyMode && (!isUnlocked || !currentUser)) {
     return (
-      <AuthGateway 
+      <AuthGateway
         onSetupComplete={handleSetup}
         onLocalOnlyReady={handleLocalOnlyReady}
       />
@@ -110,7 +114,7 @@ const Layout = () => {
   // In local-only mode but user not ready yet
   if (isLocalOnlyMode && !localOnlyUser) {
     return (
-      <AuthGateway 
+      <AuthGateway
         onSetupComplete={handleSetup}
         onLocalOnlyReady={handleLocalOnlyReady}
       />

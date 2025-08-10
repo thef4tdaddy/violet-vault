@@ -16,11 +16,14 @@ const useDataInitialization = () => {
       try {
         logger.debug("Starting data initialization from Dexie");
         setInitError(null);
-        
+
         const result = await initializeFromDexie();
-        
+
         if (result.success) {
-          logger.debug("Data initialization completed successfully", result.counts);
+          logger.debug(
+            "Data initialization completed successfully",
+            result.counts,
+          );
           setIsInitialized(true);
         } else {
           logger.error("Data initialization failed", result.error);
@@ -41,7 +44,7 @@ const useDataInitialization = () => {
   return {
     isInitialized,
     initError,
-    dataLoaded
+    dataLoaded,
   };
 };
 
