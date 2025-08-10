@@ -7,7 +7,8 @@ import usePasswordRotation from "../../hooks/usePasswordRotation";
 import useNetworkStatus from "../../hooks/useNetworkStatus";
 import useFirebaseSync from "../../hooks/useFirebaseSync";
 import usePaydayPrediction from "../../hooks/usePaydayPrediction";
-import UserSetup from "../auth/UserSetup";
+import { useLocalOnlyMode } from "../../hooks/useLocalOnlyMode";
+import AuthGateway from "../auth/AuthGateway";
 import Header from "../ui/Header";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ToastContainer } from "../ui/Toast";
@@ -51,6 +52,9 @@ const Layout = () => {
     handleUpdateProfile,
   } = useAuthFlow();
 
+  // Local-only mode hooks
+  const { isLocalOnlyMode, localOnlyUser } = useLocalOnlyMode();
+
   const { exportData, importData, resetEncryptionAndStartFresh } =
     useDataManagement();
 
@@ -83,8 +87,30 @@ const Layout = () => {
     setSyncConflicts(null);
   };
 
-  if (!isUnlocked || !currentUser) {
-    return <UserSetup onSetupComplete={handleSetup} />;
+  // Handle local-only mode or standard authentication
+  const handleLocalOnlyReady = (localUser) => {
+    logger.debug("Local-only mode ready with user", { userId: localUser.id });
+    // Local-only mode doesn't need further setup, let MainLayout render
+  };
+
+  // Show authentication gateway if neither standard nor local-only mode is ready
+  if (!isLocalOnlyMode && (!isUnlocked || !currentUser)) {
+    return (
+      <AuthGateway 
+        onSetupComplete={handleSetup}
+        onLocalOnlyReady={handleLocalOnlyReady}
+      />
+    );
+  }
+
+  // In local-only mode but user not ready yet
+  if (isLocalOnlyMode && !localOnlyUser) {
+    return (
+      <AuthGateway 
+        onSetupComplete={handleSetup}
+        onLocalOnlyReady={handleLocalOnlyReady}
+      />
+    );
   }
 
   logger.budgetSync("Rendering BudgetProvider with props", {
@@ -99,9 +125,9 @@ const Layout = () => {
   return (
     <>
       <MainContent
-        currentUser={currentUser}
+        currentUser={isLocalOnlyMode ? localOnlyUser : currentUser}
         encryptionKey={encryptionKey}
-        budgetId={budgetId}
+        budgetId={isLocalOnlyMode ? localOnlyUser?.budgetId : budgetId}
         onUserChange={handleLogout}
         onExport={exportData}
         onImport={importData}
@@ -114,6 +140,7 @@ const Layout = () => {
         firebaseSync={firebaseSync}
         rotationDue={rotationDue}
         onUpdateProfile={handleUpdateProfile}
+        isLocalOnlyMode={isLocalOnlyMode}
       />
       {showRotationModal && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
@@ -170,6 +197,7 @@ const MainContent = ({
   setSyncConflicts,
   rotationDue,
   onUpdateProfile,
+  isLocalOnlyMode = false,
 }) => {
   const budget = useBudgetStore();
   const [activeView, setActiveView] = useState("dashboard");
@@ -256,6 +284,7 @@ const MainContent = ({
             onImport={handleImport}
             onLogout={onLogout}
             onChangePassword={handleChangePassword}
+            isLocalOnlyMode={isLocalOnlyMode}
             onResetEncryption={() => {
               // Reset the budget context data first
               budget.resetAllData();
