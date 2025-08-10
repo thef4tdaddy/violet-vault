@@ -3,7 +3,7 @@ import React, { useState, useMemo } from "react";
 import { useBudgetStore } from "../../stores/budgetStore";
 import { useEnvelopes } from "../../hooks/useEnvelopes";
 import { useTransactions } from "../../hooks/useTransactions";
-import { useBills } from "../../hooks/useBills";
+import useBills from "../../hooks/useBills";
 import {
   Target,
   DollarSign,
