@@ -29,15 +29,20 @@ const useEnvelopes = (options = {}) => {
   const queryFunction = async () => {
     let envelopes = [];
 
-    // Try Zustand first for real-time data
-    if (zustandEnvelopes && zustandEnvelopes.length > 0) {
-      envelopes = [...zustandEnvelopes];
-    } else {
-      // Fallback to Dexie for offline support
+    // Primary source: Dexie (local storage)
+    try {
       if (category) {
         envelopes = await budgetDb.getEnvelopesByCategory(category);
       } else {
         envelopes = await budgetDb.envelopes.toArray();
+      }
+      console.log("Using Dexie envelopes (primary):", envelopes.length);
+    } catch (error) {
+      console.warn("Dexie query failed, falling back to Zustand:", error);
+      // Fallback to Zustand if Dexie fails
+      if (zustandEnvelopes && zustandEnvelopes.length > 0) {
+        envelopes = [...zustandEnvelopes];
+        console.log("Using Zustand envelopes (fallback):", envelopes.length);
       }
     }
 
@@ -90,7 +95,18 @@ const useEnvelopes = (options = {}) => {
       sortOrder,
     }),
     queryFn: queryFunction,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes - reduce refetches
+    gcTime: 10 * 60 * 1000, // 10 minutes - keep in cache longer
+    refetchOnMount: false, // Don't refetch if data is fresh
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    placeholderData: (previousData) => previousData, // Use previous data during refetch
+    initialData: () => {
+      // Try to get initial data from Zustand to prevent blank state
+      if (zustandEnvelopes && zustandEnvelopes.length > 0) {
+        return zustandEnvelopes;
+      }
+      return [];
+    },
     enabled: true,
   });
 
