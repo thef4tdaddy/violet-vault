@@ -5,6 +5,7 @@ import {
   AlertTriangle,
   RefreshCw,
   Cloud,
+  CloudOff,
   Key,
   History,
   ShieldOff,
@@ -15,6 +16,7 @@ import logoWithText from "../../assets/Shield Text Logo.webp";
 import ChangePasswordModal from "../auth/ChangePasswordModal";
 import BudgetHistoryViewer from "../history/BudgetHistoryViewer";
 import LocalOnlyModeSettings from "../auth/LocalOnlyModeSettings";
+import { useBudgetStore } from "../../stores/budgetStore";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
@@ -35,6 +37,9 @@ const Header = memo(
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [showHistoryModal, setShowHistoryModal] = useState(false);
     const [showLocalOnlySettings, setShowLocalOnlySettings] = useState(false);
+    
+    // Cloud sync state
+    const { cloudSyncEnabled, setCloudSyncEnabled } = useBudgetStore();
 
     const handleToggleResetModal = useCallback(() => {
       setShowResetModal((prev) => !prev);
@@ -51,6 +56,42 @@ const Header = memo(
     const handleToggleLocalOnlySettings = useCallback(() => {
       setShowLocalOnlySettings((prev) => !prev);
     }, []);
+
+    const handleToggleCloudSync = useCallback(async () => {
+      const newValue = !cloudSyncEnabled;
+      setCloudSyncEnabled(newValue);
+      
+      if (newValue) {
+        console.log("🌩️ Cloud sync enabled - starting background sync");
+        
+        // Start the background sync service
+        try {
+          const { default: CloudSyncService } = await import("../../services/cloudSyncService");
+          const { useAuth } = await import("../../stores/authStore");
+          const authState = useAuth.getState();
+          
+          if (authState.encryptionKey && authState.currentUser && authState.budgetId) {
+            CloudSyncService.start({
+              encryptionKey: authState.encryptionKey,
+              currentUser: authState.currentUser,
+              budgetId: authState.budgetId
+            });
+          }
+        } catch (error) {
+          console.error("Failed to start cloud sync:", error);
+        }
+      } else {
+        console.log("💾 Cloud sync disabled - stopping background sync");
+        
+        // Stop the background sync service
+        try {
+          const { default: CloudSyncService } = await import("../../services/cloudSyncService");
+          CloudSyncService.stop();
+        } catch (error) {
+          console.error("Failed to stop cloud sync:", error);
+        }
+      }
+    }, [cloudSyncEnabled, setCloudSyncEnabled]);
     return (
       <div
         className="rounded-3xl mb-6 py-2 backdrop-blur-md border border-white/20 shadow-2xl"
@@ -151,6 +192,27 @@ const Header = memo(
                 <History className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">History</span>
               </button>
+
+              {!isLocalOnlyMode && (
+                <button
+                  onClick={handleToggleCloudSync}
+                  className={`btn flex items-center rounded-2xl px-3 sm:px-4 py-2 text-sm font-medium hover:shadow-lg transition-all ${
+                    cloudSyncEnabled
+                      ? "btn-primary text-white bg-green-600 border-green-600 hover:bg-green-700"
+                      : "btn-secondary text-gray-600 bg-gray-100 border-gray-300 hover:bg-gray-200"
+                  }`}
+                  title={cloudSyncEnabled ? "Cloud sync enabled - click to disable" : "Cloud sync disabled - click to enable"}
+                >
+                  {cloudSyncEnabled ? (
+                    <Cloud className="h-4 w-4 sm:mr-2" />
+                  ) : (
+                    <CloudOff className="h-4 w-4 sm:mr-2" />
+                  )}
+                  <span className="hidden sm:inline">
+                    {cloudSyncEnabled ? "Cloud Sync" : "Local Only"}
+                  </span>
+                </button>
+              )}
 
               {LOCAL_ONLY_MODE && (
                 <button

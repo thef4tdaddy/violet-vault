@@ -628,18 +628,14 @@ if (LOCAL_ONLY_MODE) {
       persist(base, {
         name: "violet-vault-store",
         partialize: (state) => ({
-          envelopes: state.envelopes,
-          bills: state.bills,
-          transactions: state.transactions,
-          allTransactions: state.allTransactions,
-          savingsGoals: state.savingsGoals,
-          supplementalAccounts: state.supplementalAccounts,
-          debts: state.debts,
+          // App state only (data arrays handled by TanStack Query)
           unassignedCash: state.unassignedCash,
           biweeklyAllocation: state.biweeklyAllocation,
           paycheckHistory: state.paycheckHistory,
           actualBalance: state.actualBalance,
           isActualBalanceManual: state.isActualBalanceManual,
+          cloudSyncEnabled: state.cloudSyncEnabled,
+          isOnline: state.isOnline,
         }),
       }),
       { name: "violet-vault-devtools" },
