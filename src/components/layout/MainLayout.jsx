@@ -8,6 +8,7 @@ import useNetworkStatus from "../../hooks/useNetworkStatus";
 import useFirebaseSync from "../../hooks/useFirebaseSync";
 import usePaydayPrediction from "../../hooks/usePaydayPrediction";
 import { useLocalOnlyMode } from "../../hooks/useLocalOnlyMode";
+import useDataInitialization from "../../hooks/useDataInitialization";
 import AuthGateway from "../auth/AuthGateway";
 import Header from "../ui/Header";
 import LoadingSpinner from "../ui/LoadingSpinner";
@@ -54,6 +55,9 @@ const Layout = () => {
 
   // Local-only mode hooks
   const { isLocalOnlyMode, localOnlyUser } = useLocalOnlyMode();
+
+  // Initialize data from Dexie to Zustand on app startup
+  const { isInitialized: dataInitialized, initError, dataLoaded } = useDataInitialization();
 
   const { exportData, importData, resetEncryptionAndStartFresh } =
     useDataManagement();

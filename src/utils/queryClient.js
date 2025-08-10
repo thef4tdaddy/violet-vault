@@ -26,34 +26,7 @@ const queryClient = new QueryClient({
       // Network mode for offline support
       networkMode: "offlineFirst",
 
-      // Persist to Dexie by default
-      persister: {
-        persistQuery: async ({ queryKey, queryData }) => {
-          try {
-            const cacheKey = JSON.stringify(queryKey);
-            await budgetDb.setCachedValue(
-              cacheKey,
-              queryData,
-              24 * 60 * 60 * 1000,
-            ); // 24 hour cache
-          } catch (error) {
-            console.warn("Failed to persist query to Dexie:", error);
-          }
-        },
-        restoreQuery: async ({ queryKey }) => {
-          try {
-            const cacheKey = JSON.stringify(queryKey);
-            const cachedData = await budgetDb.getCachedValue(
-              cacheKey,
-              24 * 60 * 60 * 1000,
-            );
-            return cachedData;
-          } catch (error) {
-            console.warn("Failed to restore query from Dexie:", error);
-            return null;
-          }
-        },
-      },
+      // Remove persister - handle persistence in individual hooks instead
     },
     mutations: {
       // Mutation defaults

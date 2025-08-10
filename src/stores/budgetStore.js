@@ -512,6 +512,53 @@ const storeInitializer = (set, get) => ({
       state.dataLoaded = loaded;
     }),
 
+  // Initialize Zustand store from Dexie on app startup
+  initializeFromDexie: async () => {
+    try {
+      console.log("🔄 Initializing Zustand store from Dexie...");
+      
+      // Import budgetDb inside the function to avoid circular imports
+      const { budgetDb } = await import("../db/budgetDb");
+      
+      // Load all data from Dexie
+      const [envelopes, transactions, bills, savingsGoals, paycheckHistory] = await Promise.all([
+        budgetDb.envelopes.toArray(),
+        budgetDb.transactions.toArray(),
+        budgetDb.bills.toArray(),
+        budgetDb.savingsGoals.toArray(),
+        budgetDb.paycheckHistory.toArray()
+      ]);
+
+      console.log("📦 Loaded data from Dexie:", {
+        envelopes: envelopes.length,
+        transactions: transactions.length,
+        bills: bills.length,
+        savingsGoals: savingsGoals.length,
+        paycheckHistory: paycheckHistory.length
+      });
+
+      // Update Zustand store with loaded data
+      set((state) => {
+        state.envelopes = envelopes;
+        state.transactions = transactions;
+        state.allTransactions = transactions; // allTransactions should mirror transactions
+        state.bills = bills;
+        state.savingsGoals = savingsGoals;
+        state.paycheckHistory = paycheckHistory;
+        state.dataLoaded = true;
+      });
+
+      console.log("✅ Successfully initialized Zustand store from Dexie");
+      return { success: true, counts: { envelopes: envelopes.length, transactions: transactions.length, bills: bills.length } };
+    } catch (error) {
+      console.error("❌ Failed to initialize Zustand store from Dexie:", error);
+      set((state) => {
+        state.dataLoaded = false;
+      });
+      return { success: false, error: error.message };
+    }
+  },
+
   // Add an action to set the online status
   setOnlineStatus: (status) =>
     set((state) => {
