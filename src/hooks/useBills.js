@@ -30,12 +30,17 @@ const useBills = (options = {}) => {
   const queryFunction = async () => {
     let bills = [];
 
-    // Try Zustand first for real-time data
-    if (zustandBills && zustandBills.length > 0) {
-      bills = [...zustandBills];
-    } else {
-      // Fallback to Dexie for offline support
+    // Primary source: Dexie (local storage)
+    try {
       bills = await budgetDb.bills.toArray();
+      console.log("Using Dexie bills (primary):", bills.length);
+    } catch (error) {
+      console.warn("Dexie query failed, falling back to Zustand:", error);
+      // Fallback to Zustand if Dexie fails
+      if (zustandBills && zustandBills.length > 0) {
+        bills = [...zustandBills];
+        console.log("Using Zustand bills (fallback):", bills.length);
+      }
     }
 
     // Apply status filters
@@ -114,6 +119,17 @@ const useBills = (options = {}) => {
     }),
     queryFn: queryFunction,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes - keep in cache longer
+    refetchOnMount: false, // Don't refetch if data is fresh
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    placeholderData: (previousData) => previousData, // Use previous data during refetch
+    initialData: () => {
+      // Try to get initial data from Zustand to prevent blank state
+      if (zustandBills && zustandBills.length > 0) {
+        return zustandBills;
+      }
+      return [];
+    },
     enabled: true,
   });
 
