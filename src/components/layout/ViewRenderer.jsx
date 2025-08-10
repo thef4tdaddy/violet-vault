@@ -160,8 +160,21 @@ const ViewRenderer = ({
         transactions={bills}
         envelopes={envelopes}
         onPayBill={(updatedBill) => {
-          // Update the bill using budget store method
-          updateTransaction(updatedBill);
+          // Handle bill payment properly - mark as paid and update in bills store
+          logger.debug("ViewRenderer onPayBill called", {
+            billId: updatedBill.id,
+            isPaid: updatedBill.isPaid,
+            paidDate: updatedBill.paidDate,
+          });
+          
+          // Update the bill in the bills collection
+          updateBill(updatedBill);
+          
+          // BillManager's handlePayBill already creates the payment transaction
+          // and updates envelope balances via reconcileTransaction
+          logger.debug("Bill payment completed successfully", {
+            billId: updatedBill.id,
+          });
         }}
         onUpdateBill={handleUpdateBill}
         onCreateRecurringBill={(newBill) => {
