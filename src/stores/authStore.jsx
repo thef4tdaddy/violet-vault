@@ -29,9 +29,19 @@ export const useAuth = create((set) => ({
       try {
         if (userData) {
           logger.auth("New user setup path.", userData);
-          const { salt: newSalt, key } =
-            await encryptionUtils.deriveKey(password);
-          logger.auth("Generated key and salt for new user.");
+
+          // Check if imported salt is provided (for key import scenario)
+          let newSalt, key;
+          if (userData.importedSalt) {
+            logger.auth("Using imported salt for key restoration.");
+            newSalt = userData.importedSalt;
+            key = await encryptionUtils.deriveKeyFromSalt(password, newSalt);
+          } else {
+            const keyData = await encryptionUtils.deriveKey(password);
+            newSalt = keyData.salt;
+            key = keyData.key;
+          }
+          logger.auth("Generated/restored key and salt for user.");
 
           const finalUserData = {
             ...userData,
