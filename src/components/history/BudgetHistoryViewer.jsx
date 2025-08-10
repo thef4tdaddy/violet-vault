@@ -16,6 +16,8 @@ import {
   Plus,
   Minus,
   Edit3,
+  Shield,
+  ShieldAlert,
 } from "lucide-react";
 
 const BudgetHistoryViewer = ({ onClose }) => {
@@ -28,6 +30,7 @@ const BudgetHistoryViewer = ({ onClose }) => {
     restoreFromHistory,
     getStatistics,
     exportHistory,
+    verifyIntegrity,
     formatCommitMessage,
     formatChangeDescription,
   } = useBudgetHistory();
@@ -38,24 +41,28 @@ const BudgetHistoryViewer = ({ onClose }) => {
   const [statistics, setStatistics] = useState(null);
   const [expandedCommits, setExpandedCommits] = useState(new Set());
   const [filter, setFilter] = useState({ author: "all", limit: 50 });
+  const [integrityCheck, setIntegrityCheck] = useState(null);
+  const [showIntegrityDetails, setShowIntegrityDetails] = useState(false);
 
-  // Load initial data
+  // Load initial data and perform integrity check
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [historyData, statsData] = await Promise.all([
+        const [historyData, statsData, integrityResult] = await Promise.all([
           getHistory(filter),
           getStatistics(),
+          verifyIntegrity(),
         ]);
         setHistory(historyData || []);
         setStatistics(statsData);
+        setIntegrityCheck(integrityResult);
       } catch (err) {
         console.error("Failed to load budget history data:", err);
       }
     };
 
     loadData();
-  }, [filter, getHistory, getStatistics]);
+  }, [filter, getHistory, getStatistics, verifyIntegrity]);
 
   // Load commit details when selected
   useEffect(() => {
@@ -187,6 +194,101 @@ const BudgetHistoryViewer = ({ onClose }) => {
             </button>
           </div>
 
+          {/* Integrity Warning */}
+          {integrityCheck && !integrityCheck.valid && (
+            <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex items-start">
+                <ShieldAlert className="h-5 w-5 text-red-600 mr-3 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <h3 className="font-medium text-red-900 mb-2">
+                    History Integrity Warning
+                  </h3>
+                  <p className="text-sm text-red-800 mb-3">
+                    {integrityCheck.message}
+                  </p>
+
+                  {integrityCheck.details && (
+                    <div className="space-y-2">
+                      <button
+                        onClick={() =>
+                          setShowIntegrityDetails(!showIntegrityDetails)
+                        }
+                        className="text-sm text-red-700 hover:text-red-900 underline"
+                      >
+                        {showIntegrityDetails ? "Hide Details" : "Show Details"}
+                      </button>
+
+                      {showIntegrityDetails && (
+                        <div className="bg-red-100 p-3 rounded border border-red-200 text-sm">
+                          <div className="space-y-2">
+                            <div>
+                              <strong>Broken at commit:</strong>{" "}
+                              {integrityCheck.brokenAt}
+                            </div>
+
+                            {integrityCheck.details.lastValidCommit && (
+                              <div>
+                                <strong>Last valid commit:</strong>
+                                <div className="ml-2 font-mono text-xs">
+                                  {integrityCheck.details.lastValidCommit.hash.substring(
+                                    0,
+                                    8,
+                                  )}{" "}
+                                  -
+                                  {
+                                    integrityCheck.details.lastValidCommit
+                                      .message
+                                  }
+                                </div>
+                              </div>
+                            )}
+
+                            {integrityCheck.details.suspiciousCommit && (
+                              <div>
+                                <strong>Suspicious commit:</strong>
+                                <div className="ml-2 font-mono text-xs">
+                                  {
+                                    integrityCheck.details.suspiciousCommit
+                                      .shortHash
+                                  }{" "}
+                                  -
+                                  {
+                                    integrityCheck.details.suspiciousCommit
+                                      .message
+                                  }
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="mt-3 text-xs text-red-700">
+                    ⚠️ Your budget history may have been tampered with. Consider
+                    exporting your data and investigating recent changes.
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Integrity Success */}
+          {integrityCheck &&
+            integrityCheck.valid &&
+            integrityCheck.totalCommits > 0 && (
+              <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-3">
+                <div className="flex items-center">
+                  <Shield className="h-4 w-4 text-green-600 mr-2" />
+                  <div className="text-sm text-green-800">
+                    <strong>✓ History Verified:</strong>{" "}
+                    {integrityCheck.message}
+                  </div>
+                </div>
+              </div>
+            )}
+
           {/* Statistics */}
           {statistics && (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -287,6 +389,18 @@ const BudgetHistoryViewer = ({ onClose }) => {
             </div>
 
             <div className="flex gap-2">
+              <button
+                onClick={async () => {
+                  const result = await verifyIntegrity();
+                  setIntegrityCheck(result);
+                }}
+                disabled={loading}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 flex items-center text-sm"
+              >
+                <Shield className="h-4 w-4 mr-2" />
+                Verify Integrity
+              </button>
+
               <button
                 onClick={() => exportHistory()}
                 disabled={loading}

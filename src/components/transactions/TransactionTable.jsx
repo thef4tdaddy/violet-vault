@@ -1,6 +1,7 @@
-import React, { useRef } from "react";
-import { Edit3, Trash2, Scissors } from "lucide-react";
+import React, { useRef, useState } from "react";
+import { Edit3, Trash2, Scissors, History } from "lucide-react";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import ObjectHistoryViewer from "../history/ObjectHistoryViewer";
 
 const TransactionTable = ({
   transactions = [],
@@ -9,6 +10,8 @@ const TransactionTable = ({
   onDelete,
   onSplit,
 }) => {
+  const [historyTransaction, setHistoryTransaction] = useState(null);
+
   const handleDelete = (transactionId) => {
     if (confirm("Are you sure you want to delete this transaction?")) {
       onDelete(transactionId);
@@ -134,6 +137,13 @@ const TransactionTable = ({
                           </button>
                         )}
                         <button
+                          onClick={() => setHistoryTransaction(transaction)}
+                          className="text-gray-600 hover:text-blue-600"
+                          title="View history"
+                        >
+                          <History className="h-4 w-4" />
+                        </button>
+                        <button
                           onClick={() => onEdit(transaction)}
                           className="text-blue-600 hover:text-blue-800"
                           title="Edit transaction"
@@ -156,6 +166,16 @@ const TransactionTable = ({
           </tbody>
         </table>
       </div>
+
+      {/* Transaction History Modal */}
+      {historyTransaction && (
+        <ObjectHistoryViewer
+          objectId={historyTransaction.id}
+          objectType="Transaction"
+          objectName={historyTransaction.description}
+          onClose={() => setHistoryTransaction(null)}
+        />
+      )}
     </div>
   );
 };
