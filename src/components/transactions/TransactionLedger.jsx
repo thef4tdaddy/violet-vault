@@ -27,6 +27,13 @@ const TransactionLedger = ({
     isLoading: transactionsLoading,
   } = useTransactions();
 
+  // Debug logging for transaction data
+  console.log("TransactionLedger Debug:", {
+    transactionsCount: transactions.length,
+    transactionsLoading,
+    transactions: transactions.slice(0, 3), // Show first 3 for debugging
+  });
+
   const { data: envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
 
   // Keep Zustand for legacy operations not yet migrated
