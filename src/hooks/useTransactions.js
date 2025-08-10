@@ -22,17 +22,34 @@ const useTransactions = (options = {}) => {
   // Get Zustand store for mutations
   const {
     transactions: zustandTransactions,
+    allTransactions: zustandAllTransactions,
     addTransaction: zustandAddTransaction,
     reconcileTransaction: zustandReconcileTransaction,
   } = useBudgetStore();
+
+  console.log("useTransactions Zustand data debug:", {
+    zustandTransactionsLength: zustandTransactions?.length || 0,
+    zustandAllTransactionsLength: zustandAllTransactions?.length || 0,
+    firstZustandTransaction: zustandTransactions?.[0],
+    firstAllTransaction: zustandAllTransactions?.[0],
+  });
 
   // Smart query function with filtering and analytics
   const queryFunction = async () => {
     let transactions = [];
 
-    // Try Zustand first for real-time data
-    if (zustandTransactions && zustandTransactions.length > 0) {
+    console.log("useTransactions queryFunction debug:", {
+      zustandTransactionsLength: zustandTransactions?.length || 0,
+      hasDateRange: !!dateRange,
+    });
+
+    // Try Zustand first for real-time data - check both arrays
+    if (zustandAllTransactions && zustandAllTransactions.length > 0) {
+      transactions = [...zustandAllTransactions];
+      console.log("Using Zustand allTransactions:", transactions.length);
+    } else if (zustandTransactions && zustandTransactions.length > 0) {
       transactions = [...zustandTransactions];
+      console.log("Using Zustand transactions:", transactions.length);
     } else {
       // Fallback to Dexie for offline support
       if (dateRange) {
@@ -46,6 +63,7 @@ const useTransactions = (options = {}) => {
           .reverse()
           .toArray();
       }
+      console.log("Using Dexie transactions:", transactions.length);
     }
 
     // Apply filters
