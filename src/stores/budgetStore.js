@@ -77,14 +77,7 @@ migrateOldData();
 
 // Base store configuration
 const storeInitializer = (set, get) => ({
-  // State
-  envelopes: [],
-  bills: [],
-  transactions: [],
-  allTransactions: [],
-  savingsGoals: [],
-  supplementalAccounts: [],
-  debts: [], // Debt tracking array
+  // App State (auth, UI, settings) - data arrays handled by TanStack Query
   unassignedCash: 0,
   biweeklyAllocation: 0,
   // Unassigned cash modal state
@@ -94,30 +87,9 @@ const storeInitializer = (set, get) => ({
   isActualBalanceManual: false, // Track if balance was manually set
   isOnline: true, // Add isOnline state, default to true
   dataLoaded: false,
+  cloudSyncEnabled: false, // Toggle for Firestore cloud sync
 
-  // Optimized actions - direct state mutations with Immer
-  setEnvelopes: (envelopes) =>
-    set((state) => {
-      state.envelopes = envelopes;
-    }),
-
-  addEnvelope: (envelope) =>
-    set((state) => {
-      state.envelopes.push(envelope);
-    }),
-
-  updateEnvelope: (envelope) =>
-    set((state) => {
-      const index = state.envelopes.findIndex((e) => e.id === envelope.id);
-      if (index !== -1) {
-        state.envelopes[index] = envelope;
-      }
-    }),
-
-  deleteEnvelope: (id) =>
-    set((state) => {
-      state.envelopes = state.envelopes.filter((e) => e.id !== id);
-    }),
+  // App state actions (data mutations now handled by TanStack Query hooks)
 
   // Optimized bulk operations
   bulkUpdateEnvelopes: (updates) =>
@@ -512,58 +484,38 @@ const storeInitializer = (set, get) => ({
       state.dataLoaded = loaded;
     }),
 
-  // Initialize Zustand store from Dexie on app startup
-  initializeFromDexie: async () => {
+  // Start background sync service (when cloud sync is enabled)
+  startBackgroundSync: async () => {
+    const state = get();
+    
+    if (!state.cloudSyncEnabled) {
+      console.log("💾 Cloud sync disabled - background sync not started");
+      return;
+    }
+
+    console.log("🔄 Starting background sync service...");
+    
     try {
-      console.log("🔄 Initializing Zustand store from Dexie...");
+      // Get auth context from auth store
+      const { useAuth } = await import("./authStore");
+      const authState = useAuth.getState();
+      
+      if (!authState.encryptionKey || !authState.currentUser || !authState.budgetId) {
+        console.warn("⚠️ Missing auth context for background sync");
+        return;
+      }
 
-      // Import budgetDb inside the function to avoid circular imports
-      const { budgetDb } = await import("../db/budgetDb");
-
-      // Load all data from Dexie
-      const [envelopes, transactions, bills, savingsGoals, paycheckHistory] =
-        await Promise.all([
-          budgetDb.envelopes.toArray(),
-          budgetDb.transactions.toArray(),
-          budgetDb.bills.toArray(),
-          budgetDb.savingsGoals.toArray(),
-          budgetDb.paycheckHistory.toArray(),
-        ]);
-
-      console.log("📦 Loaded data from Dexie:", {
-        envelopes: envelopes.length,
-        transactions: transactions.length,
-        bills: bills.length,
-        savingsGoals: savingsGoals.length,
-        paycheckHistory: paycheckHistory.length,
+      // Import and start the background sync service
+      const { default: CloudSyncService } = await import("../services/cloudSyncService");
+      CloudSyncService.start({
+        encryptionKey: authState.encryptionKey,
+        currentUser: authState.currentUser,
+        budgetId: authState.budgetId
       });
-
-      // Update Zustand store with loaded data
-      set((state) => {
-        state.envelopes = envelopes;
-        state.transactions = transactions;
-        state.allTransactions = transactions; // allTransactions should mirror transactions
-        state.bills = bills;
-        state.savingsGoals = savingsGoals;
-        state.paycheckHistory = paycheckHistory;
-        state.dataLoaded = true;
-      });
-
-      console.log("✅ Successfully initialized Zustand store from Dexie");
-      return {
-        success: true,
-        counts: {
-          envelopes: envelopes.length,
-          transactions: transactions.length,
-          bills: bills.length,
-        },
-      };
+      
+      console.log("✅ Background sync service started");
     } catch (error) {
-      console.error("❌ Failed to initialize Zustand store from Dexie:", error);
-      set((state) => {
-        state.dataLoaded = false;
-      });
-      return { success: false, error: error.message };
+      console.error("❌ Failed to start background sync service:", error);
     }
   },
 
@@ -571,6 +523,13 @@ const storeInitializer = (set, get) => ({
   setOnlineStatus: (status) =>
     set((state) => {
       state.isOnline = status;
+    }),
+
+  // Toggle cloud sync (Firestore)
+  setCloudSyncEnabled: (enabled) =>
+    set((state) => {
+      state.cloudSyncEnabled = enabled;
+      console.log(`🌩️ Cloud sync ${enabled ? 'enabled' : 'disabled'}`);
     }),
 
   // Clear all transactions (for cleanup)
