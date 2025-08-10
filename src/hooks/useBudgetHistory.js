@@ -182,6 +182,25 @@ export const useBudgetHistory = () => {
     }
   }, [store]);
 
+  // Verify history integrity
+  const verifyIntegrity = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const result = await store.verifyBudgetHistoryIntegrity();
+      logger.debug("History integrity check completed", {
+        valid: result.valid,
+      });
+      return result;
+    } catch (err) {
+      setError(err.message);
+      logger.error("Failed to verify history integrity", err);
+      return { valid: false, error: err.message };
+    } finally {
+      setLoading(false);
+    }
+  }, [store]);
+
   // Enhanced store actions that include history tracking
   const actions = {
     addEnvelope: useCallback(
@@ -279,6 +298,7 @@ export const useBudgetHistory = () => {
     getStatistics,
     exportHistory,
     clearHistory,
+    verifyIntegrity,
 
     // Enhanced actions with history tracking
     actions,
