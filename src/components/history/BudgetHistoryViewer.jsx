@@ -31,7 +31,6 @@ const BudgetHistoryViewer = ({ onClose }) => {
     getStatistics,
     exportHistory,
     verifyIntegrity,
-    formatCommitMessage,
     formatChangeDescription,
   } = useBudgetHistory();
 

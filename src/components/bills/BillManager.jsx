@@ -3,7 +3,7 @@ import React, { useState, useMemo } from "react";
 import { useBudgetStore } from "../../stores/budgetStore";
 import { useTransactions } from "../../hooks/useTransactions";
 import { useEnvelopes } from "../../hooks/useEnvelopes";
-import { useBills } from "../../hooks/useBills";
+import useBills from "../../hooks/useBills";
 import {
   FileText,
   Calendar,
