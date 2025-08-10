@@ -1,9 +1,11 @@
 import React, { memo, useState } from "react";
-import { User, ChevronDown, Settings } from "lucide-react";
+import { User, ChevronDown, Settings, Key } from "lucide-react";
 import ProfileSettings from "./ProfileSettings";
+import KeyManagementSettings from "./KeyManagementSettings";
 
 const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showKeyManagement, setShowKeyManagement] = useState(false);
 
   if (!currentUser) {
     return null;
@@ -29,7 +31,15 @@ const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
           className="btn btn-secondary flex items-center rounded-xl"
         >
           <Settings className="h-4 w-4 mr-2" />
-          Edit Profile
+          Profile
+        </button>
+
+        <button
+          onClick={() => setShowKeyManagement(true)}
+          className="btn btn-secondary flex items-center rounded-xl"
+        >
+          <Key className="h-4 w-4 mr-2" />
+          Backup Key
         </button>
 
         <button onClick={onUserChange} className="btn btn-secondary">
@@ -42,6 +52,11 @@ const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
         onClose={() => setShowProfileModal(false)}
         currentUser={currentUser}
         onUpdateProfile={onUpdateProfile}
+      />
+
+      <KeyManagementSettings
+        isOpen={showKeyManagement}
+        onClose={() => setShowKeyManagement(false)}
       />
     </>
   );
