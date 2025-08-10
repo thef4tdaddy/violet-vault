@@ -27,13 +27,14 @@ const AuthGateway = ({ onSetupComplete, onLocalOnlyReady }) => {
           if (savedData) {
             setAuthMode('standard');
           } else {
-            // New user - show mode selection
-            setAuthMode(null);
+            // New user - default to standard mode instead of showing mode selection
+            setAuthMode('standard');
           }
         }
       } catch (error) {
         console.error("Failed to check existing mode:", error);
-        setAuthMode(null);
+        // Default to standard mode on error instead of showing mode selection
+        setAuthMode('standard');
       } finally {
         setIsCheckingLocalMode(false);
       }
