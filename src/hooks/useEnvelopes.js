@@ -29,20 +29,22 @@ const useEnvelopes = (options = {}) => {
   const queryFunction = async () => {
     let envelopes = [];
 
-    // Primary source: Dexie (local storage)
-    try {
-      if (category) {
-        envelopes = await budgetDb.getEnvelopesByCategory(category);
-      } else {
-        envelopes = await budgetDb.envelopes.toArray();
-      }
-      console.log("Using Dexie envelopes (primary):", envelopes.length);
-    } catch (error) {
-      console.warn("Dexie query failed, falling back to Zustand:", error);
-      // Fallback to Zustand if Dexie fails
-      if (zustandEnvelopes && zustandEnvelopes.length > 0) {
-        envelopes = [...zustandEnvelopes];
-        console.log("Using Zustand envelopes (fallback):", envelopes.length);
+    // Primary source: Zustand (active state)
+    if (zustandEnvelopes && zustandEnvelopes.length > 0) {
+      envelopes = [...zustandEnvelopes];
+      console.log("Using Zustand envelopes (primary):", envelopes.length);
+    } else {
+      // Fallback to Dexie only when Zustand is empty
+      try {
+        if (category) {
+          envelopes = await budgetDb.getEnvelopesByCategory(category);
+        } else {
+          envelopes = await budgetDb.envelopes.toArray();
+        }
+        console.log("Using Dexie envelopes (fallback):", envelopes.length);
+      } catch (error) {
+        console.warn("Dexie query failed:", error);
+        envelopes = [];
       }
     }
 
@@ -100,13 +102,7 @@ const useEnvelopes = (options = {}) => {
     refetchOnMount: false, // Don't refetch if data is fresh
     refetchOnWindowFocus: false, // Don't refetch on window focus
     placeholderData: (previousData) => previousData, // Use previous data during refetch
-    initialData: () => {
-      // Try to get initial data from Zustand to prevent blank state
-      if (zustandEnvelopes && zustandEnvelopes.length > 0) {
-        return zustandEnvelopes;
-      }
-      return [];
-    },
+    initialData: undefined, // Remove initialData to prevent persister errors
     enabled: true,
   });
 

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useBudgetStore } from "../stores/budgetStore";
+import { budgetDb } from "../db/budgetDb";
 import logger from "../utils/logger";
 
 /**
@@ -34,27 +35,51 @@ const useFirebaseSync = (
             "📥 Loading data from cloud:",
             Object.keys(cloudData.data),
           );
-          // Update budget store with cloud data
-          if (cloudData.data.envelopes)
+          
+          // Update both Zustand and Dexie with cloud data
+          if (cloudData.data.envelopes) {
             budget.setEnvelopes(cloudData.data.envelopes);
-          if (cloudData.data.bills) budget.setBills(cloudData.data.bills);
-          if (cloudData.data.savingsGoals)
+            await budgetDb.bulkUpsertEnvelopes(cloudData.data.envelopes);
+            console.log("✅ Synced envelopes to Dexie:", cloudData.data.envelopes.length);
+          }
+          if (cloudData.data.bills) {
+            budget.setBills(cloudData.data.bills);
+            await budgetDb.bulkUpsertBills(cloudData.data.bills);
+            console.log("✅ Synced bills to Dexie:", cloudData.data.bills.length);
+          }
+          if (cloudData.data.savingsGoals) {
             budget.setSavingsGoals(cloudData.data.savingsGoals);
-          if (cloudData.data.transactions)
+            await budgetDb.bulkUpsertSavingsGoals(cloudData.data.savingsGoals);
+            console.log("✅ Synced savings goals to Dexie:", cloudData.data.savingsGoals.length);
+          }
+          if (cloudData.data.transactions) {
             budget.setTransactions(cloudData.data.transactions);
-          if (cloudData.data.allTransactions)
+            await budgetDb.bulkUpsertTransactions(cloudData.data.transactions);
+            console.log("✅ Synced transactions to Dexie:", cloudData.data.transactions.length);
+          }
+          if (cloudData.data.allTransactions) {
             budget.setAllTransactions(cloudData.data.allTransactions);
+            await budgetDb.bulkUpsertTransactions(cloudData.data.allTransactions);
+            console.log("✅ Synced allTransactions to Dexie:", cloudData.data.allTransactions.length);
+          }
+          if (cloudData.data.paycheckHistory) {
+            budget.setPaycheckHistory(cloudData.data.paycheckHistory);
+            await budgetDb.bulkUpsertPaychecks(cloudData.data.paycheckHistory);
+            console.log("✅ Synced paycheck history to Dexie:", cloudData.data.paycheckHistory.length);
+          }
+          
+          // Non-Dexie data
           if (typeof cloudData.data.unassignedCash === "number")
             budget.setUnassignedCash(cloudData.data.unassignedCash);
           if (typeof cloudData.data.biweeklyAllocation === "number")
             budget.setBiweeklyAllocation(cloudData.data.biweeklyAllocation);
-          if (cloudData.data.paycheckHistory)
-            budget.setPaycheckHistory(cloudData.data.paycheckHistory);
           if (typeof cloudData.data.actualBalance === "number")
             budget.setActualBalance(
               cloudData.data.actualBalance,
               cloudData.data.isActualBalanceManual,
             );
+            
+          console.log("🔄 Firestore → Zustand + Dexie sync completed");
         }
       } catch (error) {
         console.warn("Failed to load cloud data:", error.message);

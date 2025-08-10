@@ -40,32 +40,35 @@ const useTransactions = (options = {}) => {
 
     console.log("useTransactions queryFunction debug:", {
       zustandTransactionsLength: zustandTransactions?.length || 0,
+      zustandAllTransactionsLength: zustandAllTransactions?.length || 0,
       hasDateRange: !!dateRange,
     });
 
-    // Primary source: Dexie (local storage)
-    try {
-      if (dateRange) {
-        transactions = await budgetDb.getTransactionsByDateRange(
-          dateRange.start,
-          dateRange.end,
-        );
-      } else {
-        transactions = await budgetDb.transactions
-          .orderBy("date")
-          .reverse()
-          .toArray();
-      }
-      console.log("Using Dexie transactions (primary):", transactions.length);
-    } catch (error) {
-      console.warn("Dexie query failed, falling back to Zustand:", error);
-      // Fallback to Zustand if Dexie fails
-      if (zustandAllTransactions && zustandAllTransactions.length > 0) {
-        transactions = [...zustandAllTransactions];
-        console.log("Using Zustand allTransactions (fallback):", transactions.length);
-      } else if (zustandTransactions && zustandTransactions.length > 0) {
-        transactions = [...zustandTransactions];
-        console.log("Using Zustand transactions (fallback):", transactions.length);
+    // Primary source: Zustand (active state)
+    if (zustandAllTransactions && zustandAllTransactions.length > 0) {
+      transactions = [...zustandAllTransactions];
+      console.log("Using Zustand allTransactions (primary):", transactions.length);
+    } else if (zustandTransactions && zustandTransactions.length > 0) {
+      transactions = [...zustandTransactions];
+      console.log("Using Zustand transactions (primary):", transactions.length);
+    } else {
+      // Fallback to Dexie only when Zustand is empty
+      try {
+        if (dateRange) {
+          transactions = await budgetDb.getTransactionsByDateRange(
+            dateRange.start,
+            dateRange.end,
+          );
+        } else {
+          transactions = await budgetDb.transactions
+            .orderBy("date")
+            .reverse()
+            .toArray();
+        }
+        console.log("Using Dexie transactions (fallback):", transactions.length);
+      } catch (error) {
+        console.warn("Dexie query failed:", error);
+        transactions = [];
       }
     }
 
@@ -153,16 +156,7 @@ const useTransactions = (options = {}) => {
     refetchOnMount: false, // Don't refetch if data is fresh
     refetchOnWindowFocus: false, // Don't refetch on window focus
     placeholderData: (previousData) => previousData, // Use previous data during refetch
-    initialData: () => {
-      // Try to get initial data from Zustand to prevent blank state
-      if (zustandAllTransactions && zustandAllTransactions.length > 0) {
-        return zustandAllTransactions;
-      }
-      if (zustandTransactions && zustandTransactions.length > 0) {
-        return zustandTransactions;
-      }
-      return [];
-    },
+    initialData: undefined, // Remove initialData to prevent persister errors
     enabled: true,
   });
 

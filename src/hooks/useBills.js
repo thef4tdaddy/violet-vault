@@ -30,16 +30,18 @@ const useBills = (options = {}) => {
   const queryFunction = async () => {
     let bills = [];
 
-    // Primary source: Dexie (local storage)
-    try {
-      bills = await budgetDb.bills.toArray();
-      console.log("Using Dexie bills (primary):", bills.length);
-    } catch (error) {
-      console.warn("Dexie query failed, falling back to Zustand:", error);
-      // Fallback to Zustand if Dexie fails
-      if (zustandBills && zustandBills.length > 0) {
-        bills = [...zustandBills];
-        console.log("Using Zustand bills (fallback):", bills.length);
+    // Primary source: Zustand (active state)
+    if (zustandBills && zustandBills.length > 0) {
+      bills = [...zustandBills];
+      console.log("Using Zustand bills (primary):", bills.length);
+    } else {
+      // Fallback to Dexie only when Zustand is empty
+      try {
+        bills = await budgetDb.bills.toArray();
+        console.log("Using Dexie bills (fallback):", bills.length);
+      } catch (error) {
+        console.warn("Dexie query failed:", error);
+        bills = [];
       }
     }
 
@@ -123,13 +125,7 @@ const useBills = (options = {}) => {
     refetchOnMount: false, // Don't refetch if data is fresh
     refetchOnWindowFocus: false, // Don't refetch on window focus
     placeholderData: (previousData) => previousData, // Use previous data during refetch
-    initialData: () => {
-      // Try to get initial data from Zustand to prevent blank state
-      if (zustandBills && zustandBills.length > 0) {
-        return zustandBills;
-      }
-      return [];
-    },
+    initialData: undefined, // Remove initialData to prevent persister errors
     enabled: true,
   });
 
