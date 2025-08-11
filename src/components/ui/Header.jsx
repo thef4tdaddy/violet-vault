@@ -115,12 +115,13 @@ const Header = memo(
               className={`rounded border-4 bg-white/95 mb-4 ${
                 // Environment-specific border colors for better differentiation
                 import.meta.env.MODE === "development"
-                  ? "border-orange-500"
-                  : window.location.hostname.includes("vercel.app") &&
-                      !window.location.hostname.includes(
-                        "violet-vault-production",
-                      )
-                    ? "border-red-500" // Preview environments
+                  ? "border-orange-500" // Local development
+                  : window.location.hostname.includes("dev.f4tdaddy.com") ||
+                      (window.location.hostname.includes("vercel.app") &&
+                        !window.location.hostname.includes(
+                          "violet-vault-production",
+                        ))
+                    ? "border-red-500" // Preview/staging environments
                     : "border-purple-600" // Production
               }`}
             >
