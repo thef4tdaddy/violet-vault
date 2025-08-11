@@ -1,19 +1,80 @@
 import React from "react";
 import { DollarSign, Wallet, Target, TrendingUp } from "lucide-react";
 import { useBudgetStore } from "../../stores/budgetStore";
+import { useEnvelopes } from "../../hooks/useEnvelopes";
+import { useSavingsGoals } from "../../hooks/useSavingsGoals";
 import UnassignedCashModal from "../modals/UnassignedCashModal";
+import { AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/categories";
+import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
 
 /**
  * Summary cards component showing financial overview
- * Extracted from Layout.jsx for better organization
+ * Now uses TanStack Query hooks for data loading
  */
-const SummaryCards = ({
-  totalCash,
-  unassignedCash,
-  totalSavingsBalance,
-  biweeklyAllocation,
-}) => {
-  const { openUnassignedCashModal } = useBudgetStore();
+const SummaryCards = () => {
+  const { openUnassignedCashModal, unassignedCash } = useBudgetStore();
+
+  // Get data from TanStack Query hooks
+  const { data: envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
+  const { data: savingsGoals = [], isLoading: savingsLoading } =
+    useSavingsGoals();
+
+  // Calculate totals from hook data
+  const totalEnvelopeBalance = envelopes.reduce(
+    (sum, env) => sum + (env.currentBalance || 0),
+    0,
+  );
+  const totalSavingsBalance = savingsGoals.reduce(
+    (sum, goal) => sum + (goal.currentAmount || 0),
+    0,
+  );
+  const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
+
+  // Calculate total biweekly funding need
+  const biweeklyAllocation = envelopes.reduce((sum, env) => {
+    const envelopeType =
+      env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
+
+    let biweeklyNeed = 0;
+    if (envelopeType === "bill" && env.biweeklyAllocation) {
+      biweeklyNeed = Math.max(
+        0,
+        env.biweeklyAllocation - (env.currentBalance || 0),
+      );
+    } else if (envelopeType === "variable" && env.monthlyBudget) {
+      const biweeklyTarget = env.monthlyBudget / BIWEEKLY_MULTIPLIER;
+      biweeklyNeed = Math.max(0, biweeklyTarget - (env.currentBalance || 0));
+    } else if (envelopeType === "savings" && env.targetAmount) {
+      const remainingToTarget = Math.max(
+        0,
+        env.targetAmount - (env.currentBalance || 0),
+      );
+      biweeklyNeed = Math.min(remainingToTarget, env.biweeklyAllocation || 0);
+    }
+
+    return sum + biweeklyNeed;
+  }, 0);
+
+  // Show loading state while data is being fetched
+  if (envelopesLoading || savingsLoading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="glassmorphism rounded-3xl p-6 animate-pulse">
+            <div className="flex items-center">
+              <div className="relative mr-4">
+                <div className="bg-gray-300 p-3 rounded-2xl w-12 h-12"></div>
+              </div>
+              <div>
+                <div className="h-4 bg-gray-300 rounded w-24 mb-2"></div>
+                <div className="h-8 bg-gray-300 rounded w-20"></div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   const cards = [
     {
