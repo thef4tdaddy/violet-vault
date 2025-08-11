@@ -13,7 +13,7 @@ const corsHeaders = {
 };
 
 export default {
-  async fetch(request, env, ctx) {
+  async fetch(request, env) {
     const url = new URL(request.url);
 
     // Handle CORS preflight requests
@@ -114,7 +114,7 @@ export default {
   },
 
   // Handle scheduled events (cron triggers)
-  async scheduled(controller, env, ctx) {
+  async scheduled(controller, env) {
     console.log("Running scheduled cleanup...");
     try {
       const result = await cleanupOldScreenshots(env);
@@ -428,7 +428,7 @@ async function getReleasePleaseInfo(env) {
 
     // If no release PR found, increment the current version
     if (!nextVersion) {
-      const [major, minor, patch] = currentVersion.split(".").map(Number);
+      const [major, minor] = currentVersion.split(".").map(Number);
       nextVersion = `${major}.${minor + 1}.0`;
     }
 
