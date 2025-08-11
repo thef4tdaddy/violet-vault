@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  DollarSign,
-  TrendingDown,
-  Percent,
-  Calendar,
-  AlertTriangle,
-} from "lucide-react";
+import { DollarSign, TrendingDown, Percent, Calendar, AlertTriangle } from "lucide-react";
 
 /**
  * Debt overview summary cards
@@ -66,7 +60,8 @@ const DebtSummaryCards = ({ stats, upcomingPayments = [] }) => {
 };
 
 const DebtSummaryCard = ({
-  icon: Icon,
+  // eslint-disable-next-line no-unused-vars
+  icon: _Icon,
   label,
   value,
   subtext,
@@ -89,7 +84,7 @@ const DebtSummaryCard = ({
     emerald: "text-emerald-600",
   };
 
-  const bgColorClasses = {
+  const _bgColorClasses = {
     red: "bg-red-50",
     orange: "bg-orange-50",
     purple: "bg-purple-50",
@@ -109,7 +104,7 @@ const DebtSummaryCard = ({
             className={`absolute inset-0 ${colorClasses[color]} rounded-2xl blur-lg opacity-30`}
           ></div>
           <div className={`relative ${colorClasses[color]} p-3 rounded-2xl`}>
-            <Icon className="h-6 w-6 text-white" />
+            <_Icon className="h-6 w-6 text-white" />
           </div>
         </div>
         <div className="flex-1">
@@ -117,9 +112,7 @@ const DebtSummaryCard = ({
             <p className="text-sm font-semibold text-gray-600 mb-1">{label}</p>
             {alert && <AlertTriangle className="h-3 w-3 ml-2 text-amber-500" />}
           </div>
-          <p className={`text-2xl font-bold ${textColorClasses[color]}`}>
-            {value}
-          </p>
+          <p className={`text-2xl font-bold ${textColorClasses[color]}`}>{value}</p>
           {subtext && <p className="text-xs text-gray-500 mt-1">{subtext}</p>}
         </div>
       </div>

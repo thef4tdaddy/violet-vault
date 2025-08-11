@@ -81,7 +81,8 @@ const NavigationTabs = memo(({ activeView, onViewChange }) => {
   );
 });
 
-const NavButton = memo(({ active, onClick, icon: Icon, label }) => (
+// eslint-disable-next-line no-unused-vars
+const NavButton = memo(({ active, onClick, icon: _Icon, label }) => (
   <button
     onClick={onClick}
     className={`flex-shrink-0 sm:flex-1 flex flex-col items-center sm:flex-row sm:px-4 px-3 py-2 text-xs sm:text-sm font-medium border-t-2 sm:border-b-2 transition-colors relative min-w-0 ${
@@ -90,7 +91,7 @@ const NavButton = memo(({ active, onClick, icon: Icon, label }) => (
         : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30"
     }`}
   >
-    <Icon className="h-4 w-4 mb-1 sm:mb-0 sm:mr-2 flex-shrink-0" />
+    <_Icon className="h-4 w-4 mb-1 sm:mb-0 sm:mr-2 flex-shrink-0" />
     <span className="truncate whitespace-nowrap">{label}</span>
   </button>
 ));

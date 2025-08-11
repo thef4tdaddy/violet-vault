@@ -27,7 +27,7 @@ export const useBudgetHistory = () => {
         setLoading(false);
       }
     },
-    [store],
+    [store]
   );
 
   // Manual commit with custom message
@@ -49,7 +49,7 @@ export const useBudgetHistory = () => {
         setLoading(false);
       }
     },
-    [store],
+    [store]
   );
 
   // Get commit history
@@ -68,7 +68,7 @@ export const useBudgetHistory = () => {
         setLoading(false);
       }
     },
-    [store],
+    [store]
   );
 
   // Get detailed commit information
@@ -90,7 +90,7 @@ export const useBudgetHistory = () => {
         setLoading(false);
       }
     },
-    [store],
+    [store]
   );
 
   // Restore budget to a previous state
@@ -112,7 +112,7 @@ export const useBudgetHistory = () => {
         setLoading(false);
       }
     },
-    [store],
+    [store]
   );
 
   // Get history statistics
@@ -164,7 +164,7 @@ export const useBudgetHistory = () => {
         setLoading(false);
       }
     },
-    [store],
+    [store]
   );
 
   // Clear all history (destructive)
@@ -207,49 +207,49 @@ export const useBudgetHistory = () => {
       (envelope) => {
         store.addEnvelopeWithHistory(envelope);
       },
-      [store],
+      [store]
     ),
 
     updateEnvelope: useCallback(
       (envelope) => {
         store.updateEnvelopeWithHistory(envelope);
       },
-      [store],
+      [store]
     ),
 
     deleteEnvelope: useCallback(
       (id, name) => {
         store.deleteEnvelopeWithHistory(id, name);
       },
-      [store],
+      [store]
     ),
 
     addTransaction: useCallback(
       (transaction) => {
         store.addTransactionWithHistory(transaction);
       },
-      [store],
+      [store]
     ),
 
     updateTransaction: useCallback(
       (transaction) => {
         store.updateTransactionWithHistory(transaction);
       },
-      [store],
+      [store]
     ),
 
     updateUnassignedCash: useCallback(
       (amount, reason) => {
         store.updateUnassignedCashWithHistory(amount, reason);
       },
-      [store],
+      [store]
     ),
 
     importData: useCallback(
       (data, source) => {
         store.importDataWithHistory(data, source);
       },
-      [store],
+      [store]
     ),
   };
 

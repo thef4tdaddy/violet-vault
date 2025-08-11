@@ -22,7 +22,7 @@ class ErrorViewer {
     if (process.env.NODE_ENV === "development") {
       console.log(
         "%c🔍 VioletVault Error Viewer Available",
-        "color: #8b5cf6; font-weight: bold; font-size: 14px",
+        "color: #8b5cf6; font-weight: bold; font-size: 14px"
       );
       console.log("Use window.VioletVaultErrors.view() to see stored errors");
       console.log("Other commands: .clear(), .export(), .count(), .latest(n)");
@@ -50,9 +50,7 @@ class ErrorViewer {
 
     errors.forEach((error, index) => {
       const timeAgo = this.getTimeAgo(error.timestamp);
-      console.group(
-        `${index + 1}. ${error.name}: ${error.message} (${timeAgo})`,
-      );
+      console.group(`${index + 1}. ${error.name}: ${error.message} (${timeAgo})`);
       console.log("Component:", error.failingComponent);
       console.log("Timestamp:", error.timestamp);
       console.log("URL:", error.url);
@@ -99,9 +97,7 @@ class ErrorViewer {
     console.log(`📋 Latest ${n} errors:`);
     errors.forEach((error, index) => {
       const timeAgo = this.getTimeAgo(error.timestamp);
-      console.log(
-        `${index + 1}. ${error.failingComponent}: ${error.message} (${timeAgo})`,
-      );
+      console.log(`${index + 1}. ${error.failingComponent}: ${error.message} (${timeAgo})`);
     });
     return errors;
   }

@@ -59,13 +59,12 @@ const Layout = () => {
 
   // Initialize data from Dexie to Zustand on app startup
   const {
-    isInitialized: dataInitialized,
-    initError,
-    dataLoaded,
+    isInitialized: _dataInitialized,
+    initError: _initError,
+    dataLoaded: _dataLoaded,
   } = useDataInitialization();
 
-  const { exportData, importData, resetEncryptionAndStartFresh } =
-    useDataManagement();
+  const { exportData, importData, resetEncryptionAndStartFresh } = useDataManagement();
 
   const {
     rotationDue,
@@ -104,22 +103,12 @@ const Layout = () => {
 
   // Show authentication gateway if neither standard nor local-only mode is ready
   if (!isLocalOnlyMode && (!isUnlocked || !currentUser)) {
-    return (
-      <AuthGateway
-        onSetupComplete={handleSetup}
-        onLocalOnlyReady={handleLocalOnlyReady}
-      />
-    );
+    return <AuthGateway onSetupComplete={handleSetup} onLocalOnlyReady={handleLocalOnlyReady} />;
   }
 
   // In local-only mode but user not ready yet
   if (isLocalOnlyMode && !localOnlyUser) {
-    return (
-      <AuthGateway
-        onSetupComplete={handleSetup}
-        onLocalOnlyReady={handleLocalOnlyReady}
-      />
-    );
+    return <AuthGateway onSetupComplete={handleSetup} onLocalOnlyReady={handleLocalOnlyReady} />;
   }
 
   logger.budgetSync("Rendering BudgetProvider with props", {
@@ -155,9 +144,7 @@ const Layout = () => {
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="glassmorphism rounded-2xl p-6 w-full max-w-md border border-white/30 shadow-2xl">
             <h3 className="text-xl font-semibold mb-4">Password Expired</h3>
-            <p className="text-gray-700 mb-4">
-              For security, please set a new password.
-            </p>
+            <p className="text-gray-700 mb-4">For security, please set a new password.</p>
             <input
               type="password"
               value={newPassword}
@@ -212,12 +199,7 @@ const MainContent = ({
   const [activeView, setActiveView] = useState("dashboard");
 
   // Custom hooks for MainContent business logic
-  const { handleManualSync } = useFirebaseSync(
-    firebaseSync,
-    encryptionKey,
-    budgetId,
-    currentUser,
-  );
+  const { handleManualSync } = useFirebaseSync(firebaseSync, encryptionKey, budgetId, currentUser);
 
   // Handle import by saving data then loading into context
   const handleImport = async (event) => {
@@ -230,14 +212,7 @@ const MainContent = ({
   // Handle change password - delegate to parent component
   const handleChangePassword = onChangePassword;
 
-  const {
-    envelopes,
-    savingsGoals,
-    unassignedCash,
-    paycheckHistory,
-    isOnline,
-    isSyncing,
-  } = budget;
+  const { envelopes, savingsGoals, unassignedCash, paycheckHistory, isOnline, isSyncing } = budget;
 
   // Payday prediction notifications (after destructuring)
   usePaydayPrediction(paycheckHistory, !!currentUser);
@@ -249,33 +224,23 @@ const MainContent = ({
   const totalSavingsBalance = Array.isArray(savingsGoals)
     ? savingsGoals.reduce((sum, goal) => sum + goal.currentAmount, 0)
     : 0;
-  const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
+  const _totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
 
   // Calculate total biweekly funding need across all envelope types
-  const totalBiweeklyNeed = Array.isArray(envelopes)
+  const _totalBiweeklyNeed = Array.isArray(envelopes)
     ? envelopes.reduce((sum, env) => {
         // Auto-classify envelope type if not set
-        const envelopeType =
-          env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
+        const envelopeType = env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
 
         let biweeklyNeed = 0;
         if (envelopeType === "bill" && env.biweeklyAllocation) {
-          biweeklyNeed = Math.max(
-            0,
-            env.biweeklyAllocation - env.currentBalance,
-          );
+          biweeklyNeed = Math.max(0, env.biweeklyAllocation - env.currentBalance);
         } else if (envelopeType === "variable" && env.monthlyBudget) {
           const biweeklyTarget = env.monthlyBudget / BIWEEKLY_MULTIPLIER;
           biweeklyNeed = Math.max(0, biweeklyTarget - env.currentBalance);
         } else if (envelopeType === "savings" && env.targetAmount) {
-          const remainingToTarget = Math.max(
-            0,
-            env.targetAmount - env.currentBalance,
-          );
-          biweeklyNeed = Math.min(
-            remainingToTarget,
-            env.biweeklyAllocation || 0,
-          );
+          const remainingToTarget = Math.max(0, env.targetAmount - env.currentBalance);
+          biweeklyNeed = Math.min(remainingToTarget, env.biweeklyAllocation || 0);
         }
 
         return sum + biweeklyNeed;
@@ -350,14 +315,10 @@ const MainContent = ({
         <div className="mt-8 text-center">
           <div className="glassmorphism rounded-2xl p-4 max-w-md mx-auto">
             <p className="text-sm text-gray-600">
-              <span className="font-semibold text-purple-600">
-                {getVersionInfo().displayName}
-              </span>{" "}
+              <span className="font-semibold text-purple-600">{getVersionInfo().displayName}</span>{" "}
               v{getVersionInfo().version}
             </p>
-            <p className="text-xs text-gray-500 mt-1">
-              Built with ❤️ for secure budgeting
-            </p>
+            <p className="text-xs text-gray-500 mt-1">Built with ❤️ for secure budgeting</p>
           </div>
         </div>
       </div>
