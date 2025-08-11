@@ -11,8 +11,16 @@ const TransactionForm = ({
   categories = [],
   onSubmit,
   suggestEnvelope,
+  onPayBill, // Optional callback for handling bill payments
 }) => {
   if (!isOpen) return null;
+
+  // Debug logging to track envelope data issue
+  console.log("TransactionForm Debug:", {
+    envelopesCount: envelopes.length,
+    envelopes: envelopes.slice(0, 3),
+    isOpen,
+  });
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -20,6 +28,25 @@ const TransactionForm = ({
       alert("Please fill in description and amount");
       return;
     }
+
+    // Handle bill payment if transaction is assigned to a bill envelope
+    if (transactionForm.envelopeId && onPayBill) {
+      const selectedEnvelope = envelopes.find(
+        (env) => env.id === transactionForm.envelopeId,
+      );
+      if (selectedEnvelope && selectedEnvelope.envelopeType === "bill") {
+        // Create a bill payment record
+        const billPayment = {
+          billId: selectedEnvelope.id,
+          amount: Math.abs(parseFloat(transactionForm.amount)),
+          paidDate: transactionForm.date,
+          transactionId: Date.now(), // Will be updated after transaction creation
+          notes: `Payment for ${selectedEnvelope.name} - ${transactionForm.description}`,
+        };
+        onPayBill(billPayment);
+      }
+    }
+
     onSubmit();
   };
 
@@ -187,9 +214,29 @@ const TransactionForm = ({
               {envelopes.map((envelope) => (
                 <option key={envelope.id} value={envelope.id}>
                   {envelope.name}
+                  {envelope.envelopeType === "bill" ? " 📝 (Bill)" : ""}
+                  {envelope.envelopeType === "variable" ? " 🔄 (Variable)" : ""}
+                  {envelope.envelopeType === "savings" ? " 💰 (Savings)" : ""}
                 </option>
               ))}
             </select>
+            {transactionForm.envelopeId &&
+              (() => {
+                const selectedEnvelope = envelopes.find(
+                  (env) => env.id === transactionForm.envelopeId,
+                );
+                return selectedEnvelope &&
+                  selectedEnvelope.envelopeType === "bill" ? (
+                  <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-blue-800">
+                      💡 <strong>Bill Payment:</strong> Assigning this
+                      transaction to "{selectedEnvelope.name}" will
+                      automatically mark it as a bill payment and deduct from
+                      the envelope balance.
+                    </p>
+                  </div>
+                ) : null;
+              })()}
             {transactionForm.description && suggestEnvelope && (
               <div className="mt-2">
                 {(() => {
@@ -234,7 +281,7 @@ const TransactionForm = ({
             />
           </div>
 
-          <div className="flex items-center">
+          <div className="flex items-center justify-start">
             <input
               type="checkbox"
               id="reconciled"
@@ -245,12 +292,9 @@ const TransactionForm = ({
                   reconciled: e.target.checked,
                 })
               }
-              className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
+              className="w-4 h-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
             />
-            <label
-              htmlFor="reconciled"
-              className="ml-2 block text-sm text-gray-900"
-            >
+            <label htmlFor="reconciled" className="ml-3 text-sm text-gray-700">
               Mark as reconciled
             </label>
           </div>
