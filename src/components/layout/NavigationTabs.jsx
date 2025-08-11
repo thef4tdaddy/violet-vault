@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import {
   DollarSign,
   Wallet,
@@ -15,7 +15,7 @@ import {
  * Navigation tabs component for the main layout
  * Extracted from Layout.jsx for better organization
  */
-const NavigationTabs = ({ activeView, onViewChange }) => {
+const NavigationTabs = memo(({ activeView, onViewChange }) => {
   const tabs = [
     {
       key: "dashboard",
@@ -79,9 +79,9 @@ const NavigationTabs = ({ activeView, onViewChange }) => {
       </nav>
     </div>
   );
-};
+});
 
-const NavButton = ({ active, onClick, icon: Icon, label }) => (
+const NavButton = memo(({ active, onClick, icon: Icon, label }) => (
   <button
     onClick={onClick}
     className={`flex-shrink-0 sm:flex-1 flex flex-col items-center sm:flex-row sm:px-4 px-3 py-2 text-xs sm:text-sm font-medium border-t-2 sm:border-b-2 transition-colors relative min-w-0 ${
@@ -93,6 +93,6 @@ const NavButton = ({ active, onClick, icon: Icon, label }) => (
     <Icon className="h-4 w-4 mb-1 sm:mb-0 sm:mr-2 flex-shrink-0" />
     <span className="truncate whitespace-nowrap">{label}</span>
   </button>
-);
+));
 
 export default NavigationTabs;

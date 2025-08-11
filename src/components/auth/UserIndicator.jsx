@@ -3,6 +3,16 @@ import { User, ChevronDown, Settings, Key } from "lucide-react";
 import ProfileSettings from "./ProfileSettings";
 import KeyManagementSettings from "./KeyManagementSettings";
 
+const UserButton = memo(({ onClick, icon: Icon, label }) => (
+  <button
+    onClick={onClick}
+    className="btn btn-secondary flex items-center rounded-xl"
+  >
+    {Icon && <Icon className="h-4 w-4 mr-2" />}
+    {label}
+  </button>
+));
+
 const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showKeyManagement, setShowKeyManagement] = useState(false);
@@ -26,25 +36,19 @@ const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
           <ChevronDown className="h-4 w-4 text-gray-500 ml-2" />
         </div>
 
-        <button
+        <UserButton
           onClick={() => setShowProfileModal(true)}
-          className="btn btn-secondary flex items-center rounded-xl"
-        >
-          <Settings className="h-4 w-4 mr-2" />
-          Profile
-        </button>
+          icon={Settings}
+          label="Profile"
+        />
 
-        <button
+        <UserButton
           onClick={() => setShowKeyManagement(true)}
-          className="btn btn-secondary flex items-center rounded-xl"
-        >
-          <Key className="h-4 w-4 mr-2" />
-          Backup Key
-        </button>
+          icon={Key}
+          label="Backup Key"
+        />
 
-        <button onClick={onUserChange} className="btn btn-secondary">
-          Switch User
-        </button>
+        <UserButton onClick={onUserChange} label="Switch User" />
       </div>
 
       <ProfileSettings

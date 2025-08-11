@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import {
   X,
   DollarSign,
@@ -16,6 +16,60 @@ import useUnassignedCashDistribution from "../../hooks/useUnassignedCashDistribu
  * Modal for distributing unassigned cash to envelopes
  * Pure UI component - all logic handled by useUnassignedCashDistribution hook
  */
+const EnvelopeItem = memo(
+  ({ envelope, distributionAmount, updateDistribution, isProcessing }) => {
+    const newBalance = (envelope.currentAmount || 0) + distributionAmount;
+
+    return (
+      <div className="bg-white border rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0">
+          <div className="flex items-center flex-1">
+            <div
+              className="w-3 h-3 rounded-full mr-3 flex-shrink-0"
+              style={{ backgroundColor: envelope.color }}
+            />
+            <div className="flex-1 min-w-0">
+              <h5 className="font-medium text-gray-900 text-sm truncate">
+                {envelope.name}
+              </h5>
+              <p className="text-xs text-gray-600 truncate">
+                Current: ${(envelope.currentAmount || 0).toFixed(2)}
+                {envelope.monthlyAmount && (
+                  <span className="hidden sm:inline ml-2">
+                    • Budget: ${envelope.monthlyAmount.toFixed(2)}/month
+                  </span>
+                )}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between sm:justify-end space-x-3">
+            <div className="text-right">
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={distributionAmount || ""}
+                onChange={(e) =>
+                  updateDistribution(envelope.id, e.target.value)
+                }
+                disabled={isProcessing}
+                className="w-20 sm:w-24 px-2 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                placeholder="0.00"
+              />
+              {distributionAmount > 0 && (
+                <div className="text-xs text-gray-500 mt-1">
+                  New: ${newBalance.toFixed(2)}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  },
+);
+
 const UnassignedCashModal = () => {
   const { isUnassignedCashModalOpen, closeUnassignedCashModal } =
     useBudgetStore();
@@ -172,63 +226,15 @@ const UnassignedCashModal = () => {
             </div>
           ) : (
             <div className="overflow-y-auto h-64 sm:max-h-64 space-y-3">
-              {envelopes.map((envelope) => {
-                const distributionAmount = distributions[envelope.id] || 0;
-                const newBalance =
-                  (envelope.currentAmount || 0) + distributionAmount;
-
-                return (
-                  <div
-                    key={envelope.id}
-                    className="bg-white border rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0">
-                      <div className="flex items-center flex-1">
-                        <div
-                          className="w-3 h-3 rounded-full mr-3 flex-shrink-0"
-                          style={{ backgroundColor: envelope.color }}
-                        />
-                        <div className="flex-1 min-w-0">
-                          <h5 className="font-medium text-gray-900 text-sm truncate">
-                            {envelope.name}
-                          </h5>
-                          <p className="text-xs text-gray-600 truncate">
-                            Current: ${(envelope.currentAmount || 0).toFixed(2)}
-                            {envelope.monthlyAmount && (
-                              <span className="hidden sm:inline ml-2">
-                                • Budget: ${envelope.monthlyAmount.toFixed(2)}
-                                /month
-                              </span>
-                            )}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between sm:justify-end space-x-3">
-                        <div className="text-right">
-                          <input
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            value={distributionAmount || ""}
-                            onChange={(e) =>
-                              updateDistribution(envelope.id, e.target.value)
-                            }
-                            disabled={isProcessing}
-                            className="w-20 sm:w-24 px-2 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                            placeholder="0.00"
-                          />
-                          {distributionAmount > 0 && (
-                            <div className="text-xs text-gray-500 mt-1">
-                              New: ${newBalance.toFixed(2)}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+              {envelopes.map((envelope) => (
+                <EnvelopeItem
+                  key={envelope.id}
+                  envelope={envelope}
+                  distributionAmount={distributions[envelope.id] || 0}
+                  updateDistribution={updateDistribution}
+                  isProcessing={isProcessing}
+                />
+              ))}
             </div>
           )}
         </div>
@@ -302,4 +308,4 @@ const UnassignedCashModal = () => {
   );
 };
 
-export default UnassignedCashModal;
+export default memo(UnassignedCashModal);

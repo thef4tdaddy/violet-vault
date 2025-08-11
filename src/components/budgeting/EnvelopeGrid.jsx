@@ -1,5 +1,5 @@
 // src/new/UnifiedEnvelopeManager.jsx
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, lazy, Suspense } from "react";
 import { useBudgetStore } from "../../stores/budgetStore";
 import { useEnvelopes } from "../../hooks/useEnvelopes";
 import { useTransactions } from "../../hooks/useTransactions";
@@ -28,9 +28,11 @@ import {
   Calculator,
   History,
 } from "lucide-react";
-import CreateEnvelopeModal from "./CreateEnvelopeModal";
-import EditEnvelopeModal from "./EditEnvelopeModal";
-import ObjectHistoryViewer from "../history/ObjectHistoryViewer";
+const CreateEnvelopeModal = lazy(() => import("./CreateEnvelopeModal"));
+const EditEnvelopeModal = lazy(() => import("./EditEnvelopeModal"));
+const ObjectHistoryViewer = lazy(
+  () => import("../history/ObjectHistoryViewer"),
+);
 import {
   ENVELOPE_TYPES,
   ENVELOPE_TYPE_CONFIG,
@@ -1081,89 +1083,95 @@ const UnifiedEnvelopeManager = ({
 
       {/* Create Envelope Modal */}
       {showCreateModal && (
-        <CreateEnvelopeModal
-          isOpen={showCreateModal}
-          onClose={() => setShowCreateModal(false)}
-          onCreateEnvelope={(envelope) => {
-            // Use TanStack mutation with Zustand fallback
-            try {
-              addEnvelope(envelope);
-            } catch (error) {
-              console.warn(
-                "TanStack addEnvelope failed, using Zustand fallback",
-                error,
-              );
-              budget.addEnvelope(envelope);
-            }
-            setShowCreateModal(false);
-          }}
-          unassignedCash={unassignedCash}
-        />
+        <Suspense fallback={<div className="loading-spinner">Loading...</div>}>
+          <CreateEnvelopeModal
+            isOpen={showCreateModal}
+            onClose={() => setShowCreateModal(false)}
+            onCreateEnvelope={(envelope) => {
+              // Use TanStack mutation with Zustand fallback
+              try {
+                addEnvelope(envelope);
+              } catch (error) {
+                console.warn(
+                  "TanStack addEnvelope failed, using Zustand fallback",
+                  error,
+                );
+                budget.addEnvelope(envelope);
+              }
+              setShowCreateModal(false);
+            }}
+            unassignedCash={unassignedCash}
+          />
+        </Suspense>
       )}
 
       {/* Envelope History Modal */}
       {historyEnvelope && (
-        <ObjectHistoryViewer
-          objectId={historyEnvelope.id}
-          objectType="Envelope"
-          objectName={historyEnvelope.name}
-          onClose={() => setHistoryEnvelope(null)}
-        />
+        <Suspense fallback={<div className="loading-spinner">Loading...</div>}>
+          <ObjectHistoryViewer
+            objectId={historyEnvelope.id}
+            objectType="Envelope"
+            objectName={historyEnvelope.name}
+            onClose={() => setHistoryEnvelope(null)}
+          />
+        </Suspense>
       )}
 
       {/* Edit Envelope Modal */}
       {editingEnvelope && (
-        <EditEnvelopeModal
-          isOpen={!!editingEnvelope}
-          onClose={() => setEditingEnvelope(null)}
-          envelope={editingEnvelope}
-          onUpdateEnvelope={(envelope) => {
-            if (envelope.id === "unassigned") {
-              // Handle unassigned cash update - keep using Zustand for UI state
-              budget.setUnassignedCash(envelope.currentBalance);
-            } else {
+        <Suspense fallback={<div className="loading-spinner">Loading...</div>}>
+          <EditEnvelopeModal
+            isOpen={!!editingEnvelope}
+            onClose={() => setEditingEnvelope(null)}
+            envelope={editingEnvelope}
+            onUpdateEnvelope={(envelope) => {
+              if (envelope.id === "unassigned") {
+                // Handle unassigned cash update - keep using Zustand for UI state
+                budget.setUnassignedCash(envelope.currentBalance);
+              } else {
+                // Use TanStack mutation with Zustand fallback
+                try {
+                  updateEnvelope({ id: envelope.id, updates: envelope });
+                } catch (error) {
+                  console.warn(
+                    "TanStack updateEnvelope failed, using Zustand fallback",
+                    error,
+                  );
+                  budget.updateEnvelope(envelope);
+                }
+              }
+              setEditingEnvelope(null);
+            }}
+            onDeleteEnvelope={(envelopeId) => {
               // Use TanStack mutation with Zustand fallback
               try {
-                updateEnvelope({ id: envelope.id, updates: envelope });
+                deleteEnvelope(envelopeId);
               } catch (error) {
                 console.warn(
-                  "TanStack updateEnvelope failed, using Zustand fallback",
+                  "TanStack deleteEnvelope failed, using Zustand fallback",
                   error,
                 );
-                budget.updateEnvelope(envelope);
+                budget.deleteEnvelope(envelopeId);
               }
-            }
-            setEditingEnvelope(null);
-          }}
-          onDeleteEnvelope={(envelopeId) => {
-            // Use TanStack mutation with Zustand fallback
-            try {
-              deleteEnvelope(envelopeId);
-            } catch (error) {
-              console.warn(
-                "TanStack deleteEnvelope failed, using Zustand fallback",
-                error,
-              );
-              budget.deleteEnvelope(envelopeId);
-            }
-            setEditingEnvelope(null);
-          }}
-          onUpdateBill={(bill) => {
-            // Use TanStack mutation with Zustand fallback
-            try {
-              updateBill({ id: bill.id, updates: bill });
-            } catch (error) {
-              console.warn(
-                "TanStack updateBill failed, using Zustand fallback",
-                error,
-              );
-              budget.updateBill(bill);
-            }
-          }}
-          existingEnvelopes={envelopes}
-          allBills={bills}
-          currentUser={budget.currentUser}
-        />
+              setEditingEnvelope(null);
+            }}
+            onUpdateBill={(bill) => {
+              // Use TanStack mutation with Zustand fallback
+              try {
+                updateBill({ id: bill.id, updates: bill });
+              } catch (error) {
+                console.warn(
+                  "TanStack updateBill failed, using Zustand fallback",
+                  error,
+                );
+                budget.updateBill(bill);
+              }
+            }}
+            existingEnvelopes={envelopes}
+            allBills={bills}
+            currentUser={budget.currentUser}
+          />
+        </Suspense>
       )}
     </div>
   );
