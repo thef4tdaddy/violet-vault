@@ -87,7 +87,7 @@ const storeInitializer = (set, get) => ({
   isActualBalanceManual: false, // Track if balance was manually set
   isOnline: true, // Add isOnline state, default to true
   dataLoaded: false,
-  cloudSyncEnabled: false, // Toggle for Firestore cloud sync
+  cloudSyncEnabled: true, // Toggle for Firestore cloud sync (default enabled)
 
   // App state actions (data mutations now handled by TanStack Query hooks)
 
@@ -489,7 +489,7 @@ const storeInitializer = (set, get) => ({
     const state = get();
 
     if (!state.cloudSyncEnabled) {
-      console.log("💾 Cloud sync disabled - background sync not started");
+      console.log("💾 Local-only mode enabled - background sync not started");
       return;
     }
 

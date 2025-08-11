@@ -22,10 +22,12 @@ const useDataInitialization = () => {
         setInitError(null);
 
         if (cloudSyncEnabled) {
-          logger.debug("🌩️ Starting background cloud sync service");
+          logger.debug(
+            "🌩️ Starting background cloud sync service (default enabled)",
+          );
           startBackgroundSync();
         } else {
-          logger.debug("💾 Cloud sync disabled - working in local-only mode");
+          logger.debug("💾 Local-only mode enabled - cloud sync disabled");
         }
 
         setIsInitialized(true);
