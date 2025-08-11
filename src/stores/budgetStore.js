@@ -89,9 +89,22 @@ const storeInitializer = (set, get) => ({
   dataLoaded: false,
   cloudSyncEnabled: true, // Toggle for Firestore cloud sync (default enabled)
 
+  // Data arrays used by queries and mutations
+  envelopes: [],
+  bills: [],
+  transactions: [],
+  allTransactions: [],
+  savingsGoals: [],
+  supplementalAccounts: [],
+  debts: [],
+
   // App state actions (data mutations now handled by TanStack Query hooks)
 
   // Optimized bulk operations
+  setEnvelopes: (envelopes) =>
+    set((state) => {
+      state.envelopes = envelopes;
+    }),
   bulkUpdateEnvelopes: (updates) =>
     set((state) => {
       updates.forEach((update) => {
