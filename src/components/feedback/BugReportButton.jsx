@@ -30,13 +30,20 @@ const BugReportButton = () => {
         if (confirm(message)) {
           window.open(result.issueUrl, "_blank");
         }
+      } else if (result.localFallback) {
+        // Service unavailable, but we logged it locally
+        alert(
+          `Thanks! Your bug report has been logged locally.\n\nThe bug report service is temporarily unavailable (${result.fallbackReason}), but your report including screenshot and session data has been saved to the browser console for manual review.\n\nPlease check the browser console (F12) for the full report details.`,
+        );
       } else {
         alert(
           "Thanks! Your bug report has been submitted. Check the console for details.",
         );
       }
     } else {
-      alert("Failed to submit bug report. Please try again.");
+      alert(
+        "Failed to submit bug report. Please try again or check the browser console for error details.",
+      );
     }
   };
 
