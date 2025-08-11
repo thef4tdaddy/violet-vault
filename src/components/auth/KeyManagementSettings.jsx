@@ -145,9 +145,9 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start justify-center p-4 z-[9999] overflow-y-auto">
-      <div className="glassmorphism rounded-2xl w-full max-w-4xl my-8 border border-white/30 shadow-2xl min-h-[90vh] max-h-[95vh] overflow-y-auto">
-        <div className="p-6">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] overflow-y-auto">
+      <div className="glassmorphism w-full h-full border-0 shadow-none overflow-y-auto">
+        <div className="p-6 h-full">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-semibold flex items-center">
