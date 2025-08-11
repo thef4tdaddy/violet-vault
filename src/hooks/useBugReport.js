@@ -119,17 +119,50 @@ const useBugReport = () => {
 
         if (!response.ok) {
           const errorText = await response.text();
-          throw new Error(
-            `HTTP error! status: ${response.status} - ${errorText}`,
-          );
-        }
+          console.error("Bug report submission failed:", {
+            status: response.status,
+            statusText: response.statusText,
+            error: errorText,
+          });
 
-        const result = await response.json();
-        console.log("Bug report submitted successfully:", result);
+          // Parse error response to provide better user feedback
+          let parsedError = null;
+          try {
+            parsedError = JSON.parse(errorText);
+          } catch (e) {
+            // Error text isn't JSON, use as-is
+          }
 
-        // Store the issue URL for user feedback
-        if (result.issueUrl) {
-          reportData.issueUrl = result.issueUrl;
+          // If it's a server configuration error, fall back to local logging
+          if (
+            response.status === 500 ||
+            (parsedError &&
+              parsedError.message &&
+              parsedError.message.includes("GitHub API error"))
+          ) {
+            console.warn("Bug report service unavailable, logging locally:", {
+              ...reportData,
+              screenshot: screenshotData ? "[Screenshot captured]" : null,
+              sessionUrl: sessionUrl || "[No session replay URL available]",
+            });
+
+            // Don't throw error, treat as successful local logging
+            reportData.localFallback = true;
+            reportData.fallbackReason =
+              parsedError?.message || `Server error: ${response.status}`;
+          } else {
+            throw new Error(
+              `HTTP error! status: ${response.status} - ${errorText}`,
+            );
+          }
+        } else {
+          const result = await response.json();
+          console.log("Bug report submitted successfully:", result);
+
+          // Store the issue URL for user feedback
+          if (result.issueUrl) {
+            reportData.issueUrl = result.issueUrl;
+          }
         }
       } else {
         // Fallback: log the report data if no endpoint is configured
