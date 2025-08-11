@@ -16,6 +16,11 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
+    // Support workers deployed behind a path prefix
+    // e.g. https://api.example.com/bug-report/report-issue
+    // by stripping optional /bug-report prefix before routing
+    const pathname = url.pathname.replace(/^\/bug-report/, "");
+
     // Handle CORS preflight requests
     if (request.method === "OPTIONS") {
       return new Response(null, {
@@ -25,7 +30,7 @@ export default {
     }
 
     // Route handling
-    if (url.pathname === "/cleanup" && request.method === "POST") {
+    if (pathname === "/cleanup" && request.method === "POST") {
       const result = await cleanupOldScreenshots(env);
       return new Response(JSON.stringify(result), {
         status: 200,
@@ -33,7 +38,7 @@ export default {
       });
     }
 
-    if (url.pathname === "/stats" && request.method === "GET") {
+    if (pathname === "/stats" && request.method === "GET") {
       const result = await getUsageStats(env);
       return new Response(JSON.stringify(result), {
         status: 200,
@@ -41,7 +46,7 @@ export default {
       });
     }
 
-    if (url.pathname === "/milestones" && request.method === "GET") {
+    if (pathname === "/milestones" && request.method === "GET") {
       const result = await getMilestones(env);
       return new Response(JSON.stringify(result), {
         status: 200,
@@ -49,7 +54,7 @@ export default {
       });
     }
 
-    if (url.pathname === "/releases" && request.method === "GET") {
+    if (pathname === "/releases" && request.method === "GET") {
       const result = await getReleasePleaseInfo(env);
       return new Response(JSON.stringify(result), {
         status: 200,
@@ -58,7 +63,7 @@ export default {
     }
 
     // Default route: bug report submission
-    if (url.pathname === "/report-issue" || url.pathname === "/") {
+    if (pathname === "/report-issue" || pathname === "/" || pathname === "") {
       if (request.method !== "POST") {
         return new Response("Method not allowed", {
           status: 405,
