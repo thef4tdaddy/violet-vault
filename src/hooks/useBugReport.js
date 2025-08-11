@@ -14,15 +14,32 @@ const useBugReport = () => {
 
   const captureScreenshot = async () => {
     try {
+      // Check if we're on mobile - use simpler approach
+      const isMobile =
+        /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent,
+        ) || window.innerWidth <= 768;
+
+      // Add timeout to prevent indefinite hanging
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error("Screenshot capture timed out")),
+          isMobile ? 10000 : 15000,
+        ),
+      );
+
       // Dynamic import to avoid bundle size issues
       const html2canvas = (await import("html2canvas")).default;
 
-      const canvas = await html2canvas(document.body, {
+      const screenshotPromise = html2canvas(document.body, {
         useCORS: true,
         logging: false,
-        scale: 0.5, // Reduce size for better performance
+        scale: isMobile ? 0.3 : 0.5, // Even smaller scale for mobile
         allowTaint: true,
         backgroundColor: "#ffffff",
+        // Mobile-specific optimizations
+        height: isMobile ? Math.min(window.innerHeight, 2000) : undefined,
+        width: isMobile ? Math.min(window.innerWidth, 1200) : undefined,
         // Exclude the bug report button and modal from screenshot
         ignoreElements: (element) => {
           return element.getAttribute("data-bug-report") === "true";
@@ -51,11 +68,18 @@ const useBugReport = () => {
         },
       });
 
-      const screenshotDataUrl = canvas.toDataURL("image/png", 0.7);
+      // Race between screenshot capture and timeout
+      const canvas = await Promise.race([screenshotPromise, timeoutPromise]);
+
+      const screenshotDataUrl = canvas.toDataURL(
+        "image/png",
+        isMobile ? 0.5 : 0.7,
+      );
       setScreenshot(screenshotDataUrl);
       return screenshotDataUrl;
     } catch (error) {
-      console.error("Failed to capture screenshot:", error);
+      console.warn("Failed to capture screenshot:", error.message);
+      // Return null instead of throwing - this allows the bug report to continue without screenshot
       return null;
     }
   };
@@ -65,118 +89,171 @@ const useBugReport = () => {
 
     setIsSubmitting(true);
 
-    try {
-      let screenshotData = null;
+    // Add overall timeout to prevent infinite hanging
+    const timeoutPromise = new Promise(
+      (_, reject) =>
+        setTimeout(
+          () => reject(new Error("Bug report submission timed out")),
+          30000,
+        ), // 30 second timeout
+    );
 
-      if (includeScreenshot) {
-        screenshotData = screenshot || (await captureScreenshot());
-      }
-
-      // Get Highlight.io session URL for the bug report
-      let sessionUrl = null;
+    const submissionPromise = async () => {
       try {
-        // Try different methods to get session URL based on Highlight.io SDK version
-        if (typeof H.getSessionMetadata === "function") {
-          const sessionMetadata = H.getSessionMetadata();
-          if (sessionMetadata?.sessionUrl) {
-            sessionUrl = sessionMetadata.sessionUrl;
+        let screenshotData = null;
+
+        if (includeScreenshot) {
+          try {
+            screenshotData = screenshot || (await captureScreenshot());
+          } catch (screenshotError) {
+            console.warn(
+              "Screenshot capture failed, proceeding without screenshot:",
+              screenshotError,
+            );
+            screenshotData = null;
           }
-        } else if (typeof H.getSessionURL === "function") {
-          sessionUrl = H.getSessionURL();
-        } else if (typeof H.getSession === "function") {
-          const session = H.getSession();
-          sessionUrl = session?.url || session?.sessionUrl;
         }
-      } catch (error) {
-        console.warn("Failed to get Highlight.io session metadata:", error);
-      }
 
-      const reportData = {
-        description: description.trim(),
-        screenshot: screenshotData,
-        sessionUrl, // Include Highlight.io session replay URL
-        env: {
-          userAgent: navigator.userAgent,
-          url: window.location.href,
-          timestamp: new Date().toISOString(),
-          appVersion: import.meta.env.VITE_APP_VERSION || "1.6.1",
-          viewport: `${window.innerWidth}x${window.innerHeight}`,
-          referrer: document.referrer || "direct",
-        },
-      };
+        // Get Highlight.io session URL for the bug report
+        let sessionUrl = null;
+        try {
+          // Try different methods to get session URL based on Highlight.io SDK version
+          if (typeof H.getSessionMetadata === "function") {
+            const sessionMetadata = H.getSessionMetadata();
+            if (sessionMetadata?.sessionUrl) {
+              sessionUrl = sessionMetadata.sessionUrl;
+            }
+          } else if (typeof H.getSessionURL === "function") {
+            sessionUrl = H.getSessionURL();
+          } else if (typeof H.getSession === "function") {
+            const session = H.getSession();
+            sessionUrl = session?.url || session?.sessionUrl;
+          }
+        } catch (error) {
+          console.warn("Failed to get Highlight.io session metadata:", error);
+        }
 
-      // Submit to Cloudflare Worker if endpoint is configured
-      const bugReportEndpoint = import.meta.env.VITE_BUG_REPORT_ENDPOINT;
+        const reportData = {
+          description: description.trim(),
+          screenshot: screenshotData,
+          sessionUrl, // Include Highlight.io session replay URL
+          env: {
+            userAgent: navigator.userAgent,
+            url: window.location.href,
+            timestamp: new Date().toISOString(),
+            appVersion: import.meta.env.VITE_APP_VERSION || "1.6.1",
+            viewport: `${window.innerWidth}x${window.innerHeight}`,
+            referrer: document.referrer || "direct",
+          },
+        };
 
-      if (bugReportEndpoint) {
-        console.log("Submitting bug report to:", bugReportEndpoint);
+        // Submit to Cloudflare Worker if endpoint is configured
+        const bugReportEndpoint = import.meta.env.VITE_BUG_REPORT_ENDPOINT;
 
-        const response = await fetch(bugReportEndpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(reportData),
-        });
+        if (bugReportEndpoint) {
+          console.log("Submitting bug report to:", bugReportEndpoint);
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error("Bug report submission failed:", {
-            status: response.status,
-            statusText: response.statusText,
-            error: errorText,
+          const response = await fetch(bugReportEndpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(reportData),
           });
 
-          // Parse error response to provide better user feedback
-          let parsedError = null;
-          try {
-            parsedError = JSON.parse(errorText);
-          } catch {
-            // Error text isn't JSON, use as-is
-          }
-
-          // If it's a server configuration error, fall back to local logging
-          if (
-            response.status === 500 ||
-            (parsedError && parsedError.message && parsedError.message.includes("GitHub API error"))
-          ) {
-            console.warn("Bug report service unavailable, logging locally:", {
-              ...reportData,
-              screenshot: screenshotData ? "[Screenshot captured]" : null,
-              sessionUrl: sessionUrl || "[No session replay URL available]",
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Bug report submission failed:", {
+              status: response.status,
+              statusText: response.statusText,
+              error: errorText,
             });
 
-            // Don't throw error, treat as successful local logging
-            reportData.localFallback = true;
-            reportData.fallbackReason = parsedError?.message || `Server error: ${response.status}`;
+            // Parse error response to provide better user feedback
+            let parsedError = null;
+            try {
+              parsedError = JSON.parse(errorText);
+            } catch {
+              // Error text isn't JSON, use as-is
+            }
+
+            // If it's a server configuration error, fall back to local logging
+            if (
+              response.status === 500 ||
+              (parsedError &&
+                parsedError.message &&
+                parsedError.message.includes("GitHub API error"))
+            ) {
+              console.warn("Bug report service unavailable, logging locally:", {
+                ...reportData,
+                screenshot: screenshotData ? "[Screenshot captured]" : null,
+                sessionUrl: sessionUrl || "[No session replay URL available]",
+              });
+
+              // Don't throw error, treat as successful local logging
+              reportData.localFallback = true;
+              reportData.fallbackReason =
+                parsedError?.message || `Server error: ${response.status}`;
+            } else {
+              // For other errors, also fallback to local logging instead of throwing
+              console.warn("Bug report submission failed, logging locally:", {
+                ...reportData,
+                screenshot: screenshotData ? "[Screenshot captured]" : null,
+                sessionUrl: sessionUrl || "[No session replay URL available]",
+              });
+              reportData.localFallback = true;
+              reportData.fallbackReason = `HTTP error: ${response.status} - ${errorText}`;
+            }
           } else {
-            throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+            const result = await response.json();
+            console.log("Bug report submitted successfully:", result);
+
+            // Store the issue URL for user feedback
+            if (result.issueUrl) {
+              reportData.issueUrl = result.issueUrl;
+            }
           }
         } else {
-          const result = await response.json();
-          console.log("Bug report submitted successfully:", result);
-
-          // Store the issue URL for user feedback
-          if (result.issueUrl) {
-            reportData.issueUrl = result.issueUrl;
-          }
+          // Fallback: log the report data if no endpoint is configured
+          console.log("No bug report endpoint configured. Report data:", {
+            ...reportData,
+            screenshot: screenshotData ? "[Screenshot captured]" : null,
+            sessionUrl: sessionUrl || "[No session replay URL available]",
+          });
         }
-      } else {
-        // Fallback: log the report data if no endpoint is configured
-        console.log("No bug report endpoint configured. Report data:", {
-          ...reportData,
-          screenshot: screenshotData ? "[Screenshot captured]" : null,
-          sessionUrl: sessionUrl || "[No session replay URL available]",
-        });
+
+        // Reset form on success
+        setDescription("");
+        setScreenshot(null);
+        setIsModalOpen(false);
+
+        // Return result data for UI feedback
+        return reportData;
+      } catch (innerError) {
+        console.error("Error in bug report submission:", innerError);
+        throw innerError; // Re-throw to be caught by the outer handler
       }
+    };
 
-      // Reset form on success
-      setDescription("");
-      setScreenshot(null);
-      setIsModalOpen(false);
-
-      // Return result data for UI feedback
-      return reportData;
+    try {
+      // Race between submission and timeout
+      const result = await Promise.race([submissionPromise(), timeoutPromise]);
+      return result;
     } catch (error) {
       console.error("Failed to submit bug report:", error);
+
+      // Even on timeout/error, log the report locally
+      try {
+        console.warn("Bug report failed, logging locally:", {
+          description: description.trim(),
+          screenshot: screenshot ? "[Screenshot available]" : null,
+          timestamp: new Date().toISOString(),
+          userAgent: navigator.userAgent,
+          url: window.location.href,
+          error: error.message,
+        });
+      } catch (logError) {
+        console.error("Failed to log bug report locally:", logError);
+      }
+
       return false;
     } finally {
       setIsSubmitting(false);
@@ -192,7 +269,10 @@ const useBugReport = () => {
         if (import.meta.env.MODE === "development") {
           console.log("🔧 Started Highlight.io session for bug report");
         }
-      } else if (typeof H.start === "function" && typeof H.isRecording !== "function") {
+      } else if (
+        typeof H.start === "function" &&
+        typeof H.isRecording !== "function"
+      ) {
         // Fallback for older SDK versions that don't have isRecording
         H.start();
         if (import.meta.env.MODE === "development") {
