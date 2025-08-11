@@ -3,11 +3,12 @@ import { subscribeWithSelector } from "zustand/middleware";
 import { persist, devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { budgetHistoryMiddleware } from "../utils/budgetHistoryMiddleware.js";
+import { budgetDb } from "../db/budgetDb.js";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
 // Migration function to handle old localStorage format
-const migrateOldData = () => {
+const migrateOldData = async () => {
   try {
     const oldData = localStorage.getItem("budget-store");
     const newData = localStorage.getItem("violet-vault-store");
@@ -34,21 +35,57 @@ const migrateOldData = () => {
 
       const parsedOldData = JSON.parse(oldData);
 
+      // Helpers to normalize incoming data
+      const normalizeArray = (data) => {
+        if (Array.isArray(data)) return data;
+        if (data && typeof data === "object") return Object.values(data);
+        return [];
+      };
+
+      const ensureIds = (items) =>
+        items.map((item) => ({
+          id:
+            item.id ||
+            (globalThis.crypto?.randomUUID
+              ? globalThis.crypto.randomUUID()
+              : `${Date.now()}-${Math.random().toString(16).slice(2)}`),
+          ...item,
+        }));
+
       // Transform old reducer-based format to new direct format
       if (parsedOldData?.state) {
+        const envelopes = ensureIds(
+          normalizeArray(parsedOldData.state.envelopes),
+        );
+        const bills = ensureIds(normalizeArray(parsedOldData.state.bills));
+        const transactions = normalizeArray(parsedOldData.state.transactions);
+        const allTransactions = normalizeArray(
+          parsedOldData.state.allTransactions,
+        );
+        const savingsGoals = ensureIds(
+          normalizeArray(parsedOldData.state.savingsGoals),
+        );
+        const supplementalAccounts = normalizeArray(
+          parsedOldData.state.supplementalAccounts,
+        );
+        const debts = ensureIds(normalizeArray(parsedOldData.state.debts));
+        const paycheckHistory = ensureIds(
+          normalizeArray(parsedOldData.state.paycheckHistory),
+        );
+
         const transformedData = {
           state: {
-            envelopes: parsedOldData.state.envelopes || [],
-            bills: parsedOldData.state.bills || [],
-            transactions: parsedOldData.state.transactions || [],
-            allTransactions: parsedOldData.state.allTransactions || [],
-            savingsGoals: parsedOldData.state.savingsGoals || [],
-            supplementalAccounts:
-              parsedOldData.state.supplementalAccounts || [],
-            debts: parsedOldData.state.debts || [],
+            envelopes,
+            bills,
+            transactions,
+            allTransactions,
+            savingsGoals,
+            supplementalAccounts,
+            debts,
             unassignedCash: parsedOldData.state.unassignedCash || 0,
-            biweeklyAllocation: parsedOldData.state.biweeklyAllocation || 0,
-            paycheckHistory: parsedOldData.state.paycheckHistory || [],
+            biweeklyAllocation:
+              parsedOldData.state.biweeklyAllocation || 0,
+            paycheckHistory,
             actualBalance: parsedOldData.state.actualBalance || 0,
           },
           version: 0,
@@ -62,6 +99,16 @@ const migrateOldData = () => {
           "✅ Data migration completed successfully - replaced existing data",
         );
 
+        // Seed Dexie with migrated data so hooks can access it
+        await budgetDb.bulkUpsertEnvelopes(envelopes);
+        await budgetDb.bulkUpsertBills(bills);
+        await budgetDb.bulkUpsertTransactions(
+          allTransactions.length > 0 ? allTransactions : transactions,
+        );
+        await budgetDb.bulkUpsertSavingsGoals(savingsGoals);
+        await budgetDb.bulkUpsertDebts(debts);
+        await budgetDb.bulkUpsertPaychecks(paycheckHistory);
+
         // Remove old data after successful migration
         localStorage.removeItem("budget-store");
         console.log("🧹 Cleaned up old budget-store data");
@@ -73,7 +120,7 @@ const migrateOldData = () => {
 };
 
 // Run migration before creating store
-migrateOldData();
+await migrateOldData();
 
 // Base store configuration
 const storeInitializer = (set, get) => ({
