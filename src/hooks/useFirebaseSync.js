@@ -30,9 +30,16 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
           if (cloudData.data.envelopes) budget.setEnvelopes(cloudData.data.envelopes);
           if (cloudData.data.bills) budget.setBills(cloudData.data.bills);
           if (cloudData.data.savingsGoals) budget.setSavingsGoals(cloudData.data.savingsGoals);
-          if (cloudData.data.transactions) budget.setTransactions(cloudData.data.transactions);
-          if (cloudData.data.allTransactions)
+          if (cloudData.data.transactions) {
+            budget.setTransactions(cloudData.data.transactions);
+          }
+          if (cloudData.data.allTransactions) {
             budget.setAllTransactions(cloudData.data.allTransactions);
+          } else if (cloudData.data.transactions) {
+            // Fallback for older sync data that only has `transactions`
+            // Ensures the ledger isn't empty when allTransactions is missing
+            budget.setAllTransactions(cloudData.data.transactions);
+          }
           if (typeof cloudData.data.unassignedCash === "number")
             budget.setUnassignedCash(cloudData.data.unassignedCash);
           if (typeof cloudData.data.biweeklyAllocation === "number")
