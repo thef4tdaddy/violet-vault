@@ -49,11 +49,11 @@ const UnassignedCashModal = () => {
   const isOverDistributed = totalDistributed > unassignedCash;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl p-6 w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+      <div className="bg-white rounded-xl sm:rounded-xl rounded-t-xl p-4 sm:p-6 w-full max-w-4xl h-full sm:max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <div>
+        <div className="flex justify-between items-start mb-4 sm:mb-6">
+          <div className="flex-1">
             <h3 className="text-lg font-semibold text-gray-900">
               {unassignedCash < 0
                 ? "Address Budget Deficit"
@@ -76,52 +76,54 @@ const UnassignedCashModal = () => {
           <button
             onClick={closeUnassignedCashModal}
             disabled={isProcessing}
-            className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
+            className="text-gray-400 hover:text-gray-600 disabled:opacity-50 p-1"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Distribution Summary */}
-        <div className="bg-gray-50 rounded-lg p-4 mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-gray-50 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+          <div className="grid grid-cols-3 sm:grid-cols-3 gap-2 sm:gap-4">
             <div className="text-center">
-              <div className="text-sm text-gray-600">Total Distributing</div>
+              <div className="text-xs sm:text-sm text-gray-600">
+                Distributing
+              </div>
               <div
-                className={`text-xl font-bold ${isOverDistributed ? "text-red-600" : "text-blue-600"}`}
+                className={`text-lg sm:text-xl font-bold ${isOverDistributed ? "text-red-600" : "text-blue-600"}`}
               >
                 ${totalDistributed.toFixed(2)}
               </div>
             </div>
             <div className="text-center">
-              <div className="text-sm text-gray-600">Remaining</div>
+              <div className="text-xs sm:text-sm text-gray-600">Remaining</div>
               <div
-                className={`text-xl font-bold ${remainingCash < 0 ? "text-red-600" : "text-green-600"}`}
+                className={`text-lg sm:text-xl font-bold ${remainingCash < 0 ? "text-red-600" : "text-green-600"}`}
               >
                 ${remainingCash.toFixed(2)}
               </div>
             </div>
             <div className="text-center">
-              <div className="text-sm text-gray-600">Status</div>
+              <div className="text-xs sm:text-sm text-gray-600">Status</div>
               <div className="flex items-center justify-center">
                 {isOverDistributed ? (
                   <div className="flex items-center text-red-600">
-                    <AlertTriangle className="h-4 w-4 mr-1" />
-                    <span className="text-sm font-medium">
-                      {unassignedCash < 0
-                        ? "Increasing Deficit"
-                        : "Over Budget"}
+                    <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    <span className="text-xs sm:text-sm font-medium">
+                      {unassignedCash < 0 ? "Increasing" : "Over"}
                     </span>
                   </div>
                 ) : hasDistributions ? (
                   <div className="flex items-center text-green-600">
-                    <CheckCircle className="h-4 w-4 mr-1" />
-                    <span className="text-sm font-medium">Ready</span>
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    <span className="text-xs sm:text-sm font-medium">
+                      Ready
+                    </span>
                   </div>
                 ) : (
                   <div className="flex items-center text-gray-500">
-                    <DollarSign className="h-4 w-4 mr-1" />
-                    <span className="text-sm font-medium">No Distribution</span>
+                    <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    <span className="text-xs sm:text-sm font-medium">None</span>
                   </div>
                 )}
               </div>
@@ -130,7 +132,7 @@ const UnassignedCashModal = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="flex flex-wrap gap-3 mb-6">
+        <div className="flex flex-wrap gap-2 sm:gap-3 mb-4 sm:mb-6">
           <button
             onClick={distributeEqually}
             disabled={isProcessing || envelopes.length === 0}
@@ -159,7 +161,9 @@ const UnassignedCashModal = () => {
 
         {/* Envelope List */}
         <div className="flex-1 overflow-hidden">
-          <h4 className="font-medium text-gray-900 mb-3">Select Envelopes</h4>
+          <h4 className="font-medium text-gray-900 mb-3 sticky top-0 bg-white py-1 z-10">
+            Select Envelopes
+          </h4>
 
           {envelopes.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
@@ -167,7 +171,7 @@ const UnassignedCashModal = () => {
               <p className="text-sm">No envelopes available for distribution</p>
             </div>
           ) : (
-            <div className="overflow-y-auto max-h-64 space-y-3">
+            <div className="overflow-y-auto h-64 sm:max-h-64 space-y-3">
               {envelopes.map((envelope) => {
                 const distributionAmount = distributions[envelope.id] || 0;
                 const newBalance =
@@ -176,22 +180,22 @@ const UnassignedCashModal = () => {
                 return (
                   <div
                     key={envelope.id}
-                    className="bg-white border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                    className="bg-white border rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors"
                   >
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0">
                       <div className="flex items-center flex-1">
                         <div
-                          className="w-3 h-3 rounded-full mr-3"
+                          className="w-3 h-3 rounded-full mr-3 flex-shrink-0"
                           style={{ backgroundColor: envelope.color }}
                         />
-                        <div className="flex-1">
-                          <h5 className="font-medium text-gray-900 text-sm">
+                        <div className="flex-1 min-w-0">
+                          <h5 className="font-medium text-gray-900 text-sm truncate">
                             {envelope.name}
                           </h5>
-                          <p className="text-xs text-gray-600">
+                          <p className="text-xs text-gray-600 truncate">
                             Current: ${(envelope.currentAmount || 0).toFixed(2)}
                             {envelope.monthlyAmount && (
-                              <span className="ml-2">
+                              <span className="hidden sm:inline ml-2">
                                 • Budget: ${envelope.monthlyAmount.toFixed(2)}
                                 /month
                               </span>
@@ -200,7 +204,7 @@ const UnassignedCashModal = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-center space-x-3">
+                      <div className="flex items-center justify-between sm:justify-end space-x-3">
                         <div className="text-right">
                           <input
                             type="number"
@@ -211,7 +215,7 @@ const UnassignedCashModal = () => {
                               updateDistribution(envelope.id, e.target.value)
                             }
                             disabled={isProcessing}
-                            className="w-24 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                            className="w-20 sm:w-24 px-2 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                             placeholder="0.00"
                           />
                           {distributionAmount > 0 && (
