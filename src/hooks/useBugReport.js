@@ -44,7 +44,7 @@ const useBugReport = () => {
                 el.style.color = "#000000";
                 el.style.borderColor = "#cccccc";
               }
-            } catch (e) {
+            } catch {
               // Ignore style access errors
             }
           });
@@ -129,16 +129,14 @@ const useBugReport = () => {
           let parsedError = null;
           try {
             parsedError = JSON.parse(errorText);
-          } catch (e) {
+          } catch {
             // Error text isn't JSON, use as-is
           }
 
           // If it's a server configuration error, fall back to local logging
           if (
             response.status === 500 ||
-            (parsedError &&
-              parsedError.message &&
-              parsedError.message.includes("GitHub API error"))
+            (parsedError && parsedError.message && parsedError.message.includes("GitHub API error"))
           ) {
             console.warn("Bug report service unavailable, logging locally:", {
               ...reportData,
@@ -148,12 +146,9 @@ const useBugReport = () => {
 
             // Don't throw error, treat as successful local logging
             reportData.localFallback = true;
-            reportData.fallbackReason =
-              parsedError?.message || `Server error: ${response.status}`;
+            reportData.fallbackReason = parsedError?.message || `Server error: ${response.status}`;
           } else {
-            throw new Error(
-              `HTTP error! status: ${response.status} - ${errorText}`,
-            );
+            throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
           }
         } else {
           const result = await response.json();
@@ -197,10 +192,7 @@ const useBugReport = () => {
         if (import.meta.env.MODE === "development") {
           console.log("🔧 Started Highlight.io session for bug report");
         }
-      } else if (
-        typeof H.start === "function" &&
-        typeof H.isRecording !== "function"
-      ) {
+      } else if (typeof H.start === "function" && typeof H.isRecording !== "function") {
         // Fallback for older SDK versions that don't have isRecording
         H.start();
         if (import.meta.env.MODE === "development") {

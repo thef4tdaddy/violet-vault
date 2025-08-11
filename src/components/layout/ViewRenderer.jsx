@@ -17,13 +17,7 @@ import logger from "../../utils/logger";
  * ViewRenderer component for handling main content switching
  * Extracted from Layout.jsx for better organization
  */
-const ViewRenderer = ({
-  activeView,
-  budget,
-  currentUser,
-  totalBiweeklyNeed,
-  setActiveView,
-}) => {
+const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setActiveView }) => {
   const {
     envelopes,
     bills,
@@ -31,11 +25,11 @@ const ViewRenderer = ({
     supplementalAccounts,
     unassignedCash,
     paycheckHistory,
-    actualBalance,
+    actualBalance: _actualBalance,
     transactions,
     allTransactions: rawAllTransactions,
-    setActualBalance,
-    reconcileTransaction,
+    setActualBalance: _setActualBalance,
+    reconcileTransaction: _reconcileTransaction,
     addSavingsGoal,
     updateSavingsGoal,
     deleteSavingsGoal,
@@ -47,20 +41,18 @@ const ViewRenderer = ({
     updateEnvelope,
     processPaycheck,
     addTransaction,
-    updateTransaction,
-    deleteTransaction,
+    updateTransaction: _updateTransaction,
+    deleteTransaction: _deleteTransaction,
     addBill,
     updateBill,
-    setAllTransactions,
-    setTransactions,
+    setAllTransactions: _setAllTransactions,
+    setTransactions: _setTransactions,
   } = budget;
 
   // Filter out null/undefined transactions to prevent runtime errors
-  const allTransactions = (rawAllTransactions || []).filter(
-    (t) => t && typeof t === "object",
-  );
+  const allTransactions = (rawAllTransactions || []).filter((t) => t && typeof t === "object");
   const safeTransactions = (transactions || []).filter(
-    (t) => t && typeof t === "object" && typeof t.amount === "number",
+    (t) => t && typeof t === "object" && typeof t.amount === "number"
   );
 
   // Stable callback for bill updates
@@ -87,7 +79,7 @@ const ViewRenderer = ({
         });
       }
     },
-    [updateBill],
+    [updateBill]
   );
 
   // Debug log to verify function creation - only on dev sites
@@ -179,16 +171,14 @@ const ViewRenderer = ({
             createdAt: new Date().toISOString(),
           };
           addBill(bill);
-          console.log(
-            "✅ Bill stored successfully - no transaction created until paid",
-          );
+          console.log("✅ Bill stored successfully - no transaction created until paid");
         }}
         onSearchNewBills={async () => {
           try {
             // This would integrate with email parsing or other bill detection services
             // For now, we'll show a placeholder notification
             alert(
-              "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox.",
+              "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox."
             );
           } catch (error) {
             console.error("Failed to search for new bills:", error);
@@ -209,16 +199,10 @@ const ViewRenderer = ({
         onUpdateTransaction={() => {}} // Will be implemented
         onDeleteTransaction={() => {}} // Will be implemented
         onBulkImport={(newTransactions) => {
-          console.log(
-            "🔄 onBulkImport called with transactions:",
-            newTransactions.length,
-          );
+          console.log("🔄 onBulkImport called with transactions:", newTransactions.length);
           // Add transactions using budget store method - need to loop through individual transactions
           newTransactions.forEach((transaction) => addTransaction(transaction));
-          console.log(
-            "💾 Bulk import complete. Added transactions:",
-            newTransactions.length,
-          );
+          console.log("💾 Bulk import complete. Added transactions:", newTransactions.length);
         }}
         currentUser={currentUser}
       />
@@ -238,9 +222,7 @@ const ViewRenderer = ({
 
   return (
     <ErrorBoundary>
-      <Suspense
-        fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}
-      >
+      <Suspense fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}>
         {views[activeView]}
       </Suspense>
     </ErrorBoundary>

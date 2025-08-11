@@ -214,7 +214,7 @@ class RollbackManager {
     try {
       const { stdout: commits } = await execAsync("git log --oneline -5");
       console.log(commits);
-    } catch (error) {
+    } catch {
       console.log("  No git history available");
     }
 
@@ -233,7 +233,7 @@ class RollbackManager {
       } else {
         console.log("  No tags found");
       }
-    } catch (error) {
+    } catch {
       console.log("  No tags available");
     }
 
@@ -276,7 +276,7 @@ class RollbackManager {
             console.log(
               `  ${rollback} (${rollbackData.currentCommit.split(" ").slice(1).join(" ")})`,
             );
-          } catch (error) {
+          } catch {
             console.log(`  ${rollback} (details unavailable)`);
           }
         });

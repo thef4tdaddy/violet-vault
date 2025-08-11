@@ -26,10 +26,7 @@ const initializeCache = () => {
       // Only use cached data if it's still valid
       if (parsed.timestamp && now - parsed.timestamp < versionCache.ttl) {
         versionCache = parsed;
-        console.log(
-          "📦 Loaded version cache from localStorage:",
-          versionCache.data,
-        );
+        console.log("📦 Loaded version cache from localStorage:", versionCache.data);
         return true;
       } else {
         // Cache expired, remove it
@@ -79,10 +76,7 @@ export const fetchTargetVersion = async () => {
   try {
     // Use our Cloudflare Worker endpoint to fetch release-please data (more accurate than milestones)
     const endpoint =
-      import.meta.env.VITE_BUG_REPORT_ENDPOINT?.replace(
-        "/report-issue",
-        "/releases",
-      ) ||
+      import.meta.env.VITE_BUG_REPORT_ENDPOINT?.replace("/report-issue", "/releases") ||
       "https://violet-vault-bug-reporter.fragrant-fog-c708.workers.dev/releases";
 
     const response = await fetch(endpoint, {
@@ -98,10 +92,7 @@ export const fetchTargetVersion = async () => {
     if (data.success && data.nextVersion) {
       // Save to cache
       saveCache(data.nextVersion);
-      console.log(
-        "✅ Fetched next version from release-please:",
-        data.nextVersion,
-      );
+      console.log("✅ Fetched next version from release-please:", data.nextVersion);
       return data.nextVersion;
     } else if (data.fallback?.nextVersion) {
       // Use fallback but don't cache it (so we retry next time)
@@ -121,7 +112,7 @@ export const fetchTargetVersion = async () => {
 // Fallback target version detection (used when API is unavailable)
 const getTargetVersionFallback = () => {
   const currentVersion = APP_VERSION;
-  const [major, minor, patch] = currentVersion.split(".").map(Number);
+  const [major, minor] = currentVersion.split(".").map(Number);
 
   // Smart fallback based on current version
   if (major === 1 && minor === 6) {
@@ -159,12 +150,11 @@ export const getBranchInfo = (targetVersion = null) => {
     !window.location.hostname.includes("git-");
   const isPreviewBranchOnVercel =
     isVercelDeploy &&
-    (window.location.hostname.includes("git-") ||
-      window.location.hostname.includes("-git-"));
+    (window.location.hostname.includes("git-") || window.location.hostname.includes("-git-"));
 
   // Other common environment indicators
   const nodeEnv = import.meta.env.NODE_ENV;
-  const mode = import.meta.env.MODE;
+  const _mode = import.meta.env.MODE;
 
   const fallbackVersion = targetVersion || getTargetVersionFallback();
 
@@ -181,11 +171,7 @@ export const getBranchInfo = (targetVersion = null) => {
       isDevelopment: true,
       platform: "local",
     };
-  } else if (
-    isVercelPreview ||
-    isPreviewBranchOnVercel ||
-    appEnv === "preview"
-  ) {
+  } else if (isVercelPreview || isPreviewBranchOnVercel || appEnv === "preview") {
     return {
       branch: "develop",
       environment: "preview",
@@ -286,13 +272,9 @@ export const clearVersionCache = () => {
 export const getCacheStatus = () => {
   const now = Date.now();
   const isValid =
-    versionCache.data &&
-    versionCache.timestamp &&
-    now - versionCache.timestamp < versionCache.ttl;
+    versionCache.data && versionCache.timestamp && now - versionCache.timestamp < versionCache.ttl;
 
-  const timeUntilExpiry = isValid
-    ? versionCache.timestamp + versionCache.ttl - now
-    : 0;
+  const timeUntilExpiry = isValid ? versionCache.timestamp + versionCache.ttl - now : 0;
   const daysUntilExpiry = Math.round(timeUntilExpiry / (24 * 60 * 60 * 1000));
   const hoursUntilExpiry = Math.round(timeUntilExpiry / (60 * 60 * 1000));
 
@@ -301,9 +283,7 @@ export const getCacheStatus = () => {
     isValid,
     version: versionCache.data,
     cachedAt: versionCache.timestamp ? new Date(versionCache.timestamp) : null,
-    expiresAt: versionCache.timestamp
-      ? new Date(versionCache.timestamp + versionCache.ttl)
-      : null,
+    expiresAt: versionCache.timestamp ? new Date(versionCache.timestamp + versionCache.ttl) : null,
     daysUntilExpiry: isValid ? daysUntilExpiry : 0,
     hoursUntilExpiry: isValid ? hoursUntilExpiry : 0,
     // Legacy support
@@ -328,9 +308,7 @@ export const simulateVersionTransition = (newTargetVersion) => {
     console.warn("Failed to save simulated cache:", error);
   }
 
-  console.log(
-    `✅ Simulated transition complete. Run getVersionInfoAsync() to test.`,
-  );
+  console.log(`✅ Simulated transition complete. Run getVersionInfoAsync() to test.`);
   return newTargetVersion;
 };
 

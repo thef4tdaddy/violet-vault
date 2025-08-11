@@ -21,11 +21,7 @@ export const budgetHistoryMiddleware = (config) => (set, get, api) => {
 
       // Create initial commit if this is the first time
       if (!budgetHistory.currentCommitHash) {
-        await budgetHistory.commit(
-          lastCommittedState,
-          "Initial budget state",
-          "system",
-        );
+        await budgetHistory.commit(lastCommittedState, "Initial budget state", "system");
       }
 
       logger.debug("Budget history initialized and ready");
@@ -69,9 +65,7 @@ export const budgetHistoryMiddleware = (config) => (set, get, api) => {
         const currentState = getCommittableState(get());
 
         // Only commit if state has actually changed
-        if (
-          JSON.stringify(currentState) !== JSON.stringify(lastCommittedState)
-        ) {
+        if (JSON.stringify(currentState) !== JSON.stringify(lastCommittedState)) {
           await budgetHistory.commit(currentState, message, author);
           lastCommittedState = currentState;
         }
@@ -119,11 +113,7 @@ export const budgetHistoryMiddleware = (config) => (set, get, api) => {
 
       try {
         const currentState = getCommittableState(get());
-        const commitHash = await budgetHistory.commit(
-          currentState,
-          message,
-          author,
-        );
+        const commitHash = await budgetHistory.commit(currentState, message, author);
         lastCommittedState = currentState;
         return commitHash;
       } catch (error) {
@@ -170,10 +160,7 @@ export const budgetHistoryMiddleware = (config) => (set, get, api) => {
 
         // Create a new commit documenting the restoration
         setTimeout(() => {
-          scheduleCommit(
-            `Restored to commit ${commitHash.substring(0, 8)}`,
-            "user",
-          );
+          scheduleCommit(`Restored to commit ${commitHash.substring(0, 8)}`, "user");
         }, 100);
 
         return restoredState;
@@ -227,7 +214,7 @@ export const budgetHistoryMiddleware = (config) => (set, get, api) => {
         {
           historyMessage: `Added envelope: ${envelope.name}`,
           author: "user",
-        },
+        }
       ),
 
     updateEnvelopeWithHistory: (envelope) =>
@@ -242,7 +229,7 @@ export const budgetHistoryMiddleware = (config) => (set, get, api) => {
         {
           historyMessage: `Updated envelope: ${envelope.name}`,
           author: "user",
-        },
+        }
       ),
 
     deleteEnvelopeWithHistory: (id, name = "Unknown") =>
@@ -254,7 +241,7 @@ export const budgetHistoryMiddleware = (config) => (set, get, api) => {
         {
           historyMessage: `Deleted envelope: ${name}`,
           author: "user",
-        },
+        }
       ),
 
     addTransactionWithHistory: (transaction) =>
@@ -267,18 +254,14 @@ export const budgetHistoryMiddleware = (config) => (set, get, api) => {
         {
           historyMessage: `Added transaction: ${transaction.description}`,
           author: "user",
-        },
+        }
       ),
 
     updateTransactionWithHistory: (transaction) =>
       enhancedSet(
         (state) => {
-          const transIndex = state.transactions.findIndex(
-            (t) => t.id === transaction.id,
-          );
-          const allTransIndex = state.allTransactions.findIndex(
-            (t) => t.id === transaction.id,
-          );
+          const transIndex = state.transactions.findIndex((t) => t.id === transaction.id);
+          const allTransIndex = state.allTransactions.findIndex((t) => t.id === transaction.id);
 
           if (transIndex !== -1) {
             state.transactions[transIndex] = transaction;
@@ -291,7 +274,7 @@ export const budgetHistoryMiddleware = (config) => (set, get, api) => {
         {
           historyMessage: `Updated transaction: ${transaction.description}`,
           author: "user",
-        },
+        }
       ),
 
     updateUnassignedCashWithHistory: (amount, reason = "Cash updated") =>
@@ -303,7 +286,7 @@ export const budgetHistoryMiddleware = (config) => (set, get, api) => {
         {
           historyMessage: reason,
           author: "user",
-        },
+        }
       ),
 
     // Import operations (bulk updates)
@@ -312,25 +295,21 @@ export const budgetHistoryMiddleware = (config) => (set, get, api) => {
         (state) => {
           if (data.envelopes) state.envelopes = data.envelopes;
           if (data.transactions) state.transactions = data.transactions;
-          if (data.allTransactions)
-            state.allTransactions = data.allTransactions;
+          if (data.allTransactions) state.allTransactions = data.allTransactions;
           if (data.bills) state.bills = data.bills;
           if (data.savingsGoals) state.savingsGoals = data.savingsGoals;
-          if (data.supplementalAccounts)
-            state.supplementalAccounts = data.supplementalAccounts;
+          if (data.supplementalAccounts) state.supplementalAccounts = data.supplementalAccounts;
           if (data.debts) state.debts = data.debts;
-          if (typeof data.unassignedCash === "number")
-            state.unassignedCash = data.unassignedCash;
+          if (typeof data.unassignedCash === "number") state.unassignedCash = data.unassignedCash;
           if (typeof data.biweeklyAllocation === "number")
             state.biweeklyAllocation = data.biweeklyAllocation;
-          if (typeof data.actualBalance === "number")
-            state.actualBalance = data.actualBalance;
+          if (typeof data.actualBalance === "number") state.actualBalance = data.actualBalance;
         },
         false,
         {
           historyMessage: `Data imported from ${source}`,
           author: "system",
-        },
+        }
       ),
   };
 };

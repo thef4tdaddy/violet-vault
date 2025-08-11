@@ -506,13 +506,15 @@ const EditEnvelopeModal = ({
                       className="w-full px-4 py-3 border border-purple-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
                     >
                       <option value="">Choose a bill to auto-populate settings...</option>
-                      {allBills.map((bill) => (
-                        <option key={bill.id} value={bill.id}>
-                          {bill.name || bill.provider} - ${parseFloat(bill.amount || 0).toFixed(2)}{" "}
-                          ({bill.frequency || "monthly"}
-                          {bill.envelopeId && bill.envelopeId !== envelope?.id ? " - linked" : ""})
-                        </option>
-                      ))}
+                      {allBills
+                        .filter((bill) => !bill.envelopeId || bill.envelopeId === envelope?.id) // Only show unassigned bills or bills assigned to this envelope
+                        .map((bill) => (
+                          <option key={bill.id} value={bill.id}>
+                            {bill.name || bill.provider} - $
+                            {parseFloat(bill.amount || 0).toFixed(2)} ({bill.frequency || "monthly"}
+                            )
+                          </option>
+                        ))}
                     </select>
                     {selectedBillId && (
                       <p className="text-xs text-purple-600 mt-2 flex items-center">

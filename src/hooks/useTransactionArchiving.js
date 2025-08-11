@@ -1,9 +1,6 @@
 import { useState, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { 
-  getArchivingRecommendations,
-  createArchiver 
-} from "../utils/transactionArchiving";
+import { getArchivingRecommendations, createArchiver } from "../utils/transactionArchiving";
 import { queryKeys } from "../utils/queryClient";
 import logger from "../utils/logger";
 
@@ -17,75 +14,77 @@ const useTransactionArchiving = () => {
   const [lastArchiveResult, setLastArchiveResult] = useState(null);
 
   // Get archiving information and recommendations
-  const { 
-    data: archivingInfo, 
-    isLoading: infoLoading, 
+  const {
+    data: archivingInfo,
+    isLoading: infoLoading,
     refetch: refreshInfo,
-    error: infoError 
+    error: infoError,
   } = useQuery({
     queryKey: queryKeys.analytics.balance(),
     queryFn: getArchivingRecommendations,
     staleTime: 30 * 60 * 1000, // 30 minutes
     gcTime: 60 * 60 * 1000, // 1 hour
-    retry: 2
+    retry: 2,
   });
 
   /**
    * Execute transaction archiving process
    */
-  const executeArchiving = useCallback(async (olderThanMonths = 6) => {
-    if (isArchiving) {
-      logger.warn('Archiving process already in progress');
-      return;
-    }
+  const executeArchiving = useCallback(
+    async (olderThanMonths = 6) => {
+      if (isArchiving) {
+        logger.warn("Archiving process already in progress");
+        return;
+      }
 
-    try {
-      setIsArchiving(true);
-      setArchivingProgress({ stage: 'starting', progress: 0 });
-      
-      logger.info('Starting transaction archiving', { olderThanMonths });
+      try {
+        setIsArchiving(true);
+        setArchivingProgress({ stage: "starting", progress: 0 });
 
-      // Create progress tracking
-      const archiver = createArchiver();
-      
-      setArchivingProgress({ stage: 'analyzing', progress: 10 });
-      
-      // Execute archiving with progress updates
-      const result = await archiver.archiveOldTransactions(olderThanMonths);
-      
-      setArchivingProgress({ stage: 'complete', progress: 100 });
-      setLastArchiveResult(result);
-      
-      // Refresh archiving info after completion
-      await refreshInfo();
-      
-      logger.info('Transaction archiving completed', result);
-      
-      return result;
-      
-    } catch (error) {
-      logger.error('Transaction archiving failed', error);
-      setLastArchiveResult({
-        success: false,
-        error: error.message,
-        stats: { processed: 0, archived: 0, errors: 1 }
-      });
-      throw error;
-    } finally {
-      setIsArchiving(false);
-      setArchivingProgress(null);
-    }
-  }, [isArchiving, refreshInfo]);
+        logger.info("Starting transaction archiving", { olderThanMonths });
+
+        // Create progress tracking
+        const archiver = createArchiver();
+
+        setArchivingProgress({ stage: "analyzing", progress: 10 });
+
+        // Execute archiving with progress updates
+        const result = await archiver.archiveOldTransactions(olderThanMonths);
+
+        setArchivingProgress({ stage: "complete", progress: 100 });
+        setLastArchiveResult(result);
+
+        // Refresh archiving info after completion
+        await refreshInfo();
+
+        logger.info("Transaction archiving completed", result);
+
+        return result;
+      } catch (error) {
+        logger.error("Transaction archiving failed", error);
+        setLastArchiveResult({
+          success: false,
+          error: error.message,
+          stats: { processed: 0, archived: 0, errors: 1 },
+        });
+        throw error;
+      } finally {
+        setIsArchiving(false);
+        setArchivingProgress(null);
+      }
+    },
+    [isArchiving, refreshInfo]
+  );
 
   /**
    * Get archived analytics data
    */
-  const getArchivedAnalytics = useCallback(async (period = 'yearly', category = null) => {
+  const getArchivedAnalytics = useCallback(async (period = "yearly", category = null) => {
     try {
       const archiver = createArchiver();
       return await archiver.getArchivedAnalytics(period, category);
     } catch (error) {
-      logger.error('Failed to retrieve archived analytics', error);
+      logger.error("Failed to retrieve archived analytics", error);
       throw error;
     }
   }, []);
@@ -93,21 +92,24 @@ const useTransactionArchiving = () => {
   /**
    * Restore archived transactions (emergency function)
    */
-  const restoreArchive = useCallback(async (archiveId) => {
-    try {
-      logger.warn('Restoring archived transactions', { archiveId });
-      const archiver = createArchiver();
-      const restored = await archiver.restoreArchivedTransactions(archiveId);
-      
-      // Refresh data after restore
-      await refreshInfo();
-      
-      return restored;
-    } catch (error) {
-      logger.error('Failed to restore archived transactions', error);
-      throw error;
-    }
-  }, [refreshInfo]);
+  const restoreArchive = useCallback(
+    async (archiveId) => {
+      try {
+        logger.warn("Restoring archived transactions", { archiveId });
+        const archiver = createArchiver();
+        const restored = await archiver.restoreArchivedTransactions(archiveId);
+
+        // Refresh data after restore
+        await refreshInfo();
+
+        return restored;
+      } catch (error) {
+        logger.error("Failed to restore archived transactions", error);
+        throw error;
+      }
+    },
+    [refreshInfo]
+  );
 
   /**
    * Calculate potential storage savings
@@ -117,13 +119,13 @@ const useTransactionArchiving = () => {
     const originalSize = transactionCount * 0.5; // KB
     const archivedSize = originalSize * 0.3; // KB
     const savings = originalSize - archivedSize; // KB
-    
+
     return {
       originalSizeKB: Math.round(originalSize),
       archivedSizeKB: Math.round(archivedSize),
       savingsKB: Math.round(savings),
       savingsPercent: Math.round((savings / originalSize) * 100),
-      savingsMB: Math.round(savings / 1024 * 100) / 100
+      savingsMB: Math.round((savings / 1024) * 100) / 100,
     };
   }, []);
 
@@ -135,14 +137,18 @@ const useTransactionArchiving = () => {
 
     const { current, recommendations } = archivingInfo;
     const savings = calculateSavings(current.veryOldTransactions);
-    
+
     return {
       ...recommendations,
       currentStats: current,
       potentialSavings: savings,
       isRecommended: current.veryOldTransactions > 50,
-      urgency: current.veryOldTransactions > 1000 ? 'high' : 
-               current.veryOldTransactions > 200 ? 'medium' : 'low'
+      urgency:
+        current.veryOldTransactions > 1000
+          ? "high"
+          : current.veryOldTransactions > 200
+            ? "medium"
+            : "low",
     };
   }, [archivingInfo, calculateSavings]);
 
@@ -159,22 +165,22 @@ const useTransactionArchiving = () => {
     archivingInfo,
     archivingStatus: getArchivingStatus(),
     lastResult: lastArchiveResult,
-    
+
     // State
     isArchiving,
     archivingProgress,
     isLoading: infoLoading,
     error: infoError,
-    
+
     // Actions
     executeArchiving,
     getArchivedAnalytics,
     restoreArchive,
     refreshInfo,
-    
+
     // Utilities
     needsArchiving: needsArchiving(),
-    calculateSavings
+    calculateSavings,
   };
 };
 

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import logger from "../utils/logger";
 
 /**
@@ -7,7 +7,7 @@ import logger from "../utils/logger";
  * This is a stub to prevent breaking existing components during migration
  */
 export const useLocalOnlyMode = () => {
-  const [loading, setLoading] = useState(false);
+  const [_loading, _setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   // Stub values - local-only mode is now handled by cloudSyncEnabled toggle
@@ -25,16 +25,12 @@ export const useLocalOnlyMode = () => {
   }, []);
 
   const enterLocalOnlyMode = useCallback(async () => {
-    logger.warn(
-      "enterLocalOnlyMode called - use cloudSyncEnabled toggle instead",
-    );
+    logger.warn("enterLocalOnlyMode called - use cloudSyncEnabled toggle instead");
     return { success: false, error: "Local-only mode deprecated" };
   }, []);
 
   const exitLocalOnlyModeAndClear = useCallback(async () => {
-    logger.warn(
-      "exitLocalOnlyModeAndClear called - use cloudSyncEnabled toggle instead",
-    );
+    logger.warn("exitLocalOnlyModeAndClear called - use cloudSyncEnabled toggle instead");
     return { success: false, error: "Local-only mode deprecated" };
   }, []);
 
@@ -71,7 +67,7 @@ export const useLocalOnlyMode = () => {
     isLocalOnlyMode,
     localOnlyUser,
     isInitialized,
-    loading,
+    loading: _loading,
     error,
 
     // Actions

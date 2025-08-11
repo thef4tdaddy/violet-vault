@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { create } from "zustand";
 import { encryptionUtils } from "../utils/encryption";
 import logger from "../utils/logger";
 import { identifyUser } from "../utils/highlight";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = create((set) => ({
   isUnlocked: false,
   encryptionKey: null,
@@ -19,10 +20,7 @@ export const useAuth = create((set) => ({
     });
 
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(
-        () => reject(new Error("Login timeout after 10 seconds")),
-        10000,
-      ),
+      setTimeout(() => reject(new Error("Login timeout after 10 seconds")), 10000)
     );
 
     const loginPromise = (async () => {
@@ -45,8 +43,7 @@ export const useAuth = create((set) => ({
 
           const finalUserData = {
             ...userData,
-            budgetId:
-              userData.budgetId || encryptionUtils.generateBudgetId(password),
+            budgetId: userData.budgetId || encryptionUtils.generateBudgetId(password),
           };
 
           logger.auth("Setting auth state for new user.", {
@@ -81,9 +78,7 @@ export const useAuth = create((set) => ({
           logger.auth("Existing user login path.");
           const savedData = localStorage.getItem("envelopeBudgetData");
           if (!savedData) {
-            logger.warn(
-              "No saved data found in localStorage for existing user.",
-            );
+            logger.warn("No saved data found in localStorage for existing user.");
             return {
               success: false,
               error: "No saved data found. Try creating a new budget.",
@@ -99,21 +94,13 @@ export const useAuth = create((set) => ({
             });
             return {
               success: false,
-              error:
-                "Local data is corrupted. Please clear data and start fresh.",
+              error: "Local data is corrupted. Please clear data and start fresh.",
             };
           }
           const saltArray = new Uint8Array(savedSalt);
-          const key = await encryptionUtils.deriveKeyFromSalt(
-            password,
-            saltArray,
-          );
+          const key = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
 
-          const decryptedData = await encryptionUtils.decrypt(
-            encryptedData,
-            key,
-            iv,
-          );
+          const decryptedData = await encryptionUtils.decrypt(encryptedData, key, iv);
           logger.auth("Successfully decrypted local data.");
 
           let migratedData = decryptedData;
@@ -138,7 +125,7 @@ export const useAuth = create((set) => ({
                 encryptedData: encrypted.data,
                 salt: Array.from(saltArray),
                 iv: encrypted.iv,
-              }),
+              })
             );
             logger.auth("Data migration complete and saved.", { newBudgetId });
           }
@@ -169,10 +156,7 @@ export const useAuth = create((set) => ({
         }
       } catch (error) {
         logger.error("Login failed.", error);
-        if (
-          error.name === "OperationError" ||
-          error.message.toLowerCase().includes("decrypt")
-        ) {
+        if (error.name === "OperationError" || error.message.toLowerCase().includes("decrypt")) {
           return { success: false, error: "Invalid password." };
         }
         return { success: false, error: "Invalid password or corrupted data." };
@@ -202,10 +186,7 @@ export const useAuth = create((set) => ({
     logger.auth("Updating user.", updatedUser);
     set((state) => ({
       currentUser: updatedUser,
-      budgetId:
-        updatedUser.budgetId !== state.budgetId
-          ? updatedUser.budgetId
-          : state.budgetId,
+      budgetId: updatedUser.budgetId !== state.budgetId ? updatedUser.budgetId : state.budgetId,
     }));
   },
 
@@ -218,19 +199,11 @@ export const useAuth = create((set) => ({
 
       const { salt: savedSalt, encryptedData, iv } = JSON.parse(savedData);
       const saltArray = new Uint8Array(savedSalt);
-      const oldKey = await encryptionUtils.deriveKeyFromSalt(
-        oldPassword,
-        saltArray,
-      );
+      const oldKey = await encryptionUtils.deriveKeyFromSalt(oldPassword, saltArray);
 
-      const decryptedData = await encryptionUtils.decrypt(
-        encryptedData,
-        oldKey,
-        iv,
-      );
+      const decryptedData = await encryptionUtils.decrypt(encryptedData, oldKey, iv);
 
-      const { key: newKey, salt: newSalt } =
-        await encryptionUtils.generateKey(newPassword);
+      const { key: newKey, salt: newSalt } = await encryptionUtils.generateKey(newPassword);
       const encrypted = await encryptionUtils.encrypt(decryptedData, newKey);
 
       localStorage.setItem(
@@ -239,17 +212,14 @@ export const useAuth = create((set) => ({
           encryptedData: encrypted.data,
           salt: Array.from(newSalt),
           iv: encrypted.iv,
-        }),
+        })
       );
 
       set({ salt: newSalt, encryptionKey: newKey });
       return { success: true };
     } catch (error) {
       logger.error("Password change failed.", error);
-      if (
-        error.name === "OperationError" ||
-        error.message.toLowerCase().includes("decrypt")
-      ) {
+      if (error.name === "OperationError" || error.message.toLowerCase().includes("decrypt")) {
         return { success: false, error: "Invalid current password." };
       }
       return { success: false, error: error.message };
@@ -291,11 +261,7 @@ export const useAuth = create((set) => ({
       const savedData = localStorage.getItem("envelopeBudgetData");
       if (savedData) {
         const { encryptedData, iv } = JSON.parse(savedData);
-        const decryptedData = await encryptionUtils.decrypt(
-          encryptedData,
-          encryptionKey,
-          iv,
-        );
+        const decryptedData = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
 
         // Update the currentUser in the encrypted data
         const updatedData = {
@@ -303,17 +269,14 @@ export const useAuth = create((set) => ({
           currentUser: updatedProfile,
         };
 
-        const encrypted = await encryptionUtils.encrypt(
-          updatedData,
-          encryptionKey,
-        );
+        const encrypted = await encryptionUtils.encrypt(updatedData, encryptionKey);
         localStorage.setItem(
           "envelopeBudgetData",
           JSON.stringify({
             encryptedData: encrypted.data,
             salt: Array.from(currentSalt),
             iv: encrypted.iv,
-          }),
+          })
         );
       }
 
@@ -348,13 +311,7 @@ export const AuthProvider = ({ children }) => {
         resetTimeout();
       };
 
-      const events = [
-        "mousedown",
-        "mousemove",
-        "keypress",
-        "scroll",
-        "touchstart",
-      ];
+      const events = ["mousedown", "mousemove", "keypress", "scroll", "touchstart"];
       events.forEach((event) => {
         document.addEventListener(event, handleActivity, true);
       });
