@@ -1,6 +1,6 @@
 {
   "project": "violet-vault",
-  "lastUpdated": "2025-08-10",
+  "lastUpdated": "2025-08-11",
   "currentStatus": {
     "totalWarnings": 26,
     "targetWarnings": 17,
@@ -180,7 +180,7 @@
           "warnings": 1,
           "details": [
             {
-              "line": 56,
+              "line": 63,
               "message": "React Hook useEffect has a missing dependency: 'budget'. Either include it or remove the dependency array"
             }
           ]
