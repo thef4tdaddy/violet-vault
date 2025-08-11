@@ -326,12 +326,7 @@ const MainContent = ({
         <NavigationTabs activeView={activeView} onViewChange={setActiveView} />
 
         {/* Summary Cards - Enhanced with clickable unassigned cash distribution */}
-        <SummaryCards
-          totalCash={totalCash}
-          unassignedCash={unassignedCash}
-          totalSavingsBalance={totalSavingsBalance}
-          biweeklyAllocation={totalBiweeklyNeed}
-        />
+        <SummaryCards />
 
         {/* Main Content */}
         <ViewRendererComponent
