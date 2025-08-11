@@ -9,17 +9,14 @@ import logger from "../utils/logger";
 const useDataInitialization = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [initError, setInitError] = useState(null);
-  const { 
-    cloudSyncEnabled,
-    startBackgroundSync
-  } = useBudgetStore();
+  const { cloudSyncEnabled, startBackgroundSync } = useBudgetStore();
 
   useEffect(() => {
     const initializeServices = async () => {
       try {
         logger.debug("Initializing background services", {
           cloudSyncEnabled,
-          isInitialized
+          isInitialized,
         });
 
         setInitError(null);

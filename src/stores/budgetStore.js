@@ -487,32 +487,38 @@ const storeInitializer = (set, get) => ({
   // Start background sync service (when cloud sync is enabled)
   startBackgroundSync: async () => {
     const state = get();
-    
+
     if (!state.cloudSyncEnabled) {
       console.log("💾 Cloud sync disabled - background sync not started");
       return;
     }
 
     console.log("🔄 Starting background sync service...");
-    
+
     try {
       // Get auth context from auth store
       const { useAuth } = await import("./authStore");
       const authState = useAuth.getState();
-      
-      if (!authState.encryptionKey || !authState.currentUser || !authState.budgetId) {
+
+      if (
+        !authState.encryptionKey ||
+        !authState.currentUser ||
+        !authState.budgetId
+      ) {
         console.warn("⚠️ Missing auth context for background sync");
         return;
       }
 
       // Import and start the background sync service
-      const { default: CloudSyncService } = await import("../services/cloudSyncService");
+      const { default: CloudSyncService } = await import(
+        "../services/cloudSyncService"
+      );
       CloudSyncService.start({
         encryptionKey: authState.encryptionKey,
         currentUser: authState.currentUser,
-        budgetId: authState.budgetId
+        budgetId: authState.budgetId,
       });
-      
+
       console.log("✅ Background sync service started");
     } catch (error) {
       console.error("❌ Failed to start background sync service:", error);
@@ -529,7 +535,7 @@ const storeInitializer = (set, get) => ({
   setCloudSyncEnabled: (enabled) =>
     set((state) => {
       state.cloudSyncEnabled = enabled;
-      console.log(`🌩️ Cloud sync ${enabled ? 'enabled' : 'disabled'}`);
+      console.log(`🌩️ Cloud sync ${enabled ? "enabled" : "disabled"}`);
     }),
 
   // Clear all transactions (for cleanup)

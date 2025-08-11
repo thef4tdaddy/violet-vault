@@ -166,10 +166,10 @@ const ViewRenderer = ({
             isPaid: updatedBill.isPaid,
             paidDate: updatedBill.paidDate,
           });
-          
+
           // Update the bill in the bills collection
           updateBill(updatedBill);
-          
+
           // BillManager's handlePayBill already creates the payment transaction
           // and updates envelope balances via reconcileTransaction
           logger.debug("Bill payment completed successfully", {
