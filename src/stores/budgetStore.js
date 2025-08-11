@@ -746,6 +746,46 @@ const storeInitializer = (set, get) => ({
       );
     }),
 
+  // Load imported data into store
+  loadData: (importedData) =>
+    set((state) => {
+      console.log("📥 Loading imported data into store", {
+        envelopes: importedData.envelopes?.length || 0,
+        bills: importedData.bills?.length || 0,
+        transactions: importedData.transactions?.length || 0,
+        allTransactions: importedData.allTransactions?.length || 0,
+        savingsGoals: importedData.savingsGoals?.length || 0,
+      });
+
+      // Load all data arrays
+      if (importedData.envelopes) state.envelopes = importedData.envelopes;
+      if (importedData.bills) state.bills = importedData.bills;
+      if (importedData.transactions)
+        state.transactions = importedData.transactions;
+      if (importedData.allTransactions)
+        state.allTransactions = importedData.allTransactions;
+      if (importedData.savingsGoals)
+        state.savingsGoals = importedData.savingsGoals;
+      if (importedData.debts) state.debts = importedData.debts;
+      if (importedData.paycheckHistory)
+        state.paycheckHistory = importedData.paycheckHistory;
+      if (importedData.supplementalAccounts)
+        state.supplementalAccounts = importedData.supplementalAccounts;
+
+      // Load financial state
+      if (typeof importedData.unassignedCash === "number")
+        state.unassignedCash = importedData.unassignedCash;
+      if (typeof importedData.biweeklyAllocation === "number")
+        state.biweeklyAllocation = importedData.biweeklyAllocation;
+      if (typeof importedData.actualBalance === "number")
+        state.actualBalance = importedData.actualBalance;
+      if (typeof importedData.isActualBalanceManual === "boolean")
+        state.isActualBalanceManual = importedData.isActualBalanceManual;
+
+      state.dataLoaded = true;
+      console.log("✅ Data loaded into store successfully");
+    }),
+
   // Reset functionality
   resetStore: () =>
     set((state) => {

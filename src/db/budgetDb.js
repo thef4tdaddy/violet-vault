@@ -45,26 +45,78 @@ export class VioletVaultDB extends Dexie {
     const addTimestampHooks = (table) => {
       // eslint-disable-next-line no-unused-vars
       table.hook("creating", (primKey, obj, trans) => {
-        // Handle frozen/sealed objects from Firebase by creating extensible copy
+        // Handle frozen/sealed/readonly objects from Firebase by creating extensible copy
         try {
           obj.lastModified = Date.now();
           if (!obj.createdAt) obj.createdAt = Date.now();
         } catch (error) {
           if (
             error.message.includes("not extensible") ||
-            error.message.includes("Cannot add property")
+            error.message.includes("Cannot add property") ||
+            error.message.includes("read only property") ||
+            error.message.includes("Cannot assign to read only")
           ) {
-            // Create a new extensible object with timestamp properties
-            const extensibleObj = {
-              ...obj,
-              lastModified: Date.now(),
-              createdAt: obj.createdAt || Date.now(),
-            };
-            // Replace the object reference for Dexie
-            Object.assign(obj, extensibleObj);
-            // If that fails, modify the transaction to use the new object
-            if (typeof trans.source === "object" && trans.source !== null) {
-              trans.source = extensibleObj;
+            console.log("🔧 Handling readonly/frozen object from Firebase", {
+              errorType: error.message,
+              objectId: obj.id,
+              objectKeys: Object.keys(obj),
+            });
+
+            // Create a completely new extensible object
+            const extensibleObj = {};
+
+            // Copy all properties from the readonly object
+            Object.keys(obj).forEach((key) => {
+              try {
+                extensibleObj[key] = obj[key];
+              } catch (copyError) {
+                console.warn(
+                  `Failed to copy property ${key}:`,
+                  copyError.message,
+                );
+              }
+            });
+
+            // Add timestamp properties
+            extensibleObj.lastModified = Date.now();
+            extensibleObj.createdAt = extensibleObj.createdAt || Date.now();
+
+            // Try to replace the object properties
+            try {
+              Object.assign(obj, extensibleObj);
+            } catch (assignError) {
+              // If Object.assign fails, clear the object and reassign
+              try {
+                // Clear existing properties (if possible)
+                Object.keys(obj).forEach((key) => {
+                  try {
+                    delete obj[key];
+                  } catch (deleteError) {
+                    // Property can't be deleted, skip it
+                  }
+                });
+
+                // Add all properties from extensible object
+                Object.keys(extensibleObj).forEach((key) => {
+                  try {
+                    obj[key] = extensibleObj[key];
+                  } catch (setError) {
+                    console.warn(
+                      `Failed to set property ${key}:`,
+                      setError.message,
+                    );
+                  }
+                });
+              } catch (finalError) {
+                console.warn(
+                  "Complete object replacement failed:",
+                  finalError.message,
+                );
+                // As a last resort, try to modify the transaction
+                if (typeof trans.source === "object" && trans.source !== null) {
+                  trans.source = extensibleObj;
+                }
+              }
             }
           } else {
             throw error; // Re-throw unexpected errors
