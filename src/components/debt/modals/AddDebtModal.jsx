@@ -1,16 +1,19 @@
 import React, { useState } from "react";
-import { X, CreditCard } from "lucide-react";
+import { X, CreditCard, Wallet, Receipt } from "lucide-react";
 import {
   DEBT_TYPES,
   DEBT_TYPE_CONFIG,
   PAYMENT_FREQUENCIES,
 } from "../../../constants/debts";
+import { useBudgetStore } from "../../../stores/budgetStore";
 
 /**
  * Modal for adding new debts
  * Pure UI component with form validation
  */
 const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
+  // Get envelopes for dropdown selection
+  const { envelopes = [] } = useBudgetStore();
   const [formData, setFormData] = useState({
     name: "",
     creditor: "",
@@ -22,6 +25,9 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
     paymentFrequency: PAYMENT_FREQUENCIES.MONTHLY,
     paymentDueDate: "",
     notes: "",
+    // Connection fields
+    createBill: true, // Automatically create a bill for payments
+    envelopeId: "", // Envelope to fund payments from
   });
 
   const [errors, setErrors] = useState({});
@@ -114,6 +120,8 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
       paymentFrequency: PAYMENT_FREQUENCIES.MONTHLY,
       paymentDueDate: "",
       notes: "",
+      createBill: true,
+      envelopeId: "",
     });
     setErrors({});
     setIsSubmitting(false);
@@ -348,6 +356,66 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
               />
             </div>
+          </div>
+
+          {/* Envelope & Bill Integration */}
+          <div className="space-y-4">
+            <h4 className="font-medium text-gray-900 flex items-center">
+              <Wallet className="h-4 w-4 mr-2 text-purple-600" />
+              Payment Integration
+            </h4>
+
+            {/* Create Bill Toggle */}
+            <div className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                id="createBill"
+                checked={formData.createBill}
+                onChange={(e) =>
+                  setFormData({ ...formData, createBill: e.target.checked })
+                }
+                className="h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+              />
+              <label
+                htmlFor="createBill"
+                className="text-sm font-medium text-gray-700 flex items-center"
+              >
+                <Receipt className="h-4 w-4 mr-2 text-blue-600" />
+                Create recurring bill for payments
+              </label>
+            </div>
+            <p className="text-xs text-gray-500 ml-7">
+              Automatically create a bill entry to track when payments are due
+            </p>
+
+            {/* Envelope Selection */}
+            {formData.createBill && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Payment Envelope (Optional)
+                </label>
+                <select
+                  value={formData.envelopeId}
+                  onChange={(e) =>
+                    setFormData({ ...formData, envelopeId: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                >
+                  <option value="">Select envelope for payments...</option>
+                  {envelopes
+                    .filter((env) => !env.archived)
+                    .map((envelope) => (
+                      <option key={envelope.id} value={envelope.id}>
+                        📁 {envelope.name} ($
+                        {envelope.currentBalance?.toFixed(2) || "0.00"})
+                      </option>
+                    ))}
+                </select>
+                <p className="mt-1 text-xs text-gray-500">
+                  Choose which envelope will fund the debt payments
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Notes */}
