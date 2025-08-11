@@ -1,28 +1,140 @@
 import { useEffect, useState } from "react";
 import { useBudgetStore } from "../stores/budgetStore";
+import { budgetDb } from "../db/budgetDb";
 import logger from "../utils/logger";
 
 /**
- * Hook to initialize background cloud sync service
- * This ensures the proper data flow: Firestore ↔ Dexie ↔ TanStack Query ↔ UI
+ * Hook to initialize data and background cloud sync service
+ * This ensures the proper data flow: Dexie → Zustand → TanStack Query → UI
+ * And cloud sync flow: Firestore ↔ Dexie ↔ Zustand ↔ UI
  */
 const useDataInitialization = () => {
   const [isInitialized, setIsInitialized] = useState(false);
+  const [dataLoaded, setDataLoaded] = useState(false);
   const [initError, setInitError] = useState(null);
-  const { cloudSyncEnabled, startBackgroundSync } = useBudgetStore();
+  const {
+    cloudSyncEnabled,
+    startBackgroundSync,
+    setEnvelopes,
+    setBills,
+    setTransactions,
+    setAllTransactions,
+    setSavingsGoals,
+    setDebts,
+    setPaycheckHistory,
+    envelopes,
+    bills,
+    transactions,
+    allTransactions,
+  } = useBudgetStore();
 
   useEffect(() => {
+    const loadDataFromDexie = async () => {
+      try {
+        logger.debug("🔄 Loading data from Dexie into Zustand store");
+
+        // Load all data from Dexie into Zustand arrays
+        const [
+          dexieEnvelopes,
+          dexieBills,
+          dexieTransactions,
+          dexieSavingsGoals,
+          dexieDebts,
+          dexiePaychecks,
+        ] = await Promise.all([
+          budgetDb.envelopes.toArray(),
+          budgetDb.bills.toArray(),
+          budgetDb.transactions.toArray(),
+          budgetDb.savingsGoals.toArray(),
+          budgetDb.debts.toArray(),
+          budgetDb.paychecks.toArray(),
+        ]);
+
+        logger.debug("📊 Dexie data loaded", {
+          envelopes: dexieEnvelopes.length,
+          bills: dexieBills.length,
+          transactions: dexieTransactions.length,
+          savingsGoals: dexieSavingsGoals.length,
+          debts: dexieDebts.length,
+          paychecks: dexiePaychecks.length,
+        });
+
+        // Only update Zustand if arrays are currently empty (avoid overwriting cloud sync data)
+        if (envelopes.length === 0 && dexieEnvelopes.length > 0) {
+          logger.debug(
+            "📦 Loading envelopes into Zustand:",
+            dexieEnvelopes.length,
+          );
+          setEnvelopes(dexieEnvelopes);
+        }
+
+        if (bills.length === 0 && dexieBills.length > 0) {
+          logger.debug("📋 Loading bills into Zustand:", dexieBills.length);
+          setBills(dexieBills);
+        }
+
+        if (
+          transactions.length === 0 &&
+          allTransactions.length === 0 &&
+          dexieTransactions.length > 0
+        ) {
+          logger.debug(
+            "💳 Loading transactions into Zustand:",
+            dexieTransactions.length,
+          );
+          setTransactions(dexieTransactions);
+          setAllTransactions(dexieTransactions);
+        }
+
+        if (dexieSavingsGoals.length > 0) {
+          logger.debug(
+            "💰 Loading savings goals into Zustand:",
+            dexieSavingsGoals.length,
+          );
+          setSavingsGoals(dexieSavingsGoals);
+        }
+
+        if (dexieDebts.length > 0) {
+          logger.debug("💳 Loading debts into Zustand:", dexieDebts.length);
+          setDebts(dexieDebts);
+        }
+
+        if (dexiePaychecks.length > 0) {
+          logger.debug(
+            "💰 Loading paychecks into Zustand:",
+            dexiePaychecks.length,
+          );
+          setPaycheckHistory(dexiePaychecks);
+        }
+
+        setDataLoaded(true);
+        logger.debug("✅ Data loading completed");
+      } catch (error) {
+        logger.error("❌ Failed to load data from Dexie", error);
+        setInitError(error.message);
+      }
+    };
+
     const initializeServices = async () => {
       try {
-        logger.debug("Initializing background services", {
+        logger.debug("Initializing data and background services", {
           cloudSyncEnabled,
           isInitialized,
+          dataLoaded,
         });
 
         setInitError(null);
 
+        // First, load data from Dexie
+        if (!dataLoaded) {
+          await loadDataFromDexie();
+        }
+
+        // Then initialize cloud sync if enabled
         if (cloudSyncEnabled) {
-          logger.debug("🌩️ Starting background cloud sync service (default enabled)");
+          logger.debug(
+            "🌩️ Starting background cloud sync service (default enabled)",
+          );
           startBackgroundSync();
         } else {
           logger.debug("💾 Local-only mode enabled - cloud sync disabled");
@@ -39,11 +151,28 @@ const useDataInitialization = () => {
     if (!isInitialized) {
       initializeServices();
     }
-  }, [cloudSyncEnabled, startBackgroundSync, isInitialized]);
+  }, [
+    cloudSyncEnabled,
+    startBackgroundSync,
+    isInitialized,
+    dataLoaded,
+    setEnvelopes,
+    setBills,
+    setTransactions,
+    setAllTransactions,
+    setSavingsGoals,
+    setDebts,
+    setPaycheckHistory,
+    envelopes.length,
+    bills.length,
+    transactions.length,
+    allTransactions.length,
+  ]);
 
   return {
     isInitialized,
     initError,
+    dataLoaded,
     cloudSyncEnabled,
   };
 };
