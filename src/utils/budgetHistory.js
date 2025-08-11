@@ -551,16 +551,27 @@ class BudgetHistory {
           const commit = await this.getCommit(commitSummary.hash);
 
           // Verify parent hash matches expected previous hash
-          if (commit.parentHash !== previousHash) {
-            validChain = false;
-            brokenAt = i;
-            logger.warn("Hash chain broken", {
-              commitIndex: i,
+          // For the first commit (i === 0), we're more lenient as it might be a legacy commit
+          if (i === 0) {
+            // First commit - accept any parent hash (including empty, null, or legacy values)
+            // This handles cases where the initial commit was created before strict validation
+            logger.debug("First commit parent hash", {
               commitHash: commit.hash,
-              expectedParent: previousHash,
-              actualParent: commit.parentHash,
+              parentHash: commit.parentHash,
             });
-            break;
+          } else {
+            // Non-first commits must have correct parent chain
+            if (commit.parentHash !== previousHash) {
+              validChain = false;
+              brokenAt = i;
+              logger.warn("Hash chain broken", {
+                commitIndex: i,
+                commitHash: commit.hash,
+                expectedParent: previousHash,
+                actualParent: commit.parentHash,
+              });
+              break;
+            }
           }
 
           // Verify commit hash integrity

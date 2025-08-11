@@ -171,18 +171,18 @@ const BudgetHistoryViewer = ({ onClose }) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-4 z-50 overflow-y-auto">
+      <div className="bg-white rounded-xl w-full max-w-7xl my-8 shadow-2xl">
         <div className="p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-2xl font-semibold text-gray-900 flex items-center">
                 <History className="h-6 w-6 mr-3 text-blue-600" />
-                Budget History
+                Change History
               </h2>
               <p className="text-gray-600 mt-1">
-                Encrypted version control for your budget data
+                View and restore previous versions of your budget
               </p>
             </div>
             <button
@@ -295,7 +295,7 @@ const BudgetHistoryViewer = ({ onClose }) => {
                 <div className="flex items-center">
                   <GitCommit className="h-5 w-5 text-blue-600 mr-2" />
                   <div>
-                    <p className="text-sm text-blue-700">Total Commits</p>
+                    <p className="text-sm text-blue-700">Total Changes</p>
                     <p className="text-lg font-semibold text-blue-900">
                       {statistics.totalCommits}
                     </p>
@@ -379,10 +379,10 @@ const BudgetHistoryViewer = ({ onClose }) => {
                   }
                   className="border border-gray-300 rounded px-3 py-1 text-sm"
                 >
-                  <option value={25}>25 commits</option>
-                  <option value={50}>50 commits</option>
-                  <option value={100}>100 commits</option>
-                  <option value={-1}>All commits</option>
+                  <option value={25}>25 changes</option>
+                  <option value={50}>50 changes</option>
+                  <option value={100}>100 changes</option>
+                  <option value={-1}>All changes</option>
                 </select>
               </div>
             </div>
@@ -412,10 +412,10 @@ const BudgetHistoryViewer = ({ onClose }) => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Commit History List */}
+            {/* Change History List */}
             <div className="space-y-3">
               <h3 className="text-lg font-semibold text-gray-900">
-                Commit History
+                Recent Changes
               </h3>
 
               {loading && (
@@ -504,16 +504,16 @@ const BudgetHistoryViewer = ({ onClose }) => {
               )}
             </div>
 
-            {/* Commit Details */}
+            {/* Change Details */}
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                Commit Details
+                Change Details
               </h3>
 
               {!selectedCommit && (
                 <div className="text-center py-8 text-gray-500">
                   <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                  <p>Select a commit to view details</p>
+                  <p>Select a change to view details</p>
                 </div>
               )}
 
