@@ -27,18 +27,26 @@ const TransactionLedger = ({
     isLoading: transactionsLoading,
   } = useTransactions();
 
+  const { data: envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
+
   // Debug logging for transaction data
   console.log("TransactionLedger Debug:", {
     transactionsCount: transactions.length,
     transactionsLoading,
     transactions: transactions.slice(0, 3), // Show first 3 for debugging
+    envelopesCount: envelopes.length,
+    envelopesLoading,
+    envelopes: envelopes.slice(0, 3), // Show first 3 envelopes for debugging
   });
-
-  const { data: envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
 
   // Keep Zustand for legacy operations not yet migrated
   const budget = useBudgetStore();
-  const { updateTransaction, deleteTransaction, setAllTransactions } = budget;
+  const {
+    updateTransaction,
+    deleteTransaction,
+    setAllTransactions,
+    updateBill,
+  } = budget;
 
   // Handle bulk import by updating both store arrays
   const handleBulkImport = (newTransactions) => {
@@ -149,6 +157,25 @@ const TransactionLedger = ({
 
   const handleSuggestEnvelope = (description) => {
     return suggestEnvelope(description, envelopes);
+  };
+
+  const handlePayBill = (billPayment) => {
+    // Update the bill to mark it as paid
+    const billEnvelope = envelopes.find((env) => env.id === billPayment.billId);
+    if (billEnvelope) {
+      const updatedBill = {
+        ...billEnvelope,
+        lastPaidDate: billPayment.paidDate,
+        lastPaidAmount: billPayment.amount,
+        currentBalance: Math.max(
+          0,
+          (billEnvelope.currentBalance || 0) - billPayment.amount,
+        ),
+        isPaid: true,
+        paidThisPeriod: true,
+      };
+      updateBill(updatedBill);
+    }
   };
 
   const handleSplitTransaction = async (
@@ -291,6 +318,7 @@ const TransactionLedger = ({
         categories={TRANSACTION_CATEGORIES}
         onSubmit={handleSubmitTransaction}
         suggestEnvelope={handleSuggestEnvelope}
+        onPayBill={handlePayBill}
       />
 
       {/* Import Modal */}
