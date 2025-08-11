@@ -48,18 +48,20 @@ const UnifiedEnvelopeManager = ({
 }) => {
   // Enhanced TanStack Query integration with loading states
   const {
-    data: tanStackEnvelopes = [],
+    envelopes: tanStackEnvelopes = [],
     addEnvelope,
     updateEnvelope,
     deleteEnvelope,
     isLoading: envelopesLoading,
   } = useEnvelopes();
 
-  const { data: tanStackTransactions = [], isLoading: transactionsLoading } =
-    useTransactions();
+  const {
+    transactions: tanStackTransactions = [],
+    isLoading: transactionsLoading,
+  } = useTransactions();
 
   const {
-    data: tanStackBills = [],
+    bills: tanStackBills = [],
     updateBill,
     isLoading: billsLoading,
   } = useBills();

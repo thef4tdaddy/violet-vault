@@ -35,17 +35,19 @@ const BillManager = ({
   className = "",
 }) => {
   // Enhanced TanStack Query integration with loading states
-  const { data: tanStackTransactions = [], isLoading: transactionsLoading } =
-    useTransactions();
+  const {
+    transactions: tanStackTransactions = [],
+    isLoading: transactionsLoading,
+  } = useTransactions();
 
   const {
-    data: tanStackEnvelopes = [],
+    envelopes: tanStackEnvelopes = [],
     addEnvelope,
     isLoading: envelopesLoading,
   } = useEnvelopes();
 
   const {
-    data: tanStackBills = [],
+    bills: tanStackBills = [],
     addBill,
     updateBill,
     deleteBill,

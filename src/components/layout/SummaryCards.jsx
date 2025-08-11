@@ -15,8 +15,8 @@ const SummaryCards = () => {
   const { openUnassignedCashModal, unassignedCash } = useBudgetStore();
 
   // Get data from TanStack Query hooks
-  const { data: envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
-  const { data: savingsGoals = [], isLoading: savingsLoading } =
+  const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
+  const { savingsGoals = [], isLoading: savingsLoading } =
     useSavingsGoals();
 
   // Calculate totals from hook data

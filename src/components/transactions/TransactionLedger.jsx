@@ -22,12 +22,12 @@ const TransactionLedger = ({
 }) => {
   // Enhanced TanStack Query integration with caching and optimistic updates
   const {
-    data: transactions = [],
+    transactions = [],
     addTransaction,
     isLoading: transactionsLoading,
   } = useTransactions();
 
-  const { data: envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
+  const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
 
   // Debug logging for transaction data
   console.log("TransactionLedger Debug:", {
