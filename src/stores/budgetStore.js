@@ -3,11 +3,12 @@ import { subscribeWithSelector } from "zustand/middleware";
 import { persist, devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { budgetHistoryMiddleware } from "../utils/budgetHistoryMiddleware.js";
+import { budgetDb } from "../db/budgetDb.js";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
 // Migration function to handle old localStorage format
-const migrateOldData = () => {
+const migrateOldData = async () => {
   try {
     const oldData = localStorage.getItem("budget-store");
     const newData = localStorage.getItem("violet-vault-store");
@@ -62,6 +63,24 @@ const migrateOldData = () => {
           "✅ Data migration completed successfully - replaced existing data",
         );
 
+        // Seed Dexie with migrated data so hooks can access it
+        await budgetDb.bulkUpsertEnvelopes(
+          transformedData.state.envelopes,
+        );
+        await budgetDb.bulkUpsertBills(transformedData.state.bills);
+        await budgetDb.bulkUpsertTransactions(
+          transformedData.state.allTransactions.length > 0
+            ? transformedData.state.allTransactions
+            : transformedData.state.transactions,
+        );
+        await budgetDb.bulkUpsertSavingsGoals(
+          transformedData.state.savingsGoals,
+        );
+        await budgetDb.bulkUpsertDebts(transformedData.state.debts);
+        await budgetDb.bulkUpsertPaychecks(
+          transformedData.state.paycheckHistory,
+        );
+
         // Remove old data after successful migration
         localStorage.removeItem("budget-store");
         console.log("🧹 Cleaned up old budget-store data");
@@ -73,7 +92,7 @@ const migrateOldData = () => {
 };
 
 // Run migration before creating store
-migrateOldData();
+await migrateOldData();
 
 // Base store configuration
 const storeInitializer = (set, get) => ({
