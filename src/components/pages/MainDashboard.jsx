@@ -26,12 +26,11 @@ import DebtSummaryWidget from "../debt/ui/DebtSummaryWidget";
 
 const Dashboard = ({ setActiveView }) => {
   // Enhanced TanStack Query integration with optimistic updates
-  const { data: envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
+  const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
 
-  const { data: savingsGoals = [], isLoading: savingsLoading } =
-    useSavingsGoals();
+  const { savingsGoals = [], isLoading: savingsLoading } = useSavingsGoals();
 
-  const { data: transactions = [], isLoading: transactionsLoading } =
+  const { transactions = [], isLoading: transactionsLoading } =
     useTransactions();
 
   // Keep Zustand for non-migrated operations

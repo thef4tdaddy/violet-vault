@@ -11,14 +11,14 @@ import {
 const useEnvelopeSystem = () => {
   // Enhanced TanStack Query integration
   const {
-    data: envelopes = [],
+    envelopes = [],
     addEnvelope,
     updateEnvelope,
     deleteEnvelope,
     isLoading: envelopesLoading,
   } = useEnvelopes();
 
-  const { data: bills = [], isLoading: billsLoading } = useBills();
+  const { bills = [], isLoading: billsLoading } = useBills();
 
   // Keep Zustand for non-migrated operations
   const {
