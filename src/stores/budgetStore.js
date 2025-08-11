@@ -56,6 +56,21 @@ const migrateOldData = () => {
         localStorage.removeItem("budget-store");
         console.log("🧹 Cleaned up old budget-store data");
       }
+    } else if (newData) {
+      // Ensure existing violet-vault-store data has allTransactions field
+      const parsedNewData = JSON.parse(newData);
+      if (
+        parsedNewData?.state &&
+        parsedNewData.state.transactions &&
+        (!parsedNewData.state.allTransactions ||
+          parsedNewData.state.allTransactions.length === 0)
+      ) {
+        parsedNewData.state.allTransactions = parsedNewData.state.transactions;
+        localStorage.setItem("violet-vault-store", JSON.stringify(parsedNewData));
+        console.log(
+          "✅ Added missing allTransactions to existing violet-vault-store data"
+        );
+      }
     }
   } catch (error) {
     console.warn("⚠️ Failed to migrate old data:", error);
