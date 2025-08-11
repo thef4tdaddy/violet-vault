@@ -746,7 +746,7 @@ const storeInitializer = (set, get) => ({
       );
     }),
 
-  // Load imported data into store
+  // Load imported data into store and persist it
   loadData: (importedData) =>
     set((state) => {
       console.log("📥 Loading imported data into store", {
@@ -784,6 +784,15 @@ const storeInitializer = (set, get) => ({
 
       state.dataLoaded = true;
       console.log("✅ Data loaded into store successfully");
+
+      // Force TanStack Query cache invalidation to show imported data immediately
+      setTimeout(() => {
+        window.dispatchEvent(
+          new CustomEvent("importCompleted", {
+            detail: { source: "loadData", dataLoaded: true },
+          }),
+        );
+      }, 100);
     }),
 
   // Reset functionality
