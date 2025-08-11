@@ -211,8 +211,8 @@ const Header = memo(
                   }`}
                   title={
                     cloudSyncEnabled
-                      ? "Cloud sync enabled - click to disable"
-                      : "Cloud sync disabled - click to enable"
+                      ? "Turn off cloud sync"
+                      : "Turn on cloud sync"
                   }
                 >
                   {cloudSyncEnabled ? (
@@ -221,7 +221,7 @@ const Header = memo(
                     <CloudOff className="h-4 w-4 sm:mr-2" />
                   )}
                   <span className="hidden sm:inline">
-                    {cloudSyncEnabled ? "Cloud Sync" : "Local Only"}
+                    {cloudSyncEnabled ? "Turn Off Sync" : "Turn On Sync"}
                   </span>
                 </button>
               )}
