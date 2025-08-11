@@ -22,6 +22,7 @@ const ViewRenderer = ({
   budget,
   currentUser,
   totalBiweeklyNeed,
+  setActiveView,
 }) => {
   const {
     envelopes,
@@ -109,6 +110,7 @@ const ViewRenderer = ({
         onReconcileTransaction={reconcileTransaction}
         transactions={safeTransactions}
         paycheckHistory={paycheckHistory}
+        setActiveView={setActiveView}
       />
     ),
     envelopes: (

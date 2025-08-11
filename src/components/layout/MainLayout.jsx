@@ -28,6 +28,7 @@ import {
   BookOpen,
   BarChart3,
 } from "lucide-react";
+import NavigationTabs from "./NavigationTabs";
 import { AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
 import SyncStatusIndicators from "../sync/SyncStatusIndicators";
@@ -322,66 +323,7 @@ const MainContent = ({
         */}
 
         {/* Navigation Tabs */}
-        <div className="glassmorphism rounded-t-3xl sm:rounded-3xl mb-6 sm:shadow-xl border border-white/20 fixed bottom-0 left-0 right-0 sm:static z-40">
-          <nav className="flex justify-around overflow-x-auto">
-            <NavButton
-              key="dashboard"
-              active={activeView === "dashboard"}
-              onClick={() => setActiveView("dashboard")}
-              icon={CreditCard}
-              label="Dashboard"
-            />
-            <NavButton
-              key="envelopes"
-              active={activeView === "envelopes"}
-              onClick={() => setActiveView("envelopes")}
-              icon={Wallet}
-              label="Envelopes"
-            />
-            <NavButton
-              key="savings"
-              active={activeView === "savings"}
-              onClick={() => setActiveView("savings")}
-              icon={Target}
-              label="Savings Goals"
-            />
-            <NavButton
-              key="supplemental"
-              active={activeView === "supplemental"}
-              onClick={() => setActiveView("supplemental")}
-              icon={CreditCard}
-              label="Supplemental"
-            />
-            <NavButton
-              key="paycheck"
-              active={activeView === "paycheck"}
-              onClick={() => setActiveView("paycheck")}
-              icon={DollarSign}
-              label="Add Paycheck"
-            />
-            <NavButton
-              key="bills"
-              active={activeView === "bills"}
-              onClick={() => setActiveView("bills")}
-              icon={Calendar}
-              label="Manage Bills"
-            />
-            <NavButton
-              key="transactions"
-              active={activeView === "transactions"}
-              onClick={() => setActiveView("transactions")}
-              icon={BookOpen}
-              label="Transactions"
-            />
-            <NavButton
-              key="analytics"
-              active={activeView === "analytics"}
-              onClick={() => setActiveView("analytics")}
-              icon={BarChart3}
-              label="Analytics"
-            />
-          </nav>
-        </div>
+        <NavigationTabs activeView={activeView} onViewChange={setActiveView} />
 
         {/* Summary Cards - Enhanced with clickable unassigned cash distribution */}
         <SummaryCards
@@ -396,6 +338,7 @@ const MainContent = ({
           activeView={activeView}
           budget={budget}
           currentUser={currentUser}
+          setActiveView={setActiveView}
         />
 
         <SyncStatusIndicators isOnline={isOnline} isSyncing={isSyncing} />
@@ -426,20 +369,6 @@ const MainContent = ({
     </div>
   );
 };
-
-const NavButton = ({ active, onClick, icon: Icon, label }) => (
-  <button
-    onClick={onClick}
-    className={`flex-1 flex flex-col items-center sm:flex-row sm:px-6 px-2 py-3 text-xs sm:text-sm font-semibold border-t-2 sm:border-b-2 transition-all ${
-      active
-        ? "border-purple-500 text-purple-600 bg-purple-50/50"
-        : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30"
-    }`}
-  >
-    <Icon className="h-5 w-5 mb-1 sm:mb-0 sm:mr-3" />
-    <span>{label}</span>
-  </button>
-);
 
 // SummaryCard component removed - now using enhanced SummaryCards component with clickable functionality
 

@@ -24,7 +24,7 @@ import { useSavingsGoals } from "../../hooks/useSavingsGoals";
 import { useTransactions } from "../../hooks/useTransactions";
 import DebtSummaryWidget from "../debt/ui/DebtSummaryWidget";
 
-const Dashboard = () => {
+const Dashboard = ({ setActiveView }) => {
   // Enhanced TanStack Query integration with optimistic updates
   const { data: envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
 
@@ -174,9 +174,13 @@ const Dashboard = () => {
       {/* Debt Summary Widget */}
       <DebtSummaryWidget
         onNavigateToDebts={() => {
-          // This will navigate to debt tracking view
-          // The actual navigation would be handled by parent component
-          console.log("Navigate to debts requested");
+          if (setActiveView) {
+            setActiveView("debts");
+          } else {
+            console.log(
+              "Navigate to debts requested - setActiveView not available",
+            );
+          }
         }}
       />
 
