@@ -129,11 +129,12 @@ class CloudSyncService {
    */
   async fetchFirestoreData(FirebaseSync) {
     try {
-      const data = await FirebaseSync.fetchBudgetData(
-        this.config.budgetId,
-        this.config.encryptionKey,
-      );
-      return data;
+      // Initialize the FirebaseSync instance
+      FirebaseSync.initialize(this.config.budgetId, this.config.encryptionKey);
+
+      // Load data from cloud
+      const data = await FirebaseSync.loadFromCloud();
+      return data?.data || null;
     } catch (error) {
       logger.warn("⚠️ Failed to fetch Firestore data", error.message);
       return null;
@@ -314,11 +315,11 @@ class CloudSyncService {
       lastModified: Date.now(),
     };
 
-    await FirebaseSync.saveBudgetData(
-      this.config.budgetId,
-      dataToSync,
-      this.config.encryptionKey,
-    );
+    // Initialize the FirebaseSync instance
+    FirebaseSync.initialize(this.config.budgetId, this.config.encryptionKey);
+
+    // Save data to cloud
+    await FirebaseSync.saveToCloud(dataToSync, this.config.currentUser);
   }
 
   /**
