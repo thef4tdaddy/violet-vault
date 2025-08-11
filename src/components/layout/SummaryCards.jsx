@@ -1,9 +1,9 @@
-import React from "react";
+import React, { memo, lazy, Suspense } from "react";
 import { DollarSign, Wallet, Target, TrendingUp } from "lucide-react";
 import { useBudgetStore } from "../../stores/budgetStore";
 import { useEnvelopes } from "../../hooks/useEnvelopes";
 import { useSavingsGoals } from "../../hooks/useSavingsGoals";
-import UnassignedCashModal from "../modals/UnassignedCashModal";
+const UnassignedCashModal = lazy(() => import("../modals/UnassignedCashModal"));
 import { AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
 
@@ -126,87 +126,83 @@ const SummaryCards = () => {
           />
         ))}
       </div>
-      <UnassignedCashModal />
+      <Suspense fallback={null}>
+        <UnassignedCashModal />
+      </Suspense>
     </>
   );
 };
 
-const SummaryCard = ({
-  icon: Icon,
-  label,
-  value,
-  color,
-  onClick,
-  clickable,
-  isNegative,
-}) => {
-  const colorClasses = {
-    purple: "bg-purple-500",
-    emerald: "bg-emerald-500",
-    cyan: "bg-cyan-500",
-    amber: "bg-amber-500",
-    red: "bg-red-500",
-  };
+const SummaryCard = memo(
+  ({ icon: Icon, label, value, color, onClick, clickable, isNegative }) => {
+    const colorClasses = {
+      purple: "bg-purple-500",
+      emerald: "bg-emerald-500",
+      cyan: "bg-cyan-500",
+      amber: "bg-amber-500",
+      red: "bg-red-500",
+    };
 
-  const textColorClasses = {
-    purple: "text-gray-900",
-    emerald: "text-emerald-600",
-    cyan: "text-cyan-600",
-    amber: "text-amber-600",
-    red: "text-red-600",
-  };
+    const textColorClasses = {
+      purple: "text-gray-900",
+      emerald: "text-emerald-600",
+      cyan: "text-cyan-600",
+      amber: "text-amber-600",
+      red: "text-red-600",
+    };
 
-  const baseClasses =
-    "glassmorphism rounded-3xl p-6 transition-all duration-200";
-  const clickableClasses = clickable
-    ? "cursor-pointer hover:shadow-lg hover:scale-105 active:scale-95"
-    : "";
+    const baseClasses =
+      "glassmorphism rounded-3xl p-6 transition-all duration-200";
+    const clickableClasses = clickable
+      ? "cursor-pointer hover:shadow-lg hover:scale-105 active:scale-95"
+      : "";
 
-  const cardContent = (
-    <div className="flex items-center">
-      <div className="relative mr-4">
-        <div
-          className={`absolute inset-0 ${colorClasses[color]} rounded-2xl blur-lg opacity-30`}
-        ></div>
-        <div className={`relative ${colorClasses[color]} p-3 rounded-2xl`}>
-          <Icon className="h-6 w-6 text-white" />
+    const cardContent = (
+      <div className="flex items-center">
+        <div className="relative mr-4">
+          <div
+            className={`absolute inset-0 ${colorClasses[color]} rounded-2xl blur-lg opacity-30`}
+          ></div>
+          <div className={`relative ${colorClasses[color]} p-3 rounded-2xl`}>
+            <Icon className="h-6 w-6 text-white" />
+          </div>
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-gray-600 mb-1">
+            {label}
+            {clickable && !isNegative && (
+              <span className="ml-1 text-xs text-gray-400">
+                (click to distribute)
+              </span>
+            )}
+            {isNegative && (
+              <span className="ml-1 text-xs text-red-500">
+                (overspending - click to address)
+              </span>
+            )}
+          </p>
+          <p
+            className={`text-2xl font-bold ${textColorClasses[color]} ${isNegative ? "animate-pulse" : ""}`}
+          >
+            ${value.toFixed(2)}
+            {isNegative && <span className="ml-2 text-sm">⚠️</span>}
+          </p>
         </div>
       </div>
-      <div>
-        <p className="text-sm font-semibold text-gray-600 mb-1">
-          {label}
-          {clickable && !isNegative && (
-            <span className="ml-1 text-xs text-gray-400">
-              (click to distribute)
-            </span>
-          )}
-          {isNegative && (
-            <span className="ml-1 text-xs text-red-500">
-              (overspending - click to address)
-            </span>
-          )}
-        </p>
-        <p
-          className={`text-2xl font-bold ${textColorClasses[color]} ${isNegative ? "animate-pulse" : ""}`}
-        >
-          ${value.toFixed(2)}
-          {isNegative && <span className="ml-2 text-sm">⚠️</span>}
-        </p>
-      </div>
-    </div>
-  );
+    );
 
-  return clickable ? (
-    <button
-      onClick={onClick}
-      className={`${baseClasses} ${clickableClasses} text-left w-full`}
-      disabled={!onClick}
-    >
-      {cardContent}
-    </button>
-  ) : (
-    <div className={baseClasses}>{cardContent}</div>
-  );
-};
+    return clickable ? (
+      <button
+        onClick={onClick}
+        className={`${baseClasses} ${clickableClasses} text-left w-full`}
+        disabled={!onClick}
+      >
+        {cardContent}
+      </button>
+    ) : (
+      <div className={baseClasses}>{cardContent}</div>
+    );
+  },
+);
 
-export default SummaryCards;
+export default memo(SummaryCards);

@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMemo, useCallback } from "react";
 import { useBudgetStore } from "../stores/budgetStore";
 import { queryKeys, optimisticHelpers } from "../utils/queryClient";
 import { budgetDb } from "../db/budgetDb";
@@ -25,8 +26,8 @@ const useEnvelopes = (options = {}) => {
     transferFunds: zustandTransferFunds,
   } = useBudgetStore();
 
-  // Smart query function with filtering
-  const queryFunction = async () => {
+  // Memoized query function with filtering
+  const queryFunction = useCallback(async () => {
     let envelopes = [];
 
     // Primary source: Zustand (active state)
@@ -86,25 +87,31 @@ const useEnvelopes = (options = {}) => {
     });
 
     return filteredEnvelopes;
-  };
+  }, [zustandEnvelopes, category, includeArchived, sortBy, sortOrder]);
+
+  // Memoized query options for performance
+  const queryOptions = useMemo(
+    () => ({
+      queryKey: queryKeys.envelopesList({
+        category,
+        includeArchived,
+        sortBy,
+        sortOrder,
+      }),
+      queryFn: queryFunction,
+      staleTime: 5 * 60 * 1000, // 5 minutes - reduce refetches
+      gcTime: 10 * 60 * 1000, // 10 minutes - keep in cache longer
+      refetchOnMount: false, // Don't refetch if data is fresh
+      refetchOnWindowFocus: false, // Don't refetch on window focus
+      placeholderData: (previousData) => previousData, // Use previous data during refetch
+      initialData: undefined, // Remove initialData to prevent persister errors
+      enabled: true,
+    }),
+    [category, includeArchived, sortBy, sortOrder, queryFunction],
+  );
 
   // Main envelopes query
-  const envelopesQuery = useQuery({
-    queryKey: queryKeys.envelopesList({
-      category,
-      includeArchived,
-      sortBy,
-      sortOrder,
-    }),
-    queryFn: queryFunction,
-    staleTime: 5 * 60 * 1000, // 5 minutes - reduce refetches
-    gcTime: 10 * 60 * 1000, // 10 minutes - keep in cache longer
-    refetchOnMount: false, // Don't refetch if data is fresh
-    refetchOnWindowFocus: false, // Don't refetch on window focus
-    placeholderData: (previousData) => previousData, // Use previous data during refetch
-    initialData: undefined, // Remove initialData to prevent persister errors
-    enabled: true,
-  });
+  const envelopesQuery = useQuery(queryOptions);
 
   // Add envelope mutation
   const addEnvelopeMutation = useMutation({
