@@ -3,7 +3,13 @@ import { Edit3, Trash2, Scissors, History } from "lucide-react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import ObjectHistoryViewer from "../history/ObjectHistoryViewer";
 
-const TransactionTable = ({ transactions = [], envelopes = [], onEdit, onDelete, onSplit }) => {
+const TransactionTable = ({
+  transactions = [],
+  envelopes = [],
+  onEdit,
+  onDelete,
+  onSplit,
+}) => {
   const [historyTransaction, setHistoryTransaction] = useState(null);
 
   const handleDelete = (transactionId) => {
@@ -63,7 +69,9 @@ const TransactionTable = ({ transactions = [], envelopes = [], onEdit, onDelete,
             ) : (
               rowVirtualizer.getVirtualItems().map((virtualRow) => {
                 const transaction = transactions[virtualRow.index];
-                const envelope = envelopes.find((e) => e.id === transaction.envelopeId);
+                const envelope = envelopes.find(
+                  (e) => e.id === transaction.envelopeId,
+                );
                 return (
                   <tr
                     key={transaction.id}
@@ -80,9 +88,13 @@ const TransactionTable = ({ transactions = [], envelopes = [], onEdit, onDelete,
                       {new Date(transaction.date).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
-                      <div className="font-medium">{transaction.description}</div>
+                      <div className="font-medium">
+                        {transaction.description}
+                      </div>
                       {transaction.notes && (
-                        <div className="text-xs text-gray-500">{transaction.notes}</div>
+                        <div className="text-xs text-gray-500">
+                          {transaction.notes}
+                        </div>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -103,7 +115,11 @@ const TransactionTable = ({ transactions = [], envelopes = [], onEdit, onDelete,
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <span
-                        className={transaction.amount >= 0 ? "text-emerald-600" : "text-red-600"}
+                        className={
+                          transaction.amount >= 0
+                            ? "text-emerald-600"
+                            : "text-red-600"
+                        }
                       >
                         {transaction.amount >= 0 ? "+" : ""}$
                         {Math.abs(transaction.amount).toFixed(2)}

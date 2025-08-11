@@ -1,5 +1,10 @@
 import React from "react";
-import { TrendingDown, AlertTriangle, Calendar, ArrowRight } from "lucide-react";
+import {
+  TrendingDown,
+  AlertTriangle,
+  Calendar,
+  ArrowRight,
+} from "lucide-react";
 import { useDebtManagement } from "../../../hooks/useDebtManagement";
 
 /**
@@ -46,7 +51,9 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <p className="text-xs text-gray-500 mb-1">Total Debt</p>
-            <p className="text-lg font-bold text-red-600">${debtStats.totalDebt.toFixed(2)}</p>
+            <p className="text-lg font-bold text-red-600">
+              ${debtStats.totalDebt.toFixed(2)}
+            </p>
           </div>
 
           <div>
