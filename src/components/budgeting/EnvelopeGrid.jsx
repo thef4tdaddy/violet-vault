@@ -603,7 +603,6 @@ const UnifiedEnvelopeManager = ({
               <option value="all">All Types</option>
               <option value={ENVELOPE_TYPES.BILL}>📝 Bills</option>
               <option value={ENVELOPE_TYPES.VARIABLE}>🔄 Variable</option>
-              <option value={ENVELOPE_TYPES.SAVINGS}>💰 Savings</option>
             </select>
 
             <select
