@@ -100,19 +100,7 @@ const ViewRenderer = ({
   }
 
   const views = {
-    dashboard: (
-      <Dashboard
-        envelopes={envelopes}
-        savingsGoals={savingsGoals}
-        unassignedCash={unassignedCash}
-        actualBalance={actualBalance}
-        onUpdateActualBalance={setActualBalance}
-        onReconcileTransaction={reconcileTransaction}
-        transactions={safeTransactions}
-        paycheckHistory={paycheckHistory}
-        setActiveView={setActiveView}
-      />
-    ),
+    dashboard: <Dashboard setActiveView={setActiveView} />,
     envelopes: (
       <div className="space-y-6">
         <SmartEnvelopeSuggestions
