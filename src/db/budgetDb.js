@@ -5,7 +5,7 @@ export class VioletVaultDB extends Dexie {
     super("VioletVault");
 
     // Enhanced schema with comprehensive indexes for optimal query performance
-    this.version(2).stores({
+    this.version(3).stores({
       // Main budget data with timestamps for versioning
       budget: "id, lastModified, version",
 
@@ -35,6 +35,10 @@ export class VioletVaultDB extends Dexie {
 
       // Enhanced cache with TTL and category support
       cache: "key, value, expiresAt, category, [category+expiresAt]",
+
+      // Debts table for debt tracking
+      debts:
+        "id, name, creditor, type, status, currentBalance, minimumPayment, lastModified",
     });
 
     // Enhanced hooks for automatic timestamping across all tables
@@ -55,6 +59,7 @@ export class VioletVaultDB extends Dexie {
     addTimestampHooks(this.bills);
     addTimestampHooks(this.savingsGoals);
     addTimestampHooks(this.paycheckHistory);
+    addTimestampHooks(this.debts);
 
     // Audit log hook
     this.auditLog.hook("creating", (_primKey, obj, _trans) => {
@@ -83,6 +88,14 @@ export class VioletVaultDB extends Dexie {
     return this.transaction("rw", this.bills, async () => {
       for (const bill of bills) {
         await this.bills.put(bill);
+      }
+    });
+  }
+
+  async bulkUpsertDebts(debts) {
+    return this.transaction("rw", this.debts, async () => {
+      for (const debt of debts) {
+        await this.debts.put(debt);
       }
     });
   }
@@ -455,6 +468,7 @@ export const clearData = async () => {
     budgetDb.envelopes.clear(),
     budgetDb.transactions.clear(),
     budgetDb.bills.clear(),
+    budgetDb.debts.clear(),
     budgetDb.savingsGoals.clear(),
     budgetDb.paycheckHistory.clear(),
     budgetDb.auditLog.clear(),

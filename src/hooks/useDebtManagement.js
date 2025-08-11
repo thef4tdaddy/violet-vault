@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useBudgetStore } from "../stores/budgetStore";
+import useDebts from "./useDebts";
 import {
   DEBT_TYPES,
   DEBT_STATUS,
@@ -14,19 +15,15 @@ import {
  * Handles relationships between debts, bills, envelopes, and transactions
  */
 export const useDebtManagement = () => {
-  const budget = useBudgetStore();
+  const { bills = [], envelopes = [], allTransactions = [], addBill, updateBill } =
+    useBudgetStore();
   const {
     debts = [],
-    bills = [],
-    envelopes = [],
-    allTransactions = [],
     addDebt,
     updateDebt,
     deleteDebt,
     recordDebtPayment,
-    addBill,
-    updateBill,
-  } = budget;
+  } = useDebts();
 
   // Calculate comprehensive debt statistics
   const debtStats = useMemo(() => calculateDebtStats(debts), [debts]);
