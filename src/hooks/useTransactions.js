@@ -47,7 +47,10 @@ const useTransactions = (options = {}) => {
     // Primary source: Zustand (active state)
     if (zustandAllTransactions && zustandAllTransactions.length > 0) {
       transactions = [...zustandAllTransactions];
-      console.log("Using Zustand allTransactions (primary):", transactions.length);
+      console.log(
+        "Using Zustand allTransactions (primary):",
+        transactions.length,
+      );
     } else if (zustandTransactions && zustandTransactions.length > 0) {
       transactions = [...zustandTransactions];
       console.log("Using Zustand transactions (primary):", transactions.length);
@@ -65,7 +68,10 @@ const useTransactions = (options = {}) => {
             .reverse()
             .toArray();
         }
-        console.log("Using Dexie transactions (fallback):", transactions.length);
+        console.log(
+          "Using Dexie transactions (fallback):",
+          transactions.length,
+        );
       } catch (error) {
         console.warn("Dexie query failed:", error);
         transactions = [];

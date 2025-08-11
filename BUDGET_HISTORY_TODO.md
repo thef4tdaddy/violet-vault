@@ -47,7 +47,7 @@
    - [ ] Add batch operations (delete old commits, etc.)
 
 7. **Performance Optimizations**
-   - [ ] Implement commit pagination for large histories  
+   - [ ] Implement commit pagination for large histories
    - [ ] Add commit compression for storage efficiency
    - [ ] Optimize diff generation for large objects
    - [ ] Add background commit cleanup

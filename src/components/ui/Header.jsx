@@ -37,7 +37,7 @@ const Header = memo(
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [showHistoryModal, setShowHistoryModal] = useState(false);
     const [showLocalOnlySettings, setShowLocalOnlySettings] = useState(false);
-    
+
     // Cloud sync state
     const { cloudSyncEnabled, setCloudSyncEnabled } = useBudgetStore();
 
@@ -60,21 +60,27 @@ const Header = memo(
     const handleToggleCloudSync = useCallback(async () => {
       const newValue = !cloudSyncEnabled;
       setCloudSyncEnabled(newValue);
-      
+
       if (newValue) {
         console.log("🌩️ Cloud sync enabled - starting background sync");
-        
+
         // Start the background sync service
         try {
-          const { default: CloudSyncService } = await import("../../services/cloudSyncService");
+          const { default: CloudSyncService } = await import(
+            "../../services/cloudSyncService"
+          );
           const { useAuth } = await import("../../stores/authStore");
           const authState = useAuth.getState();
-          
-          if (authState.encryptionKey && authState.currentUser && authState.budgetId) {
+
+          if (
+            authState.encryptionKey &&
+            authState.currentUser &&
+            authState.budgetId
+          ) {
             CloudSyncService.start({
               encryptionKey: authState.encryptionKey,
               currentUser: authState.currentUser,
-              budgetId: authState.budgetId
+              budgetId: authState.budgetId,
             });
           }
         } catch (error) {
@@ -82,10 +88,12 @@ const Header = memo(
         }
       } else {
         console.log("💾 Cloud sync disabled - stopping background sync");
-        
+
         // Stop the background sync service
         try {
-          const { default: CloudSyncService } = await import("../../services/cloudSyncService");
+          const { default: CloudSyncService } = await import(
+            "../../services/cloudSyncService"
+          );
           CloudSyncService.stop();
         } catch (error) {
           console.error("Failed to stop cloud sync:", error);
@@ -201,7 +209,11 @@ const Header = memo(
                       ? "btn-primary text-white bg-green-600 border-green-600 hover:bg-green-700"
                       : "btn-secondary text-gray-600 bg-gray-100 border-gray-300 hover:bg-gray-200"
                   }`}
-                  title={cloudSyncEnabled ? "Cloud sync enabled - click to disable" : "Cloud sync disabled - click to enable"}
+                  title={
+                    cloudSyncEnabled
+                      ? "Cloud sync enabled - click to disable"
+                      : "Cloud sync disabled - click to enable"
+                  }
                 >
                   {cloudSyncEnabled ? (
                     <Cloud className="h-4 w-4 sm:mr-2" />
