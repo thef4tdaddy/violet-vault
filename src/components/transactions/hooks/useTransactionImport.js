@@ -60,21 +60,28 @@ export const useTransactionImport = (currentUser, onBulkImport) => {
       setImportProgress((i / importData.length) * 100);
 
       try {
+        const amount = parseFloat(
+          row[fieldMapping.amount]?.replace(/[$,]/g, "") || "0",
+        );
+        
         const transaction = {
-          id: Date.now() + i,
+          id: `import_${Date.now()}_${i}_${Math.random().toString(36).substr(2, 9)}`,
           date:
             row[fieldMapping.date] || new Date().toISOString().split("T")[0],
           description: row[fieldMapping.description] || "Imported Transaction",
-          amount: parseFloat(
-            row[fieldMapping.amount]?.replace(/[$,]/g, "") || "0",
-          ),
-          category: row[fieldMapping.category] || "Other",
+          amount,
+          category: row[fieldMapping.category] || "Imported",
           notes: row[fieldMapping.notes] || "",
-          envelopeId: "",
+          envelopeId: "", // Empty means unassigned
+          
+          // Add type based on amount
+          type: amount >= 0 ? "income" : "expense",
+          
+          // Import metadata
           reconciled: false,
-          createdBy: currentUser.userName,
+          createdBy: currentUser?.userName || "Unknown",
           createdAt: new Date().toISOString(),
-          importSource: "file",
+          importSource: "file_import",
         };
 
         processedTransactions.push(transaction);
@@ -89,8 +96,16 @@ export const useTransactionImport = (currentUser, onBulkImport) => {
 
     onBulkImport(processedTransactions);
     resetImport();
+    
+    // More informative success message
+    const incomeCount = processedTransactions.filter(t => t.amount >= 0).length;
+    const expenseCount = processedTransactions.filter(t => t.amount < 0).length;
+    
     alert(
-      `Successfully imported ${processedTransactions.length} transactions!`,
+      `Successfully imported ${processedTransactions.length} transactions!\n` +
+      `• ${incomeCount} income transactions\n` +
+      `• ${expenseCount} expense transactions\n\n` +
+      `All transactions have been added to your ledger with "Imported" category.`
     );
   };
 

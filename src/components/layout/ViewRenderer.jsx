@@ -47,6 +47,7 @@ const ViewRenderer = ({
     updateEnvelope,
     processPaycheck,
     addTransaction,
+    addTransactions,
     updateTransaction: _updateTransaction,
     deleteTransaction: _deleteTransaction,
     addBill,
@@ -213,12 +214,61 @@ const ViewRenderer = ({
             "🔄 onBulkImport called with transactions:",
             newTransactions.length,
           );
-          // Add transactions using budget store method - need to loop through individual transactions
-          newTransactions.forEach((transaction) => addTransaction(transaction));
-          console.log(
-            "💾 Bulk import complete. Added transactions:",
-            newTransactions.length,
-          );
+          
+          // Validate and normalize transactions for current data structure
+          const validatedTransactions = newTransactions
+            .filter((transaction) => transaction && typeof transaction === "object")
+            .map((transaction) => ({
+              // Ensure required fields with proper defaults
+              id: transaction.id || `import_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+              date: transaction.date || new Date().toISOString().split("T")[0],
+              description: transaction.description || "Imported Transaction",
+              amount: parseFloat(transaction.amount) || 0,
+              category: transaction.category || "Imported",
+              envelopeId: transaction.envelopeId || "", // Empty means unassigned
+              
+              // Import metadata
+              type: transaction.type || (parseFloat(transaction.amount) >= 0 ? "income" : "expense"),
+              notes: transaction.notes || "",
+              importSource: "file_import",
+              createdBy: currentUser?.userName || "Unknown",
+              createdAt: transaction.createdAt || new Date().toISOString(),
+              
+              // Legacy compatibility
+              reconciled: transaction.reconciled || false,
+              
+              // Additional fields that might be present
+              ...Object.fromEntries(
+                Object.entries(transaction).filter(([key]) => 
+                  !["id", "date", "description", "amount", "category", "envelopeId", "type", "notes"].includes(key)
+                )
+              ),
+            }));
+
+          if (validatedTransactions.length === 0) {
+            console.warn("No valid transactions to import");
+            return;
+          }
+
+          // Use bulk import method for efficiency
+          try {
+            addTransactions(validatedTransactions);
+            console.log(
+              "💾 Bulk import complete. Added transactions:",
+              validatedTransactions.length,
+            );
+          } catch (error) {
+            console.error("Failed to import transactions:", error);
+            // Fallback to individual imports if bulk fails
+            console.warn("Falling back to individual transaction imports");
+            validatedTransactions.forEach((transaction) => {
+              try {
+                addTransaction(transaction);
+              } catch (individualError) {
+                console.error(`Failed to import transaction ${transaction.id}:`, individualError);
+              }
+            });
+          }
         }}
         currentUser={currentUser}
       />
