@@ -33,7 +33,37 @@ const useDataInitialization = () => {
       try {
         logger.debug("🔄 Loading data from Dexie into Zustand store");
 
-        // Load all data from Dexie into Zustand arrays
+        // Check if budgetDb is properly initialized
+        if (!budgetDb || !budgetDb.envelopes) {
+          logger.warn(
+            "⚠️ BudgetDb not properly initialized, skipping data load",
+          );
+          return;
+        }
+
+        // Ensure database is open before accessing tables
+        if (!budgetDb.isOpen()) {
+          logger.debug("📂 Opening Dexie database");
+          await budgetDb.open();
+        }
+
+        // Load all data from Dexie into Zustand arrays with individual error handling
+        const loadTable = async (tableName, tableObject) => {
+          try {
+            if (tableObject && typeof tableObject.toArray === "function") {
+              return await tableObject.toArray();
+            } else {
+              logger.warn(
+                `⚠️ Table ${tableName} not available or not properly initialized`,
+              );
+              return [];
+            }
+          } catch (error) {
+            logger.warn(`⚠️ Failed to load ${tableName}:`, error.message);
+            return [];
+          }
+        };
+
         const [
           dexieEnvelopes,
           dexieBills,
@@ -42,12 +72,12 @@ const useDataInitialization = () => {
           dexieDebts,
           dexiePaychecks,
         ] = await Promise.all([
-          budgetDb.envelopes.toArray(),
-          budgetDb.bills.toArray(),
-          budgetDb.transactions.toArray(),
-          budgetDb.savingsGoals.toArray(),
-          budgetDb.debts.toArray(),
-          budgetDb.paychecks.toArray(),
+          loadTable("envelopes", budgetDb.envelopes),
+          loadTable("bills", budgetDb.bills),
+          loadTable("transactions", budgetDb.transactions),
+          loadTable("savingsGoals", budgetDb.savingsGoals),
+          loadTable("debts", budgetDb.debts),
+          loadTable("paychecks", budgetDb.paycheckHistory),
         ]);
 
         logger.debug("📊 Dexie data loaded", {
