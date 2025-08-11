@@ -538,6 +538,7 @@ const storeInitializer = (set, get) => ({
       console.log(`🌩️ Cloud sync ${enabled ? "enabled" : "disabled"}`);
     }),
 
+
   // Clear all transactions (for cleanup)
   clearAllTransactions: () =>
     set((state) => {
