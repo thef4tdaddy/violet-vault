@@ -65,7 +65,7 @@ const NavigationTabs = ({ activeView, onViewChange }) => {
   ];
 
   return (
-    <div className="glassmorphism rounded-t-3xl sm:rounded-3xl mb-6 sm:shadow-xl border border-white/20 fixed bottom-0 left-0 right-0 sm:static z-40 overflow-hidden">
+    <div className="glassmorphism rounded-3xl mb-6 sm:shadow-xl border border-white/20 fixed bottom-0 left-0 right-0 sm:static z-40 overflow-hidden">
       <nav className="flex sm:justify-around overflow-x-auto scrollbar-hide">
         {tabs.map((tab) => (
           <NavButton
