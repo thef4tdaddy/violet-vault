@@ -66,11 +66,17 @@ const Header = memo(
 
         // Start the background sync service
         try {
-          const { default: CloudSyncService } = await import("../../services/cloudSyncService");
+          const { default: CloudSyncService } = await import(
+            "../../services/cloudSyncService"
+          );
           const { useAuth } = await import("../../stores/authStore");
           const authState = useAuth.getState();
 
-          if (authState.encryptionKey && authState.currentUser && authState.budgetId) {
+          if (
+            authState.encryptionKey &&
+            authState.currentUser &&
+            authState.budgetId
+          ) {
             CloudSyncService.start({
               encryptionKey: authState.encryptionKey,
               currentUser: authState.currentUser,
@@ -85,7 +91,9 @@ const Header = memo(
 
         // Stop the background sync service
         try {
-          const { default: CloudSyncService } = await import("../../services/cloudSyncService");
+          const { default: CloudSyncService } = await import(
+            "../../services/cloudSyncService"
+          );
           CloudSyncService.stop();
         } catch (error) {
           console.error("Failed to stop cloud sync:", error);
@@ -110,7 +118,9 @@ const Header = memo(
                   ? "border-orange-500" // Local development
                   : window.location.hostname.includes("dev.f4tdaddy.com") ||
                       (window.location.hostname.includes("vercel.app") &&
-                        !window.location.hostname.includes("violet-vault-production"))
+                        !window.location.hostname.includes(
+                          "violet-vault-production",
+                        ))
                     ? "border-red-500" // Preview/staging environments
                     : "border-purple-600" // Production
               }`}
@@ -136,7 +146,9 @@ const Header = memo(
                   title="Click to manage Local-Only Mode settings"
                 >
                   <Monitor className="h-3 w-3 text-blue-600 mr-1" />
-                  <span className="text-xs font-medium text-blue-800">Local-Only Mode</span>
+                  <span className="text-xs font-medium text-blue-800">
+                    Local-Only Mode
+                  </span>
                 </button>
               )}
             </div>
@@ -198,7 +210,11 @@ const Header = memo(
                       ? "btn-primary text-white bg-green-600 border-green-600 hover:bg-green-700"
                       : "btn-secondary text-gray-600 bg-gray-100 border-gray-300 hover:bg-gray-200"
                   }`}
-                  title={cloudSyncEnabled ? "Turn off cloud sync" : "Turn on cloud sync"}
+                  title={
+                    cloudSyncEnabled
+                      ? "Turn off cloud sync"
+                      : "Turn on cloud sync"
+                  }
                 >
                   {cloudSyncEnabled ? (
                     <Cloud className="h-4 w-4 sm:mr-2" />
@@ -246,8 +262,12 @@ const Header = memo(
               <div className="flex items-start space-x-2 mb-4">
                 <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
                 <div>
-                  <div className="font-medium text-amber-800">Reset Options</div>
-                  <div className="text-sm text-amber-600 mt-1">Choose your reset option</div>
+                  <div className="font-medium text-amber-800">
+                    Reset Options
+                  </div>
+                  <div className="text-sm text-amber-600 mt-1">
+                    Choose your reset option
+                  </div>
                 </div>
               </div>
 
@@ -260,7 +280,9 @@ const Header = memo(
                   className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-gray-50 border border-gray-200"
                 >
                   <div className="font-medium">Logout Only</div>
-                  <div className="text-xs text-gray-500">Keep your data, just logout</div>
+                  <div className="text-xs text-gray-500">
+                    Keep your data, just logout
+                  </div>
                 </button>
 
                 <button
@@ -271,7 +293,9 @@ const Header = memo(
                   className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-red-50 border border-red-200 text-red-600"
                 >
                   <div className="font-medium">Clear All Data</div>
-                  <div className="text-xs text-red-500">Delete everything and start fresh</div>
+                  <div className="text-xs text-red-500">
+                    Delete everything and start fresh
+                  </div>
                 </button>
               </div>
             </div>
@@ -286,7 +310,9 @@ const Header = memo(
           />
         )}
 
-        {showHistoryModal && <BudgetHistoryViewer onClose={handleToggleHistoryModal} />}
+        {showHistoryModal && (
+          <BudgetHistoryViewer onClose={handleToggleHistoryModal} />
+        )}
 
         {showLocalOnlySettings && (
           <LocalOnlyModeSettings
@@ -302,7 +328,7 @@ const Header = memo(
         )}
       </div>
     );
-  }
+  },
 );
 
 export default Header;
