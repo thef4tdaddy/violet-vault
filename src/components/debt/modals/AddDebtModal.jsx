@@ -16,6 +16,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
     creditor: "",
     type: DEBT_TYPES.PERSONAL,
     currentBalance: "",
+    originalBalance: "",
     interestRate: "",
     minimumPayment: "",
     paymentFrequency: PAYMENT_FREQUENCIES.MONTHLY,
@@ -41,6 +42,20 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
 
     if (!formData.currentBalance || parseFloat(formData.currentBalance) < 0) {
       newErrors.currentBalance = "Valid current balance is required";
+    }
+
+    if (formData.originalBalance && parseFloat(formData.originalBalance) < 0) {
+      newErrors.originalBalance = "Original balance must be positive";
+    }
+
+    // Validate that original balance is not less than current balance if both provided
+    if (
+      formData.originalBalance &&
+      formData.currentBalance &&
+      parseFloat(formData.originalBalance) < parseFloat(formData.currentBalance)
+    ) {
+      newErrors.originalBalance =
+        "Original balance cannot be less than current balance";
     }
 
     if (
@@ -72,7 +87,9 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
         currentBalance: parseFloat(formData.currentBalance),
         interestRate: parseFloat(formData.interestRate) || 0,
         minimumPayment: parseFloat(formData.minimumPayment),
-        originalBalance: parseFloat(formData.currentBalance), // Set original to current for new debts
+        originalBalance: formData.originalBalance
+          ? parseFloat(formData.originalBalance)
+          : parseFloat(formData.currentBalance), // Default to current balance if not specified
       };
 
       await onSubmit(debtData);
@@ -91,6 +108,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
       creditor: "",
       type: DEBT_TYPES.PERSONAL,
       currentBalance: "",
+      originalBalance: "",
       interestRate: "",
       minimumPayment: "",
       paymentFrequency: PAYMENT_FREQUENCIES.MONTHLY,
@@ -219,25 +237,30 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Interest Rate (APR %)
+                  Original Balance
                 </label>
                 <input
                   type="number"
                   step="0.01"
                   min="0"
-                  max="100"
-                  value={formData.interestRate}
+                  value={formData.originalBalance}
                   onChange={(e) =>
-                    setFormData({ ...formData, interestRate: e.target.value })
+                    setFormData({
+                      ...formData,
+                      originalBalance: e.target.value,
+                    })
                   }
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  placeholder="0.00"
+                  placeholder="Leave blank to use current balance"
                 />
-                {errors.interestRate && (
+                {errors.originalBalance && (
                   <p className="mt-1 text-sm text-red-600">
-                    {errors.interestRate}
+                    {errors.originalBalance}
                   </p>
                 )}
+                <p className="mt-1 text-xs text-gray-500">
+                  Optional: The original debt amount when you first took it out
+                </p>
               </div>
             </div>
 
@@ -260,6 +283,31 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
                 {errors.minimumPayment && (
                   <p className="mt-1 text-sm text-red-600">
                     {errors.minimumPayment}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Interest Rate (APR %)
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max="100"
+                  value={formData.interestRate}
+                  onChange={(e) =>
+                    setFormData({ ...formData, interestRate: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  placeholder="0.00"
+                />
+                {errors.interestRate && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.interestRate}
                   </p>
                 )}
               </div>
