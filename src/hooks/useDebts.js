@@ -151,4 +151,5 @@ const useDebts = () => {
   };
 };
 
+export { useDebts };
 export default useDebts;
