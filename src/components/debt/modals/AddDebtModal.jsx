@@ -422,7 +422,11 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
                       })
                     }
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    placeholder={formData.name ? `${formData.name} Payment` : "Debt Payment"}
+                    placeholder={
+                      formData.name
+                        ? `${formData.name} Payment`
+                        : "Debt Payment"
+                    }
                   />
                   <p className="mt-1 text-xs text-gray-500">
                     A new envelope will be created to fund this debt's payments

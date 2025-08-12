@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { X, Edit, Trash2, DollarSign, Calendar, TrendingDown } from "lucide-react";
+import {
+  X,
+  Edit,
+  Trash2,
+  DollarSign,
+  Calendar,
+  TrendingDown,
+} from "lucide-react";
 
 /**
  * Modal for viewing and managing individual debt details
@@ -16,7 +23,9 @@ const DebtDetailModal = ({
   onLinkToBill,
 }) => {
   const [showPaymentForm, setShowPaymentForm] = useState(false);
-  const [paymentAmount, setPaymentAmount] = useState(debt?.minimumPayment?.toString() || "");
+  const [paymentAmount, setPaymentAmount] = useState(
+    debt?.minimumPayment?.toString() || "",
+  );
 
   if (!isOpen || !debt) return null;
 
@@ -40,7 +49,7 @@ const DebtDetailModal = ({
   const handleDelete = () => {
     if (
       window.confirm(
-        `Are you sure you want to delete "${debt.name}"? This action cannot be undone.`
+        `Are you sure you want to delete "${debt.name}"? This action cannot be undone.`,
       )
     ) {
       onDelete(debt.id);
@@ -49,7 +58,8 @@ const DebtDetailModal = ({
 
   const progressPercentage =
     debt.originalBalance > 0
-      ? ((debt.originalBalance - debt.currentBalance) / debt.originalBalance) * 100
+      ? ((debt.originalBalance - debt.currentBalance) / debt.originalBalance) *
+        100
       : 0;
 
   return (
@@ -63,7 +73,10 @@ const DebtDetailModal = ({
               {debt.creditor} • {debt.type}
             </p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
             <X className="h-6 w-6" />
           </button>
         </div>
@@ -73,7 +86,9 @@ const DebtDetailModal = ({
           <div className="bg-red-50 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-red-600 font-medium">Current Balance</p>
+                <p className="text-sm text-red-600 font-medium">
+                  Current Balance
+                </p>
                 <p className="text-2xl font-bold text-red-700">
                   ${debt.currentBalance?.toFixed(2) || "0.00"}
                 </p>
@@ -85,7 +100,9 @@ const DebtDetailModal = ({
           <div className="bg-orange-50 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-orange-600 font-medium">Monthly Payment</p>
+                <p className="text-sm text-orange-600 font-medium">
+                  Monthly Payment
+                </p>
                 <p className="text-2xl font-bold text-orange-700">
                   ${debt.minimumPayment?.toFixed(2) || "0.00"}
                 </p>
@@ -97,7 +114,9 @@ const DebtDetailModal = ({
           <div className="bg-purple-50 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-purple-600 font-medium">Interest Rate</p>
+                <p className="text-sm text-purple-600 font-medium">
+                  Interest Rate
+                </p>
                 <p className="text-2xl font-bold text-purple-700">
                   {debt.interestRate?.toFixed(2) || "0.00"}%
                 </p>
@@ -130,7 +149,9 @@ const DebtDetailModal = ({
         {/* Payoff Information */}
         {debt.payoffInfo && (
           <div className="bg-blue-50 rounded-xl p-4 mb-6">
-            <h4 className="font-medium text-blue-900 mb-3">Payoff Projection</h4>
+            <h4 className="font-medium text-blue-900 mb-3">
+              Payoff Projection
+            </h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
               <div>
                 <p className="text-blue-600">Time to Payoff</p>
@@ -167,15 +188,21 @@ const DebtDetailModal = ({
                 <div className="flex items-center justify-between bg-white rounded-lg p-3">
                   <div>
                     <p className="font-medium">📄 {debt.relatedBill.name}</p>
-                    <p className="text-sm text-gray-600">Bill • ${debt.relatedBill.amount}/month</p>
+                    <p className="text-sm text-gray-600">
+                      Bill • ${debt.relatedBill.amount}/month
+                    </p>
                   </div>
                 </div>
               )}
               {debt.relatedEnvelope && (
                 <div className="flex items-center justify-between bg-white rounded-lg p-3">
                   <div>
-                    <p className="font-medium">📧 {debt.relatedEnvelope.name}</p>
-                    <p className="text-sm text-gray-600">Envelope • Payment source</p>
+                    <p className="font-medium">
+                      📧 {debt.relatedEnvelope.name}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Envelope • Payment source
+                    </p>
                   </div>
                 </div>
               )}
@@ -205,7 +232,9 @@ const DebtDetailModal = ({
                     className="flex justify-between items-center bg-gray-50 rounded-lg p-2"
                   >
                     <div>
-                      <p className="text-sm font-medium">${payment.amount?.toFixed(2)}</p>
+                      <p className="text-sm font-medium">
+                        ${payment.amount?.toFixed(2)}
+                      </p>
                       <p className="text-xs text-gray-600">
                         {new Date(payment.date).toLocaleDateString()}
                       </p>
@@ -235,8 +264,13 @@ const DebtDetailModal = ({
                 Record Payment
               </button>
             ) : (
-              <form onSubmit={handleRecordPayment} className="bg-green-50 rounded-xl p-4">
-                <h4 className="font-medium text-green-900 mb-3">Record Payment</h4>
+              <form
+                onSubmit={handleRecordPayment}
+                className="bg-green-50 rounded-xl p-4"
+              >
+                <h4 className="font-medium text-green-900 mb-3">
+                  Record Payment
+                </h4>
                 <div className="flex gap-3">
                   <input
                     type="number"

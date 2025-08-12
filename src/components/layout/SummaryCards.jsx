@@ -17,8 +17,7 @@ const SummaryCards = () => {
 
   // Get data from TanStack Query hooks (same pattern as Dashboard)
   const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
-  const { data: savingsGoals = [], isLoading: savingsLoading } =
-    useSavingsGoals();
+  const { savingsGoals = [], isLoading: savingsLoading } = useSavingsGoals();
 
   // Calculate totals from hook data
   const totalEnvelopeBalance = envelopes.reduce(

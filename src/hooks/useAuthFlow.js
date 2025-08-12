@@ -30,7 +30,9 @@ const useAuthFlow = () => {
         const { encryptionUtils } = await import("../utils/encryption");
         const userDataWithId = {
           ...userData,
-          budgetId: userData.budgetId || encryptionUtils.generateBudgetId(userData.password),
+          budgetId:
+            userData.budgetId ||
+            encryptionUtils.generateBudgetId(userData.password),
         };
 
         logger.auth("Calling login", {
@@ -50,7 +52,10 @@ const useAuthFlow = () => {
             await budgetStore.initializeBudgetHistory(userData.password);
             logger.auth("Budget history initialized on login");
           } catch (historyError) {
-            logger.error("Failed to initialize budget history on login", historyError);
+            logger.error(
+              "Failed to initialize budget history on login",
+              historyError,
+            );
             // Don't fail login if history initialization fails
           }
 
@@ -66,7 +71,7 @@ const useAuthFlow = () => {
         alert(`Setup error: ${error.message}`);
       }
     },
-    [login, budgetStore]
+    [login, budgetStore],
   );
 
   const handleLogout = useCallback(() => {
@@ -82,7 +87,7 @@ const useAuthFlow = () => {
         alert("Password updated successfully.");
       }
     },
-    [changePassword]
+    [changePassword],
   );
 
   const handleUpdateProfile = useCallback(
@@ -92,7 +97,7 @@ const useAuthFlow = () => {
         throw new Error(result.error);
       }
     },
-    [updateProfile]
+    [updateProfile],
   );
 
   return {

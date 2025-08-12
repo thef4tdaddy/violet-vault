@@ -23,8 +23,12 @@ const TransactionSummary = ({ transactions = [] }) => {
             </div>
           </div>
           <div>
-            <p className="text-sm font-semibold text-gray-600 mb-1">Total Income</p>
-            <p className="text-2xl font-bold text-emerald-600">${totalIncome.toFixed(2)}</p>
+            <p className="text-sm font-semibold text-gray-600 mb-1">
+              Total Income
+            </p>
+            <p className="text-2xl font-bold text-emerald-600">
+              ${totalIncome.toFixed(2)}
+            </p>
           </div>
         </div>
       </div>
@@ -38,8 +42,12 @@ const TransactionSummary = ({ transactions = [] }) => {
             </div>
           </div>
           <div>
-            <p className="text-sm font-semibold text-gray-600 mb-1">Total Expenses</p>
-            <p className="text-2xl font-bold text-red-600">${totalExpenses.toFixed(2)}</p>
+            <p className="text-sm font-semibold text-gray-600 mb-1">
+              Total Expenses
+            </p>
+            <p className="text-2xl font-bold text-red-600">
+              ${totalExpenses.toFixed(2)}
+            </p>
           </div>
         </div>
       </div>
@@ -61,7 +69,9 @@ const TransactionSummary = ({ transactions = [] }) => {
             </div>
           </div>
           <div>
-            <p className="text-sm font-semibold text-gray-600 mb-1">Net Cash Flow</p>
+            <p className="text-sm font-semibold text-gray-600 mb-1">
+              Net Cash Flow
+            </p>
             <p
               className={`text-2xl font-bold ${
                 netCashFlow >= 0 ? "text-cyan-600" : "text-amber-600"

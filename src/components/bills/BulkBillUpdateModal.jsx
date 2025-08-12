@@ -10,7 +10,13 @@ import {
   Undo2,
 } from "lucide-react";
 
-const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBills, onError }) => {
+const BulkBillUpdateModal = ({
+  isOpen,
+  onClose,
+  selectedBills = [],
+  onUpdateBills,
+  onError,
+}) => {
   const [updateMode, setUpdateMode] = useState("amounts"); // "amounts", "dates", "both"
   const [changes, setChanges] = useState({});
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -70,13 +76,17 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
       const change = changes[bill.id];
       return (
         change &&
-        (change.amount !== change.originalAmount || change.dueDate !== change.originalDueDate)
+        (change.amount !== change.originalAmount ||
+          change.dueDate !== change.originalDueDate)
       );
     });
 
     const totalAmountChange = changedBills.reduce((sum, bill) => {
       const change = changes[bill.id];
-      return sum + (Math.abs(change?.amount || 0) - Math.abs(change?.originalAmount || 0));
+      return (
+        sum +
+        (Math.abs(change?.amount || 0) - Math.abs(change?.originalAmount || 0))
+      );
     }, 0);
 
     return {
@@ -103,7 +113,8 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
           if (!change) return bill;
 
           const hasChanges =
-            change.amount !== change.originalAmount || change.dueDate !== change.originalDueDate;
+            change.amount !== change.originalAmount ||
+            change.dueDate !== change.originalDueDate;
 
           if (!hasChanges) return bill;
 
@@ -122,7 +133,10 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
                     amount: { from: change.originalAmount, to: change.amount },
                   }),
                   ...(change.dueDate !== change.originalDueDate && {
-                    dueDate: { from: change.originalDueDate, to: change.dueDate },
+                    dueDate: {
+                      from: change.originalDueDate,
+                      to: change.dueDate,
+                    },
                   }),
                 },
               },
@@ -133,7 +147,8 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
           const change = changes[bill.id];
           return (
             change &&
-            (change.amount !== change.originalAmount || change.dueDate !== change.originalDueDate)
+            (change.amount !== change.originalAmount ||
+              change.dueDate !== change.originalDueDate)
           );
         });
 
@@ -163,14 +178,18 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
 
             <div className="space-y-4">
               <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-medium text-blue-900 mb-2">Summary of Changes</h4>
+                <h4 className="font-medium text-blue-900 mb-2">
+                  Summary of Changes
+                </h4>
                 <div className="text-sm text-blue-700 space-y-1">
                   <p>
-                    • {summary.changedBills} of {summary.totalBills} bills will be updated
+                    • {summary.changedBills} of {summary.totalBills} bills will
+                    be updated
                   </p>
                   {summary.totalAmountChange !== 0 && (
                     <p>
-                      • Net amount change: {summary.totalAmountChange > 0 ? "+" : ""}$
+                      • Net amount change:{" "}
+                      {summary.totalAmountChange > 0 ? "+" : ""}$
                       {summary.totalAmountChange.toFixed(2)}
                     </p>
                   )}
@@ -180,8 +199,10 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
               <div className="max-h-48 overflow-y-auto space-y-2">
                 {selectedBills.map((bill) => {
                   const change = changes[bill.id];
-                  const hasAmountChange = change?.amount !== change?.originalAmount;
-                  const hasDateChange = change?.dueDate !== change?.originalDueDate;
+                  const hasAmountChange =
+                    change?.amount !== change?.originalAmount;
+                  const hasDateChange =
+                    change?.dueDate !== change?.originalDueDate;
 
                   if (!hasAmountChange && !hasDateChange) return null;
 
@@ -193,7 +214,8 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
                       <div className="text-sm text-gray-600 space-y-1 mt-1">
                         {hasAmountChange && (
                           <p>
-                            Amount: ${Math.abs(change.originalAmount).toFixed(2)} → $
+                            Amount: $
+                            {Math.abs(change.originalAmount).toFixed(2)} → $
                             {Math.abs(change.amount).toFixed(2)}
                           </p>
                         )}
@@ -238,10 +260,14 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
             <div>
               <h3 className="text-lg font-semibold">Bulk Update Bills</h3>
               <p className="text-sm text-gray-600 mt-1">
-                Update amounts and due dates for {selectedBills.length} selected bills
+                Update amounts and due dates for {selectedBills.length} selected
+                bills
               </p>
             </div>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600"
+            >
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -285,7 +311,9 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
 
           {/* Bulk Actions */}
           <div className="bg-gray-50 p-4 rounded-lg mb-6">
-            <h4 className="font-medium text-gray-900 mb-3">Apply to All Selected Bills</h4>
+            <h4 className="font-medium text-gray-900 mb-3">
+              Apply to All Selected Bills
+            </h4>
             <div className="flex gap-3">
               {(updateMode === "amounts" || updateMode === "both") && (
                 <div className="flex items-center gap-2">
@@ -297,7 +325,10 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
                     className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-40"
                     onChange={(e) => {
                       if (e.target.value) {
-                        applyBulkChange("amount", parseFloat(e.target.value) || 0);
+                        applyBulkChange(
+                          "amount",
+                          parseFloat(e.target.value) || 0,
+                        );
                       }
                     }}
                   />
@@ -334,8 +365,10 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
             <div className="space-y-3">
               {selectedBills.map((bill) => {
                 const change = changes[bill.id];
-                const hasAmountChange = change?.amount !== change?.originalAmount;
-                const hasDateChange = change?.dueDate !== change?.originalDueDate;
+                const hasAmountChange =
+                  change?.amount !== change?.originalAmount;
+                const hasDateChange =
+                  change?.dueDate !== change?.originalDueDate;
 
                 return (
                   <div
@@ -355,7 +388,8 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
                       </div>
 
                       <div className="flex items-center gap-4">
-                        {(updateMode === "amounts" || updateMode === "both") && (
+                        {(updateMode === "amounts" ||
+                          updateMode === "both") && (
                           <div className="flex items-center gap-2">
                             <DollarSign className="h-4 w-4 text-gray-400" />
                             <input
@@ -363,15 +397,22 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
                               step="0.01"
                               value={Math.abs(change?.amount || 0)}
                               onChange={(e) =>
-                                updateChange(bill.id, "amount", parseFloat(e.target.value) || 0)
+                                updateChange(
+                                  bill.id,
+                                  "amount",
+                                  parseFloat(e.target.value) || 0,
+                                )
                               }
                               className={`w-24 px-2 py-1 border rounded text-sm ${
-                                hasAmountChange ? "border-blue-400 bg-white" : "border-gray-300"
+                                hasAmountChange
+                                  ? "border-blue-400 bg-white"
+                                  : "border-gray-300"
                               }`}
                             />
                             {hasAmountChange && (
                               <span className="text-xs text-blue-600">
-                                (was ${Math.abs(change.originalAmount).toFixed(2)})
+                                (was $
+                                {Math.abs(change.originalAmount).toFixed(2)})
                               </span>
                             )}
                           </div>
@@ -383,9 +424,13 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
                             <input
                               type="date"
                               value={change?.dueDate || ""}
-                              onChange={(e) => updateChange(bill.id, "dueDate", e.target.value)}
+                              onChange={(e) =>
+                                updateChange(bill.id, "dueDate", e.target.value)
+                              }
                               className={`px-2 py-1 border rounded text-sm ${
-                                hasDateChange ? "border-blue-400 bg-white" : "border-gray-300"
+                                hasDateChange
+                                  ? "border-blue-400 bg-white"
+                                  : "border-gray-300"
                               }`}
                             />
                           </div>

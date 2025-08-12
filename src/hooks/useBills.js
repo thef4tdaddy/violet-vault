@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useBudgetStore } from "../stores/budgetStore";
-import { queryKeys } from "../utils/queryClient";
+import { useCallback, useEffect } from "react";
+import { queryKeys, optimisticHelpers } from "../utils/queryClient";
 import { budgetDb } from "../db/budgetDb";
 
 /**
@@ -17,32 +17,23 @@ const useBills = (options = {}) => {
     sortOrder = "asc",
   } = options;
 
-  // Get Zustand store for mutations
-  const {
-    bills: zustandBills,
-    addBill: zustandAddBill,
-    updateBill: zustandUpdateBill,
-    deleteBill: zustandDeleteBill,
-    markBillPaid: zustandMarkBillPaid,
-  } = useBudgetStore();
+  // Removed Zustand dependencies - data now handled by TanStack Query → Dexie
 
-  // Smart query function with filtering and due date logic
-  const queryFunction = async () => {
-    let bills = [];
+  // TanStack Query function - hydrates from Dexie, Dexie syncs with Firebase
+  const queryFunction = useCallback(async () => {
+    console.log("🔄 TanStack Query: Fetching bills from Dexie...");
 
-    // Primary source: Zustand (active state)
-    if (zustandBills && zustandBills.length > 0) {
-      bills = [...zustandBills];
-      console.log("Using Zustand bills (primary):", bills.length);
-    } else {
-      // Fallback to Dexie only when Zustand is empty
-      try {
-        bills = await budgetDb.bills.toArray();
-        console.log("Using Dexie bills (fallback):", bills.length);
-      } catch (error) {
-        console.warn("Dexie query failed:", error);
-        bills = [];
-      }
+    try {
+      let bills = [];
+
+      // Always fetch from Dexie (single source of truth for local data)
+      bills = await budgetDb.bills.toArray();
+
+      console.log("✅ TanStack Query: Loaded from Dexie:", bills.length);
+    } catch (error) {
+      console.error("❌ TanStack Query: Dexie fetch failed:", error);
+      // Return empty array when Dexie fails (no fallback to Zustand)
+      return [];
     }
 
     // Apply status filters
@@ -72,7 +63,9 @@ const useBills = (options = {}) => {
 
     // Apply category filter
     if (category) {
-      filteredBills = filteredBills.filter((bill) => bill.category === category);
+      filteredBills = filteredBills.filter(
+        (bill) => bill.category === category,
+      );
     }
 
     // Apply sorting
@@ -106,7 +99,7 @@ const useBills = (options = {}) => {
     });
 
     return filteredBills;
-  };
+  }, [status, daysAhead, category, sortBy, sortOrder]);
 
   // Main bills query
   const billsQuery = useQuery({
@@ -126,6 +119,29 @@ const useBills = (options = {}) => {
     initialData: undefined, // Remove initialData to prevent persister errors
     enabled: true,
   });
+
+  // Listen for import completion to force refresh
+  useEffect(() => {
+    const handleImportCompleted = () => {
+      console.log("🔄 Import detected, invalidating bills cache");
+      queryClient.invalidateQueries({ queryKey: queryKeys.bills });
+    };
+
+    const handleInvalidateAll = () => {
+      console.log("🔄 Invalidating all bill queries");
+      queryClient.invalidateQueries({ queryKey: queryKeys.bills });
+      queryClient.invalidateQueries({ queryKey: queryKeys.billsList });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+    };
+
+    window.addEventListener("importCompleted", handleImportCompleted);
+    window.addEventListener("invalidateAllQueries", handleInvalidateAll);
+
+    return () => {
+      window.removeEventListener("importCompleted", handleImportCompleted);
+      window.removeEventListener("invalidateAllQueries", handleInvalidateAll);
+    };
+  }, [queryClient]);
 
   // Upcoming bills query (separate for dashboard widgets)
   const upcomingBillsQuery = useQuery({
@@ -158,15 +174,11 @@ const useBills = (options = {}) => {
         ...billData,
       };
 
-      // Call Zustand mutation
-      zustandAddBill(newBill);
+      // Apply optimistic update
+      await optimisticHelpers.addBill(newBill);
 
-      // Persist to Dexie
-      try {
-        await budgetDb.bills.add(newBill);
-      } catch (error) {
-        console.warn("Failed to persist bill to Dexie:", error);
-      }
+      // Apply to Dexie directly
+      await budgetDb.bills.add(newBill);
 
       return newBill;
     },
@@ -184,18 +196,14 @@ const useBills = (options = {}) => {
   const updateBillMutation = useMutation({
     mutationKey: ["bills", "update"],
     mutationFn: async ({ id, updates }) => {
-      // Call Zustand mutation
-      zustandUpdateBill(id, updates);
+      // Apply optimistic update
+      await optimisticHelpers.updateBill(id, updates);
 
-      // Update in Dexie
-      try {
-        await budgetDb.bills.update(id, {
-          ...updates,
-          lastModified: Date.now(),
-        });
-      } catch (error) {
-        console.warn("Failed to update bill in Dexie:", error);
-      }
+      // Apply to Dexie directly
+      await budgetDb.bills.update(id, {
+        ...updates,
+        updatedAt: new Date().toISOString(),
+      });
 
       return { id, updates };
     },
@@ -213,15 +221,11 @@ const useBills = (options = {}) => {
   const deleteBillMutation = useMutation({
     mutationKey: ["bills", "delete"],
     mutationFn: async (billId) => {
-      // Call Zustand mutation
-      zustandDeleteBill(billId);
+      // Apply optimistic update
+      await optimisticHelpers.removeBill(billId);
 
-      // Remove from Dexie
-      try {
-        await budgetDb.bills.delete(billId);
-      } catch (error) {
-        console.warn("Failed to delete bill from Dexie:", error);
-      }
+      // Apply to Dexie directly
+      await budgetDb.bills.delete(billId);
 
       return billId;
     },
@@ -247,17 +251,28 @@ const useBills = (options = {}) => {
         lastPaid: new Date().toISOString(),
       };
 
-      // Call Zustand mutation
-      zustandMarkBillPaid(billId, paidData);
+      // Apply optimistic update
+      await optimisticHelpers.updateBill(billId, paidData);
 
-      // Update in Dexie
-      try {
-        await budgetDb.bills.update(billId, {
-          ...paidData,
-          lastModified: Date.now(),
-        });
-      } catch (error) {
-        console.warn("Failed to mark bill paid in Dexie:", error);
+      // Apply to Dexie directly
+      await budgetDb.bills.update(billId, {
+        ...paidData,
+        updatedAt: new Date().toISOString(),
+      });
+
+      // If bill is linked to envelope, update envelope balance
+      if (envelopeId && paidAmount) {
+        const envelope = await budgetDb.envelopes.get(envelopeId);
+        if (envelope) {
+          const newBalance = (envelope.currentBalance || 0) - paidAmount;
+          await budgetDb.envelopes.update(envelopeId, {
+            currentBalance: newBalance,
+            updatedAt: new Date().toISOString(),
+          });
+          await optimisticHelpers.updateEnvelope(envelopeId, {
+            currentBalance: newBalance,
+          });
+        }
       }
 
       return { billId, paidData };
@@ -292,18 +307,22 @@ const useBills = (options = {}) => {
       const paidDate = new Date(bill.paidDate);
       const today = new Date();
       return (
-        paidDate.getMonth() === today.getMonth() && paidDate.getFullYear() === today.getFullYear()
+        paidDate.getMonth() === today.getMonth() &&
+        paidDate.getFullYear() === today.getFullYear()
       );
     }).length,
 
     // Amount calculations
     upcomingAmount: upcomingBills.reduce(
       (sum, bill) => sum + (bill.amount || bill.estimatedAmount || 0),
-      0
+      0,
     ),
     monthlyBudget: bills
       .filter((bill) => bill.isRecurring)
-      .reduce((sum, bill) => sum + (bill.amount || bill.estimatedAmount || 0), 0),
+      .reduce(
+        (sum, bill) => sum + (bill.amount || bill.estimatedAmount || 0),
+        0,
+      ),
 
     // Category breakdown
     categoryBreakdown: bills.reduce((acc, bill) => {
@@ -359,7 +378,8 @@ const useBills = (options = {}) => {
   // Utility functions
   const getBillById = (id) => bills.find((bill) => bill.id === id);
 
-  const getBillsByCategory = (cat) => bills.filter((bill) => bill.category === cat);
+  const getBillsByCategory = (cat) =>
+    bills.filter((bill) => bill.category === cat);
 
   const getBillsByStatus = (stat) => {
     if (stat === "paid") return bills.filter((bill) => bill.isPaid);
@@ -452,7 +472,8 @@ const useBills = (options = {}) => {
 
     // Query controls
     refetch: billsQuery.refetch,
-    invalidate: () => queryClient.invalidateQueries({ queryKey: queryKeys.bills }),
+    invalidate: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.bills }),
   };
 };
 

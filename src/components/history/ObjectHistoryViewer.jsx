@@ -22,7 +22,8 @@ import {
  * @param {function} props.onClose - Close callback
  */
 const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
-  const { getHistory, getCommitDetails, formatChangeDescription } = useBudgetHistory();
+  const { getHistory, getCommitDetails, formatChangeDescription } =
+    useBudgetHistory();
 
   const [relevantHistory, setRelevantHistory] = useState([]);
   const [expandedCommits, setExpandedCommits] = useState(new Set());
@@ -138,7 +139,10 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
                 Complete change history for this {objectType.toLowerCase()}
               </p>
             </div>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 text-xl"
+            >
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -169,8 +173,8 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
                 <div className="flex items-center">
                   <GitCommit className="h-4 w-4 text-blue-600 mr-2" />
                   <div className="text-sm text-blue-800">
-                    <strong>Found {relevantHistory.length} changes</strong> to this{" "}
-                    {objectType.toLowerCase()}
+                    <strong>Found {relevantHistory.length} changes</strong> to
+                    this {objectType.toLowerCase()}
                   </div>
                 </div>
               </div>
@@ -248,7 +252,10 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
                       <div className="border-t border-gray-200 pt-3">
                         <div className="space-y-3">
                           {historyItem.relevantChanges.map((change, index) => (
-                            <div key={index} className="bg-gray-50 p-3 rounded border">
+                            <div
+                              key={index}
+                              className="bg-gray-50 p-3 rounded border"
+                            >
                               <div className="font-medium text-sm text-gray-900 mb-2">
                                 {formatChangeDescription(change)}
                               </div>
@@ -256,26 +263,32 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
                               {/* Show diff details if available */}
                               {change.diff && (
                                 <div className="space-y-2 text-xs">
-                                  {Object.entries(change.diff).map(([field, fieldChange]) => (
-                                    <div key={field} className="font-mono">
-                                      <div className="font-semibold text-gray-700">{field}:</div>
-                                      <div className="ml-2 space-y-1">
-                                        <div className="text-red-700">
-                                          - {JSON.stringify(fieldChange.from)}
+                                  {Object.entries(change.diff).map(
+                                    ([field, fieldChange]) => (
+                                      <div key={field} className="font-mono">
+                                        <div className="font-semibold text-gray-700">
+                                          {field}:
                                         </div>
-                                        <div className="text-green-700">
-                                          + {JSON.stringify(fieldChange.to)}
+                                        <div className="ml-2 space-y-1">
+                                          <div className="text-red-700">
+                                            - {JSON.stringify(fieldChange.from)}
+                                          </div>
+                                          <div className="text-green-700">
+                                            + {JSON.stringify(fieldChange.to)}
+                                          </div>
                                         </div>
                                       </div>
-                                    </div>
-                                  ))}
+                                    ),
+                                  )}
                                 </div>
                               )}
 
                               {/* Show full values for create/delete operations */}
                               {change.type === "add" && change.newValue && (
                                 <div className="text-xs font-mono">
-                                  <div className="font-semibold text-gray-700 mb-1">Created:</div>
+                                  <div className="font-semibold text-gray-700 mb-1">
+                                    Created:
+                                  </div>
                                   <div className="bg-green-50 p-2 rounded border">
                                     {JSON.stringify(change.newValue, null, 2)}
                                   </div>
@@ -284,7 +297,9 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
 
                               {change.type === "delete" && change.oldValue && (
                                 <div className="text-xs font-mono">
-                                  <div className="font-semibold text-gray-700 mb-1">Deleted:</div>
+                                  <div className="font-semibold text-gray-700 mb-1">
+                                    Deleted:
+                                  </div>
                                   <div className="bg-red-50 p-2 rounded border">
                                     {JSON.stringify(change.oldValue, null, 2)}
                                   </div>

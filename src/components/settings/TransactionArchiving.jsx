@@ -55,10 +55,13 @@ const TransactionArchiving = () => {
     try {
       setShowPreview(true);
       // Create a temporary archiver to get preview data
-      const { createArchiver } = await import("../../utils/transactionArchiving");
+      const { createArchiver } = await import(
+        "../../utils/transactionArchiving"
+      );
       const archiver = createArchiver();
       const cutoffDate = archiver.calculateCutoffDate(selectedPeriod);
-      const transactionsToArchive = await archiver.getTransactionsForArchiving(cutoffDate);
+      const transactionsToArchive =
+        await archiver.getTransactionsForArchiving(cutoffDate);
 
       // Group by category and envelope for preview
       const preview = {
@@ -94,10 +97,16 @@ const TransactionArchiving = () => {
         preview.totalAmount += transaction.amount || 0;
 
         // Date range
-        if (!preview.dateRange.earliest || transaction.date < preview.dateRange.earliest) {
+        if (
+          !preview.dateRange.earliest ||
+          transaction.date < preview.dateRange.earliest
+        ) {
           preview.dateRange.earliest = transaction.date;
         }
-        if (!preview.dateRange.latest || transaction.date > preview.dateRange.latest) {
+        if (
+          !preview.dateRange.latest ||
+          transaction.date > preview.dateRange.latest
+        ) {
           preview.dateRange.latest = transaction.date;
         }
       });
@@ -159,7 +168,9 @@ const TransactionArchiving = () => {
               <Archive className="h-6 w-6 text-purple-600" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">Transaction Archiving</h2>
+              <h2 className="text-xl font-semibold text-gray-900">
+                Transaction Archiving
+              </h2>
               <p className="text-gray-600 mt-1">
                 Archive old transactions while preserving analytics data
               </p>
@@ -179,13 +190,17 @@ const TransactionArchiving = () => {
       {/* Status Overview */}
       {archivingStatus && (
         <div className="bg-white rounded-xl p-6 border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Current Status</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Current Status
+          </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="bg-blue-50 p-4 rounded-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-blue-700">Total Transactions</p>
+                  <p className="text-sm font-medium text-blue-700">
+                    Total Transactions
+                  </p>
                   <p className="text-2xl font-bold text-blue-900">
                     {archivingStatus.currentStats.totalTransactions.toLocaleString()}
                   </p>
@@ -197,7 +212,9 @@ const TransactionArchiving = () => {
             <div className="bg-yellow-50 p-4 rounded-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-yellow-700">Old Transactions (1+ years)</p>
+                  <p className="text-sm font-medium text-yellow-700">
+                    Old Transactions (1+ years)
+                  </p>
                   <p className="text-2xl font-bold text-yellow-900">
                     {archivingStatus.currentStats.oldTransactions.toLocaleString()}
                   </p>
@@ -209,7 +226,9 @@ const TransactionArchiving = () => {
             <div className="bg-red-50 p-4 rounded-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-red-700">Very Old (2+ years)</p>
+                  <p className="text-sm font-medium text-red-700">
+                    Very Old (2+ years)
+                  </p>
                   <p className="text-2xl font-bold text-red-900">
                     {archivingStatus.currentStats.veryOldTransactions.toLocaleString()}
                   </p>
@@ -221,17 +240,23 @@ const TransactionArchiving = () => {
 
           {/* Recommendation Alert */}
           {needsArchiving && (
-            <div className={`p-4 rounded-lg border ${getUrgencyColor(archivingStatus.urgency)}`}>
+            <div
+              className={`p-4 rounded-lg border ${getUrgencyColor(archivingStatus.urgency)}`}
+            >
               <div className="flex items-start space-x-3">
                 {React.createElement(getUrgencyIcon(archivingStatus.urgency), {
                   className: "h-5 w-5 mt-0.5 flex-shrink-0",
                 })}
                 <div className="flex-1">
-                  <p className="font-medium">{archivingStatus.suggestedAction}</p>
+                  <p className="font-medium">
+                    {archivingStatus.suggestedAction}
+                  </p>
                   {archivingStatus.potentialSavings && (
                     <p className="text-sm mt-1">
-                      Potential storage savings: {archivingStatus.potentialSavings.savingsMB}MB (
-                      {archivingStatus.potentialSavings.savingsPercent}% reduction)
+                      Potential storage savings:{" "}
+                      {archivingStatus.potentialSavings.savingsMB}MB (
+                      {archivingStatus.potentialSavings.savingsPercent}%
+                      reduction)
                     </p>
                   )}
                 </div>
@@ -244,7 +269,9 @@ const TransactionArchiving = () => {
       {/* Archiving Configuration */}
       {needsArchiving && (
         <div className="bg-white rounded-xl p-6 border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Archive Configuration</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Archive Configuration
+          </h3>
 
           <div className="space-y-4">
             <div>
@@ -268,7 +295,8 @@ const TransactionArchiving = () => {
                 <option value={60}>60 months (5 years)</option>
               </select>
               <p className="text-xs text-gray-500 mt-1">
-                Transactions older than this period will be archived but analytics will be preserved
+                Transactions older than this period will be archived but
+                analytics will be preserved
               </p>
             </div>
 
@@ -276,9 +304,13 @@ const TransactionArchiving = () => {
               <div className="flex items-start space-x-3">
                 <Info className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
                 <div className="text-sm text-blue-800">
-                  <p className="font-medium mb-1">What happens during archiving:</p>
+                  <p className="font-medium mb-1">
+                    What happens during archiving:
+                  </p>
                   <ul className="list-disc list-inside space-y-1">
-                    <li>Old transactions are compressed and moved to archives</li>
+                    <li>
+                      Old transactions are compressed and moved to archives
+                    </li>
                     <li>Analytics data is preserved in aggregated form</li>
                     <li>Historical insights remain available in reports</li>
                     <li>Database performance is improved</li>
@@ -307,7 +339,10 @@ const TransactionArchiving = () => {
                       disabled={true}
                       className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                     />
-                    <label htmlFor="preserveAnalytics" className="text-sm text-gray-700">
+                    <label
+                      htmlFor="preserveAnalytics"
+                      className="text-sm text-gray-700"
+                    >
                       Preserve analytics data (recommended)
                     </label>
                   </div>
@@ -319,7 +354,10 @@ const TransactionArchiving = () => {
                       disabled={true}
                       className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                     />
-                    <label htmlFor="optimizeDatabase" className="text-sm text-gray-700">
+                    <label
+                      htmlFor="optimizeDatabase"
+                      className="text-sm text-gray-700"
+                    >
                       Optimize database after archiving
                     </label>
                   </div>
@@ -334,7 +372,9 @@ const TransactionArchiving = () => {
       {showPreview && previewData && (
         <div className="bg-white rounded-xl p-6 border border-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Archive Preview</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Archive Preview
+            </h3>
             <button
               onClick={() => setShowPreview(false)}
               className="text-gray-400 hover:text-gray-600"
@@ -358,7 +398,9 @@ const TransactionArchiving = () => {
                   <p className="text-2xl font-bold text-blue-900">
                     {previewData.totalCount.toLocaleString()}
                   </p>
-                  <p className="text-sm text-blue-700">Transactions to Archive</p>
+                  <p className="text-sm text-blue-700">
+                    Transactions to Archive
+                  </p>
                 </div>
                 <div className="bg-green-50 p-4 rounded-lg text-center">
                   <p className="text-2xl font-bold text-green-900">
@@ -418,7 +460,8 @@ const TransactionArchiving = () => {
                   </div>
                   {Object.keys(previewData.categories).length > 8 && (
                     <p className="text-xs text-gray-500 mt-3 text-center">
-                      +{Object.keys(previewData.categories).length - 8} more categories
+                      +{Object.keys(previewData.categories).length - 8} more
+                      categories
                     </p>
                   )}
                 </div>
@@ -429,11 +472,15 @@ const TransactionArchiving = () => {
                 <div className="flex items-start space-x-3">
                   <HardDrive className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="font-medium text-yellow-800">Estimated Storage Impact</p>
+                    <p className="font-medium text-yellow-800">
+                      Estimated Storage Impact
+                    </p>
                     <p className="text-sm text-yellow-700 mt-1">
-                      Archiving these {previewData.totalCount.toLocaleString()} transactions will
-                      reduce storage usage by approximately{" "}
-                      {Math.round(((previewData.totalCount * 0.35) / 1024) * 100) / 100}
+                      Archiving these {previewData.totalCount.toLocaleString()}{" "}
+                      transactions will reduce storage usage by approximately{" "}
+                      {Math.round(
+                        ((previewData.totalCount * 0.35) / 1024) * 100,
+                      ) / 100}
                       MB while preserving all analytics data.
                     </p>
                   </div>
@@ -445,9 +492,12 @@ const TransactionArchiving = () => {
                 <div className="flex items-center space-x-3">
                   <Clock className="h-5 w-5 text-gray-600" />
                   <div>
-                    <p className="font-medium text-gray-800">Archive Cutoff Date</p>
+                    <p className="font-medium text-gray-800">
+                      Archive Cutoff Date
+                    </p>
                     <p className="text-sm text-gray-600">
-                      Transactions before {new Date(previewData.cutoffDate).toLocaleDateString()}{" "}
+                      Transactions before{" "}
+                      {new Date(previewData.cutoffDate).toLocaleDateString()}{" "}
                       will be archived
                     </p>
                   </div>
@@ -461,7 +511,9 @@ const TransactionArchiving = () => {
       {/* Archiving Progress */}
       {isArchiving && archivingProgress && (
         <div className="bg-white rounded-xl p-6 border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Archiving in Progress</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Archiving in Progress
+          </h3>
 
           <div className="space-y-4">
             <div>
@@ -490,7 +542,9 @@ const TransactionArchiving = () => {
         <div className="bg-white rounded-xl p-6 border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Ready to Archive</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Ready to Archive
+              </h3>
               <p className="text-gray-600 text-sm mt-1">
                 {confirmArchiving
                   ? 'Click "Confirm Archive" to proceed with archiving.'
@@ -511,7 +565,10 @@ const TransactionArchiving = () => {
               )}
 
               {confirmArchiving && (
-                <button onClick={() => setConfirmArchiving(false)} className="btn btn-secondary">
+                <button
+                  onClick={() => setConfirmArchiving(false)}
+                  className="btn btn-secondary"
+                >
                   Cancel
                 </button>
               )}
@@ -522,7 +579,9 @@ const TransactionArchiving = () => {
                 disabled={isArchiving}
               >
                 <Archive className="h-4 w-4" />
-                <span>{confirmArchiving ? "Confirm Archive" : "Start Archiving"}</span>
+                <span>
+                  {confirmArchiving ? "Confirm Archive" : "Start Archiving"}
+                </span>
               </button>
             </div>
           </div>
@@ -532,9 +591,13 @@ const TransactionArchiving = () => {
       {/* Last Result */}
       {lastResult && (
         <div className="bg-white rounded-xl p-6 border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Last Archiving Result</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Last Archiving Result
+          </h3>
 
-          <div className={`p-4 rounded-lg ${lastResult.success ? "bg-green-50" : "bg-red-50"}`}>
+          <div
+            className={`p-4 rounded-lg ${lastResult.success ? "bg-green-50" : "bg-red-50"}`}
+          >
             <div className="flex items-start space-x-3">
               {lastResult.success ? (
                 <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
@@ -545,7 +608,9 @@ const TransactionArchiving = () => {
                 <p
                   className={`font-medium ${lastResult.success ? "text-green-800" : "text-red-800"}`}
                 >
-                  {lastResult.success ? "Archiving Completed Successfully" : "Archiving Failed"}
+                  {lastResult.success
+                    ? "Archiving Completed Successfully"
+                    : "Archiving Failed"}
                 </p>
                 <p
                   className={`text-sm mt-1 ${lastResult.success ? "text-green-700" : "text-red-700"}`}
@@ -556,7 +621,9 @@ const TransactionArchiving = () => {
                   <div className="mt-2 text-sm">
                     <p>Processed: {lastResult.stats.processed} transactions</p>
                     <p>Archived: {lastResult.stats.archived} transactions</p>
-                    <p>Analytics created: {lastResult.stats.aggregated} records</p>
+                    <p>
+                      Analytics created: {lastResult.stats.aggregated} records
+                    </p>
                   </div>
                 )}
               </div>
@@ -570,10 +637,12 @@ const TransactionArchiving = () => {
         <div className="bg-white rounded-xl p-6 border border-gray-200">
           <div className="text-center py-8">
             <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No Archiving Needed</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              No Archiving Needed
+            </h3>
             <p className="text-gray-600">
-              Your transaction data is well-optimized. Check back when you have more historical
-              data.
+              Your transaction data is well-optimized. Check back when you have
+              more historical data.
             </p>
           </div>
         </div>

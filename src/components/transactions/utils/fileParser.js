@@ -58,9 +58,17 @@ export const autoDetectFieldMapping = (data) => {
   headers.forEach((header) => {
     const lower = header.toLowerCase();
     if (lower.includes("date")) mapping.date = header;
-    if (lower.includes("description") || lower.includes("name") || lower.includes("memo"))
+    if (
+      lower.includes("description") ||
+      lower.includes("name") ||
+      lower.includes("memo")
+    )
       mapping.description = header;
-    if (lower.includes("amount") || lower.includes("debit") || lower.includes("credit"))
+    if (
+      lower.includes("amount") ||
+      lower.includes("debit") ||
+      lower.includes("credit")
+    )
       mapping.amount = header;
     if (lower.includes("category")) mapping.category = header;
   });

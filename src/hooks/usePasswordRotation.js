@@ -47,8 +47,13 @@ const usePasswordRotation = () => {
       }
 
       const { encryptedData, iv } = JSON.parse(savedData);
-      const decrypted = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
-      const { key, salt: newSalt } = await encryptionUtils.generateKey(newPassword);
+      const decrypted = await encryptionUtils.decrypt(
+        encryptedData,
+        encryptionKey,
+        iv,
+      );
+      const { key, salt: newSalt } =
+        await encryptionUtils.generateKey(newPassword);
       const reencrypted = await encryptionUtils.encrypt(decrypted, key);
 
       const saveData = {
