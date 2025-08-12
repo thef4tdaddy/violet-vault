@@ -36,15 +36,13 @@ const DebtList = ({ debts, onDebtClick, onRecordPayment }) => {
 };
 
 const DebtCard = ({ debt, onClick, onRecordPayment }) => {
-  const config =
-    DEBT_TYPE_CONFIG[debt.type] || DEBT_TYPE_CONFIG[DEBT_TYPES.OTHER];
+  const config = DEBT_TYPE_CONFIG[debt.type] || DEBT_TYPE_CONFIG[DEBT_TYPES.OTHER];
   const IconComponent = getDebtIcon(debt.type);
 
   // Calculate progress percentage
   const progressPercentage =
     debt.originalBalance > 0
-      ? ((debt.originalBalance - debt.currentBalance) / debt.originalBalance) *
-        100
+      ? ((debt.originalBalance - debt.currentBalance) / debt.originalBalance) * 100
       : 0;
 
   // Determine status styling
@@ -93,9 +91,7 @@ const DebtCard = ({ debt, onClick, onRecordPayment }) => {
           <div className="ml-4 flex-1 min-w-0">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <h4 className="text-lg font-semibold text-gray-900 truncate">
-                  {debt.name}
-                </h4>
+                <h4 className="text-lg font-semibold text-gray-900 truncate">{debt.name}</h4>
                 <p className="text-sm text-gray-600 truncate">
                   {debt.creditor} • {config.name}
                 </p>

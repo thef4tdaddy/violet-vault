@@ -116,11 +116,11 @@ const useBudgetData = () => {
       const summary = {
         totalEnvelopeBalance: (envelopes || []).reduce(
           (sum, env) => sum + (env.currentBalance || 0),
-          0,
+          0
         ),
         totalSavingsBalance: (savingsGoals || []).reduce(
           (sum, goal) => sum + (goal.currentAmount || 0),
-          0,
+          0
         ),
         unassignedCash: unassignedCash || 0,
         actualBalance: actualBalance || 0,
@@ -233,13 +233,7 @@ const useBudgetData = () => {
     };
 
     reconcileMissingTransactions();
-  }, [
-    envelopes,
-    transactions,
-    unassignedCash,
-    queryClient,
-    zustandAddTransaction,
-  ]);
+  }, [envelopes, transactions, unassignedCash, queryClient, zustandAddTransaction]);
 
   // Enhanced mutations with optimistic updates and Dexie persistence
   const addEnvelopeMutation = useMutation({

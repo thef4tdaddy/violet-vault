@@ -6,12 +6,7 @@ import { DEBT_TYPE_CONFIG } from "../../../constants/debts";
  * Debt filtering and sorting controls
  * Pure UI component for debt list filtering
  */
-const DebtFilters = ({
-  filterOptions,
-  setFilterOptions,
-  debtTypes,
-  debtsByType,
-}) => {
+const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes, debtsByType }) => {
   const handleFilterChange = (field, value) => {
     setFilterOptions((prev) => ({
       ...prev,
@@ -76,9 +71,7 @@ const DebtFilters = ({
             <input
               type="checkbox"
               checked={filterOptions.showPaidOff}
-              onChange={(e) =>
-                handleFilterChange("showPaidOff", e.target.checked)
-              }
+              onChange={(e) => handleFilterChange("showPaidOff", e.target.checked)}
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mr-2"
             />
             Show Paid Off
