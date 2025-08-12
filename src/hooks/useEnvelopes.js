@@ -26,67 +26,73 @@ const useEnvelopes = (options = {}) => {
     transferFunds: zustandTransferFunds,
   } = useBudgetStore();
 
-  // Memoized query function with filtering
+  // TanStack Query function - hydrates from Dexie, Dexie syncs with Firebase
   const queryFunction = useCallback(async () => {
-    let envelopes = [];
+    console.log("🔄 TanStack Query: Fetching envelopes from Dexie...");
 
-    // Primary source: Dexie (persistent database)
     try {
+      let envelopes = [];
+
+      // Always fetch from Dexie (single source of truth for local data)
       if (category) {
         envelopes = await budgetDb.getEnvelopesByCategory(category);
       } else {
         envelopes = await budgetDb.envelopes.toArray();
       }
-      console.log("Using Dexie envelopes (primary):", envelopes.length);
-    } catch (error) {
-      console.warn("Dexie query failed, falling back to Zustand:", error);
-      // Fallback to Zustand only when Dexie fails
-      if (zustandEnvelopes && zustandEnvelopes.length > 0) {
+
+      console.log("✅ TanStack Query: Loaded from Dexie:", envelopes.length);
+
+      // If Dexie is empty and we have Zustand data, it means we need to seed Dexie
+      if (
+        envelopes.length === 0 &&
+        zustandEnvelopes &&
+        zustandEnvelopes.length > 0
+      ) {
+        console.log("🌱 TanStack Query: Seeding Dexie from Zustand...");
+        await budgetDb.bulkUpsertEnvelopes(zustandEnvelopes);
         envelopes = [...zustandEnvelopes];
-        console.log("Using Zustand envelopes (fallback):", envelopes.length);
-      } else {
-        envelopes = [];
       }
+
+      // Apply filters
+      let filteredEnvelopes = envelopes;
+
+      if (category) {
+        filteredEnvelopes = envelopes.filter(
+          (env) => env.category === category,
+        );
+      }
+
+      if (!includeArchived) {
+        filteredEnvelopes = filteredEnvelopes.filter((env) => !env.archived);
+      }
+
+      // Apply sorting
+      filteredEnvelopes.sort((a, b) => {
+        let aValue = a[sortBy];
+        let bValue = b[sortBy];
+
+        // Handle numeric values
+        if (typeof aValue === "number" && typeof bValue === "number") {
+          return sortOrder === "asc" ? aValue - bValue : bValue - aValue;
+        }
+
+        // Handle string values
+        aValue = String(aValue || "").toLowerCase();
+        bValue = String(bValue || "").toLowerCase();
+
+        if (sortOrder === "asc") {
+          return aValue.localeCompare(bValue);
+        } else {
+          return bValue.localeCompare(aValue);
+        }
+      });
+
+      return filteredEnvelopes;
+    } catch (error) {
+      console.error("❌ TanStack Query: Dexie fetch failed:", error);
+      // Emergency fallback only when Dexie completely fails
+      return zustandEnvelopes || [];
     }
-
-    // Apply filters
-    let filteredEnvelopes = envelopes;
-
-    if (category) {
-      filteredEnvelopes = filteredEnvelopes.filter(
-        (env) => env.category === category,
-      );
-    }
-
-    if (!includeArchived) {
-      filteredEnvelopes = filteredEnvelopes.filter((env) => !env.archived);
-    }
-
-    // Apply sorting
-    filteredEnvelopes.sort((a, b) => {
-      let aVal = a[sortBy];
-      let bVal = b[sortBy];
-
-      // Handle numeric fields
-      if (sortBy === "currentBalance" || sortBy === "targetAmount") {
-        aVal = parseFloat(aVal) || 0;
-        bVal = parseFloat(bVal) || 0;
-      }
-
-      // Handle string fields
-      if (typeof aVal === "string") {
-        aVal = aVal.toLowerCase();
-        bVal = bVal.toLowerCase();
-      }
-
-      if (sortOrder === "desc") {
-        return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
-      } else {
-        return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
-      }
-    });
-
-    return filteredEnvelopes;
   }, [zustandEnvelopes, category, includeArchived, sortBy, sortOrder]);
 
   // Memoized query options for performance
