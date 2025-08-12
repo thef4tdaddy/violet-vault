@@ -248,6 +248,55 @@ const useTransactions = (options = {}) => {
     },
   });
 
+  // Delete transaction mutation
+  const deleteTransactionMutation = useMutation({
+    mutationKey: ["transactions", "delete"],
+    mutationFn: async (transactionId) => {
+      // Apply optimistic update using helper
+      await optimisticHelpers.removeTransaction(transactionId);
+
+      return transactionId;
+    },
+    onSuccess: () => {
+      // Invalidate related queries
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
+      queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      queryClient.invalidateQueries({ queryKey: queryKeys.analytics });
+    },
+    onError: (error, transactionId) => {
+      console.error("Failed to delete transaction:", error);
+      // Rollback optimistic update
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
+    },
+  });
+
+  // Update transaction mutation
+  const updateTransactionMutation = useMutation({
+    mutationKey: ["transactions", "update"],
+    mutationFn: async ({ id, updates }) => {
+      // Apply optimistic update using helper
+      await optimisticHelpers.updateTransaction(id, {
+        ...updates,
+        updatedAt: new Date().toISOString(),
+      });
+
+      return { id, updates };
+    },
+    onSuccess: () => {
+      // Invalidate related queries
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
+      queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      queryClient.invalidateQueries({ queryKey: queryKeys.analytics });
+    },
+    onError: (error) => {
+      console.error("Failed to update transaction:", error);
+      // Rollback optimistic update
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
+    },
+  });
+
   // Analytics computation
   const transactions = transactionsQuery.data || [];
 
@@ -359,10 +408,20 @@ const useTransactions = (options = {}) => {
     addTransactionAsync: addTransactionMutation.mutateAsync,
     reconcileTransaction: reconcileTransactionMutation.mutate,
     reconcileTransactionAsync: reconcileTransactionMutation.mutateAsync,
+    deleteTransaction: deleteTransactionMutation.mutate,
+    deleteTransactionAsync: deleteTransactionMutation.mutateAsync,
+    updateTransaction: updateTransactionMutation.mutate,
+    updateTransactionAsync: updateTransactionMutation.mutateAsync,
+
+    // Convenience functions for common patterns
+    onDelete: deleteTransactionMutation.mutate, // Common prop name used by components
+    onUpdate: updateTransactionMutation.mutate, // Common prop name used by components
 
     // Mutation states
     isAdding: addTransactionMutation.isPending,
     isReconciling: reconcileTransactionMutation.isPending,
+    isDeleting: deleteTransactionMutation.isPending,
+    isUpdating: updateTransactionMutation.isPending,
 
     // Utility functions
     getTransactionById,
