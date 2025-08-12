@@ -309,6 +309,132 @@ export const optimisticHelpers = {
       console.warn("Failed to persist transaction to Dexie:", error);
     }
   },
+
+  // Bill optimistic helpers
+  addBill: async (newBill) => {
+    queryClient.setQueryData(queryKeys.billsList(), (old) => {
+      if (!old) return [newBill];
+      return [...old, newBill];
+    });
+
+    try {
+      await budgetDb.bills.add(newBill);
+    } catch (error) {
+      console.warn("Failed to persist bill to Dexie:", error);
+    }
+  },
+
+  updateBill: async (billId, updates) => {
+    queryClient.setQueryData(queryKeys.billsList(), (old) => {
+      if (!old) return old;
+      return old.map((bill) =>
+        bill.id === billId ? { ...bill, ...updates } : bill,
+      );
+    });
+
+    try {
+      await budgetDb.bills.put({ id: billId, ...updates });
+    } catch (error) {
+      console.warn("Failed to persist bill update to Dexie:", error);
+    }
+  },
+
+  removeBill: async (billId) => {
+    queryClient.setQueryData(queryKeys.billsList(), (old) => {
+      if (!old) return old;
+      return old.filter((bill) => bill.id !== billId);
+    });
+
+    try {
+      await budgetDb.bills.delete(billId);
+    } catch (error) {
+      console.warn("Failed to remove bill from Dexie:", error);
+    }
+  },
+
+  // Savings goal optimistic helpers
+  addSavingsGoal: async (newGoal) => {
+    queryClient.setQueryData(queryKeys.savingsGoalsList(), (old) => {
+      if (!old) return [newGoal];
+      return [...old, newGoal];
+    });
+
+    try {
+      await budgetDb.savingsGoals.add(newGoal);
+    } catch (error) {
+      console.warn("Failed to persist savings goal to Dexie:", error);
+    }
+  },
+
+  updateSavingsGoal: async (goalId, updates) => {
+    queryClient.setQueryData(queryKeys.savingsGoalsList(), (old) => {
+      if (!old) return old;
+      return old.map((goal) =>
+        goal.id === goalId ? { ...goal, ...updates } : goal,
+      );
+    });
+
+    try {
+      await budgetDb.savingsGoals.put({ id: goalId, ...updates });
+    } catch (error) {
+      console.warn("Failed to persist savings goal update to Dexie:", error);
+    }
+  },
+
+  removeSavingsGoal: async (goalId) => {
+    queryClient.setQueryData(queryKeys.savingsGoalsList(), (old) => {
+      if (!old) return old;
+      return old.filter((goal) => goal.id !== goalId);
+    });
+
+    try {
+      await budgetDb.savingsGoals.delete(goalId);
+    } catch (error) {
+      console.warn("Failed to remove savings goal from Dexie:", error);
+    }
+  },
+
+  // Debt optimistic helpers
+  addDebt: async (newDebt) => {
+    queryClient.setQueryData(queryKeys.debtsList(), (old) => {
+      if (!old) return [newDebt];
+      return [...old, newDebt];
+    });
+
+    try {
+      await budgetDb.debts.add(newDebt);
+    } catch (error) {
+      console.warn("Failed to persist debt to Dexie:", error);
+    }
+  },
+
+  updateDebt: async (debtId, updates) => {
+    queryClient.setQueryData(queryKeys.debtsList(), (old) => {
+      if (!old) return old;
+      return old.map((debt) =>
+        debt.id === debtId ? { ...debt, ...updates } : debt,
+      );
+    });
+
+    try {
+      await budgetDb.debts.put({ id: debtId, ...updates });
+    } catch (error) {
+      console.warn("Failed to persist debt update to Dexie:", error);
+    }
+  },
+
+  removeDebt: async (debtId) => {
+    queryClient.setQueryData(queryKeys.debtsList(), (old) => {
+      if (!old) return old;
+      return old.filter((debt) => debt.id !== debtId);
+    });
+
+    try {
+      await budgetDb.debts.delete(debtId);
+    } catch (error) {
+      console.warn("Failed to remove debt from Dexie:", error);
+    }
+  },
 };
 
 // Enhanced background sync utilities

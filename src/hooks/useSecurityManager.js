@@ -72,10 +72,21 @@ export const useSecurityManager = () => {
                 typeof value === "number" ||
                 typeof value === "boolean" ||
                 value === null ||
-                value === undefined ||
-                (typeof value === "object" && JSON.stringify(value))
+                value === undefined
               ) {
                 safeMetadata[key] = value;
+              } else if (typeof value === "object" && value !== null) {
+                // Test if object is safely serializable
+                try {
+                  JSON.stringify(value);
+                  safeMetadata[key] = value;
+                } catch (serializeError) {
+                  // Object has circular references, skip it
+                  console.debug(
+                    `Skipping non-serializable object for key: ${key}`,
+                    serializeError.message,
+                  );
+                }
               }
             } catch (err) {
               // Skip non-serializable values
