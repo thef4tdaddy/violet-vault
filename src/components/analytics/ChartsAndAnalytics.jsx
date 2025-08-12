@@ -129,9 +129,22 @@ const ChartsAnalytics = ({
       }
     });
 
-    return Object.values(grouped).sort((a, b) =>
+    const results = Object.values(grouped).sort((a, b) =>
       a.month.localeCompare(b.month),
     );
+
+    // Ensure we always return an array, even if empty
+    return results.length > 0
+      ? results
+      : [
+          {
+            month: new Date().toISOString().slice(0, 7),
+            income: 0,
+            expenses: 0,
+            net: 0,
+            transactionCount: 0,
+          },
+        ];
   }, [filteredTransactions, isValidDate]);
 
   // Envelope spending breakdown
@@ -159,7 +172,9 @@ const ChartsAnalytics = ({
       }
     });
 
-    return Object.values(spending).sort((a, b) => b.amount - a.amount);
+    const results = Object.values(spending).sort((a, b) => b.amount - a.amount);
+    // Ensure we always return a valid array
+    return results.length > 0 ? results : [];
   }, [filteredTransactions, safeEnvelopes]);
 
   // Category breakdown
@@ -200,15 +215,25 @@ const ChartsAnalytics = ({
     const patterns = days.map((day) => ({ day, amount: 0, count: 0 }));
 
     filteredTransactions.forEach((transaction) => {
-      if (transaction.amount < 0) {
-        const dayIndex = new Date(transaction.date).getDay();
-        patterns[dayIndex].amount += Math.abs(transaction.amount);
-        patterns[dayIndex].count++;
+      if (
+        transaction &&
+        transaction.amount < 0 &&
+        isValidDate(transaction.date)
+      ) {
+        try {
+          const dayIndex = new Date(transaction.date).getDay();
+          if (dayIndex >= 0 && dayIndex < 7) {
+            patterns[dayIndex].amount += Math.abs(transaction.amount);
+            patterns[dayIndex].count++;
+          }
+        } catch {
+          console.warn("Invalid date in weeklyPatterns:", transaction.date);
+        }
       }
     });
 
     return patterns;
-  }, [filteredTransactions]);
+  }, [filteredTransactions, isValidDate]);
 
   // Envelope health analysis
   const envelopeHealth = useMemo(() => {
@@ -560,27 +585,36 @@ const ChartsAnalytics = ({
               Top Spending Envelopes
             </h3>
             <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={envelopeSpending.slice(0, 8)}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="amount"
-                  label={({ name, percent }) =>
-                    `${name} ${(percent * 100).toFixed(0)}%`
-                  }
-                >
-                  {envelopeSpending.slice(0, 8).map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={entry.color || chartColors[index]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-              </PieChart>
+              {envelopeSpending.length > 0 ? (
+                <PieChart>
+                  <Pie
+                    data={envelopeSpending.slice(0, 8)}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="amount"
+                    label={({ name, percent }) =>
+                      `${name} ${(percent * 100).toFixed(0)}%`
+                    }
+                  >
+                    {envelopeSpending.slice(0, 8).map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={entry.color || chartColors[index]}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<CustomTooltip />} />
+                </PieChart>
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  <div className="text-center">
+                    <Wallet className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p>No envelope spending data available</p>
+                  </div>
+                </div>
+              )}
             </ResponsiveContainer>
           </div>
         </div>
@@ -612,7 +646,7 @@ const ChartsAnalytics = ({
             </div>
 
             <ResponsiveContainer width="100%" height={400}>
-              {chartType === "line" && (
+              {chartType === "line" && monthlyTrends.length > 0 && (
                 <LineChart data={monthlyTrends}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="month" stroke="#6b7280" />
@@ -635,7 +669,7 @@ const ChartsAnalytics = ({
                   />
                 </LineChart>
               )}
-              {chartType === "bar" && (
+              {chartType === "bar" && monthlyTrends.length > 0 && (
                 <BarChart data={monthlyTrends}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="month" stroke="#6b7280" />
@@ -646,7 +680,7 @@ const ChartsAnalytics = ({
                   <Bar dataKey="expenses" fill="#ef4444" name="Expenses" />
                 </BarChart>
               )}
-              {chartType === "area" && (
+              {chartType === "area" && monthlyTrends.length > 0 && (
                 <AreaChart data={monthlyTrends}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="month" stroke="#6b7280" />
@@ -672,6 +706,14 @@ const ChartsAnalytics = ({
                     name="Expenses"
                   />
                 </AreaChart>
+              )}
+              {monthlyTrends.length === 0 && (
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  <div className="text-center">
+                    <BarChart3 className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p>No data available for the selected period</p>
+                  </div>
+                </div>
               )}
             </ResponsiveContainer>
           </div>
