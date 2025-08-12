@@ -341,54 +341,98 @@ const storeInitializer = (set, get) => ({
       console.log("🔐 validatePassword: Data check", {
         hasSavedData: !!savedData,
         hasAuthSalt: !!authState.salt,
+        hasEncryptionKey: !!authState.encryptionKey,
         authStateKeys: Object.keys(authState),
       });
 
-      if (!savedData || !authState.salt) {
-        console.log("🔐 validatePassword: Missing data or salt");
-        return false;
-      }
+      // If we have no encrypted data saved yet, validate against the current auth salt
+      if (!savedData && authState.salt) {
+        console.log(
+          "🔐 validatePassword: No saved data, validating against auth salt",
+        );
 
-      const parsedData = JSON.parse(savedData);
-      const { salt: savedSalt, encryptedData } = parsedData;
-      const saltArray = new Uint8Array(savedSalt);
-
-      console.log("🔐 validatePassword: Parsed data", {
-        hasSavedSalt: !!savedSalt,
-        hasEncryptedData: !!encryptedData,
-        saltLength: saltArray.length,
-      });
-
-      // Try to derive the key with the provided password
-      const testKey = await encryptionUtils.deriveKeyFromSalt(
-        password,
-        saltArray,
-      );
-
-      console.log("🔐 validatePassword: Key derived successfully");
-
-      // Try to decrypt actual data to validate password
-      if (encryptedData) {
         try {
-          await encryptionUtils.decrypt(encryptedData, testKey);
-          console.log(
-            "🔐 validatePassword: Decryption successful - password is correct",
+          const saltArray = new Uint8Array(authState.salt);
+          const testKey = await encryptionUtils.deriveKeyFromSalt(
+            password,
+            saltArray,
           );
-          return true;
-        } catch (decryptError) {
+
+          // Compare the derived key with the current encryption key if available
+          if (authState.encryptionKey) {
+            const keysMatch =
+              JSON.stringify(Array.from(testKey)) ===
+              JSON.stringify(Array.from(authState.encryptionKey));
+            console.log(
+              "🔐 validatePassword: Key comparison result:",
+              keysMatch,
+            );
+            return keysMatch;
+          } else {
+            // If no current key, just check if we can derive a key (basic validation)
+            console.log(
+              "🔐 validatePassword: No current key, basic validation passed",
+            );
+            return true;
+          }
+        } catch (error) {
           console.log(
-            "🔐 validatePassword: Decryption failed - password is incorrect",
-            decryptError.message,
+            "🔐 validatePassword: Auth salt validation failed:",
+            error.message,
           );
           return false;
         }
       }
 
-      // Fallback: if no encrypted data to test, just check if key exists
+      // If we have encrypted data, validate against it (original logic)
+      if (savedData && authState.salt) {
+        const parsedData = JSON.parse(savedData);
+        const { salt: savedSalt, encryptedData } = parsedData;
+        const saltArray = new Uint8Array(savedSalt);
+
+        console.log("🔐 validatePassword: Parsed data", {
+          hasSavedSalt: !!savedSalt,
+          hasEncryptedData: !!encryptedData,
+          saltLength: saltArray.length,
+        });
+
+        // Try to derive the key with the provided password
+        const testKey = await encryptionUtils.deriveKeyFromSalt(
+          password,
+          saltArray,
+        );
+
+        console.log("🔐 validatePassword: Key derived successfully");
+
+        // Try to decrypt actual data to validate password
+        if (encryptedData) {
+          try {
+            await encryptionUtils.decrypt(encryptedData, testKey);
+            console.log(
+              "🔐 validatePassword: Decryption successful - password is correct",
+            );
+            return true;
+          } catch (decryptError) {
+            console.log(
+              "🔐 validatePassword: Decryption failed - password is incorrect",
+              decryptError.message,
+            );
+            return false;
+          }
+        }
+
+        // Fallback: if no encrypted data to test, just check if key exists
+        console.log(
+          "🔐 validatePassword: No encrypted data to test, using fallback",
+        );
+        return !!testKey;
+      }
+
+      // If we have neither saved data nor auth salt, cannot validate
       console.log(
-        "🔐 validatePassword: No encrypted data to test, using fallback",
+        "🔐 validatePassword: No data or salt available for validation",
       );
-      return !!testKey;
+      return false;
     } catch (error) {
       console.error(
         "🔐 validatePassword: Validation failed with error:",
