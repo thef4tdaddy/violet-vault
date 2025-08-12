@@ -208,10 +208,7 @@ const DebtDashboard = () => {
       {activeTab === "overview" && (
         <>
           {/* Summary Cards */}
-          <DebtSummaryCards
-            stats={debtStats}
-            upcomingPayments={upcomingPayments}
-          />
+          <DebtSummaryCards stats={debtStats} />
 
           {/* Filters and Controls */}
           <DebtFilters
