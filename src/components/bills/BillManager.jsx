@@ -22,6 +22,10 @@ import {
 } from "lucide-react";
 import { getBillIcon, getIconByName } from "../../utils/billIcons";
 import AddBillModal from "./AddBillModal";
+import BulkBillUpdateModal from "./BulkBillUpdateModal";
+import BillDiscoveryModal from "./BillDiscoveryModal";
+import { useBillOperations } from "../../hooks/useBillOperations";
+import { generateBillSuggestions } from "../../utils/billDiscovery";
 import logger from "../../utils/logger";
 
 const BillManager = ({
@@ -72,12 +76,16 @@ const BillManager = ({
 
   const reconcileTransaction = budget.reconcileTransaction;
   const handlePayBillAction = onPayBill || updateBill;
+
   const [selectedBills, setSelectedBills] = useState(new Set());
   const [viewMode, setViewMode] = useState("upcoming");
   const [isSearching, setIsSearching] = useState(false);
   const [showBillDetail, setShowBillDetail] = useState(null);
   const [showAddBillModal, setShowAddBillModal] = useState(false);
   const [editingBill, setEditingBill] = useState(null);
+  const [showBulkUpdateModal, setShowBulkUpdateModal] = useState(false);
+  const [showDiscoveryModal, setShowDiscoveryModal] = useState(false);
+  const [discoveredBills, setDiscoveredBills] = useState([]);
   const [filterOptions, setFilterOptions] = useState({
     billTypes: ["all"],
     providers: [],
@@ -165,6 +173,16 @@ const BillManager = ({
       all: bills,
     };
   }, [bills]);
+
+  // Initialize bill operations hook with computed bills
+  const billOperations = useBillOperations({
+    bills,
+    envelopes,
+    updateBill,
+    onUpdateBill,
+    onError,
+    budget,
+  });
 
   const totals = useMemo(() => {
     const overdueTotal = categorizedBills.overdue.reduce((sum, b) => sum + Math.abs(b.amount), 0);
@@ -300,78 +318,16 @@ const BillManager = ({
     return <FileText className="h-6 w-6" />;
   };
 
-  const handlePayBill = (billId) => {
-    try {
-      console.log("🔄 BillManager.handlePayBill called", {
-        billId,
-        billsLength: bills.length,
-        handlePayBillAction: typeof handlePayBillAction,
-      });
+  const handlePayBill = async (billId) => {
+    const result = await billOperations.handlePayBill(billId);
 
-      const bill = bills.find((b) => b.id === billId);
-      if (!bill) {
-        console.error("❌ Bill not found", {
-          billId,
-          availableBills: bills.map((b) => b.id),
-        });
-        onError?.("Bill not found");
-        return;
-      }
+    if (result.success && result.updatedBill) {
+      // Handle transaction record and balance updates using existing logic
+      const bill = result.updatedBill;
 
-      if (bill.isPaid) {
-        console.warn("⚠️ Bill is already paid", { billId });
-        onError?.("Bill is already paid");
-        return;
-      }
-
-      // Check if there are sufficient funds
-      if (bill.envelopeId) {
-        const envelope = envelopes.find((env) => env.id === bill.envelopeId);
-        if (!envelope) {
-          onError?.("Assigned envelope not found");
-          return;
-        }
-
-        // Allow envelopes to have more money than their budget
-        // Only check if the envelope has any balance at all (currentBalance can exceed budget)
-        const availableBalance = envelope.currentBalance || 0;
-        const billAmount = Math.abs(bill.amount);
-
-        if (availableBalance < billAmount) {
-          onError?.(
-            `Insufficient funds in envelope "${envelope.name}". Available: $${availableBalance.toFixed(2)}, Required: $${billAmount.toFixed(2)}`
-          );
-          return;
-        }
-      } else {
-        const unassignedCash = budget.unassignedCash || 0;
-        const billAmount = Math.abs(bill.amount);
-
-        if (unassignedCash < billAmount) {
-          onError?.(
-            `Insufficient unassigned cash. Available: $${unassignedCash.toFixed(2)}, Required: $${billAmount.toFixed(2)}`
-          );
-          return;
-        }
-      }
-
-      const updatedBill = {
-        ...bill,
-        isPaid: true,
-        paidDate: new Date().toISOString().split("T")[0],
-      };
-
-      console.log("🔄 Calling handlePayBillAction", {
-        updatedBill: updatedBill,
-        functionType: typeof handlePayBillAction,
-      });
-
-      handlePayBillAction?.(updatedBill);
-
-      // Create transaction record and update balances
       const paymentTxn = {
         id: `${bill.id}_payment_${Date.now()}`,
-        date: updatedBill.paidDate,
+        date: bill.paidDate,
         description: bill.provider || bill.description || "Bill Payment",
         amount: -Math.abs(bill.amount),
         envelopeId: bill.envelopeId || "unassigned",
@@ -385,12 +341,11 @@ const BillManager = ({
         const updatedEnvelopes = envelopes.map((env) => {
           if (env.id === bill.envelopeId) {
             const currentBalance = env.currentBalance || 0;
-            const newBalance = currentBalance - billAmount; // Allow negative balances if needed
+            const newBalance = currentBalance - billAmount;
 
             return {
               ...env,
               currentBalance: newBalance,
-              // Track last transaction for debugging
               lastTransaction: {
                 type: "bill_payment",
                 amount: -billAmount,
@@ -409,27 +364,52 @@ const BillManager = ({
       } else {
         const billAmount = Math.abs(bill.amount);
         const currentUnassigned = budget.unassignedCash || 0;
-        const newUnassigned = currentUnassigned - billAmount; // Allow negative unassigned cash if needed
+        const newUnassigned = currentUnassigned - billAmount;
 
         reconcileTransaction({
           transaction: paymentTxn,
           newUnassignedCash: newUnassigned,
         });
       }
-    } catch (error) {
-      console.error("Error paying bill:", error);
-      onError?.(error.message || "Failed to pay bill");
     }
   };
 
   const searchNewBills = async () => {
     setIsSearching(true);
     try {
+      // Use real bill discovery logic
+      const suggestions = generateBillSuggestions(transactions, bills, envelopes);
+      setDiscoveredBills(suggestions);
+      setShowDiscoveryModal(true);
+
+      // Also call the prop function for backward compatibility
       await onSearchNewBills?.();
     } catch (error) {
-      onError?.(error);
+      console.error("Error discovering bills:", error);
+      onError?.(error.message || "Failed to discover new bills");
     } finally {
       setIsSearching(false);
+    }
+  };
+
+  const handleAddDiscoveredBills = async (billsToAdd) => {
+    try {
+      for (const bill of billsToAdd) {
+        // Use the existing addBill logic
+        if (onCreateRecurringBill) {
+          await onCreateRecurringBill(bill);
+        } else {
+          try {
+            await addBill(bill);
+          } catch (error) {
+            console.warn("TanStack addBill failed, using Zustand fallback", error);
+            budget.addTransaction(bill);
+          }
+        }
+      }
+      console.log(`Successfully added ${billsToAdd.length} discovered bills`);
+    } catch (error) {
+      throw new Error(`Failed to add discovered bills: ${error.message}`);
     }
   };
 
@@ -445,39 +425,24 @@ const BillManager = ({
     });
   };
 
-  const paySelectedBills = () => {
+  const paySelectedBills = async () => {
     if (selectedBills.size === 0) {
       onError?.("No bills selected");
       return;
     }
 
-    try {
-      let successCount = 0;
-      let errorCount = 0;
-      const errors = [];
+    const result = await billOperations.handleBulkPayment(Array.from(selectedBills));
 
-      selectedBills.forEach((billId) => {
-        try {
-          handlePayBill(billId);
-          successCount++;
-        } catch (error) {
-          errorCount++;
-          errors.push(`Bill ${billId}: ${error.message}`);
-        }
-      });
-
+    if (result.success) {
       setSelectedBills(new Set());
+    }
+  };
 
-      if (errorCount > 0) {
-        onError?.(
-          `${successCount} bills paid successfully, ${errorCount} failed:\n${errors.join("\n")}`
-        );
-      } else {
-        console.log(`Successfully paid ${successCount} bills`);
-      }
-    } catch (error) {
-      console.error("Error paying selected bills:", error);
-      onError?.(error.message || "Failed to pay selected bills");
+  const handleBulkUpdate = async (updatedBills) => {
+    const result = await billOperations.handleBulkUpdate(updatedBills);
+
+    if (result.success) {
+      setSelectedBills(new Set());
     }
   };
 
@@ -659,12 +624,20 @@ const BillManager = ({
             </select>
 
             {selectedBills.size > 0 && (
-              <button
-                onClick={paySelectedBills}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center text-sm"
-              >
-                <CheckCircle className="h-4 w-4 mr-2" /> Pay {selectedBills.size} Selected
-              </button>
+              <>
+                <button
+                  onClick={() => setShowBulkUpdateModal(true)}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center text-sm"
+                >
+                  <Settings className="h-4 w-4 mr-2" /> Update {selectedBills.size} Selected
+                </button>
+                <button
+                  onClick={paySelectedBills}
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center text-sm"
+                >
+                  <CheckCircle className="h-4 w-4 mr-2" /> Pay {selectedBills.size} Selected
+                </button>
+              </>
             )}
           </div>
         </div>
@@ -1070,6 +1043,32 @@ const BillManager = ({
               budget.addEnvelope(envelopeData);
             }
           }}
+        />
+      )}
+
+      {/* Bulk Update Modal */}
+      {showBulkUpdateModal && (
+        <BulkBillUpdateModal
+          isOpen={showBulkUpdateModal}
+          onClose={() => setShowBulkUpdateModal(false)}
+          selectedBills={bills.filter((bill) => selectedBills.has(bill.id))}
+          onUpdateBills={handleBulkUpdate}
+          onError={onError}
+        />
+      )}
+
+      {/* Bill Discovery Modal */}
+      {showDiscoveryModal && (
+        <BillDiscoveryModal
+          isOpen={showDiscoveryModal}
+          onClose={() => {
+            setShowDiscoveryModal(false);
+            setDiscoveredBills([]);
+          }}
+          discoveredBills={discoveredBills}
+          onAddBills={handleAddDiscoveredBills}
+          onError={onError}
+          availableEnvelopes={envelopes}
         />
       )}
     </div>
