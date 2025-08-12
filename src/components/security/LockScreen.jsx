@@ -93,7 +93,7 @@ const LockScreen = () => {
   if (!isLocked) return null;
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-purple-900 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-purple-900 flex items-center justify-center p-4 z-[9999]">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div

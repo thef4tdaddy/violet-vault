@@ -41,6 +41,7 @@ const DebtDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedDebt, setSelectedDebt] = useState(null);
+  const [editingDebt, setEditingDebt] = useState(null);
   const [filterOptions, setFilterOptions] = useState({
     type: "all", // all, mortgage, auto, credit_card, etc.
     status: "all", // all, active, paid_off, etc.
@@ -104,6 +105,16 @@ const DebtDashboard = () => {
   const handleAddDebt = (debtData) => {
     createDebt(debtData);
     setShowAddModal(false);
+  };
+
+  const handleEditDebt = (debtId, debtData) => {
+    updateDebt(debtId, debtData);
+    setEditingDebt(null);
+    // Refresh selected debt if it was updated
+    if (selectedDebt?.id === debtId) {
+      const updatedDebt = debts.find((d) => d.id === debtId);
+      setSelectedDebt(updatedDebt);
+    }
   };
 
   const handleDebtClick = (debt) => {
@@ -295,6 +306,13 @@ const DebtDashboard = () => {
         onSubmit={handleAddDebt}
       />
 
+      <AddDebtModal
+        isOpen={!!editingDebt}
+        onClose={() => setEditingDebt(null)}
+        onSubmit={handleEditDebt}
+        debt={editingDebt}
+      />
+
       {selectedDebt && (
         <DebtDetailModal
           debt={selectedDebt}
@@ -304,6 +322,7 @@ const DebtDashboard = () => {
           onDelete={handleDeleteDebt}
           onRecordPayment={handleRecordPayment}
           onLinkToBill={handleLinkToBill}
+          onEdit={(debt) => setEditingDebt(debt)}
         />
       )}
     </div>

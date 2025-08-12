@@ -8,32 +8,74 @@ import {
 import { useBudgetStore } from "../../../stores/budgetStore";
 
 /**
- * Modal for adding new debts
+ * Modal for adding new debts or editing existing ones
  * Pure UI component with form validation
  */
-const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
+const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
+  const isEditMode = !!debt;
+
   // Get envelopes for dropdown selection
   const { envelopes = [] } = useBudgetStore();
   const [formData, setFormData] = useState({
-    name: "",
-    creditor: "",
-    type: DEBT_TYPES.PERSONAL,
-    currentBalance: "",
-    originalBalance: "",
-    interestRate: "",
-    minimumPayment: "",
-    paymentFrequency: PAYMENT_FREQUENCIES.MONTHLY,
-    paymentDueDate: "",
-    notes: "",
+    name: debt?.name || "",
+    creditor: debt?.creditor || "",
+    type: debt?.type || DEBT_TYPES.PERSONAL,
+    currentBalance: debt?.currentBalance?.toString() || "",
+    originalBalance: debt?.originalBalance?.toString() || "",
+    interestRate: debt?.interestRate?.toString() || "",
+    minimumPayment: debt?.minimumPayment?.toString() || "",
+    paymentFrequency: debt?.paymentFrequency || PAYMENT_FREQUENCIES.MONTHLY,
+    paymentDueDate: debt?.paymentDueDate || "",
+    notes: debt?.notes || "",
     // Connection fields
     paymentMethod: "create_new", // "create_new" or "connect_existing"
-    createBill: true, // Automatically create a bill for payments (when paymentMethod is create_new)
-    envelopeId: "", // Envelope to fund payments from
-    existingBillId: "", // For connecting to existing bill
+    createBill: !isEditMode, // Don't auto-create bill when editing
+    envelopeId: debt?.envelopeId || "", // Envelope to fund payments from
+    existingBillId: debt?.relatedBill?.id || "", // For connecting to existing bill
   });
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Update form data when debt prop changes
+  React.useEffect(() => {
+    if (debt) {
+      setFormData({
+        name: debt.name || "",
+        creditor: debt.creditor || "",
+        type: debt.type || DEBT_TYPES.PERSONAL,
+        currentBalance: debt.currentBalance?.toString() || "",
+        originalBalance: debt.originalBalance?.toString() || "",
+        interestRate: debt.interestRate?.toString() || "",
+        minimumPayment: debt.minimumPayment?.toString() || "",
+        paymentFrequency: debt.paymentFrequency || PAYMENT_FREQUENCIES.MONTHLY,
+        paymentDueDate: debt.paymentDueDate || "",
+        notes: debt.notes || "",
+        paymentMethod: "create_new",
+        createBill: false, // Don't auto-create bill when editing
+        envelopeId: debt.envelopeId || "",
+        existingBillId: debt.relatedBill?.id || "",
+      });
+    } else if (!debt && isOpen) {
+      // Reset form for new debt
+      setFormData({
+        name: "",
+        creditor: "",
+        type: DEBT_TYPES.PERSONAL,
+        currentBalance: "",
+        originalBalance: "",
+        interestRate: "",
+        minimumPayment: "",
+        paymentFrequency: PAYMENT_FREQUENCIES.MONTHLY,
+        paymentDueDate: "",
+        notes: "",
+        paymentMethod: "create_new",
+        createBill: true,
+        envelopeId: "",
+        existingBillId: "",
+      });
+    }
+  }, [debt, isOpen]);
 
   if (!isOpen) return null;
 
@@ -93,11 +135,25 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
           : parseFloat(formData.currentBalance), // Default to current balance if not specified
       };
 
-      await onSubmit(debtData);
-      resetForm();
+      if (isEditMode) {
+        // For edit mode, pass debt ID and updates
+        await onSubmit(debt.id, debtData);
+      } else {
+        // For add mode, just pass the debt data
+        await onSubmit(debtData);
+      }
+
+      if (!isEditMode) {
+        resetForm(); // Only reset form when adding new debt
+      }
     } catch (error) {
-      console.error("Error creating debt:", error);
-      setErrors({ submit: "Failed to create debt. Please try again." });
+      console.error(
+        `Error ${isEditMode ? "updating" : "creating"} debt:`,
+        error,
+      );
+      setErrors({
+        submit: `Failed to ${isEditMode ? "update" : "create"} debt. Please try again.`,
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -137,7 +193,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xl font-semibold text-gray-900 flex items-center">
             <CreditCard className="h-5 w-5 mr-2 text-red-600" />
-            Add New Debt
+            {isEditMode ? "Edit Debt" : "Add New Debt"}
           </h3>
           <button
             onClick={handleClose}
@@ -505,7 +561,13 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
               disabled={isSubmitting}
               className="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {isSubmitting ? "Adding..." : "Add Debt"}
+              {isSubmitting
+                ? isEditMode
+                  ? "Updating..."
+                  : "Adding..."
+                : isEditMode
+                  ? "Update Debt"
+                  : "Add Debt"}
             </button>
           </div>
         </form>
