@@ -53,26 +53,71 @@ export const useSecurityManager = () => {
     (event) => {
       if (!securitySettings.securityLoggingEnabled) return;
 
-      const securityEvent = {
-        id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        timestamp: new Date().toISOString(),
-        type: event.type,
-        description: event.description,
-        metadata: {
+      try {
+        // Safely serialize metadata to avoid circular references
+        const safeMetadata = {
           userAgent: navigator.userAgent,
           timestamp: Date.now(),
           url: window.location.href,
-          ...event.metadata,
-        },
-      };
+        };
 
-      setSecurityEvents((prev) => {
-        const updated = [securityEvent, ...prev];
-        // Keep only last 100 events to prevent storage bloat
-        return updated.slice(0, 100);
-      });
+        // Safely add event metadata, avoiding circular references
+        if (event.metadata) {
+          Object.keys(event.metadata).forEach((key) => {
+            try {
+              const value = event.metadata[key];
+              // Only include serializable values
+              if (
+                typeof value === "string" ||
+                typeof value === "number" ||
+                typeof value === "boolean" ||
+                value === null ||
+                value === undefined ||
+                (typeof value === "object" && JSON.stringify(value))
+              ) {
+                safeMetadata[key] = value;
+              }
+            } catch (err) {
+              // Skip non-serializable values
+              console.warn(
+                `Skipping non-serializable metadata key: ${key}`,
+                err,
+              );
+            }
+          });
+        }
 
-      logger.info(`Security event logged: ${event.type}`, securityEvent);
+        const securityEvent = {
+          id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          timestamp: new Date().toISOString(),
+          type: event.type,
+          description: event.description,
+          metadata: safeMetadata,
+        };
+
+        setSecurityEvents((prev) => {
+          const updated = [securityEvent, ...prev];
+          // Keep only last 100 events to prevent storage bloat
+          return updated.slice(0, 100);
+        });
+
+        logger.info(`Security event logged: ${event.type}`, securityEvent);
+      } catch (error) {
+        console.error("Failed to log security event:", error);
+        // Still try to log a minimal event
+        try {
+          const minimalEvent = {
+            id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            timestamp: new Date().toISOString(),
+            type: event.type || "UNKNOWN",
+            description: event.description || "Security event (logging error)",
+            metadata: { error: "Logging error occurred" },
+          };
+          setSecurityEvents((prev) => [minimalEvent, ...prev.slice(0, 99)]);
+        } catch (fallbackError) {
+          console.error("Failed to log minimal security event:", fallbackError);
+        }
+      }
     },
     [securitySettings.securityLoggingEnabled],
   );
@@ -267,7 +312,8 @@ export const useSecurityManager = () => {
           description: "Security settings updated",
           metadata: {
             changes: updates,
-            previousSettings: prev,
+            // Only log serializable parts of previous settings
+            previousSettingsKeys: Object.keys(prev),
           },
         });
 
