@@ -12,6 +12,7 @@ import {
   AlertTriangle,
   CheckCircle,
   Info,
+  X,
 } from "lucide-react";
 import { useSecurityManager } from "../../hooks/useSecurityManager";
 
@@ -66,7 +67,7 @@ const SecuritySettings = ({ isOpen, onClose }) => {
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 p-1"
             >
-              <Settings className="h-5 w-5" />
+              <X className="h-5 w-5" />
             </button>
           </div>
 
