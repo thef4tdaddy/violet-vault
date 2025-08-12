@@ -310,6 +310,40 @@ export const optimisticHelpers = {
     }
   },
 
+  removeTransaction: async (transactionId) => {
+    // Update TanStack Query cache
+    queryClient.setQueryData(queryKeys.transactionsList(), (old) => {
+      if (!old) return old;
+      return old.filter((transaction) => transaction.id !== transactionId);
+    });
+
+    // Remove from Dexie
+    try {
+      await budgetDb.transactions.delete(transactionId);
+    } catch (error) {
+      console.warn("Failed to remove transaction from Dexie:", error);
+    }
+  },
+
+  updateTransaction: async (transactionId, updates) => {
+    // Update TanStack Query cache
+    queryClient.setQueryData(queryKeys.transactionsList(), (old) => {
+      if (!old) return old;
+      return old.map((transaction) =>
+        transaction.id === transactionId
+          ? { ...transaction, ...updates }
+          : transaction,
+      );
+    });
+
+    // Update in Dexie
+    try {
+      await budgetDb.transactions.put({ id: transactionId, ...updates });
+    } catch (error) {
+      console.warn("Failed to update transaction in Dexie:", error);
+    }
+  },
+
   // Bill optimistic helpers
   addBill: async (newBill) => {
     queryClient.setQueryData(queryKeys.billsList(), (old) => {
