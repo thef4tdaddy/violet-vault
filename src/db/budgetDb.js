@@ -43,7 +43,6 @@ export class VioletVaultDB extends Dexie {
 
     // Enhanced hooks for automatic timestamping across all tables
     const addTimestampHooks = (table) => {
-      // eslint-disable-next-line no-unused-vars
       table.hook("creating", (primKey, obj, trans) => {
         // Handle frozen/sealed/readonly objects from Firebase by creating extensible copy
         try {
@@ -84,14 +83,14 @@ export class VioletVaultDB extends Dexie {
             // Try to replace the object properties
             try {
               Object.assign(obj, extensibleObj);
-            } catch (assignError) {
+            } catch {
               // If Object.assign fails, clear the object and reassign
               try {
                 // Clear existing properties (if possible)
                 Object.keys(obj).forEach((key) => {
                   try {
                     delete obj[key];
-                  } catch (deleteError) {
+                  } catch {
                     // Property can't be deleted, skip it
                   }
                 });
