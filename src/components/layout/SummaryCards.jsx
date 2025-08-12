@@ -12,12 +12,22 @@ import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
  * Now uses TanStack Query hooks for data loading
  */
 const SummaryCards = () => {
-  const { openUnassignedCashModal, unassignedCash } = useBudgetStore();
+  const budgetStore = useBudgetStore();
+  const { openUnassignedCashModal, unassignedCash } = budgetStore;
 
   // Get data from TanStack Query hooks
-  const { data: envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
-  const { data: savingsGoals = [], isLoading: savingsLoading } =
+  const { data: queryEnvelopes = [], isLoading: envelopesLoading } =
+    useEnvelopes();
+  const { data: querySavingsGoals = [], isLoading: savingsLoading } =
     useSavingsGoals();
+
+  // Fallback to Zustand data if TanStack Query data is empty (like Dashboard does)
+  const envelopes =
+    queryEnvelopes.length > 0 ? queryEnvelopes : budgetStore.envelopes || [];
+  const savingsGoals =
+    querySavingsGoals.length > 0
+      ? querySavingsGoals
+      : budgetStore.savingsGoals || [];
 
   // Calculate totals from hook data
   const totalEnvelopeBalance = envelopes.reduce(
@@ -32,7 +42,10 @@ const SummaryCards = () => {
 
   // Debug logging to compare with Dashboard
   console.log("🔍 SummaryCards Debug:", {
-    envelopesCount: envelopes.length,
+    queryEnvelopesCount: queryEnvelopes.length,
+    zustandEnvelopesCount: budgetStore.envelopes?.length || 0,
+    usingQuery: queryEnvelopes.length > 0,
+    finalEnvelopesCount: envelopes.length,
     totalEnvelopeBalance,
     totalSavingsBalance,
     unassignedCash,
