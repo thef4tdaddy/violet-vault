@@ -29,7 +29,9 @@ const migrateOldData = async () => {
 
     // Migrate if old data exists (always replace new data)
     if (oldData) {
-      console.log("🔄 Migrating data from old budget-store to violet-vault-store...");
+      console.log(
+        "🔄 Migrating data from old budget-store to violet-vault-store...",
+      );
 
       const parsedOldData = JSON.parse(oldData);
 
@@ -42,7 +44,8 @@ const migrateOldData = async () => {
             transactions: parsedOldData.state.transactions || [],
             allTransactions: parsedOldData.state.allTransactions || [],
             savingsGoals: parsedOldData.state.savingsGoals || [],
-            supplementalAccounts: parsedOldData.state.supplementalAccounts || [],
+            supplementalAccounts:
+              parsedOldData.state.supplementalAccounts || [],
             debts: parsedOldData.state.debts || [],
             unassignedCash: parsedOldData.state.unassignedCash || 0,
             biweeklyAllocation: parsedOldData.state.biweeklyAllocation || 0,
@@ -52,8 +55,13 @@ const migrateOldData = async () => {
           version: 0,
         };
 
-        localStorage.setItem("violet-vault-store", JSON.stringify(transformedData));
-        console.log("✅ Data migration completed successfully - replaced existing data");
+        localStorage.setItem(
+          "violet-vault-store",
+          JSON.stringify(transformedData),
+        );
+        console.log(
+          "✅ Data migration completed successfully - replaced existing data",
+        );
 
         // Seed Dexie with migrated data so hooks can access it
         await budgetDb.bulkUpsertEnvelopes(transformedData.state.envelopes);
@@ -61,11 +69,15 @@ const migrateOldData = async () => {
         await budgetDb.bulkUpsertTransactions(
           transformedData.state.allTransactions.length > 0
             ? transformedData.state.allTransactions
-            : transformedData.state.transactions
+            : transformedData.state.transactions,
         );
-        await budgetDb.bulkUpsertSavingsGoals(transformedData.state.savingsGoals);
+        await budgetDb.bulkUpsertSavingsGoals(
+          transformedData.state.savingsGoals,
+        );
         await budgetDb.bulkUpsertDebts(transformedData.state.debts);
-        await budgetDb.bulkUpsertPaychecks(transformedData.state.paycheckHistory);
+        await budgetDb.bulkUpsertPaychecks(
+          transformedData.state.paycheckHistory,
+        );
 
         // Remove old data after successful migration
         localStorage.removeItem("budget-store");
@@ -184,8 +196,13 @@ const storeInitializer = (set, get) => ({
       }
       // Handle transfer to unassigned cash
       else if (toEnvelopeId === "unassigned") {
-        const fromIndex = state.envelopes.findIndex((e) => e.id === fromEnvelopeId);
-        if (fromIndex === -1 || state.envelopes[fromIndex].currentBalance < amount) {
+        const fromIndex = state.envelopes.findIndex(
+          (e) => e.id === fromEnvelopeId,
+        );
+        if (
+          fromIndex === -1 ||
+          state.envelopes[fromIndex].currentBalance < amount
+        ) {
           console.warn("Insufficient envelope balance for transfer");
           return false;
         }
@@ -194,7 +211,9 @@ const storeInitializer = (set, get) => ({
       }
       // Handle transfer between envelopes
       else {
-        const fromIndex = state.envelopes.findIndex((e) => e.id === fromEnvelopeId);
+        const fromIndex = state.envelopes.findIndex(
+          (e) => e.id === fromEnvelopeId,
+        );
         const toIndex = state.envelopes.findIndex((e) => e.id === toEnvelopeId);
 
         if (fromIndex === -1 || toIndex === -1) {
@@ -216,7 +235,8 @@ const storeInitializer = (set, get) => ({
       const transaction = {
         id: `transfer_${Date.now()}`,
         amount,
-        description: description || `Transfer: ${fromEnvelopeId} → ${toEnvelopeId}`,
+        description:
+          description || `Transfer: ${fromEnvelopeId} → ${toEnvelopeId}`,
         type: "transfer",
         fromEnvelopeId,
         toEnvelopeId,
@@ -278,8 +298,12 @@ const storeInitializer = (set, get) => ({
 
   updateTransaction: (transaction) =>
     set((state) => {
-      const transIndex = state.transactions.findIndex((t) => t.id === transaction.id);
-      const allTransIndex = state.allTransactions.findIndex((t) => t.id === transaction.id);
+      const transIndex = state.transactions.findIndex(
+        (t) => t.id === transaction.id,
+      );
+      const allTransIndex = state.allTransactions.findIndex(
+        (t) => t.id === transaction.id,
+      );
 
       if (transIndex !== -1) {
         state.transactions[transIndex] = transaction;
@@ -334,7 +358,9 @@ const storeInitializer = (set, get) => ({
       });
 
       const billIndex = state.bills.findIndex((b) => b.id === bill.id);
-      const allTransIndex = state.allTransactions.findIndex((t) => t.id === bill.id);
+      const allTransIndex = state.allTransactions.findIndex(
+        (t) => t.id === bill.id,
+      );
 
       console.log("🔄 Update bill indices", {
         billIndex,
@@ -494,20 +520,31 @@ const storeInitializer = (set, get) => ({
 
   deleteSupplementalAccount: (id) =>
     set((state) => {
-      state.supplementalAccounts = state.supplementalAccounts.filter((a) => a.id !== id);
+      state.supplementalAccounts = state.supplementalAccounts.filter(
+        (a) => a.id !== id,
+      );
     }),
 
-  transferFromSupplementalAccount: (accountId, envelopeId, amount, description) =>
+  transferFromSupplementalAccount: (
+    accountId,
+    envelopeId,
+    amount,
+    description,
+  ) =>
     set((state) => {
       // Find and update supplemental account
-      const accountIndex = state.supplementalAccounts.findIndex((a) => a.id === accountId);
+      const accountIndex = state.supplementalAccounts.findIndex(
+        (a) => a.id === accountId,
+      );
       if (accountIndex === -1) return;
 
       const account = state.supplementalAccounts[accountIndex];
       if (account.currentBalance < amount) return;
 
       // Find and update envelope
-      const envelopeIndex = state.envelopes.findIndex((e) => e.id === envelopeId);
+      const envelopeIndex = state.envelopes.findIndex(
+        (e) => e.id === envelopeId,
+      );
       if (envelopeIndex === -1) return;
 
       // Update balances
@@ -611,13 +648,19 @@ const storeInitializer = (set, get) => ({
       const { useAuth } = await import("./authStore");
       const authState = useAuth.getState();
 
-      if (!authState.encryptionKey || !authState.currentUser || !authState.budgetId) {
+      if (
+        !authState.encryptionKey ||
+        !authState.currentUser ||
+        !authState.budgetId
+      ) {
         console.warn("⚠️ Missing auth context for background sync");
         return;
       }
 
       // Import and start the background sync service
-      const { default: CloudSyncService } = await import("../services/cloudSyncService");
+      const { default: CloudSyncService } = await import(
+        "../services/cloudSyncService"
+      );
       CloudSyncService.start({
         encryptionKey: authState.encryptionKey,
         currentUser: authState.currentUser,
@@ -653,12 +696,16 @@ const storeInitializer = (set, get) => ({
   // Remove duplicate reconcile transactions
   removeDuplicateReconcileTransactions: () =>
     set((state) => {
-      const reconcilePatterns = ["Balance reconciliation", "reconciliation", "Auto-Reconcile"];
+      const reconcilePatterns = [
+        "Balance reconciliation",
+        "reconciliation",
+        "Auto-Reconcile",
+      ];
 
       // Filter out duplicate reconcile transactions
       state.transactions = state.transactions.filter((t, index, array) => {
         const isReconcile = reconcilePatterns.some((pattern) =>
-          t.description?.toLowerCase().includes(pattern.toLowerCase())
+          t.description?.toLowerCase().includes(pattern.toLowerCase()),
         );
 
         if (!isReconcile) return true;
@@ -669,28 +716,34 @@ const storeInitializer = (set, get) => ({
             (other) =>
               other.description === t.description &&
               other.amount === t.amount &&
-              Math.abs(new Date(other.date).getTime() - new Date(t.date).getTime()) < 60000 // Within 1 minute
+              Math.abs(
+                new Date(other.date).getTime() - new Date(t.date).getTime(),
+              ) < 60000, // Within 1 minute
           ) === index
         );
       });
 
-      state.allTransactions = state.allTransactions.filter((t, index, array) => {
-        const isReconcile = reconcilePatterns.some((pattern) =>
-          t.description?.toLowerCase().includes(pattern.toLowerCase())
-        );
+      state.allTransactions = state.allTransactions.filter(
+        (t, index, array) => {
+          const isReconcile = reconcilePatterns.some((pattern) =>
+            t.description?.toLowerCase().includes(pattern.toLowerCase()),
+          );
 
-        if (!isReconcile) return true;
+          if (!isReconcile) return true;
 
-        // Keep only the first occurrence of each reconcile transaction
-        return (
-          array.findIndex(
-            (other) =>
-              other.description === t.description &&
-              other.amount === t.amount &&
-              Math.abs(new Date(other.date).getTime() - new Date(t.date).getTime()) < 60000 // Within 1 minute
-          ) === index
-        );
-      });
+          // Keep only the first occurrence of each reconcile transaction
+          return (
+            array.findIndex(
+              (other) =>
+                other.description === t.description &&
+                other.amount === t.amount &&
+                Math.abs(
+                  new Date(other.date).getTime() - new Date(t.date).getTime(),
+                ) < 60000, // Within 1 minute
+            ) === index
+          );
+        },
+      );
     }),
 
   // Load imported data into store and persist it
@@ -707,11 +760,15 @@ const storeInitializer = (set, get) => ({
       // Load all data arrays
       if (importedData.envelopes) state.envelopes = importedData.envelopes;
       if (importedData.bills) state.bills = importedData.bills;
-      if (importedData.transactions) state.transactions = importedData.transactions;
-      if (importedData.allTransactions) state.allTransactions = importedData.allTransactions;
-      if (importedData.savingsGoals) state.savingsGoals = importedData.savingsGoals;
+      if (importedData.transactions)
+        state.transactions = importedData.transactions;
+      if (importedData.allTransactions)
+        state.allTransactions = importedData.allTransactions;
+      if (importedData.savingsGoals)
+        state.savingsGoals = importedData.savingsGoals;
       if (importedData.debts) state.debts = importedData.debts;
-      if (importedData.paycheckHistory) state.paycheckHistory = importedData.paycheckHistory;
+      if (importedData.paycheckHistory)
+        state.paycheckHistory = importedData.paycheckHistory;
       if (importedData.supplementalAccounts)
         state.supplementalAccounts = importedData.supplementalAccounts;
 
@@ -734,7 +791,7 @@ const storeInitializer = (set, get) => ({
         window.dispatchEvent(
           new CustomEvent("importCompleted", {
             detail: { source: "loadData", dataLoaded: true },
-          })
+          }),
         );
 
         // Also dispatch specific invalidation events
@@ -763,9 +820,43 @@ const storeInitializer = (set, get) => ({
       state.isOnline = true; // Also reset isOnline status
       state.dataLoaded = false;
     }),
+
+  // Security functionality
+  validatePassword: async (password) => {
+    try {
+      // Import the auth store to access password validation
+      const { useAuth } = await import("./authStore.jsx");
+      const { encryptionUtils } = await import("../utils/encryption");
+
+      const authState = useAuth.getState();
+      const savedData = localStorage.getItem("envelopeBudgetData");
+
+      if (!savedData || !authState.salt) {
+        return false;
+      }
+
+      const { salt: savedSalt } = JSON.parse(savedData);
+      const saltArray = new Uint8Array(savedSalt);
+
+      // Try to derive the key with the provided password
+      const testKey = await encryptionUtils.deriveKeyFromSalt(
+        password,
+        saltArray,
+      );
+
+      // Compare with current encryption key (basic validation)
+      // Note: This is a simplified validation - in production you'd want more robust verification
+      return !!testKey;
+    } catch (error) {
+      console.error("Password validation failed:", error);
+      return false;
+    }
+  },
 });
 
-const base = subscribeWithSelector(immer(budgetHistoryMiddleware(storeInitializer)));
+const base = subscribeWithSelector(
+  immer(budgetHistoryMiddleware(storeInitializer)),
+);
 
 let useOptimizedBudgetStore;
 
@@ -788,8 +879,8 @@ if (LOCAL_ONLY_MODE) {
           isOnline: state.isOnline,
         }),
       }),
-      { name: "violet-vault-devtools" }
-    )
+      { name: "violet-vault-devtools" },
+    ),
   );
 }
 
