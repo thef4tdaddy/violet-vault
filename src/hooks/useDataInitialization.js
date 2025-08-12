@@ -35,9 +35,7 @@ const useDataInitialization = () => {
 
         // Check if budgetDb is properly initialized
         if (!budgetDb || !budgetDb.envelopes) {
-          logger.warn(
-            "⚠️ BudgetDb not properly initialized, skipping data load",
-          );
+          logger.warn("⚠️ BudgetDb not properly initialized, skipping data load");
           return;
         }
 
@@ -53,9 +51,7 @@ const useDataInitialization = () => {
             if (tableObject && typeof tableObject.toArray === "function") {
               return await tableObject.toArray();
             } else {
-              logger.warn(
-                `⚠️ Table ${tableName} not available or not properly initialized`,
-              );
+              logger.warn(`⚠️ Table ${tableName} not available or not properly initialized`);
               return [];
             }
           } catch (error) {
@@ -91,10 +87,7 @@ const useDataInitialization = () => {
 
         // Only update Zustand if arrays are currently empty (avoid overwriting cloud sync data)
         if (envelopes.length === 0 && dexieEnvelopes.length > 0) {
-          logger.debug(
-            "📦 Loading envelopes into Zustand:",
-            dexieEnvelopes.length,
-          );
+          logger.debug("📦 Loading envelopes into Zustand:", dexieEnvelopes.length);
           setEnvelopes(dexieEnvelopes);
         }
 
@@ -108,19 +101,13 @@ const useDataInitialization = () => {
           allTransactions.length === 0 &&
           dexieTransactions.length > 0
         ) {
-          logger.debug(
-            "💳 Loading transactions into Zustand:",
-            dexieTransactions.length,
-          );
+          logger.debug("💳 Loading transactions into Zustand:", dexieTransactions.length);
           setTransactions(dexieTransactions);
           setAllTransactions(dexieTransactions);
         }
 
         if (dexieSavingsGoals.length > 0) {
-          logger.debug(
-            "💰 Loading savings goals into Zustand:",
-            dexieSavingsGoals.length,
-          );
+          logger.debug("💰 Loading savings goals into Zustand:", dexieSavingsGoals.length);
           setSavingsGoals(dexieSavingsGoals);
         }
 
@@ -130,10 +117,7 @@ const useDataInitialization = () => {
         }
 
         if (dexiePaychecks.length > 0) {
-          logger.debug(
-            "💰 Loading paychecks into Zustand:",
-            dexiePaychecks.length,
-          );
+          logger.debug("💰 Loading paychecks into Zustand:", dexiePaychecks.length);
           setPaycheckHistory(dexiePaychecks);
         }
 
@@ -162,9 +146,7 @@ const useDataInitialization = () => {
 
         // Then initialize cloud sync if enabled
         if (cloudSyncEnabled) {
-          logger.debug(
-            "🌩️ Starting background cloud sync service (default enabled)",
-          );
+          logger.debug("🌩️ Starting background cloud sync service (default enabled)");
           startBackgroundSync();
         } else {
           logger.debug("💾 Local-only mode enabled - cloud sync disabled");

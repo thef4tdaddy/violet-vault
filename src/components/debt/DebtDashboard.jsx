@@ -65,16 +65,12 @@ const DebtDashboard = () => {
 
     // Filter by status
     if (filterOptions.status !== "all") {
-      filtered = filtered.filter(
-        (debt) => debt.status === filterOptions.status,
-      );
+      filtered = filtered.filter((debt) => debt.status === filterOptions.status);
     }
 
     // Hide paid off unless explicitly shown
     if (!filterOptions.showPaidOff) {
-      filtered = filtered.filter(
-        (debt) => debt.status !== DEBT_STATUS.PAID_OFF,
-      );
+      filtered = filtered.filter((debt) => debt.status !== DEBT_STATUS.PAID_OFF);
     }
 
     // Sort debts
@@ -153,8 +149,7 @@ const DebtDashboard = () => {
             Debt Tracking
           </h2>
           <p className="text-gray-600 mt-1">
-            {debtStats.activeDebtCount} active debts • Total: $
-            {debtStats.totalDebt.toFixed(2)}
+            {debtStats.activeDebtCount} active debts • Total: ${debtStats.totalDebt.toFixed(2)}
           </p>
         </div>
 
@@ -197,10 +192,7 @@ const DebtDashboard = () => {
       {activeTab === "overview" && (
         <>
           {/* Summary Cards */}
-          <DebtSummaryCards
-            stats={debtStats}
-            upcomingPayments={upcomingPayments}
-          />
+          <DebtSummaryCards stats={debtStats} upcomingPayments={upcomingPayments} />
 
           {/* Filters and Controls */}
           <DebtFilters
@@ -220,8 +212,7 @@ const DebtDashboard = () => {
                     Upcoming Payments ({upcomingPayments.length})
                   </h4>
                   <p className="text-sm text-orange-600 mt-1">
-                    You have {upcomingPayments.length} debt payments due in the
-                    next 30 days.
+                    You have {upcomingPayments.length} debt payments due in the next 30 days.
                   </p>
                   <div className="flex gap-2 mt-2">
                     {upcomingPayments.slice(0, 3).map((debt) => (
@@ -256,19 +247,14 @@ const DebtDashboard = () => {
             {filteredDebts.length === 0 ? (
               <div className="text-center py-12">
                 <CreditCard className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  No Debts Found
-                </h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No Debts Found</h3>
                 <p className="text-gray-500 mb-4">
                   {debts.length === 0
                     ? "Start tracking your debts to get insights into your debt payoff journey."
                     : "No debts match your current filters."}
                 </p>
                 {debts.length === 0 && (
-                  <button
-                    onClick={() => setShowAddModal(true)}
-                    className="btn btn-primary"
-                  >
+                  <button onClick={() => setShowAddModal(true)} className="btn btn-primary">
                     <Plus className="h-4 w-4 mr-2" />
                     Add Your First Debt
                   </button>

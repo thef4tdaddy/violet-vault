@@ -101,9 +101,7 @@ const NavButton = memo(({ active, onClick, icon: _Icon, label }) => (
         {label.length > 8 ? label.split(" ")[0] : label}
       </span>
       {/* Small screens - show first word only */}
-      <span className="md:hidden text-xs">
-        {label.split(" ")[0]}
-      </span>
+      <span className="md:hidden text-xs">{label.split(" ")[0]}</span>
     </span>
   </button>
 ));

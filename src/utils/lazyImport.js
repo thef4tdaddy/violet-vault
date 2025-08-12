@@ -9,7 +9,7 @@ const lazyImport = (factory) =>
         return { default: () => null };
       }
       return { default: Component };
-    }),
+    })
   );
 
 export default lazyImport;
