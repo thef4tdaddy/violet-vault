@@ -343,6 +343,8 @@ const storeInitializer = (set, get) => ({
         hasAuthSalt: !!authState.salt,
         hasEncryptionKey: !!authState.encryptionKey,
         authStateKeys: Object.keys(authState),
+        saltValue: authState.salt,
+        savedDataValue: savedData,
       });
 
       // If we have no encrypted data saved yet, validate against the current auth salt
