@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { X, CreditCard, Wallet, Receipt } from "lucide-react";
-import { DEBT_TYPES, DEBT_TYPE_CONFIG, PAYMENT_FREQUENCIES } from "../../../constants/debts";
+import {
+  DEBT_TYPES,
+  DEBT_TYPE_CONFIG,
+  PAYMENT_FREQUENCIES,
+} from "../../../constants/debts";
 import { useBudgetStore } from "../../../stores/budgetStore";
 
 /**
@@ -22,8 +26,10 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
     paymentDueDate: "",
     notes: "",
     // Connection fields
-    createBill: true, // Automatically create a bill for payments
+    paymentMethod: "create_new", // "create_new" or "connect_existing"
+    createBill: true, // Automatically create a bill for payments (when paymentMethod is create_new)
     envelopeId: "", // Envelope to fund payments from
+    existingBillId: "", // For connecting to existing bill
   });
 
   const [errors, setErrors] = useState({});
@@ -50,18 +56,13 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
       newErrors.originalBalance = "Original balance must be positive";
     }
 
-    // Validate that original balance is not less than current balance if both provided
-    if (
-      formData.originalBalance &&
-      formData.currentBalance &&
-      parseFloat(formData.originalBalance) < parseFloat(formData.currentBalance)
-    ) {
-      newErrors.originalBalance = "Original balance cannot be less than current balance";
-    }
+    // Allow original balance to be less than current balance (e.g., for debt consolidation scenarios)
+    // Remove this validation as it's too restrictive
 
     if (
       formData.interestRate &&
-      (parseFloat(formData.interestRate) < 0 || parseFloat(formData.interestRate) > 100)
+      (parseFloat(formData.interestRate) < 0 ||
+        parseFloat(formData.interestRate) > 100)
     ) {
       newErrors.interestRate = "Interest rate must be between 0 and 100";
     }
@@ -114,8 +115,11 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
       paymentFrequency: PAYMENT_FREQUENCIES.MONTHLY,
       paymentDueDate: "",
       notes: "",
+      paymentMethod: "create_new",
       createBill: true,
       envelopeId: "",
+      existingBillId: "",
+      newEnvelopeName: "",
     });
     setErrors({});
     setIsSubmitting(false);
@@ -151,35 +155,51 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Debt Name *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Debt Name *
+                </label>
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   placeholder="e.g., Car Loan, Credit Card"
                 />
-                {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
+                {errors.name && (
+                  <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Creditor *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Creditor *
+                </label>
                 <input
                   type="text"
                   value={formData.creditor}
-                  onChange={(e) => setFormData({ ...formData, creditor: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, creditor: e.target.value })
+                  }
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   placeholder="e.g., Chase Bank, Capital One"
                 />
-                {errors.creditor && <p className="mt-1 text-sm text-red-600">{errors.creditor}</p>}
+                {errors.creditor && (
+                  <p className="mt-1 text-sm text-red-600">{errors.creditor}</p>
+                )}
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Debt Type</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Debt Type
+              </label>
               <select
                 value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, type: e.target.value })
+                }
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
               >
                 {Object.values(DEBT_TYPES).map((type) => {
@@ -208,18 +228,22 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
                   step="0.01"
                   min="0"
                   value={formData.currentBalance}
-                  onChange={(e) => setFormData({ ...formData, currentBalance: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, currentBalance: e.target.value })
+                  }
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   placeholder="0.00"
                 />
                 {errors.currentBalance && (
-                  <p className="mt-1 text-sm text-red-600">{errors.currentBalance}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.currentBalance}
+                  </p>
                 )}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Original Balance
+                  Original Balance (Optional)
                 </label>
                 <input
                   type="number"
@@ -233,14 +257,13 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
                     })
                   }
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  placeholder="Leave blank to use current balance"
+                  placeholder="Leave blank to auto-fill"
                 />
                 {errors.originalBalance && (
-                  <p className="mt-1 text-sm text-red-600">{errors.originalBalance}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.originalBalance}
+                  </p>
                 )}
-                <p className="mt-1 text-xs text-gray-500">
-                  Optional: The original debt amount when you first took it out
-                </p>
               </div>
             </div>
 
@@ -254,12 +277,16 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
                   step="0.01"
                   min="0"
                   value={formData.minimumPayment}
-                  onChange={(e) => setFormData({ ...formData, minimumPayment: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, minimumPayment: e.target.value })
+                  }
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   placeholder="0.00"
                 />
                 {errors.minimumPayment && (
-                  <p className="mt-1 text-sm text-red-600">{errors.minimumPayment}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.minimumPayment}
+                  </p>
                 )}
               </div>
             </div>
@@ -275,12 +302,16 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
                   min="0"
                   max="100"
                   value={formData.interestRate}
-                  onChange={(e) => setFormData({ ...formData, interestRate: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, interestRate: e.target.value })
+                  }
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   placeholder="0.00"
                 />
                 {errors.interestRate && (
-                  <p className="mt-1 text-sm text-red-600">{errors.interestRate}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.interestRate}
+                  </p>
                 )}
               </div>
 
@@ -314,7 +345,9 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
               <input
                 type="date"
                 value={formData.paymentDueDate}
-                onChange={(e) => setFormData({ ...formData, paymentDueDate: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, paymentDueDate: e.target.value })
+                }
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
               />
             </div>
@@ -324,64 +357,122 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit }) => {
           <div className="space-y-4">
             <h4 className="font-medium text-gray-900 flex items-center">
               <Wallet className="h-4 w-4 mr-2 text-purple-600" />
-              Payment Integration
+              Payment Setup
             </h4>
 
-            {/* Create Bill Toggle */}
-            <div className="flex items-center space-x-3">
-              <input
-                type="checkbox"
-                id="createBill"
-                checked={formData.createBill}
-                onChange={(e) => setFormData({ ...formData, createBill: e.target.checked })}
-                className="h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
-              />
-              <label
-                htmlFor="createBill"
-                className="text-sm font-medium text-gray-700 flex items-center"
-              >
-                <Receipt className="h-4 w-4 mr-2 text-blue-600" />
-                Create recurring bill for payments
-              </label>
-            </div>
-            <p className="text-xs text-gray-500 ml-7">
-              Automatically create a bill entry to track when payments are due
-            </p>
-
-            {/* Envelope Selection */}
-            {formData.createBill && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Payment Envelope (Optional)
-                </label>
-                <select
-                  value={formData.envelopeId}
-                  onChange={(e) => setFormData({ ...formData, envelopeId: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
+            {/* Payment Method Radio Buttons */}
+            <div className="space-y-3">
+              <div className="flex items-center space-x-3">
+                <input
+                  type="radio"
+                  id="create_new"
+                  name="paymentMethod"
+                  value="create_new"
+                  checked={formData.paymentMethod === "create_new"}
+                  onChange={(e) =>
+                    setFormData({ ...formData, paymentMethod: e.target.value })
+                  }
+                  className="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"
+                />
+                <label
+                  htmlFor="create_new"
+                  className="text-sm font-medium text-gray-700 flex items-center"
                 >
-                  <option value="">Select envelope for payments...</option>
-                  {envelopes
-                    .filter((env) => !env.archived)
-                    .map((envelope) => (
-                      <option key={envelope.id} value={envelope.id}>
-                        📁 {envelope.name} ($
-                        {envelope.currentBalance?.toFixed(2) || "0.00"})
-                      </option>
-                    ))}
-                </select>
-                <p className="mt-1 text-xs text-gray-500">
-                  Choose which envelope will fund the debt payments
-                </p>
+                  <Receipt className="h-4 w-4 mr-2 text-blue-600" />
+                  Create new envelope and bill
+                </label>
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <input
+                  type="radio"
+                  id="connect_existing"
+                  name="paymentMethod"
+                  value="connect_existing"
+                  checked={formData.paymentMethod === "connect_existing"}
+                  onChange={(e) =>
+                    setFormData({ ...formData, paymentMethod: e.target.value })
+                  }
+                  className="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"
+                />
+                <label
+                  htmlFor="connect_existing"
+                  className="text-sm font-medium text-gray-700 flex items-center"
+                >
+                  <Wallet className="h-4 w-4 mr-2 text-purple-600" />
+                  Connect to existing envelope and bill
+                </label>
+              </div>
+            </div>
+
+            {/* Create New: Envelope Name Input */}
+            {formData.paymentMethod === "create_new" && (
+              <div className="space-y-4 pl-7 border-l-2 border-blue-200">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    New Envelope Name
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.newEnvelopeName || ""}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        newEnvelopeName: e.target.value,
+                      })
+                    }
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    placeholder={formData.name ? `${formData.name} Payment` : "Debt Payment"}
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    A new envelope will be created to fund this debt's payments
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Connect Existing: Envelope Selection */}
+            {formData.paymentMethod === "connect_existing" && (
+              <div className="space-y-4 pl-7 border-l-2 border-purple-200">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Existing Envelope
+                  </label>
+                  <select
+                    value={formData.envelopeId}
+                    onChange={(e) =>
+                      setFormData({ ...formData, envelopeId: e.target.value })
+                    }
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  >
+                    <option value="">Select existing envelope...</option>
+                    {envelopes
+                      .filter((env) => !env.archived)
+                      .map((envelope) => (
+                        <option key={envelope.id} value={envelope.id}>
+                          📁 {envelope.name} ($
+                          {envelope.currentBalance?.toFixed(2) || "0.00"})
+                        </option>
+                      ))}
+                  </select>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Choose which existing envelope will fund the debt payments
+                  </p>
+                </div>
               </div>
             )}
           </div>
 
           {/* Notes */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Notes (Optional)
+            </label>
             <textarea
               value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, notes: e.target.value })
+              }
               rows={3}
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
               placeholder="Additional notes about this debt..."

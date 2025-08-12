@@ -141,12 +141,18 @@ export const useSecurityManager = () => {
    */
   const lockApp = useCallback(
     (reason = "Manual lock") => {
-      setIsLocked(true);
-      logSecurityEvent({
-        type: "MANUAL_LOCK",
-        description: reason,
-        metadata: { trigger: "manual" },
-      });
+      try {
+        setIsLocked(true);
+        logSecurityEvent({
+          type: "MANUAL_LOCK",
+          description: reason,
+          metadata: { trigger: "manual" },
+        });
+      } catch (error) {
+        console.error("Error during app lock:", error);
+        // Still lock the app even if logging fails
+        setIsLocked(true);
+      }
     },
     [logSecurityEvent],
   );
@@ -157,8 +163,16 @@ export const useSecurityManager = () => {
   const unlockApp = useCallback(
     async (password) => {
       try {
+        // Check if validatePassword function exists
+        if (!budget.validatePassword) {
+          console.warn(
+            "validatePassword function not available on budget store",
+          );
+          return { success: false, error: "Security validation not available" };
+        }
+
         // Validate password against stored budget
-        const isValidPassword = await budget.validatePassword?.(password);
+        const isValidPassword = await budget.validatePassword(password);
 
         if (isValidPassword) {
           setIsLocked(false);
@@ -178,11 +192,16 @@ export const useSecurityManager = () => {
           return { success: false, error: "Invalid password" };
         }
       } catch (error) {
-        logSecurityEvent({
-          type: "UNLOCK_ERROR",
-          description: `Error during unlock attempt: ${error.message}`,
-          metadata: { error: error.message },
-        });
+        console.error("Error during unlock attempt:", error);
+        try {
+          logSecurityEvent({
+            type: "UNLOCK_ERROR",
+            description: `Error during unlock attempt: ${error.message}`,
+            metadata: { error: error.message },
+          });
+        } catch (logError) {
+          console.error("Failed to log security event:", logError);
+        }
         return { success: false, error: "Unlock failed" };
       }
     },
