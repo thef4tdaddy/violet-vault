@@ -35,97 +35,111 @@ const useTransactions = (options = {}) => {
     firstAllTransaction: zustandAllTransactions?.[0],
   });
 
-  // Smart query function with filtering and analytics
+  // TanStack Query function - hydrates from Dexie, Dexie syncs with Firebase
   const queryFunction = async () => {
-    let transactions = [];
+    console.log("🔄 TanStack Query: Fetching transactions from Dexie...");
 
-    console.log("useTransactions queryFunction debug:", {
-      zustandTransactionsLength: zustandTransactions?.length || 0,
-      zustandAllTransactionsLength: zustandAllTransactions?.length || 0,
-      hasDateRange: !!dateRange,
-    });
+    try {
+      let transactions = [];
 
-    // Primary source: Zustand (active state)
-    if (zustandAllTransactions && zustandAllTransactions.length > 0) {
-      transactions = [...zustandAllTransactions];
-      console.log("Using Zustand allTransactions (primary):", transactions.length);
-    } else if (zustandTransactions && zustandTransactions.length > 0) {
-      transactions = [...zustandTransactions];
-      console.log("Using Zustand transactions (primary):", transactions.length);
-    } else {
-      // Fallback to Dexie only when Zustand is empty
-      try {
-        if (dateRange) {
-          transactions = await budgetDb.getTransactionsByDateRange(dateRange.start, dateRange.end);
-        } else {
-          transactions = await budgetDb.transactions.orderBy("date").reverse().toArray();
+      // Always fetch from Dexie (single source of truth for local data)
+      transactions = await budgetDb.transactions
+        .orderBy("date")
+        .reverse()
+        .toArray();
+
+      console.log("✅ TanStack Query: Loaded from Dexie:", transactions.length);
+
+      // If Dexie is empty and we have Zustand data, seed Dexie
+      const zustandData =
+        zustandAllTransactions?.length > 0
+          ? zustandAllTransactions
+          : zustandTransactions;
+      if (transactions.length === 0 && zustandData && zustandData.length > 0) {
+        console.log("🌱 TanStack Query: Seeding Dexie from Zustand...");
+        await budgetDb.bulkUpsertTransactions(zustandData);
+        transactions = [...zustandData];
+      }
+
+      // Apply date range filtering if specified
+      if (dateRange) {
+        const { start, end } = dateRange;
+        transactions = transactions.filter((t) => {
+          const transactionDate = new Date(t.date);
+          return transactionDate >= start && transactionDate <= end;
+        });
+      }
+
+      // Apply additional filters
+      let filteredTransactions = transactions;
+
+      if (envelopeId) {
+        filteredTransactions = filteredTransactions.filter(
+          (t) => t.envelopeId === envelopeId,
+        );
+      }
+
+      if (category) {
+        filteredTransactions = filteredTransactions.filter(
+          (t) => t.category === category,
+        );
+      }
+
+      if (type) {
+        if (type === "income") {
+          filteredTransactions = filteredTransactions.filter(
+            (t) => t.amount > 0,
+          );
+        } else if (type === "expense") {
+          filteredTransactions = filteredTransactions.filter(
+            (t) => t.amount < 0,
+          );
+        } else if (type === "transfer") {
+          filteredTransactions = filteredTransactions.filter(
+            (t) => t.type === "transfer",
+          );
         }
-        console.log("Using Dexie transactions (fallback):", transactions.length);
-      } catch (error) {
-        console.warn("Dexie query failed:", error);
-        transactions = [];
       }
-    }
 
-    // Apply filters
-    let filteredTransactions = transactions;
+      // Apply sorting
+      filteredTransactions.sort((a, b) => {
+        let aVal = a[sortBy];
+        let bVal = b[sortBy];
 
-    if (dateRange) {
-      const { start, end } = dateRange;
-      filteredTransactions = filteredTransactions.filter((t) => {
-        const transactionDate = new Date(t.date);
-        return transactionDate >= start && transactionDate <= end;
+        // Handle date fields
+        if (sortBy === "date") {
+          aVal = new Date(aVal);
+          bVal = new Date(bVal);
+        }
+
+        // Handle numeric fields
+        if (sortBy === "amount") {
+          aVal = parseFloat(aVal) || 0;
+          bVal = parseFloat(bVal) || 0;
+        }
+
+        if (sortOrder === "desc") {
+          return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
+        } else {
+          return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+        }
       });
-    }
 
-    if (envelopeId) {
-      filteredTransactions = filteredTransactions.filter((t) => t.envelopeId === envelopeId);
-    }
-
-    if (category) {
-      filteredTransactions = filteredTransactions.filter((t) => t.category === category);
-    }
-
-    if (type) {
-      if (type === "income") {
-        filteredTransactions = filteredTransactions.filter((t) => t.amount > 0);
-      } else if (type === "expense") {
-        filteredTransactions = filteredTransactions.filter((t) => t.amount < 0);
-      } else if (type === "transfer") {
-        filteredTransactions = filteredTransactions.filter((t) => t.type === "transfer");
-      }
-    }
-
-    // Apply sorting
-    filteredTransactions.sort((a, b) => {
-      let aVal = a[sortBy];
-      let bVal = b[sortBy];
-
-      // Handle date fields
-      if (sortBy === "date") {
-        aVal = new Date(aVal);
-        bVal = new Date(bVal);
+      // Apply limit
+      if (limit) {
+        filteredTransactions = filteredTransactions.slice(0, limit);
       }
 
-      // Handle numeric fields
-      if (sortBy === "amount") {
-        aVal = parseFloat(aVal) || 0;
-        bVal = parseFloat(bVal) || 0;
-      }
-
-      if (sortOrder === "desc") {
-        return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
-      } else {
-        return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
-      }
-    });
-
-    // Apply limit
-    if (limit > 0) {
-      filteredTransactions = filteredTransactions.slice(0, limit);
+      return filteredTransactions;
+    } catch (error) {
+      console.error("❌ TanStack Query: Dexie fetch failed:", error);
+      // Emergency fallback only when Dexie completely fails
+      const zustandData =
+        zustandAllTransactions?.length > 0
+          ? zustandAllTransactions
+          : zustandTransactions;
+      return zustandData || [];
     }
-
-    return filteredTransactions;
   };
 
   // Main transactions query
@@ -238,9 +252,13 @@ const useTransactions = (options = {}) => {
   const transactions = transactionsQuery.data || [];
 
   const analytics = {
-    totalIncome: transactions.filter((t) => t.amount > 0).reduce((sum, t) => sum + t.amount, 0),
+    totalIncome: transactions
+      .filter((t) => t.amount > 0)
+      .reduce((sum, t) => sum + t.amount, 0),
     totalExpenses: Math.abs(
-      transactions.filter((t) => t.amount < 0).reduce((sum, t) => sum + t.amount, 0)
+      transactions
+        .filter((t) => t.amount < 0)
+        .reduce((sum, t) => sum + t.amount, 0),
     ),
     netAmount: transactions.reduce((sum, t) => sum + t.amount, 0),
     transactionCount: transactions.length,
@@ -291,9 +309,11 @@ const useTransactions = (options = {}) => {
   // Utility functions
   const getTransactionById = (id) => transactions.find((t) => t.id === id);
 
-  const getTransactionsByEnvelope = (envId) => transactions.filter((t) => t.envelopeId === envId);
+  const getTransactionsByEnvelope = (envId) =>
+    transactions.filter((t) => t.envelopeId === envId);
 
-  const getTransactionsByCategory = (cat) => transactions.filter((t) => t.category === cat);
+  const getTransactionsByCategory = (cat) =>
+    transactions.filter((t) => t.category === cat);
 
   const getAvailableCategories = () => {
     const categories = new Set(transactions.map((t) => t.category));
@@ -356,7 +376,8 @@ const useTransactions = (options = {}) => {
 
     // Query controls
     refetch: transactionsQuery.refetch,
-    invalidate: () => queryClient.invalidateQueries({ queryKey: queryKeys.transactions }),
+    invalidate: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions }),
   };
 };
 
