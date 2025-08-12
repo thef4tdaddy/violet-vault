@@ -10,7 +10,12 @@ import { budgetDb } from "../db/budgetDb";
  */
 const useEnvelopes = (options = {}) => {
   const queryClient = useQueryClient();
-  const { category, includeArchived = false, sortBy = "name", sortOrder = "asc" } = options;
+  const {
+    category,
+    includeArchived = false,
+    sortBy = "name",
+    sortOrder = "asc",
+  } = options;
 
   // Get Zustand store for mutations
   const {
@@ -25,21 +30,21 @@ const useEnvelopes = (options = {}) => {
   const queryFunction = useCallback(async () => {
     let envelopes = [];
 
-    // Primary source: Zustand (active state)
-    if (zustandEnvelopes && zustandEnvelopes.length > 0) {
-      envelopes = [...zustandEnvelopes];
-      console.log("Using Zustand envelopes (primary):", envelopes.length);
-    } else {
-      // Fallback to Dexie only when Zustand is empty
-      try {
-        if (category) {
-          envelopes = await budgetDb.getEnvelopesByCategory(category);
-        } else {
-          envelopes = await budgetDb.envelopes.toArray();
-        }
-        console.log("Using Dexie envelopes (fallback):", envelopes.length);
-      } catch (error) {
-        console.warn("Dexie query failed:", error);
+    // Primary source: Dexie (persistent database)
+    try {
+      if (category) {
+        envelopes = await budgetDb.getEnvelopesByCategory(category);
+      } else {
+        envelopes = await budgetDb.envelopes.toArray();
+      }
+      console.log("Using Dexie envelopes (primary):", envelopes.length);
+    } catch (error) {
+      console.warn("Dexie query failed, falling back to Zustand:", error);
+      // Fallback to Zustand only when Dexie fails
+      if (zustandEnvelopes && zustandEnvelopes.length > 0) {
+        envelopes = [...zustandEnvelopes];
+        console.log("Using Zustand envelopes (fallback):", envelopes.length);
+      } else {
         envelopes = [];
       }
     }
@@ -48,7 +53,9 @@ const useEnvelopes = (options = {}) => {
     let filteredEnvelopes = envelopes;
 
     if (category) {
-      filteredEnvelopes = filteredEnvelopes.filter((env) => env.category === category);
+      filteredEnvelopes = filteredEnvelopes.filter(
+        (env) => env.category === category,
+      );
     }
 
     if (!includeArchived) {
@@ -100,7 +107,7 @@ const useEnvelopes = (options = {}) => {
       initialData: undefined, // Remove initialData to prevent persister errors
       enabled: true,
     }),
-    [category, includeArchived, sortBy, sortOrder, queryFunction]
+    [category, includeArchived, sortBy, sortOrder, queryFunction],
   );
 
   // Main envelopes query
@@ -209,13 +216,27 @@ const useEnvelopes = (options = {}) => {
   // Fund transfer mutation
   const transferFundsMutation = useMutation({
     mutationKey: ["envelopes", "transfer"],
-    mutationFn: async ({ fromEnvelopeId, toEnvelopeId, amount, description }) => {
+    mutationFn: async ({
+      fromEnvelopeId,
+      toEnvelopeId,
+      amount,
+      description,
+    }) => {
       // Call Zustand mutation
-      const result = zustandTransferFunds(fromEnvelopeId, toEnvelopeId, amount, description);
+      const result = zustandTransferFunds(
+        fromEnvelopeId,
+        toEnvelopeId,
+        amount,
+        description,
+      );
 
       // Update both envelopes in cache and Dexie
-      const fromEnvelope = zustandEnvelopes.find((env) => env.id === fromEnvelopeId);
-      const toEnvelope = zustandEnvelopes.find((env) => env.id === toEnvelopeId);
+      const fromEnvelope = zustandEnvelopes.find(
+        (env) => env.id === fromEnvelopeId,
+      );
+      const toEnvelope = zustandEnvelopes.find(
+        (env) => env.id === toEnvelopeId,
+      );
 
       if (fromEnvelope) {
         await optimisticHelpers.updateEnvelope(fromEnvelopeId, {
@@ -244,19 +265,26 @@ const useEnvelopes = (options = {}) => {
 
   // Computed values
   const envelopes = envelopesQuery.data || [];
-  const totalBalance = envelopes.reduce((sum, env) => sum + (env.currentBalance || 0), 0);
-  const totalTargetAmount = envelopes.reduce((sum, env) => sum + (env.targetAmount || 0), 0);
+  const totalBalance = envelopes.reduce(
+    (sum, env) => sum + (env.currentBalance || 0),
+    0,
+  );
+  const totalTargetAmount = envelopes.reduce(
+    (sum, env) => sum + (env.targetAmount || 0),
+    0,
+  );
   const underfundedEnvelopes = envelopes.filter(
-    (env) => (env.currentBalance || 0) < (env.targetAmount || 0)
+    (env) => (env.currentBalance || 0) < (env.targetAmount || 0),
   );
   const overfundedEnvelopes = envelopes.filter(
-    (env) => (env.currentBalance || 0) > (env.targetAmount || 0)
+    (env) => (env.currentBalance || 0) > (env.targetAmount || 0),
   );
 
   // Utility functions
   const getEnvelopeById = (id) => envelopes.find((env) => env.id === id);
 
-  const getEnvelopesByCategory = (cat) => envelopes.filter((env) => env.category === cat);
+  const getEnvelopesByCategory = (cat) =>
+    envelopes.filter((env) => env.category === cat);
 
   const getAvailableCategories = () => {
     const categories = new Set(envelopes.map((env) => env.category));
@@ -300,7 +328,8 @@ const useEnvelopes = (options = {}) => {
 
     // Query controls
     refetch: envelopesQuery.refetch,
-    invalidate: () => queryClient.invalidateQueries({ queryKey: queryKeys.envelopes }),
+    invalidate: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.envelopes }),
   };
 };
 
