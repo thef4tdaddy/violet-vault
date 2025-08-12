@@ -16,11 +16,11 @@ const DebtDetailModal = ({
   debt,
   isOpen,
   onClose,
-  // eslint-disable-next-line no-unused-vars
-  onUpdate: _onUpdate, // TODO: Implement update functionality
+  onUpdate,
   onDelete,
   onRecordPayment,
   onLinkToBill,
+  onEdit,
 }) => {
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState(
@@ -310,9 +310,7 @@ const DebtDetailModal = ({
             Close
           </button>
           <button
-            onClick={() => {
-              /* TODO: Open edit modal */
-            }}
+            onClick={() => onEdit && onEdit(debt)}
             className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 flex items-center justify-center"
           >
             <Edit className="h-4 w-4 mr-2" />
