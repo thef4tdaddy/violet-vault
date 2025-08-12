@@ -824,6 +824,8 @@ const storeInitializer = (set, get) => ({
   // Security functionality
   validatePassword: async (password) => {
     try {
+      console.log("🔐 validatePassword: Starting validation...");
+
       // Import the auth store to access password validation
       const { useAuth } = await import("./authStore.jsx");
       const { encryptionUtils } = await import("../utils/encryption");
@@ -831,12 +833,26 @@ const storeInitializer = (set, get) => ({
       const authState = useAuth.getState();
       const savedData = localStorage.getItem("envelopeBudgetData");
 
+      console.log("🔐 validatePassword: Data check", {
+        hasSavedData: !!savedData,
+        hasAuthSalt: !!authState.salt,
+        authStateKeys: Object.keys(authState),
+      });
+
       if (!savedData || !authState.salt) {
+        console.log("🔐 validatePassword: Missing data or salt");
         return false;
       }
 
-      const { salt: savedSalt } = JSON.parse(savedData);
+      const parsedData = JSON.parse(savedData);
+      const { salt: savedSalt, encryptedData } = parsedData;
       const saltArray = new Uint8Array(savedSalt);
+
+      console.log("🔐 validatePassword: Parsed data", {
+        hasSavedSalt: !!savedSalt,
+        hasEncryptedData: !!encryptedData,
+        saltLength: saltArray.length,
+      });
 
       // Try to derive the key with the provided password
       const testKey = await encryptionUtils.deriveKeyFromSalt(
@@ -844,11 +860,35 @@ const storeInitializer = (set, get) => ({
         saltArray,
       );
 
-      // Compare with current encryption key (basic validation)
-      // Note: This is a simplified validation - in production you'd want more robust verification
+      console.log("🔐 validatePassword: Key derived successfully");
+
+      // Try to decrypt actual data to validate password
+      if (encryptedData) {
+        try {
+          await encryptionUtils.decrypt(encryptedData, testKey);
+          console.log(
+            "🔐 validatePassword: Decryption successful - password is correct",
+          );
+          return true;
+        } catch (decryptError) {
+          console.log(
+            "🔐 validatePassword: Decryption failed - password is incorrect",
+            decryptError.message,
+          );
+          return false;
+        }
+      }
+
+      // Fallback: if no encrypted data to test, just check if key exists
+      console.log(
+        "🔐 validatePassword: No encrypted data to test, using fallback",
+      );
       return !!testKey;
     } catch (error) {
-      console.error("Password validation failed:", error);
+      console.error(
+        "🔐 validatePassword: Validation failed with error:",
+        error,
+      );
       return false;
     }
   },
