@@ -51,15 +51,57 @@ const useBugReport = () => {
           elements.forEach((el) => {
             try {
               const style = window.getComputedStyle(el);
-              // Convert oklch() and other modern color functions to RGB
-              if (
+              // Convert oklch() and other modern color functions to safe RGB values
+              const hasProblematicColors =
                 style.backgroundColor?.includes("oklch") ||
                 style.color?.includes("oklch") ||
-                style.borderColor?.includes("oklch")
-              ) {
-                el.style.backgroundColor = "#ffffff";
-                el.style.color = "#000000";
-                el.style.borderColor = "#cccccc";
+                style.borderColor?.includes("oklch") ||
+                style.backgroundColor?.includes("lab(") ||
+                style.color?.includes("lab(") ||
+                style.borderColor?.includes("lab(") ||
+                style.backgroundColor?.includes("lch(") ||
+                style.color?.includes("lch(") ||
+                style.borderColor?.includes("lch(");
+
+              if (hasProblematicColors) {
+                // Use safe fallback colors
+                if (
+                  style.backgroundColor?.includes("oklch") ||
+                  style.backgroundColor?.includes("lab(") ||
+                  style.backgroundColor?.includes("lch(")
+                ) {
+                  el.style.backgroundColor = "#ffffff";
+                }
+                if (
+                  style.color?.includes("oklch") ||
+                  style.color?.includes("lab(") ||
+                  style.color?.includes("lch(")
+                ) {
+                  el.style.color = "#000000";
+                }
+                if (
+                  style.borderColor?.includes("oklch") ||
+                  style.borderColor?.includes("lab(") ||
+                  style.borderColor?.includes("lch(")
+                ) {
+                  el.style.borderColor = "#cccccc";
+                }
+              }
+
+              // Also handle any CSS variables that might contain problematic values
+              const cssVariables = style.cssText.match(/--[\w-]+:\s*[^;]+/g);
+              if (cssVariables) {
+                cssVariables.forEach((variable) => {
+                  if (
+                    variable.includes("oklch") ||
+                    variable.includes("lab(") ||
+                    variable.includes("lch(")
+                  ) {
+                    // Remove the problematic CSS variable
+                    const varName = variable.split(":")[0];
+                    el.style.removeProperty(varName.trim());
+                  }
+                });
               }
             } catch {
               // Ignore style access errors
@@ -295,18 +337,33 @@ const useBugReport = () => {
   };
 
   const previewScreenshot = async () => {
-    const screenshotData = await captureScreenshot();
-    if (screenshotData) {
-      // Open screenshot in new tab for preview
-      const win = window.open();
-      win.document.write(`
-        <html>
-          <head><title>Screenshot Preview</title></head>
-          <body style="margin: 0; background: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh;">
-            <img src="${screenshotData}" style="max-width: 90%; max-height: 90%; border: 1px solid #ddd; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
-          </body>
-        </html>
-      `);
+    try {
+      const screenshotData = await captureScreenshot();
+      if (screenshotData) {
+        // Open screenshot in new tab for preview
+        const win = window.open();
+        if (win) {
+          win.document.write(`
+            <html>
+              <head><title>Screenshot Preview</title></head>
+              <body style="margin: 0; background: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+                <img src="${screenshotData}" style="max-width: 90%; max-height: 90%; border: 1px solid #ddd; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+              </body>
+            </html>
+          `);
+        } else {
+          // Popup blocked or failed
+          console.warn(
+            "Failed to open screenshot preview - popup may be blocked",
+          );
+          // Could set screenshot to show inline preview instead
+          setScreenshot(screenshotData);
+        }
+      } else {
+        console.warn("Screenshot capture failed during preview");
+      }
+    } catch (error) {
+      console.error("Error during screenshot preview:", error);
     }
   };
 

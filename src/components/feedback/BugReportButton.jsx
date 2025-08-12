@@ -1,6 +1,7 @@
 import React from "react";
 import { Bug, Camera, Send, X, AlertCircle } from "lucide-react";
 import useBugReport from "../../hooks/useBugReport";
+import useToast from "../../hooks/useToast";
 
 /**
  * Floating bug report button with screenshot capability
@@ -21,29 +22,46 @@ const BugReportButton = () => {
     previewScreenshot,
   } = useBugReport();
 
+  const { addToast } = useToast();
+
   const handleSubmit = async () => {
     const result = await submitReport();
     if (result) {
       // Show success message with GitHub issue link if available
       if (result.issueUrl) {
-        const message = `Thanks! Your bug report has been submitted.\n\nGitHub Issue: ${result.issueUrl}\n\nClick OK to view the issue.`;
-        if (confirm(message)) {
-          window.open(result.issueUrl, "_blank");
-        }
+        addToast({
+          type: "success",
+          title: "Bug Report Submitted!",
+          message: "Your report has been created as a GitHub issue.",
+          duration: 6000,
+          action: {
+            label: "View Issue",
+            onClick: () => window.open(result.issueUrl, "_blank"),
+          },
+        });
       } else if (result.localFallback) {
         // Service unavailable, but we logged it locally
-        alert(
-          `Thanks! Your bug report has been logged locally.\n\nThe bug report service is temporarily unavailable (${result.fallbackReason}), but your report including screenshot and session data has been saved to the browser console for manual review.\n\nPlease check the browser console (F12) for the full report details.`,
-        );
+        addToast({
+          type: "warning",
+          title: "Report Logged Locally",
+          message: `Service temporarily unavailable, but your report has been saved. Check browser console for details.`,
+          duration: 8000,
+        });
       } else {
-        alert(
-          "Thanks! Your bug report has been submitted. Check the console for details.",
-        );
+        addToast({
+          type: "success",
+          title: "Report Submitted!",
+          message: "Your bug report has been submitted successfully.",
+          duration: 4000,
+        });
       }
     } else {
-      alert(
-        "Failed to submit bug report. Please try again or check the browser console for error details.",
-      );
+      addToast({
+        type: "error",
+        title: "Submission Failed",
+        message: "Failed to submit bug report. Please try again.",
+        duration: 5000,
+      });
     }
   };
 
@@ -99,14 +117,14 @@ const BugReportButton = () => {
               </div>
 
               <div className="flex items-center justify-between">
-                <label className="flex items-center">
+                <label className="flex items-center cursor-pointer">
                   <input
                     type="checkbox"
                     checked={includeScreenshot}
                     onChange={(e) => setIncludeScreenshot(e.target.checked)}
-                    className="mr-2 text-red-500 focus:ring-red-500"
+                    className="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500 focus:ring-2"
                   />
-                  <span className="text-sm text-gray-700">
+                  <span className="ml-2 text-sm text-gray-700">
                     Include screenshot
                   </span>
                 </label>
