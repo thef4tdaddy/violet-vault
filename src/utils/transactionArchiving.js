@@ -24,7 +24,13 @@ export const ARCHIVE_CONFIG = {
   },
 
   // What to preserve in archives
-  PRESERVE_CATEGORIES: ["income", "fixed-expenses", "variable-expenses", "savings", "transfers"],
+  PRESERVE_CATEGORIES: [
+    "income",
+    "fixed-expenses",
+    "variable-expenses",
+    "savings",
+    "transfers",
+  ],
 };
 
 /**
@@ -44,16 +50,25 @@ export class TransactionArchiver {
   /**
    * Execute the complete archiving process
    */
-  async archiveOldTransactions(olderThanMonths = this.config.DEFAULT_ARCHIVE_AGE_MONTHS) {
+  async archiveOldTransactions(
+    olderThanMonths = this.config.DEFAULT_ARCHIVE_AGE_MONTHS,
+  ) {
     try {
-      logger.info("Starting transaction archiving process", { olderThanMonths });
+      logger.info("Starting transaction archiving process", {
+        olderThanMonths,
+      });
 
       const cutoffDate = this.calculateCutoffDate(olderThanMonths);
-      const oldTransactions = await this.getTransactionsForArchiving(cutoffDate);
+      const oldTransactions =
+        await this.getTransactionsForArchiving(cutoffDate);
 
       if (oldTransactions.length === 0) {
         logger.info("No transactions found for archiving");
-        return { success: true, stats: this.stats, message: "No transactions to archive" };
+        return {
+          success: true,
+          stats: this.stats,
+          message: "No transactions to archive",
+        };
       }
 
       logger.info(`Found ${oldTransactions.length} transactions to archive`);
@@ -311,7 +326,11 @@ export class TransactionArchiver {
 
     // Calculate dates for each period
     const periodDates = periods.map((period) => {
-      const date = new Date(now.getFullYear(), now.getMonth() - period.months, now.getDate());
+      const date = new Date(
+        now.getFullYear(),
+        now.getMonth() - period.months,
+        now.getDate(),
+      );
       return {
         ...period,
         cutoffDate: date.toISOString().split("T")[0],
@@ -323,11 +342,17 @@ export class TransactionArchiver {
     const periodCounts = await Promise.all(
       periodDates.map(async (period) => ({
         ...period,
-        count: await budgetDb.transactions.where("date").below(period.cutoffDate).count(),
-      }))
+        count: await budgetDb.transactions
+          .where("date")
+          .below(period.cutoffDate)
+          .count(),
+      })),
     );
 
-    const archives = await budgetDb.cache.where("category").equals("transaction_archive").count();
+    const archives = await budgetDb.cache
+      .where("category")
+      .equals("transaction_archive")
+      .count();
 
     const analyticsAggregations = await budgetDb.cache
       .where("category")
@@ -336,7 +361,8 @@ export class TransactionArchiver {
 
     // Find the best recommendation based on transaction volume
     const bestRecommendation =
-      periodCounts.find((p) => p.count > 50) || periodCounts[periodCounts.length - 1];
+      periodCounts.find((p) => p.count > 50) ||
+      periodCounts[periodCounts.length - 1];
 
     return {
       current: {
@@ -344,7 +370,8 @@ export class TransactionArchiver {
         periodBreakdown: periodCounts,
         // Keep backward compatibility
         oldTransactions: periodCounts.find((p) => p.months === 12)?.count || 0,
-        veryOldTransactions: periodCounts.find((p) => p.months === 24)?.count || 0,
+        veryOldTransactions:
+          periodCounts.find((p) => p.months === 24)?.count || 0,
       },
       archived: {
         archiveCount: archives,
@@ -366,7 +393,9 @@ export class TransactionArchiver {
    * Retrieve archived transaction data for analytics
    */
   async getArchivedAnalytics(period = "yearly", category = null) {
-    const keyPattern = category ? `analytics_${period}_*_${category}` : `analytics_${period}_*`;
+    const keyPattern = category
+      ? `analytics_${period}_*_${category}`
+      : `analytics_${period}_*`;
 
     const results = await budgetDb.cache
       .where("key")
@@ -382,7 +411,9 @@ export class TransactionArchiver {
   async restoreArchivedTransactions(archiveId) {
     logger.warn(`Attempting to restore archived transactions: ${archiveId}`);
 
-    const archive = await budgetDb.cache.get(`transaction_archive_${archiveId}`);
+    const archive = await budgetDb.cache.get(
+      `transaction_archive_${archiveId}`,
+    );
     if (!archive) {
       throw new Error(`Archive ${archiveId} not found`);
     }
@@ -393,7 +424,7 @@ export class TransactionArchiver {
     }
 
     logger.info(
-      `Restored ${archive.value.transactions.length} transactions from archive ${archiveId}`
+      `Restored ${archive.value.transactions.length} transactions from archive ${archiveId}`,
     );
     return archive.value.transactions.length;
   }

@@ -14,7 +14,7 @@ jobs:
   deploy-preview:
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -50,7 +50,7 @@ jobs:
               auto_merge: false,
               required_contexts: []
             });
-            
+
             return deployment.data.id;
 
       - name: Upload preview build to artifacts
@@ -66,28 +66,28 @@ jobs:
           script: |
             const prNumber = context.payload.pull_request.number;
             const artifactName = `preview-build-${prNumber}`;
-            
+
             const comment = `🚀 **Preview Build Ready!**
-            
+
             This PR has been built and is ready for preview testing.
-            
+
             📦 **Artifact**: \`${artifactName}\`
             🔗 **Download**: [Preview Build Artifact](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
-            
+
             ### Testing Instructions:
             1. Download the artifact from the link above
             2. Extract the contents to your local web server
             3. Test the changes thoroughly
             4. Report any issues in this PR
-            
+
             ### Build Info:
             - **Commit**: ${context.sha.substring(0, 7)}
             - **Environment**: Staging
             - **Build Time**: ${new Date().toISOString()}
-            
+
             ---
             *This preview will be available for 7 days*`;
-            
+
             github.rest.issues.createComment({
               issue_number: prNumber,
               owner: context.repo.owner,

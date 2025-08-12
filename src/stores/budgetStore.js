@@ -109,457 +109,19 @@ const storeInitializer = (set, get) => ({
   // NOTE: Data arrays (envelopes, transactions, etc.) are now handled by TanStack Query → Dexie
   // Zustand only contains UI state and app settings
 
-  // App state actions (data mutations now handled by TanStack Query hooks)
+  // Transfer funds logic moved to TanStack Query hooks
 
-  // Optimized bulk operations
-  setEnvelopes: (envelopes) =>
-    set((state) => {
-      state.envelopes = envelopes;
-    }),
-  bulkUpdateEnvelopes: (updates) =>
-    set((state) => {
-      updates.forEach((update) => {
-        const index = state.envelopes.findIndex((e) => e.id === update.id);
-        if (index !== -1) {
-          Object.assign(state.envelopes[index], update);
-        }
-      });
-    }),
+  // Data selectors moved to TanStack Query hooks
 
-  // Envelope CRUD operations
-  addEnvelope: (envelope) =>
-    set((state) => {
-      console.log("📁 BudgetStore.addEnvelope called", {
-        envelopeId: envelope.id,
-        envelopeName: envelope.name,
-        currentBalance: envelope.currentBalance,
-      });
-      state.envelopes.push({
-        ...envelope,
-        createdAt: envelope.createdAt || new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
-    }),
+  // Transaction operations moved to TanStack Query hooks
 
-  updateEnvelope: (id, updates) =>
-    set((state) => {
-      console.log("🔄 BudgetStore.updateEnvelope called", {
-        envelopeId: id,
-        updates,
-      });
-      const index = state.envelopes.findIndex((e) => e.id === id);
-      if (index !== -1) {
-        state.envelopes[index] = {
-          ...state.envelopes[index],
-          ...updates,
-          updatedAt: new Date().toISOString(),
-        };
-      }
-    }),
+  // Bills operations moved to TanStack Query hooks
 
-  deleteEnvelope: (id) =>
-    set((state) => {
-      console.log("🗑️ BudgetStore.deleteEnvelope called", { envelopeId: id });
-      state.envelopes = state.envelopes.filter((e) => e.id !== id);
-    }),
+  // Debt operations moved to TanStack Query hooks
 
-  // Transfer funds between envelopes
-  transferFunds: (fromEnvelopeId, toEnvelopeId, amount, description) =>
-    set((state) => {
-      console.log("💸 BudgetStore.transferFunds called", {
-        fromEnvelopeId,
-        toEnvelopeId,
-        amount,
-        description,
-      });
+  // Savings goals operations moved to TanStack Query hooks
 
-      // Handle transfer from unassigned cash
-      if (fromEnvelopeId === "unassigned") {
-        if (state.unassignedCash < amount) {
-          console.warn("Insufficient unassigned cash for transfer");
-          return false;
-        }
-        state.unassignedCash -= amount;
-
-        // Add to target envelope
-        const toIndex = state.envelopes.findIndex((e) => e.id === toEnvelopeId);
-        if (toIndex !== -1) {
-          state.envelopes[toIndex].currentBalance =
-            (state.envelopes[toIndex].currentBalance || 0) + amount;
-        }
-      }
-      // Handle transfer to unassigned cash
-      else if (toEnvelopeId === "unassigned") {
-        const fromIndex = state.envelopes.findIndex(
-          (e) => e.id === fromEnvelopeId,
-        );
-        if (
-          fromIndex === -1 ||
-          state.envelopes[fromIndex].currentBalance < amount
-        ) {
-          console.warn("Insufficient envelope balance for transfer");
-          return false;
-        }
-        state.envelopes[fromIndex].currentBalance -= amount;
-        state.unassignedCash += amount;
-      }
-      // Handle transfer between envelopes
-      else {
-        const fromIndex = state.envelopes.findIndex(
-          (e) => e.id === fromEnvelopeId,
-        );
-        const toIndex = state.envelopes.findIndex((e) => e.id === toEnvelopeId);
-
-        if (fromIndex === -1 || toIndex === -1) {
-          console.warn("Source or target envelope not found");
-          return false;
-        }
-
-        if (state.envelopes[fromIndex].currentBalance < amount) {
-          console.warn("Insufficient balance in source envelope");
-          return false;
-        }
-
-        state.envelopes[fromIndex].currentBalance -= amount;
-        state.envelopes[toIndex].currentBalance =
-          (state.envelopes[toIndex].currentBalance || 0) + amount;
-      }
-
-      // Create transfer transaction
-      const transaction = {
-        id: `transfer_${Date.now()}`,
-        amount,
-        description:
-          description || `Transfer: ${fromEnvelopeId} → ${toEnvelopeId}`,
-        type: "transfer",
-        fromEnvelopeId,
-        toEnvelopeId,
-        date: new Date().toISOString().split("T")[0],
-        createdAt: new Date().toISOString(),
-      };
-
-      state.transactions.push(transaction);
-      state.allTransactions.push(transaction);
-
-      return true;
-    }),
-
-  // Computed selectors for better performance
-  getEnvelopeById: (id) => {
-    return get().envelopes.find((e) => e.id === id);
-  },
-
-  getEnvelopesByCategory: (category) => {
-    return get().envelopes.filter((e) => e.category === category);
-  },
-
-  getEnvelopesByType: (envelopeType) => {
-    return get().envelopes.filter((e) => e.envelopeType === envelopeType);
-  },
-
-  getTotalEnvelopeBalance: () => {
-    return get().envelopes.reduce((sum, e) => sum + (e.currentBalance || 0), 0);
-  },
-
-  getTotalEnvelopeBalanceByType: (envelopeType) => {
-    return get()
-      .envelopes.filter((e) => e.envelopeType === envelopeType)
-      .reduce((sum, e) => sum + (e.currentBalance || 0), 0);
-  },
-
-  // Transaction management actions
-  setTransactions: (transactions) =>
-    set((state) => {
-      state.transactions = transactions;
-    }),
-
-  setAllTransactions: (allTransactions) =>
-    set((state) => {
-      state.allTransactions = allTransactions;
-    }),
-
-  addTransaction: (transaction) =>
-    set((state) => {
-      state.transactions.push(transaction);
-      state.allTransactions.push(transaction);
-    }),
-
-  addTransactions: (transactions) =>
-    set((state) => {
-      state.transactions.push(...transactions);
-      state.allTransactions.push(...transactions);
-    }),
-
-  updateTransaction: (transaction) =>
-    set((state) => {
-      const transIndex = state.transactions.findIndex(
-        (t) => t.id === transaction.id,
-      );
-      const allTransIndex = state.allTransactions.findIndex(
-        (t) => t.id === transaction.id,
-      );
-
-      if (transIndex !== -1) {
-        state.transactions[transIndex] = transaction;
-      }
-      if (allTransIndex !== -1) {
-        state.allTransactions[allTransIndex] = transaction;
-      }
-    }),
-
-  deleteTransaction: (id) =>
-    set((state) => {
-      // Find the transaction before deleting to reverse any unassigned cash changes
-      const transaction =
-        state.transactions.find((t) => t.id === id) ||
-        state.allTransactions.find((t) => t.id === id);
-
-      if (transaction && transaction.envelopeId === "unassigned") {
-        // Reverse the unassigned cash change when deleting
-        if (transaction.type === "income") {
-          // Remove the income amount from unassigned cash
-          state.unassignedCash -= Math.abs(transaction.amount);
-        } else if (transaction.type === "expense") {
-          // Add back the expense amount to unassigned cash
-          state.unassignedCash += Math.abs(transaction.amount);
-        }
-      }
-
-      // Remove from both arrays
-      state.transactions = state.transactions.filter((t) => t.id !== id);
-      state.allTransactions = state.allTransactions.filter((t) => t.id !== id);
-    }),
-
-  // Bills management actions
-  setBills: (bills) =>
-    set((state) => {
-      state.bills = bills;
-    }),
-
-  addBill: (bill) =>
-    set((state) => {
-      state.bills.push(bill);
-      state.allTransactions.push(bill);
-    }),
-
-  updateBill: (bill) =>
-    set((state) => {
-      console.log("🔄 BudgetStore.updateBill called", {
-        billId: bill.id,
-        envelopeId: bill.envelopeId,
-        billName: bill.name || bill.provider,
-        fullBill: bill,
-      });
-
-      const billIndex = state.bills.findIndex((b) => b.id === bill.id);
-      const allTransIndex = state.allTransactions.findIndex(
-        (t) => t.id === bill.id,
-      );
-
-      console.log("🔄 Update bill indices", {
-        billIndex,
-        allTransIndex,
-        billsLength: state.bills.length,
-        allTransLength: state.allTransactions.length,
-      });
-
-      if (billIndex !== -1) {
-        console.log("🔄 Updating bill in bills array", {
-          oldBill: state.bills[billIndex],
-          newBill: bill,
-        });
-        state.bills[billIndex] = bill;
-      } else {
-        console.log("⚠️ Bill not found in bills array, adding it", {
-          billId: bill.id,
-        });
-        state.bills.push(bill);
-      }
-
-      if (allTransIndex !== -1) {
-        console.log("🔄 Updating bill in allTransactions array", {
-          oldTrans: state.allTransactions[allTransIndex],
-          newTrans: bill,
-        });
-        state.allTransactions[allTransIndex] = bill;
-      } else {
-        console.log("⚠️ Bill not found in allTransactions array, adding it", {
-          billId: bill.id,
-        });
-        state.allTransactions.push(bill);
-      }
-
-      console.log("✅ Bill update completed", {
-        billId: bill.id,
-        envelopeId: bill.envelopeId,
-      });
-    }),
-
-  deleteBill: (id) =>
-    set((state) => {
-      state.bills = state.bills.filter((b) => b.id !== id);
-      state.allTransactions = state.allTransactions.filter((t) => t.id !== id);
-    }),
-
-  // Debt tracking management
-  setDebts: (debts) =>
-    set((state) => {
-      state.debts = debts;
-    }),
-
-  addDebt: (debt) =>
-    set((state) => {
-      console.log("💳 BudgetStore.addDebt called", {
-        debtId: debt.id,
-        debtName: debt.name,
-        debtType: debt.type,
-        balance: debt.currentBalance,
-      });
-      state.debts.push({
-        ...debt,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
-    }),
-
-  updateDebt: (debt) =>
-    set((state) => {
-      console.log("🔄 BudgetStore.updateDebt called", {
-        debtId: debt.id,
-        debtName: debt.name,
-        balance: debt.currentBalance,
-      });
-      const index = state.debts.findIndex((d) => d.id === debt.id);
-      if (index !== -1) {
-        state.debts[index] = {
-          ...debt,
-          updatedAt: new Date().toISOString(),
-        };
-      }
-    }),
-
-  deleteDebt: (id) =>
-    set((state) => {
-      console.log("🗑️ BudgetStore.deleteDebt called", { debtId: id });
-      state.debts = state.debts.filter((d) => d.id !== id);
-    }),
-
-  // Record debt payment
-  recordDebtPayment: (debtId, payment) =>
-    set((state) => {
-      const debt = state.debts.find((d) => d.id === debtId);
-      if (debt) {
-        // Add payment to history
-        if (!debt.paymentHistory) debt.paymentHistory = [];
-        debt.paymentHistory.push({
-          ...payment,
-          id: crypto.randomUUID(),
-          date: payment.date || new Date().toISOString(),
-        });
-
-        // Update current balance
-        debt.currentBalance = Math.max(0, debt.currentBalance - payment.amount);
-        debt.updatedAt = new Date().toISOString();
-
-        console.log("💰 Debt payment recorded", {
-          debtId,
-          paymentAmount: payment.amount,
-          newBalance: debt.currentBalance,
-        });
-      }
-    }),
-
-  // Savings goals management
-  setSavingsGoals: (savingsGoals) =>
-    set((state) => {
-      state.savingsGoals = savingsGoals;
-    }),
-
-  addSavingsGoal: (goal) =>
-    set((state) => {
-      state.savingsGoals.push(goal);
-    }),
-
-  updateSavingsGoal: (goal) =>
-    set((state) => {
-      const index = state.savingsGoals.findIndex((g) => g.id === goal.id);
-      if (index !== -1) {
-        state.savingsGoals[index] = goal;
-      }
-    }),
-
-  deleteSavingsGoal: (id) =>
-    set((state) => {
-      state.savingsGoals = state.savingsGoals.filter((g) => g.id !== id);
-    }),
-
-  // Supplemental accounts management
-  setSupplementalAccounts: (accounts) =>
-    set((state) => {
-      state.supplementalAccounts = accounts;
-    }),
-
-  addSupplementalAccount: (account) =>
-    set((state) => {
-      state.supplementalAccounts.push(account);
-    }),
-
-  updateSupplementalAccount: (id, account) =>
-    set((state) => {
-      const index = state.supplementalAccounts.findIndex((a) => a.id === id);
-      if (index !== -1) {
-        state.supplementalAccounts[index] = account;
-      }
-    }),
-
-  deleteSupplementalAccount: (id) =>
-    set((state) => {
-      state.supplementalAccounts = state.supplementalAccounts.filter(
-        (a) => a.id !== id,
-      );
-    }),
-
-  transferFromSupplementalAccount: (
-    accountId,
-    envelopeId,
-    amount,
-    description,
-  ) =>
-    set((state) => {
-      // Find and update supplemental account
-      const accountIndex = state.supplementalAccounts.findIndex(
-        (a) => a.id === accountId,
-      );
-      if (accountIndex === -1) return;
-
-      const account = state.supplementalAccounts[accountIndex];
-      if (account.currentBalance < amount) return;
-
-      // Find and update envelope
-      const envelopeIndex = state.envelopes.findIndex(
-        (e) => e.id === envelopeId,
-      );
-      if (envelopeIndex === -1) return;
-
-      // Update balances
-      state.supplementalAccounts[accountIndex].currentBalance -= amount;
-      state.envelopes[envelopeIndex].currentAmount += amount;
-
-      // Create transaction record
-      const transaction = {
-        id: Date.now(),
-        amount: amount,
-        description: description || `Transfer from ${account.name}`,
-        source: "supplemental",
-        sourceAccountId: accountId,
-        targetEnvelopeId: envelopeId,
-        date: new Date().toISOString(),
-        type: "transfer",
-      };
-
-      state.transactions.push(transaction);
-      state.allTransactions.push(transaction);
-    }),
+  // Supplemental accounts operations moved to TanStack Query hooks
 
   // Unassigned cash and allocation management
   setUnassignedCash: (amount) =>
@@ -590,24 +152,7 @@ const storeInitializer = (set, get) => ({
       state.isActualBalanceManual = isManual;
     }),
 
-  // Reconcile transaction - properly handles unassigned cash updates
-  reconcileTransaction: (transaction) =>
-    set((state) => {
-      // Add transaction to both arrays
-      state.transactions.push(transaction);
-      state.allTransactions.push(transaction);
-
-      // If transaction targets unassigned cash, update unassigned cash balance
-      if (transaction.envelopeId === "unassigned") {
-        if (transaction.type === "income") {
-          // Income adds to unassigned cash
-          state.unassignedCash += Math.abs(transaction.amount);
-        } else if (transaction.type === "expense") {
-          // Expense subtracts from unassigned cash
-          state.unassignedCash -= Math.abs(transaction.amount);
-        }
-      }
-    }),
+  // Reconcile transaction moved to TanStack Query hooks
 
   // Paycheck history management
   setPaycheckHistory: (history) =>
@@ -680,140 +225,106 @@ const storeInitializer = (set, get) => ({
       console.log(`🌩️ Cloud sync ${enabled ? "enabled" : "disabled"}`);
     }),
 
-  // Clear all transactions (for cleanup)
-  clearAllTransactions: () =>
-    set((state) => {
-      state.transactions = [];
-      state.allTransactions = [];
-    }),
+  // Transaction cleanup moved to TanStack Query hooks
 
-  // Remove duplicate reconcile transactions
-  removeDuplicateReconcileTransactions: () =>
-    set((state) => {
-      const reconcilePatterns = [
-        "Balance reconciliation",
-        "reconciliation",
-        "Auto-Reconcile",
-      ];
+  // Load imported data - now directly to Dexie via TanStack Query hooks
+  loadData: async (importedData) => {
+    console.log("📥 Loading imported data directly to Dexie", {
+      envelopes: importedData.envelopes?.length || 0,
+      bills: importedData.bills?.length || 0,
+      transactions: importedData.transactions?.length || 0,
+      allTransactions: importedData.allTransactions?.length || 0,
+      savingsGoals: importedData.savingsGoals?.length || 0,
+    });
 
-      // Filter out duplicate reconcile transactions
-      state.transactions = state.transactions.filter((t, index, array) => {
-        const isReconcile = reconcilePatterns.some((pattern) =>
-          t.description?.toLowerCase().includes(pattern.toLowerCase()),
-        );
+    try {
+      // Load data arrays directly to Dexie
+      if (importedData.envelopes?.length)
+        await budgetDb.bulkUpsertEnvelopes(importedData.envelopes);
+      if (importedData.bills?.length)
+        await budgetDb.bulkUpsertBills(importedData.bills);
+      if (importedData.transactions?.length)
+        await budgetDb.bulkUpsertTransactions(importedData.transactions);
+      if (importedData.allTransactions?.length)
+        await budgetDb.bulkUpsertTransactions(importedData.allTransactions);
+      if (importedData.savingsGoals?.length)
+        await budgetDb.bulkUpsertSavingsGoals(importedData.savingsGoals);
+      if (importedData.debts?.length)
+        await budgetDb.bulkUpsertDebts(importedData.debts);
+      if (importedData.paycheckHistory?.length)
+        await budgetDb.bulkUpsertPaychecks(importedData.paycheckHistory);
 
-        if (!isReconcile) return true;
+      // Update UI state in Zustand
+      set((state) => {
+        if (typeof importedData.unassignedCash === "number")
+          state.unassignedCash = importedData.unassignedCash;
+        if (typeof importedData.biweeklyAllocation === "number")
+          state.biweeklyAllocation = importedData.biweeklyAllocation;
+        if (typeof importedData.actualBalance === "number")
+          state.actualBalance = importedData.actualBalance;
+        if (typeof importedData.isActualBalanceManual === "boolean")
+          state.isActualBalanceManual = importedData.isActualBalanceManual;
 
-        // Keep only the first occurrence of each reconcile transaction
-        return (
-          array.findIndex(
-            (other) =>
-              other.description === t.description &&
-              other.amount === t.amount &&
-              Math.abs(
-                new Date(other.date).getTime() - new Date(t.date).getTime(),
-              ) < 60000, // Within 1 minute
-          ) === index
-        );
+        state.dataLoaded = true;
       });
 
-      state.allTransactions = state.allTransactions.filter(
-        (t, index, array) => {
-          const isReconcile = reconcilePatterns.some((pattern) =>
-            t.description?.toLowerCase().includes(pattern.toLowerCase()),
-          );
-
-          if (!isReconcile) return true;
-
-          // Keep only the first occurrence of each reconcile transaction
-          return (
-            array.findIndex(
-              (other) =>
-                other.description === t.description &&
-                other.amount === t.amount &&
-                Math.abs(
-                  new Date(other.date).getTime() - new Date(t.date).getTime(),
-                ) < 60000, // Within 1 minute
-            ) === index
-          );
-        },
-      );
-    }),
-
-  // Load imported data into store and persist it
-  loadData: (importedData) =>
-    set((state) => {
-      console.log("📥 Loading imported data into store", {
-        envelopes: importedData.envelopes?.length || 0,
-        bills: importedData.bills?.length || 0,
-        transactions: importedData.transactions?.length || 0,
-        allTransactions: importedData.allTransactions?.length || 0,
-        savingsGoals: importedData.savingsGoals?.length || 0,
-      });
-
-      // Load all data arrays
-      if (importedData.envelopes) state.envelopes = importedData.envelopes;
-      if (importedData.bills) state.bills = importedData.bills;
-      if (importedData.transactions)
-        state.transactions = importedData.transactions;
-      if (importedData.allTransactions)
-        state.allTransactions = importedData.allTransactions;
-      if (importedData.savingsGoals)
-        state.savingsGoals = importedData.savingsGoals;
-      if (importedData.debts) state.debts = importedData.debts;
-      if (importedData.paycheckHistory)
-        state.paycheckHistory = importedData.paycheckHistory;
-      if (importedData.supplementalAccounts)
-        state.supplementalAccounts = importedData.supplementalAccounts;
-
-      // Load financial state
-      if (typeof importedData.unassignedCash === "number")
-        state.unassignedCash = importedData.unassignedCash;
-      if (typeof importedData.biweeklyAllocation === "number")
-        state.biweeklyAllocation = importedData.biweeklyAllocation;
-      if (typeof importedData.actualBalance === "number")
-        state.actualBalance = importedData.actualBalance;
-      if (typeof importedData.isActualBalanceManual === "boolean")
-        state.isActualBalanceManual = importedData.isActualBalanceManual;
-
-      state.dataLoaded = true;
-      console.log("✅ Data loaded into store successfully");
+      console.log("✅ Data loaded to Dexie successfully");
 
       // Force TanStack Query cache invalidation to show imported data immediately
       setTimeout(() => {
-        // Dispatch multiple events to ensure all hooks refresh
         window.dispatchEvent(
           new CustomEvent("importCompleted", {
             detail: { source: "loadData", dataLoaded: true },
           }),
         );
-
-        // Also dispatch specific invalidation events
         window.dispatchEvent(new CustomEvent("invalidateAllQueries"));
-
         console.log("🔄 Import cache invalidation events dispatched");
       }, 100);
-    }),
+    } catch (error) {
+      console.error("❌ Failed to load data to Dexie:", error);
+    }
+  },
 
-  // Reset functionality
-  resetStore: () =>
-    set((state) => {
-      state.envelopes = [];
-      state.bills = [];
-      state.transactions = [];
-      state.allTransactions = [];
-      state.savingsGoals = [];
-      state.supplementalAccounts = [];
-      state.debts = [];
-      state.unassignedCash = 0;
-      state.biweeklyAllocation = 0;
-      state.isUnassignedCashModalOpen = false;
-      state.paycheckHistory = [];
-      state.actualBalance = 0;
-      state.isActualBalanceManual = false;
-      state.isOnline = true; // Also reset isOnline status
-      state.dataLoaded = false;
-    }),
+  // Reset functionality - clears UI state and Dexie
+  resetStore: async () => {
+    try {
+      // Clear Dexie data
+      await budgetDb.transaction(
+        "rw",
+        budgetDb.envelopes,
+        budgetDb.bills,
+        budgetDb.transactions,
+        budgetDb.savingsGoals,
+        budgetDb.debts,
+        budgetDb.paychecks,
+        async () => {
+          await budgetDb.envelopes.clear();
+          await budgetDb.bills.clear();
+          await budgetDb.transactions.clear();
+          await budgetDb.savingsGoals.clear();
+          await budgetDb.debts.clear();
+          await budgetDb.paychecks.clear();
+        },
+      );
+
+      // Reset UI state
+      set((state) => {
+        state.unassignedCash = 0;
+        state.biweeklyAllocation = 0;
+        state.isUnassignedCashModalOpen = false;
+        state.paycheckHistory = [];
+        state.actualBalance = 0;
+        state.isActualBalanceManual = false;
+        state.isOnline = true;
+        state.dataLoaded = false;
+      });
+
+      // Invalidate all caches
+      window.dispatchEvent(new CustomEvent("invalidateAllQueries"));
+    } catch (error) {
+      console.error("❌ Failed to reset store:", error);
+    }
+  },
 
   // Security functionality
   validatePassword: async (password) => {
@@ -903,7 +414,7 @@ if (LOCAL_ONLY_MODE) {
       persist(base, {
         name: "violet-vault-store",
         partialize: (state) => ({
-          // App state only (data arrays handled by TanStack Query)
+          // UI and app state only (data arrays handled by TanStack Query → Dexie)
           unassignedCash: state.unassignedCash,
           biweeklyAllocation: state.biweeklyAllocation,
           paycheckHistory: state.paycheckHistory,
@@ -911,6 +422,8 @@ if (LOCAL_ONLY_MODE) {
           isActualBalanceManual: state.isActualBalanceManual,
           cloudSyncEnabled: state.cloudSyncEnabled,
           isOnline: state.isOnline,
+          isUnassignedCashModalOpen: state.isUnassignedCashModalOpen,
+          dataLoaded: state.dataLoaded,
         }),
       }),
       { name: "violet-vault-devtools" },

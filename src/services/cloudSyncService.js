@@ -78,7 +78,11 @@ class CloudSyncService {
    */
   async performSync() {
     try {
-      if (!this.config?.encryptionKey || !this.config?.currentUser || !this.config?.budgetId) {
+      if (
+        !this.config?.encryptionKey ||
+        !this.config?.currentUser ||
+        !this.config?.budgetId
+      ) {
         logger.warn("⚠️ Missing auth context for sync");
         return { success: false, error: "Missing authentication context" };
       }
@@ -96,7 +100,10 @@ class CloudSyncService {
       ]);
 
       // Step 2: Determine sync direction based on data freshness
-      const syncResult = await this.determineSyncDirection(firestoreData, dexieData);
+      const syncResult = await this.determineSyncDirection(
+        firestoreData,
+        dexieData,
+      );
 
       // Step 3: Perform the sync
       const result = await this.executSync(syncResult, FirebaseSync);
@@ -139,13 +146,14 @@ class CloudSyncService {
    */
   async fetchDexieData() {
     try {
-      const [envelopes, transactions, bills, savingsGoals, paycheckHistory] = await Promise.all([
-        budgetDb.envelopes.toArray(),
-        budgetDb.transactions.toArray(),
-        budgetDb.bills.toArray(),
-        budgetDb.savingsGoals.toArray(),
-        budgetDb.paycheckHistory.toArray(),
-      ]);
+      const [envelopes, transactions, bills, savingsGoals, paycheckHistory] =
+        await Promise.all([
+          budgetDb.envelopes.toArray(),
+          budgetDb.transactions.toArray(),
+          budgetDb.bills.toArray(),
+          budgetDb.savingsGoals.toArray(),
+          budgetDb.paycheckHistory.toArray(),
+        ]);
 
       return {
         envelopes,
@@ -157,7 +165,7 @@ class CloudSyncService {
           ...envelopes.map((e) => e.lastModified || e.createdAt || 0),
           ...transactions.map((t) => t.lastModified || t.createdAt || 0),
           ...bills.map((b) => b.lastModified || b.createdAt || 0),
-          0
+          0,
         ),
       };
     } catch (error) {
@@ -181,9 +189,11 @@ class CloudSyncService {
     const dexieLastModified = dexieData.lastModified;
     const firestoreHasData =
       firestoreData &&
-      Object.values(firestoreData).some((arr) => Array.isArray(arr) && arr.length > 0);
+      Object.values(firestoreData).some(
+        (arr) => Array.isArray(arr) && arr.length > 0,
+      );
     const dexieHasData = Object.values(dexieData).some(
-      (arr) => Array.isArray(arr) && arr.length > 0
+      (arr) => Array.isArray(arr) && arr.length > 0,
     );
 
     logger.debug("🔍 Sync analysis", {
@@ -273,20 +283,26 @@ class CloudSyncService {
           addPromises.push(budgetDb.envelopes.bulkAdd(firestoreData.envelopes));
         }
         if (firestoreData.transactions?.length > 0) {
-          addPromises.push(budgetDb.transactions.bulkAdd(firestoreData.transactions));
+          addPromises.push(
+            budgetDb.transactions.bulkAdd(firestoreData.transactions),
+          );
         }
         if (firestoreData.bills?.length > 0) {
           addPromises.push(budgetDb.bills.bulkAdd(firestoreData.bills));
         }
         if (firestoreData.savingsGoals?.length > 0) {
-          addPromises.push(budgetDb.savingsGoals.bulkAdd(firestoreData.savingsGoals));
+          addPromises.push(
+            budgetDb.savingsGoals.bulkAdd(firestoreData.savingsGoals),
+          );
         }
         if (firestoreData.paycheckHistory?.length > 0) {
-          addPromises.push(budgetDb.paycheckHistory.bulkAdd(firestoreData.paycheckHistory));
+          addPromises.push(
+            budgetDb.paycheckHistory.bulkAdd(firestoreData.paycheckHistory),
+          );
         }
 
         await Promise.all(addPromises);
-      }
+      },
     );
   }
 

@@ -16,15 +16,16 @@ const useBugReport = () => {
     try {
       // Check if we're on mobile - use simpler approach
       const isMobile =
-        /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-        window.innerWidth <= 768;
+        /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent,
+        ) || window.innerWidth <= 768;
 
       // Add timeout to prevent indefinite hanging
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(
           () => reject(new Error("Screenshot capture timed out")),
-          isMobile ? 10000 : 15000
-        )
+          isMobile ? 10000 : 15000,
+        ),
       );
 
       // Dynamic import to avoid bundle size issues
@@ -70,7 +71,10 @@ const useBugReport = () => {
       // Race between screenshot capture and timeout
       const canvas = await Promise.race([screenshotPromise, timeoutPromise]);
 
-      const screenshotDataUrl = canvas.toDataURL("image/png", isMobile ? 0.5 : 0.7);
+      const screenshotDataUrl = canvas.toDataURL(
+        "image/png",
+        isMobile ? 0.5 : 0.7,
+      );
       setScreenshot(screenshotDataUrl);
       return screenshotDataUrl;
     } catch (error) {
@@ -87,7 +91,11 @@ const useBugReport = () => {
 
     // Add overall timeout to prevent infinite hanging
     const timeoutPromise = new Promise(
-      (_, reject) => setTimeout(() => reject(new Error("Bug report submission timed out")), 30000) // 30 second timeout
+      (_, reject) =>
+        setTimeout(
+          () => reject(new Error("Bug report submission timed out")),
+          30000,
+        ), // 30 second timeout
     );
 
     const submissionPromise = async () => {
@@ -100,7 +108,7 @@ const useBugReport = () => {
           } catch (screenshotError) {
             console.warn(
               "Screenshot capture failed, proceeding without screenshot:",
-              screenshotError
+              screenshotError,
             );
             screenshotData = null;
           }
@@ -261,7 +269,10 @@ const useBugReport = () => {
         if (import.meta.env.MODE === "development") {
           console.log("🔧 Started Highlight.io session for bug report");
         }
-      } else if (typeof H.start === "function" && typeof H.isRecording !== "function") {
+      } else if (
+        typeof H.start === "function" &&
+        typeof H.isRecording !== "function"
+      ) {
         // Fallback for older SDK versions that don't have isRecording
         H.start();
         if (import.meta.env.MODE === "development") {

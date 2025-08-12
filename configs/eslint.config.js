@@ -6,7 +6,7 @@ import reactRefresh from "eslint-plugin-react-refresh";
 export default [
   {
     ignores: [
-      "dist/**", 
+      "dist/**",
       ".markdownlintignore",
       "node_modules/**",
       ".git/**",
@@ -20,7 +20,7 @@ export default [
       "build/**",
       "public/**/*.js",
       "**/*.test.js",
-      "**/*.spec.js"
+      "**/*.spec.js",
     ],
   },
   {

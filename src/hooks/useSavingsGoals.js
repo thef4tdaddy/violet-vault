@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useBudgetStore } from "../stores/budgetStore";
-import { queryKeys } from "../utils/queryClient";
-// import { budgetDb } from "../db/budgetDb"; // TODO: Use for offline fallback
+import { useCallback, useEffect } from "react";
+import { queryKeys, optimisticHelpers } from "../utils/queryClient";
+import { budgetDb } from "../db/budgetDb";
 
 /**
  * Specialized hook for savings goals management
@@ -16,26 +16,23 @@ const useSavingsGoals = (options = {}) => {
     includeCompleted = true,
   } = options;
 
-  // Get Zustand store for mutations
-  const {
-    savingsGoals: zustandSavingsGoals,
-    addSavingsGoal: zustandAddSavingsGoal,
-    updateSavingsGoal: zustandUpdateSavingsGoal,
-    deleteSavingsGoal: zustandDeleteSavingsGoal,
-    contributeTo: zustandContributeTo,
-  } = useBudgetStore();
+  // Removed Zustand dependencies - data now handled by TanStack Query → Dexie
 
-  // Smart query function with filtering and progress calculations
-  const queryFunction = async () => {
-    let goals = [];
+  // TanStack Query function - hydrates from Dexie, Dexie syncs with Firebase
+  const queryFunction = useCallback(async () => {
+    console.log("🔄 TanStack Query: Fetching savings goals from Dexie...");
 
-    // Try Zustand first for real-time data
-    if (zustandSavingsGoals && zustandSavingsGoals.length > 0) {
-      goals = [...zustandSavingsGoals];
-    } else {
-      // Fallback to Dexie for offline support (need to add savingsGoals table to schema)
-      // For now, return empty array if no Zustand data
-      goals = [];
+    try {
+      let goals = [];
+
+      // Always fetch from Dexie (single source of truth for local data)
+      goals = await budgetDb.savingsGoals.toArray();
+
+      console.log("✅ TanStack Query: Loaded from Dexie:", goals.length);
+    } catch (error) {
+      console.error("❌ TanStack Query: Dexie fetch failed:", error);
+      // Return empty array when Dexie fails (no fallback to Zustand)
+      return [];
     }
 
     // Enrich goals with calculated fields
@@ -46,7 +43,8 @@ const useSavingsGoals = (options = {}) => {
       const targetDate = goal.targetDate ? new Date(goal.targetDate) : null;
 
       // Progress calculations
-      const progressRate = targetAmount > 0 ? (currentAmount / targetAmount) * 100 : 0;
+      const progressRate =
+        targetAmount > 0 ? (currentAmount / targetAmount) * 100 : 0;
       const remainingAmount = Math.max(0, targetAmount - currentAmount);
       const isCompleted = currentAmount >= targetAmount;
 
@@ -84,7 +82,8 @@ const useSavingsGoals = (options = {}) => {
         daysRemaining,
         isOverdue,
         timelineStatus,
-        suggestedMonthlyContribution: Math.round(suggestedMonthlyContribution * 100) / 100,
+        suggestedMonthlyContribution:
+          Math.round(suggestedMonthlyContribution * 100) / 100,
 
         // Goal category/priority
         priority: goal.priority || "medium",
@@ -97,7 +96,9 @@ const useSavingsGoals = (options = {}) => {
 
     switch (status) {
       case "active":
-        filteredGoals = filteredGoals.filter((goal) => !goal.isCompleted && !goal.isPaused);
+        filteredGoals = filteredGoals.filter(
+          (goal) => !goal.isCompleted && !goal.isPaused,
+        );
         break;
       case "completed":
         filteredGoals = filteredGoals.filter((goal) => goal.isCompleted);
@@ -109,7 +110,9 @@ const useSavingsGoals = (options = {}) => {
         filteredGoals = filteredGoals.filter((goal) => goal.isOverdue);
         break;
       case "urgent":
-        filteredGoals = filteredGoals.filter((goal) => goal.timelineStatus === "urgent");
+        filteredGoals = filteredGoals.filter(
+          (goal) => goal.timelineStatus === "urgent",
+        );
         break;
       default:
         if (!includeCompleted) {
@@ -129,7 +132,11 @@ const useSavingsGoals = (options = {}) => {
       }
 
       // Handle numeric fields
-      if (sortBy === "targetAmount" || sortBy === "currentAmount" || sortBy === "progressRate") {
+      if (
+        sortBy === "targetAmount" ||
+        sortBy === "currentAmount" ||
+        sortBy === "progressRate"
+      ) {
         aVal = parseFloat(aVal) || 0;
         bVal = parseFloat(bVal) || 0;
       }
@@ -155,7 +162,7 @@ const useSavingsGoals = (options = {}) => {
     });
 
     return filteredGoals;
-  };
+  }, [status, sortBy, sortOrder, includeCompleted]);
 
   // Main savings goals query
   const savingsGoalsQuery = useQuery({
@@ -167,8 +174,36 @@ const useSavingsGoals = (options = {}) => {
     }),
     queryFn: queryFunction,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnMount: false, // Don't refetch if data is fresh
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    placeholderData: (previousData) => previousData, // Use previous data during refetch
+    initialData: undefined, // Remove initialData to prevent persister errors
     enabled: true,
   });
+
+  // Listen for import completion to force refresh
+  useEffect(() => {
+    const handleImportCompleted = () => {
+      console.log("🔄 Import detected, invalidating savings goals cache");
+      queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals });
+    };
+
+    const handleInvalidateAll = () => {
+      console.log("🔄 Invalidating all savings goal queries");
+      queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals });
+      queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalsList });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+    };
+
+    window.addEventListener("importCompleted", handleImportCompleted);
+    window.addEventListener("invalidateAllQueries", handleInvalidateAll);
+
+    return () => {
+      window.removeEventListener("importCompleted", handleImportCompleted);
+      window.removeEventListener("invalidateAllQueries", handleInvalidateAll);
+    };
+  }, [queryClient]);
 
   // Add savings goal mutation
   const addSavingsGoalMutation = useMutation({
@@ -184,15 +219,11 @@ const useSavingsGoals = (options = {}) => {
         ...goalData,
       };
 
-      // Call Zustand mutation
-      zustandAddSavingsGoal(newGoal);
+      // Apply optimistic update
+      await optimisticHelpers.addSavingsGoal(newGoal);
 
-      // TODO: Persist to Dexie when savingsGoals table is added
-      // try {
-      //   await budgetDb.savingsGoals.add(newGoal);
-      // } catch (error) {
-      //   console.warn("Failed to persist savings goal to Dexie:", error);
-      // }
+      // Apply to Dexie directly
+      await budgetDb.savingsGoals.add(newGoal);
 
       return newGoal;
     },
@@ -210,15 +241,14 @@ const useSavingsGoals = (options = {}) => {
   const updateSavingsGoalMutation = useMutation({
     mutationKey: ["savingsGoals", "update"],
     mutationFn: async ({ id, updates }) => {
-      // Call Zustand mutation
-      zustandUpdateSavingsGoal(id, updates);
+      // Apply optimistic update
+      await optimisticHelpers.updateSavingsGoal(id, updates);
 
-      // TODO: Update in Dexie when savingsGoals table is added
-      // try {
-      //   await budgetDb.savingsGoals.update(id, { ...updates, lastModified: Date.now() });
-      // } catch (error) {
-      //   console.warn("Failed to update savings goal in Dexie:", error);
-      // }
+      // Apply to Dexie directly
+      await budgetDb.savingsGoals.update(id, {
+        ...updates,
+        updatedAt: new Date().toISOString(),
+      });
 
       return { id, updates };
     },
@@ -236,15 +266,11 @@ const useSavingsGoals = (options = {}) => {
   const deleteSavingsGoalMutation = useMutation({
     mutationKey: ["savingsGoals", "delete"],
     mutationFn: async (goalId) => {
-      // Call Zustand mutation
-      zustandDeleteSavingsGoal(goalId);
+      // Apply optimistic update
+      await optimisticHelpers.removeSavingsGoal(goalId);
 
-      // TODO: Remove from Dexie when savingsGoals table is added
-      // try {
-      //   await budgetDb.savingsGoals.delete(goalId);
-      // } catch (error) {
-      //   console.warn("Failed to delete savings goal from Dexie:", error);
-      // }
+      // Apply to Dexie directly
+      await budgetDb.savingsGoals.delete(goalId);
 
       return goalId;
     },
@@ -262,12 +288,26 @@ const useSavingsGoals = (options = {}) => {
   const contributeToGoalMutation = useMutation({
     mutationKey: ["savingsGoals", "contribute"],
     mutationFn: async ({ goalId, amount, source = "manual" }) => {
-      // Call Zustand mutation
-      const result = zustandContributeTo(goalId, amount, source);
+      // Get current goal from Dexie
+      const goal = await budgetDb.savingsGoals.get(goalId);
+      if (!goal) {
+        throw new Error("Savings goal not found");
+      }
 
-      // TODO: Update in Dexie when savingsGoals table is added
+      const newAmount = (goal.currentAmount || 0) + amount;
 
-      return { goalId, amount, source, result };
+      // Update goal in Dexie directly
+      await budgetDb.savingsGoals.update(goalId, {
+        currentAmount: newAmount,
+        updatedAt: new Date().toISOString(),
+      });
+
+      // Apply optimistic update
+      await optimisticHelpers.updateSavingsGoal(goalId, {
+        currentAmount: newAmount,
+      });
+
+      return { goalId, amount, source, newAmount };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals });
@@ -286,23 +326,38 @@ const useSavingsGoals = (options = {}) => {
 
   const analytics = {
     totalGoals: goals.length,
-    activeGoals: goals.filter((goal) => !goal.isCompleted && !goal.isPaused).length,
+    activeGoals: goals.filter((goal) => !goal.isCompleted && !goal.isPaused)
+      .length,
     completedGoals: goals.filter((goal) => goal.isCompleted).length,
     pausedGoals: goals.filter((goal) => goal.isPaused).length,
     overdueGoals: goals.filter((goal) => goal.isOverdue).length,
-    urgentGoals: goals.filter((goal) => goal.timelineStatus === "urgent").length,
+    urgentGoals: goals.filter((goal) => goal.timelineStatus === "urgent")
+      .length,
 
     // Amount calculations
-    totalTargetAmount: goals.reduce((sum, goal) => sum + (goal.targetAmount || 0), 0),
-    totalCurrentAmount: goals.reduce((sum, goal) => sum + (goal.currentAmount || 0), 0),
-    totalRemainingAmount: goals.reduce((sum, goal) => sum + (goal.remainingAmount || 0), 0),
+    totalTargetAmount: goals.reduce(
+      (sum, goal) => sum + (goal.targetAmount || 0),
+      0,
+    ),
+    totalCurrentAmount: goals.reduce(
+      (sum, goal) => sum + (goal.currentAmount || 0),
+      0,
+    ),
+    totalRemainingAmount: goals.reduce(
+      (sum, goal) => sum + (goal.remainingAmount || 0),
+      0,
+    ),
 
     // Progress calculations
     overallProgressRate:
-      goals.length > 0 ? goals.reduce((sum, goal) => sum + goal.progressRate, 0) / goals.length : 0,
+      goals.length > 0
+        ? goals.reduce((sum, goal) => sum + goal.progressRate, 0) / goals.length
+        : 0,
 
     completionRate:
-      goals.length > 0 ? (goals.filter((goal) => goal.isCompleted).length / goals.length) * 100 : 0,
+      goals.length > 0
+        ? (goals.filter((goal) => goal.isCompleted).length / goals.length) * 100
+        : 0,
 
     // Priority breakdown
     priorityBreakdown: goals.reduce((acc, goal) => {
@@ -333,7 +388,10 @@ const useSavingsGoals = (options = {}) => {
     upcomingDeadlines: goals
       .filter(
         (goal) =>
-          goal.targetDate && goal.daysRemaining && goal.daysRemaining <= 30 && !goal.isCompleted
+          goal.targetDate &&
+          goal.daysRemaining &&
+          goal.daysRemaining <= 30 &&
+          !goal.isCompleted,
       )
       .sort((a, b) => (a.daysRemaining || 0) - (b.daysRemaining || 0)),
 
@@ -345,9 +403,11 @@ const useSavingsGoals = (options = {}) => {
   // Utility functions
   const getGoalById = (id) => goals.find((goal) => goal.id === id);
 
-  const getGoalsByCategory = (category) => goals.filter((goal) => goal.category === category);
+  const getGoalsByCategory = (category) =>
+    goals.filter((goal) => goal.category === category);
 
-  const getGoalsByPriority = (priority) => goals.filter((goal) => goal.priority === priority);
+  const getGoalsByPriority = (priority) =>
+    goals.filter((goal) => goal.priority === priority);
 
   const getGoalsByStatus = (goalStatus) => {
     switch (goalStatus) {
@@ -373,7 +433,9 @@ const useSavingsGoals = (options = {}) => {
 
   // Strategic planning helpers
   const getOptimalContributionPlan = () => {
-    const activeGoals = goals.filter((goal) => !goal.isCompleted && !goal.isPaused);
+    const activeGoals = goals.filter(
+      (goal) => !goal.isCompleted && !goal.isPaused,
+    );
 
     // Sort by deadline urgency and priority
     const prioritizedGoals = activeGoals.sort((a, b) => {
@@ -461,7 +523,8 @@ const useSavingsGoals = (options = {}) => {
 
     // Query controls
     refetch: savingsGoalsQuery.refetch,
-    invalidate: () => queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals }),
+    invalidate: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals }),
   };
 };
 

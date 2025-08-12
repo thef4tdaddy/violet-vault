@@ -44,7 +44,10 @@ export const useBillOperations = ({
                   updates: updatedBill,
                 });
               } catch (error) {
-                logger.warn("TanStack updateBill failed, using Zustand fallback", error);
+                logger.warn(
+                  "TanStack updateBill failed, using Zustand fallback",
+                  error,
+                );
                 budget?.updateBill(updatedBill);
               }
             }
@@ -52,9 +55,13 @@ export const useBillOperations = ({
           } catch (error) {
             errorCount++;
             const billName =
-              updatedBill.provider || updatedBill.description || `Bill ${updatedBill.id}`;
+              updatedBill.provider ||
+              updatedBill.description ||
+              `Bill ${updatedBill.id}`;
             errors.push(`${billName}: ${error.message}`);
-            logger.error("Failed to update bill", error, { billId: updatedBill.id });
+            logger.error("Failed to update bill", error, {
+              billId: updatedBill.id,
+            });
           }
         }
 
@@ -92,7 +99,7 @@ export const useBillOperations = ({
         setIsProcessing(false);
       }
     },
-    [updateBill, onUpdateBill, onError, budget]
+    [updateBill, onUpdateBill, onError, budget],
   );
 
   /**
@@ -124,7 +131,7 @@ export const useBillOperations = ({
 
           if (availableBalance < billAmount) {
             throw new Error(
-              `Insufficient funds in envelope "${envelope.name}". Available: $${availableBalance.toFixed(2)}, Required: $${billAmount.toFixed(2)}`
+              `Insufficient funds in envelope "${envelope.name}". Available: $${availableBalance.toFixed(2)}, Required: $${billAmount.toFixed(2)}`,
             );
           }
         } else {
@@ -133,7 +140,7 @@ export const useBillOperations = ({
 
           if (unassignedCash < billAmount) {
             throw new Error(
-              `Insufficient unassigned cash. Available: $${unassignedCash.toFixed(2)}, Required: $${billAmount.toFixed(2)}`
+              `Insufficient unassigned cash. Available: $${unassignedCash.toFixed(2)}, Required: $${billAmount.toFixed(2)}`,
             );
           }
         }
@@ -150,7 +157,10 @@ export const useBillOperations = ({
               type: "payment",
               changes: {
                 isPaid: { from: false, to: true },
-                paidDate: { from: null, to: new Date().toISOString().split("T")[0] },
+                paidDate: {
+                  from: null,
+                  to: new Date().toISOString().split("T")[0],
+                },
               },
             },
           ],
@@ -166,7 +176,10 @@ export const useBillOperations = ({
               updates: updatedBill,
             });
           } catch (error) {
-            logger.warn("TanStack updateBill failed, using Zustand fallback", error);
+            logger.warn(
+              "TanStack updateBill failed, using Zustand fallback",
+              error,
+            );
             budget?.updateBill(updatedBill);
           }
         }
@@ -191,7 +204,7 @@ export const useBillOperations = ({
         setIsProcessing(false);
       }
     },
-    [bills, envelopes, budget, updateBill, onUpdateBill, onError]
+    [bills, envelopes, budget, updateBill, onUpdateBill, onError],
   );
 
   /**
@@ -255,7 +268,7 @@ export const useBillOperations = ({
         setIsProcessing(false);
       }
     },
-    [handlePayBill, onError]
+    [handlePayBill, onError],
   );
 
   /**
@@ -277,7 +290,10 @@ export const useBillOperations = ({
         errors.push("Invalid due date format");
       }
 
-      if (bill.envelopeId && !envelopes.find((env) => env.id === bill.envelopeId)) {
+      if (
+        bill.envelopeId &&
+        !envelopes.find((env) => env.id === bill.envelopeId)
+      ) {
         errors.push("Assigned envelope does not exist");
       }
 
@@ -286,7 +302,7 @@ export const useBillOperations = ({
         errors,
       };
     },
-    [envelopes]
+    [envelopes],
   );
 
   /**
@@ -298,7 +314,7 @@ export const useBillOperations = ({
       type,
       changes,
     }),
-    []
+    [],
   );
 
   return {

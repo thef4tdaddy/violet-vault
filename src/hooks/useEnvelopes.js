@@ -17,14 +17,8 @@ const useEnvelopes = (options = {}) => {
     sortOrder = "asc",
   } = options;
 
-  // Get Zustand store for mutations
-  const {
-    envelopes: zustandEnvelopes,
-    addEnvelope: zustandAddEnvelope,
-    updateEnvelope: zustandUpdateEnvelope,
-    deleteEnvelope: zustandDeleteEnvelope,
-    transferFunds: zustandTransferFunds,
-  } = useBudgetStore();
+  // Zustand no longer contains data arrays - only UI state
+  // All data operations now go through TanStack Query → Dexie
 
   // TanStack Query function - hydrates from Dexie, Dexie syncs with Firebase
   const queryFunction = useCallback(async () => {
@@ -41,17 +35,6 @@ const useEnvelopes = (options = {}) => {
       }
 
       console.log("✅ TanStack Query: Loaded from Dexie:", envelopes.length);
-
-      // If Dexie is empty and we have Zustand data, it means we need to seed Dexie
-      if (
-        envelopes.length === 0 &&
-        zustandEnvelopes &&
-        zustandEnvelopes.length > 0
-      ) {
-        console.log("🌱 TanStack Query: Seeding Dexie from Zustand...");
-        await budgetDb.bulkUpsertEnvelopes(zustandEnvelopes);
-        envelopes = [...zustandEnvelopes];
-      }
 
       // Apply filters
       let filteredEnvelopes = envelopes;
@@ -90,10 +73,10 @@ const useEnvelopes = (options = {}) => {
       return filteredEnvelopes;
     } catch (error) {
       console.error("❌ TanStack Query: Dexie fetch failed:", error);
-      // Emergency fallback only when Dexie completely fails
-      return zustandEnvelopes || [];
+      // Return empty array when Dexie fails (no fallback to Zustand)
+      return [];
     }
-  }, [zustandEnvelopes, category, includeArchived, sortBy, sortOrder]);
+  }, [category, includeArchived, sortBy, sortOrder]);
 
   // Memoized query options for performance
   const queryOptions = useMemo(
@@ -159,8 +142,8 @@ const useEnvelopes = (options = {}) => {
       // Optimistic update
       await optimisticHelpers.addEnvelope(newEnvelope);
 
-      // Call Zustand mutation
-      zustandAddEnvelope(newEnvelope);
+      // Apply to Dexie directly
+      await budgetDb.envelopes.add(newEnvelope);
 
       return newEnvelope;
     },
@@ -182,8 +165,11 @@ const useEnvelopes = (options = {}) => {
       // Apply optimistic update
       await optimisticHelpers.updateEnvelope(id, updates);
 
-      // Call Zustand mutation
-      zustandUpdateEnvelope(id, updates);
+      // Apply to Dexie directly
+      await budgetDb.envelopes.update(id, {
+        ...updates,
+        updatedAt: new Date().toISOString(),
+      });
 
       return { id, updates };
     },
@@ -204,8 +190,8 @@ const useEnvelopes = (options = {}) => {
       // Apply optimistic update
       await optimisticHelpers.removeEnvelope(envelopeId);
 
-      // Call Zustand mutation
-      zustandDeleteEnvelope(envelopeId);
+      // Apply to Dexie directly
+      await budgetDb.envelopes.delete(envelopeId);
 
       return envelopeId;
     },
@@ -228,35 +214,56 @@ const useEnvelopes = (options = {}) => {
       amount,
       description,
     }) => {
-      // Call Zustand mutation
-      const result = zustandTransferFunds(
+      // Get current envelopes from Dexie for transfer calculation
+      const fromEnvelope = await budgetDb.envelopes.get(fromEnvelopeId);
+      const toEnvelope = await budgetDb.envelopes.get(toEnvelopeId);
+
+      if (!fromEnvelope || !toEnvelope) {
+        throw new Error("Source or target envelope not found");
+      }
+
+      if (fromEnvelope.currentBalance < amount) {
+        throw new Error("Insufficient balance in source envelope");
+      }
+
+      // Update balances in Dexie directly
+      await budgetDb.envelopes.update(fromEnvelopeId, {
+        currentBalance: fromEnvelope.currentBalance - amount,
+        updatedAt: new Date().toISOString(),
+      });
+
+      await budgetDb.envelopes.update(toEnvelopeId, {
+        currentBalance: toEnvelope.currentBalance + amount,
+        updatedAt: new Date().toISOString(),
+      });
+
+      // Create transfer transaction in Dexie
+      const transaction = {
+        id: `transfer_${Date.now()}`,
+        amount,
+        description:
+          description || `Transfer: ${fromEnvelopeId} → ${toEnvelopeId}`,
+        type: "transfer",
         fromEnvelopeId,
         toEnvelopeId,
-        amount,
-        description,
-      );
+        date: new Date().toISOString().split("T")[0],
+        createdAt: new Date().toISOString(),
+      };
 
-      // Update both envelopes in cache and Dexie
-      const fromEnvelope = zustandEnvelopes.find(
-        (env) => env.id === fromEnvelopeId,
-      );
-      const toEnvelope = zustandEnvelopes.find(
-        (env) => env.id === toEnvelopeId,
-      );
+      await budgetDb.transactions.add(transaction);
 
-      if (fromEnvelope) {
-        await optimisticHelpers.updateEnvelope(fromEnvelopeId, {
-          currentBalance: fromEnvelope.currentBalance - amount,
-        });
-      }
+      // Apply optimistic updates to cache
+      await optimisticHelpers.updateEnvelope(fromEnvelopeId, {
+        currentBalance: fromEnvelope.currentBalance - amount,
+      });
 
-      if (toEnvelope) {
-        await optimisticHelpers.updateEnvelope(toEnvelopeId, {
-          currentBalance: toEnvelope.currentBalance + amount,
-        });
-      }
+      await optimisticHelpers.updateEnvelope(toEnvelopeId, {
+        currentBalance: toEnvelope.currentBalance + amount,
+      });
 
-      return result;
+      await optimisticHelpers.addTransaction(transaction);
+
+      return { success: true, transaction };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });

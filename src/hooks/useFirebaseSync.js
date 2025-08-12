@@ -7,7 +7,12 @@ import logger from "../utils/logger";
  * Custom hook for Firebase synchronization management
  * Extracts sync logic from MainLayout component
  */
-const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => {
+const useFirebaseSync = (
+  firebaseSync,
+  encryptionKey,
+  budgetId,
+  currentUser,
+) => {
   const budget = useBudgetStore();
   const [activeUsers, setActiveUsers] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
@@ -26,35 +31,52 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
         setIsLoading(true);
         const cloudData = await firebaseSync.loadFromCloud();
         if (cloudData && cloudData.data) {
-          console.log("📥 Loading data from cloud:", Object.keys(cloudData.data));
+          console.log(
+            "📥 Loading data from cloud:",
+            Object.keys(cloudData.data),
+          );
 
           // Update both Zustand and Dexie with cloud data
           if (cloudData.data.envelopes) {
             budget.setEnvelopes(cloudData.data.envelopes);
             await budgetDb.bulkUpsertEnvelopes(cloudData.data.envelopes);
-            console.log("✅ Synced envelopes to Dexie:", cloudData.data.envelopes.length);
+            console.log(
+              "✅ Synced envelopes to Dexie:",
+              cloudData.data.envelopes.length,
+            );
           }
           if (cloudData.data.bills) {
             budget.setBills(cloudData.data.bills);
             await budgetDb.bulkUpsertBills(cloudData.data.bills);
-            console.log("✅ Synced bills to Dexie:", cloudData.data.bills.length);
+            console.log(
+              "✅ Synced bills to Dexie:",
+              cloudData.data.bills.length,
+            );
           }
           if (cloudData.data.savingsGoals) {
             budget.setSavingsGoals(cloudData.data.savingsGoals);
             await budgetDb.bulkUpsertSavingsGoals(cloudData.data.savingsGoals);
-            console.log("✅ Synced savings goals to Dexie:", cloudData.data.savingsGoals.length);
+            console.log(
+              "✅ Synced savings goals to Dexie:",
+              cloudData.data.savingsGoals.length,
+            );
           }
           if (cloudData.data.transactions) {
             budget.setTransactions(cloudData.data.transactions);
             await budgetDb.bulkUpsertTransactions(cloudData.data.transactions);
-            console.log("✅ Synced transactions to Dexie:", cloudData.data.transactions.length);
+            console.log(
+              "✅ Synced transactions to Dexie:",
+              cloudData.data.transactions.length,
+            );
           }
           if (cloudData.data.allTransactions) {
             budget.setAllTransactions(cloudData.data.allTransactions);
-            await budgetDb.bulkUpsertTransactions(cloudData.data.allTransactions);
+            await budgetDb.bulkUpsertTransactions(
+              cloudData.data.allTransactions,
+            );
             console.log(
               "✅ Synced allTransactions to Dexie:",
-              cloudData.data.allTransactions.length
+              cloudData.data.allTransactions.length,
             );
           }
           if (cloudData.data.paycheckHistory) {
@@ -62,7 +84,7 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
             await budgetDb.bulkUpsertPaychecks(cloudData.data.paycheckHistory);
             console.log(
               "✅ Synced paycheck history to Dexie:",
-              cloudData.data.paycheckHistory.length
+              cloudData.data.paycheckHistory.length,
             );
           }
 
@@ -74,7 +96,7 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
           if (typeof cloudData.data.actualBalance === "number")
             budget.setActualBalance(
               cloudData.data.actualBalance,
-              cloudData.data.isActualBalanceManual
+              cloudData.data.isActualBalanceManual,
             );
 
           console.log("🔄 Firestore → Zustand + Dexie sync completed");
@@ -111,7 +133,7 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
             actualBalance: budget.actualBalance,
             isActualBalanceManual: budget.isActualBalanceManual,
           },
-          currentUser
+          currentUser,
         );
         console.log("✅ Data auto-saved to cloud");
       } catch (error) {
@@ -152,7 +174,7 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
           actualBalance: budget.actualBalance,
           isActualBalanceManual: budget.isActualBalanceManual,
         },
-        currentUser
+        currentUser,
       );
       alert("Data synced to cloud");
     } catch (err) {
@@ -186,7 +208,12 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
     // Update periodically to catch changes
     const interval = setInterval(updateActivityData, 5000);
     return () => clearInterval(interval);
-  }, [budget, budget.getActiveUsers, budget.getRecentActivity, budget.isSyncing]);
+  }, [
+    budget,
+    budget.getActiveUsers,
+    budget.getRecentActivity,
+    budget.isSyncing,
+  ]);
 
   return {
     activeUsers,
