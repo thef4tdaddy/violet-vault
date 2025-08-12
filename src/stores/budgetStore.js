@@ -238,21 +238,55 @@ const storeInitializer = (set, get) => ({
     });
 
     try {
-      // Load data arrays directly to Dexie
-      if (importedData.envelopes?.length)
-        await budgetDb.bulkUpsertEnvelopes(importedData.envelopes);
-      if (importedData.bills?.length)
-        await budgetDb.bulkUpsertBills(importedData.bills);
-      if (importedData.transactions?.length)
-        await budgetDb.bulkUpsertTransactions(importedData.transactions);
-      if (importedData.allTransactions?.length)
-        await budgetDb.bulkUpsertTransactions(importedData.allTransactions);
-      if (importedData.savingsGoals?.length)
-        await budgetDb.bulkUpsertSavingsGoals(importedData.savingsGoals);
-      if (importedData.debts?.length)
-        await budgetDb.bulkUpsertDebts(importedData.debts);
-      if (importedData.paycheckHistory?.length)
-        await budgetDb.bulkUpsertPaychecks(importedData.paycheckHistory);
+      // Helper function to ensure records have valid IDs
+      const ensureValidIds = (records, type) => {
+        return records.map((record, index) => {
+          if (!record.id) {
+            // Generate unique ID based on content or timestamp
+            const timestamp = Date.now();
+            const uniqueSuffix = Math.random().toString(36).substr(2, 9);
+            record.id = `${type}_${timestamp}_${index}_${uniqueSuffix}`;
+            console.log(`📝 Generated ID for ${type}:`, record.id);
+          }
+          return record;
+        });
+      };
+
+      // Load data arrays directly to Dexie with ID validation
+      if (importedData.envelopes?.length) {
+        const validEnvelopes = ensureValidIds(importedData.envelopes, "envelope");
+        await budgetDb.bulkUpsertEnvelopes(validEnvelopes);
+      }
+      
+      if (importedData.bills?.length) {
+        const validBills = ensureValidIds(importedData.bills, "bill");
+        await budgetDb.bulkUpsertBills(validBills);
+      }
+      
+      if (importedData.transactions?.length) {
+        const validTransactions = ensureValidIds(importedData.transactions, "transaction");
+        await budgetDb.bulkUpsertTransactions(validTransactions);
+      }
+      
+      if (importedData.allTransactions?.length) {
+        const validAllTransactions = ensureValidIds(importedData.allTransactions, "transaction");
+        await budgetDb.bulkUpsertTransactions(validAllTransactions);
+      }
+      
+      if (importedData.savingsGoals?.length) {
+        const validSavingsGoals = ensureValidIds(importedData.savingsGoals, "goal");
+        await budgetDb.bulkUpsertSavingsGoals(validSavingsGoals);
+      }
+      
+      if (importedData.debts?.length) {
+        const validDebts = ensureValidIds(importedData.debts, "debt");
+        await budgetDb.bulkUpsertDebts(validDebts);
+      }
+      
+      if (importedData.paycheckHistory?.length) {
+        const validPaychecks = ensureValidIds(importedData.paycheckHistory, "paycheck");
+        await budgetDb.bulkUpsertPaychecks(validPaychecks);
+      }
 
       // Update UI state in Zustand
       set((state) => {
