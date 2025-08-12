@@ -1,17 +1,11 @@
 import React from "react";
-import {
-  DollarSign,
-  TrendingDown,
-  Percent,
-  Calendar,
-  AlertTriangle,
-} from "lucide-react";
+import { DollarSign, TrendingDown, Percent, AlertTriangle } from "lucide-react";
 
 /**
  * Debt overview summary cards
  * Pure UI component for displaying debt statistics
  */
-const DebtSummaryCards = ({ stats, upcomingPayments = [] }) => {
+const DebtSummaryCards = ({ stats }) => {
   const cards = [
     {
       key: "total-debt",
@@ -37,19 +31,10 @@ const DebtSummaryCards = ({ stats, upcomingPayments = [] }) => {
       color: "purple",
       subtext: "Weighted by balance",
     },
-    {
-      key: "upcoming-payments",
-      icon: Calendar,
-      label: "Due Soon",
-      value: upcomingPayments.length.toString(),
-      color: upcomingPayments.length > 0 ? "amber" : "emerald",
-      subtext: "Next 30 days",
-      alert: upcomingPayments.length > 0,
-    },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {cards.map((card) => (
         <DebtSummaryCard
           key={card.key}

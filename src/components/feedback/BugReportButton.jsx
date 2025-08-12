@@ -32,12 +32,8 @@ const BugReportButton = () => {
         addToast({
           type: "success",
           title: "Bug Report Submitted!",
-          message: "Your report has been created as a GitHub issue.",
-          duration: 6000,
-          action: {
-            label: "View Issue",
-            onClick: () => window.open(result.issueUrl, "_blank"),
-          },
+          message: `Your report has been created as GitHub issue #${result.issueNumber || "N/A"}. Thank you for helping improve VioletVault!`,
+          duration: 8000,
         });
       } else if (result.localFallback) {
         // Service unavailable, but we logged it locally

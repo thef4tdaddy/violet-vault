@@ -175,6 +175,82 @@ const useBugReport = () => {
           console.warn("Failed to get Highlight.io session metadata:", error);
         }
 
+        // Get current page context for smart labeling
+        const getCurrentPageContext = () => {
+          const path = window.location.pathname;
+          const hash = window.location.hash;
+
+          // Detect current page/component
+          let currentPage = "unknown";
+          if (path.includes("/debt") || hash.includes("debt"))
+            currentPage = "debt";
+          else if (path.includes("/envelope") || hash.includes("envelope"))
+            currentPage = "envelope";
+          else if (
+            path.includes("/transaction") ||
+            hash.includes("transaction")
+          )
+            currentPage = "transaction";
+          else if (path.includes("/savings") || hash.includes("savings"))
+            currentPage = "savings";
+          else if (path.includes("/analytics") || hash.includes("analytics"))
+            currentPage = "analytics";
+          else if (path === "/" || path === "" || hash === "#/")
+            currentPage = "dashboard";
+
+          // Try to detect active component from DOM classes/attributes
+          const activeElements = document.querySelectorAll(
+            '[data-active="true"], .active, [aria-current="page"]',
+          );
+          const componentHints = Array.from(activeElements)
+            .map((el) => el.textContent?.toLowerCase().trim())
+            .filter((text) => text && text.length < 50);
+
+          // Get additional verbose context about the current screen
+          const getScreenTitle = () => {
+            const titleElement = document.querySelector(
+              "h1, h2, .page-title, [data-page-title]",
+            );
+            return titleElement?.textContent?.trim() || "Unknown Screen";
+          };
+
+          const getActiveButtons = () => {
+            const buttons = document.querySelectorAll(
+              'button:not([disabled]), [role="button"]:not([disabled])',
+            );
+            return Array.from(buttons)
+              .map((btn) => btn.textContent?.trim())
+              .filter((text) => text && text.length < 30 && text.length > 2)
+              .slice(0, 5); // Top 5 button labels
+          };
+
+          const getVisibleModals = () => {
+            const modals = document.querySelectorAll(
+              '[role="dialog"], .modal, [data-modal]',
+            );
+            return Array.from(modals)
+              .filter((modal) => modal.offsetParent !== null) // Only visible modals
+              .map((modal) => {
+                const title = modal.querySelector(
+                  "h1, h2, h3, .modal-title, [data-modal-title]",
+                );
+                return title?.textContent?.trim() || "Untitled Modal";
+              })
+              .slice(0, 3);
+          };
+
+          return {
+            page: currentPage,
+            pathname: path,
+            hash: hash,
+            componentHints: componentHints.slice(0, 3), // Limit to avoid too much data
+            screenTitle: getScreenTitle(),
+            activeButtons: getActiveButtons(),
+            visibleModals: getVisibleModals(),
+            documentTitle: document.title,
+          };
+        };
+
         const reportData = {
           description: description.trim(),
           screenshot: screenshotData,
@@ -186,6 +262,12 @@ const useBugReport = () => {
             appVersion: import.meta.env.VITE_APP_VERSION || "1.6.1",
             viewport: `${window.innerWidth}x${window.innerHeight}`,
             referrer: document.referrer || "direct",
+            pageContext: getCurrentPageContext(), // Enhanced context for smart labeling
+            windowSize: window.screen
+              ? `${window.screen.width}x${window.screen.height}`
+              : "unknown",
+            devicePixelRatio: window.devicePixelRatio || 1,
+            connectionType: navigator.connection?.effectiveType || "unknown",
           },
         };
 

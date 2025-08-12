@@ -582,6 +582,153 @@ async function getMilestones(env) {
 }
 
 /**
+ * Generate smart labels based on bug report content and context
+ */
+async function generateSmartLabels(description, reportEnv) {
+  const labels = ["bug", "user-reported"];
+
+  const descriptionLower = description.toLowerCase();
+  const urlPath = reportEnv?.url ? new URL(reportEnv.url).pathname : "";
+  const pageContext = reportEnv?.pageContext;
+
+  // Priority-based labeling
+  const criticalKeywords = [
+    "crash",
+    "error",
+    "broken",
+    "not working",
+    "fail",
+    "exception",
+    "500",
+    "404",
+  ];
+  const highPriorityKeywords = ["slow", "performance", "timeout", "loading"];
+  const mediumPriorityKeywords = ["improvement", "enhance", "better", "should"];
+
+  if (criticalKeywords.some((keyword) => descriptionLower.includes(keyword))) {
+    labels.push("🔴 Critical");
+  } else if (
+    highPriorityKeywords.some((keyword) => descriptionLower.includes(keyword))
+  ) {
+    labels.push("🟡 Medium");
+  } else if (
+    mediumPriorityKeywords.some((keyword) => descriptionLower.includes(keyword))
+  ) {
+    labels.push("🟢 Low");
+  }
+
+  // Enhanced component/feature-based labeling with page context
+  const componentMap = {
+    debt: ["debt", "payoff", "payment", "creditor"],
+    envelope: ["envelope", "budget", "allocation"],
+    transaction: ["transaction", "ledger", "import", "export"],
+    savings: ["savings", "goal", "target"],
+    auth: ["login", "password", "security", "lock"],
+    sync: ["sync", "firebase", "cloud"],
+    analytics: ["chart", "analytics", "graph", "report"],
+    mobile: ["mobile", "responsive", "phone", "tablet"],
+    ui: ["ui", "interface", "button", "modal", "dropdown"],
+    performance: ["slow", "performance", "memory", "speed"],
+  };
+
+  // Use page context for more accurate labeling
+  if (pageContext?.page && pageContext.page !== "unknown") {
+    labels.push(pageContext.page);
+  }
+
+  // Component hints from DOM analysis
+  if (pageContext?.componentHints) {
+    for (const hint of pageContext.componentHints) {
+      for (const [component, keywords] of Object.entries(componentMap)) {
+        if (keywords.some((keyword) => hint.includes(keyword))) {
+          labels.push(component);
+          break;
+        }
+      }
+    }
+  }
+
+  // Fallback to description and URL analysis
+  for (const [component, keywords] of Object.entries(componentMap)) {
+    if (
+      keywords.some(
+        (keyword) =>
+          descriptionLower.includes(keyword) || urlPath.includes(keyword),
+      )
+    ) {
+      labels.push(component);
+      break; // Only add one component label to avoid clutter
+    }
+  }
+
+  // URL-based labeling for specific pages (enhanced)
+  if (urlPath.includes("/debt") || pageContext?.page === "debt")
+    labels.push("debt");
+  else if (urlPath.includes("/envelope") || pageContext?.page === "envelope")
+    labels.push("envelope");
+  else if (
+    urlPath.includes("/transaction") ||
+    pageContext?.page === "transaction"
+  )
+    labels.push("transaction");
+  else if (urlPath.includes("/savings") || pageContext?.page === "savings")
+    labels.push("savings");
+  else if (urlPath.includes("/analytics") || pageContext?.page === "analytics")
+    labels.push("analytics");
+
+  // Device/Browser specific
+  if (reportEnv?.userAgent) {
+    const userAgent = reportEnv.userAgent.toLowerCase();
+    if (
+      userAgent.includes("mobile") ||
+      userAgent.includes("android") ||
+      userAgent.includes("iphone")
+    ) {
+      labels.push("mobile");
+    }
+    if (userAgent.includes("safari") && !userAgent.includes("chrome")) {
+      labels.push("safari");
+    } else if (userAgent.includes("firefox")) {
+      labels.push("firefox");
+    } else if (userAgent.includes("edge")) {
+      labels.push("edge");
+    }
+  }
+
+  // Screen size based labeling
+  if (reportEnv?.viewport) {
+    const [width] = reportEnv.viewport.split("x").map(Number);
+    if (width <= 768) {
+      labels.push("mobile");
+    } else if (width <= 1024) {
+      labels.push("tablet");
+    }
+  }
+
+  // Feature request detection
+  if (
+    descriptionLower.includes("feature") ||
+    descriptionLower.includes("request") ||
+    descriptionLower.includes("add") ||
+    descriptionLower.includes("implement")
+  ) {
+    labels.push("enhancement");
+  }
+
+  // Documentation related
+  if (
+    descriptionLower.includes("documentation") ||
+    descriptionLower.includes("help") ||
+    descriptionLower.includes("tutorial")
+  ) {
+    labels.push("documentation");
+  }
+
+  // Remove duplicates and return
+  return [...new Set(labels)];
+}
+
+/**
  * Create GitHub issue using the GitHub API
  */
 async function createGitHubIssue(data, env) {
@@ -597,7 +744,49 @@ async function createGitHubIssue(data, env) {
     issueBody += `- **URL:** ${reportEnv.url}\n`;
     issueBody += `- **User Agent:** ${reportEnv.userAgent}\n`;
     issueBody += `- **Viewport:** ${reportEnv.viewport}\n`;
-    issueBody += `- **Timestamp:** ${reportEnv.timestamp}\n\n`;
+    issueBody += `- **Timestamp:** ${reportEnv.timestamp}\n`;
+
+    // Add enhanced page context information
+    if (reportEnv.pageContext) {
+      issueBody += `\n## Page Context\n`;
+      issueBody += `- **Current Page:** ${reportEnv.pageContext.page || "unknown"}\n`;
+      issueBody += `- **Screen Title:** ${reportEnv.pageContext.screenTitle || "Unknown"}\n`;
+      issueBody += `- **Document Title:** ${reportEnv.pageContext.documentTitle || "N/A"}\n`;
+
+      if (
+        reportEnv.pageContext.visibleModals &&
+        reportEnv.pageContext.visibleModals.length > 0
+      ) {
+        issueBody += `- **Active Modals:** ${reportEnv.pageContext.visibleModals.join(", ")}\n`;
+      }
+
+      if (
+        reportEnv.pageContext.activeButtons &&
+        reportEnv.pageContext.activeButtons.length > 0
+      ) {
+        issueBody += `- **Available Actions:** ${reportEnv.pageContext.activeButtons.slice(0, 3).join(", ")}\n`;
+      }
+
+      if (
+        reportEnv.pageContext.componentHints &&
+        reportEnv.pageContext.componentHints.length > 0
+      ) {
+        issueBody += `- **Component Hints:** ${reportEnv.pageContext.componentHints.join(", ")}\n`;
+      }
+    }
+
+    // Add device/connection info if available
+    if (reportEnv.windowSize) {
+      issueBody += `- **Screen Size:** ${reportEnv.windowSize}\n`;
+    }
+    if (reportEnv.devicePixelRatio) {
+      issueBody += `- **Device Pixel Ratio:** ${reportEnv.devicePixelRatio}\n`;
+    }
+    if (reportEnv.connectionType && reportEnv.connectionType !== "unknown") {
+      issueBody += `- **Connection Type:** ${reportEnv.connectionType}\n`;
+    }
+
+    issueBody += `\n`;
   }
 
   // Add session replay link
@@ -612,6 +801,28 @@ async function createGitHubIssue(data, env) {
 
   issueBody += `---\n*This issue was automatically created from a bug report submitted via the VioletVault app.*`;
 
+  // Generate smart labels and get milestone info
+  const smartLabels = await generateSmartLabels(description, reportEnv);
+  const milestoneInfo = await getMilestones(env);
+
+  // Prepare issue data
+  const issueData = {
+    title: `Bug Report: ${description.substring(0, 80)}${description.length > 80 ? "..." : ""}`,
+    body: issueBody,
+    labels: smartLabels,
+  };
+
+  // Add milestone if available
+  if (milestoneInfo.success && milestoneInfo.current) {
+    // Find the milestone by title match
+    const currentMilestone = milestoneInfo.milestones.find(
+      (m) => m.title === milestoneInfo.current.title,
+    );
+    if (currentMilestone) {
+      issueData.milestone = currentMilestone.number || null;
+    }
+  }
+
   // Create the GitHub issue
   const response = await fetch(
     `https://api.github.com/repos/${env.GITHUB_REPO}/issues`,
@@ -622,11 +833,7 @@ async function createGitHubIssue(data, env) {
         Accept: "application/vnd.github.v3+json",
         "User-Agent": "VioletVault-BugReporter/1.0",
       },
-      body: JSON.stringify({
-        title: `Bug Report: ${description.substring(0, 80)}${description.length > 80 ? "..." : ""}`,
-        body: issueBody,
-        labels: ["bug", "user-reported"],
-      }),
+      body: JSON.stringify(issueData),
     },
   );
 

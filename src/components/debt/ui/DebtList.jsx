@@ -93,7 +93,7 @@ const DebtCard = ({ debt, onClick, onRecordPayment }) => {
           <div className="ml-4 flex-1 min-w-0">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <h4 className="text-lg font-semibold text-gray-900 truncate">
+                <h4 className="text-base md:text-lg font-semibold text-gray-900 truncate">
                   {debt.name}
                 </h4>
                 <p className="text-sm text-gray-600 truncate">
@@ -110,11 +110,11 @@ const DebtCard = ({ debt, onClick, onRecordPayment }) => {
             </div>
 
             {/* Financial Details */}
-            <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="mt-3 grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Current Balance */}
               <div>
                 <p className="text-xs text-gray-500">Current Balance</p>
-                <p className="text-lg font-bold text-red-600">
+                <p className="text-base md:text-lg font-bold text-red-600">
                   ${debt.currentBalance?.toFixed(2) || "0.00"}
                 </p>
               </div>
@@ -122,7 +122,7 @@ const DebtCard = ({ debt, onClick, onRecordPayment }) => {
               {/* Payment */}
               <div>
                 <p className="text-xs text-gray-500">Payment</p>
-                <p className="text-lg font-semibold text-gray-900">
+                <p className="text-base md:text-lg font-semibold text-gray-900">
                   ${debt.minimumPayment?.toFixed(2) || "0.00"}
                   <span className="text-xs text-gray-500 ml-1">
                     /{debt.paymentFrequency || "monthly"}
@@ -133,7 +133,7 @@ const DebtCard = ({ debt, onClick, onRecordPayment }) => {
               {/* Interest Rate */}
               <div>
                 <p className="text-xs text-gray-500">Interest Rate</p>
-                <p className="text-lg font-semibold text-purple-600">
+                <p className="text-base md:text-lg font-semibold text-purple-600">
                   {debt.interestRate?.toFixed(2) || "0.00"}%
                 </p>
               </div>
@@ -143,7 +143,7 @@ const DebtCard = ({ debt, onClick, onRecordPayment }) => {
                 <p className="text-xs text-gray-500">
                   {debt.nextPaymentDate ? "Next Payment" : "Payoff Months"}
                 </p>
-                <p className="text-sm font-semibold text-gray-900">
+                <p className="text-sm md:text-base font-semibold text-gray-900">
                   {debt.nextPaymentDate ? (
                     <span className="flex items-center">
                       <Calendar className="h-3 w-3 mr-1" />
@@ -194,16 +194,17 @@ const DebtCard = ({ debt, onClick, onRecordPayment }) => {
         </div>
 
         {/* Action Button */}
-        <div className="ml-4 flex items-center space-x-2">
+        <div className="ml-2 md:ml-4 flex items-center space-x-1 md:space-x-2 flex-shrink-0">
           {debt.status === "active" && debt.minimumPayment > 0 && (
             <button
               onClick={handleRecordPayment}
-              className="px-3 py-1 text-xs font-medium text-green-700 bg-green-100 rounded-lg hover:bg-green-200 transition-colors"
+              className="px-2 md:px-3 py-1 text-xs font-medium text-green-700 bg-green-100 rounded-lg hover:bg-green-200 transition-colors"
             >
-              Quick Pay
+              <span className="hidden sm:inline">Quick Pay</span>
+              <span className="sm:hidden">Pay</span>
             </button>
           )}
-          <ArrowRight className="h-5 w-5 text-gray-400" />
+          <ArrowRight className="h-4 w-4 md:h-5 md:w-5 text-gray-400" />
         </div>
       </div>
     </div>
