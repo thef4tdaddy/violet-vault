@@ -5,7 +5,23 @@ import reactRefresh from "eslint-plugin-react-refresh";
 
 export default [
   {
-    ignores: ["dist/**", ".markdownlintignore"],
+    ignores: [
+      "dist/**", 
+      ".markdownlintignore",
+      "node_modules/**",
+      ".git/**",
+      "coverage/**",
+      "*.min.js",
+      "*.bundle.js",
+      ".vscode/**",
+      ".idea/**",
+      "*.log",
+      ".env*",
+      "build/**",
+      "public/**/*.js",
+      "**/*.test.js",
+      "**/*.spec.js"
+    ],
   },
   {
     files: ["**/*.{js,jsx}"],
