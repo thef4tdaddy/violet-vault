@@ -208,7 +208,8 @@ const LockScreen = () => {
         {/* Footer */}
         <div className="text-center mt-6">
           <p className="text-blue-200 text-xs">
-            Having trouble? Check your CLAUDE.md security settings
+            Having trouble? Use the same password you set when first opening the
+            app
           </p>
         </div>
       </div>
