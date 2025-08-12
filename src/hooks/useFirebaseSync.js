@@ -36,9 +36,8 @@ const useFirebaseSync = (
             Object.keys(cloudData.data),
           );
 
-          // Update both Zustand and Dexie with cloud data
+          // Sync Firebase data directly to Dexie (TanStack Query will fetch from Dexie)
           if (cloudData.data.envelopes) {
-            budget.setEnvelopes(cloudData.data.envelopes);
             await budgetDb.bulkUpsertEnvelopes(cloudData.data.envelopes);
             console.log(
               "✅ Synced envelopes to Dexie:",
@@ -46,7 +45,6 @@ const useFirebaseSync = (
             );
           }
           if (cloudData.data.bills) {
-            budget.setBills(cloudData.data.bills);
             await budgetDb.bulkUpsertBills(cloudData.data.bills);
             console.log(
               "✅ Synced bills to Dexie:",
@@ -54,7 +52,6 @@ const useFirebaseSync = (
             );
           }
           if (cloudData.data.savingsGoals) {
-            budget.setSavingsGoals(cloudData.data.savingsGoals);
             await budgetDb.bulkUpsertSavingsGoals(cloudData.data.savingsGoals);
             console.log(
               "✅ Synced savings goals to Dexie:",
@@ -62,7 +59,6 @@ const useFirebaseSync = (
             );
           }
           if (cloudData.data.transactions) {
-            budget.setTransactions(cloudData.data.transactions);
             await budgetDb.bulkUpsertTransactions(cloudData.data.transactions);
             console.log(
               "✅ Synced transactions to Dexie:",
@@ -70,7 +66,6 @@ const useFirebaseSync = (
             );
           }
           if (cloudData.data.allTransactions) {
-            budget.setAllTransactions(cloudData.data.allTransactions);
             await budgetDb.bulkUpsertTransactions(
               cloudData.data.allTransactions,
             );
@@ -80,7 +75,6 @@ const useFirebaseSync = (
             );
           }
           if (cloudData.data.paycheckHistory) {
-            budget.setPaycheckHistory(cloudData.data.paycheckHistory);
             await budgetDb.bulkUpsertPaychecks(cloudData.data.paycheckHistory);
             console.log(
               "✅ Synced paycheck history to Dexie:",
@@ -99,7 +93,7 @@ const useFirebaseSync = (
               cloudData.data.isActualBalanceManual,
             );
 
-          console.log("🔄 Firestore → Zustand + Dexie sync completed");
+          console.log("🔄 Firebase → Dexie sync completed");
         }
       } catch (error) {
         console.warn("Failed to load cloud data:", error.message);
@@ -120,16 +114,26 @@ const useFirebaseSync = (
     const timeoutId = setTimeout(async () => {
       try {
         console.log("💾 Auto-saving data to cloud...");
+        // Get data from Dexie for cloud sync
+        const [envelopes, bills, savingsGoals, transactions, paychecks] =
+          await Promise.all([
+            budgetDb.envelopes.toArray(),
+            budgetDb.bills.toArray(),
+            budgetDb.savingsGoals.toArray(),
+            budgetDb.transactions.toArray(),
+            budgetDb.paycheckHistory.toArray(),
+          ]);
+
         await firebaseSync.saveToCloud(
           {
-            envelopes: budget.envelopes,
-            bills: budget.bills,
-            savingsGoals: budget.savingsGoals,
+            envelopes,
+            bills,
+            savingsGoals,
             unassignedCash: budget.unassignedCash,
             biweeklyAllocation: budget.biweeklyAllocation,
-            transactions: budget.allTransactions,
-            allTransactions: budget.allTransactions,
-            paycheckHistory: budget.paycheckHistory,
+            transactions,
+            allTransactions: transactions,
+            paycheckHistory: paychecks,
             actualBalance: budget.actualBalance,
             isActualBalanceManual: budget.isActualBalanceManual,
           },
@@ -147,13 +151,8 @@ const useFirebaseSync = (
     currentUser,
     budgetId,
     isLoading, // Prevent saves during loads
-    budget.envelopes,
-    budget.bills,
-    budget.savingsGoals,
     budget.unassignedCash,
     budget.biweeklyAllocation,
-    budget.allTransactions,
-    budget.paycheckHistory,
     budget.actualBalance,
     budget.isActualBalanceManual,
   ]);
@@ -161,16 +160,26 @@ const useFirebaseSync = (
   const handleManualSync = useCallback(async () => {
     try {
       if (!firebaseSync) return;
+      // Get data from Dexie for manual sync
+      const [envelopes, bills, savingsGoals, transactions, paychecks] =
+        await Promise.all([
+          budgetDb.envelopes.toArray(),
+          budgetDb.bills.toArray(),
+          budgetDb.savingsGoals.toArray(),
+          budgetDb.transactions.toArray(),
+          budgetDb.paycheckHistory.toArray(),
+        ]);
+
       await firebaseSync.saveToCloud(
         {
-          envelopes: budget.envelopes,
-          bills: budget.bills,
-          savingsGoals: budget.savingsGoals,
+          envelopes,
+          bills,
+          savingsGoals,
           unassignedCash: budget.unassignedCash,
           biweeklyAllocation: budget.biweeklyAllocation,
-          transactions: budget.allTransactions,
-          allTransactions: budget.allTransactions,
-          paycheckHistory: budget.paycheckHistory,
+          transactions,
+          allTransactions: transactions,
+          paycheckHistory: paychecks,
           actualBalance: budget.actualBalance,
           isActualBalanceManual: budget.isActualBalanceManual,
         },
