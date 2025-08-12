@@ -9,6 +9,7 @@ import {
   CreditCard,
   BookOpen,
   BarChart3,
+  Settings,
 } from "lucide-react";
 
 /**
@@ -61,6 +62,11 @@ const NavigationTabs = memo(({ activeView, onViewChange }) => {
       key: "analytics",
       icon: BarChart3,
       label: "Analytics",
+    },
+    {
+      key: "automation",
+      icon: Settings,
+      label: "Auto-Funding",
     },
   ];
 
