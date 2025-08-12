@@ -106,14 +106,8 @@ const storeInitializer = (set, get) => ({
   dataLoaded: false,
   cloudSyncEnabled: true, // Toggle for Firestore cloud sync (default enabled)
 
-  // Data arrays used by queries and mutations
-  envelopes: [],
-  bills: [],
-  transactions: [],
-  allTransactions: [],
-  savingsGoals: [],
-  supplementalAccounts: [],
-  debts: [],
+  // NOTE: Data arrays (envelopes, transactions, etc.) are now handled by TanStack Query → Dexie
+  // Zustand only contains UI state and app settings
 
   // App state actions (data mutations now handled by TanStack Query hooks)
 
