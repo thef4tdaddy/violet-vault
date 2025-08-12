@@ -14,8 +14,8 @@ import {
 } from "lucide-react";
 
 const SavingsGoals = ({
-  savingsGoals,
-  unassignedCash,
+  savingsGoals = [],
+  unassignedCash = 0,
   onAddGoal,
   onUpdateGoal,
   onDeleteGoal,
