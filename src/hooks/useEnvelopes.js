@@ -120,9 +120,20 @@ const useEnvelopes = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
     };
 
+    const handleInvalidateAll = () => {
+      console.log("🔄 Invalidating all envelope queries");
+      queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
+      queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+    };
+
     window.addEventListener("importCompleted", handleImportCompleted);
-    return () =>
+    window.addEventListener("invalidateAllQueries", handleInvalidateAll);
+
+    return () => {
       window.removeEventListener("importCompleted", handleImportCompleted);
+      window.removeEventListener("invalidateAllQueries", handleInvalidateAll);
+    };
   }, [queryClient]);
 
   // Add envelope mutation

@@ -787,11 +787,17 @@ const storeInitializer = (set, get) => ({
 
       // Force TanStack Query cache invalidation to show imported data immediately
       setTimeout(() => {
+        // Dispatch multiple events to ensure all hooks refresh
         window.dispatchEvent(
           new CustomEvent("importCompleted", {
             detail: { source: "loadData", dataLoaded: true },
           }),
         );
+
+        // Also dispatch specific invalidation events
+        window.dispatchEvent(new CustomEvent("invalidateAllQueries"));
+
+        console.log("🔄 Import cache invalidation events dispatched");
       }, 100);
     }),
 
