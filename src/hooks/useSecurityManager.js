@@ -54,6 +54,15 @@ export const useSecurityManager = () => {
       if (!securitySettings.securityLoggingEnabled) return;
 
       try {
+        // Safely extract only the primitive values from event to avoid circular references
+        const safeEvent = {
+          type: typeof event.type === "string" ? event.type : "UNKNOWN",
+          description:
+            typeof event.description === "string"
+              ? event.description
+              : "Security event",
+        };
+
         // Safely serialize metadata to avoid circular references
         const safeMetadata = {
           userAgent: navigator.userAgent,
@@ -62,11 +71,11 @@ export const useSecurityManager = () => {
         };
 
         // Safely add event metadata, avoiding circular references
-        if (event.metadata) {
+        if (event.metadata && typeof event.metadata === "object") {
           Object.keys(event.metadata).forEach((key) => {
             try {
               const value = event.metadata[key];
-              // Only include serializable values
+              // Only include primitive serializable values
               if (
                 typeof value === "string" ||
                 typeof value === "number" ||
@@ -75,15 +84,45 @@ export const useSecurityManager = () => {
                 value === undefined
               ) {
                 safeMetadata[key] = value;
+              } else if (Array.isArray(value)) {
+                // Handle arrays by only including primitive values
+                const safeArray = value.filter(
+                  (item) =>
+                    typeof item === "string" ||
+                    typeof item === "number" ||
+                    typeof item === "boolean" ||
+                    item === null ||
+                    item === undefined,
+                );
+                if (safeArray.length > 0) {
+                  safeMetadata[key] = safeArray;
+                }
               } else if (typeof value === "object" && value !== null) {
-                // Test if object is safely serializable
+                // Test if object is safely serializable by creating a simple version
                 try {
-                  JSON.stringify(value);
-                  safeMetadata[key] = value;
+                  const testObject = {};
+                  Object.keys(value).forEach((objKey) => {
+                    const objValue = value[objKey];
+                    if (
+                      typeof objValue === "string" ||
+                      typeof objValue === "number" ||
+                      typeof objValue === "boolean" ||
+                      objValue === null ||
+                      objValue === undefined
+                    ) {
+                      testObject[objKey] = objValue;
+                    }
+                  });
+
+                  // Test serialization
+                  JSON.stringify(testObject);
+                  if (Object.keys(testObject).length > 0) {
+                    safeMetadata[key] = testObject;
+                  }
                 } catch (serializeError) {
-                  // Object has circular references, skip it
+                  // Object has issues, skip it
                   console.debug(
-                    `Skipping non-serializable object for key: ${key}`,
+                    `Skipping problematic object for key: ${key}`,
                     serializeError.message,
                   );
                 }
@@ -101,10 +140,40 @@ export const useSecurityManager = () => {
         const securityEvent = {
           id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
           timestamp: new Date().toISOString(),
-          type: event.type,
-          description: event.description,
+          type: safeEvent.type,
+          description: safeEvent.description,
           metadata: safeMetadata,
         };
+
+        // Final safety check - try to serialize the entire event
+        try {
+          JSON.stringify(securityEvent);
+        } catch (finalSerializeError) {
+          console.warn(
+            "Security event contains non-serializable data, using minimal version",
+            finalSerializeError,
+          );
+          // Use minimal version if serialization fails
+          const minimalEvent = {
+            id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            timestamp: new Date().toISOString(),
+            type: safeEvent.type,
+            description: safeEvent.description,
+            metadata: {
+              userAgent: navigator.userAgent,
+              timestamp: Date.now(),
+              url: window.location.href,
+              serializationError:
+                "Original event contained circular references",
+            },
+          };
+
+          setSecurityEvents((prev) => {
+            const updated = [minimalEvent, ...prev];
+            return updated.slice(0, 100);
+          });
+          return;
+        }
 
         setSecurityEvents((prev) => {
           const updated = [securityEvent, ...prev];
@@ -112,7 +181,7 @@ export const useSecurityManager = () => {
           return updated.slice(0, 100);
         });
 
-        logger.info(`Security event logged: ${event.type}`, securityEvent);
+        logger.info(`Security event logged: ${safeEvent.type}`, securityEvent);
       } catch (error) {
         console.error("Failed to log security event:", error);
         // Still try to log a minimal event
@@ -120,9 +189,15 @@ export const useSecurityManager = () => {
           const minimalEvent = {
             id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             timestamp: new Date().toISOString(),
-            type: event.type || "UNKNOWN",
-            description: event.description || "Security event (logging error)",
-            metadata: { error: "Logging error occurred" },
+            type: typeof event?.type === "string" ? event.type : "UNKNOWN",
+            description:
+              typeof event?.description === "string"
+                ? event.description
+                : "Security event (logging error)",
+            metadata: {
+              error: "Logging error occurred",
+              errorMessage: error.message || "Unknown error",
+            },
           };
           setSecurityEvents((prev) => [minimalEvent, ...prev.slice(0, 99)]);
         } catch (fallbackError) {
