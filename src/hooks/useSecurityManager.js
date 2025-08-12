@@ -171,8 +171,10 @@ export const useSecurityManager = () => {
           return { success: false, error: "Security validation not available" };
         }
 
+        console.log("🔐 Attempting password validation...");
         // Validate password against stored budget
         const isValidPassword = await budget.validatePassword(password);
+        console.log("🔐 Password validation result:", isValidPassword);
 
         if (isValidPassword) {
           setIsLocked(false);
