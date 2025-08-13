@@ -176,7 +176,7 @@ const DebtDashboard = () => {
       </div>
 
       {/* Tab Navigation */}
-      <div className="glassmorphism rounded-2xl p-1">
+      <div className="glassmorphism rounded-2xl p-1 border border-white/20 ring-1 ring-gray-800/10">
         <div className="flex space-x-1">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -247,7 +247,7 @@ const DebtDashboard = () => {
           )}
 
           {/* Debt List */}
-          <div className="bg-white rounded-xl shadow-sm border">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 ring-1 ring-gray-800/10">
             <div className="p-4 border-b">
               <h3 className="font-semibold text-gray-900 flex items-center">
                 <TrendingDown className="h-4 w-4 mr-2 text-red-600" />
