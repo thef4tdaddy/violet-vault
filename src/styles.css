@@ -239,94 +239,39 @@ tbody tr:hover {
   background-color: rgba(255, 255, 255, 0.3);
 }
 
-/* ===== BLACK BORDERS FOR WHITE BACKGROUNDS ===== */
-/* Add visible black borders to all white/light background elements */
+/* ===== BLACK BORDERS FOR MAJOR COMPONENTS ===== */
+/* Target only major container/card components, not individual elements */
 
-/* Universal white background rule with higher specificity */
-*[class*="bg-white"],
-*[class*="backdrop-blur"],
-*.glassmorphism,
-*.glass-card,
-*.glass-enhanced {
-  border: 1px solid rgba(0, 0, 0, 0.2) !important;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* More specific targeting for common Tailwind classes */
-.bg-white,
-.bg-white\/60,
-.bg-white\/70,
-.bg-white\/80,
-.bg-white\/90,
-.bg-gray-50,
-.bg-gray-100,
-.bg-slate-50,
-.bg-slate-100 {
-  border: 2px solid rgba(0, 0, 0, 0.25) !important;
-  outline: 1px solid rgba(0, 0, 0, 0.15) !important;
-}
-
-/* Glassmorphism components - override existing styles */
+/* Glassmorphism components - the main cards/containers */
 .glassmorphism,
 .glass-card,
-.glass-enhanced,
-*[class*="backdrop-blur"] {
-  border: 2px solid rgba(0, 0, 0, 0.3) !important;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15), 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+.glass-enhanced {
+  border: 1px solid rgba(0, 0, 0, 0.4) !important;
 }
 
-/* Cards and containers */
-div[class*="rounded"],
-div[class*="p-"],
-div[class*="space-"],
-section,
-article,
-.card,
-.container {
-  border: 1px solid rgba(0, 0, 0, 0.15) !important;
+/* Major white background containers only */
+.bg-white\/60.backdrop-blur-sm,
+.bg-white\/70.backdrop-blur-sm,
+.bg-white\/80.backdrop-blur-sm {
+  border: 1px solid rgba(0, 0, 0, 0.3) !important;
 }
 
-/* Modals and overlays */
+/* Main dashboard cards and summary components */
+div[class*="bg-white"][class*="rounded-lg"][class*="p-"]:not([class*="text-"]):not([class*="w-2"]):not([class*="h-2"]):not([class*="h-3"]):not([class*="h-4"]) {
+  border: 1px solid rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Modal and dialog containers */
 div[role="dialog"],
-.modal,
-.popup,
-.dropdown,
-.tooltip,
-*[class*="fixed"],
-*[class*="absolute"] {
-  border: 2px solid rgba(0, 0, 0, 0.3) !important;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2) !important;
+.modal-content,
+*[class*="fixed"][class*="inset-0"] + * {
+  border: 1px solid rgba(0, 0, 0, 0.4) !important;
 }
 
-/* Form elements */
-input,
-textarea,
-select,
-button {
-  border: 1px solid rgba(0, 0, 0, 0.25) !important;
-}
-
-/* Strong border for debug visibility */
-.debug-borders * {
-  border: 2px solid red !important;
-}
-
-/* Specific targeting for budget app components */
-*[class*="envelope"],
-*[class*="bill"],
-*[class*="transaction"],
-*[class*="debt"],
-*[class*="savings"],
-*[class*="summary"] {
-  border: 2px solid rgba(0, 0, 0, 0.25) !important;
-}
-
-/* Grid and layout components */
-.grid > *,
-.flex > *,
-*[class*="grid-cols"] > *,
-*[class*="space-"] > * {
-  border: 1px solid rgba(0, 0, 0, 0.15) !important;
+/* Major grid containers for envelope/bill cards */
+.grid[class*="grid-cols"] > div[class*="p-6"],
+.grid[class*="grid-cols"] > div[class*="p-4"]:not([class*="h-2"]):not([class*="h-3"]):not([class*="h-4"]) {
+  border: 1px solid rgba(0, 0, 0, 0.3) !important;
 }
 
 /* ===== ACCESSIBILITY ===== */
