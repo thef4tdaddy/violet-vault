@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useBudgetStore } from "../stores/budgetStore";
 import { budgetDb } from "../db/budgetDb";
 import logger from "../utils/logger";
+import { useToastHelpers } from "../utils/toastHelpers";
 
 /**
  * Custom hook for Firebase synchronization management
@@ -14,6 +15,7 @@ const useFirebaseSync = (
   currentUser,
 ) => {
   const budget = useBudgetStore();
+  const { showSuccessToast, showErrorToast } = useToastHelpers();
   const [activeUsers, setActiveUsers] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -196,10 +198,10 @@ const useFirebaseSync = (
         },
         currentUser,
       );
-      alert("Data synced to cloud");
+      showSuccessToast("Data synced to cloud successfully", "Sync Complete");
     } catch (err) {
       console.error("Manual sync failed", err);
-      alert(`Sync failed: ${err.message}`);
+      showErrorToast(`Sync failed: ${err.message}`, "Sync Failed");
     }
   }, [firebaseSync, budget, currentUser]);
 

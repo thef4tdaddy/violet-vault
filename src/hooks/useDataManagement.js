@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { encryptionUtils } from "../utils/encryption";
 import { useAuth } from "../stores/authStore.jsx";
+import { useToastHelpers } from "../utils/toastHelpers";
 
 /**
  * Custom hook for data import/export operations
@@ -8,6 +9,7 @@ import { useAuth } from "../stores/authStore.jsx";
  */
 const useDataManagement = () => {
   const { encryptionKey, currentUser } = useAuth();
+  const { showSuccessToast, showErrorToast, showWarningToast } = useToastHelpers();
 
   const exportData = useCallback(async () => {
     try {
@@ -49,7 +51,7 @@ const useDataManagement = () => {
       }
 
       if (!rawData) {
-        alert("No data found to export");
+        showWarningToast("No data found to export", "Export Error");
         return;
       }
 
@@ -209,19 +211,13 @@ const useDataManagement = () => {
         - Deprecated fields excluded: ${deprecatedFields.join(", ") || "none found"}
         - File size: ${Math.round(dataStr.length / 1024)}KB`);
 
-      alert(`Export completed! 
-        
-🧹 Clean export created with:
-• ${cleanEnvelopes.length} envelopes (old nested data removed)
-• ${cleanBills.length} bills 
-• ${transactions.length} transactions
-• No deprecated arrays (updatedEnvelopes, etc.)
-• File size: ${Math.round(dataStr.length / 1024)}KB
-
-Check console for detailed filtering log.`);
+      showSuccessToast(
+        `Clean export created with ${cleanEnvelopes.length} envelopes, ${cleanBills.length} bills, and ${transactions.length} transactions (${Math.round(dataStr.length / 1024)}KB)`,
+        "Export Completed"
+      );
     } catch (error) {
       console.error("❌ Export failed:", error);
-      alert(`Export failed: ${error.message}`);
+      showErrorToast(`Export failed: ${error.message}`, "Export Failed");
     }
   }, [encryptionKey, currentUser]);
 
@@ -308,12 +304,12 @@ Check console for detailed filtering log.`);
         };
 
         console.log("✅ Import completed successfully");
-        alert("Data imported successfully!");
+        showSuccessToast("Data imported successfully!", "Import Completed");
 
         return processedData;
       } catch (error) {
         console.error("❌ Import failed:", error);
-        alert(`Import failed: ${error.message}`);
+        showErrorToast(`Import failed: ${error.message}`, "Import Failed");
         throw error;
       }
     },
