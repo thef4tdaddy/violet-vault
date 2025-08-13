@@ -3,14 +3,14 @@
 .glassmorphism {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.15);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
 .glass-card {
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(0, 0, 0, 0.12);
   box-shadow:
     0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
@@ -19,7 +19,7 @@
 .glass-enhanced {
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(25px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(0, 0, 0, 0.18);
   box-shadow:
     0 25px 50px -12px rgba(0, 0, 0, 0.25),
     0 0 0 1px rgba(255, 255, 255, 0.1) inset;
@@ -237,6 +237,116 @@ th {
 
 tbody tr:hover {
   background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* ===== BLACK BORDERS FOR WHITE BACKGROUNDS ===== */
+/* Add thin black borders to all white/light background elements */
+
+/* White background containers */
+.bg-white,
+[class*="bg-white"],
+.bg-gray-50,
+.bg-gray-100,
+.bg-slate-50,
+.bg-slate-100 {
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Cards and panels with white/light backgrounds */
+.rounded,
+.rounded-lg,
+.rounded-xl,
+.rounded-2xl,
+.rounded-3xl {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Modal and popup backgrounds */
+.modal,
+.popup,
+.dropdown,
+.tooltip {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+/* Form elements with white backgrounds */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+input[type="url"],
+input[type="tel"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="week"],
+input[type="time"],
+textarea,
+select {
+  border: 1px solid rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Button backgrounds that are white/light */
+.btn-secondary,
+.btn-outline,
+button[class*="bg-white"],
+button[class*="bg-gray-"] {
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+}
+
+/* List items and table rows with white backgrounds */
+li:has(.bg-white),
+tr:has(.bg-white),
+.list-item,
+.table-row {
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Dashboard components and widgets */
+.widget,
+.dashboard-card,
+.stats-card,
+.summary-card {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Navigation elements with light backgrounds */
+.nav-item:has(.bg-white),
+.menu-item:has(.bg-white),
+.tab:has(.bg-white) {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Content areas and sections */
+.content,
+.section,
+.panel,
+.container:has(.bg-white) {
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Specific budget app components */
+.envelope-card,
+.transaction-item,
+.bill-item,
+.debt-card,
+.savings-goal,
+.paycheck-item {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+/* Headers and footers with light backgrounds */
+.header:has(.bg-white),
+.footer:has(.bg-white),
+.toolbar:has(.bg-white) {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Sidebars and navigation panels */
+.sidebar:has(.bg-white),
+.nav-panel:has(.bg-white) {
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 /* ===== ACCESSIBILITY ===== */
