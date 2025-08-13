@@ -317,7 +317,7 @@ const MainContent = ({
 
         {/* Version Footer */}
         <div className="mt-8 text-center">
-          <div className="glassmorphism rounded-2xl p-4 max-w-md mx-auto">
+          <div className="glassmorphism rounded-2xl p-4 max-w-md mx-auto border border-gray-800/20">
             <p className="text-sm text-gray-600">
               <span className="font-semibold text-purple-600">{getVersionInfo().displayName}</span>{" "}
               v{getVersionInfo().version}

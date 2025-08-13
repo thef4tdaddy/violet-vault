@@ -306,7 +306,7 @@ const SettingsDashboard = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl">
+      <div className="bg-white border border-gray-300 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl">
         <div className="flex h-full">
           {/* Sidebar */}
           <div className="w-64 bg-gray-50 border-r border-gray-200 flex-shrink-0">
@@ -353,7 +353,7 @@ const SettingsDashboard = ({
       {/* Modals */}
       {showResetConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-60">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+          <div className="bg-white border border-gray-300 rounded-lg p-6 w-full max-w-md">
             <div className="flex items-center gap-3 mb-4">
               <AlertTriangle className="h-6 w-6 text-red-500" />
               <h4 className="font-semibold text-gray-900">Confirm Data Reset</h4>

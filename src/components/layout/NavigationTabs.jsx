@@ -66,7 +66,7 @@ const NavigationTabs = memo(({ activeView, onViewChange }) => {
   ];
 
   return (
-    <div className="glassmorphism rounded-3xl mb-6 lg:shadow-xl border border-white/20 fixed bottom-0 left-0 right-0 lg:static z-40 overflow-hidden">
+    <div className="glassmorphism rounded-3xl mb-6 lg:shadow-xl border border-white/20 ring-1 ring-gray-800/10 fixed bottom-0 left-0 right-0 lg:static z-40 overflow-hidden">
       <nav className="flex justify-start lg:justify-around overflow-x-auto scrollbar-hide pb-safe px-2 lg:px-0">
         {tabs.map((tab) => (
           <NavButton

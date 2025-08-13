@@ -28,7 +28,7 @@ const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
         <div className="relative">
           <button
             onClick={() => setShowDropdown(!showDropdown)}
-            className="flex items-center glassmorphism rounded-2xl px-5 py-3 shadow-xl border border-white/30 backdrop-blur-sm hover:bg-white/20 transition-all"
+            className="flex items-center glassmorphism rounded-2xl px-5 py-3 shadow-xl border border-white/30 ring-1 ring-gray-800/10 backdrop-blur-sm hover:bg-white/20 transition-all"
           >
             <div
               className="w-3 h-3 rounded-full mr-3 shadow-sm ring-2 ring-white/50"
@@ -51,7 +51,7 @@ const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
                 onClick={() => setShowDropdown(false)}
               />
               {/* Dropdown Menu */}
-              <div className="absolute top-full mt-2 right-0 z-20 bg-white rounded-xl shadow-xl border border-gray-200 py-2 min-w-[180px]">
+              <div className="absolute top-full mt-2 right-0 z-20 bg-white rounded-xl shadow-xl border border-gray-200 ring-1 ring-gray-800/10 py-2 min-w-[180px]">
                 <button
                   onClick={() => {
                     setShowProfileModal(true);
