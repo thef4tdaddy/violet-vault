@@ -15,7 +15,7 @@ import LoadingSpinner from "../ui/LoadingSpinner";
 import { ToastContainer } from "../ui/Toast";
 import useToast from "../../hooks/useToast";
 import ViewRendererComponent from "./ViewRenderer";
-import FirebaseSync from "../../utils/firebaseSync";
+import cloudSyncService from "../../services/cloudSyncService";
 import logger from "../../utils/logger";
 import { getVersionInfo } from "../../utils/version";
 import {
@@ -86,7 +86,7 @@ const Layout = () => {
   // Network status detection
   useNetworkStatus();
 
-  const firebaseSync = useMemo(() => new FirebaseSync(), []);
+  const firebaseSync = useMemo(() => cloudSyncService, []);
   const [syncConflicts, setSyncConflicts] = useState(null);
 
   // Toast notifications

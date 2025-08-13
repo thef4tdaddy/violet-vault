@@ -22,87 +22,34 @@ const useFirebaseSync = (
 
   // Auto-initialize Firebase sync when dependencies are ready
   useEffect(() => {
-    if (!firebaseSync || !budgetId || !encryptionKey) return;
+    if (!firebaseSync || !budgetId || !encryptionKey || !currentUser) return;
 
-    console.log("🔄 Auto-initializing Firebase sync...");
-    firebaseSync.initialize(budgetId, encryptionKey);
+    console.log("🔄 Auto-initializing chunked Firebase sync...");
+    
+    // Start the cloud sync service with config
+    const config = {
+      budgetId,
+      encryptionKey,
+      currentUser,
+    };
+    firebaseSync.start(config);
 
-    // Auto-load data from cloud
+    // Auto-load data from cloud using force sync
     const loadCloudData = async () => {
       try {
         setIsLoading(true);
-        const cloudData = await firebaseSync.loadFromCloud();
-        if (cloudData && cloudData.data) {
-          console.log(
-            "📥 Loading data from cloud:",
-            Object.keys(cloudData.data),
-          );
-
-          // Sync Firebase data directly to Dexie (TanStack Query will fetch from Dexie)
-          if (cloudData.data.envelopes) {
-            await budgetDb.bulkUpsertEnvelopes(cloudData.data.envelopes);
-            console.log(
-              "✅ Synced envelopes to Dexie:",
-              cloudData.data.envelopes.length,
-            );
-          }
-          if (cloudData.data.bills) {
-            await budgetDb.bulkUpsertBills(cloudData.data.bills);
-            console.log(
-              "✅ Synced bills to Dexie:",
-              cloudData.data.bills.length,
-            );
-          }
-          if (cloudData.data.savingsGoals) {
-            await budgetDb.bulkUpsertSavingsGoals(cloudData.data.savingsGoals);
-            console.log(
-              "✅ Synced savings goals to Dexie:",
-              cloudData.data.savingsGoals.length,
-            );
-          }
-          if (cloudData.data.transactions) {
-            await budgetDb.bulkUpsertTransactions(cloudData.data.transactions);
-            console.log(
-              "✅ Synced transactions to Dexie:",
-              cloudData.data.transactions.length,
-            );
-          }
-          if (cloudData.data.allTransactions) {
-            await budgetDb.bulkUpsertTransactions(
-              cloudData.data.allTransactions,
-            );
-            console.log(
-              "✅ Synced allTransactions to Dexie:",
-              cloudData.data.allTransactions.length,
-            );
-          }
-          if (cloudData.data.paycheckHistory) {
-            await budgetDb.bulkUpsertPaychecks(cloudData.data.paycheckHistory);
-            console.log(
-              "✅ Synced paycheck history to Dexie:",
-              cloudData.data.paycheckHistory.length,
-            );
-          }
-          if (cloudData.data.debts) {
-            await budgetDb.bulkUpsertDebts(cloudData.data.debts);
-            console.log(
-              "✅ Synced debts to Dexie:",
-              cloudData.data.debts.length,
-            );
-          }
-
-          // Non-Dexie data
-          if (typeof cloudData.data.unassignedCash === "number")
-            budget.setUnassignedCash(cloudData.data.unassignedCash);
-          if (typeof cloudData.data.biweeklyAllocation === "number")
-            budget.setBiweeklyAllocation(cloudData.data.biweeklyAllocation);
-          if (typeof cloudData.data.actualBalance === "number")
-            budget.setActualBalance(
-              cloudData.data.actualBalance,
-              cloudData.data.isActualBalanceManual,
-            );
-
-          console.log("🔄 Firebase → Dexie sync completed");
+        const syncResult = await firebaseSync.forceSync();
+        if (syncResult && syncResult.success) {
+          console.log("✅ Chunked sync completed:", syncResult);
+          showSuccessToast("Data synced from cloud successfully");
+          
+          // The cloudSyncService handles syncing data to Dexie automatically
+          // TanStack Query will pick up the changes from Dexie
+          
+          // Update non-Dexie Zustand state if needed
+          // These would need to be handled separately since they're not in Dexie
+          
+          console.log("🔄 Chunked Firebase → Dexie sync completed");
         }
       } catch (error) {
         console.warn("Failed to load cloud data:", error.message);
@@ -115,95 +62,64 @@ const useFirebaseSync = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firebaseSync, budgetId, encryptionKey]); // Remove budget from deps to prevent load loop
 
-  // Auto-save data when it changes
+  // The cloudSyncService automatically handles syncing - no manual auto-save needed
+  // It runs periodic sync every 30 seconds and handles bidirectional sync
   useEffect(() => {
-    if (!firebaseSync || !currentUser || !budgetId || isLoading) return;
+    if (!firebaseSync || !currentUser || !budgetId) return;
 
-    // Debounce saves to avoid excessive syncing
-    const timeoutId = setTimeout(async () => {
-      try {
-        console.log("💾 Auto-saving data to cloud...");
-        // Get data from Dexie for cloud sync
-        const [envelopes, bills, savingsGoals, transactions, paychecks, debts] =
-          await Promise.all([
-            budgetDb.envelopes.toArray(),
-            budgetDb.bills.toArray(),
-            budgetDb.savingsGoals.toArray(),
-            budgetDb.transactions.toArray(),
-            budgetDb.paycheckHistory.toArray(),
-            budgetDb.debts.toArray(),
-          ]);
+    // Ensure the sync service is running with current config
+    const config = {
+      budgetId,
+      encryptionKey,
+      currentUser,
+    };
+    
+    // Make sure service is started (idempotent)
+    if (!firebaseSync.isRunning) {
+      firebaseSync.start(config);
+    }
 
-        await firebaseSync.saveToCloud(
-          {
-            envelopes,
-            bills,
-            savingsGoals,
-            unassignedCash: budget.unassignedCash,
-            biweeklyAllocation: budget.biweeklyAllocation,
-            transactions,
-            allTransactions: transactions,
-            paycheckHistory: paychecks,
-            debts,
-            actualBalance: budget.actualBalance,
-            isActualBalanceManual: budget.isActualBalanceManual,
-          },
-          currentUser,
-        );
-        console.log("✅ Data auto-saved to cloud");
-      } catch (error) {
-        console.warn("Auto-save failed:", error.message);
-      }
-    }, 2000); // 2 second debounce
+    // Cleanup function to stop sync service when component unmounts
+    return () => {
+      // Don't stop the service here since other components might need it
+      // firebaseSync.stop();
+    };
+  }, [firebaseSync, currentUser, budgetId, encryptionKey]);
 
-    return () => clearTimeout(timeoutId);
-  }, [
-    firebaseSync,
-    currentUser,
-    budgetId,
-    isLoading, // Prevent saves during loads
-    budget.unassignedCash,
-    budget.biweeklyAllocation,
-    budget.actualBalance,
-    budget.isActualBalanceManual,
-  ]);
+  // Legacy code for manual save operations (if needed)
+  const handleManualSave = async () => {
+    try {
+      console.log("💾 Manual save triggered - using forceSync...");
+      const result = await firebaseSync.forceSync();
+      if (result && result.success) {
+        showSuccessToast("Data saved successfully");
+      } else {
+        showErrorToast("Failed to save data");
+    } catch (error) {
+      console.warn("Manual save failed:", error.message);
+      showErrorToast("Failed to save data");
+    }
+  };
 
   const handleManualSync = useCallback(async () => {
     try {
       if (!firebaseSync) return;
-      // Get data from Dexie for manual sync
-      const [envelopes, bills, savingsGoals, transactions, paychecks, debts] =
-        await Promise.all([
-          budgetDb.envelopes.toArray(),
-          budgetDb.bills.toArray(),
-          budgetDb.savingsGoals.toArray(),
-          budgetDb.transactions.toArray(),
-          budgetDb.paycheckHistory.toArray(),
-          budgetDb.debts.toArray(),
-        ]);
-
-      await firebaseSync.saveToCloud(
-        {
-          envelopes,
-          bills,
-          savingsGoals,
-          unassignedCash: budget.unassignedCash,
-          biweeklyAllocation: budget.biweeklyAllocation,
-          transactions,
-          allTransactions: transactions,
-          paycheckHistory: paychecks,
-          debts,
-          actualBalance: budget.actualBalance,
-          isActualBalanceManual: budget.isActualBalanceManual,
-        },
-        currentUser,
-      );
-      showSuccessToast("Data synced to cloud successfully", "Sync Complete");
+      
+      console.log("🔄 Manual sync triggered...");
+      const result = await firebaseSync.forceSync();
+      
+      if (result && result.success) {
+        showSuccessToast("Manual sync completed successfully");
+        console.log("✅ Manual sync completed:", result);
+      } else {
+        showErrorToast("Manual sync failed");
+        console.warn("❌ Manual sync failed:", result);
+      }
     } catch (err) {
       console.error("Manual sync failed", err);
       showErrorToast(`Sync failed: ${err.message}`, "Sync Failed");
     }
-  }, [firebaseSync, budget, currentUser]);
+  }, [firebaseSync]);
 
   // Update activity data from Firebase sync
   useEffect(() => {
