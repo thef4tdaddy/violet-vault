@@ -4,7 +4,7 @@
  * Provides consistent toast notifications across the application
  */
 
-import { useToast } from "../hooks/useToast";
+import useToast from "../hooks/useToast";
 
 /**
  * Toast helper functions factory
