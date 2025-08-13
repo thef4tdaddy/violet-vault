@@ -37,6 +37,12 @@ export class VioletVaultDB extends Dexie {
 
       // Debts table for debt tracking
       debts: "id, name, creditor, type, status, currentBalance, minimumPayment, lastModified",
+
+      // Budget History tables for version control
+      budgetCommits:
+        "hash, timestamp, message, author, parentHash, encryptedSnapshot, deviceFingerprint, [timestamp+author], [author+timestamp]",
+      budgetChanges:
+        "++id, commitHash, entityType, entityId, changeType, description, beforeData, afterData, [commitHash+entityType], [entityType+changeType]",
     });
 
     // Enhanced hooks for automatic timestamping across all tables
@@ -125,6 +131,14 @@ export class VioletVaultDB extends Dexie {
     addTimestampHooks(this.savingsGoals);
     addTimestampHooks(this.paycheckHistory);
     addTimestampHooks(this.debts);
+
+    // Budget history tables don't need lastModified since they're immutable
+    // but we'll add timestamp on creation
+    this.budgetCommits.hook("creating", (primKey, obj, trans) => {
+      if (!obj.timestamp) {
+        obj.timestamp = Date.now();
+      }
+    });
 
     // Audit log hook
     // eslint-disable-next-line no-unused-vars
@@ -447,6 +461,57 @@ export class VioletVaultDB extends Dexie {
       lastOptimized: Date.now(),
     };
   }
+
+  // Budget History Methods
+  async createBudgetCommit(commitData) {
+    return this.budgetCommits.add({
+      hash: commitData.hash,
+      timestamp: commitData.timestamp || Date.now(),
+      message: commitData.message,
+      author: commitData.author,
+      parentHash: commitData.parentHash,
+      encryptedSnapshot: commitData.encryptedSnapshot,
+      deviceFingerprint: commitData.deviceFingerprint,
+    });
+  }
+
+  async getBudgetCommits(options = {}) {
+    const { limit = 50, offset = 0, author, since } = options;
+    let query = this.budgetCommits.orderBy("timestamp").reverse();
+
+    if (author) {
+      query = query.where("author").equals(author);
+    }
+
+    if (since) {
+      query = query.where("timestamp").above(since);
+    }
+
+    return query.offset(offset).limit(limit).toArray();
+  }
+
+  async getBudgetCommit(hash) {
+    return this.budgetCommits.where("hash").equals(hash).first();
+  }
+
+  async createBudgetChanges(changes) {
+    return this.budgetChanges.bulkAdd(changes);
+  }
+
+  async getBudgetChanges(commitHash) {
+    return this.budgetChanges.where("commitHash").equals(commitHash).toArray();
+  }
+
+  async getBudgetCommitCount() {
+    return this.budgetCommits.count();
+  }
+
+  async clearBudgetHistory() {
+    return this.transaction("rw", [this.budgetCommits, this.budgetChanges], async () => {
+      await this.budgetCommits.clear();
+      await this.budgetChanges.clear();
+    });
+  }
 }
 
 export const budgetDb = new VioletVaultDB();
@@ -484,6 +549,8 @@ export const clearData = async () => {
     budgetDb.paycheckHistory.clear(),
     budgetDb.auditLog.clear(),
     budgetDb.cache.clear(),
+    budgetDb.budgetCommits.clear(),
+    budgetDb.budgetChanges.clear(),
   ]);
 };
 

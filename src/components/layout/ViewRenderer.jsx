@@ -1,4 +1,5 @@
 import React, { Suspense, useCallback } from "react";
+import { Wallet, Settings } from "lucide-react";
 import Dashboard from "../pages/MainDashboard";
 import SmartEnvelopeSuggestions from "../budgeting/SmartEnvelopeSuggestions";
 import EnvelopeGrid from "../budgeting/EnvelopeGrid";
@@ -97,6 +98,30 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
     dashboard: <Dashboard setActiveView={setActiveView} />,
     envelopes: (
       <div className="space-y-6">
+        {/* Envelope Header with Auto-Funding Access */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+              <div className="relative mr-4">
+                <div className="absolute inset-0 bg-purple-500 rounded-2xl blur-lg opacity-30"></div>
+                <div className="relative bg-purple-500 p-3 rounded-2xl">
+                  <Wallet className="h-6 w-6 text-white" />
+                </div>
+              </div>
+              Budget Envelopes
+            </h2>
+            <p className="text-gray-600 mt-1">Organize your money into spending categories</p>
+          </div>
+          <button
+            onClick={() => setActiveView("automation")}
+            className="btn btn-secondary flex items-center"
+            title="Manage automatic envelope funding rules"
+          >
+            <Settings className="h-4 w-4 mr-2" />
+            Auto-Funding
+          </button>
+        </div>
+
         <SmartEnvelopeSuggestions
           transactions={safeTransactions}
           envelopes={envelopes}

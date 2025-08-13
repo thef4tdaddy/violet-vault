@@ -63,11 +63,6 @@ const NavigationTabs = memo(({ activeView, onViewChange }) => {
       icon: BarChart3,
       label: "Analytics",
     },
-    {
-      key: "automation",
-      icon: Settings,
-      label: "Auto-Funding",
-    },
   ];
 
   return (
