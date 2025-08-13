@@ -64,9 +64,13 @@ const AddBillModal = ({
   useEffect(() => {
     if (isOpen) {
       const initialData = getInitialFormData(editingBill);
-      const billEnvelopes = availableEnvelopes.filter(
-        (env) => env.envelopeType === "bill" || !env.envelopeType
-      );
+      const billEnvelopes = availableEnvelopes.filter((env) => {
+        // Check if envelope is suitable for bills - either explicitly marked as "bill" type
+        // or if no type is set (legacy data), allow all envelopes for backwards compatibility
+        const isBillEnvelope = env.envelopeType === "bill";
+        const isLegacyEnvelope = !env.envelopeType;
+        return isBillEnvelope || isLegacyEnvelope;
+      });
 
       logger.debug("Initializing bill modal form data", {
         editingBill: editingBill?.id,
@@ -79,6 +83,14 @@ const AddBillModal = ({
           name: e.name,
           type: e.envelopeType,
         })),
+        // Debug envelope filtering
+        allEnvelopeDetails: availableEnvelopes.map((e) => ({
+          id: e.id,
+          name: e.name,
+          envelopeType: e.envelopeType,
+          passesFilter: e.envelopeType === "bill" || !e.envelopeType,
+        })),
+        filterCriteria: "envelopeType === 'bill' || !envelopeType",
       });
       setFormData(initialData);
     }
@@ -492,7 +504,22 @@ const AddBillModal = ({
               >
                 <option value="">No envelope (use unassigned cash)</option>
                 {availableEnvelopes
-                  .filter((env) => env.envelopeType === "bill" || !env.envelopeType)
+                  .filter((env) => {
+                    // Check if envelope is suitable for bills - either explicitly marked as "bill" type
+                    // or if no type is set (legacy data), allow all envelopes for backwards compatibility
+                    const isBillEnvelope = env.envelopeType === "bill";
+                    const isLegacyEnvelope = !env.envelopeType;
+                    const isAllowed = isBillEnvelope || isLegacyEnvelope;
+                    
+                    console.log(`Envelope ${env.name}:`, {
+                      envelopeType: env.envelopeType,
+                      isBillEnvelope,
+                      isLegacyEnvelope,
+                      isAllowed
+                    });
+                    
+                    return isAllowed;
+                  })
                   .map((envelope) => (
                     <option key={envelope.id} value={envelope.id}>
                       {envelope.name} ($
