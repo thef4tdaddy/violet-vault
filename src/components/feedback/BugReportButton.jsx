@@ -79,13 +79,21 @@ const BugReportButton = () => {
           className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
           data-bug-report="true"
         >
-          <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl" data-bug-report="true">
+          <div
+            className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl"
+            data-bug-report="true"
+          >
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center">
                 <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
-                <h3 className="text-lg font-semibold text-gray-900">Report a Problem</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Report a Problem
+                </h3>
               </div>
-              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">
+              <button
+                onClick={closeModal}
+                className="text-gray-400 hover:text-gray-600"
+              >
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -105,15 +113,21 @@ const BugReportButton = () => {
               </div>
 
               <div className="flex items-center justify-between">
-                <label className="flex items-center cursor-pointer">
+                <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
                   <input
+                    id="include-screenshot-checkbox"
                     type="checkbox"
                     checked={includeScreenshot}
                     onChange={(e) => setIncludeScreenshot(e.target.checked)}
-                    className="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500 focus:ring-2"
+                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded mt-0.5 justify-self-start"
                   />
-                  <span className="ml-2 text-sm text-gray-700">Include screenshot</span>
-                </label>
+                  <label
+                    htmlFor="include-screenshot-checkbox"
+                    className="text-sm text-gray-700 cursor-pointer"
+                  >
+                    Include screenshot
+                  </label>
+                </div>
 
                 {includeScreenshot && (
                   <button
@@ -133,7 +147,9 @@ const BugReportButton = () => {
                     alt="Screenshot preview"
                     className="w-full h-32 object-contain rounded"
                   />
-                  <p className="text-xs text-gray-500 text-center mt-1">Screenshot captured</p>
+                  <p className="text-xs text-gray-500 text-center mt-1">
+                    Screenshot captured
+                  </p>
                 </div>
               )}
             </div>
