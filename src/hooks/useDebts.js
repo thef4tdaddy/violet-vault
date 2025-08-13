@@ -1,34 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useBudgetStore } from "../stores/budgetStore";
 import { queryKeys } from "../utils/queryClient";
 import { budgetDb } from "../db/budgetDb";
 
 const useDebts = () => {
   const queryClient = useQueryClient();
-  const {
-    debts: zustandDebts,
-    addDebt: zustandAddDebt,
-    updateDebt: zustandUpdateDebt,
-    deleteDebt: zustandDeleteDebt,
-    recordDebtPayment: zustandRecordDebtPayment,
-    setDebts: zustandSetDebts,
-  } = useBudgetStore();
 
   const queryFunction = async () => {
-    let debts = [];
-    if (zustandDebts && zustandDebts.length > 0) {
-      debts = [...zustandDebts];
-    } else {
-      try {
-        debts = await budgetDb.debts.toArray();
-        if (debts.length > 0) {
-          zustandSetDebts(debts);
-        }
-      } catch (error) {
-        console.warn("Dexie query failed:", error);
-      }
+    try {
+      const debts = await budgetDb.debts.toArray();
+      return debts || [];
+    } catch (error) {
+      console.warn("Dexie query failed:", error);
+      return [];
     }
-    return debts;
   };
 
   const debtsQuery = useQuery({
@@ -46,12 +30,7 @@ const useDebts = () => {
     mutationKey: ["debts", "add"],
     mutationFn: async (debtData) => {
       const debt = debtData.id ? debtData : { id: crypto.randomUUID(), ...debtData };
-      zustandAddDebt(debt);
-      try {
-        await budgetDb.debts.add(debt);
-      } catch (error) {
-        console.warn("Failed to persist debt to Dexie:", error);
-      }
+      await budgetDb.debts.add(debt);
       return debt;
     },
     onSuccess: () => {
@@ -62,17 +41,11 @@ const useDebts = () => {
   const updateDebtMutation = useMutation({
     mutationKey: ["debts", "update"],
     mutationFn: async ({ id, updates }) => {
-      const updatedDebt = { id, ...updates };
-      zustandUpdateDebt(updatedDebt);
-      try {
-        await budgetDb.debts.update(id, {
-          ...updates,
-          lastModified: Date.now(),
-        });
-      } catch (error) {
-        console.warn("Failed to update debt in Dexie:", error);
-      }
-      return updatedDebt;
+      await budgetDb.debts.update(id, {
+        ...updates,
+        lastModified: Date.now(),
+      });
+      return { id, ...updates };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.debts });
@@ -82,12 +55,7 @@ const useDebts = () => {
   const deleteDebtMutation = useMutation({
     mutationKey: ["debts", "delete"],
     mutationFn: async (id) => {
-      zustandDeleteDebt(id);
-      try {
-        await budgetDb.debts.delete(id);
-      } catch (error) {
-        console.warn("Failed to delete debt from Dexie:", error);
-      }
+      await budgetDb.debts.delete(id);
       return id;
     },
     onSuccess: () => {
@@ -98,20 +66,15 @@ const useDebts = () => {
   const recordPaymentMutation = useMutation({
     mutationKey: ["debts", "recordPayment"],
     mutationFn: async ({ id, payment }) => {
-      zustandRecordDebtPayment(id, payment);
-      try {
-        const debt = await budgetDb.debts.get(id);
-        if (debt) {
-          const history = [...(debt.paymentHistory || []), { ...payment }];
-          const newBalance = Math.max(0, (debt.currentBalance || 0) - payment.amount);
-          await budgetDb.debts.update(id, {
-            currentBalance: newBalance,
-            paymentHistory: history,
-            lastModified: Date.now(),
-          });
-        }
-      } catch (error) {
-        console.warn("Failed to record debt payment in Dexie:", error);
+      const debt = await budgetDb.debts.get(id);
+      if (debt) {
+        const history = [...(debt.paymentHistory || []), { ...payment }];
+        const newBalance = Math.max(0, (debt.currentBalance || 0) - payment.amount);
+        await budgetDb.debts.update(id, {
+          currentBalance: newBalance,
+          paymentHistory: history,
+          lastModified: Date.now(),
+        });
       }
       return { id, payment };
     },
