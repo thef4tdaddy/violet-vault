@@ -23,9 +23,9 @@ const useBills = (options = {}) => {
   const queryFunction = useCallback(async () => {
     console.log("🔄 TanStack Query: Fetching bills from Dexie...");
 
-    try {
-      let bills = [];
+    let bills = [];
 
+    try {
       // Always fetch from Dexie (single source of truth for local data)
       bills = await budgetDb.bills.toArray();
 
@@ -46,6 +46,13 @@ const useBills = (options = {}) => {
     today.setHours(0, 0, 0, 0);
 
     let filteredBills = bills;
+    
+    console.log("🔍 Bills filtering debug:", {
+      inputBillsCount: bills.length,
+      status,
+      today: today.toISOString(),
+      firstBillData: bills[0]
+    });
 
     if (status === "upcoming") {
       const futureDate = new Date();
@@ -102,11 +109,13 @@ const useBills = (options = {}) => {
     });
 
     console.log("🔄 TanStack Query returning filtered bills:", {
-      total: bills.length,
-      filtered: filteredBills.length,
+      originalBillsLength: bills.length,
+      filteredBillsLength: filteredBills.length,
       status,
-      firstFiltered: filteredBills[0],
-      filteredTitles: filteredBills.map(b => b.name || b.title || b.billName || "No Name").slice(0, 3),
+      billsStillExist: bills.length > 0,
+      filteredStillExist: filteredBills.length > 0,
+      firstOriginalBill: bills[0],
+      firstFilteredBill: filteredBills[0],
       filterApplied: status !== "all" ? `Applied ${status} filter` : "No filter applied"
     });
     
