@@ -242,7 +242,18 @@ const storeInitializer = (set, get) => ({
 
       if (importedData.bills?.length) {
         const validBills = ensureValidIds(importedData.bills, "bill");
+        console.log("📋 Importing bills to Dexie:", { 
+          count: validBills.length, 
+          firstBill: validBills[0] 
+        });
         await budgetDb.bulkUpsertBills(validBills);
+        
+        // Verify bills were saved
+        const savedBills = await budgetDb.bills.toArray();
+        console.log("✅ Bills verification after import:", { 
+          savedCount: savedBills.length,
+          firstSavedBill: savedBills[0] 
+        });
       }
 
       if (importedData.transactions?.length) {
