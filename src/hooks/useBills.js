@@ -29,7 +29,11 @@ const useBills = (options = {}) => {
       // Always fetch from Dexie (single source of truth for local data)
       bills = await budgetDb.bills.toArray();
 
-      console.log("✅ TanStack Query: Loaded from Dexie:", bills.length);
+      console.log("✅ TanStack Query: Loaded from Dexie:", {
+        count: bills.length,
+        firstBill: bills[0],
+        billTitles: bills.map(b => b.name || b.title).slice(0, 3)
+      });
     } catch (error) {
       console.error("❌ TanStack Query: Dexie fetch failed:", error);
       // Return empty array when Dexie fails (no fallback to Zustand)
@@ -96,6 +100,13 @@ const useBills = (options = {}) => {
       }
     });
 
+    console.log("🔄 TanStack Query returning filtered bills:", {
+      total: bills.length,
+      filtered: filteredBills.length,
+      status,
+      firstFiltered: filteredBills[0]
+    });
+    
     return filteredBills;
   }, [status, daysAhead, category, sortBy, sortOrder]);
 
