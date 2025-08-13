@@ -37,6 +37,7 @@ import SummaryCards from "./SummaryCards";
 import BugReportButton from "../feedback/BugReportButton";
 import LockScreen from "../security/LockScreen";
 import SecuritySettings from "../settings/SecuritySettings";
+import SettingsDashboard from "../settings/SettingsDashboard";
 import { useSecurityManager } from "../../hooks/useSecurityManager";
 
 // Heavy components now lazy loaded in ViewRenderer
@@ -209,6 +210,7 @@ const MainContent = ({
   const budget = useBudgetStore();
   const [activeView, setActiveView] = useState("dashboard");
   const [showSecuritySettings, setShowSecuritySettings] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   // Custom hooks for MainContent business logic
   const { handleManualSync } = useFirebaseSync(firebaseSync, encryptionKey, budgetId, currentUser);
@@ -266,21 +268,9 @@ const MainContent = ({
           <Header
             currentUser={currentUser}
             onUserChange={onUserChange}
-            onExport={onExport}
-            onImport={handleImport}
-            onLogout={onLogout}
-            onChangePassword={handleChangePassword}
-            isLocalOnlyMode={isLocalOnlyMode}
-            onResetEncryption={() => {
-              // Reset the budget context data first
-              budget.resetAllData();
-              // Then call the original reset function (clears localStorage and calls logout)
-              onResetEncryption();
-            }}
-            onSync={handleManualSync}
             onUpdateProfile={onUpdateProfile}
-            securityManager={securityManager}
-            onShowSecuritySettings={() => setShowSecuritySettings(true)}
+            isLocalOnlyMode={isLocalOnlyMode}
+            onShowSettings={() => setShowSettingsModal(true)}
           />
         </div>
         {rotationDue && (
@@ -342,6 +332,30 @@ const MainContent = ({
         isOpen={showSecuritySettings}
         onClose={() => setShowSecuritySettings(false)}
       />
+
+      {/* Settings Dashboard Modal */}
+      {showSettingsModal && (
+        <SettingsDashboard
+          isOpen={showSettingsModal}
+          onClose={() => setShowSettingsModal(false)}
+          onExport={onExport}
+          onImport={handleImport}
+          onLogout={onLogout}
+          onResetEncryption={() => {
+            // Reset the budget context data first
+            budget.resetAllData();
+            // Then call the original reset function (clears localStorage and calls logout)
+            onResetEncryption();
+          }}
+          onSync={handleManualSync}
+          onChangePassword={handleChangePassword}
+          currentUser={currentUser}
+          onUserChange={onUserChange}
+          onUpdateProfile={onUpdateProfile}
+          isLocalOnlyMode={isLocalOnlyMode}
+          securityManager={securityManager}
+        />
+      )}
     </div>
   );
 };
