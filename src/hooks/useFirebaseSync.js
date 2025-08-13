@@ -95,6 +95,7 @@ const useFirebaseSync = (
         showSuccessToast("Data saved successfully");
       } else {
         showErrorToast("Failed to save data");
+      }
     } catch (error) {
       console.warn("Manual save failed:", error.message);
       showErrorToast("Failed to save data");
