@@ -246,32 +246,41 @@ tbody tr:hover {
 .glassmorphism,
 .glass-card,
 .glass-enhanced {
-  border: 1px solid rgba(0, 0, 0, 0.4) !important;
+  border: 2px solid rgba(0, 0, 0, 1) !important;
 }
 
 /* Major white background containers only */
 .bg-white\/60.backdrop-blur-sm,
 .bg-white\/70.backdrop-blur-sm,
 .bg-white\/80.backdrop-blur-sm {
-  border: 1px solid rgba(0, 0, 0, 0.3) !important;
+  border: 2px solid rgba(0, 0, 0, 1) !important;
 }
 
 /* Main dashboard cards and summary components */
 div[class*="bg-white"][class*="rounded-lg"][class*="p-"]:not([class*="text-"]):not([class*="w-2"]):not([class*="h-2"]):not([class*="h-3"]):not([class*="h-4"]) {
-  border: 1px solid rgba(0, 0, 0, 0.35) !important;
+  border: 2px solid rgba(0, 0, 0, 1) !important;
 }
 
 /* Modal and dialog containers */
 div[role="dialog"],
 .modal-content,
 *[class*="fixed"][class*="inset-0"] + * {
-  border: 1px solid rgba(0, 0, 0, 0.4) !important;
+  border: 2px solid rgba(0, 0, 0, 1) !important;
 }
 
 /* Major grid containers for envelope/bill cards */
 .grid[class*="grid-cols"] > div[class*="p-6"],
 .grid[class*="grid-cols"] > div[class*="p-4"]:not([class*="h-2"]):not([class*="h-3"]):not([class*="h-4"]) {
-  border: 1px solid rgba(0, 0, 0, 0.3) !important;
+  border: 2px solid rgba(0, 0, 0, 1) !important;
+}
+
+/* Bug report button */
+button[class*="bug"],
+button[title*="bug" i],
+button[title*="report" i],
+*[class*="bug-report"],
+.bug-report-button {
+  border: 2px solid rgba(0, 0, 0, 1) !important;
 }
 
 /* ===== ACCESSIBILITY ===== */
