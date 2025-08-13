@@ -8,7 +8,11 @@ import {
   getIconByName,
   getIconNameForStorage,
 } from "../../utils/billIcons";
-import { toBiweekly, toMonthly, getFrequencyOptions } from "../../utils/frequencyCalculations";
+import {
+  toBiweekly,
+  toMonthly,
+  getFrequencyOptions,
+} from "../../utils/frequencyCalculations";
 import { getBillCategories } from "../../constants/categories";
 import logger from "../../utils/logger";
 
@@ -29,7 +33,11 @@ const getInitialFormData = (bill = null) => {
         bill.iconName ||
         getIconNameForStorage(
           bill.icon ||
-            getBillIcon(bill.name || bill.provider || "", bill.notes || "", bill.category || "")
+            getBillIcon(
+              bill.name || bill.provider || "",
+              bill.notes || "",
+              bill.category || "",
+            ),
         ),
     };
   }
@@ -101,7 +109,7 @@ const AddBillModal = ({
     const suggestedIcon = getBillIcon(
       formData.name || "",
       formData.notes || "",
-      formData.category || "Bills"
+      formData.category || "Bills",
     );
     setFormData((prev) => ({
       ...prev,
@@ -136,12 +144,14 @@ const AddBillModal = ({
   if (!isOpen) return null;
 
   const calculateBiweeklyAmount = (amount, frequency, customFrequency = 1) => {
-    if (frequency === "custom") return toBiweekly(amount, "yearly") * customFrequency;
+    if (frequency === "custom")
+      return toBiweekly(amount, "yearly") * customFrequency;
     return toBiweekly(amount, frequency);
   };
 
   const calculateMonthlyAmount = (amount, frequency, customFrequency = 1) => {
-    if (frequency === "custom") return toMonthly(amount, "yearly") * customFrequency;
+    if (frequency === "custom")
+      return toMonthly(amount, "yearly") * customFrequency;
     return toMonthly(amount, frequency);
   };
 
@@ -176,13 +186,18 @@ const AddBillModal = ({
   };
 
   const normalizeDateFormat = (dateString) => {
-    if (!dateString || /^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
+    if (!dateString || /^\d{4}-\d{2}-\d{2}$/.test(dateString))
+      return dateString;
     if (typeof dateString === "string") {
       const dateMatch = dateString.match(/(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})/);
       if (dateMatch) {
         const [, month, day, year] = dateMatch;
         let fullYear =
-          year.length === 2 ? (parseInt(year) <= 30 ? `20${year}` : `19${year}`) : year;
+          year.length === 2
+            ? parseInt(year) <= 30
+              ? `20${year}`
+              : `19${year}`
+            : year;
         return `${fullYear}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
       }
     }
@@ -218,9 +233,19 @@ const AddBillModal = ({
       notes: formData.notes,
       dueDate: normalizedDueDate,
       customFrequency:
-        formData.frequency === "custom" ? parseFloat(formData.customFrequency) || 1 : undefined,
-      biweeklyAmount: calculateBiweeklyAmount(amount, formData.frequency, formData.customFrequency),
-      monthlyAmount: calculateMonthlyAmount(amount, formData.frequency, formData.customFrequency),
+        formData.frequency === "custom"
+          ? parseFloat(formData.customFrequency) || 1
+          : undefined,
+      biweeklyAmount: calculateBiweeklyAmount(
+        amount,
+        formData.frequency,
+        formData.customFrequency,
+      ),
+      monthlyAmount: calculateMonthlyAmount(
+        amount,
+        formData.frequency,
+        formData.customFrequency,
+      ),
       nextDueDate: getNextDueDate(formData.frequency, normalizedDueDate),
       icon: getIconByName(formData.iconName),
       iconName: formData.iconName,
@@ -251,7 +276,9 @@ const AddBillModal = ({
       formDataSelectedEnvelope: formData.selectedEnvelope,
       billDataEnvelopeId: billData.envelopeId,
       availableEnvelopesIds: availableEnvelopes.map((e) => e.id),
-      envelopeFound: availableEnvelopes.find((e) => e.id === formData.selectedEnvelope),
+      envelopeFound: availableEnvelopes.find(
+        (e) => e.id === formData.selectedEnvelope,
+      ),
     });
 
     if (editingBill) {
@@ -283,7 +310,11 @@ const AddBillModal = ({
         const envelopeData = {
           id: `envelope_${Date.now()}`,
           name: formData.name.trim(),
-          budget: calculateMonthlyAmount(amount, formData.frequency, formData.customFrequency),
+          budget: calculateMonthlyAmount(
+            amount,
+            formData.frequency,
+            formData.customFrequency,
+          ),
           currentBalance: 0,
           color: formData.color,
           category: formData.category,
@@ -326,8 +357,13 @@ const AddBillModal = ({
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="glassmorphism rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-white/30 shadow-2xl">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-semibold">{editingBill ? "Edit Bill" : "Add New Bill"}</h3>
-          <button onClick={cancelEdit} className="text-gray-400 hover:text-gray-600">
+          <h3 className="text-xl font-semibold">
+            {editingBill ? "Edit Bill" : "Add New Bill"}
+          </h3>
+          <button
+            onClick={cancelEdit}
+            className="text-gray-400 hover:text-gray-600"
+          >
             <X className="h-6 w-6" />
           </button>
         </div>
@@ -335,11 +371,15 @@ const AddBillModal = ({
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Bill Name *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Bill Name *
+              </label>
               <input
                 type="text"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g., Car Insurance, Netflix, Property Tax"
                 required
@@ -347,12 +387,16 @@ const AddBillModal = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Amount *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Amount *
+              </label>
               <input
                 type="number"
                 step="0.01"
                 value={formData.amount}
-                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, amount: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="0.00"
                 required
@@ -365,7 +409,9 @@ const AddBillModal = ({
               </label>
               <select
                 value={formData.frequency}
-                onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, frequency: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 {frequencies.map((freq) => (
@@ -399,20 +445,28 @@ const AddBillModal = ({
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Next Due Date</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Next Due Date
+              </label>
               <input
                 type="date"
                 value={formData.dueDate}
-                onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, dueDate: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Category
+              </label>
               <select
                 value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, category: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 {categories.map((category) => (
@@ -424,7 +478,9 @@ const AddBillModal = ({
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Color
+              </label>
               <div className="flex gap-2 flex-wrap">
                 {colors.map((color) => (
                   <button
@@ -447,12 +503,15 @@ const AddBillModal = ({
                 <div className="flex items-center">
                   Icon
                   <Sparkles className="h-4 w-4 ml-2 text-purple-500" />
-                  <span className="text-xs text-purple-600 ml-1">Smart suggestions</span>
+                  <span className="text-xs text-purple-600 ml-1">
+                    Smart suggestions
+                  </span>
                 </div>
               </label>
               <div className="flex gap-2 flex-wrap">
                 {iconSuggestions.map((IconComponent, index) => {
-                  const isSelected = formData.iconName === IconComponent.displayName;
+                  const isSelected =
+                    formData.iconName === IconComponent.displayName;
                   return (
                     <button
                       key={index}
@@ -476,7 +535,8 @@ const AddBillModal = ({
                 })}
               </div>
               <p className="text-xs text-gray-500 mt-1">
-                Icons are automatically suggested based on your bill name and category
+                Icons are automatically suggested based on your bill name and
+                category
               </p>
             </div>
 
@@ -486,7 +546,9 @@ const AddBillModal = ({
               </label>
               <textarea
                 value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, notes: e.target.value })
+                }
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="Any additional notes about this bill..."
@@ -510,14 +572,14 @@ const AddBillModal = ({
                     const isBillEnvelope = env.envelopeType === "bill";
                     const isLegacyEnvelope = !env.envelopeType;
                     const isAllowed = isBillEnvelope || isLegacyEnvelope;
-                    
+
                     console.log(`Envelope ${env.name}:`, {
                       envelopeType: env.envelopeType,
                       isBillEnvelope,
                       isLegacyEnvelope,
-                      isAllowed
+                      isAllowed,
                     });
-                    
+
                     return isAllowed;
                   })
                   .map((envelope) => (
@@ -530,13 +592,14 @@ const AddBillModal = ({
               {formData.selectedEnvelope && (
                 <p className="text-xs text-green-600 mt-1">
                   Selected:{" "}
-                  {availableEnvelopes.find((e) => e.id === formData.selectedEnvelope)?.name ||
-                    "Unknown"}
+                  {availableEnvelopes.find(
+                    (e) => e.id === formData.selectedEnvelope,
+                  )?.name || "Unknown"}
                 </p>
               )}
               <p className="text-xs text-blue-600 mt-1">
-                Only bill envelopes are available for assignment. Choose which envelope will be used
-                to pay this bill.
+                Only bill envelopes are available for assignment. Choose which
+                envelope will be used to pay this bill.
               </p>
             </div>
 
@@ -595,7 +658,7 @@ const AddBillModal = ({
                     {calculateMonthlyAmount(
                       parseFloat(formData.amount) || 0,
                       formData.frequency,
-                      formData.customFrequency
+                      formData.customFrequency,
                     ).toFixed(2)}
                   </span>
                 </div>
@@ -606,7 +669,7 @@ const AddBillModal = ({
                     {calculateBiweeklyAmount(
                       parseFloat(formData.amount) || 0,
                       formData.frequency,
-                      formData.customFrequency
+                      formData.customFrequency,
                     ).toFixed(2)}
                   </span>
                 </div>
@@ -651,14 +714,19 @@ const AddBillModal = ({
                 <Trash2 className="h-6 w-6 text-red-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Delete Bill</h3>
-                <p className="text-sm text-gray-600">This action cannot be undone</p>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Delete Bill
+                </h3>
+                <p className="text-sm text-gray-600">
+                  This action cannot be undone
+                </p>
               </div>
             </div>
 
             <p className="text-gray-700 mb-6">
-              Are you sure you want to delete "{editingBill?.name || editingBill?.provider}"? This
-              will permanently remove the bill from your tracker.
+              Are you sure you want to delete "
+              {editingBill?.name || editingBill?.provider}"? This will
+              permanently remove the bill from your tracker.
             </p>
 
             <div className="flex gap-3">
