@@ -22,34 +22,11 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          // Split vendor libraries into separate chunks
-          if (id.includes('node_modules')) {
-            if (id.includes('react') || id.includes('react-dom')) {
-              return 'react-vendor';
-            }
-            if (id.includes('firebase')) {
-              return 'firebase-vendor';
-            }
-            if (id.includes('dexie')) {
-              return 'dexie-vendor';
-            }
-            if (id.includes('recharts') || id.includes('lucide-react')) {
-              return 'ui-vendor';
-            }
-            return 'vendor';
-          }
-          
-          // Split large app modules
-          if (id.includes('utils/firebaseSync')) {
-            return 'firebase-sync';
-          }
-          if (id.includes('utils/budgetHistory')) {
-            return 'budget-history';
-          }
-          if (id.includes('db/budgetDb')) {
-            return 'database';
-          }
+        manualChunks: {
+          // Keep React together to avoid module issues
+          vendor: ["react", "react-dom", "lucide-react"],
+          firebase: ["firebase/app", "firebase/auth", "firebase/firestore"],
+          charts: ["recharts"],
         },
       },
     },
