@@ -55,14 +55,17 @@ const BillManager = ({
     addBill,
     updateBill,
     deleteBill,
+    markBillPaid,
     isLoading: billsLoading,
   } = useBills();
-  
+
   console.log("🏠 BillManager: Received from useBills:", {
     tanStackBillsLength: tanStackBills.length,
     billsLoading,
     firstBill: tanStackBills[0],
-    billTitles: tanStackBills.map(b => b.name || b.title || b.billName || "No Name").slice(0, 3)
+    billTitles: tanStackBills
+      .map((b) => b.name || b.title || b.billName || "No Name")
+      .slice(0, 3),
   });
 
   // Keep Zustand for non-migrated operations and fallbacks
@@ -88,8 +91,6 @@ const BillManager = ({
     [propEnvelopes, tanStackEnvelopes, budget.envelopes],
   );
 
-  const reconcileTransaction = budget.reconcileTransaction;
-  const handlePayBillAction = onPayBill || updateBill;
 
   const [selectedBills, setSelectedBills] = useState(new Set());
   const [viewMode, setViewMode] = useState("upcoming");
@@ -117,12 +118,12 @@ const BillManager = ({
     const billsFromStore = tanStackBills.length
       ? tanStackBills
       : budget.bills || [];
-      
+
     console.log("🔄 BillManager: Bill sources comparison:", {
       tanStackBillsLength: tanStackBills.length,
       budgetBillsLength: (budget.bills || []).length,
       usingTanStack: tanStackBills.length > 0,
-      billsFromStoreLength: billsFromStore.length
+      billsFromStoreLength: billsFromStore.length,
     });
 
     // Merge both sources, prioritizing store bills over transaction bills with same ID
@@ -378,58 +379,34 @@ const BillManager = ({
   };
 
   const handlePayBill = async (billId) => {
-    const result = await billOperations.handlePayBill(billId);
-
-    if (result.success && result.updatedBill) {
-      // Handle transaction record and balance updates using existing logic
-      const bill = result.updatedBill;
-
-      const paymentTxn = {
-        id: `${bill.id}_payment_${Date.now()}`,
-        date: bill.paidDate,
-        description: bill.provider || bill.description || "Bill Payment",
-        amount: -Math.abs(bill.amount),
-        envelopeId: bill.envelopeId || "unassigned",
-        category: bill.category,
-        type: "transaction",
-        source: "bill_payment",
-      };
-
-      if (bill.envelopeId) {
-        const billAmount = Math.abs(bill.amount);
-        const updatedEnvelopes = envelopes.map((env) => {
-          if (env.id === bill.envelopeId) {
-            const currentBalance = env.currentBalance || 0;
-            const newBalance = currentBalance - billAmount;
-
-            return {
-              ...env,
-              currentBalance: newBalance,
-              lastTransaction: {
-                type: "bill_payment",
-                amount: -billAmount,
-                date: paymentTxn.date,
-                billId: bill.id,
-              },
-            };
-          }
-          return env;
-        });
-
-        reconcileTransaction({
-          transaction: paymentTxn,
-          updatedEnvelopes,
-        });
-      } else {
-        const billAmount = Math.abs(bill.amount);
-        const currentUnassigned = budget.unassignedCash || 0;
-        const newUnassigned = currentUnassigned - billAmount;
-
-        reconcileTransaction({
-          transaction: paymentTxn,
-          newUnassignedCash: newUnassigned,
-        });
+    try {
+      const bill = bills.find((b) => b.id === billId);
+      if (!bill) {
+        console.error("Bill not found:", billId);
+        return;
       }
+
+      if (bill.isPaid) {
+        console.warn("Bill is already paid:", billId);
+        return;
+      }
+
+      // Use the proper markBillPaid function that handles everything atomically
+      await markBillPaid({
+        billId: bill.id,
+        paidAmount: Math.abs(bill.amount),
+        paidDate: new Date().toISOString().split("T")[0],
+        envelopeId: bill.envelopeId,
+      });
+
+      console.log("✅ Bill payment completed successfully:", {
+        billId: bill.id,
+        amount: bill.amount,
+        envelopeId: bill.envelopeId,
+      });
+    } catch (error) {
+      console.error("❌ Failed to pay bill:", error);
+      onError?.(error.message || "Failed to pay bill");
     }
   };
 
@@ -497,12 +474,33 @@ const BillManager = ({
       return;
     }
 
-    const result = await billOperations.handleBulkPayment(
-      Array.from(selectedBills),
-    );
+    try {
+      let successCount = 0;
+      let errorCount = 0;
+      const errors = [];
 
-    if (result.success) {
+      for (const billId of selectedBills) {
+        try {
+          await handlePayBill(billId);
+          successCount++;
+        } catch (error) {
+          errorCount++;
+          errors.push(`Bill ${billId}: ${error.message}`);
+        }
+      }
+
+      if (errorCount > 0) {
+        onError?.(
+          `${successCount} bills paid successfully, ${errorCount} failed:\n${errors.join("\n")}`,
+        );
+      } else {
+        console.log(`✅ Successfully paid ${successCount} bills`);
+      }
+
       setSelectedBills(new Set());
+    } catch (error) {
+      console.error("❌ Error in bulk payment:", error);
+      onError?.(error.message || "Failed to pay selected bills");
     }
   };
 
