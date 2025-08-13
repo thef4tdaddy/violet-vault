@@ -197,9 +197,9 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
       <TransactionLedger
         transactions={allTransactions}
         envelopes={envelopes}
-        onAddTransaction={() => {}} // Will be implemented
-        onUpdateTransaction={() => {}} // Will be implemented
-        onDeleteTransaction={() => {}} // Will be implemented
+        onAddTransaction={addTransaction}
+        onUpdateTransaction={_updateTransaction}
+        onDeleteTransaction={_deleteTransaction}
         onBulkImport={(newTransactions) => {
           console.log("🔄 onBulkImport called with transactions:", newTransactions.length);
 

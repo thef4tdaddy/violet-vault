@@ -91,32 +91,15 @@ export const queryKeys = {
   envelopes: ["envelopes"],
   envelopesList: (filters = {}) => [...queryKeys.envelopes, "list", filters],
   envelopeById: (id) => [...queryKeys.envelopes, "detail", id],
-  envelopesByCategory: (category) => [
-    ...queryKeys.envelopes,
-    "category",
-    category,
-  ],
+  envelopesByCategory: (category) => [...queryKeys.envelopes, "category", category],
   envelopeBalances: () => [...queryKeys.envelopes, "balances"],
 
   // Transactions
   transactions: ["transactions"],
-  transactionsList: (filters = {}) => [
-    ...queryKeys.transactions,
-    "list",
-    filters,
-  ],
+  transactionsList: (filters = {}) => [...queryKeys.transactions, "list", filters],
   transactionById: (id) => [...queryKeys.transactions, "detail", id],
-  transactionsByDateRange: (start, end) => [
-    ...queryKeys.transactions,
-    "dateRange",
-    start,
-    end,
-  ],
-  transactionsByEnvelope: (envelopeId) => [
-    ...queryKeys.transactions,
-    "envelope",
-    envelopeId,
-  ],
+  transactionsByDateRange: (start, end) => [...queryKeys.transactions, "dateRange", start, end],
+  transactionsByEnvelope: (envelopeId) => [...queryKeys.transactions, "envelope", envelopeId],
 
   // Bills
   bills: ["bills"],
@@ -133,11 +116,7 @@ export const queryKeys = {
   analytics: ["analytics"],
   analyticsSpending: (period) => [...queryKeys.analytics, "spending", period],
   analyticsTrends: (period) => [...queryKeys.analytics, "trends", period],
-  analyticsCategories: (period) => [
-    ...queryKeys.analytics,
-    "categories",
-    period,
-  ],
+  analyticsCategories: (period) => [...queryKeys.analytics, "categories", period],
   analyticsBalance: () => [...queryKeys.analytics, "balance"],
 
   // Dashboard
@@ -165,9 +144,7 @@ export const prefetchHelpers = {
         queryKey: queryKeys.envelopesList(filters),
         queryFn: async () => {
           // Try to get from Dexie first for offline support
-          const cached = await budgetDb.getEnvelopesByCategory(
-            filters.category,
-          );
+          const cached = await budgetDb.getEnvelopesByCategory(filters.category);
           if (cached && cached.length > 0) {
             return cached;
           }
@@ -184,15 +161,9 @@ export const prefetchHelpers = {
   prefetchTransactions: async (dateRange) => {
     try {
       return await queryClient.prefetchQuery({
-        queryKey: queryKeys.transactionsByDateRange(
-          dateRange.start,
-          dateRange.end,
-        ),
+        queryKey: queryKeys.transactionsByDateRange(dateRange.start, dateRange.end),
         queryFn: async () => {
-          const cached = await budgetDb.getTransactionsByDateRange(
-            dateRange.start,
-            dateRange.end,
-          );
+          const cached = await budgetDb.getTransactionsByDateRange(dateRange.start, dateRange.end);
           if (cached && cached.length > 0) {
             return cached;
           }
@@ -237,7 +208,7 @@ export const optimisticHelpers = {
     queryClient.setQueryData(queryKeys.envelopesList(), (old) => {
       if (!old) return old;
       return old.map((envelope) =>
-        envelope.id === envelopeId ? { ...envelope, ...updates } : envelope,
+        envelope.id === envelopeId ? { ...envelope, ...updates } : envelope
       );
     });
 
@@ -298,7 +269,7 @@ export const optimisticHelpers = {
         (old) => {
           if (!old) return [newTransaction];
           return [newTransaction, ...old];
-        },
+        }
       );
     }
 
@@ -330,9 +301,7 @@ export const optimisticHelpers = {
     queryClient.setQueryData(queryKeys.transactionsList(), (old) => {
       if (!old) return old;
       return old.map((transaction) =>
-        transaction.id === transactionId
-          ? { ...transaction, ...updates }
-          : transaction,
+        transaction.id === transactionId ? { ...transaction, ...updates } : transaction
       );
     });
 
@@ -361,9 +330,7 @@ export const optimisticHelpers = {
   updateBill: async (billId, updates) => {
     queryClient.setQueryData(queryKeys.billsList(), (old) => {
       if (!old) return old;
-      return old.map((bill) =>
-        bill.id === billId ? { ...bill, ...updates } : bill,
-      );
+      return old.map((bill) => (bill.id === billId ? { ...bill, ...updates } : bill));
     });
 
     try {
@@ -403,9 +370,7 @@ export const optimisticHelpers = {
   updateSavingsGoal: async (goalId, updates) => {
     queryClient.setQueryData(queryKeys.savingsGoalsList(), (old) => {
       if (!old) return old;
-      return old.map((goal) =>
-        goal.id === goalId ? { ...goal, ...updates } : goal,
-      );
+      return old.map((goal) => (goal.id === goalId ? { ...goal, ...updates } : goal));
     });
 
     try {
@@ -445,9 +410,7 @@ export const optimisticHelpers = {
   updateDebt: async (debtId, updates) => {
     queryClient.setQueryData(queryKeys.debtsList(), (old) => {
       if (!old) return old;
-      return old.map((debt) =>
-        debt.id === debtId ? { ...debt, ...updates } : debt,
-      );
+      return old.map((debt) => (debt.id === debtId ? { ...debt, ...updates } : debt));
     });
 
     try {
@@ -484,16 +447,14 @@ export const backgroundSync = {
     ];
 
     const results = await Promise.allSettled(
-      queries.map((queryKey) => queryClient.refetchQueries({ queryKey })),
+      queries.map((queryKey) => queryClient.refetchQueries({ queryKey }))
     );
 
     // Log sync results in development
     if (process.env.NODE_ENV === "development") {
       const successful = results.filter((r) => r.status === "fulfilled").length;
       const failed = results.filter((r) => r.status === "rejected").length;
-      console.log(
-        `Background sync completed: ${successful} successful, ${failed} failed`,
-      );
+      console.log(`Background sync completed: ${successful} successful, ${failed} failed`);
     }
 
     return results;
@@ -531,11 +492,7 @@ export const backgroundSync = {
           const queryKey = JSON.parse(entry.key);
           queryClient.setQueryData(queryKey, entry.value);
         } catch (parseError) {
-          console.warn(
-            "Failed to parse cached query key:",
-            entry.key,
-            parseError,
-          );
+          console.warn("Failed to parse cached query key:", entry.key, parseError);
         }
       });
 
