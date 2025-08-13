@@ -134,6 +134,13 @@ export const queryKeys = {
   paychecks: ["paychecks"],
   paycheckHistory: () => [...queryKeys.paychecks, "history"],
   paycheckPredictions: () => [...queryKeys.paychecks, "predictions"],
+
+  // Budget History (version control)
+  budgetHistory: ["budgetHistory"],
+  budgetCommits: (options = {}) => [...queryKeys.budgetHistory, "commits", options],
+  budgetCommit: (hash) => [...queryKeys.budgetHistory, "commit", hash],
+  budgetChanges: (commitHash) => [...queryKeys.budgetHistory, "changes", commitHash],
+  budgetHistoryStats: () => [...queryKeys.budgetHistory, "stats"],
 };
 
 // Enhanced prefetch utilities with Dexie fallback
