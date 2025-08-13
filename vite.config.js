@@ -9,6 +9,12 @@ export default defineConfig({
   resolve: {
     dedupe: ["react", "react-dom"],
   },
+  // Increase memory limits and optimize for build performance
+  server: {
+    hmr: {
+      overlay: false, // Disable error overlay for better performance
+    },
+  },
   define: {
     "process.env": {},
     global: {},
@@ -16,14 +22,41 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ["react", "react-dom", "recharts", "lucide-react"],
+        manualChunks: (id) => {
+          // Split vendor libraries into separate chunks
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'react-vendor';
+            }
+            if (id.includes('firebase')) {
+              return 'firebase-vendor';
+            }
+            if (id.includes('dexie')) {
+              return 'dexie-vendor';
+            }
+            if (id.includes('recharts') || id.includes('lucide-react')) {
+              return 'ui-vendor';
+            }
+            return 'vendor';
+          }
+          
+          // Split large app modules
+          if (id.includes('utils/firebaseSync')) {
+            return 'firebase-sync';
+          }
+          if (id.includes('utils/budgetHistory')) {
+            return 'budget-history';
+          }
+          if (id.includes('db/budgetDb')) {
+            return 'database';
+          }
         },
       },
     },
     chunkSizeWarningLimit: 1000,
     reportCompressedSize: false, // Disable verbose size reporting
     minify: false, // Keep disabled for faster builds
+    sourcemap: false, // Disable sourcemaps for faster builds
   },
   esbuild: {
     // Only drop debugger statements in production, keep console for Highlight.io
