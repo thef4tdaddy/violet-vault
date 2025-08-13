@@ -144,10 +144,7 @@ const AutoFundingRuleBuilder = ({
             break;
 
           case RULE_TYPES.PERCENTAGE:
-            if (
-              !ruleData.config.percentage ||
-              ruleData.config.percentage <= 0
-            ) {
+            if (!ruleData.config.percentage || ruleData.config.percentage <= 0) {
               newErrors.percentage = "Percentage must be greater than 0";
             }
             if (ruleData.config.percentage > 100) {
@@ -159,10 +156,7 @@ const AutoFundingRuleBuilder = ({
             break;
 
           case RULE_TYPES.SPLIT_REMAINDER:
-            if (
-              !ruleData.config.targetIds ||
-              ruleData.config.targetIds.length === 0
-            ) {
+            if (!ruleData.config.targetIds || ruleData.config.targetIds.length === 0) {
               newErrors.targetIds = "At least one target envelope is required";
             }
             break;
@@ -171,10 +165,7 @@ const AutoFundingRuleBuilder = ({
             if (!ruleData.config.targetId) {
               newErrors.targetId = "Target envelope is required";
             }
-            if (
-              !ruleData.config.targetAmount ||
-              ruleData.config.targetAmount <= 0
-            ) {
+            if (!ruleData.config.targetAmount || ruleData.config.targetAmount <= 0) {
               newErrors.targetAmount = "Target amount must be greater than 0";
             }
             break;
@@ -222,14 +213,14 @@ const AutoFundingRuleBuilder = ({
 
   const updateCondition = (conditionId, updates) => {
     const updatedConditions = ruleData.config.conditions.map((condition) =>
-      condition.id === conditionId ? { ...condition, ...updates } : condition,
+      condition.id === conditionId ? { ...condition, ...updates } : condition
     );
     updateConfig({ conditions: updatedConditions });
   };
 
   const removeCondition = (conditionId) => {
     const filteredConditions = ruleData.config.conditions.filter(
-      (condition) => condition.id !== conditionId,
+      (condition) => condition.id !== conditionId
     );
     updateConfig({ conditions: filteredConditions });
   };
@@ -256,9 +247,7 @@ const AutoFundingRuleBuilder = ({
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold">
-                  {editingRule
-                    ? "Edit Auto-Funding Rule"
-                    : "Create Auto-Funding Rule"}
+                  {editingRule ? "Edit Auto-Funding Rule" : "Create Auto-Funding Rule"}
                 </h3>
                 <p className="text-sm text-gray-600 mt-1">
                   Step {step} of 4:{" "}
@@ -271,10 +260,7 @@ const AutoFundingRuleBuilder = ({
                         : "Review & Save"}
                 </p>
               </div>
-              <button
-                onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 p-1"
-              >
+              <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1">
                 <X className="h-6 w-6" />
               </button>
             </div>
@@ -337,9 +323,7 @@ const AutoFundingRuleBuilder = ({
                   </label>
                   <textarea
                     value={ruleData.description}
-                    onChange={(e) =>
-                      updateRuleData({ description: e.target.value })
-                    }
+                    onChange={(e) => updateRuleData({ description: e.target.value })}
                     placeholder="Describe what this rule does and when it should run..."
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -356,8 +340,7 @@ const AutoFundingRuleBuilder = ({
                         type: RULE_TYPES.FIXED_AMOUNT,
                         icon: DollarSign,
                         title: "Fixed Amount",
-                        description:
-                          "Move a specific dollar amount to an envelope",
+                        description: "Move a specific dollar amount to an envelope",
                       },
                       {
                         type: RULE_TYPES.PERCENTAGE,
@@ -369,15 +352,13 @@ const AutoFundingRuleBuilder = ({
                         type: RULE_TYPES.SPLIT_REMAINDER,
                         icon: Target,
                         title: "Split Remainder",
-                        description:
-                          "Divide remaining funds across multiple envelopes",
+                        description: "Divide remaining funds across multiple envelopes",
                       },
                       {
                         type: RULE_TYPES.PRIORITY_FILL,
                         icon: ArrowRight,
                         title: "Priority Fill",
-                        description:
-                          "Fill envelope to target amount before others",
+                        description: "Fill envelope to target amount before others",
                       },
                     ].map(({ type, icon: Icon, title, description }) => (
                       <div
@@ -392,26 +373,20 @@ const AutoFundingRuleBuilder = ({
                         <div className="flex items-start gap-3">
                           <Icon
                             className={`h-5 w-5 mt-0.5 ${
-                              ruleData.type === type
-                                ? "text-blue-600"
-                                : "text-gray-600"
+                              ruleData.type === type ? "text-blue-600" : "text-gray-600"
                             }`}
                           />
                           <div>
                             <h4
                               className={`font-medium ${
-                                ruleData.type === type
-                                  ? "text-blue-900"
-                                  : "text-gray-900"
+                                ruleData.type === type ? "text-blue-900" : "text-gray-900"
                               }`}
                             >
                               {title}
                             </h4>
                             <p
                               className={`text-sm mt-1 ${
-                                ruleData.type === type
-                                  ? "text-blue-700"
-                                  : "text-gray-600"
+                                ruleData.type === type ? "text-blue-700" : "text-gray-600"
                               }`}
                             >
                               {description}
@@ -476,26 +451,20 @@ const AutoFundingRuleBuilder = ({
                         <div className="flex items-start gap-3">
                           <Icon
                             className={`h-5 w-5 mt-0.5 ${
-                              ruleData.trigger === type
-                                ? "text-blue-600"
-                                : "text-gray-600"
+                              ruleData.trigger === type ? "text-blue-600" : "text-gray-600"
                             }`}
                           />
                           <div>
                             <h4
                               className={`font-medium ${
-                                ruleData.trigger === type
-                                  ? "text-blue-900"
-                                  : "text-gray-900"
+                                ruleData.trigger === type ? "text-blue-900" : "text-gray-900"
                               }`}
                             >
                               {title}
                             </h4>
                             <p
                               className={`text-sm mt-1 ${
-                                ruleData.trigger === type
-                                  ? "text-blue-700"
-                                  : "text-gray-600"
+                                ruleData.trigger === type ? "text-blue-700" : "text-gray-600"
                               }`}
                             >
                               {description}
@@ -551,9 +520,7 @@ const AutoFundingRuleBuilder = ({
                             })
                           }
                           className={`flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                            errors.amount
-                              ? "border-red-300 ring-2 ring-red-200"
-                              : ""
+                            errors.amount ? "border-red-300 ring-2 ring-red-200" : ""
                           }`}
                         />
                       </div>
@@ -571,13 +538,9 @@ const AutoFundingRuleBuilder = ({
                       </label>
                       <select
                         value={ruleData.config.targetId || ""}
-                        onChange={(e) =>
-                          updateConfig({ targetId: e.target.value })
-                        }
+                        onChange={(e) => updateConfig({ targetId: e.target.value })}
                         className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                          errors.targetId
-                            ? "border-red-300 ring-2 ring-red-200"
-                            : ""
+                          errors.targetId ? "border-red-300 ring-2 ring-red-200" : ""
                         }`}
                       >
                         <option value="">Select envelope...</option>
@@ -617,9 +580,7 @@ const AutoFundingRuleBuilder = ({
                             })
                           }
                           className={`flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                            errors.percentage
-                              ? "border-red-300 ring-2 ring-red-200"
-                              : ""
+                            errors.percentage ? "border-red-300 ring-2 ring-red-200" : ""
                           }`}
                         />
                         <span className="text-gray-500">%</span>
@@ -638,13 +599,9 @@ const AutoFundingRuleBuilder = ({
                       </label>
                       <select
                         value={ruleData.config.targetId || ""}
-                        onChange={(e) =>
-                          updateConfig({ targetId: e.target.value })
-                        }
+                        onChange={(e) => updateConfig({ targetId: e.target.value })}
                         className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                          errors.targetId
-                            ? "border-red-300 ring-2 ring-red-200"
-                            : ""
+                          errors.targetId ? "border-red-300 ring-2 ring-red-200" : ""
                         }`}
                       >
                         <option value="">Select envelope...</option>
@@ -686,17 +643,14 @@ const AutoFundingRuleBuilder = ({
                         >
                           <div className="flex items-center justify-between">
                             <div>
-                              <h4 className="font-medium text-gray-900">
-                                {envelope.name}
-                              </h4>
+                              <h4 className="font-medium text-gray-900">{envelope.name}</h4>
                               <p className="text-sm text-gray-600">
-                                Balance: $
-                                {envelope.currentBalance?.toFixed(2) || "0.00"}
+                                Balance: ${envelope.currentBalance?.toFixed(2) || "0.00"}
                               </p>
                             </div>
-                            {ruleData.config.targetIds?.includes(
-                              envelope.id,
-                            ) && <Check className="h-5 w-5 text-blue-600" />}
+                            {ruleData.config.targetIds?.includes(envelope.id) && (
+                              <Check className="h-5 w-5 text-blue-600" />
+                            )}
                           </div>
                         </div>
                       ))}
@@ -718,13 +672,9 @@ const AutoFundingRuleBuilder = ({
                       </label>
                       <select
                         value={ruleData.config.targetId || ""}
-                        onChange={(e) =>
-                          updateConfig({ targetId: e.target.value })
-                        }
+                        onChange={(e) => updateConfig({ targetId: e.target.value })}
                         className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                          errors.targetId
-                            ? "border-red-300 ring-2 ring-red-200"
-                            : ""
+                          errors.targetId ? "border-red-300 ring-2 ring-red-200" : ""
                         }`}
                       >
                         <option value="">Select envelope...</option>
@@ -760,9 +710,7 @@ const AutoFundingRuleBuilder = ({
                             })
                           }
                           className={`flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                            errors.targetAmount
-                              ? "border-red-300 ring-2 ring-red-200"
-                              : ""
+                            errors.targetAmount ? "border-red-300 ring-2 ring-red-200" : ""
                           }`}
                         />
                       </div>
@@ -792,22 +740,16 @@ const AutoFundingRuleBuilder = ({
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between">
                       <span className="text-blue-700">Name:</span>
-                      <span className="font-medium text-blue-900">
-                        {ruleData.name}
-                      </span>
+                      <span className="font-medium text-blue-900">{ruleData.name}</span>
                     </div>
 
                     <div className="flex justify-between">
                       <span className="text-blue-700">Type:</span>
                       <span className="font-medium text-blue-900">
-                        {ruleData.type === RULE_TYPES.FIXED_AMOUNT &&
-                          "Fixed Amount"}
-                        {ruleData.type === RULE_TYPES.PERCENTAGE &&
-                          "Percentage"}
-                        {ruleData.type === RULE_TYPES.SPLIT_REMAINDER &&
-                          "Split Remainder"}
-                        {ruleData.type === RULE_TYPES.PRIORITY_FILL &&
-                          "Priority Fill"}
+                        {ruleData.type === RULE_TYPES.FIXED_AMOUNT && "Fixed Amount"}
+                        {ruleData.type === RULE_TYPES.PERCENTAGE && "Percentage"}
+                        {ruleData.type === RULE_TYPES.SPLIT_REMAINDER && "Split Remainder"}
+                        {ruleData.type === RULE_TYPES.PRIORITY_FILL && "Priority Fill"}
                       </span>
                     </div>
 
@@ -815,20 +757,15 @@ const AutoFundingRuleBuilder = ({
                       <span className="text-blue-700">Trigger:</span>
                       <span className="font-medium text-blue-900">
                         {ruleData.trigger === TRIGGER_TYPES.MANUAL && "Manual"}
-                        {ruleData.trigger === TRIGGER_TYPES.INCOME_DETECTED &&
-                          "Income Detected"}
-                        {ruleData.trigger === TRIGGER_TYPES.MONTHLY &&
-                          "Monthly"}
-                        {ruleData.trigger === TRIGGER_TYPES.BIWEEKLY &&
-                          "Biweekly"}
+                        {ruleData.trigger === TRIGGER_TYPES.INCOME_DETECTED && "Income Detected"}
+                        {ruleData.trigger === TRIGGER_TYPES.MONTHLY && "Monthly"}
+                        {ruleData.trigger === TRIGGER_TYPES.BIWEEKLY && "Biweekly"}
                       </span>
                     </div>
 
                     <div className="flex justify-between">
                       <span className="text-blue-700">Priority:</span>
-                      <span className="font-medium text-blue-900">
-                        {ruleData.priority}
-                      </span>
+                      <span className="font-medium text-blue-900">{ruleData.priority}</span>
                     </div>
 
                     {ruleData.config.amount > 0 && (
@@ -853,44 +790,36 @@ const AutoFundingRuleBuilder = ({
                       <div className="flex justify-between">
                         <span className="text-blue-700">Target:</span>
                         <span className="font-medium text-blue-900">
-                          {envelopes.find(
-                            (e) => e.id === ruleData.config.targetId,
-                          )?.name || "Unknown"}
+                          {envelopes.find((e) => e.id === ruleData.config.targetId)?.name ||
+                            "Unknown"}
                         </span>
                       </div>
                     )}
 
-                    {ruleData.config.targetIds &&
-                      ruleData.config.targetIds.length > 0 && (
-                        <div>
-                          <span className="text-blue-700">Targets:</span>
-                          <div className="mt-1">
-                            {ruleData.config.targetIds.map((id) => {
-                              const envelope = envelopes.find(
-                                (e) => e.id === id,
-                              );
-                              return envelope ? (
-                                <span
-                                  key={id}
-                                  className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs mr-1 mb-1"
-                                >
-                                  {envelope.name}
-                                </span>
-                              ) : null;
-                            })}
-                          </div>
+                    {ruleData.config.targetIds && ruleData.config.targetIds.length > 0 && (
+                      <div>
+                        <span className="text-blue-700">Targets:</span>
+                        <div className="mt-1">
+                          {ruleData.config.targetIds.map((id) => {
+                            const envelope = envelopes.find((e) => e.id === id);
+                            return envelope ? (
+                              <span
+                                key={id}
+                                className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs mr-1 mb-1"
+                              >
+                                {envelope.name}
+                              </span>
+                            ) : null;
+                          })}
                         </div>
-                      )}
+                      </div>
+                    )}
                   </div>
 
                   {ruleData.description && (
                     <div className="mt-4 pt-4 border-t border-blue-200">
-                      <span className="text-blue-700 text-sm">
-                        Description:
-                      </span>
-                      <p className="text-blue-900 text-sm mt-1">
-                        {ruleData.description}
-                      </p>
+                      <span className="text-blue-700 text-sm">Description:</span>
+                      <p className="text-blue-900 text-sm mt-1">{ruleData.description}</p>
                     </div>
                   )}
                 </div>

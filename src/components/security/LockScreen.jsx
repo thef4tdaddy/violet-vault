@@ -1,13 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  Lock,
-  Unlock,
-  Eye,
-  EyeOff,
-  AlertCircle,
-  Shield,
-  Clock,
-} from "lucide-react";
+import { Lock, Unlock, Eye, EyeOff, AlertCircle, Shield, Clock } from "lucide-react";
 import { useSecurityManager } from "../../hooks/useSecurityManager";
 
 const LockScreen = () => {
@@ -25,7 +17,7 @@ const LockScreen = () => {
       const recentFailures = securityEvents.filter(
         (event) =>
           event.type === "FAILED_UNLOCK" &&
-          Date.now() - new Date(event.timestamp).getTime() < 5 * 60 * 1000, // last 5 minutes
+          Date.now() - new Date(event.timestamp).getTime() < 5 * 60 * 1000 // last 5 minutes
       ).length;
       setFailedAttempts(recentFailures);
     }
@@ -113,9 +105,7 @@ const LockScreen = () => {
             <Shield className="h-10 w-10 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-white mb-2">Violet Vault</h1>
-          <p className="text-blue-100">
-            Your session has been locked for security
-          </p>
+          <p className="text-blue-100">Your session has been locked for security</p>
         </div>
 
         {/* Unlock Form */}
@@ -143,11 +133,7 @@ const LockScreen = () => {
                   disabled={isUnlocking}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-100 hover:text-white disabled:opacity-50"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>
@@ -167,8 +153,7 @@ const LockScreen = () => {
                 <span className="text-sm">
                   {failedAttempts} failed attempt
                   {failedAttempts !== 1 ? "s" : ""}
-                  {failedAttempts >= 3 &&
-                    " - delays are being applied for security"}
+                  {failedAttempts >= 3 && " - delays are being applied for security"}
                 </span>
               </div>
             )}
@@ -208,8 +193,7 @@ const LockScreen = () => {
         {/* Footer */}
         <div className="text-center mt-6">
           <p className="text-blue-200 text-xs">
-            Having trouble? Use the same password you set when first opening the
-            app
+            Having trouble? Use the same password you set when first opening the app
           </p>
         </div>
       </div>

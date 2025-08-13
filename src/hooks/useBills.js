@@ -63,9 +63,7 @@ const useBills = (options = {}) => {
 
     // Apply category filter
     if (category) {
-      filteredBills = filteredBills.filter(
-        (bill) => bill.category === category,
-      );
+      filteredBills = filteredBills.filter((bill) => bill.category === category);
     }
 
     // Apply sorting
@@ -307,22 +305,18 @@ const useBills = (options = {}) => {
       const paidDate = new Date(bill.paidDate);
       const today = new Date();
       return (
-        paidDate.getMonth() === today.getMonth() &&
-        paidDate.getFullYear() === today.getFullYear()
+        paidDate.getMonth() === today.getMonth() && paidDate.getFullYear() === today.getFullYear()
       );
     }).length,
 
     // Amount calculations
     upcomingAmount: upcomingBills.reduce(
       (sum, bill) => sum + (bill.amount || bill.estimatedAmount || 0),
-      0,
+      0
     ),
     monthlyBudget: bills
       .filter((bill) => bill.isRecurring)
-      .reduce(
-        (sum, bill) => sum + (bill.amount || bill.estimatedAmount || 0),
-        0,
-      ),
+      .reduce((sum, bill) => sum + (bill.amount || bill.estimatedAmount || 0), 0),
 
     // Category breakdown
     categoryBreakdown: bills.reduce((acc, bill) => {
@@ -378,8 +372,7 @@ const useBills = (options = {}) => {
   // Utility functions
   const getBillById = (id) => bills.find((bill) => bill.id === id);
 
-  const getBillsByCategory = (cat) =>
-    bills.filter((bill) => bill.category === cat);
+  const getBillsByCategory = (cat) => bills.filter((bill) => bill.category === cat);
 
   const getBillsByStatus = (stat) => {
     if (stat === "paid") return bills.filter((bill) => bill.isPaid);
@@ -472,8 +465,7 @@ const useBills = (options = {}) => {
 
     // Query controls
     refetch: billsQuery.refetch,
-    invalidate: () =>
-      queryClient.invalidateQueries({ queryKey: queryKeys.bills }),
+    invalidate: () => queryClient.invalidateQueries({ queryKey: queryKeys.bills }),
   };
 };
 
