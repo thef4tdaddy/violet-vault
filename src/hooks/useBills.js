@@ -32,8 +32,10 @@ const useBills = (options = {}) => {
       console.log("✅ TanStack Query: Loaded from Dexie:", {
         count: bills.length,
         firstBill: bills[0],
-        billTitles: bills.map(b => b.name || b.title || b.billName || "No Name").slice(0, 3),
-        billStructure: bills[0] ? Object.keys(bills[0]) : "No bills"
+        billTitles: bills
+          .map((b) => b.name || b.title || b.billName || "No Name")
+          .slice(0, 3),
+        billStructure: bills[0] ? Object.keys(bills[0]) : "No bills",
       });
     } catch (error) {
       console.error("❌ TanStack Query: Dexie fetch failed:", error);
@@ -46,12 +48,12 @@ const useBills = (options = {}) => {
     today.setHours(0, 0, 0, 0);
 
     let filteredBills = bills;
-    
+
     console.log("🔍 Bills filtering debug:", {
       inputBillsCount: bills.length,
       status,
       today: today.toISOString(),
-      firstBillData: bills[0]
+      firstBillData: bills[0],
     });
 
     if (status === "upcoming") {
@@ -75,7 +77,9 @@ const useBills = (options = {}) => {
 
     // Apply category filter
     if (category) {
-      filteredBills = filteredBills.filter((bill) => bill.category === category);
+      filteredBills = filteredBills.filter(
+        (bill) => bill.category === category,
+      );
     }
 
     // Apply sorting
@@ -116,9 +120,10 @@ const useBills = (options = {}) => {
       filteredStillExist: filteredBills.length > 0,
       firstOriginalBill: bills[0],
       firstFilteredBill: filteredBills[0],
-      filterApplied: status !== "all" ? `Applied ${status} filter` : "No filter applied"
+      filterApplied:
+        status !== "all" ? `Applied ${status} filter` : "No filter applied",
     });
-    
+
     return filteredBills;
   }, [status, daysAhead, category, sortBy, sortOrder]);
 
@@ -264,10 +269,17 @@ const useBills = (options = {}) => {
   const markBillPaidMutation = useMutation({
     mutationKey: ["bills", "markPaid"],
     mutationFn: async ({ billId, paidAmount, paidDate, envelopeId }) => {
+      const bill = await budgetDb.bills.get(billId);
+      if (!bill) {
+        throw new Error(`Bill with ID ${billId} not found`);
+      }
+
+      const paymentDate = paidDate || new Date().toISOString().split("T")[0];
+
       const paidData = {
         isPaid: true,
         paidAmount: paidAmount,
-        paidDate: paidDate || new Date().toISOString().split("T")[0],
+        paidDate: paymentDate,
         envelopeId: envelopeId,
         lastPaid: new Date().toISOString(),
       };
@@ -281,6 +293,26 @@ const useBills = (options = {}) => {
         updatedAt: new Date().toISOString(),
       });
 
+      // Create transaction record for the bill payment
+      const paymentTransaction = {
+        id: `${billId}_payment_${Date.now()}`,
+        date: paymentDate,
+        description:
+          bill.provider || bill.description || bill.name || "Bill Payment",
+        amount: -Math.abs(paidAmount), // Negative for expense
+        envelopeId: envelopeId || "unassigned",
+        category: bill.category || "Bills & Utilities",
+        type: "expense",
+        source: "bill_payment",
+        billId: billId,
+        notes: `Payment for ${bill.provider || bill.description || bill.name}`,
+        createdAt: new Date().toISOString(),
+      };
+
+      // Add transaction to Dexie
+      await budgetDb.transactions.add(paymentTransaction);
+      await optimisticHelpers.addTransaction(paymentTransaction);
+
       // If bill is linked to envelope, update envelope balance
       if (envelopeId && paidAmount) {
         const envelope = await budgetDb.envelopes.get(envelopeId);
@@ -289,6 +321,13 @@ const useBills = (options = {}) => {
           await budgetDb.envelopes.update(envelopeId, {
             currentBalance: newBalance,
             updatedAt: new Date().toISOString(),
+            lastTransaction: {
+              type: "bill_payment",
+              amount: -paidAmount,
+              date: paymentDate,
+              billId: billId,
+              transactionId: paymentTransaction.id,
+            },
           });
           await optimisticHelpers.updateEnvelope(envelopeId, {
             currentBalance: newBalance,
@@ -296,7 +335,7 @@ const useBills = (options = {}) => {
         }
       }
 
-      return { billId, paidData };
+      return { billId, paidData, transaction: paymentTransaction };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
@@ -328,18 +367,22 @@ const useBills = (options = {}) => {
       const paidDate = new Date(bill.paidDate);
       const today = new Date();
       return (
-        paidDate.getMonth() === today.getMonth() && paidDate.getFullYear() === today.getFullYear()
+        paidDate.getMonth() === today.getMonth() &&
+        paidDate.getFullYear() === today.getFullYear()
       );
     }).length,
 
     // Amount calculations
     upcomingAmount: upcomingBills.reduce(
       (sum, bill) => sum + (bill.amount || bill.estimatedAmount || 0),
-      0
+      0,
     ),
     monthlyBudget: bills
       .filter((bill) => bill.isRecurring)
-      .reduce((sum, bill) => sum + (bill.amount || bill.estimatedAmount || 0), 0),
+      .reduce(
+        (sum, bill) => sum + (bill.amount || bill.estimatedAmount || 0),
+        0,
+      ),
 
     // Category breakdown
     categoryBreakdown: bills.reduce((acc, bill) => {
@@ -395,7 +438,8 @@ const useBills = (options = {}) => {
   // Utility functions
   const getBillById = (id) => bills.find((bill) => bill.id === id);
 
-  const getBillsByCategory = (cat) => bills.filter((bill) => bill.category === cat);
+  const getBillsByCategory = (cat) =>
+    bills.filter((bill) => bill.category === cat);
 
   const getBillsByStatus = (stat) => {
     if (stat === "paid") return bills.filter((bill) => bill.isPaid);
@@ -488,7 +532,8 @@ const useBills = (options = {}) => {
 
     // Query controls
     refetch: billsQuery.refetch,
-    invalidate: () => queryClient.invalidateQueries({ queryKey: queryKeys.bills }),
+    invalidate: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.bills }),
   };
 };
 
