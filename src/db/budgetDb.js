@@ -5,7 +5,7 @@ export class VioletVaultDB extends Dexie {
     super("VioletVault");
 
     // Enhanced schema with comprehensive indexes for optimal query performance
-    this.version(3).stores({
+    this.version(4).stores({
       // Main budget data with timestamps for versioning
       budget: "id, lastModified, version",
 

@@ -240,113 +240,93 @@ tbody tr:hover {
 }
 
 /* ===== BLACK BORDERS FOR WHITE BACKGROUNDS ===== */
-/* Add thin black borders to all white/light background elements */
+/* Add visible black borders to all white/light background elements */
 
-/* White background containers */
+/* Universal white background rule with higher specificity */
+*[class*="bg-white"],
+*[class*="backdrop-blur"],
+*.glassmorphism,
+*.glass-card,
+*.glass-enhanced {
+  border: 1px solid rgba(0, 0, 0, 0.2) !important;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* More specific targeting for common Tailwind classes */
 .bg-white,
-[class*="bg-white"],
+.bg-white\/60,
+.bg-white\/70,
+.bg-white\/80,
+.bg-white\/90,
 .bg-gray-50,
 .bg-gray-100,
 .bg-slate-50,
 .bg-slate-100 {
-  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border: 2px solid rgba(0, 0, 0, 0.25) !important;
+  outline: 1px solid rgba(0, 0, 0, 0.15) !important;
 }
 
-/* Cards and panels with white/light backgrounds */
-.rounded,
-.rounded-lg,
-.rounded-xl,
-.rounded-2xl,
-.rounded-3xl {
-  border: 1px solid rgba(0, 0, 0, 0.08);
+/* Glassmorphism components - override existing styles */
+.glassmorphism,
+.glass-card,
+.glass-enhanced,
+*[class*="backdrop-blur"] {
+  border: 2px solid rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15), 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Modal and popup backgrounds */
-.modal,
-.popup,
-.dropdown,
-.tooltip {
-  border: 1px solid rgba(0, 0, 0, 0.12);
-}
-
-/* Form elements with white backgrounds */
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="search"],
-input[type="url"],
-input[type="tel"],
-input[type="date"],
-input[type="datetime-local"],
-input[type="month"],
-input[type="week"],
-input[type="time"],
-textarea,
-select {
+/* Cards and containers */
+div[class*="rounded"],
+div[class*="p-"],
+div[class*="space-"],
+section,
+article,
+.card,
+.container {
   border: 1px solid rgba(0, 0, 0, 0.15) !important;
 }
 
-/* Button backgrounds that are white/light */
-.btn-secondary,
-.btn-outline,
-button[class*="bg-white"],
-button[class*="bg-gray-"] {
-  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+/* Modals and overlays */
+div[role="dialog"],
+.modal,
+.popup,
+.dropdown,
+.tooltip,
+*[class*="fixed"],
+*[class*="absolute"] {
+  border: 2px solid rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2) !important;
 }
 
-/* List items and table rows with white backgrounds */
-li:has(.bg-white),
-tr:has(.bg-white),
-.list-item,
-.table-row {
-  border: 1px solid rgba(0, 0, 0, 0.06);
+/* Form elements */
+input,
+textarea,
+select,
+button {
+  border: 1px solid rgba(0, 0, 0, 0.25) !important;
 }
 
-/* Dashboard components and widgets */
-.widget,
-.dashboard-card,
-.stats-card,
-.summary-card {
-  border: 1px solid rgba(0, 0, 0, 0.1);
+/* Strong border for debug visibility */
+.debug-borders * {
+  border: 2px solid red !important;
 }
 
-/* Navigation elements with light backgrounds */
-.nav-item:has(.bg-white),
-.menu-item:has(.bg-white),
-.tab:has(.bg-white) {
-  border: 1px solid rgba(0, 0, 0, 0.08);
+/* Specific targeting for budget app components */
+*[class*="envelope"],
+*[class*="bill"],
+*[class*="transaction"],
+*[class*="debt"],
+*[class*="savings"],
+*[class*="summary"] {
+  border: 2px solid rgba(0, 0, 0, 0.25) !important;
 }
 
-/* Content areas and sections */
-.content,
-.section,
-.panel,
-.container:has(.bg-white) {
-  border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-/* Specific budget app components */
-.envelope-card,
-.transaction-item,
-.bill-item,
-.debt-card,
-.savings-goal,
-.paycheck-item {
-  border: 1px solid rgba(0, 0, 0, 0.12);
-}
-
-/* Headers and footers with light backgrounds */
-.header:has(.bg-white),
-.footer:has(.bg-white),
-.toolbar:has(.bg-white) {
-  border: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-/* Sidebars and navigation panels */
-.sidebar:has(.bg-white),
-.nav-panel:has(.bg-white) {
-  border: 1px solid rgba(0, 0, 0, 0.1);
+/* Grid and layout components */
+.grid > *,
+.flex > *,
+*[class*="grid-cols"] > *,
+*[class*="space-"] > * {
+  border: 1px solid rgba(0, 0, 0, 0.15) !important;
 }
 
 /* ===== ACCESSIBILITY ===== */

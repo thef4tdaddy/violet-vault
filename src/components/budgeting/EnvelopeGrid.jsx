@@ -440,7 +440,7 @@ const UnifiedEnvelopeManager = ({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <div className="bg-white/60 backdrop-blur-sm p-4 rounded-lg border border-white/20">
+        <div className="bg-white/60 backdrop-blur-sm p-4 rounded-lg border border-white/20 ring-1 ring-gray-800/10">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Biweekly Funding Need</p>
@@ -455,7 +455,7 @@ const UnifiedEnvelopeManager = ({
           </div>
         </div>
 
-        <div className="bg-white/60 backdrop-blur-sm p-4 rounded-lg border border-white/20">
+        <div className="bg-white/60 backdrop-blur-sm p-4 rounded-lg border border-white/20 ring-1 ring-gray-800/10">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Current Balance</p>
@@ -467,7 +467,7 @@ const UnifiedEnvelopeManager = ({
           </div>
         </div>
 
-        <div className="bg-white/60 backdrop-blur-sm p-4 rounded-lg border border-white/20">
+        <div className="bg-white/60 backdrop-blur-sm p-4 rounded-lg border border-white/20 ring-1 ring-gray-800/10">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Spent This Period</p>
@@ -487,7 +487,7 @@ const UnifiedEnvelopeManager = ({
           </div>
         </div>
 
-        <div className="bg-white/60 backdrop-blur-sm p-4 rounded-lg border border-white/20">
+        <div className="bg-white/60 backdrop-blur-sm p-4 rounded-lg border border-white/20 ring-1 ring-gray-800/10">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Bills Due</p>
@@ -497,7 +497,7 @@ const UnifiedEnvelopeManager = ({
           </div>
         </div>
 
-        <div className="bg-white/60 backdrop-blur-sm p-4 rounded-lg border border-white/20">
+        <div className="bg-white/60 backdrop-blur-sm p-4 rounded-lg border border-white/20 ring-1 ring-gray-800/10">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Overdue</p>
@@ -507,7 +507,7 @@ const UnifiedEnvelopeManager = ({
           </div>
         </div>
 
-        <div className="bg-white/60 backdrop-blur-sm p-4 rounded-lg border border-white/20">
+        <div className="bg-white/60 backdrop-blur-sm p-4 rounded-lg border border-white/20 ring-1 ring-gray-800/10">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Available After Bills</p>
@@ -522,7 +522,7 @@ const UnifiedEnvelopeManager = ({
         </div>
       </div>
 
-      <div className="bg-white/60 backdrop-blur-sm p-3 rounded-lg border border-white/20">
+      <div className="bg-white/60 backdrop-blur-sm p-3 rounded-lg border border-white/20 ring-1 ring-gray-800/10">
         <div className="flex items-center justify-between">
           <h4 className="font-medium text-gray-900 flex items-center text-sm">
             <Filter className="h-3 w-3 mr-2" />
@@ -582,7 +582,7 @@ const UnifiedEnvelopeManager = ({
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div
-          className={`p-6 rounded-lg border-2 transition-all cursor-pointer hover:shadow-lg bg-white/60 border-gray-200 ${
+          className={`p-6 rounded-lg border-2 transition-all cursor-pointer hover:shadow-lg bg-white/60 border-gray-200 ring-1 ring-gray-800/10 ${
             selectedEnvelopeId === "unassigned" ? "ring-2 ring-green-500" : ""
           }`}
           onClick={() => setSelectedEnvelopeId("unassigned")}
@@ -840,7 +840,7 @@ const UnifiedEnvelopeManager = ({
 
       {/* Detailed view moved up - appears right below the envelope grid */}
       {selectedEnvelope && (
-        <div className="bg-white/60 backdrop-blur-sm rounded-lg p-6 border border-white/20 mt-4">
+        <div className="bg-white/60 backdrop-blur-sm rounded-lg p-6 border border-white/20 ring-1 ring-gray-800/10 mt-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">
               {selectedEnvelope.name} - Detailed View
