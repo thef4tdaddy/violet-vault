@@ -61,7 +61,7 @@ const SummaryCards = () => {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="glassmorphism rounded-3xl p-6 animate-pulse">
+          <div key={i} className="glassmorphism rounded-3xl p-6 animate-pulse border border-white/20 ring-1 ring-gray-800/10">
             <div className="flex items-center">
               <div className="relative mr-4">
                 <div className="bg-gray-300 p-3 rounded-2xl w-12 h-12"></div>
@@ -153,7 +153,7 @@ const SummaryCard = memo(
       red: "text-red-600",
     };
 
-    const baseClasses = "glassmorphism rounded-3xl p-6 transition-all duration-200";
+    const baseClasses = "glassmorphism rounded-3xl p-6 transition-all duration-200 border border-white/20 ring-1 ring-gray-800/10";
     const clickableClasses = clickable
       ? "cursor-pointer hover:shadow-lg hover:scale-105 active:scale-95"
       : "";
