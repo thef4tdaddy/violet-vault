@@ -32,7 +32,8 @@ const useBills = (options = {}) => {
       console.log("✅ TanStack Query: Loaded from Dexie:", {
         count: bills.length,
         firstBill: bills[0],
-        billTitles: bills.map(b => b.name || b.title).slice(0, 3)
+        billTitles: bills.map(b => b.name || b.title || b.billName || "No Name").slice(0, 3),
+        billStructure: bills[0] ? Object.keys(bills[0]) : "No bills"
       });
     } catch (error) {
       console.error("❌ TanStack Query: Dexie fetch failed:", error);
@@ -104,7 +105,9 @@ const useBills = (options = {}) => {
       total: bills.length,
       filtered: filteredBills.length,
       status,
-      firstFiltered: filteredBills[0]
+      firstFiltered: filteredBills[0],
+      filteredTitles: filteredBills.map(b => b.name || b.title || b.billName || "No Name").slice(0, 3),
+      filterApplied: status !== "all" ? `Applied ${status} filter` : "No filter applied"
     });
     
     return filteredBills;

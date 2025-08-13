@@ -57,6 +57,13 @@ const BillManager = ({
     deleteBill,
     isLoading: billsLoading,
   } = useBills();
+  
+  console.log("🏠 BillManager: Received from useBills:", {
+    tanStackBillsLength: tanStackBills.length,
+    billsLoading,
+    firstBill: tanStackBills[0],
+    billTitles: tanStackBills.map(b => b.name || b.title || b.billName || "No Name").slice(0, 3)
+  });
 
   // Keep Zustand for non-migrated operations and fallbacks
   const budget = useBudgetStore();
@@ -110,6 +117,13 @@ const BillManager = ({
     const billsFromStore = tanStackBills.length
       ? tanStackBills
       : budget.bills || [];
+      
+    console.log("🔄 BillManager: Bill sources comparison:", {
+      tanStackBillsLength: tanStackBills.length,
+      budgetBillsLength: (budget.bills || []).length,
+      usingTanStack: tanStackBills.length > 0,
+      billsFromStoreLength: billsFromStore.length
+    });
 
     // Merge both sources, prioritizing store bills over transaction bills with same ID
     const combinedBills = [...billsFromStore];
