@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useBudgetHistory } from "../../hooks/useBudgetHistory";
+import { useBudgetCommits } from "../../hooks/useBudgetHistoryQuery";
 import {
   History,
   GitCommit,
@@ -22,70 +22,31 @@ import {
  * @param {function} props.onClose - Close callback
  */
 const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
-  const { getHistory, getCommitDetails, formatChangeDescription } = useBudgetHistory();
+  const { data: allCommits = [], isLoading } = useBudgetCommits();
 
   const [relevantHistory, setRelevantHistory] = useState([]);
   const [expandedCommits, setExpandedCommits] = useState(new Set());
-  const [loading, setLoading] = useState(true);
 
   // Load history filtered for this specific object
   useEffect(() => {
-    const loadObjectHistory = async () => {
-      try {
-        setLoading(true);
+    if (!allCommits.length || isLoading) return;
 
-        // Get all history commits
-        const allHistory = await getHistory({ limit: -1 });
+    // Filter for commits that likely affected this specific object
+    const objectHistory = allCommits.filter((commit) => {
+      // For now, include all commits as we need commit details to filter properly
+      // This could be optimized later by adding object-specific tracking
+      return (
+        commit.message &&
+        (commit.message.toLowerCase().includes(objectType.toLowerCase()) ||
+          commit.message.includes(objectId) ||
+          commit.message
+            .toLowerCase()
+            .includes(objectName?.toLowerCase() || ""))
+      );
+    });
 
-        // Filter for commits that affected this specific object
-        const objectHistory = [];
-
-        for (const commitSummary of allHistory) {
-          try {
-            const commitDetails = await getCommitDetails(commitSummary.hash);
-
-            // Check if any changes in this commit relate to our object
-            const relevantChanges = commitDetails.changes.filter((change) => {
-              // Match by object ID in the change path
-              if (change.path && change.path.includes(objectId)) {
-                return true;
-              }
-
-              // Match by object properties
-              if (change.newValue && change.newValue.id === objectId) {
-                return true;
-              }
-              if (change.oldValue && change.oldValue.id === objectId) {
-                return true;
-              }
-
-              return false;
-            });
-
-            if (relevantChanges.length > 0) {
-              objectHistory.push({
-                ...commitSummary,
-                relevantChanges,
-                fullCommit: commitDetails.commit,
-              });
-            }
-          } catch (error) {
-            console.warn("Failed to load commit details:", error);
-          }
-        }
-
-        setRelevantHistory(objectHistory);
-      } catch (error) {
-        console.error("Failed to load object history:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (objectId) {
-      loadObjectHistory();
-    }
-  }, [objectId, getHistory, getCommitDetails]);
+    setRelevantHistory(objectHistory.slice(0, 20)); // Limit to 20 most recent
+  }, [allCommits, isLoading, objectId, objectType, objectName]);
 
   const toggleCommitExpanded = (commitHash) => {
     setExpandedCommits((prev) => {
@@ -123,6 +84,14 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
     }
   };
 
+  const formatChangeDescription = (change) => {
+    // Simple change description formatter
+    if (change.type === "add") return `Added ${objectType.toLowerCase()}`;
+    if (change.type === "delete") return `Deleted ${objectType.toLowerCase()}`;
+    if (change.type === "modify") return `Modified ${objectType.toLowerCase()}`;
+    return `Changed ${objectType.toLowerCase()}`;
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -138,13 +107,16 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
                 Complete change history for this {objectType.toLowerCase()}
               </p>
             </div>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 text-xl"
+            >
               <X className="h-5 w-5" />
             </button>
           </div>
 
           {/* Loading State */}
-          {loading && (
+          {isLoading && (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
               <span className="ml-2 text-gray-600">Loading history...</span>
@@ -152,33 +124,36 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
           )}
 
           {/* No History */}
-          {!loading && relevantHistory.length === 0 && (
+          {!isLoading && relevantHistory.length === 0 && (
             <div className="text-center py-8 text-gray-500">
               <History className="h-12 w-12 mx-auto mb-3 opacity-50" />
               <p className="font-medium">No history found</p>
               <p className="text-sm mt-1">
-                This {objectType.toLowerCase()} hasn't been modified yet
+                This {objectType.toLowerCase()} hasn't been modified yet or
+                budget history is not initialized
               </p>
             </div>
           )}
 
           {/* History List */}
-          {!loading && relevantHistory.length > 0 && (
+          {!isLoading && relevantHistory.length > 0 && (
             <div className="space-y-4">
               <div className="bg-blue-50 p-3 rounded-lg">
                 <div className="flex items-center">
                   <GitCommit className="h-4 w-4 text-blue-600 mr-2" />
                   <div className="text-sm text-blue-800">
-                    <strong>Found {relevantHistory.length} changes</strong> to this{" "}
-                    {objectType.toLowerCase()}
+                    <strong>
+                      Found {relevantHistory.length} related changes
+                    </strong>{" "}
+                    for this {objectType.toLowerCase()}
                   </div>
                 </div>
               </div>
 
               <div className="space-y-3">
-                {relevantHistory.map((historyItem) => (
+                {relevantHistory.map((commit) => (
                   <div
-                    key={historyItem.hash}
+                    key={commit.hash}
                     className="border border-gray-200 rounded-lg p-4 bg-white hover:shadow-md transition-all"
                   >
                     {/* Commit Header */}
@@ -187,30 +162,32 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
                         <div className="flex items-center gap-2 mb-2">
                           <GitCommit className="h-4 w-4 text-gray-600" />
                           <span className="font-mono text-sm text-gray-600">
-                            {historyItem.shortHash}
+                            {commit.hash?.substring(0, 8) || "unknown"}
                           </span>
                           <span
-                            className={`px-2 py-1 rounded-full text-xs ${getAuthorColor(historyItem.author)}`}
+                            className={`px-2 py-1 rounded-full text-xs ${getAuthorColor(commit.author)}`}
                           >
-                            {historyItem.author}
+                            {commit.author || "unknown"}
                           </span>
                         </div>
 
                         <p className="text-sm font-medium text-gray-900 mb-1">
-                          {historyItem.message}
+                          {commit.message || "No message"}
                         </p>
 
                         <div className="flex items-center text-xs text-gray-500">
                           <Calendar className="h-3 w-3 mr-1" />
-                          {new Date(historyItem.timestamp).toLocaleString()}
+                          {commit.timestamp
+                            ? new Date(commit.timestamp).toLocaleString()
+                            : "Unknown time"}
                         </div>
                       </div>
 
                       <button
-                        onClick={() => toggleCommitExpanded(historyItem.hash)}
+                        onClick={() => toggleCommitExpanded(commit.hash)}
                         className="text-gray-400 hover:text-gray-600 p-1 rounded"
                       >
-                        {expandedCommits.has(historyItem.hash) ? (
+                        {expandedCommits.has(commit.hash) ? (
                           <ChevronDown className="h-4 w-4" />
                         ) : (
                           <ChevronRight className="h-4 w-4" />
@@ -218,80 +195,31 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
                       </button>
                     </div>
 
-                    {/* Changes Summary */}
+                    {/* Basic commit info */}
                     <div className="mb-3">
                       <div className="text-sm text-gray-700">
-                        <strong>
-                          {historyItem.relevantChanges.length} change
-                          {historyItem.relevantChanges.length !== 1 ? "s" : ""}
-                        </strong>{" "}
-                        to this {objectType.toLowerCase()}:
-                      </div>
-
-                      <div className="mt-2 space-y-1">
-                        {historyItem.relevantChanges.map((change, index) => (
-                          <div
-                            key={index}
-                            className="flex items-start gap-2 p-2 bg-gray-50 rounded text-sm"
-                          >
-                            {getChangeIcon(change.type)}
-                            <div className="flex-1">
-                              <p>{formatChangeDescription(change)}</p>
-                            </div>
-                          </div>
-                        ))}
+                        This commit may have affected the{" "}
+                        {objectType.toLowerCase()}
                       </div>
                     </div>
 
                     {/* Expanded Details */}
-                    {expandedCommits.has(historyItem.hash) && (
+                    {expandedCommits.has(commit.hash) && (
                       <div className="border-t border-gray-200 pt-3">
-                        <div className="space-y-3">
-                          {historyItem.relevantChanges.map((change, index) => (
-                            <div key={index} className="bg-gray-50 p-3 rounded border">
-                              <div className="font-medium text-sm text-gray-900 mb-2">
-                                {formatChangeDescription(change)}
-                              </div>
-
-                              {/* Show diff details if available */}
-                              {change.diff && (
-                                <div className="space-y-2 text-xs">
-                                  {Object.entries(change.diff).map(([field, fieldChange]) => (
-                                    <div key={field} className="font-mono">
-                                      <div className="font-semibold text-gray-700">{field}:</div>
-                                      <div className="ml-2 space-y-1">
-                                        <div className="text-red-700">
-                                          - {JSON.stringify(fieldChange.from)}
-                                        </div>
-                                        <div className="text-green-700">
-                                          + {JSON.stringify(fieldChange.to)}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-
-                              {/* Show full values for create/delete operations */}
-                              {change.type === "add" && change.newValue && (
-                                <div className="text-xs font-mono">
-                                  <div className="font-semibold text-gray-700 mb-1">Created:</div>
-                                  <div className="bg-green-50 p-2 rounded border">
-                                    {JSON.stringify(change.newValue, null, 2)}
-                                  </div>
-                                </div>
-                              )}
-
-                              {change.type === "delete" && change.oldValue && (
-                                <div className="text-xs font-mono">
-                                  <div className="font-semibold text-gray-700 mb-1">Deleted:</div>
-                                  <div className="bg-red-50 p-2 rounded border">
-                                    {JSON.stringify(change.oldValue, null, 2)}
-                                  </div>
-                                </div>
-                              )}
+                        <div className="bg-gray-50 p-3 rounded">
+                          <div className="text-sm text-gray-600">
+                            <strong>Commit Hash:</strong> {commit.hash}
+                          </div>
+                          <div className="text-sm text-gray-600 mt-1">
+                            <strong>Device:</strong>{" "}
+                            {commit.deviceFingerprint || "Unknown"}
+                          </div>
+                          {commit.parentHash && (
+                            <div className="text-sm text-gray-600 mt-1">
+                              <strong>Parent:</strong>{" "}
+                              {commit.parentHash.substring(0, 8)}
                             </div>
-                          ))}
+                          )}
                         </div>
                       </div>
                     )}

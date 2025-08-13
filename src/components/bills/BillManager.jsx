@@ -1186,11 +1186,10 @@ const BillManager = ({
       {/* History Modal */}
       {historyBill && (
         <ObjectHistoryViewer
-          isOpen={!!historyBill}
-          onClose={() => setHistoryBill(null)}
-          object={historyBill}
+          objectId={historyBill.id}
           objectType="bill"
-          title={`History: ${historyBill.provider || historyBill.description}`}
+          objectName={historyBill.provider || historyBill.description}
+          onClose={() => setHistoryBill(null)}
         />
       )}
     </div>
