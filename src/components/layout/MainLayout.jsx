@@ -322,6 +322,9 @@ const MainContent = ({
               <span className="font-semibold text-purple-600">{getVersionInfo().displayName}</span>{" "}
               v{getVersionInfo().version}
             </p>
+            <p className="text-xs text-gray-500 mt-1">
+              Last updated: {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}
+            </p>
             <p className="text-xs text-gray-500 mt-1">Built with ❤️ for secure budgeting</p>
           </div>
         </div>
