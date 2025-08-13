@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { useAuth } from "../stores/authStore.jsx";
 import { useBudgetStore } from "../stores/budgetStore.js";
 import logger from "../utils/logger";
+import { useToastHelpers } from "../utils/toastHelpers";
 
 /**
  * Custom hook for authentication flow management
@@ -21,6 +22,7 @@ const useAuthFlow = () => {
   } = useAuth();
 
   const budgetStore = useBudgetStore();
+  const { showSuccessToast, showErrorToast } = useToastHelpers();
 
   const handleSetup = useCallback(
     async (userData) => {
@@ -59,11 +61,11 @@ const useAuthFlow = () => {
           }
         } else {
           console.error("❌ Setup failed:", result.error);
-          alert(`Setup failed: ${result.error}`);
+          showErrorToast(`Setup failed: ${result.error}`, "Account Setup Failed");
         }
       } catch (error) {
         console.error("❌ Setup error:", error);
-        alert(`Setup error: ${error.message}`);
+        showErrorToast(`Setup error: ${error.message}`, "Setup Error");
       }
     },
     [login, budgetStore]
@@ -77,9 +79,9 @@ const useAuthFlow = () => {
     async (oldPass, newPass) => {
       const result = await changePassword(oldPass, newPass);
       if (!result.success) {
-        alert(`Password change failed: ${result.error}`);
+        showErrorToast(`Password change failed: ${result.error}`, "Password Change Failed");
       } else {
-        alert("Password updated successfully.");
+        showSuccessToast("Password updated successfully", "Password Changed");
       }
     },
     [changePassword]
