@@ -1,5 +1,5 @@
 import React from "react";
-import { DollarSign, TrendingDown, Percent, AlertTriangle } from "lucide-react";
+import { DollarSign, TrendingDown, Percent, AlertTriangle, Calendar } from "lucide-react";
 
 /**
  * Debt overview summary cards
@@ -31,10 +31,19 @@ const DebtSummaryCards = ({ stats }) => {
       color: "purple",
       subtext: "Weighted by balance",
     },
+    {
+      key: "due-soon",
+      icon: Calendar,
+      label: "Due Soon",
+      value: `$${stats.dueSoonAmount.toFixed(2)}`,
+      color: "yellow",
+      subtext: `${stats.dueSoonCount} payments this week`,
+      alert: stats.dueSoonCount > 0,
+    },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {cards.map((card) => (
         <DebtSummaryCard
           key={card.key}

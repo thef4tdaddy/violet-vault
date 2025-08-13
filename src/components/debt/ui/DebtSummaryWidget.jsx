@@ -1,16 +1,13 @@
 import React from "react";
-import { TrendingDown, AlertTriangle, Calendar, ArrowRight } from "lucide-react";
+import { TrendingDown, ArrowRight } from "lucide-react";
 import { useDebtManagement } from "../../../hooks/useDebtManagement";
 
 /**
  * Small debt summary widget for dashboard
- * Shows key debt metrics and upcoming payments
+ * Shows key debt metrics
  */
 const DebtSummaryWidget = ({ onNavigateToDebts }) => {
-  const { debtStats, getUpcomingPayments } = useDebtManagement();
-
-  const upcomingPayments = getUpcomingPayments(7); // Next 7 days
-  const hasUpcomingPayments = upcomingPayments.length > 0;
+  const { debtStats } = useDebtManagement();
 
   // Don't show widget if no debts exist
   if (debtStats.totalDebtCount === 0) {
@@ -67,27 +64,6 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
           </div>
         )}
 
-        {/* Upcoming Payments Alert */}
-        {hasUpcomingPayments && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-            <div className="flex items-start">
-              <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 mr-2" />
-              <div>
-                <p className="text-sm font-medium text-amber-800">
-                  {upcomingPayments.length} Payment
-                  {upcomingPayments.length > 1 ? "s" : ""} Due
-                </p>
-                <p className="text-xs text-amber-600 mt-1">
-                  Next 7 days • $
-                  {upcomingPayments
-                    .reduce((sum, debt) => sum + (debt.minimumPayment || 0), 0)
-                    .toFixed(2)}{" "}
-                  total
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Quick Stats */}
         <div className="flex justify-between text-xs text-gray-600 pt-2 border-t border-gray-100">
