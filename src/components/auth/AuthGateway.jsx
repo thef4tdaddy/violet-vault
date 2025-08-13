@@ -83,7 +83,7 @@ const AuthGateway = ({ onSetupComplete, onLocalOnlyReady }) => {
   // Mode selection for new users
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="glassmorphism rounded-2xl w-full max-w-2xl border border-white/30 shadow-2xl overflow-hidden">
+      <div className="glassmorphism rounded-2xl w-full max-w-2xl border-2 border-black shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 p-6 border-b border-white/20 text-center">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to VioletVault</h1>

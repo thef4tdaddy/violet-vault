@@ -21,7 +21,7 @@ const Header = memo(
     }, []);
     return (
       <div
-        className="rounded-3xl mb-6 py-2 backdrop-blur-md border border-white/20 shadow-2xl ring-1 ring-gray-800/10"
+        className="rounded-3xl mb-6 py-2 backdrop-blur-md border-2 border-black shadow-2xl"
         style={{
           background: "rgba(255, 254, 255, 0.95)", // Using your logo's white #fffeff
           boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",

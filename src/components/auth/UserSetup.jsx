@@ -186,7 +186,7 @@ const UserSetup = ({ onSetupComplete }) => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="glassmorphism rounded-3xl p-8 w-full max-w-md">
+      <div className="glassmorphism rounded-3xl p-8 w-full max-w-md border-2 border-black">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-8">
             <img
