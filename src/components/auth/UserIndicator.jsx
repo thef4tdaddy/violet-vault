@@ -4,10 +4,7 @@ import ProfileSettings from "./ProfileSettings";
 import KeyManagementSettings from "./KeyManagementSettings";
 
 const UserButton = memo(({ onClick, icon: Icon, label }) => (
-  <button
-    onClick={onClick}
-    className="btn btn-secondary flex items-center rounded-xl"
-  >
+  <button onClick={onClick} className="btn btn-secondary flex items-center rounded-xl">
     {Icon && <Icon className="h-4 w-4 mr-2" />}
     {label}
   </button>
@@ -36,17 +33,9 @@ const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
           <ChevronDown className="h-4 w-4 text-gray-500 ml-2" />
         </div>
 
-        <UserButton
-          onClick={() => setShowProfileModal(true)}
-          icon={Settings}
-          label="Profile"
-        />
+        <UserButton onClick={() => setShowProfileModal(true)} icon={Settings} label="Profile" />
 
-        <UserButton
-          onClick={() => setShowKeyManagement(true)}
-          icon={Key}
-          label="Backup Key"
-        />
+        <UserButton onClick={() => setShowKeyManagement(true)} icon={Key} label="Backup Key" />
 
         <UserButton onClick={onUserChange} label="Switch User" />
       </div>

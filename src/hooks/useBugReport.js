@@ -16,16 +16,15 @@ const useBugReport = () => {
     try {
       // Check if we're on mobile - use simpler approach
       const isMobile =
-        /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent,
-        ) || window.innerWidth <= 768;
+        /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        window.innerWidth <= 768;
 
       // Add timeout to prevent indefinite hanging
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(
           () => reject(new Error("Screenshot capture timed out")),
-          isMobile ? 10000 : 15000,
-        ),
+          isMobile ? 10000 : 15000
+        )
       );
 
       // Dynamic import to avoid bundle size issues
@@ -113,10 +112,7 @@ const useBugReport = () => {
       // Race between screenshot capture and timeout
       const canvas = await Promise.race([screenshotPromise, timeoutPromise]);
 
-      const screenshotDataUrl = canvas.toDataURL(
-        "image/png",
-        isMobile ? 0.5 : 0.7,
-      );
+      const screenshotDataUrl = canvas.toDataURL("image/png", isMobile ? 0.5 : 0.7);
       setScreenshot(screenshotDataUrl);
       return screenshotDataUrl;
     } catch (error) {
@@ -133,11 +129,7 @@ const useBugReport = () => {
 
     // Add overall timeout to prevent infinite hanging
     const timeoutPromise = new Promise(
-      (_, reject) =>
-        setTimeout(
-          () => reject(new Error("Bug report submission timed out")),
-          30000,
-        ), // 30 second timeout
+      (_, reject) => setTimeout(() => reject(new Error("Bug report submission timed out")), 30000) // 30 second timeout
     );
 
     const submissionPromise = async () => {
@@ -150,7 +142,7 @@ const useBugReport = () => {
           } catch (screenshotError) {
             console.warn(
               "Screenshot capture failed, proceeding without screenshot:",
-              screenshotError,
+              screenshotError
             );
             screenshotData = null;
           }
@@ -182,25 +174,19 @@ const useBugReport = () => {
 
           // Detect current page/component
           let currentPage = "unknown";
-          if (path.includes("/debt") || hash.includes("debt"))
-            currentPage = "debt";
+          if (path.includes("/debt") || hash.includes("debt")) currentPage = "debt";
           else if (path.includes("/envelope") || hash.includes("envelope"))
             currentPage = "envelope";
-          else if (
-            path.includes("/transaction") ||
-            hash.includes("transaction")
-          )
+          else if (path.includes("/transaction") || hash.includes("transaction"))
             currentPage = "transaction";
-          else if (path.includes("/savings") || hash.includes("savings"))
-            currentPage = "savings";
+          else if (path.includes("/savings") || hash.includes("savings")) currentPage = "savings";
           else if (path.includes("/analytics") || hash.includes("analytics"))
             currentPage = "analytics";
-          else if (path === "/" || path === "" || hash === "#/")
-            currentPage = "dashboard";
+          else if (path === "/" || path === "" || hash === "#/") currentPage = "dashboard";
 
           // Try to detect active component from DOM classes/attributes
           const activeElements = document.querySelectorAll(
-            '[data-active="true"], .active, [aria-current="page"]',
+            '[data-active="true"], .active, [aria-current="page"]'
           );
           const componentHints = Array.from(activeElements)
             .map((el) => el.textContent?.toLowerCase().trim())
@@ -208,15 +194,13 @@ const useBugReport = () => {
 
           // Get additional verbose context about the current screen
           const getScreenTitle = () => {
-            const titleElement = document.querySelector(
-              "h1, h2, .page-title, [data-page-title]",
-            );
+            const titleElement = document.querySelector("h1, h2, .page-title, [data-page-title]");
             return titleElement?.textContent?.trim() || "Unknown Screen";
           };
 
           const getActiveButtons = () => {
             const buttons = document.querySelectorAll(
-              'button:not([disabled]), [role="button"]:not([disabled])',
+              'button:not([disabled]), [role="button"]:not([disabled])'
             );
             return Array.from(buttons)
               .map((btn) => btn.textContent?.trim())
@@ -225,15 +209,11 @@ const useBugReport = () => {
           };
 
           const getVisibleModals = () => {
-            const modals = document.querySelectorAll(
-              '[role="dialog"], .modal, [data-modal]',
-            );
+            const modals = document.querySelectorAll('[role="dialog"], .modal, [data-modal]');
             return Array.from(modals)
               .filter((modal) => modal.offsetParent !== null) // Only visible modals
               .map((modal) => {
-                const title = modal.querySelector(
-                  "h1, h2, h3, .modal-title, [data-modal-title]",
-                );
+                const title = modal.querySelector("h1, h2, h3, .modal-title, [data-modal-title]");
                 return title?.textContent?.trim() || "Untitled Modal";
               })
               .slice(0, 3);
@@ -393,10 +373,7 @@ const useBugReport = () => {
         if (import.meta.env.MODE === "development") {
           console.log("🔧 Started Highlight.io session for bug report");
         }
-      } else if (
-        typeof H.start === "function" &&
-        typeof H.isRecording !== "function"
-      ) {
+      } else if (typeof H.start === "function" && typeof H.isRecording !== "function") {
         // Fallback for older SDK versions that don't have isRecording
         H.start();
         if (import.meta.env.MODE === "development") {
@@ -435,9 +412,7 @@ const useBugReport = () => {
           `);
         } else {
           // Popup blocked or failed
-          console.warn(
-            "Failed to open screenshot preview - popup may be blocked",
-          );
+          console.warn("Failed to open screenshot preview - popup may be blocked");
           // Could set screenshot to show inline preview instead
           setScreenshot(screenshotData);
         }

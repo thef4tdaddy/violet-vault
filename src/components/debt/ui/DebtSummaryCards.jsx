@@ -103,9 +103,7 @@ const DebtSummaryCard = ({
             <p className="text-sm font-semibold text-gray-600 mb-1">{label}</p>
             {alert && <AlertTriangle className="h-3 w-3 ml-2 text-amber-500" />}
           </div>
-          <p className={`text-2xl font-bold ${textColorClasses[color]}`}>
-            {value}
-          </p>
+          <p className={`text-2xl font-bold ${textColorClasses[color]}`}>{value}</p>
           {subtext && <p className="text-xs text-gray-500 mt-1">{subtext}</p>}
         </div>
       </div>
