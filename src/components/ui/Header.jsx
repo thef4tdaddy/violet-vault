@@ -3,32 +3,18 @@ import { Settings, Monitor } from "lucide-react";
 import UserIndicator from "../auth/UserIndicator";
 import logoWithText from "../../assets/Shield Text Logo.webp";
 import LocalOnlyModeSettings from "../auth/LocalOnlyModeSettings";
-import SettingsDashboard from "../settings/SettingsDashboard";
-import { useBudgetStore } from "../../stores/budgetStore";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
 const Header = memo(
   ({
-    onExport,
-    onImport,
-    onLogout,
-    onResetEncryption,
-    onSync,
-    onChangePassword,
     currentUser,
     onUserChange,
     onUpdateProfile,
     isLocalOnlyMode = false,
-    securityManager,
-    onShowSecuritySettings,
+    onShowSettings,
   }) => {
-    const [showSettingsModal, setShowSettingsModal] = useState(false);
     const [showLocalOnlySettings, setShowLocalOnlySettings] = useState(false);
-
-    const handleToggleSettingsModal = useCallback(() => {
-      setShowSettingsModal((prev) => !prev);
-    }, []);
 
     const handleToggleLocalOnlySettings = useCallback(() => {
       setShowLocalOnlySettings((prev) => !prev);
@@ -93,7 +79,7 @@ const Header = memo(
 
             <div className="flex gap-2 sm:gap-3 items-center justify-center flex-wrap">
               <button
-                onClick={handleToggleSettingsModal}
+                onClick={onShowSettings}
                 className="btn btn-primary flex items-center rounded-2xl px-3 sm:px-4 py-2 text-sm font-medium hover:shadow-lg transition-all"
                 title="Open Settings Dashboard"
               >
@@ -104,23 +90,6 @@ const Header = memo(
           </div>
         </div>
 
-        {showSettingsModal && (
-          <SettingsDashboard
-            isOpen={showSettingsModal}
-            onClose={handleToggleSettingsModal}
-            onExport={onExport}
-            onImport={onImport}
-            onLogout={onLogout}
-            onResetEncryption={onResetEncryption}
-            onSync={onSync}
-            onChangePassword={onChangePassword}
-            currentUser={currentUser}
-            onUserChange={onUserChange}
-            onUpdateProfile={onUpdateProfile}
-            isLocalOnlyMode={isLocalOnlyMode}
-            securityManager={securityManager}
-          />
-        )}
 
         {showLocalOnlySettings && (
           <LocalOnlyModeSettings
