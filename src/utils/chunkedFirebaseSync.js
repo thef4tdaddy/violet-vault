@@ -27,7 +27,7 @@ class ChunkedFirebaseSync {
   constructor() {
     this.budgetId = null;
     this.encryptionKey = null;
-    this.maxChunkSize = 800 * 1024; // 800KB target size (Firestore limit is 1MB, leaving room for encryption overhead)
+    this.maxChunkSize = 400 * 1024; // 400KB target size (Firestore limit is 1MB, need significant room for encryption overhead)
     this.chunkSizeThreshold = 0.8; // Trigger re-chunking at 80% of max size
     this.isAuthenticated = false;
     this.authPromise = null;
@@ -133,9 +133,11 @@ class ChunkedFirebaseSync {
     };
     const baseSize = this.calculateSize(baseChunkStructure);
 
-    // Reserve extra space for encryption overhead (empirically observed ~100% overhead)
-    const encryptionOverheadMultiplier = 2.2; // Conservative estimate based on real data
-    const effectiveMaxSize = Math.floor(this.maxChunkSize / encryptionOverheadMultiplier);
+    // Reserve extra space for encryption overhead AND final document metadata
+    // We need to be extremely conservative: raw data -> JSON -> encryption -> final doc structure
+    const FIREBASE_MAX_SIZE = 1048576; // Firebase's actual 1MB limit
+    const encryptionOverheadMultiplier = 4.0; // Very aggressive to account for encryption + metadata
+    const effectiveMaxSize = Math.floor(FIREBASE_MAX_SIZE / encryptionOverheadMultiplier);
 
     for (const item of array) {
       const itemSize = this.calculateSize(item);
@@ -260,12 +262,14 @@ class ChunkedFirebaseSync {
             lastModified: Date.now(),
           };
 
-          // Verify chunk size is within limit
+          // Verify chunk size is within Firebase's 1MB limit
           const chunkSize = this.calculateSize(chunkDoc);
-          if (chunkSize > this.maxChunkSize) {
-            console.error(`❌ Chunk ${chunkId} exceeds size limit:`, {
+          const FIREBASE_MAX_SIZE = 1048576; // Firebase's actual 1MB limit
+          if (chunkSize > FIREBASE_MAX_SIZE) {
+            console.error(`❌ Chunk ${chunkId} exceeds Firebase size limit:`, {
               actualSizeKB: Math.round(chunkSize / 1024),
-              maxSizeKB: Math.round(this.maxChunkSize / 1024),
+              firebaseLimitKB: Math.round(FIREBASE_MAX_SIZE / 1024),
+              targetMaxSizeKB: Math.round(this.maxChunkSize / 1024),
               chunkType: fieldName,
               chunkIndex: i,
               itemsInChunk: chunks[i].length,
