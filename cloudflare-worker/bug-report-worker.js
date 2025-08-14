@@ -424,7 +424,7 @@ async function getReleasePleaseInfo(env) {
     const latestRelease = releases.find((release) => !release.prerelease);
     const currentVersion = latestRelease
       ? latestRelease.tag_name.replace(/^v/, "")
-      : "1.6.1";
+      : "1.8.0";
 
     // If no release PR found, increment the current version
     if (!nextVersion) {

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { H } from "../utils/highlight.js";
+import { APP_VERSION } from "../utils/version";
 
 /**
  * Custom hook for bug report functionality
@@ -446,7 +447,7 @@ const useBugReport = () => {
             userAgent: navigator.userAgent,
             url: window.location.href,
             timestamp: new Date().toISOString(),
-            appVersion: import.meta.env.VITE_APP_VERSION || "1.6.1",
+            appVersion: APP_VERSION,
             viewport: `${window.innerWidth}x${window.innerHeight}`,
             referrer: document.referrer || "direct",
             pageContext: getCurrentPageContext(), // Enhanced context for smart labeling
