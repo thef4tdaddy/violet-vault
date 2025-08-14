@@ -91,16 +91,16 @@ const NavButton = memo(({ active, onClick, icon: _Icon, label }) => (
         ? "border-t-2 lg:border-b-2 border-purple-500 text-purple-600 bg-purple-50/50 border-purple-400 ring-1 ring-purple-300"
         : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30 hover:border-purple-200"
     }`}
-    style={{ minWidth: "70px" }} // Increase minimum tap target and prevent clipping
+    style={{ minWidth: "75px" }} // Increase minimum tap target and prevent clipping
   >
     <_Icon className="h-4 w-4 mb-1 lg:mb-0 lg:mr-2 flex-shrink-0" />
     <span className="text-center lg:text-left leading-tight">
       {/* Responsive label display with better text truncation */}
       <span className="hidden lg:inline truncate">{label}</span>
       {/* Medium screens (tablets) - show abbreviated labels for long words */}
-      <span className="hidden md:inline lg:hidden text-xs truncate">
+      <span className="hidden md:inline lg:hidden text-xs truncate max-w-[60px] overflow-hidden">
         {label === "Supplemental"
-          ? "Suppl"
+          ? "Extra"
           : label === "Analytics"
             ? "Stats"
             : label === "Debt Tracking"
@@ -114,12 +114,20 @@ const NavButton = memo(({ active, onClick, icon: _Icon, label }) => (
                     : label.split(" ")[0]}
       </span>
       {/* Small screens - show optimized short labels */}
-      <span className="md:hidden text-xs truncate">
+      <span className="md:hidden text-xs truncate max-w-[50px] overflow-hidden whitespace-nowrap">
         {label === "Supplemental"
-          ? "Supp"
+          ? "Extra"
           : label === "Analytics"
             ? "Chart"
-            : label.split(" ")[0]}
+            : label === "Add Paycheck"
+              ? "Pay"
+              : label === "Manage Bills"
+                ? "Bills"
+                : label === "Savings Goals"
+                  ? "Save"
+                  : label === "Debt Tracking"
+                    ? "Debt"
+                    : label.split(" ")[0]}
       </span>
     </span>
   </button>
