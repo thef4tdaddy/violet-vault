@@ -9,7 +9,6 @@ import {
   getIconNameForStorage,
 } from "../../utils/billIcons";
 import {
-  toBiweekly,
   toMonthly,
   getFrequencyOptions,
 } from "../../utils/frequencyCalculations";
