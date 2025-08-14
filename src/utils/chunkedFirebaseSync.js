@@ -136,7 +136,7 @@ class ChunkedFirebaseSync {
     // Reserve extra space for encryption overhead AND final document metadata
     // We need to be extremely conservative: raw data -> JSON -> encryption -> final doc structure
     const FIREBASE_MAX_SIZE = 1048576; // Firebase's actual 1MB limit
-    const encryptionOverheadMultiplier = 5.0; // Even more aggressive to account for encryption + metadata
+    const encryptionOverheadMultiplier = 12.0; // Extremely aggressive - real overhead is 10x+
     const effectiveMaxSize = Math.floor(FIREBASE_MAX_SIZE / encryptionOverheadMultiplier);
 
     console.log(
