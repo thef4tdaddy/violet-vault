@@ -49,8 +49,13 @@ const usePasswordRotation = () => {
       }
 
       const { encryptedData, iv } = JSON.parse(savedData);
-      const decrypted = await encryptionUtils.decrypt(encryptedData, encryptionKey, iv);
-      const { key, salt: newSalt } = await encryptionUtils.generateKey(newPassword);
+      const decrypted = await encryptionUtils.decrypt(
+        encryptedData,
+        encryptionKey,
+        iv,
+      );
+      const { key, salt: newSalt } =
+        await encryptionUtils.generateKey(newPassword);
       const reencrypted = await encryptionUtils.encrypt(decrypted, key);
 
       const saveData = {
@@ -70,10 +75,16 @@ const usePasswordRotation = () => {
       setRotationDue(false);
       setNewPassword("");
       setConfirmPassword("");
-      showSuccessToast("Your password has been successfully updated", "Password Updated");
+      showSuccessToast(
+        "Your password has been successfully updated",
+        "Password Updated",
+      );
     } catch (error) {
       console.error("Failed to change password:", error);
-      showErrorToast(`Failed to change password: ${error.message}`, "Password Update Failed");
+      showErrorToast(
+        `Failed to change password: ${error.message}`,
+        "Password Update Failed",
+      );
     }
   }, [newPassword, confirmPassword, encryptionKey]);
 

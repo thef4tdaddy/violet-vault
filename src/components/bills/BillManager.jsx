@@ -91,7 +91,6 @@ const BillManager = ({
     [propEnvelopes, tanStackEnvelopes, budget.envelopes],
   );
 
-
   const [selectedBills, setSelectedBills] = useState(new Set());
   const [viewMode, setViewMode] = useState("upcoming");
   const [isSearching, setIsSearching] = useState(false);

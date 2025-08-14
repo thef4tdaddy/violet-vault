@@ -25,7 +25,7 @@ const useFirebaseSync = (
     if (!firebaseSync || !budgetId || !encryptionKey || !currentUser) return;
 
     console.log("🔄 Auto-initializing chunked Firebase sync...");
-    
+
     // Start the cloud sync service with config
     const config = {
       budgetId,
@@ -42,13 +42,13 @@ const useFirebaseSync = (
         if (syncResult && syncResult.success) {
           console.log("✅ Chunked sync completed:", syncResult);
           showSuccessToast("Data synced from cloud successfully");
-          
+
           // The cloudSyncService handles syncing data to Dexie automatically
           // TanStack Query will pick up the changes from Dexie
-          
+
           // Update non-Dexie Zustand state if needed
           // These would need to be handled separately since they're not in Dexie
-          
+
           console.log("🔄 Chunked Firebase → Dexie sync completed");
         }
       } catch (error) {
@@ -73,7 +73,7 @@ const useFirebaseSync = (
       encryptionKey,
       currentUser,
     };
-    
+
     // Make sure service is started (idempotent)
     if (!firebaseSync.isRunning) {
       firebaseSync.start(config);
@@ -105,10 +105,10 @@ const useFirebaseSync = (
   const handleManualSync = useCallback(async () => {
     try {
       if (!firebaseSync) return;
-      
+
       console.log("🔄 Manual sync triggered...");
       const result = await firebaseSync.forceSync();
-      
+
       if (result && result.success) {
         showSuccessToast("Manual sync completed successfully");
         console.log("✅ Manual sync completed:", result);

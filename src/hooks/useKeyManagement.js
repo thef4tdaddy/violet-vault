@@ -36,7 +36,11 @@ export const useKeyManagement = () => {
         throw new Error("No encryption key available - please login first");
       }
 
-      const keyData = await keyExportUtils.exportKeyData(encryptionKey, salt, budgetId);
+      const keyData = await keyExportUtils.exportKeyData(
+        encryptionKey,
+        salt,
+        budgetId,
+      );
       logger.debug("Key exported successfully", {
         fingerprint: keyData.fingerprint.substring(0, 8),
         budgetId: keyData.budgetId,
@@ -69,7 +73,7 @@ export const useKeyManagement = () => {
         const keyData = await exportKey();
         const protectedKeyFile = await keyExportUtils.createProtectedKeyFile(
           keyData,
-          exportPassword
+          exportPassword,
         );
 
         logger.debug("Protected key file created successfully");
@@ -83,7 +87,7 @@ export const useKeyManagement = () => {
         setLoading(false);
       }
     },
-    [exportKey]
+    [exportKey],
   );
 
   /**
@@ -96,7 +100,10 @@ export const useKeyManagement = () => {
         setError(null);
 
         const keyData = await exportKey();
-        await keyExportUtils.exportToClipboard(keyData, clearAfterSeconds * 1000);
+        await keyExportUtils.exportToClipboard(
+          keyData,
+          clearAfterSeconds * 1000,
+        );
 
         logger.debug("Key copied to clipboard", {
           clearAfterSeconds,
@@ -117,7 +124,7 @@ export const useKeyManagement = () => {
         setLoading(false);
       }
     },
-    [exportKey]
+    [exportKey],
   );
 
   /**
@@ -147,7 +154,7 @@ export const useKeyManagement = () => {
         setLoading(false);
       }
     },
-    [exportKey]
+    [exportKey],
   );
 
   /**
@@ -173,7 +180,7 @@ export const useKeyManagement = () => {
         setLoading(false);
       }
     },
-    [exportProtectedKey]
+    [exportProtectedKey],
   );
 
   /**
@@ -223,7 +230,10 @@ export const useKeyManagement = () => {
         if (!importPassword) {
           throw new Error("Password required to import protected key file");
         }
-        importedKeyData = await keyExportUtils.importProtectedKeyFile(keyFileData, importPassword);
+        importedKeyData = await keyExportUtils.importProtectedKeyFile(
+          keyFileData,
+          importPassword,
+        );
       } else {
         importedKeyData = await keyExportUtils.importKeyData(keyFileData);
       }
@@ -275,7 +285,9 @@ export const useKeyManagement = () => {
         });
 
         if (!loginResult.success) {
-          throw new Error("Failed to login with imported key - password may be incorrect");
+          throw new Error(
+            "Failed to login with imported key - password may be incorrect",
+          );
         }
 
         logger.debug("Import and login successful", {
@@ -297,7 +309,7 @@ export const useKeyManagement = () => {
         setLoading(false);
       }
     },
-    [importKey, login]
+    [importKey, login],
   );
 
   /**
@@ -309,7 +321,8 @@ export const useKeyManagement = () => {
         throw new Error("No encryption key available");
       }
 
-      const fingerprint = await keyExportUtils.generateKeyFingerprint(encryptionKey);
+      const fingerprint =
+        await keyExportUtils.generateKeyFingerprint(encryptionKey);
       return fingerprint;
     } catch (err) {
       logger.error("Failed to get key fingerprint", err);
@@ -336,7 +349,7 @@ export const useKeyManagement = () => {
         throw new Error(`Key verification failed: ${err.message}`);
       }
     },
-    [getCurrentKeyFingerprint, importKey]
+    [getCurrentKeyFingerprint, importKey],
   );
 
   return {

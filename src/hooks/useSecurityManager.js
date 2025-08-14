@@ -32,12 +32,18 @@ export const useSecurityManager = () => {
 
   // Save settings to localStorage when changed
   useEffect(() => {
-    localStorage.setItem("violetVault_securitySettings", JSON.stringify(securitySettings));
+    localStorage.setItem(
+      "violetVault_securitySettings",
+      JSON.stringify(securitySettings),
+    );
   }, [securitySettings]);
 
   // Save security events to localStorage
   useEffect(() => {
-    localStorage.setItem("violetVault_securityEvents", JSON.stringify(securityEvents));
+    localStorage.setItem(
+      "violetVault_securityEvents",
+      JSON.stringify(securityEvents),
+    );
   }, [securityEvents]);
 
   /**
@@ -51,7 +57,10 @@ export const useSecurityManager = () => {
         // Safely extract only the primitive values from event to avoid circular references
         const safeEvent = {
           type: typeof event.type === "string" ? event.type : "UNKNOWN",
-          description: typeof event.description === "string" ? event.description : "Security event",
+          description:
+            typeof event.description === "string"
+              ? event.description
+              : "Security event",
         };
 
         // Safely serialize metadata to avoid circular references
@@ -83,7 +92,7 @@ export const useSecurityManager = () => {
                     typeof item === "number" ||
                     typeof item === "boolean" ||
                     item === null ||
-                    item === undefined
+                    item === undefined,
                 );
                 if (safeArray.length > 0) {
                   safeMetadata[key] = safeArray;
@@ -114,13 +123,16 @@ export const useSecurityManager = () => {
                   // Object has issues, skip it
                   console.debug(
                     `Skipping problematic object for key: ${key}`,
-                    serializeError.message
+                    serializeError.message,
                   );
                 }
               }
             } catch (err) {
               // Skip non-serializable values
-              console.warn(`Skipping non-serializable metadata key: ${key}`, err);
+              console.warn(
+                `Skipping non-serializable metadata key: ${key}`,
+                err,
+              );
             }
           });
         }
@@ -139,7 +151,7 @@ export const useSecurityManager = () => {
         } catch (finalSerializeError) {
           console.warn(
             "Security event contains non-serializable data, using minimal version",
-            finalSerializeError
+            finalSerializeError,
           );
           // Use minimal version if serialization fails
           const minimalEvent = {
@@ -151,7 +163,8 @@ export const useSecurityManager = () => {
               userAgent: navigator.userAgent,
               timestamp: Date.now(),
               url: window.location.href,
-              serializationError: "Original event contained circular references",
+              serializationError:
+                "Original event contained circular references",
             },
           };
 
@@ -192,7 +205,7 @@ export const useSecurityManager = () => {
         }
       }
     },
-    [securitySettings.securityLoggingEnabled]
+    [securitySettings.securityLoggingEnabled],
   );
 
   /**
@@ -272,7 +285,7 @@ export const useSecurityManager = () => {
         setIsLocked(true);
       }
     },
-    [logSecurityEvent]
+    [logSecurityEvent],
   );
 
   /**
@@ -283,7 +296,9 @@ export const useSecurityManager = () => {
       try {
         // Check if validatePassword function exists
         if (!budget.validatePassword) {
-          console.warn("validatePassword function not available on budget store");
+          console.warn(
+            "validatePassword function not available on budget store",
+          );
           return { success: false, error: "Security validation not available" };
         }
 
@@ -323,7 +338,7 @@ export const useSecurityManager = () => {
         return { success: false, error: "Unlock failed" };
       }
     },
-    [budget, updateActivity, logSecurityEvent]
+    [budget, updateActivity, logSecurityEvent],
   );
 
   /**
@@ -367,7 +382,7 @@ export const useSecurityManager = () => {
         return { success: false, error: "Failed to copy to clipboard" };
       }
     },
-    [securitySettings.clipboardClearTimeout, logSecurityEvent]
+    [securitySettings.clipboardClearTimeout, logSecurityEvent],
   );
 
   /**
@@ -391,7 +406,7 @@ export const useSecurityManager = () => {
         return newSettings;
       });
     },
-    [logSecurityEvent]
+    [logSecurityEvent],
   );
 
   /**
@@ -438,7 +453,14 @@ export const useSecurityManager = () => {
 
   // Set up activity listeners
   useEffect(() => {
-    const events = ["mousedown", "mousemove", "keypress", "scroll", "touchstart", "click"];
+    const events = [
+      "mousedown",
+      "mousemove",
+      "keypress",
+      "scroll",
+      "touchstart",
+      "click",
+    ];
 
     const activityHandler = () => {
       updateActivity();
@@ -466,7 +488,8 @@ export const useSecurityManager = () => {
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, [securitySettings.lockOnPageHide, lockApp, updateActivity]);
 
   // Start/stop auto-lock timer based on settings
@@ -478,7 +501,12 @@ export const useSecurityManager = () => {
     }
 
     return stopAutoLockTimer;
-  }, [securitySettings.autoLockEnabled, isLocked, startAutoLockTimer, stopAutoLockTimer]);
+  }, [
+    securitySettings.autoLockEnabled,
+    isLocked,
+    startAutoLockTimer,
+    stopAutoLockTimer,
+  ]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -514,7 +542,8 @@ export const useSecurityManager = () => {
       timeUntilAutoLock: securitySettings.autoLockEnabled
         ? Math.max(
             0,
-            securitySettings.autoLockTimeout * 60 * 1000 - (Date.now() - lastActivityRef.current)
+            securitySettings.autoLockTimeout * 60 * 1000 -
+              (Date.now() - lastActivityRef.current),
           )
         : null,
     }),
