@@ -8,6 +8,7 @@ import {
   DollarSign,
   AlertTriangle,
   Target,
+  X,
 } from "lucide-react";
 import { useDebtManagement } from "../../hooks/useDebtManagement";
 import DebtSummaryCards from "./ui/DebtSummaryCards";
@@ -42,6 +43,7 @@ const DebtDashboard = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedDebt, setSelectedDebt] = useState(null);
   const [editingDebt, setEditingDebt] = useState(null);
+  const [showUpcomingPaymentsModal, setShowUpcomingPaymentsModal] = useState(false);
   const [filterOptions, setFilterOptions] = useState({
     type: "all", // all, mortgage, auto, credit_card, etc.
     status: "all", // all, active, paid_off, etc.
@@ -203,7 +205,10 @@ const DebtDashboard = () => {
       {activeTab === "overview" && (
         <>
           {/* Summary Cards */}
-          <DebtSummaryCards stats={debtStats} />
+          <DebtSummaryCards 
+            stats={debtStats}
+            onDueSoonClick={() => setShowUpcomingPaymentsModal(true)}
+          />
 
           {/* Filters and Controls */}
           <DebtFilters
@@ -213,38 +218,6 @@ const DebtDashboard = () => {
             debtsByType={debtsByType}
           />
 
-          {/* Upcoming Payments Alert */}
-          {upcomingPayments.length > 0 && (
-            <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
-              <div className="flex items-start">
-                <AlertTriangle className="h-5 w-5 text-orange-600 mt-0.5 mr-3" />
-                <div>
-                  <h4 className="font-medium text-orange-800">
-                    Upcoming Payments ({upcomingPayments.length})
-                  </h4>
-                  <p className="text-sm text-orange-600 mt-1">
-                    You have {upcomingPayments.length} debt payments due in the next 30 days.
-                  </p>
-                  <div className="flex gap-2 mt-2">
-                    {upcomingPayments.slice(0, 3).map((debt) => (
-                      <span
-                        key={debt.id}
-                        className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded cursor-pointer hover:bg-orange-200"
-                        onClick={() => handleDebtClick(debt)}
-                      >
-                        {debt.name}: ${debt.minimumPayment?.toFixed(2)}
-                      </span>
-                    ))}
-                    {upcomingPayments.length > 3 && (
-                      <span className="text-xs text-orange-600">
-                        +{upcomingPayments.length - 3} more
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* Debt List */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 ring-1 ring-gray-800/10">
@@ -310,6 +283,72 @@ const DebtDashboard = () => {
           onLinkToBill={handleLinkToBill}
           onEdit={(debt) => setEditingDebt(debt)}
         />
+      )}
+
+      {/* Upcoming Payments Modal */}
+      {showUpcomingPaymentsModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900">Upcoming Debt Payments</h3>
+                <p className="text-gray-600">Payments due in the next 30 days</p>
+              </div>
+              <button 
+                onClick={() => setShowUpcomingPaymentsModal(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            {upcomingPayments.length === 0 ? (
+              <div className="text-center py-8">
+                <Calendar className="h-12 w-12 mx-auto text-gray-300 mb-4" />
+                <h4 className="text-lg font-medium text-gray-900 mb-2">No Upcoming Payments</h4>
+                <p className="text-gray-500">You have no debt payments due in the next 30 days.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {upcomingPayments.map((debt) => (
+                  <div 
+                    key={debt.id}
+                    className="flex items-center justify-between bg-gray-50 rounded-xl p-4 hover:bg-gray-100 cursor-pointer transition-colors"
+                    onClick={() => {
+                      setShowUpcomingPaymentsModal(false);
+                      handleDebtClick(debt);
+                    }}
+                  >
+                    <div>
+                      <h4 className="font-medium text-gray-900">{debt.name}</h4>
+                      <p className="text-sm text-gray-600">{debt.creditor}</p>
+                      {debt.nextPaymentDate && (
+                        <p className="text-xs text-orange-600">
+                          Due: {new Date(debt.nextPaymentDate).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-red-600">
+                        ${debt.minimumPayment?.toFixed(2) || '0.00'}
+                      </p>
+                      <p className="text-xs text-gray-500">minimum payment</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="flex justify-center mt-6">
+              <button
+                onClick={() => setShowUpcomingPaymentsModal(false)}
+                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
