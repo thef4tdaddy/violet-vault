@@ -8,12 +8,7 @@ import { useToastHelpers } from "../utils/toastHelpers";
  * Custom hook for Firebase synchronization management
  * Extracts sync logic from MainLayout component
  */
-const useFirebaseSync = (
-  firebaseSync,
-  encryptionKey,
-  budgetId,
-  currentUser,
-) => {
+const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => {
   const budget = useBudgetStore();
   const { showSuccessToast, showErrorToast } = useToastHelpers();
   const [activeUsers, setActiveUsers] = useState([]);
@@ -147,12 +142,7 @@ const useFirebaseSync = (
     // Update periodically to catch changes
     const interval = setInterval(updateActivityData, 5000);
     return () => clearInterval(interval);
-  }, [
-    budget,
-    budget.getActiveUsers,
-    budget.getRecentActivity,
-    budget.isSyncing,
-  ]);
+  }, [budget, budget.getActiveUsers, budget.getRecentActivity, budget.isSyncing]);
 
   return {
     activeUsers,
