@@ -76,11 +76,12 @@ const AddBillModal = ({
     if (isOpen) {
       const initialData = getInitialFormData(editingBill);
       const billEnvelopes = availableEnvelopes.filter((env) => {
-        // Check if envelope is suitable for bills - either explicitly marked as "bill" type
-        // or if no type is set (legacy data), allow all envelopes for backwards compatibility
+        // Check if envelope is suitable for bills - allow "bill" and "variable" types
+        // Also allow legacy envelopes with no type set for backwards compatibility
         const isBillEnvelope = env.envelopeType === "bill";
+        const isVariableEnvelope = env.envelopeType === "variable";
         const isLegacyEnvelope = !env.envelopeType;
-        return isBillEnvelope || isLegacyEnvelope;
+        return isBillEnvelope || isVariableEnvelope || isLegacyEnvelope;
       });
 
       logger.debug("Initializing bill modal form data", {
@@ -576,15 +577,17 @@ const AddBillModal = ({
                 <option value="">No envelope (use unassigned cash)</option>
                 {availableEnvelopes
                   .filter((env) => {
-                    // Check if envelope is suitable for bills - either explicitly marked as "bill" type
-                    // or if no type is set (legacy data), allow all envelopes for backwards compatibility
+                    // Check if envelope is suitable for bills - allow "bill" and "variable" types
+                    // Also allow legacy envelopes with no type set for backwards compatibility
                     const isBillEnvelope = env.envelopeType === "bill";
+                    const isVariableEnvelope = env.envelopeType === "variable";
                     const isLegacyEnvelope = !env.envelopeType;
-                    const isAllowed = isBillEnvelope || isLegacyEnvelope;
+                    const isAllowed = isBillEnvelope || isVariableEnvelope || isLegacyEnvelope;
 
                     console.log(`Envelope ${env.name}:`, {
                       envelopeType: env.envelopeType,
                       isBillEnvelope,
+                      isVariableEnvelope,
                       isLegacyEnvelope,
                       isAllowed,
                     });
@@ -607,7 +610,7 @@ const AddBillModal = ({
                 </p>
               )}
               <p className="text-xs text-blue-600 mt-1">
-                Only bill envelopes are available for assignment. Choose which
+                Bill and variable envelopes are available for assignment. Choose which
                 envelope will be used to pay this bill.
               </p>
             </div>
