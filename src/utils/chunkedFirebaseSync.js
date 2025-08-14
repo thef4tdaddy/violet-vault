@@ -25,7 +25,7 @@ class ChunkedFirebaseSync {
   constructor() {
     this.budgetId = null;
     this.encryptionKey = null;
-    this.maxChunkSize = 600 * 1024; // 600KB safety margin (Firestore limit is 1MB)
+    this.maxChunkSize = 350 * 1024; // 350KB to account for encryption overhead (Firestore limit is 1MB)
     this.chunkSizeThreshold = 0.8; // Trigger re-chunking at 80% of max size
   }
 
