@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, lazy, Suspense } from "react";
 import {
   X,
   DollarSign,
@@ -8,59 +8,78 @@ import {
   CheckCircle,
   AlertTriangle,
   Loader2,
+  Clock,
+  Receipt,
 } from "lucide-react";
 import { useBudgetStore } from "../../stores/budgetStore";
 import useUnassignedCashDistribution from "../../hooks/useUnassignedCashDistribution";
+import { ENVELOPE_TYPES } from "../../constants/categories";
+
+const BillEnvelopeFundingInfo = lazy(() => import("../budgeting/BillEnvelopeFundingInfo"));
 
 /**
  * Modal for distributing unassigned cash to envelopes
  * Pure UI component - all logic handled by useUnassignedCashDistribution hook
  */
-const EnvelopeItem = memo(({ envelope, distributionAmount, updateDistribution, isProcessing }) => {
-  const newBalance = (envelope.currentBalance || 0) + distributionAmount;
+const EnvelopeItem = memo(
+  ({ envelope, distributionAmount, updateDistribution, isProcessing, bills = [] }) => {
+    const newBalance = (envelope.currentBalance || 0) + distributionAmount;
+    const isBillEnvelope = envelope.envelopeType === ENVELOPE_TYPES.BILL;
 
-  return (
-    <div className="bg-white border rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0">
-        <div className="flex items-center flex-1">
-          <div
-            className="w-3 h-3 rounded-full mr-3 flex-shrink-0"
-            style={{ backgroundColor: envelope.color }}
-          />
-          <div className="flex-1 min-w-0">
-            <h5 className="font-medium text-gray-900 text-sm truncate">{envelope.name}</h5>
-            <p className="text-xs text-gray-600 truncate">
-              Current: ${(envelope.currentBalance || 0).toFixed(2)}
-              {(envelope.monthlyBudget ?? envelope.monthlyAmount) && (
-                <span className="hidden sm:inline ml-2">
-                  • Budget: ${(envelope.monthlyBudget ?? envelope.monthlyAmount).toFixed(2)}/month
-                </span>
-              )}
-            </p>
-          </div>
-        </div>
+    return (
+      <div className="bg-white border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+        <div className="flex flex-col space-y-3">
+          {/* Main envelope info and input */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0">
+            <div className="flex items-center flex-1">
+              <div
+                className="w-4 h-4 rounded-full mr-3 flex-shrink-0"
+                style={{ backgroundColor: envelope.color }}
+              />
+              <div className="flex-1 min-w-0">
+                <h5 className="font-medium text-gray-900 text-sm truncate">{envelope.name}</h5>
+                <p className="text-xs text-gray-600 truncate">
+                  Current: ${(envelope.currentBalance || 0).toFixed(2)}
+                  {(envelope.monthlyBudget ?? envelope.monthlyAmount) && (
+                    <span className="hidden sm:inline ml-2">
+                      • Budget: ${(envelope.monthlyBudget ?? envelope.monthlyAmount).toFixed(2)}
+                      /month
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
 
-        <div className="flex items-center justify-between sm:justify-end space-x-3">
-          <div className="text-right">
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              value={distributionAmount || ""}
-              onChange={(e) => updateDistribution(envelope.id, e.target.value)}
-              disabled={isProcessing}
-              className="w-20 sm:w-24 px-2 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-              placeholder="0.00"
-            />
-            {distributionAmount > 0 && (
-              <div className="text-xs text-gray-500 mt-1">New: ${newBalance.toFixed(2)}</div>
-            )}
+            <div className="flex items-center justify-between sm:justify-end space-x-3">
+              <div className="text-right">
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={distributionAmount || ""}
+                  onChange={(e) => updateDistribution(envelope.id, e.target.value)}
+                  disabled={isProcessing}
+                  className="w-24 sm:w-28 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-50"
+                  placeholder="0.00"
+                />
+                {distributionAmount > 0 && (
+                  <div className="text-xs text-gray-500 mt-1">New: ${newBalance.toFixed(2)}</div>
+                )}
+              </div>
+            </div>
           </div>
+
+          {/* Bill envelope funding info */}
+          {isBillEnvelope && (
+            <Suspense fallback={<div className="h-16 bg-gray-100 rounded animate-pulse" />}>
+              <BillEnvelopeFundingInfo envelope={envelope} bills={bills} showDetails={false} />
+            </Suspense>
+          )}
         </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
 
 const UnassignedCashModal = () => {
   const { isUnassignedCashModalOpen, closeUnassignedCashModal } = useBudgetStore();
@@ -79,10 +98,12 @@ const UnassignedCashModal = () => {
     clearDistributions,
     distributeEqually,
     distributeProportionally,
+    distributeBillPriority,
     applyDistribution,
 
     // Data
     envelopes,
+    bills,
     unassignedCash,
     getDistributionPreview,
   } = useUnassignedCashDistribution();
@@ -173,6 +194,15 @@ const UnassignedCashModal = () => {
         {/* Quick Actions */}
         <div className="flex flex-wrap gap-2 sm:gap-3 mb-4 sm:mb-6">
           <button
+            onClick={distributeBillPriority}
+            disabled={isProcessing || envelopes.length === 0}
+            className="btn btn-primary flex items-center text-sm disabled:opacity-50"
+            title="Smart distribution based on bill due dates and funding needs"
+          >
+            <Receipt className="h-4 w-4 mr-2" />
+            Smart Bills First
+          </button>
+          <button
             onClick={distributeEqually}
             disabled={isProcessing || envelopes.length === 0}
             className="btn btn-secondary flex items-center text-sm disabled:opacity-50"
@@ -218,6 +248,7 @@ const UnassignedCashModal = () => {
                   distributionAmount={distributions[envelope.id] || 0}
                   updateDistribution={updateDistribution}
                   isProcessing={isProcessing}
+                  bills={bills}
                 />
               ))}
             </div>
