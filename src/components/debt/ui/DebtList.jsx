@@ -77,7 +77,7 @@ const DebtCard = ({ debt, onClick, onRecordPayment }) => {
 
   return (
     <div
-      className={`p-6 hover:bg-gray-50 cursor-pointer transition-colors border-l-4 ${config.borderColor}`}
+      className="p-6 hover:bg-gray-50/50 cursor-pointer transition-all duration-200 border border-gray-200 hover:border-gray-300 rounded-xl hover:shadow-sm"
       onClick={onClick}
     >
       <div className="flex items-center justify-between">
