@@ -68,6 +68,23 @@ class ChunkedFirebaseSync {
             }
           } catch (error) {
             console.error("❌ Firebase authentication failed:", error);
+            
+            // Handle specific auth configuration errors
+            if (error.code === "auth/configuration-not-found") {
+              console.warn("🔧 Firebase Auth configuration issue detected:", {
+                message: "Anonymous authentication may not be enabled in Firebase Console",
+                solution: "Enable Anonymous Authentication in Firebase Console > Authentication > Sign-in method",
+                projectId: this.config?.projectId || "unknown",
+              });
+              
+              // Don't fail completely - allow app to work in local-only mode
+              console.log("📱 Continuing in local-only mode without cloud sync");
+              this.isAuthenticated = false;
+              unsubscribe();
+              resolve(false); // Resolve with false instead of rejecting
+              return;
+            }
+            
             unsubscribe();
             reject(error);
           }
@@ -182,7 +199,11 @@ class ChunkedFirebaseSync {
     }
 
     // Ensure user is authenticated before any Firestore operations
-    await this.ensureAuthenticated();
+    const isAuthenticated = await this.ensureAuthenticated();
+    if (!isAuthenticated) {
+      console.log("⚠️ Skipping cloud save - Firebase Auth not available");
+      return { success: false, error: "Firebase authentication unavailable", localOnly: true };
+    }
 
     try {
       console.log("🌩️ Starting chunked save to cloud...");
@@ -327,7 +348,11 @@ class ChunkedFirebaseSync {
     }
 
     // Ensure user is authenticated before any Firestore operations
-    await this.ensureAuthenticated();
+    const isAuthenticated = await this.ensureAuthenticated();
+    if (!isAuthenticated) {
+      console.log("⚠️ Skipping cloud load - Firebase Auth not available");
+      return { data: null, localOnly: true };
+    }
 
     try {
       console.log("🌩️ Starting chunked load from cloud...");
@@ -426,7 +451,11 @@ class ChunkedFirebaseSync {
     }
 
     // Ensure user is authenticated before any Firestore operations
-    await this.ensureAuthenticated();
+    const isAuthenticated = await this.ensureAuthenticated();
+    if (!isAuthenticated) {
+      console.log("⚠️ Skipping cloud reset - Firebase Auth not available");
+      return { success: false, error: "Firebase authentication unavailable", localOnly: true };
+    }
 
     try {
       console.log("🗑️ Cleaning up old cloud data...");
