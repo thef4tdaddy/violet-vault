@@ -32,7 +32,9 @@ const useAuthFlow = () => {
         const { encryptionUtils } = await import("../utils/encryption");
         const userDataWithId = {
           ...userData,
-          budgetId: userData.budgetId || encryptionUtils.generateBudgetId(userData.password),
+          budgetId:
+            userData.budgetId ||
+            encryptionUtils.generateBudgetId(userData.password),
         };
 
         logger.auth("Calling login", {
@@ -52,7 +54,10 @@ const useAuthFlow = () => {
             await budgetStore.initializeBudgetHistory(userData.password);
             logger.auth("Budget history initialized on login");
           } catch (historyError) {
-            logger.error("Failed to initialize budget history on login", historyError);
+            logger.error(
+              "Failed to initialize budget history on login",
+              historyError,
+            );
             // Don't fail login if history initialization fails
           }
 
@@ -61,14 +66,17 @@ const useAuthFlow = () => {
           }
         } else {
           console.error("❌ Setup failed:", result.error);
-          showErrorToast(`Setup failed: ${result.error}`, "Account Setup Failed");
+          showErrorToast(
+            `Setup failed: ${result.error}`,
+            "Account Setup Failed",
+          );
         }
       } catch (error) {
         console.error("❌ Setup error:", error);
         showErrorToast(`Setup error: ${error.message}`, "Setup Error");
       }
     },
-    [login, budgetStore]
+    [login, budgetStore],
   );
 
   const handleLogout = useCallback(() => {
@@ -79,12 +87,15 @@ const useAuthFlow = () => {
     async (oldPass, newPass) => {
       const result = await changePassword(oldPass, newPass);
       if (!result.success) {
-        showErrorToast(`Password change failed: ${result.error}`, "Password Change Failed");
+        showErrorToast(
+          `Password change failed: ${result.error}`,
+          "Password Change Failed",
+        );
       } else {
         showSuccessToast("Password updated successfully", "Password Changed");
       }
     },
-    [changePassword]
+    [changePassword],
   );
 
   const handleUpdateProfile = useCallback(
@@ -94,7 +105,7 @@ const useAuthFlow = () => {
         throw new Error(result.error);
       }
     },
-    [updateProfile]
+    [updateProfile],
   );
 
   return {

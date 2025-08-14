@@ -80,7 +80,10 @@ class BudgetHistory {
     });
 
     const encoder = new TextEncoder();
-    const hashBuffer = await crypto.subtle.digest("SHA-256", encoder.encode(commitString));
+    const hashBuffer = await crypto.subtle.digest(
+      "SHA-256",
+      encoder.encode(commitString),
+    );
 
     return Array.from(new Uint8Array(hashBuffer))
       .map((b) => b.toString(16).padStart(2, "0"))
@@ -222,7 +225,11 @@ class BudgetHistory {
     }
 
     // Check simple properties
-    const simpleProps = ["unassignedCash", "biweeklyAllocation", "actualBalance"];
+    const simpleProps = [
+      "unassignedCash",
+      "biweeklyAllocation",
+      "actualBalance",
+    ];
     for (const prop of simpleProps) {
       if (oldState[prop] !== newState[prop]) {
         changes.push({
@@ -272,7 +279,10 @@ class BudgetHistory {
       const existing = JSON.parse(localStorage.getItem(commitsKey) || "{}");
 
       // Encrypt the commit
-      const encryptedCommit = await encryptionUtils.encrypt(commit, this.historyKey);
+      const encryptedCommit = await encryptionUtils.encrypt(
+        commit,
+        this.historyKey,
+      );
 
       // Store with commit hash as key
       existing[commitHash] = {
@@ -289,7 +299,10 @@ class BudgetHistory {
       if (commitHashes.length > this.MAX_COMMITS) {
         // Sort by timestamp and remove oldest
         const sortedHashes = commitHashes
-          .sort((a, b) => new Date(existing[a].timestamp) - new Date(existing[b].timestamp))
+          .sort(
+            (a, b) =>
+              new Date(existing[a].timestamp) - new Date(existing[b].timestamp),
+          )
           .slice(0, commitHashes.length - this.MAX_COMMITS);
 
         for (const hashToRemove of sortedHashes) {
@@ -327,7 +340,7 @@ class BudgetHistory {
       const decryptedCommit = await encryptionUtils.decrypt(
         storedCommit.encrypted.data,
         this.historyKey,
-        storedCommit.encrypted.iv
+        storedCommit.encrypted.iv,
       );
 
       return {
@@ -470,7 +483,8 @@ class BudgetHistory {
         }
 
         // Count authors
-        authorCounts[commitSummary.author] = (authorCounts[commitSummary.author] || 0) + 1;
+        authorCounts[commitSummary.author] =
+          (authorCounts[commitSummary.author] || 0) + 1;
 
         // Track date ranges
         const commitDate = new Date(commitSummary.timestamp);
@@ -492,7 +506,8 @@ class BudgetHistory {
         authorBreakdown: authorCounts,
         averageChangesPerCommit:
           history.length > 0 ? totalChanges / Math.min(history.length, 10) : 0,
-        storageSize: localStorage.getItem(`${this.STORAGE_KEY}-commits`)?.length || 0,
+        storageSize:
+          localStorage.getItem(`${this.STORAGE_KEY}-commits`)?.length || 0,
       };
     } catch (error) {
       logger.error("Failed to get history statistics", error);
@@ -609,8 +624,10 @@ class BudgetHistory {
         details: validChain
           ? null
           : {
-              lastValidCommit: brokenAt > 0 ? verifiedCommits[brokenAt - 1] : null,
-              suspiciousCommit: brokenAt < history.length ? history[brokenAt] : null,
+              lastValidCommit:
+                brokenAt > 0 ? verifiedCommits[brokenAt - 1] : null,
+              suspiciousCommit:
+                brokenAt < history.length ? history[brokenAt] : null,
             },
       };
     } catch (error) {

@@ -12,7 +12,10 @@ import {
   toMonthly,
   getFrequencyOptions,
 } from "../../utils/frequencyCalculations";
-import { BIWEEKLY_MULTIPLIER, convertToBiweekly } from "../../constants/frequency";
+import {
+  BIWEEKLY_MULTIPLIER,
+  convertToBiweekly,
+} from "../../constants/frequency";
 import { getBillCategories } from "../../constants/categories";
 import logger from "../../utils/logger";
 
@@ -145,8 +148,12 @@ const AddBillModal = ({
 
   const calculateBiweeklyAmount = (amount, frequency, customFrequency = 1) => {
     // First convert to monthly equivalent, then use unified biweekly logic
-    const monthlyAmount = calculateMonthlyAmount(amount, frequency, customFrequency);
-    
+    const monthlyAmount = calculateMonthlyAmount(
+      amount,
+      frequency,
+      customFrequency,
+    );
+
     // Use unified constant for consistent biweekly calculation across app
     return convertToBiweekly(monthlyAmount);
   };

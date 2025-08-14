@@ -43,13 +43,18 @@ const useTransactions = (options = {}) => {
       let transactions = [];
 
       // Always fetch from Dexie (single source of truth for local data)
-      transactions = await budgetDb.transactions.orderBy("date").reverse().toArray();
+      transactions = await budgetDb.transactions
+        .orderBy("date")
+        .reverse()
+        .toArray();
 
       console.log("✅ TanStack Query: Loaded from Dexie:", transactions.length);
 
       // If Dexie is empty and we have Zustand data, seed Dexie
       const zustandData =
-        zustandAllTransactions?.length > 0 ? zustandAllTransactions : zustandTransactions;
+        zustandAllTransactions?.length > 0
+          ? zustandAllTransactions
+          : zustandTransactions;
       if (transactions.length === 0 && zustandData && zustandData.length > 0) {
         console.log("🌱 TanStack Query: Seeding Dexie from Zustand...");
         await budgetDb.bulkUpsertTransactions(zustandData);
@@ -69,20 +74,30 @@ const useTransactions = (options = {}) => {
       let filteredTransactions = transactions;
 
       if (envelopeId) {
-        filteredTransactions = filteredTransactions.filter((t) => t.envelopeId === envelopeId);
+        filteredTransactions = filteredTransactions.filter(
+          (t) => t.envelopeId === envelopeId,
+        );
       }
 
       if (category) {
-        filteredTransactions = filteredTransactions.filter((t) => t.category === category);
+        filteredTransactions = filteredTransactions.filter(
+          (t) => t.category === category,
+        );
       }
 
       if (type) {
         if (type === "income") {
-          filteredTransactions = filteredTransactions.filter((t) => t.amount > 0);
+          filteredTransactions = filteredTransactions.filter(
+            (t) => t.amount > 0,
+          );
         } else if (type === "expense") {
-          filteredTransactions = filteredTransactions.filter((t) => t.amount < 0);
+          filteredTransactions = filteredTransactions.filter(
+            (t) => t.amount < 0,
+          );
         } else if (type === "transfer") {
-          filteredTransactions = filteredTransactions.filter((t) => t.type === "transfer");
+          filteredTransactions = filteredTransactions.filter(
+            (t) => t.type === "transfer",
+          );
         }
       }
 
@@ -120,7 +135,9 @@ const useTransactions = (options = {}) => {
       console.error("❌ TanStack Query: Dexie fetch failed:", error);
       // Emergency fallback only when Dexie completely fails
       const zustandData =
-        zustandAllTransactions?.length > 0 ? zustandAllTransactions : zustandTransactions;
+        zustandAllTransactions?.length > 0
+          ? zustandAllTransactions
+          : zustandTransactions;
       return zustandData || [];
     }
   };
@@ -284,9 +301,13 @@ const useTransactions = (options = {}) => {
   const transactions = transactionsQuery.data || [];
 
   const analytics = {
-    totalIncome: transactions.filter((t) => t.amount > 0).reduce((sum, t) => sum + t.amount, 0),
+    totalIncome: transactions
+      .filter((t) => t.amount > 0)
+      .reduce((sum, t) => sum + t.amount, 0),
     totalExpenses: Math.abs(
-      transactions.filter((t) => t.amount < 0).reduce((sum, t) => sum + t.amount, 0)
+      transactions
+        .filter((t) => t.amount < 0)
+        .reduce((sum, t) => sum + t.amount, 0),
     ),
     netAmount: transactions.reduce((sum, t) => sum + t.amount, 0),
     transactionCount: transactions.length,
@@ -337,9 +358,11 @@ const useTransactions = (options = {}) => {
   // Utility functions
   const getTransactionById = (id) => transactions.find((t) => t.id === id);
 
-  const getTransactionsByEnvelope = (envId) => transactions.filter((t) => t.envelopeId === envId);
+  const getTransactionsByEnvelope = (envId) =>
+    transactions.filter((t) => t.envelopeId === envId);
 
-  const getTransactionsByCategory = (cat) => transactions.filter((t) => t.category === cat);
+  const getTransactionsByCategory = (cat) =>
+    transactions.filter((t) => t.category === cat);
 
   const getAvailableCategories = () => {
     const categories = new Set(transactions.map((t) => t.category));
@@ -412,7 +435,8 @@ const useTransactions = (options = {}) => {
 
     // Query controls
     refetch: transactionsQuery.refetch,
-    invalidate: () => queryClient.invalidateQueries({ queryKey: queryKeys.transactions }),
+    invalidate: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions }),
   };
 };
 

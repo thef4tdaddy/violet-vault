@@ -25,6 +25,7 @@ VITE_FIREBASE_MEASUREMENT_ID=G-ABCDEF
 ```
 
 You can find these values in:
+
 1. Firebase Console → Project Settings → General Tab → Your apps → Web app config
 
 ## Firestore Security Rules
@@ -44,14 +45,14 @@ service cloud.firestore {
     match /budgets/{budgetId} {
       // Allow authenticated users to read/write their own budget documents
       allow read, write: if request.auth != null;
-      
+
       // Subcollection for budget chunks
       match /chunks/{chunkId} {
         // Allow authenticated users to read/write chunks within their budget
         allow read, write: if request.auth != null;
       }
     }
-    
+
     // Fallback: deny all other access
     match /{document=**} {
       allow read, write: if false;
@@ -71,23 +72,23 @@ service cloud.firestore {
     // Budget documents - only allow if user is owner or has access
     match /budgets/{budgetId} {
       // Allow read/write if user is owner or in allowed users list
-      allow read, write: if request.auth != null && 
-        (resource.data.ownerId == request.auth.uid || 
+      allow read, write: if request.auth != null &&
+        (resource.data.ownerId == request.auth.uid ||
          request.auth.uid in resource.data.allowedUsers);
-      
+
       // Allow creation if the user is setting themselves as owner
-      allow create: if request.auth != null && 
+      allow create: if request.auth != null &&
         request.resource.data.ownerId == request.auth.uid;
-      
+
       // Subcollection for budget chunks
       match /chunks/{chunkId} {
         // Check parent document permissions
-        allow read, write: if request.auth != null && 
+        allow read, write: if request.auth != null &&
           (get(/databases/$(database)/documents/budgets/$(budgetId)).data.ownerId == request.auth.uid ||
            request.auth.uid in get(/databases/$(database)/documents/budgets/$(budgetId)).data.allowedUsers);
       }
     }
-    
+
     // User profiles (optional - for team features)
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
@@ -108,6 +109,7 @@ service cloud.firestore {
 ## Data Structure Overview
 
 ### Budget Manifest Document
+
 ```
 /budgets/{budgetId}
 {
@@ -121,6 +123,7 @@ service cloud.firestore {
 ```
 
 ### Budget Chunks
+
 ```
 /budgets/{budgetId}/chunks/{chunkId}
 {
@@ -158,17 +161,20 @@ This error occurs when Firestore security rules don't allow the operation. Solut
 ### Migration from Single Document
 
 The app automatically migrates from single-document storage to chunked storage when:
+
 - Document size approaches Firestore limits
 - User has large amounts of data
 
 ## Development vs Production
 
 ### Development
+
 - Use the basic security rules
 - Enable Firebase Auth for testing
 - Monitor usage in Firebase Console
 
 ### Production
+
 - Use advanced security rules with proper user isolation
 - Set up billing alerts in Firebase Console
 - Configure backup procedures
@@ -177,12 +183,14 @@ The app automatically migrates from single-document storage to chunked storage w
 ## Support
 
 If you encounter issues:
+
 1. Check the browser console for Firebase errors
 2. Review Firestore security rules in Firebase Console
 3. Test authentication flow
 4. Verify environment variables are set correctly
 
 For VioletVault-specific issues, create an issue in the GitHub repository with:
+
 - Firebase error messages
 - Browser console logs
 - Security rules configuration

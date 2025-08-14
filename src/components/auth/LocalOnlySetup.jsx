@@ -88,9 +88,12 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="glassmorphism rounded-2xl p-8 w-full max-w-md text-center border border-white/30 shadow-2xl">
           <ShieldOff className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Local-Only Mode Unavailable</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Local-Only Mode Unavailable
+          </h2>
           <p className="text-gray-600 mb-6">
-            Your browser doesn't support the features required for local-only mode.
+            Your browser doesn't support the features required for local-only
+            mode.
           </p>
           <button
             onClick={onSwitchToAuth}
@@ -111,8 +114,12 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
           <div className="flex items-center justify-center mb-4">
             <img src={logoOnly} alt="VioletVault" className="h-16 w-16 mr-4" />
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Local-Only Mode</h1>
-              <p className="text-gray-600">Privacy-first budgeting without cloud sync</p>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Local-Only Mode
+              </h1>
+              <p className="text-gray-600">
+                Privacy-first budgeting without cloud sync
+              </p>
             </div>
           </div>
         </div>
@@ -135,7 +142,9 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
                 <div className="flex items-start">
                   <Shield className="h-5 w-5 text-blue-600 mr-3 mt-0.5" />
                   <div className="text-sm">
-                    <p className="text-blue-900 font-medium mb-2">Complete Privacy</p>
+                    <p className="text-blue-900 font-medium mb-2">
+                      Complete Privacy
+                    </p>
                     <ul className="text-blue-800 space-y-1 text-sm">
                       <li>• No cloud sync or account required</li>
                       <li>• All data stored locally on your device</li>
@@ -150,7 +159,9 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
                 <div className="flex items-start">
                   <AlertTriangle className="h-5 w-5 text-amber-600 mr-3 mt-0.5" />
                   <div className="text-sm">
-                    <p className="text-amber-900 font-medium mb-2">Important Limitations</p>
+                    <p className="text-amber-900 font-medium mb-2">
+                      Important Limitations
+                    </p>
                     <ul className="text-amber-800 space-y-1 text-sm">
                       <li>• Data is not backed up automatically</li>
                       <li>• Clearing browser data will delete your budget</li>
@@ -169,7 +180,9 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
                 >
                   <User className="h-6 w-6 text-purple-600 mb-2" />
                   <div className="font-medium text-gray-900">Start Fresh</div>
-                  <div className="text-sm text-gray-600">Create a new local-only budget</div>
+                  <div className="text-sm text-gray-600">
+                    Create a new local-only budget
+                  </div>
                 </button>
 
                 <button
@@ -179,7 +192,9 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
                 >
                   <Upload className="h-6 w-6 text-green-600 mb-2" />
                   <div className="font-medium text-gray-900">Import Data</div>
-                  <div className="text-sm text-gray-600">Restore from previous export</div>
+                  <div className="text-sm text-gray-600">
+                    Restore from previous export
+                  </div>
                 </button>
               </div>
 
@@ -198,7 +213,9 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
           {step === "customize" && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Customize Your Profile</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Customize Your Profile
+                </h3>
 
                 <div className="space-y-4">
                   <div>
@@ -277,12 +294,15 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
           {step === "import" && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Import Previous Data</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Import Previous Data
+                </h3>
 
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-400 transition-colors">
                   <Upload className="h-8 w-8 text-gray-400 mx-auto mb-3" />
                   <div className="text-sm text-gray-600 mb-3">
-                    Select a previously exported VioletVault local-only backup file
+                    Select a previously exported VioletVault local-only backup
+                    file
                   </div>
                   <input
                     type="file"
@@ -298,7 +318,9 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
                     Select File
                   </label>
                   {importFile && (
-                    <div className="mt-3 text-sm text-green-600">✓ {importFile.name} selected</div>
+                    <div className="mt-3 text-sm text-green-600">
+                      ✓ {importFile.name} selected
+                    </div>
                   )}
                 </div>
 
@@ -307,8 +329,9 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
                     <div className="text-sm text-blue-800">
                       <p className="font-medium mb-1">Import Process</p>
                       <p>
-                        This will restore your envelopes, transactions, and settings from the backup
-                        file. Your existing local data (if any) will be replaced.
+                        This will restore your envelopes, transactions, and
+                        settings from the backup file. Your existing local data
+                        (if any) will be replaced.
                       </p>
                     </div>
                   </div>

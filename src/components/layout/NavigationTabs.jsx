@@ -99,9 +99,9 @@ const NavButton = memo(({ active, onClick, icon: _Icon, label }) => (
       <span className="hidden lg:inline truncate">{label}</span>
       {/* Medium screens (tablets) - show abbreviated labels for long words */}
       <span className="hidden md:inline lg:hidden text-xs truncate">
-        {label === "Supplemental" 
-          ? "Suppl" 
-          : label === "Analytics" 
+        {label === "Supplemental"
+          ? "Suppl"
+          : label === "Analytics"
             ? "Stats"
             : label === "Debt Tracking"
               ? "Debts"
@@ -111,17 +111,15 @@ const NavButton = memo(({ active, onClick, icon: _Icon, label }) => (
                   ? "Bills"
                   : label === "Savings Goals"
                     ? "Savings"
-                    : label.split(" ")[0]
-        }
+                    : label.split(" ")[0]}
       </span>
       {/* Small screens - show optimized short labels */}
       <span className="md:hidden text-xs truncate">
-        {label === "Supplemental" 
-          ? "Supp" 
-          : label === "Analytics" 
+        {label === "Supplemental"
+          ? "Supp"
+          : label === "Analytics"
             ? "Chart"
-            : label.split(" ")[0]
-        }
+            : label.split(" ")[0]}
       </span>
     </span>
   </button>
