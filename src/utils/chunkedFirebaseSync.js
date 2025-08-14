@@ -136,12 +136,25 @@ class ChunkedFirebaseSync {
     // Reserve extra space for encryption overhead AND final document metadata
     // We need to be extremely conservative: raw data -> JSON -> encryption -> final doc structure
     const FIREBASE_MAX_SIZE = 1048576; // Firebase's actual 1MB limit
-    const encryptionOverheadMultiplier = 4.0; // Very aggressive to account for encryption + metadata
+    const encryptionOverheadMultiplier = 5.0; // Even more aggressive to account for encryption + metadata
     const effectiveMaxSize = Math.floor(FIREBASE_MAX_SIZE / encryptionOverheadMultiplier);
+
+    console.log(
+      `🔧 Chunking ${arrayName} with effectiveMaxSize: ${Math.round(effectiveMaxSize / 1024)}KB (${effectiveMaxSize} bytes)`
+    );
 
     for (const item of array) {
       const itemSize = this.calculateSize(item);
       const projectedChunkSize = currentSize + itemSize + baseSize;
+
+      // Check if a single item is too large
+      if (itemSize > effectiveMaxSize * 0.8) {
+        console.warn(`⚠️ Large ${arrayName} item detected:`, {
+          itemSizeKB: Math.round(itemSize / 1024),
+          effectiveMaxKB: Math.round(effectiveMaxSize / 1024),
+          itemId: item.id || "unknown",
+        });
+      }
 
       // If adding this item would exceed the effective limit, start a new chunk
       if (projectedChunkSize > effectiveMaxSize && currentChunk.length > 0) {
@@ -151,6 +164,16 @@ class ChunkedFirebaseSync {
       } else {
         currentChunk.push(item);
         currentSize += itemSize;
+      }
+
+      // Safety check: if current chunk is getting too big, force a split
+      if (currentSize > effectiveMaxSize * 0.9 && currentChunk.length > 1) {
+        console.warn(
+          `🚨 Force splitting ${arrayName} chunk with ${currentChunk.length} items (${Math.round(currentSize / 1024)}KB)`
+        );
+        chunks.push([...currentChunk]);
+        currentChunk = [];
+        currentSize = 0;
       }
     }
 
