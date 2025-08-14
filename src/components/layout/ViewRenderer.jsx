@@ -300,11 +300,8 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
     ),
     analytics: (
       <ChartsAndAnalytics
-        transactions={allTransactions}
-        envelopes={envelopes}
-        bills={bills}
-        paycheckHistory={paycheckHistory}
-        savingsGoals={savingsGoals}
+        transactions={safeTransactions}
+        envelopes={envelopes || []}
         currentUser={currentUser}
       />
     ),

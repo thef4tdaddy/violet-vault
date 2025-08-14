@@ -95,27 +95,50 @@ class CloudSyncService {
         .default;
 
       // Step 1: Get data from both sources
-      const [firestoreData, dexieData] = await Promise.all([
+      const [chunkedFirestoreData, dexieData] = await Promise.all([
         this.fetchChunkedFirestoreData(ChunkedFirebaseSync),
         this.fetchDexieData(),
       ]);
 
-      // Step 2: Check for migration needs and handle accordingly
-      const migrationResult = await this.handleMigrationIfNeeded(
-        ChunkedFirebaseSync,
-        dexieData,
-      );
-      if (migrationResult.migrated) {
-        return migrationResult;
+      // Step 2: Check for old format data if chunked data not found
+      let firestoreData = chunkedFirestoreData;
+      let needsMigration = false;
+
+      if (!chunkedFirestoreData) {
+        logger.debug(
+          "🔍 Chunked data not found, checking for old format data...",
+        );
+        // Try to load from old single-document format
+        const oldFormatData = await this.fetchOldFormatFirestoreData();
+        if (oldFormatData) {
+          logger.warn("📦 Found old format data - migration needed!");
+          firestoreData = oldFormatData;
+          needsMigration = true;
+        }
       }
 
-      // Step 3: Determine sync direction based on data freshness
+      // Step 3: Handle migration if needed
+      if (
+        needsMigration ||
+        (!firestoreData && this.hasSignificantData(dexieData))
+      ) {
+        logger.debug("🔄 Starting migration to chunked format...");
+        const migrationResult = await this.migrateToChunkedFormat(
+          ChunkedFirebaseSync,
+          firestoreData || dexieData,
+        );
+        if (migrationResult.migrated) {
+          return migrationResult;
+        }
+      }
+
+      // Step 4: Determine sync direction based on data freshness
       const syncResult = await this.determineSyncDirection(
         firestoreData,
         dexieData,
       );
 
-      // Step 4: Perform the sync using chunked approach
+      // Step 5: Perform the sync using chunked approach
       const result = await this.executeChunkedSync(
         syncResult,
         ChunkedFirebaseSync,
@@ -362,6 +385,29 @@ class CloudSyncService {
       return data?.data || null;
     } catch (error) {
       logger.warn("⚠️ Failed to fetch chunked Firestore data", error.message);
+      return null;
+    }
+  }
+
+  /**
+   * Fetch data from old single-document Firestore format
+   */
+  async fetchOldFormatFirestoreData() {
+    try {
+      // Import the old FirebaseSync for legacy data
+      const { default: FirebaseSync } = await import("../utils/firebaseSync");
+
+      // Initialize the old FirebaseSync instance
+      FirebaseSync.initialize(this.config.budgetId, this.config.encryptionKey);
+
+      // Load data from cloud using old format
+      const data = await FirebaseSync.loadFromCloud();
+      return data?.data || null;
+    } catch (error) {
+      logger.debug(
+        "📭 No old format data found (expected for new accounts)",
+        error.message,
+      );
       return null;
     }
   }
