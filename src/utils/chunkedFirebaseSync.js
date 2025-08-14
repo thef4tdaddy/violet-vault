@@ -250,7 +250,10 @@ class ChunkedFirebaseSync {
       for (const fieldName of arrayFields) {
         const array = data[fieldName] || [];
 
+        console.log(`🔍 Processing ${fieldName}: ${array.length} items`);
+
         if (array.length === 0) {
+          console.log(`⚠️ Skipping empty ${fieldName} array`);
           chunkMap[fieldName] = [];
           continue;
         }
