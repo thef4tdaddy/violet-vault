@@ -12,6 +12,7 @@ class CloudSyncService {
     this.config = null;
     this.lastSyncTime = 0;
     this.syncIntervalMs = 30000; // 30 seconds
+    this.lastSyncedCommitHash = null; // Track using existing git-like history
   }
 
   /**
@@ -81,6 +82,13 @@ class CloudSyncService {
       if (!this.config?.encryptionKey || !this.config?.currentUser || !this.config?.budgetId) {
         logger.warn("⚠️ Missing auth context for sync");
         return { success: false, error: "Missing authentication context" };
+      }
+
+      // Check if data has actually changed before performing expensive sync
+      const hasChanged = await this.hasDataChanged();
+      if (!hasChanged) {
+        logger.debug("⏭️ No data changes detected, skipping sync");
+        return { success: true, skipped: true, reason: "No changes detected" };
       }
 
       logger.debug("🔄 Starting chunked bidirectional sync...");
@@ -537,6 +545,30 @@ class CloudSyncService {
   }
 
   /**
+   * Check if data has changed using the existing budget history system
+   */
+  async hasDataChanged() {
+    try {
+      const { budgetHistory } = await import("../utils/budgetHistory.js");
+      const currentCommitHash = budgetHistory.currentCommitHash;
+
+      const hasChanged = currentCommitHash !== this.lastSyncedCommitHash;
+      if (hasChanged) {
+        logger.debug("📊 Data change detected via budget history", {
+          previousCommit: this.lastSyncedCommitHash?.slice(0, 8) || "none",
+          currentCommit: currentCommitHash?.slice(0, 8) || "none",
+        });
+        this.lastSyncedCommitHash = currentCommitHash;
+      }
+
+      return hasChanged;
+    } catch (error) {
+      logger.warn("Failed to check budget history changes, assuming changed", error);
+      return true; // Fail safe - sync if we can't determine changes
+    }
+  }
+
+  /**
    * Get sync status
    */
   getStatus() {
@@ -546,6 +578,7 @@ class CloudSyncService {
       syncIntervalMs: this.syncIntervalMs,
       hasConfig: !!this.config,
       syncType: "chunked", // Indicate we're using chunked sync
+      lastSyncedCommit: this.lastSyncedCommitHash?.slice(0, 8) || null,
     };
   }
 }
