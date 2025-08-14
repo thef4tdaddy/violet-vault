@@ -62,7 +62,7 @@
 .btn-secondary {
   background: #f1f5f9;
   color: #334155;
-  border: 1px solid #e2e8f0;
+  border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 .btn-secondary:hover {
@@ -73,6 +73,7 @@
 .btn-success {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
+  border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 .btn-success:hover {
@@ -258,7 +259,11 @@ tbody tr:hover {
 }
 
 /* Main dashboard cards and summary components */
-div[class*="bg-white"][class*="rounded-lg"][class*="p-"]:not([class*="text-"]):not([class*="w-2"]):not([class*="h-2"]):not([class*="h-3"]):not([class*="h-4"]) {
+div[class*="bg-white"][class*="rounded-lg"][class*="p-"]:not(
+    [class*="text-"]
+  ):not([class*="w-2"]):not([class*="h-2"]):not([class*="h-3"]):not(
+    [class*="h-4"]
+  ) {
   border: 2px solid rgba(0, 0, 0, 1) !important;
 }
 
@@ -271,7 +276,10 @@ div[role="dialog"],
 
 /* Major grid containers for envelope/bill cards */
 .grid[class*="grid-cols"] > div[class*="p-6"],
-.grid[class*="grid-cols"] > div[class*="p-4"]:not([class*="h-2"]):not([class*="h-3"]):not([class*="h-4"]) {
+.grid[class*="grid-cols"]
+  > div[class*="p-4"]:not([class*="h-2"]):not([class*="h-3"]):not(
+    [class*="h-4"]
+  ) {
   border: 2px solid rgba(0, 0, 0, 1) !important;
 }
 
