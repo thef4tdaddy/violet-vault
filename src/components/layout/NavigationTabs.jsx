@@ -67,7 +67,7 @@ const NavigationTabs = memo(({ activeView, onViewChange }) => {
 
   return (
     <div className="glassmorphism rounded-3xl mb-6 lg:shadow-xl border border-white/20 ring-1 ring-gray-800/10 fixed bottom-0 left-0 right-0 lg:static z-40 overflow-hidden">
-      <nav className="flex justify-start lg:justify-around overflow-x-auto scrollbar-hide pb-safe px-2 lg:px-0">
+      <nav className="flex justify-evenly lg:justify-around overflow-x-auto scrollbar-hide pb-safe px-1 lg:px-0 gap-1 lg:gap-0">
         {tabs.map((tab) => (
           <NavButton
             key={tab.key}
@@ -86,23 +86,43 @@ const NavigationTabs = memo(({ activeView, onViewChange }) => {
 const NavButton = memo(({ active, onClick, icon: _Icon, label }) => (
   <button
     onClick={onClick}
-    className={`flex-shrink-0 lg:flex-1 flex flex-col items-center lg:flex-row lg:px-4 px-2 py-2 text-xs lg:text-sm font-medium border-t-2 lg:border-b-2 transition-colors relative ${
+    className={`flex-shrink-0 lg:flex-1 flex flex-col items-center lg:flex-row lg:px-4 px-2 py-2 text-xs lg:text-sm font-medium transition-colors relative border border-black/10 ${
       active
-        ? "border-purple-500 text-purple-600 bg-purple-50/50"
-        : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30"
+        ? "border-t-2 lg:border-b-2 border-purple-500 text-purple-600 bg-purple-50/50 border-purple-400 ring-1 ring-purple-300"
+        : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30 hover:border-purple-200"
     }`}
-    style={{ minWidth: "60px" }} // Ensure minimum tap target for accessibility
+    style={{ minWidth: "70px" }} // Increase minimum tap target and prevent clipping
   >
     <_Icon className="h-4 w-4 mb-1 lg:mb-0 lg:mr-2 flex-shrink-0" />
     <span className="text-center lg:text-left leading-tight">
-      {/* Responsive label display */}
-      <span className="hidden lg:inline">{label}</span>
-      {/* Medium screens (tablets) - show short labels */}
-      <span className="hidden md:inline lg:hidden text-xs">
-        {label.length > 8 ? label.split(" ")[0] : label}
+      {/* Responsive label display with better text truncation */}
+      <span className="hidden lg:inline truncate">{label}</span>
+      {/* Medium screens (tablets) - show abbreviated labels for long words */}
+      <span className="hidden md:inline lg:hidden text-xs truncate">
+        {label === "Supplemental" 
+          ? "Suppl" 
+          : label === "Analytics" 
+            ? "Stats"
+            : label === "Debt Tracking"
+              ? "Debts"
+              : label === "Add Paycheck"
+                ? "Paycheck"
+                : label === "Manage Bills"
+                  ? "Bills"
+                  : label === "Savings Goals"
+                    ? "Savings"
+                    : label.split(" ")[0]
+        }
       </span>
-      {/* Small screens - show first word only */}
-      <span className="md:hidden text-xs">{label.split(" ")[0]}</span>
+      {/* Small screens - show optimized short labels */}
+      <span className="md:hidden text-xs truncate">
+        {label === "Supplemental" 
+          ? "Supp" 
+          : label === "Analytics" 
+            ? "Chart"
+            : label.split(" ")[0]
+        }
+      </span>
     </span>
   </button>
 ));
