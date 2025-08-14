@@ -330,7 +330,7 @@ const useBugReport = () => {
               localStorageItems: localStorage.length,
               sessionStorageItems: sessionStorage.length,
             };
-          } catch (error) {
+          } catch {
             return { error: "Storage access denied" };
           }
         };
@@ -401,7 +401,7 @@ const useBugReport = () => {
             return errors.length > 0
               ? errors
               : ["No performance data available"];
-          } catch (error) {
+          } catch {
             return ["Performance API unavailable"];
           }
         };
