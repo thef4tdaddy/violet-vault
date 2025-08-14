@@ -47,6 +47,7 @@
   background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
   color: white;
   box-shadow: 0 10px 15px -3px rgba(168, 85, 247, 0.3);
+  border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 .btn-primary:hover {
