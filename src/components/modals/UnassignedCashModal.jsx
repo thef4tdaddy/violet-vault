@@ -36,7 +36,7 @@ const UnassignedCashModal = () => {
     applyDistribution,
 
     // Data
-    envelopes,
+    envelopes = [],
     unassignedCash,
     getDistributionPreview,
   } = useUnassignedCashDistribution();

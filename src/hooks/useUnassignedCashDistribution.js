@@ -9,7 +9,7 @@ import { BIWEEKLY_MULTIPLIER } from "../constants/frequency";
  */
 const useUnassignedCashDistribution = () => {
   const budget = useBudgetStore();
-  const { envelopes, unassignedCash, bulkUpdateEnvelopes, setUnassignedCash } = budget;
+  const { envelopes = [], unassignedCash = 0, bulkUpdateEnvelopes, setUnassignedCash } = budget;
 
   // Distribution state (modal state now handled by budget store)
   const [distributions, setDistributions] = useState({});
