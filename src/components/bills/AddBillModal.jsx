@@ -582,7 +582,8 @@ const AddBillModal = ({
                     const isBillEnvelope = env.envelopeType === "bill";
                     const isVariableEnvelope = env.envelopeType === "variable";
                     const isLegacyEnvelope = !env.envelopeType;
-                    const isAllowed = isBillEnvelope || isVariableEnvelope || isLegacyEnvelope;
+                    const isAllowed =
+                      isBillEnvelope || isVariableEnvelope || isLegacyEnvelope;
 
                     console.log(`Envelope ${env.name}:`, {
                       envelopeType: env.envelopeType,
@@ -610,8 +611,8 @@ const AddBillModal = ({
                 </p>
               )}
               <p className="text-xs text-blue-600 mt-1">
-                Bill and variable envelopes are available for assignment. Choose which
-                envelope will be used to pay this bill.
+                Bill and variable envelopes are available for assignment. Choose
+                which envelope will be used to pay this bill.
               </p>
             </div>
 
