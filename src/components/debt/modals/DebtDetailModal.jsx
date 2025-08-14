@@ -44,7 +44,13 @@ const DebtDetailModal = ({
       )
     ) {
       onDelete(debt.id);
+      onClose(); // Close modal after deletion
     }
+  };
+
+  const handleEdit = () => {
+    onClose(); // Close detail modal first
+    onEdit(debt); // Then open edit modal
   };
 
   const progressPercentage =
@@ -276,7 +282,7 @@ const DebtDetailModal = ({
             Close
           </button>
           <button
-            onClick={() => onEdit && onEdit(debt)}
+            onClick={handleEdit}
             className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 flex items-center justify-center"
           >
             <Edit className="h-4 w-4 mr-2" />

@@ -315,7 +315,13 @@ const calculateNextPaymentDate = (debt, relatedBill) => {
 };
 
 const calculatePayoffProjection = (debt) => {
-  if (!debt.currentBalance || !debt.minimumPayment || !debt.interestRate) {
+  // Ensure we have valid numeric values
+  const currentBalance = parseFloat(debt.currentBalance) || 0;
+  const minimumPayment = parseFloat(debt.minimumPayment) || 0;
+  const interestRate = parseFloat(debt.interestRate) || 0;
+
+  // Return null projection if missing essential data
+  if (currentBalance <= 0 || minimumPayment <= 0 || interestRate <= 0) {
     return {
       monthsToPayoff: null,
       totalInterest: null,
@@ -323,9 +329,19 @@ const calculatePayoffProjection = (debt) => {
     };
   }
 
-  const monthlyRate = debt.interestRate / 100 / 12;
-  const monthlyPayment = debt.minimumPayment;
-  const balance = debt.currentBalance;
+  const monthlyRate = interestRate / 100 / 12;
+  const monthlyPayment = minimumPayment;
+  const balance = currentBalance;
+
+  // Check if payment covers interest (prevents infinite payoff scenarios)
+  const monthlyInterest = balance * monthlyRate;
+  if (monthlyPayment <= monthlyInterest) {
+    return {
+      monthsToPayoff: null,
+      totalInterest: null,
+      payoffDate: null,
+    };
+  }
 
   // Calculate months to payoff using amortization formula
   const monthsToPayoff = Math.ceil(
@@ -338,10 +354,15 @@ const calculatePayoffProjection = (debt) => {
   const payoffDate = new Date();
   payoffDate.setMonth(payoffDate.getMonth() + monthsToPayoff);
 
+  // Validate all calculations are finite numbers
+  const validMonthsToPayoff = isFinite(monthsToPayoff) && monthsToPayoff > 0 ? monthsToPayoff : null;
+  const validTotalInterest = isFinite(totalInterest) && totalInterest >= 0 ? totalInterest : null;
+  const validPayoffDate = validMonthsToPayoff ? payoffDate.toISOString() : null;
+
   return {
-    monthsToPayoff: isFinite(monthsToPayoff) ? monthsToPayoff : null,
-    totalInterest: isFinite(totalInterest) ? totalInterest : null,
-    payoffDate: isFinite(monthsToPayoff) ? payoffDate.toISOString() : null,
+    monthsToPayoff: validMonthsToPayoff,
+    totalInterest: validTotalInterest,
+    payoffDate: validPayoffDate,
   };
 };
 

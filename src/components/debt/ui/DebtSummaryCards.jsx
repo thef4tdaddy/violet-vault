@@ -5,7 +5,7 @@ import { DollarSign, TrendingDown, Percent, AlertTriangle, Calendar } from "luci
  * Debt overview summary cards
  * Pure UI component for displaying debt statistics
  */
-const DebtSummaryCards = ({ stats }) => {
+const DebtSummaryCards = ({ stats, onDueSoonClick }) => {
   const cards = [
     {
       key: "total-debt",
@@ -39,6 +39,7 @@ const DebtSummaryCards = ({ stats }) => {
       color: "yellow",
       subtext: `${stats.dueSoonCount} payments this week`,
       alert: stats.dueSoonCount > 0,
+      onClick: stats.dueSoonCount > 0 ? onDueSoonClick : null,
     },
   ];
 
@@ -53,6 +54,7 @@ const DebtSummaryCards = ({ stats }) => {
           subtext={card.subtext}
           color={card.color}
           alert={card.alert}
+          onClick={card.onClick}
         />
       ))}
     </div>
@@ -67,12 +69,14 @@ const DebtSummaryCard = ({
   subtext,
   color,
   alert,
+  onClick,
 }) => {
   const colorClasses = {
     red: "bg-red-500",
     orange: "bg-orange-500",
     purple: "bg-purple-500",
     amber: "bg-amber-500",
+    yellow: "bg-yellow-500",
     emerald: "bg-emerald-500",
   };
 
@@ -81,6 +85,7 @@ const DebtSummaryCard = ({
     orange: "text-orange-600",
     purple: "text-purple-600",
     amber: "text-amber-600",
+    yellow: "text-yellow-600",
     emerald: "text-emerald-600",
   };
 
@@ -89,6 +94,7 @@ const DebtSummaryCard = ({
     orange: "bg-orange-50",
     purple: "bg-purple-50",
     amber: "bg-amber-50",
+    yellow: "bg-yellow-50",
     emerald: "bg-emerald-50",
   };
 
@@ -96,7 +102,8 @@ const DebtSummaryCard = ({
     <div
       className={`glassmorphism rounded-3xl p-6 border-2 transition-all duration-200 ${
         alert ? "border-amber-200 bg-amber-50/50" : "border-white/20"
-      } hover:shadow-lg`}
+      } hover:shadow-lg ${onClick ? "cursor-pointer hover:scale-105" : ""}`}
+      onClick={onClick}
     >
       <div className="flex items-center">
         <div className="relative mr-4">
