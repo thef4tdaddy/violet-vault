@@ -136,8 +136,8 @@ class ChunkedFirebaseSync {
     };
     const baseSize = this.calculateSize(baseChunkStructure);
 
-    // Reserve extra space for encryption overhead (Base64 encoding adds ~33% + AES padding)
-    const encryptionOverheadMultiplier = 1.25; // Target 80% usage of maxChunkSize
+    // Reserve extra space for encryption overhead (empirically observed ~100% overhead)
+    const encryptionOverheadMultiplier = 2.2; // Conservative estimate based on real data
     const effectiveMaxSize = Math.floor(
       this.maxChunkSize / encryptionOverheadMultiplier,
     );
