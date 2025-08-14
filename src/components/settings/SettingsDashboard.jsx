@@ -20,12 +20,8 @@ import LoadingSpinner from "../ui/LoadingSpinner";
 
 // Lazy load heavy components
 const ChangePasswordModal = lazy(() => import("../auth/ChangePasswordModal"));
-const BudgetHistoryViewer = lazy(
-  () => import("../history/BudgetHistoryViewer"),
-);
-const LocalOnlyModeSettings = lazy(
-  () => import("../auth/LocalOnlyModeSettings"),
-);
+const BudgetHistoryViewer = lazy(() => import("../history/BudgetHistoryViewer"));
+const LocalOnlyModeSettings = lazy(() => import("../auth/LocalOnlyModeSettings"));
 const SecuritySettings = lazy(() => import("./SecuritySettings"));
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
@@ -68,17 +64,11 @@ const SettingsDashboard = ({
     if (newValue) {
       console.log("🌩️ Cloud sync enabled - starting background sync");
       try {
-        const { default: CloudSyncService } = await import(
-          "../../services/cloudSyncService"
-        );
+        const { default: CloudSyncService } = await import("../../services/cloudSyncService");
         const { useAuth } = await import("../../stores/authStore");
         const authState = useAuth.getState();
 
-        if (
-          authState.encryptionKey &&
-          authState.currentUser &&
-          authState.budgetId
-        ) {
+        if (authState.encryptionKey && authState.currentUser && authState.budgetId) {
           CloudSyncService.start({
             encryptionKey: authState.encryptionKey,
             currentUser: authState.currentUser,
@@ -91,9 +81,7 @@ const SettingsDashboard = ({
     } else {
       console.log("💾 Cloud sync disabled - stopping background sync");
       try {
-        const { default: CloudSyncService } = await import(
-          "../../services/cloudSyncService"
-        );
+        const { default: CloudSyncService } = await import("../../services/cloudSyncService");
         CloudSyncService.stop();
       } catch (error) {
         console.error("Failed to stop cloud sync:", error);
@@ -113,21 +101,16 @@ const SettingsDashboard = ({
       case "general":
         return (
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-900">
-              General Settings
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900">General Settings</h3>
 
             {isLocalOnlyMode && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-start">
                   <Monitor className="h-5 w-5 text-blue-600 mt-0.5 mr-3" />
                   <div>
-                    <h4 className="font-medium text-blue-900">
-                      Local-Only Mode
-                    </h4>
+                    <h4 className="font-medium text-blue-900">Local-Only Mode</h4>
                     <p className="text-sm text-blue-700 mt-1">
-                      You're running in local-only mode. Data is stored locally
-                      only.
+                      You're running in local-only mode. Data is stored locally only.
                     </p>
                     <button
                       onClick={() => setShowLocalOnlySettings(true)}
@@ -145,9 +128,7 @@ const SettingsDashboard = ({
                 <h4 className="font-medium text-gray-900">Cloud Sync</h4>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600">
-                      Sync your data across devices
-                    </p>
+                    <p className="text-sm text-gray-600">Sync your data across devices</p>
                     <p className="text-xs text-gray-500 mt-1">
                       Status: {cloudSyncEnabled ? "Enabled" : "Disabled"}
                     </p>
@@ -173,16 +154,12 @@ const SettingsDashboard = ({
       case "account":
         return (
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Account Settings
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900">Account Settings</h3>
 
             <div className="space-y-4">
               <div className="bg-gray-50 rounded-lg p-4">
                 <h4 className="font-medium text-gray-900 mb-2">Current User</h4>
-                <p className="text-sm text-gray-600">
-                  {currentUser?.name || "User"}
-                </p>
+                <p className="text-sm text-gray-600">{currentUser?.name || "User"}</p>
               </div>
 
               <button
@@ -192,9 +169,7 @@ const SettingsDashboard = ({
                 <Key className="h-5 w-5 text-gray-600 mr-3" />
                 <div className="text-left">
                   <p className="font-medium text-gray-900">Change Password</p>
-                  <p className="text-sm text-gray-500">
-                    Update your encryption password
-                  </p>
+                  <p className="text-sm text-gray-500">Update your encryption password</p>
                 </div>
               </button>
 
@@ -203,9 +178,7 @@ const SettingsDashboard = ({
                   <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 mr-3" />
                   <div className="flex-1">
                     <h4 className="font-medium text-red-900">Danger Zone</h4>
-                    <p className="text-sm text-red-700 mt-1">
-                      These actions cannot be undone.
-                    </p>
+                    <p className="text-sm text-red-700 mt-1">These actions cannot be undone.</p>
                     <div className="mt-3 space-y-2">
                       <button
                         onClick={onLogout}
@@ -230,9 +203,7 @@ const SettingsDashboard = ({
       case "security":
         return (
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Security Settings
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900">Security Settings</h3>
 
             <div className="space-y-4">
               {securityManager && (
@@ -243,12 +214,8 @@ const SettingsDashboard = ({
                   >
                     <Lock className="h-5 w-5 text-gray-600 mr-3" />
                     <div className="text-left">
-                      <p className="font-medium text-gray-900">
-                        Lock Application
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Immediately lock the app
-                      </p>
+                      <p className="font-medium text-gray-900">Lock Application</p>
+                      <p className="text-sm text-gray-500">Immediately lock the app</p>
                     </div>
                   </button>
 
@@ -258,12 +225,8 @@ const SettingsDashboard = ({
                   >
                     <Shield className="h-5 w-5 text-gray-600 mr-3" />
                     <div className="text-left">
-                      <p className="font-medium text-gray-900">
-                        Advanced Security
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Auto-lock, logging, and privacy
-                      </p>
+                      <p className="font-medium text-gray-900">Advanced Security</p>
+                      <p className="text-sm text-gray-500">Auto-lock, logging, and privacy</p>
                     </div>
                   </button>
                 </>
@@ -275,9 +238,7 @@ const SettingsDashboard = ({
       case "data":
         return (
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Data Management
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900">Data Management</h3>
 
             <div className="space-y-4">
               <button
@@ -287,9 +248,7 @@ const SettingsDashboard = ({
                 <History className="h-5 w-5 text-gray-600 mr-3" />
                 <div className="text-left">
                   <p className="font-medium text-gray-900">View History</p>
-                  <p className="text-sm text-gray-500">
-                    Browse budget change history
-                  </p>
+                  <p className="text-sm text-gray-500">Browse budget change history</p>
                 </div>
               </button>
 
@@ -300,9 +259,7 @@ const SettingsDashboard = ({
                 <Download className="h-5 w-5 text-gray-600 mr-3" />
                 <div className="text-left">
                   <p className="font-medium text-gray-900">Export Data</p>
-                  <p className="text-sm text-gray-500">
-                    Download your budget data
-                  </p>
+                  <p className="text-sm text-gray-500">Download your budget data</p>
                 </div>
               </button>
 
@@ -321,9 +278,7 @@ const SettingsDashboard = ({
                   <Upload className="h-5 w-5 text-gray-600 mr-3" />
                   <div className="text-left">
                     <p className="font-medium text-gray-900">Import Data</p>
-                    <p className="text-sm text-gray-500">
-                      Upload budget data from file
-                    </p>
+                    <p className="text-sm text-gray-500">Upload budget data from file</p>
                   </div>
                 </label>
               </div>
@@ -336,9 +291,7 @@ const SettingsDashboard = ({
                   <Cloud className="h-5 w-5 text-blue-600 mr-3" />
                   <div className="text-left">
                     <p className="font-medium text-blue-900">Sync to Cloud</p>
-                    <p className="text-sm text-blue-600">
-                      Upload your data to cloud storage
-                    </p>
+                    <p className="text-sm text-blue-600">Upload your data to cloud storage</p>
                   </div>
                 </button>
               )}
@@ -408,13 +361,10 @@ const SettingsDashboard = ({
           <div className="bg-white border border-gray-300 rounded-lg p-6 w-full max-w-md">
             <div className="flex items-center gap-3 mb-4">
               <AlertTriangle className="h-6 w-6 text-red-500" />
-              <h4 className="font-semibold text-gray-900">
-                Confirm Data Reset
-              </h4>
+              <h4 className="font-semibold text-gray-900">Confirm Data Reset</h4>
             </div>
             <p className="text-gray-600 mb-6">
-              This will permanently delete all your budget data. This action
-              cannot be undone.
+              This will permanently delete all your budget data. This action cannot be undone.
             </p>
             <div className="flex gap-3">
               <button
@@ -447,9 +397,7 @@ const SettingsDashboard = ({
           />
         )}
 
-        {showHistoryModal && (
-          <BudgetHistoryViewer onClose={() => setShowHistoryModal(false)} />
-        )}
+        {showHistoryModal && <BudgetHistoryViewer onClose={() => setShowHistoryModal(false)} />}
 
         {showLocalOnlySettings && (
           <LocalOnlyModeSettings

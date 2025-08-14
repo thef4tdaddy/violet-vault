@@ -174,39 +174,25 @@ export const TOAST_MESSAGES = {
 export const quickToast = {
   // Auth toasts
   loginSuccess: (addToast) =>
-    createToastHelpers(addToast).showSuccessToast(
-      TOAST_MESSAGES.AUTH.LOGIN_SUCCESS,
-    ),
+    createToastHelpers(addToast).showSuccessToast(TOAST_MESSAGES.AUTH.LOGIN_SUCCESS),
   passwordUpdated: (addToast) =>
-    createToastHelpers(addToast).showSuccessToast(
-      TOAST_MESSAGES.AUTH.PASSWORD_UPDATED,
-    ),
+    createToastHelpers(addToast).showSuccessToast(TOAST_MESSAGES.AUTH.PASSWORD_UPDATED),
   passwordMismatch: (addToast) =>
-    createToastHelpers(addToast).showErrorToast(
-      TOAST_MESSAGES.AUTH.PASSWORD_MISMATCH,
-    ),
+    createToastHelpers(addToast).showErrorToast(TOAST_MESSAGES.AUTH.PASSWORD_MISMATCH),
 
   // Data toasts
   exportSuccess: (addToast) =>
-    createToastHelpers(addToast).showSuccessToast(
-      TOAST_MESSAGES.DATA.EXPORT_SUCCESS,
-    ),
+    createToastHelpers(addToast).showSuccessToast(TOAST_MESSAGES.DATA.EXPORT_SUCCESS),
   importSuccess: (addToast) =>
-    createToastHelpers(addToast).showSuccessToast(
-      TOAST_MESSAGES.DATA.IMPORT_SUCCESS,
-    ),
+    createToastHelpers(addToast).showSuccessToast(TOAST_MESSAGES.DATA.IMPORT_SUCCESS),
   saveSuccess: (addToast) =>
-    createToastHelpers(addToast).showSuccessToast(
-      TOAST_MESSAGES.DATA.SAVE_SUCCESS,
-    ),
+    createToastHelpers(addToast).showSuccessToast(TOAST_MESSAGES.DATA.SAVE_SUCCESS),
 
   // Sync toasts
   syncSuccess: (addToast) =>
     createToastHelpers(addToast).showSuccessToast(TOAST_MESSAGES.SYNC.SUCCESS),
   syncFailed: (addToast, error) =>
-    createToastHelpers(addToast).showErrorToast(
-      `${TOAST_MESSAGES.SYNC.FAILED}: ${error}`,
-    ),
+    createToastHelpers(addToast).showErrorToast(`${TOAST_MESSAGES.SYNC.FAILED}: ${error}`),
 };
 
 export default {

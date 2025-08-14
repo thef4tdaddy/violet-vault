@@ -1,11 +1,7 @@
 import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useBudgetStore } from "../stores/budgetStore";
-import {
-  queryKeys,
-  optimisticHelpers,
-  prefetchHelpers,
-} from "../utils/queryClient";
+import { queryKeys, optimisticHelpers, prefetchHelpers } from "../utils/queryClient";
 import { budgetDb } from "../db/budgetDb";
 
 /**
@@ -85,10 +81,7 @@ const useBudgetData = () => {
         return await budgetDb.getTransactionsByDateRange(start, end);
       }
 
-      const cachedTransactions = await budgetDb.transactions
-        .orderBy("date")
-        .reverse()
-        .toArray();
+      const cachedTransactions = await budgetDb.transactions.orderBy("date").reverse().toArray();
       return cachedTransactions;
     },
 
@@ -123,11 +116,11 @@ const useBudgetData = () => {
       const summary = {
         totalEnvelopeBalance: (envelopes || []).reduce(
           (sum, env) => sum + (env.currentBalance || 0),
-          0,
+          0
         ),
         totalSavingsBalance: (savingsGoals || []).reduce(
           (sum, goal) => sum + (goal.currentAmount || 0),
-          0,
+          0
         ),
         unassignedCash: unassignedCash || 0,
         actualBalance: actualBalance || 0,
@@ -143,9 +136,7 @@ const useBudgetData = () => {
 
       // Calculate difference for balance reconciliation
       summary.virtualBalance =
-        summary.totalEnvelopeBalance +
-        summary.totalSavingsBalance +
-        summary.unassignedCash;
+        summary.totalEnvelopeBalance + summary.totalSavingsBalance + summary.unassignedCash;
       summary.difference = summary.actualBalance - summary.virtualBalance;
       summary.isBalanced = Math.abs(summary.difference) < 0.01;
 
@@ -242,13 +233,7 @@ const useBudgetData = () => {
     };
 
     reconcileMissingTransactions();
-  }, [
-    envelopes,
-    transactions,
-    unassignedCash,
-    queryClient,
-    zustandAddTransaction,
-  ]);
+  }, [envelopes, transactions, unassignedCash, queryClient, zustandAddTransaction]);
 
   // Enhanced mutations with optimistic updates and Dexie persistence
   const addEnvelopeMutation = useMutation({
@@ -349,8 +334,7 @@ const useBudgetData = () => {
   const prefetchData = {
     envelopes: (filters) => prefetchHelpers.prefetchEnvelopes(filters),
     dashboard: () => prefetchHelpers.prefetchDashboard(),
-    transactions: (dateRange) =>
-      prefetchHelpers.prefetchTransactions(dateRange),
+    transactions: (dateRange) => prefetchHelpers.prefetchTransactions(dateRange),
   };
 
   const syncStatus = {
@@ -397,14 +381,8 @@ const useBudgetData = () => {
     actualBalance,
 
     // Loading states
-    isLoading:
-      envelopesQuery.isLoading ||
-      transactionsQuery.isLoading ||
-      billsQuery.isLoading,
-    isFetching:
-      envelopesQuery.isFetching ||
-      transactionsQuery.isFetching ||
-      billsQuery.isFetching,
+    isLoading: envelopesQuery.isLoading || transactionsQuery.isLoading || billsQuery.isLoading,
+    isFetching: envelopesQuery.isFetching || transactionsQuery.isFetching || billsQuery.isFetching,
     isOffline: !navigator.onLine,
 
     // Individual query states for fine-grained loading

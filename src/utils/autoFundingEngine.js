@@ -38,9 +38,7 @@ export const CONDITION_TYPES = {
  */
 export class AutoFundingRule {
   constructor(config) {
-    this.id =
-      config.id ||
-      `rule_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    this.id = config.id || `rule_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     this.name = config.name || "Untitled Rule";
     this.description = config.description || "";
     this.type = config.type || RULE_TYPES.FIXED_AMOUNT;
@@ -106,18 +104,14 @@ export class AutoFundingRule {
       switch (condition.type) {
         case CONDITION_TYPES.BALANCE_LESS_THAN:
           if (condition.envelopeId) {
-            const envelope = envelopes.find(
-              (e) => e.id === condition.envelopeId,
-            );
+            const envelope = envelopes.find((e) => e.id === condition.envelopeId);
             return envelope && envelope.currentBalance < condition.value;
           }
           return unassignedCash < condition.value;
 
         case CONDITION_TYPES.BALANCE_GREATER_THAN:
           if (condition.envelopeId) {
-            const envelope = envelopes.find(
-              (e) => e.id === condition.envelopeId,
-            );
+            const envelope = envelopes.find((e) => e.id === condition.envelopeId);
             return envelope && envelope.currentBalance > condition.value;
           }
           return unassignedCash > condition.value;
@@ -165,10 +159,7 @@ export class AutoFundingRule {
 
       case RULE_TYPES.PERCENTAGE:
         const baseAmount = this.getBaseAmountForPercentage(context);
-        return Math.min(
-          (baseAmount * this.config.percentage) / 100,
-          unassignedCash,
-        );
+        return Math.min((baseAmount * this.config.percentage) / 100, unassignedCash);
 
       case RULE_TYPES.SPLIT_REMAINDER:
         const targetCount = this.config.targetIds?.length || 1;
@@ -195,9 +186,7 @@ export class AutoFundingRule {
       // Use recent income transactions
       const recentIncome = transactions
         .filter(
-          (t) =>
-            t.amount > 0 &&
-            new Date(t.date) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+          (t) => t.amount > 0 && new Date(t.date) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
         )
         .reduce((sum, t) => sum + t.amount, 0);
       return recentIncome || unassignedCash;
@@ -215,8 +204,7 @@ export class AutoFundingRule {
 
     if (!targetEnvelope) return 0;
 
-    const targetAmount =
-      this.config.targetAmount || targetEnvelope.monthlyBudget || 0;
+    const targetAmount = this.config.targetAmount || targetEnvelope.monthlyBudget || 0;
     const currentBalance = targetEnvelope.currentBalance || 0;
     const needed = Math.max(0, targetAmount - currentBalance);
 
@@ -312,7 +300,7 @@ export class AutoFundingEngine {
       });
 
       const applicableRules = this.getRulesByPriority(true).filter((rule) =>
-        rule.shouldExecute(context),
+        rule.shouldExecute(context)
       );
 
       logger.debug("Found applicable rules", {
@@ -446,9 +434,7 @@ export class AutoFundingEngine {
 
       case RULE_TYPES.SPLIT_REMAINDER:
         if (rule.config.targetIds && rule.config.targetIds.length > 0) {
-          const amountPerEnvelope = Math.floor(
-            totalAmount / rule.config.targetIds.length,
-          );
+          const amountPerEnvelope = Math.floor(totalAmount / rule.config.targetIds.length);
           rule.config.targetIds.forEach((envelopeId) => {
             transfers.push({
               fromEnvelopeId: "unassigned",
@@ -473,7 +459,7 @@ export class AutoFundingEngine {
         transfer.fromEnvelopeId,
         transfer.toEnvelopeId,
         transfer.amount,
-        transfer.description,
+        transfer.description
       );
 
       logger.debug("Transfer executed", transfer);
