@@ -10,12 +10,14 @@ import {
   query,
   where,
 } from "firebase/firestore";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
 import { encryptionUtils } from "./encryption";
 import { H } from "./highlight.js";
 import { firebaseConfig } from "./firebaseConfig";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 /**
  * ChunkedFirebaseSync - Handles large budget data by splitting into multiple documents
@@ -27,6 +29,47 @@ class ChunkedFirebaseSync {
     this.encryptionKey = null;
     this.maxChunkSize = 350 * 1024; // 350KB to account for encryption overhead (Firestore limit is 1MB)
     this.chunkSizeThreshold = 0.8; // Trigger re-chunking at 80% of max size
+    this.isAuthenticated = false;
+    this.authPromise = null;
+  }
+
+  /**
+   * Ensure user is authenticated with Firebase Auth
+   */
+  async ensureAuthenticated() {
+    if (this.isAuthenticated) {
+      return true;
+    }
+
+    if (this.authPromise) {
+      return this.authPromise;
+    }
+
+    this.authPromise = new Promise((resolve, reject) => {
+      const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        try {
+          if (user) {
+            console.log("🔥 Firebase user already authenticated:", user.uid);
+            this.isAuthenticated = true;
+            unsubscribe();
+            resolve(true);
+          } else {
+            console.log("🔥 Signing in anonymously to Firebase...");
+            const userCredential = await signInAnonymously(auth);
+            console.log("✅ Anonymous Firebase authentication successful:", userCredential.user.uid);
+            this.isAuthenticated = true;
+            unsubscribe();
+            resolve(true);
+          }
+        } catch (error) {
+          console.error("❌ Firebase authentication failed:", error);
+          unsubscribe();
+          reject(error);
+        }
+      }, reject);
+    });
+
+    return this.authPromise;
   }
 
   initialize(budgetId, encryptionKey) {
@@ -130,6 +173,9 @@ class ChunkedFirebaseSync {
     if (!this.budgetId || !this.encryptionKey) {
       throw new Error("ChunkedFirebaseSync not initialized");
     }
+
+    // Ensure user is authenticated before any Firestore operations
+    await this.ensureAuthenticated();
 
     try {
       console.log("🌩️ Starting chunked save to cloud...");
@@ -273,6 +319,9 @@ class ChunkedFirebaseSync {
       throw new Error("ChunkedFirebaseSync not initialized");
     }
 
+    // Ensure user is authenticated before any Firestore operations
+    await this.ensureAuthenticated();
+
     try {
       console.log("🌩️ Starting chunked load from cloud...");
 
@@ -368,6 +417,9 @@ class ChunkedFirebaseSync {
     if (!this.budgetId) {
       throw new Error("ChunkedFirebaseSync not initialized");
     }
+
+    // Ensure user is authenticated before any Firestore operations
+    await this.ensureAuthenticated();
 
     try {
       console.log("🗑️ Cleaning up old cloud data...");
