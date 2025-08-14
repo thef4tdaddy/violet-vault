@@ -46,27 +46,34 @@ class ChunkedFirebaseSync {
     }
 
     this.authPromise = new Promise((resolve, reject) => {
-      const unsubscribe = onAuthStateChanged(auth, async (user) => {
-        try {
-          if (user) {
-            console.log("🔥 Firebase user already authenticated:", user.uid);
-            this.isAuthenticated = true;
+      const unsubscribe = onAuthStateChanged(
+        auth,
+        async (user) => {
+          try {
+            if (user) {
+              console.log("🔥 Firebase user already authenticated:", user.uid);
+              this.isAuthenticated = true;
+              unsubscribe();
+              resolve(true);
+            } else {
+              console.log("🔥 Signing in anonymously to Firebase...");
+              const userCredential = await signInAnonymously(auth);
+              console.log(
+                "✅ Anonymous Firebase authentication successful:",
+                userCredential.user.uid,
+              );
+              this.isAuthenticated = true;
+              unsubscribe();
+              resolve(true);
+            }
+          } catch (error) {
+            console.error("❌ Firebase authentication failed:", error);
             unsubscribe();
-            resolve(true);
-          } else {
-            console.log("🔥 Signing in anonymously to Firebase...");
-            const userCredential = await signInAnonymously(auth);
-            console.log("✅ Anonymous Firebase authentication successful:", userCredential.user.uid);
-            this.isAuthenticated = true;
-            unsubscribe();
-            resolve(true);
+            reject(error);
           }
-        } catch (error) {
-          console.error("❌ Firebase authentication failed:", error);
-          unsubscribe();
-          reject(error);
-        }
-      }, reject);
+        },
+        reject,
+      );
     });
 
     return this.authPromise;
