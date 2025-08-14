@@ -1,15 +1,20 @@
 import { useState, useCallback, useMemo } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useBudgetStore } from "../stores/budgetStore";
+import useEnvelopes from "./useEnvelopes";
 import { ENVELOPE_TYPES, AUTO_CLASSIFY_ENVELOPE_TYPE } from "../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../constants/frequency";
+import { budgetDb } from "../db/budgetDb";
+import { queryKeys } from "../utils/queryClient";
 
 /**
  * Custom hook for managing unassigned cash distribution logic
  * Handles distribution calculations, validation, and envelope updates
  */
 const useUnassignedCashDistribution = () => {
-  const budget = useBudgetStore();
-  const { envelopes, unassignedCash, bulkUpdateEnvelopes, setUnassignedCash } = budget;
+  const { unassignedCash, setUnassignedCash } = useBudgetStore();
+  const { envelopes } = useEnvelopes();
+  const queryClient = useQueryClient();
 
   // Distribution state (modal state now handled by budget store)
   const [distributions, setDistributions] = useState({});
@@ -139,8 +144,8 @@ const useUnassignedCashDistribution = () => {
           const envelope = envelopes.find((env) => env.id === envelopeId);
           if (envelope) {
             envelopeUpdates.push({
-              id: envelopeId,
-              currentAmount: (envelope.currentAmount || 0) + distributionAmount,
+              ...envelope,
+              currentBalance: (envelope.currentBalance || 0) + distributionAmount,
             });
           }
         }
@@ -148,21 +153,24 @@ const useUnassignedCashDistribution = () => {
 
       // Apply updates
       if (envelopeUpdates.length > 0) {
-        bulkUpdateEnvelopes(envelopeUpdates);
+        await budgetDb.bulkUpsertEnvelopes(envelopeUpdates);
         setUnassignedCash(remainingCash);
+        queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
+        queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       }
 
       // Reset distributions after successful application
       setDistributions({});
     } catch (error) {
       console.error("Error applying distribution:", error);
+    } finally {
       setIsProcessing(false);
     }
   }, [
     isValidDistribution,
     distributions,
     envelopes,
-    bulkUpdateEnvelopes,
+    queryClient,
     setUnassignedCash,
     remainingCash,
   ]);
@@ -175,7 +183,7 @@ const useUnassignedCashDistribution = () => {
         return {
           ...envelope,
           distributionAmount,
-          newBalance: (envelope.currentAmount || 0) + distributionAmount,
+          newBalance: (envelope.currentBalance || 0) + distributionAmount,
         };
       })
       .filter((envelope) => envelope.distributionAmount > 0);
