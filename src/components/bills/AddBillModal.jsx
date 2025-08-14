@@ -76,11 +76,10 @@ const AddBillModal = ({
     if (isOpen) {
       const initialData = getInitialFormData(editingBill);
       const billEnvelopes = availableEnvelopes.filter((env) => {
-        // Check if envelope is suitable for bills - either explicitly marked as "bill" type
-        // or if no type is set (legacy data), allow all envelopes for backwards compatibility
-        const isBillEnvelope = env.envelopeType === "bill";
-        const isLegacyEnvelope = !env.envelopeType;
-        return isBillEnvelope || isLegacyEnvelope;
+        // Allow bills to be assigned to any envelope type - bills can be paid from
+        // bill envelopes, variable envelopes, or even savings envelopes if needed
+        // This gives users flexibility to organize their budgets as they prefer
+        return true; // Allow all envelopes for bill assignment
       });
 
       logger.debug("Initializing bill modal form data", {
@@ -574,29 +573,12 @@ const AddBillModal = ({
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">No envelope (use unassigned cash)</option>
-                {availableEnvelopes
-                  .filter((env) => {
-                    // Check if envelope is suitable for bills - either explicitly marked as "bill" type
-                    // or if no type is set (legacy data), allow all envelopes for backwards compatibility
-                    const isBillEnvelope = env.envelopeType === "bill";
-                    const isLegacyEnvelope = !env.envelopeType;
-                    const isAllowed = isBillEnvelope || isLegacyEnvelope;
-
-                    console.log(`Envelope ${env.name}:`, {
-                      envelopeType: env.envelopeType,
-                      isBillEnvelope,
-                      isLegacyEnvelope,
-                      isAllowed,
-                    });
-
-                    return isAllowed;
-                  })
-                  .map((envelope) => (
-                    <option key={envelope.id} value={envelope.id}>
-                      {envelope.name} ($
-                      {(envelope.currentBalance || 0).toFixed(2)} available)
-                    </option>
-                  ))}
+                {availableEnvelopes.map((envelope) => (
+                  <option key={envelope.id} value={envelope.id}>
+                    {envelope.name} ($
+                    {(envelope.currentBalance || 0).toFixed(2)} available)
+                  </option>
+                ))}
               </select>
               {formData.selectedEnvelope && (
                 <p className="text-xs text-green-600 mt-1">
@@ -607,8 +589,8 @@ const AddBillModal = ({
                 </p>
               )}
               <p className="text-xs text-blue-600 mt-1">
-                Only bill envelopes are available for assignment. Choose which
-                envelope will be used to pay this bill.
+                Choose which envelope will be used to pay this bill. Bills can be 
+                assigned to any envelope type for maximum budgeting flexibility.
               </p>
             </div>
 
