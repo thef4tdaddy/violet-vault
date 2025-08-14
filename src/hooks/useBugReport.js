@@ -47,67 +47,37 @@ const useBugReport = () => {
         },
         // Skip problematic CSS properties that html2canvas can't parse
         onclone: (clonedDoc) => {
-          // Remove any elements with problematic CSS like oklch() colors
-          const elements = clonedDoc.querySelectorAll("*");
-          elements.forEach((el) => {
-            try {
-              const style = window.getComputedStyle(el);
-              // Convert oklch() and other modern color functions to safe RGB values
-              const hasProblematicColors =
-                style.backgroundColor?.includes("oklch") ||
-                style.color?.includes("oklch") ||
-                style.borderColor?.includes("oklch") ||
-                style.backgroundColor?.includes("lab(") ||
-                style.color?.includes("lab(") ||
-                style.borderColor?.includes("lab(") ||
-                style.backgroundColor?.includes("lch(") ||
-                style.color?.includes("lch(") ||
-                style.borderColor?.includes("lch(");
-
-              if (hasProblematicColors) {
-                // Use safe fallback colors
-                if (
-                  style.backgroundColor?.includes("oklch") ||
-                  style.backgroundColor?.includes("lab(") ||
-                  style.backgroundColor?.includes("lch(")
-                ) {
-                  el.style.backgroundColor = "#ffffff";
-                }
-                if (
-                  style.color?.includes("oklch") ||
-                  style.color?.includes("lab(") ||
-                  style.color?.includes("lch(")
-                ) {
-                  el.style.color = "#000000";
-                }
-                if (
-                  style.borderColor?.includes("oklch") ||
-                  style.borderColor?.includes("lab(") ||
-                  style.borderColor?.includes("lch(")
-                ) {
-                  el.style.borderColor = "#cccccc";
-                }
+          try {
+            // Add global style override to handle oklch and other modern color functions
+            const style = clonedDoc.createElement("style");
+            style.textContent = `
+              /* Override problematic modern color functions for screenshot compatibility */
+              * {
+                /* Fallback for any oklch colors to safe RGB equivalents */
+                background-color: rgba(255, 255, 255, 0) !important;
+                color: rgb(0, 0, 0) !important;
+                border-color: rgb(204, 204, 204) !important;
               }
-
-              // Also handle any CSS variables that might contain problematic values
-              const cssVariables = style.cssText.match(/--[\w-]+:\s*[^;]+/g);
-              if (cssVariables) {
-                cssVariables.forEach((variable) => {
-                  if (
-                    variable.includes("oklch") ||
-                    variable.includes("lab(") ||
-                    variable.includes("lch(")
-                  ) {
-                    // Remove the problematic CSS variable
-                    const varName = variable.split(":")[0];
-                    el.style.removeProperty(varName.trim());
-                  }
-                });
-              }
-            } catch {
-              // Ignore style access errors
-            }
-          });
+              
+              /* Restore common colors that should be preserved */
+              .text-white, [class*="text-white"] { color: rgb(255, 255, 255) !important; }
+              .text-black, [class*="text-black"] { color: rgb(0, 0, 0) !important; }
+              .text-gray-600, [class*="text-gray-600"] { color: rgb(75, 85, 99) !important; }
+              .text-gray-900, [class*="text-gray-900"] { color: rgb(17, 24, 39) !important; }
+              .text-purple-600, [class*="text-purple-600"] { color: rgb(147, 51, 234) !important; }
+              .text-red-500, [class*="text-red-500"] { color: rgb(239, 68, 68) !important; }
+              .text-green-500, [class*="text-green-500"] { color: rgb(34, 197, 94) !important; }
+              
+              .bg-white, [class*="bg-white"] { background-color: rgb(255, 255, 255) !important; }
+              .bg-purple-500, [class*="bg-purple-500"] { background-color: rgb(168, 85, 247) !important; }
+              .bg-red-500, [class*="bg-red-500"] { background-color: rgb(239, 68, 68) !important; }
+              .bg-gray-50, [class*="bg-gray-50"] { background-color: rgb(249, 250, 251) !important; }
+              .bg-gray-100, [class*="bg-gray-100"] { background-color: rgb(243, 244, 246) !important; }
+            `;
+            clonedDoc.head.appendChild(style);
+          } catch (error) {
+            console.warn("Failed to apply screenshot color fixes:", error);
+          }
         },
       });
 
