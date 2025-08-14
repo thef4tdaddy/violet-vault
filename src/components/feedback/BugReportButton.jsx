@@ -66,7 +66,7 @@ const BugReportButton = () => {
       {/* Floating Bug Report Button */}
       <button
         onClick={openModal}
-        className="fixed bottom-4 right-4 z-50 bg-red-500 hover:bg-red-600 text-white rounded-full p-3 shadow-lg transition-all duration-200 hover:scale-105"
+        className="fixed bottom-20 right-4 lg:bottom-4 z-50 bg-red-500 hover:bg-red-600 text-white rounded-full p-3 shadow-lg transition-all duration-200 hover:scale-105"
         title="Report a Problem"
         data-bug-report="true"
       >
