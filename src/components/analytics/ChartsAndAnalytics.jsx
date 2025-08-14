@@ -535,7 +535,7 @@ const ChartsAnalytics = ({
           <div className="glassmorphism rounded-xl p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Spending Envelopes</h3>
             <ResponsiveContainer width="100%" height={300}>
-              {envelopeSpending.length > 0 ? (
+              {envelopeSpending && envelopeSpending.length > 0 ? (
                 <PieChart>
                   <Pie
                     data={envelopeSpending.slice(0, 8)}
@@ -546,9 +546,12 @@ const ChartsAnalytics = ({
                     dataKey="amount"
                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                   >
-                    {envelopeSpending.slice(0, 8).map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color || chartColors[index]} />
-                    ))}
+                    {envelopeSpending &&
+                      envelopeSpending
+                        .slice(0, 8)
+                        .map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color || chartColors[index]} />
+                        ))}
                   </Pie>
                   <Tooltip content={<CustomTooltip />} />
                 </PieChart>
@@ -589,7 +592,7 @@ const ChartsAnalytics = ({
             </div>
 
             <ResponsiveContainer width="100%" height={400}>
-              {chartType === "line" && monthlyTrends.length > 0 && (
+              {chartType === "line" && monthlyTrends && monthlyTrends.length > 0 && (
                 <LineChart data={monthlyTrends}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="month" stroke="#6b7280" />
@@ -612,7 +615,7 @@ const ChartsAnalytics = ({
                   />
                 </LineChart>
               )}
-              {chartType === "bar" && monthlyTrends.length > 0 && (
+              {chartType === "bar" && monthlyTrends && monthlyTrends.length > 0 && (
                 <BarChart data={monthlyTrends}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="month" stroke="#6b7280" />
@@ -623,7 +626,7 @@ const ChartsAnalytics = ({
                   <Bar dataKey="expenses" fill="#ef4444" name="Expenses" />
                 </BarChart>
               )}
-              {chartType === "area" && monthlyTrends.length > 0 && (
+              {chartType === "area" && monthlyTrends && monthlyTrends.length > 0 && (
                 <AreaChart data={monthlyTrends}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="month" stroke="#6b7280" />
@@ -650,7 +653,7 @@ const ChartsAnalytics = ({
                   />
                 </AreaChart>
               )}
-              {monthlyTrends.length === 0 && (
+              {(!monthlyTrends || monthlyTrends.length === 0) && (
                 <div className="flex items-center justify-center h-full text-gray-500">
                   <div className="text-center">
                     <BarChart3 className="h-12 w-12 mx-auto mb-3 opacity-50" />
@@ -665,7 +668,7 @@ const ChartsAnalytics = ({
           <div className="glassmorphism rounded-xl p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Weekly Spending Patterns</h3>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={weeklyPatterns}>
+              <BarChart data={weeklyPatterns || []}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis dataKey="day" stroke="#6b7280" />
                 <YAxis stroke="#6b7280" />
@@ -744,7 +747,7 @@ const ChartsAnalytics = ({
           <div className="glassmorphism rounded-xl p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Budget vs Actual Spending</h3>
             <ResponsiveContainer width="100%" height={400}>
-              <BarChart data={budgetVsActual} layout="horizontal">
+              <BarChart data={budgetVsActual || []} layout="horizontal">
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis type="number" stroke="#6b7280" />
                 <YAxis dataKey="name" type="category" stroke="#6b7280" width={100} />
@@ -766,7 +769,7 @@ const ChartsAnalytics = ({
             <ResponsiveContainer width="100%" height={400}>
               <PieChart>
                 <Pie
-                  data={categoryBreakdown}
+                  data={categoryBreakdown || []}
                   cx="50%"
                   cy="50%"
                   outerRadius={120}
@@ -774,7 +777,7 @@ const ChartsAnalytics = ({
                   dataKey="amount"
                   label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                 >
-                  {categoryBreakdown.map((_, index) => (
+                  {(categoryBreakdown || []).map((_, index) => (
                     <Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
                   ))}
                 </Pie>
@@ -787,7 +790,7 @@ const ChartsAnalytics = ({
           <div className="glassmorphism rounded-xl p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Category Details</h3>
             <div className="space-y-3 max-h-96 overflow-y-auto">
-              {categoryBreakdown.map((category, index) => (
+              {(categoryBreakdown || []).map((category, index) => (
                 <div
                   key={index}
                   className="flex items-center justify-between p-3 bg-white/40 rounded-lg"
