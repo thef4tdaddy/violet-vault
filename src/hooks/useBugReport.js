@@ -184,24 +184,32 @@ const useBugReport = () => {
 
           // Detect active view from navigation tabs (VioletVault uses tab-based navigation)
           let currentPage = "unknown";
-          
+
           // First try to detect from active navigation tab
-          const activeTab = document.querySelector('[aria-current="page"], .border-t-2.border-purple-500, .text-purple-600.bg-purple-50');
+          const activeTab = document.querySelector(
+            '[aria-current="page"], .border-t-2.border-purple-500, .text-purple-600.bg-purple-50',
+          );
           if (activeTab) {
             const tabText = activeTab.textContent?.toLowerCase().trim();
             if (tabText) {
-              if (tabText.includes('dashboard')) currentPage = 'dashboard';
-              else if (tabText.includes('envelope')) currentPage = 'envelopes';
-              else if (tabText.includes('savings')) currentPage = 'savings';
-              else if (tabText.includes('supplemental')) currentPage = 'supplemental';
-              else if (tabText.includes('paycheck')) currentPage = 'paycheck';
-              else if (tabText.includes('bills') || tabText.includes('manage')) currentPage = 'bills';
-              else if (tabText.includes('debt')) currentPage = 'debt';
-              else if (tabText.includes('analytics') || tabText.includes('chart')) currentPage = 'analytics';
-              else if (tabText.includes('settings')) currentPage = 'settings';
+              if (tabText.includes("dashboard")) currentPage = "dashboard";
+              else if (tabText.includes("envelope")) currentPage = "envelopes";
+              else if (tabText.includes("savings")) currentPage = "savings";
+              else if (tabText.includes("supplemental"))
+                currentPage = "supplemental";
+              else if (tabText.includes("paycheck")) currentPage = "paycheck";
+              else if (tabText.includes("bills") || tabText.includes("manage"))
+                currentPage = "bills";
+              else if (tabText.includes("debt")) currentPage = "debt";
+              else if (
+                tabText.includes("analytics") ||
+                tabText.includes("chart")
+              )
+                currentPage = "analytics";
+              else if (tabText.includes("settings")) currentPage = "settings";
             }
           }
-          
+
           // Fallback to URL-based detection for other pages
           if (currentPage === "unknown") {
             if (path.includes("/debt") || hash.includes("debt"))
@@ -220,17 +228,39 @@ const useBugReport = () => {
             else if (path === "/" || path === "" || hash === "#/")
               currentPage = "dashboard";
           }
-          
+
           // Additional detection from main content area
           if (currentPage === "unknown") {
-            const mainContent = document.querySelector('main, [role="main"], .main-content');
+            const mainContent = document.querySelector(
+              'main, [role="main"], .main-content',
+            );
             if (mainContent) {
-              const contentText = mainContent.textContent?.toLowerCase() || '';
-              if (contentText.includes('envelope') && contentText.includes('budget')) currentPage = 'envelopes';
-              else if (contentText.includes('debt') && contentText.includes('payoff')) currentPage = 'debt';
-              else if (contentText.includes('savings') && contentText.includes('goal')) currentPage = 'savings';
-              else if (contentText.includes('bill') && contentText.includes('manage')) currentPage = 'bills';
-              else if (contentText.includes('paycheck') || contentText.includes('income')) currentPage = 'paycheck';
+              const contentText = mainContent.textContent?.toLowerCase() || "";
+              if (
+                contentText.includes("envelope") &&
+                contentText.includes("budget")
+              )
+                currentPage = "envelopes";
+              else if (
+                contentText.includes("debt") &&
+                contentText.includes("payoff")
+              )
+                currentPage = "debt";
+              else if (
+                contentText.includes("savings") &&
+                contentText.includes("goal")
+              )
+                currentPage = "savings";
+              else if (
+                contentText.includes("bill") &&
+                contentText.includes("manage")
+              )
+                currentPage = "bills";
+              else if (
+                contentText.includes("paycheck") ||
+                contentText.includes("income")
+              )
+                currentPage = "paycheck";
             }
           }
 

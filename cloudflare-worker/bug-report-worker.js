@@ -708,18 +708,23 @@ async function generateSmartLabels(description, reportEnv) {
   // Enhanced context analysis using comprehensive browser info
   if (reportEnv?.browserInfo) {
     // Memory-related issues
-    if (reportEnv.browserInfo.memory && typeof reportEnv.browserInfo.memory === 'object') {
-      const usedMemory = parseInt(reportEnv.browserInfo.memory.usedJSHeapSize) || 0;
-      if (usedMemory > 100) { // More than 100MB JS heap usage
+    if (
+      reportEnv.browserInfo.memory &&
+      typeof reportEnv.browserInfo.memory === "object"
+    ) {
+      const usedMemory =
+        parseInt(reportEnv.browserInfo.memory.usedJSHeapSize) || 0;
+      if (usedMemory > 100) {
+        // More than 100MB JS heap usage
         labels.push("performance", "memory");
       }
     }
-    
+
     // Touch/mobile device indicators
     if (reportEnv.browserInfo.maxTouchPoints > 0) {
       labels.push("mobile", "touch");
     }
-    
+
     // Offline/connectivity issues
     if (reportEnv.browserInfo.onLine === false) {
       labels.push("connectivity", "offline");
@@ -729,12 +734,14 @@ async function generateSmartLabels(description, reportEnv) {
   // Storage-related issues
   if (reportEnv?.storageInfo) {
     const localStorageKB = parseInt(reportEnv.storageInfo.localStorage) || 0;
-    const sessionStorageKB = parseInt(reportEnv.storageInfo.sessionStorage) || 0;
-    
-    if (localStorageKB > 1024 || sessionStorageKB > 512) { // Large storage usage
+    const sessionStorageKB =
+      parseInt(reportEnv.storageInfo.sessionStorage) || 0;
+
+    if (localStorageKB > 1024 || sessionStorageKB > 512) {
+      // Large storage usage
       labels.push("storage", "performance");
     }
-    
+
     if (reportEnv.storageInfo.error) {
       labels.push("storage", "permissions");
     }
@@ -746,16 +753,20 @@ async function generateSmartLabels(description, reportEnv) {
     if (reportEnv.domInfo.documentDimensions) {
       const docWidth = reportEnv.domInfo.documentDimensions.width;
       const docHeight = reportEnv.domInfo.documentDimensions.height;
-      
+
       if (docHeight > 10000 || docWidth > 3000) {
         labels.push("performance", "ui");
       }
     }
-    
+
     // Focus-related issues
     if (reportEnv.domInfo.focusedElement) {
       const focusedType = reportEnv.domInfo.focusedElement.type;
-      if (focusedType === 'text' || focusedType === 'email' || focusedType === 'password') {
+      if (
+        focusedType === "text" ||
+        focusedType === "email" ||
+        focusedType === "password"
+      ) {
         labels.push("forms", "input");
       }
     }
@@ -763,8 +774,8 @@ async function generateSmartLabels(description, reportEnv) {
 
   // Performance timing analysis
   if (reportEnv?.performanceInfo && Array.isArray(reportEnv.performanceInfo)) {
-    const perfData = reportEnv.performanceInfo.join(' ').toLowerCase();
-    if (perfData.includes('slow') || perfData.includes('timeout')) {
+    const perfData = reportEnv.performanceInfo.join(" ").toLowerCase();
+    if (perfData.includes("slow") || perfData.includes("timeout")) {
       labels.push("performance", "loading");
     }
   }
@@ -772,43 +783,43 @@ async function generateSmartLabels(description, reportEnv) {
   // Active modals and UI state context
   if (pageContext?.visibleModals && pageContext.visibleModals.length > 0) {
     labels.push("modal", "ui");
-    
+
     // Check for specific modal types
-    const modalText = pageContext.visibleModals.join(' ').toLowerCase();
-    if (modalText.includes('edit') || modalText.includes('add')) {
+    const modalText = pageContext.visibleModals.join(" ").toLowerCase();
+    if (modalText.includes("edit") || modalText.includes("add")) {
       labels.push("forms");
     }
-    if (modalText.includes('debt')) {
+    if (modalText.includes("debt")) {
       labels.push("debt");
     }
-    if (modalText.includes('envelope') || modalText.includes('budget')) {
+    if (modalText.includes("envelope") || modalText.includes("budget")) {
       labels.push("envelope");
     }
   }
 
   // Button context for interaction issues
   if (pageContext?.activeButtons && pageContext.activeButtons.length > 0) {
-    const buttonText = pageContext.activeButtons.join(' ').toLowerCase();
-    if (buttonText.includes('save') || buttonText.includes('submit')) {
+    const buttonText = pageContext.activeButtons.join(" ").toLowerCase();
+    if (buttonText.includes("save") || buttonText.includes("submit")) {
       labels.push("forms", "save");
     }
-    if (buttonText.includes('delete') || buttonText.includes('remove')) {
+    if (buttonText.includes("delete") || buttonText.includes("remove")) {
       labels.push("delete");
     }
-    if (buttonText.includes('sync') || buttonText.includes('backup')) {
+    if (buttonText.includes("sync") || buttonText.includes("backup")) {
       labels.push("sync");
     }
   }
 
   // Enhanced accessibility and device context
-  if (reportEnv?.colorScheme === 'dark') {
+  if (reportEnv?.colorScheme === "dark") {
     labels.push("dark-mode");
   }
-  
+
   if (reportEnv?.reducedMotion === true) {
     labels.push("accessibility", "motion");
   }
-  
+
   if (reportEnv?.standaloneMode === true) {
     labels.push("pwa", "standalone");
   }
@@ -816,7 +827,7 @@ async function generateSmartLabels(description, reportEnv) {
   // Network/connection type analysis
   if (reportEnv?.connectionType) {
     const conn = reportEnv.connectionType.toLowerCase();
-    if (conn.includes('slow') || conn === '2g' || conn === '3g') {
+    if (conn.includes("slow") || conn === "2g" || conn === "3g") {
       labels.push("performance", "slow-connection");
     }
   }
@@ -853,45 +864,58 @@ async function createGitHubIssue(data, env) {
   // Build issue body with all available information
   // Parse line breaks into checklist items if description contains bullet points or line breaks
   let processedDescription = description;
-  if (description.includes('\n') && description.split('\n').length > 2) {
+  if (description.includes("\n") && description.split("\n").length > 2) {
     // Convert multi-line descriptions into GitHub checklist format
-    const lines = description.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    const lines = description
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
     if (lines.length > 1) {
       const firstLine = lines[0];
       const remainingLines = lines.slice(1);
-      
-      processedDescription = `${firstLine}\n\n### Steps/Details:\n` + 
-        remainingLines.map(line => {
-          // Convert to checklist items if not already formatted
-          if (line.startsWith('-') || line.startsWith('*') || line.startsWith('•')) {
-            return `- [ ] ${line.substring(1).trim()}`;
-          } else if (line.match(/^\d+\./)) {
-            // Convert numbered list to checklist
-            return `- [ ] ${line.replace(/^\d+\.\s*/, '')}`;
-          } else {
-            return `- [ ] ${line}`;
-          }
-        }).join('\n');
+
+      processedDescription =
+        `${firstLine}\n\n### Steps/Details:\n` +
+        remainingLines
+          .map((line) => {
+            // Convert to checklist items if not already formatted
+            if (
+              line.startsWith("-") ||
+              line.startsWith("*") ||
+              line.startsWith("•")
+            ) {
+              return `- [ ] ${line.substring(1).trim()}`;
+            } else if (line.match(/^\d+\./)) {
+              // Convert numbered list to checklist
+              return `- [ ] ${line.replace(/^\d+\.\s*/, "")}`;
+            } else {
+              return `- [ ] ${line}`;
+            }
+          })
+          .join("\n");
     }
   }
-  
+
   let issueBody = `## Bug Report\n\n${processedDescription}\n\n`;
 
   // Add user location prominently at the top
   if (reportEnv?.pageContext) {
     issueBody += `## 📍 User Location\n`;
-    issueBody += `**Page:** ${reportEnv.pageContext.page || 'unknown'}\n`;
-    issueBody += `**Screen:** ${reportEnv.pageContext.screenTitle || 'Unknown'}\n`;
+    issueBody += `**Page:** ${reportEnv.pageContext.page || "unknown"}\n`;
+    issueBody += `**Screen:** ${reportEnv.pageContext.screenTitle || "Unknown"}\n`;
     issueBody += `**URL:** ${reportEnv.url}\n`;
-    
-    if (reportEnv.pageContext.visibleModals && reportEnv.pageContext.visibleModals.length > 0) {
-      issueBody += `**Active Modal(s):** ${reportEnv.pageContext.visibleModals.join(', ')}\n`;
+
+    if (
+      reportEnv.pageContext.visibleModals &&
+      reportEnv.pageContext.visibleModals.length > 0
+    ) {
+      issueBody += `**Active Modal(s):** ${reportEnv.pageContext.visibleModals.join(", ")}\n`;
     }
-    
+
     if (reportEnv.pageContext.userLocation) {
       issueBody += `**Context:** ${reportEnv.pageContext.userLocation}\n`;
     }
-    
+
     issueBody += `\n`;
   } else if (reportEnv?.url) {
     issueBody += `## 📍 User Location\n`;
@@ -945,7 +969,7 @@ async function createGitHubIssue(data, env) {
     if (reportEnv.connectionType && reportEnv.connectionType !== "unknown") {
       issueBody += `- **Connection Type:** ${reportEnv.connectionType}\n`;
     }
-    
+
     // Add enhanced context information
     if (reportEnv.colorScheme) {
       issueBody += `- **Color Scheme:** ${reportEnv.colorScheme}\n`;
@@ -954,23 +978,26 @@ async function createGitHubIssue(data, env) {
       issueBody += `- **Timezone:** ${reportEnv.timezone}\n`;
     }
     if (reportEnv.touchSupport !== undefined) {
-      issueBody += `- **Touch Support:** ${reportEnv.touchSupport ? 'Yes' : 'No'}\n`;
+      issueBody += `- **Touch Support:** ${reportEnv.touchSupport ? "Yes" : "No"}\n`;
     }
     if (reportEnv.standaloneMode !== undefined) {
-      issueBody += `- **PWA Mode:** ${reportEnv.standaloneMode ? 'Standalone' : 'Browser'}\n`;
+      issueBody += `- **PWA Mode:** ${reportEnv.standaloneMode ? "Standalone" : "Browser"}\n`;
     }
 
     // Add browser performance info
     if (reportEnv.browserInfo) {
       issueBody += `\n## Browser Performance\n`;
-      if (reportEnv.browserInfo.memory && typeof reportEnv.browserInfo.memory === 'object') {
+      if (
+        reportEnv.browserInfo.memory &&
+        typeof reportEnv.browserInfo.memory === "object"
+      ) {
         issueBody += `- **JS Memory Usage:** ${reportEnv.browserInfo.memory.usedJSHeapSize} / ${reportEnv.browserInfo.memory.totalJSHeapSize}\n`;
       }
       if (reportEnv.browserInfo.hardwareConcurrency) {
         issueBody += `- **CPU Cores:** ${reportEnv.browserInfo.hardwareConcurrency}\n`;
       }
       if (reportEnv.browserInfo.onLine !== undefined) {
-        issueBody += `- **Online Status:** ${reportEnv.browserInfo.onLine ? 'Online' : 'Offline'}\n`;
+        issueBody += `- **Online Status:** ${reportEnv.browserInfo.onLine ? "Online" : "Offline"}\n`;
       }
     }
 
@@ -980,7 +1007,10 @@ async function createGitHubIssue(data, env) {
       if (reportEnv.storageInfo.localStorage && !reportEnv.storageInfo.error) {
         issueBody += `- **Local Storage:** ${reportEnv.storageInfo.localStorage} (${reportEnv.storageInfo.localStorageItems} items)\n`;
       }
-      if (reportEnv.storageInfo.sessionStorage && !reportEnv.storageInfo.error) {
+      if (
+        reportEnv.storageInfo.sessionStorage &&
+        !reportEnv.storageInfo.error
+      ) {
         issueBody += `- **Session Storage:** ${reportEnv.storageInfo.sessionStorage} (${reportEnv.storageInfo.sessionStorageItems} items)\n`;
       }
       if (reportEnv.storageInfo.error) {
@@ -998,14 +1028,18 @@ async function createGitHubIssue(data, env) {
         issueBody += `- **Document Size:** ${reportEnv.domInfo.documentDimensions.width}x${reportEnv.domInfo.documentDimensions.height}px\n`;
       }
       if (reportEnv.domInfo.focusedElement) {
-        issueBody += `- **Focused Element:** ${reportEnv.domInfo.focusedElement.tagName}${reportEnv.domInfo.focusedElement.id ? `#${reportEnv.domInfo.focusedElement.id}` : ''}${reportEnv.domInfo.focusedElement.type ? ` (${reportEnv.domInfo.focusedElement.type})` : ''}\n`;
+        issueBody += `- **Focused Element:** ${reportEnv.domInfo.focusedElement.tagName}${reportEnv.domInfo.focusedElement.id ? `#${reportEnv.domInfo.focusedElement.id}` : ""}${reportEnv.domInfo.focusedElement.type ? ` (${reportEnv.domInfo.focusedElement.type})` : ""}\n`;
       }
     }
 
     // Add performance timing if available
-    if (reportEnv.performanceInfo && Array.isArray(reportEnv.performanceInfo) && reportEnv.performanceInfo.length > 0) {
+    if (
+      reportEnv.performanceInfo &&
+      Array.isArray(reportEnv.performanceInfo) &&
+      reportEnv.performanceInfo.length > 0
+    ) {
       issueBody += `\n## Performance Timing\n`;
-      reportEnv.performanceInfo.forEach(info => {
+      reportEnv.performanceInfo.forEach((info) => {
         issueBody += `- ${info}\n`;
       });
     }
