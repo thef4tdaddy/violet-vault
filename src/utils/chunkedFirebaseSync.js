@@ -169,7 +169,7 @@ class ChunkedFirebaseSync {
   /**
    * Save data to cloud using chunked approach
    */
-  async saveToCloud(data, currentUser, options = {}) {
+  async saveToCloud(data, currentUser, _options = {}) {
     if (!this.budgetId || !this.encryptionKey) {
       throw new Error("ChunkedFirebaseSync not initialized");
     }
