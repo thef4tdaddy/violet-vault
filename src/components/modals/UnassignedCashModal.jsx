@@ -17,7 +17,7 @@ import useUnassignedCashDistribution from "../../hooks/useUnassignedCashDistribu
  * Pure UI component - all logic handled by useUnassignedCashDistribution hook
  */
 const EnvelopeItem = memo(({ envelope, distributionAmount, updateDistribution, isProcessing }) => {
-  const newBalance = (envelope.currentAmount || 0) + distributionAmount;
+  const newBalance = (envelope.currentBalance || 0) + distributionAmount;
 
   return (
     <div className="bg-white border rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors">
@@ -30,10 +30,10 @@ const EnvelopeItem = memo(({ envelope, distributionAmount, updateDistribution, i
           <div className="flex-1 min-w-0">
             <h5 className="font-medium text-gray-900 text-sm truncate">{envelope.name}</h5>
             <p className="text-xs text-gray-600 truncate">
-              Current: ${(envelope.currentAmount || 0).toFixed(2)}
-              {envelope.monthlyAmount && (
+              Current: ${(envelope.currentBalance || 0).toFixed(2)}
+              {(envelope.monthlyBudget ?? envelope.monthlyAmount) && (
                 <span className="hidden sm:inline ml-2">
-                  • Budget: ${envelope.monthlyAmount.toFixed(2)}/month
+                  • Budget: ${(envelope.monthlyBudget ?? envelope.monthlyAmount).toFixed(2)}/month
                 </span>
               )}
             </p>
