@@ -3,6 +3,7 @@ import { useMemo, useCallback, useEffect } from "react";
 import { useBudgetStore } from "../stores/budgetStore";
 import { queryKeys, optimisticHelpers } from "../utils/queryClient";
 import { budgetDb } from "../db/budgetDb";
+import { AUTO_CLASSIFY_ENVELOPE_TYPE } from "../constants/categories";
 
 /**
  * Specialized hook for envelope management
@@ -35,6 +36,12 @@ const useEnvelopes = (options = {}) => {
       }
 
       console.log("✅ TanStack Query: Loaded from Dexie:", envelopes.length);
+
+      // Ensure all envelopes have envelopeType set for consistency
+      envelopes = envelopes.map(envelope => ({
+        ...envelope,
+        envelopeType: envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category || "expenses"),
+      }));
 
       // Apply filters
       let filteredEnvelopes = envelopes;
@@ -137,6 +144,8 @@ const useEnvelopes = (options = {}) => {
         archived: false,
         createdAt: new Date().toISOString(),
         ...envelopeData,
+        // Ensure envelopeType is set using auto-classification
+        envelopeType: envelopeData.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelopeData.category || "expenses"),
       };
 
       // Optimistic update
