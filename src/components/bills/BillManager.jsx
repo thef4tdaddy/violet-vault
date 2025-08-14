@@ -43,7 +43,11 @@ const BillManager = ({
   // Enhanced TanStack Query integration with loading states
   const { data: tanStackTransactions = [], isLoading: transactionsLoading } = useTransactions();
 
-  const { data: tanStackEnvelopes = [], addEnvelope, isLoading: envelopesLoading } = useEnvelopes();
+  const {
+    envelopes: tanStackEnvelopes = [],
+    addEnvelope,
+    isLoading: envelopesLoading,
+  } = useEnvelopes();
 
   const {
     bills: tanStackBills = [],
@@ -74,15 +78,30 @@ const BillManager = ({
     [propTransactions, tanStackTransactions, budget.allTransactions]
   );
 
-  const envelopes = useMemo(
-    () =>
+  const envelopes = useMemo(() => {
+    const result =
       propEnvelopes && propEnvelopes.length
         ? propEnvelopes
         : tanStackEnvelopes.length
           ? tanStackEnvelopes
-          : budget.envelopes || [],
-    [propEnvelopes, tanStackEnvelopes, budget.envelopes]
-  );
+          : budget.envelopes || [];
+
+    logger.debug("🔍 BillManager envelopes resolution:", {
+      propEnvelopesLength: propEnvelopes?.length || 0,
+      tanStackEnvelopesLength: tanStackEnvelopes?.length || 0,
+      budgetEnvelopesLength: budget.envelopes?.length || 0,
+      resultLength: result?.length || 0,
+      envelopesLoading,
+      selectedSource: propEnvelopes?.length
+        ? "props"
+        : tanStackEnvelopes?.length
+          ? "tanstack"
+          : "budget",
+      firstEnvelope: result?.[0],
+    });
+
+    return result;
+  }, [propEnvelopes, tanStackEnvelopes, budget.envelopes]);
 
   const [selectedBills, setSelectedBills] = useState(new Set());
   const [viewMode, setViewMode] = useState("upcoming");
