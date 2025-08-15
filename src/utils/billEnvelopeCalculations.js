@@ -337,11 +337,22 @@ export const getBillEnvelopeDisplayInfo = (envelope, bills = []) => {
           const progressThroughCycle = Math.max(0, Math.min(1, (cycleDays - daysUntilNextBill) / cycleDays));
           const expectedFunding = targetAmount * progressThroughCycle;
           
+          // Debug logging for 1Password case
+          console.log('🔍 Bill Status Debug:', {
+            billName: nextBill.name,
+            frequency: nextBill.frequency,
+            daysUntilBill: daysUntilNextBill,
+            cycleDays,
+            progressThroughCycle,
+            targetAmount,
+            expectedFunding,
+            currentBalance
+          });
+          
           // On Track = current funding is within reasonable range of expected
           // Allow some buffer (±20%) for timing variations
           const buffer = 0.2;
           const minExpected = expectedFunding * (1 - buffer);
-          const maxExpected = expectedFunding * (1 + buffer);
           
           if (currentBalance >= minExpected) {
             return "On Track";
