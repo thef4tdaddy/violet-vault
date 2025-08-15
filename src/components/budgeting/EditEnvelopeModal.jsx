@@ -103,7 +103,10 @@ const EditEnvelopeModal = ({
         priority: envelope.priority || "medium",
         autoAllocate: envelope.autoAllocate ?? true,
         icon: envelope.icon || Tag,
-        envelopeType: envelope.envelopeType || ENVELOPE_TYPES.VARIABLE,
+        envelopeType:
+          envelope.envelopeType === ENVELOPE_TYPES.SAVINGS
+            ? ENVELOPE_TYPES.VARIABLE
+            : envelope.envelopeType || ENVELOPE_TYPES.VARIABLE,
         monthlyBudget: envelope.monthlyBudget?.toString() || "",
         biweeklyAllocation: envelope.biweeklyAllocation?.toString() || "",
         targetAmount: envelope.targetAmount?.toString() || "",
@@ -179,13 +182,8 @@ const EditEnvelopeModal = ({
       } else if (parseFloat(formData.monthlyBudget) > 50000) {
         newErrors.monthlyBudget = "Monthly budget seems unusually high";
       }
-    } else if (formData.envelopeType === ENVELOPE_TYPES.SAVINGS) {
-      if (!formData.targetAmount || parseFloat(formData.targetAmount) <= 0) {
-        newErrors.targetAmount = "Target amount must be greater than 0";
-      } else if (parseFloat(formData.targetAmount) > 1000000) {
-        newErrors.targetAmount = "Target amount seems unusually high";
-      }
     }
+    // Remove savings validation since savings envelopes are managed separately
 
     // Legacy monthlyAmount validation (only if still present and no type-specific amount is set)
     if (formData.monthlyAmount && parseFloat(formData.monthlyAmount) > 50000) {
@@ -419,56 +417,66 @@ const EditEnvelopeModal = ({
                 Envelope Type
               </h3>
 
-              <div className="grid grid-cols-1 gap-3">
-                {Object.entries(ENVELOPE_TYPE_CONFIG).map(([type, config]) => {
-                  const IconComponent =
-                    type === ENVELOPE_TYPES.BILL
-                      ? FileText
-                      : type === ENVELOPE_TYPES.VARIABLE
-                        ? TrendingUp
-                        : Target;
-                  return (
-                    <label
-                      key={type}
-                      className={`glassmorphism border-2 rounded-2xl p-4 cursor-pointer transition-all hover:shadow-lg ${
-                        formData.envelopeType === type
-                          ? `${config.borderColor} ${config.bgColor} shadow-md`
-                          : "border-gray-200 hover:border-gray-300"
-                      }`}
-                    >
-                      <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
-                        <input
-                          type="radio"
-                          name="envelopeType"
-                          value={type}
-                          checked={formData.envelopeType === type}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              envelopeType: e.target.value,
-                            })
-                          }
-                          className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 mt-0.5 justify-self-start"
-                        />
-                        <div>
-                          <div className="flex items-center mb-1">
-                            <IconComponent
-                              className={`h-4 w-4 mr-2 ${config.textColor}`}
-                            />
-                            <span
-                              className={`font-semibold ${config.textColor}`}
-                            >
-                              {config.name}
-                            </span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {Object.entries(ENVELOPE_TYPE_CONFIG)
+                  .filter(([type]) => type !== ENVELOPE_TYPES.SAVINGS) // Remove savings from envelope manager
+                  .map(([type, config]) => {
+                    const IconComponent =
+                      type === ENVELOPE_TYPES.BILL
+                        ? FileText
+                        : type === ENVELOPE_TYPES.VARIABLE
+                          ? TrendingUp
+                          : Target;
+                    const isSelected = formData.envelopeType === type;
+                    return (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() =>
+                          setFormData({
+                            ...formData,
+                            envelopeType: type,
+                          })
+                        }
+                        className={`border-2 rounded-xl p-4 text-left transition-all hover:shadow-md ${
+                          isSelected
+                            ? `${config.borderColor} ${config.bgColor} shadow-md`
+                            : "border-gray-200 hover:border-gray-300 bg-white"
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div
+                            className={`mt-1 w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                              isSelected
+                                ? `${config.borderColor.replace("border-", "border-")} ${config.bgColor.replace("bg-", "bg-")}`
+                                : "border-gray-300"
+                            }`}
+                          >
+                            {isSelected && (
+                              <div
+                                className={`w-2 h-2 rounded-full ${config.bgColor.replace("bg-", "bg-").replace("-50", "-500")}`}
+                              />
+                            )}
                           </div>
-                          <p className="text-sm text-gray-600">
-                            {config.description}
-                          </p>
+                          <div className="flex-1">
+                            <div className="flex items-center mb-1">
+                              <IconComponent
+                                className={`h-4 w-4 mr-2 ${isSelected ? config.textColor : "text-gray-500"}`}
+                              />
+                              <span
+                                className={`font-semibold ${isSelected ? config.textColor : "text-gray-700"}`}
+                              >
+                                {config.name}
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-600">
+                              {config.description}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </label>
-                  );
-                })}
+                      </button>
+                    );
+                  })}
               </div>
             </div>
 
@@ -524,6 +532,70 @@ const EditEnvelopeModal = ({
                   ))}
                 </select>
               </div>
+
+              {/* Bill Connection - ALWAYS VISIBLE */}
+              <div className="bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-300 rounded-xl p-6 mb-4">
+                <label className="block text-lg font-bold text-purple-800 mb-4 flex items-center">
+                  <Sparkles className="h-6 w-6 mr-3" />
+                  🔗 Connect to Existing Bill
+                </label>
+
+                {/* Debug info */}
+                <div className="mb-3 p-2 bg-yellow-100 border border-yellow-300 rounded text-xs text-yellow-800">
+                  Debug: Bills available:{" "}
+                  {allBills ? allBills.length : "undefined"} | Props received:{" "}
+                  {allBills ? "yes" : "no"} | Selected:{" "}
+                  {selectedBillId || "none"}
+                </div>
+
+                <select
+                  value={selectedBillId}
+                  onChange={(e) => handleBillSelection(e.target.value)}
+                  className="w-full px-4 py-4 border-2 border-purple-400 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white shadow-md text-base"
+                >
+                  <option value="">
+                    {allBills && allBills.length > 0
+                      ? "Choose a bill to auto-populate settings..."
+                      : "No bills available to connect"}
+                  </option>
+                  {allBills &&
+                    allBills
+                      .filter(
+                        (bill) =>
+                          !bill.envelopeId || bill.envelopeId === envelope?.id,
+                      ) // Only show unassigned bills or bills assigned to this envelope
+                      .map((bill) => (
+                        <option key={bill.id} value={bill.id}>
+                          {bill.name || bill.provider} - $
+                          {parseFloat(bill.amount || 0).toFixed(2)} (
+                          {bill.frequency || "monthly"})
+                        </option>
+                      ))}
+                </select>
+
+                {selectedBillId && (
+                  <div className="mt-3 p-3 bg-green-100 border border-green-300 rounded-lg">
+                    <p className="text-sm text-green-700 flex items-center">
+                      <CheckCircle className="h-5 w-5 mr-2" />
+                      <strong>Connected!</strong> Envelope settings have been
+                      populated from the selected bill.
+                    </p>
+                  </div>
+                )}
+
+                <p className="text-sm text-purple-700 mt-3 font-medium">
+                  📝 <strong>Tip:</strong> Connect a bill to automatically fill
+                  envelope details like name, amount, and category. Works for
+                  all envelope types.
+                </p>
+
+                {(!allBills || allBills.length === 0) && (
+                  <p className="text-sm text-red-600 mt-3 font-medium">
+                    ⚠️ No bills found. Create bills first to connect them to
+                    envelopes.
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Type-Specific Budget Settings */}
@@ -532,55 +604,12 @@ const EditEnvelopeModal = ({
                 <DollarSign className="h-4 w-4 mr-2 text-blue-600" />
                 {formData.envelopeType === ENVELOPE_TYPES.BILL
                   ? "Bill Payment Settings"
-                  : formData.envelopeType === ENVELOPE_TYPES.VARIABLE
-                    ? "Variable Budget Settings"
-                    : "Savings Goal Settings"}
+                  : "Variable Budget Settings"}
               </h3>
 
               {/* Type-specific fields */}
               {formData.envelopeType === ENVELOPE_TYPES.BILL && (
                 <div className="space-y-4">
-                  {/* Bill Connection */}
-                  <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
-                    <label className="block text-sm font-medium text-purple-800 mb-2 flex items-center">
-                      <Sparkles className="h-4 w-4 mr-2" />
-                      Connect to Existing Bill (Optional)
-                    </label>
-                    <select
-                      value={selectedBillId}
-                      onChange={(e) => handleBillSelection(e.target.value)}
-                      className="w-full px-4 py-3 border border-purple-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
-                    >
-                      <option value="">
-                        Choose a bill to auto-populate settings...
-                      </option>
-                      {allBills
-                        .filter(
-                          (bill) =>
-                            !bill.envelopeId ||
-                            bill.envelopeId === envelope?.id,
-                        ) // Only show unassigned bills or bills assigned to this envelope
-                        .map((bill) => (
-                          <option key={bill.id} value={bill.id}>
-                            {bill.name || bill.provider} - $
-                            {parseFloat(bill.amount || 0).toFixed(2)} (
-                            {bill.frequency || "monthly"})
-                          </option>
-                        ))}
-                    </select>
-                    {selectedBillId && (
-                      <p className="text-xs text-purple-600 mt-2 flex items-center">
-                        <CheckCircle className="h-3 w-3 mr-1" />
-                        Envelope settings have been populated from the selected
-                        bill. You can edit them below.
-                      </p>
-                    )}
-                    <p className="text-xs text-purple-700 mt-2">
-                      Select a bill to automatically fill in the envelope name,
-                      amount, frequency, and category based on the bill details.
-                    </p>
-                  </div>
-
                   {/* Payment Frequency Selection */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
