@@ -13,6 +13,7 @@ import DebtDashboard from "../debt/DebtDashboard";
 import AutoFundingView from "../automation/AutoFundingView";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ErrorBoundary } from "@highlight-run/react";
+import useBills from "../../hooks/useBills";
 import logger from "../../utils/logger";
 
 /**
@@ -26,6 +27,9 @@ const ViewRenderer = ({
   totalBiweeklyNeed,
   setActiveView,
 }) => {
+  // Get updateBill from TanStack Query hook instead of budget store
+  const { updateBill: tanStackUpdateBill } = useBills();
+
   const {
     envelopes,
     bills,
@@ -53,7 +57,6 @@ const ViewRenderer = ({
     updateTransaction: _updateTransaction,
     deleteTransaction: _deleteTransaction,
     addBill,
-    updateBill,
     setAllTransactions: _setAllTransactions,
     setTransactions: _setTransactions,
   } = budget;
@@ -72,17 +75,19 @@ const ViewRenderer = ({
       logger.debug("ViewRenderer handleUpdateBill called", {
         billId: updatedBill.id,
         envelopeId: updatedBill.envelopeId,
-        hasUpdateBill: !!updateBill,
+        hasTanStackUpdateBill: !!tanStackUpdateBill,
       });
 
       try {
-        // Use updateBill for proper bill persistence with envelope assignment
-        // The budget store's updateBill handles both bills and allTransactions internally
-        updateBill(updatedBill);
-        logger.debug("ViewRenderer updateBill completed successfully", {
-          billId: updatedBill.id,
-          envelopeId: updatedBill.envelopeId,
-        });
+        // Use TanStack Query updateBill for proper bill persistence with envelope assignment
+        tanStackUpdateBill({ id: updatedBill.id, updates: updatedBill });
+        logger.debug(
+          "ViewRenderer TanStack updateBill completed successfully",
+          {
+            billId: updatedBill.id,
+            envelopeId: updatedBill.envelopeId,
+          },
+        );
       } catch (error) {
         logger.error("Error in ViewRenderer handleUpdateBill", error, {
           billId: updatedBill.id,
@@ -90,7 +95,7 @@ const ViewRenderer = ({
         });
       }
     },
-    [updateBill],
+    [tanStackUpdateBill],
   );
 
   // Debug log to verify function creation - only on dev sites
@@ -186,8 +191,8 @@ const ViewRenderer = ({
             paidDate: updatedBill.paidDate,
           });
 
-          // Update the bill in the bills collection
-          updateBill(updatedBill);
+          // Update the bill in the bills collection using TanStack Query
+          tanStackUpdateBill({ id: updatedBill.id, updates: updatedBill });
 
           // BillManager's handlePayBill already creates the payment transaction
           // and updates envelope balances via reconcileTransaction
