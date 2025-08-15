@@ -21,7 +21,7 @@ import {
   ENVELOPE_TYPE_CONFIG,
   getEnvelopeCategories,
 } from "../../../constants/categories";
-import { toMonthly, toBiweekly, getFrequencyOptions } from "../../../utils/frequencyCalculations";
+import { getFrequencyOptions } from "../../../utils/frequencyCalculations";
 
 const EnvelopeEditModal = ({
   isOpen = false,
@@ -60,7 +60,9 @@ const EnvelopeEditModal = ({
   const categories = getEnvelopeCategories();
 
   // Find linked bills for this envelope
-  const linkedBills = allBills.filter((bill) => bill.envelopeId === envelope?.id);
+  const linkedBills = allBills.filter(
+    (bill) => bill.envelopeId === envelope?.id,
+  );
   const initialBillId = linkedBills.length > 0 ? linkedBills[0].id : "";
 
   useEffect(() => {
@@ -92,7 +94,9 @@ const EnvelopeEditModal = ({
       newErrors.name = "Envelope name is required";
     } else {
       const duplicate = existingEnvelopes.find(
-        (env) => env.id !== envelope?.id && env.name.toLowerCase() === formData.name.toLowerCase()
+        (env) =>
+          env.id !== envelope?.id &&
+          env.name.toLowerCase() === formData.name.toLowerCase(),
       );
       if (duplicate) {
         newErrors.name = "An envelope with this name already exists";
@@ -105,8 +109,12 @@ const EnvelopeEditModal = ({
 
     // Type-specific validation
     if (formData.envelopeType === ENVELOPE_TYPES.BILL) {
-      if (!formData.biweeklyAllocation || parseFloat(formData.biweeklyAllocation) <= 0) {
-        newErrors.biweeklyAllocation = "Biweekly allocation must be greater than 0";
+      if (
+        !formData.biweeklyAllocation ||
+        parseFloat(formData.biweeklyAllocation) <= 0
+      ) {
+        newErrors.biweeklyAllocation =
+          "Biweekly allocation must be greater than 0";
       }
     } else if (formData.envelopeType === ENVELOPE_TYPES.SAVINGS) {
       if (!formData.targetAmount || parseFloat(formData.targetAmount) <= 0) {
@@ -150,8 +158,11 @@ const EnvelopeEditModal = ({
 
       // Add type-specific fields
       if (formData.envelopeType === ENVELOPE_TYPES.BILL) {
-        updatedEnvelope.biweeklyAllocation = parseFloat(formData.biweeklyAllocation);
-        updatedEnvelope.monthlyAmount = parseFloat(formData.biweeklyAllocation) * 2.16667; // Convert biweekly to monthly
+        updatedEnvelope.biweeklyAllocation = parseFloat(
+          formData.biweeklyAllocation,
+        );
+        updatedEnvelope.monthlyAmount =
+          parseFloat(formData.biweeklyAllocation) * 2.16667; // Convert biweekly to monthly
       } else if (formData.envelopeType === ENVELOPE_TYPES.SAVINGS) {
         updatedEnvelope.targetAmount = parseFloat(formData.targetAmount);
         updatedEnvelope.monthlyAmount = parseFloat(formData.monthlyAmount) || 0;
@@ -227,12 +238,12 @@ const EnvelopeEditModal = ({
 
   if (!isOpen || !envelope) return null;
 
-  const currentTypeConfig = getTypeConfig(formData.envelopeType);
-  const frequencyOptions = getFrequencyOptions();
+  const _currentTypeConfig = getTypeConfig(formData.envelopeType);
+  const _frequencyOptions = getFrequencyOptions();
 
   // Available bills for assignment (unassigned or currently assigned to this envelope)
   const availableBills = allBills.filter(
-    (bill) => !bill.envelopeId || bill.envelopeId === envelope.id
+    (bill) => !bill.envelopeId || bill.envelopeId === envelope.id,
   );
 
   return (
@@ -243,7 +254,10 @@ const EnvelopeEditModal = ({
             <Edit className="h-5 w-5 mr-2 text-purple-600" />
             Edit Envelope
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
             <X className="h-6 w-6" />
           </button>
         </div>
@@ -258,7 +272,9 @@ const EnvelopeEditModal = ({
 
           {/* Envelope Type Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Envelope Type</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Envelope Type
+            </label>
             <div className="grid grid-cols-3 gap-3">
               {Object.entries(ENVELOPE_TYPE_CONFIG).map(([type, config]) => (
                 <button
@@ -294,7 +310,9 @@ const EnvelopeEditModal = ({
                 }`}
                 placeholder="e.g., Groceries, Electric Bill"
               />
-              {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+              {errors.name && (
+                <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+              )}
             </div>
 
             <div>
@@ -316,7 +334,9 @@ const EnvelopeEditModal = ({
                   </option>
                 ))}
               </select>
-              {errors.category && <p className="text-red-500 text-xs mt-1">{errors.category}</p>}
+              {errors.category && (
+                <p className="text-red-500 text-xs mt-1">{errors.category}</p>
+              )}
             </div>
           </div>
 
@@ -334,14 +354,20 @@ const EnvelopeEditModal = ({
                     step="0.01"
                     min="0"
                     value={formData.biweeklyAllocation}
-                    onChange={(e) => handleInputChange("biweeklyAllocation", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("biweeklyAllocation", e.target.value)
+                    }
                     className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-purple-500 ${
-                      errors.biweeklyAllocation ? "border-red-500" : "border-gray-300"
+                      errors.biweeklyAllocation
+                        ? "border-red-500"
+                        : "border-gray-300"
                     }`}
                     placeholder="0.00"
                   />
                   {errors.biweeklyAllocation && (
-                    <p className="text-red-500 text-xs mt-1">{errors.biweeklyAllocation}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.biweeklyAllocation}
+                    </p>
                   )}
                 </div>
 
@@ -359,7 +385,8 @@ const EnvelopeEditModal = ({
                     <option value="">No bill assigned</option>
                     {availableBills.map((bill) => (
                       <option key={bill.id} value={bill.id}>
-                        {bill.name || bill.provider} - ${Math.abs(bill.amount).toFixed(2)}
+                        {bill.name || bill.provider} - $
+                        {Math.abs(bill.amount).toFixed(2)}
                       </option>
                     ))}
                   </select>
@@ -379,14 +406,18 @@ const EnvelopeEditModal = ({
                     step="0.01"
                     min="0"
                     value={formData.targetAmount}
-                    onChange={(e) => handleInputChange("targetAmount", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("targetAmount", e.target.value)
+                    }
                     className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-purple-500 ${
                       errors.targetAmount ? "border-red-500" : "border-gray-300"
                     }`}
                     placeholder="0.00"
                   />
                   {errors.targetAmount && (
-                    <p className="text-red-500 text-xs mt-1">{errors.targetAmount}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.targetAmount}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -399,7 +430,9 @@ const EnvelopeEditModal = ({
                     step="0.01"
                     min="0"
                     value={formData.monthlyAmount}
-                    onChange={(e) => handleInputChange("monthlyAmount", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("monthlyAmount", e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
                     placeholder="0.00"
                   />
@@ -418,14 +451,18 @@ const EnvelopeEditModal = ({
                   step="0.01"
                   min="0"
                   value={formData.monthlyBudget}
-                  onChange={(e) => handleInputChange("monthlyBudget", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("monthlyBudget", e.target.value)
+                  }
                   className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-purple-500 ${
                     errors.monthlyBudget ? "border-red-500" : "border-gray-300"
                   }`}
                   placeholder="0.00"
                 />
                 {errors.monthlyBudget && (
-                  <p className="text-red-500 text-xs mt-1">{errors.monthlyBudget}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.monthlyBudget}
+                  </p>
                 )}
               </div>
             )}
@@ -439,14 +476,18 @@ const EnvelopeEditModal = ({
                 type="number"
                 step="0.01"
                 value={formData.currentBalance}
-                onChange={(e) => handleInputChange("currentBalance", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("currentBalance", e.target.value)
+                }
                 className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-purple-500 ${
                   errors.currentBalance ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="0.00"
               />
               {errors.currentBalance && (
-                <p className="text-red-500 text-xs mt-1">{errors.currentBalance}</p>
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.currentBalance}
+                </p>
               )}
             </div>
           </div>
@@ -485,7 +526,9 @@ const EnvelopeEditModal = ({
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
             <textarea
               value={formData.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
@@ -501,10 +544,15 @@ const EnvelopeEditModal = ({
               type="checkbox"
               id="autoAllocate"
               checked={formData.autoAllocate}
-              onChange={(e) => handleInputChange("autoAllocate", e.target.checked)}
+              onChange={(e) =>
+                handleInputChange("autoAllocate", e.target.checked)
+              }
               className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
             />
-            <label htmlFor="autoAllocate" className="ml-2 text-sm text-gray-700">
+            <label
+              htmlFor="autoAllocate"
+              className="ml-2 text-sm text-gray-700"
+            >
               Enable automatic allocation
             </label>
           </div>
@@ -519,8 +567,8 @@ const EnvelopeEditModal = ({
               <div className="space-y-2">
                 {linkedBills.map((bill) => (
                   <div key={bill.id} className="text-sm text-blue-800">
-                    {bill.name || bill.provider} - ${Math.abs(bill.amount).toFixed(2)} (
-                    {bill.frequency})
+                    {bill.name || bill.provider} - $
+                    {Math.abs(bill.amount).toFixed(2)} ({bill.frequency})
                   </div>
                 ))}
               </div>

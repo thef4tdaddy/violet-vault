@@ -16,7 +16,7 @@ export const useAutoFunding = () => {
   // Initialize auto-funding system
   useEffect(() => {
     initializeAutoFunding();
-  }, []);
+  }, [initializeAutoFunding]);
 
   // Load saved rules and history from localStorage
   const initializeAutoFunding = useCallback(async () => {
@@ -108,7 +108,7 @@ export const useAutoFunding = () => {
         setIsExecuting(false);
       }
     },
-    [budget, isExecuting, refreshData]
+    [budget, isExecuting, refreshData],
   );
 
   // Add new rule
@@ -123,7 +123,7 @@ export const useAutoFunding = () => {
         throw error;
       }
     },
-    [refreshData]
+    [refreshData],
   );
 
   // Update existing rule
@@ -138,7 +138,7 @@ export const useAutoFunding = () => {
         throw error;
       }
     },
-    [refreshData]
+    [refreshData],
   );
 
   // Delete rule
@@ -155,7 +155,7 @@ export const useAutoFunding = () => {
         throw error;
       }
     },
-    [refreshData]
+    [refreshData],
   );
 
   // Toggle rule enabled status
@@ -172,7 +172,7 @@ export const useAutoFunding = () => {
         throw error;
       }
     },
-    [updateRule]
+    [updateRule],
   );
 
   // Clear execution history
@@ -207,7 +207,7 @@ export const useAutoFunding = () => {
         throw error;
       }
     },
-    [refreshData]
+    [refreshData],
   );
 
   // Auto-trigger rules based on transaction events
@@ -221,7 +221,8 @@ export const useAutoFunding = () => {
           logger.debug("Income detected, checking for income-triggered rules");
 
           const incomeRules = rules.filter(
-            (rule) => rule.enabled && rule.trigger === TRIGGER_TYPES.INCOME_DETECTED
+            (rule) =>
+              rule.enabled && rule.trigger === TRIGGER_TYPES.INCOME_DETECTED,
           );
 
           if (incomeRules.length > 0) {
@@ -240,7 +241,7 @@ export const useAutoFunding = () => {
         logger.error("Error handling transaction-triggered rules", error);
       }
     },
-    [isInitialized, isExecuting, rules, executeRules]
+    [isInitialized, isExecuting, rules, executeRules],
   );
 
   // Check for scheduled rule execution
@@ -253,9 +254,11 @@ export const useAutoFunding = () => {
         if (!rule.enabled) return false;
 
         // Check for scheduled triggers
-        return [TRIGGER_TYPES.MONTHLY, TRIGGER_TYPES.WEEKLY, TRIGGER_TYPES.BIWEEKLY].includes(
-          rule.trigger
-        );
+        return [
+          TRIGGER_TYPES.MONTHLY,
+          TRIGGER_TYPES.WEEKLY,
+          TRIGGER_TYPES.BIWEEKLY,
+        ].includes(rule.trigger);
       });
 
       if (scheduledRules.length > 0) {
@@ -297,7 +300,7 @@ export const useAutoFunding = () => {
       () => {
         checkScheduledRules();
       },
-      5 * 60 * 1000
+      5 * 60 * 1000,
     ); // Check every 5 minutes
 
     return () => clearInterval(interval);
@@ -309,9 +312,10 @@ export const useAutoFunding = () => {
     const totalExecutions = executionHistory.length;
     const totalFunded = executionHistory.reduce(
       (sum, execution) => sum + (execution.totalFunded || 0),
-      0
+      0,
     );
-    const lastExecution = executionHistory.length > 0 ? executionHistory[0] : null;
+    const lastExecution =
+      executionHistory.length > 0 ? executionHistory[0] : null;
 
     return {
       totalRules: rules.length,
