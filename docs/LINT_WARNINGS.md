@@ -33,28 +33,33 @@ The increase from 0 to 62 warnings was initially due to refactoring, but has bee
 ### ✅ Recently Fixed (High Priority)
 
 #### Envelope System Components - FIXED
+
 - `src/components/budgeting/envelope/EnvelopeCreateModal.jsx` (1 warning remaining)
-  - ✅ `currentTypeConfig` variable prefixed with underscore  
+  - ✅ `currentTypeConfig` variable prefixed with underscore
   - ⚠️ `_unassignedCash` parameter unused (intentionally preserved for future feature)
 - `src/components/budgeting/envelope/EnvelopeEditModal.jsx` (0 warnings)
   - ✅ `toMonthly`, `toBiweekly` unused imports removed
   - ✅ `currentTypeConfig`, `frequencyOptions` variables prefixed with underscore
 
 #### Legacy Zustand References - FIXED
+
 - `src/hooks/useEnvelopes.js` (0 warnings)
   - ✅ `useBudgetStore` unused import removed after TanStack Query migration
 
 #### React Hook Dependencies - MOSTLY FIXED
+
 - ✅ Fixed `useAuthFlow.js` - added missing toast dependencies
-- ✅ Fixed `useDataManagement.js` - added missing toast dependencies  
+- ✅ Fixed `useDataManagement.js` - added missing toast dependencies
 - ✅ Fixed `useAutoFunding.js` - added missing initializeAutoFunding dependency
 - ✅ Fixed `LockScreen.jsx` - added missing error dependency and removed unused error parameter
 
 #### Syntax Issues - FIXED
+
 - ✅ Fixed `autoFundingEngine.js` no-case-declarations by adding block scopes
 - ✅ Fixed `budgetDb.js` unused trans parameter removed
 
 #### Test Configuration - FIXED
+
 - ✅ Added Vitest globals (vi, describe, test, it, expect, etc.) to ESLint config
 - ✅ Resolved all 16 test setup warnings in `src/test/setup.js`
 - ✅ Aligned with `vitest.config.js` globals: true configuration
@@ -62,11 +67,13 @@ The increase from 0 to 62 warnings was initially due to refactoring, but has bee
 ### 🟡 Medium Priority (Development Features)
 
 #### Auto-Funding System (Feature in Development)
+
 - `src/components/automation/AutoFundingRuleBuilder.jsx` (6 warnings)
   - Multiple unused condition management functions
   - Icon parameters unused in UI mapping
 
 #### Bill Management
+
 - `src/components/bills/BillManager.jsx` (2 warnings)
   - `onPayBill` function unused (future feature)
   - Missing dependency in useMemo hook
@@ -74,6 +81,7 @@ The increase from 0 to 62 warnings was initially due to refactoring, but has bee
 ### 🟢 Low Priority (Legacy/Cleanup)
 
 #### React Hooks Dependencies (8 warnings)
+
 - `src/hooks/useAuthFlow.js` (2 warnings)
 - `src/hooks/useDataManagement.js` (2 warnings)
 - `src/hooks/useFirebaseSync.js` (1 warning)
@@ -82,12 +90,14 @@ The increase from 0 to 62 warnings was initially due to refactoring, but has bee
 - `src/hooks/useAutoFunding.js` (1 warning)
 
 #### Unused Development Functions
+
 - `src/components/history/ObjectHistoryViewer.jsx` (2 warnings)
   - `getChangeIcon`, `formatChangeDescription` functions prepared but unused
 - `src/utils/autoFundingEngine.js` (6 warnings)
   - Variables prepared for future auto-funding features
 
 #### Test Configuration
+
 - `src/test/setup.js` (16 warnings)
   - Vitest `vi` global not properly configured in ESLint
 
@@ -122,15 +132,15 @@ The increase from 0 to 62 warnings was initially due to refactoring, but has bee
 
 ## Progress History
 
-| Date       | Total Warnings | Change   | Notes                                            |
-| ---------- | -------------- | -------- | ------------------------------------------------ |
+| Date       | Total Warnings | Change   | Notes                                                         |
+| ---------- | -------------- | -------- | ------------------------------------------------------------- |
 | 2025-08-15 | 18             | -6       | React Hook dependencies fixed: all functional issues resolved |
-| 2025-08-15 | 24             | -18      | Vitest globals fix: eliminated all test setup warnings |
-| 2025-08-15 | 42             | -20      | High-priority lint fixes: React hooks, syntax, unused vars |
-| 2025-08-15 | 62             | +62      | Envelope refactoring and TanStack Query migration |
-| 2025-08-11 | 0              | -39      | Complete cleanup - all warnings resolved         |
-| 2025-08-07 | 39             | +18      | Warning count increased from ongoing development |
-| 2025-08-07 | 21             | Baseline | Initial documentation                            |
+| 2025-08-15 | 24             | -18      | Vitest globals fix: eliminated all test setup warnings        |
+| 2025-08-15 | 42             | -20      | High-priority lint fixes: React hooks, syntax, unused vars    |
+| 2025-08-15 | 62             | +62      | Envelope refactoring and TanStack Query migration             |
+| 2025-08-11 | 0              | -39      | Complete cleanup - all warnings resolved                      |
+| 2025-08-07 | 39             | +18      | Warning count increased from ongoing development              |
+| 2025-08-07 | 21             | Baseline | Initial documentation                                         |
 
 ## Best Practices Applied
 

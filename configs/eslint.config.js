@@ -32,7 +32,7 @@ export default [
         ...globals.node,
         // Vitest globals (when globals: true in vitest.config.js)
         vi: "readonly",
-        describe: "readonly", 
+        describe: "readonly",
         test: "readonly",
         it: "readonly",
         expect: "readonly",

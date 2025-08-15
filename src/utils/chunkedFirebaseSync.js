@@ -60,7 +60,7 @@ class ChunkedFirebaseSync {
               const userCredential = await signInAnonymously(auth);
               console.log(
                 "✅ Anonymous Firebase authentication successful:",
-                userCredential.user.uid
+                userCredential.user.uid,
               );
               this.isAuthenticated = true;
               unsubscribe();
@@ -72,14 +72,17 @@ class ChunkedFirebaseSync {
             // Handle specific auth configuration errors
             if (error.code === "auth/configuration-not-found") {
               console.warn("🔧 Firebase Auth configuration issue detected:", {
-                message: "Anonymous authentication may not be enabled in Firebase Console",
+                message:
+                  "Anonymous authentication may not be enabled in Firebase Console",
                 solution:
                   "Enable Anonymous Authentication in Firebase Console > Authentication > Sign-in method",
                 projectId: this.config?.projectId || "unknown",
               });
 
               // Don't fail completely - allow app to work in local-only mode
-              console.log("📱 Continuing in local-only mode without cloud sync");
+              console.log(
+                "📱 Continuing in local-only mode without cloud sync",
+              );
               this.isAuthenticated = false;
               unsubscribe();
               resolve(false); // Resolve with false instead of rejecting
@@ -90,7 +93,7 @@ class ChunkedFirebaseSync {
             reject(error);
           }
         },
-        reject
+        reject,
       );
     });
 
@@ -137,10 +140,12 @@ class ChunkedFirebaseSync {
     // We need to be extremely conservative: raw data -> JSON -> encryption -> final doc structure
     const FIREBASE_MAX_SIZE = 1048576; // Firebase's actual 1MB limit
     const encryptionOverheadMultiplier = 12.0; // Extremely aggressive - real overhead is 10x+
-    const effectiveMaxSize = Math.floor(FIREBASE_MAX_SIZE / encryptionOverheadMultiplier);
+    const effectiveMaxSize = Math.floor(
+      FIREBASE_MAX_SIZE / encryptionOverheadMultiplier,
+    );
 
     console.log(
-      `🔧 Chunking ${arrayName} with effectiveMaxSize: ${Math.round(effectiveMaxSize / 1024)}KB (${effectiveMaxSize} bytes)`
+      `🔧 Chunking ${arrayName} with effectiveMaxSize: ${Math.round(effectiveMaxSize / 1024)}KB (${effectiveMaxSize} bytes)`,
     );
 
     for (const item of array) {
@@ -169,7 +174,7 @@ class ChunkedFirebaseSync {
       // Safety check: if current chunk is getting too big, force a split
       if (currentSize > effectiveMaxSize * 0.9 && currentChunk.length > 1) {
         console.warn(
-          `🚨 Force splitting ${arrayName} chunk with ${currentChunk.length} items (${Math.round(currentSize / 1024)}KB)`
+          `🚨 Force splitting ${arrayName} chunk with ${currentChunk.length} items (${Math.round(currentSize / 1024)}KB)`,
         );
         chunks.push([...currentChunk]);
         currentChunk = [];
@@ -210,7 +215,10 @@ class ChunkedFirebaseSync {
       lastModified: Date.now(),
       chunkMap,
       metadata: {
-        totalDocuments: Object.values(chunkMap).reduce((sum, chunks) => sum + chunks.length, 0),
+        totalDocuments: Object.values(chunkMap).reduce(
+          (sum, chunks) => sum + chunks.length,
+          0,
+        ),
         createdAt: metadata.createdAt || new Date().toISOString(),
         ...metadata,
       },
@@ -244,7 +252,13 @@ class ChunkedFirebaseSync {
       const chunkMap = {};
 
       // Arrays that need to be chunked
-      const arrayFields = ["transactions", "envelopes", "bills", "savingsGoals", "paycheckHistory"];
+      const arrayFields = [
+        "transactions",
+        "envelopes",
+        "bills",
+        "savingsGoals",
+        "paycheckHistory",
+      ];
 
       // Process each array field
       for (const fieldName of arrayFields) {
@@ -276,7 +290,7 @@ class ChunkedFirebaseSync {
           // Encrypt the chunk data
           const encryptedChunk = await encryptionUtils.encrypt(
             JSON.stringify(chunkData),
-            this.encryptionKey
+            this.encryptionKey,
           );
 
           const chunkDoc = {
@@ -320,14 +334,14 @@ class ChunkedFirebaseSync {
               }
 
               console.log(
-                `📦 Re-chunked ${fieldName}[${i}]: split into ${firstHalf.length} + ${secondHalf.length} items`
+                `📦 Re-chunked ${fieldName}[${i}]: split into ${firstHalf.length} + ${secondHalf.length} items`,
               );
               i--; // Retry this index with the new smaller chunk
               continue;
             } else {
               // Single item is too large - this is a critical error
               throw new Error(
-                `Single item in ${fieldName} is too large to store (${Math.round(chunkSize / 1024)}KB). Consider reducing data size.`
+                `Single item in ${fieldName} is too large to store (${Math.round(chunkSize / 1024)}KB). Consider reducing data size.`,
               );
             }
           }
@@ -356,7 +370,7 @@ class ChunkedFirebaseSync {
       // Encrypt manifest
       const encryptedManifest = await encryptionUtils.encrypt(
         JSON.stringify(manifest),
-        this.encryptionKey
+        this.encryptionKey,
       );
 
       const manifestDoc = doc(db, "budgets", this.budgetId);
@@ -364,14 +378,21 @@ class ChunkedFirebaseSync {
         type: "budget_manifest",
         encryptedData: encryptedManifest,
         lastModified: Date.now(),
-        chunkCount: Object.values(chunkMap).reduce((sum, chunks) => sum + chunks.length, 0),
+        chunkCount: Object.values(chunkMap).reduce(
+          (sum, chunks) => sum + chunks.length,
+          0,
+        ),
       });
 
       // Execute the batch write
       await batch.commit();
 
       const duration = Date.now() - startTime;
-      const totalDocs = Object.values(chunkMap).reduce((sum, chunks) => sum + chunks.length, 0) + 1;
+      const totalDocs =
+        Object.values(chunkMap).reduce(
+          (sum, chunks) => sum + chunks.length,
+          0,
+        ) + 1;
 
       console.log("✅ Chunked save completed", {
         duration: `${duration}ms`,
@@ -384,7 +405,7 @@ class ChunkedFirebaseSync {
         duration,
         totalDocuments: totalDocs,
         chunkBreakdown: Object.fromEntries(
-          Object.entries(chunkMap).map(([key, chunks]) => [key, chunks.length])
+          Object.entries(chunkMap).map(([key, chunks]) => [key, chunks.length]),
         ),
       });
     } catch (error) {
@@ -427,7 +448,10 @@ class ChunkedFirebaseSync {
       // Decrypt manifest
       const manifestData = manifestDoc.data();
       const decryptedManifest = JSON.parse(
-        await encryptionUtils.decrypt(manifestData.encryptedData, this.encryptionKey)
+        await encryptionUtils.decrypt(
+          manifestData.encryptedData,
+          this.encryptionKey,
+        ),
       );
 
       if (decryptedManifest.type !== "budget_manifest") {
@@ -450,12 +474,17 @@ class ChunkedFirebaseSync {
 
         // Load all chunks for this field
         for (const chunkId of chunkIds) {
-          const chunkDoc = await getDoc(doc(db, "budgets", this.budgetId, "chunks", chunkId));
+          const chunkDoc = await getDoc(
+            doc(db, "budgets", this.budgetId, "chunks", chunkId),
+          );
 
           if (chunkDoc.exists()) {
             const encryptedChunk = chunkDoc.data();
             const decryptedChunk = JSON.parse(
-              await encryptionUtils.decrypt(encryptedChunk.encryptedData, this.encryptionKey)
+              await encryptionUtils.decrypt(
+                encryptedChunk.encryptedData,
+                this.encryptionKey,
+              ),
             );
 
             chunks.push({
@@ -520,7 +549,7 @@ class ChunkedFirebaseSync {
       // Delete all existing chunks
       const chunksQuery = query(
         collection(db, "budgets", this.budgetId, "chunks"),
-        where("budgetId", "==", this.budgetId)
+        where("budgetId", "==", this.budgetId),
       );
 
       const chunksSnapshot = await getDocs(chunksQuery);
@@ -532,7 +561,9 @@ class ChunkedFirebaseSync {
 
       if (chunksSnapshot.docs.length > 0) {
         await batch.commit();
-        console.log(`🗑️ Deleted ${chunksSnapshot.docs.length} old chunk documents`);
+        console.log(
+          `🗑️ Deleted ${chunksSnapshot.docs.length} old chunk documents`,
+        );
       }
 
       console.log("✅ Cloud data reset completed");

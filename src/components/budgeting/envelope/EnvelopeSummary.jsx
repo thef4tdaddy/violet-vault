@@ -21,7 +21,9 @@ const EnvelopeSummary = ({ totals }) => {
           <TrendingUp className="h-8 w-8 text-green-600 mr-3" />
           <div>
             <p className="text-xs text-gray-600">Total Balance</p>
-            <p className="text-lg font-semibold text-gray-900">${totals.totalBalance.toFixed(2)}</p>
+            <p className="text-lg font-semibold text-gray-900">
+              ${totals.totalBalance.toFixed(2)}
+            </p>
           </div>
         </div>
       </div>
@@ -31,7 +33,9 @@ const EnvelopeSummary = ({ totals }) => {
           <Target className="h-8 w-8 text-red-600 mr-3" />
           <div>
             <p className="text-xs text-gray-600">Total Spent</p>
-            <p className="text-lg font-semibold text-gray-900">${totals.totalSpent.toFixed(2)}</p>
+            <p className="text-lg font-semibold text-gray-900">
+              ${totals.totalSpent.toFixed(2)}
+            </p>
           </div>
         </div>
       </div>
