@@ -4,91 +4,10 @@
  * Provides consistent toast notifications across the application
  */
 
-import useToast from "../hooks/useToast";
+import { useToastStore } from "../stores/toastStore";
 
 /**
- * Toast helper functions factory
- * Returns standardized toast functions for a component
- */
-export const createToastHelpers = (addToast) => ({
-  /**
-   * Show success toast notification
-   * @param {string} message - Main message text
-   * @param {string} title - Optional title (defaults to "Success")
-   * @param {number} duration - Optional duration in ms (defaults to 5000)
-   */
-  showSuccessToast: (message, title = "Success", duration = 5000) => {
-    addToast({
-      type: "success",
-      title,
-      message,
-      duration,
-    });
-  },
-
-  /**
-   * Show error toast notification
-   * @param {string} message - Main message text
-   * @param {string} title - Optional title (defaults to "Error")
-   * @param {number} duration - Optional duration in ms (defaults to 8000)
-   */
-  showErrorToast: (message, title = "Error", duration = 8000) => {
-    addToast({
-      type: "error",
-      title,
-      message,
-      duration,
-    });
-  },
-
-  /**
-   * Show warning toast notification
-   * @param {string} message - Main message text
-   * @param {string} title - Optional title (defaults to "Warning")
-   * @param {number} duration - Optional duration in ms (defaults to 6000)
-   */
-  showWarningToast: (message, title = "Warning", duration = 6000) => {
-    addToast({
-      type: "warning",
-      title,
-      message,
-      duration,
-    });
-  },
-
-  /**
-   * Show info toast notification
-   * @param {string} message - Main message text
-   * @param {string} title - Optional title (defaults to "Info")
-   * @param {number} duration - Optional duration in ms (defaults to 5000)
-   */
-  showInfoToast: (message, title = "Info", duration = 5000) => {
-    addToast({
-      type: "info",
-      title,
-      message,
-      duration,
-    });
-  },
-
-  /**
-   * Show payday-themed toast notification
-   * @param {string} message - Main message text
-   * @param {string} title - Optional title (defaults to "Payday")
-   * @param {number} duration - Optional duration in ms (defaults to 6000)
-   */
-  showPaydayToast: (message, title = "Payday", duration = 6000) => {
-    addToast({
-      type: "payday",
-      title,
-      message,
-      duration,
-    });
-  },
-});
-
-/**
- * Hook wrapper for toast helpers
+ * Hook wrapper for toast helpers using Zustand store
  * Use this in components to get standardized toast functions
  *
  * @returns {Object} Toast helper functions
@@ -98,8 +17,16 @@ export const createToastHelpers = (addToast) => ({
  * showErrorToast("Failed to save data", "Save Error");
  */
 export const useToastHelpers = () => {
-  const { addToast } = useToast();
-  return createToastHelpers(addToast);
+  const { showSuccess, showError, showWarning, showInfo, showPayday } =
+    useToastStore();
+
+  return {
+    showSuccessToast: showSuccess,
+    showErrorToast: showError,
+    showWarningToast: showWarning,
+    showInfoToast: showInfo,
+    showPaydayToast: showPayday,
+  };
 };
 
 /**
@@ -169,34 +96,35 @@ export const TOAST_MESSAGES = {
 
 /**
  * Quick toast functions using predefined messages
- * These functions use the standard messages above for consistency
+ * These functions use the global Zustand store for consistency
  */
 export const quickToast = {
   // Auth toasts
-  loginSuccess: (addToast) =>
-    createToastHelpers(addToast).showSuccessToast(TOAST_MESSAGES.AUTH.LOGIN_SUCCESS),
-  passwordUpdated: (addToast) =>
-    createToastHelpers(addToast).showSuccessToast(TOAST_MESSAGES.AUTH.PASSWORD_UPDATED),
-  passwordMismatch: (addToast) =>
-    createToastHelpers(addToast).showErrorToast(TOAST_MESSAGES.AUTH.PASSWORD_MISMATCH),
+  loginSuccess: () =>
+    useToastStore.getState().showSuccess(TOAST_MESSAGES.AUTH.LOGIN_SUCCESS),
+  passwordUpdated: () =>
+    useToastStore.getState().showSuccess(TOAST_MESSAGES.AUTH.PASSWORD_UPDATED),
+  passwordMismatch: () =>
+    useToastStore.getState().showError(TOAST_MESSAGES.AUTH.PASSWORD_MISMATCH),
 
   // Data toasts
-  exportSuccess: (addToast) =>
-    createToastHelpers(addToast).showSuccessToast(TOAST_MESSAGES.DATA.EXPORT_SUCCESS),
-  importSuccess: (addToast) =>
-    createToastHelpers(addToast).showSuccessToast(TOAST_MESSAGES.DATA.IMPORT_SUCCESS),
-  saveSuccess: (addToast) =>
-    createToastHelpers(addToast).showSuccessToast(TOAST_MESSAGES.DATA.SAVE_SUCCESS),
+  exportSuccess: () =>
+    useToastStore.getState().showSuccess(TOAST_MESSAGES.DATA.EXPORT_SUCCESS),
+  importSuccess: () =>
+    useToastStore.getState().showSuccess(TOAST_MESSAGES.DATA.IMPORT_SUCCESS),
+  saveSuccess: () =>
+    useToastStore.getState().showSuccess(TOAST_MESSAGES.DATA.SAVE_SUCCESS),
 
   // Sync toasts
-  syncSuccess: (addToast) =>
-    createToastHelpers(addToast).showSuccessToast(TOAST_MESSAGES.SYNC.SUCCESS),
-  syncFailed: (addToast, error) =>
-    createToastHelpers(addToast).showErrorToast(`${TOAST_MESSAGES.SYNC.FAILED}: ${error}`),
+  syncSuccess: () =>
+    useToastStore.getState().showSuccess(TOAST_MESSAGES.SYNC.SUCCESS),
+  syncFailed: (error) =>
+    useToastStore
+      .getState()
+      .showError(`${TOAST_MESSAGES.SYNC.FAILED}: ${error}`),
 };
 
 export default {
-  createToastHelpers,
   useToastHelpers,
   TOAST_MESSAGES,
   quickToast,
