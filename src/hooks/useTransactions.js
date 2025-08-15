@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useBudgetStore } from "../stores/budgetStore";
 import { queryKeys, optimisticHelpers } from "../utils/queryClient";
 import { budgetDb } from "../db/budgetDb";
+import logger from "../utils/logger.js";
 
 /**
  * Specialized hook for transaction management
@@ -30,7 +31,9 @@ const useTransactions = (options = {}) => {
 
   // TanStack Query function - hydrates from Dexie, Dexie syncs with Firebase
   const queryFunction = async () => {
-    console.log("🔄 TanStack Query: Fetching transactions from Dexie...");
+    logger.debug("TanStack Query: Fetching transactions from Dexie", {
+      source: "useTransactions",
+    });
 
     try {
       let transactions = [];
@@ -41,7 +44,10 @@ const useTransactions = (options = {}) => {
         .reverse()
         .toArray();
 
-      console.log("✅ TanStack Query: Loaded from Dexie:", transactions.length);
+      logger.debug("TanStack Query: Loaded from Dexie", {
+        count: transactions.length,
+        source: "useTransactions",
+      });
 
       // If Dexie is empty and we have Zustand data, seed Dexie
       const zustandData =
@@ -49,7 +55,10 @@ const useTransactions = (options = {}) => {
           ? zustandAllTransactions
           : zustandTransactions;
       if (transactions.length === 0 && zustandData && zustandData.length > 0) {
-        console.log("🌱 TanStack Query: Seeding Dexie from Zustand...");
+        logger.debug("TanStack Query: Seeding Dexie from Zustand", {
+          zustandDataLength: zustandData.length,
+          source: "useTransactions",
+        });
         await budgetDb.bulkUpsertTransactions(zustandData);
         transactions = [...zustandData];
       }
@@ -125,7 +134,9 @@ const useTransactions = (options = {}) => {
 
       return filteredTransactions;
     } catch (error) {
-      console.error("❌ TanStack Query: Dexie fetch failed:", error);
+      logger.error("TanStack Query: Dexie fetch failed", error, {
+        source: "useTransactions",
+      });
       // Emergency fallback only when Dexie completely fails
       const zustandData =
         zustandAllTransactions?.length > 0
@@ -159,12 +170,16 @@ const useTransactions = (options = {}) => {
   // Listen for import completion to force refresh
   useEffect(() => {
     const handleImportCompleted = () => {
-      console.log("🔄 Import detected, invalidating transactions cache");
+      logger.debug("Import detected, invalidating transactions cache", {
+        source: "useTransactions",
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
     };
 
     const handleInvalidateAll = () => {
-      console.log("🔄 Invalidating all transaction queries");
+      logger.debug("Invalidating all transaction queries", {
+        source: "useTransactions",
+      });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList });
     };
@@ -208,7 +223,9 @@ const useTransactions = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.analytics });
     },
     onError: (error) => {
-      console.error("Failed to add transaction:", error);
+      logger.error("Failed to add transaction", error, {
+        source: "addTransactionMutation",
+      });
       // TODO: Implement rollback logic
     },
   });
@@ -237,7 +254,9 @@ const useTransactions = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
     onError: (error) => {
-      console.error("Failed to reconcile transaction:", error);
+      logger.error("Failed to reconcile transaction", error, {
+        source: "reconcileTransactionMutation",
+      });
     },
   });
 
@@ -258,7 +277,9 @@ const useTransactions = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.analytics });
     },
     onError: (error, transactionId) => {
-      console.error("Failed to delete transaction:", error);
+      logger.error("Failed to delete transaction", error, {
+        source: "deleteTransactionMutation",
+      });
       // Rollback optimistic update
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
     },
@@ -284,7 +305,9 @@ const useTransactions = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.analytics });
     },
     onError: (error) => {
-      console.error("Failed to update transaction:", error);
+      logger.error("Failed to update transaction", error, {
+        source: "updateTransactionMutation",
+      });
       // Rollback optimistic update
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
     },
