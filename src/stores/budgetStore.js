@@ -29,7 +29,9 @@ const migrateOldData = async () => {
 
     // Migrate if old data exists (always replace new data)
     if (oldData) {
-      console.log("🔄 Migrating data from old budget-store to violet-vault-store...");
+      console.log(
+        "🔄 Migrating data from old budget-store to violet-vault-store...",
+      );
 
       const parsedOldData = JSON.parse(oldData);
 
@@ -42,7 +44,8 @@ const migrateOldData = async () => {
             transactions: parsedOldData.state.transactions || [],
             allTransactions: parsedOldData.state.allTransactions || [],
             savingsGoals: parsedOldData.state.savingsGoals || [],
-            supplementalAccounts: parsedOldData.state.supplementalAccounts || [],
+            supplementalAccounts:
+              parsedOldData.state.supplementalAccounts || [],
             debts: parsedOldData.state.debts || [],
             unassignedCash: parsedOldData.state.unassignedCash || 0,
             biweeklyAllocation: parsedOldData.state.biweeklyAllocation || 0,
@@ -52,8 +55,13 @@ const migrateOldData = async () => {
           version: 0,
         };
 
-        localStorage.setItem("violet-vault-store", JSON.stringify(transformedData));
-        console.log("✅ Data migration completed successfully - replaced existing data");
+        localStorage.setItem(
+          "violet-vault-store",
+          JSON.stringify(transformedData),
+        );
+        console.log(
+          "✅ Data migration completed successfully - replaced existing data",
+        );
 
         // Seed Dexie with migrated data so hooks can access it
         await budgetDb.bulkUpsertEnvelopes(transformedData.state.envelopes);
@@ -61,11 +69,15 @@ const migrateOldData = async () => {
         await budgetDb.bulkUpsertTransactions(
           transformedData.state.allTransactions.length > 0
             ? transformedData.state.allTransactions
-            : transformedData.state.transactions
+            : transformedData.state.transactions,
         );
-        await budgetDb.bulkUpsertSavingsGoals(transformedData.state.savingsGoals);
+        await budgetDb.bulkUpsertSavingsGoals(
+          transformedData.state.savingsGoals,
+        );
         await budgetDb.bulkUpsertDebts(transformedData.state.debts);
-        await budgetDb.bulkUpsertPaychecks(transformedData.state.paycheckHistory);
+        await budgetDb.bulkUpsertPaychecks(
+          transformedData.state.paycheckHistory,
+        );
 
         // Remove old data after successful migration
         localStorage.removeItem("budget-store");
@@ -175,13 +187,19 @@ const storeInitializer = (set, get) => ({
       const { useAuth } = await import("./authStore");
       const authState = useAuth.getState();
 
-      if (!authState.encryptionKey || !authState.currentUser || !authState.budgetId) {
+      if (
+        !authState.encryptionKey ||
+        !authState.currentUser ||
+        !authState.budgetId
+      ) {
         console.warn("⚠️ Missing auth context for background sync");
         return;
       }
 
       // Import and start the background sync service
-      const { default: CloudSyncService } = await import("../services/cloudSyncService");
+      const { default: CloudSyncService } = await import(
+        "../services/cloudSyncService"
+      );
       CloudSyncService.start({
         encryptionKey: authState.encryptionKey,
         currentUser: authState.currentUser,
@@ -236,7 +254,10 @@ const storeInitializer = (set, get) => ({
 
       // Load data arrays directly to Dexie with ID validation
       if (importedData.envelopes?.length) {
-        const validEnvelopes = ensureValidIds(importedData.envelopes, "envelope");
+        const validEnvelopes = ensureValidIds(
+          importedData.envelopes,
+          "envelope",
+        );
         await budgetDb.bulkUpsertEnvelopes(validEnvelopes);
       }
 
@@ -257,17 +278,26 @@ const storeInitializer = (set, get) => ({
       }
 
       if (importedData.transactions?.length) {
-        const validTransactions = ensureValidIds(importedData.transactions, "transaction");
+        const validTransactions = ensureValidIds(
+          importedData.transactions,
+          "transaction",
+        );
         await budgetDb.bulkUpsertTransactions(validTransactions);
       }
 
       if (importedData.allTransactions?.length) {
-        const validAllTransactions = ensureValidIds(importedData.allTransactions, "transaction");
+        const validAllTransactions = ensureValidIds(
+          importedData.allTransactions,
+          "transaction",
+        );
         await budgetDb.bulkUpsertTransactions(validAllTransactions);
       }
 
       if (importedData.savingsGoals?.length) {
-        const validSavingsGoals = ensureValidIds(importedData.savingsGoals, "goal");
+        const validSavingsGoals = ensureValidIds(
+          importedData.savingsGoals,
+          "goal",
+        );
         await budgetDb.bulkUpsertSavingsGoals(validSavingsGoals);
       }
 
@@ -277,7 +307,10 @@ const storeInitializer = (set, get) => ({
       }
 
       if (importedData.paycheckHistory?.length) {
-        const validPaychecks = ensureValidIds(importedData.paycheckHistory, "paycheck");
+        const validPaychecks = ensureValidIds(
+          importedData.paycheckHistory,
+          "paycheck",
+        );
         await budgetDb.bulkUpsertPaychecks(validPaychecks);
       }
 
@@ -302,7 +335,7 @@ const storeInitializer = (set, get) => ({
         window.dispatchEvent(
           new CustomEvent("importCompleted", {
             detail: { source: "loadData", dataLoaded: true },
-          })
+          }),
         );
         window.dispatchEvent(new CustomEvent("invalidateAllQueries"));
         console.log("🔄 Import cache invalidation events dispatched");
@@ -331,7 +364,7 @@ const storeInitializer = (set, get) => ({
           await budgetDb.savingsGoals.clear();
           await budgetDb.debts.clear();
           await budgetDb.paychecks.clear();
-        }
+        },
       );
 
       // Reset UI state
@@ -376,26 +409,39 @@ const storeInitializer = (set, get) => ({
 
       // If we have no encrypted data saved yet, validate against the current auth salt
       if (!savedData && authState.salt) {
-        console.log("🔐 validatePassword: No saved data, validating against auth salt");
+        console.log(
+          "🔐 validatePassword: No saved data, validating against auth salt",
+        );
 
         try {
           const saltArray = new Uint8Array(authState.salt);
-          const testKey = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
+          const testKey = await encryptionUtils.deriveKeyFromSalt(
+            password,
+            saltArray,
+          );
 
           // Compare the derived key with the current encryption key if available
           if (authState.encryptionKey) {
             const keysMatch =
               JSON.stringify(Array.from(testKey)) ===
               JSON.stringify(Array.from(authState.encryptionKey));
-            console.log("🔐 validatePassword: Key comparison result:", keysMatch);
+            console.log(
+              "🔐 validatePassword: Key comparison result:",
+              keysMatch,
+            );
             return keysMatch;
           } else {
             // If no current key, just check if we can derive a key (basic validation)
-            console.log("🔐 validatePassword: No current key, basic validation passed");
+            console.log(
+              "🔐 validatePassword: No current key, basic validation passed",
+            );
             return true;
           }
         } catch (error) {
-          console.log("🔐 validatePassword: Auth salt validation failed:", error.message);
+          console.log(
+            "🔐 validatePassword: Auth salt validation failed:",
+            error.message,
+          );
           return false;
         }
       }
@@ -413,7 +459,10 @@ const storeInitializer = (set, get) => ({
         });
 
         // Try to derive the key with the provided password
-        const testKey = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
+        const testKey = await encryptionUtils.deriveKeyFromSalt(
+          password,
+          saltArray,
+        );
 
         console.log("🔐 validatePassword: Key derived successfully");
 
@@ -421,33 +470,44 @@ const storeInitializer = (set, get) => ({
         if (encryptedData) {
           try {
             await encryptionUtils.decrypt(encryptedData, testKey);
-            console.log("🔐 validatePassword: Decryption successful - password is correct");
+            console.log(
+              "🔐 validatePassword: Decryption successful - password is correct",
+            );
             return true;
           } catch (decryptError) {
             console.log(
               "🔐 validatePassword: Decryption failed - password is incorrect",
-              decryptError.message
+              decryptError.message,
             );
             return false;
           }
         }
 
         // Fallback: if no encrypted data to test, just check if key exists
-        console.log("🔐 validatePassword: No encrypted data to test, using fallback");
+        console.log(
+          "🔐 validatePassword: No encrypted data to test, using fallback",
+        );
         return !!testKey;
       }
 
       // If we have neither saved data nor auth salt, cannot validate
-      console.log("🔐 validatePassword: No data or salt available for validation");
+      console.log(
+        "🔐 validatePassword: No data or salt available for validation",
+      );
       return false;
     } catch (error) {
-      console.error("🔐 validatePassword: Validation failed with error:", error);
+      console.error(
+        "🔐 validatePassword: Validation failed with error:",
+        error,
+      );
       return false;
     }
   },
 });
 
-const base = subscribeWithSelector(immer(budgetHistoryMiddleware(storeInitializer)));
+const base = subscribeWithSelector(
+  immer(budgetHistoryMiddleware(storeInitializer)),
+);
 
 let useOptimizedBudgetStore;
 
@@ -472,8 +532,8 @@ if (LOCAL_ONLY_MODE) {
           dataLoaded: state.dataLoaded,
         }),
       }),
-      { name: "violet-vault-devtools" }
-    )
+      { name: "violet-vault-devtools" },
+    ),
   );
 }
 

@@ -16,7 +16,11 @@ const EnvelopeHeader = ({
           <div className="relative mr-4">
             <div className="absolute inset-0 bg-purple-500 rounded-2xl blur-lg opacity-30"></div>
             <div className="relative bg-purple-500 p-3 rounded-2xl">
-              <svg className="h-6 w-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <svg
+                className="h-6 w-6 text-white"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
                 <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
                 <path
                   fillRule="evenodd"
@@ -28,7 +32,9 @@ const EnvelopeHeader = ({
           </div>
           Envelope Management
         </h2>
-        <p className="text-gray-600 mt-1">Track spending with virtual envelopes</p>
+        <p className="text-gray-600 mt-1">
+          Track spending with virtual envelopes
+        </p>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">

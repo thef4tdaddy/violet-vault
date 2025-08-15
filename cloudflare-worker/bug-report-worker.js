@@ -686,7 +686,7 @@ async function generateSmartLabels(description, reportEnv) {
     ) {
       labels.push("mobile");
     }
-    
+
     // Browser detection - clean and truthful
     if (userAgent.includes("firefox/")) {
       labels.push("firefox");
@@ -699,7 +699,7 @@ async function generateSmartLabels(description, reportEnv) {
     } else if (userAgent.includes("webkit/")) {
       labels.push("webkit");
     }
-    
+
     // Engine detection for additional context
     if (userAgent.includes("webkit/")) {
       labels.push("webkit-engine");
@@ -868,32 +868,38 @@ async function generateSmartLabels(description, reportEnv) {
   // Branch/Environment detection for dev vs live
   if (reportEnv?.url) {
     const url = reportEnv.url.toLowerCase();
-    
+
     // Detect development/staging environments
-    if (url.includes("localhost") || 
-        url.includes("127.0.0.1") || 
-        url.includes("dev.") ||
-        url.includes("staging.") ||
-        url.includes("preview") ||
-        url.includes("git-") ||
-        url.includes("vercel.app") ||
-        url.includes("netlify.app")) {
+    if (
+      url.includes("localhost") ||
+      url.includes("127.0.0.1") ||
+      url.includes("dev.") ||
+      url.includes("staging.") ||
+      url.includes("preview") ||
+      url.includes("git-") ||
+      url.includes("vercel.app") ||
+      url.includes("netlify.app")
+    ) {
       labels.push("dev-environment");
-    } else if (url.includes("violevault.com") || 
-               url.includes("production") ||
-               !url.includes("localhost")) {
+    } else if (
+      url.includes("violevault.com") ||
+      url.includes("production") ||
+      !url.includes("localhost")
+    ) {
       labels.push("live-environment");
     }
   }
-  
+
   // App version analysis for branch detection
   if (reportEnv?.appVersion) {
     const version = reportEnv.appVersion.toLowerCase();
-    if (version.includes("dev") || 
-        version.includes("preview") || 
-        version.includes("staging") ||
-        version.includes("alpha") ||
-        version.includes("beta")) {
+    if (
+      version.includes("dev") ||
+      version.includes("preview") ||
+      version.includes("staging") ||
+      version.includes("alpha") ||
+      version.includes("beta")
+    ) {
       labels.push("dev-build");
     } else {
       labels.push("production-build");
@@ -913,13 +919,14 @@ async function createGitHubIssue(data, env) {
   // Build issue body with all available information
   // Parse line breaks into checklist items if description contains line breaks or list indicators
   let processedDescription = description;
-  
+
   // Very lenient parsing - trigger on ANY line breaks (single \n or multiple)
-  const shouldParse = description.includes("\n") || 
-                     description.includes("- ") ||
-                     description.includes("* ") ||
-                     description.includes("• ") ||
-                     /^\d+\./m.test(description);
+  const shouldParse =
+    description.includes("\n") ||
+    description.includes("- ") ||
+    description.includes("* ") ||
+    description.includes("• ") ||
+    /^\d+\./m.test(description);
 
   if (shouldParse) {
     // Convert multi-line descriptions into GitHub checklist format
@@ -927,7 +934,7 @@ async function createGitHubIssue(data, env) {
       .split("\n")
       .map((line) => line.trim())
       .filter((line) => line.length > 0); // Remove empty lines
-      
+
     // Always process if we have multiple non-empty lines, OR if single line has list indicators
     if (lines.length > 1) {
       const firstLine = lines[0];
@@ -938,7 +945,11 @@ async function createGitHubIssue(data, env) {
         remainingLines
           .map((line) => {
             // Convert to checklist items - handle existing list formats
-            if (line.startsWith("- ") || line.startsWith("* ") || line.startsWith("• ")) {
+            if (
+              line.startsWith("- ") ||
+              line.startsWith("* ") ||
+              line.startsWith("• ")
+            ) {
               return `- [ ] ${line.substring(2).trim()}`;
             } else if (line.match(/^\d+\.\s*/)) {
               // Convert numbered list to checklist
@@ -949,28 +960,32 @@ async function createGitHubIssue(data, env) {
             }
           })
           .join("\n");
-    } else if (lines.length === 1 && (lines[0].includes("- ") || lines[0].includes("* ") || lines[0].includes("• ") || /^\d+\./.test(lines[0]))) {
+    } else if (
+      lines.length === 1 &&
+      (lines[0].includes("- ") ||
+        lines[0].includes("* ") ||
+        lines[0].includes("• ") ||
+        /^\d+\./.test(lines[0]))
+    ) {
       // Handle single line with list indicators - split on list markers
       const line = lines[0];
       let parts = [];
-      
+
       if (line.includes("- ")) {
-        parts = line.split("- ").filter(p => p.trim().length > 0);
+        parts = line.split("- ").filter((p) => p.trim().length > 0);
       } else if (line.includes("* ")) {
-        parts = line.split("* ").filter(p => p.trim().length > 0);  
+        parts = line.split("* ").filter((p) => p.trim().length > 0);
       } else if (line.includes("• ")) {
-        parts = line.split("• ").filter(p => p.trim().length > 0);
+        parts = line.split("• ").filter((p) => p.trim().length > 0);
       }
-      
+
       if (parts.length > 1) {
         const firstPart = parts[0].trim();
         const remainingParts = parts.slice(1);
-        
-        processedDescription = 
+
+        processedDescription =
           `${firstPart}\n\n### Tasks/Steps:\n` +
-          remainingParts
-            .map(part => `- [ ] ${part.trim()}`)
-            .join("\n");
+          remainingParts.map((part) => `- [ ] ${part.trim()}`).join("\n");
       }
     }
   }
@@ -1005,21 +1020,30 @@ async function createGitHubIssue(data, env) {
   if (reportEnv) {
     issueBody += `## Environment\n`;
     issueBody += `- **App Version:** ${reportEnv.appVersion}\n`;
-    
+
     // Detect and show environment type
     let environmentType = "Unknown";
     if (reportEnv.url) {
       const url = reportEnv.url.toLowerCase();
-      if (url.includes("localhost") || url.includes("127.0.0.1") || url.includes("dev.") || url.includes("staging.")) {
+      if (
+        url.includes("localhost") ||
+        url.includes("127.0.0.1") ||
+        url.includes("dev.") ||
+        url.includes("staging.")
+      ) {
         environmentType = "🚧 Development/Local";
-      } else if (url.includes("preview") || url.includes("git-") || url.includes("vercel.app")) {
+      } else if (
+        url.includes("preview") ||
+        url.includes("git-") ||
+        url.includes("vercel.app")
+      ) {
         environmentType = "🔄 Preview/Staging";
       } else {
         environmentType = "✅ Production/Live";
       }
     }
     issueBody += `- **Environment:** ${environmentType}\n`;
-    
+
     issueBody += `- **User Agent:** ${reportEnv.userAgent}\n`;
     issueBody += `- **Viewport:** ${reportEnv.viewport}\n`;
     issueBody += `- **Timestamp:** ${reportEnv.timestamp}\n`;
@@ -1071,7 +1095,7 @@ async function createGitHubIssue(data, env) {
     if (reportEnv.timezone) {
       issueBody += `- **Timezone:** ${reportEnv.timezone}\n`;
     }
-    
+
     // Add geographic location context if available
     if (reportEnv.language) {
       issueBody += `- **Language:** ${reportEnv.language}\n`;

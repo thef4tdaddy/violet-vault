@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { parseCSV, parseOFX, autoDetectFieldMapping } from "../utils/fileParser";
+import {
+  parseCSV,
+  parseOFX,
+  autoDetectFieldMapping,
+} from "../utils/fileParser";
 
 export const useTransactionImport = (currentUser, onBulkImport) => {
   const [importData, setImportData] = useState([]);
@@ -39,7 +43,11 @@ export const useTransactionImport = (currentUser, onBulkImport) => {
   };
 
   const handleImport = async () => {
-    if (!fieldMapping.date || !fieldMapping.description || !fieldMapping.amount) {
+    if (
+      !fieldMapping.date ||
+      !fieldMapping.description ||
+      !fieldMapping.amount
+    ) {
       alert("Please map at least Date, Description, and Amount fields");
       return;
     }
@@ -52,11 +60,14 @@ export const useTransactionImport = (currentUser, onBulkImport) => {
       setImportProgress((i / importData.length) * 100);
 
       try {
-        const amount = parseFloat(row[fieldMapping.amount]?.replace(/[$,]/g, "") || "0");
+        const amount = parseFloat(
+          row[fieldMapping.amount]?.replace(/[$,]/g, "") || "0",
+        );
 
         const transaction = {
           id: `import_${Date.now()}_${i}_${Math.random().toString(36).substr(2, 9)}`,
-          date: row[fieldMapping.date] || new Date().toISOString().split("T")[0],
+          date:
+            row[fieldMapping.date] || new Date().toISOString().split("T")[0],
           description: row[fieldMapping.description] || "Imported Transaction",
           amount,
           category: row[fieldMapping.category] || "Imported",
@@ -87,14 +98,18 @@ export const useTransactionImport = (currentUser, onBulkImport) => {
     resetImport();
 
     // More informative success message
-    const incomeCount = processedTransactions.filter((t) => t.amount >= 0).length;
-    const expenseCount = processedTransactions.filter((t) => t.amount < 0).length;
+    const incomeCount = processedTransactions.filter(
+      (t) => t.amount >= 0,
+    ).length;
+    const expenseCount = processedTransactions.filter(
+      (t) => t.amount < 0,
+    ).length;
 
     alert(
       `Successfully imported ${processedTransactions.length} transactions!\n` +
         `• ${incomeCount} income transactions\n` +
         `• ${expenseCount} expense transactions\n\n` +
-        `All transactions have been added to your ledger with "Imported" category.`
+        `All transactions have been added to your ledger with "Imported" category.`,
     );
   };
 
