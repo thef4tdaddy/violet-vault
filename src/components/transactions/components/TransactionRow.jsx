@@ -19,7 +19,6 @@ const TransactionRow = ({
   onSplit,
   onDeleteClick,
   onHistoryClick,
-  isDeleting = false,
 }) => {
   const envelope = findEnvelopeForTransaction(transaction, envelopes);
   const { formatted: formattedAmount, className: amountClassName } =
