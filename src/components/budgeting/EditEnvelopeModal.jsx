@@ -89,6 +89,21 @@ const EditEnvelopeModal = ({
     { value: "low", label: "Low Priority", color: "text-blue-600" },
   ];
 
+  // Debug logging for bills
+  useEffect(() => {
+    console.log("🔍 EditEnvelopeModal - allBills received:", {
+      allBills,
+      length: allBills?.length,
+      bills: allBills?.map(bill => ({
+        id: bill.id,
+        name: bill.name,
+        provider: bill.provider,
+        amount: bill.amount,
+        envelopeId: bill.envelopeId
+      }))
+    });
+  }, [allBills]);
+
   // Populate form when envelope changes
   useEffect(() => {
     if (envelope) {
