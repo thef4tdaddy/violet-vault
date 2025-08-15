@@ -438,15 +438,15 @@ const EditEnvelopeModal = ({
                             envelopeType: type,
                           })
                         }
-                        className={`border-2 rounded-xl p-4 text-left transition-all hover:shadow-md ${
+                        className={`border-2 rounded-xl p-6 text-left transition-all hover:shadow-lg ${
                           isSelected
-                            ? `${config.borderColor} ${config.bgColor} shadow-md`
-                            : "border-gray-200 hover:border-gray-300 bg-white"
+                            ? `${config.borderColor} ${config.bgColor} shadow-lg ring-2 ring-blue-200`
+                            : "border-gray-200 hover:border-gray-400 bg-white hover:bg-gray-50"
                         }`}
                       >
-                        <div className="flex items-start gap-3">
+                        <div className="flex items-start gap-4">
                           <div
-                            className={`mt-1 w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                            className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                               isSelected
                                 ? `${config.borderColor.replace("border-", "border-")} ${config.bgColor.replace("bg-", "bg-")}`
                                 : "border-gray-300"
@@ -454,22 +454,22 @@ const EditEnvelopeModal = ({
                           >
                             {isSelected && (
                               <div
-                                className={`w-2 h-2 rounded-full ${config.bgColor.replace("bg-", "bg-").replace("-50", "-500")}`}
+                                className={`w-3 h-3 rounded-full ${config.bgColor.replace("bg-", "bg-").replace("-50", "-600")}`}
                               />
                             )}
                           </div>
                           <div className="flex-1">
-                            <div className="flex items-center mb-1">
+                            <div className="flex items-center mb-2">
                               <IconComponent
-                                className={`h-4 w-4 mr-2 ${isSelected ? config.textColor : "text-gray-500"}`}
+                                className={`h-5 w-5 mr-3 ${isSelected ? config.textColor : "text-gray-500"}`}
                               />
                               <span
-                                className={`font-semibold ${isSelected ? config.textColor : "text-gray-700"}`}
+                                className={`text-lg font-bold ${isSelected ? config.textColor : "text-gray-800"}`}
                               >
                                 {config.name}
                               </span>
                             </div>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-gray-600 leading-relaxed">
                               {config.description}
                             </p>
                           </div>
@@ -540,14 +540,6 @@ const EditEnvelopeModal = ({
                   🔗 Connect to Existing Bill
                 </label>
 
-                {/* Debug info */}
-                <div className="mb-3 p-2 bg-yellow-100 border border-yellow-300 rounded text-xs text-yellow-800">
-                  Debug: Bills available:{" "}
-                  {allBills ? allBills.length : "undefined"} | Props received:{" "}
-                  {allBills ? "yes" : "no"} | Selected:{" "}
-                  {selectedBillId || "none"}
-                </div>
-
                 <select
                   value={selectedBillId}
                   onChange={(e) => handleBillSelection(e.target.value)}
@@ -556,7 +548,7 @@ const EditEnvelopeModal = ({
                   <option value="">
                     {allBills && allBills.length > 0
                       ? "Choose a bill to auto-populate settings..."
-                      : "No bills available to connect"}
+                      : `No bills available (${allBills ? allBills.length : "undefined"} found)`}
                   </option>
                   {allBills &&
                     allBills
@@ -630,20 +622,20 @@ const EditEnvelopeModal = ({
                     </select>
                   </div>
 
-                  {/* Payment Amount Input */}
+                  {/* Bill Amount Input */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       {formData.frequency === "yearly"
-                        ? "Yearly Payment Amount *"
+                        ? "Yearly Bill Amount *"
                         : formData.frequency === "quarterly"
-                          ? "Quarterly Payment Amount *"
+                          ? "Quarterly Bill Amount *"
                           : formData.frequency === "monthly"
-                            ? "Monthly Payment Amount *"
+                            ? "Monthly Bill Amount *"
                             : formData.frequency === "biweekly"
-                              ? "Biweekly Payment Amount *"
+                              ? "Biweekly Bill Amount *"
                               : formData.frequency === "weekly"
-                                ? "Weekly Payment Amount *"
-                                : "Payment Amount *"}
+                                ? "Weekly Bill Amount *"
+                                : "Bill Amount *"}
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -653,50 +645,50 @@ const EditEnvelopeModal = ({
                         type="number"
                         step="0.01"
                         min="0"
-                        value={formData.biweeklyAllocation}
-                        onChange={(e) =>
+                        value={formData.monthlyBudget}
+                        onChange={(e) => {
+                          const billAmount = e.target.value;
+                          // Auto-calculate biweekly allocation based on frequency
+                          const biweeklyAmount = billAmount
+                            ? toBiweekly(
+                                parseFloat(billAmount),
+                                formData.frequency,
+                              ).toFixed(2)
+                            : "";
                           setFormData({
                             ...formData,
-                            biweeklyAllocation: e.target.value,
-                          })
-                        }
+                            monthlyBudget: billAmount,
+                            biweeklyAllocation: biweeklyAmount,
+                          });
+                        }}
                         className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                          errors.biweeklyAllocation
+                          errors.monthlyBudget
                             ? "border-red-300 bg-red-50"
                             : "border-gray-300"
                         }`}
-                        placeholder="0.00"
+                        placeholder="Enter bill amount"
                       />
                     </div>
-                    {errors.biweeklyAllocation && (
+                    {errors.monthlyBudget && (
                       <p className="mt-1 text-sm text-red-600 flex items-center">
                         <AlertCircle className="h-3 w-3 mr-1" />
-                        {errors.biweeklyAllocation}
+                        {errors.monthlyBudget}
                       </p>
                     )}
 
-                    {/* Calculated amounts display */}
-                    {formData.biweeklyAllocation && (
-                      <div className="mt-2 p-3 bg-gray-50 rounded-lg">
-                        <p className="text-xs font-medium text-gray-700 mb-2">
-                          Calculated amounts:
+                    {/* Auto-calculated biweekly allocation display */}
+                    {formData.monthlyBudget && (
+                      <div className="mt-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <p className="text-sm font-semibold text-green-800 mb-2">
+                          ✅ Auto-calculated biweekly allocation:
                         </p>
-                        <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
-                          <div>
-                            Monthly: $
-                            {toMonthly(
-                              parseFloat(formData.biweeklyAllocation),
-                              formData.frequency,
-                            ).toFixed(2)}
-                          </div>
-                          <div>
-                            Biweekly: $
-                            {toBiweekly(
-                              parseFloat(formData.biweeklyAllocation),
-                              formData.frequency,
-                            ).toFixed(2)}
-                          </div>
+                        <div className="text-lg font-bold text-green-700">
+                          ${formData.biweeklyAllocation}/biweekly
                         </div>
+                        <p className="text-xs text-green-600 mt-1">
+                          This amount will be automatically allocated every
+                          payday to cover your {formData.frequency} bill.
+                        </p>
                       </div>
                     )}
                   </div>
