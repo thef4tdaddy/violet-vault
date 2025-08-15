@@ -53,7 +53,10 @@ export const calculateBillEnvelopeNeeds = (envelope, bills = []) => {
   // Calculate funding needs
   const currentBalance = envelope.currentBalance || 0;
   const biweeklyAllocation = envelope.biweeklyAllocation || 0;
-  const targetMonthlyAmount = biweeklyAllocation * BIWEEKLY_MULTIPLIER;
+  
+  // For bill envelopes, target should be the actual bill amount, not biweekly * multiplier
+  // The biweekly allocation is how much to save per paycheck, target is the bill amount
+  const targetMonthlyAmount = nextBillAmount || (biweeklyAllocation * BIWEEKLY_MULTIPLIER);
 
   // Calculate remaining to fund for next bill
   const remainingToFund = Math.max(0, nextBillAmount - currentBalance);

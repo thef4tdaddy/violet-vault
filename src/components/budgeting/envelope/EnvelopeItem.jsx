@@ -133,19 +133,6 @@ const EnvelopeItem = ({
         </div>
       </div>
 
-      {/* Bills Preview */}
-      {envelope.upcomingBills && envelope.upcomingBills.length > 0 && (
-        <div className="mt-4 pt-3 border-t border-gray-200">
-          <p className="text-xs text-gray-600 mb-2">Next Bill:</p>
-          <p className="text-sm font-medium text-gray-900">
-            {envelope.upcomingBills[0].name ||
-              envelope.upcomingBills[0].provider}
-            <span className="text-gray-500 ml-2">
-              ${Math.abs(envelope.upcomingBills[0].amount).toFixed(2)}
-            </span>
-          </p>
-        </div>
-      )}
 
       {/* Bill Funding Info for Bill Envelopes */}
       {envelope.envelopeType === ENVELOPE_TYPES.BILL && bills.length > 0 && (
