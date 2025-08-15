@@ -272,25 +272,65 @@ const EnvelopeEditModal = ({
 
           {/* Envelope Type Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              <Target className="h-4 w-4 inline mr-2" />
               Envelope Type
             </label>
-            <div className="grid grid-cols-3 gap-3">
-              {Object.entries(ENVELOPE_TYPE_CONFIG).map(([type, config]) => (
-                <button
-                  key={type}
-                  type="button"
-                  onClick={() => handleInputChange("envelopeType", type)}
-                  className={`p-3 border rounded-lg text-center transition-all ${
-                    formData.envelopeType === type
-                      ? "border-purple-500 bg-purple-50 text-purple-700"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  <config.icon className="h-5 w-5 mx-auto mb-1" />
-                  <div className="text-xs font-medium">{config.label}</div>
-                </button>
-              ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {Object.entries(ENVELOPE_TYPE_CONFIG)
+                .filter(([type]) => type !== ENVELOPE_TYPES.SAVINGS) // Remove savings from envelope manager
+                .map(([type, config]) => {
+                  const IconComponent =
+                    type === ENVELOPE_TYPES.BILL
+                      ? FileText
+                      : type === ENVELOPE_TYPES.VARIABLE
+                        ? TrendingUp
+                        : Target;
+                  const isSelected = formData.envelopeType === type;
+                  return (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => handleInputChange("envelopeType", type)}
+                      className={`border-2 rounded-xl p-6 text-left transition-all hover:shadow-lg ${
+                        isSelected
+                          ? `${config.borderColor} ${config.bgColor} shadow-lg ring-2 ring-blue-200`
+                          : "border-gray-200 hover:border-gray-400 bg-white hover:bg-gray-50"
+                      }`}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div
+                          className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                            isSelected
+                              ? `${config.borderColor.replace("border-", "border-")} ${config.bgColor.replace("bg-", "bg-")}`
+                              : "border-gray-300"
+                          }`}
+                        >
+                          {isSelected && (
+                            <div
+                              className={`w-3 h-3 rounded-full ${config.bgColor.replace("bg-", "bg-").replace("-50", "-600")}`}
+                            />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center mb-2">
+                            <IconComponent
+                              className={`h-5 w-5 mr-3 ${isSelected ? config.textColor : "text-gray-500"}`}
+                            />
+                            <span
+                              className={`text-lg font-bold ${isSelected ? config.textColor : "text-gray-800"}`}
+                            >
+                              {config.name}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600 leading-relaxed">
+                            {config.description}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
             </div>
           </div>
 
@@ -372,24 +412,53 @@ const EnvelopeEditModal = ({
                 </div>
 
                 {/* Bill Assignment */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    <Settings className="h-4 w-4 inline mr-1" />
-                    Assign Bill
-                  </label>
-                  <select
-                    value={selectedBillId}
-                    onChange={(e) => setSelectedBillId(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
-                  >
-                    <option value="">No bill assigned</option>
-                    {availableBills.map((bill) => (
-                      <option key={bill.id} value={bill.id}>
-                        {bill.name || bill.provider} - $
-                        {Math.abs(bill.amount).toFixed(2)}
+                <div className="md:col-span-2">
+                  <div className="bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-300 rounded-xl p-4 mb-4">
+                    <label className="block text-lg font-bold text-purple-800 mb-3 flex items-center">
+                      <Sparkles className="h-5 w-5 mr-2" />
+                      🔗 Connect to Existing Bill
+                    </label>
+                    <select
+                      value={selectedBillId}
+                      onChange={(e) => setSelectedBillId(e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-purple-400 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white shadow-md text-base"
+                    >
+                      <option value="">
+                        {availableBills && availableBills.length > 0
+                          ? "Choose a bill to auto-populate settings..."
+                          : `No bills available (${availableBills ? availableBills.length : "undefined"} found)`}
                       </option>
-                    ))}
-                  </select>
+                      {availableBills.map((bill) => (
+                        <option key={bill.id} value={bill.id}>
+                          {bill.name ||
+                            bill.provider ||
+                            bill.description ||
+                            "Unnamed Bill"}{" "}
+                          - ${Math.abs(bill.amount || 0).toFixed(2)} (
+                          {bill.frequency || "monthly"})
+                        </option>
+                      ))}
+                    </select>
+                    {selectedBillId && (
+                      <div className="mt-3 p-3 bg-green-100 border border-green-300 rounded-lg">
+                        <p className="text-sm text-green-700 flex items-center">
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          <strong>Connected!</strong> Envelope settings
+                          populated from the selected bill.
+                        </p>
+                      </div>
+                    )}
+                    <p className="text-sm text-purple-700 mt-3 font-medium">
+                      📝 <strong>Tip:</strong> Connect a bill to automatically
+                      fill envelope details like name, amount, and category.
+                    </p>
+                    {(!availableBills || availableBills.length === 0) && (
+                      <p className="text-sm text-red-600 mt-3 font-medium">
+                        ⚠️ No bills found. Create bills first to connect them to
+                        envelopes.
+                      </p>
+                    )}
+                  </div>
                 </div>
               </>
             )}
