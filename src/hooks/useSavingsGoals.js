@@ -162,7 +162,7 @@ const useSavingsGoals = (options = {}) => {
     });
 
     return filteredGoals;
-  }, [status, sortBy, sortOrder, includeCompleted, goals]);
+  }, [status, sortBy, sortOrder, includeCompleted]);
 
   // Main savings goals query
   const savingsGoalsQuery = useQuery({

@@ -37,7 +37,7 @@ const useFirebaseSync = (
     // Auto-load data from cloud using force sync
     const loadCloudData = async () => {
       try {
-        setIsLoading(true);
+        _setIsLoading(true);
         const syncResult = await firebaseSync.forceSync();
         if (syncResult && syncResult.success) {
           console.log("✅ Chunked sync completed:", syncResult);
@@ -54,7 +54,7 @@ const useFirebaseSync = (
       } catch (error) {
         console.warn("Failed to load cloud data:", error.message);
       } finally {
-        setIsLoading(false);
+        _setIsLoading(false);
       }
     };
 
