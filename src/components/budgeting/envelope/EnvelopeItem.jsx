@@ -100,14 +100,46 @@ const EnvelopeItem = ({
           </p>
         </div>
         <div>
-          <p className="text-xs text-gray-500">Available</p>
-          <p
-            className={`text-lg font-semibold ${
-              envelope.available >= 0 ? "text-green-600" : "text-red-600"
-            }`}
-          >
-            ${envelope.available.toFixed(2)}
-          </p>
+          {envelope.envelopeType === ENVELOPE_TYPES.BILL ? (
+            // For bill envelopes, show how much more is needed instead of negative "available"
+            (() => {
+              // Find linked bills to get the target amount
+              const linkedBills = bills.filter(bill => bill.envelopeId === envelope.id && !bill.isPaid);
+              const nextBill = linkedBills
+                .filter(bill => new Date(bill.dueDate) >= new Date())
+                .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))[0];
+              const targetAmount = nextBill ? (nextBill.amount || 0) : (envelope.monthlyBudget || envelope.monthlyAmount || 0);
+              const currentBalance = envelope.currentBalance || 0;
+              const amountNeeded = Math.max(0, targetAmount - currentBalance);
+              
+              return (
+                <>
+                  <p className="text-xs text-gray-500">
+                    {amountNeeded > 0 ? "Still Need" : "Surplus"}
+                  </p>
+                  <p
+                    className={`text-lg font-semibold ${
+                      amountNeeded > 0 ? "text-orange-600" : "text-green-600"
+                    }`}
+                  >
+                    ${amountNeeded > 0 ? amountNeeded.toFixed(2) : (currentBalance - targetAmount).toFixed(2)}
+                  </p>
+                </>
+              );
+            })()
+          ) : (
+            // For non-bill envelopes, keep the original "Available" display
+            <>
+              <p className="text-xs text-gray-500">Available</p>
+              <p
+                className={`text-lg font-semibold ${
+                  envelope.available >= 0 ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                ${envelope.available.toFixed(2)}
+              </p>
+            </>
+          )}
         </div>
       </div>
 
