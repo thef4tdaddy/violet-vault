@@ -19,7 +19,7 @@ import UnassignedCashEnvelope from "./envelope/UnassignedCashEnvelope";
 const EnvelopeCreateModal = lazy(
   () => import("./envelope/EnvelopeCreateModal"),
 );
-const EnvelopeEditModal = lazy(() => import("./envelope/EnvelopeEditModal"));
+const EnvelopeEditModal = lazy(() => import("./EditEnvelopeModal"));
 const EnvelopeHistoryModal = lazy(
   () => import("./envelope/EnvelopeHistoryModal"),
 );
