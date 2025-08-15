@@ -94,13 +94,13 @@ const EditEnvelopeModal = ({
     console.log("🔍 EditEnvelopeModal - allBills received:", {
       allBills,
       length: allBills?.length,
-      bills: allBills?.map(bill => ({
+      bills: allBills?.map((bill) => ({
         id: bill.id,
         name: bill.name,
         provider: bill.provider,
         amount: bill.amount,
-        envelopeId: bill.envelopeId
-      }))
+        envelopeId: bill.envelopeId,
+      })),
     });
   }, [allBills]);
 
