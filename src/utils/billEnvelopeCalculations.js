@@ -310,9 +310,24 @@ export const getBillEnvelopeDisplayInfo = (envelope, bills = []) => {
     priority,
     status,
     displayText: {
-      primaryStatus: calculations.isFullyFunded
-        ? "Fully Funded"
-        : `Need $${calculations.remainingToFund.toFixed(2)}`,
+      primaryStatus: (() => {
+        if (calculations.remainingToFund <= 0) {
+          // Check if truly fully funded (100%) vs just meeting next bill
+          const actualProgress = calculations.targetMonthlyAmount > 0 
+            ? (calculations.currentBalance / calculations.targetMonthlyAmount) * 100 
+            : 0;
+          
+          if (actualProgress >= 100) {
+            return "Fully Funded";
+          } else if (actualProgress >= 75 || calculations.remainingToFund <= 0) {
+            return "On Track";
+          } else {
+            return `Need $${calculations.remainingToFund.toFixed(2)}`;
+          }
+        } else {
+          return `Need $${calculations.remainingToFund.toFixed(2)}`;
+        }
+      })(),
       secondaryStatus: calculations.nextBill
         ? `Next: ${calculations.nextBill.name} (${calculations.daysUntilNextBill} days)`
         : "No upcoming bills",
