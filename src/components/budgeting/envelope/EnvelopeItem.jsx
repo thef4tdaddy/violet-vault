@@ -38,9 +38,28 @@ const EnvelopeItem = ({
     }
   };
 
-  const utilizationColorClass = getUtilizationColor(
-    envelope.utilizationRate,
-    envelope.status,
+  // Get utilization color - use sophisticated logic for bill envelopes
+  const utilizationColorClass = envelope.envelopeType === ENVELOPE_TYPES.BILL ? (
+    (() => {
+      const displayInfo = getBillEnvelopeDisplayInfo(envelope, bills);
+      if (!displayInfo) {
+        // Fallback to original function
+        return getUtilizationColor(envelope.utilizationRate, envelope.status);
+      }
+      
+      const { displayText } = displayInfo;
+      const isOnTrack = displayText.primaryStatus === 'On Track';
+      const isFullyFunded = displayText.primaryStatus === 'Fully Funded';
+      const isBehind = displayText.primaryStatus.startsWith('Behind');
+      
+      if (isFullyFunded) return "bg-green-100 text-green-800";
+      if (isOnTrack) return "bg-blue-100 text-blue-800";
+      if (isBehind) return "bg-red-100 text-red-800";
+      return "bg-orange-100 text-orange-800"; // Default for other states
+    })()
+  ) : (
+    // Non-bill envelopes use original function
+    getUtilizationColor(envelope.utilizationRate, envelope.status)
   );
 
   return (
@@ -102,28 +121,63 @@ const EnvelopeItem = ({
         </div>
         <div>
           {envelope.envelopeType === ENVELOPE_TYPES.BILL ? (
-            // For bill envelopes, show how much more is needed instead of negative "available"
+            // For bill envelopes, use the same sophisticated logic as bottom section
             (() => {
-              // Find linked bills to get the target amount
-              const linkedBills = bills.filter(bill => bill.envelopeId === envelope.id && !bill.isPaid);
-              const nextBill = linkedBills
-                .filter(bill => new Date(bill.dueDate) >= new Date())
-                .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))[0];
-              const targetAmount = nextBill ? (nextBill.amount || 0) : (envelope.monthlyBudget || envelope.monthlyAmount || 0);
-              const currentBalance = envelope.currentBalance || 0;
-              const amountNeeded = Math.max(0, targetAmount - currentBalance);
+              const displayInfo = getBillEnvelopeDisplayInfo(envelope, bills);
+              
+              if (!displayInfo) {
+                // Fallback to simple calculation if sophisticated logic fails
+                const linkedBills = bills.filter(bill => bill.envelopeId === envelope.id && !bill.isPaid);
+                const nextBill = linkedBills
+                  .filter(bill => new Date(bill.dueDate) >= new Date())
+                  .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))[0];
+                const targetAmount = nextBill ? (nextBill.amount || 0) : (envelope.monthlyBudget || envelope.monthlyAmount || 0);
+                const currentBalance = envelope.currentBalance || 0;
+                const amountNeeded = Math.max(0, targetAmount - currentBalance);
+                
+                return (
+                  <>
+                    <p className="text-xs text-gray-500">
+                      {amountNeeded > 0 ? "Still Need" : "Surplus"}
+                    </p>
+                    <p className="text-lg font-semibold text-orange-600">
+                      ${amountNeeded.toFixed(2)}
+                    </p>
+                  </>
+                );
+              }
+              
+              const { displayText, remainingToFund, currentBalance, targetMonthlyAmount } = displayInfo;
+              const isOnTrack = displayText.primaryStatus === 'On Track';
+              const isFullyFunded = displayText.primaryStatus === 'Fully Funded';
+              const isBehind = displayText.primaryStatus.startsWith('Behind');
+              
+              // Calculate amount to display based on status
+              let displayAmount = remainingToFund;
+              let displayLabel = "Still Need";
+              let textColor = "text-orange-600";
+              
+              if (isFullyFunded) {
+                displayAmount = currentBalance - targetMonthlyAmount;
+                displayLabel = "Surplus";
+                textColor = "text-green-600";
+              } else if (isOnTrack) {
+                displayLabel = "On Track";
+                displayAmount = remainingToFund;
+                textColor = "text-blue-600";
+              } else if (isBehind) {
+                displayLabel = "Behind";
+                textColor = "text-red-600";
+              }
               
               return (
                 <>
-                  <p className="text-xs text-gray-500">
-                    {amountNeeded > 0 ? "Still Need" : "Surplus"}
-                  </p>
-                  <p
-                    className={`text-lg font-semibold ${
-                      amountNeeded > 0 ? "text-orange-600" : "text-green-600"
-                    }`}
-                  >
-                    ${amountNeeded > 0 ? amountNeeded.toFixed(2) : (currentBalance - targetAmount).toFixed(2)}
+                  <p className="text-xs text-gray-500">{displayLabel}</p>
+                  <p className={`text-lg font-semibold ${textColor}`}>
+                    {isOnTrack && !isFullyFunded ? 
+                      `$${displayAmount.toFixed(2)}` : 
+                      `$${Math.abs(displayAmount).toFixed(2)}`
+                    }
                   </p>
                 </>
               );
@@ -215,13 +269,40 @@ const EnvelopeItem = ({
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div
             className={`h-2 rounded-full transition-all duration-300 ${
-              envelope.utilizationRate > 1
-                ? "bg-red-500"
-                : envelope.utilizationRate > 0.8
-                  ? "bg-orange-500"
-                  : envelope.utilizationRate > 0.5
-                    ? "bg-blue-500"
-                    : "bg-green-500"
+              envelope.envelopeType === ENVELOPE_TYPES.BILL ? (
+                (() => {
+                  const displayInfo = getBillEnvelopeDisplayInfo(envelope, bills);
+                  if (!displayInfo) {
+                    // Fallback to old logic if sophisticated calculation fails
+                    return envelope.utilizationRate > 1
+                      ? "bg-red-500"
+                      : envelope.utilizationRate > 0.8
+                        ? "bg-orange-500"
+                        : envelope.utilizationRate > 0.5
+                          ? "bg-blue-500"
+                          : "bg-green-500";
+                  }
+                  
+                  const { displayText } = displayInfo;
+                  const isOnTrack = displayText.primaryStatus === 'On Track';
+                  const isFullyFunded = displayText.primaryStatus === 'Fully Funded';
+                  const isBehind = displayText.primaryStatus.startsWith('Behind');
+                  
+                  if (isFullyFunded) return "bg-green-500";
+                  if (isOnTrack) return "bg-blue-500";
+                  if (isBehind) return "bg-red-500";
+                  return "bg-orange-500"; // Default for other states
+                })()
+              ) : (
+                // Non-bill envelopes use original logic
+                envelope.utilizationRate > 1
+                  ? "bg-red-500"
+                  : envelope.utilizationRate > 0.8
+                    ? "bg-orange-500"
+                    : envelope.utilizationRate > 0.5
+                      ? "bg-blue-500"
+                      : "bg-green-500"
+              )
             }`}
             style={{
               width: `${Math.min(envelope.utilizationRate * 100, 100)}%`,

@@ -316,13 +316,6 @@ export const getBillEnvelopeDisplayInfo = (envelope, bills = []) => {
         const nextBill = calculations.nextBill;
         const daysUntilNextBill = calculations.daysUntilNextBill;
         
-        console.log('🔍 Status Logic Debug:', {
-          currentBalance,
-          targetAmount,
-          nextBill: nextBill ? nextBill.name : 'none',
-          daysUntilNextBill,
-          fullyFunded: currentBalance >= targetAmount
-        });
         
         // Fully funded = current balance meets or exceeds target
         if (currentBalance >= targetAmount) {
@@ -345,17 +338,6 @@ export const getBillEnvelopeDisplayInfo = (envelope, bills = []) => {
           const progressThroughCycle = Math.max(0, Math.min(1, (cycleDays - daysUntilNextBill) / cycleDays));
           const expectedFunding = targetAmount * progressThroughCycle;
           
-          // Debug logging for 1Password case
-          console.log('🔍 Bill Status Debug:', {
-            billName: nextBill.name,
-            frequency: nextBill.frequency,
-            daysUntilBill: daysUntilNextBill,
-            cycleDays,
-            progressThroughCycle,
-            targetAmount,
-            expectedFunding,
-            currentBalance
-          });
           
           // On Track = current funding is within reasonable range of expected
           // Allow some buffer (±20%) for timing variations
