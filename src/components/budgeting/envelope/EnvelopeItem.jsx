@@ -177,19 +177,32 @@ const EnvelopeItem = ({
             }
           >
             {(() => {
-              // Find linked bills to get minimal additional info
-              const linkedBills = bills.filter(bill => bill.envelopeId === envelope.id && !bill.isPaid);
-              const nextBill = linkedBills
-                .filter(bill => new Date(bill.dueDate) >= new Date())
-                .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))[0];
+              // Import the bill envelope display calculation
+              const { getBillEnvelopeDisplayInfo } = require('../../../utils/billEnvelopeCalculations');
+              const displayInfo = getBillEnvelopeDisplayInfo(envelope, bills);
               
-              if (!nextBill) return null;
+              if (!displayInfo) return null;
               
-              const daysUntil = Math.ceil((new Date(nextBill.dueDate) - new Date()) / (1000 * 60 * 60 * 24));
+              const { nextBill, daysUntilNextBill, displayText } = displayInfo;
               
               return (
-                <div className="text-xs text-gray-500">
-                  Next: {nextBill.name || nextBill.provider} in {daysUntil} day{daysUntil !== 1 ? 's' : ''}
+                <div className="space-y-1">
+                  {/* Status Text */}
+                  <div className={`text-sm font-medium ${
+                    displayText.primaryStatus === 'Fully Funded' ? 'text-green-600' :
+                    displayText.primaryStatus === 'On Track' ? 'text-blue-600' :
+                    displayText.primaryStatus.startsWith('Behind') ? 'text-red-600' :
+                    'text-orange-600'
+                  }`}>
+                    {displayText.primaryStatus}
+                  </div>
+                  
+                  {/* Next Bill Info */}
+                  {nextBill && (
+                    <div className="text-xs text-gray-500">
+                      Next: {nextBill.name} in {daysUntilNextBill} day{daysUntilNextBill !== 1 ? 's' : ''}
+                    </div>
+                  )}
                 </div>
               );
             })()}

@@ -343,12 +343,16 @@ export const getBillEnvelopeDisplayInfo = (envelope, bills = []) => {
           const minExpected = expectedFunding * (1 - buffer);
           const maxExpected = expectedFunding * (1 + buffer);
           
-          if (currentBalance >= minExpected && currentBalance <= maxExpected) {
+          if (currentBalance >= minExpected) {
             return "On Track";
+          } else {
+            // Behind schedule - show how much behind expected pace
+            const amountBehind = expectedFunding - currentBalance;
+            return `Behind: $${Math.max(0, amountBehind).toFixed(2)}`;
           }
         }
         
-        // Otherwise show how much is still needed
+        // Fallback - show how much is still needed
         return `Need $${calculations.remainingToFund.toFixed(2)}`;
       })(),
       secondaryStatus: calculations.nextBill
