@@ -24,6 +24,7 @@ const TransactionLedger = ({
   const {
     transactions = [],
     addTransaction,
+    deleteTransaction,
     isLoading: transactionsLoading,
   } = useTransactions();
 
@@ -43,7 +44,6 @@ const TransactionLedger = ({
   const budget = useBudgetStore();
   const {
     updateTransaction,
-    deleteTransaction,
     setAllTransactions,
     updateBill,
   } = budget;

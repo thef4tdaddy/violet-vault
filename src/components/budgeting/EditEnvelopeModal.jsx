@@ -397,7 +397,7 @@ const EditEnvelopeModal = ({
   const isUnassignedCash = envelope.id === "unassigned";
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 px-6 py-4">
@@ -610,12 +610,32 @@ const EditEnvelopeModal = ({
               <h3 className="font-semibold text-gray-900 flex items-center">
                 <DollarSign className="h-4 w-4 mr-2 text-blue-600" />
                 {formData.envelopeType === ENVELOPE_TYPES.BILL
-                  ? "Bill Payment Settings"
+                  ? selectedBillId ? "Connected Bill Settings" : "Bill Payment Settings"
                   : "Variable Budget Settings"}
               </h3>
 
+              {/* Connected Bill Display */}
+              {formData.envelopeType === ENVELOPE_TYPES.BILL && selectedBillId && (
+                <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                  <div className="flex items-center mb-2">
+                    <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+                    <span className="font-medium text-green-800">Bill Connected</span>
+                  </div>
+                  {(() => {
+                    const connectedBill = allBills.find(bill => bill.id === selectedBillId);
+                    return connectedBill ? (
+                      <div className="text-sm text-green-700">
+                        <p><strong>{connectedBill.name || connectedBill.provider}</strong></p>
+                        <p>Amount: ${connectedBill.amount || 'N/A'} ({connectedBill.frequency || 'monthly'})</p>
+                        <p className="text-xs mt-1">Bill settings will override manual envelope settings.</p>
+                      </div>
+                    ) : null;
+                  })()}
+                </div>
+              )}
+
               {/* Type-specific fields */}
-              {formData.envelopeType === ENVELOPE_TYPES.BILL && (
+              {formData.envelopeType === ENVELOPE_TYPES.BILL && !selectedBillId && (
                 <div className="space-y-4">
                   {/* Payment Frequency Selection */}
                   <div>
@@ -960,83 +980,63 @@ const EditEnvelopeModal = ({
               </div>
 
               {/* Auto-allocate option */}
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="autoAllocate"
-                  checked={formData.autoAllocate}
-                  onChange={(e) =>
-                    setFormData({ ...formData, autoAllocate: e.target.checked })
-                  }
-                  className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
-                />
-                <label
-                  htmlFor="autoAllocate"
-                  className="ml-3 text-sm text-gray-700"
-                >
-                  Auto-allocate funds from paychecks
+              <div className="space-y-3">
+                <label className="block text-sm font-medium text-gray-700">
+                  Paycheck Allocation
                 </label>
+                
+                <div className="space-y-2">
+                  {/* Auto-allocate option */}
+                  <div className="glassmorphism border-2 border-white/20 rounded-xl p-3">
+                    <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
+                      <input
+                        type="radio"
+                        id="autoAllocateTrue"
+                        name="autoAllocate"
+                        value="true"
+                        checked={formData.autoAllocate === true}
+                        onChange={() => setFormData({ ...formData, autoAllocate: true })}
+                        className="w-4 h-4 text-purple-600 mt-0.5 justify-self-start"
+                      />
+                      <div>
+                        <div className="flex items-center mb-1">
+                          <Sparkles className="h-4 w-4 mr-2 text-purple-600" />
+                          <span className="font-medium text-sm">Auto-allocate</span>
+                        </div>
+                        <p className="text-xs text-gray-600 leading-tight">
+                          Automatically allocate funds from paychecks based on envelope priority
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Manual allocation option */}
+                  <div className="glassmorphism border-2 border-white/20 rounded-xl p-3">
+                    <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
+                      <input
+                        type="radio"
+                        id="autoAllocateFalse"
+                        name="autoAllocate"
+                        value="false"
+                        checked={formData.autoAllocate === false}
+                        onChange={() => setFormData({ ...formData, autoAllocate: false })}
+                        className="w-4 h-4 text-purple-600 mt-0.5 justify-self-start"
+                      />
+                      <div>
+                        <div className="flex items-center mb-1">
+                          <Settings className="h-4 w-4 mr-2 text-gray-600" />
+                          <span className="font-medium text-sm">Manual allocation</span>
+                        </div>
+                        <p className="text-xs text-gray-600 leading-tight">
+                          Manually allocate funds to this envelope as needed
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Linked Bills Section */}
-            {envelope && formData.envelopeType === ENVELOPE_TYPES.BILL && (
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                <h4 className="text-sm font-medium text-blue-900 mb-3 flex items-center">
-                  <FileText className="h-4 w-4 mr-2" />
-                  Bills Using This Envelope
-                </h4>
-                {(() => {
-                  const linkedBills = allBills.filter(
-                    (bill) => bill.envelopeId === envelope.id,
-                  );
-                  if (linkedBills.length === 0) {
-                    return (
-                      <p className="text-sm text-blue-700">
-                        No bills are currently assigned to this envelope.
-                        <br />
-                        <span className="text-xs text-blue-600">
-                          Assign bills in the Bills tab to automatically deduct
-                          payments from this envelope.
-                        </span>
-                      </p>
-                    );
-                  }
-                  return (
-                    <div className="space-y-2">
-                      {linkedBills.map((bill) => (
-                        <div
-                          key={bill.id}
-                          className="flex items-center justify-between bg-white p-2 rounded-lg"
-                        >
-                          <div className="flex items-center">
-                            <div className="text-blue-600 mr-2">
-                              <FileText className="h-4 w-4" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-gray-900">
-                                {bill.provider || bill.name || bill.description}
-                              </p>
-                              <p className="text-xs text-gray-600">
-                                Due: {bill.frequency} • $
-                                {Math.abs(bill.amount || 0).toFixed(2)}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="text-xs text-blue-600">
-                            {bill.isPaid ? "✓ Paid" : "Pending"}
-                          </div>
-                        </div>
-                      ))}
-                      <p className="text-xs text-blue-600 mt-2">
-                        💡 When these bills are paid, the amount will be
-                        automatically deducted from this envelope
-                      </p>
-                    </div>
-                  );
-                })()}
-              </div>
-            )}
 
             {/* Form Errors */}
             {errors.submit && (
