@@ -1,6 +1,7 @@
 import { QueryClient, MutationCache, QueryCache } from "@tanstack/react-query";
 import { H } from "./highlight";
 import { budgetDb } from "../db/budgetDb";
+import logger from "./logger.js";
 
 // Enhanced TanStack Query configuration with Dexie integration
 const queryClient = new QueryClient({
@@ -35,7 +36,11 @@ const queryClient = new QueryClient({
 
       // Global error handling
       onError: (error, variables, context) => {
-        console.error("Mutation error:", error);
+        logger.error("Mutation error", error, {
+          variables,
+          context,
+          source: "queryClient",
+        });
         H.consumeError(error, {
           metadata: { variables, context },
           tags: { type: "mutation_error" },
@@ -47,7 +52,10 @@ const queryClient = new QueryClient({
   // Query cache with global error handling
   queryCache: new QueryCache({
     onError: (error, query) => {
-      console.error("Query error:", error);
+      logger.error("Query error", error, {
+        queryKey: query.queryKey,
+        source: "queryClient",
+      });
       H.consumeError(error, {
         metadata: { queryKey: query.queryKey },
         tags: { type: "query_error" },
@@ -56,7 +64,10 @@ const queryClient = new QueryClient({
     onSuccess: (data, query) => {
       // Optional: Track successful queries
       if (process.env.NODE_ENV === "development") {
-        console.log("Query success:", query.queryKey);
+        logger.debug("Query success", {
+          queryKey: query.queryKey,
+          source: "queryClient",
+        });
       }
     },
   }),
@@ -192,7 +203,10 @@ export const prefetchHelpers = {
         staleTime: 2 * 60 * 1000, // 2 minutes
       });
     } catch (error) {
-      console.warn("Failed to prefetch envelopes:", error);
+      logger.warn("Failed to prefetch envelopes", {
+        error: error.message,
+        source: "prefetchHelpers",
+      });
     }
   },
 
@@ -216,7 +230,10 @@ export const prefetchHelpers = {
         staleTime: 60 * 1000, // 1 minute
       });
     } catch (error) {
-      console.warn("Failed to prefetch transactions:", error);
+      logger.warn("Failed to prefetch transactions", {
+        error: error.message,
+        source: "prefetchHelpers",
+      });
     }
   },
 
@@ -234,7 +251,10 @@ export const prefetchHelpers = {
         staleTime: 30 * 1000, // 30 seconds
       });
     } catch (error) {
-      console.warn("Failed to prefetch dashboard:", error);
+      logger.warn("Failed to prefetch dashboard", {
+        error: error.message,
+        source: "prefetchHelpers",
+      });
     }
   },
 };
@@ -260,7 +280,11 @@ export const optimisticHelpers = {
     try {
       await budgetDb.envelopes.put({ id: envelopeId, ...updates });
     } catch (error) {
-      console.warn("Failed to persist envelope update to Dexie:", error);
+      logger.warn("Failed to persist envelope update to Dexie", {
+        error: error.message,
+        envelopeId,
+        source: "optimisticHelpers",
+      });
     }
   },
 
@@ -275,7 +299,11 @@ export const optimisticHelpers = {
     try {
       await budgetDb.envelopes.add(newEnvelope);
     } catch (error) {
-      console.warn("Failed to persist new envelope to Dexie:", error);
+      logger.warn("Failed to persist new envelope to Dexie", {
+        error: error.message,
+        envelopeId: newEnvelope.id,
+        source: "optimisticHelpers",
+      });
     }
   },
 
@@ -295,7 +323,11 @@ export const optimisticHelpers = {
     try {
       await budgetDb.envelopes.delete(envelopeId);
     } catch (error) {
-      console.warn("Failed to remove envelope from Dexie:", error);
+      logger.warn("Failed to remove envelope from Dexie", {
+        error: error.message,
+        envelopeId,
+        source: "optimisticHelpers",
+      });
     }
   },
 
@@ -321,7 +353,11 @@ export const optimisticHelpers = {
     try {
       await budgetDb.transactions.add(newTransaction);
     } catch (error) {
-      console.warn("Failed to persist transaction to Dexie:", error);
+      logger.warn("Failed to persist transaction to Dexie", {
+        error: error.message,
+        transactionId: newTransaction.id,
+        source: "optimisticHelpers",
+      });
     }
   },
 
@@ -336,7 +372,11 @@ export const optimisticHelpers = {
     try {
       await budgetDb.transactions.delete(transactionId);
     } catch (error) {
-      console.warn("Failed to remove transaction from Dexie:", error);
+      logger.warn("Failed to remove transaction from Dexie", {
+        error: error.message,
+        transactionId,
+        source: "optimisticHelpers",
+      });
     }
   },
 
@@ -355,7 +395,11 @@ export const optimisticHelpers = {
     try {
       await budgetDb.transactions.put({ id: transactionId, ...updates });
     } catch (error) {
-      console.warn("Failed to update transaction in Dexie:", error);
+      logger.warn("Failed to update transaction in Dexie", {
+        error: error.message,
+        transactionId,
+        source: "optimisticHelpers",
+      });
     }
   },
 
@@ -369,7 +413,11 @@ export const optimisticHelpers = {
     try {
       await budgetDb.bills.add(newBill);
     } catch (error) {
-      console.warn("Failed to persist bill to Dexie:", error);
+      logger.warn("Failed to persist bill to Dexie", {
+        error: error.message,
+        billId: newBill.id,
+        source: "optimisticHelpers",
+      });
     }
   },
 
@@ -384,7 +432,11 @@ export const optimisticHelpers = {
     try {
       await budgetDb.bills.put({ id: billId, ...updates });
     } catch (error) {
-      console.warn("Failed to persist bill update to Dexie:", error);
+      logger.warn("Failed to persist bill update to Dexie", {
+        error: error.message,
+        billId,
+        source: "optimisticHelpers",
+      });
     }
   },
 
@@ -397,7 +449,11 @@ export const optimisticHelpers = {
     try {
       await budgetDb.bills.delete(billId);
     } catch (error) {
-      console.warn("Failed to remove bill from Dexie:", error);
+      logger.warn("Failed to remove bill from Dexie", {
+        error: error.message,
+        billId,
+        source: "optimisticHelpers",
+      });
     }
   },
 
@@ -411,7 +467,11 @@ export const optimisticHelpers = {
     try {
       await budgetDb.savingsGoals.add(newGoal);
     } catch (error) {
-      console.warn("Failed to persist savings goal to Dexie:", error);
+      logger.warn("Failed to persist savings goal to Dexie", {
+        error: error.message,
+        goalId: newGoal.id,
+        source: "optimisticHelpers",
+      });
     }
   },
 
@@ -426,7 +486,11 @@ export const optimisticHelpers = {
     try {
       await budgetDb.savingsGoals.put({ id: goalId, ...updates });
     } catch (error) {
-      console.warn("Failed to persist savings goal update to Dexie:", error);
+      logger.warn("Failed to persist savings goal update to Dexie", {
+        error: error.message,
+        goalId,
+        source: "optimisticHelpers",
+      });
     }
   },
 
@@ -439,7 +503,11 @@ export const optimisticHelpers = {
     try {
       await budgetDb.savingsGoals.delete(goalId);
     } catch (error) {
-      console.warn("Failed to remove savings goal from Dexie:", error);
+      logger.warn("Failed to remove savings goal from Dexie", {
+        error: error.message,
+        goalId,
+        source: "optimisticHelpers",
+      });
     }
   },
 
@@ -453,7 +521,11 @@ export const optimisticHelpers = {
     try {
       await budgetDb.debts.add(newDebt);
     } catch (error) {
-      console.warn("Failed to persist debt to Dexie:", error);
+      logger.warn("Failed to persist debt to Dexie", {
+        error: error.message,
+        debtId: newDebt.id,
+        source: "optimisticHelpers",
+      });
     }
   },
 
@@ -468,7 +540,11 @@ export const optimisticHelpers = {
     try {
       await budgetDb.debts.put({ id: debtId, ...updates });
     } catch (error) {
-      console.warn("Failed to persist debt update to Dexie:", error);
+      logger.warn("Failed to persist debt update to Dexie", {
+        error: error.message,
+        debtId,
+        source: "optimisticHelpers",
+      });
     }
   },
 
@@ -481,7 +557,11 @@ export const optimisticHelpers = {
     try {
       await budgetDb.debts.delete(debtId);
     } catch (error) {
-      console.warn("Failed to remove debt from Dexie:", error);
+      logger.warn("Failed to remove debt from Dexie", {
+        error: error.message,
+        debtId,
+        source: "optimisticHelpers",
+      });
     }
   },
 };
@@ -506,8 +586,9 @@ export const backgroundSync = {
     if (process.env.NODE_ENV === "development") {
       const successful = results.filter((r) => r.status === "fulfilled").length;
       const failed = results.filter((r) => r.status === "rejected").length;
-      console.log(
+      logger.info(
         `Background sync completed: ${successful} successful, ${failed} failed`,
+        { successful, failed, source: "backgroundSync" },
       );
     }
 
@@ -531,9 +612,13 @@ export const backgroundSync = {
       });
 
       await Promise.all(syncPromises);
-      console.log("Successfully synced query cache with Dexie");
+      logger.info("Successfully synced query cache with Dexie", {
+        source: "backgroundSync",
+      });
     } catch (error) {
-      console.error("Failed to sync cache with Dexie:", error);
+      logger.error("Failed to sync cache with Dexie", error, {
+        source: "backgroundSync",
+      });
     }
   },
 
@@ -546,18 +631,22 @@ export const backgroundSync = {
           const queryKey = JSON.parse(entry.key);
           queryClient.setQueryData(queryKey, entry.value);
         } catch (parseError) {
-          console.warn(
-            "Failed to parse cached query key:",
-            entry.key,
-            parseError,
-          );
+          logger.warn("Failed to parse cached query key", {
+            key: entry.key,
+            error: parseError.message,
+            source: "backgroundSync",
+          });
         }
       });
 
       await Promise.all(restorePromises);
-      console.log("Successfully restored query cache from Dexie");
+      logger.info("Successfully restored query cache from Dexie", {
+        source: "backgroundSync",
+      });
     } catch (error) {
-      console.error("Failed to restore cache from Dexie:", error);
+      logger.error("Failed to restore cache from Dexie", error, {
+        source: "backgroundSync",
+      });
     }
   },
 };
@@ -567,13 +656,17 @@ export const networkManager = {
   onOnline: () => {
     // Trigger background sync when coming online
     backgroundSync.syncAllData();
-    console.log("Network online - triggering background sync");
+    logger.info("Network online - triggering background sync", {
+      source: "networkManager",
+    });
   },
 
   onOffline: () => {
     // Save current state to Dexie when going offline
     backgroundSync.syncWithDexie();
-    console.log("Network offline - persisting cache to Dexie");
+    logger.info("Network offline - persisting cache to Dexie", {
+      source: "networkManager",
+    });
   },
 };
 
