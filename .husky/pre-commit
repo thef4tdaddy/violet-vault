@@ -1,3 +1,23 @@
+# Check if this is a docs-only commit to skip linting
+ALL_STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
+DOCS_ONLY_PATTERNS="^(docs/|README\.md|\.md$|CHANGELOG\.md|LICENSE|\.husky/)"
+
+# Check if all staged files are documentation
+DOCS_ONLY=true
+for file in $ALL_STAGED_FILES; do
+  if ! echo "$file" | grep -qE "$DOCS_ONLY_PATTERNS"; then
+    DOCS_ONLY=false
+    break
+  fi
+done
+
+# Skip linting for docs-only commits
+if [ "$DOCS_ONLY" = true ] && [ -n "$ALL_STAGED_FILES" ]; then
+  echo "📝 Documentation-only commit detected, skipping ESLint"
+  echo "📄 Files: $(echo $ALL_STAGED_FILES | tr '\n' ' ')"
+  exit 0
+fi
+
 # Run linting on staged files only for performance
 echo "🔍 Running ESLint on staged JS/JSX files..."
 
