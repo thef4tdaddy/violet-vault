@@ -316,6 +316,14 @@ export const getBillEnvelopeDisplayInfo = (envelope, bills = []) => {
         const nextBill = calculations.nextBill;
         const daysUntilNextBill = calculations.daysUntilNextBill;
         
+        console.log('🔍 Status Logic Debug:', {
+          currentBalance,
+          targetAmount,
+          nextBill: nextBill ? nextBill.name : 'none',
+          daysUntilNextBill,
+          fullyFunded: currentBalance >= targetAmount
+        });
+        
         // Fully funded = current balance meets or exceeds target
         if (currentBalance >= targetAmount) {
           return "Fully Funded";
@@ -363,8 +371,9 @@ export const getBillEnvelopeDisplayInfo = (envelope, bills = []) => {
           }
         }
         
-        // Fallback - show how much is still needed
-        return `Need $${calculations.remainingToFund.toFixed(2)}`;
+        // Fallback - show how much is still needed, but if $0 then say On Track
+        const remaining = calculations.remainingToFund;
+        return remaining <= 0 ? "On Track" : `Need $${remaining.toFixed(2)}`;
       })(),
       secondaryStatus: calculations.nextBill
         ? `Next: ${calculations.nextBill.name} (${calculations.daysUntilNextBill} days)`
