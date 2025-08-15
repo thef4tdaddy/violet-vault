@@ -48,31 +48,116 @@ const useBugReport = () => {
         // Skip problematic CSS properties that html2canvas can't parse
         onclone: (clonedDoc) => {
           try {
-            // Add global style override to handle oklch and other modern color functions
+            // Remove all existing stylesheets and replace with safe equivalents
+            const existingStyles = clonedDoc.querySelectorAll(
+              'style, link[rel="stylesheet"]',
+            );
+            existingStyles.forEach((style) => {
+              if (style.sheet) {
+                try {
+                  // Check if stylesheet contains modern color functions
+                  const cssText = Array.from(style.sheet.cssRules)
+                    .map((rule) => rule.cssText)
+                    .join("\n");
+
+                  if (
+                    cssText.includes("oklch(") ||
+                    cssText.includes("lch(") ||
+                    cssText.includes("lab(")
+                  ) {
+                    console.warn(
+                      "Removing stylesheet with unsupported color functions for screenshot",
+                    );
+                    style.remove();
+                  }
+                } catch {
+                  // Cross-origin or other access issues - safer to remove
+                  style.remove();
+                }
+              }
+            });
+
+            // Add comprehensive safe style override
             const style = clonedDoc.createElement("style");
             style.textContent = `
-              /* Override problematic modern color functions for screenshot compatibility */
+              /* Safe color fallbacks for screenshot compatibility */
               * {
-                /* Fallback for any oklch colors to safe RGB equivalents */
-                background-color: rgba(255, 255, 255, 0) !important;
-                color: rgb(0, 0, 0) !important;
-                border-color: rgb(204, 204, 204) !important;
+                /* Reset any problematic color functions */
+                filter: none !important;
+                backdrop-filter: none !important;
               }
               
-              /* Restore common colors that should be preserved */
+              /* Tailwind color mappings to safe RGB values */
               .text-white, [class*="text-white"] { color: rgb(255, 255, 255) !important; }
               .text-black, [class*="text-black"] { color: rgb(0, 0, 0) !important; }
-              .text-gray-600, [class*="text-gray-600"] { color: rgb(75, 85, 99) !important; }
-              .text-gray-900, [class*="text-gray-900"] { color: rgb(17, 24, 39) !important; }
-              .text-purple-600, [class*="text-purple-600"] { color: rgb(147, 51, 234) !important; }
-              .text-red-500, [class*="text-red-500"] { color: rgb(239, 68, 68) !important; }
-              .text-green-500, [class*="text-green-500"] { color: rgb(34, 197, 94) !important; }
+              .text-gray-50 { color: rgb(249, 250, 251) !important; }
+              .text-gray-100 { color: rgb(243, 244, 246) !important; }
+              .text-gray-200 { color: rgb(229, 231, 235) !important; }
+              .text-gray-300 { color: rgb(209, 213, 219) !important; }
+              .text-gray-400 { color: rgb(156, 163, 175) !important; }
+              .text-gray-500 { color: rgb(107, 114, 128) !important; }
+              .text-gray-600 { color: rgb(75, 85, 99) !important; }
+              .text-gray-700 { color: rgb(55, 65, 81) !important; }
+              .text-gray-800 { color: rgb(31, 41, 55) !important; }
+              .text-gray-900 { color: rgb(17, 24, 39) !important; }
               
-              .bg-white, [class*="bg-white"] { background-color: rgb(255, 255, 255) !important; }
-              .bg-purple-500, [class*="bg-purple-500"] { background-color: rgb(168, 85, 247) !important; }
-              .bg-red-500, [class*="bg-red-500"] { background-color: rgb(239, 68, 68) !important; }
-              .bg-gray-50, [class*="bg-gray-50"] { background-color: rgb(249, 250, 251) !important; }
-              .bg-gray-100, [class*="bg-gray-100"] { background-color: rgb(243, 244, 246) !important; }
+              .text-purple-500 { color: rgb(168, 85, 247) !important; }
+              .text-purple-600 { color: rgb(147, 51, 234) !important; }
+              .text-purple-700 { color: rgb(126, 34, 206) !important; }
+              
+              .text-red-500 { color: rgb(239, 68, 68) !important; }
+              .text-red-600 { color: rgb(220, 38, 38) !important; }
+              
+              .text-green-500 { color: rgb(34, 197, 94) !important; }
+              .text-green-600 { color: rgb(22, 163, 74) !important; }
+              
+              .text-blue-500 { color: rgb(59, 130, 246) !important; }
+              .text-blue-600 { color: rgb(37, 99, 235) !important; }
+              
+              .text-yellow-500 { color: rgb(234, 179, 8) !important; }
+              .text-amber-600 { color: rgb(217, 119, 6) !important; }
+              
+              .text-emerald-600 { color: rgb(5, 150, 105) !important; }
+              .text-cyan-600 { color: rgb(8, 145, 178) !important; }
+              .text-orange-600 { color: rgb(234, 88, 12) !important; }
+              
+              /* Background colors */
+              .bg-white { background-color: rgb(255, 255, 255) !important; }
+              .bg-gray-50 { background-color: rgb(249, 250, 251) !important; }
+              .bg-gray-100 { background-color: rgb(243, 244, 246) !important; }
+              .bg-gray-200 { background-color: rgb(229, 231, 235) !important; }
+              
+              .bg-purple-50 { background-color: rgb(250, 245, 255) !important; }
+              .bg-purple-100 { background-color: rgb(243, 232, 255) !important; }
+              .bg-purple-400 { background-color: rgb(196, 181, 253) !important; }
+              .bg-purple-500 { background-color: rgb(168, 85, 247) !important; }
+              .bg-purple-600 { background-color: rgb(147, 51, 234) !important; }
+              
+              .bg-red-50 { background-color: rgb(254, 242, 242) !important; }
+              .bg-red-500 { background-color: rgb(239, 68, 68) !important; }
+              
+              .bg-green-50 { background-color: rgb(240, 253, 244) !important; }
+              .bg-emerald-50 { background-color: rgb(236, 253, 245) !important; }
+              
+              .bg-blue-50 { background-color: rgb(239, 246, 255) !important; }
+              .bg-amber-50 { background-color: rgb(255, 251, 235) !important; }
+              
+              /* Gradients - convert to solid colors for compatibility */
+              .bg-gradient-to-br { background-image: none !important; }
+              .from-purple-400 { background-color: rgb(196, 181, 253) !important; }
+              .via-purple-500 { background-color: rgb(168, 85, 247) !important; }
+              .to-indigo-600 { background-color: rgb(79, 70, 229) !important; }
+              
+              /* Border colors */
+              .border-white { border-color: rgb(255, 255, 255) !important; }
+              .border-gray-200 { border-color: rgb(229, 231, 235) !important; }
+              .border-gray-300 { border-color: rgb(209, 213, 219) !important; }
+              .border-purple-200 { border-color: rgb(221, 214, 254) !important; }
+              .border-emerald-200 { border-color: rgb(167, 243, 208) !important; }
+              .border-red-200 { border-color: rgb(254, 202, 202) !important; }
+              .border-amber-200 { border-color: rgb(253, 230, 138) !important; }
+              .border-blue-200 { border-color: rgb(191, 219, 254) !important; }
+              .border-orange-500 { border-color: rgb(249, 115, 22) !important; }
             `;
             clonedDoc.head.appendChild(style);
           } catch (error) {
