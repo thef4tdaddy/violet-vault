@@ -107,18 +107,40 @@ const BillEnvelopeFundingInfo = memo(({ envelope, bills = [], showDetails = fals
         </div>
       )}
 
-      {/* Current status */}
-      <div className="text-xs text-gray-500">
-        Current: ${currentBalance.toFixed(2)}
-        {targetMonthlyAmount > 0 && (
-          <span className="ml-2">• Target: ${targetMonthlyAmount.toFixed(2)}/month</span>
+      {/* Current status and remaining funding */}
+      <div className="text-xs space-y-1">
+        <div className="text-gray-500">
+          Current: ${currentBalance.toFixed(2)}
+          {targetMonthlyAmount > 0 && (
+            <span className="ml-2">• Target: ${targetMonthlyAmount.toFixed(2)}/month</span>
+          )}
+        </div>
+        
+        {/* Show remaining funding needed */}
+        {remainingToFund > 0 && (
+          <div className={`font-medium ${
+            remainingToFund > currentBalance 
+              ? "text-red-600" 
+              : remainingToFund > 0 
+                ? "text-orange-600" 
+                : "text-green-600"
+          }`}>
+            Need ${remainingToFund.toFixed(2)} more for next bill
+          </div>
+        )}
+        
+        {/* Show funding surplus if overfunded */}
+        {remainingToFund <= 0 && currentBalance > nextBill?.amount && (
+          <div className="text-green-600 font-medium">
+            ${(currentBalance - (nextBill?.amount || 0)).toFixed(2)} surplus available
+          </div>
         )}
       </div>
 
       {/* Detailed information if requested */}
       {showDetails && (
         <div className="mt-3 pt-2 border-t border-gray-200">
-          <div className="grid grid-cols-2 gap-2 text-xs">
+          <div className="grid grid-cols-2 gap-2 text-xs mb-2">
             <div className="flex items-center space-x-1">
               <Receipt className="h-3 w-3 text-gray-400" />
               <span className="text-gray-600">
@@ -132,6 +154,42 @@ const BillEnvelopeFundingInfo = memo(({ envelope, bills = [], showDetails = fals
               </div>
             )}
           </div>
+
+          {/* Funding timeline and recommendations */}
+          {remainingToFund > 0 && targetMonthlyAmount > 0 && (
+            <div className="bg-blue-50 p-2 rounded text-xs">
+              <div className="flex items-center space-x-1 mb-1">
+                <TrendingUp className="h-3 w-3 text-blue-600" />
+                <span className="font-medium text-blue-700">Funding Recommendations</span>
+              </div>
+              <div className="text-blue-600 space-y-1">
+                {daysUntilNextBill && daysUntilNextBill > 0 && (
+                  <div>
+                    • Need ${(remainingToFund / daysUntilNextBill).toFixed(2)}/day to fund on time
+                  </div>
+                )}
+                {targetMonthlyAmount > currentBalance && (
+                  <div>
+                    • Monthly allocation: ${targetMonthlyAmount.toFixed(2)} 
+                    (${(targetMonthlyAmount / 2).toFixed(2)} per paycheck)
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Overfunding alert */}
+          {currentBalance > targetMonthlyAmount && targetMonthlyAmount > 0 && (
+            <div className="bg-green-50 p-2 rounded text-xs">
+              <div className="flex items-center space-x-1 mb-1">
+                <CheckCircle className="h-3 w-3 text-green-600" />
+                <span className="font-medium text-green-700">Well Funded</span>
+              </div>
+              <div className="text-green-600">
+                This envelope is {Math.round((currentBalance / targetMonthlyAmount) * 100)}% funded for the month
+              </div>
+            </div>
+          )}
 
           {priority.reason && (
             <div className="mt-2 text-xs text-gray-500 italic">{priority.reason}</div>

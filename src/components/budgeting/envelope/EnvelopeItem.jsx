@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import {
   Edit,
   History,
@@ -9,8 +9,21 @@ import {
   TrendingDown,
 } from "lucide-react";
 import { getStatusStyle, getUtilizationColor } from "../../../utils/budgeting";
+import { ENVELOPE_TYPES } from "../../../constants/categories";
 
-const EnvelopeItem = ({ envelope, onSelect, onEdit, onViewHistory, isSelected }) => {
+// Lazy load the bill funding info component
+const BillEnvelopeFundingInfo = React.lazy(
+  () => import("../BillEnvelopeFundingInfo"),
+);
+
+const EnvelopeItem = ({
+  envelope,
+  onSelect,
+  onEdit,
+  onViewHistory,
+  isSelected,
+  bills = [],
+}) => {
   const getStatusIcon = (status) => {
     switch (status) {
       case "overdue":
@@ -24,7 +37,10 @@ const EnvelopeItem = ({ envelope, onSelect, onEdit, onViewHistory, isSelected })
     }
   };
 
-  const utilizationColorClass = getUtilizationColor(envelope.utilizationRate, envelope.status);
+  const utilizationColorClass = getUtilizationColor(
+    envelope.utilizationRate,
+    envelope.status,
+  );
 
   return (
     <div
@@ -36,7 +52,9 @@ const EnvelopeItem = ({ envelope, onSelect, onEdit, onViewHistory, isSelected })
       {/* Header */}
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1">
-          <h3 className="font-semibold text-gray-900 truncate">{envelope.name}</h3>
+          <h3 className="font-semibold text-gray-900 truncate">
+            {envelope.name}
+          </h3>
           <p className="text-xs text-gray-600 mt-1">{envelope.category}</p>
         </div>
 
@@ -45,7 +63,9 @@ const EnvelopeItem = ({ envelope, onSelect, onEdit, onViewHistory, isSelected })
             className={`flex items-center px-2 py-1 rounded-full text-xs ${utilizationColorClass}`}
           >
             {envelope.status !== "healthy" && getStatusIcon(envelope.status)}
-            <span className="ml-1">{(envelope.utilizationRate * 100).toFixed(0)}%</span>
+            <span className="ml-1">
+              {(envelope.utilizationRate * 100).toFixed(0)}%
+            </span>
           </div>
 
           <div className="flex gap-1">
@@ -95,15 +115,21 @@ const EnvelopeItem = ({ envelope, onSelect, onEdit, onViewHistory, isSelected })
       <div className="grid grid-cols-3 gap-2 text-xs">
         <div className="text-center">
           <p className="text-gray-500">Spent</p>
-          <p className="font-medium text-red-600">${envelope.totalSpent.toFixed(2)}</p>
+          <p className="font-medium text-red-600">
+            ${envelope.totalSpent.toFixed(2)}
+          </p>
         </div>
         <div className="text-center">
           <p className="text-gray-500">Upcoming</p>
-          <p className="font-medium text-orange-600">${envelope.totalUpcoming.toFixed(2)}</p>
+          <p className="font-medium text-orange-600">
+            ${envelope.totalUpcoming.toFixed(2)}
+          </p>
         </div>
         <div className="text-center">
           <p className="text-gray-500">Overdue</p>
-          <p className="font-medium text-red-700">${envelope.totalOverdue.toFixed(2)}</p>
+          <p className="font-medium text-red-700">
+            ${envelope.totalOverdue.toFixed(2)}
+          </p>
         </div>
       </div>
 
@@ -112,11 +138,31 @@ const EnvelopeItem = ({ envelope, onSelect, onEdit, onViewHistory, isSelected })
         <div className="mt-4 pt-3 border-t border-gray-200">
           <p className="text-xs text-gray-600 mb-2">Next Bill:</p>
           <p className="text-sm font-medium text-gray-900">
-            {envelope.upcomingBills[0].name || envelope.upcomingBills[0].provider}
+            {envelope.upcomingBills[0].name ||
+              envelope.upcomingBills[0].provider}
             <span className="text-gray-500 ml-2">
               ${Math.abs(envelope.upcomingBills[0].amount).toFixed(2)}
             </span>
           </p>
+        </div>
+      )}
+
+      {/* Bill Funding Info for Bill Envelopes */}
+      {envelope.envelopeType === ENVELOPE_TYPES.BILL && bills.length > 0 && (
+        <div className="mt-4 pt-3 border-t border-gray-200">
+          <Suspense
+            fallback={
+              <div className="text-xs text-gray-500">
+                Loading funding info...
+              </div>
+            }
+          >
+            <BillEnvelopeFundingInfo
+              envelope={envelope}
+              bills={bills}
+              showDetails={false}
+            />
+          </Suspense>
         </div>
       )}
 
