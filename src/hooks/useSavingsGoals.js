@@ -162,6 +162,7 @@ const useSavingsGoals = (options = {}) => {
     });
 
     return filteredGoals;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, sortBy, sortOrder, includeCompleted]);
 
   // Main savings goals query
