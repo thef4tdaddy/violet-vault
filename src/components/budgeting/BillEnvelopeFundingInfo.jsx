@@ -114,9 +114,9 @@ const BillEnvelopeFundingInfo = memo(
         <div className="text-xs space-y-1">
           <div className="text-gray-500">
             Current: ${currentBalance.toFixed(2)}
-            {targetMonthlyAmount > 0 && (
+            {targetMonthlyAmount > 0 && nextBill && (
               <span className="ml-2">
-                • Target: ${targetMonthlyAmount.toFixed(2)}/month
+                • Target: ${targetMonthlyAmount.toFixed(2)}/{nextBill.frequency || 'month'}
               </span>
             )}
           </div>

@@ -102,6 +102,7 @@ export const calculateBillEnvelopeNeeds = (envelope, bills = []) => {
           amount: nextBillAmount,
           dueDate: nextBill.dueDate,
           category: nextBill.category,
+          frequency: nextBill.frequency || 'monthly',
         }
       : null,
   };
