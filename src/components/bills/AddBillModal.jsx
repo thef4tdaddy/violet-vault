@@ -257,7 +257,8 @@ const AddBillModal = ({
         formData.customFrequency,
       ),
       nextDueDate: getNextDueDate(formData.frequency, normalizedDueDate),
-      icon: getIconByName(formData.iconName),
+      // Don't store the React component - only store the iconName string
+      // The icon component will be resolved when displaying the bill
       iconName: formData.iconName,
       type: editingBill ? editingBill.type : "recurring_bill",
       isPaid: editingBill ? editingBill.isPaid : false,
