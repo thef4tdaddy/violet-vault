@@ -16,9 +16,7 @@ import EnvelopeItem from "./envelope/EnvelopeItem";
 import UnassignedCashEnvelope from "./envelope/UnassignedCashEnvelope";
 
 // Lazy load modals for better performance
-const EnvelopeCreateModal = lazy(
-  () => import("./envelope/EnvelopeCreateModal"),
-);
+const EnvelopeCreateModal = lazy(() => import("./CreateEnvelopeModal"));
 const EnvelopeEditModal = lazy(() => import("./EditEnvelopeModal"));
 const EnvelopeHistoryModal = lazy(
   () => import("./envelope/EnvelopeHistoryModal"),
