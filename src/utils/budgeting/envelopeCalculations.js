@@ -248,6 +248,20 @@ export const calculateEnvelopeTotals = (envelopeData) => {
       acc.totalBalance += env.currentBalance || 0;
       acc.totalUpcoming += env.totalUpcoming || 0;
 
+      // Count bills due within 30 days
+      const today = new Date();
+      const thirtyDaysFromNow = new Date(
+        today.getTime() + 30 * 24 * 60 * 60 * 1000,
+      );
+
+      const billsDueWithin30Days = (env.upcomingBills || []).filter((bill) => {
+        if (!bill.dueDate) return false;
+        const dueDate = new Date(bill.dueDate);
+        return dueDate >= today && dueDate <= thirtyDaysFromNow;
+      });
+
+      acc.billsDueCount += billsDueWithin30Days.length;
+
       // Calculate biweekly needs based on envelope type
       let biweeklyNeed = 0;
       if (envelopeType === ENVELOPE_TYPES.BILL && env.biweeklyAllocation) {
@@ -273,6 +287,7 @@ export const calculateEnvelopeTotals = (envelopeData) => {
       totalBalance: 0,
       totalUpcoming: 0,
       totalBiweeklyNeed: 0,
+      billsDueCount: 0,
     },
   );
 };
