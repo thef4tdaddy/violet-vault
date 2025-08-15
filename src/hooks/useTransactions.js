@@ -28,13 +28,6 @@ const useTransactions = (options = {}) => {
     reconcileTransaction: zustandReconcileTransaction,
   } = useBudgetStore();
 
-  console.log("useTransactions Zustand data debug:", {
-    zustandTransactionsLength: zustandTransactions?.length || 0,
-    zustandAllTransactionsLength: zustandAllTransactions?.length || 0,
-    firstZustandTransaction: zustandTransactions?.[0],
-    firstAllTransaction: zustandAllTransactions?.[0],
-  });
-
   // TanStack Query function - hydrates from Dexie, Dexie syncs with Firebase
   const queryFunction = async () => {
     console.log("🔄 TanStack Query: Fetching transactions from Dexie...");
