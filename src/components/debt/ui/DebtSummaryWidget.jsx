@@ -15,9 +15,9 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
   }
 
   return (
-    <div className="glassmorphism rounded-2xl p-6 border border-white/20 hover:shadow-lg transition-all duration-200">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-gray-900 flex items-center">
+    <div className="glassmorphism rounded-2xl p-4 border border-white/20 hover:shadow-lg transition-all duration-200">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-lg font-bold text-gray-900 flex items-center">
           <div className="relative mr-3">
             <div className="absolute inset-0 bg-red-500 rounded-2xl blur-lg opacity-30"></div>
             <div className="relative bg-red-500 p-2 rounded-2xl">
@@ -38,19 +38,19 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
         )}
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {/* Key Metrics */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <p className="text-sm text-gray-500 mb-1">Total Debt</p>
-            <p className="text-xl font-bold text-red-600">
+            <p className="text-base font-medium text-gray-600 mb-1">Total Debt</p>
+            <p className="text-2xl font-bold text-red-600">
               ${debtStats.totalDebt.toFixed(2)}
             </p>
           </div>
 
           <div>
-            <p className="text-sm text-gray-500 mb-1">Monthly Payments</p>
-            <p className="text-xl font-bold text-orange-600">
+            <p className="text-base font-medium text-gray-600 mb-1">Monthly Payments</p>
+            <p className="text-2xl font-bold text-orange-600">
               ${debtStats.totalMonthlyPayments.toFixed(2)}
             </p>
           </div>
@@ -59,16 +59,16 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
         {/* Average Interest Rate */}
         {debtStats.averageInterestRate > 0 && (
           <div>
-            <p className="text-sm text-gray-500 mb-1">Avg Interest Rate</p>
-            <p className="text-base font-semibold text-purple-600">
+            <p className="text-base font-medium text-gray-600 mb-1">Avg Interest Rate</p>
+            <p className="text-lg font-bold text-purple-600">
               {debtStats.averageInterestRate.toFixed(2)}% APR
             </p>
           </div>
         )}
 
         {/* Quick Stats */}
-        <div className="flex justify-between text-sm text-gray-600 pt-2 border-t border-gray-100">
-          <span>{debtStats.activeDebtCount} active debts</span>
+        <div className="flex justify-between text-base font-medium text-gray-700 pt-2 border-t border-gray-200">
+          <span>{debtStats.activeDebtCount} active debt{debtStats.activeDebtCount !== 1 ? 's' : ''}</span>
           {debtStats.totalInterestPaid > 0 && (
             <span>${debtStats.totalInterestPaid.toFixed(0)} interest paid</span>
           )}
