@@ -1,5 +1,6 @@
 // src/components/budgeting/EnvelopeGrid.jsx - Refactored with separated logic
 import React, { useState, useMemo, lazy, Suspense } from "react";
+import { DollarSign } from "lucide-react";
 import { useBudgetStore } from "../../stores/budgetStore";
 import { useEnvelopes } from "../../hooks/useEnvelopes";
 import { useTransactions } from "../../hooks/useTransactions";
@@ -100,8 +101,30 @@ const UnifiedEnvelopeManager = ({
 
   const sortedEnvelopes = useMemo(() => {
     const filtered = filterEnvelopes(envelopeData, filterOptions);
-    return sortEnvelopes(filtered, filterOptions.sortBy);
-  }, [envelopeData, filterOptions]);
+    const sorted = sortEnvelopes(filtered, filterOptions.sortBy);
+
+    // Create unassigned cash envelope to show first
+    const unassignedEnvelope = {
+      id: "unassigned",
+      name: "Unassigned Cash",
+      currentBalance: unassignedCash,
+      category: "Cash Management",
+      color: "#6b7280",
+      description: "Available cash not allocated to any specific envelope",
+      envelopeType: "cash",
+      totalSpent: 0,
+      totalUpcoming: 0,
+      totalOverdue: 0,
+      allocated: unassignedCash,
+      available: unassignedCash,
+      committed: 0,
+      utilizationRate: 0,
+      status: unassignedCash < 0 ? "overspent" : "healthy",
+      upcomingBills: [],
+    };
+
+    return [unassignedEnvelope, ...sorted];
+  }, [envelopeData, filterOptions, unassignedCash]);
 
   const totals = useMemo(() => {
     return calculateEnvelopeTotals(envelopeData);
@@ -109,13 +132,23 @@ const UnifiedEnvelopeManager = ({
 
   // Event Handlers
   const handleEnvelopeSelect = (envelopeId) => {
-    setSelectedEnvelopeId(
-      envelopeId === selectedEnvelopeId ? null : envelopeId,
-    );
+    if (envelopeId === "unassigned") {
+      // Make the entire unassigned cash envelope card clickable to open distribution modal
+      budget.openUnassignedCashModal();
+    } else {
+      setSelectedEnvelopeId(
+        envelopeId === selectedEnvelopeId ? null : envelopeId,
+      );
+    }
   };
 
   const handleEnvelopeEdit = (envelope) => {
-    setEditingEnvelope(envelope);
+    if (envelope.id === "unassigned") {
+      // For unassigned cash, open the distribution modal instead of edit modal
+      budget.openUnassignedCashModal();
+    } else {
+      setEditingEnvelope(envelope);
+    }
   };
 
   const handleViewHistory = (envelope) => {
