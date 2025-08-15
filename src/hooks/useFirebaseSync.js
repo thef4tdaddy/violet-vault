@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useBudgetStore } from "../stores/budgetStore";
-import { budgetDb } from "../db/budgetDb";
+// import { budgetDb } from "../db/budgetDb"; // TODO: Use for local sync operations
 import logger from "../utils/logger";
 import { useToastHelpers } from "../utils/toastHelpers";
 
@@ -8,12 +8,17 @@ import { useToastHelpers } from "../utils/toastHelpers";
  * Custom hook for Firebase synchronization management
  * Extracts sync logic from MainLayout component
  */
-const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => {
+const useFirebaseSync = (
+  firebaseSync,
+  encryptionKey,
+  budgetId,
+  currentUser,
+) => {
   const budget = useBudgetStore();
   const { showSuccessToast, showErrorToast } = useToastHelpers();
   const [activeUsers, setActiveUsers] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [_isLoading, _setIsLoading] = useState(false); // TODO: Use for loading states
 
   // Auto-initialize Firebase sync when dependencies are ready
   useEffect(() => {
@@ -82,7 +87,8 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
   }, [firebaseSync, currentUser, budgetId, encryptionKey]);
 
   // Legacy code for manual save operations (if needed)
-  const handleManualSave = async () => {
+  const _handleManualSave = async () => {
+    // TODO: Implement manual save functionality
     try {
       console.log("💾 Manual save triggered - using forceSync...");
       const result = await firebaseSync.forceSync();
@@ -115,7 +121,7 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
       console.error("Manual sync failed", err);
       showErrorToast(`Sync failed: ${err.message}`, "Sync Failed");
     }
-  }, [firebaseSync]);
+  }, [firebaseSync, showErrorToast, showSuccessToast]);
 
   // Update activity data from Firebase sync
   useEffect(() => {
@@ -142,7 +148,12 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
     // Update periodically to catch changes
     const interval = setInterval(updateActivityData, 5000);
     return () => clearInterval(interval);
-  }, [budget, budget.getActiveUsers, budget.getRecentActivity, budget.isSyncing]);
+  }, [
+    budget,
+    budget.getActiveUsers,
+    budget.getRecentActivity,
+    budget.isSyncing,
+  ]);
 
   return {
     activeUsers,
