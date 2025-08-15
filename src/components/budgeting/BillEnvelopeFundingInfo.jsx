@@ -110,31 +110,16 @@ const BillEnvelopeFundingInfo = memo(
           </div>
         )}
 
-        {/* Current status and remaining funding */}
-        <div className="text-xs space-y-1">
+        {/* Simplified status display */}
+        <div className="text-xs">
           <div className="text-gray-500">
-            Current: ${currentBalance.toFixed(2)}
             {targetMonthlyAmount > 0 && nextBill && (
-              <span className="ml-2">
-                • Target: ${targetMonthlyAmount.toFixed(2)}/{nextBill.frequency || 'month'}
+              <span>
+                Target: ${targetMonthlyAmount.toFixed(2)}/{nextBill.frequency || 'month'}
               </span>
             )}
           </div>
 
-          {/* Show remaining funding needed */}
-          {remainingToFund > 0 && (
-            <div
-              className={`font-medium ${
-                remainingToFund > currentBalance
-                  ? "text-red-600"
-                  : remainingToFund > 0
-                    ? "text-orange-600"
-                    : "text-green-600"
-              }`}
-            >
-              Need ${remainingToFund.toFixed(2)} more for next bill
-            </div>
-          )}
 
           {/* Show funding surplus if overfunded */}
           {remainingToFund <= 0 && currentBalance > nextBill?.amount && (
