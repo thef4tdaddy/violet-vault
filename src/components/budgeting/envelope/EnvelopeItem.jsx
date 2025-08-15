@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { getStatusStyle, getUtilizationColor } from "../../../utils/budgeting";
 import { ENVELOPE_TYPES } from "../../../constants/categories";
+import { getBillEnvelopeDisplayInfo } from "../../../utils/billEnvelopeCalculations";
 
 // Lazy load the bill funding info component
 const BillEnvelopeFundingInfo = React.lazy(
@@ -177,8 +178,7 @@ const EnvelopeItem = ({
             }
           >
             {(() => {
-              // Import the bill envelope display calculation
-              const { getBillEnvelopeDisplayInfo } = require('../../../utils/billEnvelopeCalculations');
+              // Use the imported function
               const displayInfo = getBillEnvelopeDisplayInfo(envelope, bills);
               
               if (!displayInfo) return null;
