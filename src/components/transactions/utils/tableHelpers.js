@@ -6,17 +6,17 @@
 export const COLUMN_WIDTHS = {
   date: "w-32",
   description: "", // flexible width
-  category: "w-36", 
+  category: "w-36",
   envelope: "w-48",
   amount: "w-32",
-  actions: "w-36"
+  actions: "w-36",
 };
 
 // Table configuration
 export const TABLE_CONFIG = {
   estimateRowSize: 80,
   overscan: 10,
-  maxHeight: "70vh"
+  maxHeight: "70vh",
 };
 
 /**
@@ -32,11 +32,11 @@ export const findEnvelopeForTransaction = (transaction, envelopes) => {
 export const formatTransactionAmount = (amount) => {
   const isPositive = amount >= 0;
   const absoluteAmount = Math.abs(amount);
-  
+
   return {
     formatted: `${isPositive ? "+" : ""}$${absoluteAmount.toFixed(2)}`,
     className: isPositive ? "text-emerald-600" : "text-red-600",
-    isPositive
+    isPositive,
   };
 };
 
@@ -55,14 +55,14 @@ export const getEnvelopeDisplay = (envelope) => {
     return {
       name: "Unassigned",
       color: "#gray",
-      className: "text-gray-400"
+      className: "text-gray-400",
     };
   }
-  
+
   return {
     name: envelope.name,
     color: envelope.color,
-    className: "text-gray-700"
+    className: "text-gray-700",
   };
 };
 
@@ -72,5 +72,5 @@ export default {
   findEnvelopeForTransaction,
   formatTransactionAmount,
   formatTransactionDate,
-  getEnvelopeDisplay
+  getEnvelopeDisplay,
 };

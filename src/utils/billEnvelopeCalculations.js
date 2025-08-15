@@ -53,10 +53,11 @@ export const calculateBillEnvelopeNeeds = (envelope, bills = []) => {
   // Calculate funding needs
   const currentBalance = envelope.currentBalance || 0;
   const biweeklyAllocation = envelope.biweeklyAllocation || 0;
-  
+
   // For bill envelopes, target should be the actual bill amount, not biweekly * multiplier
   // The biweekly allocation is how much to save per paycheck, target is the bill amount
-  const targetMonthlyAmount = nextBillAmount || (biweeklyAllocation * BIWEEKLY_MULTIPLIER);
+  const targetMonthlyAmount =
+    nextBillAmount || biweeklyAllocation * BIWEEKLY_MULTIPLIER;
 
   // Calculate remaining to fund for next bill
   const remainingToFund = Math.max(0, nextBillAmount - currentBalance);
@@ -102,7 +103,7 @@ export const calculateBillEnvelopeNeeds = (envelope, bills = []) => {
           amount: nextBillAmount,
           dueDate: nextBill.dueDate,
           category: nextBill.category,
-          frequency: nextBill.frequency || 'monthly',
+          frequency: nextBill.frequency || "monthly",
         }
       : null,
   };
@@ -315,35 +316,36 @@ export const getBillEnvelopeDisplayInfo = (envelope, bills = []) => {
         const targetAmount = calculations.targetMonthlyAmount;
         const nextBill = calculations.nextBill;
         const daysUntilNextBill = calculations.daysUntilNextBill;
-        
-        
+
         // Fully funded = current balance meets or exceeds target
         if (currentBalance >= targetAmount) {
           return "Fully Funded";
         }
-        
+
         // Calculate if "On Track" based on bill cycle progression
         if (nextBill && daysUntilNextBill > 0) {
           // Determine total cycle length based on frequency
           const frequencyDays = {
-            'weekly': 7,
-            'biweekly': 14, 
-            'monthly': 30,
-            'quarterly': 90,
-            'semiannual': 180,
-            'yearly': 365
+            weekly: 7,
+            biweekly: 14,
+            monthly: 30,
+            quarterly: 90,
+            semiannual: 180,
+            yearly: 365,
           };
-          
+
           const cycleDays = frequencyDays[nextBill.frequency] || 30;
-          const progressThroughCycle = Math.max(0, Math.min(1, (cycleDays - daysUntilNextBill) / cycleDays));
+          const progressThroughCycle = Math.max(
+            0,
+            Math.min(1, (cycleDays - daysUntilNextBill) / cycleDays),
+          );
           const expectedFunding = targetAmount * progressThroughCycle;
-          
-          
+
           // On Track = current funding is within reasonable range of expected
           // Allow some buffer (±20%) for timing variations
           const buffer = 0.2;
           const minExpected = expectedFunding * (1 - buffer);
-          
+
           if (currentBalance >= minExpected) {
             return "On Track";
           } else {
@@ -352,7 +354,7 @@ export const getBillEnvelopeDisplayInfo = (envelope, bills = []) => {
             return `Behind: $${Math.max(0, amountBehind).toFixed(2)}`;
           }
         }
-        
+
         // Fallback - show how much is still needed, but if $0 then say On Track
         const remaining = calculations.remainingToFund;
         return remaining <= 0 ? "On Track" : `Need $${remaining.toFixed(2)}`;

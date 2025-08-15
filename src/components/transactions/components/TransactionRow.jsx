@@ -1,11 +1,11 @@
 import React from "react";
 import { Edit3, Trash2, Scissors, History } from "lucide-react";
-import { 
+import {
   COLUMN_WIDTHS,
   findEnvelopeForTransaction,
   formatTransactionAmount,
   formatTransactionDate,
-  getEnvelopeDisplay
+  getEnvelopeDisplay,
 } from "../utils/tableHelpers";
 
 /**
@@ -19,12 +19,17 @@ const TransactionRow = ({
   onSplit,
   onDeleteClick,
   onHistoryClick,
-  isDeleting = false
+  isDeleting = false,
 }) => {
   const envelope = findEnvelopeForTransaction(transaction, envelopes);
-  const { formatted: formattedAmount, className: amountClassName } = formatTransactionAmount(transaction.amount);
+  const { formatted: formattedAmount, className: amountClassName } =
+    formatTransactionAmount(transaction.amount);
   const formattedDate = formatTransactionDate(transaction.date);
-  const { name: envelopeName, color: envelopeColor, className: envelopeClassName } = getEnvelopeDisplay(envelope);
+  const {
+    name: envelopeName,
+    color: envelopeColor,
+    className: envelopeClassName,
+  } = getEnvelopeDisplay(envelope);
 
   return (
     <tr
@@ -38,7 +43,9 @@ const TransactionRow = ({
       }}
     >
       {/* Date */}
-      <td className={`${COLUMN_WIDTHS.date} px-4 py-4 text-sm text-gray-900 truncate`}>
+      <td
+        className={`${COLUMN_WIDTHS.date} px-4 py-4 text-sm text-gray-900 truncate`}
+      >
         {formattedDate}
       </td>
 
@@ -55,7 +62,9 @@ const TransactionRow = ({
       </td>
 
       {/* Category */}
-      <td className={`${COLUMN_WIDTHS.category} px-4 py-4 text-sm text-gray-500 truncate`}>
+      <td
+        className={`${COLUMN_WIDTHS.category} px-4 py-4 text-sm text-gray-500 truncate`}
+      >
         {transaction.category || "Uncategorized"}
       </td>
 
@@ -73,7 +82,9 @@ const TransactionRow = ({
       </td>
 
       {/* Amount */}
-      <td className={`${COLUMN_WIDTHS.amount} px-4 py-4 text-right text-sm font-medium`}>
+      <td
+        className={`${COLUMN_WIDTHS.amount} px-4 py-4 text-right text-sm font-medium`}
+      >
         <span className={`${amountClassName} font-semibold`}>
           {formattedAmount}
         </span>

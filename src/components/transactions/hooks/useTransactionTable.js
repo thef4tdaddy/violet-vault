@@ -37,14 +37,14 @@ export const useTransactionTable = (transactions = []) => {
   return {
     // Refs
     parentRef,
-    
+
     // Virtualization
     rowVirtualizer,
-    
+
     // State
     historyTransaction,
     deletingTransaction,
-    
+
     // Actions
     handleDeleteClick,
     cancelDelete,
