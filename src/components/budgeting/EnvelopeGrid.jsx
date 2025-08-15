@@ -76,10 +76,18 @@ const UnifiedEnvelopeManager = ({
       ? propUnassignedCash
       : budget.unassignedCash || 0;
 
-  const bills = useMemo(
-    () => (tanStackBills.length ? tanStackBills : budget.bills || []),
-    [tanStackBills, budget.bills],
-  );
+  const bills = useMemo(() => {
+    const result = tanStackBills.length ? tanStackBills : budget.bills || [];
+    console.log("🔍 EnvelopeGrid bills debug:", {
+      tanStackBills,
+      tanStackBillsLength: tanStackBills.length,
+      budgetBills: budget.bills,
+      budgetBillsLength: budget.bills?.length,
+      finalResult: result,
+      finalLength: result.length
+    });
+    return result;
+  }, [tanStackBills, budget.bills]);
 
   // UI State
   const [selectedEnvelopeId, setSelectedEnvelopeId] = useState(null);
