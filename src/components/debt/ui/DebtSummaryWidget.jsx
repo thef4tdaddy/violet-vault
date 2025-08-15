@@ -30,10 +30,10 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
         {onNavigateToDebts && (
           <button
             onClick={onNavigateToDebts}
-            className="text-sm text-blue-600 hover:text-blue-700 flex items-center"
+            className="text-base text-blue-600 hover:text-blue-700 flex items-center font-medium"
           >
             View All
-            <ArrowRight className="h-3 w-3 ml-1" />
+            <ArrowRight className="h-4 w-4 ml-1" />
           </button>
         )}
       </div>
@@ -42,15 +42,15 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
         {/* Key Metrics */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <p className="text-xs text-gray-500 mb-1">Total Debt</p>
-            <p className="text-lg font-bold text-red-600">
+            <p className="text-sm text-gray-500 mb-1">Total Debt</p>
+            <p className="text-xl font-bold text-red-600">
               ${debtStats.totalDebt.toFixed(2)}
             </p>
           </div>
 
           <div>
-            <p className="text-xs text-gray-500 mb-1">Monthly Payments</p>
-            <p className="text-lg font-bold text-orange-600">
+            <p className="text-sm text-gray-500 mb-1">Monthly Payments</p>
+            <p className="text-xl font-bold text-orange-600">
               ${debtStats.totalMonthlyPayments.toFixed(2)}
             </p>
           </div>
@@ -59,15 +59,15 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
         {/* Average Interest Rate */}
         {debtStats.averageInterestRate > 0 && (
           <div>
-            <p className="text-xs text-gray-500 mb-1">Avg Interest Rate</p>
-            <p className="text-sm font-semibold text-purple-600">
+            <p className="text-sm text-gray-500 mb-1">Avg Interest Rate</p>
+            <p className="text-base font-semibold text-purple-600">
               {debtStats.averageInterestRate.toFixed(2)}% APR
             </p>
           </div>
         )}
 
         {/* Quick Stats */}
-        <div className="flex justify-between text-xs text-gray-600 pt-2 border-t border-gray-100">
+        <div className="flex justify-between text-sm text-gray-600 pt-2 border-t border-gray-100">
           <span>{debtStats.activeDebtCount} active debts</span>
           {debtStats.totalInterestPaid > 0 && (
             <span>${debtStats.totalInterestPaid.toFixed(0)} interest paid</span>
