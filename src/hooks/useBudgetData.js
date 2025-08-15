@@ -7,6 +7,7 @@ import {
   prefetchHelpers,
 } from "../utils/queryClient";
 import { budgetDb } from "../db/budgetDb";
+import logger from "../utils/logger.js";
 
 /**
  * Unified budget data hook combining TanStack Query, Zustand, and Dexie
@@ -268,7 +269,9 @@ const useBudgetData = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
     onError: (error) => {
-      console.error("Failed to add envelope:", error);
+      logger.error("Failed to add envelope", error, {
+        source: "addEnvelopeMutation",
+      });
       // TODO: Implement rollback logic
     },
   });
@@ -364,9 +367,9 @@ const useBudgetData = () => {
     try {
       await queryClient.refetchQueries();
       localStorage.setItem("lastSyncTime", new Date().toISOString());
-      console.log("Force sync completed");
+      logger.info("Force sync completed", { source: "forceSync" });
     } catch (error) {
-      console.error("Force sync failed:", error);
+      logger.error("Force sync failed", error, { source: "forceSync" });
       throw error;
     }
   };
@@ -376,9 +379,9 @@ const useBudgetData = () => {
     try {
       await queryClient.clear();
       await budgetDb.cache.clear();
-      console.log("Cache cleared successfully");
+      logger.info("Cache cleared successfully", { source: "clearCache" });
     } catch (error) {
-      console.error("Failed to clear cache:", error);
+      logger.error("Failed to clear cache", error, { source: "clearCache" });
       throw error;
     }
   };
