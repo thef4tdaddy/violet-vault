@@ -166,7 +166,7 @@ const EnvelopeItem = ({
       </div>
 
 
-      {/* Bill Funding Info for Bill Envelopes */}
+      {/* Minimal Bill Info for Bill Envelopes - most info already shown above */}
       {envelope.envelopeType === ENVELOPE_TYPES.BILL && bills.length > 0 && (
         <div className="mt-4 pt-3 border-t border-gray-200">
           <Suspense
@@ -176,11 +176,23 @@ const EnvelopeItem = ({
               </div>
             }
           >
-            <BillEnvelopeFundingInfo
-              envelope={envelope}
-              bills={bills}
-              showDetails={false}
-            />
+            {(() => {
+              // Find linked bills to get minimal additional info
+              const linkedBills = bills.filter(bill => bill.envelopeId === envelope.id && !bill.isPaid);
+              const nextBill = linkedBills
+                .filter(bill => new Date(bill.dueDate) >= new Date())
+                .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))[0];
+              
+              if (!nextBill) return null;
+              
+              const daysUntil = Math.ceil((new Date(nextBill.dueDate) - new Date()) / (1000 * 60 * 60 * 24));
+              
+              return (
+                <div className="text-xs text-gray-500">
+                  Next: {nextBill.name || nextBill.provider} in {daysUntil} day{daysUntil !== 1 ? 's' : ''}
+                </div>
+              );
+            })()}
           </Suspense>
         </div>
       )}
