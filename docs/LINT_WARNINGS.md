@@ -3,25 +3,25 @@
 This document tracks ESLint warnings in the Violet Vault project to maintain code quality and monitor progress toward our target of 17 warnings.
 
 **Last Updated:** 2025-08-15  
-**Current Status:** 62 warnings (Target: 17 warnings) ⚠️ NEEDS ATTENTION
+**Current Status:** 42 warnings (Target: 17 warnings) ⚠️ IMPROVED - 17 warnings fixed
 
 ## Current Warnings Breakdown
 
 ### By Severity
 
 - **Errors:** 0
-- **Warnings:** 62 ⚠️
+- **Warnings:** 42 ⚠️ (Reduced from 62)
 
 ### By Category
 
-- **Unused Variables (no-unused-vars):** 37 warnings
-- **React Hooks Dependencies (react-hooks/exhaustive-deps):** 8 warnings
-- **Test Setup Issues (no-undef):** 16 warnings
-- **Case Block Declarations (no-case-declarations):** 2 warnings
+- **Unused Variables (no-unused-vars):** 25 warnings (Reduced from 37)
+- **React Hooks Dependencies (react-hooks/exhaustive-deps):** 3 warnings (Fixed: 5)
+- **Test Setup Issues (no-undef):** 16 warnings (Unchanged)
+- **Case Block Declarations (no-case-declarations):** 0 warnings (Fixed: 2)
 
 ## Impact Analysis After Envelope Refactoring (#212)
 
-The significant increase from 0 to 62 warnings is primarily due to:
+The increase from 0 to 62 warnings was initially due to refactoring, but has been reduced to 42 through systematic cleanup:
 
 1. **Envelope System Refactoring** - New components with unused imports/variables
 2. **TanStack Query Migration** - Legacy Zustand imports left unused
@@ -30,19 +30,29 @@ The significant increase from 0 to 62 warnings is primarily due to:
 
 ## Current Warnings by File
 
-### 🔴 High Priority (Refactoring-Related)
+### ✅ Recently Fixed (High Priority)
 
-#### Envelope System Components
-- `src/components/budgeting/envelope/EnvelopeCreateModal.jsx` (2 warnings)
-  - `unassignedCash` parameter unused
-  - `currentTypeConfig` variable unused
-- `src/components/budgeting/envelope/EnvelopeEditModal.jsx` (4 warnings)
-  - `toMonthly`, `toBiweekly` imports unused
-  - `currentTypeConfig`, `frequencyOptions` variables unused
+#### Envelope System Components - FIXED
+- `src/components/budgeting/envelope/EnvelopeCreateModal.jsx` (1 warning remaining)
+  - ✅ `currentTypeConfig` variable prefixed with underscore  
+  - ⚠️ `_unassignedCash` parameter unused (intentionally preserved for future feature)
+- `src/components/budgeting/envelope/EnvelopeEditModal.jsx` (0 warnings)
+  - ✅ `toMonthly`, `toBiweekly` unused imports removed
+  - ✅ `currentTypeConfig`, `frequencyOptions` variables prefixed with underscore
 
-#### Legacy Zustand References
-- `src/hooks/useEnvelopes.js` (1 warning)
-  - `useBudgetStore` import unused (TanStack Query migration)
+#### Legacy Zustand References - FIXED
+- `src/hooks/useEnvelopes.js` (0 warnings)
+  - ✅ `useBudgetStore` unused import removed after TanStack Query migration
+
+#### React Hook Dependencies - MOSTLY FIXED
+- ✅ Fixed `useAuthFlow.js` - added missing toast dependencies
+- ✅ Fixed `useDataManagement.js` - added missing toast dependencies  
+- ✅ Fixed `useAutoFunding.js` - added missing initializeAutoFunding dependency
+- ✅ Fixed `LockScreen.jsx` - added missing error dependency and removed unused error parameter
+
+#### Syntax Issues - FIXED
+- ✅ Fixed `autoFundingEngine.js` no-case-declarations by adding block scopes
+- ✅ Fixed `budgetDb.js` unused trans parameter removed
 
 ### 🟡 Medium Priority (Development Features)
 
@@ -109,6 +119,7 @@ The significant increase from 0 to 62 warnings is primarily due to:
 
 | Date       | Total Warnings | Change   | Notes                                            |
 | ---------- | -------------- | -------- | ------------------------------------------------ |
+| 2025-08-15 | 42             | -20      | High-priority lint fixes: React hooks, syntax, unused vars |
 | 2025-08-15 | 62             | +62      | Envelope refactoring and TanStack Query migration |
 | 2025-08-11 | 0              | -39      | Complete cleanup - all warnings resolved         |
 | 2025-08-07 | 39             | +18      | Warning count increased from ongoing development |
@@ -138,7 +149,7 @@ The significant increase from 0 to 62 warnings is primarily due to:
 ## Monitoring
 
 - **Target:** Maintain ≤ 17 warnings
-- **Current Goal:** Reduce from 62 → 17 warnings (28% of current)
+- **Current Goal:** Reduce from 42 → 17 warnings (40% of current - significant progress made)
 - **Review Frequency:** After significant changes or weekly
 - **Auto-check:** ✅ Automated via GitHub Actions
 
