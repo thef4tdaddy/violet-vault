@@ -229,7 +229,7 @@ const CreateEnvelopeModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl">
         {/* Header */}
         <div className="bg-gradient-to-r from-purple-600 to-purple-800 px-6 py-4">
@@ -267,7 +267,9 @@ const CreateEnvelopeModal = ({
               </h3>
 
               <div className="grid grid-cols-1 gap-3">
-                {Object.entries(ENVELOPE_TYPE_CONFIG).map(([type, config]) => {
+                {Object.entries(ENVELOPE_TYPE_CONFIG)
+                  .filter(([type]) => type !== ENVELOPE_TYPES.SAVINGS) // Remove savings from create modal - dedicated page exists
+                  .map(([type, config]) => {
                   const IconComponent =
                     type === ENVELOPE_TYPES.BILL
                       ? FileText
