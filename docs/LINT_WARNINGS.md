@@ -3,25 +3,25 @@
 This document tracks ESLint warnings in the Violet Vault project to maintain code quality and monitor progress toward our target of 17 warnings.
 
 **Last Updated:** 2025-08-15  
-**Current Status:** 42 warnings (Target: 17 warnings) ⚠️ IMPROVED - 17 warnings fixed
+**Current Status:** 18 warnings (Target: 17 warnings) 🎯 ALMOST COMPLETE - 44 warnings fixed
 
 ## Current Warnings Breakdown
 
 ### By Severity
 
 - **Errors:** 0
-- **Warnings:** 42 ⚠️ (Reduced from 62)
+- **Warnings:** 18 ⚠️ (Reduced from 62 → 42 → 24 → 18)
 
 ### By Category
 
-- **Unused Variables (no-unused-vars):** 25 warnings (Reduced from 37)
-- **React Hooks Dependencies (react-hooks/exhaustive-deps):** 3 warnings (Fixed: 5)
-- **Test Setup Issues (no-undef):** 16 warnings (Unchanged)
-- **Case Block Declarations (no-case-declarations):** 0 warnings (Fixed: 2)
+- **Unused Variables (no-unused-vars):** 18 warnings (Reduced from 37)
+- **React Hooks Dependencies (react-hooks/exhaustive-deps):** 0 warnings (Fixed: 8) ✅
+- **Test Setup Issues (no-undef):** 0 warnings (Fixed: 16) ✅
+- **Case Block Declarations (no-case-declarations):** 0 warnings (Fixed: 2) ✅
 
 ## Impact Analysis After Envelope Refactoring (#212)
 
-The increase from 0 to 62 warnings was initially due to refactoring, but has been reduced to 42 through systematic cleanup:
+The increase from 0 to 62 warnings was initially due to refactoring, but has been reduced to 18 through systematic cleanup:
 
 1. **Envelope System Refactoring** - New components with unused imports/variables
 2. **TanStack Query Migration** - Legacy Zustand imports left unused
@@ -53,6 +53,11 @@ The increase from 0 to 62 warnings was initially due to refactoring, but has bee
 #### Syntax Issues - FIXED
 - ✅ Fixed `autoFundingEngine.js` no-case-declarations by adding block scopes
 - ✅ Fixed `budgetDb.js` unused trans parameter removed
+
+#### Test Configuration - FIXED
+- ✅ Added Vitest globals (vi, describe, test, it, expect, etc.) to ESLint config
+- ✅ Resolved all 16 test setup warnings in `src/test/setup.js`
+- ✅ Aligned with `vitest.config.js` globals: true configuration
 
 ### 🟡 Medium Priority (Development Features)
 
@@ -119,6 +124,8 @@ The increase from 0 to 62 warnings was initially due to refactoring, but has bee
 
 | Date       | Total Warnings | Change   | Notes                                            |
 | ---------- | -------------- | -------- | ------------------------------------------------ |
+| 2025-08-15 | 18             | -6       | React Hook dependencies fixed: all functional issues resolved |
+| 2025-08-15 | 24             | -18      | Vitest globals fix: eliminated all test setup warnings |
 | 2025-08-15 | 42             | -20      | High-priority lint fixes: React hooks, syntax, unused vars |
 | 2025-08-15 | 62             | +62      | Envelope refactoring and TanStack Query migration |
 | 2025-08-11 | 0              | -39      | Complete cleanup - all warnings resolved         |
@@ -149,7 +156,7 @@ The increase from 0 to 62 warnings was initially due to refactoring, but has bee
 ## Monitoring
 
 - **Target:** Maintain ≤ 17 warnings
-- **Current Goal:** Reduce from 42 → 17 warnings (40% of current - significant progress made)
+- **Current Goal:** Reduce from 18 → 17 warnings (94% of target achieved - almost there!)
 - **Review Frequency:** After significant changes or weekly
 - **Auto-check:** ✅ Automated via GitHub Actions
 
