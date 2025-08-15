@@ -311,22 +311,45 @@ export const getBillEnvelopeDisplayInfo = (envelope, bills = []) => {
     status,
     displayText: {
       primaryStatus: (() => {
-        if (calculations.remainingToFund <= 0) {
-          // Check if truly fully funded (100%) vs just meeting next bill
-          const actualProgress = calculations.targetMonthlyAmount > 0 
-            ? (calculations.currentBalance / calculations.targetMonthlyAmount) * 100 
-            : 0;
-          
-          if (actualProgress >= 100) {
-            return "Fully Funded";
-          } else if (actualProgress >= 75 || calculations.remainingToFund <= 0) {
-            return "On Track";
-          } else {
-            return `Need $${calculations.remainingToFund.toFixed(2)}`;
-          }
-        } else {
-          return `Need $${calculations.remainingToFund.toFixed(2)}`;
+        const currentBalance = calculations.currentBalance;
+        const targetAmount = calculations.targetMonthlyAmount;
+        const nextBill = calculations.nextBill;
+        const daysUntilNextBill = calculations.daysUntilNextBill;
+        
+        // Fully funded = current balance meets or exceeds target
+        if (currentBalance >= targetAmount) {
+          return "Fully Funded";
         }
+        
+        // Calculate if "On Track" based on bill cycle progression
+        if (nextBill && daysUntilNextBill > 0) {
+          // Determine total cycle length based on frequency
+          const frequencyDays = {
+            'weekly': 7,
+            'biweekly': 14, 
+            'monthly': 30,
+            'quarterly': 90,
+            'semiannual': 180,
+            'yearly': 365
+          };
+          
+          const cycleDays = frequencyDays[nextBill.frequency] || 30;
+          const progressThroughCycle = Math.max(0, Math.min(1, (cycleDays - daysUntilNextBill) / cycleDays));
+          const expectedFunding = targetAmount * progressThroughCycle;
+          
+          // On Track = current funding is within reasonable range of expected
+          // Allow some buffer (±20%) for timing variations
+          const buffer = 0.2;
+          const minExpected = expectedFunding * (1 - buffer);
+          const maxExpected = expectedFunding * (1 + buffer);
+          
+          if (currentBalance >= minExpected && currentBalance <= maxExpected) {
+            return "On Track";
+          }
+        }
+        
+        // Otherwise show how much is still needed
+        return `Need $${calculations.remainingToFund.toFixed(2)}`;
       })(),
       secondaryStatus: calculations.nextBill
         ? `Next: ${calculations.nextBill.name} (${calculations.daysUntilNextBill} days)`
