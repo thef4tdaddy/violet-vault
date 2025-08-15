@@ -42,7 +42,7 @@ const UnifiedEnvelopeManager = ({
   const { data: tanStackTransactions = [], isLoading: transactionsLoading } =
     useTransactions();
   const {
-    data: tanStackBills = [],
+    bills: tanStackBills = [],
     updateBill,
     isLoading: billsLoading,
   } = useBills();
