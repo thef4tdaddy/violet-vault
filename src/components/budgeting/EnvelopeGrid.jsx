@@ -82,7 +82,7 @@ const UnifiedEnvelopeManager = ({
       budgetBills: budget.bills,
       budgetBillsLength: budget.bills?.length,
       finalResult: result,
-      finalLength: result.length
+      finalLength: result.length,
     });
     return result;
   }, [tanStackBills, budget.bills]);

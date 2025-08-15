@@ -115,11 +115,11 @@ const BillEnvelopeFundingInfo = memo(
           <div className="text-gray-500">
             {targetMonthlyAmount > 0 && nextBill && (
               <span>
-                Target: ${targetMonthlyAmount.toFixed(2)}/{nextBill.frequency || 'month'}
+                Target: ${targetMonthlyAmount.toFixed(2)}/
+                {nextBill.frequency || "month"}
               </span>
             )}
           </div>
-
 
           {/* Show funding surplus if overfunded */}
           {remainingToFund <= 0 && currentBalance > nextBill?.amount && (

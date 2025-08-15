@@ -42,11 +42,7 @@ const TransactionLedger = ({
 
   // Keep Zustand for legacy operations not yet migrated
   const budget = useBudgetStore();
-  const {
-    updateTransaction,
-    setAllTransactions,
-    updateBill,
-  } = budget;
+  const { updateTransaction, setAllTransactions, updateBill } = budget;
 
   // Handle bulk import by updating both store arrays
   const handleBulkImport = (newTransactions) => {

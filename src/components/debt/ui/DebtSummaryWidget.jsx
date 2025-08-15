@@ -42,14 +42,18 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
         {/* Key Metrics */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <p className="text-base font-medium text-gray-600 mb-1">Total Debt</p>
+            <p className="text-base font-medium text-gray-600 mb-1">
+              Total Debt
+            </p>
             <p className="text-2xl font-bold text-red-600">
               ${debtStats.totalDebt.toFixed(2)}
             </p>
           </div>
 
           <div>
-            <p className="text-base font-medium text-gray-600 mb-1">Monthly Payments</p>
+            <p className="text-base font-medium text-gray-600 mb-1">
+              Monthly Payments
+            </p>
             <p className="text-2xl font-bold text-orange-600">
               ${debtStats.totalMonthlyPayments.toFixed(2)}
             </p>
@@ -59,7 +63,9 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
         {/* Average Interest Rate */}
         {debtStats.averageInterestRate > 0 && (
           <div>
-            <p className="text-base font-medium text-gray-600 mb-1">Avg Interest Rate</p>
+            <p className="text-base font-medium text-gray-600 mb-1">
+              Avg Interest Rate
+            </p>
             <p className="text-lg font-bold text-purple-600">
               {debtStats.averageInterestRate.toFixed(2)}% APR
             </p>
@@ -68,7 +74,10 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
 
         {/* Quick Stats */}
         <div className="flex justify-between text-base font-medium text-gray-700 pt-2 border-t border-gray-200">
-          <span>{debtStats.activeDebtCount} active debt{debtStats.activeDebtCount !== 1 ? 's' : ''}</span>
+          <span>
+            {debtStats.activeDebtCount} active debt
+            {debtStats.activeDebtCount !== 1 ? "s" : ""}
+          </span>
           {debtStats.totalInterestPaid > 0 && (
             <span>${debtStats.totalInterestPaid.toFixed(0)} interest paid</span>
           )}

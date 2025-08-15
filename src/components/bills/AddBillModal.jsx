@@ -347,7 +347,13 @@ const AddBillModal = ({
       availableEnvelopes: availableEnvelopes.length,
       selectedEnvelope: formData.selectedEnvelope,
     });
-    setFormData({ ...formData, selectedEnvelope: newEnvelopeId });
+
+    // When an envelope is selected, disable create envelope to prevent duplicates
+    setFormData({
+      ...formData,
+      selectedEnvelope: newEnvelopeId,
+      createEnvelope: newEnvelopeId ? false : formData.createEnvelope,
+    });
   };
 
   const cancelEdit = () => {
@@ -619,29 +625,75 @@ const AddBillModal = ({
 
             {!editingBill && (
               <div className="md:col-span-2">
-                <div className="flex items-center space-x-2">
-                  <input
-                    id="create-envelope-checkbox"
-                    type="checkbox"
-                    checked={formData.createEnvelope}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        createEnvelope: e.target.checked,
-                      })
-                    }
-                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
-                  />
-                  <label
-                    htmlFor="create-envelope-checkbox"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    Create associated envelope for budgeting
-                  </label>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Envelope Options
+                </label>
+
+                <div className="space-y-2">
+                  {/* Use existing envelope option */}
+                  <div className="glassmorphism border-2 border-white/20 rounded-xl p-3">
+                    <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
+                      <input
+                        type="radio"
+                        id="useExistingEnvelope"
+                        name="envelopeOption"
+                        value="existing"
+                        checked={!formData.createEnvelope}
+                        onChange={() =>
+                          setFormData({ ...formData, createEnvelope: false })
+                        }
+                        disabled={!formData.selectedEnvelope}
+                        className="w-4 h-4 text-purple-600 mt-0.5 justify-self-start"
+                      />
+                      <div>
+                        <div className="flex items-center mb-1">
+                          <span className="font-medium text-sm">
+                            {formData.selectedEnvelope
+                              ? "Use selected envelope"
+                              : "Use existing envelope (select one above)"}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-600 leading-tight">
+                          {formData.selectedEnvelope
+                            ? `Bill will be paid from: ${availableEnvelopes.find((e) => e.id === formData.selectedEnvelope)?.name || "Selected envelope"}`
+                            : "Select an envelope above to pay this bill from existing funds"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Create new envelope option */}
+                  <div className="glassmorphism border-2 border-white/20 rounded-xl p-3">
+                    <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
+                      <input
+                        type="radio"
+                        id="createNewEnvelope"
+                        name="envelopeOption"
+                        value="create"
+                        checked={formData.createEnvelope}
+                        onChange={() =>
+                          setFormData({
+                            ...formData,
+                            createEnvelope: true,
+                            selectedEnvelope: "",
+                          })
+                        }
+                        className="w-4 h-4 text-purple-600 mt-0.5 justify-self-start"
+                      />
+                      <div>
+                        <div className="flex items-center mb-1">
+                          <span className="font-medium text-sm">
+                            Create associated envelope
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-600 leading-tight">
+                          Create a new envelope specifically for budgeting this
+                          bill
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-1 ml-6">
-                  This will create an envelope to help you save for this bill
-                </p>
               </div>
             )}
           </div>

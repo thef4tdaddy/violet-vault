@@ -4,11 +4,11 @@ import { AlertTriangle } from "lucide-react";
 /**
  * Inline delete confirmation component
  */
-const DeleteConfirmation = ({ 
-  transaction, 
-  onConfirm, 
+const DeleteConfirmation = ({
+  transaction,
+  onConfirm,
   onCancel,
-  virtualRow 
+  virtualRow,
 }) => {
   return (
     <tr

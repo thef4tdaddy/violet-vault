@@ -37,22 +37,32 @@ const TransactionTable = ({
           {/* Table Header */}
           <thead className="bg-white/50 sticky top-0 z-10">
             <tr>
-              <th className={`${COLUMN_WIDTHS.date} px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider`}>
+              <th
+                className={`${COLUMN_WIDTHS.date} px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider`}
+              >
                 Date
               </th>
               <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Description
               </th>
-              <th className={`${COLUMN_WIDTHS.category} px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider`}>
+              <th
+                className={`${COLUMN_WIDTHS.category} px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider`}
+              >
                 Category
               </th>
-              <th className={`${COLUMN_WIDTHS.envelope} px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider`}>
+              <th
+                className={`${COLUMN_WIDTHS.envelope} px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider`}
+              >
                 Envelope
               </th>
-              <th className={`${COLUMN_WIDTHS.amount} px-4 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider`}>
+              <th
+                className={`${COLUMN_WIDTHS.amount} px-4 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider`}
+              >
                 Amount
               </th>
-              <th className={`${COLUMN_WIDTHS.actions} px-4 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider`}>
+              <th
+                className={`${COLUMN_WIDTHS.actions} px-4 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider`}
+              >
                 Actions
               </th>
             </tr>
