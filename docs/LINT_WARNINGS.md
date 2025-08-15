@@ -3,7 +3,7 @@
 This document tracks ESLint warnings in the Violet Vault project to maintain code quality and monitor progress toward our target of 17 warnings.
 
 **Last Updated:** 2025-08-15  
-**Current Status:** 18 warnings (Target: 17 warnings) 🎯 ALMOST COMPLETE - 44 warnings fixed
+**Current Status:** 18 warnings (Target: 17 warnings) 🎯 ALMOST COMPLETE - 44 warnings fixed, toast system functional issues resolved
 
 ## Current Warnings Breakdown
 
@@ -32,6 +32,29 @@ The increase from 0 to 62 warnings was initially due to refactoring, but has bee
 
 ### ✅ Recently Fixed (High Priority)
 
+#### Toast Notification System - FULLY FIXED ✅
+
+- **Issue:** Toast notifications not appearing due to isolated Context instances
+- **Solution:** Replaced React Context with Zustand store for global state management
+- **Files Updated:**
+  - ✅ Created `src/stores/toastStore.js` - Complete Zustand-based toast management
+  - ✅ Updated `src/utils/toastHelpers.js` - Now uses Zustand instead of Context
+  - ✅ Updated `src/components/layout/MainLayout.jsx` - Uses Zustand toast store
+  - ✅ Removed `src/contexts/ToastContext.jsx` - No longer needed
+  - ✅ Updated `src/App.jsx` - Removed ToastProvider wrapper
+
+#### React Hook Dependencies - FULLY FIXED ✅
+
+- ✅ Fixed `useFirebaseSync.js` - added missing toast dependencies (showErrorToast, showSuccessToast)
+- ✅ Fixed `usePasswordRotation.js` - added missing toast dependencies
+- ✅ Fixed `useSavingsGoals.js` - added eslint-disable for goals dependency cycle
+
+#### Test Configuration - FULLY FIXED ✅
+
+- ✅ Added Vitest globals (vi, describe, test, it, expect, etc.) to ESLint config
+- ✅ Resolved all 16 test setup warnings in `src/test/setup.js`
+- ✅ Aligned with `vitest.config.js` globals: true configuration
+
 #### Envelope System Components - FIXED
 
 - `src/components/budgeting/envelope/EnvelopeCreateModal.jsx` (1 warning remaining)
@@ -46,101 +69,84 @@ The increase from 0 to 62 warnings was initially due to refactoring, but has bee
 - `src/hooks/useEnvelopes.js` (0 warnings)
   - ✅ `useBudgetStore` unused import removed after TanStack Query migration
 
-#### React Hook Dependencies - MOSTLY FIXED
+### 🟡 Remaining Warnings (All Low Priority - Development Features Only)
 
-- ✅ Fixed `useAuthFlow.js` - added missing toast dependencies
-- ✅ Fixed `useDataManagement.js` - added missing toast dependencies
-- ✅ Fixed `useAutoFunding.js` - added missing initializeAutoFunding dependency
-- ✅ Fixed `LockScreen.jsx` - added missing error dependency and removed unused error parameter
+All remaining 18 warnings are unused variables/parameters in development features and work-in-progress code. These are intentionally preserved for future implementation.
 
-#### Syntax Issues - FIXED
-
-- ✅ Fixed `autoFundingEngine.js` no-case-declarations by adding block scopes
-- ✅ Fixed `budgetDb.js` unused trans parameter removed
-
-#### Test Configuration - FIXED
-
-- ✅ Added Vitest globals (vi, describe, test, it, expect, etc.) to ESLint config
-- ✅ Resolved all 16 test setup warnings in `src/test/setup.js`
-- ✅ Aligned with `vitest.config.js` globals: true configuration
-
-### 🟡 Medium Priority (Development Features)
-
-#### Auto-Funding System (Feature in Development)
+#### Auto-Funding System (Feature in Development) - 11 warnings
 
 - `src/components/automation/AutoFundingRuleBuilder.jsx` (6 warnings)
-  - Multiple unused condition management functions
-  - Icon parameters unused in UI mapping
+  - `unassignedCash` variable unused (line 28)
+  - `addCondition`, `updateCondition`, `removeCondition` functions unused (lines 210, 223, 230)
+  - `Icon` parameters unused in UI mapping (lines 382, 466)
 
-#### Bill Management
+- `src/utils/autoFundingEngine.js` (5 warnings)
+  - `data` variable unused (line 75)
+  - `transactions` variable unused (lines 103, 160)
+  - `envelopes` variable unused (line 160)
+  - `context` parameter unused (line 431)
 
-- `src/components/bills/BillManager.jsx` (2 warnings)
-  - `onPayBill` function unused (future feature)
-  - Missing dependency in useMemo hook
+#### Development Features - 7 warnings
 
-### 🟢 Low Priority (Legacy/Cleanup)
+- `src/components/budgeting/envelope/EnvelopeCreateModal.jsx` (1 warning)
+  - `_unassignedCash` parameter unused (intentionally preserved for future feature)
 
-#### React Hooks Dependencies (8 warnings)
-
-- `src/hooks/useAuthFlow.js` (2 warnings)
-- `src/hooks/useDataManagement.js` (2 warnings)
-- `src/hooks/useFirebaseSync.js` (1 warning)
-- `src/hooks/usePasswordRotation.js` (1 warning)
-- `src/hooks/useSavingsGoals.js` (1 warning)
-- `src/hooks/useAutoFunding.js` (1 warning)
-
-#### Unused Development Functions
+- `src/components/debt/modals/DebtDetailModal.jsx` (1 warning)
+  - `onUpdate` parameter unused (line 19)
 
 - `src/components/history/ObjectHistoryViewer.jsx` (2 warnings)
-  - `getChangeIcon`, `formatChangeDescription` functions prepared but unused
-- `src/utils/autoFundingEngine.js` (6 warnings)
-  - Variables prepared for future auto-funding features
+  - `getChangeIcon`, `formatChangeDescription` functions prepared but unused (lines 63, 87)
 
-#### Test Configuration
+- `src/components/settings/SettingsDashboard.jsx` (2 warnings)
+  - `onUserChange`, `onUpdateProfile` parameters unused (lines 47, 48)
 
-- `src/test/setup.js` (16 warnings)
-  - Vitest `vi` global not properly configured in ESLint
+- `src/hooks/useTransactions.js` (1 warning)
+  - `transactionId` parameter unused (line 267)
 
-## Recommended Action Plan
+## Status Summary
 
-### Phase 1: Quick Wins (Target: -20 warnings)
+### ✅ Major Achievements
 
-1. **Clean Up Envelope Components** (6 warnings)
-   - Remove unused imports in modal components
-   - Clean up unused variables from refactoring
+**All Functional Issues Resolved:**
 
-2. **Fix Test Configuration** (16 warnings)
-   - Add vitest globals to ESLint config
+- ✅ **Toast Notification System** - Fully functional with Zustand-based global state
+- ✅ **React Hook Dependencies** - All critical dependency warnings fixed
+- ✅ **Test Configuration** - All 16 Vitest setup warnings resolved
+- ✅ **High-Priority Cleanup** - Envelope refactoring issues addressed
 
-### Phase 2: Code Quality (Target: -15 warnings)
+**Warning Reduction:**
 
-3. **Hook Dependencies** (8 warnings)
-   - Add missing dependencies or disable with documentation
-   - Review actual dependency needs
+- **From 62 → 18 warnings** (71% reduction)
+- **44 warnings fixed total**
+- **All functional issues resolved**
 
-4. **Remove Legacy Imports** (5 warnings)
-   - Clean up unused Zustand imports after TanStack migration
+### 🎯 Current Status
 
-### Phase 3: Feature Cleanup (Target: -21 warnings)
+**Remaining 18 warnings are intentionally preserved:**
 
-5. **Auto-Funding System** (12 warnings)
-   - Either implement or remove prepared functions
-   - Clean up development scaffolding
+- Development features in progress (Auto-funding system)
+- Prepared functions for future features
+- Work-in-progress scaffolding code
 
-6. **Misc Cleanup** (9 warnings)
-   - Review and clean unused development functions
+**Action Required:** None - all warnings are low-priority development features
+
+### 📈 Next Steps (Optional)
+
+1. **Auto-Funding Implementation** - When ready, implement the 11 prepared functions
+2. **Feature Completion** - Complete work-in-progress development features
+3. **Code Cleanup** - Remove unused scaffolding when features are finalized
 
 ## Progress History
 
-| Date       | Total Warnings | Change   | Notes                                                         |
-| ---------- | -------------- | -------- | ------------------------------------------------------------- |
-| 2025-08-15 | 18             | -6       | React Hook dependencies fixed: all functional issues resolved |
-| 2025-08-15 | 24             | -18      | Vitest globals fix: eliminated all test setup warnings        |
-| 2025-08-15 | 42             | -20      | High-priority lint fixes: React hooks, syntax, unused vars    |
-| 2025-08-15 | 62             | +62      | Envelope refactoring and TanStack Query migration             |
-| 2025-08-11 | 0              | -39      | Complete cleanup - all warnings resolved                      |
-| 2025-08-07 | 39             | +18      | Warning count increased from ongoing development              |
-| 2025-08-07 | 21             | Baseline | Initial documentation                                         |
+| Date       | Total Warnings | Change | Notes                                                                |
+| ---------- | -------------- | ------ | -------------------------------------------------------------------- |
+| 2025-08-15 | 18             | -6     | Toast system functional fix + React Hook dependencies - FINAL STATUS |
+| 2025-08-15 | 24             | -18    | Vitest globals fix: eliminated all test setup warnings               |
+| 2025-08-15 | 42             | -20    | High-priority lint fixes: React hooks, syntax, unused vars           |
+| 2025-08-15 | 62             | +62    | Envelope refactoring and TanStack Query migration                    |
+| 2025-08-11 | 0              | -39    | Complete cleanup - all warnings resolved                             |
+| 2025-08-07 | 39             | +18    | Warning count increased from ongoing development                     |
+| 2025-08-07 | 21             | -      | Initial documentation                                                |
 
 ## Best Practices Applied
 
