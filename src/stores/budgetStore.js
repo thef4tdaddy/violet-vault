@@ -4,6 +4,7 @@ import { persist, devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { budgetHistoryMiddleware } from "../utils/budgetHistoryMiddleware.js";
 import { budgetDb } from "../db/budgetDb.js";
+import logger from "../utils/logger.js";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
@@ -15,8 +16,9 @@ const migrateOldData = async () => {
 
     // Migrate if old data exists (always replace new data)
     if (oldData) {
-      console.log(
-        "🔄 Migrating data from old budget-store to violet-vault-store...",
+      logger.info(
+        "Migrating data from old budget-store to violet-vault-store",
+        { source: "migrateOldData" },
       );
 
       const parsedOldData = JSON.parse(oldData);
@@ -45,8 +47,9 @@ const migrateOldData = async () => {
           "violet-vault-store",
           JSON.stringify(transformedData),
         );
-        console.log(
-          "✅ Data migration completed successfully - replaced existing data",
+        logger.info(
+          "Data migration completed successfully - replaced existing data",
+          { source: "migrateOldData" },
         );
 
         // Seed Dexie with migrated data so hooks can access it
@@ -67,11 +70,16 @@ const migrateOldData = async () => {
 
         // Remove old data after successful migration
         localStorage.removeItem("budget-store");
-        console.log("🧹 Cleaned up old budget-store data");
+        logger.info("Cleaned up old budget-store data", {
+          source: "migrateOldData",
+        });
       }
     }
   } catch (error) {
-    console.warn("⚠️ Failed to migrate old data:", error);
+    logger.warn("Failed to migrate old data", {
+      error: error.message,
+      source: "migrateOldData",
+    });
   }
 };
 
@@ -162,11 +170,13 @@ const storeInitializer = (set, get) => ({
     const state = get();
 
     if (!state.cloudSyncEnabled) {
-      console.log("💾 Local-only mode enabled - background sync not started");
+      logger.info("Local-only mode enabled - background sync not started", {
+        cloudSyncEnabled: false,
+      });
       return;
     }
 
-    console.log("🔄 Starting background sync service...");
+    logger.info("Starting background sync service", { cloudSyncEnabled: true });
 
     try {
       // Get auth context from auth store
@@ -178,7 +188,11 @@ const storeInitializer = (set, get) => ({
         !authState.currentUser ||
         !authState.budgetId
       ) {
-        console.warn("⚠️ Missing auth context for background sync");
+        logger.warn("Missing auth context for background sync", {
+          hasEncryptionKey: !!authState.encryptionKey,
+          hasCurrentUser: !!authState.currentUser,
+          hasBudgetId: !!authState.budgetId,
+        });
         return;
       }
 
@@ -192,9 +206,13 @@ const storeInitializer = (set, get) => ({
         budgetId: authState.budgetId,
       });
 
-      console.log("✅ Background sync service started");
+      logger.info("Background sync service started", {
+        service: "CloudSyncService",
+      });
     } catch (error) {
-      console.error("❌ Failed to start background sync service:", error);
+      logger.error("Failed to start background sync service", error, {
+        service: "CloudSyncService",
+      });
     }
   },
 
@@ -208,19 +226,22 @@ const storeInitializer = (set, get) => ({
   setCloudSyncEnabled: (enabled) =>
     set((state) => {
       state.cloudSyncEnabled = enabled;
-      console.log(`🌩️ Cloud sync ${enabled ? "enabled" : "disabled"}`);
+      logger.info(`Cloud sync ${enabled ? "enabled" : "disabled"}`, {
+        cloudSyncEnabled: enabled,
+      });
     }),
 
   // Transaction cleanup moved to TanStack Query hooks
 
   // Load imported data - now directly to Dexie via TanStack Query hooks
   loadData: async (importedData) => {
-    console.log("📥 Loading imported data directly to Dexie", {
+    logger.info("Loading imported data directly to Dexie", {
       envelopes: importedData.envelopes?.length || 0,
       bills: importedData.bills?.length || 0,
       transactions: importedData.transactions?.length || 0,
       allTransactions: importedData.allTransactions?.length || 0,
       savingsGoals: importedData.savingsGoals?.length || 0,
+      source: "loadData",
     });
 
     try {
@@ -232,7 +253,10 @@ const storeInitializer = (set, get) => ({
             const timestamp = Date.now();
             const uniqueSuffix = Math.random().toString(36).substr(2, 9);
             record.id = `${type}_${timestamp}_${index}_${uniqueSuffix}`;
-            console.log(`📝 Generated ID for ${type}:`, record.id);
+            logger.debug(`Generated ID for ${type}`, {
+              recordId: record.id,
+              type,
+            });
           }
           return record;
         });
@@ -249,17 +273,19 @@ const storeInitializer = (set, get) => ({
 
       if (importedData.bills?.length) {
         const validBills = ensureValidIds(importedData.bills, "bill");
-        console.log("📋 Importing bills to Dexie:", {
+        logger.debug("Importing bills to Dexie", {
           count: validBills.length,
           firstBill: validBills[0],
+          source: "loadData",
         });
         await budgetDb.bulkUpsertBills(validBills);
 
         // Verify bills were saved
         const savedBills = await budgetDb.bills.toArray();
-        console.log("✅ Bills verification after import:", {
+        logger.debug("Bills verification after import", {
           savedCount: savedBills.length,
           firstSavedBill: savedBills[0],
+          source: "loadData",
         });
       }
 
@@ -314,7 +340,7 @@ const storeInitializer = (set, get) => ({
         state.dataLoaded = true;
       });
 
-      console.log("✅ Data loaded to Dexie successfully");
+      logger.info("Data loaded to Dexie successfully", { source: "loadData" });
 
       // Force TanStack Query cache invalidation to show imported data immediately
       setTimeout(() => {
@@ -324,10 +350,14 @@ const storeInitializer = (set, get) => ({
           }),
         );
         window.dispatchEvent(new CustomEvent("invalidateAllQueries"));
-        console.log("🔄 Import cache invalidation events dispatched");
+        logger.debug("Import cache invalidation events dispatched", {
+          source: "loadData",
+        });
       }, 100);
     } catch (error) {
-      console.error("❌ Failed to load data to Dexie:", error);
+      logger.error("Failed to load data to Dexie", error, {
+        source: "loadData",
+      });
     }
   },
 
@@ -368,14 +398,14 @@ const storeInitializer = (set, get) => ({
       // Invalidate all caches
       window.dispatchEvent(new CustomEvent("invalidateAllQueries"));
     } catch (error) {
-      console.error("❌ Failed to reset store:", error);
+      logger.error("Failed to reset store", error, { source: "resetStore" });
     }
   },
 
   // Security functionality
   validatePassword: async (password) => {
     try {
-      console.log("🔐 validatePassword: Starting validation...");
+      logger.auth("validatePassword: Starting validation");
 
       // Import the auth store to access password validation
       const { useAuth } = await import("./authStore.jsx");
@@ -384,19 +414,17 @@ const storeInitializer = (set, get) => ({
       const authState = useAuth.getState();
       const savedData = localStorage.getItem("envelopeBudgetData");
 
-      console.log("🔐 validatePassword: Data check", {
+      logger.auth("validatePassword: Data check", {
         hasSavedData: !!savedData,
         hasAuthSalt: !!authState.salt,
         hasEncryptionKey: !!authState.encryptionKey,
         authStateKeys: Object.keys(authState),
-        saltValue: authState.salt,
-        savedDataValue: savedData,
       });
 
       // If we have no encrypted data saved yet, validate against the current auth salt
       if (!savedData && authState.salt) {
-        console.log(
-          "🔐 validatePassword: No saved data, validating against auth salt",
+        logger.auth(
+          "validatePassword: No saved data, validating against auth salt",
         );
 
         try {
@@ -411,23 +439,21 @@ const storeInitializer = (set, get) => ({
             const keysMatch =
               JSON.stringify(Array.from(testKey)) ===
               JSON.stringify(Array.from(authState.encryptionKey));
-            console.log(
-              "🔐 validatePassword: Key comparison result:",
+            logger.auth("validatePassword: Key comparison result", {
               keysMatch,
-            );
+            });
             return keysMatch;
           } else {
             // If no current key, just check if we can derive a key (basic validation)
-            console.log(
-              "🔐 validatePassword: No current key, basic validation passed",
+            logger.auth(
+              "validatePassword: No current key, basic validation passed",
             );
             return true;
           }
         } catch (error) {
-          console.log(
-            "🔐 validatePassword: Auth salt validation failed:",
-            error.message,
-          );
+          logger.auth("validatePassword: Auth salt validation failed", {
+            error: error.message,
+          });
           return false;
         }
       }
@@ -438,7 +464,7 @@ const storeInitializer = (set, get) => ({
         const { salt: savedSalt, encryptedData } = parsedData;
         const saltArray = new Uint8Array(savedSalt);
 
-        console.log("🔐 validatePassword: Parsed data", {
+        logger.auth("validatePassword: Parsed data", {
           hasSavedSalt: !!savedSalt,
           hasEncryptedData: !!encryptedData,
           saltLength: saltArray.length,
@@ -450,42 +476,39 @@ const storeInitializer = (set, get) => ({
           saltArray,
         );
 
-        console.log("🔐 validatePassword: Key derived successfully");
+        logger.auth("validatePassword: Key derived successfully");
 
         // Try to decrypt actual data to validate password
         if (encryptedData) {
           try {
             await encryptionUtils.decrypt(encryptedData, testKey);
-            console.log(
-              "🔐 validatePassword: Decryption successful - password is correct",
+            logger.auth(
+              "validatePassword: Decryption successful - password is correct",
             );
             return true;
           } catch (decryptError) {
-            console.log(
-              "🔐 validatePassword: Decryption failed - password is incorrect",
-              decryptError.message,
+            logger.auth(
+              "validatePassword: Decryption failed - password is incorrect",
+              { error: decryptError.message },
             );
             return false;
           }
         }
 
         // Fallback: if no encrypted data to test, just check if key exists
-        console.log(
-          "🔐 validatePassword: No encrypted data to test, using fallback",
+        logger.auth(
+          "validatePassword: No encrypted data to test, using fallback",
         );
         return !!testKey;
       }
 
       // If we have neither saved data nor auth salt, cannot validate
-      console.log(
-        "🔐 validatePassword: No data or salt available for validation",
-      );
+      logger.auth("validatePassword: No data or salt available for validation");
       return false;
     } catch (error) {
-      console.error(
-        "🔐 validatePassword: Validation failed with error:",
-        error,
-      );
+      logger.error("validatePassword: Validation failed with error", error, {
+        source: "validatePassword",
+      });
       return false;
     }
   },
