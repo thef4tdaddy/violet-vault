@@ -33,7 +33,6 @@ import ObjectHistoryViewer from "../history/ObjectHistoryViewer";
 const BillManager = ({
   transactions: propTransactions = [], // Unified data source - filters for bills
   envelopes: propEnvelopes = [],
-  onPayBill,
   onUpdateBill,
   onCreateRecurringBill,
   onSearchNewBills,
@@ -101,7 +100,7 @@ const BillManager = ({
     });
 
     return result;
-  }, [propEnvelopes, tanStackEnvelopes, budget.envelopes]);
+  }, [propEnvelopes, tanStackEnvelopes, budget.envelopes, envelopesLoading]);
 
   const [selectedBills, setSelectedBills] = useState(new Set());
   const [viewMode, setViewMode] = useState("upcoming");
