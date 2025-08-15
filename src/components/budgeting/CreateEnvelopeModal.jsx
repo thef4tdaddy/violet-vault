@@ -21,7 +21,6 @@ import {
 } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
 import {
-  toMonthly,
   toBiweekly,
   getFrequencyOptions,
 } from "../../utils/frequencyCalculations";
