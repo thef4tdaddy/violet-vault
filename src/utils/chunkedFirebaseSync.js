@@ -447,6 +447,17 @@ class ChunkedFirebaseSync {
 
       // Decrypt manifest
       const manifestData = manifestDoc.data();
+
+      // Validate manifest encrypted data exists and has sufficient length
+      if (
+        !manifestData.encryptedData ||
+        manifestData.encryptedData.length < 32
+      ) {
+        throw new Error(
+          `Invalid or corrupted manifest data (size: ${manifestData.encryptedData?.length || 0})`,
+        );
+      }
+
       const decryptedManifest = JSON.parse(
         await encryptionUtils.decrypt(
           manifestData.encryptedData,
@@ -480,17 +491,38 @@ class ChunkedFirebaseSync {
 
           if (chunkDoc.exists()) {
             const encryptedChunk = chunkDoc.data();
-            const decryptedChunk = JSON.parse(
-              await encryptionUtils.decrypt(
-                encryptedChunk.encryptedData,
-                this.encryptionKey,
-              ),
-            );
 
-            chunks.push({
-              index: decryptedChunk.chunkIndex,
-              data: decryptedChunk.data,
-            });
+            // Validate encrypted data exists and has sufficient length
+            if (
+              !encryptedChunk.encryptedData ||
+              encryptedChunk.encryptedData.length < 32
+            ) {
+              console.warn(
+                `⚠️ Invalid or corrupted chunk data: ${chunkId} (size: ${encryptedChunk.encryptedData?.length || 0})`,
+              );
+              continue;
+            }
+
+            try {
+              const decryptedChunk = JSON.parse(
+                await encryptionUtils.decrypt(
+                  encryptedChunk.encryptedData,
+                  this.encryptionKey,
+                ),
+              );
+
+              chunks.push({
+                index: decryptedChunk.chunkIndex,
+                data: decryptedChunk.data,
+              });
+            } catch (decryptError) {
+              console.warn(
+                `⚠️ Failed to decrypt chunk: ${chunkId}`,
+                decryptError.message,
+              );
+              // Skip corrupted chunks rather than failing the entire operation
+              continue;
+            }
           } else {
             console.warn(`⚠️ Missing chunk: ${chunkId}`);
           }
@@ -513,8 +545,32 @@ class ChunkedFirebaseSync {
       return { data: reconstructedData };
     } catch (error) {
       console.error("❌ Chunked load failed:", error);
+      console.error(
+        "⚠️ ⚠️ Failed to fetch chunked Firestore data",
+        error.message,
+      );
+
+      // Provide more specific error context
+      if (
+        error.message.includes("provided data is too small") ||
+        error.message.includes("too small")
+      ) {
+        console.error(
+          "🔍 This error typically occurs when trying to decrypt corrupted or incomplete data chunks.",
+        );
+        console.error(
+          "💡 The chunks may have been partially written or corrupted during upload.",
+        );
+      }
+
       H.consumeError(error, {
-        metadata: { budgetId: this.budgetId, operation: "chunked_load" },
+        metadata: {
+          budgetId: this.budgetId,
+          operation: "chunked_load",
+          errorType: error.message.includes("too small")
+            ? "data_too_small"
+            : "unknown",
+        },
       });
       throw error;
     }
