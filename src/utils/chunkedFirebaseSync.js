@@ -138,7 +138,7 @@ class ChunkedFirebaseSync {
     // Reserve extra space for encryption overhead AND final document metadata
     // We need to be extremely conservative: raw data -> JSON -> encryption -> final doc structure
     const FIREBASE_MAX_SIZE = 1048576; // Firebase's actual 1MB limit
-    const encryptionOverheadMultiplier = 12.0; // Extremely aggressive - real overhead is 10x+
+    const encryptionOverheadMultiplier = 3.0; // More reasonable - 200% overhead for encryption + JSON + chunking
     const effectiveMaxSize = Math.floor(FIREBASE_MAX_SIZE / encryptionOverheadMultiplier);
 
     console.log(
@@ -524,6 +524,12 @@ class ChunkedFirebaseSync {
         );
       }
 
+      console.log("🔓 Attempting to decrypt manifest", {
+        encryptedDataSize: manifestData.encryptedData?.length || 0,
+        encryptedDataType: typeof manifestData.encryptedData,
+        hasEncryptionKey: !!this.encryptionKey,
+      });
+      
       const decryptedManifest = JSON.parse(
         await encryptionUtils.decrypt(manifestData.encryptedData, this.encryptionKey)
       );
@@ -562,6 +568,13 @@ class ChunkedFirebaseSync {
             }
 
             try {
+              console.log(`🔓 Attempting to decrypt chunk ${chunkId}`, {
+                encryptedDataSize: encryptedChunk.encryptedData?.length || 0,
+                encryptedDataType: typeof encryptedChunk.encryptedData,
+                chunkType: encryptedChunk.chunkType,
+                chunkIndex: encryptedChunk.chunkIndex,
+              });
+              
               const decryptedChunk = JSON.parse(
                 await encryptionUtils.decrypt(encryptedChunk.encryptedData, this.encryptionKey)
               );
