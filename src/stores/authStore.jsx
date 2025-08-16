@@ -5,7 +5,7 @@ import logger from "../utils/logger";
 import { identifyUser } from "../utils/highlight";
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const useAuth = create((set) => ({
+export const useAuth = create((set, get) => ({
   isUnlocked: false,
   encryptionKey: null,
   salt: null,
