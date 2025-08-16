@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { TRANSACTION_CATEGORIES } from "../../constants/categories";
+import logger from "../../utils/logger";
 import {
   Zap,
   Plus,
@@ -287,7 +288,7 @@ const TransactionSplitter = ({
       // Close modal
       onClose?.();
     } catch (error) {
-      console.error("Error creating split transactions:", error);
+      logger.error("Error creating split transactions:", error);
       alert("Failed to split transaction. Please try again.");
     } finally {
       setIsProcessing(false);

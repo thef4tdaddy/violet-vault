@@ -14,6 +14,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { useLocalOnlyMode } from "../../hooks/useLocalOnlyMode";
+import logger from "../../utils/logger";
 
 const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
   const {
@@ -37,7 +38,7 @@ const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
   // Load statistics when modal opens
   useEffect(() => {
     if (isOpen) {
-      getStats().then(setStats).catch(console.error);
+      getStats().then(setStats).catch(logger.error);
     }
   }, [isOpen, getStats]);
 
@@ -55,7 +56,7 @@ const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
     try {
       await exportData();
     } catch (err) {
-      console.error("Export failed:", err);
+      logger.error("Export failed:", err);
     }
   };
 
@@ -81,7 +82,7 @@ const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
 
       alert("Data imported successfully!");
     } catch (err) {
-      console.error("Import failed:", err);
+      logger.error("Import failed:", err);
       alert(`Import failed: ${err.message}`);
     }
   };
@@ -92,7 +93,7 @@ const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
       onModeSwitch("standard");
       onClose();
     } catch (err) {
-      console.error("Failed to exit local-only mode:", err);
+      logger.error("Failed to exit local-only mode:", err);
     }
   };
 
@@ -107,7 +108,7 @@ const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
       setShowConfirmClear(false);
       alert("All data cleared successfully!");
     } catch (err) {
-      console.error("Failed to clear data:", err);
+      logger.error("Failed to clear data:", err);
     }
   };
 

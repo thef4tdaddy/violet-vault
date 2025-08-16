@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useLocalOnlyMode } from "../../hooks/useLocalOnlyMode";
 import logoOnly from "../../assets/icon-512x512.png";
+import logger from "../../utils/logger";
 
 const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
   const {
@@ -53,7 +54,7 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
       });
       onModeSelected("local-only");
     } catch (err) {
-      console.error("Failed to start local-only mode:", err);
+      logger.error("Failed to start local-only mode:", err);
     }
   };
 
@@ -78,7 +79,7 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
       await enterLocalOnlyMode(fileData.user);
       onModeSelected("local-only");
     } catch (err) {
-      console.error("Failed to import and start:", err);
+      logger.error("Failed to import and start:", err);
       alert(`Import failed: ${err.message}`);
     }
   };

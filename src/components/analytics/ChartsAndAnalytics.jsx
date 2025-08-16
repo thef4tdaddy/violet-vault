@@ -27,6 +27,7 @@ import {
   ArrowDownRight,
   Wallet,
 } from "lucide-react";
+import logger from "../../utils/logger";
 
 const ChartsAnalytics = ({
   transactions = [],
@@ -75,7 +76,7 @@ const ChartsAnalytics = ({
       try {
         return new Date(t.date) >= getDateRange;
       } catch {
-        console.warn("Invalid date in transaction:", t.date);
+        logger.warn("Invalid date in transaction:", t.date);
         return false;
       }
     });
@@ -117,7 +118,7 @@ const ChartsAnalytics = ({
         grouped[monthKey].net = grouped[monthKey].income - grouped[monthKey].expenses;
         grouped[monthKey].transactionCount++;
       } catch {
-        console.warn("Error processing transaction in monthlyTrends:", transaction);
+        logger.warn("Error processing transaction in monthlyTrends:", transaction);
         return;
       }
     });
@@ -204,7 +205,7 @@ const ChartsAnalytics = ({
             patterns[dayIndex].count++;
           }
         } catch {
-          console.warn("Invalid date in weeklyPatterns:", transaction.date);
+          logger.warn("Invalid date in weeklyPatterns:", transaction.date);
         }
       }
     });

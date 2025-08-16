@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { X, CreditCard, Wallet, Receipt } from "lucide-react";
 import { DEBT_TYPES, DEBT_TYPE_CONFIG, PAYMENT_FREQUENCIES } from "../../../constants/debts";
 import { useBudgetStore } from "../../../stores/budgetStore";
+import logger from "../../../utils/logger";
 
 /**
  * Modal for adding new debts or editing existing ones
@@ -142,7 +143,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
         resetForm(); // Only reset form when adding new debt
       }
     } catch (error) {
-      console.error(`Error ${isEditMode ? "updating" : "creating"} debt:`, error);
+      logger.error(`Error ${isEditMode ? "updating" : "creating"} debt:`, error);
       setErrors({
         submit: `Failed to ${isEditMode ? "update" : "create"} debt. Please try again.`,
       });

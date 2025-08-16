@@ -14,6 +14,7 @@ import EnvelopeHeader from "./envelope/EnvelopeHeader";
 import EnvelopeSummary from "./envelope/EnvelopeSummary";
 import EnvelopeItem from "./envelope/EnvelopeItem";
 import UnassignedCashEnvelope from "./envelope/UnassignedCashEnvelope";
+import logger from "../../utils/logger";
 
 // Lazy load modals for better performance
 const EnvelopeCreateModal = lazy(() => import("./CreateEnvelopeModal"));
@@ -67,7 +68,7 @@ const UnifiedEnvelopeManager = ({
 
   const bills = useMemo(() => {
     const result = tanStackBills.length ? tanStackBills : budget.bills || [];
-    console.log("🔍 EnvelopeGrid bills debug:", {
+    logger.debug("🔍 EnvelopeGrid bills debug:", {
       tanStackBills,
       tanStackBillsLength: tanStackBills.length,
       budgetBills: budget.bills,
@@ -123,7 +124,7 @@ const UnifiedEnvelopeManager = ({
       await addEnvelope(envelopeData);
       setShowCreateModal(false);
     } catch (error) {
-      console.error("Failed to create envelope:", error);
+      logger.error("Failed to create envelope:", error);
     }
   };
 
@@ -132,7 +133,7 @@ const UnifiedEnvelopeManager = ({
       await updateEnvelope({ id: envelopeData.id, updates: envelopeData });
       setEditingEnvelope(null);
     } catch (error) {
-      console.error("Failed to update envelope:", error);
+      logger.error("Failed to update envelope:", error);
     }
   };
 
@@ -211,7 +212,7 @@ const UnifiedEnvelopeManager = ({
               try {
                 updateBill({ id: bill.id, updates: bill });
               } catch (error) {
-                console.warn("TanStack updateBill failed, using Zustand fallback", error);
+                logger.warn("TanStack updateBill failed, using Zustand fallback", error);
                 budget.updateBill(bill);
               }
             }}

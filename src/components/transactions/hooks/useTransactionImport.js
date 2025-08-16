@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { parseCSV, parseOFX, autoDetectFieldMapping } from "../utils/fileParser";
+import logger from "../../../utils/logger";
 
 export const useTransactionImport = (currentUser, onBulkImport) => {
   const [importData, setImportData] = useState([]);
@@ -75,7 +76,7 @@ export const useTransactionImport = (currentUser, onBulkImport) => {
 
         processedTransactions.push(transaction);
       } catch (error) {
-        console.error(`Error processing row ${i}:`, error);
+        logger.error(`Error processing row ${i}:`, error);
       }
 
       if (i % 10 === 0) {

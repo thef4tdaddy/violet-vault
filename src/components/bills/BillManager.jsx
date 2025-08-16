@@ -57,7 +57,7 @@ const BillManager = ({
     isLoading: billsLoading,
   } = useBills();
 
-  console.log("🏠 BillManager: Received from useBills:", {
+  logger.debug("🏠 BillManager: Received from useBills:", {
     tanStackBillsLength: tanStackBills.length,
     billsLoading,
     firstBill: tanStackBills[0],
@@ -127,7 +127,7 @@ const BillManager = ({
     );
     const billsFromStore = tanStackBills.length ? tanStackBills : budget.bills || [];
 
-    console.log("🔄 BillManager: Bill sources comparison:", {
+    logger.debug("🔄 BillManager: Bill sources comparison:", {
       tanStackBillsLength: tanStackBills.length,
       budgetBillsLength: (budget.bills || []).length,
       usingTanStack: tanStackBills.length > 0,
@@ -176,7 +176,7 @@ const BillManager = ({
             else if (daysUntilDue <= 7) urgency = "soon";
           }
         } catch (error) {
-          console.warn(`Invalid due date for bill ${bill.id}:`, bill.dueDate, error);
+          logger.warn(`Invalid due date for bill ${bill.id}:`, bill.dueDate, error);
         }
       }
 
@@ -355,12 +355,12 @@ const BillManager = ({
     try {
       const bill = bills.find((b) => b.id === billId);
       if (!bill) {
-        console.error("Bill not found:", billId);
+        logger.error("Bill not found:", billId);
         return;
       }
 
       if (bill.isPaid) {
-        console.warn("Bill is already paid:", billId);
+        logger.warn("Bill is already paid:", billId);
         return;
       }
 
@@ -372,13 +372,13 @@ const BillManager = ({
         envelopeId: bill.envelopeId,
       });
 
-      console.log("✅ Bill payment completed successfully:", {
+      logger.debug("✅ Bill payment completed successfully:", {
         billId: bill.id,
         amount: bill.amount,
         envelopeId: bill.envelopeId,
       });
     } catch (error) {
-      console.error("❌ Failed to pay bill:", error);
+      logger.error("❌ Failed to pay bill:", error);
       onError?.(error.message || "Failed to pay bill");
     }
   };
@@ -394,7 +394,7 @@ const BillManager = ({
       // Also call the prop function for backward compatibility
       await onSearchNewBills?.();
     } catch (error) {
-      console.error("Error discovering bills:", error);
+      logger.error("Error discovering bills:", error);
       onError?.(error.message || "Failed to discover new bills");
     } finally {
       setIsSearching(false);
@@ -411,12 +411,12 @@ const BillManager = ({
           try {
             await addBill(bill);
           } catch (error) {
-            console.warn("TanStack addBill failed, using Zustand fallback", error);
+            logger.warn("TanStack addBill failed, using Zustand fallback", error);
             budget.addTransaction(bill);
           }
         }
       }
-      console.log(`Successfully added ${billsToAdd.length} discovered bills`);
+      logger.debug(`Successfully added ${billsToAdd.length} discovered bills`);
     } catch (error) {
       throw new Error(`Failed to add discovered bills: ${error.message}`);
     }
@@ -460,12 +460,12 @@ const BillManager = ({
           `${successCount} bills paid successfully, ${errorCount} failed:\n${errors.join("\n")}`
         );
       } else {
-        console.log(`✅ Successfully paid ${successCount} bills`);
+        logger.debug(`✅ Successfully paid ${successCount} bills`);
       }
 
       setSelectedBills(new Set());
     } catch (error) {
-      console.error("❌ Error in bulk payment:", error);
+      logger.error("❌ Error in bulk payment:", error);
       onError?.(error.message || "Failed to pay selected bills");
     }
   };
@@ -1002,7 +1002,7 @@ const BillManager = ({
               try {
                 addBill(newBill);
               } catch (error) {
-                console.warn("TanStack addBill failed, using Zustand fallback", error);
+                logger.warn("TanStack addBill failed, using Zustand fallback", error);
                 budget.addTransaction(newBill);
               }
             }
@@ -1013,7 +1013,7 @@ const BillManager = ({
             try {
               addEnvelope(envelopeData);
             } catch (error) {
-              console.warn("TanStack addEnvelope failed, using Zustand fallback", error);
+              logger.warn("TanStack addEnvelope failed, using Zustand fallback", error);
               budget.addEnvelope(envelopeData);
             }
           }}
@@ -1071,7 +1071,7 @@ const BillManager = ({
             try {
               deleteBill(billId);
             } catch (error) {
-              console.warn("TanStack deleteBill failed, using Zustand fallback", error);
+              logger.warn("TanStack deleteBill failed, using Zustand fallback", error);
               budget.deleteBill(billId);
             }
             setEditingBill(null);
@@ -1081,7 +1081,7 @@ const BillManager = ({
             try {
               addEnvelope(envelopeData);
             } catch (error) {
-              console.warn("TanStack addEnvelope failed, using Zustand fallback", error);
+              logger.warn("TanStack addEnvelope failed, using Zustand fallback", error);
               budget.addEnvelope(envelopeData);
             }
           }}

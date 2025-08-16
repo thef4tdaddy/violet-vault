@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { DollarSign, User, Wallet, Calculator, TrendingUp, Clock, CheckCircle } from "lucide-react";
 import { BILL_CATEGORIES, ENVELOPE_TYPES } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
+import logger from "../../utils/logger";
 
 const PaycheckProcessor = ({
   envelopes = [],
@@ -102,12 +103,12 @@ const PaycheckProcessor = ({
         date: new Date().toISOString(),
       });
 
-      console.log("Paycheck processed:", result);
+      logger.debug("Paycheck processed:", result);
 
       setPaycheckAmount("");
       setShowPreview(false);
     } catch (error) {
-      console.error("Failed to process paycheck:", error);
+      logger.error("Failed to process paycheck:", error);
       alert("Failed to process paycheck");
     } finally {
       setIsProcessing(false);

@@ -18,6 +18,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useKeyManagement } from "../../hooks/useKeyManagement";
+import logger from "../../utils/logger";
 
 const KeyManagementSettings = ({ isOpen, onClose }) => {
   const {
@@ -52,7 +53,7 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
   // Load current key fingerprint on open
   React.useEffect(() => {
     if (isOpen) {
-      getCurrentKeyFingerprint().then(setKeyFingerprint).catch(console.error);
+      getCurrentKeyFingerprint().then(setKeyFingerprint).catch(logger.error);
     }
   }, [isOpen, getCurrentKeyFingerprint]);
 
@@ -75,7 +76,7 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
       setCopiedToClipboard(true);
       setTimeout(() => setCopiedToClipboard(false), 3000);
     } catch (err) {
-      console.error("Clipboard copy failed:", err);
+      logger.error("Clipboard copy failed:", err);
     }
   };
 
@@ -83,7 +84,7 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
     try {
       await downloadKeyFile();
     } catch (err) {
-      console.error("Download failed:", err);
+      logger.error("Download failed:", err);
     }
   };
 
@@ -97,7 +98,7 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
       await downloadProtectedKeyFile(exportPassword);
       setExportPassword("");
     } catch (err) {
-      console.error("Protected download failed:", err);
+      logger.error("Protected download failed:", err);
     }
   };
 
@@ -135,7 +136,7 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
       setImportPassword("");
       setVaultPassword("");
     } catch (err) {
-      console.error("Import failed:", err);
+      logger.error("Import failed:", err);
       alert(`Import failed: ${err.message}`);
     }
   };

@@ -18,6 +18,7 @@ import PaydayPrediction from "../budgeting/PaydayPrediction";
 import { predictNextPayday } from "../../utils/paydayPredictor";
 import EditableBalance from "../ui/EditableBalance";
 import { useActualBalance } from "../../hooks/useActualBalance";
+import logger from "../../utils/logger";
 import { useBudgetStore } from "../../stores/budgetStore";
 import { useEnvelopes } from "../../hooks/useEnvelopes";
 import { useSavingsGoals } from "../../hooks/useSavingsGoals";
@@ -51,7 +52,7 @@ const Dashboard = ({ setActiveView }) => {
   const totalVirtualBalance = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
 
   // Debug logging to compare with SummaryCards
-  console.log("📊 Dashboard Debug:", {
+  logger.debug("📊 Dashboard Debug:", {
     envelopesCount: envelopes.length,
     totalEnvelopeBalance,
     totalSavingsBalance,
@@ -168,7 +169,7 @@ const Dashboard = ({ setActiveView }) => {
           if (setActiveView) {
             setActiveView("debts");
           } else {
-            console.log("Navigate to debts requested - setActiveView not available");
+            logger.debug("Navigate to debts requested - setActiveView not available");
           }
         }}
       />

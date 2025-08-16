@@ -22,6 +22,7 @@ import {
   getEnvelopeCategories,
 } from "../../constants/categories";
 import { toMonthly, toBiweekly, getFrequencyOptions } from "../../utils/frequencyCalculations";
+import logger from "../../utils/logger";
 
 const EditEnvelopeModal = ({
   isOpen = false,
@@ -87,7 +88,7 @@ const EditEnvelopeModal = ({
 
   // Debug logging for bills
   useEffect(() => {
-    console.log("🔍 EditEnvelopeModal - allBills received:", {
+    logger.debug("🔍 EditEnvelopeModal - allBills received:", {
       allBills,
       length: allBills?.length,
       bills: allBills?.map((bill) => ({
@@ -329,7 +330,7 @@ const EditEnvelopeModal = ({
       resetForm();
       onClose();
     } catch (error) {
-      console.error("Error updating envelope:", error);
+      logger.error("Error updating envelope:", error);
       setErrors({ submit: "Failed to update envelope. Please try again." });
     } finally {
       setIsSubmitting(false);
@@ -348,7 +349,7 @@ const EditEnvelopeModal = ({
       resetForm();
       onClose();
     } catch (error) {
-      console.error("Error deleting envelope:", error);
+      logger.error("Error deleting envelope:", error);
       setErrors({ submit: "Failed to delete envelope. Please try again." });
     } finally {
       setIsSubmitting(false);

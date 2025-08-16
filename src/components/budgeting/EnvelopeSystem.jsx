@@ -5,6 +5,7 @@ import { useEnvelopes } from "../../hooks/useEnvelopes";
 import { useBills } from "../../hooks/useBills";
 import { calculateBiweeklyNeeds } from "../../utils/budgeting";
 import { FREQUENCY_MULTIPLIERS, BIWEEKLY_MULTIPLIER } from "../../constants/categories";
+import logger from "../../utils/logger";
 
 const useEnvelopeSystem = () => {
   // Enhanced TanStack Query integration
@@ -85,7 +86,7 @@ const useEnvelopeSystem = () => {
         await addEnvelope(envelopeData);
         return { success: true };
       } catch (error) {
-        console.error("Failed to create envelope:", error);
+        logger.error("Failed to create envelope:", error);
         return { success: false, error: error.message };
       }
     },
@@ -98,7 +99,7 @@ const useEnvelopeSystem = () => {
         await updateEnvelope({ id: envelopeId, updates });
         return { success: true };
       } catch (error) {
-        console.error("Failed to update envelope:", error);
+        logger.error("Failed to update envelope:", error);
         return { success: false, error: error.message };
       }
     },
@@ -111,7 +112,7 @@ const useEnvelopeSystem = () => {
         await deleteEnvelope(envelopeId);
         return { success: true };
       } catch (error) {
-        console.error("Failed to delete envelope:", error);
+        logger.error("Failed to delete envelope:", error);
         return { success: false, error: error.message };
       }
     },

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getVersionInfo, getVersionInfoAsync, getCacheStatus } from "../../utils/version";
+import logger from "../../utils/logger";
 
 /**
  * Version footer component with branch differentiation
@@ -19,7 +20,7 @@ const VersionFooter = () => {
 
       // Only fetch if we don't have valid cached data
       if (!currentCache.isValid) {
-        console.log("🔄 No valid cache, fetching milestone data...");
+        logger.debug("🔄 No valid cache, fetching milestone data...");
         setIsLoadingMilestone(true);
         getVersionInfoAsync()
           .then((updatedInfo) => {
@@ -28,11 +29,11 @@ const VersionFooter = () => {
             setIsLoadingMilestone(false);
           })
           .catch((error) => {
-            console.warn("Failed to fetch milestone info:", error);
+            logger.warn("Failed to fetch milestone info:", error);
             setIsLoadingMilestone(false);
           });
       } else {
-        console.log(
+        logger.debug(
           `🎯 Using cached milestone (expires in ${currentCache.daysUntilExpiry > 0 ? currentCache.daysUntilExpiry + " days" : currentCache.hoursUntilExpiry + " hours"})`
         );
         // Use cached version

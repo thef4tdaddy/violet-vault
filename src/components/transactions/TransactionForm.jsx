@@ -1,5 +1,6 @@
 import React from "react";
 import { X, TrendingDown, TrendingUp, Zap } from "lucide-react";
+import logger from "../../utils/logger";
 
 const TransactionForm = ({
   isOpen,
@@ -16,7 +17,7 @@ const TransactionForm = ({
   if (!isOpen) return null;
 
   // Debug logging to track envelope data issue
-  console.log("TransactionForm Debug:", {
+  logger.debug("TransactionForm Debug:", {
     envelopesCount: envelopes.length,
     envelopes: envelopes.slice(0, 3),
     isOpen,
