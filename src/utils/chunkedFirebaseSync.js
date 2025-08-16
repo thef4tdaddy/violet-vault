@@ -14,6 +14,7 @@ import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
 import { encryptionUtils } from "./encryption";
 import { H } from "./highlight.js";
 import { firebaseConfig } from "./firebaseConfig";
+import logger from "./logger.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -435,10 +436,43 @@ class ChunkedFirebaseSync {
     try {
       console.log("🌩️ Starting chunked load from cloud...");
 
+      // Debug current auth state
+      const currentUser = auth.currentUser;
+      console.log("🔍 Current Firebase Auth state:", {
+        isSignedIn: !!currentUser,
+        uid: currentUser?.uid,
+        isAnonymous: currentUser?.isAnonymous,
+        providerId: currentUser?.providerId,
+      });
+
       const startTime = Date.now();
 
       // Load the manifest first
-      const manifestDoc = await getDoc(doc(db, "budgets", this.budgetId));
+      console.log("📄 Attempting to fetch manifest document...", {
+        budgetId: this.budgetId,
+        collection: "budgets",
+        isAuthenticated: this.isAuthenticated,
+      });
+
+      let manifestDoc;
+      try {
+        manifestDoc = await getDoc(doc(db, "budgets", this.budgetId));
+        console.log(
+          "📄 Firebase getDoc completed, exists:",
+          manifestDoc.exists(),
+        );
+      } catch (firestoreError) {
+        logger.error("Firestore getDoc failed", firestoreError, {
+          budgetId: this.budgetId,
+          code: firestoreError.code,
+          message: firestoreError.message,
+          name: firestoreError.name,
+          source: "chunkedFirebaseSync.loadFromCloud",
+        });
+        throw new Error(
+          `Firestore read failed: ${firestoreError.code} - ${firestoreError.message}`,
+        );
+      }
 
       if (!manifestDoc.exists()) {
         console.log("📭 No cloud data found");
