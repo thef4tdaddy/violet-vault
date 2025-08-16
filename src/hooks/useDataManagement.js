@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { encryptionUtils } from "../utils/encryption";
 import { useAuth } from "../stores/authStore.jsx";
 import { useToastHelpers } from "../utils/toastHelpers";
+import logger from "../utils/logger";
 
 /**
  * Custom hook for data import/export operations
@@ -13,7 +14,7 @@ const useDataManagement = () => {
 
   const exportData = useCallback(async () => {
     try {
-      console.log("📁 Starting export process...");
+      logger.info("Starting export process");
 
       // Try different localStorage keys (new Zustand format first, then old formats)
       let rawData = null;
@@ -24,7 +25,7 @@ const useDataManagement = () => {
       if (newData) {
         rawData = JSON.parse(newData);
         dataSource = "violet-vault-store";
-        console.log("📁 Found data in violet-vault-store");
+        logger.debug("Found data in violet-vault-store");
       }
 
       // Try old budget-store (main branch)
@@ -33,7 +34,7 @@ const useDataManagement = () => {
         if (oldData) {
           rawData = JSON.parse(oldData);
           dataSource = "budget-store";
-          console.log("📁 Found data in budget-store");
+          logger.debug("Found data in budget-store");
         }
       }
 
@@ -46,7 +47,7 @@ const useDataManagement = () => {
             state: await encryptionUtils.decrypt(encryptedData, encryptionKey, iv),
           };
           dataSource = "envelopeBudgetData";
-          console.log("📁 Found encrypted data in envelopeBudgetData");
+          logger.debug("Found encrypted data in envelopeBudgetData");
         }
       }
 
@@ -68,7 +69,10 @@ const useDataManagement = () => {
         decryptedData = rawData.state;
       }
 
-      console.log("📁 Data extracted from", dataSource, "- Keys:", Object.keys(decryptedData));
+      logger.debug("Data extracted from source", {
+        source: dataSource,
+        keys: Object.keys(decryptedData),
+      });
 
       // Log what old data we're filtering out
       const deprecatedFields = Object.keys(decryptedData).filter((key) =>
@@ -76,7 +80,7 @@ const useDataManagement = () => {
       );
 
       if (deprecatedFields.length > 0) {
-        console.log("🧹 Filtering out deprecated fields:", deprecatedFields);
+        logger.debug("Filtering out deprecated fields", { fields: deprecatedFields });
       }
 
       // Check for nested deprecated data in envelopes
@@ -85,9 +89,9 @@ const useDataManagement = () => {
       );
 
       if (envelopesWithOldData.length > 0) {
-        console.log(
-          `🧹 Cleaning nested transaction arrays from ${envelopesWithOldData.length} envelopes`
-        );
+        logger.debug("Cleaning nested transaction arrays from envelopes", {
+          count: envelopesWithOldData.length,
+        });
       }
 
       // Normalize transactions for unified structure
@@ -201,22 +205,22 @@ const useDataManagement = () => {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
-      console.log("✅ Export completed successfully");
-      console.log(`📊 Clean export summary:
-        - ${cleanEnvelopes.length} envelopes (old nested arrays removed)
-        - ${cleanBills.length} bills (cleaned structure)
-        - ${transactions.length} pure transactions
-        - ${allTransactions.length} total transactions (auto-generated)
-        - ${exportData.savingsGoals.length} savings goals
-        - Deprecated fields excluded: ${deprecatedFields.join(", ") || "none found"}
-        - File size: ${Math.round(dataStr.length / 1024)}KB`);
+      logger.info("Export completed successfully", {
+        envelopes: cleanEnvelopes.length,
+        bills: cleanBills.length,
+        transactions: transactions.length,
+        allTransactions: allTransactions.length,
+        savingsGoals: exportData.savingsGoals.length,
+        deprecatedFields: deprecatedFields.join(", ") || "none found",
+        fileSizeKB: Math.round(dataStr.length / 1024),
+      });
 
       showSuccessToast(
         `Clean export created with ${cleanEnvelopes.length} envelopes, ${cleanBills.length} bills, and ${transactions.length} transactions (${Math.round(dataStr.length / 1024)}KB)`,
         "Export Completed"
       );
     } catch (error) {
-      console.error("❌ Export failed:", error);
+      logger.error("Export failed", error);
       showErrorToast(`Export failed: ${error.message}`, "Export Failed");
     }
   }, [encryptionKey, currentUser, showErrorToast, showSuccessToast, showWarningToast]);
@@ -227,7 +231,7 @@ const useDataManagement = () => {
       if (!file) return;
 
       try {
-        console.log("📁 Starting import process...");
+        logger.info("Starting import process");
 
         // Read the file
         const fileContent = await new Promise((resolve, reject) => {
@@ -239,7 +243,7 @@ const useDataManagement = () => {
 
         // Parse JSON
         const importedData = JSON.parse(fileContent);
-        console.log("✅ File parsed successfully:", {
+        logger.info("File parsed successfully", {
           envelopes: importedData.envelopes?.length || 0,
           bills: importedData.bills?.length || 0,
           savingsGoals: importedData.savingsGoals?.length || 0,
@@ -265,7 +269,7 @@ const useDataManagement = () => {
         );
 
         if (!confirmed) {
-          console.log("Import cancelled by user");
+          logger.info("Import cancelled by user");
           return;
         }
 
@@ -280,18 +284,18 @@ const useDataManagement = () => {
 
           if (currentVioletData) {
             localStorage.setItem(`violet-vault-store_backup_${timestamp}`, currentVioletData);
-            console.log("✅ Current violet-vault-store data backed up");
+            logger.debug("Current violet-vault-store data backed up");
           }
           if (currentBudgetData) {
             localStorage.setItem(`budget-store_backup_${timestamp}`, currentBudgetData);
-            console.log("✅ Current budget-store data backed up");
+            logger.debug("Current budget-store data backed up");
           }
           if (currentLegacyData) {
             localStorage.setItem(`envelopeBudgetData_backup_${timestamp}`, currentLegacyData);
-            console.log("✅ Current legacy data backed up");
+            logger.debug("Current legacy data backed up");
           }
         } catch (backupError) {
-          console.warn("⚠️ Failed to create backup:", backupError);
+          logger.warn("Failed to create backup", backupError);
         }
 
         // Prepare the data for loading - ensure user information is preserved
@@ -303,12 +307,12 @@ const useDataManagement = () => {
           currentUser: currentUser,
         };
 
-        console.log("✅ Import completed successfully");
+        logger.info("Import completed successfully");
         showSuccessToast("Data imported successfully!", "Import Completed");
 
         return processedData;
       } catch (error) {
-        console.error("❌ Import failed:", error);
+        logger.error("Import failed", error);
         showErrorToast(`Import failed: ${error.message}`, "Import Failed");
         throw error;
       }
@@ -317,7 +321,7 @@ const useDataManagement = () => {
   );
 
   const resetEncryptionAndStartFresh = useCallback(() => {
-    console.log("🔄 Resetting encryption and starting fresh...");
+    logger.info("Resetting encryption and starting fresh");
 
     // Clear all stored data
     const keysToRemove = ["envelopeBudgetData", "userProfile", "passwordLastChanged"];
@@ -333,7 +337,7 @@ const useDataManagement = () => {
       }
     });
 
-    console.log("✅ All data cleared, ready for fresh start");
+    logger.info("All data cleared, ready for fresh start");
 
     // Force page reload to reset application state
     window.location.reload();

@@ -19,7 +19,7 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
   useEffect(() => {
     if (!firebaseSync || !budgetId || !encryptionKey || !currentUser) return;
 
-    console.log("🔄 Auto-initializing chunked Firebase sync...");
+    logger.info("🔄 Auto-initializing chunked Firebase sync...");
 
     // Start the cloud sync service with config
     const config = {
@@ -35,7 +35,7 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
         _setIsLoading(true);
         const syncResult = await firebaseSync.forceSync();
         if (syncResult && syncResult.success) {
-          console.log("✅ Chunked sync completed:", syncResult);
+          logger.info("✅ Chunked sync completed:", syncResult);
           showSuccessToast("Data synced from cloud successfully");
 
           // The cloudSyncService handles syncing data to Dexie automatically
@@ -44,7 +44,7 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
           // Update non-Dexie Zustand state if needed
           // These would need to be handled separately since they're not in Dexie
 
-          console.log("🔄 Chunked Firebase → Dexie sync completed");
+          logger.info("🔄 Chunked Firebase → Dexie sync completed");
         }
       } catch (error) {
         console.warn("Failed to load cloud data:", error.message);
@@ -85,7 +85,7 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
   const _handleManualSave = async () => {
     // TODO: Implement manual save functionality
     try {
-      console.log("💾 Manual save triggered - using forceSync...");
+      logger.info("💾 Manual save triggered - using forceSync...");
       const result = await firebaseSync.forceSync();
       if (result && result.success) {
         showSuccessToast("Data saved successfully");
@@ -102,12 +102,12 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
     try {
       if (!firebaseSync) return;
 
-      console.log("🔄 Manual sync triggered...");
+      logger.info("🔄 Manual sync triggered...");
       const result = await firebaseSync.forceSync();
 
       if (result && result.success) {
         showSuccessToast("Manual sync completed successfully");
-        console.log("✅ Manual sync completed:", result);
+        logger.info("✅ Manual sync completed:", result);
       } else {
         showErrorToast("Manual sync failed");
         console.warn("❌ Manual sync failed:", result);

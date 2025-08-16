@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../utils/queryClient";
 import { budgetDb } from "../db/budgetDb";
 import { budgetHistory } from "../utils/budgetHistory";
+import logger from "../utils/logger";
 
 /**
  * TanStack Query hooks for budget history following proper data flow:
@@ -20,7 +21,7 @@ export const useBudgetCommits = (options = {}) => {
         const commits = await budgetDb.getBudgetCommits(options);
         return commits || [];
       } catch (error) {
-        console.warn("Failed to fetch budget commits:", error);
+        logger.warn("Failed to fetch budget commits:", error);
         return [];
       }
     },
@@ -90,7 +91,7 @@ export const useBudgetCommitDetails = (commitHash) => {
 
         return { commit, changes };
       } catch (error) {
-        console.warn("Failed to fetch commit details:", error);
+        logger.warn("Failed to fetch commit details:", error);
         return null;
       }
     },
@@ -115,7 +116,7 @@ export const useBudgetHistoryStats = () => {
           lastCommitAuthor: lastCommit?.author,
         };
       } catch (error) {
-        console.warn("Failed to fetch budget history stats:", error);
+        logger.warn("Failed to fetch budget history stats:", error);
         return {
           totalCommits: 0,
           lastCommitDate: null,

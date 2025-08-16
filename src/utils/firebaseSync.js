@@ -3,6 +3,7 @@ import { getFirestore, doc, setDoc, getDoc, onSnapshot, serverTimestamp } from "
 import { encryptionUtils } from "./encryption";
 import { H } from "./highlight.js";
 import { firebaseConfig } from "./firebaseConfig";
+import logger from "./logger";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -46,7 +47,7 @@ class FirebaseSync {
       window.location.hostname.includes("vercel.app") ||
       window.location.hostname.includes("f4tdaddy.com")
     ) {
-      console.log("🔧 FirebaseSync Debug Info:", {
+      logger.debug("FirebaseSync Debug Info", {
         budgetId,
         budgetIdLength: budgetId?.length,
         hasEncryptionKey: !!encryptionKey,
@@ -67,13 +68,13 @@ class FirebaseSync {
 
   setupNetworkMonitoring() {
     window.addEventListener("online", () => {
-      console.log("📶 Network connection restored");
+      logger.info("Network connection restored");
       this.isOnline = true;
       this.processSyncQueue();
     });
 
     window.addEventListener("offline", () => {
-      console.log("📵 Network connection lost");
+      logger.info("Network connection lost");
       this.isOnline = false;
     });
   }
@@ -99,7 +100,7 @@ class FirebaseSync {
       try {
         callback(event);
       } catch (error) {
-        console.error("❌ Error in sync listener:", error);
+        logger.error("Error in sync listener:", error);
       }
     });
   }
@@ -109,7 +110,7 @@ class FirebaseSync {
       try {
         callback(error);
       } catch (err) {
-        console.error("❌ Error in error listener:", err);
+        logger.error("Error in error listener:", err);
       }
     });
   }
@@ -176,17 +177,17 @@ class FirebaseSync {
 
   async decryptFromCloud(cloudData) {
     if (!cloudData || typeof cloudData !== "object") {
-      console.log("⚠️ Invalid cloud data format");
+      logger.warn("Invalid cloud data format");
       return null;
     }
 
     if (!cloudData.encryptedData || !cloudData.iv) {
-      console.log("⚠️ No encrypted data found in cloud document");
+      logger.warn("No encrypted data found in cloud document");
       return null;
     }
 
     try {
-      console.log("🔓 Attempting to decrypt cloud data...");
+      logger.debug("Attempting to decrypt cloud data");
 
       // Validate encryption key
       if (!this.encryptionKey) {
@@ -195,7 +196,7 @@ class FirebaseSync {
 
       // Check data format
       if (!Array.isArray(cloudData.encryptedData) || !Array.isArray(cloudData.iv)) {
-        console.error("❌ Invalid encrypted data format:", {
+        logger.error("Invalid encrypted data format", {
           encryptedDataType: typeof cloudData.encryptedData,
           ivType: typeof cloudData.iv,
           encryptedDataLength: cloudData.encryptedData?.length,
@@ -210,7 +211,7 @@ class FirebaseSync {
         cloudData.iv
       );
 
-      console.log("✅ Successfully decrypted cloud data");
+      logger.debug("Successfully decrypted cloud data");
 
       // Validate decrypted data structure
       if (!decryptedData || typeof decryptedData !== "object") {

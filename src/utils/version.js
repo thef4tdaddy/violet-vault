@@ -1,5 +1,6 @@
 // src/utils/version.js
 import packageJson from "../../package.json";
+import logger from "./logger";
 
 export const APP_VERSION = packageJson.version;
 export const APP_NAME = packageJson.name;
@@ -26,7 +27,7 @@ const initializeCache = () => {
       // Only use cached data if it's still valid
       if (parsed.timestamp && now - parsed.timestamp < versionCache.ttl) {
         versionCache = parsed;
-        console.log("📦 Loaded version cache from localStorage:", versionCache.data);
+        logger.debug("Loaded version cache from localStorage", { version: versionCache.data });
         return true;
       } else {
         // Cache expired, remove it
@@ -34,7 +35,7 @@ const initializeCache = () => {
       }
     }
   } catch (error) {
-    console.warn("Failed to load milestone cache:", error);
+    logger.warn("Failed to load milestone cache:", error);
   }
   return false;
 };
@@ -47,9 +48,9 @@ const saveCache = (data) => {
       timestamp: Date.now(),
     };
     localStorage.setItem(CACHE_KEY, JSON.stringify(versionCache));
-    console.log("💾 Cached version data:", data);
+    logger.debug("Cached version data", { version: data });
   } catch (error) {
-    console.warn("Failed to save version cache:", error);
+    logger.warn("Failed to save version cache:", error);
   }
 };
 
@@ -67,11 +68,11 @@ export const fetchTargetVersion = async () => {
     versionCache.timestamp &&
     now - versionCache.timestamp < versionCache.ttl
   ) {
-    console.log("🎯 Using cached target version:", versionCache.data);
+    logger.debug("Using cached target version", { version: versionCache.data });
     return versionCache.data;
   }
 
-  console.log("🔄 Fetching fresh release-please data from API...");
+  logger.debug("Fetching fresh release-please data from API");
 
   try {
     // Use our Cloudflare Worker endpoint to fetch release-please data (more accurate than milestones)
@@ -92,20 +93,20 @@ export const fetchTargetVersion = async () => {
     if (data.success && data.nextVersion) {
       // Save to cache
       saveCache(data.nextVersion);
-      console.log("✅ Fetched next version from release-please:", data.nextVersion);
+      logger.info("Fetched next version from release-please", { version: data.nextVersion });
       return data.nextVersion;
     } else if (data.fallback?.nextVersion) {
       // Use fallback but don't cache it (so we retry next time)
-      console.log("⚠️ Using fallback next version:", data.fallback.nextVersion);
+      logger.warn("Using fallback next version", { version: data.fallback.nextVersion });
       return data.fallback.nextVersion;
     }
   } catch (error) {
-    console.warn("❌ Failed to fetch milestone data:", error);
+    logger.warn("Failed to fetch milestone data", error);
   }
 
   // Fallback logic if API fails
   const fallbackVersion = getTargetVersionFallback();
-  console.log("🔄 Using local fallback version:", fallbackVersion);
+  logger.debug("Using local fallback version", { version: fallbackVersion });
   return fallbackVersion;
 };
 
@@ -249,7 +250,7 @@ export const getVersionInfoAsync = async () => {
     const targetVersion = await fetchTargetVersion();
     return getVersionInfo(targetVersion);
   } catch (error) {
-    console.warn("Failed to fetch async version info, using fallback:", error);
+    logger.warn("Failed to fetch async version info, using fallback:", error);
     return getVersionInfo();
   }
 };
@@ -263,9 +264,9 @@ export const clearVersionCache = () => {
       timestamp: null,
       ttl: 7 * 24 * 60 * 60 * 1000,
     };
-    console.log("🗑️ Version cache cleared");
+    logger.debug("Version cache cleared");
   } catch (error) {
-    console.warn("Failed to clear cache:", error);
+    logger.warn("Failed to clear cache:", error);
   }
 };
 
@@ -293,7 +294,7 @@ export const getCacheStatus = () => {
 
 // Development utility for testing version transitions
 export const simulateVersionTransition = (newTargetVersion) => {
-  console.log(`🧪 Simulating version transition to v${newTargetVersion}`);
+  logger.debug("Simulating version transition", { targetVersion: newTargetVersion });
   clearVersionCache();
 
   // Temporarily override the cache with new version for testing
@@ -303,12 +304,12 @@ export const simulateVersionTransition = (newTargetVersion) => {
       timestamp: Date.now(),
     };
     localStorage.setItem(CACHE_KEY, JSON.stringify(versionCache));
-    console.log(`💾 Cached new target version: ${newTargetVersion}`);
+    logger.debug("Cached new target version", { version: newTargetVersion });
   } catch (error) {
-    console.warn("Failed to save simulated cache:", error);
+    logger.warn("Failed to save simulated cache:", error);
   }
 
-  console.log(`✅ Simulated transition complete. Run getVersionInfoAsync() to test.`);
+  logger.info("Simulated transition complete. Run getVersionInfoAsync() to test.");
   return newTargetVersion;
 };
 

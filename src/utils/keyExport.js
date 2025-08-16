@@ -1,4 +1,5 @@
 import { encryptionUtils } from "./encryption";
+import logger from "./logger";
 
 /**
  * VioletVault Key Export/Import Utilities
@@ -176,7 +177,7 @@ export const keyExportUtils = {
             await navigator.clipboard.writeText("");
           }
         } catch (error) {
-          console.warn("Could not auto-clear clipboard:", error);
+          logger.warn("Could not auto-clear clipboard:", error);
         }
       }, clearAfterMs);
 

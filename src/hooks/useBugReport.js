@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { H } from "../utils/highlight.js";
 import { APP_VERSION } from "../utils/version";
+import logger from "../utils/logger";
 
 /**
  * Custom hook for bug report functionality
@@ -160,7 +161,7 @@ const useBugReport = () => {
             `;
             clonedDoc.head.appendChild(style);
           } catch (error) {
-            console.warn("Failed to apply screenshot color fixes:", error);
+            logger.warn("Failed to apply screenshot color fixes:", error);
           }
         },
       });
@@ -172,11 +173,11 @@ const useBugReport = () => {
       setScreenshot(screenshotDataUrl);
       return screenshotDataUrl;
     } catch (error) {
-      console.warn("Primary screenshot capture failed:", error.message);
+      logger.warn("Primary screenshot capture failed:", error.message);
 
       // Try fallback screenshot with minimal options
       try {
-        console.log("🔄 Attempting fallback screenshot with minimal configuration...");
+        logger.debug("Attempting fallback screenshot with minimal configuration");
         const html2canvas = (await import("html2canvas")).default;
 
         const fallbackCanvas = await html2canvas(document.body, {
@@ -195,10 +196,10 @@ const useBugReport = () => {
 
         const fallbackDataUrl = fallbackCanvas.toDataURL("image/png", 0.3);
         setScreenshot(fallbackDataUrl);
-        console.log("✅ Fallback screenshot captured successfully");
+        logger.info("Fallback screenshot captured successfully");
         return fallbackDataUrl;
       } catch (fallbackError) {
-        console.warn("Fallback screenshot also failed:", fallbackError.message);
+        logger.warn("Fallback screenshot also failed:", fallbackError.message);
         // Return null instead of throwing - this allows the bug report to continue without screenshot
         return null;
       }
@@ -223,7 +224,7 @@ const useBugReport = () => {
           try {
             screenshotData = screenshot || (await captureScreenshot());
           } catch (screenshotError) {
-            console.warn(
+            logger.warn(
               "Screenshot capture failed, proceeding without screenshot:",
               screenshotError
             );
@@ -244,7 +245,7 @@ const useBugReport = () => {
                 sessionUrl = String(sessionMetadata.url);
               }
             } catch (metadataError) {
-              console.warn("getSessionMetadata failed:", metadataError.message);
+              logger.warn("getSessionMetadata failed:", metadataError.message);
             }
           }
 
@@ -254,7 +255,7 @@ const useBugReport = () => {
               const rawUrl = H.getSessionURL();
               sessionUrl = typeof rawUrl === "string" ? rawUrl : String(rawUrl);
             } catch (urlError) {
-              console.warn("getSessionURL failed:", urlError.message);
+              logger.warn("getSessionURL failed:", urlError.message);
             }
           }
 
@@ -264,7 +265,7 @@ const useBugReport = () => {
               const rawUrl = session?.url || session?.sessionUrl || session?.replayUrl;
               sessionUrl = rawUrl ? String(rawUrl) : null;
             } catch (sessionError) {
-              console.warn("getSession failed:", sessionError.message);
+              logger.warn("getSession failed:", sessionError.message);
             }
           }
 
@@ -274,11 +275,11 @@ const useBugReport = () => {
               const currentUrl = H.getCurrentSessionURL();
               sessionUrl = typeof currentUrl === "string" ? currentUrl : String(currentUrl);
             } catch (currentError) {
-              console.warn("getCurrentSessionURL failed:", currentError.message);
+              logger.warn("getCurrentSessionURL failed:", currentError.message);
             }
           }
         } catch (error) {
-          console.warn("Failed to get Highlight.io session metadata:", error.message);
+          logger.warn("Failed to get Highlight.io session metadata:", error.message);
         }
 
         // Get current page context for smart labeling
@@ -537,7 +538,7 @@ const useBugReport = () => {
         const bugReportEndpoint = import.meta.env.VITE_BUG_REPORT_ENDPOINT;
 
         if (bugReportEndpoint) {
-          console.log("Submitting bug report to:", bugReportEndpoint);
+          logger.info("Submitting bug report to endpoint", { endpoint: bugReportEndpoint });
 
           const response = await fetch(bugReportEndpoint, {
             method: "POST",
@@ -547,7 +548,7 @@ const useBugReport = () => {
 
           if (!response.ok) {
             const errorText = await response.text();
-            console.error("Bug report submission failed:", {
+            logger.error("Bug report submission failed", {
               status: response.status,
               statusText: response.statusText,
               error: errorText,
@@ -568,7 +569,7 @@ const useBugReport = () => {
                 parsedError.message &&
                 parsedError.message.includes("GitHub API error"))
             ) {
-              console.warn("Bug report service unavailable, logging locally:", {
+              logger.warn("Bug report service unavailable, logging locally", {
                 ...reportData,
                 screenshot: screenshotData ? "[Screenshot captured]" : null,
                 sessionUrl: sessionUrl || "[No session replay URL available]",
@@ -580,7 +581,7 @@ const useBugReport = () => {
                 parsedError?.message || `Server error: ${response.status}`;
             } else {
               // For other errors, also fallback to local logging instead of throwing
-              console.warn("Bug report submission failed, logging locally:", {
+              logger.warn("Bug report submission failed, logging locally", {
                 ...reportData,
                 screenshot: screenshotData ? "[Screenshot captured]" : null,
                 sessionUrl: sessionUrl || "[No session replay URL available]",
@@ -590,7 +591,7 @@ const useBugReport = () => {
             }
           } else {
             const result = await response.json();
-            console.log("Bug report submitted successfully:", result);
+            logger.info("Bug report submitted successfully", result);
 
             // Store the issue URL for user feedback
             if (result.issueUrl) {
@@ -599,7 +600,7 @@ const useBugReport = () => {
           }
         } else {
           // Fallback: log the report data if no endpoint is configured
-          console.log("No bug report endpoint configured. Report data:", {
+          logger.info("No bug report endpoint configured. Report data:", {
             ...reportData,
             screenshot: screenshotData ? "[Screenshot captured]" : null,
             sessionUrl: sessionUrl || "[No session replay URL available]",
@@ -614,7 +615,7 @@ const useBugReport = () => {
         // Return result data for UI feedback
         return reportData;
       } catch (innerError) {
-        console.error("Error in bug report submission:", innerError);
+        logger.error("Error in bug report submission:", innerError);
         throw innerError; // Re-throw to be caught by the outer handler
       }
     };
@@ -624,11 +625,11 @@ const useBugReport = () => {
       const result = await Promise.race([submissionPromise(), timeoutPromise]);
       return result;
     } catch (error) {
-      console.error("Failed to submit bug report:", error);
+      logger.error("Failed to submit bug report:", error);
 
       // Even on timeout/error, log the report locally
       try {
-        console.warn("Bug report failed, logging locally:", {
+        logger.warn("Bug report failed, logging locally", {
           description: description.trim(),
           screenshot: screenshot ? "[Screenshot available]" : null,
           timestamp: new Date().toISOString(),
@@ -637,7 +638,7 @@ const useBugReport = () => {
           error: error.message,
         });
       } catch (logError) {
-        console.error("Failed to log bug report locally:", logError);
+        logger.error("Failed to log bug report locally:", logError);
       }
 
       return false;
@@ -655,11 +656,11 @@ const useBugReport = () => {
         if (!H.isRecording()) {
           H.start();
           if (import.meta.env.MODE === "development") {
-            console.log("🔧 Started Highlight.io session for bug report");
+            logger.debug("Started Highlight.io session for bug report");
           }
         } else {
           if (import.meta.env.MODE === "development") {
-            console.log("🔧 Highlight.io session already active");
+            logger.debug("Highlight.io session already active");
           }
         }
       } else {
@@ -667,12 +668,12 @@ const useBugReport = () => {
         try {
           H.start();
           if (import.meta.env.MODE === "development") {
-            console.log("🔧 Attempted Highlight.io session start for bug report");
+            logger.debug("Attempted Highlight.io session start for bug report");
           }
         } catch (startError) {
           if (startError.message?.includes("already recording")) {
             if (import.meta.env.MODE === "development") {
-              console.log("🔧 Highlight.io session already active (detected via error)");
+              logger.debug("Highlight.io session already active (detected via error)");
             }
           } else {
             throw startError; // Re-throw unexpected errors
@@ -686,11 +687,11 @@ const useBugReport = () => {
         error.message?.includes("Highlight is already recording")
       ) {
         if (import.meta.env.MODE === "development") {
-          console.log("🔧 Highlight.io session already active (gracefully handled)");
+          logger.debug("Highlight.io session already active (gracefully handled)");
         }
         // This is expected - don't log as error
       } else {
-        console.warn("Failed to start Highlight.io session:", error.message);
+        logger.warn("Failed to start Highlight.io session:", error.message);
         // Don't block the bug report modal from opening due to Highlight issues
       }
     }
@@ -720,15 +721,15 @@ const useBugReport = () => {
           `);
         } else {
           // Popup blocked or failed
-          console.warn("Failed to open screenshot preview - popup may be blocked");
+          logger.warn("Failed to open screenshot preview - popup may be blocked");
           // Could set screenshot to show inline preview instead
           setScreenshot(screenshotData);
         }
       } else {
-        console.warn("Screenshot capture failed during preview");
+        logger.warn("Screenshot capture failed during preview");
       }
     } catch (error) {
-      console.error("Error during screenshot preview:", error);
+      logger.error("Error during screenshot preview:", error);
     }
   };
 

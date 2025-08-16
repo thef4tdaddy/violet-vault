@@ -12,6 +12,8 @@
  * - Yearly: 1 year per year
  */
 
+import logger from "./logger";
+
 // Precise frequency multipliers (periods per year)
 export const FREQUENCY_MULTIPLIERS = {
   weekly: 52.1775, // More precise than 52
@@ -47,7 +49,7 @@ export function convertFrequency(amount, fromFrequency, toFrequency, usePrecise 
   const toMultiplier = multipliers[toFrequency];
 
   if (!fromMultiplier || !toMultiplier) {
-    console.warn(`Unknown frequency: ${fromFrequency} or ${toFrequency}`);
+    logger.warn(`Unknown frequency: ${fromFrequency} or ${toFrequency}`);
     return amount;
   }
 

@@ -3,6 +3,7 @@ import { useMemo, useCallback, useEffect } from "react";
 import { queryKeys, optimisticHelpers } from "../utils/queryClient";
 import { budgetDb } from "../db/budgetDb";
 import { AUTO_CLASSIFY_ENVELOPE_TYPE } from "../constants/categories";
+import logger from "../utils/logger";
 
 /**
  * Specialized hook for envelope management
@@ -17,7 +18,7 @@ const useEnvelopes = (options = {}) => {
 
   // TanStack Query function - hydrates from Dexie, Dexie syncs with Firebase
   const queryFunction = useCallback(async () => {
-    console.log("🔄 TanStack Query: Fetching envelopes from Dexie...");
+    logger.debug("TanStack Query: Fetching envelopes from Dexie");
 
     try {
       let envelopes = [];
@@ -29,7 +30,7 @@ const useEnvelopes = (options = {}) => {
         envelopes = await budgetDb.envelopes.toArray();
       }
 
-      console.log("✅ TanStack Query: Loaded from Dexie:", envelopes.length);
+      logger.debug("TanStack Query: Loaded from Dexie", { count: envelopes.length });
 
       // Ensure all envelopes have envelopeType set for consistency
       envelopes = envelopes.map((envelope) => ({
@@ -72,7 +73,7 @@ const useEnvelopes = (options = {}) => {
 
       return filteredEnvelopes;
     } catch (error) {
-      console.error("❌ TanStack Query: Dexie fetch failed:", error);
+      logger.error("TanStack Query: Dexie fetch failed", error);
       // Return empty array when Dexie fails (no fallback to Zustand)
       return [];
     }
@@ -105,12 +106,12 @@ const useEnvelopes = (options = {}) => {
   // Listen for import completion to force refresh
   useEffect(() => {
     const handleImportCompleted = () => {
-      console.log("🔄 Import detected, invalidating envelopes cache");
+      logger.debug("Import detected, invalidating envelopes cache");
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
     };
 
     const handleInvalidateAll = () => {
-      console.log("🔄 Invalidating all envelope queries");
+      logger.debug("Invalidating all envelope queries");
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
@@ -157,7 +158,7 @@ const useEnvelopes = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
     onError: (error) => {
-      console.error("Failed to add envelope:", error);
+      logger.error("Failed to add envelope:", error);
       // TODO: Implement rollback logic
     },
   });
@@ -182,7 +183,7 @@ const useEnvelopes = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
     onError: (error) => {
-      console.error("Failed to update envelope:", error);
+      logger.error("Failed to update envelope:", error);
       // TODO: Implement rollback logic
     },
   });
@@ -204,7 +205,7 @@ const useEnvelopes = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
     onError: (error) => {
-      console.error("Failed to delete envelope:", error);
+      logger.error("Failed to delete envelope:", error);
       // TODO: Implement rollback logic
     },
   });
@@ -269,7 +270,7 @@ const useEnvelopes = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
     onError: (error) => {
-      console.error("Failed to transfer funds:", error);
+      logger.error("Failed to transfer funds:", error);
       // TODO: Implement rollback logic
     },
   });

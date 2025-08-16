@@ -1,9 +1,10 @@
 import { H } from "highlight.run";
+import logger from "./logger";
 
 export const initHighlight = () => {
   // Only log in development mode
   if (import.meta.env.MODE === "development") {
-    console.log("🔧 Initializing Highlight.io in", import.meta.env.MODE, "mode");
+    logger.debug("Initializing Highlight.io in mode", { mode: import.meta.env.MODE });
   }
 
   H.init(import.meta.env.VITE_HIGHLIGHT_PROJECT_ID || "your-project-id-here", {
@@ -37,7 +38,7 @@ export const initHighlight = () => {
 
   // Only log in development mode
   if (import.meta.env.MODE === "development") {
-    console.log("✅ Highlight.io initialized");
+    logger.debug("Highlight.io initialized");
   }
 
   // Setup console capture for enhanced error tracking (commented out to avoid conflicts)
