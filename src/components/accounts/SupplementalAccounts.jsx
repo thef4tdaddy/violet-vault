@@ -146,11 +146,7 @@ const SupplementalAccounts = ({
   };
 
   const handleTransfer = () => {
-    if (
-      !transferForm.envelopeId ||
-      !transferForm.amount ||
-      transferForm.amount <= 0
-    ) {
+    if (!transferForm.envelopeId || !transferForm.amount || transferForm.amount <= 0) {
       alert("Please select an envelope and enter a valid amount");
       return;
     }
@@ -165,7 +161,7 @@ const SupplementalAccounts = ({
       transferringAccount.id,
       transferForm.envelopeId,
       amount,
-      transferForm.description,
+      transferForm.description
     );
 
     setShowTransferModal(false);
@@ -175,8 +171,7 @@ const SupplementalAccounts = ({
 
   const getAccountTypeInfo = (type) => {
     return (
-      accountTypes.find((t) => t.value === type) ||
-      accountTypes.find((t) => t.value === "Other")
+      accountTypes.find((t) => t.value === type) || accountTypes.find((t) => t.value === "Other")
     );
   };
 
@@ -194,12 +189,9 @@ const SupplementalAccounts = ({
   const getExpirationStatus = (daysUntil) => {
     if (daysUntil === null) return { text: "", color: "text-gray-500" };
     if (daysUntil < 0) return { text: "Expired", color: "text-red-600" };
-    if (daysUntil === 0)
-      return { text: "Expires Today", color: "text-red-600" };
-    if (daysUntil <= 30)
-      return { text: `${daysUntil} days left`, color: "text-orange-600" };
-    if (daysUntil <= 90)
-      return { text: `${daysUntil} days left`, color: "text-yellow-600" };
+    if (daysUntil === 0) return { text: "Expires Today", color: "text-red-600" };
+    if (daysUntil <= 30) return { text: `${daysUntil} days left`, color: "text-orange-600" };
+    if (daysUntil <= 90) return { text: `${daysUntil} days left`, color: "text-yellow-600" };
     return { text: `${daysUntil} days left`, color: "text-green-600" };
   };
 
@@ -227,8 +219,7 @@ const SupplementalAccounts = ({
             Supplemental Accounts
           </h3>
           <p className="text-sm text-gray-700 mt-1 font-medium">
-            Track FSA, HSA, and other non-budget accounts • Total: $
-            {totalValue.toFixed(2)}
+            Track FSA, HSA, and other non-budget accounts • Total: ${totalValue.toFixed(2)}
           </p>
         </div>
 
@@ -238,11 +229,7 @@ const SupplementalAccounts = ({
             className="p-2 text-gray-600 hover:text-cyan-600 rounded-lg hover:bg-cyan-50"
             title={showBalances ? "Hide balances" : "Show balances"}
           >
-            {showBalances ? (
-              <Eye className="h-4 w-4" />
-            ) : (
-              <EyeOff className="h-4 w-4" />
-            )}
+            {showBalances ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
           </button>
           <button
             onClick={() => setShowAddModal(true)}
@@ -266,9 +253,7 @@ const SupplementalAccounts = ({
               </p>
               <div className="text-xs text-orange-700 mt-1">
                 {expiringAccounts.map((account) => {
-                  const days = calculateDaysUntilExpiration(
-                    account.expirationDate,
-                  );
+                  const days = calculateDaysUntilExpiration(account.expirationDate);
                   return (
                     <span key={account.id} className="mr-3">
                       {account.name}: {days === 0 ? "Today" : `${days} days`}
@@ -291,9 +276,7 @@ const SupplementalAccounts = ({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {supplementalAccounts.map((account) => {
             const typeInfo = getAccountTypeInfo(account.type);
-            const daysUntilExpiration = calculateDaysUntilExpiration(
-              account.expirationDate,
-            );
+            const daysUntilExpiration = calculateDaysUntilExpiration(account.expirationDate);
             const expirationStatus = getExpirationStatus(daysUntilExpiration);
 
             return (
@@ -308,9 +291,7 @@ const SupplementalAccounts = ({
                       style={{ backgroundColor: account.color }}
                     />
                     <div>
-                      <h4 className="font-medium text-gray-900 text-sm">
-                        {account.name}
-                      </h4>
+                      <h4 className="font-medium text-gray-900 text-sm">{account.name}</h4>
                       <p className="text-xs text-gray-600">
                         {typeInfo.icon} {typeInfo.label}
                       </p>
@@ -340,25 +321,17 @@ const SupplementalAccounts = ({
 
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-600">
-                      Current Balance:
-                    </span>
+                    <span className="text-xs text-gray-600">Current Balance:</span>
                     <span className="font-bold text-gray-900">
-                      {showBalances
-                        ? `$${account.currentBalance.toFixed(2)}`
-                        : "••••"}
+                      {showBalances ? `$${account.currentBalance.toFixed(2)}` : "••••"}
                     </span>
                   </div>
 
                   {account.annualContribution > 0 && (
                     <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-600">
-                        Annual Contribution:
-                      </span>
+                      <span className="text-xs text-gray-600">Annual Contribution:</span>
                       <span className="text-xs text-gray-700">
-                        {showBalances
-                          ? `$${account.annualContribution.toFixed(2)}`
-                          : "••••"}
+                        {showBalances ? `$${account.annualContribution.toFixed(2)}` : "••••"}
                       </span>
                     </div>
                   )}
@@ -366,9 +339,7 @@ const SupplementalAccounts = ({
                   {account.expirationDate && (
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-gray-600">Expires:</span>
-                      <span
-                        className={`text-xs font-medium ${expirationStatus.color}`}
-                      >
+                      <span className={`text-xs font-medium ${expirationStatus.color}`}>
                         {expirationStatus.text}
                       </span>
                     </div>
@@ -376,9 +347,7 @@ const SupplementalAccounts = ({
                 </div>
 
                 {account.description && (
-                  <p className="text-xs text-gray-500 mt-2 italic">
-                    {account.description}
-                  </p>
+                  <p className="text-xs text-gray-500 mt-2 italic">{account.description}</p>
                 )}
 
                 {/* Transfer Button */}
@@ -395,8 +364,7 @@ const SupplementalAccounts = ({
                 )}
 
                 <div className="mt-2 text-xs text-gray-500">
-                  Last updated:{" "}
-                  {new Date(account.lastUpdated).toLocaleDateString()}
+                  Last updated: {new Date(account.lastUpdated).toLocaleDateString()}
                 </div>
               </div>
             );
@@ -432,9 +400,7 @@ const SupplementalAccounts = ({
                 <input
                   type="text"
                   value={accountForm.name}
-                  onChange={(e) =>
-                    setAccountForm({ ...accountForm, name: e.target.value })
-                  }
+                  onChange={(e) => setAccountForm({ ...accountForm, name: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500"
                   placeholder="e.g., Health FSA 2024"
                   required
@@ -447,9 +413,7 @@ const SupplementalAccounts = ({
                 </label>
                 <select
                   value={accountForm.type}
-                  onChange={(e) =>
-                    setAccountForm({ ...accountForm, type: e.target.value })
-                  }
+                  onChange={(e) => setAccountForm({ ...accountForm, type: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500"
                 >
                   {accountTypes.map((type) => (
@@ -519,9 +483,7 @@ const SupplementalAccounts = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Color
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
                 <div className="flex gap-2 flex-wrap">
                   {colors.map((color) => (
                     <button
@@ -570,10 +532,7 @@ const SupplementalAccounts = ({
                   }
                   className="h-4 w-4 text-cyan-600 focus:ring-cyan-500 border-gray-300 rounded"
                 />
-                <label
-                  htmlFor="isActive"
-                  className="ml-2 block text-sm text-gray-900"
-                >
+                <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900">
                   Account is active
                 </label>
               </div>
@@ -590,10 +549,7 @@ const SupplementalAccounts = ({
               >
                 Cancel
               </button>
-              <button
-                onClick={handleAddAccount}
-                className="flex-1 btn btn-primary"
-              >
+              <button onClick={handleAddAccount} className="flex-1 btn btn-primary">
                 {editingAccount ? "Update Account" : "Add Account"}
               </button>
             </div>
@@ -606,9 +562,7 @@ const SupplementalAccounts = ({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-md">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-semibold">
-                Transfer from {transferringAccount.name}
-              </h3>
+              <h3 className="text-lg font-semibold">Transfer from {transferringAccount.name}</h3>
               <button
                 onClick={() => {
                   setShowTransferModal(false);
@@ -661,17 +615,13 @@ const SupplementalAccounts = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Amount *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Amount *</label>
                 <input
                   type="number"
                   step="0.01"
                   max={transferringAccount.currentBalance}
                   value={transferForm.amount}
-                  onChange={(e) =>
-                    setTransferForm({ ...transferForm, amount: e.target.value })
-                  }
+                  onChange={(e) => setTransferForm({ ...transferForm, amount: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500"
                   placeholder="0.00"
                   required
@@ -679,9 +629,7 @@ const SupplementalAccounts = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
                 <input
                   type="text"
                   value={transferForm.description}
@@ -712,10 +660,7 @@ const SupplementalAccounts = ({
               >
                 Cancel
               </button>
-              <button
-                onClick={handleTransfer}
-                className="flex-1 btn btn-primary"
-              >
+              <button onClick={handleTransfer} className="flex-1 btn btn-primary">
                 Transfer ${transferForm.amount || "0.00"}
               </button>
             </div>

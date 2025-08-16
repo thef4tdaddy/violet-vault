@@ -62,7 +62,7 @@ class ChunkedFirebaseSync {
               const userCredential = await signInAnonymously(auth);
               console.log(
                 "✅ Anonymous Firebase authentication successful:",
-                userCredential.user.uid,
+                userCredential.user.uid
               );
               this.isAuthenticated = true;
               unsubscribe();
@@ -74,17 +74,14 @@ class ChunkedFirebaseSync {
             // Handle specific auth configuration errors
             if (error.code === "auth/configuration-not-found") {
               console.warn("🔧 Firebase Auth configuration issue detected:", {
-                message:
-                  "Anonymous authentication may not be enabled in Firebase Console",
+                message: "Anonymous authentication may not be enabled in Firebase Console",
                 solution:
                   "Enable Anonymous Authentication in Firebase Console > Authentication > Sign-in method",
                 projectId: this.config?.projectId || "unknown",
               });
 
               // Don't fail completely - allow app to work in local-only mode
-              console.log(
-                "📱 Continuing in local-only mode without cloud sync",
-              );
+              console.log("📱 Continuing in local-only mode without cloud sync");
               this.isAuthenticated = false;
               unsubscribe();
               resolve(false); // Resolve with false instead of rejecting
@@ -95,7 +92,7 @@ class ChunkedFirebaseSync {
             reject(error);
           }
         },
-        reject,
+        reject
       );
     });
 
@@ -142,12 +139,10 @@ class ChunkedFirebaseSync {
     // We need to be extremely conservative: raw data -> JSON -> encryption -> final doc structure
     const FIREBASE_MAX_SIZE = 1048576; // Firebase's actual 1MB limit
     const encryptionOverheadMultiplier = 12.0; // Extremely aggressive - real overhead is 10x+
-    const effectiveMaxSize = Math.floor(
-      FIREBASE_MAX_SIZE / encryptionOverheadMultiplier,
-    );
+    const effectiveMaxSize = Math.floor(FIREBASE_MAX_SIZE / encryptionOverheadMultiplier);
 
     console.log(
-      `🔧 Chunking ${arrayName} with effectiveMaxSize: ${Math.round(effectiveMaxSize / 1024)}KB (${effectiveMaxSize} bytes)`,
+      `🔧 Chunking ${arrayName} with effectiveMaxSize: ${Math.round(effectiveMaxSize / 1024)}KB (${effectiveMaxSize} bytes)`
     );
 
     for (const item of array) {
@@ -176,7 +171,7 @@ class ChunkedFirebaseSync {
       // Safety check: if current chunk is getting too big, force a split
       if (currentSize > effectiveMaxSize * 0.9 && currentChunk.length > 1) {
         console.warn(
-          `🚨 Force splitting ${arrayName} chunk with ${currentChunk.length} items (${Math.round(currentSize / 1024)}KB)`,
+          `🚨 Force splitting ${arrayName} chunk with ${currentChunk.length} items (${Math.round(currentSize / 1024)}KB)`
         );
         chunks.push([...currentChunk]);
         currentChunk = [];
@@ -217,10 +212,7 @@ class ChunkedFirebaseSync {
       lastModified: Date.now(),
       chunkMap,
       metadata: {
-        totalDocuments: Object.values(chunkMap).reduce(
-          (sum, chunks) => sum + chunks.length,
-          0,
-        ),
+        totalDocuments: Object.values(chunkMap).reduce((sum, chunks) => sum + chunks.length, 0),
         createdAt: metadata.createdAt || new Date().toISOString(),
         ...metadata,
       },
@@ -274,13 +266,7 @@ class ChunkedFirebaseSync {
       const chunkMap = {};
 
       // Arrays that need to be chunked
-      const arrayFields = [
-        "transactions",
-        "envelopes",
-        "bills",
-        "savingsGoals",
-        "paycheckHistory",
-      ];
+      const arrayFields = ["transactions", "envelopes", "bills", "savingsGoals", "paycheckHistory"];
 
       // Process each array field
       for (const fieldName of arrayFields) {
@@ -312,7 +298,7 @@ class ChunkedFirebaseSync {
           // Encrypt the chunk data
           const encryptedChunk = await encryptionUtils.encrypt(
             JSON.stringify(chunkData),
-            this.encryptionKey,
+            this.encryptionKey
           );
 
           const chunkDoc = {
@@ -356,14 +342,14 @@ class ChunkedFirebaseSync {
               }
 
               console.log(
-                `📦 Re-chunked ${fieldName}[${i}]: split into ${firstHalf.length} + ${secondHalf.length} items`,
+                `📦 Re-chunked ${fieldName}[${i}]: split into ${firstHalf.length} + ${secondHalf.length} items`
               );
               i--; // Retry this index with the new smaller chunk
               continue;
             } else {
               // Single item is too large - this is a critical error
               throw new Error(
-                `Single item in ${fieldName} is too large to store (${Math.round(chunkSize / 1024)}KB). Consider reducing data size.`,
+                `Single item in ${fieldName} is too large to store (${Math.round(chunkSize / 1024)}KB). Consider reducing data size.`
               );
             }
           }
@@ -392,7 +378,7 @@ class ChunkedFirebaseSync {
       // Encrypt manifest
       const encryptedManifest = await encryptionUtils.encrypt(
         JSON.stringify(manifest),
-        this.encryptionKey,
+        this.encryptionKey
       );
 
       const manifestDoc = doc(db, "budgets", this.budgetId);
@@ -400,24 +386,17 @@ class ChunkedFirebaseSync {
         type: "budget_manifest",
         encryptedData: encryptedManifest,
         lastModified: Date.now(),
-        chunkCount: Object.values(chunkMap).reduce(
-          (sum, chunks) => sum + chunks.length,
-          0,
-        ),
+        chunkCount: Object.values(chunkMap).reduce((sum, chunks) => sum + chunks.length, 0),
       });
 
       // Execute the batch write atomically
       console.log(
-        `🔄 Committing ${Object.values(chunkMap).reduce((sum, chunks) => sum + chunks.length, 0) + 1} documents atomically...`,
+        `🔄 Committing ${Object.values(chunkMap).reduce((sum, chunks) => sum + chunks.length, 0) + 1} documents atomically...`
       );
       await batch.commit();
 
       const duration = Date.now() - startTime;
-      const totalDocs =
-        Object.values(chunkMap).reduce(
-          (sum, chunks) => sum + chunks.length,
-          0,
-        ) + 1;
+      const totalDocs = Object.values(chunkMap).reduce((sum, chunks) => sum + chunks.length, 0) + 1;
 
       console.log("✅ Chunked save completed", {
         duration: `${duration}ms`,
@@ -430,7 +409,7 @@ class ChunkedFirebaseSync {
         duration,
         totalDocuments: totalDocs,
         chunkBreakdown: Object.fromEntries(
-          Object.entries(chunkMap).map(([key, chunks]) => [key, chunks.length]),
+          Object.entries(chunkMap).map(([key, chunks]) => [key, chunks.length])
         ),
       });
     } catch (error) {
@@ -460,13 +439,30 @@ class ChunkedFirebaseSync {
     try {
       console.log("🌩️ Starting chunked load from cloud...");
 
-      // Debug current auth state
+      // Debug current auth state and encryption key for cross-browser sync troubleshooting
       const currentUser = auth.currentUser;
+      let encryptionKeyDebug = "none";
+      if (this.encryptionKey) {
+        try {
+          // Get first 16 bytes of encryption key as hex for debugging (safe to log)
+          const keyView = new Uint8Array(this.encryptionKey);
+          encryptionKeyDebug =
+            Array.from(keyView.slice(0, 16))
+              .map((b) => b.toString(16).padStart(2, "0"))
+              .join("")
+              .slice(0, 16) + "...";
+        } catch (error) {
+          encryptionKeyDebug = "error";
+        }
+      }
+
       console.log("🔍 Current Firebase Auth state:", {
         isSignedIn: !!currentUser,
         uid: currentUser?.uid,
         isAnonymous: currentUser?.isAnonymous,
         providerId: currentUser?.providerId,
+        budgetId: this.budgetId?.slice(0, 8) || "none",
+        encryptionKeyPreview: encryptionKeyDebug,
       });
 
       const startTime = Date.now();
@@ -481,10 +477,7 @@ class ChunkedFirebaseSync {
       let manifestDoc;
       try {
         manifestDoc = await getDoc(doc(db, "budgets", this.budgetId));
-        console.log(
-          "📄 Firebase getDoc completed, exists:",
-          manifestDoc.exists(),
-        );
+        console.log("📄 Firebase getDoc completed, exists:", manifestDoc.exists());
       } catch (firestoreError) {
         logger.error("Firestore getDoc failed", firestoreError, {
           budgetId: this.budgetId,
@@ -494,7 +487,7 @@ class ChunkedFirebaseSync {
           source: "chunkedFirebaseSync.loadFromCloud",
         });
         throw new Error(
-          `Firestore read failed: ${firestoreError.code} - ${firestoreError.message}`,
+          `Firestore read failed: ${firestoreError.code} - ${firestoreError.message}`
         );
       }
 
@@ -507,18 +500,12 @@ class ChunkedFirebaseSync {
       const manifestData = manifestDoc.data();
 
       // Validate manifest encrypted data exists and has sufficient length
-      if (
-        !manifestData.encryptedData ||
-        manifestData.encryptedData.length < 32
-      ) {
-        console.error(
-          `🔍 Corrupted manifest detected - triggering automatic cleanup`,
-          {
-            hasEncryptedData: !!manifestData.encryptedData,
-            encryptedDataSize: manifestData.encryptedData?.length || 0,
-            manifestKeys: Object.keys(manifestData),
-          },
-        );
+      if (!manifestData.encryptedData || manifestData.encryptedData.length < 32) {
+        console.error(`🔍 Corrupted manifest detected - triggering automatic cleanup`, {
+          hasEncryptedData: !!manifestData.encryptedData,
+          encryptedDataSize: manifestData.encryptedData?.length || 0,
+          manifestKeys: Object.keys(manifestData),
+        });
 
         // Automatically clean up corrupted manifest
         console.log("🔧 Attempting automatic cleanup of corrupted manifest...");
@@ -528,22 +515,16 @@ class ChunkedFirebaseSync {
           // Return null to indicate no data available (will trigger fresh upload if local data exists)
           return { data: null, recovered: true };
         } catch (cleanupError) {
-          console.error(
-            "❌ Failed to cleanup corrupted manifest:",
-            cleanupError,
-          );
+          console.error("❌ Failed to cleanup corrupted manifest:", cleanupError);
         }
 
         throw new Error(
-          `Invalid or corrupted manifest data (size: ${manifestData.encryptedData?.length || 0})`,
+          `Invalid or corrupted manifest data (size: ${manifestData.encryptedData?.length || 0})`
         );
       }
 
       const decryptedManifest = JSON.parse(
-        await encryptionUtils.decrypt(
-          manifestData.encryptedData,
-          this.encryptionKey,
-        ),
+        await encryptionUtils.decrypt(manifestData.encryptedData, this.encryptionKey)
       );
 
       if (decryptedManifest.type !== "budget_manifest") {
@@ -566,30 +547,22 @@ class ChunkedFirebaseSync {
 
         // Load all chunks for this field
         for (const chunkId of chunkIds) {
-          const chunkDoc = await getDoc(
-            doc(db, "budgets", this.budgetId, "chunks", chunkId),
-          );
+          const chunkDoc = await getDoc(doc(db, "budgets", this.budgetId, "chunks", chunkId));
 
           if (chunkDoc.exists()) {
             const encryptedChunk = chunkDoc.data();
 
             // Validate encrypted data exists and has sufficient length
-            if (
-              !encryptedChunk.encryptedData ||
-              encryptedChunk.encryptedData.length < 32
-            ) {
+            if (!encryptedChunk.encryptedData || encryptedChunk.encryptedData.length < 32) {
               console.warn(
-                `⚠️ Invalid or corrupted chunk data: ${chunkId} (size: ${encryptedChunk.encryptedData?.length || 0})`,
+                `⚠️ Invalid or corrupted chunk data: ${chunkId} (size: ${encryptedChunk.encryptedData?.length || 0})`
               );
               continue;
             }
 
             try {
               const decryptedChunk = JSON.parse(
-                await encryptionUtils.decrypt(
-                  encryptedChunk.encryptedData,
-                  this.encryptionKey,
-                ),
+                await encryptionUtils.decrypt(encryptedChunk.encryptedData, this.encryptionKey)
               );
 
               chunks.push({
@@ -597,10 +570,7 @@ class ChunkedFirebaseSync {
                 data: decryptedChunk.data,
               });
             } catch (decryptError) {
-              console.warn(
-                `⚠️ Failed to decrypt chunk: ${chunkId}`,
-                decryptError.message,
-              );
+              console.warn(`⚠️ Failed to decrypt chunk: ${chunkId}`, decryptError.message);
               // Skip corrupted chunks rather than failing the entire operation
               continue;
             }
@@ -626,30 +596,21 @@ class ChunkedFirebaseSync {
       return { data: reconstructedData };
     } catch (error) {
       console.error("❌ Chunked load failed:", error);
-      console.error(
-        "⚠️ ⚠️ Failed to fetch chunked Firestore data",
-        error.message,
-      );
+      console.error("⚠️ ⚠️ Failed to fetch chunked Firestore data", error.message);
 
       // Provide more specific error context and auto-recovery
       if (
         error.message.includes("provided data is too small") ||
         error.message.includes("too small") ||
-        error.message.includes(
-          "operation failed for an operation-specific reason",
-        )
+        error.message.includes("operation failed for an operation-specific reason")
       ) {
         console.error(
-          "🔍 This error typically occurs when trying to decrypt corrupted or incomplete data chunks.",
+          "🔍 This error typically occurs when trying to decrypt corrupted or incomplete data chunks."
         );
-        console.error(
-          "💡 The chunks may have been partially written or corrupted during upload.",
-        );
+        console.error("💡 The chunks may have been partially written or corrupted during upload.");
 
         // Automatically clean up corrupted data to allow fresh sync
-        console.log(
-          "🔧 Attempting automatic cleanup of corrupted cloud data...",
-        );
+        console.log("🔧 Attempting automatic cleanup of corrupted cloud data...");
         try {
           await this.resetCloudData();
           console.log("✅ Corrupted cloud data cleaned up successfully");
@@ -664,9 +625,7 @@ class ChunkedFirebaseSync {
         metadata: {
           budgetId: this.budgetId,
           operation: "chunked_load",
-          errorType: error.message.includes("too small")
-            ? "data_too_small"
-            : "unknown",
+          errorType: error.message.includes("too small") ? "data_too_small" : "unknown",
         },
       });
       throw error;
@@ -702,7 +661,7 @@ class ChunkedFirebaseSync {
       // Delete all existing chunks
       const chunksQuery = query(
         collection(db, "budgets", this.budgetId, "chunks"),
-        where("budgetId", "==", this.budgetId),
+        where("budgetId", "==", this.budgetId)
       );
 
       const chunksSnapshot = await getDocs(chunksQuery);
@@ -714,9 +673,7 @@ class ChunkedFirebaseSync {
 
       if (chunksSnapshot.docs.length > 0) {
         await batch.commit();
-        console.log(
-          `🗑️ Deleted ${chunksSnapshot.docs.length} old chunk documents`,
-        );
+        console.log(`🗑️ Deleted ${chunksSnapshot.docs.length} old chunk documents`);
       }
 
       console.log("✅ Cloud data reset completed");

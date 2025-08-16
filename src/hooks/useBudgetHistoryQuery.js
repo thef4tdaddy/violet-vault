@@ -36,7 +36,7 @@ export const useBudgetCommits = (options = {}) => {
       const hash = await budgetHistory.generateCommitHash(commitData);
       const encryptedSnapshot = await budgetHistory.encryptSnapshot(
         commitData.snapshot,
-        commitData.password,
+        commitData.password
       );
 
       const commit = {
@@ -140,10 +140,7 @@ export const useBudgetHistoryOperations = () => {
       }
 
       // Decrypt and restore the snapshot
-      const snapshot = await budgetHistory.decryptSnapshot(
-        commit.encryptedSnapshot,
-        password,
-      );
+      const snapshot = await budgetHistory.decryptSnapshot(commit.encryptedSnapshot, password);
 
       // Restore all data to the snapshot state
       await budgetHistory.restoreFromSnapshot(snapshot);
