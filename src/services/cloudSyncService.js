@@ -666,6 +666,13 @@ class CloudSyncService {
       lastSyncedCommit: this.lastSyncedCommitHash?.slice(0, 8) || null,
     };
   }
+
+  /**
+   * Check if service is running (getter to avoid this.isRunning conflict)
+   */
+  get serviceIsRunning() {
+    return this.isRunning;
+  }
 }
 
 // Export singleton instance

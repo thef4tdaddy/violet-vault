@@ -58,6 +58,7 @@ const SettingsDashboard = ({
 
   // Cloud sync state
   const { cloudSyncEnabled, setCloudSyncEnabled } = useBudgetStore();
+  const [isSyncing, setIsSyncing] = useState(false);
 
   if (!isOpen) return null;
 
@@ -98,6 +99,54 @@ const SettingsDashboard = ({
       } catch (error) {
         console.error("Failed to stop cloud sync:", error);
       }
+    }
+  };
+
+  const handleManualSync = async () => {
+    if (!cloudSyncEnabled || isSyncing) return;
+
+    setIsSyncing(true);
+    try {
+      console.log("🔄 Manual sync triggered from settings");
+      const { default: CloudSyncService } = await import(
+        "../../services/cloudSyncService"
+      );
+
+      if (!CloudSyncService.serviceIsRunning) {
+        console.log(
+          "⚠️ Cloud sync service not running, starting temporarily...",
+        );
+        const { useAuth } = await import("../../stores/authStore");
+        const authState = useAuth.getState();
+
+        if (
+          authState.encryptionKey &&
+          authState.currentUser &&
+          authState.budgetId
+        ) {
+          CloudSyncService.start({
+            encryptionKey: authState.encryptionKey,
+            currentUser: authState.currentUser,
+            budgetId: authState.budgetId,
+          });
+        } else {
+          throw new Error("Missing authentication context for sync");
+        }
+      }
+
+      const result = await CloudSyncService.forceSync();
+
+      if (result.success) {
+        console.log("✅ Manual sync completed", result);
+        // TODO: Could add a success toast notification here
+      } else {
+        console.error("❌ Manual sync failed", result.error);
+        // TODO: Could add an error toast notification here
+      }
+    } catch (error) {
+      console.error("❌ Manual sync failed:", error);
+    } finally {
+      setIsSyncing(false);
     }
   };
 
@@ -165,6 +214,21 @@ const SettingsDashboard = ({
                     />
                   </button>
                 </div>
+
+                {cloudSyncEnabled && (
+                  <div className="pt-2">
+                    <button
+                      onClick={handleManualSync}
+                      disabled={isSyncing}
+                      className="flex items-center px-3 py-2 text-sm border border-purple-200 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <RefreshCw
+                        className={`h-4 w-4 mr-2 ${isSyncing ? "animate-spin" : ""}`}
+                      />
+                      {isSyncing ? "Syncing..." : "Sync Now"}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
