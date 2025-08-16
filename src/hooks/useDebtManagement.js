@@ -11,6 +11,7 @@ import {
   calculateDebtStats,
   AUTO_CLASSIFY_DEBT_TYPE,
 } from "../constants/debts";
+import logger from "../utils/logger.js";
 
 /**
  * Business logic hook for debt management
@@ -146,10 +147,11 @@ export const useDebtManagement = () => {
       };
 
       addBill(billData);
-      console.log("💳 Created automatic bill for debt:", {
+      logger.info("Created automatic bill for debt", {
         debtId: newDebt.id,
         billName: billData.name,
         envelopeId: billData.envelopeId,
+        source: "useDebtManagement.createDebt"
       });
     }
 
