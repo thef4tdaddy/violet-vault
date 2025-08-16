@@ -29,7 +29,9 @@ const useSavingsGoals = (options = {}) => {
       // Always fetch from Dexie (single source of truth for local data)
       goals = await budgetDb.savingsGoals.toArray();
 
-      logger.debug("TanStack Query: Loaded from Dexie", { count: goals.length });
+      logger.debug("TanStack Query: Loaded from Dexie", {
+        count: goals.length,
+      });
     } catch (error) {
       logger.error("TanStack Query: Dexie fetch failed", error);
       // Return empty array when Dexie fails (no fallback to Zustand)
@@ -44,7 +46,8 @@ const useSavingsGoals = (options = {}) => {
       const targetDate = goal.targetDate ? new Date(goal.targetDate) : null;
 
       // Progress calculations
-      const progressRate = targetAmount > 0 ? (currentAmount / targetAmount) * 100 : 0;
+      const progressRate =
+        targetAmount > 0 ? (currentAmount / targetAmount) * 100 : 0;
       const remainingAmount = Math.max(0, targetAmount - currentAmount);
       const isCompleted = currentAmount >= targetAmount;
 
@@ -82,7 +85,8 @@ const useSavingsGoals = (options = {}) => {
         daysRemaining,
         isOverdue,
         timelineStatus,
-        suggestedMonthlyContribution: Math.round(suggestedMonthlyContribution * 100) / 100,
+        suggestedMonthlyContribution:
+          Math.round(suggestedMonthlyContribution * 100) / 100,
 
         // Goal category/priority
         priority: goal.priority || "medium",
@@ -95,7 +99,9 @@ const useSavingsGoals = (options = {}) => {
 
     switch (status) {
       case "active":
-        filteredGoals = filteredGoals.filter((goal) => !goal.isCompleted && !goal.isPaused);
+        filteredGoals = filteredGoals.filter(
+          (goal) => !goal.isCompleted && !goal.isPaused,
+        );
         break;
       case "completed":
         filteredGoals = filteredGoals.filter((goal) => goal.isCompleted);
@@ -107,7 +113,9 @@ const useSavingsGoals = (options = {}) => {
         filteredGoals = filteredGoals.filter((goal) => goal.isOverdue);
         break;
       case "urgent":
-        filteredGoals = filteredGoals.filter((goal) => goal.timelineStatus === "urgent");
+        filteredGoals = filteredGoals.filter(
+          (goal) => goal.timelineStatus === "urgent",
+        );
         break;
       default:
         if (!includeCompleted) {
@@ -127,7 +135,11 @@ const useSavingsGoals = (options = {}) => {
       }
 
       // Handle numeric fields
-      if (sortBy === "targetAmount" || sortBy === "currentAmount" || sortBy === "progressRate") {
+      if (
+        sortBy === "targetAmount" ||
+        sortBy === "currentAmount" ||
+        sortBy === "progressRate"
+      ) {
         aVal = parseFloat(aVal) || 0;
         bVal = parseFloat(bVal) || 0;
       }
@@ -318,23 +330,38 @@ const useSavingsGoals = (options = {}) => {
 
   const analytics = {
     totalGoals: goals.length,
-    activeGoals: goals.filter((goal) => !goal.isCompleted && !goal.isPaused).length,
+    activeGoals: goals.filter((goal) => !goal.isCompleted && !goal.isPaused)
+      .length,
     completedGoals: goals.filter((goal) => goal.isCompleted).length,
     pausedGoals: goals.filter((goal) => goal.isPaused).length,
     overdueGoals: goals.filter((goal) => goal.isOverdue).length,
-    urgentGoals: goals.filter((goal) => goal.timelineStatus === "urgent").length,
+    urgentGoals: goals.filter((goal) => goal.timelineStatus === "urgent")
+      .length,
 
     // Amount calculations
-    totalTargetAmount: goals.reduce((sum, goal) => sum + (goal.targetAmount || 0), 0),
-    totalCurrentAmount: goals.reduce((sum, goal) => sum + (goal.currentAmount || 0), 0),
-    totalRemainingAmount: goals.reduce((sum, goal) => sum + (goal.remainingAmount || 0), 0),
+    totalTargetAmount: goals.reduce(
+      (sum, goal) => sum + (goal.targetAmount || 0),
+      0,
+    ),
+    totalCurrentAmount: goals.reduce(
+      (sum, goal) => sum + (goal.currentAmount || 0),
+      0,
+    ),
+    totalRemainingAmount: goals.reduce(
+      (sum, goal) => sum + (goal.remainingAmount || 0),
+      0,
+    ),
 
     // Progress calculations
     overallProgressRate:
-      goals.length > 0 ? goals.reduce((sum, goal) => sum + goal.progressRate, 0) / goals.length : 0,
+      goals.length > 0
+        ? goals.reduce((sum, goal) => sum + goal.progressRate, 0) / goals.length
+        : 0,
 
     completionRate:
-      goals.length > 0 ? (goals.filter((goal) => goal.isCompleted).length / goals.length) * 100 : 0,
+      goals.length > 0
+        ? (goals.filter((goal) => goal.isCompleted).length / goals.length) * 100
+        : 0,
 
     // Priority breakdown
     priorityBreakdown: goals.reduce((acc, goal) => {
@@ -365,7 +392,10 @@ const useSavingsGoals = (options = {}) => {
     upcomingDeadlines: goals
       .filter(
         (goal) =>
-          goal.targetDate && goal.daysRemaining && goal.daysRemaining <= 30 && !goal.isCompleted
+          goal.targetDate &&
+          goal.daysRemaining &&
+          goal.daysRemaining <= 30 &&
+          !goal.isCompleted,
       )
       .sort((a, b) => (a.daysRemaining || 0) - (b.daysRemaining || 0)),
 
@@ -377,9 +407,11 @@ const useSavingsGoals = (options = {}) => {
   // Utility functions
   const getGoalById = (id) => goals.find((goal) => goal.id === id);
 
-  const getGoalsByCategory = (category) => goals.filter((goal) => goal.category === category);
+  const getGoalsByCategory = (category) =>
+    goals.filter((goal) => goal.category === category);
 
-  const getGoalsByPriority = (priority) => goals.filter((goal) => goal.priority === priority);
+  const getGoalsByPriority = (priority) =>
+    goals.filter((goal) => goal.priority === priority);
 
   const getGoalsByStatus = (goalStatus) => {
     switch (goalStatus) {
@@ -405,7 +437,9 @@ const useSavingsGoals = (options = {}) => {
 
   // Strategic planning helpers
   const getOptimalContributionPlan = () => {
-    const activeGoals = goals.filter((goal) => !goal.isCompleted && !goal.isPaused);
+    const activeGoals = goals.filter(
+      (goal) => !goal.isCompleted && !goal.isPaused,
+    );
 
     // Sort by deadline urgency and priority
     const prioritizedGoals = activeGoals.sort((a, b) => {
@@ -493,7 +527,8 @@ const useSavingsGoals = (options = {}) => {
 
     // Query controls
     refetch: savingsGoalsQuery.refetch,
-    invalidate: () => queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals }),
+    invalidate: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals }),
   };
 };
 

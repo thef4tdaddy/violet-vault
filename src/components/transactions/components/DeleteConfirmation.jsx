@@ -4,7 +4,12 @@ import { AlertTriangle } from "lucide-react";
 /**
  * Inline delete confirmation component
  */
-const DeleteConfirmation = ({ transaction, onConfirm, onCancel, virtualRow }) => {
+const DeleteConfirmation = ({
+  transaction,
+  onConfirm,
+  onCancel,
+  virtualRow,
+}) => {
   return (
     <tr
       className="bg-red-50 border border-red-200"
@@ -20,7 +25,9 @@ const DeleteConfirmation = ({ transaction, onConfirm, onCancel, virtualRow }) =>
         <div className="flex items-center justify-between">
           <div className="flex items-center text-red-700">
             <AlertTriangle className="h-5 w-5 mr-2 flex-shrink-0" />
-            <span className="font-medium">Delete "{transaction.description}"?</span>
+            <span className="font-medium">
+              Delete "{transaction.description}"?
+            </span>
           </div>
           <div className="flex gap-2 flex-shrink-0">
             <button
