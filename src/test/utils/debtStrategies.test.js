@@ -34,15 +34,15 @@ describe("Debt Strategy Calculations", () => {
       const result = calculateDebtAvalanche(mockDebts, 300);
 
       expect(result).toBeDefined();
-      expect(result.paymentPlan).toBeDefined();
+      expect(result.payoffOrder).toBeDefined();
       expect(result.summary).toBeDefined();
-      expect(result.paymentPlan[0].priorityOrder).toBe(1); // Credit Card B should be first (24.9%)
+      expect(result.payoffOrder[0].debtId).toBe("2"); // Credit Card B should be first (24.9%)
     });
 
     it("should handle zero extra payment", () => {
       const result = calculateDebtAvalanche(mockDebts, 0);
       expect(result).toBeDefined();
-      expect(result.summary.totalInterestPaid).toBeGreaterThan(0);
+      expect(result.totalInterest).toBeGreaterThan(0);
     });
   });
 
@@ -51,9 +51,9 @@ describe("Debt Strategy Calculations", () => {
       const result = calculateDebtSnowball(mockDebts, 300);
 
       expect(result).toBeDefined();
-      expect(result.paymentPlan).toBeDefined();
+      expect(result.payoffOrder).toBeDefined();
       expect(result.summary).toBeDefined();
-      expect(result.paymentPlan[0].priorityOrder).toBe(1); // Credit Card B should be first ($3,000)
+      expect(result.payoffOrder[0].debtId).toBe("2"); // Credit Card B should be first ($3,000)
     });
   });
 });
