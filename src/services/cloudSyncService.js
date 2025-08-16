@@ -150,6 +150,33 @@ class CloudSyncService {
         bills: dexieData.bills?.length || 0,
       });
 
+      // CRITICAL: If we have forceSync but no local data, wait and retry
+      if (chunkedFirestoreData?.forceSync && dexieItemCount === 0) {
+        logger.warn(
+          "🔄 ForceSync triggered but no local data found - waiting 1s for data to load...",
+        );
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        // Retry fetching local data
+        const retryDexieData = await this.fetchDexieData();
+        const retryItemCount =
+          (retryDexieData.envelopes?.length || 0) +
+          (retryDexieData.transactions?.length || 0) +
+          (retryDexieData.bills?.length || 0);
+
+        logger.debug("🔄 Retry fetch results", {
+          originalItemCount: dexieItemCount,
+          retryItemCount,
+          foundData: retryItemCount > 0,
+        });
+
+        if (retryItemCount > 0) {
+          // Use the retry data instead
+          Object.assign(dexieData, retryDexieData);
+          logger.info("✅ Local data found on retry - proceeding with sync");
+        }
+      }
+
       // Step 2: Check for old format data if chunked data not found
       let firestoreData = chunkedFirestoreData;
       let needsMigration = false;
