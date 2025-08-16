@@ -176,9 +176,9 @@ class ChunkedFirebaseSync {
         // Remove the last item before pushing the chunk
         const lastItem = currentChunk.pop();
         const lastItemSize = this.calculateSize(lastItem);
-        
+
         chunks.push([...currentChunk]);
-        
+
         // Start new chunk with the item that caused the split
         currentChunk = [lastItem];
         currentSize = lastItemSize;
@@ -328,7 +328,7 @@ class ChunkedFirebaseSync {
           // Verify chunk size is within Firebase's 1MB limit
           const chunkSize = this.calculateSize(chunkDoc);
           const FIREBASE_MAX_SIZE = 1000000; // 1MB with safety margin (1,048,576 - 48,576 bytes buffer)
-          
+
           console.log(`📏 Chunk ${chunkId} size check:`, {
             actualSizeKB: Math.round(chunkSize / 1024),
             firebaseLimitKB: Math.round(FIREBASE_MAX_SIZE / 1024),
@@ -337,10 +337,13 @@ class ChunkedFirebaseSync {
             originalArraySize: encryptedChunk?.data?.length || 0,
             base64DataSize: chunkDoc.encryptedData?.data?.length || 0,
             base64IvSize: chunkDoc.encryptedData?.iv?.length || 0,
-            compressionRatio: encryptedChunk?.data ? 
-              Math.round((chunkDoc.encryptedData.data.length / encryptedChunk.data.length) * 100) + '%' : 'N/A',
+            compressionRatio: encryptedChunk?.data
+              ? Math.round(
+                  (chunkDoc.encryptedData.data.length / encryptedChunk.data.length) * 100
+                ) + "%"
+              : "N/A",
           });
-          
+
           if (chunkSize > FIREBASE_MAX_SIZE) {
             console.error(`❌ Chunk ${chunkId} exceeds Firebase size limit:`, {
               actualSizeKB: Math.round(chunkSize / 1024),
@@ -477,10 +480,9 @@ class ChunkedFirebaseSync {
         try {
           // Get first 16 bytes of encryption key as hex for debugging (safe to log)
           const keyView = new Uint8Array(this.encryptionKey);
-          encryptionKeyDebug =
-            Array.from(keyView.slice(0, 16))
-              .map((b) => b.toString(16).padStart(2, "0"))
-              .join("");
+          encryptionKeyDebug = Array.from(keyView.slice(0, 16))
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("");
         } catch (error) {
           encryptionKeyDebug = "error";
         }
@@ -494,7 +496,7 @@ class ChunkedFirebaseSync {
         budgetId: this.budgetId?.slice(0, 8) || "none",
         fullBudgetId: this.budgetId,
         encryptionKeyPreview: encryptionKeyDebug,
-        encryptionKeyLength: this.encryptionKey ? (new Uint8Array(this.encryptionKey)).length : 0,
+        encryptionKeyLength: this.encryptionKey ? new Uint8Array(this.encryptionKey).length : 0,
       });
 
       const startTime = Date.now();
@@ -559,19 +561,23 @@ class ChunkedFirebaseSync {
         encryptedDataSize: manifestData.encryptedData?.length || 0,
         encryptedDataType: typeof manifestData.encryptedData,
         hasEncryptionKey: !!this.encryptionKey,
-        isBase64Format: typeof manifestData.encryptedData?.data === 'string',
+        isBase64Format: typeof manifestData.encryptedData?.data === "string",
       });
-      
+
       // Handle both old array format and new base64 format for manifest
       let decryptedManifest;
-      if (typeof manifestData.encryptedData?.data === 'string') {
+      if (typeof manifestData.encryptedData?.data === "string") {
         // New base64 format
         const manifestDecryptionData = {
-          data: Array.from(atob(manifestData.encryptedData.data), c => c.charCodeAt(0)),
-          iv: Array.from(atob(manifestData.encryptedData.iv), c => c.charCodeAt(0)),
+          data: Array.from(atob(manifestData.encryptedData.data), (c) => c.charCodeAt(0)),
+          iv: Array.from(atob(manifestData.encryptedData.iv), (c) => c.charCodeAt(0)),
         };
         decryptedManifest = JSON.parse(
-          await encryptionUtils.decrypt(manifestDecryptionData.data, this.encryptionKey, manifestDecryptionData.iv)
+          await encryptionUtils.decrypt(
+            manifestDecryptionData.data,
+            this.encryptionKey,
+            manifestDecryptionData.iv
+          )
         );
       } else {
         // Old array format (backward compatibility)
@@ -619,24 +625,28 @@ class ChunkedFirebaseSync {
                 encryptedDataType: typeof encryptedChunk.encryptedData,
                 chunkType: encryptedChunk.chunkType,
                 chunkIndex: encryptedChunk.chunkIndex,
-                isBase64Format: typeof encryptedChunk.encryptedData?.data === 'string',
+                isBase64Format: typeof encryptedChunk.encryptedData?.data === "string",
               });
-              
+
               // Handle both old array format and new base64 format
               let decryptionData;
-              if (typeof encryptedChunk.encryptedData?.data === 'string') {
+              if (typeof encryptedChunk.encryptedData?.data === "string") {
                 // New base64 format
                 decryptionData = {
-                  data: Array.from(atob(encryptedChunk.encryptedData.data), c => c.charCodeAt(0)),
-                  iv: Array.from(atob(encryptedChunk.encryptedData.iv), c => c.charCodeAt(0)),
+                  data: Array.from(atob(encryptedChunk.encryptedData.data), (c) => c.charCodeAt(0)),
+                  iv: Array.from(atob(encryptedChunk.encryptedData.iv), (c) => c.charCodeAt(0)),
                 };
               } else {
                 // Old array format (backward compatibility)
                 decryptionData = encryptedChunk.encryptedData;
               }
-              
+
               const decryptedChunk = JSON.parse(
-                await encryptionUtils.decrypt(decryptionData.data, this.encryptionKey, decryptionData.iv)
+                await encryptionUtils.decrypt(
+                  decryptionData.data,
+                  this.encryptionKey,
+                  decryptionData.iv
+                )
               );
 
               chunks.push({
