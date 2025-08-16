@@ -683,4 +683,5 @@ if (typeof window !== "undefined") {
   backgroundSync.restoreFromDexie();
 }
 
+export { queryClient };
 export default queryClient;
