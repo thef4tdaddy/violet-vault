@@ -135,6 +135,21 @@ class CloudSyncService {
         this.fetchDexieData(),
       ]);
 
+      // Debug data state
+      const dexieItemCount =
+        (dexieData.envelopes?.length || 0) +
+        (dexieData.transactions?.length || 0) +
+        (dexieData.bills?.length || 0);
+      logger.debug("📊 Sync data analysis", {
+        hasCloudData: !!chunkedFirestoreData?.data,
+        cloudForceSync: !!chunkedFirestoreData?.forceSync,
+        dexieItemCount,
+        hasSignificantLocalData: this.hasSignificantData(dexieData),
+        envelopes: dexieData.envelopes?.length || 0,
+        transactions: dexieData.transactions?.length || 0,
+        bills: dexieData.bills?.length || 0,
+      });
+
       // Step 2: Check for old format data if chunked data not found
       let firestoreData = chunkedFirestoreData;
       let needsMigration = false;
@@ -152,12 +167,19 @@ class CloudSyncService {
         }
       }
 
-      // Step 3: Handle migration if needed
+      // Step 3: Handle migration if needed or forced sync after recovery
+      const shouldForceSync = chunkedFirestoreData?.forceSync;
       if (
         needsMigration ||
-        (!firestoreData && this.hasSignificantData(dexieData))
+        (!firestoreData && this.hasSignificantData(dexieData)) ||
+        (shouldForceSync && this.hasSignificantData(dexieData))
       ) {
-        logger.debug("🔄 Starting migration to chunked format...");
+        const reason = needsMigration
+          ? "migration needed"
+          : shouldForceSync
+            ? "forced sync after corruption recovery"
+            : "no cloud data but local data exists";
+        logger.debug(`🔄 Starting migration to chunked format: ${reason}...`);
         const migrationResult = await this.migrateToChunkedFormat(
           ChunkedFirebaseSync,
           firestoreData || dexieData,
@@ -431,7 +453,8 @@ class CloudSyncService {
         logger.info(
           "🔧 Cloud data corruption detected and cleaned up - ready for fresh sync",
         );
-        return null; // Return null to trigger fresh upload from local data
+        // Return special flag to force sync attempt even with empty cloud data
+        return { data: null, forceSync: true };
       }
 
       return result?.data || null;
@@ -635,7 +658,10 @@ class CloudSyncService {
       (data.transactions?.length || 0) +
       (data.bills?.length || 0) +
       (data.savingsGoals?.length || 0);
-    return totalItems > 5; // Arbitrary threshold
+
+    // Lower threshold to be more sensitive to data
+    // Even a few envelopes or transactions should trigger sync
+    return totalItems > 0; // Any data is significant
   }
 
   /**
