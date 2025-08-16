@@ -14,6 +14,7 @@ class BudgetHistory {
     this.initialized = false;
     this.historyKey = null;
     this.currentCommitHash = null;
+    this.integrityStatus = null; // Track chain integrity
   }
 
   /**
@@ -34,7 +35,10 @@ class BudgetHistory {
       // Load the current commit hash
       await this.loadCurrentCommit();
 
-      logger.debug("Budget history system initialized");
+      // Perform automatic integrity check on initialization
+      await this.performIntegrityCheck();
+
+      logger.debug("Budget history system initialized with integrity check");
     } catch (error) {
       logger.error("Failed to initialize budget history system", error);
       throw error;
@@ -681,6 +685,252 @@ class BudgetHistory {
       logger.debug("Budget history cleared");
     } catch (error) {
       logger.error("Failed to clear history", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Perform integrity check and update status
+   * @private
+   */
+  async performIntegrityCheck() {
+    try {
+      this.integrityStatus = await this.verifyIntegrity();
+      
+      if (!this.integrityStatus.valid) {
+        logger.warn("Budget history integrity compromised", this.integrityStatus);
+      } else {
+        logger.debug("Budget history integrity verified", {
+          totalCommits: this.integrityStatus.totalCommits,
+          verifiedCommits: this.integrityStatus.verifiedCommits,
+        });
+      }
+    } catch (error) {
+      logger.error("Failed to perform integrity check", error);
+      this.integrityStatus = {
+        valid: false,
+        error: error.message,
+        message: "Integrity check failed",
+      };
+    }
+  }
+
+  /**
+   * Get current integrity status
+   * @returns {Object|null} - Current integrity status
+   */
+  getIntegrityStatus() {
+    return this.integrityStatus;
+  }
+
+  /**
+   * Check if history has integrity issues
+   * @returns {boolean} - True if there are integrity issues
+   */
+  hasIntegrityIssues() {
+    return this.integrityStatus && !this.integrityStatus.valid;
+  }
+
+  /**
+   * Get integrity warnings for UI display
+   * @returns {Array} - Array of warning objects
+   */
+  getIntegrityWarnings() {
+    if (!this.hasIntegrityIssues()) {
+      return [];
+    }
+
+    const warnings = [];
+    const status = this.integrityStatus;
+
+    if (status.brokenAt !== null) {
+      warnings.push({
+        type: "chain_broken",
+        severity: "high",
+        title: "Hash Chain Broken",
+        message: `History integrity compromised at commit ${status.brokenAt}. This may indicate tampering or data corruption.`,
+        details: status.details,
+        recommendation: "Review recent changes and consider restoring from a backup.",
+      });
+    }
+
+    if (status.error) {
+      warnings.push({
+        type: "verification_error",
+        severity: "medium",
+        title: "Verification Error",
+        message: `Unable to verify history integrity: ${status.error}`,
+        recommendation: "Check system logs and retry initialization.",
+      });
+    }
+
+    return warnings;
+  }
+
+  /**
+   * Advanced tamper detection using statistical analysis
+   * @returns {Promise<Object>} - Tamper detection results
+   */
+  async detectTampering() {
+    if (!this.initialized) {
+      throw new Error("Budget history not initialized");
+    }
+
+    try {
+      const history = await this.getHistory({ limit: -1 });
+      const results = {
+        suspicious: false,
+        confidence: 0,
+        indicators: [],
+        recommendations: [],
+      };
+
+      if (history.length < 3) {
+        return results; // Not enough data for analysis
+      }
+
+      // Analyze timestamp patterns for irregularities
+      const timestamps = history.map(h => new Date(h.timestamp).getTime());
+      const intervals = [];
+      
+      for (let i = 1; i < timestamps.length; i++) {
+        intervals.push(timestamps[i] - timestamps[i-1]);
+      }
+
+      // Check for unusual timestamp patterns
+      const avgInterval = intervals.reduce((sum, int) => sum + int, 0) / intervals.length;
+      const suspiciousIntervals = intervals.filter(int => 
+        int < 0 || // Negative intervals (time went backwards)
+        Math.abs(int - avgInterval) > avgInterval * 10 // Extremely large gaps
+      );
+
+      if (suspiciousIntervals.length > 0) {
+        results.suspicious = true;
+        results.confidence += 30;
+        results.indicators.push({
+          type: "timestamp_anomaly",
+          description: `${suspiciousIntervals.length} commits with suspicious timestamps`,
+          severity: "medium",
+        });
+      }
+
+      // Check for missing parent hash chains
+      let chainBreaks = 0;
+      for (let i = 1; i < history.length; i++) {
+        const current = history[i];
+        const previous = history[i-1];
+        
+        if (current.parentHash !== previous.hash) {
+          chainBreaks++;
+        }
+      }
+
+      if (chainBreaks > 0) {
+        results.suspicious = true;
+        results.confidence += 50;
+        results.indicators.push({
+          type: "chain_breaks",
+          description: `${chainBreaks} broken parent-child relationships`,
+          severity: "high",
+        });
+      }
+
+      // Check for unusual commit patterns (too many commits in short time)
+      const recentCommits = history.filter(h => 
+        new Date(h.timestamp) > new Date(Date.now() - 24 * 60 * 60 * 1000)
+      );
+
+      if (recentCommits.length > 100) {
+        results.suspicious = true;
+        results.confidence += 20;
+        results.indicators.push({
+          type: "excessive_commits",
+          description: `${recentCommits.length} commits in the last 24 hours`,
+          severity: "low",
+        });
+      }
+
+      // Generate recommendations
+      if (results.suspicious) {
+        if (results.confidence >= 70) {
+          results.recommendations.push("Immediate review required - high likelihood of tampering");
+          results.recommendations.push("Consider restoring from a known good backup");
+        } else if (results.confidence >= 40) {
+          results.recommendations.push("Investigate recent changes and verify system integrity");
+          results.recommendations.push("Monitor for additional suspicious activity");
+        } else {
+          results.recommendations.push("Minor anomalies detected - continue monitoring");
+        }
+      }
+
+      logger.debug("Tamper detection completed", {
+        suspicious: results.suspicious,
+        confidence: results.confidence,
+        indicators: results.indicators.length,
+      });
+
+      return results;
+    } catch (error) {
+      logger.error("Failed to perform tamper detection", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Generate security report including integrity and tamper detection
+   * @returns {Promise<Object>} - Comprehensive security report
+   */
+  async generateSecurityReport() {
+    if (!this.initialized) {
+      throw new Error("Budget history not initialized");
+    }
+
+    try {
+      const [integrityResult, tamperResult] = await Promise.all([
+        this.verifyIntegrity(),
+        this.detectTampering(),
+      ]);
+
+      const report = {
+        timestamp: new Date().toISOString(),
+        integrity: integrityResult,
+        tamperDetection: tamperResult,
+        overallStatus: "secure",
+        riskLevel: "low",
+        actionRequired: false,
+        summary: "",
+      };
+
+      // Determine overall status
+      if (!integrityResult.valid || tamperResult.suspicious) {
+        if (tamperResult.confidence >= 70 || integrityResult.brokenAt !== null) {
+          report.overallStatus = "compromised";
+          report.riskLevel = "high";
+          report.actionRequired = true;
+          report.summary = "History integrity is compromised. Immediate action required.";
+        } else if (tamperResult.confidence >= 40) {
+          report.overallStatus = "suspicious";
+          report.riskLevel = "medium";
+          report.actionRequired = true;
+          report.summary = "Suspicious activity detected. Investigation recommended.";
+        } else {
+          report.overallStatus = "warning";
+          report.riskLevel = "low";
+          report.summary = "Minor integrity issues detected. Monitoring recommended.";
+        }
+      } else {
+        report.summary = `History verified secure with ${integrityResult.totalCommits} commits.`;
+      }
+
+      logger.info("Security report generated", {
+        status: report.overallStatus,
+        riskLevel: report.riskLevel,
+        actionRequired: report.actionRequired,
+      });
+
+      return report;
+    } catch (error) {
+      logger.error("Failed to generate security report", error);
       throw error;
     }
   }
