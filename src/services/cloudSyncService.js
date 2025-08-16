@@ -259,6 +259,18 @@ class CloudSyncService {
           budgetDb.paycheckHistory.toArray(),
         ]);
 
+      // Debug what we're actually fetching from Dexie
+      logger.debug("🗃️ CloudSync fetchDexieData results", {
+        envelopesCount: envelopes.length,
+        transactionsCount: transactions.length,
+        billsCount: bills.length,
+        savingsGoalsCount: savingsGoals.length,
+        paycheckHistoryCount: paycheckHistory.length,
+        firstEnvelope: envelopes[0]?.name || "none",
+        firstTransaction: transactions[0]?.description || "none",
+        firstBill: bills[0]?.name || "none",
+      });
+
       return {
         envelopes,
         transactions,
