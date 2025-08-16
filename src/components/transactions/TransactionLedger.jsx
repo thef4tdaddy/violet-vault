@@ -91,7 +91,7 @@ const TransactionLedger = ({
     handleFileUpload,
     handleImport,
     resetImport,
-  } = useTransactionImport(currentUser, handleBulkImport);
+  } = useTransactionImport(currentUser, handleBulkImport, budget);
 
   const filteredTransactions = useTransactionFilters(
     transactions,

@@ -839,13 +839,23 @@ export class AutoFundingEngine {
       description: transaction.description,
     });
 
+    // Check if this is a payday and update payday detection
+    await this.detectAndRecordPayday(transaction);
+
     // Find rules triggered by income detection
     const incomeTriggeredRules = this.getRules(true).filter(
       rule => rule.trigger === TRIGGER_TYPES.INCOME_DETECTED
     );
 
-    if (incomeTriggeredRules.length === 0) {
-      logger.debug("No income-triggered rules found");
+    // Also check for payday-triggered rules
+    const paydayTriggeredRules = this.getRules(true).filter(
+      rule => rule.trigger === TRIGGER_TYPES.PAYDAY
+    );
+
+    const allTriggeredRules = [...incomeTriggeredRules, ...paydayTriggeredRules];
+
+    if (allTriggeredRules.length === 0) {
+      logger.debug("No income or payday-triggered rules found");
       return null;
     }
 
@@ -859,10 +869,343 @@ export class AutoFundingEngine {
         transactions: budget.allTransactions || [],
         triggeredBy: transaction,
         incomeAmount: transaction.amount,
+        isPayday: this.isLikelyPayday(transaction),
       },
     };
 
     return await this.executeRules(context, budget);
+  }
+
+  /**
+   * Advanced Payday Detection Algorithm
+   */
+  async detectAndRecordPayday(transaction) {
+    const date = new Date(transaction.date);
+    const amount = transaction.amount;
+    const description = (transaction.description || "").toLowerCase();
+
+    // Payday indicators
+    const paydayScore = this.calculatePaydayScore(transaction);
+    
+    if (paydayScore >= 5) { // Threshold for payday detection
+      const paydayRecord = {
+        date: date,
+        amount: amount,
+        description: transaction.description,
+        dayOfWeek: date.getDay(), // 0 = Sunday, 1 = Monday, etc.
+        dayOfMonth: date.getDate(),
+        weekOfMonth: Math.ceil(date.getDate() / 7),
+        biweeklyPosition: this.calculateBiweeklyPosition(date),
+        confidence: paydayScore,
+        transactionId: transaction.id,
+        detectedAt: new Date().toISOString(),
+      };
+
+      this.paydayHistory.push(paydayRecord);
+      
+      // Keep only last 24 paydays (2 years worth for monthly pay)
+      this.paydayHistory = this.paydayHistory
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 24);
+
+      logger.info("Payday detected and recorded", {
+        amount,
+        date: date.toISOString().split('T')[0],
+        dayOfWeek: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()],
+        confidence: paydayScore,
+        totalPaydays: this.paydayHistory.length,
+      });
+
+      // Analyze and update payday patterns
+      this.analyzePaydayPatterns();
+    }
+  }
+
+  /**
+   * Calculate payday detection score
+   */
+  calculatePaydayScore(transaction) {
+    let score = 0;
+    const amount = transaction.amount;
+    const description = (transaction.description || "").toLowerCase();
+    const date = new Date(transaction.date);
+
+    // 1. Amount-based scoring
+    if (amount >= 500) score += 2;
+    if (amount >= 1000) score += 1;
+    if (amount >= 2000) score += 1;
+
+    // 2. Description-based scoring
+    const paydayKeywords = [
+      "payroll", "salary", "wage", "pay", "paycheck", 
+      "direct deposit", "dd", "employer", "company"
+    ];
+    const matchedKeywords = paydayKeywords.filter(keyword => 
+      description.includes(keyword)
+    );
+    score += matchedKeywords.length;
+
+    // 3. Timing-based scoring (common payday patterns)
+    const dayOfWeek = date.getDay();
+    const dayOfMonth = date.getDate();
+
+    // Friday is common payday
+    if (dayOfWeek === 5) score += 1;
+    // Thursday is second most common
+    if (dayOfWeek === 4) score += 0.5;
+
+    // Common monthly payday dates
+    if ([1, 15, 30, 31].includes(dayOfMonth)) score += 1;
+    // Last day of month
+    if (this.isLastDayOfMonth(date)) score += 1;
+
+    // 4. Pattern consistency scoring
+    if (this.paydayHistory.length > 0) {
+      const consistencyScore = this.calculatePatternConsistency(transaction);
+      score += consistencyScore;
+    }
+
+    return score;
+  }
+
+  /**
+   * Calculate biweekly position for pattern detection
+   */
+  calculateBiweeklyPosition(date) {
+    // Use epoch as reference point for biweekly calculations
+    const epoch = new Date(1970, 0, 1); // Thursday, Jan 1, 1970
+    const diffTime = date.getTime() - epoch.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays % 14; // 0-13 representing position in 2-week cycle
+  }
+
+  /**
+   * Check if date is last day of month
+   */
+  isLastDayOfMonth(date) {
+    const nextDay = new Date(date);
+    nextDay.setDate(date.getDate() + 1);
+    return nextDay.getMonth() !== date.getMonth();
+  }
+
+  /**
+   * Calculate pattern consistency with historical paydays
+   */
+  calculatePatternConsistency(transaction) {
+    if (this.paydayHistory.length < 2) return 0;
+
+    const date = new Date(transaction.date);
+    const amount = transaction.amount;
+    let consistencyScore = 0;
+
+    // Check amount consistency (within 20% of historical amounts)
+    const historicalAmounts = this.paydayHistory.map(p => p.amount);
+    const avgAmount = historicalAmounts.reduce((sum, amt) => sum + amt, 0) / historicalAmounts.length;
+    const amountVariance = Math.abs(amount - avgAmount) / avgAmount;
+    
+    if (amountVariance <= 0.1) consistencyScore += 2; // Within 10%
+    else if (amountVariance <= 0.2) consistencyScore += 1; // Within 20%
+
+    // Check timing consistency
+    const recentPaydays = this.paydayHistory.slice(0, 6); // Last 6 paydays
+    
+    // Day of week consistency
+    const dayOfWeek = date.getDay();
+    const historicalDaysOfWeek = recentPaydays.map(p => new Date(p.date).getDay());
+    if (historicalDaysOfWeek.includes(dayOfWeek)) {
+      consistencyScore += 1;
+    }
+
+    // Monthly pattern consistency (for monthly pay)
+    const dayOfMonth = date.getDate();
+    const historicalDaysOfMonth = recentPaydays.map(p => new Date(p.date).getDate());
+    if (historicalDaysOfMonth.some(day => Math.abs(day - dayOfMonth) <= 2)) {
+      consistencyScore += 1;
+    }
+
+    // Biweekly pattern consistency
+    const biweeklyPos = this.calculateBiweeklyPosition(date);
+    const historicalBiweeklyPos = recentPaydays.map(p => p.biweeklyPosition);
+    if (historicalBiweeklyPos.some(pos => Math.abs(pos - biweeklyPos) <= 1)) {
+      consistencyScore += 1;
+    }
+
+    return Math.min(consistencyScore, 3); // Cap at 3 points
+  }
+
+  /**
+   * Analyze payday patterns and extract insights
+   */
+  analyzePaydayPatterns() {
+    if (this.paydayHistory.length < 3) return;
+
+    const patterns = {
+      frequency: this.detectPaydayFrequency(),
+      dayOfWeek: this.detectPreferredPaydayDayOfWeek(),
+      dayOfMonth: this.detectPreferredPaydayDayOfMonth(),
+      averageAmount: this.calculateAveragePaydayAmount(),
+      consistency: this.calculateOverallConsistency(),
+    };
+
+    logger.info("Payday patterns analyzed", patterns);
+    
+    // Store patterns for future reference
+    this.paydayPatterns = patterns;
+  }
+
+  /**
+   * Detect payday frequency (weekly, biweekly, monthly, etc.)
+   */
+  detectPaydayFrequency() {
+    if (this.paydayHistory.length < 3) return "unknown";
+
+    const intervals = [];
+    for (let i = 0; i < this.paydayHistory.length - 1; i++) {
+      const current = new Date(this.paydayHistory[i].date);
+      const next = new Date(this.paydayHistory[i + 1].date);
+      const daysDiff = Math.abs((current - next) / (1000 * 60 * 60 * 24));
+      intervals.push(daysDiff);
+    }
+
+    const avgInterval = intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length;
+
+    if (avgInterval >= 6 && avgInterval <= 8) return "weekly";
+    if (avgInterval >= 13 && avgInterval <= 16) return "biweekly";
+    if (avgInterval >= 14 && avgInterval <= 17) return "semimonthly";
+    if (avgInterval >= 28 && avgInterval <= 33) return "monthly";
+    
+    return "irregular";
+  }
+
+  /**
+   * Detect preferred payday day of week
+   */
+  detectPreferredPaydayDayOfWeek() {
+    const dayOfWeekCounts = [0, 0, 0, 0, 0, 0, 0]; // Sun-Sat
+    
+    this.paydayHistory.forEach(payday => {
+      const dayOfWeek = new Date(payday.date).getDay();
+      dayOfWeekCounts[dayOfWeek]++;
+    });
+
+    const maxCount = Math.max(...dayOfWeekCounts);
+    const preferredDay = dayOfWeekCounts.indexOf(maxCount);
+    
+    return ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][preferredDay];
+  }
+
+  /**
+   * Detect preferred payday day of month
+   */
+  detectPreferredPaydayDayOfMonth() {
+    const dayOfMonthCounts = {};
+    
+    this.paydayHistory.forEach(payday => {
+      const dayOfMonth = new Date(payday.date).getDate();
+      dayOfMonthCounts[dayOfMonth] = (dayOfMonthCounts[dayOfMonth] || 0) + 1;
+    });
+
+    const entries = Object.entries(dayOfMonthCounts);
+    if (entries.length === 0) return null;
+
+    const maxEntry = entries.reduce((max, current) => 
+      current[1] > max[1] ? current : max
+    );
+
+    return parseInt(maxEntry[0]);
+  }
+
+  /**
+   * Calculate average payday amount
+   */
+  calculateAveragePaydayAmount() {
+    if (this.paydayHistory.length === 0) return 0;
+    
+    const total = this.paydayHistory.reduce((sum, payday) => sum + payday.amount, 0);
+    return total / this.paydayHistory.length;
+  }
+
+  /**
+   * Calculate overall pattern consistency
+   */
+  calculateOverallConsistency() {
+    if (this.paydayHistory.length < 3) return 0;
+
+    const frequency = this.detectPaydayFrequency();
+    if (frequency === "irregular" || frequency === "unknown") return 0.2;
+
+    // Calculate timing consistency
+    const intervals = [];
+    for (let i = 0; i < this.paydayHistory.length - 1; i++) {
+      const current = new Date(this.paydayHistory[i].date);
+      const next = new Date(this.paydayHistory[i + 1].date);
+      const daysDiff = Math.abs((current - next) / (1000 * 60 * 60 * 24));
+      intervals.push(daysDiff);
+    }
+
+    const avgInterval = intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length;
+    const variance = intervals.reduce((sum, interval) => sum + Math.pow(interval - avgInterval, 2), 0) / intervals.length;
+    const standardDeviation = Math.sqrt(variance);
+    
+    // Lower deviation = higher consistency
+    const consistencyScore = Math.max(0, 1 - (standardDeviation / avgInterval));
+    
+    return Math.min(consistencyScore, 1);
+  }
+
+  /**
+   * Check if transaction is likely a payday
+   */
+  isLikelyPayday(transaction) {
+    const paydayScore = this.calculatePaydayScore(transaction);
+    return paydayScore >= 5;
+  }
+
+  /**
+   * Get payday insights and statistics
+   */
+  getPaydayInsights() {
+    return {
+      totalPaydays: this.paydayHistory.length,
+      patterns: this.paydayPatterns || {},
+      recentPaydays: this.paydayHistory.slice(0, 5),
+      nextExpectedPayday: this.predictNextPayday(),
+    };
+  }
+
+  /**
+   * Predict next payday based on historical patterns
+   */
+  predictNextPayday() {
+    if (this.paydayHistory.length < 2) return null;
+
+    const frequency = this.detectPaydayFrequency();
+    const lastPayday = new Date(this.paydayHistory[0].date);
+    
+    let nextPayday = new Date(lastPayday);
+    
+    switch (frequency) {
+      case "weekly":
+        nextPayday.setDate(nextPayday.getDate() + 7);
+        break;
+      case "biweekly":
+        nextPayday.setDate(nextPayday.getDate() + 14);
+        break;
+      case "semimonthly":
+        nextPayday.setDate(nextPayday.getDate() + 15);
+        break;
+      case "monthly":
+        nextPayday.setMonth(nextPayday.getMonth() + 1);
+        break;
+      default:
+        return null;
+    }
+
+    return {
+      date: nextPayday.toISOString().split('T')[0],
+      confidence: this.calculateOverallConsistency(),
+      frequency,
+    };
   }
 
   /**
@@ -891,11 +1234,16 @@ export class AutoFundingEngine {
 
     if (data.paydayHistory) {
       this.paydayHistory = data.paydayHistory;
+      // Re-analyze patterns after import
+      if (this.paydayHistory.length >= 3) {
+        this.analyzePaydayPatterns();
+      }
     }
 
     logger.info("Auto-funding data with patterns imported", {
       rulesCount: this.rules.size,
       patternsCount: this.incomePatterns.size,
+      paydaysCount: this.paydayHistory.length,
     });
   }
 
