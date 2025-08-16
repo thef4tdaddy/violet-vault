@@ -10,7 +10,7 @@ import logger from "../utils/logger";
 const useDataInitialization = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [initError, setInitError] = useState(null);
-  const { cloudSyncEnabled, startBackgroundSync } = useBudgetStore();
+  const { cloudSyncEnabled } = useBudgetStore();
 
   useEffect(() => {
     const initializeServices = async () => {
@@ -22,12 +22,10 @@ const useDataInitialization = () => {
 
         setInitError(null);
 
-        // Initialize cloud sync if enabled
+        // Note: Background sync is now started after successful login in authStore
+        // This ensures auth context is available before sync attempts
         if (cloudSyncEnabled) {
-          logger.debug(
-            "🌩️ Starting background cloud sync service (default enabled)",
-          );
-          startBackgroundSync();
+          logger.debug("🌩️ Cloud sync enabled - will start after user login");
         } else {
           logger.debug("💾 Local-only mode enabled - cloud sync disabled");
         }
@@ -43,7 +41,7 @@ const useDataInitialization = () => {
     if (!isInitialized) {
       initializeServices();
     }
-  }, [cloudSyncEnabled, startBackgroundSync, isInitialized]);
+  }, [cloudSyncEnabled, isInitialized]);
 
   return {
     isInitialized,
