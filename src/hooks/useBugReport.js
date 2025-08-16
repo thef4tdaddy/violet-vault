@@ -18,15 +18,16 @@ const useBugReport = () => {
     try {
       // Check if we're on mobile - use simpler approach
       const isMobile =
-        /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-        window.innerWidth <= 768;
+        /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent,
+        ) || window.innerWidth <= 768;
 
       // Add timeout to prevent indefinite hanging
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(
           () => reject(new Error("Screenshot capture timed out")),
-          isMobile ? 10000 : 15000
-        )
+          isMobile ? 10000 : 15000,
+        ),
       );
 
       // Dynamic import to avoid bundle size issues
@@ -54,7 +55,9 @@ const useBugReport = () => {
           try {
             // More aggressive CSS cleanup approach for screenshot compatibility
             // Remove all existing stylesheets that could contain problematic color functions
-            const existingStyles = clonedDoc.querySelectorAll('style, link[rel="stylesheet"]');
+            const existingStyles = clonedDoc.querySelectorAll(
+              'style, link[rel="stylesheet"]',
+            );
             existingStyles.forEach((style) => {
               // Remove all stylesheets to avoid any color function parsing issues
               // We'll replace them with safe equivalents below
@@ -169,7 +172,10 @@ const useBugReport = () => {
       // Race between screenshot capture and timeout
       const canvas = await Promise.race([screenshotPromise, timeoutPromise]);
 
-      const screenshotDataUrl = canvas.toDataURL("image/png", isMobile ? 0.5 : 0.7);
+      const screenshotDataUrl = canvas.toDataURL(
+        "image/png",
+        isMobile ? 0.5 : 0.7,
+      );
       setScreenshot(screenshotDataUrl);
       return screenshotDataUrl;
     } catch (error) {
@@ -177,7 +183,9 @@ const useBugReport = () => {
 
       // Try fallback screenshot with minimal options
       try {
-        logger.debug("Attempting fallback screenshot with minimal configuration");
+        logger.debug(
+          "Attempting fallback screenshot with minimal configuration",
+        );
         const html2canvas = (await import("html2canvas")).default;
 
         const fallbackCanvas = await html2canvas(document.body, {
@@ -213,7 +221,11 @@ const useBugReport = () => {
 
     // Add overall timeout to prevent infinite hanging
     const timeoutPromise = new Promise(
-      (_, reject) => setTimeout(() => reject(new Error("Bug report submission timed out")), 30000) // 30 second timeout
+      (_, reject) =>
+        setTimeout(
+          () => reject(new Error("Bug report submission timed out")),
+          30000,
+        ), // 30 second timeout
     );
 
     const submissionPromise = async () => {
@@ -226,7 +238,7 @@ const useBugReport = () => {
           } catch (screenshotError) {
             logger.warn(
               "Screenshot capture failed, proceeding without screenshot:",
-              screenshotError
+              screenshotError,
             );
             screenshotData = null;
           }
@@ -262,7 +274,8 @@ const useBugReport = () => {
           if (!sessionUrl && typeof H.getSession === "function") {
             try {
               const session = H.getSession();
-              const rawUrl = session?.url || session?.sessionUrl || session?.replayUrl;
+              const rawUrl =
+                session?.url || session?.sessionUrl || session?.replayUrl;
               sessionUrl = rawUrl ? String(rawUrl) : null;
             } catch (sessionError) {
               logger.warn("getSession failed:", sessionError.message);
@@ -273,13 +286,19 @@ const useBugReport = () => {
           if (!sessionUrl && typeof H.getCurrentSessionURL === "function") {
             try {
               const currentUrl = H.getCurrentSessionURL();
-              sessionUrl = typeof currentUrl === "string" ? currentUrl : String(currentUrl);
+              sessionUrl =
+                typeof currentUrl === "string"
+                  ? currentUrl
+                  : String(currentUrl);
             } catch (currentError) {
               logger.warn("getCurrentSessionURL failed:", currentError.message);
             }
           }
         } catch (error) {
-          logger.warn("Failed to get Highlight.io session metadata:", error.message);
+          logger.warn(
+            "Failed to get Highlight.io session metadata:",
+            error.message,
+          );
         }
 
         // Get current page context for smart labeling
@@ -292,7 +311,7 @@ const useBugReport = () => {
 
           // First try to detect from active navigation tab
           const activeTab = document.querySelector(
-            '[aria-current="page"], .border-t-2.border-purple-500, .text-purple-600.bg-purple-50'
+            '[aria-current="page"], .border-t-2.border-purple-500, .text-purple-600.bg-purple-50',
           );
           if (activeTab) {
             const tabText = activeTab.textContent?.toLowerCase().trim();
@@ -300,12 +319,16 @@ const useBugReport = () => {
               if (tabText.includes("dashboard")) currentPage = "dashboard";
               else if (tabText.includes("envelope")) currentPage = "envelopes";
               else if (tabText.includes("savings")) currentPage = "savings";
-              else if (tabText.includes("supplemental")) currentPage = "supplemental";
+              else if (tabText.includes("supplemental"))
+                currentPage = "supplemental";
               else if (tabText.includes("paycheck")) currentPage = "paycheck";
               else if (tabText.includes("bills") || tabText.includes("manage"))
                 currentPage = "bills";
               else if (tabText.includes("debt")) currentPage = "debt";
-              else if (tabText.includes("analytics") || tabText.includes("chart"))
+              else if (
+                tabText.includes("analytics") ||
+                tabText.includes("chart")
+              )
                 currentPage = "analytics";
               else if (tabText.includes("settings")) currentPage = "settings";
             }
@@ -313,38 +336,61 @@ const useBugReport = () => {
 
           // Fallback to URL-based detection for other pages
           if (currentPage === "unknown") {
-            if (path.includes("/debt") || hash.includes("debt")) currentPage = "debt";
+            if (path.includes("/debt") || hash.includes("debt"))
+              currentPage = "debt";
             else if (path.includes("/envelope") || hash.includes("envelope"))
               currentPage = "envelopes";
-            else if (path.includes("/transaction") || hash.includes("transaction"))
+            else if (
+              path.includes("/transaction") ||
+              hash.includes("transaction")
+            )
               currentPage = "transaction";
-            else if (path.includes("/savings") || hash.includes("savings")) currentPage = "savings";
+            else if (path.includes("/savings") || hash.includes("savings"))
+              currentPage = "savings";
             else if (path.includes("/analytics") || hash.includes("analytics"))
               currentPage = "analytics";
-            else if (path === "/" || path === "" || hash === "#/") currentPage = "dashboard";
+            else if (path === "/" || path === "" || hash === "#/")
+              currentPage = "dashboard";
           }
 
           // Additional detection from main content area
           if (currentPage === "unknown") {
-            const mainContent = document.querySelector('main, [role="main"], .main-content');
+            const mainContent = document.querySelector(
+              'main, [role="main"], .main-content',
+            );
             if (mainContent) {
               const contentText = mainContent.textContent?.toLowerCase() || "";
-              if (contentText.includes("envelope") && contentText.includes("budget"))
+              if (
+                contentText.includes("envelope") &&
+                contentText.includes("budget")
+              )
                 currentPage = "envelopes";
-              else if (contentText.includes("debt") && contentText.includes("payoff"))
+              else if (
+                contentText.includes("debt") &&
+                contentText.includes("payoff")
+              )
                 currentPage = "debt";
-              else if (contentText.includes("savings") && contentText.includes("goal"))
+              else if (
+                contentText.includes("savings") &&
+                contentText.includes("goal")
+              )
                 currentPage = "savings";
-              else if (contentText.includes("bill") && contentText.includes("manage"))
+              else if (
+                contentText.includes("bill") &&
+                contentText.includes("manage")
+              )
                 currentPage = "bills";
-              else if (contentText.includes("paycheck") || contentText.includes("income"))
+              else if (
+                contentText.includes("paycheck") ||
+                contentText.includes("income")
+              )
                 currentPage = "paycheck";
             }
           }
 
           // Try to detect active component from DOM classes/attributes
           const activeElements = document.querySelectorAll(
-            '[data-active="true"], .active, [aria-current="page"]'
+            '[data-active="true"], .active, [aria-current="page"]',
           );
           const componentHints = Array.from(activeElements)
             .map((el) => el.textContent?.toLowerCase().trim())
@@ -352,13 +398,15 @@ const useBugReport = () => {
 
           // Get additional verbose context about the current screen
           const getScreenTitle = () => {
-            const titleElement = document.querySelector("h1, h2, .page-title, [data-page-title]");
+            const titleElement = document.querySelector(
+              "h1, h2, .page-title, [data-page-title]",
+            );
             return titleElement?.textContent?.trim() || "Unknown Screen";
           };
 
           const getActiveButtons = () => {
             const buttons = document.querySelectorAll(
-              'button:not([disabled]), [role="button"]:not([disabled])'
+              'button:not([disabled]), [role="button"]:not([disabled])',
             );
             return Array.from(buttons)
               .map((btn) => btn.textContent?.trim())
@@ -367,11 +415,15 @@ const useBugReport = () => {
           };
 
           const getVisibleModals = () => {
-            const modals = document.querySelectorAll('[role="dialog"], .modal, [data-modal]');
+            const modals = document.querySelectorAll(
+              '[role="dialog"], .modal, [data-modal]',
+            );
             return Array.from(modals)
               .filter((modal) => modal.offsetParent !== null) // Only visible modals
               .map((modal) => {
-                const title = modal.querySelector("h1, h2, h3, .modal-title, [data-modal-title]");
+                const title = modal.querySelector(
+                  "h1, h2, h3, .modal-title, [data-modal-title]",
+                );
                 return title?.textContent?.trim() || "Untitled Modal";
               })
               .slice(0, 3);
@@ -389,7 +441,8 @@ const useBugReport = () => {
             documentTitle: document.title,
             userLocation: `${currentPage} page${getScreenTitle() !== "Unknown Screen" ? ` - ${getScreenTitle()}` : ""}`,
             activeModals: getVisibleModals().join(", ") || "None",
-            recentInteractions: getActiveButtons().slice(0, 3).join(", ") || "None detected",
+            recentInteractions:
+              getActiveButtons().slice(0, 3).join(", ") || "None detected",
           };
         };
 
@@ -408,9 +461,13 @@ const useBugReport = () => {
             memory: performance.memory
               ? {
                   usedJSHeapSize:
-                    Math.round(performance.memory.usedJSHeapSize / 1024 / 1024) + "MB",
+                    Math.round(
+                      performance.memory.usedJSHeapSize / 1024 / 1024,
+                    ) + "MB",
                   totalJSHeapSize:
-                    Math.round(performance.memory.totalJSHeapSize / 1024 / 1024) + "MB",
+                    Math.round(
+                      performance.memory.totalJSHeapSize / 1024 / 1024,
+                    ) + "MB",
                 }
               : "unavailable",
           };
@@ -449,7 +506,7 @@ const useBugReport = () => {
                 body.offsetWidth,
                 html.offsetWidth,
                 body.clientWidth,
-                html.clientWidth
+                html.clientWidth,
               ),
               height: Math.max(
                 body.scrollHeight,
@@ -457,7 +514,7 @@ const useBugReport = () => {
                 body.offsetHeight,
                 html.offsetHeight,
                 body.clientHeight,
-                html.clientHeight
+                html.clientHeight,
               ),
             },
             focusedElement: document.activeElement
@@ -480,18 +537,24 @@ const useBugReport = () => {
             const entries = performance.getEntriesByType("navigation");
             if (entries.length > 0) {
               errors.push(
-                `Load time: ${Math.round(entries[0].loadEventEnd - entries[0].fetchStart)}ms`
+                `Load time: ${Math.round(entries[0].loadEventEnd - entries[0].fetchStart)}ms`,
               );
             }
 
             // Add timing information
             if (performance.timing) {
               const timing = performance.timing;
-              errors.push(`DNS: ${timing.domainLookupEnd - timing.domainLookupStart}ms`);
-              errors.push(`Connect: ${timing.connectEnd - timing.connectStart}ms`);
+              errors.push(
+                `DNS: ${timing.domainLookupEnd - timing.domainLookupStart}ms`,
+              );
+              errors.push(
+                `Connect: ${timing.connectEnd - timing.connectStart}ms`,
+              );
             }
 
-            return errors.length > 0 ? errors : ["No performance data available"];
+            return errors.length > 0
+              ? errors
+              : ["No performance data available"];
           } catch {
             return ["Performance API unavailable"];
           }
@@ -500,7 +563,9 @@ const useBugReport = () => {
         const reportData = {
           description: description.trim(),
           screenshot: screenshotData,
-          sessionUrl: sessionUrl || "Session replay unavailable (possibly blocked by adblocker)",
+          sessionUrl:
+            sessionUrl ||
+            "Session replay unavailable (possibly blocked by adblocker)",
           env: {
             userAgent: navigator.userAgent,
             url: window.location.href,
@@ -523,10 +588,12 @@ const useBugReport = () => {
 
             // Additional context
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            colorScheme: window.matchMedia("(prefers-color-scheme: dark)").matches
+            colorScheme: window.matchMedia("(prefers-color-scheme: dark)")
+              .matches
               ? "dark"
               : "light",
-            reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+            reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)")
+              .matches,
             touchSupport: "ontouchstart" in window,
             standaloneMode:
               window.navigator.standalone ||
@@ -538,7 +605,9 @@ const useBugReport = () => {
         const bugReportEndpoint = import.meta.env.VITE_BUG_REPORT_ENDPOINT;
 
         if (bugReportEndpoint) {
-          logger.info("Submitting bug report to endpoint", { endpoint: bugReportEndpoint });
+          logger.info("Submitting bug report to endpoint", {
+            endpoint: bugReportEndpoint,
+          });
 
           const response = await fetch(bugReportEndpoint, {
             method: "POST",
@@ -673,7 +742,9 @@ const useBugReport = () => {
         } catch (startError) {
           if (startError.message?.includes("already recording")) {
             if (import.meta.env.MODE === "development") {
-              logger.debug("Highlight.io session already active (detected via error)");
+              logger.debug(
+                "Highlight.io session already active (detected via error)",
+              );
             }
           } else {
             throw startError; // Re-throw unexpected errors
@@ -687,7 +758,9 @@ const useBugReport = () => {
         error.message?.includes("Highlight is already recording")
       ) {
         if (import.meta.env.MODE === "development") {
-          logger.debug("Highlight.io session already active (gracefully handled)");
+          logger.debug(
+            "Highlight.io session already active (gracefully handled)",
+          );
         }
         // This is expected - don't log as error
       } else {
@@ -721,7 +794,9 @@ const useBugReport = () => {
           `);
         } else {
           // Popup blocked or failed
-          logger.warn("Failed to open screenshot preview - popup may be blocked");
+          logger.warn(
+            "Failed to open screenshot preview - popup may be blocked",
+          );
           // Could set screenshot to show inline preview instead
           setScreenshot(screenshotData);
         }
