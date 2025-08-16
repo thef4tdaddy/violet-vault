@@ -77,6 +77,9 @@ export const useAuth = create((set) => ({
           localStorage.setItem("userProfile", JSON.stringify(profileData));
           logger.auth("Saved user profile to localStorage.");
 
+          // Start background sync after successful login
+          await this.startBackgroundSyncAfterLogin();
+
           return { success: true };
         } else {
           logger.auth("Existing user login path.");
@@ -166,6 +169,9 @@ export const useAuth = create((set) => ({
             accountType: "returning_user",
           });
 
+          // Start background sync after successful login
+          await this.startBackgroundSyncAfterLogin();
+
           return { success: true, data: migratedData };
         }
       } catch (error) {
@@ -208,6 +214,25 @@ export const useAuth = create((set) => ({
           ? updatedUser.budgetId
           : state.budgetId,
     }));
+  },
+
+  async startBackgroundSyncAfterLogin() {
+    try {
+      logger.auth("Starting background sync after successful login");
+
+      // Import budget store to access startBackgroundSync
+      const { useBudgetStore } = await import("./budgetStore");
+      const budgetState = useBudgetStore.getState();
+
+      if (budgetState.cloudSyncEnabled) {
+        await budgetState.startBackgroundSync();
+        logger.auth("Background sync started successfully after login");
+      } else {
+        logger.auth("Cloud sync disabled - skipping background sync");
+      }
+    } catch (error) {
+      logger.error("Failed to start background sync after login", error);
+    }
   },
 
   async changePassword(oldPassword, newPassword) {
