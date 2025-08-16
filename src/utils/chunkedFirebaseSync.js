@@ -18,7 +18,31 @@ import logger from "./logger.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
 const auth = getAuth(app);
+
+// ---- Binary <-> Base64 helpers to avoid massive Function.apply() (stack overflow) ----
+function base64FromBytes(bytes) {
+  // Accepts Array<number> | Uint8Array
+  const u8 = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  const CHUNK_SIZE = 0x8000; // 32k chars per chunk keeps call stacks safe
+  let binary = "";
+  for (let i = 0; i < u8.length; i += CHUNK_SIZE) {
+    const slice = u8.subarray(i, i + CHUNK_SIZE);
+    // Using apply on small chunks is safe and fast
+    binary += String.fromCharCode.apply(null, slice);
+  }
+  return btoa(binary);
+}
+
+function bytesFromBase64(str) {
+  const binary = atob(str);
+  const len = binary.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+// -----------------------------------------------------------------------------
 
 /**
  * ChunkedFirebaseSync - Handles large budget data by splitting into multiple documents
@@ -315,8 +339,8 @@ class ChunkedFirebaseSync {
           // Convert arrays to base64 to reduce Firestore storage size
           const chunkDoc = {
             encryptedData: {
-              data: btoa(String.fromCharCode.apply(null, encryptedChunk.data)),
-              iv: btoa(String.fromCharCode.apply(null, encryptedChunk.iv)),
+              data: base64FromBytes(encryptedChunk.data),
+              iv: base64FromBytes(encryptedChunk.iv),
             },
             chunkType: fieldName,
             chunkIndex: i,
@@ -352,7 +376,7 @@ class ChunkedFirebaseSync {
               chunkType: fieldName,
               chunkIndex: i,
               itemsInChunk: chunks[i].length,
-              encryptedDataSize: Math.round(encryptedChunk.length / 1024),
+              encryptedDataSize: Math.round((encryptedChunk.data?.length || 0) / 1024),
             });
 
             // Instead of throwing immediately, try to re-chunk with smaller size
@@ -416,8 +440,8 @@ class ChunkedFirebaseSync {
       batch.set(manifestDoc, {
         type: "budget_manifest",
         encryptedData: {
-          data: btoa(String.fromCharCode.apply(null, encryptedManifest.data)),
-          iv: btoa(String.fromCharCode.apply(null, encryptedManifest.iv)),
+          data: base64FromBytes(encryptedManifest.data),
+          iv: base64FromBytes(encryptedManifest.iv),
         },
         lastModified: Date.now(),
         chunkCount: Object.values(chunkMap).reduce((sum, chunks) => sum + chunks.length, 0),
@@ -569,8 +593,8 @@ class ChunkedFirebaseSync {
       if (typeof manifestData.encryptedData?.data === "string") {
         // New base64 format
         const manifestDecryptionData = {
-          data: Array.from(atob(manifestData.encryptedData.data), (c) => c.charCodeAt(0)),
-          iv: Array.from(atob(manifestData.encryptedData.iv), (c) => c.charCodeAt(0)),
+          data: Array.from(bytesFromBase64(manifestData.encryptedData.data)),
+          iv: Array.from(bytesFromBase64(manifestData.encryptedData.iv)),
         };
         decryptedManifest = JSON.parse(
           await encryptionUtils.decrypt(
@@ -633,8 +657,8 @@ class ChunkedFirebaseSync {
               if (typeof encryptedChunk.encryptedData?.data === "string") {
                 // New base64 format
                 decryptionData = {
-                  data: Array.from(atob(encryptedChunk.encryptedData.data), (c) => c.charCodeAt(0)),
-                  iv: Array.from(atob(encryptedChunk.encryptedData.iv), (c) => c.charCodeAt(0)),
+                  data: Array.from(bytesFromBase64(encryptedChunk.encryptedData.data)),
+                  iv: Array.from(bytesFromBase64(encryptedChunk.encryptedData.iv)),
                 };
               } else {
                 // Old array format (backward compatibility)
