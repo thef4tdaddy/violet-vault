@@ -25,10 +25,12 @@ export const useAutoFunding = () => {
       const savedData = localStorage.getItem("violetVault_autoFunding");
       if (savedData) {
         const data = JSON.parse(savedData);
-        autoFundingEngine.importData(data);
-        logger.info("Auto-funding data loaded from localStorage", {
+        autoFundingEngine.importDataWithUndoStack(data);
+        logger.info("Auto-funding data with undo stack loaded from localStorage", {
           rulesCount: data.rules?.length || 0,
           historyCount: data.executionHistory?.length || 0,
+          patternsCount: data.incomePatterns?.length || 0,
+          undoableCount: data.undoStack?.filter(item => item.canUndo).length || 0,
         });
       }
 
@@ -47,9 +49,9 @@ export const useAutoFunding = () => {
   // Save data to localStorage whenever rules or history changes
   const saveToLocalStorage = useCallback(() => {
     try {
-      const data = autoFundingEngine.exportData();
+      const data = autoFundingEngine.exportDataWithUndoStack();
       localStorage.setItem("violetVault_autoFunding", JSON.stringify(data));
-      logger.debug("Auto-funding data saved to localStorage");
+      logger.debug("Auto-funding data with undo stack saved to localStorage");
     } catch (error) {
       logger.error("Failed to save auto-funding data to localStorage", error);
     }
@@ -200,7 +202,7 @@ export const useAutoFunding = () => {
   const importData = useCallback(
     (data) => {
       try {
-        autoFundingEngine.importData(data);
+        autoFundingEngine.importDataWithUndoStack(data);
         refreshData();
       } catch (error) {
         logger.error("Failed to import auto-funding data", error);
@@ -210,38 +212,67 @@ export const useAutoFunding = () => {
     [refreshData],
   );
 
-  // Auto-trigger rules based on transaction events
+  // Undo operations
+  const undoLastExecution = useCallback(
+    async () => {
+      try {
+        const result = await autoFundingEngine.undoLastExecution(budget);
+        refreshData();
+        return result;
+      } catch (error) {
+        logger.error("Failed to undo last execution", error);
+        throw error;
+      }
+    },
+    [budget, refreshData],
+  );
+
+  const undoExecution = useCallback(
+    async (executionId) => {
+      try {
+        const result = await autoFundingEngine.undoExecution(executionId, budget);
+        refreshData();
+        return result;
+      } catch (error) {
+        logger.error("Failed to undo execution", error);
+        throw error;
+      }
+    },
+    [budget, refreshData],
+  );
+
+  const getUndoableExecutions = useCallback(() => {
+    return autoFundingEngine.getUndoableExecutions();
+  }, []);
+
+  const getUndoStatistics = useCallback(() => {
+    return autoFundingEngine.getUndoStatistics();
+  }, []);
+
+  // Auto-trigger rules based on transaction events with smart income detection
   const handleTransactionAdded = useCallback(
     async (transaction) => {
       if (!isInitialized || isExecuting) return;
 
       try {
-        // Check if it's income (positive amount)
-        if (transaction.amount > 0) {
-          logger.debug("Income detected, checking for income-triggered rules");
-
-          const incomeRules = rules.filter(
-            (rule) =>
-              rule.enabled && rule.trigger === TRIGGER_TYPES.INCOME_DETECTED,
-          );
-
-          if (incomeRules.length > 0) {
-            logger.info("Executing income-triggered rules", {
-              rulesCount: incomeRules.length,
-              incomeAmount: transaction.amount,
-            });
-
-            await executeRules(TRIGGER_TYPES.INCOME_DETECTED, {
-              triggeredBy: transaction,
-              incomeAmount: transaction.amount,
-            });
-          }
+        // Use smart income detection instead of simple positive amount check
+        const result = await autoFundingEngine.handleNewTransaction(transaction, budget);
+        
+        if (result) {
+          logger.info("Auto-funding triggered by income detection", {
+            transactionAmount: transaction.amount,
+            rulesExecuted: result.execution.rulesExecuted,
+            totalFunded: result.execution.totalFunded,
+          });
+          
+          // Refresh data to reflect changes
+          refreshData();
         }
       } catch (error) {
-        logger.error("Error handling transaction-triggered rules", error);
+        logger.error("Error handling smart income detection", error);
       }
     },
-    [isInitialized, isExecuting, rules, executeRules],
+    [isInitialized, isExecuting, budget, refreshData],
   );
 
   // Check for scheduled rule execution
@@ -344,6 +375,12 @@ export const useAutoFunding = () => {
     clearHistory,
     exportData,
     importData,
+
+    // Undo operations
+    undoLastExecution,
+    undoExecution,
+    getUndoableExecutions,
+    getUndoStatistics,
 
     // Event handlers
     handleTransactionAdded,
