@@ -399,6 +399,14 @@ class CloudSyncService {
         return null;
       }
 
+      // Handle corruption recovery
+      if (result?.recovered) {
+        logger.info(
+          "🔧 Cloud data corruption detected and cleaned up - ready for fresh sync",
+        );
+        return null; // Return null to trigger fresh upload from local data
+      }
+
       return result?.data || null;
     } catch (error) {
       logger.warn("⚠️ Failed to fetch chunked Firestore data", error.message);
