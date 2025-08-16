@@ -144,8 +144,7 @@ class CloudSyncService {
           encryptionKeyDebug =
             Array.from(keyView.slice(0, 16))
               .map((b) => b.toString(16).padStart(2, "0"))
-              .join("")
-              .slice(0, 16) + "...";
+              .join("");
         } catch (error) {
           encryptionKeyDebug = "error";
         }

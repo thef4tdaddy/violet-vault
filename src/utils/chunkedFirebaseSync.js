@@ -449,8 +449,7 @@ class ChunkedFirebaseSync {
           encryptionKeyDebug =
             Array.from(keyView.slice(0, 16))
               .map((b) => b.toString(16).padStart(2, "0"))
-              .join("")
-              .slice(0, 16) + "...";
+              .join("");
         } catch (error) {
           encryptionKeyDebug = "error";
         }
@@ -462,7 +461,9 @@ class ChunkedFirebaseSync {
         isAnonymous: currentUser?.isAnonymous,
         providerId: currentUser?.providerId,
         budgetId: this.budgetId?.slice(0, 8) || "none",
+        fullBudgetId: this.budgetId,
         encryptionKeyPreview: encryptionKeyDebug,
+        encryptionKeyLength: this.encryptionKey ? (new Uint8Array(this.encryptionKey)).length : 0,
       });
 
       const startTime = Date.now();
