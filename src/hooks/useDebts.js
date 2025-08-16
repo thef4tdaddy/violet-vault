@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../utils/queryClient";
 import { budgetDb } from "../db/budgetDb";
+import logger from "../utils/logger.js";
 
 const useDebts = () => {
   const queryClient = useQueryClient();
@@ -10,7 +11,10 @@ const useDebts = () => {
       const debts = await budgetDb.debts.toArray();
       return debts || [];
     } catch (error) {
-      console.warn("Dexie query failed:", error);
+      logger.warn("Dexie query failed", {
+        error: error.message,
+        source: "useDebts",
+      });
       return [];
     }
   };

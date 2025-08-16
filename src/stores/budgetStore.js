@@ -512,6 +512,17 @@ const storeInitializer = (set, get) => ({
       return false;
     }
   },
+
+  // Legacy compatibility: Debt management moved to TanStack Query hooks
+  setDebts: () => {
+    logger.warn(
+      "setDebts called - debts are now managed by TanStack Query/useDebts hook",
+      {
+        source: "budgetStore.setDebts",
+        migration: "Use useDebts() hook instead",
+      },
+    );
+  },
 });
 
 const base = subscribeWithSelector(
