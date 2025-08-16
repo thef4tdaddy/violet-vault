@@ -32,6 +32,7 @@ class ChunkedFirebaseSync {
     this.chunkSizeThreshold = 0.8; // Trigger re-chunking at 80% of max size
     this.isAuthenticated = false;
     this.authPromise = null;
+    this.activeSavePromise = null; // Prevent concurrent saves
   }
 
   /**
@@ -234,6 +235,26 @@ class ChunkedFirebaseSync {
       throw new Error("ChunkedFirebaseSync not initialized");
     }
 
+    // Prevent concurrent saves that can cause corruption
+    if (this.activeSavePromise) {
+      console.log("🔄 Save already in progress, waiting for completion...");
+      return await this.activeSavePromise;
+    }
+
+    this.activeSavePromise = this._saveToCloudInternal(data, currentUser);
+    try {
+      const result = await this.activeSavePromise;
+      return result;
+    } finally {
+      this.activeSavePromise = null;
+    }
+  }
+
+  async _saveToCloudInternal(data, currentUser) {
+    if (!this.budgetId || !this.encryptionKey) {
+      throw new Error("ChunkedFirebaseSync not initialized");
+    }
+
     // Ensure user is authenticated before any Firestore operations
     const isAuthenticated = await this.ensureAuthenticated();
     if (!isAuthenticated) {
@@ -385,7 +406,10 @@ class ChunkedFirebaseSync {
         ),
       });
 
-      // Execute the batch write
+      // Execute the batch write atomically
+      console.log(
+        `🔄 Committing ${Object.values(chunkMap).reduce((sum, chunks) => sum + chunks.length, 0) + 1} documents atomically...`,
+      );
       await batch.commit();
 
       const duration = Date.now() - startTime;
@@ -487,6 +511,29 @@ class ChunkedFirebaseSync {
         !manifestData.encryptedData ||
         manifestData.encryptedData.length < 32
       ) {
+        console.error(
+          `🔍 Corrupted manifest detected - triggering automatic cleanup`,
+          {
+            hasEncryptedData: !!manifestData.encryptedData,
+            encryptedDataSize: manifestData.encryptedData?.length || 0,
+            manifestKeys: Object.keys(manifestData),
+          },
+        );
+
+        // Automatically clean up corrupted manifest
+        console.log("🔧 Attempting automatic cleanup of corrupted manifest...");
+        try {
+          await this.resetCloudData();
+          console.log("✅ Corrupted manifest cleaned up successfully");
+          // Return null to indicate no data available (will trigger fresh upload if local data exists)
+          return { data: null, recovered: true };
+        } catch (cleanupError) {
+          console.error(
+            "❌ Failed to cleanup corrupted manifest:",
+            cleanupError,
+          );
+        }
+
         throw new Error(
           `Invalid or corrupted manifest data (size: ${manifestData.encryptedData?.length || 0})`,
         );

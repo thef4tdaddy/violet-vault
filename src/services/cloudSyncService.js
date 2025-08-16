@@ -13,6 +13,7 @@ class CloudSyncService {
     this.lastSyncTime = 0;
     this.syncIntervalMs = 30000; // 30 seconds
     this.lastSyncedCommitHash = null; // Track using existing git-like history
+    this.activeSyncPromise = null; // Prevent concurrent syncs
   }
 
   /**
@@ -20,8 +21,18 @@ class CloudSyncService {
    */
   start(config) {
     if (this.isRunning) {
-      logger.debug("🔄 Cloud sync service already running");
-      return;
+      logger.debug("🔄 Cloud sync service already running", {
+        currentBudgetId: this.config?.budgetId?.slice(0, 8) || "none",
+        newBudgetId: config?.budgetId?.slice(0, 8) || "none",
+        sameBudget: this.config?.budgetId === config?.budgetId,
+      });
+      // If same budget, just return. If different budget, restart service.
+      if (this.config?.budgetId === config?.budgetId) {
+        return;
+      } else {
+        logger.debug("🔄 Different budget detected, restarting sync service");
+        this.stop();
+      }
     }
 
     this.config = config;
@@ -78,6 +89,22 @@ class CloudSyncService {
    * Perform bidirectional sync between Firestore and Dexie using chunked approach
    */
   async performSync() {
+    // Prevent concurrent syncs that can cause corruption
+    if (this.activeSyncPromise) {
+      logger.debug("🔄 Sync already in progress, waiting for completion...");
+      return await this.activeSyncPromise;
+    }
+
+    this.activeSyncPromise = this._performSyncInternal();
+    try {
+      const result = await this.activeSyncPromise;
+      return result;
+    } finally {
+      this.activeSyncPromise = null;
+    }
+  }
+
+  async _performSyncInternal() {
     try {
       if (
         !this.config?.encryptionKey ||
