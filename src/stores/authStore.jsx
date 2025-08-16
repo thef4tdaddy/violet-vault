@@ -78,7 +78,8 @@ export const useAuth = create((set) => ({
           logger.auth("Saved user profile to localStorage.");
 
           // Start background sync after successful login
-          await this.startBackgroundSyncAfterLogin();
+          const { startBackgroundSyncAfterLogin } = get();
+          await startBackgroundSyncAfterLogin();
 
           return { success: true };
         } else {
@@ -170,7 +171,8 @@ export const useAuth = create((set) => ({
           });
 
           // Start background sync after successful login
-          await this.startBackgroundSyncAfterLogin();
+          const { startBackgroundSyncAfterLogin } = get();
+          await startBackgroundSyncAfterLogin();
 
           return { success: true, data: migratedData };
         }
