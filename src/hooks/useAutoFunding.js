@@ -249,6 +249,15 @@ export const useAutoFunding = () => {
     return autoFundingEngine.getUndoStatistics();
   }, []);
 
+  // Payday detection and insights
+  const getPaydayInsights = useCallback(() => {
+    return autoFundingEngine.getPaydayInsights();
+  }, []);
+
+  const isLikelyPayday = useCallback((transaction) => {
+    return autoFundingEngine.isLikelyPayday(transaction);
+  }, []);
+
   // Auto-trigger rules based on transaction events with smart income detection
   const handleTransactionAdded = useCallback(
     async (transaction) => {
@@ -381,6 +390,10 @@ export const useAutoFunding = () => {
     undoExecution,
     getUndoableExecutions,
     getUndoStatistics,
+
+    // Payday detection
+    getPaydayInsights,
+    isLikelyPayday,
 
     // Event handlers
     handleTransactionAdded,

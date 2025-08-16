@@ -4,13 +4,15 @@ import {
   parseOFX,
   autoDetectFieldMapping,
 } from "../utils/fileParser";
+import { autoFundingEngine } from "../../../utils/autoFundingEngine";
 import logger from "../../../utils/logger";
 
-export const useTransactionImport = (currentUser, onBulkImport) => {
+export const useTransactionImport = (currentUser, onBulkImport, budget) => {
   const [importData, setImportData] = useState([]);
   const [importStep, setImportStep] = useState(1);
   const [fieldMapping, setFieldMapping] = useState({});
   const [importProgress, setImportProgress] = useState(0);
+  const [autoFundingResults, setAutoFundingResults] = useState([]);
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -95,10 +97,41 @@ export const useTransactionImport = (currentUser, onBulkImport) => {
       }
     }
 
+    // Import transactions first
     onBulkImport(processedTransactions);
+
+    // Process auto-funding for income transactions
+    const autoFundingPromises = [];
+    const incomeTransactions = processedTransactions.filter(t => t.amount > 0);
+    
+    if (incomeTransactions.length > 0 && budget) {
+      logger.info("Processing auto-funding for imported income transactions", {
+        incomeCount: incomeTransactions.length,
+      });
+
+      // Process each income transaction for auto-funding
+      for (const transaction of incomeTransactions) {
+        try {
+          const autoFundingResult = await autoFundingEngine.handleNewTransaction(transaction, budget);
+          if (autoFundingResult && autoFundingResult.success) {
+            autoFundingPromises.push({
+              transaction,
+              result: autoFundingResult,
+            });
+          }
+        } catch (error) {
+          logger.error("Auto-funding failed for imported transaction", {
+            transactionId: transaction.id,
+            error: error.message,
+          });
+        }
+      }
+    }
+
+    setAutoFundingResults(autoFundingPromises);
     resetImport();
 
-    // More informative success message
+    // Enhanced success message including auto-funding results
     const incomeCount = processedTransactions.filter(
       (t) => t.amount >= 0,
     ).length;
@@ -106,12 +139,23 @@ export const useTransactionImport = (currentUser, onBulkImport) => {
       (t) => t.amount < 0,
     ).length;
 
-    alert(
-      `Successfully imported ${processedTransactions.length} transactions!\n` +
-        `• ${incomeCount} income transactions\n` +
-        `• ${expenseCount} expense transactions\n\n` +
-        `All transactions have been added to your ledger with "Imported" category.`,
-    );
+    let message = `Successfully imported ${processedTransactions.length} transactions!\n` +
+      `• ${incomeCount} income transactions\n` +
+      `• ${expenseCount} expense transactions\n\n`;
+
+    if (autoFundingPromises.length > 0) {
+      const totalAutoFunded = autoFundingPromises.reduce(
+        (sum, result) => sum + result.result.execution.totalFunded,
+        0
+      );
+      message += `🤖 Auto-funding executed for ${autoFundingPromises.length} income transactions:\n` +
+        `• Total auto-funded: $${totalAutoFunded.toFixed(2)}\n` +
+        `• Rules executed: ${autoFundingPromises.reduce((sum, result) => sum + result.result.execution.rulesExecuted, 0)}\n\n`;
+    }
+
+    message += `All transactions have been added to your ledger with "Imported" category.`;
+
+    alert(message);
   };
 
   const resetImport = () => {
@@ -119,6 +163,7 @@ export const useTransactionImport = (currentUser, onBulkImport) => {
     setImportData([]);
     setImportProgress(0);
     setFieldMapping({});
+    setAutoFundingResults([]);
   };
 
   return {
@@ -128,6 +173,7 @@ export const useTransactionImport = (currentUser, onBulkImport) => {
     fieldMapping,
     setFieldMapping,
     importProgress,
+    autoFundingResults,
     handleFileUpload,
     handleImport,
     resetImport,
