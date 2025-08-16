@@ -42,9 +42,7 @@ Flexbox's `items-center` and centering behaviors override attempts to position r
         <Icon className="h-4 w-4 mr-2" />
         <span className="font-medium text-sm">Option Label</span>
       </div>
-      <p className="text-xs text-gray-600 leading-tight ml-6">
-        Description text
-      </p>
+      <p className="text-xs text-gray-600 leading-tight ml-6">Description text</p>
     </div>
   </div>
 </div>

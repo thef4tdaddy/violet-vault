@@ -8,8 +8,7 @@ import {
  * Get styling based on envelope type
  */
 export const getEnvelopeTypeStyle = (envelope) => {
-  const envelopeType =
-    envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
+  const envelopeType = envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category);
   const config = ENVELOPE_TYPE_CONFIG[envelopeType];
 
   if (!config) {

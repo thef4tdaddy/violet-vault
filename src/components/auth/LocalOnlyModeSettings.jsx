@@ -137,12 +137,9 @@ const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
             <div className="flex items-start">
               <Shield className="h-5 w-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" />
               <div className="text-sm">
-                <p className="text-blue-900 font-medium mb-1">
-                  Privacy-First Mode Active
-                </p>
+                <p className="text-blue-900 font-medium mb-1">Privacy-First Mode Active</p>
                 <p className="text-blue-800">
-                  Your data is stored only on this device. No cloud sync or
-                  password required.
+                  Your data is stored only on this device. No cloud sync or password required.
                 </p>
               </div>
             </div>
@@ -163,9 +160,7 @@ const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className="bg-green-50 p-4 rounded-lg text-center">
                 <Database className="h-6 w-6 text-green-600 mx-auto mb-2" />
-                <div className="text-lg font-semibold text-green-900">
-                  {stats.totalEnvelopes}
-                </div>
+                <div className="text-lg font-semibold text-green-900">{stats.totalEnvelopes}</div>
                 <div className="text-xs text-green-700">Envelopes</div>
               </div>
 
@@ -187,9 +182,7 @@ const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
 
               <div className="bg-gray-50 p-4 rounded-lg text-center">
                 <Monitor className="h-6 w-6 text-gray-600 mx-auto mb-2" />
-                <div className="text-lg font-semibold text-gray-900">
-                  {stats.totalBills}
-                </div>
+                <div className="text-lg font-semibold text-gray-900">{stats.totalBills}</div>
                 <div className="text-xs text-gray-700">Bills</div>
               </div>
             </div>
@@ -198,9 +191,7 @@ const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
           {/* Data Management Section */}
           <div className="space-y-6">
             <div>
-              <h4 className="font-medium text-gray-900 mb-4">
-                Data Management
-              </h4>
+              <h4 className="font-medium text-gray-900 mb-4">Data Management</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Export Data */}
                 <button
@@ -241,9 +232,7 @@ const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
 
             {/* Mode Management Section */}
             <div>
-              <h4 className="font-medium text-gray-900 mb-4">
-                Mode Management
-              </h4>
+              <h4 className="font-medium text-gray-900 mb-4">Mode Management</h4>
               <div className="space-y-4">
                 {/* Switch to Standard Mode */}
                 <div className="border border-purple-300 rounded-lg p-4">
@@ -251,13 +240,11 @@ const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
                     <div className="flex-1">
                       <div className="flex items-center">
                         <LogOut className="h-5 w-5 text-purple-600 mr-2" />
-                        <h5 className="font-medium text-gray-900">
-                          Switch to Standard Mode
-                        </h5>
+                        <h5 className="font-medium text-gray-900">Switch to Standard Mode</h5>
                       </div>
                       <p className="text-sm text-gray-600 mt-1">
-                        Enable password protection and cloud sync features. Your
-                        local data will be preserved.
+                        Enable password protection and cloud sync features. Your local data will be
+                        preserved.
                       </p>
                     </div>
                     <button
@@ -276,13 +263,11 @@ const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
                     <div className="flex-1">
                       <div className="flex items-center">
                         <Trash2 className="h-5 w-5 text-red-600 mr-2" />
-                        <h5 className="font-medium text-gray-900">
-                          Clear All Data
-                        </h5>
+                        <h5 className="font-medium text-gray-900">Clear All Data</h5>
                       </div>
                       <p className="text-sm text-gray-600 mt-1">
-                        Permanently delete all envelopes, transactions, and
-                        settings. This cannot be undone.
+                        Permanently delete all envelopes, transactions, and settings. This cannot be
+                        undone.
                       </p>
                     </div>
                     <button
@@ -330,12 +315,10 @@ const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
         {showConfirmExit && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4 rounded-2xl">
             <div className="bg-white rounded-xl p-6 w-full max-w-md">
-              <h4 className="text-lg font-semibold text-gray-900 mb-4">
-                Switch to Standard Mode?
-              </h4>
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Switch to Standard Mode?</h4>
               <p className="text-sm text-gray-600 mb-6">
-                This will enable password protection and cloud sync features.
-                Your local data will be preserved and you can set up encryption.
+                This will enable password protection and cloud sync features. Your local data will
+                be preserved and you can set up encryption.
               </p>
               <div className="flex gap-3">
                 <button
@@ -362,22 +345,15 @@ const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
             <div className="bg-white rounded-xl p-6 w-full max-w-md">
               <div className="flex items-center mb-4">
                 <AlertTriangle className="h-6 w-6 text-red-600 mr-2" />
-                <h4 className="text-lg font-semibold text-gray-900">
-                  Clear All Data?
-                </h4>
+                <h4 className="text-lg font-semibold text-gray-900">Clear All Data?</h4>
               </div>
               <p className="text-sm text-gray-600 mb-6">
-                This will permanently delete all your envelopes, transactions,
-                bills, and settings.
-                <strong className="text-red-600">
-                  {" "}
-                  This action cannot be undone.
-                </strong>
+                This will permanently delete all your envelopes, transactions, bills, and settings.
+                <strong className="text-red-600"> This action cannot be undone.</strong>
               </p>
               <div className="bg-red-50 border border-red-200 rounded p-3 mb-6">
                 <p className="text-xs text-red-800">
-                  💡 <strong>Tip:</strong> Export your data first if you want to
-                  keep a backup.
+                  💡 <strong>Tip:</strong> Export your data first if you want to keep a backup.
                 </p>
               </div>
               <div className="flex gap-3">
