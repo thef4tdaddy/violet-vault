@@ -592,7 +592,42 @@ class CloudSyncService {
    */
   async migrateToChunkedFormat(ChunkedFirebaseSync, dexieData) {
     try {
-      logger.debug("🔄 Starting migration to chunked format...");
+      // Debug what data we're actually migrating
+      const dataItemCount =
+        (dexieData?.envelopes?.length || 0) +
+        (dexieData?.transactions?.length || 0) +
+        (dexieData?.bills?.length || 0);
+
+      logger.debug("🔄 Starting migration to chunked format...", {
+        hasDataToMigrate: !!dexieData,
+        envelopesCount: dexieData?.envelopes?.length || 0,
+        transactionsCount: dexieData?.transactions?.length || 0,
+        billsCount: dexieData?.bills?.length || 0,
+        totalItems: dataItemCount,
+      });
+
+      // CRITICAL: If no data to migrate but we expect data, fetch fresh data
+      if (dataItemCount === 0) {
+        logger.warn(
+          "🔄 Migration called with empty data - fetching fresh local data...",
+        );
+        const freshDexieData = await this.fetchDexieData();
+        const freshItemCount =
+          (freshDexieData?.envelopes?.length || 0) +
+          (freshDexieData?.transactions?.length || 0) +
+          (freshDexieData?.bills?.length || 0);
+
+        logger.debug("🔄 Fresh data fetch results", {
+          originalItemCount: dataItemCount,
+          freshItemCount,
+          foundFreshData: freshItemCount > 0,
+        });
+
+        if (freshItemCount > 0) {
+          dexieData = freshDexieData;
+          logger.info("✅ Fresh local data found - using for migration");
+        }
+      }
 
       // Step 1: Clean up old cloud data
       const resetResult = await ChunkedFirebaseSync.resetCloudData();
