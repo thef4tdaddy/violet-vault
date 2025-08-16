@@ -173,9 +173,15 @@ class ChunkedFirebaseSync {
         console.warn(
           `🚨 Force splitting ${arrayName} chunk with ${currentChunk.length} items (${Math.round(currentSize / 1024)}KB)`
         );
+        // Remove the last item before pushing the chunk
+        const lastItem = currentChunk.pop();
+        const lastItemSize = this.calculateSize(lastItem);
+        
         chunks.push([...currentChunk]);
-        currentChunk = [];
-        currentSize = 0;
+        
+        // Start new chunk with the item that caused the split
+        currentChunk = [lastItem];
+        currentSize = lastItemSize;
       }
     }
 
@@ -190,6 +196,11 @@ class ChunkedFirebaseSync {
       averageItemsPerChunk: Math.round(array.length / chunks.length),
       effectiveMaxSizeKB: Math.round(effectiveMaxSize / 1024),
       encryptionOverhead: `${((encryptionOverheadMultiplier - 1) * 100).toFixed(0)}%`,
+      chunkSizes: chunks.map((chunk, i) => ({
+        index: i,
+        items: chunk.length,
+        estimatedSizeKB: Math.round(this.calculateSize(chunk) / 1024),
+      })),
     });
 
     return chunks;
