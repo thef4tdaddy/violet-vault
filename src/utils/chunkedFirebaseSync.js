@@ -584,10 +584,13 @@ class ChunkedFirebaseSync {
         error.message,
       );
 
-      // Provide more specific error context
+      // Provide more specific error context and auto-recovery
       if (
         error.message.includes("provided data is too small") ||
-        error.message.includes("too small")
+        error.message.includes("too small") ||
+        error.message.includes(
+          "operation failed for an operation-specific reason",
+        )
       ) {
         console.error(
           "🔍 This error typically occurs when trying to decrypt corrupted or incomplete data chunks.",
@@ -595,6 +598,19 @@ class ChunkedFirebaseSync {
         console.error(
           "💡 The chunks may have been partially written or corrupted during upload.",
         );
+
+        // Automatically clean up corrupted data to allow fresh sync
+        console.log(
+          "🔧 Attempting automatic cleanup of corrupted cloud data...",
+        );
+        try {
+          await this.resetCloudData();
+          console.log("✅ Corrupted cloud data cleaned up successfully");
+          // Return null to indicate no data available (will trigger fresh upload if local data exists)
+          return { data: null, recovered: true };
+        } catch (cleanupError) {
+          console.error("❌ Failed to cleanup corrupted data:", cleanupError);
+        }
       }
 
       H.consumeError(error, {
