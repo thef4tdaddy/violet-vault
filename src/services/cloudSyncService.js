@@ -1,5 +1,7 @@
 import { budgetDb } from "../db/budgetDb";
 import logger from "../utils/logger";
+import { queryClient } from "../utils/queryClient";
+import { queryKeys } from "../utils/queryClient";
 
 /**
  * CloudSyncService - Background bidirectional sync between Firestore and Dexie
@@ -14,6 +16,72 @@ class CloudSyncService {
     this.syncIntervalMs = 30000; // 30 seconds
     this.lastSyncedCommitHash = null; // Track using existing git-like history
     this.activeSyncPromise = null; // Prevent concurrent syncs
+  }
+
+  /**
+   * Save downloaded cloud data to Dexie and invalidate TanStack Query caches
+   */
+  async saveToDexieAndInvalidate(data) {
+    logger.debug("💾 Saving downloaded cloud data to Dexie...");
+    
+    try {
+      // Save all data types to Dexie using bulk upsert methods
+      const promises = [];
+      
+      if (data.transactions?.length > 0) {
+        promises.push(budgetDb.bulkUpsertTransactions(data.transactions));
+        logger.debug(`💾 Saving ${data.transactions.length} transactions to Dexie`);
+      }
+      
+      if (data.envelopes?.length > 0) {
+        promises.push(budgetDb.bulkUpsertEnvelopes(data.envelopes));
+        logger.debug(`💾 Saving ${data.envelopes.length} envelopes to Dexie`);
+      }
+      
+      if (data.bills?.length > 0) {
+        promises.push(budgetDb.bulkUpsertBills(data.bills));
+        logger.debug(`💾 Saving ${data.bills.length} bills to Dexie`);
+      }
+      
+      if (data.debts?.length > 0) {
+        promises.push(budgetDb.bulkUpsertDebts(data.debts));
+        logger.debug(`💾 Saving ${data.debts.length} debts to Dexie`);
+      }
+      
+      if (data.savingsGoals?.length > 0) {
+        promises.push(budgetDb.bulkUpsertSavingsGoals(data.savingsGoals));
+        logger.debug(`💾 Saving ${data.savingsGoals.length} savings goals to Dexie`);
+      }
+      
+      if (data.paycheckHistory?.length > 0) {
+        promises.push(budgetDb.bulkUpsertPaychecks(data.paycheckHistory));
+        logger.debug(`💾 Saving ${data.paycheckHistory.length} paycheck history to Dexie`);
+      }
+      
+      // Wait for all saves to complete
+      await Promise.all(promises);
+      
+      logger.debug("✅ Successfully saved all data to Dexie");
+      
+      // Invalidate all relevant TanStack Query caches to trigger UI refresh
+      logger.debug("🔄 Invalidating TanStack Query caches...");
+      
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.transactions }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.envelopes }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.bills }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.debts }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.dashboard }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.analytics }),
+      ]);
+      
+      logger.debug("✅ TanStack Query caches invalidated - UI should refresh with synced data");
+      
+    } catch (error) {
+      logger.error("❌ Failed to save downloaded data to Dexie:", error);
+      throw error;
+    }
   }
 
   /**
@@ -647,7 +715,7 @@ class CloudSyncService {
     if (direction === "toFirestore") {
       await this.syncFromDexieToChunkedFirestore(data, ChunkedFirebaseSync);
     } else if (direction === "fromFirestore") {
-      await this.syncFromFirestoreToDexie(data);
+      await this.saveToDexieAndInvalidate(data);
     } else {
       logger.debug("🔄 No sync needed - data is up to date");
     }
