@@ -312,8 +312,12 @@ class ChunkedFirebaseSync {
             this.encryptionKey
           );
 
+          // Convert arrays to base64 to reduce Firestore storage size
           const chunkDoc = {
-            encryptedData: encryptedChunk,
+            encryptedData: {
+              data: btoa(String.fromCharCode.apply(null, encryptedChunk.data)),
+              iv: btoa(String.fromCharCode.apply(null, encryptedChunk.iv)),
+            },
             chunkType: fieldName,
             chunkIndex: i,
             totalChunks: chunks.length,
@@ -330,7 +334,11 @@ class ChunkedFirebaseSync {
             firebaseLimitKB: Math.round(FIREBASE_MAX_SIZE / 1024),
             withinLimit: chunkSize <= FIREBASE_MAX_SIZE,
             rawDataItems: chunks[i].length,
-            encryptedDataSizeKB: Math.round(encryptedChunk.length / 1024),
+            originalArraySize: encryptedChunk?.data?.length || 0,
+            base64DataSize: chunkDoc.encryptedData?.data?.length || 0,
+            base64IvSize: chunkDoc.encryptedData?.iv?.length || 0,
+            compressionRatio: encryptedChunk?.data ? 
+              Math.round((chunkDoc.encryptedData.data.length / encryptedChunk.data.length) * 100) + '%' : 'N/A',
           });
           
           if (chunkSize > FIREBASE_MAX_SIZE) {
@@ -404,7 +412,10 @@ class ChunkedFirebaseSync {
       const manifestDoc = doc(db, "budgets", this.budgetId);
       batch.set(manifestDoc, {
         type: "budget_manifest",
-        encryptedData: encryptedManifest,
+        encryptedData: {
+          data: btoa(String.fromCharCode.apply(null, encryptedManifest.data)),
+          iv: btoa(String.fromCharCode.apply(null, encryptedManifest.iv)),
+        },
         lastModified: Date.now(),
         chunkCount: Object.values(chunkMap).reduce((sum, chunks) => sum + chunks.length, 0),
       });
@@ -548,11 +559,26 @@ class ChunkedFirebaseSync {
         encryptedDataSize: manifestData.encryptedData?.length || 0,
         encryptedDataType: typeof manifestData.encryptedData,
         hasEncryptionKey: !!this.encryptionKey,
+        isBase64Format: typeof manifestData.encryptedData?.data === 'string',
       });
       
-      const decryptedManifest = JSON.parse(
-        await encryptionUtils.decrypt(manifestData.encryptedData, this.encryptionKey)
-      );
+      // Handle both old array format and new base64 format for manifest
+      let decryptedManifest;
+      if (typeof manifestData.encryptedData?.data === 'string') {
+        // New base64 format
+        const manifestDecryptionData = {
+          data: Array.from(atob(manifestData.encryptedData.data), c => c.charCodeAt(0)),
+          iv: Array.from(atob(manifestData.encryptedData.iv), c => c.charCodeAt(0)),
+        };
+        decryptedManifest = JSON.parse(
+          await encryptionUtils.decrypt(manifestDecryptionData.data, this.encryptionKey, manifestDecryptionData.iv)
+        );
+      } else {
+        // Old array format (backward compatibility)
+        decryptedManifest = JSON.parse(
+          await encryptionUtils.decrypt(manifestData.encryptedData, this.encryptionKey)
+        );
+      }
 
       if (decryptedManifest.type !== "budget_manifest") {
         throw new Error("Invalid manifest document");
@@ -589,14 +615,28 @@ class ChunkedFirebaseSync {
 
             try {
               console.log(`🔓 Attempting to decrypt chunk ${chunkId}`, {
-                encryptedDataSize: encryptedChunk.encryptedData?.length || 0,
+                hasEncryptedData: !!encryptedChunk.encryptedData,
                 encryptedDataType: typeof encryptedChunk.encryptedData,
                 chunkType: encryptedChunk.chunkType,
                 chunkIndex: encryptedChunk.chunkIndex,
+                isBase64Format: typeof encryptedChunk.encryptedData?.data === 'string',
               });
               
+              // Handle both old array format and new base64 format
+              let decryptionData;
+              if (typeof encryptedChunk.encryptedData?.data === 'string') {
+                // New base64 format
+                decryptionData = {
+                  data: Array.from(atob(encryptedChunk.encryptedData.data), c => c.charCodeAt(0)),
+                  iv: Array.from(atob(encryptedChunk.encryptedData.iv), c => c.charCodeAt(0)),
+                };
+              } else {
+                // Old array format (backward compatibility)
+                decryptionData = encryptedChunk.encryptedData;
+              }
+              
               const decryptedChunk = JSON.parse(
-                await encryptionUtils.decrypt(encryptedChunk.encryptedData, this.encryptionKey)
+                await encryptionUtils.decrypt(decryptionData.data, this.encryptionKey, decryptionData.iv)
               );
 
               chunks.push({
