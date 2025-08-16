@@ -42,7 +42,9 @@ const TransactionTable = ({
               >
                 Date
               </th>
-              <th className="px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th
+                className={`${COLUMN_WIDTHS.description} px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider`}
+              >
                 Description
               </th>
               <th
