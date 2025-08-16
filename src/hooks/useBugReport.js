@@ -17,15 +17,16 @@ const useBugReport = () => {
     try {
       // Check if we're on mobile - use simpler approach
       const isMobile =
-        /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-        window.innerWidth <= 768;
+        /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent,
+        ) || window.innerWidth <= 768;
 
       // Add timeout to prevent indefinite hanging
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(
           () => reject(new Error("Screenshot capture timed out")),
-          isMobile ? 10000 : 15000
-        )
+          isMobile ? 10000 : 15000,
+        ),
       );
 
       // Dynamic import to avoid bundle size issues
@@ -40,6 +41,10 @@ const useBugReport = () => {
         // Mobile-specific optimizations
         height: isMobile ? Math.min(window.innerHeight, 2000) : undefined,
         width: isMobile ? Math.min(window.innerWidth, 1200) : undefined,
+        // Additional compatibility options
+        foreignObjectRendering: false, // Disable to avoid modern CSS issues
+        imageTimeout: 15000, // Increase timeout for slow image loading
+        removeContainer: true, // Clean up after rendering
         // Exclude the bug report button and modal from screenshot
         ignoreElements: (element) => {
           return element.getAttribute("data-bug-report") === "true";
@@ -47,31 +52,15 @@ const useBugReport = () => {
         // Skip problematic CSS properties that html2canvas can't parse
         onclone: (clonedDoc) => {
           try {
-            // Remove all existing stylesheets and replace with safe equivalents
-            const existingStyles = clonedDoc.querySelectorAll('style, link[rel="stylesheet"]');
+            // More aggressive CSS cleanup approach for screenshot compatibility
+            // Remove all existing stylesheets that could contain problematic color functions
+            const existingStyles = clonedDoc.querySelectorAll(
+              'style, link[rel="stylesheet"]',
+            );
             existingStyles.forEach((style) => {
-              if (style.sheet) {
-                try {
-                  // Check if stylesheet contains modern color functions
-                  const cssText = Array.from(style.sheet.cssRules)
-                    .map((rule) => rule.cssText)
-                    .join("\n");
-
-                  if (
-                    cssText.includes("oklch(") ||
-                    cssText.includes("lch(") ||
-                    cssText.includes("lab(")
-                  ) {
-                    console.warn(
-                      "Removing stylesheet with unsupported color functions for screenshot"
-                    );
-                    style.remove();
-                  }
-                } catch {
-                  // Cross-origin or other access issues - safer to remove
-                  style.remove();
-                }
-              }
+              // Remove all stylesheets to avoid any color function parsing issues
+              // We'll replace them with safe equivalents below
+              style.remove();
             });
 
             // Add comprehensive safe style override
@@ -79,9 +68,25 @@ const useBugReport = () => {
             style.textContent = `
               /* Safe color fallbacks for screenshot compatibility */
               * {
-                /* Reset any problematic color functions */
+                /* Reset any problematic color functions and advanced CSS features */
                 filter: none !important;
                 backdrop-filter: none !important;
+                color-scheme: unset !important;
+                accent-color: unset !important;
+                /* Force simple color values to avoid modern color function parsing */
+                color: inherit !important;
+                background-color: transparent !important;
+                border-color: transparent !important;
+              }
+              
+              /* Reset any CSS custom properties that might contain color functions */
+              :root, * {
+                --tw-ring-color: transparent !important;
+                --tw-ring-offset-color: transparent !important;
+                --tw-shadow-color: transparent !important;
+                --tw-border-opacity: 1 !important;
+                --tw-bg-opacity: 1 !important;
+                --tw-text-opacity: 1 !important;
               }
               
               /* Tailwind color mappings to safe RGB values */
@@ -166,13 +171,45 @@ const useBugReport = () => {
       // Race between screenshot capture and timeout
       const canvas = await Promise.race([screenshotPromise, timeoutPromise]);
 
-      const screenshotDataUrl = canvas.toDataURL("image/png", isMobile ? 0.5 : 0.7);
+      const screenshotDataUrl = canvas.toDataURL(
+        "image/png",
+        isMobile ? 0.5 : 0.7,
+      );
       setScreenshot(screenshotDataUrl);
       return screenshotDataUrl;
     } catch (error) {
-      console.warn("Failed to capture screenshot:", error.message);
-      // Return null instead of throwing - this allows the bug report to continue without screenshot
-      return null;
+      console.warn("Primary screenshot capture failed:", error.message);
+
+      // Try fallback screenshot with minimal options
+      try {
+        console.log(
+          "🔄 Attempting fallback screenshot with minimal configuration...",
+        );
+        const html2canvas = (await import("html2canvas")).default;
+
+        const fallbackCanvas = await html2canvas(document.body, {
+          logging: false,
+          scale: 0.25, // Very small scale for compatibility
+          backgroundColor: "#ffffff",
+          useCORS: false, // Disable CORS for compatibility
+          allowTaint: false,
+          foreignObjectRendering: false,
+          removeContainer: true,
+          ignoreElements: (element) => {
+            return element.getAttribute("data-bug-report") === "true";
+          },
+          // Skip onclone entirely for fallback
+        });
+
+        const fallbackDataUrl = fallbackCanvas.toDataURL("image/png", 0.3);
+        setScreenshot(fallbackDataUrl);
+        console.log("✅ Fallback screenshot captured successfully");
+        return fallbackDataUrl;
+      } catch (fallbackError) {
+        console.warn("Fallback screenshot also failed:", fallbackError.message);
+        // Return null instead of throwing - this allows the bug report to continue without screenshot
+        return null;
+      }
     }
   };
 
@@ -183,7 +220,11 @@ const useBugReport = () => {
 
     // Add overall timeout to prevent infinite hanging
     const timeoutPromise = new Promise(
-      (_, reject) => setTimeout(() => reject(new Error("Bug report submission timed out")), 30000) // 30 second timeout
+      (_, reject) =>
+        setTimeout(
+          () => reject(new Error("Bug report submission timed out")),
+          30000,
+        ), // 30 second timeout
     );
 
     const submissionPromise = async () => {
@@ -196,7 +237,7 @@ const useBugReport = () => {
           } catch (screenshotError) {
             console.warn(
               "Screenshot capture failed, proceeding without screenshot:",
-              screenshotError
+              screenshotError,
             );
             screenshotData = null;
           }
@@ -205,22 +246,61 @@ const useBugReport = () => {
         // Get Highlight.io session URL for the bug report
         let sessionUrl = null;
         try {
-          // Try different methods to get session URL based on Highlight.io SDK version
+          // Enhanced session URL retrieval with better error handling
           if (typeof H.getSessionMetadata === "function") {
-            const sessionMetadata = H.getSessionMetadata();
-            if (sessionMetadata?.sessionUrl) {
-              sessionUrl = String(sessionMetadata.sessionUrl);
+            try {
+              const sessionMetadata = H.getSessionMetadata();
+              if (sessionMetadata?.sessionUrl) {
+                sessionUrl = String(sessionMetadata.sessionUrl);
+              } else if (sessionMetadata?.url) {
+                sessionUrl = String(sessionMetadata.url);
+              }
+            } catch (metadataError) {
+              console.warn("getSessionMetadata failed:", metadataError.message);
             }
-          } else if (typeof H.getSessionURL === "function") {
-            const rawUrl = H.getSessionURL();
-            sessionUrl = typeof rawUrl === "string" ? rawUrl : String(rawUrl);
-          } else if (typeof H.getSession === "function") {
-            const session = H.getSession();
-            const rawUrl = session?.url || session?.sessionUrl;
-            sessionUrl = rawUrl ? String(rawUrl) : null;
+          }
+
+          // Fallback methods if primary method failed
+          if (!sessionUrl && typeof H.getSessionURL === "function") {
+            try {
+              const rawUrl = H.getSessionURL();
+              sessionUrl = typeof rawUrl === "string" ? rawUrl : String(rawUrl);
+            } catch (urlError) {
+              console.warn("getSessionURL failed:", urlError.message);
+            }
+          }
+
+          if (!sessionUrl && typeof H.getSession === "function") {
+            try {
+              const session = H.getSession();
+              const rawUrl =
+                session?.url || session?.sessionUrl || session?.replayUrl;
+              sessionUrl = rawUrl ? String(rawUrl) : null;
+            } catch (sessionError) {
+              console.warn("getSession failed:", sessionError.message);
+            }
+          }
+
+          // Additional fallback for newer SDK versions
+          if (!sessionUrl && typeof H.getCurrentSessionURL === "function") {
+            try {
+              const currentUrl = H.getCurrentSessionURL();
+              sessionUrl =
+                typeof currentUrl === "string"
+                  ? currentUrl
+                  : String(currentUrl);
+            } catch (currentError) {
+              console.warn(
+                "getCurrentSessionURL failed:",
+                currentError.message,
+              );
+            }
           }
         } catch (error) {
-          console.warn("Failed to get Highlight.io session metadata:", error);
+          console.warn(
+            "Failed to get Highlight.io session metadata:",
+            error.message,
+          );
         }
 
         // Get current page context for smart labeling
@@ -233,7 +313,7 @@ const useBugReport = () => {
 
           // First try to detect from active navigation tab
           const activeTab = document.querySelector(
-            '[aria-current="page"], .border-t-2.border-purple-500, .text-purple-600.bg-purple-50'
+            '[aria-current="page"], .border-t-2.border-purple-500, .text-purple-600.bg-purple-50',
           );
           if (activeTab) {
             const tabText = activeTab.textContent?.toLowerCase().trim();
@@ -241,12 +321,16 @@ const useBugReport = () => {
               if (tabText.includes("dashboard")) currentPage = "dashboard";
               else if (tabText.includes("envelope")) currentPage = "envelopes";
               else if (tabText.includes("savings")) currentPage = "savings";
-              else if (tabText.includes("supplemental")) currentPage = "supplemental";
+              else if (tabText.includes("supplemental"))
+                currentPage = "supplemental";
               else if (tabText.includes("paycheck")) currentPage = "paycheck";
               else if (tabText.includes("bills") || tabText.includes("manage"))
                 currentPage = "bills";
               else if (tabText.includes("debt")) currentPage = "debt";
-              else if (tabText.includes("analytics") || tabText.includes("chart"))
+              else if (
+                tabText.includes("analytics") ||
+                tabText.includes("chart")
+              )
                 currentPage = "analytics";
               else if (tabText.includes("settings")) currentPage = "settings";
             }
@@ -254,38 +338,61 @@ const useBugReport = () => {
 
           // Fallback to URL-based detection for other pages
           if (currentPage === "unknown") {
-            if (path.includes("/debt") || hash.includes("debt")) currentPage = "debt";
+            if (path.includes("/debt") || hash.includes("debt"))
+              currentPage = "debt";
             else if (path.includes("/envelope") || hash.includes("envelope"))
               currentPage = "envelopes";
-            else if (path.includes("/transaction") || hash.includes("transaction"))
+            else if (
+              path.includes("/transaction") ||
+              hash.includes("transaction")
+            )
               currentPage = "transaction";
-            else if (path.includes("/savings") || hash.includes("savings")) currentPage = "savings";
+            else if (path.includes("/savings") || hash.includes("savings"))
+              currentPage = "savings";
             else if (path.includes("/analytics") || hash.includes("analytics"))
               currentPage = "analytics";
-            else if (path === "/" || path === "" || hash === "#/") currentPage = "dashboard";
+            else if (path === "/" || path === "" || hash === "#/")
+              currentPage = "dashboard";
           }
 
           // Additional detection from main content area
           if (currentPage === "unknown") {
-            const mainContent = document.querySelector('main, [role="main"], .main-content');
+            const mainContent = document.querySelector(
+              'main, [role="main"], .main-content',
+            );
             if (mainContent) {
               const contentText = mainContent.textContent?.toLowerCase() || "";
-              if (contentText.includes("envelope") && contentText.includes("budget"))
+              if (
+                contentText.includes("envelope") &&
+                contentText.includes("budget")
+              )
                 currentPage = "envelopes";
-              else if (contentText.includes("debt") && contentText.includes("payoff"))
+              else if (
+                contentText.includes("debt") &&
+                contentText.includes("payoff")
+              )
                 currentPage = "debt";
-              else if (contentText.includes("savings") && contentText.includes("goal"))
+              else if (
+                contentText.includes("savings") &&
+                contentText.includes("goal")
+              )
                 currentPage = "savings";
-              else if (contentText.includes("bill") && contentText.includes("manage"))
+              else if (
+                contentText.includes("bill") &&
+                contentText.includes("manage")
+              )
                 currentPage = "bills";
-              else if (contentText.includes("paycheck") || contentText.includes("income"))
+              else if (
+                contentText.includes("paycheck") ||
+                contentText.includes("income")
+              )
                 currentPage = "paycheck";
             }
           }
 
           // Try to detect active component from DOM classes/attributes
           const activeElements = document.querySelectorAll(
-            '[data-active="true"], .active, [aria-current="page"]'
+            '[data-active="true"], .active, [aria-current="page"]',
           );
           const componentHints = Array.from(activeElements)
             .map((el) => el.textContent?.toLowerCase().trim())
@@ -293,13 +400,15 @@ const useBugReport = () => {
 
           // Get additional verbose context about the current screen
           const getScreenTitle = () => {
-            const titleElement = document.querySelector("h1, h2, .page-title, [data-page-title]");
+            const titleElement = document.querySelector(
+              "h1, h2, .page-title, [data-page-title]",
+            );
             return titleElement?.textContent?.trim() || "Unknown Screen";
           };
 
           const getActiveButtons = () => {
             const buttons = document.querySelectorAll(
-              'button:not([disabled]), [role="button"]:not([disabled])'
+              'button:not([disabled]), [role="button"]:not([disabled])',
             );
             return Array.from(buttons)
               .map((btn) => btn.textContent?.trim())
@@ -308,11 +417,15 @@ const useBugReport = () => {
           };
 
           const getVisibleModals = () => {
-            const modals = document.querySelectorAll('[role="dialog"], .modal, [data-modal]');
+            const modals = document.querySelectorAll(
+              '[role="dialog"], .modal, [data-modal]',
+            );
             return Array.from(modals)
               .filter((modal) => modal.offsetParent !== null) // Only visible modals
               .map((modal) => {
-                const title = modal.querySelector("h1, h2, h3, .modal-title, [data-modal-title]");
+                const title = modal.querySelector(
+                  "h1, h2, h3, .modal-title, [data-modal-title]",
+                );
                 return title?.textContent?.trim() || "Untitled Modal";
               })
               .slice(0, 3);
@@ -330,7 +443,8 @@ const useBugReport = () => {
             documentTitle: document.title,
             userLocation: `${currentPage} page${getScreenTitle() !== "Unknown Screen" ? ` - ${getScreenTitle()}` : ""}`,
             activeModals: getVisibleModals().join(", ") || "None",
-            recentInteractions: getActiveButtons().slice(0, 3).join(", ") || "None detected",
+            recentInteractions:
+              getActiveButtons().slice(0, 3).join(", ") || "None detected",
           };
         };
 
@@ -349,9 +463,13 @@ const useBugReport = () => {
             memory: performance.memory
               ? {
                   usedJSHeapSize:
-                    Math.round(performance.memory.usedJSHeapSize / 1024 / 1024) + "MB",
+                    Math.round(
+                      performance.memory.usedJSHeapSize / 1024 / 1024,
+                    ) + "MB",
                   totalJSHeapSize:
-                    Math.round(performance.memory.totalJSHeapSize / 1024 / 1024) + "MB",
+                    Math.round(
+                      performance.memory.totalJSHeapSize / 1024 / 1024,
+                    ) + "MB",
                 }
               : "unavailable",
           };
@@ -390,7 +508,7 @@ const useBugReport = () => {
                 body.offsetWidth,
                 html.offsetWidth,
                 body.clientWidth,
-                html.clientWidth
+                html.clientWidth,
               ),
               height: Math.max(
                 body.scrollHeight,
@@ -398,7 +516,7 @@ const useBugReport = () => {
                 body.offsetHeight,
                 html.offsetHeight,
                 body.clientHeight,
-                html.clientHeight
+                html.clientHeight,
               ),
             },
             focusedElement: document.activeElement
@@ -421,18 +539,24 @@ const useBugReport = () => {
             const entries = performance.getEntriesByType("navigation");
             if (entries.length > 0) {
               errors.push(
-                `Load time: ${Math.round(entries[0].loadEventEnd - entries[0].fetchStart)}ms`
+                `Load time: ${Math.round(entries[0].loadEventEnd - entries[0].fetchStart)}ms`,
               );
             }
 
             // Add timing information
             if (performance.timing) {
               const timing = performance.timing;
-              errors.push(`DNS: ${timing.domainLookupEnd - timing.domainLookupStart}ms`);
-              errors.push(`Connect: ${timing.connectEnd - timing.connectStart}ms`);
+              errors.push(
+                `DNS: ${timing.domainLookupEnd - timing.domainLookupStart}ms`,
+              );
+              errors.push(
+                `Connect: ${timing.connectEnd - timing.connectStart}ms`,
+              );
             }
 
-            return errors.length > 0 ? errors : ["No performance data available"];
+            return errors.length > 0
+              ? errors
+              : ["No performance data available"];
           } catch {
             return ["Performance API unavailable"];
           }
@@ -441,7 +565,9 @@ const useBugReport = () => {
         const reportData = {
           description: description.trim(),
           screenshot: screenshotData,
-          sessionUrl: sessionUrl || "Session replay unavailable (possibly blocked by adblocker)",
+          sessionUrl:
+            sessionUrl ||
+            "Session replay unavailable (possibly blocked by adblocker)",
           env: {
             userAgent: navigator.userAgent,
             url: window.location.href,
@@ -464,10 +590,12 @@ const useBugReport = () => {
 
             // Additional context
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            colorScheme: window.matchMedia("(prefers-color-scheme: dark)").matches
+            colorScheme: window.matchMedia("(prefers-color-scheme: dark)")
+              .matches
               ? "dark"
               : "light",
-            reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+            reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)")
+              .matches,
             touchSupport: "ontouchstart" in window,
             standaloneMode:
               window.navigator.standalone ||
@@ -591,23 +719,55 @@ const useBugReport = () => {
   const openModal = () => {
     // Ensure Highlight.io session is active when opening bug report modal
     try {
-      // Check if Highlight is already recording before attempting to start
-      if (typeof H.isRecording === "function" && !H.isRecording()) {
-        H.start();
-        if (import.meta.env.MODE === "development") {
-          console.log("🔧 Started Highlight.io session for bug report");
+      // Enhanced session management to handle conflicts better
+      if (typeof H.isRecording === "function") {
+        // Modern SDK with isRecording method
+        if (!H.isRecording()) {
+          H.start();
+          if (import.meta.env.MODE === "development") {
+            console.log("🔧 Started Highlight.io session for bug report");
+          }
+        } else {
+          if (import.meta.env.MODE === "development") {
+            console.log("🔧 Highlight.io session already active");
+          }
         }
-      } else if (typeof H.start === "function" && typeof H.isRecording !== "function") {
-        // Fallback for older SDK versions that don't have isRecording
-        H.start();
-        if (import.meta.env.MODE === "development") {
-          console.log("🔧 Attempted Highlight.io session start for bug report");
+      } else {
+        // Older SDK or no isRecording method - try graceful start
+        try {
+          H.start();
+          if (import.meta.env.MODE === "development") {
+            console.log(
+              "🔧 Attempted Highlight.io session start for bug report",
+            );
+          }
+        } catch (startError) {
+          if (startError.message?.includes("already recording")) {
+            if (import.meta.env.MODE === "development") {
+              console.log(
+                "🔧 Highlight.io session already active (detected via error)",
+              );
+            }
+          } else {
+            throw startError; // Re-throw unexpected errors
+          }
         }
       }
     } catch (error) {
-      // Don't throw error if Highlight is already recording
-      if (!error.message?.includes("already recording")) {
-        console.error("Failed to start Highlight.io session:", error);
+      // Enhanced error handling for session conflicts
+      if (
+        error.message?.includes("already recording") ||
+        error.message?.includes("Highlight is already recording")
+      ) {
+        if (import.meta.env.MODE === "development") {
+          console.log(
+            "🔧 Highlight.io session already active (gracefully handled)",
+          );
+        }
+        // This is expected - don't log as error
+      } else {
+        console.warn("Failed to start Highlight.io session:", error.message);
+        // Don't block the bug report modal from opening due to Highlight issues
       }
     }
     setIsModalOpen(true);
@@ -636,7 +796,9 @@ const useBugReport = () => {
           `);
         } else {
           // Popup blocked or failed
-          console.warn("Failed to open screenshot preview - popup may be blocked");
+          console.warn(
+            "Failed to open screenshot preview - popup may be blocked",
+          );
           // Could set screenshot to show inline preview instead
           setScreenshot(screenshotData);
         }
