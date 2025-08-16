@@ -5,7 +5,7 @@
 // Fixed column widths for consistent table layout
 export const COLUMN_WIDTHS = {
   date: "w-32",
-  description: "", // flexible width
+  description: "w-64", // fixed width for table alignment
   category: "w-36",
   envelope: "w-48",
   amount: "w-32",

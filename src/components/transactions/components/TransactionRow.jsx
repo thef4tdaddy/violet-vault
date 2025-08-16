@@ -49,7 +49,7 @@ const TransactionRow = ({
       </td>
 
       {/* Description */}
-      <td className="px-4 py-4 text-sm">
+      <td className={`${COLUMN_WIDTHS.description} px-4 py-4 text-sm`}>
         <div className="font-medium text-gray-900 truncate">
           {transaction.description}
         </div>
