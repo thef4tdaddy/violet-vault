@@ -138,7 +138,7 @@ class ChunkedFirebaseSync {
     // Reserve extra space for encryption overhead AND final document metadata
     // We need to be extremely conservative: raw data -> JSON -> encryption -> final doc structure
     const FIREBASE_MAX_SIZE = 1048576; // Firebase's actual 1MB limit
-    const encryptionOverheadMultiplier = 3.0; // More reasonable - 200% overhead for encryption + JSON + chunking
+    const encryptionOverheadMultiplier = 4.5; // Balanced - ~300% overhead for JSON + encryption + metadata + safety margin
     const effectiveMaxSize = Math.floor(FIREBASE_MAX_SIZE / encryptionOverheadMultiplier);
 
     console.log(
@@ -312,7 +312,16 @@ class ChunkedFirebaseSync {
 
           // Verify chunk size is within Firebase's 1MB limit
           const chunkSize = this.calculateSize(chunkDoc);
-          const FIREBASE_MAX_SIZE = 1048576; // Firebase's actual 1MB limit
+          const FIREBASE_MAX_SIZE = 1000000; // 1MB with safety margin (1,048,576 - 48,576 bytes buffer)
+          
+          console.log(`📏 Chunk ${chunkId} size check:`, {
+            actualSizeKB: Math.round(chunkSize / 1024),
+            firebaseLimitKB: Math.round(FIREBASE_MAX_SIZE / 1024),
+            withinLimit: chunkSize <= FIREBASE_MAX_SIZE,
+            rawDataItems: chunks[i].length,
+            encryptedDataSizeKB: Math.round(encryptedChunk.length / 1024),
+          });
+          
           if (chunkSize > FIREBASE_MAX_SIZE) {
             console.error(`❌ Chunk ${chunkId} exceeds Firebase size limit:`, {
               actualSizeKB: Math.round(chunkSize / 1024),
