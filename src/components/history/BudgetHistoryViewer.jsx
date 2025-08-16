@@ -19,6 +19,7 @@ import {
   Shield,
   ShieldAlert,
 } from "lucide-react";
+import IntegrityStatusIndicator from "./IntegrityStatusIndicator";
 import logger from "../../utils/logger";
 
 const BudgetHistoryViewer = ({ onClose }) => {
@@ -177,7 +178,7 @@ const BudgetHistoryViewer = ({ onClose }) => {
         <div className="p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
-            <div>
+            <div className="flex-1">
               <h2 className="text-2xl font-semibold text-gray-900 flex items-center">
                 <History className="h-6 w-6 mr-3 text-blue-600" />
                 Change History
@@ -185,6 +186,11 @@ const BudgetHistoryViewer = ({ onClose }) => {
               <p className="text-gray-600 mt-1">
                 View and restore previous versions of your budget
               </p>
+              
+              {/* Integrity Status Indicator */}
+              <div className="mt-3">
+                <IntegrityStatusIndicator />
+              </div>
             </div>
             <button
               onClick={onClose}
