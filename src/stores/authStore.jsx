@@ -126,10 +126,9 @@ export const useAuth = create((set, get) => ({
           let keyPreview = "none";
           try {
             const keyView = new Uint8Array(key);
-            keyPreview =
-              Array.from(keyView.slice(0, 16))
-                .map((b) => b.toString(16).padStart(2, "0"))
-                .join("");
+            keyPreview = Array.from(keyView.slice(0, 16))
+              .map((b) => b.toString(16).padStart(2, "0"))
+              .join("");
           } catch (error) {
             keyPreview = "error";
           }

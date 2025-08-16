@@ -190,7 +190,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
         onUpdateBill={handleUpdateBill}
         onCreateRecurringBill={(newBill) => {
           // Store bill properly using budget store - no transaction created until paid
-          console.log("📋 Creating new bill:", newBill);
+          logger.debug("📋 Creating new bill:", newBill);
           const bill = {
             ...newBill,
             id: newBill.id || `bill_${Date.now()}`,
@@ -200,7 +200,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
             createdAt: new Date().toISOString(),
           };
           addBill(bill);
-          console.log("✅ Bill stored successfully - no transaction created until paid");
+          logger.debug("✅ Bill stored successfully - no transaction created until paid");
         }}
         onSearchNewBills={async () => {
           try {
@@ -210,12 +210,12 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
               "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox."
             );
           } catch (error) {
-            console.error("Failed to search for new bills:", error);
+            logger.error("Failed to search for new bills:", error);
             alert("Failed to search for new bills. Please try again.");
           }
         }}
         onError={(error) => {
-          console.error("Bill management error:", error);
+          logger.error("Bill management error:", error);
           alert(`Error: ${error.message || error}`);
         }}
       />
@@ -228,7 +228,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
         onUpdateTransaction={_updateTransaction}
         onDeleteTransaction={_deleteTransaction}
         onBulkImport={(newTransactions) => {
-          console.log("🔄 onBulkImport called with transactions:", newTransactions.length);
+          logger.debug("🔄 onBulkImport called with transactions:", newTransactions.length);
 
           // Validate and normalize transactions for current data structure
           const validatedTransactions = newTransactions
@@ -273,26 +273,26 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
             }));
 
           if (validatedTransactions.length === 0) {
-            console.warn("No valid transactions to import");
+            logger.warn("No valid transactions to import");
             return;
           }
 
           // Use bulk import method for efficiency
           try {
             addTransactions(validatedTransactions);
-            console.log(
+            logger.debug(
               "💾 Bulk import complete. Added transactions:",
               validatedTransactions.length
             );
           } catch (error) {
-            console.error("Failed to import transactions:", error);
+            logger.error("Failed to import transactions:", error);
             // Fallback to individual imports if bulk fails
-            console.warn("Falling back to individual transaction imports");
+            logger.warn("Falling back to individual transaction imports");
             validatedTransactions.forEach((transaction) => {
               try {
                 addTransaction(transaction);
               } catch (individualError) {
-                console.error(`Failed to import transaction ${transaction.id}:`, individualError);
+                logger.error(`Failed to import transaction ${transaction.id}:`, individualError);
               }
             });
           }

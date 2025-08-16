@@ -19,6 +19,7 @@ import {
   Shield,
   ShieldAlert,
 } from "lucide-react";
+import logger from "../../utils/logger";
 
 const BudgetHistoryViewer = ({ onClose }) => {
   const {
@@ -56,7 +57,7 @@ const BudgetHistoryViewer = ({ onClose }) => {
         setStatistics(statsData);
         setIntegrityCheck(integrityResult);
       } catch (err) {
-        console.error("Failed to load budget history data:", err);
+        logger.error("Failed to load budget history data:", err);
       }
     };
 
@@ -75,7 +76,7 @@ const BudgetHistoryViewer = ({ onClose }) => {
         const details = await getCommitDetails(selectedCommit);
         setCommitDetails(details);
       } catch (err) {
-        console.error("Failed to load commit details:", err);
+        logger.error("Failed to load commit details:", err);
       }
     };
 
@@ -97,7 +98,7 @@ const BudgetHistoryViewer = ({ onClose }) => {
       const updatedHistory = await getHistory(filter);
       setHistory(updatedHistory || []);
     } catch (err) {
-      console.error("Failed to restore from history:", err);
+      logger.error("Failed to restore from history:", err);
     }
   };
 

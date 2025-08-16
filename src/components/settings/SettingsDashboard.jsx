@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useBudgetStore } from "../../stores/budgetStore";
 import LoadingSpinner from "../ui/LoadingSpinner";
+import logger from "../../utils/logger";
 
 // Lazy load heavy components
 const ChangePasswordModal = lazy(() => import("../auth/ChangePasswordModal"));
@@ -63,7 +64,7 @@ const SettingsDashboard = ({
     setCloudSyncEnabled(newValue);
 
     if (newValue) {
-      console.log("🌩️ Cloud sync enabled - starting background sync");
+      logger.debug("🌩️ Cloud sync enabled - starting background sync");
       try {
         const { default: CloudSyncService } = await import("../../services/cloudSyncService");
         const { useAuth } = await import("../../stores/authStore");
@@ -77,15 +78,15 @@ const SettingsDashboard = ({
           });
         }
       } catch (error) {
-        console.error("Failed to start cloud sync:", error);
+        logger.error("Failed to start cloud sync:", error);
       }
     } else {
-      console.log("💾 Cloud sync disabled - stopping background sync");
+      logger.debug("💾 Cloud sync disabled - stopping background sync");
       try {
         const { default: CloudSyncService } = await import("../../services/cloudSyncService");
         CloudSyncService.stop();
       } catch (error) {
-        console.error("Failed to stop cloud sync:", error);
+        logger.error("Failed to stop cloud sync:", error);
       }
     }
   };
@@ -95,11 +96,11 @@ const SettingsDashboard = ({
 
     setIsSyncing(true);
     try {
-      console.log("🔄 Manual sync triggered from settings");
+      logger.debug("🔄 Manual sync triggered from settings");
       const { default: CloudSyncService } = await import("../../services/cloudSyncService");
 
       if (!CloudSyncService.serviceIsRunning) {
-        console.log("⚠️ Cloud sync service not running, starting temporarily...");
+        logger.warn("⚠️ Cloud sync service not running, starting temporarily...");
         const { useAuth } = await import("../../stores/authStore");
         const authState = useAuth.getState();
 
@@ -117,14 +118,14 @@ const SettingsDashboard = ({
       const result = await CloudSyncService.forceSync();
 
       if (result.success) {
-        console.log("✅ Manual sync completed", result);
+        logger.info("✅ Manual sync completed", result);
         // TODO: Could add a success toast notification here
       } else {
-        console.error("❌ Manual sync failed", result.error);
+        logger.error("❌ Manual sync failed", result.error);
         // TODO: Could add an error toast notification here
       }
     } catch (error) {
-      console.error("❌ Manual sync failed:", error);
+      logger.error("❌ Manual sync failed:", error);
     } finally {
       setIsSyncing(false);
     }

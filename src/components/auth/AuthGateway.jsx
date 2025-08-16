@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Shield, ShieldOff } from "lucide-react";
 import { useLocalOnlyMode } from "../../hooks/useLocalOnlyMode";
+import logger from "../../utils/logger";
 import UserSetup from "./UserSetup";
 import LocalOnlySetup from "./LocalOnlySetup";
 
@@ -32,7 +33,7 @@ const AuthGateway = ({ onSetupComplete, onLocalOnlyReady }) => {
           }
         }
       } catch (error) {
-        console.error("Failed to check existing mode:", error);
+        logger.error("Failed to check existing mode:", error);
         // Default to standard mode on error instead of showing mode selection
         setAuthMode("standard");
       } finally {

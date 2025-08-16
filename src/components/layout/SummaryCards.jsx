@@ -3,6 +3,7 @@ import { DollarSign, Wallet, Target, TrendingUp } from "lucide-react";
 import { useBudgetStore } from "../../stores/budgetStore";
 import { useEnvelopes } from "../../hooks/useEnvelopes";
 import { useSavingsGoals } from "../../hooks/useSavingsGoals";
+import logger from "../../utils/logger";
 const UnassignedCashModal = lazy(() => import("../modals/UnassignedCashModal"));
 import { AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
@@ -28,7 +29,7 @@ const SummaryCards = () => {
   const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
 
   // Debug logging to compare with Dashboard
-  console.log("🔍 SummaryCards Debug:", {
+  logger.debug("🔍 SummaryCards Debug:", {
     envelopesCount: envelopes.length,
     totalEnvelopeBalance,
     totalSavingsBalance,

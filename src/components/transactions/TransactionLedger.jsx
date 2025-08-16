@@ -16,6 +16,7 @@ import { TRANSACTION_CATEGORIES } from "../../constants/categories";
 import { useBudgetStore } from "../../stores/budgetStore";
 import { useTransactions } from "../../hooks/useTransactions";
 import { useEnvelopes } from "../../hooks/useEnvelopes";
+import logger from "../../utils/logger";
 
 const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855f7" } }) => {
   // Enhanced TanStack Query integration with caching and optimistic updates
@@ -29,7 +30,7 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
   const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
 
   // Debug logging for transaction data
-  console.log("TransactionLedger Debug:", {
+  logger.debug("TransactionLedger Debug:", {
     transactionsCount: transactions.length,
     transactionsLoading,
     transactions: transactions.slice(0, 3), // Show first 3 for debugging
@@ -44,10 +45,10 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
 
   // Handle bulk import by updating both store arrays
   const handleBulkImport = (newTransactions) => {
-    console.log("🔄 Bulk import called with transactions:", newTransactions.length);
+    logger.debug("🔄 Bulk import called with transactions:", newTransactions.length);
     const updatedAllTransactions = [...transactions, ...newTransactions];
     setAllTransactions(updatedAllTransactions);
-    console.log("💾 Bulk import complete. Total transactions:", updatedAllTransactions.length);
+    logger.debug("💾 Bulk import complete. Total transactions:", updatedAllTransactions.length);
   };
   const [showAddModal, setShowAddModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
@@ -168,7 +169,7 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
       // Close the modal
       setSplittingTransaction(null);
     } catch (error) {
-      console.error("Error splitting transaction:", error);
+      logger.error("Error splitting transaction:", error);
       // You could add error handling here if needed
     }
   };

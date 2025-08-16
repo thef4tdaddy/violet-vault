@@ -524,7 +524,7 @@ const AddBillModal = ({
                     const isLegacyEnvelope = !env.envelopeType;
                     const isAllowed = isBillEnvelope || isVariableEnvelope || isLegacyEnvelope;
 
-                    console.log(`Envelope ${env.name}:`, {
+                    logger.debug(`Envelope ${env.name}:`, {
                       envelopeType: env.envelopeType,
                       isBillEnvelope,
                       isVariableEnvelope,

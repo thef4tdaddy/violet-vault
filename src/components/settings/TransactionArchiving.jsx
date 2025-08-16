@@ -14,6 +14,7 @@ import {
   Info,
 } from "lucide-react";
 import useTransactionArchiving from "../../hooks/useTransactionArchiving";
+import logger from "../../utils/logger";
 
 /**
  * Transaction Archiving Management Component
@@ -47,7 +48,7 @@ const TransactionArchiving = () => {
       await executeArchiving(selectedPeriod);
       setConfirmArchiving(false);
     } catch (error) {
-      console.error("Archiving failed:", error);
+      logger.error("Archiving failed:", error);
     }
   };
 
@@ -104,7 +105,7 @@ const TransactionArchiving = () => {
 
       setPreviewData(preview);
     } catch (error) {
-      console.error("Failed to generate preview:", error);
+      logger.error("Failed to generate preview:", error);
     }
   };
 

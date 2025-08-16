@@ -301,7 +301,14 @@ class ChunkedFirebaseSync {
       const chunkMap = {};
 
       // Arrays that need to be chunked
-      const arrayFields = ["transactions", "envelopes", "bills", "debts", "savingsGoals", "paycheckHistory"];
+      const arrayFields = [
+        "transactions",
+        "envelopes",
+        "bills",
+        "debts",
+        "savingsGoals",
+        "paycheckHistory",
+      ];
 
       // Process each array field
       for (const fieldName of arrayFields) {

@@ -21,6 +21,7 @@ import {
 } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
 import { toBiweekly, getFrequencyOptions } from "../../utils/frequencyCalculations";
+import logger from "../../utils/logger";
 
 // Import shared components
 import EnvelopeTypeSelector from "./shared/EnvelopeTypeSelector";
@@ -234,7 +235,7 @@ const CreateEnvelopeModal = ({
       resetForm();
       onClose();
     } catch (error) {
-      console.error("Error creating envelope:", error);
+      logger.error("Error creating envelope:", error);
       setErrors({ submit: "Failed to create envelope. Please try again." });
     } finally {
       setIsSubmitting(false);

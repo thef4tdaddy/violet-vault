@@ -1,16 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Shield, Users, Eye, EyeOff } from "lucide-react";
 import logoOnly from "../../assets/icon-512x512.png";
-
-// Helper to log only in development
-const devLog = (...args) => {
-  if (import.meta.env.MODE === "development") {
-    console.log(...args);
-  }
-};
+import logger from "../../utils/logger";
 
 const UserSetup = ({ onSetupComplete }) => {
-  devLog("🏗️ UserSetup component rendered", {
+  logger.debug("🏗️ UserSetup component rendered", {
     onSetupComplete: !!onSetupComplete,
   });
 
@@ -35,23 +29,23 @@ const UserSetup = ({ onSetupComplete }) => {
 
   // Load saved user profile on component mount
   useEffect(() => {
-    devLog("🔍 UserSetup mounted, checking for saved profile");
+    logger.debug("🔍 UserSetup mounted, checking for saved profile");
     const savedProfile = localStorage.getItem("userProfile");
     const savedData = localStorage.getItem("envelopeBudgetData");
 
     if (savedProfile && savedData) {
       try {
         const profile = JSON.parse(savedProfile);
-        devLog("📋 Found saved profile:", profile);
+        logger.debug("📋 Found saved profile:", profile);
         setUserName(profile.userName || "");
         setUserColor(profile.userColor || "#a855f7");
         setIsReturningUser(true);
-        devLog("👋 Returning user detected");
+        logger.debug("👋 Returning user detected");
       } catch (error) {
-        console.warn("Failed to load saved profile:", error);
+        logger.warn("Failed to load saved profile:", error);
       }
     } else {
-      devLog("📋 No saved profile found, new user");
+      logger.debug("📋 No saved profile found, new user");
       setIsReturningUser(false);
     }
   }, []);
@@ -69,7 +63,7 @@ const UserSetup = ({ onSetupComplete }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    devLog("🔄 Form submitted - STEP 2 HANDLER:", {
+    logger.debug("🔄 Form submitted - STEP 2 HANDLER:", {
       step,
       masterPassword: !!masterPassword,
       userName: userName.trim(),
@@ -77,7 +71,7 @@ const UserSetup = ({ onSetupComplete }) => {
     });
 
     if (!masterPassword || !userName.trim()) {
-      console.warn("⚠️ Form validation failed:", {
+      logger.warn("⚠️ Form validation failed:", {
         masterPassword: !!masterPassword,
         userName: userName.trim(),
       });
@@ -86,15 +80,15 @@ const UserSetup = ({ onSetupComplete }) => {
 
     setIsLoading(true);
     try {
-      devLog("🚀 Calling onSetupComplete...");
+      logger.debug("🚀 Calling onSetupComplete...");
       await onSetupComplete({
         password: masterPassword,
         userName: userName.trim(),
         userColor,
       });
-      devLog("✅ onSetupComplete succeeded");
+      logger.debug("✅ onSetupComplete succeeded");
     } catch (error) {
-      console.error("❌ Setup failed:", error);
+      logger.error("❌ Setup failed:", error);
     } finally {
       setIsLoading(false);
     }
@@ -102,7 +96,7 @@ const UserSetup = ({ onSetupComplete }) => {
 
   const handleStep1Continue = async (e) => {
     e.preventDefault();
-    devLog("🔄 Step 1 continue clicked:", {
+    logger.debug("🔄 Step 1 continue clicked:", {
       step,
       masterPassword: !!masterPassword,
       isReturningUser,
@@ -117,15 +111,15 @@ const UserSetup = ({ onSetupComplete }) => {
 
       setIsLoading(true);
       try {
-        devLog("🚀 Attempting login for returning user...");
+        logger.debug("🚀 Attempting login for returning user...");
         await onSetupComplete({
           password: masterPassword,
           userName,
           userColor,
         });
-        devLog("✅ Returning user login succeeded");
+        logger.debug("✅ Returning user login succeeded");
       } catch (error) {
-        console.error("❌ Login failed:", error);
+        logger.error("❌ Login failed:", error);
         alert("Incorrect password. Please try again.");
       } finally {
         setIsLoading(false);
@@ -138,7 +132,7 @@ const UserSetup = ({ onSetupComplete }) => {
 
   const handleStartTrackingClick = async (e) => {
     e.preventDefault();
-    devLog("🎯 Start Tracking button clicked:", {
+    logger.debug("🎯 Start Tracking button clicked:", {
       step,
       masterPassword: !!masterPassword,
       userName: userName.trim(),
@@ -146,7 +140,7 @@ const UserSetup = ({ onSetupComplete }) => {
     });
 
     if (!masterPassword || !userName.trim()) {
-      console.warn("⚠️ Validation failed on Start Tracking:", {
+      logger.warn("⚠️ Validation failed on Start Tracking:", {
         masterPassword: !!masterPassword,
         userName: userName.trim(),
       });
@@ -156,7 +150,7 @@ const UserSetup = ({ onSetupComplete }) => {
 
     setIsLoading(true);
     try {
-      devLog("🚀 Calling onSetupComplete from Start Tracking...");
+      logger.debug("🚀 Calling onSetupComplete from Start Tracking...");
 
       // Add timeout protection
       await handleWithTimeout(async () => {
@@ -167,9 +161,9 @@ const UserSetup = ({ onSetupComplete }) => {
         });
       }, 10000);
 
-      devLog("✅ onSetupComplete succeeded from Start Tracking");
+      logger.debug("✅ onSetupComplete succeeded from Start Tracking");
     } catch (error) {
-      console.error("❌ Setup failed from Start Tracking:", error);
+      logger.error("❌ Setup failed from Start Tracking:", error);
       alert(`Setup failed: ${error.message}`);
     } finally {
       setIsLoading(false);
@@ -177,7 +171,7 @@ const UserSetup = ({ onSetupComplete }) => {
   };
 
   const clearSavedProfile = () => {
-    devLog("🗑️ Clearing saved profile");
+    logger.debug("🗑️ Clearing saved profile");
     localStorage.removeItem("userProfile");
     setUserName("");
     setUserColor("#a855f7");
@@ -231,7 +225,7 @@ const UserSetup = ({ onSetupComplete }) => {
                   type={showPassword ? "text" : "password"}
                   value={masterPassword}
                   onChange={(e) => {
-                    devLog("🔐 Password input changed");
+                    logger.debug("🔐 Password input changed");
                     setMasterPassword(e.target.value);
                   }}
                   placeholder="Master password"
@@ -299,7 +293,7 @@ const UserSetup = ({ onSetupComplete }) => {
                   type="text"
                   value={userName}
                   onChange={(e) => {
-                    devLog("👤 Name input changed:", e.target.value);
+                    logger.debug("👤 Name input changed:", e.target.value);
                     setUserName(e.target.value);
                   }}
                   placeholder="e.g., Sarah, John, etc."
