@@ -611,6 +611,16 @@ class CloudSyncService {
       const { budgetHistory } = await import("../utils/budgetHistory.js");
       const currentCommitHash = budgetHistory.currentCommitHash;
 
+      // For first-time sync (no previous commit hash), always sync
+      if (!this.lastSyncedCommitHash) {
+        logger.debug("🆕 First-time sync detected - forcing sync attempt", {
+          currentCommit: currentCommitHash?.slice(0, 8) || "none",
+          hasCurrentCommit: !!currentCommitHash,
+        });
+        this.lastSyncedCommitHash = currentCommitHash;
+        return true; // Always sync on first run
+      }
+
       const hasChanged = currentCommitHash !== this.lastSyncedCommitHash;
       if (hasChanged) {
         logger.debug("📊 Data change detected via budget history", {
@@ -618,6 +628,11 @@ class CloudSyncService {
           currentCommit: currentCommitHash?.slice(0, 8) || "none",
         });
         this.lastSyncedCommitHash = currentCommitHash;
+      } else {
+        logger.debug("⏭️ No data changes since last sync", {
+          commitHash: currentCommitHash?.slice(0, 8) || "none",
+          lastSynced: this.lastSyncedCommitHash?.slice(0, 8) || "none",
+        });
       }
 
       return hasChanged;
