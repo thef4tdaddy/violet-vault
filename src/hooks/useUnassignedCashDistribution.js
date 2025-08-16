@@ -11,6 +11,7 @@ import {
   calculateBillEnvelopePriority,
   getRecommendedBillFunding,
 } from "../utils/billEnvelopeCalculations";
+import logger from "../utils/logger";
 
 /**
  * Custom hook for managing unassigned cash distribution logic
@@ -227,7 +228,7 @@ const useUnassignedCashDistribution = () => {
       // Reset distributions after successful application
       setDistributions({});
     } catch (error) {
-      console.error("Error applying distribution:", error);
+      logger.error("Error applying distribution:", error);
     } finally {
       setIsProcessing(false);
     }

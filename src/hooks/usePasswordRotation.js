@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { encryptionUtils } from "../utils/encryption";
 import { useAuth } from "../stores/authStore.jsx";
 import { useToastHelpers } from "../utils/toastHelpers";
+import logger from "../utils/logger";
 
 /**
  * Custom hook for password rotation management
@@ -72,7 +73,7 @@ const usePasswordRotation = () => {
       setConfirmPassword("");
       showSuccessToast("Your password has been successfully updated", "Password Updated");
     } catch (error) {
-      console.error("Failed to change password:", error);
+      logger.error("Failed to change password:", error);
       showErrorToast(`Failed to change password: ${error.message}`, "Password Update Failed");
     }
   }, [newPassword, confirmPassword, encryptionKey, showErrorToast, showSuccessToast]);

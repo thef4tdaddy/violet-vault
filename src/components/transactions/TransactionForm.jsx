@@ -25,7 +25,26 @@ const TransactionForm = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    logger.debug("TransactionForm submit attempted", {
+      editingTransaction: !!editingTransaction,
+      formData: {
+        description: transactionForm.description?.slice(0, 50) + "...",
+        amount: transactionForm.amount,
+        envelopeId: transactionForm.envelopeId,
+        category: transactionForm.category,
+        type: transactionForm.type,
+        date: transactionForm.date,
+      },
+    });
+
     if (!transactionForm.description.trim() || !transactionForm.amount) {
+      logger.warn("Transaction form validation failed", {
+        hasDescription: !!transactionForm.description.trim(),
+        hasAmount: !!transactionForm.amount,
+        description: transactionForm.description,
+        amount: transactionForm.amount,
+      });
       alert("Please fill in description and amount");
       return;
     }
@@ -34,6 +53,13 @@ const TransactionForm = ({
     if (transactionForm.envelopeId && onPayBill) {
       const selectedEnvelope = envelopes.find((env) => env.id === transactionForm.envelopeId);
       if (selectedEnvelope && selectedEnvelope.envelopeType === "bill") {
+        logger.info("Creating bill payment from transaction", {
+          billId: selectedEnvelope.id,
+          billName: selectedEnvelope.name,
+          amount: Math.abs(parseFloat(transactionForm.amount)),
+          paidDate: transactionForm.date,
+        });
+
         // Create a bill payment record
         const billPayment = {
           billId: selectedEnvelope.id,
@@ -46,10 +72,20 @@ const TransactionForm = ({
       }
     }
 
+    logger.info(`Transaction ${editingTransaction ? "updated" : "created"} successfully`, {
+      transactionId: editingTransaction?.id,
+      amount: transactionForm.amount,
+      envelopeId: transactionForm.envelopeId,
+    });
+
     onSubmit();
   };
 
   const resetAndClose = () => {
+    logger.debug("TransactionForm closed", {
+      wasEditing: !!editingTransaction,
+      hadData: !!(transactionForm.description || transactionForm.amount),
+    });
     onClose();
   };
 

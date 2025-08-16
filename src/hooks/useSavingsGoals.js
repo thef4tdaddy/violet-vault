@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
 import { queryKeys, optimisticHelpers } from "../utils/queryClient";
 import { budgetDb } from "../db/budgetDb";
+import logger from "../utils/logger";
 
 /**
  * Specialized hook for savings goals management
@@ -20,7 +21,7 @@ const useSavingsGoals = (options = {}) => {
 
   // TanStack Query function - hydrates from Dexie, Dexie syncs with Firebase
   const queryFunction = useCallback(async () => {
-    console.log("🔄 TanStack Query: Fetching savings goals from Dexie...");
+    logger.debug("TanStack Query: Fetching savings goals from Dexie");
 
     try {
       let goals = [];
@@ -28,9 +29,9 @@ const useSavingsGoals = (options = {}) => {
       // Always fetch from Dexie (single source of truth for local data)
       goals = await budgetDb.savingsGoals.toArray();
 
-      console.log("✅ TanStack Query: Loaded from Dexie:", goals.length);
+      logger.debug("TanStack Query: Loaded from Dexie", { count: goals.length });
     } catch (error) {
-      console.error("❌ TanStack Query: Dexie fetch failed:", error);
+      logger.error("TanStack Query: Dexie fetch failed", error);
       // Return empty array when Dexie fails (no fallback to Zustand)
       return [];
     }
@@ -176,12 +177,12 @@ const useSavingsGoals = (options = {}) => {
   // Listen for import completion to force refresh
   useEffect(() => {
     const handleImportCompleted = () => {
-      console.log("🔄 Import detected, invalidating savings goals cache");
+      logger.debug("Import detected, invalidating savings goals cache");
       queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals });
     };
 
     const handleInvalidateAll = () => {
-      console.log("🔄 Invalidating all savings goal queries");
+      logger.debug("Invalidating all savings goal queries");
       queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals });
       queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalsList });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
@@ -223,7 +224,7 @@ const useSavingsGoals = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
     onError: (error) => {
-      console.error("Failed to add savings goal:", error);
+      logger.error("Failed to add savings goal:", error);
       // TODO: Implement rollback logic
     },
   });
@@ -248,7 +249,7 @@ const useSavingsGoals = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
     onError: (error) => {
-      console.error("Failed to update savings goal:", error);
+      logger.error("Failed to update savings goal:", error);
       // TODO: Implement rollback logic
     },
   });
@@ -270,7 +271,7 @@ const useSavingsGoals = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
     onError: (error) => {
-      console.error("Failed to delete savings goal:", error);
+      logger.error("Failed to delete savings goal:", error);
       // TODO: Implement rollback logic
     },
   });
@@ -307,7 +308,7 @@ const useSavingsGoals = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
     onError: (error) => {
-      console.error("Failed to contribute to savings goal:", error);
+      logger.error("Failed to contribute to savings goal:", error);
       // TODO: Implement rollback logic
     },
   });

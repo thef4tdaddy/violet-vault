@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
 import { queryKeys, optimisticHelpers } from "../utils/queryClient";
 import { budgetDb } from "../db/budgetDb";
+import logger from "../utils/logger";
 
 /**
  * Specialized hook for bill management
@@ -21,7 +22,7 @@ const useBills = (options = {}) => {
 
   // TanStack Query function - hydrates from Dexie, Dexie syncs with Firebase
   const queryFunction = useCallback(async () => {
-    console.log("🔄 TanStack Query: Fetching bills from Dexie...");
+    logger.debug("TanStack Query: Fetching bills from Dexie");
 
     let bills = [];
 
@@ -29,14 +30,14 @@ const useBills = (options = {}) => {
       // Always fetch from Dexie (single source of truth for local data)
       bills = await budgetDb.bills.toArray();
 
-      console.log("✅ TanStack Query: Loaded from Dexie:", {
+      logger.debug("TanStack Query: Loaded from Dexie", {
         count: bills.length,
         firstBill: bills[0],
         billTitles: bills.map((b) => b.name || b.title || b.billName || "No Name").slice(0, 3),
         billStructure: bills[0] ? Object.keys(bills[0]) : "No bills",
       });
     } catch (error) {
-      console.error("❌ TanStack Query: Dexie fetch failed:", error);
+      logger.error("TanStack Query: Dexie fetch failed", error);
       // Return empty array when Dexie fails (no fallback to Zustand)
       return [];
     }
@@ -47,7 +48,7 @@ const useBills = (options = {}) => {
 
     let filteredBills = bills;
 
-    console.log("🔍 Bills filtering debug:", {
+    logger.debug("Bills filtering debug", {
       inputBillsCount: bills.length,
       status,
       today: today.toISOString(),
@@ -108,7 +109,7 @@ const useBills = (options = {}) => {
       }
     });
 
-    console.log("🔄 TanStack Query returning filtered bills:", {
+    logger.debug("TanStack Query returning filtered bills", {
       originalBillsLength: bills.length,
       filteredBillsLength: filteredBills.length,
       status,
@@ -144,12 +145,12 @@ const useBills = (options = {}) => {
   // Listen for import completion to force refresh
   useEffect(() => {
     const handleImportCompleted = () => {
-      console.log("🔄 Import detected, invalidating bills cache");
+      logger.debug("Import detected, invalidating bills cache");
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
     };
 
     const handleInvalidateAll = () => {
-      console.log("🔄 Invalidating all bill queries");
+      logger.debug("Invalidating all bill queries");
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
       queryClient.invalidateQueries({ queryKey: queryKeys.billsList });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
@@ -208,7 +209,7 @@ const useBills = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
     onError: (error) => {
-      console.error("Failed to add bill:", error);
+      logger.error("Failed to add bill:", error);
       // TODO: Implement rollback logic
     },
   });
@@ -233,7 +234,7 @@ const useBills = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
     onError: (error) => {
-      console.error("Failed to update bill:", error);
+      logger.error("Failed to update bill:", error);
       // TODO: Implement rollback logic
     },
   });
@@ -255,7 +256,7 @@ const useBills = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
     onError: (error) => {
-      console.error("Failed to delete bill:", error);
+      logger.error("Failed to delete bill:", error);
       // TODO: Implement rollback logic
     },
   });
@@ -338,7 +339,7 @@ const useBills = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
     onError: (error) => {
-      console.error("Failed to mark bill paid:", error);
+      logger.error("Failed to mark bill paid:", error);
       // TODO: Implement rollback logic
     },
   });

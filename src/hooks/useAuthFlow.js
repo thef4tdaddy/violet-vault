@@ -45,7 +45,7 @@ const useAuthFlow = () => {
         logger.auth("Login result", { success: !!result });
 
         if (result.success) {
-          console.log("✅ Setup completed successfully");
+          logger.info("✅ Setup completed successfully");
 
           // Initialize budget history with the user's password
           try {
@@ -60,11 +60,11 @@ const useAuthFlow = () => {
             localStorage.setItem("passwordLastChanged", Date.now().toString());
           }
         } else {
-          console.error("❌ Setup failed:", result.error);
+          logger.error("❌ Setup failed:", result.error);
           showErrorToast(`Setup failed: ${result.error}`, "Account Setup Failed");
         }
       } catch (error) {
-        console.error("❌ Setup error:", error);
+        logger.error("❌ Setup error:", error);
         showErrorToast(`Setup error: ${error.message}`, "Setup Error");
       }
     },
