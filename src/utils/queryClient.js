@@ -98,6 +98,11 @@ export const queryKeys = {
   budgetData: () => [...queryKeys.budget, "data"],
   budgetSummary: () => [...queryKeys.budget, "summary"],
 
+  // Budget metadata (unassigned cash, actual balance, etc.)
+  budgetMetadata: ["budgetMetadata"],
+  unassignedCash: () => [...queryKeys.budgetMetadata, "unassignedCash"],
+  actualBalance: () => [...queryKeys.budgetMetadata, "actualBalance"],
+
   // Envelopes
   envelopes: ["envelopes"],
   envelopesList: (filters = {}) => [...queryKeys.envelopes, "list", filters],
