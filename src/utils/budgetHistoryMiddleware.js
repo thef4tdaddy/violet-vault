@@ -12,21 +12,35 @@ export const budgetHistoryMiddleware = (config) => (set, get, api) => {
 
   // Initialize history when password is available
   const initializeHistory = async (password) => {
-    if (!password || isInitialized) return;
+    if (!password) {
+      logger.warn("Budget history initialization attempted without password");
+      return;
+    }
+    
+    if (isInitialized) {
+      logger.debug("Budget history already initialized");
+      return;
+    }
 
     try {
+      logger.debug("Initializing budget history with password");
       await budgetHistory.initialize(password);
       isInitialized = true;
       lastCommittedState = getCommittableState(get());
 
       // Create initial commit if this is the first time
       if (!budgetHistory.currentCommitHash) {
+        logger.debug("Creating initial budget commit");
         await budgetHistory.commit(lastCommittedState, "Initial budget state", "system");
       }
 
-      logger.debug("Budget history initialized and ready");
+      logger.info("✅ Budget history initialized and ready", {
+        hasCommitHash: !!budgetHistory.currentCommitHash,
+        isInitialized: true
+      });
     } catch (error) {
-      logger.error("Failed to initialize budget history", error);
+      logger.error("❌ Failed to initialize budget history", error);
+      isInitialized = false; // Ensure we stay in uninitialized state
     }
   };
 
@@ -125,9 +139,17 @@ export const budgetHistoryMiddleware = (config) => (set, get, api) => {
     // Get budget history
     getBudgetHistory: async (options = {}) => {
       if (!isInitialized) {
+        logger.error("❌ getBudgetHistory called but history not initialized", {
+          isInitialized,
+          hasPassword: !!budgetHistory.historyKey
+        });
         throw new Error("Budget history not initialized");
       }
-      return budgetHistory.getHistory(options);
+      
+      logger.debug("📚 Fetching budget history", options);
+      const history = await budgetHistory.getHistory(options);
+      logger.debug("📚 Retrieved budget history", { count: history?.length || 0 });
+      return history;
     },
 
     // Get specific commit details

@@ -59,10 +59,14 @@ export const useBudgetHistory = () => {
         setLoading(true);
         setError(null);
         const history = await store.getBudgetHistory(options);
+        logger.debug("Retrieved budget history", { count: history?.length || 0 });
         return history;
       } catch (err) {
         setError(err.message);
-        logger.error("Failed to get budget history", err);
+        logger.error("Failed to get budget history", err, {
+          errorMessage: err.message,
+          isInitializationError: err.message.includes("not initialized")
+        });
         return [];
       } finally {
         setLoading(false);
