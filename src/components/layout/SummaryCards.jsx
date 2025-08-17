@@ -21,10 +21,13 @@ const SummaryCards = () => {
   const { savingsGoals = [], isLoading: savingsLoading } = useSavingsGoals();
 
   // Calculate totals from hook data
-  const totalEnvelopeBalance = envelopes.reduce((sum, env) => sum + (env.currentBalance || 0), 0);
+  const totalEnvelopeBalance = envelopes.reduce(
+    (sum, env) => sum + (env.currentBalance || 0),
+    0,
+  );
   const totalSavingsBalance = savingsGoals.reduce(
     (sum, goal) => sum + (goal.currentAmount || 0),
-    0
+    0,
   );
   const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
 
@@ -41,16 +44,23 @@ const SummaryCards = () => {
 
   // Calculate total biweekly funding need
   const biweeklyAllocation = envelopes.reduce((sum, env) => {
-    const envelopeType = env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
+    const envelopeType =
+      env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
 
     let biweeklyNeed = 0;
     if (envelopeType === "bill" && env.biweeklyAllocation) {
-      biweeklyNeed = Math.max(0, env.biweeklyAllocation - (env.currentBalance || 0));
+      biweeklyNeed = Math.max(
+        0,
+        env.biweeklyAllocation - (env.currentBalance || 0),
+      );
     } else if (envelopeType === "variable" && env.monthlyBudget) {
       const biweeklyTarget = env.monthlyBudget / BIWEEKLY_MULTIPLIER;
       biweeklyNeed = Math.max(0, biweeklyTarget - (env.currentBalance || 0));
     } else if (envelopeType === "savings" && env.targetAmount) {
-      const remainingToTarget = Math.max(0, env.targetAmount - (env.currentBalance || 0));
+      const remainingToTarget = Math.max(
+        0,
+        env.targetAmount - (env.currentBalance || 0),
+      );
       biweeklyNeed = Math.min(remainingToTarget, env.biweeklyAllocation || 0);
     }
 
@@ -177,10 +187,14 @@ const SummaryCard = memo(
           <p className="text-sm font-semibold text-gray-600 mb-1">
             {label}
             {clickable && !isNegative && (
-              <span className="ml-1 text-xs text-gray-400">(click to distribute)</span>
+              <span className="ml-1 text-xs text-gray-400">
+                (click to distribute)
+              </span>
             )}
             {isNegative && (
-              <span className="ml-1 text-xs text-red-500">(overspending - click to address)</span>
+              <span className="ml-1 text-xs text-red-500">
+                (overspending - click to address)
+              </span>
             )}
           </p>
           <p
@@ -204,7 +218,7 @@ const SummaryCard = memo(
     ) : (
       <div className={baseClasses}>{cardContent}</div>
     );
-  }
+  },
 );
 
 export default memo(SummaryCards);

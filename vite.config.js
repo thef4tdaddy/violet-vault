@@ -3,10 +3,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  plugins: [
-    react(),
-    tailwindcss(),
-  ],
+  plugins: [react(), tailwindcss()],
   // Avoid multiple copies of React which can cause
   // "Invalid hook call" errors during development
   resolve: {
@@ -28,13 +25,16 @@ export default defineConfig({
     minify: process.env.NODE_ENV === "production" ? "terser" : false, // Enable minification in production
     sourcemap: false, // Disable sourcemaps for faster builds
     // Terser options for better compression
-    terserOptions: process.env.NODE_ENV === "production" ? {
-      compress: {
-        drop_console: false, // Keep console for Highlight.io
-        drop_debugger: true,
-        pure_funcs: ["console.debug"], // Remove debug statements
-      },
-    } : {},
+    terserOptions:
+      process.env.NODE_ENV === "production"
+        ? {
+            compress: {
+              drop_console: false, // Keep console for Highlight.io
+              drop_debugger: true,
+              pure_funcs: ["console.debug"], // Remove debug statements
+            },
+          }
+        : {},
   },
   esbuild: {
     // Only drop debugger statements in production, keep console for Highlight.io
