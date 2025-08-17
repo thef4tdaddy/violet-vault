@@ -863,7 +863,12 @@ class CloudSyncService {
     try {
       // Get current data modification times from Dexie
       const currentData = await this.fetchDexieData();
-      const currentModTime = currentData.lastModified;
+      let currentModTime = currentData.lastModified;
+
+      // Ensure we have a valid timestamp
+      if (!currentModTime || isNaN(currentModTime) || currentModTime <= 0) {
+        currentModTime = Date.now();
+      }
 
       // For first-time sync, always sync
       if (!this.lastSyncedCommitHash) {

@@ -49,30 +49,8 @@ const useAuthFlow = () => {
         if (result.success) {
           logger.info("✅ Setup completed successfully");
 
-          // Initialize budget history with the user's password
-          try {
-            logger.auth("🔍 About to initialize budget history", {
-              hasMethod:
-                typeof budgetStore.initializeBudgetHistory === "function",
-              hasPassword: !!userData.password,
-              passwordLength: userData.password?.length,
-            });
-
-            if (typeof budgetStore.initializeBudgetHistory === "function") {
-              await budgetStore.initializeBudgetHistory(userData.password);
-              logger.auth("✅ Budget history initialized on login");
-            } else {
-              logger.error(
-                "❌ initializeBudgetHistory method not found on budgetStore",
-              );
-            }
-          } catch (historyError) {
-            logger.error(
-              "❌ Failed to initialize budget history on login",
-              historyError,
-            );
-            // Don't fail login if history initialization fails
-          }
+          // Budget history is now handled automatically by the Dexie/Cloud Sync system
+          logger.auth("✅ Budget history system ready (Dexie-based)");
 
           if (!localStorage.getItem("passwordLastChanged")) {
             localStorage.setItem("passwordLastChanged", Date.now().toString());
