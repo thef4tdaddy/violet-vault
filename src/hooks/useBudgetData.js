@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useBudgetStore } from "../stores/budgetStore";
 import { queryKeys, optimisticHelpers, prefetchHelpers } from "../utils/queryClient";
-import { budgetDb } from "../db/budgetDb";
+import { budgetDb, getBudgetMetadata } from "../db/budgetDb";
 import logger from "../utils/logger.js";
 
 /**
@@ -114,6 +114,9 @@ const useBudgetData = () => {
     },
 
     dashboardSummary: async () => {
+      // Load budget metadata from Dexie (includes unassigned cash)
+      const budgetMetadata = await getBudgetMetadata();
+
       const summary = {
         totalEnvelopeBalance: (envelopes || []).reduce(
           (sum, env) => sum + (env.currentBalance || 0),
@@ -123,8 +126,9 @@ const useBudgetData = () => {
           (sum, goal) => sum + (goal.currentAmount || 0),
           0
         ),
-        unassignedCash: unassignedCash || 0,
-        actualBalance: actualBalance || 0,
+        // Use Dexie value if available, fallback to Zustand, then 0
+        unassignedCash: budgetMetadata?.unassignedCash ?? unassignedCash ?? 0,
+        actualBalance: budgetMetadata?.actualBalance ?? actualBalance ?? 0,
         recentTransactions: transactions?.slice(0, 10) || [],
         upcomingBills:
           bills?.filter((bill) => {
@@ -173,6 +177,32 @@ const useBudgetData = () => {
     staleTime: 30 * 1000, // 30 seconds
     enabled: true,
   });
+
+  // Event listeners for data import and sync invalidation
+  useEffect(() => {
+    const handleImportCompleted = () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
+      queryClient.invalidateQueries({ queryKey: queryKeys.bills });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary });
+    };
+
+    const handleInvalidateAll = () => {
+      queryClient.invalidateQueries();
+    };
+
+    window.addEventListener("importCompleted", handleImportCompleted);
+    window.addEventListener("invalidateAllQueries", handleInvalidateAll);
+
+    return () => {
+      window.removeEventListener("importCompleted", handleImportCompleted);
+      window.removeEventListener("invalidateAllQueries", handleInvalidateAll);
+    };
+  }, [queryClient]);
+
+  // NOTE: Removed Zustand subscription - unassigned cash should come from Dexie via TanStack Query
+  // instead of being stored only in Zustand store
 
   // Rebuild missing transactions in background if ledger data is incomplete
   useEffect(() => {

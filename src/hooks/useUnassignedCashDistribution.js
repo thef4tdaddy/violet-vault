@@ -5,7 +5,7 @@ import useEnvelopes from "./useEnvelopes";
 import useBills from "./useBills";
 import { ENVELOPE_TYPES, AUTO_CLASSIFY_ENVELOPE_TYPE } from "../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../constants/frequency";
-import { budgetDb } from "../db/budgetDb";
+import { budgetDb, setBudgetMetadata, getBudgetMetadata } from "../db/budgetDb";
 import { queryKeys } from "../utils/queryClient";
 import {
   calculateBillEnvelopePriority,
@@ -220,9 +220,20 @@ const useUnassignedCashDistribution = () => {
       // Apply updates
       if (envelopeUpdates.length > 0) {
         await budgetDb.bulkUpsertEnvelopes(envelopeUpdates);
+
+        // Update both Zustand and Dexie metadata
         setUnassignedCash(remainingCash);
+
+        // Update budget metadata in Dexie
+        const currentMetadata = await getBudgetMetadata();
+        await setBudgetMetadata({
+          ...currentMetadata,
+          unassignedCash: remainingCash,
+        });
+
         queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
         queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+        queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary });
       }
 
       // Reset distributions after successful application
