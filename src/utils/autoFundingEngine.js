@@ -46,9 +46,7 @@ export const INCOME_DETECTION_TYPES = {
  */
 export class AutoFundingRule {
   constructor(config) {
-    this.id =
-      config.id ||
-      `rule_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    this.id = config.id || `rule_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     this.name = config.name || "Untitled Rule";
     this.description = config.description || "";
     this.type = config.type || RULE_TYPES.FIXED_AMOUNT;
@@ -114,18 +112,14 @@ export class AutoFundingRule {
       switch (condition.type) {
         case CONDITION_TYPES.BALANCE_LESS_THAN:
           if (condition.envelopeId) {
-            const envelope = envelopes.find(
-              (e) => e.id === condition.envelopeId,
-            );
+            const envelope = envelopes.find((e) => e.id === condition.envelopeId);
             return envelope && envelope.currentBalance < condition.value;
           }
           return unassignedCash < condition.value;
 
         case CONDITION_TYPES.BALANCE_GREATER_THAN:
           if (condition.envelopeId) {
-            const envelope = envelopes.find(
-              (e) => e.id === condition.envelopeId,
-            );
+            const envelope = envelopes.find((e) => e.id === condition.envelopeId);
             return envelope && envelope.currentBalance > condition.value;
           }
           return unassignedCash > condition.value;
@@ -173,10 +167,7 @@ export class AutoFundingRule {
 
       case RULE_TYPES.PERCENTAGE: {
         const baseAmount = this.getBaseAmountForPercentage(context);
-        return Math.min(
-          (baseAmount * this.config.percentage) / 100,
-          unassignedCash,
-        );
+        return Math.min((baseAmount * this.config.percentage) / 100, unassignedCash);
       }
 
       case RULE_TYPES.SPLIT_REMAINDER: {
@@ -205,9 +196,7 @@ export class AutoFundingRule {
       // Use recent income transactions
       const recentIncome = transactions
         .filter(
-          (t) =>
-            t.amount > 0 &&
-            new Date(t.date) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+          (t) => t.amount > 0 && new Date(t.date) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
         )
         .reduce((sum, t) => sum + t.amount, 0);
       return recentIncome || unassignedCash;
@@ -225,8 +214,7 @@ export class AutoFundingRule {
 
     if (!targetEnvelope) return 0;
 
-    const targetAmount =
-      this.config.targetAmount || targetEnvelope.monthlyBudget || 0;
+    const targetAmount = this.config.targetAmount || targetEnvelope.monthlyBudget || 0;
     const currentBalance = targetEnvelope.currentBalance || 0;
     const needed = Math.max(0, targetAmount - currentBalance);
 
@@ -238,26 +226,26 @@ export class AutoFundingRule {
    */
   calculatePriorityQueueAmount(context, remainingCash) {
     const { envelopes } = context.data;
-    
+
     // For priority queue rules, calculate based on remaining cash after higher priority rules
     switch (this.type) {
       case RULE_TYPES.FIXED_AMOUNT:
         return Math.min(this.config.amount, remainingCash);
-      
+
       case RULE_TYPES.PERCENTAGE:
         const baseAmount = this.getBaseAmountForPercentage(context);
         return Math.min((baseAmount * this.config.percentage) / 100, remainingCash);
-      
+
       case RULE_TYPES.PRIORITY_FILL:
         const targetEnvelope = envelopes.find((e) => e.id === this.config.targetId);
         if (!targetEnvelope) return 0;
-        
+
         const targetAmount = this.config.targetAmount || targetEnvelope.monthlyBudget || 0;
         const currentBalance = targetEnvelope.currentBalance || 0;
         const needed = Math.max(0, targetAmount - currentBalance);
-        
+
         return Math.min(needed, remainingCash);
-      
+
       default:
         return Math.min(this.calculateFundingAmount(context), remainingCash);
     }
@@ -357,7 +345,7 @@ export class AutoFundingEngine {
 
       // Get rules sorted by priority (lower number = higher priority)
       const applicableRules = this.getRulesByPriority(true).filter((rule) =>
-        rule.shouldExecute(context),
+        rule.shouldExecute(context)
       );
 
       logger.debug("Found applicable rules with priorities", {
@@ -372,7 +360,7 @@ export class AutoFundingEngine {
 
       // Enhanced priority execution with remaining cash tracking
       let remainingCash = context.data.unassignedCash;
-      
+
       for (const rule of applicableRules) {
         if (remainingCash <= 0) {
           logger.debug("No remaining cash for further rules", {
@@ -385,7 +373,7 @@ export class AutoFundingEngine {
         try {
           const result = await this.executeRuleWithPriority(rule, context, budget, remainingCash);
           executionResults.push(result);
-          
+
           if (result.success) {
             remainingCash -= result.amount;
             logger.debug("Rule executed successfully", {
@@ -468,11 +456,11 @@ export class AutoFundingEngine {
    * Execute a single rule with priority-aware cash management
    */
   async executeRuleWithPriority(rule, context, budget, availableCash) {
-    logger.debug("Executing rule with priority", { 
-      ruleId: rule.id, 
-      name: rule.name, 
+    logger.debug("Executing rule with priority", {
+      ruleId: rule.id,
+      name: rule.name,
       priority: rule.priority,
-      availableCash 
+      availableCash,
     });
 
     const fundingAmount = rule.calculatePriorityQueueAmount(context, availableCash);
@@ -529,9 +517,7 @@ export class AutoFundingEngine {
 
       case RULE_TYPES.SPLIT_REMAINDER:
         if (rule.config.targetIds && rule.config.targetIds.length > 0) {
-          const amountPerEnvelope = Math.floor(
-            totalAmount / rule.config.targetIds.length,
-          );
+          const amountPerEnvelope = Math.floor(totalAmount / rule.config.targetIds.length);
           rule.config.targetIds.forEach((envelopeId) => {
             transfers.push({
               fromEnvelopeId: "unassigned",
@@ -556,7 +542,7 @@ export class AutoFundingEngine {
         transfer.fromEnvelopeId,
         transfer.toEnvelopeId,
         transfer.amount,
-        transfer.description,
+        transfer.description
       );
 
       logger.debug("Transfer executed", transfer);
@@ -636,20 +622,35 @@ export class AutoFundingEngine {
 
     // 2. Description keyword detection
     const incomeKeywords = [
-      "payroll", "salary", "wage", "pay", "direct deposit", "dd",
-      "employer", "company", "inc", "corp", "llc", "paycheck",
-      "biweekly", "weekly", "monthly", "income", "earnings",
-      "deposit", "transfer from", "ach credit", "eft credit"
+      "payroll",
+      "salary",
+      "wage",
+      "pay",
+      "direct deposit",
+      "dd",
+      "employer",
+      "company",
+      "inc",
+      "corp",
+      "llc",
+      "paycheck",
+      "biweekly",
+      "weekly",
+      "monthly",
+      "income",
+      "earnings",
+      "deposit",
+      "transfer from",
+      "ach credit",
+      "eft credit",
     ];
 
-    const hasIncomeKeywords = incomeKeywords.some(keyword => 
-      description.includes(keyword)
-    );
+    const hasIncomeKeywords = incomeKeywords.some((keyword) => description.includes(keyword));
 
     if (hasIncomeKeywords) {
       logger.debug("Income detected by keywords", {
         description,
-        matchedKeywords: incomeKeywords.filter(k => description.includes(k)),
+        matchedKeywords: incomeKeywords.filter((k) => description.includes(k)),
       });
     }
 
@@ -657,11 +658,9 @@ export class AutoFundingEngine {
     const isRecurringIncome = this.checkRecurringIncomePattern(transaction);
 
     // 4. Bank category detection (if categorized as income)
-    const isBankCategorizedIncome = 
-      transaction.category && 
-      ["income", "payroll", "salary", "deposit"].includes(
-        transaction.category.toLowerCase()
-      );
+    const isBankCategorizedIncome =
+      transaction.category &&
+      ["income", "payroll", "salary", "deposit"].includes(transaction.category.toLowerCase());
 
     // Income detection scoring
     let incomeScore = 0;
@@ -699,7 +698,7 @@ export class AutoFundingEngine {
   checkRecurringIncomePattern(transaction) {
     const amount = transaction.amount;
     const date = new Date(transaction.date);
-    
+
     // Look for similar amounts in the past 90 days
     const ninetyDaysAgo = new Date();
     ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
@@ -712,7 +711,7 @@ export class AutoFundingEngine {
       if (amountDiff <= amountTolerance) {
         // Check if timing matches (weekly, biweekly, monthly)
         const daysSinceLastIncome = this.calculateDaysSince(pattern.lastDate, date);
-        
+
         if (this.matchesRecurringPattern(daysSinceLastIncome, pattern.frequency)) {
           logger.debug("Recurring income pattern matched", {
             amount,
@@ -742,12 +741,13 @@ export class AutoFundingEngine {
 
     if (this.incomePatterns.has(patternKey)) {
       const pattern = this.incomePatterns.get(patternKey);
-      
+
       // Update pattern with new data
       pattern.count++;
-      pattern.averageAmount = (pattern.averageAmount * (pattern.count - 1) + amount) / pattern.count;
+      pattern.averageAmount =
+        (pattern.averageAmount * (pattern.count - 1) + amount) / pattern.count;
       pattern.lastDate = date;
-      
+
       // Calculate frequency based on time between occurrences
       if (pattern.count >= 2) {
         const daysDiff = this.calculateDaysSince(pattern.firstDate, date);
@@ -776,10 +776,25 @@ export class AutoFundingEngine {
    */
   extractKeyWords(description) {
     // Remove common words and keep meaningful identifiers
-    const commonWords = ["the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for", "of", "with", "by"];
-    const words = description.split(/\s+/).filter(word => 
-      word.length > 2 && !commonWords.includes(word.toLowerCase())
-    );
+    const commonWords = [
+      "the",
+      "a",
+      "an",
+      "and",
+      "or",
+      "but",
+      "in",
+      "on",
+      "at",
+      "to",
+      "for",
+      "of",
+      "with",
+      "by",
+    ];
+    const words = description
+      .split(/\s+/)
+      .filter((word) => word.length > 2 && !commonWords.includes(word.toLowerCase()));
     return words.slice(0, 3).join("_"); // Use first 3 meaningful words
   }
 
@@ -815,14 +830,14 @@ export class AutoFundingEngine {
    */
   estimateFrequency(totalDays, occurrences) {
     if (occurrences < 2) return "unknown";
-    
+
     const averageDays = totalDays / (occurrences - 1);
-    
+
     if (averageDays >= 6 && averageDays <= 8) return "weekly";
     if (averageDays >= 13 && averageDays <= 16) return "biweekly";
     if (averageDays >= 14 && averageDays <= 17) return "semimonthly";
     if (averageDays >= 28 && averageDays <= 33) return "monthly";
-    
+
     return "irregular";
   }
 
@@ -844,12 +859,12 @@ export class AutoFundingEngine {
 
     // Find rules triggered by income detection
     const incomeTriggeredRules = this.getRules(true).filter(
-      rule => rule.trigger === TRIGGER_TYPES.INCOME_DETECTED
+      (rule) => rule.trigger === TRIGGER_TYPES.INCOME_DETECTED
     );
 
     // Also check for payday-triggered rules
     const paydayTriggeredRules = this.getRules(true).filter(
-      rule => rule.trigger === TRIGGER_TYPES.PAYDAY
+      (rule) => rule.trigger === TRIGGER_TYPES.PAYDAY
     );
 
     const allTriggeredRules = [...incomeTriggeredRules, ...paydayTriggeredRules];
@@ -886,8 +901,9 @@ export class AutoFundingEngine {
 
     // Payday indicators
     const paydayScore = this.calculatePaydayScore(transaction);
-    
-    if (paydayScore >= 5) { // Threshold for payday detection
+
+    if (paydayScore >= 5) {
+      // Threshold for payday detection
       const paydayRecord = {
         date: date,
         amount: amount,
@@ -902,7 +918,7 @@ export class AutoFundingEngine {
       };
 
       this.paydayHistory.push(paydayRecord);
-      
+
       // Keep only last 24 paydays (2 years worth for monthly pay)
       this.paydayHistory = this.paydayHistory
         .sort((a, b) => new Date(b.date) - new Date(a.date))
@@ -910,8 +926,8 @@ export class AutoFundingEngine {
 
       logger.info("Payday detected and recorded", {
         amount,
-        date: date.toISOString().split('T')[0],
-        dayOfWeek: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()],
+        date: date.toISOString().split("T")[0],
+        dayOfWeek: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][date.getDay()],
         confidence: paydayScore,
         totalPaydays: this.paydayHistory.length,
       });
@@ -937,12 +953,17 @@ export class AutoFundingEngine {
 
     // 2. Description-based scoring
     const paydayKeywords = [
-      "payroll", "salary", "wage", "pay", "paycheck", 
-      "direct deposit", "dd", "employer", "company"
+      "payroll",
+      "salary",
+      "wage",
+      "pay",
+      "paycheck",
+      "direct deposit",
+      "dd",
+      "employer",
+      "company",
     ];
-    const matchedKeywords = paydayKeywords.filter(keyword => 
-      description.includes(keyword)
-    );
+    const matchedKeywords = paydayKeywords.filter((keyword) => description.includes(keyword));
     score += matchedKeywords.length;
 
     // 3. Timing-based scoring (common payday patterns)
@@ -999,34 +1020,36 @@ export class AutoFundingEngine {
     let consistencyScore = 0;
 
     // Check amount consistency (within 20% of historical amounts)
-    const historicalAmounts = this.paydayHistory.map(p => p.amount);
-    const avgAmount = historicalAmounts.reduce((sum, amt) => sum + amt, 0) / historicalAmounts.length;
+    const historicalAmounts = this.paydayHistory.map((p) => p.amount);
+    const avgAmount =
+      historicalAmounts.reduce((sum, amt) => sum + amt, 0) / historicalAmounts.length;
     const amountVariance = Math.abs(amount - avgAmount) / avgAmount;
-    
-    if (amountVariance <= 0.1) consistencyScore += 2; // Within 10%
+
+    if (amountVariance <= 0.1)
+      consistencyScore += 2; // Within 10%
     else if (amountVariance <= 0.2) consistencyScore += 1; // Within 20%
 
     // Check timing consistency
     const recentPaydays = this.paydayHistory.slice(0, 6); // Last 6 paydays
-    
+
     // Day of week consistency
     const dayOfWeek = date.getDay();
-    const historicalDaysOfWeek = recentPaydays.map(p => new Date(p.date).getDay());
+    const historicalDaysOfWeek = recentPaydays.map((p) => new Date(p.date).getDay());
     if (historicalDaysOfWeek.includes(dayOfWeek)) {
       consistencyScore += 1;
     }
 
     // Monthly pattern consistency (for monthly pay)
     const dayOfMonth = date.getDate();
-    const historicalDaysOfMonth = recentPaydays.map(p => new Date(p.date).getDate());
-    if (historicalDaysOfMonth.some(day => Math.abs(day - dayOfMonth) <= 2)) {
+    const historicalDaysOfMonth = recentPaydays.map((p) => new Date(p.date).getDate());
+    if (historicalDaysOfMonth.some((day) => Math.abs(day - dayOfMonth) <= 2)) {
       consistencyScore += 1;
     }
 
     // Biweekly pattern consistency
     const biweeklyPos = this.calculateBiweeklyPosition(date);
-    const historicalBiweeklyPos = recentPaydays.map(p => p.biweeklyPosition);
-    if (historicalBiweeklyPos.some(pos => Math.abs(pos - biweeklyPos) <= 1)) {
+    const historicalBiweeklyPos = recentPaydays.map((p) => p.biweeklyPosition);
+    if (historicalBiweeklyPos.some((pos) => Math.abs(pos - biweeklyPos) <= 1)) {
       consistencyScore += 1;
     }
 
@@ -1048,7 +1071,7 @@ export class AutoFundingEngine {
     };
 
     logger.info("Payday patterns analyzed", patterns);
-    
+
     // Store patterns for future reference
     this.paydayPatterns = patterns;
   }
@@ -1073,7 +1096,7 @@ export class AutoFundingEngine {
     if (avgInterval >= 13 && avgInterval <= 16) return "biweekly";
     if (avgInterval >= 14 && avgInterval <= 17) return "semimonthly";
     if (avgInterval >= 28 && avgInterval <= 33) return "monthly";
-    
+
     return "irregular";
   }
 
@@ -1082,16 +1105,18 @@ export class AutoFundingEngine {
    */
   detectPreferredPaydayDayOfWeek() {
     const dayOfWeekCounts = [0, 0, 0, 0, 0, 0, 0]; // Sun-Sat
-    
-    this.paydayHistory.forEach(payday => {
+
+    this.paydayHistory.forEach((payday) => {
       const dayOfWeek = new Date(payday.date).getDay();
       dayOfWeekCounts[dayOfWeek]++;
     });
 
     const maxCount = Math.max(...dayOfWeekCounts);
     const preferredDay = dayOfWeekCounts.indexOf(maxCount);
-    
-    return ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][preferredDay];
+
+    return ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][
+      preferredDay
+    ];
   }
 
   /**
@@ -1099,8 +1124,8 @@ export class AutoFundingEngine {
    */
   detectPreferredPaydayDayOfMonth() {
     const dayOfMonthCounts = {};
-    
-    this.paydayHistory.forEach(payday => {
+
+    this.paydayHistory.forEach((payday) => {
       const dayOfMonth = new Date(payday.date).getDate();
       dayOfMonthCounts[dayOfMonth] = (dayOfMonthCounts[dayOfMonth] || 0) + 1;
     });
@@ -1108,9 +1133,7 @@ export class AutoFundingEngine {
     const entries = Object.entries(dayOfMonthCounts);
     if (entries.length === 0) return null;
 
-    const maxEntry = entries.reduce((max, current) => 
-      current[1] > max[1] ? current : max
-    );
+    const maxEntry = entries.reduce((max, current) => (current[1] > max[1] ? current : max));
 
     return parseInt(maxEntry[0]);
   }
@@ -1120,7 +1143,7 @@ export class AutoFundingEngine {
    */
   calculateAveragePaydayAmount() {
     if (this.paydayHistory.length === 0) return 0;
-    
+
     const total = this.paydayHistory.reduce((sum, payday) => sum + payday.amount, 0);
     return total / this.paydayHistory.length;
   }
@@ -1144,12 +1167,14 @@ export class AutoFundingEngine {
     }
 
     const avgInterval = intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length;
-    const variance = intervals.reduce((sum, interval) => sum + Math.pow(interval - avgInterval, 2), 0) / intervals.length;
+    const variance =
+      intervals.reduce((sum, interval) => sum + Math.pow(interval - avgInterval, 2), 0) /
+      intervals.length;
     const standardDeviation = Math.sqrt(variance);
-    
+
     // Lower deviation = higher consistency
-    const consistencyScore = Math.max(0, 1 - (standardDeviation / avgInterval));
-    
+    const consistencyScore = Math.max(0, 1 - standardDeviation / avgInterval);
+
     return Math.min(consistencyScore, 1);
   }
 
@@ -1181,9 +1206,9 @@ export class AutoFundingEngine {
 
     const frequency = this.detectPaydayFrequency();
     const lastPayday = new Date(this.paydayHistory[0].date);
-    
+
     let nextPayday = new Date(lastPayday);
-    
+
     switch (frequency) {
       case "weekly":
         nextPayday.setDate(nextPayday.getDate() + 7);
@@ -1202,7 +1227,7 @@ export class AutoFundingEngine {
     }
 
     return {
-      date: nextPayday.toISOString().split('T')[0],
+      date: nextPayday.toISOString().split("T")[0],
       confidence: this.calculateOverallConsistency(),
       frequency,
     };
@@ -1224,7 +1249,7 @@ export class AutoFundingEngine {
    */
   importDataWithPatterns(data) {
     this.importData(data);
-    
+
     if (data.incomePatterns) {
       this.incomePatterns.clear();
       data.incomePatterns.forEach(([key, pattern]) => {
@@ -1252,9 +1277,9 @@ export class AutoFundingEngine {
    */
   addToUndoStack(executionRecord, executionResults) {
     const undoableTransfers = [];
-    
+
     // Extract transfer information for undo
-    executionResults.forEach(result => {
+    executionResults.forEach((result) => {
       if (result.success && result.transfers) {
         // Get the transfers that were made for this rule
         const ruleTransfers = this.getLastTransfersForExecution(result);
@@ -1291,7 +1316,7 @@ export class AutoFundingEngine {
     // Since we don't store detailed transfer info in results,
     // we'll reconstruct it based on the rule execution
     const transfers = [];
-    
+
     if (result.targetEnvelopes && result.targetEnvelopes.length > 0) {
       if (result.targetEnvelopes.length === 1) {
         // Single target transfer
@@ -1305,7 +1330,7 @@ export class AutoFundingEngine {
       } else {
         // Multiple target transfers (split remainder)
         const amountPerEnvelope = result.amount / result.targetEnvelopes.length;
-        result.targetEnvelopes.forEach(envelopeId => {
+        result.targetEnvelopes.forEach((envelopeId) => {
           transfers.push({
             fromEnvelopeId: "unassigned",
             toEnvelopeId: envelopeId,
@@ -1324,7 +1349,7 @@ export class AutoFundingEngine {
    * Get list of undoable executions
    */
   getUndoableExecutions() {
-    return this.undoStack.filter(item => item.canUndo);
+    return this.undoStack.filter((item) => item.canUndo);
   }
 
   /**
@@ -1343,8 +1368,8 @@ export class AutoFundingEngine {
    * Undo a specific auto-funding execution by ID
    */
   async undoExecution(executionId, budget) {
-    const undoItem = this.undoStack.find(item => 
-      item.executionId === executionId && item.canUndo
+    const undoItem = this.undoStack.find(
+      (item) => item.executionId === executionId && item.canUndo
     );
 
     if (!undoItem) {
@@ -1374,14 +1399,16 @@ export class AutoFundingEngine {
         executedAt: new Date().toISOString(),
         rulesExecuted: 0,
         totalFunded: -undoItem.totalAmount, // Negative to indicate reversal
-        results: [{
-          ruleId: "undo",
-          ruleName: "Undo Auto-funding",
-          success: true,
-          amount: undoItem.totalAmount,
-          executedAt: new Date().toISOString(),
-          originalExecutionId: executionId,
-        }],
+        results: [
+          {
+            ruleId: "undo",
+            ruleName: "Undo Auto-funding",
+            success: true,
+            amount: undoItem.totalAmount,
+            executedAt: new Date().toISOString(),
+            originalExecutionId: executionId,
+          },
+        ],
         isUndo: true,
         originalExecutionId: executionId,
       };
@@ -1400,7 +1427,6 @@ export class AutoFundingEngine {
         transfersReversed: undoItem.transfers.length,
         undoRecord,
       };
-
     } catch (error) {
       logger.error("Undo operation failed", {
         executionId,
@@ -1420,7 +1446,7 @@ export class AutoFundingEngine {
         transfer.toEnvelopeId,
         transfer.fromEnvelopeId,
         transfer.amount,
-        `Undo: ${transfer.description}`,
+        `Undo: ${transfer.description}`
       );
 
       logger.debug("Transfer reversed", {
@@ -1450,14 +1476,14 @@ export class AutoFundingEngine {
    */
   getUndoStatistics() {
     const total = this.undoStack.length;
-    const undoable = this.undoStack.filter(item => item.canUndo).length;
+    const undoable = this.undoStack.filter((item) => item.canUndo).length;
     const undone = total - undoable;
 
     return {
       total,
       undoable,
       undone,
-      lastUndoable: undoable > 0 ? this.undoStack.find(item => item.canUndo) : null,
+      lastUndoable: undoable > 0 ? this.undoStack.find((item) => item.canUndo) : null,
     };
   }
 
@@ -1476,7 +1502,7 @@ export class AutoFundingEngine {
    */
   importDataWithUndoStack(data) {
     this.importDataWithPatterns(data);
-    
+
     if (data.undoStack) {
       this.undoStack = data.undoStack;
     }
@@ -1484,7 +1510,7 @@ export class AutoFundingEngine {
     logger.info("Auto-funding data with undo stack imported", {
       rulesCount: this.rules.size,
       patternsCount: this.incomePatterns.size,
-      undoableCount: this.undoStack.filter(item => item.canUndo).length,
+      undoableCount: this.undoStack.filter((item) => item.canUndo).length,
     });
   }
 }

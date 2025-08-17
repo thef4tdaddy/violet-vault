@@ -37,12 +37,9 @@ const ChartsAnalytics = ({
   // Validate and sanitize props to prevent runtime errors
   const safeTransactions = useMemo(
     () => (Array.isArray(transactions) ? transactions : []),
-    [transactions],
+    [transactions]
   );
-  const safeEnvelopes = useMemo(
-    () => (Array.isArray(envelopes) ? envelopes : []),
-    [envelopes],
-  );
+  const safeEnvelopes = useMemo(() => (Array.isArray(envelopes) ? envelopes : []), [envelopes]);
 
   // Date validation helper
   const isValidDate = useCallback((dateString) => {
@@ -118,21 +115,15 @@ const ChartsAnalytics = ({
           grouped[monthKey].expenses += Math.abs(transaction.amount);
         }
 
-        grouped[monthKey].net =
-          grouped[monthKey].income - grouped[monthKey].expenses;
+        grouped[monthKey].net = grouped[monthKey].income - grouped[monthKey].expenses;
         grouped[monthKey].transactionCount++;
       } catch {
-        logger.warn(
-          "Error processing transaction in monthlyTrends:",
-          transaction,
-        );
+        logger.warn("Error processing transaction in monthlyTrends:", transaction);
         return;
       }
     });
 
-    const results = Object.values(grouped).sort((a, b) =>
-      a.month.localeCompare(b.month),
-    );
+    const results = Object.values(grouped).sort((a, b) => a.month.localeCompare(b.month));
 
     // Ensure we always return an array, even if empty
     return results.length > 0
@@ -154,9 +145,7 @@ const ChartsAnalytics = ({
 
     filteredTransactions.forEach((transaction) => {
       if (transaction.amount < 0 && transaction.envelopeId) {
-        const envelope = safeEnvelopes.find(
-          (e) => e.id === transaction.envelopeId,
-        );
+        const envelope = safeEnvelopes.find((e) => e.id === transaction.envelopeId);
         const envelopeName = envelope ? envelope.name : "Unknown Envelope";
 
         if (!spending[envelopeName]) {
@@ -204,23 +193,11 @@ const ChartsAnalytics = ({
 
   // Weekly spending patterns
   const weeklyPatterns = useMemo(() => {
-    const days = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
+    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const patterns = days.map((day) => ({ day, amount: 0, count: 0 }));
 
     filteredTransactions.forEach((transaction) => {
-      if (
-        transaction &&
-        transaction.amount < 0 &&
-        isValidDate(transaction.date)
-      ) {
+      if (transaction && transaction.amount < 0 && isValidDate(transaction.date)) {
         try {
           const dayIndex = new Date(transaction.date).getDay();
           if (dayIndex >= 0 && dayIndex < 7) {
@@ -241,8 +218,7 @@ const ChartsAnalytics = ({
     return safeEnvelopes.map((envelope) => {
       const monthlyBudget = envelope.monthlyAmount || 0;
       const currentBalance = envelope.currentBalance || 0;
-      const spent =
-        envelope.spendingHistory?.reduce((sum, s) => sum + s.amount, 0) || 0;
+      const spent = envelope.spendingHistory?.reduce((sum, s) => sum + s.amount, 0) || 0;
 
       const healthScore = safeDivision(currentBalance, monthlyBudget, 1) * 100;
       let status = "healthy";
@@ -278,18 +254,14 @@ const ChartsAnalytics = ({
 
     filteredTransactions.forEach((transaction) => {
       if (transaction.amount < 0 && transaction.envelopeId) {
-        const envelope = safeEnvelopes.find(
-          (e) => e.id === transaction.envelopeId,
-        );
+        const envelope = safeEnvelopes.find((e) => e.id === transaction.envelopeId);
         if (envelope && analysis[envelope.name]) {
           analysis[envelope.name].actual += Math.abs(transaction.amount);
         }
       }
     });
 
-    return Object.values(analysis).filter(
-      (item) => item.budgeted > 0 || item.actual > 0,
-    );
+    return Object.values(analysis).filter((item) => item.budgeted > 0 || item.actual > 0);
   }, [filteredTransactions, safeEnvelopes, envelopes]);
 
   // Financial metrics
@@ -302,15 +274,14 @@ const ChartsAnalytics = ({
       .filter((t) => t.amount < 0)
       .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
-    const savingsRate =
-      safeDivision(totalIncome - totalExpenses, totalIncome, 0) * 100;
+    const savingsRate = safeDivision(totalIncome - totalExpenses, totalIncome, 0) * 100;
 
     const avgMonthlyIncome =
       monthlyTrends.length > 0
         ? safeDivision(
             monthlyTrends.reduce((sum, m) => sum + m.income, 0),
             monthlyTrends.length,
-            0,
+            0
           )
         : 0;
 
@@ -319,7 +290,7 @@ const ChartsAnalytics = ({
         ? safeDivision(
             monthlyTrends.reduce((sum, m) => sum + m.expenses, 0),
             monthlyTrends.length,
-            0,
+            0
           )
         : 0;
 
@@ -348,7 +319,7 @@ const ChartsAnalytics = ({
       "#84cc16",
       "#6366f1",
     ],
-    [],
+    []
   );
 
   // Optimized event handlers
@@ -393,14 +364,7 @@ const ChartsAnalytics = ({
     currentUser?.userName,
   ]);
 
-  const MetricCard = ({
-    title,
-    value,
-    subtitle,
-    icon,
-    trend,
-    color = "purple",
-  }) => {
+  const MetricCard = ({ title, value, subtitle, icon, trend, color = "purple" }) => {
     const Icon = icon;
     return (
       <div className="glassmorphism rounded-xl p-6">
@@ -408,9 +372,7 @@ const ChartsAnalytics = ({
           <div>
             <p className="text-sm font-semibold text-gray-600 mb-1">{title}</p>
             <p className={`text-2xl font-bold text-${color}-600`}>{value}</p>
-            {subtitle && (
-              <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
-            )}
+            {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
           </div>
           <div className="relative">
             <div
@@ -467,9 +429,7 @@ const ChartsAnalytics = ({
             </div>
             Analytics & Reports
           </h2>
-          <p className="text-gray-800 mt-1">
-            Financial insights and spending patterns
-          </p>
+          <p className="text-gray-800 mt-1">Financial insights and spending patterns</p>
         </div>
 
         <div className="flex gap-3">
@@ -557,9 +517,7 @@ const ChartsAnalytics = ({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Monthly Cash Flow */}
           <div className="glassmorphism rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Monthly Cash Flow
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Monthly Cash Flow</h3>
             <ResponsiveContainer width="100%" height={300}>
               <ComposedChart data={monthlyTrends}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -569,22 +527,14 @@ const ChartsAnalytics = ({
                 <Legend />
                 <Bar dataKey="income" fill="#10b981" name="Income" />
                 <Bar dataKey="expenses" fill="#ef4444" name="Expenses" />
-                <Line
-                  type="monotone"
-                  dataKey="net"
-                  stroke="#06b6d4"
-                  strokeWidth={3}
-                  name="Net"
-                />
+                <Line type="monotone" dataKey="net" stroke="#06b6d4" strokeWidth={3} name="Net" />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
 
           {/* Top Spending Envelopes */}
           <div className="glassmorphism rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Top Spending Envelopes
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Spending Envelopes</h3>
             <ResponsiveContainer width="100%" height={300}>
               {envelopeSpending && envelopeSpending.length > 0 ? (
                 <PieChart>
@@ -595,18 +545,13 @@ const ChartsAnalytics = ({
                     outerRadius={100}
                     fill="#8884d8"
                     dataKey="amount"
-                    label={({ name, percent }) =>
-                      `${name} ${(percent * 100).toFixed(0)}%`
-                    }
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                   >
                     {envelopeSpending &&
                       envelopeSpending
                         .slice(0, 8)
                         .map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={entry.color || chartColors[index]}
-                          />
+                          <Cell key={`cell-${index}`} fill={entry.color || chartColors[index]} />
                         ))}
                   </Pie>
                   <Tooltip content={<CustomTooltip />} />
@@ -629,9 +574,7 @@ const ChartsAnalytics = ({
           {/* Spending Trends Chart */}
           <div className="glassmorphism rounded-xl p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Spending Trends
-              </h3>
+              <h3 className="text-lg font-semibold text-gray-900">Spending Trends</h3>
               <div className="flex gap-2">
                 {["line", "bar", "area"].map((type) => (
                   <button
@@ -650,73 +593,67 @@ const ChartsAnalytics = ({
             </div>
 
             <ResponsiveContainer width="100%" height={400}>
-              {chartType === "line" &&
-                monthlyTrends &&
-                monthlyTrends.length > 0 && (
-                  <LineChart data={monthlyTrends}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis dataKey="month" stroke="#6b7280" />
-                    <YAxis stroke="#6b7280" />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey="income"
-                      stroke="#10b981"
-                      strokeWidth={3}
-                      name="Income"
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="expenses"
-                      stroke="#ef4444"
-                      strokeWidth={3}
-                      name="Expenses"
-                    />
-                  </LineChart>
-                )}
-              {chartType === "bar" &&
-                monthlyTrends &&
-                monthlyTrends.length > 0 && (
-                  <BarChart data={monthlyTrends}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis dataKey="month" stroke="#6b7280" />
-                    <YAxis stroke="#6b7280" />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend />
-                    <Bar dataKey="income" fill="#10b981" name="Income" />
-                    <Bar dataKey="expenses" fill="#ef4444" name="Expenses" />
-                  </BarChart>
-                )}
-              {chartType === "area" &&
-                monthlyTrends &&
-                monthlyTrends.length > 0 && (
-                  <AreaChart data={monthlyTrends}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis dataKey="month" stroke="#6b7280" />
-                    <YAxis stroke="#6b7280" />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend />
-                    <Area
-                      type="monotone"
-                      dataKey="income"
-                      stackId="1"
-                      stroke="#10b981"
-                      fill="#10b981"
-                      fillOpacity={0.6}
-                      name="Income"
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="expenses"
-                      stackId="2"
-                      stroke="#ef4444"
-                      fill="#ef4444"
-                      fillOpacity={0.6}
-                      name="Expenses"
-                    />
-                  </AreaChart>
-                )}
+              {chartType === "line" && monthlyTrends && monthlyTrends.length > 0 && (
+                <LineChart data={monthlyTrends}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="month" stroke="#6b7280" />
+                  <YAxis stroke="#6b7280" />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="income"
+                    stroke="#10b981"
+                    strokeWidth={3}
+                    name="Income"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="expenses"
+                    stroke="#ef4444"
+                    strokeWidth={3}
+                    name="Expenses"
+                  />
+                </LineChart>
+              )}
+              {chartType === "bar" && monthlyTrends && monthlyTrends.length > 0 && (
+                <BarChart data={monthlyTrends}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="month" stroke="#6b7280" />
+                  <YAxis stroke="#6b7280" />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend />
+                  <Bar dataKey="income" fill="#10b981" name="Income" />
+                  <Bar dataKey="expenses" fill="#ef4444" name="Expenses" />
+                </BarChart>
+              )}
+              {chartType === "area" && monthlyTrends && monthlyTrends.length > 0 && (
+                <AreaChart data={monthlyTrends}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="month" stroke="#6b7280" />
+                  <YAxis stroke="#6b7280" />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend />
+                  <Area
+                    type="monotone"
+                    dataKey="income"
+                    stackId="1"
+                    stroke="#10b981"
+                    fill="#10b981"
+                    fillOpacity={0.6}
+                    name="Income"
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="expenses"
+                    stackId="2"
+                    stroke="#ef4444"
+                    fill="#ef4444"
+                    fillOpacity={0.6}
+                    name="Expenses"
+                  />
+                </AreaChart>
+              )}
               {(!monthlyTrends || monthlyTrends.length === 0) && (
                 <div className="flex items-center justify-center h-full text-gray-500">
                   <div className="text-center">
@@ -730,9 +667,7 @@ const ChartsAnalytics = ({
 
           {/* Weekly Spending Patterns */}
           <div className="glassmorphism rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Weekly Spending Patterns
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Weekly Spending Patterns</h3>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={weeklyPatterns || []}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -750,24 +685,17 @@ const ChartsAnalytics = ({
         <div className="space-y-6">
           {/* Envelope Health Overview */}
           <div className="glassmorphism rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Envelope Health
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Envelope Health</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {envelopeHealth.map((envelope, index) => (
-                <div
-                  key={index}
-                  className="bg-white/60 rounded-lg p-4 border border-white/20"
-                >
+                <div key={index} className="bg-white/60 rounded-lg p-4 border border-white/20">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center">
                       <div
                         className="w-3 h-3 rounded-full mr-2"
                         style={{ backgroundColor: envelope.color }}
                       />
-                      <span className="font-medium text-gray-900">
-                        {envelope.name}
-                      </span>
+                      <span className="font-medium text-gray-900">{envelope.name}</span>
                     </div>
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -786,15 +714,11 @@ const ChartsAnalytics = ({
                   <div className="space-y-1 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Balance:</span>
-                      <span className="font-medium">
-                        ${envelope.currentBalance.toFixed(2)}
-                      </span>
+                      <span className="font-medium">${envelope.currentBalance.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Budget:</span>
-                      <span className="font-medium">
-                        ${envelope.monthlyBudget.toFixed(2)}
-                      </span>
+                      <span className="font-medium">${envelope.monthlyBudget.toFixed(2)}</span>
                     </div>
                   </div>
                   <div className="mt-2">
@@ -822,19 +746,12 @@ const ChartsAnalytics = ({
 
           {/* Budget vs Actual */}
           <div className="glassmorphism rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Budget vs Actual Spending
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Budget vs Actual Spending</h3>
             <ResponsiveContainer width="100%" height={400}>
               <BarChart data={budgetVsActual || []} layout="horizontal">
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis type="number" stroke="#6b7280" />
-                <YAxis
-                  dataKey="name"
-                  type="category"
-                  stroke="#6b7280"
-                  width={100}
-                />
+                <YAxis dataKey="name" type="category" stroke="#6b7280" width={100} />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
                 <Bar dataKey="budgeted" fill="#a855f7" name="Budgeted" />
@@ -849,9 +766,7 @@ const ChartsAnalytics = ({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Category Breakdown Pie Chart */}
           <div className="glassmorphism rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Spending by Category
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Spending by Category</h3>
             <ResponsiveContainer width="100%" height={400}>
               <PieChart>
                 <Pie
@@ -861,15 +776,10 @@ const ChartsAnalytics = ({
                   outerRadius={120}
                   fill="#8884d8"
                   dataKey="amount"
-                  label={({ name, percent }) =>
-                    `${name} ${(percent * 100).toFixed(0)}%`
-                  }
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                 >
                   {(categoryBreakdown || []).map((_, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={chartColors[index % chartColors.length]}
-                    />
+                    <Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
                   ))}
                 </Pie>
                 <Tooltip content={<CustomTooltip />} />
@@ -879,9 +789,7 @@ const ChartsAnalytics = ({
 
           {/* Category Details Table */}
           <div className="glassmorphism rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Category Details
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Category Details</h3>
             <div className="space-y-3 max-h-96 overflow-y-auto">
               {(categoryBreakdown || []).map((category, index) => (
                 <div
@@ -892,29 +800,18 @@ const ChartsAnalytics = ({
                     <div
                       className="w-4 h-4 rounded-full mr-3"
                       style={{
-                        backgroundColor:
-                          chartColors[index % chartColors.length],
+                        backgroundColor: chartColors[index % chartColors.length],
                       }}
                     />
                     <div>
-                      <div className="font-medium text-gray-900">
-                        {category.name}
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        {category.count} transactions
-                      </div>
+                      <div className="font-medium text-gray-900">{category.name}</div>
+                      <div className="text-sm text-gray-600">{category.count} transactions</div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold text-gray-900">
-                      ${category.amount.toFixed(2)}
-                    </div>
+                    <div className="font-bold text-gray-900">${category.amount.toFixed(2)}</div>
                     <div className="text-sm text-gray-600">
-                      {(
-                        (category.amount / metrics.totalExpenses) *
-                        100
-                      ).toFixed(1)}
-                      %
+                      {((category.amount / metrics.totalExpenses) * 100).toFixed(1)}%
                     </div>
                   </div>
                 </div>

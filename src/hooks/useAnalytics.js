@@ -17,14 +17,8 @@ const useAnalytics = (options = {}) => {
   } = options;
 
   // Get data from Zustand store
-  const {
-    envelopes,
-    transactions,
-    savingsGoals,
-    unassignedCash,
-    actualBalance,
-    paycheckHistory,
-  } = useBudgetStore();
+  const { envelopes, transactions, savingsGoals, unassignedCash, actualBalance, paycheckHistory } =
+    useBudgetStore();
 
   // Helper function to get date range based on period
   const getDateRange = () => {
@@ -104,75 +98,65 @@ const useAnalytics = (options = {}) => {
         .reduce((sum, t) => sum + t.amount, 0);
 
       const totalExpenses = Math.abs(
-        analysisTransactions
-          .filter((t) => t.amount < 0)
-          .reduce((sum, t) => sum + t.amount, 0),
+        analysisTransactions.filter((t) => t.amount < 0).reduce((sum, t) => sum + t.amount, 0)
       );
 
       const netAmount = totalIncome - totalExpenses;
 
       // Category breakdown
-      const categoryBreakdown = analysisTransactions.reduce(
-        (acc, transaction) => {
-          const category = transaction.category || "uncategorized";
-          if (!acc[category]) {
-            acc[category] = {
-              income: 0,
-              expenses: 0,
-              net: 0,
-              count: 0,
-              transactions: [],
-            };
-          }
+      const categoryBreakdown = analysisTransactions.reduce((acc, transaction) => {
+        const category = transaction.category || "uncategorized";
+        if (!acc[category]) {
+          acc[category] = {
+            income: 0,
+            expenses: 0,
+            net: 0,
+            count: 0,
+            transactions: [],
+          };
+        }
 
-          if (transaction.amount > 0) {
-            acc[category].income += transaction.amount;
-          } else {
-            acc[category].expenses += Math.abs(transaction.amount);
-          }
+        if (transaction.amount > 0) {
+          acc[category].income += transaction.amount;
+        } else {
+          acc[category].expenses += Math.abs(transaction.amount);
+        }
 
-          acc[category].net += transaction.amount;
-          acc[category].count += 1;
-          acc[category].transactions.push(transaction);
+        acc[category].net += transaction.amount;
+        acc[category].count += 1;
+        acc[category].transactions.push(transaction);
 
-          return acc;
-        },
-        {},
-      );
+        return acc;
+      }, {});
 
       // Envelope breakdown
-      const envelopeBreakdown = analysisTransactions.reduce(
-        (acc, transaction) => {
-          if (!transaction.envelopeId) return acc;
+      const envelopeBreakdown = analysisTransactions.reduce((acc, transaction) => {
+        if (!transaction.envelopeId) return acc;
 
-          const envelope = envelopes?.find(
-            (env) => env.id === transaction.envelopeId,
-          );
-          const envelopeName = envelope?.name || "Unknown Envelope";
+        const envelope = envelopes?.find((env) => env.id === transaction.envelopeId);
+        const envelopeName = envelope?.name || "Unknown Envelope";
 
-          if (!acc[envelopeName]) {
-            acc[envelopeName] = {
-              income: 0,
-              expenses: 0,
-              net: 0,
-              count: 0,
-              envelopeId: transaction.envelopeId,
-            };
-          }
+        if (!acc[envelopeName]) {
+          acc[envelopeName] = {
+            income: 0,
+            expenses: 0,
+            net: 0,
+            count: 0,
+            envelopeId: transaction.envelopeId,
+          };
+        }
 
-          if (transaction.amount > 0) {
-            acc[envelopeName].income += transaction.amount;
-          } else {
-            acc[envelopeName].expenses += Math.abs(transaction.amount);
-          }
+        if (transaction.amount > 0) {
+          acc[envelopeName].income += transaction.amount;
+        } else {
+          acc[envelopeName].expenses += Math.abs(transaction.amount);
+        }
 
-          acc[envelopeName].net += transaction.amount;
-          acc[envelopeName].count += 1;
+        acc[envelopeName].net += transaction.amount;
+        acc[envelopeName].count += 1;
 
-          return acc;
-        },
-        {},
-      );
+        return acc;
+      }, {});
 
       // Time series data for charts
       const timeSeriesData = [];
@@ -189,9 +173,7 @@ const useAnalytics = (options = {}) => {
           .reduce((sum, t) => sum + t.amount, 0);
 
         const dayExpenses = Math.abs(
-          dayTransactions
-            .filter((t) => t.amount < 0)
-            .reduce((sum, t) => sum + t.amount, 0),
+          dayTransactions.filter((t) => t.amount < 0).reduce((sum, t) => sum + t.amount, 0)
         );
 
         timeSeriesData.push({
@@ -258,12 +240,12 @@ const useAnalytics = (options = {}) => {
     queryFn: async () => {
       const totalEnvelopeBalance = (envelopes || []).reduce(
         (sum, env) => sum + (env.currentBalance || 0),
-        0,
+        0
       );
 
       const totalSavingsBalance = (savingsGoals || []).reduce(
         (sum, goal) => sum + (goal.currentAmount || 0),
-        0,
+        0
       );
 
       const totalVirtualBalance =
@@ -274,37 +256,20 @@ const useAnalytics = (options = {}) => {
       const envelopeAnalysis = (envelopes || []).map((envelope) => ({
         ...envelope,
         utilizationRate:
-          envelope.targetAmount > 0
-            ? (envelope.currentBalance / envelope.targetAmount) * 100
-            : 0,
-        isUnderfunded:
-          (envelope.currentBalance || 0) < (envelope.targetAmount || 0),
-        isOverfunded:
-          (envelope.currentBalance || 0) > (envelope.targetAmount || 0),
-        fundingGap: Math.max(
-          0,
-          (envelope.targetAmount || 0) - (envelope.currentBalance || 0),
-        ),
+          envelope.targetAmount > 0 ? (envelope.currentBalance / envelope.targetAmount) * 100 : 0,
+        isUnderfunded: (envelope.currentBalance || 0) < (envelope.targetAmount || 0),
+        isOverfunded: (envelope.currentBalance || 0) > (envelope.targetAmount || 0),
+        fundingGap: Math.max(0, (envelope.targetAmount || 0) - (envelope.currentBalance || 0)),
       }));
 
-      const underfundedEnvelopes = envelopeAnalysis.filter(
-        (env) => env.isUnderfunded,
-      );
-      const overfundedEnvelopes = envelopeAnalysis.filter(
-        (env) => env.isOverfunded,
-      );
+      const underfundedEnvelopes = envelopeAnalysis.filter((env) => env.isUnderfunded);
+      const overfundedEnvelopes = envelopeAnalysis.filter((env) => env.isOverfunded);
 
       // Savings goal analysis
       const savingsAnalysis = (savingsGoals || []).map((goal) => ({
         ...goal,
-        progressRate:
-          goal.targetAmount > 0
-            ? (goal.currentAmount / goal.targetAmount) * 100
-            : 0,
-        remainingAmount: Math.max(
-          0,
-          (goal.targetAmount || 0) - (goal.currentAmount || 0),
-        ),
+        progressRate: goal.targetAmount > 0 ? (goal.currentAmount / goal.targetAmount) * 100 : 0,
+        remainingAmount: Math.max(0, (goal.targetAmount || 0) - (goal.currentAmount || 0)),
         isCompleted: (goal.currentAmount || 0) >= (goal.targetAmount || 0),
       }));
 
@@ -323,23 +288,16 @@ const useAnalytics = (options = {}) => {
         insights: {
           underfundedCount: underfundedEnvelopes.length,
           overfundedCount: overfundedEnvelopes.length,
-          totalFundingGap: underfundedEnvelopes.reduce(
-            (sum, env) => sum + env.fundingGap,
-            0,
-          ),
+          totalFundingGap: underfundedEnvelopes.reduce((sum, env) => sum + env.fundingGap, 0),
           averageUtilization:
             envelopeAnalysis.length > 0
-              ? envelopeAnalysis.reduce(
-                  (sum, env) => sum + env.utilizationRate,
-                  0,
-                ) / envelopeAnalysis.length
+              ? envelopeAnalysis.reduce((sum, env) => sum + env.utilizationRate, 0) /
+                envelopeAnalysis.length
               : 0,
-          completedSavingsGoals: savingsAnalysis.filter(
-            (goal) => goal.isCompleted,
-          ).length,
+          completedSavingsGoals: savingsAnalysis.filter((goal) => goal.isCompleted).length,
           totalSavingsTarget: savingsAnalysis.reduce(
             (sum, goal) => sum + (goal.targetAmount || 0),
-            0,
+            0
           ),
         },
       };
@@ -363,12 +321,11 @@ const useAnalytics = (options = {}) => {
 
       // Sort paychecks by date
       const sortedPaychecks = [...paycheckHistory].sort(
-        (a, b) => new Date(a.date) - new Date(b.date),
+        (a, b) => new Date(a.date) - new Date(b.date)
       );
 
       const averageAmount =
-        sortedPaychecks.reduce((sum, pc) => sum + pc.amount, 0) /
-        sortedPaychecks.length;
+        sortedPaychecks.reduce((sum, pc) => sum + pc.amount, 0) / sortedPaychecks.length;
 
       // Calculate frequency (days between paychecks)
       const intervals = [];
@@ -381,27 +338,20 @@ const useAnalytics = (options = {}) => {
 
       const averageInterval =
         intervals.length > 0
-          ? intervals.reduce((sum, interval) => sum + interval, 0) /
-            intervals.length
+          ? intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length
           : 0;
 
       // Determine frequency type
       let frequency = "irregular";
-      if (averageInterval >= 13 && averageInterval <= 15)
-        frequency = "biweekly";
-      else if (averageInterval >= 6 && averageInterval <= 8)
-        frequency = "weekly";
-      else if (averageInterval >= 27 && averageInterval <= 33)
-        frequency = "monthly";
+      if (averageInterval >= 13 && averageInterval <= 15) frequency = "biweekly";
+      else if (averageInterval >= 6 && averageInterval <= 8) frequency = "weekly";
+      else if (averageInterval >= 27 && averageInterval <= 33) frequency = "monthly";
 
       // Calculate growth rate (compare recent vs older paychecks)
       let growth = 0;
       if (sortedPaychecks.length >= 4) {
-        const recentAvg =
-          sortedPaychecks.slice(-2).reduce((sum, pc) => sum + pc.amount, 0) / 2;
-        const olderAvg =
-          sortedPaychecks.slice(0, 2).reduce((sum, pc) => sum + pc.amount, 0) /
-          2;
+        const recentAvg = sortedPaychecks.slice(-2).reduce((sum, pc) => sum + pc.amount, 0) / 2;
+        const olderAvg = sortedPaychecks.slice(0, 2).reduce((sum, pc) => sum + pc.amount, 0) / 2;
         growth = ((recentAvg - olderAvg) / olderAvg) * 100;
       }
 
@@ -442,14 +392,12 @@ const useAnalytics = (options = {}) => {
         }));
 
       case "envelopeBar":
-        return Object.entries(data.envelopeBreakdown).map(
-          ([name, envelopeData]) => ({
-            name,
-            expenses: envelopeData.expenses,
-            income: envelopeData.income,
-            net: envelopeData.net,
-          }),
-        );
+        return Object.entries(data.envelopeBreakdown).map(([name, envelopeData]) => ({
+          name,
+          expenses: envelopeData.expenses,
+          income: envelopeData.income,
+          net: envelopeData.net,
+        }));
 
       default:
         return [];
@@ -485,8 +433,7 @@ const useAnalytics = (options = {}) => {
       balanceAnalyticsQuery.refetch();
       paycheckTrendsQuery.refetch();
     },
-    invalidate: () =>
-      queryClient.invalidateQueries({ queryKey: queryKeys.analytics }),
+    invalidate: () => queryClient.invalidateQueries({ queryKey: queryKeys.analytics }),
   };
 };
 
