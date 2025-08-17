@@ -71,6 +71,12 @@ const migrateOldData = async () => {
           transformedData.state.paycheckHistory,
         );
 
+        // Save unassignedCash and actualBalance to Dexie metadata
+        await setBudgetMetadata({
+          unassignedCash: transformedData.state.unassignedCash || 0,
+          actualBalance: transformedData.state.actualBalance || 0,
+        });
+
         // Remove old data after successful migration
         localStorage.removeItem("budget-store");
         logger.info("Cleaned up old budget-store data", {
@@ -92,12 +98,10 @@ await migrateOldData();
 // Base store configuration
 const storeInitializer = (set, get) => ({
   // App State (auth, UI, settings) - data arrays handled by TanStack Query
-  unassignedCash: 0,
   biweeklyAllocation: 0,
   // Unassigned cash modal state
   isUnassignedCashModalOpen: false,
   paycheckHistory: [], // Paycheck history for payday predictions
-  actualBalance: 0, // Real bank account balance
   isActualBalanceManual: false, // Track if balance was manually set
   isOnline: true, // Add isOnline state, default to true
   dataLoaded: false,
@@ -120,13 +124,7 @@ const storeInitializer = (set, get) => ({
 
   // Supplemental accounts operations moved to TanStack Query hooks
 
-  // Unassigned cash and allocation management
-  setUnassignedCash: (amount) =>
-    set((state) => {
-      state.unassignedCash = amount;
-      // Note: TanStack Query invalidation should be handled by calling code
-      // to avoid circular dependencies between store and query client
-    }),
+  // NOTE: unassignedCash now handled by TanStack Query → Dexie, not Zustand
 
   setBiweeklyAllocation: (amount) =>
     set((state) => {
@@ -145,11 +143,7 @@ const storeInitializer = (set, get) => ({
     }),
 
   // Actual balance management
-  setActualBalance: (balance, isManual = true) =>
-    set((state) => {
-      state.actualBalance = balance;
-      state.isActualBalanceManual = isManual;
-    }),
+  // NOTE: actualBalance now handled by TanStack Query → Dexie, not Zustand
 
   // Reconcile transaction moved to TanStack Query hooks
 
@@ -350,14 +344,10 @@ const storeInitializer = (set, get) => ({
         });
       }
 
-      // Update UI state in Zustand
+      // Update UI state in Zustand (only UI-related fields)
       set((state) => {
-        if (typeof importedData.unassignedCash === "number")
-          state.unassignedCash = importedData.unassignedCash;
         if (typeof importedData.biweeklyAllocation === "number")
           state.biweeklyAllocation = importedData.biweeklyAllocation;
-        if (typeof importedData.actualBalance === "number")
-          state.actualBalance = importedData.actualBalance;
         if (typeof importedData.isActualBalanceManual === "boolean")
           state.isActualBalanceManual = importedData.isActualBalanceManual;
 
@@ -409,11 +399,9 @@ const storeInitializer = (set, get) => ({
 
       // Reset UI state
       set((state) => {
-        state.unassignedCash = 0;
         state.biweeklyAllocation = 0;
         state.isUnassignedCashModalOpen = false;
         state.paycheckHistory = [];
-        state.actualBalance = 0;
         state.isActualBalanceManual = false;
         state.isOnline = true;
         state.dataLoaded = false;
@@ -565,10 +553,8 @@ if (LOCAL_ONLY_MODE) {
         name: "violet-vault-store",
         partialize: (state) => ({
           // UI and app state only (data arrays handled by TanStack Query → Dexie)
-          unassignedCash: state.unassignedCash,
           biweeklyAllocation: state.biweeklyAllocation,
           paycheckHistory: state.paycheckHistory,
-          actualBalance: state.actualBalance,
           isActualBalanceManual: state.isActualBalanceManual,
           cloudSyncEnabled: state.cloudSyncEnabled,
           isOnline: state.isOnline,

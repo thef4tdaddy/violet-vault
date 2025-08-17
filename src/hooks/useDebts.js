@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { queryKeys } from "../utils/queryClient";
 import { budgetDb } from "../db/budgetDb";
+import BudgetHistoryTracker from "../utils/budgetHistoryTracker";
 import logger from "../utils/logger.js";
 
 const useDebts = () => {
@@ -58,7 +59,18 @@ const useDebts = () => {
       const debt = debtData.id
         ? debtData
         : { id: crypto.randomUUID(), ...debtData };
+
       await budgetDb.debts.add(debt);
+
+      // Track the change in budget history
+      await BudgetHistoryTracker.trackDebtChange({
+        debtId: debt.id,
+        changeType: "add",
+        previousData: null,
+        newData: debt,
+        author: debtData.author || "Unknown User",
+      });
+
       return debt;
     },
     onSuccess: () => {
@@ -68,11 +80,27 @@ const useDebts = () => {
 
   const updateDebtMutation = useMutation({
     mutationKey: ["debts", "update"],
-    mutationFn: async ({ id, updates }) => {
+    mutationFn: async ({ id, updates, author = "Unknown User" }) => {
+      // Get previous data for tracking
+      const previousData = await budgetDb.debts.get(id);
+
       await budgetDb.debts.update(id, {
         ...updates,
         lastModified: Date.now(),
       });
+
+      // Get updated data for tracking
+      const newData = await budgetDb.debts.get(id);
+
+      // Track the change in budget history
+      await BudgetHistoryTracker.trackDebtChange({
+        debtId: id,
+        changeType: "modify",
+        previousData,
+        newData,
+        author,
+      });
+
       return { id, ...updates };
     },
     onSuccess: () => {
@@ -82,8 +110,23 @@ const useDebts = () => {
 
   const deleteDebtMutation = useMutation({
     mutationKey: ["debts", "delete"],
-    mutationFn: async (id) => {
+    mutationFn: async ({ id, author = "Unknown User" }) => {
+      // Get data before deletion for tracking
+      const previousData = await budgetDb.debts.get(id);
+
       await budgetDb.debts.delete(id);
+
+      // Track the change in budget history
+      if (previousData) {
+        await BudgetHistoryTracker.trackDebtChange({
+          debtId: id,
+          changeType: "delete",
+          previousData,
+          newData: null,
+          author,
+        });
+      }
+
       return id;
     },
     onSuccess: () => {
@@ -93,7 +136,7 @@ const useDebts = () => {
 
   const recordPaymentMutation = useMutation({
     mutationKey: ["debts", "recordPayment"],
-    mutationFn: async ({ id, payment }) => {
+    mutationFn: async ({ id, payment, author = "Unknown User" }) => {
       const debt = await budgetDb.debts.get(id);
       if (debt) {
         const history = [...(debt.paymentHistory || []), { ...payment }];
@@ -101,10 +144,27 @@ const useDebts = () => {
           0,
           (debt.currentBalance || 0) - payment.amount,
         );
+
+        const updatedDebt = {
+          ...debt,
+          currentBalance: newBalance,
+          paymentHistory: history,
+          lastModified: Date.now(),
+        };
+
         await budgetDb.debts.update(id, {
           currentBalance: newBalance,
           paymentHistory: history,
           lastModified: Date.now(),
+        });
+
+        // Track the payment in budget history
+        await BudgetHistoryTracker.trackDebtChange({
+          debtId: id,
+          changeType: "modify",
+          previousData: debt,
+          newData: updatedDebt,
+          author,
         });
       }
       return { id, payment };
