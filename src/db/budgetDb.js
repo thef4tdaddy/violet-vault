@@ -630,6 +630,33 @@ export const setBudgetMetadata = async (metadata) => {
   }
 };
 
+// Dedicated methods for unassigned cash and actual balance
+export const setUnassignedCash = async (amount) => {
+  const currentMetadata = (await getBudgetMetadata()) || {};
+  await setBudgetMetadata({
+    ...currentMetadata,
+    unassignedCash: amount,
+  });
+};
+
+export const setActualBalance = async (balance) => {
+  const currentMetadata = (await getBudgetMetadata()) || {};
+  await setBudgetMetadata({
+    ...currentMetadata,
+    actualBalance: balance,
+  });
+};
+
+export const getUnassignedCash = async () => {
+  const metadata = await getBudgetMetadata();
+  return metadata?.unassignedCash || 0;
+};
+
+export const getActualBalance = async () => {
+  const metadata = await getBudgetMetadata();
+  return metadata?.actualBalance || 0;
+};
+
 export const clearData = async () => {
   await Promise.all([
     budgetDb.budget.clear(),
