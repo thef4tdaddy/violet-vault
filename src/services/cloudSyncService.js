@@ -64,6 +64,35 @@ class CloudSyncService {
         );
       }
 
+      // Save budget metadata (unassigned cash and actual balance)
+      if (
+        typeof data.unassignedCash === "number" ||
+        typeof data.actualBalance === "number"
+      ) {
+        const currentMetadata = (await budgetDb.budget.get("metadata")) || {};
+        const newMetadata = {
+          ...currentMetadata,
+          lastModified: Date.now(),
+        };
+
+        if (typeof data.unassignedCash === "number") {
+          newMetadata.unassignedCash = data.unassignedCash;
+          logger.debug(`💾 Saving unassigned cash: $${data.unassignedCash}`);
+        }
+
+        if (typeof data.actualBalance === "number") {
+          newMetadata.actualBalance = data.actualBalance;
+          logger.debug(`💾 Saving actual balance: $${data.actualBalance}`);
+        }
+
+        promises.push(
+          budgetDb.budget.put({
+            id: "metadata",
+            ...newMetadata,
+          }),
+        );
+      }
+
       // Wait for all saves to complete
       await Promise.all(promises);
 
@@ -383,6 +412,7 @@ class CloudSyncService {
         debts,
         budgetCommits,
         budgetChanges,
+        budgetMetadata,
       ] = await Promise.all([
         budgetDb.envelopes.toArray(),
         budgetDb.transactions.toArray(),
@@ -392,6 +422,7 @@ class CloudSyncService {
         budgetDb.debts.toArray(),
         budgetDb.budgetCommits.toArray(),
         budgetDb.budgetChanges.toArray(),
+        budgetDb.budget.get("metadata"),
       ]);
 
       // Debug what we're actually fetching from Dexie
@@ -404,6 +435,8 @@ class CloudSyncService {
         debtsCount: debts.length,
         budgetCommitsCount: budgetCommits.length,
         budgetChangesCount: budgetChanges.length,
+        unassignedCash: budgetMetadata?.unassignedCash || 0,
+        actualBalance: budgetMetadata?.actualBalance || 0,
         firstEnvelope: envelopes[0]?.name || "none",
         firstTransaction: transactions[0]?.description || "none",
         firstBill: bills[0]?.name || "none",
@@ -419,6 +452,8 @@ class CloudSyncService {
         debts,
         budgetCommits,
         budgetChanges,
+        unassignedCash: budgetMetadata?.unassignedCash || 0,
+        actualBalance: budgetMetadata?.actualBalance || 0,
         lastModified: Math.max(
           ...envelopes.map((e) => e.lastModified || e.createdAt || 0),
           ...transactions.map((t) => t.lastModified || t.createdAt || 0),
@@ -426,6 +461,7 @@ class CloudSyncService {
           ...debts.map((d) => d.lastModified || d.createdAt || 0),
           ...budgetCommits.map((c) => c.timestamp || 0),
           ...budgetChanges.map((c) => c.timestamp || 0),
+          budgetMetadata?.lastModified || 0,
           0,
         ),
       };
@@ -437,6 +473,11 @@ class CloudSyncService {
         bills: [],
         savingsGoals: [],
         paycheckHistory: [],
+        debts: [],
+        budgetCommits: [],
+        budgetChanges: [],
+        unassignedCash: 0,
+        actualBalance: 0,
         lastModified: 0,
       };
     }
