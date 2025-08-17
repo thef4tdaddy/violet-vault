@@ -11,12 +11,7 @@ import logger from "../utils/logger";
  */
 const useEnvelopes = (options = {}) => {
   const queryClient = useQueryClient();
-  const {
-    category,
-    includeArchived = false,
-    sortBy = "name",
-    sortOrder = "asc",
-  } = options;
+  const { category, includeArchived = false, sortBy = "name", sortOrder = "asc" } = options;
 
   // Zustand no longer contains data arrays - only UI state
   // All data operations now go through TanStack Query → Dexie
@@ -43,17 +38,14 @@ const useEnvelopes = (options = {}) => {
       envelopes = envelopes.map((envelope) => ({
         ...envelope,
         envelopeType:
-          envelope.envelopeType ||
-          AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category || "expenses"),
+          envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category || "expenses"),
       }));
 
       // Apply filters
       let filteredEnvelopes = envelopes;
 
       if (category) {
-        filteredEnvelopes = envelopes.filter(
-          (env) => env.category === category,
-        );
+        filteredEnvelopes = envelopes.filter((env) => env.category === category);
       }
 
       if (!includeArchived) {
@@ -107,7 +99,7 @@ const useEnvelopes = (options = {}) => {
       initialData: undefined, // Remove initialData to prevent persister errors
       enabled: true,
     }),
-    [category, includeArchived, sortBy, sortOrder, queryFunction],
+    [category, includeArchived, sortBy, sortOrder, queryFunction]
   );
 
   // Main envelopes query
@@ -223,12 +215,7 @@ const useEnvelopes = (options = {}) => {
   // Fund transfer mutation
   const transferFundsMutation = useMutation({
     mutationKey: ["envelopes", "transfer"],
-    mutationFn: async ({
-      fromEnvelopeId,
-      toEnvelopeId,
-      amount,
-      description,
-    }) => {
+    mutationFn: async ({ fromEnvelopeId, toEnvelopeId, amount, description }) => {
       // Get current envelopes from Dexie for transfer calculation
       const fromEnvelope = await budgetDb.envelopes.get(fromEnvelopeId);
       const toEnvelope = await budgetDb.envelopes.get(toEnvelopeId);
@@ -256,8 +243,7 @@ const useEnvelopes = (options = {}) => {
       const transaction = {
         id: `transfer_${Date.now()}`,
         amount,
-        description:
-          description || `Transfer: ${fromEnvelopeId} → ${toEnvelopeId}`,
+        description: description || `Transfer: ${fromEnvelopeId} → ${toEnvelopeId}`,
         type: "transfer",
         fromEnvelopeId,
         toEnvelopeId,
@@ -293,26 +279,19 @@ const useEnvelopes = (options = {}) => {
 
   // Computed values
   const envelopes = envelopesQuery.data || [];
-  const totalBalance = envelopes.reduce(
-    (sum, env) => sum + (env.currentBalance || 0),
-    0,
-  );
-  const totalTargetAmount = envelopes.reduce(
-    (sum, env) => sum + (env.targetAmount || 0),
-    0,
-  );
+  const totalBalance = envelopes.reduce((sum, env) => sum + (env.currentBalance || 0), 0);
+  const totalTargetAmount = envelopes.reduce((sum, env) => sum + (env.targetAmount || 0), 0);
   const underfundedEnvelopes = envelopes.filter(
-    (env) => (env.currentBalance || 0) < (env.targetAmount || 0),
+    (env) => (env.currentBalance || 0) < (env.targetAmount || 0)
   );
   const overfundedEnvelopes = envelopes.filter(
-    (env) => (env.currentBalance || 0) > (env.targetAmount || 0),
+    (env) => (env.currentBalance || 0) > (env.targetAmount || 0)
   );
 
   // Utility functions
   const getEnvelopeById = (id) => envelopes.find((env) => env.id === id);
 
-  const getEnvelopesByCategory = (cat) =>
-    envelopes.filter((env) => env.category === cat);
+  const getEnvelopesByCategory = (cat) => envelopes.filter((env) => env.category === cat);
 
   const getAvailableCategories = () => {
     const categories = new Set(envelopes.map((env) => env.category));
@@ -356,8 +335,7 @@ const useEnvelopes = (options = {}) => {
 
     // Query controls
     refetch: envelopesQuery.refetch,
-    invalidate: () =>
-      queryClient.invalidateQueries({ queryKey: queryKeys.envelopes }),
+    invalidate: () => queryClient.invalidateQueries({ queryKey: queryKeys.envelopes }),
   };
 };
 

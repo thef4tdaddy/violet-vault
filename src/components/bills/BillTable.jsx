@@ -18,9 +18,7 @@ const BillTable = ({ bills, activeTab }) => {
           <tr className="bg-gray-50">
             <th className="text-left p-3 font-medium text-gray-700">Account</th>
             <th className="text-left p-3 font-medium text-gray-700">Amount</th>
-            <th className="text-left p-3 font-medium text-gray-700">
-              Frequency
-            </th>
+            <th className="text-left p-3 font-medium text-gray-700">Frequency</th>
           </tr>
         </thead>
         <tbody>

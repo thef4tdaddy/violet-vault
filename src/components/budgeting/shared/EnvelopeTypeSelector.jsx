@@ -1,9 +1,6 @@
 import React from "react";
 import { FileText, TrendingUp, Target, CheckCircle } from "lucide-react";
-import {
-  ENVELOPE_TYPES,
-  ENVELOPE_TYPE_CONFIG,
-} from "../../../constants/categories";
+import { ENVELOPE_TYPES, ENVELOPE_TYPE_CONFIG } from "../../../constants/categories";
 
 /**
  * Shared component for envelope type selection
@@ -79,9 +76,7 @@ const EnvelopeTypeSelector = ({
                         {config.name}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      {config.description}
-                    </p>
+                    <p className="text-sm text-gray-600 leading-relaxed">{config.description}</p>
                   </div>
                 </div>
               </button>

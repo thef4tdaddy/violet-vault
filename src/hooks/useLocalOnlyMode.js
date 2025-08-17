@@ -25,16 +25,12 @@ export const useLocalOnlyMode = () => {
   }, []);
 
   const enterLocalOnlyMode = useCallback(async () => {
-    logger.warn(
-      "enterLocalOnlyMode called - use cloudSyncEnabled toggle instead",
-    );
+    logger.warn("enterLocalOnlyMode called - use cloudSyncEnabled toggle instead");
     return { success: false, error: "Local-only mode deprecated" };
   }, []);
 
   const exitLocalOnlyModeAndClear = useCallback(async () => {
-    logger.warn(
-      "exitLocalOnlyModeAndClear called - use cloudSyncEnabled toggle instead",
-    );
+    logger.warn("exitLocalOnlyModeAndClear called - use cloudSyncEnabled toggle instead");
     return { success: false, error: "Local-only mode deprecated" };
   }, []);
 

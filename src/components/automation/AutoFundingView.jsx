@@ -19,11 +19,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import AutoFundingRuleBuilder from "./AutoFundingRuleBuilder";
-import {
-  autoFundingEngine,
-  RULE_TYPES,
-  TRIGGER_TYPES,
-} from "../../utils/autoFundingEngine";
+import { autoFundingEngine, RULE_TYPES, TRIGGER_TYPES } from "../../utils/autoFundingEngine";
 import { useBudgetStore } from "../../stores/budgetStore";
 import logger from "../../utils/logger";
 
@@ -79,9 +75,7 @@ const AutoFundingView = () => {
 
   const handleDeleteRule = (ruleId) => {
     if (
-      window.confirm(
-        "Are you sure you want to delete this rule? This action cannot be undone.",
-      )
+      window.confirm("Are you sure you want to delete this rule? This action cannot be undone.")
     ) {
       try {
         autoFundingEngine.deleteRule(ruleId);
@@ -128,11 +122,11 @@ const AutoFundingView = () => {
 
         if (totalFunded > 0) {
           alert(
-            `Successfully executed ${rulesExecuted} rules and funded $${totalFunded.toFixed(2)} total!`,
+            `Successfully executed ${rulesExecuted} rules and funded $${totalFunded.toFixed(2)} total!`
           );
         } else {
           alert(
-            "Rules executed but no funds were transferred. Check your rules and available balances.",
+            "Rules executed but no funds were transferred. Check your rules and available balances."
           );
         }
       } else {
@@ -222,19 +216,13 @@ const AutoFundingView = () => {
               <Settings className="h-8 w-8 text-blue-600" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                Auto-Funding Rules
-              </h2>
-              <p className="text-gray-600">
-                Automate your envelope funding with smart rules
-              </p>
+              <h2 className="text-2xl font-bold text-gray-900">Auto-Funding Rules</h2>
+              <p className="text-gray-600">Automate your envelope funding with smart rules</p>
             </div>
           </div>
           <button
             onClick={handleExecuteRules}
-            disabled={
-              isExecuting || rules.filter((r) => r.enabled).length === 0
-            }
+            disabled={isExecuting || rules.filter((r) => r.enabled).length === 0}
             className="flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
           >
             {isExecuting ? (
@@ -257,9 +245,7 @@ const AutoFundingView = () => {
             <div className="flex items-center gap-3">
               <Settings className="h-8 w-8 text-gray-600" />
               <div>
-                <p className="text-2xl font-bold text-gray-900">
-                  {rules.length}
-                </p>
+                <p className="text-2xl font-bold text-gray-900">{rules.length}</p>
                 <p className="text-sm text-gray-600">Total Rules</p>
               </div>
             </div>
@@ -292,9 +278,7 @@ const AutoFundingView = () => {
               <div>
                 <p className="text-2xl font-bold text-purple-900">
                   {executionHistory.length > 0
-                    ? new Date(
-                        executionHistory[0].executedAt,
-                      ).toLocaleDateString()
+                    ? new Date(executionHistory[0].executedAt).toLocaleDateString()
                     : "Never"}
                 </p>
                 <p className="text-sm text-gray-600">Last Execution</p>
@@ -347,12 +331,9 @@ const AutoFundingView = () => {
             {rules.length === 0 ? (
               <div className="text-center py-16">
                 <Settings className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-xl font-medium text-gray-900 mb-2">
-                  No Rules Created
-                </h3>
+                <h3 className="text-xl font-medium text-gray-900 mb-2">No Rules Created</h3>
                 <p className="text-gray-600 mb-6">
-                  Create your first auto-funding rule to automate envelope
-                  management
+                  Create your first auto-funding rule to automate envelope management
                 </p>
                 <button
                   onClick={handleCreateRule}
@@ -372,9 +353,7 @@ const AutoFundingView = () => {
                     <div
                       key={rule.id}
                       className={`bg-white/50 backdrop-blur-sm border rounded-xl p-6 ${
-                        rule.enabled
-                          ? "border-white/20"
-                          : "border-gray-200 opacity-60"
+                        rule.enabled ? "border-white/20" : "border-gray-200 opacity-60"
                       }`}
                     >
                       <div className="flex items-center justify-between">
@@ -399,9 +378,7 @@ const AutoFundingView = () => {
                               {rule.executionCount > 0 && (
                                 <>
                                   <span>•</span>
-                                  <span>
-                                    Executed {rule.executionCount} times
-                                  </span>
+                                  <span>Executed {rule.executionCount} times</span>
                                 </>
                               )}
                             </div>
@@ -416,9 +393,7 @@ const AutoFundingView = () => {
                                 ? "text-green-600 hover:bg-green-50"
                                 : "text-gray-400 hover:bg-gray-100"
                             }`}
-                            title={
-                              rule.enabled ? "Disable rule" : "Enable rule"
-                            }
+                            title={rule.enabled ? "Disable rule" : "Enable rule"}
                           >
                             {rule.enabled ? (
                               <Eye className="h-5 w-5" />
@@ -444,17 +419,14 @@ const AutoFundingView = () => {
                       </div>
 
                       {rule.description && (
-                        <p className="text-gray-600 mt-3 ml-16">
-                          {rule.description}
-                        </p>
+                        <p className="text-gray-600 mt-3 ml-16">{rule.description}</p>
                       )}
 
                       {/* Rule Details */}
                       <div className="ml-16 mt-4 flex flex-wrap items-center gap-2">
                         {rule.config.amount > 0 && (
                           <span className="inline-flex items-center gap-1 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
-                            <DollarSign className="h-4 w-4" />$
-                            {rule.config.amount.toFixed(2)}
+                            <DollarSign className="h-4 w-4" />${rule.config.amount.toFixed(2)}
                           </span>
                         )}
                         {rule.config.percentage > 0 && (
@@ -466,23 +438,20 @@ const AutoFundingView = () => {
                         {rule.config.targetId && (
                           <span className="inline-flex items-center gap-1 bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">
                             <Target className="h-4 w-4" />
-                            {budget.envelopes?.find(
-                              (e) => e.id === rule.config.targetId,
-                            )?.name || "Unknown"}
+                            {budget.envelopes?.find((e) => e.id === rule.config.targetId)?.name ||
+                              "Unknown"}
                           </span>
                         )}
-                        {rule.config.targetIds &&
-                          rule.config.targetIds.length > 0 && (
-                            <span className="inline-flex items-center gap-1 bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm">
-                              <Target className="h-4 w-4" />
-                              {rule.config.targetIds.length} envelopes
-                            </span>
-                          )}
+                        {rule.config.targetIds && rule.config.targetIds.length > 0 && (
+                          <span className="inline-flex items-center gap-1 bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm">
+                            <Target className="h-4 w-4" />
+                            {rule.config.targetIds.length} envelopes
+                          </span>
+                        )}
                         {rule.lastExecuted && (
                           <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm">
                             <Clock className="h-4 w-4" />
-                            Last:{" "}
-                            {new Date(rule.lastExecuted).toLocaleDateString()}
+                            Last: {new Date(rule.lastExecuted).toLocaleDateString()}
                           </span>
                         )}
                       </div>
@@ -499,12 +468,9 @@ const AutoFundingView = () => {
             {executionHistory.length === 0 ? (
               <div className="text-center py-16">
                 <History className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-xl font-medium text-gray-900 mb-2">
-                  No Execution History
-                </h3>
+                <h3 className="text-xl font-medium text-gray-900 mb-2">No Execution History</h3>
                 <p className="text-gray-600 mb-6">
-                  Rule executions will appear here once you start running your
-                  auto-funding rules
+                  Rule executions will appear here once you start running your auto-funding rules
                 </p>
                 <button
                   onClick={handleExecuteRules}
@@ -542,17 +508,11 @@ const AutoFundingView = () => {
                             Execution #{executionHistory.length - index}
                           </h3>
                           <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
-                            <span>
-                              {new Date(execution.executedAt).toLocaleString()}
-                            </span>
+                            <span>{new Date(execution.executedAt).toLocaleString()}</span>
                             <span>•</span>
-                            <span>
-                              {formatTriggerType(execution.trigger)} trigger
-                            </span>
+                            <span>{formatTriggerType(execution.trigger)} trigger</span>
                             <span>•</span>
-                            <span>
-                              {execution.rulesExecuted} rules executed
-                            </span>
+                            <span>{execution.rulesExecuted} rules executed</span>
                           </div>
                         </div>
                       </div>
@@ -560,9 +520,7 @@ const AutoFundingView = () => {
                       <div className="text-right">
                         <p
                           className={`text-xl font-bold ${
-                            execution.totalFunded > 0
-                              ? "text-green-600"
-                              : "text-gray-600"
+                            execution.totalFunded > 0 ? "text-green-600" : "text-gray-600"
                           }`}
                         >
                           ${(execution.totalFunded || 0).toFixed(2)}
@@ -570,16 +528,12 @@ const AutoFundingView = () => {
                         <button
                           onClick={() =>
                             setShowExecutionDetails(
-                              showExecutionDetails === execution.id
-                                ? null
-                                : execution.id,
+                              showExecutionDetails === execution.id ? null : execution.id
                             )
                           }
                           className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                         >
-                          {showExecutionDetails === execution.id
-                            ? "Hide Details"
-                            : "Show Details"}
+                          {showExecutionDetails === execution.id ? "Hide Details" : "Show Details"}
                         </button>
                       </div>
                     </div>
@@ -600,9 +554,7 @@ const AutoFundingView = () => {
                                 <div>
                                   <h4
                                     className={`font-medium ${
-                                      result.success
-                                        ? "text-green-900"
-                                        : "text-red-900"
+                                      result.success ? "text-green-900" : "text-red-900"
                                     }`}
                                   >
                                     {result.ruleName}
@@ -614,27 +566,18 @@ const AutoFundingView = () => {
                                         result.targetEnvelopes.length > 0 && (
                                           <span>
                                             {" "}
-                                            to {
-                                              result.targetEnvelopes.length
-                                            }{" "}
-                                            envelope
-                                            {result.targetEnvelopes.length > 1
-                                              ? "s"
-                                              : ""}
+                                            to {result.targetEnvelopes.length} envelope
+                                            {result.targetEnvelopes.length > 1 ? "s" : ""}
                                           </span>
                                         )}
                                     </p>
                                   ) : (
-                                    <p className="text-sm text-red-700 mt-1">
-                                      {result.error}
-                                    </p>
+                                    <p className="text-sm text-red-700 mt-1">{result.error}</p>
                                   )}
                                 </div>
                                 <div
                                   className={`text-sm font-medium ${
-                                    result.success
-                                      ? "text-green-600"
-                                      : "text-red-600"
+                                    result.success ? "text-green-600" : "text-red-600"
                                   }`}
                                 >
                                   {result.success ? "Success" : "Failed"}

@@ -43,8 +43,7 @@ export const COMPOUND_FREQUENCIES = {
 export const DEBT_TYPE_CONFIG = {
   [DEBT_TYPES.MORTGAGE]: {
     name: "Mortgage",
-    description:
-      "Home loan with principal, interest, and potentially PMI/escrow",
+    description: "Home loan with principal, interest, and potentially PMI/escrow",
     color: "blue",
     borderColor: "border-blue-500",
     bgColor: "bg-blue-50",
@@ -246,14 +245,9 @@ export const calculateDebtStats = (debts = []) => {
     };
   }
 
-  const activeDebts = debts.filter(
-    (debt) => debt.status === DEBT_STATUS.ACTIVE,
-  );
+  const activeDebts = debts.filter((debt) => debt.status === DEBT_STATUS.ACTIVE);
 
-  const totalDebt = activeDebts.reduce(
-    (sum, debt) => sum + (debt.currentBalance || 0),
-    0,
-  );
+  const totalDebt = activeDebts.reduce((sum, debt) => sum + (debt.currentBalance || 0), 0);
 
   const totalMonthlyPayments = activeDebts.reduce((sum, debt) => {
     const payment = debt.minimumPayment || 0;
@@ -276,8 +270,7 @@ export const calculateDebtStats = (debts = []) => {
     return sum + (debt.interestRate || 0) * (debt.currentBalance || 0);
   }, 0);
 
-  const averageInterestRate =
-    totalDebt > 0 ? weightedInterestSum / totalDebt : 0;
+  const averageInterestRate = totalDebt > 0 ? weightedInterestSum / totalDebt : 0;
 
   const debtsByType = activeDebts.reduce((acc, debt) => {
     const type = debt.type || DEBT_TYPES.OTHER;
@@ -310,10 +303,7 @@ export const calculateDebtStats = (debts = []) => {
     return dueDate >= today && dueDate <= dueSoonCutoff;
   });
 
-  const dueSoonAmount = dueSoonDebts.reduce(
-    (sum, debt) => sum + (debt.minimumPayment || 0),
-    0,
-  );
+  const dueSoonAmount = dueSoonDebts.reduce((sum, debt) => sum + (debt.minimumPayment || 0), 0);
   const dueSoonCount = dueSoonDebts.length;
 
   return {

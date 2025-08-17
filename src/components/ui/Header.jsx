@@ -7,13 +7,7 @@ import LocalOnlyModeSettings from "../auth/LocalOnlyModeSettings";
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
 const Header = memo(
-  ({
-    currentUser,
-    onUserChange,
-    onUpdateProfile,
-    isLocalOnlyMode = false,
-    onShowSettings,
-  }) => {
+  ({ currentUser, onUserChange, onUpdateProfile, isLocalOnlyMode = false, onShowSettings }) => {
     const [showLocalOnlySettings, setShowLocalOnlySettings] = useState(false);
 
     const handleToggleLocalOnlySettings = useCallback(() => {
@@ -37,9 +31,7 @@ const Header = memo(
                   ? "border-orange-500" // Local development
                   : window.location.hostname.includes("dev.f4tdaddy.com") ||
                       (window.location.hostname.includes("vercel.app") &&
-                        !window.location.hostname.includes(
-                          "violet-vault-production",
-                        ))
+                        !window.location.hostname.includes("violet-vault-production"))
                     ? "border-red-500" // Preview/staging environments
                     : "border-purple-600" // Production
               }`}
@@ -65,9 +57,7 @@ const Header = memo(
                   title="Click to manage Local-Only Mode settings"
                 >
                   <Monitor className="h-3 w-3 text-blue-600 mr-1" />
-                  <span className="text-xs font-medium text-blue-800">
-                    Local-Only Mode
-                  </span>
+                  <span className="text-xs font-medium text-blue-800">Local-Only Mode</span>
                 </button>
               )}
             </div>
@@ -108,7 +98,7 @@ const Header = memo(
         )}
       </div>
     );
-  },
+  }
 );
 
 export default Header;

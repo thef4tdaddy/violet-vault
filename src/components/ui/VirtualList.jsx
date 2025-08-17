@@ -15,7 +15,7 @@ const VirtualList = memo(
       const visibleStart = Math.floor(scrollTop / itemHeight);
       const visibleEnd = Math.min(
         items.length - 1,
-        Math.ceil((scrollTop + containerHeight) / itemHeight),
+        Math.ceil((scrollTop + containerHeight) / itemHeight)
       );
 
       const start = Math.max(0, visibleStart - overscan);
@@ -66,7 +66,7 @@ const VirtualList = memo(
         </div>
       </div>
     );
-  },
+  }
 );
 
 export default VirtualList;

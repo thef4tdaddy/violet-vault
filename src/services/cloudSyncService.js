@@ -30,9 +30,7 @@ class CloudSyncService {
 
       if (data.transactions?.length > 0) {
         promises.push(budgetDb.bulkUpsertTransactions(data.transactions));
-        logger.debug(
-          `💾 Saving ${data.transactions.length} transactions to Dexie`,
-        );
+        logger.debug(`💾 Saving ${data.transactions.length} transactions to Dexie`);
       }
 
       if (data.envelopes?.length > 0) {
@@ -52,16 +50,12 @@ class CloudSyncService {
 
       if (data.savingsGoals?.length > 0) {
         promises.push(budgetDb.bulkUpsertSavingsGoals(data.savingsGoals));
-        logger.debug(
-          `💾 Saving ${data.savingsGoals.length} savings goals to Dexie`,
-        );
+        logger.debug(`💾 Saving ${data.savingsGoals.length} savings goals to Dexie`);
       }
 
       if (data.paycheckHistory?.length > 0) {
         promises.push(budgetDb.bulkUpsertPaychecks(data.paycheckHistory));
-        logger.debug(
-          `💾 Saving ${data.paycheckHistory.length} paycheck history to Dexie`,
-        );
+        logger.debug(`💾 Saving ${data.paycheckHistory.length} paycheck history to Dexie`);
       }
 
       // Wait for all saves to complete
@@ -82,9 +76,7 @@ class CloudSyncService {
         queryClient.invalidateQueries({ queryKey: queryKeys.analytics }),
       ]);
 
-      logger.debug(
-        "✅ TanStack Query caches invalidated - UI should refresh with synced data",
-      );
+      logger.debug("✅ TanStack Query caches invalidated - UI should refresh with synced data");
     } catch (error) {
       logger.error("❌ Failed to save downloaded data to Dexie:", error);
       throw error;
@@ -181,11 +173,7 @@ class CloudSyncService {
 
   async _performSyncInternal() {
     try {
-      if (
-        !this.config?.encryptionKey ||
-        !this.config?.currentUser ||
-        !this.config?.budgetId
-      ) {
+      if (!this.config?.encryptionKey || !this.config?.currentUser || !this.config?.budgetId) {
         logger.warn("⚠️ Missing auth context for sync");
         return { success: false, error: "Missing authentication context" };
       }
@@ -201,8 +189,7 @@ class CloudSyncService {
       const startTime = Date.now();
 
       // Import ChunkedFirebaseSync for new implementation
-      const ChunkedFirebaseSync = (await import("../utils/chunkedFirebaseSync"))
-        .default;
+      const ChunkedFirebaseSync = (await import("../utils/chunkedFirebaseSync")).default;
 
       // Step 1: Get data from both sources
       const [chunkedFirestoreData, dexieData] = await Promise.all([
@@ -246,7 +233,7 @@ class CloudSyncService {
       // CRITICAL: If we have forceSync but no local data, wait and retry
       if (chunkedFirestoreData?.forceSync && dexieItemCount === 0) {
         logger.warn(
-          "🔄 ForceSync triggered but no local data found - waiting 1s for data to load...",
+          "🔄 ForceSync triggered but no local data found - waiting 1s for data to load..."
         );
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -269,7 +256,7 @@ class CloudSyncService {
           logger.info("✅ Local data found on retry - proceeding with sync");
         } else {
           logger.warn(
-            "❌ No local data found after retry - may need to download from cloud instead",
+            "❌ No local data found after retry - may need to download from cloud instead"
           );
         }
       }
@@ -279,9 +266,7 @@ class CloudSyncService {
       let needsMigration = false;
 
       if (!chunkedFirestoreData) {
-        logger.debug(
-          "🔍 Chunked data not found, checking for old format data...",
-        );
+        logger.debug("🔍 Chunked data not found, checking for old format data...");
         // Try to load from old single-document format
         const oldFormatData = await this.fetchOldFormatFirestoreData();
         if (oldFormatData) {
@@ -306,7 +291,7 @@ class CloudSyncService {
         logger.debug(`🔄 Starting migration to chunked format: ${reason}...`);
         const migrationResult = await this.migrateToChunkedFormat(
           ChunkedFirebaseSync,
-          firestoreData || dexieData,
+          firestoreData || dexieData
         );
         if (migrationResult.migrated) {
           return migrationResult;
@@ -314,16 +299,10 @@ class CloudSyncService {
       }
 
       // Step 4: Determine sync direction based on data freshness
-      const syncResult = await this.determineSyncDirection(
-        firestoreData,
-        dexieData,
-      );
+      const syncResult = await this.determineSyncDirection(firestoreData, dexieData);
 
       // Step 5: Perform the sync using chunked approach
-      const result = await this.executeChunkedSync(
-        syncResult,
-        ChunkedFirebaseSync,
-      );
+      const result = await this.executeChunkedSync(syncResult, ChunkedFirebaseSync);
 
       const duration = Date.now() - startTime;
       this.lastSyncTime = Date.now();
@@ -341,9 +320,7 @@ class CloudSyncService {
         error.message?.includes("exceeds the maximum allowed size") ||
         error.message?.includes("1,048,576 bytes")
       ) {
-        logger.warn(
-          "📦 Document size limit exceeded, forcing chunked migration...",
-        );
+        logger.warn("📦 Document size limit exceeded, forcing chunked migration...");
         return await this.forceMigrationToChunked();
       }
 
@@ -374,14 +351,13 @@ class CloudSyncService {
    */
   async fetchDexieData() {
     try {
-      const [envelopes, transactions, bills, savingsGoals, paycheckHistory] =
-        await Promise.all([
-          budgetDb.envelopes.toArray(),
-          budgetDb.transactions.toArray(),
-          budgetDb.bills.toArray(),
-          budgetDb.savingsGoals.toArray(),
-          budgetDb.paycheckHistory.toArray(),
-        ]);
+      const [envelopes, transactions, bills, savingsGoals, paycheckHistory] = await Promise.all([
+        budgetDb.envelopes.toArray(),
+        budgetDb.transactions.toArray(),
+        budgetDb.bills.toArray(),
+        budgetDb.savingsGoals.toArray(),
+        budgetDb.paycheckHistory.toArray(),
+      ]);
 
       // Debug what we're actually fetching from Dexie
       logger.debug("🗃️ CloudSync fetchDexieData results", {
@@ -405,7 +381,7 @@ class CloudSyncService {
           ...envelopes.map((e) => e.lastModified || e.createdAt || 0),
           ...transactions.map((t) => t.lastModified || t.createdAt || 0),
           ...bills.map((b) => b.lastModified || b.createdAt || 0),
-          0,
+          0
         ),
       };
     } catch (error) {
@@ -429,11 +405,9 @@ class CloudSyncService {
     const dexieLastModified = dexieData.lastModified;
     const firestoreHasData =
       firestoreData &&
-      Object.values(firestoreData).some(
-        (arr) => Array.isArray(arr) && arr.length > 0,
-      );
+      Object.values(firestoreData).some((arr) => Array.isArray(arr) && arr.length > 0);
     const dexieHasData = Object.values(dexieData).some(
-      (arr) => Array.isArray(arr) && arr.length > 0,
+      (arr) => Array.isArray(arr) && arr.length > 0
     );
 
     logger.debug("🔍 Sync analysis", {
@@ -523,26 +497,20 @@ class CloudSyncService {
           addPromises.push(budgetDb.envelopes.bulkAdd(firestoreData.envelopes));
         }
         if (firestoreData.transactions?.length > 0) {
-          addPromises.push(
-            budgetDb.transactions.bulkAdd(firestoreData.transactions),
-          );
+          addPromises.push(budgetDb.transactions.bulkAdd(firestoreData.transactions));
         }
         if (firestoreData.bills?.length > 0) {
           addPromises.push(budgetDb.bills.bulkAdd(firestoreData.bills));
         }
         if (firestoreData.savingsGoals?.length > 0) {
-          addPromises.push(
-            budgetDb.savingsGoals.bulkAdd(firestoreData.savingsGoals),
-          );
+          addPromises.push(budgetDb.savingsGoals.bulkAdd(firestoreData.savingsGoals));
         }
         if (firestoreData.paycheckHistory?.length > 0) {
-          addPromises.push(
-            budgetDb.paycheckHistory.bulkAdd(firestoreData.paycheckHistory),
-          );
+          addPromises.push(budgetDb.paycheckHistory.bulkAdd(firestoreData.paycheckHistory));
         }
 
         await Promise.all(addPromises);
-      },
+      }
     );
   }
 
@@ -568,27 +536,20 @@ class CloudSyncService {
   async fetchChunkedFirestoreData(ChunkedFirebaseSync) {
     try {
       // Initialize the ChunkedFirebaseSync instance
-      ChunkedFirebaseSync.initialize(
-        this.config.budgetId,
-        this.config.encryptionKey,
-      );
+      ChunkedFirebaseSync.initialize(this.config.budgetId, this.config.encryptionKey);
 
       // Load data from cloud
       const result = await ChunkedFirebaseSync.loadFromCloud();
 
       // Handle auth failure gracefully
       if (result?.localOnly) {
-        logger.info(
-          "📱 Running in local-only mode - Firebase auth unavailable",
-        );
+        logger.info("📱 Running in local-only mode - Firebase auth unavailable");
         return null;
       }
 
       // Handle corruption recovery
       if (result?.recovered) {
-        logger.info(
-          "🔧 Cloud data corruption detected and cleaned up - ready for fresh sync",
-        );
+        logger.info("🔧 Cloud data corruption detected and cleaned up - ready for fresh sync");
         // Return special flag to force sync attempt even with empty cloud data
         return { data: null, forceSync: true };
       }
@@ -615,10 +576,7 @@ class CloudSyncService {
       const data = await FirebaseSync.loadFromCloud();
       return data?.data || null;
     } catch (error) {
-      logger.debug(
-        "📭 No old format data found (expected for new accounts)",
-        error.message,
-      );
+      logger.debug("📭 No old format data found (expected for new accounts)", error.message);
       return null;
     }
   }
@@ -629,18 +587,12 @@ class CloudSyncService {
   async handleMigrationIfNeeded(ChunkedFirebaseSync, dexieData) {
     try {
       // Check if we have local data but can't load from chunked cloud
-      const chunkedData =
-        await this.fetchChunkedFirestoreData(ChunkedFirebaseSync);
+      const chunkedData = await this.fetchChunkedFirestoreData(ChunkedFirebaseSync);
 
       // If chunked data fails to load but we have local data, we need to migrate
       if (!chunkedData && dexieData && this.hasSignificantData(dexieData)) {
-        logger.warn(
-          "📦 Chunked cloud data not found but local data exists. Starting migration...",
-        );
-        return await this.migrateToChunkedFormat(
-          ChunkedFirebaseSync,
-          dexieData,
-        );
+        logger.warn("📦 Chunked cloud data not found but local data exists. Starting migration...");
+        return await this.migrateToChunkedFormat(ChunkedFirebaseSync, dexieData);
       }
 
       return { migrated: false };
@@ -655,25 +607,16 @@ class CloudSyncService {
    */
   async forceMigrationToChunked() {
     try {
-      logger.warn(
-        "🚨 Forcing migration to chunked format due to size limits...",
-      );
+      logger.warn("🚨 Forcing migration to chunked format due to size limits...");
 
-      const ChunkedFirebaseSync = (await import("../utils/chunkedFirebaseSync"))
-        .default;
-      ChunkedFirebaseSync.initialize(
-        this.config.budgetId,
-        this.config.encryptionKey,
-      );
+      const ChunkedFirebaseSync = (await import("../utils/chunkedFirebaseSync")).default;
+      ChunkedFirebaseSync.initialize(this.config.budgetId, this.config.encryptionKey);
 
       // Get local Dexie data
       const dexieData = await this.fetchDexieData();
 
       if (this.hasSignificantData(dexieData)) {
-        return await this.migrateToChunkedFormat(
-          ChunkedFirebaseSync,
-          dexieData,
-        );
+        return await this.migrateToChunkedFormat(ChunkedFirebaseSync, dexieData);
       } else {
         logger.warn("⚠️ No significant local data to migrate");
         return { success: false, error: "No data to migrate" };
@@ -705,9 +648,7 @@ class CloudSyncService {
 
       // CRITICAL: If no data to migrate but we expect data, fetch fresh data
       if (dataItemCount === 0) {
-        logger.warn(
-          "🔄 Migration called with empty data - fetching fresh local data...",
-        );
+        logger.warn("🔄 Migration called with empty data - fetching fresh local data...");
         const freshDexieData = await this.fetchDexieData();
         const freshItemCount =
           (freshDexieData?.envelopes?.length || 0) +
@@ -739,10 +680,7 @@ class CloudSyncService {
         lastModified: Date.now(),
       };
 
-      const saveResult = await ChunkedFirebaseSync.saveToCloud(
-        dataToSync,
-        this.config.currentUser,
-      );
+      const saveResult = await ChunkedFirebaseSync.saveToCloud(dataToSync, this.config.currentUser);
       if (saveResult?.localOnly) {
         logger.info("📱 Migration skipped - running in local-only mode");
         return { success: true, localOnly: true };
@@ -801,16 +739,10 @@ class CloudSyncService {
     };
 
     // Initialize the ChunkedFirebaseSync instance
-    ChunkedFirebaseSync.initialize(
-      this.config.budgetId,
-      this.config.encryptionKey,
-    );
+    ChunkedFirebaseSync.initialize(this.config.budgetId, this.config.encryptionKey);
 
     // Save data to cloud using chunked approach
-    const result = await ChunkedFirebaseSync.saveToCloud(
-      dataToSync,
-      this.config.currentUser,
-    );
+    const result = await ChunkedFirebaseSync.saveToCloud(dataToSync, this.config.currentUser);
 
     if (result?.localOnly) {
       logger.info("📱 Sync skipped - running in local-only mode");
@@ -869,10 +801,7 @@ class CloudSyncService {
 
       return hasChanged;
     } catch (error) {
-      logger.warn(
-        "Failed to check budget history changes, assuming changed",
-        error,
-      );
+      logger.warn("Failed to check budget history changes, assuming changed", error);
       return true; // Fail safe - sync if we can't determine changes
     }
   }

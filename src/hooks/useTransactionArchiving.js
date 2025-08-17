@@ -1,9 +1,6 @@
 import { useState, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
-import {
-  getArchivingRecommendations,
-  createArchiver,
-} from "../utils/transactionArchiving";
+import { getArchivingRecommendations, createArchiver } from "../utils/transactionArchiving";
 import { queryKeys } from "../utils/queryClient";
 import logger from "../utils/logger";
 
@@ -76,24 +73,21 @@ const useTransactionArchiving = () => {
         setArchivingProgress(null);
       }
     },
-    [isArchiving, refreshInfo],
+    [isArchiving, refreshInfo]
   );
 
   /**
    * Get archived analytics data
    */
-  const getArchivedAnalytics = useCallback(
-    async (period = "yearly", category = null) => {
-      try {
-        const archiver = createArchiver();
-        return await archiver.getArchivedAnalytics(period, category);
-      } catch (error) {
-        logger.error("Failed to retrieve archived analytics", error);
-        throw error;
-      }
-    },
-    [],
-  );
+  const getArchivedAnalytics = useCallback(async (period = "yearly", category = null) => {
+    try {
+      const archiver = createArchiver();
+      return await archiver.getArchivedAnalytics(period, category);
+    } catch (error) {
+      logger.error("Failed to retrieve archived analytics", error);
+      throw error;
+    }
+  }, []);
 
   /**
    * Restore archived transactions (emergency function)
@@ -114,7 +108,7 @@ const useTransactionArchiving = () => {
         throw error;
       }
     },
-    [refreshInfo],
+    [refreshInfo]
   );
 
   /**

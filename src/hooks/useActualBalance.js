@@ -63,7 +63,7 @@ export const useActualBalance = () => {
 
       return true;
     },
-    [actualBalance, setStoreBalance],
+    [actualBalance, setStoreBalance]
   );
 
   /**
@@ -76,7 +76,7 @@ export const useActualBalance = () => {
       if (!isActualBalanceManual || !calculatedBalance) return 0;
       return actualBalance - calculatedBalance;
     },
-    [actualBalance, isActualBalanceManual],
+    [actualBalance, isActualBalanceManual]
   );
 
   /**
@@ -90,7 +90,7 @@ export const useActualBalance = () => {
       const changeAmount = Math.abs(newBalance - actualBalance);
       return changeAmount >= threshold;
     },
-    [actualBalance],
+    [actualBalance]
   );
 
   /**

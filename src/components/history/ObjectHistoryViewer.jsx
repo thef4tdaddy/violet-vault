@@ -39,9 +39,7 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
         commit.message &&
         (commit.message.toLowerCase().includes(objectType.toLowerCase()) ||
           commit.message.includes(objectId) ||
-          commit.message
-            .toLowerCase()
-            .includes(objectName?.toLowerCase() || ""))
+          commit.message.toLowerCase().includes(objectName?.toLowerCase() || ""))
       );
     });
 
@@ -107,10 +105,7 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
                 Complete change history for this {objectType.toLowerCase()}
               </p>
             </div>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-xl"
-            >
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -129,8 +124,8 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
               <History className="h-12 w-12 mx-auto mb-3 opacity-50" />
               <p className="font-medium">No history found</p>
               <p className="text-sm mt-1">
-                This {objectType.toLowerCase()} hasn't been modified yet or
-                budget history is not initialized
+                This {objectType.toLowerCase()} hasn't been modified yet or budget history is not
+                initialized
               </p>
             </div>
           )}
@@ -142,10 +137,8 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
                 <div className="flex items-center">
                   <GitCommit className="h-4 w-4 text-blue-600 mr-2" />
                   <div className="text-sm text-blue-800">
-                    <strong>
-                      Found {relevantHistory.length} related changes
-                    </strong>{" "}
-                    for this {objectType.toLowerCase()}
+                    <strong>Found {relevantHistory.length} related changes</strong> for this{" "}
+                    {objectType.toLowerCase()}
                   </div>
                 </div>
               </div>
@@ -198,8 +191,7 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
                     {/* Basic commit info */}
                     <div className="mb-3">
                       <div className="text-sm text-gray-700">
-                        This commit may have affected the{" "}
-                        {objectType.toLowerCase()}
+                        This commit may have affected the {objectType.toLowerCase()}
                       </div>
                     </div>
 
@@ -211,13 +203,11 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
                             <strong>Commit Hash:</strong> {commit.hash}
                           </div>
                           <div className="text-sm text-gray-600 mt-1">
-                            <strong>Device:</strong>{" "}
-                            {commit.deviceFingerprint || "Unknown"}
+                            <strong>Device:</strong> {commit.deviceFingerprint || "Unknown"}
                           </div>
                           {commit.parentHash && (
                             <div className="text-sm text-gray-600 mt-1">
-                              <strong>Parent:</strong>{" "}
-                              {commit.parentHash.substring(0, 8)}
+                              <strong>Parent:</strong> {commit.parentHash.substring(0, 8)}
                             </div>
                           )}
                         </div>

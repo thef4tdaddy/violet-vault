@@ -40,12 +40,7 @@ export const LEGACY_MULTIPLIERS = {
  * @param {boolean} usePrecise - Use precise multipliers (default: true)
  * @returns {number} Converted amount
  */
-export function convertFrequency(
-  amount,
-  fromFrequency,
-  toFrequency,
-  usePrecise = true,
-) {
+export function convertFrequency(amount, fromFrequency, toFrequency, usePrecise = true) {
   if (!amount || fromFrequency === toFrequency) return amount;
 
   const multipliers = usePrecise ? FREQUENCY_MULTIPLIERS : LEGACY_MULTIPLIERS;
@@ -119,14 +114,9 @@ export function calculatePaycheckAmount(
   targetAmount,
   targetFrequency,
   paycheckFrequency = "biweekly",
-  usePrecise = true,
+  usePrecise = true
 ) {
-  return convertFrequency(
-    targetAmount,
-    targetFrequency,
-    paycheckFrequency,
-    usePrecise,
-  );
+  return convertFrequency(targetAmount, targetFrequency, paycheckFrequency, usePrecise);
 }
 
 /**
