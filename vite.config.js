@@ -37,6 +37,8 @@ export default defineConfig({
       workbox: {
         navigateFallback: "/index.html",
         navigateFallbackDenylist: [/^\/(_|api|auth)\//],
+        // Temporary fix for large bundle size - allow up to 5 MB for precaching
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB limit
       },
     }),
   ],
@@ -58,18 +60,61 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
+        manualChunks: (id) => {
           // Keep React together to avoid module issues
-          vendor: ["react", "react-dom", "lucide-react"],
-          firebase: ["firebase/app", "firebase/auth", "firebase/firestore"],
-          charts: ["recharts"],
+          if (id.includes('react') || id.includes('react-dom')) {
+            return 'vendor-react';
+          }
+          
+          // Firebase SDK into separate chunk
+          if (id.includes('firebase')) {
+            return 'vendor-firebase';
+          }
+          
+          // Charts and visualization libraries
+          if (id.includes('recharts') || id.includes('chart')) {
+            return 'vendor-charts';
+          }
+          
+          // UI libraries
+          if (id.includes('lucide-react') || id.includes('@headlessui')) {
+            return 'vendor-ui';
+          }
+          
+          // Crypto and encryption utilities
+          if (id.includes('crypto') || id.includes('encryption')) {
+            return 'vendor-crypto';
+          }
+          
+          // HTML to canvas and export utilities
+          if (id.includes('html2canvas') || id.includes('jspdf')) {
+            return 'vendor-export';
+          }
+          
+          // Large utility libraries
+          if (id.includes('lodash') || id.includes('date-fns') || id.includes('moment')) {
+            return 'vendor-utils';
+          }
+          
+          // Node modules that aren't specifically chunked above
+          if (id.includes('node_modules')) {
+            return 'vendor-misc';
+          }
         },
       },
     },
     chunkSizeWarningLimit: 1000,
-    reportCompressedSize: false, // Disable verbose size reporting
-    minify: false, // Keep disabled for faster builds
+    reportCompressedSize: process.env.NODE_ENV === "production", // Enable size reporting in production
+    minify: process.env.NODE_ENV === "production" ? "terser" : false, // Enable minification in production
     sourcemap: false, // Disable sourcemaps for faster builds
+    // Terser options for better compression
+    terserOptions: process.env.NODE_ENV === "production" ? {
+      compress: {
+        drop_console: false, // Keep console for Highlight.io
+        drop_debugger: true,
+        pure_funcs: ["console.debug"], // Remove debug statements
+      },
+    } : {},
   },
   esbuild: {
     // Only drop debugger statements in production, keep console for Highlight.io
