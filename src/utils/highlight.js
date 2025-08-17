@@ -56,7 +56,9 @@ const _setupConsoleCapture = () => {
     originalConsoleError(...args);
 
     const message = args
-      .map((arg) => (typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)))
+      .map((arg) =>
+        typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg),
+      )
       .join(" ");
 
     // Skip frequent or expected errors that create noise
@@ -80,7 +82,9 @@ const _setupConsoleCapture = () => {
     originalConsoleWarn(...args);
 
     const message = args
-      .map((arg) => (typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)))
+      .map((arg) =>
+        typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg),
+      )
       .join(" ");
 
     // Skip common development warnings that don't need tracking

@@ -32,7 +32,9 @@ const useAuthFlow = () => {
         const { encryptionUtils } = await import("../utils/encryption");
         const userDataWithId = {
           ...userData,
-          budgetId: userData.budgetId || encryptionUtils.generateBudgetId(userData.password),
+          budgetId:
+            userData.budgetId ||
+            encryptionUtils.generateBudgetId(userData.password),
         };
 
         logger.auth("Calling login", {
@@ -49,10 +51,26 @@ const useAuthFlow = () => {
 
           // Initialize budget history with the user's password
           try {
-            await budgetStore.initializeBudgetHistory(userData.password);
-            logger.auth("Budget history initialized on login");
+            logger.auth("🔍 About to initialize budget history", {
+              hasMethod:
+                typeof budgetStore.initializeBudgetHistory === "function",
+              hasPassword: !!userData.password,
+              passwordLength: userData.password?.length,
+            });
+
+            if (typeof budgetStore.initializeBudgetHistory === "function") {
+              await budgetStore.initializeBudgetHistory(userData.password);
+              logger.auth("✅ Budget history initialized on login");
+            } else {
+              logger.error(
+                "❌ initializeBudgetHistory method not found on budgetStore",
+              );
+            }
           } catch (historyError) {
-            logger.error("Failed to initialize budget history on login", historyError);
+            logger.error(
+              "❌ Failed to initialize budget history on login",
+              historyError,
+            );
             // Don't fail login if history initialization fails
           }
 
@@ -61,14 +79,17 @@ const useAuthFlow = () => {
           }
         } else {
           logger.error("❌ Setup failed:", result.error);
-          showErrorToast(`Setup failed: ${result.error}`, "Account Setup Failed");
+          showErrorToast(
+            `Setup failed: ${result.error}`,
+            "Account Setup Failed",
+          );
         }
       } catch (error) {
         logger.error("❌ Setup error:", error);
         showErrorToast(`Setup error: ${error.message}`, "Setup Error");
       }
     },
-    [login, budgetStore, showErrorToast]
+    [login, budgetStore, showErrorToast],
   );
 
   const handleLogout = useCallback(() => {
@@ -79,12 +100,15 @@ const useAuthFlow = () => {
     async (oldPass, newPass) => {
       const result = await changePassword(oldPass, newPass);
       if (!result.success) {
-        showErrorToast(`Password change failed: ${result.error}`, "Password Change Failed");
+        showErrorToast(
+          `Password change failed: ${result.error}`,
+          "Password Change Failed",
+        );
       } else {
         showSuccessToast("Password updated successfully", "Password Changed");
       }
     },
-    [changePassword, showErrorToast, showSuccessToast]
+    [changePassword, showErrorToast, showSuccessToast],
   );
 
   const handleUpdateProfile = useCallback(
@@ -94,7 +118,7 @@ const useAuthFlow = () => {
         throw new Error(result.error);
       }
     },
-    [updateProfile]
+    [updateProfile],
   );
 
   return {

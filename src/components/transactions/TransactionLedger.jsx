@@ -18,7 +18,9 @@ import { useTransactions } from "../../hooks/useTransactions";
 import { useEnvelopes } from "../../hooks/useEnvelopes";
 import logger from "../../utils/logger";
 
-const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855f7" } }) => {
+const TransactionLedger = ({
+  currentUser = { userName: "User", userColor: "#a855f7" },
+}) => {
   // Enhanced TanStack Query integration with caching and optimistic updates
   const {
     transactions = [],
@@ -45,10 +47,16 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
 
   // Handle bulk import by updating both store arrays
   const handleBulkImport = (newTransactions) => {
-    logger.debug("🔄 Bulk import called with transactions:", newTransactions.length);
+    logger.debug(
+      "🔄 Bulk import called with transactions:",
+      newTransactions.length,
+    );
     const updatedAllTransactions = [...transactions, ...newTransactions];
     setAllTransactions(updatedAllTransactions);
-    logger.debug("💾 Bulk import complete. Total transactions:", updatedAllTransactions.length);
+    logger.debug(
+      "💾 Bulk import complete. Total transactions:",
+      updatedAllTransactions.length,
+    );
   };
   const [showAddModal, setShowAddModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
@@ -65,8 +73,13 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
   const pageSize = 10;
 
   // Custom hooks
-  const { transactionForm, setTransactionForm, resetForm, populateForm, createTransaction } =
-    useTransactionForm();
+  const {
+    transactionForm,
+    setTransactionForm,
+    resetForm,
+    populateForm,
+    createTransaction,
+  } = useTransactionForm();
 
   const {
     importData,
@@ -87,13 +100,16 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
     typeFilter,
     envelopeFilter,
     sortBy,
-    sortOrder
+    sortOrder,
   );
 
-  const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / pageSize));
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredTransactions.length / pageSize),
+  );
   const paginatedTransactions = filteredTransactions.slice(
     (currentPage - 1) * pageSize,
-    currentPage * pageSize
+    currentPage * pageSize,
   );
 
   useEffect(() => {
@@ -148,7 +164,10 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
         ...billEnvelope,
         lastPaidDate: billPayment.paidDate,
         lastPaidAmount: billPayment.amount,
-        currentBalance: Math.max(0, (billEnvelope.currentBalance || 0) - billPayment.amount),
+        currentBalance: Math.max(
+          0,
+          (billEnvelope.currentBalance || 0) - billPayment.amount,
+        ),
         isPaid: true,
         paidThisPeriod: true,
       };
@@ -156,7 +175,10 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
     }
   };
 
-  const handleSplitTransaction = async (originalTransaction, splitTransactions) => {
+  const handleSplitTransaction = async (
+    originalTransaction,
+    splitTransactions,
+  ) => {
     try {
       // Delete the original transaction
       deleteTransaction(originalTransaction.id);
