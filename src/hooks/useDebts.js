@@ -1,10 +1,32 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { queryKeys } from "../utils/queryClient";
 import { budgetDb } from "../db/budgetDb";
 import logger from "../utils/logger.js";
 
 const useDebts = () => {
   const queryClient = useQueryClient();
+
+  // Event listeners for data import and sync invalidation
+  useEffect(() => {
+    const handleImportCompleted = () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.debts });
+      queryClient.invalidateQueries({ queryKey: queryKeys.debtsList });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+    };
+
+    const handleInvalidateAll = () => {
+      queryClient.invalidateQueries();
+    };
+
+    window.addEventListener("importCompleted", handleImportCompleted);
+    window.addEventListener("invalidateAllQueries", handleInvalidateAll);
+
+    return () => {
+      window.removeEventListener("importCompleted", handleImportCompleted);
+      window.removeEventListener("invalidateAllQueries", handleInvalidateAll);
+    };
+  }, [queryClient]);
 
   const queryFunction = async () => {
     try {
