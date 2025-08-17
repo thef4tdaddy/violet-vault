@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { create } from "zustand";
 import { encryptionUtils } from "../utils/encryption";
 import logger from "../utils/logger";

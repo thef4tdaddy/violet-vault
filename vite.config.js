@@ -4,9 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   plugins: [
-    react({
-      jsxImportSource: "react",
-    }),
+    react(),
     tailwindcss(),
   ],
   // Avoid multiple copies of React which can cause
@@ -25,52 +23,7 @@ export default defineConfig({
     global: {},
   },
   build: {
-    rollupOptions: {
-      output: {
-        manualChunks: (id) => {
-          // Keep React together to avoid module issues
-          if (id.includes('react') || id.includes('react-dom')) {
-            return 'vendor-react';
-          }
-          
-          // Firebase SDK into separate chunk
-          if (id.includes('firebase')) {
-            return 'vendor-firebase';
-          }
-          
-          // Charts and visualization libraries
-          if (id.includes('recharts') || id.includes('chart')) {
-            return 'vendor-charts';
-          }
-          
-          // UI libraries
-          if (id.includes('lucide-react') || id.includes('@headlessui')) {
-            return 'vendor-ui';
-          }
-          
-          // Crypto and encryption utilities
-          if (id.includes('crypto') || id.includes('encryption')) {
-            return 'vendor-crypto';
-          }
-          
-          // HTML to canvas and export utilities
-          if (id.includes('html2canvas') || id.includes('jspdf')) {
-            return 'vendor-export';
-          }
-          
-          // Large utility libraries
-          if (id.includes('lodash') || id.includes('date-fns') || id.includes('moment')) {
-            return 'vendor-utils';
-          }
-          
-          // Node modules that aren't specifically chunked above
-          if (id.includes('node_modules')) {
-            return 'vendor-misc';
-          }
-        },
-      },
-    },
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 3000, // Increased from 1000 to 3000 to accommodate large bundles
     reportCompressedSize: process.env.NODE_ENV === "production", // Enable size reporting in production
     minify: process.env.NODE_ENV === "production" ? "terser" : false, // Enable minification in production
     sourcemap: false, // Disable sourcemaps for faster builds
