@@ -10,7 +10,8 @@ import logger from "./logger.js";
 class BudgetHistory {
   constructor() {
     this.STORAGE_KEY = "violet-vault-budget-history";
-    this.MAX_COMMITS = 1000; // Prevent unbounded growth
+    this.MAX_COMMITS = 50; // Reduced limit for localStorage constraints
+    this.MIN_COMMITS = 10; // Always keep at least this many commits
     this.initialized = false;
     this.historyKey = null;
     this.currentCommitHash = null;
@@ -270,9 +271,10 @@ class BudgetHistory {
    * @param {Object} commit
    */
   async storeCommit(commitHash, commit) {
+    const commitsKey = `${this.STORAGE_KEY}-commits`;
+
     try {
       // Get existing commits
-      const commitsKey = `${this.STORAGE_KEY}-commits`;
       const existing = JSON.parse(localStorage.getItem(commitsKey) || "{}");
 
       // Encrypt the commit
@@ -288,24 +290,70 @@ class BudgetHistory {
         encrypted: encryptedCommit,
       };
 
-      // Maintain max commits limit (remove oldest)
-      const commitHashes = Object.keys(existing);
-      if (commitHashes.length > this.MAX_COMMITS) {
-        // Sort by timestamp and remove oldest
-        const sortedHashes = commitHashes
-          .sort((a, b) => new Date(existing[a].timestamp) - new Date(existing[b].timestamp))
-          .slice(0, commitHashes.length - this.MAX_COMMITS);
+      // Aggressive cleanup to prevent quota issues
+      await this.cleanupCommitsIfNeeded(existing);
 
-        for (const hashToRemove of sortedHashes) {
-          delete existing[hashToRemove];
+      // Try to store, with quota handling
+      try {
+        localStorage.setItem(commitsKey, JSON.stringify(existing));
+      } catch (quotaError) {
+        if (quotaError.name === "QuotaExceededError") {
+          logger.warn("Storage quota exceeded, performing emergency cleanup");
+
+          // Emergency cleanup - keep only recent commits
+          await this.emergencyCleanup(existing);
+
+          // Try again with cleaned data
+          localStorage.setItem(commitsKey, JSON.stringify(existing));
+        } else {
+          throw quotaError;
         }
       }
-
-      localStorage.setItem(commitsKey, JSON.stringify(existing));
     } catch (error) {
       logger.error("Failed to store commit", error);
       throw error;
     }
+  }
+
+  /**
+   * Cleanup commits if approaching limits
+   */
+  async cleanupCommitsIfNeeded(commits) {
+    const commitHashes = Object.keys(commits);
+
+    if (commitHashes.length > this.MAX_COMMITS) {
+      // Sort by timestamp and remove oldest (keep newest)
+      const sortedHashes = commitHashes
+        .sort((a, b) => new Date(commits[b].timestamp) - new Date(commits[a].timestamp))
+        .slice(this.MAX_COMMITS); // Take excess commits to remove
+
+      for (const hashToRemove of sortedHashes) {
+        delete commits[hashToRemove];
+      }
+
+      logger.debug(`Cleaned up ${sortedHashes.length} old commits`);
+    }
+  }
+
+  /**
+   * Emergency cleanup when quota is exceeded
+   */
+  async emergencyCleanup(commits) {
+    const commitHashes = Object.keys(commits);
+
+    // Keep only the most recent MIN_COMMITS commits
+    const sortedHashes = commitHashes.sort(
+      (a, b) => new Date(commits[b].timestamp) - new Date(commits[a].timestamp)
+    );
+
+    const toKeep = sortedHashes.slice(0, this.MIN_COMMITS);
+    const toRemove = sortedHashes.slice(this.MIN_COMMITS);
+
+    for (const hashToRemove of toRemove) {
+      delete commits[hashToRemove];
+    }
+
+    logger.warn(`Emergency cleanup: removed ${toRemove.length} commits, kept ${toKeep.length}`);
   }
 
   /**
@@ -668,6 +716,60 @@ class BudgetHistory {
       logger.debug("Budget history cleared");
     } catch (error) {
       logger.error("Failed to clear history", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Check and report current storage usage
+   */
+  getStorageInfo() {
+    try {
+      const commitsKey = `${this.STORAGE_KEY}-commits`;
+      const commits = localStorage.getItem(commitsKey);
+      const headKey = `${this.STORAGE_KEY}-head`;
+      const head = localStorage.getItem(headKey);
+
+      return {
+        commitsSize: commits ? commits.length : 0,
+        headSize: head ? head.length : 0,
+        totalSize: (commits ? commits.length : 0) + (head ? head.length : 0),
+        commitCount: commits ? Object.keys(JSON.parse(commits)).length : 0,
+        maxCommits: this.MAX_COMMITS,
+        minCommits: this.MIN_COMMITS,
+      };
+    } catch (error) {
+      logger.error("Failed to get storage info", error);
+      return { error: error.message };
+    }
+  }
+
+  /**
+   * Force cleanup old data if storage is problematic
+   */
+  async forceCleanup() {
+    try {
+      const commitsKey = `${this.STORAGE_KEY}-commits`;
+      const existing = JSON.parse(localStorage.getItem(commitsKey) || "{}");
+
+      logger.warn("Force cleanup initiated", {
+        currentCommits: Object.keys(existing).length,
+        targetCommits: this.MIN_COMMITS,
+      });
+
+      // Emergency cleanup to minimal commits
+      await this.emergencyCleanup(existing);
+
+      // Try to store cleaned data
+      localStorage.setItem(commitsKey, JSON.stringify(existing));
+
+      logger.info("Force cleanup completed", {
+        remainingCommits: Object.keys(existing).length,
+      });
+
+      return this.getStorageInfo();
+    } catch (error) {
+      logger.error("Failed to force cleanup", error);
       throw error;
     }
   }
