@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useEffect, useRef } from "react";
 import {
   DollarSign,
   Wallet,
@@ -17,6 +17,52 @@ import {
  * Extracted from Layout.jsx for better organization
  */
 const NavigationTabs = memo(({ activeView, onViewChange }) => {
+  const navRef = useRef(null);
+  const leftFadeRef = useRef(null);
+  const rightFadeRef = useRef(null);
+
+  // Handle scroll indicators for mobile
+  useEffect(() => {
+    const navElement = navRef.current;
+    const leftFade = leftFadeRef.current;
+    const rightFade = rightFadeRef.current;
+
+    if (!navElement || !leftFade || !rightFade) return;
+
+    const updateScrollIndicators = () => {
+      const { scrollLeft, scrollWidth, clientWidth } = navElement;
+      const maxScroll = scrollWidth - clientWidth;
+
+      // Show left fade if scrolled right
+      if (scrollLeft > 10) {
+        leftFade.style.opacity = "1";
+      } else {
+        leftFade.style.opacity = "0";
+      }
+
+      // Show right fade if not at the end
+      if (scrollLeft < maxScroll - 10) {
+        rightFade.style.opacity = "1";
+      } else {
+        rightFade.style.opacity = "0";
+      }
+    };
+
+    // Initial check
+    updateScrollIndicators();
+
+    // Listen for scroll events
+    navElement.addEventListener("scroll", updateScrollIndicators);
+
+    // Also check on resize
+    window.addEventListener("resize", updateScrollIndicators);
+
+    return () => {
+      navElement.removeEventListener("scroll", updateScrollIndicators);
+      window.removeEventListener("resize", updateScrollIndicators);
+    };
+  }, []);
+
   const tabs = [
     {
       key: "dashboard",
@@ -66,8 +112,11 @@ const NavigationTabs = memo(({ activeView, onViewChange }) => {
   ];
 
   return (
-    <div className="glassmorphism rounded-3xl mb-6 lg:shadow-xl border border-white/20 ring-1 ring-gray-800/10 fixed bottom-0 left-0 right-0 lg:static z-40 overflow-hidden">
-      <nav className="flex justify-evenly lg:justify-around overflow-x-auto scrollbar-hide pb-safe px-1 lg:px-0 gap-1 lg:gap-0">
+    <div className="glassmorphism rounded-3xl mb-6 lg:shadow-xl border border-white/20 ring-1 ring-gray-800/10 fixed bottom-0 left-0 right-0 lg:static z-40 overflow-hidden relative">
+      <nav
+        ref={navRef}
+        className="flex justify-evenly lg:justify-around overflow-x-auto scrollbar-hide pb-safe px-1 lg:px-0 gap-1 lg:gap-0"
+      >
         {tabs.map((tab) => (
           <NavButton
             key={tab.key}
@@ -78,6 +127,16 @@ const NavigationTabs = memo(({ activeView, onViewChange }) => {
           />
         ))}
       </nav>
+
+      {/* Mobile scroll indicators - only show on small screens */}
+      <div
+        ref={rightFadeRef}
+        className="lg:hidden absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white/60 via-white/20 to-transparent pointer-events-none rounded-r-3xl transition-opacity duration-300"
+      ></div>
+      <div
+        ref={leftFadeRef}
+        className="lg:hidden absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white/60 via-white/20 to-transparent pointer-events-none rounded-l-3xl opacity-0 transition-opacity duration-300"
+      ></div>
     </div>
   );
 });

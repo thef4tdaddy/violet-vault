@@ -103,7 +103,10 @@ const VersionFooter = () => {
         </div>
 
         <p className="text-xs text-gray-500">
-          Built on {versionInfo.buildDate} with ❤️ for secure budgeting
+          {versionInfo.isDevelopment
+            ? `Last commit: ${versionInfo.buildDate}`
+            : `Released: ${versionInfo.buildDate}`}{" "}
+          • Built with ❤️ for secure budgeting
         </p>
 
         {versionInfo.isDevelopment && (

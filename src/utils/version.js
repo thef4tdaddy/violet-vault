@@ -119,6 +119,30 @@ export const fetchTargetVersion = async () => {
   return fallbackVersion;
 };
 
+// Get a stable date for a version (avoids showing "load time")
+const getVersionDate = (version, isDevelopment = false) => {
+  if (isDevelopment) {
+    // For development builds, try to get actual commit date from environment
+    // Vercel provides VERCEL_GIT_COMMIT_AUTHOR_DATE
+    const commitDate = import.meta.env.VITE_VERCEL_GIT_COMMIT_AUTHOR_DATE;
+    if (commitDate) {
+      return new Date(commitDate).toISOString().split("T")[0];
+    }
+
+    // Fallback for development: Use today's date as it's better than a stale version date
+    return new Date().toISOString().split("T")[0];
+  }
+
+  // Map versions to their actual release dates for production builds
+  const versionDates = {
+    "1.8.0": "2025-08-16", // Actual v1.8.0 release date
+    "1.9.0": "2025-08-17", // Current development
+    "1.10.0": "2025-09-01", // Planned future release
+  };
+
+  return versionDates[version] || "2025-08-16"; // Default to v1.8.0 date
+};
+
 // Fallback target version detection (used when API is unavailable)
 const getTargetVersionFallback = () => {
   const currentVersion = APP_VERSION;
@@ -243,12 +267,28 @@ export const getVersionInfo = (targetVersion = null) => {
     environmentLabel = "✅ Production";
   }
 
+  // Get build time from environment variable (set during build) or use a sensible fallback
+  const buildTimestamp =
+    import.meta.env.VITE_BUILD_TIME ||
+    import.meta.env.VITE_VERCEL_GIT_COMMIT_REF_DATE;
+  let buildDate;
+
+  if (buildTimestamp) {
+    // Use the actual build/commit timestamp
+    buildDate = new Date(buildTimestamp).toISOString().split("T")[0];
+  } else {
+    // Fallback: Use a static date based on the current app version to avoid showing "load time"
+    // This ensures the date stays consistent for the same version
+    const versionDate = getVersionDate(APP_VERSION, branchInfo.isDevelopment);
+    buildDate = versionDate;
+  }
+
   return {
     version: displayVersion,
     baseVersion: APP_VERSION, // Always from package.json
     name: APP_NAME,
     displayName: "VioletVault",
-    buildDate: new Date().toISOString().split("T")[0],
+    buildDate,
     branch: branchInfo.branch,
     environment: branchInfo.environment,
     environmentLabel,
