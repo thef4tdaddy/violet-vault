@@ -857,43 +857,42 @@ class CloudSyncService {
   }
 
   /**
-   * Check if data has changed using the existing budget history system
+   * Check if data has changed by comparing with last modification times
    */
   async hasDataChanged() {
     try {
-      const { budgetHistory } = await import("../utils/budgetHistory.js");
-      const currentCommitHash = budgetHistory.currentCommitHash;
+      // Get current data modification times from Dexie
+      const currentData = await this.fetchDexieData();
+      const currentModTime = currentData.lastModified;
 
-      // For first-time sync (no previous commit hash), always sync
+      // For first-time sync, always sync
       if (!this.lastSyncedCommitHash) {
         logger.debug("🆕 First-time sync detected - forcing sync attempt", {
-          currentCommit: currentCommitHash?.slice(0, 8) || "none",
-          hasCurrentCommit: !!currentCommitHash,
+          currentModTime: new Date(currentModTime).toISOString(),
         });
-        this.lastSyncedCommitHash = currentCommitHash;
+        this.lastSyncedCommitHash = currentModTime.toString();
         return true; // Always sync on first run
       }
 
-      const hasChanged = currentCommitHash !== this.lastSyncedCommitHash;
+      const lastSyncedTime = parseInt(this.lastSyncedCommitHash) || 0;
+      const hasChanged = currentModTime > lastSyncedTime;
+
       if (hasChanged) {
-        logger.debug("📊 Data change detected via budget history", {
-          previousCommit: this.lastSyncedCommitHash?.slice(0, 8) || "none",
-          currentCommit: currentCommitHash?.slice(0, 8) || "none",
+        logger.debug("📊 Data change detected via modification time", {
+          previousModTime: new Date(lastSyncedTime).toISOString(),
+          currentModTime: new Date(currentModTime).toISOString(),
         });
-        this.lastSyncedCommitHash = currentCommitHash;
+        this.lastSyncedCommitHash = currentModTime.toString();
       } else {
         logger.debug("⏭️ No data changes since last sync", {
-          commitHash: currentCommitHash?.slice(0, 8) || "none",
-          lastSynced: this.lastSyncedCommitHash?.slice(0, 8) || "none",
+          modTime: new Date(currentModTime).toISOString(),
+          lastSynced: new Date(lastSyncedTime).toISOString(),
         });
       }
 
       return hasChanged;
     } catch (error) {
-      logger.warn(
-        "Failed to check budget history changes, assuming changed",
-        error,
-      );
+      logger.warn("Failed to check data changes, assuming changed", error);
       return true; // Fail safe - sync if we can't determine changes
     }
   }
