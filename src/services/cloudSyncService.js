@@ -351,7 +351,7 @@ class CloudSyncService {
    */
   async fetchDexieData() {
     try {
-      const [envelopes, transactions, bills, savingsGoals, paycheckHistory, debts] =
+      const [envelopes, transactions, bills, savingsGoals, paycheckHistory, debts, budgetCommits, budgetChanges] =
         await Promise.all([
           budgetDb.envelopes.toArray(),
           budgetDb.transactions.toArray(),
@@ -359,6 +359,8 @@ class CloudSyncService {
           budgetDb.savingsGoals.toArray(),
           budgetDb.paycheckHistory.toArray(),
           budgetDb.debts.toArray(),
+          budgetDb.budgetCommits.toArray(),
+          budgetDb.budgetChanges.toArray(),
         ]);
 
       // Debug what we're actually fetching from Dexie
@@ -369,6 +371,8 @@ class CloudSyncService {
         savingsGoalsCount: savingsGoals.length,
         paycheckHistoryCount: paycheckHistory.length,
         debtsCount: debts.length,
+        budgetCommitsCount: budgetCommits.length,
+        budgetChangesCount: budgetChanges.length,
         firstEnvelope: envelopes[0]?.name || "none",
         firstTransaction: transactions[0]?.description || "none",
         firstBill: bills[0]?.name || "none",
@@ -382,11 +386,15 @@ class CloudSyncService {
         savingsGoals,
         paycheckHistory,
         debts,
+        budgetCommits,
+        budgetChanges,
         lastModified: Math.max(
           ...envelopes.map((e) => e.lastModified || e.createdAt || 0),
           ...transactions.map((t) => t.lastModified || t.createdAt || 0),
           ...bills.map((b) => b.lastModified || b.createdAt || 0),
           ...debts.map((d) => d.lastModified || d.createdAt || 0),
+          ...budgetCommits.map((c) => c.timestamp || 0),
+          ...budgetChanges.map((c) => c.timestamp || 0),
           0
         ),
       };
