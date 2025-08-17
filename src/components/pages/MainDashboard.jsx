@@ -17,7 +17,8 @@ import {
 import PaydayPrediction from "../budgeting/PaydayPrediction";
 import { predictNextPayday } from "../../utils/paydayPredictor";
 import EditableBalance from "../ui/EditableBalance";
-import { useActualBalance } from "../../hooks/useActualBalance";
+import { useActualBalance } from "../../hooks/useBudgetMetadata";
+import { useUnassignedCash } from "../../hooks/useBudgetMetadata";
 import logger from "../../utils/logger";
 import { useBudgetStore } from "../../stores/budgetStore";
 import { useEnvelopes } from "../../hooks/useEnvelopes";
@@ -35,15 +36,18 @@ const Dashboard = ({ setActiveView }) => {
   const { data: transactions = [], isLoading: transactionsLoading } =
     useTransactions();
 
+  // Use TanStack Query for budget metadata
+  const { unassignedCash, isLoading: unassignedCashLoading } =
+    useUnassignedCash();
+  const {
+    actualBalance,
+    updateActualBalance,
+    isLoading: actualBalanceLoading,
+  } = useActualBalance();
+
   // Keep Zustand for non-migrated operations
   const budget = useBudgetStore();
-  const {
-    unassignedCash,
-    actualBalance,
-    setActualBalance,
-    reconcileTransaction,
-    paycheckHistory,
-  } = budget;
+  const { reconcileTransaction, paycheckHistory } = budget;
   const [showReconcileModal, setShowReconcileModal] = useState(false);
   const [newTransaction, setNewTransaction] = useState({
     amount: "",
@@ -86,16 +90,12 @@ const Dashboard = ({ setActiveView }) => {
       ? predictNextPayday(paycheckHistory)
       : null;
 
-  // Use the separated business logic hook
-  const { updateActualBalance } = useActualBalance();
-
-  const handleUpdateBalance = (newBalance) => {
-    const success = updateActualBalance(newBalance, {
-      source: "manual_dashboard",
+  const handleUpdateBalance = async (newBalance) => {
+    const success = await updateActualBalance(newBalance, {
+      isManual: true,
+      author: "Family Member", // Generic name for family budgeting
     });
-    if (success) {
-      setActualBalance(newBalance);
-    }
+    // No need to call setActualBalance since TanStack Query will handle the update
   };
 
   const handleReconcileTransaction = () => {
@@ -154,7 +154,13 @@ const Dashboard = ({ setActiveView }) => {
   };
 
   // Show loading state while TanStack queries are fetching
-  if (envelopesLoading || savingsLoading || transactionsLoading) {
+  if (
+    envelopesLoading ||
+    savingsLoading ||
+    transactionsLoading ||
+    unassignedCashLoading ||
+    actualBalanceLoading
+  ) {
     return (
       <div className="space-y-6">
         <div className="animate-pulse">

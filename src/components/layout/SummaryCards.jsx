@@ -1,6 +1,7 @@
 import React, { memo, lazy, Suspense } from "react";
 import { DollarSign, Wallet, Target, TrendingUp } from "lucide-react";
 import { useBudgetStore } from "../../stores/budgetStore";
+import { useUnassignedCash } from "../../hooks/useBudgetMetadata";
 import { useEnvelopes } from "../../hooks/useEnvelopes";
 import { useSavingsGoals } from "../../hooks/useSavingsGoals";
 import logger from "../../utils/logger";
@@ -13,8 +14,9 @@ import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
  * Now uses TanStack Query hooks for data loading
  */
 const SummaryCards = () => {
-  const budgetStore = useBudgetStore();
-  const { openUnassignedCashModal, unassignedCash } = budgetStore;
+  const { openUnassignedCashModal } = useBudgetStore();
+  const { unassignedCash, isLoading: unassignedCashLoading } =
+    useUnassignedCash();
 
   // Get data from TanStack Query hooks (same pattern as Dashboard)
   const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
@@ -39,7 +41,7 @@ const SummaryCards = () => {
     unassignedCash,
     totalCash,
     firstEnvelope: envelopes[0],
-    isLoading: envelopesLoading || savingsLoading,
+    isLoading: envelopesLoading || savingsLoading || unassignedCashLoading,
   });
 
   // Calculate total biweekly funding need
