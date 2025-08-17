@@ -13,6 +13,10 @@ import DebtDashboard from "../debt/DebtDashboard";
 import AutoFundingView from "../automation/AutoFundingView";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ErrorBoundary } from "@highlight-run/react";
+import {
+  useUnassignedCash,
+  useActualBalance,
+} from "../../hooks/useBudgetMetadata";
 import useBills from "../../hooks/useBills";
 import logger from "../../utils/logger";
 
@@ -27,6 +31,10 @@ const ViewRenderer = ({
   totalBiweeklyNeed,
   setActiveView,
 }) => {
+  // Use TanStack Query hooks for budget metadata
+  const { unassignedCash } = useUnassignedCash();
+  const { actualBalance } = useActualBalance();
+
   // Get updateBill from TanStack Query hook instead of budget store
   const { updateBill: tanStackUpdateBill } = useBills();
 
@@ -35,9 +43,7 @@ const ViewRenderer = ({
     bills,
     savingsGoals,
     supplementalAccounts,
-    unassignedCash,
     paycheckHistory,
-    actualBalance: _actualBalance,
     transactions,
     allTransactions: rawAllTransactions,
     setActualBalance: _setActualBalance,

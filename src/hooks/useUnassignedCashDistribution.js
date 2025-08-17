@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useBudgetStore } from "../stores/budgetStore";
+import { useUnassignedCash } from "./useBudgetMetadata";
 import useEnvelopes from "./useEnvelopes";
 import useBills from "./useBills";
 import {
@@ -21,7 +22,7 @@ import logger from "../utils/logger";
  * Handles distribution calculations, validation, and envelope updates
  */
 const useUnassignedCashDistribution = () => {
-  const { unassignedCash, setUnassignedCash } = useBudgetStore();
+  const { unassignedCash, setUnassignedCash } = useUnassignedCash();
   const { envelopes } = useEnvelopes();
   const { bills = [] } = useBills();
   const queryClient = useQueryClient();
@@ -249,14 +250,10 @@ const useUnassignedCashDistribution = () => {
       if (envelopeUpdates.length > 0) {
         await budgetDb.bulkUpsertEnvelopes(envelopeUpdates);
 
-        // Update both Zustand and Dexie metadata
-        setUnassignedCash(remainingCash);
-
-        // Update budget metadata in Dexie
-        const currentMetadata = await getBudgetMetadata();
-        await setBudgetMetadata({
-          ...currentMetadata,
-          unassignedCash: remainingCash,
+        // Update unassigned cash with distribution tracking
+        await setUnassignedCash(remainingCash, {
+          author: "Family Member", // Generic name for family budgeting
+          source: "distribution",
         });
 
         queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });

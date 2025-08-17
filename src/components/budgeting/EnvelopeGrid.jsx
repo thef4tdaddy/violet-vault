@@ -1,6 +1,7 @@
 // src/components/budgeting/EnvelopeGrid.jsx - Refactored with separated logic
 import React, { useState, useMemo, lazy, Suspense } from "react";
 import { useBudgetStore } from "../../stores/budgetStore";
+import { useUnassignedCash } from "../../hooks/useBudgetMetadata";
 import { useEnvelopes } from "../../hooks/useEnvelopes";
 import { useTransactions } from "../../hooks/useTransactions";
 import useBills from "../../hooks/useBills";
@@ -46,6 +47,12 @@ const UnifiedEnvelopeManager = ({
     isLoading: billsLoading,
   } = useBills();
 
+  // Use TanStack Query for unassigned cash
+  const {
+    unassignedCash: tanStackUnassignedCash,
+    isLoading: unassignedCashLoading,
+  } = useUnassignedCash();
+
   // Keep Zustand for non-migrated operations and fallbacks
   const budget = useBudgetStore();
 
@@ -73,7 +80,7 @@ const UnifiedEnvelopeManager = ({
   const unassignedCash =
     propUnassignedCash !== undefined
       ? propUnassignedCash
-      : budget.unassignedCash || 0;
+      : tanStackUnassignedCash || 0;
 
   const bills = useMemo(() => {
     const result = tanStackBills.length ? tanStackBills : budget.bills || [];
