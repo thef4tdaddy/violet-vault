@@ -3,7 +3,7 @@ import { subscribeWithSelector } from "zustand/middleware";
 import { persist, devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { budgetHistoryMiddleware } from "../utils/budgetHistoryMiddleware.js";
-import { budgetDb } from "../db/budgetDb.js";
+import { budgetDb, setBudgetMetadata } from "../db/budgetDb.js";
 import logger from "../utils/logger.js";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
@@ -111,6 +111,8 @@ const storeInitializer = (set, get) => ({
   setUnassignedCash: (amount) =>
     set((state) => {
       state.unassignedCash = amount;
+      // Note: TanStack Query invalidation should be handled by calling code
+      // to avoid circular dependencies between store and query client
     }),
 
   setBiweeklyAllocation: (amount) =>
@@ -293,6 +295,22 @@ const storeInitializer = (set, get) => ({
       if (importedData.paycheckHistory?.length) {
         const validPaychecks = ensureValidIds(importedData.paycheckHistory, "paycheck");
         await budgetDb.bulkUpsertPaychecks(validPaychecks);
+      }
+
+      // Save budget metadata to Dexie (unassigned cash, actual balance, etc.)
+      const budgetMetadata = {};
+      if (typeof importedData.unassignedCash === "number")
+        budgetMetadata.unassignedCash = importedData.unassignedCash;
+      if (typeof importedData.biweeklyAllocation === "number")
+        budgetMetadata.biweeklyAllocation = importedData.biweeklyAllocation;
+      if (typeof importedData.actualBalance === "number")
+        budgetMetadata.actualBalance = importedData.actualBalance;
+      if (typeof importedData.isActualBalanceManual === "boolean")
+        budgetMetadata.isActualBalanceManual = importedData.isActualBalanceManual;
+
+      if (Object.keys(budgetMetadata).length > 0) {
+        await setBudgetMetadata(budgetMetadata);
+        logger.info("Budget metadata saved to Dexie", { metadata: budgetMetadata });
       }
 
       // Update UI state in Zustand

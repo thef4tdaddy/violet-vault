@@ -538,6 +538,28 @@ export const setEncryptedData = async (data) => {
   }
 };
 
+// Budget metadata functions for unassigned cash and other summary data
+export const getBudgetMetadata = async () => {
+  try {
+    return await budgetDb.budget.get("metadata");
+  } catch {
+    return null;
+  }
+};
+
+export const setBudgetMetadata = async (metadata) => {
+  try {
+    await budgetDb.budget.put({
+      id: "metadata",
+      lastModified: Date.now(),
+      ...metadata,
+    });
+  } catch (err) {
+    console.error("Failed to save budget metadata:", err);
+    throw err;
+  }
+};
+
 export const clearData = async () => {
   await Promise.all([
     budgetDb.budget.clear(),
