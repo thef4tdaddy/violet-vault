@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../utils/queryClient";
 import { budgetDb } from "../db/budgetDb";
-import { budgetHistory } from "../utils/budgetHistory";
+import { encryptionUtils } from "../utils/encryption";
 import logger from "../utils/logger";
 
 /**
@@ -34,16 +34,20 @@ export const useBudgetCommits = (options = {}) => {
     mutationKey: ["budgetCommits", "create"],
     mutationFn: async (commitData) => {
       // Generate hash and encrypt snapshot
-      const hash = await budgetHistory.generateCommitHash(commitData);
-      const encryptedSnapshot = await budgetHistory.encryptSnapshot(
-        commitData.snapshot,
+      const hash = encryptionUtils.generateHash(JSON.stringify(commitData));
+      const encryptionKey = await encryptionUtils.deriveKeyFromPassword(
         commitData.password,
+      );
+      const encryptedSnapshot = await encryptionUtils.encrypt(
+        commitData.snapshot,
+        encryptionKey,
       );
 
       const commit = {
         ...commitData,
         hash,
-        encryptedSnapshot,
+        encryptedSnapshot: encryptedSnapshot.data,
+        encryptedSnapshotIv: encryptedSnapshot.iv,
         timestamp: Date.now(),
       };
 
@@ -141,13 +145,51 @@ export const useBudgetHistoryOperations = () => {
       }
 
       // Decrypt and restore the snapshot
-      const snapshot = await budgetHistory.decryptSnapshot(
+      const encryptionKey =
+        await encryptionUtils.deriveKeyFromPassword(password);
+      const snapshot = await encryptionUtils.decrypt(
         commit.encryptedSnapshot,
-        password,
+        encryptionKey,
+        commit.encryptedSnapshotIv,
       );
 
-      // Restore all data to the snapshot state
-      await budgetHistory.restoreFromSnapshot(snapshot);
+      // Restore all data to the snapshot state using Dexie
+      await budgetDb.transaction(
+        "rw",
+        [
+          budgetDb.envelopes,
+          budgetDb.transactions,
+          budgetDb.bills,
+          budgetDb.savingsGoals,
+          budgetDb.debts,
+          budgetDb.paycheckHistory,
+        ],
+        async () => {
+          // Clear existing data
+          await Promise.all([
+            budgetDb.envelopes.clear(),
+            budgetDb.transactions.clear(),
+            budgetDb.bills.clear(),
+            budgetDb.savingsGoals.clear(),
+            budgetDb.debts.clear(),
+            budgetDb.paycheckHistory.clear(),
+          ]);
+
+          // Restore snapshot data
+          if (snapshot.envelopes?.length)
+            await budgetDb.envelopes.bulkAdd(snapshot.envelopes);
+          if (snapshot.transactions?.length)
+            await budgetDb.transactions.bulkAdd(snapshot.transactions);
+          if (snapshot.bills?.length)
+            await budgetDb.bills.bulkAdd(snapshot.bills);
+          if (snapshot.savingsGoals?.length)
+            await budgetDb.savingsGoals.bulkAdd(snapshot.savingsGoals);
+          if (snapshot.debts?.length)
+            await budgetDb.debts.bulkAdd(snapshot.debts);
+          if (snapshot.paycheckHistory?.length)
+            await budgetDb.paycheckHistory.bulkAdd(snapshot.paycheckHistory);
+        },
+      );
 
       return { commitHash, snapshot };
     },

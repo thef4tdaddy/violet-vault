@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 import { persist, devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
-import { budgetHistoryMiddleware } from "../utils/budgetHistoryMiddleware.js";
 import { budgetDb, setBudgetMetadata } from "../db/budgetDb.js";
 import logger from "../utils/logger.js";
 
@@ -552,9 +551,7 @@ const storeInitializer = (set, get) => ({
   },
 });
 
-const base = subscribeWithSelector(
-  immer(budgetHistoryMiddleware(storeInitializer)),
-);
+const base = subscribeWithSelector(immer(storeInitializer));
 
 let useOptimizedBudgetStore;
 
