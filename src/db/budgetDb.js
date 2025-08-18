@@ -583,6 +583,16 @@ export class VioletVaultDB extends Dexie {
 
 export const budgetDb = new VioletVaultDB();
 
+// Expose to window for debugging (development/staging only)
+if (
+  typeof window !== "undefined" &&
+  (import.meta.env.MODE === "development" ||
+    window.location.hostname.includes("f4tdaddy.com") ||
+    window.location.hostname.includes("vercel.app"))
+) {
+  window.budgetDb = budgetDb;
+}
+
 // Utility functions
 export const getEncryptedData = async () => {
   try {
