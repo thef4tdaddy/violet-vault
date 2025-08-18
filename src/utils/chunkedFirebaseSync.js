@@ -12,7 +12,7 @@ import {
 } from "firebase/firestore";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
 import { encryptionUtils } from "./encryption";
-import { captureError, trackEvent } from "./logrocket.js";
+import { H } from "./highlight.js";
 import { firebaseConfig } from "./firebaseConfig";
 import logger from "./logger.js";
 
@@ -488,7 +488,7 @@ class ChunkedFirebaseSync {
         chunkMap,
       });
 
-      trackEvent("chunked-save-completed", {
+      H.track("chunked-save-completed", {
         budgetId: this.budgetId,
         duration,
         totalDocuments: totalDocs,
@@ -498,10 +498,8 @@ class ChunkedFirebaseSync {
       });
     } catch (error) {
       logger.error("❌ Chunked save failed:", error);
-      captureError(error, {
-        budgetId: this.budgetId,
-        operation: "chunked_save",
-        component: "ChunkedFirebaseSync",
+      H.consumeError(error, {
+        metadata: { budgetId: this.budgetId, operation: "chunked_save" },
       });
       throw error;
     }
@@ -796,13 +794,14 @@ class ChunkedFirebaseSync {
         }
       }
 
-      captureError(error, {
-        budgetId: this.budgetId,
-        operation: "chunked_load",
-        component: "ChunkedFirebaseSync",
-        errorType: error.message.includes("too small")
-          ? "data_too_small"
-          : "unknown",
+      H.consumeError(error, {
+        metadata: {
+          budgetId: this.budgetId,
+          operation: "chunked_load",
+          errorType: error.message.includes("too small")
+            ? "data_too_small"
+            : "unknown",
+        },
       });
       throw error;
     }

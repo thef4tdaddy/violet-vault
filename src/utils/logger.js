@@ -1,4 +1,4 @@
-import { captureError, trackEvent } from "./logrocket.js";
+import { H } from "./highlight.js";
 
 class Logger {
   constructor() {
@@ -44,16 +44,16 @@ class Logger {
       );
     }
 
-    // LogRocket automatically captures console logs, so just ensure it's tracked
+    // Highlight.io automatically captures console logs, so just ensure it's tracked
     try {
-      trackEvent("debug", {
+      H.track("debug", {
         message: `DEBUG: ${message}`,
         category: "debug",
         ...data,
       });
     } catch (error) {
-      // Fallback if LogRocket fails
-      console.error("LogRocket logging failed:", error);
+      // Fallback if Highlight.io fails
+      console.error("Highlight.io logging failed:", error);
     }
   }
 
@@ -65,13 +65,13 @@ class Logger {
     }
 
     try {
-      trackEvent("info", {
+      H.track("info", {
         message: `INFO: ${message}`,
         category: "app",
         ...data,
       });
     } catch (error) {
-      console.error("LogRocket logging failed:", error);
+      console.error("Highlight.io logging failed:", error);
     }
   }
 
@@ -79,7 +79,7 @@ class Logger {
   warn(message, data = {}) {
     console.warn(`⚠️ ${message}`, data);
 
-    trackEvent("warning", {
+    H.track("warning", {
       message: `WARN: ${message}`,
       category: "app",
       ...data,
@@ -91,15 +91,14 @@ class Logger {
     console.error(`❌ ${message}`, error, data);
 
     if (error instanceof Error) {
-      captureError(error, {
-        message,
-        component: "app",
-        ...data,
+      H.consumeError(error, {
+        metadata: { message, ...data },
+        tags: { component: "app" },
       });
     } else {
-      captureError(new Error(message), {
-        component: "app",
-        ...data,
+      H.consumeError(new Error(message), {
+        metadata: data,
+        tags: { component: "app" },
       });
     }
   }
@@ -111,9 +110,9 @@ class Logger {
       console.log(`💰 [BUDGET-SYNC] ${message}`, data);
     }
 
-    // Also send to LogRocket
+    // Also send to Highlight.io
     try {
-      trackEvent("budget-sync", {
+      H.track("budget-sync", {
         message: `BUDGET-SYNC: ${message}`,
         category: "budget-sync",
         ...data,
@@ -124,14 +123,13 @@ class Logger {
         message.includes("budgetId value") ||
         message.includes("sync issue")
       ) {
-        captureError(new Error(`Budget Sync: ${message}`), {
-          category: "budget-sync",
-          critical: "true",
-          ...data,
+        H.consumeError(new Error(`Budget Sync: ${message}`), {
+          metadata: data,
+          tags: { category: "budget-sync", critical: "true" },
         });
       }
     } catch (error) {
-      console.error("Failed to log to LogRocket:", error);
+      console.error("Failed to log to Highlight.io:", error);
     }
   }
 
@@ -172,12 +170,12 @@ class Logger {
     });
   }
 
-  // Test LogRocket connectivity
-  testLogRocket() {
-    console.log("🧪 Testing LogRocket connectivity...");
+  // Test Highlight.io connectivity
+  testHighlight() {
+    console.log("🧪 Testing Highlight.io connectivity...");
 
     // Send a test event
-    trackEvent("test-event", {
+    H.track("test-event", {
       message: "Test event from logger",
       category: "test",
       timestamp: new Date().toISOString(),
@@ -187,15 +185,14 @@ class Logger {
     try {
       throw new Error("Test error from logger - this is intentional");
     } catch (error) {
-      captureError(error, {
-        test: true,
-        source: "logger",
-        category: "test",
+      H.consumeError(error, {
+        metadata: { test: true, source: "logger" },
+        tags: { category: "test" },
       });
     }
 
     console.log(
-      "✅ LogRocket test messages sent - check your LogRocket dashboard",
+      "✅ Highlight.io test messages sent - check your Highlight.io dashboard",
     );
   }
 }
@@ -205,7 +202,7 @@ export const logger = new Logger();
 // Make logger available globally for testing
 if (typeof window !== "undefined") {
   window.logger = logger;
-  window.testLogRocket = () => logger.testLogRocket();
+  window.testHighlight = () => logger.testHighlight();
 }
 
 export default logger;
