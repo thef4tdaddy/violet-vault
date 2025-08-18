@@ -23,6 +23,7 @@ import {
   ShieldAlert,
 } from "lucide-react";
 import IntegrityStatusIndicator from "./IntegrityStatusIndicator";
+import HelpTooltip from "../ui/HelpTooltip";
 import logger from "../../utils/logger";
 
 const BudgetHistoryViewer = ({ onClose }) => {
@@ -151,6 +152,11 @@ const BudgetHistoryViewer = ({ onClose }) => {
               <h2 className="text-2xl font-semibold text-gray-900 flex items-center">
                 <History className="h-6 w-6 mr-3 text-blue-600" />
                 Change History
+                <HelpTooltip
+                  title="Budget History"
+                  content="Track all changes to your budget with git-like version control. Each change creates a commit that can be restored or analyzed for family collaboration."
+                  position="right"
+                />
               </h2>
               <p className="text-gray-600 mt-1">
                 View and restore previous versions of your budget

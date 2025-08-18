@@ -5,7 +5,7 @@ export class VioletVaultDB extends Dexie {
     super("VioletVault");
 
     // Enhanced schema with comprehensive indexes for optimal query performance
-    this.version(4).stores({
+    this.version(5).stores({
       // Main budget data with timestamps for versioning
       budget: "id, lastModified, version",
 
@@ -45,6 +45,12 @@ export class VioletVaultDB extends Dexie {
         "hash, timestamp, message, author, parentHash, encryptedSnapshot, deviceFingerprint, [timestamp+author], [author+timestamp]",
       budgetChanges:
         "++id, commitHash, entityType, entityId, changeType, description, beforeData, afterData, [commitHash+entityType], [entityType+changeType]",
+
+      // Advanced Budget History features
+      budgetBranches:
+        "name, description, sourceCommitHash, headCommitHash, author, created, isActive, isMerged, [created+author], [isActive+created]",
+      budgetTags:
+        "name, description, commitHash, tagType, author, created, [created+tagType], [tagType+created]",
     });
 
     // Enhanced hooks for automatic timestamping across all tables
@@ -570,6 +576,67 @@ export class VioletVaultDB extends Dexie {
 
   async getBudgetCommitCount() {
     return this.budgetCommits.count();
+  }
+
+  // Advanced Budget History Methods: Branches and Tags
+  async createBudgetBranch(branchData) {
+    return this.budgetBranches.add({
+      name: branchData.name,
+      description: branchData.description,
+      sourceCommitHash: branchData.sourceCommitHash,
+      headCommitHash: branchData.headCommitHash,
+      author: branchData.author,
+      created: branchData.created || Date.now(),
+      isActive: branchData.isActive || false,
+      isMerged: branchData.isMerged || false,
+    });
+  }
+
+  async getBudgetBranches() {
+    return this.budgetBranches.orderBy("created").toArray();
+  }
+
+  async getBudgetBranch(name) {
+    return this.budgetBranches.where("name").equals(name).first();
+  }
+
+  async getActiveBudgetBranch() {
+    return this.budgetBranches.where("isActive").equals(true).first();
+  }
+
+  async updateBudgetBranch(name, updates) {
+    return this.budgetBranches.where("name").equals(name).modify(updates);
+  }
+
+  async deleteBudgetBranch(name) {
+    return this.budgetBranches.where("name").equals(name).delete();
+  }
+
+  async createBudgetTag(tagData) {
+    return this.budgetTags.add({
+      name: tagData.name,
+      description: tagData.description,
+      commitHash: tagData.commitHash,
+      tagType: tagData.tagType,
+      author: tagData.author,
+      created: tagData.created || Date.now(),
+    });
+  }
+
+  async getBudgetTags() {
+    return this.budgetTags.orderBy("created").reverse().toArray();
+  }
+
+  async getBudgetTag(name) {
+    return this.budgetTags.where("name").equals(name).first();
+  }
+
+  async getBudgetTagsByType(tagType) {
+    return this.budgetTags.where("tagType").equals(tagType).toArray();
+  }
+
+  async deleteBudgetTag(name) {
+    return this.budgetTags.where("name").equals(name).delete();
   }
 
   async clearBudgetHistory() {
