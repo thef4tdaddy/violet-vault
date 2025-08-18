@@ -50,7 +50,7 @@
     "backup:data": "node scripts/backup-data.js"
   },
   "dependencies": {
-    "@highlight-run/react": "^19.0.23",
+    "@highlight-run/react": "^20.0.1",
     "@tailwindcss/vite": "^4.1.11",
     "@tanstack/react-query": "^5.29.0",
     "@tanstack/react-virtual": "^3.13.12",
