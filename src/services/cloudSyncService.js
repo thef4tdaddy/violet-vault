@@ -933,4 +933,15 @@ class CloudSyncService {
 
 // Export singleton instance
 const cloudSyncService = new CloudSyncService();
+
+// Expose to window for debugging (development/staging only)
+if (
+  typeof window !== "undefined" &&
+  (import.meta.env.MODE === "development" ||
+    window.location.hostname.includes("f4tdaddy.com") ||
+    window.location.hostname.includes("vercel.app"))
+) {
+  window.cloudSyncService = cloudSyncService;
+}
+
 export default cloudSyncService;
