@@ -258,7 +258,10 @@ class CloudSyncService {
         return { success: true, skipped: true, reason: "No changes detected" };
       }
 
-      logger.debug("🔄 Starting chunked bidirectional sync...");
+      logger.info("🔄 Starting Firebase sync...", {
+        budgetId: this.config?.budgetId?.slice(0, 8),
+        user: this.config?.currentUser?.userName,
+      });
       const startTime = Date.now();
 
       // Import ChunkedFirebaseSync for new implementation
@@ -393,10 +396,11 @@ class CloudSyncService {
       const currentData = await this.fetchDexieData();
       this.lastSyncedCommitHash = currentData.lastModified.toString();
 
-      logger.debug("✅ Chunked sync completed", {
+      logger.info("✅ Firebase sync completed", {
         direction: result.direction,
         duration: `${duration}ms`,
         counts: result.counts,
+        budgetId: this.config?.budgetId?.slice(0, 8),
       });
 
       return result;
@@ -883,11 +887,13 @@ class CloudSyncService {
     const { direction, data } = syncResult;
 
     if (direction === "toFirestore") {
+      logger.info("📤 Uploading local data to Firebase...");
       await this.syncFromDexieToChunkedFirestore(data, ChunkedFirebaseSync);
     } else if (direction === "fromFirestore") {
+      logger.info("📥 Downloading data from Firebase...");
       await this.saveToDexieAndInvalidate(data);
     } else {
-      logger.debug("🔄 No sync needed - data is up to date");
+      logger.info("✅ Data already synchronized");
     }
 
     return {
