@@ -55,13 +55,9 @@ export class BudgetHistoryTracker {
         timestamp: Date.now(),
       };
 
-      // For now, we'll store a simple encrypted version
-      // In production, this would use the user's encryption key
-      const encryptedSnapshot = await encryptionUtils.encrypt(
-        snapshot,
-        // Use a temporary key for now - in real implementation this would be the user's key
-        new Uint8Array(32).fill(42)
-      );
+      // For now, we'll store the snapshot as JSON
+      // TODO: Implement proper encryption using user's encryption key
+      const snapshotData = JSON.stringify(snapshot);
 
       // Create the commit
       const commit = {
@@ -70,7 +66,7 @@ export class BudgetHistoryTracker {
         message: description,
         author,
         parentHash,
-        encryptedSnapshot: encryptedSnapshot.data,
+        snapshotData: snapshotData,
         deviceFingerprint: commitData.deviceFingerprint,
       };
 
