@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { create } from "zustand";
 import { encryptionUtils } from "../utils/encryption";
 import logger from "../utils/logger";
-import { identifyUser } from "../utils/logrocket";
+import { identifyUser } from "../utils/highlight";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = create((set, get) => ({
@@ -70,7 +70,7 @@ export const useAuth = create((set, get) => ({
             lastActivity: Date.now(),
           });
 
-          // Identify user in LogRocket for session tracking
+          // Identify user in Highlight.io for session tracking
           identifyUser(finalUserData.budgetId, {
             userName: finalUserData.userName,
             userColor: finalUserData.userColor,
@@ -197,7 +197,7 @@ export const useAuth = create((set, get) => ({
             lastActivity: Date.now(),
           });
 
-          // Identify returning user in LogRocket for session tracking
+          // Identify returning user in Highlight.io for session tracking
           identifyUser(currentUserData.budgetId, {
             userName: currentUserData.userName,
             userColor: currentUserData.userColor,
