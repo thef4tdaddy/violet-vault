@@ -6,6 +6,9 @@ import { initHighlight } from "./utils/highlight.js";
 import { QueryClientProvider } from "@tanstack/react-query";
 import queryClient from "./utils/queryClient";
 
+// Initialize Firebase at app startup
+import "./utils/chunkedFirebaseSync.js";
+
 // Expose diagnostic tools for debugging
 import { runDataDiagnostic } from "./utils/dataDiagnostic.js";
 import { runSyncDiagnostic } from "./utils/syncDiagnostic.js";
