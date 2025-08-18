@@ -139,6 +139,8 @@ class FirebaseSync {
       lastActivity,
       budgetCommits,
       budgetChanges,
+      budgetBranches,
+      budgetTags,
     } = data;
 
     // Encrypt everything except username
@@ -154,6 +156,8 @@ class FirebaseSync {
         transactions,
         budgetCommits,
         budgetChanges,
+        budgetBranches,
+        budgetTags,
         activityData: lastActivity
           ? {
               userColor: lastActivity.userColor,

@@ -93,6 +93,36 @@ class CloudSyncService {
         );
       }
 
+      // Save budget history data (commits and changes)
+      if (data.budgetCommits?.length > 0) {
+        promises.push(budgetDb.budgetCommits.bulkPut(data.budgetCommits));
+        logger.debug(
+          `💾 Saving ${data.budgetCommits.length} budget commits to Dexie`,
+        );
+      }
+
+      if (data.budgetChanges?.length > 0) {
+        promises.push(budgetDb.budgetChanges.bulkPut(data.budgetChanges));
+        logger.debug(
+          `💾 Saving ${data.budgetChanges.length} budget changes to Dexie`,
+        );
+      }
+
+      // Save advanced budget history features (branches and tags)
+      if (data.budgetBranches?.length > 0) {
+        promises.push(budgetDb.budgetBranches.bulkPut(data.budgetBranches));
+        logger.debug(
+          `💾 Saving ${data.budgetBranches.length} budget branches to Dexie`,
+        );
+      }
+
+      if (data.budgetTags?.length > 0) {
+        promises.push(budgetDb.budgetTags.bulkPut(data.budgetTags));
+        logger.debug(
+          `💾 Saving ${data.budgetTags.length} budget tags to Dexie`,
+        );
+      }
+
       // Wait for all saves to complete
       await Promise.all(promises);
 
@@ -109,6 +139,8 @@ class CloudSyncService {
         queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals }),
         queryClient.invalidateQueries({ queryKey: queryKeys.dashboard }),
         queryClient.invalidateQueries({ queryKey: queryKeys.analytics }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.budgetHistory }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata }),
       ]);
 
       logger.debug(
@@ -412,6 +444,8 @@ class CloudSyncService {
         debts,
         budgetCommits,
         budgetChanges,
+        budgetBranches,
+        budgetTags,
         budgetMetadata,
       ] = await Promise.all([
         budgetDb.envelopes.toArray(),
@@ -422,6 +456,8 @@ class CloudSyncService {
         budgetDb.debts.toArray(),
         budgetDb.budgetCommits.toArray(),
         budgetDb.budgetChanges.toArray(),
+        budgetDb.budgetBranches.toArray(),
+        budgetDb.budgetTags.toArray(),
         budgetDb.budget.get("metadata"),
       ]);
 
@@ -435,6 +471,8 @@ class CloudSyncService {
         debtsCount: debts.length,
         budgetCommitsCount: budgetCommits.length,
         budgetChangesCount: budgetChanges.length,
+        budgetBranchesCount: budgetBranches.length,
+        budgetTagsCount: budgetTags.length,
         unassignedCash: budgetMetadata?.unassignedCash || 0,
         actualBalance: budgetMetadata?.actualBalance || 0,
         firstEnvelope: envelopes[0]?.name || "none",
@@ -452,6 +490,8 @@ class CloudSyncService {
         debts,
         budgetCommits,
         budgetChanges,
+        budgetBranches,
+        budgetTags,
         unassignedCash: budgetMetadata?.unassignedCash || 0,
         actualBalance: budgetMetadata?.actualBalance || 0,
         lastModified: Math.max(
@@ -461,6 +501,8 @@ class CloudSyncService {
           ...debts.map((d) => d.lastModified || d.createdAt || 0),
           ...budgetCommits.map((c) => c.timestamp || 0),
           ...budgetChanges.map((c) => c.timestamp || 0),
+          ...budgetBranches.map((b) => b.created || 0),
+          ...budgetTags.map((t) => t.created || 0),
           budgetMetadata?.lastModified || 0,
           0,
         ),
@@ -476,6 +518,8 @@ class CloudSyncService {
         debts: [],
         budgetCommits: [],
         budgetChanges: [],
+        budgetBranches: [],
+        budgetTags: [],
         unassignedCash: 0,
         actualBalance: 0,
         lastModified: 0,
