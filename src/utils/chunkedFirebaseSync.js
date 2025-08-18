@@ -21,6 +21,18 @@ const db = getFirestore(app);
 
 const auth = getAuth(app);
 
+// Expose Firebase to window for debugging (development/staging only)
+if (
+  typeof window !== "undefined" &&
+  (import.meta.env.MODE === "development" ||
+    window.location.hostname.includes("f4tdaddy.com") ||
+    window.location.hostname.includes("vercel.app"))
+) {
+  window.firebaseApp = app;
+  window.firebaseDb = db;
+  window.firebaseAuth = auth;
+}
+
 // ---- Binary <-> Base64 helpers to avoid massive Function.apply() (stack overflow) ----
 function base64FromBytes(bytes) {
   // Accepts Array<number> | Uint8Array
