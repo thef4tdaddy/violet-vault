@@ -251,12 +251,10 @@ class CloudSyncService {
         return { success: false, error: "Missing authentication context" };
       }
 
-      // Check if data has actually changed before performing expensive sync
-      const hasChanged = await this.hasDataChanged();
-      if (!hasChanged) {
-        logger.debug("⏭️ No data changes detected, skipping sync");
-        return { success: true, skipped: true, reason: "No changes detected" };
-      }
+      // TODO: Temporarily disable change detection until sync comparison is fixed
+      // The hasDataChanged() method is causing sync to skip when browsers have different data
+      // Skip this check and always perform sync comparison to determine actual sync direction
+      logger.debug("🔄 Performing sync comparison (change detection bypassed)...");
 
       logger.info("🔄 Starting Firebase sync...", {
         budgetId: this.config?.budgetId?.slice(0, 8),
