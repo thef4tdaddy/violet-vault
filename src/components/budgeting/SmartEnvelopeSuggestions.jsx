@@ -45,10 +45,7 @@ const SmartEnvelopeSuggestions = ({
 
   // Persist collapse state to localStorage
   useEffect(() => {
-    localStorage.setItem(
-      "smartSuggestions_collapsed",
-      JSON.stringify(isCollapsed),
-    );
+    localStorage.setItem("smartSuggestions_collapsed", JSON.stringify(isCollapsed));
   }, [isCollapsed]);
 
   const toggleCollapse = () => {
@@ -109,7 +106,7 @@ const SmartEnvelopeSuggestions = ({
 
     // 1. UNASSIGNED TRANSACTION ANALYSIS
     const unassignedTransactions = filteredTransactions.filter(
-      (t) => t.amount < 0 && (!t.envelopeId || t.envelopeId === ""),
+      (t) => t.amount < 0 && (!t.envelopeId || t.envelopeId === "")
     );
 
     // Group by category
@@ -131,10 +128,7 @@ const SmartEnvelopeSuggestions = ({
 
     // Suggest envelopes for significant unassigned categories
     Object.values(unassignedByCategory).forEach((categoryData) => {
-      if (
-        categoryData.amount >= minAmount &&
-        categoryData.count >= minTransactions
-      ) {
+      if (categoryData.amount >= minAmount && categoryData.count >= minTransactions) {
         const monthlyAverage = categoryData.amount / monthsOfData;
         const suggestedAmount = Math.ceil(monthlyAverage * bufferPercentage);
 
@@ -202,7 +196,7 @@ const SmartEnvelopeSuggestions = ({
         const existingEnvelope = envelopes.find(
           (e) =>
             e.name.toLowerCase().includes(category.toLowerCase()) ||
-            e.category?.toLowerCase().includes(category.toLowerCase()),
+            e.category?.toLowerCase().includes(category.toLowerCase())
         );
 
         if (!existingEnvelope) {
@@ -230,23 +224,17 @@ const SmartEnvelopeSuggestions = ({
     // 3. ENVELOPE OPTIMIZATION ANALYSIS
     envelopes.forEach((envelope) => {
       const envelopeTransactions = filteredTransactions.filter(
-        (t) => t.amount < 0 && t.envelopeId === envelope.id,
+        (t) => t.amount < 0 && t.envelopeId === envelope.id
       );
 
       if (envelopeTransactions.length === 0) return;
 
-      const totalSpent = envelopeTransactions.reduce(
-        (sum, t) => sum + Math.abs(t.amount),
-        0,
-      );
+      const totalSpent = envelopeTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0);
       const monthlySpent = totalSpent / monthsOfData;
       const monthlyBudget = envelope.monthlyAmount || 0;
 
       // Overspending detection
-      if (
-        monthlySpent > monthlyBudget * overspendingThreshold &&
-        monthlyBudget > 0
-      ) {
+      if (monthlySpent > monthlyBudget * overspendingThreshold && monthlyBudget > 0) {
         const overage = monthlySpent - monthlyBudget;
         const suggestedAmount = Math.ceil(monthlySpent * bufferPercentage);
 
@@ -374,43 +362,29 @@ const SmartEnvelopeSuggestions = ({
       className={`glassmorphism rounded-xl transition-all duration-200 ${isCollapsed ? "p-3" : "p-6"} ${className}`}
     >
       {/* Header */}
-      <div
-        className={`flex items-center justify-between ${isCollapsed ? "mb-0" : "mb-4"}`}
-      >
+      <div className={`flex items-center justify-between ${isCollapsed ? "mb-0" : "mb-4"}`}>
         <button
           onClick={toggleCollapse}
           className={`flex items-center font-semibold text-gray-900 hover:text-gray-700 transition-colors group ${isCollapsed ? "text-base" : "text-lg"}`}
         >
           <div className={`relative ${isCollapsed ? "mr-2" : "mr-3"}`}>
-            <div
-              className={`absolute inset-0 bg-amber-500 rounded-xl blur-lg opacity-30`}
-            ></div>
-            <div
-              className={`relative bg-amber-500 rounded-xl ${isCollapsed ? "p-1.5" : "p-2"}`}
-            >
-              <Zap
-                className={`text-white ${isCollapsed ? "h-3 w-3" : "h-4 w-4"}`}
-              />
+            <div className={`absolute inset-0 bg-amber-500 rounded-xl blur-lg opacity-30`}></div>
+            <div className={`relative bg-amber-500 rounded-xl ${isCollapsed ? "p-1.5" : "p-2"}`}>
+              <Zap className={`text-white ${isCollapsed ? "h-3 w-3" : "h-4 w-4"}`} />
             </div>
           </div>
           Smart Suggestions
           <div className="ml-2 transition-transform duration-200 group-hover:scale-110">
             {isCollapsed ? (
-              <ChevronDown
-                className={`text-gray-400 ${isCollapsed ? "h-4 w-4" : "h-5 w-5"}`}
-              />
+              <ChevronDown className={`text-gray-400 ${isCollapsed ? "h-4 w-4" : "h-5 w-5"}`} />
             ) : (
-              <ChevronUp
-                className={`text-gray-400 ${isCollapsed ? "h-4 w-4" : "h-5 w-5"}`}
-              />
+              <ChevronUp className={`text-gray-400 ${isCollapsed ? "h-4 w-4" : "h-5 w-5"}`} />
             )}
           </div>
         </button>
 
         <div className="flex items-center gap-2">
-          <span
-            className={`text-gray-600 ${isCollapsed ? "text-xs" : "text-sm"}`}
-          >
+          <span className={`text-gray-600 ${isCollapsed ? "text-xs" : "text-sm"}`}>
             {suggestions.length} recommendation
             {suggestions.length !== 1 ? "s" : ""}
           </span>
@@ -434,14 +408,10 @@ const SmartEnvelopeSuggestions = ({
         {/* Settings Panel */}
         {showSettings && (
           <div className="mb-4 p-4 bg-gray-50 rounded-lg border">
-            <h4 className="font-medium text-gray-900 mb-3">
-              Analysis Settings
-            </h4>
+            <h4 className="font-medium text-gray-900 mb-3">Analysis Settings</h4>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <label className="block text-gray-700 mb-1">
-                  Min Amount ($)
-                </label>
+                <label className="block text-gray-700 mb-1">Min Amount ($)</label>
                 <input
                   type="number"
                   value={analysisSettings.minAmount}
@@ -457,9 +427,7 @@ const SmartEnvelopeSuggestions = ({
                 />
               </div>
               <div>
-                <label className="block text-gray-700 mb-1">
-                  Min Transactions
-                </label>
+                <label className="block text-gray-700 mb-1">Min Transactions</label>
                 <input
                   type="number"
                   value={analysisSettings.minTransactions}
@@ -511,9 +479,7 @@ const SmartEnvelopeSuggestions = ({
                   <div className="flex-1">
                     <div className="flex items-center mb-2">
                       {getPriorityIcon(suggestion.priority)}
-                      <h4 className="font-medium text-gray-900 text-sm ml-2">
-                        {suggestion.title}
-                      </h4>
+                      <h4 className="font-medium text-gray-900 text-sm ml-2">{suggestion.title}</h4>
                       <span
                         className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
                           suggestion.priority === "high"
@@ -527,12 +493,8 @@ const SmartEnvelopeSuggestions = ({
                       </span>
                     </div>
 
-                    <p className="text-sm text-gray-600 mb-1">
-                      {suggestion.description}
-                    </p>
-                    <p className="text-xs text-gray-500 italic">
-                      {suggestion.reasoning}
-                    </p>
+                    <p className="text-sm text-gray-600 mb-1">{suggestion.description}</p>
+                    <p className="text-xs text-gray-500 italic">{suggestion.reasoning}</p>
                   </div>
 
                   <div className="text-right ml-4">
@@ -547,13 +509,9 @@ const SmartEnvelopeSuggestions = ({
                 <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200">
                   <div className="flex items-center text-xs text-gray-500">
                     {getTypeIcon(suggestion.type)}
-                    <span className="ml-1 capitalize">
-                      {suggestion.action.replace("_", " ")}
-                    </span>
+                    <span className="ml-1 capitalize">{suggestion.action.replace("_", " ")}</span>
                     <span className="mx-2">•</span>
-                    <span className="capitalize">
-                      {suggestion.impact} impact
-                    </span>
+                    <span className="capitalize">{suggestion.impact} impact</span>
                   </div>
 
                   <div className="flex gap-2">

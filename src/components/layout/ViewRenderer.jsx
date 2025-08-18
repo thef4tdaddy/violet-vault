@@ -13,10 +13,7 @@ import DebtDashboard from "../debt/DebtDashboard";
 import AutoFundingView from "../automation/AutoFundingView";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ErrorBoundary } from "@highlight-run/react";
-import {
-  useUnassignedCash,
-  useActualBalance,
-} from "../../hooks/useBudgetMetadata";
+import { useUnassignedCash, useActualBalance } from "../../hooks/useBudgetMetadata";
 import useBills from "../../hooks/useBills";
 import logger from "../../utils/logger";
 
@@ -24,13 +21,7 @@ import logger from "../../utils/logger";
  * ViewRenderer component for handling main content switching
  * Extracted from Layout.jsx for better organization
  */
-const ViewRenderer = ({
-  activeView,
-  budget,
-  currentUser,
-  totalBiweeklyNeed,
-  setActiveView,
-}) => {
+const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setActiveView }) => {
   // Use TanStack Query hooks for budget metadata
   const { unassignedCash } = useUnassignedCash();
   const { actualBalance } = useActualBalance();
@@ -68,11 +59,9 @@ const ViewRenderer = ({
   } = budget;
 
   // Filter out null/undefined transactions to prevent runtime errors
-  const allTransactions = (rawAllTransactions || []).filter(
-    (t) => t && typeof t === "object",
-  );
+  const allTransactions = (rawAllTransactions || []).filter((t) => t && typeof t === "object");
   const safeTransactions = (transactions || []).filter(
-    (t) => t && typeof t === "object" && typeof t.amount === "number",
+    (t) => t && typeof t === "object" && typeof t.amount === "number"
   );
 
   // Stable callback for bill updates
@@ -87,13 +76,10 @@ const ViewRenderer = ({
       try {
         // Use TanStack Query updateBill for proper bill persistence with envelope assignment
         tanStackUpdateBill({ id: updatedBill.id, updates: updatedBill });
-        logger.debug(
-          "ViewRenderer TanStack updateBill completed successfully",
-          {
-            billId: updatedBill.id,
-            envelopeId: updatedBill.envelopeId,
-          },
-        );
+        logger.debug("ViewRenderer TanStack updateBill completed successfully", {
+          billId: updatedBill.id,
+          envelopeId: updatedBill.envelopeId,
+        });
       } catch (error) {
         logger.error("Error in ViewRenderer handleUpdateBill", error, {
           billId: updatedBill.id,
@@ -101,7 +87,7 @@ const ViewRenderer = ({
         });
       }
     },
-    [tanStackUpdateBill],
+    [tanStackUpdateBill]
   );
 
   // Debug log to verify function creation - only on dev sites
@@ -129,9 +115,7 @@ const ViewRenderer = ({
               </div>
               Budget Envelopes
             </h2>
-            <p className="text-gray-600 mt-1">
-              Organize your money into spending categories
-            </p>
+            <p className="text-gray-600 mt-1">Organize your money into spending categories</p>
           </div>
           <button
             onClick={() => setActiveView("automation")}
@@ -219,16 +203,14 @@ const ViewRenderer = ({
             createdAt: new Date().toISOString(),
           };
           addBill(bill);
-          logger.debug(
-            "✅ Bill stored successfully - no transaction created until paid",
-          );
+          logger.debug("✅ Bill stored successfully - no transaction created until paid");
         }}
         onSearchNewBills={async () => {
           try {
             // This would integrate with email parsing or other bill detection services
             // For now, we'll show a placeholder notification
             alert(
-              "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox.",
+              "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox."
             );
           } catch (error) {
             logger.error("Failed to search for new bills:", error);
@@ -249,21 +231,15 @@ const ViewRenderer = ({
         onUpdateTransaction={_updateTransaction}
         onDeleteTransaction={_deleteTransaction}
         onBulkImport={(newTransactions) => {
-          logger.debug(
-            "🔄 onBulkImport called with transactions:",
-            newTransactions.length,
-          );
+          logger.debug("🔄 onBulkImport called with transactions:", newTransactions.length);
 
           // Validate and normalize transactions for current data structure
           const validatedTransactions = newTransactions
-            .filter(
-              (transaction) => transaction && typeof transaction === "object",
-            )
+            .filter((transaction) => transaction && typeof transaction === "object")
             .map((transaction) => ({
               // Ensure required fields with proper defaults
               id:
-                transaction.id ||
-                `import_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                transaction.id || `import_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
               date: transaction.date || new Date().toISOString().split("T")[0],
               description: transaction.description || "Imported Transaction",
               amount: parseFloat(transaction.amount) || 0,
@@ -272,8 +248,7 @@ const ViewRenderer = ({
 
               // Import metadata
               type:
-                transaction.type ||
-                (parseFloat(transaction.amount) >= 0 ? "income" : "expense"),
+                transaction.type || (parseFloat(transaction.amount) >= 0 ? "income" : "expense"),
               notes: transaction.notes || "",
               importSource: "file_import",
               createdBy: currentUser?.userName || "Unknown",
@@ -295,8 +270,8 @@ const ViewRenderer = ({
                       "envelopeId",
                       "type",
                       "notes",
-                    ].includes(key),
-                ),
+                    ].includes(key)
+                )
               ),
             }));
 
@@ -310,7 +285,7 @@ const ViewRenderer = ({
             addTransactions(validatedTransactions);
             logger.debug(
               "💾 Bulk import complete. Added transactions:",
-              validatedTransactions.length,
+              validatedTransactions.length
             );
           } catch (error) {
             logger.error("Failed to import transactions:", error);
@@ -320,10 +295,7 @@ const ViewRenderer = ({
               try {
                 addTransaction(transaction);
               } catch (individualError) {
-                logger.error(
-                  `Failed to import transaction ${transaction.id}:`,
-                  individualError,
-                );
+                logger.error(`Failed to import transaction ${transaction.id}:`, individualError);
               }
             });
           }
@@ -344,9 +316,7 @@ const ViewRenderer = ({
 
   return (
     <ErrorBoundary>
-      <Suspense
-        fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}
-      >
+      <Suspense fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}>
         {views[activeView]}
       </Suspense>
     </ErrorBoundary>

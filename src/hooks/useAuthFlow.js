@@ -32,9 +32,7 @@ const useAuthFlow = () => {
         const { encryptionUtils } = await import("../utils/encryption");
         const userDataWithId = {
           ...userData,
-          budgetId:
-            userData.budgetId ||
-            encryptionUtils.generateBudgetId(userData.password),
+          budgetId: userData.budgetId || encryptionUtils.generateBudgetId(userData.password),
         };
 
         logger.auth("Calling login", {
@@ -57,17 +55,14 @@ const useAuthFlow = () => {
           }
         } else {
           logger.error("❌ Setup failed:", result.error);
-          showErrorToast(
-            `Setup failed: ${result.error}`,
-            "Account Setup Failed",
-          );
+          showErrorToast(`Setup failed: ${result.error}`, "Account Setup Failed");
         }
       } catch (error) {
         logger.error("❌ Setup error:", error);
         showErrorToast(`Setup error: ${error.message}`, "Setup Error");
       }
     },
-    [login, budgetStore, showErrorToast],
+    [login, budgetStore, showErrorToast]
   );
 
   const handleLogout = useCallback(() => {
@@ -78,15 +73,12 @@ const useAuthFlow = () => {
     async (oldPass, newPass) => {
       const result = await changePassword(oldPass, newPass);
       if (!result.success) {
-        showErrorToast(
-          `Password change failed: ${result.error}`,
-          "Password Change Failed",
-        );
+        showErrorToast(`Password change failed: ${result.error}`, "Password Change Failed");
       } else {
         showSuccessToast("Password updated successfully", "Password Changed");
       }
     },
-    [changePassword, showErrorToast, showSuccessToast],
+    [changePassword, showErrorToast, showSuccessToast]
   );
 
   const handleUpdateProfile = useCallback(
@@ -96,7 +88,7 @@ const useAuthFlow = () => {
         throw new Error(result.error);
       }
     },
-    [updateProfile],
+    [updateProfile]
   );
 
   return {
