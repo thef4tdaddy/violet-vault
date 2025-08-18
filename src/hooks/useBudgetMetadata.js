@@ -31,12 +31,36 @@ export const useBudgetMetadata = () => {
     queryKey: queryKeys.budgetMetadata,
     queryFn: async () => {
       logger.debug("TanStack Query: Fetching budget metadata from Dexie");
-      const result = await getBudgetMetadata();
+      let result = await getBudgetMetadata();
+
+      // Initialize metadata record if it doesn't exist (new users or clean installs)
+      if (!result) {
+        logger.debug(
+          "TanStack Query: No metadata found, initializing with defaults",
+        );
+        const defaultMetadata = {
+          unassignedCash: 0,
+          actualBalance: 0,
+          isActualBalanceManual: false,
+          biweeklyAllocation: 0,
+        };
+
+        await setBudgetMetadata(defaultMetadata);
+        result = defaultMetadata;
+
+        logger.debug(
+          "TanStack Query: Budget metadata initialized with defaults",
+          defaultMetadata,
+        );
+      }
+
       logger.debug("TanStack Query: Budget metadata loaded", {
         unassignedCash: result?.unassignedCash || 0,
         actualBalance: result?.actualBalance || 0,
         hasData: !!result,
+        wasInitialized: !result,
       });
+
       return result || {};
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
