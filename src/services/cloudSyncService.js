@@ -388,6 +388,10 @@ class CloudSyncService {
 
       const duration = Date.now() - startTime;
       this.lastSyncTime = Date.now();
+      
+      // Update sync hash after successful sync
+      const currentData = await this.fetchDexieData();
+      this.lastSyncedCommitHash = currentData.lastModified.toString();
 
       logger.debug("✅ Chunked sync completed", {
         direction: result.direction,
@@ -972,7 +976,7 @@ class CloudSyncService {
           previousModTime: new Date(lastSyncedTime).toISOString(),
           currentModTime: new Date(currentModTime).toISOString(),
         });
-        this.lastSyncedCommitHash = currentModTime.toString();
+        // Don't update hash here - only update after successful sync
       } else {
         logger.debug("⏭️ No data changes since last sync", {
           modTime: new Date(currentModTime).toISOString(),
