@@ -122,4 +122,15 @@ export const encryptionUtils = {
     }
     return `budget_${Math.abs(hash).toString(16)}`;
   },
+
+  generateHash(data) {
+    let hash = 0;
+    const str = typeof data === "string" ? data : JSON.stringify(data);
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash = hash & hash;
+    }
+    return Math.abs(hash).toString(16);
+  },
 };
