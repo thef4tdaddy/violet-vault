@@ -16,13 +16,18 @@ import { H } from "./highlight.js";
 import { firebaseConfig } from "./firebaseConfig";
 import logger from "./logger.js";
 
-console.log("🔥 Firebase: Starting initialization...", firebaseConfig.projectId);
+logger.info("🔥 Firebase: Starting initialization...", {
+  projectId: firebaseConfig.projectId,
+  authDomain: firebaseConfig.authDomain,
+});
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-console.log("✅ Firebase: Initialization complete!", firebaseConfig.projectId);
+logger.info("✅ Firebase: Initialization complete!", {
+  projectId: firebaseConfig.projectId,
+});
 
 // Expose Firebase to window for debugging (development/staging only)
 if (
