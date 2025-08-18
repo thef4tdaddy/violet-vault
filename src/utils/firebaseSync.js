@@ -8,7 +8,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { encryptionUtils } from "./encryption";
-import { H } from "./highlight.js";
+import { captureError, trackEvent } from "./logrocket.js";
 import { firebaseConfig } from "./firebaseConfig";
 import logger from "./logger";
 
@@ -63,8 +63,8 @@ class FirebaseSync {
       });
     }
 
-    // Log initialization to Highlight.io
-    H.track("firebase-sync-initialized", {
+    // Log initialization to LogRocket
+    trackEvent("firebase-sync-initialized", {
       component: "FirebaseSync",
       operation: "initialize",
       budgetId,
@@ -247,13 +247,11 @@ class FirebaseSync {
     } catch (error) {
       logger.error("❌ Failed to decrypt cloud data:", error);
 
-      // Send error to Highlight.io with context
-      H.consumeError(error, {
-        metadata: {
-          hasEncryptionKey: !!this.encryptionKey,
-          errorName: error.name,
-          errorMessage: error.message,
-        },
+      // Send error to LogRocket with context
+      captureError(error, {
+        hasEncryptionKey: !!this.encryptionKey,
+        errorName: error.name,
+        errorMessage: error.message,
       });
 
       // Check for common decryption issues
@@ -279,23 +277,19 @@ class FirebaseSync {
 
   async saveToCloud(data, currentUser, options = {}) {
     if (!this.budgetId || !this.encryptionKey) {
-      H.consumeError(new Error("SaveToCloud failed - not initialized"), {
-        metadata: {
-          hasBudgetId: !!this.budgetId,
-          hasEncryptionKey: !!this.encryptionKey,
-          userName: currentUser?.userName,
-        },
-        tags: {
-          component: "FirebaseSync",
-          operation: "saveToCloud",
-          issue: "not_initialized",
-        },
+      captureError(new Error("SaveToCloud failed - not initialized"), {
+        hasBudgetId: !!this.budgetId,
+        hasEncryptionKey: !!this.encryptionKey,
+        userName: currentUser?.userName,
+        component: "FirebaseSync",
+        operation: "saveToCloud",
+        issue: "not_initialized",
       });
       throw new Error("Firebase sync not initialized");
     }
 
-    // Log save attempt to Highlight.io
-    H.track("save-to-cloud-started", {
+    // Log save attempt to LogRocket
+    trackEvent("save-to-cloud-started", {
       component: "FirebaseSync",
       operation: "saveToCloud",
       budgetId: this.budgetId,
@@ -309,7 +303,7 @@ class FirebaseSync {
     if (!this.isOnline && !options.skipQueue) {
       this.queueSyncOperation("save", { data, currentUser });
       logger.info("📴 Queued save operation for when online");
-      H.track("save-to-cloud-queued", {
+      trackEvent("save-to-cloud-queued", {
         component: "FirebaseSync",
         operation: "saveToCloud",
         status: "queued",
@@ -363,13 +357,11 @@ class FirebaseSync {
     } catch (error) {
       logger.error("❌ Failed to save to cloud:", error);
 
-      // Send error to Highlight.io with context
-      H.consumeError(error, {
-        metadata: {
-          budgetId: this.budgetId,
-          isNetworkBlocked: this.isNetworkBlockingError(error),
-          retryAttempts: this.retryAttempts,
-        },
+      // Send error to LogRocket with context
+      captureError(error, {
+        budgetId: this.budgetId,
+        isNetworkBlocked: this.isNetworkBlockingError(error),
+        retryAttempts: this.retryAttempts,
       });
 
       // Handle network blocking errors

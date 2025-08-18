@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { H } from "../utils/highlight.js";
+import { getSessionURL } from "../utils/logrocket.js";
 import { APP_VERSION } from "../utils/version";
 import logger from "../utils/logger";
 
 /**
  * Custom hook for bug report functionality
- * Handles screenshot capture, form state, submission logic, and Highlight.io session replay
+ * Handles screenshot capture, form state, submission logic, and LogRocket session replay
  */
 const useBugReport = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -244,61 +244,17 @@ const useBugReport = () => {
           }
         }
 
-        // Get Highlight.io session URL for the bug report
+        // Get LogRocket session URL for the bug report
         let sessionUrl = null;
         try {
-          // Enhanced session URL retrieval with better error handling
-          if (typeof H.getSessionMetadata === "function") {
-            try {
-              const sessionMetadata = H.getSessionMetadata();
-              if (sessionMetadata?.sessionUrl) {
-                sessionUrl = String(sessionMetadata.sessionUrl);
-              } else if (sessionMetadata?.url) {
-                sessionUrl = String(sessionMetadata.url);
-              }
-            } catch (metadataError) {
-              logger.warn("getSessionMetadata failed:", metadataError.message);
-            }
-          }
-
-          // Fallback methods if primary method failed
-          if (!sessionUrl && typeof H.getSessionURL === "function") {
-            try {
-              const rawUrl = H.getSessionURL();
-              sessionUrl = typeof rawUrl === "string" ? rawUrl : String(rawUrl);
-            } catch (urlError) {
-              logger.warn("getSessionURL failed:", urlError.message);
-            }
-          }
-
-          if (!sessionUrl && typeof H.getSession === "function") {
-            try {
-              const session = H.getSession();
-              const rawUrl =
-                session?.url || session?.sessionUrl || session?.replayUrl;
-              sessionUrl = rawUrl ? String(rawUrl) : null;
-            } catch (sessionError) {
-              logger.warn("getSession failed:", sessionError.message);
-            }
-          }
-
-          // Additional fallback for newer SDK versions
-          if (!sessionUrl && typeof H.getCurrentSessionURL === "function") {
-            try {
-              const currentUrl = H.getCurrentSessionURL();
-              sessionUrl =
-                typeof currentUrl === "string"
-                  ? currentUrl
-                  : String(currentUrl);
-            } catch (currentError) {
-              logger.warn("getCurrentSessionURL failed:", currentError.message);
-            }
+          sessionUrl = getSessionURL();
+          if (sessionUrl) {
+            logger.debug("LogRocket session URL retrieved successfully");
+          } else {
+            logger.warn("LogRocket session URL not available");
           }
         } catch (error) {
-          logger.warn(
-            "Failed to get Highlight.io session metadata:",
-            error.message,
-          );
+          logger.warn("Failed to get LogRocket session URL:", error.message);
         }
 
         // Get current page context for smart labeling
@@ -565,7 +521,7 @@ const useBugReport = () => {
           screenshot: screenshotData,
           sessionUrl:
             sessionUrl ||
-            "Session replay unavailable (possibly blocked by adblocker)",
+            "Session replay unavailable (LogRocket not initialized or error occurred)",
           env: {
             userAgent: navigator.userAgent,
             url: window.location.href,
@@ -717,55 +673,22 @@ const useBugReport = () => {
   };
 
   const openModal = () => {
-    // Ensure Highlight.io session is active when opening bug report modal
-    try {
-      // Enhanced session management to handle conflicts better
-      if (typeof H.isRecording === "function") {
-        // Modern SDK with isRecording method
-        if (!H.isRecording()) {
-          H.start();
-          if (import.meta.env.MODE === "development") {
-            logger.debug("Started Highlight.io session for bug report");
-          }
+    // LogRocket is automatically recording when initialized, no need to manually start
+    // Just verify we can get session URL for better debugging
+    if (import.meta.env.MODE === "development") {
+      try {
+        const currentSessionUrl = getSessionURL();
+        if (currentSessionUrl) {
+          logger.debug("LogRocket session available for bug report", {
+            hasSessionUrl: !!currentSessionUrl,
+          });
         } else {
-          if (import.meta.env.MODE === "development") {
-            logger.debug("Highlight.io session already active");
-          }
-        }
-      } else {
-        // Older SDK or no isRecording method - try graceful start
-        try {
-          H.start();
-          if (import.meta.env.MODE === "development") {
-            logger.debug("Attempted Highlight.io session start for bug report");
-          }
-        } catch (startError) {
-          if (startError.message?.includes("already recording")) {
-            if (import.meta.env.MODE === "development") {
-              logger.debug(
-                "Highlight.io session already active (detected via error)",
-              );
-            }
-          } else {
-            throw startError; // Re-throw unexpected errors
-          }
-        }
-      }
-    } catch (error) {
-      // Enhanced error handling for session conflicts
-      if (
-        error.message?.includes("already recording") ||
-        error.message?.includes("Highlight is already recording")
-      ) {
-        if (import.meta.env.MODE === "development") {
           logger.debug(
-            "Highlight.io session already active (gracefully handled)",
+            "LogRocket session URL not available - may impact bug report quality",
           );
         }
-        // This is expected - don't log as error
-      } else {
-        logger.warn("Failed to start Highlight.io session:", error.message);
-        // Don't block the bug report modal from opening due to Highlight issues
+      } catch (error) {
+        logger.warn("LogRocket session check failed:", error.message);
       }
     }
     setIsModalOpen(true);

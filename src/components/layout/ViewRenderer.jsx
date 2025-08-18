@@ -12,7 +12,7 @@ import ChartsAndAnalytics from "../analytics/ChartsAndAnalytics";
 import DebtDashboard from "../debt/DebtDashboard";
 import AutoFundingView from "../automation/AutoFundingView";
 import LoadingSpinner from "../ui/LoadingSpinner";
-import { ErrorBoundary } from "@highlight-run/react";
+import ErrorBoundary from "../ui/ErrorBoundary";
 import {
   useUnassignedCash,
   useActualBalance,
