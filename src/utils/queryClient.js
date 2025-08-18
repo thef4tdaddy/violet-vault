@@ -1,5 +1,5 @@
 import { QueryClient, MutationCache, QueryCache } from "@tanstack/react-query";
-import { H } from "./highlight";
+import { captureError } from "./logrocket";
 import { budgetDb } from "../db/budgetDb";
 import logger from "./logger.js";
 
@@ -41,9 +41,11 @@ const queryClient = new QueryClient({
           context,
           source: "queryClient",
         });
-        H.consumeError(error, {
-          metadata: { variables, context },
-          tags: { type: "mutation_error" },
+        captureError(error, {
+          variables,
+          context,
+          source: "queryClient",
+          type: "mutation_error",
         });
       },
     },
@@ -56,9 +58,10 @@ const queryClient = new QueryClient({
         queryKey: query.queryKey,
         source: "queryClient",
       });
-      H.consumeError(error, {
-        metadata: { queryKey: query.queryKey },
-        tags: { type: "query_error" },
+      captureError(error, {
+        queryKey: query.queryKey,
+        source: "queryClient",
+        type: "query_error",
       });
     },
     onSuccess: (data, query) => {
