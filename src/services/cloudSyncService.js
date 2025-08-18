@@ -495,15 +495,15 @@ class CloudSyncService {
         unassignedCash: budgetMetadata?.unassignedCash || 0,
         actualBalance: budgetMetadata?.actualBalance || 0,
         lastModified: Math.max(
-          ...envelopes.map((e) => e.lastModified || e.createdAt || 0),
-          ...transactions.map((t) => t.lastModified || t.createdAt || 0),
-          ...bills.map((b) => b.lastModified || b.createdAt || 0),
-          ...debts.map((d) => d.lastModified || d.createdAt || 0),
-          ...budgetCommits.map((c) => c.timestamp || 0),
-          ...budgetChanges.map((c) => c.timestamp || 0),
-          ...budgetBranches.map((b) => b.created || 0),
-          ...budgetTags.map((t) => t.created || 0),
-          budgetMetadata?.lastModified || 0,
+          ...envelopes.map((e) => this._ensureNumericTimestamp(e.lastModified || e.createdAt || 0)),
+          ...transactions.map((t) => this._ensureNumericTimestamp(t.lastModified || t.createdAt || 0)),
+          ...bills.map((b) => this._ensureNumericTimestamp(b.lastModified || b.createdAt || 0)),
+          ...debts.map((d) => this._ensureNumericTimestamp(d.lastModified || d.createdAt || 0)),
+          ...budgetCommits.map((c) => this._ensureNumericTimestamp(c.timestamp || 0)),
+          ...budgetChanges.map((c) => this._ensureNumericTimestamp(c.timestamp || 0)),
+          ...budgetBranches.map((b) => this._ensureNumericTimestamp(b.created || 0)),
+          ...budgetTags.map((t) => this._ensureNumericTimestamp(t.created || 0)),
+          this._ensureNumericTimestamp(budgetMetadata?.lastModified || 0),
           0,
         ),
       };
@@ -1006,6 +1006,26 @@ class CloudSyncService {
    */
   get serviceIsRunning() {
     return this.isRunning;
+  }
+
+  /**
+   * Ensure timestamp is numeric, convert strings to numbers
+   * Fixes sync issues caused by string timestamps
+   */
+  _ensureNumericTimestamp(timestamp) {
+    if (typeof timestamp === "string") {
+      const parsed = new Date(timestamp).getTime();
+      if (!isNaN(parsed)) {
+        logger.warn(`Converting string timestamp to number: ${timestamp} -> ${parsed}`);
+        return parsed;
+      }
+      logger.warn(`Invalid timestamp string: ${timestamp}, using 0`);
+      return 0;
+    }
+    if (typeof timestamp === "number" && !isNaN(timestamp)) {
+      return timestamp;
+    }
+    return 0;
   }
 }
 
