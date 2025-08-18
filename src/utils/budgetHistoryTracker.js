@@ -42,8 +42,7 @@ export class BudgetHistoryTracker {
         afterData,
         author,
         timestamp: Date.now(),
-        deviceFingerprint:
-          deviceFingerprint || encryptionUtils.generateDeviceFingerprint(),
+        deviceFingerprint: deviceFingerprint || encryptionUtils.generateDeviceFingerprint(),
       };
 
       const hash = encryptionUtils.generateHash(JSON.stringify(commitData));
@@ -61,7 +60,7 @@ export class BudgetHistoryTracker {
       const encryptedSnapshot = await encryptionUtils.encrypt(
         snapshot,
         // Use a temporary key for now - in real implementation this would be the user's key
-        new Uint8Array(32).fill(42),
+        new Uint8Array(32).fill(42)
       );
 
       // Create the commit
@@ -268,10 +267,7 @@ export class BudgetHistoryTracker {
   }) {
     try {
       // Check if branch name already exists
-      const existingBranch = await budgetDb.budgetBranches
-        .where("name")
-        .equals(branchName)
-        .first();
+      const existingBranch = await budgetDb.budgetBranches.where("name").equals(branchName).first();
 
       if (existingBranch) {
         throw new Error(`Branch '${branchName}' already exists`);
@@ -329,20 +325,14 @@ export class BudgetHistoryTracker {
   }) {
     try {
       // Check if tag name already exists
-      const existingTag = await budgetDb.budgetTags
-        .where("name")
-        .equals(tagName)
-        .first();
+      const existingTag = await budgetDb.budgetTags.where("name").equals(tagName).first();
 
       if (existingTag) {
         throw new Error(`Tag '${tagName}' already exists`);
       }
 
       // Verify the commit exists
-      const commit = await budgetDb.budgetCommits
-        .where("hash")
-        .equals(commitHash)
-        .first();
+      const commit = await budgetDb.budgetCommits.where("hash").equals(commitHash).first();
 
       if (!commit) {
         throw new Error(`Commit '${commitHash}' not found`);
@@ -385,12 +375,9 @@ export class BudgetHistoryTracker {
       });
 
       // Activate the target branch
-      const updatedCount = await budgetDb.budgetBranches
-        .where("name")
-        .equals(branchName)
-        .modify({
-          isActive: true,
-        });
+      const updatedCount = await budgetDb.budgetBranches.where("name").equals(branchName).modify({
+        isActive: true,
+      });
 
       if (updatedCount === 0) {
         throw new Error(`Branch '${branchName}' not found`);
@@ -410,9 +397,7 @@ export class BudgetHistoryTracker {
    */
   static async getBranches() {
     try {
-      const branches = await budgetDb.budgetBranches
-        .orderBy("created")
-        .toArray();
+      const branches = await budgetDb.budgetBranches.orderBy("created").toArray();
       return branches;
     } catch (error) {
       logger.error("Failed to get budget history branches:", error);
@@ -425,10 +410,7 @@ export class BudgetHistoryTracker {
    */
   static async getTags() {
     try {
-      const tags = await budgetDb.budgetTags
-        .orderBy("created")
-        .reverse()
-        .toArray();
+      const tags = await budgetDb.budgetTags.orderBy("created").reverse().toArray();
       return tags;
     } catch (error) {
       logger.error("Failed to get budget history tags:", error);
@@ -452,13 +434,13 @@ export class BudgetHistoryTracker {
 
       // Generate signature hash (in production, this would use proper cryptographic signing)
       const signature = encryptionUtils.generateHash(
-        JSON.stringify(signaturePayload) + deviceFingerprint,
+        JSON.stringify(signaturePayload) + deviceFingerprint
       );
 
       // Verify device consistency
       const isDeviceConsistent = await this.verifyDeviceConsistency(
         commitData.author,
-        deviceFingerprint,
+        deviceFingerprint
       );
 
       return {
@@ -494,19 +476,12 @@ export class BudgetHistoryTracker {
 
       // Check fingerprint consistency
       const knownFingerprints = [
-        ...new Set(
-          recentCommits
-            .map((c) => c.deviceFingerprint)
-            .filter((f) => f && f !== ""),
-        ),
+        ...new Set(recentCommits.map((c) => c.deviceFingerprint).filter((f) => f && f !== "")),
       ];
 
       // Allow up to 3 different fingerprints per author (multiple devices)
       if (knownFingerprints.length <= 3) {
-        return (
-          knownFingerprints.includes(currentFingerprint) ||
-          knownFingerprints.length < 3
-        );
+        return knownFingerprints.includes(currentFingerprint) || knownFingerprints.length < 3;
       }
 
       return knownFingerprints.includes(currentFingerprint);
@@ -523,21 +498,13 @@ export class BudgetHistoryTracker {
     try {
       const cutoffTime = Date.now() - timeRangeMs;
 
-      const changes = await budgetDb.budgetChanges
-        .where("commitHash")
-        .above("")
-        .toArray();
+      const changes = await budgetDb.budgetChanges.where("commitHash").above("").toArray();
 
       // Get commits within time range
-      const commits = await budgetDb.budgetCommits
-        .where("timestamp")
-        .above(cutoffTime)
-        .toArray();
+      const commits = await budgetDb.budgetCommits.where("timestamp").above(cutoffTime).toArray();
 
       const commitHashes = new Set(commits.map((c) => c.hash));
-      const recentChanges = changes.filter((c) =>
-        commitHashes.has(c.commitHash),
-      );
+      const recentChanges = changes.filter((c) => commitHashes.has(c.commitHash));
 
       // Analyze patterns
       const patterns = {
@@ -560,8 +527,7 @@ export class BudgetHistoryTracker {
 
       // Group by author activity
       commits.forEach((commit) => {
-        patterns.authorActivity[commit.author] =
-          (patterns.authorActivity[commit.author] || 0) + 1;
+        patterns.authorActivity[commit.author] = (patterns.authorActivity[commit.author] || 0) + 1;
       });
 
       // Daily activity pattern
@@ -572,8 +538,7 @@ export class BudgetHistoryTracker {
 
       // Calculate average changes per day
       const days = Object.keys(patterns.dailyActivity).length;
-      patterns.averageChangesPerDay =
-        days > 0 ? recentChanges.length / days : 0;
+      patterns.averageChangesPerDay = days > 0 ? recentChanges.length / days : 0;
 
       // Find most active hour
       const hourCounts = {};
@@ -583,9 +548,8 @@ export class BudgetHistoryTracker {
       });
 
       patterns.mostActiveHour = Object.keys(hourCounts).reduce(
-        (maxHour, hour) =>
-          hourCounts[hour] > (hourCounts[maxHour] || 0) ? hour : maxHour,
-        null,
+        (maxHour, hour) => (hourCounts[hour] > (hourCounts[maxHour] || 0) ? hour : maxHour),
+        null
       );
 
       return patterns;

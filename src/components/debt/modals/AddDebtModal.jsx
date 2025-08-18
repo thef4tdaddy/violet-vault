@@ -1,10 +1,6 @@
 import React, { useState } from "react";
 import { X, CreditCard, Wallet, Receipt } from "lucide-react";
-import {
-  DEBT_TYPES,
-  DEBT_TYPE_CONFIG,
-  PAYMENT_FREQUENCIES,
-} from "../../../constants/debts";
+import { DEBT_TYPES, DEBT_TYPE_CONFIG, PAYMENT_FREQUENCIES } from "../../../constants/debts";
 import { useBudgetStore } from "../../../stores/budgetStore";
 import logger from "../../../utils/logger";
 
@@ -104,8 +100,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
 
     if (
       formData.interestRate &&
-      (parseFloat(formData.interestRate) < 0 ||
-        parseFloat(formData.interestRate) > 100)
+      (parseFloat(formData.interestRate) < 0 || parseFloat(formData.interestRate) > 100)
     ) {
       newErrors.interestRate = "Interest rate must be between 0 and 100";
     }
@@ -148,10 +143,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
         resetForm(); // Only reset form when adding new debt
       }
     } catch (error) {
-      logger.error(
-        `Error ${isEditMode ? "updating" : "creating"} debt:`,
-        error,
-      );
+      logger.error(`Error ${isEditMode ? "updating" : "creating"} debt:`, error);
       setErrors({
         submit: `Failed to ${isEditMode ? "update" : "create"} debt. Please try again.`,
       });
@@ -212,51 +204,35 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Debt Name *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Debt Name *</label>
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   placeholder="e.g., Car Loan, Credit Card"
                 />
-                {errors.name && (
-                  <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-                )}
+                {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Creditor *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Creditor *</label>
                 <input
                   type="text"
                   value={formData.creditor}
-                  onChange={(e) =>
-                    setFormData({ ...formData, creditor: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, creditor: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   placeholder="e.g., Chase Bank, Capital One"
                 />
-                {errors.creditor && (
-                  <p className="mt-1 text-sm text-red-600">{errors.creditor}</p>
-                )}
+                {errors.creditor && <p className="mt-1 text-sm text-red-600">{errors.creditor}</p>}
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Debt Type
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Debt Type</label>
               <select
                 value={formData.type}
-                onChange={(e) =>
-                  setFormData({ ...formData, type: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
               >
                 {Object.values(DEBT_TYPES).map((type) => {
@@ -285,16 +261,12 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                   step="0.01"
                   min="0"
                   value={formData.currentBalance}
-                  onChange={(e) =>
-                    setFormData({ ...formData, currentBalance: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, currentBalance: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   placeholder="0.00"
                 />
                 {errors.currentBalance && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.currentBalance}
-                  </p>
+                  <p className="mt-1 text-sm text-red-600">{errors.currentBalance}</p>
                 )}
               </div>
 
@@ -317,9 +289,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                   placeholder="Leave blank to auto-fill"
                 />
                 {errors.originalBalance && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.originalBalance}
-                  </p>
+                  <p className="mt-1 text-sm text-red-600">{errors.originalBalance}</p>
                 )}
               </div>
             </div>
@@ -334,16 +304,12 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                   step="0.01"
                   min="0"
                   value={formData.minimumPayment}
-                  onChange={(e) =>
-                    setFormData({ ...formData, minimumPayment: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, minimumPayment: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   placeholder="0.00"
                 />
                 {errors.minimumPayment && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.minimumPayment}
-                  </p>
+                  <p className="mt-1 text-sm text-red-600">{errors.minimumPayment}</p>
                 )}
               </div>
             </div>
@@ -359,16 +325,12 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                   min="0"
                   max="100"
                   value={formData.interestRate}
-                  onChange={(e) =>
-                    setFormData({ ...formData, interestRate: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, interestRate: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   placeholder="0.00"
                 />
                 {errors.interestRate && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.interestRate}
-                  </p>
+                  <p className="mt-1 text-sm text-red-600">{errors.interestRate}</p>
                 )}
               </div>
 
@@ -402,9 +364,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
               <input
                 type="date"
                 value={formData.paymentDueDate}
-                onChange={(e) =>
-                  setFormData({ ...formData, paymentDueDate: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, paymentDueDate: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
               />
             </div>
@@ -426,9 +386,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                   name="paymentMethod"
                   value="create_new"
                   checked={formData.paymentMethod === "create_new"}
-                  onChange={(e) =>
-                    setFormData({ ...formData, paymentMethod: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
                   className="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"
                 />
                 <label
@@ -447,9 +405,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                   name="paymentMethod"
                   value="connect_existing"
                   checked={formData.paymentMethod === "connect_existing"}
-                  onChange={(e) =>
-                    setFormData({ ...formData, paymentMethod: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
                   className="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"
                 />
                 <label
@@ -479,11 +435,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                       })
                     }
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    placeholder={
-                      formData.name
-                        ? `${formData.name} Payment`
-                        : "Debt Payment"
-                    }
+                    placeholder={formData.name ? `${formData.name} Payment` : "Debt Payment"}
                   />
                   <p className="mt-1 text-xs text-gray-500">
                     A new envelope will be created to fund this debt's payments
@@ -501,9 +453,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                   </label>
                   <select
                     value={formData.envelopeId}
-                    onChange={(e) =>
-                      setFormData({ ...formData, envelopeId: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, envelopeId: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   >
                     <option value="">Select existing envelope...</option>
@@ -526,14 +476,10 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
 
           {/* Notes */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Notes (Optional)
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
             <textarea
               value={formData.notes}
-              onChange={(e) =>
-                setFormData({ ...formData, notes: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               rows={3}
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
               placeholder="Additional notes about this debt..."
