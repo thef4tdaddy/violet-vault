@@ -1,6 +1,7 @@
 import React, { memo, lazy, Suspense } from "react";
 import { DollarSign, Wallet, Target, TrendingUp } from "lucide-react";
 import { useBudgetStore } from "../../stores/budgetStore";
+import { useActualBalance } from "../../hooks/useBudgetMetadata";
 import { useUnassignedCash } from "../../hooks/useBudgetMetadata";
 import { useEnvelopes } from "../../hooks/useEnvelopes";
 import { useSavingsGoals } from "../../hooks/useSavingsGoals";
@@ -15,17 +16,22 @@ import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
  */
 const SummaryCards = () => {
   const { openUnassignedCashModal } = useBudgetStore();
-  const { unassignedCash, isLoading: unassignedCashLoading } = useUnassignedCash();
+  const { unassignedCash, isLoading: unassignedCashLoading } =
+    useUnassignedCash();
+  const { actualBalance, updateActualBalance } = useActualBalance();
 
   // Get data from TanStack Query hooks (same pattern as Dashboard)
   const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
   const { savingsGoals = [], isLoading: savingsLoading } = useSavingsGoals();
 
   // Calculate totals from hook data
-  const totalEnvelopeBalance = envelopes.reduce((sum, env) => sum + (env.currentBalance || 0), 0);
+  const totalEnvelopeBalance = envelopes.reduce(
+    (sum, env) => sum + (env.currentBalance || 0),
+    0,
+  );
   const totalSavingsBalance = savingsGoals.reduce(
     (sum, goal) => sum + (goal.currentAmount || 0),
-    0
+    0,
   );
   const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
 
@@ -42,16 +48,23 @@ const SummaryCards = () => {
 
   // Calculate total biweekly funding need
   const biweeklyAllocation = envelopes.reduce((sum, env) => {
-    const envelopeType = env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
+    const envelopeType =
+      env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
 
     let biweeklyNeed = 0;
     if (envelopeType === "bill" && env.biweeklyAllocation) {
-      biweeklyNeed = Math.max(0, env.biweeklyAllocation - (env.currentBalance || 0));
+      biweeklyNeed = Math.max(
+        0,
+        env.biweeklyAllocation - (env.currentBalance || 0),
+      );
     } else if (envelopeType === "variable" && env.monthlyBudget) {
       const biweeklyTarget = env.monthlyBudget / BIWEEKLY_MULTIPLIER;
       biweeklyNeed = Math.max(0, biweeklyTarget - (env.currentBalance || 0));
     } else if (envelopeType === "savings" && env.targetAmount) {
-      const remainingToTarget = Math.max(0, env.targetAmount - (env.currentBalance || 0));
+      const remainingToTarget = Math.max(
+        0,
+        env.targetAmount - (env.currentBalance || 0),
+      );
       biweeklyNeed = Math.min(remainingToTarget, env.biweeklyAllocation || 0);
     }
 
@@ -82,6 +95,20 @@ const SummaryCards = () => {
     );
   }
 
+  // Handler for setting actual balance
+  const handleSetActualBalance = () => {
+    const newBalance = prompt(
+      "Enter your current bank account balance:",
+      actualBalance?.toString() || "0",
+    );
+    if (newBalance !== null && !isNaN(parseFloat(newBalance))) {
+      updateActualBalance(parseFloat(newBalance), {
+        isManual: true,
+        author: "User",
+      });
+    }
+  };
+
   const cards = [
     {
       key: "total-cash",
@@ -89,6 +116,8 @@ const SummaryCards = () => {
       label: "Total Cash",
       value: totalCash,
       color: "purple",
+      onClick: handleSetActualBalance,
+      clickable: true,
     },
     {
       key: "unassigned-cash",
@@ -142,7 +171,16 @@ const SummaryCards = () => {
 
 const SummaryCard = memo(
   // eslint-disable-next-line no-unused-vars
-  ({ icon: _Icon, label, value, color, onClick, clickable, isNegative, dataTour }) => {
+  ({
+    icon: _Icon,
+    label,
+    value,
+    color,
+    onClick,
+    clickable,
+    isNegative,
+    dataTour,
+  }) => {
     const colorClasses = {
       purple: "bg-purple-500",
       emerald: "bg-emerald-500",
@@ -179,10 +217,14 @@ const SummaryCard = memo(
           <p className="text-sm font-semibold text-gray-600 mb-1">
             {label}
             {clickable && !isNegative && (
-              <span className="ml-1 text-xs text-gray-400">(click to distribute)</span>
+              <span className="ml-1 text-xs text-gray-400">
+                (click to distribute)
+              </span>
             )}
             {isNegative && (
-              <span className="ml-1 text-xs text-red-500">(overspending - click to address)</span>
+              <span className="ml-1 text-xs text-red-500">
+                (overspending - click to address)
+              </span>
             )}
           </p>
           <p
@@ -205,9 +247,11 @@ const SummaryCard = memo(
         {cardContent}
       </button>
     ) : (
-      <div className={baseClasses} data-tour={dataTour}>{cardContent}</div>
+      <div className={baseClasses} data-tour={dataTour}>
+        {cardContent}
+      </div>
     );
-  }
+  },
 );
 
 export default memo(SummaryCards);
