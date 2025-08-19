@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import { X, ChevronRight, ChevronLeft, CheckCircle, Target } from "lucide-react";
+import {
+  X,
+  ChevronRight,
+  ChevronLeft,
+  CheckCircle,
+  Target,
+} from "lucide-react";
 import useOnboardingStore from "../../stores/onboardingStore";
 import logger from "../../utils/logger";
 
@@ -27,7 +33,8 @@ const OnboardingTutorial = ({ children }) => {
     {
       id: "welcome",
       title: "Welcome to VioletVault! 🎉",
-      description: "Let's take a quick tour to get you started with envelope budgeting and personal finance tracking.",
+      description:
+        "Let's take a quick tour to get you started with envelope budgeting and personal finance tracking.",
       target: null,
       position: "center",
       action: () => logger.info("Welcome step shown"),
@@ -35,7 +42,8 @@ const OnboardingTutorial = ({ children }) => {
     {
       id: "set-bank-balance",
       title: "Set Your Bank Balance 🏦",
-      description: "First, let's set your current actual bank account balance so we can track your real money.",
+      description:
+        "First, let's set your current actual bank account balance so we can track your real money.",
       target: "[data-tour='actual-balance']",
       position: "bottom",
       action: () => startTutorialStep("firstBankBalance"),
@@ -43,15 +51,17 @@ const OnboardingTutorial = ({ children }) => {
     {
       id: "add-debts",
       title: "Add Your Debts (Optional) 💳",
-      description: "Track credit cards, loans, and other debts to get a complete financial picture.",
+      description:
+        "Track credit cards, loans, and other debts to get a complete financial picture.",
       target: "[data-tour='add-debt']",
       position: "bottom",
       action: () => startTutorialStep("firstDebts"),
     },
     {
       id: "add-bills",
-      title: "Set Up Recurring Bills (Optional) 📋", 
-      description: "Add bills like rent, utilities, subscriptions to plan for upcoming expenses.",
+      title: "Set Up Recurring Bills (Optional) 📋",
+      description:
+        "Add bills like rent, utilities, subscriptions to plan for upcoming expenses.",
       target: "[data-tour='add-bill']",
       position: "bottom",
       action: () => startTutorialStep("firstBills"),
@@ -59,7 +69,8 @@ const OnboardingTutorial = ({ children }) => {
     {
       id: "add-paycheck",
       title: "Add Your Paycheck 💰",
-      description: "Add your income source - this money will be available to allocate to envelopes.",
+      description:
+        "Add your income source - this money will be available to allocate to envelopes.",
       target: "[data-tour='add-paycheck']",
       position: "bottom",
       action: () => startTutorialStep("firstPaycheck"),
@@ -67,7 +78,8 @@ const OnboardingTutorial = ({ children }) => {
     {
       id: "create-envelope",
       title: "Create Budget Envelopes 📮",
-      description: "Create categories (envelopes) for your money like groceries, rent, savings.",
+      description:
+        "Create categories (envelopes) for your money like groceries, rent, savings.",
       target: "[data-tour='add-envelope']",
       position: "bottom",
       action: () => startTutorialStep("firstEnvelope"),
@@ -75,7 +87,8 @@ const OnboardingTutorial = ({ children }) => {
     {
       id: "link-bills",
       title: "Link Bills to Envelopes 🔗",
-      description: "Connect your bills to envelopes so they're automatically budgeted for.",
+      description:
+        "Connect your bills to envelopes so they're automatically budgeted for.",
       target: "[data-tour='envelope-grid']",
       position: "top",
       action: () => startTutorialStep("linkedEnvelopes"),
@@ -83,7 +96,8 @@ const OnboardingTutorial = ({ children }) => {
     {
       id: "allocate-money",
       title: "Allocate Your Money 📊",
-      description: "Assign money from your paycheck to different envelopes based on your priorities.",
+      description:
+        "Assign money from your paycheck to different envelopes based on your priorities.",
       target: "[data-tour='envelope-grid']",
       position: "top",
       action: () => startTutorialStep("firstAllocation"),
@@ -91,7 +105,8 @@ const OnboardingTutorial = ({ children }) => {
     {
       id: "track-spending",
       title: "Track Your Spending 💳",
-      description: "Add transactions to see where your money goes and keep envelopes accurate.",
+      description:
+        "Add transactions to see where your money goes and keep envelopes accurate.",
       target: "[data-tour='add-transaction']",
       position: "bottom",
       action: () => startTutorialStep("firstTransaction"),
@@ -99,7 +114,8 @@ const OnboardingTutorial = ({ children }) => {
     {
       id: "sync-benefits",
       title: "Sync Across Devices 🔄",
-      description: "Your data syncs automatically across all your devices so you always have access.",
+      description:
+        "Your data syncs automatically across all your devices so you always have access.",
       target: "[data-tour='sync-indicator']",
       position: "bottom",
       action: () => startTutorialStep("syncExplained"),
@@ -109,14 +125,24 @@ const OnboardingTutorial = ({ children }) => {
   // Show tutorial for new users
   useEffect(() => {
     if (!isOnboarded && preferences.showHints && !preferences.tourCompleted) {
+      // For truly new accounts, be more aggressive about showing tutorial
+      const progress = getProgress();
+      const isTrulyNew = progress.completed === 0;
+
+      const delay = isTrulyNew ? 500 : 1000; // Shorter delay for new accounts
+
       const timer = setTimeout(() => {
         setShowTutorial(true);
-        logger.info("🎯 Starting onboarding tutorial");
-      }, 1000); // Small delay to let the UI settle
+        logger.info("🎯 Starting onboarding tutorial", {
+          progress: progress.completed,
+          isTrulyNew,
+          delay,
+        });
+      }, delay);
 
       return () => clearTimeout(timer);
     }
-  }, [isOnboarded, preferences]);
+  }, [isOnboarded, preferences, getProgress]);
 
   // Handle escape key to close tutorial
   useEffect(() => {
@@ -166,14 +192,14 @@ const OnboardingTutorial = ({ children }) => {
   const getCurrentStepElement = () => {
     const step = tutorialSteps[currentStep];
     if (!step?.target) return null;
-    
+
     return document.querySelector(step.target);
   };
 
   const getTooltipPosition = () => {
     const element = getCurrentStepElement();
     const step = tutorialSteps[currentStep];
-    
+
     if (!element || step.position === "center") {
       return {
         top: "50%",
@@ -259,7 +285,7 @@ const OnboardingTutorial = ({ children }) => {
   return (
     <>
       {children}
-      
+
       {/* Tutorial Overlay */}
       <div
         ref={overlayRef}
@@ -319,7 +345,7 @@ const OnboardingTutorial = ({ children }) => {
                 <ChevronLeft className="w-4 h-4" />
                 <span>Back</span>
               </button>
-              
+
               <button
                 onClick={skipTutorial}
                 className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
