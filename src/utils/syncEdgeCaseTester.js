@@ -10,6 +10,7 @@ import logger from "./logger";
 class SyncEdgeCaseTester {
   constructor() {
     this.testResults = [];
+    this.cloudSyncService = cloudSyncService;
   }
 
   /**
