@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { CheckCircle, Circle, ChevronDown, ChevronUp, Trophy } from "lucide-react";
+import {
+  CheckCircle,
+  Circle,
+  ChevronDown,
+  ChevronUp,
+  Trophy,
+} from "lucide-react";
 import useOnboardingStore from "../../stores/onboardingStore";
 
 /**
@@ -10,7 +16,6 @@ const OnboardingProgress = () => {
     isOnboarded,
     tutorialProgress,
     getProgress,
-    markStepComplete,
     preferences,
     setPreference,
   } = useOnboardingStore();
@@ -104,7 +109,7 @@ const OnboardingProgress = () => {
   return (
     <div className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border border-purple-200 dark:border-purple-700 rounded-lg p-4 mb-6">
       {/* Header */}
-      <div 
+      <div
         className="flex items-center justify-between cursor-pointer"
         onClick={() => setIsExpanded(!isExpanded)}
       >
@@ -115,7 +120,7 @@ const OnboardingProgress = () => {
               Getting Started
             </h3>
           </div>
-          
+
           {progress.percentage > 0 && (
             <div className="flex items-center space-x-2">
               <div className="w-20 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -163,13 +168,13 @@ const OnboardingProgress = () => {
                 if (!groups[category]) groups[category] = [];
                 groups[category].push(step);
                 return groups;
-              }, {})
+              }, {}),
             ).map(([category, categorySteps]) => (
               <div key={category} className="space-y-2">
                 <h4 className="text-sm font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wide">
                   {category}
                 </h4>
-                
+
                 {categorySteps.map((step) => (
                   <div
                     key={step.id}
@@ -186,20 +191,24 @@ const OnboardingProgress = () => {
                         <Circle className="w-5 h-5 text-gray-400" />
                       )}
                     </div>
-                    
+
                     <div className="flex-1 min-w-0">
-                      <h5 className={`text-sm font-medium ${
-                        step.completed 
-                          ? "text-green-800 dark:text-green-200" 
-                          : "text-gray-900 dark:text-white"
-                      }`}>
+                      <h5
+                        className={`text-sm font-medium ${
+                          step.completed
+                            ? "text-green-800 dark:text-green-200"
+                            : "text-gray-900 dark:text-white"
+                        }`}
+                      >
                         {step.title}
                       </h5>
-                      <p className={`text-xs ${
-                        step.completed 
-                          ? "text-green-600 dark:text-green-300" 
-                          : "text-gray-500 dark:text-gray-400"
-                      }`}>
+                      <p
+                        className={`text-xs ${
+                          step.completed
+                            ? "text-green-600 dark:text-green-300"
+                            : "text-gray-500 dark:text-gray-400"
+                        }`}
+                      >
                         {step.description}
                       </p>
                     </div>
@@ -219,13 +228,21 @@ const OnboardingProgress = () => {
 
           {/* Actions */}
           <div className="flex justify-between items-center pt-3 border-t border-purple-200 dark:border-purple-700">
-            <button
-              onClick={handleDismiss}
-              className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-            >
-              Dismiss this guide
-            </button>
-            
+            <div className="flex space-x-2">
+              <button
+                onClick={handleDismiss}
+                className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+              >
+                Dismiss this guide
+              </button>
+              <button
+                onClick={() => setPreference("tourCompleted", false)}
+                className="text-sm text-purple-500 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300"
+              >
+                Restart Tutorial
+              </button>
+            </div>
+
             {progress.percentage === 100 && (
               <div className="flex items-center space-x-2 text-green-600 dark:text-green-400">
                 <Trophy className="w-4 h-4" />

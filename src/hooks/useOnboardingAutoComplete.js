@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useEnvelopes } from "./useEnvelopes";
 import { useBills } from "./useBills";
 import { useTransactions } from "./useTransactions";
@@ -19,7 +19,22 @@ export const useOnboardingAutoComplete = () => {
   const { actualBalance } = useActualBalance();
 
   // Skip if user has disabled hints or is already onboarded
-  const shouldAutoComplete = preferences.showHints && !isOnboarded;
+  // Also add delay to prevent immediate auto-completion before tutorial can show
+  const [isReady, setIsReady] = useState(false);
+  const shouldAutoComplete = preferences.showHints && !isOnboarded && isReady;
+
+  // Delay auto-completion to allow tutorial to initialize first
+  useEffect(() => {
+    if (!preferences.showHints || isOnboarded) return;
+
+    // Wait 3 seconds for tutorial to potentially show, then enable auto-completion
+    const timer = setTimeout(() => {
+      setIsReady(true);
+      logger.info("🎯 Onboarding auto-completion enabled after delay");
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [preferences.showHints, isOnboarded]);
 
   // Auto-complete bank balance step when actual balance is set
   useEffect(() => {
@@ -38,18 +53,29 @@ export const useOnboardingAutoComplete = () => {
     }
   }, [actualBalance, shouldAutoComplete, isStepComplete, markStepComplete]);
 
-  // Auto-complete envelope step when first envelope is created
+  // Auto-complete envelope step when first envelope is created (ignore system-generated ones)
   useEffect(() => {
     if (!shouldAutoComplete) return;
 
-    if (envelopes.length > 0 && !isStepComplete("firstEnvelope")) {
+    // Filter out system-generated envelopes (those created automatically during setup)
+    const userCreatedEnvelopes = envelopes.filter((env) => {
+      // Skip envelopes that look like system defaults
+      return (
+        env.name !== "Emergency Fund" &&
+        env.name !== "Unassigned Cash" &&
+        !env.name.startsWith("Default") &&
+        env.source !== "system"
+      );
+    });
+
+    if (userCreatedEnvelopes.length > 0 && !isStepComplete("firstEnvelope")) {
       logger.info(
-        "🎯 Auto-completing firstEnvelope step - envelope created:",
-        envelopes[0].name,
+        "🎯 Auto-completing firstEnvelope step - user envelope created:",
+        userCreatedEnvelopes[0].name,
       );
       markStepComplete("firstEnvelope");
     }
-  }, [envelopes.length, shouldAutoComplete, isStepComplete, markStepComplete]);
+  }, [envelopes, shouldAutoComplete, isStepComplete, markStepComplete]);
 
   // Auto-complete bills step when first bill is added
   useEffect(() => {
