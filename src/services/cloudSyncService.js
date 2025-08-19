@@ -443,13 +443,14 @@ class CloudSyncService {
    */
   async fetchDexieData() {
     try {
-      const [envelopes, transactions, bills, savingsGoals, paycheckHistory, budgetMetadata] =
+      const [envelopes, transactions, bills, savingsGoals, paycheckHistory, debts, budgetMetadata] =
         await Promise.all([
           budgetDb.envelopes.toArray(),
           budgetDb.transactions.toArray(),
           budgetDb.bills.toArray(),
           budgetDb.savingsGoals.toArray(),
           budgetDb.paycheckHistory.toArray(),
+          budgetDb.debts.toArray(),
           budgetDb.budget.get("metadata"),
         ]);
 
@@ -460,11 +461,13 @@ class CloudSyncService {
         billsCount: bills.length,
         savingsGoalsCount: savingsGoals.length,
         paycheckHistoryCount: paycheckHistory.length,
+        debtsCount: debts.length,
         unassignedCash: budgetMetadata?.unassignedCash || 0,
         actualBalance: budgetMetadata?.actualBalance || 0,
         firstEnvelope: envelopes[0]?.name || "none",
         firstTransaction: transactions[0]?.description || "none",
         firstBill: bills[0]?.name || "none",
+        firstDebt: debts[0]?.name || "none",
       });
 
       return {
@@ -473,12 +476,14 @@ class CloudSyncService {
         bills,
         savingsGoals,
         paycheckHistory,
+        debts,
         unassignedCash: budgetMetadata?.unassignedCash || 0,
         actualBalance: budgetMetadata?.actualBalance || 0,
         lastModified: Math.max(
           ...envelopes.map((e) => e.lastModified || e.createdAt || 0),
           ...transactions.map((t) => t.lastModified || t.createdAt || 0),
           ...bills.map((b) => b.lastModified || b.createdAt || 0),
+          ...debts.map((d) => d.lastModified || d.createdAt || 0),
           budgetMetadata?.lastModified || 0,
           0,
         ),
@@ -491,6 +496,7 @@ class CloudSyncService {
         bills: [],
         savingsGoals: [],
         paycheckHistory: [],
+        debts: [],
         unassignedCash: 0,
         actualBalance: 0,
         lastModified: 0,
