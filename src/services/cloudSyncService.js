@@ -729,6 +729,12 @@ class CloudSyncService {
    */
   async fetchChunkedFirestoreData(ChunkedFirebaseSync) {
     try {
+      // Check for required config before proceeding
+      if (!this.config?.budgetId || !this.config?.encryptionKey) {
+        logger.warn("⚠️ Missing config for chunked Firestore fetch");
+        return null;
+      }
+
       // Initialize the ChunkedFirebaseSync instance
       await ChunkedFirebaseSync.initialize(
         this.config.budgetId,
