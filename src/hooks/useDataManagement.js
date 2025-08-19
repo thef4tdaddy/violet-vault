@@ -1,184 +1,85 @@
 import { useCallback } from "react";
-import { encryptionUtils } from "../utils/encryption";
 import { useAuth } from "../stores/authStore.jsx";
 import { useToastHelpers } from "../utils/toastHelpers";
 import logger from "../utils/logger";
+import { budgetDb, getBudgetMetadata } from "../db/budgetDb.js";
 
 /**
  * Custom hook for data import/export operations
  * Extracts data management logic from Layout component
  */
 const useDataManagement = () => {
-  const { encryptionKey, currentUser } = useAuth();
+  const { currentUser } = useAuth();
   const { showSuccessToast, showErrorToast, showWarningToast } = useToastHelpers();
 
   const exportData = useCallback(async () => {
     try {
       logger.info("Starting export process");
 
-      // Try different localStorage keys (new Zustand format first, then old formats)
-      let rawData = null;
-      let dataSource = null;
+      const [
+        envelopes,
+        bills,
+        transactions,
+        savingsGoals,
+        debts,
+        paycheckHistory,
+        metadata,
+      ] = await Promise.all([
+        budgetDb.envelopes.toArray(),
+        budgetDb.bills.toArray(),
+        budgetDb.transactions.toArray(),
+        budgetDb.savingsGoals.toArray(),
+        budgetDb.debts.toArray(),
+        budgetDb.paycheckHistory.toArray(),
+        getBudgetMetadata(),
+      ]);
 
-      // Try new violet-vault-store (develop branch)
-      const newData = localStorage.getItem("violet-vault-store");
-      if (newData) {
-        rawData = JSON.parse(newData);
-        dataSource = "violet-vault-store";
-        logger.debug("Found data in violet-vault-store");
-      }
+      const hasData =
+        envelopes.length ||
+        bills.length ||
+        transactions.length ||
+        savingsGoals.length ||
+        debts.length ||
+        paycheckHistory.length;
 
-      // Try old budget-store (main branch)
-      if (!rawData) {
-        const oldData = localStorage.getItem("budget-store");
-        if (oldData) {
-          rawData = JSON.parse(oldData);
-          dataSource = "budget-store";
-          logger.debug("Found data in budget-store");
-        }
-      }
-
-      // Try legacy envelopeBudgetData (very old format)
-      if (!rawData) {
-        const legacyData = localStorage.getItem("envelopeBudgetData");
-        if (legacyData) {
-          const { encryptedData, iv } = JSON.parse(legacyData);
-          rawData = {
-            state: await encryptionUtils.decrypt(encryptedData, encryptionKey, iv),
-          };
-          dataSource = "envelopeBudgetData";
-          logger.debug("Found encrypted data in envelopeBudgetData");
-        }
-      }
-
-      if (!rawData) {
+      if (!hasData) {
         showWarningToast("No data found to export", "Export Error");
         return;
       }
 
-      // Extract data from different store formats
-      let decryptedData;
-      if (dataSource === "violet-vault-store") {
-        // New Zustand format - data is directly in state
-        decryptedData = rawData.state || rawData;
-      } else if (dataSource === "budget-store") {
-        // Old Zustand format - data is in state property
-        decryptedData = rawData.state || rawData;
-      } else {
-        // Legacy encrypted format - already decrypted above
-        decryptedData = rawData.state;
-      }
-
-      logger.debug("Data extracted from source", {
-        source: dataSource,
-        keys: Object.keys(decryptedData),
-      });
-
-      // Log what old data we're filtering out
-      const deprecatedFields = Object.keys(decryptedData).filter((key) =>
-        ["updatedEnvelopes", "oldTransactions", "oldBills", "oldSavingsGoals"].includes(key)
+      const pureTransactions = transactions.filter(
+        (t) => !t.type || t.type === "transaction"
       );
 
-      if (deprecatedFields.length > 0) {
-        logger.debug("Filtering out deprecated fields", {
-          fields: deprecatedFields,
-        });
-      }
-
-      // Check for nested deprecated data in envelopes
-      const envelopesWithOldData = (decryptedData.envelopes || []).filter(
-        (env) => env.transactions || env.paidTransactions || env.upcomingBills || env.overdueBills
-      );
-
-      if (envelopesWithOldData.length > 0) {
-        logger.debug("Cleaning nested transaction arrays from envelopes", {
-          count: envelopesWithOldData.length,
-        });
-      }
-
-      // Normalize transactions for unified structure
-      const allTransactions = Array.isArray(decryptedData.allTransactions)
-        ? decryptedData.allTransactions
-        : [...(decryptedData.transactions || []), ...(decryptedData.bills || [])];
-      const transactions = allTransactions.filter((t) => !t.type || t.type === "transaction");
-
-      // Clean up envelopes - remove old nested transaction arrays
-      const cleanEnvelopes = (decryptedData.envelopes || []).map((envelope) => ({
-        id: envelope.id,
-        name: envelope.name,
-        currentBalance: envelope.currentBalance || 0,
-        targetAmount: envelope.targetAmount,
-        monthlyAmount: envelope.monthlyAmount,
-        biweeklyAllocation: envelope.biweeklyAllocation,
-        color: envelope.color || "#a855f7",
-        category: envelope.category || "Other",
-        description: envelope.description || "",
-        frequency: envelope.frequency || "monthly",
-        priority: envelope.priority || "medium",
-        autoAllocate: envelope.autoAllocate !== false,
-        envelopeType: envelope.envelopeType || "variable",
-        monthlyBudget: envelope.monthlyBudget,
-        lastUpdated: envelope.lastUpdated,
-        // Exclude all old nested arrays: transactions, paidTransactions, upcomingBills, etc.
-      }));
-
-      // Clean up bills - keep only essential fields
-      const cleanBills = (decryptedData.bills || []).map((bill) => ({
-        id: bill.id,
-        name: bill.name || bill.provider,
-        provider: bill.provider,
-        amount: bill.amount || 0,
-        dueDate: bill.dueDate,
-        frequency: bill.frequency || "monthly",
-        category: bill.category,
-        envelopeId: bill.envelopeId,
-        isPaid: bill.isPaid || false,
-        paidDate: bill.paidDate,
-        description: bill.description,
-        notes: bill.notes,
-        accountNumber: bill.accountNumber,
-        lastUpdated: bill.lastUpdated,
-        type: bill.type || "bill",
-      }));
-
-      // Prepare clean export data - only include current, relevant fields
       const exportData = {
-        // Core data arrays (cleaned)
-        envelopes: cleanEnvelopes,
-        bills: cleanBills,
-        transactions,
-        allTransactions,
-
-        // Other current data
-        savingsGoals: decryptedData.savingsGoals || [],
-        supplementalAccounts: decryptedData.supplementalAccounts || [],
-        debts: decryptedData.debts || [],
-        paycheckHistory: decryptedData.paycheckHistory || [],
-
-        // Financial state
-        unassignedCash: decryptedData.unassignedCash || 0,
-        biweeklyAllocation: decryptedData.biweeklyAllocation || 0,
-        actualBalance: decryptedData.actualBalance || 0,
-        isActualBalanceManual: decryptedData.isActualBalanceManual || false,
-
-        // Exclude deprecated fields like: updatedEnvelopes, oldTransactions, etc.
-
-        // Metadata
+        envelopes,
+        bills,
+        transactions: pureTransactions,
+        allTransactions: transactions,
+        savingsGoals,
+        supplementalAccounts: metadata?.supplementalAccounts || [],
+        debts,
+        paycheckHistory,
+        unassignedCash: metadata?.unassignedCash || 0,
+        biweeklyAllocation: metadata?.biweeklyAllocation || 0,
+        actualBalance: metadata?.actualBalance || 0,
+        isActualBalanceManual: metadata?.isActualBalanceManual || false,
         exportMetadata: {
           exportedBy: currentUser?.userName || "Unknown User",
           exportDate: new Date().toISOString(),
           appVersion: "1.8.0",
           dataVersion: "2.0",
-          dataSource: dataSource,
+          dataSource: "dexie",
           exportedFrom: "develop-branch",
         },
-        // Data structure explanation for users
         _dataGuide: {
           note: "For mass updates, use these primary arrays:",
           primaryArrays: {
-            envelopes: "Main envelope data - edit currentBalance, name, category, etc.",
+            envelopes:
+              "Main envelope data - edit currentBalance, name, category, etc.",
             bills: "Bill payment data - edit amount, dueDate, provider, etc.",
-            transactions: "Pure transactions only (filtered from allTransactions)",
+            transactions:
+              "Pure transactions only (filtered from allTransactions)",
             allTransactions:
               "All transactions + bills combined (auto-generated, don't edit directly)",
           },
@@ -191,7 +92,6 @@ const useDataManagement = () => {
         },
       };
 
-      // Create and download the file
       const dataStr = JSON.stringify(exportData, null, 2);
       const dataBlob = new Blob([dataStr], { type: "application/json" });
 
@@ -208,24 +108,26 @@ const useDataManagement = () => {
       URL.revokeObjectURL(url);
 
       logger.info("Export completed successfully", {
-        envelopes: cleanEnvelopes.length,
-        bills: cleanBills.length,
-        transactions: transactions.length,
-        allTransactions: allTransactions.length,
-        savingsGoals: exportData.savingsGoals.length,
-        deprecatedFields: deprecatedFields.join(", ") || "none found",
+        envelopes: envelopes.length,
+        bills: bills.length,
+        transactions: pureTransactions.length,
+        allTransactions: transactions.length,
+        savingsGoals: savingsGoals.length,
+        debts: debts.length,
         fileSizeKB: Math.round(dataStr.length / 1024),
       });
 
       showSuccessToast(
-        `Clean export created with ${cleanEnvelopes.length} envelopes, ${cleanBills.length} bills, and ${transactions.length} transactions (${Math.round(dataStr.length / 1024)}KB)`,
+        `Export created with ${envelopes.length} envelopes, ${bills.length} bills, and ${pureTransactions.length} transactions (${Math.round(
+          dataStr.length / 1024
+        )}KB)`,
         "Export Completed"
       );
     } catch (error) {
       logger.error("Export failed", error);
       showErrorToast(`Export failed: ${error.message}`, "Export Failed");
     }
-  }, [encryptionKey, currentUser, showErrorToast, showSuccessToast, showWarningToast]);
+  }, [currentUser, showErrorToast, showSuccessToast, showWarningToast]);
 
   const importData = useCallback(
     async (event) => {
@@ -277,25 +179,43 @@ const useDataManagement = () => {
 
         // Create backup of current data before import
         try {
-          // Backup from the correct localStorage key
-          const currentVioletData = localStorage.getItem("violet-vault-store");
-          const currentBudgetData = localStorage.getItem("budget-store");
-          const currentLegacyData = localStorage.getItem("envelopeBudgetData");
+          const [
+            envelopes,
+            bills,
+            transactions,
+            savingsGoals,
+            debts,
+            paycheckHistory,
+            metadata,
+          ] = await Promise.all([
+            budgetDb.envelopes.toArray(),
+            budgetDb.bills.toArray(),
+            budgetDb.transactions.toArray(),
+            budgetDb.savingsGoals.toArray(),
+            budgetDb.debts.toArray(),
+            budgetDb.paycheckHistory.toArray(),
+            getBudgetMetadata(),
+          ]);
+
+          const currentData = {
+            envelopes,
+            bills,
+            transactions,
+            savingsGoals,
+            debts,
+            paycheckHistory,
+            unassignedCash: metadata?.unassignedCash || 0,
+            biweeklyAllocation: metadata?.biweeklyAllocation || 0,
+            actualBalance: metadata?.actualBalance || 0,
+            isActualBalanceManual: metadata?.isActualBalanceManual || false,
+          };
 
           const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-
-          if (currentVioletData) {
-            localStorage.setItem(`violet-vault-store_backup_${timestamp}`, currentVioletData);
-            logger.debug("Current violet-vault-store data backed up");
-          }
-          if (currentBudgetData) {
-            localStorage.setItem(`budget-store_backup_${timestamp}`, currentBudgetData);
-            logger.debug("Current budget-store data backed up");
-          }
-          if (currentLegacyData) {
-            localStorage.setItem(`envelopeBudgetData_backup_${timestamp}`, currentLegacyData);
-            logger.debug("Current legacy data backed up");
-          }
+          localStorage.setItem(
+            `dexie_backup_${timestamp}`,
+            JSON.stringify(currentData)
+          );
+          logger.debug("Current Dexie data backed up");
         } catch (backupError) {
           logger.warn("Failed to create backup", backupError);
         }
