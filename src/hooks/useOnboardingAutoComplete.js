@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useEnvelopes } from "./useEnvelopes";
-import { useBills } from "./useBills";
+import useBills from "./useBills";
 import { useTransactions } from "./useTransactions";
 import { useActualBalance } from "./useBudgetMetadata";
 import useOnboardingStore from "../stores/onboardingStore";
