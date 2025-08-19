@@ -152,7 +152,7 @@ class CloudSyncService {
   /**
    * Start the background sync service
    */
-  start(config) {
+  async start(config) {
     if (this.isRunning) {
       logger.info("🔄 Cloud sync service already running", {
         currentBudgetId: this.config?.budgetId?.slice(0, 8) || "none",
@@ -168,11 +168,48 @@ class CloudSyncService {
       }
     }
 
-    this.config = config;
+    if (!config?.encryptionKey) {
+      logger.error("❌ Cannot start sync service without encryption key");
+      return;
+    }
+
+    let normalizedKey = config.encryptionKey;
+    try {
+      if (normalizedKey instanceof CryptoKey) {
+        // already ok
+      } else {
+        let rawKey;
+        if (normalizedKey instanceof Uint8Array) {
+          rawKey = normalizedKey.buffer.slice(
+            normalizedKey.byteOffset,
+            normalizedKey.byteOffset + normalizedKey.byteLength,
+          );
+        } else if (normalizedKey instanceof ArrayBuffer) {
+          rawKey = normalizedKey;
+        } else {
+          logger.error("❌ Invalid encryption key type", {
+            type: typeof normalizedKey,
+          });
+          return;
+        }
+        normalizedKey = await crypto.subtle.importKey(
+          "raw",
+          rawKey,
+          { name: "AES-GCM" },
+          false,
+          ["encrypt", "decrypt"],
+        );
+      }
+    } catch (error) {
+      logger.error("❌ Failed to import encryption key", error);
+      return;
+    }
+
+    this.config = { ...config, encryptionKey: normalizedKey };
     this.isRunning = true;
 
     logger.info("🌩️ Starting cloud sync service", {
-      hasEncryptionKey: !!config?.encryptionKey,
+      hasEncryptionKey: true,
       hasUser: !!config?.currentUser,
       hasBudgetId: !!config?.budgetId,
     });
@@ -275,7 +312,8 @@ class CloudSyncService {
       const dexieItemCount =
         (dexieData.envelopes?.length || 0) +
         (dexieData.transactions?.length || 0) +
-        (dexieData.bills?.length || 0);
+        (dexieData.bills?.length || 0) +
+        (dexieData.debts?.length || 0);
       // Debug encryption key consistency for cross-browser sync troubleshooting
       let encryptionKeyDebug = "none";
       if (this.config?.encryptionKey) {
@@ -303,6 +341,7 @@ class CloudSyncService {
         envelopes: dexieData.envelopes?.length || 0,
         transactions: dexieData.transactions?.length || 0,
         bills: dexieData.bills?.length || 0,
+        debts: dexieData.debts?.length || 0,
         budgetId: this.config?.budgetId?.slice(0, 8) || "none",
         hasEncryptionKey: !!this.config?.encryptionKey,
         encryptionKeyPreview: encryptionKeyDebug,
@@ -321,7 +360,8 @@ class CloudSyncService {
         const retryItemCount =
           (retryDexieData.envelopes?.length || 0) +
           (retryDexieData.transactions?.length || 0) +
-          (retryDexieData.bills?.length || 0);
+          (retryDexieData.bills?.length || 0) +
+          (retryDexieData.debts?.length || 0);
 
         logger.info("🔄 Retry fetch results", {
           originalItemCount: dexieItemCount,
@@ -592,6 +632,7 @@ class CloudSyncService {
         envelopes: data.envelopes?.length || 0,
         transactions: data.transactions?.length || 0,
         bills: data.bills?.length || 0,
+        debts: data.debts?.length || 0,
       },
     };
   }
@@ -814,13 +855,15 @@ class CloudSyncService {
       const dataItemCount =
         (dexieData?.envelopes?.length || 0) +
         (dexieData?.transactions?.length || 0) +
-        (dexieData?.bills?.length || 0);
+        (dexieData?.bills?.length || 0) +
+        (dexieData?.debts?.length || 0);
 
       logger.info("🔄 Starting migration to chunked format...", {
         hasDataToMigrate: !!dexieData,
         envelopesCount: dexieData?.envelopes?.length || 0,
         transactionsCount: dexieData?.transactions?.length || 0,
         billsCount: dexieData?.bills?.length || 0,
+        debtsCount: dexieData?.debts?.length || 0,
         totalItems: dataItemCount,
       });
 
@@ -833,7 +876,8 @@ class CloudSyncService {
         const freshItemCount =
           (freshDexieData?.envelopes?.length || 0) +
           (freshDexieData?.transactions?.length || 0) +
-          (freshDexieData?.bills?.length || 0);
+          (freshDexieData?.bills?.length || 0) +
+          (freshDexieData?.debts?.length || 0);
 
         logger.info("🔄 Fresh data fetch results", {
           originalItemCount: dataItemCount,
@@ -879,6 +923,7 @@ class CloudSyncService {
           envelopes: dexieData.envelopes?.length || 0,
           transactions: dexieData.transactions?.length || 0,
           bills: dexieData.bills?.length || 0,
+          debts: dexieData.debts?.length || 0,
         },
       };
     } catch (error) {
@@ -903,15 +948,16 @@ class CloudSyncService {
       logger.info("✅ Data already synchronized");
     }
 
-    return {
-      success: true,
-      direction,
-      counts: {
-        envelopes: data.envelopes?.length || 0,
-        transactions: data.transactions?.length || 0,
-        bills: data.bills?.length || 0,
-      },
-    };
+      return {
+        success: true,
+        direction,
+        counts: {
+          envelopes: data.envelopes?.length || 0,
+          transactions: data.transactions?.length || 0,
+          bills: data.bills?.length || 0,
+          debts: data.debts?.length || 0,
+        },
+      };
   }
 
   /**
@@ -951,11 +997,15 @@ class CloudSyncService {
       (data.envelopes?.length || 0) +
       (data.transactions?.length || 0) +
       (data.bills?.length || 0) +
-      (data.savingsGoals?.length || 0);
+      (data.savingsGoals?.length || 0) +
+      (data.debts?.length || 0);
+
+    const metadataPresent =
+      (data.unassignedCash ?? 0) !== 0 || (data.actualBalance ?? 0) !== 0;
 
     // Lower threshold to be more sensitive to data
-    // Even a few envelopes or transactions should trigger sync
-    return totalItems > 0; // Any data is significant
+    // Even a few items or metadata changes should trigger sync
+    return totalItems > 0 || metadataPresent; // Any data is significant
   }
 
   /**
