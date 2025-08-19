@@ -539,7 +539,7 @@ class ChunkedFirebaseSync {
         }
       }
 
-      logger.debug("🔍 Current Firebase Auth state:", {
+      logger.info("🔍 Current Firebase Auth state:", {
         isSignedIn: !!currentUser,
         uid: currentUser?.uid,
         isAnonymous: currentUser?.isAnonymous,
@@ -553,7 +553,7 @@ class ChunkedFirebaseSync {
       const startTime = Date.now();
 
       // Load the manifest first
-      logger.debug("📄 Attempting to fetch manifest document...", {
+      logger.info("📄 Attempting to fetch manifest document...", {
         budgetId: this.budgetId,
         collection: "budgets",
         isAuthenticated: this.isAuthenticated,
@@ -562,7 +562,7 @@ class ChunkedFirebaseSync {
       let manifestDoc;
       try {
         manifestDoc = await getDoc(doc(db, "budgets", this.budgetId));
-        logger.debug("📄 Firebase getDoc completed, exists:", manifestDoc.exists());
+        logger.info("📄 Firebase getDoc completed, exists:", manifestDoc.exists());
       } catch (firestoreError) {
         logger.error("Firestore getDoc failed", firestoreError, {
           budgetId: this.budgetId,
@@ -608,7 +608,7 @@ class ChunkedFirebaseSync {
         );
       }
 
-      logger.debug("🔓 Attempting to decrypt manifest", {
+      logger.info("🔓 Attempting to decrypt manifest", {
         encryptedDataSize: manifestData.encryptedData?.length || 0,
         encryptedDataType: typeof manifestData.encryptedData,
         hasEncryptionKey: !!this.encryptionKey,
@@ -671,7 +671,7 @@ class ChunkedFirebaseSync {
             }
 
             try {
-              logger.debug(`🔓 Attempting to decrypt chunk ${chunkId}`, {
+              logger.info(`🔓 Attempting to decrypt chunk ${chunkId}`, {
                 hasEncryptedData: !!encryptedChunk.encryptedData,
                 encryptedDataType: typeof encryptedChunk.encryptedData,
                 chunkType: encryptedChunk.chunkType,

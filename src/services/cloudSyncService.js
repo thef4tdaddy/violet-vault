@@ -449,11 +449,13 @@ class CloudSyncService {
         unassignedCash: budgetMetadata?.unassignedCash || 0,
         actualBalance: budgetMetadata?.actualBalance || 0,
         lastModified: Math.max(
-          ...envelopes.map((e) => e.lastModified || e.createdAt || 0),
-          ...transactions.map((t) => t.lastModified || t.createdAt || 0),
-          ...bills.map((b) => b.lastModified || b.createdAt || 0),
-          ...debts.map((d) => d.lastModified || d.createdAt || 0),
-          budgetMetadata?.lastModified || 0,
+          ...envelopes.map((e) => this._ensureNumericTimestamp(e.lastModified || e.createdAt || 0)),
+          ...transactions.map((t) =>
+            this._ensureNumericTimestamp(t.lastModified || t.createdAt || 0)
+          ),
+          ...bills.map((b) => this._ensureNumericTimestamp(b.lastModified || b.createdAt || 0)),
+          ...debts.map((d) => this._ensureNumericTimestamp(d.lastModified || d.createdAt || 0)),
+          this._ensureNumericTimestamp(budgetMetadata?.lastModified || 0),
           0
         ),
       };
