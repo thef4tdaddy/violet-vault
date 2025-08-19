@@ -90,7 +90,7 @@ export const runImmediateSyncHealthCheck = async () => {
 
     const syncResult = await cloudSyncService.determineSyncDirection(
       mockFirestoreData,
-      mockDexieData
+      mockDexieData,
     );
 
     if (syncResult.direction === "toFirestore") {
@@ -101,7 +101,9 @@ export const runImmediateSyncHealthCheck = async () => {
       });
       results.passed++;
     } else {
-      throw new Error(`Wrong direction: ${syncResult.direction}, expected: toFirestore`);
+      throw new Error(
+        `Wrong direction: ${syncResult.direction}, expected: toFirestore`,
+      );
     }
   } catch (error) {
     results.tests.push({
@@ -194,7 +196,10 @@ export const runImmediateSyncHealthCheck = async () => {
 
     const syncData = await cloudSyncService.fetchDexieData();
 
-    if (typeof syncData.unassignedCash === "number" && typeof syncData.actualBalance === "number") {
+    if (
+      typeof syncData.unassignedCash === "number" &&
+      typeof syncData.actualBalance === "number"
+    ) {
       results.tests.push({
         name: "Metadata Handling",
         status: "✅ PASSED",
@@ -221,7 +226,7 @@ export const runImmediateSyncHealthCheck = async () => {
     const testBudgetId = "test-budget-" + Date.now();
     const testKey = new ArrayBuffer(32); // Dummy encryption key
 
-    chunkedFirebaseSync.initialize(testBudgetId, testKey);
+    await chunkedFirebaseSync.initialize(testBudgetId, testKey);
 
     results.tests.push({
       name: "Chunked Firebase Init",
@@ -239,7 +244,9 @@ export const runImmediateSyncHealthCheck = async () => {
   }
 
   // Print Results
-  const passRate = Math.round((results.passed / (results.passed + results.failed)) * 100);
+  const passRate = Math.round(
+    (results.passed / (results.passed + results.failed)) * 100,
+  );
 
   logger.info("🔧 SYNC HEALTH CHECK COMPLETE:", {
     total: results.tests.length,
@@ -249,13 +256,17 @@ export const runImmediateSyncHealthCheck = async () => {
   });
 
   results.tests.forEach((test) => {
-    logger.info(`${test.status} ${test.name}: ${test.details || test.error || ""}`);
+    logger.info(
+      `${test.status} ${test.name}: ${test.details || test.error || ""}`,
+    );
   });
 
   if (results.failed === 0) {
     logger.info("🎉 ALL SYNC HEALTH CHECKS PASSED! Sync system is ready.");
   } else {
-    logger.warn(`⚠️ ${results.failed} health check(s) failed. Please investigate.`);
+    logger.warn(
+      `⚠️ ${results.failed} health check(s) failed. Please investigate.`,
+    );
   }
 
   return results;
