@@ -640,11 +640,16 @@ class ChunkedFirebaseSync {
       let encryptionKeyDebug = "none";
       if (this.encryptionKey) {
         try {
-          // Get first 16 bytes of encryption key as hex for debugging (safe to log)
-          const keyView = new Uint8Array(this.encryptionKey);
-          encryptionKeyDebug = Array.from(keyView.slice(0, 16))
-            .map((b) => b.toString(16).padStart(2, "0"))
-            .join("");
+          // CryptoKey objects cannot be directly viewed as Uint8Array
+          if (this.encryptionKey instanceof CryptoKey) {
+            encryptionKeyDebug = `CryptoKey(${this.encryptionKey.algorithm.name})`;
+          } else {
+            // If it's an ArrayBuffer, get first 16 bytes as hex for debugging (safe to log)
+            const keyView = new Uint8Array(this.encryptionKey);
+            encryptionKeyDebug = Array.from(keyView.slice(0, 16))
+              .map((b) => b.toString(16).padStart(2, "0"))
+              .join("");
+          }
         } catch {
           encryptionKeyDebug = "error";
         }
@@ -658,9 +663,7 @@ class ChunkedFirebaseSync {
         budgetId: this.budgetId?.slice(0, 8) || "none",
         fullBudgetId: this.budgetId,
         encryptionKeyPreview: encryptionKeyDebug,
-        encryptionKeyLength: this.encryptionKey
-          ? new Uint8Array(this.encryptionKey).length
-          : 0,
+        encryptionKeyType: this.encryptionKey?.constructor?.name || "none",
       });
 
       const startTime = Date.now();
@@ -782,9 +785,23 @@ class ChunkedFirebaseSync {
                 manifestDecryptionData.iv,
               ),
             );
-          } catch (base64Error) {
-            logger.error("❌ Base64 conversion failed:", base64Error);
-            throw new Error(`Base64 data corruption: ${base64Error.message}`);
+          } catch (decryptError) {
+            // The error is likely from the decryption process, not base64 conversion
+            logger.error(
+              "❌ Manifest decryption failed after base64 conversion:",
+              decryptError,
+            );
+
+            if (decryptError.name === "OperationError") {
+              throw new Error(
+                `Manifest decryption failed: Wrong encryption key or corrupted data. ` +
+                  `This often happens when trying to decrypt data encrypted with a different password.`,
+              );
+            }
+
+            throw new Error(
+              `Manifest processing error: ${decryptError.message}`,
+            );
           }
         } else {
           // Old array format (backward compatibility)

@@ -280,12 +280,17 @@ class CloudSyncService {
       let encryptionKeyDebug = "none";
       if (this.config?.encryptionKey) {
         try {
-          // Get first 16 bytes of encryption key as hex for debugging (safe to log)
-          const keyView = new Uint8Array(this.config.encryptionKey);
-          encryptionKeyDebug = Array.from(keyView.slice(0, 16))
-            .map((b) => b.toString(16).padStart(2, "0"))
-            .join("");
-        } catch (error) {
+          // CryptoKey objects cannot be directly viewed as Uint8Array
+          if (this.config.encryptionKey instanceof CryptoKey) {
+            encryptionKeyDebug = `CryptoKey(${this.config.encryptionKey.algorithm.name})`;
+          } else {
+            // If it's an ArrayBuffer, get first 16 bytes as hex for debugging (safe to log)
+            const keyView = new Uint8Array(this.config.encryptionKey);
+            encryptionKeyDebug = Array.from(keyView.slice(0, 16))
+              .map((b) => b.toString(16).padStart(2, "0"))
+              .join("");
+          }
+        } catch {
           encryptionKeyDebug = "error";
         }
       }
