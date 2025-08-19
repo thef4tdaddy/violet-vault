@@ -199,23 +199,41 @@ class ChunkedFirebaseSync {
   async initialize(budgetId, encryptionKey) {
     this.budgetId = budgetId;
 
-    // Convert ArrayBuffer encryption key to CryptoKey if needed
-    if (encryptionKey instanceof ArrayBuffer) {
-      try {
+    if (!encryptionKey) {
+      throw new Error("Encryption key is required for sync");
+    }
+
+    try {
+      if (encryptionKey instanceof CryptoKey) {
+        this.encryptionKey = encryptionKey;
+      } else {
+        let rawKey;
+
+        if (encryptionKey instanceof Uint8Array) {
+          rawKey = encryptionKey.buffer.slice(
+            encryptionKey.byteOffset,
+            encryptionKey.byteOffset + encryptionKey.byteLength,
+          );
+        } else if (encryptionKey instanceof ArrayBuffer) {
+          rawKey = encryptionKey;
+        } else {
+          logger.error("Invalid encryption key type", {
+            type: typeof encryptionKey,
+          });
+          throw new Error("Invalid encryption key format");
+        }
+
         this.encryptionKey = await crypto.subtle.importKey(
           "raw",
-          encryptionKey,
+          rawKey,
           { name: "AES-GCM" },
           false,
           ["encrypt", "decrypt"],
         );
-      } catch (error) {
-        logger.error("Failed to import encryption key:", error);
-        throw new Error("Invalid encryption key format");
       }
-    } else {
-      // Assume it's already a CryptoKey
-      this.encryptionKey = encryptionKey;
+    } catch (error) {
+      logger.error("Failed to import encryption key:", error);
+      throw new Error("Invalid encryption key format");
     }
 
     logger.info("🗂️ ChunkedFirebaseSync initialized", {
@@ -558,7 +576,10 @@ class ChunkedFirebaseSync {
           totalTransactions: data.transactions?.length || 0,
           totalEnvelopes: data.envelopes?.length || 0,
           totalBills: data.bills?.length || 0,
+          totalDebts: data.debts?.length || 0,
         },
+        unassignedCash: data.unassignedCash || 0,
+        actualBalance: data.actualBalance || 0,
       });
 
       // Encrypt manifest using safe JSON stringify
@@ -862,6 +883,18 @@ class ChunkedFirebaseSync {
       const reconstructedData = {
         lastModified: decryptedManifest.lastModified,
       };
+
+      // Restore simple metadata values from manifest
+      if (decryptedManifest.metadata) {
+        if (typeof decryptedManifest.metadata.unassignedCash === "number") {
+          reconstructedData.unassignedCash =
+            decryptedManifest.metadata.unassignedCash;
+        }
+        if (typeof decryptedManifest.metadata.actualBalance === "number") {
+          reconstructedData.actualBalance =
+            decryptedManifest.metadata.actualBalance;
+        }
+      }
 
       // Load all chunks for each array field
       for (const [fieldName, chunkIds] of Object.entries(chunkMap)) {
