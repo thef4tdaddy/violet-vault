@@ -304,7 +304,7 @@ const MainContent = ({
     : 0;
 
   return (
-    <OnboardingTutorial>
+    <OnboardingTutorial setActiveView={setActiveView}>
       <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden pb-24 sm:pb-0">
         <div className="max-w-7xl mx-auto relative">
           <div className="relative z-50">

@@ -12,7 +12,7 @@ import logger from "../../utils/logger";
 /**
  * OnboardingTutorial - Provides guided tours and contextual hints for new users
  */
-const OnboardingTutorial = ({ children }) => {
+const OnboardingTutorial = ({ children, setActiveView }) => {
   const {
     isOnboarded,
     currentTutorialStep,
@@ -43,46 +43,60 @@ const OnboardingTutorial = ({ children }) => {
       id: "set-bank-balance",
       title: "Set Your Bank Balance 🏦",
       description:
-        "First, let's set your current actual bank account balance so we can track your real money.",
+        "Click on your Total Cash card to set your actual bank account balance so we can track your real money.",
       target: "[data-tour='actual-balance']",
       position: "bottom",
-      action: () => startTutorialStep("firstBankBalance"),
+      action: () => {
+        startTutorialStep("firstBankBalance");
+        // The Total Cash card should be clickable to open balance modal
+      },
     },
     {
       id: "add-debts",
       title: "Add Your Debts (Optional) 💳",
       description:
-        "Track credit cards, loans, and other debts to get a complete financial picture.",
-      target: "[data-tour='add-debt']",
-      position: "bottom",
-      action: () => startTutorialStep("firstDebts"),
+        "Let's go to the Debt Tracking page to add credit cards, loans, and other debts.",
+      target: null,
+      position: "center",
+      action: () => {
+        startTutorialStep("firstDebts");
+        if (setActiveView) setActiveView("debts");
+      },
     },
     {
       id: "add-bills",
       title: "Set Up Recurring Bills (Optional) 📋",
       description:
-        "Add bills like rent, utilities, subscriptions to plan for upcoming expenses.",
-      target: "[data-tour='add-bill']",
-      position: "bottom",
-      action: () => startTutorialStep("firstBills"),
+        "Now let's go to the Bills page to add recurring expenses like rent and utilities.",
+      target: null,
+      position: "center",
+      action: () => {
+        startTutorialStep("firstBills");
+        if (setActiveView) setActiveView("bills");
+      },
     },
     {
       id: "add-paycheck",
       title: "Add Your Paycheck 💰",
-      description:
-        "Add your income source - this money will be available to allocate to envelopes.",
-      target: "[data-tour='add-paycheck']",
-      position: "bottom",
-      action: () => startTutorialStep("firstPaycheck"),
+      description: "Let's go to the Paycheck page to add your income source.",
+      target: null,
+      position: "center",
+      action: () => {
+        startTutorialStep("firstPaycheck");
+        if (setActiveView) setActiveView("paycheck");
+      },
     },
     {
       id: "create-envelope",
       title: "Create Budget Envelopes 📮",
       description:
-        "Create categories (envelopes) for your money like groceries, rent, savings.",
-      target: "[data-tour='add-envelope']",
-      position: "bottom",
-      action: () => startTutorialStep("firstEnvelope"),
+        "Now let's go to the Envelopes page to create categories for your money like groceries, rent, savings.",
+      target: null,
+      position: "center",
+      action: () => {
+        startTutorialStep("firstEnvelope");
+        if (setActiveView) setActiveView("envelopes");
+      },
     },
     {
       id: "link-bills",
@@ -106,10 +120,13 @@ const OnboardingTutorial = ({ children }) => {
       id: "track-spending",
       title: "Track Your Spending 💳",
       description:
-        "Add transactions to see where your money goes and keep envelopes accurate.",
-      target: "[data-tour='add-transaction']",
-      position: "bottom",
-      action: () => startTutorialStep("firstTransaction"),
+        "Finally, let's go to the Transactions page to track where your money goes.",
+      target: null,
+      position: "center",
+      action: () => {
+        startTutorialStep("firstTransaction");
+        if (setActiveView) setActiveView("transactions");
+      },
     },
     {
       id: "sync-benefits",
