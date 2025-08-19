@@ -13,6 +13,10 @@ import "./utils/chunkedFirebaseSync.js";
 import { runDataDiagnostic } from "./utils/dataDiagnostic.js";
 import { runSyncDiagnostic } from "./utils/syncDiagnostic.js";
 import { fixMetadata } from "./utils/fixMetadata.js";
+import { runImmediateSyncHealthCheck } from "./utils/syncHealthChecker.js";
+import syncEdgeCaseTester from "./utils/syncEdgeCaseTester.js";
+import { validateAllSyncFlows } from "./utils/syncFlowValidator.js";
+import { runMasterSyncValidation, getQuickSyncStatus } from "./utils/masterSyncValidator.js";
 
 if (
   typeof window !== "undefined" &&
@@ -23,6 +27,11 @@ if (
   window.dataDiagnostic = runDataDiagnostic;
   window.syncDiagnostic = runSyncDiagnostic;
   window.fixMetadata = fixMetadata;
+  window.runSyncHealthCheck = runImmediateSyncHealthCheck;
+  window.runSyncEdgeCaseTests = () => syncEdgeCaseTester.runAllTests();
+  window.validateAllSyncFlows = validateAllSyncFlows;
+  window.runMasterSyncValidation = runMasterSyncValidation;
+  window.getQuickSyncStatus = getQuickSyncStatus;
 }
 
 initHighlight();
