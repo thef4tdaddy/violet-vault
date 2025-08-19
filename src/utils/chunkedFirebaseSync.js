@@ -122,12 +122,37 @@ class ChunkedFirebaseSync {
                   "Anonymous authentication may not be enabled in Firebase Console",
                 solution:
                   "Enable Anonymous Authentication in Firebase Console > Authentication > Sign-in method",
-                projectId: this.config?.projectId || "unknown",
+                projectId: firebaseConfig.projectId || "unknown",
               });
 
               // Don't fail completely - allow app to work in local-only mode
               logger.info(
                 "📱 Continuing in local-only mode without cloud sync",
+              );
+              this.isAuthenticated = false;
+              unsubscribe();
+              resolve(false); // Resolve with false instead of rejecting
+              return;
+            }
+
+            // Handle unauthorized domain errors
+            if (error.code === "auth/unauthorized-domain") {
+              logger.warn(
+                "🌐 Firebase Auth domain authorization issue detected:",
+                {
+                  message: `Domain '${window.location.hostname}' is not authorized for Firebase Auth`,
+                  solution:
+                    "Add this domain to Firebase Console > Authentication > Settings > Authorized domains",
+                  currentDomain: window.location.hostname,
+                  projectId: firebaseConfig.projectId || "unknown",
+                  setupGuide:
+                    "See docs/Firebase-Auth-Domain-Setup.md for detailed instructions",
+                },
+              );
+
+              // Don't fail completely - allow app to work in local-only mode
+              logger.info(
+                "📱 Continuing in local-only mode without cloud sync due to domain restriction",
               );
               this.isAuthenticated = false;
               unsubscribe();
