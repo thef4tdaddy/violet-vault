@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { getQuickSyncStatus } from "../../utils/masterSyncValidator";
+import cloudSyncService from "../../services/cloudSyncService";
 import logger from "../../utils/logger";
 
 const SyncHealthIndicator = () => {
@@ -11,6 +12,8 @@ const SyncHealthIndicator = () => {
   });
 
   const [showDetails, setShowDetails] = useState(false);
+  const [isBackgroundSyncing, setIsBackgroundSyncing] = useState(false);
+  const dropdownRef = useRef(null);
 
   // Check sync health on component mount and periodically
   useEffect(() => {
@@ -20,6 +23,47 @@ const SyncHealthIndicator = () => {
     const interval = setInterval(checkSyncHealth, 120000);
     return () => clearInterval(interval);
   }, []);
+
+  // Monitor background sync activity
+  useEffect(() => {
+    // Check if sync is running by monitoring the service state
+    const checkSyncActivity = () => {
+      const isRunning = cloudSyncService.isRunning && cloudSyncService.activeSyncPromise;
+      setIsBackgroundSyncing(isRunning);
+    };
+
+    // Check immediately
+    checkSyncActivity();
+
+    // Check every 5 seconds when potentially syncing
+    const activityInterval = setInterval(checkSyncActivity, 5000);
+    
+    return () => clearInterval(activityInterval);
+  }, []);
+
+  // Handle clicks outside dropdown and escape key to close it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDetails(false);
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setShowDetails(false);
+      }
+    };
+
+    if (showDetails) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+        document.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [showDetails]);
 
   const checkSyncHealth = async () => {
     try {
@@ -58,7 +102,8 @@ const SyncHealthIndicator = () => {
   };
 
   const getStatusIcon = () => {
-    if (syncStatus.isLoading) {
+    // Show spinning indicator for loading or background sync activity
+    if (syncStatus.isLoading || isBackgroundSyncing) {
       return (
         <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
           <circle
@@ -125,6 +170,7 @@ const SyncHealthIndicator = () => {
 
   const getStatusText = () => {
     if (syncStatus.isLoading) return "Checking...";
+    if (isBackgroundSyncing) return "Syncing...";
 
     switch (syncStatus.status) {
       case "HEALTHY":
@@ -169,7 +215,7 @@ const SyncHealthIndicator = () => {
       <button
         onClick={() => setShowDetails(!showDetails)}
         className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 ${getStatusColor()} hover:bg-gray-100 dark:hover:bg-gray-800`}
-        title={`Sync Status: ${syncStatus.status} - Click for details`}
+        title={`Sync Status: ${syncStatus.status}${isBackgroundSyncing ? ' (Syncing...)' : ''} - Click for details`}
       >
         {getStatusIcon()}
         <span className="text-sm font-medium">{getStatusText()}</span>
@@ -177,11 +223,25 @@ const SyncHealthIndicator = () => {
 
       {/* Details Dropdown */}
       {showDetails && (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+        <div 
+          ref={dropdownRef}
+          className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50"
+        >
           <div className="p-4">
-            <h3 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">
-              Sync Health Status
-            </h3>
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Sync Health Status
+              </h3>
+              <button
+                onClick={() => setShowDetails(false)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                title="Close"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
 
             <div className="space-y-3">
               <div className="flex justify-between items-center">
@@ -190,6 +250,21 @@ const SyncHealthIndicator = () => {
                 </span>
                 <span className={`text-sm font-medium ${getStatusColor()}`}>
                   {syncStatus.status}
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600 dark:text-gray-300">
+                  Background Sync:
+                </span>
+                <span className={`text-sm font-medium flex items-center space-x-1 ${isBackgroundSyncing ? 'text-blue-500' : 'text-gray-500'}`}>
+                  {isBackgroundSyncing && (
+                    <svg className="w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" opacity="0.25" />
+                      <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                  )}
+                  <span>{isBackgroundSyncing ? 'Active' : 'Idle'}</span>
                 </span>
               </div>
 
