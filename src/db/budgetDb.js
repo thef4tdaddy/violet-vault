@@ -37,18 +37,6 @@ export class VioletVaultDB extends Dexie {
 
       // Debts table for debt tracking
       debts: "id, name, creditor, type, status, currentBalance, minimumPayment, lastModified",
-
-      // Budget History tables for version control
-      budgetCommits:
-        "hash, timestamp, message, author, parentHash, encryptedSnapshot, deviceFingerprint, [timestamp+author], [author+timestamp]",
-      budgetChanges:
-        "++id, commitHash, entityType, entityId, changeType, description, beforeData, afterData, [commitHash+entityType], [entityType+changeType]",
-
-      // Advanced Budget History features
-      budgetBranches:
-        "name, description, sourceCommitHash, headCommitHash, author, created, isActive, isMerged, [created+author], [isActive+created]",
-      budgetTags:
-        "name, description, commitHash, tagType, author, created, [created+tagType], [tagType+created]",
     });
 
     // Enhanced hooks for automatic timestamping across all tables
@@ -137,14 +125,6 @@ export class VioletVaultDB extends Dexie {
     addTimestampHooks(this.savingsGoals);
     addTimestampHooks(this.paycheckHistory);
     addTimestampHooks(this.debts);
-
-    // Budget history tables don't need lastModified since they're immutable
-    // but we'll add timestamp on creation
-    this.budgetCommits.hook("creating", (primKey, obj) => {
-      if (!obj.timestamp) {
-        obj.timestamp = Date.now();
-      }
-    });
 
     // Audit log hook
     // eslint-disable-next-line no-unused-vars
@@ -467,118 +447,6 @@ export class VioletVaultDB extends Dexie {
       lastOptimized: Date.now(),
     };
   }
-
-  // Budget History Methods
-  async createBudgetCommit(commitData) {
-    return this.budgetCommits.add({
-      hash: commitData.hash,
-      timestamp: commitData.timestamp || Date.now(),
-      message: commitData.message,
-      author: commitData.author,
-      parentHash: commitData.parentHash,
-      encryptedSnapshot: commitData.encryptedSnapshot,
-      deviceFingerprint: commitData.deviceFingerprint,
-    });
-  }
-
-  async getBudgetCommits(options = {}) {
-    const { limit = 50, offset = 0, author, since } = options;
-    let query = this.budgetCommits.orderBy("timestamp").reverse();
-
-    if (author) {
-      query = query.where("author").equals(author);
-    }
-
-    if (since) {
-      query = query.where("timestamp").above(since);
-    }
-
-    return query.offset(offset).limit(limit).toArray();
-  }
-
-  async getBudgetCommit(hash) {
-    return this.budgetCommits.where("hash").equals(hash).first();
-  }
-
-  async createBudgetChanges(changes) {
-    return this.budgetChanges.bulkAdd(changes);
-  }
-
-  async getBudgetChanges(commitHash) {
-    return this.budgetChanges.where("commitHash").equals(commitHash).toArray();
-  }
-
-  async getBudgetCommitCount() {
-    return this.budgetCommits.count();
-  }
-
-  // Advanced Budget History Methods: Branches and Tags
-  async createBudgetBranch(branchData) {
-    return this.budgetBranches.add({
-      name: branchData.name,
-      description: branchData.description,
-      sourceCommitHash: branchData.sourceCommitHash,
-      headCommitHash: branchData.headCommitHash,
-      author: branchData.author,
-      created: branchData.created || Date.now(),
-      isActive: branchData.isActive || false,
-      isMerged: branchData.isMerged || false,
-    });
-  }
-
-  async getBudgetBranches() {
-    return this.budgetBranches.orderBy("created").toArray();
-  }
-
-  async getBudgetBranch(name) {
-    return this.budgetBranches.where("name").equals(name).first();
-  }
-
-  async getActiveBudgetBranch() {
-    return this.budgetBranches.where("isActive").equals(true).first();
-  }
-
-  async updateBudgetBranch(name, updates) {
-    return this.budgetBranches.where("name").equals(name).modify(updates);
-  }
-
-  async deleteBudgetBranch(name) {
-    return this.budgetBranches.where("name").equals(name).delete();
-  }
-
-  async createBudgetTag(tagData) {
-    return this.budgetTags.add({
-      name: tagData.name,
-      description: tagData.description,
-      commitHash: tagData.commitHash,
-      tagType: tagData.tagType,
-      author: tagData.author,
-      created: tagData.created || Date.now(),
-    });
-  }
-
-  async getBudgetTags() {
-    return this.budgetTags.orderBy("created").reverse().toArray();
-  }
-
-  async getBudgetTag(name) {
-    return this.budgetTags.where("name").equals(name).first();
-  }
-
-  async getBudgetTagsByType(tagType) {
-    return this.budgetTags.where("tagType").equals(tagType).toArray();
-  }
-
-  async deleteBudgetTag(name) {
-    return this.budgetTags.where("name").equals(name).delete();
-  }
-
-  async clearBudgetHistory() {
-    return this.transaction("rw", [this.budgetCommits, this.budgetChanges], async () => {
-      await this.budgetCommits.clear();
-      await this.budgetChanges.clear();
-    });
-  }
 }
 
 export const budgetDb = new VioletVaultDB();
@@ -675,8 +543,6 @@ export const clearData = async () => {
     budgetDb.paycheckHistory.clear(),
     budgetDb.auditLog.clear(),
     budgetDb.cache.clear(),
-    budgetDb.budgetCommits.clear(),
-    budgetDb.budgetChanges.clear(),
   ]);
 };
 
