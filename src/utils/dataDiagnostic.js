@@ -64,14 +64,7 @@ export const runDataDiagnostic = async () => {
     }
 
     // Check all other tables
-    const tables = [
-      "envelopes",
-      "transactions",
-      "bills",
-      "debts",
-      "budgetCommits",
-      "budgetChanges",
-    ];
+    const tables = ["envelopes", "transactions", "bills", "debts"];
     const counts = {};
 
     for (const table of tables) {
