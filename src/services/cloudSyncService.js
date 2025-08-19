@@ -437,35 +437,18 @@ class CloudSyncService {
   }
 
   /**
-   * Fetch data from Dexie
+   * Fetch data from Dexie (restored to working pre-budget-history version)
    */
   async fetchDexieData() {
     try {
-      const [
-        envelopes,
-        transactions,
-        bills,
-        savingsGoals,
-        paycheckHistory,
-        debts,
-        budgetCommits,
-        budgetChanges,
-        budgetBranches,
-        budgetTags,
-        budgetMetadata,
-      ] = await Promise.all([
-        budgetDb.envelopes.toArray(),
-        budgetDb.transactions.toArray(),
-        budgetDb.bills.toArray(),
-        budgetDb.savingsGoals.toArray(),
-        budgetDb.paycheckHistory.toArray(),
-        budgetDb.debts.toArray(),
-        budgetDb.budgetCommits.toArray(),
-        budgetDb.budgetChanges.toArray(),
-        budgetDb.budgetBranches.toArray(),
-        budgetDb.budgetTags.toArray(),
-        budgetDb.budget.get("metadata"),
-      ]);
+      const [envelopes, transactions, bills, savingsGoals, paycheckHistory] =
+        await Promise.all([
+          budgetDb.envelopes.toArray(),
+          budgetDb.transactions.toArray(),
+          budgetDb.bills.toArray(),
+          budgetDb.savingsGoals.toArray(),
+          budgetDb.paycheckHistory.toArray(),
+        ]);
 
       // Debug what we're actually fetching from Dexie
       logger.debug("🗃️ CloudSync fetchDexieData results", {
@@ -474,17 +457,9 @@ class CloudSyncService {
         billsCount: bills.length,
         savingsGoalsCount: savingsGoals.length,
         paycheckHistoryCount: paycheckHistory.length,
-        debtsCount: debts.length,
-        budgetCommitsCount: budgetCommits.length,
-        budgetChangesCount: budgetChanges.length,
-        budgetBranchesCount: budgetBranches.length,
-        budgetTagsCount: budgetTags.length,
-        unassignedCash: budgetMetadata?.unassignedCash || 0,
-        actualBalance: budgetMetadata?.actualBalance || 0,
         firstEnvelope: envelopes[0]?.name || "none",
         firstTransaction: transactions[0]?.description || "none",
         firstBill: bills[0]?.name || "none",
-        firstDebt: debts[0]?.name || "none",
       });
 
       return {
@@ -493,24 +468,10 @@ class CloudSyncService {
         bills,
         savingsGoals,
         paycheckHistory,
-        debts,
-        budgetCommits,
-        budgetChanges,
-        budgetBranches,
-        budgetTags,
-        unassignedCash: budgetMetadata?.unassignedCash || 0,
-        actualBalance: budgetMetadata?.actualBalance || 0,
         lastModified: Math.max(
-          ...envelopes.map((e) => this._ensureNumericTimestamp(e.lastModified || e.createdAt || 0)),
-          ...transactions.map((t) => this._ensureNumericTimestamp(t.lastModified || t.createdAt || 0)),
-          ...bills.map((b) => this._ensureNumericTimestamp(b.lastModified || b.createdAt || 0)),
-          ...debts.map((d) => this._ensureNumericTimestamp(d.lastModified || d.createdAt || 0)),
-          // TODO: Temporarily exclude budget history from sync until sync issues are resolved
-          // ...budgetCommits.map((c) => this._ensureNumericTimestamp(c.timestamp || 0)),
-          // ...budgetChanges.map((c) => this._ensureNumericTimestamp(c.timestamp || 0)),
-          // ...budgetBranches.map((b) => this._ensureNumericTimestamp(b.created || 0)),
-          // ...budgetTags.map((t) => this._ensureNumericTimestamp(t.created || 0)),
-          this._ensureNumericTimestamp(budgetMetadata?.lastModified || 0),
+          ...envelopes.map((e) => e.lastModified || e.createdAt || 0),
+          ...transactions.map((t) => t.lastModified || t.createdAt || 0),
+          ...bills.map((b) => b.lastModified || b.createdAt || 0),
           0,
         ),
       };
@@ -522,13 +483,6 @@ class CloudSyncService {
         bills: [],
         savingsGoals: [],
         paycheckHistory: [],
-        debts: [],
-        budgetCommits: [],
-        budgetChanges: [],
-        budgetBranches: [],
-        budgetTags: [],
-        unassignedCash: 0,
-        actualBalance: 0,
         lastModified: 0,
       };
     }
