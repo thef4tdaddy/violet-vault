@@ -39,6 +39,9 @@ import LockScreen from "../security/LockScreen";
 import SecuritySettings from "../settings/SecuritySettings";
 import SettingsDashboard from "../settings/SettingsDashboard";
 import { useSecurityManager } from "../../hooks/useSecurityManager";
+import OnboardingTutorial from "../onboarding/OnboardingTutorial";
+import OnboardingProgress from "../onboarding/OnboardingProgress";
+import { useOnboardingAutoComplete } from "../../hooks/useOnboardingAutoComplete";
 
 // Heavy components now lazy loaded in ViewRenderer
 
@@ -71,7 +74,8 @@ const Layout = () => {
     dataLoaded: _dataLoaded,
   } = useDataInitialization();
 
-  const { exportData, importData, resetEncryptionAndStartFresh } = useDataManagement();
+  const { exportData, importData, resetEncryptionAndStartFresh } =
+    useDataManagement();
 
   const {
     rotationDue,
@@ -110,12 +114,22 @@ const Layout = () => {
 
   // Show authentication gateway if neither standard nor local-only mode is ready
   if (!isLocalOnlyMode && (!isUnlocked || !currentUser)) {
-    return <AuthGateway onSetupComplete={handleSetup} onLocalOnlyReady={handleLocalOnlyReady} />;
+    return (
+      <AuthGateway
+        onSetupComplete={handleSetup}
+        onLocalOnlyReady={handleLocalOnlyReady}
+      />
+    );
   }
 
   // In local-only mode but user not ready yet
   if (isLocalOnlyMode && !localOnlyUser) {
-    return <AuthGateway onSetupComplete={handleSetup} onLocalOnlyReady={handleLocalOnlyReady} />;
+    return (
+      <AuthGateway
+        onSetupComplete={handleSetup}
+        onLocalOnlyReady={handleLocalOnlyReady}
+      />
+    );
   }
 
   logger.budgetSync("Rendering BudgetProvider with props", {
@@ -155,7 +169,9 @@ const Layout = () => {
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="glassmorphism rounded-2xl p-6 w-full max-w-md border border-white/30 shadow-2xl">
             <h3 className="text-xl font-semibold mb-4">Password Expired</h3>
-            <p className="text-gray-700 mb-4">For security, please set a new password.</p>
+            <p className="text-gray-700 mb-4">
+              For security, please set a new password.
+            </p>
             <input
               type="password"
               value={newPassword}
@@ -213,7 +229,15 @@ const MainContent = ({
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   // Custom hooks for MainContent business logic
-  const { handleManualSync } = useFirebaseSync(firebaseSync, encryptionKey, budgetId, currentUser);
+  const { handleManualSync } = useFirebaseSync(
+    firebaseSync,
+    encryptionKey,
+    budgetId,
+    currentUser,
+  );
+
+  // Auto-complete onboarding steps based on user actions
+  useOnboardingAutoComplete();
 
   // Handle import by saving data then loading into context
   const handleImport = async (event) => {
@@ -226,7 +250,14 @@ const MainContent = ({
   // Handle change password - delegate to parent component
   const handleChangePassword = onChangePassword;
 
-  const { envelopes, savingsGoals, unassignedCash, paycheckHistory, isOnline, isSyncing } = budget;
+  const {
+    envelopes,
+    savingsGoals,
+    unassignedCash,
+    paycheckHistory,
+    isOnline,
+    isSyncing,
+  } = budget;
 
   // Payday prediction notifications (after destructuring)
   usePaydayPrediction(paycheckHistory, !!currentUser);
@@ -238,23 +269,34 @@ const MainContent = ({
   const totalSavingsBalance = Array.isArray(savingsGoals)
     ? savingsGoals.reduce((sum, goal) => sum + goal.currentAmount, 0)
     : 0;
-  const _totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
+  const _totalCash =
+    totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
 
   // Calculate total biweekly funding need across all envelope types
   const _totalBiweeklyNeed = Array.isArray(envelopes)
     ? envelopes.reduce((sum, env) => {
         // Auto-classify envelope type if not set
-        const envelopeType = env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
+        const envelopeType =
+          env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
 
         let biweeklyNeed = 0;
         if (envelopeType === "bill" && env.biweeklyAllocation) {
-          biweeklyNeed = Math.max(0, env.biweeklyAllocation - env.currentBalance);
+          biweeklyNeed = Math.max(
+            0,
+            env.biweeklyAllocation - env.currentBalance,
+          );
         } else if (envelopeType === "variable" && env.monthlyBudget) {
           const biweeklyTarget = env.monthlyBudget / BIWEEKLY_MULTIPLIER;
           biweeklyNeed = Math.max(0, biweeklyTarget - env.currentBalance);
         } else if (envelopeType === "savings" && env.targetAmount) {
-          const remainingToTarget = Math.max(0, env.targetAmount - env.currentBalance);
-          biweeklyNeed = Math.min(remainingToTarget, env.biweeklyAllocation || 0);
+          const remainingToTarget = Math.max(
+            0,
+            env.targetAmount - env.currentBalance,
+          );
+          biweeklyNeed = Math.min(
+            remainingToTarget,
+            env.biweeklyAllocation || 0,
+          );
         }
 
         return sum + biweeklyNeed;
@@ -262,25 +304,26 @@ const MainContent = ({
     : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden pb-24 sm:pb-0">
-      <div className="max-w-7xl mx-auto relative">
-        <div className="relative z-50">
-          <Header
-            currentUser={currentUser}
-            onUserChange={onUserChange}
-            onUpdateProfile={onUpdateProfile}
-            isLocalOnlyMode={isLocalOnlyMode}
-            onShowSettings={() => setShowSettingsModal(true)}
-          />
-        </div>
-        {rotationDue && (
-          <div className="mb-4 bg-amber-100 border border-amber-300 text-amber-700 rounded-lg p-4 text-center">
-            Your password is over 90 days old. Please change it.
+    <OnboardingTutorial>
+      <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden pb-24 sm:pb-0">
+        <div className="max-w-7xl mx-auto relative">
+          <div className="relative z-50">
+            <Header
+              currentUser={currentUser}
+              onUserChange={onUserChange}
+              onUpdateProfile={onUpdateProfile}
+              isLocalOnlyMode={isLocalOnlyMode}
+              onShowSettings={() => setShowSettingsModal(true)}
+            />
           </div>
-        )}
+          {rotationDue && (
+            <div className="mb-4 bg-amber-100 border border-amber-300 text-amber-700 rounded-lg p-4 text-center">
+              Your password is over 90 days old. Please change it.
+            </div>
+          )}
 
-        {/* Team Activity & Sync - Temporarily disabled to prevent browser crashes */}
-        {/* <TeamActivitySync
+          {/* Team Activity & Sync - Temporarily disabled to prevent browser crashes */}
+          {/* <TeamActivitySync
           activeUsers={activeUsers}
           recentActivity={recentActivity}
           currentUser={currentUser}
@@ -291,75 +334,87 @@ const MainContent = ({
         />
         */}
 
-        {/* Navigation Tabs */}
-        <NavigationTabs activeView={activeView} onViewChange={setActiveView} />
+          {/* Navigation Tabs */}
+          <NavigationTabs
+            activeView={activeView}
+            onViewChange={setActiveView}
+          />
 
-        {/* Summary Cards - Enhanced with clickable unassigned cash distribution */}
-        <SummaryCards />
+          {/* Onboarding Progress */}
+          <OnboardingProgress />
 
-        {/* Main Content */}
-        <ViewRendererComponent
-          activeView={activeView}
-          budget={budget}
-          currentUser={currentUser}
-          setActiveView={setActiveView}
-        />
+          {/* Summary Cards - Enhanced with clickable unassigned cash distribution */}
+          <SummaryCards />
 
-        <SyncStatusIndicators isOnline={isOnline} isSyncing={isSyncing} />
-        <ConflictResolutionModal
-          syncConflicts={syncConflicts}
-          onResolveConflict={onResolveConflict}
-          onDismiss={() => setSyncConflicts(null)}
-        />
+          {/* Main Content */}
+          <ViewRendererComponent
+            activeView={activeView}
+            budget={budget}
+            currentUser={currentUser}
+            setActiveView={setActiveView}
+          />
 
-        {/* Bug Report Button */}
-        <BugReportButton />
+          <SyncStatusIndicators isOnline={isOnline} isSyncing={isSyncing} />
+          <ConflictResolutionModal
+            syncConflicts={syncConflicts}
+            onResolveConflict={onResolveConflict}
+            onDismiss={() => setSyncConflicts(null)}
+          />
 
-        {/* Version Footer */}
-        <div className="mt-8 text-center">
-          <div className="glassmorphism rounded-2xl p-4 max-w-md mx-auto border border-gray-800/20">
-            <p className="text-sm text-gray-600">
-              <span className="font-semibold text-purple-600">{getVersionInfo().displayName}</span>{" "}
-              v{getVersionInfo().version}
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              Last updated: {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}
-            </p>
-            <p className="text-xs text-gray-500 mt-1">Built with ❤️ for secure budgeting</p>
+          {/* Bug Report Button */}
+          <BugReportButton />
+
+          {/* Version Footer */}
+          <div className="mt-8 text-center">
+            <div className="glassmorphism rounded-2xl p-4 max-w-md mx-auto border border-gray-800/20">
+              <p className="text-sm text-gray-600">
+                <span className="font-semibold text-purple-600">
+                  {getVersionInfo().displayName}
+                </span>{" "}
+                v{getVersionInfo().version}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                Last updated: {new Date().toLocaleDateString()} at{" "}
+                {new Date().toLocaleTimeString()}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                Built with ❤️ for secure budgeting
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Security Settings Modal */}
-      <SecuritySettings
-        isOpen={showSecuritySettings}
-        onClose={() => setShowSecuritySettings(false)}
-      />
-
-      {/* Settings Dashboard Modal */}
-      {showSettingsModal && (
-        <SettingsDashboard
-          isOpen={showSettingsModal}
-          onClose={() => setShowSettingsModal(false)}
-          onExport={onExport}
-          onImport={handleImport}
-          onLogout={onLogout}
-          onResetEncryption={() => {
-            // Reset the budget context data first
-            budget.resetAllData();
-            // Then call the original reset function (clears localStorage and calls logout)
-            onResetEncryption();
-          }}
-          onSync={handleManualSync}
-          onChangePassword={handleChangePassword}
-          currentUser={currentUser}
-          onUserChange={onUserChange}
-          onUpdateProfile={onUpdateProfile}
-          isLocalOnlyMode={isLocalOnlyMode}
-          securityManager={securityManager}
+        {/* Security Settings Modal */}
+        <SecuritySettings
+          isOpen={showSecuritySettings}
+          onClose={() => setShowSecuritySettings(false)}
         />
-      )}
-    </div>
+
+        {/* Settings Dashboard Modal */}
+        {showSettingsModal && (
+          <SettingsDashboard
+            isOpen={showSettingsModal}
+            onClose={() => setShowSettingsModal(false)}
+            onExport={onExport}
+            onImport={handleImport}
+            onLogout={onLogout}
+            onResetEncryption={() => {
+              // Reset the budget context data first
+              budget.resetAllData();
+              // Then call the original reset function (clears localStorage and calls logout)
+              onResetEncryption();
+            }}
+            onSync={handleManualSync}
+            onChangePassword={handleChangePassword}
+            currentUser={currentUser}
+            onUserChange={onUserChange}
+            onUpdateProfile={onUpdateProfile}
+            isLocalOnlyMode={isLocalOnlyMode}
+            securityManager={securityManager}
+          />
+        )}
+      </div>
+    </OnboardingTutorial>
   );
 };
 

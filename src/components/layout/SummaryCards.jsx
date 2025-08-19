@@ -129,6 +129,7 @@ const SummaryCards = () => {
             onClick={card.onClick}
             clickable={card.clickable}
             isNegative={card.isNegative}
+            dataTour={card.key === "total-cash" ? "actual-balance" : undefined}
           />
         ))}
       </div>
@@ -141,7 +142,7 @@ const SummaryCards = () => {
 
 const SummaryCard = memo(
   // eslint-disable-next-line no-unused-vars
-  ({ icon: _Icon, label, value, color, onClick, clickable, isNegative }) => {
+  ({ icon: _Icon, label, value, color, onClick, clickable, isNegative, dataTour }) => {
     const colorClasses = {
       purple: "bg-purple-500",
       emerald: "bg-emerald-500",
@@ -199,11 +200,12 @@ const SummaryCard = memo(
         onClick={onClick}
         className={`${baseClasses} ${clickableClasses} text-left w-full`}
         disabled={!onClick}
+        data-tour={dataTour}
       >
         {cardContent}
       </button>
     ) : (
-      <div className={baseClasses}>{cardContent}</div>
+      <div className={baseClasses} data-tour={dataTour}>{cardContent}</div>
     );
   }
 );

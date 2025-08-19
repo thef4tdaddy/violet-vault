@@ -226,6 +226,7 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
           <button
             onClick={() => setShowAddModal(true)}
             className="btn btn-primary flex items-center"
+            data-tour="add-transaction"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Transaction

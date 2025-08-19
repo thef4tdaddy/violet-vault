@@ -238,6 +238,7 @@ const PaycheckProcessor = ({
                   onClick={handleProcessPaycheck}
                   disabled={isProcessing}
                   className="flex-1 btn btn-success py-4 text-lg font-semibold rounded-2xl"
+                  data-tour="add-paycheck"
                 >
                   {isProcessing ? (
                     <div className="flex items-center">

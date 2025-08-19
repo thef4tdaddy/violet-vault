@@ -136,7 +136,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
           minAmount={50}
           minTransactions={3}
         />
-        <EnvelopeGrid />
+        <EnvelopeGrid data-tour="envelope-grid" />
       </div>
     ),
     savings: (
