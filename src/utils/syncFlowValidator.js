@@ -243,7 +243,7 @@ export const validateAllSyncFlows = async () => {
     };
 
     // Start service
-    cloudSyncService.start(testConfig);
+    await cloudSyncService.start(testConfig);
     const runningStatus = cloudSyncService.getStatus();
 
     // Stop service
