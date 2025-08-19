@@ -591,6 +591,8 @@ class CloudSyncService {
         budgetDb.bills,
         budgetDb.savingsGoals,
         budgetDb.paycheckHistory,
+        budgetDb.debts,
+        budgetDb.budget,
       ],
       async () => {
         // Clear existing data
@@ -600,6 +602,7 @@ class CloudSyncService {
           budgetDb.bills.clear(),
           budgetDb.savingsGoals.clear(),
           budgetDb.paycheckHistory.clear(),
+          budgetDb.debts.clear(),
         ]);
 
         // Add Firestore data to Dexie
@@ -625,8 +628,24 @@ class CloudSyncService {
             budgetDb.paycheckHistory.bulkAdd(firestoreData.paycheckHistory),
           );
         }
+        if (firestoreData.debts?.length > 0) {
+          addPromises.push(budgetDb.debts.bulkAdd(firestoreData.debts));
+        }
 
         await Promise.all(addPromises);
+
+        // Handle metadata (unassigned cash, actual balance)
+        if (
+          typeof firestoreData.unassignedCash === "number" ||
+          typeof firestoreData.actualBalance === "number"
+        ) {
+          await budgetDb.budget.put({
+            id: "metadata",
+            unassignedCash: firestoreData.unassignedCash || 0,
+            actualBalance: firestoreData.actualBalance || 0,
+            lastModified: Date.now(),
+          });
+        }
       },
     );
   }
