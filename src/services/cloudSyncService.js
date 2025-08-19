@@ -566,7 +566,9 @@ class CloudSyncService {
       } else if (dexieLastModified > firestoreLastModified) {
         return { direction: "toFirestore", data: dexieData };
       } else {
-        return { direction: "none", data: dexieData };
+        // When timestamps are equal, prefer uploading to ensure latest changes sync
+        logger.debug("📊 Equal timestamps detected, forcing upload to cloud");
+        return { direction: "toFirestore", data: dexieData };
       }
     }
 
