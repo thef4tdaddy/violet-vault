@@ -554,6 +554,7 @@ const BillManager = ({
           <button
             onClick={() => setShowAddBillModal(true)}
             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center"
+            data-tour="add-bill"
           >
             <Plus className="h-4 w-4 mr-2" /> Add Bill
           </button>

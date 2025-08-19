@@ -170,6 +170,7 @@ const DebtDashboard = () => {
           <button
             onClick={() => setShowAddModal(true)}
             className="btn btn-primary flex items-center"
+            data-tour="add-debt"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Debt

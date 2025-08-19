@@ -95,6 +95,7 @@ const EnvelopeHeader = ({
         <button
           onClick={() => setShowCreateModal(true)}
           className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 flex items-center text-sm"
+          data-tour="add-envelope"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Envelope
