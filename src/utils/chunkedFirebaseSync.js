@@ -56,11 +56,36 @@ function base64FromBytes(bytes) {
 }
 
 function bytesFromBase64(str) {
-  const binary = atob(str);
-  const len = binary.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
-  return bytes;
+  // Validate base64 string
+  if (!str || typeof str !== "string") {
+    throw new Error(`Invalid base64 input: expected string, got ${typeof str}`);
+  }
+
+  // Remove any whitespace
+  const cleanStr = str.replace(/\s/g, "");
+
+  // Check for valid base64 characters
+  const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/;
+  if (!base64Regex.test(cleanStr)) {
+    throw new Error(`Invalid base64 string: contains invalid characters`);
+  }
+
+  // Check length (base64 strings should be multiples of 4)
+  if (cleanStr.length % 4 !== 0) {
+    throw new Error(
+      `Invalid base64 string: length ${cleanStr.length} is not a multiple of 4`,
+    );
+  }
+
+  try {
+    const binary = atob(cleanStr);
+    const len = binary.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
+    return bytes;
+  } catch (error) {
+    throw new Error(`Failed to decode base64 string: ${error.message}`);
+  }
 }
 // -----------------------------------------------------------------------------
 
@@ -432,9 +457,9 @@ class ChunkedFirebaseSync {
             lastModified: Date.now(),
           };
 
-          // Encrypt the chunk data
+          // Encrypt the chunk data using safe JSON stringify
           const encryptedChunk = await encryptionUtils.encrypt(
-            JSON.stringify(chunkData),
+            this.safeStringify(chunkData),
             this.encryptionKey,
           );
 
@@ -536,9 +561,9 @@ class ChunkedFirebaseSync {
         },
       });
 
-      // Encrypt manifest
+      // Encrypt manifest using safe JSON stringify
       const encryptedManifest = await encryptionUtils.encrypt(
-        JSON.stringify(manifest),
+        this.safeStringify(manifest),
         this.encryptionKey,
       );
 

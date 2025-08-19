@@ -10,7 +10,7 @@ export const encryptionUtils = {
       encoder.encode(password),
       { name: "PBKDF2" },
       false,
-      ["deriveBits", "deriveKey"]
+      ["deriveBits", "deriveKey"],
     );
 
     const key = await crypto.subtle.deriveKey(
@@ -23,7 +23,7 @@ export const encryptionUtils = {
       keyMaterial,
       { name: "AES-GCM", length: 256 },
       true,
-      ["encrypt", "decrypt"]
+      ["encrypt", "decrypt"],
     );
 
     return key;
@@ -36,7 +36,7 @@ export const encryptionUtils = {
       encoder.encode(password),
       { name: "PBKDF2" },
       false,
-      ["deriveBits", "deriveKey"]
+      ["deriveBits", "deriveKey"],
     );
 
     // Generate deterministic salt from password to ensure same password = same key
@@ -54,7 +54,7 @@ export const encryptionUtils = {
       keyMaterial,
       { name: "AES-GCM", length: 256 },
       true,
-      ["encrypt", "decrypt"]
+      ["encrypt", "decrypt"],
     );
 
     return { key, salt };
@@ -63,10 +63,14 @@ export const encryptionUtils = {
   async encrypt(data, key) {
     const encoder = new TextEncoder();
     const iv = crypto.getRandomValues(new Uint8Array(12));
+
+    // Handle both string data (already JSON stringified) and object data
+    const stringData = typeof data === "string" ? data : JSON.stringify(data);
+
     const encrypted = await crypto.subtle.encrypt(
       { name: "AES-GCM", iv: iv },
       key,
-      encoder.encode(JSON.stringify(data))
+      encoder.encode(stringData),
     );
 
     return {
@@ -79,7 +83,7 @@ export const encryptionUtils = {
     const decrypted = await crypto.subtle.decrypt(
       { name: "AES-GCM", iv: new Uint8Array(iv) },
       key,
-      new Uint8Array(encryptedData)
+      new Uint8Array(encryptedData),
     );
 
     const decoder = new TextDecoder();
