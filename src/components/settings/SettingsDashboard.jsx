@@ -71,7 +71,7 @@ const SettingsDashboard = ({
         const authState = useAuth.getState();
 
         if (authState.encryptionKey && authState.currentUser && authState.budgetId) {
-          CloudSyncService.start({
+          await CloudSyncService.start({
             encryptionKey: authState.encryptionKey,
             currentUser: authState.currentUser,
             budgetId: authState.budgetId,
@@ -105,7 +105,7 @@ const SettingsDashboard = ({
         const authState = useAuth.getState();
 
         if (authState.encryptionKey && authState.currentUser && authState.budgetId) {
-          CloudSyncService.start({
+          await CloudSyncService.start({
             encryptionKey: authState.encryptionKey,
             currentUser: authState.currentUser,
             budgetId: authState.budgetId,
