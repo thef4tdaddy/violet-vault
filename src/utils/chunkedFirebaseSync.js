@@ -853,10 +853,11 @@ class ChunkedFirebaseSync {
             message:
               "Decryption operation failed - likely due to wrong key or corrupted data",
             possibleCauses: [
-              "Encryption key mismatch between devices",
+              "Encryption key mismatch between devices", 
               "Corrupted encrypted data",
               "Wrong initialization vector",
               "Data format corruption during storage/transmission",
+              "Cloud data from different user/session",
             ],
             encryptionKeyType: typeof this.encryptionKey,
             encryptionKeyConstructor: this.encryptionKey?.constructor?.name,
@@ -865,6 +866,16 @@ class ChunkedFirebaseSync {
                 ? "base64"
                 : "array",
           });
+
+          // For new users or incompatible cloud data, clear and proceed
+          logger.warn("🔧 Decryption failed - attempting recovery by clearing incompatible cloud data");
+          try {
+            await this.resetCloudData();
+            logger.info("✅ Incompatible cloud data cleared - will upload fresh local data");
+            return { data: null, recovered: true, reason: "decryption_key_mismatch" };
+          } catch (resetError) {
+            logger.error("❌ Failed to reset cloud data during recovery:", resetError);
+          }
 
           throw new Error(
             `Manifest decryption failed: Wrong encryption key or corrupted data. ` +

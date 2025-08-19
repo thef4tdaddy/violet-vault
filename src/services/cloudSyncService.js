@@ -721,7 +721,7 @@ class CloudSyncService {
     FirebaseSync.initialize(this.config.budgetId, this.config.encryptionKey);
 
     // Save data to cloud
-    await FirebaseSync.saveToCloud(dataToSync, this.config.currentUser);
+    await FirebaseSync.saveToCloud(dataToSync, this.config?.currentUser);
   }
 
   /**
@@ -906,7 +906,7 @@ class CloudSyncService {
 
       const saveResult = await ChunkedFirebaseSync.saveToCloud(
         dataToSync,
-        this.config.currentUser,
+        this.config?.currentUser,
       );
       if (saveResult?.localOnly) {
         logger.info("📱 Migration skipped - running in local-only mode");
@@ -978,7 +978,7 @@ class CloudSyncService {
     // Save data to cloud using chunked approach
     const result = await ChunkedFirebaseSync.saveToCloud(
       dataToSync,
-      this.config.currentUser,
+      this.config?.currentUser,
     );
 
     if (result?.localOnly) {
