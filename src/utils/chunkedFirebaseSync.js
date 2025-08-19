@@ -200,10 +200,34 @@ class ChunkedFirebaseSync {
   }
 
   /**
+   * Safe JSON stringify that handles circular references
+   */
+  safeStringify(data) {
+    const seen = new WeakSet();
+    return JSON.stringify(data, (key, val) => {
+      if (val != null && typeof val === "object") {
+        if (seen.has(val)) {
+          return "[Circular Reference]";
+        }
+        seen.add(val);
+      }
+      return val;
+    });
+  }
+
+  /**
    * Calculate the byte size of an object when JSON stringified
    */
   calculateSize(data) {
-    return new TextEncoder().encode(JSON.stringify(data)).length;
+    try {
+      return new TextEncoder().encode(this.safeStringify(data)).length;
+    } catch (error) {
+      logger.warn("Failed to calculate size for data, using fallback", {
+        error: error.message,
+      });
+      // Fallback: rough estimate based on object properties
+      return new TextEncoder().encode("[Complex Object]").length;
+    }
   }
 
   /**
@@ -596,7 +620,7 @@ class ChunkedFirebaseSync {
           encryptionKeyDebug = Array.from(keyView.slice(0, 16))
             .map((b) => b.toString(16).padStart(2, "0"))
             .join("");
-        } catch (error) {
+        } catch {
           encryptionKeyDebug = "error";
         }
       }
@@ -689,31 +713,103 @@ class ChunkedFirebaseSync {
         encryptedDataType: typeof manifestData.encryptedData,
         hasEncryptionKey: !!this.encryptionKey,
         isBase64Format: typeof manifestData.encryptedData?.data === "string",
+        manifestDataKeys: Object.keys(manifestData),
       });
 
       // Handle both old array format and new base64 format for manifest
       let decryptedManifest;
-      if (typeof manifestData.encryptedData?.data === "string") {
-        // New base64 format
-        const manifestDecryptionData = {
-          data: Array.from(bytesFromBase64(manifestData.encryptedData.data)),
-          iv: Array.from(bytesFromBase64(manifestData.encryptedData.iv)),
-        };
-        decryptedManifest = JSON.parse(
-          await encryptionUtils.decrypt(
-            manifestDecryptionData.data,
-            this.encryptionKey,
-            manifestDecryptionData.iv,
-          ),
-        );
-      } else {
-        // Old array format (backward compatibility)
-        decryptedManifest = JSON.parse(
-          await encryptionUtils.decrypt(
-            manifestData.encryptedData,
-            this.encryptionKey,
-          ),
-        );
+      try {
+        if (typeof manifestData.encryptedData?.data === "string") {
+          // New base64 format - validate base64 data first
+          if (
+            !manifestData.encryptedData.data ||
+            !manifestData.encryptedData.iv
+          ) {
+            throw new Error("Missing required base64 encrypted data or IV");
+          }
+
+          logger.debug("🔍 Base64 manifest data validation", {
+            dataLength: manifestData.encryptedData.data.length,
+            ivLength: manifestData.encryptedData.iv.length,
+            dataPreview:
+              manifestData.encryptedData.data.substring(0, 50) + "...",
+            ivPreview: manifestData.encryptedData.iv.substring(0, 32) + "...",
+          });
+
+          // Validate base64 strings before conversion
+          try {
+            const manifestDecryptionData = {
+              data: Array.from(
+                bytesFromBase64(manifestData.encryptedData.data),
+              ),
+              iv: Array.from(bytesFromBase64(manifestData.encryptedData.iv)),
+            };
+
+            logger.debug("🔍 Converted base64 to arrays", {
+              dataArrayLength: manifestDecryptionData.data.length,
+              ivArrayLength: manifestDecryptionData.iv.length,
+            });
+
+            decryptedManifest = JSON.parse(
+              await encryptionUtils.decrypt(
+                manifestDecryptionData.data,
+                this.encryptionKey,
+                manifestDecryptionData.iv,
+              ),
+            );
+          } catch (base64Error) {
+            logger.error("❌ Base64 conversion failed:", base64Error);
+            throw new Error(`Base64 data corruption: ${base64Error.message}`);
+          }
+        } else {
+          // Old array format (backward compatibility)
+          if (!Array.isArray(manifestData.encryptedData)) {
+            throw new Error(
+              "Invalid legacy encrypted data format - expected array",
+            );
+          }
+
+          logger.debug("🔍 Legacy array manifest data", {
+            arrayLength: manifestData.encryptedData.length,
+            isArray: Array.isArray(manifestData.encryptedData),
+          });
+
+          decryptedManifest = JSON.parse(
+            await encryptionUtils.decrypt(
+              manifestData.encryptedData,
+              this.encryptionKey,
+            ),
+          );
+        }
+      } catch (decryptError) {
+        logger.error("❌ Manifest decryption failed:", decryptError);
+
+        // Provide specific error context
+        if (decryptError.name === "OperationError") {
+          logger.error("🔍 OperationError details:", {
+            message:
+              "Decryption operation failed - likely due to wrong key or corrupted data",
+            possibleCauses: [
+              "Encryption key mismatch between devices",
+              "Corrupted encrypted data",
+              "Wrong initialization vector",
+              "Data format corruption during storage/transmission",
+            ],
+            encryptionKeyType: typeof this.encryptionKey,
+            encryptionKeyConstructor: this.encryptionKey?.constructor?.name,
+            dataFormat:
+              typeof manifestData.encryptedData?.data === "string"
+                ? "base64"
+                : "array",
+          });
+
+          throw new Error(
+            `Manifest decryption failed: Wrong encryption key or corrupted data. ` +
+              `This often happens when trying to sync data encrypted with a different password.`,
+          );
+        }
+
+        throw new Error(`Manifest decryption error: ${decryptError.message}`);
       }
 
       if (decryptedManifest.type !== "budget_manifest") {
@@ -767,17 +863,41 @@ class ChunkedFirebaseSync {
               // Handle both old array format and new base64 format
               let decryptionData;
               if (typeof encryptedChunk.encryptedData?.data === "string") {
-                // New base64 format
-                decryptionData = {
-                  data: Array.from(
-                    bytesFromBase64(encryptedChunk.encryptedData.data),
-                  ),
-                  iv: Array.from(
-                    bytesFromBase64(encryptedChunk.encryptedData.iv),
-                  ),
-                };
+                // New base64 format - validate first
+                if (
+                  !encryptedChunk.encryptedData.data ||
+                  !encryptedChunk.encryptedData.iv
+                ) {
+                  throw new Error(
+                    `Missing required base64 encrypted data or IV for chunk ${chunkId}`,
+                  );
+                }
+
+                try {
+                  decryptionData = {
+                    data: Array.from(
+                      bytesFromBase64(encryptedChunk.encryptedData.data),
+                    ),
+                    iv: Array.from(
+                      bytesFromBase64(encryptedChunk.encryptedData.iv),
+                    ),
+                  };
+                } catch (base64Error) {
+                  logger.error(
+                    `❌ Base64 conversion failed for chunk ${chunkId}:`,
+                    base64Error,
+                  );
+                  throw new Error(
+                    `Base64 data corruption in chunk ${chunkId}: ${base64Error.message}`,
+                  );
+                }
               } else {
                 // Old array format (backward compatibility)
+                if (!Array.isArray(encryptedChunk.encryptedData)) {
+                  throw new Error(
+                    `Invalid legacy encrypted data format for chunk ${chunkId} - expected array`,
+                  );
+                }
                 decryptionData = encryptedChunk.encryptedData;
               }
 
@@ -794,10 +914,20 @@ class ChunkedFirebaseSync {
                 data: decryptedChunk.data,
               });
             } catch (decryptError) {
-              logger.warn(
-                `⚠️ Failed to decrypt chunk: ${chunkId}`,
-                decryptError.message,
-              );
+              logger.warn(`⚠️ Failed to decrypt chunk: ${chunkId}`, {
+                error: decryptError.message,
+                errorName: decryptError.name,
+                chunkType: encryptedChunk.chunkType,
+                chunkIndex: encryptedChunk.chunkIndex,
+              });
+
+              // Provide specific context for OperationError
+              if (decryptError.name === "OperationError") {
+                logger.warn(
+                  `🔍 OperationError in chunk ${chunkId} - likely key mismatch or data corruption`,
+                );
+              }
+
               // Skip corrupted chunks rather than failing the entire operation
               continue;
             }
