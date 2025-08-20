@@ -46,8 +46,8 @@ const SummaryCards = () => {
     isLoading: envelopesLoading || savingsLoading || unassignedCashLoading,
   });
 
-  // Calculate total biweekly funding need
-  const biweeklyAllocation = envelopes.reduce((sum, env) => {
+  // Calculate remaining biweekly funding need (what you still need to fund)
+  const biweeklyRemaining = envelopes.reduce((sum, env) => {
     const envelopeType =
       env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
 
@@ -60,6 +60,27 @@ const SummaryCards = () => {
     } else if (envelopeType === "variable" && env.monthlyBudget) {
       const biweeklyTarget = env.monthlyBudget / BIWEEKLY_MULTIPLIER;
       biweeklyNeed = Math.max(0, biweeklyTarget - (env.currentBalance || 0));
+    } else if (envelopeType === "savings" && env.targetAmount) {
+      const remainingToTarget = Math.max(
+        0,
+        env.targetAmount - (env.currentBalance || 0),
+      );
+      biweeklyNeed = Math.min(remainingToTarget, env.biweeklyAllocation || 0);
+    }
+
+    return sum + biweeklyNeed;
+  }, 0);
+
+  // Calculate total biweekly allocation (full amount regardless of current balance)
+  const biweeklyTotal = envelopes.reduce((sum, env) => {
+    const envelopeType =
+      env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
+
+    let biweeklyNeed = 0;
+    if (envelopeType === "bill" && env.biweeklyAllocation) {
+      biweeklyNeed = env.biweeklyAllocation;
+    } else if (env.monthlyBudget) {
+      biweeklyNeed = env.monthlyBudget / BIWEEKLY_MULTIPLIER;
     } else if (envelopeType === "savings" && env.targetAmount) {
       const remainingToTarget = Math.max(
         0,
@@ -137,17 +158,17 @@ const SummaryCards = () => {
       color: "cyan",
     },
     {
-      key: "biweekly-need",
+      key: "biweekly-remaining",
       icon: DollarSign,
-      label: "Biweekly Need",
-      value: biweeklyAllocation,
+      label: "Biweekly Remaining",
+      value: biweeklyRemaining,
       color: "amber",
     },
   ];
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         {cards.map((card) => (
           <SummaryCard
             key={card.key}
@@ -162,6 +183,22 @@ const SummaryCards = () => {
           />
         ))}
       </div>
+
+      {/* Additional summary info */}
+      <div className="mb-8">
+        <div className="glassmorphism rounded-2xl p-4 border border-white/20 ring-1 ring-gray-800/10">
+          <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center text-gray-600">
+              <DollarSign className="h-4 w-4 mr-2" />
+              <span>Total Biweekly Allocation:</span>
+            </div>
+            <span className="font-semibold text-gray-900">
+              ${biweeklyTotal.toFixed(2)}
+            </span>
+          </div>
+        </div>
+      </div>
+
       <Suspense fallback={null}>
         <UnassignedCashModal />
       </Suspense>
