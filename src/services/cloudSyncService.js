@@ -22,7 +22,7 @@ class CloudSyncService {
    * Save downloaded cloud data to Dexie and invalidate TanStack Query caches
    */
   async saveToDexieAndInvalidate(data) {
-    logger.info("💾 Saving downloaded cloud data to Dexie...");
+    logger.debug("💾 Saving downloaded cloud data to Dexie...");
 
     try {
       // Save all data types to Dexie using bulk upsert methods
@@ -30,24 +30,24 @@ class CloudSyncService {
 
       if (data.transactions?.length > 0) {
         promises.push(budgetDb.bulkUpsertTransactions(data.transactions));
-        logger.info(
+        logger.debug(
           `💾 Saving ${data.transactions.length} transactions to Dexie`,
         );
       }
 
       if (data.envelopes?.length > 0) {
         promises.push(budgetDb.bulkUpsertEnvelopes(data.envelopes));
-        logger.info(`💾 Saving ${data.envelopes.length} envelopes to Dexie`);
+        logger.debug(`💾 Saving ${data.envelopes.length} envelopes to Dexie`);
       }
 
       if (data.bills?.length > 0) {
         promises.push(budgetDb.bulkUpsertBills(data.bills));
-        logger.info(`💾 Saving ${data.bills.length} bills to Dexie`);
+        logger.debug(`💾 Saving ${data.bills.length} bills to Dexie`);
       }
 
       if (data.debts?.length > 0) {
         promises.push(budgetDb.bulkUpsertDebts(data.debts));
-        logger.info(`💾 Saving ${data.debts.length} debts to Dexie`);
+        logger.debug(`💾 Saving ${data.debts.length} debts to Dexie`);
       }
 
       if (data.savingsGoals?.length > 0) {
@@ -77,12 +77,12 @@ class CloudSyncService {
 
         if (typeof data.unassignedCash === "number") {
           newMetadata.unassignedCash = data.unassignedCash;
-          logger.info(`💾 Saving unassigned cash: $${data.unassignedCash}`);
+          logger.debug(`💾 Saving unassigned cash: $${data.unassignedCash}`);
         }
 
         if (typeof data.actualBalance === "number") {
           newMetadata.actualBalance = data.actualBalance;
-          logger.info(`💾 Saving actual balance: $${data.actualBalance}`);
+          logger.debug(`💾 Saving actual balance: $${data.actualBalance}`);
         }
 
         promises.push(
@@ -218,11 +218,7 @@ class CloudSyncService {
         );
 
         // TEMP DEBUG: Verify ChunkedFirebaseSync actually stored the correct budget ID
-        logger.info("🔍 TEMP: ChunkedFirebaseSync reinitialized", {
-          configBudgetId: this.config.budgetId,
-          storedBudgetId: ChunkedFirebaseSync.budgetId,
-          match: this.config.budgetId === ChunkedFirebaseSync.budgetId,
-        });
+        logger.debug("🔄 ChunkedFirebaseSync reinitialized");
 
         return;
       } else {
@@ -273,13 +269,8 @@ class CloudSyncService {
 
     // CRITICAL DEBUG: Track budget ID in cloud sync service config
     logger.info("🌩️ Starting cloud sync service", {
-      hasEncryptionKey: true,
-      hasUser: !!config?.currentUser,
-      hasBudgetId: !!config?.budgetId,
-      configBudgetId: config?.budgetId,
-      configBudgetIdPreview: config?.budgetId?.slice(0, 12) + "...",
+      budgetId: config?.budgetId?.slice(0, 12) + "...",
       userName: config?.currentUser?.userName,
-      storedConfigBudgetId: this.config?.budgetId,
     });
 
     // Do initial sync immediately
@@ -329,7 +320,7 @@ class CloudSyncService {
   async performSync() {
     // Prevent concurrent syncs that can cause corruption
     if (this.activeSyncPromise) {
-      logger.info("🔄 Sync already in progress, waiting for completion...");
+      logger.debug("🔄 Sync already in progress, waiting for completion...");
       return await this.activeSyncPromise;
     }
 
@@ -356,7 +347,7 @@ class CloudSyncService {
       // Check if data has actually changed before performing expensive sync
       const hasChanged = await this.hasDataChanged();
       if (!hasChanged) {
-        logger.info("⏭️ No data changes detected, skipping sync");
+        logger.debug("⏭️ No data changes detected, skipping sync");
         return { success: true, skipped: true, reason: "No changes detected" };
       }
 
@@ -862,13 +853,7 @@ class CloudSyncService {
 
       logger.info("🗂️ Initializing ChunkedFirebaseSync...");
 
-      // TEMP DEBUG: Check exact budget ID being passed
-      logger.info("🚨 TEMP DEBUG: Budget ID about to be passed to initialize", {
-        configBudgetId: this.config.budgetId,
-        configBudgetIdLength: this.config.budgetId?.length,
-        configBudgetIdType: typeof this.config.budgetId,
-        configKeys: Object.keys(this.config || {}),
-      });
+      logger.debug("🔧 Initializing ChunkedFirebaseSync");
 
       // Initialize the ChunkedFirebaseSync instance
       await ChunkedFirebaseSync.initialize(
