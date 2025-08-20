@@ -733,17 +733,33 @@ const useBugReport = () => {
           }
         }
       } else {
-        // Older SDK or no isRecording method - try graceful start
+        // Older SDK or no isRecording method - handle gracefully
         try {
+          // First try to stop any existing session, then start fresh
+          if (typeof H.stop === "function") {
+            try {
+              H.stop();
+              if (import.meta.env.MODE === "development") {
+                logger.debug("Stopped existing Highlight.io session");
+              }
+            } catch (stopError) {
+              // Ignore stop errors - session might not be active
+              if (import.meta.env.MODE === "development") {
+                logger.debug("No existing session to stop:", stopError.message);
+              }
+            }
+          }
+
+          // Now start fresh session
           H.start();
           if (import.meta.env.MODE === "development") {
-            logger.debug("Attempted Highlight.io session start for bug report");
+            logger.debug("Started fresh Highlight.io session for bug report");
           }
         } catch (startError) {
           if (startError.message?.includes("already recording")) {
             if (import.meta.env.MODE === "development") {
               logger.debug(
-                "Highlight.io session already active (detected via error)",
+                "Highlight.io session still active after stop attempt",
               );
             }
           } else {
@@ -764,7 +780,7 @@ const useBugReport = () => {
         }
         // This is expected - don't log as error
       } else {
-        logger.warn("Failed to start Highlight.io session:", error.message);
+        logger.warn("Failed to manage Highlight.io session:", error.message);
         // Don't block the bug report modal from opening due to Highlight issues
       }
     }
