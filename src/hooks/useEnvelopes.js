@@ -157,8 +157,8 @@ const useEnvelopes = (options = {}) => {
       // Optimistic update
       await optimisticHelpers.addEnvelope(newEnvelope);
 
-      // Apply to Dexie directly
-      await budgetDb.envelopes.add(newEnvelope);
+      // Use put() instead of add() to handle duplicates gracefully
+      await budgetDb.envelopes.put(newEnvelope);
 
       return newEnvelope;
     },
