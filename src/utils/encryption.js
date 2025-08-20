@@ -137,15 +137,17 @@ export const encryptionUtils = {
     }
     const budgetId = `budget_${Math.abs(hash).toString(16)}`;
 
-    // Debug logging to track budget ID generation consistency
-    console.log(`🔍 DEBUG: generateBudgetId called`, {
-      passwordLength: masterPassword?.length || 0,
-      hash: hash,
-      absHash: Math.abs(hash),
-      hexHash: Math.abs(hash).toString(16),
-      finalBudgetId: budgetId,
-      timestamp: new Date().toISOString(),
-    });
+    // Debug logging to track budget ID generation consistency (development only)
+    if (import.meta?.env?.MODE === "development") {
+      console.log(`🔍 DEBUG: generateBudgetId called`, {
+        passwordLength: masterPassword?.length || 0,
+        hash: hash,
+        absHash: Math.abs(hash),
+        hexHash: Math.abs(hash).toString(16),
+        finalBudgetId: budgetId,
+        timestamp: new Date().toISOString(),
+      });
+    }
 
     return budgetId;
   },
