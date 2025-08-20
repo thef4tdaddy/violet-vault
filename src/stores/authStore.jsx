@@ -58,13 +58,12 @@ export const useAuth = create((set, get) => ({
             encryptionUtils.generateBudgetId(password);
 
           // Debug: Track where wrong budget ID is coming from
-          if (import.meta?.env?.MODE === "development") {
-            logger.auth("DEBUG: Budget ID override investigation", {
-              userDataBudgetId: userData.budgetId || "none",
-              deterministicBudgetId,
-              userDataKeys: Object.keys(userData),
-            });
-          }
+          logger.auth("🔍 DEBUG: authStore budget ID override investigation", {
+            userDataBudgetId: userData.budgetId || "none",
+            deterministicBudgetId,
+            userDataKeys: Object.keys(userData),
+            envMode: import.meta?.env?.MODE || "unknown",
+          });
 
           const finalUserData = {
             ...userData,
