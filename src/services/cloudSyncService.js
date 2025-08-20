@@ -166,6 +166,57 @@ class CloudSyncService {
       });
       // If same budget, just return. If different budget, restart service.
       if (this.config?.budgetId === config?.budgetId) {
+        // Always reinitialize ChunkedFirebaseSync even with same budget
+        // to ensure fresh Firebase auth and proper budget ID propagation
+        logger.info(
+          "🔄 Same budget detected, but reinitializing ChunkedFirebaseSync for fresh state",
+        );
+
+        // Normalize the new encryption key
+        let normalizedKey = config.encryptionKey;
+        try {
+          if (normalizedKey instanceof CryptoKey) {
+            // already ok
+          } else {
+            let rawKey;
+            if (normalizedKey instanceof Uint8Array) {
+              rawKey = normalizedKey.buffer.slice(
+                normalizedKey.byteOffset,
+                normalizedKey.byteOffset + normalizedKey.byteLength,
+              );
+            } else if (normalizedKey instanceof ArrayBuffer) {
+              rawKey = normalizedKey;
+            } else {
+              logger.error("❌ Invalid encryption key type", {
+                type: typeof normalizedKey,
+              });
+              return;
+            }
+            normalizedKey = await crypto.subtle.importKey(
+              "raw",
+              rawKey,
+              { name: "AES-GCM" },
+              false,
+              ["encrypt", "decrypt"],
+            );
+          }
+        } catch (error) {
+          logger.error("❌ Failed to import encryption key", error);
+          return;
+        }
+
+        // Update config with new values and normalized key
+        this.config = { ...config, encryptionKey: normalizedKey };
+
+        // Force ChunkedFirebaseSync reinitialization with fresh budget ID and key
+        const { default: ChunkedFirebaseSync } = await import(
+          "../utils/chunkedFirebaseSync"
+        );
+        await ChunkedFirebaseSync.initialize(
+          this.config.budgetId,
+          this.config.encryptionKey,
+        );
+
         return;
       } else {
         logger.info("🔄 Different budget detected, restarting sync service");
