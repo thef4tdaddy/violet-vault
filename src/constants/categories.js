@@ -178,10 +178,11 @@ export function getStandardCategories() {
 
 /**
  * Get categories appropriate for bills
+ * Uses same categories as envelopes for consistency
  * @returns {Array<string>} Array of bill-appropriate category names
  */
 export function getBillCategories() {
-  return [...BILL_CATEGORIES_EXTENDED];
+  return [...STANDARD_CATEGORIES];
 }
 
 /**

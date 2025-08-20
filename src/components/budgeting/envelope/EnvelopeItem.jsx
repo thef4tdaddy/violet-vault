@@ -280,55 +280,58 @@ const EnvelopeItem = ({
         </div>
       )}
 
-      {/* Progress Bar */}
-      <div className="mt-4">
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div
-            className={`h-2 rounded-full transition-all duration-300 ${
-              envelope.envelopeType === ENVELOPE_TYPES.BILL
-                ? (() => {
-                    const displayInfo = getBillEnvelopeDisplayInfo(
-                      envelope,
-                      bills,
-                    );
-                    if (!displayInfo) {
-                      // Fallback to old logic if sophisticated calculation fails
-                      return envelope.utilizationRate > 1
-                        ? "bg-red-500"
-                        : envelope.utilizationRate > 0.8
-                          ? "bg-orange-500"
-                          : envelope.utilizationRate > 0.5
-                            ? "bg-blue-500"
-                            : "bg-green-500";
-                    }
+      {/* Progress Bar - Hide for Variable Expenses */}
+      {envelope.envelopeType !== ENVELOPE_TYPES.VARIABLE && (
+        <div className="mt-4">
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className={`h-2 rounded-full transition-all duration-300 ${
+                envelope.envelopeType === ENVELOPE_TYPES.BILL
+                  ? (() => {
+                      const displayInfo = getBillEnvelopeDisplayInfo(
+                        envelope,
+                        bills,
+                      );
+                      if (!displayInfo) {
+                        // Fallback to old logic if sophisticated calculation fails
+                        return envelope.utilizationRate > 1
+                          ? "bg-red-500"
+                          : envelope.utilizationRate > 0.8
+                            ? "bg-orange-500"
+                            : envelope.utilizationRate > 0.5
+                              ? "bg-blue-500"
+                              : "bg-green-500";
+                      }
 
-                    const { displayText } = displayInfo;
-                    const isOnTrack = displayText.primaryStatus === "On Track";
-                    const isFullyFunded =
-                      displayText.primaryStatus === "Fully Funded";
-                    const isBehind =
-                      displayText.primaryStatus.startsWith("Behind");
+                      const { displayText } = displayInfo;
+                      const isOnTrack =
+                        displayText.primaryStatus === "On Track";
+                      const isFullyFunded =
+                        displayText.primaryStatus === "Fully Funded";
+                      const isBehind =
+                        displayText.primaryStatus.startsWith("Behind");
 
-                    if (isFullyFunded) return "bg-green-500";
-                    if (isOnTrack) return "bg-blue-500";
-                    if (isBehind) return "bg-red-500";
-                    return "bg-orange-500"; // Default for other states
-                  })()
-                : // Non-bill envelopes use original logic
-                  envelope.utilizationRate > 1
-                  ? "bg-red-500"
-                  : envelope.utilizationRate > 0.8
-                    ? "bg-orange-500"
-                    : envelope.utilizationRate > 0.5
-                      ? "bg-blue-500"
-                      : "bg-green-500"
-            }`}
-            style={{
-              width: `${Math.min(envelope.utilizationRate * 100, 100)}%`,
-            }}
-          />
+                      if (isFullyFunded) return "bg-green-500";
+                      if (isOnTrack) return "bg-blue-500";
+                      if (isBehind) return "bg-red-500";
+                      return "bg-orange-500"; // Default for other states
+                    })()
+                  : // Non-bill envelopes use original logic
+                    envelope.utilizationRate > 1
+                    ? "bg-red-500"
+                    : envelope.utilizationRate > 0.8
+                      ? "bg-orange-500"
+                      : envelope.utilizationRate > 0.5
+                        ? "bg-blue-500"
+                        : "bg-green-500"
+              }`}
+              style={{
+                width: `${Math.min(envelope.utilizationRate * 100, 100)}%`,
+              }}
+            />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

@@ -656,6 +656,24 @@ class CloudSyncService {
       if (firestoreLastModified > dexieLastModified) {
         return { direction: "fromFirestore", data: firestoreData };
       } else if (dexieLastModified > firestoreLastModified) {
+        // Even if local is newer, check if cloud has significantly more data
+        const firestoreItemCount = this.countDataItems(firestoreData);
+        const dexieItemCount = this.countDataItems(dexieData);
+
+        logger.info("📊 Local timestamp newer, comparing data significance", {
+          firestoreItems: firestoreItemCount,
+          dexieItems: dexieItemCount,
+          timeDiff: dexieLastModified - firestoreLastModified,
+        });
+
+        // If cloud has significantly more data (5+ items more), prefer cloud despite newer local timestamp
+        if (firestoreItemCount >= dexieItemCount + 5) {
+          logger.info(
+            "☁️ Cloud has significantly more data despite older timestamp, downloading",
+          );
+          return { direction: "fromFirestore", data: firestoreData };
+        }
+
         return { direction: "toFirestore", data: dexieData };
       } else {
         // When timestamps are equal, check which dataset is larger/more complete
