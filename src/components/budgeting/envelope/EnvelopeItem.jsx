@@ -11,6 +11,7 @@ import {
 import { getStatusStyle, getUtilizationColor } from "../../../utils/budgeting";
 import { ENVELOPE_TYPES } from "../../../constants/categories";
 import { getBillEnvelopeDisplayInfo } from "../../../utils/billEnvelopeCalculations";
+import { BIWEEKLY_MULTIPLIER } from "../../../constants/frequency";
 
 // Lazy load the bill funding info component
 const BillEnvelopeFundingInfo = React.lazy(
@@ -209,27 +210,51 @@ const EnvelopeItem = ({
         </div>
       </div>
 
-      {/* Activity Summary */}
-      <div className="grid grid-cols-3 gap-2 text-xs">
-        <div className="text-center">
-          <p className="text-gray-500">Spent</p>
-          <p className="font-medium text-red-600">
-            ${envelope.totalSpent.toFixed(2)}
-          </p>
+      {/* Activity Summary - Different display for Variable vs Bill envelopes */}
+      {envelope.envelopeType === ENVELOPE_TYPES.VARIABLE ? (
+        <div className="grid grid-cols-3 gap-2 text-xs">
+          <div className="text-center">
+            <p className="text-gray-500">Spent (30d)</p>
+            <p className="font-medium text-red-600">
+              ${envelope.totalSpent.toFixed(2)}
+            </p>
+          </div>
+          <div className="text-center">
+            <p className="text-gray-500">Monthly Budget</p>
+            <p className="font-medium text-blue-600">
+              ${(envelope.monthlyBudget || 0).toFixed(2)}
+            </p>
+          </div>
+          <div className="text-center">
+            <p className="text-gray-500">Biweekly</p>
+            <p className="font-medium text-green-600">
+              $
+              {((envelope.monthlyBudget || 0) / BIWEEKLY_MULTIPLIER).toFixed(2)}
+            </p>
+          </div>
         </div>
-        <div className="text-center">
-          <p className="text-gray-500">Upcoming</p>
-          <p className="font-medium text-orange-600">
-            ${envelope.totalUpcoming.toFixed(2)}
-          </p>
+      ) : (
+        <div className="grid grid-cols-3 gap-2 text-xs">
+          <div className="text-center">
+            <p className="text-gray-500">Spent</p>
+            <p className="font-medium text-red-600">
+              ${envelope.totalSpent.toFixed(2)}
+            </p>
+          </div>
+          <div className="text-center">
+            <p className="text-gray-500">Upcoming</p>
+            <p className="font-medium text-orange-600">
+              ${envelope.totalUpcoming.toFixed(2)}
+            </p>
+          </div>
+          <div className="text-center">
+            <p className="text-gray-500">Overdue</p>
+            <p className="font-medium text-red-700">
+              ${envelope.totalOverdue.toFixed(2)}
+            </p>
+          </div>
         </div>
-        <div className="text-center">
-          <p className="text-gray-500">Overdue</p>
-          <p className="font-medium text-red-700">
-            ${envelope.totalOverdue.toFixed(2)}
-          </p>
-        </div>
-      </div>
+      )}
 
       {/* Minimal Bill Info for Bill Envelopes - most info already shown above */}
       {envelope.envelopeType === ENVELOPE_TYPES.BILL && bills.length > 0 && (
