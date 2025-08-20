@@ -216,6 +216,13 @@ class CloudSyncService {
           this.config.budgetId,
           this.config.encryptionKey,
         );
+        
+        // TEMP DEBUG: Verify ChunkedFirebaseSync actually stored the correct budget ID
+        logger.info("🔍 TEMP: ChunkedFirebaseSync reinitialized", {
+          configBudgetId: this.config.budgetId,
+          storedBudgetId: ChunkedFirebaseSync.budgetId,
+          match: this.config.budgetId === ChunkedFirebaseSync.budgetId,
+        });
 
         return;
       } else {
