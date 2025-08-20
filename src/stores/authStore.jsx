@@ -72,8 +72,11 @@ export const useAuth = create((set, get) => ({
           };
 
           // Debug budget ID generation for cross-browser sync troubleshooting
-          logger.auth("Budget ID generated deterministically for new user", {
+          logger.auth("🚨 BUDGET ID MISMATCH DEBUG", {
+            deterministicBudgetId: deterministicBudgetId,
+            finalUserDataBudgetId: finalUserData.budgetId,
             budgetIdPreview: finalUserData.budgetId?.slice(0, 8) || "none",
+            match: deterministicBudgetId === finalUserData.budgetId,
             alwaysFromPassword: true,
             passwordLength: password?.length || 0,
           });
