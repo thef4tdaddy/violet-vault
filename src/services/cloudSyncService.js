@@ -169,7 +169,7 @@ class CloudSyncService {
         // Always reinitialize ChunkedFirebaseSync even with same budget
         // to ensure fresh Firebase auth and proper budget ID propagation
         logger.info(
-          "🔄 Same budget detected, but reinitializing ChunkedFirebaseSync for fresh state",
+          "🔄 Same budget detected, but reinitializing ChunkedFirebaseSync to clear stale state",
         );
 
         // Normalize the new encryption key
