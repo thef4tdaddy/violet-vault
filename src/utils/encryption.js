@@ -57,6 +57,19 @@ export const encryptionUtils = {
       ["encrypt", "decrypt"],
     );
 
+    // Debug logging to verify salt determinism (development only)
+    if (import.meta?.env?.MODE === "development") {
+      const saltHex = Array.from(salt)
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+      console.log(`🔍 DEBUG: generateKey called`, {
+        passwordLength: password?.length || 0,
+        saltPreview: saltHex.slice(0, 16) + "...",
+        saltFull: saltHex,
+        timestamp: new Date().toISOString(),
+      });
+    }
+
     return { key, salt };
   },
 
