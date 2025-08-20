@@ -135,7 +135,19 @@ export const encryptionUtils = {
       hash = (hash << 5) - hash + char;
       hash = hash & hash;
     }
-    return `budget_${Math.abs(hash).toString(16)}`;
+    const budgetId = `budget_${Math.abs(hash).toString(16)}`;
+
+    // Debug logging to track budget ID generation consistency
+    console.log(`🔍 DEBUG: generateBudgetId called`, {
+      passwordLength: masterPassword?.length || 0,
+      hash: hash,
+      absHash: Math.abs(hash),
+      hexHash: Math.abs(hash).toString(16),
+      finalBudgetId: budgetId,
+      timestamp: new Date().toISOString(),
+    });
+
+    return budgetId;
   },
 
   generateHash(data) {
