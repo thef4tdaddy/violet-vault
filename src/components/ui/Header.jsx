@@ -83,7 +83,9 @@ const Header = memo(
             />
 
             <div className="flex gap-2 sm:gap-3 items-center justify-center flex-wrap">
-              {!isLocalOnlyMode && <SyncHealthIndicator data-tour="sync-indicator" />}
+              {!isLocalOnlyMode && (
+                <SyncHealthIndicator data-tour="sync-indicator" />
+              )}
 
               <button
                 onClick={onShowSettings}

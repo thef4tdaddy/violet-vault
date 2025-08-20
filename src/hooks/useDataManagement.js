@@ -10,7 +10,8 @@ import { budgetDb, getBudgetMetadata } from "../db/budgetDb.js";
  */
 const useDataManagement = () => {
   const { currentUser } = useAuth();
-  const { showSuccessToast, showErrorToast, showWarningToast } = useToastHelpers();
+  const { showSuccessToast, showErrorToast, showWarningToast } =
+    useToastHelpers();
 
   const exportData = useCallback(async () => {
     try {
@@ -48,7 +49,7 @@ const useDataManagement = () => {
       }
 
       const pureTransactions = transactions.filter(
-        (t) => !t.type || t.type === "transaction"
+        (t) => !t.type || t.type === "transaction",
       );
 
       const exportData = {
@@ -99,7 +100,10 @@ const useDataManagement = () => {
       const link = document.createElement("a");
       link.href = url;
 
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+      const timestamp = new Date()
+        .toISOString()
+        .replace(/[:.]/g, "-")
+        .slice(0, 19);
       link.download = `VioletVault Budget Backup ${timestamp}.json`;
 
       document.body.appendChild(link);
@@ -119,9 +123,9 @@ const useDataManagement = () => {
 
       showSuccessToast(
         `Export created with ${envelopes.length} envelopes, ${bills.length} bills, and ${pureTransactions.length} transactions (${Math.round(
-          dataStr.length / 1024
+          dataStr.length / 1024,
         )}KB)`,
-        "Export Completed"
+        "Export Completed",
       );
     } catch (error) {
       logger.error("Export failed", error);
@@ -155,21 +159,28 @@ const useDataManagement = () => {
         });
 
         // Build unified transaction list if missing
-        const unifiedAllTransactions = Array.isArray(importedData.allTransactions)
+        const unifiedAllTransactions = Array.isArray(
+          importedData.allTransactions,
+        )
           ? importedData.allTransactions
-          : [...(importedData.transactions || []), ...(importedData.bills || [])];
+          : [
+              ...(importedData.transactions || []),
+              ...(importedData.bills || []),
+            ];
         const unifiedTransactions = unifiedAllTransactions.filter(
-          (t) => !t.type || t.type === "transaction"
+          (t) => !t.type || t.type === "transaction",
         );
 
         // Validate the data structure
         if (!importedData.envelopes || !Array.isArray(importedData.envelopes)) {
-          throw new Error("Invalid backup file: missing or invalid envelopes data");
+          throw new Error(
+            "Invalid backup file: missing or invalid envelopes data",
+          );
         }
 
         // Confirm import with user
         const confirmed = confirm(
-          `Import ${importedData.envelopes?.length || 0} envelopes, ${importedData.bills?.length || 0} bills, and ${importedData.allTransactions?.length || 0} transactions?\n\nThis will replace your current data.`
+          `Import ${importedData.envelopes?.length || 0} envelopes, ${importedData.bills?.length || 0} bills, and ${importedData.allTransactions?.length || 0} transactions?\n\nThis will replace your current data.`,
         );
 
         if (!confirmed) {
@@ -213,7 +224,7 @@ const useDataManagement = () => {
           const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
           localStorage.setItem(
             `dexie_backup_${timestamp}`,
-            JSON.stringify(currentData)
+            JSON.stringify(currentData),
           );
           logger.debug("Current Dexie data backed up");
         } catch (backupError) {
@@ -239,14 +250,18 @@ const useDataManagement = () => {
         throw error;
       }
     },
-    [currentUser, showErrorToast, showSuccessToast]
+    [currentUser, showErrorToast, showSuccessToast],
   );
 
   const resetEncryptionAndStartFresh = useCallback(() => {
     logger.info("Resetting encryption and starting fresh");
 
     // Clear all stored data
-    const keysToRemove = ["envelopeBudgetData", "userProfile", "passwordLastChanged"];
+    const keysToRemove = [
+      "envelopeBudgetData",
+      "userProfile",
+      "passwordLastChanged",
+    ];
 
     keysToRemove.forEach((key) => {
       localStorage.removeItem(key);

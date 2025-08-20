@@ -1,12 +1,12 @@
 import React from "react";
-import { 
-  PlusCircle, 
-  Wallet, 
-  CreditCard, 
-  Calendar, 
-  DollarSign, 
+import {
+  PlusCircle,
+  Wallet,
+  CreditCard,
+  Calendar,
+  DollarSign,
   ArrowRight,
-  Lightbulb 
+  Lightbulb,
 } from "lucide-react";
 import useOnboardingStore from "../../stores/onboardingStore";
 
@@ -14,7 +14,8 @@ import useOnboardingStore from "../../stores/onboardingStore";
  * EmptyStateHints - Provides contextual hints and guidance for empty states
  */
 const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
-  const { shouldShowHint, markStepComplete, preferences } = useOnboardingStore();
+  const { shouldShowHint, markStepComplete, preferences } =
+    useOnboardingStore();
 
   // Don't show hints if user has disabled them
   if (!preferences.showHints) {
@@ -25,7 +26,8 @@ const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
     bankBalance: {
       icon: Wallet,
       title: "Set Your Bank Balance",
-      message: "Start by entering your current actual bank account balance. This helps you track your real money.",
+      message:
+        "Start by entering your current actual bank account balance. This helps you track your real money.",
       actions: [
         {
           label: "Set Bank Balance",
@@ -36,11 +38,12 @@ const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
       step: "firstBankBalance",
       color: "blue",
     },
-    
+
     debts: {
       icon: CreditCard,
       title: "Track Your Debts",
-      message: "Add credit cards, loans, and other debts to get a complete picture of your finances.",
+      message:
+        "Add credit cards, loans, and other debts to get a complete picture of your finances.",
       actions: [
         {
           label: "Add Debt",
@@ -60,7 +63,8 @@ const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
     bills: {
       icon: Calendar,
       title: "Set Up Recurring Bills",
-      message: "Add bills like rent, utilities, and subscriptions to plan for upcoming expenses.",
+      message:
+        "Add bills like rent, utilities, and subscriptions to plan for upcoming expenses.",
       actions: [
         {
           label: "Add Bill",
@@ -68,7 +72,7 @@ const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
           primary: true,
         },
         {
-          label: "Skip for Now", 
+          label: "Skip for Now",
           onClick: () => markStepComplete("firstBills"),
           primary: false,
         },
@@ -80,7 +84,8 @@ const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
     paycheck: {
       icon: DollarSign,
       title: "Add Your First Paycheck",
-      message: "Your paycheck is the foundation of envelope budgeting. Add your income to get started.",
+      message:
+        "Your paycheck is the foundation of envelope budgeting. Add your income to get started.",
       actions: [
         {
           label: "Add Paycheck",
@@ -95,7 +100,8 @@ const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
     envelopes: {
       icon: PlusCircle,
       title: "Create Your First Envelope",
-      message: "Envelopes are budget categories like groceries, rent, or savings. Create one to start organizing your money.",
+      message:
+        "Envelopes are budget categories like groceries, rent, or savings. Create one to start organizing your money.",
       actions: [
         {
           label: "Create Envelope",
@@ -110,7 +116,8 @@ const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
     transactions: {
       icon: ArrowRight,
       title: "Track Your First Expense",
-      message: "Record spending to see where your money goes and keep your envelope balances accurate.",
+      message:
+        "Record spending to see where your money goes and keep your envelope balances accurate.",
       actions: [
         {
           label: "Add Transaction",
@@ -125,7 +132,8 @@ const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
     linkedEnvelopes: {
       icon: ArrowRight,
       title: "Link Bills to Envelopes",
-      message: "Connect your bills to envelopes so the amounts are automatically budgeted for each month.",
+      message:
+        "Connect your bills to envelopes so the amounts are automatically budgeted for each month.",
       actions: [
         {
           label: "Link Bills",
@@ -157,20 +165,28 @@ const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
   const colorClasses = {
     blue: "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-700 dark:text-blue-300",
     red: "bg-red-50 border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-700 dark:text-red-300",
-    orange: "bg-orange-50 border-orange-200 text-orange-700 dark:bg-orange-900/20 dark:border-orange-700 dark:text-orange-300",
-    green: "bg-green-50 border-green-200 text-green-700 dark:bg-green-900/20 dark:border-green-700 dark:text-green-300",
-    purple: "bg-purple-50 border-purple-200 text-purple-700 dark:bg-purple-900/20 dark:border-purple-700 dark:text-purple-300",
-    indigo: "bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-900/20 dark:border-indigo-700 dark:text-indigo-300",
+    orange:
+      "bg-orange-50 border-orange-200 text-orange-700 dark:bg-orange-900/20 dark:border-orange-700 dark:text-orange-300",
+    green:
+      "bg-green-50 border-green-200 text-green-700 dark:bg-green-900/20 dark:border-green-700 dark:text-green-300",
+    purple:
+      "bg-purple-50 border-purple-200 text-purple-700 dark:bg-purple-900/20 dark:border-purple-700 dark:text-purple-300",
+    indigo:
+      "bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-900/20 dark:border-indigo-700 dark:text-indigo-300",
     teal: "bg-teal-50 border-teal-200 text-teal-700 dark:bg-teal-900/20 dark:border-teal-700 dark:text-teal-300",
   };
 
   const buttonColorClasses = {
     blue: "bg-blue-500 hover:bg-blue-600 text-blue-700 hover:text-blue-800",
-    red: "bg-red-500 hover:bg-red-600 text-red-700 hover:text-red-800", 
-    orange: "bg-orange-500 hover:bg-orange-600 text-orange-700 hover:text-orange-800",
-    green: "bg-green-500 hover:bg-green-600 text-green-700 hover:text-green-800",
-    purple: "bg-purple-500 hover:bg-purple-600 text-purple-700 hover:text-purple-800",
-    indigo: "bg-indigo-500 hover:bg-indigo-600 text-indigo-700 hover:text-indigo-800",
+    red: "bg-red-500 hover:bg-red-600 text-red-700 hover:text-red-800",
+    orange:
+      "bg-orange-500 hover:bg-orange-600 text-orange-700 hover:text-orange-800",
+    green:
+      "bg-green-500 hover:bg-green-600 text-green-700 hover:text-green-800",
+    purple:
+      "bg-purple-500 hover:bg-purple-600 text-purple-700 hover:text-purple-800",
+    indigo:
+      "bg-indigo-500 hover:bg-indigo-600 text-indigo-700 hover:text-indigo-800",
     teal: "bg-teal-500 hover:bg-teal-600 text-teal-700 hover:text-teal-800",
   };
 
@@ -192,7 +208,7 @@ const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
               {customMessage?.title || config.title}
             </h3>
           </div>
-          
+
           <p className="text-sm mb-4">
             {customMessage?.description || config.message}
           </p>

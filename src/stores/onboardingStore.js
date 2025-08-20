@@ -10,7 +10,7 @@ const useOnboardingStore = create(
     (set, get) => ({
       // Onboarding completion status
       isOnboarded: false,
-      
+
       // Tutorial progress tracking
       tutorialProgress: {
         accountSetup: false,
@@ -27,7 +27,7 @@ const useOnboardingStore = create(
 
       // Current tutorial step (null when not in tutorial)
       currentTutorialStep: null,
-      
+
       // Tutorial preferences
       preferences: {
         showHints: true,
@@ -44,11 +44,11 @@ const useOnboardingStore = create(
             [step]: true,
           },
         }));
-        
+
         // Check if all steps are complete
         const { tutorialProgress } = get();
         const allStepsComplete = Object.values(tutorialProgress).every(Boolean);
-        
+
         if (allStepsComplete) {
           get().completeOnboarding();
         }
@@ -116,16 +116,13 @@ const useOnboardingStore = create(
 
       shouldShowHint: (step) => {
         const { preferences, tutorialProgress, isOnboarded } = get();
-        return (
-          preferences.showHints &&
-          !isOnboarded &&
-          !tutorialProgress[step]
-        );
+        return preferences.showHints && !isOnboarded && !tutorialProgress[step];
       },
 
       getProgress: () => {
         const { tutorialProgress } = get();
-        const completedSteps = Object.values(tutorialProgress).filter(Boolean).length;
+        const completedSteps =
+          Object.values(tutorialProgress).filter(Boolean).length;
         const totalSteps = Object.keys(tutorialProgress).length;
         return {
           completed: completedSteps,
@@ -137,8 +134,8 @@ const useOnboardingStore = create(
     {
       name: "violet-vault-onboarding",
       version: 1,
-    }
-  )
+    },
+  ),
 );
 
 export default useOnboardingStore;

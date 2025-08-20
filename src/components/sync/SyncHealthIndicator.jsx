@@ -28,7 +28,8 @@ const SyncHealthIndicator = () => {
   useEffect(() => {
     // Check if sync is running by monitoring the service state
     const checkSyncActivity = () => {
-      const isRunning = cloudSyncService.isRunning && cloudSyncService.activeSyncPromise;
+      const isRunning =
+        cloudSyncService.isRunning && cloudSyncService.activeSyncPromise;
       setIsBackgroundSyncing(isRunning);
     };
 
@@ -37,7 +38,7 @@ const SyncHealthIndicator = () => {
 
     // Check every 5 seconds when potentially syncing
     const activityInterval = setInterval(checkSyncActivity, 5000);
-    
+
     return () => clearInterval(activityInterval);
   }, []);
 
@@ -50,17 +51,17 @@ const SyncHealthIndicator = () => {
     };
 
     const handleKeyDown = (event) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         setShowDetails(false);
       }
     };
 
     if (showDetails) {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('keydown', handleKeyDown);
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleKeyDown);
       return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-        document.removeEventListener('keydown', handleKeyDown);
+        document.removeEventListener("mousedown", handleClickOutside);
+        document.removeEventListener("keydown", handleKeyDown);
       };
     }
   }, [showDetails]);
@@ -215,7 +216,7 @@ const SyncHealthIndicator = () => {
       <button
         onClick={() => setShowDetails(!showDetails)}
         className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 ${getStatusColor()} hover:bg-gray-100 dark:hover:bg-gray-800`}
-        title={`Sync Status: ${syncStatus.status}${isBackgroundSyncing ? ' (Syncing...)' : ''} - Click for details`}
+        title={`Sync Status: ${syncStatus.status}${isBackgroundSyncing ? " (Syncing...)" : ""} - Click for details`}
       >
         {getStatusIcon()}
         <span className="text-sm font-medium">{getStatusText()}</span>
@@ -223,7 +224,7 @@ const SyncHealthIndicator = () => {
 
       {/* Details Dropdown */}
       {showDetails && (
-        <div 
+        <div
           ref={dropdownRef}
           className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50"
         >
@@ -237,8 +238,18 @@ const SyncHealthIndicator = () => {
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                 title="Close"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -257,14 +268,31 @@ const SyncHealthIndicator = () => {
                 <span className="text-sm text-gray-600 dark:text-gray-300">
                   Background Sync:
                 </span>
-                <span className={`text-sm font-medium flex items-center space-x-1 ${isBackgroundSyncing ? 'text-blue-500' : 'text-gray-500'}`}>
+                <span
+                  className={`text-sm font-medium flex items-center space-x-1 ${isBackgroundSyncing ? "text-blue-500" : "text-gray-500"}`}
+                >
                   {isBackgroundSyncing && (
-                    <svg className="w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none">
-                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" opacity="0.25" />
-                      <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    <svg
+                      className="w-3 h-3 animate-spin"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        fill="none"
+                        opacity="0.25"
+                      />
+                      <path
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                      />
                     </svg>
                   )}
-                  <span>{isBackgroundSyncing ? 'Active' : 'Idle'}</span>
+                  <span>{isBackgroundSyncing ? "Active" : "Idle"}</span>
                 </span>
               </div>
 
