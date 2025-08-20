@@ -31,16 +31,25 @@ export const useAuth = create((set, get) => ({
         if (userData) {
           logger.auth("New user setup path.", userData);
 
-          // Check if imported salt is provided (for key import scenario)
-          let newSalt, key;
-          if (userData.importedSalt) {
-            logger.auth("Using imported salt for key restoration.");
-            newSalt = userData.importedSalt;
-            key = await encryptionUtils.deriveKeyFromSalt(password, newSalt);
-          } else {
-            const keyData = await encryptionUtils.deriveKey(password);
-            newSalt = keyData.salt;
-            key = keyData.key;
+          // Always use deterministic key generation for cross-browser consistency
+          // Even for imported salt scenarios, we ensure deterministic derivation
+          const keyData = await encryptionUtils.deriveKey(password);
+          const newSalt = keyData.salt;
+          const key = keyData.key;
+
+          // Log key derivation for cross-browser sync debugging
+          if (import.meta?.env?.MODE === "development") {
+            const saltPreview =
+              Array.from(newSalt.slice(0, 8))
+                .map((b) => b.toString(16).padStart(2, "0"))
+                .join("") + "...";
+            logger.auth(
+              "Key derived deterministically for cross-browser sync",
+              {
+                saltPreview,
+                keyType: key.constructor?.name || "unknown",
+              },
+            );
           }
           logger.auth("Generated/restored key and salt for user.");
 
@@ -115,22 +124,27 @@ export const useAuth = create((set, get) => ({
                 "Local data is corrupted. Please clear data and start fresh.",
             };
           }
-          const saltArray = new Uint8Array(savedSalt);
+          // CRITICAL: Use deterministic key generation for cross-browser consistency
+          // Instead of using saved salt, always derive from password
+          const keyData = await encryptionUtils.deriveKey(password);
+          const deterministicSalt = keyData.salt;
+          const key = keyData.key;
 
           // Debug encryption key derivation for cross-browser sync troubleshooting
-          logger.auth("Deriving encryption key from stored salt", {
-            saltPreview:
-              Array.from(saltArray.slice(0, 8))
+          if (import.meta?.env?.MODE === "development") {
+            const saltPreview =
+              Array.from(deterministicSalt.slice(0, 8))
                 .map((b) => b.toString(16).padStart(2, "0"))
-                .join("") + "...",
-            saltLength: saltArray.length,
-            passwordLength: password?.length || 0,
-          });
-
-          const key = await encryptionUtils.deriveKeyFromSalt(
-            password,
-            saltArray,
-          );
+                .join("") + "...";
+            logger.auth(
+              "Using deterministic key derivation for cross-browser sync",
+              {
+                saltPreview,
+                passwordLength: password?.length || 0,
+                keyType: key.constructor?.name || "unknown",
+              },
+            );
+          }
 
           // Debug derived key (safe preview only)
           let keyPreview = "none";
@@ -181,7 +195,7 @@ export const useAuth = create((set, get) => ({
               "envelopeBudgetData",
               JSON.stringify({
                 encryptedData: encrypted.data,
-                salt: Array.from(saltArray),
+                salt: Array.from(deterministicSalt),
                 iv: encrypted.iv,
               }),
             );
@@ -195,7 +209,7 @@ export const useAuth = create((set, get) => ({
           });
 
           set({
-            salt: saltArray,
+            salt: deterministicSalt,
             encryptionKey: key,
             currentUser: currentUserData,
             budgetId: currentUserData.budgetId,
@@ -284,12 +298,10 @@ export const useAuth = create((set, get) => ({
         return { success: false, error: "No saved data found." };
       }
 
-      const { salt: savedSalt, encryptedData, iv } = JSON.parse(savedData);
-      const saltArray = new Uint8Array(savedSalt);
-      const oldKey = await encryptionUtils.deriveKeyFromSalt(
-        oldPassword,
-        saltArray,
-      );
+      const { encryptedData, iv } = JSON.parse(savedData);
+      // Use deterministic key derivation for old password
+      const oldKeyData = await encryptionUtils.deriveKey(oldPassword);
+      const oldKey = oldKeyData.key;
 
       const decryptedData = await encryptionUtils.decrypt(
         encryptedData,
@@ -305,12 +317,24 @@ export const useAuth = create((set, get) => ({
         "envelopeBudgetData",
         JSON.stringify({
           encryptedData: encrypted.data,
-          salt: Array.from(newSalt),
+          salt: Array.from(newSalt), // Deterministic salt from new password
           iv: encrypted.iv,
         }),
       );
 
       set({ salt: newSalt, encryptionKey: newKey });
+
+      // Log password change for cross-browser sync debugging
+      if (import.meta?.env?.MODE === "development") {
+        const saltPreview =
+          Array.from(newSalt.slice(0, 8))
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("") + "...";
+        logger.auth("Password changed with deterministic key", {
+          saltPreview,
+          keyType: newKey.constructor?.name || "unknown",
+        });
+      }
       return { success: true };
     } catch (error) {
       logger.error("Password change failed.", error);
