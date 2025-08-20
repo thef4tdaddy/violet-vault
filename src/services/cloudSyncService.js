@@ -297,13 +297,7 @@ class CloudSyncService {
         return { success: true, skipped: true, reason: "No changes detected" };
       }
 
-      // CRITICAL DEBUG: Track exact budget ID being passed to sync
-      logger.info("🔄 Starting Firebase sync...", {
-        budgetId: this.config?.budgetId?.slice(0, 8),
-        fullBudgetId: this.config?.budgetId,
-        user: this.config?.currentUser?.userName,
-        configKeys: Object.keys(this.config || {}),
-      });
+      logger.info("🔄 Starting Firebase sync...");
       const startTime = Date.now();
 
       // Import ChunkedFirebaseSync for new implementation
@@ -743,13 +737,7 @@ class CloudSyncService {
         return null;
       }
 
-      // CRITICAL DEBUG: Track budget ID passed to ChunkedFirebaseSync
-      logger.info("🗂️ ChunkedFirebaseSync initializing with:", {
-        budgetId: this.config.budgetId?.slice(0, 12) + "...",
-        fullBudgetId: this.config.budgetId,
-        hasEncryptionKey: !!this.config.encryptionKey,
-        configBudgetIdType: typeof this.config.budgetId,
-      });
+      logger.info("🗂️ Initializing ChunkedFirebaseSync...");
 
       // Initialize the ChunkedFirebaseSync instance
       await ChunkedFirebaseSync.initialize(

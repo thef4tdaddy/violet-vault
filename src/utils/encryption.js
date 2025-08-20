@@ -4,27 +4,6 @@ export const encryptionUtils = {
   },
 
   async deriveKeyFromSalt(password, salt) {
-    // CRITICAL: Track when deriveKeyFromSalt is called vs generateKey
-    try {
-      const logger = (await import("./logger.js")).default;
-      logger.debug(
-        "🔍 CRITICAL DEBUG: deriveKeyFromSalt called instead of generateKey",
-        {
-          passwordLength: password?.length || 0,
-          saltLength: salt?.length || 0,
-          saltType: salt?.constructor?.name || "unknown",
-          saltPreview:
-            Array.from(salt.slice(0, 8))
-              .map((b) => b.toString(16).padStart(2, "0"))
-              .join("") + "...",
-        },
-      );
-    } catch {
-      console.log(
-        "🔍 CRITICAL DEBUG: deriveKeyFromSalt called instead of generateKey",
-      );
-    }
-
     const encoder = new TextEncoder();
     const keyMaterial = await crypto.subtle.importKey(
       "raw",
@@ -46,25 +25,6 @@ export const encryptionUtils = {
       true,
       ["encrypt", "decrypt"],
     );
-
-    // Export and log the derived key for cross-browser comparison
-    try {
-      const logger = (await import("./logger.js")).default;
-      const exportedKey = await crypto.subtle.exportKey("raw", key);
-      const keyBytes = new Uint8Array(exportedKey);
-      const keyHex = Array.from(keyBytes)
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
-
-      logger.debug("🔍 CRITICAL DEBUG: deriveKeyFromSalt result", {
-        keyHex: keyHex,
-        keyPreview: keyHex.slice(0, 32) + "...",
-        keyLength: keyBytes.length,
-        iterations: 100000,
-      });
-    } catch {
-      console.log("🔍 CRITICAL DEBUG: deriveKeyFromSalt completed");
-    }
 
     return key;
   },
@@ -97,52 +57,6 @@ export const encryptionUtils = {
       ["encrypt", "decrypt"],
     );
 
-    // CRITICAL: Add comprehensive cross-browser encryption key debugging
-    try {
-      const logger = (await import("./logger.js")).default;
-
-      // Export raw key material for cross-browser verification
-      const exportedKey = await crypto.subtle.exportKey("raw", key);
-      const keyBytes = new Uint8Array(exportedKey);
-      const keyHex = Array.from(keyBytes)
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
-
-      const saltHex = Array.from(salt)
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
-
-      logger.debug(`🔍 CRITICAL DEBUG: generateKey cross-browser analysis`, {
-        passwordLength: password?.length || 0,
-        passwordPreview: password
-          ? `${password[0]}***${password[password.length - 1]}`
-          : "none",
-        saltHex: saltHex,
-        saltLength: salt.length,
-        keyHex: keyHex,
-        keyLength: keyBytes.length,
-        keyPreview: keyHex.slice(0, 32) + "...",
-        pbkdf2Iterations: 100000,
-        hashAlgorithm: "SHA-256",
-        keyAlgorithm: "AES-GCM",
-        keyLength256: keyBytes.length === 32,
-        browserInfo: {
-          userAgent: navigator.userAgent.slice(0, 50),
-          cryptoSubtle: !!crypto.subtle,
-          webCrypto: !!window.crypto,
-        },
-        timestamp: new Date().toISOString(),
-      });
-    } catch (logError) {
-      // Fallback console logging if logger fails
-      console.log(`🔍 CRITICAL DEBUG: generateKey cross-browser analysis`, {
-        passwordLength: password?.length || 0,
-        saltLength: salt?.length || 0,
-        keyType: key?.constructor?.name || "unknown",
-        loggerError: logError.message,
-      });
-    }
-
     return { key, salt };
   },
 
@@ -152,29 +66,6 @@ export const encryptionUtils = {
 
     // Handle both string data (already JSON stringified) and object data
     const stringData = typeof data === "string" ? data : JSON.stringify(data);
-
-    // CRITICAL DEBUG: Log encryption parameters for cross-browser debugging
-    try {
-      const logger = (await import("./logger.js")).default;
-      const ivHex = Array.from(iv)
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
-
-      logger.debug("🔐 CRITICAL DEBUG: encrypt() called", {
-        dataType: typeof data,
-        stringDataLength: stringData?.length || 0,
-        ivHex: ivHex,
-        keyType: key?.constructor?.name || "unknown",
-        dataPreview: stringData?.slice(0, 100) + "...",
-        timestamp: new Date().toISOString(),
-      });
-    } catch {
-      // Fallback if logger import fails
-      console.log("🔐 DEBUG: encrypt() called", {
-        dataLength: stringData?.length || 0,
-        ivLength: iv.length,
-      });
-    }
 
     const encrypted = await crypto.subtle.encrypt(
       { name: "AES-GCM", iv: iv },
@@ -189,31 +80,6 @@ export const encryptionUtils = {
   },
 
   async decrypt(encryptedData, key, iv) {
-    // CRITICAL DEBUG: Log decryption parameters for cross-browser debugging
-    try {
-      const logger = (await import("./logger.js")).default;
-      const ivHex = Array.from(iv)
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
-      const dataPreview = Array.from(encryptedData.slice(0, 16))
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
-
-      logger.debug("🔓 CRITICAL DEBUG: decrypt() called", {
-        encryptedDataLength: encryptedData?.length || 0,
-        ivHex: ivHex,
-        keyType: key?.constructor?.name || "unknown",
-        dataPreview: dataPreview + "...",
-        timestamp: new Date().toISOString(),
-      });
-    } catch {
-      // Fallback if logger import fails
-      console.log("🔓 DEBUG: decrypt() called", {
-        dataLength: encryptedData?.length || 0,
-        ivLength: iv?.length || 0,
-      });
-    }
-
     const decrypted = await crypto.subtle.decrypt(
       { name: "AES-GCM", iv: new Uint8Array(iv) },
       key,
@@ -270,34 +136,6 @@ export const encryptionUtils = {
       hash = hash & hash;
     }
     const budgetId = `budget_${Math.abs(hash).toString(16)}`;
-
-    // Debug logging to track cross-browser budget ID generation consistency
-    try {
-      const logger = (await import("./logger.js")).default;
-      logger.debug(`🔍 DEBUG: generateBudgetId detailed analysis`, {
-        passwordLength: masterPassword?.length || 0,
-        passwordType: typeof masterPassword,
-        passwordPreview: masterPassword
-          ? `${masterPassword[0]}***${masterPassword[masterPassword.length - 1]}`
-          : "none",
-        firstCharCode: masterPassword?.charCodeAt(0) || 0,
-        lastCharCode:
-          masterPassword?.charCodeAt(masterPassword.length - 1) || 0,
-        hash: hash,
-        absHash: Math.abs(hash),
-        hexHash: Math.abs(hash).toString(16),
-        finalBudgetId: budgetId,
-        timestamp: new Date().toISOString(),
-      });
-    } catch {
-      // Fallback if logger import fails
-      console.log(`🔍 DEBUG: generateBudgetId detailed analysis`, {
-        passwordLength: masterPassword?.length || 0,
-        passwordType: typeof masterPassword,
-        hash: hash,
-        finalBudgetId: budgetId,
-      });
-    }
 
     return budgetId;
   },
