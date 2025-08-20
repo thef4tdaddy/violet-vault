@@ -872,9 +872,10 @@ class ChunkedFirebaseSync {
             "🔧 Decryption failed - attempting recovery by clearing incompatible cloud data",
           );
           try {
-            await this.resetCloudData();
+            const resetResult = await this.resetCloudData();
             logger.info(
               "✅ Incompatible cloud data cleared - will upload fresh local data",
+              { resetResult },
             );
             return {
               data: null,
@@ -886,6 +887,21 @@ class ChunkedFirebaseSync {
               "❌ Failed to reset cloud data during recovery:",
               resetError,
             );
+            // For auth issues, still allow recovery to proceed locally
+            if (
+              resetError.message.includes("authentication") ||
+              resetError.message.includes("Firebase Auth not available")
+            ) {
+              logger.warn(
+                "🔧 Auth unavailable, proceeding with local-only recovery",
+              );
+              return {
+                data: null,
+                recovered: true,
+                reason: "decryption_key_mismatch_auth_unavailable",
+              };
+            }
+            // If reset fails for other reasons, fall through to throw the original error
           }
 
           throw new Error(
