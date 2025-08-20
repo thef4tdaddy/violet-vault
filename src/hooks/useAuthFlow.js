@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import { useAuth } from "../stores/authStore.jsx";
-import { useBudgetStore } from "../stores/budgetStore.js";
 import logger from "../utils/logger";
 import { useToastHelpers } from "../utils/toastHelpers";
 
@@ -21,20 +20,17 @@ const useAuthFlow = () => {
     updateProfile,
   } = useAuth();
 
-  const budgetStore = useBudgetStore();
   const { showSuccessToast, showErrorToast } = useToastHelpers();
 
   const handleSetup = useCallback(
     async (userData) => {
       logger.auth("Layout handleSetup called", { hasUserData: !!userData });
       try {
-        // Generate budgetId from password for cross-device sync
+        // ALWAYS generate budgetId deterministically from password for cross-device sync
         const { encryptionUtils } = await import("../utils/encryption");
         const userDataWithId = {
           ...userData,
-          budgetId:
-            userData.budgetId ||
-            encryptionUtils.generateBudgetId(userData.password),
+          budgetId: encryptionUtils.generateBudgetId(userData.password),
         };
 
         logger.auth("Calling login", {
@@ -67,7 +63,7 @@ const useAuthFlow = () => {
         showErrorToast(`Setup error: ${error.message}`, "Setup Error");
       }
     },
-    [login, budgetStore, showErrorToast],
+    [login, showErrorToast],
   );
 
   const handleLogout = useCallback(() => {
