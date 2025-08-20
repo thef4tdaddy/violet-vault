@@ -28,6 +28,18 @@ const useAuthFlow = () => {
       try {
         // ALWAYS generate budgetId deterministically from password for cross-device sync
         const { encryptionUtils } = await import("../utils/encryption");
+
+        // Debug: Track source of budget ID problem
+        if (import.meta?.env?.MODE === "development") {
+          logger.auth("DEBUG: useAuthFlow budget ID investigation", {
+            originalUserDataBudgetId: userData.budgetId || "none",
+            generatedBudgetId: encryptionUtils.generateBudgetId(
+              userData.password,
+            ),
+            userDataKeys: Object.keys(userData),
+          });
+        }
+
         const userDataWithId = {
           ...userData,
           budgetId: encryptionUtils.generateBudgetId(userData.password),
