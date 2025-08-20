@@ -58,16 +58,21 @@ const Dashboard = ({ setActiveView }) => {
   });
 
   // Calculate totals
-  const totalEnvelopeBalance = envelopes.reduce(
-    (sum, env) => sum + env.currentBalance,
-    0,
-  );
-  const totalSavingsBalance = savingsGoals.reduce(
-    (sum, goal) => sum + goal.currentAmount,
-    0,
-  );
+  const totalEnvelopeBalance = envelopes.reduce((sum, env) => {
+    const balance = parseFloat(env?.currentBalance) || 0;
+    return sum + (isNaN(balance) ? 0 : balance);
+  }, 0);
+  const totalSavingsBalance = savingsGoals.reduce((sum, goal) => {
+    const amount = parseFloat(goal?.currentAmount) || 0;
+    return sum + (isNaN(amount) ? 0 : amount);
+  }, 0);
+
+  // Ensure unassignedCash is not NaN
+  const safeUnassignedCash = parseFloat(unassignedCash) || 0;
   const totalVirtualBalance =
-    totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
+    totalEnvelopeBalance +
+    totalSavingsBalance +
+    (isNaN(safeUnassignedCash) ? 0 : safeUnassignedCash);
 
   // Debug logging to compare with SummaryCards
   logger.debug("📊 Dashboard Debug:", {

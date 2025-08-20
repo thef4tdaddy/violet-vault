@@ -124,33 +124,62 @@ const useBudgetData = () => {
       // Load budget metadata from Dexie (includes unassigned cash)
       const budgetMetadata = await getBudgetMetadata();
 
+      // Safe calculation with NaN prevention
+      const safeEnvelopes = Array.isArray(envelopes) ? envelopes : [];
+      const safeSavingsGoals = Array.isArray(savingsGoals) ? savingsGoals : [];
+      const safeBills = Array.isArray(bills) ? bills : [];
+      const safeTransactions = Array.isArray(transactions) ? transactions : [];
+
+      const totalEnvelopeBalance = safeEnvelopes.reduce((sum, env) => {
+        const balance = parseFloat(env?.currentBalance) || 0;
+        return sum + (isNaN(balance) ? 0 : balance);
+      }, 0);
+
+      const totalSavingsBalance = safeSavingsGoals.reduce((sum, goal) => {
+        const amount = parseFloat(goal?.currentAmount) || 0;
+        return sum + (isNaN(amount) ? 0 : amount);
+      }, 0);
+
+      // Ensure all values are numbers, not NaN
+      const unassignedCashValue =
+        parseFloat(budgetMetadata?.unassignedCash ?? unassignedCash) || 0;
+      const actualBalanceValue =
+        parseFloat(budgetMetadata?.actualBalance ?? actualBalance) || 0;
+
       const summary = {
-        totalEnvelopeBalance: (envelopes || []).reduce(
-          (sum, env) => sum + (env.currentBalance || 0),
-          0,
-        ),
-        totalSavingsBalance: (savingsGoals || []).reduce(
-          (sum, goal) => sum + (goal.currentAmount || 0),
-          0,
-        ),
-        // Use Dexie value if available, fallback to Zustand, then 0
-        unassignedCash: budgetMetadata?.unassignedCash ?? unassignedCash ?? 0,
-        actualBalance: budgetMetadata?.actualBalance ?? actualBalance ?? 0,
-        recentTransactions: transactions?.slice(0, 10) || [],
-        upcomingBills:
-          bills?.filter((bill) => {
-            const dueDate = new Date(bill.dueDate);
-            const thirtyDaysFromNow = new Date();
-            thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
-            return dueDate <= thirtyDaysFromNow;
-          }) || [],
+        totalEnvelopeBalance: isNaN(totalEnvelopeBalance)
+          ? 0
+          : totalEnvelopeBalance,
+        totalSavingsBalance: isNaN(totalSavingsBalance)
+          ? 0
+          : totalSavingsBalance,
+        unassignedCash: isNaN(unassignedCashValue) ? 0 : unassignedCashValue,
+        actualBalance: isNaN(actualBalanceValue) ? 0 : actualBalanceValue,
+        recentTransactions: safeTransactions.slice(0, 10),
+        upcomingBills: safeBills.filter((bill) => {
+          const dueDate = new Date(bill.dueDate);
+          const thirtyDaysFromNow = new Date();
+          thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+          return dueDate <= thirtyDaysFromNow;
+        }),
       };
 
-      // Calculate difference for balance reconciliation
+      // Calculate difference for balance reconciliation with NaN protection
       summary.virtualBalance =
         summary.totalEnvelopeBalance +
         summary.totalSavingsBalance +
         summary.unassignedCash;
+
+      // Final NaN check
+      if (isNaN(summary.virtualBalance)) {
+        logger.warn("Virtual balance calculated as NaN, resetting to 0", {
+          totalEnvelopeBalance: summary.totalEnvelopeBalance,
+          totalSavingsBalance: summary.totalSavingsBalance,
+          unassignedCash: summary.unassignedCash,
+        });
+        summary.virtualBalance = 0;
+      }
+
       summary.difference = summary.actualBalance - summary.virtualBalance;
       summary.isBalanced = Math.abs(summary.difference) < 0.01;
 
