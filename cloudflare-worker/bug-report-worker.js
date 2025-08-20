@@ -134,7 +134,13 @@ async function processBugReport(bugReport, env) {
   // Store screenshot if provided
   let screenshotUrl = null;
   if (screenshot) {
-    screenshotUrl = await storeScreenshot(screenshot, env);
+    try {
+      screenshotUrl = await storeScreenshot(screenshot, env);
+      console.log(`Screenshot storage result: ${screenshotUrl ? 'success' : 'failed'}`);
+    } catch (error) {
+      console.error('Screenshot storage error:', error);
+      screenshotUrl = null;
+    }
   }
 
   // Create GitHub issue
@@ -1212,7 +1218,10 @@ async function createGitHubIssue(data, env) {
 
   // Generate smart labels and get milestone info
   const smartLabels = await generateSmartLabels(description, reportEnv);
+  console.log(`Generated smart labels: ${JSON.stringify(smartLabels)}`);
+  
   const milestoneInfo = await getMilestones(env);
+  console.log(`Milestone info: ${JSON.stringify({ success: milestoneInfo.success, current: milestoneInfo.current?.title })}`);
 
   // Prepare issue data
   const issueData = {
@@ -1254,6 +1263,13 @@ async function createGitHubIssue(data, env) {
   }
 
   // Create the GitHub issue
+  console.log(`Creating GitHub issue with data: ${JSON.stringify({
+    title: issueData.title,
+    labels: issueData.labels,
+    milestone: issueData.milestone,
+    hasScreenshot: !!screenshotUrl
+  })}`);
+  
   const response = await fetch(
     `https://api.github.com/repos/${env.GITHUB_REPO}/issues`,
     {
