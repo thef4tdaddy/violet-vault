@@ -5,7 +5,7 @@ import {
   DEBT_TYPE_CONFIG,
   PAYMENT_FREQUENCIES,
 } from "../../../constants/debts";
-import { useBudgetStore } from "../../../stores/budgetStore";
+import { useEnvelopes } from "../../../hooks/useEnvelopes";
 import logger from "../../../utils/logger";
 
 /**
@@ -15,8 +15,8 @@ import logger from "../../../utils/logger";
 const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
   const isEditMode = !!debt;
 
-  // Get envelopes for dropdown selection
-  const { envelopes = [] } = useBudgetStore();
+  // Get envelopes for dropdown selection using TanStack Query
+  const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
   const [formData, setFormData] = useState({
     name: debt?.name || "",
     creditor: debt?.creditor || "",
@@ -418,47 +418,68 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
             </h4>
 
             {/* Payment Method Radio Buttons */}
-            <div className="space-y-3">
-              <div className="flex items-center space-x-3">
-                <input
-                  type="radio"
-                  id="create_new"
-                  name="paymentMethod"
-                  value="create_new"
-                  checked={formData.paymentMethod === "create_new"}
-                  onChange={(e) =>
-                    setFormData({ ...formData, paymentMethod: e.target.value })
-                  }
-                  className="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"
-                />
-                <label
-                  htmlFor="create_new"
-                  className="text-sm font-medium text-gray-700 flex items-center"
-                >
-                  <Receipt className="h-4 w-4 mr-2 text-blue-600" />
-                  Create new envelope and bill
-                </label>
+            <div className="space-y-2">
+              {/* Create New Option */}
+              <div className="glassmorphism border-2 border-white/20 rounded-xl p-3">
+                <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
+                  <input
+                    type="radio"
+                    id="create_new"
+                    name="paymentMethod"
+                    value="create_new"
+                    checked={formData.paymentMethod === "create_new"}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        paymentMethod: e.target.value,
+                      })
+                    }
+                    className="w-4 h-4 text-purple-600 mt-0.5 justify-self-start"
+                  />
+                  <div>
+                    <div className="flex items-center mb-1">
+                      <Receipt className="h-4 w-4 mr-2 text-blue-600" />
+                      <span className="font-medium text-sm">
+                        Create new envelope and bill
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-600 leading-tight">
+                      Automatically create a new envelope and bill for this debt
+                      payment
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              <div className="flex items-center space-x-3">
-                <input
-                  type="radio"
-                  id="connect_existing"
-                  name="paymentMethod"
-                  value="connect_existing"
-                  checked={formData.paymentMethod === "connect_existing"}
-                  onChange={(e) =>
-                    setFormData({ ...formData, paymentMethod: e.target.value })
-                  }
-                  className="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"
-                />
-                <label
-                  htmlFor="connect_existing"
-                  className="text-sm font-medium text-gray-700 flex items-center"
-                >
-                  <Wallet className="h-4 w-4 mr-2 text-purple-600" />
-                  Connect to existing envelope and bill
-                </label>
+              {/* Connect Existing Option */}
+              <div className="glassmorphism border-2 border-white/20 rounded-xl p-3">
+                <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
+                  <input
+                    type="radio"
+                    id="connect_existing"
+                    name="paymentMethod"
+                    value="connect_existing"
+                    checked={formData.paymentMethod === "connect_existing"}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        paymentMethod: e.target.value,
+                      })
+                    }
+                    className="w-4 h-4 text-purple-600 mt-0.5 justify-self-start"
+                  />
+                  <div>
+                    <div className="flex items-center mb-1">
+                      <Wallet className="h-4 w-4 mr-2 text-purple-600" />
+                      <span className="font-medium text-sm">
+                        Connect to existing envelope
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-600 leading-tight">
+                      Use an existing envelope to fund this debt payment
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -505,16 +526,22 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                       setFormData({ ...formData, envelopeId: e.target.value })
                     }
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    disabled={envelopesLoading}
                   >
-                    <option value="">Select existing envelope...</option>
-                    {envelopes
-                      .filter((env) => !env.archived)
-                      .map((envelope) => (
-                        <option key={envelope.id} value={envelope.id}>
-                          📁 {envelope.name} ($
-                          {envelope.currentBalance?.toFixed(2) || "0.00"})
-                        </option>
-                      ))}
+                    <option value="">
+                      {envelopesLoading
+                        ? "Loading envelopes..."
+                        : "Select existing envelope..."}
+                    </option>
+                    {!envelopesLoading &&
+                      envelopes
+                        .filter((env) => !env.archived)
+                        .map((envelope) => (
+                          <option key={envelope.id} value={envelope.id}>
+                            📁 {envelope.name} ($
+                            {envelope.currentBalance?.toFixed(2) || "0.00"})
+                          </option>
+                        ))}
                   </select>
                   <p className="mt-1 text-xs text-gray-500">
                     Choose which existing envelope will fund the debt payments
