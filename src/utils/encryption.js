@@ -150,17 +150,19 @@ export const encryptionUtils = {
     }
     const budgetId = `budget_${Math.abs(hash).toString(16)}`;
 
-    // Debug logging to track budget ID generation consistency (development only)
-    if (import.meta?.env?.MODE === "development") {
-      console.log(`🔍 DEBUG: generateBudgetId called`, {
-        passwordLength: masterPassword?.length || 0,
-        hash: hash,
-        absHash: Math.abs(hash),
-        hexHash: Math.abs(hash).toString(16),
-        finalBudgetId: budgetId,
-        timestamp: new Date().toISOString(),
-      });
-    }
+    // Debug logging to track cross-browser budget ID generation consistency
+    console.log(`🔍 DEBUG: generateBudgetId detailed analysis`, {
+      passwordLength: masterPassword?.length || 0,
+      passwordType: typeof masterPassword,
+      passwordPreview: masterPassword ? `${masterPassword[0]}***${masterPassword[masterPassword.length - 1]}` : "none",
+      firstCharCode: masterPassword?.charCodeAt(0) || 0,
+      lastCharCode: masterPassword?.charCodeAt(masterPassword.length - 1) || 0,
+      hash: hash,
+      absHash: Math.abs(hash),
+      hexHash: Math.abs(hash).toString(16),
+      finalBudgetId: budgetId,
+      timestamp: new Date().toISOString(),
+    });
 
     return budgetId;
   },
