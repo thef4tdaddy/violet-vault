@@ -739,6 +739,14 @@ class CloudSyncService {
 
       logger.info("🗂️ Initializing ChunkedFirebaseSync...");
 
+      // TEMP DEBUG: Check exact budget ID being passed
+      logger.info("🚨 TEMP DEBUG: Budget ID about to be passed to initialize", {
+        configBudgetId: this.config.budgetId,
+        configBudgetIdLength: this.config.budgetId?.length,
+        configBudgetIdType: typeof this.config.budgetId,
+        configKeys: Object.keys(this.config || {}),
+      });
+
       // Initialize the ChunkedFirebaseSync instance
       await ChunkedFirebaseSync.initialize(
         this.config.budgetId,
