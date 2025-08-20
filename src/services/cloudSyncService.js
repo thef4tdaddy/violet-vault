@@ -158,9 +158,6 @@ class CloudSyncService {
         currentBudgetId: this.config?.budgetId?.slice(0, 8) || "none",
         newBudgetId: config?.budgetId?.slice(0, 8) || "none",
         sameBudget: this.config?.budgetId === config?.budgetId,
-        // TEMP DEBUG: Full budget IDs for comparison
-        fullCurrentBudgetId: this.config?.budgetId,
-        fullNewBudgetId: config?.budgetId,
         configKeys: Object.keys(this.config || {}),
         newConfigKeys: Object.keys(config || {}),
       });
@@ -217,7 +214,6 @@ class CloudSyncService {
           this.config.encryptionKey,
         );
 
-        // TEMP DEBUG: Verify ChunkedFirebaseSync actually stored the correct budget ID
         logger.debug("🔄 ChunkedFirebaseSync reinitialized");
 
         return;

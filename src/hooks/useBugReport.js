@@ -61,7 +61,30 @@ const useBugReport = () => {
             existingStyles.forEach((style) => {
               // Remove all stylesheets to avoid any color function parsing issues
               // We'll replace them with safe equivalents below
+              logger.debug(
+                "Removing stylesheet with unsupported color functions for screenshot",
+                style.href || "inline",
+              );
               style.remove();
+            });
+
+            // Also remove any computed styles that might contain modern CSS
+            const allElements = clonedDoc.querySelectorAll("*");
+            allElements.forEach((element) => {
+              // Remove any style attributes that might contain problematic CSS
+              const style = element.getAttribute("style");
+              if (
+                style &&
+                (style.includes("oklch") ||
+                  style.includes("color(") ||
+                  style.includes("lab(") ||
+                  style.includes("lch("))
+              ) {
+                element.removeAttribute("style");
+                logger.debug(
+                  "Removed problematic inline style for screenshot compatibility",
+                );
+              }
             });
 
             // Add comprehensive safe style override
@@ -208,6 +231,26 @@ const useBugReport = () => {
         return fallbackDataUrl;
       } catch (fallbackError) {
         logger.warn("Fallback screenshot also failed:", fallbackError.message);
+
+        // Try ultimate fallback - use browser's native screenshot API if available
+        try {
+          if (
+            navigator.mediaDevices &&
+            navigator.mediaDevices.getDisplayMedia
+          ) {
+            logger.debug(
+              "Attempting native screen capture API as final fallback",
+            );
+            // This would require user interaction, so we can't use it automatically
+            // But we can let the user know this option exists
+            logger.info(
+              "Screenshot capture failed. Users can manually take screenshots using browser tools or system shortcuts.",
+            );
+          }
+        } catch (nativeError) {
+          logger.debug("Native screenshot API not available");
+        }
+
         // Return null instead of throwing - this allows the bug report to continue without screenshot
         return null;
       }
