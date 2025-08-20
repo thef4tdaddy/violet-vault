@@ -153,6 +153,29 @@ export const encryptionUtils = {
     // Handle both string data (already JSON stringified) and object data
     const stringData = typeof data === "string" ? data : JSON.stringify(data);
 
+    // CRITICAL DEBUG: Log encryption parameters for cross-browser debugging
+    try {
+      const logger = (await import("./logger.js")).default;
+      const ivHex = Array.from(iv)
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+
+      logger.debug("🔐 CRITICAL DEBUG: encrypt() called", {
+        dataType: typeof data,
+        stringDataLength: stringData?.length || 0,
+        ivHex: ivHex,
+        keyType: key?.constructor?.name || "unknown",
+        dataPreview: stringData?.slice(0, 100) + "...",
+        timestamp: new Date().toISOString(),
+      });
+    } catch {
+      // Fallback if logger import fails
+      console.log("🔐 DEBUG: encrypt() called", {
+        dataLength: stringData?.length || 0,
+        ivLength: iv.length,
+      });
+    }
+
     const encrypted = await crypto.subtle.encrypt(
       { name: "AES-GCM", iv: iv },
       key,
@@ -166,6 +189,31 @@ export const encryptionUtils = {
   },
 
   async decrypt(encryptedData, key, iv) {
+    // CRITICAL DEBUG: Log decryption parameters for cross-browser debugging
+    try {
+      const logger = (await import("./logger.js")).default;
+      const ivHex = Array.from(iv)
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+      const dataPreview = Array.from(encryptedData.slice(0, 16))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+
+      logger.debug("🔓 CRITICAL DEBUG: decrypt() called", {
+        encryptedDataLength: encryptedData?.length || 0,
+        ivHex: ivHex,
+        keyType: key?.constructor?.name || "unknown",
+        dataPreview: dataPreview + "...",
+        timestamp: new Date().toISOString(),
+      });
+    } catch {
+      // Fallback if logger import fails
+      console.log("🔓 DEBUG: decrypt() called", {
+        dataLength: encryptedData?.length || 0,
+        ivLength: iv?.length || 0,
+      });
+    }
+
     const decrypted = await crypto.subtle.decrypt(
       { name: "AES-GCM", iv: new Uint8Array(iv) },
       key,
