@@ -93,11 +93,13 @@ export const runSyncDiagnostic = async () => {
       // Flag empty databases
       const totalRecords = Object.values(counts).reduce(
         (sum, count) => (typeof count === "number" ? sum + count : sum),
-        0
+        0,
       );
 
       if (totalRecords === 0) {
-        results.warnings.push("All data tables are empty - possible sync issue");
+        results.warnings.push(
+          "All data tables are empty - possible sync issue",
+        );
         console.warn("⚠️ All data tables are empty");
       }
     }

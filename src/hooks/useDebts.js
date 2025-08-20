@@ -56,7 +56,9 @@ const useDebts = () => {
   const addDebtMutation = useMutation({
     mutationKey: ["debts", "add"],
     mutationFn: async (debtData) => {
-      const debt = debtData.id ? debtData : { id: crypto.randomUUID(), ...debtData };
+      const debt = debtData.id
+        ? debtData
+        : { id: crypto.randomUUID(), ...debtData };
 
       await budgetDb.debts.add(debt);
 
@@ -138,7 +140,10 @@ const useDebts = () => {
       const debt = await budgetDb.debts.get(id);
       if (debt) {
         const history = [...(debt.paymentHistory || []), { ...payment }];
-        const newBalance = Math.max(0, (debt.currentBalance || 0) - payment.amount);
+        const newBalance = Math.max(
+          0,
+          (debt.currentBalance || 0) - payment.amount,
+        );
 
         const updatedDebt = {
           ...debt,
@@ -190,7 +195,8 @@ const useDebts = () => {
     getDebtById,
 
     refetch: debtsQuery.refetch,
-    invalidate: () => queryClient.invalidateQueries({ queryKey: queryKeys.debts }),
+    invalidate: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.debts }),
   };
 };
 

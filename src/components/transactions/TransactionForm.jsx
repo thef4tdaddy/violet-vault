@@ -51,7 +51,9 @@ const TransactionForm = ({
 
     // Handle bill payment if transaction is assigned to a bill envelope
     if (transactionForm.envelopeId && onPayBill) {
-      const selectedEnvelope = envelopes.find((env) => env.id === transactionForm.envelopeId);
+      const selectedEnvelope = envelopes.find(
+        (env) => env.id === transactionForm.envelopeId,
+      );
       if (selectedEnvelope && selectedEnvelope.envelopeType === "bill") {
         logger.info("Creating bill payment from transaction", {
           billId: selectedEnvelope.id,
@@ -72,11 +74,14 @@ const TransactionForm = ({
       }
     }
 
-    logger.info(`Transaction ${editingTransaction ? "updated" : "created"} successfully`, {
-      transactionId: editingTransaction?.id,
-      amount: transactionForm.amount,
-      envelopeId: transactionForm.envelopeId,
-    });
+    logger.info(
+      `Transaction ${editingTransaction ? "updated" : "created"} successfully`,
+      {
+        transactionId: editingTransaction?.id,
+        amount: transactionForm.amount,
+        envelopeId: transactionForm.envelopeId,
+      },
+    );
 
     onSubmit();
   };
@@ -96,7 +101,10 @@ const TransactionForm = ({
           <h3 className="text-xl font-semibold">
             {editingTransaction ? "Edit Transaction" : "Add New Transaction"}
           </h3>
-          <button onClick={resetAndClose} className="text-gray-400 hover:text-gray-600">
+          <button
+            onClick={resetAndClose}
+            className="text-gray-400 hover:text-gray-600"
+          >
             <X className="h-6 w-6" />
           </button>
         </div>
@@ -104,7 +112,9 @@ const TransactionForm = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Date *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Date *
+              </label>
               <input
                 type="date"
                 value={transactionForm.date}
@@ -120,7 +130,9 @@ const TransactionForm = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Type *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Type *
+              </label>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
@@ -161,7 +173,9 @@ const TransactionForm = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Description *
+            </label>
             <input
               type="text"
               value={transactionForm.description}
@@ -179,7 +193,9 @@ const TransactionForm = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Amount *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Amount *
+              </label>
               <input
                 type="number"
                 step="0.01"
@@ -197,7 +213,9 @@ const TransactionForm = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Category
+              </label>
               <select
                 value={transactionForm.category}
                 onChange={(e) =>
@@ -245,14 +263,16 @@ const TransactionForm = ({
             {transactionForm.envelopeId &&
               (() => {
                 const selectedEnvelope = envelopes.find(
-                  (env) => env.id === transactionForm.envelopeId
+                  (env) => env.id === transactionForm.envelopeId,
                 );
-                return selectedEnvelope && selectedEnvelope.envelopeType === "bill" ? (
+                return selectedEnvelope &&
+                  selectedEnvelope.envelopeType === "bill" ? (
                   <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                     <p className="text-sm text-blue-800">
-                      💡 <strong>Bill Payment:</strong> Assigning this transaction to "
-                      {selectedEnvelope.name}" will automatically mark it as a bill payment and
-                      deduct from the envelope balance.
+                      💡 <strong>Bill Payment:</strong> Assigning this
+                      transaction to "{selectedEnvelope.name}" will
+                      automatically mark it as a bill payment and deduct from
+                      the envelope balance.
                     </p>
                   </div>
                 ) : null;
@@ -260,7 +280,9 @@ const TransactionForm = ({
             {transactionForm.description && suggestEnvelope && (
               <div className="mt-2">
                 {(() => {
-                  const suggested = suggestEnvelope(transactionForm.description);
+                  const suggested = suggestEnvelope(
+                    transactionForm.description,
+                  );
                   return suggested ? (
                     <button
                       type="button"
@@ -282,7 +304,9 @@ const TransactionForm = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Notes (Optional)
+            </label>
             <textarea
               value={transactionForm.notes}
               onChange={(e) =>

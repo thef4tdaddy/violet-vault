@@ -954,16 +954,16 @@ class CloudSyncService {
       logger.info("✅ Data already synchronized");
     }
 
-      return {
-        success: true,
-        direction,
-        counts: {
-          envelopes: data.envelopes?.length || 0,
-          transactions: data.transactions?.length || 0,
-          bills: data.bills?.length || 0,
-          debts: data.debts?.length || 0,
-        },
-      };
+    return {
+      success: true,
+      direction,
+      counts: {
+        envelopes: data.envelopes?.length || 0,
+        transactions: data.transactions?.length || 0,
+        bills: data.bills?.length || 0,
+        debts: data.debts?.length || 0,
+      },
+    };
   }
 
   /**

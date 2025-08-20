@@ -85,7 +85,8 @@ export const ENVELOPE_TYPE_CONFIG = {
   },
   [ENVELOPE_TYPES.VARIABLE]: {
     name: "Variable Expense Envelope",
-    description: "Regular but flexible spending (gas, groceries, medical, pet expenses)",
+    description:
+      "Regular but flexible spending (gas, groceries, medical, pet expenses)",
     color: "orange",
     borderColor: "border-orange-500",
     bgColor: "bg-orange-50",
