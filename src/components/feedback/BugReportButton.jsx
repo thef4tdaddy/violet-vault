@@ -18,8 +18,10 @@ const BugReportButton = () => {
     closeModal,
     setDescription,
     setIncludeScreenshot,
+    setScreenshot,
     submitReport,
     previewScreenshot,
+    captureScreenshot,
   } = useBugReport();
 
   const { addToast } = useToast();
@@ -130,13 +132,62 @@ const BugReportButton = () => {
                 </div>
 
                 {includeScreenshot && (
-                  <button
-                    onClick={previewScreenshot}
-                    className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
-                  >
-                    <Camera className="h-4 w-4 mr-1" />
-                    Preview
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={previewScreenshot}
+                      className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
+                    >
+                      <Camera className="h-4 w-4 mr-1" />
+                      Auto
+                    </button>
+                    <button
+                      onClick={async () => {
+                        if (
+                          navigator.mediaDevices &&
+                          navigator.mediaDevices.getDisplayMedia
+                        ) {
+                          try {
+                            const stream =
+                              await navigator.mediaDevices.getDisplayMedia({
+                                video: true,
+                                audio: false,
+                              });
+                            const video = document.createElement("video");
+                            video.srcObject = stream;
+                            video.play();
+
+                            await new Promise(
+                              (resolve) => (video.onloadedmetadata = resolve),
+                            );
+
+                            const canvas = document.createElement("canvas");
+                            canvas.width = video.videoWidth;
+                            canvas.height = video.videoHeight;
+                            const ctx = canvas.getContext("2d");
+                            ctx.drawImage(video, 0, 0);
+
+                            stream.getTracks().forEach((track) => track.stop());
+
+                            const screenshotDataUrl = canvas.toDataURL(
+                              "image/png",
+                              0.8,
+                            );
+                            setScreenshot(screenshotDataUrl);
+                          } catch (error) {
+                            console.warn(
+                              "Manual screen capture failed:",
+                              error,
+                            );
+                          }
+                        }
+                      }}
+                      className="text-sm text-green-600 hover:text-green-800 flex items-center"
+                      title="Use browser's native screen capture (more reliable)"
+                    >
+                      <Camera className="h-4 w-4 mr-1" />
+                      Manual
+                    </button>
+                  </div>
                 )}
               </div>
 

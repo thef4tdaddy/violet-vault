@@ -22,6 +22,55 @@ const useBugReport = () => {
           navigator.userAgent,
         ) || window.innerWidth <= 768;
 
+      // Try modern native screenshot API first (requires user interaction)
+      if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+        try {
+          logger.debug(
+            "Attempting native screen capture API (user interaction required)",
+          );
+          // This requires user permission and interaction
+          const stream = await navigator.mediaDevices.getDisplayMedia({
+            video: {
+              width: { ideal: 1920 },
+              height: { ideal: 1080 },
+              frameRate: { ideal: 1, max: 5 },
+            },
+            audio: false,
+          });
+
+          // Create video element to capture frame
+          const video = document.createElement("video");
+          video.srcObject = stream;
+          video.play();
+
+          // Wait for video to be ready
+          await new Promise((resolve) => {
+            video.onloadedmetadata = () => resolve();
+          });
+
+          // Capture frame to canvas
+          const canvas = document.createElement("canvas");
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(video, 0, 0);
+
+          // Stop the stream
+          stream.getTracks().forEach((track) => track.stop());
+
+          const screenshotDataUrl = canvas.toDataURL("image/png", 0.8);
+          setScreenshot(screenshotDataUrl);
+          logger.info("Native screen capture successful");
+          return screenshotDataUrl;
+        } catch (nativeError) {
+          logger.debug(
+            "Native screen capture failed or cancelled by user:",
+            nativeError.message,
+          );
+          // Fall through to html2canvas method
+        }
+      }
+
       // Add timeout to prevent indefinite hanging
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(
@@ -30,7 +79,7 @@ const useBugReport = () => {
         ),
       );
 
-      // Dynamic import to avoid bundle size issues
+      // Fallback to html2canvas (original method)
       const html2canvas = (await import("html2canvas")).default;
 
       const screenshotPromise = html2canvas(document.body, {
@@ -232,24 +281,12 @@ const useBugReport = () => {
       } catch (fallbackError) {
         logger.warn("Fallback screenshot also failed:", fallbackError.message);
 
-        // Try ultimate fallback - use browser's native screenshot API if available
-        try {
-          if (
-            navigator.mediaDevices &&
-            navigator.mediaDevices.getDisplayMedia
-          ) {
-            logger.debug(
-              "Attempting native screen capture API as final fallback",
-            );
-            // This would require user interaction, so we can't use it automatically
-            // But we can let the user know this option exists
-            logger.info(
-              "Screenshot capture failed. Users can manually take screenshots using browser tools or system shortcuts.",
-            );
-          }
-        } catch (nativeError) {
-          logger.debug("Native screenshot API not available");
-        }
+        // Inform user about manual screenshot alternatives
+        logger.info("📸 Screenshot auto-capture failed. Manual alternatives:", {
+          desktop: "Use Ctrl+Shift+S (Windows/Linux) or Cmd+Shift+4 (Mac)",
+          mobile: "Use device screenshot gesture or settings menu",
+          browser: "Browser dev tools or extensions can capture screenshots",
+        });
 
         // Return null instead of throwing - this allows the bug report to continue without screenshot
         return null;
@@ -880,6 +917,7 @@ const useBugReport = () => {
     closeModal,
     setDescription,
     setIncludeScreenshot,
+    setScreenshot,
     submitReport,
     captureScreenshot,
     previewScreenshot,
