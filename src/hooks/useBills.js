@@ -192,8 +192,11 @@ const useBills = (options = {}) => {
   const addBillMutation = useMutation({
     mutationKey: ["bills", "add"],
     mutationFn: async (billData) => {
+      // Generate unique ID with better collision resistance
+      const uniqueId = `bill_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
       const newBill = {
-        id: Date.now().toString(),
+        id: uniqueId,
         isPaid: false,
         isRecurring: false,
         category: "utilities",
@@ -204,8 +207,8 @@ const useBills = (options = {}) => {
       // Apply optimistic update
       await optimisticHelpers.addBill(newBill);
 
-      // Apply to Dexie directly
-      await budgetDb.bills.add(newBill);
+      // Use put() instead of add() to handle duplicates gracefully
+      await budgetDb.bills.put(newBill);
 
       return newBill;
     },

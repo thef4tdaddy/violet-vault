@@ -60,7 +60,7 @@ const useDebts = () => {
         ? debtData
         : { id: crypto.randomUUID(), ...debtData };
 
-      await budgetDb.debts.add(debt);
+      await budgetDb.debts.put(debt);
 
       // Track the change in budget history
       await BudgetHistoryTracker.trackDebtChange({

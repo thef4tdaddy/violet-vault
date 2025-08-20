@@ -226,8 +226,8 @@ const useSavingsGoals = (options = {}) => {
       // Apply optimistic update
       await optimisticHelpers.addSavingsGoal(newGoal);
 
-      // Apply to Dexie directly
-      await budgetDb.savingsGoals.add(newGoal);
+      // Use put() instead of add() to handle duplicates gracefully
+      await budgetDb.savingsGoals.put(newGoal);
 
       return newGoal;
     },
