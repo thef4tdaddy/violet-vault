@@ -400,6 +400,15 @@ class ChunkedFirebaseSync {
       throw new Error("ChunkedFirebaseSync not initialized");
     }
 
+    // TEMP DEBUG: Check what budget ID is actually being used for Firebase operations
+    logger.info("🔍 TEMP: saveToCloud using budget ID", {
+      budgetId: this.budgetId,
+      budgetIdLength: this.budgetId?.length,
+      budgetIdPreview: this.budgetId?.slice(0, 12) + "...",
+      dataEnvelopes: data?.envelopes?.length || 0,
+      dataTransactions: data?.transactions?.length || 0,
+    });
+
     // Prevent concurrent saves that can cause corruption
     if (this.activeSavePromise) {
       logger.info("🔄 Save already in progress, waiting for completion...");
@@ -645,6 +654,13 @@ class ChunkedFirebaseSync {
     if (!this.budgetId || !this.encryptionKey) {
       throw new Error("ChunkedFirebaseSync not initialized");
     }
+
+    // TEMP DEBUG: Check what budget ID is actually being used for Firebase load operations  
+    logger.info("🔍 TEMP: loadFromCloud using budget ID", {
+      budgetId: this.budgetId,
+      budgetIdLength: this.budgetId?.length,
+      budgetIdPreview: this.budgetId?.slice(0, 12) + "...",
+    });
 
     // Ensure user is authenticated before any Firestore operations
     const isAuthenticated = await this.ensureAuthenticated();
