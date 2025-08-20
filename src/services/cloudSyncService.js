@@ -216,7 +216,7 @@ class CloudSyncService {
           this.config.budgetId,
           this.config.encryptionKey,
         );
-        
+
         // TEMP DEBUG: Verify ChunkedFirebaseSync actually stored the correct budget ID
         logger.info("🔍 TEMP: ChunkedFirebaseSync reinitialized", {
           configBudgetId: this.config.budgetId,
@@ -658,13 +658,55 @@ class CloudSyncService {
       } else if (dexieLastModified > firestoreLastModified) {
         return { direction: "toFirestore", data: dexieData };
       } else {
-        // When timestamps are equal, prefer uploading to ensure latest changes sync
-        logger.info("📊 Equal timestamps detected, forcing upload to cloud");
-        return { direction: "toFirestore", data: dexieData };
+        // When timestamps are equal, check which dataset is larger/more complete
+        const firestoreItemCount = this.countDataItems(firestoreData);
+        const dexieItemCount = this.countDataItems(dexieData);
+
+        logger.info("📊 Equal timestamps detected, comparing data size", {
+          firestoreItems: firestoreItemCount,
+          dexieItems: dexieItemCount,
+        });
+
+        if (firestoreItemCount > dexieItemCount) {
+          logger.info("☁️ Cloud has more data, downloading from cloud");
+          return { direction: "fromFirestore", data: firestoreData };
+        } else if (dexieItemCount > firestoreItemCount) {
+          logger.info("📱 Local has more data, uploading to cloud");
+          return { direction: "toFirestore", data: dexieData };
+        } else {
+          // Same size and timestamp - prefer cloud to avoid unnecessary uploads
+          logger.info("🔄 Same size and timestamp, keeping cloud data");
+          return { direction: "fromFirestore", data: firestoreData };
+        }
       }
     }
 
     return { direction: "none", data: dexieData };
+  }
+
+  /**
+   * Count total items across all data arrays
+   */
+  countDataItems(data) {
+    if (!data) return 0;
+
+    let count = 0;
+    const arrayFields = [
+      "envelopes",
+      "transactions",
+      "bills",
+      "debts",
+      "savingsGoals",
+      "paycheckHistory",
+    ];
+
+    arrayFields.forEach((field) => {
+      if (Array.isArray(data[field])) {
+        count += data[field].length;
+      }
+    });
+
+    return count;
   }
 
   /**
