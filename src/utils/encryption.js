@@ -141,7 +141,7 @@ export const encryptionUtils = {
     return Math.abs(hash).toString(16);
   },
 
-  generateBudgetId(masterPassword) {
+  async generateBudgetId(masterPassword) {
     let hash = 0;
     for (let i = 0; i < masterPassword.length; i++) {
       const char = masterPassword.charCodeAt(i);
@@ -151,18 +151,29 @@ export const encryptionUtils = {
     const budgetId = `budget_${Math.abs(hash).toString(16)}`;
 
     // Debug logging to track cross-browser budget ID generation consistency
-    console.log(`🔍 DEBUG: generateBudgetId detailed analysis`, {
-      passwordLength: masterPassword?.length || 0,
-      passwordType: typeof masterPassword,
-      passwordPreview: masterPassword ? `${masterPassword[0]}***${masterPassword[masterPassword.length - 1]}` : "none",
-      firstCharCode: masterPassword?.charCodeAt(0) || 0,
-      lastCharCode: masterPassword?.charCodeAt(masterPassword.length - 1) || 0,
-      hash: hash,
-      absHash: Math.abs(hash),
-      hexHash: Math.abs(hash).toString(16),
-      finalBudgetId: budgetId,
-      timestamp: new Date().toISOString(),
-    });
+    try {
+      const logger = (await import("./logger.js")).default;
+      logger.debug(`🔍 DEBUG: generateBudgetId detailed analysis`, {
+        passwordLength: masterPassword?.length || 0,
+        passwordType: typeof masterPassword,
+        passwordPreview: masterPassword ? `${masterPassword[0]}***${masterPassword[masterPassword.length - 1]}` : "none",
+        firstCharCode: masterPassword?.charCodeAt(0) || 0,
+        lastCharCode: masterPassword?.charCodeAt(masterPassword.length - 1) || 0,
+        hash: hash,
+        absHash: Math.abs(hash),
+        hexHash: Math.abs(hash).toString(16),
+        finalBudgetId: budgetId,
+        timestamp: new Date().toISOString(),
+      });
+    } catch {
+      // Fallback if logger import fails
+      console.log(`🔍 DEBUG: generateBudgetId detailed analysis`, {
+        passwordLength: masterPassword?.length || 0,
+        passwordType: typeof masterPassword,
+        hash: hash,
+        finalBudgetId: budgetId,
+      });
+    }
 
     return budgetId;
   },

@@ -54,8 +54,9 @@ export const useAuth = create((set, get) => ({
           logger.auth("Generated/restored key and salt for user.");
 
           // ALWAYS use deterministic budgetId generation for cross-browser consistency
-          const deterministicBudgetId =
-            encryptionUtils.generateBudgetId(password);
+          const deterministicBudgetId = await encryptionUtils.generateBudgetId(
+            password,
+          );
 
           // Debug: Track where wrong budget ID is coming from
           logger.auth("🔍 DEBUG: authStore budget ID override investigation", {

@@ -31,18 +31,19 @@ const useAuthFlow = () => {
         const { encryptionUtils } = await import("../utils/encryption");
 
         // Debug: Track source of budget ID problem
+        const generatedBudgetId = await encryptionUtils.generateBudgetId(
+          userData.password,
+        );
         logger.auth("🔍 DEBUG: useAuthFlow budget ID investigation", {
           originalUserDataBudgetId: userData.budgetId || "none",
-          generatedBudgetId: encryptionUtils.generateBudgetId(
-            userData.password,
-          ),
+          generatedBudgetId,
           userDataKeys: Object.keys(userData),
           envMode: import.meta?.env?.MODE || "unknown",
         });
 
         const userDataWithId = {
           ...userData,
-          budgetId: encryptionUtils.generateBudgetId(userData.password),
+          budgetId: generatedBudgetId,
         };
 
         logger.auth("Calling login", {
