@@ -208,7 +208,7 @@ export const validateAllSyncFlows = async () => {
         name: "Equal timestamps",
         firestore: { lastModified: Date.now(), envelopes: [{ id: "test" }] },
         dexie: { lastModified: Date.now(), envelopes: [{ id: "test" }] },
-        expected: "toFirestore", // Should prefer upload
+        expected: "fromFirestore", // New logic: prefer cloud when sizes are equal
       },
       {
         name: "Local only data",

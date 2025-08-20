@@ -163,6 +163,7 @@ const SummaryCards = () => {
       label: "Biweekly Remaining",
       value: biweeklyRemaining,
       color: "amber",
+      subtitle: `Total allocation: $${biweeklyTotal.toFixed(2)}`,
     },
   ];
 
@@ -179,24 +180,10 @@ const SummaryCards = () => {
             onClick={card.onClick}
             clickable={card.clickable}
             isNegative={card.isNegative}
+            subtitle={card.subtitle}
             dataTour={card.key === "total-cash" ? "actual-balance" : undefined}
           />
         ))}
-      </div>
-
-      {/* Additional summary info */}
-      <div className="mb-8">
-        <div className="glassmorphism rounded-2xl p-4 border border-white/20 ring-1 ring-gray-800/10">
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center text-gray-600">
-              <DollarSign className="h-4 w-4 mr-2" />
-              <span>Total Biweekly Allocation:</span>
-            </div>
-            <span className="font-semibold text-gray-900">
-              ${biweeklyTotal.toFixed(2)}
-            </span>
-          </div>
-        </div>
       </div>
 
       <Suspense fallback={null}>
@@ -216,6 +203,7 @@ const SummaryCard = memo(
     onClick,
     clickable,
     isNegative,
+    subtitle,
     dataTour,
   }) => {
     const colorClasses = {
@@ -270,6 +258,7 @@ const SummaryCard = memo(
             ${value.toFixed(2)}
             {isNegative && <span className="ml-2 text-sm">⚠️</span>}
           </p>
+          {subtitle && <p className="text-xs text-gray-500 mt-1">{subtitle}</p>}
         </div>
       </div>
     );
