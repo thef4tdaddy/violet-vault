@@ -54,32 +54,13 @@ export const useAuth = create((set, get) => ({
           logger.auth("Generated/restored key and salt for user.");
 
           // ALWAYS use deterministic budgetId generation for cross-browser consistency
-          const deterministicBudgetId = await encryptionUtils.generateBudgetId(
-            password,
-          );
-
-          // Debug: Track where wrong budget ID is coming from
-          logger.auth("🔍 DEBUG: authStore budget ID override investigation", {
-            userDataBudgetId: userData.budgetId || "none",
-            deterministicBudgetId,
-            userDataKeys: Object.keys(userData),
-            envMode: import.meta?.env?.MODE || "unknown",
-          });
+          const deterministicBudgetId =
+            await encryptionUtils.generateBudgetId(password);
 
           const finalUserData = {
             ...userData,
             budgetId: deterministicBudgetId,
           };
-
-          // Debug budget ID generation for cross-browser sync troubleshooting
-          logger.auth("🚨 BUDGET ID MISMATCH DEBUG", {
-            deterministicBudgetId: deterministicBudgetId,
-            finalUserDataBudgetId: finalUserData.budgetId,
-            budgetIdPreview: finalUserData.budgetId?.slice(0, 8) || "none",
-            match: deterministicBudgetId === finalUserData.budgetId,
-            alwaysFromPassword: true,
-            passwordLength: password?.length || 0,
-          });
 
           logger.auth("Setting auth state for new user.", {
             budgetId: finalUserData.budgetId,
