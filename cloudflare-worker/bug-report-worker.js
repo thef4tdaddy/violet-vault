@@ -525,8 +525,33 @@ async function getMilestones(env) {
         return 0;
       });
 
-    // Current milestone is the lowest numbered open one
-    const currentMilestone = processedMilestones[0];
+    // Current milestone logic: prefer closest due date, fallback to highest version
+    let currentMilestone = processedMilestones[0]; // Default fallback
+    
+    // Find milestone with closest due date (if any have due dates)
+    const milestonesWithDueDate = processedMilestones.filter(m => m.due_on);
+    if (milestonesWithDueDate.length > 0) {
+      const now = new Date();
+      currentMilestone = milestonesWithDueDate
+        .sort((a, b) => {
+          const aDiff = Math.abs(new Date(a.due_on) - now);
+          const bDiff = Math.abs(new Date(b.due_on) - now);
+          return aDiff - bDiff; // Closest due date first
+        })[0];
+    } else {
+      // No due dates available, use highest version number (most recent)
+      currentMilestone = processedMilestones
+        .sort((a, b) => {
+          const aVersion = a.version.split(".").map(Number);
+          const bVersion = b.version.split(".").map(Number);
+          for (let i = 0; i < Math.max(aVersion.length, bVersion.length); i++) {
+            const aPart = aVersion[i] || 0;
+            const bPart = bVersion[i] || 0;
+            if (aPart !== bPart) return bPart - aPart; // Highest version first
+          }
+          return 0;
+        })[0];
+    }
 
     return {
       success: true,
@@ -1198,13 +1223,34 @@ async function createGitHubIssue(data, env) {
 
   // Add milestone if available
   if (milestoneInfo.success && milestoneInfo.current) {
-    // Find the milestone by title match
-    const currentMilestone = milestoneInfo.milestones.find(
-      (m) => m.title === milestoneInfo.current.title,
+    // Find the milestone by title match from GitHub API response
+    const response = await fetch(
+      `https://api.github.com/repos/${env.GITHUB_REPO}/milestones?state=open`,
+      {
+        headers: {
+          Authorization: `token ${env.GITHUB_TOKEN}`,
+          "User-Agent": "VioletVault-BugReporter/1.0",
+          Accept: "application/vnd.github.v3+json",
+        },
+      }
     );
-    if (currentMilestone) {
-      issueData.milestone = currentMilestone.number || null;
+    
+    if (response.ok) {
+      const allMilestones = await response.json();
+      const targetMilestone = allMilestones.find(
+        (m) => m.title === milestoneInfo.current.title,
+      );
+      if (targetMilestone) {
+        issueData.milestone = targetMilestone.number;
+        console.log(`Assigned bug report to milestone: ${targetMilestone.title} (#${targetMilestone.number})`);
+      } else {
+        console.log(`Milestone not found: ${milestoneInfo.current.title}`);
+      }
+    } else {
+      console.log('Failed to fetch milestones for assignment');
     }
+  } else {
+    console.log('No milestone info available for bug report assignment');
   }
 
   // Create the GitHub issue
