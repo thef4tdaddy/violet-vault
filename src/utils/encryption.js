@@ -90,6 +90,17 @@ export const encryptionUtils = {
     return JSON.parse(decoder.decode(decrypted));
   },
 
+  async decryptRaw(encryptedData, key, iv) {
+    const decrypted = await crypto.subtle.decrypt(
+      { name: "AES-GCM", iv: new Uint8Array(iv) },
+      key,
+      new Uint8Array(encryptedData),
+    );
+
+    const decoder = new TextDecoder();
+    return decoder.decode(decrypted);
+  },
+
   generateDeviceFingerprint() {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");

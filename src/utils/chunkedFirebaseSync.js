@@ -800,7 +800,7 @@ class ChunkedFirebaseSync {
             });
 
             decryptedManifest = JSON.parse(
-              await encryptionUtils.decrypt(
+              await encryptionUtils.decryptRaw(
                 manifestDecryptionData.data,
                 this.encryptionKey,
                 manifestDecryptionData.iv,
@@ -838,7 +838,7 @@ class ChunkedFirebaseSync {
           });
 
           decryptedManifest = JSON.parse(
-            await encryptionUtils.decrypt(
+            await encryptionUtils.decryptRaw(
               manifestData.encryptedData,
               this.encryptionKey,
             ),
@@ -999,7 +999,7 @@ class ChunkedFirebaseSync {
               }
 
               const decryptedChunk = JSON.parse(
-                await encryptionUtils.decrypt(
+                await encryptionUtils.decryptRaw(
                   decryptionData.data,
                   this.encryptionKey,
                   decryptionData.iv,
