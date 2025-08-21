@@ -119,28 +119,34 @@ export const fetchTargetVersion = async () => {
   return fallbackVersion;
 };
 
-// Get a stable date for a version (avoids showing "load time")
-const getVersionDate = (version, isDevelopment = false) => {
-  if (isDevelopment) {
-    // For development builds, try to get actual commit date from environment
-    // Vercel provides VERCEL_GIT_COMMIT_AUTHOR_DATE
-    const commitDate = import.meta.env.VITE_VERCEL_GIT_COMMIT_AUTHOR_DATE;
-    if (commitDate) {
-      return new Date(commitDate).toISOString().split("T")[0];
-    }
-
-    // Fallback for development: Use today's date as it's better than a stale version date
-    return new Date().toISOString().split("T")[0];
+// Get actual commit date from git (injected at build time)
+const getActualCommitDate = (branchInfo) => {
+  // Try git commit date first (injected by Vite build)
+  const gitCommitDate = import.meta.env.VITE_GIT_COMMIT_DATE;
+  if (gitCommitDate) {
+    return new Date(gitCommitDate).toISOString().split("T")[0];
   }
 
-  // Map versions to their actual release dates for production builds
+  // Fallback to Vercel git environment variables
+  const vercelCommitDate = import.meta.env.VITE_VERCEL_GIT_COMMIT_AUTHOR_DATE;
+  if (vercelCommitDate) {
+    return new Date(vercelCommitDate).toISOString().split("T")[0];
+  }
+
+  // Final fallback: use build time if available
+  const buildTime = import.meta.env.VITE_BUILD_TIME;
+  if (buildTime) {
+    return new Date(buildTime).toISOString().split("T")[0];
+  }
+
+  // Last resort: use a static date based on branch and version
   const versionDates = {
     "1.8.0": "2025-08-16", // Actual v1.8.0 release date
     "1.9.0": "2025-08-17", // Current development
     "1.10.0": "2025-09-01", // Planned future release
   };
 
-  return versionDates[version] || "2025-08-16"; // Default to v1.8.0 date
+  return versionDates[APP_VERSION] || new Date().toISOString().split("T")[0];
 };
 
 // Fallback target version detection (used when API is unavailable)
@@ -161,14 +167,16 @@ const getTargetVersionFallback = () => {
   }
 };
 
-// Branch and environment detection (sync version for immediate use)
+// Branch and environment detection with actual git branch info
 export const getBranchInfo = (targetVersion = null) => {
+  // Get actual git branch from build-time injection
+  const actualGitBranch = import.meta.env.VITE_GIT_BRANCH;
+
   // Check multiple environment detection methods
   const appEnv = import.meta.env.VITE_APP_ENV;
   const isDev = import.meta.env.DEV;
 
   // Vercel environment detection
-  // Vercel sets VERCEL_ENV, but we need VITE_VERCEL_ENV to access it in the browser
   const vercelEnv = import.meta.env.VITE_VERCEL_ENV; // production, preview, development
   const isVercelProduction = vercelEnv === "production";
   const isVercelPreview = vercelEnv === "preview";
@@ -189,9 +197,11 @@ export const getBranchInfo = (targetVersion = null) => {
 
   // Other common environment indicators
   const nodeEnv = import.meta.env.NODE_ENV;
-  const _mode = import.meta.env.MODE;
 
   const fallbackVersion = targetVersion || getTargetVersionFallback();
+
+  // Determine branch: Use actual git branch if available, otherwise fall back to environment detection
+  let branch = actualGitBranch || "unknown";
 
   // Environment detection priority:
   // 1. Local development (npm run dev)
@@ -200,7 +210,7 @@ export const getBranchInfo = (targetVersion = null) => {
 
   if (isDev || appEnv === "development") {
     return {
-      branch: "develop",
+      branch: branch,
       environment: "development",
       futureVersion: fallbackVersion,
       isDevelopment: true,
@@ -212,7 +222,7 @@ export const getBranchInfo = (targetVersion = null) => {
     appEnv === "preview"
   ) {
     return {
-      branch: "develop",
+      branch: branch || "develop", // Default to develop for preview
       environment: "preview",
       futureVersion: fallbackVersion,
       isDevelopment: true, // Preview shows dev features
@@ -225,7 +235,7 @@ export const getBranchInfo = (targetVersion = null) => {
     nodeEnv === "production"
   ) {
     return {
-      branch: "main",
+      branch: branch || "main", // Default to main for production
       environment: "production",
       futureVersion: null,
       isDevelopment: false,
@@ -234,7 +244,7 @@ export const getBranchInfo = (targetVersion = null) => {
   } else {
     // Default to production for safety
     return {
-      branch: "main",
+      branch: branch || "main",
       environment: "production",
       futureVersion: null,
       isDevelopment: false,
@@ -267,28 +277,15 @@ export const getVersionInfo = (targetVersion = null) => {
     environmentLabel = "✅ Production";
   }
 
-  // Get build time from environment variable (set during build) or use a sensible fallback
-  const buildTimestamp =
-    import.meta.env.VITE_BUILD_TIME ||
-    import.meta.env.VITE_VERCEL_GIT_COMMIT_REF_DATE;
-  let buildDate;
-
-  if (buildTimestamp) {
-    // Use the actual build/commit timestamp
-    buildDate = new Date(buildTimestamp).toISOString().split("T")[0];
-  } else {
-    // Fallback: Use a static date based on the current app version to avoid showing "load time"
-    // This ensures the date stays consistent for the same version
-    const versionDate = getVersionDate(APP_VERSION, branchInfo.isDevelopment);
-    buildDate = versionDate;
-  }
+  // Get actual commit date (injected at build time)
+  const commitDate = getActualCommitDate(branchInfo);
 
   return {
     version: displayVersion,
     baseVersion: APP_VERSION, // Always from package.json
     name: APP_NAME,
     displayName: "VioletVault",
-    buildDate,
+    buildDate: commitDate, // Now shows actual git commit date
     branch: branchInfo.branch,
     environment: branchInfo.environment,
     environmentLabel,
