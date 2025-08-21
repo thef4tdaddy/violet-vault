@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useBudgetStore } from "../stores/budgetStore";
 import { queryKeys, optimisticHelpers } from "../utils/queryClient";
-import { budgetDb } from "../db/budgetDb";
+import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "../db/budgetDb";
 import logger from "../utils/logger.js";
 
 /**
@@ -191,6 +191,80 @@ const useTransactions = (options = {}) => {
     };
   }, [queryClient]);
 
+  // Helper function to update balances when transactions are added/removed
+  const updateBalancesForTransaction = async (
+    transaction,
+    isRemoving = false,
+  ) => {
+    const { envelopeId, amount, type } = transaction;
+    const multiplier = isRemoving ? -1 : 1; // Reverse the effect when removing
+
+    try {
+      // Get current metadata
+      const metadata = await getBudgetMetadata();
+      const currentActualBalance = metadata?.actualBalance || 0;
+      const currentUnassignedCash = metadata?.unassignedCash || 0;
+
+      // Calculate actual balance change (income increases, expenses decrease)
+      let actualBalanceChange = 0;
+      if (type === "income") {
+        actualBalanceChange = amount * multiplier;
+      } else if (type === "expense") {
+        actualBalanceChange = -Math.abs(amount) * multiplier;
+      }
+
+      // Update envelope balance or unassigned cash
+      if (envelopeId === "unassigned" || !envelopeId) {
+        // Update unassigned cash
+        const unassignedChange =
+          type === "income"
+            ? amount * multiplier
+            : -Math.abs(amount) * multiplier;
+
+        await setBudgetMetadata({
+          actualBalance: currentActualBalance + actualBalanceChange,
+          unassignedCash: currentUnassignedCash + unassignedChange,
+        });
+      } else {
+        // Update specific envelope balance
+        const envelope = await budgetDb.envelopes.get(envelopeId);
+        if (envelope) {
+          const balanceChange =
+            type === "income"
+              ? amount * multiplier
+              : -Math.abs(amount) * multiplier;
+
+          const newBalance = (envelope.currentBalance || 0) + balanceChange;
+          await budgetDb.envelopes.update(envelopeId, {
+            currentBalance: newBalance,
+            updatedAt: new Date().toISOString(),
+          });
+        }
+
+        // Still update actual balance
+        await setBudgetMetadata({
+          actualBalance: currentActualBalance + actualBalanceChange,
+        });
+      }
+
+      logger.debug("Balance updated for transaction", {
+        transactionId: transaction.id,
+        envelopeId,
+        amount,
+        type,
+        actualBalanceChange,
+        isRemoving,
+      });
+    } catch (error) {
+      logger.error("Failed to update balances for transaction", error, {
+        transactionId: transaction.id,
+        envelopeId,
+        amount,
+        type,
+      });
+    }
+  };
+
   // Add transaction mutation
   const addTransactionMutation = useMutation({
     mutationKey: ["transactions", "add"],
@@ -210,6 +284,9 @@ const useTransactions = (options = {}) => {
 
       // Save to Dexie (single source of truth for transactions)
       await budgetDb.transactions.put(newTransaction);
+
+      // Update balances based on transaction
+      await updateBalancesForTransaction(newTransaction);
 
       return newTransaction;
     },
@@ -262,11 +339,19 @@ const useTransactions = (options = {}) => {
   const deleteTransactionMutation = useMutation({
     mutationKey: ["transactions", "delete"],
     mutationFn: async (transactionId) => {
+      // Get transaction data before deleting (needed for balance updates)
+      const transaction = await budgetDb.transactions.get(transactionId);
+
       // Apply optimistic update using helper
       await optimisticHelpers.removeTransaction(transactionId);
 
       // Delete from Dexie (single source of truth for transactions)
       await budgetDb.transactions.delete(transactionId);
+
+      // Reverse the balance changes
+      if (transaction) {
+        await updateBalancesForTransaction(transaction, true);
+      }
 
       return transactionId;
     },
