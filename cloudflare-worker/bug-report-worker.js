@@ -618,7 +618,7 @@ async function getMilestones(env) {
  */
 async function generateSmartLabels(description, reportEnv, env) {
   const labels = ["bug", "user-reported"];
-  
+
   // Fetch existing GitHub labels to avoid duplication
   let existingLabels = [];
   try {
@@ -630,12 +630,12 @@ async function generateSmartLabels(description, reportEnv, env) {
           "User-Agent": "VioletVault-BugReporter/1.0",
           Accept: "application/vnd.github.v3+json",
         },
-      }
+      },
     );
-    
+
     if (labelsResponse.ok) {
       const labelsData = await labelsResponse.json();
-      existingLabels = labelsData.map(label => label.name);
+      existingLabels = labelsData.map((label) => label.name);
       console.log(`Found ${existingLabels.length} existing labels`);
     }
   } catch (error) {
@@ -669,21 +669,23 @@ async function generateSmartLabels(description, reportEnv, env) {
 
   // Detect code pastes (requested feature)
   const codeIndicators = [
-    /```[\s\S]*?```/,           // Code blocks
-    /`[^`\n]+`/,                // Inline code
-    /function\s+\w+\s*\(/,      // Function definitions
-    /const\s+\w+\s*=/,          // Variable declarations
-    /import\s+.*from/,          // Import statements
-    /class\s+\w+/,              // Class definitions
-    /if\s*\([^)]+\)\s*{/,       // If statements with braces
-    /for\s*\([^)]*\)\s*{/,      // For loops
+    /```[\s\S]*?```/, // Code blocks
+    /`[^`\n]+`/, // Inline code
+    /function\s+\w+\s*\(/, // Function definitions
+    /const\s+\w+\s*=/, // Variable declarations
+    /import\s+.*from/, // Import statements
+    /class\s+\w+/, // Class definitions
+    /if\s*\([^)]+\)\s*{/, // If statements with braces
+    /for\s*\([^)]*\)\s*{/, // For loops
     /console\.(log|error|warn)/, // Console statements
-    /\w+\.\w+\([^)]*\)/,        // Method calls
+    /\w+\.\w+\([^)]*\)/, // Method calls
     /TypeError:|ReferenceError:|SyntaxError:/, // Error types
-    /at\s+\w+\s*\(/,            // Stack traces
+    /at\s+\w+\s*\(/, // Stack traces
   ];
 
-  const hasCodeContent = codeIndicators.some(pattern => pattern.test(description));
+  const hasCodeContent = codeIndicators.some((pattern) =>
+    pattern.test(description),
+  );
   if (hasCodeContent) {
     addLabelIfExists("code");
     console.log("Detected code content in bug report");
@@ -700,7 +702,7 @@ async function generateSmartLabels(description, reportEnv, env) {
   ) {
     addLabelIfExists("🟡 Medium");
   } else {
-    addLabelIfExists("⚪ Low");  // Default priority
+    addLabelIfExists("⚪ Low"); // Default priority
   }
 
   // Enhanced component/feature-based labeling with page context
@@ -1284,17 +1286,20 @@ async function createGitHubIssue(data, env) {
   const maxBodyLength = 65536;
   let finalIssueBody = issueBody;
   let shouldCreateComment = false;
-  
+
   if (issueBody.length > maxBodyLength) {
-    console.log(`Issue body too long (${issueBody.length} chars), will create comment`);
+    console.log(
+      `Issue body too long (${issueBody.length} chars), will create comment`,
+    );
     shouldCreateComment = true;
     // Create shorter body for initial issue
-    finalIssueBody = `## Bug Report\n\n${processedDescription}\n\n` +
+    finalIssueBody =
+      `## Bug Report\n\n${processedDescription}\n\n` +
       `## 📍 User Location\n` +
       `**Page:** ${reportEnv?.pageContext?.page || "unknown"}\n` +
       `**URL:** ${reportEnv?.url || "unknown"}\n\n` +
       `**Note:** Full diagnostic information posted in comments due to length.\n\n`;
-    
+
     if (sessionUrl) {
       finalIssueBody += `## Session Replay\n[View session replay](${sessionUrl})\n\n`;
     }
@@ -1389,18 +1394,26 @@ async function createGitHubIssue(data, env) {
             "User-Agent": "VioletVault-BugReporter/1.0",
           },
           body: JSON.stringify({
-            body: `## Full Diagnostic Information\n\n${commentBody}`
+            body: `## Full Diagnostic Information\n\n${commentBody}`,
           }),
         },
       );
-      
+
       if (commentResponse.ok) {
-        console.log(`Added comment with full diagnostic info to issue #${createdIssue.number}`);
+        console.log(
+          `Added comment with full diagnostic info to issue #${createdIssue.number}`,
+        );
       } else {
-        console.error(`Failed to add comment to issue #${createdIssue.number}:`, await commentResponse.text());
+        console.error(
+          `Failed to add comment to issue #${createdIssue.number}:`,
+          await commentResponse.text(),
+        );
       }
     } catch (commentError) {
-      console.error("Failed to create comment with full diagnostic info:", commentError);
+      console.error(
+        "Failed to create comment with full diagnostic info:",
+        commentError,
+      );
     }
   }
 
