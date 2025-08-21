@@ -12,9 +12,8 @@ const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 const migrateOldData = async () => {
   try {
     const oldData = localStorage.getItem("budget-store");
-    const newData = localStorage.getItem("violet-vault-store");
 
-    // Migrate if old data exists (always replace new data)
+    // Migrate if old data exists
     if (oldData) {
       logger.info(
         "Migrating data from old budget-store to violet-vault-store",
