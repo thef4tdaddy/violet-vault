@@ -73,9 +73,7 @@ export const validateAllSyncFlows = async () => {
       },
       {
         name: "Transaction in sync",
-        test: syncData.transactions.some(
-          (t) => t.id === testData.transaction.id,
-        ),
+        test: syncData.transactions.some((t) => t.id === testData.transaction.id),
       },
       {
         name: "Bill in sync",
@@ -87,8 +85,7 @@ export const validateAllSyncFlows = async () => {
       },
       {
         name: "Metadata synced",
-        test:
-          syncData.unassignedCash === 500 && syncData.actualBalance === 2000,
+        test: syncData.unassignedCash === 500 && syncData.actualBalance === 2000,
       },
       {
         name: "Timestamp valid",
@@ -101,17 +98,12 @@ export const validateAllSyncFlows = async () => {
     results.push({
       flow: "Complete Data Flow",
       status: allPassed ? "✅ PASSED" : "❌ FAILED",
-      details: validations
-        .map((v) => `${v.name}: ${v.test ? "✅" : "❌"}`)
-        .join(", "),
+      details: validations.map((v) => `${v.name}: ${v.test ? "✅" : "❌"}`).join(", "),
     });
 
     // Cleanup
     await budgetDb.envelopes.where("id").equals(testData.envelope.id).delete();
-    await budgetDb.transactions
-      .where("id")
-      .equals(testData.transaction.id)
-      .delete();
+    await budgetDb.transactions.where("id").equals(testData.transaction.id).delete();
     await budgetDb.bills.where("id").equals(testData.bill.id).delete();
     await budgetDb.debts.where("id").equals(testData.debt.id).delete();
   } catch (error) {
@@ -149,20 +141,15 @@ export const validateAllSyncFlows = async () => {
     const bulkValidations = [
       {
         name: "All envelopes synced",
-        test: bulkEnvelopes.every((e) =>
-          syncData.envelopes.some((se) => se.id === e.id),
-        ),
+        test: bulkEnvelopes.every((e) => syncData.envelopes.some((se) => se.id === e.id)),
       },
       {
         name: "All transactions synced",
-        test: bulkTransactions.every((t) =>
-          syncData.transactions.some((st) => st.id === t.id),
-        ),
+        test: bulkTransactions.every((t) => syncData.transactions.some((st) => st.id === t.id)),
       },
       {
         name: "Counts correct",
-        test:
-          syncData.envelopes.length >= 10 && syncData.transactions.length >= 20,
+        test: syncData.envelopes.length >= 10 && syncData.transactions.length >= 20,
       },
     ];
 
@@ -171,9 +158,7 @@ export const validateAllSyncFlows = async () => {
     results.push({
       flow: "Bulk Operations",
       status: bulkPassed ? "✅ PASSED" : "❌ FAILED",
-      details: bulkValidations
-        .map((v) => `${v.name}: ${v.test ? "✅" : "❌"}`)
-        .join(", "),
+      details: bulkValidations.map((v) => `${v.name}: ${v.test ? "✅" : "❌"}`).join(", "),
     });
 
     // Cleanup
@@ -229,7 +214,7 @@ export const validateAllSyncFlows = async () => {
       try {
         const result = await cloudSyncService.determineSyncDirection(
           scenario.firestore,
-          scenario.dexie,
+          scenario.dexie
         );
         const correct = result.direction === scenario.expected;
         directionResults.push(`${scenario.name}: ${correct ? "✅" : "❌"}`);
@@ -238,9 +223,7 @@ export const validateAllSyncFlows = async () => {
       }
     }
 
-    const allDirectionsCorrect = directionResults.every((r) =>
-      r.includes("✅"),
-    );
+    const allDirectionsCorrect = directionResults.every((r) => r.includes("✅"));
 
     results.push({
       flow: "Sync Direction Logic",
@@ -291,9 +274,7 @@ export const validateAllSyncFlows = async () => {
     results.push({
       flow: "Service Lifecycle",
       status: lifecyclePassed ? "✅ PASSED" : "❌ FAILED",
-      details: lifecycleChecks
-        .map((c) => `${c.name}: ${c.test ? "✅" : "❌"}`)
-        .join(", "),
+      details: lifecycleChecks.map((c) => `${c.name}: ${c.test ? "✅" : "❌"}`).join(", "),
     });
   } catch (error) {
     results.push({
@@ -316,9 +297,7 @@ export const validateAllSyncFlows = async () => {
   });
 
   results.forEach((result) => {
-    logger.info(
-      `${result.status} ${result.flow}: ${result.details || result.error || ""}`,
-    );
+    logger.info(`${result.status} ${result.flow}: ${result.details || result.error || ""}`);
   });
 
   if (passedFlows === totalFlows) {

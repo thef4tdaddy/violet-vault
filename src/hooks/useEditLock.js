@@ -24,17 +24,11 @@ const useEditLock = (recordType, recordId, options = {}) => {
   useEffect(() => {
     if (!recordType || !recordId) return;
 
-    const unwatch = editLockService.watchLock(
-      recordType,
-      recordId,
-      (lockDoc) => {
-        setLock(lockDoc);
-        setIsLocked(!!lockDoc);
-        setIsOwnLock(
-          lockDoc ? editLockService.ownsLock(recordType, recordId) : false,
-        );
-      },
-    );
+    const unwatch = editLockService.watchLock(recordType, recordId, (lockDoc) => {
+      setLock(lockDoc);
+      setIsLocked(!!lockDoc);
+      setIsOwnLock(lockDoc ? editLockService.ownsLock(recordType, recordId) : false);
+    });
 
     return () => {
       unwatch();
@@ -167,9 +161,7 @@ const useEditLock = (recordType, recordId, options = {}) => {
     breakLock,
 
     // Computed values
-    timeRemaining: lock?.expiresAt
-      ? Math.max(0, lock.expiresAt.toDate() - new Date())
-      : 0,
+    timeRemaining: lock?.expiresAt ? Math.max(0, lock.expiresAt.toDate() - new Date()) : 0,
     isExpired: lock?.expiresAt ? lock.expiresAt.toDate() <= new Date() : false,
   };
 };

@@ -33,9 +33,7 @@ const useBills = (options = {}) => {
       logger.debug("TanStack Query: Loaded from Dexie", {
         count: bills.length,
         firstBill: bills[0],
-        billTitles: bills
-          .map((b) => b.name || b.title || b.billName || "No Name")
-          .slice(0, 3),
+        billTitles: bills.map((b) => b.name || b.title || b.billName || "No Name").slice(0, 3),
         billStructure: bills[0] ? Object.keys(bills[0]) : "No bills",
       });
     } catch (error) {
@@ -78,9 +76,7 @@ const useBills = (options = {}) => {
 
     // Apply category filter
     if (category) {
-      filteredBills = filteredBills.filter(
-        (bill) => bill.category === category,
-      );
+      filteredBills = filteredBills.filter((bill) => bill.category === category);
     }
 
     // Apply sorting
@@ -121,8 +117,7 @@ const useBills = (options = {}) => {
       filteredStillExist: filteredBills.length > 0,
       firstOriginalBill: bills[0],
       firstFilteredBill: filteredBills[0],
-      filterApplied:
-        status !== "all" ? `Applied ${status} filter` : "No filter applied",
+      filterApplied: status !== "all" ? `Applied ${status} filter` : "No filter applied",
     });
 
     return filteredBills;
@@ -301,8 +296,7 @@ const useBills = (options = {}) => {
       const paymentTransaction = {
         id: `${billId}_payment_${Date.now()}`,
         date: paymentDate,
-        description:
-          bill.provider || bill.description || bill.name || "Bill Payment",
+        description: bill.provider || bill.description || bill.name || "Bill Payment",
         amount: -Math.abs(paidAmount), // Negative for expense
         envelopeId: envelopeId || "unassigned",
         category: bill.category || "Bills & Utilities",
@@ -371,22 +365,18 @@ const useBills = (options = {}) => {
       const paidDate = new Date(bill.paidDate);
       const today = new Date();
       return (
-        paidDate.getMonth() === today.getMonth() &&
-        paidDate.getFullYear() === today.getFullYear()
+        paidDate.getMonth() === today.getMonth() && paidDate.getFullYear() === today.getFullYear()
       );
     }).length,
 
     // Amount calculations
     upcomingAmount: upcomingBills.reduce(
       (sum, bill) => sum + (bill.amount || bill.estimatedAmount || 0),
-      0,
+      0
     ),
     monthlyBudget: bills
       .filter((bill) => bill.isRecurring)
-      .reduce(
-        (sum, bill) => sum + (bill.amount || bill.estimatedAmount || 0),
-        0,
-      ),
+      .reduce((sum, bill) => sum + (bill.amount || bill.estimatedAmount || 0), 0),
 
     // Category breakdown
     categoryBreakdown: bills.reduce((acc, bill) => {
@@ -442,8 +432,7 @@ const useBills = (options = {}) => {
   // Utility functions
   const getBillById = (id) => bills.find((bill) => bill.id === id);
 
-  const getBillsByCategory = (cat) =>
-    bills.filter((bill) => bill.category === cat);
+  const getBillsByCategory = (cat) => bills.filter((bill) => bill.category === cat);
 
   const getBillsByStatus = (stat) => {
     if (stat === "paid") return bills.filter((bill) => bill.isPaid);
@@ -536,8 +525,7 @@ const useBills = (options = {}) => {
 
     // Query controls
     refetch: billsQuery.refetch,
-    invalidate: () =>
-      queryClient.invalidateQueries({ queryKey: queryKeys.bills }),
+    invalidate: () => queryClient.invalidateQueries({ queryKey: queryKeys.bills }),
   };
 };
 
