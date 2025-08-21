@@ -1,5 +1,5 @@
 // src/services/activityLogger.js
-import budgetDb from "../db/budgetDb";
+import { budgetDb } from "../db/budgetDb.js";
 import logger from "../utils/logger";
 
 /**
