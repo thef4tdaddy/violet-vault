@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   CreditCard,
   Plus,
@@ -15,7 +15,15 @@ import {
   Calendar,
   DollarSign,
   Zap,
+  Lock,
+  Unlock,
+  User,
+  Clock,
 } from "lucide-react";
+import useEditLock from "../../hooks/useEditLock";
+import { initializeEditLocks } from "../../services/editLockService";
+import { useAuth } from "../../stores/authStore";
+import EditLockIndicator from "../ui/EditLockIndicator";
 
 const SupplementalAccounts = ({
   supplementalAccounts = [],
@@ -31,6 +39,32 @@ const SupplementalAccounts = ({
   const [showBalances, setShowBalances] = useState(true);
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [transferringAccount, setTransferringAccount] = useState(null);
+
+  // Get auth context for edit locking
+  const { budgetId, currentUser: authCurrentUser } = useAuth();
+
+  // Initialize edit lock service when component mounts
+  useEffect(() => {
+    if (budgetId && authCurrentUser) {
+      initializeEditLocks(budgetId, authCurrentUser);
+    }
+  }, [budgetId, authCurrentUser]);
+
+  // Edit locking for the account being edited
+  const {
+    isLocked,
+    isOwnLock,
+    canEdit,
+    lock,
+    acquireLock,
+    releaseLock,
+    breakLock,
+    isLoading: lockLoading,
+  } = useEditLock("supplemental_account", editingAccount?.id, {
+    autoAcquire: !!editingAccount, // Auto-acquire when editing
+    autoRelease: true,
+    showToasts: true,
+  });
 
   const [accountForm, setAccountForm] = useState({
     name: "",
@@ -92,6 +126,12 @@ const SupplementalAccounts = ({
       return;
     }
 
+    // Check edit lock for updates
+    if (editingAccount && !canEdit) {
+      alert("Cannot save changes - account is locked by another user");
+      return;
+    }
+
     const newAccount = {
       id: Date.now(),
       ...accountForm,
@@ -105,6 +145,10 @@ const SupplementalAccounts = ({
 
     if (editingAccount) {
       onUpdateAccount(editingAccount.id, newAccount);
+      // Release lock after successful update
+      if (isOwnLock) {
+        releaseLock();
+      }
       setEditingAccount(null);
     } else {
       onAddAccount(newAccount);
@@ -127,6 +171,16 @@ const SupplementalAccounts = ({
     });
     setEditingAccount(account);
     setShowAddModal(true);
+  };
+
+  const handleCloseModal = () => {
+    // Release lock when closing modal
+    if (isOwnLock) {
+      releaseLock();
+    }
+    setEditingAccount(null);
+    setShowAddModal(false);
+    resetForm();
   };
 
   const handleDelete = (accountId) => {
@@ -409,20 +463,73 @@ const SupplementalAccounts = ({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-semibold">
-                {editingAccount ? "Edit Account" : "Add Supplemental Account"}
-              </h3>
-              <button
-                onClick={() => {
-                  setShowAddModal(false);
-                  setEditingAccount(null);
-                  resetForm();
-                }}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="h-5 w-5" />
-              </button>
+              <div className="flex items-center gap-3 flex-1">
+                <h3 className="text-lg font-semibold">
+                  {editingAccount ? "Edit Account" : "Add Supplemental Account"}
+                </h3>
+                {/* Edit Lock Status for existing accounts */}
+                {editingAccount && lockLoading && (
+                  <div className="bg-yellow-100 text-yellow-800 border border-yellow-200 px-2 py-1 rounded-full text-xs font-medium flex items-center">
+                    <div className="animate-spin rounded-full h-3 w-3 border border-yellow-600 border-t-transparent mr-1" />
+                    Acquiring...
+                  </div>
+                )}
+                {editingAccount && isLocked && (
+                  <div
+                    className={`flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                      isOwnLock
+                        ? "bg-green-100 text-green-800 border border-green-200"
+                        : "bg-red-100 text-red-800 border border-red-200"
+                    }`}
+                  >
+                    {isOwnLock ? (
+                      <>
+                        <Unlock className="h-3 w-3 mr-1" />
+                        Editing
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="h-3 w-3 mr-1" />
+                        {lock?.userName}
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                {/* Lock break button for expired locks */}
+                {editingAccount &&
+                  isLocked &&
+                  !isOwnLock &&
+                  lock &&
+                  new Date(lock.expiresAt) <= new Date() && (
+                    <button
+                      onClick={breakLock}
+                      className="bg-red-100 hover:bg-red-200 text-red-800 px-2 py-1 rounded-lg text-xs font-medium transition-colors flex items-center"
+                    >
+                      <Unlock className="h-3 w-3 mr-1" />
+                      Break
+                    </button>
+                  )}
+                <button
+                  onClick={handleCloseModal}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
             </div>
+
+            {/* Edit Lock Warning */}
+            {editingAccount && (
+              <EditLockIndicator
+                isLocked={isLocked}
+                isOwnLock={isOwnLock}
+                lock={lock}
+                onBreakLock={breakLock}
+                className="mb-4"
+              />
+            )}
 
             <div className="space-y-4">
               <div>
@@ -435,7 +542,8 @@ const SupplementalAccounts = ({
                   onChange={(e) =>
                     setAccountForm({ ...accountForm, name: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500"
+                  disabled={editingAccount && !canEdit}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   placeholder="e.g., Health FSA 2024"
                   required
                 />
@@ -450,7 +558,8 @@ const SupplementalAccounts = ({
                   onChange={(e) =>
                     setAccountForm({ ...accountForm, type: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500"
+                  disabled={editingAccount && !canEdit}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 >
                   {accountTypes.map((type) => (
                     <option key={type.value} value={type.value}>
@@ -475,7 +584,8 @@ const SupplementalAccounts = ({
                         currentBalance: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500"
+                    disabled={editingAccount && !canEdit}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                     placeholder="0.00"
                     required
                   />
@@ -495,7 +605,8 @@ const SupplementalAccounts = ({
                         annualContribution: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500"
+                    disabled={editingAccount && !canEdit}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                     placeholder="0.00"
                   />
                 </div>
@@ -514,7 +625,8 @@ const SupplementalAccounts = ({
                       expirationDate: e.target.value,
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500"
+                  disabled={editingAccount && !canEdit}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 />
               </div>
 
@@ -552,7 +664,8 @@ const SupplementalAccounts = ({
                     })
                   }
                   rows={2}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500"
+                  disabled={editingAccount && !canEdit}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   placeholder="Notes about this account..."
                 />
               </div>
@@ -568,7 +681,8 @@ const SupplementalAccounts = ({
                       isActive: e.target.checked,
                     })
                   }
-                  className="h-4 w-4 text-cyan-600 focus:ring-cyan-500 border-gray-300 rounded"
+                  disabled={editingAccount && !canEdit}
+                  className="h-4 w-4 text-cyan-600 focus:ring-cyan-500 border-gray-300 rounded disabled:cursor-not-allowed"
                 />
                 <label
                   htmlFor="isActive"
@@ -581,18 +695,15 @@ const SupplementalAccounts = ({
 
             <div className="flex gap-3 mt-6">
               <button
-                onClick={() => {
-                  setShowAddModal(false);
-                  setEditingAccount(null);
-                  resetForm();
-                }}
+                onClick={handleCloseModal}
                 className="flex-1 btn btn-secondary"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddAccount}
-                className="flex-1 btn btn-primary"
+                disabled={editingAccount && !canEdit}
+                className="flex-1 btn btn-primary disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
                 {editingAccount ? "Update Account" : "Add Account"}
               </button>
