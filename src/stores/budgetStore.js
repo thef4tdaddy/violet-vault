@@ -166,9 +166,10 @@ const storeInitializer = (set, get) => ({
         state.paycheckHistory.push(paycheck);
       });
 
-      // Get current actual balance from Dexie metadata (proper data source)
+      // Get current metadata from Dexie (proper data source)
       const currentMetadata = await getBudgetMetadata();
       const currentActualBalance = currentMetadata?.actualBalance || 0;
+      const currentUnassignedCash = currentMetadata?.unassignedCash || 0;
 
       // Create transaction for the paycheck income
       const paycheckTransaction = {
@@ -190,10 +191,7 @@ const storeInitializer = (set, get) => ({
         paycheckTransaction.envelopeId = "unassigned";
         paycheckTransaction.description += " (to unassigned cash)";
 
-        // Update unassigned cash only (actual balance already updated above)
-        set((state) => {
-          state.unassignedCash = (state.unassignedCash || 0) + paycheck.amount;
-        });
+        // Note: unassigned cash will be updated in metadata save at the end
 
         // Create transaction for unassigned cash
         await budgetDb.transactions.put(paycheckTransaction);
@@ -345,11 +343,7 @@ const storeInitializer = (set, get) => ({
 
           transactions.push(unassignedTransaction);
 
-          // Update unassigned cash
-          set((state) => {
-            state.unassignedCash =
-              (state.unassignedCash || 0) + remainingAmount;
-          });
+          // Note: remaining amount will be added to unassigned cash in metadata save
         }
 
         // Save all transactions to Dexie and state
@@ -376,9 +370,25 @@ const storeInitializer = (set, get) => ({
         });
       }
 
-      // Update budget metadata in Dexie with correct actual balance
+      // Calculate correct unassigned cash based on paycheck mode
+      let newUnassignedCash = currentUnassignedCash;
+      if (paycheck.mode === "leftover") {
+        // All paycheck goes to unassigned cash
+        newUnassignedCash = currentUnassignedCash + paycheck.amount;
+      } else if (paycheck.mode === "allocate") {
+        // Only remaining amount goes to unassigned cash (calculate from transactions)
+        const unassignedTransaction = transactions.find(
+          (t) => t.envelopeId === "unassigned",
+        );
+        if (unassignedTransaction) {
+          newUnassignedCash =
+            currentUnassignedCash + unassignedTransaction.amount;
+        }
+      }
+
+      // Update budget metadata in Dexie with correct values
       await setBudgetMetadata({
-        unassignedCash: get().unassignedCash,
+        unassignedCash: newUnassignedCash,
         actualBalance: currentActualBalance + paycheck.amount,
       });
 
@@ -489,13 +499,22 @@ const storeInitializer = (set, get) => ({
         state.paycheckHistory.splice(paycheckIndex, 1);
       });
 
-      // Get current actual balance and reduce by paycheck amount
+      // Get current metadata and calculate reductions
       const currentMetadata = await getBudgetMetadata();
       const currentActualBalance = currentMetadata?.actualBalance || 0;
+      const currentUnassignedCash = currentMetadata?.unassignedCash || 0;
+
+      // Calculate how much to reduce from unassigned cash based on deleted transactions
+      const unassignedReduction = relatedTransactions
+        .filter((t) => t.envelopeId === "unassigned")
+        .reduce((sum, t) => sum + t.amount, 0);
 
       // Update budget metadata in Dexie
       await setBudgetMetadata({
-        unassignedCash: get().unassignedCash,
+        unassignedCash: Math.max(
+          0,
+          currentUnassignedCash - unassignedReduction,
+        ),
         actualBalance: currentActualBalance - paycheck.amount,
       });
 
