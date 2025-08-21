@@ -24,7 +24,7 @@ import { ACTIVITY_TYPES, ENTITY_TYPES } from "../../services/activityLogger";
  * Simple chronological list of user activities with basic filtering
  */
 const ActivityFeed = () => {
-  const { getRecentActivity, getActivityCount } = useActivityLogger();
+  const { getRecentActivity } = useActivityLogger();
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all"); // all, envelope, transaction, bill, paycheck, debt
@@ -33,7 +33,7 @@ const ActivityFeed = () => {
   // Load activities on mount and when filter changes
   useEffect(() => {
     loadActivities();
-  }, [filter, limit]);
+  }, [filter, limit]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadActivities = async () => {
     setLoading(true);

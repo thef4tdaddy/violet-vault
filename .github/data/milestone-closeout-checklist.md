@@ -22,7 +22,7 @@ Please review and update the following in **develop** branch:
 ### 📝 Documentation audit
 
 - [ ] Audit all top-level markdown files (`/README*.md`, `/*.md`, `/docs/**/*.md`).
-- [ ] Move content worth keeping into `/docs/` in the appropriate section (create subfolders if needed).
+- [ ] Move content worth keeping into `/docs/` in the appropriate section (create subfolders if needed) - LEAVE README/ROADMAP/CLAUDE/CHANGELOG/CONTRIBUTING/LICENSE IN ROOT
 - [ ] Delete or archive irrelevant/duplicated markdown (prefer removal if clearly obsolete).
 - [ ] Ensure internal links use stable paths within `/docs/`.
 
