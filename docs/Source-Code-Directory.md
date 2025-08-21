@@ -414,12 +414,9 @@ _Business logic services and utilities_
 
 ## 🌐 Contexts Directory (`/contexts/`)
 
-_React context providers - **LEGACY** (mostly migrated to Zustand)_
+_**EMPTY** - All context providers migrated to Zustand stores_
 
-| Context             | Purpose                         |
-| ------------------- | ------------------------------- |
-| `AuthContext.jsx`   | Authentication context provider |
-| `BudgetContext.jsx` | Budget data context provider    |
+**Note:** This directory exists but is empty. All state management has been migrated to Zustand stores for better performance and simpler architecture.
 
 ## 🔧 Utils Directory (`/utils/`)
 
@@ -593,7 +590,7 @@ _Testing utilities and test files_
 ### **Technology Stack**
 
 - **Frontend:** React 19 + Vite
-- **State Management:** Zustand (primary) + React Context (legacy)
+- **State Management:** Zustand (exclusively)
 - **Data Layer:** TanStack Query + Dexie (IndexedDB) + Firebase Firestore
 - **Security:** Client-side AES encryption for all sensitive data
 - **Real-time:** Firebase real-time listeners + cross-browser edit locking
