@@ -1,0 +1,146 @@
+import React from "react";
+import { Lock, Clock, AlertTriangle, User } from "lucide-react";
+
+/**
+ * Standardized Edit Lock Indicator Component
+ * Shows lock status and provides consistent UI across all edit forms
+ */
+const EditLockIndicator = ({
+  isLocked,
+  isOwnLock,
+  lock,
+  onBreakLock,
+  className = "",
+  showDetails = true,
+}) => {
+  if (!isLocked) return null;
+
+  const isExpired = lock && new Date(lock.expiresAt) <= new Date();
+  const timeRemaining = lock
+    ? Math.max(0, new Date(lock.expiresAt) - new Date())
+    : 0;
+  const minutesRemaining = Math.ceil(timeRemaining / (1000 * 60));
+
+  // Own lock - show friendly indicator
+  if (isOwnLock) {
+    return (
+      <div
+        className={`flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg ${className}`}
+      >
+        <Lock className="h-4 w-4 text-green-600" />
+        <div className="flex-1">
+          <p className="text-sm font-medium text-green-900">
+            You are editing this record
+          </p>
+          {showDetails && timeRemaining > 0 && (
+            <p className="text-xs text-green-700">
+              Lock expires in {minutesRemaining} minute
+              {minutesRemaining !== 1 ? "s" : ""}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Locked by someone else
+  return (
+    <div
+      className={`flex items-center gap-3 p-3 bg-red-50 border border-red-200 rounded-lg ${className}`}
+    >
+      <div className="flex-shrink-0">
+        {isExpired ? (
+          <AlertTriangle className="h-5 w-5 text-red-600" />
+        ) : (
+          <Lock className="h-5 w-5 text-red-600" />
+        )}
+      </div>
+
+      <div className="flex-1">
+        <p className="text-sm font-medium text-red-900">
+          {isExpired ? "Lock Expired" : "Currently Being Edited"}
+        </p>
+
+        {showDetails && (
+          <div className="mt-1 space-y-1">
+            <div className="flex items-center gap-2 text-xs text-red-700">
+              <User className="h-3 w-3" />
+              <span>by {lock?.userName || "Unknown User"}</span>
+            </div>
+
+            {!isExpired && timeRemaining > 0 && (
+              <div className="flex items-center gap-2 text-xs text-red-700">
+                <Clock className="h-3 w-3" />
+                <span>
+                  {minutesRemaining} minute{minutesRemaining !== 1 ? "s" : ""}{" "}
+                  remaining
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {isExpired && onBreakLock && (
+        <button
+          onClick={onBreakLock}
+          className="flex-shrink-0 px-3 py-1.5 text-xs bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+        >
+          Break Lock
+        </button>
+      )}
+    </div>
+  );
+};
+
+/**
+ * Compact version for smaller spaces (like table rows)
+ */
+export const CompactEditLockIndicator = ({
+  isLocked,
+  isOwnLock,
+  lock,
+  onBreakLock,
+  className = "",
+}) => {
+  if (!isLocked) return null;
+
+  const isExpired = lock && new Date(lock.expiresAt) <= new Date();
+
+  if (isOwnLock) {
+    return (
+      <div
+        className={`inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs ${className}`}
+      >
+        <Lock className="h-3 w-3" />
+        <span>Editing</span>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs ${className}`}
+    >
+      {isExpired ? (
+        <AlertTriangle className="h-3 w-3" />
+      ) : (
+        <Lock className="h-3 w-3" />
+      )}
+      <span>
+        {isExpired ? "Expired" : "Locked"} by {lock?.userName || "User"}
+      </span>
+      {isExpired && onBreakLock && (
+        <button
+          onClick={onBreakLock}
+          className="ml-1 text-red-600 hover:text-red-800"
+          title="Break expired lock"
+        >
+          ×
+        </button>
+      )}
+    </div>
+  );
+};
+
+export default EditLockIndicator;
