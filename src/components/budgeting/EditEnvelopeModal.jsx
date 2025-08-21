@@ -15,7 +15,14 @@ import {
   FileText,
   TrendingUp,
   CheckCircle,
+  Lock,
+  Unlock,
+  User,
+  Clock,
 } from "lucide-react";
+import useEditLock from "../../hooks/useEditLock";
+import { initializeEditLocks } from "../../services/editLockService";
+import { useAuth } from "../../stores/authStore";
 import {
   ENVELOPE_TYPES,
   ENVELOPE_TYPE_CONFIG,
@@ -39,6 +46,34 @@ const EditEnvelopeModal = ({
   allBills = [], // Add bills prop to show linked bills
   currentUser = { userName: "User", userColor: "#a855f7" }, // eslint-disable-line no-unused-vars
 }) => {
+  // Get auth context for edit locking
+  const { budgetId, currentUser: authCurrentUser } = useAuth();
+
+  // Initialize edit lock service when modal opens
+  useEffect(() => {
+    if (isOpen && budgetId && authCurrentUser) {
+      initializeEditLocks(budgetId, authCurrentUser);
+    }
+  }, [isOpen, budgetId, authCurrentUser]);
+
+  // Edit locking for the envelope
+  const {
+    isLocked,
+    isOwnLock,
+    canEdit,
+    lockedBy,
+    expiresAt,
+    timeRemaining,
+    isExpired,
+    acquireLock,
+    releaseLock,
+    breakLock,
+    isLoading: lockLoading,
+  } = useEditLock("envelope", envelope?.id, {
+    autoAcquire: isOpen && envelope?.id, // Auto-acquire when modal opens
+    autoRelease: true, // Auto-release when modal closes
+    showToasts: true, // Show toast notifications
+  });
   const [formData, setFormData] = useState({
     name: "",
     monthlyAmount: "",
@@ -389,6 +424,10 @@ const EditEnvelopeModal = ({
   };
 
   const handleClose = () => {
+    // Release lock when closing
+    if (isOwnLock) {
+      releaseLock();
+    }
     resetForm();
     onClose();
   };
@@ -403,25 +442,108 @@ const EditEnvelopeModal = ({
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center">
+            <div className="flex items-center flex-1">
               <div className="bg-white/20 p-2 rounded-xl mr-3">
                 <Edit className="h-5 w-5 text-white" />
               </div>
-              <div>
-                <h2 className="text-xl font-bold text-white">Edit Envelope</h2>
-                <p className="text-blue-100 text-sm">
-                  Modify envelope settings
-                </p>
+              <div className="flex-1">
+                <div className="flex items-center gap-3">
+                  <h2 className="text-xl font-bold text-white">
+                    Edit Envelope
+                  </h2>
+                  {/* Edit Lock Status */}
+                  {isLocked && (
+                    <div
+                      className={`flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                        isOwnLock
+                          ? "bg-green-500/20 text-green-100 border border-green-400/30"
+                          : "bg-red-500/20 text-red-100 border border-red-400/30"
+                      }`}
+                    >
+                      {isOwnLock ? (
+                        <>
+                          <Unlock className="h-3 w-3 mr-1" />
+                          You're Editing
+                        </>
+                      ) : (
+                        <>
+                          <Lock className="h-3 w-3 mr-1" />
+                          <User className="h-3 w-3 mr-1" />
+                          {lockedBy}
+                        </>
+                      )}
+                    </div>
+                  )}
+                  {lockLoading && (
+                    <div className="bg-yellow-500/20 text-yellow-100 border border-yellow-400/30 px-3 py-1 rounded-full text-xs font-medium flex items-center">
+                      <div className="animate-spin rounded-full h-3 w-3 border border-yellow-300 border-t-transparent mr-1" />
+                      Acquiring Lock...
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <p className="text-blue-100 text-sm">
+                    Modify envelope settings
+                  </p>
+                  {isLocked && !isOwnLock && expiresAt && (
+                    <div className="flex items-center text-red-200 text-xs">
+                      <Clock className="h-3 w-3 mr-1" />
+                      {isExpired
+                        ? "Expired"
+                        : `${Math.ceil(timeRemaining / 1000)}s remaining`}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-            <button
-              onClick={handleClose}
-              className="text-white/80 hover:text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
-            >
-              <X className="h-5 w-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              {/* Lock Controls */}
+              {isLocked && !isOwnLock && isExpired && (
+                <button
+                  onClick={breakLock}
+                  className="bg-red-500/20 hover:bg-red-500/30 text-red-100 px-3 py-1 rounded-lg text-xs font-medium transition-colors flex items-center"
+                >
+                  <Unlock className="h-3 w-3 mr-1" />
+                  Break Lock
+                </button>
+              )}
+              <button
+                onClick={handleClose}
+                className="text-white/80 hover:text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* Lock Warning Banner */}
+        {isLocked && !canEdit && (
+          <div className="bg-red-50 border-l-4 border-red-400 p-4 mx-6 mt-4">
+            <div className="flex items-center">
+              <Lock className="h-5 w-5 text-red-400 mr-3" />
+              <div>
+                <h3 className="text-sm font-medium text-red-800">
+                  Currently Being Edited
+                </h3>
+                <p className="text-sm text-red-700 mt-1">
+                  {lockedBy} is currently editing this envelope.
+                  {isExpired
+                    ? "The lock has expired and can be broken."
+                    : `Lock expires in ${Math.ceil(timeRemaining / 1000)} seconds.`}
+                </p>
+                {isExpired && (
+                  <button
+                    onClick={breakLock}
+                    className="mt-2 bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
+                  >
+                    Break Lock & Take Control
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Form Content */}
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
@@ -514,9 +636,10 @@ const EditEnvelopeModal = ({
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
+                  disabled={!canEdit}
                   className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
                     errors.name ? "border-red-300 bg-red-50" : "border-gray-300"
-                  }`}
+                  } ${!canEdit ? "bg-gray-100 cursor-not-allowed" : ""}`}
                   placeholder="e.g., Groceries, Gas, Entertainment"
                   maxLength={50}
                 />
@@ -538,7 +661,10 @@ const EditEnvelopeModal = ({
                   onChange={(e) =>
                     setFormData({ ...formData, category: e.target.value })
                   }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  disabled={!canEdit}
+                  className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
                 >
                   <option value="">Select a category...</option>
                   {categories.map((category) => (
@@ -559,7 +685,10 @@ const EditEnvelopeModal = ({
                 <select
                   value={selectedBillId}
                   onChange={(e) => handleBillSelection(e.target.value)}
-                  className="w-full px-4 py-4 border-2 border-purple-400 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white shadow-md text-base"
+                  disabled={!canEdit}
+                  className={`w-full px-4 py-4 border-2 border-purple-400 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white shadow-md text-base ${
+                    !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
                 >
                   <option value="">
                     {allBills && allBills.length > 0
@@ -1120,6 +1249,7 @@ const EditEnvelopeModal = ({
             <button
               onClick={handleSubmit}
               disabled={
+                !canEdit ||
                 isSubmitting ||
                 !formData.name.trim() ||
                 (formData.envelopeType === ENVELOPE_TYPES.BILL &&
@@ -1131,7 +1261,12 @@ const EditEnvelopeModal = ({
               }
               className="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center"
             >
-              {isSubmitting ? (
+              {!canEdit ? (
+                <>
+                  <Lock className="h-4 w-4 mr-2" />
+                  Locked by {lockedBy}
+                </>
+              ) : isSubmitting ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
                   Saving...
