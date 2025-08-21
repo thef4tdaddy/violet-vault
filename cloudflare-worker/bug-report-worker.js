@@ -614,9 +614,40 @@ async function getMilestones(env) {
 
 /**
  * Generate smart labels based on bug report content and context
+ * Uses existing GitHub labels instead of creating new ones
  */
-async function generateSmartLabels(description, reportEnv) {
+async function generateSmartLabels(description, reportEnv, env) {
   const labels = ["bug", "user-reported"];
+  
+  // Fetch existing GitHub labels to avoid duplication
+  let existingLabels = [];
+  try {
+    const labelsResponse = await fetch(
+      `https://api.github.com/repos/${env.GITHUB_REPO}/labels`,
+      {
+        headers: {
+          Authorization: `token ${env.GITHUB_TOKEN}`,
+          "User-Agent": "VioletVault-BugReporter/1.0",
+          Accept: "application/vnd.github.v3+json",
+        },
+      }
+    );
+    
+    if (labelsResponse.ok) {
+      const labelsData = await labelsResponse.json();
+      existingLabels = labelsData.map(label => label.name);
+      console.log(`Found ${existingLabels.length} existing labels`);
+    }
+  } catch (error) {
+    console.error("Failed to fetch existing labels:", error);
+  }
+
+  // Helper function to add label only if it exists
+  const addLabelIfExists = (labelName) => {
+    if (existingLabels.includes(labelName) && !labels.includes(labelName)) {
+      labels.push(labelName);
+    }
+  };
 
   const descriptionLower = description.toLowerCase();
   const urlPath = reportEnv?.url ? new URL(reportEnv.url).pathname : "";
@@ -636,16 +667,40 @@ async function generateSmartLabels(description, reportEnv) {
   const highPriorityKeywords = ["slow", "performance", "timeout", "loading"];
   const mediumPriorityKeywords = ["improvement", "enhance", "better", "should"];
 
+  // Detect code pastes (requested feature)
+  const codeIndicators = [
+    /```[\s\S]*?```/,           // Code blocks
+    /`[^`\n]+`/,                // Inline code
+    /function\s+\w+\s*\(/,      // Function definitions
+    /const\s+\w+\s*=/,          // Variable declarations
+    /import\s+.*from/,          // Import statements
+    /class\s+\w+/,              // Class definitions
+    /if\s*\([^)]+\)\s*{/,       // If statements with braces
+    /for\s*\([^)]*\)\s*{/,      // For loops
+    /console\.(log|error|warn)/, // Console statements
+    /\w+\.\w+\([^)]*\)/,        // Method calls
+    /TypeError:|ReferenceError:|SyntaxError:/, // Error types
+    /at\s+\w+\s*\(/,            // Stack traces
+  ];
+
+  const hasCodeContent = codeIndicators.some(pattern => pattern.test(description));
+  if (hasCodeContent) {
+    addLabelIfExists("code");
+    console.log("Detected code content in bug report");
+  }
+
   if (criticalKeywords.some((keyword) => descriptionLower.includes(keyword))) {
-    labels.push("🔴 Critical");
+    addLabelIfExists("🔴 Critical");
   } else if (
     highPriorityKeywords.some((keyword) => descriptionLower.includes(keyword))
   ) {
-    labels.push("🟡 Medium");
+    addLabelIfExists("🟡 Medium");
   } else if (
     mediumPriorityKeywords.some((keyword) => descriptionLower.includes(keyword))
   ) {
-    labels.push("🟢 Low");
+    addLabelIfExists("🟡 Medium");
+  } else {
+    addLabelIfExists("⚪ Low");  // Default priority
   }
 
   // Enhanced component/feature-based labeling with page context
@@ -664,7 +719,7 @@ async function generateSmartLabels(description, reportEnv) {
 
   // Use page context for more accurate labeling
   if (pageContext?.page && pageContext.page !== "unknown") {
-    labels.push(pageContext.page);
+    addLabelIfExists(pageContext.page);
   }
 
   // Component hints from DOM analysis
@@ -672,7 +727,7 @@ async function generateSmartLabels(description, reportEnv) {
     for (const hint of pageContext.componentHints) {
       for (const [component, keywords] of Object.entries(componentMap)) {
         if (keywords.some((keyword) => hint.includes(keyword))) {
-          labels.push(component);
+          addLabelIfExists(component);
           break;
         }
       }
@@ -687,25 +742,25 @@ async function generateSmartLabels(description, reportEnv) {
           descriptionLower.includes(keyword) || urlPath.includes(keyword),
       )
     ) {
-      labels.push(component);
+      addLabelIfExists(component);
       break; // Only add one component label to avoid clutter
     }
   }
 
   // URL-based labeling for specific pages (enhanced)
   if (urlPath.includes("/debt") || pageContext?.page === "debt")
-    labels.push("debt");
+    addLabelIfExists("debt");
   else if (urlPath.includes("/envelope") || pageContext?.page === "envelope")
-    labels.push("envelope");
+    addLabelIfExists("envelope");
   else if (
     urlPath.includes("/transaction") ||
     pageContext?.page === "transaction"
   )
-    labels.push("transaction");
+    addLabelIfExists("transaction");
   else if (urlPath.includes("/savings") || pageContext?.page === "savings")
-    labels.push("savings");
+    addLabelIfExists("savings");
   else if (urlPath.includes("/analytics") || pageContext?.page === "analytics")
-    labels.push("analytics");
+    addLabelIfExists("analytics");
 
   // Device/Browser specific - be truthful about what browser reports
   if (reportEnv?.userAgent) {
@@ -715,28 +770,28 @@ async function generateSmartLabels(description, reportEnv) {
       userAgent.includes("android") ||
       userAgent.includes("iphone")
     ) {
-      labels.push("mobile");
+      addLabelIfExists("mobile");
     }
 
     // Browser detection - clean and truthful
     if (userAgent.includes("firefox/")) {
-      labels.push("firefox");
+      addLabelIfExists("firefox");
     } else if (userAgent.includes("safari/") && !userAgent.includes("chrome")) {
-      labels.push("safari");
+      addLabelIfExists("safari");
     } else if (userAgent.includes("chrome/")) {
-      labels.push("chrome");
+      addLabelIfExists("chrome");
     } else if (userAgent.includes("edg/") || userAgent.includes("edge/")) {
-      labels.push("edge");
+      addLabelIfExists("edge");
     } else if (userAgent.includes("webkit/")) {
-      labels.push("webkit");
+      addLabelIfExists("webkit");
     }
 
     // Engine detection for additional context
     if (userAgent.includes("webkit/")) {
-      labels.push("webkit-engine");
+      addLabelIfExists("webkit-engine");
     }
     if (userAgent.includes("gecko/")) {
-      labels.push("gecko-engine");
+      addLabelIfExists("gecko-engine");
     }
   }
 
@@ -1217,7 +1272,7 @@ async function createGitHubIssue(data, env) {
   issueBody += `---\n*This issue was automatically created from a bug report submitted via the VioletVault app.*`;
 
   // Generate smart labels and get milestone info
-  const smartLabels = await generateSmartLabels(description, reportEnv);
+  const smartLabels = await generateSmartLabels(description, reportEnv, env);
   console.log(`Generated smart labels: ${JSON.stringify(smartLabels)}`);
 
   const milestoneInfo = await getMilestones(env);
@@ -1225,10 +1280,34 @@ async function createGitHubIssue(data, env) {
     `Milestone info: ${JSON.stringify({ success: milestoneInfo.success, current: milestoneInfo.current?.title })}`,
   );
 
+  // Check if body exceeds GitHub's 65536 character limit
+  const maxBodyLength = 65536;
+  let finalIssueBody = issueBody;
+  let shouldCreateComment = false;
+  
+  if (issueBody.length > maxBodyLength) {
+    console.log(`Issue body too long (${issueBody.length} chars), will create comment`);
+    shouldCreateComment = true;
+    // Create shorter body for initial issue
+    finalIssueBody = `## Bug Report\n\n${processedDescription}\n\n` +
+      `## 📍 User Location\n` +
+      `**Page:** ${reportEnv?.pageContext?.page || "unknown"}\n` +
+      `**URL:** ${reportEnv?.url || "unknown"}\n\n` +
+      `**Note:** Full diagnostic information posted in comments due to length.\n\n`;
+    
+    if (sessionUrl) {
+      finalIssueBody += `## Session Replay\n[View session replay](${sessionUrl})\n\n`;
+    }
+    if (screenshotUrl) {
+      finalIssueBody += `## Screenshot\n![Bug Report Screenshot](${screenshotUrl})\n\n`;
+    }
+    finalIssueBody += `---\n*This issue was automatically created from a bug report submitted via the VioletVault app.*`;
+  }
+
   // Prepare issue data
   const issueData = {
     title: `Bug Report: ${description.substring(0, 80)}${description.length > 80 ? "..." : ""}`,
-    body: issueBody,
+    body: finalIssueBody,
     labels: smartLabels,
   };
 
@@ -1294,7 +1373,38 @@ async function createGitHubIssue(data, env) {
     throw new Error(`GitHub API error: ${response.status} - ${errorData}`);
   }
 
-  return await response.json();
+  const createdIssue = await response.json();
+
+  // If body was too long, create a comment with full diagnostic information
+  if (shouldCreateComment) {
+    try {
+      const commentBody = issueBody.substring(finalIssueBody.length);
+      const commentResponse = await fetch(
+        `https://api.github.com/repos/${env.GITHUB_REPO}/issues/${createdIssue.number}/comments`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `token ${env.GITHUB_TOKEN}`,
+            Accept: "application/vnd.github.v3+json",
+            "User-Agent": "VioletVault-BugReporter/1.0",
+          },
+          body: JSON.stringify({
+            body: `## Full Diagnostic Information\n\n${commentBody}`
+          }),
+        },
+      );
+      
+      if (commentResponse.ok) {
+        console.log(`Added comment with full diagnostic info to issue #${createdIssue.number}`);
+      } else {
+        console.error(`Failed to add comment to issue #${createdIssue.number}:`, await commentResponse.text());
+      }
+    } catch (commentError) {
+      console.error("Failed to create comment with full diagnostic info:", commentError);
+    }
+  }
+
+  return createdIssue;
 }
 
 /**

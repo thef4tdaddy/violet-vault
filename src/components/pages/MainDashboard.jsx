@@ -139,9 +139,9 @@ const Dashboard = ({ setActiveView }) => {
 
   // Handle payday actions
   const handleProcessPaycheck = () => {
-    // Navigate to paycheck processor or trigger paycheck modal
-    alert("Navigate to paycheck processor for payday processing!");
-    // TODO: Integrate with actual paycheck processing flow
+    // Navigate to paycheck processor
+    setActiveView("paycheck");
+    logger.debug("Navigating to paycheck processor");
   };
 
   const handlePrepareEnvelopes = () => {
