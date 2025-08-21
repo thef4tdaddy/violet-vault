@@ -89,17 +89,38 @@ const ChartsAnalytics = ({
   const monthlyTrends = useMemo(() => {
     const grouped = {};
 
+    // Additional safety check for filteredTransactions
+    if (
+      !Array.isArray(filteredTransactions) ||
+      filteredTransactions.length === 0
+    ) {
+      return [
+        {
+          month: new Date().toISOString().slice(0, 7),
+          income: 0,
+          expenses: 0,
+          net: 0,
+          transactionCount: 0,
+        },
+      ];
+    }
+
     filteredTransactions.forEach((transaction) => {
       if (
         !transaction ||
         !isValidDate(transaction.date) ||
-        typeof transaction.amount !== "number"
+        typeof transaction.amount !== "number" ||
+        isNaN(transaction.amount)
       ) {
         return; // Skip invalid transactions
       }
 
       try {
         const date = new Date(transaction.date);
+        if (isNaN(date.getTime())) {
+          return; // Skip invalid dates
+        }
+
         const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 
         if (!grouped[monthKey]) {
@@ -112,19 +133,21 @@ const ChartsAnalytics = ({
           };
         }
 
-        if (transaction.amount > 0) {
-          grouped[monthKey].income += transaction.amount;
+        const amount = Number(transaction.amount);
+        if (amount > 0) {
+          grouped[monthKey].income += amount;
         } else {
-          grouped[monthKey].expenses += Math.abs(transaction.amount);
+          grouped[monthKey].expenses += Math.abs(amount);
         }
 
         grouped[monthKey].net =
           grouped[monthKey].income - grouped[monthKey].expenses;
         grouped[monthKey].transactionCount++;
-      } catch {
+      } catch (error) {
         logger.warn(
           "Error processing transaction in monthlyTrends:",
           transaction,
+          error,
         );
         return;
       }
@@ -134,9 +157,9 @@ const ChartsAnalytics = ({
       a.month.localeCompare(b.month),
     );
 
-    // Ensure we always return an array, even if empty
+    // Ensure we always return a valid array with at least one item
     return results.length > 0
-      ? results
+      ? results.filter((item) => item && typeof item.month === "string")
       : [
           {
             month: new Date().toISOString().slice(0, 7),
@@ -152,28 +175,52 @@ const ChartsAnalytics = ({
   const envelopeSpending = useMemo(() => {
     const spending = {};
 
+    // Additional safety checks
+    if (!Array.isArray(filteredTransactions) || !Array.isArray(safeEnvelopes)) {
+      return [];
+    }
+
     filteredTransactions.forEach((transaction) => {
-      if (transaction.amount < 0 && transaction.envelopeId) {
-        const envelope = safeEnvelopes.find(
-          (e) => e.id === transaction.envelopeId,
-        );
-        const envelopeName = envelope ? envelope.name : "Unknown Envelope";
+      if (
+        !transaction ||
+        typeof transaction.amount !== "number" ||
+        isNaN(transaction.amount) ||
+        transaction.amount >= 0 ||
+        !transaction.envelopeId
+      ) {
+        return; // Skip invalid transactions
+      }
 
-        if (!spending[envelopeName]) {
-          spending[envelopeName] = {
-            name: envelopeName,
-            amount: 0,
-            count: 0,
-            color: envelope?.color || "#8B5CF6",
-          };
-        }
+      const envelope = safeEnvelopes.find(
+        (e) => e && e.id === transaction.envelopeId,
+      );
+      const envelopeName = envelope?.name || "Unknown Envelope";
 
-        spending[envelopeName].amount += Math.abs(transaction.amount);
+      if (!spending[envelopeName]) {
+        spending[envelopeName] = {
+          name: envelopeName,
+          amount: 0,
+          count: 0,
+          color: envelope?.color || "#8B5CF6",
+        };
+      }
+
+      const amount = Math.abs(Number(transaction.amount));
+      if (!isNaN(amount)) {
+        spending[envelopeName].amount += amount;
         spending[envelopeName].count++;
       }
     });
 
-    const results = Object.values(spending).sort((a, b) => b.amount - a.amount);
+    const results = Object.values(spending)
+      .filter(
+        (item) =>
+          item &&
+          typeof item.name === "string" &&
+          typeof item.amount === "number",
+      )
+      .sort((a, b) => b.amount - a.amount);
+
     // Ensure we always return a valid array
     return results.length > 0 ? results : [];
   }, [filteredTransactions, safeEnvelopes]);
@@ -182,24 +229,46 @@ const ChartsAnalytics = ({
   const categoryBreakdown = useMemo(() => {
     const categories = {};
 
+    // Additional safety checks
+    if (!Array.isArray(filteredTransactions)) {
+      return [];
+    }
+
     filteredTransactions.forEach((transaction) => {
-      if (transaction.amount < 0) {
-        const category = transaction.category || "Uncategorized";
+      if (
+        !transaction ||
+        typeof transaction.amount !== "number" ||
+        isNaN(transaction.amount) ||
+        transaction.amount >= 0
+      ) {
+        return; // Skip invalid transactions
+      }
 
-        if (!categories[category]) {
-          categories[category] = {
-            name: category,
-            amount: 0,
-            count: 0,
-          };
-        }
+      const category = transaction.category || "Uncategorized";
 
-        categories[category].amount += Math.abs(transaction.amount);
+      if (!categories[category]) {
+        categories[category] = {
+          name: category,
+          amount: 0,
+          count: 0,
+        };
+      }
+
+      const amount = Math.abs(Number(transaction.amount));
+      if (!isNaN(amount)) {
+        categories[category].amount += amount;
         categories[category].count++;
       }
     });
 
-    return Object.values(categories).sort((a, b) => b.amount - a.amount);
+    return Object.values(categories)
+      .filter(
+        (item) =>
+          item &&
+          typeof item.name === "string" &&
+          typeof item.amount === "number",
+      )
+      .sort((a, b) => b.amount - a.amount);
   }, [filteredTransactions]);
 
   // Weekly spending patterns
@@ -215,92 +284,169 @@ const ChartsAnalytics = ({
     ];
     const patterns = days.map((day) => ({ day, amount: 0, count: 0 }));
 
+    // Additional safety checks
+    if (!Array.isArray(filteredTransactions)) {
+      return patterns;
+    }
+
     filteredTransactions.forEach((transaction) => {
       if (
-        transaction &&
-        transaction.amount < 0 &&
-        isValidDate(transaction.date)
+        !transaction ||
+        typeof transaction.amount !== "number" ||
+        isNaN(transaction.amount) ||
+        transaction.amount >= 0 ||
+        !isValidDate(transaction.date)
       ) {
-        try {
-          const dayIndex = new Date(transaction.date).getDay();
-          if (dayIndex >= 0 && dayIndex < 7) {
-            patterns[dayIndex].amount += Math.abs(transaction.amount);
+        return; // Skip invalid transactions
+      }
+
+      try {
+        const date = new Date(transaction.date);
+        if (isNaN(date.getTime())) {
+          return; // Skip invalid dates
+        }
+
+        const dayIndex = date.getDay();
+        if (dayIndex >= 0 && dayIndex < 7 && patterns[dayIndex]) {
+          const amount = Math.abs(Number(transaction.amount));
+          if (!isNaN(amount)) {
+            patterns[dayIndex].amount += amount;
             patterns[dayIndex].count++;
           }
-        } catch {
-          logger.warn("Invalid date in weeklyPatterns:", transaction.date);
         }
+      } catch (error) {
+        logger.warn("Invalid date in weeklyPatterns:", transaction.date, error);
       }
     });
 
-    return patterns;
+    return patterns.filter(
+      (pattern) => pattern && typeof pattern.day === "string",
+    );
   }, [filteredTransactions, isValidDate]);
 
   // Envelope health analysis
   const envelopeHealth = useMemo(() => {
-    return safeEnvelopes.map((envelope) => {
-      const monthlyBudget = envelope.monthlyAmount || 0;
-      const currentBalance = envelope.currentBalance || 0;
-      const spent =
-        envelope.spendingHistory?.reduce((sum, s) => sum + s.amount, 0) || 0;
+    // Additional safety checks
+    if (!Array.isArray(safeEnvelopes)) {
+      return [];
+    }
 
-      const healthScore = safeDivision(currentBalance, monthlyBudget, 1) * 100;
-      let status = "healthy";
+    return safeEnvelopes
+      .filter((envelope) => envelope && typeof envelope === "object")
+      .map((envelope) => {
+        const monthlyBudget = Number(envelope.monthlyAmount) || 0;
+        const currentBalance = Number(envelope.currentBalance) || 0;
+        const spent = Array.isArray(envelope.spendingHistory)
+          ? envelope.spendingHistory.reduce((sum, s) => {
+              const amount = Number(s?.amount) || 0;
+              return isNaN(amount) ? sum : sum + amount;
+            }, 0)
+          : 0;
 
-      if (healthScore < 20) status = "critical";
-      else if (healthScore < 50) status = "warning";
-      else if (healthScore > 150) status = "overfunded";
+        const healthScore =
+          safeDivision(currentBalance, monthlyBudget, 1) * 100;
+        let status = "healthy";
 
-      return {
-        name: envelope.name,
-        currentBalance,
-        monthlyBudget,
-        spent,
-        healthScore: Math.max(0, Math.min(200, healthScore)),
-        status,
-        color: envelope.color,
-      };
-    });
+        if (healthScore < 20) status = "critical";
+        else if (healthScore < 50) status = "warning";
+        else if (healthScore > 150) status = "overfunded";
+
+        return {
+          name: envelope.name || "Unknown Envelope",
+          currentBalance: isNaN(currentBalance) ? 0 : currentBalance,
+          monthlyBudget: isNaN(monthlyBudget) ? 0 : monthlyBudget,
+          spent: isNaN(spent) ? 0 : spent,
+          healthScore: Math.max(
+            0,
+            Math.min(200, isNaN(healthScore) ? 0 : healthScore),
+          ),
+          status,
+          color: envelope.color || "#8B5CF6",
+        };
+      });
   }, [safeEnvelopes]);
 
   // Budget vs actual analysis
   const budgetVsActual = useMemo(() => {
     const analysis = {};
 
-    envelopes.forEach((envelope) => {
-      analysis[envelope.name] = {
-        name: envelope.name,
-        budgeted: envelope.monthlyAmount || 0,
-        actual: 0,
-        color: envelope.color,
-      };
+    // Additional safety checks
+    if (!Array.isArray(safeEnvelopes) || !Array.isArray(filteredTransactions)) {
+      return [];
+    }
+
+    safeEnvelopes.forEach((envelope) => {
+      if (envelope && envelope.name) {
+        analysis[envelope.name] = {
+          name: envelope.name,
+          budgeted: Number(envelope.monthlyAmount) || 0,
+          actual: 0,
+          color: envelope.color || "#8B5CF6",
+        };
+      }
     });
 
     filteredTransactions.forEach((transaction) => {
-      if (transaction.amount < 0 && transaction.envelopeId) {
-        const envelope = safeEnvelopes.find(
-          (e) => e.id === transaction.envelopeId,
-        );
-        if (envelope && analysis[envelope.name]) {
-          analysis[envelope.name].actual += Math.abs(transaction.amount);
+      if (
+        !transaction ||
+        typeof transaction.amount !== "number" ||
+        isNaN(transaction.amount) ||
+        transaction.amount >= 0 ||
+        !transaction.envelopeId
+      ) {
+        return; // Skip invalid transactions
+      }
+
+      const envelope = safeEnvelopes.find(
+        (e) => e && e.id === transaction.envelopeId,
+      );
+
+      if (envelope && envelope.name && analysis[envelope.name]) {
+        const amount = Math.abs(Number(transaction.amount));
+        if (!isNaN(amount)) {
+          analysis[envelope.name].actual += amount;
         }
       }
     });
 
     return Object.values(analysis).filter(
-      (item) => item.budgeted > 0 || item.actual > 0,
+      (item) =>
+        item &&
+        typeof item.name === "string" &&
+        typeof item.budgeted === "number" &&
+        typeof item.actual === "number" &&
+        (item.budgeted > 0 || item.actual > 0),
     );
-  }, [filteredTransactions, safeEnvelopes, envelopes]);
+  }, [filteredTransactions, safeEnvelopes]);
 
   // Financial metrics
   const metrics = useMemo(() => {
+    // Additional safety checks
+    if (!Array.isArray(filteredTransactions) || !Array.isArray(monthlyTrends)) {
+      return {
+        totalIncome: 0,
+        totalExpenses: 0,
+        netCashFlow: 0,
+        savingsRate: 0,
+        avgMonthlyIncome: 0,
+        avgMonthlyExpenses: 0,
+        transactionCount: 0,
+      };
+    }
+
     const totalIncome = filteredTransactions
-      .filter((t) => t.amount > 0)
-      .reduce((sum, t) => sum + t.amount, 0);
+      .filter(
+        (t) =>
+          t && typeof t.amount === "number" && !isNaN(t.amount) && t.amount > 0,
+      )
+      .reduce((sum, t) => sum + Number(t.amount), 0);
 
     const totalExpenses = filteredTransactions
-      .filter((t) => t.amount < 0)
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+      .filter(
+        (t) =>
+          t && typeof t.amount === "number" && !isNaN(t.amount) && t.amount < 0,
+      )
+      .reduce((sum, t) => sum + Math.abs(Number(t.amount)), 0);
 
     const savingsRate =
       safeDivision(totalIncome - totalExpenses, totalIncome, 0) * 100;
@@ -308,7 +454,11 @@ const ChartsAnalytics = ({
     const avgMonthlyIncome =
       monthlyTrends.length > 0
         ? safeDivision(
-            monthlyTrends.reduce((sum, m) => sum + m.income, 0),
+            monthlyTrends
+              .filter(
+                (m) => m && typeof m.income === "number" && !isNaN(m.income),
+              )
+              .reduce((sum, m) => sum + m.income, 0),
             monthlyTrends.length,
             0,
           )
@@ -317,19 +467,26 @@ const ChartsAnalytics = ({
     const avgMonthlyExpenses =
       monthlyTrends.length > 0
         ? safeDivision(
-            monthlyTrends.reduce((sum, m) => sum + m.expenses, 0),
+            monthlyTrends
+              .filter(
+                (m) =>
+                  m && typeof m.expenses === "number" && !isNaN(m.expenses),
+              )
+              .reduce((sum, m) => sum + m.expenses, 0),
             monthlyTrends.length,
             0,
           )
         : 0;
 
     return {
-      totalIncome,
-      totalExpenses,
-      netCashFlow: totalIncome - totalExpenses,
-      savingsRate,
-      avgMonthlyIncome,
-      avgMonthlyExpenses,
+      totalIncome: isNaN(totalIncome) ? 0 : totalIncome,
+      totalExpenses: isNaN(totalExpenses) ? 0 : totalExpenses,
+      netCashFlow: isNaN(totalIncome - totalExpenses)
+        ? 0
+        : totalIncome - totalExpenses,
+      savingsRate: isNaN(savingsRate) ? 0 : savingsRate,
+      avgMonthlyIncome: isNaN(avgMonthlyIncome) ? 0 : avgMonthlyIncome,
+      avgMonthlyExpenses: isNaN(avgMonthlyExpenses) ? 0 : avgMonthlyExpenses,
       transactionCount: filteredTransactions.length,
     };
   }, [filteredTransactions, monthlyTrends]);
