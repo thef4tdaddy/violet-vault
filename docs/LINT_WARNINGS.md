@@ -3,18 +3,18 @@
 This document tracks ESLint warnings in the Violet Vault project to maintain code quality and monitor progress toward our target of 17 warnings.
 
 **Last Updated:** 2025-08-21  
-**Current Status:** 64 warnings ⚠️ INCREASED - Issues from new features and dependency updates
+**Current Status:** 62 warnings ⚠️ INCREASED - Issues from new v1.9.0 features, remediation in progress
 
 ## Current Warnings Breakdown
 
 ### By Severity
 
 - **Errors:** 0
-- **Warnings:** 64 ⚠️ (Increased from 18 → 64)
+- **Warnings:** 62 ⚠️ (Increased from 18 → 64 → 62, remediation started)
 
 ### By Category
 
-- **Unused Variables (no-unused-vars):** 58 warnings ⚠️ (Increased significantly)
+- **Unused Variables (no-unused-vars):** 56 warnings ⚠️ (Remediation started - fixing low-risk cases)
 - **React Hooks Dependencies (react-hooks/exhaustive-deps):** 4 warnings ⚠️
 - **Case Block Declarations (no-case-declarations):** 2 warnings ⚠️
 - **Other Issues:** 0 warnings
@@ -130,17 +130,25 @@ All remaining 18 warnings are unused variables/parameters in development feature
 
 **Action Required:** None - all warnings are low-priority development features
 
-### 📈 Next Steps (Optional)
+### 📈 Action Plan for v1.9.0 Lint Remediation
 
-1. **Auto-Funding Implementation** - When ready, implement the 11 prepared functions
-2. **Feature Completion** - Complete work-in-progress development features
-3. **Code Cleanup** - Remove unused scaffolding when features are finalized
+**Immediate Priority (Low-Risk Fixes):**
+
+1. **Remove Unused Destructured Variables** - 15+ cases of unused variables from useEditLock and similar hooks
+2. **Fix React Hook Dependencies** - 4 missing dependency warnings with proper disable comments
+3. **Case Block Declarations** - 2 variable declaration warnings in switch statements
+4. **Remove Unused Function Parameters** - Several unused props and parameters
+
+**Target:** Reduce from 62 → 25 warnings (goal: return to pre-v1.9.0 baseline)
+
+**Owner:** Development team  
+**Target Milestone:** Complete by end of August 2025
 
 ## Progress History
 
 | Date       | Total Warnings | Change | Notes                                                                |
 | ---------- | -------------- | ------ | -------------------------------------------------------------------- |
-| 2025-08-21 | 64             | +46    | New features: Edit Lock Service, Activity Logger, dependency updates |
+| 2025-08-21 | 62             | +44    | New features: Edit Lock Service, Activity Logger - remediation started |
 | 2025-08-15 | 18             | -6     | Toast system functional fix + React Hook dependencies               |
 | 2025-08-15 | 24             | -18    | Vitest globals fix: eliminated all test setup warnings               |
 | 2025-08-15 | 42             | -20    | High-priority lint fixes: React hooks, syntax, unused vars           |
