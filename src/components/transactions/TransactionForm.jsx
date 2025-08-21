@@ -1,5 +1,17 @@
-import React from "react";
-import { X, TrendingDown, TrendingUp, Zap } from "lucide-react";
+import React, { useEffect } from "react";
+import {
+  X,
+  TrendingDown,
+  TrendingUp,
+  Zap,
+  Lock,
+  Unlock,
+  User,
+  Clock,
+} from "lucide-react";
+import useEditLock from "../../hooks/useEditLock";
+import { initializeEditLocks } from "../../services/editLockService";
+import { useAuth } from "../../stores/authStore";
 import logger from "../../utils/logger";
 
 const TransactionForm = ({
@@ -14,6 +26,35 @@ const TransactionForm = ({
   suggestEnvelope,
   onPayBill, // Optional callback for handling bill payments
 }) => {
+  // Get auth context for edit locking
+  const { budgetId, currentUser } = useAuth();
+
+  // Initialize edit lock service when modal opens
+  useEffect(() => {
+    if (isOpen && budgetId && currentUser) {
+      initializeEditLocks(budgetId, currentUser);
+    }
+  }, [isOpen, budgetId, currentUser]);
+
+  // Edit locking for the transaction (only when editing existing transaction)
+  const {
+    isLocked,
+    isOwnLock,
+    canEdit,
+    lockedBy,
+    expiresAt,
+    timeRemaining,
+    isExpired,
+    acquireLock,
+    releaseLock,
+    breakLock,
+    isLoading: lockLoading,
+  } = useEditLock("transaction", editingTransaction?.id, {
+    autoAcquire: isOpen && editingTransaction?.id, // Only auto-acquire for edits
+    autoRelease: true,
+    showToasts: true,
+  });
+
   if (!isOpen) return null;
 
   // Debug logging to track envelope data issue
@@ -91,6 +132,10 @@ const TransactionForm = ({
       wasEditing: !!editingTransaction,
       hadData: !!(transactionForm.description || transactionForm.amount),
     });
+    // Release lock when closing
+    if (isOwnLock) {
+      releaseLock();
+    }
     onClose();
   };
 
@@ -98,16 +143,87 @@ const TransactionForm = ({
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="glassmorphism rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-white/30 shadow-2xl">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-semibold">
-            {editingTransaction ? "Edit Transaction" : "Add New Transaction"}
-          </h3>
-          <button
-            onClick={resetAndClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            <X className="h-6 w-6" />
-          </button>
+          <div className="flex items-center gap-3 flex-1">
+            <h3 className="text-xl font-semibold">
+              {editingTransaction ? "Edit Transaction" : "Add New Transaction"}
+            </h3>
+            {/* Edit Lock Status for existing transactions */}
+            {editingTransaction && isLocked && (
+              <div
+                className={`flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                  isOwnLock
+                    ? "bg-green-100 text-green-800 border border-green-200"
+                    : "bg-red-100 text-red-800 border border-red-200"
+                }`}
+              >
+                {isOwnLock ? (
+                  <>
+                    <Unlock className="h-3 w-3 mr-1" />
+                    You're Editing
+                  </>
+                ) : (
+                  <>
+                    <Lock className="h-3 w-3 mr-1" />
+                    <User className="h-3 w-3 mr-1" />
+                    {lockedBy}
+                  </>
+                )}
+              </div>
+            )}
+            {editingTransaction && lockLoading && (
+              <div className="bg-yellow-100 text-yellow-800 border border-yellow-200 px-3 py-1 rounded-full text-xs font-medium flex items-center">
+                <div className="animate-spin rounded-full h-3 w-3 border border-yellow-600 border-t-transparent mr-1" />
+                Acquiring Lock...
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {/* Lock Controls for expired locks */}
+            {editingTransaction && isLocked && !isOwnLock && isExpired && (
+              <button
+                onClick={breakLock}
+                className="bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded-lg text-xs font-medium transition-colors flex items-center"
+              >
+                <Unlock className="h-3 w-3 mr-1" />
+                Break Lock
+              </button>
+            )}
+            <button
+              onClick={resetAndClose}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              <X className="h-6 w-6" />
+            </button>
+          </div>
         </div>
+
+        {/* Lock Warning Banner for existing transactions */}
+        {editingTransaction && isLocked && !canEdit && (
+          <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+            <div className="flex items-center">
+              <Lock className="h-5 w-5 text-red-400 mr-3" />
+              <div>
+                <h3 className="text-sm font-medium text-red-800">
+                  Currently Being Edited
+                </h3>
+                <p className="text-sm text-red-700 mt-1">
+                  {lockedBy} is currently editing this transaction.
+                  {isExpired
+                    ? "The lock has expired and can be broken."
+                    : `Lock expires in ${Math.ceil(timeRemaining / 1000)} seconds.`}
+                </p>
+                {isExpired && (
+                  <button
+                    onClick={breakLock}
+                    className="mt-2 bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
+                  >
+                    Break Lock & Take Control
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -124,7 +240,12 @@ const TransactionForm = ({
                     date: e.target.value,
                   })
                 }
-                className="glassmorphism w-full px-3 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-emerald-500"
+                disabled={editingTransaction && !canEdit}
+                className={`glassmorphism w-full px-3 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-emerald-500 ${
+                  editingTransaction && !canEdit
+                    ? "bg-gray-100 cursor-not-allowed"
+                    : ""
+                }`}
                 required
               />
             </div>
@@ -142,11 +263,12 @@ const TransactionForm = ({
                       type: "expense",
                     })
                   }
+                  disabled={editingTransaction && !canEdit}
                   className={`p-2 rounded-lg border-2 transition-all ${
                     transactionForm.type === "expense"
                       ? "border-red-500 bg-red-50 text-red-700"
                       : "border-gray-200 hover:border-red-300"
-                  }`}
+                  } ${editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""}`}
                 >
                   <TrendingDown className="h-4 w-4 mx-auto mb-1" />
                   <span className="text-sm">Expense</span>
@@ -347,8 +469,25 @@ const TransactionForm = ({
             >
               Cancel
             </button>
-            <button type="submit" className="flex-1 btn btn-primary">
-              {editingTransaction ? "Update Transaction" : "Add Transaction"}
+            <button
+              type="submit"
+              disabled={editingTransaction && !canEdit}
+              className={`flex-1 btn btn-primary flex items-center justify-center ${
+                editingTransaction && !canEdit
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : ""
+              }`}
+            >
+              {editingTransaction && !canEdit ? (
+                <>
+                  <Lock className="h-4 w-4 mr-2" />
+                  Locked by {lockedBy}
+                </>
+              ) : editingTransaction ? (
+                "Update Transaction"
+              ) : (
+                "Add Transaction"
+              )}
             </button>
           </div>
         </form>

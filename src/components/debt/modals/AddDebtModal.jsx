@@ -1,5 +1,17 @@
-import React, { useState } from "react";
-import { X, CreditCard, Wallet, Receipt } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import {
+  X,
+  CreditCard,
+  Wallet,
+  Receipt,
+  Lock,
+  Unlock,
+  User,
+  Clock,
+} from "lucide-react";
+import useEditLock from "../../../hooks/useEditLock";
+import { initializeEditLocks } from "../../../services/editLockService";
+import { useAuth } from "../../../stores/authStore";
 import {
   DEBT_TYPES,
   DEBT_TYPE_CONFIG,
@@ -14,6 +26,35 @@ import logger from "../../../utils/logger";
  */
 const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
   const isEditMode = !!debt;
+
+  // Get auth context for edit locking
+  const { budgetId, currentUser } = useAuth();
+
+  // Initialize edit lock service when modal opens
+  useEffect(() => {
+    if (isOpen && budgetId && currentUser) {
+      initializeEditLocks(budgetId, currentUser);
+    }
+  }, [isOpen, budgetId, currentUser]);
+
+  // Edit locking for the debt (only when editing existing debt)
+  const {
+    isLocked,
+    isOwnLock,
+    canEdit,
+    lockedBy,
+    expiresAt,
+    timeRemaining,
+    isExpired,
+    acquireLock,
+    releaseLock,
+    breakLock,
+    isLoading: lockLoading,
+  } = useEditLock("debt", debt?.id, {
+    autoAcquire: isOpen && debt?.id, // Only auto-acquire for edits
+    autoRelease: true,
+    showToasts: true,
+  });
 
   // Get envelopes for dropdown selection using TanStack Query
   const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
@@ -183,6 +224,10 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
   };
 
   const handleClose = () => {
+    // Release lock when closing
+    if (isOwnLock) {
+      releaseLock();
+    }
     resetForm();
     onClose();
   };
@@ -192,17 +237,88 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
       <div className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-semibold text-gray-900 flex items-center">
-            <CreditCard className="h-5 w-5 mr-2 text-red-600" />
-            {isEditMode ? "Edit Debt" : "Add New Debt"}
-          </h3>
-          <button
-            onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <X className="h-6 w-6" />
-          </button>
+          <div className="flex items-center gap-3 flex-1">
+            <h3 className="text-xl font-semibold text-gray-900 flex items-center">
+              <CreditCard className="h-5 w-5 mr-2 text-red-600" />
+              {isEditMode ? "Edit Debt" : "Add New Debt"}
+            </h3>
+            {/* Edit Lock Status for existing debts */}
+            {isEditMode && isLocked && (
+              <div
+                className={`flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                  isOwnLock
+                    ? "bg-green-100 text-green-800 border border-green-200"
+                    : "bg-red-100 text-red-800 border border-red-200"
+                }`}
+              >
+                {isOwnLock ? (
+                  <>
+                    <Unlock className="h-3 w-3 mr-1" />
+                    You're Editing
+                  </>
+                ) : (
+                  <>
+                    <Lock className="h-3 w-3 mr-1" />
+                    <User className="h-3 w-3 mr-1" />
+                    {lockedBy}
+                  </>
+                )}
+              </div>
+            )}
+            {isEditMode && lockLoading && (
+              <div className="bg-yellow-100 text-yellow-800 border border-yellow-200 px-3 py-1 rounded-full text-xs font-medium flex items-center">
+                <div className="animate-spin rounded-full h-3 w-3 border border-yellow-600 border-t-transparent mr-1" />
+                Acquiring Lock...
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {/* Lock Controls for expired locks */}
+            {isEditMode && isLocked && !isOwnLock && isExpired && (
+              <button
+                onClick={breakLock}
+                className="bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded-lg text-xs font-medium transition-colors flex items-center"
+              >
+                <Unlock className="h-3 w-3 mr-1" />
+                Break Lock
+              </button>
+            )}
+            <button
+              onClick={handleClose}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X className="h-6 w-6" />
+            </button>
+          </div>
         </div>
+
+        {/* Lock Warning Banner for existing debts */}
+        {isEditMode && isLocked && !canEdit && (
+          <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+            <div className="flex items-center">
+              <Lock className="h-5 w-5 text-red-400 mr-3" />
+              <div>
+                <h3 className="text-sm font-medium text-red-800">
+                  Currently Being Edited
+                </h3>
+                <p className="text-sm text-red-700 mt-1">
+                  {lockedBy} is currently editing this debt.
+                  {isExpired
+                    ? "The lock has expired and can be broken."
+                    : `Lock expires in ${Math.ceil(timeRemaining / 1000)} seconds.`}
+                </p>
+                {isExpired && (
+                  <button
+                    onClick={breakLock}
+                    className="mt-2 bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
+                  >
+                    Break Lock & Take Control
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -586,16 +702,25 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
             </button>
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              disabled={isSubmitting || (isEditMode && !canEdit)}
+              className="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
             >
-              {isSubmitting
-                ? isEditMode
-                  ? "Updating..."
-                  : "Adding..."
-                : isEditMode
-                  ? "Update Debt"
-                  : "Add Debt"}
+              {isEditMode && !canEdit ? (
+                <>
+                  <Lock className="h-4 w-4 mr-2" />
+                  Locked by {lockedBy}
+                </>
+              ) : isSubmitting ? (
+                isEditMode ? (
+                  "Updating..."
+                ) : (
+                  "Adding..."
+                )
+              ) : isEditMode ? (
+                "Update Debt"
+              ) : (
+                "Add Debt"
+              )}
             </button>
           </div>
         </form>
