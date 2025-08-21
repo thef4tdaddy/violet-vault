@@ -153,10 +153,242 @@ const storeInitializer = (set, get) => ({
       state.paycheckHistory = history;
     }),
 
-  processPaycheck: (paycheck) =>
-    set((state) => {
-      state.paycheckHistory.push(paycheck);
-    }),
+  processPaycheck: async (paycheck) => {
+    const state = get();
+
+    try {
+      // Add to paycheck history
+      set((state) => {
+        state.paycheckHistory.push(paycheck);
+      });
+
+      // Create transaction for the paycheck income
+      const paycheckTransaction = {
+        id: `paycheck_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        date: paycheck.date
+          ? paycheck.date.split("T")[0]
+          : new Date().toISOString().split("T")[0],
+        description: `Paycheck from ${paycheck.payerName}`,
+        amount: paycheck.amount,
+        type: "income",
+        category: "paycheck",
+        payerName: paycheck.payerName,
+        paycheckMode: paycheck.mode,
+        createdAt: new Date().toISOString(),
+      };
+
+      if (paycheck.mode === "leftover") {
+        // All money goes to unassigned cash
+        paycheckTransaction.envelopeId = "unassigned";
+        paycheckTransaction.description += " (to unassigned cash)";
+
+        // Update unassigned cash
+        set((state) => {
+          state.unassignedCash = (state.unassignedCash || 0) + paycheck.amount;
+        });
+
+        // Create transaction for unassigned cash
+        await budgetDb.transactions.put(paycheckTransaction);
+
+        // Add transaction to state
+        set((state) => {
+          if (!state.transactions) state.transactions = [];
+          if (!state.allTransactions) state.allTransactions = [];
+          state.transactions.push(paycheckTransaction);
+          state.allTransactions.push(paycheckTransaction);
+        });
+
+        logger.info("Paycheck processed to unassigned cash", {
+          amount: paycheck.amount,
+          payerName: paycheck.payerName,
+          transactionId: paycheckTransaction.id,
+        });
+      } else if (paycheck.mode === "allocate") {
+        // Auto-allocate to envelopes based on allocation logic
+        let remainingAmount = paycheck.amount;
+        const transactions = [];
+        const BIWEEKLY_MULTIPLIER = 2.17; // From PaycheckProcessor
+
+        // Get current envelopes from state
+        const envelopes = state.envelopes || [];
+
+        // First, allocate to bill envelopes (higher priority)
+        const billEnvelopes = envelopes.filter(
+          (envelope) =>
+            envelope.autoAllocate &&
+            (envelope.envelopeType === "bill" ||
+              ["utilities", "insurance", "housing", "transportation"].includes(
+                envelope.category,
+              )),
+        );
+
+        for (const envelope of billEnvelopes) {
+          if (remainingAmount <= 0) break;
+
+          const needed = Math.max(
+            0,
+            (envelope.biweeklyAllocation || 0) - (envelope.currentBalance || 0),
+          );
+          const allocation = Math.min(needed, remainingAmount);
+
+          if (allocation > 0) {
+            // Create transaction for this envelope
+            const envelopeTransaction = {
+              id: `paycheck_env_${envelope.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+              date: paycheck.date
+                ? paycheck.date.split("T")[0]
+                : new Date().toISOString().split("T")[0],
+              description: `Paycheck allocation from ${paycheck.payerName} to ${envelope.name}`,
+              amount: allocation,
+              type: "income",
+              category: "paycheck-allocation",
+              envelopeId: envelope.id,
+              payerName: paycheck.payerName,
+              paycheckMode: paycheck.mode,
+              createdAt: new Date().toISOString(),
+            };
+
+            transactions.push(envelopeTransaction);
+
+            // Update envelope balance
+            set((state) => {
+              const envIndex = state.envelopes.findIndex(
+                (e) => e.id === envelope.id,
+              );
+              if (envIndex !== -1) {
+                state.envelopes[envIndex].currentBalance =
+                  (state.envelopes[envIndex].currentBalance || 0) + allocation;
+              }
+            });
+
+            remainingAmount -= allocation;
+          }
+        }
+
+        // Then, allocate to variable expense envelopes (biweekly portion of monthly budget)
+        const variableEnvelopes = envelopes.filter(
+          (envelope) =>
+            envelope.autoAllocate &&
+            envelope.envelopeType === "variable" &&
+            (envelope.monthlyBudget || 0) > 0,
+        );
+
+        for (const envelope of variableEnvelopes) {
+          if (remainingAmount <= 0) break;
+
+          const biweeklyTarget =
+            (envelope.monthlyBudget || 0) / BIWEEKLY_MULTIPLIER;
+          const needed = Math.max(
+            0,
+            biweeklyTarget - (envelope.currentBalance || 0),
+          );
+          const allocation = Math.min(needed, remainingAmount);
+
+          if (allocation > 0) {
+            // Create transaction for this envelope
+            const envelopeTransaction = {
+              id: `paycheck_env_${envelope.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+              date: paycheck.date
+                ? paycheck.date.split("T")[0]
+                : new Date().toISOString().split("T")[0],
+              description: `Paycheck allocation from ${paycheck.payerName} to ${envelope.name}`,
+              amount: allocation,
+              type: "income",
+              category: "paycheck-allocation",
+              envelopeId: envelope.id,
+              payerName: paycheck.payerName,
+              paycheckMode: paycheck.mode,
+              createdAt: new Date().toISOString(),
+            };
+
+            transactions.push(envelopeTransaction);
+
+            // Update envelope balance
+            set((state) => {
+              const envIndex = state.envelopes.findIndex(
+                (e) => e.id === envelope.id,
+              );
+              if (envIndex !== -1) {
+                state.envelopes[envIndex].currentBalance =
+                  (state.envelopes[envIndex].currentBalance || 0) + allocation;
+              }
+            });
+
+            remainingAmount -= allocation;
+          }
+        }
+
+        // Put remaining amount in unassigned cash
+        if (remainingAmount > 0) {
+          const unassignedTransaction = {
+            id: `paycheck_unassigned_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            date: paycheck.date
+              ? paycheck.date.split("T")[0]
+              : new Date().toISOString().split("T")[0],
+            description: `Paycheck leftover from ${paycheck.payerName} (to unassigned cash)`,
+            amount: remainingAmount,
+            type: "income",
+            category: "paycheck",
+            envelopeId: "unassigned",
+            payerName: paycheck.payerName,
+            paycheckMode: paycheck.mode,
+            createdAt: new Date().toISOString(),
+          };
+
+          transactions.push(unassignedTransaction);
+
+          // Update unassigned cash
+          set((state) => {
+            state.unassignedCash =
+              (state.unassignedCash || 0) + remainingAmount;
+          });
+        }
+
+        // Save all transactions to Dexie and state
+        for (const transaction of transactions) {
+          await budgetDb.transactions.put(transaction);
+
+          // Add transaction to state
+          set((state) => {
+            if (!state.transactions) state.transactions = [];
+            if (!state.allTransactions) state.allTransactions = [];
+            state.transactions.push(transaction);
+            state.allTransactions.push(transaction);
+          });
+        }
+
+        logger.info("Paycheck auto-allocated to envelopes", {
+          amount: paycheck.amount,
+          payerName: paycheck.payerName,
+          envelopeAllocations: transactions.filter(
+            (t) => t.envelopeId !== "unassigned",
+          ).length,
+          remainingToUnassigned: remainingAmount,
+          totalTransactions: transactions.length,
+        });
+      }
+
+      // Update budget metadata in Dexie
+      await setBudgetMetadata({
+        unassignedCash: get().unassignedCash,
+        actualBalance: get().actualBalance,
+      });
+
+      logger.info("Paycheck processing completed successfully", {
+        mode: paycheck.mode,
+        amount: paycheck.amount,
+        payerName: paycheck.payerName,
+      });
+
+      return paycheckTransaction;
+    } catch (error) {
+      logger.error("Failed to process paycheck", error, {
+        paycheck,
+        source: "processPaycheck",
+      });
+      throw error;
+    }
+  },
 
   // Data loading state
   setDataLoaded: (loaded) =>

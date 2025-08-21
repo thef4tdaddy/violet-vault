@@ -108,7 +108,7 @@ const PaycheckProcessor = ({
     setIsProcessing(true);
 
     try {
-      const result = onProcessPaycheck({
+      const result = await onProcessPaycheck({
         amount,
         payerName: payerName.trim(),
         mode: allocationMode,
