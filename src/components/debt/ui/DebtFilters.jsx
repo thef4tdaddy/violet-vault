@@ -6,7 +6,12 @@ import { DEBT_TYPE_CONFIG } from "../../../constants/debts";
  * Debt filtering and sorting controls
  * Pure UI component for debt list filtering
  */
-const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes, debtsByType }) => {
+const DebtFilters = ({
+  filterOptions,
+  setFilterOptions,
+  debtTypes,
+  debtsByType,
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleFilterChange = (field, value) => {
@@ -29,7 +34,9 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes, debtsByType }
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center space-x-2">
           <Filter className="h-4 w-4 text-gray-600" />
-          <span className="text-sm font-medium text-gray-700">Filters & Sorting</span>
+          <span className="text-sm font-medium text-gray-700">
+            Filters & Sorting
+          </span>
           {hasActiveFilters && (
             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
               Active
@@ -53,7 +60,9 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes, debtsByType }
         <div className="px-4 pb-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Debt Type</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Debt Type
+              </label>
               <select
                 value={filterOptions.type}
                 onChange={(e) => handleFilterChange("type", e.target.value)}
@@ -73,7 +82,9 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes, debtsByType }
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Status
+              </label>
               <select
                 value={filterOptions.status}
                 onChange={(e) => handleFilterChange("status", e.target.value)}
@@ -87,7 +98,9 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes, debtsByType }
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Sort By
+              </label>
               <select
                 value={filterOptions.sortBy}
                 onChange={(e) => handleFilterChange("sortBy", e.target.value)}
@@ -102,12 +115,16 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes, debtsByType }
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Options</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Options
+              </label>
               <label className="flex items-center text-sm cursor-pointer">
                 <input
                   type="checkbox"
                   checked={filterOptions.showPaidOff}
-                  onChange={(e) => handleFilterChange("showPaidOff", e.target.checked)}
+                  onChange={(e) =>
+                    handleFilterChange("showPaidOff", e.target.checked)
+                  }
                   className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
                 />
                 <span className="ml-2 text-gray-700">Show Paid Off</span>

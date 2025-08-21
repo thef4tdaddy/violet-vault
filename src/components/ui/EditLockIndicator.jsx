@@ -16,7 +16,9 @@ const EditLockIndicator = ({
   if (!isLocked) return null;
 
   const isExpired = lock && new Date(lock.expiresAt) <= new Date();
-  const timeRemaining = lock ? Math.max(0, new Date(lock.expiresAt) - new Date()) : 0;
+  const timeRemaining = lock
+    ? Math.max(0, new Date(lock.expiresAt) - new Date())
+    : 0;
   const minutesRemaining = Math.ceil(timeRemaining / (1000 * 60));
 
   // Own lock - show friendly indicator
@@ -27,7 +29,9 @@ const EditLockIndicator = ({
       >
         <Lock className="h-4 w-4 text-green-600" />
         <div className="flex-1">
-          <p className="text-sm font-medium text-green-900">You are editing this record</p>
+          <p className="text-sm font-medium text-green-900">
+            You are editing this record
+          </p>
           {showDetails && timeRemaining > 0 && (
             <p className="text-xs text-green-700">
               Lock expires in {minutesRemaining} minute
@@ -68,7 +72,8 @@ const EditLockIndicator = ({
               <div className="flex items-center gap-2 text-xs text-red-700">
                 <Clock className="h-3 w-3" />
                 <span>
-                  {minutesRemaining} minute{minutesRemaining !== 1 ? "s" : ""} remaining
+                  {minutesRemaining} minute{minutesRemaining !== 1 ? "s" : ""}{" "}
+                  remaining
                 </span>
               </div>
             )}
@@ -117,7 +122,11 @@ export const CompactEditLockIndicator = ({
     <div
       className={`inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs ${className}`}
     >
-      {isExpired ? <AlertTriangle className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
+      {isExpired ? (
+        <AlertTriangle className="h-3 w-3" />
+      ) : (
+        <Lock className="h-3 w-3" />
+      )}
       <span>
         {isExpired ? "Expired" : "Locked"} by {lock?.userName || "User"}
       </span>

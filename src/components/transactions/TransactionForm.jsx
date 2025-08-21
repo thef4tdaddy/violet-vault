@@ -1,5 +1,14 @@
 import React, { useEffect } from "react";
-import { X, TrendingDown, TrendingUp, Zap, Lock, Unlock, User, Clock } from "lucide-react";
+import {
+  X,
+  TrendingDown,
+  TrendingUp,
+  Zap,
+  Lock,
+  Unlock,
+  User,
+  Clock,
+} from "lucide-react";
 import useEditLock from "../../hooks/useEditLock";
 import { initializeEditLocks } from "../../services/editLockService";
 import { useAuth } from "../../stores/authStore";
@@ -78,7 +87,9 @@ const TransactionForm = ({
 
     // Handle bill payment if transaction is assigned to a bill envelope
     if (transactionForm.envelopeId && onPayBill) {
-      const selectedEnvelope = envelopes.find((env) => env.id === transactionForm.envelopeId);
+      const selectedEnvelope = envelopes.find(
+        (env) => env.id === transactionForm.envelopeId,
+      );
       if (selectedEnvelope && selectedEnvelope.envelopeType === "bill") {
         logger.info("Creating bill payment from transaction", {
           billId: selectedEnvelope.id,
@@ -99,11 +110,14 @@ const TransactionForm = ({
       }
     }
 
-    logger.info(`Transaction ${editingTransaction ? "updated" : "created"} successfully`, {
-      transactionId: editingTransaction?.id,
-      amount: transactionForm.amount,
-      envelopeId: transactionForm.envelopeId,
-    });
+    logger.info(
+      `Transaction ${editingTransaction ? "updated" : "created"} successfully`,
+      {
+        transactionId: editingTransaction?.id,
+        amount: transactionForm.amount,
+        envelopeId: transactionForm.envelopeId,
+      },
+    );
 
     onSubmit();
   };
@@ -169,7 +183,10 @@ const TransactionForm = ({
                 Break Lock
               </button>
             )}
-            <button onClick={resetAndClose} className="text-gray-400 hover:text-gray-600">
+            <button
+              onClick={resetAndClose}
+              className="text-gray-400 hover:text-gray-600"
+            >
               <X className="h-6 w-6" />
             </button>
           </div>
@@ -181,7 +198,9 @@ const TransactionForm = ({
             <div className="flex items-center">
               <Lock className="h-5 w-5 text-red-400 mr-3" />
               <div>
-                <h3 className="text-sm font-medium text-red-800">Currently Being Edited</h3>
+                <h3 className="text-sm font-medium text-red-800">
+                  Currently Being Edited
+                </h3>
                 <p className="text-sm text-red-700 mt-1">
                   {lockedBy} is currently editing this transaction.
                   {isExpired
@@ -204,7 +223,9 @@ const TransactionForm = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Date *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Date *
+              </label>
               <input
                 type="date"
                 value={transactionForm.date}
@@ -216,14 +237,18 @@ const TransactionForm = ({
                 }
                 disabled={editingTransaction && !canEdit}
                 className={`glassmorphism w-full px-3 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-emerald-500 ${
-                  editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
+                  editingTransaction && !canEdit
+                    ? "bg-gray-100 cursor-not-allowed"
+                    : ""
                 }`}
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Type *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Type *
+              </label>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
@@ -265,7 +290,9 @@ const TransactionForm = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Description *
+            </label>
             <input
               type="text"
               value={transactionForm.description}
@@ -283,7 +310,9 @@ const TransactionForm = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Amount *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Amount *
+              </label>
               <input
                 type="number"
                 step="0.01"
@@ -301,7 +330,9 @@ const TransactionForm = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Category
+              </label>
               <select
                 value={transactionForm.category}
                 onChange={(e) =>
@@ -349,14 +380,16 @@ const TransactionForm = ({
             {transactionForm.envelopeId &&
               (() => {
                 const selectedEnvelope = envelopes.find(
-                  (env) => env.id === transactionForm.envelopeId
+                  (env) => env.id === transactionForm.envelopeId,
                 );
-                return selectedEnvelope && selectedEnvelope.envelopeType === "bill" ? (
+                return selectedEnvelope &&
+                  selectedEnvelope.envelopeType === "bill" ? (
                   <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                     <p className="text-sm text-blue-800">
-                      💡 <strong>Bill Payment:</strong> Assigning this transaction to "
-                      {selectedEnvelope.name}" will automatically mark it as a bill payment and
-                      deduct from the envelope balance.
+                      💡 <strong>Bill Payment:</strong> Assigning this
+                      transaction to "{selectedEnvelope.name}" will
+                      automatically mark it as a bill payment and deduct from
+                      the envelope balance.
                     </p>
                   </div>
                 ) : null;
@@ -364,7 +397,9 @@ const TransactionForm = ({
             {transactionForm.description && suggestEnvelope && (
               <div className="mt-2">
                 {(() => {
-                  const suggested = suggestEnvelope(transactionForm.description);
+                  const suggested = suggestEnvelope(
+                    transactionForm.description,
+                  );
                   return suggested ? (
                     <button
                       type="button"
@@ -386,7 +421,9 @@ const TransactionForm = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Notes (Optional)
+            </label>
             <textarea
               value={transactionForm.notes}
               onChange={(e) =>
@@ -431,7 +468,9 @@ const TransactionForm = ({
               type="submit"
               disabled={editingTransaction && !canEdit}
               className={`flex-1 btn btn-primary flex items-center justify-center ${
-                editingTransaction && !canEdit ? "bg-gray-400 cursor-not-allowed" : ""
+                editingTransaction && !canEdit
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : ""
               }`}
             >
               {editingTransaction && !canEdit ? (

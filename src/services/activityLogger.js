@@ -124,33 +124,53 @@ class ActivityLogger {
 
   // Envelope activities
   async logEnvelopeCreated(envelope) {
-    return this.logActivity(ACTIVITY_TYPES.ENVELOPE_CREATED, ENTITY_TYPES.ENVELOPE, envelope.id, {
-      name: envelope.name,
-      category: envelope.category,
-      monthlyBudget: envelope.monthlyBudget,
-    });
+    return this.logActivity(
+      ACTIVITY_TYPES.ENVELOPE_CREATED,
+      ENTITY_TYPES.ENVELOPE,
+      envelope.id,
+      {
+        name: envelope.name,
+        category: envelope.category,
+        monthlyBudget: envelope.monthlyBudget,
+      },
+    );
   }
 
   async logEnvelopeUpdated(envelope, changes = {}) {
-    return this.logActivity(ACTIVITY_TYPES.ENVELOPE_UPDATED, ENTITY_TYPES.ENVELOPE, envelope.id, {
-      name: envelope.name,
-      changes: Object.keys(changes),
-      ...changes,
-    });
+    return this.logActivity(
+      ACTIVITY_TYPES.ENVELOPE_UPDATED,
+      ENTITY_TYPES.ENVELOPE,
+      envelope.id,
+      {
+        name: envelope.name,
+        changes: Object.keys(changes),
+        ...changes,
+      },
+    );
   }
 
   async logEnvelopeDeleted(envelope) {
-    return this.logActivity(ACTIVITY_TYPES.ENVELOPE_DELETED, ENTITY_TYPES.ENVELOPE, envelope.id, {
-      name: envelope.name,
-      category: envelope.category,
-    });
+    return this.logActivity(
+      ACTIVITY_TYPES.ENVELOPE_DELETED,
+      ENTITY_TYPES.ENVELOPE,
+      envelope.id,
+      {
+        name: envelope.name,
+        category: envelope.category,
+      },
+    );
   }
 
   async logEnvelopeFunded(envelopeId, amount, source = "manual") {
-    return this.logActivity(ACTIVITY_TYPES.ENVELOPE_FUNDED, ENTITY_TYPES.ENVELOPE, envelopeId, {
-      amount,
-      source,
-    });
+    return this.logActivity(
+      ACTIVITY_TYPES.ENVELOPE_FUNDED,
+      ENTITY_TYPES.ENVELOPE,
+      envelopeId,
+      {
+        amount,
+        source,
+      },
+    );
   }
 
   // Transaction activities
@@ -165,7 +185,7 @@ class ActivityLogger {
         category: transaction.category,
         envelopeId: transaction.envelopeId,
         date: transaction.date,
-      }
+      },
     );
   }
 
@@ -179,7 +199,7 @@ class ActivityLogger {
         amount: transaction.amount,
         changes: Object.keys(changes),
         ...changes,
-      }
+      },
     );
   }
 
@@ -192,7 +212,7 @@ class ActivityLogger {
         description: transaction.description,
         amount: transaction.amount,
         category: transaction.category,
-      }
+      },
     );
   }
 
@@ -204,36 +224,51 @@ class ActivityLogger {
       {
         count,
         source,
-      }
+      },
     );
   }
 
   // Bill activities
   async logBillCreated(bill) {
-    return this.logActivity(ACTIVITY_TYPES.BILL_CREATED, ENTITY_TYPES.BILL, bill.id, {
-      name: bill.name,
-      amount: bill.amount,
-      category: bill.category,
-      dueDate: bill.dueDate,
-    });
+    return this.logActivity(
+      ACTIVITY_TYPES.BILL_CREATED,
+      ENTITY_TYPES.BILL,
+      bill.id,
+      {
+        name: bill.name,
+        amount: bill.amount,
+        category: bill.category,
+        dueDate: bill.dueDate,
+      },
+    );
   }
 
   async logBillUpdated(bill, changes = {}) {
-    return this.logActivity(ACTIVITY_TYPES.BILL_UPDATED, ENTITY_TYPES.BILL, bill.id, {
-      name: bill.name,
-      amount: bill.amount,
-      changes: Object.keys(changes),
-      ...changes,
-    });
+    return this.logActivity(
+      ACTIVITY_TYPES.BILL_UPDATED,
+      ENTITY_TYPES.BILL,
+      bill.id,
+      {
+        name: bill.name,
+        amount: bill.amount,
+        changes: Object.keys(changes),
+        ...changes,
+      },
+    );
   }
 
   async logBillPaid(bill, paymentAmount) {
-    return this.logActivity(ACTIVITY_TYPES.BILL_PAID, ENTITY_TYPES.BILL, bill.id, {
-      name: bill.name,
-      amount: paymentAmount,
-      dueDate: bill.dueDate,
-      paidDate: new Date().toISOString(),
-    });
+    return this.logActivity(
+      ACTIVITY_TYPES.BILL_PAID,
+      ENTITY_TYPES.BILL,
+      bill.id,
+      {
+        name: bill.name,
+        amount: paymentAmount,
+        dueDate: bill.dueDate,
+        paidDate: new Date().toISOString(),
+      },
+    );
   }
 
   // Paycheck activities
@@ -247,35 +282,50 @@ class ActivityLogger {
         payerName: paycheck.payerName,
         mode: paycheck.mode,
         date: paycheck.date,
-      }
+      },
     );
   }
 
   async logPaycheckDeleted(paycheck) {
-    return this.logActivity(ACTIVITY_TYPES.PAYCHECK_DELETED, ENTITY_TYPES.PAYCHECK, paycheck.id, {
-      amount: paycheck.amount,
-      payerName: paycheck.payerName,
-      mode: paycheck.mode,
-    });
+    return this.logActivity(
+      ACTIVITY_TYPES.PAYCHECK_DELETED,
+      ENTITY_TYPES.PAYCHECK,
+      paycheck.id,
+      {
+        amount: paycheck.amount,
+        payerName: paycheck.payerName,
+        mode: paycheck.mode,
+      },
+    );
   }
 
   // Debt activities
   async logDebtCreated(debt) {
-    return this.logActivity(ACTIVITY_TYPES.DEBT_CREATED, ENTITY_TYPES.DEBT, debt.id, {
-      name: debt.name,
-      creditor: debt.creditor,
-      currentBalance: debt.currentBalance,
-      minimumPayment: debt.minimumPayment,
-    });
+    return this.logActivity(
+      ACTIVITY_TYPES.DEBT_CREATED,
+      ENTITY_TYPES.DEBT,
+      debt.id,
+      {
+        name: debt.name,
+        creditor: debt.creditor,
+        currentBalance: debt.currentBalance,
+        minimumPayment: debt.minimumPayment,
+      },
+    );
   }
 
   async logDebtUpdated(debt, changes = {}) {
-    return this.logActivity(ACTIVITY_TYPES.DEBT_UPDATED, ENTITY_TYPES.DEBT, debt.id, {
-      name: debt.name,
-      creditor: debt.creditor,
-      changes: Object.keys(changes),
-      ...changes,
-    });
+    return this.logActivity(
+      ACTIVITY_TYPES.DEBT_UPDATED,
+      ENTITY_TYPES.DEBT,
+      debt.id,
+      {
+        name: debt.name,
+        creditor: debt.creditor,
+        changes: Object.keys(changes),
+        ...changes,
+      },
+    );
   }
 
   // System activities
@@ -287,7 +337,7 @@ class ActivityLogger {
       {
         syncType,
         itemsChanged,
-      }
+      },
     );
   }
 
@@ -306,7 +356,11 @@ class ActivityLogger {
           .reverse()
           .limit(limit);
       } else if (entityType) {
-        query = budgetDb.auditLog.where("entityType").equals(entityType).reverse().limit(limit);
+        query = budgetDb.auditLog
+          .where("entityType")
+          .equals(entityType)
+          .reverse()
+          .limit(limit);
       }
 
       const activities = await query.toArray();
@@ -328,7 +382,10 @@ class ActivityLogger {
           .equals([entityType, entityId])
           .count();
       } else if (entityType) {
-        return await budgetDb.auditLog.where("entityType").equals(entityType).count();
+        return await budgetDb.auditLog
+          .where("entityType")
+          .equals(entityType)
+          .count();
       } else {
         return await budgetDb.auditLog.count();
       }
@@ -344,9 +401,14 @@ class ActivityLogger {
   async clearOldActivities(daysToKeep = 90) {
     try {
       const cutoffTime = Date.now() - daysToKeep * 24 * 60 * 60 * 1000;
-      const deletedCount = await budgetDb.auditLog.where("timestamp").below(cutoffTime).delete();
+      const deletedCount = await budgetDb.auditLog
+        .where("timestamp")
+        .below(cutoffTime)
+        .delete();
 
-      logger.info(`Cleared ${deletedCount} old activities older than ${daysToKeep} days`);
+      logger.info(
+        `Cleared ${deletedCount} old activities older than ${daysToKeep} days`,
+      );
       return deletedCount;
     } catch (error) {
       logger.error("Failed to clear old activities:", error);

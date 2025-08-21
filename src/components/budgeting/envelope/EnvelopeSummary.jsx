@@ -1,5 +1,11 @@
 import React from "react";
-import { DollarSign, TrendingUp, Calculator, Target, Calendar } from "lucide-react";
+import {
+  DollarSign,
+  TrendingUp,
+  Calculator,
+  Target,
+  Calendar,
+} from "lucide-react";
 
 const EnvelopeSummary = ({ totals }) => {
   const balanceAfterBills = totals.totalBalance - totals.totalUpcoming;
@@ -23,8 +29,12 @@ const EnvelopeSummary = ({ totals }) => {
           <TrendingUp className="h-8 w-8 text-green-600 mr-3" />
           <div>
             <p className="text-xs text-gray-600">Balance / After Bills</p>
-            <p className="text-lg font-semibold text-gray-900">${totals.totalBalance.toFixed(2)}</p>
-            <p className="text-sm text-gray-500">${balanceAfterBills.toFixed(2)} after bills</p>
+            <p className="text-lg font-semibold text-gray-900">
+              ${totals.totalBalance.toFixed(2)}
+            </p>
+            <p className="text-sm text-gray-500">
+              ${balanceAfterBills.toFixed(2)} after bills
+            </p>
           </div>
         </div>
       </div>
@@ -34,7 +44,9 @@ const EnvelopeSummary = ({ totals }) => {
           <Target className="h-8 w-8 text-red-600 mr-3" />
           <div>
             <p className="text-xs text-gray-600">Total Spent</p>
-            <p className="text-lg font-semibold text-gray-900">${totals.totalSpent.toFixed(2)}</p>
+            <p className="text-lg font-semibold text-gray-900">
+              ${totals.totalSpent.toFixed(2)}
+            </p>
           </div>
         </div>
       </div>
@@ -56,7 +68,9 @@ const EnvelopeSummary = ({ totals }) => {
           <Calendar className="h-8 w-8 text-orange-600 mr-3" />
           <div>
             <p className="text-xs text-gray-600">Bills due</p>
-            <p className="text-lg font-semibold text-gray-900">{totals.billsDueCount || 0}</p>
+            <p className="text-lg font-semibold text-gray-900">
+              {totals.billsDueCount || 0}
+            </p>
           </div>
         </div>
       </div>

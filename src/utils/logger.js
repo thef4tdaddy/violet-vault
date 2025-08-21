@@ -30,7 +30,7 @@ class Logger {
       const consoleLog = window.originalConsoleLog || console.log;
       consoleLog(
         `🔍 [${this.isDevelopment ? "DEV" : this.isDevSite ? "DEV-SITE" : "PROD"}] ${message}`,
-        data
+        data,
       );
     }
 
@@ -110,7 +110,10 @@ class Logger {
       });
 
       // For critical budget sync issues, also send as error to ensure visibility
-      if (message.includes("budgetId value") || message.includes("sync issue")) {
+      if (
+        message.includes("budgetId value") ||
+        message.includes("sync issue")
+      ) {
         H.consumeError(new Error(`Budget Sync: ${message}`), {
           metadata: data,
           tags: { category: "budget-sync", critical: "true" },
@@ -179,7 +182,9 @@ class Logger {
       });
     }
 
-    console.log("✅ Highlight.io test messages sent - check your Highlight.io dashboard");
+    console.log(
+      "✅ Highlight.io test messages sent - check your Highlight.io dashboard",
+    );
   }
 }
 
