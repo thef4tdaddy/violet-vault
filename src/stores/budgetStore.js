@@ -2,7 +2,11 @@ import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 import { persist, devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
-import { budgetDb, setBudgetMetadata } from "../db/budgetDb.js";
+import {
+  budgetDb,
+  setBudgetMetadata,
+  getBudgetMetadata,
+} from "../db/budgetDb.js";
 import activityLogger from "../services/activityLogger.js";
 import logger from "../utils/logger.js";
 
@@ -162,10 +166,9 @@ const storeInitializer = (set, get) => ({
         state.paycheckHistory.push(paycheck);
       });
 
-      // Update actual balance once for the paycheck income (regardless of allocation mode)
-      set((state) => {
-        state.actualBalance = (state.actualBalance || 0) + paycheck.amount;
-      });
+      // Get current actual balance from Dexie metadata (proper data source)
+      const currentMetadata = await getBudgetMetadata();
+      const currentActualBalance = currentMetadata?.actualBalance || 0;
 
       // Create transaction for the paycheck income
       const paycheckTransaction = {
@@ -373,10 +376,10 @@ const storeInitializer = (set, get) => ({
         });
       }
 
-      // Update budget metadata in Dexie
+      // Update budget metadata in Dexie with correct actual balance
       await setBudgetMetadata({
         unassignedCash: get().unassignedCash,
-        actualBalance: get().actualBalance,
+        actualBalance: currentActualBalance + paycheck.amount,
       });
 
       logger.info("Paycheck processing completed successfully", {
@@ -486,10 +489,14 @@ const storeInitializer = (set, get) => ({
         state.paycheckHistory.splice(paycheckIndex, 1);
       });
 
+      // Get current actual balance and reduce by paycheck amount
+      const currentMetadata = await getBudgetMetadata();
+      const currentActualBalance = currentMetadata?.actualBalance || 0;
+
       // Update budget metadata in Dexie
       await setBudgetMetadata({
         unassignedCash: get().unassignedCash,
-        actualBalance: get().actualBalance,
+        actualBalance: currentActualBalance - paycheck.amount,
       });
 
       logger.info("Paycheck deleted successfully", {
