@@ -65,7 +65,6 @@ const EditEnvelopeModal = ({
     expiresAt,
     timeRemaining,
     isExpired,
-    acquireLock,
     releaseLock,
     breakLock,
     isLoading: lockLoading,
