@@ -129,13 +129,68 @@ _Envelope budgeting system components_
 
 _Bill tracking and payment management_
 
-| Component              | Purpose                               |
-| ---------------------- | ------------------------------------- |
-| `AddBillModal.jsx`     | Modal for adding new bills            |
-| `BillManager.jsx`      | Main bill management interface        |
-| `BillTable.jsx`        | Tabular display of bills              |
-| `BillTabs.jsx`         | Tab navigation for bill categories    |
-| `SmartBillMatcher.jsx` | Automatic bill detection and matching |
+| Component                  | Purpose                                    |
+| -------------------------- | ------------------------------------------ |
+| `AddBillModal.jsx`         | Modal for adding/editing bills with edit locking |
+| `BillDiscoveryModal.jsx`   | **NEW v1.9.0** - Automated bill discovery interface |
+| `BillManager.jsx`          | Main bill management interface             |
+| `BillTable.jsx`            | Tabular display of bills                   |
+| `BillTabs.jsx`             | Tab navigation for bill categories         |
+| `BulkBillUpdateModal.jsx`  | **NEW v1.9.0** - Bulk operations for bills |
+| `SmartBillMatcher.jsx`     | Automatic bill detection and matching     |
+
+### **Debt Management** (`/debt/`) - **NEW in v1.9.0**
+
+_Debt tracking and payoff strategies_
+
+| Component            | Purpose                                  |
+| -------------------- | ---------------------------------------- |
+| `DebtDashboard.jsx`  | Main dashboard for debt overview         |
+| `DebtStrategies.jsx` | Debt payoff strategy calculator          |
+
+#### **Debt Modals** (`/debt/modals/`)
+
+| Component             | Purpose                           |
+| --------------------- | --------------------------------- |
+| `AddDebtModal.jsx`    | Modal for adding new debts with edit locking |
+| `DebtDetailModal.jsx` | Detailed debt information and editing |
+
+#### **Debt UI Components** (`/debt/ui/`)
+
+| Component               | Purpose                        |
+| ----------------------- | ------------------------------ |
+| `DebtFilters.jsx`       | Filtering controls for debts   |
+| `DebtList.jsx`          | List view of debt accounts     |
+| `DebtSummaryCards.jsx`  | Summary cards for debt metrics |
+| `DebtSummaryWidget.jsx` | Widget for debt overview       |
+
+### **Feedback & Support** (`/feedback/`) - **NEW in v1.9.0**
+
+_User feedback and bug reporting_
+
+| Component             | Purpose                              |
+| --------------------- | ------------------------------------ |
+| `BugReportButton.jsx` | Bug reporting with screenshot capture |
+
+### **History & Audit** (`/history/`) - **NEW in v1.9.0**
+
+_Budget history and integrity monitoring_
+
+| Component                      | Purpose                                    |
+| ------------------------------ | ------------------------------------------ |
+| `BudgetHistoryViewer.jsx`      | Comprehensive budget history viewer       |
+| `IntegrityStatusIndicator.jsx` | Security integrity status display         |
+| `ObjectHistoryViewer.jsx`      | Object-level change history viewer        |
+
+### **Onboarding** (`/onboarding/`) - **NEW in v1.9.0**
+
+_User onboarding and tutorial system_
+
+| Component                 | Purpose                               |
+| ------------------------- | ------------------------------------- |
+| `EmptyStateHints.jsx`     | Helpful hints for empty states        |
+| `OnboardingProgress.jsx`  | Progress tracking for onboarding      |
+| `OnboardingTutorial.jsx`  | Interactive tutorial system           |
 
 ### **Savings Goals** (`/savings/`)
 
@@ -145,18 +200,57 @@ _Savings goal tracking and management_
 | ------------------ | ---------------------------------- |
 | `SavingsGoals.jsx` | Savings goals management interface |
 
+### **Security** (`/security/`) - **NEW in v1.9.0**
+
+_Security and access control_
+
+| Component        | Purpose                          |
+| ---------------- | -------------------------------- |
+| `LockScreen.jsx` | Application lock screen interface |
+
+### **Settings** (`/settings/`)
+
+_Application settings and configuration_
+
+| Component                    | Purpose                                   |
+| ---------------------------- | ----------------------------------------- |
+| `SecuritySettings.jsx`       | Security configuration interface          |
+| `SettingsDashboard.jsx`      | Main settings dashboard                   |
+| `TransactionArchiving.jsx`   | **NEW v1.9.0** - Transaction archiving settings |
+
+### **Sync Components** (`/sync/`)
+
+_Multi-device synchronization and real-time collaboration_
+
+| Component                     | Purpose                                |
+| ----------------------------- | -------------------------------------- |
+| `ActivityBanner.jsx`          | Real-time user activity notifications  |
+| `ConflictResolutionModal.jsx` | Sync conflict resolution interface     |
+| `ManualSyncControls.jsx`      | **NEW v1.9.0** - Manual sync controls |
+| `SyncHealthIndicator.jsx`     | **NEW v1.9.0** - Sync health monitoring |
+| `SyncIndicator.jsx`           | Sync status indicator                  |
+| `SyncStatusIndicators.jsx`    | Multiple sync status displays          |
+| `TeamActivitySync.jsx`        | Real-time team activity sync           |
+
 ### **Transactions** (`/transactions/`)
 
 _Transaction management and analysis_
 
-| Component                 | Purpose                              |
-| ------------------------- | ------------------------------------ |
-| `TransactionFilters.jsx`  | Transaction filtering interface      |
-| `TransactionForm.jsx`     | Form for adding/editing transactions |
-| `TransactionLedger.jsx`   | Complete transaction history view    |
-| `TransactionSplitter.jsx` | Split transaction functionality      |
-| `TransactionSummary.jsx`  | Transaction summary and totals       |
-| `TransactionTable.jsx`    | Tabular transaction display          |
+| Component                 | Purpose                                      |
+| ------------------------- | -------------------------------------------- |
+| `TransactionFilters.jsx`  | Transaction filtering interface              |
+| `TransactionForm.jsx`     | Form for adding/editing transactions with edit locking |
+| `TransactionLedger.jsx`   | Complete transaction history view            |
+| `TransactionSplitter.jsx` | Split transaction functionality              |
+| `TransactionSummary.jsx`  | Transaction summary and totals               |
+| `TransactionTable.jsx`    | Tabular transaction display                  |
+
+#### **Transaction Components** (`/transactions/components/`) - **NEW in v1.9.0**
+
+| Component                   | Purpose                           |
+| --------------------------- | --------------------------------- |
+| `DeleteConfirmation.jsx`    | Confirmation dialog for deletions |
+| `TransactionRow.jsx`        | Individual transaction row component |
 
 #### **Transaction Hooks** (`/transactions/hooks/`)
 
@@ -165,6 +259,7 @@ _Transaction management and analysis_
 | `useTransactionFilters.js` | Transaction filtering logic       |
 | `useTransactionForm.js`    | Transaction form state management |
 | `useTransactionImport.js`  | Transaction import functionality  |
+| `useTransactionTable.js`   | **NEW v1.9.0** - Table state management |
 
 #### **Transaction Import** (`/transactions/import/`)
 
@@ -182,6 +277,22 @@ _Transaction management and analysis_
 | --------------------- | -------------------------- |
 | `envelopeMatching.js` | Auto-categorization logic  |
 | `fileParser.js`       | CSV/file parsing utilities |
+| `tableHelpers.js`     | **NEW v1.9.0** - Table utility functions |
+
+### **UI Components** (`/ui/`)
+
+_Reusable UI elements and common components_
+
+| Component               | Purpose                                       |
+| ----------------------- | --------------------------------------------- |
+| `EditLockIndicator.jsx` | **NEW v1.9.0** - Edit lock status indicator  |
+| `EditableBalance.jsx`   | **NEW v1.9.0** - Inline editable balance display |
+| `Header.jsx`            | Application header component                  |
+| `HelpTooltip.jsx`       | **NEW v1.9.0** - Help and information tooltips |
+| `LoadingSpinner.jsx`    | Loading state indicator                       |
+| `Toast.jsx`             | Toast notification system                     |
+| `VersionFooter.jsx`     | App version display                           |
+| `VirtualList.jsx`       | Performance-optimized list rendering          |
 
 ### **Analytics** (`/analytics/`)
 
@@ -233,36 +344,77 @@ _Modal dialog components_
 | --------------------------- | -------------------------------- |
 | `PasswordRotationModal.jsx` | Password rotation security modal |
 
+### **Modals** (`/modals/`)
+
+_Modal dialog components_
+
+| Component                   | Purpose                              |
+| --------------------------- | ------------------------------------ |
+| `PasswordRotationModal.jsx` | Password rotation security modal     |
+| `UnassignedCashModal.jsx`   | **NEW v1.9.0** - Cash distribution modal |
+
 ## 🪝 Hooks Directory (`/hooks/`)
 
 _Custom React hooks for business logic_
 
-| Hook                     | Purpose                                                             |
-| ------------------------ | ------------------------------------------------------------------- |
-| `useActualBalance.js`    | Bank account balance management and reconciliation                  |
-| `useAuthFlow.js`         | Authentication flow management                                      |
-| `useBudgetData.js`       | **NEW v1.9** - Unified TanStack Query + Zustand + Dexie hook        |
-| `useDataManagement.js`   | Import/export operations                                            |
-| `useEnvelopes.js`        | **NEW v1.9** - Specialized envelope management with smart filtering |
-| `useFirebaseSync.js`     | Firebase synchronization and activity management                    |
-| `useNetworkStatus.js`    | Network status management (online/offline detection)                |
-| `usePasswordRotation.js` | Password security and rotation                                      |
-| `usePaydayPrediction.js` | Payday prediction and notifications                                 |
-| `useToast.js`            | Toast notification management                                       |
-| `useTransactions.js`     | **NEW v1.9** - Advanced transaction queries with analytics          |
+| Hook                          | Purpose                                                   |
+| ----------------------------- | --------------------------------------------------------- |
+| `useActivityLogger.js`        | **NEW v1.9.0** - Budget activity logging                 |
+| `useActualBalance.js`         | Bank account balance management and reconciliation       |
+| `useAnalytics.js`             | **NEW v1.9.0** - Financial analytics and reporting       |
+| `useAuthFlow.js`              | Authentication flow management                            |
+| `useAutoFunding.js`           | **NEW v1.9.0** - Auto-funding rules management           |
+| `useBillOperations.js`        | **NEW v1.9.0** - Bill CRUD operations                    |
+| `useBills.js`                 | **NEW v1.9.0** - Bill management hook                    |
+| `useBudgetData.js`            | **NEW v1.9.0** - Unified TanStack Query + Zustand + Dexie hook |
+| `useBudgetHistoryQuery.js`    | **NEW v1.9.0** - Budget history querying                 |
+| `useBudgetMetadata.js`        | **NEW v1.9.0** - Budget metadata management              |
+| `useBugReport.js`             | **NEW v1.9.0** - Bug reporting functionality             |
+| `useDataInitialization.js`   | **NEW v1.9.0** - Data initialization and migration       |
+| `useDataManagement.js`        | Import/export operations                                  |
+| `useDebtManagement.js`        | **NEW v1.9.0** - Debt tracking and payoff strategies     |
+| `useDebts.js`                 | **NEW v1.9.0** - Debt management hook                    |
+| `useEditLock.js`              | **NEW v1.9.0** - Cross-browser edit locking              |
+| `useEnvelopes.js`             | **NEW v1.9.0** - Specialized envelope management         |
+| `useFirebaseSync.js`          | Firebase synchronization and activity management         |
+| `useKeyManagement.js`         | **NEW v1.9.0** - Encryption key management               |
+| `useLocalOnlyMode.js`         | **NEW v1.9.0** - Local-only operation mode               |
+| `useManualSync.js`            | **NEW v1.9.0** - Manual sync controls                    |
+| `useNetworkStatus.js`         | Network status management (online/offline detection)     |
+| `useOnboardingAutoComplete.js`| **NEW v1.9.0** - Automatic onboarding completion        |
+| `usePasswordRotation.js`      | Password security and rotation                            |
+| `usePaydayPrediction.js`      | Payday prediction and notifications                       |
+| `useSavingsGoals.js`          | **NEW v1.9.0** - Savings goal management                 |
+| `useSecurityManager.js`       | **NEW v1.9.0** - Security settings management            |
+| `useToast.js`                 | Toast notification management                             |
+| `useTransactionArchiving.js`  | **NEW v1.9.0** - Transaction archiving functionality     |
+| `useTransactions.js`          | **NEW v1.9.0** - Advanced transaction queries with analytics |
+| `useUnassignedCashDistribution.js` | **NEW v1.9.0** - Unassigned cash distribution     |
 
 ## 🏪 Stores Directory (`/stores/`)
 
 _Zustand state management stores_
 
-| Store            | Purpose                                           |
-| ---------------- | ------------------------------------------------- |
-| `authStore.jsx`  | Authentication state management (renamed for JSX) |
-| `budgetStore.js` | Main budget data state management (Zustand store) |
+| Store                | Purpose                                           |
+| -------------------- | ------------------------------------------------- |
+| `authStore.jsx`      | Authentication state management (renamed for JSX) |
+| `budgetStore.js`     | Main budget data state management (Zustand store) |
+| `onboardingStore.js` | **NEW v1.9.0** - Onboarding progress state        |
+| `toastStore.js`      | **NEW v1.9.0** - Toast notification state         |
+
+## 🔧 Services Directory (`/services/`) - **NEW in v1.9.0**
+
+_Business logic services and utilities_
+
+| Service               | Purpose                                         |
+| --------------------- | ----------------------------------------------- |
+| `activityLogger.js`   | Level 1 Budget History - activity logging service |
+| `cloudSyncService.js` | Enhanced cloud synchronization service         |
+| `editLockService.js`  | Cross-browser edit locking with Firebase       |
 
 ## 🌐 Contexts Directory (`/contexts/`)
 
-_React context providers_
+_React context providers - **LEGACY** (mostly migrated to Zustand)_
 
 | Context             | Purpose                         |
 | ------------------- | ------------------------------- |
@@ -273,19 +425,48 @@ _React context providers_
 
 _Utility functions and services_
 
-| Utility              | Purpose                                                                     |
-| -------------------- | --------------------------------------------------------------------------- |
-| `billIcons.js`       | Bill categorization icons                                                   |
-| `encryption.js`      | Data encryption/decryption utilities                                        |
-| `firebaseConfig.js`  | Firebase configuration                                                      |
-| `firebaseSync.js`    | Firebase synchronization service                                            |
-| `highlight.js`       | Error highlighting and debugging utilities                                  |
-| `logger.js`          | Application logging utilities                                               |
-| `paydayPredictor.js` | Payday prediction algorithms with enhanced recommendations                  |
-| `performance.js`     | Performance monitoring utilities                                            |
-| `queryClient.js`     | **Enhanced v1.9** - TanStack Query + Dexie integration with offline support |
-| `sentry.js`          | Error monitoring and reporting                                              |
-| `version.js`         | Application version management                                              |
+| Utility                        | Purpose                                                      |
+| ------------------------------ | ------------------------------------------------------------ |
+| `autoFundingEngine.js`         | **NEW v1.9.0** - Auto-funding rules processing engine      |
+| `billDiscovery.js`             | **NEW v1.9.0** - Automated bill discovery algorithms       |
+| `billEnvelopeCalculations.js`  | **NEW v1.9.0** - Bill-to-envelope calculation utilities    |
+| `billIcons.js`                 | Bill categorization icons                                    |
+| `budgetHistoryTracker.js`      | **NEW v1.9.0** - Budget history tracking utilities         |
+| `chunkedFirebaseSync.js`       | **NEW v1.9.0** - Chunked Firebase synchronization          |
+| `dataDiagnostic.js`            | **NEW v1.9.0** - Data integrity diagnostic utilities       |
+| `debugTools.js`                | **NEW v1.9.0** - Development debugging utilities           |
+| `debtStrategies.js`            | **NEW v1.9.0** - Debt payoff strategy calculations         |
+| `encryption.js`                | Data encryption/decryption utilities                        |
+| `errorViewer.js`               | **NEW v1.9.0** - Error visualization utilities             |
+| `firebaseConfig.js`            | Firebase configuration                                       |
+| `firebaseSync.js`              | Firebase synchronization service                            |
+| `fixMetadata.js`               | **NEW v1.9.0** - Metadata repair utilities                 |
+| `frequencyCalculations.js`     | **NEW v1.9.0** - Frequency conversion utilities            |
+| `highlight.js`                 | Error highlighting and debugging utilities                   |
+| `keyExport.js`                 | **NEW v1.9.0** - Encryption key export utilities          |
+| `lazyImport.js`                | **NEW v1.9.0** - Dynamic import utilities                  |
+| `logger.js`                    | Application logging utilities                                |
+| `masterSyncValidator.js`       | **NEW v1.9.0** - Master sync validation utilities          |
+| `paydayPredictor.js`           | Payday prediction algorithms with enhanced recommendations  |
+| `performance.js`               | Performance monitoring utilities                             |
+| `queryClient.js`               | **Enhanced v1.9.0** - TanStack Query + Dexie integration with offline support |
+| `syncDiagnostic.js`            | **NEW v1.9.0** - Sync diagnostic utilities                 |
+| `syncEdgeCaseTester.js`        | **NEW v1.9.0** - Sync edge case testing utilities          |
+| `syncFlowValidator.js`         | **NEW v1.9.0** - Sync flow validation utilities            |
+| `syncHealthChecker.js`         | **NEW v1.9.0** - Sync health monitoring utilities          |
+| `testBudgetHistory.js`         | **NEW v1.9.0** - Budget history testing utilities          |
+| `toastHelpers.js`              | **NEW v1.9.0** - Toast notification helper functions       |
+| `transactionArchiving.js`      | **NEW v1.9.0** - Transaction archiving utilities           |
+| `version.js`                   | Application version management                               |
+
+#### **Budgeting Utilities** (`/utils/budgeting/`) - **NEW in v1.9.0**
+
+| Utility                   | Purpose                                    |
+| ------------------------- | ------------------------------------------ |
+| `envelopeCalculations.js` | Envelope calculation and validation logic  |
+| `envelopeMatching.js`     | Envelope matching and categorization       |
+| `envelopeStyles.js`       | Envelope styling and theming utilities     |
+| `index.js`                | Budgeting utilities barrel export          |
 
 ## 💾 Database Directory (`/db/`)
 
@@ -299,9 +480,25 @@ _Local database management_
 
 _Application constants and configurations_
 
-| File            | Purpose                         |
-| --------------- | ------------------------------- |
-| `categories.js` | Transaction and bill categories |
+| File            | Purpose                                       |
+| --------------- | --------------------------------------------- |
+| `categories.js` | Transaction and bill categories               |
+| `debts.js`      | **NEW v1.9.0** - Debt-related constants      |
+| `frequency.js`  | **NEW v1.9.0** - Frequency calculation constants |
+
+## 🧪 Test Directory (`/test/`) - **NEW in v1.9.0**
+
+_Testing utilities and test files_
+
+| File                  | Purpose                              |
+| --------------------- | ------------------------------------ |
+| `setup.js`            | Vitest test setup configuration      |
+
+#### **Test Utils** (`/test/utils/`)
+
+| File                      | Purpose                           |
+| ------------------------- | --------------------------------- |
+| `debtStrategies.test.js`  | Debt strategy calculation tests   |
 
 ---
 
@@ -384,7 +581,38 @@ _Application constants and configurations_
 
 ---
 
-**Total Files:** ~120+ files  
-**Lines of Code:** ~15,000+ lines  
-**Architecture:** React + Zustand + IndexedDB + Firebase  
-**Security:** Client-side encryption for all sensitive data
+## 📊 Architecture Summary (v1.9.0)
+
+### **File Statistics**
+
+- **Total Files:** ~200+ files (66% increase from v1.8.0)
+- **Lines of Code:** ~25,000+ lines (significant expansion)
+- **New Components:** 35+ new components/hooks/services in v1.9.0
+- **New Directories:** `/activity/`, `/automation/`, `/debt/`, `/feedback/`, `/history/`, `/onboarding/`, `/security/`, `/services/`, `/test/`
+
+### **Technology Stack**
+
+- **Frontend:** React 19 + Vite
+- **State Management:** Zustand (primary) + React Context (legacy)
+- **Data Layer:** TanStack Query + Dexie (IndexedDB) + Firebase Firestore
+- **Security:** Client-side AES encryption for all sensitive data
+- **Real-time:** Firebase real-time listeners + cross-browser edit locking
+- **Testing:** Vitest + Testing Library
+- **Build:** Vite with optimized chunking and lazy loading
+
+### **v1.9.0 Architecture Enhancements**
+
+- **🔐 Security & Compliance:** Edit locking, activity logging, integrity monitoring
+- **📊 Enhanced Data Layer:** TanStack Query integration with offline support
+- **🤖 Intelligent Automation:** Auto-funding rules with machine learning patterns
+- **📱 User Experience:** Comprehensive onboarding, feedback systems, help tooltips
+- **🔄 Sync Infrastructure:** Chunked sync, health monitoring, edge case handling
+- **💳 Debt Management:** Complete debt tracking and payoff strategy system
+
+### **Security Features**
+
+- Client-side AES-256 encryption for all budget data
+- Cross-browser edit locking with Firebase Firestore
+- Comprehensive activity logging with tamper detection
+- Hash chain verification for budget history integrity
+- Real-time security status monitoring
