@@ -244,14 +244,15 @@ export class AutoFundingRule {
       case RULE_TYPES.FIXED_AMOUNT:
         return Math.min(this.config.amount, remainingCash);
 
-      case RULE_TYPES.PERCENTAGE:
+      case RULE_TYPES.PERCENTAGE: {
         const baseAmount = this.getBaseAmountForPercentage(context);
         return Math.min(
           (baseAmount * this.config.percentage) / 100,
           remainingCash,
         );
+      }
 
-      case RULE_TYPES.PRIORITY_FILL:
+      case RULE_TYPES.PRIORITY_FILL: {
         const targetEnvelope = envelopes.find(
           (e) => e.id === this.config.targetId,
         );
@@ -263,6 +264,7 @@ export class AutoFundingRule {
         const needed = Math.max(0, targetAmount - currentBalance);
 
         return Math.min(needed, remainingCash);
+      }
 
       default:
         return Math.min(this.calculateFundingAmount(context), remainingCash);
