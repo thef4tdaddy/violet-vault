@@ -140,7 +140,7 @@ class EditLockService {
       const q = query(
         collection(firestore, lockPath),
         where("recordType", "==", recordType),
-        where("recordId", "==", recordId)
+        where("recordId", "==", recordId),
       );
 
       const snapshot = await getDocs(q);
@@ -164,7 +164,7 @@ class EditLockService {
     const q = query(
       collection(firestore, lockPath),
       where("recordType", "==", recordType),
-      where("recordId", "==", recordId)
+      where("recordId", "==", recordId),
     );
 
     const unsubscribe = onSnapshot(
@@ -179,7 +179,7 @@ class EditLockService {
       (error) => {
         logger.error("Lock listener error", error);
         callback(null);
-      }
+      },
     );
 
     this.lockListeners.set(lockId, unsubscribe);
@@ -211,7 +211,7 @@ class EditLockService {
             lastActivity: serverTimestamp(),
             expiresAt: new Date(Date.now() + 60000), // Extend by 60 seconds
           },
-          { merge: true }
+          { merge: true },
         );
       } catch (error) {
         logger.error("Heartbeat failed", error);

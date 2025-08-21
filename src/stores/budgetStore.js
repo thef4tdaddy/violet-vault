@@ -15,9 +15,12 @@ const migrateOldData = async () => {
 
     // Migrate if old data exists
     if (oldData) {
-      logger.info("Migrating data from old budget-store to violet-vault-store", {
-        source: "migrateOldData",
-      });
+      logger.info(
+        "Migrating data from old budget-store to violet-vault-store",
+        {
+          source: "migrateOldData",
+        },
+      );
 
       const parsedOldData = JSON.parse(oldData);
 
@@ -30,7 +33,8 @@ const migrateOldData = async () => {
             transactions: parsedOldData.state.transactions || [],
             allTransactions: parsedOldData.state.allTransactions || [],
             savingsGoals: parsedOldData.state.savingsGoals || [],
-            supplementalAccounts: parsedOldData.state.supplementalAccounts || [],
+            supplementalAccounts:
+              parsedOldData.state.supplementalAccounts || [],
             debts: parsedOldData.state.debts || [],
             unassignedCash: parsedOldData.state.unassignedCash || 0,
             biweeklyAllocation: parsedOldData.state.biweeklyAllocation || 0,
@@ -40,10 +44,16 @@ const migrateOldData = async () => {
           version: 0,
         };
 
-        localStorage.setItem("violet-vault-store", JSON.stringify(transformedData));
-        logger.info("Data migration completed successfully - replaced existing data", {
-          source: "migrateOldData",
-        });
+        localStorage.setItem(
+          "violet-vault-store",
+          JSON.stringify(transformedData),
+        );
+        logger.info(
+          "Data migration completed successfully - replaced existing data",
+          {
+            source: "migrateOldData",
+          },
+        );
 
         // Seed Dexie with migrated data so hooks can access it
         await budgetDb.bulkUpsertEnvelopes(transformedData.state.envelopes);
@@ -51,11 +61,15 @@ const migrateOldData = async () => {
         await budgetDb.bulkUpsertTransactions(
           transformedData.state.allTransactions.length > 0
             ? transformedData.state.allTransactions
-            : transformedData.state.transactions
+            : transformedData.state.transactions,
         );
-        await budgetDb.bulkUpsertSavingsGoals(transformedData.state.savingsGoals);
+        await budgetDb.bulkUpsertSavingsGoals(
+          transformedData.state.savingsGoals,
+        );
         await budgetDb.bulkUpsertDebts(transformedData.state.debts);
-        await budgetDb.bulkUpsertPaychecks(transformedData.state.paycheckHistory);
+        await budgetDb.bulkUpsertPaychecks(
+          transformedData.state.paycheckHistory,
+        );
 
         // Save unassignedCash and actualBalance to Dexie metadata
         await setBudgetMetadata({
@@ -148,10 +162,17 @@ const storeInitializer = (set, get) => ({
         state.paycheckHistory.push(paycheck);
       });
 
+      // Update actual balance once for the paycheck income (regardless of allocation mode)
+      set((state) => {
+        state.actualBalance = (state.actualBalance || 0) + paycheck.amount;
+      });
+
       // Create transaction for the paycheck income
       const paycheckTransaction = {
         id: `paycheck_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        date: paycheck.date ? paycheck.date.split("T")[0] : new Date().toISOString().split("T")[0],
+        date: paycheck.date
+          ? paycheck.date.split("T")[0]
+          : new Date().toISOString().split("T")[0],
         description: `Paycheck from ${paycheck.payerName}`,
         amount: paycheck.amount,
         type: "income",
@@ -166,10 +187,9 @@ const storeInitializer = (set, get) => ({
         paycheckTransaction.envelopeId = "unassigned";
         paycheckTransaction.description += " (to unassigned cash)";
 
-        // Update unassigned cash and actual balance
+        // Update unassigned cash only (actual balance already updated above)
         set((state) => {
           state.unassignedCash = (state.unassignedCash || 0) + paycheck.amount;
-          state.actualBalance = (state.actualBalance || 0) + paycheck.amount;
         });
 
         // Create transaction for unassigned cash
@@ -202,7 +222,9 @@ const storeInitializer = (set, get) => ({
           (envelope) =>
             envelope.autoAllocate &&
             (envelope.envelopeType === "bill" ||
-              ["utilities", "insurance", "housing", "transportation"].includes(envelope.category))
+              ["utilities", "insurance", "housing", "transportation"].includes(
+                envelope.category,
+              )),
         );
 
         for (const envelope of billEnvelopes) {
@@ -210,7 +232,7 @@ const storeInitializer = (set, get) => ({
 
           const needed = Math.max(
             0,
-            (envelope.biweeklyAllocation || 0) - (envelope.currentBalance || 0)
+            (envelope.biweeklyAllocation || 0) - (envelope.currentBalance || 0),
           );
           const allocation = Math.min(needed, remainingAmount);
 
@@ -235,7 +257,9 @@ const storeInitializer = (set, get) => ({
 
             // Update envelope balance
             set((state) => {
-              const envIndex = state.envelopes.findIndex((e) => e.id === envelope.id);
+              const envIndex = state.envelopes.findIndex(
+                (e) => e.id === envelope.id,
+              );
               if (envIndex !== -1) {
                 state.envelopes[envIndex].currentBalance =
                   (state.envelopes[envIndex].currentBalance || 0) + allocation;
@@ -251,14 +275,18 @@ const storeInitializer = (set, get) => ({
           (envelope) =>
             envelope.autoAllocate &&
             envelope.envelopeType === "variable" &&
-            (envelope.monthlyBudget || 0) > 0
+            (envelope.monthlyBudget || 0) > 0,
         );
 
         for (const envelope of variableEnvelopes) {
           if (remainingAmount <= 0) break;
 
-          const biweeklyTarget = (envelope.monthlyBudget || 0) / BIWEEKLY_MULTIPLIER;
-          const needed = Math.max(0, biweeklyTarget - (envelope.currentBalance || 0));
+          const biweeklyTarget =
+            (envelope.monthlyBudget || 0) / BIWEEKLY_MULTIPLIER;
+          const needed = Math.max(
+            0,
+            biweeklyTarget - (envelope.currentBalance || 0),
+          );
           const allocation = Math.min(needed, remainingAmount);
 
           if (allocation > 0) {
@@ -282,7 +310,9 @@ const storeInitializer = (set, get) => ({
 
             // Update envelope balance
             set((state) => {
-              const envIndex = state.envelopes.findIndex((e) => e.id === envelope.id);
+              const envIndex = state.envelopes.findIndex(
+                (e) => e.id === envelope.id,
+              );
               if (envIndex !== -1) {
                 state.envelopes[envIndex].currentBalance =
                   (state.envelopes[envIndex].currentBalance || 0) + allocation;
@@ -314,14 +344,10 @@ const storeInitializer = (set, get) => ({
 
           // Update unassigned cash
           set((state) => {
-            state.unassignedCash = (state.unassignedCash || 0) + remainingAmount;
+            state.unassignedCash =
+              (state.unassignedCash || 0) + remainingAmount;
           });
         }
-
-        // Update actual balance with the full paycheck amount
-        set((state) => {
-          state.actualBalance = (state.actualBalance || 0) + paycheck.amount;
-        });
 
         // Save all transactions to Dexie and state
         for (const transaction of transactions) {
@@ -339,7 +365,9 @@ const storeInitializer = (set, get) => ({
         logger.info("Paycheck auto-allocated to envelopes", {
           amount: paycheck.amount,
           payerName: paycheck.payerName,
-          envelopeAllocations: transactions.filter((t) => t.envelopeId !== "unassigned").length,
+          envelopeAllocations: transactions.filter(
+            (t) => t.envelopeId !== "unassigned",
+          ).length,
           remainingToUnassigned: remainingAmount,
           totalTransactions: transactions.length,
         });
@@ -380,7 +408,9 @@ const storeInitializer = (set, get) => ({
 
     try {
       // Find the paycheck to delete
-      const paycheckIndex = state.paycheckHistory.findIndex((p) => p.id === paycheckId);
+      const paycheckIndex = state.paycheckHistory.findIndex(
+        (p) => p.id === paycheckId,
+      );
       if (paycheckIndex === -1) {
         throw new Error(`Paycheck with ID ${paycheckId} not found`);
       }
@@ -394,7 +424,8 @@ const storeInitializer = (set, get) => ({
             t.payerName === paycheck.payerName &&
             t.paycheckMode === paycheck.mode &&
             t.category?.includes("paycheck") &&
-            Math.abs(new Date(t.date) - new Date(paycheck.date)) < 24 * 60 * 60 * 1000 // Within 24 hours
+            Math.abs(new Date(t.date) - new Date(paycheck.date)) <
+              24 * 60 * 60 * 1000, // Within 24 hours
         ) || [];
 
       logger.info("Deleting paycheck and related transactions", {
@@ -410,16 +441,22 @@ const storeInitializer = (set, get) => ({
         if (transaction.envelopeId === "unassigned") {
           // Reverse unassigned cash
           set((state) => {
-            state.unassignedCash = Math.max(0, (state.unassignedCash || 0) - transaction.amount);
+            state.unassignedCash = Math.max(
+              0,
+              (state.unassignedCash || 0) - transaction.amount,
+            );
           });
         } else if (transaction.envelopeId) {
           // Reverse envelope balance
           set((state) => {
-            const envIndex = state.envelopes.findIndex((e) => e.id === transaction.envelopeId);
+            const envIndex = state.envelopes.findIndex(
+              (e) => e.id === transaction.envelopeId,
+            );
             if (envIndex !== -1) {
               state.envelopes[envIndex].currentBalance = Math.max(
                 0,
-                (state.envelopes[envIndex].currentBalance || 0) - transaction.amount
+                (state.envelopes[envIndex].currentBalance || 0) -
+                  transaction.amount,
               );
             }
           });
@@ -433,11 +470,13 @@ const storeInitializer = (set, get) => ({
       set((state) => {
         const transactionIds = relatedTransactions.map((t) => t.id);
         if (state.transactions) {
-          state.transactions = state.transactions.filter((t) => !transactionIds.includes(t.id));
+          state.transactions = state.transactions.filter(
+            (t) => !transactionIds.includes(t.id),
+          );
         }
         if (state.allTransactions) {
           state.allTransactions = state.allTransactions.filter(
-            (t) => !transactionIds.includes(t.id)
+            (t) => !transactionIds.includes(t.id),
           );
         }
       });
@@ -500,7 +539,11 @@ const storeInitializer = (set, get) => ({
       const { useAuth } = await import("./authStore");
       const authState = useAuth.getState();
 
-      if (!authState.encryptionKey || !authState.currentUser || !authState.budgetId) {
+      if (
+        !authState.encryptionKey ||
+        !authState.currentUser ||
+        !authState.budgetId
+      ) {
         logger.warn("Missing auth context for background sync", {
           hasEncryptionKey: !!authState.encryptionKey,
           hasCurrentUser: !!authState.currentUser,
@@ -510,7 +553,9 @@ const storeInitializer = (set, get) => ({
       }
 
       // Import and start the background sync service
-      const { default: CloudSyncService } = await import("../services/cloudSyncService");
+      const { default: CloudSyncService } = await import(
+        "../services/cloudSyncService"
+      );
       await CloudSyncService.start({
         encryptionKey: authState.encryptionKey,
         currentUser: authState.currentUser,
@@ -575,7 +620,10 @@ const storeInitializer = (set, get) => ({
 
       // Load data arrays directly to Dexie with ID validation
       if (importedData.envelopes?.length) {
-        const validEnvelopes = ensureValidIds(importedData.envelopes, "envelope");
+        const validEnvelopes = ensureValidIds(
+          importedData.envelopes,
+          "envelope",
+        );
         await budgetDb.bulkUpsertEnvelopes(validEnvelopes);
       }
 
@@ -598,17 +646,26 @@ const storeInitializer = (set, get) => ({
       }
 
       if (importedData.transactions?.length) {
-        const validTransactions = ensureValidIds(importedData.transactions, "transaction");
+        const validTransactions = ensureValidIds(
+          importedData.transactions,
+          "transaction",
+        );
         await budgetDb.bulkUpsertTransactions(validTransactions);
       }
 
       if (importedData.allTransactions?.length) {
-        const validAllTransactions = ensureValidIds(importedData.allTransactions, "transaction");
+        const validAllTransactions = ensureValidIds(
+          importedData.allTransactions,
+          "transaction",
+        );
         await budgetDb.bulkUpsertTransactions(validAllTransactions);
       }
 
       if (importedData.savingsGoals?.length) {
-        const validSavingsGoals = ensureValidIds(importedData.savingsGoals, "goal");
+        const validSavingsGoals = ensureValidIds(
+          importedData.savingsGoals,
+          "goal",
+        );
         await budgetDb.bulkUpsertSavingsGoals(validSavingsGoals);
       }
 
@@ -618,7 +675,10 @@ const storeInitializer = (set, get) => ({
       }
 
       if (importedData.paycheckHistory?.length) {
-        const validPaychecks = ensureValidIds(importedData.paycheckHistory, "paycheck");
+        const validPaychecks = ensureValidIds(
+          importedData.paycheckHistory,
+          "paycheck",
+        );
         await budgetDb.bulkUpsertPaychecks(validPaychecks);
       }
 
@@ -631,7 +691,8 @@ const storeInitializer = (set, get) => ({
       if (typeof importedData.actualBalance === "number")
         budgetMetadata.actualBalance = importedData.actualBalance;
       if (typeof importedData.isActualBalanceManual === "boolean")
-        budgetMetadata.isActualBalanceManual = importedData.isActualBalanceManual;
+        budgetMetadata.isActualBalanceManual =
+          importedData.isActualBalanceManual;
 
       if (Object.keys(budgetMetadata).length > 0) {
         await setBudgetMetadata(budgetMetadata);
@@ -657,7 +718,7 @@ const storeInitializer = (set, get) => ({
         window.dispatchEvent(
           new CustomEvent("importCompleted", {
             detail: { source: "loadData", dataLoaded: true },
-          })
+          }),
         );
         window.dispatchEvent(new CustomEvent("invalidateAllQueries"));
         logger.debug("Import cache invalidation events dispatched", {
@@ -690,7 +751,7 @@ const storeInitializer = (set, get) => ({
           await budgetDb.savingsGoals.clear();
           await budgetDb.debts.clear();
           await budgetDb.paychecks.clear();
-        }
+        },
       );
 
       // Reset UI state
@@ -731,11 +792,16 @@ const storeInitializer = (set, get) => ({
 
       // If we have no encrypted data saved yet, validate against the current auth salt
       if (!savedData && authState.salt) {
-        logger.auth("validatePassword: No saved data, validating against auth salt");
+        logger.auth(
+          "validatePassword: No saved data, validating against auth salt",
+        );
 
         try {
           const saltArray = new Uint8Array(authState.salt);
-          const testKey = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
+          const testKey = await encryptionUtils.deriveKeyFromSalt(
+            password,
+            saltArray,
+          );
 
           // Compare the derived key with the current encryption key if available
           if (authState.encryptionKey) {
@@ -748,7 +814,9 @@ const storeInitializer = (set, get) => ({
             return keysMatch;
           } else {
             // If no current key, just check if we can derive a key (basic validation)
-            logger.auth("validatePassword: No current key, basic validation passed");
+            logger.auth(
+              "validatePassword: No current key, basic validation passed",
+            );
             return true;
           }
         } catch (error) {
@@ -772,7 +840,10 @@ const storeInitializer = (set, get) => ({
         });
 
         // Try to derive the key with the provided password
-        const testKey = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
+        const testKey = await encryptionUtils.deriveKeyFromSalt(
+          password,
+          saltArray,
+        );
 
         logger.auth("validatePassword: Key derived successfully");
 
@@ -780,18 +851,25 @@ const storeInitializer = (set, get) => ({
         if (encryptedData) {
           try {
             await encryptionUtils.decrypt(encryptedData, testKey);
-            logger.auth("validatePassword: Decryption successful - password is correct");
+            logger.auth(
+              "validatePassword: Decryption successful - password is correct",
+            );
             return true;
           } catch (decryptError) {
-            logger.auth("validatePassword: Decryption failed - password is incorrect", {
-              error: decryptError.message,
-            });
+            logger.auth(
+              "validatePassword: Decryption failed - password is incorrect",
+              {
+                error: decryptError.message,
+              },
+            );
             return false;
           }
         }
 
         // Fallback: if no encrypted data to test, just check if key exists
-        logger.auth("validatePassword: No encrypted data to test, using fallback");
+        logger.auth(
+          "validatePassword: No encrypted data to test, using fallback",
+        );
         return !!testKey;
       }
 
@@ -808,10 +886,13 @@ const storeInitializer = (set, get) => ({
 
   // Legacy compatibility: Debt management moved to TanStack Query hooks
   setDebts: () => {
-    logger.warn("setDebts called - debts are now managed by TanStack Query/useDebts hook", {
-      source: "budgetStore.setDebts",
-      migration: "Use useDebts() hook instead",
-    });
+    logger.warn(
+      "setDebts called - debts are now managed by TanStack Query/useDebts hook",
+      {
+        source: "budgetStore.setDebts",
+        migration: "Use useDebts() hook instead",
+      },
+    );
   },
 });
 
@@ -838,8 +919,8 @@ if (LOCAL_ONLY_MODE) {
           dataLoaded: state.dataLoaded,
         }),
       }),
-      { name: "violet-vault-devtools" }
-    )
+      { name: "violet-vault-devtools" },
+    ),
   );
 }
 

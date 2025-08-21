@@ -4,7 +4,10 @@ import { useBudgetStore } from "../../stores/budgetStore";
 import { useEnvelopes } from "../../hooks/useEnvelopes";
 import { useBills } from "../../hooks/useBills";
 import { calculateBiweeklyNeeds } from "../../utils/budgeting";
-import { FREQUENCY_MULTIPLIERS, BIWEEKLY_MULTIPLIER } from "../../constants/categories";
+import {
+  FREQUENCY_MULTIPLIERS,
+  BIWEEKLY_MULTIPLIER,
+} from "../../constants/categories";
 import logger from "../../utils/logger";
 
 const useEnvelopeSystem = () => {
@@ -20,8 +23,12 @@ const useEnvelopeSystem = () => {
   const { bills = [], isLoading: billsLoading } = useBills();
 
   // Keep Zustand for non-migrated operations
-  const { unassignedCash, setEnvelopes, setBiweeklyAllocation, setUnassignedCash } =
-    useBudgetStore();
+  const {
+    unassignedCash,
+    setEnvelopes,
+    setBiweeklyAllocation,
+    setUnassignedCash,
+  } = useBudgetStore();
 
   const lastBillsRef = useRef(null);
   const isCalculatingRef = useRef(false);
@@ -29,7 +36,9 @@ const useEnvelopeSystem = () => {
   // Calculate biweekly allocation needs from bills using utility function
   const updateBiweeklyAllocations = useCallback(() => {
     if (isCalculatingRef.current) {
-      logger.debug("Skipping biweekly allocation update - calculation already in progress");
+      logger.debug(
+        "Skipping biweekly allocation update - calculation already in progress",
+      );
       return; // Prevent recursive calls
     }
 
@@ -63,10 +72,15 @@ const useEnvelopeSystem = () => {
       // Update each bill envelope's biweekly allocation
       bills.forEach((bill) => {
         if (bill.envelopeId) {
-          const envelopeIndex = updatedEnvelopes.findIndex((env) => env.id === bill.envelopeId);
+          const envelopeIndex = updatedEnvelopes.findIndex(
+            (env) => env.id === bill.envelopeId,
+          );
           if (envelopeIndex >= 0) {
             const envelope = updatedEnvelopes[envelopeIndex];
-            if (!envelope.biweeklyAllocation || envelope.biweeklyAllocation === 0) {
+            if (
+              !envelope.biweeklyAllocation ||
+              envelope.biweeklyAllocation === 0
+            ) {
               // Calculate this bill's biweekly amount
               const multiplier = FREQUENCY_MULTIPLIERS[bill.frequency] || 12;
               const annualAmount = bill.amount * multiplier;
@@ -114,7 +128,9 @@ const useEnvelopeSystem = () => {
   useEffect(() => {
     if (bills.length > 0 && JSON.stringify(bills) !== lastBillsRef.current) {
       logger.debug("Bills changed, triggering biweekly allocation update", {
-        previousBillsCount: lastBillsRef.current ? JSON.parse(lastBillsRef.current).length : 0,
+        previousBillsCount: lastBillsRef.current
+          ? JSON.parse(lastBillsRef.current).length
+          : 0,
         currentBillsCount: bills.length,
       });
       updateBiweeklyAllocations();
@@ -136,7 +152,7 @@ const useEnvelopeSystem = () => {
         return { success: false, error: error.message };
       }
     },
-    [addEnvelope]
+    [addEnvelope],
   );
 
   const modifyEnvelope = useCallback(
@@ -149,7 +165,7 @@ const useEnvelopeSystem = () => {
         return { success: false, error: error.message };
       }
     },
-    [updateEnvelope]
+    [updateEnvelope],
   );
 
   const removeEnvelope = useCallback(
@@ -162,7 +178,7 @@ const useEnvelopeSystem = () => {
         return { success: false, error: error.message };
       }
     },
-    [deleteEnvelope]
+    [deleteEnvelope],
   );
 
   return {
