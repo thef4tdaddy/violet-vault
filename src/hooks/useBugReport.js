@@ -111,144 +111,122 @@ const useBugReport = () => {
         ignoreElements: (element) => {
           return element.getAttribute("data-bug-report") === "true";
         },
-        // Skip problematic CSS properties that html2canvas can't parse
+        // Aggressive CSS cleanup to prevent oklch and other modern color function errors
         onclone: (clonedDoc) => {
           try {
-            // More aggressive CSS cleanup approach for screenshot compatibility
-            // Remove all existing stylesheets that could contain problematic color functions
-            const existingStyles = clonedDoc.querySelectorAll(
-              'style, link[rel="stylesheet"]',
+            logger.debug("Starting CSS cleanup for screenshot compatibility");
+
+            // Step 1: Remove ALL external stylesheets completely
+            const externalStyles = clonedDoc.querySelectorAll(
+              'link[rel="stylesheet"]',
             );
-            existingStyles.forEach((style) => {
-              // Remove all stylesheets to avoid any color function parsing issues
-              // We'll replace them with safe equivalents below
+            externalStyles.forEach((link) => {
+              logger.debug("Removing external stylesheet:", link.href);
+              link.remove();
+            });
+
+            // Step 2: Remove ALL existing style tags (including Tailwind/Vite injected styles)
+            const styleTags = clonedDoc.querySelectorAll("style");
+            styleTags.forEach((style, index) => {
               logger.debug(
-                "Removing stylesheet with unsupported color functions for screenshot",
-                style.href || "inline",
+                `Removing style tag ${index}:`,
+                style.textContent?.substring(0, 100) + "...",
               );
               style.remove();
             });
 
-            // Also remove any computed styles that might contain modern CSS
+            // Step 3: Remove any inline styles that might contain modern CSS
             const allElements = clonedDoc.querySelectorAll("*");
+            let cleanedInlineStyles = 0;
             allElements.forEach((element) => {
-              // Remove any style attributes that might contain problematic CSS
-              const style = element.getAttribute("style");
-              if (
-                style &&
-                (style.includes("oklch") ||
-                  style.includes("color(") ||
-                  style.includes("lab(") ||
-                  style.includes("lch("))
-              ) {
-                element.removeAttribute("style");
-                logger.debug(
-                  "Removed problematic inline style for screenshot compatibility",
+              const inlineStyle = element.getAttribute("style");
+              if (inlineStyle) {
+                // Check for ANY modern CSS feature that might cause parsing issues
+                const problematicFeatures = [
+                  "oklch",
+                  "lch",
+                  "lab",
+                  "color(",
+                  "color-mix(",
+                  "light-dark(",
+                  "@container",
+                  "@supports",
+                  ":has(",
+                  ":is(",
+                  ":where(",
+                  "clamp(",
+                  "min(",
+                  "max(",
+                  "var(--",
+                  "accent-color",
+                  "backdrop-filter",
+                  "filter:",
+                  "-webkit-backdrop-filter",
+                ];
+
+                const hasProblematic = problematicFeatures.some((feature) =>
+                  inlineStyle.toLowerCase().includes(feature.toLowerCase()),
                 );
+
+                if (hasProblematic) {
+                  element.removeAttribute("style");
+                  cleanedInlineStyles++;
+                }
               }
             });
+            logger.debug(
+              `Cleaned ${cleanedInlineStyles} inline styles with problematic CSS`,
+            );
 
-            // Add comprehensive safe style override
-            const style = clonedDoc.createElement("style");
-            style.textContent = `
-              /* Safe color fallbacks for screenshot compatibility */
+            // Step 4: Remove CSS custom properties from document root
+            const root = clonedDoc.documentElement;
+            if (root) {
+              root.removeAttribute("style");
+              // Also remove any CSS custom property classes that Tailwind might have added
+              const classList = Array.from(root.classList);
+              classList.forEach((className) => {
+                if (className.includes("--") || className.startsWith("tw-")) {
+                  root.classList.remove(className);
+                }
+              });
+            }
+
+            // Step 5: Add minimal, safe CSS that won't cause parsing errors
+            const safeStyle = clonedDoc.createElement("style");
+            safeStyle.textContent = `
+              /* Ultra-minimal safe CSS for screenshot - no modern features */
+              body { 
+                font-family: Arial, sans-serif; 
+                color: #333333; 
+                background-color: #ffffff;
+                margin: 8px;
+              }
+              
+              /* Basic element styling */
+              h1, h2, h3, h4, h5, h6 { color: #1f2937; }
+              button { 
+                background-color: #f3f4f6; 
+                border: 1px solid #d1d5db; 
+                padding: 4px 8px;
+                color: #374151;
+              }
+              
+              /* Remove all advanced CSS that could cause parsing issues */
               * {
-                /* Reset any problematic color functions and advanced CSS features */
-                filter: none !important;
-                backdrop-filter: none !important;
-                color-scheme: unset !important;
-                accent-color: unset !important;
-                /* Force simple color values to avoid modern color function parsing */
-                color: inherit !important;
-                background-color: transparent !important;
-                border-color: transparent !important;
+                filter: none;
+                backdrop-filter: none;
+                box-shadow: none;
+                text-shadow: none;
+                background-image: none;
+                transform: none;
+                transition: none;
+                animation: none;
               }
-              
-              /* Reset any CSS custom properties that might contain color functions */
-              :root, * {
-                --tw-ring-color: transparent !important;
-                --tw-ring-offset-color: transparent !important;
-                --tw-shadow-color: transparent !important;
-                --tw-border-opacity: 1 !important;
-                --tw-bg-opacity: 1 !important;
-                --tw-text-opacity: 1 !important;
-              }
-              
-              /* Tailwind color mappings to safe RGB values */
-              .text-white, [class*="text-white"] { color: rgb(255, 255, 255) !important; }
-              .text-black, [class*="text-black"] { color: rgb(0, 0, 0) !important; }
-              .text-gray-50 { color: rgb(249, 250, 251) !important; }
-              .text-gray-100 { color: rgb(243, 244, 246) !important; }
-              .text-gray-200 { color: rgb(229, 231, 235) !important; }
-              .text-gray-300 { color: rgb(209, 213, 219) !important; }
-              .text-gray-400 { color: rgb(156, 163, 175) !important; }
-              .text-gray-500 { color: rgb(107, 114, 128) !important; }
-              .text-gray-600 { color: rgb(75, 85, 99) !important; }
-              .text-gray-700 { color: rgb(55, 65, 81) !important; }
-              .text-gray-800 { color: rgb(31, 41, 55) !important; }
-              .text-gray-900 { color: rgb(17, 24, 39) !important; }
-              
-              .text-purple-500 { color: rgb(168, 85, 247) !important; }
-              .text-purple-600 { color: rgb(147, 51, 234) !important; }
-              .text-purple-700 { color: rgb(126, 34, 206) !important; }
-              
-              .text-red-500 { color: rgb(239, 68, 68) !important; }
-              .text-red-600 { color: rgb(220, 38, 38) !important; }
-              
-              .text-green-500 { color: rgb(34, 197, 94) !important; }
-              .text-green-600 { color: rgb(22, 163, 74) !important; }
-              
-              .text-blue-500 { color: rgb(59, 130, 246) !important; }
-              .text-blue-600 { color: rgb(37, 99, 235) !important; }
-              
-              .text-yellow-500 { color: rgb(234, 179, 8) !important; }
-              .text-amber-600 { color: rgb(217, 119, 6) !important; }
-              
-              .text-emerald-600 { color: rgb(5, 150, 105) !important; }
-              .text-cyan-600 { color: rgb(8, 145, 178) !important; }
-              .text-orange-600 { color: rgb(234, 88, 12) !important; }
-              
-              /* Background colors */
-              .bg-white { background-color: rgb(255, 255, 255) !important; }
-              .bg-gray-50 { background-color: rgb(249, 250, 251) !important; }
-              .bg-gray-100 { background-color: rgb(243, 244, 246) !important; }
-              .bg-gray-200 { background-color: rgb(229, 231, 235) !important; }
-              
-              .bg-purple-50 { background-color: rgb(250, 245, 255) !important; }
-              .bg-purple-100 { background-color: rgb(243, 232, 255) !important; }
-              .bg-purple-400 { background-color: rgb(196, 181, 253) !important; }
-              .bg-purple-500 { background-color: rgb(168, 85, 247) !important; }
-              .bg-purple-600 { background-color: rgb(147, 51, 234) !important; }
-              
-              .bg-red-50 { background-color: rgb(254, 242, 242) !important; }
-              .bg-red-500 { background-color: rgb(239, 68, 68) !important; }
-              
-              .bg-green-50 { background-color: rgb(240, 253, 244) !important; }
-              .bg-emerald-50 { background-color: rgb(236, 253, 245) !important; }
-              
-              .bg-blue-50 { background-color: rgb(239, 246, 255) !important; }
-              .bg-amber-50 { background-color: rgb(255, 251, 235) !important; }
-              
-              /* Gradients - convert to solid colors for compatibility */
-              .bg-gradient-to-br { background-image: none !important; }
-              .from-purple-400 { background-color: rgb(196, 181, 253) !important; }
-              .via-purple-500 { background-color: rgb(168, 85, 247) !important; }
-              .to-indigo-600 { background-color: rgb(79, 70, 229) !important; }
-              
-              /* Border colors */
-              .border-white { border-color: rgb(255, 255, 255) !important; }
-              .border-gray-200 { border-color: rgb(229, 231, 235) !important; }
-              .border-gray-300 { border-color: rgb(209, 213, 219) !important; }
-              .border-purple-200 { border-color: rgb(221, 214, 254) !important; }
-              .border-emerald-200 { border-color: rgb(167, 243, 208) !important; }
-              .border-red-200 { border-color: rgb(254, 202, 202) !important; }
-              .border-amber-200 { border-color: rgb(253, 230, 138) !important; }
-              .border-blue-200 { border-color: rgb(191, 219, 254) !important; }
-              .border-orange-500 { border-color: rgb(249, 115, 22) !important; }
             `;
-            clonedDoc.head.appendChild(style);
+            clonedDoc.head.appendChild(safeStyle);
+            logger.debug("Added minimal safe CSS for screenshot compatibility");
           } catch (error) {
-            logger.warn("Failed to apply screenshot color fixes:", error);
+            logger.warn("Failed to apply CSS cleanup for screenshots:", error);
           }
         },
       });
@@ -911,72 +889,69 @@ const useBugReport = () => {
   };
 
   const openModal = () => {
-    // Ensure Highlight.io session is active when opening bug report modal
+    // Simplified Highlight.io session management to avoid conflicts
     try {
-      // Enhanced session management to handle conflicts better
+      // Only check if we need to start a session, don't try to stop/restart existing ones
       if (typeof H.isRecording === "function") {
         // Modern SDK with isRecording method
         if (!H.isRecording()) {
-          H.start();
-          if (import.meta.env.MODE === "development") {
-            logger.debug("Started Highlight.io session for bug report");
+          try {
+            H.start();
+            if (import.meta.env.MODE === "development") {
+              logger.debug("Started new Highlight.io session for bug report");
+            }
+          } catch (startError) {
+            // If start fails, session might already be active - that's fine
+            if (import.meta.env.MODE === "development") {
+              logger.debug(
+                "Highlight.io start failed (session may already be active):",
+                startError.message,
+              );
+            }
           }
         } else {
           if (import.meta.env.MODE === "development") {
-            logger.debug("Highlight.io session already active");
+            logger.debug(
+              "Highlight.io session already active - using existing session",
+            );
           }
         }
-      } else {
-        // Older SDK or no isRecording method - handle gracefully
+      } else if (typeof H.start === "function") {
+        // Older SDK - only try to start if no session management available
         try {
-          // First try to stop any existing session, then start fresh
-          if (typeof H.stop === "function") {
-            try {
-              H.stop();
-              if (import.meta.env.MODE === "development") {
-                logger.debug("Stopped existing Highlight.io session");
-              }
-            } catch (stopError) {
-              // Ignore stop errors - session might not be active
-              if (import.meta.env.MODE === "development") {
-                logger.debug("No existing session to stop:", stopError.message);
-              }
-            }
-          }
-
-          // Now start fresh session
-          H.start();
-          if (import.meta.env.MODE === "development") {
-            logger.debug("Started fresh Highlight.io session for bug report");
-          }
-        } catch (startError) {
-          if (startError.message?.includes("already recording")) {
+          // Check if H object has any indication of existing session
+          if (
+            typeof H.getSessionMetadata === "function" ||
+            typeof H.getSessionURL === "function"
+          ) {
+            // Session likely exists, don't try to start new one
             if (import.meta.env.MODE === "development") {
               logger.debug(
-                "Highlight.io session still active after stop attempt",
+                "Using existing Highlight.io session (no isRecording method available)",
               );
             }
           } else {
-            throw startError; // Re-throw unexpected errors
+            // No clear session indication, try to start
+            H.start();
+            if (import.meta.env.MODE === "development") {
+              logger.debug(
+                "Started Highlight.io session (no session detection available)",
+              );
+            }
+          }
+        } catch (error) {
+          // Any error in starting is fine - session might already exist
+          if (import.meta.env.MODE === "development") {
+            logger.debug("Highlight.io start attempt ignored:", error.message);
           }
         }
       }
     } catch (error) {
-      // Enhanced error handling for session conflicts
-      if (
-        error.message?.includes("already recording") ||
-        error.message?.includes("Highlight is already recording")
-      ) {
-        if (import.meta.env.MODE === "development") {
-          logger.debug(
-            "Highlight.io session already active (gracefully handled)",
-          );
-        }
-        // This is expected - don't log as error
-      } else {
-        logger.warn("Failed to manage Highlight.io session:", error.message);
-        // Don't block the bug report modal from opening due to Highlight issues
+      // Don't log session management errors as warnings - they're expected
+      if (import.meta.env.MODE === "development") {
+        logger.debug("Highlight.io session management info:", error.message);
       }
+      // Don't block the bug report modal from opening due to Highlight issues
     }
     setIsModalOpen(true);
   };
