@@ -25,7 +25,9 @@ const useAuthFlow = () => {
   const handleSetup = useCallback(
     async (userData) => {
       logger.auth("Layout handleSetup called", { hasUserData: !!userData });
-      logger.auth("🚨 DEBUG VERSION 2: useAuthFlow.js with debug logging is running!");
+      logger.auth(
+        "🚨 DEBUG VERSION 2: useAuthFlow.js with debug logging is running!",
+      );
       try {
         // ALWAYS generate budgetId deterministically from password for cross-device sync
         const { encryptionUtils } = await import("../utils/encryption");

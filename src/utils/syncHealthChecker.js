@@ -224,10 +224,11 @@ export const runImmediateSyncHealthCheck = async () => {
 
     // Test that ChunkedFirebaseSync class exists and has required methods
     // Don't actually initialize it to avoid interfering with real sync operations
-    if (typeof chunkedFirebaseSync.initialize === 'function' && 
-        typeof chunkedFirebaseSync.saveToCloud === 'function' &&
-        typeof chunkedFirebaseSync.loadFromCloud === 'function') {
-      
+    if (
+      typeof chunkedFirebaseSync.initialize === "function" &&
+      typeof chunkedFirebaseSync.saveToCloud === "function" &&
+      typeof chunkedFirebaseSync.loadFromCloud === "function"
+    ) {
       results.tests.push({
         name: "Chunked Firebase Init",
         status: "✅ PASSED",

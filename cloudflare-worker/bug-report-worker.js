@@ -136,9 +136,11 @@ async function processBugReport(bugReport, env) {
   if (screenshot) {
     try {
       screenshotUrl = await storeScreenshot(screenshot, env);
-      console.log(`Screenshot storage result: ${screenshotUrl ? 'success' : 'failed'}`);
+      console.log(
+        `Screenshot storage result: ${screenshotUrl ? "success" : "failed"}`,
+      );
     } catch (error) {
-      console.error('Screenshot storage error:', error);
+      console.error("Screenshot storage error:", error);
       screenshotUrl = null;
     }
   }
@@ -533,30 +535,28 @@ async function getMilestones(env) {
 
     // Current milestone logic: prefer closest due date, fallback to highest version
     let currentMilestone = processedMilestones[0]; // Default fallback
-    
+
     // Find milestone with closest due date (if any have due dates)
-    const milestonesWithDueDate = processedMilestones.filter(m => m.due_on);
+    const milestonesWithDueDate = processedMilestones.filter((m) => m.due_on);
     if (milestonesWithDueDate.length > 0) {
       const now = new Date();
-      currentMilestone = milestonesWithDueDate
-        .sort((a, b) => {
-          const aDiff = Math.abs(new Date(a.due_on) - now);
-          const bDiff = Math.abs(new Date(b.due_on) - now);
-          return aDiff - bDiff; // Closest due date first
-        })[0];
+      currentMilestone = milestonesWithDueDate.sort((a, b) => {
+        const aDiff = Math.abs(new Date(a.due_on) - now);
+        const bDiff = Math.abs(new Date(b.due_on) - now);
+        return aDiff - bDiff; // Closest due date first
+      })[0];
     } else {
       // No due dates available, use highest version number (most recent)
-      currentMilestone = processedMilestones
-        .sort((a, b) => {
-          const aVersion = a.version.split(".").map(Number);
-          const bVersion = b.version.split(".").map(Number);
-          for (let i = 0; i < Math.max(aVersion.length, bVersion.length); i++) {
-            const aPart = aVersion[i] || 0;
-            const bPart = bVersion[i] || 0;
-            if (aPart !== bPart) return bPart - aPart; // Highest version first
-          }
-          return 0;
-        })[0];
+      currentMilestone = processedMilestones.sort((a, b) => {
+        const aVersion = a.version.split(".").map(Number);
+        const bVersion = b.version.split(".").map(Number);
+        for (let i = 0; i < Math.max(aVersion.length, bVersion.length); i++) {
+          const aPart = aVersion[i] || 0;
+          const bPart = bVersion[i] || 0;
+          if (aPart !== bPart) return bPart - aPart; // Highest version first
+        }
+        return 0;
+      })[0];
     }
 
     return {
@@ -1219,9 +1219,11 @@ async function createGitHubIssue(data, env) {
   // Generate smart labels and get milestone info
   const smartLabels = await generateSmartLabels(description, reportEnv);
   console.log(`Generated smart labels: ${JSON.stringify(smartLabels)}`);
-  
+
   const milestoneInfo = await getMilestones(env);
-  console.log(`Milestone info: ${JSON.stringify({ success: milestoneInfo.success, current: milestoneInfo.current?.title })}`);
+  console.log(
+    `Milestone info: ${JSON.stringify({ success: milestoneInfo.success, current: milestoneInfo.current?.title })}`,
+  );
 
   // Prepare issue data
   const issueData = {
@@ -1241,9 +1243,9 @@ async function createGitHubIssue(data, env) {
           "User-Agent": "VioletVault-BugReporter/1.0",
           Accept: "application/vnd.github.v3+json",
         },
-      }
+      },
     );
-    
+
     if (response.ok) {
       const allMilestones = await response.json();
       const targetMilestone = allMilestones.find(
@@ -1251,25 +1253,29 @@ async function createGitHubIssue(data, env) {
       );
       if (targetMilestone) {
         issueData.milestone = targetMilestone.number;
-        console.log(`Assigned bug report to milestone: ${targetMilestone.title} (#${targetMilestone.number})`);
+        console.log(
+          `Assigned bug report to milestone: ${targetMilestone.title} (#${targetMilestone.number})`,
+        );
       } else {
         console.log(`Milestone not found: ${milestoneInfo.current.title}`);
       }
     } else {
-      console.log('Failed to fetch milestones for assignment');
+      console.log("Failed to fetch milestones for assignment");
     }
   } else {
-    console.log('No milestone info available for bug report assignment');
+    console.log("No milestone info available for bug report assignment");
   }
 
   // Create the GitHub issue
-  console.log(`Creating GitHub issue with data: ${JSON.stringify({
-    title: issueData.title,
-    labels: issueData.labels,
-    milestone: issueData.milestone,
-    hasScreenshot: !!screenshotUrl
-  })}`);
-  
+  console.log(
+    `Creating GitHub issue with data: ${JSON.stringify({
+      title: issueData.title,
+      labels: issueData.labels,
+      milestone: issueData.milestone,
+      hasScreenshot: !!screenshotUrl,
+    })}`,
+  );
+
   const response = await fetch(
     `https://api.github.com/repos/${env.GITHUB_REPO}/issues`,
     {
