@@ -8,10 +8,14 @@ import SupplementalAccounts from "../accounts/SupplementalAccounts";
 import PaycheckProcessor from "../budgeting/PaycheckProcessor";
 import BillManager from "../bills/BillManager";
 import TransactionLedger from "../transactions/TransactionLedger";
-import ChartsAndAnalytics from "../analytics/ChartsAndAnalytics";
-import DebtDashboard from "../debt/DebtDashboard";
-import AutoFundingView from "../automation/AutoFundingView";
-import ActivityFeed from "../activity/ActivityFeed";
+const ChartsAndAnalytics = React.lazy(
+  () => import("../analytics/ChartsAndAnalytics"),
+);
+const DebtDashboard = React.lazy(() => import("../debt/DebtDashboard"));
+const AutoFundingView = React.lazy(
+  () => import("../automation/AutoFundingView"),
+);
+const ActivityFeed = React.lazy(() => import("../activity/ActivityFeed"));
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ErrorBoundary } from "@highlight-run/react";
 import {
@@ -335,15 +339,29 @@ const ViewRenderer = ({
       />
     ),
     analytics: (
-      <ChartsAndAnalytics
-        transactions={safeTransactions}
-        envelopes={envelopes || []}
-        currentUser={currentUser}
-      />
+      <Suspense fallback={<LoadingSpinner />}>
+        <ChartsAndAnalytics
+          transactions={safeTransactions}
+          envelopes={envelopes || []}
+          currentUser={currentUser}
+        />
+      </Suspense>
     ),
-    debts: <DebtDashboard />,
-    automation: <AutoFundingView />,
-    activity: <ActivityFeed />,
+    debts: (
+      <Suspense fallback={<LoadingSpinner />}>
+        <DebtDashboard />
+      </Suspense>
+    ),
+    automation: (
+      <Suspense fallback={<LoadingSpinner />}>
+        <AutoFundingView />
+      </Suspense>
+    ),
+    activity: (
+      <Suspense fallback={<LoadingSpinner />}>
+        <ActivityFeed />
+      </Suspense>
+    ),
   };
 
   return (
