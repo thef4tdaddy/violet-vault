@@ -18,6 +18,7 @@ import {
   PAYMENT_FREQUENCIES,
 } from "../../../constants/debts";
 import { useEnvelopes } from "../../../hooks/useEnvelopes";
+import useBills from "../../../hooks/useBills";
 import logger from "../../../utils/logger";
 
 /**
@@ -56,8 +57,9 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
     showToasts: true,
   });
 
-  // Get envelopes for dropdown selection using TanStack Query
+  // Get envelopes and bills for dropdown selection using TanStack Query
   const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
+  const { bills = [], isLoading: billsLoading } = useBills();
   const [formData, setFormData] = useState({
     name: debt?.name || "",
     creditor: debt?.creditor || "",
@@ -82,6 +84,16 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
   // Update form data when debt prop changes
   React.useEffect(() => {
     if (debt) {
+      // Determine payment method based on existing connections
+      let paymentMethod = "create_new";
+      if (connectedBill && connectedEnvelope) {
+        paymentMethod = "connect_existing_bill"; // Bill connection takes precedence
+      } else if (connectedBill) {
+        paymentMethod = "connect_existing_bill";
+      } else if (connectedEnvelope || debt.envelopeId) {
+        paymentMethod = "connect_existing";
+      }
+
       setFormData({
         name: debt.name || "",
         creditor: debt.creditor || "",
@@ -93,10 +105,10 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
         paymentFrequency: debt.paymentFrequency || PAYMENT_FREQUENCIES.MONTHLY,
         paymentDueDate: debt.paymentDueDate || "",
         notes: debt.notes || "",
-        paymentMethod: "create_new",
+        paymentMethod: paymentMethod,
         createBill: false, // Don't auto-create bill when editing
-        envelopeId: debt.envelopeId || "",
-        existingBillId: debt.relatedBill?.id || "",
+        envelopeId: debt.envelopeId || connectedEnvelope?.id || "",
+        existingBillId: connectedBill?.id || "",
       });
     } else if (!debt && isOpen) {
       // Reset form for new debt
@@ -117,9 +129,20 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
         existingBillId: "",
       });
     }
-  }, [debt, isOpen]);
+  }, [debt, isOpen, connectedBill, connectedEnvelope]);
 
   if (!isOpen) return null;
+
+  // Find connected bill and envelope for this debt
+  const connectedBill =
+    isEditMode && debt?.id
+      ? bills.find((bill) => bill.debtId === debt.id)
+      : null;
+  const connectedEnvelope = connectedBill
+    ? envelopes.find((env) => env.id === connectedBill.envelopeId)
+    : debt?.envelopeId
+      ? envelopes.find((env) => env.id === debt.envelopeId)
+      : null;
 
   const validateForm = () => {
     const newErrors = {};
@@ -175,6 +198,14 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
         originalBalance: formData.originalBalance
           ? parseFloat(formData.originalBalance)
           : parseFloat(formData.currentBalance), // Default to current balance if not specified
+        // Include connection data for the parent component to handle
+        connectionData: {
+          paymentMethod: formData.paymentMethod,
+          createBill: formData.createBill,
+          envelopeId: formData.envelopeId || "",
+          existingBillId: formData.existingBillId || "",
+          newEnvelopeName: formData.newEnvelopeName || "",
+        },
       };
 
       if (isEditMode) {
@@ -526,11 +557,85 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
             </div>
           </div>
 
+          {/* Existing Connections Display */}
+          {isEditMode && (connectedBill || connectedEnvelope) && (
+            <div className="space-y-4">
+              <h4 className="font-medium text-gray-900 flex items-center">
+                <Receipt className="h-4 w-4 mr-2 text-blue-600" />
+                Current Connections
+              </h4>
+
+              <div className="glassmorphism rounded-xl p-4 border border-blue-200 bg-blue-50">
+                <div className="space-y-3">
+                  {connectedBill && (
+                    <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                      <div className="flex items-center">
+                        <Receipt className="h-4 w-4 mr-2 text-blue-600" />
+                        <div>
+                          <div className="font-medium text-gray-900">
+                            Connected Bill
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {connectedBill.name} • $
+                            {connectedBill.amount?.toFixed(2) || "0.00"}
+                            {connectedBill.dueDate && (
+                              <span className="ml-2">
+                                • Due:{" "}
+                                {new Date(
+                                  connectedBill.dueDate,
+                                ).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
+                        Auto-synced
+                      </div>
+                    </div>
+                  )}
+
+                  {connectedEnvelope && (
+                    <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                      <div className="flex items-center">
+                        <Wallet className="h-4 w-4 mr-2 text-purple-600" />
+                        <div>
+                          <div className="font-medium text-gray-900">
+                            Connected Envelope
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {connectedEnvelope.name} • $
+                            {connectedEnvelope.currentBalance?.toFixed(2) ||
+                              "0.00"}{" "}
+                            available
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-xs text-purple-600 bg-purple-100 px-2 py-1 rounded-full">
+                        Funding source
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-3 p-2 bg-blue-100 rounded-lg">
+                  <p className="text-xs text-blue-700">
+                    <strong>Note:</strong> These connections sync automatically.
+                    Changes to the bill's due date or amount will update this
+                    debt.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Envelope & Bill Integration */}
           <div className="space-y-4">
             <h4 className="font-medium text-gray-900 flex items-center">
               <Wallet className="h-4 w-4 mr-2 text-purple-600" />
-              Payment Setup
+              {isEditMode && (connectedBill || connectedEnvelope)
+                ? "Update Payment Setup"
+                : "Payment Setup"}
             </h4>
 
             {/* Payment Method Radio Buttons */}
@@ -567,7 +672,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                 </div>
               </div>
 
-              {/* Connect Existing Option */}
+              {/* Connect Existing Envelope Option */}
               <div className="glassmorphism border-2 border-white/20 rounded-xl p-3">
                 <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
                   <input
@@ -593,6 +698,38 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                     </div>
                     <p className="text-xs text-gray-600 leading-tight">
                       Use an existing envelope to fund this debt payment
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Connect Existing Bill Option */}
+              <div className="glassmorphism border-2 border-white/20 rounded-xl p-3">
+                <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
+                  <input
+                    type="radio"
+                    id="connect_existing_bill"
+                    name="paymentMethod"
+                    value="connect_existing_bill"
+                    checked={formData.paymentMethod === "connect_existing_bill"}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        paymentMethod: e.target.value,
+                      })
+                    }
+                    className="w-4 h-4 text-blue-600 mt-0.5 justify-self-start"
+                  />
+                  <div>
+                    <div className="flex items-center mb-1">
+                      <Receipt className="h-4 w-4 mr-2 text-blue-600" />
+                      <span className="font-medium text-sm">
+                        Connect to existing bill
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-600 leading-tight">
+                      Link to an existing bill and auto-sync due dates and
+                      amounts
                     </p>
                   </div>
                 </div>
@@ -661,6 +798,49 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                   </select>
                   <p className="mt-1 text-xs text-gray-500">
                     Choose which existing envelope will fund the debt payments
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Connect Existing Bill: Bill Selection */}
+            {formData.paymentMethod === "connect_existing_bill" && (
+              <div className="space-y-4 pl-7 border-l-2 border-blue-200">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Existing Bill
+                  </label>
+                  <select
+                    value={formData.existingBillId}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        existingBillId: e.target.value,
+                      })
+                    }
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    disabled={billsLoading}
+                  >
+                    <option value="">
+                      {billsLoading
+                        ? "Loading bills..."
+                        : "Select existing bill..."}
+                    </option>
+                    {!billsLoading &&
+                      bills
+                        .filter((bill) => !bill.debtId) // Only show bills not already linked to debts
+                        .map((bill) => (
+                          <option key={bill.id} value={bill.id}>
+                            📋 {bill.name} (${bill.amount?.toFixed(2) || "0.00"}
+                            {bill.dueDate &&
+                              ` • Due: ${new Date(bill.dueDate).toLocaleDateString()}`}
+                            )
+                          </option>
+                        ))}
+                  </select>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Choose which existing bill to link to this debt. The bill's
+                    due date and amount will sync automatically.
                   </p>
                 </div>
               </div>
