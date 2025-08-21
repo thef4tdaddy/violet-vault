@@ -376,14 +376,8 @@ const storeInitializer = (set, get) => ({
         // All paycheck goes to unassigned cash
         newUnassignedCash = currentUnassignedCash + paycheck.amount;
       } else if (paycheck.mode === "allocate") {
-        // Only remaining amount goes to unassigned cash (calculate from transactions)
-        const unassignedTransaction = transactions.find(
-          (t) => t.envelopeId === "unassigned",
-        );
-        if (unassignedTransaction) {
-          newUnassignedCash =
-            currentUnassignedCash + unassignedTransaction.amount;
-        }
+        // Only remaining amount goes to unassigned cash (already calculated as remainingAmount)
+        newUnassignedCash = currentUnassignedCash + remainingAmount;
       }
 
       // Update budget metadata in Dexie with correct values
