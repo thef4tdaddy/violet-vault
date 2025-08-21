@@ -1,7 +1,7 @@
 # VioletVault Source Code Directory
 
-**Last Updated:** August 8, 2025  
-**Branch:** develop (v1.8.0 completed, v1.9.0 in progress)
+**Last Updated:** August 21, 2025  
+**Branch:** develop (v1.9.0 completed - Security & Compliance)
 
 This document provides a comprehensive overview of the `/src/` directory structure and the purpose of each file and folder.
 
@@ -17,18 +17,16 @@ This document provides a comprehensive overview of the `/src/` directory structu
 
 ## 🖼️ Assets Directory (`/assets/`)
 
-**Status:** ⚠️ Contains unused assets that need cleanup
+**Status:** ✅ **CLEAN** - Assets have been properly organized
 
-| File                                  | Purpose                            | Status             | Used In         |
-| ------------------------------------- | ---------------------------------- | ------------------ | --------------- |
-| `Logo 1024x1024.webp`                 | ❌ **UNUSED** - Old logo format    | Should be removed  | None            |
-| `Logo Only 1024x1024.png`             | ✅ **ACTIVE** - Logo without text  | Used in UserSetup  | `UserSetup.jsx` |
-| `Logo and Text with Black Border.png` | ❌ **UNUSED** - Logo variant       | Should be removed  | None            |
-| `Logo with Text Final.png`            | ✅ **ACTIVE** - Final logo version | Used in Header     | `Header.jsx`    |
-| `favicon.ico`                         | ✅ **ACTIVE** - Browser favicon    | Used in HTML       | `index.html`    |
-| `logo-512x512.png`                    | ✅ **ACTIVE** - App logo           | Used for PWA/icons | Build system    |
+| File                        | Purpose                            | Status    | Used In      |
+| --------------------------- | ---------------------------------- | --------- | ------------ |
+| `Shield Text Logo.webp`     | ✅ **ACTIVE** - Main logo with text | Active    | Header       |
+| `favicon.ico`              | ✅ **ACTIVE** - Browser favicon    | Active    | HTML         |
+| `icon-512x512.png`         | ✅ **ACTIVE** - PWA icon           | Active    | PWA manifest |
+| `logo-512x512.png`         | ✅ **ACTIVE** - App logo           | Active    | Build system |
 
-**Cleanup Required:** Remove unused logo files (`Logo 1024x1024.webp` and `Logo and Text with Black Border.png`) to reduce bundle size.
+**Cleanup Status:** ✅ Assets directory is now clean and optimized
 
 ## 🧩 Components Directory (`/components/`)
 
@@ -55,12 +53,42 @@ _Main application views/pages_
 
 _User authentication and profile management_
 
-| Component                 | Purpose                               |
-| ------------------------- | ------------------------------------- |
-| `ChangePasswordModal.jsx` | Password change modal interface       |
-| `ProfileSettings.jsx`     | User profile settings and preferences |
-| `UserIndicator.jsx`       | Current user display component        |
-| `UserSetup.jsx`           | Initial user setup and onboarding     |
+| Component                     | Purpose                                      |
+| ----------------------------- | -------------------------------------------- |
+| `AuthGateway.jsx`             | Authentication routing and access control    |
+| `ChangePasswordModal.jsx`     | Password change modal interface              |
+| `KeyManagementSettings.jsx`   | Encryption key management interface          |
+| `LocalOnlyModeSettings.jsx`   | Local-only mode configuration                |
+| `LocalOnlySetup.jsx`          | Setup wizard for local-only operation       |
+| `ProfileSettings.jsx`         | User profile settings and preferences        |
+| `UserIndicator.jsx`           | Current user display component               |
+| `UserSetup.jsx`               | Initial user setup and onboarding           |
+
+### **Accounts** (`/accounts/`)
+
+_Account management and tracking_
+
+| Component                  | Purpose                                |
+| -------------------------- | -------------------------------------- |
+| `SupplementalAccounts.jsx` | Additional account management with edit locking |
+
+### **Activity** (`/activity/`) - **NEW in v1.9.0**
+
+_Budget history and activity tracking_
+
+| Component         | Purpose                                          |
+| ----------------- | ------------------------------------------------ |
+| `ActivityFeed.jsx` | Level 1 Budget History - chronological activity list |
+
+### **Automation** (`/automation/`) - **NEW in v1.9.0**
+
+_Auto-funding rules and intelligent budgeting_
+
+| Component                    | Purpose                                    |
+| ---------------------------- | ------------------------------------------ |
+| `AutoFundingDashboard.jsx`   | Dashboard for auto-funding rule management |
+| `AutoFundingRuleBuilder.jsx` | Interface for creating auto-funding rules  |
+| `AutoFundingView.jsx`        | Main view for auto-funding features       |
 
 ### **Budgeting** (`/budgeting/`)
 
@@ -68,6 +96,7 @@ _Envelope budgeting system components_
 
 | Component                      | Purpose                                 |
 | ------------------------------ | --------------------------------------- |
+| `BillEnvelopeFundingInfo.jsx`  | Bill-to-envelope funding information    |
 | `CashFlowSummary.jsx`          | Cash flow overview and analysis         |
 | `CreateEnvelopeModal.jsx`      | Modal for creating new budget envelopes |
 | `EditEnvelopeModal.jsx`        | Modal for editing existing envelopes    |
@@ -76,6 +105,25 @@ _Envelope budgeting system components_
 | `PaycheckProcessor.jsx`        | Paycheck allocation and processing      |
 | `PaydayPrediction.jsx`         | Payday prediction and notifications     |
 | `SmartEnvelopeSuggestions.jsx` | AI-driven envelope creation suggestions |
+
+#### **Envelope Subcomponents** (`/budgeting/envelope/`)
+
+| Component                     | Purpose                              |
+| ----------------------------- | ------------------------------------ |
+| `EnvelopeHeader.jsx`          | Header component for envelope views  |
+| `EnvelopeHistoryModal.jsx`    | Modal showing envelope change history |
+| `EnvelopeItem.jsx`            | Individual envelope display component |
+| `EnvelopeSummary.jsx`         | Summary view of envelope data        |
+| `UnassignedCashEnvelope.jsx`  | Special envelope for unassigned cash |
+
+#### **Budgeting Shared Components** (`/budgeting/shared/`)
+
+| Component                     | Purpose                                   |
+| ----------------------------- | ----------------------------------------- |
+| `AllocationModeSelector.jsx`  | Selector for envelope allocation modes    |
+| `BillConnectionSelector.jsx`  | Bill-to-envelope connection interface     |
+| `EnvelopeTypeSelector.jsx`    | Envelope type selection component        |
+| `FrequencySelector.jsx`       | Frequency selection for budgeting items  |
 
 ### **Bills Management** (`/bills/`)
 
