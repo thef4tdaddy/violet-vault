@@ -33,17 +33,14 @@ const BudgetHistoryViewer = ({ onClose }) => {
     isError: hasError,
     error,
     stats: statistics,
-    statsLoading,
     restore,
     exportHistory,
-    clearHistory,
-    refetch,
   } = useBudgetHistory({ limit: 50 });
 
   const [selectedCommit, setSelectedCommit] = useState(null);
   const [expandedCommits, setExpandedCommits] = useState(new Set());
   const [filter, setFilter] = useState({ author: "all", limit: 50 });
-  const [integrityCheck, setIntegrityCheck] = useState(null);
+  const [integrityCheck] = useState(null);
   const [showIntegrityDetails, setShowIntegrityDetails] = useState(false);
 
   // Get commit details for selected commit

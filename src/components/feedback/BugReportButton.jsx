@@ -21,7 +21,6 @@ const BugReportButton = () => {
     setScreenshot,
     submitReport,
     previewScreenshot,
-    captureScreenshot,
   } = useBugReport();
 
   const { addToast } = useToast();
