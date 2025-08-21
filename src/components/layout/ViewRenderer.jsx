@@ -11,6 +11,7 @@ import TransactionLedger from "../transactions/TransactionLedger";
 import ChartsAndAnalytics from "../analytics/ChartsAndAnalytics";
 import DebtDashboard from "../debt/DebtDashboard";
 import AutoFundingView from "../automation/AutoFundingView";
+import ActivityFeed from "../activity/ActivityFeed";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ErrorBoundary } from "@highlight-run/react";
 import {
@@ -342,6 +343,7 @@ const ViewRenderer = ({
     ),
     debts: <DebtDashboard />,
     automation: <AutoFundingView />,
+    activity: <ActivityFeed />,
   };
 
   return (

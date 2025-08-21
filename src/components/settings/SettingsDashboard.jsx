@@ -21,9 +21,7 @@ import logger from "../../utils/logger";
 
 // Lazy load heavy components
 const ChangePasswordModal = lazy(() => import("../auth/ChangePasswordModal"));
-const BudgetHistoryViewer = lazy(
-  () => import("../history/BudgetHistoryViewer"),
-);
+const ActivityFeed = lazy(() => import("../activity/ActivityFeed"));
 const LocalOnlyModeSettings = lazy(
   () => import("../auth/LocalOnlyModeSettings"),
 );
@@ -52,7 +50,7 @@ const SettingsDashboard = ({
 }) => {
   const [activeSection, setActiveSection] = useState("general");
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [showActivityFeed, setShowActivityFeed] = useState(false);
   const [showLocalOnlySettings, setShowLocalOnlySettings] = useState(false);
   const [showSecuritySettings, setShowSecuritySettings] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
@@ -346,14 +344,14 @@ const SettingsDashboard = ({
 
             <div className="space-y-4">
               <button
-                onClick={() => setShowHistoryModal(true)}
+                onClick={() => setShowActivityFeed(true)}
                 className="w-full flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <History className="h-5 w-5 text-gray-600 mr-3" />
                 <div className="text-left">
-                  <p className="font-medium text-gray-900">View History</p>
+                  <p className="font-medium text-gray-900">Activity History</p>
                   <p className="text-sm text-gray-500">
-                    Browse budget change history
+                    View recent budget activities and changes
                   </p>
                 </div>
               </button>
@@ -539,8 +537,20 @@ const SettingsDashboard = ({
           />
         )}
 
-        {showHistoryModal && (
-          <BudgetHistoryViewer onClose={() => setShowHistoryModal(false)} />
+        {showActivityFeed && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-60">
+            <div className="bg-white rounded-xl w-full max-w-6xl max-h-[90vh] overflow-hidden shadow-2xl relative">
+              <button
+                onClick={() => setShowActivityFeed(false)}
+                className="absolute top-4 right-4 z-10 text-gray-400 hover:text-gray-600 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-lg hover:shadow-xl transition-all border border-gray-200"
+              >
+                <X className="h-5 w-5" />
+              </button>
+              <div className="p-6 overflow-y-auto max-h-[calc(90vh-48px)]">
+                <ActivityFeed />
+              </div>
+            </div>
+          </div>
         )}
 
         {showLocalOnlySettings && (

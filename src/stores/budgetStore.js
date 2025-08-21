@@ -3,6 +3,7 @@ import { subscribeWithSelector } from "zustand/middleware";
 import { persist, devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { budgetDb, setBudgetMetadata } from "../db/budgetDb.js";
+import activityLogger from "../services/activityLogger.js";
 import logger from "../utils/logger.js";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
@@ -380,6 +381,13 @@ const storeInitializer = (set, get) => ({
         payerName: paycheck.payerName,
       });
 
+      // Log paycheck processing activity
+      try {
+        await activityLogger.logPaycheckProcessed(paycheck);
+      } catch (logError) {
+        logger.warn("Failed to log paycheck activity:", logError);
+      }
+
       return paycheckTransaction;
     } catch (error) {
       logger.error("Failed to process paycheck", error, {
@@ -485,6 +493,13 @@ const storeInitializer = (set, get) => ({
         payerName: paycheck.payerName,
         deletedTransactions: relatedTransactions.length,
       });
+
+      // Log paycheck deletion activity
+      try {
+        await activityLogger.logPaycheckDeleted(paycheck);
+      } catch (logError) {
+        logger.warn("Failed to log paycheck deletion activity:", logError);
+      }
 
       return true;
     } catch (error) {
