@@ -8,6 +8,7 @@ import {
   TrendingUp,
   Clock,
   CheckCircle,
+  Trash2,
 } from "lucide-react";
 import { BILL_CATEGORIES, ENVELOPE_TYPES } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
@@ -17,6 +18,7 @@ const PaycheckProcessor = ({
   envelopes = [],
   paycheckHistory = [],
   onProcessPaycheck,
+  onDeletePaycheck,
   currentUser,
 }) => {
   const [paycheckAmount, setPaycheckAmount] = useState("");
@@ -24,6 +26,7 @@ const PaycheckProcessor = ({
   const [allocationMode, setAllocationMode] = useState("allocate"); // 'allocate' or 'leftover'
   const [isProcessing, setIsProcessing] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [deletingPaycheckId, setDeletingPaycheckId] = useState(null);
 
   const calculateAllocation = () => {
     const amount = parseFloat(paycheckAmount) || 0;
@@ -124,6 +127,28 @@ const PaycheckProcessor = ({
       alert("Failed to process paycheck");
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const handleDeletePaycheck = async (paycheck) => {
+    if (!onDeletePaycheck) return;
+
+    const confirmed = window.confirm(
+      `Are you sure you want to delete the paycheck from ${paycheck.payerName} for $${paycheck.amount.toFixed(2)}? This will reverse all related transactions and cannot be undone.`,
+    );
+
+    if (!confirmed) return;
+
+    setDeletingPaycheckId(paycheck.id);
+
+    try {
+      await onDeletePaycheck(paycheck.id);
+      logger.debug("Paycheck deleted:", paycheck.id);
+    } catch (error) {
+      logger.error("Failed to delete paycheck:", error);
+      alert("Failed to delete paycheck. Please try again.");
+    } finally {
+      setDeletingPaycheckId(null);
     }
   };
 
@@ -401,14 +426,30 @@ const PaycheckProcessor = ({
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="font-bold text-2xl text-emerald-600">
-                    ${paycheck.amount.toFixed(2)}
-                  </div>
-                  {paycheck.leftoverAmount !== undefined && (
-                    <div className="text-sm text-gray-600">
-                      +${paycheck.leftoverAmount.toFixed(2)} unassigned
+                <div className="flex items-center space-x-4">
+                  <div className="text-right">
+                    <div className="font-bold text-2xl text-emerald-600">
+                      ${paycheck.amount.toFixed(2)}
                     </div>
+                    {paycheck.leftoverAmount !== undefined && (
+                      <div className="text-sm text-gray-600">
+                        +${paycheck.leftoverAmount.toFixed(2)} unassigned
+                      </div>
+                    )}
+                  </div>
+                  {onDeletePaycheck && (
+                    <button
+                      onClick={() => handleDeletePaycheck(paycheck)}
+                      disabled={deletingPaycheckId === paycheck.id}
+                      className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-xl transition-colors disabled:opacity-50"
+                      title="Delete paycheck"
+                    >
+                      {deletingPaycheckId === paycheck.id ? (
+                        <div className="animate-spin h-5 w-5 border-2 border-red-500 border-t-transparent rounded-full" />
+                      ) : (
+                        <Trash2 className="h-5 w-5" />
+                      )}
+                    </button>
                   )}
                 </div>
               </div>
