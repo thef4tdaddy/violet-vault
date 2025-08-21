@@ -51,7 +51,6 @@ const UnifiedEnvelopeManager = ({
   // Use TanStack Query for unassigned cash
   const {
     unassignedCash: tanStackUnassignedCash,
-    isLoading: unassignedCashLoading,
   } = useUnassignedCash();
 
   // Keep Zustand for non-migrated operations and fallbacks

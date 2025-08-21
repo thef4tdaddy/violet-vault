@@ -16,7 +16,6 @@ const DebtDetailModal = ({
   debt,
   isOpen,
   onClose,
-  onUpdate,
   onDelete,
   onRecordPayment,
   onLinkToBill,
