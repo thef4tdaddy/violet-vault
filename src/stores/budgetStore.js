@@ -171,6 +171,9 @@ const storeInitializer = (set, get) => ({
       const currentActualBalance = currentMetadata?.actualBalance || 0;
       const currentUnassignedCash = currentMetadata?.unassignedCash || 0;
 
+      // Track remaining amount for unassigned cash calculation
+      let remainingAmount = 0;
+
       // Create transaction for the paycheck income
       const paycheckTransaction = {
         id: `paycheck_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -188,6 +191,7 @@ const storeInitializer = (set, get) => ({
 
       if (paycheck.mode === "leftover") {
         // All money goes to unassigned cash
+        remainingAmount = paycheck.amount;
         paycheckTransaction.envelopeId = "unassigned";
         paycheckTransaction.description += " (to unassigned cash)";
 
@@ -211,7 +215,7 @@ const storeInitializer = (set, get) => ({
         });
       } else if (paycheck.mode === "allocate") {
         // Auto-allocate to envelopes based on allocation logic
-        let remainingAmount = paycheck.amount;
+        remainingAmount = paycheck.amount;
         const transactions = [];
         const BIWEEKLY_MULTIPLIER = 2.17; // From PaycheckProcessor
 
