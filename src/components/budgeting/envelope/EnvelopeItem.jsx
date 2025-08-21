@@ -75,9 +75,19 @@ const EnvelopeItem = ({
       {/* Header */}
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1">
-          <h3 className="font-semibold text-gray-900 truncate">
-            {envelope.name}
-          </h3>
+          <div className="flex items-center gap-2">
+            {/* Color indicator */}
+            {envelope.color && (
+              <div
+                className="w-3 h-3 rounded-full flex-shrink-0"
+                style={{ backgroundColor: envelope.color }}
+                title={`Color: ${envelope.color}`}
+              />
+            )}
+            <h3 className="font-semibold text-gray-900 truncate">
+              {envelope.name}
+            </h3>
+          </div>
           <p className="text-xs text-gray-600 mt-1">{envelope.category}</p>
         </div>
 
