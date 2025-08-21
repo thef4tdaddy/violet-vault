@@ -16,7 +16,7 @@ Please review and update the following in **develop** branch:
 
 - [ ] Run a dependency health check (`npm outdated` and `npx npm-check-updates`).
 - [ ] Assess which updates are **worth** doing this cycle (security, bugfix, perf, TypeScript types, build tooling). Note breaking changes.
-- [ ] If updating, create/label issues and link them here; otherwise record rationale in `/docs/milestones.md` under this milestone.
+- [ ] If updating, create seperate branch for update, test, then merge into develop before release; otherwise record rationale in `/docs/milestones.md` under this milestone.
 - [ ] After updates, run CI locally: `npm run build && npm test && npm run typecheck`.
 
 ### 📝 Documentation audit
