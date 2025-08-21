@@ -390,6 +390,112 @@ const storeInitializer = (set, get) => ({
     }
   },
 
+  // Delete paycheck and reverse its transactions
+  deletePaycheck: async (paycheckId) => {
+    const state = get();
+
+    try {
+      // Find the paycheck to delete
+      const paycheckIndex = state.paycheckHistory.findIndex(
+        (p) => p.id === paycheckId,
+      );
+      if (paycheckIndex === -1) {
+        throw new Error(`Paycheck with ID ${paycheckId} not found`);
+      }
+
+      const paycheck = state.paycheckHistory[paycheckIndex];
+
+      // Find and delete related transactions
+      const relatedTransactions =
+        state.allTransactions?.filter(
+          (t) =>
+            t.payerName === paycheck.payerName &&
+            t.paycheckMode === paycheck.mode &&
+            t.category?.includes("paycheck") &&
+            Math.abs(new Date(t.date) - new Date(paycheck.date)) <
+              24 * 60 * 60 * 1000, // Within 24 hours
+        ) || [];
+
+      logger.info("Deleting paycheck and related transactions", {
+        paycheckId,
+        payerName: paycheck.payerName,
+        amount: paycheck.amount,
+        mode: paycheck.mode,
+        relatedTransactions: relatedTransactions.length,
+      });
+
+      // Reverse transactions (update balances)
+      for (const transaction of relatedTransactions) {
+        if (transaction.envelopeId === "unassigned") {
+          // Reverse unassigned cash
+          set((state) => {
+            state.unassignedCash = Math.max(
+              0,
+              (state.unassignedCash || 0) - transaction.amount,
+            );
+          });
+        } else if (transaction.envelopeId) {
+          // Reverse envelope balance
+          set((state) => {
+            const envIndex = state.envelopes.findIndex(
+              (e) => e.id === transaction.envelopeId,
+            );
+            if (envIndex !== -1) {
+              state.envelopes[envIndex].currentBalance = Math.max(
+                0,
+                (state.envelopes[envIndex].currentBalance || 0) -
+                  transaction.amount,
+              );
+            }
+          });
+        }
+
+        // Delete transaction from Dexie
+        await budgetDb.transactions.delete(transaction.id);
+      }
+
+      // Remove transactions from state
+      set((state) => {
+        const transactionIds = relatedTransactions.map((t) => t.id);
+        if (state.transactions) {
+          state.transactions = state.transactions.filter(
+            (t) => !transactionIds.includes(t.id),
+          );
+        }
+        if (state.allTransactions) {
+          state.allTransactions = state.allTransactions.filter(
+            (t) => !transactionIds.includes(t.id),
+          );
+        }
+      });
+
+      // Remove paycheck from history
+      set((state) => {
+        state.paycheckHistory.splice(paycheckIndex, 1);
+      });
+
+      // Update budget metadata in Dexie
+      await setBudgetMetadata({
+        unassignedCash: get().unassignedCash,
+        actualBalance: get().actualBalance,
+      });
+
+      logger.info("Paycheck deleted successfully", {
+        paycheckId,
+        payerName: paycheck.payerName,
+        deletedTransactions: relatedTransactions.length,
+      });
+
+      return true;
+    } catch (error) {
+      logger.error("Failed to delete paycheck", error, {
+        paycheckId,
+        source: "deletePaycheck",
+      });
+      throw error;
+    }
+  },
+
   // Data loading state
   setDataLoaded: (loaded) =>
     set((state) => {

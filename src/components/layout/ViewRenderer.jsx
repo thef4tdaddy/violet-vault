@@ -58,6 +58,7 @@ const ViewRenderer = ({
     addEnvelope,
     updateEnvelope,
     processPaycheck,
+    deletePaycheck,
     addTransaction,
     addTransactions,
     updateTransaction: _updateTransaction,
@@ -182,6 +183,7 @@ const ViewRenderer = ({
         envelopes={envelopes}
         paycheckHistory={paycheckHistory}
         onProcessPaycheck={processPaycheck}
+        onDeletePaycheck={deletePaycheck}
         currentUser={currentUser}
       />
     ),
