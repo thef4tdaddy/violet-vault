@@ -160,11 +160,13 @@ const DebtDetailModal = ({
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
               <div>
-                <p className="text-blue-600">Time to Payoff</p>
+                <p className="text-blue-600">Expected Payoff</p>
                 <p className="font-semibold text-blue-900">
-                  {debt.payoffInfo.monthsToPayoff
-                    ? `${debt.payoffInfo.monthsToPayoff} months`
-                    : "N/A"}
+                  {debt.payoffInfo.payoffDate
+                    ? new Date(debt.payoffInfo.payoffDate).toLocaleDateString()
+                    : debt.payoffInfo.monthsToPayoff
+                      ? `${debt.payoffInfo.monthsToPayoff} months`
+                      : "Insufficient data"}
                 </p>
               </div>
               <div>

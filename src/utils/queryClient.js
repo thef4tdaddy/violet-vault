@@ -354,9 +354,9 @@ export const optimisticHelpers = {
       );
     }
 
-    // Persist to Dexie
+    // Persist to Dexie (use put to handle duplicate IDs gracefully)
     try {
-      await budgetDb.transactions.add(newTransaction);
+      await budgetDb.transactions.put(newTransaction);
     } catch (error) {
       logger.warn("Failed to persist transaction to Dexie", {
         error: error.message,

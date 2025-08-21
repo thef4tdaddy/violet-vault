@@ -313,8 +313,8 @@ const useBills = (options = {}) => {
         createdAt: new Date().toISOString(),
       };
 
-      // Add transaction to Dexie
-      await budgetDb.transactions.add(paymentTransaction);
+      // Add transaction to Dexie (use put to handle duplicates)
+      await budgetDb.transactions.put(paymentTransaction);
       await optimisticHelpers.addTransaction(paymentTransaction);
 
       // If bill is linked to envelope, update envelope balance

@@ -31,15 +31,7 @@ const TransactionLedger = ({
 
   const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
 
-  // Debug logging for transaction data
-  logger.debug("TransactionLedger Debug:", {
-    transactionsCount: transactions.length,
-    transactionsLoading,
-    transactions: transactions.slice(0, 3), // Show first 3 for debugging
-    envelopesCount: envelopes.length,
-    envelopesLoading,
-    envelopes: envelopes.slice(0, 3), // Show first 3 envelopes for debugging
-  });
+  // Removed excessive debug logging that was spamming console (issue #463)
 
   // Keep Zustand for legacy operations not yet migrated
   const budget = useBudgetStore();

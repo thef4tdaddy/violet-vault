@@ -265,7 +265,7 @@ const useEnvelopes = (options = {}) => {
         createdAt: new Date().toISOString(),
       };
 
-      await budgetDb.transactions.add(transaction);
+      await budgetDb.transactions.put(transaction);
 
       // Apply optimistic updates to cache
       await optimisticHelpers.updateEnvelope(fromEnvelopeId, {
