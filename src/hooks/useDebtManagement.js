@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import useDebts from "./useDebts";
 import useBills from "./useBills";
 import useEnvelopes from "./useEnvelopes";
@@ -158,21 +158,50 @@ export const useDebtManagement = () => {
     return newDebt;
   };
 
+  // Sync debt due dates with connected bills
+  const syncDebtDueDates = () => {
+    debts.forEach((debt) => {
+      const relatedBill = bills.find((bill) => bill.debtId === debt.id);
+      if (
+        relatedBill &&
+        relatedBill.dueDate &&
+        debt.paymentDueDate !== relatedBill.dueDate
+      ) {
+        logger.debug("Syncing debt due date with connected bill", {
+          debtId: debt.id,
+          debtName: debt.name,
+          oldDueDate: debt.paymentDueDate,
+          newDueDate: relatedBill.dueDate,
+          billId: relatedBill.id,
+        });
+
+        updateDebt({
+          id: debt.id,
+          updates: {
+            paymentDueDate: relatedBill.dueDate,
+          },
+        });
+      }
+    });
+  };
+
   // Update debt and maintain relationships
   const updateDebtData = (debtId, updates) => {
     const debt = debts.find((d) => d.id === debtId);
     if (!debt) return;
 
     const updatedDebt = { ...debt, ...updates };
-    updateDebt(updatedDebt);
+    updateDebt({ id: debtId, updates });
 
     // Update related bill if payment amount changed
     if (updates.minimumPayment !== undefined) {
       const relatedBill = bills.find((bill) => bill.debtId === debtId);
       if (relatedBill) {
         updateBill({
-          ...relatedBill,
-          amount: updates.minimumPayment,
+          id: relatedBill.id,
+          updates: {
+            amount: updates.minimumPayment,
+          },
         });
       }
     }
@@ -267,6 +296,13 @@ export const useDebtManagement = () => {
       );
   };
 
+  // Auto-sync debt due dates when bills change
+  useEffect(() => {
+    if (bills.length > 0 && debts.length > 0) {
+      syncDebtDueDates();
+    }
+  }, [bills]);
+
   return {
     // Data
     debts: enrichedDebts,
@@ -280,6 +316,7 @@ export const useDebtManagement = () => {
     deleteDebt,
     recordPayment,
     linkDebtToBill,
+    syncDebtDueDates,
 
     // Utilities
     getUpcomingPayments,
