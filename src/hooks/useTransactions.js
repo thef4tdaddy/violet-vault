@@ -21,12 +21,10 @@ const useTransactions = (options = {}) => {
     sortOrder = "desc",
   } = options;
 
-  // Get Zustand store for mutations
+  // Get Zustand store for UI state only (transactions are managed by TanStack Query → Dexie)
   const {
     transactions: zustandTransactions,
     allTransactions: zustandAllTransactions,
-    addTransaction: zustandAddTransaction,
-    reconcileTransaction: zustandReconcileTransaction,
   } = useBudgetStore();
 
   // TanStack Query function - hydrates from Dexie, Dexie syncs with Firebase
@@ -207,11 +205,11 @@ const useTransactions = (options = {}) => {
         amount: transactionData.amount || 0,
       };
 
-      // Apply optimistic update
+      // Apply optimistic update and save to Dexie
       await optimisticHelpers.addTransaction(newTransaction);
 
-      // Call Zustand mutation
-      zustandAddTransaction(newTransaction);
+      // Save to Dexie (single source of truth for transactions)
+      await budgetDb.transactions.put(newTransaction);
 
       return newTransaction;
     },
@@ -240,11 +238,11 @@ const useTransactions = (options = {}) => {
         reconciledAt: new Date().toISOString(),
       };
 
-      // Call Zustand mutation
-      zustandReconcileTransaction(reconciledTransaction);
-
-      // Apply optimistic update
+      // Apply optimistic update and save to Dexie
       await optimisticHelpers.addTransaction(reconciledTransaction);
+
+      // Save to Dexie (single source of truth for transactions)
+      await budgetDb.transactions.put(reconciledTransaction);
 
       return reconciledTransaction;
     },
@@ -266,6 +264,9 @@ const useTransactions = (options = {}) => {
     mutationFn: async (transactionId) => {
       // Apply optimistic update using helper
       await optimisticHelpers.removeTransaction(transactionId);
+
+      // Delete from Dexie (single source of truth for transactions)
+      await budgetDb.transactions.delete(transactionId);
 
       return transactionId;
     },
@@ -289,13 +290,18 @@ const useTransactions = (options = {}) => {
   const updateTransactionMutation = useMutation({
     mutationKey: ["transactions", "update"],
     mutationFn: async ({ id, updates }) => {
-      // Apply optimistic update using helper
-      await optimisticHelpers.updateTransaction(id, {
+      const updatedTransaction = {
         ...updates,
         updatedAt: new Date().toISOString(),
-      });
+      };
 
-      return { id, updates };
+      // Apply optimistic update using helper
+      await optimisticHelpers.updateTransaction(id, updatedTransaction);
+
+      // Update in Dexie (single source of truth for transactions)
+      await budgetDb.transactions.update(id, updatedTransaction);
+
+      return { id, updates: updatedTransaction };
     },
     onSuccess: () => {
       // Invalidate related queries
