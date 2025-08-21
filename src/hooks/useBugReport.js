@@ -82,7 +82,19 @@ const useBugReport = () => {
       // Fallback to html2canvas (original method)
       const html2canvas = (await import("html2canvas")).default;
 
-      const screenshotPromise = html2canvas(document.body, {
+      // Try simpler approach first - capture just the main content area
+      let targetElement = document.body;
+
+      // Look for main content container to avoid capturing complex layouts
+      const mainContent = document.querySelector(
+        'main, [role="main"], .main-content, .app, #root, #app',
+      );
+      if (mainContent && mainContent.offsetParent !== null) {
+        targetElement = mainContent;
+        logger.debug("Using main content element for screenshot capture");
+      }
+
+      const screenshotPromise = html2canvas(targetElement, {
         useCORS: true,
         logging: false,
         scale: isMobile ? 0.3 : 0.5, // Even smaller scale for mobile
@@ -281,15 +293,80 @@ const useBugReport = () => {
       } catch (fallbackError) {
         logger.warn("Fallback screenshot also failed:", fallbackError.message);
 
-        // Inform user about manual screenshot alternatives
-        logger.info("📸 Screenshot auto-capture failed. Manual alternatives:", {
-          desktop: "Use Ctrl+Shift+S (Windows/Linux) or Cmd+Shift+4 (Mac)",
-          mobile: "Use device screenshot gesture or settings menu",
-          browser: "Browser dev tools or extensions can capture screenshots",
-        });
+        // Try one more super-simple approach with canvas-based screenshot
+        try {
+          logger.debug("Attempting canvas-based screenshot as final fallback");
 
-        // Return null instead of throwing - this allows the bug report to continue without screenshot
-        return null;
+          // Create a simple canvas representation of the viewport
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+
+          // Set canvas size to viewport size
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+
+          // Fill with white background
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          // Add a simple text representation
+          ctx.fillStyle = "#333333";
+          ctx.font = "16px Arial, sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText("VioletVault App Screenshot", canvas.width / 2, 50);
+          ctx.fillText(
+            `Page: ${window.location.pathname}`,
+            canvas.width / 2,
+            80,
+          );
+          ctx.fillText(
+            `Timestamp: ${new Date().toLocaleString()}`,
+            canvas.width / 2,
+            110,
+          );
+          ctx.fillText(
+            "(Automatic screenshot capture failed)",
+            canvas.width / 2,
+            140,
+          );
+
+          // Try to get page title or main content
+          const pageTitle = document.title || "Unknown Page";
+          ctx.fillText(`Title: ${pageTitle}`, canvas.width / 2, 170);
+
+          // Add basic app state information
+          const activeTab = document.querySelector(
+            '[aria-current="page"], .border-t-2.border-purple-500',
+          );
+          if (activeTab) {
+            ctx.fillText(
+              `Active Section: ${activeTab.textContent?.trim() || "Unknown"}`,
+              canvas.width / 2,
+              200,
+            );
+          }
+
+          const fallbackDataUrl = canvas.toDataURL("image/png", 0.8);
+          setScreenshot(fallbackDataUrl);
+          logger.info("Canvas-based fallback screenshot created successfully");
+          return fallbackDataUrl;
+        } catch (canvasError) {
+          logger.warn("Canvas fallback also failed:", canvasError.message);
+
+          // Inform user about manual screenshot alternatives
+          logger.info(
+            "📸 Screenshot auto-capture failed. Manual alternatives:",
+            {
+              desktop: "Use Ctrl+Shift+S (Windows/Linux) or Cmd+Shift+4 (Mac)",
+              mobile: "Use device screenshot gesture or settings menu",
+              browser:
+                "Browser dev tools or extensions can capture screenshots",
+            },
+          );
+
+          // Return null instead of throwing - this allows the bug report to continue without screenshot
+          return null;
+        }
       }
     }
   };
@@ -327,10 +404,12 @@ const useBugReport = () => {
         // Get Highlight.io session URL for the bug report
         let sessionUrl = null;
         try {
-          // Enhanced session URL retrieval with better error handling
+          // Enhanced session URL retrieval with better error handling and promise support
           if (typeof H.getSessionMetadata === "function") {
             try {
-              const sessionMetadata = H.getSessionMetadata();
+              const sessionMetadata = await Promise.resolve(
+                H.getSessionMetadata(),
+              );
               if (sessionMetadata?.sessionUrl) {
                 sessionUrl = String(sessionMetadata.sessionUrl);
               } else if (sessionMetadata?.url) {
@@ -344,8 +423,25 @@ const useBugReport = () => {
           // Fallback methods if primary method failed
           if (!sessionUrl && typeof H.getSessionURL === "function") {
             try {
-              const rawUrl = H.getSessionURL();
-              sessionUrl = typeof rawUrl === "string" ? rawUrl : String(rawUrl);
+              const rawUrl = await Promise.resolve(H.getSessionURL());
+              // Check if it's a promise object that wasn't properly awaited
+              if (
+                rawUrl &&
+                typeof rawUrl === "object" &&
+                rawUrl.constructor.name === "Promise"
+              ) {
+                logger.warn(
+                  "getSessionURL returned unresolved promise, attempting to resolve",
+                );
+                const resolvedUrl = await rawUrl;
+                sessionUrl =
+                  typeof resolvedUrl === "string"
+                    ? resolvedUrl
+                    : String(resolvedUrl);
+              } else {
+                sessionUrl =
+                  typeof rawUrl === "string" ? rawUrl : String(rawUrl);
+              }
             } catch (urlError) {
               logger.warn("getSessionURL failed:", urlError.message);
             }
@@ -353,7 +449,7 @@ const useBugReport = () => {
 
           if (!sessionUrl && typeof H.getSession === "function") {
             try {
-              const session = H.getSession();
+              const session = await Promise.resolve(H.getSession());
               const rawUrl =
                 session?.url || session?.sessionUrl || session?.replayUrl;
               sessionUrl = rawUrl ? String(rawUrl) : null;
@@ -365,11 +461,29 @@ const useBugReport = () => {
           // Additional fallback for newer SDK versions
           if (!sessionUrl && typeof H.getCurrentSessionURL === "function") {
             try {
-              const currentUrl = H.getCurrentSessionURL();
-              sessionUrl =
-                typeof currentUrl === "string"
-                  ? currentUrl
-                  : String(currentUrl);
+              const currentUrl = await Promise.resolve(
+                H.getCurrentSessionURL(),
+              );
+              // Handle case where this might return a promise
+              if (
+                currentUrl &&
+                typeof currentUrl === "object" &&
+                currentUrl.constructor.name === "Promise"
+              ) {
+                logger.warn(
+                  "getCurrentSessionURL returned unresolved promise, attempting to resolve",
+                );
+                const resolvedUrl = await currentUrl;
+                sessionUrl =
+                  typeof resolvedUrl === "string"
+                    ? resolvedUrl
+                    : String(resolvedUrl);
+              } else {
+                sessionUrl =
+                  typeof currentUrl === "string"
+                    ? currentUrl
+                    : String(currentUrl);
+              }
             } catch (currentError) {
               logger.warn("getCurrentSessionURL failed:", currentError.message);
             }
