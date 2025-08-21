@@ -1,4 +1,3 @@
-import { firestore } from "../utils/firebase";
 import {
   collection,
   doc,
@@ -9,8 +8,15 @@ import {
   where,
   onSnapshot,
   serverTimestamp,
+  getFirestore,
 } from "firebase/firestore";
+import { initializeApp } from "firebase/app";
+import { firebaseConfig } from "../utils/firebaseConfig";
 import logger from "../utils/logger";
+
+// Initialize Firebase app and firestore instance
+const app = initializeApp(firebaseConfig);
+const firestore = getFirestore(app);
 
 /**
  * Cross-browser edit locking service
