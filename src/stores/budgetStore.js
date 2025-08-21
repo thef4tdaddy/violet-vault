@@ -166,9 +166,10 @@ const storeInitializer = (set, get) => ({
         paycheckTransaction.envelopeId = "unassigned";
         paycheckTransaction.description += " (to unassigned cash)";
 
-        // Update unassigned cash
+        // Update unassigned cash and actual balance
         set((state) => {
           state.unassignedCash = (state.unassignedCash || 0) + paycheck.amount;
+          state.actualBalance = (state.actualBalance || 0) + paycheck.amount;
         });
 
         // Create transaction for unassigned cash
@@ -316,6 +317,11 @@ const storeInitializer = (set, get) => ({
             state.unassignedCash = (state.unassignedCash || 0) + remainingAmount;
           });
         }
+
+        // Update actual balance with the full paycheck amount
+        set((state) => {
+          state.actualBalance = (state.actualBalance || 0) + paycheck.amount;
+        });
 
         // Save all transactions to Dexie and state
         for (const transaction of transactions) {

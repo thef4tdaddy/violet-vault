@@ -27,8 +27,8 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
   const { unassignedCash } = useUnassignedCash();
   const { actualBalance } = useActualBalance();
 
-  // Get updateBill from TanStack Query hook instead of budget store
-  const { updateBill: tanStackUpdateBill } = useBills();
+  // Get bill operations from TanStack Query hook instead of budget store
+  const { updateBill: tanStackUpdateBill, addBill: tanStackAddBill } = useBills();
 
   const {
     envelopes,
@@ -55,7 +55,6 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
     addTransactions,
     updateTransaction: _updateTransaction,
     deleteTransaction: _deleteTransaction,
-    addBill,
     setAllTransactions: _setAllTransactions,
     setTransactions: _setTransactions,
   } = budget;
@@ -205,7 +204,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
             source: "manual",
             createdAt: new Date().toISOString(),
           };
-          addBill(bill);
+          tanStackAddBill(bill);
           logger.debug("✅ Bill stored successfully - no transaction created until paid");
         }}
         onSearchNewBills={async () => {
