@@ -57,12 +57,7 @@ const TransactionForm = ({
 
   if (!isOpen) return null;
 
-  // Debug logging to track envelope data issue
-  logger.debug("TransactionForm Debug:", {
-    envelopesCount: envelopes.length,
-    envelopes: envelopes.slice(0, 3),
-    isOpen,
-  });
+  // Removed excessive debug logging that was spamming console (issue #463)
 
   const handleSubmit = (e) => {
     e.preventDefault();

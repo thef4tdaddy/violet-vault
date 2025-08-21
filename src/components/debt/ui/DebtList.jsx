@@ -152,7 +152,14 @@ const DebtCard = ({ debt, onClick, onRecordPayment }) => {
                   ) : (
                     <span className="flex items-center">
                       <Clock className="h-3 w-3 mr-1" />
-                      {debt.payoffInfo?.monthsToPayoff || "N/A"}
+                      {debt.payoffInfo?.payoffDate
+                        ? new Date(debt.payoffInfo.payoffDate).toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            year: 'numeric' 
+                          })
+                        : debt.payoffInfo?.monthsToPayoff
+                          ? `${debt.payoffInfo.monthsToPayoff}mo`
+                          : "No data"}
                     </span>
                   )}
                 </p>
