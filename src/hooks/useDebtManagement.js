@@ -110,6 +110,60 @@ const calculatePayoffProjection = (debt) => {
   };
 };
 
+const calculateInterestPortion = (debt, paymentAmount) => {
+  if (!debt.interestRate || !debt.currentBalance) {
+    return 0;
+  }
+
+  const monthlyRate = debt.interestRate / 100 / 12;
+  const interestPortion = debt.currentBalance * monthlyRate;
+
+  return Math.min(interestPortion, paymentAmount);
+};
+
+const convertPaymentFrequency = (debtFrequency) => {
+  // Convert debt payment frequency to bill frequency
+  switch (debtFrequency) {
+    case PAYMENT_FREQUENCIES.WEEKLY:
+      return "weekly";
+    case PAYMENT_FREQUENCIES.BIWEEKLY:
+      return "biweekly";
+    case PAYMENT_FREQUENCIES.QUARTERLY:
+      return "quarterly";
+    case PAYMENT_FREQUENCIES.ANNUALLY:
+      return "yearly";
+    default:
+      return "monthly";
+  }
+};
+
+const createSpecialTerms = (debtType, providedTerms = {}) => {
+  // Create specialized terms based on debt type
+  switch (debtType) {
+    case DEBT_TYPES.MORTGAGE:
+      return {
+        pmi: providedTerms.pmi || 0,
+        escrowPayment: providedTerms.escrowPayment || 0,
+        ...providedTerms,
+      };
+    case DEBT_TYPES.CREDIT_CARD:
+      return {
+        creditLimit: providedTerms.creditLimit || 0,
+        cashAdvanceLimit: providedTerms.cashAdvanceLimit || 0,
+        ...providedTerms,
+      };
+    case DEBT_TYPES.CHAPTER13:
+      return {
+        planDuration: providedTerms.planDuration || 60, // months
+        trusteePayment: providedTerms.trusteePayment || 0,
+        priorityAmount: providedTerms.priorityAmount || 0,
+        ...providedTerms,
+      };
+    default:
+      return providedTerms;
+  }
+};
+
 /**
  * Business logic hook for debt management
  * Handles relationships between debts, bills, envelopes, and transactions
