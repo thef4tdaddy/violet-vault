@@ -23,6 +23,7 @@ import {
   useActualBalance,
 } from "../../hooks/useBudgetMetadata";
 import useBills from "../../hooks/useBills";
+import useBudgetData from "../../hooks/useBudgetData";
 import logger from "../../utils/logger";
 
 /**
@@ -43,6 +44,9 @@ const ViewRenderer = ({
   // Get bill operations from TanStack Query hook instead of budget store
   const { updateBill: tanStackUpdateBill, addBill: tanStackAddBill } =
     useBills();
+
+  // Get TanStack Query paycheck operations for proper UI updates
+  const { processPaycheck: tanStackProcessPaycheck } = useBudgetData();
 
   const {
     envelopes,
@@ -187,8 +191,104 @@ const ViewRenderer = ({
         biweeklyAllocation={totalBiweeklyNeed}
         envelopes={envelopes}
         paycheckHistory={paycheckHistory}
-        onProcessPaycheck={processPaycheck}
-        onDeletePaycheck={deletePaycheck}
+        onProcessPaycheck={tanStackProcessPaycheck}
+        onDeletePaycheck={async (paycheckId) => {
+          try {
+            // Get the paycheck to delete
+            const paycheckToDelete = paycheckHistory.find(
+              (p) => p.id === paycheckId,
+            );
+            if (!paycheckToDelete) {
+              throw new Error(`Paycheck with ID ${paycheckId} not found`);
+            }
+
+            logger.info("Deleting paycheck with proper balance reversal", {
+              paycheckId,
+              amount: paycheckToDelete.amount,
+              mode: paycheckToDelete.mode,
+            });
+
+            // Import required functions
+            const { budgetDb, getBudgetMetadata, setBudgetMetadata } =
+              await import("../../db/budgetDb");
+
+            // Get current metadata
+            const currentMetadata = await getBudgetMetadata();
+            const currentActualBalance = currentMetadata?.actualBalance || 0;
+            const currentUnassignedCash = currentMetadata?.unassignedCash || 0;
+
+            // Calculate new balances (subtract the paycheck amount)
+            const newActualBalance =
+              currentActualBalance - paycheckToDelete.amount;
+            let newUnassignedCash = currentUnassignedCash;
+
+            // Handle envelope balance reversals if this was an "allocate" paycheck
+            if (
+              paycheckToDelete.mode === "allocate" &&
+              paycheckToDelete.envelopeAllocations
+            ) {
+              // Subtract from envelope balances
+              for (const allocation of paycheckToDelete.envelopeAllocations) {
+                const envelope = await budgetDb.envelopes.get(
+                  allocation.envelopeId,
+                );
+                if (envelope) {
+                  await budgetDb.envelopes.update(allocation.envelopeId, {
+                    currentBalance: Math.max(
+                      0,
+                      (envelope.currentBalance || 0) - allocation.amount,
+                    ),
+                  });
+                }
+              }
+
+              // Calculate how much went to unassigned cash originally
+              const totalAllocated =
+                paycheckToDelete.envelopeAllocations.reduce(
+                  (sum, alloc) => sum + alloc.amount,
+                  0,
+                );
+              const leftoverAmount = paycheckToDelete.amount - totalAllocated;
+              newUnassignedCash = Math.max(
+                0,
+                currentUnassignedCash - leftoverAmount,
+              );
+            } else {
+              // "leftover" mode - all went to unassigned cash, so subtract it all
+              newUnassignedCash = Math.max(
+                0,
+                currentUnassignedCash - paycheckToDelete.amount,
+              );
+            }
+
+            // Update budget metadata
+            await setBudgetMetadata({
+              actualBalance: newActualBalance,
+              unassignedCash: newUnassignedCash,
+            });
+
+            // Remove paycheck from history in Dexie
+            await budgetDb.paycheckHistory.delete(paycheckId);
+
+            // Also call the old function to update Zustand state
+            await deletePaycheck(paycheckId);
+
+            logger.info(
+              "Paycheck deleted successfully with proper balance reversal",
+              {
+                paycheckId,
+                actualBalanceChange: newActualBalance - currentActualBalance,
+                unassignedCashChange: newUnassignedCash - currentUnassignedCash,
+              },
+            );
+          } catch (error) {
+            logger.error(
+              "Failed to delete paycheck with proper balance reversal",
+              error,
+            );
+            throw error;
+          }
+        }}
         currentUser={currentUser}
       />
     ),
