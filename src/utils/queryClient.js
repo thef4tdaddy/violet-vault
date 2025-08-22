@@ -637,12 +637,25 @@ export const backgroundSync = {
       const cachedEntries = await budgetDb.cache.toArray();
       const restorePromises = cachedEntries.map(async (entry) => {
         try {
-          const queryKey = JSON.parse(entry.key);
-          queryClient.setQueryData(queryKey, entry.value);
-        } catch (parseError) {
-          logger.warn("Failed to parse cached query key", {
+          // Only attempt to restore TanStack Query cache entries
+          // Skip simple cache entries (like lastSyncTime, etc.)
+          let queryKey;
+          try {
+            queryKey = JSON.parse(entry.key);
+          } catch (parseError) {
+            // If it's not valid JSON, it's likely a simple cache entry, not a query key
+            // Skip these entries as they're not TanStack Query cache
+            return;
+          }
+
+          // Only restore if it's an array (valid TanStack Query key format)
+          if (Array.isArray(queryKey)) {
+            queryClient.setQueryData(queryKey, entry.value);
+          }
+        } catch (restoreError) {
+          logger.warn("Failed to restore cached query", {
             key: entry.key,
-            error: parseError.message,
+            error: restoreError.message,
             source: "backgroundSync",
           });
         }
