@@ -74,9 +74,18 @@ class CloudSyncService {
     logger.info("🔄 Starting chunked data sync...");
 
     try {
-      const result = await chunkedFirebaseSync(
+      // Initialize chunked Firebase sync if not already done
+      await chunkedFirebaseSync.initialize(
         this.config.budgetId,
         this.config.encryptionKey,
+      );
+
+      // Fetch data from Dexie for sync
+      const localData = await this.fetchDexieData();
+
+      // Perform the sync
+      const result = await chunkedFirebaseSync.saveToCloud(
+        localData,
         this.config.currentUser,
       );
 
@@ -140,6 +149,70 @@ class CloudSyncService {
       logger.error("Failed to get last sync time from Dexie:", error);
       return null;
     }
+  }
+
+  async fetchDexieData() {
+    try {
+      const [
+        envelopes,
+        transactions, 
+        bills,
+        debts,
+        savingsGoals,
+        paycheckHistory,
+        metadata
+      ] = await Promise.all([
+        budgetDb.envelopes.toArray(),
+        budgetDb.transactions.toArray(),
+        budgetDb.bills.toArray(), 
+        budgetDb.debts.toArray(),
+        budgetDb.savingsGoals.toArray(),
+        budgetDb.paycheckHistory.toArray(),
+        budgetDb.budget.get("metadata")
+      ]);
+
+      return {
+        envelopes: envelopes || [],
+        transactions: transactions || [],
+        bills: bills || [],
+        debts: debts || [],
+        savingsGoals: savingsGoals || [],
+        paycheckHistory: paycheckHistory || [],
+        unassignedCash: metadata?.unassignedCash || 0,
+        actualBalance: metadata?.actualBalance || 0,
+        lastModified: Date.now()
+      };
+    } catch (error) {
+      logger.error("Failed to fetch data from Dexie:", error);
+      throw error;
+    }
+  }
+
+  determineSyncDirection(localData, cloudData) {
+    if (!cloudData || !cloudData.lastModified) {
+      return "upload"; // No cloud data, upload local
+    }
+    
+    if (!localData || !localData.lastModified) {
+      return "download"; // No local data, download cloud
+    }
+
+    if (localData.lastModified > cloudData.lastModified) {
+      return "upload"; // Local is newer
+    } else if (cloudData.lastModified > localData.lastModified) {
+      return "download"; // Cloud is newer  
+    } else {
+      return "sync"; // Same timestamp, need full sync
+    }
+  }
+
+  getStatus() {
+    return {
+      isSyncing: this.isSyncing,
+      isRunning: this.isRunning,
+      lastSyncTime: this.getLastSyncTime(),
+      hasConfig: !!this.config
+    };
   }
 
   async clearAllData() {
