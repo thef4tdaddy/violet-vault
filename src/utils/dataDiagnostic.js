@@ -122,6 +122,52 @@ export const runDataDiagnostic = async () => {
 };
 
 // Paycheck Data Cleanup Utility
+// Detailed Paycheck Inspection Tool
+export const inspectPaycheckRecords = async () => {
+  console.log("🔍 VioletVault Paycheck Inspection Tool");
+  console.log("=".repeat(50));
+
+  if (!window.budgetDb) {
+    console.error("❌ budgetDb not available");
+    return { success: false, error: "budgetDb not available" };
+  }
+
+  try {
+    const allPaychecks = await window.budgetDb.paycheckHistory.toArray();
+    console.log(`📊 Found ${allPaychecks.length} total paycheck records`);
+
+    allPaychecks.forEach((paycheck, index) => {
+      console.log(`\n📋 Paycheck Record #${index + 1}:`);
+      console.log({
+        id: paycheck.id,
+        idType: typeof paycheck.id,
+        idValid: !!(
+          paycheck.id &&
+          typeof paycheck.id === "string" &&
+          paycheck.id !== ""
+        ),
+        amount: paycheck.amount,
+        amountType: typeof paycheck.amount,
+        amountValid: !!(
+          typeof paycheck.amount === "number" && !isNaN(paycheck.amount)
+        ),
+        date: paycheck.date,
+        dateType: typeof paycheck.date,
+        dateValid: !!paycheck.date,
+        source: paycheck.source,
+        lastModified: paycheck.lastModified,
+        allFields: Object.keys(paycheck),
+        fullRecord: paycheck,
+      });
+    });
+
+    return { success: true, total: allPaychecks.length, records: allPaychecks };
+  } catch (error) {
+    console.error("❌ Paycheck inspection failed:", error);
+    return { success: false, error: error.message };
+  }
+};
+
 export const cleanupCorruptedPaychecks = async () => {
   console.log("🧹 VioletVault Paycheck Cleanup Tool");
   console.log("=".repeat(50));
@@ -136,16 +182,41 @@ export const cleanupCorruptedPaychecks = async () => {
     const allPaychecks = await window.budgetDb.paycheckHistory.toArray();
     console.log(`📊 Found ${allPaychecks.length} paycheck records`);
 
-    // Identify corrupted paychecks (missing required fields)
+    // Identify corrupted paychecks (missing required fields or invalid data)
     const corruptedPaychecks = allPaychecks.filter((paycheck) => {
-      return (
+      // Check for missing or invalid ID
+      const hasInvalidId =
         !paycheck.id ||
-        !paycheck.amount ||
-        !paycheck.date ||
-        typeof paycheck.amount !== "number" ||
         paycheck.id === null ||
-        paycheck.id === undefined
-      );
+        paycheck.id === undefined ||
+        paycheck.id === "" ||
+        typeof paycheck.id !== "string";
+
+      // Check for missing or invalid amount
+      const hasInvalidAmount =
+        paycheck.amount === null ||
+        paycheck.amount === undefined ||
+        typeof paycheck.amount !== "number" ||
+        isNaN(paycheck.amount);
+
+      // Check for missing or invalid date
+      const hasInvalidDate =
+        !paycheck.date || paycheck.date === null || paycheck.date === undefined;
+
+      // Log details for debugging
+      if (hasInvalidId || hasInvalidAmount || hasInvalidDate) {
+        console.log(`🔍 Found potentially corrupted paycheck:`, {
+          id: paycheck.id,
+          idValid: !hasInvalidId,
+          amount: paycheck.amount,
+          amountValid: !hasInvalidAmount,
+          date: paycheck.date,
+          dateValid: !hasInvalidDate,
+          paycheck,
+        });
+      }
+
+      return hasInvalidId || hasInvalidAmount || hasInvalidDate;
     });
 
     console.log(
@@ -212,8 +283,10 @@ export const cleanupCorruptedPaychecks = async () => {
 if (typeof window !== "undefined") {
   window.runDataDiagnostic = runDataDiagnostic;
   window.cleanupCorruptedPaychecks = cleanupCorruptedPaychecks;
+  window.inspectPaycheckRecords = inspectPaycheckRecords;
   console.log("🔧 Data diagnostic tool loaded! Run: runDataDiagnostic()");
   console.log(
     "🧹 Paycheck cleanup tool loaded! Run: cleanupCorruptedPaychecks()",
   );
+  console.log("🔍 Paycheck inspector loaded! Run: inspectPaycheckRecords()");
 }
