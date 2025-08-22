@@ -11,7 +11,7 @@ import TransactionLedger from "../transactions/TransactionLedger";
 const ChartsAndAnalytics = React.lazy(
   () => import("../analytics/ChartsAndAnalytics"),
 );
-import DebtDashboard from "../debt/DebtDashboard";
+const DebtDashboard = React.lazy(() => import("../debt/DebtDashboard"));
 const AutoFundingView = React.lazy(
   () => import("../automation/AutoFundingView"),
 );
@@ -358,7 +358,11 @@ const ViewRenderer = ({
         />
       </Suspense>
     ),
-    debts: <DebtDashboard />,
+    debts: (
+      <Suspense fallback={<LoadingSpinner />}>
+        <DebtDashboard />
+      </Suspense>
+    ),
     automation: (
       <Suspense fallback={<LoadingSpinner />}>
         <AutoFundingView />

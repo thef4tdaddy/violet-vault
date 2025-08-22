@@ -14,7 +14,7 @@ import {
 import logger from "../utils/logger.js";
 
 // Helper functions (moved to top to avoid temporal dead zone issues)
-const calculateNextPaymentDate = (debt, relatedBill) => {
+function calculateNextPaymentDate(debt, relatedBill) {
   // Use bill due date if available
   if (relatedBill?.dueDate) {
     return relatedBill.dueDate;
@@ -53,9 +53,9 @@ const calculateNextPaymentDate = (debt, relatedBill) => {
   }
 
   return nextDate.toISOString();
-};
+}
 
-const calculatePayoffProjection = (debt) => {
+function calculatePayoffProjection(debt) {
   // Ensure we have valid numeric values
   const currentBalance = parseFloat(debt.currentBalance) || 0;
   const minimumPayment = parseFloat(debt.minimumPayment) || 0;
@@ -108,9 +108,9 @@ const calculatePayoffProjection = (debt) => {
     totalInterest: validTotalInterest,
     payoffDate: validPayoffDate,
   };
-};
+}
 
-const calculateInterestPortion = (debt, paymentAmount) => {
+function calculateInterestPortion(debt, paymentAmount) {
   if (!debt.interestRate || !debt.currentBalance) {
     return 0;
   }
@@ -119,9 +119,9 @@ const calculateInterestPortion = (debt, paymentAmount) => {
   const interestPortion = debt.currentBalance * monthlyRate;
 
   return Math.min(interestPortion, paymentAmount);
-};
+}
 
-const convertPaymentFrequency = (debtFrequency) => {
+function convertPaymentFrequency(debtFrequency) {
   // Convert debt payment frequency to bill frequency
   switch (debtFrequency) {
     case PAYMENT_FREQUENCIES.WEEKLY:
@@ -135,9 +135,9 @@ const convertPaymentFrequency = (debtFrequency) => {
     default:
       return "monthly";
   }
-};
+}
 
-const createSpecialTerms = (debtType, providedTerms = {}) => {
+function createSpecialTerms(debtType, providedTerms = {}) {
   // Create specialized terms based on debt type
   switch (debtType) {
     case DEBT_TYPES.MORTGAGE:
@@ -162,7 +162,7 @@ const createSpecialTerms = (debtType, providedTerms = {}) => {
     default:
       return providedTerms;
   }
-};
+}
 
 /**
  * Business logic hook for debt management

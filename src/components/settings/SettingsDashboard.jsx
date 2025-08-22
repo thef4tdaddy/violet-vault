@@ -244,7 +244,7 @@ const SettingsDashboard = ({
               <div className="bg-gray-50 rounded-lg p-4">
                 <h4 className="font-medium text-gray-900 mb-2">Current User</h4>
                 <p className="text-sm text-gray-600">
-                  {currentUser?.name || "User"}
+                  {currentUser?.userName || currentUser?.name || "User"}
                 </p>
               </div>
 
