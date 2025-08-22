@@ -27,10 +27,21 @@ import logger from "../utils/logger.js";
  * Handles relationships between debts, bills, envelopes, and transactions
  */
 export const useDebtManagement = () => {
-  const { bills = [], addBill, updateBill } = useBills();
+  const billsHook = useBills();
   const { envelopes = [] } = useEnvelopes();
   const { allTransactions = [] } = useTransactions();
-  const { debts = [], addDebt, updateDebt, deleteDebt, recordDebtPayment } = useDebts();
+  const debtsHook = useDebts();
+
+  // Safe destructuring with fallbacks to prevent initialization errors
+  const bills = billsHook?.bills || [];
+  const addBill = billsHook?.addBill;
+  const updateBill = billsHook?.updateBill;
+
+  const debts = debtsHook?.debts || [];
+  const addDebt = debtsHook?.addDebt;
+  const updateDebt = debtsHook?.updateDebt;
+  const deleteDebt = debtsHook?.deleteDebt;
+  const recordDebtPayment = debtsHook?.recordDebtPayment;
 
   // Calculate comprehensive debt statistics
   const debtStats = useMemo(() => calculateDebtStats(debts), [debts]);
@@ -48,11 +59,18 @@ export const useDebtManagement = () => {
 
       // Get payment transactions for this debt
       const relatedTransactions = allTransactions.filter(
-        (tx) => tx.debtId === debt.id || (relatedBill && tx.billId === relatedBill.id)
+        (tx) =>
+          tx.debtId === debt.id ||
+          (relatedBill && tx.billId === relatedBill.id),
       );
 
       // Use the utility function to enrich the debt
-      return enrichDebt(debt, relatedBill, relatedEnvelope, relatedTransactions);
+      return enrichDebt(
+        debt,
+        relatedBill,
+        relatedEnvelope,
+        relatedTransactions,
+      );
     });
   }, [debts, bills, envelopes, allTransactions]);
 
@@ -78,7 +96,10 @@ export const useDebtManagement = () => {
 
   // Create a new debt with auto-classification
   const createDebt = (debtData) => {
-    const autoType = AUTO_CLASSIFY_DEBT_TYPE(debtData.creditor || "", debtData.name || "");
+    const autoType = AUTO_CLASSIFY_DEBT_TYPE(
+      debtData.creditor || "",
+      debtData.name || "",
+    );
 
     const newDebt = {
       id: crypto.randomUUID(),
@@ -91,11 +112,13 @@ export const useDebtManagement = () => {
       originalBalance: debtData.originalBalance || debtData.currentBalance || 0,
       currentBalance: debtData.currentBalance || 0,
       interestRate: debtData.interestRate || 0,
-      compoundFrequency: debtData.compoundFrequency || COMPOUND_FREQUENCIES.MONTHLY,
+      compoundFrequency:
+        debtData.compoundFrequency || COMPOUND_FREQUENCIES.MONTHLY,
 
       // Payment information
       minimumPayment: debtData.minimumPayment || 0,
-      paymentFrequency: debtData.paymentFrequency || PAYMENT_FREQUENCIES.MONTHLY,
+      paymentFrequency:
+        debtData.paymentFrequency || PAYMENT_FREQUENCIES.MONTHLY,
       paymentDueDate: debtData.paymentDueDate,
 
       // Status and tracking
@@ -103,7 +126,10 @@ export const useDebtManagement = () => {
       paymentHistory: [],
 
       // Specialized terms based on debt type
-      specialTerms: createSpecialTerms(debtData.type || autoType, debtData.specialTerms),
+      specialTerms: createSpecialTerms(
+        debtData.type || autoType,
+        debtData.specialTerms,
+      ),
 
       // Metadata
       notes: debtData.notes || "",
@@ -143,7 +169,11 @@ export const useDebtManagement = () => {
   const syncDebtDueDates = () => {
     debts.forEach((debt) => {
       const relatedBill = bills.find((bill) => bill.debtId === debt.id);
-      if (relatedBill && relatedBill.dueDate && debt.paymentDueDate !== relatedBill.dueDate) {
+      if (
+        relatedBill &&
+        relatedBill.dueDate &&
+        debt.paymentDueDate !== relatedBill.dueDate
+      ) {
         logger.debug("Syncing debt due date with connected bill", {
           debtId: debt.id,
           debtName: debt.name,
