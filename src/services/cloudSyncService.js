@@ -1,12 +1,9 @@
-import { get, set, del } from "idb-keyval";
 import { budgetDb } from "../db/budgetDb";
-import { encrypt, decrypt } from "../utils/encryption";
 import logger from "../utils/logger";
 import { chunkedFirebaseSync } from "../utils/chunkedFirebaseSync";
 
 const SYNC_INTERVAL = 5 * 60 * 1000; // 5 minutes (much more reasonable)
 const DEBOUNCE_DELAY = 10000; // 10 seconds (longer debounce to reduce noise)
-const ACTIVITY_TIMEOUT = 10 * 60 * 1000; // 10 minutes
 
 class CloudSyncService {
   constructor() {
@@ -125,14 +122,24 @@ class CloudSyncService {
 
   async updateLastSyncTime() {
     try {
-      await set("lastSyncTime", new Date().toISOString());
+      await budgetDb.setCachedValue(
+        "lastSyncTime",
+        new Date().toISOString(),
+        86400000, // 24 hours TTL
+        "sync"
+      );
     } catch (error) {
-      logger.error("Failed to update last sync time in idb-keyval:", error);
+      logger.error("Failed to update last sync time in Dexie:", error);
     }
   }
 
   async getLastSyncTime() {
-    return await get("lastSyncTime");
+    try {
+      return await budgetDb.getCachedValue("lastSyncTime", 86400000); // 24 hours
+    } catch (error) {
+      logger.error("Failed to get last sync time from Dexie:", error);
+      return null;
+    }
   }
 
   async clearAllData() {
@@ -160,7 +167,7 @@ class CloudSyncService {
       }
 
       // Clear local sync metadata
-      await del("lastSyncTime");
+      await budgetDb.clearCacheCategory("sync");
       logger.info("Local sync metadata cleared");
     } catch (error) {
       logger.error("Failed to clear cloud data:", error);
