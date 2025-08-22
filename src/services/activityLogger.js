@@ -75,6 +75,35 @@ class ActivityLogger {
   }
 
   /**
+   * Get current user with fallback to localStorage
+   */
+  getCurrentUser() {
+    // If we have a current user set, use it
+    if (this.currentUser) {
+      return this.currentUser;
+    }
+
+    // Fallback: try to get from localStorage profile
+    try {
+      const profileData = localStorage.getItem("userProfile");
+      if (profileData) {
+        const parsedProfile = JSON.parse(profileData);
+        if (parsedProfile.userName) {
+          return {
+            id: parsedProfile.id || "local-user",
+            userName: parsedProfile.userName,
+            userColor: parsedProfile.userColor,
+          };
+        }
+      }
+    } catch (error) {
+      logger.warn("Failed to get user profile from localStorage:", error);
+    }
+
+    return null;
+  }
+
+  /**
    * Log a user activity
    * @param {string} action - Activity type from ACTIVITY_TYPES
    * @param {string} entityType - Entity type from ENTITY_TYPES
@@ -88,8 +117,8 @@ class ActivityLogger {
         action,
         entityType,
         entityId,
-        userId: this.currentUser?.id || "anonymous",
-        userName: this.currentUser?.userName || "Anonymous User",
+        userId: this.getCurrentUser()?.id || "anonymous",
+        userName: this.getCurrentUser()?.userName || "Anonymous User",
         details: {
           ...details,
           userAgent: navigator.userAgent,
