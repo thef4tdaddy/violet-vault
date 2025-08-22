@@ -155,20 +155,20 @@ class CloudSyncService {
     try {
       const [
         envelopes,
-        transactions, 
+        transactions,
         bills,
         debts,
         savingsGoals,
         paycheckHistory,
-        metadata
+        metadata,
       ] = await Promise.all([
         budgetDb.envelopes.toArray(),
         budgetDb.transactions.toArray(),
-        budgetDb.bills.toArray(), 
+        budgetDb.bills.toArray(),
         budgetDb.debts.toArray(),
         budgetDb.savingsGoals.toArray(),
         budgetDb.paycheckHistory.toArray(),
-        budgetDb.budget.get("metadata")
+        budgetDb.budget.get("metadata"),
       ]);
 
       return {
@@ -180,7 +180,7 @@ class CloudSyncService {
         paycheckHistory: paycheckHistory || [],
         unassignedCash: metadata?.unassignedCash || 0,
         actualBalance: metadata?.actualBalance || 0,
-        lastModified: Date.now()
+        lastModified: Date.now(),
       };
     } catch (error) {
       logger.error("Failed to fetch data from Dexie:", error);
@@ -190,19 +190,19 @@ class CloudSyncService {
 
   determineSyncDirection(localData, cloudData) {
     if (!cloudData || !cloudData.lastModified) {
-      return "upload"; // No cloud data, upload local
+      return { direction: "toFirestore" }; // No cloud data, upload local
     }
-    
+
     if (!localData || !localData.lastModified) {
-      return "download"; // No local data, download cloud
+      return { direction: "fromFirestore" }; // No local data, download cloud
     }
 
     if (localData.lastModified > cloudData.lastModified) {
-      return "upload"; // Local is newer
+      return { direction: "toFirestore" }; // Local is newer
     } else if (cloudData.lastModified > localData.lastModified) {
-      return "download"; // Cloud is newer  
+      return { direction: "fromFirestore" }; // Cloud is newer
     } else {
-      return "sync"; // Same timestamp, need full sync
+      return { direction: "bidirectional" }; // Same timestamp, need full sync
     }
   }
 
@@ -210,8 +210,10 @@ class CloudSyncService {
     return {
       isSyncing: this.isSyncing,
       isRunning: this.isRunning,
-      lastSyncTime: this.getLastSyncTime(),
-      hasConfig: !!this.config
+      lastSyncTime: Date.now(),
+      syncIntervalMs: SYNC_INTERVAL,
+      syncType: "chunked",
+      hasConfig: !!this.config,
     };
   }
 
