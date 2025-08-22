@@ -9,6 +9,10 @@ import {
 } from "../db/budgetDb.js";
 import activityLogger from "../services/activityLogger.js";
 import logger from "../utils/logger.js";
+import {
+  calculatePaycheckBalances,
+  validateBalances,
+} from "../utils/balanceCalculator.js";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
@@ -374,20 +378,41 @@ const storeInitializer = (set, get) => ({
         });
       }
 
-      // Calculate correct unassigned cash based on paycheck mode
-      let newUnassignedCash = currentUnassignedCash;
-      if (paycheck.mode === "leftover") {
-        // All paycheck goes to unassigned cash
-        newUnassignedCash = currentUnassignedCash + paycheck.amount;
-      } else if (paycheck.mode === "allocate") {
-        // Only remaining amount goes to unassigned cash (already calculated as remainingAmount)
-        newUnassignedCash = currentUnassignedCash + remainingAmount;
+      // Use centralized balance calculator to ensure consistency
+      const currentBalances = {
+        actualBalance: currentActualBalance,
+        virtualBalance: 0, // Will be calculated from envelope balances if needed
+        unassignedCash: currentUnassignedCash,
+        isActualBalanceManual: currentMetadata?.isActualBalanceManual || false,
+      };
+
+      // Calculate envelope allocations for the centralized calculator
+      const allocations = transactions
+        .filter((t) => t.envelopeId !== "unassigned")
+        .map((t) => ({ envelopeId: t.envelopeId, amount: t.amount }));
+
+      // Use centralized calculator to get correct balance state
+      const newBalances = calculatePaycheckBalances(
+        currentBalances,
+        paycheck,
+        allocations,
+      );
+
+      // Validate the calculation
+      const validation = validateBalances(newBalances);
+      if (!validation.isValid) {
+        logger.warn("Balance validation failed after paycheck processing", {
+          errors: validation.errors,
+          warnings: validation.warnings,
+          paycheck,
+        });
       }
 
-      // Update budget metadata in Dexie with correct values
+      // Update budget metadata in Dexie with calculated values
       await setBudgetMetadata({
-        unassignedCash: newUnassignedCash,
-        actualBalance: currentActualBalance + paycheck.amount,
+        unassignedCash: newBalances.unassignedCash,
+        actualBalance: newBalances.actualBalance,
+        isActualBalanceManual: newBalances.isActualBalanceManual,
       });
 
       logger.info("Paycheck processing completed successfully", {
