@@ -309,10 +309,20 @@ const useDataManagement = () => {
           "Import Completed",
         );
 
-        // Trigger a page reload to refresh all components with new data
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
+        // Invalidate TanStack Query cache to refresh UI with new data instead of page reload
+        try {
+          const { queryClient } = await import("../utils/queryClient");
+          await queryClient.invalidateQueries();
+          logger.info("TanStack Query cache invalidated after data import");
+        } catch (error) {
+          logger.warn(
+            "Failed to invalidate query cache, falling back to page reload",
+            error,
+          );
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        }
 
         return {
           success: true,
