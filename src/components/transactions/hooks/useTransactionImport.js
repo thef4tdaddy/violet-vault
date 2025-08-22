@@ -14,9 +14,12 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
   const [importProgress, setImportProgress] = useState(0);
   const [autoFundingResults, setAutoFundingResults] = useState([]);
 
-  const handleFileUpload = (event) => {
+  const handleFileUpload = (event, options = {}) => {
     const file = event.target.files[0];
     if (!file) return;
+
+    // Store the clear option for later use during import
+    setImportData({ clearExisting: options.clearExisting || false });
 
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -33,7 +36,11 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
           return;
         }
 
-        setImportData(parsedData);
+        // Merge clear option with parsed data
+        setImportData({
+          data: parsedData,
+          clearExisting: options.clearExisting || false,
+        });
         setImportStep(2);
         setFieldMapping(autoDetectFieldMapping(parsedData));
       } catch (error) {
@@ -55,12 +62,45 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
       return;
     }
 
+    // Clear existing data if option is selected
+    if (importData.clearExisting) {
+      try {
+        // Import Dexie database
+        const { budgetDb } = await import("../../../db/budgetDb");
+
+        // Clear transactions and paycheck history
+        await budgetDb.transactions.clear();
+        await budgetDb.paycheckHistory.clear();
+
+        // Reset budget metadata balances
+        const { setBudgetMetadata } = await import("../../../db/budgetDb");
+        await setBudgetMetadata({
+          actualBalance: 0,
+          unassignedCash: 0,
+        });
+
+        // Clear envelope balances
+        await budgetDb.envelopes.toCollection().modify({ currentBalance: 0 });
+
+        logger.info("Cleared existing data before import", {
+          clearedTransactions: true,
+          clearedPaychecks: true,
+          resetBalances: true,
+        });
+      } catch (error) {
+        logger.error("Failed to clear existing data", error);
+        alert("Failed to clear existing data. Import cancelled.");
+        return;
+      }
+    }
+
     setImportStep(3);
     const processedTransactions = [];
+    const dataArray = importData.data || importData;
 
-    for (let i = 0; i < importData.length; i++) {
-      const row = importData[i];
-      setImportProgress((i / importData.length) * 100);
+    for (let i = 0; i < dataArray.length; i++) {
+      const row = dataArray[i];
+      setImportProgress((i / dataArray.length) * 100);
 
       try {
         const amount = parseFloat(
@@ -142,8 +182,11 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
       (t) => t.amount < 0,
     ).length;
 
-    let message =
-      `Successfully imported ${processedTransactions.length} transactions!\n` +
+    let message = importData.clearExisting
+      ? `🗑️ Cleared existing data and imported ${processedTransactions.length} transactions!\n`
+      : `Successfully imported ${processedTransactions.length} transactions!\n`;
+
+    message +=
       `• ${incomeCount} income transactions\n` +
       `• ${expenseCount} expense transactions\n\n`;
 
