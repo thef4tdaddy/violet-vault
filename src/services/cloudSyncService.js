@@ -4,8 +4,8 @@ import { encrypt, decrypt } from "../utils/encryption";
 import logger from "../utils/logger";
 import { chunkedFirebaseSync } from "../utils/chunkedFirebaseSync";
 
-const SYNC_INTERVAL = 30000; // 30 seconds
-const DEBOUNCE_DELAY = 5000; // 5 seconds
+const SYNC_INTERVAL = 5 * 60 * 1000; // 5 minutes (much more reasonable)
+const DEBOUNCE_DELAY = 10000; // 10 seconds (longer debounce to reduce noise)
 const ACTIVITY_TIMEOUT = 10 * 60 * 1000; // 10 minutes
 
 class CloudSyncService {
@@ -47,11 +47,24 @@ class CloudSyncService {
   }
 
   // Debounced sync to avoid rapid consecutive syncs
-  scheduleSync() {
+  scheduleSync(priority = "normal") {
     clearTimeout(this.debounceTimer);
+
+    // Use shorter delay for high-priority changes (paycheck, envelope changes, etc.)
+    const delay = priority === "high" ? 2000 : DEBOUNCE_DELAY;
+
     this.debounceTimer = setTimeout(() => {
       this.syncQueue = this.syncQueue.then(() => this.forceSync());
-    }, DEBOUNCE_DELAY);
+    }, delay);
+  }
+
+  // Trigger sync immediately for critical changes (paycheck, imports, etc.)
+  triggerSyncForCriticalChange(changeType) {
+    logger.info(
+      `🚨 Critical change detected: ${changeType}, triggering immediate sync`,
+    );
+    clearTimeout(this.debounceTimer);
+    this.syncQueue = this.syncQueue.then(() => this.forceSync());
   }
 
   async forceSync() {
@@ -67,7 +80,7 @@ class CloudSyncService {
       const result = await chunkedFirebaseSync(
         this.config.budgetId,
         this.config.encryptionKey,
-        this.config.currentUser
+        this.config.currentUser,
       );
 
       if (result.success) {
@@ -127,24 +140,28 @@ class CloudSyncService {
     // This method should be called before importing backup data to prevent sync conflicts
     try {
       logger.info("Starting to clear all cloud data...");
-      
-      if (this.config && typeof this.config.clearAllData === 'function') {
+
+      if (this.config && typeof this.config.clearAllData === "function") {
         // If the config has a clearAllData method, use it
         await this.config.clearAllData();
         logger.info("Cloud data cleared using config method");
-      } else if (chunkedFirebaseSync && typeof chunkedFirebaseSync.clearAllData === 'function') {
+      } else if (
+        chunkedFirebaseSync &&
+        typeof chunkedFirebaseSync.clearAllData === "function"
+      ) {
         // If chunkedFirebaseSync has a clearAllData method, use it
         await chunkedFirebaseSync.clearAllData();
         logger.info("Cloud data cleared using chunkedFirebaseSync");
       } else {
         // If no specific clear method exists, we can't clear cloud data
-        logger.warn("No cloud data clearing method available - skipping cloud clear");
+        logger.warn(
+          "No cloud data clearing method available - skipping cloud clear",
+        );
       }
-      
+
       // Clear local sync metadata
       await del("lastSyncTime");
       logger.info("Local sync metadata cleared");
-      
     } catch (error) {
       logger.error("Failed to clear cloud data:", error);
       throw error;
@@ -156,27 +173,36 @@ class CloudSyncService {
     // This is used after backup imports to ensure imported data replaces cloud data
     try {
       logger.info("🚀 Starting force push to cloud...");
-      
-      if (this.config && typeof this.config.forcePushToCloud === 'function') {
+
+      if (this.config && typeof this.config.forcePushToCloud === "function") {
         // If the config has a forcePushToCloud method, use it
         await this.config.forcePushToCloud();
         logger.info("Data successfully pushed to cloud using config method");
-      } else if (chunkedFirebaseSync && typeof chunkedFirebaseSync.forcePushToCloud === 'function') {
+      } else if (
+        chunkedFirebaseSync &&
+        typeof chunkedFirebaseSync.forcePushToCloud === "function"
+      ) {
         // If chunkedFirebaseSync has a forcePushToCloud method, use it
         await chunkedFirebaseSync.forcePushToCloud();
-        logger.info("Data successfully pushed to cloud using chunkedFirebaseSync");
-      } else if (chunkedFirebaseSync && typeof chunkedFirebaseSync.uploadToFirebase === 'function') {
+        logger.info(
+          "Data successfully pushed to cloud using chunkedFirebaseSync",
+        );
+      } else if (
+        chunkedFirebaseSync &&
+        typeof chunkedFirebaseSync.uploadToFirebase === "function"
+      ) {
         // Use upload method if available (one-way upload)
         await chunkedFirebaseSync.uploadToFirebase();
         logger.info("Data successfully pushed to cloud using uploadToFirebase");
       } else {
-        logger.warn("No force push method available, falling back to regular sync");
+        logger.warn(
+          "No force push method available, falling back to regular sync",
+        );
         await this.forceSync();
       }
-      
+
       // Update sync time after successful push
       await this.updateLastSyncTime();
-      
     } catch (error) {
       logger.error("Failed to force push data to cloud:", error);
       throw error;

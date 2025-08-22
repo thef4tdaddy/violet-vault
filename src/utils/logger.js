@@ -4,6 +4,7 @@ class Logger {
   constructor() {
     this.isDevelopment = import.meta.env.MODE === "development";
     this.isDevSite = this.getIsDevSite();
+    this.debugThrottles = new Map(); // For throttling frequent debug messages
   }
 
   getIsDevSite() {
@@ -34,7 +35,7 @@ class Logger {
       );
     }
 
-    // Highlight.io automatically captures console logs, so just ensure it's tracked
+    // Highlight.io tracking for all debug logs
     try {
       H.track("debug", {
         message: `DEBUG: ${message}`,
@@ -42,8 +43,19 @@ class Logger {
         ...data,
       });
     } catch (error) {
-      // Fallback if Highlight.io fails
-      console.error("Highlight.io logging failed:", error);
+      // Silently fail if highlight.io isn't available
+    }
+  }
+
+  // Throttled debug logging for frequently called functions (like React renders)
+  debugThrottled(message, data = {}, throttleMs = 1000) {
+    const key = message;
+    const now = Date.now();
+    const lastCall = this.debugThrottles.get(key);
+
+    if (!lastCall || now - lastCall > throttleMs) {
+      this.debug(message, data);
+      this.debugThrottles.set(key, now);
     }
   }
 

@@ -428,6 +428,13 @@ const storeInitializer = (set, get) => ({
         logger.warn("Failed to log paycheck activity:", logError);
       }
 
+      // Trigger immediate sync for critical paycheck change
+      if (typeof window !== "undefined" && window.cloudSyncService) {
+        window.cloudSyncService.triggerSyncForCriticalChange(
+          "paycheck_processed",
+        );
+      }
+
       return paycheckTransaction;
     } catch (error) {
       logger.error("Failed to process paycheck", error, {
