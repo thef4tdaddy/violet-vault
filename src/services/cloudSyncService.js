@@ -544,6 +544,7 @@ class CloudSyncService {
         savingsGoals,
         paycheckHistory,
         debts,
+        auditLog,
         budgetMetadata,
       ] = await Promise.all([
         budgetDb.envelopes.toArray(),
@@ -552,6 +553,7 @@ class CloudSyncService {
         budgetDb.savingsGoals.toArray(),
         budgetDb.paycheckHistory.toArray(),
         budgetDb.debts.toArray(),
+        budgetDb.auditLog.toArray(),
         budgetDb.budget.get("metadata"),
       ]);
 
@@ -563,6 +565,7 @@ class CloudSyncService {
         savingsGoalsCount: savingsGoals.length,
         paycheckHistoryCount: paycheckHistory.length,
         debtsCount: debts.length,
+        auditLogCount: auditLog.length,
         unassignedCash: budgetMetadata?.unassignedCash || 0,
         actualBalance: budgetMetadata?.actualBalance || 0,
         firstEnvelope: envelopes[0]?.name || "none",
@@ -578,6 +581,7 @@ class CloudSyncService {
         savingsGoals,
         paycheckHistory,
         debts,
+        auditLog,
         unassignedCash: budgetMetadata?.unassignedCash || 0,
         actualBalance: budgetMetadata?.actualBalance || 0,
         lastModified: Math.max(
@@ -800,6 +804,9 @@ class CloudSyncService {
         }
         if (firestoreData.debts?.length > 0) {
           addPromises.push(budgetDb.debts.bulkAdd(firestoreData.debts));
+        }
+        if (firestoreData.auditLog?.length > 0) {
+          addPromises.push(budgetDb.auditLog.bulkAdd(firestoreData.auditLog));
         }
 
         await Promise.all(addPromises);
