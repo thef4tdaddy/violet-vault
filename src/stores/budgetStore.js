@@ -625,6 +625,29 @@ const storeInitializer = (set, get) => ({
     });
 
     try {
+      // Always start with a clean slate to avoid data duplication
+      await budgetDb.transaction(
+        "rw",
+        [
+          budgetDb.envelopes,
+          budgetDb.bills,
+          budgetDb.transactions,
+          budgetDb.savingsGoals,
+          budgetDb.debts,
+          budgetDb.paycheckHistory,
+          budgetDb.budget,
+        ],
+        async () => {
+          await budgetDb.envelopes.clear();
+          await budgetDb.bills.clear();
+          await budgetDb.transactions.clear();
+          await budgetDb.savingsGoals.clear();
+          await budgetDb.debts.clear();
+          await budgetDb.paycheckHistory.clear();
+          await budgetDb.budget.clear();
+        },
+      );
+
       // Helper function to ensure records have valid IDs
       const ensureValidIds = (records, type) => {
         return records.map((record, index) => {
