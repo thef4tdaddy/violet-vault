@@ -121,6 +121,67 @@ class CloudSyncService {
   async getLastSyncTime() {
     return await get("lastSyncTime");
   }
+
+  async clearAllData() {
+    // Clear all data from Firebase/cloud storage
+    // This method should be called before importing backup data to prevent sync conflicts
+    try {
+      logger.info("Starting to clear all cloud data...");
+      
+      if (this.config && typeof this.config.clearAllData === 'function') {
+        // If the config has a clearAllData method, use it
+        await this.config.clearAllData();
+        logger.info("Cloud data cleared using config method");
+      } else if (chunkedFirebaseSync && typeof chunkedFirebaseSync.clearAllData === 'function') {
+        // If chunkedFirebaseSync has a clearAllData method, use it
+        await chunkedFirebaseSync.clearAllData();
+        logger.info("Cloud data cleared using chunkedFirebaseSync");
+      } else {
+        // If no specific clear method exists, we can't clear cloud data
+        logger.warn("No cloud data clearing method available - skipping cloud clear");
+      }
+      
+      // Clear local sync metadata
+      await del("lastSyncTime");
+      logger.info("Local sync metadata cleared");
+      
+    } catch (error) {
+      logger.error("Failed to clear cloud data:", error);
+      throw error;
+    }
+  }
+
+  async forcePushToCloud() {
+    // Force push local data to Firebase without pulling from Firebase first
+    // This is used after backup imports to ensure imported data replaces cloud data
+    try {
+      logger.info("🚀 Starting force push to cloud...");
+      
+      if (this.config && typeof this.config.forcePushToCloud === 'function') {
+        // If the config has a forcePushToCloud method, use it
+        await this.config.forcePushToCloud();
+        logger.info("Data successfully pushed to cloud using config method");
+      } else if (chunkedFirebaseSync && typeof chunkedFirebaseSync.forcePushToCloud === 'function') {
+        // If chunkedFirebaseSync has a forcePushToCloud method, use it
+        await chunkedFirebaseSync.forcePushToCloud();
+        logger.info("Data successfully pushed to cloud using chunkedFirebaseSync");
+      } else if (chunkedFirebaseSync && typeof chunkedFirebaseSync.uploadToFirebase === 'function') {
+        // Use upload method if available (one-way upload)
+        await chunkedFirebaseSync.uploadToFirebase();
+        logger.info("Data successfully pushed to cloud using uploadToFirebase");
+      } else {
+        logger.warn("No force push method available, falling back to regular sync");
+        await this.forceSync();
+      }
+      
+      // Update sync time after successful push
+      await this.updateLastSyncTime();
+      
+    } catch (error) {
+      logger.error("Failed to force push data to cloud:", error);
+      throw error;
+    }
+  }
 }
 
 export const cloudSyncService = new CloudSyncService();

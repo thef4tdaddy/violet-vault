@@ -200,6 +200,16 @@ const useDataManagement = () => {
           logger.warn("Failed to create backup", backupError);
         }
 
+        // Clear existing data from Firebase first to prevent sync conflicts
+        try {
+          logger.info("Clearing Firebase data before import...");
+          await cloudSyncService.clearAllData();
+          logger.info("Firebase data cleared successfully");
+        } catch (firebaseError) {
+          logger.warn("Failed to clear Firebase data, proceeding with import", firebaseError);
+          // Continue with import even if Firebase clear fails
+        }
+
         // Clear existing data from Dexie
         await budgetDb.transaction(
           "rw",
@@ -272,14 +282,24 @@ const useDataManagement = () => {
 
         showSuccessToast(`Local data imported! Now syncing to the cloud...`, "Import Complete");
 
-        // Trigger manual sync after successful import
+        // Force push imported data TO Firebase (one-way sync from local to cloud)
         try {
-          logger.info("🚀 Triggering manual cloud sync after import...");
-          await cloudSyncService.forceSync();
-          logger.info("✅ Manual sync after import completed successfully.");
-          showSuccessToast("Cloud sync initiated successfully!");
+          logger.info("🚀 Forcing push of imported data to Firebase...");
+          
+          // Force sync TO Firebase without pulling FROM Firebase
+          if (cloudSyncService.forcePushToCloud) {
+            await cloudSyncService.forcePushToCloud();
+            logger.info("✅ Data successfully pushed to Firebase.");
+            showSuccessToast("Imported data synced to cloud successfully!");
+          } else {
+            // Fallback to regular sync with precaution
+            logger.warn("forcePushToCloud method not available, using regular sync");
+            await cloudSyncService.forceSync();
+            logger.info("✅ Manual sync after import completed successfully.");
+            showSuccessToast("Cloud sync initiated successfully!");
+          }
         } catch (syncError) {
-          logger.error("Manual sync after import failed", syncError);
+          logger.error("Failed to push imported data to Firebase", syncError);
           showErrorToast(`Cloud sync failed: ${syncError.message}`);
         }
 

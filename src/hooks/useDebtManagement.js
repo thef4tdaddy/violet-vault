@@ -11,158 +11,16 @@ import {
   calculateDebtStats,
   AUTO_CLASSIFY_DEBT_TYPE,
 } from "../constants/debts";
+import {
+  calculateNextPaymentDate,
+  calculatePayoffProjection,
+  calculateInterestPortion,
+  convertPaymentFrequency,
+  createSpecialTerms,
+  enrichDebt,
+  getUpcomingPayments,
+} from "../utils/debtCalculations";
 import logger from "../utils/logger.js";
-
-// Helper functions (moved to top to avoid temporal dead zone issues)
-function calculateNextPaymentDate(debt, relatedBill) {
-  // Use bill due date if available
-  if (relatedBill?.dueDate) {
-    return relatedBill.dueDate;
-  }
-
-  // Use debt payment due date
-  if (debt.paymentDueDate) {
-    return debt.paymentDueDate;
-  }
-
-  // Calculate based on payment frequency and last payment
-  const lastPayment = debt.paymentHistory?.[debt.paymentHistory.length - 1];
-  if (!lastPayment) {
-    return null;
-  }
-
-  const lastPaymentDate = new Date(lastPayment.date);
-  const nextDate = new Date(lastPaymentDate);
-
-  switch (debt.paymentFrequency) {
-    case PAYMENT_FREQUENCIES.WEEKLY:
-      nextDate.setDate(nextDate.getDate() + 7);
-      break;
-    case PAYMENT_FREQUENCIES.BIWEEKLY:
-      nextDate.setDate(nextDate.getDate() + 14);
-      break;
-    case PAYMENT_FREQUENCIES.QUARTERLY:
-      nextDate.setMonth(nextDate.getMonth() + 3);
-      break;
-    case PAYMENT_FREQUENCIES.ANNUALLY:
-      nextDate.setFullYear(nextDate.getFullYear() + 1);
-      break;
-    default: // monthly
-      nextDate.setMonth(nextDate.getMonth() + 1);
-      break;
-  }
-
-  return nextDate.toISOString();
-}
-
-function calculatePayoffProjection(debt) {
-  // Ensure we have valid numeric values
-  const currentBalance = parseFloat(debt.currentBalance) || 0;
-  const minimumPayment = parseFloat(debt.minimumPayment) || 0;
-  const interestRate = parseFloat(debt.interestRate) || 0;
-
-  // Return null projection if missing essential data
-  if (currentBalance <= 0 || minimumPayment <= 0 || interestRate <= 0) {
-    return {
-      monthsToPayoff: null,
-      totalInterest: null,
-      payoffDate: null,
-    };
-  }
-
-  const monthlyRate = interestRate / 100 / 12;
-  const monthlyPayment = minimumPayment;
-  const balance = currentBalance;
-
-  // Check if payment covers interest (prevents infinite payoff scenarios)
-  const monthlyInterest = balance * monthlyRate;
-  if (monthlyPayment <= monthlyInterest) {
-    return {
-      monthsToPayoff: null,
-      totalInterest: null,
-      payoffDate: null,
-    };
-  }
-
-  // Calculate months to payoff using amortization formula
-  const monthsToPayoff = Math.ceil(
-    -Math.log(1 - (balance * monthlyRate) / monthlyPayment) /
-      Math.log(1 + monthlyRate),
-  );
-
-  const totalPayments = monthlyPayment * monthsToPayoff;
-  const totalInterest = totalPayments - balance;
-
-  const payoffDate = new Date();
-  payoffDate.setMonth(payoffDate.getMonth() + monthsToPayoff);
-
-  // Validate all calculations are finite numbers
-  const validMonthsToPayoff =
-    isFinite(monthsToPayoff) && monthsToPayoff > 0 ? monthsToPayoff : null;
-  const validTotalInterest =
-    isFinite(totalInterest) && totalInterest >= 0 ? totalInterest : null;
-  const validPayoffDate = validMonthsToPayoff ? payoffDate.toISOString() : null;
-
-  return {
-    monthsToPayoff: validMonthsToPayoff,
-    totalInterest: validTotalInterest,
-    payoffDate: validPayoffDate,
-  };
-}
-
-function calculateInterestPortion(debt, paymentAmount) {
-  if (!debt.interestRate || !debt.currentBalance) {
-    return 0;
-  }
-
-  const monthlyRate = debt.interestRate / 100 / 12;
-  const interestPortion = debt.currentBalance * monthlyRate;
-
-  return Math.min(interestPortion, paymentAmount);
-}
-
-function convertPaymentFrequency(debtFrequency) {
-  // Convert debt payment frequency to bill frequency
-  switch (debtFrequency) {
-    case PAYMENT_FREQUENCIES.WEEKLY:
-      return "weekly";
-    case PAYMENT_FREQUENCIES.BIWEEKLY:
-      return "biweekly";
-    case PAYMENT_FREQUENCIES.QUARTERLY:
-      return "quarterly";
-    case PAYMENT_FREQUENCIES.ANNUALLY:
-      return "yearly";
-    default:
-      return "monthly";
-  }
-}
-
-function createSpecialTerms(debtType, providedTerms = {}) {
-  // Create specialized terms based on debt type
-  switch (debtType) {
-    case DEBT_TYPES.MORTGAGE:
-      return {
-        pmi: providedTerms.pmi || 0,
-        escrowPayment: providedTerms.escrowPayment || 0,
-        ...providedTerms,
-      };
-    case DEBT_TYPES.CREDIT_CARD:
-      return {
-        creditLimit: providedTerms.creditLimit || 0,
-        cashAdvanceLimit: providedTerms.cashAdvanceLimit || 0,
-        ...providedTerms,
-      };
-    case DEBT_TYPES.CHAPTER13:
-      return {
-        planDuration: providedTerms.planDuration || 60, // months
-        trusteePayment: providedTerms.trusteePayment || 0,
-        priorityAmount: providedTerms.priorityAmount || 0,
-        ...providedTerms,
-      };
-    default:
-      return providedTerms;
-  }
-}
 
 /**
  * Business logic hook for debt management
@@ -172,13 +30,7 @@ export const useDebtManagement = () => {
   const { bills = [], addBill, updateBill } = useBills();
   const { envelopes = [] } = useEnvelopes();
   const { allTransactions = [] } = useTransactions();
-  const {
-    debts = [],
-    addDebt,
-    updateDebt,
-    deleteDebt,
-    recordDebtPayment,
-  } = useDebts();
+  const { debts = [], addDebt, updateDebt, deleteDebt, recordDebtPayment } = useDebts();
 
   // Calculate comprehensive debt statistics
   const debtStats = useMemo(() => calculateDebtStats(debts), [debts]);
@@ -196,25 +48,11 @@ export const useDebtManagement = () => {
 
       // Get payment transactions for this debt
       const relatedTransactions = allTransactions.filter(
-        (tx) =>
-          tx.debtId === debt.id ||
-          (relatedBill && tx.billId === relatedBill.id),
+        (tx) => tx.debtId === debt.id || (relatedBill && tx.billId === relatedBill.id)
       );
 
-      // Calculate next payment date
-      const nextPaymentDate = calculateNextPaymentDate(debt, relatedBill);
-
-      // Calculate payoff information
-      const payoffInfo = calculatePayoffProjection(debt);
-
-      return {
-        ...debt,
-        relatedBill,
-        relatedEnvelope,
-        relatedTransactions,
-        nextPaymentDate,
-        payoffInfo,
-      };
+      // Use the utility function to enrich the debt
+      return enrichDebt(debt, relatedBill, relatedEnvelope, relatedTransactions);
     });
   }, [debts, bills, envelopes, allTransactions]);
 
@@ -240,10 +78,7 @@ export const useDebtManagement = () => {
 
   // Create a new debt with auto-classification
   const createDebt = (debtData) => {
-    const autoType = AUTO_CLASSIFY_DEBT_TYPE(
-      debtData.creditor || "",
-      debtData.name || "",
-    );
+    const autoType = AUTO_CLASSIFY_DEBT_TYPE(debtData.creditor || "", debtData.name || "");
 
     const newDebt = {
       id: crypto.randomUUID(),
@@ -256,13 +91,11 @@ export const useDebtManagement = () => {
       originalBalance: debtData.originalBalance || debtData.currentBalance || 0,
       currentBalance: debtData.currentBalance || 0,
       interestRate: debtData.interestRate || 0,
-      compoundFrequency:
-        debtData.compoundFrequency || COMPOUND_FREQUENCIES.MONTHLY,
+      compoundFrequency: debtData.compoundFrequency || COMPOUND_FREQUENCIES.MONTHLY,
 
       // Payment information
       minimumPayment: debtData.minimumPayment || 0,
-      paymentFrequency:
-        debtData.paymentFrequency || PAYMENT_FREQUENCIES.MONTHLY,
+      paymentFrequency: debtData.paymentFrequency || PAYMENT_FREQUENCIES.MONTHLY,
       paymentDueDate: debtData.paymentDueDate,
 
       // Status and tracking
@@ -270,10 +103,7 @@ export const useDebtManagement = () => {
       paymentHistory: [],
 
       // Specialized terms based on debt type
-      specialTerms: createSpecialTerms(
-        debtData.type || autoType,
-        debtData.specialTerms,
-      ),
+      specialTerms: createSpecialTerms(debtData.type || autoType, debtData.specialTerms),
 
       // Metadata
       notes: debtData.notes || "",
@@ -313,11 +143,7 @@ export const useDebtManagement = () => {
   const syncDebtDueDates = () => {
     debts.forEach((debt) => {
       const relatedBill = bills.find((bill) => bill.debtId === debt.id);
-      if (
-        relatedBill &&
-        relatedBill.dueDate &&
-        debt.paymentDueDate !== relatedBill.dueDate
-      ) {
+      if (relatedBill && relatedBill.dueDate && debt.paymentDueDate !== relatedBill.dueDate) {
         logger.debug("Syncing debt due date with connected bill", {
           debtId: debt.id,
           debtName: debt.name,
@@ -432,19 +258,9 @@ export const useDebtManagement = () => {
     return payment;
   };
 
-  // Get upcoming payments across all debts
-  const getUpcomingPayments = (daysAhead = 30) => {
-    const cutoffDate = new Date();
-    cutoffDate.setDate(cutoffDate.getDate() + daysAhead);
-
-    return enrichedDebts
-      .filter(
-        (debt) => debt.status === DEBT_STATUS.ACTIVE && debt.nextPaymentDate,
-      )
-      .filter((debt) => new Date(debt.nextPaymentDate) <= cutoffDate)
-      .sort(
-        (a, b) => new Date(a.nextPaymentDate) - new Date(b.nextPaymentDate),
-      );
+  // Get upcoming payments across all debts using utility function
+  const getUpcomingPaymentsData = (daysAhead = 30) => {
+    return getUpcomingPayments(enrichedDebts, daysAhead);
   };
 
   // Auto-sync debt due dates when bills change
@@ -470,7 +286,7 @@ export const useDebtManagement = () => {
     syncDebtDueDates,
 
     // Utilities
-    getUpcomingPayments,
+    getUpcomingPayments: getUpcomingPaymentsData,
 
     // Constants
     DEBT_TYPES,
