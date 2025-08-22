@@ -15,7 +15,7 @@ import LoadingSpinner from "../ui/LoadingSpinner";
 import { ToastContainer } from "../ui/Toast";
 import { useToastStore } from "../../stores/toastStore";
 import ViewRendererComponent from "./ViewRenderer";
-import cloudSyncService from "../../services/cloudSyncService";
+import { cloudSyncService } from "../../services/cloudSyncService";
 import logger from "../../utils/logger";
 import { getVersionInfo } from "../../utils/version";
 import {

@@ -4,7 +4,7 @@
  */
 
 import { budgetDb } from "../db/budgetDb";
-import cloudSyncService from "../services/cloudSyncService";
+import { cloudSyncService } from "../services/cloudSyncService";
 import logger from "./logger";
 
 export const validateAllSyncFlows = async () => {

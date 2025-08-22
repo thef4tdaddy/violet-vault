@@ -1,6 +1,6 @@
 import { budgetDb } from "../db/budgetDb";
 import logger from "../utils/logger";
-import { chunkedFirebaseSync } from "../utils/chunkedFirebaseSync";
+import chunkedFirebaseSync from "../utils/chunkedFirebaseSync";
 
 const SYNC_INTERVAL = 5 * 60 * 1000; // 5 minutes (much more reasonable)
 const DEBOUNCE_DELAY = 10000; // 10 seconds (longer debounce to reduce noise)
@@ -126,7 +126,7 @@ class CloudSyncService {
         "lastSyncTime",
         new Date().toISOString(),
         86400000, // 24 hours TTL
-        "sync"
+        "sync",
       );
     } catch (error) {
       logger.error("Failed to update last sync time in Dexie:", error);
