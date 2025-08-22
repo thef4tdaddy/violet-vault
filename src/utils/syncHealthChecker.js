@@ -89,8 +89,8 @@ export const runImmediateSyncHealthCheck = async () => {
     };
 
     const syncResult = await cloudSyncService.determineSyncDirection(
-      mockFirestoreData,
       mockDexieData,
+      mockFirestoreData,
     );
 
     if (syncResult.direction === "toFirestore") {
