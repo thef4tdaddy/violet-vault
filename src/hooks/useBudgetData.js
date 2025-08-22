@@ -105,12 +105,17 @@ const useBudgetData = () => {
     },
 
     paycheckHistory: async () => {
-      if (paycheckHistory && paycheckHistory.length > 0) {
-        return paycheckHistory;
+      // Use Dexie directly instead of Zustand to avoid stale data
+      try {
+        const cachedPaychecks = await budgetDb.paycheckHistory
+          .orderBy("date")
+          .reverse()
+          .toArray();
+        return cachedPaychecks || [];
+      } catch (error) {
+        logger.warn("Failed to fetch paycheck history from Dexie", error);
+        return [];
       }
-
-      // Note: Need to add paycheckHistory to Dexie schema in future enhancement
-      return [];
     },
 
     dashboardSummary: async () => {
@@ -191,6 +196,13 @@ const useBudgetData = () => {
     queryKey: queryKeys.billsList(),
     queryFn: queryFunctions.bills,
     staleTime: 10 * 60 * 1000, // 10 minutes
+    enabled: true,
+  });
+
+  const paycheckHistoryQuery = useQuery({
+    queryKey: queryKeys.paycheckHistory(),
+    queryFn: queryFunctions.paycheckHistory,
+    staleTime: 5 * 60 * 1000, // 5 minutes
     enabled: true,
   });
 
@@ -556,7 +568,7 @@ const useBudgetData = () => {
     transactions: transactionsQuery.data || transactions || [],
     bills: billsQuery.data || bills || [],
     savingsGoals: savingsGoals || [],
-    paycheckHistory: paycheckHistory || [],
+    paycheckHistory: paycheckHistoryQuery.data || [],
     dashboardSummary: dashboardQuery.data,
 
     // Computed values
@@ -564,14 +576,15 @@ const useBudgetData = () => {
     actualBalance,
 
     // Loading states
-    isLoading: envelopesQuery.isLoading || transactionsQuery.isLoading || billsQuery.isLoading,
-    isFetching: envelopesQuery.isFetching || transactionsQuery.isFetching || billsQuery.isFetching,
+    isLoading: envelopesQuery.isLoading || transactionsQuery.isLoading || billsQuery.isLoading || paycheckHistoryQuery.isLoading,
+    isFetching: envelopesQuery.isFetching || transactionsQuery.isFetching || billsQuery.isFetching || paycheckHistoryQuery.isFetching,
     isOffline: !navigator.onLine,
 
     // Individual query states for fine-grained loading
     envelopesLoading: envelopesQuery.isLoading,
     transactionsLoading: transactionsQuery.isLoading,
     billsLoading: billsQuery.isLoading,
+    paycheckHistoryLoading: paycheckHistoryQuery.isLoading,
     dashboardLoading: dashboardQuery.isLoading,
 
     // Mutations
