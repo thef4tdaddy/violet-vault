@@ -11,7 +11,7 @@ import TransactionLedger from "../transactions/TransactionLedger";
 const ChartsAndAnalytics = React.lazy(
   () => import("../analytics/ChartsAndAnalytics"),
 );
-const DebtDashboard = React.lazy(() => import("../debt/DebtDashboard"));
+// const DebtDashboard = React.lazy(() => import("../debt/DebtDashboard")); // Temporarily disabled
 const AutoFundingView = React.lazy(
   () => import("../automation/AutoFundingView"),
 );
@@ -348,9 +348,13 @@ const ViewRenderer = ({
       </Suspense>
     ),
     debts: (
-      <Suspense fallback={<LoadingSpinner />}>
-        <DebtDashboard />
-      </Suspense>
+      <div className="p-8 text-center">
+        <h2 className="text-2xl font-bold mb-4">🚧 Debt Dashboard Temporarily Disabled</h2>
+        <p className="text-gray-600">
+          We're fixing a technical issue with the debt dashboard. <br />
+          This feature will be restored shortly.
+        </p>
+      </div>
     ),
     automation: (
       <Suspense fallback={<LoadingSpinner />}>
