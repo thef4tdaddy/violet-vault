@@ -211,3 +211,8 @@ class CloudSyncService {
 }
 
 export const cloudSyncService = new CloudSyncService();
+
+// Expose to window for critical sync triggers from other modules
+if (typeof window !== "undefined") {
+  window.cloudSyncService = cloudSyncService;
+}
