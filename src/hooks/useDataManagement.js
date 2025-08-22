@@ -231,19 +231,100 @@ const useDataManagement = () => {
           logger.warn("Failed to create backup", backupError);
         }
 
-        // Prepare the data for loading - ensure user information is preserved
-        const processedData = {
-          ...importedData,
-          transactions: unifiedTransactions,
-          allTransactions: unifiedAllTransactions,
-          // Preserve current user info
-          currentUser: currentUser,
+        // Clear existing data from Dexie
+        await budgetDb.transaction(
+          "rw",
+          [
+            budgetDb.envelopes,
+            budgetDb.bills,
+            budgetDb.transactions,
+            budgetDb.savingsGoals,
+            budgetDb.debts,
+            budgetDb.paycheckHistory,
+            budgetDb.budget,
+          ],
+          async () => {
+            // Clear all existing data
+            await budgetDb.envelopes.clear();
+            await budgetDb.bills.clear();
+            await budgetDb.transactions.clear();
+            await budgetDb.savingsGoals.clear();
+            await budgetDb.debts.clear();
+            await budgetDb.paycheckHistory.clear();
+
+            // Import new data
+            if (importedData.envelopes?.length) {
+              await budgetDb.envelopes.bulkAdd(importedData.envelopes);
+            }
+
+            if (importedData.bills?.length) {
+              await budgetDb.bills.bulkAdd(importedData.bills);
+            }
+
+            if (unifiedAllTransactions?.length) {
+              await budgetDb.transactions.bulkAdd(unifiedAllTransactions);
+            }
+
+            if (importedData.savingsGoals?.length) {
+              await budgetDb.savingsGoals.bulkAdd(importedData.savingsGoals);
+            }
+
+            if (importedData.debts?.length) {
+              await budgetDb.debts.bulkAdd(importedData.debts);
+            }
+
+            if (importedData.paycheckHistory?.length) {
+              await budgetDb.paycheckHistory.bulkAdd(
+                importedData.paycheckHistory,
+              );
+            }
+
+            // Import metadata (budget settings)
+            await budgetDb.budget.put({
+              id: "metadata",
+              unassignedCash: importedData.unassignedCash || 0,
+              biweeklyAllocation: importedData.biweeklyAllocation || 0,
+              actualBalance: importedData.actualBalance || 0,
+              isActualBalanceManual:
+                importedData.isActualBalanceManual || false,
+              supplementalAccounts: importedData.supplementalAccounts || [],
+              lastUpdated: new Date().toISOString(),
+            });
+          },
+        );
+
+        logger.info("Import completed successfully", {
+          imported: {
+            envelopes: importedData.envelopes?.length || 0,
+            bills: importedData.bills?.length || 0,
+            transactions: unifiedAllTransactions?.length || 0,
+            savingsGoals: importedData.savingsGoals?.length || 0,
+            debts: importedData.debts?.length || 0,
+            paycheckHistory: importedData.paycheckHistory?.length || 0,
+          },
+        });
+
+        showSuccessToast(
+          `Data imported successfully! ${importedData.envelopes?.length || 0} envelopes, ${importedData.bills?.length || 0} bills, ${unifiedAllTransactions?.length || 0} transactions restored.`,
+          "Import Completed",
+        );
+
+        // Trigger a page reload to refresh all components with new data
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+
+        return {
+          success: true,
+          imported: {
+            envelopes: importedData.envelopes?.length || 0,
+            bills: importedData.bills?.length || 0,
+            transactions: unifiedAllTransactions?.length || 0,
+            savingsGoals: importedData.savingsGoals?.length || 0,
+            debts: importedData.debts?.length || 0,
+            paycheckHistory: importedData.paycheckHistory?.length || 0,
+          },
         };
-
-        logger.info("Import completed successfully");
-        showSuccessToast("Data imported successfully!", "Import Completed");
-
-        return processedData;
       } catch (error) {
         logger.error("Import failed", error);
         showErrorToast(`Import failed: ${error.message}`, "Import Failed");
