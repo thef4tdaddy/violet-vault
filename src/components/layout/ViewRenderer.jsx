@@ -269,9 +269,8 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
               logger.info("Successfully deleted paycheck from Dexie");
             }
 
-            // Also call the old function to update Zustand state
-            logger.info("Updating Zustand state");
-            await deletePaycheck(paycheckId);
+            // REMOVED: No longer calling Zustand to prevent data inconsistency
+            // await deletePaycheck(paycheckId);
 
             logger.info("Paycheck deleted successfully with proper balance reversal", {
               paycheckId,
