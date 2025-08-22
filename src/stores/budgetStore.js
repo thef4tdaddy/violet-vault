@@ -16,6 +16,13 @@ import {
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
+// Helper function to trigger sync for critical changes
+const triggerCriticalSync = (changeType) => {
+  if (typeof window !== "undefined" && window.cloudSyncService) {
+    window.cloudSyncService.triggerSyncForCriticalChange(changeType);
+  }
+};
+
 // Migration function to handle old localStorage format
 const migrateOldData = async () => {
   try {
