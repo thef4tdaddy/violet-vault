@@ -390,13 +390,77 @@ const useBudgetData = () => {
   const processPaycheckMutation = useMutation({
     mutationKey: ["paychecks", "process"],
     mutationFn: async (paycheckData) => {
-      // Call Zustand mutation
-      const result = zustandProcessPaycheck(paycheckData);
+      // Import the needed functions from budgetDb
+      const { setBudgetMetadata } = await import("../db/budgetDb");
 
-      // Persist paycheck history to Dexie
-      // TODO: Add paycheck table to Dexie schema
+      // Get current metadata from Dexie (proper data source)
+      const currentMetadata = await getBudgetMetadata();
+      const currentActualBalance = currentMetadata?.actualBalance || 0;
+      const currentUnassignedCash = currentMetadata?.unassignedCash || 0;
 
-      return result;
+      // Calculate new balances properly (ADD, don't SET)
+      const newActualBalance = currentActualBalance + paycheckData.amount;
+      let newUnassignedCash = currentUnassignedCash;
+      let envelopeUpdates = [];
+
+      // Handle allocation mode
+      if (
+        paycheckData.mode === "allocate" &&
+        paycheckData.envelopeAllocations
+      ) {
+        // Distribute to specified envelopes
+        envelopeUpdates = paycheckData.envelopeAllocations.map(
+          (allocation) => ({
+            id: allocation.envelopeId,
+            amount: allocation.amount,
+          }),
+        );
+
+        // Any leftover goes to unassigned cash
+        const totalAllocated = paycheckData.envelopeAllocations.reduce(
+          (sum, alloc) => sum + alloc.amount,
+          0,
+        );
+        newUnassignedCash += paycheckData.amount - totalAllocated;
+      } else {
+        // Leftover mode - all to unassigned cash
+        newUnassignedCash += paycheckData.amount;
+      }
+
+      // Update budget metadata in Dexie
+      await setBudgetMetadata({
+        actualBalance: newActualBalance,
+        unassignedCash: newUnassignedCash,
+      });
+
+      // Update envelope balances in Dexie if allocating
+      if (envelopeUpdates.length > 0) {
+        const { budgetDb } = await import("../db/budgetDb");
+        for (const update of envelopeUpdates) {
+          const envelope = await budgetDb.envelopes.get(update.id);
+          if (envelope) {
+            await budgetDb.envelopes.update(update.id, {
+              currentBalance: (envelope.currentBalance || 0) + update.amount,
+            });
+          }
+        }
+      }
+
+      // Store paycheck in history
+      const paycheckRecord = {
+        ...paycheckData,
+        id: paycheckData.id || `paycheck_${Date.now()}`,
+        processedAt: new Date().toISOString(),
+        actualBalanceBefore: currentActualBalance,
+        actualBalanceAfter: newActualBalance,
+        unassignedCashBefore: currentUnassignedCash,
+        unassignedCashAfter: newUnassignedCash,
+      };
+
+      // Also call Zustand to update in-memory state
+      zustandProcessPaycheck(paycheckData);
+
+      return paycheckRecord;
     },
     onSuccess: () => {
       // Invalidate all related queries
