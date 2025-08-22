@@ -5,6 +5,15 @@ import { queryKeys, optimisticHelpers } from "../utils/queryClient";
 import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "../db/budgetDb";
 import logger from "../utils/logger.js";
 
+// Helper to trigger sync for transaction changes
+const triggerTransactionSync = (changeType) => {
+  if (typeof window !== "undefined" && window.cloudSyncService) {
+    window.cloudSyncService.triggerSyncForCriticalChange(
+      `transaction_${changeType}`,
+    );
+  }
+};
+
 /**
  * Specialized hook for transaction management
  * Provides transaction operations with smart filtering, date range support, and analytics
@@ -296,6 +305,8 @@ const useTransactions = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.analytics });
+      // Trigger immediate sync for transaction addition
+      triggerTransactionSync("added");
     },
     onError: (error) => {
       logger.error("Failed to add transaction", error, {
@@ -327,6 +338,8 @@ const useTransactions = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      // Trigger immediate sync for transaction reconciliation
+      triggerTransactionSync("reconciled");
     },
     onError: (error) => {
       logger.error("Failed to reconcile transaction", error, {
@@ -361,6 +374,8 @@ const useTransactions = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.analytics });
+      // Trigger immediate sync for transaction deletion
+      triggerTransactionSync("deleted");
     },
     onError: (error, transactionId) => {
       logger.error("Failed to delete transaction", error, {
@@ -394,6 +409,8 @@ const useTransactions = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.analytics });
+      // Trigger immediate sync for transaction update
+      triggerTransactionSync("updated");
     },
     onError: (error) => {
       logger.error("Failed to update transaction", error, {
