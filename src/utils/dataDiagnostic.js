@@ -63,8 +63,14 @@ export const runDataDiagnostic = async () => {
       }
     }
 
-    // Check all other tables
-    const tables = ["envelopes", "transactions", "bills", "debts"];
+    // Check all other tables (including paycheckHistory)
+    const tables = [
+      "envelopes",
+      "transactions",
+      "bills",
+      "debts",
+      "paycheckHistory",
+    ];
     const counts = {};
 
     for (const table of tables) {
@@ -115,8 +121,99 @@ export const runDataDiagnostic = async () => {
   return results;
 };
 
+// Paycheck Data Cleanup Utility
+export const cleanupCorruptedPaychecks = async () => {
+  console.log("🧹 VioletVault Paycheck Cleanup Tool");
+  console.log("=".repeat(50));
+
+  if (!window.budgetDb) {
+    console.error("❌ budgetDb not available");
+    return { success: false, error: "budgetDb not available" };
+  }
+
+  try {
+    // Get all paycheck history
+    const allPaychecks = await window.budgetDb.paycheckHistory.toArray();
+    console.log(`📊 Found ${allPaychecks.length} paycheck records`);
+
+    // Identify corrupted paychecks (missing required fields)
+    const corruptedPaychecks = allPaychecks.filter((paycheck) => {
+      return (
+        !paycheck.id ||
+        !paycheck.amount ||
+        !paycheck.date ||
+        typeof paycheck.amount !== "number" ||
+        paycheck.id === null ||
+        paycheck.id === undefined
+      );
+    });
+
+    console.log(
+      `🔍 Found ${corruptedPaychecks.length} corrupted paycheck records`,
+    );
+
+    if (corruptedPaychecks.length > 0) {
+      console.log("💀 Corrupted paychecks:", corruptedPaychecks);
+
+      const confirmed = confirm(
+        `Found ${corruptedPaychecks.length} corrupted paycheck records. Do you want to delete them? This action cannot be undone.`,
+      );
+
+      if (confirmed) {
+        // Delete corrupted paychecks
+        const deletePromises = corruptedPaychecks.map((paycheck) => {
+          if (paycheck.id) {
+            return window.budgetDb.paycheckHistory.delete(paycheck.id);
+          } else {
+            // For paychecks with no ID, we need to delete by a combination of fields
+            return window.budgetDb.paycheckHistory
+              .where("date")
+              .equals(paycheck.date)
+              .and(
+                (p) =>
+                  p.amount === paycheck.amount && p.source === paycheck.source,
+              )
+              .delete();
+          }
+        });
+
+        await Promise.all(deletePromises);
+        console.log(
+          `✅ Successfully deleted ${corruptedPaychecks.length} corrupted paycheck records`,
+        );
+
+        // Verify cleanup
+        const remainingPaychecks =
+          await window.budgetDb.paycheckHistory.toArray();
+        console.log(
+          `📊 Remaining paycheck records: ${remainingPaychecks.length}`,
+        );
+
+        return {
+          success: true,
+          deleted: corruptedPaychecks.length,
+          remaining: remainingPaychecks.length,
+        };
+      } else {
+        console.log("❌ Cleanup cancelled by user");
+        return { success: false, error: "Cancelled by user" };
+      }
+    } else {
+      console.log("✅ No corrupted paycheck records found");
+      return { success: true, deleted: 0, remaining: allPaychecks.length };
+    }
+  } catch (error) {
+    console.error("❌ Paycheck cleanup failed:", error);
+    return { success: false, error: error.message };
+  }
+};
+
 // Auto-run if in browser console
 if (typeof window !== "undefined") {
   window.runDataDiagnostic = runDataDiagnostic;
+  window.cleanupCorruptedPaychecks = cleanupCorruptedPaychecks;
   console.log("🔧 Data diagnostic tool loaded! Run: runDataDiagnostic()");
+  console.log(
+    "🧹 Paycheck cleanup tool loaded! Run: cleanupCorruptedPaychecks()",
+  );
 }
