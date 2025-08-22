@@ -616,21 +616,19 @@ const storeInitializer = (set, get) => ({
       }
 
       // Import and start the background sync service
-      const { default: CloudSyncService } = await import(
-        "../services/cloudSyncService"
-      );
-      await CloudSyncService.start({
+      const { cloudSyncService } = await import("../services/cloudSyncService");
+      await cloudSyncService.start({
         encryptionKey: authState.encryptionKey,
         currentUser: authState.currentUser,
         budgetId: authState.budgetId,
       });
 
       logger.info("Background sync service started", {
-        service: "CloudSyncService",
+        service: "cloudSyncService",
       });
     } catch (error) {
       logger.error("Failed to start background sync service", error, {
-        service: "CloudSyncService",
+        service: "cloudSyncService",
       });
     }
   },
