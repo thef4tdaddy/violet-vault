@@ -43,8 +43,7 @@ const DebtDashboard = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedDebt, setSelectedDebt] = useState(null);
   const [editingDebt, setEditingDebt] = useState(null);
-  const [showUpcomingPaymentsModal, setShowUpcomingPaymentsModal] =
-    useState(false);
+  const [showUpcomingPaymentsModal, setShowUpcomingPaymentsModal] = useState(false);
   const [filterOptions, setFilterOptions] = useState({
     type: "all", // all, mortgage, auto, credit_card, etc.
     status: "all", // all, active, paid_off, etc.
@@ -69,16 +68,12 @@ const DebtDashboard = () => {
 
     // Filter by status
     if (filterOptions.status !== "all") {
-      filtered = filtered.filter(
-        (debt) => debt.status === filterOptions.status,
-      );
+      filtered = filtered.filter((debt) => debt.status === filterOptions.status);
     }
 
     // Hide paid off unless explicitly shown
     if (!filterOptions.showPaidOff) {
-      filtered = filtered.filter(
-        (debt) => debt.status !== DEBT_STATUS.PAID_OFF,
-      );
+      filtered = filtered.filter((debt) => debt.status !== DEBT_STATUS.PAID_OFF);
     }
 
     // Sort debts
@@ -152,6 +147,19 @@ const DebtDashboard = () => {
     return linkDebtToBill(debtId, billData);
   };
 
+  const handleModalSubmit = (debtData) => {
+    if (editingDebt) {
+      handleEditDebt(editingDebt.id, debtData);
+    } else {
+      handleAddDebt(debtData);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowAddModal(false);
+    setEditingDebt(null);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -167,8 +175,7 @@ const DebtDashboard = () => {
             Debt Tracking
           </h2>
           <p className="text-gray-600 mt-1">
-            {debtStats.activeDebtCount} active debts • Total: $
-            {debtStats.totalDebt.toFixed(2)}
+            {debtStats.activeDebtCount} active debts • Total: ${debtStats.totalDebt.toFixed(2)}
           </p>
         </div>
 
@@ -237,19 +244,14 @@ const DebtDashboard = () => {
             {filteredDebts.length === 0 ? (
               <div className="text-center py-12">
                 <CreditCard className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  No Debts Found
-                </h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No Debts Found</h3>
                 <p className="text-gray-500 mb-4">
                   {debts.length === 0
                     ? "Start tracking your debts to get insights into your debt payoff journey."
                     : "No debts match your current filters."}
                 </p>
                 {debts.length === 0 && (
-                  <button
-                    onClick={() => setShowAddModal(true)}
-                    className="btn btn-primary"
-                  >
+                  <button onClick={() => setShowAddModal(true)} className="btn btn-primary">
                     <Plus className="h-4 w-4 mr-2" />
                     Add Your First Debt
                   </button>
@@ -271,15 +273,9 @@ const DebtDashboard = () => {
 
       {/* Modals */}
       <AddDebtModal
-        isOpen={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onSubmit={handleAddDebt}
-      />
-
-      <AddDebtModal
-        isOpen={!!editingDebt}
-        onClose={() => setEditingDebt(null)}
-        onSubmit={handleEditDebt}
+        isOpen={showAddModal || !!editingDebt}
+        onClose={handleCloseModal}
+        onSubmit={handleModalSubmit}
         debt={editingDebt}
       />
 
@@ -292,7 +288,10 @@ const DebtDashboard = () => {
           onDelete={handleDeleteDebt}
           onRecordPayment={handleRecordPayment}
           onLinkToBill={handleLinkToBill}
-          onEdit={(debt) => setEditingDebt(debt)}
+          onEdit={(debt) => {
+            setSelectedDebt(null); // Close detail modal before opening edit
+            setEditingDebt(debt);
+          }}
         />
       )}
 
@@ -302,12 +301,8 @@ const DebtDashboard = () => {
           <div className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h3 className="text-xl font-semibold text-gray-900">
-                  Upcoming Debt Payments
-                </h3>
-                <p className="text-gray-600">
-                  Payments due in the next 30 days
-                </p>
+                <h3 className="text-xl font-semibold text-gray-900">Upcoming Debt Payments</h3>
+                <p className="text-gray-600">Payments due in the next 30 days</p>
               </div>
               <button
                 onClick={() => setShowUpcomingPaymentsModal(false)}
@@ -320,12 +315,8 @@ const DebtDashboard = () => {
             {upcomingPayments.length === 0 ? (
               <div className="text-center py-8">
                 <Calendar className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-                <h4 className="text-lg font-medium text-gray-900 mb-2">
-                  No Upcoming Payments
-                </h4>
-                <p className="text-gray-500">
-                  You have no debt payments due in the next 30 days.
-                </p>
+                <h4 className="text-lg font-medium text-gray-900 mb-2">No Upcoming Payments</h4>
+                <p className="text-gray-500">You have no debt payments due in the next 30 days.</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -343,8 +334,7 @@ const DebtDashboard = () => {
                       <p className="text-sm text-gray-600">{debt.creditor}</p>
                       {debt.nextPaymentDate && (
                         <p className="text-xs text-orange-600">
-                          Due:{" "}
-                          {new Date(debt.nextPaymentDate).toLocaleDateString()}
+                          Due: {new Date(debt.nextPaymentDate).toLocaleDateString()}
                         </p>
                       )}
                     </div>
