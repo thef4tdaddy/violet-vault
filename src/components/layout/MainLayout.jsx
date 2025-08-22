@@ -239,12 +239,9 @@ const MainContent = ({
   // Auto-complete onboarding steps based on user actions
   useOnboardingAutoComplete();
 
-  // Handle import by saving data then loading into context
+  // Handle backup import through data management hook
   const handleImport = async (event) => {
-    const data = await onImport(event);
-    if (data) {
-      budget.loadData(data);
-    }
+    await onImport(event);
   };
 
   // Handle change password - delegate to parent component
