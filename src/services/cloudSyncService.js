@@ -87,7 +87,7 @@ class CloudSyncService {
       let cloudData;
       try {
         cloudData = await chunkedFirebaseSync.loadFromCloud();
-      } catch (error) {
+      } catch {
         logger.warn("Could not load cloud data, assuming no cloud data exists");
         cloudData = null;
       }
@@ -97,8 +97,22 @@ class CloudSyncService {
       logger.info(`🔄 Sync direction determined: ${syncDecision.direction}`, {
         localLastModified: localData?.lastModified,
         cloudLastModified: cloudData?.lastModified,
-        hasLocalData: !!(localData?.envelopes?.length || localData?.transactions?.length || localData?.bills?.length),
-        hasCloudData: !!(cloudData?.envelopes?.length || cloudData?.transactions?.length || cloudData?.bills?.length),
+        hasLocalData: !!(
+          localData?.envelopes?.length ||
+          localData?.transactions?.length ||
+          localData?.bills?.length ||
+          localData?.paycheckHistory?.length ||
+          localData?.savingsGoals?.length ||
+          localData?.debts?.length
+        ),
+        hasCloudData: !!(
+          cloudData?.envelopes?.length ||
+          cloudData?.transactions?.length ||
+          cloudData?.bills?.length ||
+          cloudData?.paycheckHistory?.length ||
+          cloudData?.savingsGoals?.length ||
+          cloudData?.debts?.length
+        ),
       });
 
       let result;
@@ -216,15 +230,41 @@ class CloudSyncService {
   }
 
   determineSyncDirection(localData, cloudData) {
-    // Check if cloud has meaningful data vs local
-    const hasCloudData = !!(cloudData?.envelopes?.length || cloudData?.transactions?.length || cloudData?.bills?.length);
-    const hasLocalData = !!(localData?.envelopes?.length || localData?.transactions?.length || localData?.bills?.length);
-    
+    // Check if cloud has meaningful data vs local (include all data types)
+    const hasCloudData = !!(
+      cloudData?.envelopes?.length ||
+      cloudData?.transactions?.length ||
+      cloudData?.bills?.length ||
+      cloudData?.paycheckHistory?.length ||
+      cloudData?.savingsGoals?.length ||
+      cloudData?.debts?.length
+    );
+    const hasLocalData = !!(
+      localData?.envelopes?.length ||
+      localData?.transactions?.length ||
+      localData?.bills?.length ||
+      localData?.paycheckHistory?.length ||
+      localData?.savingsGoals?.length ||
+      localData?.debts?.length
+    );
+
     logger.info("🔄 Sync direction analysis:", {
       hasCloudData,
       hasLocalData,
-      cloudItemCount: (cloudData?.envelopes?.length || 0) + (cloudData?.transactions?.length || 0) + (cloudData?.bills?.length || 0),
-      localItemCount: (localData?.envelopes?.length || 0) + (localData?.transactions?.length || 0) + (localData?.bills?.length || 0),
+      cloudItemCount:
+        (cloudData?.envelopes?.length || 0) +
+        (cloudData?.transactions?.length || 0) +
+        (cloudData?.bills?.length || 0) +
+        (cloudData?.paycheckHistory?.length || 0) +
+        (cloudData?.savingsGoals?.length || 0) +
+        (cloudData?.debts?.length || 0),
+      localItemCount:
+        (localData?.envelopes?.length || 0) +
+        (localData?.transactions?.length || 0) +
+        (localData?.bills?.length || 0) +
+        (localData?.paycheckHistory?.length || 0) +
+        (localData?.savingsGoals?.length || 0) +
+        (localData?.debts?.length || 0),
       cloudLastModified: cloudData?.lastModified,
       localLastModified: localData?.lastModified,
     });
@@ -343,46 +383,6 @@ class CloudSyncService {
     }
   }
 
-  async forcePushToCloud() {
-    // Force push local data to Firebase without pulling from Firebase first
-    // This is used after backup imports to ensure imported data replaces cloud data
-    try {
-      logger.info("🚀 Starting force push to cloud...");
-
-      if (this.config && typeof this.config.forcePushToCloud === "function") {
-        // If the config has a forcePushToCloud method, use it
-        await this.config.forcePushToCloud();
-        logger.info("Data successfully pushed to cloud using config method");
-      } else if (
-        chunkedFirebaseSync &&
-        typeof chunkedFirebaseSync.forcePushToCloud === "function"
-      ) {
-        // If chunkedFirebaseSync has a forcePushToCloud method, use it
-        await chunkedFirebaseSync.forcePushToCloud();
-        logger.info(
-          "Data successfully pushed to cloud using chunkedFirebaseSync",
-        );
-      } else if (
-        chunkedFirebaseSync &&
-        typeof chunkedFirebaseSync.uploadToFirebase === "function"
-      ) {
-        // Use upload method if available (one-way upload)
-        await chunkedFirebaseSync.uploadToFirebase();
-        logger.info("Data successfully pushed to cloud using uploadToFirebase");
-      } else {
-        logger.warn(
-          "No force push method available, falling back to regular sync",
-        );
-        await this.forceSync();
-      }
-
-      // Update sync time after successful push
-      await this.updateLastSyncTime();
-    } catch (error) {
-      logger.error("Failed to force push data to cloud:", error);
-      throw error;
-    }
-  }
 }
 
 export const cloudSyncService = new CloudSyncService();
