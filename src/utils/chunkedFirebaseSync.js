@@ -635,6 +635,13 @@ class ChunkedFirebaseSync {
           Object.entries(chunkMap).map(([key, chunks]) => [key, chunks.length]),
         ),
       });
+
+      return {
+        success: true,
+        duration,
+        totalDocuments: totalDocs,
+        chunkMap,
+      };
     } catch (error) {
       logger.error("❌ Chunked save failed:", error);
       H.consumeError(error, {

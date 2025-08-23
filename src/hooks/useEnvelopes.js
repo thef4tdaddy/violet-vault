@@ -5,6 +5,15 @@ import { budgetDb } from "../db/budgetDb";
 import { AUTO_CLASSIFY_ENVELOPE_TYPE } from "../constants/categories";
 import logger from "../utils/logger";
 
+// Helper to trigger sync for envelope changes
+const triggerEnvelopeSync = (changeType) => {
+  if (typeof window !== "undefined" && window.cloudSyncService) {
+    window.cloudSyncService.triggerSyncForCriticalChange(
+      `envelope_${changeType}`,
+    );
+  }
+};
+
 /**
  * Specialized hook for envelope management
  * Provides focused envelope operations with smart filtering and caching
@@ -166,6 +175,8 @@ const useEnvelopes = (options = {}) => {
       // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      // Trigger immediate sync for envelope addition
+      triggerEnvelopeSync("added");
     },
     onError: (error) => {
       logger.error("Failed to add envelope:", error);
@@ -191,6 +202,8 @@ const useEnvelopes = (options = {}) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      // Trigger immediate sync for envelope update
+      triggerEnvelopeSync("updated");
     },
     onError: (error) => {
       logger.error("Failed to update envelope:", error);
@@ -213,6 +226,8 @@ const useEnvelopes = (options = {}) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      // Trigger immediate sync for envelope deletion
+      triggerEnvelopeSync("deleted");
     },
     onError: (error) => {
       logger.error("Failed to delete envelope:", error);
@@ -284,6 +299,8 @@ const useEnvelopes = (options = {}) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      // Trigger immediate sync for fund transfer
+      triggerEnvelopeSync("transfer");
     },
     onError: (error) => {
       logger.error("Failed to transfer funds:", error);

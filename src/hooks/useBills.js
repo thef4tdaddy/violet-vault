@@ -4,6 +4,13 @@ import { queryKeys, optimisticHelpers } from "../utils/queryClient";
 import { budgetDb } from "../db/budgetDb";
 import logger from "../utils/logger";
 
+// Helper to trigger sync for bill changes
+const triggerBillSync = (changeType) => {
+  if (typeof window !== "undefined" && window.cloudSyncService) {
+    window.cloudSyncService.triggerSyncForCriticalChange(`bill_${changeType}`);
+  }
+};
+
 /**
  * Specialized hook for bill management
  * Provides bill operations with smart filtering, due date tracking, and envelope integration
@@ -215,6 +222,8 @@ const useBills = (options = {}) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      // Trigger immediate sync for bill addition
+      triggerBillSync("added");
     },
     onError: (error) => {
       logger.error("Failed to add bill:", error);
