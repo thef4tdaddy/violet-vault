@@ -413,7 +413,6 @@ const useDataManagement = () => {
 
           // Wait for Dexie transaction to fully commit before syncing
           await new Promise((resolve) => setTimeout(resolve, 500));
-
           // Force sync TO Firebase without pulling FROM Firebase
           if (cloudSyncService.forcePushToCloud) {
             await cloudSyncService.forcePushToCloud();
