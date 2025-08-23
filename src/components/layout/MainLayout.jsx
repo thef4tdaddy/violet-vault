@@ -248,11 +248,17 @@ const MainContent = ({
   // Handle change password - delegate to parent component
   const handleChangePassword = onChangePassword;
 
-  // Get TanStack Query data for paycheck predictions
-  const { paycheckHistory: tanStackPaycheckHistory } = useBudgetData();
+  // Get TanStack Query data
+  const {
+    envelopes = [],
+    savingsGoals = [],
+    unassignedCash = 0,
+    actualBalance = 0,
+    paycheckHistory: tanStackPaycheckHistory,
+  } = useBudgetData();
 
-  const { envelopes, savingsGoals, unassignedCash, isOnline, isSyncing } =
-    budget;
+  // Get UI state from Zustand
+  const { isOnline, isSyncing } = budget;
 
   // Payday prediction notifications using TanStack Query data
   usePaydayPrediction(tanStackPaycheckHistory, !!currentUser);
