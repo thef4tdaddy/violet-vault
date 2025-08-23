@@ -281,7 +281,8 @@ const useBudgetData = () => {
 
       // Include unassigned cash discrepancies
       const unassignedLedger = ledgerTotals["unassigned"] || 0;
-      const unassignedDiff = (Number(unassignedCash) || 0) - unassignedLedger;
+      const currentUnassignedCash = dashboardQuery.data?.unassignedCash || 0;
+      const unassignedDiff = (Number(currentUnassignedCash) || 0) - unassignedLedger;
       if (Math.abs(unassignedDiff) > 0.01) {
         newTransactions.push({
           id: `auto-unassigned-${Date.now()}`,
