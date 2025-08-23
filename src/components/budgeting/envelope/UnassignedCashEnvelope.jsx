@@ -1,6 +1,6 @@
 import React from "react";
 import { DollarSign, History } from "lucide-react";
-import { useBudgetStore } from "../../stores/uiStore";
+import { useBudgetStore } from "../../../stores/uiStore";
 
 const UnassignedCashEnvelope = ({ unassignedCash, onViewHistory }) => {
   const { openUnassignedCashModal } = useBudgetStore();
