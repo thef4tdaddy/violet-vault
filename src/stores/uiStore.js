@@ -90,9 +90,6 @@ const migrateOldData = async () => {
   }
 };
 
-// Run migration before creating store
-await migrateOldData();
-
 // UI Store configuration - handles UI state, settings, and app preferences
 // Data arrays are handled by TanStack Query → Dexie architecture
 const storeInitializer = (set, get) => ({
@@ -174,6 +171,15 @@ const storeInitializer = (set, get) => ({
         cloudSyncEnabled: enabled,
       });
     }),
+
+  // Run migration on first use
+  async runMigrationIfNeeded() {
+    try {
+      await migrateOldData();
+    } catch (error) {
+      logger.warn("Migration failed in store", { error: error.message });
+    }
+  },
 
   // Start background sync service
   async startBackgroundSync() {
