@@ -198,7 +198,7 @@ const storeInitializer = (set, get) => ({
       }
 
       // Import and start the cloud sync service
-      const { default: cloudSyncService } = await import("../services/cloudSyncService");
+      const { cloudSyncService } = await import("../services/cloudSyncService");
       
       const syncConfig = {
         budgetId: authState.budgetId,
