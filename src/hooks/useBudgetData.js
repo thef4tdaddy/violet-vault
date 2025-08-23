@@ -197,14 +197,12 @@ const useBudgetData = () => {
     enabled: true,
   });
 
-  // Temporarily disable savingsGoalsQuery to debug React #185
-  const savingsGoalsQuery = { data: [], isLoading: false, isFetching: false, error: null };
-  // const savingsGoalsQuery = useQuery({
-  //   queryKey: queryKeys.savingsGoalsList(),
-  //   queryFn: queryFunctions.savingsGoals,
-  //   staleTime: 10 * 60 * 1000, // 10 minutes
-  //   enabled: true,
-  // });
+  const savingsGoalsQuery = useQuery({
+    queryKey: queryKeys.savingsGoalsList(),
+    queryFn: queryFunctions.savingsGoals,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    enabled: true,
+  });
 
   const paycheckHistoryQuery = useQuery({
     queryKey: queryKeys.paycheckHistory(),
@@ -213,14 +211,12 @@ const useBudgetData = () => {
     enabled: true,
   });
 
-  // Temporarily disable dashboardQuery to debug React #185
-  const dashboardQuery = { data: null, isLoading: false, isFetching: false, error: null };
-  // const dashboardQuery = useQuery({
-  //   queryKey: queryKeys.dashboardSummary(),
-  //   queryFn: queryFunctions.dashboardSummary,
-  //   staleTime: 30 * 1000, // 30 seconds
-  //   enabled: true,
-  // });
+  const dashboardQuery = useQuery({
+    queryKey: queryKeys.dashboardSummary(),
+    queryFn: queryFunctions.dashboardSummary,
+    staleTime: 30 * 1000, // 30 seconds
+    enabled: true,
+  });
 
   // Event listeners for data import and sync invalidation
   useEffect(() => {
@@ -249,17 +245,9 @@ const useBudgetData = () => {
   // NOTE: Removed Zustand subscription - unassigned cash should come from Dexie via TanStack Query
   // instead of being stored only in Zustand store
 
-  // Temporarily disable reconciliation useEffect to debug React #185
-  // useEffect(() => {
-    // Reconciliation logic temporarily disabled for React #185 debugging
-    // const reconcileMissingTransactions = async () => { ... };
-    // reconcileMissingTransactions();
-  // }, [
-  //   envelopesQuery.data,
-  //   transactionsQuery.data,
-  //   // dashboardQuery.data?.unassignedCash, // Disabled for debugging
-  //   queryClient,
-  // ]);
+  // Reconciliation moved to manual trigger to prevent React #185
+  // The async reconciliation was causing hook ordering issues in production
+  // TODO: Implement as a manual user action or background service instead
 
   // Enhanced mutations with optimistic updates and Dexie persistence
   const addEnvelopeMutation = useMutation({
@@ -542,22 +530,22 @@ const useBudgetData = () => {
     paycheckHistory: paycheckHistoryQuery.data || [],
     dashboardSummary: dashboardQuery.data,
 
-    // Computed values from dashboard query (disabled for debugging)
-    unassignedCash: 0, // dashboardQuery.data?.unassignedCash || 0,
-    actualBalance: 0, // dashboardQuery.data?.actualBalance || 0,
+    // Computed values from dashboard query
+    unassignedCash: dashboardQuery.data?.unassignedCash || 0,
+    actualBalance: dashboardQuery.data?.actualBalance || 0,
 
-    // Loading states (savingsGoals temporarily disabled for React #185 debugging)
+    // Loading states
     isLoading:
       envelopesQuery.isLoading ||
       transactionsQuery.isLoading ||
       billsQuery.isLoading ||
-      // savingsGoalsQuery.isLoading ||
+      savingsGoalsQuery.isLoading ||
       paycheckHistoryQuery.isLoading,
     isFetching:
       envelopesQuery.isFetching ||
       transactionsQuery.isFetching ||
       billsQuery.isFetching ||
-      // savingsGoalsQuery.isFetching ||
+      savingsGoalsQuery.isFetching ||
       paycheckHistoryQuery.isFetching,
     isOffline: !navigator.onLine,
 
@@ -565,9 +553,9 @@ const useBudgetData = () => {
     envelopesLoading: envelopesQuery.isLoading,
     transactionsLoading: transactionsQuery.isLoading,
     billsLoading: billsQuery.isLoading,
-    savingsGoalsLoading: false, // savingsGoalsQuery.isLoading, // Disabled for React #185 debugging
+    savingsGoalsLoading: savingsGoalsQuery.isLoading,
     paycheckHistoryLoading: paycheckHistoryQuery.isLoading,
-    dashboardLoading: false, // dashboardQuery.isLoading, // Disabled for debugging
+    dashboardLoading: dashboardQuery.isLoading,
 
     // Mutations
     addEnvelope: addEnvelopeMutation.mutate,
