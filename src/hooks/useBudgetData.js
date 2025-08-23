@@ -17,6 +17,8 @@ import logger from "../utils/logger.js";
  * - Real-time state via Zustand
  * - Offline persistence via Dexie
  * - Optimistic updates for better UX
+ * 
+ * Fixed: Removed top-level await to prevent React #185 on Vercel
  */
 const useBudgetData = () => {
   const queryClient = useQueryClient();
