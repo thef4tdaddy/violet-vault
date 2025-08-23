@@ -198,7 +198,7 @@ const useBudgetData = () => {
   });
 
   const savingsGoalsQuery = useQuery({
-    queryKey: queryKeys.savingsGoals,
+    queryKey: queryKeys.savingsGoalsList(),
     queryFn: queryFunctions.savingsGoals,
     staleTime: 10 * 60 * 1000, // 10 minutes
     enabled: true,
@@ -224,7 +224,7 @@ const useBudgetData = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
-      queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals });
+      queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalsList() });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary });
     };
