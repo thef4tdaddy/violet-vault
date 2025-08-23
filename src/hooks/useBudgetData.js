@@ -7,7 +7,7 @@ import {
   prefetchHelpers,
 } from "../utils/queryClient";
 import { budgetDb, getBudgetMetadata } from "../db/budgetDb";
-import { useTransactions } from "./useTransactions";
+// import { useTransactions } from "./useTransactions";
 import logger from "../utils/logger.js";
 
 /**
@@ -32,8 +32,7 @@ const useBudgetData = () => {
     isUnassignedCashModalOpen,
   } = budgetStore;
 
-  // Get reconcileTransaction from useTransactions hook
-  const { reconcileTransaction } = useTransactions();
+  // Create reconcileTransaction mutation directly to avoid circular dependencies
 
   // Query functions that fetch from Dexie (primary data source)
   const queryFunctions = {
@@ -573,6 +572,19 @@ const useBudgetData = () => {
     }
   };
 
+  // Simple reconcileTransaction mutation to avoid circular dependency
+  const reconcileTransactionMutation = useMutation({
+    mutationKey: ["transactions", "reconcile"],
+    mutationFn: async (transactionData) => {
+      await optimisticHelpers.addTransaction(transactionData);
+      return transactionData;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary() });
+    },
+  });
+
   return {
     // Data (from TanStack Query)
     envelopes: envelopesQuery.data || [],
@@ -615,7 +627,7 @@ const useBudgetData = () => {
     deleteEnvelope: deleteEnvelopeMutation.mutate,
     addTransaction: addTransactionMutation.mutate,
     processPaycheck: processPaycheckMutation.mutate,
-    reconcileTransaction,
+    reconcileTransaction: reconcileTransactionMutation.mutate,
 
     // Mutation states
     isAddingEnvelope: addEnvelopeMutation.isPending,
