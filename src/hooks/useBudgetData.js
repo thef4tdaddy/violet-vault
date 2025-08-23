@@ -580,11 +580,11 @@ const useBudgetData = () => {
   };
 
   return {
-    // Data (from queries with Zustand fallback)
-    envelopes: envelopesQuery.data || envelopes || [],
-    transactions: transactionsQuery.data || transactions || [],
-    bills: billsQuery.data || bills || [],
-    savingsGoals: savingsGoals || [],
+    // Data (from TanStack Query)
+    envelopes: envelopesQuery.data || [],
+    transactions: transactionsQuery.data || [],
+    bills: billsQuery.data || [],
+    savingsGoals: [], // TODO: Add savingsGoals query
     paycheckHistory: paycheckHistoryQuery.data || [],
     dashboardSummary: dashboardQuery.data,
 
