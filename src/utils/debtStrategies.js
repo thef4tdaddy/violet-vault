@@ -200,9 +200,15 @@ function calculatePayoffStrategy(sortedDebts, extraPayment, strategyType) {
 
   // Calculate month-by-month payoff simulation
   const simulation = simulatePayoffStrategy(sortedDebts, extraPayment);
+  // Build simplified payment plan used by older utilities/tests
+  const paymentPlan = sortedDebts.map((debt, index) => ({
+    ...debt,
+    priorityOrder: index + 1,
+  }));
 
   return {
     strategy: strategyType,
+    paymentPlan,
     totalMonths: simulation.totalMonths,
     totalInterest: simulation.totalInterest,
     totalSavings: simulation.interestSaved,
@@ -212,6 +218,7 @@ function calculatePayoffStrategy(sortedDebts, extraPayment, strategyType) {
       totalDebt,
       totalMinimumPayment,
       recommendedExtraPayment: extraPayment,
+      totalInterestPaid: simulation.totalInterest,
       totalPayment: totalDebt + simulation.totalInterest,
       estimatedPayoffDate: simulation.payoffDate,
       timeToPayoff: `${Math.floor(simulation.totalMonths / 12)} years ${simulation.totalMonths % 12} months`,
