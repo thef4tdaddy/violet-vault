@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useBudgetStore } from "../../stores/uiStore";
+import { useBudgetStore } from "../stores/uiStore";
 // import { budgetDb } from "../db/budgetDb"; // TODO: Use for local sync operations
 import logger from "../utils/logger";
 import { useToastHelpers } from "../utils/toastHelpers";
