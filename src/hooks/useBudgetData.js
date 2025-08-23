@@ -6,9 +6,13 @@ import {
   optimisticHelpers,
   prefetchHelpers,
 } from "../utils/queryClient";
-import { budgetDb, getBudgetMetadata } from "../db/budgetDb";
+import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "../db/budgetDb";
 // import { useTransactions } from "./useTransactions";
 import logger from "../utils/logger.js";
+import {
+  calculatePaycheckBalances,
+  validateBalances,
+} from "../utils/balanceCalculator";
 
 /**
  * Unified budget data hook combining TanStack Query, Zustand, and Dexie
@@ -17,7 +21,7 @@ import logger from "../utils/logger.js";
  * - Real-time state via Zustand
  * - Offline persistence via Dexie
  * - Optimistic updates for better UX
- * 
+ *
  * Fixed: Removed top-level await to prevent React #185 on Vercel
  */
 const useBudgetData = () => {
@@ -324,11 +328,7 @@ const useBudgetData = () => {
         paycheckData,
       });
 
-      // Import the needed functions from budgetDb and balance calculator
-      const { setBudgetMetadata } = await import("../db/budgetDb");
-      const { calculatePaycheckBalances, validateBalances } = await import(
-        "../utils/balanceCalculator"
-      );
+      // Using statically imported functions to avoid chunk loading errors
 
       // Get current metadata from Dexie (proper data source)
       const currentMetadata = await getBudgetMetadata();
