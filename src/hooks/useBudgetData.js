@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useBudgetStore } from "../../stores/uiStore";
+import { useBudgetStore } from "../stores/uiStore";
 import {
   queryKeys,
   optimisticHelpers,
