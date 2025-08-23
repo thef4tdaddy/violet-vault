@@ -441,6 +441,26 @@ const useBudgetData = () => {
       const { budgetDb } = await import("../db/budgetDb");
       await budgetDb.paycheckHistory.put(paycheckRecord);
 
+      // Create a transaction record for the paycheck income
+      const paycheckTransaction = {
+        id: `paycheck_txn_${Date.now()}`,
+        date: new Date().toISOString(),
+        amount: paycheckData.amount,
+        description: `Paycheck from ${paycheckData.payerName || "Unknown"}`,
+        category: "Income",
+        type: "transaction",
+        envelopeId: null, // Income transactions don't belong to an envelope
+        paycheckId: paycheckRecord.id, // Link to the paycheck record
+        createdAt: new Date().toISOString(),
+      };
+
+      await budgetDb.transactions.put(paycheckTransaction);
+      logger.info("Created paycheck transaction record", {
+        transactionId: paycheckTransaction.id,
+        amount: paycheckTransaction.amount,
+        linkedToPaycheck: paycheckRecord.id,
+      });
+
       logger.info("Paycheck processed successfully", {
         paycheckId: paycheckRecord.id,
         amount: paycheckData.amount,
@@ -464,9 +484,16 @@ const useBudgetData = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary() });
 
+      // Invalidate balance-related queries (critical for paycheck processing)
+      queryClient.invalidateQueries({ queryKey: queryKeys.unassignedCash() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.actualBalance() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
+
       // Force immediate refetch of critical queries
       queryClient.refetchQueries({ queryKey: queryKeys.paycheckHistory() });
       queryClient.refetchQueries({ queryKey: queryKeys.envelopes });
+      queryClient.refetchQueries({ queryKey: queryKeys.unassignedCash() });
+      queryClient.refetchQueries({ queryKey: queryKeys.actualBalance() });
     },
   });
 
