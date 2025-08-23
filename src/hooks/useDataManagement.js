@@ -411,6 +411,9 @@ const useDataManagement = () => {
         try {
           logger.info("🚀 Forcing push of imported data to Firebase...");
 
+          // Wait for Dexie transaction to fully commit before syncing
+          await new Promise((resolve) => setTimeout(resolve, 500));
+
           // Force sync TO Firebase without pulling FROM Firebase
           if (cloudSyncService.forcePushToCloud) {
             await cloudSyncService.forcePushToCloud();
@@ -432,6 +435,9 @@ const useDataManagement = () => {
 
         // Invalidate TanStack Query cache to refresh UI with new data instead of page reload
         try {
+          // Wait a bit more to ensure sync is complete
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+
           const { queryClient } = await import("../utils/queryClient");
           await queryClient.invalidateQueries();
           logger.info("TanStack Query cache invalidated after data import");
