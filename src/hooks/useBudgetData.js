@@ -7,6 +7,7 @@ import {
   prefetchHelpers,
 } from "../utils/queryClient";
 import { budgetDb, getBudgetMetadata } from "../db/budgetDb";
+import { useTransactions } from "./useTransactions";
 import logger from "../utils/logger.js";
 
 /**
@@ -30,6 +31,9 @@ const useBudgetData = () => {
     biweeklyAllocation,
     isUnassignedCashModalOpen,
   } = budgetStore;
+
+  // Get reconcileTransaction from useTransactions hook
+  const { reconcileTransaction } = useTransactions();
 
   // Query functions that fetch from Dexie (primary data source)
   const queryFunctions = {
@@ -610,7 +614,7 @@ const useBudgetData = () => {
     deleteEnvelope: deleteEnvelopeMutation.mutate,
     addTransaction: addTransactionMutation.mutate,
     processPaycheck: processPaycheckMutation.mutate,
-    // reconcileTransaction removed - handled elsewhere
+    reconcileTransaction,
 
     // Mutation states
     isAddingEnvelope: addEnvelopeMutation.isPending,

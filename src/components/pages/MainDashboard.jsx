@@ -45,9 +45,8 @@ const Dashboard = ({ setActiveView }) => {
     isLoading: actualBalanceLoading,
   } = useActualBalance();
 
-  // Keep Zustand for non-migrated operations
-  const budget = useBudgetStore();
-  const { reconcileTransaction, paycheckHistory } = budget;
+  // Get reconcileTransaction and paycheckHistory from useBudgetData
+  const { reconcileTransaction, paycheckHistory } = useBudgetData();
   const [showReconcileModal, setShowReconcileModal] = useState(false);
   const [newTransaction, setNewTransaction] = useState({
     amount: "",
