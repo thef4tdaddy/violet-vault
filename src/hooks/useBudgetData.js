@@ -213,12 +213,14 @@ const useBudgetData = () => {
     enabled: true,
   });
 
-  const dashboardQuery = useQuery({
-    queryKey: queryKeys.dashboardSummary(),
-    queryFn: queryFunctions.dashboardSummary,
-    staleTime: 30 * 1000, // 30 seconds
-    enabled: true,
-  });
+  // Temporarily disable dashboardQuery to debug React #185
+  const dashboardQuery = { data: null, isLoading: false, isFetching: false, error: null };
+  // const dashboardQuery = useQuery({
+  //   queryKey: queryKeys.dashboardSummary(),
+  //   queryFn: queryFunctions.dashboardSummary,
+  //   staleTime: 30 * 1000, // 30 seconds
+  //   enabled: true,
+  // });
 
   // Event listeners for data import and sync invalidation
   useEffect(() => {
@@ -284,7 +286,7 @@ const useBudgetData = () => {
 
       // Include unassigned cash discrepancies
       const unassignedLedger = ledgerTotals["unassigned"] || 0;
-      const currentUnassignedCash = dashboardQuery.data?.unassignedCash || 0;
+      const currentUnassignedCash = 0; // dashboardQuery.data?.unassignedCash || 0; // Disabled for debugging
       const unassignedDiff = (Number(currentUnassignedCash) || 0) - unassignedLedger;
       if (Math.abs(unassignedDiff) > 0.01) {
         newTransactions.push({
@@ -313,7 +315,7 @@ const useBudgetData = () => {
   }, [
     envelopesQuery.data,
     transactionsQuery.data,
-    dashboardQuery.data?.unassignedCash,
+    // dashboardQuery.data?.unassignedCash, // Disabled for debugging
     queryClient,
   ]);
 
@@ -598,9 +600,9 @@ const useBudgetData = () => {
     paycheckHistory: paycheckHistoryQuery.data || [],
     dashboardSummary: dashboardQuery.data,
 
-    // Computed values from dashboard query
-    unassignedCash: dashboardQuery.data?.unassignedCash || 0,
-    actualBalance: dashboardQuery.data?.actualBalance || 0,
+    // Computed values from dashboard query (disabled for debugging)
+    unassignedCash: 0, // dashboardQuery.data?.unassignedCash || 0,
+    actualBalance: 0, // dashboardQuery.data?.actualBalance || 0,
 
     // Loading states (savingsGoals temporarily disabled for React #185 debugging)
     isLoading:
@@ -623,7 +625,7 @@ const useBudgetData = () => {
     billsLoading: billsQuery.isLoading,
     savingsGoalsLoading: false, // savingsGoalsQuery.isLoading, // Disabled for React #185 debugging
     paycheckHistoryLoading: paycheckHistoryQuery.isLoading,
-    dashboardLoading: dashboardQuery.isLoading,
+    dashboardLoading: false, // dashboardQuery.isLoading, // Disabled for debugging
 
     // Mutations
     addEnvelope: addEnvelopeMutation.mutate,
