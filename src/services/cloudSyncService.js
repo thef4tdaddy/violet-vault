@@ -226,20 +226,20 @@ class CloudSyncService {
     }
 
     this.isSyncing = true;
-    
+
     try {
       logger.info("🚀 Force pushing local data to Firebase...");
-      
+
       // Get local data from Dexie
       const localData = await this.fetchDexieData();
-      
+
       // Use chunked Firebase sync to save data (one-way)
       const result = await chunkedFirebaseSync.saveToCloud(
         this.config.budgetId,
         this.config.encryptionKey,
-        localData
+        localData,
       );
-      
+
       if (result.success) {
         logger.info("✅ Force push to Firebase completed successfully");
         return { success: true };

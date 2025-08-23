@@ -411,7 +411,9 @@ const useBudgetData = () => {
 
       // Import the needed functions from budgetDb and balance calculator
       const { setBudgetMetadata } = await import("../db/budgetDb");
-      const { calculatePaycheckBalances, validateBalances } = await import("../utils/balanceCalculator");
+      const { calculatePaycheckBalances, validateBalances } = await import(
+        "../utils/balanceCalculator"
+      );
 
       // Get current metadata from Dexie (proper data source)
       const currentMetadata = await getBudgetMetadata();
@@ -433,10 +435,11 @@ const useBudgetData = () => {
       };
 
       // Prepare allocations for calculator
-      const allocations = paycheckData.envelopeAllocations?.map(alloc => ({
-        envelopeId: alloc.envelopeId,
-        amount: alloc.amount,
-      })) || [];
+      const allocations =
+        paycheckData.envelopeAllocations?.map((alloc) => ({
+          envelopeId: alloc.envelopeId,
+          amount: alloc.amount,
+        })) || [];
 
       // Use centralized balance calculator to ensure consistency
       const newBalances = calculatePaycheckBalances(
@@ -528,7 +531,8 @@ const useBudgetData = () => {
         amount: paycheckData.amount,
         mode: paycheckData.mode,
         actualBalanceChange: newBalances.actualBalance - currentActualBalance,
-        unassignedCashChange: newBalances.unassignedCash - currentUnassignedCash,
+        unassignedCashChange:
+          newBalances.unassignedCash - currentUnassignedCash,
         envelopeAllocations: allocations.length,
       });
 

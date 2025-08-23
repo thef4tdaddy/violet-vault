@@ -152,8 +152,6 @@ const storeInitializer = (set, get) => ({
       state.paycheckHistory = history;
     }),
 
-
-
   // Data loading state
   setDataLoaded: (loaded) =>
     set((state) => {
