@@ -83,11 +83,38 @@ class CloudSyncService {
       // Fetch data from Dexie for sync
       const localData = await this.fetchDexieData();
 
-      // Perform the sync
-      const result = await chunkedFirebaseSync.saveToCloud(
-        localData,
-        this.config.currentUser,
-      );
+      // Check what data exists in cloud to determine sync direction
+      let cloudData;
+      try {
+        cloudData = await chunkedFirebaseSync.loadFromCloud();
+      } catch (error) {
+        logger.warn("Could not load cloud data, assuming no cloud data exists");
+        cloudData = null;
+      }
+
+      // Determine sync direction
+      const syncDecision = this.determineSyncDirection(localData, cloudData);
+      logger.info(`🔄 Sync direction determined: ${syncDecision.direction}`, {
+        localLastModified: localData?.lastModified,
+        cloudLastModified: cloudData?.lastModified,
+        hasLocalData: !!(localData?.envelopes?.length || localData?.transactions?.length || localData?.bills?.length),
+        hasCloudData: !!(cloudData?.envelopes?.length || cloudData?.transactions?.length || cloudData?.bills?.length),
+      });
+
+      let result;
+      if (syncDecision.direction === "fromFirestore") {
+        // Download from Firebase to Dexie
+        result = await chunkedFirebaseSync.loadFromCloud();
+        if (result.success) {
+          logger.info("✅ Downloaded data from Firebase to Dexie");
+        }
+      } else {
+        // Upload from Dexie to Firebase (default behavior)
+        result = await chunkedFirebaseSync.saveToCloud(
+          localData,
+          this.config.currentUser,
+        );
+      }
 
       if (result.success) {
         logger.info("✅ Chunked sync completed successfully.");
@@ -189,12 +216,41 @@ class CloudSyncService {
   }
 
   determineSyncDirection(localData, cloudData) {
+    // Check if cloud has meaningful data vs local
+    const hasCloudData = !!(cloudData?.envelopes?.length || cloudData?.transactions?.length || cloudData?.bills?.length);
+    const hasLocalData = !!(localData?.envelopes?.length || localData?.transactions?.length || localData?.bills?.length);
+    
+    logger.info("🔄 Sync direction analysis:", {
+      hasCloudData,
+      hasLocalData,
+      cloudItemCount: (cloudData?.envelopes?.length || 0) + (cloudData?.transactions?.length || 0) + (cloudData?.bills?.length || 0),
+      localItemCount: (localData?.envelopes?.length || 0) + (localData?.transactions?.length || 0) + (localData?.bills?.length || 0),
+      cloudLastModified: cloudData?.lastModified,
+      localLastModified: localData?.lastModified,
+    });
+
+    // If cloud has data but local doesn't, download from cloud
+    if (hasCloudData && !hasLocalData) {
+      return { direction: "fromFirestore" };
+    }
+
+    // If local has data but cloud doesn't, upload to cloud
+    if (hasLocalData && !hasCloudData) {
+      return { direction: "toFirestore" };
+    }
+
+    // If neither has data, nothing to sync
+    if (!hasCloudData && !hasLocalData) {
+      return { direction: "toFirestore" }; // Default to upload empty state
+    }
+
+    // Both have data - use timestamps to determine direction
     if (!cloudData || !cloudData.lastModified) {
-      return { direction: "toFirestore" }; // No cloud data, upload local
+      return { direction: "toFirestore" }; // No cloud timestamp, upload local
     }
 
     if (!localData || !localData.lastModified) {
-      return { direction: "fromFirestore" }; // No local data, download cloud
+      return { direction: "fromFirestore" }; // No local timestamp, download cloud
     }
 
     if (localData.lastModified > cloudData.lastModified) {
