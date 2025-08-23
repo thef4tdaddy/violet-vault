@@ -272,8 +272,8 @@ export const useAuth = create((set, get) => ({
     try {
       logger.auth("Starting background sync after successful login");
 
-      // Import budget store to access startBackgroundSync
-      const { useBudgetStore } = await import("./budgetStore");
+      // Import UI store to access startBackgroundSync
+      const { useBudgetStore } = await import("./uiStore");
       const budgetState = useBudgetStore.getState();
 
       if (budgetState.cloudSyncEnabled) {
@@ -409,6 +409,108 @@ export const useAuth = create((set, get) => ({
     } catch (error) {
       logger.error("Failed to update profile:", error);
       return { success: false, error: error.message };
+    }
+  },
+
+  async validatePassword(password) {
+    try {
+      logger.auth("validatePassword: Starting validation");
+
+      const { encryptionUtils } = await import("../utils/encryption");
+      const authState = useAuth.getState();
+      const savedData = localStorage.getItem("envelopeBudgetData");
+
+      logger.auth("validatePassword: Data check", {
+        hasSavedData: !!savedData,
+        hasAuthSalt: !!authState.salt,
+        hasEncryptionKey: !!authState.encryptionKey,
+        authStateKeys: Object.keys(authState),
+      });
+
+      // If we have no encrypted data saved yet, validate against the current auth salt
+      if (!savedData && authState.salt) {
+        logger.auth(
+          "validatePassword: No saved data, validating against auth salt",
+        );
+
+        try {
+          const saltArray = new Uint8Array(authState.salt);
+          const testKey = await encryptionUtils.deriveKeyFromSalt(
+            password,
+            saltArray,
+          );
+
+          // Compare the derived key with the current encryption key if available
+          if (authState.encryptionKey) {
+            const keysMatch =
+              JSON.stringify(Array.from(testKey)) ===
+              JSON.stringify(Array.from(authState.encryptionKey));
+            logger.auth("validatePassword: Key comparison result", {
+              keysMatch,
+            });
+            return keysMatch;
+          } else {
+            // If no current key, just check if we can derive a key (basic validation)
+            logger.auth(
+              "validatePassword: No current key, basic validation passed",
+            );
+            return true;
+          }
+        } catch (error) {
+          logger.auth("validatePassword: Auth salt validation failed", {
+            error: error.message,
+          });
+          return false;
+        }
+      }
+
+      // If we have encrypted data, validate against it (original logic)
+      if (savedData && authState.salt) {
+        const parsedData = JSON.parse(savedData);
+        const { salt: savedSalt, encryptedData } = parsedData;
+        const saltArray = new Uint8Array(savedSalt);
+
+        logger.auth("validatePassword: Parsed data", {
+          hasSavedSalt: !!savedSalt,
+          hasEncryptedData: !!encryptedData,
+          saltLength: saltArray.length,
+        });
+
+        // Try to derive the key with the provided password
+        const testKey = await encryptionUtils.deriveKeyFromSalt(
+          password,
+          saltArray,
+        );
+
+        logger.auth("validatePassword: Key derived successfully");
+
+        // Try to decrypt actual data to validate password
+        if (encryptedData) {
+          try {
+            await encryptionUtils.decrypt(encryptedData, testKey);
+            logger.auth(
+              "validatePassword: Decryption successful - password is correct",
+            );
+            return true;
+          } catch (decryptError) {
+            logger.auth(
+              "validatePassword: Decryption failed - password is incorrect",
+              {
+                error: decryptError.message,
+              },
+            );
+            return false;
+          }
+        }
+      }
+
+      logger.auth(
+        "validatePassword: No data to validate against - treating as valid",
+      );
+      return true;
+    } catch (error) {
+      logger.error("validatePassword: Unexpected error", error);
+      return false;
     }
   },
 }));

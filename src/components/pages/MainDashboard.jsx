@@ -20,10 +20,11 @@ import EditableBalance from "../ui/EditableBalance";
 import { useActualBalance } from "../../hooks/useBudgetMetadata";
 import { useUnassignedCash } from "../../hooks/useBudgetMetadata";
 import logger from "../../utils/logger";
-import { useBudgetStore } from "../../stores/budgetStore";
+import { useBudgetStore } from "../../stores/uiStore";
 import { useEnvelopes } from "../../hooks/useEnvelopes";
 import { useSavingsGoals } from "../../hooks/useSavingsGoals";
 import { useTransactions } from "../../hooks/useTransactions";
+import useBudgetData from "../../hooks/useBudgetData";
 import DebtSummaryWidget from "../debt/ui/DebtSummaryWidget";
 
 const Dashboard = ({ setActiveView }) => {
@@ -45,9 +46,8 @@ const Dashboard = ({ setActiveView }) => {
     isLoading: actualBalanceLoading,
   } = useActualBalance();
 
-  // Keep Zustand for non-migrated operations
-  const budget = useBudgetStore();
-  const { reconcileTransaction, paycheckHistory } = budget;
+  // Get reconcileTransaction and paycheckHistory from useBudgetData
+  const { reconcileTransaction, paycheckHistory } = useBudgetData();
   const [showReconcileModal, setShowReconcileModal] = useState(false);
   const [newTransaction, setNewTransaction] = useState({
     amount: "",

@@ -31,7 +31,7 @@ export const useManualSync = () => {
       logger.info("🔄 Starting manual upload sync (Dexie → Firebase)...");
 
       // Check if cloud sync service is running
-      if (!cloudSyncService.serviceIsRunning) {
+      if (!cloudSyncService?.isRunning) {
         throw new Error(
           "Cloud sync service is not running. Please check your connection and authentication.",
         );
@@ -86,7 +86,7 @@ export const useManualSync = () => {
       );
 
       // Check if cloud sync service is running
-      if (!cloudSyncService.serviceIsRunning) {
+      if (!cloudSyncService?.isRunning) {
         throw new Error(
           "Cloud sync service is not running. Please check your connection and authentication.",
         );
@@ -187,7 +187,7 @@ export const useManualSync = () => {
    */
   const getSyncStatus = useCallback(() => {
     return {
-      isServiceRunning: cloudSyncService.serviceIsRunning,
+      isServiceRunning: cloudSyncService?.isRunning || false,
       serviceStatus: cloudSyncService.getStatus(),
       isUploadingSyncInProgress,
       isDownloadingSyncInProgress,

@@ -410,11 +410,11 @@ const PaycheckProcessor = ({
                           : "linear-gradient(135deg, #10b981 0%, #059669 100%)",
                     }}
                   >
-                    {paycheck.payerName.charAt(0).toUpperCase()}
+                    {(paycheck.payerName || "?").charAt(0).toUpperCase()}
                   </div>
                   <div>
                     <div className="font-semibold text-gray-900 text-lg">
-                      {paycheck.payerName}
+                      {paycheck.payerName || "Unknown Payer"}
                     </div>
                     <div className="text-sm text-gray-600">
                       {new Date(paycheck.date).toLocaleDateString()} •

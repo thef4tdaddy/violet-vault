@@ -83,11 +83,52 @@ class CloudSyncService {
       // Fetch data from Dexie for sync
       const localData = await this.fetchDexieData();
 
-      // Perform the sync
-      const result = await chunkedFirebaseSync.saveToCloud(
-        localData,
-        this.config.currentUser,
-      );
+      // Check what data exists in cloud to determine sync direction
+      let cloudData;
+      try {
+        cloudData = await chunkedFirebaseSync.loadFromCloud();
+      } catch {
+        logger.warn("Could not load cloud data, assuming no cloud data exists");
+        cloudData = null;
+      }
+
+      // Determine sync direction
+      const syncDecision = this.determineSyncDirection(localData, cloudData);
+      logger.info(`🔄 Sync direction determined: ${syncDecision.direction}`, {
+        localLastModified: localData?.lastModified,
+        cloudLastModified: cloudData?.lastModified,
+        hasLocalData: !!(
+          localData?.envelopes?.length ||
+          localData?.transactions?.length ||
+          localData?.bills?.length ||
+          localData?.paycheckHistory?.length ||
+          localData?.savingsGoals?.length ||
+          localData?.debts?.length
+        ),
+        hasCloudData: !!(
+          cloudData?.envelopes?.length ||
+          cloudData?.transactions?.length ||
+          cloudData?.bills?.length ||
+          cloudData?.paycheckHistory?.length ||
+          cloudData?.savingsGoals?.length ||
+          cloudData?.debts?.length
+        ),
+      });
+
+      let result;
+      if (syncDecision.direction === "fromFirestore") {
+        // Download from Firebase to Dexie
+        result = await chunkedFirebaseSync.loadFromCloud();
+        if (result.success) {
+          logger.info("✅ Downloaded data from Firebase to Dexie");
+        }
+      } else {
+        // Upload from Dexie to Firebase (default behavior)
+        result = await chunkedFirebaseSync.saveToCloud(
+          localData,
+          this.config.currentUser,
+        );
+      }
 
       if (result.success) {
         logger.info("✅ Chunked sync completed successfully.");
@@ -189,12 +230,67 @@ class CloudSyncService {
   }
 
   determineSyncDirection(localData, cloudData) {
+    // Check if cloud has meaningful data vs local (include all data types)
+    const hasCloudData = !!(
+      cloudData?.envelopes?.length ||
+      cloudData?.transactions?.length ||
+      cloudData?.bills?.length ||
+      cloudData?.paycheckHistory?.length ||
+      cloudData?.savingsGoals?.length ||
+      cloudData?.debts?.length
+    );
+    const hasLocalData = !!(
+      localData?.envelopes?.length ||
+      localData?.transactions?.length ||
+      localData?.bills?.length ||
+      localData?.paycheckHistory?.length ||
+      localData?.savingsGoals?.length ||
+      localData?.debts?.length
+    );
+
+    logger.info("🔄 Sync direction analysis:", {
+      hasCloudData,
+      hasLocalData,
+      cloudItemCount:
+        (cloudData?.envelopes?.length || 0) +
+        (cloudData?.transactions?.length || 0) +
+        (cloudData?.bills?.length || 0) +
+        (cloudData?.paycheckHistory?.length || 0) +
+        (cloudData?.savingsGoals?.length || 0) +
+        (cloudData?.debts?.length || 0),
+      localItemCount:
+        (localData?.envelopes?.length || 0) +
+        (localData?.transactions?.length || 0) +
+        (localData?.bills?.length || 0) +
+        (localData?.paycheckHistory?.length || 0) +
+        (localData?.savingsGoals?.length || 0) +
+        (localData?.debts?.length || 0),
+      cloudLastModified: cloudData?.lastModified,
+      localLastModified: localData?.lastModified,
+    });
+
+    // If cloud has data but local doesn't, download from cloud
+    if (hasCloudData && !hasLocalData) {
+      return { direction: "fromFirestore" };
+    }
+
+    // If local has data but cloud doesn't, upload to cloud
+    if (hasLocalData && !hasCloudData) {
+      return { direction: "toFirestore" };
+    }
+
+    // If neither has data, nothing to sync
+    if (!hasCloudData && !hasLocalData) {
+      return { direction: "toFirestore" }; // Default to upload empty state
+    }
+
+    // Both have data - use timestamps to determine direction
     if (!cloudData || !cloudData.lastModified) {
-      return { direction: "toFirestore" }; // No cloud data, upload local
+      return { direction: "toFirestore" }; // No cloud timestamp, upload local
     }
 
     if (!localData || !localData.lastModified) {
-      return { direction: "fromFirestore" }; // No local data, download cloud
+      return { direction: "fromFirestore" }; // No local timestamp, download cloud
     }
 
     if (localData.lastModified > cloudData.lastModified) {
@@ -215,6 +311,43 @@ class CloudSyncService {
       syncType: "chunked",
       hasConfig: !!this.config,
     };
+  }
+
+  async forcePushToCloud() {
+    // Force push local data to Firebase without pulling from Firebase first
+    // This is used after backup imports to ensure imported data overwrites cloud data
+    if (this.isSyncing) {
+      logger.warn("🟡 Sync in progress, skipping force push");
+      return { success: false, error: "Sync already in progress" };
+    }
+
+    this.isSyncing = true;
+
+    try {
+      logger.info("🚀 Force pushing local data to Firebase...");
+
+      // Get local data from Dexie
+      const localData = await this.fetchDexieData();
+
+      // Use chunked Firebase sync to save data (one-way)
+      const result = await chunkedFirebaseSync.saveToCloud(
+        this.config.budgetId,
+        this.config.encryptionKey,
+        localData,
+      );
+
+      if (result.success) {
+        logger.info("✅ Force push to Firebase completed successfully");
+        return { success: true };
+      } else {
+        throw new Error(result.error || "Failed to push data to Firebase");
+      }
+    } catch (error) {
+      logger.error("❌ Force push to Firebase failed:", error);
+      return { success: false, error: error.message };
+    } finally {
+      this.isSyncing = false;
+    }
   }
 
   async clearAllData() {
@@ -250,46 +383,6 @@ class CloudSyncService {
     }
   }
 
-  async forcePushToCloud() {
-    // Force push local data to Firebase without pulling from Firebase first
-    // This is used after backup imports to ensure imported data replaces cloud data
-    try {
-      logger.info("🚀 Starting force push to cloud...");
-
-      if (this.config && typeof this.config.forcePushToCloud === "function") {
-        // If the config has a forcePushToCloud method, use it
-        await this.config.forcePushToCloud();
-        logger.info("Data successfully pushed to cloud using config method");
-      } else if (
-        chunkedFirebaseSync &&
-        typeof chunkedFirebaseSync.forcePushToCloud === "function"
-      ) {
-        // If chunkedFirebaseSync has a forcePushToCloud method, use it
-        await chunkedFirebaseSync.forcePushToCloud();
-        logger.info(
-          "Data successfully pushed to cloud using chunkedFirebaseSync",
-        );
-      } else if (
-        chunkedFirebaseSync &&
-        typeof chunkedFirebaseSync.uploadToFirebase === "function"
-      ) {
-        // Use upload method if available (one-way upload)
-        await chunkedFirebaseSync.uploadToFirebase();
-        logger.info("Data successfully pushed to cloud using uploadToFirebase");
-      } else {
-        logger.warn(
-          "No force push method available, falling back to regular sync",
-        );
-        await this.forceSync();
-      }
-
-      // Update sync time after successful push
-      await this.updateLastSyncTime();
-    } catch (error) {
-      logger.error("Failed to force push data to cloud:", error);
-      throw error;
-    }
-  }
 }
 
 export const cloudSyncService = new CloudSyncService();

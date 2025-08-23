@@ -193,7 +193,12 @@ export function createSpecialTerms(debtType, providedTerms = {}) {
  * @param {Array} relatedTransactions - Related transactions
  * @returns {Object} Enriched debt object
  */
-export function enrichDebt(debt, relatedBill = null, relatedEnvelope = null, relatedTransactions = []) {
+export function enrichDebt(
+  debt,
+  relatedBill = null,
+  relatedEnvelope = null,
+  relatedTransactions = [],
+) {
   try {
     const nextPaymentDate = calculateNextPaymentDate(debt, relatedBill);
     const payoffInfo = calculatePayoffProjection(debt);
@@ -211,7 +216,7 @@ export function enrichDebt(debt, relatedBill = null, relatedEnvelope = null, rel
       debtId: debt.id,
       debtName: debt.name,
     });
-    
+
     // Return debt with null enrichment on error
     return {
       ...debt,
@@ -243,9 +248,7 @@ export function getUpcomingPayments(debts, daysAhead = 30) {
       (debt) => debt.status === DEBT_STATUS.ACTIVE && debt.nextPaymentDate,
     )
     .filter((debt) => new Date(debt.nextPaymentDate) <= cutoffDate)
-    .sort(
-      (a, b) => new Date(a.nextPaymentDate) - new Date(b.nextPaymentDate),
-    );
+    .sort((a, b) => new Date(a.nextPaymentDate) - new Date(b.nextPaymentDate));
 }
 
 /**
@@ -260,7 +263,7 @@ export function calculateDebtToIncomeRatio(debts, monthlyIncome) {
   }
 
   const totalMonthlyPayments = debts
-    .filter(debt => debt.status === DEBT_STATUS.ACTIVE)
+    .filter((debt) => debt.status === DEBT_STATUS.ACTIVE)
     .reduce((sum, debt) => {
       const payment = debt.minimumPayment || 0;
       // Convert payment to monthly if needed

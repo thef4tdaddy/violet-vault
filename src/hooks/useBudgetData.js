@@ -1,12 +1,13 @@
 import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useBudgetStore } from "../stores/budgetStore";
+import { useBudgetStore } from "../stores/uiStore";
 import {
   queryKeys,
   optimisticHelpers,
   prefetchHelpers,
 } from "../utils/queryClient";
 import { budgetDb, getBudgetMetadata } from "../db/budgetDb";
+// import { useTransactions } from "./useTransactions";
 import logger from "../utils/logger.js";
 
 /**
@@ -16,99 +17,65 @@ import logger from "../utils/logger.js";
  * - Real-time state via Zustand
  * - Offline persistence via Dexie
  * - Optimistic updates for better UX
+ * 
+ * Fixed: Removed top-level await to prevent React #185 on Vercel
  */
 const useBudgetData = () => {
   const queryClient = useQueryClient();
 
-  // Get Zustand store for real-time state and mutations
+  // Get UI store for UI state only (data comes from TanStack Query → Dexie)
   const budgetStore = useBudgetStore();
   const {
-    // Data
-    envelopes,
-    transactions,
-    bills,
-    savingsGoals,
-    paycheckHistory,
-    unassignedCash,
-    actualBalance,
-
-    // Mutations
-    addEnvelope: zustandAddEnvelope,
-    updateEnvelope: zustandUpdateEnvelope,
-    deleteEnvelope: zustandDeleteEnvelope,
-    addTransaction: zustandAddTransaction,
-    processPaycheck: zustandProcessPaycheck,
-    reconcileTransaction: zustandReconcileTransaction,
+    // UI State only
+    isOnline,
+    dataLoaded,
+    cloudSyncEnabled,
+    biweeklyAllocation,
+    isUnassignedCashModalOpen,
   } = budgetStore;
 
-  // Query functions that use Zustand as data source with Dexie fallback
+  // Create reconcileTransaction mutation directly to avoid circular dependencies
+
+  // Query functions that fetch from Dexie (primary data source)
   const queryFunctions = {
     envelopes: async () => {
-      // Try Zustand first (real-time data)
-      if (envelopes && envelopes.length > 0) {
-        return envelopes;
-      }
-
-      // Fallback to Dexie for offline support
+      // Fetch directly from Dexie (primary data source)
       const cachedEnvelopes = await budgetDb.envelopes.toArray();
-      if (cachedEnvelopes.length > 0) {
-        return cachedEnvelopes;
-      }
-
-      // Return empty array as final fallback
-      return [];
+      return cachedEnvelopes || [];
     },
 
     transactions: async (filters = {}) => {
-      // Try Zustand first
-      let result = transactions || [];
+      // Fetch directly from Dexie (primary data source)
+      let result;
 
-      // Apply filters if provided
       if (filters.dateRange) {
         const { start, end } = filters.dateRange;
-        result = result.filter((t) => {
-          const transactionDate = new Date(t.date);
-          return transactionDate >= start && transactionDate <= end;
-        });
+        result = await budgetDb.getTransactionsByDateRange(start, end);
+      } else {
+        result = await budgetDb.transactions
+          .orderBy("date")
+          .reverse()
+          .toArray();
       }
 
+      // Apply additional filters
       if (filters.envelopeId) {
         result = result.filter((t) => t.envelopeId === filters.envelopeId);
       }
 
-      if (result.length > 0) {
-        return result;
-      }
-
-      // Fallback to Dexie
-      if (filters.dateRange) {
-        const { start, end } = filters.dateRange;
-        return await budgetDb.getTransactionsByDateRange(start, end);
-      }
-
-      const cachedTransactions = await budgetDb.transactions
-        .orderBy("date")
-        .reverse()
-        .toArray();
-      return cachedTransactions;
+      return result || [];
     },
 
     bills: async () => {
-      if (bills && bills.length > 0) {
-        return bills;
-      }
-
+      // Fetch directly from Dexie (primary data source)
       const cachedBills = await budgetDb.bills.toArray();
-      return cachedBills;
+      return cachedBills || [];
     },
 
     savingsGoals: async () => {
-      if (savingsGoals && savingsGoals.length > 0) {
-        return savingsGoals;
-      }
-
-      // Note: Need to add savingsGoals to Dexie schema in future enhancement
-      return [];
+      // Fetch directly from Dexie (primary data source)
+      const cachedSavingsGoals = await budgetDb.savingsGoals.toArray();
+      return cachedSavingsGoals || [];
     },
 
     paycheckHistory: async () => {
@@ -129,11 +96,27 @@ const useBudgetData = () => {
       // Load budget metadata from Dexie (includes unassigned cash)
       const budgetMetadata = await getBudgetMetadata();
 
+      // Fetch data from Dexie instead of undefined variables
+      const cachedEnvelopes = await budgetDb.envelopes.toArray();
+      const cachedSavingsGoals = await budgetDb.savingsGoals.toArray();
+      const cachedBills = await budgetDb.bills.toArray();
+      const cachedTransactions = await budgetDb.transactions
+        .orderBy("date")
+        .reverse()
+        .limit(10)
+        .toArray();
+
       // Safe calculation with NaN prevention
-      const safeEnvelopes = Array.isArray(envelopes) ? envelopes : [];
-      const safeSavingsGoals = Array.isArray(savingsGoals) ? savingsGoals : [];
-      const safeBills = Array.isArray(bills) ? bills : [];
-      const safeTransactions = Array.isArray(transactions) ? transactions : [];
+      const safeEnvelopes = Array.isArray(cachedEnvelopes)
+        ? cachedEnvelopes
+        : [];
+      const safeSavingsGoals = Array.isArray(cachedSavingsGoals)
+        ? cachedSavingsGoals
+        : [];
+      const safeBills = Array.isArray(cachedBills) ? cachedBills : [];
+      const safeTransactions = Array.isArray(cachedTransactions)
+        ? cachedTransactions
+        : [];
 
       const totalEnvelopeBalance = safeEnvelopes.reduce((sum, env) => {
         const balance = parseFloat(env?.currentBalance) || 0;
@@ -214,6 +197,13 @@ const useBudgetData = () => {
     enabled: true,
   });
 
+  const savingsGoalsQuery = useQuery({
+    queryKey: queryKeys.savingsGoalsList(),
+    queryFn: queryFunctions.savingsGoals,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    enabled: true,
+  });
+
   const paycheckHistoryQuery = useQuery({
     queryKey: queryKeys.paycheckHistory(),
     queryFn: queryFunctions.paycheckHistory,
@@ -234,6 +224,7 @@ const useBudgetData = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
+      queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalsList() });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary });
     };
@@ -254,81 +245,14 @@ const useBudgetData = () => {
   // NOTE: Removed Zustand subscription - unassigned cash should come from Dexie via TanStack Query
   // instead of being stored only in Zustand store
 
-  // Rebuild missing transactions in background if ledger data is incomplete
-  useEffect(() => {
-    const reconcileMissingTransactions = async () => {
-      if (!envelopes) return;
-
-      // Sum existing transactions by envelope
-      const ledgerTotals = (transactions || []).reduce((acc, t) => {
-        const amt = Number(t.amount) || 0;
-        acc[t.envelopeId] = (acc[t.envelopeId] || 0) + amt;
-        return acc;
-      }, {});
-
-      const newTransactions = [];
-
-      // Check each envelope for discrepancies
-      for (const env of envelopes) {
-        const ledgerBalance = ledgerTotals[env.id] || 0;
-        const diff = (Number(env.currentBalance) || 0) - ledgerBalance;
-        if (Math.abs(diff) > 0.01) {
-          newTransactions.push({
-            id: `auto-${env.id}-${Date.now()}`,
-            date: new Date().toISOString().split("T")[0],
-            envelopeId: env.id,
-            amount: diff,
-            type: diff >= 0 ? "income" : "expense",
-            category: "reconciliation",
-            description: "Auto-generated to rebuild missing transaction",
-            autoGenerated: true,
-          });
-        }
-      }
-
-      // Include unassigned cash discrepancies
-      const unassignedLedger = ledgerTotals["unassigned"] || 0;
-      const unassignedDiff = (Number(unassignedCash) || 0) - unassignedLedger;
-      if (Math.abs(unassignedDiff) > 0.01) {
-        newTransactions.push({
-          id: `auto-unassigned-${Date.now()}`,
-          date: new Date().toISOString().split("T")[0],
-          envelopeId: "unassigned",
-          amount: unassignedDiff,
-          type: unassignedDiff >= 0 ? "income" : "expense",
-          category: "reconciliation",
-          description: "Auto-generated to rebuild missing transaction",
-          autoGenerated: true,
-        });
-      }
-
-      for (const tx of newTransactions) {
-        await optimisticHelpers.addTransaction(tx);
-        zustandAddTransaction(tx);
-      }
-
-      if (newTransactions.length > 0) {
-        queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
-        queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
-      }
-    };
-
-    reconcileMissingTransactions();
-  }, [
-    envelopes,
-    transactions,
-    unassignedCash,
-    queryClient,
-    zustandAddTransaction,
-  ]);
+  // Reconciliation moved to manual trigger to prevent React #185
+  // The async reconciliation was causing hook ordering issues in production
+  // TODO: Implement as a manual user action or background service instead
 
   // Enhanced mutations with optimistic updates and Dexie persistence
   const addEnvelopeMutation = useMutation({
     mutationKey: ["envelopes", "add"],
     mutationFn: async (newEnvelope) => {
-      // Call Zustand mutation
-      zustandAddEnvelope(newEnvelope);
-
       // Persist to Dexie
       await optimisticHelpers.addEnvelope(newEnvelope);
 
@@ -350,9 +274,6 @@ const useBudgetData = () => {
   const updateEnvelopeMutation = useMutation({
     mutationKey: ["envelopes", "update"],
     mutationFn: async ({ envelopeId, updates }) => {
-      // Call Zustand mutation
-      zustandUpdateEnvelope(envelopeId, updates);
-
       // Apply optimistic update with Dexie persistence
       await optimisticHelpers.updateEnvelope(envelopeId, updates);
 
@@ -367,9 +288,6 @@ const useBudgetData = () => {
   const deleteEnvelopeMutation = useMutation({
     mutationKey: ["envelopes", "delete"],
     mutationFn: async (envelopeId) => {
-      // Call Zustand mutation
-      zustandDeleteEnvelope(envelopeId);
-
       // Remove from cache and Dexie
       await optimisticHelpers.removeEnvelope(envelopeId);
 
@@ -384,9 +302,6 @@ const useBudgetData = () => {
   const addTransactionMutation = useMutation({
     mutationKey: ["transactions", "add"],
     mutationFn: async (newTransaction) => {
-      // Call Zustand mutation
-      zustandAddTransaction(newTransaction);
-
       // Apply optimistic update with Dexie persistence
       await optimisticHelpers.addTransaction(newTransaction);
 
@@ -409,8 +324,11 @@ const useBudgetData = () => {
         paycheckData,
       });
 
-      // Import the needed functions from budgetDb
+      // Import the needed functions from budgetDb and balance calculator
       const { setBudgetMetadata } = await import("../db/budgetDb");
+      const { calculatePaycheckBalances, validateBalances } = await import(
+        "../utils/balanceCalculator"
+      );
 
       // Get current metadata from Dexie (proper data source)
       const currentMetadata = await getBudgetMetadata();
@@ -423,91 +341,84 @@ const useBudgetData = () => {
         currentMetadata,
       });
 
-      // Calculate new balances properly (ADD, don't SET)
-      const newActualBalance = currentActualBalance + paycheckData.amount;
-      let newUnassignedCash = currentUnassignedCash;
-      let envelopeUpdates = [];
+      // Prepare current balances for calculator
+      const currentBalances = {
+        actualBalance: currentActualBalance,
+        virtualBalance: 0, // Will be calculated from envelope balances if needed
+        unassignedCash: currentUnassignedCash,
+        isActualBalanceManual: currentMetadata?.isActualBalanceManual || false,
+      };
 
-      // Handle allocation mode
-      if (
-        paycheckData.mode === "allocate" &&
-        paycheckData.envelopeAllocations
-      ) {
-        logger.info("Processing allocate mode paycheck");
+      // Prepare allocations for calculator
+      const allocations =
+        paycheckData.envelopeAllocations?.map((alloc) => ({
+          envelopeId: alloc.envelopeId,
+          amount: alloc.amount,
+        })) || [];
 
-        // Distribute to specified envelopes
-        envelopeUpdates = paycheckData.envelopeAllocations.map(
-          (allocation) => ({
-            id: allocation.envelopeId,
-            amount: allocation.amount,
-          }),
-        );
+      // Use centralized balance calculator to ensure consistency
+      const newBalances = calculatePaycheckBalances(
+        currentBalances,
+        paycheckData,
+        allocations,
+      );
 
-        // Any leftover goes to unassigned cash
-        const totalAllocated = paycheckData.envelopeAllocations.reduce(
-          (sum, alloc) => sum + alloc.amount,
-          0,
-        );
-        const leftoverAmount = paycheckData.amount - totalAllocated;
-        newUnassignedCash += leftoverAmount;
-
-        logger.info("Allocate mode calculations", {
-          totalAllocated,
-          leftoverAmount,
-          envelopeUpdates,
+      // Validate the calculation
+      const validation = validateBalances(newBalances);
+      if (!validation.isValid) {
+        logger.warn("Balance validation failed after paycheck processing", {
+          errors: validation.errors,
+          warnings: validation.warnings,
+          paycheck: paycheckData,
+          newBalances,
         });
-      } else {
-        logger.info(
-          "Processing leftover mode paycheck - all to unassigned cash",
-        );
-        // Leftover mode - all to unassigned cash
-        newUnassignedCash += paycheckData.amount;
       }
 
-      logger.info("Calculated new balances", {
-        newActualBalance,
-        newUnassignedCash,
-        balanceIncrease: newActualBalance - currentActualBalance,
-        unassignedIncrease: newUnassignedCash - currentUnassignedCash,
+      logger.info("Calculated new balances using centralized calculator", {
+        actualBalance: `${currentActualBalance} → ${newBalances.actualBalance}`,
+        unassignedCash: `${currentUnassignedCash} → ${newBalances.unassignedCash}`,
+        paycheckAmount: paycheckData.amount,
+        paycheckMode: paycheckData.mode,
+        allocationsCount: allocations.length,
       });
 
-      // Update budget metadata in Dexie
+      // Update budget metadata in Dexie using calculated balances
       await setBudgetMetadata({
-        actualBalance: newActualBalance,
-        unassignedCash: newUnassignedCash,
+        actualBalance: newBalances.actualBalance,
+        unassignedCash: newBalances.unassignedCash,
       });
 
-      logger.info("Budget metadata updated in Dexie");
+      logger.info("Budget metadata updated in Dexie with validated balances");
 
       // Update envelope balances in Dexie if allocating
-      if (envelopeUpdates.length > 0) {
+      if (allocations.length > 0) {
         logger.info("Updating envelope balances", {
-          envelopeCount: envelopeUpdates.length,
-          envelopeUpdates,
+          envelopeCount: allocations.length,
+          allocations,
         });
 
         const { budgetDb } = await import("../db/budgetDb");
-        for (const update of envelopeUpdates) {
-          const envelope = await budgetDb.envelopes.get(update.id);
+        for (const allocation of allocations) {
+          const envelope = await budgetDb.envelopes.get(allocation.envelopeId);
           if (envelope) {
             const oldBalance = envelope.currentBalance || 0;
-            const newBalance = oldBalance + update.amount;
+            const newBalance = oldBalance + allocation.amount;
 
-            await budgetDb.envelopes.update(update.id, {
+            await budgetDb.envelopes.update(allocation.envelopeId, {
               currentBalance: newBalance,
             });
 
             logger.debug("Updated envelope balance", {
-              envelopeId: update.id,
+              envelopeId: allocation.envelopeId,
               envelopeName: envelope.name,
               oldBalance,
               newBalance,
-              amountAdded: update.amount,
+              amountAdded: allocation.amount,
             });
           } else {
             logger.warn("Envelope not found for allocation", {
-              envelopeId: update.id,
-              amount: update.amount,
+              envelopeId: allocation.envelopeId,
+              amount: allocation.amount,
             });
           }
         }
@@ -521,9 +432,9 @@ const useBudgetData = () => {
         id: paycheckData.id || `paycheck_${Date.now()}`,
         processedAt: new Date().toISOString(),
         actualBalanceBefore: currentActualBalance,
-        actualBalanceAfter: newActualBalance,
+        actualBalanceAfter: newBalances.actualBalance,
         unassignedCashBefore: currentUnassignedCash,
-        unassignedCashAfter: newUnassignedCash,
+        unassignedCashAfter: newBalances.unassignedCash,
       };
 
       // Store in Dexie database (this was missing!)
@@ -534,9 +445,10 @@ const useBudgetData = () => {
         paycheckId: paycheckRecord.id,
         amount: paycheckData.amount,
         mode: paycheckData.mode,
-        actualBalanceChange: newActualBalance - currentActualBalance,
-        unassignedCashChange: newUnassignedCash - currentUnassignedCash,
-        envelopeAllocations: paycheckData.envelopeAllocations?.length || 0,
+        actualBalanceChange: newBalances.actualBalance - currentActualBalance,
+        unassignedCashChange:
+          newBalances.unassignedCash - currentUnassignedCash,
+        envelopeAllocations: allocations.length,
       });
 
       // REMOVED: No longer calling Zustand to prevent data inconsistency
@@ -545,11 +457,16 @@ const useBudgetData = () => {
       return paycheckRecord;
     },
     onSuccess: () => {
-      // Invalidate all related queries
+      // Invalidate all related queries with immediate refetch
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.paycheckHistory() });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary() });
+
+      // Force immediate refetch of critical queries
+      queryClient.refetchQueries({ queryKey: queryKeys.paycheckHistory() });
+      queryClient.refetchQueries({ queryKey: queryKeys.envelopes });
     },
   });
 
@@ -591,29 +508,44 @@ const useBudgetData = () => {
     }
   };
 
+  // Simple reconcileTransaction mutation to avoid circular dependency
+  const reconcileTransactionMutation = useMutation({
+    mutationKey: ["transactions", "reconcile"],
+    mutationFn: async (transactionData) => {
+      await optimisticHelpers.addTransaction(transactionData);
+      return transactionData;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary() });
+    },
+  });
+
   return {
-    // Data (from queries with Zustand fallback)
-    envelopes: envelopesQuery.data || envelopes || [],
-    transactions: transactionsQuery.data || transactions || [],
-    bills: billsQuery.data || bills || [],
-    savingsGoals: savingsGoals || [],
+    // Data (from TanStack Query)
+    envelopes: envelopesQuery.data || [],
+    transactions: transactionsQuery.data || [],
+    bills: billsQuery.data || [],
+    savingsGoals: savingsGoalsQuery.data || [],
     paycheckHistory: paycheckHistoryQuery.data || [],
     dashboardSummary: dashboardQuery.data,
 
-    // Computed values
-    unassignedCash,
-    actualBalance,
+    // Computed values from dashboard query
+    unassignedCash: dashboardQuery.data?.unassignedCash || 0,
+    actualBalance: dashboardQuery.data?.actualBalance || 0,
 
     // Loading states
     isLoading:
       envelopesQuery.isLoading ||
       transactionsQuery.isLoading ||
       billsQuery.isLoading ||
+      savingsGoalsQuery.isLoading ||
       paycheckHistoryQuery.isLoading,
     isFetching:
       envelopesQuery.isFetching ||
       transactionsQuery.isFetching ||
       billsQuery.isFetching ||
+      savingsGoalsQuery.isFetching ||
       paycheckHistoryQuery.isFetching,
     isOffline: !navigator.onLine,
 
@@ -621,6 +553,7 @@ const useBudgetData = () => {
     envelopesLoading: envelopesQuery.isLoading,
     transactionsLoading: transactionsQuery.isLoading,
     billsLoading: billsQuery.isLoading,
+    savingsGoalsLoading: savingsGoalsQuery.isLoading,
     paycheckHistoryLoading: paycheckHistoryQuery.isLoading,
     dashboardLoading: dashboardQuery.isLoading,
 
@@ -630,7 +563,7 @@ const useBudgetData = () => {
     deleteEnvelope: deleteEnvelopeMutation.mutate,
     addTransaction: addTransactionMutation.mutate,
     processPaycheck: processPaycheckMutation.mutate,
-    reconcileTransaction: zustandReconcileTransaction, // Direct Zustand call for now
+    reconcileTransaction: reconcileTransactionMutation.mutate,
 
     // Mutation states
     isAddingEnvelope: addEnvelopeMutation.isPending,

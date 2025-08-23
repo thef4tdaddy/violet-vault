@@ -332,8 +332,10 @@ const ChartsAnalytics = ({
     }
 
     return safeEnvelopes
-      .filter((envelope) => envelope && typeof envelope === "object")
+      .filter((envelope) => envelope && typeof envelope === "object" && envelope.name)
       .map((envelope) => {
+        // Additional null safety check
+        if (!envelope) return null;
         const monthlyBudget = Number(envelope.monthlyAmount) || 0;
         const currentBalance = Number(envelope.currentBalance) || 0;
         const spent = Array.isArray(envelope.spendingHistory)
@@ -363,7 +365,8 @@ const ChartsAnalytics = ({
           status,
           color: envelope.color || "#8B5CF6",
         };
-      });
+      })
+      .filter(Boolean); // Remove any null values
   }, [safeEnvelopes]);
 
   // Budget vs actual analysis
@@ -1009,18 +1012,21 @@ const ChartsAnalytics = ({
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Spending by Category
             </h3>
-            <ResponsiveContainer width="100%" height={400}>
-              <PieChart>
-                <Pie
-                  data={categoryBreakdown || []}
+            {categoryBreakdown && categoryBreakdown.length > 0 ? (
+              <ResponsiveContainer width="100%" height={400}>
+                <PieChart>
+                  <Pie
+                    data={categoryBreakdown}
                   cx="50%"
                   cy="50%"
                   outerRadius={120}
                   fill="#8884d8"
                   dataKey="amount"
-                  label={({ name, percent }) =>
-                    `${name} ${(percent * 100).toFixed(0)}%`
-                  }
+                  label={({ name, percent }) => {
+                    const safeName = name || "Unknown";
+                    const safePercent = typeof percent === 'number' ? percent : 0;
+                    return `${safeName} ${(safePercent * 100).toFixed(0)}%`;
+                  }}
                 >
                   {(categoryBreakdown || []).map((_, index) => (
                     <Cell
@@ -1032,6 +1038,11 @@ const ChartsAnalytics = ({
                 <Tooltip content={<CustomTooltip />} />
               </PieChart>
             </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-96 text-gray-500">
+                <p>No spending data available for category breakdown</p>
+              </div>
+            )}
           </div>
 
           {/* Category Details Table */}
