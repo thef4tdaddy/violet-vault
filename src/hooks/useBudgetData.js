@@ -610,7 +610,7 @@ const useBudgetData = () => {
     deleteEnvelope: deleteEnvelopeMutation.mutate,
     addTransaction: addTransactionMutation.mutate,
     processPaycheck: processPaycheckMutation.mutate,
-    // reconcileTransaction: TODO - implement TanStack Query mutation
+    // reconcileTransaction removed - handled elsewhere
 
     // Mutation states
     isAddingEnvelope: addEnvelopeMutation.isPending,
