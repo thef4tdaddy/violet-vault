@@ -47,7 +47,7 @@ const useBudgetData = () => {
     transactions: async (filters = {}) => {
       // Fetch directly from Dexie (primary data source)
       let result;
-      
+
       if (filters.dateRange) {
         const { start, end } = filters.dateRange;
         result = await budgetDb.getTransactionsByDateRange(start, end);
@@ -96,11 +96,27 @@ const useBudgetData = () => {
       // Load budget metadata from Dexie (includes unassigned cash)
       const budgetMetadata = await getBudgetMetadata();
 
+      // Fetch data from Dexie instead of undefined variables
+      const cachedEnvelopes = await budgetDb.envelopes.toArray();
+      const cachedSavingsGoals = await budgetDb.savingsGoals.toArray();
+      const cachedBills = await budgetDb.bills.toArray();
+      const cachedTransactions = await budgetDb.transactions
+        .orderBy("date")
+        .reverse()
+        .limit(10)
+        .toArray();
+
       // Safe calculation with NaN prevention
-      const safeEnvelopes = Array.isArray(envelopes) ? envelopes : [];
-      const safeSavingsGoals = Array.isArray(savingsGoals) ? savingsGoals : [];
-      const safeBills = Array.isArray(bills) ? bills : [];
-      const safeTransactions = Array.isArray(transactions) ? transactions : [];
+      const safeEnvelopes = Array.isArray(cachedEnvelopes)
+        ? cachedEnvelopes
+        : [];
+      const safeSavingsGoals = Array.isArray(cachedSavingsGoals)
+        ? cachedSavingsGoals
+        : [];
+      const safeBills = Array.isArray(cachedBills) ? cachedBills : [];
+      const safeTransactions = Array.isArray(cachedTransactions)
+        ? cachedTransactions
+        : [];
 
       const totalEnvelopeBalance = safeEnvelopes.reduce((sum, env) => {
         const balance = parseFloat(env?.currentBalance) || 0;
@@ -515,7 +531,7 @@ const useBudgetData = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.paycheckHistory() });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary() });
-      
+
       // Force immediate refetch of critical queries
       queryClient.refetchQueries({ queryKey: queryKeys.paycheckHistory() });
       queryClient.refetchQueries({ queryKey: queryKeys.envelopes });
