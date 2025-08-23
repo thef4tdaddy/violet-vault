@@ -24,6 +24,7 @@ import { useBudgetStore } from "../../stores/uiStore";
 import { useEnvelopes } from "../../hooks/useEnvelopes";
 import { useSavingsGoals } from "../../hooks/useSavingsGoals";
 import { useTransactions } from "../../hooks/useTransactions";
+import useBudgetData from "../../hooks/useBudgetData";
 import DebtSummaryWidget from "../debt/ui/DebtSummaryWidget";
 
 const Dashboard = ({ setActiveView }) => {
