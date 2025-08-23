@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import useBudgetStore from "../stores/budgetStore";
+import useBudgetStore from "../../stores/uiStore";
 import logger from "../utils/logger";
 
 /**

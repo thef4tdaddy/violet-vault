@@ -217,6 +217,43 @@ class CloudSyncService {
     };
   }
 
+  async forcePushToCloud() {
+    // Force push local data to Firebase without pulling from Firebase first
+    // This is used after backup imports to ensure imported data overwrites cloud data
+    if (this.isSyncing) {
+      logger.warn("🟡 Sync in progress, skipping force push");
+      return { success: false, error: "Sync already in progress" };
+    }
+
+    this.isSyncing = true;
+
+    try {
+      logger.info("🚀 Force pushing local data to Firebase...");
+
+      // Get local data from Dexie
+      const localData = await this.fetchDexieData();
+
+      // Use chunked Firebase sync to save data (one-way)
+      const result = await chunkedFirebaseSync.saveToCloud(
+        this.config.budgetId,
+        this.config.encryptionKey,
+        localData,
+      );
+
+      if (result.success) {
+        logger.info("✅ Force push to Firebase completed successfully");
+        return { success: true };
+      } else {
+        throw new Error(result.error || "Failed to push data to Firebase");
+      }
+    } catch (error) {
+      logger.error("❌ Force push to Firebase failed:", error);
+      return { success: false, error: error.message };
+    } finally {
+      this.isSyncing = false;
+    }
+  }
+
   async clearAllData() {
     // Clear all data from Firebase/cloud storage
     // This method should be called before importing backup data to prevent sync conflicts

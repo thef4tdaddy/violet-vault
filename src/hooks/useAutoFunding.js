@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { autoFundingEngine, TRIGGER_TYPES } from "../utils/autoFundingEngine";
-import { useBudgetStore } from "../stores/budgetStore";
+import { useBudgetStore } from "../../stores/uiStore";
 import logger from "../utils/logger";
 
 /**
