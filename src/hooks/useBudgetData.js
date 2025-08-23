@@ -20,20 +20,15 @@ import logger from "../utils/logger.js";
 const useBudgetData = () => {
   const queryClient = useQueryClient();
 
-  // Get UI store for mutations only (data comes from TanStack Query → Dexie)
+  // Get UI store for UI state only (data comes from TanStack Query → Dexie)
   const budgetStore = useBudgetStore();
   const {
-    // UI State
-    unassignedCash,
-    actualBalance,
-
-    // Legacy mutations (keeping for compatibility during transition)
-    addEnvelope: zustandAddEnvelope,
-    updateEnvelope: zustandUpdateEnvelope,
-    deleteEnvelope: zustandDeleteEnvelope,
-    addTransaction: zustandAddTransaction,
-    processPaycheck: zustandProcessPaycheck,
-    reconcileTransaction: zustandReconcileTransaction,
+    // UI State only
+    isOnline,
+    dataLoaded,
+    cloudSyncEnabled,
+    biweeklyAllocation,
+    isUnassignedCashModalOpen,
   } = budgetStore;
 
   // Query functions that fetch from Dexie (primary data source)
@@ -298,7 +293,6 @@ const useBudgetData = () => {
 
       for (const tx of newTransactions) {
         await optimisticHelpers.addTransaction(tx);
-        zustandAddTransaction(tx);
       }
 
       if (newTransactions.length > 0) {
@@ -311,9 +305,8 @@ const useBudgetData = () => {
   }, [
     envelopesQuery.data,
     transactionsQuery.data,
-    unassignedCash,
+    dashboardQuery.data?.unassignedCash,
     queryClient,
-    zustandAddTransaction,
   ]);
 
   // Enhanced mutations with optimistic updates and Dexie persistence
@@ -378,9 +371,6 @@ const useBudgetData = () => {
   const addTransactionMutation = useMutation({
     mutationKey: ["transactions", "add"],
     mutationFn: async (newTransaction) => {
-      // Call Zustand mutation
-      zustandAddTransaction(newTransaction);
-
       // Apply optimistic update with Dexie persistence
       await optimisticHelpers.addTransaction(newTransaction);
 
@@ -596,9 +586,9 @@ const useBudgetData = () => {
     paycheckHistory: paycheckHistoryQuery.data || [],
     dashboardSummary: dashboardQuery.data,
 
-    // Computed values
-    unassignedCash,
-    actualBalance,
+    // Computed values from dashboard query
+    unassignedCash: dashboardQuery.data?.unassignedCash || 0,
+    actualBalance: dashboardQuery.data?.actualBalance || 0,
 
     // Loading states
     isLoading:
