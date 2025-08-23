@@ -175,6 +175,43 @@ const storeInitializer = (set, get) => ({
       });
     }),
 
+  // Start background sync service
+  async startBackgroundSync() {
+    try {
+      const state = get();
+      if (!state.cloudSyncEnabled) {
+        logger.info("Cloud sync disabled - skipping background sync start");
+        return;
+      }
+
+      // Import auth store to get current user info
+      const { useAuth } = await import("./authStore");
+      const authState = useAuth.getState();
+
+      if (!authState.isUnlocked || !authState.budgetId || !authState.encryptionKey) {
+        logger.warn("Cannot start background sync - missing auth data", {
+          isUnlocked: authState.isUnlocked,
+          hasBudgetId: !!authState.budgetId,
+          hasEncryptionKey: !!authState.encryptionKey,
+        });
+        return;
+      }
+
+      // Import and start the cloud sync service
+      const { default: cloudSyncService } = await import("../services/cloudSyncService");
+      
+      const syncConfig = {
+        budgetId: authState.budgetId,
+        encryptionKey: authState.encryptionKey,
+      };
+
+      cloudSyncService.start(syncConfig);
+      logger.info("Background sync service started successfully");
+    } catch (error) {
+      logger.error("Failed to start background sync service", error);
+    }
+  },
+
   // Reset UI state only - data arrays handled by TanStack Query/Dexie
   resetAllData: () => {
     logger.info("Resetting UI state");
