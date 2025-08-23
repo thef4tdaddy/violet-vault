@@ -123,6 +123,18 @@ class CloudSyncService {
         if (cloudResult.data) {
           // Save the loaded data to Dexie
           await this.saveToDexie(cloudResult.data);
+
+          // Invalidate TanStack Query cache to refresh UI immediately
+          try {
+            const { queryClient } = await import("../utils/queryClient");
+            await queryClient.invalidateQueries();
+            logger.info(
+              "✅ TanStack Query cache invalidated after cloud data sync",
+            );
+          } catch (error) {
+            logger.warn("Failed to invalidate query cache after sync", error);
+          }
+
           result = { success: true, direction: "fromFirestore" };
           logger.info("✅ Downloaded data from Firebase and saved to Dexie");
         } else {
