@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { useBudgetStore } from "../stores/budgetStore";
+import { useBudgetStore } from "../../stores/uiStore";
 import { queryKeys, optimisticHelpers } from "../utils/queryClient";
 import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "../db/budgetDb";
 import logger from "../utils/logger.js";

@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useBudgetStore } from "../stores/budgetStore";
+import { useBudgetStore } from "../../stores/uiStore";
 import { queryKeys } from "../utils/queryClient";
 // import { budgetDb } from "../db/budgetDb"; // TODO: Use for offline fallback
 
