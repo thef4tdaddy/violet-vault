@@ -20,19 +20,14 @@ import logger from "../utils/logger.js";
 const useBudgetData = () => {
   const queryClient = useQueryClient();
 
-  // Get Zustand store for real-time state and mutations
+  // Get UI store for mutations only (data comes from TanStack Query → Dexie)
   const budgetStore = useBudgetStore();
   const {
-    // Data
-    envelopes,
-    transactions,
-    bills,
-    savingsGoals,
-    paycheckHistory,
+    // UI State
     unassignedCash,
     actualBalance,
 
-    // Mutations
+    // Legacy mutations (keeping for compatibility during transition)
     addEnvelope: zustandAddEnvelope,
     updateEnvelope: zustandUpdateEnvelope,
     deleteEnvelope: zustandDeleteEnvelope,
@@ -41,74 +36,46 @@ const useBudgetData = () => {
     reconcileTransaction: zustandReconcileTransaction,
   } = budgetStore;
 
-  // Query functions that use Zustand as data source with Dexie fallback
+  // Query functions that fetch from Dexie (primary data source)
   const queryFunctions = {
     envelopes: async () => {
-      // Try Zustand first (real-time data)
-      if (envelopes && envelopes.length > 0) {
-        return envelopes;
-      }
-
-      // Fallback to Dexie for offline support
+      // Fetch directly from Dexie (primary data source)
       const cachedEnvelopes = await budgetDb.envelopes.toArray();
-      if (cachedEnvelopes.length > 0) {
-        return cachedEnvelopes;
-      }
-
-      // Return empty array as final fallback
-      return [];
+      return cachedEnvelopes || [];
     },
 
     transactions: async (filters = {}) => {
-      // Try Zustand first
-      let result = transactions || [];
-
-      // Apply filters if provided
+      // Fetch directly from Dexie (primary data source)
+      let result;
+      
       if (filters.dateRange) {
         const { start, end } = filters.dateRange;
-        result = result.filter((t) => {
-          const transactionDate = new Date(t.date);
-          return transactionDate >= start && transactionDate <= end;
-        });
+        result = await budgetDb.getTransactionsByDateRange(start, end);
+      } else {
+        result = await budgetDb.transactions
+          .orderBy("date")
+          .reverse()
+          .toArray();
       }
 
+      // Apply additional filters
       if (filters.envelopeId) {
         result = result.filter((t) => t.envelopeId === filters.envelopeId);
       }
 
-      if (result.length > 0) {
-        return result;
-      }
-
-      // Fallback to Dexie
-      if (filters.dateRange) {
-        const { start, end } = filters.dateRange;
-        return await budgetDb.getTransactionsByDateRange(start, end);
-      }
-
-      const cachedTransactions = await budgetDb.transactions
-        .orderBy("date")
-        .reverse()
-        .toArray();
-      return cachedTransactions;
+      return result || [];
     },
 
     bills: async () => {
-      if (bills && bills.length > 0) {
-        return bills;
-      }
-
+      // Fetch directly from Dexie (primary data source)
       const cachedBills = await budgetDb.bills.toArray();
-      return cachedBills;
+      return cachedBills || [];
     },
 
     savingsGoals: async () => {
-      if (savingsGoals && savingsGoals.length > 0) {
-        return savingsGoals;
-      }
-
-      // Note: Need to add savingsGoals to Dexie schema in future enhancement
-      return [];
+      // Fetch directly from Dexie (primary data source)
+      const cachedSavingsGoals = await budgetDb.savingsGoals.toArray();
+      return cachedSavingsGoals || [];
     },
 
     paycheckHistory: async () => {
