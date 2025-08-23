@@ -197,6 +197,13 @@ const useBudgetData = () => {
     enabled: true,
   });
 
+  const savingsGoalsQuery = useQuery({
+    queryKey: queryKeys.savingsGoals,
+    queryFn: queryFunctions.savingsGoals,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    enabled: true,
+  });
+
   const paycheckHistoryQuery = useQuery({
     queryKey: queryKeys.paycheckHistory(),
     queryFn: queryFunctions.paycheckHistory,
@@ -217,6 +224,7 @@ const useBudgetData = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
+      queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary });
     };
@@ -584,7 +592,7 @@ const useBudgetData = () => {
     envelopes: envelopesQuery.data || [],
     transactions: transactionsQuery.data || [],
     bills: billsQuery.data || [],
-    savingsGoals: [], // TODO: Add savingsGoals query
+    savingsGoals: savingsGoalsQuery.data || [],
     paycheckHistory: paycheckHistoryQuery.data || [],
     dashboardSummary: dashboardQuery.data,
 
@@ -597,11 +605,13 @@ const useBudgetData = () => {
       envelopesQuery.isLoading ||
       transactionsQuery.isLoading ||
       billsQuery.isLoading ||
+      savingsGoalsQuery.isLoading ||
       paycheckHistoryQuery.isLoading,
     isFetching:
       envelopesQuery.isFetching ||
       transactionsQuery.isFetching ||
       billsQuery.isFetching ||
+      savingsGoalsQuery.isFetching ||
       paycheckHistoryQuery.isFetching,
     isOffline: !navigator.onLine,
 
@@ -609,6 +619,7 @@ const useBudgetData = () => {
     envelopesLoading: envelopesQuery.isLoading,
     transactionsLoading: transactionsQuery.isLoading,
     billsLoading: billsQuery.isLoading,
+    savingsGoalsLoading: savingsGoalsQuery.isLoading,
     paycheckHistoryLoading: paycheckHistoryQuery.isLoading,
     dashboardLoading: dashboardQuery.isLoading,
 
