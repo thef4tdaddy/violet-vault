@@ -648,6 +648,32 @@ const storeInitializer = (set, get) => ({
       });
     }),
 
+  // Reset all data - for encryption reset functionality
+  resetAllData: () => {
+    logger.info("Resetting all budget data");
+    set((state) => {
+      // Clear all data arrays
+      state.envelopes = [];
+      state.bills = [];
+      state.transactions = [];
+      state.allTransactions = [];
+      state.savingsGoals = [];
+      state.supplementalAccounts = [];
+      state.paycheckHistory = [];
+      state.debts = [];
+      
+      // Reset metadata
+      state.unassignedCash = 0;
+      state.actualBalance = 0;
+      state.biweeklyAllocation = 0;
+      state.isActualBalanceManual = false;
+      
+      // Reset UI state
+      state.dataLoaded = false;
+      state.isUnassignedCashModalOpen = false;
+    });
+  },
+
   // Transaction cleanup moved to TanStack Query hooks
 
   // Load imported data - now directly to Dexie via TanStack Query hooks
