@@ -26,7 +26,7 @@ import {
   RULE_TYPES,
   TRIGGER_TYPES,
 } from "../../utils/autoFundingEngine";
-import { useBudgetStore } from "../../stores/budgetStore";
+import { useBudgetStore } from "../../stores/uiStore";
 import logger from "../../utils/logger";
 
 const AutoFundingDashboard = ({ isOpen, onClose }) => {

@@ -1,6 +1,6 @@
 import React, { memo, lazy, Suspense } from "react";
 import { DollarSign, Wallet, Target, TrendingUp } from "lucide-react";
-import { useBudgetStore } from "../../stores/budgetStore";
+import { useBudgetStore } from "../../stores/uiStore";
 import { useActualBalance } from "../../hooks/useBudgetMetadata";
 import { useUnassignedCash } from "../../hooks/useBudgetMetadata";
 import { useEnvelopes } from "../../hooks/useEnvelopes";

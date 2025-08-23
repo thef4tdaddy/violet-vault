@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { useBudgetStore } from "../stores/budgetStore";
+// Budget store no longer needed for security manager
+// Password validation moved to auth store
 import logger from "../utils/logger";
 
 /**
@@ -7,7 +8,7 @@ import logger from "../utils/logger";
  * Handles session expiration, auto-lock, security events, and clipboard protection
  */
 export const useSecurityManager = () => {
-  const budget = useBudgetStore();
+  // Budget store usage removed - password validation moved to auth store
   const [isLocked, setIsLocked] = useState(false);
   const [securitySettings, setSecuritySettings] = useState(() => {
     const saved = localStorage.getItem("violetVault_securitySettings");
@@ -294,17 +295,11 @@ export const useSecurityManager = () => {
   const unlockApp = useCallback(
     async (password) => {
       try {
-        // Check if validatePassword function exists
-        if (!budget.validatePassword) {
-          console.warn(
-            "validatePassword function not available on budget store",
-          );
-          return { success: false, error: "Security validation not available" };
-        }
-
         console.log("🔐 Attempting password validation...");
-        // Validate password against stored budget
-        const isValidPassword = await budget.validatePassword(password);
+        // Validate password against auth store
+        const { useAuth } = await import("../stores/authStore");
+        const auth = useAuth.getState();
+        const isValidPassword = await auth.validatePassword(password);
         console.log("🔐 Password validation result:", isValidPassword);
 
         if (isValidPassword) {
@@ -338,7 +333,7 @@ export const useSecurityManager = () => {
         return { success: false, error: "Unlock failed" };
       }
     },
-    [budget, updateActivity, logSecurityEvent],
+    [updateActivity, logSecurityEvent],
   );
 
   /**

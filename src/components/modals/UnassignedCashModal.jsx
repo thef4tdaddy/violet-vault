@@ -11,7 +11,7 @@ import {
   Clock,
   Receipt,
 } from "lucide-react";
-import { useBudgetStore } from "../../stores/budgetStore";
+import { useBudgetStore } from "../../stores/uiStore";
 import useUnassignedCashDistribution from "../../hooks/useUnassignedCashDistribution";
 import { ENVELOPE_TYPES } from "../../constants/categories";
 

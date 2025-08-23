@@ -1,6 +1,6 @@
 // src/new/UnifiedBillTracker.jsx
 import React, { useState, useMemo } from "react";
-import { useBudgetStore } from "../../stores/budgetStore";
+import { useBudgetStore } from "../../stores/uiStore";
 import { useTransactions } from "../../hooks/useTransactions";
 import { useEnvelopes } from "../../hooks/useEnvelopes";
 import useBills from "../../hooks/useBills";

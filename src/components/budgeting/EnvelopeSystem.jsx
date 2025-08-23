@@ -1,6 +1,6 @@
 // src/components/budgeting/EnvelopeSystem.jsx - Refactored with separated logic
 import React, { useEffect, useCallback, useRef } from "react";
-import { useBudgetStore } from "../../stores/budgetStore";
+import { useBudgetStore } from "../../stores/uiStore";
 import { useEnvelopes } from "../../hooks/useEnvelopes";
 import { useBills } from "../../hooks/useBills";
 import { calculateBiweeklyNeeds } from "../../utils/budgeting";

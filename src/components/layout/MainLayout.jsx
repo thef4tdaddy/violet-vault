@@ -1,6 +1,6 @@
 // src/components/layout/MainLayout.jsx
 import React, { useState, useMemo, Suspense } from "react";
-import { useBudgetStore } from "../../stores/budgetStore";
+import { useBudgetStore } from "../../stores/uiStore";
 import useBudgetData from "../../hooks/useBudgetData";
 import useAuthFlow from "../../hooks/useAuthFlow";
 import useDataManagement from "../../hooks/useDataManagement";

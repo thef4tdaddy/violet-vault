@@ -15,7 +15,7 @@ import {
   Monitor,
   AlertTriangle,
 } from "lucide-react";
-import { useBudgetStore } from "../../stores/budgetStore";
+import { useBudgetStore } from "../../stores/uiStore";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import logger from "../../utils/logger";
 
