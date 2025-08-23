@@ -46,7 +46,10 @@ const ViewRenderer = ({
     useBills();
 
   // Get TanStack Query paycheck operations for proper UI updates
-  const { processPaycheck: tanStackProcessPaycheck } = useBudgetData();
+  const {
+    processPaycheck: tanStackProcessPaycheck,
+    paycheckHistory: tanStackPaycheckHistory,
+  } = useBudgetData();
 
   const {
     envelopes,
@@ -190,22 +193,35 @@ const ViewRenderer = ({
       <PaycheckProcessor
         biweeklyAllocation={totalBiweeklyNeed}
         envelopes={envelopes}
-        paycheckHistory={paycheckHistory}
+        paycheckHistory={tanStackPaycheckHistory}
         onProcessPaycheck={tanStackProcessPaycheck}
         onDeletePaycheck={async (paycheckId) => {
           try {
-            // Get the paycheck to delete
-            const paycheckToDelete = paycheckHistory.find(
+            // Validate paycheck ID
+            if (!paycheckId) {
+              throw new Error("Paycheck ID is required for deletion");
+            }
+
+            logger.info("Starting paycheck deletion process", {
+              paycheckId,
+              paycheckIdType: typeof paycheckId,
+            });
+
+            // Get the paycheck to delete from TanStack Query data
+            const paycheckToDelete = tanStackPaycheckHistory.find(
               (p) => p.id === paycheckId,
             );
             if (!paycheckToDelete) {
-              throw new Error(`Paycheck with ID ${paycheckId} not found`);
+              throw new Error(
+                `Paycheck with ID ${paycheckId} not found in paycheckHistory`,
+              );
             }
 
-            logger.info("Deleting paycheck with proper balance reversal", {
+            logger.info("Found paycheck to delete", {
               paycheckId,
               amount: paycheckToDelete.amount,
               mode: paycheckToDelete.mode,
+              allocations: paycheckToDelete.envelopeAllocations?.length || 0,
             });
 
             // Import required functions
@@ -227,6 +243,10 @@ const ViewRenderer = ({
               paycheckToDelete.mode === "allocate" &&
               paycheckToDelete.envelopeAllocations
             ) {
+              logger.info(
+                "Reversing envelope allocations for allocate mode paycheck",
+              );
+
               // Subtract from envelope balances
               for (const allocation of paycheckToDelete.envelopeAllocations) {
                 const envelope = await budgetDb.envelopes.get(
@@ -238,6 +258,10 @@ const ViewRenderer = ({
                       0,
                       (envelope.currentBalance || 0) - allocation.amount,
                     ),
+                  });
+                  logger.debug("Reversed envelope allocation", {
+                    envelopeId: allocation.envelopeId,
+                    amount: allocation.amount,
                   });
                 }
               }
@@ -254,6 +278,9 @@ const ViewRenderer = ({
                 currentUnassignedCash - leftoverAmount,
               );
             } else {
+              logger.info(
+                "Reversing leftover mode paycheck from unassigned cash",
+              );
               // "leftover" mode - all went to unassigned cash, so subtract it all
               newUnassignedCash = Math.max(
                 0,
@@ -262,16 +289,51 @@ const ViewRenderer = ({
             }
 
             // Update budget metadata
+            logger.info("Updating budget metadata", {
+              oldActualBalance: currentActualBalance,
+              newActualBalance,
+              oldUnassignedCash: currentUnassignedCash,
+              newUnassignedCash,
+            });
+
             await setBudgetMetadata({
               actualBalance: newActualBalance,
               unassignedCash: newUnassignedCash,
             });
 
-            // Remove paycheck from history in Dexie
-            await budgetDb.paycheckHistory.delete(paycheckId);
+            // Remove paycheck from history in Dexie - ensure we have a valid key
+            logger.info("Deleting paycheck from Dexie", {
+              paycheckId,
+              paycheckIdType: typeof paycheckId,
+            });
 
-            // Also call the old function to update Zustand state
-            await deletePaycheck(paycheckId);
+            // Verify the paycheck exists in Dexie before attempting to delete
+            const existsInDexie =
+              await budgetDb.paycheckHistory.get(paycheckId);
+            if (!existsInDexie) {
+              logger.warn("Paycheck not found in Dexie database", {
+                paycheckId,
+              });
+            } else {
+              await budgetDb.paycheckHistory.delete(paycheckId);
+              logger.info("Successfully deleted paycheck from Dexie");
+            }
+
+            // REMOVED: No longer calling Zustand to prevent data inconsistency
+            // await deletePaycheck(paycheckId);
+
+            // Invalidate TanStack Query caches to refresh UI
+            const { queryClient } = await import("../../utils/queryClient");
+            const { queryKeys } = await import("../../utils/queryClient");
+
+            queryClient.invalidateQueries({
+              queryKey: queryKeys.paycheckHistory(),
+            });
+            queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
+            queryClient.invalidateQueries({
+              queryKey: queryKeys.budgetMetadata,
+            });
+            queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
 
             logger.info(
               "Paycheck deleted successfully with proper balance reversal",
@@ -285,6 +347,11 @@ const ViewRenderer = ({
             logger.error(
               "Failed to delete paycheck with proper balance reversal",
               error,
+              {
+                paycheckId,
+                errorMessage: error.message,
+                errorStack: error.stack,
+              },
             );
             throw error;
           }
