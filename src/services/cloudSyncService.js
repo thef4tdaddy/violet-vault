@@ -118,9 +118,14 @@ class CloudSyncService {
       let result;
       if (syncDecision.direction === "fromFirestore") {
         // Download from Firebase to Dexie
-        result = await chunkedFirebaseSync.loadFromCloud();
-        if (result.success) {
-          logger.info("✅ Downloaded data from Firebase to Dexie");
+        const cloudResult = await chunkedFirebaseSync.loadFromCloud();
+        if (cloudResult.data) {
+          // Save the loaded data to Dexie
+          await this.saveToDexie(cloudResult.data);
+          result = { success: true, direction: "fromFirestore" };
+          logger.info("✅ Downloaded data from Firebase and saved to Dexie");
+        } else {
+          result = { success: false, error: "No cloud data found" };
         }
       } else {
         // Upload from Dexie to Firebase (default behavior)
@@ -225,6 +230,69 @@ class CloudSyncService {
       };
     } catch (error) {
       logger.error("Failed to fetch data from Dexie:", error);
+      throw error;
+    }
+  }
+
+  async saveToDexie(data) {
+    try {
+      logger.debug("💾 Saving cloud data to Dexie...");
+
+      // Clear existing data and save new data in a transaction
+      await budgetDb.transaction(
+        "rw",
+        [
+          budgetDb.envelopes,
+          budgetDb.bills,
+          budgetDb.transactions,
+          budgetDb.savingsGoals,
+          budgetDb.debts,
+          budgetDb.paycheckHistory,
+          budgetDb.budget,
+        ],
+        async () => {
+          // Clear existing data
+          await budgetDb.envelopes.clear();
+          await budgetDb.bills.clear();
+          await budgetDb.transactions.clear();
+          await budgetDb.savingsGoals.clear();
+          await budgetDb.debts.clear();
+          await budgetDb.paycheckHistory.clear();
+
+          // Save new data
+          if (data.envelopes?.length) {
+            await budgetDb.envelopes.bulkAdd(data.envelopes);
+          }
+          if (data.bills?.length) {
+            await budgetDb.bills.bulkAdd(data.bills);
+          }
+          if (data.transactions?.length) {
+            await budgetDb.transactions.bulkAdd(data.transactions);
+          }
+          if (data.savingsGoals?.length) {
+            await budgetDb.savingsGoals.bulkAdd(data.savingsGoals);
+          }
+          if (data.debts?.length) {
+            await budgetDb.debts.bulkAdd(data.debts);
+          }
+          if (data.paycheckHistory?.length) {
+            await budgetDb.paycheckHistory.bulkAdd(data.paycheckHistory);
+          }
+
+          // Save metadata
+          await budgetDb.budget.put({
+            id: "metadata",
+            unassignedCash: data.unassignedCash || 0,
+            actualBalance: data.actualBalance || 0,
+            supplementalAccounts: data.supplementalAccounts || [],
+            lastUpdated: new Date().toISOString(),
+          });
+        },
+      );
+
+      logger.info("✅ Cloud data saved to Dexie successfully");
+    } catch (error) {
+      logger.error("Failed to save cloud data to Dexie:", error);
       throw error;
     }
   }
@@ -382,7 +450,6 @@ class CloudSyncService {
       throw error;
     }
   }
-
 }
 
 export const cloudSyncService = new CloudSyncService();
