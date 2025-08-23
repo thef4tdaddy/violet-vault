@@ -1,6 +1,7 @@
 // src/components/layout/MainLayout.jsx
 import React, { useState, useMemo, Suspense } from "react";
 import { useBudgetStore } from "../../stores/budgetStore";
+import useBudgetData from "../../hooks/useBudgetData";
 import useAuthFlow from "../../hooks/useAuthFlow";
 import useDataManagement from "../../hooks/useDataManagement";
 import usePasswordRotation from "../../hooks/usePasswordRotation";
@@ -15,7 +16,7 @@ import LoadingSpinner from "../ui/LoadingSpinner";
 import { ToastContainer } from "../ui/Toast";
 import { useToastStore } from "../../stores/toastStore";
 import ViewRendererComponent from "./ViewRenderer";
-import cloudSyncService from "../../services/cloudSyncService";
+import { cloudSyncService } from "../../services/cloudSyncService";
 import logger from "../../utils/logger";
 import { getVersionInfo } from "../../utils/version";
 import {
@@ -247,17 +248,14 @@ const MainContent = ({
   // Handle change password - delegate to parent component
   const handleChangePassword = onChangePassword;
 
-  const {
-    envelopes,
-    savingsGoals,
-    unassignedCash,
-    paycheckHistory,
-    isOnline,
-    isSyncing,
-  } = budget;
+  // Get TanStack Query data for paycheck predictions
+  const { paycheckHistory: tanStackPaycheckHistory } = useBudgetData();
 
-  // Payday prediction notifications (after destructuring)
-  usePaydayPrediction(paycheckHistory, !!currentUser);
+  const { envelopes, savingsGoals, unassignedCash, isOnline, isSyncing } =
+    budget;
+
+  // Payday prediction notifications using TanStack Query data
+  usePaydayPrediction(tanStackPaycheckHistory, !!currentUser);
 
   // Calculate totals
   const totalEnvelopeBalance = Array.isArray(envelopes)

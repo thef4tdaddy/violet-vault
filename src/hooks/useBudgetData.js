@@ -112,12 +112,17 @@ const useBudgetData = () => {
     },
 
     paycheckHistory: async () => {
-      if (paycheckHistory && paycheckHistory.length > 0) {
-        return paycheckHistory;
+      // Use Dexie directly instead of Zustand to avoid stale data
+      try {
+        const cachedPaychecks = await budgetDb.paycheckHistory
+          .orderBy("date")
+          .reverse()
+          .toArray();
+        return cachedPaychecks || [];
+      } catch (error) {
+        logger.warn("Failed to fetch paycheck history from Dexie", error);
+        return [];
       }
-
-      // Note: Need to add paycheckHistory to Dexie schema in future enhancement
-      return [];
     },
 
     dashboardSummary: async () => {
@@ -206,6 +211,13 @@ const useBudgetData = () => {
     queryKey: queryKeys.billsList(),
     queryFn: queryFunctions.bills,
     staleTime: 10 * 60 * 1000, // 10 minutes
+    enabled: true,
+  });
+
+  const paycheckHistoryQuery = useQuery({
+    queryKey: queryKeys.paycheckHistory(),
+    queryFn: queryFunctions.paycheckHistory,
+    staleTime: 5 * 60 * 1000, // 5 minutes
     enabled: true,
   });
 
@@ -390,6 +402,13 @@ const useBudgetData = () => {
   const processPaycheckMutation = useMutation({
     mutationKey: ["paychecks", "process"],
     mutationFn: async (paycheckData) => {
+      logger.info("Starting paycheck processing", {
+        amount: paycheckData.amount,
+        mode: paycheckData.mode,
+        allocations: paycheckData.envelopeAllocations?.length || 0,
+        paycheckData,
+      });
+
       // Import the needed functions from budgetDb
       const { setBudgetMetadata } = await import("../db/budgetDb");
 
@@ -397,6 +416,12 @@ const useBudgetData = () => {
       const currentMetadata = await getBudgetMetadata();
       const currentActualBalance = currentMetadata?.actualBalance || 0;
       const currentUnassignedCash = currentMetadata?.unassignedCash || 0;
+
+      logger.info("Current balances before paycheck", {
+        currentActualBalance,
+        currentUnassignedCash,
+        currentMetadata,
+      });
 
       // Calculate new balances properly (ADD, don't SET)
       const newActualBalance = currentActualBalance + paycheckData.amount;
@@ -408,6 +433,8 @@ const useBudgetData = () => {
         paycheckData.mode === "allocate" &&
         paycheckData.envelopeAllocations
       ) {
+        logger.info("Processing allocate mode paycheck");
+
         // Distribute to specified envelopes
         envelopeUpdates = paycheckData.envelopeAllocations.map(
           (allocation) => ({
@@ -421,11 +448,28 @@ const useBudgetData = () => {
           (sum, alloc) => sum + alloc.amount,
           0,
         );
-        newUnassignedCash += paycheckData.amount - totalAllocated;
+        const leftoverAmount = paycheckData.amount - totalAllocated;
+        newUnassignedCash += leftoverAmount;
+
+        logger.info("Allocate mode calculations", {
+          totalAllocated,
+          leftoverAmount,
+          envelopeUpdates,
+        });
       } else {
+        logger.info(
+          "Processing leftover mode paycheck - all to unassigned cash",
+        );
         // Leftover mode - all to unassigned cash
         newUnassignedCash += paycheckData.amount;
       }
+
+      logger.info("Calculated new balances", {
+        newActualBalance,
+        newUnassignedCash,
+        balanceIncrease: newActualBalance - currentActualBalance,
+        unassignedIncrease: newUnassignedCash - currentUnassignedCash,
+      });
 
       // Update budget metadata in Dexie
       await setBudgetMetadata({
@@ -433,20 +477,45 @@ const useBudgetData = () => {
         unassignedCash: newUnassignedCash,
       });
 
+      logger.info("Budget metadata updated in Dexie");
+
       // Update envelope balances in Dexie if allocating
       if (envelopeUpdates.length > 0) {
+        logger.info("Updating envelope balances", {
+          envelopeCount: envelopeUpdates.length,
+          envelopeUpdates,
+        });
+
         const { budgetDb } = await import("../db/budgetDb");
         for (const update of envelopeUpdates) {
           const envelope = await budgetDb.envelopes.get(update.id);
           if (envelope) {
+            const oldBalance = envelope.currentBalance || 0;
+            const newBalance = oldBalance + update.amount;
+
             await budgetDb.envelopes.update(update.id, {
-              currentBalance: (envelope.currentBalance || 0) + update.amount,
+              currentBalance: newBalance,
+            });
+
+            logger.debug("Updated envelope balance", {
+              envelopeId: update.id,
+              envelopeName: envelope.name,
+              oldBalance,
+              newBalance,
+              amountAdded: update.amount,
+            });
+          } else {
+            logger.warn("Envelope not found for allocation", {
+              envelopeId: update.id,
+              amount: update.amount,
             });
           }
         }
+
+        logger.info("Finished updating envelope balances");
       }
 
-      // Store paycheck in history
+      // Store paycheck in history in Dexie (FIXED: was missing this!)
       const paycheckRecord = {
         ...paycheckData,
         id: paycheckData.id || `paycheck_${Date.now()}`,
@@ -457,8 +526,21 @@ const useBudgetData = () => {
         unassignedCashAfter: newUnassignedCash,
       };
 
-      // Also call Zustand to update in-memory state
-      zustandProcessPaycheck(paycheckData);
+      // Store in Dexie database (this was missing!)
+      const { budgetDb } = await import("../db/budgetDb");
+      await budgetDb.paycheckHistory.put(paycheckRecord);
+
+      logger.info("Paycheck processed successfully", {
+        paycheckId: paycheckRecord.id,
+        amount: paycheckData.amount,
+        mode: paycheckData.mode,
+        actualBalanceChange: newActualBalance - currentActualBalance,
+        unassignedCashChange: newUnassignedCash - currentUnassignedCash,
+        envelopeAllocations: paycheckData.envelopeAllocations?.length || 0,
+      });
+
+      // REMOVED: No longer calling Zustand to prevent data inconsistency
+      // zustandProcessPaycheck(paycheckData);
 
       return paycheckRecord;
     },
@@ -466,7 +548,7 @@ const useBudgetData = () => {
       // Invalidate all related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
-      queryClient.invalidateQueries({ queryKey: queryKeys.paychecks });
+      queryClient.invalidateQueries({ queryKey: queryKeys.paycheckHistory() });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
     },
   });
@@ -515,7 +597,7 @@ const useBudgetData = () => {
     transactions: transactionsQuery.data || transactions || [],
     bills: billsQuery.data || bills || [],
     savingsGoals: savingsGoals || [],
-    paycheckHistory: paycheckHistory || [],
+    paycheckHistory: paycheckHistoryQuery.data || [],
     dashboardSummary: dashboardQuery.data,
 
     // Computed values
@@ -526,17 +608,20 @@ const useBudgetData = () => {
     isLoading:
       envelopesQuery.isLoading ||
       transactionsQuery.isLoading ||
-      billsQuery.isLoading,
+      billsQuery.isLoading ||
+      paycheckHistoryQuery.isLoading,
     isFetching:
       envelopesQuery.isFetching ||
       transactionsQuery.isFetching ||
-      billsQuery.isFetching,
+      billsQuery.isFetching ||
+      paycheckHistoryQuery.isFetching,
     isOffline: !navigator.onLine,
 
     // Individual query states for fine-grained loading
     envelopesLoading: envelopesQuery.isLoading,
     transactionsLoading: transactionsQuery.isLoading,
     billsLoading: billsQuery.isLoading,
+    paycheckHistoryLoading: paycheckHistoryQuery.isLoading,
     dashboardLoading: dashboardQuery.isLoading,
 
     // Mutations
