@@ -240,10 +240,13 @@ const useBudgetData = () => {
   // Rebuild missing transactions in background if ledger data is incomplete
   useEffect(() => {
     const reconcileMissingTransactions = async () => {
-      if (!envelopes) return;
+      const envelopesData = envelopesQuery.data;
+      const transactionsData = transactionsQuery.data;
+
+      if (!envelopesData) return;
 
       // Sum existing transactions by envelope
-      const ledgerTotals = (transactions || []).reduce((acc, t) => {
+      const ledgerTotals = (transactionsData || []).reduce((acc, t) => {
         const amt = Number(t.amount) || 0;
         acc[t.envelopeId] = (acc[t.envelopeId] || 0) + amt;
         return acc;
@@ -252,7 +255,7 @@ const useBudgetData = () => {
       const newTransactions = [];
 
       // Check each envelope for discrepancies
-      for (const env of envelopes) {
+      for (const env of envelopesData) {
         const ledgerBalance = ledgerTotals[env.id] || 0;
         const diff = (Number(env.currentBalance) || 0) - ledgerBalance;
         if (Math.abs(diff) > 0.01) {
@@ -298,8 +301,8 @@ const useBudgetData = () => {
 
     reconcileMissingTransactions();
   }, [
-    envelopes,
-    transactions,
+    envelopesQuery.data,
+    transactionsQuery.data,
     unassignedCash,
     queryClient,
     zustandAddTransaction,
