@@ -542,11 +542,16 @@ const useBudgetData = () => {
       return paycheckRecord;
     },
     onSuccess: () => {
-      // Invalidate all related queries
+      // Invalidate all related queries with immediate refetch
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.paycheckHistory() });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary() });
+      
+      // Force immediate refetch of critical queries
+      queryClient.refetchQueries({ queryKey: queryKeys.paycheckHistory() });
+      queryClient.refetchQueries({ queryKey: queryKeys.envelopes });
     },
   });
 
