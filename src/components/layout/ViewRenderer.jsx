@@ -11,7 +11,9 @@ import TransactionLedger from "../transactions/TransactionLedger";
 const ChartsAndAnalytics = React.lazy(
   () => import("../analytics/ChartsAndAnalytics"),
 );
-const DebtDashboard = React.lazy(() => import("../debt/DebtDashboard"));
+// Temporarily disable lazy loading due to chunk loading error
+// const DebtDashboard = React.lazy(() => import("../debt/DebtDashboard"));
+import DebtDashboard from "../debt/DebtDashboard";
 const AutoFundingView = React.lazy(
   () => import("../automation/AutoFundingView"),
 );
