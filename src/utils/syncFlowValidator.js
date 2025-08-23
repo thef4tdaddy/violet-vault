@@ -4,7 +4,7 @@
  */
 
 import { budgetDb } from "../db/budgetDb";
-import cloudSyncService from "../services/cloudSyncService";
+import { cloudSyncService } from "../services/cloudSyncService";
 import logger from "./logger";
 
 export const validateAllSyncFlows = async () => {
@@ -208,7 +208,7 @@ export const validateAllSyncFlows = async () => {
         name: "Equal timestamps",
         firestore: { lastModified: Date.now(), envelopes: [{ id: "test" }] },
         dexie: { lastModified: Date.now(), envelopes: [{ id: "test" }] },
-        expected: "fromFirestore", // New logic: prefer cloud when sizes are equal
+        expected: "bidirectional", // Same timestamp, need full sync
       },
       {
         name: "Local only data",
@@ -228,8 +228,8 @@ export const validateAllSyncFlows = async () => {
     for (const scenario of scenarios) {
       try {
         const result = await cloudSyncService.determineSyncDirection(
-          scenario.firestore,
           scenario.dexie,
+          scenario.firestore,
         );
         const correct = result.direction === scenario.expected;
         directionResults.push(`${scenario.name}: ${correct ? "✅" : "❌"}`);
