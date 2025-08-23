@@ -86,7 +86,8 @@ class CloudSyncService {
       // Check what data exists in cloud to determine sync direction
       let cloudData;
       try {
-        cloudData = await chunkedFirebaseSync.loadFromCloud();
+        const cloudResult = await chunkedFirebaseSync.loadFromCloud();
+        cloudData = cloudResult?.data || null;
       } catch {
         logger.warn("Could not load cloud data, assuming no cloud data exists");
         cloudData = null;
