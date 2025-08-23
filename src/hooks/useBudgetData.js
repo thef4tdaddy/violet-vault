@@ -197,12 +197,14 @@ const useBudgetData = () => {
     enabled: true,
   });
 
-  const savingsGoalsQuery = useQuery({
-    queryKey: queryKeys.savingsGoalsList(),
-    queryFn: queryFunctions.savingsGoals,
-    staleTime: 10 * 60 * 1000, // 10 minutes
-    enabled: true,
-  });
+  // Temporarily disable savingsGoalsQuery to debug React #185
+  const savingsGoalsQuery = { data: [], isLoading: false, isFetching: false, error: null };
+  // const savingsGoalsQuery = useQuery({
+  //   queryKey: queryKeys.savingsGoalsList(),
+  //   queryFn: queryFunctions.savingsGoals,
+  //   staleTime: 10 * 60 * 1000, // 10 minutes
+  //   enabled: true,
+  // });
 
   const paycheckHistoryQuery = useQuery({
     queryKey: queryKeys.paycheckHistory(),
@@ -600,18 +602,18 @@ const useBudgetData = () => {
     unassignedCash: dashboardQuery.data?.unassignedCash || 0,
     actualBalance: dashboardQuery.data?.actualBalance || 0,
 
-    // Loading states
+    // Loading states (savingsGoals temporarily disabled for React #185 debugging)
     isLoading:
       envelopesQuery.isLoading ||
       transactionsQuery.isLoading ||
       billsQuery.isLoading ||
-      savingsGoalsQuery.isLoading ||
+      // savingsGoalsQuery.isLoading ||
       paycheckHistoryQuery.isLoading,
     isFetching:
       envelopesQuery.isFetching ||
       transactionsQuery.isFetching ||
       billsQuery.isFetching ||
-      savingsGoalsQuery.isFetching ||
+      // savingsGoalsQuery.isFetching ||
       paycheckHistoryQuery.isFetching,
     isOffline: !navigator.onLine,
 
@@ -619,7 +621,7 @@ const useBudgetData = () => {
     envelopesLoading: envelopesQuery.isLoading,
     transactionsLoading: transactionsQuery.isLoading,
     billsLoading: billsQuery.isLoading,
-    savingsGoalsLoading: savingsGoalsQuery.isLoading,
+    savingsGoalsLoading: false, // savingsGoalsQuery.isLoading, // Disabled for React #185 debugging
     paycheckHistoryLoading: paycheckHistoryQuery.isLoading,
     dashboardLoading: dashboardQuery.isLoading,
 
