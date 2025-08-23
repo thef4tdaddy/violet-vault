@@ -68,7 +68,7 @@ const SettingsDashboard = ({
     if (newValue) {
       logger.debug("🌩️ Cloud sync enabled - starting background sync");
       try {
-        const { default: CloudSyncService } = await import(
+        const { cloudSyncService } = await import(
           "../../services/cloudSyncService"
         );
         const { useAuth } = await import("../../stores/authStore");
@@ -79,7 +79,7 @@ const SettingsDashboard = ({
           authState.currentUser &&
           authState.budgetId
         ) {
-          await CloudSyncService.start({
+          await cloudSyncService.start({
             encryptionKey: authState.encryptionKey,
             currentUser: authState.currentUser,
             budgetId: authState.budgetId,
@@ -91,10 +91,10 @@ const SettingsDashboard = ({
     } else {
       logger.debug("💾 Cloud sync disabled - stopping background sync");
       try {
-        const { default: CloudSyncService } = await import(
+        const { cloudSyncService } = await import(
           "../../services/cloudSyncService"
         );
-        CloudSyncService.stop();
+        cloudSyncService.stop();
       } catch (error) {
         logger.error("Failed to stop cloud sync:", error);
       }
@@ -107,11 +107,11 @@ const SettingsDashboard = ({
     setIsSyncing(true);
     try {
       logger.debug("🔄 Manual sync triggered from settings");
-      const { default: CloudSyncService } = await import(
+      const { cloudSyncService } = await import(
         "../../services/cloudSyncService"
       );
 
-      if (!CloudSyncService.serviceIsRunning) {
+      if (!cloudSyncService.isRunning) {
         logger.warn(
           "⚠️ Cloud sync service not running, starting temporarily...",
         );
@@ -123,7 +123,7 @@ const SettingsDashboard = ({
           authState.currentUser &&
           authState.budgetId
         ) {
-          await CloudSyncService.start({
+          await cloudSyncService.start({
             encryptionKey: authState.encryptionKey,
             currentUser: authState.currentUser,
             budgetId: authState.budgetId,
@@ -133,7 +133,7 @@ const SettingsDashboard = ({
         }
       }
 
-      const result = await CloudSyncService.forceSync();
+      const result = await cloudSyncService.forceSync();
 
       if (result.success) {
         logger.info("✅ Manual sync completed", result);
