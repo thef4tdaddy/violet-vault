@@ -313,9 +313,6 @@ const useBudgetData = () => {
   const addEnvelopeMutation = useMutation({
     mutationKey: ["envelopes", "add"],
     mutationFn: async (newEnvelope) => {
-      // Call Zustand mutation
-      zustandAddEnvelope(newEnvelope);
-
       // Persist to Dexie
       await optimisticHelpers.addEnvelope(newEnvelope);
 
@@ -337,9 +334,6 @@ const useBudgetData = () => {
   const updateEnvelopeMutation = useMutation({
     mutationKey: ["envelopes", "update"],
     mutationFn: async ({ envelopeId, updates }) => {
-      // Call Zustand mutation
-      zustandUpdateEnvelope(envelopeId, updates);
-
       // Apply optimistic update with Dexie persistence
       await optimisticHelpers.updateEnvelope(envelopeId, updates);
 
@@ -354,9 +348,6 @@ const useBudgetData = () => {
   const deleteEnvelopeMutation = useMutation({
     mutationKey: ["envelopes", "delete"],
     mutationFn: async (envelopeId) => {
-      // Call Zustand mutation
-      zustandDeleteEnvelope(envelopeId);
-
       // Remove from cache and Dexie
       await optimisticHelpers.removeEnvelope(envelopeId);
 
@@ -619,7 +610,7 @@ const useBudgetData = () => {
     deleteEnvelope: deleteEnvelopeMutation.mutate,
     addTransaction: addTransactionMutation.mutate,
     processPaycheck: processPaycheckMutation.mutate,
-    reconcileTransaction: zustandReconcileTransaction, // Direct Zustand call for now
+    // reconcileTransaction: TODO - implement TanStack Query mutation
 
     // Mutation states
     isAddingEnvelope: addEnvelopeMutation.isPending,
