@@ -70,9 +70,9 @@ const Layout = () => {
 
   // Initialize data from Dexie to Zustand on app startup
   const {
-    isInitialized: _dataInitialized,
-    initError: _initError,
-    dataLoaded: _dataLoaded,
+    isInitialized,
+    initError,
+    dataLoaded,
   } = useDataInitialization();
 
   const { exportData, importData, resetEncryptionAndStartFresh } = useDataManagement();
@@ -254,7 +254,7 @@ const MainContent = ({
   const _totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
 
   // Calculate total biweekly funding need across all envelope types
-  const _totalBiweeklyNeed = Array.isArray(envelopes)
+  const totalBiweeklyNeed = Array.isArray(envelopes)
     ? envelopes.reduce((sum, env) => {
         // Auto-classify envelope type if not set
         const envelopeType = env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
@@ -319,6 +319,7 @@ const MainContent = ({
             activeView={activeView}
             budget={budget}
             currentUser={currentUser}
+            totalBiweeklyNeed={totalBiweeklyNeed}
             setActiveView={setActiveView}
           />
 
