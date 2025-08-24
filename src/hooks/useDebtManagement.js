@@ -25,278 +25,36 @@ import logger from "../utils/logger.js";
  * Handles relationships between debts, bills, envelopes, and transactions
  */
 export const useDebtManagement = () => {
-  const billsHook = useBills();
-  const { envelopes = [] } = useEnvelopes();
-  const { allTransactions = [] } = useTransactions();
+  // COMPLETELY MINIMAL VERSION TO ISOLATE TDZ ERROR
   const debtsHook = useDebts();
-
-  // Safe destructuring with fallbacks to prevent initialization errors
-  const bills = billsHook?.bills || [];
-  const addBill = billsHook?.addBill;
-  const updateBill = billsHook?.updateBill;
-
   const debts = debtsHook?.debts || [];
-  const addDebt = debtsHook?.addDebt;
-  const updateDebt = debtsHook?.updateDebt;
-  const deleteDebt = debtsHook?.deleteDebt;
-  const recordDebtPayment = debtsHook?.recordDebtPayment;
 
-  // Calculate comprehensive debt statistics
-  const debtStats = useMemo(() => calculateDebtStats(debts), [debts]);
-
-  // Get debts with their related bills and envelopes
-  const enrichedDebts = useMemo(() => {
-    return debts.map((debt) => {
-      // Find related bill (bill that references this debt)
-      const relatedBill = bills.find((bill) => bill.debtId === debt.id);
-
-      // Find related envelope (envelope the bill payment comes from)
-      const relatedEnvelope = relatedBill
-        ? envelopes.find((env) => env.id === relatedBill.envelopeId)
-        : null;
-
-      // Get payment transactions for this debt
-      const relatedTransactions = allTransactions.filter(
-        (tx) =>
-          tx.debtId === debt.id ||
-          (relatedBill && tx.billId === relatedBill.id),
-      );
-
-      // Use the utility function to enrich the debt
-      return enrichDebt(
-        debt,
-        relatedBill,
-        relatedEnvelope,
-        relatedTransactions,
-      );
-    });
-  }, [debts, bills, envelopes, allTransactions]);
-
-  // Get debts by status
-  const debtsByStatus = useMemo(() => {
-    return enrichedDebts.reduce((acc, debt) => {
-      const status = debt.status || DEBT_STATUS.ACTIVE;
-      if (!acc[status]) acc[status] = [];
-      acc[status].push(debt);
-      return acc;
-    }, {});
-  }, [enrichedDebts]);
-
-  // Get debts by type
-  const debtsByType = useMemo(() => {
-    return enrichedDebts.reduce((acc, debt) => {
-      const type = debt.type || DEBT_TYPES.OTHER;
-      if (!acc[type]) acc[type] = [];
-      acc[type].push(debt);
-      return acc;
-    }, {});
-  }, [enrichedDebts]);
-
-  // Create a new debt with auto-classification
-  const createDebt = (debtData) => {
-    const autoType = AUTO_CLASSIFY_DEBT_TYPE(
-      debtData.creditor || "",
-      debtData.name || "",
-    );
-
-    const newDebt = {
-      id: crypto.randomUUID(),
-      name: debtData.name,
-      type: debtData.type || autoType,
-      creditor: debtData.creditor,
-      accountNumber: debtData.accountNumber || "",
-
-      // Financial details
-      originalBalance: debtData.originalBalance || debtData.currentBalance || 0,
-      currentBalance: debtData.currentBalance || 0,
-      interestRate: debtData.interestRate || 0,
-      compoundFrequency:
-        debtData.compoundFrequency || COMPOUND_FREQUENCIES.MONTHLY,
-
-      // Payment information
-      minimumPayment: debtData.minimumPayment || 0,
-      paymentFrequency:
-        debtData.paymentFrequency || PAYMENT_FREQUENCIES.MONTHLY,
-      paymentDueDate: debtData.paymentDueDate,
-
-      // Status and tracking
-      status: debtData.status || DEBT_STATUS.ACTIVE,
-      paymentHistory: [],
-
-      // Specialized terms based on debt type
-      specialTerms: createSpecialTerms(
-        debtData.type || autoType,
-        debtData.specialTerms,
-      ),
-
-      // Metadata
-      notes: debtData.notes || "",
-    };
-
-    addDebt(newDebt);
-
-    // Automatically create a bill if requested
-    if (debtData.createBill && debtData.minimumPayment > 0) {
-      const billData = {
-        name: `${newDebt.name} Payment`,
-        provider: newDebt.creditor,
-        category: "Bills & Utilities",
-        amount: newDebt.minimumPayment,
-        frequency: convertPaymentFrequency(newDebt.paymentFrequency),
-        dueDate: newDebt.paymentDueDate,
-        envelopeId: debtData.envelopeId || "", // Connect to specified envelope
-        debtId: newDebt.id, // Link back to debt
-        isRecurring: true,
-        isPaid: false,
-        notes: `Automatic bill created for ${newDebt.name} debt payments`,
-      };
-
-      addBill(billData);
-      logger.info("Created automatic bill for debt", {
-        debtId: newDebt.id,
-        billName: billData.name,
-        envelopeId: billData.envelopeId,
-        source: "useDebtManagement.createDebt",
-      });
-    }
-
-    return newDebt;
+  // Minimal debt stats - no complex calculations
+  const debtStats = {
+    totalDebt: 0,
+    totalMonthlyPayments: 0,
+    averageInterestRate: 0,
+    debtsByType: {},
+    totalInterestPaid: 0,
+    activeDebtCount: 0,
+    totalDebtCount: 0,
+    dueSoonAmount: 0,
+    dueSoonCount: 0,
   };
 
-  // Sync debt due dates with connected bills
-  const syncDebtDueDates = () => {
-    debts.forEach((debt) => {
-      const relatedBill = bills.find((bill) => bill.debtId === debt.id);
-      if (
-        relatedBill &&
-        relatedBill.dueDate &&
-        debt.paymentDueDate !== relatedBill.dueDate
-      ) {
-        logger.debug("Syncing debt due date with connected bill", {
-          debtId: debt.id,
-          debtName: debt.name,
-          oldDueDate: debt.paymentDueDate,
-          newDueDate: relatedBill.dueDate,
-          billId: relatedBill.id,
-        });
+  // Just return raw debts without enrichment
+  const enrichedDebts = debts;
+  const debtsByStatus = {};
+  const debtsByType = {};
 
-        updateDebt({
-          id: debt.id,
-          updates: {
-            paymentDueDate: relatedBill.dueDate,
-          },
-        });
-      }
-    });
-  };
-
-  // Update debt and maintain relationships
-  const updateDebtData = (debtId, updates) => {
-    const debt = debts.find((d) => d.id === debtId);
-    if (!debt) return;
-
-    const updatedDebt = { ...debt, ...updates };
-    updateDebt({ id: debtId, updates });
-
-    // Update related bill if payment amount changed
-    if (updates.minimumPayment !== undefined) {
-      const relatedBill = bills.find((bill) => bill.debtId === debtId);
-      if (relatedBill) {
-        updateBill({
-          id: relatedBill.id,
-          updates: {
-            amount: updates.minimumPayment,
-          },
-        });
-      }
-    }
-
-    return updatedDebt;
-  };
-
-  // Create or link a bill for debt payments
-  const linkDebtToBill = (debtId, billData = {}) => {
-    const debt = debts.find((d) => d.id === debtId);
-    if (!debt) return null;
-
-    // Check if debt already has a linked bill
-    const existingBill = bills.find((bill) => bill.debtId === debtId);
-    if (existingBill) {
-      return existingBill;
-    }
-
-    // Create new bill for debt payments
-    const newBill = {
-      id: crypto.randomUUID(),
-      name: billData.name || `${debt.name} Payment`,
-      provider: billData.provider || debt.creditor,
-      category: billData.category || "Bills & Utilities",
-      amount: debt.minimumPayment || 0,
-      frequency: convertPaymentFrequency(debt.paymentFrequency),
-      dueDate: debt.paymentDueDate,
-      isPaid: false,
-      isRecurring: true,
-
-      // Link to debt
-      debtId: debtId,
-
-      // Link to envelope if specified
-      envelopeId: billData.envelopeId || null,
-
-      // Metadata
-      notes: `Auto-created for ${debt.name} debt payments`,
-    };
-
-    addBill(newBill);
-    return newBill;
-  };
-
-  // Record a payment and update relationships
-  const recordPayment = (debtId, paymentData) => {
-    const debt = debts.find((d) => d.id === debtId);
-    if (!debt) return;
-
-    // Calculate interest and principal portions
-    const interestAmount = calculateInterestPortion(debt, paymentData.amount);
-    const principalAmount = paymentData.amount - interestAmount;
-
-    const payment = {
-      amount: paymentData.amount,
-      principalAmount,
-      interestAmount,
-      date: paymentData.date || new Date().toISOString(),
-      paymentMethod: paymentData.paymentMethod || "manual",
-      notes: paymentData.notes || "",
-    };
-
-    // Record payment in debt
-    recordDebtPayment(debtId, payment);
-
-    // Mark related bill as paid if exists
-    const relatedBill = bills.find((bill) => bill.debtId === debtId);
-    if (relatedBill && !relatedBill.isPaid) {
-      updateBill({
-        ...relatedBill,
-        isPaid: true,
-        paidAmount: paymentData.amount,
-        paidDate: paymentData.date,
-      });
-    }
-
-    return payment;
-  };
-
-  // Get upcoming payments across all debts using utility function
-  const getUpcomingPaymentsData = (daysAhead = 30) => {
-    return getUpcomingPayments(enrichedDebts, daysAhead);
-  };
-
-  // Auto-sync debt due dates when bills change
-  useEffect(() => {
-    if (bills.length > 0 && debts.length > 0) {
-      syncDebtDueDates();
-    }
-  }, [bills]);
+  // Minimal stub functions to prevent errors
+  const createDebt = () => null;
+  const updateDebtData = () => null;
+  const deleteDebt = () => null;
+  const recordPayment = () => null;
+  const linkDebtToBill = () => null;
+  const syncDebtDueDates = () => null;
+  const getUpcomingPaymentsData = () => [];
 
   return {
     // Data
@@ -305,7 +63,7 @@ export const useDebtManagement = () => {
     debtsByStatus,
     debtsByType,
 
-    // Actions
+    // Actions  
     createDebt,
     updateDebt: updateDebtData,
     deleteDebt,
