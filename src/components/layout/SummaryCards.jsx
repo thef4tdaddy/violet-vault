@@ -179,7 +179,7 @@ const SummaryCards = () => {
 };
 
 const SummaryCard = memo(
-  ({ label, value, color, onClick, clickable, isNegative, subtitle, dataTour }) => {
+  ({ icon: Icon, label, value, color, onClick, clickable, isNegative, subtitle, dataTour }) => {
     const colorClasses = {
       purple: "bg-purple-500",
       emerald: "bg-emerald-500",
@@ -209,7 +209,7 @@ const SummaryCard = memo(
             className={`absolute inset-0 ${colorClasses[color]} rounded-2xl blur-lg opacity-30`}
           ></div>
           <div className={`relative ${colorClasses[color]} p-3 rounded-2xl`}>
-            <_Icon className="h-6 w-6 text-white" />
+            <Icon className="h-6 w-6 text-white" />
           </div>
         </div>
         <div>
