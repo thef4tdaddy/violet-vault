@@ -29,6 +29,7 @@ import { useBillOperations } from "../../hooks/useBillOperations";
 import { generateBillSuggestions } from "../../utils/billDiscovery";
 import logger from "../../utils/logger";
 import ObjectHistoryViewer from "../history/ObjectHistoryViewer";
+import { processRecurringBill } from "../../utils/bills/recurringBillUtils";
 
 const BillManager = ({
   transactions: propTransactions = [], // Unified data source - filters for bills
@@ -151,12 +152,28 @@ const BillManager = ({
       let daysUntilDue = null;
       let urgency = "normal";
 
-      if (bill.dueDate) {
+      // Handle recurring bill logic using utility
+      const processedBill = processRecurringBill(bill, (updatedBill) => {
+        if (onUpdateBill) {
+          onUpdateBill(updatedBill);
+        } else {
+          updateBill({
+            id: updatedBill.id,
+            updates: {
+              isPaid: false,
+              dueDate: updatedBill.dueDate,
+              paidDate: null,
+            },
+          });
+        }
+      });
+
+      if (processedBill.dueDate) {
         try {
           const today = new Date();
 
           // Fix 2-digit year parsing by converting to 4-digit years
-          let normalizedDate = bill.dueDate;
+          let normalizedDate = processedBill.dueDate;
 
           // Handle various date formats and convert 2-digit years to 4-digit
           if (typeof normalizedDate === "string") {
@@ -183,15 +200,15 @@ const BillManager = ({
           }
         } catch (error) {
           logger.warn(
-            `Invalid due date for bill ${bill.id}:`,
-            bill.dueDate,
+            `Invalid due date for bill ${processedBill.id}:`,
+            processedBill.dueDate,
             error,
           );
         }
       }
 
       return {
-        ...bill,
+        ...processedBill,
         // Ensure required fields have valid values
         amount: typeof bill.amount === "number" ? bill.amount : 0,
         description: bill.description || bill.provider || `Bill ${bill.id}`,
