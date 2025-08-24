@@ -93,14 +93,10 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
   // Update form data when debt prop changes
   React.useEffect(() => {
     if (debt) {
-      // Determine payment method based on existing connections
+      // Determine payment method based on existing connections - SIMPLIFIED
       let paymentMethod = "create_new";
-      if (connectedBill && connectedEnvelope) {
-        paymentMethod = "connect_existing_bill"; // Bill connection takes precedence
-      } else if (connectedBill) {
-        paymentMethod = "connect_existing_bill";
-      } else if (connectedEnvelope || debt.envelopeId) {
-        paymentMethod = "connect_existing";
+      if (connectedBill) {
+        paymentMethod = "connect_existing_bill"; // Bill connection (uses bill's envelope)
       }
 
       setFormData({
@@ -636,7 +632,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                 : "Payment Setup"}
             </h4>
 
-            {/* Payment Method Radio Buttons */}
+            {/* Payment Method Radio Buttons - SIMPLIFIED UX */}
             <div className="space-y-2">
               {/* Create New Option */}
               <div className="glassmorphism border-2 border-white/20 rounded-xl p-3">
@@ -670,38 +666,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                 </div>
               </div>
 
-              {/* Connect Existing Envelope Option */}
-              <div className="glassmorphism border-2 border-white/20 rounded-xl p-3">
-                <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
-                  <input
-                    type="radio"
-                    id="connect_existing"
-                    name="paymentMethod"
-                    value="connect_existing"
-                    checked={formData.paymentMethod === "connect_existing"}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        paymentMethod: e.target.value,
-                      })
-                    }
-                    className="w-4 h-4 text-purple-600 mt-0.5 justify-self-start"
-                  />
-                  <div>
-                    <div className="flex items-center mb-1">
-                      <Wallet className="h-4 w-4 mr-2 text-purple-600" />
-                      <span className="font-medium text-sm">
-                        Connect to existing envelope
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-600 leading-tight">
-                      Use an existing envelope to fund this debt payment
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Connect Existing Bill Option */}
+              {/* Connect Existing Bill Option - AUTO-USES BILL'S ENVELOPE */}
               <div className="glassmorphism border-2 border-white/20 rounded-xl p-3">
                 <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
                   <input
@@ -726,8 +691,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                       </span>
                     </div>
                     <p className="text-xs text-gray-600 leading-tight">
-                      Link to an existing bill and auto-sync due dates and
-                      amounts
+                      Link to an existing bill and automatically use its envelope for funding
                     </p>
                   </div>
                 </div>
@@ -764,44 +728,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
               </div>
             )}
 
-            {/* Connect Existing: Envelope Selection */}
-            {formData.paymentMethod === "connect_existing" && (
-              <div className="space-y-4 pl-7 border-l-2 border-purple-200">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Existing Envelope
-                  </label>
-                  <select
-                    value={formData.envelopeId}
-                    onChange={(e) =>
-                      setFormData({ ...formData, envelopeId: e.target.value })
-                    }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    disabled={envelopesLoading}
-                  >
-                    <option value="">
-                      {envelopesLoading
-                        ? "Loading envelopes..."
-                        : "Select existing envelope..."}
-                    </option>
-                    {!envelopesLoading &&
-                      envelopes
-                        .filter((env) => !env.archived)
-                        .map((envelope) => (
-                          <option key={envelope.id} value={envelope.id}>
-                            📁 {envelope.name} ($
-                            {envelope.currentBalance?.toFixed(2) || "0.00"})
-                          </option>
-                        ))}
-                  </select>
-                  <p className="mt-1 text-xs text-gray-500">
-                    Choose which existing envelope will fund the debt payments
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Connect Existing Bill: Bill Selection */}
+            {/* Connect Existing Bill: Bill Selection - AUTO-USES BILL'S ENVELOPE */}
             {formData.paymentMethod === "connect_existing_bill" && (
               <div className="space-y-4 pl-7 border-l-2 border-blue-200">
                 <div>
@@ -838,7 +765,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                   </select>
                   <p className="mt-1 text-xs text-gray-500">
                     Choose which existing bill to link to this debt. The bill's
-                    due date and amount will sync automatically.
+                    due date, amount, and envelope will sync automatically.
                   </p>
                 </div>
               </div>

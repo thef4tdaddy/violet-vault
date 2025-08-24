@@ -139,10 +139,6 @@ export const useDebtManagement = () => {
         });
 
         logger.info("Created new envelope and bill for debt");
-      } else if (paymentMethod === "connect_existing" && envelopeId) {
-        // Connect to existing envelope only
-        await updateDebtData(createdDebt.id, { envelopeId });
-        logger.info("Connected debt to existing envelope");
       } else if (paymentMethod === "connect_existing_bill" && existingBillId) {
         // Connect to existing bill (will use bill's envelope)
         await updateBill(existingBillId, { debtId: createdDebt.id });
