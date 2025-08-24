@@ -9,8 +9,8 @@ export const DEBT_DEBUG_CONFIG = {
   ENABLE_DEBT_MANAGEMENT_HOOK: true,    // useDebtManagement hook
   ENABLE_DEBT_DASHBOARD: true,          // Main DebtDashboard component (RE-ENABLED)
   
-  // Debt dashboard sections - TESTING BASIC DASHBOARD ONLY
-  ENABLE_DEBT_SUMMARY_CARDS: false,    // DebtSummaryCards component (DISABLED)
+  // Debt dashboard sections - TESTING SUMMARY CARDS
+  ENABLE_DEBT_SUMMARY_CARDS: true,     // DebtSummaryCards component (TESTING)
   ENABLE_DEBT_LIST: false,             // DebtList component (DISABLED)
   ENABLE_DEBT_FILTERS: true,           // DebtFilters component (TESTING)
   ENABLE_DEBT_MODALS: false,           // Add/Edit/Detail modals (DISABLED)
