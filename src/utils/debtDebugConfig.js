@@ -13,7 +13,7 @@ export const DEBT_DEBUG_CONFIG = {
   ENABLE_DEBT_SUMMARY_CARDS: true,     // DebtSummaryCards component (TESTING)
   ENABLE_DEBT_LIST: true,              // DebtList component (TESTING)
   ENABLE_DEBT_FILTERS: true,           // DebtFilters component (TESTING)
-  ENABLE_DEBT_MODALS: true,            // Add/Edit/Detail modals (TESTING)
+  ENABLE_DEBT_MODALS: false,           // Add/Edit/Detail modals (TDZ ERROR FOUND HERE!)
   
   // Debt calculations
   ENABLE_DEBT_STATS_CALC: true,        // debtStats calculations
@@ -26,9 +26,9 @@ export const DEBT_DEBUG_CONFIG = {
   ENABLE_DEBT_SORTING: true,           // debt filtering/sorting
   ENABLE_UPCOMING_PAYMENTS: true,      // upcoming payments feature
   
-  // Individual components
-  ENABLE_DEBT_DETAIL_MODAL: true,      // DebtDetailModal (TESTING)
-  ENABLE_ADD_DEBT_MODAL: true,         // AddDebtModal (TESTING)  
+  // Individual components  
+  ENABLE_DEBT_DETAIL_MODAL: false,     // DebtDetailModal (TDZ ERROR HERE!)
+  ENABLE_ADD_DEBT_MODAL: false,        // AddDebtModal (TDZ ERROR HERE!)  
   ENABLE_DEBT_STRATEGIES: false,       // DebtStrategies (already disabled)
 };
 
