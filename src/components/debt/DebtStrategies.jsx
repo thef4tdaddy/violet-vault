@@ -9,10 +9,7 @@ import {
   ArrowRight,
   CheckCircle,
 } from "lucide-react";
-import {
-  compareDebtStrategies,
-  calculateExtraPaymentImpact,
-} from "../../utils/debtStrategies";
+import { compareDebtStrategies, calculateExtraPaymentImpact } from "../../utils/debtStrategies";
 
 /**
  * Debt Payment Strategies Component

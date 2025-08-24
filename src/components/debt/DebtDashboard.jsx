@@ -16,7 +16,7 @@ import DebtList from "./ui/DebtList";
 import AddDebtModal from "./modals/AddDebtModal";
 import DebtDetailModal from "./modals/DebtDetailModal";
 import DebtFilters from "./ui/DebtFilters";
-import DebtStrategies from "./DebtStrategies";
+// import DebtStrategies from "./DebtStrategies"; // Temporarily disabled for debugging
 
 /**
  * Main debt tracking dashboard component
@@ -269,7 +269,11 @@ const DebtDashboard = () => {
       )}
 
       {/* Strategies Tab */}
-      {activeTab === "strategies" && <DebtStrategies debts={debts} />}
+      {activeTab === "strategies" && (
+        <div className="glassmorphism rounded-2xl p-6 text-center">
+          <p className="text-gray-600">Debt strategies temporarily disabled for debugging</p>
+        </div>
+      )}
 
       {/* Modals */}
       <AddDebtModal
