@@ -318,6 +318,118 @@ const useBudgetData = () => {
     },
   });
 
+  // Delete transaction mutation (was missing!)
+  const deleteTransactionMutation = useMutation({
+    mutationKey: ["transactions", "delete"],
+    mutationFn: async (transactionId) => {
+      logger.info("Starting transaction deletion", { transactionId });
+
+      // Get the transaction to check if it has an associated paycheck
+      const transaction = await budgetDb.transactions.get(transactionId);
+      if (!transaction) {
+        throw new Error("Transaction not found");
+      }
+
+      // If this transaction is linked to a paycheck, delete the paycheck too
+      if (transaction.paycheckId) {
+        logger.info(
+          "Transaction is linked to paycheck, deleting paycheck too",
+          {
+            transactionId,
+            paycheckId: transaction.paycheckId,
+          },
+        );
+
+        // Use the existing deletePaycheck logic
+        // Manually delete the paycheck and reverse its effects
+        try {
+          const paycheckRecord = await budgetDb.paycheckHistory.get(
+            transaction.paycheckId,
+          );
+          if (paycheckRecord) {
+            // Reverse the balance changes
+            const currentMetadata = await getBudgetMetadata();
+            const currentActualBalance = currentMetadata?.actualBalance || 0;
+            const currentUnassignedCash = currentMetadata?.unassignedCash || 0;
+
+            // Calculate new balances by reversing the paycheck
+            const newActualBalance =
+              currentActualBalance - paycheckRecord.amount;
+            const unassignedCashChange =
+              paycheckRecord.unassignedCashAfter -
+              paycheckRecord.unassignedCashBefore;
+            const newUnassignedCash =
+              currentUnassignedCash - unassignedCashChange;
+
+            // Update budget metadata
+            await setBudgetMetadata({
+              actualBalance: newActualBalance,
+              unassignedCash: newUnassignedCash,
+            });
+
+            // Reverse envelope allocations if any
+            if (paycheckRecord.envelopeAllocations?.length > 0) {
+              for (const allocation of paycheckRecord.envelopeAllocations) {
+                const envelope = await budgetDb.envelopes.get(
+                  allocation.envelopeId,
+                );
+                if (envelope) {
+                  const newBalance =
+                    envelope.currentBalance - allocation.amount;
+                  await budgetDb.envelopes.update(allocation.envelopeId, {
+                    currentBalance: Math.max(0, newBalance),
+                  });
+                }
+              }
+            }
+
+            // Delete the paycheck record
+            await budgetDb.paycheckHistory.delete(transaction.paycheckId);
+
+            logger.info("Associated paycheck deleted and effects reversed", {
+              paycheckId: transaction.paycheckId,
+              actualBalanceChange: newActualBalance - currentActualBalance,
+              unassignedCashChange: newUnassignedCash - currentUnassignedCash,
+            });
+
+            // Also delete the transaction and return
+            await budgetDb.transactions.delete(transactionId);
+            return {
+              success: true,
+              transactionId,
+              deletedPaycheck: transaction.paycheckId,
+            };
+          }
+        } catch (error) {
+          logger.error("Failed to delete associated paycheck", error);
+          // Continue with just deleting the transaction
+        }
+      }
+
+      // Delete the transaction
+      await budgetDb.transactions.delete(transactionId);
+
+      logger.info("Transaction deleted successfully", { transactionId });
+      return { success: true, transactionId };
+    },
+    onSuccess: () => {
+      // Comprehensive cache invalidation for all dashboard components
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
+      queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
+      queryClient.invalidateQueries({ queryKey: queryKeys.paycheckHistory() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.unassignedCash() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.actualBalance() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
+
+      // Force immediate refetch for summary cards
+      queryClient.refetchQueries({ queryKey: queryKeys.dashboardSummary() });
+      queryClient.refetchQueries({ queryKey: queryKeys.unassignedCash() });
+      queryClient.refetchQueries({ queryKey: queryKeys.actualBalance() });
+    },
+  });
+
   const processPaycheckMutation = useMutation({
     mutationKey: ["paychecks", "process"],
     mutationFn: async (paycheckData) => {
@@ -692,6 +804,7 @@ const useBudgetData = () => {
     updateEnvelope: updateEnvelopeMutation.mutate,
     deleteEnvelope: deleteEnvelopeMutation.mutate,
     addTransaction: addTransactionMutation.mutate,
+    deleteTransaction: deleteTransactionMutation.mutate,
     processPaycheck: processPaycheckMutation.mutate,
     deletePaycheck: deletePaycheckMutation.mutate,
     reconcileTransaction: reconcileTransactionMutation.mutate,
@@ -701,6 +814,7 @@ const useBudgetData = () => {
     isUpdatingEnvelope: updateEnvelopeMutation.isPending,
     isDeletingEnvelope: deleteEnvelopeMutation.isPending,
     isAddingTransaction: addTransactionMutation.isPending,
+    isDeletingTransaction: deleteTransactionMutation.isPending,
     isProcessingPaycheck: processPaycheckMutation.isPending,
     isDeletingPaycheck: deletePaycheckMutation.isPending,
 
