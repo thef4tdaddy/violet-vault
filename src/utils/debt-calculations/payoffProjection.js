@@ -25,7 +25,7 @@ export function calculatePayoffProjection(debt) {
 
   const monthlyRate = interestRate / 100 / 12;
   const monthlyInterest = currentBalance * monthlyRate;
-  
+
   // Check if payment covers interest (prevents infinite payoff scenarios)
   if (minimumPayment <= monthlyInterest) {
     return {
@@ -40,7 +40,7 @@ export function calculatePayoffProjection(debt) {
   try {
     const ratio = (currentBalance * monthlyRate) / minimumPayment;
     const logValue = 1 - ratio;
-    
+
     if (logValue <= 0) {
       return {
         monthsToPayoff: null,
@@ -48,10 +48,8 @@ export function calculatePayoffProjection(debt) {
         payoffDate: null,
       };
     }
-    
-    calculatedMonths = Math.ceil(
-      -Math.log(logValue) / Math.log(1 + monthlyRate)
-    );
+
+    calculatedMonths = Math.ceil(-Math.log(logValue) / Math.log(1 + monthlyRate));
   } catch (err) {
     return {
       monthsToPayoff: null,
@@ -71,7 +69,7 @@ export function calculatePayoffProjection(debt) {
 
   const totalPayments = minimumPayment * calculatedMonths;
   const calculatedInterest = totalPayments - currentBalance;
-  
+
   if (!isFinite(calculatedInterest) || calculatedInterest < 0) {
     return {
       monthsToPayoff: calculatedMonths,

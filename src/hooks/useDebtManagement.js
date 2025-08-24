@@ -70,7 +70,7 @@ export const useDebtManagement = () => {
 
       // Find related transactions
       const relatedTransactions = transactions.filter(
-        (transaction) => transaction.debtId === debt.id,
+        (transaction) => transaction.debtId === debt.id
       );
 
       // Enrich the debt with calculated properties
@@ -171,8 +171,7 @@ export const useDebtManagement = () => {
         currentBalance: newBalance,
         lastPaymentDate: paymentDate,
         lastPaymentAmount: amount,
-        status:
-          newBalance === 0 ? DEBT_STATUS.PAID_OFF : debt.status,
+        status: newBalance === 0 ? DEBT_STATUS.PAID_OFF : debt.status,
       };
 
       // Add payment to history
@@ -289,7 +288,7 @@ export const useDebtManagement = () => {
     debtsByStatus,
     debtsByType,
 
-    // Actions  
+    // Actions
     createDebt,
     updateDebt: updateDebtData,
     deleteDebt,

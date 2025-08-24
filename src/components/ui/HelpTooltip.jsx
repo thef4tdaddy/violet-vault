@@ -35,13 +35,9 @@ const HelpTooltip = ({ content, title, position = "top" }) => {
       </button>
 
       {isVisible && (
-        <div
-          className={`absolute z-50 ${positionClasses[position]} pointer-events-none`}
-        >
+        <div className={`absolute z-50 ${positionClasses[position]} pointer-events-none`}>
           <div className="bg-gray-800 text-white text-sm rounded-lg px-3 py-2 max-w-xs shadow-lg">
-            {title && (
-              <div className="font-medium mb-1 text-gray-100">{title}</div>
-            )}
+            {title && <div className="font-medium mb-1 text-gray-100">{title}</div>}
             <div className="text-gray-200 leading-relaxed">{content}</div>
           </div>
           <div className={`absolute w-0 h-0 ${arrowClasses[position]}`}></div>
