@@ -497,6 +497,109 @@ const useBudgetData = () => {
     },
   });
 
+  // Delete paycheck mutation (was missing!)
+  const deletePaycheckMutation = useMutation({
+    mutationKey: ["paychecks", "delete"],
+    mutationFn: async (paycheckId) => {
+      logger.info("Starting paycheck deletion", { paycheckId });
+
+      // Get the paycheck record to reverse its effects
+      const paycheckRecord = await budgetDb.paycheckHistory.get(paycheckId);
+      if (!paycheckRecord) {
+        throw new Error("Paycheck record not found");
+      }
+
+      logger.info("Found paycheck record to delete", {
+        id: paycheckRecord.id,
+        amount: paycheckRecord.amount,
+        mode: paycheckRecord.mode,
+        allocations: paycheckRecord.envelopeAllocations?.length || 0,
+      });
+
+      // Reverse the balance changes
+      const currentMetadata = await getBudgetMetadata();
+      const currentActualBalance = currentMetadata?.actualBalance || 0;
+      const currentUnassignedCash = currentMetadata?.unassignedCash || 0;
+
+      // Calculate new balances by reversing the paycheck
+      const newActualBalance = currentActualBalance - paycheckRecord.amount;
+      const unassignedCashChange =
+        paycheckRecord.unassignedCashAfter -
+        paycheckRecord.unassignedCashBefore;
+      const newUnassignedCash = currentUnassignedCash - unassignedCashChange;
+
+      // Update budget metadata
+      await setBudgetMetadata({
+        actualBalance: newActualBalance,
+        unassignedCash: newUnassignedCash,
+      });
+
+      // Reverse envelope allocations if any
+      if (paycheckRecord.envelopeAllocations?.length > 0) {
+        for (const allocation of paycheckRecord.envelopeAllocations) {
+          const envelope = await budgetDb.envelopes.get(allocation.envelopeId);
+          if (envelope) {
+            const newBalance = envelope.currentBalance - allocation.amount;
+            await budgetDb.envelopes.update(allocation.envelopeId, {
+              currentBalance: Math.max(0, newBalance), // Prevent negative balances
+            });
+
+            logger.debug("Reversed envelope allocation", {
+              envelopeId: allocation.envelopeId,
+              amountReversed: allocation.amount,
+              oldBalance: envelope.currentBalance,
+              newBalance: Math.max(0, newBalance),
+            });
+          }
+        }
+      }
+
+      // Delete the paycheck transaction if it exists
+      const paycheckTransactions = await budgetDb.transactions
+        .where("paycheckId")
+        .equals(paycheckId)
+        .toArray();
+
+      for (const transaction of paycheckTransactions) {
+        await budgetDb.transactions.delete(transaction.id);
+        logger.debug("Deleted paycheck transaction", {
+          transactionId: transaction.id,
+        });
+      }
+
+      // Delete the paycheck record
+      await budgetDb.paycheckHistory.delete(paycheckId);
+
+      logger.info("Paycheck deleted successfully", {
+        paycheckId,
+        actualBalanceChange: newActualBalance - currentActualBalance,
+        unassignedCashChange: newUnassignedCash - currentUnassignedCash,
+        envelopeAllocationsReversed:
+          paycheckRecord.envelopeAllocations?.length || 0,
+        transactionsDeleted: paycheckTransactions.length,
+      });
+
+      return { success: true, paycheckId };
+    },
+    onSuccess: () => {
+      // Invalidate all related queries
+      queryClient.invalidateQueries({ queryKey: queryKeys.paycheckHistory() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
+      queryClient.invalidateQueries({ queryKey: queryKeys.unassignedCash() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.actualBalance() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary() });
+
+      // Force immediate refetch
+      queryClient.refetchQueries({ queryKey: queryKeys.paycheckHistory() });
+      queryClient.refetchQueries({ queryKey: queryKeys.envelopes });
+      queryClient.refetchQueries({ queryKey: queryKeys.unassignedCash() });
+      queryClient.refetchQueries({ queryKey: queryKeys.actualBalance() });
+    },
+  });
+
   // Utility functions
   const prefetchData = {
     envelopes: (filters) => prefetchHelpers.prefetchEnvelopes(filters),
@@ -590,6 +693,7 @@ const useBudgetData = () => {
     deleteEnvelope: deleteEnvelopeMutation.mutate,
     addTransaction: addTransactionMutation.mutate,
     processPaycheck: processPaycheckMutation.mutate,
+    deletePaycheck: deletePaycheckMutation.mutate,
     reconcileTransaction: reconcileTransactionMutation.mutate,
 
     // Mutation states
@@ -598,6 +702,7 @@ const useBudgetData = () => {
     isDeletingEnvelope: deleteEnvelopeMutation.isPending,
     isAddingTransaction: addTransactionMutation.isPending,
     isProcessingPaycheck: processPaycheckMutation.isPending,
+    isDeletingPaycheck: deletePaycheckMutation.isPending,
 
     // Sync utilities
     syncStatus,
