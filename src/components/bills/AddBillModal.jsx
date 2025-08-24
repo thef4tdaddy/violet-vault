@@ -64,6 +64,7 @@ const AddBillModal = ({
 }) => {
   const [formData, setFormData] = useState(getInitialFormData(editingBill));
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteEnvelopeToo, setDeleteEnvelopeToo] = useState(false);
 
   // Get auth context for edit locking
   const { budgetId, currentUser } = useAuth();
@@ -356,14 +357,16 @@ const AddBillModal = ({
       releaseLock();
     }
     setShowDeleteConfirm(false);
+    setDeleteEnvelopeToo(false);
     setFormData(getInitialFormData(null)); // Reset form data
     onClose();
   };
 
   const handleDelete = () => {
     if (editingBill && onDeleteBill) {
-      onDeleteBill(editingBill.id);
+      onDeleteBill(editingBill.id, deleteEnvelopeToo ? editingBill.envelopeId : null);
       setShowDeleteConfirm(false);
+      setDeleteEnvelopeToo(false);
       onClose();
     }
   };
@@ -829,10 +832,59 @@ const AddBillModal = ({
               </div>
             </div>
 
-            <p className="text-gray-700 mb-6">
-              Are you sure you want to delete "{editingBill?.name || editingBill?.provider}"? This
-              will permanently remove the bill from your tracker.
-            </p>
+            <div className="mb-6">
+              <p className="text-gray-700 mb-4">
+                Are you sure you want to delete "{editingBill?.name || editingBill?.provider}"?
+              </p>
+              
+              {editingBill?.envelopeId && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                  <h4 className="font-medium text-yellow-800 mb-3">Connected Envelope Found</h4>
+                  <p className="text-sm text-yellow-700 mb-3">
+                    This bill is connected to envelope: <strong>
+                      {availableEnvelopes.find(e => e.id === editingBill.envelopeId)?.name || 'Unknown Envelope'}
+                    </strong>
+                  </p>
+                  
+                  <div className="space-y-2">
+                    <label className="flex items-center text-sm">
+                      <input
+                        type="radio"
+                        name="envelopeAction"
+                        checked={!deleteEnvelopeToo}
+                        onChange={() => setDeleteEnvelopeToo(false)}
+                        className="mr-2"
+                      />
+                      <span className="text-yellow-800">Keep envelope (recommended)</span>
+                    </label>
+                    
+                    <label className="flex items-center text-sm">
+                      <input
+                        type="radio"
+                        name="envelopeAction"
+                        checked={deleteEnvelopeToo}
+                        onChange={() => setDeleteEnvelopeToo(true)}
+                        className="mr-2"
+                      />
+                      <span className="text-red-700">
+                        Also delete "{availableEnvelopes.find(e => e.id === editingBill.envelopeId)?.name || 'connected envelope'}"
+                      </span>
+                    </label>
+                  </div>
+                  
+                  <p className="text-xs text-yellow-600 mt-2">
+                    {deleteEnvelopeToo 
+                      ? "⚠️ This will permanently delete both the bill and envelope. Any money in the envelope will be transferred to unassigned cash."
+                      : "✅ The envelope will remain available for other bills or manual use."
+                    }
+                  </p>
+                </div>
+              )}
+              
+              <p className="text-sm text-gray-600">
+                This action cannot be undone.
+              </p>
+            </div>
 
             <div className="flex gap-3">
               <button

@@ -1179,16 +1179,20 @@ const BillManager = ({
             }
             setEditingBill(null);
           }}
-          onDeleteBill={(billId) => {
+          onDeleteBill={(billId, envelopeId) => {
             // Use TanStack mutation with Zustand fallback
             try {
-              deleteBill(billId);
+              deleteBill({ billId, envelopeId });
             } catch (error) {
               logger.warn(
                 "TanStack deleteBill failed, using Zustand fallback",
                 error,
               );
               budget.deleteBill(billId);
+              // If envelope should also be deleted, handle it in Zustand too
+              if (envelopeId) {
+                budget.deleteEnvelope(envelopeId);
+              }
             }
             setEditingBill(null);
           }}
