@@ -1,18 +1,11 @@
 import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useBudgetStore } from "../stores/uiStore";
-import {
-  queryKeys,
-  optimisticHelpers,
-  prefetchHelpers,
-} from "../utils/queryClient";
+import { queryKeys, optimisticHelpers, prefetchHelpers } from "../utils/queryClient";
 import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "../db/budgetDb";
 // import { useTransactions } from "./useTransactions";
 import logger from "../utils/logger.js";
-import {
-  calculatePaycheckBalances,
-  validateBalances,
-} from "../utils/balanceCalculator";
+import { calculatePaycheckBalances, validateBalances } from "../utils/balanceCalculator";
 
 /**
  * Unified budget data hook combining TanStack Query, Zustand, and Dexie
@@ -56,10 +49,7 @@ const useBudgetData = () => {
         const { start, end } = filters.dateRange;
         result = await budgetDb.getTransactionsByDateRange(start, end);
       } else {
-        result = await budgetDb.transactions
-          .orderBy("date")
-          .reverse()
-          .toArray();
+        result = await budgetDb.transactions.orderBy("date").reverse().toArray();
       }
 
       // Apply additional filters
@@ -85,10 +75,7 @@ const useBudgetData = () => {
     paycheckHistory: async () => {
       // Use Dexie directly instead of Zustand to avoid stale data
       try {
-        const cachedPaychecks = await budgetDb.paycheckHistory
-          .orderBy("date")
-          .reverse()
-          .toArray();
+        const cachedPaychecks = await budgetDb.paycheckHistory.orderBy("date").reverse().toArray();
         return cachedPaychecks || [];
       } catch (error) {
         logger.warn("Failed to fetch paycheck history from Dexie", error);
@@ -111,16 +98,10 @@ const useBudgetData = () => {
         .toArray();
 
       // Safe calculation with NaN prevention
-      const safeEnvelopes = Array.isArray(cachedEnvelopes)
-        ? cachedEnvelopes
-        : [];
-      const safeSavingsGoals = Array.isArray(cachedSavingsGoals)
-        ? cachedSavingsGoals
-        : [];
+      const safeEnvelopes = Array.isArray(cachedEnvelopes) ? cachedEnvelopes : [];
+      const safeSavingsGoals = Array.isArray(cachedSavingsGoals) ? cachedSavingsGoals : [];
       const safeBills = Array.isArray(cachedBills) ? cachedBills : [];
-      const safeTransactions = Array.isArray(cachedTransactions)
-        ? cachedTransactions
-        : [];
+      const safeTransactions = Array.isArray(cachedTransactions) ? cachedTransactions : [];
 
       const totalEnvelopeBalance = safeEnvelopes.reduce((sum, env) => {
         const balance = parseFloat(env?.currentBalance) || 0;
@@ -133,18 +114,12 @@ const useBudgetData = () => {
       }, 0);
 
       // Ensure all values are numbers, not NaN
-      const unassignedCashValue =
-        parseFloat(budgetMetadata?.unassignedCash ?? unassignedCash) || 0;
-      const actualBalanceValue =
-        parseFloat(budgetMetadata?.actualBalance ?? actualBalance) || 0;
+      const unassignedCashValue = parseFloat(budgetMetadata?.unassignedCash ?? unassignedCash) || 0;
+      const actualBalanceValue = parseFloat(budgetMetadata?.actualBalance ?? actualBalance) || 0;
 
       const summary = {
-        totalEnvelopeBalance: isNaN(totalEnvelopeBalance)
-          ? 0
-          : totalEnvelopeBalance,
-        totalSavingsBalance: isNaN(totalSavingsBalance)
-          ? 0
-          : totalSavingsBalance,
+        totalEnvelopeBalance: isNaN(totalEnvelopeBalance) ? 0 : totalEnvelopeBalance,
+        totalSavingsBalance: isNaN(totalSavingsBalance) ? 0 : totalSavingsBalance,
         unassignedCash: isNaN(unassignedCashValue) ? 0 : unassignedCashValue,
         actualBalance: isNaN(actualBalanceValue) ? 0 : actualBalanceValue,
         recentTransactions: safeTransactions.slice(0, 10),
@@ -158,9 +133,7 @@ const useBudgetData = () => {
 
       // Calculate difference for balance reconciliation with NaN protection
       summary.virtualBalance =
-        summary.totalEnvelopeBalance +
-        summary.totalSavingsBalance +
-        summary.unassignedCash;
+        summary.totalEnvelopeBalance + summary.totalSavingsBalance + summary.unassignedCash;
 
       // Final NaN check
       if (isNaN(summary.virtualBalance)) {
@@ -340,20 +313,15 @@ const useBudgetData = () => {
 
       // If this transaction is linked to a paycheck, delete the paycheck too
       if (transaction.paycheckId) {
-        logger.info(
-          "Transaction is linked to paycheck, deleting paycheck too",
-          {
-            transactionId,
-            paycheckId: transaction.paycheckId,
-          },
-        );
+        logger.info("Transaction is linked to paycheck, deleting paycheck too", {
+          transactionId,
+          paycheckId: transaction.paycheckId,
+        });
 
         // Use the existing deletePaycheck logic
         // Manually delete the paycheck and reverse its effects
         try {
-          const paycheckRecord = await budgetDb.paycheckHistory.get(
-            transaction.paycheckId,
-          );
+          const paycheckRecord = await budgetDb.paycheckHistory.get(transaction.paycheckId);
           if (paycheckRecord) {
             // Reverse the balance changes
             const currentMetadata = await getBudgetMetadata();
@@ -361,13 +329,10 @@ const useBudgetData = () => {
             const currentUnassignedCash = currentMetadata?.unassignedCash || 0;
 
             // Calculate new balances by reversing the paycheck
-            const newActualBalance =
-              currentActualBalance - paycheckRecord.amount;
+            const newActualBalance = currentActualBalance - paycheckRecord.amount;
             const unassignedCashChange =
-              paycheckRecord.unassignedCashAfter -
-              paycheckRecord.unassignedCashBefore;
-            const newUnassignedCash =
-              currentUnassignedCash - unassignedCashChange;
+              paycheckRecord.unassignedCashAfter - paycheckRecord.unassignedCashBefore;
+            const newUnassignedCash = currentUnassignedCash - unassignedCashChange;
 
             // Update budget metadata
             await setBudgetMetadata({
@@ -378,12 +343,9 @@ const useBudgetData = () => {
             // Reverse envelope allocations if any
             if (paycheckRecord.envelopeAllocations?.length > 0) {
               for (const allocation of paycheckRecord.envelopeAllocations) {
-                const envelope = await budgetDb.envelopes.get(
-                  allocation.envelopeId,
-                );
+                const envelope = await budgetDb.envelopes.get(allocation.envelopeId);
                 if (envelope) {
-                  const newBalance =
-                    envelope.currentBalance - allocation.amount;
+                  const newBalance = envelope.currentBalance - allocation.amount;
                   await budgetDb.envelopes.update(allocation.envelopeId, {
                     currentBalance: Math.max(0, newBalance),
                   });
@@ -477,11 +439,7 @@ const useBudgetData = () => {
         })) || [];
 
       // Use centralized balance calculator to ensure consistency
-      const newBalances = calculatePaycheckBalances(
-        currentBalances,
-        paycheckData,
-        allocations,
-      );
+      const newBalances = calculatePaycheckBalances(currentBalances, paycheckData, allocations);
 
       // Validate the calculation
       const validation = validateBalances(newBalances);
@@ -586,8 +544,7 @@ const useBudgetData = () => {
         amount: paycheckData.amount,
         mode: paycheckData.mode,
         actualBalanceChange: newBalances.actualBalance - currentActualBalance,
-        unassignedCashChange:
-          newBalances.unassignedCash - currentUnassignedCash,
+        unassignedCashChange: newBalances.unassignedCash - currentUnassignedCash,
         envelopeAllocations: allocations.length,
       });
 
@@ -644,8 +601,7 @@ const useBudgetData = () => {
       // Calculate new balances by reversing the paycheck
       const newActualBalance = currentActualBalance - paycheckRecord.amount;
       const unassignedCashChange =
-        paycheckRecord.unassignedCashAfter -
-        paycheckRecord.unassignedCashBefore;
+        paycheckRecord.unassignedCashAfter - paycheckRecord.unassignedCashBefore;
       const newUnassignedCash = currentUnassignedCash - unassignedCashChange;
 
       // Update budget metadata
@@ -694,8 +650,7 @@ const useBudgetData = () => {
         paycheckId,
         actualBalanceChange: newActualBalance - currentActualBalance,
         unassignedCashChange: newUnassignedCash - currentUnassignedCash,
-        envelopeAllocationsReversed:
-          paycheckRecord.envelopeAllocations?.length || 0,
+        envelopeAllocationsReversed: paycheckRecord.envelopeAllocations?.length || 0,
         transactionsDeleted: paycheckTransactions.length,
       });
 
@@ -724,8 +679,7 @@ const useBudgetData = () => {
   const prefetchData = {
     envelopes: (filters) => prefetchHelpers.prefetchEnvelopes(filters),
     dashboard: () => prefetchHelpers.prefetchDashboard(),
-    transactions: (dateRange) =>
-      prefetchHelpers.prefetchTransactions(dateRange),
+    transactions: (dateRange) => prefetchHelpers.prefetchTransactions(dateRange),
   };
 
   const syncStatus = {

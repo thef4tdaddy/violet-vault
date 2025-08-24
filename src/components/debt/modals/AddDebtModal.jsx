@@ -1,22 +1,9 @@
 import React, { useState, useEffect } from "react";
-import {
-  X,
-  CreditCard,
-  Wallet,
-  Receipt,
-  Lock,
-  Unlock,
-  User,
-  Clock,
-} from "lucide-react";
+import { X, CreditCard, Wallet, Receipt, Lock, Unlock, User, Clock } from "lucide-react";
 import useEditLock from "../../../hooks/useEditLock";
 import { initializeEditLocks } from "../../../services/editLockService";
 import { useAuth } from "../../../stores/authStore";
-import {
-  DEBT_TYPES,
-  DEBT_TYPE_CONFIG,
-  PAYMENT_FREQUENCIES,
-} from "../../../constants/debts";
+import { DEBT_TYPES, DEBT_TYPE_CONFIG, PAYMENT_FREQUENCIES } from "../../../constants/debts";
 import { useEnvelopes } from "../../../hooks/useEnvelopes";
 import useBills from "../../../hooks/useBills";
 import logger from "../../../utils/logger";
@@ -79,11 +66,9 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Find connected bill and envelope for this debt - MOVED BEFORE useEffect 
+  // Find connected bill and envelope for this debt - MOVED BEFORE useEffect
   const connectedBill =
-    isEditMode && debt?.id
-      ? bills.find((bill) => bill.debtId === debt.id)
-      : null;
+    isEditMode && debt?.id ? bills.find((bill) => bill.debtId === debt.id) : null;
   const connectedEnvelope = connectedBill
     ? envelopes.find((env) => env.id === connectedBill.envelopeId)
     : debt?.envelopeId
@@ -162,8 +147,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
 
     if (
       formData.interestRate &&
-      (parseFloat(formData.interestRate) < 0 ||
-        parseFloat(formData.interestRate) > 100)
+      (parseFloat(formData.interestRate) < 0 || parseFloat(formData.interestRate) > 100)
     ) {
       newErrors.interestRate = "Interest rate must be between 0 and 100";
     }
@@ -214,10 +198,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
         resetForm(); // Only reset form when adding new debt
       }
     } catch (error) {
-      logger.error(
-        `Error ${isEditMode ? "updating" : "creating"} debt:`,
-        error,
-      );
+      logger.error(`Error ${isEditMode ? "updating" : "creating"} debt:`, error);
       setErrors({
         submit: `Failed to ${isEditMode ? "update" : "create"} debt. Please try again.`,
       });
@@ -323,9 +304,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
             <div className="flex items-center">
               <Lock className="h-5 w-5 text-red-400 mr-3" />
               <div>
-                <h3 className="text-sm font-medium text-red-800">
-                  Currently Being Edited
-                </h3>
+                <h3 className="text-sm font-medium text-red-800">Currently Being Edited</h3>
                 <p className="text-sm text-red-700 mt-1">
                   {lockedBy} is currently editing this debt.
                   {isExpired
@@ -353,51 +332,35 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Debt Name *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Debt Name *</label>
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   placeholder="e.g., Car Loan, Credit Card"
                 />
-                {errors.name && (
-                  <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-                )}
+                {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Creditor *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Creditor *</label>
                 <input
                   type="text"
                   value={formData.creditor}
-                  onChange={(e) =>
-                    setFormData({ ...formData, creditor: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, creditor: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   placeholder="e.g., Chase Bank, Capital One"
                 />
-                {errors.creditor && (
-                  <p className="mt-1 text-sm text-red-600">{errors.creditor}</p>
-                )}
+                {errors.creditor && <p className="mt-1 text-sm text-red-600">{errors.creditor}</p>}
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Debt Type
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Debt Type</label>
               <select
                 value={formData.type}
-                onChange={(e) =>
-                  setFormData({ ...formData, type: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
               >
                 {Object.values(DEBT_TYPES).map((type) => {
@@ -426,16 +389,12 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                   step="0.01"
                   min="0"
                   value={formData.currentBalance}
-                  onChange={(e) =>
-                    setFormData({ ...formData, currentBalance: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, currentBalance: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   placeholder="0.00"
                 />
                 {errors.currentBalance && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.currentBalance}
-                  </p>
+                  <p className="mt-1 text-sm text-red-600">{errors.currentBalance}</p>
                 )}
               </div>
 
@@ -458,9 +417,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                   placeholder="Leave blank to auto-fill"
                 />
                 {errors.originalBalance && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.originalBalance}
-                  </p>
+                  <p className="mt-1 text-sm text-red-600">{errors.originalBalance}</p>
                 )}
               </div>
             </div>
@@ -475,16 +432,12 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                   step="0.01"
                   min="0"
                   value={formData.minimumPayment}
-                  onChange={(e) =>
-                    setFormData({ ...formData, minimumPayment: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, minimumPayment: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   placeholder="0.00"
                 />
                 {errors.minimumPayment && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.minimumPayment}
-                  </p>
+                  <p className="mt-1 text-sm text-red-600">{errors.minimumPayment}</p>
                 )}
               </div>
             </div>
@@ -500,16 +453,12 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                   min="0"
                   max="100"
                   value={formData.interestRate}
-                  onChange={(e) =>
-                    setFormData({ ...formData, interestRate: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, interestRate: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   placeholder="0.00"
                 />
                 {errors.interestRate && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.interestRate}
-                  </p>
+                  <p className="mt-1 text-sm text-red-600">{errors.interestRate}</p>
                 )}
               </div>
 
@@ -543,9 +492,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
               <input
                 type="date"
                 value={formData.paymentDueDate}
-                onChange={(e) =>
-                  setFormData({ ...formData, paymentDueDate: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, paymentDueDate: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
               />
             </div>
@@ -566,18 +513,12 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                       <div className="flex items-center">
                         <Receipt className="h-4 w-4 mr-2 text-blue-600" />
                         <div>
-                          <div className="font-medium text-gray-900">
-                            Connected Bill
-                          </div>
+                          <div className="font-medium text-gray-900">Connected Bill</div>
                           <div className="text-sm text-gray-600">
-                            {connectedBill.name} • $
-                            {connectedBill.amount?.toFixed(2) || "0.00"}
+                            {connectedBill.name} • ${connectedBill.amount?.toFixed(2) || "0.00"}
                             {connectedBill.dueDate && (
                               <span className="ml-2">
-                                • Due:{" "}
-                                {new Date(
-                                  connectedBill.dueDate,
-                                ).toLocaleDateString()}
+                                • Due: {new Date(connectedBill.dueDate).toLocaleDateString()}
                               </span>
                             )}
                           </div>
@@ -594,14 +535,10 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                       <div className="flex items-center">
                         <Wallet className="h-4 w-4 mr-2 text-purple-600" />
                         <div>
-                          <div className="font-medium text-gray-900">
-                            Connected Envelope
-                          </div>
+                          <div className="font-medium text-gray-900">Connected Envelope</div>
                           <div className="text-sm text-gray-600">
                             {connectedEnvelope.name} • $
-                            {connectedEnvelope.currentBalance?.toFixed(2) ||
-                              "0.00"}{" "}
-                            available
+                            {connectedEnvelope.currentBalance?.toFixed(2) || "0.00"} available
                           </div>
                         </div>
                       </div>
@@ -614,9 +551,8 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
 
                 <div className="mt-3 p-2 bg-blue-100 rounded-lg">
                   <p className="text-xs text-blue-700">
-                    <strong>Note:</strong> These connections sync automatically.
-                    Changes to the bill's due date or amount will update this
-                    debt.
+                    <strong>Note:</strong> These connections sync automatically. Changes to the
+                    bill's due date or amount will update this debt.
                   </p>
                 </div>
               </div>
@@ -654,13 +590,10 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                   <div>
                     <div className="flex items-center mb-1">
                       <Receipt className="h-4 w-4 mr-2 text-blue-600" />
-                      <span className="font-medium text-sm">
-                        Create new envelope and bill
-                      </span>
+                      <span className="font-medium text-sm">Create new envelope and bill</span>
                     </div>
                     <p className="text-xs text-gray-600 leading-tight">
-                      Automatically create a new envelope and bill for this debt
-                      payment
+                      Automatically create a new envelope and bill for this debt payment
                     </p>
                   </div>
                 </div>
@@ -686,9 +619,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                   <div>
                     <div className="flex items-center mb-1">
                       <Receipt className="h-4 w-4 mr-2 text-blue-600" />
-                      <span className="font-medium text-sm">
-                        Connect to existing bill
-                      </span>
+                      <span className="font-medium text-sm">Connect to existing bill</span>
                     </div>
                     <p className="text-xs text-gray-600 leading-tight">
                       Link to an existing bill and automatically use its envelope for funding
@@ -715,11 +646,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                       })
                     }
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    placeholder={
-                      formData.name
-                        ? `${formData.name} Payment`
-                        : "Debt Payment"
-                    }
+                    placeholder={formData.name ? `${formData.name} Payment` : "Debt Payment"}
                   />
                   <p className="mt-1 text-xs text-gray-500">
                     A new envelope will be created to fund this debt's payments
@@ -747,9 +674,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                     disabled={billsLoading}
                   >
                     <option value="">
-                      {billsLoading
-                        ? "Loading bills..."
-                        : "Select existing bill..."}
+                      {billsLoading ? "Loading bills..." : "Select existing bill..."}
                     </option>
                     {!billsLoading &&
                       bills
@@ -764,8 +689,8 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                         ))}
                   </select>
                   <p className="mt-1 text-xs text-gray-500">
-                    Choose which existing bill to link to this debt. The bill's
-                    due date, amount, and envelope will sync automatically.
+                    Choose which existing bill to link to this debt. The bill's due date, amount,
+                    and envelope will sync automatically.
                   </p>
                 </div>
               </div>
@@ -774,14 +699,10 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
 
           {/* Notes */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Notes (Optional)
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
             <textarea
               value={formData.notes}
-              onChange={(e) =>
-                setFormData({ ...formData, notes: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               rows={3}
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
               placeholder="Additional notes about this debt..."
