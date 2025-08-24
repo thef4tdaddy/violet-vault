@@ -708,11 +708,10 @@ const BillManager = ({
         </div>
 
         <div className="flex items-center justify-between">
-          <h4 className="font-medium text-gray-900 flex items-center">
-            <Filter className="h-4 w-4 mr-2" /> Filters
-          </h4>
-
-          <div className="flex gap-3">
+          <div className="flex items-center gap-4">
+            <h4 className="font-medium text-gray-900 flex items-center">
+              <Filter className="h-4 w-4 mr-2" /> Filters
+            </h4>
             <select
               value={filterOptions.sortBy}
               onChange={(e) =>
@@ -729,26 +728,26 @@ const BillManager = ({
               <option value="provider">Provider Name</option>
               <option value="urgency">Urgency</option>
             </select>
-
-            {selectedBills.size > 0 && (
-              <>
-                <button
-                  onClick={() => setShowBulkUpdateModal(true)}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center text-sm"
-                >
-                  <Settings className="h-4 w-4 mr-2" /> Update{" "}
-                  {selectedBills.size} Selected
-                </button>
-                <button
-                  onClick={paySelectedBills}
-                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center text-sm"
-                >
-                  <CheckCircle className="h-4 w-4 mr-2" /> Pay{" "}
-                  {selectedBills.size} Selected
-                </button>
-              </>
-            )}
           </div>
+
+          {selectedBills.size > 0 && (
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowBulkUpdateModal(true)}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center text-sm"
+              >
+                <Settings className="h-4 w-4 mr-2" /> Update{" "}
+                {selectedBills.size} Selected
+              </button>
+              <button
+                onClick={paySelectedBills}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center text-sm"
+              >
+                <CheckCircle className="h-4 w-4 mr-2" /> Pay{" "}
+                {selectedBills.size} Selected
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
