@@ -83,44 +83,19 @@ export function enrichDebt(
   relatedEnvelope = null,
   relatedTransactions = [],
 ) {
-  try {
-    // const nextPaymentDate = calculateNextPaymentDate(debt, relatedBill); // DISABLED - testing if this causes TDZ
-    const nextPaymentDate = null;
-    // const payoffInfo = calculatePayoffProjection(debt); // DISABLED - error persists even with separated files
-    const payoffInfo = {
+  // COMPLETELY DISABLE ENRICHMENT TO TEST - just return basic debt
+  return {
+    ...debt,
+    relatedBill: null,
+    relatedEnvelope: null,
+    relatedTransactions: [],
+    nextPaymentDate: null,
+    payoffInfo: {
       monthsToPayoff: null,
       totalInterest: null,
       payoffDate: null,
-    };
-
-    return {
-      ...debt,
-      relatedBill,
-      relatedEnvelope,
-      relatedTransactions,
-      nextPaymentDate,
-      payoffInfo,
-    };
-  } catch (error) {
-    logger.error("Error enriching debt", error, {
-      debtId: debt.id,
-      debtName: debt.name,
-    });
-
-    // Return debt with null enrichment on error
-    return {
-      ...debt,
-      relatedBill,
-      relatedEnvelope,
-      relatedTransactions,
-      nextPaymentDate: null,
-      payoffInfo: {
-        monthsToPayoff: null,
-        totalInterest: null,
-        payoffDate: null,
-      },
-    };
-  }
+    },
+  };
 }
 
 /**
