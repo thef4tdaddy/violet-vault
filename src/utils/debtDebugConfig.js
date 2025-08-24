@@ -26,9 +26,9 @@ export const DEBT_DEBUG_CONFIG = {
   ENABLE_DEBT_SORTING: true,           // debt filtering/sorting
   ENABLE_UPCOMING_PAYMENTS: true,      // upcoming payments feature
   
-  // Individual components  
-  ENABLE_DEBT_DETAIL_MODAL: false,     // DebtDetailModal (TDZ ERROR HERE!)
-  ENABLE_ADD_DEBT_MODAL: false,        // AddDebtModal (TDZ ERROR HERE!)  
+  // Individual components - TESTING ONE BY ONE
+  ENABLE_DEBT_DETAIL_MODAL: false,     // DebtDetailModal (DISABLED)
+  ENABLE_ADD_DEBT_MODAL: true,         // AddDebtModal (TESTING)  
   ENABLE_DEBT_STRATEGIES: false,       // DebtStrategies (already disabled)
 };
 
