@@ -1,4 +1,4 @@
-import logger from "./logger";
+import logger from "../logger";
 
 /**
  * Calculate the next due date based on payment date and frequency
