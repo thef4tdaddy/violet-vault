@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { useDebtManagement } from "../../hooks/useDebtManagement";
+import { isDebtFeatureEnabled } from "../../utils/debtDebugConfig";
 import DebtSummaryCards from "./ui/DebtSummaryCards";
 import DebtList from "./ui/DebtList";
 import AddDebtModal from "./modals/AddDebtModal";
@@ -225,57 +226,75 @@ const DebtDashboard = () => {
       {activeTab === "overview" && (
         <>
           {/* Summary Cards */}
-          <DebtSummaryCards
-            stats={debtStats}
-            onDueSoonClick={() => setShowUpcomingPaymentsModal(true)}
-          />
+          {isDebtFeatureEnabled('ENABLE_DEBT_SUMMARY_CARDS') ? (
+            <DebtSummaryCards
+              stats={debtStats}
+              onDueSoonClick={() => setShowUpcomingPaymentsModal(true)}
+            />
+          ) : (
+            <div className="bg-white rounded-xl p-6 text-center border border-gray-200">
+              <p className="text-gray-500">Summary Cards disabled for debugging</p>
+            </div>
+          )}
 
           {/* Filters and Controls */}
-          <DebtFilters
-            filterOptions={filterOptions}
-            setFilterOptions={setFilterOptions}
-            debtTypes={DEBT_TYPES}
-            debtsByType={debtsByType}
-          />
+          {isDebtFeatureEnabled('ENABLE_DEBT_FILTERS') ? (
+            <DebtFilters
+              filterOptions={filterOptions}
+              setFilterOptions={setFilterOptions}
+              debtTypes={DEBT_TYPES}
+              debtsByType={debtsByType}
+            />
+          ) : (
+            <div className="bg-white rounded-xl p-4 text-center border border-gray-200">
+              <p className="text-gray-500">Debt Filters disabled for debugging</p>
+            </div>
+          )}
 
           {/* Debt List */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 ring-1 ring-gray-800/10">
-            <div className="p-4 border-b">
-              <h3 className="font-semibold text-gray-900 flex items-center">
-                <TrendingDown className="h-4 w-4 mr-2 text-red-600" />
-                Your Debts ({filteredDebts.length})
-              </h3>
-            </div>
-
-            {filteredDebts.length === 0 ? (
-              <div className="text-center py-12">
-                <CreditCard className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  No Debts Found
+          {isDebtFeatureEnabled('ENABLE_DEBT_LIST') ? (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 ring-1 ring-gray-800/10">
+              <div className="p-4 border-b">
+                <h3 className="font-semibold text-gray-900 flex items-center">
+                  <TrendingDown className="h-4 w-4 mr-2 text-red-600" />
+                  Your Debts ({filteredDebts.length})
                 </h3>
-                <p className="text-gray-500 mb-4">
-                  {debts.length === 0
-                    ? "Start tracking your debts to get insights into your debt payoff journey."
-                    : "No debts match your current filters."}
-                </p>
-                {debts.length === 0 && (
-                  <button
-                    onClick={() => setShowAddModal(true)}
-                    className="btn btn-primary"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Your First Debt
-                  </button>
-                )}
               </div>
-            ) : (
-              <DebtList
-                debts={filteredDebts}
-                onDebtClick={handleDebtClick}
-                onRecordPayment={handleRecordPayment}
-              />
-            )}
-          </div>
+
+              {filteredDebts.length === 0 ? (
+                <div className="text-center py-12">
+                  <CreditCard className="h-12 w-12 mx-auto text-gray-300 mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    No Debts Found
+                  </h3>
+                  <p className="text-gray-500 mb-4">
+                    {debts.length === 0
+                      ? "Start tracking your debts to get insights into your debt payoff journey."
+                      : "No debts match your current filters."}
+                  </p>
+                  {debts.length === 0 && (
+                    <button
+                      onClick={() => setShowAddModal(true)}
+                      className="btn btn-primary"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Your First Debt
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <DebtList
+                  debts={filteredDebts}
+                  onDebtClick={handleDebtClick}
+                  onRecordPayment={handleRecordPayment}
+                />
+              )}
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl p-6 text-center border border-gray-200">
+              <p className="text-gray-500">Debt List disabled for debugging</p>
+            </div>
+          )}
         </>
       )}
 
@@ -289,14 +308,16 @@ const DebtDashboard = () => {
       )}
 
       {/* Modals */}
-      <AddDebtModal
-        isOpen={showAddModal || !!editingDebt}
-        onClose={handleCloseModal}
-        onSubmit={handleModalSubmit}
-        debt={editingDebt}
-      />
+      {isDebtFeatureEnabled('ENABLE_ADD_DEBT_MODAL') && (
+        <AddDebtModal
+          isOpen={showAddModal || !!editingDebt}
+          onClose={handleCloseModal}
+          onSubmit={handleModalSubmit}
+          debt={editingDebt}
+        />
+      )}
 
-      {selectedDebt && (
+      {selectedDebt && isDebtFeatureEnabled('ENABLE_DEBT_DETAIL_MODAL') && (
         <DebtDetailModal
           debt={selectedDebt}
           isOpen={!!selectedDebt}
