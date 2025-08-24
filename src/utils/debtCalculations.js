@@ -84,8 +84,14 @@ export function enrichDebt(
   relatedTransactions = [],
 ) {
   try {
-    const nextPaymentDate = calculateNextPaymentDate(debt, relatedBill);
-    const payoffInfo = calculatePayoffProjection(debt);
+    // const nextPaymentDate = calculateNextPaymentDate(debt, relatedBill); // DISABLED - testing if this causes TDZ
+    const nextPaymentDate = null;
+    // const payoffInfo = calculatePayoffProjection(debt); // DISABLED - error persists even with separated files
+    const payoffInfo = {
+      monthsToPayoff: null,
+      totalInterest: null,
+      payoffDate: null,
+    };
 
     return {
       ...debt,
