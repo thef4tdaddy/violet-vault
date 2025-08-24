@@ -29,7 +29,7 @@ const TransactionTable = ({ transactions = [], envelopes = [], onEdit, onDelete,
       <div ref={parentRef} className="overflow-auto max-h-[70vh]">
         <table className="w-full table-fixed">
           {/* Table Header */}
-          <thead className="bg-white/50 sticky top-0 z-10">
+          <thead className="bg-white/90 backdrop-blur-sm sticky top-0 z-20 border-b-2 border-gray-300 shadow-sm">
             <tr>
               <th
                 className={`${COLUMN_WIDTHS.date} px-4 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider`}

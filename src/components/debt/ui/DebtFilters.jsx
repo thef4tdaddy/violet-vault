@@ -103,15 +103,18 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes, debtsByType }
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Options</label>
-              <label className="flex items-center text-sm cursor-pointer">
+              <div className="grid grid-cols-[auto_1fr] gap-2 items-center">
                 <input
                   type="checkbox"
+                  id="showPaidOff"
                   checked={filterOptions.showPaidOff}
                   onChange={(e) => handleFilterChange("showPaidOff", e.target.checked)}
                   className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
                 />
-                <span className="ml-2 text-gray-700">Show Paid Off</span>
-              </label>
+                <label htmlFor="showPaidOff" className="text-sm text-gray-700 cursor-pointer">
+                  Show Paid Off
+                </label>
+              </div>
             </div>
           </div>
         </div>
