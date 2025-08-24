@@ -171,7 +171,7 @@ const DebtDetailModal = ({
               <div>
                 <p className="text-blue-600">Total Interest</p>
                 <p className="font-semibold text-blue-900">
-                  ${debt.payoffInfo.totalInterest?.toFixed(2) || "N/A"}
+                  ${debt.payoffInfo?.totalInterest?.toFixed(2) || "N/A"}
                 </p>
               </div>
               <div>
