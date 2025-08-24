@@ -153,9 +153,9 @@ const useEnvelopeSystem = () => {
   );
 
   const removeEnvelope = useCallback(
-    async (envelopeId) => {
+    async (envelopeId, deleteBillsToo = false) => {
       try {
-        await deleteEnvelope(envelopeId);
+        await deleteEnvelope(envelopeId, deleteBillsToo);
         return { success: true };
       } catch (error) {
         logger.error("Failed to delete envelope:", error);

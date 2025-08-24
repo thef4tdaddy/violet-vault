@@ -23,6 +23,7 @@ import {
 import useEditLock from "../../hooks/useEditLock";
 import { initializeEditLocks } from "../../services/editLockService";
 import { useAuth } from "../../stores/authStore";
+import DeleteEnvelopeModal from "./DeleteEnvelopeModal";
 import {
   ENVELOPE_TYPES,
   ENVELOPE_TYPE_CONFIG,
@@ -88,7 +89,7 @@ const EditEnvelopeModal = ({
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedBillId, setSelectedBillId] = useState("");
   const [initialBillId, setInitialBillId] = useState("");
 
@@ -183,7 +184,7 @@ const EditEnvelopeModal = ({
     });
     setErrors({});
     setIsSubmitting(false);
-    setShowDeleteConfirm(false);
+    setShowDeleteModal(false);
     setSelectedBillId("");
     setInitialBillId("");
   };
@@ -371,15 +372,14 @@ const EditEnvelopeModal = ({
     }
   };
 
-  const handleDelete = async () => {
-    if (!showDeleteConfirm) {
-      setShowDeleteConfirm(true);
-      return;
-    }
+  const handleDeleteClick = () => {
+    setShowDeleteModal(true);
+  };
 
+  const handleDeleteConfirm = async (envelopeId, deleteBillsToo = false) => {
     setIsSubmitting(true);
     try {
-      await onDeleteEnvelope(envelope.id);
+      await onDeleteEnvelope(envelopeId, deleteBillsToo);
       resetForm();
       onClose();
     } catch (error) {
@@ -1124,25 +1124,13 @@ const EditEnvelopeModal = ({
           <div className="flex gap-3">
             <button
               type="button"
-              onClick={handleDelete}
-              className={`px-4 py-2 text-white rounded-xl transition-colors flex items-center ${
-                showDeleteConfirm ? "bg-red-600 hover:bg-red-700" : "bg-red-500 hover:bg-red-600"
-              }`}
+              onClick={handleDeleteClick}
+              className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-colors flex items-center"
               disabled={isSubmitting}
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              {showDeleteConfirm ? "Confirm Delete" : "Delete"}
+              Delete
             </button>
-            {showDeleteConfirm && (
-              <button
-                type="button"
-                onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
-                disabled={isSubmitting}
-              >
-                Cancel Delete
-              </button>
-            )}
           </div>
 
           <div className="flex gap-3">
@@ -1186,6 +1174,16 @@ const EditEnvelopeModal = ({
           </div>
         </div>
       </div>
+      
+      {/* Delete Confirmation Modal */}
+      <DeleteEnvelopeModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteConfirm}
+        envelope={envelope}
+        connectedBills={allBills?.filter(bill => bill.envelopeId === envelope?.id) || []}
+        isDeleting={isSubmitting}
+      />
     </div>
   );
 };
