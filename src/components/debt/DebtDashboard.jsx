@@ -27,7 +27,7 @@ const DebtDashboard = () => {
     debts,
     debtStats,
     debtsByType,
-    debtsByStatus,
+    debtsByStatus: _,
     createDebt,
     updateDebt,
     deleteDebt,
