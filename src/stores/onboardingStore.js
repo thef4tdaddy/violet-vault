@@ -121,7 +121,8 @@ const useOnboardingStore = create(
 
       getProgress: () => {
         const { tutorialProgress } = get();
-        const completedSteps = Object.values(tutorialProgress).filter(Boolean).length;
+        const completedSteps =
+          Object.values(tutorialProgress).filter(Boolean).length;
         const totalSteps = Object.keys(tutorialProgress).length;
         return {
           completed: completedSteps,
@@ -133,8 +134,8 @@ const useOnboardingStore = create(
     {
       name: "violet-vault-onboarding",
       version: 1,
-    }
-  )
+    },
+  ),
 );
 
 export default useOnboardingStore;
