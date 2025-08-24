@@ -11,7 +11,7 @@ export const DEBT_DEBUG_CONFIG = {
   
   // Debt dashboard sections - TESTING SUMMARY CARDS
   ENABLE_DEBT_SUMMARY_CARDS: true,     // DebtSummaryCards component (TESTING)
-  ENABLE_DEBT_LIST: false,             // DebtList component (DISABLED)
+  ENABLE_DEBT_LIST: true,              // DebtList component (TESTING)
   ENABLE_DEBT_FILTERS: true,           // DebtFilters component (TESTING)
   ENABLE_DEBT_MODALS: false,           // Add/Edit/Detail modals (DISABLED)
   
