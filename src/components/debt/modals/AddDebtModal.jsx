@@ -79,6 +79,17 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Find connected bill and envelope for this debt - MOVED BEFORE useEffect 
+  const connectedBill =
+    isEditMode && debt?.id
+      ? bills.find((bill) => bill.debtId === debt.id)
+      : null;
+  const connectedEnvelope = connectedBill
+    ? envelopes.find((env) => env.id === connectedBill.envelopeId)
+    : debt?.envelopeId
+      ? envelopes.find((env) => env.id === debt.envelopeId)
+      : null;
+
   // Update form data when debt prop changes
   React.useEffect(() => {
     if (debt) {
@@ -130,17 +141,6 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
   }, [debt, isOpen, connectedBill, connectedEnvelope]);
 
   if (!isOpen) return null;
-
-  // Find connected bill and envelope for this debt
-  const connectedBill =
-    isEditMode && debt?.id
-      ? bills.find((bill) => bill.debtId === debt.id)
-      : null;
-  const connectedEnvelope = connectedBill
-    ? envelopes.find((env) => env.id === connectedBill.envelopeId)
-    : debt?.envelopeId
-      ? envelopes.find((env) => env.id === debt.envelopeId)
-      : null;
 
   const validateForm = () => {
     const newErrors = {};
