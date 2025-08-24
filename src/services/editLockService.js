@@ -135,7 +135,6 @@ class EditLockService {
    */
   async getLock(recordType, recordId) {
     try {
-      const lockId = `${recordType}_${recordId}`;
       const lockPath = `budgets/${this.budgetId}/edit-locks`;
       const q = query(
         collection(firestore, lockPath),
@@ -225,7 +224,7 @@ class EditLockService {
   /**
    * Stop heartbeat for a lock
    */
-  stopHeartbeat(lockId) {
+  stopHeartbeat() {
     if (this.heartbeatInterval) {
       clearInterval(this.heartbeatInterval);
       this.heartbeatInterval = null;
@@ -251,7 +250,7 @@ class EditLockService {
     }
 
     // Release all owned locks
-    for (const [lockId, lock] of this.locks) {
+    for (const [, lock] of this.locks) {
       if (lock.userId === this.currentUser?.id) {
         this.releaseLock(lock.recordType, lock.recordId);
       }

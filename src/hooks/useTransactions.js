@@ -349,7 +349,7 @@ const useTransactions = (options = {}) => {
       // Trigger immediate sync for transaction deletion
       triggerTransactionSync("deleted");
     },
-    onError: (error, transactionId) => {
+    onError: (error) => {
       logger.error("Failed to delete transaction", error, {
         source: "deleteTransactionMutation",
       });

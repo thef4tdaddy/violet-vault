@@ -594,7 +594,7 @@ export const backgroundSync = {
           let queryKey;
           try {
             queryKey = JSON.parse(entry.key);
-          } catch (parseError) {
+          } catch {
             // If it's not valid JSON, it's likely a simple cache entry, not a query key
             // Skip these entries as they're not TanStack Query cache
             return;

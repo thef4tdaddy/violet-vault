@@ -42,7 +42,7 @@ class Logger {
         category: "debug",
         ...data,
       });
-    } catch (error) {
+    } catch {
       // Silently fail if highlight.io isn't available
     }
   }

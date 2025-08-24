@@ -41,8 +41,6 @@ const SettingsDashboard = ({
   onSync,
   onChangePassword,
   currentUser,
-  onUserChange,
-  onUpdateProfile,
   isLocalOnlyMode = false,
   securityManager,
 }) => {

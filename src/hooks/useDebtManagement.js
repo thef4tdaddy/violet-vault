@@ -12,8 +12,6 @@ import {
   AUTO_CLASSIFY_DEBT_TYPE,
 } from "../constants/debts";
 import {
-  calculateNextPaymentDate,
-  calculatePayoffProjection,
   calculateInterestPortion,
   convertPaymentFrequency,
   createSpecialTerms,

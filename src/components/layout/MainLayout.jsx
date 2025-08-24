@@ -235,7 +235,6 @@ const MainContent = ({
     envelopes = [],
     savingsGoals = [],
     unassignedCash = 0,
-    actualBalance = 0,
     paycheckHistory: tanStackPaycheckHistory,
   } = useBudgetData();
 

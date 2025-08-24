@@ -20,7 +20,6 @@ import EditableBalance from "../ui/EditableBalance";
 import { useActualBalance } from "../../hooks/useBudgetMetadata";
 import { useUnassignedCash } from "../../hooks/useBudgetMetadata";
 import logger from "../../utils/logger";
-import { useBudgetStore } from "../../stores/uiStore";
 import { useEnvelopes } from "../../hooks/useEnvelopes";
 import { useSavingsGoals } from "../../hooks/useSavingsGoals";
 import { useTransactions } from "../../hooks/useTransactions";
@@ -91,7 +90,7 @@ const Dashboard = ({ setActiveView }) => {
     paycheckHistory && paycheckHistory.length >= 2 ? predictNextPayday(paycheckHistory) : null;
 
   const handleUpdateBalance = async (newBalance) => {
-    const success = await updateActualBalance(newBalance, {
+    await updateActualBalance(newBalance, {
       isManual: true,
       author: "Family Member", // Generic name for family budgeting
     });

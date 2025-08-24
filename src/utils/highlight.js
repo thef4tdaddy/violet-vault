@@ -239,7 +239,7 @@ class ErrorReportingFallback {
         this.queue = [];
         logger.debug("Successfully flushed error queue to Highlight.io");
       }
-    } catch (error) {
+    } catch {
       logger.debug("Retry failed, keeping errors in queue", {
         queueSize: this.queue.length,
       });
