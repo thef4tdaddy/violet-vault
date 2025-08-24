@@ -36,13 +36,15 @@ const DebtList = ({ debts, onDebtClick, onRecordPayment }) => {
 };
 
 const DebtCard = ({ debt, onClick, onRecordPayment }) => {
-  const config = DEBT_TYPE_CONFIG[debt.type] || DEBT_TYPE_CONFIG[DEBT_TYPES.OTHER];
+  const config =
+    DEBT_TYPE_CONFIG[debt.type] || DEBT_TYPE_CONFIG[DEBT_TYPES.OTHER];
   const IconComponent = getDebtIcon(debt.type);
 
   // Calculate progress percentage
   const progressPercentage =
     debt.originalBalance > 0
-      ? ((debt.originalBalance - debt.currentBalance) / debt.originalBalance) * 100
+      ? ((debt.originalBalance - debt.currentBalance) / debt.originalBalance) *
+        100
       : 0;
 
   // Determine status styling
@@ -151,7 +153,9 @@ const DebtCard = ({ debt, onClick, onRecordPayment }) => {
                     <span className="flex items-center">
                       <Clock className="h-3 w-3 mr-1" />
                       {debt.payoffInfo?.payoffDate
-                        ? new Date(debt.payoffInfo.payoffDate).toLocaleDateString("en-US", {
+                        ? new Date(
+                            debt.payoffInfo.payoffDate,
+                          ).toLocaleDateString("en-US", {
                             month: "short",
                             year: "numeric",
                           })
@@ -184,13 +188,17 @@ const DebtCard = ({ debt, onClick, onRecordPayment }) => {
             {(debt.relatedBill || debt.relatedEnvelope) && (
               <div className="mt-3 flex flex-wrap gap-2">
                 {debt.relatedBill && (
-                  <span className="inline-flex items-center px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">
-                    📄 Bill: {debt.relatedBill.name}
+                  <span className="inline-flex items-center px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full max-w-full">
+                    <span className="truncate">
+                      📄 Bill: {debt.relatedBill.name}
+                    </span>
                   </span>
                 )}
                 {debt.relatedEnvelope && (
-                  <span className="inline-flex items-center px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full">
-                    📧 Envelope: {debt.relatedEnvelope.name}
+                  <span className="inline-flex items-center px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full max-w-full">
+                    <span className="truncate">
+                      📧 Envelope: {debt.relatedEnvelope.name}
+                    </span>
                   </span>
                 )}
               </div>
