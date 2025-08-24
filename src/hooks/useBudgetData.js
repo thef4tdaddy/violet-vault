@@ -312,9 +312,17 @@ const useBudgetData = () => {
       return newTransaction;
     },
     onSuccess: () => {
+      // Comprehensive cache invalidation for global stats
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.unassignedCash() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.actualBalance() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
+
+      // Force immediate refetch for summary cards
+      queryClient.refetchQueries({ queryKey: queryKeys.dashboardSummary() });
     },
   });
 
