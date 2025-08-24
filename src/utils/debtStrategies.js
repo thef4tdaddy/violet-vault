@@ -265,7 +265,7 @@ export function calculateCustomStrategy(debts, extraPayment = 0) {
   const sortedDebts = [...activeDebts].sort((a, b) => (b.priority || 1) - (a.priority || 1));
 
   return calculatePayoffStrategy(sortedDebts, extraPayment, "custom");
-};
+}
 
 /**
  * Compare all debt strategies
