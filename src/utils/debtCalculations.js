@@ -199,7 +199,12 @@ export function enrichDebt(
 ) {
   try {
     const nextPaymentDate = calculateNextPaymentDate(debt, relatedBill);
-    const payoffInfo = calculatePayoffProjection(debt);
+    // const payoffInfo = calculatePayoffProjection(debt); // Temporarily disabled for debugging
+    const payoffInfo = {
+      monthsToPayoff: null,
+      totalInterest: null,
+      payoffDate: null,
+    };
 
     return {
       ...debt,
