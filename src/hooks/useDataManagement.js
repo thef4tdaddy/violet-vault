@@ -25,6 +25,7 @@ const useDataManagement = () => {
         savingsGoals,
         debts,
         paycheckHistory,
+        auditLog,
         metadata,
       ] = await Promise.all([
         budgetDb.envelopes.toArray(),
@@ -33,6 +34,7 @@ const useDataManagement = () => {
         budgetDb.savingsGoals.toArray(),
         budgetDb.debts.toArray(),
         budgetDb.paycheckHistory.toArray(),
+        budgetDb.auditLog.toArray(),
         getBudgetMetadata(),
       ]);
 
@@ -42,7 +44,8 @@ const useDataManagement = () => {
         transactions.length ||
         savingsGoals.length ||
         debts.length ||
-        paycheckHistory.length;
+        paycheckHistory.length ||
+        auditLog.length;
 
       if (!hasData) {
         showWarningToast("No data found to export", "Export Error");
@@ -62,6 +65,7 @@ const useDataManagement = () => {
         supplementalAccounts: metadata?.supplementalAccounts || [],
         debts,
         paycheckHistory,
+        auditLog,
         unassignedCash: metadata?.unassignedCash || 0,
         biweeklyAllocation: metadata?.biweeklyAllocation || 0,
         actualBalance: metadata?.actualBalance || 0,
@@ -80,10 +84,17 @@ const useDataManagement = () => {
             envelopes:
               "Main envelope data - edit currentBalance, name, category, etc.",
             bills: "Bill payment data - edit amount, dueDate, provider, etc.",
+            debts:
+              "Debt tracking data - edit currentBalance, minimumPayment, etc.",
+            savingsGoals:
+              "Savings goal data - edit targetAmount, currentAmount, etc.",
+            paycheckHistory: "Paycheck history for trend analysis",
             transactions:
               "Pure transactions only (filtered from allTransactions)",
             allTransactions:
               "All transactions + bills combined (auto-generated, don't edit directly)",
+            auditLog:
+              "Change history and audit trail (generally shouldn't be edited)",
           },
           deprecatedArrays: {
             note: "These may exist from old exports but are not actively used in v1.8+",
@@ -119,6 +130,8 @@ const useDataManagement = () => {
         allTransactions: transactions.length,
         savingsGoals: savingsGoals.length,
         debts: debts.length,
+        paycheckHistory: paycheckHistory.length,
+        auditLog: auditLog.length,
         fileSizeKB: Math.round(dataStr.length / 1024),
       });
 
@@ -163,6 +176,8 @@ const useDataManagement = () => {
           envelopes: importedData.envelopes?.length || 0,
           bills: importedData.bills?.length || 0,
           savingsGoals: importedData.savingsGoals?.length || 0,
+          debts: importedData.debts?.length || 0,
+          auditLog: importedData.auditLog?.length || 0,
           allTransactions: importedData.allTransactions?.length || 0,
         });
 
@@ -188,7 +203,7 @@ const useDataManagement = () => {
 
         // Confirm import with user
         const confirmed = confirm(
-          `Import ${importedData.envelopes?.length || 0} envelopes, ${importedData.bills?.length || 0} bills, ${importedData.debts?.length || 0} debts, and ${importedData.allTransactions?.length || 0} transactions?\n\nThis will replace your current data.`,
+          `Import ${importedData.envelopes?.length || 0} envelopes, ${importedData.bills?.length || 0} bills, ${importedData.debts?.length || 0} debts, ${importedData.auditLog?.length || 0} audit entries, and ${importedData.allTransactions?.length || 0} transactions?\n\nThis will replace your current data.`,
         );
 
         if (!confirmed) {
@@ -205,6 +220,7 @@ const useDataManagement = () => {
             savingsGoals,
             debts,
             paycheckHistory,
+            auditLog,
             metadata,
           ] = await Promise.all([
             budgetDb.envelopes.toArray(),
@@ -213,6 +229,7 @@ const useDataManagement = () => {
             budgetDb.savingsGoals.toArray(),
             budgetDb.debts.toArray(),
             budgetDb.paycheckHistory.toArray(),
+            budgetDb.auditLog.toArray(),
             getBudgetMetadata(),
           ]);
 
@@ -223,6 +240,7 @@ const useDataManagement = () => {
             savingsGoals,
             debts,
             paycheckHistory,
+            auditLog,
             unassignedCash: metadata?.unassignedCash || 0,
             biweeklyAllocation: metadata?.biweeklyAllocation || 0,
             actualBalance: metadata?.actualBalance || 0,
@@ -262,6 +280,7 @@ const useDataManagement = () => {
             budgetDb.savingsGoals,
             budgetDb.debts,
             budgetDb.paycheckHistory,
+            budgetDb.auditLog,
             budgetDb.budget,
           ],
           async () => {
@@ -357,6 +376,16 @@ const useDataManagement = () => {
               }
             }
 
+            try {
+              await budgetDb.auditLog.clear();
+            } catch (error) {
+              logger.warn(
+                "Standard audit log clear failed, using individual deletion",
+                error,
+              );
+              await budgetDb.auditLog.toCollection().delete();
+            }
+
             // Import new data
             if (importedData.envelopes?.length) {
               await budgetDb.envelopes.bulkAdd(importedData.envelopes);
@@ -384,6 +413,10 @@ const useDataManagement = () => {
               );
             }
 
+            if (importedData.auditLog?.length) {
+              await budgetDb.auditLog.bulkAdd(importedData.auditLog);
+            }
+
             // Import metadata (budget settings)
             await budgetDb.budget.put({
               id: "metadata",
@@ -406,6 +439,7 @@ const useDataManagement = () => {
             savingsGoals: importedData.savingsGoals?.length || 0,
             debts: importedData.debts?.length || 0,
             paycheckHistory: importedData.paycheckHistory?.length || 0,
+            auditLog: importedData.auditLog?.length || 0,
           },
         });
 
@@ -466,6 +500,7 @@ const useDataManagement = () => {
             savingsGoals: importedData.savingsGoals?.length || 0,
             debts: importedData.debts?.length || 0,
             paycheckHistory: importedData.paycheckHistory?.length || 0,
+            auditLog: importedData.auditLog?.length || 0,
           },
         };
       } catch (error) {
