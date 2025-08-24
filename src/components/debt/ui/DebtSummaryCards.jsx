@@ -80,7 +80,6 @@ const DebtSummaryCard = ({ icon: Icon, label, value, subtext, color, alert, onCl
     emerald: "text-emerald-600",
   };
 
-
   return (
     <div
       className={`glassmorphism rounded-3xl p-6 border-2 transition-all duration-200 ${
