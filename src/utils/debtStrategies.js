@@ -5,12 +5,17 @@
  * Calculate optimal debt payment strategies
  */
 
-// Strategy types
-export const DEBT_STRATEGIES = {
-  AVALANCHE: "avalanche", // Highest interest rate first
-  SNOWBALL: "snowball", // Smallest balance first
-  CUSTOM: "custom", // User-defined priority
-};
+// Strategy types - using function to avoid temporal dead zone issues
+export function getDebtStrategies() {
+  return {
+    AVALANCHE: "avalanche", // Highest interest rate first
+    SNOWBALL: "snowball", // Smallest balance first
+    CUSTOM: "custom", // User-defined priority
+  };
+}
+
+// Export as constant for backwards compatibility
+export const DEBT_STRATEGIES = getDebtStrategies();
 
 // Helper functions (placed before usage to avoid temporal dead zone issues)
 
@@ -228,7 +233,7 @@ export function calculateDebtAvalanche(debts, extraPayment = 0) {
   );
 
   return calculatePayoffStrategy(sortedDebts, extraPayment, "avalanche");
-};
+}
 
 /**
  * Calculate debt snowball strategy (smallest balance first)
@@ -245,7 +250,7 @@ export function calculateDebtSnowball(debts, extraPayment = 0) {
   );
 
   return calculatePayoffStrategy(sortedDebts, extraPayment, "snowball");
-};
+}
 
 /**
  * Calculate custom debt strategy based on user-defined priorities
@@ -253,7 +258,7 @@ export function calculateDebtSnowball(debts, extraPayment = 0) {
  * @param {number} extraPayment - Additional monthly payment amount
  * @returns {Object} Strategy analysis with payoff order and projections
  */
-export const calculateCustomStrategy = (debts, extraPayment = 0) => {
+export function calculateCustomStrategy(debts, extraPayment = 0) {
   const activeDebts = debts.filter((debt) => debt.status === "active" && debt.currentBalance > 0);
 
   // Sort by user-defined priority (highest priority first)
@@ -290,7 +295,7 @@ export function compareDebtStrategies(debts, extraPayment = 0) {
       timeWithSnowball: avalanche.totalMonths - snowball.totalMonths,
     },
   };
-};
+}
 
 /**
  * Calculate the impact of different extra payment amounts
@@ -319,4 +324,4 @@ export function calculateExtraPaymentImpact(
         amount === 0 ? 0 : (result.totalInterest - calculateStrategy(debts, 0).totalInterest) * -1,
     };
   });
-};
+}
