@@ -7,13 +7,13 @@
 export const DEBT_DEBUG_CONFIG = {
   // Core debt functionality
   ENABLE_DEBT_MANAGEMENT_HOOK: true,    // useDebtManagement hook
-  ENABLE_DEBT_DASHBOARD: true,          // Main DebtDashboard component
+  ENABLE_DEBT_DASHBOARD: false,         // Main DebtDashboard component (DISABLED)
   
-  // Debt dashboard sections
-  ENABLE_DEBT_SUMMARY_CARDS: true,     // DebtSummaryCards component
-  ENABLE_DEBT_LIST: true,              // DebtList component  
-  ENABLE_DEBT_FILTERS: true,           // DebtFilters component
-  ENABLE_DEBT_MODALS: true,            // Add/Edit/Detail modals
+  // Debt dashboard sections - START BY DISABLING MOST COMPLEX COMPONENTS
+  ENABLE_DEBT_SUMMARY_CARDS: false,    // DebtSummaryCards component (DISABLED)
+  ENABLE_DEBT_LIST: false,             // DebtList component (DISABLED)
+  ENABLE_DEBT_FILTERS: false,          // DebtFilters component (DISABLED)
+  ENABLE_DEBT_MODALS: false,           // Add/Edit/Detail modals (DISABLED)
   
   // Debt calculations
   ENABLE_DEBT_STATS_CALC: true,        // debtStats calculations
@@ -27,8 +27,8 @@ export const DEBT_DEBUG_CONFIG = {
   ENABLE_UPCOMING_PAYMENTS: true,      // upcoming payments feature
   
   // Individual components
-  ENABLE_DEBT_DETAIL_MODAL: true,      // DebtDetailModal
-  ENABLE_ADD_DEBT_MODAL: true,         // AddDebtModal
+  ENABLE_DEBT_DETAIL_MODAL: false,     // DebtDetailModal (DISABLED)
+  ENABLE_ADD_DEBT_MODAL: false,        // AddDebtModal (DISABLED)  
   ENABLE_DEBT_STRATEGIES: false,       // DebtStrategies (already disabled)
 };
 

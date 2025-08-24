@@ -14,6 +14,7 @@ const ChartsAndAnalytics = React.lazy(
 // Temporarily disable lazy loading due to chunk loading error
 // const DebtDashboard = React.lazy(() => import("../debt/DebtDashboard"));
 import DebtDashboard from "../debt/DebtDashboard";
+import { isDebtFeatureEnabled } from "../../utils/debtDebugConfig";
 const AutoFundingView = React.lazy(
   () => import("../automation/AutoFundingView"),
 );
@@ -413,10 +414,22 @@ const ViewRenderer = ({
         />
       </Suspense>
     ),
-    debts: (
+    debts: isDebtFeatureEnabled('ENABLE_DEBT_DASHBOARD') ? (
       <Suspense fallback={<LoadingSpinner />}>
         <DebtDashboard />
       </Suspense>
+    ) : (
+      <div className="p-8 text-center bg-white rounded-xl border border-gray-200">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          Debt Dashboard Temporarily Disabled
+        </h2>
+        <p className="text-gray-600 mb-4">
+          The debt dashboard is currently disabled for debugging the temporal dead zone error.
+        </p>
+        <p className="text-sm text-gray-500">
+          Debug configuration can be adjusted in src/utils/debtDebugConfig.js
+        </p>
+      </div>
     ),
     automation: (
       <Suspense fallback={<LoadingSpinner />}>
