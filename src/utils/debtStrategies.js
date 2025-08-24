@@ -219,7 +219,7 @@ function calculatePayoffStrategy(sortedDebts, extraPayment, strategyType) {
  * @param {number} extraPayment - Additional monthly payment amount
  * @returns {Object} Strategy analysis with payoff order and projections
  */
-export const calculateDebtAvalanche = (debts, extraPayment = 0) => {
+export function calculateDebtAvalanche(debts, extraPayment = 0) {
   const activeDebts = debts.filter((debt) => debt.status === "active" && debt.currentBalance > 0);
 
   // Sort by interest rate (highest first)
@@ -236,7 +236,7 @@ export const calculateDebtAvalanche = (debts, extraPayment = 0) => {
  * @param {number} extraPayment - Additional monthly payment amount
  * @returns {Object} Strategy analysis with payoff order and projections
  */
-export const calculateDebtSnowball = (debts, extraPayment = 0) => {
+export function calculateDebtSnowball(debts, extraPayment = 0) {
   const activeDebts = debts.filter((debt) => debt.status === "active" && debt.currentBalance > 0);
 
   // Sort by balance (smallest first)
@@ -268,7 +268,7 @@ export const calculateCustomStrategy = (debts, extraPayment = 0) => {
  * @param {number} extraPayment - Additional monthly payment
  * @returns {Object} Comparison of all strategies
  */
-export const compareDebtStrategies = (debts, extraPayment = 0) => {
+export function compareDebtStrategies(debts, extraPayment = 0) {
   const avalanche = calculateDebtAvalanche(debts, extraPayment);
   const snowball = calculateDebtSnowball(debts, extraPayment);
 
@@ -299,11 +299,11 @@ export const compareDebtStrategies = (debts, extraPayment = 0) => {
  * @param {Array} extraPaymentAmounts - Array of amounts to test [0, 50, 100, 200, 500]
  * @returns {Array} Impact analysis for each payment amount
  */
-export const calculateExtraPaymentImpact = (
+export function calculateExtraPaymentImpact(
   debts,
   strategy = "avalanche",
   extraPaymentAmounts = [0, 50, 100, 200, 500]
-) => {
+) {
   const calculateStrategy =
     strategy === "snowball" ? calculateDebtSnowball : calculateDebtAvalanche;
 
