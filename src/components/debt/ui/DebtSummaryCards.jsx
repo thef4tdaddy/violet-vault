@@ -61,15 +61,7 @@ const DebtSummaryCards = ({ stats, onDueSoonClick }) => {
   );
 };
 
-const DebtSummaryCard = ({
-  icon: Icon,
-  label,
-  value,
-  subtext,
-  color,
-  alert,
-  onClick,
-}) => {
+const DebtSummaryCard = ({ icon: Icon, label, value, subtext, color, alert, onClick }) => {
   const colorClasses = {
     red: "bg-red-500",
     orange: "bg-orange-500",
@@ -88,14 +80,6 @@ const DebtSummaryCard = ({
     emerald: "text-emerald-600",
   };
 
-  const _bgColorClasses = {
-    red: "bg-red-50",
-    orange: "bg-orange-50",
-    purple: "bg-purple-50",
-    amber: "bg-amber-50",
-    yellow: "bg-yellow-50",
-    emerald: "bg-emerald-50",
-  };
 
   return (
     <div
