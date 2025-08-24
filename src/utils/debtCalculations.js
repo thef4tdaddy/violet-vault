@@ -92,8 +92,7 @@ export function calculatePayoffProjection(debt) {
 
   // Calculate months to payoff using amortization formula
   const monthsToPayoff = Math.ceil(
-    -Math.log(1 - (balance * monthlyRate) / monthlyPayment) /
-      Math.log(1 + monthlyRate),
+    -Math.log(1 - (balance * monthlyRate) / monthlyPayment) / Math.log(1 + monthlyRate)
   );
 
   const totalPayments = monthlyPayment * monthsToPayoff;
@@ -105,8 +104,7 @@ export function calculatePayoffProjection(debt) {
   // Validate all calculations are finite numbers
   const validMonthsToPayoff =
     isFinite(monthsToPayoff) && monthsToPayoff > 0 ? monthsToPayoff : null;
-  const validTotalInterest =
-    isFinite(totalInterest) && totalInterest >= 0 ? totalInterest : null;
+  const validTotalInterest = isFinite(totalInterest) && totalInterest >= 0 ? totalInterest : null;
   const validPayoffDate = validMonthsToPayoff ? payoffDate.toISOString() : null;
 
   return {
@@ -197,7 +195,7 @@ export function enrichDebt(
   debt,
   relatedBill = null,
   relatedEnvelope = null,
-  relatedTransactions = [],
+  relatedTransactions = []
 ) {
   try {
     const nextPaymentDate = calculateNextPaymentDate(debt, relatedBill);
@@ -244,9 +242,7 @@ export function getUpcomingPayments(debts, daysAhead = 30) {
   cutoffDate.setDate(cutoffDate.getDate() + daysAhead);
 
   return debts
-    .filter(
-      (debt) => debt.status === DEBT_STATUS.ACTIVE && debt.nextPaymentDate,
-    )
+    .filter((debt) => debt.status === DEBT_STATUS.ACTIVE && debt.nextPaymentDate)
     .filter((debt) => new Date(debt.nextPaymentDate) <= cutoffDate)
     .sort((a, b) => new Date(a.nextPaymentDate) - new Date(b.nextPaymentDate));
 }

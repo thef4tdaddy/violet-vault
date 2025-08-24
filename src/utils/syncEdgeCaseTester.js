@@ -97,8 +97,7 @@ class SyncEdgeCaseTester {
 
     try {
       const syncData = await cloudSyncService.fetchDexieData();
-      const passed =
-        !isNaN(syncData.lastModified) && syncData.lastModified >= 0;
+      const passed = !isNaN(syncData.lastModified) && syncData.lastModified >= 0;
 
       this.testResults.push({
         test: "testCorruptedTimestamps",
@@ -107,10 +106,7 @@ class SyncEdgeCaseTester {
       });
     } finally {
       // Cleanup
-      await budgetDb.envelopes
-        .where("id")
-        .equals("test-corrupted-timestamps")
-        .delete();
+      await budgetDb.envelopes.where("id").equals("test-corrupted-timestamps").delete();
     }
   }
 
@@ -133,8 +129,7 @@ class SyncEdgeCaseTester {
       }
 
       const syncData = await cloudSyncService.fetchDexieData();
-      const passed =
-        !isNaN(syncData.lastModified) && syncData.lastModified >= 0;
+      const passed = !isNaN(syncData.lastModified) && syncData.lastModified >= 0;
 
       this.testResults.push({
         test: "testMixedDataTypes",
@@ -170,8 +165,7 @@ class SyncEdgeCaseTester {
       await budgetDb.transactions.bulkAdd(largeTransactions);
 
       const syncData = await cloudSyncService.fetchDexieData();
-      const passed =
-        syncData.transactions.length === 1000 && !isNaN(syncData.lastModified);
+      const passed = syncData.transactions.length === 1000 && !isNaN(syncData.lastModified);
 
       this.testResults.push({
         test: "testLargeDatasets",
@@ -180,10 +174,7 @@ class SyncEdgeCaseTester {
       });
     } finally {
       // Cleanup
-      await budgetDb.transactions
-        .where("id")
-        .startsWith("large-test-")
-        .delete();
+      await budgetDb.transactions.where("id").startsWith("large-test-").delete();
     }
   }
 
@@ -268,8 +259,7 @@ class SyncEdgeCaseTester {
       }
 
       const syncData = await cloudSyncService.fetchDexieData();
-      const passed =
-        !isNaN(syncData.lastModified) && syncData.lastModified >= now;
+      const passed = !isNaN(syncData.lastModified) && syncData.lastModified >= now;
 
       this.testResults.push({
         test: "testStringVsNumberTimestamps",
@@ -299,8 +289,7 @@ class SyncEdgeCaseTester {
       await budgetDb.debts.add(testData);
 
       const syncData = await cloudSyncService.fetchDexieData();
-      const passed =
-        syncData.debts.length >= 1 && !isNaN(syncData.lastModified);
+      const passed = syncData.debts.length >= 1 && !isNaN(syncData.lastModified);
 
       this.testResults.push({
         test: "testNullAndUndefinedValues",
@@ -381,9 +370,7 @@ class SyncEdgeCaseTester {
       await budgetDb.transactions.add(testData);
 
       const syncData = await cloudSyncService.fetchDexieData();
-      const foundItem = syncData.transactions.find(
-        (t) => t.id === "unicode-test",
-      );
+      const foundItem = syncData.transactions.find((t) => t.id === "unicode-test");
       const passed = foundItem && foundItem.name === testData.name;
 
       this.testResults.push({
@@ -412,9 +399,7 @@ class SyncEdgeCaseTester {
 
     this.testResults.forEach((result) => {
       const emoji = result.status === "passed" ? "✅" : "❌";
-      logger.info(
-        `${emoji} ${result.test}: ${result.details || result.error || result.status}`,
-      );
+      logger.info(`${emoji} ${result.test}: ${result.details || result.error || result.status}`);
     });
   }
 }
