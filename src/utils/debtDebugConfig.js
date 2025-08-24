@@ -7,7 +7,7 @@
 export const DEBT_DEBUG_CONFIG = {
   // Core debt functionality
   ENABLE_DEBT_MANAGEMENT_HOOK: true,    // useDebtManagement hook
-  ENABLE_DEBT_DASHBOARD: false,         // Main DebtDashboard component (DISABLED)
+  ENABLE_DEBT_DASHBOARD: true,          // Main DebtDashboard component (RE-ENABLED)
   
   // Debt dashboard sections - START BY DISABLING MOST COMPLEX COMPONENTS
   ENABLE_DEBT_SUMMARY_CARDS: false,    // DebtSummaryCards component (DISABLED)
