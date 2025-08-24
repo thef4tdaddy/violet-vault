@@ -16,7 +16,10 @@ import { fixMetadata } from "./utils/fixMetadata.js";
 import { runImmediateSyncHealthCheck } from "./utils/syncHealthChecker.js";
 import syncEdgeCaseTester from "./utils/syncEdgeCaseTester.js";
 import { validateAllSyncFlows } from "./utils/syncFlowValidator.js";
-import { runMasterSyncValidation, getQuickSyncStatus } from "./utils/masterSyncValidator.js";
+import {
+  runMasterSyncValidation,
+  getQuickSyncStatus,
+} from "./utils/masterSyncValidator.js";
 
 if (
   typeof window !== "undefined" &&
@@ -39,5 +42,5 @@ initHighlight();
 ReactDOM.createRoot(document.getElementById("root")).render(
   <QueryClientProvider client={queryClient}>
     <App />
-  </QueryClientProvider>
+  </QueryClientProvider>,
 );

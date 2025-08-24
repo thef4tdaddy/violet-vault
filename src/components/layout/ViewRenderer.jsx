@@ -8,15 +8,22 @@ import SupplementalAccounts from "../accounts/SupplementalAccounts";
 import PaycheckProcessor from "../budgeting/PaycheckProcessor";
 import BillManager from "../bills/BillManager";
 import TransactionLedger from "../transactions/TransactionLedger";
-const ChartsAndAnalytics = React.lazy(() => import("../analytics/ChartsAndAnalytics"));
+const ChartsAndAnalytics = React.lazy(
+  () => import("../analytics/ChartsAndAnalytics"),
+);
 // Temporarily disable lazy loading due to chunk loading error
 // const DebtDashboard = React.lazy(() => import("../debt/DebtDashboard"));
 import DebtDashboard from "../debt/DebtDashboard";
-const AutoFundingView = React.lazy(() => import("../automation/AutoFundingView"));
+const AutoFundingView = React.lazy(
+  () => import("../automation/AutoFundingView"),
+);
 const ActivityFeed = React.lazy(() => import("../activity/ActivityFeed"));
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ErrorBoundary } from "@highlight-run/react";
-import { useUnassignedCash, useActualBalance } from "../../hooks/useBudgetMetadata";
+import {
+  useUnassignedCash,
+  useActualBalance,
+} from "../../hooks/useBudgetMetadata";
 import useBills from "../../hooks/useBills";
 import useBudgetData from "../../hooks/useBudgetData";
 import logger from "../../utils/logger";
@@ -25,18 +32,27 @@ import logger from "../../utils/logger";
  * ViewRenderer component for handling main content switching
  * Extracted from Layout.jsx for better organization
  */
-const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setActiveView }) => {
+const ViewRenderer = ({
+  activeView,
+  budget,
+  currentUser,
+  totalBiweeklyNeed,
+  setActiveView,
+}) => {
   // Use TanStack Query hooks for budget metadata
   const { unassignedCash } = useUnassignedCash();
   // useActualBalance hook called but values not currently needed
   useActualBalance();
 
   // Get bill operations from TanStack Query hook instead of budget store
-  const { updateBill: tanStackUpdateBill, addBill: tanStackAddBill } = useBills();
+  const { updateBill: tanStackUpdateBill, addBill: tanStackAddBill } =
+    useBills();
 
   // Get TanStack Query paycheck operations for proper UI updates
-  const { processPaycheck: tanStackProcessPaycheck, paycheckHistory: tanStackPaycheckHistory } =
-    useBudgetData();
+  const {
+    processPaycheck: tanStackProcessPaycheck,
+    paycheckHistory: tanStackPaycheckHistory,
+  } = useBudgetData();
 
   const {
     envelopes,
@@ -57,7 +73,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
 
   // Filter out null/undefined transactions to prevent runtime errors
   const safeTransactions = (transactions || []).filter(
-    (t) => t && typeof t === "object" && typeof t.amount === "number"
+    (t) => t && typeof t === "object" && typeof t.amount === "number",
   );
 
   // Stable callback for bill updates
@@ -72,10 +88,13 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
       try {
         // Use TanStack Query updateBill for proper bill persistence with envelope assignment
         tanStackUpdateBill({ id: updatedBill.id, updates: updatedBill });
-        logger.debug("ViewRenderer TanStack updateBill completed successfully", {
-          billId: updatedBill.id,
-          envelopeId: updatedBill.envelopeId,
-        });
+        logger.debug(
+          "ViewRenderer TanStack updateBill completed successfully",
+          {
+            billId: updatedBill.id,
+            envelopeId: updatedBill.envelopeId,
+          },
+        );
       } catch (error) {
         logger.error("Error in ViewRenderer handleUpdateBill", error, {
           billId: updatedBill.id,
@@ -83,7 +102,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
         });
       }
     },
-    [tanStackUpdateBill]
+    [tanStackUpdateBill],
   );
 
   // Debug log to verify function creation - only on dev sites
@@ -111,7 +130,9 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
               </div>
               Budget Envelopes
             </h2>
-            <p className="text-gray-600 mt-1">Organize your money into spending categories</p>
+            <p className="text-gray-600 mt-1">
+              Organize your money into spending categories
+            </p>
           </div>
           <button
             onClick={() => setActiveView("automation")}
@@ -175,9 +196,13 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
             });
 
             // Get the paycheck to delete from TanStack Query data
-            const paycheckToDelete = tanStackPaycheckHistory.find((p) => p.id === paycheckId);
+            const paycheckToDelete = tanStackPaycheckHistory.find(
+              (p) => p.id === paycheckId,
+            );
             if (!paycheckToDelete) {
-              throw new Error(`Paycheck with ID ${paycheckId} not found in paycheckHistory`);
+              throw new Error(
+                `Paycheck with ID ${paycheckId} not found in paycheckHistory`,
+              );
             }
 
             logger.info("Found paycheck to delete", {
@@ -188,9 +213,8 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
             });
 
             // Import required functions
-            const { budgetDb, getBudgetMetadata, setBudgetMetadata } = await import(
-              "../../db/budgetDb"
-            );
+            const { budgetDb, getBudgetMetadata, setBudgetMetadata } =
+              await import("../../db/budgetDb");
 
             // Get current metadata
             const currentMetadata = await getBudgetMetadata();
@@ -198,19 +222,30 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
             const currentUnassignedCash = currentMetadata?.unassignedCash || 0;
 
             // Calculate new balances (subtract the paycheck amount)
-            const newActualBalance = currentActualBalance - paycheckToDelete.amount;
+            const newActualBalance =
+              currentActualBalance - paycheckToDelete.amount;
             let newUnassignedCash = currentUnassignedCash;
 
             // Handle envelope balance reversals if this was an "allocate" paycheck
-            if (paycheckToDelete.mode === "allocate" && paycheckToDelete.envelopeAllocations) {
-              logger.info("Reversing envelope allocations for allocate mode paycheck");
+            if (
+              paycheckToDelete.mode === "allocate" &&
+              paycheckToDelete.envelopeAllocations
+            ) {
+              logger.info(
+                "Reversing envelope allocations for allocate mode paycheck",
+              );
 
               // Subtract from envelope balances
               for (const allocation of paycheckToDelete.envelopeAllocations) {
-                const envelope = await budgetDb.envelopes.get(allocation.envelopeId);
+                const envelope = await budgetDb.envelopes.get(
+                  allocation.envelopeId,
+                );
                 if (envelope) {
                   await budgetDb.envelopes.update(allocation.envelopeId, {
-                    currentBalance: Math.max(0, (envelope.currentBalance || 0) - allocation.amount),
+                    currentBalance: Math.max(
+                      0,
+                      (envelope.currentBalance || 0) - allocation.amount,
+                    ),
                   });
                   logger.debug("Reversed envelope allocation", {
                     envelopeId: allocation.envelopeId,
@@ -220,16 +255,25 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
               }
 
               // Calculate how much went to unassigned cash originally
-              const totalAllocated = paycheckToDelete.envelopeAllocations.reduce(
-                (sum, alloc) => sum + alloc.amount,
-                0
-              );
+              const totalAllocated =
+                paycheckToDelete.envelopeAllocations.reduce(
+                  (sum, alloc) => sum + alloc.amount,
+                  0,
+                );
               const leftoverAmount = paycheckToDelete.amount - totalAllocated;
-              newUnassignedCash = Math.max(0, currentUnassignedCash - leftoverAmount);
+              newUnassignedCash = Math.max(
+                0,
+                currentUnassignedCash - leftoverAmount,
+              );
             } else {
-              logger.info("Reversing leftover mode paycheck from unassigned cash");
+              logger.info(
+                "Reversing leftover mode paycheck from unassigned cash",
+              );
               // "leftover" mode - all went to unassigned cash, so subtract it all
-              newUnassignedCash = Math.max(0, currentUnassignedCash - paycheckToDelete.amount);
+              newUnassignedCash = Math.max(
+                0,
+                currentUnassignedCash - paycheckToDelete.amount,
+              );
             }
 
             // Update budget metadata
@@ -252,7 +296,8 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
             });
 
             // Verify the paycheck exists in Dexie before attempting to delete
-            const existsInDexie = await budgetDb.paycheckHistory.get(paycheckId);
+            const existsInDexie =
+              await budgetDb.paycheckHistory.get(paycheckId);
             if (!existsInDexie) {
               logger.warn("Paycheck not found in Dexie database", {
                 paycheckId,
@@ -278,17 +323,24 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
             });
             queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
 
-            logger.info("Paycheck deleted successfully with proper balance reversal", {
-              paycheckId,
-              actualBalanceChange: newActualBalance - currentActualBalance,
-              unassignedCashChange: newUnassignedCash - currentUnassignedCash,
-            });
+            logger.info(
+              "Paycheck deleted successfully with proper balance reversal",
+              {
+                paycheckId,
+                actualBalanceChange: newActualBalance - currentActualBalance,
+                unassignedCashChange: newUnassignedCash - currentUnassignedCash,
+              },
+            );
           } catch (error) {
-            logger.error("Failed to delete paycheck with proper balance reversal", error, {
-              paycheckId,
-              errorMessage: error.message,
-              errorStack: error.stack,
-            });
+            logger.error(
+              "Failed to delete paycheck with proper balance reversal",
+              error,
+              {
+                paycheckId,
+                errorMessage: error.message,
+                errorStack: error.stack,
+              },
+            );
             throw error;
           }
         }}
@@ -329,14 +381,16 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
             createdAt: new Date().toISOString(),
           };
           tanStackAddBill(bill);
-          logger.debug("✅ Bill stored successfully - no transaction created until paid");
+          logger.debug(
+            "✅ Bill stored successfully - no transaction created until paid",
+          );
         }}
         onSearchNewBills={async () => {
           try {
             // This would integrate with email parsing or other bill detection services
             // For now, we'll show a placeholder notification
             alert(
-              "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox."
+              "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox.",
             );
           } catch (error) {
             logger.error("Failed to search for new bills:", error);
@@ -378,7 +432,9 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
 
   return (
     <ErrorBoundary>
-      <Suspense fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}>
+      <Suspense
+        fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}
+      >
         {views[activeView]}
       </Suspense>
     </ErrorBoundary>

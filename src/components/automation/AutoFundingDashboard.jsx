@@ -21,7 +21,11 @@ import {
   RotateCcw,
 } from "lucide-react";
 import AutoFundingRuleBuilder from "./AutoFundingRuleBuilder";
-import { autoFundingEngine, RULE_TYPES, TRIGGER_TYPES } from "../../utils/autoFundingEngine";
+import {
+  autoFundingEngine,
+  RULE_TYPES,
+  TRIGGER_TYPES,
+} from "../../utils/autoFundingEngine";
 import { useBudgetStore } from "../../stores/uiStore";
 import logger from "../../utils/logger";
 
@@ -77,7 +81,9 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
 
   const handleDeleteRule = (ruleId) => {
     if (
-      window.confirm("Are you sure you want to delete this rule? This action cannot be undone.")
+      window.confirm(
+        "Are you sure you want to delete this rule? This action cannot be undone.",
+      )
     ) {
       try {
         autoFundingEngine.deleteRule(ruleId);
@@ -124,11 +130,11 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
 
         if (totalFunded > 0) {
           alert(
-            `Successfully executed ${rulesExecuted} rules and funded $${totalFunded.toFixed(2)} total!`
+            `Successfully executed ${rulesExecuted} rules and funded $${totalFunded.toFixed(2)} total!`,
           );
         } else {
           alert(
-            "Rules executed but no funds were transferred. Check your rules and available balances."
+            "Rules executed but no funds were transferred. Check your rules and available balances.",
           );
         }
       } else {
@@ -223,7 +229,9 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
                     <Settings className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold">Auto-Funding Rules</h3>
+                    <h3 className="text-lg font-semibold">
+                      Auto-Funding Rules
+                    </h3>
                     <p className="text-sm text-gray-600">
                       Automate your envelope funding with smart rules
                     </p>
@@ -232,7 +240,9 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
                 <div className="flex items-center gap-3">
                   <button
                     onClick={handleExecuteRules}
-                    disabled={isExecuting || rules.filter((r) => r.enabled).length === 0}
+                    disabled={
+                      isExecuting || rules.filter((r) => r.enabled).length === 0
+                    }
                     className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                   >
                     {isExecuting ? (
@@ -247,7 +257,10 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
                       </>
                     )}
                   </button>
-                  <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1">
+                  <button
+                    onClick={onClose}
+                    className="text-gray-400 hover:text-gray-600 p-1"
+                  >
                     <Plus className="h-6 w-6 rotate-45" />
                   </button>
                 </div>
@@ -260,7 +273,9 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
                     <Settings className="h-4 w-4 text-gray-600" />
                     <span className="text-sm text-gray-600">Total Rules</span>
                   </div>
-                  <p className="text-lg font-semibold text-gray-900 mt-1">{rules.length}</p>
+                  <p className="text-lg font-semibold text-gray-900 mt-1">
+                    {rules.length}
+                  </p>
                 </div>
                 <div className="bg-green-50 p-3 rounded-lg">
                   <div className="flex items-center gap-2">
@@ -274,7 +289,9 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
                 <div className="bg-blue-50 p-3 rounded-lg">
                   <div className="flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm text-blue-600">Available Cash</span>
+                    <span className="text-sm text-blue-600">
+                      Available Cash
+                    </span>
                   </div>
                   <p className="text-lg font-semibold text-blue-900 mt-1">
                     ${(budget.unassignedCash || 0).toFixed(2)}
@@ -283,11 +300,15 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
                 <div className="bg-purple-50 p-3 rounded-lg">
                   <div className="flex items-center gap-2">
                     <History className="h-4 w-4 text-purple-600" />
-                    <span className="text-sm text-purple-600">Last Execution</span>
+                    <span className="text-sm text-purple-600">
+                      Last Execution
+                    </span>
                   </div>
                   <p className="text-lg font-semibold text-purple-900 mt-1">
                     {executionHistory.length > 0
-                      ? new Date(executionHistory[0].executedAt).toLocaleDateString()
+                      ? new Date(
+                          executionHistory[0].executedAt,
+                        ).toLocaleDateString()
                       : "Never"}
                   </p>
                 </div>
@@ -337,9 +358,12 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
                   {rules.length === 0 ? (
                     <div className="text-center py-12">
                       <Settings className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                      <h4 className="text-lg font-medium text-gray-900 mb-2">No Rules Created</h4>
+                      <h4 className="text-lg font-medium text-gray-900 mb-2">
+                        No Rules Created
+                      </h4>
                       <p className="text-gray-600 mb-4">
-                        Create your first auto-funding rule to automate envelope management
+                        Create your first auto-funding rule to automate envelope
+                        management
                       </p>
                       <button
                         onClick={handleCreateRule}
@@ -372,7 +396,9 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
                                 <div>
                                   <h4
                                     className={`font-medium ${
-                                      rule.enabled ? "text-gray-900" : "text-gray-500"
+                                      rule.enabled
+                                        ? "text-gray-900"
+                                        : "text-gray-500"
                                     }`}
                                   >
                                     {rule.name}
@@ -380,13 +406,17 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
                                   <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
                                     <span>{formatRuleType(rule.type)}</span>
                                     <span>•</span>
-                                    <span>{formatTriggerType(rule.trigger)}</span>
+                                    <span>
+                                      {formatTriggerType(rule.trigger)}
+                                    </span>
                                     <span>•</span>
                                     <span>Priority: {rule.priority}</span>
                                     {rule.executionCount > 0 && (
                                       <>
                                         <span>•</span>
-                                        <span>Executed {rule.executionCount} times</span>
+                                        <span>
+                                          Executed {rule.executionCount} times
+                                        </span>
                                       </>
                                     )}
                                   </div>
@@ -401,7 +431,11 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
                                       ? "text-green-600 hover:bg-green-50"
                                       : "text-gray-400 hover:bg-gray-100"
                                   }`}
-                                  title={rule.enabled ? "Disable rule" : "Enable rule"}
+                                  title={
+                                    rule.enabled
+                                      ? "Disable rule"
+                                      : "Enable rule"
+                                  }
                                 >
                                   {rule.enabled ? (
                                     <Eye className="h-4 w-4" />
@@ -427,14 +461,17 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
                             </div>
 
                             {rule.description && (
-                              <p className="text-sm text-gray-600 mt-2 ml-11">{rule.description}</p>
+                              <p className="text-sm text-gray-600 mt-2 ml-11">
+                                {rule.description}
+                              </p>
                             )}
 
                             {/* Rule Details */}
                             <div className="ml-11 mt-3 flex flex-wrap items-center gap-2">
                               {rule.config.amount > 0 && (
                                 <span className="inline-flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
-                                  <DollarSign className="h-3 w-3" />${rule.config.amount.toFixed(2)}
+                                  <DollarSign className="h-3 w-3" />$
+                                  {rule.config.amount.toFixed(2)}
                                 </span>
                               )}
                               {rule.config.percentage > 0 && (
@@ -446,20 +483,25 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
                               {rule.config.targetId && (
                                 <span className="inline-flex items-center gap-1 bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">
                                   <Target className="h-3 w-3" />
-                                  {budget.envelopes?.find((e) => e.id === rule.config.targetId)
-                                    ?.name || "Unknown"}
+                                  {budget.envelopes?.find(
+                                    (e) => e.id === rule.config.targetId,
+                                  )?.name || "Unknown"}
                                 </span>
                               )}
-                              {rule.config.targetIds && rule.config.targetIds.length > 0 && (
-                                <span className="inline-flex items-center gap-1 bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs">
-                                  <Target className="h-3 w-3" />
-                                  {rule.config.targetIds.length} envelopes
-                                </span>
-                              )}
+                              {rule.config.targetIds &&
+                                rule.config.targetIds.length > 0 && (
+                                  <span className="inline-flex items-center gap-1 bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs">
+                                    <Target className="h-3 w-3" />
+                                    {rule.config.targetIds.length} envelopes
+                                  </span>
+                                )}
                               {rule.lastExecuted && (
                                 <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs">
                                   <Clock className="h-3 w-3" />
-                                  Last: {new Date(rule.lastExecuted).toLocaleDateString()}
+                                  Last:{" "}
+                                  {new Date(
+                                    rule.lastExecuted,
+                                  ).toLocaleDateString()}
                                 </span>
                               )}
                             </div>
@@ -480,8 +522,8 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
                         No Execution History
                       </h4>
                       <p className="text-gray-600 mb-4">
-                        Rule executions will appear here once you start running your auto-funding
-                        rules
+                        Rule executions will appear here once you start running
+                        your auto-funding rules
                       </p>
                       <button
                         onClick={handleExecuteRules}
@@ -495,7 +537,10 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
                   ) : (
                     <div className="space-y-3">
                       {executionHistory.map((execution, index) => (
-                        <div key={execution.id} className="border border-gray-200 rounded-lg p-4">
+                        <div
+                          key={execution.id}
+                          className="border border-gray-200 rounded-lg p-4"
+                        >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <div
@@ -516,11 +561,20 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
                                   Execution #{executionHistory.length - index}
                                 </h4>
                                 <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
-                                  <span>{new Date(execution.executedAt).toLocaleString()}</span>
+                                  <span>
+                                    {new Date(
+                                      execution.executedAt,
+                                    ).toLocaleString()}
+                                  </span>
                                   <span>•</span>
-                                  <span>{formatTriggerType(execution.trigger)} trigger</span>
+                                  <span>
+                                    {formatTriggerType(execution.trigger)}{" "}
+                                    trigger
+                                  </span>
                                   <span>•</span>
-                                  <span>{execution.rulesExecuted} rules executed</span>
+                                  <span>
+                                    {execution.rulesExecuted} rules executed
+                                  </span>
                                 </div>
                               </div>
                             </div>
@@ -528,7 +582,9 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
                             <div className="text-right">
                               <p
                                 className={`text-lg font-semibold ${
-                                  execution.totalFunded > 0 ? "text-green-600" : "text-gray-600"
+                                  execution.totalFunded > 0
+                                    ? "text-green-600"
+                                    : "text-gray-600"
                                 }`}
                               >
                                 ${(execution.totalFunded || 0).toFixed(2)}
@@ -536,7 +592,9 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
                               <button
                                 onClick={() =>
                                   setShowExecutionDetails(
-                                    showExecutionDetails === execution.id ? null : execution.id
+                                    showExecutionDetails === execution.id
+                                      ? null
+                                      : execution.id,
                                   )
                                 }
                                 className="text-blue-600 hover:text-blue-700 text-sm"
@@ -551,52 +609,70 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
                           {showExecutionDetails === execution.id && (
                             <div className="mt-4 pt-4 border-t border-gray-200">
                               <div className="space-y-2">
-                                {execution.results?.map((result, resultIndex) => (
-                                  <div
-                                    key={resultIndex}
-                                    className={`p-3 rounded-lg ${
-                                      result.success
-                                        ? "bg-green-50 border border-green-200"
-                                        : "bg-red-50 border border-red-200"
-                                    }`}
-                                  >
-                                    <div className="flex items-center justify-between">
-                                      <div>
-                                        <h5
-                                          className={`font-medium ${
-                                            result.success ? "text-green-900" : "text-red-900"
+                                {execution.results?.map(
+                                  (result, resultIndex) => (
+                                    <div
+                                      key={resultIndex}
+                                      className={`p-3 rounded-lg ${
+                                        result.success
+                                          ? "bg-green-50 border border-green-200"
+                                          : "bg-red-50 border border-red-200"
+                                      }`}
+                                    >
+                                      <div className="flex items-center justify-between">
+                                        <div>
+                                          <h5
+                                            className={`font-medium ${
+                                              result.success
+                                                ? "text-green-900"
+                                                : "text-red-900"
+                                            }`}
+                                          >
+                                            {result.ruleName}
+                                          </h5>
+                                          {result.success ? (
+                                            <p className="text-sm text-green-700 mt-1">
+                                              Funded $
+                                              {(result.amount || 0).toFixed(2)}
+                                              {result.targetEnvelopes &&
+                                                result.targetEnvelopes.length >
+                                                  0 && (
+                                                  <span>
+                                                    {" "}
+                                                    to{" "}
+                                                    {
+                                                      result.targetEnvelopes
+                                                        .length
+                                                    }{" "}
+                                                    envelope
+                                                    {result.targetEnvelopes
+                                                      .length > 1
+                                                      ? "s"
+                                                      : ""}
+                                                  </span>
+                                                )}
+                                            </p>
+                                          ) : (
+                                            <p className="text-sm text-red-700 mt-1">
+                                              {result.error}
+                                            </p>
+                                          )}
+                                        </div>
+                                        <div
+                                          className={`text-sm font-medium ${
+                                            result.success
+                                              ? "text-green-600"
+                                              : "text-red-600"
                                           }`}
                                         >
-                                          {result.ruleName}
-                                        </h5>
-                                        {result.success ? (
-                                          <p className="text-sm text-green-700 mt-1">
-                                            Funded ${(result.amount || 0).toFixed(2)}
-                                            {result.targetEnvelopes &&
-                                              result.targetEnvelopes.length > 0 && (
-                                                <span>
-                                                  {" "}
-                                                  to {result.targetEnvelopes.length} envelope
-                                                  {result.targetEnvelopes.length > 1 ? "s" : ""}
-                                                </span>
-                                              )}
-                                          </p>
-                                        ) : (
-                                          <p className="text-sm text-red-700 mt-1">
-                                            {result.error}
-                                          </p>
-                                        )}
-                                      </div>
-                                      <div
-                                        className={`text-sm font-medium ${
-                                          result.success ? "text-green-600" : "text-red-600"
-                                        }`}
-                                      >
-                                        {result.success ? "Success" : "Failed"}
+                                          {result.success
+                                            ? "Success"
+                                            : "Failed"}
+                                        </div>
                                       </div>
                                     </div>
-                                  </div>
-                                ))}
+                                  ),
+                                )}
                               </div>
                             </div>
                           )}
