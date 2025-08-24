@@ -117,7 +117,7 @@ export const fetchTargetVersion = async () => {
 };
 
 // Get actual commit date from git (injected at build time)
-const getActualCommitDate = (branchInfo) => {
+const getActualCommitDate = () => {
   // Try git commit date first (injected by Vite build)
   const gitCommitDate = import.meta.env.VITE_GIT_COMMIT_DATE;
   if (gitCommitDate) {

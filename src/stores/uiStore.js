@@ -3,6 +3,8 @@ import { subscribeWithSelector } from "zustand/middleware";
 import { persist, devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import logger from "../utils/logger.js";
+import { budgetDb } from "../db/budgetDb";
+import { setBudgetMetadata } from "../hooks/useBudgetMetadata";
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 

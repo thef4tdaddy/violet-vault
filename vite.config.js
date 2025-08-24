@@ -36,7 +36,7 @@ const getGitInfo = () => {
   }
 };
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(() => {
   const gitInfo = getGitInfo();
 
   return {

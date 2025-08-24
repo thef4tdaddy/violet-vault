@@ -78,7 +78,7 @@ export class AutoFundingRule {
   shouldExecute(context) {
     if (!this.enabled) return false;
 
-    const { trigger, data, currentDate } = context;
+    const { trigger, currentDate } = context;
 
     // Check trigger type match
     if (this.trigger !== trigger && trigger !== TRIGGER_TYPES.MANUAL) {
@@ -106,7 +106,7 @@ export class AutoFundingRule {
    * Evaluate conditions for conditional rules
    */
   evaluateConditions(context) {
-    const { envelopes, unassignedCash, transactions } = context.data;
+    const { envelopes, unassignedCash } = context.data;
 
     return this.config.conditions.every((condition) => {
       switch (condition.type) {
@@ -159,7 +159,7 @@ export class AutoFundingRule {
    * Calculate funding amount based on rule type
    */
   calculateFundingAmount(context) {
-    const { envelopes, unassignedCash, transactions } = context.data;
+    const { envelopes, unassignedCash } = context.data;
 
     switch (this.type) {
       case RULE_TYPES.FIXED_AMOUNT:
@@ -499,7 +499,7 @@ export class AutoFundingEngine {
   /**
    * Plan transfers for a rule execution
    */
-  planTransfers(rule, totalAmount, context) {
+  planTransfers(rule, totalAmount) {
     const transfers = [];
 
     switch (rule.type) {

@@ -28,7 +28,7 @@ import logger from "../../utils/logger";
 const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setActiveView }) => {
   // Use TanStack Query hooks for budget metadata
   const { unassignedCash } = useUnassignedCash();
-  const { actualBalance } = useActualBalance();
+  const {} = useActualBalance();
 
   // Get bill operations from TanStack Query hook instead of budget store
   const { updateBill: tanStackUpdateBill, addBill: tanStackAddBill } = useBills();
@@ -42,9 +42,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
     bills,
     savingsGoals,
     supplementalAccounts,
-    paycheckHistory,
     transactions,
-    allTransactions: rawAllTransactions,
     setActualBalance: _setActualBalance,
     reconcileTransaction: _reconcileTransaction,
     addSavingsGoal,
@@ -56,10 +54,6 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
     transferFromSupplementalAccount,
     addEnvelope,
     updateEnvelope,
-    processPaycheck,
-    deletePaycheck,
-    addTransaction,
-    addTransactions,
     updateTransaction: _updateTransaction,
     deleteTransaction: _deleteTransaction,
     setAllTransactions: _setAllTransactions,
@@ -67,7 +61,6 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
   } = budget;
 
   // Filter out null/undefined transactions to prevent runtime errors
-  const allTransactions = (rawAllTransactions || []).filter((t) => t && typeof t === "object");
   const safeTransactions = (transactions || []).filter(
     (t) => t && typeof t === "object" && typeof t.amount === "number"
   );
