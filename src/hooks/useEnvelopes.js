@@ -188,12 +188,38 @@ const useEnvelopes = (options = {}) => {
   const updateEnvelopeMutation = useMutation({
     mutationKey: ["envelopes", "update"],
     mutationFn: async ({ id, updates }) => {
-      // Apply optimistic update
-      await optimisticHelpers.updateEnvelope(id, updates);
+      // Validate envelope data before update to prevent corruption
+      const existingEnvelope = await budgetDb.envelopes.get(id);
+      if (!existingEnvelope) {
+        throw new Error(`Envelope ${id} not found`);
+      }
 
-      // Apply to Dexie directly
-      await budgetDb.envelopes.update(id, {
+      // Ensure critical fields aren't accidentally cleared
+      const safeUpdates = {
         ...updates,
+        // Preserve essential fields if they exist and aren't being intentionally cleared
+        name: updates.name !== undefined ? updates.name : existingEnvelope.name,
+        category:
+          updates.category !== undefined
+            ? updates.category
+            : existingEnvelope.category,
+      };
+
+      // Log envelope updates for debugging corruption issues
+      logger.info("Updating envelope", {
+        envelopeId: id,
+        existingName: existingEnvelope.name,
+        newName: safeUpdates.name,
+        updates: Object.keys(updates),
+        source: "updateEnvelopeMutation",
+      });
+
+      // Apply optimistic update with validated data
+      await optimisticHelpers.updateEnvelope(id, safeUpdates);
+
+      // Apply to Dexie directly with safe updates
+      await budgetDb.envelopes.update(id, {
+        ...safeUpdates,
         updatedAt: new Date().toISOString(),
       });
 
