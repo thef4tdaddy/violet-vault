@@ -77,12 +77,10 @@ export function calculatePayoffProjection(debt) {
   }
 
   const monthlyRate = interestRate / 100 / 12;
-  const monthlyPayment = minimumPayment;
-  const balance = currentBalance;
-
+  const monthlyInterest = currentBalance * monthlyRate;
+  
   // Check if payment covers interest (prevents infinite payoff scenarios)
-  const monthlyInterest = balance * monthlyRate;
-  if (monthlyPayment <= monthlyInterest) {
+  if (minimumPayment <= monthlyInterest) {
     return {
       monthsToPayoff: null,
       totalInterest: null,
@@ -91,13 +89,23 @@ export function calculatePayoffProjection(debt) {
   }
 
   // Calculate months to payoff using amortization formula
-  let monthsToPayoffCalculation;
+  let calculatedMonths;
   try {
-    monthsToPayoffCalculation = Math.ceil(
-      -Math.log(1 - (balance * monthlyRate) / monthlyPayment) /
-        Math.log(1 + monthlyRate),
+    const ratio = (currentBalance * monthlyRate) / minimumPayment;
+    const logValue = 1 - ratio;
+    
+    if (logValue <= 0) {
+      return {
+        monthsToPayoff: null,
+        totalInterest: null,
+        payoffDate: null,
+      };
+    }
+    
+    calculatedMonths = Math.ceil(
+      -Math.log(logValue) / Math.log(1 + monthlyRate)
     );
-  } catch (error) {
+  } catch (err) {
     return {
       monthsToPayoff: null,
       totalInterest: null,
@@ -105,24 +113,33 @@ export function calculatePayoffProjection(debt) {
     };
   }
 
-  const monthsToPayoff = monthsToPayoffCalculation;
-  const totalPayments = monthlyPayment * monthsToPayoff;
-  const totalInterest = totalPayments - balance;
+  // Validate and build return values
+  if (!isFinite(calculatedMonths) || calculatedMonths <= 0) {
+    return {
+      monthsToPayoff: null,
+      totalInterest: null,
+      payoffDate: null,
+    };
+  }
 
-  const payoffDate = new Date();
-  payoffDate.setMonth(payoffDate.getMonth() + monthsToPayoff);
+  const totalPayments = minimumPayment * calculatedMonths;
+  const calculatedInterest = totalPayments - currentBalance;
+  
+  if (!isFinite(calculatedInterest) || calculatedInterest < 0) {
+    return {
+      monthsToPayoff: calculatedMonths,
+      totalInterest: null,
+      payoffDate: null,
+    };
+  }
 
-  // Validate all calculations are finite numbers
-  const validMonthsToPayoff =
-    isFinite(monthsToPayoff) && monthsToPayoff > 0 ? monthsToPayoff : null;
-  const validTotalInterest =
-    isFinite(totalInterest) && totalInterest >= 0 ? totalInterest : null;
-  const validPayoffDate = validMonthsToPayoff ? payoffDate.toISOString() : null;
+  const futureDate = new Date();
+  futureDate.setMonth(futureDate.getMonth() + calculatedMonths);
 
   return {
-    monthsToPayoff: validMonthsToPayoff,
-    totalInterest: validTotalInterest,
-    payoffDate: validPayoffDate,
+    monthsToPayoff: calculatedMonths,
+    totalInterest: calculatedInterest,
+    payoffDate: futureDate.toISOString(),
   };
 }
 
@@ -211,12 +228,7 @@ export function enrichDebt(
 ) {
   try {
     const nextPaymentDate = calculateNextPaymentDate(debt, relatedBill);
-    // const payoffInfo = calculatePayoffProjection(debt); // Temporarily disabled - still getting TDZ error
-    const payoffInfo = {
-      monthsToPayoff: null,
-      totalInterest: null,
-      payoffDate: null,
-    };
+    const payoffInfo = calculatePayoffProjection(debt);
 
     return {
       ...debt,
