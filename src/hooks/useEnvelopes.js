@@ -187,7 +187,7 @@ const useEnvelopes = (options = {}) => {
 
       return newEnvelope;
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
@@ -241,7 +241,7 @@ const useEnvelopes = (options = {}) => {
 
       return { id, updates };
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       // Trigger immediate sync for envelope update
@@ -256,7 +256,7 @@ const useEnvelopes = (options = {}) => {
   // Delete envelope mutation
   const deleteEnvelopeMutation = useMutation({
     mutationKey: ["envelopes", "delete"],
-    mutationFn: async (envelopeId) => {
+    mutationFn: async ({ envelopeId, deleteBillsToo = false }) => {
       // Get the envelope to check if it has money
       const envelope = await budgetDb.envelopes.get(envelopeId);
 
@@ -276,18 +276,53 @@ const useEnvelopes = (options = {}) => {
         );
       }
 
+      // Handle connected bills if requested
+      if (deleteBillsToo) {
+        logger.info(`Deleting envelope ${envelopeId} and connected bills`);
+        
+        // Get all bills connected to this envelope
+        const connectedBills = await budgetDb.bills.where('envelopeId').equals(envelopeId).toArray();
+        
+        if (connectedBills.length > 0) {
+          logger.info(`Found ${connectedBills.length} connected bills to delete`);
+          
+          // Delete each connected bill
+          for (const bill of connectedBills) {
+            await budgetDb.bills.delete(bill.id);
+            await optimisticHelpers.removeBill(bill.id);
+          }
+        }
+      } else {
+        // Disconnect bills but don't delete them
+        const connectedBills = await budgetDb.bills.where('envelopeId').equals(envelopeId).toArray();
+        
+        if (connectedBills.length > 0) {
+          logger.info(`Disconnecting ${connectedBills.length} bills from envelope ${envelopeId}`);
+          
+          // Remove envelope connection from bills
+          for (const bill of connectedBills) {
+            await budgetDb.bills.update(bill.id, { envelopeId: null });
+            await optimisticHelpers.updateBill(bill.id, { envelopeId: null });
+          }
+        }
+      }
+
       // Apply optimistic update
       await optimisticHelpers.removeEnvelope(envelopeId);
 
       // Apply to Dexie directly
       await budgetDb.envelopes.delete(envelopeId);
 
-      return { envelopeId, transferredAmount: envelope?.currentBalance || 0 };
+      return { envelopeId, deleteBillsToo, transferredAmount: envelope?.currentBalance || 0 };
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
+      
+      // Always invalidate bill queries since they might be affected by disconnection/deletion
+      queryClient.invalidateQueries({ queryKey: queryKeys.bills });
+      
       // Trigger immediate sync for envelope deletion
       triggerEnvelopeSync("deleted");
     },
@@ -357,7 +392,7 @@ const useEnvelopes = (options = {}) => {
 
       return { success: true, transaction };
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
@@ -421,6 +456,14 @@ const useEnvelopes = (options = {}) => {
     return updateEnvelopeMutation.mutateAsync({ id: envelopeId, updates });
   };
 
+  // Wrapper functions for envelope deletion with bill handling
+  const deleteEnvelopeWrapper = (envelopeId, deleteBillsToo = false) => {
+    deleteEnvelopeMutation.mutate({ envelopeId, deleteBillsToo });
+  };
+
+  const deleteEnvelopeAsyncWrapper = (envelopeId, deleteBillsToo = false) => {
+    return deleteEnvelopeMutation.mutateAsync({ envelopeId, deleteBillsToo });
+  };
   return {
     // Data
     envelopes,
@@ -441,8 +484,8 @@ const useEnvelopes = (options = {}) => {
     addEnvelopeAsync: addEnvelopeMutation.mutateAsync,
     updateEnvelope: updateEnvelopeMutation.mutate,
     updateEnvelopeAsync: updateEnvelopeMutation.mutateAsync,
-    deleteEnvelope: deleteEnvelopeMutation.mutate,
-    deleteEnvelopeAsync: deleteEnvelopeMutation.mutateAsync,
+    deleteEnvelope: deleteEnvelopeWrapper,
+    deleteEnvelopeAsync: deleteEnvelopeAsyncWrapper,
     transferFunds: transferFundsMutation.mutate,
     transferFundsAsync: transferFundsMutation.mutateAsync,
 
