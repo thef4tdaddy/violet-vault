@@ -36,15 +36,13 @@ const DebtList = ({ debts, onDebtClick, onRecordPayment }) => {
 };
 
 const DebtCard = ({ debt, onClick, onRecordPayment }) => {
-  const config =
-    DEBT_TYPE_CONFIG[debt.type] || DEBT_TYPE_CONFIG[DEBT_TYPES.OTHER];
+  const config = DEBT_TYPE_CONFIG[debt.type] || DEBT_TYPE_CONFIG[DEBT_TYPES.OTHER];
   const IconComponent = getDebtIcon(debt.type);
 
   // Calculate progress percentage
   const progressPercentage =
     debt.originalBalance > 0
-      ? ((debt.originalBalance - debt.currentBalance) / debt.originalBalance) *
-        100
+      ? ((debt.originalBalance - debt.currentBalance) / debt.originalBalance) * 100
       : 0;
 
   // Determine status styling
@@ -153,9 +151,7 @@ const DebtCard = ({ debt, onClick, onRecordPayment }) => {
                     <span className="flex items-center">
                       <Clock className="h-3 w-3 mr-1" />
                       {debt.payoffInfo?.payoffDate
-                        ? new Date(
-                            debt.payoffInfo.payoffDate,
-                          ).toLocaleDateString("en-US", {
+                        ? new Date(debt.payoffInfo.payoffDate).toLocaleDateString("en-US", {
                             month: "short",
                             year: "numeric",
                           })

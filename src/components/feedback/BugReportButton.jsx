@@ -80,21 +80,13 @@ const BugReportButton = () => {
           className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
           data-bug-report="true"
         >
-          <div
-            className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl"
-            data-bug-report="true"
-          >
+          <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl" data-bug-report="true">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center">
                 <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Report a Problem
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900">Report a Problem</h3>
               </div>
-              <button
-                onClick={closeModal}
-                className="text-gray-400 hover:text-gray-600"
-              >
+              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -107,10 +99,15 @@ const BugReportButton = () => {
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="What happened? What were you trying to do?"
-                  className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  rows={4}
+                  placeholder="What happened? What were you trying to do?&#10;&#10;📝 Tip: You can include code blocks using:&#10;```&#10;your code here&#10;```"
+                  className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-red-500 focus:border-transparent font-mono text-sm"
+                  rows={6}
                 />
+                <div className="mt-2 text-xs text-gray-500">
+                  💡 <strong>Pro tip:</strong> Use{" "}
+                  <code className="bg-gray-100 px-1 rounded">```</code> for code blocks, mention
+                  specific buttons/features you were using, and include error messages if any.
+                </div>
               </div>
 
               <div className="flex items-center justify-between">
@@ -135,29 +132,27 @@ const BugReportButton = () => {
                     <button
                       onClick={previewScreenshot}
                       className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
+                      title="Automatically capture screenshot using html2canvas"
                     >
                       <Camera className="h-4 w-4 mr-1" />
-                      Auto
+                      Auto Capture
                     </button>
                     <button
                       onClick={async () => {
-                        if (
-                          navigator.mediaDevices &&
-                          navigator.mediaDevices.getDisplayMedia
-                        ) {
+                        if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
                           try {
-                            const stream =
-                              await navigator.mediaDevices.getDisplayMedia({
-                                video: true,
-                                audio: false,
-                              });
+                            const stream = await navigator.mediaDevices.getDisplayMedia({
+                              video: {
+                                width: { ideal: 1920 },
+                                height: { ideal: 1080 },
+                              },
+                              audio: false,
+                            });
                             const video = document.createElement("video");
                             video.srcObject = stream;
                             video.play();
 
-                            await new Promise(
-                              (resolve) => (video.onloadedmetadata = resolve),
-                            );
+                            await new Promise((resolve) => (video.onloadedmetadata = resolve));
 
                             const canvas = document.createElement("canvas");
                             canvas.width = video.videoWidth;
@@ -167,24 +162,25 @@ const BugReportButton = () => {
 
                             stream.getTracks().forEach((track) => track.stop());
 
-                            const screenshotDataUrl = canvas.toDataURL(
-                              "image/png",
-                              0.8,
-                            );
+                            const screenshotDataUrl = canvas.toDataURL("image/png", 0.9);
                             setScreenshot(screenshotDataUrl);
                           } catch (error) {
-                            console.warn(
-                              "Manual screen capture failed:",
-                              error,
+                            console.warn("Manual screen capture failed:", error);
+                            alert(
+                              "Screen capture failed. Please try the Auto Capture option or include a manual screenshot."
                             );
                           }
+                        } else {
+                          alert(
+                            "Screen capture is not supported in your browser. Please use Auto Capture or include a manual screenshot."
+                          );
                         }
                       }}
                       className="text-sm text-green-600 hover:text-green-800 flex items-center"
-                      title="Use browser's native screen capture (more reliable)"
+                      title="Use browser's native screen capture (requires permission)"
                     >
                       <Camera className="h-4 w-4 mr-1" />
-                      Manual
+                      Screen Capture
                     </button>
                   </div>
                 )}
@@ -192,14 +188,42 @@ const BugReportButton = () => {
 
               {screenshot && (
                 <div className="border border-gray-200 rounded-lg p-2">
-                  <img
-                    src={screenshot}
-                    alt="Screenshot preview"
-                    className="w-full h-32 object-contain rounded"
-                  />
-                  <p className="text-xs text-gray-500 text-center mt-1">
-                    Screenshot captured
-                  </p>
+                  <div className="relative">
+                    <img
+                      src={screenshot}
+                      alt="Screenshot preview"
+                      className="w-full h-32 object-contain rounded cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={() => {
+                        // Open screenshot in new tab for full view
+                        const win = window.open();
+                        if (win) {
+                          win.document.write(`
+                            <html>
+                              <head><title>Bug Report Screenshot</title></head>
+                              <body style="margin: 0; background: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+                                <img src="${screenshot}" style="max-width: 95%; max-height: 95%; border: 1px solid #ddd; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+                              </body>
+                            </html>
+                          `);
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={() => setScreenshot(null)}
+                      className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                      title="Remove screenshot"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                  <div className="flex justify-between items-center mt-2">
+                    <p className="text-xs text-gray-500">
+                      ✅ Screenshot ready (click to view full size)
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {Math.round(screenshot.length / 1024)}KB
+                    </p>
+                  </div>
                 </div>
               )}
             </div>

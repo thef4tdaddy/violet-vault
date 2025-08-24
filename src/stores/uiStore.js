@@ -13,12 +13,9 @@ const migrateOldData = async () => {
 
     // Migrate if old data exists
     if (oldData) {
-      logger.info(
-        "Migrating data from old budget-store to violet-vault-store",
-        {
-          source: "migrateOldData",
-        },
-      );
+      logger.info("Migrating data from old budget-store to violet-vault-store", {
+        source: "migrateOldData",
+      });
 
       const parsedOldData = JSON.parse(oldData);
 
@@ -31,8 +28,7 @@ const migrateOldData = async () => {
             transactions: parsedOldData.state.transactions || [],
             allTransactions: parsedOldData.state.allTransactions || [],
             savingsGoals: parsedOldData.state.savingsGoals || [],
-            supplementalAccounts:
-              parsedOldData.state.supplementalAccounts || [],
+            supplementalAccounts: parsedOldData.state.supplementalAccounts || [],
             debts: parsedOldData.state.debts || [],
             unassignedCash: parsedOldData.state.unassignedCash || 0,
             biweeklyAllocation: parsedOldData.state.biweeklyAllocation || 0,
@@ -42,16 +38,10 @@ const migrateOldData = async () => {
           version: 0,
         };
 
-        localStorage.setItem(
-          "violet-vault-store",
-          JSON.stringify(transformedData),
-        );
-        logger.info(
-          "Data migration completed successfully - replaced existing data",
-          {
-            source: "migrateOldData",
-          },
-        );
+        localStorage.setItem("violet-vault-store", JSON.stringify(transformedData));
+        logger.info("Data migration completed successfully - replaced existing data", {
+          source: "migrateOldData",
+        });
 
         // Seed Dexie with migrated data so hooks can access it
         await budgetDb.bulkUpsertEnvelopes(transformedData.state.envelopes);
@@ -59,15 +49,11 @@ const migrateOldData = async () => {
         await budgetDb.bulkUpsertTransactions(
           transformedData.state.allTransactions.length > 0
             ? transformedData.state.allTransactions
-            : transformedData.state.transactions,
+            : transformedData.state.transactions
         );
-        await budgetDb.bulkUpsertSavingsGoals(
-          transformedData.state.savingsGoals,
-        );
+        await budgetDb.bulkUpsertSavingsGoals(transformedData.state.savingsGoals);
         await budgetDb.bulkUpsertDebts(transformedData.state.debts);
-        await budgetDb.bulkUpsertPaychecks(
-          transformedData.state.paycheckHistory,
-        );
+        await budgetDb.bulkUpsertPaychecks(transformedData.state.paycheckHistory);
 
         // Save unassignedCash and actualBalance to Dexie metadata
         await setBudgetMetadata({
@@ -205,7 +191,7 @@ const storeInitializer = (set, get) => ({
 
       // Import and start the cloud sync service
       const { cloudSyncService } = await import("../services/cloudSyncService");
-      
+
       const syncConfig = {
         budgetId: authState.budgetId,
         encryptionKey: authState.encryptionKey,
@@ -241,13 +227,10 @@ const storeInitializer = (set, get) => ({
 
   // Legacy compatibility: Debt management moved to TanStack Query hooks
   setDebts: () => {
-    logger.warn(
-      "setDebts called - debts are now managed by TanStack Query/useDebts hook",
-      {
-        source: "budgetStore.setDebts",
-        migration: "Use useDebts() hook instead",
-      },
-    );
+    logger.warn("setDebts called - debts are now managed by TanStack Query/useDebts hook", {
+      source: "budgetStore.setDebts",
+      migration: "Use useDebts() hook instead",
+    });
   },
 });
 
@@ -274,8 +257,8 @@ if (LOCAL_ONLY_MODE) {
           dataLoaded: state.dataLoaded,
         }),
       }),
-      { name: "violet-vault-ui-devtools" },
-    ),
+      { name: "violet-vault-ui-devtools" }
+    )
   );
 }
 
