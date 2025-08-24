@@ -91,10 +91,20 @@ export function calculatePayoffProjection(debt) {
   }
 
   // Calculate months to payoff using amortization formula
-  const monthsToPayoff = Math.ceil(
-    -Math.log(1 - (balance * monthlyRate) / monthlyPayment) / Math.log(1 + monthlyRate)
-  );
+  let monthsToPayoffCalculation;
+  try {
+    monthsToPayoffCalculation = Math.ceil(
+      -Math.log(1 - (balance * monthlyRate) / monthlyPayment) / Math.log(1 + monthlyRate)
+    );
+  } catch (error) {
+    return {
+      monthsToPayoff: null,
+      totalInterest: null,
+      payoffDate: null,
+    };
+  }
 
+  const monthsToPayoff = monthsToPayoffCalculation;
   const totalPayments = monthlyPayment * monthsToPayoff;
   const totalInterest = totalPayments - balance;
 
@@ -199,12 +209,7 @@ export function enrichDebt(
 ) {
   try {
     const nextPaymentDate = calculateNextPaymentDate(debt, relatedBill);
-    // const payoffInfo = calculatePayoffProjection(debt); // Temporarily disabled for debugging
-    const payoffInfo = {
-      monthsToPayoff: null,
-      totalInterest: null,
-      payoffDate: null,
-    };
+    const payoffInfo = calculatePayoffProjection(debt);
 
     return {
       ...debt,
