@@ -28,7 +28,8 @@ import logger from "../../utils/logger";
 const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setActiveView }) => {
   // Use TanStack Query hooks for budget metadata
   const { unassignedCash } = useUnassignedCash();
-  const {} = useActualBalance();
+  // useActualBalance hook called but values not currently needed
+  useActualBalance();
 
   // Get bill operations from TanStack Query hook instead of budget store
   const { updateBill: tanStackUpdateBill, addBill: tanStackAddBill } = useBills();
@@ -43,8 +44,6 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
     savingsGoals,
     supplementalAccounts,
     transactions,
-    setActualBalance: _setActualBalance,
-    reconcileTransaction: _reconcileTransaction,
     addSavingsGoal,
     updateSavingsGoal,
     deleteSavingsGoal,
@@ -54,10 +53,6 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
     transferFromSupplementalAccount,
     addEnvelope,
     updateEnvelope,
-    updateTransaction: _updateTransaction,
-    deleteTransaction: _deleteTransaction,
-    setAllTransactions: _setAllTransactions,
-    setTransactions: _setTransactions,
   } = budget;
 
   // Filter out null/undefined transactions to prevent runtime errors

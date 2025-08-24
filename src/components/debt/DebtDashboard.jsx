@@ -27,7 +27,7 @@ const DebtDashboard = () => {
     debts,
     debtStats,
     debtsByType,
-    debtsByStatus: _debtsByStatus, // eslint-disable-line no-unused-vars
+    // debtsByStatus not currently used
     createDebt,
     updateDebt,
     deleteDebt,

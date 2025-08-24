@@ -69,11 +69,7 @@ const Layout = () => {
   const { isLocalOnlyMode, localOnlyUser } = useLocalOnlyMode();
 
   // Initialize data from Dexie to Zustand on app startup
-  const {
-    isInitialized,
-    initError,
-    dataLoaded,
-  } = useDataInitialization();
+  const { isInitialized, initError, dataLoaded } = useDataInitialization();
 
   const { exportData, importData, resetEncryptionAndStartFresh } = useDataManagement();
 
@@ -251,7 +247,6 @@ const MainContent = ({
   const totalSavingsBalance = Array.isArray(savingsGoals)
     ? savingsGoals.reduce((sum, goal) => sum + goal.currentAmount, 0)
     : 0;
-  const _totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
 
   // Calculate total biweekly funding need across all envelope types
   const totalBiweeklyNeed = Array.isArray(envelopes)
