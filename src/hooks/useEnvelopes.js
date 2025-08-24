@@ -48,6 +48,22 @@ const useEnvelopes = (options = {}) => {
         count: envelopes.length,
       });
 
+      // Debug: Check for corrupted envelopes (missing critical fields)
+      const corruptedEnvelopes = envelopes.filter(
+        (env) => !env.name || !env.category,
+      );
+      if (corruptedEnvelopes.length > 0) {
+        logger.warn("Found corrupted envelopes missing critical fields", {
+          count: corruptedEnvelopes.length,
+          corruptedEnvelopes: corruptedEnvelopes.map((env) => ({
+            id: env.id,
+            name: env.name || "[MISSING NAME]",
+            category: env.category || "[MISSING CATEGORY]",
+            currentBalance: env.currentBalance,
+          })),
+        });
+      }
+
       // Ensure all envelopes have envelopeType set for consistency
       envelopes = envelopes.map((envelope) => ({
         ...envelope,
@@ -382,6 +398,29 @@ const useEnvelopes = (options = {}) => {
     return Array.from(categories).sort();
   };
 
+  // Repair corrupted envelopes
+  const repairCorruptedEnvelope = async (
+    envelopeId,
+    name,
+    category = "utilities",
+  ) => {
+    logger.info("Repairing corrupted envelope", { envelopeId, name, category });
+
+    const updates = {
+      name,
+      category,
+      // Set reasonable defaults for missing fields
+      targetAmount: 100,
+      monthlyBudget: 50,
+      biweeklyAllocation: 25,
+      envelopeType: AUTO_CLASSIFY_ENVELOPE_TYPE(category),
+      description: `Repaired envelope: ${name}`,
+      lastUpdate: new Date().toISOString(),
+    };
+
+    return updateEnvelopeMutation.mutateAsync({ id: envelopeId, updates });
+  };
+
   return {
     // Data
     envelopes,
@@ -416,6 +455,7 @@ const useEnvelopes = (options = {}) => {
     // Utility functions
     getEnvelopeById,
     getEnvelopesByCategory,
+    repairCorruptedEnvelope,
 
     // Query controls
     refetch: envelopesQuery.refetch,
