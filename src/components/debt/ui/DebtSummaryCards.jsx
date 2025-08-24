@@ -62,8 +62,7 @@ const DebtSummaryCards = ({ stats, onDueSoonClick }) => {
 };
 
 const DebtSummaryCard = ({
-  // eslint-disable-next-line no-unused-vars
-  icon: _Icon,
+  icon: Icon,
   label,
   value,
   subtext,
@@ -111,7 +110,7 @@ const DebtSummaryCard = ({
             className={`absolute inset-0 ${colorClasses[color]} rounded-2xl blur-lg opacity-30`}
           ></div>
           <div className={`relative ${colorClasses[color]} p-3 rounded-2xl`}>
-            <_Icon className="h-6 w-6 text-white" />
+            <Icon className="h-6 w-6 text-white" />
           </div>
         </div>
         <div className="flex-1">
