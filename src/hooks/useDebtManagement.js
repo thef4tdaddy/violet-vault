@@ -32,9 +32,9 @@ export const useDebtManagement = () => {
   const { transactions = [], createTransaction } = useTransactions();
 
   const debts = debtsHook?.debts || [];
-  const createDebtData = debtsHook?.createDebt;
-  const updateDebtData = debtsHook?.updateDebt;
-  const deleteDebtData = debtsHook?.deleteDebt;
+  const createDebtData = debtsHook?.addDebtAsync;
+  const updateDebtData = debtsHook?.updateDebtAsync;
+  const deleteDebtData = debtsHook?.deleteDebtAsync;
 
   // Calculate debt statistics
   const debtStats = useMemo(() => {
@@ -70,11 +70,16 @@ export const useDebtManagement = () => {
 
       // Find related transactions
       const relatedTransactions = transactions.filter(
-        (transaction) => transaction.debtId === debt.id
+        (transaction) => transaction.debtId === debt.id,
       );
 
       // Enrich the debt with calculated properties
-      return enrichDebt(debt, relatedBill, relatedEnvelope, relatedTransactions);
+      return enrichDebt(
+        debt,
+        relatedBill,
+        relatedEnvelope,
+        relatedTransactions,
+      );
     });
   }, [debts, bills, envelopes, transactions]);
 
@@ -188,7 +193,7 @@ export const useDebtManagement = () => {
       });
 
       // Update the debt
-      await updateDebtData(debtId, updatedDebt);
+      await updateDebtData({ id: debtId, updates: updatedDebt });
 
       // Create a transaction record
       await createTransaction({
@@ -225,9 +230,12 @@ export const useDebtManagement = () => {
       });
 
       // Update debt with payment due date from bill
-      await updateDebtData(debtId, {
-        paymentDueDate: bill.dueDate,
-        envelopeId: bill.envelopeId, // Use bill's envelope
+      await updateDebtData({
+        id: debtId,
+        updates: {
+          paymentDueDate: bill.dueDate,
+          envelopeId: bill.envelopeId, // Use bill's envelope
+        },
       });
 
       logger.info("Debt linked to bill successfully");
@@ -243,9 +251,12 @@ export const useDebtManagement = () => {
       const syncPromises = debts.map(async (debt) => {
         const linkedBill = bills.find((bill) => bill.debtId === debt.id);
         if (linkedBill && debt.paymentDueDate !== linkedBill.dueDate) {
-          await updateDebtData(debt.id, {
-            paymentDueDate: linkedBill.dueDate,
-            minimumPayment: linkedBill.amount,
+          await updateDebtData({
+            id: debt.id,
+            updates: {
+              paymentDueDate: linkedBill.dueDate,
+              minimumPayment: linkedBill.amount,
+            },
           });
         }
       });
@@ -268,7 +279,7 @@ export const useDebtManagement = () => {
       }
 
       // Delete the debt
-      await deleteDebtData(debtId);
+      await deleteDebtData({ id: debtId });
       logger.info("Debt deleted successfully");
     } catch (error) {
       logger.error("Error deleting debt:", error);
