@@ -12,7 +12,6 @@ import {
 import {
   compareDebtStrategies,
   calculateExtraPaymentImpact,
-  DEBT_STRATEGIES,
 } from "../../utils/debtStrategies";
 
 /**
@@ -21,7 +20,7 @@ import {
  */
 const DebtStrategies = ({ debts }) => {
   const [extraPayment, setExtraPayment] = useState(100);
-  const [selectedStrategy, setSelectedStrategy] = useState(DEBT_STRATEGIES.AVALANCHE);
+  const [selectedStrategy, setSelectedStrategy] = useState("avalanche");
 
   // Filter to active debts only
   const activeDebts = useMemo(
@@ -273,8 +272,8 @@ const DebtStrategies = ({ debts }) => {
             onChange={(e) => setSelectedStrategy(e.target.value)}
             className="ml-auto px-3 py-1 border border-gray-300 rounded text-sm"
           >
-            <option value={DEBT_STRATEGIES.AVALANCHE}>Avalanche Strategy</option>
-            <option value={DEBT_STRATEGIES.SNOWBALL}>Snowball Strategy</option>
+            <option value="avalanche">Avalanche Strategy</option>
+            <option value="snowball">Snowball Strategy</option>
           </select>
         </div>
 
