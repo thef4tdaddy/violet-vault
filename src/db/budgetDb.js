@@ -5,7 +5,7 @@ export class VioletVaultDB extends Dexie {
     super("VioletVault");
 
     // Enhanced schema with comprehensive indexes for optimal query performance
-    this.version(5).stores({
+    this.version(6).stores({
       // Main budget data with timestamps for versioning
       budget: "id, lastModified, version",
 
@@ -18,7 +18,7 @@ export class VioletVaultDB extends Dexie {
 
       // Bills table with indexes for due date and payment status queries
       bills:
-        "id, name, dueDate, amount, category, isPaid, isRecurring, frequency, lastModified, [dueDate+isPaid], [category+isPaid], [isRecurring+frequency], [isPaid+dueDate]",
+        "id, name, dueDate, amount, category, isPaid, isRecurring, frequency, envelopeId, lastModified, [dueDate+isPaid], [category+isPaid], [isRecurring+frequency], [isPaid+dueDate], [envelopeId]",
 
       // Savings Goals table for goal tracking and progress monitoring
       savingsGoals:
