@@ -5,7 +5,7 @@ export class VioletVaultDB extends Dexie {
     super("VioletVault");
 
     // Enhanced schema with comprehensive indexes for optimal query performance
-    this.version(6).stores({
+    this.version(7).stores({
       // Main budget data with timestamps for versioning
       budget: "id, lastModified, version",
 
@@ -37,6 +37,12 @@ export class VioletVaultDB extends Dexie {
 
       // Debts table for debt tracking
       debts: "id, name, creditor, type, status, currentBalance, minimumPayment, lastModified",
+
+      // Budget History Tracking tables
+      budgetCommits: "hash, timestamp, message, author, parentHash, deviceFingerprint, [author+timestamp], [timestamp]",
+      budgetChanges: "++id, commitHash, entityType, entityId, changeType, description, [entityType+commitHash], [commitHash]",
+      budgetBranches: "++id, name, description, sourceCommitHash, headCommitHash, author, created, isActive, isMerged, [isActive], [name]",
+      budgetTags: "++id, name, description, commitHash, tagType, author, created, [tagType+created], [commitHash]",
     });
 
     // Enhanced hooks for automatic timestamping across all tables
@@ -447,6 +453,23 @@ export class VioletVaultDB extends Dexie {
       lastOptimized: Date.now(),
     };
   }
+
+  // Budget History Tracking methods
+  async createBudgetCommit(commit) {
+    return this.budgetCommits.put(commit);
+  }
+
+  async createBudgetChanges(changes) {
+    return this.budgetChanges.bulkPut(changes);
+  }
+
+  async createBudgetBranch(branch) {
+    return this.budgetBranches.put(branch);
+  }
+
+  async createBudgetTag(tag) {
+    return this.budgetTags.put(tag);
+  }
 }
 
 export const budgetDb = new VioletVaultDB();
@@ -543,6 +566,10 @@ export const clearData = async () => {
     budgetDb.paycheckHistory.clear(),
     budgetDb.auditLog.clear(),
     budgetDb.cache.clear(),
+    budgetDb.budgetCommits.clear(),
+    budgetDb.budgetChanges.clear(),
+    budgetDb.budgetBranches.clear(),
+    budgetDb.budgetTags.clear(),
   ]);
 };
 
