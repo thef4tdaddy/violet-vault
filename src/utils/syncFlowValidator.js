@@ -218,7 +218,7 @@ export const validateAllSyncFlows = async () => {
         );
         const correct = result.direction === scenario.expected;
         directionResults.push(`${scenario.name}: ${correct ? "✅" : "❌"}`);
-      } catch (error) {
+      } catch {
         directionResults.push(`${scenario.name}: ❌ Error`);
       }
     }

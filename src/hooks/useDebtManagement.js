@@ -1,4 +1,4 @@
-import { useMemo, useEffect } from "react";
+import { useMemo } from "react";
 import useDebts from "./useDebts";
 import useBills from "./useBills";
 import useEnvelopes from "./useEnvelopes";
@@ -14,7 +14,6 @@ import {
 import {
   calculateInterestPortion,
   convertPaymentFrequency,
-  createSpecialTerms,
   enrichDebt,
   getUpcomingPayments,
 } from "../utils/debtCalculations";
@@ -70,16 +69,11 @@ export const useDebtManagement = () => {
 
       // Find related transactions
       const relatedTransactions = transactions.filter(
-        (transaction) => transaction.debtId === debt.id,
+        (transaction) => transaction.debtId === debt.id
       );
 
       // Enrich the debt with calculated properties
-      return enrichDebt(
-        debt,
-        relatedBill,
-        relatedEnvelope,
-        relatedTransactions,
-      );
+      return enrichDebt(debt, relatedBill, relatedEnvelope, relatedTransactions);
     });
   }, [debts, bills, envelopes, transactions]);
 
@@ -110,7 +104,6 @@ export const useDebtManagement = () => {
       const {
         paymentMethod,
         createBill: shouldCreateBill,
-        envelopeId,
         existingBillId,
         newEnvelopeName,
       } = connectionData || {};

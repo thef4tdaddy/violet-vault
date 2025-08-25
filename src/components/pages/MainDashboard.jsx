@@ -272,7 +272,9 @@ const Dashboard = ({ setActiveView }) => {
                   isBalanced ? "text-green-900" : difference > 0 ? "text-green-900" : "text-red-900"
                 }`}
               >
-                {isBalanced ? "Accounts Balanced!" : `${difference > 0 ? "+" : ""}$${difference.toFixed(2)}`}
+                {isBalanced
+                  ? "Accounts Balanced!"
+                  : `${difference > 0 ? "+" : ""}$${difference.toFixed(2)}`}
               </div>
               <p
                 className={`text-sm ${

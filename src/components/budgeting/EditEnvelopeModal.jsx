@@ -1174,14 +1174,14 @@ const EditEnvelopeModal = ({
           </div>
         </div>
       </div>
-      
+
       {/* Delete Confirmation Modal */}
       <DeleteEnvelopeModal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDeleteConfirm}
         envelope={envelope}
-        connectedBills={allBills?.filter(bill => bill.envelopeId === envelope?.id) || []}
+        connectedBills={allBills?.filter((bill) => bill.envelopeId === envelope?.id) || []}
         isDeleting={isSubmitting}
       />
     </div>

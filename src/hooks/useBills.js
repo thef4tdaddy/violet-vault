@@ -258,30 +258,30 @@ const useBills = (options = {}) => {
       // If envelope should also be deleted
       if (envelopeId) {
         logger.info(`Deleting bill ${billId} and connected envelope ${envelopeId}`);
-        
+
         // Get the envelope to check if it has money
         const envelope = await budgetDb.envelopes.get(envelopeId);
-        
+
         if (envelope && envelope.currentBalance > 0) {
           // Transfer money to unassigned cash before deletion
           const { getUnassignedCash, setUnassignedCash } = await import("../db/budgetDb");
           const currentUnassignedCash = await getUnassignedCash();
           const newUnassignedCash = currentUnassignedCash + envelope.currentBalance;
-          
+
           await setUnassignedCash(newUnassignedCash);
-          
+
           logger.info(
             `Transferred $${envelope.currentBalance.toFixed(2)} from deleted envelope "${envelope.name}" to unassigned cash`
           );
         }
-        
+
         // Delete the envelope
         await budgetDb.envelopes.delete(envelopeId);
-        
+
         // Apply optimistic update for envelope too
         await optimisticHelpers.removeEnvelope(envelopeId);
       }
-      
+
       // Apply optimistic update for bill
       await optimisticHelpers.removeBill(billId);
 
@@ -293,7 +293,7 @@ const useBills = (options = {}) => {
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
-      
+
       // If envelope was also deleted, invalidate envelope queries
       if (result?.envelopeId) {
         queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });

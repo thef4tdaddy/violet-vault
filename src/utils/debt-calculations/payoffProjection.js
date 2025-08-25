@@ -50,7 +50,7 @@ export function calculatePayoffProjection(debt) {
     }
 
     calculatedMonths = Math.ceil(-Math.log(logValue) / Math.log(1 + monthlyRate));
-  } catch (err) {
+  } catch {
     return {
       monthsToPayoff: null,
       totalInterest: null,
