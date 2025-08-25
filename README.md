@@ -220,6 +220,7 @@ VioletVault takes your financial privacy seriously:
 - **[⚠️ Lint Warnings](docs/LINT_WARNINGS.md)** - ESLint warning tracking and resolution
 - **[🔄 Refactoring Analysis](docs/Refactoring-Analysis.md)** - Architecture improvement plans
 - **[🛠️ New Utilities Analysis](docs/New-Utilities-Analysis.md)** - Feature analysis and utilities
+- **[❓ Troubleshooting FAQ](docs/Troubleshooting-FAQ.md)** - Common issues and solutions
 
 ## 🗺️ Roadmap
 
