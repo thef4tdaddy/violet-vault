@@ -18,6 +18,12 @@ service cloud.firestore {
       }
     }
 
+    // Locks collection for sync coordination
+    match /locks/{lockId} {
+      // Allow authenticated users to read/write/create/delete lock documents
+      allow read, write, create, delete: if request.auth != null;
+    }
+
     // Fallback: deny all other access
     match /{document=**} {
       allow read, write: if false;

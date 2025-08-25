@@ -53,6 +53,12 @@ service cloud.firestore {
       }
     }
 
+    // Locks collection for sync coordination
+    match /locks/{lockId} {
+      // Allow authenticated users to read/write/create/delete lock documents
+      allow read, write, create, delete: if request.auth != null;
+    }
+
     // Fallback: deny all other access
     match /{document=**} {
       allow read, write: if false;
@@ -87,6 +93,12 @@ service cloud.firestore {
           (get(/databases/$(database)/documents/budgets/$(budgetId)).data.ownerId == request.auth.uid ||
            request.auth.uid in get(/databases/$(database)/documents/budgets/$(budgetId)).data.allowedUsers);
       }
+    }
+
+    // Locks collection for sync coordination
+    match /locks/{lockId} {
+      // Allow authenticated users to read/write/create/delete lock documents
+      allow read, write, create, delete: if request.auth != null;
     }
 
     // User profiles (optional - for team features)
