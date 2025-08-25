@@ -9,7 +9,7 @@ import logger from "../../utils/logger";
 const OnboardingTutorial = ({ children, setActiveView }) => {
   const {
     isOnboarded,
-    currentTutorialStep,
+    // currentTutorialStep, // Available for future use
     endTutorialStep,
     markStepComplete,
     startTutorialStep,
@@ -289,7 +289,7 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
   }
 
   const step = tutorialSteps[currentStep];
-  const progress = getProgress();
+  // const progress = getProgress(); // Available for future progress indicators
 
   return (
     <>

@@ -7,7 +7,6 @@ import {
   PAYMENT_FREQUENCIES,
   COMPOUND_FREQUENCIES,
 } from "../constants/debts";
-import logger from "./logger.js";
 
 // Import separated debt calculation functions
 import { calculateNextPaymentDate } from "./debt-calculations/nextPaymentDate";
@@ -78,10 +77,11 @@ export function createSpecialTerms(debtType, providedTerms = {}) {
  * @returns {Object} Enriched debt object
  */
 export function enrichDebt(
-  debt,
-  relatedBill = null,
-  relatedEnvelope = null,
-  relatedTransactions = []
+  debt
+  // TODO: Re-enable these parameters when enrichment is restored
+  // relatedBill = null,
+  // relatedEnvelope = null,
+  // relatedTransactions = []
 ) {
   // COMPLETELY DISABLE ENRICHMENT TO TEST - just return basic debt
   return {

@@ -8,9 +8,7 @@ import logger from "../utils/logger";
 // Helper to trigger sync for envelope changes
 const triggerEnvelopeSync = (changeType) => {
   if (typeof window !== "undefined" && window.cloudSyncService) {
-    window.cloudSyncService.triggerSyncForCriticalChange(
-      `envelope_${changeType}`,
-    );
+    window.cloudSyncService.triggerSyncForCriticalChange(`envelope_${changeType}`);
   }
 };
 
@@ -20,12 +18,7 @@ const triggerEnvelopeSync = (changeType) => {
  */
 const useEnvelopes = (options = {}) => {
   const queryClient = useQueryClient();
-  const {
-    category,
-    includeArchived = false,
-    sortBy = "name",
-    sortOrder = "asc",
-  } = options;
+  const { category, includeArchived = false, sortBy = "name", sortOrder = "asc" } = options;
 
   // Zustand no longer contains data arrays - only UI state
   // All data operations now go through TanStack Query → Dexie
@@ -49,9 +42,7 @@ const useEnvelopes = (options = {}) => {
       });
 
       // Debug: Check for corrupted envelopes (missing critical fields)
-      const corruptedEnvelopes = envelopes.filter(
-        (env) => !env.name || !env.category,
-      );
+      const corruptedEnvelopes = envelopes.filter((env) => !env.name || !env.category);
       if (corruptedEnvelopes.length > 0) {
         logger.warn("Found corrupted envelopes missing critical fields", {
           count: corruptedEnvelopes.length,
@@ -68,17 +59,14 @@ const useEnvelopes = (options = {}) => {
       envelopes = envelopes.map((envelope) => ({
         ...envelope,
         envelopeType:
-          envelope.envelopeType ||
-          AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category || "expenses"),
+          envelope.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(envelope.category || "expenses"),
       }));
 
       // Apply filters
       let filteredEnvelopes = envelopes;
 
       if (category) {
-        filteredEnvelopes = envelopes.filter(
-          (env) => env.category === category,
-        );
+        filteredEnvelopes = envelopes.filter((env) => env.category === category);
       }
 
       if (!includeArchived) {
@@ -132,7 +120,7 @@ const useEnvelopes = (options = {}) => {
       initialData: undefined, // Remove initialData to prevent persister errors
       enabled: true,
     }),
-    [category, includeArchived, sortBy, sortOrder, queryFunction],
+    [category, includeArchived, sortBy, sortOrder, queryFunction]
   );
 
   // Main envelopes query
@@ -187,7 +175,7 @@ const useEnvelopes = (options = {}) => {
 
       return newEnvelope;
     },
-    onSuccess: (result) => {
+    onSuccess: () => {
       // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
@@ -215,10 +203,7 @@ const useEnvelopes = (options = {}) => {
         ...updates,
         // Preserve essential fields if they exist and aren't being intentionally cleared
         name: updates.name !== undefined ? updates.name : existingEnvelope.name,
-        category:
-          updates.category !== undefined
-            ? updates.category
-            : existingEnvelope.category,
+        category: updates.category !== undefined ? updates.category : existingEnvelope.category,
       };
 
       // Log envelope updates for debugging corruption issues
@@ -241,7 +226,7 @@ const useEnvelopes = (options = {}) => {
 
       return { id, updates };
     },
-    onSuccess: (result) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       // Trigger immediate sync for envelope update
@@ -262,30 +247,30 @@ const useEnvelopes = (options = {}) => {
 
       if (envelope && envelope.currentBalance > 0) {
         // Transfer the money to unassigned cash before deletion
-        const { getUnassignedCash, setUnassignedCash } = await import(
-          "../db/budgetDb"
-        );
+        const { getUnassignedCash, setUnassignedCash } = await import("../db/budgetDb");
         const currentUnassignedCash = await getUnassignedCash();
-        const newUnassignedCash =
-          currentUnassignedCash + envelope.currentBalance;
+        const newUnassignedCash = currentUnassignedCash + envelope.currentBalance;
 
         await setUnassignedCash(newUnassignedCash);
 
         logger.info(
-          `Transferred $${envelope.currentBalance.toFixed(2)} from deleted envelope "${envelope.name}" to unassigned cash`,
+          `Transferred $${envelope.currentBalance.toFixed(2)} from deleted envelope "${envelope.name}" to unassigned cash`
         );
       }
 
       // Handle connected bills if requested
       if (deleteBillsToo) {
         logger.info(`Deleting envelope ${envelopeId} and connected bills`);
-        
+
         // Get all bills connected to this envelope
-        const connectedBills = await budgetDb.bills.where('envelopeId').equals(envelopeId).toArray();
-        
+        const connectedBills = await budgetDb.bills
+          .where("envelopeId")
+          .equals(envelopeId)
+          .toArray();
+
         if (connectedBills.length > 0) {
           logger.info(`Found ${connectedBills.length} connected bills to delete`);
-          
+
           // Delete each connected bill
           for (const bill of connectedBills) {
             await budgetDb.bills.delete(bill.id);
@@ -294,11 +279,14 @@ const useEnvelopes = (options = {}) => {
         }
       } else {
         // Disconnect bills but don't delete them
-        const connectedBills = await budgetDb.bills.where('envelopeId').equals(envelopeId).toArray();
-        
+        const connectedBills = await budgetDb.bills
+          .where("envelopeId")
+          .equals(envelopeId)
+          .toArray();
+
         if (connectedBills.length > 0) {
           logger.info(`Disconnecting ${connectedBills.length} bills from envelope ${envelopeId}`);
-          
+
           // Remove envelope connection from bills
           for (const bill of connectedBills) {
             await budgetDb.bills.update(bill.id, { envelopeId: null });
@@ -315,14 +303,14 @@ const useEnvelopes = (options = {}) => {
 
       return { envelopeId, deleteBillsToo, transferredAmount: envelope?.currentBalance || 0 };
     },
-    onSuccess: (result) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.budgetMetadata });
-      
+
       // Always invalidate bill queries since they might be affected by disconnection/deletion
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
-      
+
       // Trigger immediate sync for envelope deletion
       triggerEnvelopeSync("deleted");
     },
@@ -335,12 +323,7 @@ const useEnvelopes = (options = {}) => {
   // Fund transfer mutation
   const transferFundsMutation = useMutation({
     mutationKey: ["envelopes", "transfer"],
-    mutationFn: async ({
-      fromEnvelopeId,
-      toEnvelopeId,
-      amount,
-      description,
-    }) => {
+    mutationFn: async ({ fromEnvelopeId, toEnvelopeId, amount, description }) => {
       // Get current envelopes from Dexie for transfer calculation
       const fromEnvelope = await budgetDb.envelopes.get(fromEnvelopeId);
       const toEnvelope = await budgetDb.envelopes.get(toEnvelopeId);
@@ -368,8 +351,7 @@ const useEnvelopes = (options = {}) => {
       const transaction = {
         id: `transfer_${Date.now()}`,
         amount,
-        description:
-          description || `Transfer: ${fromEnvelopeId} → ${toEnvelopeId}`,
+        description: description || `Transfer: ${fromEnvelopeId} → ${toEnvelopeId}`,
         type: "transfer",
         fromEnvelopeId,
         toEnvelopeId,
@@ -392,7 +374,7 @@ const useEnvelopes = (options = {}) => {
 
       return { success: true, transaction };
     },
-    onSuccess: (result) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
@@ -407,26 +389,19 @@ const useEnvelopes = (options = {}) => {
 
   // Computed values
   const envelopes = envelopesQuery.data || [];
-  const totalBalance = envelopes.reduce(
-    (sum, env) => sum + (env.currentBalance || 0),
-    0,
-  );
-  const totalTargetAmount = envelopes.reduce(
-    (sum, env) => sum + (env.targetAmount || 0),
-    0,
-  );
+  const totalBalance = envelopes.reduce((sum, env) => sum + (env.currentBalance || 0), 0);
+  const totalTargetAmount = envelopes.reduce((sum, env) => sum + (env.targetAmount || 0), 0);
   const underfundedEnvelopes = envelopes.filter(
-    (env) => (env.currentBalance || 0) < (env.targetAmount || 0),
+    (env) => (env.currentBalance || 0) < (env.targetAmount || 0)
   );
   const overfundedEnvelopes = envelopes.filter(
-    (env) => (env.currentBalance || 0) > (env.targetAmount || 0),
+    (env) => (env.currentBalance || 0) > (env.targetAmount || 0)
   );
 
   // Utility functions
   const getEnvelopeById = (id) => envelopes.find((env) => env.id === id);
 
-  const getEnvelopesByCategory = (cat) =>
-    envelopes.filter((env) => env.category === cat);
+  const getEnvelopesByCategory = (cat) => envelopes.filter((env) => env.category === cat);
 
   const getAvailableCategories = () => {
     const categories = new Set(envelopes.map((env) => env.category));
@@ -434,11 +409,7 @@ const useEnvelopes = (options = {}) => {
   };
 
   // Repair corrupted envelopes
-  const repairCorruptedEnvelope = async (
-    envelopeId,
-    name,
-    category = "utilities",
-  ) => {
+  const repairCorruptedEnvelope = async (envelopeId, name, category = "utilities") => {
     logger.info("Repairing corrupted envelope", { envelopeId, name, category });
 
     const updates = {
@@ -502,8 +473,7 @@ const useEnvelopes = (options = {}) => {
 
     // Query controls
     refetch: envelopesQuery.refetch,
-    invalidate: () =>
-      queryClient.invalidateQueries({ queryKey: queryKeys.envelopes }),
+    invalidate: () => queryClient.invalidateQueries({ queryKey: queryKeys.envelopes }),
   };
 };
 

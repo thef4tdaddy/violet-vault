@@ -43,7 +43,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
   });
 
   // Get envelopes and bills for dropdown selection using TanStack Query
-  const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
+  const { envelopes = [] } = useEnvelopes();
   const { bills = [], isLoading: billsLoading } = useBills();
   const [formData, setFormData] = useState({
     name: debt?.name || "",

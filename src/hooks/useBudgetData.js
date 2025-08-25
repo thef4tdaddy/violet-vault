@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useBudgetStore } from "../stores/uiStore";
+// import { useBudgetStore } from "../stores/uiStore"; // Available for future use
 import { queryKeys, optimisticHelpers, prefetchHelpers } from "../utils/queryClient";
 import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "../db/budgetDb";
 // import { useTransactions } from "./useTransactions";
@@ -20,16 +20,8 @@ import { calculatePaycheckBalances, validateBalances } from "../utils/balanceCal
 const useBudgetData = () => {
   const queryClient = useQueryClient();
 
-  // Get UI store for UI state only (data comes from TanStack Query → Dexie)
-  const budgetStore = useBudgetStore();
-  const {
-    // UI State only
-    isOnline,
-    dataLoaded,
-    cloudSyncEnabled,
-    biweeklyAllocation,
-    isUnassignedCashModalOpen,
-  } = budgetStore;
+  // Store hook available for future use
+  // const budgetStore = useBudgetStore();
 
   // Create reconcileTransaction mutation directly to avoid circular dependencies
 
@@ -114,8 +106,8 @@ const useBudgetData = () => {
       }, 0);
 
       // Ensure all values are numbers, not NaN
-      const unassignedCashValue = parseFloat(budgetMetadata?.unassignedCash ?? unassignedCash) || 0;
-      const actualBalanceValue = parseFloat(budgetMetadata?.actualBalance ?? actualBalance) || 0;
+      const unassignedCashValue = parseFloat(budgetMetadata?.unassignedCash) || 0;
+      const actualBalanceValue = parseFloat(budgetMetadata?.actualBalance) || 0;
 
       const summary = {
         totalEnvelopeBalance: isNaN(totalEnvelopeBalance) ? 0 : totalEnvelopeBalance,

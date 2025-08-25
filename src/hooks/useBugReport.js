@@ -683,7 +683,7 @@ const useBugReport = () => {
           let formattedDesc = desc;
 
           // Extract code blocks (both ``` and single ` formats)
-          formattedDesc = formattedDesc.replace(/```[\s\S]*?```/g, (match, offset) => {
+          formattedDesc = formattedDesc.replace(/```[\s\S]*?```/g, (match) => {
             const placeholder = `__CODE_BLOCK_${codeBlocks.length}__`;
             codeBlocks.push({
               content: match,
@@ -693,7 +693,7 @@ const useBugReport = () => {
           });
 
           // Extract inline code
-          formattedDesc = formattedDesc.replace(/`[^`]+`/g, (match, offset) => {
+          formattedDesc = formattedDesc.replace(/`[^`]+`/g, (match) => {
             const placeholder = `__INLINE_CODE_${codeBlocks.length}__`;
             codeBlocks.push({
               content: match,

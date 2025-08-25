@@ -37,25 +37,26 @@ const DeleteEnvelopeModal = ({
           </div>
 
           <div className="mb-6">
-            <p className="text-gray-700 mb-4">
-              Are you sure you want to delete "{envelope.name}"?
-            </p>
-            
+            <p className="text-gray-700 mb-4">Are you sure you want to delete "{envelope.name}"?</p>
+
             {/* Connected Bills Section */}
             {connectedBills.length > 0 && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
                 <h4 className="font-medium text-yellow-800 mb-3">
-                  {connectedBills.length} Connected Bill{connectedBills.length > 1 ? 's' : ''} Found
+                  {connectedBills.length} Connected Bill{connectedBills.length > 1 ? "s" : ""} Found
                 </h4>
-                
+
                 <div className="space-y-2 mb-3">
-                  {connectedBills.map(bill => (
-                    <div key={bill.id} className="text-sm text-yellow-700 bg-yellow-100 px-2 py-1 rounded">
+                  {connectedBills.map((bill) => (
+                    <div
+                      key={bill.id}
+                      className="text-sm text-yellow-700 bg-yellow-100 px-2 py-1 rounded"
+                    >
                       • {bill.name || bill.provider} - ${Math.abs(bill.amount || 0).toFixed(2)}
                     </div>
                   ))}
                 </div>
-                
+
                 <div className="space-y-2">
                   <label className="flex items-center text-sm">
                     <input
@@ -65,9 +66,11 @@ const DeleteEnvelopeModal = ({
                       onChange={() => setDeleteBillsToo(false)}
                       className="mr-2"
                     />
-                    <span className="text-yellow-800">Keep bills and disconnect them (recommended)</span>
+                    <span className="text-yellow-800">
+                      Keep bills and disconnect them (recommended)
+                    </span>
                   </label>
-                  
+
                   <label className="flex items-center text-sm">
                     <input
                       type="radio"
@@ -77,25 +80,26 @@ const DeleteEnvelopeModal = ({
                       className="mr-2"
                     />
                     <span className="text-red-700">
-                      Also delete all {connectedBills.length} connected bill{connectedBills.length > 1 ? 's' : ''}
+                      Also delete all {connectedBills.length} connected bill
+                      {connectedBills.length > 1 ? "s" : ""}
                     </span>
                   </label>
                 </div>
-                
+
                 <p className="text-xs text-yellow-600 mt-2">
-                  {deleteBillsToo 
+                  {deleteBillsToo
                     ? "⚠️ This will permanently delete the envelope AND all connected bills."
-                    : "✅ Bills will remain but lose their envelope connection."
-                  }
+                    : "✅ Bills will remain but lose their envelope connection."}
                 </p>
               </div>
             )}
-            
+
             {/* Balance Warning */}
             {envelope.currentBalance > 0 && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
                 <p className="text-sm text-blue-800">
-                  💰 This envelope has ${envelope.currentBalance.toFixed(2)}. The money will be transferred to unassigned cash.
+                  💰 This envelope has ${envelope.currentBalance.toFixed(2)}. The money will be
+                  transferred to unassigned cash.
                 </p>
               </div>
             )}
@@ -115,7 +119,7 @@ const DeleteEnvelopeModal = ({
               disabled={isDeleting}
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              {isDeleting ? 'Deleting...' : 'Delete Envelope'}
+              {isDeleting ? "Deleting..." : "Delete Envelope"}
             </button>
           </div>
         </div>

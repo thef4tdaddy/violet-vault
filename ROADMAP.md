@@ -475,7 +475,7 @@ We welcome community input on our roadmap! Here's how you can contribute:
 
 ---
 
-**Last Updated:** August 5, 2025
+**Last Updated:** August 25, 2025
 **Next Review:** August 11, 2025 (v1.8.0 planning)
 
 ## 📅 **Complete Release Timeline**

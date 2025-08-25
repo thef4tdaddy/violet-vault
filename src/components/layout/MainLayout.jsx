@@ -69,7 +69,7 @@ const Layout = () => {
   const { isLocalOnlyMode, localOnlyUser } = useLocalOnlyMode();
 
   // Initialize data from Dexie to Zustand on app startup
-  const { isInitialized, initError, dataLoaded } = useDataInitialization();
+  useDataInitialization(); // Return values not currently used
 
   const { exportData, importData, resetEncryptionAndStartFresh } = useDataManagement();
 
@@ -229,8 +229,8 @@ const MainContent = ({
   // Get TanStack Query data
   const {
     envelopes = [],
-    savingsGoals = [],
-    unassignedCash = 0,
+    // savingsGoals = [], // Not currently used
+    // unassignedCash = 0, // Not currently used
     paycheckHistory: tanStackPaycheckHistory,
   } = useBudgetData();
 
@@ -240,13 +240,13 @@ const MainContent = ({
   // Payday prediction notifications using TanStack Query data
   usePaydayPrediction(tanStackPaycheckHistory, !!currentUser);
 
-  // Calculate totals
-  const totalEnvelopeBalance = Array.isArray(envelopes)
-    ? envelopes.reduce((sum, env) => sum + env.currentBalance, 0)
-    : 0;
-  const totalSavingsBalance = Array.isArray(savingsGoals)
-    ? savingsGoals.reduce((sum, goal) => sum + goal.currentAmount, 0)
-    : 0;
+  // Calculate totals - TODO: These are calculated but not currently used
+  // const totalEnvelopeBalance = Array.isArray(envelopes)
+  //   ? envelopes.reduce((sum, env) => sum + env.currentBalance, 0)
+  //   : 0;
+  // const totalSavingsBalance = Array.isArray(savingsGoals)
+  //   ? savingsGoals.reduce((sum, goal) => sum + goal.currentAmount, 0)
+  //   : 0;
 
   // Calculate total biweekly funding need across all envelope types
   const totalBiweeklyNeed = Array.isArray(envelopes)
