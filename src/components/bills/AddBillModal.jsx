@@ -784,9 +784,6 @@ const AddBillModal = ({
                 </div>
               </div>
             )}
-            </div>
-          )}
-
           </div>
 
           {formData.amount && (
