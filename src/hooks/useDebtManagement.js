@@ -35,26 +35,7 @@ export const useDebtManagement = () => {
   const updateDebtData = debtsHook?.updateDebtAsync;
   const deleteDebtData = debtsHook?.deleteDebtAsync;
 
-  // Calculate debt statistics
-  const debtStats = useMemo(() => {
-    if (!debts?.length) {
-      return {
-        totalDebt: 0,
-        totalMonthlyPayments: 0,
-        averageInterestRate: 0,
-        debtsByType: {},
-        totalInterestPaid: 0,
-        activeDebtCount: 0,
-        totalDebtCount: debts.length,
-        dueSoonAmount: 0,
-        dueSoonCount: 0,
-      };
-    }
-
-    return calculateDebtStats(debts);
-  }, [debts]);
-
-  // Enrich debts with related data and calculations
+  // Enrich debts with related data and calculations FIRST
   const enrichedDebts = useMemo(() => {
     if (!debts?.length) return [];
 
@@ -69,13 +50,37 @@ export const useDebtManagement = () => {
 
       // Find related transactions
       const relatedTransactions = transactions.filter(
-        (transaction) => transaction.debtId === debt.id
+        (transaction) => transaction.debtId === debt.id,
       );
 
       // Enrich the debt with calculated properties
-      return enrichDebt(debt, relatedBill, relatedEnvelope, relatedTransactions);
+      return enrichDebt(
+        debt,
+        relatedBill,
+        relatedEnvelope,
+        relatedTransactions,
+      );
     });
   }, [debts, bills, envelopes, transactions]);
+
+  // Calculate debt statistics using enriched debts
+  const debtStats = useMemo(() => {
+    if (!enrichedDebts?.length) {
+      return {
+        totalDebt: 0,
+        totalMonthlyPayments: 0,
+        averageInterestRate: 0,
+        debtsByType: {},
+        totalInterestPaid: 0,
+        activeDebtCount: 0,
+        totalDebtCount: debts?.length || 0,
+        dueSoonAmount: 0,
+        dueSoonCount: 0,
+      };
+    }
+
+    return calculateDebtStats(enrichedDebts);
+  }, [enrichedDebts, debts]);
 
   // Group debts by status and type for easy filtering
   const debtsByStatus = useMemo(() => {
