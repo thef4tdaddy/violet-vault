@@ -116,34 +116,48 @@ export const fetchTargetVersion = async () => {
   return fallbackVersion;
 };
 
-// Get actual commit date from git (injected at build time)
-const getActualCommitDate = () => {
-  // Try git commit date first (injected by Vite build)
+// Get actual commit timestamp from git (injected at build time)
+const getActualCommitTimestamp = () => {
+  // Try git commit date first (injected by Vite build) - this is the actual commit timestamp
   const gitCommitDate = import.meta.env.VITE_GIT_COMMIT_DATE;
   if (gitCommitDate) {
-    return new Date(gitCommitDate).toISOString().split("T")[0];
+    return new Date(gitCommitDate);
   }
 
   // Fallback to Vercel git environment variables
   const vercelCommitDate = import.meta.env.VITE_VERCEL_GIT_COMMIT_AUTHOR_DATE;
   if (vercelCommitDate) {
-    return new Date(vercelCommitDate).toISOString().split("T")[0];
+    return new Date(vercelCommitDate);
   }
 
   // Final fallback: use build time if available
   const buildTime = import.meta.env.VITE_BUILD_TIME;
   if (buildTime) {
-    return new Date(buildTime).toISOString().split("T")[0];
+    return new Date(buildTime);
   }
 
-  // Last resort: use a static date based on branch and version
-  const versionDates = {
-    "1.8.0": "2025-08-16", // Actual v1.8.0 release date
-    "1.9.0": "2025-08-17", // Current development
-    "1.10.0": "2025-09-01", // Planned future release
-  };
+  // Last resort: use current time
+  return new Date();
+};
 
-  return versionDates[APP_VERSION] || new Date().toISOString().split("T")[0];
+// Format commit timestamp for display
+const formatCommitTimestamp = (timestamp, environment) => {
+  const date = new Date(timestamp);
+  
+  // For production, show just the date
+  if (environment === "production") {
+    return date.toISOString().split("T")[0];
+  }
+  
+  // For development/preview, show date and time for better debugging
+  return date.toLocaleString("en-US", {
+    year: "numeric",
+    month: "short", 
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZoneName: "short"
+  });
 };
 
 // Fallback target version detection (used when API is unavailable)
@@ -269,15 +283,23 @@ export const getVersionInfo = (targetVersion = null) => {
     environmentLabel = "✅ Production";
   }
 
-  // Get actual commit date (injected at build time)
-  const commitDate = getActualCommitDate(branchInfo);
+  // Get actual commit timestamp (injected at build time)
+  const commitTimestamp = getActualCommitTimestamp();
+  const formattedCommitTime = formatCommitTimestamp(commitTimestamp, branchInfo.environment);
+
+  // Get additional git info for better debugging
+  const gitCommitHash = import.meta.env.VITE_GIT_COMMIT_HASH || "unknown";
+  const gitCommitMessage = import.meta.env.VITE_GIT_COMMIT_MESSAGE || "";
 
   return {
     version: displayVersion,
     baseVersion: APP_VERSION, // Always from package.json
     name: APP_NAME,
     displayName: "VioletVault",
-    buildDate: commitDate, // Now shows actual git commit date
+    buildDate: formattedCommitTime, // Now shows actual git commit timestamp
+    commitTimestamp: commitTimestamp, // Raw timestamp for other uses
+    commitHash: gitCommitHash, // Short git commit hash
+    commitMessage: gitCommitMessage, // First line of commit message
     branch: branchInfo.branch,
     environment: branchInfo.environment,
     environmentLabel,

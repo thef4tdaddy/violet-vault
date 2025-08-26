@@ -97,8 +97,12 @@ const VersionFooter = () => {
         <p className="text-xs text-gray-500">
           {versionInfo.isDevelopment
             ? `Last commit: ${versionInfo.buildDate}`
-            : `Released: ${versionInfo.buildDate}`}{" "}
-          • Built with ❤️ for secure budgeting
+            : `Released: ${versionInfo.buildDate}`}
+          {versionInfo.commitHash && versionInfo.commitHash !== "unknown" && (
+            <span className="ml-1 font-mono">({versionInfo.commitHash})</span>
+          )}
+          <br />
+          Built with ❤️ for secure budgeting
         </p>
 
         {versionInfo.isDevelopment && (
@@ -106,6 +110,11 @@ const VersionFooter = () => {
             <p className="text-xs text-orange-600 font-medium">
               Development build from {versionInfo.branch} branch
             </p>
+            {versionInfo.commitMessage && versionInfo.commitMessage !== "Build without git" && (
+              <p className="text-xs text-orange-500 mt-1 italic truncate">
+                "{versionInfo.commitMessage}"
+              </p>
+            )}
             {cacheInfo.isValid && (
               <p className="text-xs text-orange-400 mt-1">
                 📦 Cached milestone (expires in{" "}
