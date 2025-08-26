@@ -14,7 +14,11 @@ import { calculatePayoffProjection } from "./debt-calculations/payoffProjection"
 import { calculateInterestPortion } from "./debt-calculations/interestCalculation";
 
 // Re-export the imported functions for backward compatibility
-export { calculateNextPaymentDate, calculatePayoffProjection, calculateInterestPortion };
+export {
+  calculateNextPaymentDate,
+  calculatePayoffProjection,
+  calculateInterestPortion,
+};
 
 /**
  * Convert debt payment frequency to bill frequency
@@ -77,24 +81,24 @@ export function createSpecialTerms(debtType, providedTerms = {}) {
  * @returns {Object} Enriched debt object
  */
 export function enrichDebt(
-  debt
-  // TODO: Re-enable these parameters when enrichment is restored
-  // relatedBill = null,
-  // relatedEnvelope = null,
-  // relatedTransactions = []
+  debt,
+  relatedBill = null,
+  relatedEnvelope = null,
+  relatedTransactions = [],
 ) {
-  // COMPLETELY DISABLE ENRICHMENT TO TEST - just return basic debt
+  // Calculate next payment date
+  const nextPaymentDate = calculateNextPaymentDate(debt);
+
+  // Calculate payoff projection
+  const payoffInfo = calculatePayoffProjection(debt);
+
   return {
     ...debt,
-    relatedBill: null,
-    relatedEnvelope: null,
-    relatedTransactions: [],
-    nextPaymentDate: null,
-    payoffInfo: {
-      monthsToPayoff: null,
-      totalInterest: null,
-      payoffDate: null,
-    },
+    relatedBill,
+    relatedEnvelope,
+    relatedTransactions,
+    nextPaymentDate,
+    payoffInfo,
   };
 }
 
@@ -109,7 +113,9 @@ export function getUpcomingPayments(debts, daysAhead = 30) {
   cutoffDate.setDate(cutoffDate.getDate() + daysAhead);
 
   return debts
-    .filter((debt) => debt.status === DEBT_STATUS.ACTIVE && debt.nextPaymentDate)
+    .filter(
+      (debt) => debt.status === DEBT_STATUS.ACTIVE && debt.nextPaymentDate,
+    )
     .filter((debt) => new Date(debt.nextPaymentDate) <= cutoffDate)
     .sort((a, b) => new Date(a.nextPaymentDate) - new Date(b.nextPaymentDate));
 }
