@@ -121,42 +121,50 @@ export const fetchTargetVersion = async () => {
 
 // Get actual commit timestamp from git (injected at build time)
 const getActualCommitTimestamp = () => {
-  // Try git commit date first (injected by Vite build) - this is the actual commit timestamp
+  // Priority 1: Try git commit date first (injected by Vite build) - this is the actual commit timestamp
   const gitCommitDate = import.meta.env.VITE_GIT_COMMIT_DATE;
   if (gitCommitDate && gitCommitDate !== "undefined") {
+    console.debug("✅ Using git commit date:", gitCommitDate);
     return new Date(gitCommitDate);
   }
 
-  // Try git author date as alternative
+  // Priority 2: Try git author date as alternative
   const gitAuthorDate = import.meta.env.VITE_GIT_AUTHOR_DATE;
   if (gitAuthorDate && gitAuthorDate !== "undefined") {
+    console.debug("✅ Using git author date:", gitAuthorDate);
     return new Date(gitAuthorDate);
   }
 
-  // Fallback to Vercel git environment variables
+  // Priority 3: Fallback to Vercel git environment variables
   const vercelCommitDate = import.meta.env.VITE_VERCEL_GIT_COMMIT_AUTHOR_DATE;
   if (vercelCommitDate && vercelCommitDate !== "undefined") {
+    console.debug("✅ Using Vercel git commit date:", vercelCommitDate);
     return new Date(vercelCommitDate);
   }
 
-  // Final fallback: use build time if available
+  // Priority 4: Use build time only as last resort (not preferred for git commit display)
   const buildTime = import.meta.env.VITE_BUILD_TIME;
   if (buildTime && buildTime !== "undefined") {
+    console.warn(
+      "⚠️ Using build time as fallback for git commit (no git timestamp found):",
+      buildTime,
+    );
     return new Date(buildTime);
   }
 
-  // For development builds without git info, show a more informative message
-  console.warn(
-    "⚠️ No git timestamp found, using current time. Environment variables:",
+  // Final fallback: use current time (should rarely happen)
+  console.error(
+    "❌ No git or build timestamp found, using current time. Environment variables:",
     {
       VITE_GIT_COMMIT_DATE: import.meta.env.VITE_GIT_COMMIT_DATE,
       VITE_GIT_AUTHOR_DATE: import.meta.env.VITE_GIT_AUTHOR_DATE,
+      VITE_VERCEL_GIT_COMMIT_AUTHOR_DATE: import.meta.env
+        .VITE_VERCEL_GIT_COMMIT_AUTHOR_DATE,
       VITE_BUILD_TIME: import.meta.env.VITE_BUILD_TIME,
       DEV: import.meta.env.DEV,
     },
   );
 
-  // Last resort: use current time
   return new Date();
 };
 
@@ -169,7 +177,7 @@ const formatCommitTimestamp = (timestamp, environment) => {
     return date.toISOString().split("T")[0];
   }
 
-  // For development/preview, show date and time for better debugging
+  // For all dev/preview builds, show as "Last commit" since we prioritize git timestamp
   return date.toLocaleString("en-US", {
     year: "numeric",
     month: "short",
