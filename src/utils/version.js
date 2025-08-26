@@ -79,7 +79,10 @@ export const fetchTargetVersion = async () => {
   try {
     // Use our Cloudflare Worker endpoint to fetch release-please data (more accurate than milestones)
     const endpoint =
-      import.meta.env.VITE_BUG_REPORT_ENDPOINT?.replace("/report-issue", "/releases") ||
+      import.meta.env.VITE_BUG_REPORT_ENDPOINT?.replace(
+        "/report-issue",
+        "/releases",
+      ) ||
       "https://violet-vault-bug-reporter.fragrant-fog-c708.workers.dev/releases";
 
     const response = await fetch(endpoint, {
@@ -120,21 +123,38 @@ export const fetchTargetVersion = async () => {
 const getActualCommitTimestamp = () => {
   // Try git commit date first (injected by Vite build) - this is the actual commit timestamp
   const gitCommitDate = import.meta.env.VITE_GIT_COMMIT_DATE;
-  if (gitCommitDate) {
+  if (gitCommitDate && gitCommitDate !== "undefined") {
     return new Date(gitCommitDate);
+  }
+
+  // Try git author date as alternative
+  const gitAuthorDate = import.meta.env.VITE_GIT_AUTHOR_DATE;
+  if (gitAuthorDate && gitAuthorDate !== "undefined") {
+    return new Date(gitAuthorDate);
   }
 
   // Fallback to Vercel git environment variables
   const vercelCommitDate = import.meta.env.VITE_VERCEL_GIT_COMMIT_AUTHOR_DATE;
-  if (vercelCommitDate) {
+  if (vercelCommitDate && vercelCommitDate !== "undefined") {
     return new Date(vercelCommitDate);
   }
 
   // Final fallback: use build time if available
   const buildTime = import.meta.env.VITE_BUILD_TIME;
-  if (buildTime) {
+  if (buildTime && buildTime !== "undefined") {
     return new Date(buildTime);
   }
+
+  // For development builds without git info, show a more informative message
+  console.warn(
+    "⚠️ No git timestamp found, using current time. Environment variables:",
+    {
+      VITE_GIT_COMMIT_DATE: import.meta.env.VITE_GIT_COMMIT_DATE,
+      VITE_GIT_AUTHOR_DATE: import.meta.env.VITE_GIT_AUTHOR_DATE,
+      VITE_BUILD_TIME: import.meta.env.VITE_BUILD_TIME,
+      DEV: import.meta.env.DEV,
+    },
+  );
 
   // Last resort: use current time
   return new Date();
@@ -143,20 +163,20 @@ const getActualCommitTimestamp = () => {
 // Format commit timestamp for display
 const formatCommitTimestamp = (timestamp, environment) => {
   const date = new Date(timestamp);
-  
+
   // For production, show just the date
   if (environment === "production") {
     return date.toISOString().split("T")[0];
   }
-  
+
   // For development/preview, show date and time for better debugging
   return date.toLocaleString("en-US", {
     year: "numeric",
-    month: "short", 
+    month: "short",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-    timeZoneName: "short"
+    timeZoneName: "short",
   });
 };
 
@@ -203,7 +223,8 @@ export const getBranchInfo = (targetVersion = null) => {
     !window.location.hostname.includes("git-");
   const isPreviewBranchOnVercel =
     isVercelDeploy &&
-    (window.location.hostname.includes("git-") || window.location.hostname.includes("-git-"));
+    (window.location.hostname.includes("git-") ||
+      window.location.hostname.includes("-git-"));
 
   // Other common environment indicators
   const nodeEnv = import.meta.env.NODE_ENV;
@@ -226,7 +247,11 @@ export const getBranchInfo = (targetVersion = null) => {
       isDevelopment: true,
       platform: "local",
     };
-  } else if (isVercelPreview || isPreviewBranchOnVercel || appEnv === "preview") {
+  } else if (
+    isVercelPreview ||
+    isPreviewBranchOnVercel ||
+    appEnv === "preview"
+  ) {
     return {
       branch: branch || "develop", // Default to develop for preview
       environment: "preview",
@@ -285,7 +310,10 @@ export const getVersionInfo = (targetVersion = null) => {
 
   // Get actual commit timestamp (injected at build time)
   const commitTimestamp = getActualCommitTimestamp();
-  const formattedCommitTime = formatCommitTimestamp(commitTimestamp, branchInfo.environment);
+  const formattedCommitTime = formatCommitTimestamp(
+    commitTimestamp,
+    branchInfo.environment,
+  );
 
   // Get additional git info for better debugging
   const gitCommitHash = import.meta.env.VITE_GIT_COMMIT_HASH || "unknown";
@@ -338,9 +366,13 @@ export const clearVersionCache = () => {
 export const getCacheStatus = () => {
   const now = Date.now();
   const isValid =
-    versionCache.data && versionCache.timestamp && now - versionCache.timestamp < versionCache.ttl;
+    versionCache.data &&
+    versionCache.timestamp &&
+    now - versionCache.timestamp < versionCache.ttl;
 
-  const timeUntilExpiry = isValid ? versionCache.timestamp + versionCache.ttl - now : 0;
+  const timeUntilExpiry = isValid
+    ? versionCache.timestamp + versionCache.ttl - now
+    : 0;
   const daysUntilExpiry = Math.round(timeUntilExpiry / (24 * 60 * 60 * 1000));
   const hoursUntilExpiry = Math.round(timeUntilExpiry / (60 * 60 * 1000));
 
@@ -349,7 +381,9 @@ export const getCacheStatus = () => {
     isValid,
     version: versionCache.data,
     cachedAt: versionCache.timestamp ? new Date(versionCache.timestamp) : null,
-    expiresAt: versionCache.timestamp ? new Date(versionCache.timestamp + versionCache.ttl) : null,
+    expiresAt: versionCache.timestamp
+      ? new Date(versionCache.timestamp + versionCache.ttl)
+      : null,
     daysUntilExpiry: isValid ? daysUntilExpiry : 0,
     hoursUntilExpiry: isValid ? hoursUntilExpiry : 0,
     // Legacy support
@@ -376,7 +410,9 @@ export const simulateVersionTransition = (newTargetVersion) => {
     logger.warn("Failed to save simulated cache:", error);
   }
 
-  logger.info("Simulated transition complete. Run getVersionInfoAsync() to test.");
+  logger.info(
+    "Simulated transition complete. Run getVersionInfoAsync() to test.",
+  );
   return newTargetVersion;
 };
 
