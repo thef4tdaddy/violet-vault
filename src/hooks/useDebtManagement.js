@@ -82,6 +82,7 @@ export const useDebtManagement = () => {
           enrichedDebt: {
             id: enrichedDebt.id,
             name: enrichedDebt.name,
+            status: enrichedDebt.status,
             currentBalance: enrichedDebt.currentBalance,
             minimumPayment: enrichedDebt.minimumPayment,
             interestRate: enrichedDebt.interestRate,
