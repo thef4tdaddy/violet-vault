@@ -614,10 +614,63 @@ const AddBillModal = ({
               />
             </div>
 
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Envelope Assignment
-              </label>
+            {/* Connected Envelope Display - Matches Standard Pattern */}
+            {editingBill && editingBill.envelopeId && (
+              <div className="md:col-span-2">
+                <div className="bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-300 rounded-xl p-6 mb-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <label className="block text-lg font-bold text-green-800 flex items-center">
+                      <Sparkles className="h-6 w-6 mr-3" />
+                      🔗 Connected to Envelope
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        // Clear envelope connection
+                        setFormData({
+                          ...formData,
+                          selectedEnvelope: "",
+                        });
+                      }}
+                      className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded-lg transition-colors flex items-center"
+                    >
+                      <X className="h-3 w-3 mr-1" />
+                      Disconnect
+                    </button>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center p-3 bg-white rounded-lg border border-green-200">
+                      <Sparkles className="h-5 w-5 mr-3 text-green-600" />
+                      <div className="flex-1">
+                        <div className="font-medium text-green-800">Connected Envelope</div>
+                        <div className="text-sm text-green-700">
+                          {availableEnvelopes.find((e) => e.id === editingBill.envelopeId)?.name || "Unknown Envelope"} • $
+                          {(availableEnvelopes.find((e) => e.id === editingBill.envelopeId)?.currentBalance || 0).toFixed(2)} available
+                        </div>
+                      </div>
+                      <div className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                        Funding source
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 p-3 bg-green-100 border border-green-300 rounded-lg">
+                    <p className="text-sm text-green-700 font-medium">
+                      📝 <strong>Connected!</strong> This bill is linked to the envelope above for payment funding. 
+                      Use the disconnect button to change the envelope connection.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Envelope Assignment - Hidden when connected */}
+            {!(editingBill && editingBill.envelopeId) && (
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Envelope Assignment
+                </label>
               <select
                 value={formData.selectedEnvelope}
                 onChange={handleEnvelopeChange}
@@ -731,6 +784,9 @@ const AddBillModal = ({
                 </div>
               </div>
             )}
+            </div>
+          )}
+
           </div>
 
           {formData.amount && (
