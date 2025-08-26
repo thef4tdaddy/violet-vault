@@ -498,75 +498,86 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
             </div>
           </div>
 
-          {/* Existing Connections Display */}
+          {/* Connected Status Display - Matches Envelope Modal Pattern */}
           {isEditMode && (connectedBill || connectedEnvelope) && (
-            <div className="space-y-4">
-              <h4 className="font-medium text-gray-900 flex items-center">
-                <Receipt className="h-4 w-4 mr-2 text-blue-600" />
-                Current Connections
-              </h4>
+            <div className="bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-300 rounded-xl p-6 mb-4">
+              <div className="flex items-center justify-between mb-4">
+                <label className="block text-lg font-bold text-green-800 flex items-center">
+                  <Receipt className="h-6 w-6 mr-3" />
+                  🔗 Connected to Payment System
+                </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    // Clear connections and reset to disconnected state
+                    setFormData({
+                      ...formData,
+                      paymentMethod: "create_new",
+                      existingBillId: "",
+                      envelopeId: "",
+                    });
+                  }}
+                  className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded-lg transition-colors flex items-center"
+                >
+                  <X className="h-3 w-3 mr-1" />
+                  Disconnect
+                </button>
+              </div>
 
-              <div className="glassmorphism rounded-xl p-4 border border-blue-200 bg-blue-50">
-                <div className="space-y-3">
-                  {connectedBill && (
-                    <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
-                      <div className="flex items-center">
-                        <Receipt className="h-4 w-4 mr-2 text-blue-600" />
-                        <div>
-                          <div className="font-medium text-gray-900">Connected Bill</div>
-                          <div className="text-sm text-gray-600">
-                            {connectedBill.name} • ${connectedBill.amount?.toFixed(2) || "0.00"}
-                            {connectedBill.dueDate && (
-                              <span className="ml-2">
-                                • Due: {new Date(connectedBill.dueDate).toLocaleDateString()}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
-                        Auto-synced
+              <div className="space-y-3">
+                {connectedBill && (
+                  <div className="flex items-center p-3 bg-white rounded-lg border border-green-200">
+                    <Receipt className="h-5 w-5 mr-3 text-green-600" />
+                    <div className="flex-1">
+                      <div className="font-medium text-green-800">Connected Bill</div>
+                      <div className="text-sm text-green-700">
+                        {connectedBill.name} • ${connectedBill.amount?.toFixed(2) || "0.00"}
+                        {connectedBill.dueDate && (
+                          <span className="ml-2">
+                            • Due: {new Date(connectedBill.dueDate).toLocaleDateString()}
+                          </span>
+                        )}
                       </div>
                     </div>
-                  )}
+                    <div className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                      Auto-synced
+                    </div>
+                  </div>
+                )}
 
-                  {connectedEnvelope && (
-                    <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
-                      <div className="flex items-center">
-                        <Wallet className="h-4 w-4 mr-2 text-purple-600" />
-                        <div>
-                          <div className="font-medium text-gray-900">Connected Envelope</div>
-                          <div className="text-sm text-gray-600">
-                            {connectedEnvelope.name} • $
-                            {connectedEnvelope.currentBalance?.toFixed(2) || "0.00"} available
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-xs text-purple-600 bg-purple-100 px-2 py-1 rounded-full">
-                        Funding source
+                {connectedEnvelope && (
+                  <div className="flex items-center p-3 bg-white rounded-lg border border-green-200">
+                    <Wallet className="h-5 w-5 mr-3 text-green-600" />
+                    <div className="flex-1">
+                      <div className="font-medium text-green-800">Connected Envelope</div>
+                      <div className="text-sm text-green-700">
+                        {connectedEnvelope.name} • $
+                        {connectedEnvelope.currentBalance?.toFixed(2) || "0.00"} available
                       </div>
                     </div>
-                  )}
-                </div>
+                    <div className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                      Funding source
+                    </div>
+                  </div>
+                )}
+              </div>
 
-                <div className="mt-3 p-2 bg-blue-100 rounded-lg">
-                  <p className="text-xs text-blue-700">
-                    <strong>Note:</strong> These connections sync automatically. Changes to the
-                    bill's due date or amount will update this debt.
-                  </p>
-                </div>
+              <div className="mt-3 p-3 bg-green-100 border border-green-300 rounded-lg">
+                <p className="text-sm text-green-700 font-medium">
+                  📝 <strong>Connected!</strong> This debt is linked to your payment system. Changes to the
+                  bill's due date or amount will sync automatically. Use the disconnect button above to change connections.
+                </p>
               </div>
             </div>
           )}
 
-          {/* Envelope & Bill Integration */}
-          <div className="space-y-4">
-            <h4 className="font-medium text-gray-900 flex items-center">
-              <Wallet className="h-4 w-4 mr-2 text-purple-600" />
-              {isEditMode && (connectedBill || connectedEnvelope)
-                ? "Update Payment Setup"
-                : "Payment Setup"}
-            </h4>
+          {/* Envelope & Bill Integration - Hide when connected */}
+          {!(isEditMode && (connectedBill || connectedEnvelope)) && (
+            <div className="space-y-4">
+              <h4 className="font-medium text-gray-900 flex items-center">
+                <Wallet className="h-4 w-4 mr-2 text-purple-600" />
+                Payment Setup
+              </h4>
 
             {/* Payment Method Radio Buttons - SIMPLIFIED UX */}
             <div className="space-y-2">
@@ -695,7 +706,8 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                 </div>
               </div>
             )}
-          </div>
+            </div>
+          )}
 
           {/* Notes */}
           <div>
