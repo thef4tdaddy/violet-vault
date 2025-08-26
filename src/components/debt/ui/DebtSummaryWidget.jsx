@@ -1,6 +1,7 @@
 import React from "react";
 import { TrendingDown, ArrowRight } from "lucide-react";
 import { useDebtManagement } from "../../../hooks/useDebtManagement";
+import logger from "../../../utils/logger";
 
 /**
  * Small debt summary widget for dashboard
@@ -10,10 +11,13 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
   const { debtStats, debts } = useDebtManagement();
 
   // Add debug logging to understand what's happening
-  console.debug("💰 DebtSummaryWidget Debug:", {
+  logger.debug("💰 DebtSummaryWidget Debug:", {
     debtStats,
     debtsCount: debts?.length || 0,
     totalDebtCount: debtStats?.totalDebtCount || 0,
+    isStatsValid: !!debtStats,
+    totalDebt: debtStats?.totalDebt || 0,
+    activeDebtCount: debtStats?.activeDebtCount || 0,
   });
 
   // Don't show widget if no debts exist
