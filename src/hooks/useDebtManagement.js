@@ -39,7 +39,15 @@ export const useDebtManagement = () => {
   const enrichedDebts = useMemo(() => {
     if (!debts?.length) return [];
 
-    return debts.map((debt) => {
+    logger.debug("🔧 Enriching debts:", {
+      rawDebtsCount: debts.length,
+      billsCount: bills.length,
+      envelopesCount: envelopes.length,
+      transactionsCount: transactions.length,
+      sampleDebt: debts[0],
+    });
+
+    const enriched = debts.map((debt, index) => {
       // Find related bill and envelope
       const relatedBill = bills.find((bill) => bill.debtId === debt.id);
       const relatedEnvelope = relatedBill
@@ -54,19 +62,52 @@ export const useDebtManagement = () => {
       );
 
       // Enrich the debt with calculated properties
-      return enrichDebt(
+      const enrichedDebt = enrichDebt(
         debt,
         relatedBill,
         relatedEnvelope,
         relatedTransactions,
       );
+
+      // Log first debt enrichment details
+      if (index === 0) {
+        logger.debug("🔧 First debt enrichment details:", {
+          originalDebt: {
+            id: debt.id,
+            name: debt.name,
+            currentBalance: debt.currentBalance,
+            minimumPayment: debt.minimumPayment,
+            interestRate: debt.interestRate,
+          },
+          enrichedDebt: {
+            id: enrichedDebt.id,
+            name: enrichedDebt.name,
+            currentBalance: enrichedDebt.currentBalance,
+            minimumPayment: enrichedDebt.minimumPayment,
+            interestRate: enrichedDebt.interestRate,
+            payoffInfo: enrichedDebt.payoffInfo,
+            nextPaymentDate: enrichedDebt.nextPaymentDate,
+          },
+          relatedBill,
+          relatedEnvelope,
+          relatedTransactionsCount: relatedTransactions.length,
+        });
+      }
+
+      return enrichedDebt;
     });
+
+    logger.debug("🔧 Debt enrichment complete:", {
+      enrichedCount: enriched.length,
+    });
+
+    return enriched;
   }, [debts, bills, envelopes, transactions]);
 
   // Calculate debt statistics using enriched debts
   const debtStats = useMemo(() => {
     if (!enrichedDebts?.length) {
-      return {
+      const emptyStats = {
         totalDebt: 0,
         totalMonthlyPayments: 0,
         averageInterestRate: 0,
@@ -77,9 +118,22 @@ export const useDebtManagement = () => {
         dueSoonAmount: 0,
         dueSoonCount: 0,
       };
+      logger.debug(
+        "📊 Using empty debt stats (no enriched debts):",
+        emptyStats,
+      );
+      return emptyStats;
     }
 
-    return calculateDebtStats(enrichedDebts);
+    const calculatedStats = calculateDebtStats(enrichedDebts);
+    logger.debug("📊 Calculated debt stats:", {
+      inputDebtsCount: enrichedDebts.length,
+      calculatedStats,
+      firstDebtBalance: enrichedDebts[0]?.currentBalance,
+      firstDebtMinPayment: enrichedDebts[0]?.minimumPayment,
+    });
+
+    return calculatedStats;
   }, [enrichedDebts, debts]);
 
   // Group debts by status and type for easy filtering
