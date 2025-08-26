@@ -7,10 +7,17 @@ import { useDebtManagement } from "../../../hooks/useDebtManagement";
  * Shows key debt metrics
  */
 const DebtSummaryWidget = ({ onNavigateToDebts }) => {
-  const { debtStats } = useDebtManagement();
+  const { debtStats, debts } = useDebtManagement();
+
+  // Add debug logging to understand what's happening
+  console.debug("💰 DebtSummaryWidget Debug:", {
+    debtStats,
+    debtsCount: debts?.length || 0,
+    totalDebtCount: debtStats?.totalDebtCount || 0,
+  });
 
   // Don't show widget if no debts exist
-  if (debtStats.totalDebtCount === 0) {
+  if (!debtStats || debtStats.totalDebtCount === 0) {
     return null;
   }
 
@@ -42,12 +49,18 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
         {/* Key Metrics */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <p className="text-base font-medium text-gray-600 mb-1">Total Debt</p>
-            <p className="text-2xl font-bold text-red-600">${debtStats.totalDebt.toFixed(2)}</p>
+            <p className="text-base font-medium text-gray-600 mb-1">
+              Total Debt
+            </p>
+            <p className="text-2xl font-bold text-red-600">
+              ${debtStats.totalDebt.toFixed(2)}
+            </p>
           </div>
 
           <div>
-            <p className="text-base font-medium text-gray-600 mb-1">Monthly Payments</p>
+            <p className="text-base font-medium text-gray-600 mb-1">
+              Monthly Payments
+            </p>
             <p className="text-2xl font-bold text-orange-600">
               ${debtStats.totalMonthlyPayments.toFixed(2)}
             </p>
@@ -57,7 +70,9 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
         {/* Average Interest Rate */}
         {debtStats.averageInterestRate > 0 && (
           <div>
-            <p className="text-base font-medium text-gray-600 mb-1">Avg Interest Rate</p>
+            <p className="text-base font-medium text-gray-600 mb-1">
+              Avg Interest Rate
+            </p>
             <p className="text-lg font-bold text-purple-600">
               {debtStats.averageInterestRate.toFixed(2)}% APR
             </p>
