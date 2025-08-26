@@ -321,6 +321,26 @@ export const useDebtManagement = () => {
     }
   };
 
+  // Update a debt with proper parameter formatting
+  const updateDebt = async (debtId, updates, author = "Unknown User") => {
+    try {
+      if (!debtId) {
+        throw new Error("Debt ID is required for update");
+      }
+      
+      logger.debug("Updating debt:", { debtId, updates, author });
+      
+      return await updateDebtData({
+        id: debtId,
+        updates,
+        author,
+      });
+    } catch (error) {
+      logger.error("Error updating debt:", error);
+      throw error;
+    }
+  };
+
   // Delete a debt and its related connections
   const deleteDebt = async (debtId) => {
     try {
@@ -354,7 +374,7 @@ export const useDebtManagement = () => {
 
     // Actions
     createDebt,
-    updateDebt: updateDebtData,
+    updateDebt,
     deleteDebt,
     recordPayment,
     linkDebtToBill,
