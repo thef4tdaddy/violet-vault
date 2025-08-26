@@ -11,27 +11,48 @@ const getGitInfo = () => {
       encoding: "utf8",
     }).trim();
 
-    // Get last commit date for current branch
+    // Get last commit date for current branch (with full timestamp)
     const commitDate = execSync("git log -1 --format=%cI", {
       encoding: "utf8",
     }).trim();
 
-    // Get commit hash
+    // Get commit hash (short)
     const commitHash = execSync("git rev-parse HEAD", { encoding: "utf8" })
       .trim()
       .substring(0, 7);
 
-    return {
+    // Get commit author date (alternative format)
+    const authorDate = execSync("git log -1 --format=%aI", {
+      encoding: "utf8", 
+    }).trim();
+
+    // Get commit message (first line only)
+    const commitMessage = execSync("git log -1 --format=%s", {
+      encoding: "utf8",
+    }).trim();
+
+    console.log("🔧 Git Info Injection:", {
       branch,
       commitDate,
       commitHash,
+      message: commitMessage.substring(0, 50) + "...",
+    });
+
+    return {
+      branch,
+      commitDate,
+      authorDate,
+      commitHash,
+      commitMessage,
     };
   } catch (error) {
     console.warn("Failed to get git info:", error.message);
     return {
       branch: "unknown",
       commitDate: new Date().toISOString(),
+      authorDate: new Date().toISOString(),
       commitHash: "unknown",
+      commitMessage: "Build without git",
     };
   }
 };
@@ -60,8 +81,14 @@ export default defineConfig(() => {
       "import.meta.env.VITE_GIT_COMMIT_DATE": JSON.stringify(
         gitInfo.commitDate,
       ),
+      "import.meta.env.VITE_GIT_AUTHOR_DATE": JSON.stringify(
+        gitInfo.authorDate,
+      ),
       "import.meta.env.VITE_GIT_COMMIT_HASH": JSON.stringify(
         gitInfo.commitHash,
+      ),
+      "import.meta.env.VITE_GIT_COMMIT_MESSAGE": JSON.stringify(
+        gitInfo.commitMessage,
       ),
       "import.meta.env.VITE_BUILD_TIME": JSON.stringify(
         new Date().toISOString(),
