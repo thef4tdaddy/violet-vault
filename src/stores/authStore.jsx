@@ -427,7 +427,7 @@ export const useAuth = create((set, get) => ({
       // If we have encrypted data, validate against it (original logic)
       if (savedData && authState.salt) {
         const parsedData = JSON.parse(savedData);
-        const { salt: savedSalt, encryptedData } = parsedData;
+        const { salt: savedSalt, encryptedData, iv } = parsedData;
         const saltArray = new Uint8Array(savedSalt);
 
         logger.auth("validatePassword: Parsed data", {
@@ -444,7 +444,7 @@ export const useAuth = create((set, get) => ({
             const keyData = await encryptionUtils.deriveKey(password);
             const deterministicKey = keyData.key;
 
-            await encryptionUtils.decrypt(encryptedData, deterministicKey);
+            await encryptionUtils.decrypt(encryptedData, deterministicKey, iv);
             logger.auth(
               "validatePassword: Deterministic decryption successful - password is correct"
             );
@@ -465,7 +465,7 @@ export const useAuth = create((set, get) => ({
               logger.auth("validatePassword: Trying saved salt key derivation");
               const saltBasedKey = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
 
-              await encryptionUtils.decrypt(encryptedData, saltBasedKey);
+              await encryptionUtils.decrypt(encryptedData, saltBasedKey, iv);
               logger.auth(
                 "validatePassword: Salt-based decryption successful - password is correct"
               );
