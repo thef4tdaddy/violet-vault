@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { X, TrendingDown, TrendingUp, Zap, Lock, Unlock, User, Clock } from "lucide-react";
+import ReceiptButton from "../receipts/ReceiptButton";
 import useEditLock from "../../hooks/useEditLock";
 import { initializeEditLocks } from "../../services/editLockService";
 import { useAuth } from "../../stores/authStore";
@@ -416,6 +417,27 @@ const TransactionForm = ({
               Mark as reconciled
             </label>
           </div>
+
+          {/* Receipt Scanner Option - Only show for new transactions */}
+          {!editingTransaction && (
+            <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-purple-900 mb-1">Have a receipt?</p>
+                  <p className="text-sm text-purple-700">
+                    Scan a receipt to automatically fill in transaction details
+                  </p>
+                </div>
+                <ReceiptButton
+                  variant="secondary"
+                  onTransactionCreated={(transaction) => {
+                    logger.info('Transaction created from receipt in form', transaction);
+                    onClose(); // Close the form since transaction was created
+                  }}
+                />
+              </div>
+            </div>
+          )}
 
           <div className="flex flex-col sm:flex-row gap-3 mt-6">
             <button
