@@ -1,5 +1,5 @@
 // src/components/PaycheckProcessor.jsx - Complete Component
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   DollarSign,
   User,
@@ -42,7 +42,13 @@ const PaycheckProcessor = ({
 
   // For new users with no paycheck history, default to showing the add new payer form
   const uniquePayers = getUniquePayers();
-  const [showAddNewPayer, setShowAddNewPayer] = useState(uniquePayers.length === 0);
+  const [showAddNewPayer, setShowAddNewPayer] = useState(false);
+
+  // Use useEffect to set initial state based on paycheck history
+  useEffect(() => {
+    const hasNoPaychecks = uniquePayers.length === 0;
+    setShowAddNewPayer(hasNoPaychecks);
+  }, [uniquePayers.length]);
 
   // Get smart prediction for a specific payer
   const getPayerPrediction = (payer) => {
@@ -79,7 +85,10 @@ const PaycheckProcessor = ({
     if (newPayerName.trim()) {
       setPayerName(newPayerName.trim());
       setNewPayerName("");
-      setShowAddNewPayer(false);
+      // Only hide the form if there are existing payers, otherwise keep it open for new users
+      if (uniquePayers.length > 0) {
+        setShowAddNewPayer(false);
+      }
     }
   };
 
@@ -286,6 +295,17 @@ const PaycheckProcessor = ({
                         })()}
                       </div>
                     </div>
+                  )}
+                  
+                  {/* Show a button to easily add new person even when payers exist */}
+                  {uniquePayers.length > 0 && !showAddNewPayer && (
+                    <button
+                      type="button"
+                      onClick={() => setShowAddNewPayer(true)}
+                      className="mt-2 text-sm text-purple-600 hover:text-purple-800 font-medium"
+                    >
+                      + Need to add someone new?
+                    </button>
                   )}
                 </div>
               ) : (
