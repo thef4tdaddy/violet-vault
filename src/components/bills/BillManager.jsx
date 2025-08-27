@@ -1,6 +1,9 @@
 // src/new/UnifiedBillTracker.jsx
 import React, { useState, useMemo } from "react";
-import { useBudgetStore } from "../../stores/budgetStore";
+import { useBudgetStore } from "../../stores/uiStore";
+import { useTransactions } from "../../hooks/useTransactions";
+import { useEnvelopes } from "../../hooks/useEnvelopes";
+import useBills from "../../hooks/useBills";
 import {
   FileText,
   Calendar,
@@ -16,47 +19,100 @@ import {
   Target,
   Filter,
   Eye,
+  History,
 } from "lucide-react";
 import { getBillIcon, getIconByName } from "../../utils/billIcons";
 import AddBillModal from "./AddBillModal";
+import BulkBillUpdateModal from "./BulkBillUpdateModal";
+import BillDiscoveryModal from "./BillDiscoveryModal";
+import { useBillOperations } from "../../hooks/useBillOperations";
+import { generateBillSuggestions } from "../../utils/billDiscovery";
 import logger from "../../utils/logger";
+import ObjectHistoryViewer from "../history/ObjectHistoryViewer";
+import { processRecurringBill } from "../../utils/bills/recurringBillUtils";
 
 const BillManager = ({
   transactions: propTransactions = [], // Unified data source - filters for bills
   envelopes: propEnvelopes = [],
-  onPayBill,
   onUpdateBill,
   onCreateRecurringBill,
   onSearchNewBills,
   onError,
   className = "",
 }) => {
+  // Enhanced TanStack Query integration with loading states
+  const { data: tanStackTransactions = [], isLoading: transactionsLoading } = useTransactions();
+
+  const {
+    envelopes: tanStackEnvelopes = [],
+    addEnvelope,
+    isLoading: envelopesLoading,
+  } = useEnvelopes();
+
+  const {
+    bills: tanStackBills = [],
+    addBill,
+    updateBill,
+    deleteBill,
+    markBillPaid,
+    isLoading: billsLoading,
+  } = useBills();
+
+  logger.debug("🏠 BillManager: Received from useBills:", {
+    tanStackBillsLength: tanStackBills.length,
+    billsLoading,
+    firstBill: tanStackBills[0],
+    billTitles: tanStackBills.map((b) => b.name || b.title || b.billName || "No Name").slice(0, 3),
+  });
+
+  // Keep Zustand for non-migrated operations and fallbacks
   const budget = useBudgetStore();
 
   const transactions = useMemo(
     () =>
       propTransactions && propTransactions.length
         ? propTransactions
-        : budget.allTransactions || [],
-    [propTransactions, budget.allTransactions],
+        : tanStackTransactions.length
+          ? tanStackTransactions
+          : budget.allTransactions || [],
+    [propTransactions, tanStackTransactions, budget.allTransactions]
   );
 
-  const envelopes = useMemo(
-    () =>
+  const envelopes = useMemo(() => {
+    const result =
       propEnvelopes && propEnvelopes.length
         ? propEnvelopes
-        : budget.envelopes || [],
-    [propEnvelopes, budget.envelopes],
-  );
+        : tanStackEnvelopes.length
+          ? tanStackEnvelopes
+          : budget.envelopes || [];
 
-  const reconcileTransaction = budget.reconcileTransaction;
-  const handlePayBillAction = onPayBill || budget.updateBill;
+    logger.debug("🔍 BillManager envelopes resolution:", {
+      propEnvelopesLength: propEnvelopes?.length || 0,
+      tanStackEnvelopesLength: tanStackEnvelopes?.length || 0,
+      budgetEnvelopesLength: budget.envelopes?.length || 0,
+      resultLength: result?.length || 0,
+      envelopesLoading,
+      selectedSource: propEnvelopes?.length
+        ? "props"
+        : tanStackEnvelopes?.length
+          ? "tanstack"
+          : "budget",
+      firstEnvelope: result?.[0],
+    });
+
+    return result;
+  }, [propEnvelopes, tanStackEnvelopes, budget.envelopes, envelopesLoading]);
+
   const [selectedBills, setSelectedBills] = useState(new Set());
   const [viewMode, setViewMode] = useState("upcoming");
   const [isSearching, setIsSearching] = useState(false);
   const [showBillDetail, setShowBillDetail] = useState(null);
   const [showAddBillModal, setShowAddBillModal] = useState(false);
   const [editingBill, setEditingBill] = useState(null);
+  const [showBulkUpdateModal, setShowBulkUpdateModal] = useState(false);
+  const [showDiscoveryModal, setShowDiscoveryModal] = useState(false);
+  const [discoveredBills, setDiscoveredBills] = useState([]);
+  const [historyBill, setHistoryBill] = useState(null);
   const [filterOptions, setFilterOptions] = useState({
     billTypes: ["all"],
     providers: [],
@@ -68,9 +124,16 @@ const BillManager = ({
   const bills = useMemo(() => {
     // Combine bills from transactions and the dedicated bills store
     const billsFromTransactions = transactions.filter(
-      (t) => t && (t.type === "bill" || t.type === "recurring_bill"),
+      (t) => t && (t.type === "bill" || t.type === "recurring_bill")
     );
-    const billsFromStore = budget.bills || [];
+    const billsFromStore = tanStackBills.length ? tanStackBills : budget.bills || [];
+
+    logger.debug("🔄 BillManager: Bill sources comparison:", {
+      tanStackBillsLength: tanStackBills.length,
+      budgetBillsLength: (budget.bills || []).length,
+      usingTanStack: tanStackBills.length > 0,
+      billsFromStoreLength: billsFromStore.length,
+    });
 
     // Merge both sources, prioritizing store bills over transaction bills with same ID
     const combinedBills = [...billsFromStore];
@@ -84,12 +147,28 @@ const BillManager = ({
       let daysUntilDue = null;
       let urgency = "normal";
 
-      if (bill.dueDate) {
+      // Handle recurring bill logic using utility
+      const processedBill = processRecurringBill(bill, (updatedBill) => {
+        if (onUpdateBill) {
+          onUpdateBill(updatedBill);
+        } else {
+          updateBill({
+            id: updatedBill.id,
+            updates: {
+              isPaid: false,
+              dueDate: updatedBill.dueDate,
+              paidDate: null,
+            },
+          });
+        }
+      });
+
+      if (processedBill.dueDate) {
         try {
           const today = new Date();
 
           // Fix 2-digit year parsing by converting to 4-digit years
-          let normalizedDate = bill.dueDate;
+          let normalizedDate = processedBill.dueDate;
 
           // Handle various date formats and convert 2-digit years to 4-digit
           if (typeof normalizedDate === "string") {
@@ -97,10 +176,9 @@ const BillManager = ({
             normalizedDate = normalizedDate.replace(
               /(\d{1,2})[/-](\d{1,2})[/-](\d{2})$/,
               (match, month, day, year) => {
-                const fullYear =
-                  parseInt(year) <= 30 ? `20${year}` : `19${year}`;
+                const fullYear = parseInt(year) <= 30 ? `20${year}` : `19${year}`;
                 return `${month}/${day}/${fullYear}`;
-              },
+              }
             );
           }
 
@@ -115,16 +193,16 @@ const BillManager = ({
             else if (daysUntilDue <= 7) urgency = "soon";
           }
         } catch (error) {
-          console.warn(
-            `Invalid due date for bill ${bill.id}:`,
-            bill.dueDate,
-            error,
+          logger.warn(
+            `Invalid due date for bill ${processedBill.id}:`,
+            processedBill.dueDate,
+            error
           );
         }
       }
 
       return {
-        ...bill,
+        ...processedBill,
         // Ensure required fields have valid values
         amount: typeof bill.amount === "number" ? bill.amount : 0,
         description: bill.description || bill.provider || `Bill ${bill.id}`,
@@ -133,7 +211,7 @@ const BillManager = ({
         urgency,
       };
     });
-  }, [transactions, budget.bills]);
+  }, [transactions, tanStackBills, budget.bills]);
 
   const categorizedBills = useMemo(() => {
     const upcomingBills = bills.filter((b) => !b.isPaid && b.daysUntilDue >= 0);
@@ -141,40 +219,36 @@ const BillManager = ({
     const paidBills = bills.filter((b) => b.isPaid);
 
     return {
-      upcoming: upcomingBills.sort(
-        (a, b) => (a.daysUntilDue || 999) - (b.daysUntilDue || 999),
-      ),
-      overdue: overdueBills.sort(
-        (a, b) => (a.daysUntilDue || 0) - (b.daysUntilDue || 0),
-      ),
+      upcoming: upcomingBills.sort((a, b) => (a.daysUntilDue || 999) - (b.daysUntilDue || 999)),
+      overdue: overdueBills.sort((a, b) => (a.daysUntilDue || 0) - (b.daysUntilDue || 0)),
       paid: paidBills.sort(
-        (a, b) =>
-          new Date(b.paidDate || b.date) - new Date(a.paidDate || a.date),
+        (a, b) => new Date(b.paidDate || b.date) - new Date(a.paidDate || a.date)
       ),
       all: bills,
     };
   }, [bills]);
 
+  // Initialize bill operations hook with computed bills
+  const billOperations = useBillOperations({
+    bills,
+    envelopes,
+    updateBill,
+    onUpdateBill,
+    onError,
+    budget,
+  });
+
   const totals = useMemo(() => {
-    const overdueTotal = categorizedBills.overdue.reduce(
-      (sum, b) => sum + Math.abs(b.amount),
-      0,
-    );
+    const overdueTotal = categorizedBills.overdue.reduce((sum, b) => sum + Math.abs(b.amount), 0);
 
     // Calculate "due soon" as bills due within 7 days (urgent + soon)
     const dueSoonBills = categorizedBills.upcoming.filter(
-      (b) => b.urgency === "urgent" || b.urgency === "soon",
+      (b) => b.urgency === "urgent" || b.urgency === "soon"
     );
-    const dueSoonTotal = dueSoonBills.reduce(
-      (sum, b) => sum + Math.abs(b.amount),
-      0,
-    );
+    const dueSoonTotal = dueSoonBills.reduce((sum, b) => sum + Math.abs(b.amount), 0);
 
     const paidThisMonth = categorizedBills.paid
-      .filter(
-        (b) =>
-          new Date(b.paidDate || b.date).getMonth() === new Date().getMonth(),
-      )
+      .filter((b) => new Date(b.paidDate || b.date).getMonth() === new Date().getMonth())
       .reduce((sum, b) => sum + Math.abs(b.amount), 0);
 
     return {
@@ -189,35 +263,23 @@ const BillManager = ({
   const displayBills = useMemo(() => {
     let billsToShow = categorizedBills[viewMode] || [];
 
-    if (
-      filterOptions.billTypes.length > 0 &&
-      !filterOptions.billTypes.includes("all")
-    ) {
+    if (filterOptions.billTypes.length > 0 && !filterOptions.billTypes.includes("all")) {
       billsToShow = billsToShow.filter((bill) =>
-        filterOptions.billTypes.includes(
-          bill.metadata?.type || bill.category?.toLowerCase(),
-        ),
+        filterOptions.billTypes.includes(bill.metadata?.type || bill.category?.toLowerCase())
       );
     }
 
     if (filterOptions.providers.length > 0) {
-      billsToShow = billsToShow.filter((bill) =>
-        filterOptions.providers.includes(bill.provider),
-      );
+      billsToShow = billsToShow.filter((bill) => filterOptions.providers.includes(bill.provider));
     }
 
     if (filterOptions.envelopes.length > 0) {
-      billsToShow = billsToShow.filter((bill) =>
-        filterOptions.envelopes.includes(bill.envelopeId),
-      );
+      billsToShow = billsToShow.filter((bill) => filterOptions.envelopes.includes(bill.envelopeId));
     }
 
     switch (filterOptions.sortBy) {
       case "due_date":
-        billsToShow.sort(
-          (a, b) =>
-            new Date(a.dueDate || a.date) - new Date(b.dueDate || b.date),
-        );
+        billsToShow.sort((a, b) => new Date(a.dueDate || a.date) - new Date(b.dueDate || b.date));
         break;
       case "amount_desc":
         billsToShow.sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount));
@@ -226,15 +288,11 @@ const BillManager = ({
         billsToShow.sort((a, b) => Math.abs(a.amount) - Math.abs(b.amount));
         break;
       case "provider":
-        billsToShow.sort((a, b) =>
-          (a.provider || "").localeCompare(b.provider || ""),
-        );
+        billsToShow.sort((a, b) => (a.provider || "").localeCompare(b.provider || ""));
         break;
       case "urgency": {
         const urgencyOrder = { overdue: 0, urgent: 1, soon: 2, normal: 3 };
-        billsToShow.sort(
-          (a, b) => urgencyOrder[a.urgency] - urgencyOrder[b.urgency],
-        );
+        billsToShow.sort((a, b) => urgencyOrder[a.urgency] - urgencyOrder[b.urgency]);
         break;
       }
     }
@@ -302,7 +360,7 @@ const BillManager = ({
     const IconComponent = getBillIcon(
       bill.provider || "",
       bill.description || "",
-      bill.category || "",
+      bill.category || ""
     );
 
     // Ensure we have a valid React component
@@ -314,124 +372,34 @@ const BillManager = ({
     return <FileText className="h-6 w-6" />;
   };
 
-  const handlePayBill = (billId) => {
+  const handlePayBill = async (billId) => {
     try {
-      console.log("🔄 BillManager.handlePayBill called", {
-        billId,
-        billsLength: bills.length,
-        handlePayBillAction: typeof handlePayBillAction,
-      });
-
       const bill = bills.find((b) => b.id === billId);
       if (!bill) {
-        console.error("❌ Bill not found", {
-          billId,
-          availableBills: bills.map((b) => b.id),
-        });
-        onError?.("Bill not found");
+        logger.error("Bill not found:", billId);
         return;
       }
 
       if (bill.isPaid) {
-        console.warn("⚠️ Bill is already paid", { billId });
-        onError?.("Bill is already paid");
+        logger.warn("Bill is already paid:", billId);
         return;
       }
 
-      // Check if there are sufficient funds
-      if (bill.envelopeId) {
-        const envelope = envelopes.find((env) => env.id === bill.envelopeId);
-        if (!envelope) {
-          onError?.("Assigned envelope not found");
-          return;
-        }
-
-        // Allow envelopes to have more money than their budget
-        // Only check if the envelope has any balance at all (currentBalance can exceed budget)
-        const availableBalance = envelope.currentBalance || 0;
-        const billAmount = Math.abs(bill.amount);
-
-        if (availableBalance < billAmount) {
-          onError?.(
-            `Insufficient funds in envelope "${envelope.name}". Available: $${availableBalance.toFixed(2)}, Required: $${billAmount.toFixed(2)}`,
-          );
-          return;
-        }
-      } else {
-        const unassignedCash = budget.unassignedCash || 0;
-        const billAmount = Math.abs(bill.amount);
-
-        if (unassignedCash < billAmount) {
-          onError?.(
-            `Insufficient unassigned cash. Available: $${unassignedCash.toFixed(2)}, Required: $${billAmount.toFixed(2)}`,
-          );
-          return;
-        }
-      }
-
-      const updatedBill = {
-        ...bill,
-        isPaid: true,
+      // Use the proper markBillPaid function that handles everything atomically
+      await markBillPaid({
+        billId: bill.id,
+        paidAmount: Math.abs(bill.amount),
         paidDate: new Date().toISOString().split("T")[0],
-      };
-
-      console.log("🔄 Calling handlePayBillAction", {
-        updatedBill: updatedBill,
-        functionType: typeof handlePayBillAction,
+        envelopeId: bill.envelopeId,
       });
 
-      handlePayBillAction?.(updatedBill);
-
-      // Create transaction record and update balances
-      const paymentTxn = {
-        id: `${bill.id}_payment_${Date.now()}`,
-        date: updatedBill.paidDate,
-        description: bill.provider || bill.description || "Bill Payment",
-        amount: -Math.abs(bill.amount),
-        envelopeId: bill.envelopeId || "unassigned",
-        category: bill.category,
-        type: "transaction",
-        source: "bill_payment",
-      };
-
-      if (bill.envelopeId) {
-        const billAmount = Math.abs(bill.amount);
-        const updatedEnvelopes = envelopes.map((env) => {
-          if (env.id === bill.envelopeId) {
-            const currentBalance = env.currentBalance || 0;
-            const newBalance = currentBalance - billAmount; // Allow negative balances if needed
-
-            return {
-              ...env,
-              currentBalance: newBalance,
-              // Track last transaction for debugging
-              lastTransaction: {
-                type: "bill_payment",
-                amount: -billAmount,
-                date: paymentTxn.date,
-                billId: bill.id,
-              },
-            };
-          }
-          return env;
-        });
-
-        reconcileTransaction({
-          transaction: paymentTxn,
-          updatedEnvelopes,
-        });
-      } else {
-        const billAmount = Math.abs(bill.amount);
-        const currentUnassigned = budget.unassignedCash || 0;
-        const newUnassigned = currentUnassigned - billAmount; // Allow negative unassigned cash if needed
-
-        reconcileTransaction({
-          transaction: paymentTxn,
-          newUnassignedCash: newUnassigned,
-        });
-      }
+      logger.debug("✅ Bill payment completed successfully:", {
+        billId: bill.id,
+        amount: bill.amount,
+        envelopeId: bill.envelopeId,
+      });
     } catch (error) {
-      console.error("Error paying bill:", error);
+      logger.error("❌ Failed to pay bill:", error);
       onError?.(error.message || "Failed to pay bill");
     }
   };
@@ -439,11 +407,39 @@ const BillManager = ({
   const searchNewBills = async () => {
     setIsSearching(true);
     try {
+      // Use real bill discovery logic
+      const suggestions = generateBillSuggestions(transactions, bills, envelopes);
+      setDiscoveredBills(suggestions);
+      setShowDiscoveryModal(true);
+
+      // Also call the prop function for backward compatibility
       await onSearchNewBills?.();
     } catch (error) {
-      onError?.(error);
+      logger.error("Error discovering bills:", error);
+      onError?.(error.message || "Failed to discover new bills");
     } finally {
       setIsSearching(false);
+    }
+  };
+
+  const handleAddDiscoveredBills = async (billsToAdd) => {
+    try {
+      for (const bill of billsToAdd) {
+        // Use the existing addBill logic
+        if (onCreateRecurringBill) {
+          await onCreateRecurringBill(bill);
+        } else {
+          try {
+            await addBill(bill);
+          } catch (error) {
+            logger.warn("TanStack addBill failed, using Zustand fallback", error);
+            budget.addTransaction(bill);
+          }
+        }
+      }
+      logger.debug(`Successfully added ${billsToAdd.length} discovered bills`);
+    } catch (error) {
+      throw new Error(`Failed to add discovered bills: ${error.message}`);
     }
   };
 
@@ -459,7 +455,7 @@ const BillManager = ({
     });
   };
 
-  const paySelectedBills = () => {
+  const paySelectedBills = async () => {
     if (selectedBills.size === 0) {
       onError?.("No bills selected");
       return;
@@ -470,28 +466,36 @@ const BillManager = ({
       let errorCount = 0;
       const errors = [];
 
-      selectedBills.forEach((billId) => {
+      for (const billId of selectedBills) {
         try {
-          handlePayBill(billId);
+          await handlePayBill(billId);
           successCount++;
         } catch (error) {
           errorCount++;
           errors.push(`Bill ${billId}: ${error.message}`);
         }
-      });
-
-      setSelectedBills(new Set());
+      }
 
       if (errorCount > 0) {
         onError?.(
-          `${successCount} bills paid successfully, ${errorCount} failed:\n${errors.join("\n")}`,
+          `${successCount} bills paid successfully, ${errorCount} failed:\n${errors.join("\n")}`
         );
       } else {
-        console.log(`Successfully paid ${successCount} bills`);
+        logger.debug(`✅ Successfully paid ${successCount} bills`);
       }
+
+      setSelectedBills(new Set());
     } catch (error) {
-      console.error("Error paying selected bills:", error);
+      logger.error("❌ Error in bulk payment:", error);
       onError?.(error.message || "Failed to pay selected bills");
+    }
+  };
+
+  const handleBulkUpdate = async (updatedBills) => {
+    const result = await billOperations.handleBulkUpdate(updatedBills);
+
+    if (result.success) {
+      setSelectedBills(new Set());
     }
   };
 
@@ -517,6 +521,24 @@ const BillManager = ({
     { id: "all", label: "All Bills", count: bills.length, color: "gray" },
   ];
 
+  // Show loading state while TanStack queries are fetching
+  const isLoading = transactionsLoading || envelopesLoading || billsLoading;
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="h-24 bg-gray-200 rounded"></div>
+            <div className="h-24 bg-gray-200 rounded"></div>
+            <div className="h-24 bg-gray-200 rounded"></div>
+          </div>
+          <div className="h-64 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`space-y-6 ${className}`}>
       <div className="flex items-center justify-between">
@@ -530,9 +552,7 @@ const BillManager = ({
             </div>
             Bill Tracker
           </h2>
-          <p className="text-gray-600 mt-1">
-            Manage bills, due dates, and payments
-          </p>
+          <p className="text-gray-600 mt-1">Manage bills, due dates, and payments</p>
         </div>
 
         <div className="flex gap-3">
@@ -555,6 +575,7 @@ const BillManager = ({
           <button
             onClick={() => setShowAddBillModal(true)}
             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center"
+            data-tour="add-bill"
           >
             <Plus className="h-4 w-4 mr-2" /> Add Bill
           </button>
@@ -579,30 +600,22 @@ const BillManager = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-orange-100 text-sm">Due Soon</p>
-              <p className="text-2xl font-bold">
-                ${totals.upcoming.toFixed(2)}
-              </p>
+              <p className="text-2xl font-bold">${totals.upcoming.toFixed(2)}</p>
             </div>
             <Clock className="h-8 w-8 text-orange-200" />
           </div>
-          <p className="text-xs text-orange-100 mt-2">
-            {totals.dueSoonCount} bills due soon
-          </p>
+          <p className="text-xs text-orange-100 mt-2">{totals.dueSoonCount} bills due soon</p>
         </div>
 
         <div className="bg-gradient-to-br from-green-500 to-green-600 p-4 rounded-lg text-white">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-green-100 text-sm">Paid This Month</p>
-              <p className="text-2xl font-bold">
-                ${totals.paidThisMonth.toFixed(2)}
-              </p>
+              <p className="text-2xl font-bold">${totals.paidThisMonth.toFixed(2)}</p>
             </div>
             <CheckCircle className="h-8 w-8 text-green-200" />
           </div>
-          <p className="text-xs text-green-100 mt-2">
-            {categorizedBills.paid.length} bills paid
-          </p>
+          <p className="text-xs text-green-100 mt-2">{categorizedBills.paid.length} bills paid</p>
         </div>
 
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-4 rounded-lg text-white">
@@ -642,11 +655,10 @@ const BillManager = ({
         </div>
 
         <div className="flex items-center justify-between">
-          <h4 className="font-medium text-gray-900 flex items-center">
-            <Filter className="h-4 w-4 mr-2" /> Filters
-          </h4>
-
-          <div className="flex gap-3">
+          <div className="flex items-center gap-4">
+            <h4 className="font-medium text-gray-900 flex items-center">
+              <Filter className="h-4 w-4 mr-2" /> Filters
+            </h4>
             <select
               value={filterOptions.sortBy}
               onChange={(e) =>
@@ -663,17 +675,24 @@ const BillManager = ({
               <option value="provider">Provider Name</option>
               <option value="urgency">Urgency</option>
             </select>
+          </div>
 
-            {selectedBills.size > 0 && (
+          {selectedBills.size > 0 && (
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowBulkUpdateModal(true)}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center text-sm"
+              >
+                <Settings className="h-4 w-4 mr-2" /> Update {selectedBills.size} Selected
+              </button>
               <button
                 onClick={paySelectedBills}
                 className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center text-sm"
               >
-                <CheckCircle className="h-4 w-4 mr-2" /> Pay{" "}
-                {selectedBills.size} Selected
+                <CheckCircle className="h-4 w-4 mr-2" /> Pay {selectedBills.size} Selected
               </button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -694,14 +713,12 @@ const BillManager = ({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {displayBills.map((bill) => {
-            const envelope = envelopes.find(
-              (env) => env.id === bill.envelopeId,
-            );
+            const envelope = envelopes.find((env) => env.id === bill.envelopeId);
             const urgencyStyle = getUrgencyStyle(bill.urgency, bill.isPaid);
 
             return (
               <div
-                key={bill.id}
+                key={`${bill.id}-${bill.isPaid ? "paid" : "unpaid"}-${bill.amount}`}
                 className={`p-4 rounded-lg border-2 transition-all hover:shadow-lg ${urgencyStyle} ${
                   selectedBills.has(bill.id) ? "ring-2 ring-blue-500" : ""
                 } flex flex-col`}
@@ -728,6 +745,16 @@ const BillManager = ({
                       <Eye className="h-4 w-4" />
                     </button>
                     <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setHistoryBill(bill);
+                      }}
+                      className="text-gray-400 hover:text-blue-600 p-1 rounded"
+                      title="View History"
+                    >
+                      <History className="h-4 w-4" />
+                    </button>
+                    <button
                       onClick={() => setEditingBill(bill)}
                       className="text-gray-400 hover:text-gray-600 p-1 rounded"
                       title="Edit bill"
@@ -741,9 +768,9 @@ const BillManager = ({
                 <div className="flex-1">
                   <div className="mb-2">
                     <h3 className="font-medium text-gray-900 text-sm leading-tight">
-                      {bill.provider || bill.description}
+                      {bill.provider || bill.description || bill.name || `Bill ${bill.id}`}
                     </h3>
-                    <p className="text-xs text-gray-600">{bill.category}</p>
+                    <p className="text-xs text-gray-600">{bill.category || ""}</p>
                   </div>
 
                   {envelope && (
@@ -770,7 +797,8 @@ const BillManager = ({
                     )}
                     {bill.isPaid && bill.paidDate && (
                       <p className="text-green-600">
-                        Paid: {new Date(bill.paidDate).toLocaleDateString()}
+                        Paid:{" "}
+                        {bill.paidDate ? new Date(bill.paidDate).toLocaleDateString() : "Recently"}
                       </p>
                     )}
                     {bill.accountNumber && <p>Account: {bill.accountNumber}</p>}
@@ -785,8 +813,7 @@ const BillManager = ({
                         ${Math.abs(bill.amount).toFixed(2)}
                       </p>
                       {bill.metadata?.minimumPayment &&
-                        bill.metadata.minimumPayment !==
-                          Math.abs(bill.amount) && (
+                        bill.metadata.minimumPayment !== Math.abs(bill.amount) && (
                           <p className="text-xs text-gray-500">
                             Min: ${bill.metadata.minimumPayment.toFixed(2)}
                           </p>
@@ -805,8 +832,7 @@ const BillManager = ({
                 </div>
 
                 {/* Additional metadata - only show if present */}
-                {(bill.metadata?.statementPeriod ||
-                  bill.metadata?.serviceAddress) && (
+                {(bill.metadata?.statementPeriod || bill.metadata?.serviceAddress) && (
                   <div className="mt-3 pt-3 border-t border-gray-200">
                     <div className="text-xs text-gray-600 space-y-1">
                       {bill.metadata.statementPeriod && (
@@ -851,16 +877,12 @@ const BillManager = ({
 
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="text-3xl">
-                    {getCategoryIcon(showBillDetail)}
-                  </div>
+                  <div className="text-3xl">{getCategoryIcon(showBillDetail)}</div>
                   <div>
                     <p className="font-medium text-lg">
                       {showBillDetail.provider || showBillDetail.description}
                     </p>
-                    <p className="text-sm text-gray-600">
-                      {showBillDetail.category}
-                    </p>
+                    <p className="text-sm text-gray-600">{showBillDetail.category}</p>
                   </div>
                 </div>
 
@@ -874,9 +896,7 @@ const BillManager = ({
                     </p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Due Date
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
                     <p className="text-sm">
                       {showBillDetail.dueDate
                         ? new Date(showBillDetail.dueDate).toLocaleDateString()
@@ -890,9 +910,7 @@ const BillManager = ({
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Account Number
                     </label>
-                    <p className="text-sm font-mono">
-                      {showBillDetail.accountNumber}
-                    </p>
+                    <p className="text-sm font-mono">{showBillDetail.accountNumber}</p>
                   </div>
                 )}
 
@@ -901,10 +919,7 @@ const BillManager = ({
                     Status & Urgency
                   </label>
                   <div className="flex items-center gap-2">
-                    {getUrgencyIcon(
-                      showBillDetail.urgency,
-                      showBillDetail.isPaid,
-                    )}
+                    {getUrgencyIcon(showBillDetail.urgency, showBillDetail.isPaid)}
                     <span
                       className={`px-3 py-1 rounded-full text-sm ${
                         showBillDetail.isPaid
@@ -937,21 +952,16 @@ const BillManager = ({
                       Assigned Envelope
                     </label>
                     <p className="text-sm">
-                      {envelopes.find(
-                        (env) => env.id === showBillDetail.envelopeId,
-                      )?.name || "Unknown"}
+                      {envelopes.find((env) => env.id === showBillDetail.envelopeId)?.name ||
+                        "Unknown"}
                     </p>
                   </div>
                 )}
 
                 {showBillDetail.notes && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Notes
-                    </label>
-                    <p className="text-sm text-gray-600">
-                      {showBillDetail.notes}
-                    </p>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                    <p className="text-sm text-gray-600">{showBillDetail.notes}</p>
                   </div>
                 )}
 
@@ -1010,14 +1020,24 @@ const BillManager = ({
             if (onCreateRecurringBill) {
               onCreateRecurringBill(newBill);
             } else {
-              // Fallback to budget context
-              budget.addTransaction(newBill);
+              // Use TanStack mutation with Zustand fallback
+              try {
+                addBill(newBill);
+              } catch (error) {
+                logger.warn("TanStack addBill failed, using Zustand fallback", error);
+                budget.addTransaction(newBill);
+              }
             }
             setShowAddBillModal(false);
           }}
           onAddEnvelope={(envelopeData) => {
-            // Add envelope to budget context
-            budget.addEnvelope(envelopeData);
+            // Use TanStack mutation with Zustand fallback
+            try {
+              addEnvelope(envelopeData);
+            } catch (error) {
+              logger.warn("TanStack addEnvelope failed, using Zustand fallback", error);
+              budget.addEnvelope(envelopeData);
+            }
           }}
         />
       )}
@@ -1052,23 +1072,81 @@ const BillManager = ({
                 throw error;
               }
             } else {
-              logger.debug("Using budget.updateBill fallback", {
+              logger.debug("Using TanStack updateBill with fallback", {
                 billId: updatedBillData.id,
               });
-              // Fallback to budget context
-              budget.updateBill(updatedBillData);
+              // Use TanStack mutation with Zustand fallback
+              try {
+                updateBill({
+                  id: updatedBillData.id,
+                  updates: updatedBillData,
+                });
+              } catch (error) {
+                logger.warn("TanStack updateBill failed, using Zustand fallback", error);
+                budget.updateBill(updatedBillData);
+              }
             }
             setEditingBill(null);
           }}
-          onDeleteBill={(billId) => {
-            // Use budget store's deleteBill function
-            budget.deleteBill(billId);
+          onDeleteBill={(billId, envelopeId) => {
+            // Use TanStack mutation with Zustand fallback
+            try {
+              deleteBill({ billId, envelopeId });
+            } catch (error) {
+              logger.warn("TanStack deleteBill failed, using Zustand fallback", error);
+              budget.deleteBill(billId);
+              // If envelope should also be deleted, handle it in Zustand too
+              if (envelopeId) {
+                budget.deleteEnvelope(envelopeId);
+              }
+            }
             setEditingBill(null);
           }}
           onAddEnvelope={(envelopeData) => {
-            // Add envelope to budget context
-            budget.addEnvelope(envelopeData);
+            // Use TanStack mutation with Zustand fallback
+            try {
+              addEnvelope(envelopeData);
+            } catch (error) {
+              logger.warn("TanStack addEnvelope failed, using Zustand fallback", error);
+              budget.addEnvelope(envelopeData);
+            }
           }}
+        />
+      )}
+
+      {/* Bulk Update Modal */}
+      {showBulkUpdateModal && (
+        <BulkBillUpdateModal
+          isOpen={showBulkUpdateModal}
+          onClose={() => setShowBulkUpdateModal(false)}
+          selectedBills={bills.filter((bill) => selectedBills.has(bill.id))}
+          onUpdateBills={handleBulkUpdate}
+          onError={onError}
+        />
+      )}
+
+      {/* Bill Discovery Modal */}
+      {showDiscoveryModal && (
+        <BillDiscoveryModal
+          isOpen={showDiscoveryModal}
+          onClose={() => {
+            setShowDiscoveryModal(false);
+            setDiscoveredBills([]);
+          }}
+          discoveredBills={discoveredBills}
+          onAddBills={handleAddDiscoveredBills}
+          onError={onError}
+          availableEnvelopes={envelopes}
+        />
+      )}
+
+      {/* History Modal */}
+      {historyBill && (
+        <ObjectHistoryViewer
+          objectId={historyBill.id}
+          objectType="bill"
+          objectName={historyBill.provider || historyBill.description}
+          onClose={() => setHistoryBill(null)}
         />
       )}
     </div>

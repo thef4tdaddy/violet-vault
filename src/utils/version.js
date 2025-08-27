@@ -1,5 +1,6 @@
 // src/utils/version.js
 import packageJson from "../../package.json";
+import logger from "./logger";
 
 export const APP_VERSION = packageJson.version;
 export const APP_NAME = packageJson.name;
@@ -26,10 +27,9 @@ const initializeCache = () => {
       // Only use cached data if it's still valid
       if (parsed.timestamp && now - parsed.timestamp < versionCache.ttl) {
         versionCache = parsed;
-        console.log(
-          "📦 Loaded version cache from localStorage:",
-          versionCache.data,
-        );
+        logger.debug("Loaded version cache from localStorage", {
+          version: versionCache.data,
+        });
         return true;
       } else {
         // Cache expired, remove it
@@ -37,7 +37,7 @@ const initializeCache = () => {
       }
     }
   } catch (error) {
-    console.warn("Failed to load milestone cache:", error);
+    logger.warn("Failed to load milestone cache:", error);
   }
   return false;
 };
@@ -50,9 +50,9 @@ const saveCache = (data) => {
       timestamp: Date.now(),
     };
     localStorage.setItem(CACHE_KEY, JSON.stringify(versionCache));
-    console.log("💾 Cached version data:", data);
+    logger.debug("Cached version data", { version: data });
   } catch (error) {
-    console.warn("Failed to save version cache:", error);
+    logger.warn("Failed to save version cache:", error);
   }
 };
 
@@ -70,11 +70,11 @@ export const fetchTargetVersion = async () => {
     versionCache.timestamp &&
     now - versionCache.timestamp < versionCache.ttl
   ) {
-    console.log("🎯 Using cached target version:", versionCache.data);
+    logger.debug("Using cached target version", { version: versionCache.data });
     return versionCache.data;
   }
 
-  console.log("🔄 Fetching fresh release-please data from API...");
+  logger.debug("Fetching fresh release-please data from API");
 
   try {
     // Use our Cloudflare Worker endpoint to fetch release-please data (more accurate than milestones)
@@ -98,30 +98,100 @@ export const fetchTargetVersion = async () => {
     if (data.success && data.nextVersion) {
       // Save to cache
       saveCache(data.nextVersion);
-      console.log(
-        "✅ Fetched next version from release-please:",
-        data.nextVersion,
-      );
+      logger.info("Fetched next version from release-please", {
+        version: data.nextVersion,
+      });
       return data.nextVersion;
     } else if (data.fallback?.nextVersion) {
       // Use fallback but don't cache it (so we retry next time)
-      console.log("⚠️ Using fallback next version:", data.fallback.nextVersion);
+      logger.warn("Using fallback next version", {
+        version: data.fallback.nextVersion,
+      });
       return data.fallback.nextVersion;
     }
   } catch (error) {
-    console.warn("❌ Failed to fetch milestone data:", error);
+    logger.warn("Failed to fetch milestone data", error);
   }
 
   // Fallback logic if API fails
   const fallbackVersion = getTargetVersionFallback();
-  console.log("🔄 Using local fallback version:", fallbackVersion);
+  logger.debug("Using local fallback version", { version: fallbackVersion });
   return fallbackVersion;
+};
+
+// Get actual commit timestamp from git (injected at build time)
+const getActualCommitTimestamp = () => {
+  // Priority 1: Try git commit date first (injected by Vite build) - this is the actual commit timestamp
+  const gitCommitDate = import.meta.env.VITE_GIT_COMMIT_DATE;
+  if (gitCommitDate && gitCommitDate !== "undefined") {
+    console.debug("✅ Using git commit date:", gitCommitDate);
+    return new Date(gitCommitDate);
+  }
+
+  // Priority 2: Try git author date as alternative
+  const gitAuthorDate = import.meta.env.VITE_GIT_AUTHOR_DATE;
+  if (gitAuthorDate && gitAuthorDate !== "undefined") {
+    console.debug("✅ Using git author date:", gitAuthorDate);
+    return new Date(gitAuthorDate);
+  }
+
+  // Priority 3: Fallback to Vercel git environment variables
+  const vercelCommitDate = import.meta.env.VITE_VERCEL_GIT_COMMIT_AUTHOR_DATE;
+  if (vercelCommitDate && vercelCommitDate !== "undefined") {
+    console.debug("✅ Using Vercel git commit date:", vercelCommitDate);
+    return new Date(vercelCommitDate);
+  }
+
+  // Priority 4: Use build time only as last resort (not preferred for git commit display)
+  const buildTime = import.meta.env.VITE_BUILD_TIME;
+  if (buildTime && buildTime !== "undefined") {
+    console.warn(
+      "⚠️ Using build time as fallback for git commit (no git timestamp found):",
+      buildTime,
+    );
+    return new Date(buildTime);
+  }
+
+  // Final fallback: use current time (should rarely happen)
+  console.error(
+    "❌ No git or build timestamp found, using current time. Environment variables:",
+    {
+      VITE_GIT_COMMIT_DATE: import.meta.env.VITE_GIT_COMMIT_DATE,
+      VITE_GIT_AUTHOR_DATE: import.meta.env.VITE_GIT_AUTHOR_DATE,
+      VITE_VERCEL_GIT_COMMIT_AUTHOR_DATE: import.meta.env
+        .VITE_VERCEL_GIT_COMMIT_AUTHOR_DATE,
+      VITE_BUILD_TIME: import.meta.env.VITE_BUILD_TIME,
+      DEV: import.meta.env.DEV,
+    },
+  );
+
+  return new Date();
+};
+
+// Format commit timestamp for display
+const formatCommitTimestamp = (timestamp, environment) => {
+  const date = new Date(timestamp);
+
+  // For production, show just the date
+  if (environment === "production") {
+    return date.toISOString().split("T")[0];
+  }
+
+  // For all dev/preview builds, show as "Last commit" since we prioritize git timestamp
+  return date.toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZoneName: "short",
+  });
 };
 
 // Fallback target version detection (used when API is unavailable)
 const getTargetVersionFallback = () => {
   const currentVersion = APP_VERSION;
-  const [major, minor, patch] = currentVersion.split(".").map(Number);
+  const [major, minor] = currentVersion.split(".").map(Number);
 
   // Smart fallback based on current version
   if (major === 1 && minor === 6) {
@@ -136,14 +206,16 @@ const getTargetVersionFallback = () => {
   }
 };
 
-// Branch and environment detection (sync version for immediate use)
+// Branch and environment detection with actual git branch info
 export const getBranchInfo = (targetVersion = null) => {
+  // Get actual git branch from build-time injection
+  const actualGitBranch = import.meta.env.VITE_GIT_BRANCH;
+
   // Check multiple environment detection methods
   const appEnv = import.meta.env.VITE_APP_ENV;
   const isDev = import.meta.env.DEV;
 
   // Vercel environment detection
-  // Vercel sets VERCEL_ENV, but we need VITE_VERCEL_ENV to access it in the browser
   const vercelEnv = import.meta.env.VITE_VERCEL_ENV; // production, preview, development
   const isVercelProduction = vercelEnv === "production";
   const isVercelPreview = vercelEnv === "preview";
@@ -164,9 +236,11 @@ export const getBranchInfo = (targetVersion = null) => {
 
   // Other common environment indicators
   const nodeEnv = import.meta.env.NODE_ENV;
-  const mode = import.meta.env.MODE;
 
   const fallbackVersion = targetVersion || getTargetVersionFallback();
+
+  // Determine branch: Use actual git branch if available, otherwise fall back to environment detection
+  let branch = actualGitBranch || "unknown";
 
   // Environment detection priority:
   // 1. Local development (npm run dev)
@@ -175,7 +249,7 @@ export const getBranchInfo = (targetVersion = null) => {
 
   if (isDev || appEnv === "development") {
     return {
-      branch: "develop",
+      branch: branch,
       environment: "development",
       futureVersion: fallbackVersion,
       isDevelopment: true,
@@ -187,7 +261,7 @@ export const getBranchInfo = (targetVersion = null) => {
     appEnv === "preview"
   ) {
     return {
-      branch: "develop",
+      branch: branch || "develop", // Default to develop for preview
       environment: "preview",
       futureVersion: fallbackVersion,
       isDevelopment: true, // Preview shows dev features
@@ -200,7 +274,7 @@ export const getBranchInfo = (targetVersion = null) => {
     nodeEnv === "production"
   ) {
     return {
-      branch: "main",
+      branch: branch || "main", // Default to main for production
       environment: "production",
       futureVersion: null,
       isDevelopment: false,
@@ -209,7 +283,7 @@ export const getBranchInfo = (targetVersion = null) => {
   } else {
     // Default to production for safety
     return {
-      branch: "main",
+      branch: branch || "main",
       environment: "production",
       futureVersion: null,
       isDevelopment: false,
@@ -242,12 +316,26 @@ export const getVersionInfo = (targetVersion = null) => {
     environmentLabel = "✅ Production";
   }
 
+  // Get actual commit timestamp (injected at build time)
+  const commitTimestamp = getActualCommitTimestamp();
+  const formattedCommitTime = formatCommitTimestamp(
+    commitTimestamp,
+    branchInfo.environment,
+  );
+
+  // Get additional git info for better debugging
+  const gitCommitHash = import.meta.env.VITE_GIT_COMMIT_HASH || "unknown";
+  const gitCommitMessage = import.meta.env.VITE_GIT_COMMIT_MESSAGE || "";
+
   return {
     version: displayVersion,
     baseVersion: APP_VERSION, // Always from package.json
     name: APP_NAME,
     displayName: "VioletVault",
-    buildDate: new Date().toISOString().split("T")[0],
+    buildDate: formattedCommitTime, // Now shows actual git commit timestamp
+    commitTimestamp: commitTimestamp, // Raw timestamp for other uses
+    commitHash: gitCommitHash, // Short git commit hash
+    commitMessage: gitCommitMessage, // First line of commit message
     branch: branchInfo.branch,
     environment: branchInfo.environment,
     environmentLabel,
@@ -263,7 +351,7 @@ export const getVersionInfoAsync = async () => {
     const targetVersion = await fetchTargetVersion();
     return getVersionInfo(targetVersion);
   } catch (error) {
-    console.warn("Failed to fetch async version info, using fallback:", error);
+    logger.warn("Failed to fetch async version info, using fallback:", error);
     return getVersionInfo();
   }
 };
@@ -277,9 +365,9 @@ export const clearVersionCache = () => {
       timestamp: null,
       ttl: 7 * 24 * 60 * 60 * 1000,
     };
-    console.log("🗑️ Version cache cleared");
+    logger.debug("Version cache cleared");
   } catch (error) {
-    console.warn("Failed to clear cache:", error);
+    logger.warn("Failed to clear cache:", error);
   }
 };
 
@@ -313,7 +401,9 @@ export const getCacheStatus = () => {
 
 // Development utility for testing version transitions
 export const simulateVersionTransition = (newTargetVersion) => {
-  console.log(`🧪 Simulating version transition to v${newTargetVersion}`);
+  logger.debug("Simulating version transition", {
+    targetVersion: newTargetVersion,
+  });
   clearVersionCache();
 
   // Temporarily override the cache with new version for testing
@@ -323,13 +413,13 @@ export const simulateVersionTransition = (newTargetVersion) => {
       timestamp: Date.now(),
     };
     localStorage.setItem(CACHE_KEY, JSON.stringify(versionCache));
-    console.log(`💾 Cached new target version: ${newTargetVersion}`);
+    logger.debug("Cached new target version", { version: newTargetVersion });
   } catch (error) {
-    console.warn("Failed to save simulated cache:", error);
+    logger.warn("Failed to save simulated cache:", error);
   }
 
-  console.log(
-    `✅ Simulated transition complete. Run getVersionInfoAsync() to test.`,
+  logger.info(
+    "Simulated transition complete. Run getVersionInfoAsync() to test.",
   );
   return newTargetVersion;
 };

@@ -3,6 +3,8 @@
  * Access via browser console: window.VioletVaultErrors
  */
 
+import logger from "./logger";
+
 class ErrorViewer {
   constructor() {
     this.initializeConsoleAPI();
@@ -20,12 +22,12 @@ class ErrorViewer {
 
     // Add friendly console message
     if (process.env.NODE_ENV === "development") {
-      console.log(
+      logger.info(
         "%c🔍 VioletVault Error Viewer Available",
         "color: #8b5cf6; font-weight: bold; font-size: 14px"
       );
-      console.log("Use window.VioletVaultErrors.view() to see stored errors");
-      console.log("Other commands: .clear(), .export(), .count(), .latest(n)");
+      logger.info("Use window.VioletVaultErrors.view() to see stored errors");
+      logger.info("Other commands: .clear(), .export(), .count(), .latest(n)");
     }
   }
 
@@ -33,7 +35,7 @@ class ErrorViewer {
     try {
       return JSON.parse(localStorage.getItem("violet-vault-errors") || "[]");
     } catch (error) {
-      console.error("Failed to parse stored errors:", error);
+      logger.error("Failed to parse stored errors:", error);
       return [];
     }
   }
@@ -42,31 +44,28 @@ class ErrorViewer {
     const errors = this.getStoredErrors();
 
     if (errors.length === 0) {
-      console.log("✅ No errors stored locally");
+      logger.info("✅ No errors stored locally");
       return;
     }
 
-    console.group(`🚨 VioletVault Stored Errors (${errors.length})`);
+    logger.info(`🚨 VioletVault Stored Errors (${errors.length})`);
 
     errors.forEach((error, index) => {
       const timeAgo = this.getTimeAgo(error.timestamp);
-      console.group(`${index + 1}. ${error.name}: ${error.message} (${timeAgo})`);
-      console.log("Component:", error.failingComponent);
-      console.log("Timestamp:", error.timestamp);
-      console.log("URL:", error.url);
-      console.log("Stack:", error.stack);
-      console.log("Component Stack:", error.componentStack);
-      console.groupEnd();
+      logger.info(`${index + 1}. ${error.name}: ${error.message} (${timeAgo})`);
+      logger.debug("Component:", error.failingComponent);
+      logger.debug("Timestamp:", error.timestamp);
+      logger.debug("URL:", error.url);
+      logger.debug("Stack:", error.stack);
+      logger.debug("Component Stack:", error.componentStack);
     });
-
-    console.groupEnd();
 
     return errors;
   }
 
   clearErrors() {
     localStorage.removeItem("violet-vault-errors");
-    console.log("🧹 Cleared all stored errors");
+    logger.info("🧹 Cleared all stored errors");
   }
 
   exportErrors() {
@@ -81,23 +80,23 @@ class ErrorViewer {
     link.click();
 
     URL.revokeObjectURL(url);
-    console.log("📥 Exported errors to JSON file");
+    logger.info("📥 Exported errors to JSON file");
 
     return errors;
   }
 
   getErrorCount() {
     const count = this.getStoredErrors().length;
-    console.log(`📊 ${count} errors stored locally`);
+    logger.info(`📊 ${count} errors stored locally`);
     return count;
   }
 
   getLatestErrors(n = 5) {
     const errors = this.getStoredErrors().slice(0, n);
-    console.log(`📋 Latest ${n} errors:`);
+    logger.info(`📋 Latest ${n} errors:`);
     errors.forEach((error, index) => {
       const timeAgo = this.getTimeAgo(error.timestamp);
-      console.log(`${index + 1}. ${error.failingComponent}: ${error.message} (${timeAgo})`);
+      logger.info(`${index + 1}. ${error.failingComponent}: ${error.message} (${timeAgo})`);
     });
     return errors;
   }
@@ -119,17 +118,17 @@ class ErrorViewer {
     const errors = this.getStoredErrors();
 
     if (errors.length === 0) {
-      console.log("✅ No errors to retry");
+      logger.info("✅ No errors to retry");
       return;
     }
 
-    console.log(`🔄 Attempting to send ${errors.length} stored errors...`);
+    logger.info(`🔄 Attempting to send ${errors.length} stored errors...`);
 
     // This would integrate with whatever error service you want to use
     // For now, just log them with instructions for manual sending
-    console.group("📤 Errors ready to send to external service:");
+    logger.info("📤 Errors ready to send to external service:");
     errors.forEach((error, index) => {
-      console.log(`${index + 1}.`, {
+      logger.debug(`${index + 1}.`, {
         timestamp: error.timestamp,
         error: error.name,
         message: error.message,
@@ -137,9 +136,8 @@ class ErrorViewer {
         signature: error.errorSignature,
       });
     });
-    console.groupEnd();
 
-    console.log("💡 You can copy these errors and manually report them");
+    logger.info("💡 You can copy these errors and manually report them");
     return errors;
   }
 }

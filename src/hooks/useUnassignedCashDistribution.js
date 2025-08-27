@@ -1,15 +1,27 @@
 import { useState, useCallback, useMemo } from "react";
-import { useBudgetStore } from "../stores/budgetStore";
+import { useQueryClient } from "@tanstack/react-query";
+import { useUnassignedCash } from "./useBudgetMetadata";
+import useEnvelopes from "./useEnvelopes";
+import useBills from "./useBills";
 import { ENVELOPE_TYPES, AUTO_CLASSIFY_ENVELOPE_TYPE } from "../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../constants/frequency";
+import { budgetDb } from "../db/budgetDb";
+import { queryKeys } from "../utils/queryClient";
+import {
+  calculateBillEnvelopePriority,
+  getRecommendedBillFunding,
+} from "../utils/billEnvelopeCalculations";
+import logger from "../utils/logger";
 
 /**
  * Custom hook for managing unassigned cash distribution logic
  * Handles distribution calculations, validation, and envelope updates
  */
 const useUnassignedCashDistribution = () => {
-  const budget = useBudgetStore();
-  const { envelopes, unassignedCash, bulkUpdateEnvelopes, setUnassignedCash } = budget;
+  const { unassignedCash, setUnassignedCash } = useUnassignedCash();
+  const { envelopes } = useEnvelopes();
+  const { bills = [] } = useBills();
+  const queryClient = useQueryClient();
 
   // Distribution state (modal state now handled by budget store)
   const [distributions, setDistributions] = useState({});
@@ -123,6 +135,65 @@ const useUnassignedCashDistribution = () => {
     setDistributions(newDistributions);
   }, [envelopes, unassignedCash, distributeEqually]);
 
+  // Distribute based on bill envelope priorities
+  const distributeBillPriority = useCallback(() => {
+    if (envelopes.length === 0) return;
+
+    const billEnvelopes = envelopes.filter(
+      (env) =>
+        env.envelopeType === ENVELOPE_TYPES.BILL ||
+        AUTO_CLASSIFY_ENVELOPE_TYPE(env.category) === ENVELOPE_TYPES.BILL
+    );
+
+    if (billEnvelopes.length === 0) {
+      // Fallback to proportional if no bill envelopes
+      distributeProportionally();
+      return;
+    }
+
+    // Calculate priorities and recommendations for each bill envelope
+    const envelopeRecommendations = billEnvelopes.map((envelope) => {
+      const priority = calculateBillEnvelopePriority(envelope, bills);
+      const recommendation = getRecommendedBillFunding(envelope, bills, unassignedCash);
+
+      return {
+        envelope,
+        priority: priority.priority,
+        priorityLevel: priority.priorityLevel,
+        recommendedAmount: recommendation.recommendedAmount,
+        reason: recommendation.reason,
+        isUrgent: recommendation.isUrgent,
+      };
+    });
+
+    // Sort by priority (highest first)
+    envelopeRecommendations.sort((a, b) => b.priority - a.priority);
+
+    const newDistributions = {};
+    let remainingCash = unassignedCash;
+
+    // First pass: Fund urgent/critical envelopes fully
+    envelopeRecommendations.forEach(({ envelope, recommendedAmount, isUrgent }) => {
+      if (isUrgent && remainingCash >= recommendedAmount) {
+        newDistributions[envelope.id] = recommendedAmount;
+        remainingCash -= recommendedAmount;
+      }
+    });
+
+    // Second pass: Fund other envelopes based on availability
+    envelopeRecommendations.forEach(({ envelope, recommendedAmount, isUrgent }) => {
+      if (!isUrgent && remainingCash > 0) {
+        const amountToAllocate = Math.min(recommendedAmount, remainingCash);
+        if (amountToAllocate > 0) {
+          newDistributions[envelope.id] = amountToAllocate;
+          remainingCash -= amountToAllocate;
+        }
+      }
+    });
+
+    setDistributions(newDistributions);
+  }, [envelopes, bills, unassignedCash, distributeProportionally]);
+
   // Apply the distribution to envelopes
   const applyDistribution = useCallback(async () => {
     if (!isValidDistribution) return;
@@ -139,8 +210,8 @@ const useUnassignedCashDistribution = () => {
           const envelope = envelopes.find((env) => env.id === envelopeId);
           if (envelope) {
             envelopeUpdates.push({
-              id: envelopeId,
-              currentAmount: (envelope.currentAmount || 0) + distributionAmount,
+              ...envelope,
+              currentBalance: (envelope.currentBalance || 0) + distributionAmount,
             });
           }
         }
@@ -148,21 +219,31 @@ const useUnassignedCashDistribution = () => {
 
       // Apply updates
       if (envelopeUpdates.length > 0) {
-        bulkUpdateEnvelopes(envelopeUpdates);
-        setUnassignedCash(remainingCash);
+        await budgetDb.bulkUpsertEnvelopes(envelopeUpdates);
+
+        // Update unassigned cash with distribution tracking
+        await setUnassignedCash(remainingCash, {
+          author: "Family Member", // Generic name for family budgeting
+          source: "distribution",
+        });
+
+        queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
+        queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+        queryClient.invalidateQueries({ queryKey: queryKeys.dashboardSummary });
       }
 
       // Reset distributions after successful application
       setDistributions({});
     } catch (error) {
-      console.error("Error applying distribution:", error);
+      logger.error("Error applying distribution:", error);
+    } finally {
       setIsProcessing(false);
     }
   }, [
     isValidDistribution,
     distributions,
     envelopes,
-    bulkUpdateEnvelopes,
+    queryClient,
     setUnassignedCash,
     remainingCash,
   ]);
@@ -175,7 +256,7 @@ const useUnassignedCashDistribution = () => {
         return {
           ...envelope,
           distributionAmount,
-          newBalance: (envelope.currentAmount || 0) + distributionAmount,
+          newBalance: (envelope.currentBalance || 0) + distributionAmount,
         };
       })
       .filter((envelope) => envelope.distributionAmount > 0);
@@ -197,10 +278,12 @@ const useUnassignedCashDistribution = () => {
     clearDistributions,
     distributeEqually,
     distributeProportionally,
+    distributeBillPriority,
     applyDistribution,
 
     // Data
     envelopes,
+    bills,
     unassignedCash,
     getDistributionPreview,
   };

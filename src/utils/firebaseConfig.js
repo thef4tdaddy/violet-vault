@@ -1,3 +1,5 @@
+import logger from "./logger";
+
 export const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "demo-api-key",
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "demo-project.firebaseapp.com",
@@ -13,10 +15,9 @@ const requiredKeys = ["VITE_FIREBASE_API_KEY", "VITE_FIREBASE_PROJECT_ID"];
 
 const missingKeys = requiredKeys.filter((key) => !import.meta.env[key]);
 if (missingKeys.length > 0) {
-  console.warn(
-    "⚠️ Using demo Firebase config. Set environment variables for production:",
-    missingKeys
-  );
+  logger.warn("Using demo Firebase config. Set environment variables for production", {
+    missingKeys,
+  });
 }
 
 // Debug: Log what Firebase project we're connecting to (dev/preview only)
@@ -25,7 +26,7 @@ if (
   window.location.hostname.includes("vercel.app") ||
   window.location.hostname.includes("f4tdaddy.com")
 ) {
-  console.log("🔥 Firebase Config Debug:", {
+  logger.debug("Firebase Config Debug", {
     projectId: firebaseConfig.projectId,
     authDomain: firebaseConfig.authDomain,
     usingDemo: firebaseConfig.projectId === "demo-project",

@@ -1,4 +1,9 @@
 {
+  "build": {
+    "env": {
+      "GENERATE_SOURCEMAP": "true"
+    }
+  },
   "headers": [
     {
       "source": "/assets/(.*)",

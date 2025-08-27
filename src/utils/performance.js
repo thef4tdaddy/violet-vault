@@ -1,4 +1,6 @@
 // Performance monitoring utilities
+import logger from "./logger";
+
 export const performanceMonitor = {
   // Track component render times
   measureRender: (componentName, fn) => {
@@ -6,7 +8,7 @@ export const performanceMonitor = {
       const start = performance.now();
       const result = fn();
       const end = performance.now();
-      console.log(`${componentName} render time: ${(end - start).toFixed(2)}ms`);
+      logger.debug(`${componentName} render time: ${(end - start).toFixed(2)}ms`);
       return result;
     }
     return fn();
@@ -41,7 +43,7 @@ export const performanceMonitor = {
   logMemoryUsage: () => {
     if (process.env.NODE_ENV === "development" && "memory" in performance) {
       const memInfo = performance.memory;
-      console.log("Memory Usage:", {
+      logger.debug("Memory Usage", {
         used: `${Math.round(memInfo.usedJSHeapSize / 1048576)}MB`,
         total: `${Math.round(memInfo.totalJSHeapSize / 1048576)}MB`,
         limit: `${Math.round(memInfo.jsHeapSizeLimit / 1048576)}MB`,
@@ -55,7 +57,7 @@ export const performanceMonitor = {
       const start = performance.now();
       const result = await asyncFn();
       const end = performance.now();
-      console.log(`${operationName} took: ${(end - start).toFixed(2)}ms`);
+      logger.debug(`${operationName} took: ${(end - start).toFixed(2)}ms`);
       return result;
     }
     return await asyncFn();
@@ -71,7 +73,7 @@ export const performanceMonitor = {
       if (originalImport) {
         window.__vitePreload = (id, importer) => {
           if (!loadedChunks.has(id)) {
-            console.log(`Loading chunk: ${id}`);
+            logger.debug(`Loading chunk: ${id}`);
             loadedChunks.add(id);
           }
           return originalImport(id, importer);

@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { useBudgetStore } from "../stores/budgetStore";
+import { useBudgetStore } from "../stores/uiStore";
+// import { budgetDb } from "../db/budgetDb"; // TODO: Use for local sync operations
 import logger from "../utils/logger";
+import { useToastHelpers } from "../utils/toastHelpers";
 
 /**
  * Custom hook for Firebase synchronization management
@@ -8,130 +10,113 @@ import logger from "../utils/logger";
  */
 const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => {
   const budget = useBudgetStore();
+  const { showSuccessToast, showErrorToast } = useToastHelpers();
   const [activeUsers, setActiveUsers] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [_isLoading, _setIsLoading] = useState(false); // TODO: Use for loading states
 
   // Auto-initialize Firebase sync when dependencies are ready
   useEffect(() => {
-    if (!firebaseSync || !budgetId || !encryptionKey) return;
+    if (!firebaseSync || !budgetId || !encryptionKey || !currentUser) return;
 
-    console.log("🔄 Auto-initializing Firebase sync...");
-    firebaseSync.initialize(budgetId, encryptionKey);
+    logger.info("🔄 Auto-initializing chunked Firebase sync...");
 
-    // Auto-load data from cloud
+    // Start the cloud sync service with config
+    const config = {
+      budgetId,
+      encryptionKey,
+      currentUser,
+    };
+    firebaseSync.start(config);
+
+    // Auto-load data from cloud using force sync
     const loadCloudData = async () => {
       try {
-        setIsLoading(true);
-        const cloudData = await firebaseSync.loadFromCloud();
-        if (cloudData && cloudData.data) {
-          console.log("📥 Loading data from cloud:", Object.keys(cloudData.data));
-          // Update budget store with cloud data
-          if (cloudData.data.envelopes) budget.setEnvelopes(cloudData.data.envelopes);
-          if (cloudData.data.bills) budget.setBills(cloudData.data.bills);
-          if (cloudData.data.savingsGoals) budget.setSavingsGoals(cloudData.data.savingsGoals);
-          if (cloudData.data.transactions) {
-            budget.setTransactions(cloudData.data.transactions);
-          }
-          if (cloudData.data.allTransactions) {
-            budget.setAllTransactions(cloudData.data.allTransactions);
-          } else if (cloudData.data.transactions) {
-            // Fallback for older sync data that only has `transactions`
-            // Ensures the ledger isn't empty when allTransactions is missing
-            budget.setAllTransactions(cloudData.data.transactions);
-          }
-          if (typeof cloudData.data.unassignedCash === "number")
-            budget.setUnassignedCash(cloudData.data.unassignedCash);
-          if (typeof cloudData.data.biweeklyAllocation === "number")
-            budget.setBiweeklyAllocation(cloudData.data.biweeklyAllocation);
-          if (cloudData.data.paycheckHistory)
-            budget.setPaycheckHistory(cloudData.data.paycheckHistory);
-          if (typeof cloudData.data.actualBalance === "number")
-            budget.setActualBalance(
-              cloudData.data.actualBalance,
-              cloudData.data.isActualBalanceManual
-            );
+        _setIsLoading(true);
+        const syncResult = await firebaseSync.forceSync();
+        if (syncResult && syncResult.success) {
+          logger.info("✅ Chunked sync completed:", syncResult);
+          showSuccessToast("Data synced from cloud successfully");
+
+          // The cloudSyncService handles syncing data to Dexie automatically
+          // TanStack Query will pick up the changes from Dexie
+
+          // Update non-Dexie Zustand state if needed
+          // These would need to be handled separately since they're not in Dexie
+
+          logger.info("🔄 Chunked Firebase → Dexie sync completed");
         }
       } catch (error) {
         console.warn("Failed to load cloud data:", error.message);
       } finally {
-        setIsLoading(false);
+        _setIsLoading(false);
       }
     };
 
     loadCloudData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firebaseSync, budgetId, encryptionKey]); // Remove budget from deps to prevent load loop
 
-  // Auto-save data when it changes
+  // The cloudSyncService automatically handles syncing - no manual auto-save needed
+  // It runs periodic sync every 30 seconds and handles bidirectional sync
   useEffect(() => {
-    if (!firebaseSync || !currentUser || !budgetId || isLoading) return;
+    if (!firebaseSync || !currentUser || !budgetId) return;
 
-    // Debounce saves to avoid excessive syncing
-    const timeoutId = setTimeout(async () => {
-      try {
-        console.log("💾 Auto-saving data to cloud...");
-        await firebaseSync.saveToCloud(
-          {
-            envelopes: budget.envelopes,
-            bills: budget.bills,
-            savingsGoals: budget.savingsGoals,
-            unassignedCash: budget.unassignedCash,
-            biweeklyAllocation: budget.biweeklyAllocation,
-            transactions: budget.allTransactions,
-            allTransactions: budget.allTransactions,
-            paycheckHistory: budget.paycheckHistory,
-            actualBalance: budget.actualBalance,
-            isActualBalanceManual: budget.isActualBalanceManual,
-          },
-          currentUser
-        );
-        console.log("✅ Data auto-saved to cloud");
-      } catch (error) {
-        console.warn("Auto-save failed:", error.message);
+    // Ensure the sync service is running with current config
+    const config = {
+      budgetId,
+      encryptionKey,
+      currentUser,
+    };
+
+    // Make sure service is started (idempotent)
+    if (!firebaseSync.isRunning) {
+      firebaseSync.start(config);
+    }
+
+    // Cleanup function to stop sync service when component unmounts
+    return () => {
+      // Don't stop the service here since other components might need it
+      // firebaseSync.stop();
+    };
+  }, [firebaseSync, currentUser, budgetId, encryptionKey]);
+
+  // Legacy code for manual save operations (if needed)
+  const _handleManualSave = async () => {
+    // TODO: Implement manual save functionality
+    try {
+      logger.info("💾 Manual save triggered - using forceSync...");
+      const result = await firebaseSync.forceSync();
+      if (result && result.success) {
+        showSuccessToast("Data saved successfully");
+      } else {
+        showErrorToast("Failed to save data");
       }
-    }, 2000); // 2 second debounce
-
-    return () => clearTimeout(timeoutId);
-  }, [
-    firebaseSync,
-    currentUser,
-    budgetId,
-    isLoading, // Prevent saves during loads
-    budget.envelopes,
-    budget.bills,
-    budget.savingsGoals,
-    budget.unassignedCash,
-    budget.biweeklyAllocation,
-    budget.allTransactions,
-    budget.paycheckHistory,
-    budget.actualBalance,
-    budget.isActualBalanceManual,
-  ]);
+    } catch (error) {
+      console.warn("Manual save failed:", error.message);
+      showErrorToast("Failed to save data");
+    }
+  };
 
   const handleManualSync = useCallback(async () => {
     try {
       if (!firebaseSync) return;
-      await firebaseSync.saveToCloud(
-        {
-          envelopes: budget.envelopes,
-          bills: budget.bills,
-          savingsGoals: budget.savingsGoals,
-          unassignedCash: budget.unassignedCash,
-          biweeklyAllocation: budget.biweeklyAllocation,
-          transactions: budget.allTransactions,
-          allTransactions: budget.allTransactions,
-          paycheckHistory: budget.paycheckHistory,
-          actualBalance: budget.actualBalance,
-          isActualBalanceManual: budget.isActualBalanceManual,
-        },
-        currentUser
-      );
-      alert("Data synced to cloud");
+
+      logger.info("🔄 Manual sync triggered...");
+      const result = await firebaseSync.forceSync();
+
+      if (result && result.success) {
+        showSuccessToast("Manual sync completed successfully");
+        logger.info("✅ Manual sync completed:", result);
+      } else {
+        showErrorToast("Manual sync failed");
+        console.warn("❌ Manual sync failed:", result);
+      }
     } catch (err) {
       console.error("Manual sync failed", err);
-      alert(`Sync failed: ${err.message}`);
+      showErrorToast(`Sync failed: ${err.message}`, "Sync Failed");
     }
-  }, [firebaseSync, budget, currentUser]);
+  }, [firebaseSync, showErrorToast, showSuccessToast]);
 
   // Update activity data from Firebase sync
   useEffect(() => {

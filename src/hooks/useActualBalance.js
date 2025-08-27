@@ -1,5 +1,6 @@
 import { useCallback } from "react";
-import useBudgetStore from "../stores/budgetStore";
+import { useBudgetStore } from "../stores/uiStore";
+import logger from "../utils/logger";
 
 /**
  * Custom hook for managing actual balance operations
@@ -25,7 +26,7 @@ export const useActualBalance = () => {
 
       // Validate input
       if (typeof newBalance !== "number" || isNaN(newBalance)) {
-        console.warn("Invalid balance value provided:", newBalance);
+        logger.warn("Invalid balance value provided:", { value: newBalance });
         return false;
       }
 
@@ -34,7 +35,10 @@ export const useActualBalance = () => {
       const MIN_BALANCE = -100000; // -$100k limit (for overdrafts)
 
       if (newBalance > MAX_BALANCE || newBalance < MIN_BALANCE) {
-        console.warn("Balance outside reasonable limits:", newBalance);
+        logger.warn("Balance outside reasonable limits:", {
+          value: newBalance,
+          limits: { max: MAX_BALANCE, min: MIN_BALANCE },
+        });
         return false;
       }
 
@@ -55,7 +59,7 @@ export const useActualBalance = () => {
       };
 
       // For now, just log to console (in production this would go to an audit service)
-      console.log("Balance updated:", auditEntry);
+      logger.info("Balance updated", auditEntry);
 
       return true;
     },

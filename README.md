@@ -2,6 +2,8 @@
 
 **A comprehensive cash management system** with advanced envelope budgeting, intelligent automation, and professional-grade infrastructure. Bringing the traditional cash envelope method into the digital age with end-to-end encryption, smart distribution, and real-time collaboration.
 
+🎯 **Recent improvements:** v1.9.0 Security & Compliance milestone completed with smart deletion modals, data integrity enhancements, and comprehensive auto-funding system.
+
 [![CI](https://github.com/thef4tdaddy/violet-vault/workflows/CI/badge.svg)](https://github.com/thef4tdaddy/violet-vault/actions)
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
@@ -18,6 +20,7 @@
 - **Bill Management** - Enhanced bill tracking with compact multi-row layouts
 - **Savings Goals** - Advanced goal tracking with progress monitoring and automation
 - **Transaction Ledger** - Complete transaction history with enhanced reconciliation tools
+- **Smart Deletion System** - Professional modals for bill/envelope deletion with relationship handling
 
 ### 🔒 Security & Privacy
 
@@ -217,6 +220,7 @@ VioletVault takes your financial privacy seriously:
 - **[⚠️ Lint Warnings](docs/LINT_WARNINGS.md)** - ESLint warning tracking and resolution
 - **[🔄 Refactoring Analysis](docs/Refactoring-Analysis.md)** - Architecture improvement plans
 - **[🛠️ New Utilities Analysis](docs/New-Utilities-Analysis.md)** - Feature analysis and utilities
+- **[❓ Troubleshooting FAQ](docs/Troubleshooting-FAQ.md)** - Common issues and solutions
 
 ## 🗺️ Roadmap
 

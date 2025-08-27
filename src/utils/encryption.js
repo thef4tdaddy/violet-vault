@@ -63,10 +63,14 @@ export const encryptionUtils = {
   async encrypt(data, key) {
     const encoder = new TextEncoder();
     const iv = crypto.getRandomValues(new Uint8Array(12));
+
+    // Handle both string data (already JSON stringified) and object data
+    const stringData = typeof data === "string" ? data : JSON.stringify(data);
+
     const encrypted = await crypto.subtle.encrypt(
       { name: "AES-GCM", iv: iv },
       key,
-      encoder.encode(JSON.stringify(data))
+      encoder.encode(stringData)
     );
 
     return {
@@ -84,6 +88,17 @@ export const encryptionUtils = {
 
     const decoder = new TextDecoder();
     return JSON.parse(decoder.decode(decrypted));
+  },
+
+  async decryptRaw(encryptedData, key, iv) {
+    const decrypted = await crypto.subtle.decrypt(
+      { name: "AES-GCM", iv: new Uint8Array(iv) },
+      key,
+      new Uint8Array(encryptedData)
+    );
+
+    const decoder = new TextDecoder();
+    return decoder.decode(decrypted);
   },
 
   generateDeviceFingerprint() {
@@ -113,13 +128,26 @@ export const encryptionUtils = {
     return Math.abs(hash).toString(16);
   },
 
-  generateBudgetId(masterPassword) {
+  async generateBudgetId(masterPassword) {
     let hash = 0;
     for (let i = 0; i < masterPassword.length; i++) {
       const char = masterPassword.charCodeAt(i);
       hash = (hash << 5) - hash + char;
       hash = hash & hash;
     }
-    return `budget_${Math.abs(hash).toString(16)}`;
+    const budgetId = `budget_${Math.abs(hash).toString(16)}`;
+
+    return budgetId;
+  },
+
+  generateHash(data) {
+    let hash = 0;
+    const str = typeof data === "string" ? data : JSON.stringify(data);
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash = hash & hash;
+    }
+    return Math.abs(hash).toString(16);
   },
 };

@@ -5,7 +5,23 @@ import reactRefresh from "eslint-plugin-react-refresh";
 
 export default [
   {
-    ignores: ["dist/**", ".markdownlintignore"],
+    ignores: [
+      "dist/**",
+      ".markdownlintignore",
+      "node_modules/**",
+      ".git/**",
+      "coverage/**",
+      "*.min.js",
+      "*.bundle.js",
+      ".vscode/**",
+      ".idea/**",
+      "*.log",
+      ".env*",
+      "build/**",
+      "public/**/*.js",
+      "**/*.test.js",
+      "**/*.spec.js",
+    ],
   },
   {
     files: ["**/*.{js,jsx}"],
@@ -14,6 +30,18 @@ export default [
       globals: {
         ...globals.browser,
         ...globals.node,
+        // Vitest globals (when globals: true in vitest.config.js)
+        vi: "readonly",
+        describe: "readonly",
+        test: "readonly",
+        it: "readonly",
+        expect: "readonly",
+        beforeAll: "readonly",
+        afterAll: "readonly",
+        beforeEach: "readonly",
+        afterEach: "readonly",
+        suite: "readonly",
+        // Node.js globals
         process: "readonly",
         module: "readonly",
         require: "readonly",

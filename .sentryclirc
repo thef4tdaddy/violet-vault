@@ -1,6 +1,0 @@
-[defaults]
-org=f4tdaddy
-project=violet-vault
-
-[auth]
-token=$SENTRY_AUTH_TOKEN

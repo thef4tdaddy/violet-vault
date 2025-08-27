@@ -1,6 +1,18 @@
 // Extracted from old BillManager - proper bill creation modal
 import React, { useState, useEffect } from "react";
-import { X, Save, Sparkles, Trash2 } from "lucide-react";
+import {
+  X,
+  Save,
+  Sparkles,
+  Trash2,
+  Lock,
+  Unlock,
+  User,
+  Clock,
+} from "lucide-react";
+import useEditLock from "../../hooks/useEditLock";
+import { initializeEditLocks } from "../../services/editLockService";
+import { useAuth } from "../../stores/authStore";
 import {
   getBillIcon,
   getBillIconOptions,
@@ -8,7 +20,14 @@ import {
   getIconByName,
   getIconNameForStorage,
 } from "../../utils/billIcons";
-import { toBiweekly, toMonthly, getFrequencyOptions } from "../../utils/frequencyCalculations";
+import {
+  toMonthly,
+  getFrequencyOptions,
+} from "../../utils/frequencyCalculations";
+import {
+  BIWEEKLY_MULTIPLIER,
+  convertToBiweekly,
+} from "../../constants/frequency";
 import { getBillCategories } from "../../constants/categories";
 import logger from "../../utils/logger";
 
@@ -29,7 +48,11 @@ const getInitialFormData = (bill = null) => {
         bill.iconName ||
         getIconNameForStorage(
           bill.icon ||
-            getBillIcon(bill.name || bill.provider || "", bill.notes || "", bill.category || "")
+            getBillIcon(
+              bill.name || bill.provider || "",
+              bill.notes || "",
+              bill.category || "",
+            ),
         ),
     };
   }
@@ -60,13 +83,46 @@ const AddBillModal = ({
 }) => {
   const [formData, setFormData] = useState(getInitialFormData(editingBill));
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteEnvelopeToo, setDeleteEnvelopeToo] = useState(false);
+
+  // Get auth context for edit locking
+  const { budgetId, currentUser } = useAuth();
+
+  // Initialize edit lock service when modal opens
+  useEffect(() => {
+    if (isOpen && budgetId && currentUser) {
+      initializeEditLocks(budgetId, currentUser);
+    }
+  }, [isOpen, budgetId, currentUser]);
+
+  // Edit locking for the bill (only when editing existing bill)
+  const {
+    isLocked,
+    isOwnLock,
+    canEdit,
+    lockedBy,
+    timeRemaining,
+    isExpired,
+    releaseLock,
+    breakLock,
+    isLoading: lockLoading,
+  } = useEditLock("bill", editingBill?.id, {
+    autoAcquire: isOpen && editingBill?.id, // Only auto-acquire for edits
+    autoRelease: true,
+    showToasts: true,
+  });
 
   useEffect(() => {
     if (isOpen) {
       const initialData = getInitialFormData(editingBill);
-      const billEnvelopes = availableEnvelopes.filter(
-        (env) => env.envelopeType === "bill" || !env.envelopeType
-      );
+      const billEnvelopes = availableEnvelopes.filter((env) => {
+        // Check if envelope is suitable for bills - allow "bill" and "variable" types
+        // Also allow legacy envelopes with no type set for backwards compatibility
+        const isBillEnvelope = env.envelopeType === "bill";
+        const isVariableEnvelope = env.envelopeType === "variable";
+        const isLegacyEnvelope = !env.envelopeType;
+        return isBillEnvelope || isVariableEnvelope || isLegacyEnvelope;
+      });
 
       logger.debug("Initializing bill modal form data", {
         editingBill: editingBill?.id,
@@ -79,6 +135,14 @@ const AddBillModal = ({
           name: e.name,
           type: e.envelopeType,
         })),
+        // Debug envelope filtering
+        allEnvelopeDetails: availableEnvelopes.map((e) => ({
+          id: e.id,
+          name: e.name,
+          envelopeType: e.envelopeType,
+          passesFilter: e.envelopeType === "bill" || !e.envelopeType,
+        })),
+        filterCriteria: "envelopeType === 'bill' || !envelopeType",
       });
       setFormData(initialData);
     }
@@ -89,7 +153,7 @@ const AddBillModal = ({
     const suggestedIcon = getBillIcon(
       formData.name || "",
       formData.notes || "",
-      formData.category || "Bills"
+      formData.category || "Bills",
     );
     setFormData((prev) => ({
       ...prev,
@@ -124,12 +188,20 @@ const AddBillModal = ({
   if (!isOpen) return null;
 
   const calculateBiweeklyAmount = (amount, frequency, customFrequency = 1) => {
-    if (frequency === "custom") return toBiweekly(amount, "yearly") * customFrequency;
-    return toBiweekly(amount, frequency);
+    // First convert to monthly equivalent, then use unified biweekly logic
+    const monthlyAmount = calculateMonthlyAmount(
+      amount,
+      frequency,
+      customFrequency,
+    );
+
+    // Use unified constant for consistent biweekly calculation across app
+    return convertToBiweekly(monthlyAmount);
   };
 
   const calculateMonthlyAmount = (amount, frequency, customFrequency = 1) => {
-    if (frequency === "custom") return toMonthly(amount, "yearly") * customFrequency;
+    if (frequency === "custom")
+      return toMonthly(amount, "yearly") * customFrequency;
     return toMonthly(amount, frequency);
   };
 
@@ -164,13 +236,18 @@ const AddBillModal = ({
   };
 
   const normalizeDateFormat = (dateString) => {
-    if (!dateString || /^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
+    if (!dateString || /^\d{4}-\d{2}-\d{2}$/.test(dateString))
+      return dateString;
     if (typeof dateString === "string") {
       const dateMatch = dateString.match(/(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})/);
       if (dateMatch) {
         const [, month, day, year] = dateMatch;
         let fullYear =
-          year.length === 2 ? (parseInt(year) <= 30 ? `20${year}` : `19${year}`) : year;
+          year.length === 2
+            ? parseInt(year) <= 30
+              ? `20${year}`
+              : `19${year}`
+            : year;
         return `${fullYear}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
       }
     }
@@ -206,11 +283,22 @@ const AddBillModal = ({
       notes: formData.notes,
       dueDate: normalizedDueDate,
       customFrequency:
-        formData.frequency === "custom" ? parseFloat(formData.customFrequency) || 1 : undefined,
-      biweeklyAmount: calculateBiweeklyAmount(amount, formData.frequency, formData.customFrequency),
-      monthlyAmount: calculateMonthlyAmount(amount, formData.frequency, formData.customFrequency),
+        formData.frequency === "custom"
+          ? parseFloat(formData.customFrequency) || 1
+          : undefined,
+      biweeklyAmount: calculateBiweeklyAmount(
+        amount,
+        formData.frequency,
+        formData.customFrequency,
+      ),
+      monthlyAmount: calculateMonthlyAmount(
+        amount,
+        formData.frequency,
+        formData.customFrequency,
+      ),
       nextDueDate: getNextDueDate(formData.frequency, normalizedDueDate),
-      icon: getIconByName(formData.iconName),
+      // Don't store the React component - only store the iconName string
+      // The icon component will be resolved when displaying the bill
       iconName: formData.iconName,
       type: editingBill ? editingBill.type : "recurring_bill",
       isPaid: editingBill ? editingBill.isPaid : false,
@@ -239,7 +327,9 @@ const AddBillModal = ({
       formDataSelectedEnvelope: formData.selectedEnvelope,
       billDataEnvelopeId: billData.envelopeId,
       availableEnvelopesIds: availableEnvelopes.map((e) => e.id),
-      envelopeFound: availableEnvelopes.find((e) => e.id === formData.selectedEnvelope),
+      envelopeFound: availableEnvelopes.find(
+        (e) => e.id === formData.selectedEnvelope,
+      ),
     });
 
     if (editingBill) {
@@ -271,7 +361,11 @@ const AddBillModal = ({
         const envelopeData = {
           id: `envelope_${Date.now()}`,
           name: formData.name.trim(),
-          budget: calculateMonthlyAmount(amount, formData.frequency, formData.customFrequency),
+          budget: calculateMonthlyAmount(
+            amount,
+            formData.frequency,
+            formData.customFrequency,
+          ),
           currentBalance: 0,
           color: formData.color,
           category: formData.category,
@@ -293,19 +387,34 @@ const AddBillModal = ({
       availableEnvelopes: availableEnvelopes.length,
       selectedEnvelope: formData.selectedEnvelope,
     });
-    setFormData({ ...formData, selectedEnvelope: newEnvelopeId });
+
+    // When an envelope is selected, disable create envelope to prevent duplicates
+    setFormData({
+      ...formData,
+      selectedEnvelope: newEnvelopeId,
+      createEnvelope: newEnvelopeId ? false : formData.createEnvelope,
+    });
   };
 
   const cancelEdit = () => {
+    // Release lock when closing
+    if (isOwnLock) {
+      releaseLock();
+    }
     setShowDeleteConfirm(false);
+    setDeleteEnvelopeToo(false);
     setFormData(getInitialFormData(null)); // Reset form data
     onClose();
   };
 
   const handleDelete = () => {
     if (editingBill && onDeleteBill) {
-      onDeleteBill(editingBill.id);
+      onDeleteBill(
+        editingBill.id,
+        deleteEnvelopeToo ? editingBill.envelopeId : null,
+      );
       setShowDeleteConfirm(false);
+      setDeleteEnvelopeToo(false);
       onClose();
     }
   };
@@ -314,33 +423,122 @@ const AddBillModal = ({
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="glassmorphism rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-white/30 shadow-2xl">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-semibold">{editingBill ? "Edit Bill" : "Add New Bill"}</h3>
-          <button onClick={cancelEdit} className="text-gray-400 hover:text-gray-600">
-            <X className="h-6 w-6" />
-          </button>
+          <div className="flex items-center gap-3 flex-1">
+            <h3 className="text-xl font-semibold">
+              {editingBill ? "Edit Bill" : "Add New Bill"}
+            </h3>
+            {/* Edit Lock Status for existing bills */}
+            {editingBill && isLocked && (
+              <div
+                className={`flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                  isOwnLock
+                    ? "bg-green-100 text-green-800 border border-green-200"
+                    : "bg-red-100 text-red-800 border border-red-200"
+                }`}
+              >
+                {isOwnLock ? (
+                  <>
+                    <Unlock className="h-3 w-3 mr-1" />
+                    You're Editing
+                  </>
+                ) : (
+                  <>
+                    <Lock className="h-3 w-3 mr-1" />
+                    <User className="h-3 w-3 mr-1" />
+                    {lockedBy}
+                  </>
+                )}
+              </div>
+            )}
+            {editingBill && lockLoading && (
+              <div className="bg-yellow-100 text-yellow-800 border border-yellow-200 px-3 py-1 rounded-full text-xs font-medium flex items-center">
+                <div className="animate-spin rounded-full h-3 w-3 border border-yellow-600 border-t-transparent mr-1" />
+                Acquiring Lock...
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {/* Lock Controls for expired locks */}
+            {editingBill && isLocked && !isOwnLock && isExpired && (
+              <button
+                onClick={breakLock}
+                className="bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded-lg text-xs font-medium transition-colors flex items-center"
+              >
+                <Unlock className="h-3 w-3 mr-1" />
+                Break Lock
+              </button>
+            )}
+            <button
+              onClick={cancelEdit}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              <X className="h-6 w-6" />
+            </button>
+          </div>
         </div>
+
+        {/* Lock Warning Banner for existing bills */}
+        {editingBill && isLocked && !canEdit && (
+          <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+            <div className="flex items-center">
+              <Lock className="h-5 w-5 text-red-400 mr-3" />
+              <div>
+                <h3 className="text-sm font-medium text-red-800">
+                  Currently Being Edited
+                </h3>
+                <p className="text-sm text-red-700 mt-1">
+                  {lockedBy} is currently editing this bill.
+                  {isExpired
+                    ? "The lock has expired and can be broken."
+                    : `Lock expires in ${Math.ceil(timeRemaining / 1000)} seconds.`}
+                </p>
+                {isExpired && (
+                  <button
+                    onClick={breakLock}
+                    className="mt-2 bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
+                  >
+                    Break Lock & Take Control
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Bill Name *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Bill Name *
+              </label>
               <input
                 type="text"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                disabled={editingBill && !canEdit}
+                className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                  editingBill && !canEdit
+                    ? "bg-gray-100 cursor-not-allowed"
+                    : ""
+                }`}
                 placeholder="e.g., Car Insurance, Netflix, Property Tax"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Amount *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Amount *
+              </label>
               <input
                 type="number"
                 step="0.01"
                 value={formData.amount}
-                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, amount: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="0.00"
                 required
@@ -353,7 +551,9 @@ const AddBillModal = ({
               </label>
               <select
                 value={formData.frequency}
-                onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, frequency: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 {frequencies.map((freq) => (
@@ -387,20 +587,28 @@ const AddBillModal = ({
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Next Due Date</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Next Due Date
+              </label>
               <input
                 type="date"
                 value={formData.dueDate}
-                onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, dueDate: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Category
+              </label>
               <select
                 value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, category: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 {categories.map((category) => (
@@ -412,7 +620,9 @@ const AddBillModal = ({
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Color
+              </label>
               <div className="flex gap-2 flex-wrap">
                 {colors.map((color) => (
                   <button
@@ -435,12 +645,15 @@ const AddBillModal = ({
                 <div className="flex items-center">
                   Icon
                   <Sparkles className="h-4 w-4 ml-2 text-purple-500" />
-                  <span className="text-xs text-purple-600 ml-1">Smart suggestions</span>
+                  <span className="text-xs text-purple-600 ml-1">
+                    Smart suggestions
+                  </span>
                 </div>
               </label>
               <div className="flex gap-2 flex-wrap">
                 {iconSuggestions.map((IconComponent, index) => {
-                  const isSelected = formData.iconName === IconComponent.displayName;
+                  const isSelected =
+                    formData.iconName === IconComponent.displayName;
                   return (
                     <button
                       key={index}
@@ -464,7 +677,8 @@ const AddBillModal = ({
                 })}
               </div>
               <p className="text-xs text-gray-500 mt-1">
-                Icons are automatically suggested based on your bill name and category
+                Icons are automatically suggested based on your bill name and
+                category
               </p>
             </div>
 
@@ -474,73 +688,136 @@ const AddBillModal = ({
               </label>
               <textarea
                 value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, notes: e.target.value })
+                }
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="Any additional notes about this bill..."
               />
             </div>
 
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Envelope Assignment
-              </label>
-              <select
-                value={formData.selectedEnvelope}
-                onChange={handleEnvelopeChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">No envelope (use unassigned cash)</option>
-                {availableEnvelopes
-                  .filter((env) => env.envelopeType === "bill" || !env.envelopeType)
-                  .map((envelope) => (
-                    <option key={envelope.id} value={envelope.id}>
-                      {envelope.name} ($
-                      {(envelope.currentBalance || 0).toFixed(2)} available)
-                    </option>
-                  ))}
-              </select>
-              {formData.selectedEnvelope && (
-                <p className="text-xs text-green-600 mt-1">
-                  Selected:{" "}
-                  {availableEnvelopes.find((e) => e.id === formData.selectedEnvelope)?.name ||
-                    "Unknown"}
-                </p>
-              )}
-              <p className="text-xs text-blue-600 mt-1">
-                Only bill envelopes are available for assignment. Choose which envelope will be used
-                to pay this bill.
-              </p>
-            </div>
-
-            {!editingBill && (
+            {/* Connected Envelope Display - Matches Standard Pattern */}
+            {editingBill && editingBill.envelopeId && (
               <div className="md:col-span-2">
-                <div className="flex items-center space-x-2">
-                  <input
-                    id="create-envelope-checkbox"
-                    type="checkbox"
-                    checked={formData.createEnvelope}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        createEnvelope: e.target.checked,
-                      })
-                    }
-                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
-                  />
-                  <label
-                    htmlFor="create-envelope-checkbox"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    Create associated envelope for budgeting
-                  </label>
+                <div className="bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-300 rounded-xl p-6 mb-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <label className="block text-lg font-bold text-green-800 flex items-center">
+                      <Sparkles className="h-6 w-6 mr-3" />
+                      🔗 Connected to Envelope
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        // Clear envelope connection
+                        setFormData({
+                          ...formData,
+                          selectedEnvelope: "",
+                        });
+                      }}
+                      className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded-lg transition-colors flex items-center"
+                    >
+                      <X className="h-3 w-3 mr-1" />
+                      Disconnect
+                    </button>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center p-3 bg-white rounded-lg border border-green-200">
+                      <Sparkles className="h-5 w-5 mr-3 text-green-600" />
+                      <div className="flex-1">
+                        <div className="font-medium text-green-800">
+                          Connected Envelope
+                        </div>
+                        <div className="text-sm text-green-700">
+                          {availableEnvelopes.find(
+                            (e) => e.id === editingBill.envelopeId,
+                          )?.name || "Unknown Envelope"}{" "}
+                          • $
+                          {(
+                            availableEnvelopes.find(
+                              (e) => e.id === editingBill.envelopeId,
+                            )?.currentBalance || 0
+                          ).toFixed(2)}{" "}
+                          available
+                        </div>
+                      </div>
+                      <div className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                        Funding source
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 p-3 bg-green-100 border border-green-300 rounded-lg">
+                    <p className="text-sm text-green-700 font-medium">
+                      📝 <strong>Connected!</strong> This bill is linked to the
+                      envelope above for payment funding. Use the disconnect
+                      button to change the envelope connection.
+                    </p>
+                  </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-1 ml-6">
-                  This will create an envelope to help you save for this bill
+              </div>
+            )}
+
+            {/* Envelope Assignment - Hidden when connected */}
+            {!(editingBill && editingBill.envelopeId) && (
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Envelope Assignment
+                </label>
+                <select
+                  value={formData.selectedEnvelope}
+                  onChange={handleEnvelopeChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">No envelope (use unassigned cash)</option>
+                  {availableEnvelopes
+                    .filter((env) => {
+                      // Check if envelope is suitable for bills - allow "bill" and "variable" types
+                      // Also allow legacy envelopes with no type set for backwards compatibility
+                      const isBillEnvelope = env.envelopeType === "bill";
+                      const isVariableEnvelope =
+                        env.envelopeType === "variable";
+                      const isLegacyEnvelope = !env.envelopeType;
+                      const isAllowed =
+                        isBillEnvelope ||
+                        isVariableEnvelope ||
+                        isLegacyEnvelope;
+
+                      logger.debug(`Envelope ${env.name}:`, {
+                        envelopeType: env.envelopeType,
+                        isBillEnvelope,
+                        isVariableEnvelope,
+                        isLegacyEnvelope,
+                        isAllowed,
+                      });
+
+                      return isAllowed;
+                    })
+                    .map((envelope) => (
+                      <option key={envelope.id} value={envelope.id}>
+                        {envelope.name} ($
+                        {(envelope.currentBalance || 0).toFixed(2)} available)
+                      </option>
+                    ))}
+                </select>
+                {formData.selectedEnvelope && (
+                  <p className="text-xs text-green-600 mt-1">
+                    Selected:{" "}
+                    {availableEnvelopes.find(
+                      (e) => e.id === formData.selectedEnvelope,
+                    )?.name || "Unknown"}
+                  </p>
+                )}
+                <p className="text-xs text-blue-600 mt-1">
+                  Bill and variable envelopes are available for assignment.
+                  Choose which envelope will be used to pay this bill.
                 </p>
               </div>
             )}
           </div>
+
+          {/* Envelope Options - Temporarily removed for JSX structure fix */}
 
           {formData.amount && (
             <div className="bg-gray-50 rounded-lg p-4">
@@ -568,7 +845,7 @@ const AddBillModal = ({
                     {calculateMonthlyAmount(
                       parseFloat(formData.amount) || 0,
                       formData.frequency,
-                      formData.customFrequency
+                      formData.customFrequency,
                     ).toFixed(2)}
                   </span>
                 </div>
@@ -579,7 +856,7 @@ const AddBillModal = ({
                     {calculateBiweeklyAmount(
                       parseFloat(formData.amount) || 0,
                       formData.frequency,
-                      formData.customFrequency
+                      formData.customFrequency,
                     ).toFixed(2)}
                   </span>
                 </div>
@@ -607,10 +884,22 @@ const AddBillModal = ({
             )}
             <button
               type="submit"
-              className="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold px-4 py-2 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-purple-400/30 w-auto"
+              disabled={editingBill && !canEdit}
+              className={`flex-1 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold px-4 py-2 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105 border border-black/20 w-auto ${
+                editingBill && !canEdit ? "bg-gray-400 cursor-not-allowed" : ""
+              }`}
             >
-              <Save className="h-4 w-4 mr-2" />
-              {editingBill ? "Update Bill" : "Add Bill"}
+              {editingBill && !canEdit ? (
+                <>
+                  <Lock className="h-4 w-4 mr-2" />
+                  Locked by {lockedBy}
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  {editingBill ? "Update Bill" : "Add Bill"}
+                </>
+              )}
             </button>
           </div>
         </form>
@@ -624,15 +913,79 @@ const AddBillModal = ({
                 <Trash2 className="h-6 w-6 text-red-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Delete Bill</h3>
-                <p className="text-sm text-gray-600">This action cannot be undone</p>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Delete Bill
+                </h3>
+                <p className="text-sm text-gray-600">
+                  This action cannot be undone
+                </p>
               </div>
             </div>
 
-            <p className="text-gray-700 mb-6">
-              Are you sure you want to delete "{editingBill?.name || editingBill?.provider}"? This
-              will permanently remove the bill from your tracker.
-            </p>
+            <div className="mb-6">
+              <p className="text-gray-700 mb-4">
+                Are you sure you want to delete "
+                {editingBill?.name || editingBill?.provider}"?
+              </p>
+
+              {editingBill?.envelopeId && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                  <h4 className="font-medium text-yellow-800 mb-3">
+                    Connected Envelope Found
+                  </h4>
+                  <p className="text-sm text-yellow-700 mb-3">
+                    This bill is connected to envelope:{" "}
+                    <strong>
+                      {availableEnvelopes.find(
+                        (e) => e.id === editingBill.envelopeId,
+                      )?.name || "Unknown Envelope"}
+                    </strong>
+                  </p>
+
+                  <div className="space-y-2">
+                    <label className="flex items-center text-sm">
+                      <input
+                        type="radio"
+                        name="envelopeAction"
+                        checked={!deleteEnvelopeToo}
+                        onChange={() => setDeleteEnvelopeToo(false)}
+                        className="mr-2"
+                      />
+                      <span className="text-yellow-800">
+                        Keep envelope (recommended)
+                      </span>
+                    </label>
+
+                    <label className="flex items-center text-sm">
+                      <input
+                        type="radio"
+                        name="envelopeAction"
+                        checked={deleteEnvelopeToo}
+                        onChange={() => setDeleteEnvelopeToo(true)}
+                        className="mr-2"
+                      />
+                      <span className="text-red-700">
+                        Also delete "
+                        {availableEnvelopes.find(
+                          (e) => e.id === editingBill.envelopeId,
+                        )?.name || "connected envelope"}
+                        "
+                      </span>
+                    </label>
+                  </div>
+
+                  <p className="text-xs text-yellow-600 mt-2">
+                    {deleteEnvelopeToo
+                      ? "⚠️ This will permanently delete both the bill and envelope. Any money in the envelope will be transferred to unassigned cash."
+                      : "✅ The envelope will remain available for other bills or manual use."}
+                  </p>
+                </div>
+              )}
+
+              <p className="text-sm text-gray-600">
+                This action cannot be undone.
+              </p>
+            </div>
 
             <div className="flex gap-3">
               <button

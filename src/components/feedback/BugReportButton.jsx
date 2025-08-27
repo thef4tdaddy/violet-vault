@@ -1,6 +1,7 @@
 import React from "react";
 import { Bug, Camera, Send, X, AlertCircle } from "lucide-react";
 import useBugReport from "../../hooks/useBugReport";
+import useToast from "../../hooks/useToast";
 
 /**
  * Floating bug report button with screenshot capability
@@ -17,24 +18,47 @@ const BugReportButton = () => {
     closeModal,
     setDescription,
     setIncludeScreenshot,
+    setScreenshot,
     submitReport,
     previewScreenshot,
   } = useBugReport();
+
+  const { addToast } = useToast();
 
   const handleSubmit = async () => {
     const result = await submitReport();
     if (result) {
       // Show success message with GitHub issue link if available
       if (result.issueUrl) {
-        const message = `Thanks! Your bug report has been submitted.\n\nGitHub Issue: ${result.issueUrl}\n\nClick OK to view the issue.`;
-        if (confirm(message)) {
-          window.open(result.issueUrl, "_blank");
-        }
+        addToast({
+          type: "success",
+          title: "Bug Report Submitted!",
+          message: `Your report has been created as GitHub issue #${result.issueNumber || "N/A"}. Thank you for helping improve VioletVault!`,
+          duration: 8000,
+        });
+      } else if (result.localFallback) {
+        // Service unavailable, but we logged it locally
+        addToast({
+          type: "warning",
+          title: "Report Logged Locally",
+          message: `Service temporarily unavailable, but your report has been saved. Check browser console for details.`,
+          duration: 8000,
+        });
       } else {
-        alert("Thanks! Your bug report has been submitted. Check the console for details.");
+        addToast({
+          type: "success",
+          title: "Report Submitted!",
+          message: "Your bug report has been submitted successfully.",
+          duration: 4000,
+        });
       }
     } else {
-      alert("Failed to submit bug report. Please try again.");
+      addToast({
+        type: "error",
+        title: "Submission Failed",
+        message: "Failed to submit bug report. Please try again.",
+        duration: 5000,
+      });
     }
   };
 
@@ -43,7 +67,7 @@ const BugReportButton = () => {
       {/* Floating Bug Report Button */}
       <button
         onClick={openModal}
-        className="fixed bottom-4 right-4 z-50 bg-red-500 hover:bg-red-600 text-white rounded-full p-3 shadow-lg transition-all duration-200 hover:scale-105"
+        className="fixed bottom-24 right-4 lg:bottom-4 z-50 bg-red-500 hover:bg-red-600 text-white rounded-full p-3 shadow-lg transition-all duration-200 hover:scale-105"
         title="Report a Problem"
         data-bug-report="true"
       >
@@ -75,42 +99,131 @@ const BugReportButton = () => {
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="What happened? What were you trying to do?"
-                  className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  rows={4}
+                  placeholder="What happened? What were you trying to do?&#10;&#10;📝 Tip: You can include code blocks using:&#10;```&#10;your code here&#10;```"
+                  className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-red-500 focus:border-transparent font-mono text-sm"
+                  rows={6}
                 />
+                <div className="mt-2 text-xs text-gray-500">
+                  💡 <strong>Pro tip:</strong> Use{" "}
+                  <code className="bg-gray-100 px-1 rounded">```</code> for code blocks, mention
+                  specific buttons/features you were using, and include error messages if any.
+                </div>
               </div>
 
               <div className="flex items-center justify-between">
-                <label className="flex items-center">
+                <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
                   <input
+                    id="include-screenshot-checkbox"
                     type="checkbox"
                     checked={includeScreenshot}
                     onChange={(e) => setIncludeScreenshot(e.target.checked)}
-                    className="mr-2 text-red-500 focus:ring-red-500"
+                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded mt-0.5 justify-self-start"
                   />
-                  <span className="text-sm text-gray-700">Include screenshot</span>
-                </label>
+                  <label
+                    htmlFor="include-screenshot-checkbox"
+                    className="text-sm text-gray-700 cursor-pointer"
+                  >
+                    Include screenshot
+                  </label>
+                </div>
 
                 {includeScreenshot && (
-                  <button
-                    onClick={previewScreenshot}
-                    className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
-                  >
-                    <Camera className="h-4 w-4 mr-1" />
-                    Preview
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={previewScreenshot}
+                      className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
+                      title="Automatically capture screenshot using html2canvas"
+                    >
+                      <Camera className="h-4 w-4 mr-1" />
+                      Auto Capture
+                    </button>
+                    <button
+                      onClick={async () => {
+                        if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+                          try {
+                            const stream = await navigator.mediaDevices.getDisplayMedia({
+                              video: {
+                                width: { ideal: 1920 },
+                                height: { ideal: 1080 },
+                              },
+                              audio: false,
+                            });
+                            const video = document.createElement("video");
+                            video.srcObject = stream;
+                            video.play();
+
+                            await new Promise((resolve) => (video.onloadedmetadata = resolve));
+
+                            const canvas = document.createElement("canvas");
+                            canvas.width = video.videoWidth;
+                            canvas.height = video.videoHeight;
+                            const ctx = canvas.getContext("2d");
+                            ctx.drawImage(video, 0, 0);
+
+                            stream.getTracks().forEach((track) => track.stop());
+
+                            const screenshotDataUrl = canvas.toDataURL("image/png", 0.9);
+                            setScreenshot(screenshotDataUrl);
+                          } catch (error) {
+                            console.warn("Manual screen capture failed:", error);
+                            alert(
+                              "Screen capture failed. Please try the Auto Capture option or include a manual screenshot."
+                            );
+                          }
+                        } else {
+                          alert(
+                            "Screen capture is not supported in your browser. Please use Auto Capture or include a manual screenshot."
+                          );
+                        }
+                      }}
+                      className="text-sm text-green-600 hover:text-green-800 flex items-center"
+                      title="Use browser's native screen capture (requires permission)"
+                    >
+                      <Camera className="h-4 w-4 mr-1" />
+                      Screen Capture
+                    </button>
+                  </div>
                 )}
               </div>
 
               {screenshot && (
                 <div className="border border-gray-200 rounded-lg p-2">
-                  <img
-                    src={screenshot}
-                    alt="Screenshot preview"
-                    className="w-full h-32 object-contain rounded"
-                  />
-                  <p className="text-xs text-gray-500 text-center mt-1">Screenshot captured</p>
+                  <div className="relative">
+                    <img
+                      src={screenshot}
+                      alt="Screenshot preview"
+                      className="w-full h-32 object-contain rounded cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={() => {
+                        // Open screenshot in new tab for full view
+                        const win = window.open();
+                        if (win) {
+                          win.document.write(`
+                            <html>
+                              <head><title>Bug Report Screenshot</title></head>
+                              <body style="margin: 0; background: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+                                <img src="${screenshot}" style="max-width: 95%; max-height: 95%; border: 1px solid #ddd; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+                              </body>
+                            </html>
+                          `);
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={() => setScreenshot(null)}
+                      className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                      title="Remove screenshot"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                  <div className="flex justify-between items-center mt-2">
+                    <p className="text-xs text-gray-500">
+                      ✅ Screenshot ready (click to view full size)
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {Math.round(screenshot.length / 1024)}KB
+                    </p>
+                  </div>
                 </div>
               )}
             </div>

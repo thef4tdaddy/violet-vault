@@ -22,6 +22,7 @@ import {
   GitBranch,
   FileText,
 } from "lucide-react";
+import logger from "../../utils/logger";
 
 const TeamActivitySync = ({
   activeUsers = [],
@@ -61,7 +62,7 @@ const TeamActivitySync = ({
 
   // Debug logging
   useEffect(() => {
-    console.log("🔧 TeamActivitySync Debug:", {
+    logger.debug("🔧 TeamActivitySync Debug:", {
       activeUsers: activeUsers?.length || 0,
       recentActivity: recentActivity?.length || 0,
       currentUser: currentUser?.userName || "none",
@@ -135,7 +136,7 @@ const TeamActivitySync = ({
   const processedActivities = useMemo(() => {
     try {
       if (!Array.isArray(recentActivity)) {
-        console.warn("recentActivity is not an array:", recentActivity);
+        logger.warn("recentActivity is not an array:", recentActivity);
         return [];
       }
 
@@ -147,7 +148,7 @@ const TeamActivitySync = ({
             const timeB = new Date(activityB.timestamp || 0).getTime();
             return timeB - timeA;
           } catch (error) {
-            console.error("Error sorting activities:", error, activityA, activityB);
+            logger.error("Error sorting activities:", error, activityA, activityB);
             return 0;
           }
         })
@@ -171,7 +172,7 @@ const TeamActivitySync = ({
               timeAgo: formatTimeAgo(activity.timestamp),
             };
           } catch (error) {
-            console.error("Error processing activity:", error, activity);
+            logger.error("Error processing activity:", error, activity);
             return {
               ...activity,
               changes: [
@@ -188,7 +189,7 @@ const TeamActivitySync = ({
           }
         });
     } catch (error) {
-      console.error("Error processing activities:", error);
+      logger.error("Error processing activities:", error);
       return [];
     }
   }, [recentActivity]);
@@ -309,7 +310,7 @@ const TeamActivitySync = ({
       }, 0);
       return Math.abs(hash).toString(16).substring(0, 7);
     } catch (error) {
-      console.error("Error generating commit ID:", error, activity);
+      logger.error("Error generating commit ID:", error, activity);
       return "unknown";
     }
   };
@@ -337,7 +338,7 @@ const TeamActivitySync = ({
       const diffInDays = Math.floor(diffInHours / 24);
       return `${diffInDays}d`;
     } catch (error) {
-      console.error("Error formatting time ago:", error, timestamp);
+      logger.error("Error formatting time ago:", error, timestamp);
       return "unknown";
     }
   };
@@ -347,12 +348,12 @@ const TeamActivitySync = ({
   const otherActiveUsers = useMemo(() => {
     try {
       if (!Array.isArray(activeUsers)) {
-        console.warn("activeUsers is not an array:", activeUsers);
+        logger.warn("activeUsers is not an array:", activeUsers);
         return [];
       }
       return activeUsers.filter((user) => currentUser && user && user.id !== currentUser.id);
     } catch (error) {
-      console.error("Error filtering active users:", error);
+      logger.error("Error filtering active users:", error);
       return [];
     }
   }, [activeUsers, currentUser]);

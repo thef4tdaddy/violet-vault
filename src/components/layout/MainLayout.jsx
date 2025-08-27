@@ -1,19 +1,22 @@
 // src/components/layout/MainLayout.jsx
 import React, { useState, useMemo, Suspense } from "react";
-import { useBudgetStore } from "../../stores/budgetStore";
+import { useBudgetStore } from "../../stores/uiStore";
+import useBudgetData from "../../hooks/useBudgetData";
 import useAuthFlow from "../../hooks/useAuthFlow";
 import useDataManagement from "../../hooks/useDataManagement";
 import usePasswordRotation from "../../hooks/usePasswordRotation";
 import useNetworkStatus from "../../hooks/useNetworkStatus";
 import useFirebaseSync from "../../hooks/useFirebaseSync";
 import usePaydayPrediction from "../../hooks/usePaydayPrediction";
-import UserSetup from "../auth/UserSetup";
+import { useLocalOnlyMode } from "../../hooks/useLocalOnlyMode";
+import useDataInitialization from "../../hooks/useDataInitialization";
+import AuthGateway from "../auth/AuthGateway";
 import Header from "../ui/Header";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ToastContainer } from "../ui/Toast";
-import useToast from "../../hooks/useToast";
+import { useToastStore } from "../../stores/toastStore";
 import ViewRendererComponent from "./ViewRenderer";
-import FirebaseSync from "../../utils/firebaseSync";
+import { cloudSyncService } from "../../services/cloudSyncService";
 import logger from "../../utils/logger";
 import { getVersionInfo } from "../../utils/version";
 import {
@@ -26,17 +29,28 @@ import {
   BookOpen,
   BarChart3,
 } from "lucide-react";
+import NavigationTabs from "./NavigationTabs";
 import { AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
 import SyncStatusIndicators from "../sync/SyncStatusIndicators";
 import ConflictResolutionModal from "../sync/ConflictResolutionModal";
 import SummaryCards from "./SummaryCards";
 import BugReportButton from "../feedback/BugReportButton";
+import LockScreen from "../security/LockScreen";
+import SecuritySettings from "../settings/SecuritySettings";
+import SettingsDashboard from "../settings/SettingsDashboard";
+import { useSecurityManager } from "../../hooks/useSecurityManager";
+import OnboardingTutorial from "../onboarding/OnboardingTutorial";
+import OnboardingProgress from "../onboarding/OnboardingProgress";
+import { useOnboardingAutoComplete } from "../../hooks/useOnboardingAutoComplete";
 
 // Heavy components now lazy loaded in ViewRenderer
 
 const Layout = () => {
   logger.debug("Layout component is running");
+
+  // Security manager hook
+  const securityManager = useSecurityManager();
 
   // Custom hooks for business logic
   const {
@@ -50,6 +64,12 @@ const Layout = () => {
     handleChangePassword,
     handleUpdateProfile,
   } = useAuthFlow();
+
+  // Local-only mode hooks
+  const { isLocalOnlyMode, localOnlyUser } = useLocalOnlyMode();
+
+  // Initialize data from Dexie to Zustand on app startup
+  useDataInitialization(); // Return values not currently used
 
   const { exportData, importData, resetEncryptionAndStartFresh } = useDataManagement();
 
@@ -66,11 +86,11 @@ const Layout = () => {
   // Network status detection
   useNetworkStatus();
 
-  const firebaseSync = useMemo(() => new FirebaseSync(), []);
+  const firebaseSync = useMemo(() => cloudSyncService, []);
   const [syncConflicts, setSyncConflicts] = useState(null);
 
-  // Toast notifications
-  const { toasts, removeToast } = useToast();
+  // Toast notifications from Zustand store
+  const { toasts, removeToast } = useToastStore();
 
   logger.auth("Auth hook values", {
     isUnlocked,
@@ -82,8 +102,20 @@ const Layout = () => {
     setSyncConflicts(null);
   };
 
-  if (!isUnlocked || !currentUser) {
-    return <UserSetup onSetupComplete={handleSetup} />;
+  // Handle local-only mode or standard authentication
+  const handleLocalOnlyReady = (localUser) => {
+    logger.debug("Local-only mode ready with user", { userId: localUser.id });
+    // Local-only mode doesn't need further setup, let MainLayout render
+  };
+
+  // Show authentication gateway if neither standard nor local-only mode is ready
+  if (!isLocalOnlyMode && (!isUnlocked || !currentUser)) {
+    return <AuthGateway onSetupComplete={handleSetup} onLocalOnlyReady={handleLocalOnlyReady} />;
+  }
+
+  // In local-only mode but user not ready yet
+  if (isLocalOnlyMode && !localOnlyUser) {
+    return <AuthGateway onSetupComplete={handleSetup} onLocalOnlyReady={handleLocalOnlyReady} />;
   }
 
   logger.budgetSync("Rendering BudgetProvider with props", {
@@ -97,10 +129,13 @@ const Layout = () => {
 
   return (
     <>
+      {/* Security Lock Screen - renders on top of everything when locked */}
+      <LockScreen />
+
       <MainContent
-        currentUser={currentUser}
+        currentUser={isLocalOnlyMode ? localOnlyUser : currentUser}
         encryptionKey={encryptionKey}
-        budgetId={budgetId}
+        budgetId={isLocalOnlyMode ? localOnlyUser?.budgetId : budgetId}
         onUserChange={handleLogout}
         onExport={exportData}
         onImport={importData}
@@ -113,6 +148,8 @@ const Layout = () => {
         firebaseSync={firebaseSync}
         rotationDue={rotationDue}
         onUpdateProfile={handleUpdateProfile}
+        isLocalOnlyMode={isLocalOnlyMode}
+        securityManager={securityManager}
       />
       {showRotationModal && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
@@ -167,37 +204,49 @@ const MainContent = ({
   setSyncConflicts,
   rotationDue,
   onUpdateProfile,
+  isLocalOnlyMode = false,
+  securityManager,
 }) => {
   const budget = useBudgetStore();
   const [activeView, setActiveView] = useState("dashboard");
+  const [showSecuritySettings, setShowSecuritySettings] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   // Custom hooks for MainContent business logic
   const { handleManualSync } = useFirebaseSync(firebaseSync, encryptionKey, budgetId, currentUser);
 
-  // Handle import by saving data then loading into context
+  // Auto-complete onboarding steps based on user actions
+  useOnboardingAutoComplete();
+
+  // Handle backup import through data management hook
   const handleImport = async (event) => {
-    const data = await onImport(event);
-    if (data) {
-      budget.loadData(data);
-    }
+    await onImport(event);
   };
 
   // Handle change password - delegate to parent component
   const handleChangePassword = onChangePassword;
 
-  const { envelopes, savingsGoals, unassignedCash, paycheckHistory, isOnline, isSyncing } = budget;
+  // Get TanStack Query data
+  const {
+    envelopes = [],
+    // savingsGoals = [], // Not currently used
+    // unassignedCash = 0, // Not currently used
+    paycheckHistory: tanStackPaycheckHistory,
+  } = useBudgetData();
 
-  // Payday prediction notifications (after destructuring)
-  usePaydayPrediction(paycheckHistory, !!currentUser);
+  // Get UI state from Zustand
+  const { isOnline, isSyncing } = budget;
 
-  // Calculate totals
-  const totalEnvelopeBalance = Array.isArray(envelopes)
-    ? envelopes.reduce((sum, env) => sum + env.currentBalance, 0)
-    : 0;
-  const totalSavingsBalance = Array.isArray(savingsGoals)
-    ? savingsGoals.reduce((sum, goal) => sum + goal.currentAmount, 0)
-    : 0;
-  const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
+  // Payday prediction notifications using TanStack Query data
+  usePaydayPrediction(tanStackPaycheckHistory, !!currentUser);
+
+  // Calculate totals - TODO: These are calculated but not currently used
+  // const totalEnvelopeBalance = Array.isArray(envelopes)
+  //   ? envelopes.reduce((sum, env) => sum + env.currentBalance, 0)
+  //   : 0;
+  // const totalSavingsBalance = Array.isArray(savingsGoals)
+  //   ? savingsGoals.reduce((sum, goal) => sum + goal.currentAmount, 0)
+  //   : 0;
 
   // Calculate total biweekly funding need across all envelope types
   const totalBiweeklyNeed = Array.isArray(envelopes)
@@ -221,34 +270,26 @@ const MainContent = ({
     : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden pb-24 sm:pb-0">
-      <div className="max-w-7xl mx-auto relative">
-        <div className="relative z-50">
-          <Header
-            currentUser={currentUser}
-            onUserChange={onUserChange}
-            onExport={onExport}
-            onImport={handleImport}
-            onLogout={onLogout}
-            onChangePassword={handleChangePassword}
-            onResetEncryption={() => {
-              // Reset the budget context data first
-              budget.resetAllData();
-              // Then call the original reset function (clears localStorage and calls logout)
-              onResetEncryption();
-            }}
-            onSync={handleManualSync}
-            onUpdateProfile={onUpdateProfile}
-          />
-        </div>
-        {rotationDue && (
-          <div className="mb-4 bg-amber-100 border border-amber-300 text-amber-700 rounded-lg p-4 text-center">
-            Your password is over 90 days old. Please change it.
+    <OnboardingTutorial setActiveView={setActiveView}>
+      <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden pb-20 lg:pb-0">
+        <div className="max-w-7xl mx-auto relative">
+          <div className="relative z-50">
+            <Header
+              currentUser={currentUser}
+              onUserChange={onUserChange}
+              onUpdateProfile={onUpdateProfile}
+              isLocalOnlyMode={isLocalOnlyMode}
+              onShowSettings={() => setShowSettingsModal(true)}
+            />
           </div>
-        )}
+          {rotationDue && (
+            <div className="mb-4 bg-amber-100 border border-amber-300 text-amber-700 rounded-lg p-4 text-center">
+              Your password is over 90 days old. Please change it.
+            </div>
+          )}
 
-        {/* Team Activity & Sync - Temporarily disabled to prevent browser crashes */}
-        {/* <TeamActivitySync
+          {/* Team Activity & Sync - Temporarily disabled to prevent browser crashes */}
+          {/* <TeamActivitySync
           activeUsers={activeUsers}
           recentActivity={recentActivity}
           currentUser={currentUser}
@@ -259,117 +300,84 @@ const MainContent = ({
         />
         */}
 
-        {/* Navigation Tabs */}
-        <div className="glassmorphism rounded-t-3xl sm:rounded-3xl mb-6 sm:shadow-xl border border-white/20 fixed bottom-0 left-0 right-0 sm:static z-40">
-          <nav className="flex justify-around overflow-x-auto">
-            <NavButton
-              key="dashboard"
-              active={activeView === "dashboard"}
-              onClick={() => setActiveView("dashboard")}
-              icon={CreditCard}
-              label="Dashboard"
-            />
-            <NavButton
-              key="envelopes"
-              active={activeView === "envelopes"}
-              onClick={() => setActiveView("envelopes")}
-              icon={Wallet}
-              label="Envelopes"
-            />
-            <NavButton
-              key="savings"
-              active={activeView === "savings"}
-              onClick={() => setActiveView("savings")}
-              icon={Target}
-              label="Savings Goals"
-            />
-            <NavButton
-              key="supplemental"
-              active={activeView === "supplemental"}
-              onClick={() => setActiveView("supplemental")}
-              icon={CreditCard}
-              label="Supplemental"
-            />
-            <NavButton
-              key="paycheck"
-              active={activeView === "paycheck"}
-              onClick={() => setActiveView("paycheck")}
-              icon={DollarSign}
-              label="Add Paycheck"
-            />
-            <NavButton
-              key="bills"
-              active={activeView === "bills"}
-              onClick={() => setActiveView("bills")}
-              icon={Calendar}
-              label="Manage Bills"
-            />
-            <NavButton
-              key="transactions"
-              active={activeView === "transactions"}
-              onClick={() => setActiveView("transactions")}
-              icon={BookOpen}
-              label="Transactions"
-            />
-            <NavButton
-              key="analytics"
-              active={activeView === "analytics"}
-              onClick={() => setActiveView("analytics")}
-              icon={BarChart3}
-              label="Analytics"
-            />
-          </nav>
-        </div>
+          {/* Navigation Tabs */}
+          <NavigationTabs activeView={activeView} onViewChange={setActiveView} />
 
-        {/* Summary Cards - Enhanced with clickable unassigned cash distribution */}
-        <SummaryCards
-          totalCash={totalCash}
-          unassignedCash={unassignedCash}
-          totalSavingsBalance={totalSavingsBalance}
-          biweeklyAllocation={totalBiweeklyNeed}
-        />
+          {/* Onboarding Progress */}
+          <OnboardingProgress />
 
-        {/* Main Content */}
-        <ViewRendererComponent activeView={activeView} budget={budget} currentUser={currentUser} />
+          {/* Summary Cards - Enhanced with clickable unassigned cash distribution */}
+          <SummaryCards />
 
-        <SyncStatusIndicators isOnline={isOnline} isSyncing={isSyncing} />
-        <ConflictResolutionModal
-          syncConflicts={syncConflicts}
-          onResolveConflict={onResolveConflict}
-          onDismiss={() => setSyncConflicts(null)}
-        />
+          {/* Main Content */}
+          <ViewRendererComponent
+            activeView={activeView}
+            budget={budget}
+            currentUser={currentUser}
+            totalBiweeklyNeed={totalBiweeklyNeed}
+            setActiveView={setActiveView}
+          />
 
-        {/* Bug Report Button */}
-        <BugReportButton />
+          <SyncStatusIndicators isOnline={isOnline} isSyncing={isSyncing} />
+          <ConflictResolutionModal
+            syncConflicts={syncConflicts}
+            onResolveConflict={onResolveConflict}
+            onDismiss={() => setSyncConflicts(null)}
+          />
 
-        {/* Version Footer */}
-        <div className="mt-8 text-center">
-          <div className="glassmorphism rounded-2xl p-4 max-w-md mx-auto">
-            <p className="text-sm text-gray-600">
-              <span className="font-semibold text-purple-600">{getVersionInfo().displayName}</span>{" "}
-              v{getVersionInfo().version}
-            </p>
-            <p className="text-xs text-gray-500 mt-1">Built with ❤️ for secure budgeting</p>
+          {/* Bug Report Button */}
+          <BugReportButton />
+
+          {/* Version Footer */}
+          <div className="mt-8 text-center">
+            <div className="glassmorphism rounded-2xl p-4 max-w-md mx-auto border border-gray-800/20">
+              <p className="text-sm text-gray-600">
+                <span className="font-semibold text-purple-600">
+                  {getVersionInfo().displayName}
+                </span>{" "}
+                v{getVersionInfo().version}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                Last updated: {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">Built with ❤️ for secure budgeting</p>
+            </div>
           </div>
         </div>
+
+        {/* Security Settings Modal */}
+        <SecuritySettings
+          isOpen={showSecuritySettings}
+          onClose={() => setShowSecuritySettings(false)}
+        />
+
+        {/* Settings Dashboard Modal */}
+        {showSettingsModal && (
+          <SettingsDashboard
+            isOpen={showSettingsModal}
+            onClose={() => setShowSettingsModal(false)}
+            onExport={onExport}
+            onImport={handleImport}
+            onLogout={onLogout}
+            onResetEncryption={() => {
+              // Reset the budget context data first
+              budget.resetAllData();
+              // Then call the original reset function (clears localStorage and calls logout)
+              onResetEncryption();
+            }}
+            onSync={handleManualSync}
+            onChangePassword={handleChangePassword}
+            currentUser={currentUser}
+            onUserChange={onUserChange}
+            onUpdateProfile={onUpdateProfile}
+            isLocalOnlyMode={isLocalOnlyMode}
+            securityManager={securityManager}
+          />
+        )}
       </div>
-    </div>
+    </OnboardingTutorial>
   );
 };
-
-const NavButton = ({ active, onClick, icon: Icon, label }) => (
-  <button
-    onClick={onClick}
-    className={`flex-1 flex flex-col items-center sm:flex-row sm:px-6 px-2 py-3 text-xs sm:text-sm font-semibold border-t-2 sm:border-b-2 transition-all ${
-      active
-        ? "border-purple-500 text-purple-600 bg-purple-50/50"
-        : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30"
-    }`}
-  >
-    <Icon className="h-5 w-5 mb-1 sm:mb-0 sm:mr-3" />
-    <span>{label}</span>
-  </button>
-);
 
 // SummaryCard component removed - now using enhanced SummaryCards component with clickable functionality
 

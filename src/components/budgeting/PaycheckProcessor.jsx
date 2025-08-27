@@ -1,13 +1,24 @@
 // src/components/PaycheckProcessor.jsx - Complete Component
 import React, { useState } from "react";
-import { DollarSign, User, Wallet, Calculator, TrendingUp, Clock, CheckCircle } from "lucide-react";
+import {
+  DollarSign,
+  User,
+  Wallet,
+  Calculator,
+  TrendingUp,
+  Clock,
+  CheckCircle,
+  Trash2,
+} from "lucide-react";
 import { BILL_CATEGORIES, ENVELOPE_TYPES } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
+import logger from "../../utils/logger";
 
 const PaycheckProcessor = ({
   envelopes = [],
   paycheckHistory = [],
   onProcessPaycheck,
+  onDeletePaycheck,
   currentUser,
 }) => {
   const [paycheckAmount, setPaycheckAmount] = useState("");
@@ -15,6 +26,59 @@ const PaycheckProcessor = ({
   const [allocationMode, setAllocationMode] = useState("allocate"); // 'allocate' or 'leftover'
   const [isProcessing, setIsProcessing] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [deletingPaycheckId, setDeletingPaycheckId] = useState(null);
+  const [showAddNewPayer, setShowAddNewPayer] = useState(false);
+  const [newPayerName, setNewPayerName] = useState("");
+
+  // Get unique payers from paycheck history for dropdown
+  const getUniquePayers = () => {
+    const payers = new Set();
+    paycheckHistory.forEach((paycheck) => {
+      if (paycheck.payerName && paycheck.payerName.trim()) {
+        payers.add(paycheck.payerName);
+      }
+    });
+    return Array.from(payers).sort();
+  };
+
+  // Get smart prediction for a specific payer
+  const getPayerPrediction = (payer) => {
+    const payerPaychecks = paycheckHistory
+      .filter((p) => p.payerName === payer && p.amount > 0)
+      .slice(0, 5) // Last 5 paychecks
+      .map((p) => p.amount);
+
+    if (payerPaychecks.length === 0) return null;
+
+    const average = payerPaychecks.reduce((sum, amount) => sum + amount, 0) / payerPaychecks.length;
+    const mostRecent = payerPaychecks[0];
+
+    return {
+      average: Math.round(average * 100) / 100,
+      mostRecent: mostRecent,
+      count: payerPaychecks.length,
+    };
+  };
+
+  // Handle payer selection
+  const handlePayerChange = (selectedPayer) => {
+    setPayerName(selectedPayer);
+
+    // Smart prediction: suggest the most recent paycheck amount for this payer
+    const prediction = getPayerPrediction(selectedPayer);
+    if (prediction && !paycheckAmount) {
+      setPaycheckAmount(prediction.mostRecent.toString());
+    }
+  };
+
+  // Handle adding new payer
+  const handleAddNewPayer = () => {
+    if (newPayerName.trim()) {
+      setPayerName(newPayerName.trim());
+      setNewPayerName("");
+      setShowAddNewPayer(false);
+    }
+  };
 
   const calculateAllocation = () => {
     const amount = parseFloat(paycheckAmount) || 0;
@@ -95,22 +159,44 @@ const PaycheckProcessor = ({
     setIsProcessing(true);
 
     try {
-      const result = onProcessPaycheck({
+      const result = await onProcessPaycheck({
         amount,
         payerName: payerName.trim(),
         mode: allocationMode,
         date: new Date().toISOString(),
       });
 
-      console.log("Paycheck processed:", result);
+      logger.debug("Paycheck processed:", result);
 
       setPaycheckAmount("");
       setShowPreview(false);
     } catch (error) {
-      console.error("Failed to process paycheck:", error);
+      logger.error("Failed to process paycheck:", error);
       alert("Failed to process paycheck");
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const handleDeletePaycheck = async (paycheck) => {
+    if (!onDeletePaycheck) return;
+
+    const confirmed = window.confirm(
+      `Are you sure you want to delete the paycheck from ${paycheck.payerName} for $${paycheck.amount.toFixed(2)}? This will reverse all related transactions and cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    setDeletingPaycheckId(paycheck.id);
+
+    try {
+      await onDeletePaycheck(paycheck.id);
+      logger.debug("Paycheck deleted:", paycheck.id);
+    } catch (error) {
+      logger.error("Failed to delete paycheck:", error);
+      alert("Failed to delete paycheck. Please try again.");
+    } finally {
+      setDeletingPaycheckId(null);
     }
   };
 
@@ -157,14 +243,79 @@ const PaycheckProcessor = ({
                 <User className="h-4 w-4 inline mr-2" />
                 Whose Paycheck?
               </label>
-              <input
-                type="text"
-                value={payerName}
-                onChange={(e) => setPayerName(e.target.value)}
-                className="glassmorphism w-full px-6 py-4 border border-white/20 rounded-2xl focus:ring-2 focus:ring-purple-500"
-                placeholder="e.g., Sarah, John, etc."
-                disabled={isProcessing}
-              />
+
+              {!showAddNewPayer ? (
+                <div className="space-y-3">
+                  {/* Dropdown for existing payers */}
+                  <select
+                    value={payerName}
+                    onChange={(e) => {
+                      if (e.target.value === "ADD_NEW") {
+                        setShowAddNewPayer(true);
+                      } else {
+                        handlePayerChange(e.target.value);
+                      }
+                    }}
+                    className="glassmorphism w-full px-6 py-4 border border-white/20 rounded-2xl focus:ring-2 focus:ring-purple-500"
+                    disabled={isProcessing}
+                  >
+                    <option value="">Select a person...</option>
+                    {getUniquePayers().map((payer) => {
+                      const prediction = getPayerPrediction(payer);
+                      return (
+                        <option key={payer} value={payer}>
+                          {payer} {prediction ? `(avg: $${prediction.average.toFixed(2)})` : ""}
+                        </option>
+                      );
+                    })}
+                    <option value="ADD_NEW">+ Add New Person</option>
+                  </select>
+
+                  {/* Show prediction info for selected payer */}
+                  {payerName && getPayerPrediction(payerName) && (
+                    <div className="glassmorphism p-4 rounded-xl border border-blue-200/50 bg-blue-50/20">
+                      <div className="text-sm text-gray-600">
+                        <TrendingUp className="h-4 w-4 inline mr-2 text-blue-500" />
+                        <strong>{payerName}'s History:</strong>
+                        {(() => {
+                          const pred = getPayerPrediction(payerName);
+                          return ` Avg: $${pred.average.toFixed(2)} • Last: $${pred.mostRecent.toFixed(2)} (${pred.count} paychecks)`;
+                        })()}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex gap-3">
+                    <input
+                      type="text"
+                      value={newPayerName}
+                      onChange={(e) => setNewPayerName(e.target.value)}
+                      className="glassmorphism flex-1 px-6 py-4 border border-white/20 rounded-2xl focus:ring-2 focus:ring-purple-500"
+                      placeholder="Enter new person's name"
+                      onKeyPress={(e) => e.key === "Enter" && handleAddNewPayer()}
+                      autoFocus
+                    />
+                    <button
+                      onClick={handleAddNewPayer}
+                      className="px-6 py-4 bg-emerald-500 text-white rounded-2xl hover:bg-emerald-600 transition-colors"
+                      disabled={!newPayerName.trim()}
+                    >
+                      <CheckCircle className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowAddNewPayer(false);
+                        setNewPayerName("");
+                      }}
+                      className="px-6 py-4 bg-gray-500 text-white rounded-2xl hover:bg-gray-600 transition-colors"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div>
@@ -237,6 +388,7 @@ const PaycheckProcessor = ({
                   onClick={handleProcessPaycheck}
                   disabled={isProcessing}
                   className="flex-1 btn btn-success py-4 text-lg font-semibold rounded-2xl"
+                  data-tour="add-paycheck"
                 >
                   {isProcessing ? (
                     <div className="flex items-center">
@@ -351,10 +503,12 @@ const PaycheckProcessor = ({
                           : "linear-gradient(135deg, #10b981 0%, #059669 100%)",
                     }}
                   >
-                    {paycheck.payerName.charAt(0).toUpperCase()}
+                    {(paycheck.payerName || "?").charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <div className="font-semibold text-gray-900 text-lg">{paycheck.payerName}</div>
+                    <div className="font-semibold text-gray-900 text-lg">
+                      {paycheck.payerName || "Unknown Payer"}
+                    </div>
                     <div className="text-sm text-gray-600">
                       {new Date(paycheck.date).toLocaleDateString()} •
                       <span className="ml-1 font-medium">
@@ -363,14 +517,30 @@ const PaycheckProcessor = ({
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="font-bold text-2xl text-emerald-600">
-                    ${paycheck.amount.toFixed(2)}
-                  </div>
-                  {paycheck.leftoverAmount !== undefined && (
-                    <div className="text-sm text-gray-600">
-                      +${paycheck.leftoverAmount.toFixed(2)} unassigned
+                <div className="flex items-center space-x-4">
+                  <div className="text-right">
+                    <div className="font-bold text-2xl text-emerald-600">
+                      ${paycheck.amount.toFixed(2)}
                     </div>
+                    {paycheck.leftoverAmount !== undefined && (
+                      <div className="text-sm text-gray-600">
+                        +${paycheck.leftoverAmount.toFixed(2)} unassigned
+                      </div>
+                    )}
+                  </div>
+                  {onDeletePaycheck && (
+                    <button
+                      onClick={() => handleDeletePaycheck(paycheck)}
+                      disabled={deletingPaycheckId === paycheck.id}
+                      className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-xl transition-colors disabled:opacity-50"
+                      title="Delete paycheck"
+                    >
+                      {deletingPaycheckId === paycheck.id ? (
+                        <div className="animate-spin h-5 w-5 border-2 border-red-500 border-t-transparent rounded-full" />
+                      ) : (
+                        <Trash2 className="h-5 w-5" />
+                      )}
+                    </button>
                   )}
                 </div>
               </div>
