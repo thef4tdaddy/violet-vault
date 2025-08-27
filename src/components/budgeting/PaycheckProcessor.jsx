@@ -198,9 +198,9 @@ const PaycheckProcessor = ({
 
       logger.debug("Paycheck processed:", result);
 
-      // Clean up temp payers - once a paycheck is processed, the payer is now in history  
+      // Clean up temp payers - once a paycheck is processed, the payer is now in history
       const processedPayerName = payerName.trim();
-      setTempPayers(prev => prev.filter(name => name !== processedPayerName));
+      setTempPayers((prev) => prev.filter((name) => name !== processedPayerName));
 
       setPaycheckAmount("");
       setShowPreview(false);
