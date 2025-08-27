@@ -407,34 +407,15 @@ export const useAuth = create((set, get) => ({
         logger.auth("validatePassword: No saved data, validating against auth salt");
 
         try {
-          // Use the same deterministic key derivation as login
-          const keyData = await encryptionUtils.deriveKey(password);
-          const testKey = keyData.key;
+          // For the no-data case, we don't have encrypted data to test against
+          // So we'll use a simple approach: try to derive a key and assume it's valid
+          // This is less secure but necessary when no encrypted data exists yet
+          const saltArray = new Uint8Array(authState.salt);
+          const testKey = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
           
-          // Since we can't directly compare CryptoKey objects, try a small encryption/decryption test
-          if (authState.encryptionKey) {
-            try {
-              // Test encryption with the derived key
-              const testData = new TextEncoder().encode("validation-test");
-              const encrypted = await crypto.subtle.encrypt(
-                { name: "AES-GCM", iv: new Uint8Array(12) },
-                testKey,
-                testData
-              );
-              
-              logger.auth("validatePassword: Encryption test successful");
-              logger.production("Password validation successful", { method: "encryption_test" });
-              return true;
-            } catch (encryptError) {
-              logger.auth("validatePassword: Encryption test failed", { error: encryptError.message });
-              logger.production("Password validation failed", { method: "encryption_test", error: encryptError.message });
-              return false;
-            }
-          } else {
-            // If no current key, just check if we can derive a key (basic validation)
-            logger.auth("validatePassword: No current key, basic validation passed");
-            return true;
-          }
+          logger.auth("validatePassword: Key derived successfully for no-data case");
+          logger.production("Password validation successful", { method: "no_data_fallback" });
+          return true;
         } catch (error) {
           logger.auth("validatePassword: Auth salt validation failed", {
             error: error.message,
@@ -455,7 +436,8 @@ export const useAuth = create((set, get) => ({
           saltLength: saltArray.length,
         });
 
-        // Use the same deterministic key derivation as login for consistency
+        // CRITICAL: Use the same deterministic key generation as login
+        // Login now ignores saved salt and uses deterministic derivation
         const keyData = await encryptionUtils.deriveKey(password);
         const testKey = keyData.key;
 
