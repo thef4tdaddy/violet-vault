@@ -2,14 +2,14 @@
   "project": "violet-vault",
   "lastUpdated": "2025-08-27",
   "currentStatus": {
-    "totalWarnings": 23,
+    "totalWarnings": 25,
     "targetWarnings": 17,
     "errors": 0
   },
   "warningCategories": [
     {
       "type": "no-unused-vars",
-      "count": 15,
+      "count": 17,
       "severity": "warning",
       "files": [
         {
@@ -93,6 +93,20 @@
             {
               "line": 182,
               "message": "'Icon' is defined but never used"
+            }
+          ]
+        },
+        {
+          "path": "src/stores/authStore.jsx",
+          "warnings": 2,
+          "details": [
+            {
+              "line": 11,
+              "message": "'compareUint8Arrays' is defined but never used. Allowed unused vars must match /^[A-Z_]/u"
+            },
+            {
+              "line": 419,
+              "message": "'encrypted' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
             }
           ]
         },
@@ -203,7 +217,7 @@
     "highPriority": [
       {
         "task": "Fix no-unused-vars warnings",
-        "warningsAffected": 15,
+        "warningsAffected": 17,
         "files": [
           "AutoFundingRuleBuilder.jsx",
           "DebtDetailModal.jsx",
@@ -211,6 +225,7 @@
           "ObjectHistoryViewer.jsx",
           "NavigationTabs.jsx",
           "SummaryCards.jsx",
+          "authStore.jsx",
           "autoFundingEngine.js"
         ],
         "action": "Remove unused variables or prefix with underscore if intentionally unused"
