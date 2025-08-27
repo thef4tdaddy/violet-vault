@@ -150,23 +150,23 @@ const PaycheckProcessor = ({
       totalEnvelopes: envelopes.length,
       billEnvelopesFound: billEnvelopes.length,
       variableEnvelopesFound: variableEnvelopes.length,
-      billEnvelopes: billEnvelopes.map(e => ({
+      billEnvelopes: billEnvelopes.map((e) => ({
         id: e.id,
         name: e.name,
         autoAllocate: e.autoAllocate,
         envelopeType: e.envelopeType,
         category: e.category,
         biweeklyAllocation: e.biweeklyAllocation,
-        currentBalance: e.currentBalance
+        currentBalance: e.currentBalance,
       })),
-      variableEnvelopes: variableEnvelopes.map(e => ({
+      variableEnvelopes: variableEnvelopes.map((e) => ({
         id: e.id,
         name: e.name,
         autoAllocate: e.autoAllocate,
         envelopeType: e.envelopeType,
         monthlyBudget: e.monthlyBudget,
-        currentBalance: e.currentBalance
-      }))
+        currentBalance: e.currentBalance,
+      })),
     });
 
     // First, allocate to bill envelopes (higher priority)
@@ -179,7 +179,7 @@ const PaycheckProcessor = ({
         currentBalance: envelope.currentBalance,
         needed,
         allocation,
-        remainingAmount
+        remainingAmount,
       });
 
       if (allocation > 0) {
@@ -201,7 +201,7 @@ const PaycheckProcessor = ({
         currentBalance: envelope.currentBalance,
         needed,
         allocation,
-        remainingAmount
+        remainingAmount,
       });
 
       if (allocation > 0) {
@@ -214,14 +214,14 @@ const PaycheckProcessor = ({
     logger.debug("Final allocation results", {
       totalAllocated,
       remainingAmount,
-      allocations
+      allocations,
     });
 
     // Create detailed summary for debugging
     const billCount = billEnvelopes.length;
     const variableCount = variableEnvelopes.length;
     const allocatedCount = Object.keys(allocations).length;
-    
+
     return {
       mode: "allocate",
       totalAmount: amount,
@@ -234,8 +234,8 @@ const PaycheckProcessor = ({
         billEnvelopesFound: billCount,
         variableEnvelopesFound: variableCount,
         allocatedEnvelopes: allocatedCount,
-        autoAllocateEnvelopes: envelopes.filter(e => e.autoAllocate).length
-      }
+        autoAllocateEnvelopes: envelopes.filter((e) => e.autoAllocate).length,
+      },
     };
   };
 
@@ -545,13 +545,15 @@ const PaycheckProcessor = ({
                   <p className="text-sm text-gray-600 bg-emerald-50 p-3 rounded-xl">
                     {preview.summary}
                   </p>
-                  
+
                   {/* Debug info for production troubleshooting */}
                   {preview.debugInfo && preview.mode === "allocate" && (
                     <div className="mt-2 text-xs text-gray-500 bg-gray-50 p-2 rounded-lg">
-                      <strong>Allocation Debug:</strong> {preview.debugInfo.totalEnvelopes} total envelopes, 
-                      {preview.debugInfo.autoAllocateEnvelopes} with auto-allocate enabled, 
-                      found {preview.debugInfo.billEnvelopesFound} bills + {preview.debugInfo.variableEnvelopesFound} variable = 
+                      <strong>Allocation Debug:</strong> {preview.debugInfo.totalEnvelopes} total
+                      envelopes,
+                      {preview.debugInfo.autoAllocateEnvelopes} with auto-allocate enabled, found{" "}
+                      {preview.debugInfo.billEnvelopesFound} bills +{" "}
+                      {preview.debugInfo.variableEnvelopesFound} variable =
                       {preview.debugInfo.allocatedEnvelopes} receiving funds
                     </div>
                   )}
