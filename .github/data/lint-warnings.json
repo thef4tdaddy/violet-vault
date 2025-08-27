@@ -2,14 +2,14 @@
   "project": "violet-vault",
   "lastUpdated": "2025-08-27",
   "currentStatus": {
-    "totalWarnings": 21,
+    "totalWarnings": 25,
     "targetWarnings": 17,
     "errors": 0
   },
   "warningCategories": [
     {
       "type": "no-unused-vars",
-      "count": 14,
+      "count": 15,
       "severity": "warning",
       "files": [
         {
@@ -39,6 +39,16 @@
             {
               "line": 441,
               "message": "'Icon' is defined but never used"
+            }
+          ]
+        },
+        {
+          "path": "src/components/debt/modals/DebtDetailModal.jsx",
+          "warnings": 1,
+          "details": [
+            {
+              "line": 18,
+              "message": "'onLinkToBill' is defined but never used"
             }
           ]
         },
@@ -107,6 +117,37 @@
       ]
     },
     {
+      "type": "no-undef",
+      "count": 3,
+      "severity": "warning",
+      "files": [
+        {
+          "path": "src/components/bills/AddBillModal.jsx",
+          "warnings": 1,
+          "details": [
+            {
+              "line": 694,
+              "message": "'setEditingBill' is not defined"
+            }
+          ]
+        },
+        {
+          "path": "src/services/cloudSyncService.js",
+          "warnings": 2,
+          "details": [
+            {
+              "line": 26,
+              "message": "'budgetId' is not defined"
+            },
+            {
+              "line": 40,
+              "message": "'budgetId' is not defined"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "type": "react-hooks/exhaustive-deps",
       "count": 7,
       "severity": "warning",
@@ -141,11 +182,11 @@
           "details": [
             {
               "line": 33,
-              "message": "The 'debts' logical expression could make the dependencies of useMemo Hook (at line 106) change on every render. To fix this, wrap the initialization of 'debts' in its own useMemo() Hook"
+              "message": "The 'debts' logical expression could make the dependencies of useMemo Hook (at line 101) change on every render. To fix this, wrap the initialization of 'debts' in its own useMemo() Hook"
             },
             {
               "line": 33,
-              "message": "The 'debts' logical expression could make the dependencies of useMemo Hook (at line 138) change on every render. To fix this, wrap the initialization of 'debts' in its own useMemo() Hook"
+              "message": "The 'debts' logical expression could make the dependencies of useMemo Hook (at line 130) change on every render. To fix this, wrap the initialization of 'debts' in its own useMemo() Hook"
             }
           ]
         },
@@ -176,9 +217,10 @@
     "highPriority": [
       {
         "task": "Fix no-unused-vars warnings",
-        "warningsAffected": 14,
+        "warningsAffected": 15,
         "files": [
           "AutoFundingRuleBuilder.jsx",
+          "DebtDetailModal.jsx",
           "DebtSummaryCards.jsx",
           "ObjectHistoryViewer.jsx",
           "NavigationTabs.jsx",
@@ -201,7 +243,17 @@
       }
     ],
     "mediumPriority": [],
-    "lowPriority": []
+    "lowPriority": [
+      {
+        "task": "Fix no-undef warnings",
+        "warningsAffected": 3,
+        "files": [
+          "AddBillModal.jsx",
+          "cloudSyncService.js"
+        ],
+        "action": "Review and fix no-undef violations"
+      }
+    ]
   },
   "commands": {
     "checkWarnings": "npm run lint",
