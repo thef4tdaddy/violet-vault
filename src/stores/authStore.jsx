@@ -407,24 +407,29 @@ export const useAuth = create((set, get) => ({
         logger.auth("validatePassword: No saved data, validating against auth salt");
 
         try {
-          const saltArray = new Uint8Array(authState.salt);
-          const testKey = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
-
-          // Compare the derived key with the current encryption key if available
+          // Use the same deterministic key derivation as login
+          const keyData = await encryptionUtils.deriveKey(password);
+          const testKey = keyData.key;
+          
+          // Since we can't directly compare CryptoKey objects, try a small encryption/decryption test
           if (authState.encryptionKey) {
-            // Proper byte-wise comparison instead of JSON.stringify
-            const keysMatch = compareUint8Arrays(testKey, authState.encryptionKey);
-            logger.auth("validatePassword: Key comparison result", {
-              keysMatch,
-              testKeyLength: testKey.length,
-              currentKeyLength: authState.encryptionKey.length,
-            });
-            if (keysMatch) {
-              logger.production("Password validation successful", { method: "key_compare" });
-            } else {
-              logger.production("Password validation failed", { method: "key_compare" });
+            try {
+              // Test encryption with the derived key
+              const testData = new TextEncoder().encode("validation-test");
+              const encrypted = await crypto.subtle.encrypt(
+                { name: "AES-GCM", iv: new Uint8Array(12) },
+                testKey,
+                testData
+              );
+              
+              logger.auth("validatePassword: Encryption test successful");
+              logger.production("Password validation successful", { method: "encryption_test" });
+              return true;
+            } catch (encryptError) {
+              logger.auth("validatePassword: Encryption test failed", { error: encryptError.message });
+              logger.production("Password validation failed", { method: "encryption_test", error: encryptError.message });
+              return false;
             }
-            return keysMatch;
           } else {
             // If no current key, just check if we can derive a key (basic validation)
             logger.auth("validatePassword: No current key, basic validation passed");
@@ -450,8 +455,9 @@ export const useAuth = create((set, get) => ({
           saltLength: saltArray.length,
         });
 
-        // Try to derive the key with the provided password
-        const testKey = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
+        // Use the same deterministic key derivation as login for consistency
+        const keyData = await encryptionUtils.deriveKey(password);
+        const testKey = keyData.key;
 
         logger.auth("validatePassword: Key derived successfully");
 
@@ -463,12 +469,15 @@ export const useAuth = create((set, get) => ({
             logger.production("Password validation successful", { method: "decrypt" });
             return true;
           } catch (decryptError) {
+            const errorMessage = decryptError.message || decryptError.toString() || "Decryption failed";
             logger.auth("validatePassword: Decryption failed - password is incorrect", {
-              error: decryptError.message,
+              error: errorMessage,
+              errorType: decryptError.name || typeof decryptError,
             });
             logger.production("Password validation failed", {
               method: "decrypt",
-              error: decryptError.message,
+              error: errorMessage,
+              errorType: decryptError.name || typeof decryptError,
             });
             return false;
           }
