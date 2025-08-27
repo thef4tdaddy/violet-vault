@@ -797,13 +797,21 @@ async function generateSmartLabels(description, reportEnv, env) {
     }
   }
 
-  // Screen size based labeling
-  if (reportEnv?.viewport) {
+  // Screen size based labeling - use more accurate device detection
+  if (reportEnv?.viewport && reportEnv?.userAgent) {
     const [width] = reportEnv.viewport.split("x").map(Number);
-    if (width <= 768) {
-      labels.push("mobile");
-    } else if (width <= 1024) {
-      labels.push("tablet");
+    const userAgent = reportEnv.userAgent.toLowerCase();
+    
+    // Only label as mobile if actually detected as mobile device
+    if (userAgent.includes("mobile") || userAgent.includes("android") || userAgent.includes("iphone")) {
+      addLabelIfExists("mobile");
+    } else if (userAgent.includes("ipad") || (width >= 768 && width <= 1024 && reportEnv.touchSupport)) {
+      addLabelIfExists("tablet"); 
+    } else {
+      // Desktop/laptop - don't add any device type label unless explicitly detected
+      if (width > 1024) {
+        addLabelIfExists("desktop");
+      }
     }
   }
 
@@ -1005,16 +1013,36 @@ async function createGitHubIssue(data, env) {
   const { description, screenshotUrl, sessionUrl, env: reportEnv } = data;
 
   // Build issue body with all available information
-  // Parse line breaks into checklist items if description contains line breaks or list indicators
+  // Parse line breaks into checklist items ONLY if it's NOT code content
   let processedDescription = description;
 
-  // Very lenient parsing - trigger on ANY line breaks (single \n or multiple)
+  // Check if description contains code blocks or technical content that should NOT be converted to tasks
+  const hasCodeBlocks = 
+    /```[\s\S]*?```/.test(description) ||  // Code blocks
+    /`[^`\n]+`/.test(description) ||       // Inline code
+    /function\s+\w+\s*\(/.test(description) || // Function definitions
+    /const\s+\w+\s*=/.test(description) ||     // Variable declarations  
+    /import\s+.*from/.test(description) ||     // Import statements
+    /class\s+\w+/.test(description) ||         // Class definitions
+    /TypeError:|ReferenceError:|SyntaxError:/.test(description) || // Error types
+    /at\s+\w+\s*\(/.test(description) ||       // Stack traces
+    /console\.(log|error|warn)/.test(description) || // Console statements
+    description.includes("Error:") ||          // General error messages
+    description.includes("Exception") ||       // Exception references
+    /\w+\.\w+\([^)]*\)/.test(description);     // Method calls
+
+  // Only parse into task lists if it's clearly a user task list (not technical content)  
   const shouldParse =
-    description.includes("\n") ||
-    description.includes("- ") ||
-    description.includes("* ") ||
-    description.includes("• ") ||
-    /^\d+\./m.test(description);
+    !hasCodeBlocks && (
+      (description.includes("\n") && (
+        description.includes("- ") ||
+        description.includes("* ") ||
+        description.includes("• ") ||
+        /^\d+\./m.test(description)
+      )) ||
+      // Only parse single lines if they have clear list indicators
+      (description.includes("- ") || description.includes("* ") || description.includes("• "))
+    );
 
   if (shouldParse) {
     // Convert multi-line descriptions into GitHub checklist format
