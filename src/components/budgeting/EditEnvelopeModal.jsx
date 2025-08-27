@@ -19,7 +19,12 @@ import {
   Unlock,
   User,
   Clock,
+  Receipt,
 } from "lucide-react";
+import ConnectionDisplay, {
+  ConnectionItem,
+  ConnectionInfo,
+} from "../ui/ConnectionDisplay";
 import useEditLock from "../../hooks/useEditLock";
 import { initializeEditLocks } from "../../services/editLockService";
 import { useAuth } from "../../stores/authStore";
@@ -421,7 +426,7 @@ const EditEnvelopeModal = ({
                     <div
                       className={`flex items-center px-3 py-1 rounded-full text-xs font-medium ${
                         isOwnLock
-                          ? "bg-green-500/20 text-green-100 border border-green-400/30"
+                          ? "bg-purple-500/20 text-purple-100 border border-purple-400/30"
                           : "bg-red-500/20 text-red-100 border border-red-400/30"
                       }`}
                     >
@@ -440,7 +445,7 @@ const EditEnvelopeModal = ({
                     </div>
                   )}
                   {lockLoading && (
-                    <div className="bg-yellow-500/20 text-yellow-100 border border-yellow-400/30 px-3 py-1 rounded-full text-xs font-medium flex items-center">
+                    <div className="bg-purple-500/20 text-purple-100 border border-purple-400/30 px-3 py-1 rounded-full text-xs font-medium flex items-center">
                       <div className="animate-spin rounded-full h-3 w-3 border border-yellow-300 border-t-transparent mr-1" />
                       Acquiring Lock...
                     </div>
@@ -660,8 +665,8 @@ const EditEnvelopeModal = ({
                 </select>
 
                 {selectedBillId && (
-                  <div className="mt-3 p-3 bg-green-100 border border-green-300 rounded-lg">
-                    <p className="text-sm text-green-700 flex items-center">
+                  <div className="mt-3 p-3 bg-purple-100 border border-purple-300 rounded-lg">
+                    <p className="text-sm text-purple-700 flex items-center">
                       <CheckCircle className="h-5 w-5 mr-2" />
                       <strong>Connected!</strong> Envelope settings have been populated from the
                       selected bill.
@@ -693,32 +698,34 @@ const EditEnvelopeModal = ({
                   : "Variable Budget Settings"}
               </h3>
 
-              {/* Connected Bill Display */}
-              {formData.envelopeType === ENVELOPE_TYPES.BILL && selectedBillId && (
-                <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-                  <div className="flex items-center mb-2">
-                    <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-                    <span className="font-medium text-green-800">Bill Connected</span>
-                  </div>
-                  {(() => {
-                    const connectedBill = allBills.find((bill) => bill.id === selectedBillId);
-                    return connectedBill ? (
-                      <div className="text-sm text-green-700">
-                        <p>
-                          <strong>{connectedBill.name || connectedBill.provider}</strong>
-                        </p>
-                        <p>
-                          Amount: ${connectedBill.amount || "N/A"} (
-                          {connectedBill.frequency || "monthly"})
-                        </p>
-                        <p className="text-xs mt-1">
-                          Bill settings will override manual envelope settings.
-                        </p>
-                      </div>
-                    ) : null;
-                  })()}
-                </div>
-              )}
+              {/* Connected Bill Display - Using Purple Theme */}
+              {(() => {
+                const connectedBill = formData.envelopeType === ENVELOPE_TYPES.BILL && selectedBillId 
+                  ? allBills.find((bill) => bill.id === selectedBillId) 
+                  : null;
+                
+                return connectedBill ? (
+                  <ConnectionDisplay
+                    title="Connected Bill"
+                    icon={Receipt}
+                    theme="purple"
+                    isVisible={true}
+                  >
+                    <ConnectionItem
+                      icon={Receipt}
+                      title="Connected Bill"
+                      details={`${connectedBill.name || connectedBill.provider} • $${connectedBill.amount || "0.00"} (${connectedBill.frequency || "monthly"})`}
+                      badge="Auto-synced"
+                      theme="purple"
+                    />
+
+                    <ConnectionInfo theme="purple">
+                      💜 <strong>Connected!</strong> This envelope is linked to the bill above.
+                      Bill settings will override manual envelope settings for amount and frequency.
+                    </ConnectionInfo>
+                  </ConnectionDisplay>
+                ) : null;
+              })()}
 
               {/* Type-specific fields */}
               {formData.envelopeType === ENVELOPE_TYPES.BILL && !selectedBillId && (
@@ -797,14 +804,14 @@ const EditEnvelopeModal = ({
 
                     {/* Auto-calculated biweekly allocation display */}
                     {formData.monthlyBudget && (
-                      <div className="mt-3 p-4 bg-green-50 border border-green-200 rounded-lg">
-                        <p className="text-sm font-semibold text-green-800 mb-2">
+                      <div className="mt-3 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                        <p className="text-sm font-semibold text-purple-800 mb-2">
                           ✅ Auto-calculated biweekly allocation:
                         </p>
-                        <div className="text-lg font-bold text-green-700">
+                        <div className="text-lg font-bold text-purple-700">
                           ${formData.biweeklyAllocation}/biweekly
                         </div>
-                        <p className="text-xs text-green-600 mt-1">
+                        <p className="text-xs text-purple-600 mt-1">
                           This amount will be automatically allocated every payday to cover your{" "}
                           {formData.frequency} bill.
                         </p>

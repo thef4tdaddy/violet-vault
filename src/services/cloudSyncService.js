@@ -23,7 +23,7 @@ class CloudSyncService {
 
     this.config = config;
     this.isRunning = true;
-    logger.info("🚀 Starting cloud sync service...");
+    logger.production("Cloud sync service started", { user: budgetId });
 
     // Initial sync
     this.scheduleSync();
@@ -37,7 +37,7 @@ class CloudSyncService {
   stop() {
     if (!this.isRunning) return;
 
-    logger.info("🛑 Stopping cloud sync service...");
+    logger.production("Cloud sync service stopped", { user: budgetId });
     clearInterval(this.syncIntervalId);
     clearTimeout(this.debounceTimer);
     this.isRunning = false;
@@ -129,7 +129,7 @@ class CloudSyncService {
           }
 
           result = { success: true, direction: "fromFirestore" };
-          logger.info("✅ Downloaded data from Firebase and saved to Dexie");
+          logger.production("Data synced from cloud", { direction: "download" });
         } else {
           result = { success: false, error: "No cloud data found" };
         }
@@ -139,7 +139,10 @@ class CloudSyncService {
       }
 
       if (result.success) {
-        logger.info("✅ Chunked sync completed successfully.");
+        logger.production("Sync completed successfully", { 
+            direction: syncDecision.direction,
+            recordsProcessed: result?.recordsProcessed || 0
+          });
         await this.updateLastSyncTime();
         await this.updateUserActivity();
       } else {

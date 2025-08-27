@@ -1,6 +1,10 @@
 // Extracted from old BillManager - proper bill creation modal
 import React, { useState, useEffect } from "react";
-import { X, Save, Sparkles, Trash2, Lock, Unlock, User, Clock } from "lucide-react";
+import { X, Save, Sparkles, Trash2, Lock, Unlock, User, Clock, Wallet } from "lucide-react";
+import ConnectionDisplay, {
+  ConnectionItem,
+  ConnectionInfo,
+} from "../ui/ConnectionDisplay";
 import useEditLock from "../../hooks/useEditLock";
 import { initializeEditLocks } from "../../services/editLockService";
 import { useAuth } from "../../stores/authStore";
@@ -382,7 +386,7 @@ const AddBillModal = ({
               <div
                 className={`flex items-center px-3 py-1 rounded-full text-xs font-medium ${
                   isOwnLock
-                    ? "bg-green-100 text-green-800 border border-green-200"
+                    ? "bg-purple-100 text-purple-800 border border-purple-200"
                     : "bg-red-100 text-red-800 border border-red-200"
                 }`}
               >
@@ -401,7 +405,7 @@ const AddBillModal = ({
               </div>
             )}
             {editingBill && lockLoading && (
-              <div className="bg-yellow-100 text-yellow-800 border border-yellow-200 px-3 py-1 rounded-full text-xs font-medium flex items-center">
+              <div className="bg-purple-100 text-purple-800 border border-purple-200 px-3 py-1 rounded-full text-xs font-medium flex items-center">
                 <div className="animate-spin rounded-full h-3 w-3 border border-yellow-600 border-t-transparent mr-1" />
                 Acquiring Lock...
               </div>
@@ -619,7 +623,7 @@ const AddBillModal = ({
               <div className="md:col-span-2">
                 <div className="bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-300 rounded-xl p-6 mb-4">
                   <div className="flex items-center justify-between mb-4">
-                    <label className="block text-lg font-bold text-green-800 flex items-center">
+                    <label className="block text-lg font-bold text-purple-800 flex items-center">
                       <Sparkles className="h-6 w-6 mr-3" />
                       🔗 Connected to Envelope
                     </label>
@@ -641,10 +645,10 @@ const AddBillModal = ({
 
                   <div className="space-y-3">
                     <div className="flex items-center p-3 bg-white rounded-lg border border-green-200">
-                      <Sparkles className="h-5 w-5 mr-3 text-green-600" />
+                      <Sparkles className="h-5 w-5 mr-3 text-purple-600" />
                       <div className="flex-1">
-                        <div className="font-medium text-green-800">Connected Envelope</div>
-                        <div className="text-sm text-green-700">
+                        <div className="font-medium text-purple-800">Connected Envelope</div>
+                        <div className="text-sm text-purple-700">
                           {availableEnvelopes.find((e) => e.id === editingBill.envelopeId)?.name ||
                             "Unknown Envelope"}{" "}
                           • $
@@ -655,19 +659,74 @@ const AddBillModal = ({
                           available
                         </div>
                       </div>
-                      <div className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                      <div className="text-xs text-purple-600 bg-purple-100 px-2 py-1 rounded-full">
                         Funding source
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-3 p-3 bg-green-100 border border-green-300 rounded-lg">
-                    <p className="text-sm text-green-700 font-medium">
+                  <div className="mt-3 p-3 bg-purple-100 border border-purple-300 rounded-lg">
+                    <p className="text-sm text-purple-700 font-medium">
                       📝 <strong>Connected!</strong> This bill is linked to the envelope above for
                       payment funding. Use the disconnect button to change the envelope connection.
                     </p>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Connected Envelope Display - Using Purple Theme */}
+            {editingBill && editingBill.envelopeId && (
+              <div className="md:col-span-2">
+                <ConnectionDisplay
+                  title="Connected Envelope"
+                  icon={Wallet}
+                  theme="purple"
+                  isVisible={true}
+                  onDisconnect={() => {
+                    // Disconnect the bill from the envelope
+                    setFormData({
+                      ...formData,
+                      selectedEnvelope: "",
+                    });
+                    // Also update the editing bill to remove the envelope connection
+                    if (editingBill) {
+                      setEditingBill({
+                        ...editingBill,
+                        envelopeId: null,
+                      });
+                    }
+                  }}
+                >
+                  {(() => {
+                    const connectedEnvelope = availableEnvelopes.find(
+                      (env) => env.id === editingBill.envelopeId
+                    );
+                    return connectedEnvelope ? (
+                      <ConnectionItem
+                        icon={Wallet}
+                        title="Connected Envelope"
+                        details={`${connectedEnvelope.name} • $${(connectedEnvelope.currentBalance || 0).toFixed(2)} available`}
+                        badge="Funding source"
+                        theme="purple"
+                      />
+                    ) : (
+                      <ConnectionItem
+                        icon={Wallet}
+                        title="Connected Envelope"
+                        details="Unknown envelope (may have been deleted)"
+                        badge="Error"
+                        badgeColor="red"
+                        theme="purple"
+                      />
+                    );
+                  })()}
+
+                  <ConnectionInfo theme="purple">
+                    💜 <strong>Connected!</strong> This bill is linked to the envelope above.
+                    Payments will be automatically deducted from the envelope balance.
+                  </ConnectionInfo>
+                </ConnectionDisplay>
               </div>
             )}
 
@@ -710,7 +769,7 @@ const AddBillModal = ({
                     ))}
                 </select>
                 {formData.selectedEnvelope && (
-                  <p className="text-xs text-green-600 mt-1">
+                  <p className="text-xs text-purple-600 mt-1">
                     Selected:{" "}
                     {availableEnvelopes.find((e) => e.id === formData.selectedEnvelope)?.name ||
                       "Unknown"}
@@ -831,9 +890,9 @@ const AddBillModal = ({
               </p>
 
               {editingBill?.envelopeId && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                  <h4 className="font-medium text-yellow-800 mb-3">Connected Envelope Found</h4>
-                  <p className="text-sm text-yellow-700 mb-3">
+                <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-4">
+                  <h4 className="font-medium text-purple-800 mb-3">Connected Envelope Found</h4>
+                  <p className="text-sm text-purple-700 mb-3">
                     This bill is connected to envelope:{" "}
                     <strong>
                       {availableEnvelopes.find((e) => e.id === editingBill.envelopeId)?.name ||
@@ -850,7 +909,7 @@ const AddBillModal = ({
                         onChange={() => setDeleteEnvelopeToo(false)}
                         className="mr-2"
                       />
-                      <span className="text-yellow-800">Keep envelope (recommended)</span>
+                      <span className="text-purple-800">Keep envelope (recommended)</span>
                     </label>
 
                     <label className="flex items-center text-sm">
@@ -870,7 +929,7 @@ const AddBillModal = ({
                     </label>
                   </div>
 
-                  <p className="text-xs text-yellow-600 mt-2">
+                  <p className="text-xs text-purple-600 mt-2">
                     {deleteEnvelopeToo
                       ? "⚠️ This will permanently delete both the bill and envelope. Any money in the envelope will be transferred to unassigned cash."
                       : "✅ The envelope will remain available for other bills or manual use."}
