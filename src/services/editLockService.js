@@ -92,7 +92,7 @@ class EditLockService {
       }
 
       // Acquire the lock - using correct path per security rules
-      await setDoc(doc(firestore, 'locks', lockId), lockDoc);
+      await setDoc(doc(firestore, "locks", lockId), lockDoc);
 
       // Cache locally
       this.locks.set(lockId, lockDoc);
@@ -109,7 +109,10 @@ class EditLockService {
       return { success: true, lockDoc };
     } catch (error) {
       // Handle Firebase permission errors gracefully
-      if (error.code === "permission-denied" || error.message?.includes("Missing or insufficient permissions")) {
+      if (
+        error.code === "permission-denied" ||
+        error.message?.includes("Missing or insufficient permissions")
+      ) {
         logger.warn("❌ Edit locks unavailable - insufficient Firebase permissions", {
           userId: this.currentUser?.id,
           budgetId: this.budgetId?.slice(0, 8),
@@ -117,7 +120,7 @@ class EditLockService {
         // Return success but indicate locks are disabled
         return { success: true, reason: "locks_disabled", lockDoc: null };
       }
-      
+
       logger.error("❌ Failed to acquire lock", error);
       // For any other error, also gracefully degrade
       return { success: true, reason: "locks_disabled", error: error.message };
@@ -132,7 +135,7 @@ class EditLockService {
 
     try {
       // Remove from Firebase - using correct path per security rules
-      await deleteDoc(doc(firestore, 'locks', lockId));
+      await deleteDoc(doc(firestore, "locks", lockId));
 
       // Remove from local cache
       this.locks.delete(lockId);
@@ -144,7 +147,10 @@ class EditLockService {
       return { success: true };
     } catch (error) {
       // Handle Firebase permission errors gracefully
-      if (error.code === "permission-denied" || error.message?.includes("Missing or insufficient permissions")) {
+      if (
+        error.code === "permission-denied" ||
+        error.message?.includes("Missing or insufficient permissions")
+      ) {
         logger.warn("❌ Failed to release lock - insufficient permissions (continuing anyway)", {
           recordType,
           recordId,
@@ -154,7 +160,7 @@ class EditLockService {
         this.stopHeartbeat(lockId);
         return { success: true };
       }
-      
+
       logger.error("❌ Failed to release lock", error);
       return { success: false, error: error.message };
     }
@@ -167,7 +173,7 @@ class EditLockService {
     try {
       // Query locks collection - using correct path per security rules
       const q = query(
-        collection(firestore, 'locks'),
+        collection(firestore, "locks"),
         where("recordType", "==", recordType),
         where("recordId", "==", recordId),
         where("budgetId", "==", this.budgetId) // Filter by current budget
@@ -181,14 +187,17 @@ class EditLockService {
       return null;
     } catch (error) {
       // Handle Firebase permission errors gracefully
-      if (error.code === "permission-denied" || error.message?.includes("Missing or insufficient permissions")) {
+      if (
+        error.code === "permission-denied" ||
+        error.message?.includes("Missing or insufficient permissions")
+      ) {
         logger.warn("❌ Failed to get lock - insufficient permissions", {
           recordType,
           recordId,
         });
         return null; // No lock found (graceful degradation)
       }
-      
+
       logger.error("❌ Failed to get lock", error);
       return null;
     }
@@ -199,9 +208,9 @@ class EditLockService {
    */
   watchLock(recordType, recordId, callback) {
     const lockId = `${recordType}_${recordId}`;
-    // Query locks collection - using correct path per security rules  
+    // Query locks collection - using correct path per security rules
     const q = query(
-      collection(firestore, 'locks'),
+      collection(firestore, "locks"),
       where("recordType", "==", recordType),
       where("recordId", "==", recordId),
       where("budgetId", "==", this.budgetId) // Filter by current budget
@@ -246,7 +255,7 @@ class EditLockService {
       try {
         // Update heartbeat in Firebase - using correct path per security rules
         await setDoc(
-          doc(firestore, 'locks', lockId),
+          doc(firestore, "locks", lockId),
           {
             lastActivity: serverTimestamp(),
             expiresAt: new Date(Date.now() + 60000), // Extend by 60 seconds

@@ -21,10 +21,7 @@ import {
   Clock,
   Receipt,
 } from "lucide-react";
-import ConnectionDisplay, {
-  ConnectionItem,
-  ConnectionInfo,
-} from "../ui/ConnectionDisplay";
+import ConnectionDisplay, { ConnectionItem, ConnectionInfo } from "../ui/ConnectionDisplay";
 import useEditLock from "../../hooks/useEditLock";
 import { initializeEditLocks } from "../../services/editLockService";
 import { useAuth } from "../../stores/authStore";
@@ -700,10 +697,11 @@ const EditEnvelopeModal = ({
 
               {/* Connected Bill Display - Using Purple Theme */}
               {(() => {
-                const connectedBill = formData.envelopeType === ENVELOPE_TYPES.BILL && selectedBillId 
-                  ? allBills.find((bill) => bill.id === selectedBillId) 
-                  : null;
-                
+                const connectedBill =
+                  formData.envelopeType === ENVELOPE_TYPES.BILL && selectedBillId
+                    ? allBills.find((bill) => bill.id === selectedBillId)
+                    : null;
+
                 return connectedBill ? (
                   <ConnectionDisplay
                     title="Connected Bill"
@@ -720,8 +718,8 @@ const EditEnvelopeModal = ({
                     />
 
                     <ConnectionInfo theme="purple">
-                      💜 <strong>Connected!</strong> This envelope is linked to the bill above.
-                      Bill settings will override manual envelope settings for amount and frequency.
+                      💜 <strong>Connected!</strong> This envelope is linked to the bill above. Bill
+                      settings will override manual envelope settings for amount and frequency.
                     </ConnectionInfo>
                   </ConnectionDisplay>
                 ) : null;

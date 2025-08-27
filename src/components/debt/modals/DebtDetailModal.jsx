@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import { X, Edit, Trash2, DollarSign, Calendar, TrendingDown, Receipt, Wallet } from "lucide-react";
-import ConnectionDisplay, {
-  ConnectionItem,
-  ConnectionInfo,
-} from "../../ui/ConnectionDisplay";
+import ConnectionDisplay, { ConnectionItem, ConnectionInfo } from "../../ui/ConnectionDisplay";
 
 /**
  * Modal for viewing and managing individual debt details
@@ -187,8 +184,8 @@ const DebtDetailModal = ({
           )}
 
           <ConnectionInfo theme="purple">
-            💜 <strong>Connected!</strong> This debt's payments are funded from the connected envelope. 
-            Money will be automatically allocated for debt payments.
+            💜 <strong>Connected!</strong> This debt's payments are funded from the connected
+            envelope. Money will be automatically allocated for debt payments.
           </ConnectionInfo>
         </ConnectionDisplay>
 
