@@ -123,7 +123,7 @@ const getActualCommitTimestamp = () => {
   if (gitCommitDate && gitCommitDate !== "undefined") {
     logger.debug("✅ Using git commit date:", gitCommitDate);
     const commitDate = new Date(gitCommitDate);
-    
+
     // Fix for incorrect system clock showing 2025 instead of 2024
     if (commitDate.getFullYear() === 2025) {
       const correctedDate = new Date(commitDate);
@@ -131,7 +131,7 @@ const getActualCommitTimestamp = () => {
       logger.debug("🔧 Corrected commit date from 2025 to 2024:", correctedDate.toISOString());
       return correctedDate;
     }
-    
+
     return commitDate;
   }
 
@@ -140,7 +140,7 @@ const getActualCommitTimestamp = () => {
   if (gitAuthorDate && gitAuthorDate !== "undefined") {
     logger.debug("✅ Using git author date:", gitAuthorDate);
     const authorDate = new Date(gitAuthorDate);
-    
+
     // Fix for incorrect system clock showing 2025 instead of 2024
     if (authorDate.getFullYear() === 2025) {
       const correctedDate = new Date(authorDate);
@@ -148,7 +148,7 @@ const getActualCommitTimestamp = () => {
       logger.debug("🔧 Corrected author date from 2025 to 2024:", correctedDate.toISOString());
       return correctedDate;
     }
-    
+
     return authorDate;
   }
 
@@ -157,7 +157,7 @@ const getActualCommitTimestamp = () => {
   if (vercelCommitDate && vercelCommitDate !== "undefined") {
     logger.debug("✅ Using Vercel git commit date:", vercelCommitDate);
     const vercelDate = new Date(vercelCommitDate);
-    
+
     // Fix for incorrect system clock showing 2025 instead of 2024
     if (vercelDate.getFullYear() === 2025) {
       const correctedDate = new Date(vercelDate);
@@ -165,7 +165,7 @@ const getActualCommitTimestamp = () => {
       logger.debug("🔧 Corrected Vercel date from 2025 to 2024:", correctedDate.toISOString());
       return correctedDate;
     }
-    
+
     return vercelDate;
   }
 
@@ -177,7 +177,7 @@ const getActualCommitTimestamp = () => {
       buildTime
     );
     const buildDate = new Date(buildTime);
-    
+
     // Fix for incorrect system clock showing 2025 instead of 2024
     if (buildDate.getFullYear() === 2025) {
       const correctedDate = new Date(buildDate);
@@ -185,7 +185,7 @@ const getActualCommitTimestamp = () => {
       logger.debug("🔧 Corrected build time from 2025 to 2024:", correctedDate.toISOString());
       return correctedDate;
     }
-    
+
     return buildDate;
   }
 
@@ -199,7 +199,7 @@ const getActualCommitTimestamp = () => {
   });
 
   const currentDate = new Date();
-  
+
   // Fix for incorrect system clock showing 2025 instead of 2024
   if (currentDate.getFullYear() === 2025) {
     const correctedDate = new Date(currentDate);
@@ -207,7 +207,7 @@ const getActualCommitTimestamp = () => {
     logger.debug("🔧 Corrected current time from 2025 to 2024:", correctedDate.toISOString());
     return correctedDate;
   }
-  
+
   return currentDate;
 };
 
