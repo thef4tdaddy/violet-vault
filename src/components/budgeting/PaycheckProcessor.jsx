@@ -28,20 +28,20 @@ const PaycheckProcessor = ({
   const [showPreview, setShowPreview] = useState(false);
   const [deletingPaycheckId, setDeletingPaycheckId] = useState(null);
   const [newPayerName, setNewPayerName] = useState("");
-  const [tempPayers, setTempPayers] = useState([]); // Track payers added this session
+  const [tempPayers, setTempPayers] = useState([]); // Track payers added this session (not saved until paycheck is processed)
 
   // Get unique payers from paycheck history AND temporary payers for dropdown
   const getUniquePayers = () => {
     const payers = new Set();
 
-    // Add payers from history
+    // Add payers from history (these are permanently saved and synced)
     paycheckHistory.forEach((paycheck) => {
       if (paycheck.payerName && paycheck.payerName.trim()) {
         payers.add(paycheck.payerName);
       }
     });
 
-    // Add temporary payers from this session
+    // Add temporary payers from this session (only saved when paycheck is processed)
     tempPayers.forEach((payer) => {
       if (payer && payer.trim()) {
         payers.add(payer);
@@ -92,11 +92,13 @@ const PaycheckProcessor = ({
   };
 
   // Handle adding new payer
+  // NOTE: New payers are only stored temporarily until a paycheck is processed
+  // They will NOT be saved/synced to cloud until an actual paycheck uses this name
   const handleAddNewPayer = () => {
     if (newPayerName.trim()) {
       const trimmedName = newPayerName.trim();
 
-      // Add to temp payers list so it shows in dropdown
+      // Add to temp payers list so it shows in dropdown (session-only, not persisted)
       setTempPayers((prev) => [...prev, trimmedName]);
 
       // Set as current selection
@@ -195,6 +197,10 @@ const PaycheckProcessor = ({
       });
 
       logger.debug("Paycheck processed:", result);
+
+      // Clean up temp payers - once a paycheck is processed, the payer is now in history  
+      const processedPayerName = payerName.trim();
+      setTempPayers(prev => prev.filter(name => name !== processedPayerName));
 
       setPaycheckAmount("");
       setShowPreview(false);
