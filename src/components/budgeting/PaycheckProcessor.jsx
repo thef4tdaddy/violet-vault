@@ -33,21 +33,21 @@ const PaycheckProcessor = ({
   // Get unique payers from paycheck history AND temporary payers for dropdown
   const getUniquePayers = () => {
     const payers = new Set();
-    
+
     // Add payers from history
     paycheckHistory.forEach((paycheck) => {
       if (paycheck.payerName && paycheck.payerName.trim()) {
         payers.add(paycheck.payerName);
       }
     });
-    
+
     // Add temporary payers from this session
     tempPayers.forEach((payer) => {
       if (payer && payer.trim()) {
         payers.add(payer);
       }
     });
-    
+
     return Array.from(payers).sort();
   };
 
@@ -95,14 +95,14 @@ const PaycheckProcessor = ({
   const handleAddNewPayer = () => {
     if (newPayerName.trim()) {
       const trimmedName = newPayerName.trim();
-      
+
       // Add to temp payers list so it shows in dropdown
-      setTempPayers(prev => [...prev, trimmedName]);
-      
+      setTempPayers((prev) => [...prev, trimmedName]);
+
       // Set as current selection
       setPayerName(trimmedName);
       setNewPayerName("");
-      
+
       // Hide the add new payer form and show dropdown
       setShowAddNewPayer(false);
     }
@@ -312,7 +312,6 @@ const PaycheckProcessor = ({
                       </div>
                     </div>
                   )}
-
                 </div>
               ) : (
                 <div className="space-y-3">
