@@ -38,6 +38,27 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
   // Get TanStack Query paycheck operations for proper UI updates
   const { processPaycheck: tanStackProcessPaycheck, paycheckHistory: tanStackPaycheckHistory } =
     useBudgetData();
+    
+  // Diagnostic: Check what useBudgetData is actually returning
+  const budgetData = useBudgetData();
+  console.log("ViewRenderer - useBudgetData returned:", {
+    envelopes: budgetData.envelopes,
+    envelopesLength: budgetData.envelopes?.length
+  });
+  
+  // Also check Dexie directly
+  React.useEffect(() => {
+    const checkDexieData = async () => {
+      try {
+        const { budgetDb } = await import("../../db/budgetDb");
+        const dexieEnvelopes = await budgetDb.envelopes.toArray();
+        console.log("Direct Dexie check - envelopes:", dexieEnvelopes.length, dexieEnvelopes);
+      } catch (error) {
+        console.log("Dexie check error:", error);
+      }
+    };
+    checkDexieData();
+  }, []);
 
   const {
     envelopes,
