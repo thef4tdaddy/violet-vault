@@ -296,7 +296,7 @@ const PaycheckProcessor = ({
                       </div>
                     </div>
                   )}
-                  
+
                   {/* Show a button to easily add new person even when payers exist */}
                   {uniquePayers.length > 0 && !showAddNewPayer && (
                     <button
