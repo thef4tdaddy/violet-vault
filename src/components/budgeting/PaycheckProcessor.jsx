@@ -145,10 +145,42 @@ const PaycheckProcessor = ({
         envelope.monthlyBudget > 0
     );
 
+    // Debug logging to understand allocation issues
+    logger.debug("Paycheck allocation debug", {
+      totalEnvelopes: envelopes.length,
+      billEnvelopesFound: billEnvelopes.length,
+      variableEnvelopesFound: variableEnvelopes.length,
+      billEnvelopes: billEnvelopes.map(e => ({
+        id: e.id,
+        name: e.name,
+        autoAllocate: e.autoAllocate,
+        envelopeType: e.envelopeType,
+        category: e.category,
+        biweeklyAllocation: e.biweeklyAllocation,
+        currentBalance: e.currentBalance
+      })),
+      variableEnvelopes: variableEnvelopes.map(e => ({
+        id: e.id,
+        name: e.name,
+        autoAllocate: e.autoAllocate,
+        envelopeType: e.envelopeType,
+        monthlyBudget: e.monthlyBudget,
+        currentBalance: e.currentBalance
+      }))
+    });
+
     // First, allocate to bill envelopes (higher priority)
     billEnvelopes.forEach((envelope) => {
       const needed = Math.max(0, envelope.biweeklyAllocation - envelope.currentBalance);
       const allocation = Math.min(needed, remainingAmount);
+
+      logger.debug(`Bill envelope allocation: ${envelope.name}`, {
+        biweeklyAllocation: envelope.biweeklyAllocation,
+        currentBalance: envelope.currentBalance,
+        needed,
+        allocation,
+        remainingAmount
+      });
 
       if (allocation > 0) {
         allocations[envelope.id] = allocation;
@@ -163,11 +195,26 @@ const PaycheckProcessor = ({
       const needed = Math.max(0, biweeklyTarget - envelope.currentBalance);
       const allocation = Math.min(needed, remainingAmount);
 
+      logger.debug(`Variable envelope allocation: ${envelope.name}`, {
+        monthlyBudget: envelope.monthlyBudget,
+        biweeklyTarget,
+        currentBalance: envelope.currentBalance,
+        needed,
+        allocation,
+        remainingAmount
+      });
+
       if (allocation > 0) {
         allocations[envelope.id] = allocation;
         remainingAmount -= allocation;
         totalAllocated += allocation;
       }
+    });
+
+    logger.debug("Final allocation results", {
+      totalAllocated,
+      remainingAmount,
+      allocations
     });
 
     return {
