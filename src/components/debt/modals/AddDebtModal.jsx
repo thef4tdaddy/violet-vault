@@ -257,7 +257,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
               <div
                 className={`flex items-center px-3 py-1 rounded-full text-xs font-medium ${
                   isOwnLock
-                    ? "bg-green-100 text-green-800 border border-green-200"
+                    ? "bg-purple-100 text-purple-800 border border-purple-200"
                     : "bg-red-100 text-red-800 border border-red-200"
                 }`}
               >
@@ -276,7 +276,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
               </div>
             )}
             {isEditMode && lockLoading && (
-              <div className="bg-yellow-100 text-yellow-800 border border-yellow-200 px-3 py-1 rounded-full text-xs font-medium flex items-center">
+              <div className="bg-purple-100 text-purple-800 border border-purple-200 px-3 py-1 rounded-full text-xs font-medium flex items-center">
                 <div className="animate-spin rounded-full h-3 w-3 border border-yellow-600 border-t-transparent mr-1" />
                 Acquiring Lock...
               </div>
@@ -506,6 +506,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
           <ConnectionDisplay
             title="Connected to Payment System"
             icon={Receipt}
+            theme="purple"
             isVisible={isEditMode && (connectedBill || connectedEnvelope)}
             onDisconnect={() => {
               // Clear connections and reset to disconnected state
@@ -528,6 +529,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                       : ""
                   }`}
                   badge="Auto-synced"
+                  theme="purple"
                 />
               )}
 
@@ -537,12 +539,13 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                   title="Connected Envelope"
                   details={`${connectedEnvelope.name} • $${connectedEnvelope.currentBalance?.toFixed(2) || "0.00"} available`}
                   badge="Funding source"
+                  theme="purple"
                 />
               )}
             </div>
 
-            <ConnectionInfo>
-              📝 <strong>Connected!</strong> This debt is linked to your payment system. Changes to
+            <ConnectionInfo theme="purple">
+              💜 <strong>Connected!</strong> This debt is linked to your payment system. Changes to
               the bill's due date or amount will sync automatically. Use the disconnect button above
               to change connections.
             </ConnectionInfo>

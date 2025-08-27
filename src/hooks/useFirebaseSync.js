@@ -85,9 +85,10 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
   const _handleManualSave = async () => {
     // TODO: Implement manual save functionality
     try {
-      logger.info("💾 Manual save triggered - using forceSync...");
+      logger.production("Manual save triggered");
       const result = await firebaseSync.forceSync();
       if (result && result.success) {
+        logger.production("Manual save completed successfully");
         showSuccessToast("Data saved successfully");
       } else {
         showErrorToast("Failed to save data");

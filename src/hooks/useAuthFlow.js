@@ -54,7 +54,7 @@ const useAuthFlow = () => {
         logger.auth("Login result", { success: !!result });
 
         if (result.success) {
-          logger.info("✅ Setup completed successfully");
+          logger.production("User login successful", { budgetId: userData.budgetId });
 
           // Budget history is now handled automatically by the Dexie/Cloud Sync system
           logger.auth("✅ Budget history system ready (Dexie-based)");
