@@ -108,10 +108,10 @@ class Logger {
 
   // Production-level logging for important user-visible events
   // Always shows in console AND sends to Highlight.io regardless of environment
-  // 
+  //
   // USE FOR:
   // - User login/logout events
-  // - Data sync completion (upload/download) 
+  // - Data sync completion (upload/download)
   // - Bug report submissions
   // - Manual save operations
   // - Critical user actions (delete debt, envelope, etc.)

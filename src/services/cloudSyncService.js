@@ -139,10 +139,10 @@ class CloudSyncService {
       }
 
       if (result.success) {
-        logger.production("Sync completed successfully", { 
-            direction: syncDecision.direction,
-            recordsProcessed: result?.recordsProcessed || 0
-          });
+        logger.production("Sync completed successfully", {
+          direction: syncDecision.direction,
+          recordsProcessed: result?.recordsProcessed || 0,
+        });
         await this.updateLastSyncTime();
         await this.updateUserActivity();
       } else {

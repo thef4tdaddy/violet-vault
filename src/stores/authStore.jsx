@@ -466,9 +466,9 @@ export const useAuth = create((set, get) => ({
             logger.auth("validatePassword: Decryption failed - password is incorrect", {
               error: decryptError.message,
             });
-            logger.production("Password validation failed", { 
-              method: "decrypt", 
-              error: decryptError.message 
+            logger.production("Password validation failed", {
+              method: "decrypt",
+              error: decryptError.message,
             });
             return false;
           }

@@ -1,10 +1,7 @@
 // Extracted from old BillManager - proper bill creation modal
 import React, { useState, useEffect } from "react";
 import { X, Save, Sparkles, Trash2, Lock, Unlock, User, Clock, Wallet } from "lucide-react";
-import ConnectionDisplay, {
-  ConnectionItem,
-  ConnectionInfo,
-} from "../ui/ConnectionDisplay";
+import ConnectionDisplay, { ConnectionItem, ConnectionInfo } from "../ui/ConnectionDisplay";
 import useEditLock from "../../hooks/useEditLock";
 import { initializeEditLocks } from "../../services/editLockService";
 import { useAuth } from "../../stores/authStore";

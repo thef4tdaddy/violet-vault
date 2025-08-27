@@ -24,13 +24,13 @@ const ConnectionDisplay = ({
       iconColor: "text-purple-600",
     },
     green: {
-      container: "bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-300", 
+      container: "bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-300",
       titleText: "text-green-800",
       iconColor: "text-green-600",
     },
     yellow: {
       container: "bg-yellow-50 border border-yellow-200",
-      titleText: "text-yellow-800", 
+      titleText: "text-yellow-800",
       iconColor: "text-yellow-600",
     },
   };
@@ -38,9 +38,7 @@ const ConnectionDisplay = ({
   const currentTheme = themes[theme] || themes.purple;
 
   return (
-    <div
-      className={`${currentTheme.container} rounded-xl p-6 mb-4 ${className}`}
-    >
+    <div className={`${currentTheme.container} rounded-xl p-6 mb-4 ${className}`}>
       <div className="flex items-center justify-between mb-4">
         <label className={`block text-lg font-bold ${currentTheme.titleText} flex items-center`}>
           {IconComponent && <IconComponent className={`h-6 w-6 mr-3 ${currentTheme.iconColor}`} />}
