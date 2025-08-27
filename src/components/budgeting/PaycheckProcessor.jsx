@@ -114,7 +114,6 @@ const PaycheckProcessor = ({
     const amount = parseFloat(paycheckAmount) || 0;
     if (amount <= 0) return null;
 
-
     if (allocationMode === "leftover") {
       return {
         mode: "leftover",

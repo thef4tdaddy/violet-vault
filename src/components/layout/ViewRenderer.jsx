@@ -38,14 +38,14 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
   // Get TanStack Query paycheck operations for proper UI updates
   const { processPaycheck: tanStackProcessPaycheck, paycheckHistory: tanStackPaycheckHistory } =
     useBudgetData();
-    
+
   // Diagnostic: Check what useBudgetData is actually returning
   const budgetData = useBudgetData();
   console.log("ViewRenderer - useBudgetData returned:", {
     envelopes: budgetData.envelopes,
-    envelopesLength: budgetData.envelopes?.length
+    envelopesLength: budgetData.envelopes?.length,
   });
-  
+
   // Also check Dexie directly
   React.useEffect(() => {
     const checkDexieData = async () => {
