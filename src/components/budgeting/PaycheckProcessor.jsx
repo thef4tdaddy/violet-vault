@@ -28,15 +28,26 @@ const PaycheckProcessor = ({
   const [showPreview, setShowPreview] = useState(false);
   const [deletingPaycheckId, setDeletingPaycheckId] = useState(null);
   const [newPayerName, setNewPayerName] = useState("");
+  const [tempPayers, setTempPayers] = useState([]); // Track payers added this session
 
-  // Get unique payers from paycheck history for dropdown
+  // Get unique payers from paycheck history AND temporary payers for dropdown
   const getUniquePayers = () => {
     const payers = new Set();
+    
+    // Add payers from history
     paycheckHistory.forEach((paycheck) => {
       if (paycheck.payerName && paycheck.payerName.trim()) {
         payers.add(paycheck.payerName);
       }
     });
+    
+    // Add temporary payers from this session
+    tempPayers.forEach((payer) => {
+      if (payer && payer.trim()) {
+        payers.add(payer);
+      }
+    });
+    
     return Array.from(payers).sort();
   };
 
@@ -83,12 +94,17 @@ const PaycheckProcessor = ({
   // Handle adding new payer
   const handleAddNewPayer = () => {
     if (newPayerName.trim()) {
-      setPayerName(newPayerName.trim());
+      const trimmedName = newPayerName.trim();
+      
+      // Add to temp payers list so it shows in dropdown
+      setTempPayers(prev => [...prev, trimmedName]);
+      
+      // Set as current selection
+      setPayerName(trimmedName);
       setNewPayerName("");
-      // Only hide the form if there are existing payers, otherwise keep it open for new users
-      if (uniquePayers.length > 0) {
-        setShowAddNewPayer(false);
-      }
+      
+      // Hide the add new payer form and show dropdown
+      setShowAddNewPayer(false);
     }
   };
 
@@ -297,16 +313,6 @@ const PaycheckProcessor = ({
                     </div>
                   )}
 
-                  {/* Show a button to easily add new person even when payers exist */}
-                  {uniquePayers.length > 0 && !showAddNewPayer && (
-                    <button
-                      type="button"
-                      onClick={() => setShowAddNewPayer(true)}
-                      className="mt-2 text-sm text-purple-600 hover:text-purple-800 font-medium"
-                    >
-                      + Need to add someone new?
-                    </button>
-                  )}
                 </div>
               ) : (
                 <div className="space-y-3">
