@@ -23,7 +23,7 @@ class CloudSyncService {
 
     this.config = config;
     this.isRunning = true;
-    logger.production("Cloud sync service started", { user: budgetId });
+    logger.production("Cloud sync service started", { user: config?.budgetId || "unknown" });
 
     // Initial sync
     this.scheduleSync();
@@ -37,7 +37,7 @@ class CloudSyncService {
   stop() {
     if (!this.isRunning) return;
 
-    logger.production("Cloud sync service stopped", { user: budgetId });
+    logger.production("Cloud sync service stopped", { user: this.config?.budgetId || "unknown" });
     clearInterval(this.syncIntervalId);
     clearTimeout(this.debounceTimer);
     this.isRunning = false;

@@ -27,7 +27,6 @@ const PaycheckProcessor = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [deletingPaycheckId, setDeletingPaycheckId] = useState(null);
-  const [showAddNewPayer, setShowAddNewPayer] = useState(false);
   const [newPayerName, setNewPayerName] = useState("");
 
   // Get unique payers from paycheck history for dropdown
@@ -40,6 +39,10 @@ const PaycheckProcessor = ({
     });
     return Array.from(payers).sort();
   };
+
+  // For new users with no paycheck history, default to showing the add new payer form
+  const uniquePayers = getUniquePayers();
+  const [showAddNewPayer, setShowAddNewPayer] = useState(uniquePayers.length === 0);
 
   // Get smart prediction for a specific payer
   const getPayerPrediction = (payer) => {
@@ -244,7 +247,7 @@ const PaycheckProcessor = ({
                 Whose Paycheck?
               </label>
 
-              {!showAddNewPayer ? (
+              {!showAddNewPayer && uniquePayers.length > 0 ? (
                 <div className="space-y-3">
                   {/* Dropdown for existing payers */}
                   <select
@@ -260,7 +263,7 @@ const PaycheckProcessor = ({
                     disabled={isProcessing}
                   >
                     <option value="">Select a person...</option>
-                    {getUniquePayers().map((payer) => {
+                    {uniquePayers.map((payer) => {
                       const prediction = getPayerPrediction(payer);
                       return (
                         <option key={payer} value={payer}>
@@ -287,6 +290,14 @@ const PaycheckProcessor = ({
                 </div>
               ) : (
                 <div className="space-y-3">
+                  {uniquePayers.length === 0 && (
+                    <div className="glassmorphism p-4 rounded-xl border border-blue-200/50 bg-blue-50/20 mb-4">
+                      <div className="text-sm text-gray-600">
+                        <User className="h-4 w-4 inline mr-2 text-blue-500" />
+                        <strong>First paycheck?</strong> Let's start by adding who this paycheck is for.
+                      </div>
+                    </div>
+                  )}
                   <div className="flex gap-3">
                     <input
                       type="text"
@@ -304,15 +315,29 @@ const PaycheckProcessor = ({
                     >
                       <CheckCircle className="h-5 w-5" />
                     </button>
-                    <button
-                      onClick={() => {
-                        setShowAddNewPayer(false);
-                        setNewPayerName("");
-                      }}
-                      className="px-6 py-4 bg-gray-500 text-white rounded-2xl hover:bg-gray-600 transition-colors"
-                    >
-                      ✕
-                    </button>
+                    {uniquePayers.length > 0 ? (
+                      <button
+                        onClick={() => {
+                          setShowAddNewPayer(false);
+                          setNewPayerName("");
+                        }}
+                        className="px-6 py-4 bg-gray-500 text-white rounded-2xl hover:bg-gray-600 transition-colors"
+                        title="Back to person selection"
+                      >
+                        ←
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setShowAddNewPayer(false);
+                          setNewPayerName("");
+                        }}
+                        className="px-6 py-4 bg-gray-500 text-white rounded-2xl hover:bg-gray-600 transition-colors"
+                        title="Cancel"
+                      >
+                        ✕
+                      </button>
+                    )}
                   </div>
                 </div>
               )}
