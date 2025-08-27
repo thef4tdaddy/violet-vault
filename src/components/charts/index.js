@@ -15,5 +15,5 @@ export {
 } from "./ComposedFinancialChart";
 
 // Hook exports for convenience
-export { useChartConfig } from "../../hooks/useChartConfig";
+export { useChartConfig } from "../../hooks/useChartConfig.jsx";
 export { useAnalyticsData } from "../../hooks/useAnalyticsData";
