@@ -105,8 +105,8 @@
               "message": "'compareUint8Arrays' is defined but never used. Allowed unused vars must match /^[A-Z_]/u"
             },
             {
-              "line": 419,
-              "message": "'encrypted' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
+              "line": 414,
+              "message": "'testKey' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
             }
           ]
         },
