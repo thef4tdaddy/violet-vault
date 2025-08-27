@@ -2,14 +2,14 @@
   "project": "violet-vault",
   "lastUpdated": "2025-08-27",
   "currentStatus": {
-    "totalWarnings": 25,
+    "totalWarnings": 27,
     "targetWarnings": 17,
     "errors": 0
   },
   "warningCategories": [
     {
       "type": "no-unused-vars",
-      "count": 17,
+      "count": 18,
       "severity": "warning",
       "files": [
         {
@@ -97,6 +97,16 @@
           ]
         },
         {
+          "path": "src/components/layout/ViewRenderer.jsx",
+          "warnings": 1,
+          "details": [
+            {
+              "line": 71,
+              "message": "'envelopes' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
+            }
+          ]
+        },
+        {
           "path": "src/stores/authStore.jsx",
           "warnings": 2,
           "details": [
@@ -149,7 +159,7 @@
     },
     {
       "type": "react-hooks/exhaustive-deps",
-      "count": 7,
+      "count": 8,
       "severity": "warning",
       "files": [
         {
@@ -159,6 +169,16 @@
             {
               "line": 214,
               "message": "React Hook useMemo has missing dependencies: 'onUpdateBill' and 'updateBill'. Either include them or remove the dependency array. If 'onUpdateBill' changes too often, find the parent component that defines it and wrap that definition in useCallback"
+            }
+          ]
+        },
+        {
+          "path": "src/components/layout/ViewRenderer.jsx",
+          "warnings": 1,
+          "details": [
+            {
+              "line": 68,
+              "message": "React Hook React.useEffect has a missing dependency: 'budgetData.envelopes'. Either include it or remove the dependency array"
             }
           ]
         },
@@ -217,7 +237,7 @@
     "highPriority": [
       {
         "task": "Fix no-unused-vars warnings",
-        "warningsAffected": 17,
+        "warningsAffected": 18,
         "files": [
           "AutoFundingRuleBuilder.jsx",
           "DebtDetailModal.jsx",
@@ -225,6 +245,7 @@
           "ObjectHistoryViewer.jsx",
           "NavigationTabs.jsx",
           "SummaryCards.jsx",
+          "ViewRenderer.jsx",
           "authStore.jsx",
           "autoFundingEngine.js"
         ],
@@ -232,9 +253,10 @@
       },
       {
         "task": "Fix react-hooks/exhaustive-deps warnings",
-        "warningsAffected": 7,
+        "warningsAffected": 8,
         "files": [
           "BillManager.jsx",
+          "ViewRenderer.jsx",
           "OnboardingTutorial.jsx",
           "useDebtManagement.js",
           "useEditLock.js",
