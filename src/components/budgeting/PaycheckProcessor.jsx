@@ -114,8 +114,6 @@ const PaycheckProcessor = ({
     const amount = parseFloat(paycheckAmount) || 0;
     if (amount <= 0) return null;
 
-    // Temporary debug for production - this should show envelope data
-    console.log("PaycheckProcessor debug - envelopes received:", envelopes.length, envelopes);
 
     if (allocationMode === "leftover") {
       return {
