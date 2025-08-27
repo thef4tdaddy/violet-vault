@@ -412,7 +412,7 @@ export const useAuth = create((set, get) => ({
           // This is less secure but necessary when no encrypted data exists yet
           const saltArray = new Uint8Array(authState.salt);
           const testKey = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
-          
+
           logger.auth("validatePassword: Key derived successfully for no-data case");
           logger.production("Password validation successful", { method: "no_data_fallback" });
           return true;
@@ -443,32 +443,45 @@ export const useAuth = create((set, get) => ({
             logger.auth("validatePassword: Trying deterministic key derivation");
             const keyData = await encryptionUtils.deriveKey(password);
             const deterministicKey = keyData.key;
-            
+
             await encryptionUtils.decrypt(encryptedData, deterministicKey);
-            logger.auth("validatePassword: Deterministic decryption successful - password is correct");
-            logger.production("Password validation successful", { method: "deterministic_decrypt" });
+            logger.auth(
+              "validatePassword: Deterministic decryption successful - password is correct"
+            );
+            logger.production("Password validation successful", {
+              method: "deterministic_decrypt",
+            });
             return true;
           } catch (deterministicError) {
-            logger.auth("validatePassword: Deterministic decryption failed, trying saved salt approach", {
-              error: deterministicError.message || deterministicError.toString(),
-            });
-            
+            logger.auth(
+              "validatePassword: Deterministic decryption failed, trying saved salt approach",
+              {
+                error: deterministicError.message || deterministicError.toString(),
+              }
+            );
+
             // Second try: Use saved salt approach (fallback for non-migrated data)
             try {
               logger.auth("validatePassword: Trying saved salt key derivation");
               const saltBasedKey = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
-              
+
               await encryptionUtils.decrypt(encryptedData, saltBasedKey);
-              logger.auth("validatePassword: Salt-based decryption successful - password is correct");
+              logger.auth(
+                "validatePassword: Salt-based decryption successful - password is correct"
+              );
               logger.production("Password validation successful", { method: "salt_based_decrypt" });
               return true;
             } catch (saltBasedError) {
-              const errorMessage = saltBasedError.message || saltBasedError.toString() || "Decryption failed";
-              logger.auth("validatePassword: Both decryption methods failed - password is incorrect", {
-                deterministicError: deterministicError.message || deterministicError.toString(),
-                saltBasedError: errorMessage,
-                errorType: saltBasedError.name || typeof saltBasedError,
-              });
+              const errorMessage =
+                saltBasedError.message || saltBasedError.toString() || "Decryption failed";
+              logger.auth(
+                "validatePassword: Both decryption methods failed - password is incorrect",
+                {
+                  deterministicError: deterministicError.message || deterministicError.toString(),
+                  saltBasedError: errorMessage,
+                  errorType: saltBasedError.name || typeof saltBasedError,
+                }
+              );
               logger.production("Password validation failed", {
                 method: "both_decrypt_methods",
                 error: errorMessage,
