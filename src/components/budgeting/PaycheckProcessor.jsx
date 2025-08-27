@@ -294,7 +294,8 @@ const PaycheckProcessor = ({
                     <div className="glassmorphism p-4 rounded-xl border border-blue-200/50 bg-blue-50/20 mb-4">
                       <div className="text-sm text-gray-600">
                         <User className="h-4 w-4 inline mr-2 text-blue-500" />
-                        <strong>First paycheck?</strong> Let's start by adding who this paycheck is for.
+                        <strong>First paycheck?</strong> Let's start by adding who this paycheck is
+                        for.
                       </div>
                     </div>
                   )}
