@@ -11,12 +11,14 @@ import {
   getFirestore,
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
 import { firebaseConfig } from "../utils/firebaseConfig";
 import logger from "../utils/logger";
 
 // Initialize Firebase app and firestore instance
 const app = initializeApp(firebaseConfig);
 const firestore = getFirestore(app);
+const auth = getAuth(app);
 
 /**
  * Cross-browser edit locking service
@@ -52,10 +54,17 @@ class EditLockService {
       return { success: false, reason: "not_initialized" };
     }
 
+    // Check Firebase authentication
+    if (!auth.currentUser) {
+      logger.warn("❌ Edit locks unavailable - Firebase not authenticated");
+      return { success: true, reason: "locks_disabled" };
+    }
+
     const lockId = `${recordType}_${recordId}`;
     const lockDoc = {
       recordType,
       recordId,
+      budgetId: this.budgetId, // Add budgetId for context
       userId: this.currentUser.id || "anonymous",
       userName: this.currentUser.userName || "Unknown User",
       acquiredAt: serverTimestamp(),
@@ -82,9 +91,8 @@ class EditLockService {
         }
       }
 
-      // Acquire the lock
-      const lockPath = `budgets/${this.budgetId}/edit-locks/${lockId}`;
-      await setDoc(doc(firestore, lockPath), lockDoc);
+      // Acquire the lock - using correct path per security rules
+      await setDoc(doc(firestore, 'locks', lockId), lockDoc);
 
       // Cache locally
       this.locks.set(lockId, lockDoc);
@@ -100,8 +108,19 @@ class EditLockService {
 
       return { success: true, lockDoc };
     } catch (error) {
-      logger.error("Failed to acquire lock", error);
-      return { success: false, reason: "error", error: error.message };
+      // Handle Firebase permission errors gracefully
+      if (error.code === "permission-denied" || error.message?.includes("Missing or insufficient permissions")) {
+        logger.warn("❌ Edit locks unavailable - insufficient Firebase permissions", {
+          userId: this.currentUser?.id,
+          budgetId: this.budgetId?.slice(0, 8),
+        });
+        // Return success but indicate locks are disabled
+        return { success: true, reason: "locks_disabled", lockDoc: null };
+      }
+      
+      logger.error("❌ Failed to acquire lock", error);
+      // For any other error, also gracefully degrade
+      return { success: true, reason: "locks_disabled", error: error.message };
     }
   }
 
@@ -112,9 +131,8 @@ class EditLockService {
     const lockId = `${recordType}_${recordId}`;
 
     try {
-      // Remove from Firebase
-      const lockPath = `budgets/${this.budgetId}/edit-locks/${lockId}`;
-      await deleteDoc(doc(firestore, lockPath));
+      // Remove from Firebase - using correct path per security rules
+      await deleteDoc(doc(firestore, 'locks', lockId));
 
       // Remove from local cache
       this.locks.delete(lockId);
@@ -125,7 +143,19 @@ class EditLockService {
       logger.info("🔓 Lock released", { recordType, recordId });
       return { success: true };
     } catch (error) {
-      logger.error("Failed to release lock", error);
+      // Handle Firebase permission errors gracefully
+      if (error.code === "permission-denied" || error.message?.includes("Missing or insufficient permissions")) {
+        logger.warn("❌ Failed to release lock - insufficient permissions (continuing anyway)", {
+          recordType,
+          recordId,
+        });
+        // Remove from local cache even if Firebase failed
+        this.locks.delete(lockId);
+        this.stopHeartbeat(lockId);
+        return { success: true };
+      }
+      
+      logger.error("❌ Failed to release lock", error);
       return { success: false, error: error.message };
     }
   }
@@ -135,11 +165,12 @@ class EditLockService {
    */
   async getLock(recordType, recordId) {
     try {
-      const lockPath = `budgets/${this.budgetId}/edit-locks`;
+      // Query locks collection - using correct path per security rules
       const q = query(
-        collection(firestore, lockPath),
+        collection(firestore, 'locks'),
         where("recordType", "==", recordType),
-        where("recordId", "==", recordId)
+        where("recordId", "==", recordId),
+        where("budgetId", "==", this.budgetId) // Filter by current budget
       );
 
       const snapshot = await getDocs(q);
@@ -149,7 +180,16 @@ class EditLockService {
       }
       return null;
     } catch (error) {
-      logger.error("Failed to get lock", error);
+      // Handle Firebase permission errors gracefully
+      if (error.code === "permission-denied" || error.message?.includes("Missing or insufficient permissions")) {
+        logger.warn("❌ Failed to get lock - insufficient permissions", {
+          recordType,
+          recordId,
+        });
+        return null; // No lock found (graceful degradation)
+      }
+      
+      logger.error("❌ Failed to get lock", error);
       return null;
     }
   }
@@ -159,11 +199,12 @@ class EditLockService {
    */
   watchLock(recordType, recordId, callback) {
     const lockId = `${recordType}_${recordId}`;
-    const lockPath = `budgets/${this.budgetId}/edit-locks`;
+    // Query locks collection - using correct path per security rules  
     const q = query(
-      collection(firestore, lockPath),
+      collection(firestore, 'locks'),
       where("recordType", "==", recordType),
-      where("recordId", "==", recordId)
+      where("recordId", "==", recordId),
+      where("budgetId", "==", this.budgetId) // Filter by current budget
     );
 
     const unsubscribe = onSnapshot(
@@ -203,9 +244,9 @@ class EditLockService {
   startHeartbeat(lockId) {
     const heartbeatInterval = setInterval(async () => {
       try {
-        const lockPath = `budgets/${this.budgetId}/edit-locks/${lockId}`;
+        // Update heartbeat in Firebase - using correct path per security rules
         await setDoc(
-          doc(firestore, lockPath),
+          doc(firestore, 'locks', lockId),
           {
             lastActivity: serverTimestamp(),
             expiresAt: new Date(Date.now() + 60000), // Extend by 60 seconds

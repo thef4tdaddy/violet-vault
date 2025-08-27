@@ -4,6 +4,18 @@ import { encryptionUtils } from "../utils/encryption";
 import logger from "../utils/logger";
 import { identifyUser } from "../utils/highlight";
 
+/**
+ * Compare two Uint8Array objects byte-wise for equality
+ * More reliable than JSON.stringify comparison
+ */
+function compareUint8Arrays(a, b) {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
+
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = create((set, get) => ({
   isUnlocked: false,
@@ -376,6 +388,7 @@ export const useAuth = create((set, get) => ({
 
   async validatePassword(password) {
     try {
+      logger.production("Password validation started", { hasPassword: !!password });
       logger.auth("validatePassword: Starting validation");
 
       const { encryptionUtils } = await import("../utils/encryption");
@@ -399,12 +412,18 @@ export const useAuth = create((set, get) => ({
 
           // Compare the derived key with the current encryption key if available
           if (authState.encryptionKey) {
-            const keysMatch =
-              JSON.stringify(Array.from(testKey)) ===
-              JSON.stringify(Array.from(authState.encryptionKey));
+            // Proper byte-wise comparison instead of JSON.stringify
+            const keysMatch = compareUint8Arrays(testKey, authState.encryptionKey);
             logger.auth("validatePassword: Key comparison result", {
               keysMatch,
+              testKeyLength: testKey.length,
+              currentKeyLength: authState.encryptionKey.length,
             });
+            if (keysMatch) {
+              logger.production("Password validation successful", { method: "key_compare" });
+            } else {
+              logger.production("Password validation failed", { method: "key_compare" });
+            }
             return keysMatch;
           } else {
             // If no current key, just check if we can derive a key (basic validation)
@@ -441,10 +460,15 @@ export const useAuth = create((set, get) => ({
           try {
             await encryptionUtils.decrypt(encryptedData, testKey);
             logger.auth("validatePassword: Decryption successful - password is correct");
+            logger.production("Password validation successful", { method: "decrypt" });
             return true;
           } catch (decryptError) {
             logger.auth("validatePassword: Decryption failed - password is incorrect", {
               error: decryptError.message,
+            });
+            logger.production("Password validation failed", { 
+              method: "decrypt", 
+              error: decryptError.message 
             });
             return false;
           }
