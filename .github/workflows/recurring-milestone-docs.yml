@@ -1,4 +1,5 @@
-name: Recurring milestone docs & roadmap issue
+name: Milestone Closeout Checklist
+description: Create a recurring issue for milestone closeout checklist
 
 on:
   milestone:
@@ -18,8 +19,8 @@ jobs:
       - name: Create the recurring milestone issue
         uses: peter-evans/create-issue-from-file@v5
         with:
-          title: "📋 Update docs & roadmap for milestone: ${{ github.event.milestone.title }}"
-          content-filepath: .github/data/milestone-docs-checklist.md
+          title: "📋 Milestone Closeout Checklist for milestone: ${{ github.event.milestone.title }}"
+          content-filepath: .github/data/milestone-closeout-checklist.md
           milestone: ${{ github.event.milestone.number }}
           labels: "recurring,docs,maintenance,roadmap"
           search-existing: open

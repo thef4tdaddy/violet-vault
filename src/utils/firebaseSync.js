@@ -3,6 +3,7 @@ import { getFirestore, doc, setDoc, getDoc, onSnapshot, serverTimestamp } from "
 import { encryptionUtils } from "./encryption";
 import { H } from "./highlight.js";
 import { firebaseConfig } from "./firebaseConfig";
+import logger from "./logger";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -46,7 +47,7 @@ class FirebaseSync {
       window.location.hostname.includes("vercel.app") ||
       window.location.hostname.includes("f4tdaddy.com")
     ) {
-      console.log("🔧 FirebaseSync Debug Info:", {
+      logger.debug("FirebaseSync Debug Info", {
         budgetId,
         budgetIdLength: budgetId?.length,
         hasEncryptionKey: !!encryptionKey,
@@ -67,13 +68,13 @@ class FirebaseSync {
 
   setupNetworkMonitoring() {
     window.addEventListener("online", () => {
-      console.log("📶 Network connection restored");
+      logger.info("Network connection restored");
       this.isOnline = true;
       this.processSyncQueue();
     });
 
     window.addEventListener("offline", () => {
-      console.log("📵 Network connection lost");
+      logger.info("Network connection lost");
       this.isOnline = false;
     });
   }
@@ -99,7 +100,7 @@ class FirebaseSync {
       try {
         callback(event);
       } catch (error) {
-        console.error("❌ Error in sync listener:", error);
+        logger.error("Error in sync listener:", error);
       }
     });
   }
@@ -109,7 +110,7 @@ class FirebaseSync {
       try {
         callback(error);
       } catch (err) {
-        console.error("❌ Error in error listener:", err);
+        logger.error("Error in error listener:", err);
       }
     });
   }
@@ -123,11 +124,17 @@ class FirebaseSync {
       envelopes,
       bills,
       savingsGoals,
+      debts,
       unassignedCash,
       paycheckHistory,
       actualBalance,
       transactions,
+      auditLog,
       lastActivity,
+      budgetCommits,
+      budgetChanges,
+      budgetBranches,
+      budgetTags,
     } = data;
 
     // Encrypt everything except username
@@ -136,10 +143,16 @@ class FirebaseSync {
         envelopes,
         bills,
         savingsGoals,
+        debts,
         unassignedCash,
         paycheckHistory,
         actualBalance,
         transactions,
+        auditLog,
+        budgetCommits,
+        budgetChanges,
+        budgetBranches,
+        budgetTags,
         activityData: lastActivity
           ? {
               userColor: lastActivity.userColor,
@@ -176,17 +189,17 @@ class FirebaseSync {
 
   async decryptFromCloud(cloudData) {
     if (!cloudData || typeof cloudData !== "object") {
-      console.log("⚠️ Invalid cloud data format");
+      logger.warn("Invalid cloud data format");
       return null;
     }
 
     if (!cloudData.encryptedData || !cloudData.iv) {
-      console.log("⚠️ No encrypted data found in cloud document");
+      logger.warn("No encrypted data found in cloud document");
       return null;
     }
 
     try {
-      console.log("🔓 Attempting to decrypt cloud data...");
+      logger.debug("Attempting to decrypt cloud data");
 
       // Validate encryption key
       if (!this.encryptionKey) {
@@ -195,7 +208,7 @@ class FirebaseSync {
 
       // Check data format
       if (!Array.isArray(cloudData.encryptedData) || !Array.isArray(cloudData.iv)) {
-        console.error("❌ Invalid encrypted data format:", {
+        logger.error("Invalid encrypted data format", {
           encryptedDataType: typeof cloudData.encryptedData,
           ivType: typeof cloudData.iv,
           encryptedDataLength: cloudData.encryptedData?.length,
@@ -210,7 +223,7 @@ class FirebaseSync {
         cloudData.iv
       );
 
-      console.log("✅ Successfully decrypted cloud data");
+      logger.debug("Successfully decrypted cloud data");
 
       // Validate decrypted data structure
       if (!decryptedData || typeof decryptedData !== "object") {
@@ -228,7 +241,7 @@ class FirebaseSync {
 
       return decryptedData;
     } catch (error) {
-      console.error("❌ Failed to decrypt cloud data:", error);
+      logger.error("❌ Failed to decrypt cloud data:", error);
 
       // Send error to Highlight.io with context
       H.consumeError(error, {
@@ -241,17 +254,17 @@ class FirebaseSync {
 
       // Check for common decryption issues
       if (error.name === "OperationError") {
-        console.error("🔑 Encryption key mismatch - data may be from different password");
+        logger.error("🔑 Encryption key mismatch - data may be from different password");
         // Clear the corrupted data automatically
         setTimeout(() => {
           this.clearCorruptedData().catch((clearError) => {
-            console.error("❌ Failed to auto-clear corrupted data:", clearError);
+            logger.error("❌ Failed to auto-clear corrupted data:", clearError);
           });
         }, 1000);
       } else if (error.name === "InvalidAccessError") {
-        console.error("🚫 Invalid encryption key format");
+        logger.error("🚫 Invalid encryption key format");
       } else if (error.message?.includes("JSON")) {
-        console.error("📄 JSON parsing error in decrypted data");
+        logger.error("📄 JSON parsing error in decrypted data");
       }
 
       throw error;
@@ -289,7 +302,7 @@ class FirebaseSync {
     // If offline, queue the operation
     if (!this.isOnline && !options.skipQueue) {
       this.queueSyncOperation("save", { data, currentUser });
-      console.log("📴 Queued save operation for when online");
+      logger.info("📴 Queued save operation for when online");
       H.track("save-to-cloud-queued", {
         component: "FirebaseSync",
         operation: "saveToCloud",
@@ -340,9 +353,9 @@ class FirebaseSync {
       this.retryAttempts = 0; // Reset retry counter on success
 
       this.notifySyncListeners({ type: "sync_success", operation: "save" });
-      console.log("✅ Successfully saved to cloud");
+      logger.info("✅ Successfully saved to cloud");
     } catch (error) {
-      console.error("❌ Failed to save to cloud:", error);
+      logger.error("❌ Failed to save to cloud:", error);
 
       // Send error to Highlight.io with context
       H.consumeError(error, {
@@ -355,7 +368,7 @@ class FirebaseSync {
 
       // Handle network blocking errors
       if (this.isNetworkBlockingError(error)) {
-        console.warn("🚫 Firebase requests are being blocked by browser extension/ad blocker");
+        logger.warn("🚫 Firebase requests are being blocked by browser extension/ad blocker");
         this.notifyErrorListeners({
           type: "network_blocked",
           operation: "save",
@@ -372,7 +385,7 @@ class FirebaseSync {
         this.retryAttempts++;
         const delay = this.retryDelay * Math.pow(2, this.retryAttempts - 1); // Exponential backoff
 
-        console.log(
+        logger.info(
           `🔄 Retrying save operation in ${delay}ms (attempt ${this.retryAttempts}/${this.maxRetryAttempts})`
         );
 
@@ -408,12 +421,12 @@ class FirebaseSync {
     try {
       this.notifySyncListeners({ type: "sync_start", operation: "load" });
 
-      console.log("🔍 Loading from cloud with budgetId:", this.budgetId);
+      logger.info("🔍 Loading from cloud with budgetId:", this.budgetId);
       const docRef = doc(db, "budgets", this.budgetId);
 
       try {
         const docSnap = await getDoc(docRef);
-        console.log("📄 Firebase getDoc completed, exists:", docSnap.exists());
+        logger.debug("📄 Firebase getDoc completed, exists:", docSnap.exists());
 
         if (docSnap.exists()) {
           const cloudData = docSnap.data();
@@ -424,12 +437,12 @@ class FirebaseSync {
             window.location.hostname.includes("vercel.app") ||
             window.location.hostname.includes("f4tdaddy.com")
           ) {
-            console.log("✅ Cloud document found for budgetId:", this.budgetId);
-            console.log("🔧 Cloud data keys:", Object.keys(cloudData));
-            console.log("🔧 Has encrypted data:", !!cloudData.encryptedData);
-            console.log("🔧 Encrypted data length:", cloudData.encryptedData?.length || 0);
-            console.log("🔧 Last updated:", cloudData.lastUpdated?.toDate?.()?.toISOString());
-            console.log("🔧 Document size estimate:", JSON.stringify(cloudData).length, "chars");
+            logger.debug("✅ Cloud document found for budgetId:", this.budgetId);
+            logger.debug("🔧 Cloud data keys:", Object.keys(cloudData));
+            logger.debug("🔧 Has encrypted data:", !!cloudData.encryptedData);
+            logger.debug("🔧 Encrypted data length:", cloudData.encryptedData?.length || 0);
+            logger.debug("🔧 Last updated:", cloudData.lastUpdated?.toDate?.()?.toISOString());
+            logger.debug("🔧 Document size estimate:", JSON.stringify(cloudData).length, "chars");
           }
 
           const decryptedData = await this.decryptFromCloud(cloudData);
@@ -440,7 +453,7 @@ class FirebaseSync {
             window.location.hostname.includes("vercel.app") ||
             window.location.hostname.includes("f4tdaddy.com")
           ) {
-            console.log("🔐 Decryption result:", {
+            logger.debug("🔐 Decryption result:", {
               success: !!decryptedData,
               hasEnvelopes: !!decryptedData?.envelopes?.length,
               envelopeCount: decryptedData?.envelopes?.length || 0,
@@ -476,16 +489,16 @@ class FirebaseSync {
             },
           };
         } else {
-          console.log("❌ No cloud document found for budgetId:", this.budgetId);
-          console.log("🔍 This could mean:");
-          console.log("  - Different password was used on other device");
-          console.log("  - Data hasn't been saved to cloud yet");
-          console.log("  - Network/permissions issue");
-          console.log("  - Document path: budgets/" + this.budgetId);
+          logger.warn("❌ No cloud document found for budgetId:", this.budgetId);
+          logger.info("🔍 This could mean:");
+          logger.info("  - Different password was used on other device");
+          logger.info("  - Data hasn't been saved to cloud yet");
+          logger.info("  - Network/permissions issue");
+          logger.info("  - Document path: budgets/" + this.budgetId);
         }
       } catch (docError) {
-        console.error("❌ Firebase getDoc failed:", docError);
-        console.error("🔧 Error details:", {
+        logger.error("❌ Firebase getDoc failed:", docError);
+        logger.error("🔧 Error details:", {
           code: docError.code,
           message: docError.message,
           budgetId: this.budgetId,
@@ -494,18 +507,18 @@ class FirebaseSync {
 
       return null;
     } catch (error) {
-      console.error("❌ Failed to load from cloud:", error);
+      logger.error("❌ Failed to load from cloud:", error);
 
       // Handle specific decryption errors
       if (error.name === "OperationError" && error.message.includes("decrypt")) {
-        console.log("🔄 Attempting to clear corrupted cloud data...");
+        logger.info("🔄 Attempting to clear corrupted cloud data...");
         // Don't throw error, just return null to allow fresh start
         return null;
       }
 
       // Handle network blocking errors
       if (this.isNetworkBlockingError(error)) {
-        console.warn("🚫 Firebase requests are being blocked by browser extension/ad blocker");
+        logger.warn("🚫 Firebase requests are being blocked by browser extension/ad blocker");
         this.notifyErrorListeners({
           type: "network_blocked",
           operation: "load",
@@ -547,11 +560,11 @@ class FirebaseSync {
           : cloudData.lastUpdated?.getTime?.() || 0;
         if (cloudTimestamp > (this.lastSyncTimestamp || 0)) {
           try {
-            console.log("📡 Processing real-time update from Firebase...");
+            logger.debug("📡 Processing real-time update from Firebase...");
 
             // Check if this is a cleared data marker
             if (cloudData.cleared) {
-              console.log("🧹 Cloud data was cleared - ignoring cleared marker");
+              logger.info("🧹 Cloud data was cleared - ignoring cleared marker");
               return;
             }
 
@@ -568,11 +581,11 @@ class FirebaseSync {
               this.lastSyncTimestamp = cloudTimestamp;
             }
           } catch (error) {
-            console.error("❌ Failed to decrypt incoming data:", error);
+            logger.error("❌ Failed to decrypt incoming data:", error);
 
             // Handle decryption errors gracefully
             if (error.name === "OperationError") {
-              console.log("🔐 Real-time sync encryption key mismatch - ignoring update");
+              logger.warn("🔐 Real-time sync encryption key mismatch - ignoring update");
               this.notifyErrorListeners({
                 type: "realtime_decrypt_error",
                 error: "Encryption key mismatch in real-time sync",
@@ -580,7 +593,7 @@ class FirebaseSync {
                 suggestion: "Data may be from a different password or device",
               });
             } else if (error.message?.includes("JSON")) {
-              console.error("📄 JSON parsing error in real-time sync");
+              logger.error("📄 JSON parsing error in real-time sync");
               this.notifyErrorListeners({
                 type: "realtime_parse_error",
                 error: "Failed to parse real-time sync data",
@@ -682,7 +695,7 @@ class FirebaseSync {
       return;
     }
 
-    console.log(`🔄 Processing ${this.syncQueue.length} queued sync operations`);
+    logger.info(`🔄 Processing ${this.syncQueue.length} queued sync operations`);
 
     const operations = [...this.syncQueue];
     this.syncQueue = [];
@@ -696,10 +709,10 @@ class FirebaseSync {
             });
             break;
           default:
-            console.warn("❓ Unknown queued operation type:", operation.type);
+            logger.warn("❓ Unknown queued operation type:", operation.type);
         }
       } catch (error) {
-        console.error("❌ Failed to process queued operation:", error);
+        logger.error("❌ Failed to process queued operation:", error);
 
         // Re-queue if retries available
         if (operation.retries < 2) {
@@ -800,7 +813,7 @@ class FirebaseSync {
       throw new Error("Budget ID not set");
     }
 
-    console.log("🧹 Clearing potentially corrupted cloud data...");
+    logger.info("🧹 Clearing potentially corrupted cloud data...");
 
     try {
       const docRef = doc(db, "budgets", this.budgetId);
@@ -818,7 +831,7 @@ class FirebaseSync {
         { merge: false }
       ); // Force complete replacement
 
-      console.log("✅ Successfully cleared corrupted cloud data");
+      logger.info("✅ Successfully cleared corrupted cloud data");
 
       // Reset local sync state
       this.lastSyncTimestamp = null;
@@ -827,10 +840,10 @@ class FirebaseSync {
 
       return true;
     } catch (error) {
-      console.error("❌ Failed to clear corrupted data:", error);
+      logger.error("❌ Failed to clear corrupted data:", error);
 
       if (this.isNetworkBlockingError(error)) {
-        console.warn("🚫 Cannot clear data - Firebase requests blocked");
+        logger.warn("🚫 Cannot clear data - Firebase requests blocked");
         return "blocked";
       }
 
@@ -848,7 +861,7 @@ class FirebaseSync {
       timestamp: new Date().toISOString(),
     };
 
-    console.log("🔧 Sync Debug Info:", info);
+    logger.debug("🔧 Sync Debug Info:", info);
 
     // Try to check if document exists without decryption
     if (this.budgetId) {

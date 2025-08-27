@@ -1,205 +1,92 @@
 import { useCallback } from "react";
-import { encryptionUtils } from "../utils/encryption";
 import { useAuth } from "../stores/authStore.jsx";
+import { useToastHelpers } from "../utils/toastHelpers";
+import logger from "../utils/logger";
+import { budgetDb, getBudgetMetadata } from "../db/budgetDb.js";
+import { cloudSyncService } from "../services/cloudSyncService.js";
 
 /**
  * Custom hook for data import/export operations
  * Extracts data management logic from Layout component
  */
 const useDataManagement = () => {
-  const { encryptionKey, currentUser } = useAuth();
+  const { currentUser } = useAuth();
+  const { showSuccessToast, showErrorToast, showWarningToast } = useToastHelpers();
 
   const exportData = useCallback(async () => {
     try {
-      console.log("📁 Starting export process...");
+      logger.info("Starting export process");
 
-      // Try different localStorage keys (new Zustand format first, then old formats)
-      let rawData = null;
-      let dataSource = null;
+      const [
+        envelopes,
+        bills,
+        transactions,
+        savingsGoals,
+        debts,
+        paycheckHistory,
+        auditLog,
+        metadata,
+      ] = await Promise.all([
+        budgetDb.envelopes.toArray(),
+        budgetDb.bills.toArray(),
+        budgetDb.transactions.toArray(),
+        budgetDb.savingsGoals.toArray(),
+        budgetDb.debts.toArray(),
+        budgetDb.paycheckHistory.toArray(),
+        budgetDb.auditLog.toArray(),
+        getBudgetMetadata(),
+      ]);
 
-      // Try new violet-vault-store (develop branch)
-      const newData = localStorage.getItem("violet-vault-store");
-      if (newData) {
-        rawData = JSON.parse(newData);
-        dataSource = "violet-vault-store";
-        console.log("📁 Found data in violet-vault-store");
-      }
+      const hasData =
+        envelopes.length ||
+        bills.length ||
+        transactions.length ||
+        savingsGoals.length ||
+        debts.length ||
+        paycheckHistory.length ||
+        auditLog.length;
 
-      // Try old budget-store (main branch)
-      if (!rawData) {
-        const oldData = localStorage.getItem("budget-store");
-        if (oldData) {
-          rawData = JSON.parse(oldData);
-          dataSource = "budget-store";
-          console.log("📁 Found data in budget-store");
-        }
-      }
-
-      // Try legacy envelopeBudgetData (very old format)
-      if (!rawData) {
-        const legacyData = localStorage.getItem("envelopeBudgetData");
-        if (legacyData) {
-          const { encryptedData, iv } = JSON.parse(legacyData);
-          rawData = {
-            state: await encryptionUtils.decrypt(
-              encryptedData,
-              encryptionKey,
-              iv,
-            ),
-          };
-          dataSource = "envelopeBudgetData";
-          console.log("📁 Found encrypted data in envelopeBudgetData");
-        }
-      }
-
-      if (!rawData) {
-        alert("No data found to export");
+      if (!hasData) {
+        showWarningToast("No data found to export", "Export Error");
         return;
       }
 
-      // Extract data from different store formats
-      let decryptedData;
-      if (dataSource === "violet-vault-store") {
-        // New Zustand format - data is directly in state
-        decryptedData = rawData.state || rawData;
-      } else if (dataSource === "budget-store") {
-        // Old Zustand format - data is in state property
-        decryptedData = rawData.state || rawData;
-      } else {
-        // Legacy encrypted format - already decrypted above
-        decryptedData = rawData.state;
-      }
+      const pureTransactions = transactions.filter((t) => !t.type || t.type === "transaction");
 
-      console.log(
-        "📁 Data extracted from",
-        dataSource,
-        "- Keys:",
-        Object.keys(decryptedData),
-      );
-
-      // Log what old data we're filtering out
-      const deprecatedFields = Object.keys(decryptedData).filter((key) =>
-        [
-          "updatedEnvelopes",
-          "oldTransactions",
-          "oldBills",
-          "oldSavingsGoals",
-        ].includes(key),
-      );
-
-      if (deprecatedFields.length > 0) {
-        console.log("🧹 Filtering out deprecated fields:", deprecatedFields);
-      }
-
-      // Check for nested deprecated data in envelopes
-      const envelopesWithOldData = (decryptedData.envelopes || []).filter(
-        (env) =>
-          env.transactions ||
-          env.paidTransactions ||
-          env.upcomingBills ||
-          env.overdueBills,
-      );
-
-      if (envelopesWithOldData.length > 0) {
-        console.log(
-          `🧹 Cleaning nested transaction arrays from ${envelopesWithOldData.length} envelopes`,
-        );
-      }
-
-      // Normalize transactions for unified structure
-      const allTransactions = Array.isArray(decryptedData.allTransactions)
-        ? decryptedData.allTransactions
-        : [
-            ...(decryptedData.transactions || []),
-            ...(decryptedData.bills || []),
-          ];
-      const transactions = allTransactions.filter(
-        (t) => !t.type || t.type === "transaction",
-      );
-
-      // Clean up envelopes - remove old nested transaction arrays
-      const cleanEnvelopes = (decryptedData.envelopes || []).map(
-        (envelope) => ({
-          id: envelope.id,
-          name: envelope.name,
-          currentBalance: envelope.currentBalance || 0,
-          targetAmount: envelope.targetAmount,
-          monthlyAmount: envelope.monthlyAmount,
-          biweeklyAllocation: envelope.biweeklyAllocation,
-          color: envelope.color || "#a855f7",
-          category: envelope.category || "Other",
-          description: envelope.description || "",
-          frequency: envelope.frequency || "monthly",
-          priority: envelope.priority || "medium",
-          autoAllocate: envelope.autoAllocate !== false,
-          envelopeType: envelope.envelopeType || "variable",
-          monthlyBudget: envelope.monthlyBudget,
-          lastUpdated: envelope.lastUpdated,
-          // Exclude all old nested arrays: transactions, paidTransactions, upcomingBills, etc.
-        }),
-      );
-
-      // Clean up bills - keep only essential fields
-      const cleanBills = (decryptedData.bills || []).map((bill) => ({
-        id: bill.id,
-        name: bill.name || bill.provider,
-        provider: bill.provider,
-        amount: bill.amount || 0,
-        dueDate: bill.dueDate,
-        frequency: bill.frequency || "monthly",
-        category: bill.category,
-        envelopeId: bill.envelopeId,
-        isPaid: bill.isPaid || false,
-        paidDate: bill.paidDate,
-        description: bill.description,
-        notes: bill.notes,
-        accountNumber: bill.accountNumber,
-        lastUpdated: bill.lastUpdated,
-        type: bill.type || "bill",
-      }));
-
-      // Prepare clean export data - only include current, relevant fields
       const exportData = {
-        // Core data arrays (cleaned)
-        envelopes: cleanEnvelopes,
-        bills: cleanBills,
-        transactions,
-        allTransactions,
-
-        // Other current data
-        savingsGoals: decryptedData.savingsGoals || [],
-        supplementalAccounts: decryptedData.supplementalAccounts || [],
-        debts: decryptedData.debts || [],
-        paycheckHistory: decryptedData.paycheckHistory || [],
-
-        // Financial state
-        unassignedCash: decryptedData.unassignedCash || 0,
-        biweeklyAllocation: decryptedData.biweeklyAllocation || 0,
-        actualBalance: decryptedData.actualBalance || 0,
-        isActualBalanceManual: decryptedData.isActualBalanceManual || false,
-
-        // Exclude deprecated fields like: updatedEnvelopes, oldTransactions, etc.
-
-        // Metadata
+        envelopes,
+        bills,
+        transactions: pureTransactions,
+        allTransactions: transactions,
+        savingsGoals,
+        supplementalAccounts: metadata?.supplementalAccounts || [],
+        debts,
+        paycheckHistory,
+        auditLog,
+        unassignedCash: metadata?.unassignedCash || 0,
+        biweeklyAllocation: metadata?.biweeklyAllocation || 0,
+        actualBalance: metadata?.actualBalance || 0,
+        isActualBalanceManual: metadata?.isActualBalanceManual || false,
         exportMetadata: {
           exportedBy: currentUser?.userName || "Unknown User",
           exportDate: new Date().toISOString(),
           appVersion: "1.8.0",
           dataVersion: "2.0",
-          dataSource: dataSource,
+          dataSource: "dexie",
           exportedFrom: "develop-branch",
         },
-        // Data structure explanation for users
         _dataGuide: {
           note: "For mass updates, use these primary arrays:",
           primaryArrays: {
-            envelopes:
-              "Main envelope data - edit currentBalance, name, category, etc.",
+            envelopes: "Main envelope data - edit currentBalance, name, category, etc.",
             bills: "Bill payment data - edit amount, dueDate, provider, etc.",
-            transactions:
-              "Pure transactions only (filtered from allTransactions)",
+            debts: "Debt tracking data - edit currentBalance, minimumPayment, etc.",
+            savingsGoals: "Savings goal data - edit targetAmount, currentAmount, etc.",
+            paycheckHistory: "Paycheck history for trend analysis",
+            transactions: "Pure transactions only (filtered from allTransactions)",
             allTransactions:
               "All transactions + bills combined (auto-generated, don't edit directly)",
+            auditLog: "Change history and audit trail (generally shouldn't be edited)",
           },
           deprecatedArrays: {
             note: "These may exist from old exports but are not actively used in v1.8+",
@@ -210,7 +97,6 @@ const useDataManagement = () => {
         },
       };
 
-      // Create and download the file
       const dataStr = JSON.stringify(exportData, null, 2);
       const dataBlob = new Blob([dataStr], { type: "application/json" });
 
@@ -218,10 +104,7 @@ const useDataManagement = () => {
       const link = document.createElement("a");
       link.href = url;
 
-      const timestamp = new Date()
-        .toISOString()
-        .replace(/[:.]/g, "-")
-        .slice(0, 19);
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
       link.download = `VioletVault Budget Backup ${timestamp}.json`;
 
       document.body.appendChild(link);
@@ -229,31 +112,34 @@ const useDataManagement = () => {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
-      console.log("✅ Export completed successfully");
-      console.log(`📊 Clean export summary:
-        - ${cleanEnvelopes.length} envelopes (old nested arrays removed)
-        - ${cleanBills.length} bills (cleaned structure)
-        - ${transactions.length} pure transactions
-        - ${allTransactions.length} total transactions (auto-generated)
-        - ${exportData.savingsGoals.length} savings goals
-        - Deprecated fields excluded: ${deprecatedFields.join(", ") || "none found"}
-        - File size: ${Math.round(dataStr.length / 1024)}KB`);
+      logger.info("Export completed successfully", {
+        envelopes: envelopes.length,
+        bills: bills.length,
+        transactions: pureTransactions.length,
+        allTransactions: transactions.length,
+        savingsGoals: savingsGoals.length,
+        debts: debts.length,
+        paycheckHistory: paycheckHistory.length,
+        auditLog: auditLog.length,
+        fileSizeKB: Math.round(dataStr.length / 1024),
+      });
 
-      alert(`Export completed! 
-        
-🧹 Clean export created with:
-• ${cleanEnvelopes.length} envelopes (old nested data removed)
-• ${cleanBills.length} bills 
-• ${transactions.length} transactions
-• No deprecated arrays (updatedEnvelopes, etc.)
-• File size: ${Math.round(dataStr.length / 1024)}KB
+      const exportSummary = [
+        `${envelopes.length} envelopes`,
+        `${bills.length} bills`,
+        `${debts.length} debts`,
+        `${pureTransactions.length} transactions`,
+      ].join(", ");
 
-Check console for detailed filtering log.`);
+      showSuccessToast(
+        `Export created with ${exportSummary} (${Math.round(dataStr.length / 1024)}KB)`,
+        "Export Completed"
+      );
     } catch (error) {
-      console.error("❌ Export failed:", error);
-      alert(`Export failed: ${error.message}`);
+      logger.error("Export failed", error);
+      showErrorToast(`Export failed: ${error.message}`, "Export Failed");
     }
-  }, [encryptionKey, currentUser]);
+  }, [currentUser, showErrorToast, showSuccessToast, showWarningToast]);
 
   const importData = useCallback(
     async (event) => {
@@ -261,7 +147,7 @@ Check console for detailed filtering log.`);
       if (!file) return;
 
       try {
-        console.log("📁 Starting import process...");
+        logger.info("Starting import process");
 
         // Read the file
         const fileContent = await new Promise((resolve, reject) => {
@@ -273,108 +159,304 @@ Check console for detailed filtering log.`);
 
         // Parse JSON
         const importedData = JSON.parse(fileContent);
-        console.log("✅ File parsed successfully:", {
+        logger.info("File parsed successfully", {
           envelopes: importedData.envelopes?.length || 0,
           bills: importedData.bills?.length || 0,
           savingsGoals: importedData.savingsGoals?.length || 0,
+          debts: importedData.debts?.length || 0,
+          auditLog: importedData.auditLog?.length || 0,
           allTransactions: importedData.allTransactions?.length || 0,
         });
 
         // Build unified transaction list if missing
-        const unifiedAllTransactions = Array.isArray(
-          importedData.allTransactions,
-        )
+        const unifiedAllTransactions = Array.isArray(importedData.allTransactions)
           ? importedData.allTransactions
-          : [
-              ...(importedData.transactions || []),
-              ...(importedData.bills || []),
-            ];
-        const unifiedTransactions = unifiedAllTransactions.filter(
-          (t) => !t.type || t.type === "transaction",
-        );
+          : [...(importedData.transactions || []), ...(importedData.bills || [])];
+        // Filter transactions (variable used later in validation)
+        // const unifiedTransactions = unifiedAllTransactions.filter(
+        //   (t) => !t.type || t.type === "transaction",
+        // );
 
         // Validate the data structure
         if (!importedData.envelopes || !Array.isArray(importedData.envelopes)) {
-          throw new Error(
-            "Invalid backup file: missing or invalid envelopes data",
-          );
+          throw new Error("Invalid backup file: missing or invalid envelopes data");
         }
 
         // Confirm import with user
         const confirmed = confirm(
-          `Import ${importedData.envelopes?.length || 0} envelopes, ${importedData.bills?.length || 0} bills, and ${importedData.allTransactions?.length || 0} transactions?\n\nThis will replace your current data.`,
+          `Import ${importedData.envelopes?.length || 0} envelopes, ${importedData.bills?.length || 0} bills, ${importedData.debts?.length || 0} debts, ${importedData.auditLog?.length || 0} audit entries, and ${importedData.allTransactions?.length || 0} transactions?\n\nThis will replace your current data.`
         );
 
         if (!confirmed) {
-          console.log("Import cancelled by user");
+          logger.info("Import cancelled by user");
           return;
         }
 
         // Create backup of current data before import
         try {
-          // Backup from the correct localStorage key
-          const currentVioletData = localStorage.getItem("violet-vault-store");
-          const currentBudgetData = localStorage.getItem("budget-store");
-          const currentLegacyData = localStorage.getItem("envelopeBudgetData");
+          const [
+            envelopes,
+            bills,
+            transactions,
+            savingsGoals,
+            debts,
+            paycheckHistory,
+            auditLog,
+            metadata,
+          ] = await Promise.all([
+            budgetDb.envelopes.toArray(),
+            budgetDb.bills.toArray(),
+            budgetDb.transactions.toArray(),
+            budgetDb.savingsGoals.toArray(),
+            budgetDb.debts.toArray(),
+            budgetDb.paycheckHistory.toArray(),
+            budgetDb.auditLog.toArray(),
+            getBudgetMetadata(),
+          ]);
+
+          const currentData = {
+            envelopes,
+            bills,
+            transactions,
+            savingsGoals,
+            debts,
+            paycheckHistory,
+            auditLog,
+            unassignedCash: metadata?.unassignedCash || 0,
+            biweeklyAllocation: metadata?.biweeklyAllocation || 0,
+            actualBalance: metadata?.actualBalance || 0,
+            isActualBalanceManual: metadata?.isActualBalanceManual || false,
+          };
 
           const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-
-          if (currentVioletData) {
-            localStorage.setItem(
-              `violet-vault-store_backup_${timestamp}`,
-              currentVioletData,
-            );
-            console.log("✅ Current violet-vault-store data backed up");
-          }
-          if (currentBudgetData) {
-            localStorage.setItem(
-              `budget-store_backup_${timestamp}`,
-              currentBudgetData,
-            );
-            console.log("✅ Current budget-store data backed up");
-          }
-          if (currentLegacyData) {
-            localStorage.setItem(
-              `envelopeBudgetData_backup_${timestamp}`,
-              currentLegacyData,
-            );
-            console.log("✅ Current legacy data backed up");
-          }
+          localStorage.setItem(`dexie_backup_${timestamp}`, JSON.stringify(currentData));
+          logger.debug("Current Dexie data backed up");
         } catch (backupError) {
-          console.warn("⚠️ Failed to create backup:", backupError);
+          logger.warn("Failed to create backup", backupError);
         }
 
-        // Prepare the data for loading - ensure user information is preserved
-        const processedData = {
-          ...importedData,
-          transactions: unifiedTransactions,
-          allTransactions: unifiedAllTransactions,
-          // Preserve current user info
-          currentUser: currentUser,
+        // Clear existing data from Firebase first to prevent sync conflicts
+        try {
+          logger.info("Clearing Firebase data before import...");
+          await cloudSyncService.clearAllData();
+          logger.info("Firebase data cleared successfully");
+        } catch (firebaseError) {
+          logger.warn("Failed to clear Firebase data, proceeding with import", firebaseError);
+          // Continue with import even if Firebase clear fails
+        }
+
+        // Clear existing data from Dexie
+        await budgetDb.transaction(
+          "rw",
+          [
+            budgetDb.envelopes,
+            budgetDb.bills,
+            budgetDb.transactions,
+            budgetDb.savingsGoals,
+            budgetDb.debts,
+            budgetDb.paycheckHistory,
+            budgetDb.auditLog,
+            budgetDb.budget,
+          ],
+          async () => {
+            // Clear all existing data with robust error handling
+            try {
+              await budgetDb.envelopes.clear();
+            } catch (error) {
+              logger.warn("Standard envelope clear failed, using individual deletion", error);
+              await budgetDb.envelopes.toCollection().delete();
+            }
+
+            try {
+              await budgetDb.bills.clear();
+            } catch (error) {
+              logger.warn("Standard bill clear failed, using individual deletion", error);
+              await budgetDb.bills.toCollection().delete();
+            }
+
+            try {
+              await budgetDb.transactions.clear();
+            } catch (error) {
+              logger.warn("Standard transaction clear failed, using individual deletion", error);
+              await budgetDb.transactions.toCollection().delete();
+            }
+
+            try {
+              await budgetDb.savingsGoals.clear();
+            } catch (error) {
+              logger.warn("Standard savings goals clear failed, using individual deletion", error);
+              await budgetDb.savingsGoals.toCollection().delete();
+            }
+
+            try {
+              await budgetDb.debts.clear();
+            } catch (error) {
+              logger.warn("Standard debt clear failed, using individual deletion", error);
+              await budgetDb.debts.toCollection().delete();
+            }
+
+            try {
+              await budgetDb.paycheckHistory.clear();
+            } catch (error) {
+              logger.warn("Standard paycheck clear failed, using individual deletion", error);
+              // For paycheckHistory, we need to be extra aggressive due to corrupted records
+              try {
+                await budgetDb.paycheckHistory.toCollection().delete();
+              } catch (individualError) {
+                logger.warn(
+                  "Individual paycheck deletion failed, using manual cleanup",
+                  individualError
+                );
+                // Manual cleanup for corrupted records
+                const allPaychecks = await budgetDb.paycheckHistory.toArray();
+                for (const paycheck of allPaychecks) {
+                  try {
+                    if (paycheck.id) {
+                      await budgetDb.paycheckHistory.delete(paycheck.id);
+                    } else {
+                      // Delete by composite key for records without ID
+                      await budgetDb.paycheckHistory
+                        .where("[date+amount]")
+                        .equals([paycheck.date, paycheck.amount])
+                        .delete();
+                    }
+                  } catch (deleteError) {
+                    logger.error("Failed to delete individual paycheck record", {
+                      paycheck,
+                      error: deleteError.message,
+                    });
+                  }
+                }
+              }
+            }
+
+            try {
+              await budgetDb.auditLog.clear();
+            } catch (error) {
+              logger.warn("Standard audit log clear failed, using individual deletion", error);
+              await budgetDb.auditLog.toCollection().delete();
+            }
+
+            // Import new data
+            if (importedData.envelopes?.length) {
+              await budgetDb.envelopes.bulkAdd(importedData.envelopes);
+            }
+
+            if (importedData.bills?.length) {
+              await budgetDb.bills.bulkAdd(importedData.bills);
+            }
+
+            if (unifiedAllTransactions?.length) {
+              await budgetDb.transactions.bulkAdd(unifiedAllTransactions);
+            }
+
+            if (importedData.savingsGoals?.length) {
+              await budgetDb.savingsGoals.bulkAdd(importedData.savingsGoals);
+            }
+
+            if (importedData.debts?.length) {
+              await budgetDb.debts.bulkAdd(importedData.debts);
+            }
+
+            if (importedData.paycheckHistory?.length) {
+              await budgetDb.paycheckHistory.bulkAdd(importedData.paycheckHistory);
+            }
+
+            if (importedData.auditLog?.length) {
+              await budgetDb.auditLog.bulkAdd(importedData.auditLog);
+            }
+
+            // Import metadata (budget settings)
+            await budgetDb.budget.put({
+              id: "metadata",
+              unassignedCash: importedData.unassignedCash || 0,
+              biweeklyAllocation: importedData.biweeklyAllocation || 0,
+              actualBalance: importedData.actualBalance || 0,
+              isActualBalanceManual: importedData.isActualBalanceManual || false,
+              supplementalAccounts: importedData.supplementalAccounts || [],
+              lastUpdated: new Date().toISOString(),
+            });
+          }
+        );
+
+        logger.info("Import completed successfully", {
+          imported: {
+            envelopes: importedData.envelopes?.length || 0,
+            bills: importedData.bills?.length || 0,
+            transactions: unifiedAllTransactions?.length || 0,
+            savingsGoals: importedData.savingsGoals?.length || 0,
+            debts: importedData.debts?.length || 0,
+            paycheckHistory: importedData.paycheckHistory?.length || 0,
+            auditLog: importedData.auditLog?.length || 0,
+          },
+        });
+
+        showSuccessToast(`Local data imported! Now syncing to the cloud...`, "Import Complete");
+
+        // Force push imported data TO Firebase (one-way sync from local to cloud)
+        try {
+          logger.info("🚀 Forcing push of imported data to Firebase...");
+
+          // Wait for Dexie transaction to fully commit before syncing
+          await new Promise((resolve) => setTimeout(resolve, 500));
+          // Force sync TO Firebase without pulling FROM Firebase
+          if (cloudSyncService.forcePushToCloud) {
+            await cloudSyncService.forcePushToCloud();
+            logger.info("✅ Data successfully pushed to Firebase.");
+            showSuccessToast("Imported data synced to cloud successfully!");
+          } else {
+            // Fallback to regular sync with precaution
+            logger.warn("forcePushToCloud method not available, using regular sync");
+            await cloudSyncService.forceSync();
+            logger.info("✅ Manual sync after import completed successfully.");
+            showSuccessToast("Cloud sync initiated successfully!");
+          }
+        } catch (syncError) {
+          logger.error("Failed to push imported data to Firebase", syncError);
+          showErrorToast(`Cloud sync failed: ${syncError.message}`);
+        }
+
+        // Invalidate TanStack Query cache to refresh UI with new data instead of page reload
+        try {
+          // Wait a bit more to ensure sync is complete
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+
+          const { queryClient } = await import("../utils/queryClient");
+          await queryClient.invalidateQueries();
+          logger.info("TanStack Query cache invalidated after data import");
+        } catch (error) {
+          logger.warn("Failed to invalidate query cache, falling back to page reload", error);
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        }
+
+        return {
+          success: true,
+          imported: {
+            envelopes: importedData.envelopes?.length || 0,
+            bills: importedData.bills?.length || 0,
+            transactions: unifiedAllTransactions?.length || 0,
+            savingsGoals: importedData.savingsGoals?.length || 0,
+            debts: importedData.debts?.length || 0,
+            paycheckHistory: importedData.paycheckHistory?.length || 0,
+            auditLog: importedData.auditLog?.length || 0,
+          },
         };
-
-        console.log("✅ Import completed successfully");
-        alert("Data imported successfully!");
-
-        return processedData;
       } catch (error) {
-        console.error("❌ Import failed:", error);
-        alert(`Import failed: ${error.message}`);
+        logger.error("Import failed", error);
+        showErrorToast(`Import failed: ${error.message}`, "Import Failed");
         throw error;
       }
     },
-    [currentUser],
+    [showErrorToast, showSuccessToast]
   );
 
   const resetEncryptionAndStartFresh = useCallback(() => {
-    console.log("🔄 Resetting encryption and starting fresh...");
+    logger.info("Resetting encryption and starting fresh");
 
     // Clear all stored data
-    const keysToRemove = [
-      "envelopeBudgetData",
-      "userProfile",
-      "passwordLastChanged",
-    ];
+    const keysToRemove = ["envelopeBudgetData", "userProfile", "passwordLastChanged"];
 
     keysToRemove.forEach((key) => {
       localStorage.removeItem(key);
@@ -387,7 +469,7 @@ Check console for detailed filtering log.`);
       }
     });
 
-    console.log("✅ All data cleared, ready for fresh start");
+    logger.info("All data cleared, ready for fresh start");
 
     // Force page reload to reset application state
     window.location.reload();

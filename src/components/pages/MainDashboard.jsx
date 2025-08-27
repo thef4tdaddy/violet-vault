@@ -17,22 +17,33 @@ import {
 import PaydayPrediction from "../budgeting/PaydayPrediction";
 import { predictNextPayday } from "../../utils/paydayPredictor";
 import EditableBalance from "../ui/EditableBalance";
-import { useActualBalance } from "../../hooks/useActualBalance";
-import { useBudgetStore } from "../../stores/budgetStore";
+import { useActualBalance } from "../../hooks/useBudgetMetadata";
+import { useUnassignedCash } from "../../hooks/useBudgetMetadata";
+import logger from "../../utils/logger";
+import { useEnvelopes } from "../../hooks/useEnvelopes";
+import { useSavingsGoals } from "../../hooks/useSavingsGoals";
+import { useTransactions } from "../../hooks/useTransactions";
+import useBudgetData from "../../hooks/useBudgetData";
+import DebtSummaryWidget from "../debt/ui/DebtSummaryWidget";
 
-const Dashboard = () => {
-  // Get live data from budget store instead of props
-  const budget = useBudgetStore();
+const Dashboard = ({ setActiveView }) => {
+  // Enhanced TanStack Query integration with optimistic updates
+  const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
+
+  const { data: savingsGoals = [], isLoading: savingsLoading } = useSavingsGoals();
+
+  const { data: transactions = [], isLoading: transactionsLoading } = useTransactions();
+
+  // Use TanStack Query for budget metadata
+  const { unassignedCash, isLoading: unassignedCashLoading } = useUnassignedCash();
   const {
-    envelopes,
-    savingsGoals,
-    unassignedCash,
     actualBalance,
-    setActualBalance,
-    reconcileTransaction,
-    transactions,
-    paycheckHistory,
-  } = budget;
+    updateActualBalance,
+    isLoading: actualBalanceLoading,
+  } = useActualBalance();
+
+  // Get reconcileTransaction and paycheckHistory from useBudgetData
+  const { reconcileTransaction, paycheckHistory } = useBudgetData();
   const [showReconcileModal, setShowReconcileModal] = useState(false);
   const [newTransaction, setNewTransaction] = useState({
     amount: "",
@@ -43,9 +54,31 @@ const Dashboard = () => {
   });
 
   // Calculate totals
-  const totalEnvelopeBalance = envelopes.reduce((sum, env) => sum + env.currentBalance, 0);
-  const totalSavingsBalance = savingsGoals.reduce((sum, goal) => sum + goal.currentAmount, 0);
-  const totalVirtualBalance = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
+  const totalEnvelopeBalance = envelopes.reduce((sum, env) => {
+    const balance = parseFloat(env?.currentBalance) || 0;
+    return sum + (isNaN(balance) ? 0 : balance);
+  }, 0);
+  const totalSavingsBalance = savingsGoals.reduce((sum, goal) => {
+    const amount = parseFloat(goal?.currentAmount) || 0;
+    return sum + (isNaN(amount) ? 0 : amount);
+  }, 0);
+
+  // Ensure unassignedCash is not NaN
+  const safeUnassignedCash = parseFloat(unassignedCash) || 0;
+  const totalVirtualBalance =
+    totalEnvelopeBalance +
+    totalSavingsBalance +
+    (isNaN(safeUnassignedCash) ? 0 : safeUnassignedCash);
+
+  // Debug logging to compare with SummaryCards
+  logger.debug("📊 Dashboard Debug:", {
+    envelopesCount: envelopes.length,
+    totalEnvelopeBalance,
+    totalSavingsBalance,
+    unassignedCash,
+    totalVirtualBalance,
+    firstEnvelope: envelopes[0],
+  });
   const difference = actualBalance - totalVirtualBalance;
   const isBalanced = Math.abs(difference) < 0.01; // Allow for rounding differences
 
@@ -56,14 +89,12 @@ const Dashboard = () => {
   const paydayPrediction =
     paycheckHistory && paycheckHistory.length >= 2 ? predictNextPayday(paycheckHistory) : null;
 
-  // Use the separated business logic hook
-  const { updateActualBalance } = useActualBalance();
-
-  const handleUpdateBalance = (newBalance) => {
-    const success = updateActualBalance(newBalance, { source: "manual_dashboard" });
-    if (success) {
-      setActualBalance(newBalance);
-    }
+  const handleUpdateBalance = async (newBalance) => {
+    await updateActualBalance(newBalance, {
+      isManual: true,
+      author: "Family Member", // Generic name for family budgeting
+    });
+    // No need to call setActualBalance since TanStack Query will handle the update
   };
 
   const handleReconcileTransaction = () => {
@@ -107,9 +138,9 @@ const Dashboard = () => {
 
   // Handle payday actions
   const handleProcessPaycheck = () => {
-    // Navigate to paycheck processor or trigger paycheck modal
-    alert("Navigate to paycheck processor for payday processing!");
-    // TODO: Integrate with actual paycheck processing flow
+    // Navigate to paycheck processor
+    setActiveView("paycheck");
+    logger.debug("Navigating to paycheck processor");
   };
 
   const handlePrepareEnvelopes = () => {
@@ -117,6 +148,29 @@ const Dashboard = () => {
     alert("Navigate to envelope management for funding planning!");
     // TODO: Integrate with envelope planning interface
   };
+
+  // Show loading state while TanStack queries are fetching
+  if (
+    envelopesLoading ||
+    savingsLoading ||
+    transactionsLoading ||
+    unassignedCashLoading ||
+    actualBalanceLoading
+  ) {
+    return (
+      <div className="space-y-6">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/2 mb-6"></div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="h-32 bg-gray-200 rounded"></div>
+            <div className="h-32 bg-gray-200 rounded"></div>
+            <div className="h-32 bg-gray-200 rounded"></div>
+          </div>
+          <div className="h-96 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -129,6 +183,17 @@ const Dashboard = () => {
           onPrepareEnvelopes={handlePrepareEnvelopes}
         />
       )}
+
+      {/* Debt Summary Widget */}
+      <DebtSummaryWidget
+        onNavigateToDebts={() => {
+          if (setActiveView) {
+            setActiveView("debts");
+          } else {
+            logger.debug("Navigate to debts requested - setActiveView not available");
+          }
+        }}
+      />
 
       {/* Account Balance Overview */}
       <div className="glassmorphism rounded-2xl p-6 border border-white/20">
@@ -207,7 +272,9 @@ const Dashboard = () => {
                   isBalanced ? "text-green-900" : difference > 0 ? "text-green-900" : "text-red-900"
                 }`}
               >
-                {difference > 0 ? "+" : ""}${difference.toFixed(2)}
+                {isBalanced
+                  ? "Accounts Balanced!"
+                  : `${difference > 0 ? "+" : ""}$${difference.toFixed(2)}`}
               </div>
               <p
                 className={`text-sm ${

@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from "react";
-import {
-  getVersionInfo,
-  getVersionInfoAsync,
-  getCacheStatus,
-} from "../../utils/version";
+import { getVersionInfo, getVersionInfoAsync, getCacheStatus } from "../../utils/version";
+import logger from "../../utils/logger";
 
 /**
  * Version footer component with branch differentiation
@@ -23,7 +20,7 @@ const VersionFooter = () => {
 
       // Only fetch if we don't have valid cached data
       if (!currentCache.isValid) {
-        console.log("🔄 No valid cache, fetching milestone data...");
+        logger.debug("🔄 No valid cache, fetching milestone data...");
         setIsLoadingMilestone(true);
         getVersionInfoAsync()
           .then((updatedInfo) => {
@@ -32,12 +29,12 @@ const VersionFooter = () => {
             setIsLoadingMilestone(false);
           })
           .catch((error) => {
-            console.warn("Failed to fetch milestone info:", error);
+            logger.warn("Failed to fetch milestone info:", error);
             setIsLoadingMilestone(false);
           });
       } else {
-        console.log(
-          `🎯 Using cached milestone (expires in ${currentCache.daysUntilExpiry > 0 ? currentCache.daysUntilExpiry + " days" : currentCache.hoursUntilExpiry + " hours"})`,
+        logger.debug(
+          `🎯 Using cached milestone (expires in ${currentCache.daysUntilExpiry > 0 ? currentCache.daysUntilExpiry + " days" : currentCache.hoursUntilExpiry + " hours"})`
         );
         // Use cached version
         getVersionInfoAsync().then((updatedInfo) => {
@@ -51,24 +48,21 @@ const VersionFooter = () => {
   const getEnvironmentStyles = () => {
     if (versionInfo.environment === "development") {
       return {
-        container:
-          "glassmorphism rounded-2xl p-4 max-w-md mx-auto border-l-4 border-orange-400",
+        container: "glassmorphism rounded-2xl p-4 max-w-md mx-auto border-l-4 border-orange-400",
         title: "font-semibold text-orange-600",
         version: "text-orange-700 font-mono",
         label: "text-orange-600 text-xs font-medium",
       };
     } else if (versionInfo.environment === "preview") {
       return {
-        container:
-          "glassmorphism rounded-2xl p-4 max-w-md mx-auto border-l-4 border-blue-400",
+        container: "glassmorphism rounded-2xl p-4 max-w-md mx-auto border-l-4 border-blue-400",
         title: "font-semibold text-blue-600",
         version: "text-blue-700 font-mono",
         label: "text-blue-600 text-xs font-medium",
       };
     } else {
       return {
-        container:
-          "glassmorphism rounded-2xl p-4 max-w-md mx-auto border-l-4 border-green-400",
+        container: "glassmorphism rounded-2xl p-4 max-w-md mx-auto border-l-4 border-green-400",
         title: "font-semibold text-purple-600",
         version: "text-gray-700 font-mono",
         label: "text-green-600 text-xs font-medium",
@@ -90,8 +84,7 @@ const VersionFooter = () => {
           <span className={styles.label}>{versionInfo.environmentLabel}</span>
           {versionInfo.isDevelopment && versionInfo.futureVersion && (
             <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
-              → v{versionInfo.baseVersion} targeting v
-              {versionInfo.futureVersion}
+              → v{versionInfo.baseVersion} targeting v{versionInfo.futureVersion}
             </span>
           )}
           {versionInfo.environment === "production" && (
@@ -102,7 +95,14 @@ const VersionFooter = () => {
         </div>
 
         <p className="text-xs text-gray-500">
-          Built on {versionInfo.buildDate} with ❤️ for secure budgeting
+          {versionInfo.isDevelopment
+            ? `Last commit: ${versionInfo.buildDate}`
+            : `Released: ${versionInfo.buildDate}`}
+          {versionInfo.commitHash && versionInfo.commitHash !== "unknown" && (
+            <span className="ml-1 font-mono">({versionInfo.commitHash})</span>
+          )}
+          <br />
+          Built with ❤️ for secure budgeting
         </p>
 
         {versionInfo.isDevelopment && (
@@ -110,6 +110,11 @@ const VersionFooter = () => {
             <p className="text-xs text-orange-600 font-medium">
               Development build from {versionInfo.branch} branch
             </p>
+            {versionInfo.commitMessage && versionInfo.commitMessage !== "Build without git" && (
+              <p className="text-xs text-orange-500 mt-1 italic truncate">
+                "{versionInfo.commitMessage}"
+              </p>
+            )}
             {cacheInfo.isValid && (
               <p className="text-xs text-orange-400 mt-1">
                 📦 Cached milestone (expires in{" "}

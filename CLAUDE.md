@@ -23,3 +23,8 @@
 - Milestones: Create merge commit to develop
 - Releases: Create merge commit to main
 - Always ensure branch is up to date before merging
+
+## Data Structure
+
+- Firebase (if enabled) -> Dexie -> TanStack
+- Zustand only is for ui state, and auth settings

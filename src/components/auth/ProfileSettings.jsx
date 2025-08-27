@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { X, User, Palette, Save } from "lucide-react";
+import logger from "../../utils/logger";
 
 const ProfileSettings = ({ isOpen, onClose, currentUser, onUpdateProfile }) => {
   const [userName, setUserName] = useState(currentUser?.userName || "");
@@ -34,7 +35,7 @@ const ProfileSettings = ({ isOpen, onClose, currentUser, onUpdateProfile }) => {
       await onUpdateProfile(updatedProfile);
       onClose();
     } catch (error) {
-      console.error("Failed to update profile:", error);
+      logger.error("Failed to update profile:", error);
       alert(`Failed to update profile: ${error.message}`);
     } finally {
       setIsLoading(false);

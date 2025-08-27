@@ -1,41 +1,56 @@
-// src/components/EnvelopeSystem.jsx - Focused Envelope Operations with infinite loop fixes
-import React, { useEffect, useMemo, useCallback, useRef } from "react";
-import { useBudgetStore } from "../../stores/budgetStore";
-import { BIWEEKLY_MULTIPLIER, FREQUENCY_MULTIPLIERS } from "../../constants/frequency";
+// src/components/budgeting/EnvelopeSystem.jsx - Refactored with separated logic
+import React, { useEffect, useCallback, useRef } from "react";
+import { useBudgetStore } from "../../stores/uiStore";
+import { useEnvelopes } from "../../hooks/useEnvelopes";
+import { useBills } from "../../hooks/useBills";
+import { calculateBiweeklyNeeds } from "../../utils/budgeting";
+import { FREQUENCY_MULTIPLIERS, BIWEEKLY_MULTIPLIER } from "../../constants/categories";
+import logger from "../../utils/logger";
 
 const useEnvelopeSystem = () => {
+  // Enhanced TanStack Query integration
   const {
-    envelopes,
-    bills,
-    unassignedCash,
-    setEnvelopes,
-    setBiweeklyAllocation,
-    setUnassignedCash,
+    envelopes = [],
     addEnvelope,
     updateEnvelope,
     deleteEnvelope,
-  } = useBudgetStore();
+    isLoading: envelopesLoading,
+  } = useEnvelopes();
+
+  const { bills = [], isLoading: billsLoading } = useBills();
+
+  // Keep Zustand for non-migrated operations
+  const { unassignedCash, setEnvelopes, setBiweeklyAllocation, setUnassignedCash } =
+    useBudgetStore();
 
   const lastBillsRef = useRef(null);
   const isCalculatingRef = useRef(false);
 
-  // Calculate biweekly allocation needs from bills
-  const calculateBiweeklyNeeds = useCallback(() => {
+  // Calculate biweekly allocation needs from bills using utility function
+  const updateBiweeklyAllocations = useCallback(() => {
     if (isCalculatingRef.current) {
+      logger.debug("Skipping biweekly allocation update - calculation already in progress");
       return; // Prevent recursive calls
     }
 
+    logger.debug("Starting biweekly allocation calculation", {
+      billsCount: bills.length,
+      bills: bills.map((b) => ({
+        id: b.id,
+        name: b.name,
+        amount: b.amount,
+        frequency: b.frequency,
+      })),
+    });
+
     isCalculatingRef.current = true;
 
-    let totalBiweeklyNeed = 0;
+    // Use the utility function for calculation
+    const totalBiweeklyNeed = calculateBiweeklyNeeds(bills);
 
-    // Calculate total first - convert to monthly then to biweekly
-    bills.forEach((bill) => {
-      const multiplier = FREQUENCY_MULTIPLIERS[bill.frequency] || 12;
-      const annualAmount = bill.amount * multiplier;
-      const monthlyAmount = annualAmount / 12;
-      const biweeklyAmount = monthlyAmount / BIWEEKLY_MULTIPLIER; // Simple monthly / 2
-      totalBiweeklyNeed += biweeklyAmount;
+    logger.info("Calculated total biweekly need", {
+      totalBiweeklyNeed,
+      billsProcessed: bills.length,
     });
 
     // Set the allocation outside of setEnvelopes
@@ -43,279 +58,130 @@ const useEnvelopeSystem = () => {
 
     setEnvelopes((currentEnvelopes) => {
       const updatedEnvelopes = [...currentEnvelopes];
+      let envelopesUpdated = 0;
 
+      // Update each bill envelope's biweekly allocation
       bills.forEach((bill) => {
-        const multiplier = FREQUENCY_MULTIPLIERS[bill.frequency] || 12;
-        const annualAmount = bill.amount * multiplier;
-        const monthlyAmount = annualAmount / 12;
-        const biweeklyAmount = monthlyAmount / BIWEEKLY_MULTIPLIER; // Simple monthly / 2
+        if (bill.envelopeId) {
+          const envelopeIndex = updatedEnvelopes.findIndex((env) => env.id === bill.envelopeId);
+          if (envelopeIndex >= 0) {
+            const envelope = updatedEnvelopes[envelopeIndex];
+            if (!envelope.biweeklyAllocation || envelope.biweeklyAllocation === 0) {
+              // Calculate this bill's biweekly amount
+              const multiplier = FREQUENCY_MULTIPLIERS[bill.frequency] || 12;
+              const annualAmount = bill.amount * multiplier;
+              const monthlyAmount = annualAmount / 12;
+              const biweeklyAmount = monthlyAmount / BIWEEKLY_MULTIPLIER;
 
-        // Find or create envelope for this bill
-        let envelope = updatedEnvelopes.find((env) => env.linkedBillId === bill.id);
+              logger.debug("Updating envelope biweekly allocation", {
+                billId: bill.id,
+                billName: bill.name,
+                envelopeId: bill.envelopeId,
+                envelopeName: envelope.name,
+                billAmount: bill.amount,
+                frequency: bill.frequency,
+                calculatedBiweekly: biweeklyAmount,
+              });
 
-        if (!envelope) {
-          // Create new envelope for this bill
-          const newEnvelope = {
-            id: `bill_${bill.id}`,
-            name: bill.name,
-            biweeklyAllocation: biweeklyAmount,
-            currentBalance: 0,
-            color: bill.color,
-            linkedBillId: bill.id,
-            spendingHistory: [],
-            category: bill.category,
-            isFromBill: true,
-            targetAmount: biweeklyAmount * 2, // Two weeks buffer
-          };
-          updatedEnvelopes.push(newEnvelope);
-        } else {
-          // Update existing envelope
-          envelope.biweeklyAllocation = biweeklyAmount;
-          envelope.targetAmount = biweeklyAmount * 2;
+              updatedEnvelopes[envelopeIndex] = {
+                ...envelope,
+                biweeklyAllocation: biweeklyAmount,
+                envelopeType: "bill", // Ensure bill envelopes are typed correctly
+              };
+              envelopesUpdated++;
+            }
+          } else {
+            logger.warn("Bill references non-existent envelope", {
+              billId: bill.id,
+              billName: bill.name,
+              envelopeId: bill.envelopeId,
+            });
+          }
         }
       });
 
+      logger.info("Envelope biweekly allocation update completed", {
+        envelopesUpdated,
+        totalEnvelopes: updatedEnvelopes.length,
+      });
+
+      isCalculatingRef.current = false;
       return updatedEnvelopes;
     });
+  }, [bills, setBiweeklyAllocation, setEnvelopes]);
 
-    setTimeout(() => {
-      isCalculatingRef.current = false;
-    }, 100);
-  }, [bills, setEnvelopes, setBiweeklyAllocation]);
-
-  // Spend money from an envelope
-  const spendFromEnvelope = useCallback(
-    (envelopeId, amount, description = "Spending") => {
-      setEnvelopes((currentEnvelopes) =>
-        currentEnvelopes.map((envelope) => {
-          if (envelope.id === envelopeId) {
-            const newBalance = Math.max(0, envelope.currentBalance - amount);
-            const spendingRecord = {
-              id: Date.now(),
-              amount: amount,
-              description: description,
-              date: new Date().toISOString(),
-              balanceAfter: newBalance,
-            };
-
-            return {
-              ...envelope,
-              currentBalance: newBalance,
-              spendingHistory: [...(envelope.spendingHistory || []), spendingRecord],
-            };
-          }
-          return envelope;
-        })
-      );
-    },
-    [setEnvelopes]
-  );
-
-  // Transfer money between envelopes
-  const transferBetweenEnvelopes = useCallback(
-    (fromEnvelopeId, toEnvelopeId, amount) => {
-      if (fromEnvelopeId === "unassigned") {
-        // Transfer from unassigned cash to envelope
-        setUnassignedCash((currentUnassigned) => {
-          if (currentUnassigned >= amount) {
-            setEnvelopes((currentEnvelopes) =>
-              currentEnvelopes.map((envelope) => {
-                if (envelope.id === toEnvelopeId) {
-                  return {
-                    ...envelope,
-                    currentBalance: envelope.currentBalance + amount,
-                  };
-                }
-                return envelope;
-              })
-            );
-            return currentUnassigned - amount;
-          }
-          return currentUnassigned;
-        });
-        return;
-      }
-
-      if (toEnvelopeId === "unassigned") {
-        // Transfer from envelope to unassigned cash
-        setEnvelopes((currentEnvelopes) => {
-          const fromEnvelope = currentEnvelopes.find((env) => env.id === fromEnvelopeId);
-          if (fromEnvelope && fromEnvelope.currentBalance >= amount) {
-            setUnassignedCash((current) => current + amount);
-            spendFromEnvelope(fromEnvelopeId, amount, "Transfer to unassigned cash");
-          }
-          return currentEnvelopes;
-        });
-        return;
-      }
-
-      // Transfer between two envelopes
-      setEnvelopes((currentEnvelopes) => {
-        const fromEnvelope = currentEnvelopes.find((env) => env.id === fromEnvelopeId);
-        if (!fromEnvelope || fromEnvelope.currentBalance < amount) {
-          return currentEnvelopes; // Insufficient funds
-        }
-
-        return currentEnvelopes.map((envelope) => {
-          if (envelope.id === fromEnvelopeId) {
-            return {
-              ...envelope,
-              currentBalance: envelope.currentBalance - amount,
-            };
-          }
-          if (envelope.id === toEnvelopeId) {
-            return {
-              ...envelope,
-              currentBalance: envelope.currentBalance + amount,
-            };
-          }
-          return envelope;
-        });
-      });
-    },
-    [setEnvelopes, setUnassignedCash, spendFromEnvelope]
-  );
-
-  // Process paycheck allocation to envelopes
-  const allocatePaycheckToEnvelopes = useCallback(
-    (paycheckAmount, allocationMode = "allocate") => {
-      if (allocationMode === "leftover") {
-        // All money goes to unassigned cash
-        setUnassignedCash((current) => current + paycheckAmount);
-        return {
-          allocations: {},
-          leftoverAmount: paycheckAmount,
-        };
-      }
-
-      // Smart allocation based on envelope needs
-      let remainingAmount = paycheckAmount;
-      const allocations = {};
-
-      setEnvelopes((currentEnvelopes) => {
-        const updatedEnvelopes = [...currentEnvelopes];
-
-        // First pass: Fill envelopes that are below their biweekly allocation
-        currentEnvelopes.forEach((envelope) => {
-          if (remainingAmount <= 0) return;
-
-          const needed = Math.max(0, envelope.biweeklyAllocation - envelope.currentBalance);
-          const allocation = Math.min(needed, remainingAmount);
-
-          if (allocation > 0) {
-            allocations[envelope.id] = allocation;
-            remainingAmount -= allocation;
-
-            // Update envelope balance
-            const envelopeIndex = updatedEnvelopes.findIndex((env) => env.id === envelope.id);
-            if (envelopeIndex !== -1) {
-              updatedEnvelopes[envelopeIndex] = {
-                ...updatedEnvelopes[envelopeIndex],
-                currentBalance: updatedEnvelopes[envelopeIndex].currentBalance + allocation,
-              };
-            }
-          }
-        });
-
-        return updatedEnvelopes;
-      });
-
-      // Remaining amount goes to unassigned cash
-      setUnassignedCash((current) => current + remainingAmount);
-
-      return {
-        allocations,
-        leftoverAmount: remainingAmount,
-      };
-    },
-    [setEnvelopes, setUnassignedCash]
-  );
-
-  // Auto-calculate biweekly needs when bills change
+  // Auto-update allocations when bills change
   useEffect(() => {
-    const billsStr = JSON.stringify(bills);
-    if (bills.length > 0 && lastBillsRef.current !== billsStr) {
-      lastBillsRef.current = billsStr;
-      calculateBiweeklyNeeds();
+    if (bills.length > 0 && JSON.stringify(bills) !== lastBillsRef.current) {
+      logger.debug("Bills changed, triggering biweekly allocation update", {
+        previousBillsCount: lastBillsRef.current ? JSON.parse(lastBillsRef.current).length : 0,
+        currentBillsCount: bills.length,
+      });
+      updateBiweeklyAllocations();
+      lastBillsRef.current = JSON.stringify(bills);
+    } else if (bills.length === 0 && lastBillsRef.current !== null) {
+      logger.debug("All bills removed, clearing biweekly allocations");
+      lastBillsRef.current = null;
     }
-  }, [bills, calculateBiweeklyNeeds]);
+  }, [bills, updateBiweeklyAllocations]);
 
-  // Calculate total envelope balance
-  const totalEnvelopeBalance = useMemo(() => {
-    return envelopes.reduce((sum, env) => sum + env.currentBalance, 0);
-  }, [envelopes]);
-
-  // Get envelope by ID
-  const getEnvelopeById = useCallback(
-    (id) => {
-      return envelopes.find((env) => env.id === id);
-    },
-    [envelopes]
-  );
-
-  // Get envelopes by category
-  const getEnvelopesByCategory = useCallback(
-    (category) => {
-      return envelopes.filter((env) => env.category === category);
-    },
-    [envelopes]
-  );
-
-  // Check if envelope has sufficient funds
-  const hasEnoughFunds = useCallback(
-    (envelopeId, amount) => {
-      if (envelopeId === "unassigned") {
-        return unassignedCash >= amount;
+  // Envelope operations with TanStack integration
+  const createEnvelope = useCallback(
+    async (envelopeData) => {
+      try {
+        await addEnvelope(envelopeData);
+        return { success: true };
+      } catch (error) {
+        logger.error("Failed to create envelope:", error);
+        return { success: false, error: error.message };
       }
-      const envelope = getEnvelopeById(envelopeId);
-      return envelope ? envelope.currentBalance >= amount : false;
     },
-    [unassignedCash, getEnvelopeById]
+    [addEnvelope]
   );
 
-  // Get envelope allocation status
-  const getEnvelopeStatus = useCallback(
-    (envelopeId) => {
-      const envelope = getEnvelopeById(envelopeId);
-      if (!envelope) return null;
-
-      const percentFilled =
-        envelope.biweeklyAllocation > 0
-          ? (envelope.currentBalance / envelope.biweeklyAllocation) * 100
-          : 0;
-
-      return {
-        isUnderfunded: envelope.currentBalance < envelope.biweeklyAllocation,
-        isOverfunded: envelope.currentBalance > envelope.biweeklyAllocation,
-        percentFilled,
-        amountNeeded: Math.max(0, envelope.biweeklyAllocation - envelope.currentBalance),
-        amountOver: Math.max(0, envelope.currentBalance - envelope.biweeklyAllocation),
-      };
+  const modifyEnvelope = useCallback(
+    async (envelopeId, updates) => {
+      try {
+        await updateEnvelope({ id: envelopeId, updates });
+        return { success: true };
+      } catch (error) {
+        logger.error("Failed to update envelope:", error);
+        return { success: false, error: error.message };
+      }
     },
-    [getEnvelopeById]
+    [updateEnvelope]
+  );
+
+  const removeEnvelope = useCallback(
+    async (envelopeId, deleteBillsToo = false) => {
+      try {
+        await deleteEnvelope(envelopeId, deleteBillsToo);
+        return { success: true };
+      } catch (error) {
+        logger.error("Failed to delete envelope:", error);
+        return { success: false, error: error.message };
+      }
+    },
+    [deleteEnvelope]
   );
 
   return {
     // Data
     envelopes,
-    totalEnvelopeBalance,
+    bills,
+    unassignedCash,
 
-    // Core operations
-    spendFromEnvelope,
-    transferBetweenEnvelopes,
-    allocatePaycheckToEnvelopes,
+    // Loading states
+    isLoading: envelopesLoading || billsLoading,
 
-    // CRUD operations
-    addEnvelope,
-    updateEnvelope,
-    deleteEnvelope,
+    // Operations
+    createEnvelope,
+    updateEnvelope: modifyEnvelope,
+    deleteEnvelope: removeEnvelope,
+    updateBiweeklyAllocations,
 
-    // Utility functions
-    calculateBiweeklyNeeds,
-    getEnvelopeById,
-    getEnvelopesByCategory,
-    hasEnoughFunds,
-    getEnvelopeStatus,
+    // Zustand operations (for legacy compatibility)
+    setUnassignedCash,
   };
 };
 

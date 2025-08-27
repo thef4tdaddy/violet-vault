@@ -12,6 +12,7 @@ import {
   Zap,
   FileText,
   TrendingUp,
+  CheckCircle,
 } from "lucide-react";
 import {
   ENVELOPE_TYPES,
@@ -19,12 +20,22 @@ import {
   getEnvelopeCategories,
 } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
+import { toBiweekly, getFrequencyOptions } from "../../utils/frequencyCalculations";
+import logger from "../../utils/logger";
+
+// Import shared components
+import EnvelopeTypeSelector from "./shared/EnvelopeTypeSelector";
+import AllocationModeSelector from "./shared/AllocationModeSelector";
+import BillConnectionSelector from "./shared/BillConnectionSelector";
+import FrequencySelector from "./shared/FrequencySelector";
 
 const CreateEnvelopeModal = ({
   isOpen = false,
   onClose,
   onCreateEnvelope,
+  onCreateBill, // Add ability to create new bills
   existingEnvelopes = [],
+  allBills = [], // Add bills prop for connection
   currentUser = { userName: "User", userColor: "#a855f7" },
 }) => {
   const [formData, setFormData] = useState({
@@ -38,16 +49,38 @@ const CreateEnvelopeModal = ({
     priority: "medium",
     autoAllocate: true,
     envelopeType: ENVELOPE_TYPES.VARIABLE, // Default to variable
-    monthlyBudget: "", // For variable expense envelopes
-    biweeklyAllocation: "", // For bill envelopes
+    monthlyBudget: "", // For variable expense envelopes and bill envelopes
     targetAmount: "", // For savings envelopes
   });
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedBillId, setSelectedBillId] = useState("");
 
   // Use standardized categories for quick selection
   const categories = getEnvelopeCategories();
+
+  // Handle bill selection and auto-populate envelope data
+  const handleBillSelection = (billId) => {
+    setSelectedBillId(billId);
+    if (!billId) return;
+
+    const selectedBill = allBills.find((bill) => bill.id === billId);
+    if (!selectedBill) return;
+
+    // Auto-populate envelope fields from the selected bill
+    setFormData((prevData) => ({
+      ...prevData,
+      name: selectedBill.name || selectedBill.provider || prevData.name,
+      category: selectedBill.category || prevData.category,
+      color: selectedBill.color || prevData.color,
+      frequency: selectedBill.frequency || prevData.frequency,
+      description:
+        selectedBill.description || `Connected to ${selectedBill.name || selectedBill.provider}`,
+      envelopeType: ENVELOPE_TYPES.BILL, // Force to bill type when bill is selected
+      monthlyBudget: selectedBill.amount?.toString() || prevData.monthlyBudget,
+    }));
+  };
 
   // Color palette for envelope customization
   const colors = [
@@ -63,15 +96,6 @@ const CreateEnvelopeModal = ({
     "#6366f1", // Indigo
     "#ec4899", // Pink
     "#64748b", // Slate
-  ];
-
-  // Frequency options
-  const frequencies = [
-    { value: "weekly", label: "Weekly", multiplier: 52 },
-    { value: "biweekly", label: "Bi-weekly", multiplier: 26 },
-    { value: "monthly", label: "Monthly", multiplier: 12 },
-    { value: "quarterly", label: "Quarterly", multiplier: 4 },
-    { value: "yearly", label: "Yearly", multiplier: 1 },
   ];
 
   const priorities = [
@@ -93,7 +117,6 @@ const CreateEnvelopeModal = ({
       autoAllocate: true,
       envelopeType: ENVELOPE_TYPES.VARIABLE,
       monthlyBudget: "",
-      biweeklyAllocation: "",
       targetAmount: "",
     });
     setErrors({});
@@ -120,8 +143,8 @@ const CreateEnvelopeModal = ({
 
     // Envelope type specific validation
     if (formData.envelopeType === ENVELOPE_TYPES.BILL) {
-      if (!formData.biweeklyAllocation || parseFloat(formData.biweeklyAllocation) <= 0) {
-        newErrors.biweeklyAllocation = "Biweekly allocation must be greater than 0";
+      if (!formData.monthlyBudget || parseFloat(formData.monthlyBudget) <= 0) {
+        newErrors.monthlyBudget = "Bill amount must be greater than 0";
       }
     } else if (formData.envelopeType === ENVELOPE_TYPES.VARIABLE) {
       if (!formData.monthlyBudget || parseFloat(formData.monthlyBudget) <= 0) {
@@ -149,11 +172,8 @@ const CreateEnvelopeModal = ({
 
   const calculateBiweeklyAmount = () => {
     const monthlyAmount = parseFloat(formData.monthlyAmount) || 0;
-    const frequency = frequencies.find((f) => f.value === formData.frequency);
-    if (!frequency) return 0;
-
-    const yearlyAmount = monthlyAmount * 12;
-    return (yearlyAmount / 26).toFixed(2);
+    if (!monthlyAmount) return 0;
+    return toBiweekly(monthlyAmount, "monthly").toFixed(2);
   };
 
   const handleSubmit = async (e) => {
@@ -175,18 +195,26 @@ const CreateEnvelopeModal = ({
         description: formData.description.trim(),
         priority: formData.priority,
         autoAllocate: formData.autoAllocate,
-        biweeklyAllocation: parseFloat(calculateBiweeklyAmount()),
+        biweeklyAllocation:
+          formData.envelopeType === ENVELOPE_TYPES.BILL && formData.monthlyBudget
+            ? toBiweekly(parseFloat(formData.monthlyBudget), formData.frequency)
+            : parseFloat(calculateBiweeklyAmount()),
         createdBy: currentUser.userName,
         createdAt: new Date().toISOString(),
         spendingHistory: [],
         dueDate: null,
         lastUpdated: new Date().toISOString(),
+        // Bill connection
+        billId: selectedBillId || null,
+
         // Envelope type specific fields
         envelopeType: formData.envelopeType,
         monthlyBudget:
           formData.envelopeType === ENVELOPE_TYPES.VARIABLE
             ? parseFloat(formData.monthlyBudget) || null
-            : null,
+            : formData.envelopeType === ENVELOPE_TYPES.BILL
+              ? parseFloat(formData.monthlyBudget) || null
+              : null,
         targetAmount:
           formData.envelopeType === ENVELOPE_TYPES.SAVINGS
             ? parseFloat(formData.targetAmount) || null
@@ -194,8 +222,11 @@ const CreateEnvelopeModal = ({
       };
 
       // Override biweeklyAllocation for bill envelopes
-      if (formData.envelopeType === ENVELOPE_TYPES.BILL && formData.biweeklyAllocation) {
-        newEnvelope.biweeklyAllocation = parseFloat(formData.biweeklyAllocation);
+      if (formData.envelopeType === ENVELOPE_TYPES.BILL && formData.monthlyBudget) {
+        newEnvelope.biweeklyAllocation = toBiweekly(
+          parseFloat(formData.monthlyBudget),
+          formData.frequency
+        );
       }
 
       await onCreateEnvelope(newEnvelope);
@@ -204,7 +235,7 @@ const CreateEnvelopeModal = ({
       resetForm();
       onClose();
     } catch (error) {
-      console.error("Error creating envelope:", error);
+      logger.error("Error creating envelope:", error);
       setErrors({ submit: "Failed to create envelope. Please try again." });
     } finally {
       setIsSubmitting(false);
@@ -219,7 +250,7 @@ const CreateEnvelopeModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl">
         {/* Header */}
         <div className="bg-gradient-to-r from-purple-600 to-purple-800 px-6 py-4">
@@ -246,58 +277,22 @@ const CreateEnvelopeModal = ({
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           <div className="space-y-6">
             {/* Envelope Type Selection */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-gray-900 flex items-center">
-                <Target className="h-4 w-4 mr-2 text-purple-600" />
-                Envelope Type
-              </h3>
+            <EnvelopeTypeSelector
+              selectedType={formData.envelopeType}
+              onTypeChange={(type) => setFormData({ ...formData, envelopeType: type })}
+              excludeTypes={[ENVELOPE_TYPES.SAVINGS]} // Remove savings from create modal - dedicated page exists
+            />
 
-              <div className="grid grid-cols-1 gap-3">
-                {Object.entries(ENVELOPE_TYPE_CONFIG).map(([type, config]) => {
-                  const IconComponent =
-                    type === ENVELOPE_TYPES.BILL
-                      ? FileText
-                      : type === ENVELOPE_TYPES.VARIABLE
-                        ? TrendingUp
-                        : Target;
-                  return (
-                    <label
-                      key={type}
-                      className={`glassmorphism border-2 rounded-2xl p-4 cursor-pointer transition-all hover:shadow-lg ${
-                        formData.envelopeType === type
-                          ? `${config.borderColor} ${config.bgColor} shadow-md`
-                          : "border-gray-200 hover:border-gray-300"
-                      }`}
-                    >
-                      <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
-                        <input
-                          type="radio"
-                          name="envelopeType"
-                          value={type}
-                          checked={formData.envelopeType === type}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              envelopeType: e.target.value,
-                            })
-                          }
-                          className="w-4 h-4 text-purple-600 focus:ring-purple-500 border-gray-300 mt-0.5 justify-self-start"
-                        />
-                        <div>
-                          <div className="flex items-center mb-1">
-                            <IconComponent className={`h-4 w-4 mr-2 ${config.textColor}`} />
-                            <span className={`font-semibold ${config.textColor}`}>
-                              {config.name}
-                            </span>
-                          </div>
-                          <p className="text-sm text-gray-600">{config.description}</p>
-                        </div>
-                      </div>
-                    </label>
-                  );
-                })}
-              </div>
-            </div>
+            {/* Bill Connection for Bill Envelopes */}
+            {formData.envelopeType === ENVELOPE_TYPES.BILL && (
+              <BillConnectionSelector
+                selectedBillId={selectedBillId}
+                onBillSelection={handleBillSelection}
+                allBills={allBills}
+                showCreateOption={true}
+                onCreateBill={onCreateBill}
+              />
+            )}
 
             {/* Basic Information */}
             <div className="space-y-4">
@@ -359,41 +354,103 @@ const CreateEnvelopeModal = ({
               </h3>
 
               {/* Type-specific fields */}
-              {formData.envelopeType === ENVELOPE_TYPES.BILL && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Biweekly Payment Amount *
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <DollarSign className="h-4 w-4 text-gray-400" />
+              {formData.envelopeType === ENVELOPE_TYPES.BILL && !selectedBillId && (
+                <div className="space-y-4">
+                  {/* Frequency Selection */}
+                  <FrequencySelector
+                    selectedFrequency={formData.frequency}
+                    onFrequencyChange={(frequency) => setFormData({ ...formData, frequency })}
+                    label="Payment Frequency *"
+                  />
+
+                  {/* Bill Amount */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {(() => {
+                        const freqOptions = getFrequencyOptions();
+                        const selectedFreq = freqOptions.find(
+                          (f) => f.value === formData.frequency
+                        );
+                        return `${selectedFreq?.label || "Monthly"} Bill Amount *`;
+                      })()}
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <DollarSign className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.monthlyBudget}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            monthlyBudget: e.target.value,
+                          })
+                        }
+                        className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
+                          errors.monthlyBudget ? "border-red-300 bg-red-50" : "border-gray-300"
+                        }`}
+                        placeholder="0.00"
+                      />
                     </div>
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={formData.biweeklyAllocation}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          biweeklyAllocation: e.target.value,
-                        })
-                      }
-                      className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
-                        errors.biweeklyAllocation ? "border-red-300 bg-red-50" : "border-gray-300"
-                      }`}
-                      placeholder="0.00"
-                    />
-                  </div>
-                  {errors.biweeklyAllocation && (
-                    <p className="mt-1 text-sm text-red-600 flex items-center">
-                      <AlertCircle className="h-3 w-3 mr-1" />
-                      {errors.biweeklyAllocation}
+                    {errors.monthlyBudget && (
+                      <p className="mt-1 text-sm text-red-600 flex items-center">
+                        <AlertCircle className="h-3 w-3 mr-1" />
+                        {errors.monthlyBudget}
+                      </p>
+                    )}
+                    <p className="mt-1 text-xs text-gray-500">
+                      Amount for this bill based on frequency selected above
                     </p>
-                  )}
-                  <p className="mt-1 text-xs text-gray-500">
-                    Amount needed every two weeks for this bill
-                  </p>
+
+                    {/* Auto-calculated biweekly allocation display */}
+                    {formData.monthlyBudget && (
+                      <div className="mt-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <p className="text-sm font-semibold text-green-800 mb-2">
+                          ✅ Auto-calculated biweekly allocation:
+                        </p>
+                        <div className="text-lg font-bold text-green-900">
+                          $
+                          {toBiweekly(
+                            parseFloat(formData.monthlyBudget),
+                            formData.frequency
+                          ).toFixed(2)}
+                        </div>
+                        <p className="text-xs text-green-700 mt-1">
+                          This amount will be automatically allocated from each paycheck
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Connected Bill Display */}
+              {formData.envelopeType === ENVELOPE_TYPES.BILL && selectedBillId && (
+                <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                  <div className="flex items-center mb-2">
+                    <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+                    <span className="font-medium text-green-800">Bill Connected</span>
+                  </div>
+                  {(() => {
+                    const connectedBill = allBills.find((bill) => bill.id === selectedBillId);
+                    return connectedBill ? (
+                      <div className="text-sm text-green-700">
+                        <p>
+                          <strong>{connectedBill.name || connectedBill.provider}</strong>
+                        </p>
+                        <p>
+                          Amount: ${connectedBill.amount || "N/A"} (
+                          {connectedBill.frequency || "monthly"})
+                        </p>
+                        <p className="text-xs mt-1">
+                          Bill settings will override manual envelope settings.
+                        </p>
+                      </div>
+                    ) : null;
+                  })()}
                 </div>
               )}
 
@@ -584,19 +641,11 @@ const CreateEnvelopeModal = ({
                 </p>
               </div>
 
-              {/* Auto-allocate option */}
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="autoAllocate"
-                  checked={formData.autoAllocate}
-                  onChange={(e) => setFormData({ ...formData, autoAllocate: e.target.checked })}
-                  className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
-                />
-                <label htmlFor="autoAllocate" className="ml-3 text-sm text-gray-700">
-                  Auto-allocate funds from paychecks
-                </label>
-              </div>
+              {/* Auto-allocate option using radio buttons */}
+              <AllocationModeSelector
+                autoAllocate={formData.autoAllocate}
+                onAutoAllocateChange={(value) => setFormData({ ...formData, autoAllocate: value })}
+              />
             </div>
 
             {/* Form Errors */}
@@ -640,7 +689,7 @@ const CreateEnvelopeModal = ({
               disabled={
                 isSubmitting ||
                 !formData.name.trim() ||
-                (formData.envelopeType === ENVELOPE_TYPES.BILL && !formData.biweeklyAllocation) ||
+                (formData.envelopeType === ENVELOPE_TYPES.BILL && !formData.monthlyBudget) ||
                 (formData.envelopeType === ENVELOPE_TYPES.VARIABLE && !formData.monthlyBudget) ||
                 (formData.envelopeType === ENVELOPE_TYPES.SAVINGS && !formData.targetAmount)
               }

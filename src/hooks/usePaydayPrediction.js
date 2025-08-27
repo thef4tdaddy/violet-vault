@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { predictNextPayday, checkRecentPayday } from "../utils/paydayPredictor";
 import useToast from "./useToast";
+import logger from "../utils/logger";
 
 /**
  * Custom hook for payday prediction and notifications
@@ -47,7 +48,7 @@ const usePaydayPrediction = (paycheckHistory, isUnlocked) => {
           }
         }
       } catch (error) {
-        console.error("Error checking payday prediction:", error);
+        logger.error("Error checking payday prediction:", error);
       }
     };
 

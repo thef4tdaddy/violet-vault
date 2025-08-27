@@ -24,7 +24,19 @@ const BillTable = ({ bills, activeTab }) => {
         <tbody>
           {currentBills.map((bill) => (
             <tr key={bill.id} className="border-t border-gray-200">
-              <td className="p-3 font-medium">{bill.name}</td>
+              <td className="p-3 font-medium">
+                <div className="flex items-center gap-2">
+                  {/* Color indicator */}
+                  {bill.color && (
+                    <div
+                      className="w-3 h-3 rounded-full flex-shrink-0"
+                      style={{ backgroundColor: bill.color }}
+                      title={`Color: ${bill.color}`}
+                    />
+                  )}
+                  {bill.name}
+                </div>
+              </td>
               <td className="p-3">${bill.amount?.toFixed(2) || "0.00"}</td>
               <td className="p-3">{bill.frequency || "Monthly"}</td>
             </tr>

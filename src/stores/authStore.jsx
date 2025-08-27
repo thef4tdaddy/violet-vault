@@ -1,10 +1,11 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { create } from "zustand";
 import { encryptionUtils } from "../utils/encryption";
 import logger from "../utils/logger";
 import { identifyUser } from "../utils/highlight";
 
-export const useAuth = create((set) => ({
+// eslint-disable-next-line react-refresh/only-export-components
+export const useAuth = create((set, get) => ({
   isUnlocked: false,
   encryptionKey: null,
   salt: null,
@@ -26,12 +27,32 @@ export const useAuth = create((set) => ({
       try {
         if (userData) {
           logger.auth("New user setup path.", userData);
-          const { salt: newSalt, key } = await encryptionUtils.deriveKey(password);
-          logger.auth("Generated key and salt for new user.");
+
+          // Always use deterministic key generation for cross-browser consistency
+          // Even for imported salt scenarios, we ensure deterministic derivation
+          const keyData = await encryptionUtils.deriveKey(password);
+          const newSalt = keyData.salt;
+          const key = keyData.key;
+
+          // Log key derivation for cross-browser sync debugging
+          if (import.meta?.env?.MODE === "development") {
+            const saltPreview =
+              Array.from(newSalt.slice(0, 8))
+                .map((b) => b.toString(16).padStart(2, "0"))
+                .join("") + "...";
+            logger.auth("Key derived deterministically for cross-browser sync", {
+              saltPreview,
+              keyType: key.constructor?.name || "unknown",
+            });
+          }
+          logger.auth("Generated/restored key and salt for user.");
+
+          // ALWAYS use deterministic budgetId generation for cross-browser consistency
+          const deterministicBudgetId = await encryptionUtils.generateBudgetId(password);
 
           const finalUserData = {
             ...userData,
-            budgetId: userData.budgetId || encryptionUtils.generateBudgetId(password),
+            budgetId: deterministicBudgetId,
           };
 
           logger.auth("Setting auth state for new user.", {
@@ -61,6 +82,10 @@ export const useAuth = create((set) => ({
           localStorage.setItem("userProfile", JSON.stringify(profileData));
           logger.auth("Saved user profile to localStorage.");
 
+          // Start background sync after successful login
+          const { startBackgroundSyncAfterLogin } = get();
+          await startBackgroundSyncAfterLogin();
+
           return { success: true };
         } else {
           logger.auth("Existing user login path.");
@@ -85,8 +110,46 @@ export const useAuth = create((set) => ({
               error: "Local data is corrupted. Please clear data and start fresh.",
             };
           }
-          const saltArray = new Uint8Array(savedSalt);
-          const key = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
+          // CRITICAL: Use deterministic key generation for cross-browser consistency
+          // Instead of using saved salt, always derive from password
+          const keyData = await encryptionUtils.deriveKey(password);
+          const deterministicSalt = keyData.salt;
+          const key = keyData.key;
+
+          // Debug encryption key derivation for cross-browser sync troubleshooting
+          if (import.meta?.env?.MODE === "development") {
+            const saltPreview =
+              Array.from(deterministicSalt.slice(0, 8))
+                .map((b) => b.toString(16).padStart(2, "0"))
+                .join("") + "...";
+            logger.auth("Using deterministic key derivation for cross-browser sync", {
+              saltPreview,
+              passwordLength: password?.length || 0,
+              keyType: key.constructor?.name || "unknown",
+            });
+          }
+
+          // Debug derived key (safe preview only)
+          let keyPreview = "none";
+          try {
+            // CryptoKey objects cannot be directly viewed as Uint8Array
+            if (key instanceof CryptoKey) {
+              keyPreview = `CryptoKey(${key.algorithm.name})`;
+            } else {
+              // If it's an ArrayBuffer, get first 16 bytes as hex for debugging (safe to log)
+              const keyView = new Uint8Array(key);
+              keyPreview = Array.from(keyView.slice(0, 16))
+                .map((b) => b.toString(16).padStart(2, "0"))
+                .join("");
+            }
+          } catch {
+            keyPreview = "error";
+          }
+
+          logger.auth("Encryption key derived successfully", {
+            keyPreview,
+            keyType: key?.constructor?.name || "unknown",
+          });
 
           const decryptedData = await encryptionUtils.decrypt(encryptedData, key, iv);
           logger.auth("Successfully decrypted local data.");
@@ -111,7 +174,7 @@ export const useAuth = create((set) => ({
               "envelopeBudgetData",
               JSON.stringify({
                 encryptedData: encrypted.data,
-                salt: Array.from(saltArray),
+                salt: Array.from(deterministicSalt),
                 iv: encrypted.iv,
               })
             );
@@ -125,7 +188,7 @@ export const useAuth = create((set) => ({
           });
 
           set({
-            salt: saltArray,
+            salt: deterministicSalt,
             encryptionKey: key,
             currentUser: currentUserData,
             budgetId: currentUserData.budgetId,
@@ -139,6 +202,10 @@ export const useAuth = create((set) => ({
             userColor: currentUserData.userColor,
             accountType: "returning_user",
           });
+
+          // Start background sync after successful login
+          const { startBackgroundSyncAfterLogin } = get();
+          await startBackgroundSyncAfterLogin();
 
           return { success: true, data: migratedData };
         }
@@ -178,6 +245,25 @@ export const useAuth = create((set) => ({
     }));
   },
 
+  async startBackgroundSyncAfterLogin() {
+    try {
+      logger.auth("Starting background sync after successful login");
+
+      // Import UI store to access startBackgroundSync
+      const { useBudgetStore } = await import("./uiStore");
+      const budgetState = useBudgetStore.getState();
+
+      if (budgetState.cloudSyncEnabled) {
+        await budgetState.startBackgroundSync();
+        logger.auth("Background sync started successfully after login");
+      } else {
+        logger.auth("Cloud sync disabled - skipping background sync");
+      }
+    } catch (error) {
+      logger.error("Failed to start background sync after login", error);
+    }
+  },
+
   async changePassword(oldPassword, newPassword) {
     try {
       const savedData = localStorage.getItem("envelopeBudgetData");
@@ -185,9 +271,10 @@ export const useAuth = create((set) => ({
         return { success: false, error: "No saved data found." };
       }
 
-      const { salt: savedSalt, encryptedData, iv } = JSON.parse(savedData);
-      const saltArray = new Uint8Array(savedSalt);
-      const oldKey = await encryptionUtils.deriveKeyFromSalt(oldPassword, saltArray);
+      const { encryptedData, iv } = JSON.parse(savedData);
+      // Use deterministic key derivation for old password
+      const oldKeyData = await encryptionUtils.deriveKey(oldPassword);
+      const oldKey = oldKeyData.key;
 
       const decryptedData = await encryptionUtils.decrypt(encryptedData, oldKey, iv);
 
@@ -198,12 +285,24 @@ export const useAuth = create((set) => ({
         "envelopeBudgetData",
         JSON.stringify({
           encryptedData: encrypted.data,
-          salt: Array.from(newSalt),
+          salt: Array.from(newSalt), // Deterministic salt from new password
           iv: encrypted.iv,
         })
       );
 
       set({ salt: newSalt, encryptionKey: newKey });
+
+      // Log password change for cross-browser sync debugging
+      if (import.meta?.env?.MODE === "development") {
+        const saltPreview =
+          Array.from(newSalt.slice(0, 8))
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("") + "...";
+        logger.auth("Password changed with deterministic key", {
+          saltPreview,
+          keyType: newKey.constructor?.name || "unknown",
+        });
+      }
       return { success: true };
     } catch (error) {
       logger.error("Password change failed.", error);
@@ -272,6 +371,91 @@ export const useAuth = create((set) => ({
     } catch (error) {
       logger.error("Failed to update profile:", error);
       return { success: false, error: error.message };
+    }
+  },
+
+  async validatePassword(password) {
+    try {
+      logger.auth("validatePassword: Starting validation");
+
+      const { encryptionUtils } = await import("../utils/encryption");
+      const authState = useAuth.getState();
+      const savedData = localStorage.getItem("envelopeBudgetData");
+
+      logger.auth("validatePassword: Data check", {
+        hasSavedData: !!savedData,
+        hasAuthSalt: !!authState.salt,
+        hasEncryptionKey: !!authState.encryptionKey,
+        authStateKeys: Object.keys(authState),
+      });
+
+      // If we have no encrypted data saved yet, validate against the current auth salt
+      if (!savedData && authState.salt) {
+        logger.auth("validatePassword: No saved data, validating against auth salt");
+
+        try {
+          const saltArray = new Uint8Array(authState.salt);
+          const testKey = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
+
+          // Compare the derived key with the current encryption key if available
+          if (authState.encryptionKey) {
+            const keysMatch =
+              JSON.stringify(Array.from(testKey)) ===
+              JSON.stringify(Array.from(authState.encryptionKey));
+            logger.auth("validatePassword: Key comparison result", {
+              keysMatch,
+            });
+            return keysMatch;
+          } else {
+            // If no current key, just check if we can derive a key (basic validation)
+            logger.auth("validatePassword: No current key, basic validation passed");
+            return true;
+          }
+        } catch (error) {
+          logger.auth("validatePassword: Auth salt validation failed", {
+            error: error.message,
+          });
+          return false;
+        }
+      }
+
+      // If we have encrypted data, validate against it (original logic)
+      if (savedData && authState.salt) {
+        const parsedData = JSON.parse(savedData);
+        const { salt: savedSalt, encryptedData } = parsedData;
+        const saltArray = new Uint8Array(savedSalt);
+
+        logger.auth("validatePassword: Parsed data", {
+          hasSavedSalt: !!savedSalt,
+          hasEncryptedData: !!encryptedData,
+          saltLength: saltArray.length,
+        });
+
+        // Try to derive the key with the provided password
+        const testKey = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
+
+        logger.auth("validatePassword: Key derived successfully");
+
+        // Try to decrypt actual data to validate password
+        if (encryptedData) {
+          try {
+            await encryptionUtils.decrypt(encryptedData, testKey);
+            logger.auth("validatePassword: Decryption successful - password is correct");
+            return true;
+          } catch (decryptError) {
+            logger.auth("validatePassword: Decryption failed - password is incorrect", {
+              error: decryptError.message,
+            });
+            return false;
+          }
+        }
+      }
+
+      logger.auth("validatePassword: No data to validate against - treating as valid");
+      return true;
+    } catch (error) {
+      logger.error("validatePassword: Unexpected error", error);
+      return false;
     }
   },
 }));

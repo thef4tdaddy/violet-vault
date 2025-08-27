@@ -4,38 +4,29 @@ class Logger {
   constructor() {
     this.isDevelopment = import.meta.env.MODE === "development";
     this.isDevSite = this.getIsDevSite();
+    this.debugThrottles = new Map(); // For throttling frequent debug messages
   }
 
   getIsDevSite() {
     if (typeof window === "undefined") return false;
     return (
       window.location.hostname === "localhost" ||
-      window.location.hostname.startsWith("dev.") ||
+      window.location.hostname.startsWith("dev") ||
+      /^dev\./.test(window.location.hostname) ||
       window.location.hostname.includes("preview") ||
-      window.location.hostname.includes("vercel") ||
       window.location.hostname.includes("127.0.0.1") ||
       window.location.hostname.includes("192.168.") ||
-      // Include Vercel preview deployments
+      // Include Vercel preview deployments but NOT production vercel.app
       window.location.hostname.includes("-git-") ||
-      window.location.hostname.includes(".vercel.app")
+      (window.location.hostname.includes(".vercel.app") &&
+        !window.location.hostname.startsWith("violet-vault.vercel.app"))
     );
   }
 
   // Debug-level logging for development and sync issues
   debug(message, data = {}) {
-    // Always log to console in development or on dev sites
-    // Also log bill-related debug messages on dev site for debugging
-    const isBillRelated =
-      message.includes("Bill") ||
-      message.includes("Envelope") ||
-      message.includes("Form") ||
-      message.includes("Modal") ||
-      data.billId ||
-      data.envelopeId ||
-      data.selectedEnvelope;
-
-    // Show logs in development or on dev/preview sites, and bill-related logs only on dev sites
-    if (this.isDevelopment || (this.isDevSite && isBillRelated)) {
+    // Show debug logs only in development or on dev.* sites
+    if (this.isDevelopment || this.isDevSite) {
       // Use window.originalConsoleLog if available, otherwise regular console.log
       const consoleLog = window.originalConsoleLog || console.log;
       consoleLog(
@@ -44,22 +35,34 @@ class Logger {
       );
     }
 
-    // Highlight.io automatically captures console logs, so just ensure it's tracked
+    // Highlight.io tracking for all debug logs
     try {
       H.track("debug", {
         message: `DEBUG: ${message}`,
         category: "debug",
         ...data,
       });
-    } catch (error) {
-      // Fallback if Highlight.io fails
-      console.error("Highlight.io logging failed:", error);
+    } catch {
+      // Silently fail if highlight.io isn't available
+    }
+  }
+
+  // Throttled debug logging for frequently called functions (like React renders)
+  debugThrottled(message, data = {}, throttleMs = 1000) {
+    const key = message;
+    const now = Date.now();
+    const lastCall = this.debugThrottles.get(key);
+
+    if (!lastCall || now - lastCall > throttleMs) {
+      this.debug(message, data);
+      this.debugThrottles.set(key, now);
     }
   }
 
   // Info-level logging for important events
   info(message, data = {}) {
-    if (this.isDevelopment) {
+    // Show info logs only in development or on dev.* sites
+    if (this.isDevelopment || this.isDevSite) {
       const consoleLog = window.originalConsoleLog || console.log;
       consoleLog(`ℹ️ ${message}`, data);
     }

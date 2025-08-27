@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect } from "react";
 import { encryptionUtils } from "../utils/encryption";
 import { useAuth } from "../stores/authStore.jsx";
+import { useToastHelpers } from "../utils/toastHelpers";
+import logger from "../utils/logger";
 
 /**
  * Custom hook for password rotation management
@@ -8,6 +10,7 @@ import { useAuth } from "../stores/authStore.jsx";
  */
 const usePasswordRotation = () => {
   const { encryptionKey } = useAuth();
+  const { showErrorToast, showSuccessToast } = useToastHelpers();
   const [rotationDue, setRotationDue] = useState(false);
   const [showRotationModal, setShowRotationModal] = useState(false);
   const [newPassword, setNewPassword] = useState("");
@@ -36,7 +39,7 @@ const usePasswordRotation = () => {
 
   const handleRotationPasswordChange = useCallback(async () => {
     if (!newPassword || newPassword !== confirmPassword) {
-      alert("Passwords do not match");
+      showErrorToast("Passwords do not match", "Password Mismatch");
       return;
     }
 
@@ -68,12 +71,12 @@ const usePasswordRotation = () => {
       setRotationDue(false);
       setNewPassword("");
       setConfirmPassword("");
-      alert("Password updated successfully");
+      showSuccessToast("Your password has been successfully updated", "Password Updated");
     } catch (error) {
-      console.error("Failed to change password:", error);
-      alert(`Failed to change password: ${error.message}`);
+      logger.error("Failed to change password:", error);
+      showErrorToast(`Failed to change password: ${error.message}`, "Password Update Failed");
     }
-  }, [newPassword, confirmPassword, encryptionKey]);
+  }, [newPassword, confirmPassword, encryptionKey, showErrorToast, showSuccessToast]);
 
   const dismissRotation = useCallback(() => {
     setShowRotationModal(false);

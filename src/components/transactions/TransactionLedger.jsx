@@ -13,26 +13,34 @@ import { useTransactionForm } from "./hooks/useTransactionForm";
 import { useTransactionImport } from "./hooks/useTransactionImport";
 import { suggestEnvelope } from "./utils/envelopeMatching";
 import { TRANSACTION_CATEGORIES } from "../../constants/categories";
-import { useBudgetStore } from "../../stores/budgetStore";
+import { useBudgetStore } from "../../stores/uiStore";
+import { useTransactions } from "../../hooks/useTransactions";
+import { useEnvelopes } from "../../hooks/useEnvelopes";
+import logger from "../../utils/logger";
 
 const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855f7" } }) => {
-  // Get live data from budget store instead of props
-  const budget = useBudgetStore();
+  // Enhanced TanStack Query integration with caching and optimistic updates
   const {
-    allTransactions: transactions = [],
-    envelopes = [],
+    transactions = [],
     addTransaction,
-    updateTransaction,
     deleteTransaction,
-    setAllTransactions,
-  } = budget;
+    isLoading: transactionsLoading,
+  } = useTransactions();
+
+  const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
+
+  // Removed excessive debug logging that was spamming console (issue #463)
+
+  // Keep Zustand for legacy operations not yet migrated
+  const budget = useBudgetStore();
+  const { updateTransaction, setAllTransactions, updateBill } = budget;
 
   // Handle bulk import by updating both store arrays
   const handleBulkImport = (newTransactions) => {
-    console.log("🔄 Bulk import called with transactions:", newTransactions.length);
+    logger.debug("🔄 Bulk import called with transactions:", newTransactions.length);
     const updatedAllTransactions = [...transactions, ...newTransactions];
     setAllTransactions(updatedAllTransactions);
-    console.log("💾 Bulk import complete. Total transactions:", updatedAllTransactions.length);
+    logger.debug("💾 Bulk import complete. Total transactions:", updatedAllTransactions.length);
   };
   const [showAddModal, setShowAddModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
@@ -62,7 +70,7 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
     handleFileUpload,
     handleImport,
     resetImport,
-  } = useTransactionImport(currentUser, handleBulkImport);
+  } = useTransactionImport(currentUser, handleBulkImport, budget);
 
   const filteredTransactions = useTransactionFilters(
     transactions,
@@ -124,6 +132,22 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
     return suggestEnvelope(description, envelopes);
   };
 
+  const handlePayBill = (billPayment) => {
+    // Update the bill to mark it as paid
+    const billEnvelope = envelopes.find((env) => env.id === billPayment.billId);
+    if (billEnvelope) {
+      const updatedBill = {
+        ...billEnvelope,
+        lastPaidDate: billPayment.paidDate,
+        lastPaidAmount: billPayment.amount,
+        currentBalance: Math.max(0, (billEnvelope.currentBalance || 0) - billPayment.amount),
+        isPaid: true,
+        paidThisPeriod: true,
+      };
+      updateBill(updatedBill);
+    }
+  };
+
   const handleSplitTransaction = async (originalTransaction, splitTransactions) => {
     try {
       // Delete the original transaction
@@ -137,7 +161,7 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
       // Close the modal
       setSplittingTransaction(null);
     } catch (error) {
-      console.error("Error splitting transaction:", error);
+      logger.error("Error splitting transaction:", error);
       // You could add error handling here if needed
     }
   };
@@ -151,6 +175,18 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
     .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
   const netCashFlow = totalIncome - totalExpenses;
+
+  // Show loading state while data is fetching
+  if (transactionsLoading || envelopesLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
+          <div className="h-64 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -182,6 +218,7 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
           <button
             onClick={() => setShowAddModal(true)}
             className="btn btn-primary flex items-center"
+            data-tour="add-transaction"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Transaction
@@ -249,6 +286,7 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
         categories={TRANSACTION_CATEGORIES}
         onSubmit={handleSubmitTransaction}
         suggestEnvelope={handleSuggestEnvelope}
+        onPayBill={handlePayBill}
       />
 
       {/* Import Modal */}
