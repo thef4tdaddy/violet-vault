@@ -39,26 +39,33 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
   const { processPaycheck: tanStackProcessPaycheck, paycheckHistory: tanStackPaycheckHistory } =
     useBudgetData();
 
-  // Diagnostic: Check what useBudgetData is actually returning
+  // TanStack Query data consistency check - force cache refresh if Dexie has data but TanStack doesn't
   const budgetData = useBudgetData();
-  console.log("ViewRenderer - useBudgetData returned:", {
-    envelopes: budgetData.envelopes,
-    envelopesLength: budgetData.envelopes?.length,
-  });
-
-  // Also check Dexie directly
   React.useEffect(() => {
-    const checkDexieData = async () => {
+    const ensureDataConsistency = async () => {
       try {
-        const { budgetDb } = await import("../../db/budgetDb");
-        const dexieEnvelopes = await budgetDb.envelopes.toArray();
-        console.log("Direct Dexie check - envelopes:", dexieEnvelopes.length, dexieEnvelopes);
+        // Only check if we're not currently loading and have no envelope data
+        if (!budgetData.isLoading && (!budgetData.envelopes || budgetData.envelopes.length === 0)) {
+          const { budgetDb } = await import("../../db/budgetDb");
+          const dexieEnvelopes = await budgetDb.envelopes.toArray();
+
+          // If Dexie has data but TanStack doesn't, force cache refresh
+          if (dexieEnvelopes.length > 0) {
+            const { queryClient } = await import("../../utils/queryClient");
+            const { queryKeys } = await import("../../utils/queryClient");
+
+            // Force invalidate and refetch envelope queries
+            queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
+            queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
+            await queryClient.refetchQueries({ queryKey: queryKeys.envelopesList() });
+          }
+        }
       } catch (error) {
-        console.log("Dexie check error:", error);
+        logger.warn("Data consistency check failed", error);
       }
     };
-    checkDexieData();
-  }, []);
+    ensureDataConsistency();
+  }, [budgetData.isLoading, budgetData.envelopes?.length]);
 
   const {
     envelopes,
@@ -147,7 +154,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
 
         <SmartEnvelopeSuggestions
           transactions={safeTransactions}
-          envelopes={envelopes}
+          envelopes={budgetData.envelopes}
           onCreateEnvelope={addEnvelope}
           onUpdateEnvelope={updateEnvelope}
           dateRange="6months"
@@ -174,14 +181,14 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
         onUpdateAccount={updateSupplementalAccount}
         onDeleteAccount={deleteSupplementalAccount}
         onTransferToEnvelope={transferFromSupplementalAccount}
-        envelopes={envelopes}
+        envelopes={budgetData.envelopes}
         currentUser={currentUser}
       />
     ),
     paycheck: (
       <PaycheckProcessor
         biweeklyAllocation={totalBiweeklyNeed}
-        envelopes={envelopes}
+        envelopes={budgetData.envelopes}
         paycheckHistory={tanStackPaycheckHistory}
         onProcessPaycheck={tanStackProcessPaycheck}
         onDeletePaycheck={async (paycheckId) => {
@@ -320,7 +327,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
     bills: (
       <BillManager
         transactions={bills}
-        envelopes={envelopes}
+        envelopes={budgetData.envelopes}
         onPayBill={(updatedBill) => {
           // Handle bill payment properly - mark as paid and update in bills store
           logger.debug("ViewRenderer onPayBill called", {
@@ -376,7 +383,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
       <Suspense fallback={<LoadingSpinner />}>
         <ChartsAndAnalytics
           transactions={safeTransactions}
-          envelopes={envelopes || []}
+          envelopes={budgetData.envelopes || []}
           currentUser={currentUser}
         />
       </Suspense>
