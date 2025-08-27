@@ -16,7 +16,9 @@ const ConnectionDisplay = ({
   if (!isVisible) return null;
 
   return (
-    <div className={`bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-300 rounded-xl p-6 mb-4 ${className}`}>
+    <div
+      className={`bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-300 rounded-xl p-6 mb-4 ${className}`}
+    >
       <div className="flex items-center justify-between mb-4">
         <label className="block text-lg font-bold text-green-800 flex items-center">
           {IconComponent && <IconComponent className="h-6 w-6 mr-3" />}
@@ -61,11 +63,7 @@ export const ConnectionItem = ({
         <div className="font-medium text-green-800">{title}</div>
         {details && <div className="text-sm text-green-700">{details}</div>}
       </div>
-      {badge && (
-        <div className={badgeColors[badgeColor] || badgeColors.green}>
-          {badge}
-        </div>
-      )}
+      {badge && <div className={badgeColors[badgeColor] || badgeColors.green}>{badge}</div>}
     </div>
   );
 };

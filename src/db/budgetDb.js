@@ -39,10 +39,14 @@ export class VioletVaultDB extends Dexie {
       debts: "id, name, creditor, type, status, currentBalance, minimumPayment, lastModified",
 
       // Budget History Tracking tables
-      budgetCommits: "hash, timestamp, message, author, parentHash, deviceFingerprint, [author+timestamp], [timestamp]",
-      budgetChanges: "++id, commitHash, entityType, entityId, changeType, description, [entityType+commitHash], [commitHash]",
-      budgetBranches: "++id, name, description, sourceCommitHash, headCommitHash, author, created, isActive, isMerged, [isActive], [name]",
-      budgetTags: "++id, name, description, commitHash, tagType, author, created, [tagType+created], [commitHash]",
+      budgetCommits:
+        "hash, timestamp, message, author, parentHash, deviceFingerprint, [author+timestamp], [timestamp]",
+      budgetChanges:
+        "++id, commitHash, entityType, entityId, changeType, description, [entityType+commitHash], [commitHash]",
+      budgetBranches:
+        "++id, name, description, sourceCommitHash, headCommitHash, author, created, isActive, isMerged, [isActive], [name]",
+      budgetTags:
+        "++id, name, description, commitHash, tagType, author, created, [tagType+created], [commitHash]",
     });
 
     // Enhanced hooks for automatic timestamping across all tables
