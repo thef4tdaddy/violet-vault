@@ -217,15 +217,25 @@ const PaycheckProcessor = ({
       allocations
     });
 
+    // Create detailed summary for debugging
+    const billCount = billEnvelopes.length;
+    const variableCount = variableEnvelopes.length;
+    const allocatedCount = Object.keys(allocations).length;
+    
     return {
       mode: "allocate",
       totalAmount: amount,
       allocations,
       totalAllocated,
       leftoverAmount: remainingAmount,
-      summary: `$${totalAllocated.toFixed(
-        2
-      )} to envelopes (bills + variable), $${remainingAmount.toFixed(2)} to unassigned`,
+      summary: `$${totalAllocated.toFixed(2)} to ${allocatedCount} envelopes (${billCount} bills, ${variableCount} variable), $${remainingAmount.toFixed(2)} to unassigned`,
+      debugInfo: {
+        totalEnvelopes: envelopes.length,
+        billEnvelopesFound: billCount,
+        variableEnvelopesFound: variableCount,
+        allocatedEnvelopes: allocatedCount,
+        autoAllocateEnvelopes: envelopes.filter(e => e.autoAllocate).length
+      }
     };
   };
 
@@ -535,6 +545,16 @@ const PaycheckProcessor = ({
                   <p className="text-sm text-gray-600 bg-emerald-50 p-3 rounded-xl">
                     {preview.summary}
                   </p>
+                  
+                  {/* Debug info for production troubleshooting */}
+                  {preview.debugInfo && preview.mode === "allocate" && (
+                    <div className="mt-2 text-xs text-gray-500 bg-gray-50 p-2 rounded-lg">
+                      <strong>Allocation Debug:</strong> {preview.debugInfo.totalEnvelopes} total envelopes, 
+                      {preview.debugInfo.autoAllocateEnvelopes} with auto-allocate enabled, 
+                      found {preview.debugInfo.billEnvelopesFound} bills + {preview.debugInfo.variableEnvelopesFound} variable = 
+                      {preview.debugInfo.allocatedEnvelopes} receiving funds
+                    </div>
+                  )}
                 </div>
 
                 {preview.mode === "allocate" && Object.keys(preview.allocations).length > 0 && (
