@@ -2,7 +2,7 @@
   "project": "violet-vault",
   "lastUpdated": "2025-08-27",
   "currentStatus": {
-    "totalWarnings": 25,
+    "totalWarnings": 23,
     "targetWarnings": 17,
     "errors": 0
   },
@@ -47,7 +47,7 @@
           "warnings": 1,
           "details": [
             {
-              "line": 18,
+              "line": 15,
               "message": "'onLinkToBill' is defined but never used"
             }
           ]
@@ -118,7 +118,7 @@
     },
     {
       "type": "no-undef",
-      "count": 3,
+      "count": 1,
       "severity": "warning",
       "files": [
         {
@@ -126,22 +126,8 @@
           "warnings": 1,
           "details": [
             {
-              "line": 694,
+              "line": 691,
               "message": "'setEditingBill' is not defined"
-            }
-          ]
-        },
-        {
-          "path": "src/services/cloudSyncService.js",
-          "warnings": 2,
-          "details": [
-            {
-              "line": 26,
-              "message": "'budgetId' is not defined"
-            },
-            {
-              "line": 40,
-              "message": "'budgetId' is not defined"
             }
           ]
         }
@@ -246,10 +232,9 @@
     "lowPriority": [
       {
         "task": "Fix no-undef warnings",
-        "warningsAffected": 3,
+        "warningsAffected": 1,
         "files": [
-          "AddBillModal.jsx",
-          "cloudSyncService.js"
+          "AddBillModal.jsx"
         ],
         "action": "Review and fix no-undef violations"
       }
