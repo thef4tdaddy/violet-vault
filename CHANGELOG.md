@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.0.0](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.8.0...violet-vault-v2.0.0) (2025-08-27)
+## [1.9.0](https://github.com/thef4tdaddy/violet-vault/compare/violet-vault-v1.8.0...violet-vault-v1.9.0) (2025-08-27)
 
 
 ### ⚠ BREAKING CHANGES
