@@ -1,22 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
-import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  ComposedChart,
-} from "recharts";
+import React, { useState, useCallback } from "react";
 import {
   TrendingUp,
   TrendingDown,
@@ -27,438 +9,53 @@ import {
   ArrowDownRight,
   Wallet,
 } from "lucide-react";
+import {
+  TrendLineChart,
+  CategoryBarChart,
+  DistributionPieChart,
+  DistributionPieChartWithDetails,
+  CashFlowChart,
+  BudgetVsActualChart,
+  useChartConfig,
+} from "../charts";
+import { useAnalyticsData } from "../../hooks/useAnalyticsData";
 import logger from "../../utils/logger";
 
 const ChartsAnalytics = ({
   transactions = [],
   envelopes = [],
   currentUser = { userName: "User", userColor: "#a855f7" },
+  timeFilter = "thisMonth", // New prop for time filtering
+  focus = "overview", // New prop for focused analysis
 }) => {
-  // Validate and sanitize props to prevent runtime errors
-  const safeTransactions = useMemo(
-    () => (Array.isArray(transactions) ? transactions : []),
-    [transactions]
-  );
-  const safeEnvelopes = useMemo(() => (Array.isArray(envelopes) ? envelopes : []), [envelopes]);
+  // Use the extracted analytics data hook
+  const analyticsData = useAnalyticsData({
+    transactions,
+    envelopes,
+    timeFilter,
+  });
 
-  // Date validation helper
-  const isValidDate = useCallback((dateString) => {
-    if (!dateString) return false;
-    const date = new Date(dateString);
-    return date instanceof Date && !isNaN(date) && date.getFullYear() > 1900;
-  }, []);
-
-  // Safe division helper
-  const safeDivision = (numerator, denominator, fallback = 0) => {
-    return denominator === 0 ? fallback : numerator / denominator;
-  };
-  const [activeTab, setActiveTab] = useState("overview");
-  const [dateRange, setDateRange] = useState("6months"); // 1month, 3months, 6months, 1year, all
+  const { formatters } = useChartConfig();
+  const [activeTab, setActiveTab] = useState(focus || "overview");
   const [chartType, setChartType] = useState("line"); // line, bar, area
+  const [dateRange, setDateRange] = useState(timeFilter);
 
-  // Memoized date range calculations
-  const getDateRange = useMemo(() => {
-    const now = new Date();
-    const ranges = {
-      "1month": new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()),
-      "3months": new Date(now.getFullYear(), now.getMonth() - 3, now.getDate()),
-      "6months": new Date(now.getFullYear(), now.getMonth() - 6, now.getDate()),
-      "1year": new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()),
-      all: new Date(2020, 0, 1),
-    };
-    return ranges[dateRange];
-  }, [dateRange]);
-
-  // Filter transactions by date range
-  const filteredTransactions = useMemo(() => {
-    return safeTransactions.filter((t) => {
-      if (!t || !isValidDate(t.date)) return false;
-      try {
-        return new Date(t.date) >= getDateRange;
-      } catch {
-        logger.warn("Invalid date in transaction:", t.date);
-        return false;
-      }
-    });
-  }, [safeTransactions, getDateRange, isValidDate]);
-
-  // Monthly spending trends
-  const monthlyTrends = useMemo(() => {
-    const grouped = {};
-
-    // Additional safety check for filteredTransactions
-    if (!Array.isArray(filteredTransactions) || filteredTransactions.length === 0) {
-      return [
-        {
-          month: new Date().toISOString().slice(0, 7),
-          income: 0,
-          expenses: 0,
-          net: 0,
-          transactionCount: 0,
-        },
-      ];
-    }
-
-    filteredTransactions.forEach((transaction) => {
-      if (
-        !transaction ||
-        !isValidDate(transaction.date) ||
-        typeof transaction.amount !== "number" ||
-        isNaN(transaction.amount)
-      ) {
-        return; // Skip invalid transactions
-      }
-
-      try {
-        const date = new Date(transaction.date);
-        if (isNaN(date.getTime())) {
-          return; // Skip invalid dates
-        }
-
-        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-
-        if (!grouped[monthKey]) {
-          grouped[monthKey] = {
-            month: monthKey,
-            income: 0,
-            expenses: 0,
-            net: 0,
-            transactionCount: 0,
-          };
-        }
-
-        const amount = Number(transaction.amount);
-        if (amount > 0) {
-          grouped[monthKey].income += amount;
-        } else {
-          grouped[monthKey].expenses += Math.abs(amount);
-        }
-
-        grouped[monthKey].net = grouped[monthKey].income - grouped[monthKey].expenses;
-        grouped[monthKey].transactionCount++;
-      } catch (error) {
-        logger.warn("Error processing transaction in monthlyTrends:", transaction, error);
-        return;
-      }
-    });
-
-    const results = Object.values(grouped).sort((a, b) => a.month.localeCompare(b.month));
-
-    // Ensure we always return a valid array with at least one item
-    return results.length > 0
-      ? results.filter((item) => item && typeof item.month === "string")
-      : [
-          {
-            month: new Date().toISOString().slice(0, 7),
-            income: 0,
-            expenses: 0,
-            net: 0,
-            transactionCount: 0,
-          },
-        ];
-  }, [filteredTransactions, isValidDate]);
-
-  // Envelope spending breakdown
-  const envelopeSpending = useMemo(() => {
-    const spending = {};
-
-    // Additional safety checks
-    if (!Array.isArray(filteredTransactions) || !Array.isArray(safeEnvelopes)) {
-      return [];
-    }
-
-    filteredTransactions.forEach((transaction) => {
-      if (
-        !transaction ||
-        typeof transaction.amount !== "number" ||
-        isNaN(transaction.amount) ||
-        transaction.amount >= 0 ||
-        !transaction.envelopeId
-      ) {
-        return; // Skip invalid transactions
-      }
-
-      const envelope = safeEnvelopes.find((e) => e && e.id === transaction.envelopeId);
-      const envelopeName = envelope?.name || "Unknown Envelope";
-
-      if (!spending[envelopeName]) {
-        spending[envelopeName] = {
-          name: envelopeName,
-          amount: 0,
-          count: 0,
-          color: envelope?.color || "#8B5CF6",
-        };
-      }
-
-      const amount = Math.abs(Number(transaction.amount));
-      if (!isNaN(amount)) {
-        spending[envelopeName].amount += amount;
-        spending[envelopeName].count++;
-      }
-    });
-
-    const results = Object.values(spending)
-      .filter((item) => item && typeof item.name === "string" && typeof item.amount === "number")
-      .sort((a, b) => b.amount - a.amount);
-
-    // Ensure we always return a valid array
-    return results.length > 0 ? results : [];
-  }, [filteredTransactions, safeEnvelopes]);
-
-  // Category breakdown
-  const categoryBreakdown = useMemo(() => {
-    const categories = {};
-
-    // Additional safety checks
-    if (!Array.isArray(filteredTransactions)) {
-      return [];
-    }
-
-    filteredTransactions.forEach((transaction) => {
-      if (
-        !transaction ||
-        typeof transaction.amount !== "number" ||
-        isNaN(transaction.amount) ||
-        transaction.amount >= 0
-      ) {
-        return; // Skip invalid transactions
-      }
-
-      const category = transaction.category || "Uncategorized";
-
-      if (!categories[category]) {
-        categories[category] = {
-          name: category,
-          amount: 0,
-          count: 0,
-        };
-      }
-
-      const amount = Math.abs(Number(transaction.amount));
-      if (!isNaN(amount)) {
-        categories[category].amount += amount;
-        categories[category].count++;
-      }
-    });
-
-    return Object.values(categories)
-      .filter((item) => item && typeof item.name === "string" && typeof item.amount === "number")
-      .sort((a, b) => b.amount - a.amount);
-  }, [filteredTransactions]);
-
-  // Weekly spending patterns
-  const weeklyPatterns = useMemo(() => {
-    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    const patterns = days.map((day) => ({ day, amount: 0, count: 0 }));
-
-    // Additional safety checks
-    if (!Array.isArray(filteredTransactions)) {
-      return patterns;
-    }
-
-    filteredTransactions.forEach((transaction) => {
-      if (
-        !transaction ||
-        typeof transaction.amount !== "number" ||
-        isNaN(transaction.amount) ||
-        transaction.amount >= 0 ||
-        !isValidDate(transaction.date)
-      ) {
-        return; // Skip invalid transactions
-      }
-
-      try {
-        const date = new Date(transaction.date);
-        if (isNaN(date.getTime())) {
-          return; // Skip invalid dates
-        }
-
-        const dayIndex = date.getDay();
-        if (dayIndex >= 0 && dayIndex < 7 && patterns[dayIndex]) {
-          const amount = Math.abs(Number(transaction.amount));
-          if (!isNaN(amount)) {
-            patterns[dayIndex].amount += amount;
-            patterns[dayIndex].count++;
-          }
-        }
-      } catch (error) {
-        logger.warn("Invalid date in weeklyPatterns:", transaction.date, error);
-      }
-    });
-
-    return patterns.filter((pattern) => pattern && typeof pattern.day === "string");
-  }, [filteredTransactions, isValidDate]);
-
-  // Envelope health analysis
-  const envelopeHealth = useMemo(() => {
-    // Additional safety checks
-    if (!Array.isArray(safeEnvelopes)) {
-      return [];
-    }
-
-    return safeEnvelopes
-      .filter((envelope) => envelope && typeof envelope === "object" && envelope.name)
-      .map((envelope) => {
-        // Additional null safety check
-        if (!envelope) return null;
-        const monthlyBudget = Number(envelope.monthlyAmount) || 0;
-        const currentBalance = Number(envelope.currentBalance) || 0;
-        const spent = Array.isArray(envelope.spendingHistory)
-          ? envelope.spendingHistory.reduce((sum, s) => {
-              const amount = Number(s?.amount) || 0;
-              return isNaN(amount) ? sum : sum + amount;
-            }, 0)
-          : 0;
-
-        const healthScore = safeDivision(currentBalance, monthlyBudget, 1) * 100;
-        let status = "healthy";
-
-        if (healthScore < 20) status = "critical";
-        else if (healthScore < 50) status = "warning";
-        else if (healthScore > 150) status = "overfunded";
-
-        return {
-          name: envelope.name || "Unknown Envelope",
-          currentBalance: isNaN(currentBalance) ? 0 : currentBalance,
-          monthlyBudget: isNaN(monthlyBudget) ? 0 : monthlyBudget,
-          spent: isNaN(spent) ? 0 : spent,
-          healthScore: Math.max(0, Math.min(200, isNaN(healthScore) ? 0 : healthScore)),
-          status,
-          color: envelope.color || "#8B5CF6",
-        };
-      })
-      .filter(Boolean); // Remove any null values
-  }, [safeEnvelopes]);
-
-  // Budget vs actual analysis
-  const budgetVsActual = useMemo(() => {
-    const analysis = {};
-
-    // Additional safety checks
-    if (!Array.isArray(safeEnvelopes) || !Array.isArray(filteredTransactions)) {
-      return [];
-    }
-
-    safeEnvelopes.forEach((envelope) => {
-      if (envelope && envelope.name) {
-        analysis[envelope.name] = {
-          name: envelope.name,
-          budgeted: Number(envelope.monthlyAmount) || 0,
-          actual: 0,
-          color: envelope.color || "#8B5CF6",
-        };
-      }
-    });
-
-    filteredTransactions.forEach((transaction) => {
-      if (
-        !transaction ||
-        typeof transaction.amount !== "number" ||
-        isNaN(transaction.amount) ||
-        transaction.amount >= 0 ||
-        !transaction.envelopeId
-      ) {
-        return; // Skip invalid transactions
-      }
-
-      const envelope = safeEnvelopes.find((e) => e && e.id === transaction.envelopeId);
-
-      if (envelope && envelope.name && analysis[envelope.name]) {
-        const amount = Math.abs(Number(transaction.amount));
-        if (!isNaN(amount)) {
-          analysis[envelope.name].actual += amount;
-        }
-      }
-    });
-
-    return Object.values(analysis).filter(
-      (item) =>
-        item &&
-        typeof item.name === "string" &&
-        typeof item.budgeted === "number" &&
-        typeof item.actual === "number" &&
-        (item.budgeted > 0 || item.actual > 0)
-    );
-  }, [filteredTransactions, safeEnvelopes]);
-
-  // Financial metrics
-  const metrics = useMemo(() => {
-    // Additional safety checks
-    if (!Array.isArray(filteredTransactions) || !Array.isArray(monthlyTrends)) {
-      return {
-        totalIncome: 0,
-        totalExpenses: 0,
-        netCashFlow: 0,
-        savingsRate: 0,
-        avgMonthlyIncome: 0,
-        avgMonthlyExpenses: 0,
-        transactionCount: 0,
-      };
-    }
-
-    const totalIncome = filteredTransactions
-      .filter((t) => t && typeof t.amount === "number" && !isNaN(t.amount) && t.amount > 0)
-      .reduce((sum, t) => sum + Number(t.amount), 0);
-
-    const totalExpenses = filteredTransactions
-      .filter((t) => t && typeof t.amount === "number" && !isNaN(t.amount) && t.amount < 0)
-      .reduce((sum, t) => sum + Math.abs(Number(t.amount)), 0);
-
-    const savingsRate = safeDivision(totalIncome - totalExpenses, totalIncome, 0) * 100;
-
-    const avgMonthlyIncome =
-      monthlyTrends.length > 0
-        ? safeDivision(
-            monthlyTrends
-              .filter((m) => m && typeof m.income === "number" && !isNaN(m.income))
-              .reduce((sum, m) => sum + m.income, 0),
-            monthlyTrends.length,
-            0
-          )
-        : 0;
-
-    const avgMonthlyExpenses =
-      monthlyTrends.length > 0
-        ? safeDivision(
-            monthlyTrends
-              .filter((m) => m && typeof m.expenses === "number" && !isNaN(m.expenses))
-              .reduce((sum, m) => sum + m.expenses, 0),
-            monthlyTrends.length,
-            0
-          )
-        : 0;
-
-    return {
-      totalIncome: isNaN(totalIncome) ? 0 : totalIncome,
-      totalExpenses: isNaN(totalExpenses) ? 0 : totalExpenses,
-      netCashFlow: isNaN(totalIncome - totalExpenses) ? 0 : totalIncome - totalExpenses,
-      savingsRate: isNaN(savingsRate) ? 0 : savingsRate,
-      avgMonthlyIncome: isNaN(avgMonthlyIncome) ? 0 : avgMonthlyIncome,
-      avgMonthlyExpenses: isNaN(avgMonthlyExpenses) ? 0 : avgMonthlyExpenses,
-      transactionCount: filteredTransactions.length,
-    };
-  }, [filteredTransactions, monthlyTrends]);
-
-  // Memoized chart colors
-  const chartColors = useMemo(
-    () => [
-      "#a855f7",
-      "#06b6d4",
-      "#10b981",
-      "#f59e0b",
-      "#ef4444",
-      "#8b5cf6",
-      "#14b8a6",
-      "#f97316",
-      "#84cc16",
-      "#6366f1",
-    ],
-    []
-  );
+  // Destructure analytics data
+  const {
+    filteredTransactions,
+    monthlyTrends,
+    envelopeSpending,
+    categoryBreakdown,
+    weeklyPatterns,
+    envelopeHealth,
+    budgetVsActual,
+    metrics,
+  } = analyticsData;
 
   // Optimized event handlers
   const handleDateRangeChange = useCallback((e) => {
     setDateRange(e.target.value);
+    logger.debug("Date range changed:", e.target.value);
   }, []);
 
   const handleChartTypeChange = useCallback((type) => {
@@ -532,22 +129,6 @@ const ChartsAnalytics = ({
       </div>
     );
   };
-
-  const CustomTooltip = useCallback(({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-semibold text-gray-900 mb-2">{label}</p>
-          {payload.map((entry, index) => (
-            <p key={index} style={{ color: entry.color }} className="text-sm">
-              {entry.name}: ${entry.value?.toFixed(2)}
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  }, []);
 
   return (
     <div className="space-y-6">
@@ -650,56 +231,17 @@ const ChartsAnalytics = ({
       {activeTab === "overview" && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Monthly Cash Flow */}
-          <div className="glassmorphism rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Monthly Cash Flow</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <ComposedChart data={monthlyTrends}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="month" stroke="#6b7280" />
-                <YAxis stroke="#6b7280" />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
-                <Bar dataKey="income" fill="#10b981" name="Income" />
-                <Bar dataKey="expenses" fill="#ef4444" name="Expenses" />
-                <Line type="monotone" dataKey="net" stroke="#06b6d4" strokeWidth={3} name="Net" />
-              </ComposedChart>
-            </ResponsiveContainer>
-          </div>
+          <CashFlowChart title="Monthly Cash Flow" data={monthlyTrends} height={300} />
 
           {/* Top Spending Envelopes */}
-          <div className="glassmorphism rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Spending Envelopes</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              {envelopeSpending && envelopeSpending.length > 0 ? (
-                <PieChart>
-                  <Pie
-                    data={envelopeSpending.slice(0, 8)}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="amount"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  >
-                    {envelopeSpending &&
-                      envelopeSpending
-                        .slice(0, 8)
-                        .map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color || chartColors[index]} />
-                        ))}
-                  </Pie>
-                  <Tooltip content={<CustomTooltip />} />
-                </PieChart>
-              ) : (
-                <div className="flex items-center justify-center h-full text-gray-500">
-                  <div className="text-center">
-                    <Wallet className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                    <p>No envelope spending data available</p>
-                  </div>
-                </div>
-              )}
-            </ResponsiveContainer>
-          </div>
+          <DistributionPieChart
+            title="Top Spending Envelopes"
+            data={envelopeSpending?.slice(0, 8)}
+            dataKey="amount"
+            nameKey="name"
+            height={300}
+            emptyMessage="No envelope spending data available"
+          />
         </div>
       )}
 
@@ -726,92 +268,47 @@ const ChartsAnalytics = ({
               </div>
             </div>
 
-            <ResponsiveContainer width="100%" height={400}>
-              {chartType === "line" && monthlyTrends && monthlyTrends.length > 0 && (
-                <LineChart data={monthlyTrends}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="month" stroke="#6b7280" />
-                  <YAxis stroke="#6b7280" />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="income"
-                    stroke="#10b981"
-                    strokeWidth={3}
-                    name="Income"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="expenses"
-                    stroke="#ef4444"
-                    strokeWidth={3}
-                    name="Expenses"
-                  />
-                </LineChart>
-              )}
-              {chartType === "bar" && monthlyTrends && monthlyTrends.length > 0 && (
-                <BarChart data={monthlyTrends}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="month" stroke="#6b7280" />
-                  <YAxis stroke="#6b7280" />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend />
-                  <Bar dataKey="income" fill="#10b981" name="Income" />
-                  <Bar dataKey="expenses" fill="#ef4444" name="Expenses" />
-                </BarChart>
-              )}
-              {chartType === "area" && monthlyTrends && monthlyTrends.length > 0 && (
-                <AreaChart data={monthlyTrends}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="month" stroke="#6b7280" />
-                  <YAxis stroke="#6b7280" />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend />
-                  <Area
-                    type="monotone"
-                    dataKey="income"
-                    stackId="1"
-                    stroke="#10b981"
-                    fill="#10b981"
-                    fillOpacity={0.6}
-                    name="Income"
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="expenses"
-                    stackId="2"
-                    stroke="#ef4444"
-                    fill="#ef4444"
-                    fillOpacity={0.6}
-                    name="Expenses"
-                  />
-                </AreaChart>
-              )}
-              {(!monthlyTrends || monthlyTrends.length === 0) && (
-                <div className="flex items-center justify-center h-full text-gray-500">
-                  <div className="text-center">
-                    <BarChart3 className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                    <p>No data available for the selected period</p>
-                  </div>
-                </div>
-              )}
-            </ResponsiveContainer>
+            {chartType === "line" && (
+              <TrendLineChart
+                data={monthlyTrends}
+                lines={[
+                  { dataKey: "income", name: "Income", color: "#10b981" },
+                  { dataKey: "expenses", name: "Expenses", color: "#ef4444" },
+                ]}
+                height={400}
+                emptyMessage="No data available for the selected period"
+              />
+            )}
+
+            {chartType === "bar" && (
+              <CategoryBarChart
+                data={monthlyTrends}
+                bars={[
+                  { dataKey: "income", name: "Income", fill: "#10b981" },
+                  { dataKey: "expenses", name: "Expenses", fill: "#ef4444" },
+                ]}
+                height={400}
+                emptyMessage="No data available for the selected period"
+              />
+            )}
+
+            {chartType === "area" && (
+              <CashFlowChart
+                data={monthlyTrends}
+                height={400}
+                emptyMessage="No data available for the selected period"
+              />
+            )}
           </div>
 
           {/* Weekly Spending Patterns */}
-          <div className="glassmorphism rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Weekly Spending Patterns</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={weeklyPatterns || []}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="day" stroke="#6b7280" />
-                <YAxis stroke="#6b7280" />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="amount" fill="#a855f7" name="Amount Spent" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          <CategoryBarChart
+            title="Weekly Spending Patterns"
+            data={weeklyPatterns}
+            bars={[{ dataKey: "amount", name: "Amount Spent", fill: "#a855f7" }]}
+            height={300}
+            emptyMessage="No weekly spending data available"
+          />
         </div>
       )}
 
@@ -879,90 +376,18 @@ const ChartsAnalytics = ({
           </div>
 
           {/* Budget vs Actual */}
-          <div className="glassmorphism rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Budget vs Actual Spending</h3>
-            <ResponsiveContainer width="100%" height={400}>
-              <BarChart data={budgetVsActual || []} layout="horizontal">
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis type="number" stroke="#6b7280" />
-                <YAxis dataKey="name" type="category" stroke="#6b7280" width={100} />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
-                <Bar dataKey="budgeted" fill="#a855f7" name="Budgeted" />
-                <Bar dataKey="actual" fill="#06b6d4" name="Actual" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          <BudgetVsActualChart data={budgetVsActual} height={400} />
         </div>
       )}
 
       {activeTab === "categories" && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Category Breakdown Pie Chart */}
-          <div className="glassmorphism rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Spending by Category</h3>
-            {categoryBreakdown && categoryBreakdown.length > 0 ? (
-              <ResponsiveContainer width="100%" height={400}>
-                <PieChart>
-                  <Pie
-                    data={categoryBreakdown}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={120}
-                    fill="#8884d8"
-                    dataKey="amount"
-                    label={({ name, percent }) => {
-                      const safeName = name || "Unknown";
-                      const safePercent = typeof percent === "number" ? percent : 0;
-                      return `${safeName} ${(safePercent * 100).toFixed(0)}%`;
-                    }}
-                  >
-                    {(categoryBreakdown || []).map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip content={<CustomTooltip />} />
-                </PieChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="flex items-center justify-center h-96 text-gray-500">
-                <p>No spending data available for category breakdown</p>
-              </div>
-            )}
-          </div>
-
-          {/* Category Details Table */}
-          <div className="glassmorphism rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Category Details</h3>
-            <div className="space-y-3 max-h-96 overflow-y-auto">
-              {(categoryBreakdown || []).map((category, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-3 bg-white/40 rounded-lg"
-                >
-                  <div className="flex items-center">
-                    <div
-                      className="w-4 h-4 rounded-full mr-3"
-                      style={{
-                        backgroundColor: chartColors[index % chartColors.length],
-                      }}
-                    />
-                    <div>
-                      <div className="font-medium text-gray-900">{category.name}</div>
-                      <div className="text-sm text-gray-600">{category.count} transactions</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-bold text-gray-900">${category.amount.toFixed(2)}</div>
-                    <div className="text-sm text-gray-600">
-                      {((category.amount / metrics.totalExpenses) * 100).toFixed(1)}%
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <DistributionPieChartWithDetails
+          title="Spending by Category"
+          data={categoryBreakdown}
+          dataKey="amount"
+          nameKey="name"
+          maxItems={8}
+        />
       )}
     </div>
   );
