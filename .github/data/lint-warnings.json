@@ -125,7 +125,7 @@
           "warnings": 1,
           "details": [
             {
-              "line": 321,
+              "line": 328,
               "message": "'lockId' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
             }
           ]
@@ -239,8 +239,8 @@
           "warnings": 1,
           "details": [
             {
-              "line": 43,
-              "message": "React Hook useEffect has missing dependencies: 'acquireLock' and 'isLocked'. Either include them or remove the dependency array"
+              "line": 54,
+              "message": "React Hook useEffect has a missing dependency: 'acquireLock'. Either include it or remove the dependency array"
             }
           ]
         },
