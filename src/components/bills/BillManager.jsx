@@ -204,7 +204,13 @@ const BillManager = ({
       return {
         ...processedBill,
         // Ensure required fields have valid values
-        amount: typeof bill.amount === "number" ? bill.amount : 0,
+        // Fix for #540: Better amount preservation and fallback logic
+        amount:
+          typeof bill.amount === "number"
+            ? bill.amount
+            : typeof bill.paidAmount === "number" && bill.isPaid
+              ? bill.paidAmount
+              : parseFloat(bill.originalAmount) || 0,
         description: bill.description || bill.provider || `Bill ${bill.id}`,
         isPaid: Boolean(bill.isPaid),
         daysUntilDue,
