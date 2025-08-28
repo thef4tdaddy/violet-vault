@@ -253,7 +253,7 @@ class EditLockService {
   startHeartbeat(lockId) {
     // Stop existing heartbeat for this lock if any
     this.stopHeartbeat(lockId);
-    
+
     const heartbeatInterval = setInterval(async () => {
       try {
         // Update heartbeat in Firebase - using correct path per security rules
@@ -265,7 +265,7 @@ class EditLockService {
           },
           { merge: true }
         );
-        
+
         // Update local cache
         const localLock = this.locks.get(lockId);
         if (localLock) {

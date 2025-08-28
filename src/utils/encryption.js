@@ -90,7 +90,7 @@ export const encryptionUtils = {
         keyType: typeof key,
         hasIv: !!iv,
         ivType: typeof iv,
-        ivLength: iv?.length
+        ivLength: iv?.length,
       });
 
       const decrypted = await crypto.subtle.decrypt(
@@ -108,7 +108,7 @@ export const encryptionUtils = {
         error: error.message,
         errorName: error.name,
         errorType: typeof error,
-        stack: error.stack
+        stack: error.stack,
       });
       throw error;
     }
