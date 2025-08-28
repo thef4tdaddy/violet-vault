@@ -284,20 +284,20 @@ export const useSecurityManager = () => {
       try {
         console.log("🔐 SAFETY LOCK - Attempting password validation...", {
           hasPassword: !!password,
-          passwordLength: password?.length
+          passwordLength: password?.length,
         });
-        
+
         // Validate password against auth store
         const { useAuth } = await import("../stores/authStore");
         const auth = useAuth.getState();
-        
+
         console.log("🔐 SAFETY LOCK - Auth state check:", {
           hasEncryptionKey: !!auth.encryptionKey,
           hasSalt: !!auth.salt,
           hasCurrentUser: !!auth.currentUser,
-          isUnlocked: auth.isUnlocked
+          isUnlocked: auth.isUnlocked,
         });
-        
+
         const isValidPassword = await auth.validatePassword(password);
         console.log("🔐 SAFETY LOCK - Password validation result:", isValidPassword);
 
@@ -324,17 +324,17 @@ export const useSecurityManager = () => {
           message: error.message,
           stack: error.stack,
           name: error.name,
-          type: typeof error
+          type: typeof error,
         });
-        
+
         try {
           logSecurityEvent({
-            type: "UNLOCK_ERROR", 
+            type: "UNLOCK_ERROR",
             description: `Error during unlock attempt: ${error.message}`,
-            metadata: { 
+            metadata: {
               error: error.message,
               errorType: error.name,
-              errorStack: error.stack
+              errorStack: error.stack,
             },
           });
         } catch (logError) {

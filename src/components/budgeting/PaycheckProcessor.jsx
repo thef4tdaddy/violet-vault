@@ -23,14 +23,20 @@ const PaycheckProcessor = ({
 }) => {
   // PRODUCTION DEBUG: Check autoAllocate values since user says all are enabled
   React.useEffect(() => {
-    const autoAllocateCheck = envelopes?.map(e => ({
+    const autoAllocateCheck = envelopes?.map((e) => ({
       name: e?.name,
       autoAllocate: e?.autoAllocate,
-      id: e?.id?.substring(0, 8) + '...'
+      id: e?.id?.substring(0, 8) + "...",
     }));
     console.log("ENVELOPE AUTO-ALLOCATE CHECK:", autoAllocateCheck);
-    console.log("Auto-allocate TRUE count:", envelopes?.filter(e => e?.autoAllocate === true).length);
-    console.log("Auto-allocate FALSE count:", envelopes?.filter(e => e?.autoAllocate === false).length);
+    console.log(
+      "Auto-allocate TRUE count:",
+      envelopes?.filter((e) => e?.autoAllocate === true).length
+    );
+    console.log(
+      "Auto-allocate FALSE count:",
+      envelopes?.filter((e) => e?.autoAllocate === false).length
+    );
   }, [envelopes]);
   const [paycheckAmount, setPaycheckAmount] = useState("");
   const [payerName, setPayerName] = useState(currentUser?.userName || "");
@@ -145,17 +151,18 @@ const PaycheckProcessor = ({
     let totalAllocated = 0;
 
     // PRODUCTION DEBUG: Check filtering details since user says auto-allocate is enabled on all
-    const autoAllocateEnvelopes = envelopes.filter(e => e.autoAllocate);
+    const autoAllocateEnvelopes = envelopes.filter((e) => e.autoAllocate);
     console.log("=== FILTERING DEBUG ===");
     console.log("Envelopes with autoAllocate=true:", autoAllocateEnvelopes.length);
-    autoAllocateEnvelopes.forEach(e => {
+    autoAllocateEnvelopes.forEach((e) => {
       console.log(`- ${e.name}:`, {
-        envelopeType: e.envelopeType, 
+        envelopeType: e.envelopeType,
         category: e.category,
         monthlyBudget: e.monthlyBudget,
         biweeklyAllocation: e.biweeklyAllocation,
-        matchesBillFilter: (e.envelopeType === ENVELOPE_TYPES.BILL || BILL_CATEGORIES.includes(e.category)),
-        matchesVariableFilter: (e.envelopeType === ENVELOPE_TYPES.VARIABLE && e.monthlyBudget > 0)
+        matchesBillFilter:
+          e.envelopeType === ENVELOPE_TYPES.BILL || BILL_CATEGORIES.includes(e.category),
+        matchesVariableFilter: e.envelopeType === ENVELOPE_TYPES.VARIABLE && e.monthlyBudget > 0,
       });
     });
 
@@ -176,8 +183,16 @@ const PaycheckProcessor = ({
     );
 
     console.log("FINAL FILTER RESULTS:");
-    console.log("Bill envelopes:", billEnvelopes.length, billEnvelopes.map(e => e.name));
-    console.log("Variable envelopes:", variableEnvelopes.length, variableEnvelopes.map(e => e.name));
+    console.log(
+      "Bill envelopes:",
+      billEnvelopes.length,
+      billEnvelopes.map((e) => e.name)
+    );
+    console.log(
+      "Variable envelopes:",
+      variableEnvelopes.length,
+      variableEnvelopes.map((e) => e.name)
+    );
     console.log("=== END DEBUG ===");
 
     // Debug logging to understand allocation issues
