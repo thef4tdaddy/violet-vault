@@ -1,6 +1,20 @@
 name: Release Please
 
 on:
+  # Manual trigger for immediate releases
+  workflow_dispatch:
+    inputs:
+      force_release:
+        description: 'Force release even if major/minor'
+        required: false
+        default: false
+        type: boolean
+  
+  # Daily automated check for patch releases only
+  schedule:
+    - cron: '0 10 * * *'  # 10 AM UTC daily
+  
+  # Also run on push to main for immediate patch releases
   push:
     branches:
       - main
@@ -11,8 +25,65 @@ permissions:
   issues: write
 
 jobs:
-  release-please:
+  # First job: Check what type of release would be created
+  check-release-type:
     runs-on: ubuntu-latest
+    outputs:
+      should-auto-release: ${{ steps.check.outputs.should-auto-release }}
+      release-type: ${{ steps.check.outputs.release-type }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Check release type
+        id: check
+        run: |
+          # Get the latest tag
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "Latest tag: $LATEST_TAG"
+          
+          # Get commits since last release
+          COMMITS_SINCE=$(git log --oneline ${LATEST_TAG}..HEAD --format="%s" | head -20)
+          echo "Recent commits:"
+          echo "$COMMITS_SINCE"
+          
+          # Check for breaking changes or major features
+          HAS_BREAKING=$(echo "$COMMITS_SINCE" | grep -i "BREAKING CHANGE\|!" || true)
+          HAS_MAJOR_FEAT=$(echo "$COMMITS_SINCE" | grep -E "^feat(\([^)]*\))?!:" || true)
+          HAS_FEAT=$(echo "$COMMITS_SINCE" | grep -E "^feat(\([^)]*\))?:" || true)
+          HAS_FIX=$(echo "$COMMITS_SINCE" | grep -E "^fix(\([^)]*\))?:" || true)
+          
+          # Determine release type
+          if [ -n "$HAS_BREAKING" ] || [ -n "$HAS_MAJOR_FEAT" ]; then
+            RELEASE_TYPE="major"
+          elif [ -n "$HAS_FEAT" ]; then
+            RELEASE_TYPE="minor" 
+          elif [ -n "$HAS_FIX" ]; then
+            RELEASE_TYPE="patch"
+          else
+            RELEASE_TYPE="none"
+          fi
+          
+          echo "Detected release type: $RELEASE_TYPE"
+          echo "release-type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
+          
+          # Only auto-release patches, or if forced
+          if [ "$RELEASE_TYPE" = "patch" ] || [ "${{ github.event.inputs.force_release }}" = "true" ]; then
+            echo "should-auto-release=true" >> $GITHUB_OUTPUT
+            echo "Will proceed with automatic release"
+          else
+            echo "should-auto-release=false" >> $GITHUB_OUTPUT 
+            if [ "$RELEASE_TYPE" != "none" ]; then
+              echo "::warning::$RELEASE_TYPE release detected but automatic release is disabled. Use workflow_dispatch with force_release=true to release manually."
+            fi
+          fi
+
+  # Second job: Create release (only if auto-release is approved)
+  release-please:
+    needs: check-release-type
+    runs-on: ubuntu-latest
+    if: needs.check-release-type.outputs.should-auto-release == 'true'
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
@@ -23,6 +94,13 @@ jobs:
         with:
           config-file: configs/release-please-config.json
           manifest-file: .release-please-manifest.json
+      
+      - name: Release Summary
+        if: steps.release.outputs.release_created
+        run: |
+          echo "🚀 Release created: ${{ steps.release.outputs.tag_name }}"
+          echo "📦 Package: violet-vault"
+          echo "🔄 Type: ${{ needs.check-release-type.outputs.release-type }}"
 
   # Build and deploy when a release is created
   build-and-deploy:
@@ -56,3 +134,86 @@ jobs:
         with:
           name: dist-${{ needs.release-please.outputs.tag_name }}
           path: dist/
+
+  # Third job: Notify about blocked releases  
+  notify-blocked:
+    needs: check-release-type
+    runs-on: ubuntu-latest
+    if: needs.check-release-type.outputs.should-auto-release == 'false' && needs.check-release-type.outputs.release-type != 'none'
+    steps:
+      - name: Create Issue for Manual Release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const releaseType = '${{ needs.check-release-type.outputs.release-type }}';
+            const title = `🚨 Manual Release Required: ${releaseType} version detected`;
+            const body = `
+            ## Manual Release Required
+            
+            A **${releaseType}** release has been detected but automatic releases are only enabled for patch versions.
+            
+            ### What to do:
+            1. Review the pending changes carefully
+            2. Run the "Release Please" workflow manually with \`force_release=true\` when ready
+            3. Or wait for patch-level changes to accumulate before releasing
+            
+            ### Release Type: \`${releaseType}\`
+            
+            **Why this requires manual approval:**
+            - \`patch\`: Bug fixes (auto-released ✅)  
+            - \`minor\`: New features (manual approval required ⚠️)
+            - \`major\`: Breaking changes (manual approval required ⚠️)
+            
+            This issue will be automatically closed when a release is created.
+            `;
+            
+            // Check if issue already exists
+            const existingIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['automated-release-blocked'],
+              state: 'open'
+            });
+            
+            if (existingIssues.data.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['automated-release-blocked', 'release-management']
+              });
+            }
+
+  # Fourth job: Clean up old release notification issues
+  cleanup-notifications:
+    needs: release-please
+    runs-on: ubuntu-latest
+    if: needs.release-please.outputs.release_created
+    steps:
+      - name: Close release notification issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['automated-release-blocked'],
+              state: 'open'
+            });
+            
+            for (const issue of issues.data) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed'
+              });
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `✅ Release ${{ needs.release-please.outputs.tag_name }} has been created. Closing this notification.`
+              });
+            }
