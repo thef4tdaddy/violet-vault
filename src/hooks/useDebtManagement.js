@@ -58,16 +58,11 @@ export const useDebtManagement = () => {
 
       // Find related transactions
       const relatedTransactions = transactions.filter(
-        (transaction) => transaction.debtId === debt.id,
+        (transaction) => transaction.debtId === debt.id
       );
 
       // Enrich the debt with calculated properties
-      const enrichedDebt = enrichDebt(
-        debt,
-        relatedBill,
-        relatedEnvelope,
-        relatedTransactions,
-      );
+      const enrichedDebt = enrichDebt(debt, relatedBill, relatedEnvelope, relatedTransactions);
 
       // Log first debt enrichment details
       if (index === 0) {
@@ -119,10 +114,7 @@ export const useDebtManagement = () => {
         dueSoonAmount: 0,
         dueSoonCount: 0,
       };
-      logger.debug(
-        "📊 Using empty debt stats (no enriched debts):",
-        emptyStats,
-      );
+      logger.debug("📊 Using empty debt stats (no enriched debts):", emptyStats);
       return emptyStats;
     }
 
@@ -327,9 +319,9 @@ export const useDebtManagement = () => {
       if (!debtId) {
         throw new Error("Debt ID is required for update");
       }
-      
+
       logger.debug("Updating debt:", { debtId, updates, author });
-      
+
       return await updateDebtData({
         id: debtId,
         updates,

@@ -52,17 +52,20 @@ This implements the foundation of the Universal OCR System as outlined in GitHub
 ## 🎯 Key Features
 
 ### Privacy & Security
+
 - ✅ **Client-side only**: All OCR processing happens in the browser
 - ✅ **No cloud services**: Never sends images to external APIs
 - ✅ **Encrypted storage**: Receipt data stored in encrypted IndexedDB
 
 ### User Experience
+
 - ✅ **Mobile-first**: Camera capture support for mobile devices
 - ✅ **Drag & drop**: Desktop-friendly file upload
 - ✅ **Progressive enhancement**: Works without OCR if needed
 - ✅ **Smart defaults**: Auto-fills form fields from extracted data
 
 ### Technical Performance
+
 - ✅ **Lazy loading**: OCR worker initialized on first use
 - ✅ **Bundle optimization**: +43KB for full OCR functionality
 - ✅ **Error handling**: Graceful degradation for failed processing
@@ -73,17 +76,20 @@ This implements the foundation of the Universal OCR System as outlined in GitHub
 The OCR system recognizes these patterns from receipts:
 
 ### Financial Data
+
 - **Total amounts**: `total: $25.99`, `amount: $25.99`
-- **Tax**: `tax: $2.08`, `sales tax: $2.08`  
+- **Tax**: `tax: $2.08`, `sales tax: $2.08`
 - **Subtotal**: `subtotal: $23.91`
 - **Date formats**: `12/25/2023`, `Dec 25, 2023`, `2023-12-25`
 
-### Merchant Detection  
+### Merchant Detection
+
 - **All caps lines**: `WALMART SUPERCENTER`
 - **Title case**: `Target Store #1234`
 - **Common patterns**: Filters out obvious non-merchant text
 
 ### Line Items
+
 - **Item + price**: `Bananas $3.45`
 - **Filtering**: Removes totals, taxes, and system text
 - **Quantity detection**: Basic quantity/price parsing
@@ -91,16 +97,19 @@ The OCR system recognizes these patterns from receipts:
 ## 🔗 Integration Points
 
 ### Transaction System
+
 - Creates transaction with extracted receipt data
 - Links receipt to transaction for audit trail
 - Supports editing extracted data before saving
 
-### Envelope System  
+### Envelope System
+
 - Smart envelope suggestions based on merchant
 - Category auto-detection for common merchants
 - Balance checking before transaction creation
 
 ### Analytics Integration
+
 - Receipt data contributes to spending analytics
 - Merchant-based categorization for insights
 - Historical receipt search and filtering
@@ -108,32 +117,34 @@ The OCR system recognizes these patterns from receipts:
 ## 🚀 Usage Examples
 
 ### Basic Receipt Scan
+
 ```jsx
-import ReceiptButton from './components/receipts/ReceiptButton';
+import ReceiptButton from "./components/receipts/ReceiptButton";
 
 // Simple button integration
-<ReceiptButton 
+<ReceiptButton
   onTransactionCreated={(transaction, receipt) => {
-    console.log('Receipt processed:', receipt);
-    console.log('Transaction created:', transaction);
+    console.log("Receipt processed:", receipt);
+    console.log("Transaction created:", transaction);
   }}
-/>
+/>;
 ```
 
 ### Custom Integration
+
 ```jsx
-import { processReceiptImage } from './utils/ocrProcessor';
+import { processReceiptImage } from "./utils/ocrProcessor";
 
 const handleReceiptUpload = async (file) => {
   try {
     const result = await processReceiptImage(file);
-    console.log('Extracted data:', result);
-    
+    console.log("Extracted data:", result);
+
     if (result.total && result.merchant) {
       // Create transaction automatically
     }
   } catch (error) {
-    console.error('OCR failed:', error);
+    console.error("OCR failed:", error);
   }
 };
 ```

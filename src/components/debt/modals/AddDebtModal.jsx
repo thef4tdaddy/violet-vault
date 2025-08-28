@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { X, CreditCard, Wallet, Receipt, Lock, Unlock, User, Clock } from "lucide-react";
-import ConnectionDisplay, { ConnectionItem, ConnectionInfo } from "../../../components/ui/ConnectionDisplay";
+import ConnectionDisplay, {
+  ConnectionItem,
+  ConnectionInfo,
+} from "../../../components/ui/ConnectionDisplay";
 import useEditLock from "../../../hooks/useEditLock";
 import { initializeEditLocks } from "../../../services/editLockService";
 import { useAuth } from "../../../stores/authStore";
@@ -520,7 +523,7 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                   icon={Receipt}
                   title="Connected Bill"
                   details={`${connectedBill.name} • $${connectedBill.amount?.toFixed(2) || "0.00"}${
-                    connectedBill.dueDate 
+                    connectedBill.dueDate
                       ? ` • Due: ${new Date(connectedBill.dueDate).toLocaleDateString()}`
                       : ""
                   }`}
@@ -539,8 +542,9 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
             </div>
 
             <ConnectionInfo>
-              📝 <strong>Connected!</strong> This debt is linked to your payment system. Changes to the
-              bill's due date or amount will sync automatically. Use the disconnect button above to change connections.
+              📝 <strong>Connected!</strong> This debt is linked to your payment system. Changes to
+              the bill's due date or amount will sync automatically. Use the disconnect button above
+              to change connections.
             </ConnectionInfo>
           </ConnectionDisplay>
 
@@ -552,133 +556,133 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
                 Payment Setup
               </h4>
 
-            {/* Payment Method Radio Buttons - SIMPLIFIED UX */}
-            <div className="space-y-2">
-              {/* Create New Option */}
-              <div className="glassmorphism border-2 border-white/20 rounded-xl p-3">
-                <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
-                  <input
-                    type="radio"
-                    id="create_new"
-                    name="paymentMethod"
-                    value="create_new"
-                    checked={formData.paymentMethod === "create_new"}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        paymentMethod: e.target.value,
-                      })
-                    }
-                    className="w-4 h-4 text-purple-600 mt-0.5 justify-self-start"
-                  />
-                  <div>
-                    <div className="flex items-center mb-1">
-                      <Receipt className="h-4 w-4 mr-2 text-blue-600" />
-                      <span className="font-medium text-sm">Create new envelope and bill</span>
+              {/* Payment Method Radio Buttons - SIMPLIFIED UX */}
+              <div className="space-y-2">
+                {/* Create New Option */}
+                <div className="glassmorphism border-2 border-white/20 rounded-xl p-3">
+                  <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
+                    <input
+                      type="radio"
+                      id="create_new"
+                      name="paymentMethod"
+                      value="create_new"
+                      checked={formData.paymentMethod === "create_new"}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          paymentMethod: e.target.value,
+                        })
+                      }
+                      className="w-4 h-4 text-purple-600 mt-0.5 justify-self-start"
+                    />
+                    <div>
+                      <div className="flex items-center mb-1">
+                        <Receipt className="h-4 w-4 mr-2 text-blue-600" />
+                        <span className="font-medium text-sm">Create new envelope and bill</span>
+                      </div>
+                      <p className="text-xs text-gray-600 leading-tight">
+                        Automatically create a new envelope and bill for this debt payment
+                      </p>
                     </div>
-                    <p className="text-xs text-gray-600 leading-tight">
-                      Automatically create a new envelope and bill for this debt payment
-                    </p>
+                  </div>
+                </div>
+
+                {/* Connect Existing Bill Option - AUTO-USES BILL'S ENVELOPE */}
+                <div className="glassmorphism border-2 border-white/20 rounded-xl p-3">
+                  <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
+                    <input
+                      type="radio"
+                      id="connect_existing_bill"
+                      name="paymentMethod"
+                      value="connect_existing_bill"
+                      checked={formData.paymentMethod === "connect_existing_bill"}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          paymentMethod: e.target.value,
+                        })
+                      }
+                      className="w-4 h-4 text-blue-600 mt-0.5 justify-self-start"
+                    />
+                    <div>
+                      <div className="flex items-center mb-1">
+                        <Receipt className="h-4 w-4 mr-2 text-blue-600" />
+                        <span className="font-medium text-sm">Connect to existing bill</span>
+                      </div>
+                      <p className="text-xs text-gray-600 leading-tight">
+                        Link to an existing bill and automatically use its envelope for funding
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Connect Existing Bill Option - AUTO-USES BILL'S ENVELOPE */}
-              <div className="glassmorphism border-2 border-white/20 rounded-xl p-3">
-                <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
-                  <input
-                    type="radio"
-                    id="connect_existing_bill"
-                    name="paymentMethod"
-                    value="connect_existing_bill"
-                    checked={formData.paymentMethod === "connect_existing_bill"}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        paymentMethod: e.target.value,
-                      })
-                    }
-                    className="w-4 h-4 text-blue-600 mt-0.5 justify-self-start"
-                  />
+              {/* Create New: Envelope Name Input */}
+              {formData.paymentMethod === "create_new" && (
+                <div className="space-y-4 pl-7 border-l-2 border-blue-200">
                   <div>
-                    <div className="flex items-center mb-1">
-                      <Receipt className="h-4 w-4 mr-2 text-blue-600" />
-                      <span className="font-medium text-sm">Connect to existing bill</span>
-                    </div>
-                    <p className="text-xs text-gray-600 leading-tight">
-                      Link to an existing bill and automatically use its envelope for funding
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      New Envelope Name
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.newEnvelopeName || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          newEnvelopeName: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      placeholder={formData.name ? `${formData.name} Payment` : "Debt Payment"}
+                    />
+                    <p className="mt-1 text-xs text-gray-500">
+                      A new envelope will be created to fund this debt's payments
                     </p>
                   </div>
                 </div>
-              </div>
-            </div>
+              )}
 
-            {/* Create New: Envelope Name Input */}
-            {formData.paymentMethod === "create_new" && (
-              <div className="space-y-4 pl-7 border-l-2 border-blue-200">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    New Envelope Name
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.newEnvelopeName || ""}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        newEnvelopeName: e.target.value,
-                      })
-                    }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    placeholder={formData.name ? `${formData.name} Payment` : "Debt Payment"}
-                  />
-                  <p className="mt-1 text-xs text-gray-500">
-                    A new envelope will be created to fund this debt's payments
-                  </p>
+              {/* Connect Existing Bill: Bill Selection - AUTO-USES BILL'S ENVELOPE */}
+              {formData.paymentMethod === "connect_existing_bill" && (
+                <div className="space-y-4 pl-7 border-l-2 border-blue-200">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Existing Bill
+                    </label>
+                    <select
+                      value={formData.existingBillId}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          existingBillId: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      disabled={billsLoading}
+                    >
+                      <option value="">
+                        {billsLoading ? "Loading bills..." : "Select existing bill..."}
+                      </option>
+                      {!billsLoading &&
+                        bills
+                          .filter((bill) => !bill.debtId) // Only show bills not already linked to debts
+                          .map((bill) => (
+                            <option key={bill.id} value={bill.id}>
+                              📋 {bill.name} (${bill.amount?.toFixed(2) || "0.00"}
+                              {bill.dueDate &&
+                                ` • Due: ${new Date(bill.dueDate).toLocaleDateString()}`}
+                              )
+                            </option>
+                          ))}
+                    </select>
+                    <p className="mt-1 text-xs text-gray-500">
+                      Choose which existing bill to link to this debt. The bill's due date, amount,
+                      and envelope will sync automatically.
+                    </p>
+                  </div>
                 </div>
-              </div>
-            )}
-
-            {/* Connect Existing Bill: Bill Selection - AUTO-USES BILL'S ENVELOPE */}
-            {formData.paymentMethod === "connect_existing_bill" && (
-              <div className="space-y-4 pl-7 border-l-2 border-blue-200">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Existing Bill
-                  </label>
-                  <select
-                    value={formData.existingBillId}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        existingBillId: e.target.value,
-                      })
-                    }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    disabled={billsLoading}
-                  >
-                    <option value="">
-                      {billsLoading ? "Loading bills..." : "Select existing bill..."}
-                    </option>
-                    {!billsLoading &&
-                      bills
-                        .filter((bill) => !bill.debtId) // Only show bills not already linked to debts
-                        .map((bill) => (
-                          <option key={bill.id} value={bill.id}>
-                            📋 {bill.name} (${bill.amount?.toFixed(2) || "0.00"}
-                            {bill.dueDate &&
-                              ` • Due: ${new Date(bill.dueDate).toLocaleDateString()}`}
-                            )
-                          </option>
-                        ))}
-                  </select>
-                  <p className="mt-1 text-xs text-gray-500">
-                    Choose which existing bill to link to this debt. The bill's due date, amount,
-                    and envelope will sync automatically.
-                  </p>
-                </div>
-              </div>
-            )}
+              )}
             </div>
           )}
 

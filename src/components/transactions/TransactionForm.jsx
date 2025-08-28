@@ -431,7 +431,7 @@ const TransactionForm = ({
                 <ReceiptButton
                   variant="secondary"
                   onTransactionCreated={(transaction) => {
-                    logger.info('Transaction created from receipt in form', transaction);
+                    logger.info("Transaction created from receipt in form", transaction);
                     onClose(); // Close the form since transaction was created
                   }}
                 />
