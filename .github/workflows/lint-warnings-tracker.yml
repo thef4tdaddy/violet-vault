@@ -1,6 +1,11 @@
 name: Lint Warnings Tracker
 
 on:
+  # Run hourly to track lint warnings
+  schedule:
+    - cron: "0 * * * *" # Every hour at minute 0
+
+  # Keep PR checks for validation
   pull_request:
     branches: [main, develop]
     paths:
@@ -10,15 +15,9 @@ on:
       - "*.jsx"
       - "*.ts"
       - "*.tsx"
-  push:
-    branches: [main, develop]
-    paths:
-      - "src/**"
-      - "scripts/**"
-      - "*.js"
-      - "*.jsx"
-      - "*.ts"
-      - "*.tsx"
+
+  # Manual trigger option
+  workflow_dispatch:
 
 jobs:
   lint-warnings:
