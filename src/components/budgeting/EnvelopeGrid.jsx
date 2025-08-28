@@ -152,6 +152,8 @@ const UnifiedEnvelopeManager = ({
 
   return (
     <div className={`space-y-6 ${className}`}>
+      <EnvelopeSummary totals={totals} />
+      
       <EnvelopeHeader
         filterOptions={filterOptions}
         setFilterOptions={setFilterOptions}
@@ -159,8 +161,6 @@ const UnifiedEnvelopeManager = ({
         viewMode={viewMode}
         setViewMode={setViewMode}
       />
-
-      <EnvelopeSummary totals={totals} />
 
       {/* Envelopes Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

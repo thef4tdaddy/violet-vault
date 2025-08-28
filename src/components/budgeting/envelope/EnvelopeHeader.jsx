@@ -26,9 +26,9 @@ const EnvelopeHeader = ({
               </svg>
             </div>
           </div>
-          Envelope Management
+          Budget Envelopes
         </h2>
-        <p className="text-gray-600 mt-1">Track spending with virtual envelopes</p>
+        <p className="text-gray-600 mt-1">Organize your money into spending categories</p>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
@@ -47,7 +47,6 @@ const EnvelopeHeader = ({
             <option value="all">All Types</option>
             <option value={ENVELOPE_TYPES.BILL}>Bills</option>
             <option value={ENVELOPE_TYPES.VARIABLE}>Variable</option>
-            <option value={ENVELOPE_TYPES.SAVINGS}>Savings</option>
           </select>
 
           <select
@@ -71,9 +70,10 @@ const EnvelopeHeader = ({
             value={viewMode}
             onChange={(e) => setViewMode(e.target.value)}
             className="px-2 py-1 border border-gray-300 rounded text-xs"
+            title="Choose how much information to show for each envelope"
           >
-            <option value="overview">Overview</option>
-            <option value="detailed">Detailed View</option>
+            <option value="overview">Compact Cards</option>
+            <option value="detailed">Expanded Cards</option>
           </select>
 
           <label className="flex items-center text-xs">
