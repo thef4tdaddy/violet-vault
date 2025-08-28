@@ -63,15 +63,21 @@ const useConnectionManager = (entityType, entityId) => {
     switch (entityType) {
       case "bill":
         // Bills can connect to envelopes that aren't connected to other bills (or this one)
-        return envelopes.filter((envelope) => !envelope.billId || envelope.billId === entityId);
+        return envelopes.filter(
+          (envelope) => !envelope.billId || envelope.billId === entityId,
+        );
 
       case "envelope":
         // Envelopes can connect to bills that aren't connected to other envelopes (or this one)
-        return bills.filter((bill) => !bill.envelopeId || bill.envelopeId === entityId);
+        return bills.filter(
+          (bill) => !bill.envelopeId || bill.envelopeId === entityId,
+        );
 
       case "debt":
         // Debts can connect to envelopes that aren't connected to other debts (or this one)
-        return envelopes.filter((envelope) => !envelope.debtId || envelope.debtId === entityId);
+        return envelopes.filter(
+          (envelope) => !envelope.debtId || envelope.debtId === entityId,
+        );
 
       default:
         return [];
@@ -124,8 +130,11 @@ const useConnectionManager = (entityType, entityId) => {
 
         case "debt":
           // Connect debt to envelope
-          const targetEnvelopeForDebt = envelopes.find((e) => e.id === targetId);
-          if (!targetEnvelopeForDebt) throw new Error("Target envelope not found");
+          const targetEnvelopeForDebt = envelopes.find(
+            (e) => e.id === targetId,
+          );
+          if (!targetEnvelopeForDebt)
+            throw new Error("Target envelope not found");
 
           await updateDebt({ id: entityId, updates: { envelopeId: targetId } });
 
@@ -142,10 +151,18 @@ const useConnectionManager = (entityType, entityId) => {
       }
 
       setSelectedConnectionId("");
-      logger.debug("✅ Connection created successfully", { entityType, entityId, targetId });
+      logger.debug("✅ Connection created successfully", {
+        entityType,
+        entityId,
+        targetId,
+      });
       return { success: true };
     } catch (error) {
-      logger.error("❌ Failed to create connection", error, { entityType, entityId, targetId });
+      logger.error("❌ Failed to create connection", error, {
+        entityType,
+        entityId,
+        targetId,
+      });
       addToast({
         type: "error",
         title: "Connection Failed",
@@ -160,7 +177,8 @@ const useConnectionManager = (entityType, entityId) => {
 
   // Handle connection removal
   const handleDisconnect = async () => {
-    if (!currentEntity || currentConnections.length === 0) return { success: false };
+    if (!currentEntity || currentConnections.length === 0)
+      return { success: false };
 
     setIsConnecting(true);
     logger.debug("🔗 Removing connection", {
@@ -187,7 +205,9 @@ const useConnectionManager = (entityType, entityId) => {
           // Remove all bills connected to this envelope
           const connectedBillIds = currentConnections.map((c) => c.id);
           await Promise.all(
-            connectedBillIds.map((billId) => updateBill(billId, { envelopeId: null }))
+            connectedBillIds.map((billId) =>
+              updateBill(billId, { envelopeId: null }),
+            ),
           );
 
           addToast({
@@ -214,10 +234,16 @@ const useConnectionManager = (entityType, entityId) => {
           throw new Error(`Unknown entity type: ${entityType}`);
       }
 
-      logger.debug("✅ Connection removed successfully", { entityType, entityId });
+      logger.debug("✅ Connection removed successfully", {
+        entityType,
+        entityId,
+      });
       return { success: true };
     } catch (error) {
-      logger.error("❌ Failed to remove connection", error, { entityType, entityId });
+      logger.error("❌ Failed to remove connection", error, {
+        entityType,
+        entityId,
+      });
       addToast({
         type: "error",
         title: "Disconnection Failed",
@@ -273,10 +299,16 @@ const useConnectionManager = (entityType, entityId) => {
           duration: 3000,
         });
 
-        logger.debug("✅ Envelope auto-populated", { envelopeId: entityId, updates });
+        logger.debug("✅ Envelope auto-populated", {
+          envelopeId: entityId,
+          updates,
+        });
       }
     } catch (error) {
-      logger.error("❌ Failed to auto-populate envelope", error, { envelopeId: entityId, billId });
+      logger.error("❌ Failed to auto-populate envelope", error, {
+        envelopeId: entityId,
+        billId,
+      });
     }
   };
 
