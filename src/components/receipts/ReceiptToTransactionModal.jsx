@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Receipt, DollarSign, Calendar, Building, FileText, ArrowRight, Check } from 'lucide-react';
-import { useReceipts } from '../../hooks/useReceipts';
-import { useTransactions } from '../../hooks/useTransactions';
-import { useEnvelopes } from '../../hooks/useEnvelopes';
-import logger from '../../utils/logger';
+import React, { useState, useEffect } from "react";
+import { Receipt, DollarSign, Calendar, Building, FileText, ArrowRight, Check } from "lucide-react";
+import { useReceipts } from "../../hooks/useReceipts";
+import { useTransactions } from "../../hooks/useTransactions";
+import { useEnvelopes } from "../../hooks/useEnvelopes";
+import logger from "../../utils/logger";
 
 /**
  * Modal for converting receipt data into a transaction
@@ -15,15 +15,15 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
   const { envelopes } = useEnvelopes();
 
   const [transactionForm, setTransactionForm] = useState({
-    description: receiptData.merchant || '',
+    description: receiptData.merchant || "",
     amount: receiptData.total || 0,
-    date: receiptData.date || new Date().toISOString().split('T')[0],
-    envelopeId: '',
-    category: 'shopping',
-    type: 'expense',
-    notes: '',
+    date: receiptData.date || new Date().toISOString().split("T")[0],
+    envelopeId: "",
+    category: "shopping",
+    type: "expense",
+    notes: "",
   });
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState(1); // 1: Edit data, 2: Select envelope, 3: Confirm
 
@@ -31,25 +31,26 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
   useEffect(() => {
     if (receiptData.merchant && envelopes.length > 0) {
       const merchant = receiptData.merchant.toLowerCase();
-      
+
       // Simple merchant-to-envelope matching
       const suggestions = [
-        { keywords: ['walmart', 'target', 'grocery', 'food', 'market'], category: 'groceries' },
-        { keywords: ['gas', 'shell', 'exxon', 'chevron', 'fuel'], category: 'transportation' },
-        { keywords: ['restaurant', 'mcdonald', 'pizza', 'cafe', 'dining'], category: 'dining' },
-        { keywords: ['pharmacy', 'cvs', 'walgreens', 'health'], category: 'healthcare' },
-        { keywords: ['home depot', 'lowes', 'hardware'], category: 'home' },
+        { keywords: ["walmart", "target", "grocery", "food", "market"], category: "groceries" },
+        { keywords: ["gas", "shell", "exxon", "chevron", "fuel"], category: "transportation" },
+        { keywords: ["restaurant", "mcdonald", "pizza", "cafe", "dining"], category: "dining" },
+        { keywords: ["pharmacy", "cvs", "walgreens", "health"], category: "healthcare" },
+        { keywords: ["home depot", "lowes", "hardware"], category: "home" },
       ];
 
       for (const suggestion of suggestions) {
-        if (suggestion.keywords.some(keyword => merchant.includes(keyword))) {
-          const matchingEnvelope = envelopes.find(env => 
-            env.category?.toLowerCase().includes(suggestion.category) || 
-            env.name?.toLowerCase().includes(suggestion.category)
+        if (suggestion.keywords.some((keyword) => merchant.includes(keyword))) {
+          const matchingEnvelope = envelopes.find(
+            (env) =>
+              env.category?.toLowerCase().includes(suggestion.category) ||
+              env.name?.toLowerCase().includes(suggestion.category)
           );
-          
+
           if (matchingEnvelope) {
-            setTransactionForm(prev => ({
+            setTransactionForm((prev) => ({
               ...prev,
               envelopeId: matchingEnvelope.id,
               category: suggestion.category,
@@ -62,7 +63,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
   }, [receiptData.merchant, envelopes]);
 
   const handleFormChange = (field, value) => {
-    setTransactionForm(prev => ({
+    setTransactionForm((prev) => ({
       ...prev,
       [field]: value,
     }));
@@ -86,7 +87,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
     }
 
     setIsSubmitting(true);
-    
+
     try {
       // Create the transaction
       const transaction = await addTransactionAsync({
@@ -111,7 +112,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
         },
       });
 
-      logger.info('✅ Receipt converted to transaction successfully', {
+      logger.info("✅ Receipt converted to transaction successfully", {
         transactionId: transaction.id,
         receiptId: receipt.id,
         merchant: receiptData.merchant,
@@ -119,9 +120,8 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
       });
 
       onComplete?.(transaction, receipt);
-      
     } catch (error) {
-      logger.error('❌ Failed to create transaction from receipt:', error);
+      logger.error("❌ Failed to create transaction from receipt:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -133,9 +133,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Review Extracted Data
-              </h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Review Extracted Data</h3>
               <p className="text-sm text-gray-600 mb-6">
                 Please verify and edit the information extracted from your receipt.
               </p>
@@ -150,7 +148,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
                 <input
                   type="text"
                   value={transactionForm.description}
-                  onChange={(e) => handleFormChange('description', e.target.value)}
+                  onChange={(e) => handleFormChange("description", e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Enter merchant name"
                 />
@@ -165,7 +163,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
                   type="number"
                   step="0.01"
                   value={transactionForm.amount}
-                  onChange={(e) => handleFormChange('amount', parseFloat(e.target.value) || 0)}
+                  onChange={(e) => handleFormChange("amount", parseFloat(e.target.value) || 0)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="0.00"
                 />
@@ -179,18 +177,16 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
                 <input
                   type="date"
                   value={transactionForm.date}
-                  onChange={(e) => handleFormChange('date', e.target.value)}
+                  onChange={(e) => handleFormChange("date", e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Category
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
                 <select
                   value={transactionForm.category}
-                  onChange={(e) => handleFormChange('category', e.target.value)}
+                  onChange={(e) => handleFormChange("category", e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
                   <option value="shopping">Shopping</option>
@@ -212,7 +208,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
               </label>
               <textarea
                 value={transactionForm.notes}
-                onChange={(e) => handleFormChange('notes', e.target.value)}
+                onChange={(e) => handleFormChange("notes", e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
                 rows={3}
                 placeholder="Add any additional notes about this transaction..."
@@ -245,9 +241,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Choose Envelope
-              </h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Choose Envelope</h3>
               <p className="text-sm text-gray-600 mb-6">
                 Select which envelope this transaction should be assigned to.
               </p>
@@ -257,11 +251,11 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
               {envelopes.map((envelope) => (
                 <button
                   key={envelope.id}
-                  onClick={() => handleFormChange('envelopeId', envelope.id)}
+                  onClick={() => handleFormChange("envelopeId", envelope.id)}
                   className={`p-4 border rounded-xl text-left transition-colors ${
                     transactionForm.envelopeId === envelope.id
-                      ? 'border-purple-500 bg-purple-50'
-                      : 'border-gray-200 hover:bg-gray-50'
+                      ? "border-purple-500 bg-purple-50"
+                      : "border-gray-200 hover:bg-gray-50"
                   }`}
                 >
                   <div className="flex justify-between items-center">
@@ -291,13 +285,11 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
         );
 
       case 3: {
-        const selectedEnvelope = envelopes.find(env => env.id === transactionForm.envelopeId);
+        const selectedEnvelope = envelopes.find((env) => env.id === transactionForm.envelopeId);
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Confirm Transaction
-              </h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Confirm Transaction</h3>
               <p className="text-sm text-gray-600 mb-6">
                 Review the transaction details before creating.
               </p>
@@ -322,7 +314,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
                 <div>
                   <p className="text-sm text-gray-500">Envelope</p>
                   <p className="font-medium text-gray-900">
-                    {selectedEnvelope?.name || 'None selected'}
+                    {selectedEnvelope?.name || "None selected"}
                   </p>
                 </div>
                 <div>
@@ -334,7 +326,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
                   <p className="font-medium text-gray-900 capitalize">{transactionForm.type}</p>
                 </div>
               </div>
-              
+
               {transactionForm.notes && (
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   <p className="text-sm text-gray-500">Notes</p>
@@ -378,28 +370,30 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
           <div className="flex items-center space-x-4">
             {[1, 2, 3].map((stepNum) => (
               <div key={stepNum} className="flex items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  stepNum === step 
-                    ? 'bg-purple-600 text-white' 
-                    : stepNum < step 
-                      ? 'bg-green-500 text-white' 
-                      : 'bg-gray-200 text-gray-600'
-                }`}>
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                    stepNum === step
+                      ? "bg-purple-600 text-white"
+                      : stepNum < step
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-200 text-gray-600"
+                  }`}
+                >
                   {stepNum < step ? <Check className="h-4 w-4" /> : stepNum}
                 </div>
                 {stepNum < 3 && (
-                  <ArrowRight className={`h-4 w-4 mx-2 ${
-                    stepNum < step ? 'text-green-500' : 'text-gray-300'
-                  }`} />
+                  <ArrowRight
+                    className={`h-4 w-4 mx-2 ${
+                      stepNum < step ? "text-green-500" : "text-gray-300"
+                    }`}
+                  />
                 )}
               </div>
             ))}
           </div>
         </div>
 
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
-          {renderStepContent()}
-        </div>
+        <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">{renderStepContent()}</div>
 
         <div className="p-6 border-t border-gray-200 bg-gray-50">
           <div className="flex gap-3">
@@ -412,9 +406,9 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
                 Back
               </button>
             )}
-            
+
             <div className="flex-1" />
-            
+
             {step < 3 ? (
               <button
                 onClick={handleNext}
@@ -432,7 +426,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
                 className="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors disabled:opacity-50"
                 disabled={isSubmitting || !transactionForm.envelopeId}
               >
-                {isSubmitting ? 'Creating...' : 'Create Transaction'}
+                {isSubmitting ? "Creating..." : "Create Transaction"}
               </button>
             )}
           </div>
