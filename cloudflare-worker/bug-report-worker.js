@@ -655,15 +655,8 @@ async function generateSmartLabels(description, reportEnv, env) {
     console.log("Detected code content in bug report");
   }
 
-  if (criticalKeywords.some((keyword) => descriptionLower.includes(keyword))) {
-    addLabelIfExists("🔴 Critical");
-  } else if (highPriorityKeywords.some((keyword) => descriptionLower.includes(keyword))) {
-    addLabelIfExists("🟡 Medium");
-  } else if (mediumPriorityKeywords.some((keyword) => descriptionLower.includes(keyword))) {
-    addLabelIfExists("🟡 Medium");
-  } else {
-    addLabelIfExists("⚪ Low"); // Default priority
-  }
+  // All bug reports from the app should be assumed as critical (per issue #546)
+  addLabelIfExists("🔴 Critical");
 
   // Enhanced component/feature-based labeling with page context
   const componentMap = {
@@ -764,7 +757,9 @@ async function generateSmartLabels(description, reportEnv, env) {
       addLabelIfExists("mobile");
     } else if (
       userAgent.includes("ipad") ||
-      (width >= 768 && width <= 1024 && reportEnv.touchSupport)
+      // More specific tablet detection - avoid false positives from MacBook Touch Bar
+      (width >= 768 && width <= 1024 && reportEnv.touchSupport && 
+       !userAgent.includes("macintosh") && !userAgent.includes("windows"))
     ) {
       addLabelIfExists("tablet");
     } else {

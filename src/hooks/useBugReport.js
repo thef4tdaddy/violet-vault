@@ -73,151 +73,17 @@ const useBugReport = () => {
         )
       );
 
-      // Fallback to html2canvas (original method)
+      // Skip the ugly CSS cleanup fallback - user doesn't like it (issue #546)
+      // Instead, try a minimal html2canvas capture without the complex CSS manipulation
       const html2canvas = (await import("html2canvas")).default;
 
-      // Try simpler approach first - capture just the main content area
-      let targetElement = document.body;
-
-      // Look for main content container to avoid capturing complex layouts
-      const mainContent = document.querySelector(
-        'main, [role="main"], .main-content, .app, #root, #app'
-      );
-      if (mainContent && mainContent.offsetParent !== null) {
-        targetElement = mainContent;
-        logger.debug("Using main content element for screenshot capture");
-      }
-
-      const screenshotPromise = html2canvas(targetElement, {
-        useCORS: true,
+      const screenshotPromise = html2canvas(document.body, {
         logging: false,
-        scale: isMobile ? 0.3 : 0.5, // Even smaller scale for mobile
-        allowTaint: true,
+        scale: 0.5,
         backgroundColor: "#ffffff",
-        // Mobile-specific optimizations
-        height: isMobile ? Math.min(window.innerHeight, 2000) : undefined,
-        width: isMobile ? Math.min(window.innerWidth, 1200) : undefined,
-        // Additional compatibility options
-        foreignObjectRendering: false, // Disable to avoid modern CSS issues
-        imageTimeout: 15000, // Increase timeout for slow image loading
-        removeContainer: true, // Clean up after rendering
         // Exclude the bug report button and modal from screenshot
         ignoreElements: (element) => {
           return element.getAttribute("data-bug-report") === "true";
-        },
-        // Aggressive CSS cleanup to prevent oklch and other modern color function errors
-        onclone: (clonedDoc) => {
-          try {
-            logger.debug("Starting CSS cleanup for screenshot compatibility");
-
-            // Step 1: Remove ALL external stylesheets completely
-            const externalStyles = clonedDoc.querySelectorAll('link[rel="stylesheet"]');
-            externalStyles.forEach((link) => {
-              logger.debug("Removing external stylesheet:", link.href);
-              link.remove();
-            });
-
-            // Step 2: Remove ALL existing style tags (including Tailwind/Vite injected styles)
-            const styleTags = clonedDoc.querySelectorAll("style");
-            styleTags.forEach((style, index) => {
-              logger.debug(
-                `Removing style tag ${index}:`,
-                style.textContent?.substring(0, 100) + "..."
-              );
-              style.remove();
-            });
-
-            // Step 3: Remove any inline styles that might contain modern CSS
-            const allElements = clonedDoc.querySelectorAll("*");
-            let cleanedInlineStyles = 0;
-            allElements.forEach((element) => {
-              const inlineStyle = element.getAttribute("style");
-              if (inlineStyle) {
-                // Check for ANY modern CSS feature that might cause parsing issues
-                const problematicFeatures = [
-                  "oklch",
-                  "lch",
-                  "lab",
-                  "color(",
-                  "color-mix(",
-                  "light-dark(",
-                  "@container",
-                  "@supports",
-                  ":has(",
-                  ":is(",
-                  ":where(",
-                  "clamp(",
-                  "min(",
-                  "max(",
-                  "var(--",
-                  "accent-color",
-                  "backdrop-filter",
-                  "filter:",
-                  "-webkit-backdrop-filter",
-                ];
-
-                const hasProblematic = problematicFeatures.some((feature) =>
-                  inlineStyle.toLowerCase().includes(feature.toLowerCase())
-                );
-
-                if (hasProblematic) {
-                  element.removeAttribute("style");
-                  cleanedInlineStyles++;
-                }
-              }
-            });
-            logger.debug(`Cleaned ${cleanedInlineStyles} inline styles with problematic CSS`);
-
-            // Step 4: Remove CSS custom properties from document root
-            const root = clonedDoc.documentElement;
-            if (root) {
-              root.removeAttribute("style");
-              // Also remove any CSS custom property classes that Tailwind might have added
-              const classList = Array.from(root.classList);
-              classList.forEach((className) => {
-                if (className.includes("--") || className.startsWith("tw-")) {
-                  root.classList.remove(className);
-                }
-              });
-            }
-
-            // Step 5: Add minimal, safe CSS that won't cause parsing errors
-            const safeStyle = clonedDoc.createElement("style");
-            safeStyle.textContent = `
-              /* Ultra-minimal safe CSS for screenshot - no modern features */
-              body { 
-                font-family: Arial, sans-serif; 
-                color: #333333; 
-                background-color: #ffffff;
-                margin: 8px;
-              }
-              
-              /* Basic element styling */
-              h1, h2, h3, h4, h5, h6 { color: #1f2937; }
-              button { 
-                background-color: #f3f4f6; 
-                border: 1px solid #d1d5db; 
-                padding: 4px 8px;
-                color: #374151;
-              }
-              
-              /* Remove all advanced CSS that could cause parsing issues */
-              * {
-                filter: none;
-                backdrop-filter: none;
-                box-shadow: none;
-                text-shadow: none;
-                background-image: none;
-                transform: none;
-                transition: none;
-                animation: none;
-              }
-            `;
-            clonedDoc.head.appendChild(safeStyle);
-            logger.debug("Added minimal safe CSS for screenshot compatibility");
-          } catch (error) {
-            logger.warn("Failed to apply CSS cleanup for screenshots:", error);
-          }
         },
       });
 
