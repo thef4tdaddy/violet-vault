@@ -2,14 +2,14 @@
   "project": "violet-vault",
   "lastUpdated": "2025-08-28",
   "currentStatus": {
-    "totalWarnings": 27,
+    "totalWarnings": 29,
     "targetWarnings": 17,
     "errors": 0
   },
   "warningCategories": [
     {
       "type": "no-unused-vars",
-      "count": 18,
+      "count": 20,
       "severity": "warning",
       "files": [
         {
@@ -39,6 +39,20 @@
             {
               "line": 441,
               "message": "'Icon' is defined but never used"
+            }
+          ]
+        },
+        {
+          "path": "src/components/budgeting/PaycheckProcessor.jsx",
+          "warnings": 2,
+          "details": [
+            {
+              "line": 209,
+              "message": "'index' is defined but never used"
+            },
+            {
+              "line": 231,
+              "message": "'index' is defined but never used"
             }
           ]
         },
@@ -237,9 +251,10 @@
     "highPriority": [
       {
         "task": "Fix no-unused-vars warnings",
-        "warningsAffected": 18,
+        "warningsAffected": 20,
         "files": [
           "AutoFundingRuleBuilder.jsx",
+          "PaycheckProcessor.jsx",
           "DebtDetailModal.jsx",
           "DebtSummaryCards.jsx",
           "ObjectHistoryViewer.jsx",
