@@ -422,14 +422,22 @@ export const useAuth = create((set, get) => ({
       // If we have encrypted data, validate against it (original logic)
       if (savedData && authState.salt) {
         const parsedData = JSON.parse(savedData);
-        const { salt: savedSalt, encryptedData } = parsedData;
+        const { salt: savedSalt, encryptedData, iv } = parsedData;
         const saltArray = new Uint8Array(savedSalt);
 
         logger.auth("validatePassword: Parsed data", {
           hasSavedSalt: !!savedSalt,
           hasEncryptedData: !!encryptedData,
+          hasIv: !!iv,
           saltLength: saltArray.length,
+          ivLength: iv ? iv.length : 0,
         });
+
+        // Validate that we have all required components
+        if (!encryptedData || !iv) {
+          logger.auth("validatePassword: Missing required encryption components");
+          return false;
+        }
 
         // Try to derive the key with the provided password
         const testKey = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
@@ -437,17 +445,16 @@ export const useAuth = create((set, get) => ({
         logger.auth("validatePassword: Key derived successfully");
 
         // Try to decrypt actual data to validate password
-        if (encryptedData) {
-          try {
-            await encryptionUtils.decrypt(encryptedData, testKey);
-            logger.auth("validatePassword: Decryption successful - password is correct");
-            return true;
-          } catch (decryptError) {
-            logger.auth("validatePassword: Decryption failed - password is incorrect", {
-              error: decryptError.message,
-            });
-            return false;
-          }
+        try {
+          await encryptionUtils.decrypt(encryptedData, testKey, iv);
+          logger.auth("validatePassword: Decryption successful - password is correct");
+          return true;
+        } catch (decryptError) {
+          logger.auth("validatePassword: Decryption failed - password is incorrect", {
+            error: decryptError.message,
+            errorType: decryptError.constructor?.name,
+          });
+          return false;
         }
       }
 
