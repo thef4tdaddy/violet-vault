@@ -127,7 +127,7 @@ const useConnectionManager = (entityType, entityId) => {
           const targetEnvelopeForDebt = envelopes.find((e) => e.id === targetId);
           if (!targetEnvelopeForDebt) throw new Error("Target envelope not found");
 
-          await updateDebt(entityId, { envelopeId: targetId });
+          await updateDebt({ id: entityId, updates: { envelopeId: targetId } });
 
           addToast({
             type: "success",
@@ -200,7 +200,7 @@ const useConnectionManager = (entityType, entityId) => {
 
         case "debt":
           // Remove debt's envelope connection
-          await updateDebt(entityId, { envelopeId: null });
+          await updateDebt({ id: entityId, updates: { envelopeId: null } });
 
           addToast({
             type: "info",
