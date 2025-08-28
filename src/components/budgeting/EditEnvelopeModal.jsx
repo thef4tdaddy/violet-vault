@@ -22,6 +22,7 @@ import {
   Receipt,
 } from "lucide-react";
 import ConnectionDisplay, { ConnectionItem, ConnectionInfo } from "../ui/ConnectionDisplay";
+import EditLockIndicator from "../ui/EditLockIndicator";
 import useEditLock from "../../hooks/useEditLock";
 import { initializeEditLocks } from "../../services/editLockService";
 import { useAuth } from "../../stores/authStore";
@@ -57,6 +58,7 @@ const EditEnvelopeModal = ({
 
   // Edit locking for the envelope
   const {
+    lock,
     isLocked,
     isOwnLock,
     canEdit,
@@ -480,29 +482,16 @@ const EditEnvelopeModal = ({
           </div>
         </div>
 
-        {/* Lock Warning Banner */}
-        {isLocked && !canEdit && (
-          <div className="bg-red-50 border-l-4 border-red-400 p-4 mx-6 mt-4">
-            <div className="flex items-center">
-              <Lock className="h-5 w-5 text-red-400 mr-3" />
-              <div>
-                <h3 className="text-sm font-medium text-red-800">Currently Being Edited</h3>
-                <p className="text-sm text-red-700 mt-1">
-                  {lockedBy} is currently editing this envelope.
-                  {isExpired
-                    ? "The lock has expired and can be broken."
-                    : `Lock expires in ${Math.ceil(timeRemaining / 1000)} seconds.`}
-                </p>
-                {isExpired && (
-                  <button
-                    onClick={breakLock}
-                    className="mt-2 bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
-                  >
-                    Break Lock & Take Control
-                  </button>
-                )}
-              </div>
-            </div>
+        {/* Edit Lock Indicator - Shows green banner for own locks, red for others, with live countdown */}
+        {isLocked && (
+          <div className="mx-6 mt-4">
+            <EditLockIndicator
+              isLocked={isLocked}
+              isOwnLock={isOwnLock}
+              lock={lock}
+              onBreakLock={breakLock}
+              showDetails={true}
+            />
           </div>
         )}
 
