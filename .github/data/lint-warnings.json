@@ -2,14 +2,14 @@
   "project": "violet-vault",
   "lastUpdated": "2025-08-28",
   "currentStatus": {
-    "totalWarnings": 30,
+    "totalWarnings": 32,
     "targetWarnings": 17,
     "errors": 0
   },
   "warningCategories": [
     {
       "type": "no-unused-vars",
-      "count": 21,
+      "count": 23,
       "severity": "warning",
       "files": [
         {
@@ -43,15 +43,29 @@
           ]
         },
         {
+          "path": "src/components/budgeting/EditEnvelopeModal.jsx",
+          "warnings": 2,
+          "details": [
+            {
+              "line": 66,
+              "message": "'expiresAt' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
+            },
+            {
+              "line": 67,
+              "message": "'timeRemaining' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
+            }
+          ]
+        },
+        {
           "path": "src/components/budgeting/PaycheckProcessor.jsx",
           "warnings": 2,
           "details": [
             {
-              "line": 234,
+              "line": 179,
               "message": "'index' is defined but never used"
             },
             {
-              "line": 256,
+              "line": 201,
               "message": "'index' is defined but never used"
             }
           ]
@@ -239,7 +253,7 @@
           "warnings": 1,
           "details": [
             {
-              "line": 54,
+              "line": 56,
               "message": "React Hook useEffect has a missing dependency: 'acquireLock'. Either include it or remove the dependency array"
             }
           ]
@@ -261,9 +275,10 @@
     "highPriority": [
       {
         "task": "Fix no-unused-vars warnings",
-        "warningsAffected": 21,
+        "warningsAffected": 23,
         "files": [
           "AutoFundingRuleBuilder.jsx",
+          "EditEnvelopeModal.jsx",
           "PaycheckProcessor.jsx",
           "DebtDetailModal.jsx",
           "DebtSummaryCards.jsx",
