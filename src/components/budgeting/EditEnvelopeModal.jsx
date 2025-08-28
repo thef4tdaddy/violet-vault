@@ -170,8 +170,6 @@ const EditEnvelopeModal = ({
     setErrors({});
     setIsSubmitting(false);
     setShowDeleteModal(false);
-    setSelectedBillId("");
-    setInitialBillId("");
   };
 
   const validateForm = () => {
