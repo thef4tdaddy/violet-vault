@@ -21,6 +21,14 @@ const PaycheckProcessor = ({
   onDeletePaycheck,
   currentUser,
 }) => {
+  // PRODUCTION DEBUG: Log envelope data received by PaycheckProcessor
+  console.log("PaycheckProcessor debug - envelopes received:", envelopes?.length || 0, envelopes);
+  console.log("PaycheckProcessor debug - envelope types:", envelopes?.map(e => ({
+    name: e?.name,
+    type: e?.envelopeType,
+    autoAllocate: e?.autoAllocate,
+    id: e?.id
+  })));
   const [paycheckAmount, setPaycheckAmount] = useState("");
   const [payerName, setPayerName] = useState(currentUser?.userName || "");
   const [allocationMode, setAllocationMode] = useState("allocate"); // 'allocate' or 'leftover'
