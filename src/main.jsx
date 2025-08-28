@@ -17,6 +17,7 @@ import { runImmediateSyncHealthCheck } from "./utils/syncHealthChecker.js";
 import syncEdgeCaseTester from "./utils/syncEdgeCaseTester.js";
 import { validateAllSyncFlows } from "./utils/syncFlowValidator.js";
 import { runMasterSyncValidation, getQuickSyncStatus } from "./utils/masterSyncValidator.js";
+import { fixAutoAllocateUndefined } from "./utils/fixAutoAllocateUndefined.js";
 
 if (
   typeof window !== "undefined" &&
@@ -32,6 +33,7 @@ if (
   window.validateAllSyncFlows = validateAllSyncFlows;
   window.runMasterSyncValidation = runMasterSyncValidation;
   window.getQuickSyncStatus = getQuickSyncStatus;
+  window.fixAutoAllocateUndefined = fixAutoAllocateUndefined;
 }
 
 initHighlight();
