@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { TRANSACTION_CATEGORIES } from "../../constants/categories";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 import {
   Zap,
   Plus,

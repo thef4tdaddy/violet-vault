@@ -12,8 +12,8 @@ import {
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { firebaseConfig } from "../utils/firebaseConfig";
-import logger from "../utils/logger";
+import { firebaseConfig } from "../utils/common/firebaseConfig";
+import logger from "../utils/common/logger";
 
 // Initialize Firebase app and firestore instance
 const app = initializeApp(firebaseConfig);

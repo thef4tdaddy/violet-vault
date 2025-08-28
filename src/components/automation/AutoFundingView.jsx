@@ -20,8 +20,8 @@ import {
 } from "lucide-react";
 import AutoFundingRuleBuilder from "./AutoFundingRuleBuilder";
 import { autoFundingEngine, RULE_TYPES, TRIGGER_TYPES } from "../../utils/autoFundingEngine";
-import { useBudgetStore } from "../../stores/uiStore";
-import logger from "../../utils/logger";
+import { useBudgetStore } from "../../stores/ui/uiStore";
+import logger from "../../utils/common/logger";
 
 const AutoFundingView = () => {
   const budget = useBudgetStore();

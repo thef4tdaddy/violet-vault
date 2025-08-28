@@ -17,13 +17,13 @@ import {
 import PaydayPrediction from "../budgeting/PaydayPrediction";
 import { predictNextPayday } from "../../utils/paydayPredictor";
 import EditableBalance from "../ui/EditableBalance";
-import { useActualBalance } from "../../hooks/useBudgetMetadata";
-import { useUnassignedCash } from "../../hooks/useBudgetMetadata";
-import logger from "../../utils/logger";
-import { useEnvelopes } from "../../hooks/useEnvelopes";
-import { useSavingsGoals } from "../../hooks/useSavingsGoals";
-import { useTransactions } from "../../hooks/useTransactions";
-import useBudgetData from "../../hooks/useBudgetData";
+import { useActualBalance } from "../../hooks/budgeting/useBudgetMetadata";
+import { useUnassignedCash } from "../../hooks/budgeting/useBudgetMetadata";
+import logger from "../../utils/common/logger";
+import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
+import { useSavingsGoals } from "../../hooks/common/useSavingsGoals";
+import { useTransactions } from "../../hooks/transactions/useTransactions";
+import useBudgetData from "../../hooks/budgeting/useBudgetData";
 import DebtSummaryWidget from "../debt/ui/DebtSummaryWidget";
 
 const Dashboard = ({ setActiveView }) => {

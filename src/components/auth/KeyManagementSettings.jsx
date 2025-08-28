@@ -17,8 +17,8 @@ import {
   Info,
   ExternalLink,
 } from "lucide-react";
-import { useKeyManagement } from "../../hooks/useKeyManagement";
-import logger from "../../utils/logger";
+import { useKeyManagement } from "../../hooks/common/useKeyManagement";
+import logger from "../../utils/common/logger";
 
 const KeyManagementSettings = ({ isOpen, onClose }) => {
   const {

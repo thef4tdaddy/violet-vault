@@ -2,22 +2,22 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
-import { initHighlight } from "./utils/highlight.js";
+import { initHighlight } from "./utils/common/highlight.js";
 import { QueryClientProvider } from "@tanstack/react-query";
-import queryClient from "./utils/queryClient";
+import queryClient from "./utils/common/queryClient";
 
 // Initialize Firebase at app startup
-import "./utils/chunkedFirebaseSync.js";
+import "./utils/sync/chunkedFirebaseSync.js";
 
 // Expose diagnostic tools for debugging
-import { runDataDiagnostic } from "./utils/dataDiagnostic.js";
-import { runSyncDiagnostic } from "./utils/syncDiagnostic.js";
-import { fixMetadata } from "./utils/fixMetadata.js";
-import { runImmediateSyncHealthCheck } from "./utils/syncHealthChecker.js";
-import syncEdgeCaseTester from "./utils/syncEdgeCaseTester.js";
-import { validateAllSyncFlows } from "./utils/syncFlowValidator.js";
-import { runMasterSyncValidation, getQuickSyncStatus } from "./utils/masterSyncValidator.js";
-import { fixAutoAllocateUndefined } from "./utils/fixAutoAllocateUndefined.js";
+import { runDataDiagnostic } from "./utils/common/dataDiagnostic.js";
+import { runSyncDiagnostic } from "./utils/sync/syncDiagnostic.js";
+import { fixMetadata } from "./utils/common/fixMetadata.js";
+import { runImmediateSyncHealthCheck } from "./utils/sync/syncHealthChecker.js";
+import syncEdgeCaseTester from "./utils/sync/syncEdgeCaseTester.js";
+import { validateAllSyncFlows } from "./utils/sync/syncFlowValidator.js";
+import { runMasterSyncValidation, getQuickSyncStatus } from "./utils/sync/masterSyncValidator.js";
+import { fixAutoAllocateUndefined } from "./utils/common/fixAutoAllocateUndefined.js";
 
 if (
   typeof window !== "undefined" &&

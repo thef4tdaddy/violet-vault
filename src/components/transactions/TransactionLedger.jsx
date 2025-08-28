@@ -8,15 +8,15 @@ import TransactionForm from "./TransactionForm";
 import ImportModal from "./import/ImportModal";
 import TransactionSplitter from "./TransactionSplitter";
 
-import { useTransactionFilters } from "./hooks/useTransactionFilters";
-import { useTransactionForm } from "./hooks/useTransactionForm";
-import { useTransactionImport } from "./hooks/useTransactionImport";
-import { suggestEnvelope } from "./utils/envelopeMatching";
+import { useTransactionFilters } from "../../hooks/transactions/useTransactionFilters";
+import { useTransactionForm } from "../../hooks/transactions/useTransactionForm";
+import { useTransactionImport } from "../../hooks/transactions/useTransactionImport";
+import { suggestEnvelope } from "../../utils/transactions/envelopeMatching";
 import { TRANSACTION_CATEGORIES } from "../../constants/categories";
-import { useBudgetStore } from "../../stores/uiStore";
-import { useTransactions } from "../../hooks/useTransactions";
-import { useEnvelopes } from "../../hooks/useEnvelopes";
-import logger from "../../utils/logger";
+import { useBudgetStore } from "../../stores/ui/uiStore";
+import { useTransactions } from "../../hooks/transactions/useTransactions";
+import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
+import logger from "../../utils/common/logger";
 
 const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855f7" } }) => {
   // Enhanced TanStack Query integration with caching and optimistic updates

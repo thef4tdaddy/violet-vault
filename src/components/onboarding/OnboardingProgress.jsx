@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { CheckCircle, Circle, ChevronDown, ChevronUp, Trophy } from "lucide-react";
-import useOnboardingStore from "../../stores/onboardingStore";
+import useOnboardingStore from "../../stores/ui/onboardingStore";
 
 /**
  * OnboardingProgress - Shows progress checklist for new users

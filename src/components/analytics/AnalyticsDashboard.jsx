@@ -13,13 +13,13 @@ import {
   Wallet,
   PieChart,
 } from "lucide-react";
-import { useAnalytics } from "../../hooks/useAnalytics";
+import { useAnalytics } from "../../hooks/analytics/useAnalytics";
 import { useBudgetStore } from "../../stores/budgetStore";
 import ChartsAndAnalytics from "./ChartsAndAnalytics";
 import TrendAnalysisCharts from "./TrendAnalysisCharts";
 import PerformanceMonitor from "./PerformanceMonitor";
 import ReportExporter from "./ReportExporter";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 
 /**
  * Enhanced Analytics Dashboard for v1.10.0

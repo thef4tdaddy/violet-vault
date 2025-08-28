@@ -1,7 +1,7 @@
 import React from "react";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import ChartContainer from "./ChartContainer";
-import { useChartConfig } from "../../hooks/useChartConfig";
+import { useChartConfig } from "../../hooks/common/useChartConfig";
 
 /**
  * Reusable distribution pie chart component

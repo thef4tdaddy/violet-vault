@@ -13,8 +13,8 @@ import {
   Settings,
   Info,
 } from "lucide-react";
-import useTransactionArchiving from "../../hooks/useTransactionArchiving";
-import logger from "../../utils/logger";
+import useTransactionArchiving from "../../hooks/transactions/useTransactionArchiving";
+import logger from "../../utils/common/logger";
 
 /**
  * Transaction Archiving Management Component

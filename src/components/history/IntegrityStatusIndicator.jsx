@@ -8,7 +8,7 @@ import {
   Eye,
   RefreshCw,
 } from "lucide-react";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 
 const IntegrityStatusIndicator = ({ className = "" }) => {
   const [integrityStatus, setIntegrityStatus] = useState({

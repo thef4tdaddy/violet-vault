@@ -1,7 +1,7 @@
 import React from "react";
 import { Bug, Camera, Send, X, AlertCircle } from "lucide-react";
-import useBugReport from "../../hooks/useBugReport";
-import useToast from "../../hooks/useToast";
+import useBugReport from "../../hooks/common/useBugReport";
+import useToast from "../../hooks/common/useToast";
 
 /**
  * Floating bug report button with screenshot capability

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useBudgetHistory, useBudgetCommitDetails } from "../../hooks/useBudgetHistoryQuery";
+import { useBudgetHistory, useBudgetCommitDetails } from "../../hooks/budgeting/useBudgetHistoryQuery";
 import {
   History,
   GitCommit,
@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import IntegrityStatusIndicator from "./IntegrityStatusIndicator";
 import HelpTooltip from "../ui/HelpTooltip";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 
 const BudgetHistoryViewer = ({ onClose }) => {
   const {

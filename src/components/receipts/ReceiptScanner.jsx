@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef } from "react";
 import { Camera, Upload, FileText, Loader2, CheckCircle, XCircle, Eye } from "lucide-react";
 import { processReceiptImage } from "../../utils/ocrProcessor";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 
 /**
  * Receipt Scanner Component

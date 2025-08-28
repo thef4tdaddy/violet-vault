@@ -10,8 +10,8 @@ import {
   Target,
   X,
 } from "lucide-react";
-import { useDebtManagement } from "../../hooks/useDebtManagement";
-import { isDebtFeatureEnabled } from "../../utils/debtDebugConfig";
+import { useDebtManagement } from "../../hooks/debts/useDebtManagement";
+import { isDebtFeatureEnabled } from "../../utils/debts/debtDebugConfig";
 import DebtSummaryCards from "./ui/DebtSummaryCards";
 import DebtList from "./ui/DebtList";
 import AddDebtModal from "./modals/AddDebtModal";

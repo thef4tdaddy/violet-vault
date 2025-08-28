@@ -11,8 +11,8 @@ import {
   Clock,
   Receipt,
 } from "lucide-react";
-import { useBudgetStore } from "../../stores/uiStore";
-import useUnassignedCashDistribution from "../../hooks/useUnassignedCashDistribution";
+import { useBudgetStore } from "../../stores/ui/uiStore";
+import useUnassignedCashDistribution from "../../hooks/common/useUnassignedCashDistribution";
 import { ENVELOPE_TYPES } from "../../constants/categories";
 
 const BillEnvelopeFundingInfo = lazy(() => import("../budgeting/BillEnvelopeFundingInfo"));

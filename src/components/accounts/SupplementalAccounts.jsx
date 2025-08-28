@@ -20,9 +20,9 @@ import {
   User,
   Clock,
 } from "lucide-react";
-import useEditLock from "../../hooks/useEditLock";
+import useEditLock from "../../hooks/common/useEditLock";
 import { initializeEditLocks } from "../../services/editLockService";
-import { useAuth } from "../../stores/authStore";
+import { useAuth } from "../../stores/auth/authStore";
 import EditLockIndicator from "../ui/EditLockIndicator";
 
 const SupplementalAccounts = ({

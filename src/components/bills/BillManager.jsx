@@ -1,9 +1,9 @@
 // src/new/UnifiedBillTracker.jsx
 import React, { useState, useMemo } from "react";
-import { useBudgetStore } from "../../stores/uiStore";
-import { useTransactions } from "../../hooks/useTransactions";
-import { useEnvelopes } from "../../hooks/useEnvelopes";
-import useBills from "../../hooks/useBills";
+import { useBudgetStore } from "../../stores/ui/uiStore";
+import { useTransactions } from "../../hooks/transactions/useTransactions";
+import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
+import useBills from "../../hooks/bills/useBills";
 import {
   FileText,
   Calendar,
@@ -25,9 +25,9 @@ import { getBillIcon, getIconByName } from "../../utils/billIcons";
 import AddBillModal from "./AddBillModal";
 import BulkBillUpdateModal from "./BulkBillUpdateModal";
 import BillDiscoveryModal from "./BillDiscoveryModal";
-import { useBillOperations } from "../../hooks/useBillOperations";
+import { useBillOperations } from "../../hooks/bills/useBillOperations";
 import { generateBillSuggestions } from "../../utils/billDiscovery";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 import ObjectHistoryViewer from "../history/ObjectHistoryViewer";
 import { processRecurringBill } from "../../utils/bills/recurringBillUtils";
 

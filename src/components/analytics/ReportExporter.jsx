@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 
 /**
  * Report Exporter for v1.10.0

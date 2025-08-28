@@ -16,4 +16,4 @@ export {
 
 // Hook exports for convenience
 export { useChartConfig } from "../../hooks/useChartConfig.jsx";
-export { useAnalyticsData } from "../../hooks/useAnalyticsData";
+export { useAnalyticsData } from "../../hooks/analytics/useAnalyticsData";

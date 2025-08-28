@@ -3,7 +3,7 @@ import { Camera, Receipt as ReceiptIcon } from "lucide-react";
 import ReceiptScanner from "./ReceiptScanner";
 import ReceiptToTransactionModal from "./ReceiptToTransactionModal";
 import { preloadOCR } from "../../utils/ocrProcessor";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 
 /**
  * Button to trigger receipt scanning

@@ -1,6 +1,6 @@
 // src/services/activityLogger.js
 import { budgetDb } from "../db/budgetDb.js";
-import logger from "../utils/logger";
+import logger from "../utils/common/logger";
 
 /**
  * Activity Logger Service - Level 1 Budget History Implementation

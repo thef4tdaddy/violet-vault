@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { X, ChevronRight, ChevronLeft, CheckCircle, Target } from "lucide-react";
-import useOnboardingStore from "../../stores/onboardingStore";
-import logger from "../../utils/logger";
+import useOnboardingStore from "../../stores/ui/onboardingStore";
+import logger from "../../utils/common/logger";
 
 /**
  * OnboardingTutorial - Provides guided tours and contextual hints for new users

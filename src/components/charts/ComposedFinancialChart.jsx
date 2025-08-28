@@ -11,7 +11,7 @@ import {
   Legend,
 } from "recharts";
 import ChartContainer from "./ChartContainer";
-import { useChartConfig } from "../../hooks/useChartConfig";
+import { useChartConfig } from "../../hooks/common/useChartConfig";
 
 /**
  * Reusable composed financial chart component

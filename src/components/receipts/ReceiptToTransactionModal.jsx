@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Receipt, DollarSign, Calendar, Building, FileText, ArrowRight, Check } from "lucide-react";
-import { useReceipts } from "../../hooks/useReceipts";
-import { useTransactions } from "../../hooks/useTransactions";
-import { useEnvelopes } from "../../hooks/useEnvelopes";
-import logger from "../../utils/logger";
+import { useReceipts } from "../../hooks/common/useReceipts";
+import { useTransactions } from "../../hooks/transactions/useTransactions";
+import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
+import logger from "../../utils/common/logger";
 
 /**
  * Modal for converting receipt data into a transaction

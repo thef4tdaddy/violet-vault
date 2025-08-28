@@ -8,7 +8,7 @@ import {
   ArrowRight,
   Lightbulb,
 } from "lucide-react";
-import useOnboardingStore from "../../stores/onboardingStore";
+import useOnboardingStore from "../../stores/ui/onboardingStore";
 
 /**
  * EmptyStateHints - Provides contextual hints and guidance for empty states

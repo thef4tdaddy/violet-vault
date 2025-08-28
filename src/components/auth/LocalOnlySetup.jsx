@@ -11,9 +11,9 @@ import {
   Palette,
   User,
 } from "lucide-react";
-import { useLocalOnlyMode } from "../../hooks/useLocalOnlyMode";
+import { useLocalOnlyMode } from "../../hooks/common/useLocalOnlyMode";
 import logoOnly from "../../assets/icon-512x512.png";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 
 const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
   const {

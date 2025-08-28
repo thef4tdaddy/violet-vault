@@ -1,11 +1,11 @@
 import React, { memo, lazy, Suspense } from "react";
 import { DollarSign, Wallet, Target, TrendingUp } from "lucide-react";
-import { useBudgetStore } from "../../stores/uiStore";
-import { useActualBalance } from "../../hooks/useBudgetMetadata";
-import { useUnassignedCash } from "../../hooks/useBudgetMetadata";
-import { useEnvelopes } from "../../hooks/useEnvelopes";
-import { useSavingsGoals } from "../../hooks/useSavingsGoals";
-import logger from "../../utils/logger";
+import { useBudgetStore } from "../../stores/ui/uiStore";
+import { useActualBalance } from "../../hooks/budgeting/useBudgetMetadata";
+import { useUnassignedCash } from "../../hooks/budgeting/useBudgetMetadata";
+import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
+import { useSavingsGoals } from "../../hooks/common/useSavingsGoals";
+import logger from "../../utils/common/logger";
 const UnassignedCashModal = lazy(() => import("../modals/UnassignedCashModal"));
 import { AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";

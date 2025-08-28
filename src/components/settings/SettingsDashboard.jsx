@@ -15,9 +15,9 @@ import {
   Monitor,
   AlertTriangle,
 } from "lucide-react";
-import { useBudgetStore } from "../../stores/uiStore";
+import { useBudgetStore } from "../../stores/ui/uiStore";
 import LoadingSpinner from "../ui/LoadingSpinner";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 
 // Lazy load heavy components
 const ChangePasswordModal = lazy(() => import("../auth/ChangePasswordModal"));
@@ -67,7 +67,7 @@ const SettingsDashboard = ({
       logger.debug("🌩️ Cloud sync enabled - starting background sync");
       try {
         const { cloudSyncService } = await import("../../services/cloudSyncService");
-        const { useAuth } = await import("../../stores/authStore");
+        const { useAuth } = await import("../../stores/auth/authStore");
         const authState = useAuth.getState();
 
         if (authState.encryptionKey && authState.currentUser && authState.budgetId) {
@@ -101,7 +101,7 @@ const SettingsDashboard = ({
 
       if (!cloudSyncService.isRunning) {
         logger.warn("⚠️ Cloud sync service not running, starting temporarily...");
-        const { useAuth } = await import("../../stores/authStore");
+        const { useAuth } = await import("../../stores/auth/authStore");
         const authState = useAuth.getState();
 
         if (authState.encryptionKey && authState.currentUser && authState.budgetId) {
@@ -326,7 +326,7 @@ const SettingsDashboard = ({
                 onClick={async () => {
                   try {
                     const { createTestBudgetHistory } = await import(
-                      "../../utils/testBudgetHistory"
+                      "../../utils/common/testBudgetHistory"
                     );
                     await createTestBudgetHistory();
                     alert("✅ Test budget history created! Check console for details.");

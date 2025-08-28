@@ -27,9 +27,9 @@ import ConnectionDisplay, {
   UniversalConnectionManager,
 } from "../ui/ConnectionDisplay";
 import EditLockIndicator from "../ui/EditLockIndicator";
-import useEditLock from "../../hooks/useEditLock";
+import useEditLock from "../../hooks/common/useEditLock";
 import { initializeEditLocks } from "../../services/editLockService";
-import { useAuth } from "../../stores/authStore";
+import { useAuth } from "../../stores/auth/authStore";
 import DeleteEnvelopeModal from "./DeleteEnvelopeModal";
 import {
   ENVELOPE_TYPES,
@@ -37,7 +37,7 @@ import {
   getEnvelopeCategories,
 } from "../../constants/categories";
 import { toMonthly, toBiweekly, getFrequencyOptions } from "../../utils/frequencyCalculations";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 
 const EditEnvelopeModal = ({
   isOpen = false,

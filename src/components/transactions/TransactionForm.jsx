@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import { X, TrendingDown, TrendingUp, Zap, Lock, Unlock, User, Clock } from "lucide-react";
 import ReceiptButton from "../receipts/ReceiptButton";
-import useEditLock from "../../hooks/useEditLock";
+import useEditLock from "../../hooks/common/useEditLock";
 import { initializeEditLocks } from "../../services/editLockService";
-import { useAuth } from "../../stores/authStore";
-import logger from "../../utils/logger";
+import { useAuth } from "../../stores/auth/authStore";
+import logger from "../../utils/common/logger";
 
 const TransactionForm = ({
   isOpen,

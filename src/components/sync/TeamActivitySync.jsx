@@ -22,7 +22,7 @@ import {
   GitBranch,
   FileText,
 } from "lucide-react";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 
 const TeamActivitySync = ({
   activeUsers = [],

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { X, User, Palette, Save } from "lucide-react";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 
 const ProfileSettings = ({ isOpen, onClose, currentUser, onUpdateProfile }) => {
   const [userName, setUserName] = useState(currentUser?.userName || "");

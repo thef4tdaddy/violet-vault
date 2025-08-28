@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Lock, Unlock, Eye, EyeOff, AlertCircle, Shield, Clock } from "lucide-react";
-import { useSecurityManager } from "../../hooks/useSecurityManager";
-import { useAuth } from "../../stores/authStore";
+import { useSecurityManager } from "../../hooks/auth/useSecurityManager";
+import { useAuth } from "../../stores/auth/authStore";
 import shieldLogo from "../../assets/logo-512x512.png";
 
 const LockScreen = () => {
