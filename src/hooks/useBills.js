@@ -323,8 +323,7 @@ const useBills = (options = {}) => {
         paidDate: paymentDate,
         envelopeId: envelopeId,
         lastPaid: new Date().toISOString(),
-        // Preserve the original bill amount to prevent UI corruption (#540)
-        amount: bill.amount, // Explicitly preserve original amount
+        // DO NOT modify the original amount - it should remain unchanged
       };
 
       // Apply optimistic update
