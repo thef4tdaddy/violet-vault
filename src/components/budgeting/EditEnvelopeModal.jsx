@@ -460,8 +460,16 @@ const EditEnvelopeModal = ({
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-xs">
               <strong>🔍 Lock Debug:</strong>
               <div className="mt-1 space-y-1">
-                <div>Current User ID: {authCurrentUser?.id || "none"}</div>
-                <div>Current User Name: {authCurrentUser?.userName || "none"}</div>
+                <div>Raw User ID: {authCurrentUser?.id || "none"}</div>
+                <div>User Budget ID: {authCurrentUser?.budgetId || "none"}</div>
+                <div>User Name: {authCurrentUser?.userName || "none"}</div>
+                <div>
+                  Computed User ID:{" "}
+                  {authCurrentUser?.id ||
+                    authCurrentUser?.budgetId ||
+                    `user_${authCurrentUser?.userName?.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase()}` ||
+                    "anonymous"}
+                </div>
                 <div>Lock User ID: {lock?.userId || "none"}</div>
                 <div>Lock User Name: {lock?.userName || "none"}</div>
                 <div>Is Own Lock: {isOwnLock ? "TRUE" : "FALSE"}</div>

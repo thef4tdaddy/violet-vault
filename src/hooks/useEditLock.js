@@ -27,8 +27,12 @@ const useEditLock = (recordType, recordId, options = {}) => {
     const unwatch = editLockService.watchLock(recordType, recordId, (lockDoc) => {
       setLock(lockDoc);
       setIsLocked(!!lockDoc);
-      // Check ownership directly from the lock document
-      const currentUserId = editLockService.currentUser?.id;
+      // Check ownership directly from the lock document using same ID logic as service
+      const currentUserId =
+        editLockService.currentUser?.id ||
+        editLockService.currentUser?.budgetId ||
+        `user_${editLockService.currentUser?.userName?.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase()}` ||
+        "anonymous";
       setIsOwnLock(lockDoc && currentUserId && lockDoc.userId === currentUserId);
 
       logger.debug("🔐 Lock state updated", {
