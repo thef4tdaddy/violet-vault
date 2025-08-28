@@ -37,10 +37,10 @@ const PaycheckProcessor = ({
       "Auto-allocate FALSE count:",
       envelopes?.filter((e) => e?.autoAllocate === false).length
     );
-    
+
     // Show detailed breakdown of autoAllocate values
     const autoAllocateBreakdown = {};
-    envelopes?.forEach(e => {
+    envelopes?.forEach((e) => {
       const value = e?.autoAllocate;
       const key = `${typeof value}_${value}`;
       if (!autoAllocateBreakdown[key]) autoAllocateBreakdown[key] = [];
