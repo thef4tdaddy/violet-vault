@@ -19,7 +19,14 @@ import {
   Unlock,
   User,
   Clock,
+  Receipt,
 } from "lucide-react";
+import ConnectionDisplay, {
+  ConnectionItem,
+  ConnectionInfo,
+  UniversalConnectionManager,
+} from "../ui/ConnectionDisplay";
+import EditLockIndicator from "../ui/EditLockIndicator";
 import useEditLock from "../../hooks/useEditLock";
 import { initializeEditLocks } from "../../services/editLockService";
 import { useAuth } from "../../stores/authStore";
@@ -38,9 +45,7 @@ const EditEnvelopeModal = ({
   envelope,
   onUpdateEnvelope,
   onDeleteEnvelope,
-  onUpdateBill, // Add bill update function
   existingEnvelopes = [],
-  allBills = [], // Add bills prop to show linked bills
   currentUser = { userName: "User", userColor: "#a855f7" }, // eslint-disable-line no-unused-vars
 }) => {
   // Get auth context for edit locking
@@ -55,6 +60,7 @@ const EditEnvelopeModal = ({
 
   // Edit locking for the envelope
   const {
+    lock,
     isLocked,
     isOwnLock,
     canEdit,
@@ -90,8 +96,6 @@ const EditEnvelopeModal = ({
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedBillId, setSelectedBillId] = useState("");
-  const [initialBillId, setInitialBillId] = useState("");
 
   // Predefined categories for quick selection using standardized categories
   const categories = getEnvelopeCategories();
@@ -121,21 +125,6 @@ const EditEnvelopeModal = ({
     { value: "low", label: "Low Priority", color: "text-blue-600" },
   ];
 
-  // Debug logging for bills
-  useEffect(() => {
-    logger.debug("🔍 EditEnvelopeModal - allBills received:", {
-      allBills,
-      length: allBills?.length,
-      bills: allBills?.map((bill) => ({
-        id: bill.id,
-        name: bill.name,
-        provider: bill.provider,
-        amount: bill.amount,
-        envelopeId: bill.envelopeId,
-      })),
-    });
-  }, [allBills]);
-
   // Populate form when envelope changes
   useEffect(() => {
     if (envelope) {
@@ -158,12 +147,8 @@ const EditEnvelopeModal = ({
         biweeklyAllocation: envelope.biweeklyAllocation?.toString() || "",
         targetAmount: envelope.targetAmount?.toString() || "",
       });
-
-      const linkedBill = allBills.find((bill) => bill.envelopeId === envelope.id);
-      setSelectedBillId(linkedBill?.id || "");
-      setInitialBillId(linkedBill?.id || "");
     }
-  }, [envelope, allBills]);
+  }, [envelope]);
 
   // Get smart icon suggestions based on current form data
   // Simple icon suggestions for envelopes - to be enhanced later
@@ -185,8 +170,6 @@ const EditEnvelopeModal = ({
     setErrors({});
     setIsSubmitting(false);
     setShowDeleteModal(false);
-    setSelectedBillId("");
-    setInitialBillId("");
   };
 
   const validateForm = () => {
@@ -246,39 +229,6 @@ const EditEnvelopeModal = ({
     return toBiweekly(monthlyAmount, "monthly").toFixed(2);
   };
 
-  // Handle bill selection and auto-populate envelope data
-  const handleBillSelection = (billId) => {
-    setSelectedBillId(billId);
-
-    if (!billId) return;
-
-    const selectedBill = allBills.find((bill) => bill.id === billId);
-    if (!selectedBill) return;
-
-    // Auto-populate envelope fields from the selected bill
-    setFormData((prevData) => ({
-      ...prevData,
-      name: selectedBill.name || selectedBill.provider || prevData.name,
-      category: selectedBill.category || prevData.category,
-      color: selectedBill.color || prevData.color,
-      frequency: selectedBill.frequency || prevData.frequency,
-      description:
-        selectedBill.description ||
-        selectedBill.notes ||
-        `Auto-created for ${selectedBill.name} bill`,
-      biweeklyAllocation:
-        selectedBill.biweeklyAmount?.toString() ||
-        (selectedBill.amount
-          ? toBiweekly(selectedBill.amount, selectedBill.frequency || "monthly").toFixed(2)
-          : ""),
-      monthlyAmount:
-        selectedBill.monthlyAmount?.toString() ||
-        (selectedBill.amount
-          ? toMonthly(selectedBill.amount, selectedBill.frequency || "monthly").toFixed(2)
-          : ""),
-    }));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -315,8 +265,6 @@ const EditEnvelopeModal = ({
           autoAllocate: formData.autoAllocate,
           biweeklyAllocation: parseFloat(calculateBiweeklyAmount()),
           lastUpdated: new Date().toISOString(),
-          // Link bill connection
-          billId: selectedBillId || null,
           // Envelope type specific fields
           envelopeType: formData.envelopeType,
           monthlyBudget:
@@ -335,30 +283,6 @@ const EditEnvelopeModal = ({
         }
 
         await onUpdateEnvelope(updatedEnvelope);
-
-        // If a bill was selected, establish the bidirectional relationship
-        if (selectedBillId && onUpdateBill) {
-          const selectedBill = allBills.find((bill) => bill.id === selectedBillId);
-          if (selectedBill) {
-            await onUpdateBill({
-              ...selectedBill,
-              envelopeId: envelope.id,
-              lastUpdated: new Date().toISOString(),
-            });
-          }
-        }
-
-        // If the envelope was previously linked to a different bill, detach it
-        if (initialBillId && initialBillId !== selectedBillId && onUpdateBill) {
-          const previousBill = allBills.find((bill) => bill.id === initialBillId);
-          if (previousBill) {
-            await onUpdateBill({
-              ...previousBill,
-              envelopeId: null,
-              lastUpdated: new Date().toISOString(),
-            });
-          }
-        }
       }
 
       // Reset and close
@@ -405,7 +329,7 @@ const EditEnvelopeModal = ({
 
   return (
     <div className="fixed inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl">
+      <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[95vh] overflow-hidden shadow-2xl flex flex-col">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 px-6 py-4">
           <div className="flex items-center justify-between">
@@ -416,31 +340,8 @@ const EditEnvelopeModal = ({
               <div className="flex-1">
                 <div className="flex items-center gap-3">
                   <h2 className="text-xl font-bold text-white">Edit Envelope</h2>
-                  {/* Edit Lock Status */}
-                  {isLocked && (
-                    <div
-                      className={`flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                        isOwnLock
-                          ? "bg-green-500/20 text-green-100 border border-green-400/30"
-                          : "bg-red-500/20 text-red-100 border border-red-400/30"
-                      }`}
-                    >
-                      {isOwnLock ? (
-                        <>
-                          <Unlock className="h-3 w-3 mr-1" />
-                          You're Editing
-                        </>
-                      ) : (
-                        <>
-                          <Lock className="h-3 w-3 mr-1" />
-                          <User className="h-3 w-3 mr-1" />
-                          {lockedBy}
-                        </>
-                      )}
-                    </div>
-                  )}
                   {lockLoading && (
-                    <div className="bg-yellow-500/20 text-yellow-100 border border-yellow-400/30 px-3 py-1 rounded-full text-xs font-medium flex items-center">
+                    <div className="bg-purple-500/20 text-purple-100 border border-purple-400/30 px-3 py-1 rounded-full text-xs font-medium flex items-center">
                       <div className="animate-spin rounded-full h-3 w-3 border border-yellow-300 border-t-transparent mr-1" />
                       Acquiring Lock...
                     </div>
@@ -448,12 +349,6 @@ const EditEnvelopeModal = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <p className="text-blue-100 text-sm">Modify envelope settings</p>
-                  {isLocked && !isOwnLock && expiresAt && (
-                    <div className="flex items-center text-red-200 text-xs">
-                      <Clock className="h-3 w-3 mr-1" />
-                      {isExpired ? "Expired" : `${Math.ceil(timeRemaining / 1000)}s remaining`}
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
@@ -478,34 +373,21 @@ const EditEnvelopeModal = ({
           </div>
         </div>
 
-        {/* Lock Warning Banner */}
-        {isLocked && !canEdit && (
-          <div className="bg-red-50 border-l-4 border-red-400 p-4 mx-6 mt-4">
-            <div className="flex items-center">
-              <Lock className="h-5 w-5 text-red-400 mr-3" />
-              <div>
-                <h3 className="text-sm font-medium text-red-800">Currently Being Edited</h3>
-                <p className="text-sm text-red-700 mt-1">
-                  {lockedBy} is currently editing this envelope.
-                  {isExpired
-                    ? "The lock has expired and can be broken."
-                    : `Lock expires in ${Math.ceil(timeRemaining / 1000)} seconds.`}
-                </p>
-                {isExpired && (
-                  <button
-                    onClick={breakLock}
-                    className="mt-2 bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
-                  >
-                    Break Lock & Take Control
-                  </button>
-                )}
-              </div>
-            </div>
+        {/* Edit Lock Indicator - Shows green banner for own locks, red for others, with live countdown */}
+        {isLocked && (
+          <div className="mx-6 mt-4">
+            <EditLockIndicator
+              isLocked={isLocked}
+              isOwnLock={isOwnLock}
+              lock={lock}
+              onBreakLock={breakLock}
+              showDetails={true}
+            />
           </div>
         )}
 
         {/* Form Content */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <div className="flex-1 p-6 overflow-y-auto">
           <div className="space-y-6">
             {/* Envelope Type Selection */}
             <div className="space-y-4">
@@ -628,58 +510,13 @@ const EditEnvelopeModal = ({
                 </select>
               </div>
 
-              {/* Bill Connection - ALWAYS VISIBLE */}
-              <div className="bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-300 rounded-xl p-6 mb-4">
-                <label className="block text-lg font-bold text-purple-800 mb-4 flex items-center">
-                  <Sparkles className="h-6 w-6 mr-3" />
-                  🔗 Connect to Existing Bill
-                </label>
-
-                <select
-                  value={selectedBillId}
-                  onChange={(e) => handleBillSelection(e.target.value)}
-                  disabled={!canEdit}
-                  className={`w-full px-4 py-4 border-2 border-purple-400 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white shadow-md text-base ${
-                    !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
-                  }`}
-                >
-                  <option value="">
-                    {allBills && allBills.length > 0
-                      ? "Choose a bill to auto-populate settings..."
-                      : `No bills available (${allBills ? allBills.length : "undefined"} found)`}
-                  </option>
-                  {allBills &&
-                    allBills
-                      .filter((bill) => !bill.envelopeId || bill.envelopeId === envelope?.id) // Only show unassigned bills or bills assigned to this envelope
-                      .map((bill) => (
-                        <option key={bill.id} value={bill.id}>
-                          {bill.name || bill.provider} - ${parseFloat(bill.amount || 0).toFixed(2)}{" "}
-                          ({bill.frequency || "monthly"})
-                        </option>
-                      ))}
-                </select>
-
-                {selectedBillId && (
-                  <div className="mt-3 p-3 bg-green-100 border border-green-300 rounded-lg">
-                    <p className="text-sm text-green-700 flex items-center">
-                      <CheckCircle className="h-5 w-5 mr-2" />
-                      <strong>Connected!</strong> Envelope settings have been populated from the
-                      selected bill.
-                    </p>
-                  </div>
-                )}
-
-                <p className="text-sm text-purple-700 mt-3 font-medium">
-                  📝 <strong>Tip:</strong> Connect a bill to automatically fill envelope details
-                  like name, amount, and category. Works for all envelope types.
-                </p>
-
-                {(!allBills || allBills.length === 0) && (
-                  <p className="text-sm text-red-600 mt-3 font-medium">
-                    ⚠️ No bills found. Create bills first to connect them to envelopes.
-                  </p>
-                )}
-              </div>
+              {/* Bill Connection - Using Universal Connection Manager */}
+              <UniversalConnectionManager
+                entityType="envelope"
+                entityId={envelope?.id}
+                canEdit={canEdit}
+                theme="purple"
+              />
             </div>
 
             {/* Type-Specific Budget Settings */}
@@ -687,41 +524,14 @@ const EditEnvelopeModal = ({
               <h3 className="font-semibold text-gray-900 flex items-center">
                 <DollarSign className="h-4 w-4 mr-2 text-blue-600" />
                 {formData.envelopeType === ENVELOPE_TYPES.BILL
-                  ? selectedBillId
-                    ? "Connected Bill Settings"
-                    : "Bill Payment Settings"
+                  ? "Bill Payment Settings"
                   : "Variable Budget Settings"}
               </h3>
 
-              {/* Connected Bill Display */}
-              {formData.envelopeType === ENVELOPE_TYPES.BILL && selectedBillId && (
-                <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-                  <div className="flex items-center mb-2">
-                    <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-                    <span className="font-medium text-green-800">Bill Connected</span>
-                  </div>
-                  {(() => {
-                    const connectedBill = allBills.find((bill) => bill.id === selectedBillId);
-                    return connectedBill ? (
-                      <div className="text-sm text-green-700">
-                        <p>
-                          <strong>{connectedBill.name || connectedBill.provider}</strong>
-                        </p>
-                        <p>
-                          Amount: ${connectedBill.amount || "N/A"} (
-                          {connectedBill.frequency || "monthly"})
-                        </p>
-                        <p className="text-xs mt-1">
-                          Bill settings will override manual envelope settings.
-                        </p>
-                      </div>
-                    ) : null;
-                  })()}
-                </div>
-              )}
+              {/* ConnectionDisplay removed - using simpler connection UI above to avoid duplication */}
 
               {/* Type-specific fields */}
-              {formData.envelopeType === ENVELOPE_TYPES.BILL && !selectedBillId && (
+              {formData.envelopeType === ENVELOPE_TYPES.BILL && (
                 <div className="space-y-4">
                   {/* Payment Frequency Selection */}
                   <div>
@@ -797,14 +607,14 @@ const EditEnvelopeModal = ({
 
                     {/* Auto-calculated biweekly allocation display */}
                     {formData.monthlyBudget && (
-                      <div className="mt-3 p-4 bg-green-50 border border-green-200 rounded-lg">
-                        <p className="text-sm font-semibold text-green-800 mb-2">
+                      <div className="mt-3 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                        <p className="text-sm font-semibold text-purple-800 mb-2">
                           ✅ Auto-calculated biweekly allocation:
                         </p>
-                        <div className="text-lg font-bold text-green-700">
+                        <div className="text-lg font-bold text-purple-700">
                           ${formData.biweeklyAllocation}/biweekly
                         </div>
-                        <p className="text-xs text-green-600 mt-1">
+                        <p className="text-xs text-purple-600 mt-1">
                           This amount will be automatically allocated every payday to cover your{" "}
                           {formData.frequency} bill.
                         </p>
@@ -1120,7 +930,7 @@ const EditEnvelopeModal = ({
         </div>
 
         {/* Footer */}
-        <div className="bg-gray-50 px-6 py-4 flex items-center justify-between rounded-b-2xl">
+        <div className="bg-gray-50 px-6 py-4 flex items-center justify-between rounded-b-2xl flex-shrink-0">
           <div className="flex gap-3">
             <button
               type="button"
@@ -1181,7 +991,7 @@ const EditEnvelopeModal = ({
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDeleteConfirm}
         envelope={envelope}
-        connectedBills={allBills?.filter((bill) => bill.envelopeId === envelope?.id) || []}
+        connectedBills={[]}
         isDeleting={isSubmitting}
       />
     </div>

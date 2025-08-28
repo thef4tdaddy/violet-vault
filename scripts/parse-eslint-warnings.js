@@ -66,9 +66,7 @@ function parseESLintOutput(output) {
     if (inSummary) continue;
 
     // Match file paths (absolute or relative)
-    const fileMatch = line.match(
-      /^\/.*?\.(js|jsx|ts|tsx)$|^[^/\s].*?\.(js|jsx|ts|tsx)$/,
-    );
+    const fileMatch = line.match(/^\/.*?\.(js|jsx|ts|tsx)$|^[^/\s].*?\.(js|jsx|ts|tsx)$/);
     if (fileMatch) {
       currentFile = fileMatch[0];
       // Convert absolute paths to relative paths
@@ -83,7 +81,7 @@ function parseESLintOutput(output) {
 
     // Match warning/error lines with format: "  line:col  level  message  rule"
     const issueMatch = line.match(
-      /^\s*(\d+):(\d+)\s+(warning|error)\s+(.*?)\s+([\w-]+(?:\/[\w-]+)*)$/,
+      /^\s*(\d+):(\d+)\s+(warning|error)\s+(.*?)\s+([\w-]+(?:\/[\w-]+)*)$/
     );
     if (issueMatch && currentFile) {
       const [, lineNum, col, level, message, rule] = issueMatch;
@@ -155,13 +153,11 @@ function parseESLintOutput(output) {
     totalCount: warnings.length,
     errorCount: errors.length,
     categories: categories,
-    warningsByFile: Array.from(warningsByFile.entries()).map(
-      ([file, fileWarnings]) => ({
-        file,
-        count: fileWarnings.length,
-        warnings: fileWarnings,
-      }),
-    ),
+    warningsByFile: Array.from(warningsByFile.entries()).map(([file, fileWarnings]) => ({
+      file,
+      count: fileWarnings.length,
+      warnings: fileWarnings,
+    })),
   };
 }
 
@@ -199,14 +195,11 @@ function generateActionPlan(categories) {
 
 function getActionForRule(rule) {
   const actionMap = {
-    "no-unused-vars":
-      "Remove unused variables or prefix with underscore if intentionally unused",
-    "react-hooks/exhaustive-deps":
-      "Add missing dependencies to useEffect dependency array",
+    "no-unused-vars": "Remove unused variables or prefix with underscore if intentionally unused",
+    "react-hooks/exhaustive-deps": "Add missing dependencies to useEffect dependency array",
     "react-refresh/only-export-components":
       "Refactor to separate component and non-component exports",
-    "prefer-const":
-      "Use const instead of let for variables that are never reassigned",
+    "prefer-const": "Use const instead of let for variables that are never reassigned",
     "no-console": "Remove console statements or add eslint-disable comment",
     "no-debugger": "Remove debugger statements",
     "no-unreachable": "Remove unreachable code after return/throw statements",

@@ -246,7 +246,8 @@ export const optimisticHelpers = {
 
     // Persist to Dexie for offline access
     try {
-      await budgetDb.envelopes.put({ id: envelopeId, ...updates });
+      // Fix for #540: Use update to preserve existing envelope data
+      await budgetDb.envelopes.update(envelopeId, updates);
     } catch (error) {
       logger.warn("Failed to persist envelope update to Dexie", {
         error: error.message,
@@ -359,7 +360,8 @@ export const optimisticHelpers = {
 
     // Update in Dexie
     try {
-      await budgetDb.transactions.put({ id: transactionId, ...updates });
+      // Fix for #540: Use update to preserve existing transaction data
+      await budgetDb.transactions.update(transactionId, updates);
     } catch (error) {
       logger.warn("Failed to update transaction in Dexie", {
         error: error.message,
@@ -394,7 +396,8 @@ export const optimisticHelpers = {
     });
 
     try {
-      await budgetDb.bills.put({ id: billId, ...updates });
+      // Fix for #540: Use update instead of put to preserve existing bill data
+      await budgetDb.bills.update(billId, updates);
     } catch (error) {
       logger.warn("Failed to persist bill update to Dexie", {
         error: error.message,
@@ -467,7 +470,8 @@ export const optimisticHelpers = {
     });
 
     try {
-      await budgetDb.savingsGoals.put({ id: goalId, ...updates });
+      // Fix for #540: Use update to preserve existing savings goal data
+      await budgetDb.savingsGoals.update(goalId, updates);
     } catch (error) {
       logger.warn("Failed to persist savings goal update to Dexie", {
         error: error.message,
@@ -519,7 +523,8 @@ export const optimisticHelpers = {
     });
 
     try {
-      await budgetDb.debts.put({ id: debtId, ...updates });
+      // Fix for #540: Use update to preserve existing debt data
+      await budgetDb.debts.update(debtId, updates);
     } catch (error) {
       logger.warn("Failed to persist debt update to Dexie", {
         error: error.message,

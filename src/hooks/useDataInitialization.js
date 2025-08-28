@@ -1,6 +1,33 @@
 import { useEffect, useState } from "react";
 import { useBudgetStore } from "../stores/uiStore";
 import logger from "../utils/logger";
+import { budgetDb } from "../db/budgetDb";
+
+/**
+ * Auto-fix undefined autoAllocate values - set all to true by default
+ */
+async function fixAutoAllocateUndefinedValues() {
+  try {
+    const allEnvelopes = await budgetDb.envelopes.toArray();
+    const undefinedEnvelopes = allEnvelopes.filter((env) => env.autoAllocate === undefined);
+
+    if (undefinedEnvelopes.length > 0) {
+      logger.info(
+        `🔧 Auto-fixing ${undefinedEnvelopes.length} envelopes with undefined autoAllocate (setting to true)`
+      );
+
+      for (const envelope of undefinedEnvelopes) {
+        await budgetDb.envelopes.update(envelope.id, {
+          autoAllocate: true, // Set to true by default as user requested
+        });
+      }
+
+      logger.info(`✅ Fixed ${undefinedEnvelopes.length} envelope autoAllocate values`);
+    }
+  } catch (error) {
+    logger.error("Failed to fix autoAllocate undefined values:", error);
+  }
+}
 
 /**
  * Hook to initialize background cloud sync service
@@ -21,6 +48,9 @@ const useDataInitialization = () => {
         });
 
         setInitError(null);
+
+        // Auto-fix undefined autoAllocate values on startup
+        await fixAutoAllocateUndefinedValues();
 
         // Note: Background sync is now started after successful login in authStore
         // This ensures auth context is available before sync attempts

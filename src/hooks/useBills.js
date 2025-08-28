@@ -323,6 +323,7 @@ const useBills = (options = {}) => {
         paidDate: paymentDate,
         envelopeId: envelopeId,
         lastPaid: new Date().toISOString(),
+        // DO NOT modify the original amount - it should remain unchanged
       };
 
       // Apply optimistic update
@@ -358,7 +359,9 @@ const useBills = (options = {}) => {
         const envelope = await budgetDb.envelopes.get(envelopeId);
         if (envelope) {
           const newBalance = (envelope.currentBalance || 0) - paidAmount;
-          await budgetDb.envelopes.update(envelopeId, {
+
+          // Ensure envelope integrity during update (#540 - prevent corrupted envelopes)
+          const envelopeUpdate = {
             currentBalance: newBalance,
             updatedAt: new Date().toISOString(),
             lastTransaction: {
@@ -368,9 +371,28 @@ const useBills = (options = {}) => {
               billId: billId,
               transactionId: paymentTransaction.id,
             },
-          });
+            // Ensure required fields are preserved to prevent corruption
+            name: envelope.name || `Envelope ${envelopeId}`,
+            category: envelope.category || "Other",
+          };
+
+          await budgetDb.envelopes.update(envelopeId, envelopeUpdate);
           await optimisticHelpers.updateEnvelope(envelopeId, {
             currentBalance: newBalance,
+          });
+
+          logger.debug("💰 Updated envelope balance for bill payment", {
+            envelopeId,
+            envelopeName: envelope.name,
+            oldBalance: envelope.currentBalance || 0,
+            newBalance,
+            paidAmount,
+          });
+        } else {
+          logger.warn("⚠️ Envelope not found for bill payment", {
+            envelopeId,
+            billId,
+            paidAmount,
           });
         }
       }

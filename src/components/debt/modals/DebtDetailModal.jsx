@@ -1,5 +1,10 @@
 import React, { useState } from "react";
-import { X, Edit, Trash2, DollarSign, Calendar, TrendingDown } from "lucide-react";
+import { X, Edit, Trash2, DollarSign, Calendar, TrendingDown, Receipt, Wallet } from "lucide-react";
+import ConnectionDisplay, {
+  ConnectionItem,
+  ConnectionInfo,
+  UniversalConnectionManager,
+} from "../../ui/ConnectionDisplay";
 
 /**
  * Modal for viewing and managing individual debt details
@@ -165,38 +170,13 @@ const DebtDetailModal = ({
           </div>
         )}
 
-        {/* Relationships */}
-        {(debt.relatedBill || debt.relatedEnvelope) && (
-          <div className="bg-gray-50 rounded-xl p-4 mb-6">
-            <h4 className="font-medium text-gray-900 mb-3">Connected To</h4>
-            <div className="space-y-2">
-              {debt.relatedBill && (
-                <div className="flex items-center justify-between bg-white rounded-lg p-3">
-                  <div>
-                    <p className="font-medium">📄 {debt.relatedBill.name}</p>
-                    <p className="text-sm text-gray-600">Bill • ${debt.relatedBill.amount}/month</p>
-                  </div>
-                </div>
-              )}
-              {debt.relatedEnvelope && (
-                <div className="flex items-center justify-between bg-white rounded-lg p-3">
-                  <div>
-                    <p className="font-medium">📧 {debt.relatedEnvelope.name}</p>
-                    <p className="text-sm text-gray-600">Envelope • Payment source</p>
-                  </div>
-                </div>
-              )}
-              {!debt.relatedBill && (
-                <button
-                  onClick={() => onLinkToBill && onLinkToBill(debt.id)}
-                  className="text-sm text-blue-600 hover:text-blue-700"
-                >
-                  + Link to Bill
-                </button>
-              )}
-            </div>
-          </div>
-        )}
+        {/* Universal Connection Manager for Debts */}
+        <UniversalConnectionManager
+          entityType="debt"
+          entityId={debt.id}
+          canEdit={true}
+          theme="purple"
+        />
 
         {/* Payment History */}
         {debt.paymentHistory && debt.paymentHistory.length > 0 && (

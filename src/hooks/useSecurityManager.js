@@ -282,12 +282,24 @@ export const useSecurityManager = () => {
   const unlockApp = useCallback(
     async (password) => {
       try {
-        console.log("🔐 Attempting password validation...");
+        console.log("🔐 SAFETY LOCK - Attempting password validation...", {
+          hasPassword: !!password,
+          passwordLength: password?.length,
+        });
+
         // Validate password against auth store
         const { useAuth } = await import("../stores/authStore");
         const auth = useAuth.getState();
+
+        console.log("🔐 SAFETY LOCK - Auth state check:", {
+          hasEncryptionKey: !!auth.encryptionKey,
+          hasSalt: !!auth.salt,
+          hasCurrentUser: !!auth.currentUser,
+          isUnlocked: auth.isUnlocked,
+        });
+
         const isValidPassword = await auth.validatePassword(password);
-        console.log("🔐 Password validation result:", isValidPassword);
+        console.log("🔐 SAFETY LOCK - Password validation result:", isValidPassword);
 
         if (isValidPassword) {
           setIsLocked(false);
@@ -307,17 +319,28 @@ export const useSecurityManager = () => {
           return { success: false, error: "Invalid password" };
         }
       } catch (error) {
-        console.error("Error during unlock attempt:", error);
+        console.error("🔐 SAFETY LOCK - Error during unlock attempt:", error);
+        console.error("🔐 SAFETY LOCK - Error details:", {
+          message: error.message,
+          stack: error.stack,
+          name: error.name,
+          type: typeof error,
+        });
+
         try {
           logSecurityEvent({
             type: "UNLOCK_ERROR",
             description: `Error during unlock attempt: ${error.message}`,
-            metadata: { error: error.message },
+            metadata: {
+              error: error.message,
+              errorType: error.name,
+              errorStack: error.stack,
+            },
           });
         } catch (logError) {
           console.error("Failed to log security event:", logError);
         }
-        return { success: false, error: "Unlock failed" };
+        return { success: false, error: `Unlock failed: ${error.message}` };
       }
     },
     [updateActivity, logSecurityEvent]

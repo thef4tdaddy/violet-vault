@@ -760,8 +760,10 @@ const useBugReport = () => {
         const bugReportEndpoint = import.meta.env.VITE_BUG_REPORT_ENDPOINT;
 
         if (bugReportEndpoint) {
-          logger.info("Submitting bug report to endpoint", {
+          logger.production("Bug report submitted", {
             endpoint: bugReportEndpoint,
+            page: getCurrentPageContext().page,
+            hasScreenshot: !!screenshotData,
           });
 
           const response = await fetch(bugReportEndpoint, {
@@ -815,7 +817,11 @@ const useBugReport = () => {
             }
           } else {
             const result = await response.json();
-            logger.info("Bug report submitted successfully", result);
+            logger.production("Bug report created successfully", {
+              issueNumber: result.issueNumber,
+              issueUrl: result.issueUrl,
+              page: getCurrentPageContext().page,
+            });
 
             // Store the issue URL for user feedback
             if (result.issueUrl) {
