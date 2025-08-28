@@ -37,6 +37,8 @@ const useEditLock = (recordType, recordId, options = {}) => {
         hasLock: !!lockDoc,
         lockUserId: lockDoc?.userId,
         currentUserId,
+        lockUserName: lockDoc?.userName,
+        lockExpiresAt: lockDoc?.expiresAt,
         isOwnLock: lockDoc && currentUserId && lockDoc.userId === currentUserId,
       });
     });

@@ -22,32 +22,6 @@ const PaycheckProcessor = ({
   currentUser,
 }) => {
   // PRODUCTION DEBUG: Check autoAllocate values since user says all are enabled
-  React.useEffect(() => {
-    const autoAllocateCheck = envelopes?.map((e) => ({
-      name: e?.name,
-      autoAllocate: e?.autoAllocate,
-      id: e?.id?.substring(0, 8) + "...",
-    }));
-    console.log("ENVELOPE AUTO-ALLOCATE CHECK:", autoAllocateCheck);
-    console.log(
-      "Auto-allocate TRUE count:",
-      envelopes?.filter((e) => e?.autoAllocate === true).length
-    );
-    console.log(
-      "Auto-allocate FALSE count:",
-      envelopes?.filter((e) => e?.autoAllocate === false).length
-    );
-
-    // Show detailed breakdown of autoAllocate values
-    const autoAllocateBreakdown = {};
-    envelopes?.forEach((e) => {
-      const value = e?.autoAllocate;
-      const key = `${typeof value}_${value}`;
-      if (!autoAllocateBreakdown[key]) autoAllocateBreakdown[key] = [];
-      autoAllocateBreakdown[key].push(e?.name);
-    });
-    console.log("DETAILED AUTO-ALLOCATE BREAKDOWN:", autoAllocateBreakdown);
-  }, [envelopes]);
   const [paycheckAmount, setPaycheckAmount] = useState("");
   const [payerName, setPayerName] = useState(currentUser?.userName || "");
   const [allocationMode, setAllocationMode] = useState("allocate"); // 'allocate' or 'leftover'
@@ -160,22 +134,6 @@ const PaycheckProcessor = ({
     const allocations = {};
     let totalAllocated = 0;
 
-    // PRODUCTION DEBUG: Check filtering details since user says auto-allocate is enabled on all
-    const autoAllocateEnvelopes = envelopes.filter((e) => e.autoAllocate);
-    console.log("=== FILTERING DEBUG ===");
-    console.log("Envelopes with autoAllocate=true:", autoAllocateEnvelopes.length);
-    autoAllocateEnvelopes.forEach((e) => {
-      console.log(`- ${e.name}:`, {
-        envelopeType: e.envelopeType,
-        category: e.category,
-        monthlyBudget: e.monthlyBudget,
-        biweeklyAllocation: e.biweeklyAllocation,
-        matchesBillFilter:
-          e.envelopeType === ENVELOPE_TYPES.BILL || BILL_CATEGORIES.includes(e.category),
-        matchesVariableFilter: e.envelopeType === ENVELOPE_TYPES.VARIABLE && e.monthlyBudget > 0,
-      });
-    });
-
     // Filter to bill envelopes with auto-allocate enabled
     const billEnvelopes = envelopes.filter(
       (envelope) =>
@@ -191,19 +149,6 @@ const PaycheckProcessor = ({
         envelope.envelopeType === ENVELOPE_TYPES.VARIABLE &&
         envelope.monthlyBudget > 0
     );
-
-    console.log("FINAL FILTER RESULTS:");
-    console.log(
-      "Bill envelopes:",
-      billEnvelopes.length,
-      billEnvelopes.map((e) => e.name)
-    );
-    console.log(
-      "Variable envelopes:",
-      variableEnvelopes.length,
-      variableEnvelopes.map((e) => e.name)
-    );
-    console.log("=== END DEBUG ===");
 
     // Debug logging to understand allocation issues
     logger.debug("Paycheck allocation debug", {

@@ -420,29 +420,6 @@ const EditEnvelopeModal = ({
               <div className="flex-1">
                 <div className="flex items-center gap-3">
                   <h2 className="text-xl font-bold text-white">Edit Envelope</h2>
-                  {/* Edit Lock Status */}
-                  {isLocked && (
-                    <div
-                      className={`flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                        isOwnLock
-                          ? "bg-purple-500/20 text-purple-100 border border-purple-400/30"
-                          : "bg-red-500/20 text-red-100 border border-red-400/30"
-                      }`}
-                    >
-                      {isOwnLock ? (
-                        <>
-                          <Unlock className="h-3 w-3 mr-1" />
-                          You're Editing
-                        </>
-                      ) : (
-                        <>
-                          <Lock className="h-3 w-3 mr-1" />
-                          <User className="h-3 w-3 mr-1" />
-                          {lockedBy}
-                        </>
-                      )}
-                    </div>
-                  )}
                   {lockLoading && (
                     <div className="bg-purple-500/20 text-purple-100 border border-purple-400/30 px-3 py-1 rounded-full text-xs font-medium flex items-center">
                       <div className="animate-spin rounded-full h-3 w-3 border border-yellow-300 border-t-transparent mr-1" />
@@ -452,12 +429,6 @@ const EditEnvelopeModal = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <p className="text-blue-100 text-sm">Modify envelope settings</p>
-                  {isLocked && !isOwnLock && expiresAt && (
-                    <div className="flex items-center text-red-200 text-xs">
-                      <Clock className="h-3 w-3 mr-1" />
-                      {isExpired ? "Expired" : `${Math.ceil(timeRemaining / 1000)}s remaining`}
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
