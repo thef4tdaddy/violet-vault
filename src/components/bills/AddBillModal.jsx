@@ -1,7 +1,11 @@
 // Extracted from old BillManager - proper bill creation modal
 import React, { useState, useEffect } from "react";
 import { X, Save, Sparkles, Trash2, Lock, Unlock, User, Clock, Wallet } from "lucide-react";
-import ConnectionDisplay, { ConnectionItem, ConnectionInfo } from "../ui/ConnectionDisplay";
+import ConnectionDisplay, {
+  ConnectionItem,
+  ConnectionInfo,
+  UniversalConnectionManager,
+} from "../ui/ConnectionDisplay";
 import useEditLock from "../../hooks/useEditLock";
 import { initializeEditLocks } from "../../services/editLockService";
 import { useAuth } from "../../stores/authStore";
@@ -672,63 +676,20 @@ const AddBillModal = ({
               </div>
             )}
 
-            {/* Connected Envelope Display - Using Purple Theme */}
-            {editingBill && editingBill.envelopeId && (
+            {/* Universal Connection Manager for Bills */}
+            {editingBill && (
               <div className="md:col-span-2">
-                <ConnectionDisplay
-                  title="Connected Envelope"
-                  icon={Wallet}
+                <UniversalConnectionManager
+                  entityType="bill"
+                  entityId={editingBill.id}
+                  canEdit={canEdit}
                   theme="purple"
-                  isVisible={true}
-                  onDisconnect={() => {
-                    // Disconnect the bill from the envelope
-                    setFormData({
-                      ...formData,
-                      selectedEnvelope: "",
-                    });
-                    // Also update the editing bill to remove the envelope connection
-                    if (editingBill) {
-                      setEditingBill({
-                        ...editingBill,
-                        envelopeId: null,
-                      });
-                    }
-                  }}
-                >
-                  {(() => {
-                    const connectedEnvelope = availableEnvelopes.find(
-                      (env) => env.id === editingBill.envelopeId
-                    );
-                    return connectedEnvelope ? (
-                      <ConnectionItem
-                        icon={Wallet}
-                        title="Connected Envelope"
-                        details={`${connectedEnvelope.name} • $${(connectedEnvelope.currentBalance || 0).toFixed(2)} available`}
-                        badge="Funding source"
-                        theme="purple"
-                      />
-                    ) : (
-                      <ConnectionItem
-                        icon={Wallet}
-                        title="Connected Envelope"
-                        details="Unknown envelope (may have been deleted)"
-                        badge="Error"
-                        badgeColor="red"
-                        theme="purple"
-                      />
-                    );
-                  })()}
-
-                  <ConnectionInfo theme="purple">
-                    💜 <strong>Connected!</strong> This bill is linked to the envelope above.
-                    Payments will be automatically deducted from the envelope balance.
-                  </ConnectionInfo>
-                </ConnectionDisplay>
+                />
               </div>
             )}
 
             {/* Envelope Assignment - Hidden when connected */}
-            {!(editingBill && editingBill.envelopeId) && (
+            {!editingBill && (
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Envelope Assignment

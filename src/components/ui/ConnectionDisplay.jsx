@@ -1,5 +1,6 @@
 import React from "react";
-import { X, CheckCircle, Sparkles } from "lucide-react";
+import { X, CheckCircle, Sparkles, Receipt, Target, CreditCard } from "lucide-react";
+import useConnectionManager from "../../hooks/useConnectionManager";
 
 /**
  * Shared component for displaying connected entity relationships in modals
@@ -133,87 +134,113 @@ export const ConnectionInfo = ({ children, className = "", theme = "purple" }) =
 };
 
 /**
- * Bill Connection Component - handles both selection and display
- * Shows dropdown when no connection, shows display when connected
+ * Universal Connection Manager Component
+ * Pure UI component that uses useConnectionManager hook for all logic
+ * Context-aware: shows appropriate relationships and options
  */
-export const BillConnectionSelector = ({
-  selectedBillId,
-  onBillSelection,
-  onDisconnect,
-  allBills = [],
-  currentEnvelopeId,
+export const UniversalConnectionManager = ({
+  entityType, // 'bill', 'envelope', 'debt'
+  entityId,
   canEdit = true,
   theme = "purple",
+  showSelector = true, // Whether to show the selection dropdown
 }) => {
-  const connectedBill = selectedBillId ? allBills.find((bill) => bill.id === selectedBillId) : null;
+  const {
+    currentConnections,
+    availableOptions,
+    selectedConnectionId,
+    isConnecting,
+    hasConnections,
+    hasAvailableOptions,
+    handleConnect,
+    handleDisconnect,
+    handleSelectionChange,
+    canConnect,
+    getConnectionConfig,
+  } = useConnectionManager(entityType, entityId);
+
+  const config = getConnectionConfig();
 
   return (
-    <ConnectionDisplay title="Connect to Existing Bill" icon={Sparkles} theme={theme}>
-      {/* Show display-only when connected, dropdown when not connected */}
-      {selectedBillId && connectedBill ? (
-        /* Display current connection */
-        <div className="w-full px-4 py-4 border-2 border-purple-400 rounded-xl bg-purple-50 text-base">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <CheckCircle className="h-5 w-5 mr-3 text-purple-600" />
-              <div>
-                <div className="font-medium text-purple-800">
-                  {`${connectedBill.name || connectedBill.provider} - $${parseFloat(connectedBill.amount || 0).toFixed(2)} (${connectedBill.frequency || "monthly"})`}
-                </div>
-                <div className="text-xs text-purple-600 mt-1">Connected to bill</div>
-              </div>
-            </div>
-            {canEdit && (
-              <button
-                type="button"
-                onClick={onDisconnect}
-                className="ml-3 px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 text-xs rounded-lg transition-colors flex items-center"
-                title="Disconnect from bill"
-              >
-                <X className="h-3 w-3 mr-1" />
-                Disconnect
-              </button>
-            )}
-          </div>
-        </div>
-      ) : (
-        /* Show dropdown when not connected */
-        <select
-          value={selectedBillId || ""}
-          onChange={(e) => onBillSelection(e.target.value)}
-          disabled={!canEdit}
-          className={`w-full px-4 py-4 border-2 border-purple-400 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white shadow-md text-base ${
-            !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
-          }`}
+    <div className="space-y-4">
+      {/* Display existing connections */}
+      {hasConnections && (
+        <ConnectionDisplay
+          title={config.displayTitle}
+          icon={entityType === "envelope" ? Receipt : Target}
+          theme={theme}
+          onDisconnect={canEdit ? handleDisconnect : undefined}
         >
-          <option value="">
-            {allBills && allBills.length > 0
-              ? "Choose a bill to auto-populate settings..."
-              : `No bills available (${allBills ? allBills.length : "undefined"} found)`}
-          </option>
-          {allBills &&
-            allBills
-              .filter((bill) => !bill.envelopeId || bill.envelopeId === currentEnvelopeId)
-              .map((bill) => (
-                <option key={bill.id} value={bill.id}>
-                  {bill.name || bill.provider} - ${parseFloat(bill.amount || 0).toFixed(2)} (
-                  {bill.frequency || "monthly"})
-                </option>
-              ))}
-        </select>
+          <div className="space-y-2">
+            {currentConnections.map((connection) => (
+              <ConnectionItem
+                key={connection.id}
+                icon={CheckCircle}
+                title={connection.name || connection.provider || "Unnamed"}
+                details={
+                  connection.amount
+                    ? `$${parseFloat(connection.amount).toFixed(2)} (${connection.frequency || "monthly"})`
+                    : connection.description
+                }
+                badge={connection.category}
+                theme={theme}
+              />
+            ))}
+          </div>
+        </ConnectionDisplay>
       )}
 
-      <p className="text-sm text-purple-700 mt-3 font-medium">
-        📝 <strong>Tip:</strong> Connect a bill to automatically fill envelope details like name,
-        amount, and category. Works for all envelope types.
-      </p>
+      {/* Show selection dropdown when no connection exists or when explicitly requested */}
+      {showSelector && (!hasConnections || entityType === "envelope") && (
+        <ConnectionDisplay title={config.selectTitle} icon={Sparkles} theme={theme}>
+          <select
+            value={selectedConnectionId || ""}
+            onChange={(e) => handleSelectionChange(e.target.value)}
+            disabled={!canEdit || isConnecting}
+            className={`w-full px-4 py-4 border-2 border-purple-400 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white shadow-md text-base ${
+              !canEdit || isConnecting ? "bg-gray-100 cursor-not-allowed" : ""
+            }`}
+          >
+            <option value="">
+              {hasAvailableOptions ? config.selectPrompt : `No ${config.connectionType}s available`}
+            </option>
+            {availableOptions.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.name || option.provider} - ${parseFloat(option.amount || 0).toFixed(2)} (
+                {option.frequency || "monthly"})
+              </option>
+            ))}
+          </select>
 
-      {(!allBills || allBills.length === 0) && (
-        <p className="text-sm text-red-600 mt-3 font-medium">
-          ⚠️ No bills found. Create bills first to connect them to envelopes.
-        </p>
+          {/* Connect button */}
+          {selectedConnectionId && (
+            <button
+              type="button"
+              onClick={handleConnect}
+              disabled={!canConnect || isConnecting}
+              className={`mt-3 px-4 py-2 rounded-lg font-medium transition-colors ${
+                canConnect && !isConnecting
+                  ? "bg-purple-600 hover:bg-purple-700 text-white"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
+            >
+              {isConnecting ? "Connecting..." : "Connect"}
+            </button>
+          )}
+
+          <ConnectionInfo theme={theme}>
+            📝 <strong>Tip:</strong> {config.tip}
+          </ConnectionInfo>
+
+          {!hasAvailableOptions && (
+            <ConnectionInfo theme="yellow">
+              ⚠️ No {config.connectionType}s found. Create {config.connectionType}s first to connect
+              them.
+            </ConnectionInfo>
+          )}
+        </ConnectionDisplay>
       )}
-    </ConnectionDisplay>
+    </div>
   );
 };
 
