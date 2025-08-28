@@ -455,7 +455,20 @@ const EditEnvelopeModal = ({
 
         {/* Edit Lock Indicator - Shows green banner for own locks, red for others, with live countdown */}
         {isLocked && (
-          <div className="mx-6 mt-4">
+          <div className="mx-6 mt-4 space-y-2">
+            {/* Production Debug Panel for Lock Issues */}
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-xs">
+              <strong>🔍 Lock Debug:</strong>
+              <div className="mt-1 space-y-1">
+                <div>Current User ID: {authCurrentUser?.id || "none"}</div>
+                <div>Current User Name: {authCurrentUser?.userName || "none"}</div>
+                <div>Lock User ID: {lock?.userId || "none"}</div>
+                <div>Lock User Name: {lock?.userName || "none"}</div>
+                <div>Is Own Lock: {isOwnLock ? "TRUE" : "FALSE"}</div>
+                <div>Can Edit: {canEdit ? "TRUE" : "FALSE"}</div>
+              </div>
+            </div>
+
             <EditLockIndicator
               isLocked={isLocked}
               isOwnLock={isOwnLock}
