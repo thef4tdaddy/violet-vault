@@ -28,9 +28,9 @@ class EditLockService {
   constructor() {
     this.locks = new Map(); // Local cache of active locks
     this.lockListeners = new Map(); // Firestore listeners
+    this.heartbeatIntervals = new Map(); // Map of lockId -> interval
     this.currentUser = null;
     this.budgetId = null;
-    this.heartbeatInterval = null;
   }
 
   /**
@@ -251,6 +251,9 @@ class EditLockService {
    * Start heartbeat to keep lock alive
    */
   startHeartbeat(lockId) {
+    // Stop existing heartbeat for this lock if any
+    this.stopHeartbeat(lockId);
+    
     const heartbeatInterval = setInterval(async () => {
       try {
         // Update heartbeat in Firebase - using correct path per security rules
@@ -262,22 +265,31 @@ class EditLockService {
           },
           { merge: true }
         );
+        
+        // Update local cache
+        const localLock = this.locks.get(lockId);
+        if (localLock) {
+          localLock.expiresAt = new Date(Date.now() + 60000);
+        }
       } catch (error) {
-        logger.error("Heartbeat failed", error);
+        logger.error("💓 Heartbeat failed for lock:", lockId, error);
         this.stopHeartbeat(lockId);
       }
-    }, 30000); // Heartbeat every 30 seconds
+    }, 5000); // Heartbeat every 5 seconds for better timer responsiveness
 
-    this.heartbeatInterval = heartbeatInterval;
+    this.heartbeatIntervals.set(lockId, heartbeatInterval);
+    logger.debug("💓 Heartbeat started for lock:", lockId);
   }
 
   /**
    * Stop heartbeat for a lock
    */
-  stopHeartbeat() {
-    if (this.heartbeatInterval) {
-      clearInterval(this.heartbeatInterval);
-      this.heartbeatInterval = null;
+  stopHeartbeat(lockId) {
+    const heartbeatInterval = this.heartbeatIntervals.get(lockId);
+    if (heartbeatInterval) {
+      clearInterval(heartbeatInterval);
+      this.heartbeatIntervals.delete(lockId);
+      logger.debug("💓 Heartbeat stopped for lock:", lockId);
     }
   }
 
@@ -295,9 +307,10 @@ class EditLockService {
    */
   cleanup() {
     // Stop all heartbeats
-    if (this.heartbeatInterval) {
-      clearInterval(this.heartbeatInterval);
+    for (const [lockId, heartbeatInterval] of this.heartbeatIntervals) {
+      clearInterval(heartbeatInterval);
     }
+    this.heartbeatIntervals.clear();
 
     // Release all owned locks
     for (const [, lock] of this.locks) {
