@@ -27,7 +27,18 @@ const useEditLock = (recordType, recordId, options = {}) => {
     const unwatch = editLockService.watchLock(recordType, recordId, (lockDoc) => {
       setLock(lockDoc);
       setIsLocked(!!lockDoc);
-      setIsOwnLock(lockDoc ? editLockService.ownsLock(recordType, recordId) : false);
+      // Check ownership directly from the lock document
+      const currentUserId = editLockService.currentUser?.id;
+      setIsOwnLock(lockDoc && currentUserId && lockDoc.userId === currentUserId);
+
+      logger.debug("🔐 Lock state updated", {
+        recordType,
+        recordId,
+        hasLock: !!lockDoc,
+        lockUserId: lockDoc?.userId,
+        currentUserId,
+        isOwnLock: lockDoc && currentUserId && lockDoc.userId === currentUserId,
+      });
     });
 
     return () => {
@@ -37,10 +48,10 @@ const useEditLock = (recordType, recordId, options = {}) => {
 
   // Auto-acquire lock if requested
   useEffect(() => {
-    if (autoAcquire && recordType && recordId && !isLocked) {
+    if (autoAcquire && recordType && recordId && (!isLocked || (!isOwnLock && lock))) {
       acquireLock();
     }
-  }, [autoAcquire, recordType, recordId]);
+  }, [autoAcquire, recordType, recordId, isLocked, isOwnLock, lock]);
 
   // Auto-release lock on unmount
   useEffect(() => {
@@ -161,8 +172,12 @@ const useEditLock = (recordType, recordId, options = {}) => {
     breakLock,
 
     // Computed values
-    timeRemaining: lock?.expiresAt ? Math.max(0, lock.expiresAt.toDate() - new Date()) : 0,
-    isExpired: lock?.expiresAt ? lock.expiresAt.toDate() <= new Date() : false,
+    timeRemaining: lock?.expiresAt
+      ? Math.max(0, (lock.expiresAt.toDate ? lock.expiresAt.toDate() : lock.expiresAt) - new Date())
+      : 0,
+    isExpired: lock?.expiresAt
+      ? (lock.expiresAt.toDate ? lock.expiresAt.toDate() : lock.expiresAt) <= new Date()
+      : false,
   };
 };
 

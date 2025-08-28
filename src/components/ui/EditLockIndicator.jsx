@@ -28,8 +28,15 @@ const EditLockIndicator = ({
 
   if (!isLocked) return null;
 
-  const isExpired = lock && new Date(lock.expiresAt) <= new Date();
-  const timeRemaining = lock ? Math.max(0, new Date(lock.expiresAt) - new Date()) : 0;
+  // Handle both Firebase Timestamp and Date objects
+  const getExpirationDate = (expiresAt) => {
+    if (!expiresAt) return new Date(0);
+    return expiresAt.toDate ? expiresAt.toDate() : new Date(expiresAt);
+  };
+
+  const expirationDate = getExpirationDate(lock?.expiresAt);
+  const isExpired = lock && expirationDate <= new Date();
+  const timeRemaining = lock ? Math.max(0, expirationDate - new Date()) : 0;
   const secondsRemaining = Math.ceil(timeRemaining / 1000);
   const minutesRemaining = Math.ceil(timeRemaining / (1000 * 60));
 
@@ -117,7 +124,12 @@ export const CompactEditLockIndicator = ({
 }) => {
   if (!isLocked) return null;
 
-  const isExpired = lock && new Date(lock.expiresAt) <= new Date();
+  const getExpirationDate = (expiresAt) => {
+    if (!expiresAt) return new Date(0);
+    return expiresAt.toDate ? expiresAt.toDate() : new Date(expiresAt);
+  };
+
+  const isExpired = lock && getExpirationDate(lock.expiresAt) <= new Date();
 
   if (isOwnLock) {
     return (
