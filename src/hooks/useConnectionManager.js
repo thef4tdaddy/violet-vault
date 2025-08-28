@@ -63,21 +63,15 @@ const useConnectionManager = (entityType, entityId) => {
     switch (entityType) {
       case "bill":
         // Bills can connect to envelopes that aren't connected to other bills (or this one)
-        return envelopes.filter(
-          (envelope) => !envelope.billId || envelope.billId === entityId,
-        );
+        return envelopes.filter((envelope) => !envelope.billId || envelope.billId === entityId);
 
       case "envelope":
         // Envelopes can connect to bills that aren't connected to other envelopes (or this one)
-        return bills.filter(
-          (bill) => !bill.envelopeId || bill.envelopeId === entityId,
-        );
+        return bills.filter((bill) => !bill.envelopeId || bill.envelopeId === entityId);
 
       case "debt":
         // Debts can connect to envelopes that aren't connected to other debts (or this one)
-        return envelopes.filter(
-          (envelope) => !envelope.debtId || envelope.debtId === entityId,
-        );
+        return envelopes.filter((envelope) => !envelope.debtId || envelope.debtId === entityId);
 
       default:
         return [];
@@ -130,11 +124,8 @@ const useConnectionManager = (entityType, entityId) => {
 
         case "debt":
           // Connect debt to envelope
-          const targetEnvelopeForDebt = envelopes.find(
-            (e) => e.id === targetId,
-          );
-          if (!targetEnvelopeForDebt)
-            throw new Error("Target envelope not found");
+          const targetEnvelopeForDebt = envelopes.find((e) => e.id === targetId);
+          if (!targetEnvelopeForDebt) throw new Error("Target envelope not found");
 
           await updateDebt({ id: entityId, updates: { envelopeId: targetId } });
 
@@ -177,8 +168,7 @@ const useConnectionManager = (entityType, entityId) => {
 
   // Handle connection removal
   const handleDisconnect = async () => {
-    if (!currentEntity || currentConnections.length === 0)
-      return { success: false };
+    if (!currentEntity || currentConnections.length === 0) return { success: false };
 
     setIsConnecting(true);
     logger.debug("🔗 Removing connection", {
@@ -205,9 +195,7 @@ const useConnectionManager = (entityType, entityId) => {
           // Remove all bills connected to this envelope
           const connectedBillIds = currentConnections.map((c) => c.id);
           await Promise.all(
-            connectedBillIds.map((billId) =>
-              updateBill(billId, { envelopeId: null }),
-            ),
+            connectedBillIds.map((billId) => updateBill(billId, { envelopeId: null }))
           );
 
           addToast({
