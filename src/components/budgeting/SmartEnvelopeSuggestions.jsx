@@ -452,9 +452,10 @@ const SmartEnvelopeSuggestions = ({
             <Lightbulb className="h-12 w-12 mx-auto mb-4 text-blue-500" />
             <h3 className="font-semibold text-gray-900 mb-2">Smart Suggestions Need Your Help!</h3>
             <p className="text-sm text-gray-600 mb-4 max-w-md mx-auto">
-              I analyze your spending patterns to suggest helpful envelope improvements, but I need transaction data to work with.
+              I analyze your spending patterns to suggest helpful envelope improvements, but I need
+              transaction data to work with.
             </p>
-            
+
             <div className="bg-white p-4 rounded-lg border border-blue-200 mb-4 text-left max-w-lg mx-auto">
               <h4 className="font-medium text-gray-900 mb-3 flex items-center">
                 <Target className="h-4 w-4 mr-2 text-blue-500" />
@@ -463,22 +464,35 @@ const SmartEnvelopeSuggestions = ({
               <ul className="space-y-2 text-sm text-gray-700">
                 <li className="flex items-start">
                   <Plus className="h-3 w-3 mt-1 mr-2 text-green-500 flex-shrink-0" />
-                  <span><strong>New Envelopes</strong> - Based on unassigned spending patterns (Coffee, Gas, etc.)</span>
+                  <span>
+                    <strong>New Envelopes</strong> - Based on unassigned spending patterns (Coffee,
+                    Gas, etc.)
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <TrendingUp className="h-3 w-3 mt-1 mr-2 text-blue-500 flex-shrink-0" />
-                  <span><strong>Budget Increases</strong> - When you consistently overspend an envelope</span>
+                  <span>
+                    <strong>Budget Increases</strong> - When you consistently overspend an envelope
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <TrendingDown className="h-3 w-3 mt-1 mr-2 text-orange-500 flex-shrink-0" />
-                  <span><strong>Budget Reductions</strong> - When envelopes are overfunded and underused</span>
+                  <span>
+                    <strong>Budget Reductions</strong> - When envelopes are overfunded and underused
+                  </span>
                 </li>
               </ul>
             </div>
 
             <div className="text-xs text-gray-500 space-y-1">
-              <p><strong>Minimum requirements:</strong> {analysisSettings.minTransactions}+ transactions, ${analysisSettings.minAmount}+ total spending per category</p>
-              <p><strong>Analysis period:</strong> Looking at your last {dateRange === "6months" ? "6 months" : `${dateRange} days`} of data</p>
+              <p>
+                <strong>Minimum requirements:</strong> {analysisSettings.minTransactions}+
+                transactions, ${analysisSettings.minAmount}+ total spending per category
+              </p>
+              <p>
+                <strong>Analysis period:</strong> Looking at your last{" "}
+                {dateRange === "6months" ? "6 months" : `${dateRange} days`} of data
+              </p>
             </div>
           </div>
         )}
@@ -490,7 +504,8 @@ const SmartEnvelopeSuggestions = ({
             <p className="font-medium">No suggestions right now</p>
             <p className="text-sm mt-1">Your budget looks well-optimized!</p>
             <p className="text-xs text-gray-400 mt-2">
-              Analyzed {filteredTransactions.length} transactions from the last {dateRange === "6months" ? "6 months" : `${dateRange} days`}
+              Analyzed {filteredTransactions.length} transactions from the last{" "}
+              {dateRange === "6months" ? "6 months" : `${dateRange} days`}
             </p>
             {dismissedSuggestions.size > 0 && (
               <button
