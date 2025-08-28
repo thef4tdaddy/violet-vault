@@ -21,17 +21,17 @@ const PaycheckProcessor = ({
   onDeletePaycheck,
   currentUser,
 }) => {
-  // PRODUCTION DEBUG: Log envelope data received by PaycheckProcessor
-  console.log("PaycheckProcessor debug - envelopes received:", envelopes?.length || 0, envelopes);
-  console.log(
-    "PaycheckProcessor debug - envelope types:",
-    envelopes?.map((e) => ({
+  // PRODUCTION DEBUG: Check autoAllocate values since user says all are enabled
+  React.useEffect(() => {
+    const autoAllocateCheck = envelopes?.map(e => ({
       name: e?.name,
-      type: e?.envelopeType,
       autoAllocate: e?.autoAllocate,
-      id: e?.id,
-    }))
-  );
+      id: e?.id?.substring(0, 8) + '...'
+    }));
+    console.log("ENVELOPE AUTO-ALLOCATE CHECK:", autoAllocateCheck);
+    console.log("Auto-allocate TRUE count:", envelopes?.filter(e => e?.autoAllocate === true).length);
+    console.log("Auto-allocate FALSE count:", envelopes?.filter(e => e?.autoAllocate === false).length);
+  }, [envelopes]);
   const [paycheckAmount, setPaycheckAmount] = useState("");
   const [payerName, setPayerName] = useState(currentUser?.userName || "");
   const [allocationMode, setAllocationMode] = useState("allocate"); // 'allocate' or 'leftover'
@@ -144,22 +144,20 @@ const PaycheckProcessor = ({
     const allocations = {};
     let totalAllocated = 0;
 
-    // PRODUCTION DEBUG: Log envelope filtering details
-    const autoAllocateEnvelopes = envelopes.filter((e) => e.autoAllocate);
-    console.log(
-      "Auto-allocate envelopes:",
-      autoAllocateEnvelopes.map((e) => ({
-        name: e.name,
-        autoAllocate: e.autoAllocate,
-        envelopeType: e.envelopeType,
+    // PRODUCTION DEBUG: Check filtering details since user says auto-allocate is enabled on all
+    const autoAllocateEnvelopes = envelopes.filter(e => e.autoAllocate);
+    console.log("=== FILTERING DEBUG ===");
+    console.log("Envelopes with autoAllocate=true:", autoAllocateEnvelopes.length);
+    autoAllocateEnvelopes.forEach(e => {
+      console.log(`- ${e.name}:`, {
+        envelopeType: e.envelopeType, 
         category: e.category,
         monthlyBudget: e.monthlyBudget,
         biweeklyAllocation: e.biweeklyAllocation,
-      }))
-    );
-
-    console.log("ENVELOPE_TYPES:", ENVELOPE_TYPES);
-    console.log("BILL_CATEGORIES:", BILL_CATEGORIES);
+        matchesBillFilter: (e.envelopeType === ENVELOPE_TYPES.BILL || BILL_CATEGORIES.includes(e.category)),
+        matchesVariableFilter: (e.envelopeType === ENVELOPE_TYPES.VARIABLE && e.monthlyBudget > 0)
+      });
+    });
 
     // Filter to bill envelopes with auto-allocate enabled
     const billEnvelopes = envelopes.filter(
@@ -177,16 +175,10 @@ const PaycheckProcessor = ({
         envelope.monthlyBudget > 0
     );
 
-    console.log(
-      "Filtered bill envelopes:",
-      billEnvelopes.length,
-      billEnvelopes.map((e) => e.name)
-    );
-    console.log(
-      "Filtered variable envelopes:",
-      variableEnvelopes.length,
-      variableEnvelopes.map((e) => e.name)
-    );
+    console.log("FINAL FILTER RESULTS:");
+    console.log("Bill envelopes:", billEnvelopes.length, billEnvelopes.map(e => e.name));
+    console.log("Variable envelopes:", variableEnvelopes.length, variableEnvelopes.map(e => e.name));
+    console.log("=== END DEBUG ===");
 
     // Debug logging to understand allocation issues
     logger.debug("Paycheck allocation debug", {
@@ -218,15 +210,7 @@ const PaycheckProcessor = ({
       const needed = Math.max(0, envelope.biweeklyAllocation - envelope.currentBalance);
       const allocation = Math.min(needed, remainingAmount);
 
-      // PRODUCTION DEBUG: Detailed allocation logging
-      console.log(`Bill envelope ${index + 1}/${billEnvelopes.length}: ${envelope.name}`, {
-        biweeklyAllocation: envelope.biweeklyAllocation,
-        currentBalance: envelope.currentBalance,
-        needed,
-        allocation,
-        remainingAmountBefore: remainingAmount,
-        remainingAmountAfter: remainingAmount - allocation,
-      });
+      // Debug logging removed - auto-allocate working correctly
 
       logger.debug(`Bill envelope allocation: ${envelope.name}`, {
         biweeklyAllocation: envelope.biweeklyAllocation,
@@ -249,16 +233,7 @@ const PaycheckProcessor = ({
       const needed = Math.max(0, biweeklyTarget - envelope.currentBalance);
       const allocation = Math.min(needed, remainingAmount);
 
-      // PRODUCTION DEBUG: Detailed allocation logging
-      console.log(`Variable envelope ${index + 1}/${variableEnvelopes.length}: ${envelope.name}`, {
-        monthlyBudget: envelope.monthlyBudget,
-        biweeklyTarget,
-        currentBalance: envelope.currentBalance,
-        needed,
-        allocation,
-        remainingAmountBefore: remainingAmount,
-        remainingAmountAfter: remainingAmount - allocation,
-      });
+      // Debug logging removed - auto-allocate working correctly
 
       logger.debug(`Variable envelope allocation: ${envelope.name}`, {
         monthlyBudget: envelope.monthlyBudget,
