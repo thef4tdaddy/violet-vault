@@ -455,28 +455,7 @@ const EditEnvelopeModal = ({
 
         {/* Edit Lock Indicator - Shows green banner for own locks, red for others, with live countdown */}
         {isLocked && (
-          <div className="mx-6 mt-4 space-y-2">
-            {/* Production Debug Panel for Lock Issues */}
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-xs">
-              <strong>🔍 Lock Debug:</strong>
-              <div className="mt-1 space-y-1">
-                <div>Raw User ID: {authCurrentUser?.id || "none"}</div>
-                <div>User Budget ID: {authCurrentUser?.budgetId || "none"}</div>
-                <div>User Name: {authCurrentUser?.userName || "none"}</div>
-                <div>
-                  Computed User ID:{" "}
-                  {authCurrentUser?.id ||
-                    authCurrentUser?.budgetId ||
-                    `user_${authCurrentUser?.userName?.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase()}` ||
-                    "anonymous"}
-                </div>
-                <div>Lock User ID: {lock?.userId || "none"}</div>
-                <div>Lock User Name: {lock?.userName || "none"}</div>
-                <div>Is Own Lock: {isOwnLock ? "TRUE" : "FALSE"}</div>
-                <div>Can Edit: {canEdit ? "TRUE" : "FALSE"}</div>
-              </div>
-            </div>
-
+          <div className="mx-6 mt-4">
             <EditLockIndicator
               isLocked={isLocked}
               isOwnLock={isOwnLock}
@@ -618,52 +597,68 @@ const EditEnvelopeModal = ({
                   🔗 Connect to Existing Bill
                 </label>
 
-                <select
-                  value={selectedBillId}
-                  onChange={(e) => handleBillSelection(e.target.value)}
-                  disabled={!canEdit}
-                  className={`w-full px-4 py-4 border-2 border-purple-400 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white shadow-md text-base ${
-                    !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
-                  }`}
-                >
-                  <option value="">
-                    {allBills && allBills.length > 0
-                      ? "Choose a bill to auto-populate settings..."
-                      : `No bills available (${allBills ? allBills.length : "undefined"} found)`}
-                  </option>
-                  {allBills &&
-                    allBills
-                      .filter((bill) => !bill.envelopeId || bill.envelopeId === envelope?.id) // Only show unassigned bills or bills assigned to this envelope
-                      .map((bill) => (
-                        <option key={bill.id} value={bill.id}>
-                          {bill.name || bill.provider} - ${parseFloat(bill.amount || 0).toFixed(2)}{" "}
-                          ({bill.frequency || "monthly"})
-                        </option>
-                      ))}
-                </select>
-
-                {selectedBillId && (
-                  <div className="mt-3 p-3 bg-purple-100 border border-purple-300 rounded-lg">
+                {/* Show display-only when connected, dropdown when not connected */}
+                {selectedBillId ? (
+                  /* Display current connection */
+                  <div className="w-full px-4 py-4 border-2 border-purple-400 rounded-xl bg-purple-50 text-base">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm text-purple-700 flex items-center">
-                        <CheckCircle className="h-5 w-5 mr-2" />
-                        <strong>Connected!</strong> Envelope settings have been populated from the
-                        selected bill.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedBillId("");
-                          // Optionally clear auto-populated fields or keep them
-                        }}
-                        className="ml-3 px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 text-xs rounded-lg transition-colors flex items-center"
-                        title="Disconnect from bill"
-                      >
-                        <X className="h-3 w-3 mr-1" />
-                        Disconnect
-                      </button>
+                      <div className="flex items-center">
+                        <CheckCircle className="h-5 w-5 mr-3 text-purple-600" />
+                        <div>
+                          <div className="font-medium text-purple-800">
+                            {(() => {
+                              const connectedBill = allBills?.find(
+                                (bill) => bill.id === selectedBillId
+                              );
+                              return connectedBill
+                                ? `${connectedBill.name || connectedBill.provider} - $${parseFloat(connectedBill.amount || 0).toFixed(2)} (${connectedBill.frequency || "monthly"})`
+                                : "Connected Bill";
+                            })()}
+                          </div>
+                          <div className="text-xs text-purple-600 mt-1">Connected to bill</div>
+                        </div>
+                      </div>
+                      {canEdit && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedBillId("");
+                          }}
+                          className="ml-3 px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 text-xs rounded-lg transition-colors flex items-center"
+                          title="Disconnect from bill"
+                        >
+                          <X className="h-3 w-3 mr-1" />
+                          Disconnect
+                        </button>
+                      )}
                     </div>
                   </div>
+                ) : (
+                  /* Show dropdown when not connected */
+                  <select
+                    value={selectedBillId}
+                    onChange={(e) => handleBillSelection(e.target.value)}
+                    disabled={!canEdit}
+                    className={`w-full px-4 py-4 border-2 border-purple-400 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white shadow-md text-base ${
+                      !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    <option value="">
+                      {allBills && allBills.length > 0
+                        ? "Choose a bill to auto-populate settings..."
+                        : `No bills available (${allBills ? allBills.length : "undefined"} found)`}
+                    </option>
+                    {allBills &&
+                      allBills
+                        .filter((bill) => !bill.envelopeId || bill.envelopeId === envelope?.id)
+                        .map((bill) => (
+                          <option key={bill.id} value={bill.id}>
+                            {bill.name || bill.provider} - $
+                            {parseFloat(bill.amount || 0).toFixed(2)} ({bill.frequency || "monthly"}
+                            )
+                          </option>
+                        ))}
+                  </select>
                 )}
 
                 <p className="text-sm text-purple-700 mt-3 font-medium">
