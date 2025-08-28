@@ -663,11 +663,25 @@ const EditEnvelopeModal = ({
 
                 {selectedBillId && (
                   <div className="mt-3 p-3 bg-purple-100 border border-purple-300 rounded-lg">
-                    <p className="text-sm text-purple-700 flex items-center">
-                      <CheckCircle className="h-5 w-5 mr-2" />
-                      <strong>Connected!</strong> Envelope settings have been populated from the
-                      selected bill.
-                    </p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-purple-700 flex items-center">
+                        <CheckCircle className="h-5 w-5 mr-2" />
+                        <strong>Connected!</strong> Envelope settings have been populated from the
+                        selected bill.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedBillId("");
+                          // Optionally clear auto-populated fields or keep them
+                        }}
+                        className="ml-3 px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 text-xs rounded-lg transition-colors flex items-center"
+                        title="Disconnect from bill"
+                      >
+                        <X className="h-3 w-3 mr-1" />
+                        Disconnect
+                      </button>
+                    </div>
                   </div>
                 )}
 
@@ -695,7 +709,7 @@ const EditEnvelopeModal = ({
                   : "Variable Budget Settings"}
               </h3>
 
-              {/* Connected Bill Display - Using Purple Theme */}
+              {/* Connected Bill Display - Using Purple Theme - Only for BILL type envelopes */}
               {(() => {
                 const connectedBill =
                   formData.envelopeType === ENVELOPE_TYPES.BILL && selectedBillId
@@ -715,6 +729,17 @@ const EditEnvelopeModal = ({
                       details={`${connectedBill.name || connectedBill.provider} • $${connectedBill.amount || "0.00"} (${connectedBill.frequency || "monthly"})`}
                       badge="Auto-synced"
                       theme="purple"
+                      actions={
+                        <button
+                          type="button"
+                          onClick={() => setSelectedBillId("")}
+                          className="px-2 py-1 bg-red-100 hover:bg-red-200 text-red-700 text-xs rounded transition-colors flex items-center"
+                          title="Disconnect from bill"
+                        >
+                          <X className="h-3 w-3 mr-1" />
+                          Disconnect
+                        </button>
+                      }
                     />
 
                     <ConnectionInfo theme="purple">
