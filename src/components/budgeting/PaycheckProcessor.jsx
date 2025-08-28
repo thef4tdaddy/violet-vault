@@ -1,5 +1,5 @@
 // src/components/PaycheckProcessor.jsx - Complete Component
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   DollarSign,
   User,
@@ -23,12 +23,15 @@ const PaycheckProcessor = ({
 }) => {
   // PRODUCTION DEBUG: Log envelope data received by PaycheckProcessor
   console.log("PaycheckProcessor debug - envelopes received:", envelopes?.length || 0, envelopes);
-  console.log("PaycheckProcessor debug - envelope types:", envelopes?.map(e => ({
-    name: e?.name,
-    type: e?.envelopeType,
-    autoAllocate: e?.autoAllocate,
-    id: e?.id
-  })));
+  console.log(
+    "PaycheckProcessor debug - envelope types:",
+    envelopes?.map((e) => ({
+      name: e?.name,
+      type: e?.envelopeType,
+      autoAllocate: e?.autoAllocate,
+      id: e?.id,
+    }))
+  );
   const [paycheckAmount, setPaycheckAmount] = useState("");
   const [payerName, setPayerName] = useState(currentUser?.userName || "");
   const [allocationMode, setAllocationMode] = useState("allocate"); // 'allocate' or 'leftover'
@@ -61,12 +64,16 @@ const PaycheckProcessor = ({
 
   // For new users with no paycheck history, default to showing the add new payer form
   const uniquePayers = getUniquePayers();
+  const initialRender = useRef(true);
   const [showAddNewPayer, setShowAddNewPayer] = useState(false);
 
-  // Use useEffect to set initial state based on paycheck history
+  // Use useEffect to set initial state based on paycheck history (only on initial render)
   useEffect(() => {
-    const hasNoPaychecks = uniquePayers.length === 0;
-    setShowAddNewPayer(hasNoPaychecks);
+    if (initialRender.current) {
+      const hasNoPaychecks = uniquePayers.length === 0;
+      setShowAddNewPayer(hasNoPaychecks);
+      initialRender.current = false;
+    }
   }, [uniquePayers.length]);
 
   // Get smart prediction for a specific payer
