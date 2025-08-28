@@ -89,6 +89,14 @@ class EditLockService {
           // Lock expired, clean it up
           await this.releaseLock(recordType, recordId);
         }
+      } else if (existingLock && existingLock.userId === this.currentUser.id) {
+        // User already owns this lock - extend it and continue
+        logger.debug("🔓 Extending existing lock owned by current user", { recordType, recordId });
+        const extendedLock = { ...existingLock, expiresAt: new Date(Date.now() + (options.duration || 60000)) };
+        await setDoc(doc(firestore, "locks", lockId), extendedLock);
+        this.locks.set(lockId, extendedLock);
+        this.startHeartbeat(lockId);
+        return { success: true, lockDoc: extendedLock, reason: "extended_existing" };
       }
 
       // Acquire the lock - using correct path per security rules

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Lock, Clock, AlertTriangle, User } from "lucide-react";
 
 /**
@@ -13,10 +13,24 @@ const EditLockIndicator = ({
   className = "",
   showDetails = true,
 }) => {
+  // Force re-render every second to update timer
+  const [, forceUpdate] = useState(0);
+  
+  useEffect(() => {
+    if (!isLocked || !lock) return;
+    
+    const interval = setInterval(() => {
+      forceUpdate(prev => prev + 1);
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, [isLocked, lock]);
+
   if (!isLocked) return null;
 
   const isExpired = lock && new Date(lock.expiresAt) <= new Date();
   const timeRemaining = lock ? Math.max(0, new Date(lock.expiresAt) - new Date()) : 0;
+  const secondsRemaining = Math.ceil(timeRemaining / 1000);
   const minutesRemaining = Math.ceil(timeRemaining / (1000 * 60));
 
   // Own lock - show friendly indicator
@@ -30,8 +44,10 @@ const EditLockIndicator = ({
           <p className="text-sm font-medium text-green-900">You are editing this record</p>
           {showDetails && timeRemaining > 0 && (
             <p className="text-xs text-green-700">
-              Lock expires in {minutesRemaining} minute
-              {minutesRemaining !== 1 ? "s" : ""}
+              {secondsRemaining > 60 
+                ? `Lock expires in ${minutesRemaining} minute${minutesRemaining !== 1 ? "s" : ""}`
+                : `Lock expires in ${secondsRemaining} second${secondsRemaining !== 1 ? "s" : ""}`
+              }
             </p>
           )}
         </div>
@@ -68,7 +84,10 @@ const EditLockIndicator = ({
               <div className="flex items-center gap-2 text-xs text-red-700">
                 <Clock className="h-3 w-3" />
                 <span>
-                  {minutesRemaining} minute{minutesRemaining !== 1 ? "s" : ""} remaining
+                  {secondsRemaining > 60 
+                    ? `${minutesRemaining} minute${minutesRemaining !== 1 ? "s" : ""} remaining`
+                    : `${secondsRemaining} second${secondsRemaining !== 1 ? "s" : ""} remaining`
+                  }
                 </span>
               </div>
             )}
