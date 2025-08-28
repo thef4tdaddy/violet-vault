@@ -10,9 +10,9 @@ on:
         default: false
         type: boolean
 
-  # Daily automated check for patch releases only
+  # Hourly automated check for patch releases only (as requested in #547)
   schedule:
-    - cron: "0 10 * * *" # 10 AM UTC daily
+    - cron: "0 * * * *" # Every hour at minute 0
 
   # Also run on push to main for immediate patch releases
   push:
