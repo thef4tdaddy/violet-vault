@@ -2,14 +2,14 @@
   "project": "violet-vault",
   "lastUpdated": "2025-08-28",
   "currentStatus": {
-    "totalWarnings": 29,
+    "totalWarnings": 30,
     "targetWarnings": 17,
     "errors": 0
   },
   "warningCategories": [
     {
       "type": "no-unused-vars",
-      "count": 20,
+      "count": 21,
       "severity": "warning",
       "files": [
         {
@@ -47,11 +47,11 @@
           "warnings": 2,
           "details": [
             {
-              "line": 209,
+              "line": 234,
               "message": "'index' is defined but never used"
             },
             {
-              "line": 231,
+              "line": 256,
               "message": "'index' is defined but never used"
             }
           ]
@@ -117,6 +117,16 @@
             {
               "line": 71,
               "message": "'envelopes' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
+            }
+          ]
+        },
+        {
+          "path": "src/services/editLockService.js",
+          "warnings": 1,
+          "details": [
+            {
+              "line": 321,
+              "message": "'lockId' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
             }
           ]
         },
@@ -251,7 +261,7 @@
     "highPriority": [
       {
         "task": "Fix no-unused-vars warnings",
-        "warningsAffected": 20,
+        "warningsAffected": 21,
         "files": [
           "AutoFundingRuleBuilder.jsx",
           "PaycheckProcessor.jsx",
@@ -261,6 +271,7 @@
           "NavigationTabs.jsx",
           "SummaryCards.jsx",
           "ViewRenderer.jsx",
+          "editLockService.js",
           "authStore.jsx",
           "autoFundingEngine.js"
         ],
@@ -285,7 +296,9 @@
       {
         "task": "Fix no-undef warnings",
         "warningsAffected": 1,
-        "files": ["AddBillModal.jsx"],
+        "files": [
+          "AddBillModal.jsx"
+        ],
         "action": "Review and fix no-undef violations"
       }
     ]
