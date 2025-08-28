@@ -407,7 +407,7 @@ const EditEnvelopeModal = ({
 
   return (
     <div className="fixed inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl">
+      <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[95vh] overflow-hidden shadow-2xl flex flex-col">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 px-6 py-4">
           <div className="flex items-center justify-between">
@@ -507,7 +507,7 @@ const EditEnvelopeModal = ({
         )}
 
         {/* Form Content */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <div className="flex-1 p-6 overflow-y-auto">
           <div className="space-y-6">
             {/* Envelope Type Selection */}
             <div className="space-y-4">
@@ -709,46 +709,7 @@ const EditEnvelopeModal = ({
                   : "Variable Budget Settings"}
               </h3>
 
-              {/* Connected Bill Display - Using Purple Theme - Only for BILL type envelopes */}
-              {(() => {
-                const connectedBill =
-                  formData.envelopeType === ENVELOPE_TYPES.BILL && selectedBillId
-                    ? allBills.find((bill) => bill.id === selectedBillId)
-                    : null;
-
-                return connectedBill ? (
-                  <ConnectionDisplay
-                    title="Connected Bill"
-                    icon={Receipt}
-                    theme="purple"
-                    isVisible={true}
-                  >
-                    <ConnectionItem
-                      icon={Receipt}
-                      title="Connected Bill"
-                      details={`${connectedBill.name || connectedBill.provider} • $${connectedBill.amount || "0.00"} (${connectedBill.frequency || "monthly"})`}
-                      badge="Auto-synced"
-                      theme="purple"
-                      actions={
-                        <button
-                          type="button"
-                          onClick={() => setSelectedBillId("")}
-                          className="px-2 py-1 bg-red-100 hover:bg-red-200 text-red-700 text-xs rounded transition-colors flex items-center"
-                          title="Disconnect from bill"
-                        >
-                          <X className="h-3 w-3 mr-1" />
-                          Disconnect
-                        </button>
-                      }
-                    />
-
-                    <ConnectionInfo theme="purple">
-                      💜 <strong>Connected!</strong> This envelope is linked to the bill above. Bill
-                      settings will override manual envelope settings for amount and frequency.
-                    </ConnectionInfo>
-                  </ConnectionDisplay>
-                ) : null;
-              })()}
+              {/* ConnectionDisplay removed - using simpler connection UI above to avoid duplication */}
 
               {/* Type-specific fields */}
               {formData.envelopeType === ENVELOPE_TYPES.BILL && !selectedBillId && (
@@ -1150,7 +1111,7 @@ const EditEnvelopeModal = ({
         </div>
 
         {/* Footer */}
-        <div className="bg-gray-50 px-6 py-4 flex items-center justify-between rounded-b-2xl">
+        <div className="bg-gray-50 px-6 py-4 flex items-center justify-between rounded-b-2xl flex-shrink-0">
           <div className="flex gap-3">
             <button
               type="button"
