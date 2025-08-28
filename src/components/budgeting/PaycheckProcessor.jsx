@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { BILL_CATEGORIES, ENVELOPE_TYPES } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 
 const PaycheckProcessor = ({
   envelopes = [],

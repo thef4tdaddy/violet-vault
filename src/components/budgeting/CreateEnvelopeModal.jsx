@@ -21,7 +21,7 @@ import {
 } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
 import { toBiweekly, getFrequencyOptions } from "../../utils/frequencyCalculations";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 
 // Import shared components
 import EnvelopeTypeSelector from "./shared/EnvelopeTypeSelector";

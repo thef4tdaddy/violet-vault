@@ -1,11 +1,11 @@
 // src/components/budgeting/EnvelopeSystem.jsx - Refactored with separated logic
 import React, { useEffect, useCallback, useRef } from "react";
-import { useBudgetStore } from "../../stores/uiStore";
-import { useEnvelopes } from "../../hooks/useEnvelopes";
-import { useBills } from "../../hooks/useBills";
+import { useBudgetStore } from "../../stores/ui/uiStore";
+import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
+import { useBills } from "../../hooks/bills/useBills";
 import { calculateBiweeklyNeeds } from "../../utils/budgeting";
 import { FREQUENCY_MULTIPLIERS, BIWEEKLY_MULTIPLIER } from "../../constants/categories";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 
 const useEnvelopeSystem = () => {
   // Enhanced TanStack Query integration

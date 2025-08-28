@@ -14,7 +14,7 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 
 /**
  * Performance Monitor for v1.10.0

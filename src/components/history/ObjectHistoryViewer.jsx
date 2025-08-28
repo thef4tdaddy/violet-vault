@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useBudgetCommits } from "../../hooks/useBudgetHistoryQuery";
+import { useBudgetCommits } from "../../hooks/budgeting/useBudgetHistoryQuery";
 import {
   History,
   GitCommit,

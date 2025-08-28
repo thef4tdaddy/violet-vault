@@ -1,6 +1,6 @@
 import React from "react";
 import { X, CheckCircle, Sparkles, Receipt, Target, CreditCard } from "lucide-react";
-import useConnectionManager from "../../hooks/useConnectionManager";
+import useConnectionManager from "../../hooks/common/useConnectionManager";
 
 /**
  * Shared component for displaying connected entity relationships in modals

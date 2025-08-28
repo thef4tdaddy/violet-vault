@@ -14,7 +14,7 @@ import {
   Info,
   X,
 } from "lucide-react";
-import { useSecurityManager } from "../../hooks/useSecurityManager";
+import { useSecurityManager } from "../../hooks/auth/useSecurityManager";
 
 const SecuritySettings = ({ isOpen, onClose }) => {
   const {

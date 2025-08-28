@@ -18,8 +18,8 @@ import {
   BudgetVsActualChart,
   useChartConfig,
 } from "../charts";
-import { useAnalyticsData } from "../../hooks/useAnalyticsData";
-import logger from "../../utils/logger";
+import { useAnalyticsData } from "../../hooks/analytics/useAnalyticsData";
+import logger from "../../utils/common/logger";
 
 const ChartsAnalytics = ({
   transactions = [],

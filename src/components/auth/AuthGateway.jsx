@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Shield, ShieldOff } from "lucide-react";
-import { useLocalOnlyMode } from "../../hooks/useLocalOnlyMode";
-import logger from "../../utils/logger";
+import { useLocalOnlyMode } from "../../hooks/common/useLocalOnlyMode";
+import logger from "../../utils/common/logger";
 import UserSetup from "./UserSetup";
 import LocalOnlySetup from "./LocalOnlySetup";
 

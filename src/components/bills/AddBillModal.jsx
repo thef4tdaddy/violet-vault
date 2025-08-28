@@ -6,9 +6,9 @@ import ConnectionDisplay, {
   ConnectionInfo,
   UniversalConnectionManager,
 } from "../ui/ConnectionDisplay";
-import useEditLock from "../../hooks/useEditLock";
+import useEditLock from "../../hooks/common/useEditLock";
 import { initializeEditLocks } from "../../services/editLockService";
-import { useAuth } from "../../stores/authStore";
+import { useAuth } from "../../stores/auth/authStore";
 import {
   getBillIcon,
   getBillIconOptions,
@@ -19,7 +19,7 @@ import {
 import { toMonthly, getFrequencyOptions } from "../../utils/frequencyCalculations";
 import { BIWEEKLY_MULTIPLIER, convertToBiweekly } from "../../constants/frequency";
 import { getBillCategories } from "../../constants/categories";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 
 const getInitialFormData = (bill = null) => {
   if (bill) {

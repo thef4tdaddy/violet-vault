@@ -12,15 +12,15 @@ const ChartsAndAnalytics = React.lazy(() => import("../analytics/ChartsAndAnalyt
 // Temporarily disable lazy loading due to chunk loading error
 // const DebtDashboard = React.lazy(() => import("../debt/DebtDashboard"));
 import DebtDashboard from "../debt/DebtDashboard";
-import { isDebtFeatureEnabled } from "../../utils/debtDebugConfig";
+import { isDebtFeatureEnabled } from "../../utils/debts/debtDebugConfig";
 const AutoFundingView = React.lazy(() => import("../automation/AutoFundingView"));
 const ActivityFeed = React.lazy(() => import("../activity/ActivityFeed"));
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ErrorBoundary } from "@highlight-run/react";
-import { useUnassignedCash, useActualBalance } from "../../hooks/useBudgetMetadata";
-import useBills from "../../hooks/useBills";
-import useBudgetData from "../../hooks/useBudgetData";
-import logger from "../../utils/logger";
+import { useUnassignedCash, useActualBalance } from "../../hooks/budgeting/useBudgetMetadata";
+import useBills from "../../hooks/bills/useBills";
+import useBudgetData from "../../hooks/budgeting/useBudgetData";
+import logger from "../../utils/common/logger";
 
 /**
  * ViewRenderer component for handling main content switching
@@ -51,8 +51,8 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
 
           // If Dexie has data but TanStack doesn't, force cache refresh
           if (dexieEnvelopes.length > 0) {
-            const { queryClient } = await import("../../utils/queryClient");
-            const { queryKeys } = await import("../../utils/queryClient");
+            const { queryClient } = await import("../../utils/common/queryClient");
+            const { queryKeys } = await import("../../utils/common/queryClient");
 
             // Force invalidate and refetch envelope queries
             queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
@@ -283,8 +283,8 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
             // await deletePaycheck(paycheckId);
 
             // Invalidate TanStack Query caches to refresh UI
-            const { queryClient } = await import("../../utils/queryClient");
-            const { queryKeys } = await import("../../utils/queryClient");
+            const { queryClient } = await import("../../utils/common/queryClient");
+            const { queryKeys } = await import("../../utils/common/queryClient");
 
             queryClient.invalidateQueries({
               queryKey: queryKeys.paycheckHistory(),

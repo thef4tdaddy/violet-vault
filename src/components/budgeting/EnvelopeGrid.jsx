@@ -1,10 +1,10 @@
 // src/components/budgeting/EnvelopeGrid.jsx - Refactored with separated logic
 import React, { useState, useMemo, lazy, Suspense } from "react";
-import { useBudgetStore } from "../../stores/uiStore";
-import { useUnassignedCash } from "../../hooks/useBudgetMetadata";
-import { useEnvelopes } from "../../hooks/useEnvelopes";
-import { useTransactions } from "../../hooks/useTransactions";
-import useBills from "../../hooks/useBills";
+import { useBudgetStore } from "../../stores/ui/uiStore";
+import { useUnassignedCash } from "../../hooks/budgeting/useBudgetMetadata";
+import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
+import { useTransactions } from "../../hooks/transactions/useTransactions";
+import useBills from "../../hooks/bills/useBills";
 import {
   calculateEnvelopeData,
   sortEnvelopes,
@@ -16,7 +16,7 @@ import EnvelopeSummary from "./envelope/EnvelopeSummary";
 import EnvelopeItem from "./envelope/EnvelopeItem";
 import UnassignedCashEnvelope from "./envelope/UnassignedCashEnvelope";
 import EmptyStateHints from "../onboarding/EmptyStateHints";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 
 // Lazy load modals for better performance
 const EnvelopeCreateModal = lazy(() => import("./CreateEnvelopeModal"));

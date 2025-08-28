@@ -13,8 +13,8 @@ import {
   ExternalLink,
   LogOut,
 } from "lucide-react";
-import { useLocalOnlyMode } from "../../hooks/useLocalOnlyMode";
-import logger from "../../utils/logger";
+import { useLocalOnlyMode } from "../../hooks/common/useLocalOnlyMode";
+import logger from "../../utils/common/logger";
 
 const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
   const {

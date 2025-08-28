@@ -1,24 +1,24 @@
 // src/components/layout/MainLayout.jsx
 import React, { useState, useMemo, Suspense } from "react";
-import { useBudgetStore } from "../../stores/uiStore";
-import useBudgetData from "../../hooks/useBudgetData";
-import useAuthFlow from "../../hooks/useAuthFlow";
-import useDataManagement from "../../hooks/useDataManagement";
-import usePasswordRotation from "../../hooks/usePasswordRotation";
-import useNetworkStatus from "../../hooks/useNetworkStatus";
-import useFirebaseSync from "../../hooks/useFirebaseSync";
-import usePaydayPrediction from "../../hooks/usePaydayPrediction";
-import { useLocalOnlyMode } from "../../hooks/useLocalOnlyMode";
-import useDataInitialization from "../../hooks/useDataInitialization";
+import { useBudgetStore } from "../../stores/ui/uiStore";
+import useBudgetData from "../../hooks/budgeting/useBudgetData";
+import useAuthFlow from "../../hooks/auth/useAuthFlow";
+import useDataManagement from "../../hooks/common/useDataManagement";
+import usePasswordRotation from "../../hooks/auth/usePasswordRotation";
+import useNetworkStatus from "../../hooks/common/useNetworkStatus";
+import useFirebaseSync from "../../hooks/sync/useFirebaseSync";
+import usePaydayPrediction from "../../hooks/budgeting/usePaydayPrediction";
+import { useLocalOnlyMode } from "../../hooks/common/useLocalOnlyMode";
+import useDataInitialization from "../../hooks/common/useDataInitialization";
 import AuthGateway from "../auth/AuthGateway";
 import Header from "../ui/Header";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ToastContainer } from "../ui/Toast";
-import { useToastStore } from "../../stores/toastStore";
+import { useToastStore } from "../../stores/ui/toastStore";
 import ViewRendererComponent from "./ViewRenderer";
 import { cloudSyncService } from "../../services/cloudSyncService";
-import logger from "../../utils/logger";
-import { getVersionInfo } from "../../utils/version";
+import logger from "../../utils/common/logger";
+import { getVersionInfo } from "../../utils/common/version";
 import {
   DollarSign,
   Wallet,
@@ -39,10 +39,10 @@ import BugReportButton from "../feedback/BugReportButton";
 import LockScreen from "../security/LockScreen";
 import SecuritySettings from "../settings/SecuritySettings";
 import SettingsDashboard from "../settings/SettingsDashboard";
-import { useSecurityManager } from "../../hooks/useSecurityManager";
+import { useSecurityManager } from "../../hooks/auth/useSecurityManager";
 import OnboardingTutorial from "../onboarding/OnboardingTutorial";
 import OnboardingProgress from "../onboarding/OnboardingProgress";
-import { useOnboardingAutoComplete } from "../../hooks/useOnboardingAutoComplete";
+import { useOnboardingAutoComplete } from "../../hooks/common/useOnboardingAutoComplete";
 
 // Heavy components now lazy loaded in ViewRenderer
 

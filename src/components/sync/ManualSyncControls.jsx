@@ -13,7 +13,7 @@ import {
   AlertCircle,
   CheckCircle,
 } from "lucide-react";
-import useManualSync from "../../hooks/useManualSync";
+import useManualSync from "../../hooks/common/useManualSync";
 
 /**
  * Manual sync controls component for family budget collaboration

@@ -15,7 +15,7 @@ import {
   User,
   Filter,
 } from "lucide-react";
-import useActivityLogger from "../../hooks/useActivityLogger";
+import useActivityLogger from "../../hooks/common/useActivityLogger";
 import { ACTIVITY_TYPES, ENTITY_TYPES } from "../../services/activityLogger";
 
 /**

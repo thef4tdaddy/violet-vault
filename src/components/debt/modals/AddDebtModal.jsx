@@ -4,13 +4,13 @@ import ConnectionDisplay, {
   ConnectionItem,
   ConnectionInfo,
 } from "../../../components/ui/ConnectionDisplay";
-import useEditLock from "../../../hooks/useEditLock";
+import useEditLock from "../../hooks/common/useEditLock";
 import { initializeEditLocks } from "../../../services/editLockService";
-import { useAuth } from "../../../stores/authStore";
+import { useAuth } from "../../../stores/auth/authStore";
 import { DEBT_TYPES, DEBT_TYPE_CONFIG, PAYMENT_FREQUENCIES } from "../../../constants/debts";
-import { useEnvelopes } from "../../../hooks/useEnvelopes";
-import useBills from "../../../hooks/useBills";
-import logger from "../../../utils/logger";
+import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
+import useBills from "../../hooks/bills/useBills";
+import logger from "../../../utils/common/logger";
 
 /**
  * Modal for adding new debts or editing existing ones

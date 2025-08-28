@@ -16,7 +16,7 @@ import {
   Scatter,
 } from "recharts";
 import { TrendingUp, TrendingDown, BarChart3, Target, AlertTriangle, Info } from "lucide-react";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 
 /**
  * Advanced Trend Analysis Charts for v1.10.0

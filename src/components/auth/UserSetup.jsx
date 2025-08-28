@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Shield, Users, Eye, EyeOff } from "lucide-react";
 import logoOnly from "../../assets/icon-512x512.png";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 
 const UserSetup = ({ onSetupComplete }) => {
   logger.debug("🏗️ UserSetup component rendered", {

@@ -1,7 +1,7 @@
 import React from "react";
 import { TrendingDown, ArrowRight } from "lucide-react";
-import { useDebtManagement } from "../../../hooks/useDebtManagement";
-import logger from "../../../utils/logger";
+import { useDebtManagement } from "../../hooks/debts/useDebtManagement";
+import logger from "../../../utils/common/logger";
 
 /**
  * Small debt summary widget for dashboard

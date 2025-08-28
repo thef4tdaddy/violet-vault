@@ -1,5 +1,5 @@
 // Debt tracking constants and configurations
-import logger from "../utils/logger";
+import logger from "../utils/common/logger";
 
 // Debt types for classification
 export const DEBT_TYPES = {

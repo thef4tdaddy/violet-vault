@@ -1,6 +1,6 @@
 import { budgetDb } from "../db/budgetDb";
-import logger from "../utils/logger";
-import chunkedFirebaseSync from "../utils/chunkedFirebaseSync";
+import logger from "../utils/common/logger";
+import chunkedFirebaseSync from "../utils/sync/chunkedFirebaseSync";
 
 const SYNC_INTERVAL = 5 * 60 * 1000; // 5 minutes (much more reasonable)
 const DEBOUNCE_DELAY = 10000; // 10 seconds (longer debounce to reduce noise)
@@ -121,7 +121,7 @@ class CloudSyncService {
 
           // Invalidate TanStack Query cache to refresh UI immediately
           try {
-            const { queryClient } = await import("../utils/queryClient");
+            const { queryClient } = await import("../utils/common/queryClient");
             await queryClient.invalidateQueries();
             logger.info("✅ TanStack Query cache invalidated after cloud data sync");
           } catch (error) {

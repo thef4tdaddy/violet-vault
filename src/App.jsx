@@ -1,6 +1,6 @@
 import React from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "./utils/queryClient";
+import { queryClient } from "./utils/common/queryClient";
 import MainLayout from "./components/layout/MainLayout";
 import { cloudSyncService } from "./services/cloudSyncService";
 import BugReportButton from "./components/feedback/BugReportButton";

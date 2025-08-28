@@ -6,8 +6,8 @@ import {
   repairCorruptedEnvelopes,
   getEnvelopeIntegrityReport,
 } from "../../utils/envelopeIntegrityChecker";
-import useToast from "../../hooks/useToast";
-import logger from "../../utils/logger";
+import useToast from "../../hooks/common/useToast";
+import logger from "../../utils/common/logger";
 
 /**
  * Envelope Integrity Checker Component
