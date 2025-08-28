@@ -5,15 +5,15 @@ on:
   workflow_dispatch:
     inputs:
       force_release:
-        description: 'Force release even if major/minor'
+        description: "Force release even if major/minor"
         required: false
         default: false
         type: boolean
-  
+
   # Daily automated check for patch releases only
   schedule:
-    - cron: '0 10 * * *'  # 10 AM UTC daily
-  
+    - cron: "0 10 * * *" # 10 AM UTC daily
+
   # Also run on push to main for immediate patch releases
   push:
     branches:
@@ -38,7 +38,7 @@ jobs:
         with:
           config-file: configs/release-please-config.json
           manifest-file: .release-please-manifest.json
-      
+
       - name: Release Summary
         if: steps.release.outputs.release_created
         run: |
@@ -56,33 +56,33 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
+
       - name: Check if auto-deploy should run
         id: check
         run: |
           # Get the just-created tag
           TAG_NAME="${{ needs.release-please.outputs.tag_name }}"
           echo "Checking tag: $TAG_NAME"
-          
+
           # Get previous tag for comparison
           PREV_TAG=$(git tag --sort=-version:refname | grep -v "$TAG_NAME" | head -1)
           echo "Previous tag: $PREV_TAG"
-          
+
           # Get commits in this release
           if [ -n "$PREV_TAG" ]; then
             COMMITS_IN_RELEASE=$(git log --oneline ${PREV_TAG}..${TAG_NAME} --format="%s")
           else
             COMMITS_IN_RELEASE=$(git log --oneline --format="%s" | head -20)
           fi
-          
+
           echo "Commits in release:"
           echo "$COMMITS_IN_RELEASE"
-          
+
           # Check for breaking changes or major features
           HAS_BREAKING=$(echo "$COMMITS_IN_RELEASE" | grep -i "BREAKING CHANGE\|!" || true)
           HAS_MAJOR_FEAT=$(echo "$COMMITS_IN_RELEASE" | grep -E "^feat(\([^)]*\))?!:" || true)
           HAS_FEAT=$(echo "$COMMITS_IN_RELEASE" | grep -E "^feat(\([^)]*\))?:" || true)
-          
+
           # Only auto-deploy patch releases (no feat: or BREAKING CHANGE)
           if [ -z "$HAS_BREAKING" ] && [ -z "$HAS_MAJOR_FEAT" ] && [ -z "$HAS_FEAT" ]; then
             echo "should-auto-deploy=true" >> $GITHUB_OUTPUT

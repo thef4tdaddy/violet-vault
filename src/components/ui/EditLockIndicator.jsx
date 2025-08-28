@@ -15,14 +15,14 @@ const EditLockIndicator = ({
 }) => {
   // Force re-render every second to update timer
   const [, forceUpdate] = useState(0);
-  
+
   useEffect(() => {
     if (!isLocked || !lock) return;
-    
+
     const interval = setInterval(() => {
-      forceUpdate(prev => prev + 1);
+      forceUpdate((prev) => prev + 1);
     }, 1000);
-    
+
     return () => clearInterval(interval);
   }, [isLocked, lock]);
 
@@ -44,10 +44,9 @@ const EditLockIndicator = ({
           <p className="text-sm font-medium text-green-900">You are editing this record</p>
           {showDetails && timeRemaining > 0 && (
             <p className="text-xs text-green-700">
-              {secondsRemaining > 60 
+              {secondsRemaining > 60
                 ? `Lock expires in ${minutesRemaining} minute${minutesRemaining !== 1 ? "s" : ""}`
-                : `Lock expires in ${secondsRemaining} second${secondsRemaining !== 1 ? "s" : ""}`
-              }
+                : `Lock expires in ${secondsRemaining} second${secondsRemaining !== 1 ? "s" : ""}`}
             </p>
           )}
         </div>
@@ -84,10 +83,9 @@ const EditLockIndicator = ({
               <div className="flex items-center gap-2 text-xs text-red-700">
                 <Clock className="h-3 w-3" />
                 <span>
-                  {secondsRemaining > 60 
+                  {secondsRemaining > 60
                     ? `${minutesRemaining} minute${minutesRemaining !== 1 ? "s" : ""} remaining`
-                    : `${secondsRemaining} second${secondsRemaining !== 1 ? "s" : ""} remaining`
-                  }
+                    : `${secondsRemaining} second${secondsRemaining !== 1 ? "s" : ""} remaining`}
                 </span>
               </div>
             )}
