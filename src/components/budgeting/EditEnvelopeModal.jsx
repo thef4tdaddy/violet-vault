@@ -21,7 +21,11 @@ import {
   Clock,
   Receipt,
 } from "lucide-react";
-import ConnectionDisplay, { ConnectionItem, ConnectionInfo } from "../ui/ConnectionDisplay";
+import ConnectionDisplay, {
+  ConnectionItem,
+  ConnectionInfo,
+  BillConnectionSelector,
+} from "../ui/ConnectionDisplay";
 import EditLockIndicator from "../ui/EditLockIndicator";
 import useEditLock from "../../hooks/useEditLock";
 import { initializeEditLocks } from "../../services/editLockService";
@@ -590,88 +594,16 @@ const EditEnvelopeModal = ({
                 </select>
               </div>
 
-              {/* Bill Connection - ALWAYS VISIBLE */}
-              <div className="bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-300 rounded-xl p-6 mb-4">
-                <label className="block text-lg font-bold text-purple-800 mb-4 flex items-center">
-                  <Sparkles className="h-6 w-6 mr-3" />
-                  🔗 Connect to Existing Bill
-                </label>
-
-                {/* Show display-only when connected, dropdown when not connected */}
-                {selectedBillId ? (
-                  /* Display current connection */
-                  <div className="w-full px-4 py-4 border-2 border-purple-400 rounded-xl bg-purple-50 text-base">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <CheckCircle className="h-5 w-5 mr-3 text-purple-600" />
-                        <div>
-                          <div className="font-medium text-purple-800">
-                            {(() => {
-                              const connectedBill = allBills?.find(
-                                (bill) => bill.id === selectedBillId
-                              );
-                              return connectedBill
-                                ? `${connectedBill.name || connectedBill.provider} - $${parseFloat(connectedBill.amount || 0).toFixed(2)} (${connectedBill.frequency || "monthly"})`
-                                : "Connected Bill";
-                            })()}
-                          </div>
-                          <div className="text-xs text-purple-600 mt-1">Connected to bill</div>
-                        </div>
-                      </div>
-                      {canEdit && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedBillId("");
-                          }}
-                          className="ml-3 px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 text-xs rounded-lg transition-colors flex items-center"
-                          title="Disconnect from bill"
-                        >
-                          <X className="h-3 w-3 mr-1" />
-                          Disconnect
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  /* Show dropdown when not connected */
-                  <select
-                    value={selectedBillId}
-                    onChange={(e) => handleBillSelection(e.target.value)}
-                    disabled={!canEdit}
-                    className={`w-full px-4 py-4 border-2 border-purple-400 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white shadow-md text-base ${
-                      !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
-                    }`}
-                  >
-                    <option value="">
-                      {allBills && allBills.length > 0
-                        ? "Choose a bill to auto-populate settings..."
-                        : `No bills available (${allBills ? allBills.length : "undefined"} found)`}
-                    </option>
-                    {allBills &&
-                      allBills
-                        .filter((bill) => !bill.envelopeId || bill.envelopeId === envelope?.id)
-                        .map((bill) => (
-                          <option key={bill.id} value={bill.id}>
-                            {bill.name || bill.provider} - $
-                            {parseFloat(bill.amount || 0).toFixed(2)} ({bill.frequency || "monthly"}
-                            )
-                          </option>
-                        ))}
-                  </select>
-                )}
-
-                <p className="text-sm text-purple-700 mt-3 font-medium">
-                  📝 <strong>Tip:</strong> Connect a bill to automatically fill envelope details
-                  like name, amount, and category. Works for all envelope types.
-                </p>
-
-                {(!allBills || allBills.length === 0) && (
-                  <p className="text-sm text-red-600 mt-3 font-medium">
-                    ⚠️ No bills found. Create bills first to connect them to envelopes.
-                  </p>
-                )}
-              </div>
+              {/* Bill Connection - Using shared component */}
+              <BillConnectionSelector
+                selectedBillId={selectedBillId}
+                onBillSelection={handleBillSelection}
+                onDisconnect={() => setSelectedBillId("")}
+                allBills={allBills}
+                currentEnvelopeId={envelope?.id}
+                canEdit={canEdit}
+                theme="purple"
+              />
             </div>
 
             {/* Type-Specific Budget Settings */}
