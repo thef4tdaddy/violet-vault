@@ -145,15 +145,18 @@ const PaycheckProcessor = ({
     let totalAllocated = 0;
 
     // PRODUCTION DEBUG: Log envelope filtering details
-    const autoAllocateEnvelopes = envelopes.filter(e => e.autoAllocate);
-    console.log("Auto-allocate envelopes:", autoAllocateEnvelopes.map(e => ({
-      name: e.name,
-      autoAllocate: e.autoAllocate,
-      envelopeType: e.envelopeType,
-      category: e.category,
-      monthlyBudget: e.monthlyBudget,
-      biweeklyAllocation: e.biweeklyAllocation
-    })));
+    const autoAllocateEnvelopes = envelopes.filter((e) => e.autoAllocate);
+    console.log(
+      "Auto-allocate envelopes:",
+      autoAllocateEnvelopes.map((e) => ({
+        name: e.name,
+        autoAllocate: e.autoAllocate,
+        envelopeType: e.envelopeType,
+        category: e.category,
+        monthlyBudget: e.monthlyBudget,
+        biweeklyAllocation: e.biweeklyAllocation,
+      }))
+    );
 
     console.log("ENVELOPE_TYPES:", ENVELOPE_TYPES);
     console.log("BILL_CATEGORIES:", BILL_CATEGORIES);
@@ -174,8 +177,16 @@ const PaycheckProcessor = ({
         envelope.monthlyBudget > 0
     );
 
-    console.log("Filtered bill envelopes:", billEnvelopes.length, billEnvelopes.map(e => e.name));
-    console.log("Filtered variable envelopes:", variableEnvelopes.length, variableEnvelopes.map(e => e.name));
+    console.log(
+      "Filtered bill envelopes:",
+      billEnvelopes.length,
+      billEnvelopes.map((e) => e.name)
+    );
+    console.log(
+      "Filtered variable envelopes:",
+      variableEnvelopes.length,
+      variableEnvelopes.map((e) => e.name)
+    );
 
     // Debug logging to understand allocation issues
     logger.debug("Paycheck allocation debug", {
