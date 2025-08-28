@@ -285,9 +285,7 @@
       {
         "task": "Fix no-undef warnings",
         "warningsAffected": 1,
-        "files": [
-          "AddBillModal.jsx"
-        ],
+        "files": ["AddBillModal.jsx"],
         "action": "Review and fix no-undef violations"
       }
     ]
