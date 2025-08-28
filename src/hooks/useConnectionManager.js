@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
-import { useBillStore } from "../stores/billStore";
-import { useEnvelopeStore } from "../stores/envelopeStore";
-import { useDebtStore } from "../stores/debtStore";
+import useBills from "./useBills";
+import useEnvelopes from "./useEnvelopes";
+import useDebts from "./useDebts";
 import useToast from "./useToast";
 import logger from "../utils/logger";
 
@@ -14,9 +14,9 @@ const useConnectionManager = (entityType, entityId) => {
   const [selectedConnectionId, setSelectedConnectionId] = useState("");
 
   const { addToast } = useToast();
-  const { bills, updateBill } = useBillStore();
-  const { envelopes, updateEnvelope } = useEnvelopeStore();
-  const { debts, updateDebt } = useDebtStore();
+  const { bills, updateBill } = useBills();
+  const { envelopes, updateEnvelope } = useEnvelopes();
+  const { debts, updateDebt } = useDebts();
 
   // Get the current entity
   const currentEntity = useMemo(() => {
