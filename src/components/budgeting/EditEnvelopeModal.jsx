@@ -24,7 +24,7 @@ import {
 import ConnectionDisplay, {
   ConnectionItem,
   ConnectionInfo,
-  BillConnectionSelector,
+  UniversalConnectionManager,
 } from "../ui/ConnectionDisplay";
 import EditLockIndicator from "../ui/EditLockIndicator";
 import useEditLock from "../../hooks/useEditLock";
@@ -45,9 +45,7 @@ const EditEnvelopeModal = ({
   envelope,
   onUpdateEnvelope,
   onDeleteEnvelope,
-  onUpdateBill, // Add bill update function
   existingEnvelopes = [],
-  allBills = [], // Add bills prop to show linked bills
   currentUser = { userName: "User", userColor: "#a855f7" }, // eslint-disable-line no-unused-vars
 }) => {
   // Get auth context for edit locking
@@ -98,8 +96,6 @@ const EditEnvelopeModal = ({
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedBillId, setSelectedBillId] = useState("");
-  const [initialBillId, setInitialBillId] = useState("");
 
   // Predefined categories for quick selection using standardized categories
   const categories = getEnvelopeCategories();
@@ -129,21 +125,6 @@ const EditEnvelopeModal = ({
     { value: "low", label: "Low Priority", color: "text-blue-600" },
   ];
 
-  // Debug logging for bills
-  useEffect(() => {
-    logger.debug("🔍 EditEnvelopeModal - allBills received:", {
-      allBills,
-      length: allBills?.length,
-      bills: allBills?.map((bill) => ({
-        id: bill.id,
-        name: bill.name,
-        provider: bill.provider,
-        amount: bill.amount,
-        envelopeId: bill.envelopeId,
-      })),
-    });
-  }, [allBills]);
-
   // Populate form when envelope changes
   useEffect(() => {
     if (envelope) {
@@ -166,12 +147,8 @@ const EditEnvelopeModal = ({
         biweeklyAllocation: envelope.biweeklyAllocation?.toString() || "",
         targetAmount: envelope.targetAmount?.toString() || "",
       });
-
-      const linkedBill = allBills.find((bill) => bill.envelopeId === envelope.id);
-      setSelectedBillId(linkedBill?.id || "");
-      setInitialBillId(linkedBill?.id || "");
     }
-  }, [envelope, allBills]);
+  }, [envelope]);
 
   // Get smart icon suggestions based on current form data
   // Simple icon suggestions for envelopes - to be enhanced later
@@ -254,39 +231,6 @@ const EditEnvelopeModal = ({
     return toBiweekly(monthlyAmount, "monthly").toFixed(2);
   };
 
-  // Handle bill selection and auto-populate envelope data
-  const handleBillSelection = (billId) => {
-    setSelectedBillId(billId);
-
-    if (!billId) return;
-
-    const selectedBill = allBills.find((bill) => bill.id === billId);
-    if (!selectedBill) return;
-
-    // Auto-populate envelope fields from the selected bill
-    setFormData((prevData) => ({
-      ...prevData,
-      name: selectedBill.name || selectedBill.provider || prevData.name,
-      category: selectedBill.category || prevData.category,
-      color: selectedBill.color || prevData.color,
-      frequency: selectedBill.frequency || prevData.frequency,
-      description:
-        selectedBill.description ||
-        selectedBill.notes ||
-        `Auto-created for ${selectedBill.name} bill`,
-      biweeklyAllocation:
-        selectedBill.biweeklyAmount?.toString() ||
-        (selectedBill.amount
-          ? toBiweekly(selectedBill.amount, selectedBill.frequency || "monthly").toFixed(2)
-          : ""),
-      monthlyAmount:
-        selectedBill.monthlyAmount?.toString() ||
-        (selectedBill.amount
-          ? toMonthly(selectedBill.amount, selectedBill.frequency || "monthly").toFixed(2)
-          : ""),
-    }));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -323,8 +267,6 @@ const EditEnvelopeModal = ({
           autoAllocate: formData.autoAllocate,
           biweeklyAllocation: parseFloat(calculateBiweeklyAmount()),
           lastUpdated: new Date().toISOString(),
-          // Link bill connection
-          billId: selectedBillId || null,
           // Envelope type specific fields
           envelopeType: formData.envelopeType,
           monthlyBudget:
@@ -343,30 +285,6 @@ const EditEnvelopeModal = ({
         }
 
         await onUpdateEnvelope(updatedEnvelope);
-
-        // If a bill was selected, establish the bidirectional relationship
-        if (selectedBillId && onUpdateBill) {
-          const selectedBill = allBills.find((bill) => bill.id === selectedBillId);
-          if (selectedBill) {
-            await onUpdateBill({
-              ...selectedBill,
-              envelopeId: envelope.id,
-              lastUpdated: new Date().toISOString(),
-            });
-          }
-        }
-
-        // If the envelope was previously linked to a different bill, detach it
-        if (initialBillId && initialBillId !== selectedBillId && onUpdateBill) {
-          const previousBill = allBills.find((bill) => bill.id === initialBillId);
-          if (previousBill) {
-            await onUpdateBill({
-              ...previousBill,
-              envelopeId: null,
-              lastUpdated: new Date().toISOString(),
-            });
-          }
-        }
       }
 
       // Reset and close
@@ -594,13 +512,10 @@ const EditEnvelopeModal = ({
                 </select>
               </div>
 
-              {/* Bill Connection - Using shared component */}
-              <BillConnectionSelector
-                selectedBillId={selectedBillId}
-                onBillSelection={handleBillSelection}
-                onDisconnect={() => setSelectedBillId("")}
-                allBills={allBills}
-                currentEnvelopeId={envelope?.id}
+              {/* Bill Connection - Using Universal Connection Manager */}
+              <UniversalConnectionManager
+                entityType="envelope"
+                entityId={envelope?.id}
                 canEdit={canEdit}
                 theme="purple"
               />
@@ -611,16 +526,14 @@ const EditEnvelopeModal = ({
               <h3 className="font-semibold text-gray-900 flex items-center">
                 <DollarSign className="h-4 w-4 mr-2 text-blue-600" />
                 {formData.envelopeType === ENVELOPE_TYPES.BILL
-                  ? selectedBillId
-                    ? "Connected Bill Settings"
-                    : "Bill Payment Settings"
+                  ? "Bill Payment Settings"
                   : "Variable Budget Settings"}
               </h3>
 
               {/* ConnectionDisplay removed - using simpler connection UI above to avoid duplication */}
 
               {/* Type-specific fields */}
-              {formData.envelopeType === ENVELOPE_TYPES.BILL && !selectedBillId && (
+              {formData.envelopeType === ENVELOPE_TYPES.BILL && (
                 <div className="space-y-4">
                   {/* Payment Frequency Selection */}
                   <div>
@@ -1080,7 +993,7 @@ const EditEnvelopeModal = ({
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDeleteConfirm}
         envelope={envelope}
-        connectedBills={allBills?.filter((bill) => bill.envelopeId === envelope?.id) || []}
+        connectedBills={[]}
         isDeleting={isSubmitting}
       />
     </div>

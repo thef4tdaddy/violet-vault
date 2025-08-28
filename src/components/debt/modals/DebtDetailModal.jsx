@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { X, Edit, Trash2, DollarSign, Calendar, TrendingDown, Receipt, Wallet } from "lucide-react";
-import ConnectionDisplay, { ConnectionItem, ConnectionInfo } from "../../ui/ConnectionDisplay";
+import ConnectionDisplay, {
+  ConnectionItem,
+  ConnectionInfo,
+  UniversalConnectionManager,
+} from "../../ui/ConnectionDisplay";
 
 /**
  * Modal for viewing and managing individual debt details
@@ -166,28 +170,13 @@ const DebtDetailModal = ({
           </div>
         )}
 
-        {/* Connected Envelope Display - Using Purple Theme */}
-        <ConnectionDisplay
-          title="Connected Envelope"
-          icon={Wallet}
+        {/* Universal Connection Manager for Debts */}
+        <UniversalConnectionManager
+          entityType="debt"
+          entityId={debt.id}
+          canEdit={true}
           theme="purple"
-          isVisible={!!debt.relatedEnvelope}
-        >
-          {debt.relatedEnvelope && (
-            <ConnectionItem
-              icon={Wallet}
-              title="Connected Envelope"
-              details={`${debt.relatedEnvelope.name} • $${debt.relatedEnvelope.currentBalance?.toFixed(2) || "0.00"} available • Payment source`}
-              badge="Funding source"
-              theme="purple"
-            />
-          )}
-
-          <ConnectionInfo theme="purple">
-            💜 <strong>Connected!</strong> This debt's payments are funded from the connected
-            envelope. Money will be automatically allocated for debt payments.
-          </ConnectionInfo>
-        </ConnectionDisplay>
+        />
 
         {/* Payment History */}
         {debt.paymentHistory && debt.paymentHistory.length > 0 && (
