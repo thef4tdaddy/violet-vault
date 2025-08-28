@@ -61,11 +61,18 @@ class EditLockService {
     }
 
     const lockId = `${recordType}_${recordId}`;
+    // Generate consistent user ID if not available
+    const userId =
+      this.currentUser.id ||
+      this.currentUser.budgetId ||
+      `user_${this.currentUser.userName?.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase()}` ||
+      "anonymous";
+
     const lockDoc = {
       recordType,
       recordId,
       budgetId: this.budgetId, // Add budgetId for context
-      userId: this.currentUser.id || "anonymous",
+      userId: userId,
       userName: this.currentUser.userName || "Unknown User",
       acquiredAt: serverTimestamp(),
       expiresAt: new Date(Date.now() + (options.duration || 60000)), // 60 seconds default
