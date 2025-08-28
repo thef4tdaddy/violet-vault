@@ -186,9 +186,19 @@ const PaycheckProcessor = ({
     });
 
     // First, allocate to bill envelopes (higher priority)
-    billEnvelopes.forEach((envelope) => {
+    billEnvelopes.forEach((envelope, index) => {
       const needed = Math.max(0, envelope.biweeklyAllocation - envelope.currentBalance);
       const allocation = Math.min(needed, remainingAmount);
+
+      // PRODUCTION DEBUG: Detailed allocation logging
+      console.log(`Bill envelope ${index + 1}/${billEnvelopes.length}: ${envelope.name}`, {
+        biweeklyAllocation: envelope.biweeklyAllocation,
+        currentBalance: envelope.currentBalance,
+        needed,
+        allocation,
+        remainingAmountBefore: remainingAmount,
+        remainingAmountAfter: remainingAmount - allocation,
+      });
 
       logger.debug(`Bill envelope allocation: ${envelope.name}`, {
         biweeklyAllocation: envelope.biweeklyAllocation,
@@ -206,10 +216,21 @@ const PaycheckProcessor = ({
     });
 
     // Then, allocate to variable expense envelopes (biweekly portion of monthly budget)
-    variableEnvelopes.forEach((envelope) => {
+    variableEnvelopes.forEach((envelope, index) => {
       const biweeklyTarget = (envelope.monthlyBudget || 0) / BIWEEKLY_MULTIPLIER; // Half of monthly budget
       const needed = Math.max(0, biweeklyTarget - envelope.currentBalance);
       const allocation = Math.min(needed, remainingAmount);
+
+      // PRODUCTION DEBUG: Detailed allocation logging
+      console.log(`Variable envelope ${index + 1}/${variableEnvelopes.length}: ${envelope.name}`, {
+        monthlyBudget: envelope.monthlyBudget,
+        biweeklyTarget,
+        currentBalance: envelope.currentBalance,
+        needed,
+        allocation,
+        remainingAmountBefore: remainingAmount,
+        remainingAmountAfter: remainingAmount - allocation,
+      });
 
       logger.debug(`Variable envelope allocation: ${envelope.name}`, {
         monthlyBudget: envelope.monthlyBudget,
