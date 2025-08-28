@@ -93,8 +93,9 @@ class EditLockService {
         // User already owns this lock - extend it and continue
         logger.debug("🔓 Extending existing lock owned by current user", { recordType, recordId });
         const extendedLock = {
-          ...existingLock,
+          ...lockDoc, // Use the new lockDoc structure instead of existing
           expiresAt: new Date(Date.now() + (options.duration || 60000)),
+          lastActivity: serverTimestamp(),
         };
         await setDoc(doc(firestore, "locks", lockId), extendedLock);
         this.locks.set(lockId, extendedLock);
@@ -281,7 +282,13 @@ class EditLockService {
         const localLock = this.locks.get(lockId);
         if (localLock) {
           localLock.expiresAt = new Date(Date.now() + 60000);
+          localLock.lastActivity = new Date();
         }
+
+        logger.debug("💓 Lock heartbeat updated", {
+          lockId,
+          expiresAt: new Date(Date.now() + 60000),
+        });
       } catch (error) {
         logger.error("💓 Heartbeat failed for lock:", lockId, error);
         this.stopHeartbeat(lockId);
