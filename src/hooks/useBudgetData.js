@@ -409,16 +409,33 @@ const useBudgetData = () => {
       const currentActualBalance = currentMetadata?.actualBalance || 0;
       const currentUnassignedCash = currentMetadata?.unassignedCash || 0;
 
+      // Calculate current virtual balance from envelope balances
+      const currentEnvelopes = envelopesQuery.data || [];
+      const currentSavings = savingsQuery.data || [];
+      
+      const currentTotalEnvelopeBalance = currentEnvelopes.reduce(
+        (sum, env) => sum + (parseFloat(env.currentBalance) || 0),
+        0
+      );
+      const currentTotalSavingsBalance = currentSavings.reduce(
+        (sum, saving) => sum + (parseFloat(saving.currentBalance) || 0),
+        0
+      );
+      const currentVirtualBalance = currentTotalEnvelopeBalance + currentTotalSavingsBalance;
+
       logger.info("Current balances before paycheck", {
         currentActualBalance,
         currentUnassignedCash,
+        currentVirtualBalance,
+        currentTotalEnvelopeBalance,
+        currentTotalSavingsBalance,
         currentMetadata,
       });
 
       // Prepare current balances for calculator
       const currentBalances = {
         actualBalance: currentActualBalance,
-        virtualBalance: 0, // Will be calculated from envelope balances if needed
+        virtualBalance: currentVirtualBalance,
         unassignedCash: currentUnassignedCash,
         isActualBalanceManual: currentMetadata?.isActualBalanceManual || false,
       };
