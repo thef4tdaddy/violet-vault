@@ -1,10 +1,16 @@
 name: CI
 
 on:
+  # Run hourly for automated formatting and linting
+  schedule:
+    - cron: '0 * * * *' # Every hour at minute 0
+  
+  # Keep PR checks for essential validation (without auto-formatting)
   pull_request:
     branches: [main]
-  push:
-    branches: [main]
+  
+  # Manual trigger option
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -27,9 +33,11 @@ jobs:
         run: npm ci
 
       - name: Auto-fix formatting
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: npm run format
 
       - name: Check for formatting changes
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: |
           if [ -n "$(git status --porcelain)" ]; then
             echo "Code was auto-formatted. Committing changes..."
@@ -38,23 +46,14 @@ jobs:
             git add .
             git commit -m "style: auto-fix prettier formatting"
             
-            # Fix detached HEAD issue by ensuring we're on the right branch
-            if [ "${{ github.event_name }}" == "pull_request" ]; then
-              # For PRs, push to the PR branch
-              BRANCH_NAME="${{ github.head_ref }}"
-              echo "Pushing to PR branch: $BRANCH_NAME"
-              git push origin HEAD:$BRANCH_NAME
-            else
-              # For push events, push to the current branch
-              BRANCH_NAME="${{ github.ref_name }}"
-              echo "Pushing to branch: $BRANCH_NAME" 
-              git push origin HEAD:$BRANCH_NAME
-            fi
+            # Push to main branch for scheduled runs
+            git push origin HEAD:main
           else
             echo "No formatting changes needed"
           fi
 
       - name: Lint
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: npm run lint
 
       - name: Test with Coverage

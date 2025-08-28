@@ -24,6 +24,7 @@ const ChangePasswordModal = lazy(() => import("../auth/ChangePasswordModal"));
 const ActivityFeed = lazy(() => import("../activity/ActivityFeed"));
 const LocalOnlyModeSettings = lazy(() => import("../auth/LocalOnlyModeSettings"));
 const SecuritySettings = lazy(() => import("./SecuritySettings"));
+const EnvelopeIntegrityChecker = lazy(() => import("./EnvelopeIntegrityChecker"));
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
@@ -50,6 +51,7 @@ const SettingsDashboard = ({
   const [showLocalOnlySettings, setShowLocalOnlySettings] = useState(false);
   const [showSecuritySettings, setShowSecuritySettings] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showEnvelopeChecker, setShowEnvelopeChecker] = useState(false);
 
   // Cloud sync state
   const { cloudSyncEnabled, setCloudSyncEnabled } = useBudgetStore();
@@ -297,6 +299,19 @@ const SettingsDashboard = ({
 
             <div className="space-y-4">
               <button
+                onClick={() => setShowEnvelopeChecker(true)}
+                className="w-full flex items-center p-3 border border-purple-200 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
+              >
+                <AlertTriangle className="h-5 w-5 text-purple-600 mr-3" />
+                <div className="text-left">
+                  <p className="font-medium text-purple-900">Envelope Integrity Checker</p>
+                  <p className="text-sm text-purple-700">
+                    Detect and fix empty/corrupted envelopes
+                  </p>
+                </div>
+              </button>
+
+              <button
                 onClick={() => setShowActivityFeed(true)}
                 className="w-full flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
               >
@@ -507,6 +522,13 @@ const SettingsDashboard = ({
           <SecuritySettings
             isOpen={showSecuritySettings}
             onClose={() => setShowSecuritySettings(false)}
+          />
+        )}
+
+        {showEnvelopeChecker && (
+          <EnvelopeIntegrityChecker
+            isOpen={showEnvelopeChecker}
+            onClose={() => setShowEnvelopeChecker(false)}
           />
         )}
       </Suspense>

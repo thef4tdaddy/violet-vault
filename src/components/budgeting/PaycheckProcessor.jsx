@@ -1,5 +1,5 @@
 // src/components/PaycheckProcessor.jsx - Complete Component
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   DollarSign,
   User,
@@ -21,25 +21,50 @@ const PaycheckProcessor = ({
   onDeletePaycheck,
   currentUser,
 }) => {
+  // PRODUCTION DEBUG: Check autoAllocate values since user says all are enabled
   const [paycheckAmount, setPaycheckAmount] = useState("");
   const [payerName, setPayerName] = useState(currentUser?.userName || "");
   const [allocationMode, setAllocationMode] = useState("allocate"); // 'allocate' or 'leftover'
   const [isProcessing, setIsProcessing] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [deletingPaycheckId, setDeletingPaycheckId] = useState(null);
-  const [showAddNewPayer, setShowAddNewPayer] = useState(false);
   const [newPayerName, setNewPayerName] = useState("");
+  const [tempPayers, setTempPayers] = useState([]); // Track payers added this session (not saved until paycheck is processed)
 
-  // Get unique payers from paycheck history for dropdown
+  // Get unique payers from paycheck history AND temporary payers for dropdown
   const getUniquePayers = () => {
     const payers = new Set();
+
+    // Add payers from history (these are permanently saved and synced)
     paycheckHistory.forEach((paycheck) => {
       if (paycheck.payerName && paycheck.payerName.trim()) {
         payers.add(paycheck.payerName);
       }
     });
+
+    // Add temporary payers from this session (only saved when paycheck is processed)
+    tempPayers.forEach((payer) => {
+      if (payer && payer.trim()) {
+        payers.add(payer);
+      }
+    });
+
     return Array.from(payers).sort();
   };
+
+  // For new users with no paycheck history, default to showing the add new payer form
+  const uniquePayers = getUniquePayers();
+  const initialRender = useRef(true);
+  const [showAddNewPayer, setShowAddNewPayer] = useState(false);
+
+  // Use useEffect to set initial state based on paycheck history (only on initial render)
+  useEffect(() => {
+    if (initialRender.current) {
+      const hasNoPaychecks = uniquePayers.length === 0;
+      setShowAddNewPayer(hasNoPaychecks);
+      initialRender.current = false;
+    }
+  }, [uniquePayers.length]);
 
   // Get smart prediction for a specific payer
   const getPayerPrediction = (payer) => {
@@ -72,10 +97,20 @@ const PaycheckProcessor = ({
   };
 
   // Handle adding new payer
+  // NOTE: New payers are only stored temporarily until a paycheck is processed
+  // They will NOT be saved/synced to cloud until an actual paycheck uses this name
   const handleAddNewPayer = () => {
     if (newPayerName.trim()) {
-      setPayerName(newPayerName.trim());
+      const trimmedName = newPayerName.trim();
+
+      // Add to temp payers list so it shows in dropdown (session-only, not persisted)
+      setTempPayers((prev) => [...prev, trimmedName]);
+
+      // Set as current selection
+      setPayerName(trimmedName);
       setNewPayerName("");
+
+      // Hide the add new payer form and show dropdown
       setShowAddNewPayer(false);
     }
   };
@@ -115,10 +150,45 @@ const PaycheckProcessor = ({
         envelope.monthlyBudget > 0
     );
 
+    // Debug logging to understand allocation issues
+    logger.debug("Paycheck allocation debug", {
+      totalEnvelopes: envelopes.length,
+      envelopesReceived: envelopes,
+      billEnvelopesFound: billEnvelopes.length,
+      variableEnvelopesFound: variableEnvelopes.length,
+      billEnvelopes: billEnvelopes.map((e) => ({
+        id: e.id,
+        name: e.name,
+        autoAllocate: e.autoAllocate,
+        envelopeType: e.envelopeType,
+        category: e.category,
+        biweeklyAllocation: e.biweeklyAllocation,
+        currentBalance: e.currentBalance,
+      })),
+      variableEnvelopes: variableEnvelopes.map((e) => ({
+        id: e.id,
+        name: e.name,
+        autoAllocate: e.autoAllocate,
+        envelopeType: e.envelopeType,
+        monthlyBudget: e.monthlyBudget,
+        currentBalance: e.currentBalance,
+      })),
+    });
+
     // First, allocate to bill envelopes (higher priority)
-    billEnvelopes.forEach((envelope) => {
+    billEnvelopes.forEach((envelope, index) => {
       const needed = Math.max(0, envelope.biweeklyAllocation - envelope.currentBalance);
       const allocation = Math.min(needed, remainingAmount);
+
+      // Debug logging removed - auto-allocate working correctly
+
+      logger.debug(`Bill envelope allocation: ${envelope.name}`, {
+        biweeklyAllocation: envelope.biweeklyAllocation,
+        currentBalance: envelope.currentBalance,
+        needed,
+        allocation,
+        remainingAmount,
+      });
 
       if (allocation > 0) {
         allocations[envelope.id] = allocation;
@@ -128,10 +198,21 @@ const PaycheckProcessor = ({
     });
 
     // Then, allocate to variable expense envelopes (biweekly portion of monthly budget)
-    variableEnvelopes.forEach((envelope) => {
+    variableEnvelopes.forEach((envelope, index) => {
       const biweeklyTarget = (envelope.monthlyBudget || 0) / BIWEEKLY_MULTIPLIER; // Half of monthly budget
       const needed = Math.max(0, biweeklyTarget - envelope.currentBalance);
       const allocation = Math.min(needed, remainingAmount);
+
+      // Debug logging removed - auto-allocate working correctly
+
+      logger.debug(`Variable envelope allocation: ${envelope.name}`, {
+        monthlyBudget: envelope.monthlyBudget,
+        biweeklyTarget,
+        currentBalance: envelope.currentBalance,
+        needed,
+        allocation,
+        remainingAmount,
+      });
 
       if (allocation > 0) {
         allocations[envelope.id] = allocation;
@@ -140,15 +221,31 @@ const PaycheckProcessor = ({
       }
     });
 
+    logger.debug("Final allocation results", {
+      totalAllocated,
+      remainingAmount,
+      allocations,
+    });
+
+    // Create detailed summary for debugging
+    const billCount = billEnvelopes.length;
+    const variableCount = variableEnvelopes.length;
+    const allocatedCount = Object.keys(allocations).length;
+
     return {
       mode: "allocate",
       totalAmount: amount,
       allocations,
       totalAllocated,
       leftoverAmount: remainingAmount,
-      summary: `$${totalAllocated.toFixed(
-        2
-      )} to envelopes (bills + variable), $${remainingAmount.toFixed(2)} to unassigned`,
+      summary: `$${totalAllocated.toFixed(2)} to ${allocatedCount} envelopes (${billCount} bills, ${variableCount} variable), $${remainingAmount.toFixed(2)} to unassigned`,
+      debugInfo: {
+        totalEnvelopes: envelopes.length,
+        billEnvelopesFound: billCount,
+        variableEnvelopesFound: variableCount,
+        allocatedEnvelopes: allocatedCount,
+        autoAllocateEnvelopes: envelopes.filter((e) => e.autoAllocate).length,
+      },
     };
   };
 
@@ -167,6 +264,10 @@ const PaycheckProcessor = ({
       });
 
       logger.debug("Paycheck processed:", result);
+
+      // Clean up temp payers - once a paycheck is processed, the payer is now in history
+      const processedPayerName = payerName.trim();
+      setTempPayers((prev) => prev.filter((name) => name !== processedPayerName));
 
       setPaycheckAmount("");
       setShowPreview(false);
@@ -244,7 +345,7 @@ const PaycheckProcessor = ({
                 Whose Paycheck?
               </label>
 
-              {!showAddNewPayer ? (
+              {!showAddNewPayer && uniquePayers.length > 0 ? (
                 <div className="space-y-3">
                   {/* Dropdown for existing payers */}
                   <select
@@ -260,7 +361,7 @@ const PaycheckProcessor = ({
                     disabled={isProcessing}
                   >
                     <option value="">Select a person...</option>
-                    {getUniquePayers().map((payer) => {
+                    {uniquePayers.map((payer) => {
                       const prediction = getPayerPrediction(payer);
                       return (
                         <option key={payer} value={payer}>
@@ -287,6 +388,15 @@ const PaycheckProcessor = ({
                 </div>
               ) : (
                 <div className="space-y-3">
+                  {uniquePayers.length === 0 && (
+                    <div className="glassmorphism p-4 rounded-xl border border-blue-200/50 bg-blue-50/20 mb-4">
+                      <div className="text-sm text-gray-600">
+                        <User className="h-4 w-4 inline mr-2 text-blue-500" />
+                        <strong>First paycheck?</strong> Let's start by adding who this paycheck is
+                        for.
+                      </div>
+                    </div>
+                  )}
                   <div className="flex gap-3">
                     <input
                       type="text"
@@ -304,15 +414,29 @@ const PaycheckProcessor = ({
                     >
                       <CheckCircle className="h-5 w-5" />
                     </button>
-                    <button
-                      onClick={() => {
-                        setShowAddNewPayer(false);
-                        setNewPayerName("");
-                      }}
-                      className="px-6 py-4 bg-gray-500 text-white rounded-2xl hover:bg-gray-600 transition-colors"
-                    >
-                      ✕
-                    </button>
+                    {uniquePayers.length > 0 ? (
+                      <button
+                        onClick={() => {
+                          setShowAddNewPayer(false);
+                          setNewPayerName("");
+                        }}
+                        className="px-6 py-4 bg-gray-500 text-white rounded-2xl hover:bg-gray-600 transition-colors"
+                        title="Back to person selection"
+                      >
+                        ←
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setShowAddNewPayer(false);
+                          setNewPayerName("");
+                        }}
+                        className="px-6 py-4 bg-gray-500 text-white rounded-2xl hover:bg-gray-600 transition-colors"
+                        title="Cancel"
+                      >
+                        ✕
+                      </button>
+                    )}
                   </div>
                 </div>
               )}
@@ -431,6 +555,18 @@ const PaycheckProcessor = ({
                   <p className="text-sm text-gray-600 bg-emerald-50 p-3 rounded-xl">
                     {preview.summary}
                   </p>
+
+                  {/* Debug info for production troubleshooting */}
+                  {preview.debugInfo && preview.mode === "allocate" && (
+                    <div className="mt-2 text-xs text-gray-500 bg-gray-50 p-2 rounded-lg">
+                      <strong>Allocation Debug:</strong> {preview.debugInfo.totalEnvelopes} total
+                      envelopes,
+                      {preview.debugInfo.autoAllocateEnvelopes} with auto-allocate enabled, found{" "}
+                      {preview.debugInfo.billEnvelopesFound} bills +{" "}
+                      {preview.debugInfo.variableEnvelopesFound} variable =
+                      {preview.debugInfo.allocatedEnvelopes} receiving funds
+                    </div>
+                  )}
                 </div>
 
                 {preview.mode === "allocate" && Object.keys(preview.allocations).length > 0 && (

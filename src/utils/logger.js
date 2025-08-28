@@ -106,6 +106,37 @@ class Logger {
     }
   }
 
+  // Production-level logging for important user-visible events
+  // Always shows in console AND sends to Highlight.io regardless of environment
+  //
+  // USE FOR:
+  // - User login/logout events
+  // - Data sync completion (upload/download)
+  // - Bug report submissions
+  // - Manual save operations
+  // - Critical user actions (delete debt, envelope, etc.)
+  // - Service start/stop events
+  //
+  // DO NOT USE FOR:
+  // - Debug/development info
+  // - Frequent operations (renders, calculations)
+  // - Internal state changes
+  production(message, data = {}) {
+    // Always show production logs in console with distinctive styling
+    const consoleLog = window.originalConsoleLog || console.log;
+    consoleLog(`🟢 [PROD] ${message}`, data);
+
+    try {
+      H.track("production", {
+        message: `PRODUCTION: ${message}`,
+        category: "production",
+        ...data,
+      });
+    } catch (error) {
+      console.error("Highlight.io production logging failed:", error);
+    }
+  }
+
   // Specific methods for common debugging scenarios
   budgetSync(message, data = {}) {
     // Only log budget sync in development mode to reduce production noise

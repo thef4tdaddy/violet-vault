@@ -80,14 +80,38 @@ export const encryptionUtils = {
   },
 
   async decrypt(encryptedData, key, iv) {
-    const decrypted = await crypto.subtle.decrypt(
-      { name: "AES-GCM", iv: new Uint8Array(iv) },
-      key,
-      new Uint8Array(encryptedData)
-    );
+    try {
+      // Add validation logging for debug
+      console.log("🔓 Decrypt attempt:", {
+        hasEncryptedData: !!encryptedData,
+        encryptedDataType: typeof encryptedData,
+        encryptedDataLength: encryptedData?.length,
+        hasKey: !!key,
+        keyType: typeof key,
+        hasIv: !!iv,
+        ivType: typeof iv,
+        ivLength: iv?.length,
+      });
 
-    const decoder = new TextDecoder();
-    return JSON.parse(decoder.decode(decrypted));
+      const decrypted = await crypto.subtle.decrypt(
+        { name: "AES-GCM", iv: new Uint8Array(iv) },
+        key,
+        new Uint8Array(encryptedData)
+      );
+
+      const decoder = new TextDecoder();
+      const result = JSON.parse(decoder.decode(decrypted));
+      console.log("🔓 Decrypt successful");
+      return result;
+    } catch (error) {
+      console.error("🔓 Decrypt failed:", {
+        error: error.message,
+        errorName: error.name,
+        errorType: typeof error,
+        stack: error.stack,
+      });
+      throw error;
+    }
   },
 
   async decryptRaw(encryptedData, key, iv) {

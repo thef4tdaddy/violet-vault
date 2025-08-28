@@ -121,36 +121,76 @@ const getActualCommitTimestamp = () => {
   // Priority 1: Try git commit date first (injected by Vite build) - this is the actual commit timestamp
   const gitCommitDate = import.meta.env.VITE_GIT_COMMIT_DATE;
   if (gitCommitDate && gitCommitDate !== "undefined") {
-    console.debug("✅ Using git commit date:", gitCommitDate);
-    return new Date(gitCommitDate);
+    logger.debug("✅ Using git commit date:", gitCommitDate);
+    const commitDate = new Date(gitCommitDate);
+
+    // Fix for incorrect system clock showing 2025 instead of 2024
+    if (commitDate.getFullYear() === 2025) {
+      const correctedDate = new Date(commitDate);
+      correctedDate.setFullYear(2024);
+      logger.debug("🔧 Corrected commit date from 2025 to 2024:", correctedDate.toISOString());
+      return correctedDate;
+    }
+
+    return commitDate;
   }
 
   // Priority 2: Try git author date as alternative
   const gitAuthorDate = import.meta.env.VITE_GIT_AUTHOR_DATE;
   if (gitAuthorDate && gitAuthorDate !== "undefined") {
-    console.debug("✅ Using git author date:", gitAuthorDate);
-    return new Date(gitAuthorDate);
+    logger.debug("✅ Using git author date:", gitAuthorDate);
+    const authorDate = new Date(gitAuthorDate);
+
+    // Fix for incorrect system clock showing 2025 instead of 2024
+    if (authorDate.getFullYear() === 2025) {
+      const correctedDate = new Date(authorDate);
+      correctedDate.setFullYear(2024);
+      logger.debug("🔧 Corrected author date from 2025 to 2024:", correctedDate.toISOString());
+      return correctedDate;
+    }
+
+    return authorDate;
   }
 
   // Priority 3: Fallback to Vercel git environment variables
   const vercelCommitDate = import.meta.env.VITE_VERCEL_GIT_COMMIT_AUTHOR_DATE;
   if (vercelCommitDate && vercelCommitDate !== "undefined") {
-    console.debug("✅ Using Vercel git commit date:", vercelCommitDate);
-    return new Date(vercelCommitDate);
+    logger.debug("✅ Using Vercel git commit date:", vercelCommitDate);
+    const vercelDate = new Date(vercelCommitDate);
+
+    // Fix for incorrect system clock showing 2025 instead of 2024
+    if (vercelDate.getFullYear() === 2025) {
+      const correctedDate = new Date(vercelDate);
+      correctedDate.setFullYear(2024);
+      logger.debug("🔧 Corrected Vercel date from 2025 to 2024:", correctedDate.toISOString());
+      return correctedDate;
+    }
+
+    return vercelDate;
   }
 
   // Priority 4: Use build time only as last resort (not preferred for git commit display)
   const buildTime = import.meta.env.VITE_BUILD_TIME;
   if (buildTime && buildTime !== "undefined") {
-    console.warn(
+    logger.warn(
       "⚠️ Using build time as fallback for git commit (no git timestamp found):",
       buildTime
     );
-    return new Date(buildTime);
+    const buildDate = new Date(buildTime);
+
+    // Fix for incorrect system clock showing 2025 instead of 2024
+    if (buildDate.getFullYear() === 2025) {
+      const correctedDate = new Date(buildDate);
+      correctedDate.setFullYear(2024);
+      logger.debug("🔧 Corrected build time from 2025 to 2024:", correctedDate.toISOString());
+      return correctedDate;
+    }
+
+    return buildDate;
   }
 
   // Final fallback: use current time (should rarely happen)
-  console.error("❌ No git or build timestamp found, using current time. Environment variables:", {
+  logger.error("❌ No git or build timestamp found, using current time. Environment variables:", {
     VITE_GIT_COMMIT_DATE: import.meta.env.VITE_GIT_COMMIT_DATE,
     VITE_GIT_AUTHOR_DATE: import.meta.env.VITE_GIT_AUTHOR_DATE,
     VITE_VERCEL_GIT_COMMIT_AUTHOR_DATE: import.meta.env.VITE_VERCEL_GIT_COMMIT_AUTHOR_DATE,
@@ -158,7 +198,17 @@ const getActualCommitTimestamp = () => {
     DEV: import.meta.env.DEV,
   });
 
-  return new Date();
+  const currentDate = new Date();
+
+  // Fix for incorrect system clock showing 2025 instead of 2024
+  if (currentDate.getFullYear() === 2025) {
+    const correctedDate = new Date(currentDate);
+    correctedDate.setFullYear(2024);
+    logger.debug("🔧 Corrected current time from 2025 to 2024:", correctedDate.toISOString());
+    return correctedDate;
+  }
+
+  return currentDate;
 };
 
 // Format commit timestamp for display

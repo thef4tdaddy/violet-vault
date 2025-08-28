@@ -1,60 +1,106 @@
 {
   "project": "violet-vault",
-  "lastUpdated": "2025-08-10",
+  "lastUpdated": "2025-08-28",
   "currentStatus": {
-    "totalWarnings": 26,
+    "totalWarnings": 32,
     "targetWarnings": 17,
     "errors": 0
   },
   "warningCategories": [
     {
       "type": "no-unused-vars",
-      "count": 24,
+      "count": 23,
       "severity": "warning",
       "files": [
         {
-          "path": "cloudflare-worker/bug-report-worker.js",
-          "warnings": 3,
+          "path": "src/components/automation/AutoFundingRuleBuilder.jsx",
+          "warnings": 6,
           "details": [
             {
-              "line": 16,
-              "message": "'ctx' is defined but never used"
+              "line": 28,
+              "message": "'unassignedCash' is assigned a value but never used"
             },
             {
-              "line": 111,
-              "message": "'ctx' is defined but never used"
-            },
-            {
-              "line": 384,
-              "message": "'patch' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
-            }
-          ]
-        },
-        {
-          "path": "scripts/rollback.js",
-          "warnings": 3,
-          "details": [
-            {
-              "line": 200,
-              "message": "'error' is defined but never used"
+              "line": 201,
+              "message": "'addCondition' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
             },
             {
               "line": 214,
-              "message": "'error' is defined but never used"
+              "message": "'updateCondition' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
             },
             {
-              "line": 251,
-              "message": "'error' is defined but never used"
+              "line": 221,
+              "message": "'removeCondition' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
+            },
+            {
+              "line": 363,
+              "message": "'Icon' is defined but never used"
+            },
+            {
+              "line": 441,
+              "message": "'Icon' is defined but never used"
             }
           ]
         },
         {
-          "path": "src/components/layout/MainLayout.jsx",
+          "path": "src/components/budgeting/EditEnvelopeModal.jsx",
+          "warnings": 2,
+          "details": [
+            {
+              "line": 66,
+              "message": "'expiresAt' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
+            },
+            {
+              "line": 67,
+              "message": "'timeRemaining' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
+            }
+          ]
+        },
+        {
+          "path": "src/components/budgeting/PaycheckProcessor.jsx",
+          "warnings": 2,
+          "details": [
+            {
+              "line": 179,
+              "message": "'index' is defined but never used"
+            },
+            {
+              "line": 201,
+              "message": "'index' is defined but never used"
+            }
+          ]
+        },
+        {
+          "path": "src/components/debt/modals/DebtDetailModal.jsx",
           "warnings": 1,
           "details": [
             {
-              "line": 360,
+              "line": 15,
+              "message": "'onLinkToBill' is defined but never used"
+            }
+          ]
+        },
+        {
+          "path": "src/components/debt/ui/DebtSummaryCards.jsx",
+          "warnings": 1,
+          "details": [
+            {
+              "line": 64,
               "message": "'Icon' is defined but never used"
+            }
+          ]
+        },
+        {
+          "path": "src/components/history/ObjectHistoryViewer.jsx",
+          "warnings": 2,
+          "details": [
+            {
+              "line": 61,
+              "message": "'getChangeIcon' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
+            },
+            {
+              "line": 85,
+              "message": "'formatChangeDescription' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
             }
           ]
         },
@@ -63,7 +109,7 @@
           "warnings": 1,
           "details": [
             {
-              "line": 78,
+              "line": 144,
               "message": "'Icon' is defined but never used"
             }
           ]
@@ -73,98 +119,77 @@
           "warnings": 1,
           "details": [
             {
-              "line": 68,
+              "line": 182,
               "message": "'Icon' is defined but never used"
             }
           ]
         },
         {
           "path": "src/components/layout/ViewRenderer.jsx",
-          "warnings": 3,
-          "details": [
-            {
-              "line": 44,
-              "message": "'deleteTransaction' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
-            },
-            {
-              "line": 47,
-              "message": "'setAllTransactions' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
-            },
-            {
-              "line": 48,
-              "message": "'setTransactions' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
-            }
-          ]
-        },
-        {
-          "path": "src/db/budgetDb.js",
-          "warnings": 8,
-          "details": [
-            {
-              "line": 25,
-              "message": "'_trans' is defined but never used"
-            },
-            {
-              "line": 29,
-              "message": "'_primKey' is defined but never used"
-            },
-            {
-              "line": 29,
-              "message": "'_obj' is defined but never used"
-            },
-            {
-              "line": 29,
-              "message": "'_trans' is defined but never used"
-            },
-            {
-              "line": 33,
-              "message": "'_trans' is defined but never used"
-            },
-            {
-              "line": 37,
-              "message": "'_primKey' is defined but never used"
-            },
-            {
-              "line": 37,
-              "message": "'_obj' is defined but never used"
-            },
-            {
-              "line": 37,
-              "message": "'_trans' is defined but never used"
-            }
-          ]
-        },
-        {
-          "path": "src/hooks/useBugReport.js",
           "warnings": 1,
           "details": [
             {
-              "line": 47,
-              "message": "'e' is defined but never used"
+              "line": 71,
+              "message": "'envelopes' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
             }
           ]
         },
         {
-          "path": "src/utils/highlight.js",
+          "path": "src/services/editLockService.js",
           "warnings": 1,
           "details": [
             {
-              "line": 47,
-              "message": "'setupConsoleCapture' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
+              "line": 328,
+              "message": "'lockId' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
             }
           ]
         },
         {
-          "path": "src/utils/version.js",
+          "path": "src/stores/authStore.jsx",
           "warnings": 2,
           "details": [
             {
-              "line": 124,
-              "message": "'patch' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
+              "line": 11,
+              "message": "'compareUint8Arrays' is defined but never used. Allowed unused vars must match /^[A-Z_]/u"
             },
             {
-              "line": 167,
-              "message": "'mode' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
+              "line": 414,
+              "message": "'testKey' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
+            }
+          ]
+        },
+        {
+          "path": "src/utils/autoFundingEngine.js",
+          "warnings": 3,
+          "details": [
+            {
+              "line": 162,
+              "message": "'envelopes' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
+            },
+            {
+              "line": 709,
+              "message": "'patternKey' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
+            },
+            {
+              "line": 902,
+              "message": "'description' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "no-undef",
+      "count": 1,
+      "severity": "warning",
+      "files": [
+        {
+          "path": "src/components/bills/AddBillModal.jsx",
+          "warnings": 1,
+          "details": [
+            {
+              "line": 691,
+              "message": "'setEditingBill' is not defined"
             }
           ]
         }
@@ -172,33 +197,74 @@
     },
     {
       "type": "react-hooks/exhaustive-deps",
-      "count": 1,
+      "count": 8,
       "severity": "warning",
       "files": [
         {
-          "path": "src/hooks/useFirebaseSync.js",
+          "path": "src/components/bills/BillManager.jsx",
+          "warnings": 1,
+          "details": [
+            {
+              "line": 214,
+              "message": "React Hook useMemo has missing dependencies: 'onUpdateBill' and 'updateBill'. Either include them or remove the dependency array. If 'onUpdateBill' changes too often, find the parent component that defines it and wrap that definition in useCallback"
+            }
+          ]
+        },
+        {
+          "path": "src/components/layout/ViewRenderer.jsx",
+          "warnings": 1,
+          "details": [
+            {
+              "line": 68,
+              "message": "React Hook React.useEffect has a missing dependency: 'budgetData.envelopes'. Either include it or remove the dependency array"
+            }
+          ]
+        },
+        {
+          "path": "src/components/onboarding/OnboardingTutorial.jsx",
+          "warnings": 2,
+          "details": [
+            {
+              "line": 166,
+              "message": "React Hook useEffect has a missing dependency: 'closeTutorial'. Either include it or remove the dependency array"
+            },
+            {
+              "line": 285,
+              "message": "React Hook useEffect has missing dependencies: 'highlightElement' and 'removeHighlight'. Either include them or remove the dependency array"
+            }
+          ]
+        },
+        {
+          "path": "src/hooks/useDebtManagement.js",
+          "warnings": 2,
+          "details": [
+            {
+              "line": 33,
+              "message": "The 'debts' logical expression could make the dependencies of useMemo Hook (at line 101) change on every render. To fix this, wrap the initialization of 'debts' in its own useMemo() Hook"
+            },
+            {
+              "line": 33,
+              "message": "The 'debts' logical expression could make the dependencies of useMemo Hook (at line 130) change on every render. To fix this, wrap the initialization of 'debts' in its own useMemo() Hook"
+            }
+          ]
+        },
+        {
+          "path": "src/hooks/useEditLock.js",
           "warnings": 1,
           "details": [
             {
               "line": 56,
-              "message": "React Hook useEffect has a missing dependency: 'budget'. Either include it or remove the dependency array"
+              "message": "React Hook useEffect has a missing dependency: 'acquireLock'. Either include it or remove the dependency array"
             }
           ]
-        }
-      ]
-    },
-    {
-      "type": "react-refresh/only-export-components",
-      "count": 1,
-      "severity": "warning",
-      "files": [
+        },
         {
-          "path": "src/stores/authStore.jsx",
+          "path": "src/hooks/useOnboardingAutoComplete.js",
           "warnings": 1,
           "details": [
             {
-              "line": 7,
-              "message": "Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components"
+              "line": 84,
+              "message": "React Hook useEffect has a missing dependency: 'bills'. Either include it or remove the dependency array"
             }
           ]
         }
@@ -209,35 +275,46 @@
     "highPriority": [
       {
         "task": "Fix no-unused-vars warnings",
-        "warningsAffected": 24,
+        "warningsAffected": 23,
         "files": [
-          "bug-report-worker.js",
-          "rollback.js",
-          "MainLayout.jsx",
+          "AutoFundingRuleBuilder.jsx",
+          "EditEnvelopeModal.jsx",
+          "PaycheckProcessor.jsx",
+          "DebtDetailModal.jsx",
+          "DebtSummaryCards.jsx",
+          "ObjectHistoryViewer.jsx",
           "NavigationTabs.jsx",
           "SummaryCards.jsx",
           "ViewRenderer.jsx",
-          "budgetDb.js",
-          "useBugReport.js",
-          "highlight.js",
-          "version.js"
+          "editLockService.js",
+          "authStore.jsx",
+          "autoFundingEngine.js"
         ],
         "action": "Remove unused variables or prefix with underscore if intentionally unused"
       },
       {
         "task": "Fix react-hooks/exhaustive-deps warnings",
-        "warningsAffected": 1,
-        "files": ["useFirebaseSync.js"],
+        "warningsAffected": 8,
+        "files": [
+          "BillManager.jsx",
+          "ViewRenderer.jsx",
+          "OnboardingTutorial.jsx",
+          "useDebtManagement.js",
+          "useEditLock.js",
+          "useOnboardingAutoComplete.js"
+        ],
         "action": "Add missing dependencies to useEffect dependency array"
       }
     ],
     "mediumPriority": [],
     "lowPriority": [
       {
-        "task": "Fix react-refresh/only-export-components warnings",
+        "task": "Fix no-undef warnings",
         "warningsAffected": 1,
-        "files": ["authStore.jsx"],
-        "action": "Refactor to separate component and non-component exports"
+        "files": [
+          "AddBillModal.jsx"
+        ],
+        "action": "Review and fix no-undef violations"
       }
     ]
   },
