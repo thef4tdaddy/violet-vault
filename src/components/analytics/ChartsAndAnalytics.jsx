@@ -97,33 +97,76 @@ const ChartsAnalytics = ({
 
   const MetricCard = ({ title, value, subtitle, icon, trend, color = "purple" }) => {
     const Icon = icon;
+
+    const gradientClasses = {
+      red: "from-red-500 to-red-600",
+      orange: "from-orange-500 to-orange-600",
+      amber: "from-amber-500 to-amber-600",
+      yellow: "from-yellow-500 to-yellow-600",
+      emerald: "from-emerald-500 to-emerald-600",
+      teal: "from-teal-500 to-teal-600",
+      cyan: "from-cyan-500 to-cyan-600",
+      blue: "from-blue-500 to-blue-600",
+      indigo: "from-indigo-500 to-indigo-600",
+      purple: "from-purple-500 to-purple-600",
+      pink: "from-pink-500 to-pink-600",
+      gray: "from-gray-500 to-gray-600",
+    };
+
+    const textClasses = {
+      red: "text-red-100",
+      orange: "text-orange-100",
+      amber: "text-amber-100",
+      yellow: "text-yellow-100",
+      emerald: "text-emerald-100",
+      teal: "text-teal-100",
+      cyan: "text-cyan-100",
+      blue: "text-blue-100",
+      indigo: "text-indigo-100",
+      purple: "text-purple-100",
+      pink: "text-pink-100",
+      gray: "text-gray-100",
+    };
+
+    const iconClasses = {
+      red: "text-red-200",
+      orange: "text-orange-200",
+      amber: "text-amber-200",
+      yellow: "text-yellow-200",
+      emerald: "text-emerald-200",
+      teal: "text-teal-200",
+      cyan: "text-cyan-200",
+      blue: "text-blue-200",
+      indigo: "text-indigo-200",
+      purple: "text-purple-200",
+      pink: "text-pink-200",
+      gray: "text-gray-200",
+    };
+
     return (
-      <div className="glassmorphism rounded-xl p-6">
+      <div
+        className={`bg-gradient-to-br ${gradientClasses[color] || gradientClasses.purple} p-4 rounded-lg text-white`}
+      >
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-semibold text-gray-600 mb-1">{title}</p>
-            <p className={`text-2xl font-bold text-${color}-600`}>{value}</p>
-            {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
+            <p className={`${textClasses[color] || textClasses.purple} text-sm`}>{title}</p>
+            <p className="text-2xl font-bold">{value}</p>
+            {subtitle && (
+              <p className={`text-xs ${textClasses[color] || textClasses.purple} mt-2`}>
+                {subtitle}
+              </p>
+            )}
           </div>
-          <div className="relative">
-            <div
-              className={`absolute inset-0 bg-${color}-500 rounded-2xl blur-lg opacity-30`}
-            ></div>
-            <div className={`relative bg-${color}-500 p-3 rounded-2xl`}>
-              <Icon className="h-6 w-6 text-white" />
-            </div>
-          </div>
+          <Icon className={`h-8 w-8 ${iconClasses[color] || iconClasses.purple}`} />
         </div>
         {trend && (
           <div className="mt-3 flex items-center text-sm">
             {trend > 0 ? (
-              <ArrowUpRight className="h-4 w-4 text-emerald-500 mr-1" />
+              <ArrowUpRight className="h-4 w-4 text-white mr-1" />
             ) : (
-              <ArrowDownRight className="h-4 w-4 text-red-500 mr-1" />
+              <ArrowDownRight className="h-4 w-4 text-white mr-1" />
             )}
-            <span className={trend > 0 ? "text-emerald-600" : "text-red-600"}>
-              {Math.abs(trend).toFixed(1)}% vs last period
-            </span>
+            <span className="text-white">{Math.abs(trend).toFixed(1)}% vs last period</span>
           </div>
         )}
       </div>
