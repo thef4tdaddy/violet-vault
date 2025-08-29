@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useConfirm } from "../../hooks/common/useConfirm";
 import { getQuickSyncStatus } from "../../utils/sync/masterSyncValidator";
 import { cloudSyncService } from "../../services/cloudSyncService";
 import logger from "../../utils/common/logger";

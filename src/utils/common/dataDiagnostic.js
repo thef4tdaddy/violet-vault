@@ -156,7 +156,7 @@ export const inspectPaycheckRecords = async () => {
   }
 };
 
-export const cleanupCorruptedPaychecks = async () => {
+export const cleanupCorruptedPaychecks = async (confirmCallback = null) => {
   console.log("🧹 VioletVault Paycheck Cleanup Tool");
   console.log("=".repeat(50));
 
@@ -212,13 +212,17 @@ export const cleanupCorruptedPaychecks = async () => {
     if (corruptedPaychecks.length > 0) {
       console.log("💀 Corrupted paychecks:", corruptedPaychecks);
 
-      const confirmed = await confirm({
-        title: "Delete Corrupted Records",
-        message: `Found ${corruptedPaychecks.length} corrupted paycheck records. Do you want to delete them? This action cannot be undone.`,
-        confirmLabel: "Delete Records",
-        cancelLabel: "Cancel",
-        destructive: true,
-      });
+      const confirmed = confirmCallback
+        ? await confirmCallback({
+            title: "Delete Corrupted Records",
+            message: `Found ${corruptedPaychecks.length} corrupted paycheck records. Do you want to delete them? This action cannot be undone.`,
+            confirmLabel: "Delete Records",
+            cancelLabel: "Cancel",
+            destructive: true,
+          })
+        : window.confirm(
+            `Found ${corruptedPaychecks.length} corrupted paycheck records. Do you want to delete them? This action cannot be undone.`
+          );
 
       if (confirmed) {
         // Delete corrupted paychecks
