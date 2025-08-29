@@ -4,6 +4,8 @@
       "GENERATE_SOURCEMAP": "true"
     }
   },
+  "buildCommand": "npm ci && npm run build",
+  "installCommand": "npm ci",
   "headers": [
     {
       "source": "/assets/(.*)",
