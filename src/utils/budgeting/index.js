@@ -6,3 +6,22 @@ export { default as envelopeIntegrityChecker } from "./envelopeIntegrityChecker.
 export { default as envelopeMatching } from "./envelopeMatching.js";
 export { default as envelopeStyles } from "./envelopeStyles.js";
 export { default as paydayPredictor } from "./paydayPredictor.js";
+
+// Export specific functions from envelopeStyles
+export { 
+  getEnvelopeTypeStyle, 
+  getStatusStyle, 
+  getStatusIcon, 
+  getUtilizationColor 
+} from "./envelopeStyles.js";
+
+// Export specific functions from envelopeCalculations
+export {
+  calculateEnvelopeData,
+  calculateUtilizationRate,
+  determineEnvelopeStatus,
+  sortEnvelopes,
+  filterEnvelopes,
+  calculateEnvelopeTotals,
+  calculateBiweeklyNeeds
+} from "./envelopeCalculations.js";
