@@ -1,6 +1,7 @@
 // components/SavingsGoals.jsx
 import React, { useState } from "react";
 import { globalToast } from "../../stores/ui/toastStore";
+import { useConfirm } from "../../hooks/common/useConfirm";
 import {
   Target,
   Plus,
@@ -25,6 +26,7 @@ const SavingsGoals = ({
   const [showAddForm, setShowAddForm] = useState(false);
   const [showDistributeModal, setShowDistributeModal] = useState(false);
   const [editingGoal, setEditingGoal] = useState(null);
+  const confirm = useConfirm();
   const [distribution, setDistribution] = useState({});
   const [totalToDistribute, setTotalToDistribute] = useState("");
 

@@ -25,6 +25,7 @@ import useEditLock from "../../hooks/common/useEditLock";
 import { initializeEditLocks } from "../../services/editLockService";
 import { useAuth } from "../../stores/auth/authStore";
 import EditLockIndicator from "../ui/EditLockIndicator";
+import { useConfirm } from "../../hooks/common/useConfirm";
 
 const SupplementalAccounts = ({
   supplementalAccounts = [],
@@ -43,6 +44,7 @@ const SupplementalAccounts = ({
 
   // Get auth context for edit locking
   const { budgetId, currentUser: authCurrentUser } = useAuth();
+  const confirm = useConfirm();
 
   // Initialize edit lock service when component mounts
   useEffect(() => {
