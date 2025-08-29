@@ -93,7 +93,6 @@ export const BILL_PROVIDER_ICONS = {
   "amex": CreditCard,
   "credit card": CreditCard,
   "loan": CreditCard,
-  "mortgage": CreditCard,
   "bank": CreditCard,
 
   // Streaming/Entertainment

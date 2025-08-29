@@ -41,7 +41,7 @@ export const useAddBillMutation = () => {
 
       return newBill;
     },
-    onMutate: async (billData) => {
+    onMutate: async () => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: queryKeys.bills });
 
@@ -49,7 +49,7 @@ export const useAddBillMutation = () => {
       const previousBills = queryClient.getQueryData(queryKeys.bills);
       return { previousBills };
     },
-    onSuccess: (newBill) => {
+    onSuccess: () => {
       // Invalidate and refetch related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.bills });
       queryClient.invalidateQueries({ queryKey: queryKeys.billsList });
@@ -59,7 +59,7 @@ export const useAddBillMutation = () => {
       // Trigger cloud sync
       triggerBillSync("add");
     },
-    onError: (error, newBill, context) => {
+    onError: (error, billData, context) => {
       logger.error("Failed to add bill:", error);
       // Rollback optimistic update if needed
       if (context?.previousBills) {
