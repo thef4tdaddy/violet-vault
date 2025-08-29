@@ -92,7 +92,7 @@ export default [
             {
               "name": "react",
               "importNames": ["createContext", "useContext"],
-              "message": "Use Zustand stores instead of React Context. Create a store in src/stores/ and use it with create() from zustand."
+              "message": "Avoid React Context. For data: use TanStack Query + Dexie (see hooks in src/hooks/). For UI/auth state: use Zustand stores in src/stores/."
             }
           ]
         }
