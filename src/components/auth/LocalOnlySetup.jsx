@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { globalToast } from "../../stores/ui/toastStore";
 import {
   Shield,
   ShieldOff,
@@ -60,7 +61,7 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
 
   const handleImportAndStart = async () => {
     if (!importFile) {
-      alert("Please select a file to import");
+      globalToast.showError("Please select a file to import", "File Required");
       return;
     }
 
@@ -71,7 +72,7 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
 
       const validation = validateImportFile(fileData);
       if (!validation.valid) {
-        alert(`Invalid import file: ${validation.error}`);
+        globalToast.showError(`Invalid import file: ${validation.error}`, "Invalid File");
         return;
       }
 
@@ -80,7 +81,7 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
       onModeSelected("local-only");
     } catch (err) {
       logger.error("Failed to import and start:", err);
-      alert(`Import failed: ${err.message}`);
+      globalToast.showError(`Import failed: ${err.message}`, "Import Failed");
     }
   };
 

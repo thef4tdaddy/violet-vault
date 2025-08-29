@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useConfirm } from "../../hooks/common/useConfirm";
+import { globalToast } from "../../stores/ui/toastStore";
 import {
   Plus,
   Play,
@@ -77,7 +78,7 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
       setEditingRule(null);
     } catch (error) {
       logger.error("Failed to save rule", error);
-      alert("Failed to save rule: " + error.message);
+      globalToast.showError("Failed to save rule: " + error.message, "Rule Save Failed");
     }
   };
 
@@ -96,7 +97,7 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
         loadRulesAndHistory();
       } catch (error) {
         logger.error("Failed to delete rule", error);
-        alert("Failed to delete rule: " + error.message);
+        globalToast.showError("Failed to delete rule: " + error.message, "Delete Failed");
       }
     }
   };
@@ -135,22 +136,24 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
         const rulesExecuted = result.execution.rulesExecuted || 0;
 
         if (totalFunded > 0) {
-          alert(
-            `Successfully executed ${rulesExecuted} rules and funded $${totalFunded.toFixed(2)} total!`
+          globalToast.showSuccess(
+            `Successfully executed ${rulesExecuted} rules and funded $${totalFunded.toFixed(2)} total!`,
+            "Auto-Funding Complete"
           );
         } else {
-          alert(
-            "Rules executed but no funds were transferred. Check your rules and available balances."
+          globalToast.showWarning(
+            "Rules executed but no funds were transferred. Check your rules and available balances.",
+            "No Funds Transferred"
           );
         }
       } else {
-        alert("Failed to execute rules: " + result.error);
+        globalToast.showError("Failed to execute rules: " + result.error, "Execution Failed");
       }
 
       loadRulesAndHistory();
     } catch (error) {
       logger.error("Failed to execute rules", error);
-      alert("Failed to execute rules: " + error.message);
+      globalToast.showError("Failed to execute rules: " + error.message, "Execution Failed");
     } finally {
       setIsExecuting(false);
     }

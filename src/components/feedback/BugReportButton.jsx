@@ -166,14 +166,19 @@ const BugReportButton = () => {
                             setScreenshot(screenshotDataUrl);
                           } catch (error) {
                             console.warn("Manual screen capture failed:", error);
-                            alert(
-                              "Screen capture failed. Please try the Auto Capture option or include a manual screenshot."
-                            );
+                            addToast({
+                              type: "error",
+                              title: "Screen Capture Failed",
+                              message:
+                                "Please try the Auto Capture option or include a manual screenshot.",
+                            });
                           }
                         } else {
-                          alert(
-                            "Screen capture is not supported in your browser. Please use Auto Capture or include a manual screenshot."
-                          );
+                          addToast({
+                            type: "warning",
+                            title: "Screen Capture Not Supported",
+                            message: "Please use Auto Capture or include a manual screenshot.",
+                          });
                         }
                       }}
                       className="text-sm text-green-600 hover:text-green-800 flex items-center"

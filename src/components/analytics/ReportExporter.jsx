@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { globalToast } from "../../stores/ui/toastStore";
 import {
   Download,
   FileText,
@@ -115,7 +116,7 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
       onClose();
     } catch (error) {
       logger.error("Export failed", error);
-      alert("Export failed. Please try again.");
+      globalToast.showError("Export failed. Please try again.", "Export Failed");
     } finally {
       setIsExporting(false);
       setExportProgress(0);

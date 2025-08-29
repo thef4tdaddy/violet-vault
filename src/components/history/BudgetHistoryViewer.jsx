@@ -4,6 +4,7 @@ import {
   useBudgetCommitDetails,
 } from "../../hooks/budgeting/useBudgetHistoryQuery";
 import { useConfirm } from "../../hooks/common/useConfirm";
+import { globalToast } from "../../stores/ui/toastStore";
 import {
   History,
   GitCommit,
@@ -339,7 +340,10 @@ const BudgetHistoryViewer = ({ onClose }) => {
               <button
                 onClick={() => {
                   // Integrity verification will be implemented in future version
-                  alert("Integrity verification coming soon!");
+                  globalToast.showInfo(
+                    "Integrity verification coming soon!",
+                    "Feature Coming Soon"
+                  );
                 }}
                 disabled={loading}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 flex items-center text-sm"

@@ -1,6 +1,7 @@
 // src/components/PaycheckProcessor.jsx - Complete Component
 import React, { useState, useEffect, useRef } from "react";
 import { useConfirm } from "../../hooks/common/useConfirm";
+import { globalToast } from "../../stores/ui/toastStore";
 import {
   DollarSign,
   User,
@@ -275,7 +276,7 @@ const PaycheckProcessor = ({
       setShowPreview(false);
     } catch (error) {
       logger.error("Failed to process paycheck:", error);
-      alert("Failed to process paycheck");
+      globalToast.showError("Failed to process paycheck", "Processing Failed");
     } finally {
       setIsProcessing(false);
     }
@@ -301,7 +302,7 @@ const PaycheckProcessor = ({
       logger.debug("Paycheck deleted:", paycheck.id);
     } catch (error) {
       logger.error("Failed to delete paycheck:", error);
-      alert("Failed to delete paycheck. Please try again.");
+      globalToast.showError("Failed to delete paycheck. Please try again.", "Delete Failed");
     } finally {
       setDeletingPaycheckId(null);
     }

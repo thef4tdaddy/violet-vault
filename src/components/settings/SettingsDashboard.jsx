@@ -1,4 +1,5 @@
 import React, { useState, lazy, Suspense } from "react";
+import { globalToast } from "../../stores/ui/toastStore";
 import {
   X,
   Settings,
@@ -329,9 +330,15 @@ const SettingsDashboard = ({
                       "../../utils/common/testBudgetHistory"
                     );
                     await createTestBudgetHistory();
-                    alert("✅ Test budget history created! Check console for details.");
+                    globalToast.showSuccess(
+                      "✅ Test budget history created! Check console for details.",
+                      "Test History Created"
+                    );
                   } catch (error) {
-                    alert("❌ Failed to create test history: " + error.message);
+                    globalToast.showError(
+                      "❌ Failed to create test history: " + error.message,
+                      "Test Failed"
+                    );
                   }
                 }}
                 className="w-full flex items-center p-3 border border-yellow-200 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors"

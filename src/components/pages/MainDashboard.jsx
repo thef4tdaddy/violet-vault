@@ -1,5 +1,6 @@
 // components/Dashboard.jsx
 import React, { useState } from "react";
+import { globalToast } from "../../stores/ui/toastStore";
 import {
   CreditCard,
   CheckCircle,
@@ -99,7 +100,7 @@ const Dashboard = ({ setActiveView }) => {
 
   const handleReconcileTransaction = () => {
     if (!newTransaction.amount || !newTransaction.description.trim()) {
-      alert("Please enter amount and description");
+      globalToast.showError("Please enter amount and description", "Required Fields");
       return;
     }
 
@@ -145,7 +146,10 @@ const Dashboard = ({ setActiveView }) => {
 
   const handlePrepareEnvelopes = () => {
     // Navigate to envelope management or show planning interface
-    alert("Navigate to envelope management for funding planning!");
+    globalToast.showInfo(
+      "Navigate to envelope management for funding planning!",
+      "Funding Planning"
+    );
     // TODO: Integrate with envelope planning interface
   };
 

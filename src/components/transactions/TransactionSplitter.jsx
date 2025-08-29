@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { TRANSACTION_CATEGORIES } from "../../constants/categories";
+import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
 import {
   Zap,
@@ -251,7 +252,10 @@ const TransactionSplitter = ({
   const applySplitTransaction = async () => {
     const errors = validateSplits();
     if (errors.length > 0) {
-      alert("Please fix the following errors:\n\n" + errors.join("\n"));
+      globalToast.showError(
+        "Please fix the following errors:\n\n" + errors.join("\n"),
+        "Validation Errors"
+      );
       return;
     }
 
@@ -289,7 +293,7 @@ const TransactionSplitter = ({
       onClose?.();
     } catch (error) {
       logger.error("Error creating split transactions:", error);
-      alert("Failed to split transaction. Please try again.");
+      globalToast.showError("Failed to split transaction. Please try again.", "Split Failed");
     } finally {
       setIsProcessing(false);
     }
