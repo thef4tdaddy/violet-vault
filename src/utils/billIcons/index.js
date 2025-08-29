@@ -15,6 +15,16 @@ export {
   getIconNameForStorage,
 } from "./iconUtils.js";
 
+// Re-import functions for default export
+import {
+  getBillIcon,
+  suggestBillCategoryAndIcon,
+  getIconByName,
+  getIconName,
+  getIconNameForStorage,
+} from "./iconUtils.js";
+import { getBillIconOptions } from "./iconOptions.js";
+
 // Default export for backward compatibility
 export default {
   getBillIcon,

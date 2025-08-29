@@ -8,7 +8,7 @@ import logger from "../../../utils/common/logger";
 /**
  * Core bill data fetching query function
  */
-export const createBillQueryFunction = (options = {}) => {
+export const useBillQueryFunction = (options = {}) => {
   const {
     status = "all",
     daysAhead = 30,
@@ -131,7 +131,7 @@ export const useBillsQuery = (options = {}) => {
     sortOrder = "asc",
   } = options;
 
-  const queryFunction = createBillQueryFunction(options);
+  const queryFunction = useBillQueryFunction(options);
 
   return useQuery({
     queryKey: queryKeys.billsList({

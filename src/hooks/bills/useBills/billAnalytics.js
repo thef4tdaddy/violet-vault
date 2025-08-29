@@ -116,7 +116,7 @@ export const useBillUtilities = (bills = []) => {
             const dueDate = new Date(bill.dueDate);
             return dueDate < now;
           });
-        case "upcoming":
+        case "upcoming": {
           const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
           return bills.filter((bill) => {
             if (bill.isPaid) return false;
@@ -124,6 +124,7 @@ export const useBillUtilities = (bills = []) => {
             const dueDate = new Date(bill.dueDate);
             return dueDate >= now && dueDate <= thirtyDaysFromNow;
           });
+        }
         default:
           return bills;
       }
