@@ -1,5 +1,6 @@
 import React, { Suspense, useCallback } from "react";
 import { Wallet, Settings } from "lucide-react";
+import { globalToast } from "../../stores/ui/toastStore";
 import Dashboard from "../pages/MainDashboard";
 import SmartEnvelopeSuggestions from "../budgeting/SmartEnvelopeSuggestions";
 import EnvelopeGrid from "../budgeting/EnvelopeGrid";
@@ -352,17 +353,21 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
           try {
             // This would integrate with email parsing or other bill detection services
             // For now, we'll show a placeholder notification
-            alert(
-              "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox."
+            globalToast.showInfo(
+              "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox.",
+              "Feature Coming Soon"
             );
           } catch (error) {
             logger.error("Failed to search for new bills:", error);
-            alert("Failed to search for new bills. Please try again.");
+            globalToast.showError(
+              "Failed to search for new bills. Please try again.",
+              "Search Failed"
+            );
           }
         }}
         onError={(error) => {
           logger.error("Bill management error:", error);
-          alert(`Error: ${error.message || error}`);
+          globalToast.showError(`Error: ${error.message || error}`, "Error");
         }}
       />
     ),

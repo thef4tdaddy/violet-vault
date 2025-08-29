@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Shield, Users, Eye, EyeOff } from "lucide-react";
 import logoOnly from "../../assets/icon-512x512.png";
+import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
 
 const UserSetup = ({ onSetupComplete }) => {
@@ -110,7 +111,7 @@ const UserSetup = ({ onSetupComplete }) => {
     if (isReturningUser) {
       // For returning users, try to login directly
       if (!masterPassword) {
-        alert("Please enter your password");
+        globalToast.showError("Please enter your password", "Password Required");
         return;
       }
 
@@ -125,7 +126,7 @@ const UserSetup = ({ onSetupComplete }) => {
         logger.debug("✅ Returning user login succeeded");
       } catch (error) {
         logger.error("❌ Login failed:", error);
-        alert("Incorrect password. Please try again.");
+        globalToast.showError("Incorrect password. Please try again.", "Login Failed");
       } finally {
         setIsLoading(false);
       }
@@ -149,7 +150,7 @@ const UserSetup = ({ onSetupComplete }) => {
         masterPassword: !!masterPassword,
         userName: userName.trim(),
       });
-      alert("Please fill in both password and name");
+      globalToast.showError("Please fill in both password and name", "Required Fields");
       return;
     }
 
@@ -169,7 +170,7 @@ const UserSetup = ({ onSetupComplete }) => {
       logger.debug("✅ onSetupComplete succeeded from Start Tracking");
     } catch (error) {
       logger.error("❌ Setup failed from Start Tracking:", error);
-      alert(`Setup failed: ${error.message}`);
+      globalToast.showError(`Setup failed: ${error.message}`, "Setup Failed");
     } finally {
       setIsLoading(false);
     }

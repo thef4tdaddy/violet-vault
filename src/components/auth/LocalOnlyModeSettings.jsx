@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { globalToast } from "../../stores/ui/toastStore";
 import {
   X,
   Monitor,
@@ -70,7 +71,7 @@ const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
 
       const validation = validateImportFile(fileData);
       if (!validation.valid) {
-        alert(`Invalid import file: ${validation.error}`);
+        globalToast.showError(`Invalid import file: ${validation.error}`, "Invalid File");
         return;
       }
 
@@ -80,10 +81,10 @@ const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
       const newStats = await getStats();
       setStats(newStats);
 
-      alert("Data imported successfully!");
+      globalToast.showSuccess("Data imported successfully!", "Import Complete");
     } catch (err) {
       logger.error("Import failed:", err);
-      alert(`Import failed: ${err.message}`);
+      globalToast.showError(`Import failed: ${err.message}`, "Import Failed");
     }
   };
 
@@ -106,7 +107,7 @@ const LocalOnlyModeSettings = ({ isOpen, onClose, onModeSwitch }) => {
       setStats(newStats);
 
       setShowConfirmClear(false);
-      alert("All data cleared successfully!");
+      globalToast.showSuccess("All data cleared successfully!", "Data Cleared");
     } catch (err) {
       logger.error("Failed to clear data:", err);
     }

@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { X, TrendingDown, TrendingUp, Zap, Lock, Unlock, User, Clock } from "lucide-react";
+import { globalToast } from "../../stores/ui/toastStore";
 import ReceiptButton from "../receipts/ReceiptButton";
 import useEditLock from "../../hooks/common/useEditLock";
 import { initializeEditLocks } from "../../services/editLockService";
@@ -71,7 +72,7 @@ const TransactionForm = ({
         description: transactionForm.description,
         amount: transactionForm.amount,
       });
-      alert("Please fill in description and amount");
+      globalToast.showError("Please fill in description and amount", "Required Fields");
       return;
     }
 

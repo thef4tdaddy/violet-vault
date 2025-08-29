@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { globalToast } from "../../stores/ui/toastStore";
 import {
   CreditCard,
   Plus,
@@ -121,13 +122,16 @@ const SupplementalAccounts = ({
 
   const handleAddAccount = () => {
     if (!accountForm.name.trim() || !accountForm.currentBalance) {
-      alert("Please fill in account name and current balance");
+      globalToast.showError("Please fill in account name and current balance", "Required Fields");
       return;
     }
 
     // Check edit lock for updates
     if (editingAccount && !canEdit) {
-      alert("Cannot save changes - account is locked by another user");
+      globalToast.showError(
+        "Cannot save changes - account is locked by another user",
+        "Account Locked"
+      );
       return;
     }
 
@@ -208,13 +212,16 @@ const SupplementalAccounts = ({
 
   const handleTransfer = () => {
     if (!transferForm.envelopeId || !transferForm.amount || transferForm.amount <= 0) {
-      alert("Please select an envelope and enter a valid amount");
+      globalToast.showError(
+        "Please select an envelope and enter a valid amount",
+        "Transfer Required"
+      );
       return;
     }
 
     const amount = parseFloat(transferForm.amount);
     if (amount > transferringAccount.currentBalance) {
-      alert("Insufficient balance in account");
+      globalToast.showError("Insufficient balance in account", "Insufficient Balance");
       return;
     }
 

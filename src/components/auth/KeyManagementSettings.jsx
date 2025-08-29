@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { globalToast } from "../../stores/ui/toastStore";
 import {
   X,
   Shield,
@@ -90,7 +91,10 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
 
   const handleDownloadProtected = async () => {
     if (!exportPassword || exportPassword.length < 8) {
-      alert("Export password must be at least 8 characters long");
+      globalToast.showError(
+        "Export password must be at least 8 characters long",
+        "Password Too Short"
+      );
       return;
     }
 
@@ -112,17 +116,23 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
 
       const validation = validateKeyFile(keyFileData);
       if (!validation.valid) {
-        alert(`Invalid key file: ${validation.error}`);
+        globalToast.showError(`Invalid key file: ${validation.error}`, "Invalid Key File");
         return;
       }
 
       if (validation.type === "protected" && !importPassword) {
-        alert("This key file is password protected. Please enter the export password.");
+        globalToast.showError(
+          "This key file is password protected. Please enter the export password.",
+          "Password Required"
+        );
         return;
       }
 
       if (!vaultPassword) {
-        alert("Please enter your vault password to complete the import.");
+        globalToast.showError(
+          "Please enter your vault password to complete the import.",
+          "Vault Password Required"
+        );
         return;
       }
 
@@ -137,7 +147,7 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
       setVaultPassword("");
     } catch (err) {
       logger.error("Import failed:", err);
-      alert(`Import failed: ${err.message}`);
+      globalToast.showError(`Import failed: ${err.message}`, "Import Failed");
     }
   };
 

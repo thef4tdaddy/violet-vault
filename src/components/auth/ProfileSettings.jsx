@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { X, User, Palette, Save } from "lucide-react";
+import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
 
 const ProfileSettings = ({ isOpen, onClose, currentUser, onUpdateProfile }) => {
@@ -20,7 +21,7 @@ const ProfileSettings = ({ isOpen, onClose, currentUser, onUpdateProfile }) => {
 
   const handleSave = async () => {
     if (!userName.trim()) {
-      alert("Please enter a name");
+      globalToast.showError("Please enter a name", "Name Required");
       return;
     }
 
@@ -36,7 +37,7 @@ const ProfileSettings = ({ isOpen, onClose, currentUser, onUpdateProfile }) => {
       onClose();
     } catch (error) {
       logger.error("Failed to update profile:", error);
-      alert(`Failed to update profile: ${error.message}`);
+      globalToast.showError(`Failed to update profile: ${error.message}`, "Update Failed");
     } finally {
       setIsLoading(false);
     }

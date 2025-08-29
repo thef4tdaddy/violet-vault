@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { parseCSV, parseOFX, autoDetectFieldMapping } from "../../utils/transactions/fileParser";
 import { autoFundingEngine } from "../../utils/budgeting/autoFundingEngine";
+import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
 
 export const useTransactionImport = (currentUser, onBulkImport, budget) => {
@@ -28,7 +29,10 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
         } else if (file.name.toLowerCase().endsWith(".ofx")) {
           parsedData = parseOFX(content);
         } else {
-          alert("Unsupported file type. Please use CSV or OFX files.");
+          globalToast.showError(
+            "Unsupported file type. Please use CSV or OFX files.",
+            "Unsupported File"
+          );
           return;
         }
 
@@ -40,7 +44,7 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
         setImportStep(2);
         setFieldMapping(autoDetectFieldMapping(parsedData));
       } catch (error) {
-        alert("Error parsing file: " + error.message);
+        globalToast.showError("Error parsing file: " + error.message, "Parse Error");
       }
     };
 
@@ -50,7 +54,10 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
 
   const handleImport = async () => {
     if (!fieldMapping.date || !fieldMapping.description || !fieldMapping.amount) {
-      alert("Please map at least Date, Description, and Amount fields");
+      globalToast.showError(
+        "Please map at least Date, Description, and Amount fields",
+        "Mapping Required"
+      );
       return;
     }
 
@@ -81,7 +88,7 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
         });
       } catch (error) {
         logger.error("Failed to clear existing data", error);
-        alert("Failed to clear existing data. Import cancelled.");
+        globalToast.showError("Failed to clear existing data. Import cancelled.", "Clear Failed");
         return;
       }
     }
@@ -187,7 +194,7 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
 
     message += `All transactions have been added to your ledger with "Imported" category.`;
 
-    alert(message);
+    globalToast.showInfo(message, "Import Update");
   };
 
   const resetImport = () => {

@@ -1,5 +1,6 @@
 // components/SavingsGoals.jsx
 import React, { useState } from "react";
+import { globalToast } from "../../stores/ui/toastStore";
 import {
   Target,
   Plus,
@@ -97,7 +98,7 @@ const SavingsGoals = ({
     e.preventDefault();
 
     if (!formData.name.trim() || !formData.targetAmount) {
-      alert("Please fill in goal name and target amount");
+      globalToast.showError("Please fill in goal name and target amount", "Required Fields");
       return;
     }
 
@@ -105,12 +106,15 @@ const SavingsGoals = ({
     const currentAmount = parseFloat(formData.currentAmount) || 0;
 
     if (targetAmount <= 0) {
-      alert("Target amount must be greater than 0");
+      globalToast.showError("Target amount must be greater than 0", "Invalid Amount");
       return;
     }
 
     if (currentAmount > targetAmount) {
-      alert("Current amount cannot be greater than target amount");
+      globalToast.showError(
+        "Current amount cannot be greater than target amount",
+        "Invalid Amount"
+      );
       return;
     }
 
@@ -243,12 +247,15 @@ const SavingsGoals = ({
     const totalDistributed = calculateDistributionTotal();
 
     if (totalDistributed <= 0) {
-      alert("Please enter amounts to distribute");
+      globalToast.showError("Please enter amounts to distribute", "Distribution Required");
       return;
     }
 
     if (totalDistributed > unassignedCash) {
-      alert("Total distribution exceeds available unassigned cash");
+      globalToast.showError(
+        "Total distribution exceeds available unassigned cash",
+        "Insufficient Funds"
+      );
       return;
     }
 
