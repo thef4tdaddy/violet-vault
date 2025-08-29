@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { AlertTriangle, CheckCircle, Trash2, Wrench, RefreshCw, FileText, X } from "lucide-react";
 import {
-  findCorruptedEnvelopes,
   removeCorruptedEnvelopes,
   repairCorruptedEnvelopes,
   getEnvelopeIntegrityReport,
 } from "../../utils/budgeting/envelopeIntegrityChecker";
+import { useConfirm } from "../../hooks/common/useConfirm";
 import useToast from "../../hooks/common/useToast";
 import logger from "../../utils/common/logger";
 
@@ -19,6 +19,7 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedEnvelopes, setSelectedEnvelopes] = useState(new Set());
   const { addToast } = useToast();
+  const confirm = useConfirm();
 
   useEffect(() => {
     if (isOpen) {

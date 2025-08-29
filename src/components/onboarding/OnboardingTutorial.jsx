@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useConfirm } from "../../hooks/common/useConfirm";
 import { X, ChevronRight, ChevronLeft, CheckCircle, Target } from "lucide-react";
 import useOnboardingStore from "../../stores/ui/onboardingStore";
 import logger from "../../utils/common/logger";

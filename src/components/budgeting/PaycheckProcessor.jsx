@@ -22,6 +22,7 @@ const PaycheckProcessor = ({
   onDeletePaycheck,
   currentUser,
 }) => {
+  const confirm = useConfirm();
   // PRODUCTION DEBUG: Check autoAllocate values since user says all are enabled
   const [paycheckAmount, setPaycheckAmount] = useState("");
   const [payerName, setPayerName] = useState(currentUser?.userName || "");

@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { useAuth } from "../../stores/auth/authStore.jsx";
+import { useConfirm } from "./useConfirm";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
 import logger from "../../utils/common/logger";
 import { budgetDb, getBudgetMetadata } from "../../db/budgetDb.js";
@@ -12,6 +13,7 @@ import { cloudSyncService } from "../../services/cloudSyncService.js";
 const useDataManagement = () => {
   const { currentUser } = useAuth();
   const { showSuccessToast, showErrorToast, showWarningToast } = useToastHelpers();
+  const confirm = useConfirm();
 
   const exportData = useCallback(async () => {
     try {

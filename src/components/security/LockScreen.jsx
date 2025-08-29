@@ -3,7 +3,6 @@ import { useConfirm } from "../../hooks/common/useConfirm";
 import { Lock, Unlock, Eye, EyeOff, AlertCircle, Shield, Clock } from "lucide-react";
 import { useSecurityManager } from "../../hooks/auth/useSecurityManager";
 import { useAuth } from "../../stores/auth/authStore";
-import { useConfirm } from "../../hooks/common/useConfirm";
 import shieldLogo from "../../assets/logo-512x512.png";
 
 const LockScreen = () => {

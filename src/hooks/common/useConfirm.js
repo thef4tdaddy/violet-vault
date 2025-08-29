@@ -84,7 +84,7 @@ export const useConfirmModal = () => {
     }
 
     hideConfirm();
-  }, [resolver, config.onConfirm, hideConfirm]);
+  }, [resolver, config, hideConfirm]);
 
   const handleCancel = useCallback(() => {
     if (!resolver) return;
