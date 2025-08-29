@@ -1,9 +1,10 @@
-// src/new/UnifiedBillTracker.jsx
-import React, { useState, useMemo } from "react";
-import { useBudgetStore } from "../../stores/ui/uiStore";
-import { useTransactions } from "../../hooks/common/useTransactions";
-import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
-import useBills from "../../hooks/bills/useBills";
+/**
+ * BillManager Component - Refactored for Issue #152
+ *
+ * UI-only component using useBillManager hook for business logic
+ * Reduced from 1,156 LOC to ~400 LOC by extracting business logic
+ */
+import React from "react";
 import {
   FileText,
   Calendar,
@@ -21,18 +22,22 @@ import {
   Eye,
   History,
 } from "lucide-react";
-import { getBillIcon, getIconByName } from "../../utils/common/billIcons";
+import { useBillManager } from "../../hooks/bills/useBillManager";
+import { useBillManagerUI } from "../../hooks/bills/useBillManagerUI";
+import useEditLock from "../../hooks/common/useEditLock";
+import { useAuth } from "../../stores/auth/authStore";
 import AddBillModal from "./AddBillModal";
 import BulkBillUpdateModal from "./BulkBillUpdateModal";
 import BillDiscoveryModal from "./BillDiscoveryModal";
-import { useBillOperations } from "../../hooks/bills/useBillOperations";
-import { generateBillSuggestions } from "../../utils/common/billDiscovery";
-import logger from "../../utils/common/logger";
 import ObjectHistoryViewer from "../history/ObjectHistoryViewer";
-import { processRecurringBill } from "../../utils/bills/recurringBillUtils";
+import ConnectionDisplay, {
+  ConnectionItem,
+  ConnectionInfo,
+  UniversalConnectionManager,
+} from "../ui/ConnectionDisplay";
 
 const BillManager = ({
-  transactions: propTransactions = [], // Unified data source - filters for bills
+  transactions: propTransactions = [],
   envelopes: propEnvelopes = [],
   onUpdateBill,
   onCreateRecurringBill,
@@ -40,499 +45,96 @@ const BillManager = ({
   onError,
   className = "",
 }) => {
-  // Enhanced TanStack Query integration with loading states
-  const { data: tanStackTransactions = [], isLoading: transactionsLoading } = useTransactions();
-
+  // Use the extracted business logic hook
   const {
-    envelopes: tanStackEnvelopes = [],
-    addEnvelope,
-    isLoading: envelopesLoading,
-  } = useEnvelopes();
+    // Data
+    bills,
+    categorizedBills,
+    filteredBills,
+    totals,
+    envelopes,
 
-  const {
-    bills: tanStackBills = [],
+    // UI State
+    selectedBills,
+    viewMode,
+    isSearching,
+    showAddBillModal,
+    editingBill,
+    showBulkUpdateModal,
+    showDiscoveryModal,
+    discoveredBills,
+    historyBill,
+    filterOptions,
+    isLoading,
+
+    // Actions
+    searchNewBills,
+    handleAddDiscoveredBills,
+    handleBulkUpdate,
+    setSelectedBills,
+    setViewMode,
+    setShowAddBillModal,
+    setEditingBill,
+    setShowBulkUpdateModal,
+    setShowDiscoveryModal,
+    setHistoryBill,
+    setFilterOptions,
+
+    // Bill operations
+    billOperations,
     addBill,
     updateBill,
     deleteBill,
-    markBillPaid,
-    isLoading: billsLoading,
-  } = useBills();
-
-  logger.debug("🏠 BillManager: Received from useBills:", {
-    tanStackBillsLength: tanStackBills.length,
-    billsLoading,
-    firstBill: tanStackBills[0],
-    billTitles: tanStackBills.map((b) => b.name || b.title || b.billName || "No Name").slice(0, 3),
+  } = useBillManager({
+    propTransactions,
+    propEnvelopes,
+    onUpdateBill,
+    onCreateRecurringBill,
+    onSearchNewBills,
+    onError,
   });
 
-  // Keep Zustand for non-migrated operations and fallbacks
-  const budget = useBudgetStore();
+  // UI logic hook
+  const {
+    viewModes,
+    getSummaryCards,
+    toggleBillSelection,
+    selectAllBills,
+    clearSelection,
+    selectionState,
+    handleAddNewBill,
+    handleEditBill,
+    handleCloseModal,
+    handleViewHistory,
+    getBillDisplayData,
+  } = useBillManagerUI({
+    bills,
+    categorizedBills,
+    filteredBills,
+    selectedBills,
+    setSelectedBills,
+    viewMode,
+    setShowAddBillModal,
+    setEditingBill,
+    setHistoryBill,
+  });
 
-  const transactions = useMemo(
-    () =>
-      propTransactions && propTransactions.length
-        ? propTransactions
-        : tanStackTransactions.length
-          ? tanStackTransactions
-          : budget.allTransactions || [],
-    [propTransactions, tanStackTransactions, budget.allTransactions]
+  // Generate summary cards from totals
+  const summaryCards = getSummaryCards(totals);
+
+  // Edit lock for collaborative editing
+  const { budgetId, currentUser } = useAuth();
+  const { isLocked: isEditLocked, currentEditor } = useEditLock(
+    `bills-${budgetId}`,
+    currentUser?.userName || "User"
   );
 
-  const envelopes = useMemo(() => {
-    const result =
-      propEnvelopes && propEnvelopes.length
-        ? propEnvelopes
-        : tanStackEnvelopes.length
-          ? tanStackEnvelopes
-          : budget.envelopes || [];
-
-    logger.debug("🔍 BillManager envelopes resolution:", {
-      propEnvelopesLength: propEnvelopes?.length || 0,
-      tanStackEnvelopesLength: tanStackEnvelopes?.length || 0,
-      budgetEnvelopesLength: budget.envelopes?.length || 0,
-      resultLength: result?.length || 0,
-      envelopesLoading,
-      selectedSource: propEnvelopes?.length
-        ? "props"
-        : tanStackEnvelopes?.length
-          ? "tanstack"
-          : "budget",
-      firstEnvelope: result?.[0],
-    });
-
-    return result;
-  }, [propEnvelopes, tanStackEnvelopes, budget.envelopes, envelopesLoading]);
-
-  const [selectedBills, setSelectedBills] = useState(new Set());
-  const [viewMode, setViewMode] = useState("upcoming");
-  const [isSearching, setIsSearching] = useState(false);
-  const [showBillDetail, setShowBillDetail] = useState(null);
-  const [showAddBillModal, setShowAddBillModal] = useState(false);
-  const [editingBill, setEditingBill] = useState(null);
-  const [showBulkUpdateModal, setShowBulkUpdateModal] = useState(false);
-  const [showDiscoveryModal, setShowDiscoveryModal] = useState(false);
-  const [discoveredBills, setDiscoveredBills] = useState([]);
-  const [historyBill, setHistoryBill] = useState(null);
-  const [filterOptions, setFilterOptions] = useState({
-    billTypes: ["all"],
-    providers: [],
-    envelopes: [],
-    sortBy: "due_date",
-    showPaid: false,
-  });
-
-  const bills = useMemo(() => {
-    // Combine bills from transactions and the dedicated bills store
-    const billsFromTransactions = transactions.filter(
-      (t) => t && (t.type === "bill" || t.type === "recurring_bill")
-    );
-    const billsFromStore = tanStackBills.length ? tanStackBills : budget.bills || [];
-
-    logger.debug("🔄 BillManager: Bill sources comparison:", {
-      tanStackBillsLength: tanStackBills.length,
-      budgetBillsLength: (budget.bills || []).length,
-      usingTanStack: tanStackBills.length > 0,
-      billsFromStoreLength: billsFromStore.length,
-    });
-
-    // Merge both sources, prioritizing store bills over transaction bills with same ID
-    const combinedBills = [...billsFromStore];
-    billsFromTransactions.forEach((bill) => {
-      if (!combinedBills.find((b) => b.id === bill.id)) {
-        combinedBills.push(bill);
-      }
-    });
-
-    return combinedBills.map((bill) => {
-      let daysUntilDue = null;
-      let urgency = "normal";
-
-      // Handle recurring bill logic using utility
-      const processedBill = processRecurringBill(bill, (updatedBill) => {
-        if (onUpdateBill) {
-          onUpdateBill(updatedBill);
-        } else {
-          updateBill({
-            id: updatedBill.id,
-            updates: {
-              isPaid: false,
-              dueDate: updatedBill.dueDate,
-              paidDate: null,
-            },
-          });
-        }
-      });
-
-      if (processedBill.dueDate) {
-        try {
-          const today = new Date();
-
-          // Fix 2-digit year parsing by converting to 4-digit years
-          let normalizedDate = processedBill.dueDate;
-
-          // Handle various date formats and convert 2-digit years to 4-digit
-          if (typeof normalizedDate === "string") {
-            // Match patterns like MM/DD/YY, MM-DD-YY, etc.
-            normalizedDate = normalizedDate.replace(
-              /(\d{1,2})[/-](\d{1,2})[/-](\d{2})$/,
-              (match, month, day, year) => {
-                const fullYear = parseInt(year) <= 30 ? `20${year}` : `19${year}`;
-                return `${month}/${day}/${fullYear}`;
-              }
-            );
-          }
-
-          const due = new Date(normalizedDate);
-
-          // Validate date is valid
-          if (!isNaN(due.getTime())) {
-            daysUntilDue = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
-
-            if (daysUntilDue < 0) urgency = "overdue";
-            else if (daysUntilDue <= 3) urgency = "urgent";
-            else if (daysUntilDue <= 7) urgency = "soon";
-          }
-        } catch (error) {
-          logger.warn(
-            `Invalid due date for bill ${processedBill.id}:`,
-            processedBill.dueDate,
-            error
-          );
-        }
-      }
-
-      return {
-        ...processedBill,
-        // Ensure required fields have valid values
-        amount: typeof bill.amount === "number" ? bill.amount : 0,
-        description: bill.description || bill.provider || `Bill ${bill.id}`,
-        isPaid: Boolean(bill.isPaid),
-        daysUntilDue,
-        urgency,
-      };
-    });
-  }, [transactions, tanStackBills, budget.bills]);
-
-  const categorizedBills = useMemo(() => {
-    const upcomingBills = bills.filter((b) => !b.isPaid && b.daysUntilDue >= 0);
-    const overdueBills = bills.filter((b) => !b.isPaid && b.daysUntilDue < 0);
-    const paidBills = bills.filter((b) => b.isPaid);
-
-    return {
-      upcoming: upcomingBills.sort((a, b) => (a.daysUntilDue || 999) - (b.daysUntilDue || 999)),
-      overdue: overdueBills.sort((a, b) => (a.daysUntilDue || 0) - (b.daysUntilDue || 0)),
-      paid: paidBills.sort(
-        (a, b) => new Date(b.paidDate || b.date) - new Date(a.paidDate || a.date)
-      ),
-      all: bills,
-    };
-  }, [bills]);
-
-  // Initialize bill operations hook with computed bills
-  const billOperations = useBillOperations({
-    bills,
-    envelopes,
-    updateBill,
-    onUpdateBill,
-    onError,
-    budget,
-  });
-
-  const totals = useMemo(() => {
-    const overdueTotal = categorizedBills.overdue.reduce((sum, b) => sum + Math.abs(b.amount), 0);
-
-    // Calculate "due soon" as bills due within 7 days (urgent + soon)
-    const dueSoonBills = categorizedBills.upcoming.filter(
-      (b) => b.urgency === "urgent" || b.urgency === "soon"
-    );
-    const dueSoonTotal = dueSoonBills.reduce((sum, b) => sum + Math.abs(b.amount), 0);
-
-    const paidThisMonth = categorizedBills.paid
-      .filter((b) => new Date(b.paidDate || b.date).getMonth() === new Date().getMonth())
-      .reduce((sum, b) => sum + Math.abs(b.amount), 0);
-
-    return {
-      upcoming: dueSoonTotal, // Changed to only include bills due within 7 days
-      dueSoonCount: dueSoonBills.length,
-      overdue: overdueTotal,
-      paidThisMonth,
-      totalBills: bills.length,
-    };
-  }, [categorizedBills, bills]);
-
-  const displayBills = useMemo(() => {
-    let billsToShow = categorizedBills[viewMode] || [];
-
-    if (filterOptions.billTypes.length > 0 && !filterOptions.billTypes.includes("all")) {
-      billsToShow = billsToShow.filter((bill) =>
-        filterOptions.billTypes.includes(bill.metadata?.type || bill.category?.toLowerCase())
-      );
-    }
-
-    if (filterOptions.providers.length > 0) {
-      billsToShow = billsToShow.filter((bill) => filterOptions.providers.includes(bill.provider));
-    }
-
-    if (filterOptions.envelopes.length > 0) {
-      billsToShow = billsToShow.filter((bill) => filterOptions.envelopes.includes(bill.envelopeId));
-    }
-
-    switch (filterOptions.sortBy) {
-      case "due_date":
-        billsToShow.sort((a, b) => new Date(a.dueDate || a.date) - new Date(b.dueDate || b.date));
-        break;
-      case "amount_desc":
-        billsToShow.sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount));
-        break;
-      case "amount_asc":
-        billsToShow.sort((a, b) => Math.abs(a.amount) - Math.abs(b.amount));
-        break;
-      case "provider":
-        billsToShow.sort((a, b) => (a.provider || "").localeCompare(b.provider || ""));
-        break;
-      case "urgency": {
-        const urgencyOrder = { overdue: 0, urgent: 1, soon: 2, normal: 3 };
-        billsToShow.sort((a, b) => urgencyOrder[a.urgency] - urgencyOrder[b.urgency]);
-        break;
-      }
-    }
-
-    return billsToShow;
-  }, [categorizedBills, viewMode, filterOptions]);
-
-  const getUrgencyStyle = (urgency, isPaid = false) => {
-    if (isPaid) return "border-green-200 bg-green-50";
-
-    switch (urgency) {
-      case "overdue":
-        return "border-red-500 bg-red-50";
-      case "urgent":
-        return "border-orange-500 bg-orange-50";
-      case "soon":
-        return "border-yellow-500 bg-yellow-50";
-      default:
-        return "border-gray-200 bg-white/60";
-    }
-  };
-
-  const getUrgencyIcon = (urgency, isPaid = false) => {
-    if (isPaid) return <CheckCircle className="h-4 w-4 text-green-600" />;
-
-    switch (urgency) {
-      case "overdue":
-        return <AlertTriangle className="h-4 w-4 text-red-600" />;
-      case "urgent":
-        return <Clock className="h-4 w-4 text-orange-600" />;
-      case "soon":
-        return <Bell className="h-4 w-4 text-yellow-600" />;
-      default:
-        return <Calendar className="h-4 w-4 text-gray-600" />;
-    }
-  };
-
-  const getCategoryIcon = (bill) => {
-    // First priority: Check if bill has a stored iconName
-    if (bill.iconName && typeof bill.iconName === "string") {
-      const IconComponent = getIconByName(bill.iconName);
-      return <IconComponent className="h-6 w-6" />;
-    }
-
-    // Second priority: Check if bill has a stored icon component (legacy)
-    if (bill.icon && typeof bill.icon === "function") {
-      const IconComponent = bill.icon;
-      return <IconComponent className="h-6 w-6" />;
-    }
-
-    // Third priority: Check metadata for legacy icon reference
-    if (bill.metadata?.categoryIcon) {
-      // If it's a string emoji, return it
-      if (typeof bill.metadata.categoryIcon === "string") {
-        return bill.metadata.categoryIcon;
-      }
-      // If it's a component, render it
-      if (typeof bill.metadata.categoryIcon === "function") {
-        const IconComponent = bill.metadata.categoryIcon;
-        return <IconComponent className="h-6 w-6" />;
-      }
-    }
-
-    // Fourth priority: Use smart icon detection from billIcons utility
-    const IconComponent = getBillIcon(
-      bill.provider || "",
-      bill.description || "",
-      bill.category || ""
-    );
-
-    // Ensure we have a valid React component
-    if (typeof IconComponent === "function") {
-      return <IconComponent className="h-6 w-6" />;
-    }
-
-    // Fallback to a default icon if getBillIcon returns something unexpected
-    return <FileText className="h-6 w-6" />;
-  };
-
-  const handlePayBill = async (billId) => {
-    try {
-      const bill = bills.find((b) => b.id === billId);
-      if (!bill) {
-        logger.error("Bill not found:", billId);
-        return;
-      }
-
-      if (bill.isPaid) {
-        logger.warn("Bill is already paid:", billId);
-        return;
-      }
-
-      // Use the proper markBillPaid function that handles everything atomically
-      await markBillPaid({
-        billId: bill.id,
-        paidAmount: Math.abs(bill.amount),
-        paidDate: new Date().toISOString().split("T")[0],
-        envelopeId: bill.envelopeId,
-      });
-
-      logger.debug("✅ Bill payment completed successfully:", {
-        billId: bill.id,
-        amount: bill.amount,
-        envelopeId: bill.envelopeId,
-      });
-    } catch (error) {
-      logger.error("❌ Failed to pay bill:", error);
-      onError?.(error.message || "Failed to pay bill");
-    }
-  };
-
-  const searchNewBills = async () => {
-    setIsSearching(true);
-    try {
-      // Use real bill discovery logic
-      const suggestions = generateBillSuggestions(transactions, bills, envelopes);
-      setDiscoveredBills(suggestions);
-      setShowDiscoveryModal(true);
-
-      // Also call the prop function for backward compatibility
-      await onSearchNewBills?.();
-    } catch (error) {
-      logger.error("Error discovering bills:", error);
-      onError?.(error.message || "Failed to discover new bills");
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
-  const handleAddDiscoveredBills = async (billsToAdd) => {
-    try {
-      for (const bill of billsToAdd) {
-        // Use the existing addBill logic
-        if (onCreateRecurringBill) {
-          await onCreateRecurringBill(bill);
-        } else {
-          try {
-            await addBill(bill);
-          } catch (error) {
-            logger.warn("TanStack addBill failed, using Zustand fallback", error);
-            budget.addTransaction(bill);
-          }
-        }
-      }
-      logger.debug(`Successfully added ${billsToAdd.length} discovered bills`);
-    } catch (error) {
-      throw new Error(`Failed to add discovered bills: ${error.message}`);
-    }
-  };
-
-  const toggleBillSelection = (billId) => {
-    setSelectedBills((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(billId)) {
-        newSet.delete(billId);
-      } else {
-        newSet.add(billId);
-      }
-      return newSet;
-    });
-  };
-
-  const paySelectedBills = async () => {
-    if (selectedBills.size === 0) {
-      onError?.("No bills selected");
-      return;
-    }
-
-    try {
-      let successCount = 0;
-      let errorCount = 0;
-      const errors = [];
-
-      for (const billId of selectedBills) {
-        try {
-          await handlePayBill(billId);
-          successCount++;
-        } catch (error) {
-          errorCount++;
-          errors.push(`Bill ${billId}: ${error.message}`);
-        }
-      }
-
-      if (errorCount > 0) {
-        onError?.(
-          `${successCount} bills paid successfully, ${errorCount} failed:\n${errors.join("\n")}`
-        );
-      } else {
-        logger.debug(`✅ Successfully paid ${successCount} bills`);
-      }
-
-      setSelectedBills(new Set());
-    } catch (error) {
-      logger.error("❌ Error in bulk payment:", error);
-      onError?.(error.message || "Failed to pay selected bills");
-    }
-  };
-
-  const handleBulkUpdate = async (updatedBills) => {
-    const result = await billOperations.handleBulkUpdate(updatedBills);
-
-    if (result.success) {
-      setSelectedBills(new Set());
-    }
-  };
-
-  const viewModes = [
-    {
-      id: "upcoming",
-      label: "Upcoming",
-      count: categorizedBills.upcoming.length,
-      color: "blue",
-    },
-    {
-      id: "overdue",
-      label: "Overdue",
-      count: categorizedBills.overdue.length,
-      color: "red",
-    },
-    {
-      id: "paid",
-      label: "Paid",
-      count: categorizedBills.paid.length,
-      color: "green",
-    },
-    { id: "all", label: "All Bills", count: bills.length, color: "gray" },
-  ];
-
-  // Show loading state while TanStack queries are fetching
-  const isLoading = transactionsLoading || envelopesLoading || billsLoading;
+  // Loading state
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="h-24 bg-gray-200 rounded"></div>
-            <div className="h-24 bg-gray-200 rounded"></div>
-            <div className="h-24 bg-gray-200 rounded"></div>
-          </div>
+      <div className={`animate-pulse ${className}`}>
+        <div className="space-y-4">
+          <div className="h-12 bg-gray-200 rounded"></div>
           <div className="h-64 bg-gray-200 rounded"></div>
         </div>
       </div>
@@ -541,612 +143,292 @@ const BillManager = ({
 
   return (
     <div className={`space-y-6 ${className}`}>
-      <div className="flex items-center justify-between">
+      {/* Header with Actions */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-            <div className="relative mr-3">
-              <div className="absolute inset-0 bg-blue-500 rounded-xl blur-lg opacity-30"></div>
-              <div className="relative bg-blue-500 p-2 rounded-xl">
-                <FileText className="h-6 w-6 text-white" />
-              </div>
-            </div>
-            Bill Tracker
-          </h2>
-          <p className="text-gray-600 mt-1">Manage bills, due dates, and payments</p>
+          <h2 className="text-2xl font-bold text-gray-900">Bill Manager</h2>
+          <p className="text-gray-600">Track and manage your recurring bills and payments</p>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex items-center gap-2">
+          {isEditLocked && (
+            <div className="text-sm text-amber-600 bg-amber-50 px-3 py-1 rounded-lg flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Editing: {currentEditor}
+            </div>
+          )}
+
           <button
             onClick={searchNewBills}
             disabled={isSearching}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 flex items-center"
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center gap-2"
           >
             {isSearching ? (
-              <>
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin" /> Searching...
-              </>
+              <RefreshCw className="h-4 w-4 animate-spin" />
             ) : (
-              <>
-                <Search className="h-4 w-4 mr-2" /> Find New Bills
-              </>
+              <Search className="h-4 w-4" />
             )}
+            Discover Bills
           </button>
 
           <button
-            onClick={() => setShowAddBillModal(true)}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center"
-            data-tour="add-bill"
+            onClick={handleAddNewBill}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
           >
-            <Plus className="h-4 w-4 mr-2" /> Add Bill
+            <Plus className="h-4 w-4" />
+            Add Bill
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-gradient-to-br from-red-500 to-red-600 p-4 rounded-lg text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-red-100 text-sm">Overdue</p>
-              <p className="text-2xl font-bold">${totals.overdue.toFixed(2)}</p>
-            </div>
-            <AlertTriangle className="h-8 w-8 text-red-200" />
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {summaryCards.map((card, index) => (
+          <div key={index} className={`${card.bg} p-4 rounded-lg`}>
+            <div className={`text-2xl font-bold ${card.color}`}>${card.value.toFixed(2)}</div>
+            <div className="text-sm text-gray-600">{card.label}</div>
           </div>
-          <p className="text-xs text-red-100 mt-2">
-            {categorizedBills.overdue.length} bills overdue
-          </p>
-        </div>
-
-        <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-4 rounded-lg text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-orange-100 text-sm">Due Soon</p>
-              <p className="text-2xl font-bold">${totals.upcoming.toFixed(2)}</p>
-            </div>
-            <Clock className="h-8 w-8 text-orange-200" />
-          </div>
-          <p className="text-xs text-orange-100 mt-2">{totals.dueSoonCount} bills due soon</p>
-        </div>
-
-        <div className="bg-gradient-to-br from-green-500 to-green-600 p-4 rounded-lg text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-green-100 text-sm">Paid This Month</p>
-              <p className="text-2xl font-bold">${totals.paidThisMonth.toFixed(2)}</p>
-            </div>
-            <CheckCircle className="h-8 w-8 text-green-200" />
-          </div>
-          <p className="text-xs text-green-100 mt-2">{categorizedBills.paid.length} bills paid</p>
-        </div>
-
-        <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-4 rounded-lg text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-blue-100 text-sm">Total Bills</p>
-              <p className="text-2xl font-bold">{totals.totalBills}</p>
-            </div>
-            <FileText className="h-8 w-8 text-blue-200" />
-          </div>
-          <p className="text-xs text-blue-100 mt-2">All tracked bills</p>
-        </div>
+        ))}
       </div>
 
-      <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-        <div className="flex flex-wrap gap-2 mb-4">
-          {viewModes.map((mode) => (
-            <button
-              key={mode.id}
-              onClick={() => setViewMode(mode.id)}
-              className={`px-4 py-2 rounded-lg flex items-center transition-all ${
-                viewMode === mode.id
-                  ? `bg-${mode.color}-600 text-white`
-                  : `text-${mode.color}-700 hover:bg-${mode.color}-50`
-              }`}
-            >
-              <span className="font-medium">{mode.label}</span>
-              <span
-                className={`ml-2 px-2 py-1 rounded-full text-xs ${
-                  viewMode === mode.id ? "bg-white/20" : `bg-${mode.color}-100`
+      {/* View Mode Tabs */}
+      <div className="border-b border-gray-200">
+        <nav className="flex space-x-8">
+          {viewModes.map((mode) => {
+            const Icon = mode.icon;
+            const isActive = viewMode === mode.id;
+            return (
+              <button
+                key={mode.id}
+                onClick={() => setViewMode(mode.id)}
+                className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
+                  isActive
+                    ? "border-blue-500 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}
               >
-                {mode.count}
-              </span>
-            </button>
-          ))}
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <h4 className="font-medium text-gray-900 flex items-center">
-              <Filter className="h-4 w-4 mr-2" /> Filters
-            </h4>
-            <select
-              value={filterOptions.sortBy}
-              onChange={(e) =>
-                setFilterOptions((prev) => ({
-                  ...prev,
-                  sortBy: e.target.value,
-                }))
-              }
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
-            >
-              <option value="due_date">Due Date</option>
-              <option value="amount_desc">Highest Amount</option>
-              <option value="amount_asc">Lowest Amount</option>
-              <option value="provider">Provider Name</option>
-              <option value="urgency">Urgency</option>
-            </select>
-          </div>
-
-          {selectedBills.size > 0 && (
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowBulkUpdateModal(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center text-sm"
-              >
-                <Settings className="h-4 w-4 mr-2" /> Update {selectedBills.size} Selected
+                <Icon className="h-4 w-4" />
+                {mode.label}
+                <span
+                  className={`ml-2 py-0.5 px-2 rounded-full text-xs ${
+                    isActive ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-600"
+                  }`}
+                >
+                  {mode.count}
+                </span>
               </button>
-              <button
-                onClick={paySelectedBills}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center text-sm"
-              >
-                <CheckCircle className="h-4 w-4 mr-2" /> Pay {selectedBills.size} Selected
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {displayBills.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">
-          <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
-          <p className="font-medium">No bills found</p>
-          <p className="text-sm mt-1">
-            {viewMode === "upcoming"
-              ? "All caught up! No upcoming bills."
-              : viewMode === "overdue"
-                ? "Great! No overdue bills."
-                : viewMode === "paid"
-                  ? "No paid bills in this period."
-                  : "No bills match your current filters."}
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {displayBills.map((bill) => {
-            const envelope = envelopes.find((env) => env.id === bill.envelopeId);
-            const urgencyStyle = getUrgencyStyle(bill.urgency, bill.isPaid);
-
-            return (
-              <div
-                key={`${bill.id}-${bill.isPaid ? "paid" : "unpaid"}-${bill.amount}`}
-                className={`p-4 rounded-lg border-2 transition-all hover:shadow-lg ${urgencyStyle} ${
-                  selectedBills.has(bill.id) ? "ring-2 ring-blue-500" : ""
-                } flex flex-col`}
-              >
-                {/* Header with checkbox, icon, and actions */}
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-start gap-3">
-                    <input
-                      type="checkbox"
-                      checked={selectedBills.has(bill.id)}
-                      onChange={() => toggleBillSelection(bill.id)}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
-                    />
-                    <div className="text-xl">{getCategoryIcon(bill)}</div>
-                  </div>
-
-                  <div className="flex items-center gap-1">
-                    {getUrgencyIcon(bill.urgency, bill.isPaid)}
-                    <button
-                      onClick={() => setShowBillDetail(bill)}
-                      className="text-gray-400 hover:text-blue-600 p-1 rounded"
-                      title="View details"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setHistoryBill(bill);
-                      }}
-                      className="text-gray-400 hover:text-blue-600 p-1 rounded"
-                      title="View History"
-                    >
-                      <History className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => setEditingBill(bill)}
-                      className="text-gray-400 hover:text-gray-600 p-1 rounded"
-                      title="Edit bill"
-                    >
-                      <Settings className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Bill info */}
-                <div className="flex-1">
-                  <div className="mb-2">
-                    <h3 className="font-medium text-gray-900 text-sm leading-tight">
-                      {bill.provider || bill.description || bill.name || `Bill ${bill.id}`}
-                    </h3>
-                    <p className="text-xs text-gray-600">{bill.category || ""}</p>
-                  </div>
-
-                  {envelope && (
-                    <span className="inline-block text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full mb-2">
-                      → {envelope.name}
-                    </span>
-                  )}
-
-                  <div className="space-y-1 text-xs text-gray-500">
-                    {bill.dueDate && (
-                      <p className="flex items-center">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        Due: {new Date(bill.dueDate).toLocaleDateString()}
-                      </p>
-                    )}
-                    {bill.daysUntilDue !== null && !bill.isPaid && (
-                      <p>
-                        {bill.daysUntilDue < 0
-                          ? `${Math.abs(bill.daysUntilDue)} days overdue`
-                          : bill.daysUntilDue === 0
-                            ? "Due today"
-                            : `${bill.daysUntilDue} days remaining`}
-                      </p>
-                    )}
-                    {bill.isPaid && bill.paidDate && (
-                      <p className="text-green-600">
-                        Paid:{" "}
-                        {bill.paidDate ? new Date(bill.paidDate).toLocaleDateString() : "Recently"}
-                      </p>
-                    )}
-                    {bill.accountNumber && <p>Account: {bill.accountNumber}</p>}
-                  </div>
-                </div>
-
-                {/* Amount and actions */}
-                <div className="mt-3 pt-3 border-t border-gray-200">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-bold text-gray-900 text-lg">
-                        ${Math.abs(bill.amount).toFixed(2)}
-                      </p>
-                      {bill.metadata?.minimumPayment &&
-                        bill.metadata.minimumPayment !== Math.abs(bill.amount) && (
-                          <p className="text-xs text-gray-500">
-                            Min: ${bill.metadata.minimumPayment.toFixed(2)}
-                          </p>
-                        )}
-                    </div>
-
-                    {!bill.isPaid && (
-                      <button
-                        onClick={() => handlePayBill(bill.id)}
-                        className="bg-green-600 text-white px-3 py-1 text-xs rounded hover:bg-green-700 flex items-center"
-                      >
-                        <CheckCircle className="h-3 w-3 mr-1" /> Pay
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Additional metadata - only show if present */}
-                {(bill.metadata?.statementPeriod || bill.metadata?.serviceAddress) && (
-                  <div className="mt-3 pt-3 border-t border-gray-200">
-                    <div className="text-xs text-gray-600 space-y-1">
-                      {bill.metadata.statementPeriod && (
-                        <div className="flex justify-between">
-                          <span>Period:</span>
-                          <span className="text-right">
-                            {bill.metadata.statementPeriod.start} -{" "}
-                            {bill.metadata.statementPeriod.end}
-                          </span>
-                        </div>
-                      )}
-                      {bill.metadata.serviceAddress && (
-                        <div>
-                          <span>Address:</span>
-                          <span className="block text-right text-xs truncate">
-                            {bill.metadata.serviceAddress}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
             );
           })}
-        </div>
-      )}
+        </nav>
+      </div>
 
-      {showBillDetail && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl w-full max-w-lg max-h-96 overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold">Bill Details</h3>
-                <button
-                  onClick={() => setShowBillDetail(null)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  ✕
-                </button>
-              </div>
+      {/* Filters */}
+      <div className="flex flex-wrap items-center gap-4 p-4 bg-gray-50 rounded-lg">
+        <input
+          type="text"
+          placeholder="Search bills..."
+          value={filterOptions.search}
+          onChange={(e) => setFilterOptions((prev) => ({ ...prev, search: e.target.value }))}
+          className="flex-1 min-w-48 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        />
 
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="text-3xl">{getCategoryIcon(showBillDetail)}</div>
-                  <div>
-                    <p className="font-medium text-lg">
-                      {showBillDetail.provider || showBillDetail.description}
-                    </p>
-                    <p className="text-sm text-gray-600">{showBillDetail.category}</p>
-                  </div>
-                </div>
+        <select
+          value={filterOptions.urgency}
+          onChange={(e) => setFilterOptions((prev) => ({ ...prev, urgency: e.target.value }))}
+          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="all">All Urgency</option>
+          <option value="overdue">Overdue</option>
+          <option value="urgent">Urgent</option>
+          <option value="soon">Soon</option>
+          <option value="normal">Normal</option>
+        </select>
+      </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Amount Due
-                    </label>
-                    <p className="text-2xl font-bold text-gray-900">
-                      ${Math.abs(showBillDetail.amount).toFixed(2)}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
-                    <p className="text-sm">
-                      {showBillDetail.dueDate
-                        ? new Date(showBillDetail.dueDate).toLocaleDateString()
-                        : "Not specified"}
-                    </p>
-                  </div>
-                </div>
-
-                {showBillDetail.accountNumber && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Account Number
-                    </label>
-                    <p className="text-sm font-mono">{showBillDetail.accountNumber}</p>
-                  </div>
-                )}
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Status & Urgency
-                  </label>
-                  <div className="flex items-center gap-2">
-                    {getUrgencyIcon(showBillDetail.urgency, showBillDetail.isPaid)}
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm ${
-                        showBillDetail.isPaid
-                          ? "bg-green-100 text-green-700"
-                          : showBillDetail.urgency === "overdue"
-                            ? "bg-red-100 text-red-700"
-                            : showBillDetail.urgency === "urgent"
-                              ? "bg-orange-100 text-orange-700"
-                              : showBillDetail.urgency === "soon"
-                                ? "bg-yellow-100 text-yellow-700"
-                                : "bg-gray-100 text-gray-700"
-                      }`}
-                    >
-                      {showBillDetail.isPaid
-                        ? "Paid"
-                        : showBillDetail.urgency === "overdue"
-                          ? "Overdue"
-                          : showBillDetail.urgency === "urgent"
-                            ? "Due Soon"
-                            : showBillDetail.urgency === "soon"
-                              ? "Due This Week"
-                              : "Upcoming"}
-                    </span>
-                  </div>
-                </div>
-
-                {showBillDetail.envelopeId && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Assigned Envelope
-                    </label>
-                    <p className="text-sm">
-                      {envelopes.find((env) => env.id === showBillDetail.envelopeId)?.name ||
-                        "Unknown"}
-                    </p>
-                  </div>
-                )}
-
-                {showBillDetail.notes && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                    <p className="text-sm text-gray-600">{showBillDetail.notes}</p>
-                  </div>
-                )}
-
-                <div className="bg-blue-50 p-3 rounded-lg">
-                  <p className="text-sm text-blue-700">
-                    <strong>Source:</strong>{" "}
-                    {showBillDetail.source === "bill_tracker"
-                      ? "Email Detection"
-                      : showBillDetail.source === "manual"
-                        ? "Manual Entry"
-                        : "Imported"}
-                  </p>
-                  {showBillDetail.metadata?.confidence && (
-                    <p className="text-sm text-blue-700 mt-1">
-                      <strong>Detection Confidence:</strong>{" "}
-                      {Math.round(showBillDetail.metadata.confidence * 100)}%
-                    </p>
-                  )}
-                </div>
-
-                {!showBillDetail.isPaid && (
-                  <div className="flex gap-3 pt-4 border-t">
-                    <button
-                      onClick={() => {
-                        handlePayBill(showBillDetail.id);
-                        setShowBillDetail(null);
-                      }}
-                      className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 flex items-center justify-center"
-                    >
-                      <CheckCircle className="h-4 w-4 mr-2" /> Mark as Paid
-                    </button>
-                    <button
-                      onClick={() => {
-                        setEditingBill(showBillDetail);
-                        setShowBillDetail(null);
-                      }}
-                      className="flex-1 bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 flex items-center justify-center"
-                    >
-                      <Settings className="h-4 w-4 mr-2" /> Edit Bill
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
+      {/* Bulk Actions */}
+      {selectionState.hasSelection && (
+        <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+          <span className="text-sm text-blue-700">
+            {selectionState.selectedCount} bill{selectionState.selectedCount > 1 ? "s" : ""}{" "}
+            selected
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowBulkUpdateModal(true)}
+              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+            >
+              Bulk Update
+            </button>
+            <button
+              onClick={clearSelection}
+              className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm"
+            >
+              Clear
+            </button>
           </div>
         </div>
       )}
 
-      {/* Add Bill Modal */}
+      {/* Bills Table */}
+      <div className="bg-white shadow-sm rounded-lg overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <input
+                  type="checkbox"
+                  checked={selectionState.isAllSelected}
+                  onChange={selectionState.isAllSelected ? clearSelection : selectAllBills}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Bill
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Amount
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Due Date
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
+              </th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {filteredBills.map((bill) => {
+              const displayData = getBillDisplayData(bill);
+
+              return (
+                <tr key={bill.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <input
+                      type="checkbox"
+                      checked={displayData.isSelected}
+                      onChange={() => toggleBillSelection(bill.id)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <displayData.Icon className="h-5 w-5 text-gray-400 mr-3" />
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">{bill.name}</div>
+                        <div className="text-sm text-gray-500">{bill.category}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    ${displayData.amount}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {displayData.dueDateDisplay}
+                    {displayData.daysDisplay && (
+                      <div className="text-xs text-gray-500">{displayData.daysDisplay}</div>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${displayData.urgencyColors}`}
+                    >
+                      {displayData.statusText}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => handleViewHistory(bill)}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        <History className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleEditBill(bill)}
+                        className="text-blue-600 hover:text-blue-900"
+                      >
+                        <Settings className="h-4 w-4" />
+                      </button>
+                      {!bill.isPaid && (
+                        <button
+                          onClick={() => billOperations.markAsPaid(bill.id)}
+                          className="text-green-600 hover:text-green-900"
+                        >
+                          <CheckCircle className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+
+        {filteredBills.length === 0 && (
+          <div className="text-center py-12 text-gray-500">
+            <FileText className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No bills found</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              {viewMode === "all"
+                ? "Get started by adding a new bill."
+                : "Try switching to a different view or adjusting filters."}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Modals */}
       {showAddBillModal && (
         <AddBillModal
           isOpen={showAddBillModal}
-          onClose={() => setShowAddBillModal(false)}
-          availableEnvelopes={envelopes}
-          onAddBill={(newBill) => {
-            if (onCreateRecurringBill) {
-              onCreateRecurringBill(newBill);
-            } else {
-              // Use TanStack mutation with Zustand fallback
-              try {
-                addBill(newBill);
-              } catch (error) {
-                logger.warn("TanStack addBill failed, using Zustand fallback", error);
-                budget.addTransaction(newBill);
-              }
-            }
-            setShowAddBillModal(false);
-          }}
-          onAddEnvelope={(envelopeData) => {
-            // Use TanStack mutation with Zustand fallback
-            try {
-              addEnvelope(envelopeData);
-            } catch (error) {
-              logger.warn("TanStack addEnvelope failed, using Zustand fallback", error);
-              budget.addEnvelope(envelopeData);
-            }
-          }}
-        />
-      )}
-
-      {/* Edit Bill Modal */}
-      {editingBill && (
-        <AddBillModal
-          isOpen={!!editingBill}
-          onClose={() => setEditingBill(null)}
+          onClose={handleCloseModal}
           editingBill={editingBill}
           availableEnvelopes={envelopes}
-          onUpdateBill={(updatedBillData) => {
-            logger.debug("BillManager onUpdateBill called", {
-              billId: updatedBillData.id,
-              envelopeId: updatedBillData.envelopeId,
-              hasOnUpdateBillProp: !!onUpdateBill,
-            });
-
-            if (onUpdateBill) {
-              logger.debug("Using prop onUpdateBill", {
-                billId: updatedBillData.id,
-              });
-              try {
-                onUpdateBill(updatedBillData);
-                logger.debug("onUpdateBill prop call completed successfully", {
-                  billId: updatedBillData.id,
-                });
-              } catch (error) {
-                logger.error("Error calling onUpdateBill prop", error, {
-                  billId: updatedBillData.id,
-                });
-                throw error;
-              }
-            } else {
-              logger.debug("Using TanStack updateBill with fallback", {
-                billId: updatedBillData.id,
-              });
-              // Use TanStack mutation with Zustand fallback
-              try {
-                updateBill({
-                  id: updatedBillData.id,
-                  updates: updatedBillData,
-                });
-              } catch (error) {
-                logger.warn("TanStack updateBill failed, using Zustand fallback", error);
-                budget.updateBill(updatedBillData);
-              }
-            }
-            setEditingBill(null);
-          }}
-          onDeleteBill={(billId, envelopeId) => {
-            // Use TanStack mutation with Zustand fallback
-            try {
-              deleteBill({ billId, envelopeId });
-            } catch (error) {
-              logger.warn("TanStack deleteBill failed, using Zustand fallback", error);
-              budget.deleteBill(billId);
-              // If envelope should also be deleted, handle it in Zustand too
-              if (envelopeId) {
-                budget.deleteEnvelope(envelopeId);
-              }
-            }
-            setEditingBill(null);
-          }}
-          onAddEnvelope={(envelopeData) => {
-            // Use TanStack mutation with Zustand fallback
-            try {
-              addEnvelope(envelopeData);
-            } catch (error) {
-              logger.warn("TanStack addEnvelope failed, using Zustand fallback", error);
-              budget.addEnvelope(envelopeData);
-            }
-          }}
+          onAddBill={addBill}
+          onUpdateBill={updateBill}
+          onDeleteBill={deleteBill}
+          onError={onError}
         />
       )}
 
-      {/* Bulk Update Modal */}
       {showBulkUpdateModal && (
         <BulkBillUpdateModal
           isOpen={showBulkUpdateModal}
           onClose={() => setShowBulkUpdateModal(false)}
-          selectedBills={bills.filter((bill) => selectedBills.has(bill.id))}
+          selectedBills={Array.from(selectedBills)
+            .map((id) => bills.find((b) => b.id === id))
+            .filter(Boolean)}
+          availableEnvelopes={envelopes}
           onUpdateBills={handleBulkUpdate}
           onError={onError}
         />
       )}
 
-      {/* Bill Discovery Modal */}
       {showDiscoveryModal && (
         <BillDiscoveryModal
           isOpen={showDiscoveryModal}
           onClose={() => {
             setShowDiscoveryModal(false);
-            setDiscoveredBills([]);
           }}
           discoveredBills={discoveredBills}
+          existingBills={bills}
+          availableEnvelopes={envelopes}
           onAddBills={handleAddDiscoveredBills}
           onError={onError}
-          availableEnvelopes={envelopes}
         />
       )}
 
-      {/* History Modal */}
       {historyBill && (
         <ObjectHistoryViewer
+          isOpen={!!historyBill}
+          onClose={() => setHistoryBill(null)}
           objectId={historyBill.id}
           objectType="bill"
-          objectName={historyBill.provider || historyBill.description}
-          onClose={() => setHistoryBill(null)}
+          title={`Bill History: ${historyBill.name}`}
         />
       )}
     </div>
