@@ -20,7 +20,7 @@ import {
   getEnvelopeCategories,
 } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
-import { toBiweekly, getFrequencyOptions } from "../../utils/frequencyCalculations";
+import { toBiweekly, getFrequencyOptions } from "../../utils/common/frequencyCalculations";
 import logger from "../../utils/common/logger";
 
 // Import shared components

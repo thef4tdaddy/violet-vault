@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Receipt, DollarSign, Calendar, Building, FileText, ArrowRight, Check } from "lucide-react";
 import { useReceipts } from "../../hooks/common/useReceipts";
-import { useTransactions } from "../../hooks/transactions/useTransactions";
+import { useTransactions } from "../../hooks/common/useTransactions";
 import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
 import logger from "../../utils/common/logger";
 

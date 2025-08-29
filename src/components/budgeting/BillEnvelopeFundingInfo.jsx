@@ -9,7 +9,7 @@ import {
   Target,
   Receipt,
 } from "lucide-react";
-import { getBillEnvelopeDisplayInfo } from "../../utils/billEnvelopeCalculations";
+import { getBillEnvelopeDisplayInfo } from "../../utils/budgeting/billEnvelopeCalculations";
 
 /**
  * Component to display bill envelope funding information

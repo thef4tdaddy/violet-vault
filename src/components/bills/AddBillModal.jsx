@@ -15,8 +15,8 @@ import {
   getIconName,
   getIconByName,
   getIconNameForStorage,
-} from "../../utils/billIcons";
-import { toMonthly, getFrequencyOptions } from "../../utils/frequencyCalculations";
+} from "../../utils/common/billIcons";
+import { toMonthly, getFrequencyOptions } from "../../utils/common/frequencyCalculations";
 import { BIWEEKLY_MULTIPLIER, convertToBiweekly } from "../../constants/frequency";
 import { getBillCategories } from "../../constants/categories";
 import logger from "../../utils/common/logger";

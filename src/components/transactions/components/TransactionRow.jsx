@@ -6,7 +6,7 @@ import {
   formatTransactionAmount,
   formatTransactionDate,
   getEnvelopeDisplay,
-} from "../utils/tableHelpers";
+} from "../../../utils/transactions/tableHelpers";
 
 /**
  * Individual transaction row component - pure UI component

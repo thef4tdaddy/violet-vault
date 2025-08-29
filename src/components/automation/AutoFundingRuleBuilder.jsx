@@ -19,7 +19,7 @@ import {
   TRIGGER_TYPES,
   CONDITION_TYPES,
   AutoFundingRule,
-} from "../../utils/autoFundingEngine";
+} from "../../utils/budgeting/autoFundingEngine";
 
 const AutoFundingRuleBuilder = ({
   isOpen,

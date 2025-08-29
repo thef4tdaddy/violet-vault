@@ -15,14 +15,14 @@ import {
   RefreshCw,
 } from "lucide-react";
 import PaydayPrediction from "../budgeting/PaydayPrediction";
-import { predictNextPayday } from "../../utils/paydayPredictor";
+import { predictNextPayday } from "../../utils/budgeting/paydayPredictor";
 import EditableBalance from "../ui/EditableBalance";
 import { useActualBalance } from "../../hooks/budgeting/useBudgetMetadata";
 import { useUnassignedCash } from "../../hooks/budgeting/useBudgetMetadata";
 import logger from "../../utils/common/logger";
 import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
 import { useSavingsGoals } from "../../hooks/common/useSavingsGoals";
-import { useTransactions } from "../../hooks/transactions/useTransactions";
+import { useTransactions } from "../../hooks/common/useTransactions";
 import useBudgetData from "../../hooks/budgeting/useBudgetData";
 import DebtSummaryWidget from "../debt/ui/DebtSummaryWidget";
 
