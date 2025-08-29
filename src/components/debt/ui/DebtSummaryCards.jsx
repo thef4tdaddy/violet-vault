@@ -62,48 +62,50 @@ const DebtSummaryCards = ({ stats, onDueSoonClick }) => {
 };
 
 const DebtSummaryCard = ({ icon: Icon, label, value, subtext, color, alert, onClick }) => {
-  const colorClasses = {
-    red: "bg-red-500",
-    orange: "bg-orange-500",
-    purple: "bg-purple-500",
-    amber: "bg-amber-500",
-    yellow: "bg-yellow-500",
-    emerald: "bg-emerald-500",
+  const gradientClasses = {
+    red: "from-red-500 to-red-600",
+    orange: "from-orange-500 to-orange-600",
+    purple: "from-purple-500 to-purple-600",
+    amber: "from-amber-500 to-amber-600",
+    yellow: "from-yellow-500 to-yellow-600",
+    emerald: "from-emerald-500 to-emerald-600",
   };
 
-  const textColorClasses = {
-    red: "text-red-600",
-    orange: "text-orange-600",
-    purple: "text-purple-600",
-    amber: "text-amber-600",
-    yellow: "text-yellow-600",
-    emerald: "text-emerald-600",
+  const textClasses = {
+    red: "text-red-100",
+    orange: "text-orange-100",
+    purple: "text-purple-100",
+    amber: "text-amber-100",
+    yellow: "text-yellow-100",
+    emerald: "text-emerald-100",
+  };
+
+  const iconClasses = {
+    red: "text-red-200",
+    orange: "text-orange-200",
+    purple: "text-purple-200",
+    amber: "text-amber-200",
+    yellow: "text-yellow-200",
+    emerald: "text-emerald-200",
   };
 
   return (
     <div
-      className={`glassmorphism rounded-3xl p-6 border-2 transition-all duration-200 ${
-        alert ? "border-amber-200 bg-amber-50/50" : "border-white/20"
+      className={`bg-gradient-to-br ${gradientClasses[color]} p-4 rounded-lg text-white transition-all duration-200 ${
+        alert ? "ring-2 ring-white ring-opacity-50" : ""
       } hover:shadow-lg ${onClick ? "cursor-pointer hover:scale-105" : ""}`}
       onClick={onClick}
     >
-      <div className="flex items-center">
-        <div className="relative mr-4">
-          <div
-            className={`absolute inset-0 ${colorClasses[color]} rounded-2xl blur-lg opacity-30`}
-          ></div>
-          <div className={`relative ${colorClasses[color]} p-3 rounded-2xl`}>
-            <Icon className="h-6 w-6 text-white" />
-          </div>
-        </div>
-        <div className="flex-1">
+      <div className="flex items-center justify-between">
+        <div>
           <div className="flex items-center">
-            <p className="text-sm font-semibold text-gray-600 mb-1">{label}</p>
-            {alert && <AlertTriangle className="h-3 w-3 ml-2 text-amber-500" />}
+            <p className={`${textClasses[color]} text-sm`}>{label}</p>
+            {alert && <AlertTriangle className="h-3 w-3 ml-2 text-white" />}
           </div>
-          <p className={`text-2xl font-bold ${textColorClasses[color]}`}>{value}</p>
-          {subtext && <p className="text-xs text-gray-500 mt-1">{subtext}</p>}
+          <p className="text-2xl font-bold">{value}</p>
+          {subtext && <p className={`text-xs ${textClasses[color]} mt-2`}>{subtext}</p>}
         </div>
+        <Icon className={`h-8 w-8 ${iconClasses[color]}`} />
       </div>
     </div>
   );

@@ -254,3 +254,171 @@ When not connected, show connection options:
 - **Debts**: CreditCard
 
 This pattern ensures consistent user experience across all edit modals while clearly communicating connection states and available actions.
+
+## Page-Specific Summary Cards (Issue #545)
+
+### Standard Design Pattern
+
+All page-specific summary cards follow the **bill card design pattern** with gradient backgrounds and white text, making them visually distinct from the main dashboard cards at the top.
+
+### Visual Structure
+
+```jsx
+<div className="bg-gradient-to-br from-[color]-500 to-[color]-600 p-4 rounded-lg text-white">
+  <div className="flex items-center justify-between">
+    <div>
+      <p className="text-[color]-100 text-sm">[Label]</p>
+      <p className="text-2xl font-bold">[Value]</p>
+      {subtext && <p className="text-xs text-[color]-100 mt-2">[Subtext]</p>}
+    </div>
+    <Icon className="h-8 w-8 text-[color]-200" />
+  </div>
+</div>
+```
+
+### Key Design Elements
+
+**Layout:**
+
+- `bg-gradient-to-br`: Bottom-right gradient for depth
+- `p-4`: Consistent padding
+- `rounded-lg`: Standard rounded corners
+- `text-white`: Base text color
+
+**Content Structure:**
+
+- **Main content** on the left
+- **Icon** on the right (`h-8 w-8`)
+- **Label** with light color variant (`text-[color]-100`)
+- **Value** with bold white text (`text-2xl font-bold`)
+- **Subtext** with light color and smaller size (`text-xs text-[color]-100 mt-2`)
+
+### Color Standards
+
+**Available Colors:**
+
+- **Red**: `from-red-500 to-red-600` (expenses, overdue, debt)
+- **Orange**: `from-orange-500 to-orange-600` (warnings, due soon)
+- **Amber**: `from-amber-500 to-amber-600` (alerts, pending)
+- **Yellow**: `from-yellow-500 to-yellow-600` (caution items)
+- **Green**: `from-green-500 to-green-600` (income, paid, positive)
+- **Emerald**: `from-emerald-500 to-emerald-600` (growth, savings)
+- **Teal**: `from-teal-500 to-teal-600` (neutral positive)
+- **Cyan**: `from-cyan-500 to-cyan-600` (cash flow, liquidity)
+- **Blue**: `from-blue-500 to-blue-600` (general info, totals)
+- **Indigo**: `from-indigo-500 to-indigo-600` (secondary info)
+- **Purple**: `from-purple-500 to-purple-600` (analytics, insights)
+- **Pink**: `from-pink-500 to-pink-600` (special categories)
+- **Gray**: `from-gray-500 to-gray-600` (neutral, inactive)
+
+**Text Color Mapping:**
+
+- **Labels**: `text-[color]-100` (light variant)
+- **Icons**: `text-[color]-200` (slightly brighter)
+- **Values**: `text-white` (always white for maximum contrast)
+- **Subtext**: `text-[color]-100` (matches labels)
+
+### Implementation Examples
+
+**Envelope Summary Cards:**
+
+```jsx
+// Total Allocated - Blue
+<div className="bg-gradient-to-br from-blue-500 to-blue-600 p-4 rounded-lg text-white">
+  <div className="flex items-center justify-between">
+    <div>
+      <p className="text-blue-100 text-sm">Total Allocated</p>
+      <p className="text-2xl font-bold">${totals.totalAllocated.toFixed(2)}</p>
+    </div>
+    <DollarSign className="h-8 w-8 text-blue-200" />
+  </div>
+</div>
+```
+
+**Debt Summary Cards:**
+
+```jsx
+// Total Debt - Red
+<div className="bg-gradient-to-br from-red-500 to-red-600 p-4 rounded-lg text-white">
+  <div className="flex items-center justify-between">
+    <div>
+      <div className="flex items-center">
+        <p className="text-red-100 text-sm">Total Debt</p>
+        {alert && <AlertTriangle className="h-3 w-3 ml-2 text-white" />}
+      </div>
+      <p className="text-2xl font-bold">$150,000.00</p>
+      <p className="text-xs text-red-100 mt-2">5 active debts</p>
+    </div>
+    <DollarSign className="h-8 w-8 text-red-200" />
+  </div>
+</div>
+```
+
+**Transaction Summary Cards:**
+
+```jsx
+// Dynamic color based on value
+<div
+  className={`bg-gradient-to-br ${
+    netCashFlow >= 0 ? "from-cyan-500 to-cyan-600" : "from-amber-500 to-amber-600"
+  } p-4 rounded-lg text-white`}
+>
+  <div className="flex items-center justify-between">
+    <div>
+      <p className={`${netCashFlow >= 0 ? "text-cyan-100" : "text-amber-100"} text-sm`}>
+        Net Cash Flow
+      </p>
+      <p className="text-2xl font-bold">
+        {netCashFlow >= 0 ? "+" : ""}${netCashFlow.toFixed(2)}
+      </p>
+    </div>
+    <DollarSign className={`h-8 w-8 ${netCashFlow >= 0 ? "text-cyan-200" : "text-amber-200"}`} />
+  </div>
+</div>
+```
+
+### Interactive States
+
+**Clickable Cards:**
+
+```jsx
+<div
+  className="bg-gradient-to-br from-blue-500 to-blue-600 p-4 rounded-lg text-white transition-all duration-200 cursor-pointer hover:shadow-lg hover:scale-105"
+  onClick={handleClick}
+>
+  {/* Card content */}
+</div>
+```
+
+**Alert States:**
+
+```jsx
+<div className="bg-gradient-to-br from-red-500 to-red-600 p-4 rounded-lg text-white ring-2 ring-white ring-opacity-50">
+  {/* Card content with alert styling */}
+</div>
+```
+
+### Pages Using This Pattern
+
+- **Envelope System**: `src/components/budgeting/envelope/EnvelopeSummary.jsx`
+- **Debt Dashboard**: `src/components/debt/ui/DebtSummaryCards.jsx`
+- **Transaction Ledger**: `src/components/transactions/TransactionSummary.jsx`
+- **Analytics Dashboard**: `src/components/analytics/ChartsAndAnalytics.jsx`
+- **Bill Management**: `src/components/bills/BillManager.jsx` (reference pattern)
+
+### Design Goals
+
+1. **Visual Distinction**: Bright gradient backgrounds clearly differentiate from main dashboard cards
+2. **Consistency**: Same layout pattern across all pages
+3. **Readability**: High contrast with white text on colored backgrounds
+4. **Information Hierarchy**: Label → Value → Subtext structure
+5. **Icon Integration**: Consistent icon placement and sizing
+
+### Migration Notes
+
+- **From Glassmorphism**: Replace `glassmorphism` classes with gradient backgrounds
+- **From Border Cards**: Replace white cards with colored left borders
+- **Icon Updates**: Move icons to right side, standardize size to `h-8 w-8`
+- **Text Color**: Update all text to use white/light color variants instead of gray variants
+
+This standardization ensures all page-specific summary cards follow the same visual language while maintaining their distinct identity from the main dashboard summary cards.
