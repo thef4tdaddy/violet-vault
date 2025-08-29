@@ -1,5 +1,13 @@
 import React, { useState, useCallback, useRef } from "react";
-import { Camera, Upload, FileText, Loader2, CheckCircle, XCircle, Eye } from "lucide-react";
+import {
+  Camera,
+  Upload,
+  FileText,
+  Loader2,
+  CheckCircle,
+  XCircle,
+  Eye,
+} from "lucide-react";
 import { processReceiptImage } from "../../utils/common/ocrProcessor";
 import logger from "../../utils/common/logger";
 
@@ -63,7 +71,9 @@ const ReceiptScanner = ({ onReceiptProcessed, onClose }) => {
       });
     } catch (error) {
       logger.error("❌ Receipt processing failed:", error);
-      setError("Failed to process receipt. Please try again with a clearer image.");
+      setError(
+        "Failed to process receipt. Please try again with a clearer image.",
+      );
       setExtractedData(null);
     } finally {
       setIsProcessing(false);
@@ -79,7 +89,7 @@ const ReceiptScanner = ({ onReceiptProcessed, onClose }) => {
         handleFileUpload(files[0]);
       }
     },
-    [handleFileUpload]
+    [handleFileUpload],
   );
 
   const handleDragOver = useCallback((e) => {
@@ -143,13 +153,18 @@ const ReceiptScanner = ({ onReceiptProcessed, onClose }) => {
                 <FileText className="h-6 w-6 text-purple-600" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">Receipt Scanner</h2>
+                <h2 className="text-xl font-bold text-gray-900">
+                  Receipt Scanner
+                </h2>
                 <p className="text-sm text-gray-500">
                   Upload or capture a receipt to extract transaction details
                 </p>
               </div>
             </div>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-2">
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 p-2"
+            >
               ×
             </button>
           </div>
@@ -172,7 +187,9 @@ const ReceiptScanner = ({ onReceiptProcessed, onClose }) => {
                 </div>
 
                 <div>
-                  <p className="text-lg font-medium text-gray-900 mb-2">Upload Receipt Image</p>
+                  <p className="text-lg font-medium text-gray-900 mb-2">
+                    Upload Receipt Image
+                  </p>
                   <p className="text-sm text-gray-500 mb-4">
                     Drag and drop an image here, or click to browse
                   </p>
@@ -223,8 +240,12 @@ const ReceiptScanner = ({ onReceiptProcessed, onClose }) => {
               <div className="bg-purple-100 p-4 rounded-2xl inline-block mb-4">
                 <Loader2 className="h-8 w-8 text-purple-600 animate-spin" />
               </div>
-              <p className="text-lg font-medium text-gray-900">Processing Receipt...</p>
-              <p className="text-sm text-gray-500">Using AI to extract transaction details</p>
+              <p className="text-lg font-medium text-gray-900">
+                Processing Receipt...
+              </p>
+              <p className="text-sm text-gray-500">
+                Using AI to extract transaction details
+              </p>
             </div>
           )}
 
@@ -252,7 +273,9 @@ const ReceiptScanner = ({ onReceiptProcessed, onClose }) => {
               {uploadedImage && (
                 <div className="bg-gray-50 rounded-2xl p-4">
                   <div className="flex justify-between items-center mb-3">
-                    <h3 className="font-medium text-gray-900">Scanned Receipt</h3>
+                    <h3 className="font-medium text-gray-900">
+                      Scanned Receipt
+                    </h3>
                     <button
                       onClick={() => setShowImagePreview(!showImagePreview)}
                       className="flex items-center gap-2 text-purple-600 hover:text-purple-700"
@@ -273,7 +296,8 @@ const ReceiptScanner = ({ onReceiptProcessed, onClose }) => {
                   )}
 
                   <div className="text-xs text-gray-500 mt-2">
-                    {uploadedImage.name} • {Math.round(uploadedImage.size / 1024)} KB
+                    {uploadedImage.name} •{" "}
+                    {Math.round(uploadedImage.size / 1024)} KB
                   </div>
                 </div>
               )}
@@ -290,7 +314,10 @@ const ReceiptScanner = ({ onReceiptProcessed, onClose }) => {
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-600">Merchant:</span>
                       <div className="flex items-center gap-2">
-                        {renderConfidenceIndicator("merchant", extractedData.confidence.merchant)}
+                        {renderConfidenceIndicator(
+                          "merchant",
+                          extractedData.confidence.merchant,
+                        )}
                         <span className="font-medium">
                           {extractedData.merchant || "Not detected"}
                         </span>
@@ -298,9 +325,14 @@ const ReceiptScanner = ({ onReceiptProcessed, onClose }) => {
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Total Amount:</span>
+                      <span className="text-sm text-gray-600">
+                        Total Amount:
+                      </span>
                       <div className="flex items-center gap-2">
-                        {renderConfidenceIndicator("total", extractedData.confidence.total)}
+                        {renderConfidenceIndicator(
+                          "total",
+                          extractedData.confidence.total,
+                        )}
                         <span className="font-medium">
                           {extractedData.total
                             ? `$${extractedData.total.toFixed(2)}`
@@ -312,8 +344,13 @@ const ReceiptScanner = ({ onReceiptProcessed, onClose }) => {
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-600">Date:</span>
                       <div className="flex items-center gap-2">
-                        {renderConfidenceIndicator("date", extractedData.confidence.date)}
-                        <span className="font-medium">{extractedData.date || "Not detected"}</span>
+                        {renderConfidenceIndicator(
+                          "date",
+                          extractedData.confidence.date,
+                        )}
+                        <span className="font-medium">
+                          {extractedData.date || "Not detected"}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -323,8 +360,13 @@ const ReceiptScanner = ({ onReceiptProcessed, onClose }) => {
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">Tax:</span>
                         <div className="flex items-center gap-2">
-                          {renderConfidenceIndicator("tax", extractedData.confidence.tax)}
-                          <span className="font-medium">${extractedData.tax.toFixed(2)}</span>
+                          {renderConfidenceIndicator(
+                            "tax",
+                            extractedData.confidence.tax,
+                          )}
+                          <span className="font-medium">
+                            ${extractedData.tax.toFixed(2)}
+                          </span>
                         </div>
                       </div>
                     )}
@@ -333,8 +375,13 @@ const ReceiptScanner = ({ onReceiptProcessed, onClose }) => {
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">Subtotal:</span>
                         <div className="flex items-center gap-2">
-                          {renderConfidenceIndicator("subtotal", extractedData.confidence.subtotal)}
-                          <span className="font-medium">${extractedData.subtotal.toFixed(2)}</span>
+                          {renderConfidenceIndicator(
+                            "subtotal",
+                            extractedData.confidence.subtotal,
+                          )}
+                          <span className="font-medium">
+                            ${extractedData.subtotal.toFixed(2)}
+                          </span>
                         </div>
                       </div>
                     )}
@@ -353,9 +400,16 @@ const ReceiptScanner = ({ onReceiptProcessed, onClose }) => {
                     </h4>
                     <div className="max-h-32 overflow-y-auto space-y-1">
                       {extractedData.items.slice(0, 5).map((item, index) => (
-                        <div key={index} className="flex justify-between text-sm">
-                          <span className="text-gray-700 truncate flex-1">{item.description}</span>
-                          <span className="font-medium ml-2">${item.amount.toFixed(2)}</span>
+                        <div
+                          key={index}
+                          className="flex justify-between text-sm"
+                        >
+                          <span className="text-gray-700 truncate flex-1">
+                            {item.description}
+                          </span>
+                          <span className="font-medium ml-2">
+                            ${item.amount.toFixed(2)}
+                          </span>
                         </div>
                       ))}
                       {extractedData.items.length > 5 && (

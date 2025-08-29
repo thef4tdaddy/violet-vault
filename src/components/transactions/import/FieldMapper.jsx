@@ -1,14 +1,24 @@
 import React from "react";
 
-const FieldMapper = ({ importData, fieldMapping, setFieldMapping, onBack, onImport }) => {
-  const isValid = fieldMapping.date && fieldMapping.description && fieldMapping.amount;
+const FieldMapper = ({
+  importData,
+  fieldMapping,
+  setFieldMapping,
+  onBack,
+  onImport,
+}) => {
+  const isValid =
+    fieldMapping.date && fieldMapping.description && fieldMapping.amount;
 
   return (
     <div className="space-y-6">
       <div>
-        <h4 className="text-lg font-medium text-gray-900 mb-2">Map Your File Fields</h4>
+        <h4 className="text-lg font-medium text-gray-900 mb-2">
+          Map Your File Fields
+        </h4>
         <p className="text-sm text-gray-600">
-          Match your file columns to transaction fields. Preview shows data from your file.
+          Match your file columns to transaction fields. Preview shows data from
+          your file.
         </p>
       </div>
 
@@ -16,31 +26,35 @@ const FieldMapper = ({ importData, fieldMapping, setFieldMapping, onBack, onImpo
         <div>
           <h5 className="font-medium text-gray-900 mb-3">Field Mapping</h5>
           <div className="space-y-4">
-            {["date", "description", "amount", "category", "notes"].map((field) => (
-              <div key={field}>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {field.charAt(0).toUpperCase() + field.slice(1)}
-                  {["date", "description", "amount"].includes(field) && " *"}
-                </label>
-                <select
-                  value={fieldMapping[field] || ""}
-                  onChange={(e) =>
-                    setFieldMapping({
-                      ...fieldMapping,
-                      [field]: e.target.value,
-                    })
-                  }
-                  className="glassmorphism w-full px-3 py-2 border border-white/20 rounded-lg"
-                >
-                  <option value="">Skip this field</option>
-                  {Object.keys((importData.data || importData)[0] || {}).map((header) => (
-                    <option key={header} value={header}>
-                      {header}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ))}
+            {["date", "description", "amount", "category", "notes"].map(
+              (field) => (
+                <div key={field}>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {field.charAt(0).toUpperCase() + field.slice(1)}
+                    {["date", "description", "amount"].includes(field) && " *"}
+                  </label>
+                  <select
+                    value={fieldMapping[field] || ""}
+                    onChange={(e) =>
+                      setFieldMapping({
+                        ...fieldMapping,
+                        [field]: e.target.value,
+                      })
+                    }
+                    className="glassmorphism w-full px-3 py-2 border border-white/20 rounded-lg"
+                  >
+                    <option value="">Skip this field</option>
+                    {Object.keys((importData.data || importData)[0] || {}).map(
+                      (header) => (
+                        <option key={header} value={header}>
+                          {header}
+                        </option>
+                      ),
+                    )}
+                  </select>
+                </div>
+              ),
+            )}
           </div>
         </div>
 
@@ -56,25 +70,30 @@ const FieldMapper = ({ importData, fieldMapping, setFieldMapping, onBack, onImpo
                     {Object.keys((importData.data || importData)[0] || {})
                       .slice(0, 4)
                       .map((header) => (
-                        <th key={header} className="px-3 py-2 text-left font-medium text-gray-900">
+                        <th
+                          key={header}
+                          className="px-3 py-2 text-left font-medium text-gray-900"
+                        >
                           {header}
                         </th>
                       ))}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {(importData.data || importData).slice(0, 5).map((row, index) => (
-                    <tr key={index}>
-                      {Object.values(row)
-                        .slice(0, 4)
-                        .map((value, i) => (
-                          <td key={i} className="px-3 py-2 text-gray-900">
-                            {String(value).substring(0, 20)}
-                            {String(value).length > 20 && "..."}
-                          </td>
-                        ))}
-                    </tr>
-                  ))}
+                  {(importData.data || importData)
+                    .slice(0, 5)
+                    .map((row, index) => (
+                      <tr key={index}>
+                        {Object.values(row)
+                          .slice(0, 4)
+                          .map((value, i) => (
+                            <td key={i} className="px-3 py-2 text-gray-900">
+                              {String(value).substring(0, 20)}
+                              {String(value).length > 20 && "..."}
+                            </td>
+                          ))}
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>

@@ -80,13 +80,21 @@ const BugReportButton = () => {
           className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
           data-bug-report="true"
         >
-          <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl" data-bug-report="true">
+          <div
+            className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl"
+            data-bug-report="true"
+          >
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center">
                 <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
-                <h3 className="text-lg font-semibold text-gray-900">Report a Problem</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Report a Problem
+                </h3>
               </div>
-              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">
+              <button
+                onClick={closeModal}
+                className="text-gray-400 hover:text-gray-600"
+              >
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -105,8 +113,9 @@ const BugReportButton = () => {
                 />
                 <div className="mt-2 text-xs text-gray-500">
                   💡 <strong>Pro tip:</strong> Use{" "}
-                  <code className="bg-gray-100 px-1 rounded">```</code> for code blocks, mention
-                  specific buttons/features you were using, and include error messages if any.
+                  <code className="bg-gray-100 px-1 rounded">```</code> for code
+                  blocks, mention specific buttons/features you were using, and
+                  include error messages if any.
                 </div>
               </div>
 
@@ -139,20 +148,26 @@ const BugReportButton = () => {
                     </button>
                     <button
                       onClick={async () => {
-                        if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+                        if (
+                          navigator.mediaDevices &&
+                          navigator.mediaDevices.getDisplayMedia
+                        ) {
                           try {
-                            const stream = await navigator.mediaDevices.getDisplayMedia({
-                              video: {
-                                width: { ideal: 1920 },
-                                height: { ideal: 1080 },
-                              },
-                              audio: false,
-                            });
+                            const stream =
+                              await navigator.mediaDevices.getDisplayMedia({
+                                video: {
+                                  width: { ideal: 1920 },
+                                  height: { ideal: 1080 },
+                                },
+                                audio: false,
+                              });
                             const video = document.createElement("video");
                             video.srcObject = stream;
                             video.play();
 
-                            await new Promise((resolve) => (video.onloadedmetadata = resolve));
+                            await new Promise(
+                              (resolve) => (video.onloadedmetadata = resolve),
+                            );
 
                             const canvas = document.createElement("canvas");
                             canvas.width = video.videoWidth;
@@ -162,10 +177,16 @@ const BugReportButton = () => {
 
                             stream.getTracks().forEach((track) => track.stop());
 
-                            const screenshotDataUrl = canvas.toDataURL("image/png", 0.9);
+                            const screenshotDataUrl = canvas.toDataURL(
+                              "image/png",
+                              0.9,
+                            );
                             setScreenshot(screenshotDataUrl);
                           } catch (error) {
-                            console.warn("Manual screen capture failed:", error);
+                            console.warn(
+                              "Manual screen capture failed:",
+                              error,
+                            );
                             addToast({
                               type: "error",
                               title: "Screen Capture Failed",
@@ -177,7 +198,8 @@ const BugReportButton = () => {
                           addToast({
                             type: "warning",
                             title: "Screen Capture Not Supported",
-                            message: "Please use Auto Capture or include a manual screenshot.",
+                            message:
+                              "Please use Auto Capture or include a manual screenshot.",
                           });
                         }
                       }}

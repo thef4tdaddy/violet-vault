@@ -34,12 +34,18 @@ vi.mock("../../../utils/common/billIcons", () => ({
 vi.mock("../../../utils/common/frequencyCalculations", () => ({
   toMonthly: vi.fn((amount, frequency) => {
     switch (frequency) {
-      case "weekly": return amount * 4.33;
-      case "biweekly": return amount * 2.17;
-      case "monthly": return amount;
-      case "quarterly": return amount / 3;
-      case "yearly": return amount / 12;
-      default: return amount;
+      case "weekly":
+        return amount * 4.33;
+      case "biweekly":
+        return amount * 2.17;
+      case "monthly":
+        return amount;
+      case "quarterly":
+        return amount / 3;
+      case "yearly":
+        return amount / 12;
+      default:
+        return amount;
     }
   }),
 }));
@@ -100,7 +106,7 @@ describe("useBillForm Hook", () => {
       const editingBill = {
         id: "bill-123",
         name: "Electric Bill",
-        amount: 120.50,
+        amount: 120.5,
         frequency: "monthly",
         dueDate: "2024-01-15",
         category: "Utilities",
@@ -111,11 +117,11 @@ describe("useBillForm Hook", () => {
       };
 
       const { result } = renderHook(() =>
-        useBillForm({ ...mockProps, editingBill })
+        useBillForm({ ...mockProps, editingBill }),
       );
 
       expect(result.current.formData.name).toBe("Electric Bill");
-      expect(result.current.formData.amount).toBe(120.50);
+      expect(result.current.formData.amount).toBe(120.5);
       expect(result.current.formData.frequency).toBe("monthly");
       expect(result.current.formData.dueDate).toBe("2024-01-15");
       expect(result.current.formData.category).toBe("Utilities");
@@ -156,7 +162,9 @@ describe("useBillForm Hook", () => {
         result.current.updateField("dueDate", "2024-01-15");
       });
 
-      expect(result.current.validationErrors).toContain("Valid amount is required");
+      expect(result.current.validationErrors).toContain(
+        "Valid amount is required",
+      );
     });
   });
 
@@ -213,10 +221,10 @@ describe("useBillForm Hook", () => {
         expect.objectContaining({
           id: "test-uuid-123",
           name: "Test Bill",
-          amount: 100.50,
+          amount: 100.5,
           frequency: "monthly",
           dueDate: "2024-01-15",
-        })
+        }),
       );
       expect(mockProps.onClose).toHaveBeenCalled();
     });
@@ -233,7 +241,7 @@ describe("useBillForm Hook", () => {
       };
 
       const { result } = renderHook(() =>
-        useBillForm({ ...mockProps, editingBill })
+        useBillForm({ ...mockProps, editingBill }),
       );
 
       // Update form
@@ -252,7 +260,7 @@ describe("useBillForm Hook", () => {
           id: "existing-bill-123",
           amount: 85,
           updatedAt: expect.any(String),
-        })
+        }),
       );
     });
 
@@ -265,7 +273,7 @@ describe("useBillForm Hook", () => {
       });
 
       expect(mockProps.onError).toHaveBeenCalledWith(
-        "Bill name is required, Valid amount is required, Due date is required"
+        "Bill name is required, Valid amount is required, Due date is required",
       );
       expect(mockProps.onAddBill).not.toHaveBeenCalled();
     });
@@ -298,21 +306,24 @@ describe("useBillForm Hook", () => {
     it("should handle bill deletion", async () => {
       const editingBill = { id: "bill-to-delete", name: "Delete Me" };
       const { result } = renderHook(() =>
-        useBillForm({ ...mockProps, editingBill })
+        useBillForm({ ...mockProps, editingBill }),
       );
 
       await act(async () => {
         await result.current.handleDelete();
       });
 
-      expect(mockProps.onDeleteBill).toHaveBeenCalledWith("bill-to-delete", false);
+      expect(mockProps.onDeleteBill).toHaveBeenCalledWith(
+        "bill-to-delete",
+        false,
+      );
       expect(mockProps.onClose).toHaveBeenCalled();
     });
 
     it("should handle deletion with envelope removal", async () => {
       const editingBill = { id: "bill-to-delete", name: "Delete Me" };
       const { result } = renderHook(() =>
-        useBillForm({ ...mockProps, editingBill })
+        useBillForm({ ...mockProps, editingBill }),
       );
 
       act(() => {
@@ -323,7 +334,10 @@ describe("useBillForm Hook", () => {
         await result.current.handleDelete();
       });
 
-      expect(mockProps.onDeleteBill).toHaveBeenCalledWith("bill-to-delete", true);
+      expect(mockProps.onDeleteBill).toHaveBeenCalledWith(
+        "bill-to-delete",
+        true,
+      );
     });
 
     it("should not delete if no editing bill", async () => {
@@ -341,14 +355,22 @@ describe("useBillForm Hook", () => {
     it("should calculate monthly amount correctly", () => {
       const { result } = renderHook(() => useBillForm(mockProps));
 
-      const monthlyAmount = result.current.calculateMonthlyAmount("100", "weekly", 1);
+      const monthlyAmount = result.current.calculateMonthlyAmount(
+        "100",
+        "weekly",
+        1,
+      );
       expect(monthlyAmount).toBe(433); // 100 * 4.33
     });
 
     it("should calculate biweekly amount correctly", () => {
       const { result } = renderHook(() => useBillForm(mockProps));
 
-      const biweeklyAmount = result.current.calculateBiweeklyAmount("217", "monthly", 1);
+      const biweeklyAmount = result.current.calculateBiweeklyAmount(
+        "217",
+        "monthly",
+        1,
+      );
       expect(biweeklyAmount).toBe(100); // 217 / 2.17
     });
 
@@ -393,7 +415,7 @@ describe("useBillForm Hook", () => {
       };
 
       const { result } = renderHook(() =>
-        useBillForm({ ...mockProps, editingBill })
+        useBillForm({ ...mockProps, editingBill }),
       );
 
       // Modify form
@@ -413,13 +435,13 @@ describe("useBillForm Hook", () => {
   describe("Computed Values", () => {
     it("should provide suggested icon name", () => {
       const { result } = renderHook(() => useBillForm(mockProps));
-      
+
       expect(result.current.suggestedIconName).toBe("FileText");
     });
 
     it("should provide icon suggestions", () => {
       const { result } = renderHook(() => useBillForm(mockProps));
-      
+
       expect(result.current.iconSuggestions).toEqual([
         { name: "FileText", Icon: expect.any(Function) },
         { name: "Zap", Icon: expect.any(Function) },
@@ -428,8 +450,12 @@ describe("useBillForm Hook", () => {
 
     it("should provide categories", () => {
       const { result } = renderHook(() => useBillForm(mockProps));
-      
-      expect(result.current.categories).toEqual(["Bills", "Utilities", "Insurance"]);
+
+      expect(result.current.categories).toEqual([
+        "Bills",
+        "Utilities",
+        "Insurance",
+      ]);
     });
   });
 });

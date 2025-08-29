@@ -15,8 +15,12 @@ export async function fixAutoAllocateUndefined() {
     logger.info(`Found ${allEnvelopes.length} envelopes to check`);
 
     // Find envelopes with undefined autoAllocate
-    const undefinedEnvelopes = allEnvelopes.filter((env) => env.autoAllocate === undefined);
-    logger.info(`Found ${undefinedEnvelopes.length} envelopes with autoAllocate: undefined`);
+    const undefinedEnvelopes = allEnvelopes.filter(
+      (env) => env.autoAllocate === undefined,
+    );
+    logger.info(
+      `Found ${undefinedEnvelopes.length} envelopes with autoAllocate: undefined`,
+    );
 
     if (undefinedEnvelopes.length === 0) {
       logger.info("✅ No undefined autoAllocate values found");
@@ -30,20 +34,30 @@ export async function fixAutoAllocateUndefined() {
         autoAllocate: false,
       });
       fixedCount++;
-      logger.debug(`Fixed envelope "${envelope.name}" - set autoAllocate to false`);
+      logger.debug(
+        `Fixed envelope "${envelope.name}" - set autoAllocate to false`,
+      );
     }
 
-    logger.info(`✅ Fixed ${fixedCount} envelopes with undefined autoAllocate values`);
+    logger.info(
+      `✅ Fixed ${fixedCount} envelopes with undefined autoAllocate values`,
+    );
 
     // Verify the fix
     const verification = await budgetDb.envelopes.toArray();
-    const stillUndefined = verification.filter((env) => env.autoAllocate === undefined);
+    const stillUndefined = verification.filter(
+      (env) => env.autoAllocate === undefined,
+    );
 
     if (stillUndefined.length > 0) {
       logger.error(
-        `❌ Fix verification failed: ${stillUndefined.length} envelopes still have undefined autoAllocate`
+        `❌ Fix verification failed: ${stillUndefined.length} envelopes still have undefined autoAllocate`,
       );
-      return { success: false, fixed: fixedCount, remaining: stillUndefined.length };
+      return {
+        success: false,
+        fixed: fixedCount,
+        remaining: stillUndefined.length,
+      };
     }
 
     logger.info("🎉 Auto-allocate fix completed successfully!");

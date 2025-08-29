@@ -7,14 +7,17 @@ import logger from "../common/logger";
  */
 const getErrorMonitoringConfig = () => {
   const env = import.meta.env.MODE;
-  const isErrorReportingEnabled = import.meta.env.VITE_ERROR_REPORTING_ENABLED === "true";
+  const isErrorReportingEnabled =
+    import.meta.env.VITE_ERROR_REPORTING_ENABLED === "true";
 
   const config = {
-    projectId: import.meta.env.VITE_HIGHLIGHT_PROJECT_ID || "your-project-id-here",
+    projectId:
+      import.meta.env.VITE_HIGHLIGHT_PROJECT_ID || "your-project-id-here",
     environment: env,
     enabled: isErrorReportingEnabled,
     errorSampleRate: parseFloat(import.meta.env.VITE_ERROR_SAMPLE_RATE) || 1.0,
-    sessionSampleRate: parseFloat(import.meta.env.VITE_SESSION_SAMPLE_RATE) || 0.1,
+    sessionSampleRate:
+      parseFloat(import.meta.env.VITE_SESSION_SAMPLE_RATE) || 0.1,
   };
 
   // Environment-specific overrides
@@ -29,14 +32,16 @@ const getErrorMonitoringConfig = () => {
     case "staging":
       return {
         ...config,
-        enabled: config.enabled && config.projectId !== "your-staging-project-id-here",
+        enabled:
+          config.enabled && config.projectId !== "your-staging-project-id-here",
         sessionSampleRate: config.sessionSampleRate || 1.0, // Full sampling for testing
         debug: true,
       };
     case "development":
       return {
         ...config,
-        enabled: config.enabled && config.projectId !== "your-dev-project-id-here",
+        enabled:
+          config.enabled && config.projectId !== "your-dev-project-id-here",
         sessionSampleRate: config.sessionSampleRate || 1.0, // Full sampling for debugging
         debug: true,
       };
@@ -129,7 +134,9 @@ const _setupConsoleCapture = () => {
     originalConsoleError(...args);
 
     const message = args
-      .map((arg) => (typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)))
+      .map((arg) =>
+        typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg),
+      )
       .join(" ");
 
     // Skip frequent or expected errors that create noise
@@ -153,7 +160,9 @@ const _setupConsoleCapture = () => {
     originalConsoleWarn(...args);
 
     const message = args
-      .map((arg) => (typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)))
+      .map((arg) =>
+        typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg),
+      )
       .join(" ");
 
     // Skip common development warnings that don't need tracking
@@ -269,7 +278,10 @@ export const captureError = (error, context = {}) => {
   } catch (highlightError) {
     // Fallback to local storage and retry mechanism
     errorFallback.addError(error, context);
-    logger.warn("Highlight.io blocked, using fallback error reporting", highlightError);
+    logger.warn(
+      "Highlight.io blocked, using fallback error reporting",
+      highlightError,
+    );
   }
 };
 

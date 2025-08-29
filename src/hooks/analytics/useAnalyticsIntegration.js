@@ -43,7 +43,7 @@ export const useAnalyticsIntegration = ({
       analyticsData.envelopeHealth.length > 0
         ? analyticsData.envelopeHealth.reduce(
             (sum, env) => sum + Math.min(100, env.healthScore),
-            0
+            0,
           ) / analyticsData.envelopeHealth.length
         : 100;
 
@@ -71,7 +71,9 @@ export const useAnalyticsIntegration = ({
     const alertList = [];
 
     // Budget alerts
-    const overBudgetEnvelopes = analyticsData.envelopeHealth.filter((env) => env.healthScore < 20);
+    const overBudgetEnvelopes = analyticsData.envelopeHealth.filter(
+      (env) => env.healthScore < 20,
+    );
     if (overBudgetEnvelopes.length > 0) {
       alertList.push({
         type: "warning",
@@ -85,7 +87,7 @@ export const useAnalyticsIntegration = ({
 
     // Spending pattern alerts
     const unusualSpending = analyticsData.categoryBreakdown.find(
-      (cat) => cat.amount > enhancedMetrics.avgMonthlyExpenses * 0.5
+      (cat) => cat.amount > enhancedMetrics.avgMonthlyExpenses * 0.5,
     );
     if (unusualSpending) {
       alertList.push({
@@ -145,7 +147,9 @@ export const useAnalyticsIntegration = ({
             .map((row) => row.map((field) => `"${field}"`).join(","))
             .join("\n");
 
-          const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+          const blob = new Blob([csvContent], {
+            type: "text/csv;charset=utf-8;",
+          });
           const link = document.createElement("a");
           link.href = URL.createObjectURL(blob);
           link.download = `${filename}.csv`;
@@ -169,7 +173,7 @@ export const useAnalyticsIntegration = ({
         throw error;
       }
     },
-    [analyticsData, enhancedMetrics, alerts, timeFilter, enableExport]
+    [analyticsData, enhancedMetrics, alerts, timeFilter, enableExport],
   );
 
   // Data refresh utility
@@ -190,7 +194,8 @@ export const useAnalyticsIntegration = ({
         priority: "high",
         title: "Review Budget Allocations",
         description: "Several envelopes are consistently over budget",
-        action: "Consider increasing budgets for frequently overspent categories",
+        action:
+          "Consider increasing budgets for frequently overspent categories",
       });
     }
 

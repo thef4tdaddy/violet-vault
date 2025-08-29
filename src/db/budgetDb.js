@@ -10,7 +10,8 @@ export class VioletVaultDB extends Dexie {
       budget: "id, lastModified, version",
 
       // Envelopes table with compound indexes for common queries
-      envelopes: "id, name, category, archived, lastModified, [category+archived], [category+name]",
+      envelopes:
+        "id, name, category, archived, lastModified, [category+archived], [category+name]",
 
       // Transactions table with comprehensive indexing for analytics and filtering
       transactions:
@@ -36,7 +37,8 @@ export class VioletVaultDB extends Dexie {
       cache: "key, value, expiresAt, category, [category+expiresAt]",
 
       // Debts table for debt tracking
-      debts: "id, name, creditor, type, status, currentBalance, minimumPayment, lastModified",
+      debts:
+        "id, name, creditor, type, status, currentBalance, minimumPayment, lastModified",
 
       // Budget History Tracking tables
       budgetCommits:
@@ -77,7 +79,10 @@ export class VioletVaultDB extends Dexie {
               try {
                 extensibleObj[key] = obj[key];
               } catch (copyError) {
-                console.warn(`Failed to copy property ${key}:`, copyError.message);
+                console.warn(
+                  `Failed to copy property ${key}:`,
+                  copyError.message,
+                );
               }
             });
 
@@ -105,11 +110,17 @@ export class VioletVaultDB extends Dexie {
                   try {
                     obj[key] = extensibleObj[key];
                   } catch (setError) {
-                    console.warn(`Failed to set property ${key}:`, setError.message);
+                    console.warn(
+                      `Failed to set property ${key}:`,
+                      setError.message,
+                    );
                   }
                 });
               } catch (finalError) {
-                console.warn("Complete object replacement failed:", finalError.message);
+                console.warn(
+                  "Complete object replacement failed:",
+                  finalError.message,
+                );
                 // As a last resort, try to modify the transaction
                 if (typeof trans.source === "object" && trans.source !== null) {
                   trans.source = extensibleObj;
@@ -181,7 +192,11 @@ export class VioletVaultDB extends Dexie {
     // 5 minutes default
     const cached = await this.cache.get(key);
     const now = Date.now();
-    if (cached && cached.expiresAt > now && now - (cached.expiresAt - maxAge) < maxAge) {
+    if (
+      cached &&
+      cached.expiresAt > now &&
+      now - (cached.expiresAt - maxAge) < maxAge
+    ) {
       return cached.value;
     }
     return null;
@@ -196,7 +211,10 @@ export class VioletVaultDB extends Dexie {
 
     if (!result) {
       if (includeArchived) {
-        result = await this.envelopes.where("category").equals(category).toArray();
+        result = await this.envelopes
+          .where("category")
+          .equals(category)
+          .toArray();
       } else {
         result = await this.envelopes
           .where("[category+archived]")
@@ -226,22 +244,40 @@ export class VioletVaultDB extends Dexie {
     if (dateRange) {
       return this.transactions
         .where("[envelopeId+date]")
-        .between([envelopeId, dateRange.start], [envelopeId, dateRange.end], true, true)
+        .between(
+          [envelopeId, dateRange.start],
+          [envelopeId, dateRange.end],
+          true,
+          true,
+        )
         .reverse()
         .toArray();
     }
-    return this.transactions.where("envelopeId").equals(envelopeId).reverse().toArray();
+    return this.transactions
+      .where("envelopeId")
+      .equals(envelopeId)
+      .reverse()
+      .toArray();
   }
 
   async getTransactionsByCategory(category, dateRange = null) {
     if (dateRange) {
       return this.transactions
         .where("[category+date]")
-        .between([category, dateRange.start], [category, dateRange.end], true, true)
+        .between(
+          [category, dateRange.start],
+          [category, dateRange.end],
+          true,
+          true,
+        )
         .reverse()
         .toArray();
     }
-    return this.transactions.where("category").equals(category).reverse().toArray();
+    return this.transactions
+      .where("category")
+      .equals(category)
+      .reverse()
+      .toArray();
   }
 
   async getTransactionsByType(type, dateRange = null) {
@@ -298,7 +334,10 @@ export class VioletVaultDB extends Dexie {
 
   // Savings Goals queries with status and priority optimization
   async getActiveSavingsGoals() {
-    return this.savingsGoals.where("[isCompleted+isPaused]").equals([false, false]).toArray();
+    return this.savingsGoals
+      .where("[isCompleted+isPaused]")
+      .equals([false, false])
+      .toArray();
   }
 
   async getCompletedSavingsGoals() {
@@ -325,11 +364,18 @@ export class VioletVaultDB extends Dexie {
 
   // Paycheck History queries for trend analysis
   async getPaycheckHistory(limit = 50) {
-    return this.paycheckHistory.orderBy("date").reverse().limit(limit).toArray();
+    return this.paycheckHistory
+      .orderBy("date")
+      .reverse()
+      .limit(limit)
+      .toArray();
   }
 
   async getPaychecksByDateRange(startDate, endDate) {
-    return this.paycheckHistory.where("date").between(startDate, endDate, true, true).toArray();
+    return this.paycheckHistory
+      .where("date")
+      .between(startDate, endDate, true, true)
+      .toArray();
   }
 
   async getPaychecksBySource(source) {
@@ -340,7 +386,13 @@ export class VioletVaultDB extends Dexie {
   async batchUpdate(updates) {
     return this.transaction(
       "rw",
-      [this.envelopes, this.transactions, this.bills, this.savingsGoals, this.paycheckHistory],
+      [
+        this.envelopes,
+        this.transactions,
+        this.bills,
+        this.savingsGoals,
+        this.paycheckHistory,
+      ],
       async () => {
         const promises = updates.map((update) => {
           switch (update.type) {
@@ -359,7 +411,7 @@ export class VioletVaultDB extends Dexie {
           }
         });
         return Promise.all(promises);
-      }
+      },
     );
   }
 
@@ -382,9 +434,14 @@ export class VioletVaultDB extends Dexie {
 
   // Analytics helper queries
   async getAnalyticsData(dateRange, includeTransfers = false) {
-    const transactions = await this.getTransactionsByDateRange(dateRange.start, dateRange.end);
+    const transactions = await this.getTransactionsByDateRange(
+      dateRange.start,
+      dateRange.end,
+    );
 
-    return includeTransfers ? transactions : transactions.filter((t) => t.type !== "transfer");
+    return includeTransfers
+      ? transactions
+      : transactions.filter((t) => t.type !== "transfer");
   }
 
   async getCategorySpending(category, dateRange) {
@@ -399,7 +456,10 @@ export class VioletVaultDB extends Dexie {
   async cleanupCache(category = null) {
     const now = Date.now();
     if (category) {
-      await this.cache.where("[category+expiresAt]").below([category, now]).delete();
+      await this.cache
+        .where("[category+expiresAt]")
+        .below([category, now])
+        .delete();
     } else {
       await this.cache.where("expiresAt").below(now).delete();
     }
@@ -437,15 +497,21 @@ export class VioletVaultDB extends Dexie {
 
   // Data integrity and statistics
   async getDatabaseStats() {
-    const [envelopeCount, transactionCount, billCount, goalCount, paycheckCount, cacheCount] =
-      await Promise.all([
-        this.envelopes.count(),
-        this.transactions.count(),
-        this.bills.count(),
-        this.savingsGoals.count(),
-        this.paycheckHistory.count(),
-        this.cache.count(),
-      ]);
+    const [
+      envelopeCount,
+      transactionCount,
+      billCount,
+      goalCount,
+      paycheckCount,
+      cacheCount,
+    ] = await Promise.all([
+      this.envelopes.count(),
+      this.transactions.count(),
+      this.bills.count(),
+      this.savingsGoals.count(),
+      this.paycheckHistory.count(),
+      this.cache.count(),
+    ]);
 
     return {
       envelopes: envelopeCount,

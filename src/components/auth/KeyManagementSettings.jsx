@@ -93,7 +93,7 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
     if (!exportPassword || exportPassword.length < 8) {
       globalToast.showError(
         "Export password must be at least 8 characters long",
-        "Password Too Short"
+        "Password Too Short",
       );
       return;
     }
@@ -116,14 +116,17 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
 
       const validation = validateKeyFile(keyFileData);
       if (!validation.valid) {
-        globalToast.showError(`Invalid key file: ${validation.error}`, "Invalid Key File");
+        globalToast.showError(
+          `Invalid key file: ${validation.error}`,
+          "Invalid Key File",
+        );
         return;
       }
 
       if (validation.type === "protected" && !importPassword) {
         globalToast.showError(
           "This key file is password protected. Please enter the export password.",
-          "Password Required"
+          "Password Required",
         );
         return;
       }
@@ -131,7 +134,7 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
       if (!vaultPassword) {
         globalToast.showError(
           "Please enter your vault password to complete the import.",
-          "Vault Password Required"
+          "Vault Password Required",
         );
         return;
       }
@@ -139,7 +142,7 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
       const result = await importAndLogin(
         keyFileData,
         validation.type === "protected" ? importPassword : null,
-        vaultPassword
+        vaultPassword,
       );
 
       setImportResult(result);
@@ -181,8 +184,9 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
                   Your Key, Your Vault, Your Responsibility
                 </p>
                 <p className="text-amber-700">
-                  Without your encryption key, your data is <strong>unrecoverable</strong>. Store
-                  backups securely and never share your key with untrusted parties.
+                  Without your encryption key, your data is{" "}
+                  <strong>unrecoverable</strong>. Store backups securely and
+                  never share your key with untrusted parties.
                 </p>
               </div>
             </div>
@@ -219,7 +223,9 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
               <div className="flex items-start">
                 <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5" />
                 <div className="text-sm">
-                  <p className="text-green-800 font-medium">Key Import Successful</p>
+                  <p className="text-green-800 font-medium">
+                    Key Import Successful
+                  </p>
                   <p className="text-green-700 mt-1">
                     Successfully imported and logged in with key from{" "}
                     {importResult.importResult.deviceFingerprint}
@@ -268,10 +274,16 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
                     className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors disabled:opacity-50"
                   >
                     <Copy className="h-5 w-5 text-purple-600 mx-auto mb-2" />
-                    <div className="text-sm font-medium text-gray-900">Copy to Clipboard</div>
-                    <div className="text-xs text-gray-500 mt-1">Auto-clears in 30s</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      Copy to Clipboard
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      Auto-clears in 30s
+                    </div>
                     {copiedToClipboard && (
-                      <div className="text-xs text-green-600 mt-1">✓ Copied!</div>
+                      <div className="text-xs text-green-600 mt-1">
+                        ✓ Copied!
+                      </div>
                     )}
                   </button>
 
@@ -281,8 +293,12 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
                     className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors disabled:opacity-50"
                   >
                     <FileText className="h-5 w-5 text-purple-600 mx-auto mb-2" />
-                    <div className="text-sm font-medium text-gray-900">Download JSON</div>
-                    <div className="text-xs text-gray-500 mt-1">Unprotected</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      Download JSON
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      Unprotected
+                    </div>
                   </button>
 
                   <button
@@ -291,7 +307,9 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
                     className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors disabled:opacity-50"
                   >
                     <QrCode className="h-5 w-5 text-purple-600 mx-auto mb-2" />
-                    <div className="text-sm font-medium text-gray-900">Generate QR Code</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      Generate QR Code
+                    </div>
                     <div className="text-xs text-gray-500 mt-1">For mobile</div>
                   </button>
                 </div>
@@ -320,7 +338,9 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
 
               {/* Protected Export */}
               <div>
-                <h4 className="font-medium text-gray-900 mb-4">Password-Protected Export</h4>
+                <h4 className="font-medium text-gray-900 mb-4">
+                  Password-Protected Export
+                </h4>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -338,7 +358,9 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
                       />
                       <button
                         type="button"
-                        onClick={() => setShowExportPassword(!showExportPassword)}
+                        onClick={() =>
+                          setShowExportPassword(!showExportPassword)
+                        }
                         className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600"
                       >
                         {showExportPassword ? (
@@ -349,13 +371,16 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
                       </button>
                     </div>
                     <div className="text-xs text-gray-500 mt-1">
-                      Minimum 8 characters. This password will be required to import the key file.
+                      Minimum 8 characters. This password will be required to
+                      import the key file.
                     </div>
                   </div>
 
                   <button
                     onClick={handleDownloadProtected}
-                    disabled={loading || !exportPassword || exportPassword.length < 8}
+                    disabled={
+                      loading || !exportPassword || exportPassword.length < 8
+                    }
                     className="w-full bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center disabled:opacity-50"
                   >
                     <Lock className="h-4 w-4 mr-2" />
@@ -380,7 +405,9 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
                       <strong>Security Details:</strong>
                       <ul className="list-disc list-inside text-gray-600 mt-1 space-y-1">
                         <li>Keys are exported with AES-256-GCM encryption</li>
-                        <li>PBKDF2 with 100,000 iterations for key derivation</li>
+                        <li>
+                          PBKDF2 with 100,000 iterations for key derivation
+                        </li>
                         <li>SHA-256 fingerprints for integrity verification</li>
                         <li>Device fingerprints track key export source</li>
                       </ul>
@@ -404,10 +431,12 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
           {activeTab === "import" && (
             <div className="space-y-6">
               <div>
-                <h4 className="font-medium text-gray-900 mb-4">Import Encryption Key</h4>
+                <h4 className="font-medium text-gray-900 mb-4">
+                  Import Encryption Key
+                </h4>
                 <div className="text-sm text-gray-600 mb-4">
-                  Import a previously exported key to access your vault from this device or restore
-                  from backup.
+                  Import a previously exported key to access your vault from
+                  this device or restore from backup.
                 </div>
 
                 {/* File Upload */}
@@ -450,7 +479,9 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
                       />
                       <button
                         type="button"
-                        onClick={() => setShowImportPassword(!showImportPassword)}
+                        onClick={() =>
+                          setShowImportPassword(!showImportPassword)
+                        }
                         className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600"
                       >
                         {showImportPassword ? (
@@ -460,7 +491,9 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
                         )}
                       </button>
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">Required for .vaultkey files</div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      Required for .vaultkey files
+                    </div>
                   </div>
 
                   <div>
@@ -488,7 +521,9 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
                         )}
                       </button>
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">Required to login after import</div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      Required to login after import
+                    </div>
                   </div>
                 </div>
 
@@ -499,8 +534,9 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
                     <div className="text-sm text-blue-800">
                       <p className="font-medium mb-1">Import Process</p>
                       <p>
-                        Importing a key will verify its integrity, decrypt your vault, and log you
-                        in automatically. Your current session will be replaced.
+                        Importing a key will verify its integrity, decrypt your
+                        vault, and log you in automatically. Your current
+                        session will be replaced.
                       </p>
                     </div>
                   </div>

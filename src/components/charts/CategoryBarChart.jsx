@@ -1,5 +1,13 @@
 import React from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from "recharts";
 import ChartContainer from "./ChartContainer";
 import { useChartConfig } from "../../hooks/common/useChartConfig";
 
@@ -26,7 +34,8 @@ const CategoryBarChart = ({
   maxBarSize = 60,
   ...props
 }) => {
-  const { CustomTooltip, chartDefaults, chartTypeConfigs, getColorByCategory } = useChartConfig();
+  const { CustomTooltip, chartDefaults, chartTypeConfigs, getColorByCategory } =
+    useChartConfig();
 
   // Use custom tooltip or default
   const TooltipComponent = formatTooltip || CustomTooltip;
@@ -48,7 +57,12 @@ const CategoryBarChart = ({
   const AxisConfig = isHorizontal
     ? {
         XAxis: { type: "number", stroke: chartDefaults.axis.stroke },
-        YAxis: { dataKey: "name", type: "category", stroke: chartDefaults.axis.stroke, width: 100 },
+        YAxis: {
+          dataKey: "name",
+          type: "category",
+          stroke: chartDefaults.axis.stroke,
+          width: 100,
+        },
       }
     : {
         XAxis: { dataKey: "name", stroke: chartDefaults.axis.stroke },
@@ -68,7 +82,11 @@ const CategoryBarChart = ({
       dataTestId="category-bar-chart"
     >
       {hasData && (
-        <BarChart data={chartData} layout={isHorizontal ? "horizontal" : "vertical"} {...props}>
+        <BarChart
+          data={chartData}
+          layout={isHorizontal ? "horizontal" : "vertical"}
+          {...props}
+        >
           {showGrid && (
             <CartesianGrid
               strokeDasharray={chartDefaults.cartesianGrid.strokeDasharray}
@@ -79,12 +97,20 @@ const CategoryBarChart = ({
           <XAxis
             {...AxisConfig.XAxis}
             fontSize={12}
-            tickFormatter={isHorizontal ? (value) => `$${(value / 1000).toFixed(0)}K` : undefined}
+            tickFormatter={
+              isHorizontal
+                ? (value) => `$${(value / 1000).toFixed(0)}K`
+                : undefined
+            }
           />
           <YAxis
             {...AxisConfig.YAxis}
             fontSize={12}
-            tickFormatter={!isHorizontal ? (value) => `$${(value / 1000).toFixed(0)}K` : undefined}
+            tickFormatter={
+              !isHorizontal
+                ? (value) => `$${(value / 1000).toFixed(0)}K`
+                : undefined
+            }
           />
 
           <Tooltip content={<TooltipComponent />} />
@@ -95,7 +121,9 @@ const CategoryBarChart = ({
               key={barProps.dataKey}
               radius={chartTypeConfigs.bar.radius}
               maxBarSize={maxBarSize}
-              fill={barProps.fill || getColorByCategory(barProps.dataKey, index)}
+              fill={
+                barProps.fill || getColorByCategory(barProps.dataKey, index)
+              }
               {...barProps}
             />
           ))}
