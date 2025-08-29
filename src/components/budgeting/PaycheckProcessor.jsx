@@ -1,5 +1,6 @@
 // src/components/PaycheckProcessor.jsx - Complete Component
 import React, { useState, useEffect, useRef } from "react";
+import { useConfirm } from "../../hooks/common/useConfirm";
 import {
   DollarSign,
   User,
@@ -282,9 +283,13 @@ const PaycheckProcessor = ({
   const handleDeletePaycheck = async (paycheck) => {
     if (!onDeletePaycheck) return;
 
-    const confirmed = window.confirm(
-      `Are you sure you want to delete the paycheck from ${paycheck.payerName} for $${paycheck.amount.toFixed(2)}? This will reverse all related transactions and cannot be undone.`
-    );
+    const confirmed = await confirm({
+      title: "Delete Paycheck",
+      message: `Are you sure you want to delete the paycheck from ${paycheck.payerName} for $${paycheck.amount.toFixed(2)}? This will reverse all related transactions and cannot be undone.`,
+      confirmLabel: "Delete Paycheck",
+      cancelLabel: "Cancel",
+      destructive: true,
+    });
 
     if (!confirmed) return;
 

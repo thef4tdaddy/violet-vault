@@ -82,9 +82,13 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
   const handleRemoveSelected = async () => {
     if (selectedEnvelopes.size === 0) return;
 
-    const confirmed = window.confirm(
-      `Are you sure you want to permanently remove ${selectedEnvelopes.size} corrupted envelope${selectedEnvelopes.size === 1 ? "" : "s"}? This action cannot be undone.`
-    );
+    const confirmed = await confirm({
+      title: "Remove Corrupted Envelopes",
+      message: `Are you sure you want to permanently remove ${selectedEnvelopes.size} corrupted envelope${selectedEnvelopes.size === 1 ? "" : "s"}? This action cannot be undone.`,
+      confirmLabel: "Remove Envelopes",
+      cancelLabel: "Cancel",
+      destructive: true,
+    });
 
     if (!confirmed) return;
 

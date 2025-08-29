@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useConfirm } from "../../hooks/common/useConfirm";
 import {
   Plus,
   Play,
@@ -31,6 +32,7 @@ import logger from "../../utils/common/logger";
 
 const AutoFundingDashboard = ({ isOpen, onClose }) => {
   const budget = useBudgetStore();
+  const confirm = useConfirm();
   const [rules, setRules] = useState([]);
   const [executionHistory, setExecutionHistory] = useState([]);
   const [isExecuting, setIsExecuting] = useState(false);
@@ -79,10 +81,16 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleDeleteRule = (ruleId) => {
-    if (
-      window.confirm("Are you sure you want to delete this rule? This action cannot be undone.")
-    ) {
+  const handleDeleteRule = async (ruleId) => {
+    const confirmed = await confirm({
+      title: "Delete Auto-Funding Rule",
+      message: "Are you sure you want to delete this rule? This action cannot be undone.",
+      confirmLabel: "Delete Rule",
+      cancelLabel: "Cancel",
+      destructive: true,
+    });
+
+    if (confirmed) {
       try {
         autoFundingEngine.deleteRule(ruleId);
         loadRulesAndHistory();

@@ -3,6 +3,7 @@ import {
   useBudgetHistory,
   useBudgetCommitDetails,
 } from "../../hooks/budgeting/useBudgetHistoryQuery";
+import { useConfirm } from "../../hooks/common/useConfirm";
 import {
   History,
   GitCommit,
@@ -36,6 +37,7 @@ const BudgetHistoryViewer = ({ onClose }) => {
     restore,
     exportHistory,
   } = useBudgetHistory({ limit: 50 });
+  const confirm = useConfirm();
 
   const [selectedCommit, setSelectedCommit] = useState(null);
   const [expandedCommits, setExpandedCommits] = useState(new Set());
@@ -50,11 +52,16 @@ const BudgetHistoryViewer = ({ onClose }) => {
   // Note: Data loading is now handled automatically by TanStack Query hooks
 
   const handleRestoreFromHistory = async (commitHash) => {
-    if (
-      !window.confirm(
-        "This will restore your budget to a previous state. Current changes will be lost unless committed. Continue?"
-      )
-    ) {
+    const confirmed = await confirm({
+      title: "Restore from History",
+      message:
+        "This will restore your budget to a previous state. Current changes will be lost unless committed. Continue?",
+      confirmLabel: "Restore",
+      cancelLabel: "Cancel",
+      destructive: true,
+    });
+
+    if (!confirmed) {
       return;
     }
 

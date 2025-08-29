@@ -4,12 +4,14 @@ import { queryClient } from "./utils/common/queryClient";
 import MainLayout from "./components/layout/MainLayout";
 import { cloudSyncService } from "./services/cloudSyncService";
 import BugReportButton from "./components/feedback/BugReportButton";
+import ConfirmProvider from "./components/ui/ConfirmProvider";
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <div className="font-sans">
       <MainLayout firebaseSync={cloudSyncService} />
       <BugReportButton />
+      <ConfirmProvider />
     </div>
   </QueryClientProvider>
 );

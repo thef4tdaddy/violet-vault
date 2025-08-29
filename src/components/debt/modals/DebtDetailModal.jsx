@@ -41,12 +41,16 @@ const DebtDetailModal = ({
     setPaymentAmount(debt.minimumPayment?.toString() || "");
   };
 
-  const handleDelete = () => {
-    if (
-      window.confirm(
-        `Are you sure you want to delete "${debt.name}"? This action cannot be undone.`
-      )
-    ) {
+  const handleDelete = async () => {
+    const confirmed = await confirm({
+      title: "Delete Debt",
+      message: `Are you sure you want to delete "${debt.name}"? This action cannot be undone.`,
+      confirmLabel: "Delete Debt",
+      cancelLabel: "Cancel",
+      destructive: true,
+    });
+
+    if (confirmed) {
       onDelete(debt.id);
       onClose(); // Close modal after deletion
     }
