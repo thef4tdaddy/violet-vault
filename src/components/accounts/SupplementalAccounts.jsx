@@ -1,31 +1,25 @@
-import React, { useState, useEffect } from "react";
-import { globalToast } from "../../stores/ui/toastStore";
+import React from "react";
 import {
   CreditCard,
   Plus,
   Edit3,
   Trash2,
-  Save,
   X,
-  TrendingUp,
-  TrendingDown,
   AlertCircle,
   Eye,
   EyeOff,
-  RefreshCw,
-  Calendar,
-  DollarSign,
   Zap,
   Lock,
   Unlock,
-  User,
-  Clock,
 } from "lucide-react";
-import useEditLock from "../../hooks/common/useEditLock";
-import { initializeEditLocks } from "../../services/editLockService";
-import { useAuth } from "../../stores/auth/authStore";
 import EditLockIndicator from "../ui/EditLockIndicator";
-import { useConfirm } from "../../hooks/common/useConfirm";
+import useSupplementalAccounts from "../../hooks/accounts/useSupplementalAccounts";
+import {
+  ACCOUNT_TYPES,
+  ACCOUNT_COLORS,
+  calculateDaysUntilExpiration,
+  getExpirationStatus,
+} from "../../utils/accounts";
 
 const SupplementalAccounts = ({
   supplementalAccounts = [],
@@ -36,256 +30,49 @@ const SupplementalAccounts = ({
   envelopes = [],
   currentUser = { userName: "User", userColor: "#a855f7" },
 }) => {
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [editingAccount, setEditingAccount] = useState(null);
-  const [showBalances, setShowBalances] = useState(true);
-  const [showTransferModal, setShowTransferModal] = useState(false);
-  const [transferringAccount, setTransferringAccount] = useState(null);
-
-  // Get auth context for edit locking
-  const { budgetId, currentUser: authCurrentUser } = useAuth();
-  const confirm = useConfirm();
-
-  // Initialize edit lock service when component mounts
-  useEffect(() => {
-    if (budgetId && authCurrentUser) {
-      initializeEditLocks(budgetId, authCurrentUser);
-    }
-  }, [budgetId, authCurrentUser]);
-
-  // Edit locking for the account being edited
   const {
+    // UI State
+    showAddModal,
+    editingAccount,
+    showBalances,
+    showTransferModal,
+    transferringAccount,
+    // Form State
+    accountForm,
+    transferForm,
+    setAccountForm,
+    setTransferForm,
+    // Edit Locking
     isLocked,
     isOwnLock,
     canEdit,
     lock,
     releaseLock,
     breakLock,
-    isLoading: lockLoading,
-  } = useEditLock("supplemental_account", editingAccount?.id, {
-    autoAcquire: !!editingAccount, // Auto-acquire when editing
-    autoRelease: true,
-    showToasts: true,
-  });
-
-  const [accountForm, setAccountForm] = useState({
-    name: "",
-    type: "FSA",
-    currentBalance: "",
-    annualContribution: "",
-    expirationDate: "",
-    description: "",
-    color: "#06b6d4",
-    isActive: true,
-  });
-
-  const [transferForm, setTransferForm] = useState({
-    envelopeId: "",
-    amount: "",
-    description: "",
-  });
-
-  const accountTypes = [
-    { value: "FSA", label: "FSA (Flexible Spending Account)", icon: "🏥" },
-    { value: "HSA", label: "HSA (Health Savings Account)", icon: "💊" },
-    { value: "Dependent Care FSA", label: "Dependent Care FSA", icon: "👶" },
-    { value: "Commuter Benefits", label: "Commuter Benefits", icon: "🚌" },
-    { value: "Gift Cards", label: "Gift Cards", icon: "🎁" },
-    { value: "Store Credit", label: "Store Credit", icon: "🏪" },
-    { value: "Cashback/Points", label: "Cashback/Rewards Points", icon: "⭐" },
-    { value: "Other", label: "Other", icon: "💳" },
-  ];
-
-  const colors = [
-    "#06b6d4",
-    "#10b981",
-    "#8b5cf6",
-    "#f59e0b",
-    "#ef4444",
-    "#14b8a6",
-    "#6366f1",
-    "#84cc16",
-    "#f97316",
-    "#ec4899",
-  ];
-
-  const resetForm = () => {
-    setAccountForm({
-      name: "",
-      type: "FSA",
-      currentBalance: "",
-      annualContribution: "",
-      expirationDate: "",
-      description: "",
-      color: "#06b6d4",
-      isActive: true,
-    });
-  };
-
-  const handleAddAccount = () => {
-    if (!accountForm.name.trim() || !accountForm.currentBalance) {
-      globalToast.showError(
-        "Please fill in account name and current balance",
-        "Required Fields",
-      );
-      return;
-    }
-
-    // Check edit lock for updates
-    if (editingAccount && !canEdit) {
-      globalToast.showError(
-        "Cannot save changes - account is locked by another user",
-        "Account Locked",
-      );
-      return;
-    }
-
-    const newAccount = {
-      id: Date.now(),
-      ...accountForm,
-      currentBalance: parseFloat(accountForm.currentBalance) || 0,
-      annualContribution: parseFloat(accountForm.annualContribution) || 0,
-      createdBy: currentUser.userName,
-      createdAt: new Date().toISOString(),
-      lastUpdated: new Date().toISOString(),
-      transactions: [],
-    };
-
-    if (editingAccount) {
-      onUpdateAccount(editingAccount.id, newAccount);
-      // Release lock after successful update
-      if (isOwnLock) {
-        releaseLock();
-      }
-      setEditingAccount(null);
-    } else {
-      onAddAccount(newAccount);
-    }
-
-    setShowAddModal(false);
-    resetForm();
-  };
-
-  const startEdit = (account) => {
-    setAccountForm({
-      name: account.name,
-      type: account.type,
-      currentBalance: account.currentBalance.toString(),
-      annualContribution: account.annualContribution?.toString() || "",
-      expirationDate: account.expirationDate || "",
-      description: account.description || "",
-      color: account.color,
-      isActive: account.isActive,
-    });
-    setEditingAccount(account);
-    setShowAddModal(true);
-  };
-
-  const handleCloseModal = () => {
-    // Release lock when closing modal
-    if (isOwnLock) {
-      releaseLock();
-    }
-    setEditingAccount(null);
-    setShowAddModal(false);
-    resetForm();
-  };
-
-  const handleDelete = async (accountId) => {
-    const confirmed = await confirm({
-      title: "Delete Account",
-      message: "Are you sure you want to delete this account?",
-      confirmLabel: "Delete Account",
-      cancelLabel: "Cancel",
-      destructive: true,
-    });
-
-    if (confirmed) {
-      onDeleteAccount(accountId);
-    }
-  };
-
-  const startTransfer = (account) => {
-    setTransferringAccount(account);
-    setTransferForm({
-      envelopeId: "",
-      amount: "",
-      description: `Transfer from ${account.name}`,
-    });
-    setShowTransferModal(true);
-  };
-
-  const handleTransfer = () => {
-    if (
-      !transferForm.envelopeId ||
-      !transferForm.amount ||
-      transferForm.amount <= 0
-    ) {
-      globalToast.showError(
-        "Please select an envelope and enter a valid amount",
-        "Transfer Required",
-      );
-      return;
-    }
-
-    const amount = parseFloat(transferForm.amount);
-    if (amount > transferringAccount.currentBalance) {
-      globalToast.showError(
-        "Insufficient balance in account",
-        "Insufficient Balance",
-      );
-      return;
-    }
-
-    onTransferToEnvelope(
-      transferringAccount.id,
-      transferForm.envelopeId,
-      amount,
-      transferForm.description,
-    );
-
-    setShowTransferModal(false);
-    setTransferringAccount(null);
-    setTransferForm({ envelopeId: "", amount: "", description: "" });
-  };
-
-  const getAccountTypeInfo = (type) => {
-    return (
-      accountTypes.find((t) => t.value === type) ||
-      accountTypes.find((t) => t.value === "Other")
-    );
-  };
-
-  const calculateDaysUntilExpiration = (expirationDate) => {
-    if (!expirationDate) return null;
-
-    const today = new Date();
-    const expiry = new Date(expirationDate);
-    const diffTime = expiry - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    return diffDays;
-  };
-
-  const getExpirationStatus = (daysUntil) => {
-    if (daysUntil === null) return { text: "", color: "text-gray-500" };
-    if (daysUntil < 0) return { text: "Expired", color: "text-red-600" };
-    if (daysUntil === 0)
-      return { text: "Expires Today", color: "text-red-600" };
-    if (daysUntil <= 30)
-      return { text: `${daysUntil} days left`, color: "text-orange-600" };
-    if (daysUntil <= 90)
-      return { text: `${daysUntil} days left`, color: "text-yellow-600" };
-    return { text: `${daysUntil} days left`, color: "text-green-600" };
-  };
-
-  const totalValue = supplementalAccounts
-    .filter((account) => account.isActive)
-    .reduce((sum, account) => sum + account.currentBalance, 0);
-
-  const expiringAccounts = supplementalAccounts.filter((account) => {
-    const days = calculateDaysUntilExpiration(account.expirationDate);
-    return days !== null && days <= 30 && days >= 0;
+    lockLoading,
+    // Actions
+    handleAddAccount,
+    startEdit,
+    handleCloseModal,
+    handleDelete,
+    startTransfer,
+    handleTransfer,
+    handleCloseTransferModal,
+    openAddForm,
+    toggleBalanceVisibility,
+    // Computed Values
+    totalValue,
+    expiringAccounts,
+    // Utilities
+    getAccountTypeInfo,
+  } = useSupplementalAccounts({
+    supplementalAccounts,
+    onAddAccount,
+    onUpdateAccount,
+    onDeleteAccount,
+    onTransferToEnvelope,
+    envelopes,
+    currentUser,
   });
 
   return (
@@ -310,7 +97,7 @@ const SupplementalAccounts = ({
 
         <div className="flex gap-2">
           <button
-            onClick={() => setShowBalances(!showBalances)}
+            onClick={toggleBalanceVisibility}
             className="p-2 text-gray-600 hover:text-cyan-600 rounded-lg hover:bg-cyan-50"
             title={showBalances ? "Hide balances" : "Show balances"}
           >
@@ -321,7 +108,7 @@ const SupplementalAccounts = ({
             )}
           </button>
           <button
-            onClick={() => setShowAddModal(true)}
+            onClick={openAddForm}
             className="btn btn-primary text-sm flex items-center"
           >
             <Plus className="h-3 w-3 mr-1" />
@@ -583,7 +370,7 @@ const SupplementalAccounts = ({
                   disabled={editingAccount && !canEdit}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 >
-                  {accountTypes.map((type) => (
+                  {ACCOUNT_TYPES.map((type) => (
                     <option key={type.value} value={type.value}>
                       {type.icon} {type.label}
                     </option>
@@ -657,7 +444,7 @@ const SupplementalAccounts = ({
                   Color
                 </label>
                 <div className="flex gap-2 flex-wrap">
-                  {colors.map((color) => (
+                  {ACCOUNT_COLORS.map((color) => (
                     <button
                       key={color}
                       type="button"
@@ -743,15 +530,7 @@ const SupplementalAccounts = ({
                 Transfer from {transferringAccount.name}
               </h3>
               <button
-                onClick={() => {
-                  setShowTransferModal(false);
-                  setTransferringAccount(null);
-                  setTransferForm({
-                    envelopeId: "",
-                    amount: "",
-                    description: "",
-                  });
-                }}
+                onClick={handleCloseTransferModal}
                 className="text-gray-400 hover:text-gray-600"
               >
                 <X className="h-5 w-5" />
@@ -832,15 +611,7 @@ const SupplementalAccounts = ({
 
             <div className="flex gap-3 mt-6">
               <button
-                onClick={() => {
-                  setShowTransferModal(false);
-                  setTransferringAccount(null);
-                  setTransferForm({
-                    envelopeId: "",
-                    amount: "",
-                    description: "",
-                  });
-                }}
+                onClick={handleCloseTransferModal}
                 className="flex-1 btn btn-secondary"
               >
                 Cancel
