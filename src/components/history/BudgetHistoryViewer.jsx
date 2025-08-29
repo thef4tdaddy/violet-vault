@@ -4,6 +4,7 @@ import {
   useBudgetCommitDetails,
 } from "../../hooks/budgeting/useBudgetHistoryQuery";
 import { useConfirm } from "../../hooks/common/useConfirm";
+import { usePrompt } from "../../hooks/common/usePrompt";
 import { globalToast } from "../../stores/ui/toastStore";
 import {
   History,
@@ -39,6 +40,7 @@ const BudgetHistoryViewer = ({ onClose }) => {
     exportHistory,
   } = useBudgetHistory({ limit: 50 });
   const confirm = useConfirm();
+  const prompt = usePrompt();
 
   const [selectedCommit, setSelectedCommit] = useState(null);
   const [expandedCommits, setExpandedCommits] = useState(new Set());
@@ -68,7 +70,23 @@ const BudgetHistoryViewer = ({ onClose }) => {
 
     try {
       // Need password for decryption - in a real implementation, get from auth store
-      const password = prompt("Enter your password to restore from history:");
+      const password = await prompt({
+        title: "Password Required",
+        message: "Enter your password to restore from history:",
+        inputType: "password",
+        placeholder: "Enter your password...",
+        isRequired: true,
+        validation: (value) => {
+          if (!value.trim()) {
+            return { valid: false, error: "Password is required" };
+          }
+          if (value.length < 6) {
+            return { valid: false, error: "Password must be at least 6 characters" };
+          }
+          return { valid: true };
+        },
+      });
+
       if (!password) return;
 
       await restore({ commitHash, password });
