@@ -66,6 +66,37 @@ export default [
       "no-case-declarations": "warn",
       "no-useless-escape": "warn",
       "react-hooks/exhaustive-deps": "warn",
+      
+      // Block browser dialogs (Issues #502, #503, #504 enforcement)
+      "no-restricted-globals": [
+        "error",
+        {
+          name: "alert",
+          message: "Use toast notifications instead of alert(). Import { globalToast } from '../../stores/ui/toastStore' and use globalToast.showError(), globalToast.showSuccess(), etc."
+        },
+        {
+          name: "confirm", 
+          message: "Use ConfirmModal instead of confirm(). Import { useConfirm } from '../../hooks/common/useConfirm' and use the returned confirm function."
+        },
+        {
+          name: "prompt",
+          message: "Use PromptModal instead of prompt(). Import { usePrompt } from '../../hooks/common/usePrompt' and use the returned prompt function."
+        }
+      ],
+      
+      // Block React Context usage (Issue #491 enforcement)
+      "no-restricted-imports": [
+        "error", 
+        {
+          "paths": [
+            {
+              "name": "react",
+              "importNames": ["createContext", "useContext"],
+              "message": "Use Zustand stores instead of React Context. Create a store in src/stores/ and use it with create() from zustand."
+            }
+          ]
+        }
+      ],
     },
   },
 ];
