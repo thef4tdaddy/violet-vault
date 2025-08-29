@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
-import useBills from "./useBills";
-import useEnvelopes from "./useEnvelopes";
-import useDebts from "./useDebts";
+import useBills from "../bills/useBills";
+import useEnvelopes from "../budgeting/useEnvelopes";
+import useDebts from "../debts/useDebts";
 import useToast from "./useToast";
 import logger from "../../utils/common/logger";
 

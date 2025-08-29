@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { X, Edit, Trash2, DollarSign, Calendar, TrendingDown, Receipt, Wallet } from "lucide-react";
-import { useConfirm } from "../../hooks/common/useConfirm";
+import { useConfirm } from "../../../hooks/common/useConfirm";
 import ConnectionDisplay, {
   ConnectionItem,
   ConnectionInfo,
