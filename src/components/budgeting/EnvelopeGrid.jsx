@@ -3,7 +3,7 @@ import React, { useState, useMemo, lazy, Suspense } from "react";
 import { useBudgetStore } from "../../stores/ui/uiStore";
 import { useUnassignedCash } from "../../hooks/budgeting/useBudgetMetadata";
 import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
-import { useTransactions } from "../../hooks/transactions/useTransactions";
+import { useTransactions } from "../../hooks/common/useTransactions";
 import useBills from "../../hooks/bills/useBills";
 import {
   calculateEnvelopeData,

@@ -3,8 +3,8 @@
  * Calculates remaining amounts needed for bill payments and funding progress
  */
 
-import { ENVELOPE_TYPES } from "../constants/categories";
-import { BIWEEKLY_MULTIPLIER } from "../constants/frequency";
+import { ENVELOPE_TYPES } from "../../constants/categories";
+import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
 
 /**
  * Calculate how much is left to fulfill the next bill payment for a bill envelope

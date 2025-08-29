@@ -1,7 +1,7 @@
 // src/new/UnifiedBillTracker.jsx
 import React, { useState, useMemo } from "react";
 import { useBudgetStore } from "../../stores/ui/uiStore";
-import { useTransactions } from "../../hooks/transactions/useTransactions";
+import { useTransactions } from "../../hooks/common/useTransactions";
 import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
 import useBills from "../../hooks/bills/useBills";
 import {
@@ -21,12 +21,12 @@ import {
   Eye,
   History,
 } from "lucide-react";
-import { getBillIcon, getIconByName } from "../../utils/billIcons";
+import { getBillIcon, getIconByName } from "../../utils/common/billIcons";
 import AddBillModal from "./AddBillModal";
 import BulkBillUpdateModal from "./BulkBillUpdateModal";
 import BillDiscoveryModal from "./BillDiscoveryModal";
 import { useBillOperations } from "../../hooks/bills/useBillOperations";
-import { generateBillSuggestions } from "../../utils/billDiscovery";
+import { generateBillSuggestions } from "../../utils/common/billDiscovery";
 import logger from "../../utils/common/logger";
 import ObjectHistoryViewer from "../history/ObjectHistoryViewer";
 import { processRecurringBill } from "../../utils/bills/recurringBillUtils";

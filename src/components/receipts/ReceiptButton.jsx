@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Camera, Receipt as ReceiptIcon } from "lucide-react";
 import ReceiptScanner from "./ReceiptScanner";
 import ReceiptToTransactionModal from "./ReceiptToTransactionModal";
-import { preloadOCR } from "../../utils/ocrProcessor";
+import { preloadOCR } from "../../utils/common/ocrProcessor";
 import logger from "../../utils/common/logger";
 
 /**

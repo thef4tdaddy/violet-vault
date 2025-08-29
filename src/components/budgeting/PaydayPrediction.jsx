@@ -1,6 +1,6 @@
 import React from "react";
 import { Calendar, TrendingUp, Clock, AlertCircle, DollarSign, Zap } from "lucide-react";
-import { formatPaydayPrediction, getDaysUntilPayday } from "../../utils/paydayPredictor";
+import { formatPaydayPrediction, getDaysUntilPayday } from "../../utils/budgeting/paydayPredictor";
 
 const PaydayPrediction = ({
   prediction,

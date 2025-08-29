@@ -36,7 +36,11 @@ import {
   ENVELOPE_TYPE_CONFIG,
   getEnvelopeCategories,
 } from "../../constants/categories";
-import { toMonthly, toBiweekly, getFrequencyOptions } from "../../utils/frequencyCalculations";
+import {
+  toMonthly,
+  toBiweekly,
+  getFrequencyOptions,
+} from "../../utils/common/frequencyCalculations";
 import logger from "../../utils/common/logger";
 
 const EditEnvelopeModal = ({

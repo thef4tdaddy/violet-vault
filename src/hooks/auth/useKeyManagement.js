@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useAuth } from "../../stores/auth/authStore.jsx";
-import { keyExportUtils } from "../../utils/common/keyExport";
+import { keyExportUtils } from "../../utils/security/keyExport";
 import logger from "../../utils/common/logger";
 
 /**

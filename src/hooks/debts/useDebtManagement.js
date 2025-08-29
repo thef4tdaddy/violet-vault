@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import useDebts from "./useDebts";
-import useBills from "./useBills";
-import useEnvelopes from "./useEnvelopes";
-import useTransactions from "./useTransactions";
+import useBills from "../bills/useBills";
+import useEnvelopes from "../budgeting/useEnvelopes";
+import useTransactions from "../common/useTransactions";
 import {
   DEBT_TYPES,
   DEBT_STATUS,
@@ -16,7 +16,7 @@ import {
   convertPaymentFrequency,
   enrichDebt,
   getUpcomingPayments,
-} from "../../utils/common/debtCalculations";
+} from "../../utils/debts/debtCalculations";
 import logger from "../../utils/common/logger.js";
 
 /**

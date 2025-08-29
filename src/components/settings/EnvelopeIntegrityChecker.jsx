@@ -5,7 +5,7 @@ import {
   removeCorruptedEnvelopes,
   repairCorruptedEnvelopes,
   getEnvelopeIntegrityReport,
-} from "../../utils/envelopeIntegrityChecker";
+} from "../../utils/budgeting/envelopeIntegrityChecker";
 import useToast from "../../hooks/common/useToast";
 import logger from "../../utils/common/logger";
 

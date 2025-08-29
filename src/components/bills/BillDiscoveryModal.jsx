@@ -12,7 +12,7 @@ import {
   Zap,
   Plus,
 } from "lucide-react";
-import { getBillIcon, getIconByName } from "../../utils/billIcons";
+import { getBillIcon, getIconByName } from "../../utils/common/billIcons";
 
 const BillDiscoveryModal = ({
   isOpen,

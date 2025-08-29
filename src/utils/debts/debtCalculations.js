@@ -6,12 +6,12 @@ import {
   DEBT_STATUS,
   PAYMENT_FREQUENCIES,
   COMPOUND_FREQUENCIES,
-} from "../constants/debts";
+} from "../../constants/debts";
 
 // Import separated debt calculation functions
-import { calculateNextPaymentDate } from "./debt-calculations/nextPaymentDate";
-import { calculatePayoffProjection } from "./debt-calculations/payoffProjection";
-import { calculateInterestPortion } from "./debt-calculations/interestCalculation";
+import { calculateNextPaymentDate } from "./calculations/nextPaymentDate";
+import { calculatePayoffProjection } from "./calculations/payoffProjection";
+import { calculateInterestPortion } from "./calculations/interestCalculation";
 
 // Re-export the imported functions for backward compatibility
 export { calculateNextPaymentDate, calculatePayoffProjection, calculateInterestPortion };

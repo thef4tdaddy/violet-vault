@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { create } from "zustand";
-import { encryptionUtils } from "../utils/encryption";
-import logger from "../utils/common/logger";
-import { identifyUser } from "../utils/highlight";
+import { encryptionUtils } from "../../utils/security/encryption";
+import logger from "../../utils/common/logger";
+import { identifyUser } from "../../utils/common/highlight";
 
 /**
  * Compare two Uint8Array objects byte-wise for equality
@@ -262,7 +262,7 @@ export const useAuth = create((set, get) => ({
       logger.auth("Starting background sync after successful login");
 
       // Import UI store to access startBackgroundSync
-      const { useBudgetStore } = await import("./uiStore");
+      const { useBudgetStore } = await import("../ui/uiStore");
       const budgetState = useBudgetStore.getState();
 
       if (budgetState.cloudSyncEnabled) {
@@ -391,7 +391,7 @@ export const useAuth = create((set, get) => ({
       logger.production("Password validation started", { hasPassword: !!password });
       logger.auth("validatePassword: Starting validation");
 
-      const { encryptionUtils } = await import("../utils/encryption");
+      const { encryptionUtils } = await import("../../utils/security/encryption");
       const authState = useAuth.getState();
       const savedData = localStorage.getItem("envelopeBudgetData");
 

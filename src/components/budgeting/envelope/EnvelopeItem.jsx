@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { getStatusStyle, getUtilizationColor } from "../../../utils/budgeting";
 import { ENVELOPE_TYPES } from "../../../constants/categories";
-import { getBillEnvelopeDisplayInfo } from "../../../utils/billEnvelopeCalculations";
+import { getBillEnvelopeDisplayInfo } from "../../../utils/budgeting/billEnvelopeCalculations";
 import { BIWEEKLY_MULTIPLIER } from "../../../constants/frequency";
 
 // Lazy load the bill funding info component

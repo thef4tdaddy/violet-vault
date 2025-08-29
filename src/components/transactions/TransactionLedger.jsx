@@ -14,7 +14,7 @@ import { useTransactionImport } from "../../hooks/transactions/useTransactionImp
 import { suggestEnvelope } from "../../utils/transactions/envelopeMatching";
 import { TRANSACTION_CATEGORIES } from "../../constants/categories";
 import { useBudgetStore } from "../../stores/ui/uiStore";
-import { useTransactions } from "../../hooks/transactions/useTransactions";
+import { useTransactions } from "../../hooks/common/useTransactions";
 import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
 import logger from "../../utils/common/logger";
 

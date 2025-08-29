@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUnassignedCash } from "./useBudgetMetadata";
 import useEnvelopes from "./useEnvelopes";
-import useBills from "./useBills";
+import useBills from "../bills/useBills";
 import { ENVELOPE_TYPES, AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
 import { budgetDb } from "../../db/budgetDb";
@@ -10,7 +10,7 @@ import { queryKeys } from "../../utils/common/queryClient";
 import {
   calculateBillEnvelopePriority,
   getRecommendedBillFunding,
-} from "../../utils/common/billEnvelopeCalculations";
+} from "../../utils/budgeting/billEnvelopeCalculations";
 import logger from "../../utils/common/logger";
 
 /**

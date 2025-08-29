@@ -21,7 +21,11 @@ import {
   RotateCcw,
 } from "lucide-react";
 import AutoFundingRuleBuilder from "./AutoFundingRuleBuilder";
-import { autoFundingEngine, RULE_TYPES, TRIGGER_TYPES } from "../../utils/autoFundingEngine";
+import {
+  autoFundingEngine,
+  RULE_TYPES,
+  TRIGGER_TYPES,
+} from "../../utils/budgeting/autoFundingEngine";
 import { useBudgetStore } from "../../stores/ui/uiStore";
 import logger from "../../utils/common/logger";
 

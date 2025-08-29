@@ -1,6 +1,6 @@
 import React from "react";
 import { Calendar } from "lucide-react";
-import { getFrequencyOptions } from "../../../utils/frequencyCalculations";
+import { getFrequencyOptions } from "../../../utils/common/frequencyCalculations";
 
 /**
  * Shared component for frequency selection

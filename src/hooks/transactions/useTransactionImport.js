@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { parseCSV, parseOFX, autoDetectFieldMapping } from "../../../utils/transactions/fileParser";
-import { autoFundingEngine } from "../../../utils/budgeting/autoFundingEngine";
+import { parseCSV, parseOFX, autoDetectFieldMapping } from "../../utils/transactions/fileParser";
+import { autoFundingEngine } from "../../utils/budgeting/autoFundingEngine";
 import logger from "../../utils/common/logger";
 
 export const useTransactionImport = (currentUser, onBulkImport, budget) => {
@@ -58,14 +58,14 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
     if (importData.clearExisting) {
       try {
         // Import Dexie database
-        const { budgetDb } = await import("../../../db/budgetDb");
+        const { budgetDb } = await import("../../db/budgetDb");
 
         // Clear transactions and paycheck history
         await budgetDb.transactions.clear();
         await budgetDb.paycheckHistory.clear();
 
         // Reset budget metadata balances
-        const { setBudgetMetadata } = await import("../../../db/budgetDb");
+        const { setBudgetMetadata } = await import("../../db/budgetDb");
         await setBudgetMetadata({
           actualBalance: 0,
           unassignedCash: 0,

@@ -1,4 +1,4 @@
-import { budgetDb } from "../db/budgetDb";
+import { budgetDb } from "../../db/budgetDb";
 import logger from "../common/logger";
 
 /**

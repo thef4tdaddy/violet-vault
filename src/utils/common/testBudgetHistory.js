@@ -1,4 +1,4 @@
-import { budgetDb } from "../db/budgetDb.js";
+import { budgetDb } from "../../db/budgetDb.js";
 import logger from "./logger.js";
 
 /**
