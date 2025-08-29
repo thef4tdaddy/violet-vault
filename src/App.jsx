@@ -5,6 +5,7 @@ import MainLayout from "./components/layout/MainLayout";
 import { cloudSyncService } from "./services/cloudSyncService";
 import BugReportButton from "./components/feedback/BugReportButton";
 import ConfirmProvider from "./components/ui/ConfirmProvider";
+import PromptProvider from "./components/ui/PromptProvider";
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -12,6 +13,7 @@ const App = () => (
       <MainLayout firebaseSync={cloudSyncService} />
       <BugReportButton />
       <ConfirmProvider />
+      <PromptProvider />
     </div>
   </QueryClientProvider>
 );

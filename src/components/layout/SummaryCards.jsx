@@ -1,6 +1,7 @@
 import React, { memo, lazy, Suspense } from "react";
 import { DollarSign, Wallet, Target, TrendingUp } from "lucide-react";
 import { useBudgetStore } from "../../stores/ui/uiStore";
+import { usePrompt } from "../../hooks/common/usePrompt";
 import { useActualBalance } from "../../hooks/budgeting/useBudgetMetadata";
 import { useUnassignedCash } from "../../hooks/budgeting/useBudgetMetadata";
 import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
@@ -18,6 +19,7 @@ const SummaryCards = () => {
   const { openUnassignedCashModal } = useBudgetStore();
   const { unassignedCash, isLoading: unassignedCashLoading } = useUnassignedCash();
   const { actualBalance, updateActualBalance } = useActualBalance();
+  const prompt = usePrompt();
 
   // Get data from TanStack Query hooks (same pattern as Dashboard)
   const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
@@ -102,12 +104,23 @@ const SummaryCards = () => {
   }
 
   // Handler for setting actual balance
-  const handleSetActualBalance = () => {
-    const newBalance = prompt(
-      "Enter your current bank account balance:",
-      actualBalance?.toString() || "0"
-    );
-    if (newBalance !== null && !isNaN(parseFloat(newBalance))) {
+  const handleSetActualBalance = async () => {
+    const newBalance = await prompt({
+      title: "Set Actual Balance",
+      message: "Enter your current bank account balance:",
+      defaultValue: actualBalance?.toString() || "0",
+      inputType: "number",
+      placeholder: "0.00",
+      validation: (value) => {
+        const num = parseFloat(value);
+        if (isNaN(num)) {
+          return { valid: false, error: "Please enter a valid number" };
+        }
+        return { valid: true };
+      },
+    });
+
+    if (newBalance !== null) {
       updateActualBalance(parseFloat(newBalance), {
         isManual: true,
         author: "User",
