@@ -65,7 +65,10 @@ export const keyExportUtils = {
       const exportSalt = crypto.getRandomValues(new Uint8Array(16));
 
       // Derive key from export password
-      const exportKey = await encryptionUtils.deriveKeyFromSalt(exportPassword, exportSalt);
+      const exportKey = await encryptionUtils.deriveKeyFromSalt(
+        exportPassword,
+        exportSalt,
+      );
 
       // Encrypt the key data
       const encryptedData = await encryptionUtils.encrypt(keyData, exportKey);
@@ -103,13 +106,15 @@ export const keyExportUtils = {
         new Uint8Array(keyData.keyData),
         { name: "AES-GCM", length: 256 },
         true,
-        ["encrypt", "decrypt"]
+        ["encrypt", "decrypt"],
       );
 
       // Verify fingerprint
       const fingerprint = await this.generateKeyFingerprint(key);
       if (fingerprint !== keyData.fingerprint) {
-        throw new Error("Key integrity verification failed - corrupted key file");
+        throw new Error(
+          "Key integrity verification failed - corrupted key file",
+        );
       }
 
       return {
@@ -133,23 +138,31 @@ export const keyExportUtils = {
    */
   async importProtectedKeyFile(protectedKeyFile, exportPassword) {
     try {
-      if (!protectedKeyFile || protectedKeyFile.type !== "violet-vault-protected-key") {
+      if (
+        !protectedKeyFile ||
+        protectedKeyFile.type !== "violet-vault-protected-key"
+      ) {
         throw new Error("Invalid protected key file format");
       }
 
       if (protectedKeyFile.version !== "1.0") {
-        throw new Error(`Unsupported protected key file version: ${protectedKeyFile.version}`);
+        throw new Error(
+          `Unsupported protected key file version: ${protectedKeyFile.version}`,
+        );
       }
 
       // Derive decryption key
       const exportSalt = new Uint8Array(protectedKeyFile.exportSalt);
-      const exportKey = await encryptionUtils.deriveKeyFromSalt(exportPassword, exportSalt);
+      const exportKey = await encryptionUtils.deriveKeyFromSalt(
+        exportPassword,
+        exportSalt,
+      );
 
       // Decrypt the key data
       const keyData = await encryptionUtils.decrypt(
         protectedKeyFile.encryptedKeyData.data,
         exportKey,
-        protectedKeyFile.encryptedKeyData.iv
+        protectedKeyFile.encryptedKeyData.iv,
       );
 
       // Import the decrypted key data
@@ -227,7 +240,9 @@ export const keyExportUtils = {
 
       // For security, limit QR code to smaller key data
       if (keyString.length > 2000) {
-        throw new Error("Key data too large for QR code - use file export instead");
+        throw new Error(
+          "Key data too large for QR code - use file export instead",
+        );
       }
 
       // Generate QR code with high error correction for better scanning reliability

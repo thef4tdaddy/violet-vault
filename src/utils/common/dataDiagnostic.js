@@ -64,7 +64,13 @@ export const runDataDiagnostic = async () => {
     }
 
     // Check all other tables (including paycheckHistory)
-    const tables = ["envelopes", "transactions", "bills", "debts", "paycheckHistory"];
+    const tables = [
+      "envelopes",
+      "transactions",
+      "bills",
+      "debts",
+      "paycheckHistory",
+    ];
     const counts = {};
 
     for (const table of tables) {
@@ -135,10 +141,16 @@ export const inspectPaycheckRecords = async () => {
       console.log({
         id: paycheck.id,
         idType: typeof paycheck.id,
-        idValid: !!(paycheck.id && typeof paycheck.id === "string" && paycheck.id !== ""),
+        idValid: !!(
+          paycheck.id &&
+          typeof paycheck.id === "string" &&
+          paycheck.id !== ""
+        ),
         amount: paycheck.amount,
         amountType: typeof paycheck.amount,
-        amountValid: !!(typeof paycheck.amount === "number" && !isNaN(paycheck.amount)),
+        amountValid: !!(
+          typeof paycheck.amount === "number" && !isNaN(paycheck.amount)
+        ),
         date: paycheck.date,
         dateType: typeof paycheck.date,
         dateValid: !!paycheck.date,
@@ -207,7 +219,9 @@ export const cleanupCorruptedPaychecks = async (confirmCallback = null) => {
       return hasInvalidId || hasInvalidAmount || hasInvalidDate;
     });
 
-    console.log(`🔍 Found ${corruptedPaychecks.length} corrupted paycheck records`);
+    console.log(
+      `🔍 Found ${corruptedPaychecks.length} corrupted paycheck records`,
+    );
 
     if (corruptedPaychecks.length > 0) {
       console.log("💀 Corrupted paychecks:", corruptedPaychecks);
@@ -221,7 +235,7 @@ export const cleanupCorruptedPaychecks = async (confirmCallback = null) => {
             destructive: true,
           })
         : window.confirm(
-            `Found ${corruptedPaychecks.length} corrupted paycheck records. Do you want to delete them? This action cannot be undone.`
+            `Found ${corruptedPaychecks.length} corrupted paycheck records. Do you want to delete them? This action cannot be undone.`,
           );
 
       if (confirmed) {
@@ -234,19 +248,25 @@ export const cleanupCorruptedPaychecks = async (confirmCallback = null) => {
             return window.budgetDb.paycheckHistory
               .where("date")
               .equals(paycheck.date)
-              .and((p) => p.amount === paycheck.amount && p.source === paycheck.source)
+              .and(
+                (p) =>
+                  p.amount === paycheck.amount && p.source === paycheck.source,
+              )
               .delete();
           }
         });
 
         await Promise.all(deletePromises);
         console.log(
-          `✅ Successfully deleted ${corruptedPaychecks.length} corrupted paycheck records`
+          `✅ Successfully deleted ${corruptedPaychecks.length} corrupted paycheck records`,
         );
 
         // Verify cleanup
-        const remainingPaychecks = await window.budgetDb.paycheckHistory.toArray();
-        console.log(`📊 Remaining paycheck records: ${remainingPaychecks.length}`);
+        const remainingPaychecks =
+          await window.budgetDb.paycheckHistory.toArray();
+        console.log(
+          `📊 Remaining paycheck records: ${remainingPaychecks.length}`,
+        );
 
         return {
           success: true,
@@ -273,6 +293,8 @@ if (typeof window !== "undefined") {
   window.cleanupCorruptedPaychecks = cleanupCorruptedPaychecks;
   window.inspectPaycheckRecords = inspectPaycheckRecords;
   console.log("🔧 Data diagnostic tool loaded! Run: runDataDiagnostic()");
-  console.log("🧹 Paycheck cleanup tool loaded! Run: cleanupCorruptedPaychecks()");
+  console.log(
+    "🧹 Paycheck cleanup tool loaded! Run: cleanupCorruptedPaychecks()",
+  );
   console.log("🔍 Paycheck inspector loaded! Run: inspectPaycheckRecords()");
 }

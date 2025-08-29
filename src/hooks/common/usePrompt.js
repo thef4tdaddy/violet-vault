@@ -63,7 +63,7 @@ export const usePrompt = () => {
         showPrompt(finalConfig, resolve);
       });
     },
-    [showPrompt]
+    [showPrompt],
   );
 
   return prompt;
@@ -99,7 +99,7 @@ export const usePromptModal = () => {
 
       hidePrompt();
     },
-    [resolver, config, hidePrompt]
+    [resolver, config, hidePrompt],
   );
 
   const handleCancel = useCallback(() => {

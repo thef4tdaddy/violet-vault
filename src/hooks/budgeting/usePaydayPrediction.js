@@ -1,5 +1,8 @@
 import { useEffect } from "react";
-import { predictNextPayday, checkRecentPayday } from "../../utils/budgeting/paydayPredictor";
+import {
+  predictNextPayday,
+  checkRecentPayday,
+} from "../../utils/budgeting/paydayPredictor";
 import useToast from "../common/useToast";
 import logger from "../../utils/common/logger";
 
@@ -28,7 +31,10 @@ const usePaydayPrediction = (paycheckHistory, isUnlocked) => {
         // Show notification if:
         // 1. Today is predicted payday OR
         // 2. Payday was yesterday and we haven't shown notification yet
-        if (recentPayday.occurred && (!lastNotification || lastNotification !== today)) {
+        if (
+          recentPayday.occurred &&
+          (!lastNotification || lastNotification !== today)
+        ) {
           let title, message;
 
           if (recentPayday.wasToday) {

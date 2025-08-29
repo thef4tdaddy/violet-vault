@@ -23,7 +23,7 @@ export const normalizeBillDate = (dateInput) => {
       (match, month, day, year) => {
         const fullYear = parseInt(year) <= 30 ? `20${year}` : `19${year}`;
         return `${month}/${day}/${fullYear}`;
-      }
+      },
     );
   }
 
@@ -101,9 +101,15 @@ export const categorizeBills = (bills) => {
   const paidBills = bills.filter((b) => b.isPaid);
 
   return {
-    upcoming: upcomingBills.sort((a, b) => (a.daysUntilDue || 999) - (b.daysUntilDue || 999)),
-    overdue: overdueBills.sort((a, b) => (a.daysUntilDue || 0) - (b.daysUntilDue || 0)),
-    paid: paidBills.sort((a, b) => new Date(b.paidDate || b.date) - new Date(a.paidDate || a.date)),
+    upcoming: upcomingBills.sort(
+      (a, b) => (a.daysUntilDue || 999) - (b.daysUntilDue || 999),
+    ),
+    overdue: overdueBills.sort(
+      (a, b) => (a.daysUntilDue || 0) - (b.daysUntilDue || 0),
+    ),
+    paid: paidBills.sort(
+      (a, b) => new Date(b.paidDate || b.date) - new Date(a.paidDate || a.date),
+    ),
     all: bills,
   };
 };
@@ -114,9 +120,18 @@ export const categorizeBills = (bills) => {
  * @returns {Object} Totals object with overdue, upcoming, and paid amounts
  */
 export const calculateBillTotals = (categorizedBills) => {
-  const overdueTotal = categorizedBills.overdue.reduce((sum, b) => sum + Math.abs(b.amount), 0);
-  const upcomingTotal = categorizedBills.upcoming.reduce((sum, b) => sum + Math.abs(b.amount), 0);
-  const paidTotal = categorizedBills.paid.reduce((sum, b) => sum + Math.abs(b.amount), 0);
+  const overdueTotal = categorizedBills.overdue.reduce(
+    (sum, b) => sum + Math.abs(b.amount),
+    0,
+  );
+  const upcomingTotal = categorizedBills.upcoming.reduce(
+    (sum, b) => sum + Math.abs(b.amount),
+    0,
+  );
+  const paidTotal = categorizedBills.paid.reduce(
+    (sum, b) => sum + Math.abs(b.amount),
+    0,
+  );
 
   return {
     overdue: overdueTotal,
@@ -141,24 +156,32 @@ export const filterBills = (bills, filterOptions = {}) => {
       (bill) =>
         (bill.description || "").toLowerCase().includes(searchTerm) ||
         (bill.provider || "").toLowerCase().includes(searchTerm) ||
-        (bill.name || "").toLowerCase().includes(searchTerm)
+        (bill.name || "").toLowerCase().includes(searchTerm),
     );
   }
 
   if (filterOptions.urgency && filterOptions.urgency !== "all") {
-    filtered = filtered.filter((bill) => bill.urgency === filterOptions.urgency);
+    filtered = filtered.filter(
+      (bill) => bill.urgency === filterOptions.urgency,
+    );
   }
 
   if (filterOptions.envelope) {
-    filtered = filtered.filter((bill) => bill.envelopeId === filterOptions.envelope);
+    filtered = filtered.filter(
+      (bill) => bill.envelopeId === filterOptions.envelope,
+    );
   }
 
   if (filterOptions.amountMin !== undefined) {
-    filtered = filtered.filter((bill) => Math.abs(bill.amount) >= filterOptions.amountMin);
+    filtered = filtered.filter(
+      (bill) => Math.abs(bill.amount) >= filterOptions.amountMin,
+    );
   }
 
   if (filterOptions.amountMax !== undefined) {
-    filtered = filtered.filter((bill) => Math.abs(bill.amount) <= filterOptions.amountMax);
+    filtered = filtered.filter(
+      (bill) => Math.abs(bill.amount) <= filterOptions.amountMax,
+    );
   }
 
   return filtered;

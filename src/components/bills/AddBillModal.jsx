@@ -1,11 +1,21 @@
 /**
  * AddBillModal Component - Refactored for Issue #152
- * 
+ *
  * UI-only component using useBillForm hook for all business logic
  * Reduced from 923 LOC to ~350 LOC by extracting form logic
  */
 import React, { useEffect } from "react";
-import { X, Save, Sparkles, Trash2, Lock, Unlock, User, Clock, Wallet } from "lucide-react";
+import {
+  X,
+  Save,
+  Sparkles,
+  Trash2,
+  Lock,
+  Unlock,
+  User,
+  Clock,
+  Wallet,
+} from "lucide-react";
 import { useBillForm } from "../../hooks/bills/useBillForm";
 import useEditLock from "../../hooks/common/useEditLock";
 import { initializeEditLocks } from "../../services/editLockService";
@@ -35,22 +45,22 @@ const AddBillModal = ({
     showDeleteConfirm,
     deleteEnvelopeToo,
     isSubmitting,
-    
+
     // Computed Values
     suggestedIconName,
     iconSuggestions,
     categories,
-    
+
     // Actions
     handleSubmit,
     handleDelete,
     updateField,
     resetForm,
-    
+
     // UI State Setters
     setShowDeleteConfirm,
     setDeleteEnvelopeToo,
-    
+
     // Utility Functions
     calculateBiweeklyAmount,
     calculateMonthlyAmount,
@@ -76,18 +86,12 @@ const AddBillModal = ({
   }, [isOpen, budgetId, currentUser]);
 
   // Edit locking for the bill (only when editing existing bill)
-  const {
-    isLocked,
-    isOwnLock,
-    canEdit,
-    lockedBy,
-    acquireLock,
-    releaseLock,
-  } = useEditLock(
-    editingBill ? `bill-${editingBill.id}` : null,
-    currentUser?.userName || "User",
-    editingBill ? 300000 : 0 // 5 minutes for editing existing bills
-  );
+  const { isLocked, isOwnLock, canEdit, lockedBy, acquireLock, releaseLock } =
+    useEditLock(
+      editingBill ? `bill-${editingBill.id}` : null,
+      currentUser?.userName || "User",
+      editingBill ? 300000 : 0, // 5 minutes for editing existing bills
+    );
 
   // Auto-acquire lock when editing existing bill
   useEffect(() => {
@@ -120,13 +124,12 @@ const AddBillModal = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-xl w-full max-w-4xl max-h-[95vh] overflow-y-auto shadow-2xl">
-        
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-              {React.createElement(getIconByName(formData.iconName) || Wallet, { 
-                className: "h-5 w-5 text-blue-600" 
+              {React.createElement(getIconByName(formData.iconName) || Wallet, {
+                className: "h-5 w-5 text-blue-600",
               })}
             </div>
             <div>
@@ -134,13 +137,13 @@ const AddBillModal = ({
                 {editingBill ? "Edit Bill" : "Add New Bill"}
               </h2>
               <p className="text-sm text-gray-600">
-                {editingBill 
-                  ? `Modify details for ${editingBill.name}` 
+                {editingBill
+                  ? `Modify details for ${editingBill.name}`
                   : "Set up a new recurring bill"}
               </p>
             </div>
           </div>
-          
+
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -177,10 +180,8 @@ const AddBillModal = ({
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6 p-6">
-          
           {/* Basic Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
             {/* Bill Name */}
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -189,10 +190,12 @@ const AddBillModal = ({
               <input
                 type="text"
                 value={formData.name}
-                onChange={(e) => updateField('name', e.target.value)}
+                onChange={(e) => updateField("name", e.target.value)}
                 disabled={editingBill && !canEdit}
                 className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                  editingBill && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
+                  editingBill && !canEdit
+                    ? "bg-gray-100 cursor-not-allowed"
+                    : ""
                 }`}
                 placeholder="e.g., Electric Bill, Internet, Rent"
                 required
@@ -213,10 +216,12 @@ const AddBillModal = ({
                   step="0.01"
                   min="0"
                   value={formData.amount}
-                  onChange={(e) => updateField('amount', e.target.value)}
+                  onChange={(e) => updateField("amount", e.target.value)}
                   disabled={editingBill && !canEdit}
                   className={`w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                    editingBill && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
+                    editingBill && !canEdit
+                      ? "bg-gray-100 cursor-not-allowed"
+                      : ""
                   }`}
                   placeholder="0.00"
                   required
@@ -232,10 +237,12 @@ const AddBillModal = ({
               <input
                 type="date"
                 value={formData.dueDate}
-                onChange={(e) => updateField('dueDate', e.target.value)}
+                onChange={(e) => updateField("dueDate", e.target.value)}
                 disabled={editingBill && !canEdit}
                 className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                  editingBill && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
+                  editingBill && !canEdit
+                    ? "bg-gray-100 cursor-not-allowed"
+                    : ""
                 }`}
                 required
               />
@@ -248,13 +255,15 @@ const AddBillModal = ({
               </label>
               <select
                 value={formData.frequency}
-                onChange={(e) => updateField('frequency', e.target.value)}
+                onChange={(e) => updateField("frequency", e.target.value)}
                 disabled={editingBill && !canEdit}
                 className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                  editingBill && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
+                  editingBill && !canEdit
+                    ? "bg-gray-100 cursor-not-allowed"
+                    : ""
                 }`}
               >
-                {frequencyOptions.map(option => (
+                {frequencyOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
@@ -269,13 +278,15 @@ const AddBillModal = ({
               </label>
               <select
                 value={formData.category}
-                onChange={(e) => updateField('category', e.target.value)}
+                onChange={(e) => updateField("category", e.target.value)}
                 disabled={editingBill && !canEdit}
                 className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                  editingBill && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
+                  editingBill && !canEdit
+                    ? "bg-gray-100 cursor-not-allowed"
+                    : ""
                 }`}
               >
-                {categories.map(category => (
+                {categories.map((category) => (
                   <option key={category} value={category}>
                     {category}
                   </option>
@@ -291,7 +302,7 @@ const AddBillModal = ({
               {suggestedIconName !== formData.iconName && (
                 <button
                   type="button"
-                  onClick={() => updateField('iconName', suggestedIconName)}
+                  onClick={() => updateField("iconName", suggestedIconName)}
                   className="ml-2 text-xs text-blue-600 hover:text-blue-800"
                   disabled={editingBill && !canEdit}
                 >
@@ -305,7 +316,7 @@ const AddBillModal = ({
                 <button
                   key={name}
                   type="button"
-                  onClick={() => updateField('iconName', name)}
+                  onClick={() => updateField("iconName", name)}
                   disabled={editingBill && !canEdit}
                   className={`p-2 rounded-lg border-2 transition-colors ${
                     formData.iconName === name
@@ -313,7 +324,9 @@ const AddBillModal = ({
                       : "border-gray-200 hover:border-gray-300"
                   } ${editingBill && !canEdit ? "cursor-not-allowed opacity-50" : ""}`}
                 >
-                  {React.createElement(Icon, { className: "h-5 w-5 text-gray-600" })}
+                  {React.createElement(Icon, {
+                    className: "h-5 w-5 text-gray-600",
+                  })}
                 </button>
               ))}
             </div>
@@ -326,16 +339,17 @@ const AddBillModal = ({
             </label>
             <select
               value={formData.selectedEnvelope}
-              onChange={(e) => updateField('selectedEnvelope', e.target.value)}
+              onChange={(e) => updateField("selectedEnvelope", e.target.value)}
               disabled={editingBill && !canEdit}
               className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
                 editingBill && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
               }`}
             >
               <option value="">Select an envelope (optional)</option>
-              {availableEnvelopes.map(envelope => (
+              {availableEnvelopes.map((envelope) => (
                 <option key={envelope.id} value={envelope.id}>
-                  {envelope.name} (${envelope.currentBalance?.toFixed(2) || '0.00'})
+                  {envelope.name} ($
+                  {envelope.currentBalance?.toFixed(2) || "0.00"})
                 </option>
               ))}
             </select>
@@ -348,7 +362,7 @@ const AddBillModal = ({
             </label>
             <textarea
               value={formData.notes}
-              onChange={(e) => updateField('notes', e.target.value)}
+              onChange={(e) => updateField("notes", e.target.value)}
               disabled={editingBill && !canEdit}
               rows={3}
               className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
@@ -361,18 +375,30 @@ const AddBillModal = ({
           {/* Calculation Preview */}
           {formData.amount && formData.frequency && (
             <div className="bg-gray-50 p-4 rounded-lg">
-              <h4 className="text-sm font-medium text-gray-700 mb-2">Calculation Preview</h4>
+              <h4 className="text-sm font-medium text-gray-700 mb-2">
+                Calculation Preview
+              </h4>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="text-gray-600">Monthly equivalent:</span>
                   <span className="font-medium ml-2">
-                    ${calculateMonthlyAmount(formData.amount, formData.frequency, formData.customFrequency).toFixed(2)}
+                    $
+                    {calculateMonthlyAmount(
+                      formData.amount,
+                      formData.frequency,
+                      formData.customFrequency,
+                    ).toFixed(2)}
                   </span>
                 </div>
                 <div>
                   <span className="text-gray-600">Biweekly equivalent:</span>
                   <span className="font-medium ml-2">
-                    ${calculateBiweeklyAmount(formData.amount, formData.frequency, formData.customFrequency).toFixed(2)}
+                    $
+                    {calculateBiweeklyAmount(
+                      formData.amount,
+                      formData.frequency,
+                      formData.customFrequency,
+                    ).toFixed(2)}
                   </span>
                 </div>
                 {formData.dueDate && (
@@ -389,7 +415,6 @@ const AddBillModal = ({
 
           {/* Action Buttons */}
           <div className="flex flex-col-reverse sm:flex-row sm:justify-between items-center gap-4 pt-6 border-t border-gray-200">
-            
             {/* Delete Button (only for existing bills) */}
             {editingBill && (
               <button
@@ -413,7 +438,7 @@ const AddBillModal = ({
               >
                 Cancel
               </button>
-              
+
               <button
                 type="submit"
                 disabled={isSubmitting || (editingBill && !canEdit)}
@@ -444,15 +469,19 @@ const AddBillModal = ({
                   <Trash2 className="h-6 w-6 text-red-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Delete Bill</h3>
-                  <p className="text-sm text-gray-600">This action cannot be undone</p>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Delete Bill
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    This action cannot be undone
+                  </p>
                 </div>
               </div>
-              
+
               <p className="text-gray-700 mb-4">
                 Are you sure you want to delete "{editingBill?.name}"?
               </p>
-              
+
               <div className="flex items-center mb-4">
                 <input
                   type="checkbox"
@@ -461,11 +490,14 @@ const AddBillModal = ({
                   onChange={(e) => setDeleteEnvelopeToo(e.target.checked)}
                   className="rounded border-gray-300 text-red-600 focus:ring-red-500"
                 />
-                <label htmlFor="deleteEnvelope" className="ml-2 text-sm text-gray-700">
+                <label
+                  htmlFor="deleteEnvelope"
+                  className="ml-2 text-sm text-gray-700"
+                >
                   Also delete associated envelope
                 </label>
               </div>
-              
+
               <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setShowDeleteConfirm(false)}

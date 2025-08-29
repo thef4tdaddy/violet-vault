@@ -98,7 +98,10 @@ class EditLockService {
         }
       } else if (existingLock && existingLock.userId === this.currentUser.id) {
         // User already owns this lock - extend it and continue
-        logger.debug("🔓 Extending existing lock owned by current user", { recordType, recordId });
+        logger.debug("🔓 Extending existing lock owned by current user", {
+          recordType,
+          recordId,
+        });
         const extendedLock = {
           ...lockDoc, // Use the new lockDoc structure instead of existing
           expiresAt: new Date(Date.now() + (options.duration || 60000)),
@@ -107,7 +110,11 @@ class EditLockService {
         await setDoc(doc(firestore, "locks", lockId), extendedLock);
         this.locks.set(lockId, extendedLock);
         this.startHeartbeat(lockId);
-        return { success: true, lockDoc: extendedLock, reason: "extended_existing" };
+        return {
+          success: true,
+          lockDoc: extendedLock,
+          reason: "extended_existing",
+        };
       }
 
       // Acquire the lock - using correct path per security rules
@@ -132,10 +139,13 @@ class EditLockService {
         error.code === "permission-denied" ||
         error.message?.includes("Missing or insufficient permissions")
       ) {
-        logger.warn("❌ Edit locks unavailable - insufficient Firebase permissions", {
-          userId: this.currentUser?.id,
-          budgetId: this.budgetId?.slice(0, 8),
-        });
+        logger.warn(
+          "❌ Edit locks unavailable - insufficient Firebase permissions",
+          {
+            userId: this.currentUser?.id,
+            budgetId: this.budgetId?.slice(0, 8),
+          },
+        );
         // Return success but indicate locks are disabled
         return { success: true, reason: "locks_disabled", lockDoc: null };
       }
@@ -170,10 +180,13 @@ class EditLockService {
         error.code === "permission-denied" ||
         error.message?.includes("Missing or insufficient permissions")
       ) {
-        logger.warn("❌ Failed to release lock - insufficient permissions (continuing anyway)", {
-          recordType,
-          recordId,
-        });
+        logger.warn(
+          "❌ Failed to release lock - insufficient permissions (continuing anyway)",
+          {
+            recordType,
+            recordId,
+          },
+        );
         // Remove from local cache even if Firebase failed
         this.locks.delete(lockId);
         this.stopHeartbeat(lockId);
@@ -195,7 +208,7 @@ class EditLockService {
         collection(firestore, "locks"),
         where("recordType", "==", recordType),
         where("recordId", "==", recordId),
-        where("budgetId", "==", this.budgetId) // Filter by current budget
+        where("budgetId", "==", this.budgetId), // Filter by current budget
       );
 
       const snapshot = await getDocs(q);
@@ -232,7 +245,7 @@ class EditLockService {
       collection(firestore, "locks"),
       where("recordType", "==", recordType),
       where("recordId", "==", recordId),
-      where("budgetId", "==", this.budgetId) // Filter by current budget
+      where("budgetId", "==", this.budgetId), // Filter by current budget
     );
 
     const unsubscribe = onSnapshot(
@@ -247,7 +260,7 @@ class EditLockService {
       (error) => {
         logger.error("Lock listener error", error);
         callback(null);
-      }
+      },
     );
 
     this.lockListeners.set(lockId, unsubscribe);
@@ -282,7 +295,7 @@ class EditLockService {
             lastActivity: serverTimestamp(),
             expiresAt: new Date(Date.now() + 60000), // Extend by 60 seconds
           },
-          { merge: true }
+          { merge: true },
         );
 
         // Update local cache

@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { getVersionInfo, getVersionInfoAsync, getCacheStatus } from "../../utils/version";
+import {
+  getVersionInfo,
+  getVersionInfoAsync,
+  getCacheStatus,
+} from "../../utils/version";
 import logger from "../../utils/common/logger";
 
 /**
@@ -34,7 +38,7 @@ const VersionFooter = () => {
           });
       } else {
         logger.debug(
-          `🎯 Using cached milestone (expires in ${currentCache.daysUntilExpiry > 0 ? currentCache.daysUntilExpiry + " days" : currentCache.hoursUntilExpiry + " hours"})`
+          `🎯 Using cached milestone (expires in ${currentCache.daysUntilExpiry > 0 ? currentCache.daysUntilExpiry + " days" : currentCache.hoursUntilExpiry + " hours"})`,
         );
         // Use cached version
         getVersionInfoAsync().then((updatedInfo) => {
@@ -48,21 +52,24 @@ const VersionFooter = () => {
   const getEnvironmentStyles = () => {
     if (versionInfo.environment === "development") {
       return {
-        container: "glassmorphism rounded-2xl p-4 max-w-md mx-auto border-l-4 border-orange-400",
+        container:
+          "glassmorphism rounded-2xl p-4 max-w-md mx-auto border-l-4 border-orange-400",
         title: "font-semibold text-orange-600",
         version: "text-orange-700 font-mono",
         label: "text-orange-600 text-xs font-medium",
       };
     } else if (versionInfo.environment === "preview") {
       return {
-        container: "glassmorphism rounded-2xl p-4 max-w-md mx-auto border-l-4 border-blue-400",
+        container:
+          "glassmorphism rounded-2xl p-4 max-w-md mx-auto border-l-4 border-blue-400",
         title: "font-semibold text-blue-600",
         version: "text-blue-700 font-mono",
         label: "text-blue-600 text-xs font-medium",
       };
     } else {
       return {
-        container: "glassmorphism rounded-2xl p-4 max-w-md mx-auto border-l-4 border-green-400",
+        container:
+          "glassmorphism rounded-2xl p-4 max-w-md mx-auto border-l-4 border-green-400",
         title: "font-semibold text-purple-600",
         version: "text-gray-700 font-mono",
         label: "text-green-600 text-xs font-medium",
@@ -84,7 +91,8 @@ const VersionFooter = () => {
           <span className={styles.label}>{versionInfo.environmentLabel}</span>
           {versionInfo.isDevelopment && versionInfo.futureVersion && (
             <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
-              → v{versionInfo.baseVersion} targeting v{versionInfo.futureVersion}
+              → v{versionInfo.baseVersion} targeting v
+              {versionInfo.futureVersion}
             </span>
           )}
           {versionInfo.environment === "production" && (
@@ -110,11 +118,12 @@ const VersionFooter = () => {
             <p className="text-xs text-orange-600 font-medium">
               Development build from {versionInfo.branch} branch
             </p>
-            {versionInfo.commitMessage && versionInfo.commitMessage !== "Build without git" && (
-              <p className="text-xs text-orange-500 mt-1 italic truncate">
-                "{versionInfo.commitMessage}"
-              </p>
-            )}
+            {versionInfo.commitMessage &&
+              versionInfo.commitMessage !== "Build without git" && (
+                <p className="text-xs text-orange-500 mt-1 italic truncate">
+                  "{versionInfo.commitMessage}"
+                </p>
+              )}
             {cacheInfo.isValid && (
               <p className="text-xs text-orange-400 mt-1">
                 📦 Cached milestone (expires in{" "}

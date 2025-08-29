@@ -9,7 +9,10 @@ import {
   ArrowRight,
   CheckCircle,
 } from "lucide-react";
-import { compareDebtStrategies, calculateExtraPaymentImpact } from "../../utils/debtStrategies";
+import {
+  compareDebtStrategies,
+  calculateExtraPaymentImpact,
+} from "../../utils/debtStrategies";
 
 /**
  * Debt Payment Strategies Component
@@ -21,27 +24,32 @@ const DebtStrategies = ({ debts }) => {
 
   // Filter to active debts only
   const activeDebts = useMemo(
-    () => debts.filter((debt) => debt.status === "active" && debt.currentBalance > 0),
-    [debts]
+    () =>
+      debts.filter(
+        (debt) => debt.status === "active" && debt.currentBalance > 0,
+      ),
+    [debts],
   );
 
   // Calculate strategy comparison
   const strategyComparison = useMemo(
     () => compareDebtStrategies(activeDebts, extraPayment),
-    [activeDebts, extraPayment]
+    [activeDebts, extraPayment],
   );
 
   // Calculate extra payment impact
   const paymentImpact = useMemo(
     () => calculateExtraPaymentImpact(activeDebts, selectedStrategy),
-    [activeDebts, selectedStrategy]
+    [activeDebts, selectedStrategy],
   );
 
   if (activeDebts.length === 0) {
     return (
       <div className="glassmorphism rounded-2xl p-6 text-center">
         <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">No Active Debts!</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-2">
+          No Active Debts!
+        </h3>
         <p className="text-gray-600">
           Congratulations! You don't have any active debts to strategize about.
         </p>
@@ -61,13 +69,17 @@ const DebtStrategies = ({ debts }) => {
           <h2 className="text-xl font-semibold">Debt Payoff Strategies</h2>
         </div>
         <p className="text-gray-600 mb-4">
-          Optimize your debt payments with proven strategies. Compare different approaches and see
-          the impact of extra payments on your payoff timeline.
+          Optimize your debt payments with proven strategies. Compare different
+          approaches and see the impact of extra payments on your payoff
+          timeline.
         </p>
 
         {/* Extra Payment Input */}
         <div className="flex items-center gap-4">
-          <label htmlFor="extraPayment" className="text-sm font-medium text-gray-700">
+          <label
+            htmlFor="extraPayment"
+            className="text-sm font-medium text-gray-700"
+          >
             Extra Monthly Payment:
           </label>
           <div className="relative">
@@ -115,7 +127,9 @@ const DebtStrategies = ({ debts }) => {
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Payoff Time</span>
-              <span className="font-medium">{avalanche.summary.timeToPayoff}</span>
+              <span className="font-medium">
+                {avalanche.summary.timeToPayoff}
+              </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Total Interest</span>
@@ -135,7 +149,10 @@ const DebtStrategies = ({ debts }) => {
               <p className="text-sm text-gray-600 mb-2">Payoff Order:</p>
               <div className="space-y-1">
                 {avalanche.payoffOrder.slice(0, 3).map((debt, index) => (
-                  <div key={debt.debtId} className="flex items-center gap-2 text-sm">
+                  <div
+                    key={debt.debtId}
+                    className="flex items-center gap-2 text-sm"
+                  >
                     <span className="w-5 h-5 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-medium">
                       {index + 1}
                     </span>
@@ -180,7 +197,9 @@ const DebtStrategies = ({ debts }) => {
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Payoff Time</span>
-              <span className="font-medium">{snowball.summary.timeToPayoff}</span>
+              <span className="font-medium">
+                {snowball.summary.timeToPayoff}
+              </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Total Interest</span>
@@ -190,7 +209,9 @@ const DebtStrategies = ({ debts }) => {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Total Payment</span>
-              <span className="font-medium">${snowball.summary.totalPayment.toLocaleString()}</span>
+              <span className="font-medium">
+                ${snowball.summary.totalPayment.toLocaleString()}
+              </span>
             </div>
 
             {/* Payoff Order Preview */}
@@ -198,7 +219,10 @@ const DebtStrategies = ({ debts }) => {
               <p className="text-sm text-gray-600 mb-2">Payoff Order:</p>
               <div className="space-y-1">
                 {snowball.payoffOrder.slice(0, 3).map((debt, index) => (
-                  <div key={debt.debtId} className="flex items-center gap-2 text-sm">
+                  <div
+                    key={debt.debtId}
+                    className="flex items-center gap-2 text-sm"
+                  >
                     <span className="w-5 h-5 bg-green-100 text-green-700 rounded-full flex items-center justify-center text-xs font-medium">
                       {index + 1}
                     </span>
@@ -243,7 +267,9 @@ const DebtStrategies = ({ debts }) => {
             <p className="text-lg font-semibold text-purple-600">
               {snowball.payoffOrder.filter((d) => d.monthPaidOff <= 12).length}
             </p>
-            <p className="text-xs text-gray-500">debts paid in 1 year (snowball)</p>
+            <p className="text-xs text-gray-500">
+              debts paid in 1 year (snowball)
+            </p>
           </div>
         </div>
 
@@ -286,10 +312,17 @@ const DebtStrategies = ({ debts }) => {
             </thead>
             <tbody>
               {paymentImpact.map((impact, index) => (
-                <tr key={impact.extraPayment} className={index === 0 ? "bg-gray-50" : ""}>
-                  <td className="p-3 font-medium">${impact.extraPayment}/month</td>
+                <tr
+                  key={impact.extraPayment}
+                  className={index === 0 ? "bg-gray-50" : ""}
+                >
+                  <td className="p-3 font-medium">
+                    ${impact.extraPayment}/month
+                  </td>
                   <td className="p-3">{impact.timeToPayoff}</td>
-                  <td className="p-3 text-red-600">${impact.totalInterest.toLocaleString()}</td>
+                  <td className="p-3 text-red-600">
+                    ${impact.totalInterest.toLocaleString()}
+                  </td>
                   <td className="p-3">
                     {index === 0 ? (
                       <span className="text-gray-500">Baseline</span>
@@ -307,11 +340,13 @@ const DebtStrategies = ({ debts }) => {
 
         <div className="mt-4 p-3 bg-green-50 rounded-lg">
           <p className="text-sm text-green-800">
-            <strong>Impact:</strong> An extra ${extraPayment}/month could save you{" "}
+            <strong>Impact:</strong> An extra ${extraPayment}/month could save
+            you{" "}
             <strong>
               $
               {Math.abs(
-                paymentImpact.find((p) => p.extraPayment === extraPayment)?.monthlySavings || 0
+                paymentImpact.find((p) => p.extraPayment === extraPayment)
+                  ?.monthlySavings || 0,
               ).toLocaleString()}
             </strong>{" "}
             in interest payments and help you become debt-free faster.

@@ -45,7 +45,10 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
     }
 
     // Calculate overall financial health score (0-100)
-    const budgetAdherence = calculateBudgetAdherence(analyticsData, balanceData);
+    const budgetAdherence = calculateBudgetAdherence(
+      analyticsData,
+      balanceData,
+    );
     const savingsRate = calculateSavingsRate(analyticsData, balanceData);
     const spendingEfficiency = calculateSpendingEfficiency(analyticsData);
     const balanceStability = calculateBalanceStability(balanceData);
@@ -54,7 +57,7 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
       budgetAdherence * 0.3 +
         savingsRate * 0.25 +
         spendingEfficiency * 0.25 +
-        balanceStability * 0.2
+        balanceStability * 0.2,
     );
 
     // Generate alerts based on performance
@@ -87,7 +90,8 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
 
   // Calculate budget adherence score
   function calculateBudgetAdherence(analytics, balance) {
-    if (!balance.envelopeAnalysis || balance.envelopeAnalysis.length === 0) return 0;
+    if (!balance.envelopeAnalysis || balance.envelopeAnalysis.length === 0)
+      return 0;
 
     const adherenceScores = balance.envelopeAnalysis.map((envelope) => {
       const budget = envelope.monthlyBudget || 0;
@@ -103,7 +107,8 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
     });
 
     return Math.round(
-      adherenceScores.reduce((sum, score) => sum + score, 0) / adherenceScores.length
+      adherenceScores.reduce((sum, score) => sum + score, 0) /
+        adherenceScores.length,
     );
   }
 
@@ -129,7 +134,10 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
     if (!analytics.categoryBreakdown) return 50;
 
     const categories = Object.values(analytics.categoryBreakdown);
-    const totalExpenses = categories.reduce((sum, cat) => sum + (cat.expenses || 0), 0);
+    const totalExpenses = categories.reduce(
+      (sum, cat) => sum + (cat.expenses || 0),
+      0,
+    );
 
     if (totalExpenses === 0) return 100;
 
@@ -159,7 +167,8 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
 
     if (isBalanced) return 100;
 
-    const discrepancyRatio = Math.abs(difference) / Math.max(1, Math.abs(actualBalance));
+    const discrepancyRatio =
+      Math.abs(difference) / Math.max(1, Math.abs(actualBalance));
 
     if (discrepancyRatio <= 0.01) return 95; // 1% or less
     if (discrepancyRatio <= 0.05) return 80; // 5% or less
@@ -255,7 +264,8 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
       recommendations.push({
         type: "warning",
         title: "Financial Health Needs Attention",
-        message: "Several areas require improvement for better financial stability",
+        message:
+          "Several areas require improvement for better financial stability",
         action: "Prioritize budget planning and expense tracking",
       });
     }
@@ -265,7 +275,8 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
       recommendations.push({
         type: "tip",
         title: "Improve Budget Adherence",
-        message: "Set more realistic budget amounts based on historical spending",
+        message:
+          "Set more realistic budget amounts based on historical spending",
         action: "Use the Smart Envelope Suggestions feature",
       });
     }
@@ -328,14 +339,22 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
         {/* Overall Score */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Financial Health Score</h3>
-            <div className={`p-2 rounded-lg ${getScoreBgColor(performanceMetrics.overallScore)}`}>
-              <Zap className={`h-5 w-5 ${getScoreColor(performanceMetrics.overallScore)}`} />
+            <h3 className="text-lg font-semibold text-gray-900">
+              Financial Health Score
+            </h3>
+            <div
+              className={`p-2 rounded-lg ${getScoreBgColor(performanceMetrics.overallScore)}`}
+            >
+              <Zap
+                className={`h-5 w-5 ${getScoreColor(performanceMetrics.overallScore)}`}
+              />
             </div>
           </div>
 
           <div className="text-center">
-            <div className={`text-4xl font-bold ${getScoreColor(performanceMetrics.overallScore)}`}>
+            <div
+              className={`text-4xl font-bold ${getScoreColor(performanceMetrics.overallScore)}`}
+            >
               {performanceMetrics.overallScore}
             </div>
             <div className="text-gray-600 mt-1">out of 100</div>
@@ -344,7 +363,9 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
             <div className="mt-4 space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Budget Adherence</span>
-                <span className={getScoreColor(performanceMetrics.budgetAdherence)}>
+                <span
+                  className={getScoreColor(performanceMetrics.budgetAdherence)}
+                >
                   {performanceMetrics.budgetAdherence}%
                 </span>
               </div>
@@ -356,13 +377,19 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
               </div>
               <div className="flex justify-between text-sm">
                 <span>Spending Efficiency</span>
-                <span className={getScoreColor(performanceMetrics.spendingEfficiency)}>
+                <span
+                  className={getScoreColor(
+                    performanceMetrics.spendingEfficiency,
+                  )}
+                >
                   {performanceMetrics.spendingEfficiency}%
                 </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span>Balance Stability</span>
-                <span className={getScoreColor(performanceMetrics.balanceStability)}>
+                <span
+                  className={getScoreColor(performanceMetrics.balanceStability)}
+                >
                   {performanceMetrics.balanceStability}%
                 </span>
               </div>
@@ -373,7 +400,9 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
         {/* Real-time Alerts */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Active Alerts</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Active Alerts
+            </h3>
             <button
               onClick={() => setAlertsEnabled(!alertsEnabled)}
               className={`p-2 rounded-lg ${alertsEnabled ? "bg-green-100" : "bg-gray-100"}`}
@@ -391,7 +420,9 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
               <div className="text-center py-4">
                 <CheckCircle className="h-8 w-8 text-green-500 mx-auto mb-2" />
                 <p className="text-gray-600">No active alerts</p>
-                <p className="text-sm text-gray-500">Your finances are on track</p>
+                <p className="text-sm text-gray-500">
+                  Your finances are on track
+                </p>
               </div>
             ) : (
               performanceMetrics.alerts.map((alert, index) => (
@@ -414,15 +445,21 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
                       <CheckCircle className="h-5 w-5 text-blue-600 mt-0.5" />
                     )}
                     <div className="flex-1">
-                      <h4 className="font-medium text-gray-900 text-sm">{alert.title}</h4>
-                      <p className="text-sm text-gray-600 mt-1">{alert.message}</p>
+                      <h4 className="font-medium text-gray-900 text-sm">
+                        {alert.title}
+                      </h4>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {alert.message}
+                      </p>
                       {alert.action && (
                         <p className="text-xs text-gray-500 mt-2 font-medium">
                           Action: {alert.action}
                         </p>
                       )}
                       {alert.details && (
-                        <p className="text-xs text-gray-400 mt-1">Details: {alert.details}</p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          Details: {alert.details}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -435,7 +472,9 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
 
       {/* Recommendations */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Smart Recommendations</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          Smart Recommendations
+        </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {performanceMetrics.recommendations.map((rec, index) => (
@@ -458,9 +497,13 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
                   <Target className="h-5 w-5 text-blue-600 mt-0.5" />
                 )}
                 <div>
-                  <h4 className="font-medium text-gray-900 text-sm">{rec.title}</h4>
+                  <h4 className="font-medium text-gray-900 text-sm">
+                    {rec.title}
+                  </h4>
                   <p className="text-sm text-gray-600 mt-1">{rec.message}</p>
-                  <p className="text-xs text-gray-500 mt-2 font-medium">{rec.action}</p>
+                  <p className="text-xs text-gray-500 mt-2 font-medium">
+                    {rec.action}
+                  </p>
                 </div>
               </div>
             </div>
@@ -471,7 +514,9 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
       {/* Performance Trends (Real-time) */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Performance Trends</h3>
+          <h3 className="text-lg font-semibold text-gray-900">
+            Performance Trends
+          </h3>
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Clock className="h-4 w-4" />
             <span>Updates every 30 seconds</span>
@@ -482,7 +527,9 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
           <div className="text-center p-4 bg-gray-50 rounded-lg">
             <DollarSign className="h-8 w-8 text-green-600 mx-auto mb-2" />
             <p className="text-sm text-gray-600">Budget Performance</p>
-            <p className={`text-xl font-bold ${getScoreColor(performanceMetrics.budgetAdherence)}`}>
+            <p
+              className={`text-xl font-bold ${getScoreColor(performanceMetrics.budgetAdherence)}`}
+            >
               {performanceMetrics.budgetAdherence}%
             </p>
           </div>
@@ -490,7 +537,9 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
           <div className="text-center p-4 bg-gray-50 rounded-lg">
             <TrendingUp className="h-8 w-8 text-blue-600 mx-auto mb-2" />
             <p className="text-sm text-gray-600">Savings Momentum</p>
-            <p className={`text-xl font-bold ${getScoreColor(performanceMetrics.savingsRate)}`}>
+            <p
+              className={`text-xl font-bold ${getScoreColor(performanceMetrics.savingsRate)}`}
+            >
               {performanceMetrics.savingsRate}%
             </p>
           </div>

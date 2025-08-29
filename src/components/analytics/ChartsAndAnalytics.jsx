@@ -95,7 +95,14 @@ const ChartsAnalytics = ({
     currentUser?.userName,
   ]);
 
-  const MetricCard = ({ title, value, subtitle, icon, trend, color = "purple" }) => {
+  const MetricCard = ({
+    title,
+    value,
+    subtitle,
+    icon,
+    trend,
+    color = "purple",
+  }) => {
     const Icon = icon;
 
     const gradientClasses = {
@@ -149,15 +156,23 @@ const ChartsAnalytics = ({
       >
         <div className="flex items-center justify-between">
           <div>
-            <p className={`${textClasses[color] || textClasses.purple} text-sm`}>{title}</p>
+            <p
+              className={`${textClasses[color] || textClasses.purple} text-sm`}
+            >
+              {title}
+            </p>
             <p className="text-2xl font-bold">{value}</p>
             {subtitle && (
-              <p className={`text-xs ${textClasses[color] || textClasses.purple} mt-2`}>
+              <p
+                className={`text-xs ${textClasses[color] || textClasses.purple} mt-2`}
+              >
                 {subtitle}
               </p>
             )}
           </div>
-          <Icon className={`h-8 w-8 ${iconClasses[color] || iconClasses.purple}`} />
+          <Icon
+            className={`h-8 w-8 ${iconClasses[color] || iconClasses.purple}`}
+          />
         </div>
         {trend && (
           <div className="mt-3 flex items-center text-sm">
@@ -166,7 +181,9 @@ const ChartsAnalytics = ({
             ) : (
               <ArrowDownRight className="h-4 w-4 text-white mr-1" />
             )}
-            <span className="text-white">{Math.abs(trend).toFixed(1)}% vs last period</span>
+            <span className="text-white">
+              {Math.abs(trend).toFixed(1)}% vs last period
+            </span>
           </div>
         )}
       </div>
@@ -187,7 +204,9 @@ const ChartsAnalytics = ({
             </div>
             Analytics & Reports
           </h2>
-          <p className="text-gray-800 mt-1">Financial insights and spending patterns</p>
+          <p className="text-gray-800 mt-1">
+            Financial insights and spending patterns
+          </p>
         </div>
 
         <div className="flex gap-3">
@@ -274,7 +293,11 @@ const ChartsAnalytics = ({
       {activeTab === "overview" && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Monthly Cash Flow */}
-          <CashFlowChart title="Monthly Cash Flow" data={monthlyTrends} height={300} />
+          <CashFlowChart
+            title="Monthly Cash Flow"
+            data={monthlyTrends}
+            height={300}
+          />
 
           {/* Top Spending Envelopes */}
           <DistributionPieChart
@@ -293,7 +316,9 @@ const ChartsAnalytics = ({
           {/* Spending Trends Chart */}
           <div className="glassmorphism rounded-xl p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Spending Trends</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Spending Trends
+              </h3>
               <div className="flex gap-2">
                 {["line", "bar", "area"].map((type) => (
                   <button
@@ -348,7 +373,9 @@ const ChartsAnalytics = ({
           <CategoryBarChart
             title="Weekly Spending Patterns"
             data={weeklyPatterns}
-            bars={[{ dataKey: "amount", name: "Amount Spent", fill: "#a855f7" }]}
+            bars={[
+              { dataKey: "amount", name: "Amount Spent", fill: "#a855f7" },
+            ]}
             height={300}
             emptyMessage="No weekly spending data available"
           />
@@ -359,17 +386,24 @@ const ChartsAnalytics = ({
         <div className="space-y-6">
           {/* Envelope Health Overview */}
           <div className="glassmorphism rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Envelope Health</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Envelope Health
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {envelopeHealth.map((envelope, index) => (
-                <div key={index} className="bg-white/60 rounded-lg p-4 border border-white/20">
+                <div
+                  key={index}
+                  className="bg-white/60 rounded-lg p-4 border border-white/20"
+                >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center">
                       <div
                         className="w-3 h-3 rounded-full mr-2"
                         style={{ backgroundColor: envelope.color }}
                       />
-                      <span className="font-medium text-gray-900">{envelope.name}</span>
+                      <span className="font-medium text-gray-900">
+                        {envelope.name}
+                      </span>
                     </div>
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -388,11 +422,15 @@ const ChartsAnalytics = ({
                   <div className="space-y-1 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Balance:</span>
-                      <span className="font-medium">${envelope.currentBalance.toFixed(2)}</span>
+                      <span className="font-medium">
+                        ${envelope.currentBalance.toFixed(2)}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Budget:</span>
-                      <span className="font-medium">${envelope.monthlyBudget.toFixed(2)}</span>
+                      <span className="font-medium">
+                        ${envelope.monthlyBudget.toFixed(2)}
+                      </span>
                     </div>
                   </div>
                   <div className="mt-2">

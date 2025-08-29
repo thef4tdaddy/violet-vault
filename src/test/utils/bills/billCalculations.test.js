@@ -14,7 +14,7 @@ import {
 } from "../../../utils/bills/billCalculations";
 
 // Mock console to avoid warnings in tests
-const mockConsoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+const mockConsoleWarn = vi.spyOn(console, "warn").mockImplementation(() => {});
 
 describe("Bill Calculations Utilities", () => {
   beforeEach(() => {
@@ -144,7 +144,7 @@ describe("Bill Calculations Utilities", () => {
           amount: 100,
           daysUntilDue: 5,
           urgency: "soon",
-        })
+        }),
       );
     });
 
@@ -218,8 +218,8 @@ describe("Bill Calculations Utilities", () => {
       expect(result.overdue[0].id).toBe("bill-1");
 
       expect(result.upcoming).toHaveLength(2);
-      expect(result.upcoming.map(b => b.id)).toContain("bill-2");
-      expect(result.upcoming.map(b => b.id)).toContain("bill-4");
+      expect(result.upcoming.map((b) => b.id)).toContain("bill-2");
+      expect(result.upcoming.map((b) => b.id)).toContain("bill-4");
 
       expect(result.paid).toHaveLength(1);
       expect(result.paid[0].id).toBe("bill-3");
@@ -264,9 +264,7 @@ describe("Bill Calculations Utilities", () => {
         { amount: 100, monthlyAmount: 100 },
         { amount: 150, monthlyAmount: 150 },
       ],
-      overdue: [
-        { amount: 75, monthlyAmount: 75 },
-      ],
+      overdue: [{ amount: 75, monthlyAmount: 75 }],
       paid: [
         { amount: 200, monthlyAmount: 200 },
         { amount: 50, monthlyAmount: 50 },
@@ -304,10 +302,7 @@ describe("Bill Calculations Utilities", () => {
 
     it("should handle bills without monthlyAmount", () => {
       const billsWithoutMonthly = {
-        upcoming: [
-          { amount: 100 },
-          { amount: 150 },
-        ],
+        upcoming: [{ amount: 100 }, { amount: 150 }],
         overdue: [],
         paid: [],
         all: [{ amount: 100 }, { amount: 150 }],
@@ -327,14 +322,14 @@ describe("Bill Calculations Utilities", () => {
         name: "Electric Bill",
         category: "Utilities",
         urgency: "overdue",
-        amount: 120.50,
+        amount: 120.5,
       },
       {
         id: "bill-2",
         name: "Internet Service",
         category: "Utilities",
         urgency: "soon",
-        amount: 75.00,
+        amount: 75.0,
       },
       {
         id: "bill-3",

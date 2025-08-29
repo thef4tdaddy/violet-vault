@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import { autoFundingEngine, TRIGGER_TYPES } from "../../utils/common/autoFundingEngine";
+import {
+  autoFundingEngine,
+  TRIGGER_TYPES,
+} from "../../utils/common/autoFundingEngine";
 import { useBudgetStore } from "../../stores/ui/uiStore";
 import logger from "../../utils/common/logger";
 
@@ -26,12 +29,16 @@ export const useAutoFunding = () => {
       if (savedData) {
         const data = JSON.parse(savedData);
         autoFundingEngine.importDataWithUndoStack(data);
-        logger.info("Auto-funding data with undo stack loaded from localStorage", {
-          rulesCount: data.rules?.length || 0,
-          historyCount: data.executionHistory?.length || 0,
-          patternsCount: data.incomePatterns?.length || 0,
-          undoableCount: data.undoStack?.filter((item) => item.canUndo).length || 0,
-        });
+        logger.info(
+          "Auto-funding data with undo stack loaded from localStorage",
+          {
+            rulesCount: data.rules?.length || 0,
+            historyCount: data.executionHistory?.length || 0,
+            patternsCount: data.incomePatterns?.length || 0,
+            undoableCount:
+              data.undoStack?.filter((item) => item.canUndo).length || 0,
+          },
+        );
       }
 
       // Load current rules and history
@@ -110,7 +117,7 @@ export const useAutoFunding = () => {
         setIsExecuting(false);
       }
     },
-    [budget, isExecuting, refreshData]
+    [budget, isExecuting, refreshData],
   );
 
   // Add new rule
@@ -125,7 +132,7 @@ export const useAutoFunding = () => {
         throw error;
       }
     },
-    [refreshData]
+    [refreshData],
   );
 
   // Update existing rule
@@ -140,7 +147,7 @@ export const useAutoFunding = () => {
         throw error;
       }
     },
-    [refreshData]
+    [refreshData],
   );
 
   // Delete rule
@@ -157,7 +164,7 @@ export const useAutoFunding = () => {
         throw error;
       }
     },
-    [refreshData]
+    [refreshData],
   );
 
   // Toggle rule enabled status
@@ -174,7 +181,7 @@ export const useAutoFunding = () => {
         throw error;
       }
     },
-    [updateRule]
+    [updateRule],
   );
 
   // Clear execution history
@@ -209,7 +216,7 @@ export const useAutoFunding = () => {
         throw error;
       }
     },
-    [refreshData]
+    [refreshData],
   );
 
   // Undo operations
@@ -227,7 +234,10 @@ export const useAutoFunding = () => {
   const undoExecution = useCallback(
     async (executionId) => {
       try {
-        const result = await autoFundingEngine.undoExecution(executionId, budget);
+        const result = await autoFundingEngine.undoExecution(
+          executionId,
+          budget,
+        );
         refreshData();
         return result;
       } catch (error) {
@@ -235,7 +245,7 @@ export const useAutoFunding = () => {
         throw error;
       }
     },
-    [budget, refreshData]
+    [budget, refreshData],
   );
 
   const getUndoableExecutions = useCallback(() => {
@@ -262,7 +272,10 @@ export const useAutoFunding = () => {
 
       try {
         // Use smart income detection instead of simple positive amount check
-        const result = await autoFundingEngine.handleNewTransaction(transaction, budget);
+        const result = await autoFundingEngine.handleNewTransaction(
+          transaction,
+          budget,
+        );
 
         if (result) {
           logger.info("Auto-funding triggered by income detection", {
@@ -278,7 +291,7 @@ export const useAutoFunding = () => {
         logger.error("Error handling smart income detection", error);
       }
     },
-    [isInitialized, isExecuting, budget, refreshData]
+    [isInitialized, isExecuting, budget, refreshData],
   );
 
   // Check for scheduled rule execution
@@ -291,9 +304,11 @@ export const useAutoFunding = () => {
         if (!rule.enabled) return false;
 
         // Check for scheduled triggers
-        return [TRIGGER_TYPES.MONTHLY, TRIGGER_TYPES.WEEKLY, TRIGGER_TYPES.BIWEEKLY].includes(
-          rule.trigger
-        );
+        return [
+          TRIGGER_TYPES.MONTHLY,
+          TRIGGER_TYPES.WEEKLY,
+          TRIGGER_TYPES.BIWEEKLY,
+        ].includes(rule.trigger);
       });
 
       if (scheduledRules.length > 0) {
@@ -335,7 +350,7 @@ export const useAutoFunding = () => {
       () => {
         checkScheduledRules();
       },
-      5 * 60 * 1000
+      5 * 60 * 1000,
     ); // Check every 5 minutes
 
     return () => clearInterval(interval);
@@ -347,9 +362,10 @@ export const useAutoFunding = () => {
     const totalExecutions = executionHistory.length;
     const totalFunded = executionHistory.reduce(
       (sum, execution) => sum + (execution.totalFunded || 0),
-      0
+      0,
     );
-    const lastExecution = executionHistory.length > 0 ? executionHistory[0] : null;
+    const lastExecution =
+      executionHistory.length > 0 ? executionHistory[0] : null;
 
     return {
       totalRules: rules.length,

@@ -9,16 +9,23 @@ import SupplementalAccounts from "../accounts/SupplementalAccounts";
 import PaycheckProcessor from "../budgeting/PaycheckProcessor";
 import BillManager from "../bills/BillManager";
 import TransactionLedger from "../transactions/TransactionLedger";
-const ChartsAndAnalytics = React.lazy(() => import("../analytics/ChartsAndAnalytics"));
+const ChartsAndAnalytics = React.lazy(
+  () => import("../analytics/ChartsAndAnalytics"),
+);
 // Temporarily disable lazy loading due to chunk loading error
 // const DebtDashboard = React.lazy(() => import("../debt/DebtDashboard"));
 import DebtDashboard from "../debt/DebtDashboard";
 import { isDebtFeatureEnabled } from "../../utils/debts/debtDebugConfig";
-const AutoFundingView = React.lazy(() => import("../automation/AutoFundingView"));
+const AutoFundingView = React.lazy(
+  () => import("../automation/AutoFundingView"),
+);
 const ActivityFeed = React.lazy(() => import("../activity/ActivityFeed"));
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ErrorBoundary } from "@highlight-run/react";
-import { useUnassignedCash, useActualBalance } from "../../hooks/budgeting/useBudgetMetadata";
+import {
+  useUnassignedCash,
+  useActualBalance,
+} from "../../hooks/budgeting/useBudgetMetadata";
 import useBills from "../../hooks/bills/useBills";
 import useBudgetData from "../../hooks/budgeting/useBudgetData";
 import logger from "../../utils/common/logger";
@@ -27,18 +34,27 @@ import logger from "../../utils/common/logger";
  * ViewRenderer component for handling main content switching
  * Extracted from Layout.jsx for better organization
  */
-const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setActiveView }) => {
+const ViewRenderer = ({
+  activeView,
+  budget,
+  currentUser,
+  totalBiweeklyNeed,
+  setActiveView,
+}) => {
   // Use TanStack Query hooks for budget metadata
   const { unassignedCash } = useUnassignedCash();
   // useActualBalance hook called but values not currently needed
   useActualBalance();
 
   // Get bill operations from TanStack Query hook instead of budget store
-  const { updateBill: tanStackUpdateBill, addBill: tanStackAddBill } = useBills();
+  const { updateBill: tanStackUpdateBill, addBill: tanStackAddBill } =
+    useBills();
 
   // Get TanStack Query paycheck operations for proper UI updates
-  const { processPaycheck: tanStackProcessPaycheck, paycheckHistory: tanStackPaycheckHistory } =
-    useBudgetData();
+  const {
+    processPaycheck: tanStackProcessPaycheck,
+    paycheckHistory: tanStackPaycheckHistory,
+  } = useBudgetData();
 
   // TanStack Query data consistency check - force cache refresh if Dexie has data but TanStack doesn't
   const budgetData = useBudgetData();
@@ -46,19 +62,30 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
     const ensureDataConsistency = async () => {
       try {
         // Only check if we're not currently loading and have no envelope data
-        if (!budgetData.isLoading && (!budgetData.envelopes || budgetData.envelopes.length === 0)) {
+        if (
+          !budgetData.isLoading &&
+          (!budgetData.envelopes || budgetData.envelopes.length === 0)
+        ) {
           const { budgetDb } = await import("../../db/budgetDb");
           const dexieEnvelopes = await budgetDb.envelopes.toArray();
 
           // If Dexie has data but TanStack doesn't, force cache refresh
           if (dexieEnvelopes.length > 0) {
-            const { queryClient } = await import("../../utils/common/queryClient");
-            const { queryKeys } = await import("../../utils/common/queryClient");
+            const { queryClient } = await import(
+              "../../utils/common/queryClient"
+            );
+            const { queryKeys } = await import(
+              "../../utils/common/queryClient"
+            );
 
             // Force invalidate and refetch envelope queries
             queryClient.invalidateQueries({ queryKey: queryKeys.envelopes });
-            queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
-            await queryClient.refetchQueries({ queryKey: queryKeys.envelopesList() });
+            queryClient.invalidateQueries({
+              queryKey: queryKeys.envelopesList(),
+            });
+            await queryClient.refetchQueries({
+              queryKey: queryKeys.envelopesList(),
+            });
           }
         }
       } catch (error) {
@@ -87,7 +114,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
 
   // Filter out null/undefined transactions to prevent runtime errors
   const safeTransactions = (transactions || []).filter(
-    (t) => t && typeof t === "object" && typeof t.amount === "number"
+    (t) => t && typeof t === "object" && typeof t.amount === "number",
   );
 
   // Stable callback for bill updates
@@ -102,10 +129,13 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
       try {
         // Use TanStack Query updateBill for proper bill persistence with envelope assignment
         tanStackUpdateBill({ id: updatedBill.id, updates: updatedBill });
-        logger.debug("ViewRenderer TanStack updateBill completed successfully", {
-          billId: updatedBill.id,
-          envelopeId: updatedBill.envelopeId,
-        });
+        logger.debug(
+          "ViewRenderer TanStack updateBill completed successfully",
+          {
+            billId: updatedBill.id,
+            envelopeId: updatedBill.envelopeId,
+          },
+        );
       } catch (error) {
         logger.error("Error in ViewRenderer handleUpdateBill", error, {
           billId: updatedBill.id,
@@ -113,7 +143,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
         });
       }
     },
-    [tanStackUpdateBill]
+    [tanStackUpdateBill],
   );
 
   // Debug log to verify function creation - only on dev sites
@@ -193,9 +223,13 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
             });
 
             // Get the paycheck to delete from TanStack Query data
-            const paycheckToDelete = tanStackPaycheckHistory.find((p) => p.id === paycheckId);
+            const paycheckToDelete = tanStackPaycheckHistory.find(
+              (p) => p.id === paycheckId,
+            );
             if (!paycheckToDelete) {
-              throw new Error(`Paycheck with ID ${paycheckId} not found in paycheckHistory`);
+              throw new Error(
+                `Paycheck with ID ${paycheckId} not found in paycheckHistory`,
+              );
             }
 
             logger.info("Found paycheck to delete", {
@@ -206,9 +240,8 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
             });
 
             // Import required functions
-            const { budgetDb, getBudgetMetadata, setBudgetMetadata } = await import(
-              "../../db/budgetDb"
-            );
+            const { budgetDb, getBudgetMetadata, setBudgetMetadata } =
+              await import("../../db/budgetDb");
 
             // Get current metadata
             const currentMetadata = await getBudgetMetadata();
@@ -216,19 +249,30 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
             const currentUnassignedCash = currentMetadata?.unassignedCash || 0;
 
             // Calculate new balances (subtract the paycheck amount)
-            const newActualBalance = currentActualBalance - paycheckToDelete.amount;
+            const newActualBalance =
+              currentActualBalance - paycheckToDelete.amount;
             let newUnassignedCash = currentUnassignedCash;
 
             // Handle envelope balance reversals if this was an "allocate" paycheck
-            if (paycheckToDelete.mode === "allocate" && paycheckToDelete.envelopeAllocations) {
-              logger.info("Reversing envelope allocations for allocate mode paycheck");
+            if (
+              paycheckToDelete.mode === "allocate" &&
+              paycheckToDelete.envelopeAllocations
+            ) {
+              logger.info(
+                "Reversing envelope allocations for allocate mode paycheck",
+              );
 
               // Subtract from envelope balances
               for (const allocation of paycheckToDelete.envelopeAllocations) {
-                const envelope = await budgetDb.envelopes.get(allocation.envelopeId);
+                const envelope = await budgetDb.envelopes.get(
+                  allocation.envelopeId,
+                );
                 if (envelope) {
                   await budgetDb.envelopes.update(allocation.envelopeId, {
-                    currentBalance: Math.max(0, (envelope.currentBalance || 0) - allocation.amount),
+                    currentBalance: Math.max(
+                      0,
+                      (envelope.currentBalance || 0) - allocation.amount,
+                    ),
                   });
                   logger.debug("Reversed envelope allocation", {
                     envelopeId: allocation.envelopeId,
@@ -238,16 +282,25 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
               }
 
               // Calculate how much went to unassigned cash originally
-              const totalAllocated = paycheckToDelete.envelopeAllocations.reduce(
-                (sum, alloc) => sum + alloc.amount,
-                0
-              );
+              const totalAllocated =
+                paycheckToDelete.envelopeAllocations.reduce(
+                  (sum, alloc) => sum + alloc.amount,
+                  0,
+                );
               const leftoverAmount = paycheckToDelete.amount - totalAllocated;
-              newUnassignedCash = Math.max(0, currentUnassignedCash - leftoverAmount);
+              newUnassignedCash = Math.max(
+                0,
+                currentUnassignedCash - leftoverAmount,
+              );
             } else {
-              logger.info("Reversing leftover mode paycheck from unassigned cash");
+              logger.info(
+                "Reversing leftover mode paycheck from unassigned cash",
+              );
               // "leftover" mode - all went to unassigned cash, so subtract it all
-              newUnassignedCash = Math.max(0, currentUnassignedCash - paycheckToDelete.amount);
+              newUnassignedCash = Math.max(
+                0,
+                currentUnassignedCash - paycheckToDelete.amount,
+              );
             }
 
             // Update budget metadata
@@ -270,7 +323,8 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
             });
 
             // Verify the paycheck exists in Dexie before attempting to delete
-            const existsInDexie = await budgetDb.paycheckHistory.get(paycheckId);
+            const existsInDexie =
+              await budgetDb.paycheckHistory.get(paycheckId);
             if (!existsInDexie) {
               logger.warn("Paycheck not found in Dexie database", {
                 paycheckId,
@@ -284,8 +338,12 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
             // await deletePaycheck(paycheckId);
 
             // Invalidate TanStack Query caches to refresh UI
-            const { queryClient } = await import("../../utils/common/queryClient");
-            const { queryKeys } = await import("../../utils/common/queryClient");
+            const { queryClient } = await import(
+              "../../utils/common/queryClient"
+            );
+            const { queryKeys } = await import(
+              "../../utils/common/queryClient"
+            );
 
             queryClient.invalidateQueries({
               queryKey: queryKeys.paycheckHistory(),
@@ -296,17 +354,24 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
             });
             queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
 
-            logger.info("Paycheck deleted successfully with proper balance reversal", {
-              paycheckId,
-              actualBalanceChange: newActualBalance - currentActualBalance,
-              unassignedCashChange: newUnassignedCash - currentUnassignedCash,
-            });
+            logger.info(
+              "Paycheck deleted successfully with proper balance reversal",
+              {
+                paycheckId,
+                actualBalanceChange: newActualBalance - currentActualBalance,
+                unassignedCashChange: newUnassignedCash - currentUnassignedCash,
+              },
+            );
           } catch (error) {
-            logger.error("Failed to delete paycheck with proper balance reversal", error, {
-              paycheckId,
-              errorMessage: error.message,
-              errorStack: error.stack,
-            });
+            logger.error(
+              "Failed to delete paycheck with proper balance reversal",
+              error,
+              {
+                paycheckId,
+                errorMessage: error.message,
+                errorStack: error.stack,
+              },
+            );
             throw error;
           }
         }}
@@ -347,7 +412,9 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
             createdAt: new Date().toISOString(),
           };
           tanStackAddBill(bill);
-          logger.debug("✅ Bill stored successfully - no transaction created until paid");
+          logger.debug(
+            "✅ Bill stored successfully - no transaction created until paid",
+          );
         }}
         onSearchNewBills={async () => {
           try {
@@ -355,13 +422,13 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
             // For now, we'll show a placeholder notification
             globalToast.showInfo(
               "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox.",
-              "Feature Coming Soon"
+              "Feature Coming Soon",
             );
           } catch (error) {
             logger.error("Failed to search for new bills:", error);
             globalToast.showError(
               "Failed to search for new bills. Please try again.",
-              "Search Failed"
+              "Search Failed",
             );
           }
         }}
@@ -391,7 +458,8 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
           Debt Dashboard Temporarily Disabled
         </h2>
         <p className="text-gray-600 mb-4">
-          The debt dashboard is currently disabled for debugging the temporal dead zone error.
+          The debt dashboard is currently disabled for debugging the temporal
+          dead zone error.
         </p>
         <p className="text-sm text-gray-500">
           Debug configuration can be adjusted in src/utils/debtDebugConfig.js
@@ -412,7 +480,9 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
 
   return (
     <ErrorBoundary>
-      <Suspense fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}>
+      <Suspense
+        fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}
+      >
         {views[activeView]}
       </Suspense>
     </ErrorBoundary>

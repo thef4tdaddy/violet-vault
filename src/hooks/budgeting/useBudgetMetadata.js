@@ -33,7 +33,9 @@ export const useBudgetMetadata = () => {
 
       // Initialize metadata record if it doesn't exist (new users or clean installs)
       if (!result) {
-        logger.debug("TanStack Query: No metadata found, initializing with defaults");
+        logger.debug(
+          "TanStack Query: No metadata found, initializing with defaults",
+        );
         const defaultMetadata = {
           unassignedCash: 0,
           actualBalance: 0,
@@ -44,7 +46,10 @@ export const useBudgetMetadata = () => {
         await setBudgetMetadata(defaultMetadata);
         result = defaultMetadata;
 
-        logger.debug("TanStack Query: Budget metadata initialized with defaults", defaultMetadata);
+        logger.debug(
+          "TanStack Query: Budget metadata initialized with defaults",
+          defaultMetadata,
+        );
       }
 
       logger.debug("TanStack Query: Budget metadata loaded", {
@@ -68,7 +73,10 @@ export const useBudgetMetadata = () => {
   // Mutation for updating budget metadata
   const updateMetadataMutation = useMutation({
     mutationFn: async (updates) => {
-      logger.debug("TanStack Query: Updating budget metadata in Dexie", updates);
+      logger.debug(
+        "TanStack Query: Updating budget metadata in Dexie",
+        updates,
+      );
       await setBudgetMetadata(updates);
       return updates;
     },
@@ -115,7 +123,7 @@ export const useBudgetMetadata = () => {
         return false;
       }
     },
-    [metadata, updateMetadataMutation, unassignedCash]
+    [metadata, updateMetadataMutation, unassignedCash],
   );
 
   const updateActualBalance = useCallback(
@@ -171,7 +179,7 @@ export const useBudgetMetadata = () => {
         return false;
       }
     },
-    [metadata, updateMetadataMutation, actualBalance]
+    [metadata, updateMetadataMutation, actualBalance],
   );
 
   const setBiweeklyAllocation = useCallback(
@@ -192,7 +200,7 @@ export const useBudgetMetadata = () => {
         return false;
       }
     },
-    [metadata, updateMetadataMutation]
+    [metadata, updateMetadataMutation],
   );
 
   // Utility functions
@@ -201,7 +209,7 @@ export const useBudgetMetadata = () => {
       if (!isActualBalanceManual || !calculatedBalance) return 0;
       return actualBalance - calculatedBalance;
     },
-    [actualBalance, isActualBalanceManual]
+    [actualBalance, isActualBalanceManual],
   );
 
   const shouldConfirmChange = useCallback(
@@ -209,7 +217,7 @@ export const useBudgetMetadata = () => {
       const changeAmount = Math.abs(newBalance - actualBalance);
       return changeAmount >= threshold;
     },
-    [actualBalance]
+    [actualBalance],
   );
 
   const formatBalance = useCallback((balance, options = {}) => {
@@ -300,7 +308,7 @@ export const useUnassignedCash = () => {
       // Initialize metadata record if it doesn't exist (same as main hook)
       if (!metadata) {
         logger.debug(
-          "TanStack Query: No metadata found in useUnassignedCash, initializing with defaults"
+          "TanStack Query: No metadata found in useUnassignedCash, initializing with defaults",
         );
         const defaultMetadata = {
           unassignedCash: 0,
@@ -313,7 +321,7 @@ export const useUnassignedCash = () => {
         metadata = defaultMetadata;
         logger.debug(
           "TanStack Query: Budget metadata initialized in useUnassignedCash",
-          defaultMetadata
+          defaultMetadata,
         );
       }
 
@@ -373,7 +381,7 @@ export const useUnassignedCash = () => {
         return false;
       }
     },
-    [updateUnassignedCashMutation, unassignedCash]
+    [updateUnassignedCashMutation, unassignedCash],
   );
 
   return {
@@ -406,7 +414,7 @@ export const useActualBalance = () => {
       // Initialize metadata record if it doesn't exist (same as main hook)
       if (!metadata) {
         logger.debug(
-          "TanStack Query: No metadata found in useActualBalance, initializing with defaults"
+          "TanStack Query: No metadata found in useActualBalance, initializing with defaults",
         );
         const defaultMetadata = {
           unassignedCash: 0,
@@ -419,7 +427,7 @@ export const useActualBalance = () => {
         metadata = defaultMetadata;
         logger.debug(
           "TanStack Query: Budget metadata initialized in useActualBalance",
-          defaultMetadata
+          defaultMetadata,
         );
       }
 
@@ -513,7 +521,7 @@ export const useActualBalance = () => {
         return false;
       }
     },
-    [updateActualBalanceMutation, balanceData.actualBalance]
+    [updateActualBalanceMutation, balanceData.actualBalance],
   );
 
   // Utility functions (same as original useActualBalance hook)
@@ -522,15 +530,17 @@ export const useActualBalance = () => {
       if (!balanceData.isActualBalanceManual || !calculatedBalance) return 0;
       return (balanceData.actualBalance || 0) - calculatedBalance;
     },
-    [balanceData.actualBalance, balanceData.isActualBalanceManual]
+    [balanceData.actualBalance, balanceData.isActualBalanceManual],
   );
 
   const shouldConfirmChange = useCallback(
     (newBalance, threshold = 500) => {
-      const changeAmount = Math.abs(newBalance - (balanceData.actualBalance || 0));
+      const changeAmount = Math.abs(
+        newBalance - (balanceData.actualBalance || 0),
+      );
       return changeAmount >= threshold;
     },
-    [balanceData.actualBalance]
+    [balanceData.actualBalance],
   );
 
   const formatBalance = useCallback((balance, options = {}) => {

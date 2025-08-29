@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { calculateDebtAvalanche, calculateDebtSnowball } from "../../utils/debtStrategies";
+import {
+  calculateDebtAvalanche,
+  calculateDebtSnowball,
+} from "../../utils/debtStrategies";
 
 describe("Debt Strategy Calculations", () => {
   const mockDebts = [

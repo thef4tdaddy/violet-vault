@@ -29,7 +29,9 @@ export const useBillQueryFunction = (options = {}) => {
       logger.debug("TanStack Query: Loaded from Dexie", {
         count: bills.length,
         firstBill: bills[0],
-        billTitles: bills.map((b) => b.name || b.title || b.billName || "No Name").slice(0, 3),
+        billTitles: bills
+          .map((b) => b.name || b.title || b.billName || "No Name")
+          .slice(0, 3),
         billStructure: bills[0] ? Object.keys(bills[0]) : "No bills",
       });
     } catch (error) {
@@ -71,7 +73,9 @@ export const useBillQueryFunction = (options = {}) => {
 
     // Apply category filter
     if (category) {
-      filteredBills = filteredBills.filter((bill) => bill.category === category);
+      filteredBills = filteredBills.filter(
+        (bill) => bill.category === category,
+      );
     }
 
     // Apply sorting
@@ -112,7 +116,8 @@ export const useBillQueryFunction = (options = {}) => {
       filteredStillExist: filteredBills.length > 0,
       firstOriginalBill: bills[0],
       firstFilteredBill: filteredBills[0],
-      filterApplied: status !== "all" ? `Applied ${status} filter` : "No filter applied",
+      filterApplied:
+        status !== "all" ? `Applied ${status} filter` : "No filter applied",
     });
 
     return filteredBills;

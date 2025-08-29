@@ -8,11 +8,11 @@ export { default as envelopeStyles } from "./envelopeStyles.js";
 export { default as paydayPredictor } from "./paydayPredictor.js";
 
 // Export specific functions from envelopeStyles
-export { 
-  getEnvelopeTypeStyle, 
-  getStatusStyle, 
-  getStatusIcon, 
-  getUtilizationColor 
+export {
+  getEnvelopeTypeStyle,
+  getStatusStyle,
+  getStatusIcon,
+  getUtilizationColor,
 } from "./envelopeStyles.js";
 
 // Export specific functions from envelopeCalculations
@@ -23,5 +23,5 @@ export {
   sortEnvelopes,
   filterEnvelopes,
   calculateEnvelopeTotals,
-  calculateBiweeklyNeeds
+  calculateBiweeklyNeeds,
 } from "./envelopeCalculations.js";

@@ -25,13 +25,19 @@ const useAuthFlow = () => {
   const handleSetup = useCallback(
     async (userData) => {
       logger.auth("Layout handleSetup called", { hasUserData: !!userData });
-      logger.auth("🚨 DEBUG VERSION 2: useAuthFlow.js with debug logging is running!");
+      logger.auth(
+        "🚨 DEBUG VERSION 2: useAuthFlow.js with debug logging is running!",
+      );
       try {
         // ALWAYS generate budgetId deterministically from password for cross-device sync
-        const { encryptionUtils } = await import("../../utils/security/encryption");
+        const { encryptionUtils } = await import(
+          "../../utils/security/encryption"
+        );
 
         // Debug: Track source of budget ID problem
-        const generatedBudgetId = await encryptionUtils.generateBudgetId(userData.password);
+        const generatedBudgetId = await encryptionUtils.generateBudgetId(
+          userData.password,
+        );
         logger.auth("🔍 DEBUG: useAuthFlow budget ID investigation", {
           originalUserDataBudgetId: userData.budgetId || "none",
           generatedBudgetId,
@@ -54,7 +60,9 @@ const useAuthFlow = () => {
         logger.auth("Login result", { success: !!result });
 
         if (result.success) {
-          logger.production("User login successful", { budgetId: userData.budgetId });
+          logger.production("User login successful", {
+            budgetId: userData.budgetId,
+          });
 
           // Budget history is now handled automatically by the Dexie/Cloud Sync system
           logger.auth("✅ Budget history system ready (Dexie-based)");
@@ -64,14 +72,17 @@ const useAuthFlow = () => {
           }
         } else {
           logger.error("❌ Setup failed:", result.error);
-          showErrorToast(`Setup failed: ${result.error}`, "Account Setup Failed");
+          showErrorToast(
+            `Setup failed: ${result.error}`,
+            "Account Setup Failed",
+          );
         }
       } catch (error) {
         logger.error("❌ Setup error:", error);
         showErrorToast(`Setup error: ${error.message}`, "Setup Error");
       }
     },
-    [login, showErrorToast]
+    [login, showErrorToast],
   );
 
   const handleLogout = useCallback(() => {
@@ -82,12 +93,15 @@ const useAuthFlow = () => {
     async (oldPass, newPass) => {
       const result = await changePassword(oldPass, newPass);
       if (!result.success) {
-        showErrorToast(`Password change failed: ${result.error}`, "Password Change Failed");
+        showErrorToast(
+          `Password change failed: ${result.error}`,
+          "Password Change Failed",
+        );
       } else {
         showSuccessToast("Password updated successfully", "Password Changed");
       }
     },
-    [changePassword, showErrorToast, showSuccessToast]
+    [changePassword, showErrorToast, showSuccessToast],
   );
 
   const handleUpdateProfile = useCallback(
@@ -97,7 +111,7 @@ const useAuthFlow = () => {
         throw new Error(result.error);
       }
     },
-    [updateProfile]
+    [updateProfile],
   );
 
   return {

@@ -2,13 +2,19 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useBudgetStore } from "../../stores/ui/uiStore";
 import { queryKeys, optimisticHelpers } from "../../utils/common/queryClient";
-import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "../../db/budgetDb";
+import {
+  budgetDb,
+  getBudgetMetadata,
+  setBudgetMetadata,
+} from "../../db/budgetDb";
 import logger from "../../utils/common/logger.js";
 
 // Helper to trigger sync for transaction changes
 const triggerTransactionSync = (changeType) => {
   if (typeof window !== "undefined" && window.cloudSyncService) {
-    window.cloudSyncService.triggerSyncForCriticalChange(`transaction_${changeType}`);
+    window.cloudSyncService.triggerSyncForCriticalChange(
+      `transaction_${changeType}`,
+    );
   }
 };
 
@@ -29,8 +35,10 @@ const useTransactions = (options = {}) => {
   } = options;
 
   // Get Zustand store for UI state only (transactions are managed by TanStack Query → Dexie)
-  const { transactions: zustandTransactions, allTransactions: zustandAllTransactions } =
-    useBudgetStore();
+  const {
+    transactions: zustandTransactions,
+    allTransactions: zustandAllTransactions,
+  } = useBudgetStore();
 
   // TanStack Query function - hydrates from Dexie, Dexie syncs with Firebase
   const queryFunction = async () => {
@@ -42,7 +50,10 @@ const useTransactions = (options = {}) => {
       let transactions = [];
 
       // Always fetch from Dexie (single source of truth for local data)
-      transactions = await budgetDb.transactions.orderBy("date").reverse().toArray();
+      transactions = await budgetDb.transactions
+        .orderBy("date")
+        .reverse()
+        .toArray();
 
       logger.debug("TanStack Query: Loaded from Dexie", {
         count: transactions.length,
@@ -51,7 +62,9 @@ const useTransactions = (options = {}) => {
 
       // If Dexie is empty and we have Zustand data, seed Dexie
       const zustandData =
-        zustandAllTransactions?.length > 0 ? zustandAllTransactions : zustandTransactions;
+        zustandAllTransactions?.length > 0
+          ? zustandAllTransactions
+          : zustandTransactions;
       if (transactions.length === 0 && zustandData && zustandData.length > 0) {
         logger.debug("TanStack Query: Seeding Dexie from Zustand", {
           zustandDataLength: zustandData.length,
@@ -74,20 +87,30 @@ const useTransactions = (options = {}) => {
       let filteredTransactions = transactions;
 
       if (envelopeId) {
-        filteredTransactions = filteredTransactions.filter((t) => t.envelopeId === envelopeId);
+        filteredTransactions = filteredTransactions.filter(
+          (t) => t.envelopeId === envelopeId,
+        );
       }
 
       if (category) {
-        filteredTransactions = filteredTransactions.filter((t) => t.category === category);
+        filteredTransactions = filteredTransactions.filter(
+          (t) => t.category === category,
+        );
       }
 
       if (type) {
         if (type === "income") {
-          filteredTransactions = filteredTransactions.filter((t) => t.amount > 0);
+          filteredTransactions = filteredTransactions.filter(
+            (t) => t.amount > 0,
+          );
         } else if (type === "expense") {
-          filteredTransactions = filteredTransactions.filter((t) => t.amount < 0);
+          filteredTransactions = filteredTransactions.filter(
+            (t) => t.amount < 0,
+          );
         } else if (type === "transfer") {
-          filteredTransactions = filteredTransactions.filter((t) => t.type === "transfer");
+          filteredTransactions = filteredTransactions.filter(
+            (t) => t.type === "transfer",
+          );
         }
       }
 
@@ -127,7 +150,9 @@ const useTransactions = (options = {}) => {
       });
       // Emergency fallback only when Dexie completely fails
       const zustandData =
-        zustandAllTransactions?.length > 0 ? zustandAllTransactions : zustandTransactions;
+        zustandAllTransactions?.length > 0
+          ? zustandAllTransactions
+          : zustandTransactions;
       return zustandData || [];
     }
   };
@@ -180,7 +205,10 @@ const useTransactions = (options = {}) => {
   }, [queryClient]);
 
   // Helper function to update balances when transactions are added/removed
-  const updateBalancesForTransaction = async (transaction, isRemoving = false) => {
+  const updateBalancesForTransaction = async (
+    transaction,
+    isRemoving = false,
+  ) => {
     const { envelopeId, amount, type } = transaction;
     const multiplier = isRemoving ? -1 : 1; // Reverse the effect when removing
 
@@ -202,7 +230,9 @@ const useTransactions = (options = {}) => {
       if (envelopeId === "unassigned" || !envelopeId) {
         // Update unassigned cash
         const unassignedChange =
-          type === "income" ? amount * multiplier : -Math.abs(amount) * multiplier;
+          type === "income"
+            ? amount * multiplier
+            : -Math.abs(amount) * multiplier;
 
         await setBudgetMetadata({
           actualBalance: currentActualBalance + actualBalanceChange,
@@ -213,7 +243,9 @@ const useTransactions = (options = {}) => {
         const envelope = await budgetDb.envelopes.get(envelopeId);
         if (envelope) {
           const balanceChange =
-            type === "income" ? amount * multiplier : -Math.abs(amount) * multiplier;
+            type === "income"
+              ? amount * multiplier
+              : -Math.abs(amount) * multiplier;
 
           const newBalance = (envelope.currentBalance || 0) + balanceChange;
           await budgetDb.envelopes.update(envelopeId, {
@@ -397,9 +429,13 @@ const useTransactions = (options = {}) => {
   const transactions = transactionsQuery.data || [];
 
   const analytics = {
-    totalIncome: transactions.filter((t) => t.amount > 0).reduce((sum, t) => sum + t.amount, 0),
+    totalIncome: transactions
+      .filter((t) => t.amount > 0)
+      .reduce((sum, t) => sum + t.amount, 0),
     totalExpenses: Math.abs(
-      transactions.filter((t) => t.amount < 0).reduce((sum, t) => sum + t.amount, 0)
+      transactions
+        .filter((t) => t.amount < 0)
+        .reduce((sum, t) => sum + t.amount, 0),
     ),
     netAmount: transactions.reduce((sum, t) => sum + t.amount, 0),
     transactionCount: transactions.length,
@@ -450,9 +486,11 @@ const useTransactions = (options = {}) => {
   // Utility functions
   const getTransactionById = (id) => transactions.find((t) => t.id === id);
 
-  const getTransactionsByEnvelope = (envId) => transactions.filter((t) => t.envelopeId === envId);
+  const getTransactionsByEnvelope = (envId) =>
+    transactions.filter((t) => t.envelopeId === envId);
 
-  const getTransactionsByCategory = (cat) => transactions.filter((t) => t.category === cat);
+  const getTransactionsByCategory = (cat) =>
+    transactions.filter((t) => t.category === cat);
 
   const getAvailableCategories = () => {
     const categories = new Set(transactions.map((t) => t.category));
@@ -525,7 +563,8 @@ const useTransactions = (options = {}) => {
 
     // Query controls
     refetch: transactionsQuery.refetch,
-    invalidate: () => queryClient.invalidateQueries({ queryKey: queryKeys.transactions }),
+    invalidate: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions }),
   };
 };
 
