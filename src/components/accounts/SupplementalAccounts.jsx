@@ -182,8 +182,16 @@ const SupplementalAccounts = ({
     resetForm();
   };
 
-  const handleDelete = (accountId) => {
-    if (confirm("Are you sure you want to delete this account?")) {
+  const handleDelete = async (accountId) => {
+    const confirmed = await confirm({
+      title: "Delete Account",
+      message: "Are you sure you want to delete this account?",
+      confirmLabel: "Delete Account",
+      cancelLabel: "Cancel",
+      destructive: true,
+    });
+
+    if (confirmed) {
       onDeleteAccount(accountId);
     }
   };

@@ -147,8 +147,16 @@ const SavingsGoals = ({
     setShowAddForm(false);
   };
 
-  const handleDelete = (goal) => {
-    if (confirm(`Are you sure you want to delete the savings goal "${goal.name}"?`)) {
+  const handleDelete = async (goal) => {
+    const confirmed = await confirm({
+      title: "Delete Savings Goal",
+      message: `Are you sure you want to delete the savings goal "${goal.name}"?`,
+      confirmLabel: "Delete Goal",
+      cancelLabel: "Cancel",
+      destructive: true,
+    });
+
+    if (confirmed) {
       onDeleteGoal(goal.id);
     }
   };

@@ -212,9 +212,13 @@ export const cleanupCorruptedPaychecks = async () => {
     if (corruptedPaychecks.length > 0) {
       console.log("💀 Corrupted paychecks:", corruptedPaychecks);
 
-      const confirmed = confirm(
-        `Found ${corruptedPaychecks.length} corrupted paycheck records. Do you want to delete them? This action cannot be undone.`
-      );
+      const confirmed = await confirm({
+        title: "Delete Corrupted Records",
+        message: `Found ${corruptedPaychecks.length} corrupted paycheck records. Do you want to delete them? This action cannot be undone.`,
+        confirmLabel: "Delete Records",
+        cancelLabel: "Cancel",
+        destructive: true,
+      });
 
       if (confirmed) {
         // Delete corrupted paychecks

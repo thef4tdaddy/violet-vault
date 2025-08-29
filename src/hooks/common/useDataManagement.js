@@ -183,9 +183,13 @@ const useDataManagement = () => {
         }
 
         // Confirm import with user
-        const confirmed = confirm(
-          `Import ${importedData.envelopes?.length || 0} envelopes, ${importedData.bills?.length || 0} bills, ${importedData.debts?.length || 0} debts, ${importedData.auditLog?.length || 0} audit entries, and ${importedData.allTransactions?.length || 0} transactions?\n\nThis will replace your current data.`
-        );
+        const confirmed = await confirm({
+          title: "Import Data",
+          message: `Import ${importedData.envelopes?.length || 0} envelopes, ${importedData.bills?.length || 0} bills, ${importedData.debts?.length || 0} debts, ${importedData.auditLog?.length || 0} audit entries, and ${importedData.allTransactions?.length || 0} transactions?\n\nThis will replace your current data.`,
+          confirmLabel: "Import Data",
+          cancelLabel: "Cancel",
+          destructive: true,
+        });
 
         if (!confirmed) {
           logger.info("Import cancelled by user");

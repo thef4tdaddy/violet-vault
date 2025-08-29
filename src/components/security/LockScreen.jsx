@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useConfirm } from "../../hooks/common/useConfirm";
 import { Lock, Unlock, Eye, EyeOff, AlertCircle, Shield, Clock } from "lucide-react";
 import { useSecurityManager } from "../../hooks/auth/useSecurityManager";
 import { useAuth } from "../../stores/auth/authStore";
+import { useConfirm } from "../../hooks/common/useConfirm";
 import shieldLogo from "../../assets/logo-512x512.png";
 
 const LockScreen = () => {
   const { isLocked, unlockApp, securityEvents } = useSecurityManager();
   const logout = useAuth((state) => state.logout);
+  const confirm = useConfirm();
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isUnlocking, setIsUnlocking] = useState(false);
@@ -87,12 +90,17 @@ const LockScreen = () => {
 
   if (!isLocked) return null;
 
-  const handleReset = () => {
-    if (
-      window.confirm(
-        "Are you sure you want to reset and return to the login screen? This will end your current session."
-      )
-    ) {
+  const handleReset = async () => {
+    const confirmed = await confirm({
+      title: "Reset Session",
+      message:
+        "Are you sure you want to reset and return to the login screen? This will end your current session.",
+      confirmLabel: "Reset Session",
+      cancelLabel: "Cancel",
+      destructive: true,
+    });
+
+    if (confirmed) {
       logout();
     }
   };
