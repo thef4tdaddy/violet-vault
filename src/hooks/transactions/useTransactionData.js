@@ -42,7 +42,7 @@ const useTransactionData = (options = {}) => {
    * Main transactions query
    */
   const transactionsQuery = useQuery({
-    queryKey: queryKeys.transactions.filtered({
+    queryKey: queryKeys.transactionsList({
       dateRange,
       envelopeId,
       category,
