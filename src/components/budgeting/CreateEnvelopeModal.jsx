@@ -73,9 +73,7 @@ const CreateEnvelopeModal = ({
               </div>
               <div>
                 <h2 className="text-xl font-bold text-white">Create Envelope</h2>
-                <p className="text-green-100 text-sm">
-                  Set up a new budget envelope
-                </p>
+                <p className="text-green-100 text-sm">Set up a new budget envelope</p>
               </div>
             </div>
             <button
@@ -128,9 +126,7 @@ const CreateEnvelopeModal = ({
               selectedMode={formData.priority || "medium"}
               autoAllocate={formData.autoAllocate}
               onModeChange={(priority) => updateFormField("priority", priority)}
-              onAutoAllocateChange={(autoAllocate) =>
-                updateFormField("autoAllocate", autoAllocate)
-              }
+              onAutoAllocateChange={(autoAllocate) => updateFormField("autoAllocate", autoAllocate)}
               canEdit={true}
             />
 
@@ -141,13 +137,19 @@ const CreateEnvelopeModal = ({
                 Appearance
               </h3>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Color
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
                 <div className="flex gap-2 flex-wrap">
                   {[
-                    "#a855f7", "#3b82f6", "#10b981", "#f59e0b", "#ef4444",
-                    "#8b5cf6", "#06b6d4", "#84cc16", "#f97316", "#ec4899"
+                    "#a855f7",
+                    "#3b82f6",
+                    "#10b981",
+                    "#f59e0b",
+                    "#ef4444",
+                    "#8b5cf6",
+                    "#06b6d4",
+                    "#84cc16",
+                    "#f97316",
+                    "#ec4899",
                   ].map((color) => (
                     <button
                       key={color}

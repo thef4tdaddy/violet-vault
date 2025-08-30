@@ -7,13 +7,7 @@ import {
   getExpirationStatus,
 } from "../../utils/accounts";
 
-const AccountsGrid = ({
-  accounts,
-  showBalances,
-  onEdit,
-  onDelete,
-  onStartTransfer,
-}) => {
+const AccountsGrid = ({ accounts, showBalances, onEdit, onDelete, onStartTransfer }) => {
   if (accounts.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500 bg-white/60 rounded-lg border border-white/20">
@@ -27,9 +21,7 @@ const AccountsGrid = ({
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {accounts.map((account) => {
         const typeInfo = getAccountTypeInfo(account.type);
-        const daysUntilExpiration = calculateDaysUntilExpiration(
-          account.expirationDate,
-        );
+        const daysUntilExpiration = calculateDaysUntilExpiration(account.expirationDate);
         const expirationStatus = getExpirationStatus(daysUntilExpiration);
 
         return (

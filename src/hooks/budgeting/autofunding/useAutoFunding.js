@@ -13,7 +13,7 @@ import logger from "../../../utils/common/logger";
  */
 export const useAutoFunding = () => {
   const budget = useBudgetStore();
-  
+
   // Initialize individual hooks
   const dataHook = useAutoFundingData();
   const rulesHook = useAutoFundingRules([]);
@@ -25,17 +25,17 @@ export const useAutoFunding = () => {
     const initializeSystem = async () => {
       try {
         const savedData = await dataHook.initialize();
-        
+
         if (savedData) {
           // Load rules
           if (savedData.rules) {
             rulesHook.setAllRules(savedData.rules);
           }
-          
+
           // Load history (handled by passing to hook initialization)
           // This would require updating the hook calls above to use the loaded data
         }
-        
+
         logger.info("Complete auto-funding system initialized");
       } catch (error) {
         logger.error("Failed to initialize auto-funding system", error);
@@ -71,16 +71,12 @@ export const useAutoFunding = () => {
   const executeRules = useCallback(
     async (trigger = TRIGGER_TYPES.MANUAL, triggerData = {}) => {
       try {
-        const result = await executionHook.executeRules(
-          rulesHook.rules,
-          trigger,
-          triggerData
-        );
+        const result = await executionHook.executeRules(rulesHook.rules, trigger, triggerData);
 
         if (result.success) {
           // Add to history
           historyHook.addToHistory(result.execution);
-          
+
           // Add to undo stack if there were successful transfers
           if (result.execution.totalFunded > 0) {
             historyHook.addToUndoStack(result.execution, result.results);
@@ -88,8 +84,8 @@ export const useAutoFunding = () => {
 
           // Update rule execution tracking
           result.results
-            .filter(r => r.success)
-            .forEach(ruleResult => {
+            .filter((r) => r.success)
+            .forEach((ruleResult) => {
               rulesHook.updateRule(ruleResult.ruleId, {
                 lastExecuted: result.execution.executedAt,
                 executionCount: (rulesHook.getRuleById(ruleResult.ruleId)?.executionCount || 0) + 1,
@@ -106,7 +102,7 @@ export const useAutoFunding = () => {
         return { success: false, error: error.message };
       }
     },
-    [rulesHook, executionHook, historyHook, dataHook],
+    [rulesHook, executionHook, historyHook, dataHook]
   );
 
   // Handle transaction-based auto-funding triggers
@@ -119,11 +115,11 @@ export const useAutoFunding = () => {
       try {
         // Check if transaction looks like income (simplified logic)
         const isLikelyIncome = transaction.amount > 0 && transaction.amount >= 100;
-        
+
         if (isLikelyIncome) {
           // Get rules that should trigger on income detection
           const incomeRules = rulesHook.getRulesByTrigger(TRIGGER_TYPES.INCOME_DETECTED);
-          
+
           if (incomeRules.length > 0) {
             const result = await executeRules(TRIGGER_TYPES.INCOME_DETECTED, {
               newIncomeAmount: transaction.amount,
@@ -143,7 +139,7 @@ export const useAutoFunding = () => {
         logger.error("Error handling transaction-based auto-funding", error);
       }
     },
-    [dataHook.isInitialized, executionHook.isExecuting, rulesHook, executeRules],
+    [dataHook.isInitialized, executionHook.isExecuting, rulesHook, executeRules]
   );
 
   // Periodic check for scheduled rules
@@ -162,7 +158,7 @@ export const useAutoFunding = () => {
 
         for (const trigger of scheduledTriggers) {
           const scheduledRules = rulesHook.getRulesByTrigger(trigger);
-          
+
           if (scheduledRules.length > 0) {
             const context = {
               trigger,
@@ -175,7 +171,7 @@ export const useAutoFunding = () => {
             };
 
             const executableRules = rulesHook.getExecutableRules(context);
-            
+
             if (executableRules.length > 0) {
               logger.info("Scheduled rules ready for execution", {
                 trigger,
@@ -208,16 +204,19 @@ export const useAutoFunding = () => {
     }
   }, [historyHook, dataHook]);
 
-  const undoExecution = useCallback(async (executionId) => {
-    try {
-      const result = await historyHook.undoExecution(executionId);
-      dataHook.markUnsavedChanges();
-      return result;
-    } catch (error) {
-      logger.error("Failed to undo execution", error);
-      throw error;
-    }
-  }, [historyHook, dataHook]);
+  const undoExecution = useCallback(
+    async (executionId) => {
+      try {
+        const result = await historyHook.undoExecution(executionId);
+        dataHook.markUnsavedChanges();
+        return result;
+      } catch (error) {
+        logger.error("Failed to undo execution", error);
+        throw error;
+      }
+    },
+    [historyHook, dataHook]
+  );
 
   // Export all data with current state
   const exportData = useCallback(() => {
@@ -227,7 +226,7 @@ export const useAutoFunding = () => {
         executionHistory: historyHook.executionHistory,
         undoStack: historyHook.undoStack,
       };
-      
+
       return dataHook.exportData(currentData);
     } catch (error) {
       logger.error("Failed to export auto-funding data", error);
@@ -236,30 +235,33 @@ export const useAutoFunding = () => {
   }, [rulesHook.rules, historyHook, dataHook]);
 
   // Import data and update all hooks
-  const importData = useCallback((importData) => {
-    try {
-      const data = dataHook.importData(importData);
-      
-      if (data.rules) {
-        rulesHook.setAllRules(data.rules);
+  const importData = useCallback(
+    (importData) => {
+      try {
+        const data = dataHook.importData(importData);
+
+        if (data.rules) {
+          rulesHook.setAllRules(data.rules);
+        }
+
+        // Note: History and undo stack would need to be handled by recreating the hooks
+        // This is a limitation of the current architecture that could be improved
+
+        logger.info("Auto-funding data import completed");
+      } catch (error) {
+        logger.error("Failed to import auto-funding data", error);
+        throw error;
       }
-      
-      // Note: History and undo stack would need to be handled by recreating the hooks
-      // This is a limitation of the current architecture that could be improved
-      
-      logger.info("Auto-funding data import completed");
-    } catch (error) {
-      logger.error("Failed to import auto-funding data", error);
-      throw error;
-    }
-  }, [dataHook, rulesHook]);
+    },
+    [dataHook, rulesHook]
+  );
 
   // Get comprehensive statistics
   const getStatistics = useCallback(() => {
     try {
       const ruleStats = rulesHook.getRulesStatistics();
       const executionStats = historyHook.getExecutionStatistics();
-      
+
       return {
         rules: ruleStats,
         executions: executionStats,

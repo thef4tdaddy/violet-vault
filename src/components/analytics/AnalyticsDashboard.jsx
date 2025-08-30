@@ -37,13 +37,7 @@ const AnalyticsDashboard = () => {
   const [showExportModal, setShowExportModal] = useState(false);
 
   // Get budget data
-  const {
-    transactions,
-    envelopes,
-    savingsGoals,
-    actualBalance,
-    unassignedCash,
-  } = useBudgetStore();
+  const { transactions, envelopes, savingsGoals, actualBalance, unassignedCash } = useBudgetStore();
 
   // Analytics data with current filters
   const analyticsQuery = useAnalytics({
@@ -121,24 +115,15 @@ const AnalyticsDashboard = () => {
 
     // Calculate envelope utilization
     const totalBudgeted =
-      balance.envelopeAnalysis?.reduce(
-        (sum, env) => sum + (env.monthlyBudget || 0),
-        0,
-      ) || 0;
+      balance.envelopeAnalysis?.reduce((sum, env) => sum + (env.monthlyBudget || 0), 0) || 0;
     const totalSpent =
-      balance.envelopeAnalysis?.reduce(
-        (sum, env) => sum + (env.spent || 0),
-        0,
-      ) || 0;
-    const envelopeUtilization =
-      totalBudgeted > 0 ? (totalSpent / totalBudgeted) * 100 : 0;
+      balance.envelopeAnalysis?.reduce((sum, env) => sum + (env.spent || 0), 0) || 0;
+    const envelopeUtilization = totalBudgeted > 0 ? (totalSpent / totalBudgeted) * 100 : 0;
 
     // Calculate savings progress
     const savingsProgress =
-      balance.savingsAnalysis?.reduce(
-        (sum, goal) => sum + goal.progressRate,
-        0,
-      ) / Math.max(1, balance.savingsAnalysis?.length || 1);
+      balance.savingsAnalysis?.reduce((sum, goal) => sum + goal.progressRate, 0) /
+      Math.max(1, balance.savingsAnalysis?.length || 1);
 
     // Determine balance health
     const balanceHealth = balance.balanceSummary?.isBalanced
@@ -178,9 +163,7 @@ const AnalyticsDashboard = () => {
           <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
           <h3 className="text-red-900 font-medium">Analytics Error</h3>
         </div>
-        <p className="text-red-700 mt-2">
-          Failed to load analytics data. Please try again.
-        </p>
+        <p className="text-red-700 mt-2">Failed to load analytics data. Please try again.</p>
       </div>
     );
   }
@@ -190,12 +173,8 @@ const AnalyticsDashboard = () => {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Analytics Dashboard
-          </h1>
-          <p className="text-gray-600 mt-1">
-            Comprehensive financial insights and reporting
-          </p>
+          <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
+          <p className="text-gray-600 mt-1">Comprehensive financial insights and reporting</p>
         </div>
 
         <div className="flex items-center gap-3 mt-4 lg:mt-0">
@@ -234,9 +213,7 @@ const AnalyticsDashboard = () => {
               <p className="text-sm text-gray-600">Net Amount</p>
               <p
                 className={`text-2xl font-bold ${
-                  summaryMetrics.netAmount >= 0
-                    ? "text-green-600"
-                    : "text-red-600"
+                  summaryMetrics.netAmount >= 0 ? "text-green-600" : "text-red-600"
                 }`}
               >
                 ${Math.abs(summaryMetrics.netAmount).toLocaleString()}
@@ -330,9 +307,7 @@ const AnalyticsDashboard = () => {
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         {activeTab === "overview" && (
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Financial Overview
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Financial Overview</h2>
             <ChartsAndAnalytics
               transactions={transactions}
               envelopes={envelopes}
@@ -343,9 +318,7 @@ const AnalyticsDashboard = () => {
 
         {activeTab === "spending" && (
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Spending Analysis
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Spending Analysis</h2>
             <ChartsAndAnalytics
               transactions={transactions}
               envelopes={envelopes}
@@ -357,21 +330,14 @@ const AnalyticsDashboard = () => {
 
         {activeTab === "trends" && (
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Trends & Forecasting
-            </h2>
-            <TrendAnalysisCharts
-              analyticsData={analyticsQuery.data}
-              timeFilter={timeFilter}
-            />
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Trends & Forecasting</h2>
+            <TrendAnalysisCharts analyticsData={analyticsQuery.data} timeFilter={timeFilter} />
           </div>
         )}
 
         {activeTab === "performance" && (
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Performance Monitor
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Performance Monitor</h2>
             <PerformanceMonitor
               analyticsData={analyticsQuery.data}
               balanceData={balanceQuery.data}
@@ -381,9 +347,7 @@ const AnalyticsDashboard = () => {
 
         {activeTab === "envelopes" && (
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Envelope Analysis
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Envelope Analysis</h2>
             <ChartsAndAnalytics
               transactions={transactions}
               envelopes={envelopes}

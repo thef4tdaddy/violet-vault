@@ -25,9 +25,9 @@ export const optimisticHelpers = {
       queryClient.setQueryData(queryKeys.envelopesList(), (old) => {
         if (!old) return old;
         return old.map((envelope) =>
-          envelope.id === envelopeId 
-            ? { ...envelope, ...updates, lastModified: Date.now() } 
-            : envelope,
+          envelope.id === envelopeId
+            ? { ...envelope, ...updates, lastModified: Date.now() }
+            : envelope
         );
       });
 
@@ -67,7 +67,7 @@ export const optimisticHelpers = {
       // Add to database
       await budgetDb.envelopes.add(envelopeWithTimestamp);
 
-      logger.debug("Optimistic envelope addition completed", { 
+      logger.debug("Optimistic envelope addition completed", {
         envelopeId: newEnvelope.id,
       });
     } catch (error) {
@@ -87,7 +87,7 @@ export const optimisticHelpers = {
       // Update TanStack Query cache - envelope list
       queryClient.setQueryData(queryKeys.envelopesList(), (old) => {
         if (!old) return old;
-        return old.filter(envelope => envelope.id !== envelopeId);
+        return old.filter((envelope) => envelope.id !== envelopeId);
       });
 
       // Remove from cache - single envelope
@@ -119,17 +119,14 @@ export const optimisticHelpers = {
       }));
 
       // Update TanStack Query cache - transaction lists
-      queryClient.setQueriesData(
-        { queryKey: queryKeys.transactions },
-        (old) => {
-          if (!old) return old;
-          return old.map((transaction) =>
-            transaction.id === transactionId
-              ? { ...transaction, ...updates, lastModified: Date.now() }
-              : transaction,
-          );
-        }
-      );
+      queryClient.setQueriesData({ queryKey: queryKeys.transactions }, (old) => {
+        if (!old) return old;
+        return old.map((transaction) =>
+          transaction.id === transactionId
+            ? { ...transaction, ...updates, lastModified: Date.now() }
+            : transaction
+        );
+      });
 
       // Update database
       await budgetDb.transactions.update(transactionId, {
@@ -137,8 +134,8 @@ export const optimisticHelpers = {
         lastModified: Date.now(),
       });
 
-      logger.debug("Optimistic transaction update completed", { 
-        transactionId, 
+      logger.debug("Optimistic transaction update completed", {
+        transactionId,
         updates,
       });
     } catch (error) {
@@ -162,13 +159,10 @@ export const optimisticHelpers = {
       };
 
       // Update TanStack Query cache - transaction lists
-      queryClient.setQueriesData(
-        { queryKey: queryKeys.transactions },
-        (old) => {
-          if (!old) return [transactionWithTimestamp];
-          return [transactionWithTimestamp, ...old];
-        }
-      );
+      queryClient.setQueriesData({ queryKey: queryKeys.transactions }, (old) => {
+        if (!old) return [transactionWithTimestamp];
+        return [transactionWithTimestamp, ...old];
+      });
 
       // Add to database
       await budgetDb.transactions.add(transactionWithTimestamp);
@@ -177,7 +171,7 @@ export const optimisticHelpers = {
       queryClient.invalidateQueries({ queryKey: queryKeys.analytics });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
 
-      logger.debug("Optimistic transaction addition completed", { 
+      logger.debug("Optimistic transaction addition completed", {
         transactionId: newTransaction.id,
       });
     } catch (error) {
@@ -202,17 +196,12 @@ export const optimisticHelpers = {
       }));
 
       // Update TanStack Query cache - bill lists
-      queryClient.setQueriesData(
-        { queryKey: queryKeys.bills },
-        (old) => {
-          if (!old) return old;
-          return old.map((bill) =>
-            bill.id === billId
-              ? { ...bill, ...updates, lastModified: Date.now() }
-              : bill,
-          );
-        }
-      );
+      queryClient.setQueriesData({ queryKey: queryKeys.bills }, (old) => {
+        if (!old) return old;
+        return old.map((bill) =>
+          bill.id === billId ? { ...bill, ...updates, lastModified: Date.now() } : bill
+        );
+      });
 
       // Update database
       await budgetDb.bills.update(billId, {
@@ -277,22 +266,14 @@ export const optimisticHelpers = {
       // Process envelope updates
       for (const envelope of envelopes) {
         if (envelope.id) {
-          await optimisticHelpers.updateEnvelope(
-            queryClient, 
-            envelope.id, 
-            envelope
-          );
+          await optimisticHelpers.updateEnvelope(queryClient, envelope.id, envelope);
         }
       }
 
       // Process transaction updates
       for (const transaction of transactions) {
         if (transaction.id) {
-          await optimisticHelpers.updateTransaction(
-            queryClient,
-            transaction.id,
-            transaction
-          );
+          await optimisticHelpers.updateTransaction(queryClient, transaction.id, transaction);
         }
       }
 
@@ -340,12 +321,7 @@ export const optimisticHelpers = {
   /**
    * Create mutation config with automatic optimistic updates
    */
-  createOptimisticMutation: (queryClient, { 
-    mutationKey, 
-    queryKey, 
-    updateFn, 
-    rollbackFn,
-  }) => {
+  createOptimisticMutation: (queryClient, { mutationKey, queryKey, updateFn, rollbackFn }) => {
     return {
       mutationKey,
       onMutate: async (variables) => {
@@ -367,11 +343,11 @@ export const optimisticHelpers = {
         if (context?.previousData !== undefined) {
           queryClient.setQueryData(queryKey, context.previousData);
         }
-        
+
         if (rollbackFn) {
           rollbackFn(error, variables, context);
         }
-        
+
         logger.error("Mutation failed, rolled back optimistic update", {
           mutationKey,
           error: error.message,

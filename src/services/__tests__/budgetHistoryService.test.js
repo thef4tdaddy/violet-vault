@@ -161,9 +161,9 @@ describe("BudgetHistoryService", () => {
         afterData: {},
       };
 
-      await expect(
-        budgetHistoryService.createCommit(commitOptions)
-      ).rejects.toThrow("Database error");
+      await expect(budgetHistoryService.createCommit(commitOptions)).rejects.toThrow(
+        "Database error"
+      );
     });
   });
 
@@ -535,9 +535,7 @@ describe("BudgetHistoryService", () => {
 
       await budgetHistoryService.cleanup();
 
-      expect(budgetDb.budgetCommits.bulkDelete).toHaveBeenCalledWith(
-        oldCommits.map(c => c.hash)
-      );
+      expect(budgetDb.budgetCommits.bulkDelete).toHaveBeenCalledWith(oldCommits.map((c) => c.hash));
     });
 
     it("should not cleanup when within limits", async () => {

@@ -17,24 +17,24 @@ export const useAutoFundingData = () => {
   const initialize = useCallback(async () => {
     try {
       setIsLoading(true);
-      
+
       const savedData = localStorage.getItem(STORAGE_KEY);
       let data = null;
-      
+
       if (savedData) {
         data = JSON.parse(savedData);
         logger.info("Auto-funding data loaded from localStorage", {
           rulesCount: data.rules?.length || 0,
           historyCount: data.executionHistory?.length || 0,
-          undoableCount: data.undoStack?.filter(item => item.canUndo).length || 0,
+          undoableCount: data.undoStack?.filter((item) => item.canUndo).length || 0,
         });
       }
 
       setIsInitialized(true);
       setLastSaved(data?.lastSaved || null);
-      
+
       logger.info("Auto-funding data system initialized");
-      
+
       return data;
     } catch (error) {
       logger.error("Failed to initialize auto-funding data", error);
@@ -53,16 +53,16 @@ export const useAutoFundingData = () => {
         lastSaved: new Date().toISOString(),
         version: "1.1", // Increment version for new extracted utilities format
       };
-      
+
       localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
       setLastSaved(dataToSave.lastSaved);
       setHasUnsavedChanges(false);
-      
+
       logger.debug("Auto-funding data saved to localStorage", {
         rulesCount: data.rules?.length || 0,
         historyCount: data.executionHistory?.length || 0,
       });
-      
+
       return true;
     } catch (error) {
       logger.error("Failed to save auto-funding data to localStorage", error);
@@ -80,12 +80,12 @@ export const useAutoFundingData = () => {
 
       const data = JSON.parse(savedData);
       setLastSaved(data.lastSaved || null);
-      
+
       logger.info("Auto-funding data loaded", {
         rulesCount: data.rules?.length || 0,
         historyCount: data.executionHistory?.length || 0,
       });
-      
+
       return data;
     } catch (error) {
       logger.error("Failed to load auto-funding data", error);
@@ -119,13 +119,13 @@ export const useAutoFundingData = () => {
   const importData = useCallback((importData) => {
     try {
       // Validate import data structure
-      if (!importData || typeof importData !== 'object') {
+      if (!importData || typeof importData !== "object") {
         throw new Error("Invalid import data format");
       }
 
       // Handle different versions if needed
       let data = { ...importData };
-      
+
       if (!data.version || data.version < "1.1") {
         // Migrate older data formats if necessary
         logger.warn("Importing older data format", { version: data.version });
@@ -166,9 +166,9 @@ export const useAutoFundingData = () => {
       localStorage.removeItem(STORAGE_KEY);
       setLastSaved(null);
       setHasUnsavedChanges(false);
-      
+
       logger.info("Auto-funding data cleared from localStorage");
-      
+
       return {
         rules: [],
         executionHistory: [],
@@ -200,7 +200,7 @@ export const useAutoFundingData = () => {
 
       setHasUnsavedChanges(true);
       logger.info("Auto-funding data reset to defaults");
-      
+
       return defaultData;
     } catch (error) {
       logger.error("Failed to reset auto-funding data", error);
@@ -213,11 +213,11 @@ export const useAutoFundingData = () => {
     try {
       const testKey = `${STORAGE_KEY}_test`;
       const testData = JSON.stringify({ test: true });
-      
+
       localStorage.setItem(testKey, testData);
       const retrieved = localStorage.getItem(testKey);
       localStorage.removeItem(testKey);
-      
+
       if (retrieved !== testData) {
         throw new Error("Storage read/write test failed");
       }
@@ -225,11 +225,11 @@ export const useAutoFundingData = () => {
       // Get current data size
       const currentData = localStorage.getItem(STORAGE_KEY);
       const currentSize = currentData ? new Blob([currentData]).size : 0;
-      
+
       // Estimate available space (rough approximation)
       const storageQuota = 5 * 1024 * 1024; // Assume 5MB localStorage limit
       const usedSpace = Object.keys(localStorage)
-        .map(key => localStorage.getItem(key))
+        .map((key) => localStorage.getItem(key))
         .reduce((total, item) => total + (item ? new Blob([item]).size : 0), 0);
 
       return {
@@ -237,7 +237,7 @@ export const useAutoFundingData = () => {
         currentSize,
         usedSpace,
         availableSpace: Math.max(0, storageQuota - usedSpace),
-        healthScore: Math.min(100, Math.max(0, 100 - (usedSpace / storageQuota * 100))),
+        healthScore: Math.min(100, Math.max(0, 100 - (usedSpace / storageQuota) * 100)),
       };
     } catch (error) {
       logger.error("Storage health check failed", error);
@@ -268,7 +268,7 @@ export const useAutoFundingData = () => {
       }
 
       const backupString = JSON.stringify(backup, null, 2);
-      
+
       logger.info("Backup created", {
         size: new Blob([backupString]).size,
         includesHistory: includeHistory,
@@ -278,7 +278,7 @@ export const useAutoFundingData = () => {
       return {
         data: backup,
         string: backupString,
-        filename: `violet-vault-autofunding-backup-${new Date().toISOString().split('T')[0]}.json`,
+        filename: `violet-vault-autofunding-backup-${new Date().toISOString().split("T")[0]}.json`,
       };
     } catch (error) {
       logger.error("Failed to create backup", error);
@@ -297,20 +297,23 @@ export const useAutoFundingData = () => {
   }, []);
 
   // Auto-save functionality
-  const enableAutoSave = useCallback((data, intervalMs = 30000) => {
-    const autoSaveInterval = setInterval(() => {
-      if (hasUnsavedChanges && data) {
-        try {
-          saveData(data);
-          logger.debug("Auto-save completed");
-        } catch (error) {
-          logger.error("Auto-save failed", error);
+  const enableAutoSave = useCallback(
+    (data, intervalMs = 30000) => {
+      const autoSaveInterval = setInterval(() => {
+        if (hasUnsavedChanges && data) {
+          try {
+            saveData(data);
+            logger.debug("Auto-save completed");
+          } catch (error) {
+            logger.error("Auto-save failed", error);
+          }
         }
-      }
-    }, intervalMs);
+      }, intervalMs);
 
-    return () => clearInterval(autoSaveInterval);
-  }, [hasUnsavedChanges, saveData]);
+      return () => clearInterval(autoSaveInterval);
+    },
+    [hasUnsavedChanges, saveData]
+  );
 
   return {
     // State
@@ -318,18 +321,18 @@ export const useAutoFundingData = () => {
     isLoading,
     lastSaved,
     hasUnsavedChanges,
-    
+
     // Core operations
     initialize,
     saveData,
     loadData,
     clearData,
     resetToDefaults,
-    
+
     // Import/Export
     exportData,
     importData,
-    
+
     // Utilities
     checkStorageHealth,
     createBackup,

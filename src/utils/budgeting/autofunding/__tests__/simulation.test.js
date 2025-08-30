@@ -88,9 +88,9 @@ describe("simulation", () => {
       const result = simulateRuleExecution(mockRules, mockContext);
 
       expect(result.success).toBe(true);
-      
+
       // Check that rules were processed in priority order (1, 2, 3)
-      const successfulRules = result.simulation.ruleResults.filter(r => r.success);
+      const successfulRules = result.simulation.ruleResults.filter((r) => r.success);
       expect(successfulRules[0].ruleId).toBe("rule1"); // Priority 1
       expect(successfulRules[1].ruleId).toBe("rule2"); // Priority 2
     });
@@ -127,7 +127,7 @@ describe("simulation", () => {
 
       expect(result.success).toBe(true);
       expect(result.simulation.ruleResults).toHaveLength(3); // Still only 3 results
-      expect(result.simulation.ruleResults.find(r => r.ruleId === "rule4")).toBeUndefined();
+      expect(result.simulation.ruleResults.find((r) => r.ruleId === "rule4")).toBeUndefined();
     });
 
     it("should handle empty rules array", () => {
@@ -143,9 +143,9 @@ describe("simulation", () => {
       const result = simulateRuleExecution(mockRules, mockContext);
 
       expect(result.success).toBe(true);
-      
+
       let expectedRemaining = mockContext.data.unassignedCash;
-      result.simulation.ruleResults.forEach(ruleResult => {
+      result.simulation.ruleResults.forEach((ruleResult) => {
         if (ruleResult.success && ruleResult.amount > 0) {
           expectedRemaining -= ruleResult.amount;
         }
@@ -252,8 +252,8 @@ describe("simulation", () => {
       expect(transfers[0].amount).toBe(100);
       expect(transfers[1].amount).toBe(100);
       expect(transfers[2].amount).toBe(100);
-      
-      transfers.forEach(transfer => {
+
+      transfers.forEach((transfer) => {
         expect(transfer.fromEnvelopeId).toBe("unassigned");
         expect(transfer.description).toBe("Auto-funding (split): Split Rule");
       });
@@ -274,7 +274,7 @@ describe("simulation", () => {
       expect(transfers[0].amount).toBeCloseTo(33.66, 2);
       expect(transfers[1].amount).toBeCloseTo(33.66, 2);
       expect(transfers[2].amount).toBeCloseTo(33.68, 2); // Gets the remainder to equal 101
-      
+
       const totalAmount = transfers.reduce((sum, t) => sum + t.amount, 0);
       expect(totalAmount).toBeCloseTo(101, 2);
     });
@@ -320,7 +320,7 @@ describe("simulation", () => {
 
       expect(result.success).toBe(true);
       expect(result.plan.warnings.length).toBeGreaterThan(0);
-      expect(result.plan.warnings.some(w => w.type === "insufficient_funds")).toBe(true);
+      expect(result.plan.warnings.some((w) => w.type === "insufficient_funds")).toBe(true);
     });
   });
 
@@ -334,8 +334,8 @@ describe("simulation", () => {
 
       const warnings = generatePlanWarnings(simulation, mockContext);
 
-      expect(warnings.some(w => w.type === "insufficient_funds")).toBe(true);
-      expect(warnings.find(w => w.type === "insufficient_funds").severity).toBe("high");
+      expect(warnings.some((w) => w.type === "insufficient_funds")).toBe(true);
+      expect(warnings.find((w) => w.type === "insufficient_funds").severity).toBe("high");
     });
 
     it("should generate no execution warning", () => {
@@ -347,8 +347,8 @@ describe("simulation", () => {
 
       const warnings = generatePlanWarnings(simulation, mockContext);
 
-      expect(warnings.some(w => w.type === "no_execution")).toBe(true);
-      expect(warnings.find(w => w.type === "no_execution").severity).toBe("medium");
+      expect(warnings.some((w) => w.type === "no_execution")).toBe(true);
+      expect(warnings.find((w) => w.type === "no_execution").severity).toBe("medium");
     });
 
     it("should generate low remaining cash warning", () => {
@@ -360,8 +360,8 @@ describe("simulation", () => {
 
       const warnings = generatePlanWarnings(simulation, mockContext);
 
-      expect(warnings.some(w => w.type === "low_remaining_cash")).toBe(true);
-      expect(warnings.find(w => w.type === "low_remaining_cash").severity).toBe("low");
+      expect(warnings.some((w) => w.type === "low_remaining_cash")).toBe(true);
+      expect(warnings.find((w) => w.type === "low_remaining_cash").severity).toBe("low");
     });
   });
 
@@ -403,7 +403,7 @@ describe("simulation", () => {
       const result = validateTransfers(invalidTransfers, mockContext);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.some(e => e.error.includes("not found"))).toBe(true);
+      expect(result.errors.some((e) => e.error.includes("not found"))).toBe(true);
     });
 
     it("should detect negative transfer amounts", () => {
@@ -419,7 +419,7 @@ describe("simulation", () => {
       const result = validateTransfers(invalidTransfers, mockContext);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.some(e => e.error.includes("must be positive"))).toBe(true);
+      expect(result.errors.some((e) => e.error.includes("must be positive"))).toBe(true);
     });
 
     it("should detect total exceeding available cash", () => {
@@ -435,7 +435,7 @@ describe("simulation", () => {
       const result = validateTransfers(excessiveTransfers, mockContext);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.some(e => e.error.includes("exceed available cash"))).toBe(true);
+      expect(result.errors.some((e) => e.error.includes("exceed available cash"))).toBe(true);
     });
   });
 
@@ -456,7 +456,7 @@ describe("simulation", () => {
 
       expect(impact.unassignedChange).toBe(-500);
       expect(impact.totalTransferred).toBe(500);
-      
+
       const env1Impact = impact.envelopes.get("env1");
       expect(env1Impact.change).toBe(200);
       expect(env1Impact.newBalance).toBe(350);
@@ -485,8 +485,8 @@ describe("simulation", () => {
       expect(Math.abs(impact.unassignedChange)).toBe(0); // Handle -0 vs +0 by checking absolute value
       expect(Math.abs(impact.totalTransferred)).toBe(0);
       expect(impact.envelopes.size).toBe(mockEnvelopes.length);
-      
-      impact.envelopes.forEach(envImpact => {
+
+      impact.envelopes.forEach((envImpact) => {
         expect(envImpact.change).toBe(0);
         expect(envImpact.newBalance).toBe(envImpact.currentBalance);
       });

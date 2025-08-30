@@ -208,7 +208,7 @@ describe("Account Validation", () => {
       const expiryDate = new Date("2024-02-15");
       expiryDate.setHours(0, 0, 0, 0);
       const expectedDays = Math.ceil((expiryDate - testDate) / (1000 * 60 * 60 * 24));
-      
+
       // The actual function uses current date, so let's test with a known scenario
       expect(typeof result).toBe("number");
     });
@@ -224,10 +224,13 @@ describe("Account Validation", () => {
       // Use today's date in YYYY-MM-DD format to avoid timezone issues
       const today = new Date();
       today.setHours(0, 0, 0, 0); // Reset to start of day like the implementation
-      const todayString = today.getFullYear() + '-' + 
-        String(today.getMonth() + 1).padStart(2, '0') + '-' + 
-        String(today.getDate()).padStart(2, '0');
-      
+      const todayString =
+        today.getFullYear() +
+        "-" +
+        String(today.getMonth() + 1).padStart(2, "0") +
+        "-" +
+        String(today.getDate()).padStart(2, "0");
+
       const result = calculateDaysUntilExpiration(todayString);
       // Should be 0 or very close to 0 (allow for minor timing differences)
       expect(result).toBeGreaterThanOrEqual(-1);

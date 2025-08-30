@@ -4,12 +4,12 @@
  * Addresses screenshot upload issues and provides comprehensive bug reporting
  * Created for Issue #513
  */
-import { ScreenshotService } from './screenshotService.js';
-import { SystemInfoService } from './systemInfoService.js';
-import { BugReportAPIService } from './apiService.js';
-import { ContextAnalysisService } from './contextAnalysisService.js';
-import logger from '../../utils/common/logger.js';
-import { APP_VERSION } from '../../utils/common/version.js';
+import { ScreenshotService } from "./screenshotService.js";
+import { SystemInfoService } from "./systemInfoService.js";
+import { BugReportAPIService } from "./apiService.js";
+import { ContextAnalysisService } from "./contextAnalysisService.js";
+import logger from "../../utils/common/logger.js";
+import { APP_VERSION } from "../../utils/common/version.js";
 
 export class BugReportService {
   /**
@@ -43,7 +43,7 @@ export class BugReportService {
       // Step 3: Validate report data
       const validation = BugReportAPIService.validateReportData(reportData);
       if (!validation.isValid) {
-        throw new Error(`Invalid report data: ${validation.errors.join(', ')}`);
+        throw new Error(`Invalid report data: ${validation.errors.join(", ")}`);
       }
 
       // Step 4: Submit with fallbacks
@@ -52,7 +52,7 @@ export class BugReportService {
 
       logger.info("Bug report submitted successfully", {
         submissionId: result.submissionId,
-        provider: result.primaryProvider || 'fallback',
+        provider: result.primaryProvider || "fallback",
         hasScreenshot: !!dataCollection.screenshot,
       });
 
@@ -67,7 +67,7 @@ export class BugReportService {
       };
     } catch (error) {
       logger.error("Bug report submission failed", error);
-      
+
       // Fallback: Save locally
       try {
         await this.saveReportLocally(options, error);
@@ -101,7 +101,7 @@ export class BugReportService {
       };
     } catch (error) {
       logger.error("Data collection failed", error);
-      
+
       // Return partial data on failure
       return {
         screenshot: null,
@@ -120,17 +120,18 @@ export class BugReportService {
   static async captureScreenshotSafely() {
     try {
       const screenshot = await ScreenshotService.captureScreenshot();
-      
+
       if (screenshot) {
         // Check screenshot size and warn if too large
         const info = ScreenshotService.getScreenshotInfo(screenshot);
-        if (info.sizeKB > 1024) { // > 1MB
+        if (info.sizeKB > 1024) {
+          // > 1MB
           logger.warn(`Large screenshot captured: ${info.sizeKB}KB`, info);
         }
-        
+
         return screenshot;
       }
-      
+
       return null;
     } catch (error) {
       logger.error("Screenshot capture failed", error);
@@ -152,23 +153,23 @@ export class BugReportService {
       steps: options.steps || "",
       expected: options.expected || "",
       actual: options.actual || "",
-      
+
       // Severity and classification
       severity: options.severity || "medium",
       labels: [...(options.labels || []), "automated-report", "bug"],
-      
+
       // Technical data
       screenshot: dataCollection.screenshot,
       systemInfo: dataCollection.systemInfo,
       contextInfo: dataCollection.contextInfo,
-      
+
       // Application context
       appVersion: APP_VERSION,
       timestamp: dataCollection.timestamp,
-      
+
       // Custom data
       customData: options.customData || {},
-      
+
       // Report metadata
       reportSource: "violet-vault-bug-reporter",
       reportVersion: "2.0.0",
@@ -187,21 +188,25 @@ export class BugReportService {
     // If screenshot is too large for JSON payload, handle separately
     if (reportData.screenshot) {
       const screenshotInfo = ScreenshotService.getScreenshotInfo(reportData.screenshot);
-      
-      if (screenshotInfo.sizeKB > 500) { // > 500KB
+
+      if (screenshotInfo.sizeKB > 500) {
+        // > 500KB
         logger.info("Large screenshot detected, using alternative upload method", screenshotInfo);
-        
+
         // For large screenshots, we'll:
         // 1. Submit the bug report without the screenshot first
         // 2. Upload the screenshot separately (if provider supports it)
         // 3. Link them together
-        
+
         const reportWithoutScreenshot = { ...reportData };
         delete reportWithoutScreenshot.screenshot;
         reportWithoutScreenshot.screenshotNote = `Large screenshot (${screenshotInfo.sizeKB}KB) - will be uploaded separately`;
-        
-        const result = await BugReportAPIService.submitWithFallbacks(reportWithoutScreenshot, providers);
-        
+
+        const result = await BugReportAPIService.submitWithFallbacks(
+          reportWithoutScreenshot,
+          providers
+        );
+
         // TODO: Implement separate screenshot upload if provider supports it
         // For now, just note that screenshot was too large
         result.screenshotStatus = {
@@ -210,7 +215,7 @@ export class BugReportService {
           uploaded: false,
           reason: "Screenshot too large for JSON payload - separate upload needed",
         };
-        
+
         return result;
       }
     }
@@ -226,12 +231,12 @@ export class BugReportService {
    */
   static getProviders(customProviders = {}) {
     const defaultProviders = [];
-    
+
     // GitHub provider (if endpoint configured)
     const bugReportEndpoint = import.meta.env.VITE_BUG_REPORT_ENDPOINT;
     if (bugReportEndpoint) {
       defaultProviders.push({
-        type: 'webhook',
+        type: "webhook",
         url: bugReportEndpoint,
         primary: true,
       });
@@ -240,25 +245,25 @@ export class BugReportService {
     // Add custom providers
     if (customProviders.github) {
       defaultProviders.push({
-        type: 'github',
+        type: "github",
         config: customProviders.github,
-        primary: !defaultProviders.some(p => p.primary),
+        primary: !defaultProviders.some((p) => p.primary),
       });
     }
 
     if (customProviders.email) {
       defaultProviders.push({
-        type: 'email',
+        type: "email",
         config: customProviders.email,
-        primary: !defaultProviders.some(p => p.primary),
+        primary: !defaultProviders.some((p) => p.primary),
       });
     }
 
     if (customProviders.webhook) {
       defaultProviders.push({
-        type: 'webhook',
+        type: "webhook",
         url: customProviders.webhook.url,
-        primary: !defaultProviders.some(p => p.primary),
+        primary: !defaultProviders.some((p) => p.primary),
       });
     }
 
@@ -283,16 +288,16 @@ export class BugReportService {
       };
 
       // Save to localStorage as last resort
-      const existingReports = JSON.parse(localStorage.getItem('violet-vault-bug-reports') || '[]');
+      const existingReports = JSON.parse(localStorage.getItem("violet-vault-bug-reports") || "[]");
       existingReports.push(fallbackData);
-      
+
       // Keep only last 10 reports
       if (existingReports.length > 10) {
         existingReports.splice(0, existingReports.length - 10);
       }
-      
-      localStorage.setItem('violet-vault-bug-reports', JSON.stringify(existingReports));
-      
+
+      localStorage.setItem("violet-vault-bug-reports", JSON.stringify(existingReports));
+
       logger.info("Bug report saved locally as fallback", {
         reportCount: existingReports.length,
         title: options.title,
@@ -308,7 +313,7 @@ export class BugReportService {
    */
   static getLocalReports() {
     try {
-      return JSON.parse(localStorage.getItem('violet-vault-bug-reports') || '[]');
+      return JSON.parse(localStorage.getItem("violet-vault-bug-reports") || "[]");
     } catch (error) {
       logger.error("Failed to retrieve local reports", error);
       return [];
@@ -320,7 +325,7 @@ export class BugReportService {
    */
   static clearLocalReports() {
     try {
-      localStorage.removeItem('violet-vault-bug-reports');
+      localStorage.removeItem("violet-vault-bug-reports");
       logger.info("Local bug reports cleared");
     } catch (error) {
       logger.error("Failed to clear local reports", error);
@@ -351,7 +356,7 @@ export class BugReportService {
     try {
       const screenshot = await ScreenshotService.captureScreenshot();
       const info = screenshot ? ScreenshotService.getScreenshotInfo(screenshot) : null;
-      
+
       return {
         success: !!screenshot,
         screenshot: !!screenshot,
@@ -376,7 +381,7 @@ export class BugReportService {
   static async testSystemInfo() {
     try {
       const systemInfo = await SystemInfoService.collectSystemInfo();
-      
+
       return {
         success: true,
         systemInfo: {
@@ -402,7 +407,7 @@ export class BugReportService {
   static async testContextAnalysis() {
     try {
       const context = ContextAnalysisService.getCurrentPageContext();
-      
+
       return {
         success: true,
         context: {

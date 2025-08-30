@@ -5,17 +5,7 @@
  * Reduced from 923 LOC to ~350 LOC by extracting form logic
  */
 import React, { useEffect } from "react";
-import {
-  X,
-  Save,
-  Sparkles,
-  Trash2,
-  Lock,
-  Unlock,
-  User,
-  Clock,
-  Wallet,
-} from "lucide-react";
+import { X, Save, Sparkles, Trash2, Lock, Unlock, User, Clock, Wallet } from "lucide-react";
 import { useBillForm } from "../../hooks/bills/useBillForm";
 import useEditLock from "../../hooks/common/useEditLock";
 import { initializeEditLocks } from "../../services/editLockService";
@@ -86,12 +76,11 @@ const AddBillModal = ({
   }, [isOpen, budgetId, currentUser]);
 
   // Edit locking for the bill (only when editing existing bill)
-  const { isLocked, isOwnLock, canEdit, lockedBy, acquireLock, releaseLock } =
-    useEditLock(
-      editingBill ? `bill-${editingBill.id}` : null,
-      currentUser?.userName || "User",
-      editingBill ? 300000 : 0, // 5 minutes for editing existing bills
-    );
+  const { isLocked, isOwnLock, canEdit, lockedBy, acquireLock, releaseLock } = useEditLock(
+    editingBill ? `bill-${editingBill.id}` : null,
+    currentUser?.userName || "User",
+    editingBill ? 300000 : 0 // 5 minutes for editing existing bills
+  );
 
   // Auto-acquire lock when editing existing bill
   useEffect(() => {
@@ -184,18 +173,14 @@ const AddBillModal = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Bill Name */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Bill Name *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Bill Name *</label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => updateField("name", e.target.value)}
                 disabled={editingBill && !canEdit}
                 className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                  editingBill && !canEdit
-                    ? "bg-gray-100 cursor-not-allowed"
-                    : ""
+                  editingBill && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
                 }`}
                 placeholder="e.g., Electric Bill, Internet, Rent"
                 required
@@ -204,9 +189,7 @@ const AddBillModal = ({
 
             {/* Amount */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Amount *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Amount *</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <span className="text-gray-500 sm:text-sm">$</span>
@@ -219,9 +202,7 @@ const AddBillModal = ({
                   onChange={(e) => updateField("amount", e.target.value)}
                   disabled={editingBill && !canEdit}
                   className={`w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                    editingBill && !canEdit
-                      ? "bg-gray-100 cursor-not-allowed"
-                      : ""
+                    editingBill && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
                   }`}
                   placeholder="0.00"
                   required
@@ -231,18 +212,14 @@ const AddBillModal = ({
 
             {/* Due Date */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Due Date *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Due Date *</label>
               <input
                 type="date"
                 value={formData.dueDate}
                 onChange={(e) => updateField("dueDate", e.target.value)}
                 disabled={editingBill && !canEdit}
                 className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                  editingBill && !canEdit
-                    ? "bg-gray-100 cursor-not-allowed"
-                    : ""
+                  editingBill && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
                 }`}
                 required
               />
@@ -250,17 +227,13 @@ const AddBillModal = ({
 
             {/* Frequency */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Frequency
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Frequency</label>
               <select
                 value={formData.frequency}
                 onChange={(e) => updateField("frequency", e.target.value)}
                 disabled={editingBill && !canEdit}
                 className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                  editingBill && !canEdit
-                    ? "bg-gray-100 cursor-not-allowed"
-                    : ""
+                  editingBill && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
                 }`}
               >
                 {frequencyOptions.map((option) => (
@@ -273,17 +246,13 @@ const AddBillModal = ({
 
             {/* Category */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Category
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
               <select
                 value={formData.category}
                 onChange={(e) => updateField("category", e.target.value)}
                 disabled={editingBill && !canEdit}
                 className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                  editingBill && !canEdit
-                    ? "bg-gray-100 cursor-not-allowed"
-                    : ""
+                  editingBill && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
                 }`}
               >
                 {categories.map((category) => (
@@ -357,9 +326,7 @@ const AddBillModal = ({
 
           {/* Notes */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Notes
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
             <textarea
               value={formData.notes}
               onChange={(e) => updateField("notes", e.target.value)}
@@ -375,9 +342,7 @@ const AddBillModal = ({
           {/* Calculation Preview */}
           {formData.amount && formData.frequency && (
             <div className="bg-gray-50 p-4 rounded-lg">
-              <h4 className="text-sm font-medium text-gray-700 mb-2">
-                Calculation Preview
-              </h4>
+              <h4 className="text-sm font-medium text-gray-700 mb-2">Calculation Preview</h4>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="text-gray-600">Monthly equivalent:</span>
@@ -386,7 +351,7 @@ const AddBillModal = ({
                     {calculateMonthlyAmount(
                       formData.amount,
                       formData.frequency,
-                      formData.customFrequency,
+                      formData.customFrequency
                     ).toFixed(2)}
                   </span>
                 </div>
@@ -397,7 +362,7 @@ const AddBillModal = ({
                     {calculateBiweeklyAmount(
                       formData.amount,
                       formData.frequency,
-                      formData.customFrequency,
+                      formData.customFrequency
                     ).toFixed(2)}
                   </span>
                 </div>
@@ -469,12 +434,8 @@ const AddBillModal = ({
                   <Trash2 className="h-6 w-6 text-red-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Delete Bill
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    This action cannot be undone
-                  </p>
+                  <h3 className="text-lg font-semibold text-gray-900">Delete Bill</h3>
+                  <p className="text-sm text-gray-600">This action cannot be undone</p>
                 </div>
               </div>
 
@@ -490,10 +451,7 @@ const AddBillModal = ({
                   onChange={(e) => setDeleteEnvelopeToo(e.target.checked)}
                   className="rounded border-gray-300 text-red-600 focus:ring-red-500"
                 />
-                <label
-                  htmlFor="deleteEnvelope"
-                  className="ml-2 text-sm text-gray-700"
-                >
+                <label htmlFor="deleteEnvelope" className="ml-2 text-sm text-gray-700">
                   Also delete associated envelope
                 </label>
               </div>

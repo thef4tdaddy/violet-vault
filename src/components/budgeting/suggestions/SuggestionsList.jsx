@@ -65,19 +65,19 @@ const SuggestionsList = ({
         return (
           <div key={priority} className="space-y-3">
             {!isCompact && (
-              <div className={`flex items-center px-3 py-2 rounded-lg ${config.bgColor} ${config.borderColor} border`}>
+              <div
+                className={`flex items-center px-3 py-2 rounded-lg ${config.bgColor} ${config.borderColor} border`}
+              >
                 <PriorityIcon className={`h-4 w-4 mr-2 ${config.color}`} />
                 <h4 className={`font-medium ${config.color}`}>
                   {config.label} ({prioritySuggestions.length})
                 </h4>
               </div>
             )}
-            
-            <div className={`grid gap-3 ${
-              isCompact
-                ? "grid-cols-1"
-                : "grid-cols-1 lg:grid-cols-2"
-            }`}>
+
+            <div
+              className={`grid gap-3 ${isCompact ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-2"}`}
+            >
               {prioritySuggestions.map((suggestion) => (
                 <SuggestionCard
                   key={suggestion.id}
@@ -91,12 +91,13 @@ const SuggestionsList = ({
           </div>
         );
       })}
-      
+
       {/* Summary footer for non-compact view */}
       {!isCompact && suggestions.length > 0 && (
         <div className="text-center py-4 border-t border-gray-200 mt-6">
           <p className="text-sm text-gray-600">
-            Showing {suggestions.length} suggestion{suggestions.length !== 1 ? "s" : ""} based on your recent spending patterns
+            Showing {suggestions.length} suggestion{suggestions.length !== 1 ? "s" : ""} based on
+            your recent spending patterns
           </p>
         </div>
       )}

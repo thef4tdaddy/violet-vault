@@ -23,21 +23,21 @@ export const prefetchHelpers = {
             includeArchived: filters.includeArchived,
             useCache: true,
           });
-          
+
           if (envelopes && envelopes.length > 0) {
             return envelopes;
           }
-          
+
           // Fallback to direct database query
           const cached = await budgetDb.getEnvelopesByCategory(
             filters.category,
             filters.includeArchived
           );
-          
+
           if (cached && cached.length > 0) {
             return cached;
           }
-          
+
           throw new Error("No cached envelope data available");
         },
         staleTime: 2 * 60 * 1000, // 2 minutes
@@ -58,10 +58,7 @@ export const prefetchHelpers = {
   prefetchTransactions: async (queryClient, dateRange, options = {}) => {
     try {
       return await queryClient.prefetchQuery({
-        queryKey: queryKeys.transactionsByDateRange(
-          dateRange.start,
-          dateRange.end,
-        ),
+        queryKey: queryKeys.transactionsByDateRange(dateRange.start, dateRange.end),
         queryFn: async () => {
           // Use database service for consistent querying
           const transactions = await budgetDatabaseService.getTransactions({
@@ -69,21 +66,18 @@ export const prefetchHelpers = {
             limit: options.limit || 1000,
             useCache: true,
           });
-          
+
           if (transactions && transactions.length > 0) {
             return transactions;
           }
-          
+
           // Fallback to direct database query
-          const cached = await budgetDb.getTransactionsByDateRange(
-            dateRange.start,
-            dateRange.end,
-          );
-          
+          const cached = await budgetDb.getTransactionsByDateRange(dateRange.start, dateRange.end);
+
           if (cached && cached.length > 0) {
             return cached.slice(0, options.limit || 1000);
           }
-          
+
           throw new Error("No cached transaction data available");
         },
         staleTime: 60 * 1000, // 1 minute
@@ -104,7 +98,7 @@ export const prefetchHelpers = {
   prefetchBills: async (queryClient, options = {}) => {
     try {
       const { category, isPaid, daysAhead = 30 } = options;
-      
+
       return await queryClient.prefetchQuery({
         queryKey: queryKeys.billsList(options),
         queryFn: async () => {
@@ -114,11 +108,11 @@ export const prefetchHelpers = {
             isPaid,
             daysAhead,
           });
-          
+
           if (bills && bills.length >= 0) {
             return bills;
           }
-          
+
           throw new Error("No cached bill data available");
         },
         staleTime: 5 * 60 * 1000, // 5 minutes
@@ -146,11 +140,11 @@ export const prefetchHelpers = {
             isCompleted: options.isCompleted,
             category: options.category,
           });
-          
+
           if (goals && goals.length >= 0) {
             return goals;
           }
-          
+
           throw new Error("No cached savings goals data available");
         },
         staleTime: 2 * 60 * 1000, // 2 minutes
@@ -178,29 +172,24 @@ export const prefetchHelpers = {
           if (cached) {
             return cached;
           }
-          
+
           // Generate dashboard data from current database state
-          const [
-            envelopes,
-            recentTransactions,
-            upcomingBills,
-            metadata,
-          ] = await Promise.all([
+          const [envelopes, recentTransactions, upcomingBills, metadata] = await Promise.all([
             budgetDatabaseService.getEnvelopes({ useCache: false }),
-            budgetDatabaseService.getTransactions({ 
-              limit: 10, 
-              useCache: false 
+            budgetDatabaseService.getTransactions({
+              limit: 10,
+              useCache: false,
             }),
-            budgetDatabaseService.getBills({ 
-              isPaid: false, 
-              daysAhead: 7 
+            budgetDatabaseService.getBills({
+              isPaid: false,
+              daysAhead: 7,
             }),
             budgetDatabaseService.getBudgetMetadata(),
           ]);
 
           const dashboardData = {
             totalEnvelopes: envelopes.length,
-            activeEnvelopes: envelopes.filter(e => !e.archived).length,
+            activeEnvelopes: envelopes.filter((e) => !e.archived).length,
             recentTransactionCount: recentTransactions.length,
             upcomingBillsCount: upcomingBills.length,
             unassignedCash: metadata?.unassignedCash || 0,
@@ -210,8 +199,8 @@ export const prefetchHelpers = {
 
           // Cache the result
           await budgetDb.setCachedValue(
-            "dashboard_summary", 
-            dashboardData, 
+            "dashboard_summary",
+            dashboardData,
             60 * 1000 // 1 minute TTL
           );
 
@@ -239,7 +228,7 @@ export const prefetchHelpers = {
           // Calculate date range based on period
           const now = new Date();
           let startDate = new Date();
-          
+
           switch (period) {
             case "week":
               startDate.setDate(now.getDate() - 7);
@@ -258,11 +247,11 @@ export const prefetchHelpers = {
             { start: startDate, end: now },
             { includeTransfers: false, useCache: true }
           );
-          
+
           if (analyticsData) {
             return analyticsData;
           }
-          
+
           throw new Error("No analytics data available");
         },
         staleTime: 5 * 60 * 1000, // 5 minutes
@@ -286,16 +275,22 @@ export const prefetchHelpers = {
         prefetchHelpers.prefetchDashboard(queryClient),
         prefetchHelpers.prefetchEnvelopes(queryClient, { includeArchived: false }),
         prefetchHelpers.prefetchBills(queryClient, { isPaid: false, daysAhead: 7 }),
-        prefetchHelpers.prefetchTransactions(queryClient, {
-          start: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-          end: new Date(),
-        }, { limit: 20 }),
+        prefetchHelpers.prefetchTransactions(
+          queryClient,
+          {
+            start: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+            end: new Date(),
+          },
+          { limit: 20 }
+        ),
       ];
 
       const results = await Promise.allSettled(prefetchPromises);
-      const successful = results.filter(r => r.status === "fulfilled").length;
-      
-      logger.info(`Dashboard bundle prefetch completed: ${successful}/${results.length} successful`);
+      const successful = results.filter((r) => r.status === "fulfilled").length;
+
+      logger.info(
+        `Dashboard bundle prefetch completed: ${successful}/${results.length} successful`
+      );
       return results;
     } catch (error) {
       logger.error("Failed to prefetch dashboard bundle", error);
@@ -319,22 +314,23 @@ export const prefetchHelpers = {
     const entityPrefetchMap = {
       dashboard: () => prefetchHelpers.prefetchDashboard(queryClient),
       envelopes: () => prefetchHelpers.prefetchEnvelopes(queryClient),
-      transactions: () => prefetchHelpers.prefetchTransactions(queryClient, {
-        start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-        end: new Date(),
-      }),
+      transactions: () =>
+        prefetchHelpers.prefetchTransactions(queryClient, {
+          start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+          end: new Date(),
+        }),
       bills: () => prefetchHelpers.prefetchBills(queryClient),
       analytics: () => prefetchHelpers.prefetchAnalytics(queryClient),
       savingsGoals: () => prefetchHelpers.prefetchSavingsGoals(queryClient),
     };
 
     const toPrefetch = prefetchMap[currentRoute] || [];
-    
+
     try {
       const prefetchPromises = toPrefetch
-        .map(entity => entityPrefetchMap[entity])
+        .map((entity) => entityPrefetchMap[entity])
         .filter(Boolean)
-        .map(fn => fn());
+        .map((fn) => fn());
 
       await Promise.allSettled(prefetchPromises);
       logger.debug(`Smart prefetch completed for route: ${currentRoute}`, {

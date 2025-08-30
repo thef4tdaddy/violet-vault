@@ -1,14 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useConfirm } from "../../hooks/common/useConfirm";
-import {
-  Lock,
-  Unlock,
-  Eye,
-  EyeOff,
-  AlertCircle,
-  Shield,
-  Clock,
-} from "lucide-react";
+import { Lock, Unlock, Eye, EyeOff, AlertCircle, Shield, Clock } from "lucide-react";
 import { useSecurityManager } from "../../hooks/auth/useSecurityManager";
 import { useAuth } from "../../stores/auth/authStore";
 import shieldLogo from "../../assets/logo-512x512.png";
@@ -30,7 +22,7 @@ const LockScreen = () => {
       const recentFailures = securityEvents.filter(
         (event) =>
           event.type === "FAILED_UNLOCK" &&
-          Date.now() - new Date(event.timestamp).getTime() < 5 * 60 * 1000, // last 5 minutes
+          Date.now() - new Date(event.timestamp).getTime() < 5 * 60 * 1000 // last 5 minutes
       ).length;
       setFailedAttempts(recentFailures);
     }
@@ -137,9 +129,7 @@ const LockScreen = () => {
             />
           </div>
           <h1 className="text-2xl font-bold text-white mb-2">Violet Vault</h1>
-          <p className="text-purple-100">
-            Your session has been locked for security
-          </p>
+          <p className="text-purple-100">Your session has been locked for security</p>
         </div>
 
         {/* Unlock Form */}
@@ -167,11 +157,7 @@ const LockScreen = () => {
                   disabled={isUnlocking}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-100 hover:text-white disabled:opacity-50"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>
@@ -191,8 +177,7 @@ const LockScreen = () => {
                 <span className="text-sm">
                   {failedAttempts} failed attempt
                   {failedAttempts !== 1 ? "s" : ""}
-                  {failedAttempts >= 3 &&
-                    " - delays are being applied for security"}
+                  {failedAttempts >= 3 && " - delays are being applied for security"}
                 </span>
               </div>
             )}

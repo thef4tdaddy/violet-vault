@@ -2,11 +2,7 @@ import React from "react";
 import { Clock, TrendingUp, User, Calendar } from "lucide-react";
 import { formatPaycheckAmount } from "../../../utils/budgeting/paycheckUtils";
 
-const PaycheckHistory = ({
-  paycheckHistory = [],
-  paycheckStats,
-  onSelectPaycheck = () => {},
-}) => {
+const PaycheckHistory = ({ paycheckHistory = [], paycheckStats, onSelectPaycheck = () => {} }) => {
   if (paycheckHistory.length === 0) {
     return (
       <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 text-center">
@@ -36,9 +32,7 @@ const PaycheckHistory = ({
   };
 
   const getModeColor = (mode) => {
-    return mode === "allocate" 
-      ? "text-green-600 bg-green-50" 
-      : "text-blue-600 bg-blue-50";
+    return mode === "allocate" ? "text-green-600 bg-green-50" : "text-blue-600 bg-blue-50";
   };
 
   return (
@@ -70,7 +64,8 @@ const PaycheckHistory = ({
             <div>
               <span className="text-gray-600 block">Range</span>
               <span className="font-bold text-gray-900">
-                {formatPaycheckAmount(paycheckStats.minAmount)} - {formatPaycheckAmount(paycheckStats.maxAmount)}
+                {formatPaycheckAmount(paycheckStats.minAmount)} -{" "}
+                {formatPaycheckAmount(paycheckStats.maxAmount)}
               </span>
             </div>
           </div>
@@ -83,7 +78,7 @@ const PaycheckHistory = ({
           <Clock className="h-4 w-4 mr-2 text-green-600" />
           Recent Paychecks ({Math.min(10, paycheckHistory.length)} most recent)
         </h4>
-        
+
         <div className="space-y-2 max-h-96 overflow-y-auto">
           {paycheckHistory.slice(0, 10).map((paycheck) => (
             <div
@@ -94,9 +89,7 @@ const PaycheckHistory = ({
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center">
                   <User className="h-4 w-4 text-gray-500 mr-2" />
-                  <span className="font-medium text-gray-900">
-                    {paycheck.payerName}
-                  </span>
+                  <span className="font-medium text-gray-900">{paycheck.payerName}</span>
                   <span
                     className={`ml-2 px-2 py-1 text-xs rounded-md ${getModeColor(paycheck.allocationMode)}`}
                   >
@@ -129,10 +122,15 @@ const PaycheckHistory = ({
               {paycheck.allocations && paycheck.allocations.length > 0 && (
                 <div className="mt-2 pt-2 border-t border-gray-100">
                   <div className="text-xs text-gray-500">
-                    Allocated to {paycheck.allocations.length} envelope{paycheck.allocations.length !== 1 ? 's' : ''}:
+                    Allocated to {paycheck.allocations.length} envelope
+                    {paycheck.allocations.length !== 1 ? "s" : ""}:
                     <span className="ml-1">
-                      {paycheck.allocations.slice(0, 3).map(alloc => alloc.envelopeName).join(", ")}
-                      {paycheck.allocations.length > 3 && ` and ${paycheck.allocations.length - 3} more`}
+                      {paycheck.allocations
+                        .slice(0, 3)
+                        .map((alloc) => alloc.envelopeName)
+                        .join(", ")}
+                      {paycheck.allocations.length > 3 &&
+                        ` and ${paycheck.allocations.length - 3} more`}
                     </span>
                   </div>
                 </div>

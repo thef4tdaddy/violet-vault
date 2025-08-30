@@ -98,7 +98,11 @@ export const validateRule = (ruleConfig) => {
       break;
 
     case RULE_TYPES.PERCENTAGE:
-      if (!ruleConfig.config?.percentage || ruleConfig.config.percentage <= 0 || ruleConfig.config.percentage > 100) {
+      if (
+        !ruleConfig.config?.percentage ||
+        ruleConfig.config.percentage <= 0 ||
+        ruleConfig.config.percentage > 100
+      ) {
         errors.push("Percentage rules require a percentage between 0 and 100");
       }
       break;
@@ -121,7 +125,10 @@ export const validateRule = (ruleConfig) => {
     errors.push("Single envelope rules require a target envelope");
   }
 
-  if (ruleConfig.config?.targetType === "multiple" && (!ruleConfig.config?.targetIds || ruleConfig.config.targetIds.length === 0)) {
+  if (
+    ruleConfig.config?.targetType === "multiple" &&
+    (!ruleConfig.config?.targetIds || ruleConfig.config.targetIds.length === 0)
+  ) {
     errors.push("Multiple envelope rules require at least one target envelope");
   }
 
@@ -146,7 +153,7 @@ export const calculateFundingAmount = (rule, context) => {
 
     case RULE_TYPES.PERCENTAGE: {
       const baseAmount = getBaseAmountForPercentage(rule, context);
-      return Math.round((baseAmount * rule.config.percentage / 100) * 100) / 100;
+      return Math.round(((baseAmount * rule.config.percentage) / 100) * 100) / 100;
     }
 
     case RULE_TYPES.PRIORITY_FILL:
@@ -172,17 +179,17 @@ export const getBaseAmountForPercentage = (rule, context) => {
   switch (rule.config.sourceType) {
     case "unassigned":
       return unassignedCash;
-    
+
     case "envelope":
       if (rule.config.sourceId) {
-        const envelope = envelopes.find(e => e.id === rule.config.sourceId);
+        const envelope = envelopes.find((e) => e.id === rule.config.sourceId);
         return envelope?.currentBalance || 0;
       }
       return 0;
-    
+
     case "income":
       return newIncomeAmount || unassignedCash;
-    
+
     default:
       return unassignedCash;
   }
@@ -196,12 +203,12 @@ export const getBaseAmountForPercentage = (rule, context) => {
  */
 export const calculatePriorityFillAmount = (rule, context) => {
   const { envelopes, unassignedCash } = context.data;
-  
+
   if (!rule.config.targetId) return 0;
-  
-  const targetEnvelope = envelopes.find(e => e.id === rule.config.targetId);
+
+  const targetEnvelope = envelopes.find((e) => e.id === rule.config.targetId);
   if (!targetEnvelope) return 0;
-  
+
   const needed = (targetEnvelope.monthlyAmount || 0) - (targetEnvelope.currentBalance || 0);
   return Math.max(0, Math.min(needed, unassignedCash));
 };
@@ -216,7 +223,7 @@ export const sortRulesByPriority = (rules) => {
     // First by priority (lower number = higher priority)
     const priorityDiff = (a.priority || 100) - (b.priority || 100);
     if (priorityDiff !== 0) return priorityDiff;
-    
+
     // Then by creation date (older first)
     return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
   });
@@ -232,22 +239,23 @@ export const filterRules = (rules, filters = {}) => {
   let filtered = [...rules];
 
   if (filters.enabled !== undefined) {
-    filtered = filtered.filter(rule => rule.enabled === filters.enabled);
+    filtered = filtered.filter((rule) => rule.enabled === filters.enabled);
   }
 
   if (filters.type) {
-    filtered = filtered.filter(rule => rule.type === filters.type);
+    filtered = filtered.filter((rule) => rule.type === filters.type);
   }
 
   if (filters.trigger) {
-    filtered = filtered.filter(rule => rule.trigger === filters.trigger);
+    filtered = filtered.filter((rule) => rule.trigger === filters.trigger);
   }
 
   if (filters.search) {
     const searchTerm = filters.search.toLowerCase();
-    filtered = filtered.filter(rule => 
-      (rule.name || "").toLowerCase().includes(searchTerm) ||
-      (rule.description || "").toLowerCase().includes(searchTerm)
+    filtered = filtered.filter(
+      (rule) =>
+        (rule.name || "").toLowerCase().includes(searchTerm) ||
+        (rule.description || "").toLowerCase().includes(searchTerm)
     );
   }
 
@@ -270,7 +278,7 @@ export const getRuleStatistics = (rules) => {
     lastExecuted: null,
   };
 
-  rules.forEach(rule => {
+  rules.forEach((rule) => {
     // Enabled/disabled count
     if (rule.enabled) {
       stats.enabled++;
@@ -286,7 +294,7 @@ export const getRuleStatistics = (rules) => {
 
     // Execution stats
     stats.totalExecutions += rule.executionCount || 0;
-    
+
     if (rule.lastExecuted) {
       const lastExecuted = new Date(rule.lastExecuted);
       if (!stats.lastExecuted || lastExecuted > new Date(stats.lastExecuted)) {
@@ -320,23 +328,23 @@ export const createRuleSummary = (rule) => {
     case RULE_TYPES.FIXED_AMOUNT:
       summary.description = `Move $${rule.config.amount || 0}`;
       break;
-    
+
     case RULE_TYPES.PERCENTAGE:
       summary.description = `Move ${rule.config.percentage || 0}%`;
       break;
-    
+
     case RULE_TYPES.PRIORITY_FILL:
       summary.description = "Fill to monthly amount";
       break;
-    
+
     case RULE_TYPES.SPLIT_REMAINDER:
       summary.description = "Split remaining funds";
       break;
-    
+
     case RULE_TYPES.CONDITIONAL:
       summary.description = `If ${rule.config.conditions?.length || 0} condition(s) met`;
       break;
-    
+
     default:
       summary.description = rule.type;
   }
@@ -346,7 +354,7 @@ export const createRuleSummary = (rule) => {
     summary.targetDescription = "to envelope";
   } else if (rule.config.targetType === "multiple") {
     const count = rule.config.targetIds?.length || 0;
-    summary.targetDescription = `to ${count} envelope${count !== 1 ? 's' : ''}`;
+    summary.targetDescription = `to ${count} envelope${count !== 1 ? "s" : ""}`;
   }
 
   return summary;

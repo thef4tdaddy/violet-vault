@@ -14,7 +14,7 @@ export class ScreenshotService {
    */
   static async captureScreenshot(options = {}) {
     const { compress = true } = options;
-    
+
     try {
       // Check if we're on mobile - use simpler approach
       const isMobile = this.detectMobileDevice();
@@ -58,9 +58,8 @@ export class ScreenshotService {
    */
   static detectMobileDevice() {
     return (
-      /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-        navigator.userAgent,
-      ) || window.innerWidth <= 768
+      /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+      window.innerWidth <= 768
     );
   }
 
@@ -70,7 +69,7 @@ export class ScreenshotService {
    */
   static async captureWithDisplayMedia() {
     logger.debug("Attempting native screen capture API (user interaction required)");
-    
+
     // This requires user permission and interaction
     const stream = await navigator.mediaDevices.getDisplayMedia({
       video: {
@@ -116,10 +115,7 @@ export class ScreenshotService {
     logger.debug("Attempting html2canvas screen capture");
 
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(
-        () => reject(new Error("Screenshot timeout after 10 seconds")),
-        10000,
-      ),
+      setTimeout(() => reject(new Error("Screenshot timeout after 10 seconds")), 10000)
     );
 
     // Dynamically import html2canvas
@@ -160,7 +156,7 @@ export class ScreenshotService {
         onclone: (clonedDoc) => {
           // Remove potentially problematic elements
           const problematicElements = clonedDoc.querySelectorAll(
-            "iframe, embed, object, canvas[data-html2canvas-ignore]",
+            "iframe, embed, object, canvas[data-html2canvas-ignore]"
           );
           problematicElements.forEach((el) => el.remove());
         },
@@ -169,7 +165,6 @@ export class ScreenshotService {
       const fallbackDataUrl = fallbackCanvas.toDataURL("image/png", 0.3);
       logger.info("Fallback screenshot captured successfully");
       return fallbackDataUrl;
-
     } catch (error) {
       logger.warn("Fallback html2canvas failed, using manual canvas method");
       return await this.captureManualCanvas();
@@ -184,7 +179,7 @@ export class ScreenshotService {
     try {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
-      
+
       canvas.width = Math.min(window.innerWidth, 1200);
       canvas.height = Math.min(window.innerHeight, 800);
 
@@ -196,18 +191,16 @@ export class ScreenshotService {
       ctx.fillStyle = "#333";
       ctx.font = "24px Arial, sans-serif";
       ctx.textAlign = "center";
-      
+
       const pageTitle = document.title || "Unknown Page";
       ctx.fillText(pageTitle, canvas.width / 2, 50);
-      
+
       // Add current URL
       ctx.font = "14px Arial, sans-serif";
       ctx.fillText(window.location.href, canvas.width / 2, 80);
-      
+
       // Try to capture some visual elements
-      const activeTab = document.querySelector(
-        "[aria-selected='true'], .active, .selected",
-      );
+      const activeTab = document.querySelector("[aria-selected='true'], .active, .selected");
       if (activeTab) {
         ctx.fillText(`Active Tab: ${activeTab.textContent?.trim()}`, canvas.width / 2, 110);
       }
@@ -215,7 +208,6 @@ export class ScreenshotService {
       const fallbackDataUrl = canvas.toDataURL("image/png", 0.8);
       logger.info("Manual canvas screenshot created");
       return fallbackDataUrl;
-
     } catch (error) {
       logger.error("All screenshot methods failed", error);
       return null;
@@ -234,12 +226,7 @@ export class ScreenshotService {
    */
   static async compressScreenshot(dataUrl, options = {}) {
     try {
-      const {
-        quality = 0.7,
-        maxWidth = 1920,
-        maxHeight = 1080,
-        format = 'jpeg'
-      } = options;
+      const { quality = 0.7, maxWidth = 1920, maxHeight = 1080, format = "jpeg" } = options;
 
       logger.debug("Compressing screenshot", { quality, maxWidth, maxHeight, format });
 
@@ -260,30 +247,32 @@ export class ScreenshotService {
       }
 
       // Create canvas and draw compressed image
-      const canvas = document.createElement('canvas');
+      const canvas = document.createElement("canvas");
       canvas.width = width;
       canvas.height = height;
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext("2d");
 
       // Improve compression quality
       ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-      
+      ctx.imageSmoothingQuality = "high";
+
       // Draw image at new size
       ctx.drawImage(img, 0, 0, width, height);
 
       // Convert to compressed format
-      const mimeType = format === 'webp' ? 'image/webp' : 'image/jpeg';
+      const mimeType = format === "webp" ? "image/webp" : "image/jpeg";
       const compressedDataUrl = canvas.toDataURL(mimeType, quality);
 
       const originalSize = this.getScreenshotInfo(dataUrl);
       const compressedSize = this.getScreenshotInfo(compressedDataUrl);
-      
+
       logger.info("Screenshot compressed", {
         originalSizeKB: originalSize?.sizeKB,
         compressedSizeKB: compressedSize?.sizeKB,
-        compressionRatio: originalSize ? Math.round((1 - compressedSize.sizeKB / originalSize.sizeKB) * 100) : 0,
-        newDimensions: `${width}x${height}`
+        compressionRatio: originalSize
+          ? Math.round((1 - compressedSize.sizeKB / originalSize.sizeKB) * 100)
+          : 0,
+        newDimensions: `${width}x${height}`,
       });
 
       return compressedDataUrl;
@@ -308,33 +297,33 @@ export class ScreenshotService {
     // Compress if over 200KB
     if (info.sizeKB > 200) {
       logger.debug(`Screenshot is ${info.sizeKB}KB, applying compression`);
-      
+
       // Aggressive compression for very large screenshots
       if (info.sizeKB > 1000) {
         return this.compressScreenshot(dataUrl, {
           quality: 0.5,
           maxWidth: 1280,
           maxHeight: 720,
-          format: 'jpeg'
+          format: "jpeg",
         });
       }
-      
+
       // Moderate compression for medium-large screenshots
       if (info.sizeKB > 500) {
         return this.compressScreenshot(dataUrl, {
           quality: 0.6,
           maxWidth: 1600,
           maxHeight: 900,
-          format: 'jpeg'
+          format: "jpeg",
         });
       }
-      
+
       // Light compression for slightly large screenshots
       return this.compressScreenshot(dataUrl, {
         quality: 0.8,
         maxWidth: 1920,
         maxHeight: 1080,
-        format: 'jpeg'
+        format: "jpeg",
       });
     }
 
@@ -351,14 +340,17 @@ export class ScreenshotService {
 
     const sizeInBytes = Math.round((dataUrl.length * 3) / 4);
     const sizeInKB = Math.round(sizeInBytes / 1024);
-    const format = dataUrl.includes('data:image/jpeg') ? 'jpeg' : 
-                   dataUrl.includes('data:image/webp') ? 'webp' : 'png';
-    
+    const format = dataUrl.includes("data:image/jpeg")
+      ? "jpeg"
+      : dataUrl.includes("data:image/webp")
+        ? "webp"
+        : "png";
+
     return {
       size: sizeInBytes,
       sizeKB: sizeInKB,
       format,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 }

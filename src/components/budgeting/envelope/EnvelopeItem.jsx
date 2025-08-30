@@ -14,18 +14,9 @@ import { getBillEnvelopeDisplayInfo } from "../../../utils/budgeting/billEnvelop
 import { BIWEEKLY_MULTIPLIER } from "../../../constants/frequency";
 
 // Lazy load the bill funding info component
-const BillEnvelopeFundingInfo = React.lazy(
-  () => import("../BillEnvelopeFundingInfo"),
-);
+const BillEnvelopeFundingInfo = React.lazy(() => import("../BillEnvelopeFundingInfo"));
 
-const EnvelopeItem = ({
-  envelope,
-  onSelect,
-  onEdit,
-  onViewHistory,
-  isSelected,
-  bills = [],
-}) => {
+const EnvelopeItem = ({ envelope, onSelect, onEdit, onViewHistory, isSelected, bills = [] }) => {
   const getStatusIcon = (status) => {
     switch (status) {
       case "overdue":
@@ -46,10 +37,7 @@ const EnvelopeItem = ({
           const displayInfo = getBillEnvelopeDisplayInfo(envelope, bills);
           if (!displayInfo) {
             // Fallback to original function
-            return getUtilizationColor(
-              envelope.utilizationRate,
-              envelope.status,
-            );
+            return getUtilizationColor(envelope.utilizationRate, envelope.status);
           }
 
           const { displayText } = displayInfo;
@@ -84,9 +72,7 @@ const EnvelopeItem = ({
                 title={`Color: ${envelope.color}`}
               />
             )}
-            <h3 className="font-semibold text-gray-900 truncate">
-              {envelope.name}
-            </h3>
+            <h3 className="font-semibold text-gray-900 truncate">{envelope.name}</h3>
           </div>
           <p className="text-xs text-gray-600 mt-1">{envelope.category}</p>
         </div>
@@ -96,9 +82,7 @@ const EnvelopeItem = ({
             className={`flex items-center px-2 py-1 rounded-full text-xs ${utilizationColorClass}`}
           >
             {envelope.status !== "healthy" && getStatusIcon(envelope.status)}
-            <span className="ml-1">
-              {(envelope.utilizationRate * 100).toFixed(0)}%
-            </span>
+            <span className="ml-1">{(envelope.utilizationRate * 100).toFixed(0)}%</span>
           </div>
 
           <div className="flex gap-1">
@@ -141,7 +125,7 @@ const EnvelopeItem = ({
               if (!displayInfo) {
                 // Fallback to simple calculation if sophisticated logic fails
                 const linkedBills = bills.filter(
-                  (bill) => bill.envelopeId === envelope.id && !bill.isPaid,
+                  (bill) => bill.envelopeId === envelope.id && !bill.isPaid
                 );
                 const nextBill = linkedBills
                   .filter((bill) => new Date(bill.dueDate) >= new Date())
@@ -164,15 +148,10 @@ const EnvelopeItem = ({
                 );
               }
 
-              const {
-                displayText,
-                remainingToFund,
-                currentBalance,
-                targetMonthlyAmount,
-              } = displayInfo;
+              const { displayText, remainingToFund, currentBalance, targetMonthlyAmount } =
+                displayInfo;
               const isOnTrack = displayText.primaryStatus === "On Track";
-              const isFullyFunded =
-                displayText.primaryStatus === "Fully Funded";
+              const isFullyFunded = displayText.primaryStatus === "Fully Funded";
               const isBehind = displayText.primaryStatus.startsWith("Behind");
 
               // Calculate amount to display based on status
@@ -225,14 +204,10 @@ const EnvelopeItem = ({
         <div className="grid grid-cols-3 gap-4 py-4">
           <div className="text-center bg-red-50 rounded-lg p-4 border border-red-100">
             <p className="text-sm font-medium text-red-700 mb-2">Spent (30d)</p>
-            <p className="text-2xl font-bold text-red-600">
-              ${envelope.totalSpent.toFixed(2)}
-            </p>
+            <p className="text-2xl font-bold text-red-600">${envelope.totalSpent.toFixed(2)}</p>
           </div>
           <div className="text-center bg-blue-50 rounded-lg p-4 border border-blue-100">
-            <p className="text-sm font-medium text-blue-700 mb-2">
-              Monthly Budget
-            </p>
+            <p className="text-sm font-medium text-blue-700 mb-2">Monthly Budget</p>
             <p className="text-2xl font-bold text-blue-600">
               ${(envelope.monthlyBudget || 0).toFixed(2)}
             </p>
@@ -240,8 +215,7 @@ const EnvelopeItem = ({
           <div className="text-center bg-green-50 rounded-lg p-4 border border-green-100">
             <p className="text-sm font-medium text-green-700 mb-2">Biweekly</p>
             <p className="text-2xl font-bold text-green-600">
-              $
-              {((envelope.monthlyBudget || 0) / BIWEEKLY_MULTIPLIER).toFixed(2)}
+              ${((envelope.monthlyBudget || 0) / BIWEEKLY_MULTIPLIER).toFixed(2)}
             </p>
           </div>
         </div>
@@ -249,21 +223,15 @@ const EnvelopeItem = ({
         <div className="grid grid-cols-3 gap-2 text-xs">
           <div className="text-center">
             <p className="text-gray-500">Spent</p>
-            <p className="font-medium text-red-600">
-              ${envelope.totalSpent.toFixed(2)}
-            </p>
+            <p className="font-medium text-red-600">${envelope.totalSpent.toFixed(2)}</p>
           </div>
           <div className="text-center">
             <p className="text-gray-500">Upcoming</p>
-            <p className="font-medium text-orange-600">
-              ${envelope.totalUpcoming.toFixed(2)}
-            </p>
+            <p className="font-medium text-orange-600">${envelope.totalUpcoming.toFixed(2)}</p>
           </div>
           <div className="text-center">
             <p className="text-gray-500">Overdue</p>
-            <p className="font-medium text-red-700">
-              ${envelope.totalOverdue.toFixed(2)}
-            </p>
+            <p className="font-medium text-red-700">${envelope.totalOverdue.toFixed(2)}</p>
           </div>
         </div>
       )}
@@ -271,13 +239,7 @@ const EnvelopeItem = ({
       {/* Minimal Bill Info for Bill Envelopes - most info already shown above */}
       {envelope.envelopeType === ENVELOPE_TYPES.BILL && bills.length > 0 && (
         <div className="mt-4 pt-3 border-t border-gray-200">
-          <Suspense
-            fallback={
-              <div className="text-xs text-gray-500">
-                Loading funding info...
-              </div>
-            }
-          >
+          <Suspense fallback={<div className="text-xs text-gray-500">Loading funding info...</div>}>
             {(() => {
               // Use the imported function
               const displayInfo = getBillEnvelopeDisplayInfo(envelope, bills);
@@ -325,10 +287,7 @@ const EnvelopeItem = ({
               className={`h-2 rounded-full transition-all duration-300 ${
                 envelope.envelopeType === ENVELOPE_TYPES.BILL
                   ? (() => {
-                      const displayInfo = getBillEnvelopeDisplayInfo(
-                        envelope,
-                        bills,
-                      );
+                      const displayInfo = getBillEnvelopeDisplayInfo(envelope, bills);
                       if (!displayInfo) {
                         // Fallback to old logic if sophisticated calculation fails
                         return envelope.utilizationRate > 1
@@ -341,12 +300,9 @@ const EnvelopeItem = ({
                       }
 
                       const { displayText } = displayInfo;
-                      const isOnTrack =
-                        displayText.primaryStatus === "On Track";
-                      const isFullyFunded =
-                        displayText.primaryStatus === "Fully Funded";
-                      const isBehind =
-                        displayText.primaryStatus.startsWith("Behind");
+                      const isOnTrack = displayText.primaryStatus === "On Track";
+                      const isFullyFunded = displayText.primaryStatus === "Fully Funded";
+                      const isBehind = displayText.primaryStatus.startsWith("Behind");
 
                       if (isFullyFunded) return "bg-green-500";
                       if (isOnTrack) return "bg-blue-500";

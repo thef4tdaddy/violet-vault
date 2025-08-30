@@ -53,7 +53,7 @@ describe("useAutoFundingRules", () => {
 
     it("should update an existing rule", () => {
       let ruleId;
-      
+
       // Add a rule first
       act(() => {
         const newRule = hookResult.result.current.addRule(mockRule);
@@ -65,14 +65,14 @@ describe("useAutoFundingRules", () => {
         hookResult.result.current.updateRule(ruleId, { name: "Updated Rule" });
       });
 
-      const updatedRule = hookResult.result.current.rules.find(r => r.id === ruleId);
+      const updatedRule = hookResult.result.current.rules.find((r) => r.id === ruleId);
       expect(updatedRule.name).toBe("Updated Rule");
       expect(updatedRule.updatedAt).toBeDefined();
     });
 
     it("should delete a rule", () => {
       let ruleId;
-      
+
       // Add a rule first
       act(() => {
         const newRule = hookResult.result.current.addRule(mockRule);
@@ -92,14 +92,14 @@ describe("useAutoFundingRules", () => {
 
     it("should toggle rule enabled status", () => {
       let ruleId;
-      
+
       // Add a rule first
       act(() => {
         const newRule = hookResult.result.current.addRule(mockRule);
         ruleId = newRule.id;
       });
 
-      const initialRule = hookResult.result.current.rules.find(r => r.id === ruleId);
+      const initialRule = hookResult.result.current.rules.find((r) => r.id === ruleId);
       expect(initialRule.enabled).toBe(true); // Default is enabled
 
       // Toggle rule
@@ -107,13 +107,13 @@ describe("useAutoFundingRules", () => {
         hookResult.result.current.toggleRule(ruleId);
       });
 
-      const toggledRule = hookResult.result.current.rules.find(r => r.id === ruleId);
+      const toggledRule = hookResult.result.current.rules.find((r) => r.id === ruleId);
       expect(toggledRule.enabled).toBe(false);
     });
 
     it("should duplicate a rule", () => {
       let ruleId;
-      
+
       // Add a rule first
       act(() => {
         const newRule = hookResult.result.current.addRule(mockRule);
@@ -196,8 +196,8 @@ describe("useAutoFundingRules", () => {
       const enabledRules = hookResult.result.current.getFilteredRules({ enabled: true });
       expect(enabledRules).toHaveLength(2); // Rule 1 and Rule 3
 
-      const fixedAmountRules = hookResult.result.current.getFilteredRules({ 
-        type: RULE_TYPES.FIXED_AMOUNT 
+      const fixedAmountRules = hookResult.result.current.getFilteredRules({
+        type: RULE_TYPES.FIXED_AMOUNT,
       });
       expect(fixedAmountRules).toHaveLength(2); // Rule 1 and Rule 3
     });
@@ -221,7 +221,7 @@ describe("useAutoFundingRules", () => {
     it("should get rule by ID", () => {
       const firstRule = hookResult.result.current.rules[0];
       const foundRule = hookResult.result.current.getRuleById(firstRule.id);
-      
+
       expect(foundRule).toBeDefined();
       expect(foundRule.id).toBe(firstRule.id);
     });
@@ -250,17 +250,17 @@ describe("useAutoFundingRules", () => {
 
     it("should bulk update rules", () => {
       act(() => {
-        hookResult.result.current.bulkUpdateRules([ruleIds[0], ruleIds[1]], { 
-          priority: 100 
+        hookResult.result.current.bulkUpdateRules([ruleIds[0], ruleIds[1]], {
+          priority: 100,
         });
       });
 
       const rules = hookResult.result.current.rules;
-      expect(rules.find(r => r.id === ruleIds[0]).priority).toBe(100);
-      expect(rules.find(r => r.id === ruleIds[1]).priority).toBe(100);
+      expect(rules.find((r) => r.id === ruleIds[0]).priority).toBe(100);
+      expect(rules.find((r) => r.id === ruleIds[1]).priority).toBe(100);
       // Rule 3 should still have its original priority (which is the default 100 from createDefaultRule)
       // So let's check that it exists and wasn't updated
-      const rule3 = rules.find(r => r.id === ruleIds[2]);
+      const rule3 = rules.find((r) => r.id === ruleIds[2]);
       expect(rule3).toBeDefined();
       expect(rule3.updatedAt).toBeUndefined(); // Should not have been updated
     });
@@ -280,9 +280,9 @@ describe("useAutoFundingRules", () => {
       });
 
       const rules = hookResult.result.current.rules;
-      expect(rules.find(r => r.id === ruleIds[0]).enabled).toBe(false);
-      expect(rules.find(r => r.id === ruleIds[1]).enabled).toBe(false);
-      expect(rules.find(r => r.id === ruleIds[2]).enabled).toBe(true); // Unchanged
+      expect(rules.find((r) => r.id === ruleIds[0]).enabled).toBe(false);
+      expect(rules.find((r) => r.id === ruleIds[1]).enabled).toBe(false);
+      expect(rules.find((r) => r.id === ruleIds[2]).enabled).toBe(true); // Unchanged
     });
   });
 
@@ -308,7 +308,7 @@ describe("useAutoFundingRules", () => {
 
     it("should get rule statistics", () => {
       const stats = hookResult.result.current.getRulesStatistics();
-      
+
       expect(stats.total).toBe(2);
       expect(stats.enabled).toBe(1);
       expect(stats.disabled).toBe(1);
@@ -324,20 +324,20 @@ describe("useAutoFundingRules", () => {
       ruleIds = [];
       // Add rules with different priorities
       act(() => {
-        const rule1 = hookResult.result.current.addRule({ 
-          ...mockRule, 
-          name: "Rule 1", 
-          priority: 30 
+        const rule1 = hookResult.result.current.addRule({
+          ...mockRule,
+          name: "Rule 1",
+          priority: 30,
         });
-        const rule2 = hookResult.result.current.addRule({ 
-          ...mockRule, 
-          name: "Rule 2", 
-          priority: 10 
+        const rule2 = hookResult.result.current.addRule({
+          ...mockRule,
+          name: "Rule 2",
+          priority: 10,
         });
-        const rule3 = hookResult.result.current.addRule({ 
-          ...mockRule, 
-          name: "Rule 3", 
-          priority: 20 
+        const rule3 = hookResult.result.current.addRule({
+          ...mockRule,
+          name: "Rule 3",
+          priority: 20,
         });
         ruleIds = [rule1.id, rule2.id, rule3.id];
       });
@@ -358,9 +358,9 @@ describe("useAutoFundingRules", () => {
       });
 
       const rules = hookResult.result.current.rules;
-      expect(rules.find(r => r.id === ruleIds[0]).priority).toBe(10); // First position
-      expect(rules.find(r => r.id === ruleIds[2]).priority).toBe(20); // Second position
-      expect(rules.find(r => r.id === ruleIds[1]).priority).toBe(30); // Third position
+      expect(rules.find((r) => r.id === ruleIds[0]).priority).toBe(10); // First position
+      expect(rules.find((r) => r.id === ruleIds[2]).priority).toBe(20); // Second position
+      expect(rules.find((r) => r.id === ruleIds[1]).priority).toBe(30); // Third position
     });
   });
 });

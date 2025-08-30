@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  DollarSign,
-  TrendingUp,
-  Calculator,
-  Target,
-  Calendar,
-} from "lucide-react";
+import { DollarSign, TrendingUp, Calculator, Target, Calendar } from "lucide-react";
 
 const EnvelopeSummary = ({ totals }) => {
   const balanceAfterBills = totals.totalBalance - totals.totalUpcoming;
@@ -16,9 +10,7 @@ const EnvelopeSummary = ({ totals }) => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-blue-100 text-sm">Total Allocated</p>
-            <p className="text-2xl font-bold">
-              ${totals.totalAllocated.toFixed(2)}
-            </p>
+            <p className="text-2xl font-bold">${totals.totalAllocated.toFixed(2)}</p>
           </div>
           <DollarSign className="h-8 w-8 text-blue-200" />
         </div>
@@ -28,9 +20,7 @@ const EnvelopeSummary = ({ totals }) => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-green-100 text-sm">Balance / After Bills</p>
-            <p className="text-2xl font-bold">
-              ${totals.totalBalance.toFixed(2)}
-            </p>
+            <p className="text-2xl font-bold">${totals.totalBalance.toFixed(2)}</p>
             <p className="text-xs text-green-100 mt-2">
               ${balanceAfterBills.toFixed(2)} after bills
             </p>
@@ -43,9 +33,7 @@ const EnvelopeSummary = ({ totals }) => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-red-100 text-sm">Total Spent</p>
-            <p className="text-2xl font-bold">
-              ${totals.totalSpent.toFixed(2)}
-            </p>
+            <p className="text-2xl font-bold">${totals.totalSpent.toFixed(2)}</p>
           </div>
           <Target className="h-8 w-8 text-red-200" />
         </div>
@@ -55,9 +43,7 @@ const EnvelopeSummary = ({ totals }) => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-purple-100 text-sm">Biweekly Need</p>
-            <p className="text-2xl font-bold">
-              ${totals.totalBiweeklyNeed.toFixed(2)}
-            </p>
+            <p className="text-2xl font-bold">${totals.totalBiweeklyNeed.toFixed(2)}</p>
           </div>
           <Calculator className="h-8 w-8 text-purple-200" />
         </div>

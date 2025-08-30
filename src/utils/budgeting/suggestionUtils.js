@@ -7,8 +7,16 @@
  * Chart colors for new envelope suggestions
  */
 export const SUGGESTION_COLORS = [
-  "#a855f7", "#06b6d4", "#10b981", "#f59e0b", "#ef4444",
-  "#8b5cf6", "#14b8a6", "#f97316", "#84cc16", "#6366f1",
+  "#a855f7",
+  "#06b6d4",
+  "#10b981",
+  "#f59e0b",
+  "#ef4444",
+  "#8b5cf6",
+  "#14b8a6",
+  "#f97316",
+  "#84cc16",
+  "#6366f1",
 ];
 
 /**
@@ -112,10 +120,7 @@ export const analyzeUnassignedTransactions = (transactions, monthsOfData, settin
 
   // Generate suggestions for significant categories
   Object.values(unassignedByCategory).forEach((categoryData, index) => {
-    if (
-      categoryData.amount >= minAmount &&
-      categoryData.count >= minTransactions
-    ) {
+    if (categoryData.amount >= minAmount && categoryData.count >= minTransactions) {
       const monthlyAverage = categoryData.amount / monthsOfData;
       const suggestedAmount = Math.ceil(monthlyAverage * bufferPercentage);
 
@@ -229,11 +234,7 @@ export const analyzeMerchantPatterns = (transactions, envelopes, monthsOfData, s
  */
 export const analyzeEnvelopeOptimization = (transactions, envelopes, monthsOfData, settings) => {
   const suggestions = [];
-  const {
-    overspendingThreshold,
-    overfundingThreshold,
-    bufferPercentage,
-  } = settings;
+  const { overspendingThreshold, overfundingThreshold, bufferPercentage } = settings;
 
   envelopes.forEach((envelope) => {
     const envelopeTransactions = transactions.filter(
@@ -242,18 +243,12 @@ export const analyzeEnvelopeOptimization = (transactions, envelopes, monthsOfDat
 
     if (envelopeTransactions.length === 0) return;
 
-    const totalSpent = envelopeTransactions.reduce(
-      (sum, t) => sum + Math.abs(t.amount),
-      0
-    );
+    const totalSpent = envelopeTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0);
     const monthlySpent = totalSpent / monthsOfData;
     const monthlyBudget = envelope.monthlyAmount || 0;
 
     // Overspending detection
-    if (
-      monthlySpent > monthlyBudget * overspendingThreshold &&
-      monthlyBudget > 0
-    ) {
+    if (monthlySpent > monthlyBudget * overspendingThreshold && monthlyBudget > 0) {
       const overage = monthlySpent - monthlyBudget;
       const suggestedAmount = Math.ceil(monthlySpent * bufferPercentage);
 

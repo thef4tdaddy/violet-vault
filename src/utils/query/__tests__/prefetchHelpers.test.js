@@ -51,10 +51,7 @@ describe("prefetchHelpers", () => {
       budgetDatabaseService.getEnvelopes.mockResolvedValue(mockEnvelopes);
       mockQueryClient.prefetchQuery.mockResolvedValue(mockEnvelopes);
 
-      const result = await prefetchHelpers.prefetchEnvelopes(
-        mockQueryClient,
-        filters
-      );
+      const result = await prefetchHelpers.prefetchEnvelopes(mockQueryClient, filters);
 
       expect(mockQueryClient.prefetchQuery).toHaveBeenCalledWith({
         queryKey: queryKeys.envelopesList(filters),
@@ -77,10 +74,7 @@ describe("prefetchHelpers", () => {
         return await queryFn();
       });
 
-      const result = await prefetchHelpers.prefetchEnvelopes(
-        mockQueryClient,
-        filters
-      );
+      const result = await prefetchHelpers.prefetchEnvelopes(mockQueryClient, filters);
 
       expect(budgetDb.getEnvelopesByCategory).toHaveBeenCalledWith(
         filters.category,
@@ -125,17 +119,12 @@ describe("prefetchHelpers", () => {
       budgetDatabaseService.getTransactions.mockResolvedValue(mockTransactions);
       mockQueryClient.prefetchQuery.mockResolvedValue(mockTransactions);
 
-      const result = await prefetchHelpers.prefetchTransactions(
-        mockQueryClient,
-        dateRange,
-        { limit: 100 }
-      );
+      const result = await prefetchHelpers.prefetchTransactions(mockQueryClient, dateRange, {
+        limit: 100,
+      });
 
       expect(mockQueryClient.prefetchQuery).toHaveBeenCalledWith({
-        queryKey: queryKeys.transactionsByDateRange(
-          dateRange.start,
-          dateRange.end
-        ),
+        queryKey: queryKeys.transactionsByDateRange(dateRange.start, dateRange.end),
         queryFn: expect.any(Function),
         staleTime: 60 * 1000,
       });
@@ -167,11 +156,9 @@ describe("prefetchHelpers", () => {
         return await queryFn();
       });
 
-      const result = await prefetchHelpers.prefetchTransactions(
-        mockQueryClient,
-        dateRange,
-        { limit: 50 }
-      );
+      const result = await prefetchHelpers.prefetchTransactions(mockQueryClient, dateRange, {
+        limit: 50,
+      });
 
       expect(result).toHaveLength(50);
       expect(result).toEqual(mockTransactions.slice(0, 50));
@@ -180,9 +167,7 @@ describe("prefetchHelpers", () => {
 
   describe("prefetchBills", () => {
     it("should prefetch bills with options", async () => {
-      const mockBills = [
-        { id: "1", name: "Rent", isPaid: false, dueDate: new Date() },
-      ];
+      const mockBills = [{ id: "1", name: "Rent", isPaid: false, dueDate: new Date() }];
 
       const options = { category: "housing", isPaid: false, daysAhead: 30 };
       budgetDatabaseService.getBills.mockResolvedValue(mockBills);
@@ -214,18 +199,13 @@ describe("prefetchHelpers", () => {
 
   describe("prefetchSavingsGoals", () => {
     it("should prefetch savings goals", async () => {
-      const mockGoals = [
-        { id: "1", name: "Emergency Fund", targetAmount: 10000 },
-      ];
+      const mockGoals = [{ id: "1", name: "Emergency Fund", targetAmount: 10000 }];
 
       const options = { isCompleted: false, category: "emergency" };
       budgetDatabaseService.getSavingsGoals.mockResolvedValue(mockGoals);
       mockQueryClient.prefetchQuery.mockResolvedValue(mockGoals);
 
-      const result = await prefetchHelpers.prefetchSavingsGoals(
-        mockQueryClient,
-        options
-      );
+      const result = await prefetchHelpers.prefetchSavingsGoals(mockQueryClient, options);
 
       expect(budgetDatabaseService.getSavingsGoals).toHaveBeenCalledWith(options);
       expect(result).toEqual(mockGoals);
@@ -288,17 +268,12 @@ describe("prefetchHelpers", () => {
 
   describe("prefetchAnalytics", () => {
     it("should prefetch analytics for different periods", async () => {
-      const mockAnalyticsData = [
-        { id: "1", amount: 100, category: "food" },
-      ];
+      const mockAnalyticsData = [{ id: "1", amount: 100, category: "food" }];
 
       budgetDatabaseService.getAnalyticsData.mockResolvedValue(mockAnalyticsData);
       mockQueryClient.prefetchQuery.mockResolvedValue(mockAnalyticsData);
 
-      const result = await prefetchHelpers.prefetchAnalytics(
-        mockQueryClient,
-        "week"
-      );
+      const result = await prefetchHelpers.prefetchAnalytics(mockQueryClient, "week");
 
       expect(mockQueryClient.prefetchQuery).toHaveBeenCalledWith({
         queryKey: queryKeys.analyticsReport("spending", { period: "week" }),
@@ -348,14 +323,13 @@ describe("prefetchHelpers", () => {
       const result = await prefetchHelpers.prefetchDashboardBundle(mockQueryClient);
 
       expect(prefetchHelpers.prefetchDashboard).toHaveBeenCalledWith(mockQueryClient);
-      expect(prefetchHelpers.prefetchEnvelopes).toHaveBeenCalledWith(
-        mockQueryClient,
-        { includeArchived: false }
-      );
-      expect(prefetchHelpers.prefetchBills).toHaveBeenCalledWith(
-        mockQueryClient,
-        { isPaid: false, daysAhead: 7 }
-      );
+      expect(prefetchHelpers.prefetchEnvelopes).toHaveBeenCalledWith(mockQueryClient, {
+        includeArchived: false,
+      });
+      expect(prefetchHelpers.prefetchBills).toHaveBeenCalledWith(mockQueryClient, {
+        isPaid: false,
+        daysAhead: 7,
+      });
       expect(prefetchHelpers.prefetchTransactions).toHaveBeenCalledWith(
         mockQueryClient,
         expect.any(Object),

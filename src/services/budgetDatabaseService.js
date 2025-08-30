@@ -44,24 +44,24 @@ class BudgetDatabaseService {
    */
   async getEnvelopes(options = {}) {
     const { category, includeArchived = false, useCache = true } = options;
-    
+
     try {
       if (category) {
         return await this.db.getEnvelopesByCategory(category, includeArchived);
       }
-      
+
       if (useCache) {
         const cacheKey = `${this.cachePrefix}envelopes_active`;
         let envelopes = await this.db.getCachedValue(cacheKey, this.defaultCacheTtl);
-        
+
         if (!envelopes) {
           envelopes = await this.db.getActiveEnvelopes();
           await this.db.setCachedValue(cacheKey, envelopes, this.defaultCacheTtl);
         }
-        
+
         return envelopes;
       }
-      
+
       return await this.db.getActiveEnvelopes();
     } catch (error) {
       logger.error("Failed to get envelopes", error);
@@ -84,41 +84,34 @@ class BudgetDatabaseService {
    * Transaction operations with date range optimization
    */
   async getTransactions(options = {}) {
-    const { 
-      dateRange, 
-      envelopeId, 
-      category, 
-      type, 
-      limit = 100,
-      useCache = false 
-    } = options;
-    
+    const { dateRange, envelopeId, category, type, limit = 100, useCache = false } = options;
+
     try {
       if (envelopeId) {
         return await this.db.getTransactionsByEnvelope(envelopeId, dateRange);
       }
-      
+
       if (category) {
         return await this.db.getTransactionsByCategory(category, dateRange);
       }
-      
+
       if (type) {
         return await this.db.getTransactionsByType(type, dateRange);
       }
-      
+
       if (dateRange) {
         const transactions = await this.db.getTransactionsByDateRange(
-          dateRange.start, 
+          dateRange.start,
           dateRange.end
         );
         return limit ? transactions.slice(0, limit) : transactions;
       }
-      
+
       // Recent transactions with cache
       if (useCache && !dateRange) {
         const cacheKey = `${this.cachePrefix}recent_transactions_${limit}`;
         let transactions = await this.db.getCachedValue(cacheKey, 60000); // 1 minute cache
-        
+
         if (!transactions) {
           const startDate = new Date();
           startDate.setDate(startDate.getDate() - 30); // Last 30 days
@@ -126,10 +119,10 @@ class BudgetDatabaseService {
           transactions = transactions.slice(0, limit);
           await this.db.setCachedValue(cacheKey, transactions, 60000);
         }
-        
+
         return transactions;
       }
-      
+
       return [];
     } catch (error) {
       logger.error("Failed to get transactions", error);
@@ -153,25 +146,25 @@ class BudgetDatabaseService {
    */
   async getBills(options = {}) {
     const { category, isPaid, daysAhead = 30, includeOverdue = true } = options;
-    
+
     try {
       if (category) {
         return await this.db.getBillsByCategory(category);
       }
-      
+
       if (isPaid === true) {
         return await this.db.getPaidBills();
       }
-      
+
       if (isPaid === false) {
         const [upcoming, overdue] = await Promise.all([
           this.db.getUpcomingBills(daysAhead),
-          includeOverdue ? this.db.getOverdueBills() : []
+          includeOverdue ? this.db.getOverdueBills() : [],
         ]);
-        
+
         return [...overdue, ...upcoming];
       }
-      
+
       // All bills
       return await this.db.bills.toArray();
     } catch (error) {
@@ -195,24 +188,24 @@ class BudgetDatabaseService {
    */
   async getSavingsGoals(options = {}) {
     const { category, isCompleted, isPaused, priority } = options;
-    
+
     try {
       if (category) {
         return await this.db.getSavingsGoalsByCategory(category);
       }
-      
+
       if (priority) {
         return await this.db.getSavingsGoalsByPriority(priority);
       }
-      
+
       if (isCompleted === true) {
         return await this.db.getCompletedSavingsGoals();
       }
-      
+
       if (isCompleted === false) {
         return await this.db.getActiveSavingsGoals();
       }
-      
+
       // All savings goals
       return await this.db.savingsGoals.toArray();
     } catch (error) {
@@ -236,16 +229,16 @@ class BudgetDatabaseService {
    */
   async getPaycheckHistory(options = {}) {
     const { limit = 50, dateRange, source } = options;
-    
+
     try {
       if (source) {
         return await this.db.getPaychecksBySource(source);
       }
-      
+
       if (dateRange) {
         return await this.db.getPaychecksByDateRange(dateRange.start, dateRange.end);
       }
-      
+
       return await this.db.getPaycheckHistory(limit);
     } catch (error) {
       logger.error("Failed to get paycheck history", error);
@@ -344,23 +337,23 @@ class BudgetDatabaseService {
    */
   async getAnalyticsData(dateRange, options = {}) {
     const { includeTransfers = false, useCache = true } = options;
-    
+
     try {
       const cacheKey = `${this.cachePrefix}analytics_${dateRange.start}_${dateRange.end}_${includeTransfers}`;
-      
+
       if (useCache) {
         let data = await this.db.getCachedValue(cacheKey, this.defaultCacheTtl);
         if (data) {
           return data;
         }
       }
-      
+
       const transactions = await this.db.getAnalyticsData(dateRange, includeTransfers);
-      
+
       if (useCache) {
         await this.db.setCachedValue(cacheKey, transactions, this.defaultCacheTtl);
       }
-      
+
       return transactions;
     } catch (error) {
       logger.error("Failed to get analytics data", error);
@@ -397,30 +390,34 @@ class BudgetDatabaseService {
 
   async clearData() {
     try {
-      await this.db.transaction("rw", [
-        this.db.budget,
-        this.db.envelopes,
-        this.db.transactions,
-        this.db.bills,
-        this.db.savingsGoals,
-        this.db.paycheckHistory,
-        this.db.debts,
-        this.db.cache,
-        this.db.auditLog
-      ], async () => {
-        await Promise.all([
-          this.db.budget.clear(),
-          this.db.envelopes.clear(),
-          this.db.transactions.clear(),
-          this.db.bills.clear(),
-          this.db.savingsGoals.clear(),
-          this.db.paycheckHistory.clear(),
-          this.db.debts.clear(),
-          this.db.cache.clear(),
-          this.db.auditLog.clear(),
-        ]);
-      });
-      
+      await this.db.transaction(
+        "rw",
+        [
+          this.db.budget,
+          this.db.envelopes,
+          this.db.transactions,
+          this.db.bills,
+          this.db.savingsGoals,
+          this.db.paycheckHistory,
+          this.db.debts,
+          this.db.cache,
+          this.db.auditLog,
+        ],
+        async () => {
+          await Promise.all([
+            this.db.budget.clear(),
+            this.db.envelopes.clear(),
+            this.db.transactions.clear(),
+            this.db.bills.clear(),
+            this.db.savingsGoals.clear(),
+            this.db.paycheckHistory.clear(),
+            this.db.debts.clear(),
+            this.db.cache.clear(),
+            this.db.auditLog.clear(),
+          ]);
+        }
+      );
+
       logger.info("All budget data cleared");
     } catch (error) {
       logger.error("Failed to clear data", error);

@@ -61,7 +61,7 @@ describe("autoFundingRules", () => {
 
     it("should include default config", () => {
       const rule = createDefaultRule();
-      
+
       expect(rule.config.sourceType).toBe("unassigned");
       expect(rule.config.targetType).toBe("envelope");
       expect(rule.config.amount).toBe(0);
@@ -235,9 +235,7 @@ describe("autoFundingRules", () => {
   describe("getBaseAmountForPercentage", () => {
     const mockContext = {
       data: {
-        envelopes: [
-          { id: "env1", currentBalance: 500 },
-        ],
+        envelopes: [{ id: "env1", currentBalance: 500 }],
         unassignedCash: 1000,
         newIncomeAmount: 2000,
       },
@@ -320,7 +318,7 @@ describe("autoFundingRules", () => {
       ];
 
       const sorted = sortRulesByPriority(rules);
-      expect(sorted.map(r => r.id)).toEqual(["rule2", "rule1", "rule3"]);
+      expect(sorted.map((r) => r.id)).toEqual(["rule2", "rule1", "rule3"]);
     });
 
     it("should sort by creation date when priorities are equal", () => {
@@ -331,7 +329,7 @@ describe("autoFundingRules", () => {
       ];
 
       const sorted = sortRulesByPriority(rules);
-      expect(sorted.map(r => r.id)).toEqual(["rule2", "rule1", "rule3"]);
+      expect(sorted.map((r) => r.id)).toEqual(["rule2", "rule1", "rule3"]);
     });
 
     it("should handle missing priority (default to 100)", () => {
@@ -342,21 +340,39 @@ describe("autoFundingRules", () => {
       ];
 
       const sorted = sortRulesByPriority(rules);
-      expect(sorted.map(r => r.id)).toEqual(["rule1", "rule2", "rule3"]);
+      expect(sorted.map((r) => r.id)).toEqual(["rule1", "rule2", "rule3"]);
     });
   });
 
   describe("filterRules", () => {
     const mockRules = [
-      { id: "rule1", name: "Rent Rule", enabled: true, type: RULE_TYPES.FIXED_AMOUNT, trigger: TRIGGER_TYPES.MANUAL },
-      { id: "rule2", name: "Savings Rule", enabled: false, type: RULE_TYPES.PERCENTAGE, trigger: TRIGGER_TYPES.INCOME_DETECTED },
-      { id: "rule3", name: "Emergency Fund", enabled: true, type: RULE_TYPES.CONDITIONAL, trigger: TRIGGER_TYPES.MANUAL },
+      {
+        id: "rule1",
+        name: "Rent Rule",
+        enabled: true,
+        type: RULE_TYPES.FIXED_AMOUNT,
+        trigger: TRIGGER_TYPES.MANUAL,
+      },
+      {
+        id: "rule2",
+        name: "Savings Rule",
+        enabled: false,
+        type: RULE_TYPES.PERCENTAGE,
+        trigger: TRIGGER_TYPES.INCOME_DETECTED,
+      },
+      {
+        id: "rule3",
+        name: "Emergency Fund",
+        enabled: true,
+        type: RULE_TYPES.CONDITIONAL,
+        trigger: TRIGGER_TYPES.MANUAL,
+      },
     ];
 
     it("should filter by enabled status", () => {
       const result = filterRules(mockRules, { enabled: true });
       expect(result).toHaveLength(2);
-      expect(result.map(r => r.id)).toEqual(["rule1", "rule3"]);
+      expect(result.map((r) => r.id)).toEqual(["rule1", "rule3"]);
     });
 
     it("should filter by rule type", () => {
@@ -368,7 +384,7 @@ describe("autoFundingRules", () => {
     it("should filter by trigger type", () => {
       const result = filterRules(mockRules, { trigger: TRIGGER_TYPES.MANUAL });
       expect(result).toHaveLength(2);
-      expect(result.map(r => r.id)).toEqual(["rule1", "rule3"]);
+      expect(result.map((r) => r.id)).toEqual(["rule1", "rule3"]);
     });
 
     it("should search by name", () => {
@@ -378,12 +394,12 @@ describe("autoFundingRules", () => {
     });
 
     it("should combine multiple filters", () => {
-      const result = filterRules(mockRules, { 
-        enabled: true, 
-        trigger: TRIGGER_TYPES.MANUAL 
+      const result = filterRules(mockRules, {
+        enabled: true,
+        trigger: TRIGGER_TYPES.MANUAL,
       });
       expect(result).toHaveLength(2);
-      expect(result.map(r => r.id)).toEqual(["rule1", "rule3"]);
+      expect(result.map((r) => r.id)).toEqual(["rule1", "rule3"]);
     });
 
     it("should return all rules with no filters", () => {
@@ -394,31 +410,31 @@ describe("autoFundingRules", () => {
 
   describe("getRuleStatistics", () => {
     const mockRules = [
-      { 
-        enabled: true, 
-        type: RULE_TYPES.FIXED_AMOUNT, 
+      {
+        enabled: true,
+        type: RULE_TYPES.FIXED_AMOUNT,
         trigger: TRIGGER_TYPES.MANUAL,
         executionCount: 5,
-        lastExecuted: "2024-01-01T00:00:00Z"
+        lastExecuted: "2024-01-01T00:00:00Z",
       },
-      { 
-        enabled: false, 
-        type: RULE_TYPES.FIXED_AMOUNT, 
+      {
+        enabled: false,
+        type: RULE_TYPES.FIXED_AMOUNT,
         trigger: TRIGGER_TYPES.INCOME_DETECTED,
         executionCount: 10,
-        lastExecuted: "2024-01-02T00:00:00Z"
+        lastExecuted: "2024-01-02T00:00:00Z",
       },
-      { 
-        enabled: true, 
-        type: RULE_TYPES.PERCENTAGE, 
+      {
+        enabled: true,
+        type: RULE_TYPES.PERCENTAGE,
         trigger: TRIGGER_TYPES.MANUAL,
-        executionCount: 3
+        executionCount: 3,
       },
     ];
 
     it("should calculate overall statistics", () => {
       const stats = getRuleStatistics(mockRules);
-      
+
       expect(stats.total).toBe(3);
       expect(stats.enabled).toBe(2);
       expect(stats.disabled).toBe(1);
@@ -428,21 +444,21 @@ describe("autoFundingRules", () => {
 
     it("should group by rule type", () => {
       const stats = getRuleStatistics(mockRules);
-      
+
       expect(stats.byType[RULE_TYPES.FIXED_AMOUNT]).toBe(2);
       expect(stats.byType[RULE_TYPES.PERCENTAGE]).toBe(1);
     });
 
     it("should group by trigger type", () => {
       const stats = getRuleStatistics(mockRules);
-      
+
       expect(stats.byTrigger[TRIGGER_TYPES.MANUAL]).toBe(2);
       expect(stats.byTrigger[TRIGGER_TYPES.INCOME_DETECTED]).toBe(1);
     });
 
     it("should handle empty rules array", () => {
       const stats = getRuleStatistics([]);
-      
+
       expect(stats.total).toBe(0);
       expect(stats.enabled).toBe(0);
       expect(stats.disabled).toBe(0);
@@ -464,7 +480,7 @@ describe("autoFundingRules", () => {
       };
 
       const summary = createRuleSummary(rule);
-      
+
       expect(summary.name).toBe("Rent Rule");
       expect(summary.description).toBe("Move $500");
       expect(summary.targetDescription).toBe("to envelope");
@@ -473,14 +489,14 @@ describe("autoFundingRules", () => {
     it("should create summary for percentage rule", () => {
       const rule = {
         id: "rule2",
-        name: "Savings Rule", 
+        name: "Savings Rule",
         type: RULE_TYPES.PERCENTAGE,
         trigger: TRIGGER_TYPES.INCOME_DETECTED,
         config: { percentage: 20, targetType: "multiple", targetIds: ["env1", "env2"] },
       };
 
       const summary = createRuleSummary(rule);
-      
+
       expect(summary.description).toBe("Move 20%");
       expect(summary.targetDescription).toBe("to 2 envelopes");
     });
@@ -504,11 +520,11 @@ describe("autoFundingRules", () => {
         name: "Emergency Rule",
         type: RULE_TYPES.CONDITIONAL,
         trigger: TRIGGER_TYPES.MANUAL,
-        config: { 
+        config: {
           conditions: [
             { type: CONDITION_TYPES.BALANCE_LESS_THAN, value: 100 },
-            { type: CONDITION_TYPES.UNASSIGNED_ABOVE, value: 500 }
-          ]
+            { type: CONDITION_TYPES.UNASSIGNED_ABOVE, value: 500 },
+          ],
         },
       };
 

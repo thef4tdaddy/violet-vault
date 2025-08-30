@@ -46,7 +46,7 @@ const usePaycheckProcessor = ({
       const allocations = calculateEnvelopeAllocations(
         parseFloat(formData.amount),
         envelopes,
-        formData.allocationMode,
+        formData.allocationMode
       );
       setCurrentAllocations(allocations);
     } else {
@@ -60,39 +60,48 @@ const usePaycheckProcessor = ({
   }, [formData.amount, formData.allocationMode, envelopes]);
 
   // Form field update handler
-  const updateFormField = useCallback((field, value) => {
-    setFormData((prev) => {
-      const newData = { ...prev, [field]: value };
+  const updateFormField = useCallback(
+    (field, value) => {
+      setFormData((prev) => {
+        const newData = { ...prev, [field]: value };
 
-      // Clear field error when updated
-      if (errors[field]) {
-        setErrors((prevErrors) => {
-          const { [field]: _removed, ...remainingErrors } = prevErrors;
-          return remainingErrors;
-        });
-      }
+        // Clear field error when updated
+        if (errors[field]) {
+          setErrors((prevErrors) => {
+            const { [field]: _removed, ...remainingErrors } = prevErrors;
+            return remainingErrors;
+          });
+        }
 
-      return newData;
-    });
-  }, [errors]);
+        return newData;
+      });
+    },
+    [errors]
+  );
 
   // Get payer prediction based on history
-  const getPayerData = useCallback((payerName) => {
-    if (!payerName) return null;
-    return getPayerPrediction(payerName, paycheckHistory);
-  }, [paycheckHistory]);
+  const getPayerData = useCallback(
+    (payerName) => {
+      if (!payerName) return null;
+      return getPayerPrediction(payerName, paycheckHistory);
+    },
+    [paycheckHistory]
+  );
 
   // Apply payer prediction to form
-  const applyPayerPrediction = useCallback((payerName) => {
-    const prediction = getPayerData(payerName);
-    if (prediction) {
-      updateFormField("amount", prediction.amount.toString());
-      globalToast.showInfo(
-        `Applied prediction: $${prediction.amount} (${prediction.confidence}% confidence)`,
-        "Payer Prediction"
-      );
-    }
-  }, [getPayerData, updateFormField]);
+  const applyPayerPrediction = useCallback(
+    (payerName) => {
+      const prediction = getPayerData(payerName);
+      if (prediction) {
+        updateFormField("amount", prediction.amount.toString());
+        globalToast.showInfo(
+          `Applied prediction: $${prediction.amount} (${prediction.confidence}% confidence)`,
+          "Payer Prediction"
+        );
+      }
+    },
+    [getPayerData, updateFormField]
+  );
 
   // Validate current form
   const validateForm = useCallback(() => {
@@ -106,9 +115,9 @@ const usePaycheckProcessor = ({
         parseFloat(formData.amount)
       );
       if (!allocationValidation.isValid) {
-        setErrors(prev => ({
+        setErrors((prev) => ({
           ...prev,
-          allocations: allocationValidation.message
+          allocations: allocationValidation.message,
         }));
         return false;
       }
@@ -124,10 +133,7 @@ const usePaycheckProcessor = ({
 
       // Validate form
       if (!validateForm()) {
-        globalToast.showError(
-          "Please fix the form errors before processing",
-          "Validation Error"
-        );
+        globalToast.showError("Please fix the form errors before processing", "Validation Error");
         return false;
       }
 
@@ -143,7 +149,7 @@ const usePaycheckProcessor = ({
 
       // Add payer to temp list if new
       if (formData.payerName && !getUniquePayers(paycheckHistory).includes(formData.payerName)) {
-        setTempPayers(prev => [...prev, formData.payerName]);
+        setTempPayers((prev) => [...prev, formData.payerName]);
       }
 
       // Reset form
@@ -157,10 +163,7 @@ const usePaycheckProcessor = ({
       return true;
     } catch (error) {
       logger.error("Error processing paycheck", error);
-      globalToast.showError(
-        error.message || "Failed to process paycheck",
-        "Processing Error"
-      );
+      globalToast.showError(error.message || "Failed to process paycheck", "Processing Error");
       return false;
     } finally {
       setIsLoading(false);
@@ -188,16 +191,13 @@ const usePaycheckProcessor = ({
 
   // Get paycheck statistics
   const paycheckStats = getPaycheckStatistics(paycheckHistory);
-  const selectedPayerStats = formData.payerName 
+  const selectedPayerStats = formData.payerName
     ? getPaycheckStatistics(paycheckHistory, formData.payerName)
     : null;
 
   // Check if form can be submitted
-  const canSubmit = 
-    formData.amount && 
-    formData.payerName && 
-    Object.keys(errors).length === 0 && 
-    !isLoading;
+  const canSubmit =
+    formData.amount && formData.payerName && Object.keys(errors).length === 0 && !isLoading;
 
   return {
     // Form state

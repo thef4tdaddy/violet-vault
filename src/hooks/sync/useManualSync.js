@@ -33,7 +33,7 @@ export const useManualSync = () => {
       // Check if cloud sync service is running
       if (!cloudSyncService?.isRunning) {
         throw new Error(
-          "Cloud sync service is not running. Please check your connection and authentication.",
+          "Cloud sync service is not running. Please check your connection and authentication."
         );
       }
 
@@ -42,10 +42,7 @@ export const useManualSync = () => {
 
       if (syncResult && syncResult.success) {
         setLastSyncTime(new Date());
-        logger.info(
-          "✅ Manual upload sync completed successfully:",
-          syncResult,
-        );
+        logger.info("✅ Manual upload sync completed successfully:", syncResult);
 
         return {
           success: true,
@@ -81,14 +78,12 @@ export const useManualSync = () => {
     setSyncError(null);
 
     try {
-      logger.info(
-        "🔄 Starting manual download sync (Firebase → Dexie → TanStack)...",
-      );
+      logger.info("🔄 Starting manual download sync (Firebase → Dexie → TanStack)...");
 
       // Check if cloud sync service is running
       if (!cloudSyncService?.isRunning) {
         throw new Error(
-          "Cloud sync service is not running. Please check your connection and authentication.",
+          "Cloud sync service is not running. Please check your connection and authentication."
         );
       }
 
@@ -111,10 +106,7 @@ export const useManualSync = () => {
         ]);
 
         setLastSyncTime(new Date());
-        logger.info(
-          "✅ Manual download sync completed successfully:",
-          syncResult,
-        );
+        logger.info("✅ Manual download sync completed successfully:", syncResult);
 
         return {
           success: true,
@@ -158,10 +150,7 @@ export const useManualSync = () => {
         await queryClient.invalidateQueries();
 
         setLastSyncTime(new Date());
-        logger.info(
-          "✅ Full bidirectional sync completed successfully:",
-          syncResult,
-        );
+        logger.info("✅ Full bidirectional sync completed successfully:", syncResult);
 
         return {
           success: true,
@@ -194,12 +183,7 @@ export const useManualSync = () => {
       lastSyncTime,
       syncError,
     };
-  }, [
-    isUploadingSyncInProgress,
-    isDownloadingSyncInProgress,
-    lastSyncTime,
-    syncError,
-  ]);
+  }, [isUploadingSyncInProgress, isDownloadingSyncInProgress, lastSyncTime, syncError]);
 
   /**
    * Clear sync error

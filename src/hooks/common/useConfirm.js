@@ -50,7 +50,7 @@ export const useConfirm = () => {
         showConfirm(finalConfig, resolve);
       });
     },
-    [showConfirm],
+    [showConfirm]
   );
 
   return confirm;

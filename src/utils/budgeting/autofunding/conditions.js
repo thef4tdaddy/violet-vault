@@ -23,18 +23,14 @@ export const evaluateConditions = (conditions, context) => {
     switch (condition.type) {
       case CONDITION_TYPES.BALANCE_LESS_THAN:
         if (condition.envelopeId) {
-          const envelope = envelopes.find(
-            (e) => e.id === condition.envelopeId,
-          );
+          const envelope = envelopes.find((e) => e.id === condition.envelopeId);
           return envelope && envelope.currentBalance < condition.value;
         }
         return unassignedCash < condition.value;
 
       case CONDITION_TYPES.BALANCE_GREATER_THAN:
         if (condition.envelopeId) {
-          const envelope = envelopes.find(
-            (e) => e.id === condition.envelopeId,
-          );
+          const envelope = envelopes.find((e) => e.id === condition.envelopeId);
           return envelope && envelope.currentBalance > condition.value;
         }
         return unassignedCash > condition.value;
@@ -80,7 +76,7 @@ export const evaluateDateRangeCondition = (condition, currentDate) => {
  */
 export const evaluateTransactionAmountCondition = (condition, context) => {
   const { newIncomeAmount } = context.data;
-  
+
   if (newIncomeAmount === undefined) {
     return false;
   }
@@ -138,7 +134,7 @@ export const checkSchedule = (trigger, lastExecuted, currentDate) => {
 export const checkPaydaySchedule = (lastExecuted, now) => {
   // Basic payday logic - could be enhanced with more sophisticated detection
   const daysDiff = (now - lastExecuted) / (1000 * 60 * 60 * 24);
-  
+
   // Assume bi-weekly payday pattern is most common
   return daysDiff >= 14;
 };
@@ -160,7 +156,14 @@ export const shouldRuleExecute = (rule, context) => {
   }
 
   // Check schedule for time-based triggers
-  if ([TRIGGER_TYPES.WEEKLY, TRIGGER_TYPES.BIWEEKLY, TRIGGER_TYPES.MONTHLY, TRIGGER_TYPES.PAYDAY].includes(rule.trigger)) {
+  if (
+    [
+      TRIGGER_TYPES.WEEKLY,
+      TRIGGER_TYPES.BIWEEKLY,
+      TRIGGER_TYPES.MONTHLY,
+      TRIGGER_TYPES.PAYDAY,
+    ].includes(rule.trigger)
+  ) {
     if (!checkSchedule(rule.trigger, rule.lastExecuted, context.currentDate)) {
       return false;
     }
@@ -222,7 +225,16 @@ export const validateCondition = (condition) => {
       if (condition.value === undefined || condition.value === null) {
         errors.push("Transaction amount conditions require a value");
       }
-      if (!condition.operator || !["greater_than", "less_than", "equals", "greater_than_or_equal", "less_than_or_equal"].includes(condition.operator)) {
+      if (
+        !condition.operator ||
+        ![
+          "greater_than",
+          "less_than",
+          "equals",
+          "greater_than_or_equal",
+          "less_than_or_equal",
+        ].includes(condition.operator)
+      ) {
         errors.push("Transaction amount conditions require a valid operator");
       }
       break;
@@ -244,7 +256,7 @@ export const getConditionDescription = (condition, envelopes = []) => {
   switch (condition.type) {
     case CONDITION_TYPES.BALANCE_LESS_THAN:
       if (condition.envelopeId) {
-        const envelope = envelopes.find(e => e.id === condition.envelopeId);
+        const envelope = envelopes.find((e) => e.id === condition.envelopeId);
         const envelopeName = envelope?.name || "Unknown Envelope";
         return `${envelopeName} balance < $${condition.value}`;
       }
@@ -252,7 +264,7 @@ export const getConditionDescription = (condition, envelopes = []) => {
 
     case CONDITION_TYPES.BALANCE_GREATER_THAN:
       if (condition.envelopeId) {
-        const envelope = envelopes.find(e => e.id === condition.envelopeId);
+        const envelope = envelopes.find((e) => e.id === condition.envelopeId);
         const envelopeName = envelope?.name || "Unknown Envelope";
         return `${envelopeName} balance > $${condition.value}`;
       }
@@ -294,11 +306,11 @@ export const filterConditions = (conditions, filters = {}) => {
   let filtered = [...conditions];
 
   if (filters.type) {
-    filtered = filtered.filter(condition => condition.type === filters.type);
+    filtered = filtered.filter((condition) => condition.type === filters.type);
   }
 
   if (filters.envelopeId) {
-    filtered = filtered.filter(condition => condition.envelopeId === filters.envelopeId);
+    filtered = filtered.filter((condition) => condition.envelopeId === filters.envelopeId);
   }
 
   return filtered;

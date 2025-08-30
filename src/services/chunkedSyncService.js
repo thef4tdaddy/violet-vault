@@ -58,7 +58,7 @@ class ChunkedSyncService {
 
     // Ensure Firebase service is initialized
     await firebaseSyncService.ensureAuthenticated();
-    
+
     logger.info("Chunked sync service initialized", {
       budgetId: budgetId.substring(0, 8) + "...",
       maxChunkSize: this.maxChunkSize,
@@ -107,7 +107,7 @@ class ChunkedSyncService {
 
     const chunks = {};
     const totalItems = array.length;
-    
+
     if (totalItems === 0) {
       chunks[arrayName] = [];
       return chunks;
@@ -117,7 +117,7 @@ class ChunkedSyncService {
     let chunkSize = this.maxArrayChunkSize;
     const sampleSize = this.calculateSize(array.slice(0, Math.min(10, array.length)));
     const avgItemSize = sampleSize / Math.min(10, array.length);
-    
+
     if (avgItemSize > 0) {
       const maxItemsForSize = Math.floor(this.maxChunkSize / avgItemSize);
       chunkSize = Math.min(chunkSize, Math.max(100, maxItemsForSize));
@@ -195,7 +195,7 @@ class ChunkedSyncService {
       // Identify large arrays to chunk
       const chunkedData = {};
       const chunkMap = {};
-      
+
       for (const [key, value] of Object.entries(data)) {
         if (Array.isArray(value) && value.length > 100) {
           // Chunk large arrays
@@ -234,8 +234,8 @@ class ChunkedSyncService {
           version: "2.0",
           lastSync: Date.now(),
           userId: currentUser?.uid,
-          chunkedKeys: Object.keys(data).filter(key => 
-            Array.isArray(data[key]) && data[key].length > 100
+          chunkedKeys: Object.keys(data).filter(
+            (key) => Array.isArray(data[key]) && data[key].length > 100
           ),
         },
       };
@@ -267,14 +267,13 @@ class ChunkedSyncService {
             timestamp: Date.now(),
           };
 
-          batch.set(
-            doc(db, "budgets", this.budgetId, "chunks", chunkId),
-            chunkDocument
-          );
+          batch.set(doc(db, "budgets", this.budgetId, "chunks", chunkId), chunkDocument);
         }
 
         await batch.commit();
-        logger.debug(`Saved batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(chunkEntries.length / batchSize)}`);
+        logger.debug(
+          `Saved batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(chunkEntries.length / batchSize)}`
+        );
       }
 
       const duration = Date.now() - startTime;
@@ -322,10 +321,13 @@ class ChunkedSyncService {
       // Check if we have chunks to reassemble
       if (mainData._manifest) {
         // Decrypt manifest
-        const manifestData = await encryptionUtils.decrypt({
-          encryptedData: bytesFromBase64(mainData._manifest.encryptedData.data),
-          iv: bytesFromBase64(mainData._manifest.encryptedData.iv),
-        }, this.encryptionKey);
+        const manifestData = await encryptionUtils.decrypt(
+          {
+            encryptedData: bytesFromBase64(mainData._manifest.encryptedData.data),
+            iv: bytesFromBase64(mainData._manifest.encryptedData.iv),
+          },
+          this.encryptionKey
+        );
 
         const manifest = JSON.parse(manifestData);
         logger.debug("Loaded manifest", {
@@ -338,17 +340,20 @@ class ChunkedSyncService {
           collection(db, "budgets", this.budgetId, "chunks"),
           where("budgetId", "==", this.budgetId)
         );
-        
+
         const chunksSnapshot = await getDocs(chunksQuery);
         const chunks = {};
 
         // Decrypt all chunks
         for (const chunkDoc of chunksSnapshot.docs) {
           const chunkData = chunkDoc.data();
-          const decryptedChunk = await encryptionUtils.decrypt({
-            encryptedData: bytesFromBase64(chunkData.encryptedData.data),
-            iv: bytesFromBase64(chunkData.encryptedData.iv),
-          }, this.encryptionKey);
+          const decryptedChunk = await encryptionUtils.decrypt(
+            {
+              encryptedData: bytesFromBase64(chunkData.encryptedData.data),
+              iv: bytesFromBase64(chunkData.encryptedData.iv),
+            },
+            this.encryptionKey
+          );
 
           chunks[chunkData.chunkId] = JSON.parse(decryptedChunk);
         }
@@ -412,16 +417,16 @@ class ChunkedSyncService {
         collection(db, "budgets", this.budgetId, "chunks"),
         where("budgetId", "==", this.budgetId)
       );
-      
+
       const snapshot = await getDocs(chunksQuery);
       const batch = writeBatch(db);
-      
-      snapshot.docs.forEach(doc => {
+
+      snapshot.docs.forEach((doc) => {
         batch.delete(doc.ref);
       });
-      
+
       await batch.commit();
-      
+
       logger.info("✅ Cloud data reset completed");
     } catch (error) {
       logger.error("❌ Failed to reset cloud data", error);

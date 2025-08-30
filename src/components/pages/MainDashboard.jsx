@@ -31,15 +31,12 @@ const Dashboard = ({ setActiveView }) => {
   // Enhanced TanStack Query integration with optimistic updates
   const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
 
-  const { data: savingsGoals = [], isLoading: savingsLoading } =
-    useSavingsGoals();
+  const { data: savingsGoals = [], isLoading: savingsLoading } = useSavingsGoals();
 
-  const { data: transactions = [], isLoading: transactionsLoading } =
-    useTransactions();
+  const { data: transactions = [], isLoading: transactionsLoading } = useTransactions();
 
   // Use TanStack Query for budget metadata
-  const { unassignedCash, isLoading: unassignedCashLoading } =
-    useUnassignedCash();
+  const { unassignedCash, isLoading: unassignedCashLoading } = useUnassignedCash();
   const {
     actualBalance,
     updateActualBalance,
@@ -91,9 +88,7 @@ const Dashboard = ({ setActiveView }) => {
 
   // Get payday prediction
   const paydayPrediction =
-    paycheckHistory && paycheckHistory.length >= 2
-      ? predictNextPayday(paycheckHistory)
-      : null;
+    paycheckHistory && paycheckHistory.length >= 2 ? predictNextPayday(paycheckHistory) : null;
 
   const handleUpdateBalance = async (newBalance) => {
     await updateActualBalance(newBalance, {
@@ -105,10 +100,7 @@ const Dashboard = ({ setActiveView }) => {
 
   const handleReconcileTransaction = () => {
     if (!newTransaction.amount || !newTransaction.description.trim()) {
-      globalToast.showError(
-        "Please enter amount and description",
-        "Required Fields",
-      );
+      globalToast.showError("Please enter amount and description", "Required Fields");
       return;
     }
 
@@ -116,10 +108,7 @@ const Dashboard = ({ setActiveView }) => {
     const transaction = {
       id: Date.now(),
       ...newTransaction,
-      amount:
-        newTransaction.type === "expense"
-          ? -Math.abs(amount)
-          : Math.abs(amount),
+      amount: newTransaction.type === "expense" ? -Math.abs(amount) : Math.abs(amount),
       reconciledAt: new Date().toISOString(),
     };
 
@@ -159,7 +148,7 @@ const Dashboard = ({ setActiveView }) => {
     // Navigate to envelope management or show planning interface
     globalToast.showInfo(
       "Navigate to envelope management for funding planning!",
-      "Funding Planning",
+      "Funding Planning"
     );
     // TODO: Integrate with envelope planning interface
   };
@@ -205,9 +194,7 @@ const Dashboard = ({ setActiveView }) => {
           if (setActiveView) {
             setActiveView("debts");
           } else {
-            logger.debug(
-              "Navigate to debts requested - setActiveView not available",
-            );
+            logger.debug("Navigate to debts requested - setActiveView not available");
           }
         }}
       />
@@ -258,11 +245,7 @@ const Dashboard = ({ setActiveView }) => {
           {/* Difference */}
           <div
             className={`rounded-lg p-6 ${
-              isBalanced
-                ? "bg-green-50"
-                : Math.abs(difference) > 10
-                  ? "bg-red-50"
-                  : "bg-yellow-50"
+              isBalanced ? "bg-green-50" : Math.abs(difference) > 10 ? "bg-red-50" : "bg-yellow-50"
             }`}
           >
             <div className="flex items-center justify-between mb-4">
@@ -282,9 +265,7 @@ const Dashboard = ({ setActiveView }) => {
               ) : (
                 <AlertTriangle
                   className={`h-5 w-5 ${
-                    Math.abs(difference) > 10
-                      ? "text-red-600"
-                      : "text-yellow-600"
+                    Math.abs(difference) > 10 ? "text-red-600" : "text-yellow-600"
                   }`}
                 />
               )}
@@ -292,11 +273,7 @@ const Dashboard = ({ setActiveView }) => {
             <div className="space-y-3">
               <div
                 className={`text-2xl font-bold ${
-                  isBalanced
-                    ? "text-green-900"
-                    : difference > 0
-                      ? "text-green-900"
-                      : "text-red-900"
+                  isBalanced ? "text-green-900" : difference > 0 ? "text-green-900" : "text-red-900"
                 }`}
               >
                 {isBalanced
@@ -351,8 +328,7 @@ const Dashboard = ({ setActiveView }) => {
                   reconcileTransaction({
                     id: Date.now(),
                     amount: difference,
-                    description:
-                      "Balance reconciliation - adjusted for discrepancy",
+                    description: "Balance reconciliation - adjusted for discrepancy",
                     type: "expense",
                     envelopeId: "unassigned",
                     date: new Date().toISOString().split("T")[0],
@@ -395,15 +371,13 @@ const Dashboard = ({ setActiveView }) => {
                     <div className="font-medium">{transaction.description}</div>
                     <div className="text-sm text-gray-600">
                       {new Date(transaction.date).toLocaleDateString()}
-                      {transaction.envelopeId &&
-                        transaction.envelopeId !== "unassigned" && (
-                          <span className="ml-2">
-                            →{" "}
-                            {getEnvelopeOptions().find(
-                              (opt) => opt.id === transaction.envelopeId,
-                            )?.name || "Unknown"}
-                          </span>
-                        )}
+                      {transaction.envelopeId && transaction.envelopeId !== "unassigned" && (
+                        <span className="ml-2">
+                          →{" "}
+                          {getEnvelopeOptions().find((opt) => opt.id === transaction.envelopeId)
+                            ?.name || "Unknown"}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -412,8 +386,7 @@ const Dashboard = ({ setActiveView }) => {
                     transaction.amount > 0 ? "text-green-600" : "text-red-600"
                   }`}
                 >
-                  {transaction.amount > 0 ? "+" : ""}$
-                  {Math.abs(transaction.amount).toFixed(2)}
+                  {transaction.amount > 0 ? "+" : ""}${Math.abs(transaction.amount).toFixed(2)}
                 </div>
               </div>
             ))}
@@ -425,9 +398,7 @@ const Dashboard = ({ setActiveView }) => {
       {showReconcileModal && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="glassmorphism rounded-2xl p-6 w-full max-w-md border border-white/30 shadow-2xl">
-            <h3 className="text-xl font-semibold mb-4">
-              Reconcile Transaction
-            </h3>
+            <h3 className="text-xl font-semibold mb-4">Reconcile Transaction</h3>
 
             <div className="space-y-4">
               <div>
@@ -437,9 +408,7 @@ const Dashboard = ({ setActiveView }) => {
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
-                    onClick={() =>
-                      setNewTransaction({ ...newTransaction, type: "expense" })
-                    }
+                    onClick={() => setNewTransaction({ ...newTransaction, type: "expense" })}
                     className={`p-3 rounded-lg border-2 transition-all ${
                       newTransaction.type === "expense"
                         ? "border-red-500 bg-red-50 text-red-700"
@@ -452,9 +421,7 @@ const Dashboard = ({ setActiveView }) => {
 
                   <button
                     type="button"
-                    onClick={() =>
-                      setNewTransaction({ ...newTransaction, type: "income" })
-                    }
+                    onClick={() => setNewTransaction({ ...newTransaction, type: "income" })}
                     className={`p-3 rounded-lg border-2 transition-all ${
                       newTransaction.type === "income"
                         ? "border-green-500 bg-green-50 text-green-700"
@@ -468,9 +435,7 @@ const Dashboard = ({ setActiveView }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Amount
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Amount</label>
                 <input
                   type="number"
                   step="0.01"
@@ -487,9 +452,7 @@ const Dashboard = ({ setActiveView }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
                 <input
                   type="text"
                   value={newTransaction.description}
@@ -528,9 +491,7 @@ const Dashboard = ({ setActiveView }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Date
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
                 <input
                   type="date"
                   value={newTransaction.date}

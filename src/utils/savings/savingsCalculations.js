@@ -48,10 +48,7 @@ export const calculateDaysRemaining = (targetDate, fromDate = new Date()) => {
 /**
  * Calculate monthly savings needed to reach goal by target date
  */
-export const calculateMonthlySavingsNeeded = (
-  remainingAmount,
-  daysRemaining,
-) => {
+export const calculateMonthlySavingsNeeded = (remainingAmount, daysRemaining) => {
   if (!daysRemaining || daysRemaining <= 0) return 0;
 
   const monthsRemaining = Math.max(1, daysRemaining / 30);
@@ -65,7 +62,7 @@ export const determineGoalUrgency = (
   progressRate,
   daysRemaining,
   monthlyNeeded,
-  affordableMonthly = 0,
+  affordableMonthly = 0
 ) => {
   // Completed goals
   if (progressRate >= 100) return "completed";
@@ -80,8 +77,7 @@ export const determineGoalUrgency = (
   if (daysRemaining <= 30) return "urgent";
 
   // Behind schedule (monthly needed exceeds affordable amount by 50%+)
-  if (affordableMonthly > 0 && monthlyNeeded > affordableMonthly * 1.5)
-    return "behind";
+  if (affordableMonthly > 0 && monthlyNeeded > affordableMonthly * 1.5) return "behind";
 
   // On track
   if (progressRate >= 25 && daysRemaining > 60) return "on-track";
@@ -93,10 +89,7 @@ export const determineGoalUrgency = (
 /**
  * Calculate goal timeline milestones
  */
-export const calculateGoalMilestones = (
-  currentAmount,
-  targetAmount,
-) => {
+export const calculateGoalMilestones = (currentAmount, targetAmount) => {
   if (!targetAmount || targetAmount <= 0) return [];
 
   const milestones = [];
@@ -124,7 +117,7 @@ export const calculateRecommendedContribution = (
   remainingAmount,
   daysRemaining,
   availableCash = 0,
-  riskTolerance = "medium",
+  riskTolerance = "medium"
 ) => {
   if (!daysRemaining || daysRemaining <= 0) {
     // No deadline - base on available cash and risk tolerance
@@ -132,15 +125,11 @@ export const calculateRecommendedContribution = (
     return availableCash * (riskMultipliers[riskTolerance] || 0.2);
   }
 
-  const baseMonthlyNeeded = calculateMonthlySavingsNeeded(
-    remainingAmount,
-    daysRemaining,
-  );
+  const baseMonthlyNeeded = calculateMonthlySavingsNeeded(remainingAmount, daysRemaining);
 
   // Add buffer based on risk tolerance
   const bufferMultipliers = { low: 1.2, medium: 1.1, high: 1.05 };
-  const recommendedAmount =
-    baseMonthlyNeeded * (bufferMultipliers[riskTolerance] || 1.1);
+  const recommendedAmount = baseMonthlyNeeded * (bufferMultipliers[riskTolerance] || 1.1);
 
   // Cap at available cash if specified
   if (availableCash > 0) {
@@ -164,30 +153,16 @@ export const processSavingsGoal = (goal, fromDate = new Date()) => {
   const daysRemaining = calculateDaysRemaining(goal.targetDate, fromDate);
 
   // Timeline calculations
-  const monthlyNeeded = calculateMonthlySavingsNeeded(
-    remainingAmount,
-    daysRemaining,
-  );
-  const urgency = determineGoalUrgency(
-    progressRate,
-    daysRemaining,
-    monthlyNeeded,
-  );
-  const milestones = calculateGoalMilestones(
-    currentAmount,
-    targetAmount,
-  );
+  const monthlyNeeded = calculateMonthlySavingsNeeded(remainingAmount, daysRemaining);
+  const urgency = determineGoalUrgency(progressRate, daysRemaining, monthlyNeeded);
+  const milestones = calculateGoalMilestones(currentAmount, targetAmount);
 
   // Recommendation
   const recommendedContribution = calculateRecommendedContribution(
     remainingAmount,
     daysRemaining,
     0, // Will be provided by component
-    goal.priority === "high"
-      ? "high"
-      : goal.priority === "low"
-        ? "low"
-        : "medium",
+    goal.priority === "high" ? "high" : goal.priority === "low" ? "low" : "medium"
   );
 
   return {
@@ -206,11 +181,7 @@ export const processSavingsGoal = (goal, fromDate = new Date()) => {
 /**
  * Sort savings goals by various criteria
  */
-export const sortSavingsGoals = (
-  goals,
-  sortBy = "targetDate",
-  sortOrder = "asc",
-) => {
+export const sortSavingsGoals = (goals, sortBy = "targetDate", sortOrder = "asc") => {
   return [...goals].sort((a, b) => {
     let aVal, bVal;
 
@@ -304,10 +275,8 @@ export const filterSavingsGoals = (goals, filters = {}) => {
     if (urgency && goal.urgency !== urgency) return false;
 
     // Amount filters
-    if (minAmount && (goal.targetAmount || 0) < parseFloat(minAmount))
-      return false;
-    if (maxAmount && (goal.targetAmount || 0) > parseFloat(maxAmount))
-      return false;
+    if (minAmount && (goal.targetAmount || 0) < parseFloat(minAmount)) return false;
+    if (maxAmount && (goal.targetAmount || 0) > parseFloat(maxAmount)) return false;
 
     return true;
   });
@@ -321,14 +290,8 @@ export const calculateSavingsSummary = (goals) => {
   const completedGoals = goals.filter((g) => g.isCompleted).length;
   const activeGoals = totalGoals - completedGoals;
 
-  const totalTargetAmount = goals.reduce(
-    (sum, goal) => sum + (goal.targetAmount || 0),
-    0,
-  );
-  const totalCurrentAmount = goals.reduce(
-    (sum, goal) => sum + (goal.currentAmount || 0),
-    0,
-  );
+  const totalTargetAmount = goals.reduce((sum, goal) => sum + (goal.targetAmount || 0), 0);
+  const totalCurrentAmount = goals.reduce((sum, goal) => sum + (goal.currentAmount || 0), 0);
   const totalRemainingAmount = totalTargetAmount - totalCurrentAmount;
 
   const overallProgressRate =

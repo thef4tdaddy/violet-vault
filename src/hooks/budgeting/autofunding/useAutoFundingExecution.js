@@ -7,7 +7,10 @@ import {
   planRuleTransfers,
 } from "../../../utils/budgeting/autofunding/simulation.js";
 import { shouldRuleExecute } from "../../../utils/budgeting/autofunding/conditions.js";
-import { sortRulesByPriority, calculateFundingAmount } from "../../../utils/budgeting/autofunding/rules.js";
+import {
+  sortRulesByPriority,
+  calculateFundingAmount,
+} from "../../../utils/budgeting/autofunding/rules.js";
 import { TRIGGER_TYPES } from "../../../utils/budgeting/autofunding/rules.js";
 import { useBudgetStore } from "../../../stores/ui/uiStore";
 import logger from "../../../utils/common/logger";
@@ -43,8 +46,8 @@ export const useAutoFundingExecution = () => {
           },
         };
 
-        logger.info("Executing auto-funding rules", { 
-          trigger, 
+        logger.info("Executing auto-funding rules", {
+          trigger,
           rulesCount: rules.length,
           availableCash: context.data.unassignedCash,
         });
@@ -71,7 +74,7 @@ export const useAutoFundingExecution = () => {
         setIsExecuting(false);
       }
     },
-    [budget, isExecuting],
+    [budget, isExecuting]
   );
 
   // Core execution logic with priority handling
@@ -81,7 +84,7 @@ export const useAutoFundingExecution = () => {
 
     try {
       // Filter and sort rules by priority
-      const executableRules = rules.filter(rule => shouldRuleExecute(rule, context));
+      const executableRules = rules.filter((rule) => shouldRuleExecute(rule, context));
       const sortedRules = sortRulesByPriority(executableRules);
 
       logger.debug("Filtered executable rules", {
@@ -96,12 +99,8 @@ export const useAutoFundingExecution = () => {
       // Execute each rule in priority order
       for (const rule of sortedRules) {
         try {
-          const result = await executeSingleRule(
-            rule,
-            context,
-            remainingCash,
-          );
-          
+          const result = await executeSingleRule(rule, context, remainingCash);
+
           executionResults.push(result);
 
           if (result.success && result.amount > 0) {
@@ -134,9 +133,9 @@ export const useAutoFundingExecution = () => {
         id: executionId,
         trigger: context.trigger,
         executedAt: new Date().toISOString(),
-        rulesExecuted: executionResults.filter(r => r.success).length,
+        rulesExecuted: executionResults.filter((r) => r.success).length,
         totalFunded: executionResults
-          .filter(r => r.success)
+          .filter((r) => r.success)
           .reduce((sum, r) => sum + (r.amount || 0), 0),
         results: executionResults,
         remainingCash,
@@ -191,7 +190,7 @@ export const useAutoFundingExecution = () => {
 
     // Plan and execute transfers
     const plannedTransfers = planRuleTransfers(rule, fundingAmount);
-    
+
     for (const transfer of plannedTransfers) {
       await executeTransfer(transfer);
     }
@@ -202,146 +201,164 @@ export const useAutoFundingExecution = () => {
       success: true,
       amount: fundingAmount,
       transfers: plannedTransfers.length,
-      targetEnvelopes: plannedTransfers.map(t => t.toEnvelopeId),
+      targetEnvelopes: plannedTransfers.map((t) => t.toEnvelopeId),
       executedAt: new Date().toISOString(),
     };
   }, []);
 
   // Execute a single transfer using the budget store
-  const executeTransfer = useCallback(async (transfer) => {
-    try {
-      await budget.transferFunds(
-        transfer.fromEnvelopeId,
-        transfer.toEnvelopeId,
-        transfer.amount,
-        transfer.description,
-      );
+  const executeTransfer = useCallback(
+    async (transfer) => {
+      try {
+        await budget.transferFunds(
+          transfer.fromEnvelopeId,
+          transfer.toEnvelopeId,
+          transfer.amount,
+          transfer.description
+        );
 
-      logger.debug("Transfer executed", transfer);
-    } catch (error) {
-      logger.error("Transfer failed", { transfer, error: error.message });
-      throw error;
-    }
-  }, [budget]);
+        logger.debug("Transfer executed", transfer);
+      } catch (error) {
+        logger.error("Transfer failed", { transfer, error: error.message });
+        throw error;
+      }
+    },
+    [budget]
+  );
 
   // Simulate rule execution without making actual transfers
-  const simulateExecution = useCallback((rules, trigger = TRIGGER_TYPES.MANUAL, triggerData = {}) => {
-    try {
-      const context = {
-        trigger,
-        currentDate: new Date().toISOString(),
-        data: {
-          envelopes: budget.envelopes || [],
-          unassignedCash: budget.unassignedCash || 0,
-          transactions: budget.allTransactions || [],
-          ...triggerData,
-        },
-      };
+  const simulateExecution = useCallback(
+    (rules, trigger = TRIGGER_TYPES.MANUAL, triggerData = {}) => {
+      try {
+        const context = {
+          trigger,
+          currentDate: new Date().toISOString(),
+          data: {
+            envelopes: budget.envelopes || [],
+            unassignedCash: budget.unassignedCash || 0,
+            transactions: budget.allTransactions || [],
+            ...triggerData,
+          },
+        };
 
-      return simulateRuleExecution(rules, context);
-    } catch (error) {
-      logger.error("Simulation failed", error);
-      return { success: false, error: error.message };
-    }
-  }, [budget]);
+        return simulateRuleExecution(rules, context);
+      } catch (error) {
+        logger.error("Simulation failed", error);
+        return { success: false, error: error.message };
+      }
+    },
+    [budget]
+  );
 
   // Create detailed execution plan
-  const createPlan = useCallback((rules, trigger = TRIGGER_TYPES.MANUAL, triggerData = {}) => {
-    try {
-      const context = {
-        trigger,
-        currentDate: new Date().toISOString(),
-        data: {
-          envelopes: budget.envelopes || [],
-          unassignedCash: budget.unassignedCash || 0,
-          transactions: budget.allTransactions || [],
-          ...triggerData,
-        },
-      };
+  const createPlan = useCallback(
+    (rules, trigger = TRIGGER_TYPES.MANUAL, triggerData = {}) => {
+      try {
+        const context = {
+          trigger,
+          currentDate: new Date().toISOString(),
+          data: {
+            envelopes: budget.envelopes || [],
+            unassignedCash: budget.unassignedCash || 0,
+            transactions: budget.allTransactions || [],
+            ...triggerData,
+          },
+        };
 
-      return createExecutionPlan(rules, context);
-    } catch (error) {
-      logger.error("Plan creation failed", error);
-      return { success: false, error: error.message };
-    }
-  }, [budget]);
+        return createExecutionPlan(rules, context);
+      } catch (error) {
+        logger.error("Plan creation failed", error);
+        return { success: false, error: error.message };
+      }
+    },
+    [budget]
+  );
 
   // Validate planned transfers
-  const validatePlannedTransfers = useCallback((transfers, triggerData = {}) => {
-    try {
-      const context = {
-        data: {
-          envelopes: budget.envelopes || [],
-          unassignedCash: budget.unassignedCash || 0,
-          ...triggerData,
-        },
-      };
+  const validatePlannedTransfers = useCallback(
+    (transfers, triggerData = {}) => {
+      try {
+        const context = {
+          data: {
+            envelopes: budget.envelopes || [],
+            unassignedCash: budget.unassignedCash || 0,
+            ...triggerData,
+          },
+        };
 
-      return validateTransfers(transfers, context);
-    } catch (error) {
-      logger.error("Transfer validation failed", error);
-      return { isValid: false, errors: [{ error: error.message }] };
-    }
-  }, [budget]);
+        return validateTransfers(transfers, context);
+      } catch (error) {
+        logger.error("Transfer validation failed", error);
+        return { isValid: false, errors: [{ error: error.message }] };
+      }
+    },
+    [budget]
+  );
 
   // Calculate impact of transfers on envelope balances
-  const calculateImpact = useCallback((transfers, triggerData = {}) => {
-    try {
-      const context = {
-        data: {
-          envelopes: budget.envelopes || [],
-          unassignedCash: budget.unassignedCash || 0,
-          ...triggerData,
-        },
-      };
+  const calculateImpact = useCallback(
+    (transfers, triggerData = {}) => {
+      try {
+        const context = {
+          data: {
+            envelopes: budget.envelopes || [],
+            unassignedCash: budget.unassignedCash || 0,
+            ...triggerData,
+          },
+        };
 
-      return calculateTransferImpact(transfers, context);
-    } catch (error) {
-      logger.error("Impact calculation failed", error);
-      return {
-        envelopes: new Map(),
-        unassignedChange: 0,
-        totalTransferred: 0,
-      };
-    }
-  }, [budget]);
+        return calculateTransferImpact(transfers, context);
+      } catch (error) {
+        logger.error("Impact calculation failed", error);
+        return {
+          envelopes: new Map(),
+          unassignedChange: 0,
+          totalTransferred: 0,
+        };
+      }
+    },
+    [budget]
+  );
 
   // Check if rules can execute with current budget state
-  const canExecuteRules = useCallback((rules, trigger = TRIGGER_TYPES.MANUAL) => {
-    try {
-      const context = {
-        trigger,
-        currentDate: new Date().toISOString(),
-        data: {
-          envelopes: budget.envelopes || [],
-          unassignedCash: budget.unassignedCash || 0,
-          transactions: budget.allTransactions || [],
-        },
-      };
+  const canExecuteRules = useCallback(
+    (rules, trigger = TRIGGER_TYPES.MANUAL) => {
+      try {
+        const context = {
+          trigger,
+          currentDate: new Date().toISOString(),
+          data: {
+            envelopes: budget.envelopes || [],
+            unassignedCash: budget.unassignedCash || 0,
+            transactions: budget.allTransactions || [],
+          },
+        };
 
-      const executableRules = rules.filter(rule => shouldRuleExecute(rule, context));
-      return {
-        canExecute: executableRules.length > 0 && context.data.unassignedCash > 0,
-        executableCount: executableRules.length,
-        totalRules: rules.length,
-        availableCash: context.data.unassignedCash,
-        executableRules: executableRules.map(rule => ({
-          id: rule.id,
-          name: rule.name,
-          priority: rule.priority,
-        })),
-      };
-    } catch (error) {
-      logger.error("Failed to check rule executability", error);
-      return {
-        canExecute: false,
-        executableCount: 0,
-        totalRules: rules.length,
-        availableCash: 0,
-        executableRules: [],
-      };
-    }
-  }, [budget]);
+        const executableRules = rules.filter((rule) => shouldRuleExecute(rule, context));
+        return {
+          canExecute: executableRules.length > 0 && context.data.unassignedCash > 0,
+          executableCount: executableRules.length,
+          totalRules: rules.length,
+          availableCash: context.data.unassignedCash,
+          executableRules: executableRules.map((rule) => ({
+            id: rule.id,
+            name: rule.name,
+            priority: rule.priority,
+          })),
+        };
+      } catch (error) {
+        logger.error("Failed to check rule executability", error);
+        return {
+          canExecute: false,
+          executableCount: 0,
+          totalRules: rules.length,
+          availableCash: 0,
+          executableRules: [],
+        };
+      }
+    },
+    [budget]
+  );
 
   // Get execution summary for display
   const getExecutionSummary = useCallback(() => {
@@ -358,7 +375,7 @@ export const useAutoFundingExecution = () => {
       remainingCash: lastExecution.remainingCash,
       initialCash: lastExecution.initialCash,
       success: lastExecution.success !== false,
-      hasErrors: lastExecution.results?.some(r => !r.success) || false,
+      hasErrors: lastExecution.results?.some((r) => !r.success) || false,
     };
   }, [lastExecution]);
 
@@ -366,20 +383,20 @@ export const useAutoFundingExecution = () => {
     // State
     isExecuting,
     lastExecution,
-    
+
     // Execution
     executeRules,
     executeSingleRule,
-    
+
     // Planning and simulation
     simulateExecution,
     createPlan,
-    
+
     // Validation and analysis
     validatePlannedTransfers,
     calculateImpact,
     canExecuteRules,
-    
+
     // Utils
     getExecutionSummary,
   };

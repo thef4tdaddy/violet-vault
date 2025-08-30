@@ -4,8 +4,8 @@
  * Maps old API to new useBugReportV2 implementation
  * Created for Issue #513 to ensure zero regressions
  */
-import useBugReportV2 from './useBugReportV2.js';
-import logger from '../../utils/common/logger.js';
+import useBugReportV2 from "./useBugReportV2.js";
+import logger from "../../utils/common/logger.js";
 
 /**
  * Compatibility wrapper that maintains the exact same API as the original useBugReport
@@ -30,7 +30,7 @@ const useBugReportCompat = (options = {}) => {
     setDescription: v2Hook.setDescription,
     setIncludeScreenshot: v2Hook.setIncludeScreenshot,
     setScreenshot: v2Hook.setScreenshot,
-    
+
     /**
      * Submit report - maintains original interface
      * @returns {Promise<boolean|Object>} Success boolean or report data
@@ -38,12 +38,12 @@ const useBugReportCompat = (options = {}) => {
     submitReport: async () => {
       try {
         const success = await v2Hook.submitReport();
-        
+
         // Original hook returned the report data on success, boolean on failure
         if (success && v2Hook.submitResult) {
           return v2Hook.submitResult;
         }
-        
+
         return success;
       } catch (error) {
         logger.error("Compatibility layer: submitReport failed", error);
@@ -102,11 +102,11 @@ const useBugReportCompat = (options = {}) => {
     v2: {
       // Provide access to all V2 features for gradual migration
       ...v2Hook,
-      
+
       // Migration helpers
       isUsingV2: true,
-      version: '2.0.0',
-      
+      version: "2.0.0",
+
       // Quick migration methods
       setTitle: v2Hook.setTitle,
       setSteps: v2Hook.setSteps,

@@ -45,21 +45,23 @@ export class SystemInfoService {
         platform: navigator.platform,
         cookieEnabled: navigator.cookieEnabled,
         onLine: navigator.onLine,
-        hardwareConcurrency: navigator.hardwareConcurrency || 'unknown',
-        deviceMemory: navigator.deviceMemory || 'unknown',
-        connection: navigator.connection ? {
-          effectiveType: navigator.connection.effectiveType,
-          downlink: navigator.connection.downlink,
-          rtt: navigator.connection.rtt,
-        } : null,
+        hardwareConcurrency: navigator.hardwareConcurrency || "unknown",
+        deviceMemory: navigator.deviceMemory || "unknown",
+        connection: navigator.connection
+          ? {
+              effectiveType: navigator.connection.effectiveType,
+              downlink: navigator.connection.downlink,
+              rtt: navigator.connection.rtt,
+            }
+          : null,
         permissions: this.getPermissionStates(),
       };
     } catch (error) {
       logger.warn("Error collecting browser info", error);
       return {
-        userAgent: navigator.userAgent || 'unknown',
-        language: navigator.language || 'unknown',
-        platform: navigator.platform || 'unknown',
+        userAgent: navigator.userAgent || "unknown",
+        language: navigator.language || "unknown",
+        platform: navigator.platform || "unknown",
       };
     }
   }
@@ -84,10 +86,12 @@ export class SystemInfoService {
           pixelDepth: screen.pixelDepth,
         },
         devicePixelRatio: window.devicePixelRatio || 1,
-        orientation: screen.orientation ? {
-          angle: screen.orientation.angle,
-          type: screen.orientation.type,
-        } : null,
+        orientation: screen.orientation
+          ? {
+              angle: screen.orientation.angle,
+              type: screen.orientation.type,
+            }
+          : null,
       };
     } catch (error) {
       logger.warn("Error collecting viewport info", error);
@@ -112,21 +116,26 @@ export class SystemInfoService {
     try {
       const timing = performance.timing;
       const navigation = performance.navigation;
-      
+
       return {
         loadTime: timing.loadEventEnd - timing.navigationStart,
         domContentLoaded: timing.domContentLoadedEventEnd - timing.navigationStart,
-        firstPaint: performance.getEntriesByType('paint')
-          .find(entry => entry.name === 'first-paint')?.startTime || null,
-        firstContentfulPaint: performance.getEntriesByType('paint')
-          .find(entry => entry.name === 'first-contentful-paint')?.startTime || null,
+        firstPaint:
+          performance.getEntriesByType("paint").find((entry) => entry.name === "first-paint")
+            ?.startTime || null,
+        firstContentfulPaint:
+          performance
+            .getEntriesByType("paint")
+            .find((entry) => entry.name === "first-contentful-paint")?.startTime || null,
         navigationType: navigation.type,
         redirectCount: navigation.redirectCount,
-        memory: performance.memory ? {
-          usedJSHeapSize: performance.memory.usedJSHeapSize,
-          totalJSHeapSize: performance.memory.totalJSHeapSize,
-          jsHeapSizeLimit: performance.memory.jsHeapSizeLimit,
-        } : null,
+        memory: performance.memory
+          ? {
+              usedJSHeapSize: performance.memory.usedJSHeapSize,
+              totalJSHeapSize: performance.memory.totalJSHeapSize,
+              jsHeapSizeLimit: performance.memory.jsHeapSizeLimit,
+            }
+          : null,
       };
     } catch (error) {
       logger.warn("Error collecting performance info", error);
@@ -146,20 +155,20 @@ export class SystemInfoService {
     try {
       return {
         localStorage: {
-          available: this.isStorageAvailable('localStorage'),
+          available: this.isStorageAvailable("localStorage"),
           itemCount: localStorage.length,
-          estimatedSize: this.estimateStorageSize('localStorage'),
+          estimatedSize: this.estimateStorageSize("localStorage"),
         },
         sessionStorage: {
-          available: this.isStorageAvailable('sessionStorage'),
+          available: this.isStorageAvailable("sessionStorage"),
           itemCount: sessionStorage.length,
-          estimatedSize: this.estimateStorageSize('sessionStorage'),
+          estimatedSize: this.estimateStorageSize("sessionStorage"),
         },
         indexedDB: {
-          available: 'indexedDB' in window,
+          available: "indexedDB" in window,
         },
         webSQL: {
-          available: 'webkitRequestFileSystem' in window,
+          available: "webkitRequestFileSystem" in window,
         },
       };
     } catch (error) {
@@ -179,18 +188,20 @@ export class SystemInfoService {
     try {
       const networkInfo = {
         onLine: navigator.onLine,
-        connection: navigator.connection ? {
-          effectiveType: navigator.connection.effectiveType,
-          downlink: navigator.connection.downlink,
-          rtt: navigator.connection.rtt,
-          saveData: navigator.connection.saveData,
-        } : null,
+        connection: navigator.connection
+          ? {
+              effectiveType: navigator.connection.effectiveType,
+              downlink: navigator.connection.downlink,
+              rtt: navigator.connection.rtt,
+              saveData: navigator.connection.saveData,
+            }
+          : null,
         timing: null,
       };
 
       // Try to measure network timing if possible
-      if ('performance' in window && performance.getEntriesByType) {
-        const navigationEntries = performance.getEntriesByType('navigation');
+      if ("performance" in window && performance.getEntriesByType) {
+        const navigationEntries = performance.getEntriesByType("navigation");
         if (navigationEntries.length > 0) {
           const entry = navigationEntries[0];
           networkInfo.timing = {
@@ -222,8 +233,8 @@ export class SystemInfoService {
       // For now, return empty array with note
       return {
         note: "Error collection requires global error listener setup",
-        hasGlobalHandler: typeof window.onerror === 'function',
-        hasUnhandledRejectionHandler: typeof window.onunhandledrejection === 'function',
+        hasGlobalHandler: typeof window.onerror === "function",
+        hasUnhandledRejectionHandler: typeof window.onunhandledrejection === "function",
       };
     } catch (error) {
       logger.warn("Error collecting recent errors", error);
@@ -251,7 +262,7 @@ export class SystemInfoService {
     } catch (error) {
       logger.warn("Error collecting URL info", error);
       return {
-        href: 'unknown',
+        href: "unknown",
         error: error.message,
       };
     }
@@ -263,13 +274,17 @@ export class SystemInfoService {
    */
   static getPermissionStates() {
     const permissions = {};
-    
-    if ('permissions' in navigator && navigator.permissions.query) {
+
+    if ("permissions" in navigator && navigator.permissions.query) {
       const permissionNames = [
-        'camera', 'microphone', 'geolocation', 'notifications', 
-        'clipboard-read', 'clipboard-write'
+        "camera",
+        "microphone",
+        "geolocation",
+        "notifications",
+        "clipboard-read",
+        "clipboard-write",
       ];
-      
+
       // Note: This would be async in real implementation
       // For now, just indicate support
       permissions.supported = true;
@@ -277,7 +292,7 @@ export class SystemInfoService {
     } else {
       permissions.supported = false;
     }
-    
+
     return permissions;
   }
 
@@ -289,8 +304,8 @@ export class SystemInfoService {
   static isStorageAvailable(type) {
     try {
       const storage = window[type];
-      const testKey = '__storage_test__';
-      storage.setItem(testKey, 'test');
+      const testKey = "__storage_test__";
+      storage.setItem(testKey, "test");
       storage.removeItem(testKey);
       return true;
     } catch (error) {
@@ -307,13 +322,13 @@ export class SystemInfoService {
     try {
       const storage = window[type];
       let total = 0;
-      
+
       for (let key in storage) {
         if (Object.prototype.hasOwnProperty.call(storage, key)) {
           total += key.length + (storage[key]?.length || 0);
         }
       }
-      
+
       return total;
     } catch (error) {
       return 0;
@@ -328,16 +343,16 @@ export class SystemInfoService {
     return {
       timestamp: new Date().toISOString(),
       browser: {
-        userAgent: navigator.userAgent || 'unknown',
-        language: navigator.language || 'unknown',
+        userAgent: navigator.userAgent || "unknown",
+        language: navigator.language || "unknown",
       },
       viewport: {
         width: window.innerWidth || 0,
         height: window.innerHeight || 0,
       },
       url: {
-        href: window.location.href || 'unknown',
-        pathname: window.location.pathname || 'unknown',
+        href: window.location.href || "unknown",
+        pathname: window.location.pathname || "unknown",
       },
       error: "System info collection failed - using fallback data",
     };
@@ -353,7 +368,7 @@ export class SystemInfoService {
         documentReadyState: document.readyState,
         activeElement: document.activeElement?.tagName || null,
         visibilityState: document.visibilityState,
-        elementCount: document.querySelectorAll('*').length,
+        elementCount: document.querySelectorAll("*").length,
         scriptCount: document.scripts.length,
         styleSheetCount: document.styleSheets.length,
         imageCount: document.images.length,
@@ -380,7 +395,7 @@ export class SystemInfoService {
         customData,
         localStorage: this.getSafeLocalStorageSnapshot(),
         sessionData: this.getSafeSessionStorageSnapshot(),
-        reactDevTools: typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__ !== 'undefined',
+        reactDevTools: typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined",
       };
     } catch (error) {
       logger.warn("Error collecting application info", error);
@@ -398,23 +413,23 @@ export class SystemInfoService {
   static getSafeLocalStorageSnapshot() {
     try {
       const snapshot = {};
-      const sensitiveKeys = ['token', 'password', 'secret', 'key', 'auth'];
-      
+      const sensitiveKeys = ["token", "password", "secret", "key", "auth"];
+
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && !sensitiveKeys.some(sensitive => 
-          key.toLowerCase().includes(sensitive))) {
+        if (key && !sensitiveKeys.some((sensitive) => key.toLowerCase().includes(sensitive))) {
           try {
             const value = localStorage.getItem(key);
-            snapshot[key] = value?.length > 100 
-              ? `${value.substring(0, 100)}... (truncated, length: ${value.length})`
-              : value;
+            snapshot[key] =
+              value?.length > 100
+                ? `${value.substring(0, 100)}... (truncated, length: ${value.length})`
+                : value;
           } catch (error) {
-            snapshot[key] = '[Error reading value]';
+            snapshot[key] = "[Error reading value]";
           }
         }
       }
-      
+
       return snapshot;
     } catch (error) {
       return { error: error.message };
@@ -428,23 +443,23 @@ export class SystemInfoService {
   static getSafeSessionStorageSnapshot() {
     try {
       const snapshot = {};
-      const sensitiveKeys = ['token', 'password', 'secret', 'key', 'auth'];
-      
+      const sensitiveKeys = ["token", "password", "secret", "key", "auth"];
+
       for (let i = 0; i < sessionStorage.length; i++) {
         const key = sessionStorage.key(i);
-        if (key && !sensitiveKeys.some(sensitive => 
-          key.toLowerCase().includes(sensitive))) {
+        if (key && !sensitiveKeys.some((sensitive) => key.toLowerCase().includes(sensitive))) {
           try {
             const value = sessionStorage.getItem(key);
-            snapshot[key] = value?.length > 100 
-              ? `${value.substring(0, 100)}... (truncated, length: ${value.length})`
-              : value;
+            snapshot[key] =
+              value?.length > 100
+                ? `${value.substring(0, 100)}... (truncated, length: ${value.length})`
+                : value;
           } catch (error) {
-            snapshot[key] = '[Error reading value]';
+            snapshot[key] = "[Error reading value]";
           }
         }
       }
-      
+
       return snapshot;
     } catch (error) {
       return { error: error.message };

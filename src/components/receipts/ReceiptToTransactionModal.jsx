@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Receipt,
-  DollarSign,
-  Calendar,
-  Building,
-  FileText,
-  ArrowRight,
-  Check,
-} from "lucide-react";
+import { Receipt, DollarSign, Calendar, Building, FileText, ArrowRight, Check } from "lucide-react";
 import { useReceipts } from "../../hooks/common/useReceipts";
 import { useTransactions } from "../../hooks/common/useTransactions";
 import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
@@ -66,7 +58,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
           const matchingEnvelope = envelopes.find(
             (env) =>
               env.category?.toLowerCase().includes(suggestion.category) ||
-              env.name?.toLowerCase().includes(suggestion.category),
+              env.name?.toLowerCase().includes(suggestion.category)
           );
 
           if (matchingEnvelope) {
@@ -153,12 +145,9 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Review Extracted Data
-              </h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Review Extracted Data</h3>
               <p className="text-sm text-gray-600 mb-6">
-                Please verify and edit the information extracted from your
-                receipt.
+                Please verify and edit the information extracted from your receipt.
               </p>
             </div>
 
@@ -171,9 +160,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
                 <input
                   type="text"
                   value={transactionForm.description}
-                  onChange={(e) =>
-                    handleFormChange("description", e.target.value)
-                  }
+                  onChange={(e) => handleFormChange("description", e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Enter merchant name"
                 />
@@ -188,9 +175,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
                   type="number"
                   step="0.01"
                   value={transactionForm.amount}
-                  onChange={(e) =>
-                    handleFormChange("amount", parseFloat(e.target.value) || 0)
-                  }
+                  onChange={(e) => handleFormChange("amount", parseFloat(e.target.value) || 0)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="0.00"
                 />
@@ -210,9 +195,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Category
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
                 <select
                   value={transactionForm.category}
                   onChange={(e) => handleFormChange("category", e.target.value)}
@@ -250,10 +233,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
                 <h4 className="font-medium text-gray-900 mb-3">Items Found</h4>
                 <div className="max-h-32 overflow-y-auto space-y-1">
                   {receiptData.items.slice(0, 5).map((item, index) => (
-                    <div
-                      key={index}
-                      className="flex justify-between text-sm text-gray-600"
-                    >
+                    <div key={index} className="flex justify-between text-sm text-gray-600">
                       <span>{item.description}</span>
                       <span>${item.amount.toFixed(2)}</span>
                     </div>
@@ -273,9 +253,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Choose Envelope
-              </h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Choose Envelope</h3>
               <p className="text-sm text-gray-600 mb-6">
                 Select which envelope this transaction should be assigned to.
               </p>
@@ -294,12 +272,8 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
                 >
                   <div className="flex justify-between items-center">
                     <div>
-                      <h4 className="font-medium text-gray-900">
-                        {envelope.name}
-                      </h4>
-                      <p className="text-sm text-gray-500">
-                        {envelope.category}
-                      </p>
+                      <h4 className="font-medium text-gray-900">{envelope.name}</h4>
+                      <p className="text-sm text-gray-500">{envelope.category}</p>
                     </div>
                     <div className="text-right">
                       <p className="font-medium text-gray-900">
@@ -316,24 +290,18 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
 
             {!transactionForm.envelopeId && (
               <div className="text-center py-4">
-                <p className="text-sm text-gray-500">
-                  Please select an envelope to continue
-                </p>
+                <p className="text-sm text-gray-500">Please select an envelope to continue</p>
               </div>
             )}
           </div>
         );
 
       case 3: {
-        const selectedEnvelope = envelopes.find(
-          (env) => env.id === transactionForm.envelopeId,
-        );
+        const selectedEnvelope = envelopes.find((env) => env.id === transactionForm.envelopeId);
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Confirm Transaction
-              </h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Confirm Transaction</h3>
               <p className="text-sm text-gray-600 mb-6">
                 Review the transaction details before creating.
               </p>
@@ -343,15 +311,11 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">Description</p>
-                  <p className="font-medium text-gray-900">
-                    {transactionForm.description}
-                  </p>
+                  <p className="font-medium text-gray-900">{transactionForm.description}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Amount</p>
-                  <p className="font-medium text-gray-900">
-                    ${transactionForm.amount.toFixed(2)}
-                  </p>
+                  <p className="font-medium text-gray-900">${transactionForm.amount.toFixed(2)}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Date</p>
@@ -367,15 +331,11 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Category</p>
-                  <p className="font-medium text-gray-900">
-                    {transactionForm.category}
-                  </p>
+                  <p className="font-medium text-gray-900">{transactionForm.category}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Type</p>
-                  <p className="font-medium text-gray-900 capitalize">
-                    {transactionForm.type}
-                  </p>
+                  <p className="font-medium text-gray-900 capitalize">{transactionForm.type}</p>
                 </div>
               </div>
 
@@ -390,8 +350,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
               <p className="text-sm text-blue-800">
                 <Receipt className="h-4 w-4 inline mr-2" />
-                Receipt will be attached to this transaction and stored
-                securely.
+                Receipt will be attached to this transaction and stored securely.
               </p>
             </div>
           </div>
@@ -409,9 +368,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
         <div className="p-6 border-b border-gray-200">
           {/* Header with progress */}
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-gray-900">
-              Create Transaction from Receipt
-            </h2>
+            <h2 className="text-xl font-bold text-gray-900">Create Transaction from Receipt</h2>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 p-2"
@@ -448,9 +405,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
           </div>
         </div>
 
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
-          {renderStepContent()}
-        </div>
+        <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">{renderStepContent()}</div>
 
         <div className="p-6 border-t border-gray-200 bg-gray-50">
           <div className="flex gap-3">
@@ -471,9 +426,7 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
                 onClick={handleNext}
                 className="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors disabled:opacity-50"
                 disabled={
-                  (step === 1 &&
-                    (!transactionForm.description ||
-                      !transactionForm.amount)) ||
+                  (step === 1 && (!transactionForm.description || !transactionForm.amount)) ||
                   (step === 2 && !transactionForm.envelopeId)
                 }
               >

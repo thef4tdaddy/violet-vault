@@ -7,7 +7,7 @@
 // Rule processing utilities
 export * from "./rules.js";
 
-// Condition evaluation utilities  
+// Condition evaluation utilities
 export * from "./conditions.js";
 
 // Simulation and execution planning utilities

@@ -36,8 +36,7 @@ const ComposedFinancialChart = ({
   xAxisKey = "month",
   ...props
 }) => {
-  const { CustomTooltip, chartDefaults, chartTypeConfigs, getColorByCategory } =
-    useChartConfig();
+  const { CustomTooltip, chartDefaults, chartTypeConfigs, getColorByCategory } = useChartConfig();
 
   // Use custom tooltip or default
   const TooltipComponent = formatTooltip || CustomTooltip;
@@ -97,11 +96,7 @@ const ComposedFinancialChart = ({
             />
           )}
 
-          <XAxis
-            dataKey={xAxisKey}
-            stroke={chartDefaults.axis.stroke}
-            fontSize={12}
-          />
+          <XAxis dataKey={xAxisKey} stroke={chartDefaults.axis.stroke} fontSize={12} />
           <YAxis
             stroke={chartDefaults.axis.stroke}
             fontSize={12}
@@ -118,13 +113,9 @@ const ComposedFinancialChart = ({
               type={chartTypeConfigs.area.type}
               fillOpacity={chartTypeConfigs.area.fillOpacity}
               strokeWidth={chartTypeConfigs.area.strokeWidth}
-              fill={
-                areaProps.fill || getColorByCategory(areaProps.dataKey, index)
-              }
+              fill={areaProps.fill || getColorByCategory(areaProps.dataKey, index)}
               stroke={
-                areaProps.stroke ||
-                areaProps.fill ||
-                getColorByCategory(areaProps.dataKey, index)
+                areaProps.stroke || areaProps.fill || getColorByCategory(areaProps.dataKey, index)
               }
               {...areaProps}
             />
@@ -136,9 +127,7 @@ const ComposedFinancialChart = ({
               key={`bar-${barProps.dataKey}`}
               radius={chartTypeConfigs.bar.radius}
               maxBarSize={chartTypeConfigs.bar.maxBarSize}
-              fill={
-                barProps.fill || getColorByCategory(barProps.dataKey, index)
-              }
+              fill={barProps.fill || getColorByCategory(barProps.dataKey, index)}
               {...barProps}
             />
           ))}
@@ -148,18 +137,10 @@ const ComposedFinancialChart = ({
             <Line
               key={`line-${lineProps.dataKey}`}
               type={chartTypeConfigs.line.type}
-              strokeWidth={
-                lineProps.strokeWidth || chartTypeConfigs.line.strokeWidth
-              }
-              dot={
-                lineProps.dot !== undefined
-                  ? lineProps.dot
-                  : chartTypeConfigs.line.dot
-              }
+              strokeWidth={lineProps.strokeWidth || chartTypeConfigs.line.strokeWidth}
+              dot={lineProps.dot !== undefined ? lineProps.dot : chartTypeConfigs.line.dot}
               activeDot={lineProps.activeDot || chartTypeConfigs.line.activeDot}
-              stroke={
-                lineProps.stroke || getColorByCategory(lineProps.dataKey, index)
-              }
+              stroke={lineProps.stroke || getColorByCategory(lineProps.dataKey, index)}
               {...lineProps}
             />
           ))}
@@ -170,11 +151,7 @@ const ComposedFinancialChart = ({
 };
 
 // Specialized cash flow chart
-export const CashFlowChart = ({
-  data,
-  title = "Monthly Cash Flow",
-  ...props
-}) => {
+export const CashFlowChart = ({ data, title = "Monthly Cash Flow", ...props }) => {
   const series = [
     {
       type: "bar",
@@ -197,14 +174,7 @@ export const CashFlowChart = ({
     },
   ];
 
-  return (
-    <ComposedFinancialChart
-      title={title}
-      data={data}
-      series={series}
-      {...props}
-    />
-  );
+  return <ComposedFinancialChart title={title} data={data} series={series} {...props} />;
 };
 
 // Specialized budget vs actual chart
@@ -230,13 +200,7 @@ export const BudgetVsActualChart = ({
   ];
 
   return (
-    <ComposedFinancialChart
-      title={title}
-      data={data}
-      series={series}
-      xAxisKey="name"
-      {...props}
-    />
+    <ComposedFinancialChart title={title} data={data} series={series} xAxisKey="name" {...props} />
   );
 };
 
