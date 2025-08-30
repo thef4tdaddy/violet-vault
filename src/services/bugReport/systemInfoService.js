@@ -309,7 +309,7 @@ export class SystemInfoService {
       let total = 0;
       
       for (let key in storage) {
-        if (storage.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(storage, key)) {
           total += key.length + (storage[key]?.length || 0);
         }
       }
