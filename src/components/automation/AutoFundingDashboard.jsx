@@ -1,29 +1,11 @@
 import React, { useState } from "react";
 import { useConfirm } from "../../hooks/common/useConfirm";
 import { globalToast } from "../../stores/ui/toastStore";
-import {
-  Plus,
-  Play,
-  Pause,
-  Settings,
-  History,
-  Edit3,
-  Trash2,
-  Eye,
-  EyeOff,
-  Clock,
-  Target,
-  DollarSign,
-  Percent,
-  ArrowRight,
-  CheckCircle,
-  AlertTriangle,
-  TrendingUp,
-  Calendar,
-  RotateCcw,
-} from "lucide-react";
+import { X } from "lucide-react";
 import AutoFundingRuleBuilder from "./AutoFundingRuleBuilder";
-import { RULE_TYPES, TRIGGER_TYPES } from "../../utils/budgeting/autofunding";
+import RulesTab from "./tabs/RulesTab";
+import HistoryTab from "./tabs/HistoryTab";
+import { TRIGGER_TYPES } from "../../utils/budgeting/autofunding";
 import { useAutoFunding } from "../../hooks/budgeting/autofunding";
 import { useBudgetStore } from "../../stores/ui/uiStore";
 import logger from "../../utils/common/logger";
@@ -159,70 +141,6 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
     }
   };
 
-  const getRuleTypeIcon = (type) => {
-    switch (type) {
-      case RULE_TYPES.FIXED_AMOUNT:
-        return DollarSign;
-      case RULE_TYPES.PERCENTAGE:
-        return Percent;
-      case RULE_TYPES.SPLIT_REMAINDER:
-        return Target;
-      case RULE_TYPES.PRIORITY_FILL:
-        return ArrowRight;
-      default:
-        return Settings;
-    }
-  };
-
-  const getRuleTypeColor = (type) => {
-    switch (type) {
-      case RULE_TYPES.FIXED_AMOUNT:
-        return "text-green-600 bg-green-100";
-      case RULE_TYPES.PERCENTAGE:
-        return "text-blue-600 bg-blue-100";
-      case RULE_TYPES.SPLIT_REMAINDER:
-        return "text-purple-600 bg-purple-100";
-      case RULE_TYPES.PRIORITY_FILL:
-        return "text-orange-600 bg-orange-100";
-      default:
-        return "text-gray-600 bg-gray-100";
-    }
-  };
-
-  const formatTriggerType = (trigger) => {
-    switch (trigger) {
-      case TRIGGER_TYPES.MANUAL:
-        return "Manual";
-      case TRIGGER_TYPES.INCOME_DETECTED:
-        return "Income Detected";
-      case TRIGGER_TYPES.MONTHLY:
-        return "Monthly";
-      case TRIGGER_TYPES.BIWEEKLY:
-        return "Biweekly";
-      case TRIGGER_TYPES.WEEKLY:
-        return "Weekly";
-      case TRIGGER_TYPES.PAYDAY:
-        return "Payday";
-      default:
-        return "Unknown";
-    }
-  };
-
-  const formatRuleType = (type) => {
-    switch (type) {
-      case RULE_TYPES.FIXED_AMOUNT:
-        return "Fixed Amount";
-      case RULE_TYPES.PERCENTAGE:
-        return "Percentage";
-      case RULE_TYPES.SPLIT_REMAINDER:
-        return "Split Remainder";
-      case RULE_TYPES.PRIORITY_FILL:
-        return "Priority Fill";
-      default:
-        return "Unknown";
-    }
-  };
-
   if (!isOpen) return null;
 
   return (
@@ -234,116 +152,47 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <Settings className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold">
-                      Auto-Funding Rules
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      Automate your envelope funding with smart rules
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={handleExecuteRules}
-                    disabled={
-                      isExecuting || rules.filter((r) => r.enabled).length === 0
-                    }
-                    className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                  >
-                    {isExecuting ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        Executing...
-                      </>
-                    ) : (
-                      <>
-                        <Play className="h-4 w-4" />
-                        Execute Rules
-                      </>
-                    )}
-                  </button>
-                  <button
-                    onClick={onClose}
-                    className="text-gray-400 hover:text-gray-600 p-1"
-                  >
-                    <Plus className="h-6 w-6 rotate-45" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Summary Stats */}
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <Settings className="h-4 w-4 text-gray-600" />
-                    <span className="text-sm text-gray-600">Total Rules</span>
-                  </div>
-                  <p className="text-lg font-semibold text-gray-900 mt-1">
-                    {rules.length}
-                  </p>
-                </div>
-                <div className="bg-green-50 p-3 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm text-green-600">Active Rules</span>
-                  </div>
-                  <p className="text-lg font-semibold text-green-900 mt-1">
-                    {rules.filter((r) => r.enabled).length}
-                  </p>
-                </div>
-                <div className="bg-blue-50 p-3 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm text-blue-600">
-                      Available Cash
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    Auto-Funding Dashboard
+                  </h2>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                      {rules.filter((r) => r.enabled).length} Active
+                    </span>
+                    <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full">
+                      {rules.length} Total
                     </span>
                   </div>
-                  <p className="text-lg font-semibold text-blue-900 mt-1">
-                    ${(budget.unassignedCash || 0).toFixed(2)}
-                  </p>
                 </div>
-                <div className="bg-purple-50 p-3 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <History className="h-4 w-4 text-purple-600" />
-                    <span className="text-sm text-purple-600">
-                      Last Execution
-                    </span>
-                  </div>
-                  <p className="text-lg font-semibold text-purple-900 mt-1">
-                    {executionHistory.length > 0
-                      ? new Date(
-                          executionHistory[0].executedAt,
-                        ).toLocaleDateString()
-                      : "Never"}
-                  </p>
-                </div>
+                <button
+                  onClick={onClose}
+                  className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg"
+                >
+                  <X className="h-5 w-5" />
+                </button>
               </div>
 
               {/* Tabs */}
-              <div className="mt-4 flex border-b border-gray-200">
+              <div className="flex space-x-8 mt-6">
                 <button
                   onClick={() => setActiveTab("rules")}
-                  className={`px-4 py-2 text-sm font-medium ${
+                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
                     activeTab === "rules"
-                      ? "text-blue-600 border-b-2 border-blue-600"
-                      : "text-gray-500 hover:text-gray-700"
+                      ? "border-blue-500 text-blue-600"
+                      : "border-transparent text-gray-500 hover:text-gray-700"
                   }`}
                 >
                   Rules ({rules.length})
                 </button>
                 <button
                   onClick={() => setActiveTab("history")}
-                  className={`px-4 py-2 text-sm font-medium ${
+                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
                     activeTab === "history"
-                      ? "text-blue-600 border-b-2 border-blue-600"
-                      : "text-gray-500 hover:text-gray-700"
+                      ? "border-blue-500 text-blue-600"
+                      : "border-transparent text-gray-500 hover:text-gray-700"
                   }`}
                 >
-                  Execution History ({executionHistory.length})
+                  History ({executionHistory.length})
                 </button>
               </div>
             </div>
@@ -351,345 +200,23 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
             {/* Content */}
             <div className="flex-1 overflow-y-auto p-6">
               {activeTab === "rules" && (
-                <div className="space-y-4">
-                  {/* Create Rule Button */}
-                  <div className="text-center py-4">
-                    <button
-                      onClick={handleCreateRule}
-                      className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
-                    >
-                      <Plus className="h-5 w-5" />
-                      Create New Rule
-                    </button>
-                  </div>
-
-                  {/* Rules List */}
-                  {rules.length === 0 ? (
-                    <div className="text-center py-12">
-                      <Settings className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                      <h4 className="text-lg font-medium text-gray-900 mb-2">
-                        No Rules Created
-                      </h4>
-                      <p className="text-gray-600 mb-4">
-                        Create your first auto-funding rule to automate envelope
-                        management
-                      </p>
-                      <button
-                        onClick={handleCreateRule}
-                        className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-                      >
-                        <Plus className="h-4 w-4" />
-                        Get Started
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {rules.map((rule) => {
-                        const Icon = getRuleTypeIcon(rule.type);
-                        const colorClass = getRuleTypeColor(rule.type);
-
-                        return (
-                          <div
-                            key={rule.id}
-                            className={`border rounded-lg p-4 ${
-                              rule.enabled
-                                ? "border-gray-200 bg-white"
-                                : "border-gray-100 bg-gray-50"
-                            }`}
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3">
-                                <div className={`p-2 rounded-lg ${colorClass}`}>
-                                  <Icon className="h-4 w-4" />
-                                </div>
-                                <div>
-                                  <h4
-                                    className={`font-medium ${
-                                      rule.enabled
-                                        ? "text-gray-900"
-                                        : "text-gray-500"
-                                    }`}
-                                  >
-                                    {rule.name}
-                                  </h4>
-                                  <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
-                                    <span>{formatRuleType(rule.type)}</span>
-                                    <span>•</span>
-                                    <span>
-                                      {formatTriggerType(rule.trigger)}
-                                    </span>
-                                    <span>•</span>
-                                    <span>Priority: {rule.priority}</span>
-                                    {rule.executionCount > 0 && (
-                                      <>
-                                        <span>•</span>
-                                        <span>
-                                          Executed {rule.executionCount} times
-                                        </span>
-                                      </>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div className="flex items-center gap-2">
-                                <button
-                                  onClick={() => handleToggleRule(rule.id)}
-                                  className={`p-2 rounded-lg ${
-                                    rule.enabled
-                                      ? "text-green-600 hover:bg-green-50"
-                                      : "text-gray-400 hover:bg-gray-100"
-                                  }`}
-                                  title={
-                                    rule.enabled
-                                      ? "Disable rule"
-                                      : "Enable rule"
-                                  }
-                                >
-                                  {rule.enabled ? (
-                                    <Eye className="h-4 w-4" />
-                                  ) : (
-                                    <EyeOff className="h-4 w-4" />
-                                  )}
-                                </button>
-                                <button
-                                  onClick={() => handleEditRule(rule)}
-                                  className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
-                                  title="Edit rule"
-                                >
-                                  <Edit3 className="h-4 w-4" />
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteRule(rule.id)}
-                                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
-                                  title="Delete rule"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
-                              </div>
-                            </div>
-
-                            {rule.description && (
-                              <p className="text-sm text-gray-600 mt-2 ml-11">
-                                {rule.description}
-                              </p>
-                            )}
-
-                            {/* Rule Details */}
-                            <div className="ml-11 mt-3 flex flex-wrap items-center gap-2">
-                              {rule.config.amount > 0 && (
-                                <span className="inline-flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
-                                  <DollarSign className="h-3 w-3" />$
-                                  {rule.config.amount.toFixed(2)}
-                                </span>
-                              )}
-                              {rule.config.percentage > 0 && (
-                                <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
-                                  <Percent className="h-3 w-3" />
-                                  {rule.config.percentage}%
-                                </span>
-                              )}
-                              {rule.config.targetId && (
-                                <span className="inline-flex items-center gap-1 bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">
-                                  <Target className="h-3 w-3" />
-                                  {budget.envelopes?.find(
-                                    (e) => e.id === rule.config.targetId,
-                                  )?.name || "Unknown"}
-                                </span>
-                              )}
-                              {rule.config.targetIds &&
-                                rule.config.targetIds.length > 0 && (
-                                  <span className="inline-flex items-center gap-1 bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs">
-                                    <Target className="h-3 w-3" />
-                                    {rule.config.targetIds.length} envelopes
-                                  </span>
-                                )}
-                              {rule.lastExecuted && (
-                                <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs">
-                                  <Clock className="h-3 w-3" />
-                                  Last:{" "}
-                                  {new Date(
-                                    rule.lastExecuted,
-                                  ).toLocaleDateString()}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
+                <RulesTab
+                  rules={rules}
+                  onCreateRule={handleCreateRule}
+                  onEditRule={handleEditRule}
+                  onDeleteRule={handleDeleteRule}
+                  onToggleRule={handleToggleRule}
+                  onExecuteRules={handleExecuteRules}
+                  isExecuting={isExecuting}
+                />
               )}
 
               {activeTab === "history" && (
-                <div className="space-y-4">
-                  {executionHistory.length === 0 ? (
-                    <div className="text-center py-12">
-                      <History className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                      <h4 className="text-lg font-medium text-gray-900 mb-2">
-                        No Execution History
-                      </h4>
-                      <p className="text-gray-600 mb-4">
-                        Rule executions will appear here once you start running
-                        your auto-funding rules
-                      </p>
-                      <button
-                        onClick={handleExecuteRules}
-                        disabled={rules.filter((r) => r.enabled).length === 0}
-                        className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400"
-                      >
-                        <Play className="h-4 w-4" />
-                        Execute Rules Now
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {executionHistory.map((execution, index) => (
-                        <div
-                          key={execution.id}
-                          className="border border-gray-200 rounded-lg p-4"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div
-                                className={`p-2 rounded-lg ${
-                                  execution.totalFunded > 0
-                                    ? "bg-green-100 text-green-600"
-                                    : "bg-gray-100 text-gray-600"
-                                }`}
-                              >
-                                {execution.totalFunded > 0 ? (
-                                  <CheckCircle className="h-4 w-4" />
-                                ) : (
-                                  <AlertTriangle className="h-4 w-4" />
-                                )}
-                              </div>
-                              <div>
-                                <h4 className="font-medium text-gray-900">
-                                  Execution #{executionHistory.length - index}
-                                </h4>
-                                <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
-                                  <span>
-                                    {new Date(
-                                      execution.executedAt,
-                                    ).toLocaleString()}
-                                  </span>
-                                  <span>•</span>
-                                  <span>
-                                    {formatTriggerType(execution.trigger)}{" "}
-                                    trigger
-                                  </span>
-                                  <span>•</span>
-                                  <span>
-                                    {execution.rulesExecuted} rules executed
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="text-right">
-                              <p
-                                className={`text-lg font-semibold ${
-                                  execution.totalFunded > 0
-                                    ? "text-green-600"
-                                    : "text-gray-600"
-                                }`}
-                              >
-                                ${(execution.totalFunded || 0).toFixed(2)}
-                              </p>
-                              <button
-                                onClick={() =>
-                                  setShowExecutionDetails(
-                                    showExecutionDetails === execution.id
-                                      ? null
-                                      : execution.id,
-                                  )
-                                }
-                                className="text-blue-600 hover:text-blue-700 text-sm"
-                              >
-                                {showExecutionDetails === execution.id
-                                  ? "Hide Details"
-                                  : "Show Details"}
-                              </button>
-                            </div>
-                          </div>
-
-                          {showExecutionDetails === execution.id && (
-                            <div className="mt-4 pt-4 border-t border-gray-200">
-                              <div className="space-y-2">
-                                {execution.results?.map(
-                                  (result, resultIndex) => (
-                                    <div
-                                      key={resultIndex}
-                                      className={`p-3 rounded-lg ${
-                                        result.success
-                                          ? "bg-green-50 border border-green-200"
-                                          : "bg-red-50 border border-red-200"
-                                      }`}
-                                    >
-                                      <div className="flex items-center justify-between">
-                                        <div>
-                                          <h5
-                                            className={`font-medium ${
-                                              result.success
-                                                ? "text-green-900"
-                                                : "text-red-900"
-                                            }`}
-                                          >
-                                            {result.ruleName}
-                                          </h5>
-                                          {result.success ? (
-                                            <p className="text-sm text-green-700 mt-1">
-                                              Funded $
-                                              {(result.amount || 0).toFixed(2)}
-                                              {result.targetEnvelopes &&
-                                                result.targetEnvelopes.length >
-                                                  0 && (
-                                                  <span>
-                                                    {" "}
-                                                    to{" "}
-                                                    {
-                                                      result.targetEnvelopes
-                                                        .length
-                                                    }{" "}
-                                                    envelope
-                                                    {result.targetEnvelopes
-                                                      .length > 1
-                                                      ? "s"
-                                                      : ""}
-                                                  </span>
-                                                )}
-                                            </p>
-                                          ) : (
-                                            <p className="text-sm text-red-700 mt-1">
-                                              {result.error}
-                                            </p>
-                                          )}
-                                        </div>
-                                        <div
-                                          className={`text-sm font-medium ${
-                                            result.success
-                                              ? "text-green-600"
-                                              : "text-red-600"
-                                          }`}
-                                        >
-                                          {result.success
-                                            ? "Success"
-                                            : "Failed"}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  ),
-                                )}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <HistoryTab
+                  executionHistory={executionHistory}
+                  showExecutionDetails={showExecutionDetails}
+                  onToggleDetails={setShowExecutionDetails}
+                />
               )}
             </div>
           </div>
@@ -704,7 +231,6 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
           setEditingRule(null);
         }}
         envelopes={budget.envelopes || []}
-        unassignedCash={budget.unassignedCash || 0}
         onSaveRule={handleSaveRule}
         editingRule={editingRule}
       />
