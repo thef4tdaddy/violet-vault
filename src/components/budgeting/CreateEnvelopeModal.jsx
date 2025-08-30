@@ -1,7 +1,7 @@
 import React from "react";
 import { Save, Plus, X, Palette } from "lucide-react";
 import useEnvelopeForm from "../../hooks/budgeting/useEnvelopeForm";
-import { EnvelopeTypeSelector } from "./shared/EnvelopeTypeSelector";
+import EnvelopeTypeSelector from "./shared/EnvelopeTypeSelector";
 import EnvelopeBasicFields from "./envelope/EnvelopeBasicFields";
 import EnvelopeBudgetFields from "./envelope/EnvelopeBudgetFields";
 import AllocationModeSelector from "./shared/AllocationModeSelector";
