@@ -1,5 +1,5 @@
 import { H } from "highlight.run";
-import logger from "../common/logger";
+import logger from "../common/logger.js";
 
 /**
  * Get environment-aware configuration for Highlight.io

@@ -1,12 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { useBudgetStore } from "../../stores/ui/uiStore";
-import { queryKeys, optimisticHelpers } from "../../utils/common/queryClient";
+import { useBudgetStore } from "../../stores/ui/uiStore.js";
+import { queryKeys, optimisticHelpers } from "../../utils/common/queryClient.js";
 import {
   budgetDb,
   getBudgetMetadata,
   setBudgetMetadata,
-} from "../../db/budgetDb";
+} from "../../db/budgetDb.js";
 import logger from "../../utils/common/logger.js";
 
 // Helper to trigger sync for transaction changes

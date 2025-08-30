@@ -1,6 +1,6 @@
 import { QueryClient, MutationCache, QueryCache } from "@tanstack/react-query";
-import { H } from "./highlight";
-import { budgetDb } from "../../db/budgetDb";
+import { H } from "./highlight.js";
+import { budgetDb } from "../../db/budgetDb.js";
 import logger from "./logger.js";
 
 // Enhanced TanStack Query configuration with Dexie integration
