@@ -6,28 +6,69 @@
  */
 
 /**
- * Normalize date strings, particularly handling 2-digit year conversion
+ * Normalize date strings to YYYY-MM-DD format
  * @param {string|Date} dateInput - Raw date input
- * @returns {string} Normalized date string
+ * @returns {string} Normalized date string in YYYY-MM-DD format, or empty string if invalid
  */
 export const normalizeBillDate = (dateInput) => {
-  if (!dateInput) return null;
+  if (!dateInput) return "";
 
-  let normalizedDate = dateInput;
+  try {
+    let dateStr = dateInput;
 
-  // Handle various date formats and convert 2-digit years to 4-digit
-  if (typeof normalizedDate === "string") {
-    // Match patterns like MM/DD/YY, MM-DD-YY, etc.
-    normalizedDate = normalizedDate.replace(
-      /(\d{1,2})[/-](\d{1,2})[/-](\d{2})$/,
-      (match, month, day, year) => {
-        const fullYear = parseInt(year) <= 30 ? `20${year}` : `19${year}`;
-        return `${month}/${day}/${fullYear}`;
-      },
-    );
+    // Handle Date object
+    if (dateInput instanceof Date) {
+      return dateInput.toISOString().split("T")[0];
+    }
+
+    // Handle ISO date strings
+    if (typeof dateStr === "string" && dateStr.includes("T")) {
+      return dateStr.split("T")[0];
+    }
+
+    // Handle various date formats and convert 2-digit years to 4-digit
+    if (typeof dateStr === "string") {
+      // Handle MM/DD/YY, MM-DD-YY patterns (but not YYYY-MM-DD)
+      dateStr = dateStr.replace(
+        /^(\d{1,2})[/-](\d{1,2})[/-](\d{2})$/,
+        (match, month, day, year) => {
+          const fullYear = parseInt(year) <= 30 ? `20${year}` : `19${year}`;
+          return `${month}/${day}/${fullYear}`;
+        },
+      );
+
+      // Parse different formats
+      let parsedDate;
+      if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        // Already in YYYY-MM-DD format - use UTC to avoid timezone issues
+        const parts = dateStr.split('-');
+        parsedDate = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
+      } else if (dateStr.match(/^\d{1,2}[/-]\d{1,2}[/-]\d{4}$/)) {
+        // MM/DD/YYYY or MM-DD-YYYY format
+        const parts = dateStr.split(/[/-]/);
+        parsedDate = new Date(Date.UTC(parseInt(parts[2]), parseInt(parts[0]) - 1, parseInt(parts[1])));
+      } else {
+        // Try direct parsing
+        parsedDate = new Date(dateStr);
+      }
+
+      if (isNaN(parsedDate.getTime())) {
+        console.warn(`Invalid date format: ${dateInput}`);
+        return "";
+      }
+
+      // Format as YYYY-MM-DD
+      const year = parsedDate.getUTCFullYear();
+      const month = String(parsedDate.getUTCMonth() + 1).padStart(2, '0');
+      const day = String(parsedDate.getUTCDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    return "";
+  } catch (error) {
+    console.warn(`Error normalizing date: ${dateInput}`, error);
+    return "";
   }
-
-  return normalizedDate;
 };
 
 /**
@@ -41,6 +82,8 @@ export const calculateDaysUntilDue = (dueDate, fromDate = new Date()) => {
 
   try {
     const normalizedDate = normalizeBillDate(dueDate);
+    if (!normalizedDate) return null;
+    
     const due = new Date(normalizedDate);
 
     // Validate date is valid
@@ -48,7 +91,12 @@ export const calculateDaysUntilDue = (dueDate, fromDate = new Date()) => {
       return null;
     }
 
-    return Math.ceil((due - fromDate) / (1000 * 60 * 60 * 24));
+    // Normalize both dates to UTC start of day for consistent calculation
+    const from = new Date(fromDate);
+    from.setUTCHours(0, 0, 0, 0);
+    due.setUTCHours(0, 0, 0, 0);
+
+    return Math.ceil((due - from) / (1000 * 60 * 60 * 24));
   } catch (error) {
     console.warn(`Invalid due date: ${dueDate}`, error);
     return null;
@@ -64,7 +112,7 @@ export const calculateBillUrgency = (daysUntilDue) => {
   if (daysUntilDue === null || daysUntilDue === undefined) return "normal";
 
   if (daysUntilDue < 0) return "overdue";
-  if (daysUntilDue <= 3) return "urgent";
+  if (daysUntilDue <= 2) return "urgent";
   if (daysUntilDue <= 7) return "soon";
   return "normal";
 };
@@ -72,11 +120,11 @@ export const calculateBillUrgency = (daysUntilDue) => {
 /**
  * Process a single bill to add calculated fields
  * @param {Object} bill - Raw bill object
- * @param {Function} onUpdate - Callback for bill updates (for recurring bills)
+ * @param {Date} fromDate - Reference date (defaults to today)
  * @returns {Object} Processed bill with daysUntilDue and urgency
  */
-export const processBillCalculations = (bill) => {
-  const daysUntilDue = calculateDaysUntilDue(bill.dueDate);
+export const processBillCalculations = (bill, fromDate = new Date()) => {
+  const daysUntilDue = calculateDaysUntilDue(bill.dueDate, fromDate);
   const urgency = calculateBillUrgency(daysUntilDue);
 
   return {
@@ -120,16 +168,16 @@ export const categorizeBills = (bills) => {
  * @returns {Object} Totals object with overdue, upcoming, and paid amounts
  */
 export const calculateBillTotals = (categorizedBills) => {
-  const overdueTotal = categorizedBills.overdue.reduce(
-    (sum, b) => sum + Math.abs(b.amount),
+  const overdueTotal = (categorizedBills.overdue || []).reduce(
+    (sum, b) => sum + Math.abs(b.amount || b.monthlyAmount || 0),
     0,
   );
-  const upcomingTotal = categorizedBills.upcoming.reduce(
-    (sum, b) => sum + Math.abs(b.amount),
+  const upcomingTotal = (categorizedBills.upcoming || []).reduce(
+    (sum, b) => sum + Math.abs(b.amount || b.monthlyAmount || 0),
     0,
   );
-  const paidTotal = categorizedBills.paid.reduce(
-    (sum, b) => sum + Math.abs(b.amount),
+  const paidTotal = (categorizedBills.paid || []).reduce(
+    (sum, b) => sum + Math.abs(b.amount || b.monthlyAmount || 0),
     0,
   );
 
@@ -137,7 +185,10 @@ export const calculateBillTotals = (categorizedBills) => {
     overdue: overdueTotal,
     upcoming: upcomingTotal,
     paid: paidTotal,
-    total: overdueTotal + upcomingTotal + paidTotal,
+    total: (categorizedBills.all || []).reduce(
+      (sum, b) => sum + Math.abs(b.amount || b.monthlyAmount || 0),
+      0,
+    ),
   };
 };
 
@@ -173,15 +224,21 @@ export const filterBills = (bills, filterOptions = {}) => {
   }
 
   if (filterOptions.amountMin !== undefined) {
-    filtered = filtered.filter(
-      (bill) => Math.abs(bill.amount) >= filterOptions.amountMin,
-    );
+    const minAmount = parseFloat(filterOptions.amountMin);
+    if (!isNaN(minAmount)) {
+      filtered = filtered.filter(
+        (bill) => Math.abs(bill.amount) >= minAmount,
+      );
+    }
   }
 
   if (filterOptions.amountMax !== undefined) {
-    filtered = filtered.filter(
-      (bill) => Math.abs(bill.amount) <= filterOptions.amountMax,
-    );
+    const maxAmount = parseFloat(filterOptions.amountMax);
+    if (!isNaN(maxAmount)) {
+      filtered = filtered.filter(
+        (bill) => Math.abs(bill.amount) <= maxAmount,
+      );
+    }
   }
 
   return filtered;
