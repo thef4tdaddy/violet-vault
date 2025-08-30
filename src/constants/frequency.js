@@ -3,9 +3,9 @@
  * Standardized across the entire application for consistency
  */
 
-// Biweekly conversion constant - always use monthly / 2 for consistency
-// This ensures all biweekly calculations use the same simple multiplier
-export const BIWEEKLY_MULTIPLIER = 2;
+// Biweekly conversion constant - proper conversion based on 26 pay periods per year
+// There are 26 biweekly periods per year, so 26/12 = 2.167 biweekly periods per month
+export const BIWEEKLY_MULTIPLIER = 26 / 12;
 
 // Standard frequency multipliers (periods per year)
 // Keep these simple and consistent

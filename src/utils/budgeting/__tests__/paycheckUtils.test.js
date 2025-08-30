@@ -176,8 +176,8 @@ describe('paycheckUtils', () => {
       const result = calculateEnvelopeAllocations(1000, mockEnvelopes, 'allocate');
       
       expect(result.allocations).toHaveLength(2);
-      expect(result.totalAllocated).toBeCloseTo(276.5, 1); // ~184.33 + ~92.17
-      expect(result.remainingAmount).toBeCloseTo(723.5, 1);
+      expect(result.totalAllocated).toBeCloseTo(276.92, 1); // ~184.62 + ~92.31
+      expect(result.remainingAmount).toBeCloseTo(723.08, 1); // 1000 - 276.92
       expect(result.allocationRate).toBeGreaterThan(0);
     });
 

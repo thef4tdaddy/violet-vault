@@ -72,8 +72,10 @@ export const formatAccountData = (accountForm, currentUser) => {
  * Generates a unique account ID
  * @returns {number} Timestamp-based ID
  */
+let idCounter = 0;
 export const generateAccountId = () => {
-  return Date.now();
+  // Ensure unique IDs even when called in quick succession
+  return Date.now() + (++idCounter);
 };
 
 /**
