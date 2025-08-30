@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Save, Trash2 } from "lucide-react";
 import useEnvelopeEdit from "../../hooks/budgeting/useEnvelopeEdit";
 import EnvelopeModalHeader from "./envelope/EnvelopeModalHeader";
-import { EnvelopeTypeSelector } from "./shared/EnvelopeTypeSelector";
+import EnvelopeTypeSelector from "./shared/EnvelopeTypeSelector";
 import EnvelopeBasicFields from "./envelope/EnvelopeBasicFields";
 import EnvelopeBudgetFields from "./envelope/EnvelopeBudgetFields";
 import { UniversalConnectionManager } from "../ui/ConnectionDisplay";
