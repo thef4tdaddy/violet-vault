@@ -190,13 +190,20 @@ export const useBillManager = ({
 
   // Apply filters to bills
   const filteredBills = useMemo(() => {
-    const billsToFilter = categorizedBills[viewMode] || categorizedBills.all;
+    const billsToFilter = categorizedBills[viewMode] || categorizedBills.all || [];
     const result = filterBills(billsToFilter, filterOptions);
     logger.debug("🔍 useBillManager filteredBills:", {
       viewMode,
+      categorizedKeys: Object.keys(categorizedBills),
       billsToFilter: billsToFilter?.length || 0,
       filteredCount: result?.length || 0,
-      filterOptions
+      filterOptions,
+      firstBillToFilter: billsToFilter?.[0] ? {
+        id: billsToFilter[0].id,
+        name: billsToFilter[0].name,
+        daysUntilDue: billsToFilter[0].daysUntilDue,
+        isPaid: billsToFilter[0].isPaid
+      } : null
     });
     return result;
   }, [categorizedBills, viewMode, filterOptions]);
