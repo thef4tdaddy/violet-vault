@@ -3,7 +3,7 @@
  * Analyzes transactions to automatically suggest new recurring bills
  */
 
-import { getBillIcon } from "./billIcons";
+import { getBillIcon } from "./billIcons.js";
 
 /**
  * Common bill patterns and their characteristics

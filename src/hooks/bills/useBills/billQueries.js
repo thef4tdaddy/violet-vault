@@ -1,9 +1,9 @@
 // Bill Query Functions - Data fetching and filtering logic
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
-import { queryKeys } from "../../../utils/common/queryClient";
-import { budgetDb } from "../../../db/budgetDb";
-import logger from "../../../utils/common/logger";
+import { queryKeys } from "../../../utils/common/queryClient.js";
+import { budgetDb } from "../../../db/budgetDb.js";
+import logger from "../../../utils/common/logger.js";
 
 /**
  * Core bill data fetching query function
