@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useConfirm } from "../../hooks/common/useConfirm";
 import { globalToast } from "../../stores/ui/toastStore";
 import {
@@ -21,38 +21,37 @@ import {
   RotateCcw,
 } from "lucide-react";
 import AutoFundingRuleBuilder from "./AutoFundingRuleBuilder";
-import {
-  autoFundingEngine,
-  RULE_TYPES,
-  TRIGGER_TYPES,
-} from "../../utils/budgeting/autoFundingEngine";
+import { useAutoFunding } from "../../hooks/budgeting/autofunding";
+import { RULE_TYPES, TRIGGER_TYPES } from "../../utils/budgeting/autofunding";
 import { useBudgetStore } from "../../stores/ui/uiStore";
 import logger from "../../utils/common/logger";
 
 const AutoFundingView = () => {
-  const budget = useBudgetStore();
   const confirm = useConfirm();
-  const [rules, setRules] = useState([]);
-  const [executionHistory, setExecutionHistory] = useState([]);
-  const [isExecuting, setIsExecuting] = useState(false);
+  const autoFunding = useAutoFunding();
   const [showRuleBuilder, setShowRuleBuilder] = useState(false);
   const [editingRule, setEditingRule] = useState(null);
   const [activeTab, setActiveTab] = useState("rules");
   const [showExecutionDetails, setShowExecutionDetails] = useState(null);
 
-  // Load rules and history on component mount
-  useEffect(() => {
-    loadRulesAndHistory();
-  }, []);
+  // Extract state from the hook
+  const {
+    rules,
+    isExecuting,
+    addRule,
+    updateRule,
+    deleteRule,
+    toggleRule,
+    executeRules,
+    getHistory,
+  } = autoFunding;
 
-  const loadRulesAndHistory = () => {
-    try {
-      setRules(autoFundingEngine.getRules());
-      setExecutionHistory(autoFundingEngine.getExecutionHistory(20));
-    } catch (error) {
-      logger.error("Failed to load auto-funding data", error);
-    }
-  };
+  // Get budget data directly from store for display purposes
+  // (The hook manages budget operations internally)
+  const budget = useBudgetStore();
+
+  // Get filtered execution history for display
+  const displayHistory = getHistory(20);
 
   const handleCreateRule = () => {
     setEditingRule(null);
@@ -67,13 +66,16 @@ const AutoFundingView = () => {
   const handleSaveRule = async (ruleData) => {
     try {
       if (editingRule) {
-        autoFundingEngine.updateRule(editingRule.id, ruleData);
+        await updateRule(editingRule.id, ruleData);
       } else {
-        autoFundingEngine.addRule(ruleData);
+        await addRule(ruleData);
       }
-      loadRulesAndHistory();
       setShowRuleBuilder(false);
       setEditingRule(null);
+      globalToast.showSuccess(
+        editingRule ? "Rule updated successfully" : "Rule created successfully",
+        "Rule Saved",
+      );
     } catch (error) {
       logger.error("Failed to save rule", error);
       globalToast.showError(
@@ -95,8 +97,8 @@ const AutoFundingView = () => {
 
     if (confirmed) {
       try {
-        autoFundingEngine.deleteRule(ruleId);
-        loadRulesAndHistory();
+        await deleteRule(ruleId);
+        globalToast.showSuccess("Rule deleted successfully", "Rule Deleted");
       } catch (error) {
         logger.error("Failed to delete rule", error);
         globalToast.showError(
@@ -107,34 +109,28 @@ const AutoFundingView = () => {
     }
   };
 
-  const handleToggleRule = (ruleId) => {
+  const handleToggleRule = async (ruleId) => {
     try {
-      const rule = autoFundingEngine.rules.get(ruleId);
-      if (rule) {
-        autoFundingEngine.updateRule(ruleId, { enabled: !rule.enabled });
-        loadRulesAndHistory();
-      }
+      await toggleRule(ruleId);
+      const rule = rules.find((r) => r.id === ruleId);
+      globalToast.showSuccess(
+        `Rule ${rule?.enabled ? "enabled" : "disabled"} successfully`,
+        "Rule Updated",
+      );
     } catch (error) {
       logger.error("Failed to toggle rule", error);
+      globalToast.showError(
+        "Failed to toggle rule: " + error.message,
+        "Toggle Failed",
+      );
     }
   };
 
   const handleExecuteRules = async () => {
     if (isExecuting) return;
 
-    setIsExecuting(true);
     try {
-      const context = {
-        trigger: TRIGGER_TYPES.MANUAL,
-        currentDate: new Date().toISOString(),
-        data: {
-          envelopes: budget.envelopes || [],
-          unassignedCash: budget.unassignedCash || 0,
-          transactions: budget.allTransactions || [],
-        },
-      };
-
-      const result = await autoFundingEngine.executeRules(context, budget);
+      const result = await executeRules(TRIGGER_TYPES.MANUAL);
 
       if (result.success) {
         const totalFunded = result.execution.totalFunded || 0;
@@ -157,16 +153,12 @@ const AutoFundingView = () => {
           "Execution Failed",
         );
       }
-
-      loadRulesAndHistory();
     } catch (error) {
       logger.error("Failed to execute rules", error);
       globalToast.showError(
         "Failed to execute rules: " + error.message,
         "Execution Failed",
       );
-    } finally {
-      setIsExecuting(false);
     }
   };
 
@@ -313,9 +305,9 @@ const AutoFundingView = () => {
               <History className="h-8 w-8 text-purple-600" />
               <div>
                 <p className="text-2xl font-bold text-purple-900">
-                  {executionHistory.length > 0
+                  {displayHistory.length > 0
                     ? new Date(
-                        executionHistory[0].executedAt,
+                        displayHistory[0].executedAt,
                       ).toLocaleDateString()
                     : "Never"}
                 </p>
@@ -345,7 +337,7 @@ const AutoFundingView = () => {
                 : "text-gray-500 hover:text-gray-700"
             }`}
           >
-            Execution History ({executionHistory.length})
+            Execution History ({displayHistory.length})
           </button>
         </div>
       </div>
@@ -518,7 +510,7 @@ const AutoFundingView = () => {
 
         {activeTab === "history" && (
           <div className="space-y-4">
-            {executionHistory.length === 0 ? (
+            {displayHistory.length === 0 ? (
               <div className="text-center py-16">
                 <History className="h-16 w-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-medium text-gray-900 mb-2">
@@ -539,7 +531,7 @@ const AutoFundingView = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                {executionHistory.map((execution, index) => (
+                {displayHistory.map((execution, index) => (
                   <div
                     key={execution.id}
                     className="bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl p-6"
@@ -561,7 +553,7 @@ const AutoFundingView = () => {
                         </div>
                         <div>
                           <h3 className="text-lg font-semibold text-gray-900">
-                            Execution #{executionHistory.length - index}
+                            Execution #{displayHistory.length - index}
                           </h3>
                           <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
                             <span>
