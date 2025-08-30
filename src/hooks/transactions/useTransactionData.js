@@ -61,7 +61,7 @@ const useTransactionData = (options = {}) => {
 
       try {
         // Get all transactions from database
-        const allTransactions = await budgetDb.getAllTransactions();
+        const allTransactions = await budgetDb.transactions.orderBy("date").reverse().toArray();
 
         if (!Array.isArray(allTransactions)) {
           logger.warn("No transactions returned from database");

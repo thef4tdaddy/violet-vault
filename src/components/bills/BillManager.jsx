@@ -372,7 +372,7 @@ const BillManager = ({
                       </button>
                       {!bill.isPaid && (
                         <button
-                          onClick={() => billOperations.markAsPaid(bill.id)}
+                          onClick={() => billOperations.handlePayBill(bill.id)}
                           className="text-green-600 hover:text-green-900"
                         >
                           <CheckCircle className="h-4 w-4" />
