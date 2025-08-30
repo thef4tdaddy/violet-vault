@@ -1,11 +1,7 @@
 import React from "react";
 import { Target, TrendingUp, AlertCircle } from "lucide-react";
 
-const AllocationPreview = ({
-  allocationPreview,
-  hasAmount,
-  allocationMode,
-}) => {
+const AllocationPreview = ({ allocationPreview, hasAmount, allocationMode }) => {
   const { allocations, totalAllocated, remainingAmount, allocationRate } = allocationPreview;
 
   if (!hasAmount) {
@@ -31,21 +27,31 @@ const AllocationPreview = ({
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case "critical": return "text-red-600 bg-red-50 border-red-200";
-      case "high": return "text-orange-600 bg-orange-50 border-orange-200";
-      case "medium": return "text-blue-600 bg-blue-50 border-blue-200";
-      case "low": return "text-gray-600 bg-gray-50 border-gray-200";
-      default: return "text-blue-600 bg-blue-50 border-blue-200";
+      case "critical":
+        return "text-red-600 bg-red-50 border-red-200";
+      case "high":
+        return "text-orange-600 bg-orange-50 border-orange-200";
+      case "medium":
+        return "text-blue-600 bg-blue-50 border-blue-200";
+      case "low":
+        return "text-gray-600 bg-gray-50 border-gray-200";
+      default:
+        return "text-blue-600 bg-blue-50 border-blue-200";
     }
   };
 
   const getPriorityLabel = (priority) => {
     switch (priority) {
-      case "critical": return "Critical";
-      case "high": return "High";
-      case "medium": return "Medium";
-      case "low": return "Low";
-      default: return "Medium";
+      case "critical":
+        return "Critical";
+      case "high":
+        return "High";
+      case "medium":
+        return "Medium";
+      case "low":
+        return "Low";
+      default:
+        return "Medium";
     }
   };
 
@@ -62,7 +68,7 @@ const AllocationPreview = ({
             {allocationMode === "allocate" ? "Standard" : "Proportional"}
           </span>
         </div>
-        
+
         <div className="grid grid-cols-3 gap-4 text-sm">
           <div>
             <span className="text-green-700 block">Total Allocated</span>
@@ -100,14 +106,12 @@ const AllocationPreview = ({
                   </span>
                 </div>
                 <div className="text-sm text-gray-500">
-                  Monthly: ${allocation.monthlyAmount?.toFixed(2) || "0.00"} • 
-                  Type: {allocation.envelopeType}
+                  Monthly: ${allocation.monthlyAmount?.toFixed(2) || "0.00"} • Type:{" "}
+                  {allocation.envelopeType}
                 </div>
               </div>
               <div className="text-right">
-                <div className="font-bold text-gray-900">
-                  ${allocation.amount.toFixed(2)}
-                </div>
+                <div className="font-bold text-gray-900">${allocation.amount.toFixed(2)}</div>
                 {allocationMode === "allocate" && allocation.monthlyAmount > 0 && (
                   <div className="text-xs text-gray-500">
                     {((allocation.amount / allocation.monthlyAmount) * 100).toFixed(0)}% of monthly

@@ -199,7 +199,7 @@ class FirebaseSyncAdapter {
             }
           : null,
       },
-      this.encryptionKey,
+      this.encryptionKey
     );
 
     // Ensure lastActivity has all required fields
@@ -250,7 +250,7 @@ class FirebaseSyncAdapter {
       const decryptedData = await encryptionUtils.decrypt(
         cloudData.encryptedData,
         this.encryptionKey,
-        cloudData.iv,
+        cloudData.iv
       );
 
       logger.debug("Successfully decrypted cloud data");
@@ -402,7 +402,7 @@ class FirebaseSyncAdapter {
     }
 
     logger.info(`Processing ${this.syncQueue.length} queued operations`);
-    
+
     while (this.syncQueue.length > 0) {
       const operation = this.syncQueue.shift();
       try {

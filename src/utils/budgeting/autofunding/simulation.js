@@ -35,7 +35,7 @@ export const simulateRuleExecution = (rules, context) => {
     for (const rule of sortedRules) {
       try {
         const ruleResult = simulateSingleRule(rule, context, availableCash);
-        
+
         if (ruleResult.success && ruleResult.amount > 0) {
           simulation.ruleResults.push(ruleResult);
           simulation.plannedTransfers.push(...ruleResult.plannedTransfers);
@@ -61,7 +61,7 @@ export const simulateRuleExecution = (rules, context) => {
           amount: 0,
           plannedTransfers: [],
         };
-        
+
         simulation.ruleResults.push(errorResult);
         simulation.errors.push({
           ruleId: rule.id,
@@ -163,16 +163,16 @@ export const planRuleTransfers = (rule, totalAmount) => {
 
     case RULE_TYPES.SPLIT_REMAINDER:
       if (rule.config.targetIds && rule.config.targetIds.length > 0) {
-        const amountPerEnvelope = Math.floor(
-          (totalAmount / rule.config.targetIds.length) * 100
-        ) / 100;
-        
+        const amountPerEnvelope =
+          Math.floor((totalAmount / rule.config.targetIds.length) * 100) / 100;
+
         rule.config.targetIds.forEach((envelopeId, index) => {
           // Handle rounding by giving any remainder to the last envelope
-          const amount = index === rule.config.targetIds.length - 1 
-            ? totalAmount - (amountPerEnvelope * (rule.config.targetIds.length - 1))
-            : amountPerEnvelope;
-            
+          const amount =
+            index === rule.config.targetIds.length - 1
+              ? totalAmount - amountPerEnvelope * (rule.config.targetIds.length - 1)
+              : amountPerEnvelope;
+
           transfers.push({
             fromEnvelopeId: "unassigned",
             toEnvelopeId: envelopeId,
@@ -197,7 +197,7 @@ export const planRuleTransfers = (rule, totalAmount) => {
  */
 export const createExecutionPlan = (rules, context) => {
   const simulation = simulateRuleExecution(rules, context);
-  
+
   if (!simulation.success) {
     return simulation;
   }
@@ -210,7 +210,7 @@ export const createExecutionPlan = (rules, context) => {
     totalToTransfer: simulation.simulation.totalPlanned,
     rulesCount: simulation.simulation.rulesExecuted,
     transfersCount: simulation.simulation.plannedTransfers.length,
-    rules: simulation.simulation.ruleResults.filter(r => r.success),
+    rules: simulation.simulation.ruleResults.filter((r) => r.success),
     transfers: simulation.simulation.plannedTransfers,
     errors: simulation.simulation.errors,
     warnings: generatePlanWarnings(simulation.simulation, context),
@@ -233,7 +233,7 @@ export const generatePlanWarnings = (simulation, context) => {
   const { unassignedCash } = context.data;
 
   // Warning if not enough cash for all rules
-  if (simulation.errors.some(e => e.error.includes("No funds available"))) {
+  if (simulation.errors.some((e) => e.error.includes("No funds available"))) {
     warnings.push({
       type: "insufficient_funds",
       message: "Some rules cannot execute due to insufficient unassigned cash",
@@ -279,7 +279,7 @@ export const validateTransfers = (transfers, context) => {
   transfers.forEach((transfer, index) => {
     // Check if target envelope exists
     if (transfer.toEnvelopeId !== "unassigned") {
-      const targetEnvelope = envelopes.find(e => e.id === transfer.toEnvelopeId);
+      const targetEnvelope = envelopes.find((e) => e.id === transfer.toEnvelopeId);
       if (!targetEnvelope) {
         errors.push({
           transferIndex: index,
@@ -333,7 +333,7 @@ export const calculateTransferImpact = (transfers, context) => {
   };
 
   // Initialize envelope impact tracking
-  envelopes.forEach(envelope => {
+  envelopes.forEach((envelope) => {
     impact.envelopes.set(envelope.id, {
       id: envelope.id,
       name: envelope.name,
@@ -341,9 +341,8 @@ export const calculateTransferImpact = (transfers, context) => {
       change: 0,
       newBalance: envelope.currentBalance,
       monthlyAmount: envelope.monthlyAmount,
-      fillPercentage: envelope.monthlyAmount > 0 
-        ? (envelope.currentBalance / envelope.monthlyAmount) * 100 
-        : 0,
+      fillPercentage:
+        envelope.monthlyAmount > 0 ? (envelope.currentBalance / envelope.monthlyAmount) * 100 : 0,
       newFillPercentage: 0,
     });
   });
@@ -353,14 +352,15 @@ export const calculateTransferImpact = (transfers, context) => {
   impact.totalTransferred = -impact.unassignedChange;
 
   // Calculate per-envelope impact
-  transfers.forEach(transfer => {
+  transfers.forEach((transfer) => {
     if (impact.envelopes.has(transfer.toEnvelopeId)) {
       const envelopeImpact = impact.envelopes.get(transfer.toEnvelopeId);
       envelopeImpact.change += transfer.amount;
       envelopeImpact.newBalance = envelopeImpact.currentBalance + envelopeImpact.change;
-      
+
       if (envelopeImpact.monthlyAmount > 0) {
-        envelopeImpact.newFillPercentage = (envelopeImpact.newBalance / envelopeImpact.monthlyAmount) * 100;
+        envelopeImpact.newFillPercentage =
+          (envelopeImpact.newBalance / envelopeImpact.monthlyAmount) * 100;
       }
     }
   });
@@ -375,8 +375,8 @@ export const calculateTransferImpact = (transfers, context) => {
  * @returns {Object} Human-readable plan summary
  */
 export const generatePlanSummary = (plan, envelopes = []) => {
-  const envelopeMap = new Map(envelopes.map(e => [e.id, e]));
-  
+  const envelopeMap = new Map(envelopes.map((e) => [e.id, e]));
+
   const summary = {
     overview: {
       totalAmount: plan.totalToTransfer,
@@ -386,16 +386,17 @@ export const generatePlanSummary = (plan, envelopes = []) => {
       hasErrors: plan.errors.length > 0,
       hasWarnings: plan.warnings.length > 0,
     },
-    rulesSummary: plan.rules.map(rule => ({
+    rulesSummary: plan.rules.map((rule) => ({
       name: rule.ruleName,
       amount: rule.amount,
       targetCount: rule.targetEnvelopes?.length || 0,
-      targets: rule.targetEnvelopes?.map(id => {
-        const envelope = envelopeMap.get(id);
-        return envelope ? envelope.name : id;
-      }) || [],
+      targets:
+        rule.targetEnvelopes?.map((id) => {
+          const envelope = envelopeMap.get(id);
+          return envelope ? envelope.name : id;
+        }) || [],
     })),
-    transfersSummary: plan.transfers.map(transfer => ({
+    transfersSummary: plan.transfers.map((transfer) => ({
       amount: transfer.amount,
       to: envelopeMap.get(transfer.toEnvelopeId)?.name || transfer.toEnvelopeId,
       description: transfer.description,

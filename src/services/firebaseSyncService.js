@@ -1,13 +1,6 @@
 // Firebase Sync Service - Core synchronization operations
 import { initializeApp } from "firebase/app";
-import {
-  getFirestore,
-  doc,
-  setDoc,
-  getDoc,
-  onSnapshot,
-  serverTimestamp,
-} from "firebase/firestore";
+import { getFirestore, doc, setDoc, getDoc, onSnapshot, serverTimestamp } from "firebase/firestore";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
 import { encryptionUtils } from "../utils/security/encryption";
 import { firebaseConfig } from "../utils/common/firebaseConfig";
@@ -118,7 +111,7 @@ class FirebaseSyncService {
       const unsubscribe = onAuthStateChanged(this.auth, async (user) => {
         try {
           clearTimeout(timeout);
-          
+
           if (user) {
             logger.debug("User already authenticated", { uid: user.uid });
             unsubscribe();
@@ -172,10 +165,7 @@ class FirebaseSyncService {
       }
 
       // Encrypt the data
-      const encryptedData = await encryptionUtils.encrypt(
-        JSON.stringify(data),
-        this.encryptionKey
-      );
+      const encryptedData = await encryptionUtils.encrypt(JSON.stringify(data), this.encryptionKey);
 
       const syncData = {
         encryptedData,
@@ -227,7 +217,7 @@ class FirebaseSyncService {
       }
 
       const cloudData = docSnap.data();
-      
+
       // Decrypt the data
       const decryptedData = await encryptionUtils.decrypt(
         cloudData.encryptedData,
@@ -236,7 +226,7 @@ class FirebaseSyncService {
 
       const parsedData = JSON.parse(decryptedData);
       logger.info("✅ Data loaded from cloud successfully");
-      
+
       this._notifyListeners("sync_success", { operation: "load" });
       return parsedData;
     } catch (error) {
@@ -255,15 +245,19 @@ class FirebaseSyncService {
     }
 
     const docRef = doc(this.db, "budgets", this.budgetId);
-    
-    this.unsubscribe = onSnapshot(docRef, (doc) => {
-      if (doc.exists()) {
-        callback(doc.data());
+
+    this.unsubscribe = onSnapshot(
+      docRef,
+      (doc) => {
+        if (doc.exists()) {
+          callback(doc.data());
+        }
+      },
+      (error) => {
+        logger.error("Real-time sync error", error);
+        this._notifyListeners("sync_error", { error, operation: "realtime" });
       }
-    }, (error) => {
-      logger.error("Real-time sync error", error);
-      this._notifyListeners("sync_error", { error, operation: "realtime" });
-    });
+    );
 
     logger.info("Real-time sync setup complete");
   }
@@ -297,7 +291,7 @@ class FirebaseSyncService {
    * Notify all listeners of sync events
    */
   _notifyListeners(event, data) {
-    this.syncListeners.forEach(callback => {
+    this.syncListeners.forEach((callback) => {
       try {
         callback(event, data);
       } catch (error) {
@@ -315,7 +309,7 @@ class FirebaseSyncService {
     }
 
     logger.info(`Processing ${this.syncQueue.length} queued operations`);
-    
+
     while (this.syncQueue.length > 0) {
       const operation = this.syncQueue.shift();
       try {
@@ -357,12 +351,12 @@ class FirebaseSyncService {
     this.syncListeners.clear();
     this.errorListeners.clear();
     this.syncQueue = [];
-    
+
     if (typeof window !== "undefined") {
       window.removeEventListener("online", this._setupNetworkMonitoring);
       window.removeEventListener("offline", this._setupNetworkMonitoring);
     }
-    
+
     logger.info("Firebase sync service cleaned up");
   }
 }

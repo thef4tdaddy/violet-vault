@@ -1,20 +1,12 @@
 import React from "react";
-import {
-  DollarSign,
-  Percent,
-  Target,
-  ArrowRight,
-  AlertCircle,
-} from "lucide-react";
+import { DollarSign, Percent, Target, ArrowRight, AlertCircle } from "lucide-react";
 import { RULE_TYPES } from "../../../utils/budgeting/autofunding";
 
 const RuleTypeStep = ({ ruleData, updateRuleData, errors }) => {
   return (
     <div className="space-y-6">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Rule Name *
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Rule Name *</label>
         <input
           type="text"
           value={ruleData.name}
@@ -46,9 +38,7 @@ const RuleTypeStep = ({ ruleData, updateRuleData, errors }) => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-3">
-          Rule Type *
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-3">Rule Type *</label>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
             {

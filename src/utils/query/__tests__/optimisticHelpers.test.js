@@ -119,7 +119,7 @@ describe("optimisticHelpers", () => {
 
       // Verify the updater function works correctly
       const updateFn = mockQueryClient.setQueryData.mock.calls.find(
-        call => call[0] === queryKeys.envelopesList()
+        (call) => call[0] === queryKeys.envelopesList()
       )[1];
 
       const updatedList = updateFn(existingEnvelopes);
@@ -243,11 +243,7 @@ describe("optimisticHelpers", () => {
 
       budgetDb.transactions.update.mockResolvedValue(true);
 
-      await optimisticHelpers.updateTransaction(
-        mockQueryClient,
-        transactionId,
-        updates
-      );
+      await optimisticHelpers.updateTransaction(mockQueryClient, transactionId, updates);
 
       expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
         queryKeys.transactionById(transactionId),
@@ -376,7 +372,7 @@ describe("optimisticHelpers", () => {
 
       // Should not call actualBalance setter if not in updates
       const actualBalanceCalls = mockQueryClient.setQueryData.mock.calls.filter(
-        call => call[0] === queryKeys.actualBalance()
+        (call) => call[0] === queryKeys.actualBalance()
       );
       expect(actualBalanceCalls).toHaveLength(0);
     });
@@ -397,23 +393,20 @@ describe("optimisticHelpers", () => {
 
       await optimisticHelpers.batchUpdate(mockQueryClient, updates);
 
-      expect(optimisticHelpers.updateEnvelope).toHaveBeenCalledWith(
-        mockQueryClient,
-        "env1",
-        { id: "env1", balance: 500 }
-      );
+      expect(optimisticHelpers.updateEnvelope).toHaveBeenCalledWith(mockQueryClient, "env1", {
+        id: "env1",
+        balance: 500,
+      });
 
-      expect(optimisticHelpers.updateTransaction).toHaveBeenCalledWith(
-        mockQueryClient,
-        "tx1",
-        { id: "tx1", amount: 150 }
-      );
+      expect(optimisticHelpers.updateTransaction).toHaveBeenCalledWith(mockQueryClient, "tx1", {
+        id: "tx1",
+        amount: 150,
+      });
 
-      expect(optimisticHelpers.updateBill).toHaveBeenCalledWith(
-        mockQueryClient,
-        "bill1",
-        { id: "bill1", isPaid: true }
-      );
+      expect(optimisticHelpers.updateBill).toHaveBeenCalledWith(mockQueryClient, "bill1", {
+        id: "bill1",
+        isPaid: true,
+      });
 
       expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
         queryKey: queryKeys.dashboard,
@@ -444,26 +437,15 @@ describe("optimisticHelpers", () => {
       const queryKey = ["envelopes", "list"];
       const previousData = [{ id: "env1", name: "Food" }];
 
-      await optimisticHelpers.rollbackUpdate(
-        mockQueryClient,
-        queryKey,
-        previousData
-      );
+      await optimisticHelpers.rollbackUpdate(mockQueryClient, queryKey, previousData);
 
-      expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
-        queryKey,
-        previousData
-      );
+      expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(queryKey, previousData);
     });
 
     it("should invalidate when no previous data", async () => {
       const queryKey = ["envelopes", "list"];
 
-      await optimisticHelpers.rollbackUpdate(
-        mockQueryClient,
-        queryKey,
-        undefined
-      );
+      await optimisticHelpers.rollbackUpdate(mockQueryClient, queryKey, undefined);
 
       expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
         queryKey,
@@ -513,10 +495,7 @@ describe("optimisticHelpers", () => {
 
       expect(mockQueryClient.cancelQueries).toHaveBeenCalledWith({ queryKey });
       expect(mockQueryClient.getQueryData).toHaveBeenCalledWith(queryKey);
-      expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
-        queryKey,
-        expect.any(Function)
-      );
+      expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(queryKey, expect.any(Function));
       expect(context.previousData).toEqual(previousData);
     });
 
@@ -537,10 +516,7 @@ describe("optimisticHelpers", () => {
 
       config.onError(error, variables, context);
 
-      expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
-        queryKey,
-        previousData
-      );
+      expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(queryKey, previousData);
       expect(rollbackFn).toHaveBeenCalledWith(error, variables, context);
     });
 

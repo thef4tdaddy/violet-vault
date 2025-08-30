@@ -126,7 +126,7 @@ const BillManager = ({
   const { budgetId, currentUser } = useAuth();
   const { isLocked: isEditLocked, currentEditor } = useEditLock(
     `bills-${budgetId}`,
-    currentUser?.userName || "User",
+    currentUser?.userName || "User"
   );
 
   // Loading state
@@ -147,9 +147,7 @@ const BillManager = ({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Bill Manager</h2>
-          <p className="text-gray-600">
-            Track and manage your recurring bills and payments
-          </p>
+          <p className="text-gray-600">Track and manage your recurring bills and payments</p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -187,9 +185,7 @@ const BillManager = ({
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {summaryCards.map((card, index) => (
           <div key={index} className={`${card.bg} p-4 rounded-lg`}>
-            <div className={`text-2xl font-bold ${card.color}`}>
-              ${card.value.toFixed(2)}
-            </div>
+            <div className={`text-2xl font-bold ${card.color}`}>${card.value.toFixed(2)}</div>
             <div className="text-sm text-gray-600">{card.label}</div>
           </div>
         ))}
@@ -215,9 +211,7 @@ const BillManager = ({
                 {mode.label}
                 <span
                   className={`ml-2 py-0.5 px-2 rounded-full text-xs ${
-                    isActive
-                      ? "bg-blue-100 text-blue-600"
-                      : "bg-gray-100 text-gray-600"
+                    isActive ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-600"
                   }`}
                 >
                   {mode.count}
@@ -234,17 +228,13 @@ const BillManager = ({
           type="text"
           placeholder="Search bills..."
           value={filterOptions.search}
-          onChange={(e) =>
-            setFilterOptions((prev) => ({ ...prev, search: e.target.value }))
-          }
+          onChange={(e) => setFilterOptions((prev) => ({ ...prev, search: e.target.value }))}
           className="flex-1 min-w-48 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
 
         <select
           value={filterOptions.urgency}
-          onChange={(e) =>
-            setFilterOptions((prev) => ({ ...prev, urgency: e.target.value }))
-          }
+          onChange={(e) => setFilterOptions((prev) => ({ ...prev, urgency: e.target.value }))}
           className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         >
           <option value="all">All Urgency</option>
@@ -288,11 +278,7 @@ const BillManager = ({
                 <input
                   type="checkbox"
                   checked={selectionState.isAllSelected}
-                  onChange={
-                    selectionState.isAllSelected
-                      ? clearSelection
-                      : selectAllBills
-                  }
+                  onChange={selectionState.isAllSelected ? clearSelection : selectAllBills}
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
               </th>
@@ -331,12 +317,8 @@ const BillManager = ({
                     <div className="flex items-center">
                       <displayData.Icon className="h-5 w-5 text-gray-400 mr-3" />
                       <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {bill.name}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {bill.category}
-                        </div>
+                        <div className="text-sm font-medium text-gray-900">{bill.name}</div>
+                        <div className="text-sm text-gray-500">{bill.category}</div>
                       </div>
                     </div>
                   </td>
@@ -346,9 +328,7 @@ const BillManager = ({
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {displayData.dueDateDisplay}
                     {displayData.daysDisplay && (
-                      <div className="text-xs text-gray-500">
-                        {displayData.daysDisplay}
-                      </div>
+                      <div className="text-xs text-gray-500">{displayData.daysDisplay}</div>
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -391,9 +371,7 @@ const BillManager = ({
         {filteredBills.length === 0 && (
           <div className="text-center py-12 text-gray-500">
             <FileText className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">
-              No bills found
-            </h3>
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No bills found</h3>
             <p className="mt-1 text-sm text-gray-500">
               {viewMode === "all"
                 ? "Get started by adding a new bill."

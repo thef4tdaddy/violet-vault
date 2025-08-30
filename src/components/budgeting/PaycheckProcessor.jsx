@@ -18,21 +18,21 @@ const PaycheckProcessor = ({
     errors,
     isLoading,
     canSubmit,
-    
-    // Allocation state  
+
+    // Allocation state
     currentAllocations,
-    
+
     // Payer data
     uniquePayers,
     paycheckStats,
     selectedPayerStats,
-    
+
     // Form actions
     updateFormField,
     applyPayerPrediction,
     processPaycheck,
     resetForm,
-    
+
     // Computed values
     hasAmount,
     hasAllocations,

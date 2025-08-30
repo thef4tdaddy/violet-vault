@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { X, Check } from "lucide-react";
-import {
-  createDefaultRule,
-  validateRule,
-} from "../../utils/budgeting/autofunding";
+import { createDefaultRule, validateRule } from "../../utils/budgeting/autofunding";
 import RuleTypeStep from "./steps/RuleTypeStep";
 import TriggerScheduleStep from "./steps/TriggerScheduleStep";
 import RuleConfigurationStep from "./steps/RuleConfigurationStep";
@@ -115,15 +112,10 @@ const AutoFundingRuleBuilder = ({
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold">
-                  {editingRule
-                    ? "Edit Auto-Funding Rule"
-                    : "Create Auto-Funding Rule"}
+                  {editingRule ? "Edit Auto-Funding Rule" : "Create Auto-Funding Rule"}
                 </h3>
               </div>
-              <button
-                onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 p-1"
-              >
+              <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1">
                 <X className="h-6 w-6" />
               </button>
             </div>
@@ -133,17 +125,10 @@ const AutoFundingRuleBuilder = ({
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-6">
             {step === 1 && (
-              <RuleTypeStep
-                ruleData={ruleData}
-                updateRuleData={updateRuleData}
-                errors={errors}
-              />
+              <RuleTypeStep ruleData={ruleData} updateRuleData={updateRuleData} errors={errors} />
             )}
             {step === 2 && (
-              <TriggerScheduleStep
-                ruleData={ruleData}
-                updateRuleData={updateRuleData}
-              />
+              <TriggerScheduleStep ruleData={ruleData} updateRuleData={updateRuleData} />
             )}
             {step === 3 && (
               <RuleConfigurationStep
@@ -154,9 +139,7 @@ const AutoFundingRuleBuilder = ({
                 errors={errors}
               />
             )}
-            {step === 4 && (
-              <ReviewStep ruleData={ruleData} envelopes={envelopes} />
-            )}
+            {step === 4 && <ReviewStep ruleData={ruleData} envelopes={envelopes} />}
           </div>
 
           {/* Footer */}

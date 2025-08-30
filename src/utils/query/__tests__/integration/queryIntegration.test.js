@@ -54,7 +54,7 @@ describe("Query Integration Tests", () => {
         },
         {
           id: "env2",
-          name: "Transportation", 
+          name: "Transportation",
           category: "transportation",
           balance: 180.25,
           targetAmount: 250,
@@ -115,7 +115,7 @@ describe("Query Integration Tests", () => {
           dueDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago (overdue)
           isPaid: false,
           isRecurring: true,
-          frequency: "monthly", 
+          frequency: "monthly",
           category: "utilities",
           envelopeId: "env2",
           lastModified: Date.now(),
@@ -135,7 +135,7 @@ describe("Query Integration Tests", () => {
           lastModified: Date.now(),
         },
         {
-          id: "goal2", 
+          id: "goal2",
           name: "Vacation",
           targetAmount: 3000,
           currentAmount: 3000,
@@ -156,7 +156,7 @@ describe("Query Integration Tests", () => {
       budgetDatabaseService.saveBills(testData.bills),
       budgetDatabaseService.saveSavingsGoals(testData.savingsGoals),
       budgetDatabaseService.saveBudgetMetadata({
-        unassignedCash: 1500.50,
+        unassignedCash: 1500.5,
         actualBalance: 8750.25,
         lastModified: Date.now(),
       }),
@@ -214,349 +214,416 @@ describe("Query Integration Tests", () => {
   });
 
   describe("Real Data Prefetching", () => {
-    it("should prefetch envelopes with real data", async () => {
-      // Clear any cached data first
-      queryClient.clear();
+    it(
+      "should prefetch envelopes with real data",
+      async () => {
+        // Clear any cached data first
+        queryClient.clear();
 
-      // Prefetch envelopes
-      await prefetchHelpers.prefetchEnvelopes(queryClient, {
-        includeArchived: false,
-      });
+        // Prefetch envelopes
+        await prefetchHelpers.prefetchEnvelopes(queryClient, {
+          includeArchived: false,
+        });
 
-      // Verify data was prefetched and cached
-      const cachedEnvelopes = queryClient.getQueryData(queryKeys.envelopesList({
-        includeArchived: false,
-      }));
+        // Verify data was prefetched and cached
+        const cachedEnvelopes = queryClient.getQueryData(
+          queryKeys.envelopesList({
+            includeArchived: false,
+          })
+        );
 
-      expect(cachedEnvelopes).toBeTruthy();
-      expect(cachedEnvelopes).toHaveLength(2); // Only non-archived
-      expect(cachedEnvelopes.find(e => e.name === "Food & Dining")).toBeTruthy();
-      expect(cachedEnvelopes.find(e => e.archived === true)).toBeFalsy();
-    }, TEST_TIMEOUT);
+        expect(cachedEnvelopes).toBeTruthy();
+        expect(cachedEnvelopes).toHaveLength(2); // Only non-archived
+        expect(cachedEnvelopes.find((e) => e.name === "Food & Dining")).toBeTruthy();
+        expect(cachedEnvelopes.find((e) => e.archived === true)).toBeFalsy();
+      },
+      TEST_TIMEOUT
+    );
 
-    it("should prefetch transactions with date filtering", async () => {
-      const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
-      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    it(
+      "should prefetch transactions with date filtering",
+      async () => {
+        const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-      await prefetchHelpers.prefetchTransactions(queryClient, {
-        start: yesterday,
-        end: tomorrow,
-      }, { limit: 25 });
+        await prefetchHelpers.prefetchTransactions(
+          queryClient,
+          {
+            start: yesterday,
+            end: tomorrow,
+          },
+          { limit: 25 }
+        );
 
-      const cachedTransactions = queryClient.getQueryData(
-        queryKeys.transactionsByDateRange(yesterday, tomorrow)
-      );
+        const cachedTransactions = queryClient.getQueryData(
+          queryKeys.transactionsByDateRange(yesterday, tomorrow)
+        );
 
-      expect(cachedTransactions).toBeTruthy();
-      expect(cachedTransactions.length).toBeGreaterThan(0);
-      expect(cachedTransactions.length).toBeLessThanOrEqual(25);
+        expect(cachedTransactions).toBeTruthy();
+        expect(cachedTransactions.length).toBeGreaterThan(0);
+        expect(cachedTransactions.length).toBeLessThanOrEqual(25);
 
-      // Verify transactions are within date range
-      cachedTransactions.forEach(tx => {
-        const txDate = new Date(tx.date);
-        expect(txDate.getTime()).toBeGreaterThanOrEqual(yesterday.getTime());
-        expect(txDate.getTime()).toBeLessThanOrEqual(tomorrow.getTime());
-      });
-    }, TEST_TIMEOUT);
+        // Verify transactions are within date range
+        cachedTransactions.forEach((tx) => {
+          const txDate = new Date(tx.date);
+          expect(txDate.getTime()).toBeGreaterThanOrEqual(yesterday.getTime());
+          expect(txDate.getTime()).toBeLessThanOrEqual(tomorrow.getTime());
+        });
+      },
+      TEST_TIMEOUT
+    );
 
-    it("should prefetch bills with status filtering", async () => {
-      await prefetchHelpers.prefetchBills(queryClient, {
-        isPaid: false,
-        daysAhead: 30,
-      });
+    it(
+      "should prefetch bills with status filtering",
+      async () => {
+        await prefetchHelpers.prefetchBills(queryClient, {
+          isPaid: false,
+          daysAhead: 30,
+        });
 
-      const cachedBills = queryClient.getQueryData(queryKeys.billsList({
-        isPaid: false,
-        daysAhead: 30,
-      }));
+        const cachedBills = queryClient.getQueryData(
+          queryKeys.billsList({
+            isPaid: false,
+            daysAhead: 30,
+          })
+        );
 
-      expect(cachedBills).toBeTruthy();
-      expect(cachedBills).toHaveLength(3); // All bills are unpaid in test data
-      
-      // Should include overdue bills
-      const overdueBill = cachedBills.find(bill => bill.name === "Phone Bill");
-      expect(overdueBill).toBeTruthy();
-      expect(new Date(overdueBill.dueDate).getTime()).toBeLessThan(Date.now());
-    }, TEST_TIMEOUT);
+        expect(cachedBills).toBeTruthy();
+        expect(cachedBills).toHaveLength(3); // All bills are unpaid in test data
 
-    it("should prefetch dashboard data and generate summary", async () => {
-      await prefetchHelpers.prefetchDashboard(queryClient);
+        // Should include overdue bills
+        const overdueBill = cachedBills.find((bill) => bill.name === "Phone Bill");
+        expect(overdueBill).toBeTruthy();
+        expect(new Date(overdueBill.dueDate).getTime()).toBeLessThan(Date.now());
+      },
+      TEST_TIMEOUT
+    );
 
-      const dashboardData = queryClient.getQueryData(queryKeys.dashboardSummary());
+    it(
+      "should prefetch dashboard data and generate summary",
+      async () => {
+        await prefetchHelpers.prefetchDashboard(queryClient);
 
-      expect(dashboardData).toBeTruthy();
-      expect(dashboardData.totalEnvelopes).toBe(3);
-      expect(dashboardData.activeEnvelopes).toBe(2);
-      expect(dashboardData.upcomingBillsCount).toBeGreaterThan(0);
-      expect(dashboardData.unassignedCash).toBe(1500.50);
-      expect(dashboardData.actualBalance).toBe(8750.25);
-      expect(dashboardData.lastUpdated).toBeTruthy();
-    }, TEST_TIMEOUT);
+        const dashboardData = queryClient.getQueryData(queryKeys.dashboardSummary());
 
-    it("should prefetch bundle of related data", async () => {
-      const results = await prefetchHelpers.prefetchDashboardBundle(queryClient);
+        expect(dashboardData).toBeTruthy();
+        expect(dashboardData.totalEnvelopes).toBe(3);
+        expect(dashboardData.activeEnvelopes).toBe(2);
+        expect(dashboardData.upcomingBillsCount).toBeGreaterThan(0);
+        expect(dashboardData.unassignedCash).toBe(1500.5);
+        expect(dashboardData.actualBalance).toBe(8750.25);
+        expect(dashboardData.lastUpdated).toBeTruthy();
+      },
+      TEST_TIMEOUT
+    );
 
-      expect(results).toHaveLength(4);
-      
-      // Verify all prefetch operations completed
-      const fulfilledCount = results.filter(r => r.status === "fulfilled").length;
-      expect(fulfilledCount).toBeGreaterThanOrEqual(3); // Allow for some failures in test env
+    it(
+      "should prefetch bundle of related data",
+      async () => {
+        const results = await prefetchHelpers.prefetchDashboardBundle(queryClient);
 
-      // Check that data exists in cache
-      expect(queryClient.getQueryData(queryKeys.dashboardSummary())).toBeTruthy();
-      expect(queryClient.getQueryData(queryKeys.envelopesList({ includeArchived: false }))).toBeTruthy();
-    }, TEST_TIMEOUT);
+        expect(results).toHaveLength(4);
+
+        // Verify all prefetch operations completed
+        const fulfilledCount = results.filter((r) => r.status === "fulfilled").length;
+        expect(fulfilledCount).toBeGreaterThanOrEqual(3); // Allow for some failures in test env
+
+        // Check that data exists in cache
+        expect(queryClient.getQueryData(queryKeys.dashboardSummary())).toBeTruthy();
+        expect(
+          queryClient.getQueryData(queryKeys.envelopesList({ includeArchived: false }))
+        ).toBeTruthy();
+      },
+      TEST_TIMEOUT
+    );
   });
 
   describe("Real Optimistic Updates", () => {
-    it("should update envelope optimistically and persist changes", async () => {
-      // Get initial envelope data
-      const initialEnvelopes = await budgetDatabaseService.getEnvelopes();
-      const foodEnvelope = initialEnvelopes.find(e => e.name === "Food & Dining");
-      
-      // Set initial cache state
-      queryClient.setQueryData(queryKeys.envelopesList(), initialEnvelopes);
-      queryClient.setQueryData(queryKeys.envelopeById(foodEnvelope.id), foodEnvelope);
+    it(
+      "should update envelope optimistically and persist changes",
+      async () => {
+        // Get initial envelope data
+        const initialEnvelopes = await budgetDatabaseService.getEnvelopes();
+        const foodEnvelope = initialEnvelopes.find((e) => e.name === "Food & Dining");
 
-      // Perform optimistic update
-      const updates = { 
-        balance: 300.00, 
-        name: "Food & Groceries" 
-      };
+        // Set initial cache state
+        queryClient.setQueryData(queryKeys.envelopesList(), initialEnvelopes);
+        queryClient.setQueryData(queryKeys.envelopeById(foodEnvelope.id), foodEnvelope);
 
-      await optimisticHelpers.updateEnvelope(queryClient, foodEnvelope.id, updates);
+        // Perform optimistic update
+        const updates = {
+          balance: 300.0,
+          name: "Food & Groceries",
+        };
 
-      // Check cache was updated
-      const cachedEnvelope = queryClient.getQueryData(queryKeys.envelopeById(foodEnvelope.id));
-      expect(cachedEnvelope.balance).toBe(300.00);
-      expect(cachedEnvelope.name).toBe("Food & Groceries");
-      expect(cachedEnvelope.lastModified).toBeTruthy();
+        await optimisticHelpers.updateEnvelope(queryClient, foodEnvelope.id, updates);
 
-      // Check database was updated
-      const dbEnvelopes = await budgetDatabaseService.getEnvelopes();
-      const updatedEnvelope = dbEnvelopes.find(e => e.id === foodEnvelope.id);
-      expect(updatedEnvelope.balance).toBe(300.00);
-      expect(updatedEnvelope.name).toBe("Food & Groceries");
-    }, TEST_TIMEOUT);
+        // Check cache was updated
+        const cachedEnvelope = queryClient.getQueryData(queryKeys.envelopeById(foodEnvelope.id));
+        expect(cachedEnvelope.balance).toBe(300.0);
+        expect(cachedEnvelope.name).toBe("Food & Groceries");
+        expect(cachedEnvelope.lastModified).toBeTruthy();
 
-    it("should add new envelope optimistically", async () => {
-      const initialEnvelopes = await budgetDatabaseService.getEnvelopes();
-      queryClient.setQueryData(queryKeys.envelopesList(), initialEnvelopes);
-
-      const newEnvelope = {
-        id: "env_new",
-        name: "Entertainment",
-        category: "lifestyle",
-        balance: 150,
-        targetAmount: 200,
-        archived: false,
-      };
-
-      await optimisticHelpers.addEnvelope(queryClient, newEnvelope);
-
-      // Check cache was updated
-      const cachedEnvelopes = queryClient.getQueryData(queryKeys.envelopesList());
-      expect(cachedEnvelopes).toHaveLength(4); // 3 original + 1 new
-      expect(cachedEnvelopes[0].id).toBe("env_new"); // Should be first (newly added)
-
-      // Check database was updated  
-      const dbEnvelopes = await budgetDatabaseService.getEnvelopes();
-      const addedEnvelope = dbEnvelopes.find(e => e.id === "env_new");
-      expect(addedEnvelope).toBeTruthy();
-      expect(addedEnvelope.name).toBe("Entertainment");
-    }, TEST_TIMEOUT);
-
-    it("should handle batch updates correctly", async () => {
-      const initialEnvelopes = await budgetDatabaseService.getEnvelopes();
-      const initialTransactions = await budgetDatabaseService.getTransactions({ limit: 10 });
-
-      // Set initial cache
-      queryClient.setQueryData(queryKeys.envelopesList(), initialEnvelopes);
-      queryClient.setQueryData(queryKeys.transactionsList(), initialTransactions);
-
-      const batchUpdates = {
-        envelopes: [
-          { id: initialEnvelopes[0].id, balance: 999.99 },
-          { id: initialEnvelopes[1].id, balance: 888.88 },
-        ],
-        transactions: [
-          { id: initialTransactions[0].id, amount: -123.45 },
-        ],
-        bills: [], // Empty array should be handled gracefully
-      };
-
-      await optimisticHelpers.batchUpdate(queryClient, batchUpdates);
-
-      // Verify envelope updates in database
-      const updatedEnvelopes = await budgetDatabaseService.getEnvelopes();
-      expect(updatedEnvelopes.find(e => e.id === initialEnvelopes[0].id).balance).toBe(999.99);
-      expect(updatedEnvelopes.find(e => e.id === initialEnvelopes[1].id).balance).toBe(888.88);
-
-      // Verify transaction updates in database  
-      const updatedTransactions = await budgetDatabaseService.getTransactions({ limit: 10 });
-      expect(updatedTransactions.find(t => t.id === initialTransactions[0].id).amount).toBe(-123.45);
-    }, TEST_TIMEOUT);
-
-    it("should handle rollback on database failures", async () => {
-      const initialEnvelopes = await budgetDatabaseService.getEnvelopes();
-      const testEnvelope = initialEnvelopes[0];
-
-      // Set cache with original data
-      queryClient.setQueryData(queryKeys.envelopeById(testEnvelope.id), testEnvelope);
-
-      // Mock database failure
-      const originalUpdate = budgetDb.envelopes.update;
-      budgetDb.envelopes.update = vi.fn().mockRejectedValue(new Error("Database error"));
-
-      try {
-        // This should still update cache but log database error
-        await optimisticHelpers.updateEnvelope(queryClient, testEnvelope.id, { balance: 99999 });
-
-        // Cache should still be updated (optimistic)
-        const cachedEnvelope = queryClient.getQueryData(queryKeys.envelopeById(testEnvelope.id));
-        expect(cachedEnvelope.balance).toBe(99999);
-
-        // But database should remain unchanged
+        // Check database was updated
         const dbEnvelopes = await budgetDatabaseService.getEnvelopes();
-        const dbEnvelope = dbEnvelopes.find(e => e.id === testEnvelope.id);
-        expect(dbEnvelope.balance).toBe(testEnvelope.balance); // Original balance
+        const updatedEnvelope = dbEnvelopes.find((e) => e.id === foodEnvelope.id);
+        expect(updatedEnvelope.balance).toBe(300.0);
+        expect(updatedEnvelope.name).toBe("Food & Groceries");
+      },
+      TEST_TIMEOUT
+    );
 
-      } finally {
-        // Restore original function
-        budgetDb.envelopes.update = originalUpdate;
-      }
-    }, TEST_TIMEOUT);
+    it(
+      "should add new envelope optimistically",
+      async () => {
+        const initialEnvelopes = await budgetDatabaseService.getEnvelopes();
+        queryClient.setQueryData(queryKeys.envelopesList(), initialEnvelopes);
+
+        const newEnvelope = {
+          id: "env_new",
+          name: "Entertainment",
+          category: "lifestyle",
+          balance: 150,
+          targetAmount: 200,
+          archived: false,
+        };
+
+        await optimisticHelpers.addEnvelope(queryClient, newEnvelope);
+
+        // Check cache was updated
+        const cachedEnvelopes = queryClient.getQueryData(queryKeys.envelopesList());
+        expect(cachedEnvelopes).toHaveLength(4); // 3 original + 1 new
+        expect(cachedEnvelopes[0].id).toBe("env_new"); // Should be first (newly added)
+
+        // Check database was updated
+        const dbEnvelopes = await budgetDatabaseService.getEnvelopes();
+        const addedEnvelope = dbEnvelopes.find((e) => e.id === "env_new");
+        expect(addedEnvelope).toBeTruthy();
+        expect(addedEnvelope.name).toBe("Entertainment");
+      },
+      TEST_TIMEOUT
+    );
+
+    it(
+      "should handle batch updates correctly",
+      async () => {
+        const initialEnvelopes = await budgetDatabaseService.getEnvelopes();
+        const initialTransactions = await budgetDatabaseService.getTransactions({ limit: 10 });
+
+        // Set initial cache
+        queryClient.setQueryData(queryKeys.envelopesList(), initialEnvelopes);
+        queryClient.setQueryData(queryKeys.transactionsList(), initialTransactions);
+
+        const batchUpdates = {
+          envelopes: [
+            { id: initialEnvelopes[0].id, balance: 999.99 },
+            { id: initialEnvelopes[1].id, balance: 888.88 },
+          ],
+          transactions: [{ id: initialTransactions[0].id, amount: -123.45 }],
+          bills: [], // Empty array should be handled gracefully
+        };
+
+        await optimisticHelpers.batchUpdate(queryClient, batchUpdates);
+
+        // Verify envelope updates in database
+        const updatedEnvelopes = await budgetDatabaseService.getEnvelopes();
+        expect(updatedEnvelopes.find((e) => e.id === initialEnvelopes[0].id).balance).toBe(999.99);
+        expect(updatedEnvelopes.find((e) => e.id === initialEnvelopes[1].id).balance).toBe(888.88);
+
+        // Verify transaction updates in database
+        const updatedTransactions = await budgetDatabaseService.getTransactions({ limit: 10 });
+        expect(updatedTransactions.find((t) => t.id === initialTransactions[0].id).amount).toBe(
+          -123.45
+        );
+      },
+      TEST_TIMEOUT
+    );
+
+    it(
+      "should handle rollback on database failures",
+      async () => {
+        const initialEnvelopes = await budgetDatabaseService.getEnvelopes();
+        const testEnvelope = initialEnvelopes[0];
+
+        // Set cache with original data
+        queryClient.setQueryData(queryKeys.envelopeById(testEnvelope.id), testEnvelope);
+
+        // Mock database failure
+        const originalUpdate = budgetDb.envelopes.update;
+        budgetDb.envelopes.update = vi.fn().mockRejectedValue(new Error("Database error"));
+
+        try {
+          // This should still update cache but log database error
+          await optimisticHelpers.updateEnvelope(queryClient, testEnvelope.id, { balance: 99999 });
+
+          // Cache should still be updated (optimistic)
+          const cachedEnvelope = queryClient.getQueryData(queryKeys.envelopeById(testEnvelope.id));
+          expect(cachedEnvelope.balance).toBe(99999);
+
+          // But database should remain unchanged
+          const dbEnvelopes = await budgetDatabaseService.getEnvelopes();
+          const dbEnvelope = dbEnvelopes.find((e) => e.id === testEnvelope.id);
+          expect(dbEnvelope.balance).toBe(testEnvelope.balance); // Original balance
+        } finally {
+          // Restore original function
+          budgetDb.envelopes.update = originalUpdate;
+        }
+      },
+      TEST_TIMEOUT
+    );
   });
 
   describe("Query Client Utilities Integration", () => {
-    it("should provide accurate cache statistics", async () => {
-      // Populate cache with various queries
-      await prefetchHelpers.prefetchEnvelopes(queryClient);
-      await prefetchHelpers.prefetchTransactions(queryClient, {
-        start: new Date(Date.now() - 86400000),
-        end: new Date(),
-      });
+    it(
+      "should provide accurate cache statistics",
+      async () => {
+        // Populate cache with various queries
+        await prefetchHelpers.prefetchEnvelopes(queryClient);
+        await prefetchHelpers.prefetchTransactions(queryClient, {
+          start: new Date(Date.now() - 86400000),
+          end: new Date(),
+        });
 
-      const stats = queryClientUtils.getCacheStats();
+        const stats = queryClientUtils.getCacheStats();
 
-      expect(stats.totalQueries).toBeGreaterThan(0);
-      expect(stats.activeQueries).toBeGreaterThanOrEqual(0);
-      expect(stats.staleQueries).toBeGreaterThanOrEqual(0);
-      expect(typeof stats.fetchingQueries).toBe("number");
-      expect(typeof stats.errorQueries).toBe("number");
-    }, TEST_TIMEOUT);
+        expect(stats.totalQueries).toBeGreaterThan(0);
+        expect(stats.activeQueries).toBeGreaterThanOrEqual(0);
+        expect(stats.staleQueries).toBeGreaterThanOrEqual(0);
+        expect(typeof stats.fetchingQueries).toBe("number");
+        expect(typeof stats.errorQueries).toBe("number");
+      },
+      TEST_TIMEOUT
+    );
 
-    it("should batch invalidate related queries", () => {
-      // Set up some cached data
-      queryClient.setQueryData(queryKeys.envelopesList(), testData.envelopes);
-      queryClient.setQueryData(queryKeys.dashboard, { summary: "test" });
-      queryClient.setQueryData(queryKeys.budgetMetadata, { cash: 1000 });
+    it(
+      "should batch invalidate related queries",
+      () => {
+        // Set up some cached data
+        queryClient.setQueryData(queryKeys.envelopesList(), testData.envelopes);
+        queryClient.setQueryData(queryKeys.dashboard, { summary: "test" });
+        queryClient.setQueryData(queryKeys.budgetMetadata, { cash: 1000 });
 
-      // Verify data exists
-      expect(queryClient.getQueryData(queryKeys.envelopesList())).toBeTruthy();
+        // Verify data exists
+        expect(queryClient.getQueryData(queryKeys.envelopesList())).toBeTruthy();
 
-      // Batch invalidate envelope-related queries
-      const relatedKeys = queryKeyUtils.getRelatedKeys("envelopes");
-      queryClientUtils.batchInvalidate(relatedKeys);
+        // Batch invalidate envelope-related queries
+        const relatedKeys = queryKeyUtils.getRelatedKeys("envelopes");
+        queryClientUtils.batchInvalidate(relatedKeys);
 
-      // Check that queries were invalidated
-      const cache = queryClient.getQueryCache();
-      const allQueries = cache.getAll();
-      
-      // Queries should still exist but be marked as stale
-      const envelopeQuery = allQueries.find(q => 
-        q.queryKey[0] === "envelopes"
-      );
-      expect(envelopeQuery).toBeTruthy();
-    }, TEST_TIMEOUT);
+        // Check that queries were invalidated
+        const cache = queryClient.getQueryCache();
+        const allQueries = cache.getAll();
 
-    it("should safely set and retrieve query data", () => {
-      const testData = { id: 1, name: "Test" };
-      const queryKey = ["test", "data"];
+        // Queries should still exist but be marked as stale
+        const envelopeQuery = allQueries.find((q) => q.queryKey[0] === "envelopes");
+        expect(envelopeQuery).toBeTruthy();
+      },
+      TEST_TIMEOUT
+    );
 
-      // Safe set should work
-      const setResult = queryClientUtils.safeSetQueryData(queryKey, testData);
-      expect(setResult).toBe(true);
+    it(
+      "should safely set and retrieve query data",
+      () => {
+        const testData = { id: 1, name: "Test" };
+        const queryKey = ["test", "data"];
 
-      // Data should be retrievable
-      expect(queryClientUtils.hasQueryData(queryKey)).toBe(true);
-      expect(queryClient.getQueryData(queryKey)).toEqual(testData);
+        // Safe set should work
+        const setResult = queryClientUtils.safeSetQueryData(queryKey, testData);
+        expect(setResult).toBe(true);
 
-      // Clear cache
-      queryClientUtils.clearEntityCache("test");
-      expect(queryClientUtils.hasQueryData(queryKey)).toBe(false);
-    }, TEST_TIMEOUT);
+        // Data should be retrievable
+        expect(queryClientUtils.hasQueryData(queryKey)).toBe(true);
+        expect(queryClient.getQueryData(queryKey)).toEqual(testData);
+
+        // Clear cache
+        queryClientUtils.clearEntityCache("test");
+        expect(queryClientUtils.hasQueryData(queryKey)).toBe(false);
+      },
+      TEST_TIMEOUT
+    );
   });
 
   describe("Performance and Memory Management", () => {
-    it("should handle large datasets efficiently", async () => {
-      // Create a large dataset
-      const largeTransactionSet = Array.from({ length: 1000 }, (_, i) => ({
-        id: `large_tx_${i}`,
-        amount: -Math.random() * 50,
-        description: `Large Transaction ${i}`,
-        envelopeId: "env1",
-        category: "expenses",
-        date: new Date(Date.now() - i * 60000).toISOString(),
-        type: "expense",
-        lastModified: Date.now(),
-      }));
+    it(
+      "should handle large datasets efficiently",
+      async () => {
+        // Create a large dataset
+        const largeTransactionSet = Array.from({ length: 1000 }, (_, i) => ({
+          id: `large_tx_${i}`,
+          amount: -Math.random() * 50,
+          description: `Large Transaction ${i}`,
+          envelopeId: "env1",
+          category: "expenses",
+          date: new Date(Date.now() - i * 60000).toISOString(),
+          type: "expense",
+          lastModified: Date.now(),
+        }));
 
-      // Save large dataset
-      const startTime = Date.now();
-      await budgetDatabaseService.saveTransactions(largeTransactionSet);
-      const saveTime = Date.now() - startTime;
+        // Save large dataset
+        const startTime = Date.now();
+        await budgetDatabaseService.saveTransactions(largeTransactionSet);
+        const saveTime = Date.now() - startTime;
 
-      // Should complete within reasonable time (adjust based on hardware)
-      expect(saveTime).toBeLessThan(5000); // 5 seconds
+        // Should complete within reasonable time (adjust based on hardware)
+        expect(saveTime).toBeLessThan(5000); // 5 seconds
 
-      // Query with limits should be fast
-      const queryStart = Date.now();
-      const limitedResults = await budgetDatabaseService.getTransactions({
-        limit: 50,
-      });
-      const queryTime = Date.now() - queryStart;
+        // Query with limits should be fast
+        const queryStart = Date.now();
+        const limitedResults = await budgetDatabaseService.getTransactions({
+          limit: 50,
+        });
+        const queryTime = Date.now() - queryStart;
 
-      expect(queryTime).toBeLessThan(1000); // 1 second
-      expect(limitedResults).toHaveLength(50);
-    }, TEST_TIMEOUT);
+        expect(queryTime).toBeLessThan(1000); // 1 second
+        expect(limitedResults).toHaveLength(50);
+      },
+      TEST_TIMEOUT
+    );
 
-    it("should properly cleanup query cache", async () => {
-      // Fill cache with data
-      await prefetchHelpers.prefetchDashboardBundle(queryClient);
-      
-      const initialStats = queryClientUtils.getCacheStats();
-      expect(initialStats.totalQueries).toBeGreaterThan(0);
+    it(
+      "should properly cleanup query cache",
+      async () => {
+        // Fill cache with data
+        await prefetchHelpers.prefetchDashboardBundle(queryClient);
 
-      // Clear all cache
-      queryClientUtils.clearAllCache();
+        const initialStats = queryClientUtils.getCacheStats();
+        expect(initialStats.totalQueries).toBeGreaterThan(0);
 
-      const finalStats = queryClientUtils.getCacheStats();
-      expect(finalStats.totalQueries).toBe(0);
-    }, TEST_TIMEOUT);
+        // Clear all cache
+        queryClientUtils.clearAllCache();
 
-    it("should handle concurrent query operations", async () => {
-      // Simulate multiple concurrent operations
-      const concurrentOperations = [
-        prefetchHelpers.prefetchEnvelopes(queryClient),
-        prefetchHelpers.prefetchTransactions(queryClient, {
-          start: new Date(Date.now() - 86400000),
-          end: new Date(),
-        }),
-        prefetchHelpers.prefetchBills(queryClient),
-        prefetchHelpers.prefetchSavingsGoals(queryClient),
-        prefetchHelpers.prefetchDashboard(queryClient),
-      ];
+        const finalStats = queryClientUtils.getCacheStats();
+        expect(finalStats.totalQueries).toBe(0);
+      },
+      TEST_TIMEOUT
+    );
 
-      const results = await Promise.allSettled(concurrentOperations);
-      
-      // Most operations should succeed
-      const successCount = results.filter(r => r.status === "fulfilled").length;
-      expect(successCount).toBeGreaterThanOrEqual(3);
+    it(
+      "should handle concurrent query operations",
+      async () => {
+        // Simulate multiple concurrent operations
+        const concurrentOperations = [
+          prefetchHelpers.prefetchEnvelopes(queryClient),
+          prefetchHelpers.prefetchTransactions(queryClient, {
+            start: new Date(Date.now() - 86400000),
+            end: new Date(),
+          }),
+          prefetchHelpers.prefetchBills(queryClient),
+          prefetchHelpers.prefetchSavingsGoals(queryClient),
+          prefetchHelpers.prefetchDashboard(queryClient),
+        ];
 
-      // Cache should contain data from successful operations
-      const stats = queryClientUtils.getCacheStats();
-      expect(stats.totalQueries).toBeGreaterThan(0);
-    }, TEST_TIMEOUT);
+        const results = await Promise.allSettled(concurrentOperations);
+
+        // Most operations should succeed
+        const successCount = results.filter((r) => r.status === "fulfilled").length;
+        expect(successCount).toBeGreaterThanOrEqual(3);
+
+        // Cache should contain data from successful operations
+        const stats = queryClientUtils.getCacheStats();
+        expect(stats.totalQueries).toBeGreaterThan(0);
+      },
+      TEST_TIMEOUT
+    );
   });
 });

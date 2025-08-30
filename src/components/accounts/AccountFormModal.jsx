@@ -72,10 +72,7 @@ const AccountFormModal = ({
                   Break
                 </button>
               )}
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
-            >
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -94,15 +91,11 @@ const AccountFormModal = ({
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Account Name *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Account Name *</label>
             <input
               type="text"
               value={accountForm.name}
-              onChange={(e) =>
-                setAccountForm({ ...accountForm, name: e.target.value })
-              }
+              onChange={(e) => setAccountForm({ ...accountForm, name: e.target.value })}
               disabled={editingAccount && !canEdit}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
               placeholder="e.g., Health FSA 2024"
@@ -111,14 +104,10 @@ const AccountFormModal = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Account Type *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Account Type *</label>
             <select
               value={accountForm.type}
-              onChange={(e) =>
-                setAccountForm({ ...accountForm, type: e.target.value })
-              }
+              onChange={(e) => setAccountForm({ ...accountForm, type: e.target.value })}
               disabled={editingAccount && !canEdit}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
             >
@@ -192,9 +181,7 @@ const AccountFormModal = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Color
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
             <div className="flex gap-2 flex-wrap">
               {ACCOUNT_COLORS.map((color) => (
                 <button
@@ -245,10 +232,7 @@ const AccountFormModal = ({
               disabled={editingAccount && !canEdit}
               className="h-4 w-4 text-cyan-600 focus:ring-cyan-500 border-gray-300 rounded disabled:cursor-not-allowed"
             />
-            <label
-              htmlFor="isActive"
-              className="ml-2 block text-sm text-gray-900"
-            >
+            <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900">
               Account is active
             </label>
           </div>

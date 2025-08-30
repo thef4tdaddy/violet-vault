@@ -83,14 +83,14 @@ export const createQueryClient = () => {
         // Invalidate related queries based on mutation type
         if (mutation.options.mutationKey?.[0]) {
           const entityType = mutation.options.mutationKey[0];
-          
+
           // Invalidate specific entity queries
           mutationQueryClient.invalidateQueries({ queryKey: [entityType] });
 
           // Invalidate dashboard and analytics queries
           mutationQueryClient.invalidateQueries({ queryKey: ["dashboard"] });
           mutationQueryClient.invalidateQueries({ queryKey: ["analytics"] });
-          
+
           // Invalidate budget metadata if applicable
           if (["transactions", "envelopes", "bills"].includes(entityType)) {
             mutationQueryClient.invalidateQueries({ queryKey: ["budgetMetadata"] });
@@ -136,13 +136,13 @@ export const queryClientUtils = {
   getCacheStats: () => {
     const cache = queryClient.getQueryCache();
     const queries = cache.getAll();
-    
+
     return {
       totalQueries: queries.length,
-      activeQueries: queries.filter(q => q.isActive()).length,
-      staleQueries: queries.filter(q => q.isStale()).length,
-      fetchingQueries: queries.filter(q => q.isFetching()).length,
-      errorQueries: queries.filter(q => q.state.error).length,
+      activeQueries: queries.filter((q) => q.isActive()).length,
+      staleQueries: queries.filter((q) => q.isStale()).length,
+      fetchingQueries: queries.filter((q) => q.isFetching()).length,
+      errorQueries: queries.filter((q) => q.state.error).length,
     };
   },
 
@@ -171,7 +171,7 @@ export const queryClientUtils = {
    * Batch invalidate multiple query keys
    */
   batchInvalidate: (queryKeys) => {
-    queryKeys.forEach(queryKey => {
+    queryKeys.forEach((queryKey) => {
       queryClient.invalidateQueries({ queryKey });
     });
     logger.info(`Batch invalidated ${queryKeys.length} query patterns`);

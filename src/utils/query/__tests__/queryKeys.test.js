@@ -22,21 +22,13 @@ describe("queryKeys", () => {
       expect(queryKeys.envelopes).toEqual(["envelopes"]);
       expect(queryKeys.envelopesList()).toEqual(["envelopes", "list", {}]);
       expect(queryKeys.envelopeById("env1")).toEqual(["envelopes", "detail", "env1"]);
-      expect(queryKeys.envelopesByCategory("food")).toEqual([
-        "envelopes",
-        "category",
-        "food",
-      ]);
+      expect(queryKeys.envelopesByCategory("food")).toEqual(["envelopes", "category", "food"]);
       expect(queryKeys.envelopeBalances()).toEqual(["envelopes", "balances"]);
     });
 
     it("should handle envelope list filters", () => {
       const filters = { category: "food", archived: false };
-      expect(queryKeys.envelopesList(filters)).toEqual([
-        "envelopes",
-        "list",
-        filters,
-      ]);
+      expect(queryKeys.envelopesList(filters)).toEqual(["envelopes", "list", filters]);
     });
   });
 
@@ -44,11 +36,7 @@ describe("queryKeys", () => {
     it("should generate correct transaction keys", () => {
       expect(queryKeys.transactions).toEqual(["transactions"]);
       expect(queryKeys.transactionsList()).toEqual(["transactions", "list", {}]);
-      expect(queryKeys.transactionById("tx1")).toEqual([
-        "transactions",
-        "detail",
-        "tx1",
-      ]);
+      expect(queryKeys.transactionById("tx1")).toEqual(["transactions", "detail", "tx1"]);
     });
 
     it("should generate date range keys", () => {
@@ -86,11 +74,7 @@ describe("queryKeys", () => {
     it("should generate correct savings goal keys", () => {
       expect(queryKeys.savingsGoals).toEqual(["savingsGoals"]);
       expect(queryKeys.savingsGoalsList()).toEqual(["savingsGoals", "list"]);
-      expect(queryKeys.savingsGoalById("goal1")).toEqual([
-        "savingsGoals",
-        "detail",
-        "goal1",
-      ]);
+      expect(queryKeys.savingsGoalById("goal1")).toEqual(["savingsGoals", "detail", "goal1"]);
       expect(queryKeys.activeSavingsGoals()).toEqual(["savingsGoals", "active"]);
     });
   });
@@ -98,21 +82,9 @@ describe("queryKeys", () => {
   describe("analytics keys", () => {
     it("should generate correct analytics keys", () => {
       expect(queryKeys.analytics).toEqual(["analytics"]);
-      expect(queryKeys.analyticsSpending("month")).toEqual([
-        "analytics",
-        "spending",
-        "month",
-      ]);
-      expect(queryKeys.analyticsTrends("week")).toEqual([
-        "analytics",
-        "trends",
-        "week",
-      ]);
-      expect(queryKeys.analyticsCategories("year")).toEqual([
-        "analytics",
-        "categories",
-        "year",
-      ]);
+      expect(queryKeys.analyticsSpending("month")).toEqual(["analytics", "spending", "month"]);
+      expect(queryKeys.analyticsTrends("week")).toEqual(["analytics", "trends", "week"]);
+      expect(queryKeys.analyticsCategories("year")).toEqual(["analytics", "categories", "year"]);
       expect(queryKeys.analyticsBalance()).toEqual(["analytics", "balance"]);
     });
 
@@ -139,16 +111,8 @@ describe("queryKeys", () => {
     it("should generate correct budget history keys", () => {
       expect(queryKeys.budgetHistory).toEqual(["budgetHistory"]);
       expect(queryKeys.budgetCommits()).toEqual(["budgetHistory", "commits", {}]);
-      expect(queryKeys.budgetCommit("hash123")).toEqual([
-        "budgetHistory",
-        "commit",
-        "hash123",
-      ]);
-      expect(queryKeys.budgetChanges("hash123")).toEqual([
-        "budgetHistory",
-        "changes",
-        "hash123",
-      ]);
+      expect(queryKeys.budgetCommit("hash123")).toEqual(["budgetHistory", "commit", "hash123"]);
+      expect(queryKeys.budgetChanges("hash123")).toEqual(["budgetHistory", "changes", "hash123"]);
       expect(queryKeys.budgetHistoryStats()).toEqual(["budgetHistory", "stats"]);
       expect(queryKeys.budgetBranches()).toEqual(["budgetHistory", "branches"]);
       expect(queryKeys.budgetTags()).toEqual(["budgetHistory", "tags"]);
@@ -174,9 +138,7 @@ describe("queryKeyUtils", () => {
     });
 
     it("should throw error for unknown entity type", () => {
-      expect(() => queryKeyUtils.getEntityKeys("unknown")).toThrow(
-        "Unknown entity type: unknown"
-      );
+      expect(() => queryKeyUtils.getEntityKeys("unknown")).toThrow("Unknown entity type: unknown");
     });
   });
 

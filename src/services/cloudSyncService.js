@@ -61,9 +61,7 @@ class CloudSyncService {
 
   // Trigger sync immediately for critical changes (paycheck, imports, etc.)
   triggerSyncForCriticalChange(changeType) {
-    logger.info(
-      `🚨 Critical change detected: ${changeType}, triggering immediate sync`,
-    );
+    logger.info(`🚨 Critical change detected: ${changeType}, triggering immediate sync`);
     clearTimeout(this.debounceTimer);
     this.syncQueue = this.syncQueue.then(() => this.forceSync());
   }
@@ -79,10 +77,7 @@ class CloudSyncService {
 
     try {
       // Initialize chunked Firebase sync if not already done
-      await chunkedFirebaseSync.initialize(
-        this.config.budgetId,
-        this.config.encryptionKey,
-      );
+      await chunkedFirebaseSync.initialize(this.config.budgetId, this.config.encryptionKey);
 
       // Fetch data from Dexie for sync
       const localData = await this.fetchDexieData();
@@ -132,9 +127,7 @@ class CloudSyncService {
           try {
             const { queryClient } = await import("../utils/common/queryClient");
             await queryClient.invalidateQueries();
-            logger.info(
-              "✅ TanStack Query cache invalidated after cloud data sync",
-            );
+            logger.info("✅ TanStack Query cache invalidated after cloud data sync");
           } catch (error) {
             logger.warn("Failed to invalidate query cache after sync", error);
           }
@@ -148,10 +141,7 @@ class CloudSyncService {
         }
       } else {
         // Upload from Dexie to Firebase (default behavior)
-        result = await chunkedFirebaseSync.saveToCloud(
-          localData,
-          this.config.currentUser,
-        );
+        result = await chunkedFirebaseSync.saveToCloud(localData, this.config.currentUser);
       }
 
       if (result.success) {
@@ -203,7 +193,7 @@ class CloudSyncService {
         "lastSyncTime",
         new Date().toISOString(),
         86400000, // 24 hours TTL
-        "sync",
+        "sync"
       );
     } catch (error) {
       logger.error("Failed to update last sync time in Dexie:", error);
@@ -221,23 +211,16 @@ class CloudSyncService {
 
   async fetchDexieData() {
     try {
-      const [
-        envelopes,
-        transactions,
-        bills,
-        debts,
-        savingsGoals,
-        paycheckHistory,
-        metadata,
-      ] = await Promise.all([
-        budgetDb.envelopes.toArray(),
-        budgetDb.transactions.toArray(),
-        budgetDb.bills.toArray(),
-        budgetDb.debts.toArray(),
-        budgetDb.savingsGoals.toArray(),
-        budgetDb.paycheckHistory.toArray(),
-        budgetDb.budget.get("metadata"),
-      ]);
+      const [envelopes, transactions, bills, debts, savingsGoals, paycheckHistory, metadata] =
+        await Promise.all([
+          budgetDb.envelopes.toArray(),
+          budgetDb.transactions.toArray(),
+          budgetDb.bills.toArray(),
+          budgetDb.debts.toArray(),
+          budgetDb.savingsGoals.toArray(),
+          budgetDb.paycheckHistory.toArray(),
+          budgetDb.budget.get("metadata"),
+        ]);
 
       return {
         envelopes: envelopes || [],
@@ -309,7 +292,7 @@ class CloudSyncService {
             supplementalAccounts: data.supplementalAccounts || [],
             lastUpdated: new Date().toISOString(),
           });
-        },
+        }
       );
 
       logger.info("✅ Cloud data saved to Dexie successfully");
@@ -423,7 +406,7 @@ class CloudSyncService {
       const result = await chunkedFirebaseSync.saveToCloud(
         this.config.budgetId,
         this.config.encryptionKey,
-        localData,
+        localData
       );
 
       if (result.success) {
@@ -450,18 +433,13 @@ class CloudSyncService {
         // If the config has a clearAllData method, use it
         await this.config.clearAllData();
         logger.info("Cloud data cleared using config method");
-      } else if (
-        chunkedFirebaseSync &&
-        typeof chunkedFirebaseSync.clearAllData === "function"
-      ) {
+      } else if (chunkedFirebaseSync && typeof chunkedFirebaseSync.clearAllData === "function") {
         // If chunkedFirebaseSync has a clearAllData method, use it
         await chunkedFirebaseSync.clearAllData();
         logger.info("Cloud data cleared using chunkedFirebaseSync");
       } else {
         // If no specific clear method exists, we can't clear cloud data
-        logger.warn(
-          "No cloud data clearing method available - skipping cloud clear",
-        );
+        logger.warn("No cloud data clearing method available - skipping cloud clear");
       }
 
       // Clear local sync metadata

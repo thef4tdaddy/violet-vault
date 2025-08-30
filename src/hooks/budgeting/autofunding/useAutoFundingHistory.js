@@ -14,7 +14,7 @@ export const useAutoFundingHistory = (initialHistory = [], initialUndoStack = []
   // Add execution to history
   const addToHistory = useCallback((executionRecord) => {
     try {
-      setExecutionHistory(prevHistory => {
+      setExecutionHistory((prevHistory) => {
         const newHistory = [executionRecord, ...prevHistory];
         // Keep only last 50 executions by default
         return newHistory.slice(0, 50);
@@ -40,7 +40,7 @@ export const useAutoFundingHistory = (initialHistory = [], initialUndoStack = []
       const undoableTransfers = [];
 
       // Extract transfer information for undo
-      executionResults.forEach(result => {
+      executionResults.forEach((result) => {
         if (result.success && result.targetEnvelopes) {
           if (result.targetEnvelopes.length === 1) {
             // Single target transfer
@@ -53,7 +53,7 @@ export const useAutoFundingHistory = (initialHistory = [], initialUndoStack = []
           } else {
             // Multiple target transfers (split remainder)
             const amountPerEnvelope = result.amount / result.targetEnvelopes.length;
-            result.targetEnvelopes.forEach(envelopeId => {
+            result.targetEnvelopes.forEach((envelopeId) => {
               undoableTransfers.push({
                 fromEnvelopeId: "unassigned",
                 toEnvelopeId: envelopeId,
@@ -75,7 +75,7 @@ export const useAutoFundingHistory = (initialHistory = [], initialUndoStack = []
           canUndo: true,
         };
 
-        setUndoStack(prevStack => {
+        setUndoStack((prevStack) => {
           const newStack = [undoItem, ...prevStack];
           // Keep only last 10 undoable executions
           return newStack.slice(0, 10);
@@ -93,49 +93,55 @@ export const useAutoFundingHistory = (initialHistory = [], initialUndoStack = []
   }, []);
 
   // Get execution history with optional filtering
-  const getHistory = useCallback((limit = 10, filters = {}) => {
-    try {
-      let filteredHistory = [...executionHistory];
+  const getHistory = useCallback(
+    (limit = 10, filters = {}) => {
+      try {
+        let filteredHistory = [...executionHistory];
 
-      // Apply filters
-      if (filters.trigger) {
-        filteredHistory = filteredHistory.filter(
-          execution => execution.trigger === filters.trigger
-        );
+        // Apply filters
+        if (filters.trigger) {
+          filteredHistory = filteredHistory.filter(
+            (execution) => execution.trigger === filters.trigger
+          );
+        }
+
+        if (filters.successful !== undefined) {
+          filteredHistory = filteredHistory.filter(
+            (execution) => (execution.success !== false) === filters.successful
+          );
+        }
+
+        if (filters.dateFrom) {
+          const fromDate = new Date(filters.dateFrom);
+          filteredHistory = filteredHistory.filter(
+            (execution) => new Date(execution.executedAt) >= fromDate
+          );
+        }
+
+        if (filters.dateTo) {
+          const toDate = new Date(filters.dateTo);
+          filteredHistory = filteredHistory.filter(
+            (execution) => new Date(execution.executedAt) <= toDate
+          );
+        }
+
+        // Apply limit
+        return filteredHistory.slice(0, limit);
+      } catch (error) {
+        logger.error("Failed to get execution history", error);
+        return [];
       }
-
-      if (filters.successful !== undefined) {
-        filteredHistory = filteredHistory.filter(
-          execution => (execution.success !== false) === filters.successful
-        );
-      }
-
-      if (filters.dateFrom) {
-        const fromDate = new Date(filters.dateFrom);
-        filteredHistory = filteredHistory.filter(
-          execution => new Date(execution.executedAt) >= fromDate
-        );
-      }
-
-      if (filters.dateTo) {
-        const toDate = new Date(filters.dateTo);
-        filteredHistory = filteredHistory.filter(
-          execution => new Date(execution.executedAt) <= toDate
-        );
-      }
-
-      // Apply limit
-      return filteredHistory.slice(0, limit);
-    } catch (error) {
-      logger.error("Failed to get execution history", error);
-      return [];
-    }
-  }, [executionHistory]);
+    },
+    [executionHistory]
+  );
 
   // Get execution by ID
-  const getExecutionById = useCallback((executionId) => {
-    return executionHistory.find(execution => execution.id === executionId);
-  }, [executionHistory]);
+  const getExecutionById = useCallback(
+    (executionId) => {
+      return executionHistory.find((execution) => execution.id === executionId);
+    },
+    [executionHistory]
+  );
 
   // Clear execution history
   const clearHistory = useCallback(() => {
@@ -150,22 +156,19 @@ export const useAutoFundingHistory = (initialHistory = [], initialUndoStack = []
 
   // Get undoable executions
   const getUndoableExecutions = useCallback(() => {
-    return undoStack.filter(item => item.canUndo);
+    return undoStack.filter((item) => item.canUndo);
   }, [undoStack]);
 
   // Get undo statistics
   const getUndoStatistics = useCallback(() => {
     const undoableItems = getUndoableExecutions();
-    
+
     return {
       totalUndoable: undoableItems.length,
       totalAmount: undoableItems.reduce((sum, item) => sum + item.totalAmount, 0),
-      oldestUndoable: undoableItems.length > 0 
-        ? undoableItems[undoableItems.length - 1].executedAt 
-        : null,
-      newestUndoable: undoableItems.length > 0 
-        ? undoableItems[0].executedAt 
-        : null,
+      oldestUndoable:
+        undoableItems.length > 0 ? undoableItems[undoableItems.length - 1].executedAt : null,
+      newestUndoable: undoableItems.length > 0 ? undoableItems[0].executedAt : null,
     };
   }, [getUndoableExecutions]);
 
@@ -180,118 +183,122 @@ export const useAutoFundingHistory = (initialHistory = [], initialUndoStack = []
   }, [getUndoableExecutions]);
 
   // Undo a specific execution by ID
-  const undoExecution = useCallback(async (executionId) => {
-    const undoItem = undoStack.find(
-      item => item.executionId === executionId && item.canUndo
-    );
+  const undoExecution = useCallback(
+    async (executionId) => {
+      const undoItem = undoStack.find((item) => item.executionId === executionId && item.canUndo);
 
-    if (!undoItem) {
-      throw new Error(`Execution ${executionId} is not undoable`);
-    }
-
-    try {
-      logger.info("Starting undo operation", {
-        executionId,
-        transfersToReverse: undoItem.transfers.length,
-        totalAmount: undoItem.totalAmount,
-      });
-
-      // Reverse all transfers
-      for (const transfer of undoItem.transfers) {
-        await reverseTransfer(transfer);
+      if (!undoItem) {
+        throw new Error(`Execution ${executionId} is not undoable`);
       }
 
-      // Mark as undone
-      setUndoStack(prevStack => 
-        prevStack.map(item => 
-          item.executionId === executionId 
-            ? { ...item, canUndo: false, undoneAt: new Date().toISOString() }
-            : item
-        )
-      );
+      try {
+        logger.info("Starting undo operation", {
+          executionId,
+          transfersToReverse: undoItem.transfers.length,
+          totalAmount: undoItem.totalAmount,
+        });
 
-      // Add undo record to execution history
-      const undoRecord = {
-        id: `undo_${executionId}_${Date.now()}`,
-        trigger: "manual_undo",
-        executedAt: new Date().toISOString(),
-        rulesExecuted: 0,
-        totalFunded: -undoItem.totalAmount, // Negative to indicate reversal
-        results: [
-          {
-            ruleId: "undo_operation",
-            ruleName: "Undo Operation",
-            success: true,
-            amount: undoItem.totalAmount,
-            executedAt: new Date().toISOString(),
-            originalExecutionId: executionId,
-          },
-        ],
-        isUndo: true,
-        originalExecutionId: executionId,
-      };
+        // Reverse all transfers
+        for (const transfer of undoItem.transfers) {
+          await reverseTransfer(transfer);
+        }
 
-      addToHistory(undoRecord);
+        // Mark as undone
+        setUndoStack((prevStack) =>
+          prevStack.map((item) =>
+            item.executionId === executionId
+              ? { ...item, canUndo: false, undoneAt: new Date().toISOString() }
+              : item
+          )
+        );
 
-      logger.info("Undo operation completed successfully", {
-        executionId,
-        amountReversed: undoItem.totalAmount,
-      });
+        // Add undo record to execution history
+        const undoRecord = {
+          id: `undo_${executionId}_${Date.now()}`,
+          trigger: "manual_undo",
+          executedAt: new Date().toISOString(),
+          rulesExecuted: 0,
+          totalFunded: -undoItem.totalAmount, // Negative to indicate reversal
+          results: [
+            {
+              ruleId: "undo_operation",
+              ruleName: "Undo Operation",
+              success: true,
+              amount: undoItem.totalAmount,
+              executedAt: new Date().toISOString(),
+              originalExecutionId: executionId,
+            },
+          ],
+          isUndo: true,
+          originalExecutionId: executionId,
+        };
 
-      return {
-        success: true,
-        executionId,
-        amountReversed: undoItem.totalAmount,
-        transfersReversed: undoItem.transfers.length,
-        undoRecord,
-      };
-    } catch (error) {
-      logger.error("Undo operation failed", {
-        executionId,
-        error: error.message,
-      });
-      throw new Error(`Failed to undo execution: ${error.message}`);
-    }
-  }, [undoStack, addToHistory]);
+        addToHistory(undoRecord);
+
+        logger.info("Undo operation completed successfully", {
+          executionId,
+          amountReversed: undoItem.totalAmount,
+        });
+
+        return {
+          success: true,
+          executionId,
+          amountReversed: undoItem.totalAmount,
+          transfersReversed: undoItem.transfers.length,
+          undoRecord,
+        };
+      } catch (error) {
+        logger.error("Undo operation failed", {
+          executionId,
+          error: error.message,
+        });
+        throw new Error(`Failed to undo execution: ${error.message}`);
+      }
+    },
+    [undoStack, addToHistory]
+  );
 
   // Reverse a single transfer
-  const reverseTransfer = useCallback(async (transfer) => {
-    try {
-      // Reverse the transfer: move money back from target to source
-      await budget.transferFunds(
-        transfer.toEnvelopeId,
-        transfer.fromEnvelopeId,
-        transfer.amount,
-        `Undo: ${transfer.description}`,
-      );
+  const reverseTransfer = useCallback(
+    async (transfer) => {
+      try {
+        // Reverse the transfer: move money back from target to source
+        await budget.transferFunds(
+          transfer.toEnvelopeId,
+          transfer.fromEnvelopeId,
+          transfer.amount,
+          `Undo: ${transfer.description}`
+        );
 
-      logger.debug("Transfer reversed", {
-        from: transfer.toEnvelopeId,
-        to: transfer.fromEnvelopeId,
-        amount: transfer.amount,
-      });
-    } catch (error) {
-      logger.error("Failed to reverse transfer", {
-        transfer,
-        error: error.message,
-      });
-      throw error;
-    }
-  }, [budget]);
+        logger.debug("Transfer reversed", {
+          from: transfer.toEnvelopeId,
+          to: transfer.fromEnvelopeId,
+          amount: transfer.amount,
+        });
+      } catch (error) {
+        logger.error("Failed to reverse transfer", {
+          transfer,
+          error: error.message,
+        });
+        throw error;
+      }
+    },
+    [budget]
+  );
 
   // Get execution statistics
   const getExecutionStatistics = useCallback(() => {
     try {
       const totalExecutions = executionHistory.length;
       const successfulExecutions = executionHistory.filter(
-        execution => execution.success !== false
+        (execution) => execution.success !== false
       );
       const totalFunded = executionHistory.reduce(
         (sum, execution) => sum + Math.max(0, execution.totalFunded || 0),
         0
       );
       const totalReversed = executionHistory
-        .filter(execution => execution.isUndo)
+        .filter((execution) => execution.isUndo)
         .reduce((sum, execution) => sum + Math.abs(execution.totalFunded || 0), 0);
 
       // Group by trigger
@@ -303,9 +310,9 @@ export const useAutoFundingHistory = (initialHistory = [], initialUndoStack = []
       // Group by date (last 30 days)
       const last30Days = new Date();
       last30Days.setDate(last30Days.getDate() - 30);
-      
+
       const recentExecutions = executionHistory.filter(
-        execution => new Date(execution.executedAt) >= last30Days
+        (execution) => new Date(execution.executedAt) >= last30Days
       );
 
       return {
@@ -318,9 +325,8 @@ export const useAutoFundingHistory = (initialHistory = [], initialUndoStack = []
         byTrigger,
         recentExecutions: recentExecutions.length,
         lastExecution: executionHistory[0] || null,
-        averageFundingPerExecution: successfulExecutions.length > 0 
-          ? totalFunded / successfulExecutions.length 
-          : 0,
+        averageFundingPerExecution:
+          successfulExecutions.length > 0 ? totalFunded / successfulExecutions.length : 0,
       };
     } catch (error) {
       logger.error("Failed to get execution statistics", error);
@@ -344,21 +350,15 @@ export const useAutoFundingHistory = (initialHistory = [], initialUndoStack = []
     try {
       const historyDate = new Date();
       historyDate.setDate(historyDate.getDate() - maxHistoryAge);
-      
+
       const undoDate = new Date();
       undoDate.setDate(undoDate.getDate() - maxUndoAge);
 
-      setExecutionHistory(prevHistory => 
-        prevHistory.filter(execution => 
-          new Date(execution.executedAt) > historyDate
-        )
+      setExecutionHistory((prevHistory) =>
+        prevHistory.filter((execution) => new Date(execution.executedAt) > historyDate)
       );
 
-      setUndoStack(prevStack => 
-        prevStack.filter(item => 
-          new Date(item.executedAt) > undoDate
-        )
-      );
+      setUndoStack((prevStack) => prevStack.filter((item) => new Date(item.executedAt) > undoDate));
 
       logger.info("History cleanup completed", {
         maxHistoryAge,
@@ -372,86 +372,86 @@ export const useAutoFundingHistory = (initialHistory = [], initialUndoStack = []
   }, []);
 
   // Export history data
-  const exportHistory = useCallback((options = {}) => {
-    try {
-      const {
-        includeUndoStack = true,
-        dateFrom,
-        dateTo,
-        format = 'json',
-      } = options;
+  const exportHistory = useCallback(
+    (options = {}) => {
+      try {
+        const { includeUndoStack = true, dateFrom, dateTo, format = "json" } = options;
 
-      let historyToExport = [...executionHistory];
-      
-      if (dateFrom) {
-        const fromDate = new Date(dateFrom);
-        historyToExport = historyToExport.filter(
-          execution => new Date(execution.executedAt) >= fromDate
-        );
-      }
+        let historyToExport = [...executionHistory];
 
-      if (dateTo) {
-        const toDate = new Date(dateTo);
-        historyToExport = historyToExport.filter(
-          execution => new Date(execution.executedAt) <= toDate
-        );
-      }
+        if (dateFrom) {
+          const fromDate = new Date(dateFrom);
+          historyToExport = historyToExport.filter(
+            (execution) => new Date(execution.executedAt) >= fromDate
+          );
+        }
 
-      const exportData = {
-        executionHistory: historyToExport,
-        undoStack: includeUndoStack ? undoStack : [],
-        exportedAt: new Date().toISOString(),
-        totalExecutions: historyToExport.length,
-        dateRange: {
-          from: dateFrom,
-          to: dateTo,
-        },
-      };
+        if (dateTo) {
+          const toDate = new Date(dateTo);
+          historyToExport = historyToExport.filter(
+            (execution) => new Date(execution.executedAt) <= toDate
+          );
+        }
 
-      if (format === 'csv') {
-        // Convert to CSV format for basic data
-        const csvHeaders = [
-          'Execution ID',
-          'Trigger',
-          'Executed At',
-          'Rules Executed',
-          'Total Funded',
-          'Success',
-        ].join(',');
+        const exportData = {
+          executionHistory: historyToExport,
+          undoStack: includeUndoStack ? undoStack : [],
+          exportedAt: new Date().toISOString(),
+          totalExecutions: historyToExport.length,
+          dateRange: {
+            from: dateFrom,
+            to: dateTo,
+          },
+        };
 
-        const csvRows = historyToExport.map(execution => [
-          execution.id,
-          execution.trigger,
-          execution.executedAt,
-          execution.rulesExecuted || 0,
-          execution.totalFunded || 0,
-          execution.success !== false ? 'true' : 'false',
-        ].join(','));
+        if (format === "csv") {
+          // Convert to CSV format for basic data
+          const csvHeaders = [
+            "Execution ID",
+            "Trigger",
+            "Executed At",
+            "Rules Executed",
+            "Total Funded",
+            "Success",
+          ].join(",");
+
+          const csvRows = historyToExport.map((execution) =>
+            [
+              execution.id,
+              execution.trigger,
+              execution.executedAt,
+              execution.rulesExecuted || 0,
+              execution.totalFunded || 0,
+              execution.success !== false ? "true" : "false",
+            ].join(",")
+          );
+
+          return {
+            format: "csv",
+            content: [csvHeaders, ...csvRows].join("\n"),
+            filename: `auto-funding-history-${new Date().toISOString().split("T")[0]}.csv`,
+          };
+        }
 
         return {
-          format: 'csv',
-          content: [csvHeaders, ...csvRows].join('\n'),
-          filename: `auto-funding-history-${new Date().toISOString().split('T')[0]}.csv`,
+          format: "json",
+          content: JSON.stringify(exportData, null, 2),
+          data: exportData,
+          filename: `auto-funding-history-${new Date().toISOString().split("T")[0]}.json`,
         };
+      } catch (error) {
+        logger.error("Failed to export history", error);
+        throw error;
       }
-
-      return {
-        format: 'json',
-        content: JSON.stringify(exportData, null, 2),
-        data: exportData,
-        filename: `auto-funding-history-${new Date().toISOString().split('T')[0]}.json`,
-      };
-    } catch (error) {
-      logger.error("Failed to export history", error);
-      throw error;
-    }
-  }, [executionHistory, undoStack]);
+    },
+    [executionHistory, undoStack]
+  );
 
   return {
     // State
     executionHistory,
     undoStack,
-    
+
     // History management
     addToHistory,
     addToUndoStack,
@@ -459,16 +459,16 @@ export const useAutoFundingHistory = (initialHistory = [], initialUndoStack = []
     getExecutionById,
     clearHistory,
     cleanup,
-    
+
     // Undo operations
     getUndoableExecutions,
     getUndoStatistics,
     undoLastExecution,
     undoExecution,
-    
+
     // Statistics and analysis
     getExecutionStatistics,
-    
+
     // Import/Export
     exportHistory,
   };

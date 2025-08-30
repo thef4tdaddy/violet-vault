@@ -22,7 +22,7 @@ vi.mock("../../db/budgetDb", () => ({
     getPaidBills: vi.fn(),
     getUpcomingBills: vi.fn(),
     getOverdueBills: vi.fn(),
-    bills: { 
+    bills: {
       toArray: vi.fn(),
       clear: vi.fn(),
     },
@@ -37,7 +37,7 @@ vi.mock("../../db/budgetDb", () => ({
     getPaychecksByDateRange: vi.fn(),
     getPaycheckHistory: vi.fn(),
     bulkUpsertPaychecks: vi.fn(),
-    debts: { 
+    debts: {
       toArray: vi.fn(),
       clear: vi.fn(),
     },
@@ -129,9 +129,7 @@ describe("BudgetDatabaseService", () => {
     });
 
     it("should get envelopes by category", async () => {
-      const mockEnvelopes = [
-        { id: "1", name: "Food", category: "expenses", archived: false },
-      ];
+      const mockEnvelopes = [{ id: "1", name: "Food", category: "expenses", archived: false }];
 
       budgetDb.getEnvelopesByCategory.mockResolvedValue(mockEnvelopes);
 
@@ -141,10 +139,7 @@ describe("BudgetDatabaseService", () => {
       });
 
       expect(result).toEqual(mockEnvelopes);
-      expect(budgetDb.getEnvelopesByCategory).toHaveBeenCalledWith(
-        "expenses",
-        false
-      );
+      expect(budgetDb.getEnvelopesByCategory).toHaveBeenCalledWith("expenses", false);
     });
 
     it("should use cached data when available", async () => {
@@ -157,10 +152,7 @@ describe("BudgetDatabaseService", () => {
       });
 
       expect(result).toEqual(mockEnvelopes);
-      expect(budgetDb.getCachedValue).toHaveBeenCalledWith(
-        "budget_db_envelopes_active",
-        300000
-      );
+      expect(budgetDb.getCachedValue).toHaveBeenCalledWith("budget_db_envelopes_active", 300000);
     });
   });
 
@@ -208,9 +200,7 @@ describe("BudgetDatabaseService", () => {
     });
 
     it("should get transactions by envelope", async () => {
-      const mockTransactions = [
-        { id: "1", envelopeId: "env1", amount: 100 },
-      ];
+      const mockTransactions = [{ id: "1", envelopeId: "env1", amount: 100 }];
 
       budgetDb.getTransactionsByEnvelope.mockResolvedValue(mockTransactions);
 
@@ -219,10 +209,7 @@ describe("BudgetDatabaseService", () => {
       });
 
       expect(result).toEqual(mockTransactions);
-      expect(budgetDb.getTransactionsByEnvelope).toHaveBeenCalledWith(
-        "env1",
-        undefined
-      );
+      expect(budgetDb.getTransactionsByEnvelope).toHaveBeenCalledWith("env1", undefined);
     });
 
     it("should limit results when specified", async () => {
@@ -323,10 +310,7 @@ describe("BudgetDatabaseService", () => {
       });
 
       expect(result).toEqual(mockData);
-      expect(budgetDb.getAnalyticsData).toHaveBeenCalledWith(
-        dateRange,
-        false
-      );
+      expect(budgetDb.getAnalyticsData).toHaveBeenCalledWith(dateRange, false);
       expect(budgetDb.setCachedValue).toHaveBeenCalled();
     });
 

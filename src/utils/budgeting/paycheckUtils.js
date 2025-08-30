@@ -60,7 +60,8 @@ export const getPayerPrediction = (payer, paycheckHistory = []) => {
 
   // Calculate average and standard deviation for confidence
   const average = payerPaychecks.reduce((a, b) => a + b, 0) / payerPaychecks.length;
-  const variance = payerPaychecks.reduce((a, b) => a + Math.pow(b - average, 2), 0) / payerPaychecks.length;
+  const variance =
+    payerPaychecks.reduce((a, b) => a + Math.pow(b - average, 2), 0) / payerPaychecks.length;
   const stdDev = Math.sqrt(variance);
 
   // Confidence based on consistency (lower std dev = higher confidence)
@@ -110,7 +111,11 @@ export const getUniquePayers = (paycheckHistory = [], tempPayers = []) => {
  * @param {string} allocationMode - 'allocate' or 'leftover'
  * @returns {Object} Allocation calculations
  */
-export const calculateEnvelopeAllocations = (paycheckAmount, envelopes = [], allocationMode = "allocate") => {
+export const calculateEnvelopeAllocations = (
+  paycheckAmount,
+  envelopes = [],
+  allocationMode = "allocate"
+) => {
   if (!paycheckAmount || paycheckAmount <= 0) {
     return {
       allocations: [],
@@ -121,10 +126,9 @@ export const calculateEnvelopeAllocations = (paycheckAmount, envelopes = [], all
   }
 
   const amount = parseFloat(paycheckAmount);
-  const allocatableEnvelopes = envelopes.filter((env) => 
-    env.autoAllocate && 
-    env.envelopeType !== ENVELOPE_TYPES.SAVINGS &&
-    env.id !== "unassigned"
+  const allocatableEnvelopes = envelopes.filter(
+    (env) =>
+      env.autoAllocate && env.envelopeType !== ENVELOPE_TYPES.SAVINGS && env.id !== "unassigned"
   );
 
   if (allocatableEnvelopes.length === 0) {
@@ -234,7 +238,7 @@ export const createPaycheckTransaction = (formData, allocations, currentUser) =>
  */
 export const validateAllocations = (allocations, paycheckAmount) => {
   const totalAllocated = allocations.reduce((sum, alloc) => sum + alloc.amount, 0);
-  
+
   if (totalAllocated > paycheckAmount) {
     return {
       isValid: false,
@@ -275,8 +279,8 @@ export const formatPaycheckAmount = (amount) => {
  * @returns {Object} Statistics
  */
 export const getPaycheckStatistics = (paycheckHistory = [], payer = null) => {
-  const filteredHistory = payer 
-    ? paycheckHistory.filter(p => p.payerName === payer)
+  const filteredHistory = payer
+    ? paycheckHistory.filter((p) => p.payerName === payer)
     : paycheckHistory;
 
   if (filteredHistory.length === 0) {
@@ -290,7 +294,7 @@ export const getPaycheckStatistics = (paycheckHistory = [], payer = null) => {
     };
   }
 
-  const amounts = filteredHistory.map(p => p.amount);
+  const amounts = filteredHistory.map((p) => p.amount);
   const totalAmount = amounts.reduce((sum, amount) => sum + amount, 0);
 
   return {

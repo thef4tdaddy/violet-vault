@@ -1,27 +1,25 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import useEnvelopeForm from '../useEnvelopeForm';
-import { ENVELOPE_TYPES } from '../../../constants/categories';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { renderHook, act } from "@testing-library/react";
+import useEnvelopeForm from "../useEnvelopeForm";
+import { ENVELOPE_TYPES } from "../../../constants/categories";
 
 // Mock the dependencies
-vi.mock('../../../stores/ui/toastStore', () => ({
+vi.mock("../../../stores/ui/toastStore", () => ({
   globalToast: {
     showError: vi.fn(),
     showWarning: vi.fn(),
   },
 }));
 
-vi.mock('../../../utils/common/logger', () => ({
+vi.mock("../../../utils/common/logger", () => ({
   default: {
     error: vi.fn(),
   },
 }));
 
-describe('useEnvelopeForm', () => {
-  const mockCurrentUser = { userName: 'Test User' };
-  const mockExistingEnvelopes = [
-    { id: '1', name: 'Existing Envelope' },
-  ];
+describe("useEnvelopeForm", () => {
+  const mockCurrentUser = { userName: "Test User" };
+  const mockExistingEnvelopes = [{ id: "1", name: "Existing Envelope" }];
 
   const defaultProps = {
     envelope: null,
@@ -35,11 +33,11 @@ describe('useEnvelopeForm', () => {
     vi.clearAllMocks();
   });
 
-  describe('Initialization', () => {
-    it('should initialize with default form data for new envelope', () => {
+  describe("Initialization", () => {
+    it("should initialize with default form data for new envelope", () => {
       const { result } = renderHook(() => useEnvelopeForm(defaultProps));
 
-      expect(result.current.formData.name).toBe('');
+      expect(result.current.formData.name).toBe("");
       expect(result.current.formData.envelopeType).toBe(ENVELOPE_TYPES.VARIABLE);
       expect(result.current.formData.autoAllocate).toBe(true);
       expect(result.current.errors).toEqual({});
@@ -47,97 +45,95 @@ describe('useEnvelopeForm', () => {
       expect(result.current.isEditing).toBe(false);
     });
 
-    it('should initialize with envelope data when editing', () => {
+    it("should initialize with envelope data when editing", () => {
       const envelope = {
-        id: 'test-id',
-        name: 'Test Envelope',
+        id: "test-id",
+        name: "Test Envelope",
         monthlyAmount: 100,
-        category: 'Food',
-        color: '#a855f7',
+        category: "Food",
+        color: "#a855f7",
       };
 
-      const { result } = renderHook(() => 
-        useEnvelopeForm({ ...defaultProps, envelope })
-      );
+      const { result } = renderHook(() => useEnvelopeForm({ ...defaultProps, envelope }));
 
-      expect(result.current.formData.name).toBe('Test Envelope');
-      expect(result.current.formData.monthlyAmount).toBe('100');
-      expect(result.current.formData.category).toBe('Food');
+      expect(result.current.formData.name).toBe("Test Envelope");
+      expect(result.current.formData.monthlyAmount).toBe("100");
+      expect(result.current.formData.category).toBe("Food");
       expect(result.current.isEditing).toBe(true);
-      expect(result.current.envelopeId).toBe('test-id');
+      expect(result.current.envelopeId).toBe("test-id");
     });
   });
 
-  describe('Form field updates', () => {
-    it('should update form field and mark as dirty', () => {
+  describe("Form field updates", () => {
+    it("should update form field and mark as dirty", () => {
       const { result } = renderHook(() => useEnvelopeForm(defaultProps));
 
       act(() => {
-        result.current.updateFormField('name', 'New Envelope');
+        result.current.updateFormField("name", "New Envelope");
       });
 
-      expect(result.current.formData.name).toBe('New Envelope');
+      expect(result.current.formData.name).toBe("New Envelope");
       expect(result.current.isDirty).toBe(true);
     });
 
-    it('should clear related errors when field is updated', () => {
+    it("should clear related errors when field is updated", () => {
       const { result } = renderHook(() => useEnvelopeForm(defaultProps));
 
       // First set an error state
       act(() => {
-        result.current.updateFormField('name', ''); // This should trigger validation
+        result.current.updateFormField("name", ""); // This should trigger validation
       });
 
       // Then update with valid value
       act(() => {
-        result.current.updateFormField('name', 'Valid Name');
+        result.current.updateFormField("name", "Valid Name");
       });
 
       expect(result.current.errors.name).toBeUndefined();
     });
 
-    it('should handle envelope type changes', () => {
+    it("should handle envelope type changes", () => {
       const { result } = renderHook(() => useEnvelopeForm(defaultProps));
 
       act(() => {
-        result.current.updateFormField('envelopeType', ENVELOPE_TYPES.SINKING_FUND);
+        result.current.updateFormField("envelopeType", ENVELOPE_TYPES.SINKING_FUND);
       });
 
       expect(result.current.formData.envelopeType).toBe(ENVELOPE_TYPES.SINKING_FUND);
     });
   });
 
-  describe('Batch form updates', () => {
-    it('should update multiple fields at once', () => {
+  describe("Batch form updates", () => {
+    it("should update multiple fields at once", () => {
       const { result } = renderHook(() => useEnvelopeForm(defaultProps));
 
       const updates = {
-        name: 'Batch Updated',
-        category: 'Entertainment',
-        monthlyAmount: '200',
+        name: "Batch Updated",
+        category: "Entertainment",
+        monthlyAmount: "200",
       };
 
       act(() => {
         result.current.updateFormData(updates);
       });
 
-      expect(result.current.formData.name).toBe('Batch Updated');
-      expect(result.current.formData.category).toBe('Entertainment');
-      expect(result.current.formData.monthlyAmount).toBe('200');
+      expect(result.current.formData.name).toBe("Batch Updated");
+      expect(result.current.formData.category).toBe("Entertainment");
+      expect(result.current.formData.monthlyAmount).toBe("200");
       expect(result.current.isDirty).toBe(true);
     });
   });
 
-  describe('Form validation', () => {
-    it('should validate form correctly', () => {
+  describe("Form validation", () => {
+    it("should validate form correctly", () => {
       const { result } = renderHook(() => useEnvelopeForm(defaultProps));
 
       // Set valid form data
       act(() => {
         result.current.updateFormData({
-          name: 'Test Envelope',
-          category: 'Food',
-          monthlyAmount: '100',
+          name: "Test Envelope",
+          category: "Food",
+          monthlyAmount: "100",
         });
       });
 
@@ -150,15 +146,15 @@ describe('useEnvelopeForm', () => {
       expect(Object.keys(result.current.errors)).toHaveLength(0);
     });
 
-    it('should detect validation errors', () => {
+    it("should detect validation errors", () => {
       const { result } = renderHook(() => useEnvelopeForm(defaultProps));
 
       // Set invalid form data
       act(() => {
         result.current.updateFormData({
-          name: '', // Invalid - required
-          category: 'Food',
-          monthlyAmount: 'invalid', // Invalid format
+          name: "", // Invalid - required
+          category: "Food",
+          monthlyAmount: "invalid", // Invalid format
         });
       });
 
@@ -172,13 +168,13 @@ describe('useEnvelopeForm', () => {
       expect(result.current.errors.monthlyAmount).toBeDefined();
     });
 
-    it('should check for duplicate names', () => {
+    it("should check for duplicate names", () => {
       const { result } = renderHook(() => useEnvelopeForm(defaultProps));
 
       act(() => {
         result.current.updateFormData({
-          name: 'Existing Envelope', // Duplicate name
-          category: 'Food',
+          name: "Existing Envelope", // Duplicate name
+          category: "Food",
         });
       });
 
@@ -188,23 +184,21 @@ describe('useEnvelopeForm', () => {
       });
 
       expect(isValid).toBe(false);
-      expect(result.current.errors.name).toContain('already exists');
+      expect(result.current.errors.name).toContain("already exists");
     });
   });
 
-  describe('Form submission', () => {
-    it('should handle successful submission', async () => {
+  describe("Form submission", () => {
+    it("should handle successful submission", async () => {
       const mockOnSave = vi.fn().mockResolvedValue();
-      const { result } = renderHook(() => 
-        useEnvelopeForm({ ...defaultProps, onSave: mockOnSave })
-      );
+      const { result } = renderHook(() => useEnvelopeForm({ ...defaultProps, onSave: mockOnSave }));
 
       // Set valid form data
       act(() => {
         result.current.updateFormData({
-          name: 'Test Envelope',
-          category: 'Food',
-          monthlyAmount: '100',
+          name: "Test Envelope",
+          category: "Food",
+          monthlyAmount: "100",
         });
       });
 
@@ -216,19 +210,19 @@ describe('useEnvelopeForm', () => {
       expect(success).toBe(true);
       expect(mockOnSave).toHaveBeenCalledWith(
         expect.objectContaining({
-          name: 'Test Envelope',
+          name: "Test Envelope",
           monthlyAmount: 100,
-          category: 'Food',
+          category: "Food",
         })
       );
       expect(result.current.isDirty).toBe(false);
     });
 
-    it('should handle submission validation errors', async () => {
+    it("should handle submission validation errors", async () => {
       const { result } = renderHook(() => useEnvelopeForm(defaultProps));
 
       // Don't set valid form data - should fail validation
-      
+
       let success;
       await act(async () => {
         success = await result.current.handleSubmit();
@@ -238,17 +232,15 @@ describe('useEnvelopeForm', () => {
       expect(defaultProps.onSave).not.toHaveBeenCalled();
     });
 
-    it('should handle submission errors', async () => {
-      const mockOnSave = vi.fn().mockRejectedValue(new Error('Save failed'));
-      const { result } = renderHook(() => 
-        useEnvelopeForm({ ...defaultProps, onSave: mockOnSave })
-      );
+    it("should handle submission errors", async () => {
+      const mockOnSave = vi.fn().mockRejectedValue(new Error("Save failed"));
+      const { result } = renderHook(() => useEnvelopeForm({ ...defaultProps, onSave: mockOnSave }));
 
       // Set valid form data
       act(() => {
         result.current.updateFormData({
-          name: 'Test Envelope',
-          category: 'Food',
+          name: "Test Envelope",
+          category: "Food",
         });
       });
 
@@ -262,10 +254,10 @@ describe('useEnvelopeForm', () => {
     });
   });
 
-  describe('Form close handling', () => {
-    it('should close without confirmation when not dirty', () => {
+  describe("Form close handling", () => {
+    it("should close without confirmation when not dirty", () => {
       const mockOnClose = vi.fn();
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useEnvelopeForm({ ...defaultProps, onClose: mockOnClose })
       );
 
@@ -276,18 +268,18 @@ describe('useEnvelopeForm', () => {
       expect(mockOnClose).toHaveBeenCalled();
     });
 
-    it('should prompt for confirmation when dirty', () => {
+    it("should prompt for confirmation when dirty", () => {
       const mockConfirm = vi.fn().mockReturnValue(true);
       window.confirm = mockConfirm;
-      
+
       const mockOnClose = vi.fn();
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useEnvelopeForm({ ...defaultProps, onClose: mockOnClose })
       );
 
       // Make form dirty
       act(() => {
-        result.current.updateFormField('name', 'Test');
+        result.current.updateFormField("name", "Test");
       });
 
       act(() => {
@@ -298,18 +290,18 @@ describe('useEnvelopeForm', () => {
       expect(mockOnClose).toHaveBeenCalled();
     });
 
-    it('should not close when user cancels confirmation', () => {
+    it("should not close when user cancels confirmation", () => {
       const mockConfirm = vi.fn().mockReturnValue(false);
       window.confirm = mockConfirm;
-      
+
       const mockOnClose = vi.fn();
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useEnvelopeForm({ ...defaultProps, onClose: mockOnClose })
       );
 
       // Make form dirty
       act(() => {
-        result.current.updateFormField('name', 'Test');
+        result.current.updateFormField("name", "Test");
       });
 
       act(() => {
@@ -321,15 +313,15 @@ describe('useEnvelopeForm', () => {
     });
   });
 
-  describe('Form reset', () => {
-    it('should reset form to default for new envelope', () => {
+  describe("Form reset", () => {
+    it("should reset form to default for new envelope", () => {
       const { result } = renderHook(() => useEnvelopeForm(defaultProps));
 
       // Modify form
       act(() => {
         result.current.updateFormData({
-          name: 'Modified',
-          category: 'Food',
+          name: "Modified",
+          category: "Food",
         });
       });
 
@@ -340,29 +332,27 @@ describe('useEnvelopeForm', () => {
         result.current.resetForm();
       });
 
-      expect(result.current.formData.name).toBe('');
-      expect(result.current.formData.category).toBe('');
+      expect(result.current.formData.name).toBe("");
+      expect(result.current.formData.category).toBe("");
       expect(result.current.errors).toEqual({});
       expect(result.current.isDirty).toBe(false);
     });
 
-    it('should reset form to original envelope data when editing', () => {
+    it("should reset form to original envelope data when editing", () => {
       const envelope = {
-        id: 'test-id',
-        name: 'Original Name',
-        category: 'Food',
+        id: "test-id",
+        name: "Original Name",
+        category: "Food",
       };
 
-      const { result } = renderHook(() => 
-        useEnvelopeForm({ ...defaultProps, envelope })
-      );
+      const { result } = renderHook(() => useEnvelopeForm({ ...defaultProps, envelope }));
 
       // Modify form
       act(() => {
-        result.current.updateFormField('name', 'Modified Name');
+        result.current.updateFormField("name", "Modified Name");
       });
 
-      expect(result.current.formData.name).toBe('Modified Name');
+      expect(result.current.formData.name).toBe("Modified Name");
       expect(result.current.isDirty).toBe(true);
 
       // Reset form
@@ -370,17 +360,17 @@ describe('useEnvelopeForm', () => {
         result.current.resetForm();
       });
 
-      expect(result.current.formData.name).toBe('Original Name');
+      expect(result.current.formData.name).toBe("Original Name");
       expect(result.current.isDirty).toBe(false);
     });
   });
 
-  describe('Calculated amounts', () => {
-    it('should provide calculated amounts', () => {
+  describe("Calculated amounts", () => {
+    it("should provide calculated amounts", () => {
       const { result } = renderHook(() => useEnvelopeForm(defaultProps));
 
       act(() => {
-        result.current.updateFormField('monthlyAmount', '100');
+        result.current.updateFormField("monthlyAmount", "100");
       });
 
       expect(result.current.calculatedAmounts.monthlyAmount).toBe(100);
@@ -388,8 +378,8 @@ describe('useEnvelopeForm', () => {
     });
   });
 
-  describe('Submit button state', () => {
-    it('should determine if form can be submitted', () => {
+  describe("Submit button state", () => {
+    it("should determine if form can be submitted", () => {
       const { result } = renderHook(() => useEnvelopeForm(defaultProps));
 
       // Initially cannot submit (missing required fields)
@@ -398,27 +388,27 @@ describe('useEnvelopeForm', () => {
       // Set required fields
       act(() => {
         result.current.updateFormData({
-          name: 'Test Envelope',
-          category: 'Food',
+          name: "Test Envelope",
+          category: "Food",
         });
       });
 
       expect(result.current.canSubmit).toBe(true);
     });
 
-    it('should not allow submit when loading', () => {
+    it("should not allow submit when loading", () => {
       const { result } = renderHook(() => useEnvelopeForm(defaultProps));
 
       act(() => {
         result.current.updateFormData({
-          name: 'Test Envelope',
-          category: 'Food',
+          name: "Test Envelope",
+          category: "Food",
         });
       });
 
       // Simulate loading state during async operation
       expect(result.current.canSubmit).toBe(true);
-      
+
       // During actual submission, isLoading would be true
       // This is handled internally by the hook
     });

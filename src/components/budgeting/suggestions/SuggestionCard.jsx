@@ -31,12 +31,7 @@ const TYPE_ICONS = {
   decrease_envelope: TrendingDown,
 };
 
-const SuggestionCard = ({
-  suggestion,
-  onApply,
-  onDismiss,
-  isCompact = false,
-}) => {
+const SuggestionCard = ({ suggestion, onApply, onDismiss, isCompact = false }) => {
   const PriorityIcon = PRIORITY_ICONS[suggestion.priority] || Zap;
   const TypeIcon = TYPE_ICONS[suggestion.type] || Eye;
   const priorityColor = PRIORITY_COLORS[suggestion.priority] || "text-gray-500";
@@ -76,9 +71,7 @@ const SuggestionCard = ({
               <PriorityIcon className="h-3 w-3" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-gray-900 text-sm truncate">
-                {suggestion.title}
-              </p>
+              <p className="font-medium text-gray-900 text-sm truncate">{suggestion.title}</p>
               <p className="text-xs text-gray-600">
                 ${suggestion.suggestedAmount.toFixed(0)}/month
               </p>
@@ -113,23 +106,21 @@ const SuggestionCard = ({
             <PriorityIcon className="h-4 w-4" />
           </div>
           <div>
-            <h4 className="font-semibold text-gray-900 text-sm">
-              {suggestion.title}
-            </h4>
+            <h4 className="font-semibold text-gray-900 text-sm">{suggestion.title}</h4>
             <div className="flex items-center mt-1">
-              <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${
-                suggestion.priority === "high"
-                  ? "bg-red-100 text-red-800"
-                  : suggestion.priority === "medium"
-                  ? "bg-amber-100 text-amber-800"
-                  : "bg-blue-100 text-blue-800"
-              }`}>
+              <span
+                className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${
+                  suggestion.priority === "high"
+                    ? "bg-red-100 text-red-800"
+                    : suggestion.priority === "medium"
+                      ? "bg-amber-100 text-amber-800"
+                      : "bg-blue-100 text-blue-800"
+                }`}
+              >
                 <TypeIcon className="h-3 w-3 mr-1" />
                 {suggestion.priority} priority
               </span>
-              <span className="ml-2 text-xs text-gray-500">
-                {suggestion.impact}
-              </span>
+              <span className="ml-2 text-xs text-gray-500">{suggestion.impact}</span>
             </div>
           </div>
         </div>
@@ -142,13 +133,9 @@ const SuggestionCard = ({
         </button>
       </div>
 
-      <p className="text-sm text-gray-700 mb-2">
-        {suggestion.description}
-      </p>
+      <p className="text-sm text-gray-700 mb-2">{suggestion.description}</p>
 
-      <p className="text-xs text-gray-600 mb-3 italic">
-        {suggestion.reasoning}
-      </p>
+      <p className="text-xs text-gray-600 mb-3 italic">{suggestion.reasoning}</p>
 
       <div className="flex items-center justify-between">
         <div className="text-sm">

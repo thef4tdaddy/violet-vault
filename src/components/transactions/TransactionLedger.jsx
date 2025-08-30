@@ -6,7 +6,7 @@ import TransactionFilters from "./TransactionFilters";
 import TransactionTable from "./TransactionTable";
 import TransactionForm from "./TransactionForm";
 import ImportModal from "./import/ImportModal";
-import TransactionSplitter from "./TransactionSplitter";
+import TransactionSplitterV2 from "./TransactionSplitterV2";
 
 import { useTransactionFilters } from "../../hooks/transactions/useTransactionFilters";
 import { useTransactionForm } from "../../hooks/transactions/useTransactionForm";
@@ -18,9 +18,7 @@ import { useTransactions } from "../../hooks/common/useTransactions";
 import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
 import logger from "../../utils/common/logger";
 
-const TransactionLedger = ({
-  currentUser = { userName: "User", userColor: "#a855f7" },
-}) => {
+const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855f7" } }) => {
   // Enhanced TanStack Query integration with caching and optimistic updates
   const {
     transactions = [],
@@ -39,16 +37,10 @@ const TransactionLedger = ({
 
   // Handle bulk import by updating both store arrays
   const handleBulkImport = (newTransactions) => {
-    logger.debug(
-      "🔄 Bulk import called with transactions:",
-      newTransactions.length,
-    );
+    logger.debug("🔄 Bulk import called with transactions:", newTransactions.length);
     const updatedAllTransactions = [...transactions, ...newTransactions];
     setAllTransactions(updatedAllTransactions);
-    logger.debug(
-      "💾 Bulk import complete. Total transactions:",
-      updatedAllTransactions.length,
-    );
+    logger.debug("💾 Bulk import complete. Total transactions:", updatedAllTransactions.length);
   };
   const [showAddModal, setShowAddModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
@@ -65,13 +57,8 @@ const TransactionLedger = ({
   const pageSize = 10;
 
   // Custom hooks
-  const {
-    transactionForm,
-    setTransactionForm,
-    resetForm,
-    populateForm,
-    createTransaction,
-  } = useTransactionForm();
+  const { transactionForm, setTransactionForm, resetForm, populateForm, createTransaction } =
+    useTransactionForm();
 
   const {
     importData,
@@ -92,16 +79,13 @@ const TransactionLedger = ({
     typeFilter,
     envelopeFilter,
     sortBy,
-    sortOrder,
+    sortOrder
   );
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredTransactions.length / pageSize),
-  );
+  const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / pageSize));
   const paginatedTransactions = filteredTransactions.slice(
     (currentPage - 1) * pageSize,
-    currentPage * pageSize,
+    currentPage * pageSize
   );
 
   useEffect(() => {
@@ -156,10 +140,7 @@ const TransactionLedger = ({
         ...billEnvelope,
         lastPaidDate: billPayment.paidDate,
         lastPaidAmount: billPayment.amount,
-        currentBalance: Math.max(
-          0,
-          (billEnvelope.currentBalance || 0) - billPayment.amount,
-        ),
+        currentBalance: Math.max(0, (billEnvelope.currentBalance || 0) - billPayment.amount),
         isPaid: true,
         paidThisPeriod: true,
       };
@@ -167,10 +148,7 @@ const TransactionLedger = ({
     }
   };
 
-  const handleSplitTransaction = async (
-    originalTransaction,
-    splitTransactions,
-  ) => {
+  const handleSplitTransaction = async (originalTransaction, splitTransactions) => {
     try {
       // Delete the original transaction
       deleteTransaction(originalTransaction.id);
@@ -326,7 +304,7 @@ const TransactionLedger = ({
       />
 
       {/* Transaction Splitter Modal */}
-      <TransactionSplitter
+      <TransactionSplitterV2
         isOpen={!!splittingTransaction}
         onClose={() => setSplittingTransaction(null)}
         transaction={splittingTransaction}

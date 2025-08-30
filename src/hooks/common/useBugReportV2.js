@@ -45,12 +45,12 @@ const useBugReportV2 = (options = {}) => {
     try {
       // Initialize Highlight.io session
       await initializeHighlightSession();
-      
+
       // Auto-capture screenshot if enabled
       if (options.autoCapture && includeScreenshot) {
         await captureScreenshot();
       }
-      
+
       setIsModalOpen(true);
       setSubmitError(null);
       setSubmitResult(null);
@@ -92,7 +92,7 @@ const useBugReportV2 = (options = {}) => {
     try {
       logger.debug("Capturing screenshot for bug report");
       const screenshotData = await BugReportService.captureScreenshotSafely();
-      
+
       if (screenshotData) {
         setScreenshot(screenshotData);
         logger.info("Screenshot captured successfully");
@@ -113,11 +113,11 @@ const useBugReportV2 = (options = {}) => {
   const showScreenshotPreview = async () => {
     try {
       let screenshotData = screenshot;
-      
+
       if (!screenshotData) {
         screenshotData = await captureScreenshot();
       }
-      
+
       if (screenshotData) {
         const win = window.open();
         if (win) {
@@ -154,10 +154,10 @@ const useBugReportV2 = (options = {}) => {
     setSubmitError(null);
 
     try {
-      logger.debug("Submitting bug report", { 
+      logger.debug("Submitting bug report", {
         title: title || "Untitled",
         hasScreenshot: includeScreenshot && !!screenshot,
-        severity 
+        severity,
       });
 
       const reportOptions = {
@@ -185,7 +185,7 @@ const useBugReportV2 = (options = {}) => {
           provider: result.primaryProvider,
           screenshotStatus: result.screenshotStatus,
         });
-        
+
         logger.info("Bug report submitted successfully", {
           submissionId: result.submissionId,
           provider: result.primaryProvider,
@@ -256,7 +256,10 @@ const useBugReportV2 = (options = {}) => {
             H.start();
             logger.debug("Started new Highlight.io session for bug report");
           } catch (startError) {
-            logger.debug("Highlight.io start failed (session may already be active)", startError.message);
+            logger.debug(
+              "Highlight.io start failed (session may already be active)",
+              startError.message
+            );
           }
         } else {
           logger.debug("Highlight.io session already active - using existing session");
@@ -330,15 +333,15 @@ const useBugReportV2 = (options = {}) => {
    */
   const validateForm = () => {
     const errors = [];
-    
+
     if (!title.trim() && !description.trim()) {
       errors.push("Either title or description is required");
     }
-    
+
     if (title.length > 200) {
       errors.push("Title is too long (max 200 characters)");
     }
-    
+
     return {
       isValid: errors.length === 0,
       errors,
@@ -351,13 +354,13 @@ const useBugReportV2 = (options = {}) => {
   const getFormCompletion = () => {
     let completed = 0;
     const fields = [title, description, steps, expected, actual];
-    
-    fields.forEach(field => {
+
+    fields.forEach((field) => {
       if (field && field.trim()) completed++;
     });
-    
+
     if (screenshot && includeScreenshot) completed++;
-    
+
     return Math.round((completed / (fields.length + 1)) * 100);
   };
 

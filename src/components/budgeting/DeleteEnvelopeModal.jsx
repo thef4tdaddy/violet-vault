@@ -31,19 +31,13 @@ const DeleteEnvelopeModal = ({
               <Trash2 className="h-6 w-6 text-red-600" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">
-                Delete Envelope
-              </h3>
-              <p className="text-sm text-gray-600">
-                This action cannot be undone
-              </p>
+              <h3 className="text-lg font-semibold text-gray-900">Delete Envelope</h3>
+              <p className="text-sm text-gray-600">This action cannot be undone</p>
             </div>
           </div>
 
           <div className="mb-6">
-            <p className="text-gray-700 mb-4">
-              Are you sure you want to delete "{envelope.name}"?
-            </p>
+            <p className="text-gray-700 mb-4">Are you sure you want to delete "{envelope.name}"?</p>
 
             {/* Connected Bills Section */}
             {connectedBills.length > 0 && (
@@ -59,8 +53,7 @@ const DeleteEnvelopeModal = ({
                       key={bill.id}
                       className="text-sm text-yellow-700 bg-yellow-100 px-2 py-1 rounded"
                     >
-                      • {bill.name || bill.provider} - $
-                      {Math.abs(bill.amount || 0).toFixed(2)}
+                      • {bill.name || bill.provider} - ${Math.abs(bill.amount || 0).toFixed(2)}
                     </div>
                   ))}
                 </div>
@@ -106,8 +99,8 @@ const DeleteEnvelopeModal = ({
             {envelope.currentBalance > 0 && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
                 <p className="text-sm text-blue-800">
-                  💰 This envelope has ${envelope.currentBalance.toFixed(2)}.
-                  The money will be transferred to unassigned cash.
+                  💰 This envelope has ${envelope.currentBalance.toFixed(2)}. The money will be
+                  transferred to unassigned cash.
                 </p>
               </div>
             )}

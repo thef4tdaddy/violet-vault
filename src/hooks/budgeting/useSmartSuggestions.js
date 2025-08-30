@@ -31,10 +31,7 @@ const useSmartSuggestions = ({
 
   // Persist collapse state to localStorage
   useEffect(() => {
-    localStorage.setItem(
-      "smartSuggestions_collapsed",
-      JSON.stringify(isCollapsed)
-    );
+    localStorage.setItem("smartSuggestions_collapsed", JSON.stringify(isCollapsed));
   }, [isCollapsed]);
 
   // Generate suggestions based on current data and settings
@@ -52,14 +49,7 @@ const useSmartSuggestions = ({
       logger.error("Error generating smart suggestions:", error);
       return [];
     }
-  }, [
-    transactions,
-    envelopes,
-    analysisSettings,
-    dateRange,
-    dismissedSuggestions,
-    showDismissed,
-  ]);
+  }, [transactions, envelopes, analysisSettings, dateRange, dismissedSuggestions, showDismissed]);
 
   // Toggle collapse state
   const toggleCollapse = useCallback(() => {
@@ -124,10 +114,7 @@ const useSmartSuggestions = ({
         handleDismissSuggestion(suggestion.id);
       } catch (error) {
         logger.error("Error applying suggestion:", error);
-        globalToast.showError(
-          error.message || "Failed to apply suggestion",
-          "Application Error"
-        );
+        globalToast.showError(error.message || "Failed to apply suggestion", "Application Error");
       }
     },
     [onCreateEnvelope, onUpdateEnvelope]
@@ -138,7 +125,7 @@ const useSmartSuggestions = ({
     (suggestionId) => {
       setDismissedSuggestions((prev) => new Set([...prev, suggestionId]));
       onDismissSuggestion?.(suggestionId);
-      
+
       globalToast.showInfo("Suggestion dismissed", "Dismissed");
     },
     [onDismissSuggestion]
@@ -173,13 +160,10 @@ const useSmartSuggestions = ({
       { high: 0, medium: 0, low: 0 }
     );
 
-    const typeCounts = suggestions.reduce(
-      (acc, s) => {
-        acc[s.type] = (acc[s.type] || 0) + 1;
-        return acc;
-      },
-      {}
-    );
+    const typeCounts = suggestions.reduce((acc, s) => {
+      acc[s.type] = (acc[s.type] || 0) + 1;
+      return acc;
+    }, {});
 
     const potentialSavings = suggestions.reduce((sum, s) => {
       if (s.type === "decrease_envelope" && s.data.currentAmount && s.data.suggestedAmount) {
@@ -218,9 +202,9 @@ const useSmartSuggestions = ({
 
     // Computed values
     hasSuggestions: suggestions.length > 0,
-    highPrioritySuggestions: suggestions.filter(s => s.priority === "high"),
-    mediumPrioritySuggestions: suggestions.filter(s => s.priority === "medium"),
-    lowPrioritySuggestions: suggestions.filter(s => s.priority === "low"),
+    highPrioritySuggestions: suggestions.filter((s) => s.priority === "high"),
+    mediumPrioritySuggestions: suggestions.filter((s) => s.priority === "medium"),
+    lowPrioritySuggestions: suggestions.filter((s) => s.priority === "low"),
   };
 };
 
