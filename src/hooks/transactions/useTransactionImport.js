@@ -4,7 +4,8 @@ import {
   parseOFX,
   autoDetectFieldMapping,
 } from "../../utils/transactions/fileParser";
-import { autoFundingEngine } from "../../utils/budgeting/autoFundingEngine";
+// TODO: Re-implement auto-funding for transaction imports using new modular architecture
+// import { useAutoFunding } from "../budgeting/autofunding";
 import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
 
@@ -164,24 +165,25 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
         incomeCount: incomeTransactions.length,
       });
 
+      // TODO: Re-implement auto-funding for income transactions using new modular hooks
       // Process each income transaction for auto-funding
-      for (const transaction of incomeTransactions) {
-        try {
-          const autoFundingResult =
-            await autoFundingEngine.handleNewTransaction(transaction, budget);
-          if (autoFundingResult && autoFundingResult.success) {
-            autoFundingPromises.push({
-              transaction,
-              result: autoFundingResult,
-            });
-          }
-        } catch (error) {
-          logger.error("Auto-funding failed for imported transaction", {
-            transactionId: transaction.id,
-            error: error.message,
-          });
-        }
-      }
+      // for (const transaction of incomeTransactions) {
+      //   try {
+      //     const autoFundingResult =
+      //       await autoFundingEngine.handleNewTransaction(transaction, budget);
+      //     if (autoFundingResult && autoFundingResult.success) {
+      //       autoFundingPromises.push({
+      //         transaction,
+      //         result: autoFundingResult,
+      //       });
+      //     }
+      //   } catch (error) {
+      //     logger.error("Auto-funding failed for imported transaction", {
+      //       transactionId: transaction.id,
+      //       error: error.message,
+      //     });
+      //   }
+      // }
     }
 
     setAutoFundingResults(autoFundingPromises);
