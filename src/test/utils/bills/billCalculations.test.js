@@ -6,7 +6,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   normalizeBillDate,
   calculateDaysUntilDue,
-  determineBillUrgency,
+  calculateBillUrgency as determineBillUrgency,
   processBillCalculations,
   categorizeBills,
   calculateBillTotals,
