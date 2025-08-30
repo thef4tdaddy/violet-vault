@@ -1,6 +1,6 @@
 import React from "react";
 import { Bug, Camera, Send, X, AlertCircle } from "lucide-react";
-import useBugReport from "../../hooks/common/useBugReport";
+import useBugReportCompat from "../../hooks/common/useBugReportCompat";
 import useToast from "../../hooks/common/useToast";
 
 /**
@@ -21,7 +21,7 @@ const BugReportButton = () => {
     setScreenshot,
     submitReport,
     previewScreenshot,
-  } = useBugReport();
+  } = useBugReportCompat();
 
   const { addToast } = useToast();
 
