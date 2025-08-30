@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { globalToast } from "../../stores/ui/toastStore";
 import { useAuth } from "../../stores/auth/authStore";
 import { useConfirm } from "../common/useConfirm";
-import { useEditLock } from "../common/useEditLock";
+import useEditLock from "../common/useEditLock";
 import { initializeEditLocks } from "../../services/editLockService";
 import {
   validateAccountForm,
