@@ -224,21 +224,172 @@ export class SystemInfoService {
   }
 
   /**
-   * Get recent JavaScript errors from console
-   * @returns {Array}
+   * Get recent JavaScript errors and console logs
+   * @returns {Object}
    */
   static getRecentErrors() {
     try {
-      // This would require setting up a global error listener
-      // For now, return empty array with note
-      return {
-        note: "Error collection requires global error listener setup",
+      const errorData = {
         hasGlobalHandler: typeof window.onerror === "function",
         hasUnhandledRejectionHandler: typeof window.onunhandledrejection === "function",
+        recentErrors: this.getStoredErrors(),
+        consoleLogs: this.getStoredConsoleLogs(),
       };
+
+      return errorData;
     } catch (error) {
       logger.warn("Error collecting recent errors", error);
+      return {
+        hasGlobalHandler: false,
+        hasUnhandledRejectionHandler: false,
+        recentErrors: [],
+        consoleLogs: [],
+        error: error.message,
+      };
+    }
+  }
+
+  /**
+   * Get stored errors from session storage
+   * @returns {Array}
+   */
+  static getStoredErrors() {
+    try {
+      const stored = sessionStorage.getItem("violet-vault-errors");
+      return stored ? JSON.parse(stored) : [];
+    } catch (error) {
       return [];
+    }
+  }
+
+  /**
+   * Get stored console logs from session storage
+   * @returns {Array}
+   */
+  static getStoredConsoleLogs() {
+    try {
+      const stored = sessionStorage.getItem("violet-vault-console-logs");
+      return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  /**
+   * Initialize console log and error capture
+   * Should be called early in app initialization
+   */
+  static initializeErrorCapture() {
+    try {
+      // Store original console methods
+      if (!window.originalConsoleLog) {
+        window.originalConsoleLog = console.log;
+        window.originalConsoleError = console.error;
+        window.originalConsoleWarn = console.warn;
+      }
+
+      // Array to store recent logs (max 50)
+      const maxLogs = 50;
+
+      // Intercept console.log
+      console.log = (...args) => {
+        window.originalConsoleLog(...args);
+        this.storeConsoleLog("log", args);
+      };
+
+      // Intercept console.error
+      console.error = (...args) => {
+        window.originalConsoleError(...args);
+        this.storeConsoleLog("error", args);
+        this.storeError("console.error", args);
+      };
+
+      // Intercept console.warn
+      console.warn = (...args) => {
+        window.originalConsoleWarn(...args);
+        this.storeConsoleLog("warn", args);
+      };
+
+      // Global error handler
+      window.onerror = (message, source, lineno, colno, error) => {
+        this.storeError("javascript", {
+          message,
+          source,
+          lineno,
+          colno,
+          stack: error?.stack,
+        });
+        return false; // Don't prevent default error handling
+      };
+
+      // Unhandled promise rejection handler
+      window.onunhandledrejection = (event) => {
+        this.storeError("unhandledrejection", {
+          reason: event.reason,
+          stack: event.reason?.stack,
+        });
+      };
+
+      logger.info("Console and error capture initialized");
+    } catch (error) {
+      logger.error("Failed to initialize error capture", error);
+    }
+  }
+
+  /**
+   * Store console log entry
+   * @param {string} level - Log level (log, error, warn)
+   * @param {Array} args - Console arguments
+   */
+  static storeConsoleLog(level, args) {
+    try {
+      const logs = this.getStoredConsoleLogs();
+      const logEntry = {
+        timestamp: new Date().toISOString(),
+        level,
+        message: args
+          .map((arg) => (typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)))
+          .join(" "),
+        args: args.length,
+      };
+
+      logs.push(logEntry);
+
+      // Keep only recent logs
+      if (logs.length > 50) {
+        logs.splice(0, logs.length - 50);
+      }
+
+      sessionStorage.setItem("violet-vault-console-logs", JSON.stringify(logs));
+    } catch (error) {
+      // Silently fail to avoid infinite loops
+    }
+  }
+
+  /**
+   * Store error entry
+   * @param {string} type - Error type
+   * @param {Object} errorData - Error details
+   */
+  static storeError(type, errorData) {
+    try {
+      const errors = this.getStoredErrors();
+      const errorEntry = {
+        timestamp: new Date().toISOString(),
+        type,
+        data: errorData,
+      };
+
+      errors.push(errorEntry);
+
+      // Keep only recent errors
+      if (errors.length > 20) {
+        errors.splice(0, errors.length - 20);
+      }
+
+      sessionStorage.setItem("violet-vault-errors", JSON.stringify(errors));
+    } catch (error) {
+      // Silently fail to avoid infinite loops
     }
   }
 
@@ -332,6 +483,19 @@ export class SystemInfoService {
       return total;
     } catch (error) {
       return 0;
+    }
+  }
+
+  /**
+   * Clear stored logs and errors (for privacy)
+   */
+  static clearStoredLogs() {
+    try {
+      sessionStorage.removeItem("violet-vault-errors");
+      sessionStorage.removeItem("violet-vault-console-logs");
+      logger.info("Stored logs and errors cleared");
+    } catch (error) {
+      logger.warn("Failed to clear stored logs", error);
     }
   }
 
