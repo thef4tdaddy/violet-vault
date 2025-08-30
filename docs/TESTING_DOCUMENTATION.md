@@ -561,11 +561,22 @@ Tests are configured using Vitest with:
 
 ## Test Quality Metrics
 
-### Current Test Coverage
-- **Services**: 18/18 database service tests passing
+### Current Test Coverage (December 2024)
+- **Total Tests**: 369 across 17 test files
+- **Passing Tests**: 316 (85.6% pass rate)
+- **Failing Tests**: 53 (14.4% - primarily ES module compatibility issues)
+
+#### Fully Passing Test Suites:
+- **Services**: 39/39 tests passing (budgetDatabaseService + budgetHistoryService)
 - **Query Utilities**: 35/35 query key tests passing  
-- **Prefetch Helpers**: 13/17 tests passing (4 minor mock issues)
-- **Optimistic Helpers**: 17/19 tests passing (2 minor mock issues)
+- **Account Management**: 82/82 tests passing (validation + helpers)
+- **Bill Calculations**: 36/36 tests passing (recently fixed date/timezone issues)
+- **Budget Utilities**: 91/91 tests passing (Issue #505 refactoring tests)
+
+#### Test Suites with Issues:
+- **Hook Integration Tests**: ES module/CommonJS mixing issues in test environment
+- **Form Tests**: Similar ES module compatibility problems
+- **Helper Integration**: Test environment configuration issues
 
 ### Test Reliability
 - ✅ All critical service functionality covered
