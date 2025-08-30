@@ -1,5 +1,5 @@
 // Consolidated budgeting utilities
-export { default as autoFundingEngine } from "./autoFundingEngine.js";
+// autoFundingEngine removed - replaced with modular autofunding utilities and hooks
 export { default as billEnvelopeCalculations } from "./billEnvelopeCalculations.js";
 export { default as envelopeCalculations } from "./envelopeCalculations.js";
 export { default as envelopeIntegrityChecker } from "./envelopeIntegrityChecker.js";
