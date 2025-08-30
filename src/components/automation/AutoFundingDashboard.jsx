@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useConfirm } from "../../hooks/common/useConfirm";
 import { globalToast } from "../../stores/ui/toastStore";
 import {
@@ -23,38 +23,33 @@ import {
   RotateCcw,
 } from "lucide-react";
 import AutoFundingRuleBuilder from "./AutoFundingRuleBuilder";
-import {
-  autoFundingEngine,
-  RULE_TYPES,
-  TRIGGER_TYPES,
-} from "../../utils/budgeting/autoFundingEngine";
+import { RULE_TYPES, TRIGGER_TYPES } from "../../utils/budgeting/autofunding";
+import { useAutoFunding } from "../../hooks/budgeting/autofunding";
 import { useBudgetStore } from "../../stores/ui/uiStore";
 import logger from "../../utils/common/logger";
 
 const AutoFundingDashboard = ({ isOpen, onClose }) => {
   const budget = useBudgetStore();
   const confirm = useConfirm();
-  const [rules, setRules] = useState([]);
-  const [executionHistory, setExecutionHistory] = useState([]);
+  const {
+    rules,
+    executeRules,
+    addRule,
+    updateRule,
+    deleteRule,
+    toggleRule,
+    getHistory,
+  } = useAutoFunding();
   const [isExecuting, setIsExecuting] = useState(false);
   const [showRuleBuilder, setShowRuleBuilder] = useState(false);
   const [editingRule, setEditingRule] = useState(null);
   const [activeTab, setActiveTab] = useState("rules"); // 'rules' | 'history'
   const [showExecutionDetails, setShowExecutionDetails] = useState(null);
 
-  // Load rules and history on component mount
-  useEffect(() => {
-    loadRulesAndHistory();
-  }, []);
+  // Get execution history
+  const executionHistory = getHistory(20);
 
-  const loadRulesAndHistory = () => {
-    try {
-      setRules(autoFundingEngine.getRules());
-      setExecutionHistory(autoFundingEngine.getExecutionHistory(20));
-    } catch (error) {
-      logger.error("Failed to load auto-funding data", error);
-    }
-  };
+  // No need to load rules and history manually - handled by the hook
 
   const handleCreateRule = () => {
     setEditingRule(null);
@@ -69,11 +64,10 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
   const handleSaveRule = async (ruleData) => {
     try {
       if (editingRule) {
-        autoFundingEngine.updateRule(editingRule.id, ruleData);
+        updateRule(editingRule.id, ruleData);
       } else {
-        autoFundingEngine.addRule(ruleData);
+        addRule(ruleData);
       }
-      loadRulesAndHistory();
       setShowRuleBuilder(false);
       setEditingRule(null);
     } catch (error) {
@@ -97,8 +91,7 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
 
     if (confirmed) {
       try {
-        autoFundingEngine.deleteRule(ruleId);
-        loadRulesAndHistory();
+        deleteRule(ruleId);
       } catch (error) {
         logger.error("Failed to delete rule", error);
         globalToast.showError(
@@ -111,11 +104,7 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
 
   const handleToggleRule = (ruleId) => {
     try {
-      const rule = autoFundingEngine.rules.get(ruleId);
-      if (rule) {
-        autoFundingEngine.updateRule(ruleId, { enabled: !rule.enabled });
-        loadRulesAndHistory();
-      }
+      toggleRule(ruleId);
     } catch (error) {
       logger.error("Failed to toggle rule", error);
     }
@@ -136,7 +125,7 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
         },
       };
 
-      const result = await autoFundingEngine.executeRules(context, budget);
+      const result = await executeRules(context, budget);
 
       if (result.success) {
         const totalFunded = result.execution.totalFunded || 0;
@@ -159,8 +148,6 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
           "Execution Failed",
         );
       }
-
-      loadRulesAndHistory();
     } catch (error) {
       logger.error("Failed to execute rules", error);
       globalToast.showError(

@@ -18,37 +18,20 @@ import {
   RULE_TYPES,
   TRIGGER_TYPES,
   CONDITION_TYPES,
-  AutoFundingRule,
-} from "../../utils/budgeting/autoFundingEngine";
+  createDefaultRule,
+  validateRule,
+} from "../../utils/budgeting/autofunding";
 
 const AutoFundingRuleBuilder = ({
   isOpen,
   onClose,
   envelopes = [],
-  unassignedCash = 0,
   onSaveRule,
   editingRule = null,
 }) => {
   const [step, setStep] = useState(1);
-  const [ruleData, setRuleData] = useState({
-    name: "",
-    description: "",
-    type: RULE_TYPES.FIXED_AMOUNT,
-    trigger: TRIGGER_TYPES.MANUAL,
-    priority: 100,
-    enabled: true,
-    config: {
-      sourceType: "unassigned",
-      sourceId: null,
-      targetType: "envelope",
-      targetId: null,
-      targetIds: [],
-      amount: 0,
-      percentage: 0,
-      conditions: [],
-      scheduleConfig: {},
-    },
-  });
+  const [ruleData, setRuleData] = useState(() => createDefaultRule());
+  const [validationErrors, setValidationErrors] = useState([]);
   const [errors, setErrors] = useState({});
 
   // Initialize with editing rule data
@@ -66,26 +49,9 @@ const AutoFundingRuleBuilder = ({
     if (!isOpen) {
       setStep(1);
       setErrors({});
+      setValidationErrors([]);
       if (!editingRule) {
-        setRuleData({
-          name: "",
-          description: "",
-          type: RULE_TYPES.FIXED_AMOUNT,
-          trigger: TRIGGER_TYPES.MANUAL,
-          priority: 100,
-          enabled: true,
-          config: {
-            sourceType: "unassigned",
-            sourceId: null,
-            targetType: "envelope",
-            targetId: null,
-            targetIds: [],
-            amount: 0,
-            percentage: 0,
-            conditions: [],
-            scheduleConfig: {},
-          },
-        });
+        setRuleData(createDefaultRule());
       }
     }
   }, [isOpen, editingRule]);
@@ -197,14 +163,23 @@ const AutoFundingRuleBuilder = ({
   };
 
   const handleSave = () => {
-    if (validateStep(3)) {
-      const rule = editingRule
-        ? { ...ruleData, id: editingRule.id }
-        : new AutoFundingRule(ruleData);
+    // Validate the rule using our extracted utility
+    const validation = validateRule(ruleData);
 
-      onSaveRule(rule);
-      onClose();
+    if (!validation.isValid) {
+      setValidationErrors(validation.errors);
+      return;
     }
+
+    setValidationErrors([]);
+
+    // Create the rule data to save
+    const ruleToSave = editingRule
+      ? { ...ruleData, id: editingRule.id, updatedAt: new Date().toISOString() }
+      : ruleData;
+
+    onSaveRule(ruleToSave);
+    onClose();
   };
 
   const addCondition = () => {
