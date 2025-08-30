@@ -260,6 +260,9 @@ export class BugReportAPIService {
       JSON.stringify(reportData.systemInfo, null, 2),
       "```",
       "",
+      "## Console Logs & Errors",
+      this.formatConsoleLogsForGitHub(reportData.systemInfo?.errors),
+      "",
     ];
 
     if (reportData.logs && reportData.logs.length > 0) {
@@ -273,7 +276,19 @@ export class BugReportAPIService {
     }
 
     if (reportData.screenshot) {
-      sections.push("## Screenshot", `![Bug Screenshot](${reportData.screenshot})`, "");
+      // GitHub Issues can't display base64 data URLs directly
+      // Instead, provide information about the screenshot
+      const screenshotInfo = reportData.screenshot.includes("data:image")
+        ? "Screenshot captured (base64 data - view in bug report tool)"
+        : reportData.screenshot;
+
+      sections.push(
+        "## Screenshot",
+        reportData.screenshot.startsWith("data:image")
+          ? `📸 Screenshot captured (${reportData.screenshot.length} chars) - available in original bug report data`
+          : `![Bug Screenshot](${reportData.screenshot})`,
+        ""
+      );
     }
 
     sections.push(
@@ -287,6 +302,50 @@ export class BugReportAPIService {
     );
 
     return sections.join("\n");
+  }
+
+  /**
+   * Format console logs and errors for GitHub issue
+   * @param {Object} errors - Error and log data from SystemInfoService
+   * @returns {string} Formatted console logs section
+   */
+  static formatConsoleLogsForGitHub(errors) {
+    if (!errors) {
+      return "No console logs captured";
+    }
+
+    const sections = [];
+
+    // Recent Errors
+    if (errors.recentErrors && errors.recentErrors.length > 0) {
+      sections.push("### Recent JavaScript Errors");
+      sections.push("```javascript");
+      errors.recentErrors.slice(-10).forEach((error) => {
+        sections.push(`[${error.timestamp}] ${error.type}: ${JSON.stringify(error.data, null, 2)}`);
+      });
+      sections.push("```");
+      sections.push("");
+    }
+
+    // Console Logs
+    if (errors.consoleLogs && errors.consoleLogs.length > 0) {
+      sections.push("### Recent Console Logs");
+      sections.push("```");
+      errors.consoleLogs.slice(-20).forEach((log) => {
+        sections.push(`[${log.timestamp}] ${log.level.toUpperCase()}: ${log.message}`);
+      });
+      sections.push("```");
+      sections.push("");
+    }
+
+    // Error Handler Status
+    sections.push("### Error Capture Status");
+    sections.push(`- Global Error Handler: ${errors.hasGlobalHandler ? "✅" : "❌"}`);
+    sections.push(
+      `- Unhandled Rejection Handler: ${errors.hasUnhandledRejectionHandler ? "✅" : "❌"}`
+    );
+
+    return sections.length > 0 ? sections.join("\n") : "No console logs or errors captured";
   }
 
   /**
