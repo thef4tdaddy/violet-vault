@@ -115,8 +115,21 @@ export const useBillManager = ({
       }
     });
 
+    logger.debug("🔍 useBillManager bills processing:", {
+      transactionBills: billsFromTransactions?.length || 0,
+      tanStackBills: tanStackBills?.length || 0,
+      budgetBills: budget.bills?.length || 0,
+      combinedBills: combinedBills?.length || 0,
+      sampleRawBill: combinedBills?.[0] ? {
+        id: combinedBills[0].id,
+        name: combinedBills[0].name,
+        dueDate: combinedBills[0].dueDate,
+        isPaid: combinedBills[0].isPaid
+      } : null
+    });
+
     // Process each bill with calculations and recurring logic
-    return combinedBills.map((bill) => {
+    const processedBills = combinedBills.map((bill) => {
       // Handle recurring bill logic using utility
       const processedBill = processRecurringBill(bill, (updatedBill) => {
         if (onUpdateBill) {
@@ -136,10 +149,41 @@ export const useBillManager = ({
       // Apply calculations (days until due, urgency)
       return processBillCalculations(processedBill);
     });
+
+    logger.debug("🔍 useBillManager bills processed:", {
+      processedCount: processedBills?.length || 0,
+      sampleProcessedBill: processedBills?.[0] ? {
+        id: processedBills[0].id,
+        name: processedBills[0].name,
+        dueDate: processedBills[0].dueDate,
+        daysUntilDue: processedBills[0].daysUntilDue,
+        isPaid: processedBills[0].isPaid,
+        urgency: processedBills[0].urgency
+      } : null
+    });
+
+    return processedBills;
   }, [transactions, tanStackBills, budget.bills, onUpdateBill, updateBill]);
 
   // Categorize bills into upcoming, overdue, paid
-  const categorizedBills = useMemo(() => categorizeBills(bills), [bills]);
+  const categorizedBills = useMemo(() => {
+    const result = categorizeBills(bills);
+    logger.debug("🔍 useBillManager categorizedBills:", {
+      allBills: bills?.length || 0,
+      upcoming: result.upcoming?.length || 0,
+      overdue: result.overdue?.length || 0,
+      paid: result.paid?.length || 0,
+      sampleBill: bills?.[0] ? {
+        id: bills[0].id,
+        name: bills[0].name,
+        dueDate: bills[0].dueDate,
+        daysUntilDue: bills[0].daysUntilDue,
+        isPaid: bills[0].isPaid,
+        urgency: bills[0].urgency
+      } : null
+    });
+    return result;
+  }, [bills]);
 
   // Calculate totals for each category
   const totals = useMemo(() => calculateBillTotals(categorizedBills), [categorizedBills]);
@@ -147,7 +191,14 @@ export const useBillManager = ({
   // Apply filters to bills
   const filteredBills = useMemo(() => {
     const billsToFilter = categorizedBills[viewMode] || categorizedBills.all;
-    return filterBills(billsToFilter, filterOptions);
+    const result = filterBills(billsToFilter, filterOptions);
+    logger.debug("🔍 useBillManager filteredBills:", {
+      viewMode,
+      billsToFilter: billsToFilter?.length || 0,
+      filteredCount: result?.length || 0,
+      filterOptions
+    });
+    return result;
   }, [categorizedBills, viewMode, filterOptions]);
 
   // Initialize bill operations hook
