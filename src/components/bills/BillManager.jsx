@@ -377,6 +377,9 @@ const BillManager = ({
                 ? "Get started by adding a new bill."
                 : "Try switching to a different view or adjusting filters."}
             </p>
+            <div className="mt-4 text-xs text-gray-400 font-mono">
+              DEBUG: Bills={bills.length}, Categorized={JSON.stringify(Object.keys(categorizedBills).map(k => `${k}:${categorizedBills[k]?.length || 0}`))}, ViewMode={viewMode}, Filtered={filteredBills.length}
+            </div>
           </div>
         )}
       </div>
