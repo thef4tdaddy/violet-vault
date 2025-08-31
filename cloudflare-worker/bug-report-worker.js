@@ -144,6 +144,18 @@ async function processBugReport(bugReport, env) {
     customData 
   } = bugReport;
 
+  // Debug logging to understand what data we're receiving
+  console.log("Bug report data received:", {
+    hasTitle: !!title,
+    hasDescription: !!description,
+    hasSteps: !!steps,
+    hasScreenshot: !!screenshot,
+    severity,
+    hasSystemInfo: !!systemInfo,
+    systemInfoKeys: systemInfo ? Object.keys(systemInfo) : null,
+    hasCustomData: !!customData
+  });
+
   // Store screenshot if provided
   let screenshotUrl = null;
   if (screenshot) {

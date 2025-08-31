@@ -105,6 +105,9 @@ export class BugReportAPIService {
                 ),
           url: String(reportData.systemInfo?.url || window.location.href), // Ensure URL is always a string
           timestamp: reportData.systemInfo?.timestamp || new Date().toISOString(),
+          
+          // Add page context from contextInfo for worker compatibility
+          pageContext: reportData.contextInfo || null,
 
           // Safely pass through diagnostic data, filtering out potentially problematic fields
           ...(reportData.systemInfo && typeof reportData.systemInfo === "object"

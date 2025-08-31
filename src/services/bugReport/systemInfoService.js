@@ -38,7 +38,38 @@ export class SystemInfoService {
    */
   static getBrowserInfo() {
     try {
+      // Parse browser name and version from user agent
+      const userAgent = navigator.userAgent;
+      let browserName = "Unknown";
+      let browserVersion = "";
+      let engine = "Unknown";
+      
+      if (userAgent.includes("Chrome/") && !userAgent.includes("Edg/")) {
+        browserName = "Chrome";
+        const match = userAgent.match(/Chrome\/([0-9.]+)/);
+        browserVersion = match ? match[1] : "";
+        engine = "Blink";
+      } else if (userAgent.includes("Firefox/")) {
+        browserName = "Firefox";
+        const match = userAgent.match(/Firefox\/([0-9.]+)/);
+        browserVersion = match ? match[1] : "";
+        engine = "Gecko";
+      } else if (userAgent.includes("Safari/") && !userAgent.includes("Chrome/")) {
+        browserName = "Safari";
+        const match = userAgent.match(/Version\/([0-9.]+)/);
+        browserVersion = match ? match[1] : "";
+        engine = "WebKit";
+      } else if (userAgent.includes("Edg/")) {
+        browserName = "Edge";
+        const match = userAgent.match(/Edg\/([0-9.]+)/);
+        browserVersion = match ? match[1] : "";
+        engine = "Blink";
+      }
+      
       return {
+        name: browserName,
+        version: browserVersion,
+        engine: engine,
         userAgent: navigator.userAgent,
         language: navigator.language,
         languages: navigator.languages || [],
