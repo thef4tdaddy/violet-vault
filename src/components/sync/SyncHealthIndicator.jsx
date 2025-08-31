@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { getQuickSyncStatus } from "../../utils/sync/masterSyncValidator";
 import { cloudSyncService } from "../../services/cloudSyncService";
 import logger from "../../utils/common/logger";
+import { AlertTriangle, RefreshCw, Wrench } from "lucide-react";
 
 const SyncHealthIndicator = () => {
   const [syncStatus, setSyncStatus] = useState({
@@ -13,6 +14,8 @@ const SyncHealthIndicator = () => {
 
   const [showDetails, setShowDetails] = useState(false);
   const [isBackgroundSyncing, setIsBackgroundSyncing] = useState(false);
+  const [isRecovering, setIsRecovering] = useState(false);
+  const [recoveryResult, setRecoveryResult] = useState(null);
   const dropdownRef = useRef(null);
 
   // Check sync health on component mount and periodically
@@ -204,6 +207,42 @@ const SyncHealthIndicator = () => {
     }
   };
 
+  const runCorruptionRecovery = async () => {
+    if (typeof window !== "undefined" && window.forceCloudDataReset) {
+      setIsRecovering(true);
+      setRecoveryResult(null);
+      
+      try {
+        logger.info("🚨 Running corruption recovery from UI...");
+        const result = await window.forceCloudDataReset();
+        
+        setRecoveryResult(result);
+        
+        if (result.success) {
+          logger.info("✅ Corruption recovery completed successfully");
+          // Recheck sync health after successful recovery
+          setTimeout(() => {
+            checkSyncHealth();
+          }, 2000);
+        } else {
+          logger.error("❌ Corruption recovery failed:", result.error);
+        }
+      } catch (error) {
+        logger.error("Corruption recovery error:", error);
+        setRecoveryResult({
+          success: false,
+          error: error.message || "Recovery failed"
+        });
+      } finally {
+        setIsRecovering(false);
+        // Clear recovery result after 5 seconds
+        setTimeout(() => {
+          setRecoveryResult(null);
+        }, 5000);
+      }
+    }
+  };
+
   return (
     <div className="relative">
       {/* Main Health Indicator */}
@@ -218,10 +257,14 @@ const SyncHealthIndicator = () => {
 
       {/* Details Dropdown */}
       {showDetails && (
-        <div
-          ref={dropdownRef}
-          className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50"
-        >
+        <>
+          {/* Backdrop */}
+          <div className="fixed inset-0 z-40" onClick={() => setShowDetails(false)} />
+          {/* Dropdown Menu */}
+          <div
+            ref={dropdownRef}
+            className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50"
+          >
           <div className="p-4">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -297,21 +340,71 @@ const SyncHealthIndicator = () => {
               )}
             </div>
 
-            <div className="mt-4 flex space-x-2">
-              <button
-                onClick={checkSyncHealth}
-                disabled={syncStatus.isLoading}
-                className="flex-1 px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {syncStatus.isLoading ? "Checking..." : "Recheck"}
-              </button>
+            <div className="mt-4 space-y-2">
+              {/* Primary actions */}
+              <div className="flex space-x-2">
+                <button
+                  onClick={checkSyncHealth}
+                  disabled={syncStatus.isLoading}
+                  className="flex-1 px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-1"
+                >
+                  <RefreshCw className={`w-3 h-3 ${syncStatus.isLoading ? 'animate-spin' : ''}`} />
+                  <span>{syncStatus.isLoading ? "Checking..." : "Recheck"}</span>
+                </button>
 
-              <button
-                onClick={runFullValidation}
-                className="flex-1 px-3 py-2 text-sm bg-purple-500 text-white rounded hover:bg-purple-600"
-              >
-                Full Test
-              </button>
+                <button
+                  onClick={runFullValidation}
+                  className="flex-1 px-3 py-2 text-sm bg-purple-500 text-white rounded hover:bg-purple-600 flex items-center justify-center space-x-1"
+                >
+                  <Wrench className="w-3 h-3" />
+                  <span>Full Test</span>
+                </button>
+              </div>
+
+              {/* Corruption recovery section */}
+              <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center space-x-2 mb-2">
+                  <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Data Recovery
+                  </span>
+                </div>
+                
+                <button
+                  onClick={runCorruptionRecovery}
+                  disabled={isRecovering}
+                  className="w-full px-3 py-2 text-sm bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-1"
+                  title="Clear corrupted cloud data and force re-upload from local data"
+                >
+                  <RefreshCw className={`w-3 h-3 ${isRecovering ? 'animate-spin' : ''}`} />
+                  <span>{isRecovering ? "Recovering..." : "Fix Corruption"}</span>
+                </button>
+                
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">
+                  Use if sync errors persist (clears cloud data)
+                </p>
+
+                {/* Recovery result display */}
+                {recoveryResult && (
+                  <div className={`mt-2 p-2 rounded text-xs ${
+                    recoveryResult.success 
+                      ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-l-4 border-green-500'
+                      : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-l-4 border-red-500'
+                  }`}>
+                    {recoveryResult.success ? (
+                      <div>
+                        <div className="font-medium">✅ Recovery Successful</div>
+                        <div className="mt-1">{recoveryResult.message}</div>
+                      </div>
+                    ) : (
+                      <div>
+                        <div className="font-medium">❌ Recovery Failed</div>
+                        <div className="mt-1">{recoveryResult.error}</div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
@@ -321,6 +414,7 @@ const SyncHealthIndicator = () => {
             </div>
           </div>
         </div>
+        </>
       )}
     </div>
   );
