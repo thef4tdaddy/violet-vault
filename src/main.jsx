@@ -17,10 +17,7 @@ import { fixMetadata } from "./utils/common/fixMetadata.js";
 import { runImmediateSyncHealthCheck } from "./utils/sync/syncHealthChecker.js";
 import syncEdgeCaseTester from "./utils/sync/syncEdgeCaseTester.js";
 import { validateAllSyncFlows } from "./utils/sync/syncFlowValidator.js";
-import {
-  runMasterSyncValidation,
-  getQuickSyncStatus,
-} from "./utils/sync/masterSyncValidator.js";
+import { runMasterSyncValidation, getQuickSyncStatus } from "./utils/sync/masterSyncValidator.js";
 import { fixAutoAllocateUndefined } from "./utils/common/fixAutoAllocateUndefined.js";
 
 if (
@@ -41,12 +38,8 @@ if (
 
   // Bug report testing tools
   window.testBugReportCapture = async () => {
-    const { SystemInfoService } = await import(
-      "./services/bugReport/systemInfoService.js"
-    );
-    const { ScreenshotService } = await import(
-      "./services/bugReport/screenshotService.js"
-    );
+    const { SystemInfoService } = await import("./services/bugReport/systemInfoService.js");
+    const { ScreenshotService } = await import("./services/bugReport/screenshotService.js");
 
     console.log("🐛 Testing bug report capture...");
 
@@ -58,13 +51,8 @@ if (
     // Test screenshot capture
     try {
       const screenshot = await ScreenshotService.captureScreenshot();
-      const info = screenshot
-        ? ScreenshotService.getScreenshotInfo(screenshot)
-        : null;
-      console.log(
-        "📸 Screenshot capture:",
-        info ? `Success (${info.sizeKB}KB)` : "Failed",
-      );
+      const info = screenshot ? ScreenshotService.getScreenshotInfo(screenshot) : null;
+      console.log("📸 Screenshot capture:", info ? `Success (${info.sizeKB}KB)` : "Failed");
       return {
         success: true,
         errors,
@@ -91,5 +79,5 @@ SystemInfoService.initializeErrorCapture();
 ReactDOM.createRoot(document.getElementById("root")).render(
   <QueryClientProvider client={queryClient}>
     <App />
-  </QueryClientProvider>,
+  </QueryClientProvider>
 );
