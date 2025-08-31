@@ -245,6 +245,22 @@ class ChunkedSyncService {
         this.encryptionKey
       );
 
+      // DEBUG: Check encryption result structure
+      logger.error("🔍 DEBUG: encryptedManifest structure", {
+        encryptedManifest,
+        hasEncryptedData: !!encryptedManifest?.encryptedData,
+        hasIv: !!encryptedManifest?.iv,
+        encryptedDataType: typeof encryptedManifest?.encryptedData,
+        ivType: typeof encryptedManifest?.iv,
+        encryptedDataLength: encryptedManifest?.encryptedData?.length || 0,
+        ivLength: encryptedManifest?.iv?.length || 0,
+        manifestKeys: encryptedManifest ? Object.keys(encryptedManifest) : [],
+      });
+
+      if (!encryptedManifest?.encryptedData || !encryptedManifest?.iv) {
+        throw new Error(`Encryption failed: missing properties - hasEncryptedData: ${!!encryptedManifest?.encryptedData}, hasIv: ${!!encryptedManifest?.iv}`);
+      }
+
       const mainDocument = {
         ...chunkedData,
         _manifest: {
