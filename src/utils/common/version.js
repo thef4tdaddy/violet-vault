@@ -195,7 +195,7 @@ const formatCommitTimestamp = (timestamp, environment) => {
     return date.toISOString().split("T")[0];
   }
 
-  // For all dev/preview builds, show as "Last commit" since we prioritize git timestamp
+  // For all dev/preview builds, show as "Last updated" since we prioritize git timestamp
   return date.toLocaleString("en-US", {
     year: "numeric",
     month: "short",

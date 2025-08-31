@@ -338,7 +338,7 @@ const MainContent = ({
                 v{getVersionInfo().version}
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                Last commit: {getVersionInfo().buildDate}
+                Last updated: {getVersionInfo().buildDate}
               </p>
               <p className="text-xs text-gray-500 mt-1">Built with ❤️ for secure budgeting</p>
             </div>
