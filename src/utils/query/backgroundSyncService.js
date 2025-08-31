@@ -21,21 +21,18 @@ export const backgroundSync = {
     ];
 
     const results = await Promise.allSettled(
-      queries.map((queryKey) => queryClient.refetchQueries({ queryKey })),
+      queries.map((queryKey) => queryClient.refetchQueries({ queryKey }))
     );
 
     // Log sync results in development
     if (process.env.NODE_ENV === "development") {
       const successful = results.filter((r) => r.status === "fulfilled").length;
       const failed = results.filter((r) => r.status === "rejected").length;
-      logger.info(
-        `Background sync completed: ${successful} successful, ${failed} failed`,
-        {
-          successful,
-          failed,
-          source: "backgroundSync",
-        },
-      );
+      logger.info(`Background sync completed: ${successful} successful, ${failed} failed`, {
+        successful,
+        failed,
+        source: "backgroundSync",
+      });
     }
 
     return results;
