@@ -465,19 +465,12 @@ const BillManager = ({
           onMarkPaid={billOperations.handlePayBill}
           onEdit={(bill) => {
             setShowBillDetail(null);
-            setEditingBill(bill);
-            setShowAddBillModal(true);
+            handleEditBill(bill);
           }}
           onCreateRecurring={(bill) => {
             // Handle making a one-time bill recurring
             console.log("Making bill recurring:", bill);
           }}
-          connectedEnvelopes={envelopes.filter(
-            (env) =>
-              env.billId === showBillDetail.id ||
-              env.category === showBillDetail.category ||
-              env.name === showBillDetail.name,
-          )}
         />
       )}
 
