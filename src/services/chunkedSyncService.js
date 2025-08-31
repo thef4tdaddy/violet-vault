@@ -245,27 +245,22 @@ class ChunkedSyncService {
         this.encryptionKey
       );
 
-      // DEBUG: Check encryption result structure
-      logger.error("🔍 DEBUG: encryptedManifest structure", {
-        encryptedManifest,
-        hasEncryptedData: !!encryptedManifest?.encryptedData,
-        hasIv: !!encryptedManifest?.iv,
-        encryptedDataType: typeof encryptedManifest?.encryptedData,
-        ivType: typeof encryptedManifest?.iv,
-        encryptedDataLength: encryptedManifest?.encryptedData?.length || 0,
-        ivLength: encryptedManifest?.iv?.length || 0,
-        manifestKeys: encryptedManifest ? Object.keys(encryptedManifest) : [],
-      });
-
-      if (!encryptedManifest?.encryptedData || !encryptedManifest?.iv) {
-        throw new Error(`Encryption failed: missing properties - hasEncryptedData: ${!!encryptedManifest?.encryptedData}, hasIv: ${!!encryptedManifest?.iv}`);
+      // Fix: encryption utility returns 'data' property, not 'encryptedData'
+      if (!encryptedManifest?.data || !encryptedManifest?.iv) {
+        logger.error("❌ Encryption failed - missing properties", {
+          encryptedManifest,
+          hasData: !!encryptedManifest?.data,
+          hasIv: !!encryptedManifest?.iv,
+          manifestKeys: encryptedManifest ? Object.keys(encryptedManifest) : [],
+        });
+        throw new Error(`Encryption failed: missing properties - hasData: ${!!encryptedManifest?.data}, hasIv: ${!!encryptedManifest?.iv}`);
       }
 
       const mainDocument = {
         ...chunkedData,
         _manifest: {
           encryptedData: {
-            data: base64FromBytes(encryptedManifest.encryptedData),
+            data: base64FromBytes(encryptedManifest.data), // ✅ Fixed: use 'data' property
             iv: base64FromBytes(encryptedManifest.iv),
           },
           timestamp: Date.now(),
