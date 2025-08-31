@@ -115,7 +115,9 @@ class ChunkedSyncService {
 
     // Calculate chunk size based on data size and item count
     let chunkSize = this.maxArrayChunkSize;
-    const sampleSize = this.calculateSize(array.slice(0, Math.min(10, array.length)));
+    const sampleSize = this.calculateSize(
+      array.slice(0, Math.min(10, array.length)),
+    );
     const avgItemSize = sampleSize / Math.min(10, array.length);
 
     if (avgItemSize > 0) {
@@ -123,7 +125,9 @@ class ChunkedSyncService {
       chunkSize = Math.min(chunkSize, Math.max(100, maxItemsForSize));
     }
 
-    logger.debug(`Chunking ${arrayName}: ${totalItems} items, ${chunkSize} per chunk`);
+    logger.debug(
+      `Chunking ${arrayName}: ${totalItems} items, ${chunkSize} per chunk`,
+    );
 
     for (let i = 0; i < totalItems; i += chunkSize) {
       const chunkIndex = Math.floor(i / chunkSize);
@@ -187,9 +191,22 @@ class ChunkedSyncService {
     const db = this._getDb();
     const startTime = Date.now();
 
+    // Warn if currentUser is undefined
+    if (!currentUser?.uid) {
+      logger.warn(
+        "saveToCloud called with undefined currentUser.uid, using 'anonymous'",
+        {
+          currentUser,
+          hasCurrentUser: !!currentUser,
+          source: "chunkedSyncService",
+        },
+      );
+    }
+
     try {
       logger.info("Starting chunked save to cloud", {
         dataSize: this.calculateSize(data),
+        userId: currentUser?.uid || "anonymous",
       });
 
       // Identify large arrays to chunk
@@ -210,7 +227,7 @@ class ChunkedSyncService {
 
       // Create manifest
       const manifest = this.createManifest(chunkMap, {
-        userId: currentUser?.uid,
+        userId: currentUser?.uid || "anonymous",
         userAgent: navigator.userAgent,
         originalKeys: Object.keys(data),
       });
@@ -218,7 +235,7 @@ class ChunkedSyncService {
       // Encrypt and save manifest
       const encryptedManifest = await encryptionUtils.encrypt(
         this.safeStringify(manifest),
-        this.encryptionKey
+        this.encryptionKey,
       );
 
       const mainDocument = {
@@ -233,9 +250,9 @@ class ChunkedSyncService {
         _metadata: {
           version: "2.0",
           lastSync: Date.now(),
-          userId: currentUser?.uid,
+          userId: currentUser?.uid || "anonymous",
           chunkedKeys: Object.keys(data).filter(
-            (key) => Array.isArray(data[key]) && data[key].length > 100
+            (key) => Array.isArray(data[key]) && data[key].length > 100,
           ),
         },
       };
@@ -254,7 +271,7 @@ class ChunkedSyncService {
         for (const [chunkId, chunkData] of batchChunks) {
           const encryptedChunk = await encryptionUtils.encrypt(
             this.safeStringify(chunkData),
-            this.encryptionKey
+            this.encryptionKey,
           );
 
           const chunkDocument = {
@@ -267,12 +284,15 @@ class ChunkedSyncService {
             timestamp: Date.now(),
           };
 
-          batch.set(doc(db, "budgets", this.budgetId, "chunks", chunkId), chunkDocument);
+          batch.set(
+            doc(db, "budgets", this.budgetId, "chunks", chunkId),
+            chunkDocument,
+          );
         }
 
         await batch.commit();
         logger.debug(
-          `Saved batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(chunkEntries.length / batchSize)}`
+          `Saved batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(chunkEntries.length / batchSize)}`,
         );
       }
 
@@ -323,10 +343,12 @@ class ChunkedSyncService {
         // Decrypt manifest
         const manifestData = await encryptionUtils.decrypt(
           {
-            encryptedData: bytesFromBase64(mainData._manifest.encryptedData.data),
+            encryptedData: bytesFromBase64(
+              mainData._manifest.encryptedData.data,
+            ),
             iv: bytesFromBase64(mainData._manifest.encryptedData.iv),
           },
-          this.encryptionKey
+          this.encryptionKey,
         );
 
         const manifest = JSON.parse(manifestData);
@@ -338,7 +360,7 @@ class ChunkedSyncService {
         // Load all chunks
         const chunksQuery = query(
           collection(db, "budgets", this.budgetId, "chunks"),
-          where("budgetId", "==", this.budgetId)
+          where("budgetId", "==", this.budgetId),
         );
 
         const chunksSnapshot = await getDocs(chunksQuery);
@@ -352,7 +374,7 @@ class ChunkedSyncService {
               encryptedData: bytesFromBase64(chunkData.encryptedData.data),
               iv: bytesFromBase64(chunkData.encryptedData.iv),
             },
-            this.encryptionKey
+            this.encryptionKey,
           );
 
           chunks[chunkData.chunkId] = JSON.parse(decryptedChunk);
@@ -375,7 +397,9 @@ class ChunkedSyncService {
             }
 
             reconstructedData[key] = reassembledArray;
-            logger.debug(`Reassembled ${key}: ${reassembledArray.length} items`);
+            logger.debug(
+              `Reassembled ${key}: ${reassembledArray.length} items`,
+            );
           }
         }
       }
@@ -415,7 +439,7 @@ class ChunkedSyncService {
       // Delete all chunks
       const chunksQuery = query(
         collection(db, "budgets", this.budgetId, "chunks"),
-        where("budgetId", "==", this.budgetId)
+        where("budgetId", "==", this.budgetId),
       );
 
       const snapshot = await getDocs(chunksQuery);
