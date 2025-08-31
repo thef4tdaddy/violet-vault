@@ -86,13 +86,6 @@ export const useBillManager = ({
           ? tanStackEnvelopes
           : budget.envelopes || [];
 
-    logger.debug("🔍 useBillManager envelopes resolution:", {
-      propEnvelopesLength: propEnvelopes?.length || 0,
-      tanStackEnvelopesLength: tanStackEnvelopes?.length || 0,
-      budgetEnvelopesLength: budget.envelopes?.length || 0,
-      resultLength: result?.length || 0,
-      envelopesLoading,
-    });
 
     return result;
   }, [propEnvelopes, tanStackEnvelopes, budget.envelopes, envelopesLoading]);
@@ -115,18 +108,6 @@ export const useBillManager = ({
       }
     });
 
-    logger.debug("🔍 useBillManager bills processing:", {
-      transactionBills: billsFromTransactions?.length || 0,
-      tanStackBills: tanStackBills?.length || 0,
-      budgetBills: budget.bills?.length || 0,
-      combinedBills: combinedBills?.length || 0,
-      sampleRawBill: combinedBills?.[0] ? {
-        id: combinedBills[0].id,
-        name: combinedBills[0].name,
-        dueDate: combinedBills[0].dueDate,
-        isPaid: combinedBills[0].isPaid
-      } : null
-    });
 
     // Process each bill with calculations and recurring logic
     const processedBills = combinedBills.map((bill) => {
@@ -150,17 +131,6 @@ export const useBillManager = ({
       return processBillCalculations(processedBill);
     });
 
-    logger.debug("🔍 useBillManager bills processed:", {
-      processedCount: processedBills?.length || 0,
-      sampleProcessedBill: processedBills?.[0] ? {
-        id: processedBills[0].id,
-        name: processedBills[0].name,
-        dueDate: processedBills[0].dueDate,
-        daysUntilDue: processedBills[0].daysUntilDue,
-        isPaid: processedBills[0].isPaid,
-        urgency: processedBills[0].urgency
-      } : null
-    });
 
     return processedBills;
   }, [transactions, tanStackBills, budget.bills, onUpdateBill, updateBill]);
@@ -168,20 +138,6 @@ export const useBillManager = ({
   // Categorize bills into upcoming, overdue, paid
   const categorizedBills = useMemo(() => {
     const result = categorizeBills(bills);
-    logger.debug("🔍 useBillManager categorizedBills:", {
-      allBills: bills?.length || 0,
-      upcoming: result.upcoming?.length || 0,
-      overdue: result.overdue?.length || 0,
-      paid: result.paid?.length || 0,
-      sampleBill: bills?.[0] ? {
-        id: bills[0].id,
-        name: bills[0].name,
-        dueDate: bills[0].dueDate,
-        daysUntilDue: bills[0].daysUntilDue,
-        isPaid: bills[0].isPaid,
-        urgency: bills[0].urgency
-      } : null
-    });
     return result;
   }, [bills]);
 
@@ -192,19 +148,6 @@ export const useBillManager = ({
   const filteredBills = useMemo(() => {
     const billsToFilter = categorizedBills[viewMode] || categorizedBills.all || [];
     const result = filterBills(billsToFilter, filterOptions);
-    logger.debug("🔍 useBillManager filteredBills:", {
-      viewMode,
-      categorizedKeys: Object.keys(categorizedBills),
-      billsToFilter: billsToFilter?.length || 0,
-      filteredCount: result?.length || 0,
-      filterOptions,
-      firstBillToFilter: billsToFilter?.[0] ? {
-        id: billsToFilter[0].id,
-        name: billsToFilter[0].name,
-        daysUntilDue: billsToFilter[0].daysUntilDue,
-        isPaid: billsToFilter[0].isPaid
-      } : null
-    });
     return result;
   }, [categorizedBills, viewMode, filterOptions]);
 

@@ -37,6 +37,7 @@ const UserSetup = ({ onSetupComplete }) => {
     if (savedProfile) {
       try {
         const profile = JSON.parse(savedProfile);
+        console.log("🔍 UserSetup savedProfile debug:", { savedProfile, profile });
         logger.debug("📋 Found saved profile:", profile);
         setUserName(profile.userName || "");
         setUserColor(profile.userColor || "#a855f7");
