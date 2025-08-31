@@ -29,12 +29,20 @@ function base64FromBytes(bytes) {
 }
 
 function bytesFromBase64(str) {
-  const binary = atob(str);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) {
-    bytes[i] = binary.charCodeAt(i);
+  if (!str || typeof str !== "string") {
+    throw new Error(`Invalid base64 string: ${typeof str}`);
   }
-  return bytes;
+
+  try {
+    const binary = atob(str);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+  } catch (error) {
+    throw new Error(`Failed to decode base64 string (length: ${str.length}): ${error.message}`);
+  }
 }
 
 /**
@@ -47,6 +55,8 @@ class ChunkedSyncService {
     this.encryptionKey = null;
     this.maxChunkSize = 800 * 1024; // 800KB per chunk (under Firestore 1MB limit)
     this.maxArrayChunkSize = 1000; // Max items per array chunk
+    this.lastCorruptedDataClear = null; // Track when we last cleared corrupted data
+    this.corruptedDataClearCooldown = 5 * 60 * 1000; // 5 minute cooldown between clears
   }
 
   /**
@@ -192,6 +202,8 @@ class ChunkedSyncService {
       logger.warn("saveToCloud called with undefined currentUser.uid/id, using 'anonymous'", {
         currentUser,
         hasCurrentUser: !!currentUser,
+        currentUserKeys: currentUser ? Object.keys(currentUser) : [],
+        currentUserValues: currentUser ? Object.values(currentUser).map((v) => typeof v) : [],
         source: "chunkedSyncService",
       });
     }
@@ -332,11 +344,26 @@ class ChunkedSyncService {
       if (mainData._manifest) {
         let manifest;
         try {
+          // Validate manifest data before decryption
+          if (!mainData._manifest?.encryptedData?.data || !mainData._manifest?.encryptedData?.iv) {
+            throw new Error("Missing encrypted manifest data structure");
+          }
+
+          const encryptedDataBytes = bytesFromBase64(mainData._manifest.encryptedData.data);
+          const ivBytes = bytesFromBase64(mainData._manifest.encryptedData.iv);
+
+          // Check if data is too small (common corruption indicator)
+          if (encryptedDataBytes.length < 16 || ivBytes.length < 12) {
+            throw new Error(
+              `Corrupted manifest data: encrypted=${encryptedDataBytes.length}bytes, iv=${ivBytes.length}bytes`
+            );
+          }
+
           // Decrypt manifest
           const manifestData = await encryptionUtils.decrypt(
             {
-              encryptedData: bytesFromBase64(mainData._manifest.encryptedData.data),
-              iv: bytesFromBase64(mainData._manifest.encryptedData.iv),
+              encryptedData: encryptedDataBytes,
+              iv: ivBytes,
             },
             this.encryptionKey
           );
@@ -349,15 +376,24 @@ class ChunkedSyncService {
             budgetId: this.budgetId.substring(0, 8) + "...",
           });
 
-          // Clear corrupted data automatically and return empty result to trigger re-upload
+          // Clear corrupted data automatically (with cooldown to prevent spam)
           logger.warn("⚠️ Manifest corruption detected - clearing corrupted cloud data");
-          try {
-            await this.clearCorruptedData();
-            logger.info(
-              "🧹 Corrupted cloud data cleared - local data will be re-uploaded on next sync"
-            );
-          } catch (clearError) {
-            logger.error("❌ Failed to clear corrupted data", clearError);
+          const now = Date.now();
+          if (
+            !this.lastCorruptedDataClear ||
+            now - this.lastCorruptedDataClear > this.corruptedDataClearCooldown
+          ) {
+            try {
+              await this.clearCorruptedData();
+              this.lastCorruptedDataClear = now;
+              logger.info(
+                "🧹 Corrupted cloud data cleared - local data will be re-uploaded on next sync"
+              );
+            } catch (clearError) {
+              logger.error("❌ Failed to clear corrupted data", clearError);
+            }
+          } else {
+            logger.warn("⏱️ Corrupted data clear on cooldown - skipping auto-clear");
           }
           return null; // Return null to trigger fresh upload from local data
         }
