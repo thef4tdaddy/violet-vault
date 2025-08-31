@@ -187,9 +187,9 @@ class ChunkedSyncService {
     const db = this._getDb();
     const startTime = Date.now();
 
-    // Warn if currentUser is undefined
-    if (!currentUser?.uid) {
-      logger.warn("saveToCloud called with undefined currentUser.uid, using 'anonymous'", {
+    // Warn if currentUser is undefined - check for both uid (Firebase) and id (local user)
+    if (!currentUser?.uid && !currentUser?.id) {
+      logger.warn("saveToCloud called with undefined currentUser.uid/id, using 'anonymous'", {
         currentUser,
         hasCurrentUser: !!currentUser,
         source: "chunkedSyncService",
@@ -199,7 +199,7 @@ class ChunkedSyncService {
     try {
       logger.info("Starting chunked save to cloud", {
         dataSize: this.calculateSize(data),
-        userId: currentUser?.uid || "anonymous",
+        userId: currentUser?.uid || currentUser?.id || "anonymous",
       });
 
       // Identify large arrays to chunk
@@ -220,7 +220,7 @@ class ChunkedSyncService {
 
       // Create manifest
       const manifest = this.createManifest(chunkMap, {
-        userId: currentUser?.uid || "anonymous",
+        userId: currentUser?.uid || currentUser?.id || "anonymous",
         userAgent: navigator.userAgent,
         originalKeys: Object.keys(data),
       });
@@ -243,7 +243,7 @@ class ChunkedSyncService {
         _metadata: {
           version: "2.0",
           lastSync: Date.now(),
-          userId: currentUser?.uid || "anonymous",
+          userId: currentUser?.uid || currentUser?.id || "anonymous",
           chunkedKeys: Object.keys(data).filter(
             (key) => Array.isArray(data[key]) && data[key].length > 100
           ),
@@ -293,7 +293,7 @@ class ChunkedSyncService {
         mainDocSize: this.calculateSize(mainDocument),
       });
 
-      return true;
+      return { success: true };
     } catch (error) {
       logger.error("❌ Chunked save failed", error);
       throw error;
@@ -349,9 +349,17 @@ class ChunkedSyncService {
             budgetId: this.budgetId.substring(0, 8) + "...",
           });
 
-          // Return the data without chunked arrays rather than failing completely
-          logger.warn("⚠️ Returning incomplete data due to manifest corruption");
-          return reconstructedData;
+          // Clear corrupted data automatically and return empty result to trigger re-upload
+          logger.warn("⚠️ Manifest corruption detected - clearing corrupted cloud data");
+          try {
+            await this.clearCorruptedData();
+            logger.info(
+              "🧹 Corrupted cloud data cleared - local data will be re-uploaded on next sync"
+            );
+          } catch (clearError) {
+            logger.error("❌ Failed to clear corrupted data", clearError);
+          }
+          return null; // Return null to trigger fresh upload from local data
         }
         logger.debug("Loaded manifest", {
           version: manifest.version,
