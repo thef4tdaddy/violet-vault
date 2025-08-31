@@ -5,7 +5,7 @@
 
 import { budgetDb } from "../../db/budgetDb";
 import { cloudSyncService } from "../../services/cloudSyncService";
-import chunkedFirebaseSync from "./chunkedFirebaseSync";
+import chunkedSyncService from "../../services/chunkedSyncService";
 import logger from "../common/logger";
 
 export const runImmediateSyncHealthCheck = async () => {
@@ -90,7 +90,7 @@ export const runImmediateSyncHealthCheck = async () => {
 
     const syncResult = await cloudSyncService.determineSyncDirection(
       mockDexieData,
-      mockFirestoreData
+      mockFirestoreData,
     );
 
     if (syncResult.direction === "toFirestore") {
@@ -101,7 +101,9 @@ export const runImmediateSyncHealthCheck = async () => {
       });
       results.passed++;
     } else {
-      throw new Error(`Wrong direction: ${syncResult.direction}, expected: toFirestore`);
+      throw new Error(
+        `Wrong direction: ${syncResult.direction}, expected: toFirestore`,
+      );
     }
   } catch (error) {
     results.tests.push({
@@ -194,7 +196,10 @@ export const runImmediateSyncHealthCheck = async () => {
 
     const syncData = await cloudSyncService.fetchDexieData();
 
-    if (typeof syncData.unassignedCash === "number" && typeof syncData.actualBalance === "number") {
+    if (
+      typeof syncData.unassignedCash === "number" &&
+      typeof syncData.actualBalance === "number"
+    ) {
       results.tests.push({
         name: "Metadata Handling",
         status: "✅ PASSED",
@@ -220,9 +225,9 @@ export const runImmediateSyncHealthCheck = async () => {
     // Test that ChunkedFirebaseSync class exists and has required methods
     // Don't actually initialize it to avoid interfering with real sync operations
     if (
-      typeof chunkedFirebaseSync.initialize === "function" &&
-      typeof chunkedFirebaseSync.saveToCloud === "function" &&
-      typeof chunkedFirebaseSync.loadFromCloud === "function"
+      typeof chunkedSyncService.initialize === "function" &&
+      typeof chunkedSyncService.saveToCloud === "function" &&
+      typeof chunkedSyncService.loadFromCloud === "function"
     ) {
       results.tests.push({
         name: "Chunked Firebase Init",
@@ -243,7 +248,9 @@ export const runImmediateSyncHealthCheck = async () => {
   }
 
   // Print Results
-  const passRate = Math.round((results.passed / (results.passed + results.failed)) * 100);
+  const passRate = Math.round(
+    (results.passed / (results.passed + results.failed)) * 100,
+  );
 
   logger.info("🔧 SYNC HEALTH CHECK COMPLETE:", {
     total: results.tests.length,
@@ -253,13 +260,17 @@ export const runImmediateSyncHealthCheck = async () => {
   });
 
   results.tests.forEach((test) => {
-    logger.info(`${test.status} ${test.name}: ${test.details || test.error || ""}`);
+    logger.info(
+      `${test.status} ${test.name}: ${test.details || test.error || ""}`,
+    );
   });
 
   if (results.failed === 0) {
     logger.info("🎉 ALL SYNC HEALTH CHECKS PASSED! Sync system is ready.");
   } else {
-    logger.warn(`⚠️ ${results.failed} health check(s) failed. Please investigate.`);
+    logger.warn(
+      `⚠️ ${results.failed} health check(s) failed. Please investigate.`,
+    );
   }
 
   return results;
