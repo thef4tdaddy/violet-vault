@@ -83,7 +83,9 @@ export class BugReportAPIService {
           // Core environment data (ensure these are always defined and properly typed)
           appVersion: reportData.systemInfo?.appVersion || "unknown",
           userAgent: reportData.systemInfo?.userAgent || navigator.userAgent,
-          viewport: reportData.systemInfo?.viewport || `${window.innerWidth}x${window.innerHeight}`,
+          viewport: typeof reportData.systemInfo?.viewport === 'object' && reportData.systemInfo.viewport?.width ?
+            `${reportData.systemInfo.viewport.width}x${reportData.systemInfo.viewport.height}` :
+            String(reportData.systemInfo?.viewport || `${window.innerWidth}x${window.innerHeight}`),
           url: String(reportData.systemInfo?.url || window.location.href), // Ensure URL is always a string
           timestamp: reportData.systemInfo?.timestamp || new Date().toISOString(),
           
