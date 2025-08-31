@@ -65,6 +65,8 @@ export const useAuth = create((set, get) => ({
           const finalUserData = {
             ...userData,
             budgetId: deterministicBudgetId,
+            // Set default userName if empty or missing
+            userName: userData.userName?.trim() || "User",
           };
 
           logger.auth("Setting auth state for new user.", {
@@ -199,19 +201,25 @@ export const useAuth = create((set, get) => ({
             userName: currentUserData.userName,
           });
 
+          // Ensure userName is not empty
+          const sanitizedUserData = {
+            ...currentUserData,
+            userName: currentUserData.userName?.trim() || "User",
+          };
+
           set({
             salt: deterministicSalt,
             encryptionKey: key,
-            currentUser: currentUserData,
-            budgetId: currentUserData.budgetId,
+            currentUser: sanitizedUserData,
+            budgetId: sanitizedUserData.budgetId,
             isUnlocked: true,
             lastActivity: Date.now(),
           });
 
           // Identify returning user in Highlight.io for session tracking
-          identifyUser(currentUserData.budgetId, {
-            userName: currentUserData.userName,
-            userColor: currentUserData.userColor,
+          identifyUser(sanitizedUserData.budgetId, {
+            userName: sanitizedUserData.userName,
+            userColor: sanitizedUserData.userColor,
             accountType: "returning_user",
           });
 
