@@ -78,16 +78,17 @@ export class BugReportAPIService {
       const payload = {
         description: reportData.description || reportData.title || "No description provided",
         screenshot: reportData.screenshot || null, // Base64 data URL from ScreenshotService
-        sessionUrl: null, // Could be added later for session replay integration
+        sessionUrl: reportData.sessionUrl || null, // Session replay URL if available
         env: {
-          ...reportData.systemInfo,
+          // Core environment data
           appVersion: reportData.systemInfo?.appVersion || "unknown",
           userAgent: reportData.systemInfo?.userAgent || navigator.userAgent,
-          viewport: reportData.systemInfo?.viewport ? 
-            `${reportData.systemInfo.viewport.width}x${reportData.systemInfo.viewport.height}` : 
-            `${window.innerWidth}x${window.innerHeight}`,
-          url: window.location.href,
-          timestamp: new Date().toISOString(),
+          viewport: reportData.systemInfo?.viewport || `${window.innerWidth}x${window.innerHeight}`,
+          url: reportData.systemInfo?.url || window.location.href,
+          timestamp: reportData.systemInfo?.timestamp || new Date().toISOString(),
+          
+          // Pass through all the rich diagnostic data
+          ...reportData.systemInfo,
         },
       };
 

@@ -638,7 +638,8 @@ const useBugReport = () => {
             title: reportData.description.substring(0, 100) + (reportData.description.length > 100 ? "..." : ""),
             description: reportData.description,
             screenshot: screenshotData,
-            systemInfo: reportData.env,
+            sessionUrl: sessionUrl, // Pass session replay URL
+            systemInfo: reportData.env, // Contains all the rich diagnostic data
             logs: [], // Console logs are already captured in systemInfo
             severity: "High", // All user reports are considered high severity
             labels: ["user-reported", "bug"],
