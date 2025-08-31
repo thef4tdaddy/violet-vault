@@ -46,29 +46,47 @@ if (
       cloudSyncService.stop();
       console.log("⏸️ Stopped background sync");
       
+      // Wait a moment for sync to fully stop
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
       // Clear all cloud data completely
       await cloudSyncService.clearAllData();
       console.log("🧹 Cleared all cloud data");
+      
+      // Wait for clearing to complete
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Force push local data to cloud (bypasses corruption checks)
       const result = await cloudSyncService.forcePushToCloud();
       console.log("🚀 Force pushed local data to cloud:", result);
       
-      // Restart sync service
-      const { useAuth } = await import("./stores/auth/authStore.jsx");
-      const authState = useAuth.getState();
-      if (authState.isUnlocked && authState.currentUser && authState.encryptionKey) {
-        cloudSyncService.start({
-          budgetId: authState.budgetId,
-          encryptionKey: authState.encryptionKey,
-          currentUser: authState.currentUser,
-        });
-        console.log("🔄 Restarted sync service");
+      if (result.success) {
+        console.log("✅ Cloud data reset completed successfully - sync will resume automatically");
+        // Don't restart sync immediately - let it happen naturally
+        return { success: true, message: "Cloud data reset completed successfully" };
+      } else {
+        throw new Error(result.error || "Force push failed");
       }
-      
-      return { success: true, message: "Cloud data reset completed" };
     } catch (error) {
       console.error("❌ Force reset failed:", error);
+      return { success: false, error: error.message };
+    }
+  };
+  
+  // Manual cloud clear only (for testing)
+  window.clearCloudDataOnly = async () => {
+    console.log("🧹 Clearing cloud data only (no restart)...");
+    try {
+      const { cloudSyncService } = await import("./services/cloudSyncService.js");
+      cloudSyncService.stop();
+      console.log("⏸️ Stopped sync service");
+      
+      await cloudSyncService.clearAllData();
+      console.log("✅ Cloud data cleared - sync service remains stopped");
+      
+      return { success: true, message: "Cloud data cleared, sync stopped" };
+    } catch (error) {
+      console.error("❌ Clear failed:", error);
       return { success: false, error: error.message };
     }
   };
