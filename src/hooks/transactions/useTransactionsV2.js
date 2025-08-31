@@ -225,14 +225,6 @@ const useTransactionsV2 = (options = {}) => {
     // === Utility Methods ===
     refetch: dataHook.refetch,
 
-    // Legacy compatibility properties (for backward compatibility)
-    // These map to the new structure but maintain old API
-    get transactions() {
-      return dataHook.transactions;
-    },
-    get allTransactions() {
-      return dataHook.allTransactions;
-    },
 
     // Mutation objects for advanced use (backward compatibility)
     addTransactionMutation: operationsHook.addTransactionMutation,
