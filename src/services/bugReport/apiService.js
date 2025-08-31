@@ -93,10 +93,8 @@ export class BugReportAPIService {
           ...(reportData.systemInfo && typeof reportData.systemInfo === 'object' ? 
             Object.fromEntries(
               Object.entries(reportData.systemInfo).filter(([key, value]) => {
-                // Filter out functions, undefined values, and overly large objects
-                return value != null && 
-                       typeof value !== 'function' && 
-                       !(typeof value === 'object' && JSON.stringify(value).length > 10000);
+                // Filter out functions and null/undefined values, but keep important diagnostic objects
+                return value != null && typeof value !== 'function';
               }).map(([key, value]) => {
                 // Ensure objects are converted to strings to prevent worker crashes
                 if (key === 'url' && typeof value === 'object' && value.href) {
@@ -121,7 +119,9 @@ export class BugReportAPIService {
         screenshotSize: payload.screenshot?.length || 0,
         screenshotPreview: payload.screenshot?.substring(0, 50) || "none",
         envKeys: Object.keys(payload.env),
+        envSample: Object.fromEntries(Object.entries(payload.env).slice(0, 5)), // First 5 fields
         hasSessionUrl: !!payload.sessionUrl,
+        payloadSize: JSON.stringify(payload).length,
       });
 
       const response = await fetch(webhookUrl, {
