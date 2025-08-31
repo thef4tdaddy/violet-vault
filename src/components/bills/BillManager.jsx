@@ -45,7 +45,6 @@ const BillManager = ({
   onError,
   className = "",
 }) => {
-
   // Use the extracted business logic hook
   const {
     // Data
@@ -94,7 +93,6 @@ const BillManager = ({
     onSearchNewBills,
     onError,
   });
-
 
   // UI logic hook
   const {
@@ -380,7 +378,11 @@ const BillManager = ({
                 : "Try switching to a different view or adjusting filters."}
             </p>
             <div className="mt-4 text-xs text-gray-400 font-mono">
-              DEBUG: Bills={bills.length}, Categorized={JSON.stringify(Object.keys(categorizedBills).map(k => `${k}:${categorizedBills[k]?.length || 0}`))}, ViewMode={viewMode}, Filtered={filteredBills.length}
+              DEBUG: Bills={bills.length}, Categorized=
+              {JSON.stringify(
+                Object.keys(categorizedBills).map((k) => `${k}:${categorizedBills[k]?.length || 0}`)
+              )}
+              , ViewMode={viewMode}, Filtered={filteredBills.length}
             </div>
           </div>
         )}

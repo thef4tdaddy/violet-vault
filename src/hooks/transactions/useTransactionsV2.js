@@ -225,7 +225,6 @@ const useTransactionsV2 = (options = {}) => {
     // === Utility Methods ===
     refetch: dataHook.refetch,
 
-
     // Mutation objects for advanced use (backward compatibility)
     addTransactionMutation: operationsHook.addTransactionMutation,
     updateTransactionMutation: operationsHook.updateTransactionMutation,
