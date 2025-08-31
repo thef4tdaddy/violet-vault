@@ -80,15 +80,23 @@ export class BugReportAPIService {
         screenshot: reportData.screenshot || null, // Base64 data URL from ScreenshotService
         sessionUrl: reportData.sessionUrl || null, // Session replay URL if available
         env: {
-          // Core environment data
+          // Core environment data (ensure these are always defined)
           appVersion: reportData.systemInfo?.appVersion || "unknown",
           userAgent: reportData.systemInfo?.userAgent || navigator.userAgent,
           viewport: reportData.systemInfo?.viewport || `${window.innerWidth}x${window.innerHeight}`,
           url: reportData.systemInfo?.url || window.location.href,
           timestamp: reportData.systemInfo?.timestamp || new Date().toISOString(),
           
-          // Pass through all the rich diagnostic data
-          ...reportData.systemInfo,
+          // Safely pass through diagnostic data, filtering out potentially problematic fields
+          ...(reportData.systemInfo && typeof reportData.systemInfo === 'object' ? 
+            Object.fromEntries(
+              Object.entries(reportData.systemInfo).filter(([key, value]) => {
+                // Filter out functions, undefined values, and overly large objects
+                return value != null && 
+                       typeof value !== 'function' && 
+                       !(typeof value === 'object' && JSON.stringify(value).length > 10000);
+              })
+            ) : {}),
         },
       };
 
@@ -111,7 +119,13 @@ export class BugReportAPIService {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const errorText = await response.text();
+        logger.error("Cloudflare Worker error response", {
+          status: response.status,
+          statusText: response.statusText,
+          errorBody: errorText,
+        });
+        throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
       }
 
       const result = await response.json();
