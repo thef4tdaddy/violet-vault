@@ -83,33 +83,45 @@ export class BugReportAPIService {
           // Core environment data (ensure these are always defined and properly typed)
           appVersion: reportData.systemInfo?.appVersion || "unknown",
           userAgent: reportData.systemInfo?.userAgent || navigator.userAgent,
-          viewport: typeof reportData.systemInfo?.viewport === 'object' && reportData.systemInfo.viewport?.width ?
-            `${reportData.systemInfo.viewport.width}x${reportData.systemInfo.viewport.height}` :
-            String(reportData.systemInfo?.viewport || `${window.innerWidth}x${window.innerHeight}`),
+          viewport:
+            typeof reportData.systemInfo?.viewport === "object" &&
+            reportData.systemInfo.viewport?.width
+              ? `${reportData.systemInfo.viewport.width}x${reportData.systemInfo.viewport.height}`
+              : String(
+                  reportData.systemInfo?.viewport || `${window.innerWidth}x${window.innerHeight}`
+                ),
           url: String(reportData.systemInfo?.url || window.location.href), // Ensure URL is always a string
           timestamp: reportData.systemInfo?.timestamp || new Date().toISOString(),
-          
+
           // Safely pass through diagnostic data, filtering out potentially problematic fields
-          ...(reportData.systemInfo && typeof reportData.systemInfo === 'object' ? 
-            Object.fromEntries(
-              Object.entries(reportData.systemInfo).filter(([key, value]) => {
-                // Filter out functions and null/undefined values, but keep important diagnostic objects
-                return value != null && typeof value !== 'function';
-              }).map(([key, value]) => {
-                // Ensure objects are converted to strings to prevent worker crashes
-                if (key === 'url' && typeof value === 'object' && value.href) {
-                  return [key, value.href];
-                }
-                if (key === 'viewport' && typeof value === 'object' && value.width && value.height) {
-                  return [key, `${value.width}x${value.height}`];
-                }
-                // Convert any other objects to JSON strings for safety
-                if (typeof value === 'object' && value !== null) {
-                  return [key, JSON.stringify(value)];
-                }
-                return [key, value];
-              })
-            ) : {}),
+          ...(reportData.systemInfo && typeof reportData.systemInfo === "object"
+            ? Object.fromEntries(
+                Object.entries(reportData.systemInfo)
+                  .filter(([key, value]) => {
+                    // Filter out functions and null/undefined values, but keep important diagnostic objects
+                    return value != null && typeof value !== "function";
+                  })
+                  .map(([key, value]) => {
+                    // Ensure objects are converted to strings to prevent worker crashes
+                    if (key === "url" && typeof value === "object" && value.href) {
+                      return [key, value.href];
+                    }
+                    if (
+                      key === "viewport" &&
+                      typeof value === "object" &&
+                      value.width &&
+                      value.height
+                    ) {
+                      return [key, `${value.width}x${value.height}`];
+                    }
+                    // Convert any other objects to JSON strings for safety
+                    if (typeof value === "object" && value !== null) {
+                      return [key, JSON.stringify(value)];
+                    }
+                    return [key, value];
+                  })
+              )
+            : {}),
         },
       };
 
@@ -158,7 +170,7 @@ export class BugReportAPIService {
 
       return {
         success: true,
-        provider: "webhook", 
+        provider: "webhook",
         submissionId: result.issueNumber || result.id || Date.now().toString(),
         issueNumber: result.issueNumber,
         url: result.issueUrl,

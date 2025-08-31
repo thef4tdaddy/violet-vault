@@ -393,6 +393,7 @@ const useBugReportV2 = (options = {}) => {
     setIncludeScreenshot,
     setSeverity,
     setLabels,
+    setScreenshot,
 
     // Modal actions
     openModal,

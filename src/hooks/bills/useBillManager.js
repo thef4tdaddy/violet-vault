@@ -86,7 +86,6 @@ export const useBillManager = ({
           ? tanStackEnvelopes
           : budget.envelopes || [];
 
-
     return result;
   }, [propEnvelopes, tanStackEnvelopes, budget.envelopes]);
 
@@ -107,7 +106,6 @@ export const useBillManager = ({
         combinedBills.push(bill);
       }
     });
-
 
     // Process each bill with calculations and recurring logic
     const processedBills = combinedBills.map((bill) => {
@@ -130,7 +128,6 @@ export const useBillManager = ({
       // Apply calculations (days until due, urgency)
       return processBillCalculations(processedBill);
     });
-
 
     return processedBills;
   }, [transactions, tanStackBills, budget.bills, onUpdateBill, updateBill]);

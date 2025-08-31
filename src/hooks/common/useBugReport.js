@@ -18,13 +18,13 @@ const useBugReport = () => {
   const captureScreenshot = async () => {
     try {
       logger.info("🔧 Starting screenshot capture process");
-      
+
       // Check if we're on mobile - use simpler approach
       const isMobile =
         /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
         window.innerWidth <= 768;
 
-      logger.info(`📱 Device type: ${isMobile ? 'Mobile' : 'Desktop'}`);
+      logger.info(`📱 Device type: ${isMobile ? "Mobile" : "Desktop"}`);
 
       // Try modern native screenshot API first (requires user interaction)
       if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
@@ -653,16 +653,21 @@ const useBugReport = () => {
           });
 
           // Use BugReportAPIService for proper payload formatting and screenshot URL handling
-          const submissionResult = await BugReportAPIService.submitToWebhook({
-            title: reportData.description.substring(0, 100) + (reportData.description.length > 100 ? "..." : ""),
-            description: reportData.description,
-            screenshot: screenshotData,
-            sessionUrl: sessionUrl, // Pass session replay URL
-            systemInfo: reportData.env, // Contains all the rich diagnostic data
-            logs: [], // Console logs are already captured in systemInfo
-            severity: "High", // All user reports are considered high severity
-            labels: ["user-reported", "bug"],
-          }, bugReportEndpoint);
+          const submissionResult = await BugReportAPIService.submitToWebhook(
+            {
+              title:
+                reportData.description.substring(0, 100) +
+                (reportData.description.length > 100 ? "..." : ""),
+              description: reportData.description,
+              screenshot: screenshotData,
+              sessionUrl: sessionUrl, // Pass session replay URL
+              systemInfo: reportData.env, // Contains all the rich diagnostic data
+              logs: [], // Console logs are already captured in systemInfo
+              severity: "High", // All user reports are considered high severity
+              labels: ["user-reported", "bug"],
+            },
+            bugReportEndpoint
+          );
 
           if (!submissionResult.success) {
             logger.error("Bug report submission failed", {
