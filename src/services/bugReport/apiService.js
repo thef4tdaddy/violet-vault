@@ -80,11 +80,11 @@ export class BugReportAPIService {
         screenshot: reportData.screenshot || null, // Base64 data URL from ScreenshotService
         sessionUrl: reportData.sessionUrl || null, // Session replay URL if available
         env: {
-          // Core environment data (ensure these are always defined)
+          // Core environment data (ensure these are always defined and properly typed)
           appVersion: reportData.systemInfo?.appVersion || "unknown",
           userAgent: reportData.systemInfo?.userAgent || navigator.userAgent,
           viewport: reportData.systemInfo?.viewport || `${window.innerWidth}x${window.innerHeight}`,
-          url: reportData.systemInfo?.url || window.location.href,
+          url: String(reportData.systemInfo?.url || window.location.href), // Ensure URL is always a string
           timestamp: reportData.systemInfo?.timestamp || new Date().toISOString(),
           
           // Safely pass through diagnostic data, filtering out potentially problematic fields
@@ -95,6 +95,12 @@ export class BugReportAPIService {
                 return value != null && 
                        typeof value !== 'function' && 
                        !(typeof value === 'object' && JSON.stringify(value).length > 10000);
+              }).map(([key, value]) => {
+                // Ensure URL objects are converted to strings to prevent worker crashes
+                if (key === 'url' && typeof value === 'object' && value.href) {
+                  return [key, value.href];
+                }
+                return [key, value];
               })
             ) : {}),
         },
