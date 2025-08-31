@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { H } from "../../utils/common/highlight.js";
 import { APP_VERSION } from "../../utils/common/version";
+import { BugReportAPIService } from "../../services/bugReport/apiService";
 import logger from "../../utils/common/logger";
 
 /**
@@ -632,66 +633,47 @@ const useBugReport = () => {
             hasScreenshot: !!screenshotData,
           });
 
-          const response = await fetch(bugReportEndpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(reportData),
-          });
+          // Use BugReportAPIService for proper payload formatting and screenshot URL handling
+          const submissionResult = await BugReportAPIService.submitToWebhook({
+            title: reportData.description.substring(0, 100) + (reportData.description.length > 100 ? "..." : ""),
+            description: reportData.description,
+            screenshot: screenshotData,
+            systemInfo: reportData.env,
+            logs: [], // Console logs are already captured in systemInfo
+            severity: "High", // All user reports are considered high severity
+            labels: ["user-reported", "bug"],
+          }, bugReportEndpoint);
 
-          if (!response.ok) {
-            const errorText = await response.text();
+          if (!submissionResult.success) {
             logger.error("Bug report submission failed", {
-              status: response.status,
-              statusText: response.statusText,
-              error: errorText,
+              error: submissionResult.error || "Unknown error",
             });
 
-            // Parse error response to provide better user feedback
-            let parsedError = null;
-            try {
-              parsedError = JSON.parse(errorText);
-            } catch {
-              // Error text isn't JSON, use as-is
-            }
+            // Fallback to local logging for any submission failure
+            logger.warn("Bug report service unavailable, logging locally", {
+              ...reportData,
+              screenshot: screenshotData ? "[Screenshot captured]" : null,
+              sessionUrl: sessionUrl || "[No session replay URL available]",
+            });
 
-            // If it's a server configuration error, fall back to local logging
-            if (
-              response.status === 500 ||
-              (parsedError &&
-                parsedError.message &&
-                parsedError.message.includes("GitHub API error"))
-            ) {
-              logger.warn("Bug report service unavailable, logging locally", {
-                ...reportData,
-                screenshot: screenshotData ? "[Screenshot captured]" : null,
-                sessionUrl: sessionUrl || "[No session replay URL available]",
-              });
-
-              // Don't throw error, treat as successful local logging
-              reportData.localFallback = true;
-              reportData.fallbackReason =
-                parsedError?.message || `Server error: ${response.status}`;
-            } else {
-              // For other errors, also fallback to local logging instead of throwing
-              logger.warn("Bug report submission failed, logging locally", {
-                ...reportData,
-                screenshot: screenshotData ? "[Screenshot captured]" : null,
-                sessionUrl: sessionUrl || "[No session replay URL available]",
-              });
-              reportData.localFallback = true;
-              reportData.fallbackReason = `HTTP error: ${response.status} - ${errorText}`;
-            }
+            // Don't throw error, treat as successful local logging
+            reportData.localFallback = true;
+            reportData.fallbackReason = submissionResult.error || "Submission failed";
           } else {
-            const result = await response.json();
             logger.production("Bug report created successfully", {
-              issueNumber: result.issueNumber,
-              issueUrl: result.issueUrl,
+              issueNumber: submissionResult.issueNumber,
+              issueUrl: submissionResult.url,
+              screenshotUrl: submissionResult.screenshotUrl,
               page: getCurrentPageContext().page,
+              hasScreenshot: !!screenshotData,
             });
 
-            // Store the issue URL for user feedback
-            if (result.issueUrl) {
-              reportData.issueUrl = result.issueUrl;
+            // Store the issue URL and screenshot URL for user feedback
+            if (submissionResult.url) {
+              reportData.issueUrl = submissionResult.url;
+            }
+            if (submissionResult.screenshotUrl) {
+              reportData.screenshotUrl = submissionResult.screenshotUrl;
             }
           }
         } else {

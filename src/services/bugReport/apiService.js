@@ -71,14 +71,32 @@ export class BugReportAPIService {
       logger.debug("Submitting bug report to webhook", {
         url: webhookUrl,
         title: reportData.title,
+        hasScreenshot: !!reportData.screenshot,
       });
 
+      // Format payload for Cloudflare Worker (matches the expected format in bug-report-worker.js)
       const payload = {
-        timestamp: new Date().toISOString(),
-        report: reportData,
-        source: "violet-vault-bug-reporter",
-        version: "1.0.0",
+        description: reportData.description || reportData.title || "No description provided",
+        screenshot: reportData.screenshot || null, // Base64 data URL from ScreenshotService
+        sessionUrl: null, // Could be added later for session replay integration
+        env: {
+          ...reportData.systemInfo,
+          appVersion: reportData.systemInfo?.appVersion || "unknown",
+          userAgent: reportData.systemInfo?.userAgent || navigator.userAgent,
+          viewport: reportData.systemInfo?.viewport ? 
+            `${reportData.systemInfo.viewport.width}x${reportData.systemInfo.viewport.height}` : 
+            `${window.innerWidth}x${window.innerHeight}`,
+          url: window.location.href,
+          timestamp: new Date().toISOString(),
+        },
       };
+
+      logger.debug("Cloudflare Worker payload prepared", {
+        hasDescription: !!payload.description,
+        hasScreenshot: !!payload.screenshot,
+        screenshotSize: payload.screenshot?.length || 0,
+        envKeys: Object.keys(payload.env),
+      });
 
       const response = await fetch(webhookUrl, {
         method: "POST",
@@ -102,8 +120,11 @@ export class BugReportAPIService {
 
       return {
         success: true,
-        provider: "webhook",
-        submissionId: result.id || Date.now().toString(),
+        provider: "webhook", 
+        submissionId: result.issueNumber || result.id || Date.now().toString(),
+        issueNumber: result.issueNumber,
+        url: result.issueUrl,
+        screenshotUrl: result.screenshotUrl,
         response: result,
       };
     } catch (error) {
