@@ -1,545 +1,130 @@
 /**
- * Bug Report API Service
- * Handles submission of bug reports to external services
- * Extracted from useBugReport.js for Issue #513
+ * Bug Report API Service - Refactored
+ * Main orchestrator for bug report submissions
+ * Split into focused services for Issue #513
  */
 import logger from "../../utils/common/logger";
+import { GitHubAPIService } from "./githubApiService";
+import { ReportSubmissionService } from "./reportSubmissionService";
 
 export class BugReportAPIService {
   /**
    * Submit bug report to GitHub Issues API
    * @param {Object} reportData - Bug report data
-   * @param {string} reportData.title - Bug report title
-   * @param {string} reportData.description - Bug description
-   * @param {string} reportData.steps - Reproduction steps
-   * @param {string} reportData.expected - Expected behavior
-   * @param {string} reportData.actual - Actual behavior
-   * @param {Object} reportData.systemInfo - System information
-   * @param {string} reportData.screenshot - Screenshot data URL
-   * @param {Array} reportData.logs - Console logs
-   * @param {string} reportData.severity - Bug severity level
-   * @param {Array} reportData.labels - GitHub labels
    * @returns {Promise<Object>} Submission result
    */
   static async submitToGitHub(reportData) {
-    try {
-      logger.debug("Submitting bug report to GitHub", { title: reportData.title });
-
-      const issueBody = this.formatGitHubIssueBody(reportData);
-      const labels = [...(reportData.labels || []), "bug", "automated-report"];
-
-      const payload = {
-        title: reportData.title,
-        body: issueBody,
-        labels: labels,
+    const validation = this.validateReportData(reportData);
+    if (!validation.isValid) {
+      logger.error("Invalid report data for submission", validation);
+      return {
+        success: false,
+        error: "Invalid report data",
+        validationErrors: validation.errors,
       };
-
-      // Note: This would typically require GitHub API credentials
-      // For now, we'll simulate the API call and return success
-      const result = await this.makeGitHubAPICall(payload);
-
-      if (result.success) {
-        logger.info("Bug report submitted successfully to GitHub", {
-          issueNumber: result.issueNumber,
-          url: result.url,
-        });
-
-        return {
-          success: true,
-          issueNumber: result.issueNumber,
-          url: result.url,
-          provider: "github",
-          submissionId: result.id,
-        };
-      } else {
-        throw new Error(result.error || "GitHub API submission failed");
-      }
-    } catch (error) {
-      logger.error("Failed to submit bug report to GitHub", error);
-      throw new Error(`GitHub submission failed: ${error.message}`);
     }
+
+    return GitHubAPIService.submitToGitHub(reportData);
   }
 
   /**
-   * Submit bug report to custom webhook
+   * Submit bug report to webhook
    * @param {Object} reportData - Bug report data
    * @param {string} webhookUrl - Webhook URL
    * @returns {Promise<Object>} Submission result
    */
   static async submitToWebhook(reportData, webhookUrl) {
-    try {
-      logger.debug("Submitting bug report to webhook", {
-        url: webhookUrl,
-        title: reportData.title,
-        hasScreenshot: !!reportData.screenshot,
-      });
-
-      // Format payload for Cloudflare Worker with V2 fields (matches the expected format in bug-report-worker.js)
-      const payload = {
-        // V2 Enhanced Fields
-        title: reportData.title || null,
-        description: reportData.description || reportData.title || "No description provided",
-        steps: reportData.steps || null,
-        expected: reportData.expected || null,
-        actual: reportData.actual || null,
-        severity: reportData.severity || "medium",
-        
-        // Media and Session Data
-        screenshot: reportData.screenshot || null, // Base64 data URL from ScreenshotService
-        sessionUrl: reportData.sessionUrl || null, // Session replay URL if available
-        
-        // System and Context Data
-        systemInfo: reportData.systemInfo || null,
-        contextInfo: reportData.contextInfo || null,
-        customData: reportData.customData || null,
-        env: {
-          // Core environment data (ensure these are always defined and properly typed)
-          appVersion: reportData.systemInfo?.appVersion || "unknown",
-          userAgent: reportData.systemInfo?.userAgent || navigator.userAgent,
-          viewport:
-            typeof reportData.systemInfo?.viewport === "object" &&
-            reportData.systemInfo.viewport?.width
-              ? `${reportData.systemInfo.viewport.width}x${reportData.systemInfo.viewport.height}`
-              : String(
-                  reportData.systemInfo?.viewport || `${window.innerWidth}x${window.innerHeight}`
-                ),
-          url: String(reportData.systemInfo?.url || window.location.href), // Ensure URL is always a string
-          timestamp: reportData.systemInfo?.timestamp || new Date().toISOString(),
-          
-          // Add page context from contextInfo for worker compatibility
-          pageContext: reportData.contextInfo || null,
-
-          // Safely pass through diagnostic data, filtering out potentially problematic fields
-          ...(reportData.systemInfo && typeof reportData.systemInfo === "object"
-            ? Object.fromEntries(
-                Object.entries(reportData.systemInfo)
-                  .filter(([key, value]) => {
-                    // Filter out functions and null/undefined values, but keep important diagnostic objects
-                    return value != null && typeof value !== "function";
-                  })
-                  .map(([key, value]) => {
-                    // Ensure objects are converted to strings to prevent worker crashes
-                    if (key === "url" && typeof value === "object" && value.href) {
-                      return [key, value.href];
-                    }
-                    if (
-                      key === "viewport" &&
-                      typeof value === "object" &&
-                      value.width &&
-                      value.height
-                    ) {
-                      return [key, `${value.width}x${value.height}`];
-                    }
-                    // Convert any other objects to JSON strings for safety
-                    if (typeof value === "object" && value !== null) {
-                      return [key, JSON.stringify(value)];
-                    }
-                    return [key, value];
-                  })
-              )
-            : {}),
-        },
-      };
-
-      logger.info("Cloudflare Worker payload prepared", {
-        hasDescription: !!payload.description,
-        hasScreenshot: !!payload.screenshot,
-        screenshotSize: payload.screenshot?.length || 0,
-        screenshotPreview: payload.screenshot?.substring(0, 50) || "none",
-        envKeys: Object.keys(payload.env),
-        envSample: Object.fromEntries(Object.entries(payload.env).slice(0, 5)), // First 5 fields
-        hasSessionUrl: !!payload.sessionUrl,
-        payloadSize: JSON.stringify(payload).length,
-      });
-
-      const response = await fetch(webhookUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "User-Agent": "VioletVault-BugReporter/1.0",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        logger.error("Cloudflare Worker error response", {
-          status: response.status,
-          statusText: response.statusText,
-          errorBody: errorText,
-        });
-        throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
-      }
-
-      const result = await response.json();
-
-      logger.info("Cloudflare Worker response received", {
-        url: webhookUrl,
-        status: response.status,
-        hasResult: !!result,
-        success: result.success,
-        issueNumber: result.issueNumber,
-        issueUrl: result.issueUrl,
-        screenshotUrl: result.screenshotUrl,
-        hasScreenshotUrl: !!result.screenshotUrl,
-      });
-
-      return {
-        success: true,
-        provider: "webhook",
-        submissionId: result.issueNumber || result.id || Date.now().toString(),
-        issueNumber: result.issueNumber,
-        url: result.issueUrl,
-        screenshotUrl: result.screenshotUrl,
-        response: result,
-      };
-    } catch (error) {
-      logger.error("Failed to submit bug report to webhook", error);
-      throw new Error(`Webhook submission failed: ${error.message}`);
-    }
+    return ReportSubmissionService.submitToWebhook(reportData, webhookUrl);
   }
 
   /**
-   * Submit bug report to email service
+   * Submit bug report to email
    * @param {Object} reportData - Bug report data
    * @param {Object} emailConfig - Email configuration
    * @returns {Promise<Object>} Submission result
    */
   static async submitToEmail(reportData, emailConfig) {
-    try {
-      logger.debug("Submitting bug report to email", {
-        to: emailConfig.to,
-        title: reportData.title,
-      });
-
-      const emailBody = this.formatEmailBody(reportData);
-
-      const payload = {
-        to: emailConfig.to,
-        subject: `Bug Report: ${reportData.title}`,
-        body: emailBody,
-        attachments: reportData.screenshot
-          ? [
-              {
-                name: "screenshot.png",
-                data: reportData.screenshot,
-                type: "image/png",
-              },
-            ]
-          : [],
-      };
-
-      // This would typically use a service like EmailJS or SendGrid
-      const result = await this.sendEmail(payload, emailConfig);
-
-      if (result.success) {
-        logger.info("Bug report sent successfully via email", {
-          to: emailConfig.to,
-          messageId: result.messageId,
-        });
-
-        return {
-          success: true,
-          provider: "email",
-          submissionId: result.messageId,
-          recipient: emailConfig.to,
-        };
-      } else {
-        throw new Error(result.error || "Email submission failed");
-      }
-    } catch (error) {
-      logger.error("Failed to submit bug report via email", error);
-      throw new Error(`Email submission failed: ${error.message}`);
-    }
+    return ReportSubmissionService.submitToEmail(reportData, emailConfig);
   }
 
   /**
-   * Submit bug report with multiple fallback providers
+   * Submit bug report with fallback providers
    * @param {Object} reportData - Bug report data
    * @param {Array} providers - Array of provider configurations
    * @returns {Promise<Object>} Submission result
    */
   static async submitWithFallbacks(reportData, providers = []) {
-    const results = [];
-    let lastError = null;
-
-    for (const provider of providers) {
-      try {
-        let result;
-
-        switch (provider.type) {
-          case "github":
-            result = await this.submitToGitHub(reportData);
-            break;
-          case "webhook":
-            result = await this.submitToWebhook(reportData, provider.url);
-            break;
-          case "email":
-            result = await this.submitToEmail(reportData, provider.config);
-            break;
-          default:
-            throw new Error(`Unknown provider type: ${provider.type}`);
-        }
-
-        results.push({
-          provider: provider.type,
-          success: true,
-          result,
-        });
-
-        // If primary provider succeeds, return immediately
-        if (provider.primary) {
-          return {
-            success: true,
-            primaryProvider: provider.type,
-            results,
-            submissionId: result.submissionId,
-          };
-        }
-      } catch (error) {
-        lastError = error;
-        results.push({
-          provider: provider.type,
-          success: false,
-          error: error.message,
-        });
-
-        logger.warn(`Provider ${provider.type} failed, trying next`, error);
-      }
-    }
-
-    // If we get here, all providers failed
-    if (results.some((r) => r.success)) {
-      // At least one fallback succeeded
+    const validation = this.validateReportData(reportData);
+    if (!validation.isValid) {
+      logger.error("Invalid report data for submission", validation);
       return {
-        success: true,
-        primaryFailed: true,
-        results,
-        submissionId: results.find((r) => r.success)?.result?.submissionId,
+        overallSuccess: false,
+        error: "Invalid report data",
+        validationErrors: validation.errors,
+        attempts: 0,
+        results: [],
       };
-    } else {
-      // All providers failed
-      throw new Error(`All providers failed. Last error: ${lastError?.message}`);
     }
+
+    return ReportSubmissionService.submitWithFallbacks(reportData, providers);
   }
 
   /**
-   * Format bug report data for GitHub Issues
-   * @param {Object} reportData - Bug report data
-   * @returns {string} Formatted issue body
-   */
-  static formatGitHubIssueBody(reportData) {
-    const sections = [
-      "## Bug Description",
-      reportData.description || "No description provided",
-      "",
-      "## Steps to Reproduce",
-      reportData.steps || "No steps provided",
-      "",
-      "## Expected Behavior",
-      reportData.expected || "No expected behavior specified",
-      "",
-      "## Actual Behavior",
-      reportData.actual || "No actual behavior specified",
-      "",
-      "## System Information",
-      "```json",
-      JSON.stringify(reportData.systemInfo, null, 2),
-      "```",
-      "",
-      "## Console Logs & Errors",
-      this.formatConsoleLogsForGitHub(reportData.systemInfo?.errors),
-      "",
-    ];
-
-    if (reportData.logs && reportData.logs.length > 0) {
-      sections.push(
-        "## Console Logs",
-        "```",
-        reportData.logs.slice(-20).join("\n"), // Last 20 log entries
-        "```",
-        ""
-      );
-    }
-
-    if (reportData.screenshot) {
-      // GitHub Issues can't display base64 data URLs directly
-      // Instead, provide information about the screenshot
-      const screenshotInfo = reportData.screenshot.includes("data:image")
-        ? "Screenshot captured (base64 data - view in bug report tool)"
-        : reportData.screenshot;
-
-      sections.push(
-        "## Screenshot",
-        reportData.screenshot.startsWith("data:image")
-          ? `📸 Screenshot captured (${reportData.screenshot.length} chars) - available in original bug report data`
-          : `![Bug Screenshot](${reportData.screenshot})`,
-        ""
-      );
-    }
-
-    sections.push(
-      "## Additional Context",
-      `- Severity: ${reportData.severity || "Medium"}`,
-      `- Reported at: ${new Date().toISOString()}`,
-      `- Page URL: ${reportData.systemInfo?.url?.href || "Unknown"}`,
-      "",
-      "---",
-      "*This bug report was automatically generated by Violet Vault Bug Reporter*"
-    );
-
-    return sections.join("\n");
-  }
-
-  /**
-   * Format console logs and errors for GitHub issue
-   * @param {Object} errors - Error and log data from SystemInfoService
-   * @returns {string} Formatted console logs section
-   */
-  static formatConsoleLogsForGitHub(errors) {
-    if (!errors) {
-      return "No console logs captured";
-    }
-
-    const sections = [];
-
-    // Recent Errors
-    if (errors.recentErrors && errors.recentErrors.length > 0) {
-      sections.push("### Recent JavaScript Errors");
-      sections.push("```javascript");
-      errors.recentErrors.slice(-10).forEach((error) => {
-        sections.push(`[${error.timestamp}] ${error.type}: ${JSON.stringify(error.data, null, 2)}`);
-      });
-      sections.push("```");
-      sections.push("");
-    }
-
-    // Console Logs
-    if (errors.consoleLogs && errors.consoleLogs.length > 0) {
-      sections.push("### Recent Console Logs");
-      sections.push("```");
-      errors.consoleLogs.slice(-20).forEach((log) => {
-        sections.push(`[${log.timestamp}] ${log.level.toUpperCase()}: ${log.message}`);
-      });
-      sections.push("```");
-      sections.push("");
-    }
-
-    // Error Handler Status
-    sections.push("### Error Capture Status");
-    sections.push(`- Global Error Handler: ${errors.hasGlobalHandler ? "✅" : "❌"}`);
-    sections.push(
-      `- Unhandled Rejection Handler: ${errors.hasUnhandledRejectionHandler ? "✅" : "❌"}`
-    );
-
-    return sections.length > 0 ? sections.join("\n") : "No console logs or errors captured";
-  }
-
-  /**
-   * Format bug report data for email
-   * @param {Object} reportData - Bug report data
-   * @returns {string} Formatted email body
-   */
-  static formatEmailBody(reportData) {
-    return `
-Bug Report: ${reportData.title}
-
-DESCRIPTION:
-${reportData.description || "No description provided"}
-
-STEPS TO REPRODUCE:
-${reportData.steps || "No steps provided"}
-
-EXPECTED BEHAVIOR:
-${reportData.expected || "No expected behavior specified"}
-
-ACTUAL BEHAVIOR:
-${reportData.actual || "No actual behavior specified"}
-
-SYSTEM INFORMATION:
-Browser: ${reportData.systemInfo?.browser?.userAgent || "Unknown"}
-Viewport: ${reportData.systemInfo?.viewport?.width}x${reportData.systemInfo?.viewport?.height}
-URL: ${reportData.systemInfo?.url?.href || "Unknown"}
-Timestamp: ${new Date().toISOString()}
-
-SEVERITY: ${reportData.severity || "Medium"}
-
-${
-  reportData.logs && reportData.logs.length > 0
-    ? `RECENT LOGS:\n${reportData.logs.slice(-10).join("\n")}`
-    : "No logs available"
-}
-
-This bug report was automatically generated by Violet Vault Bug Reporter.
-    `.trim();
-  }
-
-  /**
-   * Make GitHub API call (simulated for now)
-   * @param {Object} payload - GitHub issue payload
-   * @returns {Promise<Object>} API response
-   */
-  static async makeGitHubAPICall(payload) {
-    // In a real implementation, this would make actual API calls
-    // For now, simulate successful submission
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          success: true,
-          id: Date.now(),
-          issueNumber: Math.floor(Math.random() * 1000) + 1,
-          url: `https://github.com/user/repo/issues/${Math.floor(Math.random() * 1000) + 1}`,
-        });
-      }, 1000);
-    });
-  }
-
-  /**
-   * Send email (simulated for now)
-   * @param {Object} payload - Email payload
-   * @param {Object} config - Email configuration
-   * @returns {Promise<Object>} Send result
-   */
-  static async sendEmail(payload, config) {
-    // In a real implementation, this would integrate with email services
-    // For now, simulate successful send
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          success: true,
-          messageId: `msg_${Date.now()}`,
-        });
-      }, 500);
-    });
-  }
-
-  /**
-   * Validate bug report data before submission
-   * @param {Object} reportData - Bug report data
+   * Validate bug report data
+   * @param {Object} reportData - Report data to validate
    * @returns {Object} Validation result
    */
   static validateReportData(reportData) {
     const errors = [];
     const warnings = [];
 
-    if (!reportData.title || reportData.title.trim().length === 0) {
-      errors.push("Title is required");
+    // Basic validations
+    if (!reportData || typeof reportData !== "object") {
+      errors.push("Report data must be an object");
+      return { isValid: false, errors, warnings };
     }
 
-    if (!reportData.description || reportData.description.trim().length === 0) {
-      warnings.push("Description is empty");
+    // Required fields
+    if (
+      !reportData.title ||
+      typeof reportData.title !== "string" ||
+      reportData.title.trim().length === 0
+    ) {
+      errors.push("Title is required and must be a non-empty string");
     }
 
-    if (!reportData.steps || reportData.steps.trim().length === 0) {
-      warnings.push("Steps to reproduce are empty");
+    if (
+      !reportData.description ||
+      typeof reportData.description !== "string" ||
+      reportData.description.trim().length === 0
+    ) {
+      warnings.push("Description is recommended for better bug reports");
     }
 
-    if (!reportData.systemInfo) {
-      warnings.push("System information is missing");
+    // Optional field validations
+    if (
+      reportData.severity &&
+      !["low", "medium", "high", "critical"].includes(reportData.severity)
+    ) {
+      warnings.push("Severity should be one of: low, medium, high, critical");
     }
 
-    if (reportData.title && reportData.title.length > 200) {
+    if (reportData.labels && !Array.isArray(reportData.labels)) {
+      warnings.push("Labels should be an array");
+    }
+
+    // Content length checks
+    if (reportData.title && reportData.title.length > 500) {
       warnings.push("Title is very long and may be truncated");
+    }
+
+    if (reportData.description && reportData.description.length > 10000) {
+      warnings.push("Description is very long and may be truncated");
+    }
+
+    // System info validation
+    if (reportData.systemInfo && typeof reportData.systemInfo !== "object") {
+      warnings.push("System info should be an object");
     }
 
     return {
@@ -550,52 +135,71 @@ This bug report was automatically generated by Violet Vault Bug Reporter.
   }
 
   /**
-   * Prepare report data for submission
-   * @param {Object} rawData - Raw bug report data
-   * @returns {Object} Processed report data
+   * Format GitHub issue body - delegate to GitHubAPIService
+   * @param {Object} reportData - Bug report data
+   * @returns {string} Formatted issue body
    */
-  static prepareReportData(rawData) {
-    return {
-      title: (rawData.title || "Untitled Bug Report").trim(),
-      description: (rawData.description || "").trim(),
-      steps: (rawData.steps || "").trim(),
-      expected: (rawData.expected || "").trim(),
-      actual: (rawData.actual || "").trim(),
-      systemInfo: rawData.systemInfo || {},
-      screenshot: rawData.screenshot || null,
-      logs: Array.isArray(rawData.logs) ? rawData.logs : [],
-      severity: rawData.severity || "Medium",
-      labels: Array.isArray(rawData.labels) ? rawData.labels : [],
-      timestamp: new Date().toISOString(),
-    };
+  static formatGitHubIssueBody(reportData) {
+    return GitHubAPIService.formatGitHubIssueBody(reportData);
   }
 
   /**
-   * Get submission status
-   * @param {string} submissionId - Submission ID
-   * @param {string} provider - Provider type
-   * @returns {Promise<Object>} Status information
+   * Format console logs for GitHub - delegate to GitHubAPIService
+   * @param {Array} errors - Error array
+   * @returns {string} Formatted error information
    */
-  static async getSubmissionStatus(submissionId, provider) {
-    try {
-      // This would check the status with the actual provider
-      // For now, return a simulated status
-      return {
-        success: true,
-        status: "submitted",
-        submissionId,
-        provider,
-        submittedAt: new Date().toISOString(),
-        url: `https://example.com/issues/${submissionId}`,
-      };
-    } catch (error) {
-      logger.error("Failed to get submission status", error);
-      return {
-        success: false,
-        error: error.message,
-        submissionId,
-        provider,
-      };
-    }
+  static formatConsoleLogsForGitHub(errors) {
+    return GitHubAPIService.formatConsoleLogsForGitHub(errors);
+  }
+
+  /**
+   * Get submission statistics - delegate to ReportSubmissionService
+   * @returns {Object} Submission statistics
+   */
+  static getSubmissionStats() {
+    return ReportSubmissionService.getSubmissionStats();
+  }
+
+  /**
+   * Clear stored bug reports - delegate to ReportSubmissionService
+   */
+  static clearStoredReports() {
+    return ReportSubmissionService.clearStoredReports();
+  }
+
+  /**
+   * Get supported providers
+   * @returns {Array} Array of supported provider types
+   */
+  static getSupportedProviders() {
+    return [
+      {
+        type: "github",
+        name: "GitHub Issues",
+        description: "Submit bug reports as GitHub issues",
+        available: true,
+      },
+      {
+        type: "webhook",
+        name: "Webhook",
+        description: "Submit to custom webhook endpoint",
+        available: true,
+      },
+      {
+        type: "email",
+        name: "Email",
+        description: "Send bug reports via email",
+        available: false, // Not yet implemented
+      },
+      {
+        type: "console",
+        name: "Console Logging",
+        description: "Fallback logging to console and localStorage",
+        available: true,
+      },
+    ];
   }
 }
+
+// Maintain backward compatibility by re-exporting sub-services
+export { GitHubAPIService, ReportSubmissionService };
