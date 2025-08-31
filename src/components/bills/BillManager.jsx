@@ -26,7 +26,6 @@ import { useBillManager } from "../../hooks/bills/useBillManager";
 import { useBillManagerUI } from "../../hooks/bills/useBillManagerUI";
 import useEditLock from "../../hooks/common/useEditLock";
 import { useAuth } from "../../stores/auth/authStore";
-import logger from "../../utils/common/logger";
 import AddBillModal from "./AddBillModal";
 import BulkBillUpdateModal from "./BulkBillUpdateModal";
 import BillDiscoveryModal from "./BillDiscoveryModal";
