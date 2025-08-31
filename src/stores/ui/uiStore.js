@@ -196,6 +196,7 @@ const storeInitializer = (set, get) => ({
       const syncConfig = {
         budgetId: authState.budgetId,
         encryptionKey: authState.encryptionKey,
+        currentUser: authState.currentUser,
       };
 
       cloudSyncService.start(syncConfig);
