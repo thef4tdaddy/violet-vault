@@ -92,11 +92,13 @@ export class BugReportAPIService {
         },
       };
 
-      logger.debug("Cloudflare Worker payload prepared", {
+      logger.info("Cloudflare Worker payload prepared", {
         hasDescription: !!payload.description,
         hasScreenshot: !!payload.screenshot,
         screenshotSize: payload.screenshot?.length || 0,
+        screenshotPreview: payload.screenshot?.substring(0, 50) || "none",
         envKeys: Object.keys(payload.env),
+        hasSessionUrl: !!payload.sessionUrl,
       });
 
       const response = await fetch(webhookUrl, {
@@ -114,9 +116,15 @@ export class BugReportAPIService {
 
       const result = await response.json();
 
-      logger.info("Bug report submitted successfully to webhook", {
+      logger.info("Cloudflare Worker response received", {
         url: webhookUrl,
         status: response.status,
+        hasResult: !!result,
+        success: result.success,
+        issueNumber: result.issueNumber,
+        issueUrl: result.issueUrl,
+        screenshotUrl: result.screenshotUrl,
+        hasScreenshotUrl: !!result.screenshotUrl,
       });
 
       return {
