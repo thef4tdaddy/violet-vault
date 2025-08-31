@@ -40,7 +40,12 @@ export const LEGACY_MULTIPLIERS = {
  * @param {boolean} usePrecise - Use precise multipliers (default: true)
  * @returns {number} Converted amount
  */
-export function convertFrequency(amount, fromFrequency, toFrequency, usePrecise = true) {
+export function convertFrequency(
+  amount,
+  fromFrequency,
+  toFrequency,
+  usePrecise = true,
+) {
   if (!amount || fromFrequency === toFrequency) return amount;
 
   const multipliers = usePrecise ? FREQUENCY_MULTIPLIERS : LEGACY_MULTIPLIERS;
@@ -114,9 +119,14 @@ export function calculatePaycheckAmount(
   targetAmount,
   targetFrequency,
   paycheckFrequency = "biweekly",
-  usePrecise = true
+  usePrecise = true,
 ) {
-  return convertFrequency(targetAmount, targetFrequency, paycheckFrequency, usePrecise);
+  return convertFrequency(
+    targetAmount,
+    targetFrequency,
+    paycheckFrequency,
+    usePrecise,
+  );
 }
 
 /**
@@ -146,4 +156,42 @@ export function getFrequencyOptions(usePrecise = true) {
     },
     { value: "yearly", label: "Yearly", multiplier: multipliers.yearly },
   ];
+}
+
+/**
+ * Get display text for a frequency value
+ * @param {string} frequency - The frequency to get display text for
+ * @param {number} customFrequency - Custom multiplier for the frequency
+ * @returns {string} Human readable frequency text
+ */
+export function getFrequencyDisplayText(frequency, customFrequency = 1) {
+  if (!frequency) return "Not set";
+
+  const baseLabels = {
+    once: "One-time",
+    weekly: "Weekly",
+    biweekly: "Bi-weekly",
+    monthly: "Monthly",
+    quarterly: "Quarterly",
+    biannual: "Bi-annual",
+    annual: "Annual",
+    yearly: "Annual",
+  };
+
+  const baseLabel = baseLabels[frequency] || frequency;
+
+  // Handle custom frequency multipliers
+  if (customFrequency && customFrequency > 1) {
+    if (frequency === "monthly") {
+      return `Every ${customFrequency} months`;
+    } else if (frequency === "weekly") {
+      return `Every ${customFrequency} weeks`;
+    } else if (frequency === "yearly" || frequency === "annual") {
+      return `Every ${customFrequency} years`;
+    } else {
+      return `${baseLabel} (${customFrequency}x)`;
+    }
+  }
+
+  return baseLabel;
 }
