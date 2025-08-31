@@ -36,6 +36,43 @@ if (
   window.getQuickSyncStatus = getQuickSyncStatus;
   window.fixAutoAllocateUndefined = fixAutoAllocateUndefined;
 
+  // Emergency corruption recovery tool
+  window.forceCloudDataReset = async () => {
+    console.log("🚨 Force clearing all cloud data and re-uploading from local...");
+    try {
+      const { cloudSyncService } = await import("./services/cloudSyncService.js");
+      
+      // Stop any ongoing sync
+      cloudSyncService.stop();
+      console.log("⏸️ Stopped background sync");
+      
+      // Clear all cloud data completely
+      await cloudSyncService.clearAllData();
+      console.log("🧹 Cleared all cloud data");
+      
+      // Force push local data to cloud (bypasses corruption checks)
+      const result = await cloudSyncService.forcePushToCloud();
+      console.log("🚀 Force pushed local data to cloud:", result);
+      
+      // Restart sync service
+      const { useAuth } = await import("./stores/auth/authStore.jsx");
+      const authState = useAuth.getState();
+      if (authState.isUnlocked && authState.currentUser && authState.encryptionKey) {
+        cloudSyncService.start({
+          budgetId: authState.budgetId,
+          encryptionKey: authState.encryptionKey,
+          currentUser: authState.currentUser,
+        });
+        console.log("🔄 Restarted sync service");
+      }
+      
+      return { success: true, message: "Cloud data reset completed" };
+    } catch (error) {
+      console.error("❌ Force reset failed:", error);
+      return { success: false, error: error.message };
+    }
+  };
+
   // Bug report testing tools
   window.testBugReportCapture = async () => {
     const { SystemInfoService } = await import("./services/bugReport/systemInfoService.js");
