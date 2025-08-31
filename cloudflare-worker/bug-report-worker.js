@@ -150,10 +150,20 @@ async function processBugReport(bugReport, env) {
     hasDescription: !!description,
     hasSteps: !!steps,
     hasScreenshot: !!screenshot,
+    screenshotSize: screenshot ? screenshot.length : 0,
     severity,
     hasSystemInfo: !!systemInfo,
     systemInfoKeys: systemInfo ? Object.keys(systemInfo) : null,
-    hasCustomData: !!customData
+    hasCustomData: !!customData,
+    customDataKeys: customData ? Object.keys(customData) : null,
+    hasReportEnv: !!reportEnv,
+    reportEnvKeys: reportEnv ? Object.keys(reportEnv) : null,
+    hasPageContext: !!(reportEnv && reportEnv.pageContext),
+    pageContextKeys: (reportEnv && reportEnv.pageContext) ? Object.keys(reportEnv.pageContext) : null,
+    hasContextInfo: !!contextInfo,
+    contextInfoKeys: contextInfo ? Object.keys(contextInfo) : null,
+    hasSessionUrl: !!sessionUrl,
+    sessionUrl: sessionUrl || 'null'
   });
 
   // Store screenshot if provided
@@ -161,7 +171,12 @@ async function processBugReport(bugReport, env) {
   if (screenshot) {
     try {
       screenshotUrl = await storeScreenshot(screenshot, env);
-      console.log(`Screenshot storage result: ${screenshotUrl ? "success" : "failed"}`);
+      console.log("Screenshot storage result:", {
+        success: !!screenshotUrl,
+        url: screenshotUrl,
+        originalSize: screenshot.length,
+        hasR2Bucket: !!env.R2_BUCKET
+      });
     } catch (error) {
       console.error("Screenshot storage error:", error);
       screenshotUrl = null;
