@@ -332,6 +332,13 @@ export const getVersionInfo = (targetVersion = null) => {
   // Get actual commit timestamp (injected at build time)
   const commitTimestamp = getActualCommitTimestamp();
   const formattedCommitTime = formatCommitTimestamp(commitTimestamp, branchInfo.environment);
+  
+  // Debug: Check what timestamp is being used for footer display
+  console.log("🔍 VersionFooter debug:", { 
+    commitTimestamp: commitTimestamp.toISOString(),
+    formattedCommitTime,
+    environment: branchInfo.environment 
+  });
 
   // Get additional git info for better debugging
   const gitCommitHash = import.meta.env.VITE_GIT_COMMIT_HASH || "unknown";
