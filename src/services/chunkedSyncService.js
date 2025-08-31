@@ -558,6 +558,15 @@ class ChunkedSyncService {
   }
 
   /**
+   * Clear all data from cloud storage (alias for clearCorruptedData)
+   * Used by cloudSyncService for complete data reset
+   */
+  async clearAllData() {
+    logger.info("🧹 Clearing all cloud data (full reset)");
+    return await this.clearCorruptedData();
+  }
+
+  /**
    * Get sync statistics
    */
   getStats() {
