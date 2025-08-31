@@ -17,15 +17,19 @@ const useBugReport = () => {
 
   const captureScreenshot = async () => {
     try {
+      logger.info("🔧 Starting screenshot capture process");
+      
       // Check if we're on mobile - use simpler approach
       const isMobile =
         /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
         window.innerWidth <= 768;
 
+      logger.info(`📱 Device type: ${isMobile ? 'Mobile' : 'Desktop'}`);
+
       // Try modern native screenshot API first (requires user interaction)
       if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
         try {
-          logger.debug("Attempting native screen capture API (user interaction required)");
+          logger.info("🖥️ Attempting native screen capture API (user permission required)");
           // This requires user permission and interaction
           const stream = await navigator.mediaDevices.getDisplayMedia({
             video: {
@@ -61,9 +65,11 @@ const useBugReport = () => {
           logger.info("Native screen capture successful");
           return screenshotDataUrl;
         } catch (nativeError) {
-          logger.debug("Native screen capture failed or cancelled by user:", nativeError.message);
+          logger.info("🚫 Native screen capture failed or cancelled by user:", nativeError.message);
           // Fall through to html2canvas method
         }
+      } else {
+        logger.info("📷 Native screen capture API not available, using html2canvas");
       }
 
       // Add timeout to prevent indefinite hanging
@@ -76,6 +82,7 @@ const useBugReport = () => {
 
       // Skip the ugly CSS cleanup fallback - user doesn't like it (issue #546)
       // Instead, try a minimal html2canvas capture without the complex CSS manipulation
+      logger.info("📸 Attempting html2canvas capture of page");
       const html2canvas = (await import("html2canvas")).default;
 
       const screenshotPromise = html2canvas(document.body, {
@@ -93,6 +100,10 @@ const useBugReport = () => {
 
       const screenshotDataUrl = canvas.toDataURL("image/png", isMobile ? 0.5 : 0.7);
       setScreenshot(screenshotDataUrl);
+      logger.info("✅ HTML2Canvas screenshot capture successful", {
+        size: screenshotDataUrl.length,
+        format: screenshotDataUrl.substring(0, 50),
+      });
       return screenshotDataUrl;
     } catch (error) {
       logger.warn("Primary screenshot capture failed:", error.message);
