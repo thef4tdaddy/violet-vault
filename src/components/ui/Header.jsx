@@ -9,7 +9,6 @@ const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
 const Header = memo(
   ({ currentUser, onUserChange, onUpdateProfile, isLocalOnlyMode = false, onShowSettings }) => {
-    console.log("🔍 Header currentUser debug:", currentUser);
     const [showLocalOnlySettings, setShowLocalOnlySettings] = useState(false);
 
     const handleToggleLocalOnlySettings = useCallback(() => {
