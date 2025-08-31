@@ -116,7 +116,6 @@ const BillManager = ({
     filteredBills,
     selectedBills,
     setSelectedBills,
-    viewMode,
     setShowAddBillModal,
     setEditingBill,
     setHistoryBill,
