@@ -66,9 +66,14 @@ export class GitHubAPIService {
    * @returns {string} Formatted issue body
    */
   static formatGitHubIssueBody(reportData) {
+    // Check if description contains multiple steps/todos for checklist formatting
+    const description = reportData.description || "No description provided";
+    const formattedDescription =
+      this.formatDescriptionWithChecklists(description);
+
     const sections = [
       "## Bug Description",
-      reportData.description || "No description provided",
+      formattedDescription,
       "",
       "## Steps to Reproduce",
       reportData.steps || "No steps provided",
@@ -79,15 +84,33 @@ export class GitHubAPIService {
       "## Actual Behavior",
       reportData.actual || "No actual behavior specified",
       "",
-      "## System Information",
-      "```json",
-      JSON.stringify(reportData.systemInfo, null, 2),
-      "```",
-      "",
+    ];
+
+    // Add user location context if available
+    if (reportData.contextInfo?.userLocation) {
+      sections.push(
+        "## 📍 User Location",
+        `**URL:** ${reportData.contextInfo.url || window.location.href}`,
+        `**Page Context:** ${reportData.contextInfo.userLocation}`,
+        "",
+      );
+    }
+
+    // Add environment info
+    if (reportData.systemInfo) {
+      sections.push(
+        "## Environment",
+        this.formatEnvironmentInfo(reportData.systemInfo),
+        "",
+      );
+    }
+
+    // Add console logs with better formatting
+    sections.push(
       "## Console Logs & Errors",
       this.formatConsoleLogsForGitHub(reportData.systemInfo?.errors),
       "",
-    ];
+    );
 
     if (reportData.logs && reportData.logs.length > 0) {
       sections.push(
@@ -138,38 +161,184 @@ export class GitHubAPIService {
   }
 
   /**
+   * Format description with checklist detection for multiple steps
+   * @param {string} description - Original description
+   * @returns {string} Formatted description with checklists
+   */
+  static formatDescriptionWithChecklists(description) {
+    if (!description) return "No description provided";
+
+    // Check for patterns that suggest multiple items/steps
+    const patterns = [
+      /(\d+[\.)]\s.*)/g, // Numbered lists (1. item, 1) item)
+      /(-\s.*)/g, // Dash lists (- item)
+      /(\*\s.*)/g, // Star lists (* item)
+      /(•\s.*)/g, // Bullet lists (• item)
+    ];
+
+    let formatted = description;
+    let hasMultipleItems = false;
+
+    // Check if description has multiple line items
+    patterns.forEach((pattern) => {
+      const matches = description.match(pattern);
+      if (matches && matches.length > 1) {
+        hasMultipleItems = true;
+        // Convert to GitHub checkboxes
+        formatted = formatted.replace(pattern, (match) => {
+          const cleanedItem = match.replace(/^[\d\.)•\*-]\s*/, "").trim();
+          return `- [ ] ${cleanedItem}`;
+        });
+      }
+    });
+
+    // Also detect "and" separated items in single lines
+    if (!hasMultipleItems && description.includes(" and ")) {
+      const parts = description
+        .split(" and ")
+        .filter((part) => part.trim().length > 0);
+      if (parts.length > 1) {
+        formatted = parts.map((part) => `- [ ] ${part.trim()}`).join("\n");
+        hasMultipleItems = true;
+      }
+    }
+
+    return formatted;
+  }
+
+  /**
+   * Format environment information in a concise way
+   * @param {Object} systemInfo - System information object
+   * @returns {string} Formatted environment info
+   */
+  static formatEnvironmentInfo(systemInfo) {
+    const sections = [];
+
+    // App version and environment
+    sections.push(`- **App Version:** ${systemInfo.appVersion || "unknown"}`);
+    sections.push(`- **Environment:** ${this.detectEnvironment()}`);
+
+    // Browser info
+    if (systemInfo.browser) {
+      sections.push(
+        `- **Browser:** ${systemInfo.browser.name} ${systemInfo.browser.version}`,
+      );
+    }
+
+    // Viewport
+    if (systemInfo.viewport) {
+      sections.push(
+        `- **Viewport:** ${systemInfo.viewport.width}x${systemInfo.viewport.height}`,
+      );
+    }
+
+    // User agent (truncated)
+    if (systemInfo.userAgent) {
+      const shortUA =
+        systemInfo.userAgent.length > 100
+          ? systemInfo.userAgent.substring(0, 100) + "..."
+          : systemInfo.userAgent;
+      sections.push(`- **User Agent:** ${shortUA}`);
+    }
+
+    // Memory usage if available
+    if (systemInfo.performance?.memory) {
+      const memMB = Math.round(
+        systemInfo.performance.memory.usedJSHeapSize / 1024 / 1024,
+      );
+      sections.push(`- **Memory Usage:** ${memMB}MB used`);
+    }
+
+    sections.push(
+      `- **Timestamp:** ${systemInfo.timestamp || new Date().toISOString()}`,
+    );
+
+    return sections.join("\n");
+  }
+
+  /**
+   * Detect current environment
+   * @returns {string} Environment description
+   */
+  static detectEnvironment() {
+    const hostname = window.location.hostname;
+
+    if (hostname.includes("localhost") || hostname.includes("127.0.0.1")) {
+      return "🏠 Local Development";
+    } else if (hostname.includes("dev.") || hostname.includes("staging.")) {
+      return "🚧 Development/Staging";
+    } else {
+      return "🌐 Production";
+    }
+  }
+
+  /**
    * Format console logs and errors for GitHub
-   * @param {Array} errors - Error array from system info
+   * @param {Object} errors - Error object from system info
    * @returns {string} Formatted error information
    */
   static formatConsoleLogsForGitHub(errors) {
-    if (!errors || errors.length === 0) {
-      return "No recent errors captured.";
+    const sections = [];
+
+    // Handle errors
+    if (errors && errors.recentErrors && errors.recentErrors.length > 0) {
+      sections.push("### Recent JavaScript Errors", "");
+
+      // Show last 3 errors to avoid overwhelming the issue
+      const recentErrors = errors.recentErrors.slice(-3);
+
+      recentErrors.forEach((error, index) => {
+        sections.push(
+          `**Error ${index + 1}:**`,
+          "```javascript",
+          `${error.type || "Error"}: ${error.message || "Unknown error"}`,
+          error.stack ? `Stack: ${error.stack}` : "",
+          error.filename
+            ? `File: ${error.filename} (Line: ${error.lineno || "?"})`
+            : "",
+          `Time: ${error.timestamp || "Unknown"}`,
+          "```",
+          "",
+        );
+      });
+
+      if (errors.recentErrors.length > 3) {
+        sections.push(
+          `_... and ${errors.recentErrors.length - 3} more errors_`,
+          "",
+        );
+      }
     }
 
-    const errorSections = ["### Recent JavaScript Errors", ""];
+    // Handle console logs
+    if (errors && errors.consoleLogs && errors.consoleLogs.length > 0) {
+      sections.push("### Recent Console Logs", "");
 
-    // Show last 5 errors to avoid overwhelming the issue
-    const recentErrors = errors.slice(-5);
+      // Show last 10 console logs
+      const recentLogs = errors.consoleLogs.slice(-10);
 
-    recentErrors.forEach((error, index) => {
-      errorSections.push(
-        `**Error ${index + 1}:**`,
-        "```javascript",
-        `Message: ${error.message || "Unknown error"}`,
-        `Stack: ${error.stack || "No stack trace"}`,
-        `File: ${error.filename || "Unknown"} (Line: ${error.lineno || "?"})`,
-        `Timestamp: ${error.timestamp || "Unknown"}`,
-        "```",
-        "",
-      );
-    });
+      // Detect code patterns for syntax highlighting
+      const logText = recentLogs
+        .map((log) => {
+          const timeStr = new Date(log.timestamp).toLocaleTimeString();
+          return `[${timeStr}] ${log.level.toUpperCase()}: ${log.message}`;
+        })
+        .join("\n");
 
-    if (errors.length > 5) {
-      errorSections.push(`_... and ${errors.length - 5} more errors_`);
+      // Check if logs contain code-like patterns
+      const hasCodePatterns =
+        /(\{|\}|function|=>|const|let|var|import|export)/.test(logText);
+      const codeType = hasCodePatterns ? "javascript" : "text";
+
+      sections.push(`\`\`\`${codeType}`, logText, "```", "");
     }
 
-    return errorSections.join("\n");
+    // Fallback message
+    if (sections.length === 0) {
+      return "No recent errors or console logs captured.";
+    }
+
+    return sections.join("\n");
   }
 
   /**
