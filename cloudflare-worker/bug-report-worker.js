@@ -70,11 +70,11 @@ export default {
         // Parse the bug report data
         const bugReport = await request.json();
 
-        // Validate required fields
-        if (!bugReport.description) {
+        // Validate required fields (either title or description required)
+        if (!bugReport.title && !bugReport.description) {
           return new Response(
             JSON.stringify({
-              error: "Description is required",
+              error: "Either title or description is required",
             }),
             {
               status: 400,
@@ -129,7 +129,20 @@ export default {
  * Process the bug report by creating GitHub issue and storing screenshot
  */
 async function processBugReport(bugReport, env) {
-  const { description, screenshot, sessionUrl, env: reportEnv } = bugReport;
+  const { 
+    title,
+    description, 
+    steps,
+    expected,
+    actual,
+    severity,
+    screenshot, 
+    sessionUrl, 
+    env: reportEnv,
+    systemInfo,
+    contextInfo,
+    customData 
+  } = bugReport;
 
   // Store screenshot if provided
   let screenshotUrl = null;
@@ -146,10 +159,18 @@ async function processBugReport(bugReport, env) {
   // Create GitHub issue
   const githubIssue = await createGitHubIssue(
     {
+      title,
       description,
+      steps,
+      expected,
+      actual,
+      severity,
       screenshotUrl,
       sessionUrl,
       env: reportEnv,
+      systemInfo,
+      contextInfo,
+      customData,
     },
     env
   );
@@ -585,7 +606,7 @@ async function getMilestones(env) {
  * Generate smart labels based on bug report content and context
  * Uses existing GitHub labels instead of creating new ones
  */
-async function generateSmartLabels(description, reportEnv, env) {
+async function generateSmartLabels(description, reportEnv, env, severity = 'medium') {
   const labels = ["bug", "user-reported"];
 
   // Fetch existing GitHub labels to avoid duplication
@@ -616,6 +637,23 @@ async function generateSmartLabels(description, reportEnv, env) {
   };
 
   const descriptionLower = description.toLowerCase();
+  
+  // Add severity-based labels
+  if (severity) {
+    const severityLabel = `severity-${severity}`;
+    addLabelIfExists(severityLabel);
+    
+    // Also add priority-based labels if they exist
+    if (severity === 'critical') {
+      addLabelIfExists('priority-high');
+      addLabelIfExists('urgent');
+    } else if (severity === 'high') {
+      addLabelIfExists('priority-medium');  
+      addLabelIfExists('important');
+    } else if (severity === 'low') {
+      addLabelIfExists('priority-low');
+    }
+  }
   const urlPath = reportEnv?.url ? new URL(reportEnv.url).pathname : "";
   const pageContext = reportEnv?.pageContext;
 
@@ -956,7 +994,20 @@ async function generateSmartLabels(description, reportEnv, env) {
  * Create GitHub issue using the GitHub API
  */
 async function createGitHubIssue(data, env) {
-  const { description, screenshotUrl, sessionUrl, env: reportEnv } = data;
+  const { 
+    title,
+    description, 
+    steps,
+    expected,
+    actual,
+    severity,
+    screenshotUrl, 
+    sessionUrl, 
+    env: reportEnv,
+    systemInfo,
+    contextInfo,
+    customData 
+  } = data;
 
   // Build issue body with all available information
   // Parse line breaks into checklist items ONLY if it's NOT code content
@@ -1048,7 +1099,36 @@ async function createGitHubIssue(data, env) {
     }
   }
 
-  let issueBody = `## Bug Report\n\n${processedDescription}\n\n`;
+  // Build comprehensive issue body with V2 form data
+  let issueBody = `## Bug Report\n\n`;
+  
+  // Add description if provided
+  if (description && description.trim()) {
+    issueBody += `${processedDescription}\n\n`;
+  }
+  
+  // Add structured sections for V2 fields
+  if (steps && steps.trim()) {
+    issueBody += `## Steps to Reproduce\n\n${steps}\n\n`;
+  }
+  
+  if (expected && expected.trim()) {
+    issueBody += `## Expected Behavior\n\n${expected}\n\n`;
+  }
+  
+  if (actual && actual.trim()) {
+    issueBody += `## Actual Behavior\n\n${actual}\n\n`;
+  }
+  
+  if (severity && severity !== 'medium') {
+    const severityEmoji = {
+      'low': '🔵',
+      'medium': '🟡', 
+      'high': '🟠',
+      'critical': '🔴'
+    };
+    issueBody += `## Severity\n\n${severityEmoji[severity] || '🟡'} **${severity.toUpperCase()}**\n\n`;
+  }
 
   // Add user location prominently at the top
   if (reportEnv?.pageContext) {
@@ -1212,6 +1292,8 @@ async function createGitHubIssue(data, env) {
   // Add session replay link
   if (sessionUrl) {
     issueBody += `## Session Replay\n[View session replay](${sessionUrl})\n\n`;
+  } else if (customData?.highlightSession?.sessionUrl && customData.highlightSession.sessionUrl !== "Session replay unavailable") {
+    issueBody += `## Session Replay\n[View Highlight.io session](${customData.highlightSession.sessionUrl})\n\n`;
   }
 
   // Add screenshot
@@ -1219,10 +1301,30 @@ async function createGitHubIssue(data, env) {
     issueBody += `## Screenshot\n![Screenshot](${screenshotUrl})\n\n`;
   }
 
+  // Add additional system information if available from systemInfo
+  if (systemInfo) {
+    if (systemInfo.browser) {
+      issueBody += `## Additional Browser Info\n`;
+      if (systemInfo.browser.name) {
+        issueBody += `- **Browser:** ${systemInfo.browser.name} ${systemInfo.browser.version || ''}\n`;
+      }
+      if (systemInfo.browser.engine) {
+        issueBody += `- **Engine:** ${systemInfo.browser.engine}\n`;
+      }
+      if (systemInfo.performance) {
+        const perf = systemInfo.performance;
+        if (perf.memory) {
+          issueBody += `- **Memory Usage:** ${Math.round(perf.memory.usedJSHeapSize / 1024 / 1024)}MB used\n`;
+        }
+      }
+      issueBody += `\n`;
+    }
+  }
+
   issueBody += `---\n*This issue was automatically created from a bug report submitted via the VioletVault app.*`;
 
   // Generate smart labels and get milestone info
-  const smartLabels = await generateSmartLabels(description, reportEnv, env);
+  const smartLabels = await generateSmartLabels(description, reportEnv, env, severity);
   console.log(`Generated smart labels: ${JSON.stringify(smartLabels)}`);
 
   const milestoneInfo = await getMilestones(env);
@@ -1257,7 +1359,9 @@ async function createGitHubIssue(data, env) {
 
   // Prepare issue data
   const issueData = {
-    title: `Bug Report: ${description.substring(0, 80)}${description.length > 80 ? "..." : ""}`,
+    title: title && title.trim() 
+      ? title.substring(0, 80) + (title.length > 80 ? "..." : "")
+      : `Bug Report: ${description.substring(0, 60)}${description.length > 60 ? "..." : ""}`,
     body: finalIssueBody,
     labels: smartLabels,
   };
