@@ -96,9 +96,16 @@ export class BugReportAPIService {
                        typeof value !== 'function' && 
                        !(typeof value === 'object' && JSON.stringify(value).length > 10000);
               }).map(([key, value]) => {
-                // Ensure URL objects are converted to strings to prevent worker crashes
+                // Ensure objects are converted to strings to prevent worker crashes
                 if (key === 'url' && typeof value === 'object' && value.href) {
                   return [key, value.href];
+                }
+                if (key === 'viewport' && typeof value === 'object' && value.width && value.height) {
+                  return [key, `${value.width}x${value.height}`];
+                }
+                // Convert any other objects to JSON strings for safety
+                if (typeof value === 'object' && value !== null) {
+                  return [key, JSON.stringify(value)];
                 }
                 return [key, value];
               })
