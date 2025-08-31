@@ -46,14 +46,6 @@ const BillManager = ({
   onError,
   className = "",
 }) => {
-  logger.debug("🔍 BillManager component rendering", {
-    propTransactionsLength: propTransactions?.length || 0,
-    propEnvelopesLength: propEnvelopes?.length || 0,
-    hasOnUpdateBill: !!onUpdateBill,
-    hasOnCreateRecurringBill: !!onCreateRecurringBill,
-    hasOnSearchNewBills: !!onSearchNewBills,
-    hasOnError: !!onError
-  });
 
   // Use the extracted business logic hook
   const {
@@ -104,13 +96,6 @@ const BillManager = ({
     onError,
   });
 
-  logger.debug("🔍 BillManager useBillManager hook completed", {
-    hasBills: !!bills,
-    billsLength: bills?.length || 0,
-    hasFilteredBills: !!filteredBills,
-    filteredBillsLength: filteredBills?.length || 0,
-    isLoading
-  });
 
   // UI logic hook
   const {
