@@ -1,5 +1,5 @@
-export { default as chunkedFirebaseSync } from "./chunkedFirebaseSync.js";
-export { default as firebaseSync } from "./firebaseSync.js";
+export { default as chunkedSyncService } from "../../services/chunkedSyncService.js";
+export { default as firebaseSyncService } from "../../services/firebaseSyncService.js";
 export { default as masterSyncValidator } from "./masterSyncValidator.js";
 export { default as syncDiagnostic } from "./syncDiagnostic.js";
 export { default as syncEdgeCaseTester } from "./syncEdgeCaseTester.js";
