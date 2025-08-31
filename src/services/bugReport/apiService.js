@@ -74,11 +74,24 @@ export class BugReportAPIService {
         hasScreenshot: !!reportData.screenshot,
       });
 
-      // Format payload for Cloudflare Worker (matches the expected format in bug-report-worker.js)
+      // Format payload for Cloudflare Worker with V2 fields (matches the expected format in bug-report-worker.js)
       const payload = {
+        // V2 Enhanced Fields
+        title: reportData.title || null,
         description: reportData.description || reportData.title || "No description provided",
+        steps: reportData.steps || null,
+        expected: reportData.expected || null,
+        actual: reportData.actual || null,
+        severity: reportData.severity || "medium",
+        
+        // Media and Session Data
         screenshot: reportData.screenshot || null, // Base64 data URL from ScreenshotService
         sessionUrl: reportData.sessionUrl || null, // Session replay URL if available
+        
+        // System and Context Data
+        systemInfo: reportData.systemInfo || null,
+        contextInfo: reportData.contextInfo || null,
+        customData: reportData.customData || null,
         env: {
           // Core environment data (ensure these are always defined and properly typed)
           appVersion: reportData.systemInfo?.appVersion || "unknown",
