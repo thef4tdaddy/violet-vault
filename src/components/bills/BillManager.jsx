@@ -29,6 +29,7 @@ import { useAuth } from "../../stores/auth/authStore";
 import AddBillModal from "./AddBillModal";
 import BulkBillUpdateModal from "./BulkBillUpdateModal";
 import BillDiscoveryModal from "./BillDiscoveryModal";
+import BillDetailModal from "./modals/BillDetailModal";
 import ObjectHistoryViewer from "../history/ObjectHistoryViewer";
 import ConnectionDisplay, {
   ConnectionItem,
@@ -58,6 +59,7 @@ const BillManager = ({
     selectedBills,
     viewMode,
     isSearching,
+    showBillDetail,
     showAddBillModal,
     editingBill,
     showBulkUpdateModal,
@@ -73,6 +75,7 @@ const BillManager = ({
     handleBulkUpdate,
     setSelectedBills,
     setViewMode,
+    setShowBillDetail,
     setShowAddBillModal,
     setEditingBill,
     setShowBulkUpdateModal,
@@ -341,14 +344,23 @@ const BillManager = ({
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end gap-2">
                       <button
+                        onClick={() => setShowBillDetail(bill)}
+                        className="text-purple-600 hover:text-purple-900"
+                        title="View Details"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </button>
+                      <button
                         onClick={() => handleViewHistory(bill)}
                         className="text-gray-400 hover:text-gray-600"
+                        title="View History"
                       >
                         <History className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => handleEditBill(bill)}
                         className="text-blue-600 hover:text-blue-900"
+                        title="Edit Bill"
                       >
                         <Settings className="h-4 w-4" />
                       </button>
@@ -356,6 +368,7 @@ const BillManager = ({
                         <button
                           onClick={() => billOperations.handlePayBill(bill.id)}
                           className="text-green-600 hover:text-green-900"
+                          title="Mark as Paid"
                         >
                           <CheckCircle className="h-4 w-4" />
                         </button>
@@ -426,6 +439,31 @@ const BillManager = ({
           availableEnvelopes={envelopes}
           onAddBills={handleAddDiscoveredBills}
           onError={onError}
+        />
+      )}
+
+      {showBillDetail && (
+        <BillDetailModal
+          bill={showBillDetail}
+          isOpen={!!showBillDetail}
+          onClose={() => setShowBillDetail(null)}
+          onDelete={deleteBill}
+          onMarkPaid={billOperations.handlePayBill}
+          onEdit={(bill) => {
+            setShowBillDetail(null);
+            setEditingBill(bill);
+            setShowAddBillModal(true);
+          }}
+          onCreateRecurring={(bill) => {
+            // Handle making a one-time bill recurring
+            console.log("Making bill recurring:", bill);
+          }}
+          connectedEnvelopes={envelopes.filter(
+            (env) =>
+              env.billId === showBillDetail.id ||
+              env.category === showBillDetail.category ||
+              env.name === showBillDetail.name
+          )}
         />
       )}
 
