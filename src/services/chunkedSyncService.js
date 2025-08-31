@@ -197,9 +197,9 @@ class ChunkedSyncService {
     const db = this._getDb();
     const startTime = Date.now();
 
-    // Warn if currentUser is undefined - check for both uid (Firebase) and id (local user)
-    if (!currentUser?.uid && !currentUser?.id) {
-      logger.warn("saveToCloud called with undefined currentUser.uid/id, using 'anonymous'", {
+    // Warn if currentUser is undefined - check for budgetId (primary), uid (Firebase), or id (local user)
+    if (!currentUser?.budgetId && !currentUser?.uid && !currentUser?.id) {
+      logger.warn("saveToCloud called with undefined currentUser identifier, using 'anonymous'", {
         currentUser,
         hasCurrentUser: !!currentUser,
         currentUserKeys: currentUser ? Object.keys(currentUser) : [],
@@ -213,7 +213,7 @@ class ChunkedSyncService {
     try {
       logger.info("Starting chunked save to cloud", {
         dataSize: this.calculateSize(data),
-        userId: currentUser?.uid || currentUser?.id || "anonymous",
+        userId: currentUser?.budgetId || currentUser?.uid || currentUser?.id || "anonymous",
       });
 
       // Identify large arrays to chunk
@@ -234,7 +234,7 @@ class ChunkedSyncService {
 
       // Create manifest
       const manifest = this.createManifest(chunkMap, {
-        userId: currentUser?.uid || currentUser?.id || "anonymous",
+        userId: currentUser?.budgetId || currentUser?.uid || currentUser?.id || "anonymous",
         userAgent: navigator.userAgent,
         originalKeys: Object.keys(data),
       });
@@ -257,7 +257,7 @@ class ChunkedSyncService {
         _metadata: {
           version: "2.0",
           lastSync: Date.now(),
-          userId: currentUser?.uid || currentUser?.id || "anonymous",
+          userId: currentUser?.budgetId || currentUser?.uid || currentUser?.id || "anonymous",
           chunkedKeys: Object.keys(data).filter(
             (key) => Array.isArray(data[key]) && data[key].length > 100
           ),
