@@ -202,13 +202,21 @@ const useBugReport = () => {
         if (includeScreenshot) {
           try {
             screenshotData = screenshot || (await captureScreenshot());
+            logger.info("Screenshot capture result", {
+              hasScreenshot: !!screenshotData,
+              size: screenshotData?.length || 0,
+              isBase64DataURL: screenshotData?.startsWith("data:image/") || false,
+              firstChars: screenshotData?.substring(0, 50) || "none",
+            });
           } catch (screenshotError) {
-            logger.warn(
+            logger.error(
               "Screenshot capture failed, proceeding without screenshot:",
               screenshotError
             );
             screenshotData = null;
           }
+        } else {
+          logger.info("Screenshot capture disabled by user");
         }
 
         // Get Highlight.io session URL for the bug report
