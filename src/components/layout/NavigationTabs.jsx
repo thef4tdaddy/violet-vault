@@ -124,6 +124,7 @@ const NavigationTabs = memo(({ activeView, onViewChange }) => {
             onClick={() => onViewChange(tab.key)}
             icon={tab.icon}
             label={tab.label}
+            viewKey={tab.key}
           />
         ))}
       </nav>
@@ -141,9 +142,11 @@ const NavigationTabs = memo(({ activeView, onViewChange }) => {
   );
 });
 
-const NavButton = memo(({ active, onClick, icon: Icon, label }) => (
+const NavButton = memo(({ active, onClick, icon: Icon, label, viewKey }) => (
   <button
     onClick={onClick}
+    aria-current={active ? "page" : undefined}
+    data-view={viewKey}
     className={`flex-shrink-0 lg:flex-1 flex flex-col items-center lg:flex-row lg:px-4 px-2 py-2 text-xs lg:text-sm font-medium transition-colors relative border border-black/10 ${
       active
         ? "border-t-2 lg:border-b-2 border-purple-500 text-purple-600 bg-purple-50/50 border-purple-400 ring-1 ring-purple-300"
