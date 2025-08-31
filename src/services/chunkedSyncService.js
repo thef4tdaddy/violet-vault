@@ -115,9 +115,7 @@ class ChunkedSyncService {
 
     // Calculate chunk size based on data size and item count
     let chunkSize = this.maxArrayChunkSize;
-    const sampleSize = this.calculateSize(
-      array.slice(0, Math.min(10, array.length)),
-    );
+    const sampleSize = this.calculateSize(array.slice(0, Math.min(10, array.length)));
     const avgItemSize = sampleSize / Math.min(10, array.length);
 
     if (avgItemSize > 0) {
@@ -125,9 +123,7 @@ class ChunkedSyncService {
       chunkSize = Math.min(chunkSize, Math.max(100, maxItemsForSize));
     }
 
-    logger.debug(
-      `Chunking ${arrayName}: ${totalItems} items, ${chunkSize} per chunk`,
-    );
+    logger.debug(`Chunking ${arrayName}: ${totalItems} items, ${chunkSize} per chunk`);
 
     for (let i = 0; i < totalItems; i += chunkSize) {
       const chunkIndex = Math.floor(i / chunkSize);
@@ -193,14 +189,11 @@ class ChunkedSyncService {
 
     // Warn if currentUser is undefined
     if (!currentUser?.uid) {
-      logger.warn(
-        "saveToCloud called with undefined currentUser.uid, using 'anonymous'",
-        {
-          currentUser,
-          hasCurrentUser: !!currentUser,
-          source: "chunkedSyncService",
-        },
-      );
+      logger.warn("saveToCloud called with undefined currentUser.uid, using 'anonymous'", {
+        currentUser,
+        hasCurrentUser: !!currentUser,
+        source: "chunkedSyncService",
+      });
     }
 
     try {
@@ -235,7 +228,7 @@ class ChunkedSyncService {
       // Encrypt and save manifest
       const encryptedManifest = await encryptionUtils.encrypt(
         this.safeStringify(manifest),
-        this.encryptionKey,
+        this.encryptionKey
       );
 
       const mainDocument = {
@@ -252,7 +245,7 @@ class ChunkedSyncService {
           lastSync: Date.now(),
           userId: currentUser?.uid || "anonymous",
           chunkedKeys: Object.keys(data).filter(
-            (key) => Array.isArray(data[key]) && data[key].length > 100,
+            (key) => Array.isArray(data[key]) && data[key].length > 100
           ),
         },
       };
@@ -271,7 +264,7 @@ class ChunkedSyncService {
         for (const [chunkId, chunkData] of batchChunks) {
           const encryptedChunk = await encryptionUtils.encrypt(
             this.safeStringify(chunkData),
-            this.encryptionKey,
+            this.encryptionKey
           );
 
           const chunkDocument = {
@@ -284,15 +277,12 @@ class ChunkedSyncService {
             timestamp: Date.now(),
           };
 
-          batch.set(
-            doc(db, "budgets", this.budgetId, "chunks", chunkId),
-            chunkDocument,
-          );
+          batch.set(doc(db, "budgets", this.budgetId, "chunks", chunkId), chunkDocument);
         }
 
         await batch.commit();
         logger.debug(
-          `Saved batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(chunkEntries.length / batchSize)}`,
+          `Saved batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(chunkEntries.length / batchSize)}`
         );
       }
 
@@ -340,18 +330,29 @@ class ChunkedSyncService {
 
       // Check if we have chunks to reassemble
       if (mainData._manifest) {
-        // Decrypt manifest
-        const manifestData = await encryptionUtils.decrypt(
-          {
-            encryptedData: bytesFromBase64(
-              mainData._manifest.encryptedData.data,
-            ),
-            iv: bytesFromBase64(mainData._manifest.encryptedData.iv),
-          },
-          this.encryptionKey,
-        );
+        let manifest;
+        try {
+          // Decrypt manifest
+          const manifestData = await encryptionUtils.decrypt(
+            {
+              encryptedData: bytesFromBase64(mainData._manifest.encryptedData.data),
+              iv: bytesFromBase64(mainData._manifest.encryptedData.iv),
+            },
+            this.encryptionKey
+          );
 
-        const manifest = JSON.parse(manifestData);
+          manifest = JSON.parse(manifestData);
+        } catch (decryptError) {
+          logger.error("❌ Failed to decrypt manifest - corrupted cloud data", {
+            error: decryptError.message,
+            errorType: decryptError.name,
+            budgetId: this.budgetId.substring(0, 8) + "...",
+          });
+
+          // Return the data without chunked arrays rather than failing completely
+          logger.warn("⚠️ Returning incomplete data due to manifest corruption");
+          return reconstructedData;
+        }
         logger.debug("Loaded manifest", {
           version: manifest.version,
           totalChunks: manifest.metadata.totalChunks,
@@ -360,24 +361,34 @@ class ChunkedSyncService {
         // Load all chunks
         const chunksQuery = query(
           collection(db, "budgets", this.budgetId, "chunks"),
-          where("budgetId", "==", this.budgetId),
+          where("budgetId", "==", this.budgetId)
         );
 
         const chunksSnapshot = await getDocs(chunksQuery);
         const chunks = {};
 
-        // Decrypt all chunks
+        // Decrypt all chunks with individual error handling
         for (const chunkDoc of chunksSnapshot.docs) {
           const chunkData = chunkDoc.data();
-          const decryptedChunk = await encryptionUtils.decrypt(
-            {
-              encryptedData: bytesFromBase64(chunkData.encryptedData.data),
-              iv: bytesFromBase64(chunkData.encryptedData.iv),
-            },
-            this.encryptionKey,
-          );
+          try {
+            const decryptedChunk = await encryptionUtils.decrypt(
+              {
+                encryptedData: bytesFromBase64(chunkData.encryptedData.data),
+                iv: bytesFromBase64(chunkData.encryptedData.iv),
+              },
+              this.encryptionKey
+            );
 
-          chunks[chunkData.chunkId] = JSON.parse(decryptedChunk);
+            chunks[chunkData.chunkId] = JSON.parse(decryptedChunk);
+          } catch (chunkDecryptError) {
+            logger.error("❌ Failed to decrypt chunk - skipping corrupted chunk", {
+              chunkId: chunkData.chunkId,
+              error: chunkDecryptError.message,
+              errorType: chunkDecryptError.name,
+            });
+            // Skip this chunk but continue with others
+            continue;
+          }
         }
 
         // Reassemble chunked arrays
@@ -397,9 +408,7 @@ class ChunkedSyncService {
             }
 
             reconstructedData[key] = reassembledArray;
-            logger.debug(
-              `Reassembled ${key}: ${reassembledArray.length} items`,
-            );
+            logger.debug(`Reassembled ${key}: ${reassembledArray.length} items`);
           }
         }
       }
@@ -439,7 +448,7 @@ class ChunkedSyncService {
       // Delete all chunks
       const chunksQuery = query(
         collection(db, "budgets", this.budgetId, "chunks"),
-        where("budgetId", "==", this.budgetId),
+        where("budgetId", "==", this.budgetId)
       );
 
       const snapshot = await getDocs(chunksQuery);
@@ -454,6 +463,50 @@ class ChunkedSyncService {
       logger.info("✅ Cloud data reset completed");
     } catch (error) {
       logger.error("❌ Failed to reset cloud data", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Clear corrupted cloud data and reset to clean state
+   */
+  async clearCorruptedData() {
+    if (!this.budgetId) {
+      throw new Error("Budget ID not set");
+    }
+
+    const db = this._getDb();
+
+    try {
+      logger.info("🧹 Clearing corrupted cloud data for fresh start");
+
+      // Delete all chunks first
+      const chunksQuery = query(
+        collection(db, "budgets", this.budgetId, "chunks"),
+        where("budgetId", "==", this.budgetId)
+      );
+
+      const snapshot = await getDocs(chunksQuery);
+      const batch = writeBatch(db);
+
+      snapshot.docs.forEach((chunkDoc) => {
+        batch.delete(chunkDoc.ref);
+      });
+
+      await batch.commit();
+      logger.info(`🗑️ Deleted ${snapshot.docs.length} corrupted chunks`);
+
+      // Clear main document
+      await setDoc(doc(db, "budgets", this.budgetId), {
+        _cleared: true,
+        _timestamp: Date.now(),
+        _reason: "Corrupted data cleared",
+      });
+
+      logger.info("✅ Corrupted cloud data cleared successfully");
+      return true;
+    } catch (error) {
+      logger.error("❌ Failed to clear corrupted cloud data", error);
       throw error;
     }
   }
