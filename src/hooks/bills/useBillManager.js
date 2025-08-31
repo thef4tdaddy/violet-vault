@@ -88,7 +88,7 @@ export const useBillManager = ({
 
 
     return result;
-  }, [propEnvelopes, tanStackEnvelopes, budget.envelopes, envelopesLoading]);
+  }, [propEnvelopes, tanStackEnvelopes, budget.envelopes]);
 
   // Process bills with calculations and recurring bill logic
   const bills = useMemo(() => {
