@@ -205,7 +205,11 @@ class ChunkedSyncService {
         currentUserKeys: currentUser ? Object.keys(currentUser) : [],
         currentUserValues: currentUser ? Object.values(currentUser).map((v) => typeof v) : [],
         // Show actual property names and values for debugging
-        currentUserPropsDebug: currentUser ? Object.entries(currentUser).map(([k, v]) => `${k}: ${typeof v === 'string' ? v.substring(0, 20) : typeof v}`) : [],
+        currentUserPropsDebug: currentUser
+          ? Object.entries(currentUser).map(
+              ([k, v]) => `${k}: ${typeof v === "string" ? v.substring(0, 20) : typeof v}`
+            )
+          : [],
         source: "chunkedSyncService",
       });
     }
@@ -253,7 +257,9 @@ class ChunkedSyncService {
           hasIv: !!encryptedManifest?.iv,
           manifestKeys: encryptedManifest ? Object.keys(encryptedManifest) : [],
         });
-        throw new Error(`Encryption failed: missing properties - hasData: ${!!encryptedManifest?.data}, hasIv: ${!!encryptedManifest?.iv}`);
+        throw new Error(
+          `Encryption failed: missing properties - hasData: ${!!encryptedManifest?.data}, hasIv: ${!!encryptedManifest?.iv}`
+        );
       }
 
       const mainDocument = {
