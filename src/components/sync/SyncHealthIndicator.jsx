@@ -211,13 +211,13 @@ const SyncHealthIndicator = () => {
     if (typeof window !== "undefined" && window.forceCloudDataReset) {
       setIsRecovering(true);
       setRecoveryResult(null);
-      
+
       try {
         logger.info("🚨 Running corruption recovery from UI...");
         const result = await window.forceCloudDataReset();
-        
+
         setRecoveryResult(result);
-        
+
         if (result.success) {
           logger.info("✅ Corruption recovery completed successfully");
           // Recheck sync health after successful recovery
@@ -231,7 +231,7 @@ const SyncHealthIndicator = () => {
         logger.error("Corruption recovery error:", error);
         setRecoveryResult({
           success: false,
-          error: error.message || "Recovery failed"
+          error: error.message || "Recovery failed",
         });
       } finally {
         setIsRecovering(false);
@@ -265,155 +265,161 @@ const SyncHealthIndicator = () => {
             ref={dropdownRef}
             className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50"
           >
-          <div className="p-4">
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Sync Health Status
-              </h3>
-              <button
-                onClick={() => setShowDetails(false)}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                title="Close"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600 dark:text-gray-300">Overall Status:</span>
-                <span className={`text-sm font-medium ${getStatusColor()}`}>
-                  {syncStatus.status}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600 dark:text-gray-300">Background Sync:</span>
-                <span
-                  className={`text-sm font-medium flex items-center space-x-1 ${isBackgroundSyncing ? "text-blue-500" : "text-gray-500"}`}
+            <div className="p-4">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Sync Health Status
+                </h3>
+                <button
+                  onClick={() => setShowDetails(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  title="Close"
                 >
-                  {isBackgroundSyncing && (
-                    <svg className="w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none">
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        fill="none"
-                        opacity="0.25"
-                      />
-                      <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                    </svg>
-                  )}
-                  <span>{isBackgroundSyncing ? "Active" : "Idle"}</span>
-                </span>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
               </div>
 
-              {syncStatus.failedTests > 0 && (
+              <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600 dark:text-gray-300">Failed Tests:</span>
-                  <span className="text-sm font-medium text-red-500">{syncStatus.failedTests}</span>
-                </div>
-              )}
-
-              {syncStatus.lastChecked && (
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600 dark:text-gray-300">Last Checked:</span>
-                  <span className="text-sm text-gray-900 dark:text-gray-100">
-                    {new Date(syncStatus.lastChecked).toLocaleTimeString()}
+                  <span className="text-sm text-gray-600 dark:text-gray-300">Overall Status:</span>
+                  <span className={`text-sm font-medium ${getStatusColor()}`}>
+                    {syncStatus.status}
                   </span>
                 </div>
-              )}
 
-              {syncStatus.error && (
-                <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 rounded border-l-4 border-red-500">
-                  <p className="text-sm text-red-700 dark:text-red-300">{syncStatus.error}</p>
-                </div>
-              )}
-            </div>
-
-            <div className="mt-4 space-y-2">
-              {/* Primary actions */}
-              <div className="flex space-x-2">
-                <button
-                  onClick={checkSyncHealth}
-                  disabled={syncStatus.isLoading}
-                  className="flex-1 px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-1"
-                >
-                  <RefreshCw className={`w-3 h-3 ${syncStatus.isLoading ? 'animate-spin' : ''}`} />
-                  <span>{syncStatus.isLoading ? "Checking..." : "Recheck"}</span>
-                </button>
-
-                <button
-                  onClick={runFullValidation}
-                  className="flex-1 px-3 py-2 text-sm bg-purple-500 text-white rounded hover:bg-purple-600 flex items-center justify-center space-x-1"
-                >
-                  <Wrench className="w-3 h-3" />
-                  <span>Full Test</span>
-                </button>
-              </div>
-
-              {/* Corruption recovery section */}
-              <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-                <div className="flex items-center space-x-2 mb-2">
-                  <AlertTriangle className="w-4 h-4 text-yellow-500" />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Data Recovery
-                  </span>
-                </div>
-                
-                <button
-                  onClick={runCorruptionRecovery}
-                  disabled={isRecovering}
-                  className="w-full px-3 py-2 text-sm bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-1"
-                  title="Clear corrupted cloud data and force re-upload from local data"
-                >
-                  <RefreshCw className={`w-3 h-3 ${isRecovering ? 'animate-spin' : ''}`} />
-                  <span>{isRecovering ? "Recovering..." : "Fix Corruption"}</span>
-                </button>
-                
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">
-                  Use if sync errors persist (clears cloud data)
-                </p>
-
-                {/* Recovery result display */}
-                {recoveryResult && (
-                  <div className={`mt-2 p-2 rounded text-xs ${
-                    recoveryResult.success 
-                      ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-l-4 border-green-500'
-                      : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-l-4 border-red-500'
-                  }`}>
-                    {recoveryResult.success ? (
-                      <div>
-                        <div className="font-medium">✅ Recovery Successful</div>
-                        <div className="mt-1">{recoveryResult.message}</div>
-                      </div>
-                    ) : (
-                      <div>
-                        <div className="font-medium">❌ Recovery Failed</div>
-                        <div className="mt-1">{recoveryResult.error}</div>
-                      </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600 dark:text-gray-300">Background Sync:</span>
+                  <span
+                    className={`text-sm font-medium flex items-center space-x-1 ${isBackgroundSyncing ? "text-blue-500" : "text-gray-500"}`}
+                  >
+                    {isBackgroundSyncing && (
+                      <svg className="w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none">
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          fill="none"
+                          opacity="0.25"
+                        />
+                        <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
                     )}
+                    <span>{isBackgroundSyncing ? "Active" : "Idle"}</span>
+                  </span>
+                </div>
+
+                {syncStatus.failedTests > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600 dark:text-gray-300">Failed Tests:</span>
+                    <span className="text-sm font-medium text-red-500">
+                      {syncStatus.failedTests}
+                    </span>
+                  </div>
+                )}
+
+                {syncStatus.lastChecked && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600 dark:text-gray-300">Last Checked:</span>
+                    <span className="text-sm text-gray-900 dark:text-gray-100">
+                      {new Date(syncStatus.lastChecked).toLocaleTimeString()}
+                    </span>
+                  </div>
+                )}
+
+                {syncStatus.error && (
+                  <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 rounded border-l-4 border-red-500">
+                    <p className="text-sm text-red-700 dark:text-red-300">{syncStatus.error}</p>
                   </div>
                 )}
               </div>
-            </div>
 
-            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Console commands: runSyncHealthCheck(), runMasterSyncValidation()
-              </p>
+              <div className="mt-4 space-y-2">
+                {/* Primary actions */}
+                <div className="flex space-x-2">
+                  <button
+                    onClick={checkSyncHealth}
+                    disabled={syncStatus.isLoading}
+                    className="flex-1 px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-1"
+                  >
+                    <RefreshCw
+                      className={`w-3 h-3 ${syncStatus.isLoading ? "animate-spin" : ""}`}
+                    />
+                    <span>{syncStatus.isLoading ? "Checking..." : "Recheck"}</span>
+                  </button>
+
+                  <button
+                    onClick={runFullValidation}
+                    className="flex-1 px-3 py-2 text-sm bg-purple-500 text-white rounded hover:bg-purple-600 flex items-center justify-center space-x-1"
+                  >
+                    <Wrench className="w-3 h-3" />
+                    <span>Full Test</span>
+                  </button>
+                </div>
+
+                {/* Corruption recovery section */}
+                <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Data Recovery
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={runCorruptionRecovery}
+                    disabled={isRecovering}
+                    className="w-full px-3 py-2 text-sm bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-1"
+                    title="Clear corrupted cloud data and force re-upload from local data"
+                  >
+                    <RefreshCw className={`w-3 h-3 ${isRecovering ? "animate-spin" : ""}`} />
+                    <span>{isRecovering ? "Recovering..." : "Fix Corruption"}</span>
+                  </button>
+
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">
+                    Use if sync errors persist (clears cloud data)
+                  </p>
+
+                  {/* Recovery result display */}
+                  {recoveryResult && (
+                    <div
+                      className={`mt-2 p-2 rounded text-xs ${
+                        recoveryResult.success
+                          ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-l-4 border-green-500"
+                          : "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-l-4 border-red-500"
+                      }`}
+                    >
+                      {recoveryResult.success ? (
+                        <div>
+                          <div className="font-medium">✅ Recovery Successful</div>
+                          <div className="mt-1">{recoveryResult.message}</div>
+                        </div>
+                      ) : (
+                        <div>
+                          <div className="font-medium">❌ Recovery Failed</div>
+                          <div className="mt-1">{recoveryResult.error}</div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Console commands: runSyncHealthCheck(), runMasterSyncValidation()
+                </p>
+              </div>
             </div>
           </div>
-        </div>
         </>
       )}
     </div>

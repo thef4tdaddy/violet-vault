@@ -41,25 +41,25 @@ if (
     console.log("🚨 Force clearing all cloud data and re-uploading from local...");
     try {
       const { cloudSyncService } = await import("./services/cloudSyncService.js");
-      
+
       // Stop any ongoing sync
       cloudSyncService.stop();
       console.log("⏸️ Stopped background sync");
-      
+
       // Wait a moment for sync to fully stop
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       // Clear all cloud data completely
       await cloudSyncService.clearAllData();
       console.log("🧹 Cleared all cloud data");
-      
+
       // Wait for clearing to complete
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       // Force push local data to cloud (bypasses corruption checks)
       const result = await cloudSyncService.forcePushToCloud();
       console.log("🚀 Force pushed local data to cloud:", result);
-      
+
       if (result.success) {
         console.log("✅ Cloud data reset completed successfully - sync will resume automatically");
         // Don't restart sync immediately - let it happen naturally
@@ -72,7 +72,7 @@ if (
       return { success: false, error: error.message };
     }
   };
-  
+
   // Manual cloud clear only (for testing)
   window.clearCloudDataOnly = async () => {
     console.log("🧹 Clearing cloud data only (no restart)...");
@@ -80,10 +80,10 @@ if (
       const { cloudSyncService } = await import("./services/cloudSyncService.js");
       cloudSyncService.stop();
       console.log("⏸️ Stopped sync service");
-      
+
       await cloudSyncService.clearAllData();
       console.log("✅ Cloud data cleared - sync service remains stopped");
-      
+
       return { success: true, message: "Cloud data cleared, sync stopped" };
     } catch (error) {
       console.error("❌ Clear failed:", error);
