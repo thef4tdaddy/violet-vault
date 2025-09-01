@@ -381,7 +381,7 @@ class ChunkedSyncService {
           // Decrypt manifest
           const manifestData = await encryptionUtils.decrypt(
             {
-              encryptedData: encryptedDataBytes,
+              data: encryptedDataBytes,
               iv: ivBytes,
             },
             this.encryptionKey
@@ -436,7 +436,7 @@ class ChunkedSyncService {
           try {
             const decryptedChunk = await encryptionUtils.decrypt(
               {
-                encryptedData: bytesFromBase64(chunkData.encryptedData.data),
+                data: bytesFromBase64(chunkData.encryptedData.data),
                 iv: bytesFromBase64(chunkData.encryptedData.iv),
               },
               this.encryptionKey
