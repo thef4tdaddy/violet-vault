@@ -1,5 +1,4 @@
-import React, { useState, lazy, Suspense } from "react";
-import { globalToast } from "../../stores/ui/toastStore";
+import React, { lazy, Suspense } from "react";
 import {
   X,
   Settings,
@@ -16,16 +15,24 @@ import {
   Monitor,
   AlertTriangle,
 } from "lucide-react";
-import { useBudgetStore } from "../../stores/ui/uiStore";
 import LoadingSpinner from "../ui/LoadingSpinner";
-import logger from "../../utils/common/logger";
+import {
+  useSettingsDashboardUI,
+  useCloudSyncManager,
+  useSettingsSections,
+  useSettingsActions,
+} from "../../hooks/settings/useSettingsDashboard";
 
 // Lazy load heavy components
 const ChangePasswordModal = lazy(() => import("../auth/ChangePasswordModal"));
 const ActivityFeed = lazy(() => import("../activity/ActivityFeed"));
-const LocalOnlyModeSettings = lazy(() => import("../auth/LocalOnlyModeSettings"));
+const LocalOnlyModeSettings = lazy(
+  () => import("../auth/LocalOnlyModeSettings"),
+);
 const SecuritySettings = lazy(() => import("./SecuritySettings"));
-const EnvelopeIntegrityChecker = lazy(() => import("./EnvelopeIntegrityChecker"));
+const EnvelopeIntegrityChecker = lazy(
+  () => import("./EnvelopeIntegrityChecker"),
+);
 
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
@@ -46,117 +53,65 @@ const SettingsDashboard = ({
   isLocalOnlyMode = false,
   securityManager,
 }) => {
-  const [activeSection, setActiveSection] = useState("general");
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [showActivityFeed, setShowActivityFeed] = useState(false);
-  const [showLocalOnlySettings, setShowLocalOnlySettings] = useState(false);
-  const [showSecuritySettings, setShowSecuritySettings] = useState(false);
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [showEnvelopeChecker, setShowEnvelopeChecker] = useState(false);
+  const {
+    activeSection,
+    showPasswordModal,
+    showActivityFeed,
+    showLocalOnlySettings,
+    showSecuritySettings,
+    showResetConfirm,
+    showEnvelopeChecker,
+    handleSectionChange,
+    openPasswordModal,
+    closePasswordModal,
+    openActivityFeed,
+    closeActivityFeed,
+    openLocalOnlySettings,
+    closeLocalOnlySettings,
+    openSecuritySettings,
+    closeSecuritySettings,
+    openResetConfirm,
+    closeResetConfirm,
+    openEnvelopeChecker,
+    closeEnvelopeChecker,
+  } = useSettingsDashboardUI();
 
-  // Cloud sync state
-  const { cloudSyncEnabled, setCloudSyncEnabled } = useBudgetStore();
-  const [isSyncing, setIsSyncing] = useState(false);
+  const {
+    cloudSyncEnabled,
+    isSyncing,
+    handleToggleCloudSync,
+    handleManualSync,
+  } = useCloudSyncManager();
+
+  const { sections } = useSettingsSections();
+  const { handleCreateTestHistory, handleResetConfirmAction } =
+    useSettingsActions();
 
   if (!isOpen) return null;
-
-  const handleToggleCloudSync = async () => {
-    const newValue = !cloudSyncEnabled;
-    setCloudSyncEnabled(newValue);
-
-    if (newValue) {
-      logger.debug("🌩️ Cloud sync enabled - starting background sync");
-      try {
-        const { cloudSyncService } = await import("../../services/cloudSyncService");
-        const { useAuth } = await import("../../stores/auth/authStore");
-        const authState = useAuth.getState();
-
-        if (authState.encryptionKey && authState.currentUser && authState.budgetId) {
-          await cloudSyncService.start({
-            encryptionKey: authState.encryptionKey,
-            currentUser: authState.currentUser,
-            budgetId: authState.budgetId,
-          });
-        }
-      } catch (error) {
-        logger.error("Failed to start cloud sync:", error);
-      }
-    } else {
-      logger.debug("💾 Cloud sync disabled - stopping background sync");
-      try {
-        const { cloudSyncService } = await import("../../services/cloudSyncService");
-        cloudSyncService.stop();
-      } catch (error) {
-        logger.error("Failed to stop cloud sync:", error);
-      }
-    }
-  };
-
-  const handleManualSync = async () => {
-    if (!cloudSyncEnabled || isSyncing) return;
-
-    setIsSyncing(true);
-    try {
-      logger.debug("🔄 Manual sync triggered from settings");
-      const { cloudSyncService } = await import("../../services/cloudSyncService");
-
-      if (!cloudSyncService.isRunning) {
-        logger.warn("⚠️ Cloud sync service not running, starting temporarily...");
-        const { useAuth } = await import("../../stores/auth/authStore");
-        const authState = useAuth.getState();
-
-        if (authState.encryptionKey && authState.currentUser && authState.budgetId) {
-          await cloudSyncService.start({
-            encryptionKey: authState.encryptionKey,
-            currentUser: authState.currentUser,
-            budgetId: authState.budgetId,
-          });
-        } else {
-          throw new Error("Missing authentication context for sync");
-        }
-      }
-
-      const result = await cloudSyncService.forceSync();
-
-      if (result.success) {
-        logger.info("✅ Manual sync completed", result);
-        // TODO: Could add a success toast notification here
-      } else {
-        logger.error("❌ Manual sync failed", result.error);
-        // TODO: Could add an error toast notification here
-      }
-    } catch (error) {
-      logger.error("❌ Manual sync failed:", error);
-    } finally {
-      setIsSyncing(false);
-    }
-  };
-
-  const sections = [
-    { id: "general", label: "General", icon: Settings },
-    { id: "account", label: "Account", icon: User },
-    { id: "security", label: "Security", icon: Shield },
-    { id: "data", label: "Data", icon: Cloud },
-  ];
 
   const renderSectionContent = () => {
     switch (activeSection) {
       case "general":
         return (
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-900">General Settings</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              General Settings
+            </h3>
 
             {isLocalOnlyMode && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-start">
                   <Monitor className="h-5 w-5 text-blue-600 mt-0.5 mr-3" />
                   <div>
-                    <h4 className="font-medium text-blue-900">Local-Only Mode</h4>
+                    <h4 className="font-medium text-blue-900">
+                      Local-Only Mode
+                    </h4>
                     <p className="text-sm text-blue-700 mt-1">
-                      You're running in local-only mode. Data is stored locally only.
+                      You're running in local-only mode. Data is stored locally
+                      only.
                     </p>
                     <button
-                      onClick={() => setShowLocalOnlySettings(true)}
+                      onClick={openLocalOnlySettings}
                       className="mt-2 text-sm text-blue-600 hover:text-blue-800 underline"
                     >
                       Manage Local-Only Settings
@@ -171,7 +126,9 @@ const SettingsDashboard = ({
                 <h4 className="font-medium text-gray-900">Cloud Sync</h4>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600">Sync your data across devices</p>
+                    <p className="text-sm text-gray-600">
+                      Sync your data across devices
+                    </p>
                     <p className="text-xs text-gray-500 mt-1">
                       Status: {cloudSyncEnabled ? "Enabled" : "Disabled"}
                     </p>
@@ -197,7 +154,9 @@ const SettingsDashboard = ({
                       disabled={isSyncing}
                       className="flex items-center px-3 py-2 text-sm border border-purple-200 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <RefreshCw className={`h-4 w-4 mr-2 ${isSyncing ? "animate-spin" : ""}`} />
+                      <RefreshCw
+                        className={`h-4 w-4 mr-2 ${isSyncing ? "animate-spin" : ""}`}
+                      />
                       {isSyncing ? "Syncing..." : "Sync Now"}
                     </button>
                   </div>
@@ -210,7 +169,9 @@ const SettingsDashboard = ({
       case "account":
         return (
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-900">Account Settings</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Account Settings
+            </h3>
 
             <div className="space-y-4">
               <div className="bg-gray-50 rounded-lg p-4">
@@ -221,13 +182,15 @@ const SettingsDashboard = ({
               </div>
 
               <button
-                onClick={() => setShowPasswordModal(true)}
+                onClick={openPasswordModal}
                 className="w-full flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <Key className="h-5 w-5 text-gray-600 mr-3" />
                 <div className="text-left">
                   <p className="font-medium text-gray-900">Change Password</p>
-                  <p className="text-sm text-gray-500">Update your encryption password</p>
+                  <p className="text-sm text-gray-500">
+                    Update your encryption password
+                  </p>
                 </div>
               </button>
 
@@ -236,7 +199,9 @@ const SettingsDashboard = ({
                   <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 mr-3" />
                   <div className="flex-1">
                     <h4 className="font-medium text-red-900">Danger Zone</h4>
-                    <p className="text-sm text-red-700 mt-1">These actions cannot be undone.</p>
+                    <p className="text-sm text-red-700 mt-1">
+                      These actions cannot be undone.
+                    </p>
                     <div className="mt-3 space-y-2">
                       <button
                         onClick={onLogout}
@@ -245,7 +210,7 @@ const SettingsDashboard = ({
                         Logout Only (Keep Data)
                       </button>
                       <button
-                        onClick={() => setShowResetConfirm(true)}
+                        onClick={openResetConfirm}
                         className="block w-full text-left px-3 py-2 text-sm bg-red-100 border border-red-300 rounded-lg hover:bg-red-200 transition-colors text-red-800"
                       >
                         Clear All Data
@@ -261,7 +226,9 @@ const SettingsDashboard = ({
       case "security":
         return (
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-900">Security Settings</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Security Settings
+            </h3>
 
             <div className="space-y-4">
               {securityManager && (
@@ -272,19 +239,27 @@ const SettingsDashboard = ({
                   >
                     <Lock className="h-5 w-5 text-gray-600 mr-3" />
                     <div className="text-left">
-                      <p className="font-medium text-gray-900">Lock Application</p>
-                      <p className="text-sm text-gray-500">Immediately lock the app</p>
+                      <p className="font-medium text-gray-900">
+                        Lock Application
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Immediately lock the app
+                      </p>
                     </div>
                   </button>
 
                   <button
-                    onClick={() => setShowSecuritySettings(true)}
+                    onClick={openSecuritySettings}
                     className="w-full flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     <Shield className="h-5 w-5 text-gray-600 mr-3" />
                     <div className="text-left">
-                      <p className="font-medium text-gray-900">Advanced Security</p>
-                      <p className="text-sm text-gray-500">Auto-lock, logging, and privacy</p>
+                      <p className="font-medium text-gray-900">
+                        Advanced Security
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Auto-lock, logging, and privacy
+                      </p>
                     </div>
                   </button>
                 </>
@@ -296,16 +271,20 @@ const SettingsDashboard = ({
       case "data":
         return (
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-900">Data Management</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Data Management
+            </h3>
 
             <div className="space-y-4">
               <button
-                onClick={() => setShowEnvelopeChecker(true)}
+                onClick={openEnvelopeChecker}
                 className="w-full flex items-center p-3 border border-purple-200 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
               >
                 <AlertTriangle className="h-5 w-5 text-purple-600 mr-3" />
                 <div className="text-left">
-                  <p className="font-medium text-purple-900">Envelope Integrity Checker</p>
+                  <p className="font-medium text-purple-900">
+                    Envelope Integrity Checker
+                  </p>
                   <p className="text-sm text-purple-700">
                     Detect and fix empty/corrupted envelopes
                   </p>
@@ -313,39 +292,27 @@ const SettingsDashboard = ({
               </button>
 
               <button
-                onClick={() => setShowActivityFeed(true)}
+                onClick={openActivityFeed}
                 className="w-full flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <History className="h-5 w-5 text-gray-600 mr-3" />
                 <div className="text-left">
                   <p className="font-medium text-gray-900">Activity History</p>
-                  <p className="text-sm text-gray-500">View recent budget activities and changes</p>
+                  <p className="text-sm text-gray-500">
+                    View recent budget activities and changes
+                  </p>
                 </div>
               </button>
 
               <button
-                onClick={async () => {
-                  try {
-                    const { createTestBudgetHistory } = await import(
-                      "../../utils/common/testBudgetHistory"
-                    );
-                    await createTestBudgetHistory();
-                    globalToast.showSuccess(
-                      "✅ Test budget history created! Check console for details.",
-                      "Test History Created"
-                    );
-                  } catch (error) {
-                    globalToast.showError(
-                      "❌ Failed to create test history: " + error.message,
-                      "Test Failed"
-                    );
-                  }
-                }}
+                onClick={handleCreateTestHistory}
                 className="w-full flex items-center p-3 border border-yellow-200 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors"
               >
                 <History className="h-5 w-5 text-yellow-600 mr-3" />
                 <div className="text-left">
-                  <p className="font-medium text-yellow-900">🧪 Test Budget History</p>
+                  <p className="font-medium text-yellow-900">
+                    🧪 Test Budget History
+                  </p>
                   <p className="text-sm text-yellow-700">
                     Create test commits for family collaboration
                   </p>
@@ -359,7 +326,9 @@ const SettingsDashboard = ({
                 <Download className="h-5 w-5 text-gray-600 mr-3" />
                 <div className="text-left">
                   <p className="font-medium text-gray-900">Export Data</p>
-                  <p className="text-sm text-gray-500">Download your budget data</p>
+                  <p className="text-sm text-gray-500">
+                    Download your budget data
+                  </p>
                 </div>
               </button>
 
@@ -378,7 +347,9 @@ const SettingsDashboard = ({
                   <Upload className="h-5 w-5 text-gray-600 mr-3" />
                   <div className="text-left">
                     <p className="font-medium text-gray-900">Import Data</p>
-                    <p className="text-sm text-gray-500">Upload budget data from file</p>
+                    <p className="text-sm text-gray-500">
+                      Upload budget data from file
+                    </p>
                   </div>
                 </label>
               </div>
@@ -391,7 +362,9 @@ const SettingsDashboard = ({
                   <Cloud className="h-5 w-5 text-blue-600 mr-3" />
                   <div className="text-left">
                     <p className="font-medium text-blue-900">Sync to Cloud</p>
-                    <p className="text-sm text-blue-600">Upload your data to cloud storage</p>
+                    <p className="text-sm text-blue-600">
+                      Upload your data to cloud storage
+                    </p>
                   </div>
                 </button>
               )}
@@ -432,7 +405,7 @@ const SettingsDashboard = ({
                   return (
                     <button
                       key={section.id}
-                      onClick={() => setActiveSection(section.id)}
+                      onClick={() => handleSectionChange(section.id)}
                       className={`w-full flex items-center px-3 py-2 rounded-lg text-left transition-colors ${
                         activeSection === section.id
                           ? "bg-purple-100 text-purple-700"
@@ -461,24 +434,23 @@ const SettingsDashboard = ({
           <div className="bg-white border border-gray-300 rounded-lg p-6 w-full max-w-md">
             <div className="flex items-center gap-3 mb-4">
               <AlertTriangle className="h-6 w-6 text-red-500" />
-              <h4 className="font-semibold text-gray-900">Confirm Data Reset</h4>
+              <h4 className="font-semibold text-gray-900">
+                Confirm Data Reset
+              </h4>
             </div>
             <p className="text-gray-600 mb-6">
-              This will permanently delete all your budget data. This action cannot be undone.
+              This will permanently delete all your budget data. This action
+              cannot be undone.
             </p>
             <div className="flex gap-3">
               <button
-                onClick={() => setShowResetConfirm(false)}
+                onClick={closeResetConfirm}
                 className="flex-1 px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300"
               >
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  setShowResetConfirm(false);
-                  onClose();
-                  onResetEncryption();
-                }}
+                onClick={handleResetConfirmAction(onClose, onResetEncryption)}
                 className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
               >
                 Delete All Data
@@ -492,7 +464,7 @@ const SettingsDashboard = ({
         {showPasswordModal && (
           <ChangePasswordModal
             isOpen={showPasswordModal}
-            onClose={() => setShowPasswordModal(false)}
+            onClose={closePasswordModal}
             onChangePassword={onChangePassword}
           />
         )}
@@ -501,7 +473,7 @@ const SettingsDashboard = ({
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-60">
             <div className="bg-white rounded-xl w-full max-w-6xl max-h-[90vh] overflow-hidden shadow-2xl relative">
               <button
-                onClick={() => setShowActivityFeed(false)}
+                onClick={closeActivityFeed}
                 className="absolute top-4 right-4 z-10 text-gray-400 hover:text-gray-600 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-lg hover:shadow-xl transition-all border border-gray-200"
               >
                 <X className="h-5 w-5" />
@@ -516,7 +488,7 @@ const SettingsDashboard = ({
         {showLocalOnlySettings && (
           <LocalOnlyModeSettings
             isOpen={showLocalOnlySettings}
-            onClose={() => setShowLocalOnlySettings(false)}
+            onClose={closeLocalOnlySettings}
             onModeSwitch={(mode) => {
               if (mode === "standard") {
                 window.location.reload();
@@ -528,14 +500,14 @@ const SettingsDashboard = ({
         {showSecuritySettings && securityManager && (
           <SecuritySettings
             isOpen={showSecuritySettings}
-            onClose={() => setShowSecuritySettings(false)}
+            onClose={closeSecuritySettings}
           />
         )}
 
         {showEnvelopeChecker && (
           <EnvelopeIntegrityChecker
             isOpen={showEnvelopeChecker}
-            onClose={() => setShowEnvelopeChecker(false)}
+            onClose={closeEnvelopeChecker}
           />
         )}
       </Suspense>
