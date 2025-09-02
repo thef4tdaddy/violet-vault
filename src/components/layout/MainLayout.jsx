@@ -288,7 +288,6 @@ const MainContent = ({
             </div>
           )}
 
-
           {/* Navigation Tabs */}
           <NavigationTabs activeView={activeView} onViewChange={setActiveView} />
 
