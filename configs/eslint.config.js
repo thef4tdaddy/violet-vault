@@ -21,6 +21,7 @@ export default [
       "public/**/*.js",
       "**/*.test.js",
       "**/*.spec.js",
+      "**/__tests__/**", // Exclude test directories
       "scripts/**", // Allow console in build scripts
       "cloudflare-worker/**", // Allow console in worker
       "vite.config.js", // Allow console in build config
