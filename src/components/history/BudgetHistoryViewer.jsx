@@ -1,10 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   useBudgetHistory,
   useBudgetCommitDetails,
 } from "../../hooks/budgeting/useBudgetHistoryQuery";
-import { useConfirm } from "../../hooks/common/useConfirm";
-import { usePrompt } from "../../hooks/common/usePrompt";
 import { globalToast } from "../../stores/ui/toastStore";
 import {
   History,
@@ -27,7 +25,11 @@ import {
 } from "lucide-react";
 import IntegrityStatusIndicator from "./IntegrityStatusIndicator";
 import HelpTooltip from "../ui/HelpTooltip";
-import logger from "../../utils/common/logger";
+import {
+  useBudgetHistoryViewerUI,
+  useBudgetHistoryRestore,
+  useBudgetHistoryUIHelpers,
+} from "../../hooks/history/useBudgetHistoryViewer";
 
 const BudgetHistoryViewer = ({ onClose }) => {
   const {
@@ -39,101 +41,28 @@ const BudgetHistoryViewer = ({ onClose }) => {
     restore,
     exportHistory,
   } = useBudgetHistory({ limit: 50 });
-  const confirm = useConfirm();
-  const prompt = usePrompt();
 
-  const [selectedCommit, setSelectedCommit] = useState(null);
-  const [expandedCommits, setExpandedCommits] = useState(new Set());
-  const [filter, setFilter] = useState({ author: "all", limit: 50 });
+  const {
+    selectedCommit,
+    expandedCommits,
+    filter,
+    showIntegrityDetails,
+    handleCommitSelection,
+    toggleCommitExpanded,
+    updateFilter,
+    toggleIntegrityDetails,
+  } = useBudgetHistoryViewerUI();
+
+  const { handleRestoreFromHistory } = useBudgetHistoryRestore(restore);
+  const { getChangeIcon, getAuthorColor } = useBudgetHistoryUIHelpers();
+
   const [integrityCheck] = useState(null);
-  const [showIntegrityDetails, setShowIntegrityDetails] = useState(false);
 
   // Get commit details for selected commit
   const { data: commitDetails, isLoading: commitDetailsLoading } =
     useBudgetCommitDetails(selectedCommit);
 
   // Note: Data loading is now handled automatically by TanStack Query hooks
-
-  const handleRestoreFromHistory = async (commitHash) => {
-    const confirmed = await confirm({
-      title: "Restore from History",
-      message:
-        "This will restore your budget to a previous state. Current changes will be lost unless committed. Continue?",
-      confirmLabel: "Restore",
-      cancelLabel: "Cancel",
-      destructive: true,
-    });
-
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      // Need password for decryption - in a real implementation, get from auth store
-      const password = await prompt({
-        title: "Password Required",
-        message: "Enter your password to restore from history:",
-        inputType: "password",
-        placeholder: "Enter your password...",
-        isRequired: true,
-        validation: (value) => {
-          if (!value.trim()) {
-            return { valid: false, error: "Password is required" };
-          }
-          if (value.length < 6) {
-            return {
-              valid: false,
-              error: "Password must be at least 6 characters",
-            };
-          }
-          return { valid: true };
-        },
-      });
-
-      if (!password) return;
-
-      await restore({ commitHash, password });
-      // TanStack Query will automatically refresh all data
-    } catch (err) {
-      logger.error("Failed to restore from history:", err);
-    }
-  };
-
-  const toggleCommitExpanded = (commitHash) => {
-    setExpandedCommits((prev) => {
-      const next = new Set(prev);
-      if (next.has(commitHash)) {
-        next.delete(commitHash);
-      } else {
-        next.add(commitHash);
-      }
-      return next;
-    });
-  };
-
-  const getChangeIcon = (changeType) => {
-    switch (changeType) {
-      case "add":
-        return <Plus className="h-3 w-3 text-green-600" />;
-      case "delete":
-        return <Minus className="h-3 w-3 text-red-600" />;
-      case "modify":
-        return <Edit3 className="h-3 w-3 text-blue-600" />;
-      default:
-        return <FileText className="h-3 w-3 text-gray-600" />;
-    }
-  };
-
-  const getAuthorColor = (author) => {
-    switch (author) {
-      case "system":
-        return "bg-gray-100 text-gray-700";
-      case "user":
-        return "bg-blue-100 text-blue-700";
-      default:
-        return "bg-purple-100 text-purple-700";
-    }
-  };
 
   if (hasError && error) {
     return (
@@ -145,7 +74,10 @@ const BudgetHistoryViewer = ({ onClose }) => {
                 <AlertTriangle className="h-5 w-5 mr-2 text-red-600" />
                 History Error
               </h2>
-              <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">
+              <button
+                onClick={onClose}
+                className="text-gray-400 hover:text-gray-600 text-xl"
+              >
                 ✕
               </button>
             </div>
@@ -190,7 +122,10 @@ const BudgetHistoryViewer = ({ onClose }) => {
                 <IntegrityStatusIndicator />
               </div>
             </div>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 text-xl"
+            >
               ✕
             </button>
           </div>
@@ -201,13 +136,17 @@ const BudgetHistoryViewer = ({ onClose }) => {
               <div className="flex items-start">
                 <ShieldAlert className="h-5 w-5 text-red-600 mr-3 mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
-                  <h3 className="font-medium text-red-900 mb-2">History Integrity Warning</h3>
-                  <p className="text-sm text-red-800 mb-3">{integrityCheck.message}</p>
+                  <h3 className="font-medium text-red-900 mb-2">
+                    History Integrity Warning
+                  </h3>
+                  <p className="text-sm text-red-800 mb-3">
+                    {integrityCheck.message}
+                  </p>
 
                   {integrityCheck.details && (
                     <div className="space-y-2">
                       <button
-                        onClick={() => setShowIntegrityDetails(!showIntegrityDetails)}
+                        onClick={toggleIntegrityDetails}
                         className="text-sm text-red-700 hover:text-red-900 underline"
                       >
                         {showIntegrityDetails ? "Hide Details" : "Show Details"}
@@ -217,15 +156,23 @@ const BudgetHistoryViewer = ({ onClose }) => {
                         <div className="bg-red-100 p-3 rounded border border-red-200 text-sm">
                           <div className="space-y-2">
                             <div>
-                              <strong>Broken at commit:</strong> {integrityCheck.brokenAt}
+                              <strong>Broken at commit:</strong>{" "}
+                              {integrityCheck.brokenAt}
                             </div>
 
                             {integrityCheck.details.lastValidCommit && (
                               <div>
                                 <strong>Last valid commit:</strong>
                                 <div className="ml-2 font-mono text-xs">
-                                  {integrityCheck.details.lastValidCommit.hash.substring(0, 8)} -
-                                  {integrityCheck.details.lastValidCommit.message}
+                                  {integrityCheck.details.lastValidCommit.hash.substring(
+                                    0,
+                                    8,
+                                  )}{" "}
+                                  -
+                                  {
+                                    integrityCheck.details.lastValidCommit
+                                      .message
+                                  }
                                 </div>
                               </div>
                             )}
@@ -234,8 +181,15 @@ const BudgetHistoryViewer = ({ onClose }) => {
                               <div>
                                 <strong>Suspicious commit:</strong>
                                 <div className="ml-2 font-mono text-xs">
-                                  {integrityCheck.details.suspiciousCommit.shortHash} -
-                                  {integrityCheck.details.suspiciousCommit.message}
+                                  {
+                                    integrityCheck.details.suspiciousCommit
+                                      .shortHash
+                                  }{" "}
+                                  -
+                                  {
+                                    integrityCheck.details.suspiciousCommit
+                                      .message
+                                  }
                                 </div>
                               </div>
                             )}
@@ -246,8 +200,8 @@ const BudgetHistoryViewer = ({ onClose }) => {
                   )}
 
                   <div className="mt-3 text-xs text-red-700">
-                    ⚠️ Your budget history may have been tampered with. Consider exporting your data
-                    and investigating recent changes.
+                    ⚠️ Your budget history may have been tampered with. Consider
+                    exporting your data and investigating recent changes.
                   </div>
                 </div>
               </div>
@@ -255,16 +209,19 @@ const BudgetHistoryViewer = ({ onClose }) => {
           )}
 
           {/* Integrity Success */}
-          {integrityCheck && integrityCheck.valid && integrityCheck.totalCommits > 0 && (
-            <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-3">
-              <div className="flex items-center">
-                <Shield className="h-4 w-4 text-green-600 mr-2" />
-                <div className="text-sm text-green-800">
-                  <strong>✓ History Verified:</strong> {integrityCheck.message}
+          {integrityCheck &&
+            integrityCheck.valid &&
+            integrityCheck.totalCommits > 0 && (
+              <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-3">
+                <div className="flex items-center">
+                  <Shield className="h-4 w-4 text-green-600 mr-2" />
+                  <div className="text-sm text-green-800">
+                    <strong>✓ History Verified:</strong>{" "}
+                    {integrityCheck.message}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* Statistics */}
           {statistics && (
@@ -274,7 +231,9 @@ const BudgetHistoryViewer = ({ onClose }) => {
                   <GitCommit className="h-5 w-5 text-blue-600 mr-2" />
                   <div>
                     <p className="text-sm text-blue-700">Total Changes</p>
-                    <p className="text-lg font-semibold text-blue-900">{statistics.totalCommits}</p>
+                    <p className="text-lg font-semibold text-blue-900">
+                      {statistics.totalCommits}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -286,7 +245,9 @@ const BudgetHistoryViewer = ({ onClose }) => {
                     <p className="text-sm text-green-700">Latest Change</p>
                     <p className="text-xs text-green-900">
                       {statistics.dateRange?.newest
-                        ? new Date(statistics.dateRange.newest).toLocaleDateString()
+                        ? new Date(
+                            statistics.dateRange.newest,
+                          ).toLocaleDateString()
                         : "None"}
                     </p>
                   </div>
@@ -328,7 +289,7 @@ const BudgetHistoryViewer = ({ onClose }) => {
                 </label>
                 <select
                   value={filter.author}
-                  onChange={(e) => setFilter((prev) => ({ ...prev, author: e.target.value }))}
+                  onChange={(e) => updateFilter({ author: e.target.value })}
                   className="border border-gray-300 rounded px-3 py-1 text-sm"
                 >
                   <option value="all">All Authors</option>
@@ -338,14 +299,13 @@ const BudgetHistoryViewer = ({ onClose }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Limit</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Limit
+                </label>
                 <select
                   value={filter.limit}
                   onChange={(e) =>
-                    setFilter((prev) => ({
-                      ...prev,
-                      limit: parseInt(e.target.value),
-                    }))
+                    updateFilter({ limit: parseInt(e.target.value) })
                   }
                   className="border border-gray-300 rounded px-3 py-1 text-sm"
                 >
@@ -363,7 +323,7 @@ const BudgetHistoryViewer = ({ onClose }) => {
                   // Integrity verification will be implemented in future version
                   globalToast.showInfo(
                     "Integrity verification coming soon!",
-                    "Feature Coming Soon"
+                    "Feature Coming Soon",
                   );
                 }}
                 disabled={loading}
@@ -387,7 +347,9 @@ const BudgetHistoryViewer = ({ onClose }) => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Change History List */}
             <div className="space-y-3">
-              <h3 className="text-lg font-semibold text-gray-900">Recent Changes</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Recent Changes
+              </h3>
 
               {loading && (
                 <div className="flex items-center justify-center py-8">
@@ -416,7 +378,7 @@ const BudgetHistoryViewer = ({ onClose }) => {
                           ? "border-blue-500 bg-blue-50"
                           : "border-gray-200 bg-white hover:border-gray-300"
                       }`}
-                      onClick={() => setSelectedCommit(commit.hash)}
+                      onClick={() => handleCommitSelection(commit.hash)}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
@@ -432,7 +394,9 @@ const BudgetHistoryViewer = ({ onClose }) => {
                             </span>
                           </div>
 
-                          <p className="text-sm font-medium text-gray-900 mb-1">{commit.message}</p>
+                          <p className="text-sm font-medium text-gray-900 mb-1">
+                            {commit.message}
+                          </p>
 
                           <div className="flex items-center text-xs text-gray-500">
                             <Calendar className="h-3 w-3 mr-1" />
@@ -475,7 +439,9 @@ const BudgetHistoryViewer = ({ onClose }) => {
 
             {/* Change Details */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Change Details</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                Change Details
+              </h3>
 
               {!selectedCommit && (
                 <div className="text-center py-8 text-gray-500">
@@ -511,7 +477,9 @@ const BudgetHistoryViewer = ({ onClose }) => {
                       </p>
                       <p>
                         <strong>Date:</strong>{" "}
-                        {new Date(commitDetails.commit.timestamp).toLocaleString()}
+                        {new Date(
+                          commitDetails.commit.timestamp,
+                        ).toLocaleString()}
                       </p>
                       {commitDetails.commit.parentHash && (
                         <p>
@@ -530,7 +498,9 @@ const BudgetHistoryViewer = ({ onClose }) => {
                     </h5>
 
                     {commitDetails.changes.length === 0 && (
-                      <p className="text-gray-500 text-sm">No changes recorded</p>
+                      <p className="text-gray-500 text-sm">
+                        No changes recorded
+                      </p>
                     )}
 
                     {commitDetails.changes.length > 0 && (
@@ -543,15 +513,16 @@ const BudgetHistoryViewer = ({ onClose }) => {
                             {getChangeIcon(change.type)}
                             <div className="flex-1">
                               <p className="font-medium">
-                                {change.description || `${change.changeType} ${change.entityType}`}
+                                {change.description ||
+                                  `${change.changeType} ${change.entityType}`}
                               </p>
                               {change.diff && (
                                 <div className="mt-1 text-xs text-gray-600">
                                   {Object.keys(change.diff).map((field) => (
                                     <div key={field}>
                                       <strong>{field}:</strong>{" "}
-                                      {JSON.stringify(change.diff[field].from)} →{" "}
-                                      {JSON.stringify(change.diff[field].to)}
+                                      {JSON.stringify(change.diff[field].from)}{" "}
+                                      → {JSON.stringify(change.diff[field].to)}
                                     </div>
                                   ))}
                                 </div>
