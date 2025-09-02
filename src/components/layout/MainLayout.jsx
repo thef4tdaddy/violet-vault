@@ -288,17 +288,6 @@ const MainContent = ({
             </div>
           )}
 
-          {/* Team Activity & Sync - Temporarily disabled to prevent browser crashes */}
-          {/* <TeamActivitySync
-          activeUsers={activeUsers}
-          recentActivity={recentActivity}
-          currentUser={currentUser}
-          isOnline={isOnline}
-          isSyncing={isSyncing}
-          lastSyncTime={lastSyncTime}
-          syncError={syncError}
-        />
-        */}
 
           {/* Navigation Tabs */}
           <NavigationTabs activeView={activeView} onViewChange={setActiveView} />
