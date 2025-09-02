@@ -1,7 +1,11 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useEffect } from "react";
 import { TRANSACTION_CATEGORIES } from "../../constants/categories";
 import { globalToast } from "../../stores/ui/toastStore";
-import logger from "../../utils/common/logger";
+import {
+  useTransactionSplitterUI,
+  useTransactionSplitterLogic,
+  useTransactionSplitterOperations,
+} from "../../hooks/transactions/useTransactionSplitterUI";
 import {
   Zap,
   Plus,
@@ -27,229 +31,47 @@ const TransactionSplitter = ({
   availableCategories = [],
   className = "", // eslint-disable-line no-unused-vars
 }) => {
-  const [splitAllocations, setSplitAllocations] = useState([]);
-  const [isProcessing, setIsProcessing] = useState(false);
+  // UI state management
+  const { splitAllocations, setSplitAllocations, isProcessing, setIsProcessing, resetState } =
+    useTransactionSplitterUI();
 
-  // Find envelope by category name
-  const findEnvelopeForCategory = useCallback(
-    (categoryName) => {
-      if (!categoryName) return null;
-      return envelopes.find(
-        (env) =>
-          env.name.toLowerCase() === categoryName.toLowerCase() ||
-          env.category?.toLowerCase() === categoryName.toLowerCase()
-      );
-    },
-    [envelopes]
+  // Business logic operations
+  const {
+    initializeSplits,
+    addSplitAllocation,
+    updateSplitAllocation,
+    removeSplitAllocation,
+    calculateSplitTotals,
+    validateSplits,
+    autoBalance,
+    splitEvenly,
+  } = useTransactionSplitterLogic(splitAllocations, setSplitAllocations, transaction, envelopes);
+
+  // Transaction operations
+  const { applySplitTransaction } = useTransactionSplitterOperations(
+    splitAllocations,
+    transaction,
+    setIsProcessing,
+    onSplitTransaction,
+    onClose
   );
 
-  const initializeSplits = useCallback(() => {
-    // Check if transaction has itemized metadata (like Amazon orders)
-    if (transaction.metadata?.items && transaction.metadata.items.length > 1) {
-      // Initialize with individual items
-      const itemSplits = transaction.metadata.items.map((item, index) => ({
-        id: Date.now() + index,
-        description: item.name || `Item ${index + 1}`,
-        amount: Math.abs(item.totalPrice || item.price || 0),
-        category: item.category?.name || transaction.category || "",
-        envelopeId:
-          findEnvelopeForCategory(item.category?.name || transaction.category || "")?.id || "",
-        isOriginalItem: true,
-        originalItem: item,
-      }));
-
-      // Add shipping/tax if present
-      const extraItems = [];
-      if (transaction.metadata.shipping > 0) {
-        extraItems.push({
-          id: Date.now() + 1000,
-          description: "Shipping & Handling",
-          amount: transaction.metadata.shipping,
-          category: "Shipping",
-          envelopeId: "",
-          isOriginalItem: false,
-        });
-      }
-
-      if (transaction.metadata.tax > 0) {
-        extraItems.push({
-          id: Date.now() + 2000,
-          description: "Sales Tax",
-          amount: transaction.metadata.tax,
-          category: "Tax",
-          envelopeId: "",
-          isOriginalItem: false,
-        });
-      }
-
-      setSplitAllocations([...itemSplits, ...extraItems]);
-    } else {
-      // Initialize with single split for the full amount
-      setSplitAllocations([
-        {
-          id: Date.now(),
-          description: transaction.description || "Transaction Split",
-          amount: Math.abs(transaction.amount),
-          category: transaction.category || "",
-          envelopeId: transaction.envelopeId || "",
-          isOriginalItem: false,
-        },
-      ]);
-    }
-  }, [transaction, findEnvelopeForCategory]);
-
-  // Initialize split allocations when modal opens
+  // Initialize splits when modal opens
   useEffect(() => {
     if (isOpen && transaction) {
       initializeSplits();
     }
   }, [isOpen, transaction, initializeSplits]);
 
-  // Add new split allocation
-  const addSplitAllocation = () => {
-    const totalAmount = Math.abs(transaction.amount);
-    const allocated = splitAllocations.reduce(
-      (sum, split) => sum + (parseFloat(split.amount) || 0),
-      0
-    );
-    const remaining = totalAmount - allocated;
-
-    setSplitAllocations((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        description: "",
-        amount: Math.max(0, Math.round(remaining * 100) / 100), // Round to 2 decimal places
-        category: transaction.category || "",
-        envelopeId: "",
-        isOriginalItem: false,
-      },
-    ]);
-  };
-
-  // Update split allocation
-  const updateSplitAllocation = (id, field, value) => {
-    setSplitAllocations((prev) =>
-      prev.map((split) => {
-        if (split.id === id) {
-          const updated = { ...split, [field]: value };
-
-          // If category changes, try to find matching envelope
-          if (field === "category") {
-            const envelope = findEnvelopeForCategory(value);
-            updated.envelopeId = envelope?.id || split.envelopeId;
-          }
-
-          return updated;
-        }
-        return split;
-      })
-    );
-  };
-
-  // Remove split allocation
-  const removeSplitAllocation = (id) => {
-    if (splitAllocations.length <= 1) return;
-    setSplitAllocations((prev) => prev.filter((split) => split.id !== id));
-  };
-
-  // Calculate split totals and validation
-  const calculateSplitTotals = () => {
-    if (!transaction || transaction.amount === null || transaction.amount === undefined) {
-      return {
-        original: 0,
-        allocated: 0,
-        remaining: 0,
-        isValid: true,
-        isOverAllocated: false,
-        isUnderAllocated: false,
-      };
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      resetState();
     }
-    const originalAmount = Math.abs(transaction.amount);
-    const allocated = splitAllocations.reduce(
-      (sum, split) => sum + (parseFloat(split.amount) || 0),
-      0
-    );
-    const remaining = originalAmount - allocated;
+  }, [isOpen, resetState]);
 
-    return {
-      original: originalAmount,
-      allocated: allocated,
-      remaining: remaining,
-      isValid: Math.abs(remaining) < 0.01, // Allow for small rounding differences
-      isOverAllocated: remaining < -0.01,
-      isUnderAllocated: remaining > 0.01,
-    };
-  };
-
-  // Validate all splits
-  const validateSplits = () => {
-    const errors = [];
-
-    splitAllocations.forEach((split, index) => {
-      if (!split.description.trim()) {
-        errors.push(`Split ${index + 1}: Description is required`);
-      }
-      if (!split.category.trim()) {
-        errors.push(`Split ${index + 1}: Category is required`);
-      }
-      if (!split.amount || split.amount <= 0) {
-        errors.push(`Split ${index + 1}: Amount must be greater than 0`);
-      }
-    });
-
-    const totals = calculateSplitTotals();
-    if (!totals.isValid) {
-      if (totals.isOverAllocated) {
-        errors.push(
-          `Total splits ($${totals.allocated.toFixed(2)}) exceed original amount ($${totals.original.toFixed(2)})`
-        );
-      } else {
-        errors.push(
-          `Total splits ($${totals.allocated.toFixed(2)}) are less than original amount ($${totals.original.toFixed(2)})`
-        );
-      }
-    }
-
-    return errors;
-  };
-
-  // Auto-balance splits to equal the total
-  const autoBalance = () => {
-    const totals = calculateSplitTotals();
-    if (totals.isValid || splitAllocations.length === 0) return;
-
-    const difference = totals.remaining;
-    const adjustmentPerSplit = difference / splitAllocations.length;
-
-    setSplitAllocations((prev) =>
-      prev.map((split) => ({
-        ...split,
-        amount: Math.round((split.amount + adjustmentPerSplit) * 100) / 100,
-      }))
-    );
-  };
-
-  // Split evenly across all allocations
-  const splitEvenly = () => {
-    if (splitAllocations.length === 0) return;
-
-    const originalAmount = Math.abs(transaction.amount);
-    const amountPerSplit = Math.round((originalAmount / splitAllocations.length) * 100) / 100;
-
-    setSplitAllocations((prev) =>
-      prev.map((split, index) => ({
-        ...split,
-        amount:
-          index === 0
-            ? originalAmount - amountPerSplit * (splitAllocations.length - 1) // First split gets remainder
-            : amountPerSplit,
-      }))
-    );
-  };
-
-  // Apply the split transaction
-  const applySplitTransaction = async () => {
+  // Handle apply with validation and error display
+  const handleApplySplit = async () => {
     const errors = validateSplits();
     if (errors.length > 0) {
       globalToast.showError(
@@ -259,43 +81,16 @@ const TransactionSplitter = ({
       return;
     }
 
-    setIsProcessing(true);
-
-    try {
-      // Create split transactions
-      const splitTransactions = splitAllocations.map((split, index) => ({
-        id: `${transaction.id}_split_${index}_${Date.now()}`,
-        date: transaction.date,
-        description: split.description.trim(),
-        amount: transaction.amount < 0 ? -Math.abs(split.amount) : Math.abs(split.amount), // Preserve original sign
-        category: split.category.trim(),
-        envelopeId: split.envelopeId || null,
-        notes: `Split ${index + 1}/${splitAllocations.length} from: ${transaction.description}`,
-        source: transaction.source ? `${transaction.source}_split` : "manual_split",
-        reconciled: transaction.reconciled || false,
-        createdBy: transaction.createdBy || "User",
-        createdAt: new Date().toISOString(),
-        metadata: {
-          parentTransactionId: transaction.id,
-          splitIndex: index,
-          totalSplits: splitAllocations.length,
-          originalAmount: Math.abs(transaction.amount),
-          originalDescription: transaction.description,
-          isOriginalItem: split.isOriginalItem,
-          originalItem: split.originalItem || null,
-        },
-      }));
-
-      // Send split transactions to parent
-      await onSplitTransaction?.(transaction, splitTransactions);
-
-      // Close modal
-      onClose?.();
-    } catch (error) {
-      logger.error("Error creating split transactions:", error);
-      globalToast.showError("Failed to split transaction. Please try again.", "Split Failed");
-    } finally {
-      setIsProcessing(false);
+    const result = await applySplitTransaction();
+    if (!result.success) {
+      if (result.errors) {
+        globalToast.showError(
+          "Please fix the following errors:\n\n" + result.errors.join("\n"),
+          "Validation Errors"
+        );
+      } else if (result.error) {
+        globalToast.showError("Failed to split transaction. Please try again.", "Split Failed");
+      }
     }
   };
 
@@ -563,7 +358,7 @@ const TransactionSplitter = ({
               Cancel
             </button>
             <button
-              onClick={applySplitTransaction}
+              onClick={handleApplySplit}
               disabled={isProcessing || !totals.isValid || splitAllocations.length === 0}
               className="flex-1 bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
             >
