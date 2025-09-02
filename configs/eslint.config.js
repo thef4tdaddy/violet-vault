@@ -21,6 +21,9 @@ export default [
       "public/**/*.js",
       "**/*.test.js",
       "**/*.spec.js",
+      "scripts/**", // Allow console in build scripts
+      "cloudflare-worker/**", // Allow console in worker
+      "vite.config.js", // Allow console in build config
     ],
   },
   {
@@ -97,6 +100,34 @@ export default [
           ]
         }
       ],
+      
+      // File size limit enforcement (Epic #470 - keep components focused)
+      "max-lines": ["error", {
+        "max": 500,
+        "skipBlankLines": true,
+        "skipComments": true
+      }],
+      
+      // Block console.log statements (except debug commits)
+      "no-console": [
+        "error",
+        {
+          "allow": ["warn", "error"]
+        }
+      ],
+    },
+  },
+  {
+    // Exclusions for core infrastructure files (Issue #514)
+    files: [
+      "**/budgetDb.js",
+      "**/budgetHistoryService.js", 
+      "**/chunkedSyncService.js",
+      "**/budgetHistoryTracker.js",
+      "**/authStore.jsx"
+    ],
+    rules: {
+      "max-lines": "off", // These files excluded from 500 LOC limit
     },
   },
 ];
