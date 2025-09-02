@@ -20,15 +20,11 @@ class KeyManagementService {
 
       // Create a fingerprint using the key data
       const keyBuffer =
-        typeof encryptionKey === "string"
-          ? new TextEncoder().encode(encryptionKey)
-          : encryptionKey;
+        typeof encryptionKey === "string" ? new TextEncoder().encode(encryptionKey) : encryptionKey;
 
       const hashBuffer = await crypto.subtle.digest("SHA-256", keyBuffer);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const hashHex = hashArray
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
+      const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 
       // Format as fingerprint (8 groups of 4 hex chars)
       const fingerprint =
@@ -157,10 +153,7 @@ class KeyManagementService {
       const saltArray = Array.from(salt);
       const dataToEncrypt = JSON.stringify({ key: keyArray, salt: saltArray });
 
-      const encryptedData = await encryptionUtils.encrypt(
-        dataToEncrypt,
-        exportKeyData.key,
-      );
+      const encryptedData = await encryptionUtils.encrypt(dataToEncrypt, exportKeyData.key);
 
       const protectedKeyData = {
         encryptedKey: encryptedData,
@@ -188,9 +181,7 @@ class KeyManagementService {
       logger.debug("Protected key file downloaded");
     } catch (error) {
       logger.error("Failed to download protected key file:", error);
-      throw new Error(
-        "Failed to download protected key file: " + error.message,
-      );
+      throw new Error("Failed to download protected key file: " + error.message);
     }
   }
 
@@ -267,10 +258,7 @@ class KeyManagementService {
         if (!keyFileData.key || !keyFileData.salt) {
           return { valid: false, error: "Invalid unprotected key format" };
         }
-        if (
-          !Array.isArray(keyFileData.key) ||
-          !Array.isArray(keyFileData.salt)
-        ) {
+        if (!Array.isArray(keyFileData.key) || !Array.isArray(keyFileData.salt)) {
           return { valid: false, error: "Key or salt must be arrays" };
         }
       } else {
@@ -301,13 +289,13 @@ class KeyManagementService {
         // Derive key from import password
         const importKeyData = await encryptionUtils.deriveKey(
           importPassword,
-          new Uint8Array(keyFileData.exportSalt),
+          new Uint8Array(keyFileData.exportSalt)
         );
 
         // Decrypt the key and salt
         const decryptedData = await encryptionUtils.decrypt(
           keyFileData.encryptedKey,
-          importKeyData.key,
+          importKeyData.key
         );
         const parsedData = JSON.parse(decryptedData);
 

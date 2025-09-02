@@ -51,8 +51,12 @@ const SmartCategoryManager = ({
     applySuggestion,
   } = useSmartCategoryManager(initialDateRange);
 
-  const { filteredTransactions, transactionAnalysis, billAnalysis } =
-    useSmartCategoryAnalysis(transactions, bills, dateRange, analysisSettings);
+  const { filteredTransactions, transactionAnalysis, billAnalysis } = useSmartCategoryAnalysis(
+    transactions,
+    bills,
+    dateRange,
+    analysisSettings
+  );
 
   // Combine all suggestions
   const allSuggestions = useMemo(() => {
@@ -91,10 +95,7 @@ const SmartCategoryManager = ({
       stats[category].totalAmount += Math.abs(transaction.amount);
 
       const transactionDate = new Date(transaction.date);
-      if (
-        !stats[category].lastUsed ||
-        transactionDate > stats[category].lastUsed
-      ) {
+      if (!stats[category].lastUsed || transactionDate > stats[category].lastUsed) {
         stats[category].lastUsed = transactionDate;
       }
     });
@@ -106,8 +107,7 @@ const SmartCategoryManager = ({
 
         // Calculate frequency (transactions per month)
         if (stat.lastUsed) {
-          const monthsAgo =
-            (new Date() - stat.lastUsed) / (1000 * 60 * 60 * 24 * 30);
+          const monthsAgo = (new Date() - stat.lastUsed) / (1000 * 60 * 60 * 24 * 30);
           stat.frequency = stat.transactionCount / Math.max(1, monthsAgo);
         }
       }
@@ -117,11 +117,7 @@ const SmartCategoryManager = ({
   }, [filteredTransactions]);
 
   const handleApplySuggestion = async (suggestion) => {
-    const success = await applySuggestion(
-      suggestion,
-      onApplyToTransactions,
-      onApplyToBills,
-    );
+    const success = await applySuggestion(suggestion, onApplyToTransactions, onApplyToBills);
     if (success && suggestion.action.includes("add")) {
       onAddCategory?.(suggestion.data.categoryName, suggestion.category);
     } else if (success && suggestion.action.includes("remove")) {
@@ -175,9 +171,7 @@ const SmartCategoryManager = ({
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">
-            {allSuggestions.length} suggestions
-          </span>
+          <span className="text-sm text-gray-600">{allSuggestions.length} suggestions</span>
           <button
             onClick={toggleSettings}
             className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
@@ -193,9 +187,7 @@ const SmartCategoryManager = ({
           <h4 className="font-medium text-gray-900 mb-4">Analysis Settings</h4>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
             <div>
-              <label className="block text-gray-700 mb-1">
-                Min Transactions
-              </label>
+              <label className="block text-gray-700 mb-1">Min Transactions</label>
               <input
                 type="number"
                 value={analysisSettings.minTransactionCount}
@@ -225,9 +217,7 @@ const SmartCategoryManager = ({
               />
             </div>
             <div>
-              <label className="block text-gray-700 mb-1">
-                Unused Threshold (months)
-              </label>
+              <label className="block text-gray-700 mb-1">Unused Threshold (months)</label>
               <input
                 type="number"
                 value={analysisSettings.unusedCategoryThreshold}
@@ -300,9 +290,7 @@ const SmartCategoryManager = ({
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-2">
                     {getPriorityIcon(suggestion.priority)}
-                    <h4 className="font-medium text-gray-900">
-                      {suggestion.title}
-                    </h4>
+                    <h4 className="font-medium text-gray-900">{suggestion.title}</h4>
                     <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">
                       {suggestion.category}
                     </span>
@@ -324,18 +312,12 @@ const SmartCategoryManager = ({
                   </div>
                 </div>
 
-                <p className="text-gray-600 text-sm mb-2">
-                  {suggestion.description}
-                </p>
-                <p className="text-gray-500 text-xs mb-3">
-                  {suggestion.reasoning}
-                </p>
+                <p className="text-gray-600 text-sm mb-2">{suggestion.description}</p>
+                <p className="text-gray-500 text-xs mb-3">{suggestion.reasoning}</p>
 
                 <div className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-4">
-                    <span className="text-gray-600">
-                      Impact: ${suggestion.impact.toFixed(2)}
-                    </span>
+                    <span className="text-gray-600">Impact: ${suggestion.impact.toFixed(2)}</span>
                     <span className="text-gray-600">
                       Affects: {suggestion.affectedTransactions} items
                     </span>
@@ -362,10 +344,7 @@ const SmartCategoryManager = ({
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {categoryStats.map((stat, index) => (
-              <div
-                key={index}
-                className="bg-white/60 rounded-lg p-4 border border-white/20"
-              >
+              <div key={index} className="bg-white/60 rounded-lg p-4 border border-white/20">
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-medium text-gray-900">{stat.name}</h4>
                   <span className="text-xs text-gray-500">{stat.type}</span>
@@ -374,9 +353,7 @@ const SmartCategoryManager = ({
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Total Amount:</span>
-                    <span className="font-medium">
-                      ${stat.totalAmount.toFixed(2)}
-                    </span>
+                    <span className="font-medium">${stat.totalAmount.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Transactions:</span>
@@ -384,9 +361,7 @@ const SmartCategoryManager = ({
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Avg Amount:</span>
-                    <span className="font-medium">
-                      ${stat.avgAmount.toFixed(2)}
-                    </span>
+                    <span className="font-medium">${stat.avgAmount.toFixed(2)}</span>
                   </div>
                   {stat.lastUsed && (
                     <div className="flex justify-between">
@@ -425,9 +400,7 @@ const SmartCategoryManager = ({
           </div>
 
           <div className="bg-white/60 rounded-lg p-4 border border-white/20">
-            <h4 className="font-medium text-gray-900 mb-4">
-              Dismissed Suggestions
-            </h4>
+            <h4 className="font-medium text-gray-900 mb-4">Dismissed Suggestions</h4>
             {dismissedSuggestions.size === 0 ? (
               <p className="text-gray-500 text-sm">No dismissed suggestions</p>
             ) : (
@@ -437,9 +410,7 @@ const SmartCategoryManager = ({
                     key={suggestionId}
                     className="flex items-center justify-between p-2 bg-gray-50 rounded"
                   >
-                    <span className="text-sm text-gray-600">
-                      {suggestionId}
-                    </span>
+                    <span className="text-sm text-gray-600">{suggestionId}</span>
                     <button
                       onClick={() => handleUndismissSuggestion(suggestionId)}
                       className="text-emerald-600 hover:text-emerald-800 text-sm"
