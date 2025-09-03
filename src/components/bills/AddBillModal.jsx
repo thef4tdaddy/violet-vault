@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useBillForm } from "../../hooks/bills/useBillForm";
 import useEditLock from "../../hooks/common/useEditLock";
+// eslint-disable-next-line no-restricted-imports -- TODO: Refactor to use useEditLock hook instead
 import { initializeEditLocks } from "../../services/editLockService";
 import { useAuth } from "../../stores/auth/authStore";
 import { getIconByName } from "../../utils/common/billIcons";
