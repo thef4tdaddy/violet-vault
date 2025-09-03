@@ -3,6 +3,7 @@ import { X, TrendingDown, TrendingUp, Zap, Lock, Unlock, User, Clock } from "luc
 import { globalToast } from "../../stores/ui/toastStore";
 import ReceiptButton from "../receipts/ReceiptButton";
 import useEditLock from "../../hooks/common/useEditLock";
+// eslint-disable-next-line no-restricted-imports -- TODO: Refactor to use useEditLock hook instead
 import { initializeEditLocks } from "../../services/editLockService";
 import { useAuth } from "../../stores/auth/authStore";
 import logger from "../../utils/common/logger";

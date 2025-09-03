@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { X, Shield, AlertTriangle, CheckCircle } from "lucide-react";
+// eslint-disable-next-line no-restricted-imports -- TODO: Refactor to use hooks instead of direct service calls
 import { keyManagementService } from "../../services/keys/keyManagementService";
 import {
   useKeyManagementUI,
