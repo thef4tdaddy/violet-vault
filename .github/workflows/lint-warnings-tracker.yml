@@ -262,6 +262,11 @@ jobs:
 - **Files 400+ lines (errors):** ${files400Plus} files ${files400Plus > 5 ? '🔴' : files400Plus > 0 ? '🟡' : '🟢'}
 - **Graduated enforcement:** 300+ = warn, 400+ = error, 500+ = critical
 
+### 📋 Most Common Warnings
+${warningData.warningCategories?.slice(0, 5).map(cat => 
+  \`- **\${cat.type}**: \${cat.count} warnings (\${cat.files.length} files)\`
+).join('\\n') || 'No warning details available'}
+
 ### By Priority
 - **🚨 Critical (Errors):** 0 ✅ (All resolved)
 - **🟡 Medium (Code Quality):** ${unusedVars} warnings
@@ -276,6 +281,23 @@ jobs:
 - **Fixed 7 syntax errors** (case-declarations + useless-escape)
 - **Eliminated all console violations** (centralized logging)
 - **Optimized ESLint configuration** (underscore variable handling)
+
+---
+
+## 🎯 Action Plan
+
+### High Priority Tasks
+${warningData.actionPlan?.highPriority?.map(task => 
+  \`#### \${task.task} (\${task.warningsAffected} warnings)
+**Files:** \${task.files.join(', ')}
+**Action:** \${task.action}\`
+).join('\\n\\n') || 'No high-priority tasks identified'}
+
+### Medium Priority Tasks  
+${warningData.actionPlan?.mediumPriority?.length > 0 ? 
+  warningData.actionPlan.mediumPriority.map(task => 
+    \`- **\${task.task}**: \${task.warningsAffected} warnings in \${task.files.length} files\`
+  ).join('\\n') : '- None currently'}
 
 ---
 
