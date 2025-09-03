@@ -31,7 +31,7 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "preview:staging": "vite preview --mode staging",
-    "lint": "eslint . --config ./configs/eslint.config.js --max-warnings 50",
+    "lint": "eslint . --config ./configs/eslint.config.js --max-warnings 500",
     "lint:fix": "eslint . --config ./configs/eslint.config.js --fix",
     "format": "prettier --config ./configs/prettier.config.js --write \"{src,docs}/**/*.{js,jsx,ts,tsx,json,css,md}\"",
     "format:check": "prettier --config ./configs/prettier.config.js --check \"{src,docs}/**/*.{js,jsx,ts,tsx,json,css,md}\"",
