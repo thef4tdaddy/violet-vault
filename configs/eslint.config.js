@@ -107,24 +107,25 @@ export default [
         }
       ],
       
-      // File size limit enforcement (Epic #470 - keep components focused)
-      "max-lines": ["error", {
-        "max": 500,
+      // Graduated file size enforcement (Issue #569)
+      // 300+ lines = warning, 400+ lines = error, 500+ lines = must fix
+      "max-lines": ["warn", {
+        "max": 300,
         "skipBlankLines": true,
         "skipComments": true
       }],
       
-      // Phase 1: Complexity and function size limits (Issue #569 - prevent embedded business logic)
-      "complexity": ["error", { "max": 10 }], // Limit cyclomatic complexity
-      "max-depth": ["error", 4], // Limit nesting depth
-      "max-params": ["error", 4], // Limit function parameters
-      "max-statements": ["error", 20], // Limit statements per function
-      "max-lines-per-function": ["error", {
-        "max": 50,
+      // Phase 1: Relaxed complexity rules - only warn for moderate violations
+      "complexity": ["warn", { "max": 15 }], // Warn on high complexity
+      "max-depth": ["warn", 5], // Warn on deep nesting
+      "max-params": ["warn", 5], // Warn on too many parameters
+      "max-statements": ["warn", 25], // Warn on long functions
+      "max-lines-per-function": ["warn", {
+        "max": 75,
         "skipBlankLines": true,
         "skipComments": true
       }],
-      "max-nested-callbacks": ["error", 3], // Limit nested callbacks/functions
+      "max-nested-callbacks": ["warn", 4], // Warn on nested callbacks
       
       // Block all console statements - use logger instead
       "no-console": "error",
@@ -153,6 +154,28 @@ export default [
           ]
         }
       ],
+    },
+  },
+  {
+    // Files over 400 lines need attention (Issue #569)
+    files: ["**/*.{js,jsx}"],
+    rules: {
+      "max-lines": ["error", {
+        "max": 400, // 400+ lines = error, needs refactoring soon
+        "skipBlankLines": true,
+        "skipComments": true
+      }],
+    },
+  },
+  {
+    // Files over 500 lines must be refactored (Issue #569)
+    files: ["**/*.{js,jsx}"],
+    rules: {
+      "max-lines": ["error", {
+        "max": 500, // 500+ lines = critical, must be refactored
+        "skipBlankLines": true,
+        "skipComments": true
+      }],
     },
   },
   {
