@@ -86,6 +86,5 @@ export { useTransactionAnalytics } from "../transactions/useTransactionAnalytics
 export { useTransactionUtils } from "../transactions/useTransactionUtils.js";
 export { useTransactionBalanceUpdater } from "../transactions/useTransactionBalanceUpdater.js";
 
-// Export compatibility layer that maintains exact same API
-export { useTransactions } from "../transactions/useTransactionsCompat.js";
-export { default } from "../transactions/useTransactionsCompat.js";
+// Export the main hook as default
+export default useTransactions;
