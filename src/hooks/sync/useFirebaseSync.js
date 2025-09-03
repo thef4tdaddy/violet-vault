@@ -47,7 +47,7 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
           logger.info("🔄 Chunked Firebase → Dexie sync completed");
         }
       } catch (error) {
-        console.warn("Failed to load cloud data:", error.message);
+        logger.warn("Failed to load cloud data:", error.message);
       } finally {
         _setIsLoading(false);
       }
@@ -94,7 +94,7 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
         showErrorToast("Failed to save data");
       }
     } catch (error) {
-      console.warn("Manual save failed:", error.message);
+      logger.warn("Manual save failed:", error.message);
       showErrorToast("Failed to save data");
     }
   };
@@ -111,10 +111,10 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
         logger.info("✅ Manual sync completed:", result);
       } else {
         showErrorToast("Manual sync failed");
-        console.warn("❌ Manual sync failed:", result);
+        logger.warn("❌ Manual sync failed:", result);
       }
     } catch (err) {
-      console.error("Manual sync failed", err);
+      logger.error("Manual sync failed", err);
       showErrorToast(`Sync failed: ${err.message}`, "Sync Failed");
     }
   }, [firebaseSync, showErrorToast, showSuccessToast]);
@@ -134,7 +134,7 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
         setActiveUsers(users || []);
         setRecentActivity(activity || []);
       } catch (error) {
-        console.error("Failed to get activity data:", error);
+        logger.error("Failed to get activity data:", error);
       }
     };
 

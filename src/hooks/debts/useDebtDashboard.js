@@ -5,6 +5,7 @@
 
 import { useState, useMemo } from "react";
 import { useDebtManagement } from "./useDebtManagement";
+import logger from "../../utils/common/logger";
 
 export const useDebtDashboard = () => {
   const {
@@ -98,7 +99,7 @@ export const useDebtDashboard = () => {
       setShowAddModal(false);
       setEditingDebt(null);
     } catch (error) {
-      console.error("Failed to save debt:", error);
+      logger.error("Failed to save debt:", error);
       throw error;
     }
   };
@@ -108,7 +109,7 @@ export const useDebtDashboard = () => {
       await deleteDebt(debtId);
       setSelectedDebt(null);
     } catch (error) {
-      console.error("Failed to delete debt:", error);
+      logger.error("Failed to delete debt:", error);
       throw error;
     }
   };
@@ -122,7 +123,7 @@ export const useDebtDashboard = () => {
         setSelectedDebt(updatedDebt);
       }
     } catch (error) {
-      console.error("Failed to record payment:", error);
+      logger.error("Failed to record payment:", error);
       throw error;
     }
   };

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { globalToast } from "../../stores/ui/toastStore";
 import { useConfirm } from "../common/useConfirm";
+import logger from "../../utils/common/logger";
 
 /**
  * Custom hook for managing savings goals UI actions and modal states
@@ -30,7 +31,7 @@ const useSavingsGoalsActions = ({ onAddGoal, onUpdateGoal, onDeleteGoal, onDistr
       }
     } catch (error) {
       globalToast.error(goalId ? "Failed to update savings goal" : "Failed to add savings goal");
-      console.error("Error saving goal:", error);
+      logger.error("Error saving goal:", error);
     }
   };
 
@@ -54,7 +55,7 @@ const useSavingsGoalsActions = ({ onAddGoal, onUpdateGoal, onDeleteGoal, onDistr
         globalToast.success("Savings goal deleted successfully!");
       } catch (error) {
         globalToast.error("Failed to delete savings goal");
-        console.error("Error deleting goal:", error);
+        logger.error("Error deleting goal:", error);
       }
     }
   };
@@ -66,7 +67,7 @@ const useSavingsGoalsActions = ({ onAddGoal, onUpdateGoal, onDeleteGoal, onDistr
       globalToast.success("Funds distributed successfully!");
     } catch (error) {
       globalToast.error("Failed to distribute funds");
-      console.error("Error distributing funds:", error);
+      logger.error("Error distributing funds:", error);
     }
   };
 

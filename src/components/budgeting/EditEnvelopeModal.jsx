@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Save, Trash2 } from "lucide-react";
 import useEnvelopeEdit from "../../hooks/budgeting/useEnvelopeEdit";
+import logger from "../../utils/common/logger";
 import EnvelopeModalHeader from "./envelope/EnvelopeModalHeader";
 import EnvelopeTypeSelector from "./shared/EnvelopeTypeSelector";
 import EnvelopeBasicFields from "./envelope/EnvelopeBasicFields";
@@ -61,7 +62,7 @@ const EditEnvelopeModal = ({
       await handleDelete();
     } catch (error) {
       // Error handling is done in the hook
-      console.error("Delete failed:", error);
+      logger.error("Delete failed:", error);
     }
   };
 

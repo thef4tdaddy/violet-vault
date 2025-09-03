@@ -1,4 +1,5 @@
 import { Dexie } from "dexie";
+import logger from "../utils/common/logger";
 
 export class VioletVaultDB extends Dexie {
   constructor() {
@@ -63,7 +64,7 @@ export class VioletVaultDB extends Dexie {
             error.message.includes("read only property") ||
             error.message.includes("Cannot assign to read only")
           ) {
-            console.log("🔧 Handling readonly/frozen object from Firebase", {
+            logger.debug("🔧 Handling readonly/frozen object from Firebase", {
               errorType: error.message,
               objectId: obj.id,
               objectKeys: Object.keys(obj),
@@ -77,7 +78,7 @@ export class VioletVaultDB extends Dexie {
               try {
                 extensibleObj[key] = obj[key];
               } catch (copyError) {
-                console.warn(`Failed to copy property ${key}:`, copyError.message);
+                logger.warn(`Failed to copy property ${key}:`, copyError.message);
               }
             });
 
@@ -105,11 +106,11 @@ export class VioletVaultDB extends Dexie {
                   try {
                     obj[key] = extensibleObj[key];
                   } catch (setError) {
-                    console.warn(`Failed to set property ${key}:`, setError.message);
+                    logger.warn(`Failed to set property ${key}:`, setError.message);
                   }
                 });
               } catch (finalError) {
-                console.warn("Complete object replacement failed:", finalError.message);
+                logger.warn("Complete object replacement failed:", finalError.message);
                 // As a last resort, try to modify the transaction
                 if (typeof trans.source === "object" && trans.source !== null) {
                   trans.source = extensibleObj;
@@ -506,7 +507,7 @@ export const setEncryptedData = async (data) => {
       ...data,
     });
   } catch (err) {
-    console.error("Budget Dexie save error", err);
+    logger.error("Budget Dexie save error", err);
   }
 };
 
@@ -527,7 +528,7 @@ export const setBudgetMetadata = async (metadata) => {
       ...metadata,
     });
   } catch (err) {
-    console.error("Failed to save budget metadata:", err);
+    logger.error("Failed to save budget metadata:", err);
     throw err;
   }
 };
@@ -582,10 +583,10 @@ export const migrateData = async () => {
   try {
     // Check if migration is needed by looking for new tables
     const stats = await budgetDb.getDatabaseStats();
-    console.log("Database migration completed. Stats:", stats);
+    logger.info("Database migration completed. Stats:", stats);
     return stats;
   } catch (error) {
-    console.error("Database migration failed:", error);
+    logger.error("Database migration failed:", error);
     throw error;
   }
 };

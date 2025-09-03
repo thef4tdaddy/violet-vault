@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { create } from "zustand";
+import logger from "../../utils/common/logger";
 
 /**
  * Zustand store for managing confirm modal state
@@ -74,7 +75,7 @@ export const useConfirmModal = () => {
         await config.onConfirm();
         resolver(true);
       } catch (error) {
-        console.error("Confirmation action failed:", error);
+        logger.error("Confirmation action failed:", error);
         resolver(false);
       } finally {
         setIsLoading(false);

@@ -2,6 +2,7 @@ import React from "react";
 import { Bug, Camera, Send, X, AlertCircle } from "lucide-react";
 import useBugReportV2 from "../../hooks/common/useBugReportV2";
 import useToast from "../../hooks/common/useToast";
+import logger from "../../utils/common/logger";
 
 /**
  * Floating bug report button with screenshot capability
@@ -241,7 +242,7 @@ const BugReportButton = () => {
                             const screenshotDataUrl = canvas.toDataURL("image/png", 0.9);
                             setScreenshot(screenshotDataUrl);
                           } catch (error) {
-                            console.warn("Manual screen capture failed:", error);
+                            logger.warn("Manual screen capture failed:", error);
                             addToast({
                               type: "error",
                               title: "Screen Capture Failed",

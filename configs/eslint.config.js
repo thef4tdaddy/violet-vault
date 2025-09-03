@@ -132,10 +132,10 @@ export default [
     },
   },
   {
-    // Allow console statements only in logger.js
-    files: ["**/logger.js"],
+    // Allow console statements only in logger.js and error tracking service
+    files: ["**/logger.js", "**/errorTrackingService.js"],
     rules: {
-      "no-console": "off", // Logger utility can use console
+      "no-console": "off", // Logger utility and error tracking service can use console
     },
   },
 ];

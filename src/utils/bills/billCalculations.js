@@ -4,6 +4,7 @@
  *
  * Pure functions for bill-related calculations, date parsing, and categorization
  */
+import logger from "../common/logger";
 
 /**
  * Normalize date strings to YYYY-MM-DD format
@@ -57,7 +58,7 @@ export const normalizeBillDate = (dateInput) => {
       }
 
       if (isNaN(parsedDate.getTime())) {
-        console.warn(`Invalid date format: ${dateInput}`);
+        logger.warn(`Invalid date format: ${dateInput}`);
         return "";
       }
 
@@ -70,7 +71,7 @@ export const normalizeBillDate = (dateInput) => {
 
     return "";
   } catch (error) {
-    console.warn(`Error normalizing date: ${dateInput}`, error);
+    logger.warn(`Error normalizing date: ${dateInput}`, error);
     return "";
   }
 };
@@ -102,7 +103,7 @@ export const calculateDaysUntilDue = (dueDate, fromDate = new Date()) => {
 
     return Math.ceil((due - from) / (1000 * 60 * 60 * 24));
   } catch (error) {
-    console.warn(`Invalid due date: ${dueDate}`, error);
+    logger.warn(`Invalid due date: ${dueDate}`, error);
     return null;
   }
 };
