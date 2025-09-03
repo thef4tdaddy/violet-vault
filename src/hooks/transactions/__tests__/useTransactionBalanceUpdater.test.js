@@ -120,7 +120,7 @@ describe("useTransactionBalanceUpdater", () => {
       };
 
       mockBudgetDatabaseService.updateBudgetBalance.mockImplementation(
-        () => new Promise(resolve => setTimeout(() => resolve({ success: true }), 100))
+        () => new Promise((resolve) => setTimeout(() => resolve({ success: true }), 100))
       );
 
       const { result } = renderHook(() => useTransactionBalanceUpdater());
@@ -141,13 +141,13 @@ describe("useTransactionBalanceUpdater", () => {
   describe("updateBalanceForMultipleTransactions", () => {
     it("should successfully update balances for multiple transactions", async () => {
       const mockTransactions = [
-        { id: "1", amount: -25.50, category: "Food" },
+        { id: "1", amount: -25.5, category: "Food" },
         { id: "2", amount: -15.75, category: "Transportation" },
-        { id: "3", amount: 100.00, category: "Income" },
+        { id: "3", amount: 100.0, category: "Income" },
       ];
 
       mockBudgetDatabaseService.updateBudgetBalance
-        .mockResolvedValueOnce({ success: true, newBalance: 974.50 })
+        .mockResolvedValueOnce({ success: true, newBalance: 974.5 })
         .mockResolvedValueOnce({ success: true, newBalance: 958.75 })
         .mockResolvedValueOnce({ success: true, newBalance: 1058.75 });
 
@@ -167,15 +167,15 @@ describe("useTransactionBalanceUpdater", () => {
 
     it("should handle partial failures in batch updates", async () => {
       const mockTransactions = [
-        { id: "1", amount: -25.50, category: "Food" },
+        { id: "1", amount: -25.5, category: "Food" },
         { id: "2", amount: -15.75, category: "Transportation" },
-        { id: "3", amount: 100.00, category: "Income" },
+        { id: "3", amount: 100.0, category: "Income" },
       ];
 
       mockBudgetDatabaseService.updateBudgetBalance
-        .mockResolvedValueOnce({ success: true, newBalance: 974.50 })
+        .mockResolvedValueOnce({ success: true, newBalance: 974.5 })
         .mockRejectedValueOnce(new Error("Network error"))
-        .mockResolvedValueOnce({ success: true, newBalance: 1074.50 });
+        .mockResolvedValueOnce({ success: true, newBalance: 1074.5 });
 
       const { result } = renderHook(() => useTransactionBalanceUpdater());
 
@@ -235,13 +235,13 @@ describe("useTransactionBalanceUpdater", () => {
     it("should correctly calculate balance changes for income", async () => {
       const mockTransaction = {
         id: "1",
-        amount: 500.00,
+        amount: 500.0,
         category: "Income",
       };
 
       mockBudgetDatabaseService.updateBudgetBalance.mockResolvedValue({
         success: true,
-        newBalance: 1500.00,
+        newBalance: 1500.0,
       });
 
       const { result } = renderHook(() => useTransactionBalanceUpdater());
@@ -251,7 +251,7 @@ describe("useTransactionBalanceUpdater", () => {
       });
 
       expect(mockBudgetDatabaseService.updateBudgetBalance).toHaveBeenCalledWith({
-        transactionAmount: 500.00,
+        transactionAmount: 500.0,
         category: "Income",
         transactionId: "1",
       });
@@ -267,9 +267,7 @@ describe("useTransactionBalanceUpdater", () => {
       };
 
       // First call fails
-      mockBudgetDatabaseService.updateBudgetBalance.mockRejectedValueOnce(
-        new Error("First error")
-      );
+      mockBudgetDatabaseService.updateBudgetBalance.mockRejectedValueOnce(new Error("First error"));
 
       const { result } = renderHook(() => useTransactionBalanceUpdater());
 
@@ -313,7 +311,7 @@ describe("useTransactionBalanceUpdater", () => {
           result.current.updateBalanceForTransaction(mockTransaction1),
           result.current.updateBalanceForTransaction(mockTransaction2),
         ];
-        
+
         await Promise.all(promises);
       });
 

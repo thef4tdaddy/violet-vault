@@ -93,7 +93,7 @@ export default [
         }
       ],
       
-      // Block React Context usage (Issue #491 enforcement)
+      // Block React Context usage (Issue #491 enforcement) + Component architecture (Issue #515)
       "no-restricted-imports": [
         "error", 
         {
@@ -102,6 +102,12 @@ export default [
               "name": "react",
               "importNames": ["createContext", "useContext"],
               "message": "Avoid React Context. For data: use TanStack Query + Dexie (see hooks in src/hooks/). For UI/auth state: use Zustand stores in src/stores/."
+            }
+          ],
+          "patterns": [
+            {
+              "group": ["../services/*", "../../services/*", "../../../services/*"],
+              "message": "Components should not directly import services. Use hooks in src/hooks/ to encapsulate service calls. Utils and hooks are allowed."
             }
           ]
         }

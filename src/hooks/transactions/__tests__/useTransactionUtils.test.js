@@ -19,7 +19,7 @@ describe("useTransactionUtils", () => {
     {
       id: "2",
       description: "Salary",
-      amount: 3000.00,
+      amount: 3000.0,
       date: "2024-01-01T09:00:00Z",
       category: "Income",
       tags: ["salary"],
@@ -27,7 +27,7 @@ describe("useTransactionUtils", () => {
     {
       id: "3",
       description: "Gas Station",
-      amount: -35.00,
+      amount: -35.0,
       date: "2024-01-10T16:30:00Z",
       category: "Transportation",
       tags: ["gas", "car"],
@@ -66,8 +66,8 @@ describe("useTransactionUtils", () => {
       });
 
       expect(filtered).toHaveLength(2);
-      expect(filtered.map(t => t.id)).toContain("1");
-      expect(filtered.map(t => t.id)).toContain("3");
+      expect(filtered.map((t) => t.id)).toContain("1");
+      expect(filtered.map((t) => t.id)).toContain("3");
     });
 
     it("should filter transactions by amount range", () => {
@@ -79,7 +79,7 @@ describe("useTransactionUtils", () => {
       });
 
       expect(filtered).toHaveLength(2);
-      expect(filtered.every(t => t.amount < 0)).toBe(true);
+      expect(filtered.every((t) => t.amount < 0)).toBe(true);
     });
 
     it("should combine multiple filters", () => {
@@ -129,8 +129,8 @@ describe("useTransactionUtils", () => {
         direction: "desc",
       });
 
-      expect(sorted[0].amount).toBe(3000.00);
-      expect(sorted[1].amount).toBe(-35.00);
+      expect(sorted[0].amount).toBe(3000.0);
+      expect(sorted[1].amount).toBe(-35.0);
       expect(sorted[2].amount).toBe(-50.25);
     });
 
@@ -154,7 +154,7 @@ describe("useTransactionUtils", () => {
 
       const totals = result.current.calculateTransactionTotals(mockTransactions);
 
-      expect(totals.income).toBe(3000.00);
+      expect(totals.income).toBe(3000.0);
       expect(totals.expenses).toBe(85.25);
       expect(totals.net).toBe(2914.75);
       expect(totals.count).toBe(3);

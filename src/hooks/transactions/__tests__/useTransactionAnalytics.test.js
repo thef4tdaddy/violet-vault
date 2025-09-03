@@ -7,7 +7,7 @@ describe("useTransactionAnalytics", () => {
     {
       id: "1",
       description: "Grocery Store",
-      amount: -120.50,
+      amount: -120.5,
       date: "2024-01-15T10:00:00Z",
       category: "Food",
       tags: ["groceries"],
@@ -15,7 +15,7 @@ describe("useTransactionAnalytics", () => {
     {
       id: "2",
       description: "Salary",
-      amount: 3000.00,
+      amount: 3000.0,
       date: "2024-01-01T09:00:00Z",
       category: "Income",
       tags: ["salary"],
@@ -31,7 +31,7 @@ describe("useTransactionAnalytics", () => {
     {
       id: "4",
       description: "Restaurant",
-      amount: -85.30,
+      amount: -85.3,
       date: "2024-01-20T19:00:00Z",
       category: "Food",
       tags: ["dining"],
@@ -48,9 +48,9 @@ describe("useTransactionAnalytics", () => {
 
       const categoryTotals = result.current.calculateCategoryTotals();
 
-      expect(categoryTotals["Food"]).toBe(205.80);
+      expect(categoryTotals["Food"]).toBe(205.8);
       expect(categoryTotals["Transportation"]).toBe(45.75);
-      expect(categoryTotals["Income"]).toBe(3000.00);
+      expect(categoryTotals["Income"]).toBe(3000.0);
     });
 
     it("should handle empty transactions", () => {
@@ -66,7 +66,7 @@ describe("useTransactionAnalytics", () => {
 
       const categoryTotals = result.current.calculateCategoryTotals({ excludeIncome: true });
 
-      expect(categoryTotals["Food"]).toBe(205.80);
+      expect(categoryTotals["Food"]).toBe(205.8);
       expect(categoryTotals["Transportation"]).toBe(45.75);
       expect(categoryTotals["Income"]).toBeUndefined();
     });
@@ -80,7 +80,7 @@ describe("useTransactionAnalytics", () => {
 
       expect(trends["2024-01"]).toBeDefined();
       expect(trends["2024-01"].totalExpenses).toBe(251.55);
-      expect(trends["2024-01"].totalIncome).toBe(3000.00);
+      expect(trends["2024-01"].totalIncome).toBe(3000.0);
       expect(trends["2024-01"].netAmount).toBe(2748.45);
       expect(trends["2024-01"].transactionCount).toBe(4);
     });
@@ -115,7 +115,7 @@ describe("useTransactionAnalytics", () => {
 
       expect(topCategories).toHaveLength(2);
       expect(topCategories[0].category).toBe("Food");
-      expect(topCategories[0].amount).toBe(205.80);
+      expect(topCategories[0].amount).toBe(205.8);
       expect(topCategories[1].category).toBe("Transportation");
       expect(topCategories[1].amount).toBe(45.75);
     });
@@ -147,11 +147,11 @@ describe("useTransactionAnalytics", () => {
 
       expect(averages.overall).toBeCloseTo(62.89, 2);
       expect(averages.expenses).toBeCloseTo(83.85, 2);
-      expect(averages.income).toBe(3000.00);
+      expect(averages.income).toBe(3000.0);
     });
 
     it("should handle transactions with only expenses", () => {
-      const expenseOnlyTransactions = mockTransactions.filter(t => t.amount < 0);
+      const expenseOnlyTransactions = mockTransactions.filter((t) => t.amount < 0);
       const { result } = renderHook(() => useTransactionAnalytics(expenseOnlyTransactions));
 
       const averages = result.current.calculateAverageTransactionAmount();
@@ -171,7 +171,7 @@ describe("useTransactionAnalytics", () => {
       expect(insights).toHaveProperty("averageTransaction");
       expect(insights).toHaveProperty("monthlySpend");
       expect(insights).toHaveProperty("categoryCount");
-      
+
       expect(insights.topCategory).toBe("Food");
       expect(insights.categoryCount).toBe(3);
     });
@@ -197,7 +197,7 @@ describe("useTransactionAnalytics", () => {
       });
 
       expect(filtered).toHaveLength(3);
-      expect(filtered.map(t => t.id)).toEqual(["1", "3", "4"]);
+      expect(filtered.map((t) => t.id)).toEqual(["1", "3", "4"]);
     });
 
     it("should handle invalid date range", () => {
@@ -220,7 +220,7 @@ describe("useTransactionAnalytics", () => {
       );
 
       const initialCategoryTotals = result.current.calculateCategoryTotals();
-      expect(initialCategoryTotals["Food"]).toBe(205.80);
+      expect(initialCategoryTotals["Food"]).toBe(205.8);
 
       // Add a new transaction
       const newTransactions = [
@@ -228,7 +228,7 @@ describe("useTransactionAnalytics", () => {
         {
           id: "5",
           description: "Coffee",
-          amount: -15.50,
+          amount: -15.5,
           date: "2024-01-25T08:00:00Z",
           category: "Food",
         },
@@ -237,7 +237,7 @@ describe("useTransactionAnalytics", () => {
       rerender({ transactions: newTransactions });
 
       const updatedCategoryTotals = result.current.calculateCategoryTotals();
-      expect(updatedCategoryTotals["Food"]).toBe(221.30);
+      expect(updatedCategoryTotals["Food"]).toBe(221.3);
     });
   });
 
