@@ -1,11 +1,11 @@
 // Consolidated budgeting utilities
 // autoFundingEngine removed - replaced with modular autofunding utilities and hooks
-export { default as billEnvelopeCalculations } from "./billEnvelopeCalculations.js";
-export { default as envelopeCalculations } from "./envelopeCalculations.js";
-export { default as envelopeIntegrityChecker } from "./envelopeIntegrityChecker.js";
-export { default as envelopeMatching } from "./envelopeMatching.js";
-export { default as envelopeStyles } from "./envelopeStyles.js";
-export { default as paydayPredictor } from "./paydayPredictor.js";
+export * as billEnvelopeCalculations from "./billEnvelopeCalculations.js";
+export * as envelopeCalculations from "./envelopeCalculations.js";
+export * as envelopeIntegrityChecker from "./envelopeIntegrityChecker.js";
+export * as envelopeMatching from "./envelopeMatching.js";
+export * as envelopeStyles from "./envelopeStyles.js";
+export * as paydayPredictor from "./paydayPredictor.js";
 
 // Export specific functions from envelopeStyles
 export {

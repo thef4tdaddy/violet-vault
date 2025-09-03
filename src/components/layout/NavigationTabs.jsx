@@ -1,4 +1,5 @@
 import React, { memo, useEffect, useRef } from "react";
+import { Link, useLocation } from "react-router-dom";
 import {
   DollarSign,
   Wallet,
@@ -14,9 +15,10 @@ import {
 
 /**
  * Navigation tabs component for the main layout
- * Extracted from Layout.jsx for better organization
+ * Now using React Router for proper URL-based navigation
  */
-const NavigationTabs = memo(({ activeView, onViewChange }) => {
+const NavigationTabs = memo(() => {
+  const location = useLocation();
   const navRef = useRef(null);
   const leftFadeRef = useRef(null);
   const rightFadeRef = useRef(null);
@@ -66,50 +68,67 @@ const NavigationTabs = memo(({ activeView, onViewChange }) => {
   const tabs = [
     {
       key: "dashboard",
+      path: "/",
       icon: CreditCard,
       label: "Dashboard",
     },
     {
       key: "envelopes",
+      path: "/envelopes",
       icon: Wallet,
       label: "Envelopes",
     },
     {
       key: "savings",
+      path: "/savings",
       icon: Target,
       label: "Savings Goals",
     },
     {
       key: "supplemental",
+      path: "/supplemental",
       icon: CreditCard,
       label: "Supplemental",
     },
     {
       key: "paycheck",
+      path: "/paycheck",
       icon: DollarSign,
       label: "Add Paycheck",
     },
     {
       key: "bills",
+      path: "/bills",
       icon: Calendar,
       label: "Manage Bills",
     },
     {
       key: "transactions",
+      path: "/transactions",
       icon: BookOpen,
       label: "Transactions",
     },
     {
       key: "debts",
+      path: "/debts",
       icon: TrendingDown,
       label: "Debt Tracking",
     },
     {
       key: "analytics",
+      path: "/analytics",
       icon: BarChart3,
       label: "Analytics",
     },
   ];
+
+  // Get current active view from URL
+  const getCurrentView = () => {
+    const currentTab = tabs.find((tab) => tab.path === location.pathname);
+    return currentTab?.key || "dashboard";
+  };
+
+  const activeView = getCurrentView();
 
   return (
     <div className="glassmorphism rounded-3xl mb-6 lg:shadow-xl border border-white/20 ring-1 ring-gray-800/10 fixed bottom-2 left-2 right-2 lg:static z-50 overflow-hidden relative lg:mb-6 mb-0 lg:rounded-3xl rounded-2xl">
@@ -121,7 +140,7 @@ const NavigationTabs = memo(({ activeView, onViewChange }) => {
           <NavButton
             key={tab.key}
             active={activeView === tab.key}
-            onClick={() => onViewChange(tab.key)}
+            to={tab.path}
             icon={tab.icon}
             label={tab.label}
             viewKey={tab.key}
@@ -142,9 +161,9 @@ const NavigationTabs = memo(({ activeView, onViewChange }) => {
   );
 });
 
-const NavButton = memo(({ active, onClick, icon: _Icon, label, viewKey }) => (
-  <button
-    onClick={onClick}
+const NavButton = memo(({ active, to, icon: Icon, label, viewKey }) => (
+  <Link
+    to={to}
     aria-current={active ? "page" : undefined}
     data-view={viewKey}
     className={`flex-shrink-0 lg:flex-1 flex flex-col items-center lg:flex-row lg:px-4 px-2 py-2 text-xs lg:text-sm font-medium transition-colors relative border border-black/10 ${
@@ -191,7 +210,7 @@ const NavButton = memo(({ active, onClick, icon: _Icon, label, viewKey }) => (
                     : label.split(" ")[0]}
       </span>
     </span>
-  </button>
+  </Link>
 ));
 
 export default NavigationTabs;
