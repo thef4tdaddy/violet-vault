@@ -1,9 +1,9 @@
 name: Lint Warnings Tracker
 
 on:
-  # Run hourly to track lint warnings
+  # Daily tracking for active development monitoring
   schedule:
-    - cron: "0 * * * *" # Every hour at minute 0
+    - cron: "0 9 * * *" # Daily at 9 AM UTC
 
   # Keep PR checks for validation
   pull_request:
@@ -185,8 +185,35 @@ jobs:
               body: body
             });
 
+      - name: Check if should run based on branch and schedule
+        id: should_run
+        run: |
+          # For scheduled runs, check branch-specific frequency
+          if [ "${{ github.event_name }}" == "schedule" ]; then
+            CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+            DAY_OF_WEEK=$(date +%u) # 1=Monday, 7=Sunday
+            
+            if [ "$CURRENT_BRANCH" == "main" ]; then
+              # Main branch: only run on Sundays (weekly)
+              if [ "$DAY_OF_WEEK" == "7" ]; then
+                echo "should_run=true" >> $GITHUB_OUTPUT
+                echo "📅 Running weekly check for main branch"
+              else
+                echo "should_run=false" >> $GITHUB_OUTPUT
+                echo "⏭️ Skipping daily check for main branch (weekly only)"
+              fi
+            else
+              # Develop and other branches: run daily
+              echo "should_run=true" >> $GITHUB_OUTPUT
+              echo "📅 Running daily check for $CURRENT_BRANCH branch"
+            fi
+          else
+            # Always run for push events and manual triggers
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Update Master Lint Warnings Issue
-        if: github.event_name == 'schedule' || (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'))
+        if: steps.should_run.outputs.should_run == 'true' && (github.event_name == 'schedule' || (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')))
         uses: actions/github-script@v7
         with:
           script: |
@@ -204,6 +231,8 @@ jobs:
             const totalWarnings = warningData.currentStatus?.totalWarnings || 0;
             const unusedVars = warningData.breakdown?.['no-unused-vars'] || 0;
             const reactHooks = warningData.breakdown?.['react-hooks/exhaustive-deps'] || 0;
+            const files300Plus = warningData.fileSizeTracking?.files300Plus || 0;
+            const files400Plus = warningData.fileSizeTracking?.files400Plus || 0;
             const currentDate = new Date().toLocaleDateString('en-US', { 
               year: 'numeric', 
               month: 'long', 
@@ -227,6 +256,11 @@ jobs:
 ### By Category
 - **Unused Variables (no-unused-vars):** ${unusedVars} warnings ${unusedVars > 30 ? '🔴' : unusedVars > 15 ? '🟡' : '🟢'}
 - **React Hook Dependencies (react-hooks/exhaustive-deps):** ${reactHooks} warnings ${reactHooks > 20 ? '🔴' : reactHooks > 10 ? '🟠' : '🟢'}
+
+### 📏 File Size Tracking (Issue #569)
+- **Files 300+ lines (warnings):** ${files300Plus} files ${files300Plus > 20 ? '🔴' : files300Plus > 10 ? '🟡' : '🟢'}
+- **Files 400+ lines (errors):** ${files400Plus} files ${files400Plus > 5 ? '🔴' : files400Plus > 0 ? '🟡' : '🟢'}
+- **Graduated enforcement:** 300+ = warn, 400+ = error, 500+ = critical
 
 ### By Priority
 - **🚨 Critical (Errors):** 0 ✅ (All resolved)
@@ -273,8 +307,9 @@ jobs:
 
 This issue is automatically updated by:
 - **GitHub Actions workflow:** \`.github/workflows/lint-warnings-tracker.yml\`
-- **Update frequency:** Weekly (or on significant changes)
+- **Update frequency:** Daily on develop branch, Weekly on main branch
 - **Data source:** \`.github/data/lint-warnings.json\`
+- **File size tracking:** Graduated enforcement with 300/400/500 line limits
 
 The workflow tracks warning trends and prevents regression by blocking PRs that increase warnings by >20%.
 
