@@ -67,6 +67,7 @@ VioletVault uses a comprehensive set of shared UI components to ensure consisten
 3. **Theme-aware implementation** using consistent color schemes
 4. **Accessibility first** with proper ARIA labels and keyboard navigation
 5. **Extract common patterns** into reusable components when patterns repeat
+6. **Preserved Visual Appearance**: Exact same UI while dramatically reducing complexity when refactoring
 
 ### Benefits
 
@@ -75,6 +76,18 @@ VioletVault uses a comprehensive set of shared UI components to ensure consisten
 - **Easier maintenance**: Updates in one place benefit entire application
 - **Accessibility compliance**: Shared components ensure consistent accessibility
 - **Performance**: Reusable components reduce bundle size
+- **Preserved Visual Appearance**: Component extractions maintain exact UI while improving code organization
+
+### Refactoring Standards
+
+When extracting components for code organization and complexity reduction:
+
+1. **Maintain pixel-perfect visual appearance** - UI should remain identical
+2. **Preserve user experience** - No behavioral changes during refactoring
+3. **Extract logical sections** - Group related form fields and UI elements
+4. **Use established patterns** - Follow existing component extraction approaches
+5. **Document component purpose** - Clear comments explaining extracted sections
+6. **Test thoroughly** - Verify functionality remains unchanged post-extraction
 
 ---
 
@@ -118,7 +131,9 @@ Flexbox's `items-center` and centering behaviors override attempts to position r
         <Icon className="h-4 w-4 mr-2" />
         <span className="font-medium text-sm">Option Label</span>
       </div>
-      <p className="text-xs text-gray-600 leading-tight ml-6">Description text</p>
+      <p className="text-xs text-gray-600 leading-tight ml-6">
+        Description text
+      </p>
     </div>
   </div>
 </div>
@@ -216,7 +231,9 @@ When entities (debts, envelopes, bills) are connected to each other, use this st
           >
             <ConnectionIcon className="h-5 w-5 mr-3 text-green-600" />
             <div className="flex-1">
-              <div className="font-medium text-green-800">{connection.type}</div>
+              <div className="font-medium text-green-800">
+                {connection.type}
+              </div>
               <div className="text-sm text-green-700">{connection.details}</div>
             </div>
             <div className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
@@ -228,7 +245,8 @@ When entities (debts, envelopes, bills) are connected to each other, use this st
 
       <div className="mt-3 p-3 bg-green-100 border border-green-300 rounded-lg">
         <p className="text-sm text-green-700 font-medium">
-          📝 <strong>Connected!</strong> [Explanation of what being connected means and behavior]
+          📝 <strong>Connected!</strong> [Explanation of what being connected
+          means and behavior]
         </p>
       </div>
     </div>
@@ -436,19 +454,25 @@ All page-specific summary cards follow the **bill card design pattern** with gra
 // Dynamic color based on value
 <div
   className={`bg-gradient-to-br ${
-    netCashFlow >= 0 ? "from-cyan-500 to-cyan-600" : "from-amber-500 to-amber-600"
+    netCashFlow >= 0
+      ? "from-cyan-500 to-cyan-600"
+      : "from-amber-500 to-amber-600"
   } p-4 rounded-lg text-white`}
 >
   <div className="flex items-center justify-between">
     <div>
-      <p className={`${netCashFlow >= 0 ? "text-cyan-100" : "text-amber-100"} text-sm`}>
+      <p
+        className={`${netCashFlow >= 0 ? "text-cyan-100" : "text-amber-100"} text-sm`}
+      >
         Net Cash Flow
       </p>
       <p className="text-2xl font-bold">
         {netCashFlow >= 0 ? "+" : ""}${netCashFlow.toFixed(2)}
       </p>
     </div>
-    <DollarSign className={`h-8 w-8 ${netCashFlow >= 0 ? "text-cyan-200" : "text-amber-200"}`} />
+    <DollarSign
+      className={`h-8 w-8 ${netCashFlow >= 0 ? "text-cyan-200" : "text-amber-200"}`}
+    />
   </div>
 </div>
 ```
