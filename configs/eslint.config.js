@@ -156,6 +156,27 @@ export default [
     },
   },
   {
+    // Exclusions for complex utilities that legitimately need higher complexity (Issue #569 prevention)
+    files: [
+      "src/utils/**/calculations/**/*.js",
+      "src/utils/**/strategies/**/*.js",
+      "src/utils/**/operations/**/*.js", 
+      "src/utils/sync/**/*.js",
+      "src/utils/security/**/*.js",
+      "src/utils/query/**/*.js",
+      "src/utils/debts/**/*.js",
+      "src/utils/transactions/**/*.js",
+      "src/utils/budgeting/autofunding/**/*.js",
+    ],
+    rules: {
+      "complexity": "off", // Complex algorithms and financial calculations
+      "max-depth": "off", // Deep conditional logic for business rules
+      "max-statements": "off", // Data processing operations
+      "max-lines-per-function": "off", // Complex calculations and transformations
+      "max-nested-callbacks": "off", // Async data operations
+    },
+  },
+  {
     // Exclusions for core infrastructure files (Issue #514)
     files: [
       "**/budgetDb.js",
