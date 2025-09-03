@@ -34,6 +34,7 @@
 **ALWAYS use standardized shared UI components** - See [docs/Shared-UI-Components.md](docs/Shared-UI-Components.md)
 
 Key components to use:
+
 - **EditLockIndicator**: For multi-user edit conflict prevention
 - **ConfirmModal** (via `useConfirm()` hook): For all confirmation dialogs
 - **UniversalConnectionManager**: For entity connection management
@@ -41,3 +42,10 @@ Key components to use:
 - **BillModalHeader/BillFormFields**: For bill modal components
 
 Never create custom implementations when shared components exist.
+
+## Refactoring Standards
+
+- **Preserved Visual Appearance**: Exact same UI while dramatically reducing complexity when refactoring
+- Component extractions must maintain pixel-perfect visual appearance
+- User experience should remain identical after refactoring
+- Focus on code organization and maintainability without UI changes
