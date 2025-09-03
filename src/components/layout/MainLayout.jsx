@@ -1,5 +1,6 @@
 // src/components/layout/MainLayout.jsx
-import React, { useState, useMemo, Suspense } from "react";
+import React, { useState, Suspense } from "react";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { useBudgetStore } from "../../stores/ui/uiStore";
 import useBudgetData from "../../hooks/budgeting/useBudgetData";
 import useAuthFlow from "../../hooks/auth/useAuthFlow";
@@ -16,7 +17,6 @@ import LoadingSpinner from "../ui/LoadingSpinner";
 import { ToastContainer } from "../ui/Toast";
 import { useToastStore } from "../../stores/ui/toastStore";
 import ViewRendererComponent from "./ViewRenderer";
-import { cloudSyncService } from "../../services/cloudSyncService";
 import logger from "../../utils/common/logger";
 import { getVersionInfo } from "../../utils/common/version";
 import {
@@ -46,7 +46,7 @@ import { useOnboardingAutoComplete } from "../../hooks/common/useOnboardingAutoC
 
 // Heavy components now lazy loaded in ViewRenderer
 
-const Layout = () => {
+const Layout = ({ firebaseSync }) => {
   logger.debug("Layout component is running");
 
   // Security manager hook
@@ -86,7 +86,8 @@ const Layout = () => {
   // Network status detection
   useNetworkStatus();
 
-  const firebaseSync = useMemo(() => cloudSyncService, []);
+  // Use firebaseSync prop directly instead of importing service
+  // const firebaseSync = useMemo(() => firebaseSync, []); // Not needed - use prop directly
   const [syncConflicts, setSyncConflicts] = useState(null);
 
   // Toast notifications from Zustand store
@@ -208,7 +209,49 @@ const MainContent = ({
   securityManager,
 }) => {
   const budget = useBudgetStore();
-  const [activeView, setActiveView] = useState("dashboard");
+  // Get current route for view determination
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Helper function to get current view from URL
+  const getCurrentViewFromPath = (pathname) => {
+    const pathToViewMap = {
+      "/": "dashboard",
+      "/envelopes": "envelopes",
+      "/savings": "savings",
+      "/supplemental": "supplemental",
+      "/paycheck": "paycheck",
+      "/bills": "bills",
+      "/transactions": "transactions",
+      "/debts": "debts",
+      "/analytics": "analytics",
+      "/automation": "automation",
+      "/activity": "activity",
+    };
+    return pathToViewMap[pathname] || "dashboard";
+  };
+
+  // Not currently used but kept for future compatibility
+  const _activeView = getCurrentViewFromPath(location.pathname);
+
+  // Helper function for components that still need programmatic navigation
+  const setActiveView = (view) => {
+    const viewToPathMap = {
+      dashboard: "/",
+      envelopes: "/envelopes",
+      savings: "/savings",
+      supplemental: "/supplemental",
+      paycheck: "/paycheck",
+      bills: "/bills",
+      transactions: "/transactions",
+      debts: "/debts",
+      analytics: "/analytics",
+      automation: "/automation",
+      activity: "/activity",
+    };
+    const path = viewToPathMap[view] || "/";
+    navigate(path);
+  };
   const [showSecuritySettings, setShowSecuritySettings] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
@@ -289,7 +332,7 @@ const MainContent = ({
           )}
 
           {/* Navigation Tabs */}
-          <NavigationTabs activeView={activeView} onViewChange={setActiveView} />
+          <NavigationTabs />
 
           {/* Onboarding Progress */}
           <OnboardingProgress />
@@ -297,14 +340,154 @@ const MainContent = ({
           {/* Summary Cards - Enhanced with clickable unassigned cash distribution */}
           <SummaryCards />
 
-          {/* Main Content */}
-          <ViewRendererComponent
-            activeView={activeView}
-            budget={budget}
-            currentUser={currentUser}
-            totalBiweeklyNeed={totalBiweeklyNeed}
-            setActiveView={setActiveView}
-          />
+          {/* Main Content - Now using React Router */}
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <ViewRendererComponent
+                  activeView="dashboard"
+                  budget={budget}
+                  currentUser={currentUser}
+                  totalBiweeklyNeed={totalBiweeklyNeed}
+                  setActiveView={setActiveView}
+                />
+              }
+            />
+            <Route
+              path="/envelopes"
+              element={
+                <ViewRendererComponent
+                  activeView="envelopes"
+                  budget={budget}
+                  currentUser={currentUser}
+                  totalBiweeklyNeed={totalBiweeklyNeed}
+                  setActiveView={setActiveView}
+                />
+              }
+            />
+            <Route
+              path="/savings"
+              element={
+                <ViewRendererComponent
+                  activeView="savings"
+                  budget={budget}
+                  currentUser={currentUser}
+                  totalBiweeklyNeed={totalBiweeklyNeed}
+                  setActiveView={setActiveView}
+                />
+              }
+            />
+            <Route
+              path="/supplemental"
+              element={
+                <ViewRendererComponent
+                  activeView="supplemental"
+                  budget={budget}
+                  currentUser={currentUser}
+                  totalBiweeklyNeed={totalBiweeklyNeed}
+                  setActiveView={setActiveView}
+                />
+              }
+            />
+            <Route
+              path="/paycheck"
+              element={
+                <ViewRendererComponent
+                  activeView="paycheck"
+                  budget={budget}
+                  currentUser={currentUser}
+                  totalBiweeklyNeed={totalBiweeklyNeed}
+                  setActiveView={setActiveView}
+                />
+              }
+            />
+            <Route
+              path="/bills"
+              element={
+                <ViewRendererComponent
+                  activeView="bills"
+                  budget={budget}
+                  currentUser={currentUser}
+                  totalBiweeklyNeed={totalBiweeklyNeed}
+                  setActiveView={setActiveView}
+                />
+              }
+            />
+            <Route
+              path="/transactions"
+              element={
+                <ViewRendererComponent
+                  activeView="transactions"
+                  budget={budget}
+                  currentUser={currentUser}
+                  totalBiweeklyNeed={totalBiweeklyNeed}
+                  setActiveView={setActiveView}
+                />
+              }
+            />
+            <Route
+              path="/debts"
+              element={
+                <ViewRendererComponent
+                  activeView="debts"
+                  budget={budget}
+                  currentUser={currentUser}
+                  totalBiweeklyNeed={totalBiweeklyNeed}
+                  setActiveView={setActiveView}
+                />
+              }
+            />
+            <Route
+              path="/analytics"
+              element={
+                <ViewRendererComponent
+                  activeView="analytics"
+                  budget={budget}
+                  currentUser={currentUser}
+                  totalBiweeklyNeed={totalBiweeklyNeed}
+                  setActiveView={setActiveView}
+                />
+              }
+            />
+            <Route
+              path="/automation"
+              element={
+                <ViewRendererComponent
+                  activeView="automation"
+                  budget={budget}
+                  currentUser={currentUser}
+                  totalBiweeklyNeed={totalBiweeklyNeed}
+                  setActiveView={setActiveView}
+                />
+              }
+            />
+            <Route
+              path="/activity"
+              element={
+                <ViewRendererComponent
+                  activeView="activity"
+                  budget={budget}
+                  currentUser={currentUser}
+                  totalBiweeklyNeed={totalBiweeklyNeed}
+                  setActiveView={setActiveView}
+                />
+              }
+            />
+            {/* Catch-all route redirects to dashboard */}
+            <Route
+              path="*"
+              element={
+                <ViewRendererComponent
+                  activeView="dashboard"
+                  budget={budget}
+                  currentUser={currentUser}
+                  totalBiweeklyNeed={totalBiweeklyNeed}
+                  setActiveView={setActiveView}
+                />
+              }
+            />
+          </Routes>
 
           <SyncStatusIndicators isOnline={isOnline} isSyncing={isSyncing} />
           <ConflictResolutionModal
