@@ -70,7 +70,7 @@ export default [
       ...js.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
-      "no-unused-vars": ["warn", { varsIgnorePattern: "^[A-Z_]" }],
+      "no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^(_|[A-Z_]+)" }],
       "no-undef": "warn",
       "no-case-declarations": "warn",
       "no-useless-escape": "warn",

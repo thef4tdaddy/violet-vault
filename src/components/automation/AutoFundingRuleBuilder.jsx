@@ -90,10 +90,10 @@ const AutoFundingRuleBuilder = ({
   const handleSave = () => {
     const validation = validateRule(ruleData);
     if (!validation.isValid) {
-      setValidationErrors(validation.errors);
+      _setValidationErrors(validation.errors);
       return;
     }
-    setValidationErrors([]);
+    _setValidationErrors([]);
     const ruleToSave = editingRule
       ? { ...ruleData, id: editingRule.id, updatedAt: new Date().toISOString() }
       : ruleData;
