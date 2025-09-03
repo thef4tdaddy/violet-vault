@@ -6,11 +6,7 @@ import { getIconByName } from "../../utils/common/billIcons";
  * Header section for AddBillModal
  * Pure UI component that preserves exact visual appearance
  */
-const BillModalHeader = ({
-  editingBill,
-  formData,
-  onClose,
-}) => {
+const BillModalHeader = ({ editingBill, formData, onClose }) => {
   return (
     <div className="flex items-center justify-between p-6 border-b border-gray-200">
       <div className="flex items-center space-x-3">
@@ -24,9 +20,7 @@ const BillModalHeader = ({
             {editingBill ? "Edit Bill" : "Add New Bill"}
           </h2>
           <p className="text-sm text-gray-600">
-            {editingBill 
-              ? "Update bill information and settings"
-              : "Create a new recurring bill"}
+            {editingBill ? "Update bill information and settings" : "Create a new recurring bill"}
           </p>
         </div>
       </div>

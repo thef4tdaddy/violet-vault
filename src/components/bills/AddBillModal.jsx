@@ -62,7 +62,7 @@ const AddBillModal = ({
 
   // Get auth context for edit locking
   const { budgetId, currentUser } = useAuth();
-  
+
   // Standardized confirmation modal
   const confirm = useConfirm();
 
@@ -124,17 +124,12 @@ const AddBillModal = ({
     }
   };
 
-
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-xl w-full max-w-4xl max-h-[95vh] overflow-y-auto shadow-2xl">
-        <BillModalHeader
-          editingBill={editingBill}
-          formData={formData}
-          onClose={onClose}
-        />
+        <BillModalHeader editingBill={editingBill} formData={formData} onClose={onClose} />
 
         {/* Edit Lock Indicator */}
         {editingBill && (isLocked || isOwnLock) && (
@@ -165,7 +160,6 @@ const AddBillModal = ({
           getNextDueDate={getNextDueDate}
           onDeleteClick={handleDeleteClick}
         />
-
       </div>
     </div>
   );

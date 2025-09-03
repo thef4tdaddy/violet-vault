@@ -13,21 +13,21 @@ const BillFormFields = ({
   // Form data and handlers
   formData,
   updateField,
-  
-  // UI state  
+
+  // UI state
   canEdit,
   editingBill,
-  
+
   // Form handlers
   handleSubmit,
   isSubmitting,
   onClose,
-  
+
   // Computed values
   suggestedIconName,
   iconSuggestions,
   categories,
-  
+
   // Utility functions
   calculateBiweeklyAmount,
   calculateMonthlyAmount,
@@ -155,14 +155,8 @@ const BillFormFields = ({
                 onClick={() => updateField("iconName", iconName)}
                 disabled={editingBill && !canEdit}
                 className={`p-3 rounded-lg border-2 hover:border-blue-300 focus:ring-2 focus:ring-blue-500 transition-colors ${
-                  isSelected
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 hover:bg-gray-50"
-                } ${
-                  editingBill && !canEdit
-                    ? "opacity-50 cursor-not-allowed"
-                    : "cursor-pointer"
-                }`}
+                  isSelected ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:bg-gray-50"
+                } ${editingBill && !canEdit ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                 title={iconName}
               >
                 {React.createElement(IconComponent, {
@@ -207,9 +201,7 @@ const BillFormFields = ({
           {formData.frequency === "monthly" && formData.amount && (
             <div>Biweekly equivalent: ~${calculateBiweeklyAmount()}</div>
           )}
-          {formData.dueDate && (
-            <div>Next due: {getNextDueDate()}</div>
-          )}
+          {formData.dueDate && <div>Next due: {getNextDueDate()}</div>}
         </div>
 
         <div className="flex gap-3">
@@ -227,11 +219,7 @@ const BillFormFields = ({
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center"
           >
             <Save className="h-4 w-4 mr-2" />
-            {isSubmitting
-              ? "Saving..."
-              : editingBill
-                ? "Update Bill"
-                : "Add Bill"}
+            {isSubmitting ? "Saving..." : editingBill ? "Update Bill" : "Add Bill"}
           </button>
         </div>
       </div>
