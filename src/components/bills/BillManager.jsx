@@ -28,6 +28,7 @@ import useEditLock from "../../hooks/common/useEditLock";
 import { useAuth } from "../../stores/auth/authStore";
 import AddBillModal from "./AddBillModal";
 import BulkBillUpdateModal from "./BulkBillUpdateModal";
+import logger from "../../utils/common/logger";
 import BillDiscoveryModal from "./BillDiscoveryModal";
 import BillDetailModal from "./modals/BillDetailModal";
 import ObjectHistoryViewer from "../history/ObjectHistoryViewer";
@@ -441,7 +442,8 @@ const BillManager = ({
           }}
           onCreateRecurring={(bill) => {
             // Handle making a one-time bill recurring
-            console.log("Making bill recurring:", bill);
+            // TODO: Implement recurring bill functionality
+            logger.warn("Recurring bill creation not yet implemented:", bill.name);
           }}
         />
       )}

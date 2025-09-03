@@ -33,11 +33,11 @@ import logger from "../../utils/common/logger";
 const AnalyticsDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [timeFilter, setTimeFilter] = useState("thisMonth");
-  const [customDateRange, setCustomDateRange] = useState(null);
+  const [customDateRange, _setCustomDateRange] = useState(null);
   const [showExportModal, setShowExportModal] = useState(false);
 
   // Get budget data
-  const { transactions, envelopes, savingsGoals, actualBalance, unassignedCash } = useBudgetStore();
+  const { transactions, envelopes, _savingsGoals, _actualBalance, _unassignedCash } = useBudgetStore();
 
   // Analytics data with current filters
   const analyticsQuery = useAnalytics({
