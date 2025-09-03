@@ -14,6 +14,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import useManualSync from "../../hooks/common/useManualSync";
+import logger from "../../utils/common/logger";
 
 /**
  * Manual sync controls component for family budget collaboration
@@ -39,9 +40,9 @@ export const ManualSyncControls = ({ className = "" }) => {
     clearSyncError();
     const result = await forceUploadSync();
     if (result.success) {
-      console.log("✅ Upload sync completed:", result.message);
+      logger.info("✅ Upload sync completed:", result.message);
     } else {
-      console.error("❌ Upload sync failed:", result.error);
+      logger.error("❌ Upload sync failed:", result.error);
     }
   };
 
@@ -49,9 +50,9 @@ export const ManualSyncControls = ({ className = "" }) => {
     clearSyncError();
     const result = await forceDownloadSync();
     if (result.success) {
-      console.log("✅ Download sync completed:", result.message);
+      logger.info("✅ Download sync completed:", result.message);
     } else {
-      console.error("❌ Download sync failed:", result.error);
+      logger.error("❌ Download sync failed:", result.error);
     }
   };
 
@@ -59,9 +60,9 @@ export const ManualSyncControls = ({ className = "" }) => {
     clearSyncError();
     const result = await forceFullSync();
     if (result.success) {
-      console.log("✅ Full sync completed:", result.message);
+      logger.info("✅ Full sync completed:", result.message);
     } else {
-      console.error("❌ Full sync failed:", result.error);
+      logger.error("❌ Full sync failed:", result.error);
     }
   };
 

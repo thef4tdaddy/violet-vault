@@ -1,3 +1,5 @@
+import logger from "../common/logger";
+
 export const encryptionUtils = {
   async deriveKey(password) {
     return this.generateKey(password);
@@ -82,7 +84,8 @@ export const encryptionUtils = {
   async decrypt(encryptedData, key, iv) {
     try {
       // Add validation logging for debug
-      console.log("🔓 Decrypt attempt:", {
+      // Debug logging for decrypt attempts
+      logger.debug("🔓 Decrypt attempt:", {
         hasEncryptedData: !!encryptedData,
         encryptedDataType: typeof encryptedData,
         encryptedDataLength: encryptedData?.length,
@@ -101,10 +104,10 @@ export const encryptionUtils = {
 
       const decoder = new TextDecoder();
       const result = JSON.parse(decoder.decode(decrypted));
-      console.log("🔓 Decrypt successful");
+      logger.debug("🔓 Decrypt successful");
       return result;
     } catch (error) {
-      console.error("🔓 Decrypt failed:", {
+      logger.error("🔓 Decrypt failed:", {
         error: error.message,
         errorName: error.name,
         errorType: typeof error,
