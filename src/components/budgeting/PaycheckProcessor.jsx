@@ -9,7 +9,7 @@ const PaycheckProcessor = ({
   envelopes = [],
   paycheckHistory = [],
   onProcessPaycheck,
-  onDeletePaycheck,
+  _onDeletePaycheck,
   currentUser = { userName: "User" },
 }) => {
   const {
@@ -20,7 +20,7 @@ const PaycheckProcessor = ({
     canSubmit,
 
     // Allocation state
-    currentAllocations,
+    _currentAllocations,
 
     // Payer data
     uniquePayers,
@@ -35,7 +35,7 @@ const PaycheckProcessor = ({
 
     // Computed values
     hasAmount,
-    hasAllocations,
+    _hasAllocations,
     allocationPreview,
   } = usePaycheckProcessor({
     envelopes,

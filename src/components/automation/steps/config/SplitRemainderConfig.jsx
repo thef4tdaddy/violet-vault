@@ -3,7 +3,7 @@ import { AlertCircle } from "lucide-react";
 
 const SplitRemainderConfig = ({
   ruleData,
-  updateConfig,
+  _updateConfig,
   envelopes,
   toggleTargetEnvelope,
   errors,

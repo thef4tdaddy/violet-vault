@@ -4,7 +4,7 @@ import { Edit3, Trash2, Zap } from "lucide-react";
 const AccountCard = ({
   account,
   typeInfo,
-  daysUntilExpiration,
+  _daysUntilExpiration,
   expirationStatus,
   showBalances,
   onEdit,

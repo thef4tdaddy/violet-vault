@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import useBills from "../bills/useBills";
 import useEnvelopes from "../budgeting/useEnvelopes";
 import useDebts from "../debts/useDebts";
@@ -92,7 +92,7 @@ const useConnectionManager = (entityType, entityId) => {
 
     try {
       switch (entityType) {
-        case "bill":
+        case "bill": {
           // Connect bill to envelope
           const targetEnvelope = envelopes.find((e) => e.id === targetId);
           if (!targetEnvelope) throw new Error("Target envelope not found");
@@ -106,8 +106,9 @@ const useConnectionManager = (entityType, entityId) => {
             duration: 3000,
           });
           break;
+        }
 
-        case "envelope":
+        case "envelope": {
           // Connect envelope to bill
           const targetBill = bills.find((b) => b.id === targetId);
           if (!targetBill) throw new Error("Target bill not found");
@@ -121,8 +122,9 @@ const useConnectionManager = (entityType, entityId) => {
             duration: 3000,
           });
           break;
+        }
 
-        case "debt":
+        case "debt": {
           // Connect debt to envelope
           const targetEnvelopeForDebt = envelopes.find((e) => e.id === targetId);
           if (!targetEnvelopeForDebt) throw new Error("Target envelope not found");
@@ -136,6 +138,7 @@ const useConnectionManager = (entityType, entityId) => {
             duration: 3000,
           });
           break;
+        }
 
         default:
           throw new Error(`Unknown entity type: ${entityType}`);
@@ -191,7 +194,7 @@ const useConnectionManager = (entityType, entityId) => {
           });
           break;
 
-        case "envelope":
+        case "envelope": {
           // Remove all bills connected to this envelope
           const connectedBillIds = currentConnections.map((c) => c.id);
           await Promise.all(
@@ -205,6 +208,7 @@ const useConnectionManager = (entityType, entityId) => {
             duration: 3000,
           });
           break;
+        }
 
         case "debt":
           // Remove debt's envelope connection

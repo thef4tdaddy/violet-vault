@@ -35,7 +35,7 @@ const TriggerScheduleStep = ({ ruleData, updateRuleData }) => {
               title: "Biweekly",
               description: "Run automatically every two weeks",
             },
-          ].map(({ type, icon: Icon, title, description }) => (
+          ].map(({ type, icon: _Icon, title, description }) => (
             <div
               key={type}
               onClick={() => updateRuleData({ trigger: type })}

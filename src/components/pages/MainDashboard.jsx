@@ -14,6 +14,7 @@ import {
   Minus,
   RefreshCw,
 } from "lucide-react";
+import logger from "../../utils/common/logger";
 import PaydayPrediction from "../budgeting/PaydayPrediction";
 import EditableBalance from "../ui/EditableBalance";
 import { useActualBalance } from "../../hooks/budgeting/useBudgetMetadata";

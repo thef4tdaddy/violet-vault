@@ -16,7 +16,6 @@ import {
   Scatter,
 } from "recharts";
 import { TrendingUp, TrendingDown, BarChart3, Target, AlertTriangle, Info } from "lucide-react";
-import logger from "../../utils/common/logger";
 
 /**
  * Advanced Trend Analysis Charts for v1.10.0
@@ -27,7 +26,7 @@ import logger from "../../utils/common/logger";
  * - Predictive forecasting
  * - Comparative analysis
  */
-const TrendAnalysisCharts = ({ analyticsData, timeFilter }) => {
+const TrendAnalysisCharts = ({ analyticsData, _timeFilter }) => {
   // Generate historical spending trends
   const spendingTrends = useMemo(() => {
     if (!analyticsData) return [];

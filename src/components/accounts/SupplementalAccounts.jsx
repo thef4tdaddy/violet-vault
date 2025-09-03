@@ -32,7 +32,7 @@ const SupplementalAccounts = ({
     isOwnLock,
     canEdit,
     lock,
-    releaseLock,
+    _releaseLock,
     breakLock,
     lockLoading,
     // Actions
