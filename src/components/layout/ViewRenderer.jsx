@@ -73,8 +73,8 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
   }, [budgetData.isLoading, budgetData.envelopes?.length]);
 
   const {
-    envelopes,
-    bills,
+    _envelopes,
+    _bills,
     savingsGoals,
     supplementalAccounts,
     transactions,

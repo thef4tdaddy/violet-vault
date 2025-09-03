@@ -27,7 +27,7 @@ const ChartsAnalytics = ({
     timeFilter,
   });
 
-  const { formatters } = useChartConfig();
+  const { formatters: _formatters } = useChartConfig();
   const { exportAnalyticsData } = useAnalyticsExport();
   const {
     activeTab,

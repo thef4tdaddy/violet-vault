@@ -61,7 +61,7 @@ const DebtSummaryCards = ({ stats, onDueSoonClick }) => {
   );
 };
 
-const DebtSummaryCard = ({ icon: Icon, label, value, subtext, color, alert, onClick }) => {
+const DebtSummaryCard = ({ icon: _Icon, label, value, subtext, color, alert, onClick }) => {
   const gradientClasses = {
     red: "from-red-500 to-red-600",
     orange: "from-orange-500 to-orange-600",

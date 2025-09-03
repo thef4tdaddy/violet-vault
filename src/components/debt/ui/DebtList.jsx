@@ -22,7 +22,7 @@ const DebtList = ({ debts, onDebtClick, onRecordPayment }) => {
   );
 };
 
-const DebtCard = ({ debt, onClick, onRecordPayment }) => {
+const DebtCard = ({ debt, onClick, _onRecordPayment }) => {
   const {
     config,
     IconComponent,

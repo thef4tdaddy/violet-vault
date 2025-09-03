@@ -16,7 +16,7 @@ const AutoFundingRuleBuilder = ({
 }) => {
   const [step, setStep] = useState(1);
   const [ruleData, setRuleData] = useState(() => createDefaultRule());
-  const [validationErrors, setValidationErrors] = useState([]);
+  const [_validationErrors, _setValidationErrors] = useState([]);
   const [errors, setErrors] = useState({});
 
   // Initialize with editing rule data

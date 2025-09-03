@@ -27,7 +27,7 @@ import { useSmartCategoryManager } from "../../hooks/analytics/useSmartCategoryM
 const SmartCategoryManager = ({
   transactions = [],
   bills = [],
-  currentCategories = [],
+  _currentCategories = [],
   onAddCategory,
   onRemoveCategory,
   onUpdateCategory, // eslint-disable-line no-unused-vars
