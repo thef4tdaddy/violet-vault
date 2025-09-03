@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { create } from "zustand";
+import logger from "../../utils/common/logger";
 
 /**
  * Zustand store for managing prompt modal state
@@ -88,7 +89,7 @@ export const usePromptModal = () => {
           const result = await config.onConfirm(value);
           resolver(result !== undefined ? result : value);
         } catch (error) {
-          console.error("Prompt confirmation action failed:", error);
+          logger.error("Prompt confirmation action failed:", error);
           resolver(null);
         } finally {
           setIsLoading(false);

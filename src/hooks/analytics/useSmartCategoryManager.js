@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import logger from "../../utils/common/logger";
 
 /**
  * Hook for managing Smart Category Manager UI state and interactions
@@ -59,7 +60,7 @@ export const useSmartCategoryManager = (initialDateRange = "6months") => {
         handleDismissSuggestion(suggestion.id);
         return true;
       } catch (error) {
-        console.error("Failed to apply suggestion:", error);
+        logger.error("Failed to apply suggestion:", error);
         return false;
       }
     },
