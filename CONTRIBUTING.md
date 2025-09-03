@@ -77,8 +77,20 @@ Before committing:
 1. Code must pass ESLint with no warnings
 2. Build must complete successfully
 3. Commit messages must follow conventional format
+4. Use standardized UI components (see [Shared UI Components](docs/Shared-UI-Components.md))
 
 The pre-commit hook will automatically check these requirements.
+
+### UI Component Standards
+
+**Always use shared UI components** instead of creating custom implementations:
+
+- **EditLockIndicator**: For multi-user edit conflict prevention
+- **ConfirmModal**: For all confirmation dialogs (via `useConfirm()` hook)
+- **UniversalConnectionManager**: For entity connection management
+- **Toast System**: For notifications and alerts
+
+See the **[Shared UI Components Guide](docs/Shared-UI-Components.md)** for complete documentation of available components, usage guidelines, and design patterns.
 
 ### Getting Started
 
