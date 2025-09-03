@@ -25,6 +25,7 @@ export default [
       "scripts/**", // Allow console in build scripts
       "cloudflare-worker/**", // Allow console in worker
       "vite.config.js", // Allow console in build config
+      "**/logger.js", // Allow console in logger utility
     ],
   },
   {
@@ -109,13 +110,8 @@ export default [
         "skipComments": true
       }],
       
-      // Block console.log statements (except debug commits)
-      "no-console": [
-        "error",
-        {
-          "allow": ["warn", "error"]
-        }
-      ],
+      // Block all console statements - use logger instead
+      "no-console": "error",
     },
   },
   {
@@ -129,6 +125,13 @@ export default [
     ],
     rules: {
       "max-lines": "off", // These files excluded from 500 LOC limit
+    },
+  },
+  {
+    // Allow console statements only in logger.js
+    files: ["**/logger.js"],
+    rules: {
+      "no-console": "off", // Logger utility can use console
     },
   },
 ];

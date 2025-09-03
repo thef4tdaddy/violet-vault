@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import useActivityLogger from "../../hooks/common/useActivityLogger";
 import { ACTIVITY_TYPES, ENTITY_TYPES } from "../../services/activityLogger";
+import logger from "../../utils/common/logger";
 
 /**
  * Activity Feed Component - Level 1 Budget History UI
@@ -42,7 +43,7 @@ const ActivityFeed = () => {
       const activityList = await getRecentActivity(limit, entityType);
       setActivities(activityList);
     } catch (error) {
-      console.error("Failed to load activities:", error);
+      logger.error("Failed to load activities:", error);
       setActivities([]);
     } finally {
       setLoading(false);
