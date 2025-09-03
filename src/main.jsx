@@ -11,9 +11,9 @@ import { SystemInfoService } from "./services/bugReport/systemInfoService.js";
 import "./services/chunkedSyncService.js";
 
 // Expose diagnostic tools for debugging
-import { runDataDiagnostic } from "./utils/common/dataDiagnostic.js";
-import { runSyncDiagnostic } from "./utils/sync/syncDiagnostic.js";
-import { fixMetadata } from "./utils/common/fixMetadata.js";
+import { runDataDiagnostic } from "./utils/debug/dataDiagnostic.js";
+import { runSyncDiagnostic } from "./utils/debug/syncDiagnostic.js";
+import logger from "./utils/common/logger.js";
 import { runImmediateSyncHealthCheck } from "./utils/sync/syncHealthChecker.js";
 import syncEdgeCaseTester from "./utils/sync/syncEdgeCaseTester.js";
 import { validateAllSyncFlows } from "./utils/sync/syncFlowValidator.js";
@@ -28,7 +28,6 @@ if (
 ) {
   window.dataDiagnostic = runDataDiagnostic;
   window.syncDiagnostic = runSyncDiagnostic;
-  window.fixMetadata = fixMetadata;
   window.runSyncHealthCheck = runImmediateSyncHealthCheck;
   window.runSyncEdgeCaseTests = () => syncEdgeCaseTester.runAllTests();
   window.validateAllSyncFlows = validateAllSyncFlows;
@@ -38,55 +37,55 @@ if (
 
   // Emergency corruption recovery tool
   window.forceCloudDataReset = async () => {
-    console.log("🚨 Force clearing all cloud data and re-uploading from local...");
+    logger.warn("🚨 Force clearing all cloud data and re-uploading from local...");
     try {
       const { cloudSyncService } = await import("./services/cloudSyncService.js");
 
       // Stop any ongoing sync
       cloudSyncService.stop();
-      console.log("⏸️ Stopped background sync");
+      logger.info("⏸️ Stopped background sync");
 
       // Wait a moment for sync to fully stop
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       // Clear all cloud data completely
       await cloudSyncService.clearAllData();
-      console.log("🧹 Cleared all cloud data");
+      logger.info("🧹 Cleared all cloud data");
 
       // Wait for clearing to complete
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Force push local data to cloud (bypasses corruption checks)
       const result = await cloudSyncService.forcePushToCloud();
-      console.log("🚀 Force pushed local data to cloud:", result);
+      logger.info("🚀 Force pushed local data to cloud:", result);
 
       if (result.success) {
-        console.log("✅ Cloud data reset completed successfully - sync will resume automatically");
+        logger.info("✅ Cloud data reset completed successfully - sync will resume automatically");
         // Don't restart sync immediately - let it happen naturally
         return { success: true, message: "Cloud data reset completed successfully" };
       } else {
         throw new Error(result.error || "Force push failed");
       }
     } catch (error) {
-      console.error("❌ Force reset failed:", error);
+      logger.error("❌ Force reset failed:", error);
       return { success: false, error: error.message };
     }
   };
 
   // Manual cloud clear only (for testing)
   window.clearCloudDataOnly = async () => {
-    console.log("🧹 Clearing cloud data only (no restart)...");
+    logger.info("🧹 Clearing cloud data only (no restart)...");
     try {
       const { cloudSyncService } = await import("./services/cloudSyncService.js");
       cloudSyncService.stop();
-      console.log("⏸️ Stopped sync service");
+      logger.info("⏸️ Stopped sync service");
 
       await cloudSyncService.clearAllData();
-      console.log("✅ Cloud data cleared - sync service remains stopped");
+      logger.info("✅ Cloud data cleared - sync service remains stopped");
 
       return { success: true, message: "Cloud data cleared, sync stopped" };
     } catch (error) {
-      console.error("❌ Clear failed:", error);
+      logger.error("❌ Clear failed:", error);
       return { success: false, error: error.message };
     }
   };
@@ -96,18 +95,18 @@ if (
     const { SystemInfoService } = await import("./services/bugReport/systemInfoService.js");
     const { ScreenshotService } = await import("./services/bugReport/screenshotService.js");
 
-    console.log("🐛 Testing bug report capture...");
+    logger.info("🐛 Testing bug report capture...");
 
     // Test console log capture
     const errors = SystemInfoService.getRecentErrors();
-    console.log("📝 Console logs captured:", errors.consoleLogs?.length || 0);
-    console.log("❌ Errors captured:", errors.recentErrors?.length || 0);
+    logger.info("📝 Console logs captured:", errors.consoleLogs?.length || 0);
+    logger.info("❌ Errors captured:", errors.recentErrors?.length || 0);
 
     // Test screenshot capture
     try {
       const screenshot = await ScreenshotService.captureScreenshot();
       const info = screenshot ? ScreenshotService.getScreenshotInfo(screenshot) : null;
-      console.log("📸 Screenshot capture:", info ? `Success (${info.sizeKB}KB)` : "Failed");
+      logger.info("📸 Screenshot capture:", info ? `Success (${info.sizeKB}KB)` : "Failed");
       return {
         success: true,
         errors,
@@ -115,7 +114,7 @@ if (
         screenshotInfo: info,
       };
     } catch (error) {
-      console.log("📸 Screenshot capture failed:", error.message);
+      logger.info("📸 Screenshot capture failed:", error.message);
       return {
         success: false,
         errors,
