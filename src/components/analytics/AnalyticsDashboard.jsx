@@ -37,7 +37,8 @@ const AnalyticsDashboard = () => {
   const [showExportModal, setShowExportModal] = useState(false);
 
   // Get budget data
-  const { transactions, envelopes, _savingsGoals, _actualBalance, _unassignedCash } = useBudgetStore();
+  const { transactions, envelopes, _savingsGoals, _actualBalance, _unassignedCash } =
+    useBudgetStore();
 
   // Analytics data with current filters
   const analyticsQuery = useAnalytics({

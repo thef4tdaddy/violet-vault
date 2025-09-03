@@ -29,7 +29,7 @@ describe("useTransactionSplitterUI", () => {
   const mockTransaction = {
     id: "1",
     description: "Grocery Store",
-    amount: -120.50,
+    amount: -120.5,
     date: "2024-01-15",
     category: "Food",
   };
@@ -45,7 +45,7 @@ describe("useTransactionSplitterUI", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // Default mock implementations
     mockTransactionSplitterService.validateSplitData.mockReturnValue({
       isValid: true,
@@ -53,7 +53,7 @@ describe("useTransactionSplitterUI", () => {
     });
 
     mockTransactionSplitterService.calculateSplitTotals.mockReturnValue({
-      totalAmount: 120.50,
+      totalAmount: 120.5,
       remainingAmount: 0,
       splitCount: 2,
     });
@@ -66,7 +66,7 @@ describe("useTransactionSplitterUI", () => {
       expect(result.current.splits).toHaveLength(2); // Default to 2 splits
       expect(result.current.isProcessing).toBe(false);
       expect(result.current.errors).toEqual({});
-      expect(result.current.totals.totalAmount).toBe(120.50);
+      expect(result.current.totals.totalAmount).toBe(120.5);
     });
 
     it("should initialize splits with equal amounts", () => {
@@ -144,8 +144,8 @@ describe("useTransactionSplitterUI", () => {
 
     it("should update split amount and recalculate totals", () => {
       mockTransactionSplitterService.calculateSplitTotals.mockReturnValue({
-        totalAmount: 100.00,
-        remainingAmount: -20.50,
+        totalAmount: 100.0,
+        remainingAmount: -20.5,
         splitCount: 2,
       });
 
@@ -156,7 +156,7 @@ describe("useTransactionSplitterUI", () => {
       });
 
       expect(result.current.splits[0].amount).toBe("100.00");
-      expect(result.current.totals.remainingAmount).toBe(-20.50);
+      expect(result.current.totals.remainingAmount).toBe(-20.5);
     });
   });
 
