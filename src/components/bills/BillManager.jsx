@@ -109,7 +109,7 @@ const BillManager = ({
     handleAddNewBill,
     handleEditBill,
     handleCloseModal,
-    handleViewHistory,
+    _handleViewHistory,
     getBillDisplayData,
   } = useBillManagerUI({
     bills,

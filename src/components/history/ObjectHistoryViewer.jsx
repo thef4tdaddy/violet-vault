@@ -58,7 +58,7 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
     });
   };
 
-  const getChangeIcon = (changeType) => {
+  const _getChangeIcon = (changeType) => {
     switch (changeType) {
       case "add":
         return <Plus className="h-3 w-3 text-green-600" />;
@@ -82,7 +82,7 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
     }
   };
 
-  const formatChangeDescription = (change) => {
+  const _formatChangeDescription = (change) => {
     // Simple change description formatter
     if (change.type === "add") return `Added ${objectType.toLowerCase()}`;
     if (change.type === "delete") return `Deleted ${objectType.toLowerCase()}`;

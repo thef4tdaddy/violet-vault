@@ -15,7 +15,7 @@ const DebtDetailModal = ({
   onClose,
   onDelete,
   onRecordPayment,
-  onLinkToBill,
+  _onLinkToBill,
   onEdit,
 }) => {
   const {

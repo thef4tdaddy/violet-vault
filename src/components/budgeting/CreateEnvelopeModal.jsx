@@ -23,7 +23,7 @@ const CreateEnvelopeModal = ({
     isLoading,
     canSubmit,
     calculatedAmounts,
-    isDirty,
+    _isDirty,
 
     // Form actions
     updateFormField,

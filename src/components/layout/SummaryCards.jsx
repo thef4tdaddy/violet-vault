@@ -192,7 +192,7 @@ const SummaryCards = () => {
 };
 
 const SummaryCard = memo(
-  ({ icon: Icon, label, value, color, onClick, clickable, isNegative, subtitle, dataTour }) => {
+  ({ icon: _Icon, label, value, color, onClick, clickable, isNegative, subtitle, dataTour }) => {
     const colorClasses = {
       purple: "bg-purple-500",
       emerald: "bg-emerald-500",

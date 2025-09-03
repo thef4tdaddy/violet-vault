@@ -142,7 +142,7 @@ const NavigationTabs = memo(({ activeView, onViewChange }) => {
   );
 });
 
-const NavButton = memo(({ active, onClick, icon: Icon, label, viewKey }) => (
+const NavButton = memo(({ active, onClick, icon: _Icon, label, viewKey }) => (
   <button
     onClick={onClick}
     aria-current={active ? "page" : undefined}

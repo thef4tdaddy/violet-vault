@@ -181,7 +181,7 @@ export const CashFlowChart = ({ data, title = "Monthly Cash Flow", ...props }) =
 export const BudgetVsActualChart = ({
   data,
   title = "Budget vs Actual Spending",
-  orientation = "horizontal",
+  _orientation = "horizontal",
   ...props
 }) => {
   const series = [
