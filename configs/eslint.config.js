@@ -114,6 +114,18 @@ export default [
         "skipComments": true
       }],
       
+      // Phase 1: Complexity and function size limits (Issue #569 - prevent embedded business logic)
+      "complexity": ["error", { "max": 10 }], // Limit cyclomatic complexity
+      "max-depth": ["error", 4], // Limit nesting depth
+      "max-params": ["error", 4], // Limit function parameters
+      "max-statements": ["error", 20], // Limit statements per function
+      "max-lines-per-function": ["error", {
+        "max": 50,
+        "skipBlankLines": true,
+        "skipComments": true
+      }],
+      "max-nested-callbacks": ["error", 3], // Limit nested callbacks/functions
+      
       // Block all console statements - use logger instead
       "no-console": "error",
     },
@@ -129,6 +141,14 @@ export default [
             {
               "group": ["../services/*", "../../services/*", "../../../services/*"],
               "message": "Components should not directly import services. Use hooks in src/hooks/ to encapsulate service calls. Utils and hooks are allowed."
+            },
+            {
+              "group": ["**/calculations/*", "**/processors/*", "**/validators/*", "**/transformers/*"],
+              "message": "Components should not import business logic utilities directly. Extract to custom hooks instead."
+            },
+            {
+              "group": ["**/utils/**/calculate*", "**/utils/**/process*", "**/utils/**/validate*", "**/utils/**/transform*"],
+              "message": "Components should not import calculation/processing utilities. Use custom hooks to encapsulate business logic."
             }
           ]
         }
