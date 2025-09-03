@@ -86,5 +86,6 @@ export { useTransactionAnalytics } from "../transactions/useTransactionAnalytics
 export { useTransactionUtils } from "../transactions/useTransactionUtils.js";
 export { useTransactionBalanceUpdater } from "../transactions/useTransactionBalanceUpdater.js";
 
-// Export the main hook as default
+// Export the main hook as both named and default
+export { useTransactions };
 export default useTransactions;
