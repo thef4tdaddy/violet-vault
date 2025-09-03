@@ -106,7 +106,7 @@ export class ErrorTrackingService {
       if (this.consoleLogs.length > maxLogs) {
         this.consoleLogs = this.consoleLogs.slice(-maxLogs);
       }
-    } catch (error) {
+    } catch {
       // Fail silently for console log capture to avoid infinite loops
     }
   }

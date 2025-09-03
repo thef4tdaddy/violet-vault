@@ -65,7 +65,7 @@ const RuleTypeStep = ({ ruleData, updateRuleData, errors }) => {
               title: "Priority Fill",
               description: "Fill envelope to target amount before others",
             },
-          ].map(({ type, icon: Icon, title, description }) => (
+          ].map(({ type, icon: _Icon, title, description }) => (
             <div
               key={type}
               onClick={() => updateRuleData({ type })}

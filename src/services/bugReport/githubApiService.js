@@ -165,7 +165,7 @@ export class GitHubAPIService {
 
     // Check for patterns that suggest multiple items/steps
     const patterns = [
-      /(\d+[\.)]\s.*)/g, // Numbered lists (1. item, 1) item)
+      /(\d+[.)]\s.*)/g, // Numbered lists (1. item, 1) item)
       /(-\s.*)/g, // Dash lists (- item)
       /(\*\s.*)/g, // Star lists (* item)
       /(•\s.*)/g, // Bullet lists (• item)
@@ -181,7 +181,7 @@ export class GitHubAPIService {
         hasMultipleItems = true;
         // Convert to GitHub checkboxes
         formatted = formatted.replace(pattern, (match) => {
-          const cleanedItem = match.replace(/^[\d\.)•\*-]\s*/, "").trim();
+          const cleanedItem = match.replace(/^[\d.)•*-]\s*/, "").trim();
           return `- [ ] ${cleanedItem}`;
         });
       }
