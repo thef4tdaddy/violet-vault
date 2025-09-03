@@ -1,6 +1,6 @@
 import React from "react";
 import { ArrowRight, Calendar, Clock } from "lucide-react";
-import { useDebtCard } from "../../../hooks/debts/useDebtCard";
+// import { useDebtCard } from "../../../hooks/debts/useDebtCard";
 import DebtCardProgressBar from "./DebtCardProgressBar";
 
 /**
@@ -36,7 +36,7 @@ const DebtCard = ({ debt, onClick, onRecordPayment }) => {
     handleRecordPayment,
     currentBalance,
     interestRate,
-  } = useDebtCard(debt, onRecordPayment);
+  } = {}; // useDebtCard(debt, onRecordPayment);
 
   return (
     <div
