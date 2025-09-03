@@ -1,6 +1,75 @@
-# UI Component Patterns & Solutions
+# Shared UI Components & Design Patterns
 
-This document contains proven solutions for common UI layout issues in VioletVault.
+This document contains standardized shared UI components and proven solutions for common UI layout issues in VioletVault.
+
+## Standardized Shared UI Components
+
+VioletVault uses a comprehensive set of shared UI components to ensure consistency across all modals and forms:
+
+### Core Modal Components
+
+**EditLockIndicator** (`src/components/ui/EditLockIndicator.jsx`)
+- Standardized edit locking display for multi-user conflict prevention
+- Shows lock status, user info, and expiration timer
+- Used across bill, envelope, debt, and transaction modals
+- Variants: Full display and compact inline indicator
+
+**ConfirmModal** (`src/components/ui/ConfirmModal.jsx`)
+- Standardized confirmation dialogs replacing browser alerts
+- Supports destructive actions with red styling
+- Accessible keyboard navigation and focus management
+- Used via `useConfirm()` hook for promise-based API
+
+**UniversalConnectionManager** (`src/components/ui/ConnectionDisplay.jsx`)
+- Consistent connection UI across all entity types
+- Handles bill-envelope, debt-envelope relationships
+- Theme-aware styling (purple, blue, red themes)
+- Unified UX for creating/managing entity connections
+
+### Form Components
+
+**Toast System** (`src/components/ui/Toast.jsx`)
+- Standardized notifications replacing browser alerts
+- Support for success, error, warning, info, and custom types
+- Auto-dismiss with configurable duration
+- Accessible with proper ARIA labels
+
+### Navigation & Layout
+
+**LoadingSpinner** (`src/components/ui/LoadingSpinner.jsx`)
+- Consistent loading states across the application
+- Multiple size variants (small, medium, large)
+- Theme-aware coloring
+
+### Extracted Modal Components
+
+**BillModalHeader** (`src/components/bills/BillModalHeader.jsx`)
+- Standardized header for bill modals
+- Icon display, title management, close button
+- Preserves exact visual appearance
+
+**BillFormFields** (`src/components/bills/BillFormFields.jsx`)
+- Complete bill form implementation
+- Icon selection, validation, connection management
+- Action buttons and calculation previews
+
+### Usage Guidelines
+
+1. **Always use shared components** instead of creating custom implementations
+2. **Maintain visual consistency** by following established patterns
+3. **Theme-aware implementation** using consistent color schemes
+4. **Accessibility first** with proper ARIA labels and keyboard navigation
+5. **Extract common patterns** into reusable components when patterns repeat
+
+### Benefits
+
+- **Consistent UX**: Same behavior across all modals and forms
+- **Reduced code duplication**: Single source of truth for common patterns  
+- **Easier maintenance**: Updates in one place benefit entire application
+- **Accessibility compliance**: Shared components ensure consistent accessibility
+- **Performance**: Reusable components reduce bundle size
+
+---
 
 ## Radio Button Positioning Issue
 

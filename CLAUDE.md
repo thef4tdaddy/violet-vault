@@ -28,3 +28,16 @@
 
 - Firebase (if enabled) -> Dexie -> TanStack
 - Zustand only is for ui state, and auth settings
+
+## UI Component Standards
+
+**ALWAYS use standardized shared UI components** - See [docs/Shared-UI-Components.md](docs/Shared-UI-Components.md)
+
+Key components to use:
+- **EditLockIndicator**: For multi-user edit conflict prevention
+- **ConfirmModal** (via `useConfirm()` hook): For all confirmation dialogs
+- **UniversalConnectionManager**: For entity connection management
+- **Toast System**: For notifications instead of alerts
+- **BillModalHeader/BillFormFields**: For bill modal components
+
+Never create custom implementations when shared components exist.
