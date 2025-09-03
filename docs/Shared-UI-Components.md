@@ -9,18 +9,21 @@ VioletVault uses a comprehensive set of shared UI components to ensure consisten
 ### Core Modal Components
 
 **EditLockIndicator** (`src/components/ui/EditLockIndicator.jsx`)
+
 - Standardized edit locking display for multi-user conflict prevention
 - Shows lock status, user info, and expiration timer
 - Used across bill, envelope, debt, and transaction modals
 - Variants: Full display and compact inline indicator
 
 **ConfirmModal** (`src/components/ui/ConfirmModal.jsx`)
+
 - Standardized confirmation dialogs replacing browser alerts
 - Supports destructive actions with red styling
 - Accessible keyboard navigation and focus management
 - Used via `useConfirm()` hook for promise-based API
 
 **UniversalConnectionManager** (`src/components/ui/ConnectionDisplay.jsx`)
+
 - Consistent connection UI across all entity types
 - Handles bill-envelope, debt-envelope relationships
 - Theme-aware styling (purple, blue, red themes)
@@ -29,6 +32,7 @@ VioletVault uses a comprehensive set of shared UI components to ensure consisten
 ### Form Components
 
 **Toast System** (`src/components/ui/Toast.jsx`)
+
 - Standardized notifications replacing browser alerts
 - Support for success, error, warning, info, and custom types
 - Auto-dismiss with configurable duration
@@ -37,6 +41,7 @@ VioletVault uses a comprehensive set of shared UI components to ensure consisten
 ### Navigation & Layout
 
 **LoadingSpinner** (`src/components/ui/LoadingSpinner.jsx`)
+
 - Consistent loading states across the application
 - Multiple size variants (small, medium, large)
 - Theme-aware coloring
@@ -44,11 +49,13 @@ VioletVault uses a comprehensive set of shared UI components to ensure consisten
 ### Extracted Modal Components
 
 **BillModalHeader** (`src/components/bills/BillModalHeader.jsx`)
+
 - Standardized header for bill modals
 - Icon display, title management, close button
 - Preserves exact visual appearance
 
 **BillFormFields** (`src/components/bills/BillFormFields.jsx`)
+
 - Complete bill form implementation
 - Icon selection, validation, connection management
 - Action buttons and calculation previews
@@ -64,7 +71,7 @@ VioletVault uses a comprehensive set of shared UI components to ensure consisten
 ### Benefits
 
 - **Consistent UX**: Same behavior across all modals and forms
-- **Reduced code duplication**: Single source of truth for common patterns  
+- **Reduced code duplication**: Single source of truth for common patterns
 - **Easier maintenance**: Updates in one place benefit entire application
 - **Accessibility compliance**: Shared components ensure consistent accessibility
 - **Performance**: Reusable components reduce bundle size
