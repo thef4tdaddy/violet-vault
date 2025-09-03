@@ -26,6 +26,10 @@ export default [
       "cloudflare-worker/**", // Allow console in worker
       "vite.config.js", // Allow console in build config
       "**/logger.js", // Allow console in logger utility
+      "**/debug/**", // Debug utilities that output to browser console
+      "**/debtDebugConfig.js", // Debt debugging configuration  
+      "**/masterSyncValidator.js", // Sync validation testing
+      "**/highlight.js", // Error monitoring utility
     ],
   },
   {
