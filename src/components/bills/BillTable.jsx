@@ -57,20 +57,20 @@ const BillTable = ({
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Bill
+              <th className="px-6 py-3 text-left text-sm font-bold text-gray-800 tracking-wider">
+                <span className="text-base">B</span>ILL
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Amount
+              <th className="px-6 py-3 text-left text-sm font-bold text-gray-800 tracking-wider">
+                <span className="text-base">A</span>MOUNT
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Due Date
+              <th className="px-6 py-3 text-left text-sm font-bold text-gray-800 tracking-wider">
+                <span className="text-base">D</span>UE <span className="text-base">D</span>ATE
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
+              <th className="px-6 py-3 text-left text-sm font-bold text-gray-800 tracking-wider">
+                <span className="text-base">S</span>TATUS
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
+              <th className="px-6 py-3 text-right text-sm font-bold text-gray-800 tracking-wider">
+                <span className="text-base">A</span>CTIONS
               </th>
             </tr>
           </thead>
