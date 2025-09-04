@@ -1,6 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useConfirm } from "../../hooks/common/useConfirm";
-import { Lock, Unlock, Eye, EyeOff, AlertCircle, Shield, Clock, UserX, RotateCcw } from "lucide-react";
+import {
+  Lock,
+  Unlock,
+  Eye,
+  EyeOff,
+  AlertCircle,
+  Shield,
+  Clock,
+  UserX,
+  RotateCcw,
+} from "lucide-react";
 import { useSecurityManager } from "../../hooks/auth/useSecurityManager";
 import { useAuth } from "../../stores/auth/authStore";
 import shieldLogo from "../../assets/logo-512x512.png";
@@ -23,7 +33,7 @@ const LockScreen = () => {
       const recentFailures = securityEvents.filter(
         (event) =>
           event.type === "FAILED_UNLOCK" &&
-          Date.now() - new Date(event.timestamp).getTime() < 5 * 60 * 1000 // last 5 minutes
+          Date.now() - new Date(event.timestamp).getTime() < 5 * 60 * 1000, // last 5 minutes
       ).length;
       setFailedAttempts(recentFailures);
     }
@@ -118,7 +128,7 @@ const LockScreen = () => {
           }}
         />
       </div>
-      
+
       {/* Harder blur overlay for safety screen */}
       <div className="absolute inset-0 backdrop-blur-3xl bg-purple-900/60"></div>
 
@@ -135,92 +145,110 @@ const LockScreen = () => {
               />
             </div>
             <h1 className="text-2xl font-black text-black mb-2">
-              <span className="text-3xl">V</span>IOLET <span className="text-3xl">V</span>AULT
+              <span className="text-3xl">V</span>IOLET{" "}
+              <span className="text-3xl">V</span>AULT
             </h1>
-            <div className="text-black font-medium uppercase tracking-wider text-justify space-y-1" style={{ textAlign: 'justify', textAlignLast: 'justify' }}>
-              <p style={{ textAlign: 'justify', textAlignLast: 'justify' }}><span className="text-lg">Y</span>OUR <span className="text-lg">B</span>UDGET HAS BEEN LOCKED FOR</p>
-              <p style={{ textAlign: 'justify', textAlignLast: 'justify' }}>YOUR SAFETY BECAUSE YOU LEFT THE</p>  
-              <p style={{ textAlign: 'justify', textAlignLast: 'justify' }}>SCREEN. <span className="text-lg">U</span>SE PASSWORD TO GET BACK IN.</p>
+            <div
+              className="text-black font-medium uppercase tracking-wider text-justify space-y-1"
+              style={{ textAlign: "justify", textAlignLast: "justify" }}
+            >
+              <p style={{ textAlign: "justify", textAlignLast: "justify" }}>
+                <span className="text-lg">Y</span>OUR{" "}
+                <span className="text-lg">B</span>UDGET HAS BEEN LOCKED FOR
+              </p>
+              <p style={{ textAlign: "justify", textAlignLast: "justify" }}>
+                YOUR SAFETY BECAUSE YOU LEFT THE
+              </p>
+              <p style={{ textAlign: "justify", textAlignLast: "justify" }}>
+                SCREEN. <span className="text-lg">U</span>SE PASSWORD TO GET
+                BACK IN.
+              </p>
             </div>
           </div>
 
           {/* Unlock Form */}
           <div>
-          <form onSubmit={handleUnlock} className="space-y-4">
-            {/* Password Input */}
-            <div className="space-y-2">
-              <label className="block text-sm font-black text-black uppercase tracking-wider">
-                <span className="text-base">E</span>NTER <span className="text-base">P</span>ASSWORD TO <span className="text-base">U</span>NLOCK
-              </label>
-              <div className="relative">
-                <input
-                  ref={passwordInputRef}
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  disabled={isUnlocking}
-                  placeholder="Enter your password"
-                  className="w-full px-4 py-3 bg-white/90 border-2 border-black rounded-lg text-black placeholder-gray-500 focus:bg-white focus:border-black focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
+            <form onSubmit={handleUnlock} className="space-y-4">
+              {/* Password Input */}
+              <div className="space-y-2">
+                <label className="block text-sm font-black text-black uppercase tracking-wider">
+                  <span className="text-base">E</span>NTER{" "}
+                  <span className="text-base">P</span>ASSWORD TO{" "}
+                  <span className="text-base">U</span>NLOCK
+                </label>
+                <div className="relative">
+                  <input
+                    ref={passwordInputRef}
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    disabled={isUnlocking}
+                    placeholder="Enter your password"
+                    className="w-full px-4 py-3 bg-white/90 border-2 border-black rounded-lg text-black placeholder-gray-500 focus:bg-white focus:border-black focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={isUnlocking}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-100 hover:text-white disabled:opacity-50"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Error Message */}
+              {error && (
+                <SecurityAlert
+                  type="error"
+                  message={error}
+                  variant="fullscreen"
                 />
+              )}
+
+              {/* Failed Attempts Warning */}
+              {failedAttempts > 0 && (
+                <SecurityAlert
+                  type="warning"
+                  message={`${failedAttempts} failed attempt${failedAttempts !== 1 ? "s" : ""}${failedAttempts >= 3 ? " - delays are being applied for security" : ""}`}
+                  variant="fullscreen"
+                />
+              )}
+
+              {/* Action Buttons */}
+              <div className="space-y-3">
                 <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  disabled={isUnlocking}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-100 hover:text-white disabled:opacity-50"
+                  type="submit"
+                  disabled={isUnlocking || !password.trim()}
+                  className="w-full flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 disabled:opacity-50 text-white py-3 px-4 rounded-lg font-black transition-colors focus:outline-none focus:ring-2 focus:ring-purple-300 border-2 border-black uppercase tracking-wider"
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {isUnlocking ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>UNLOCKING...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Unlock className="h-4 w-4" />
+                      <span>UNLOCK APPLICATION</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  onClick={logout}
+                  className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg font-black transition-colors border-2 border-black uppercase tracking-wider"
+                >
+                  <UserX className="h-4 w-4" />
+                  <span>LOG OUT</span>
                 </button>
               </div>
-            </div>
-
-            {/* Error Message */}
-            {error && (
-              <SecurityAlert 
-                type="error" 
-                message={error} 
-                variant="fullscreen"
-              />
-            )}
-
-            {/* Failed Attempts Warning */}
-            {failedAttempts > 0 && (
-              <SecurityAlert 
-                type="warning" 
-                message={`${failedAttempts} failed attempt${failedAttempts !== 1 ? 's' : ''}${failedAttempts >= 3 ? ' - delays are being applied for security' : ''}`}
-                variant="fullscreen"
-              />
-            )}
-
-            {/* Action Buttons */}
-            <div className="space-y-3">
-              <button
-                type="submit"
-                disabled={isUnlocking || !password.trim()}
-                className="w-full flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 disabled:opacity-50 text-white py-3 px-4 rounded-lg font-black transition-colors focus:outline-none focus:ring-2 focus:ring-purple-300 border-2 border-black uppercase tracking-wider"
-              >
-                {isUnlocking ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>UNLOCKING...</span>
-                  </>
-                ) : (
-                  <>
-                    <Unlock className="h-4 w-4" />
-                    <span>UNLOCK APPLICATION</span>
-                  </>
-                )}
-              </button>
-              
-              <button
-                onClick={logout}
-                className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg font-black transition-colors border-2 border-black uppercase tracking-wider"
-              >
-                <UserX className="h-4 w-4" />
-                <span>LOG OUT</span>
-              </button>
-            </div>
-          </form>
+            </form>
           </div>
         </div>
       </div>
