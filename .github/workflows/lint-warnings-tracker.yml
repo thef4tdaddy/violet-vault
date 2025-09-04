@@ -239,20 +239,7 @@ jobs:
               day: 'numeric' 
             });
             
-            const commentBody = \`## 📊 Lint Warnings Update - \${currentDate}
-
-**Total warnings:** \${totalWarnings} (target: <20)
-
-### Breakdown:
-- **Unused Variables:** \${unusedVars}
-- **React Hook Dependencies:** \${reactHooks}  
-- **Large Functions (75+ lines):** \${warningData.breakdown?.['max-lines-per-function'] || 0}
-- **High Complexity:** \${warningData.breakdown?.['complexity'] || 0}
-
-### Change from baseline (96 warnings):
-\${totalWarnings < 96 ? '✅ **Improved:** -' + (96 - totalWarnings) + ' warnings' : '⚠️ **Increased:** +' + (totalWarnings - 96) + ' warnings'}
-
-*Updated automatically by GitHub Actions*\`;
+            const commentBody = \`## 📊 Lint Warnings Update - \${currentDate}\\n\\n**Total warnings:** \${totalWarnings} (target: <20)\\n\\n### Breakdown:\\n- **Unused Variables:** \${unusedVars}\\n- **React Hook Dependencies:** \${reactHooks}\\n- **Large Functions (75+ lines):** \${warningData.breakdown?.['max-lines-per-function'] || 0}\\n- **High Complexity:** \${warningData.breakdown?.['complexity'] || 0}\\n\\n### Change from baseline (96 warnings):\\n\${totalWarnings < 96 ? '✅ **Improved:** -' + (96 - totalWarnings) + ' warnings' : '⚠️ **Increased:** +' + (totalWarnings - 96) + ' warnings'}\\n\\n*Updated automatically by GitHub Actions*\`;
 
             // Add comment to the master issue (Issue #568)
             try {
