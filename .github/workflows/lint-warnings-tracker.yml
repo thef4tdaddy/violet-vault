@@ -235,6 +235,12 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            const fs = require('fs');
+            
+            // Load template from markdown file
+            const template = fs.readFileSync('.github/data/lint-warnings-comment.md', 'utf8');
+            
+            // Prepare template variables
             const currentDate = new Date().toLocaleDateString('en-US', { 
               year: 'numeric', 
               month: 'long', 
@@ -249,63 +255,70 @@ jobs:
             
             let branchInfo = '';
             if ('${{ steps.should_run.outputs.should_run_develop }}' === 'true') {
-              branchInfo += `**Develop Branch:** ${developWarnings} warnings\n`;
+              branchInfo += \`**Develop Branch:** \${developWarnings} warnings\\n\`;
             }
             if ('${{ steps.should_run.outputs.should_run_main }}' === 'true') {
-              branchInfo += `**Main Branch:** ${mainWarnings} warnings\n`;
+              branchInfo += \`**Main Branch:** \${mainWarnings} warnings\\n\`;
             }
             
+            const statusMessage = developWarnings < 96 
+              ? \`✅ Develop improved: -\${96 - developWarnings} from baseline (96)\`
+              : \`⚠️ Develop increased: +\${developWarnings - 96} from baseline (96)\`;
+            
             // Read detailed warning data for develop branch
-            let developDetails = null;
+            let detailedInfo = '';
             try {
               if ('${{ steps.should_run.outputs.should_run_develop }}' === 'true') {
-                developDetails = JSON.parse(require('fs').readFileSync('./develop-warnings.json', 'utf8'));
+                const developDetails = JSON.parse(fs.readFileSync('./develop-warnings.json', 'utf8'));
+                
+                if (developDetails && developDetails.warningCategories) {
+                  const topWarnings = developDetails.warningCategories.slice(0, 5);
+                  detailedInfo += '\\n\\n### 📋 Top Warning Categories:\\n';
+                  topWarnings.forEach(cat => {
+                    detailedInfo += \`- **\${cat.type}**: \${cat.count} warnings (\${cat.files.length} files)\\n\`;
+                  });
+
+                  // Show worst offender files
+                  const allFiles = [];
+                  developDetails.warningCategories.forEach(cat => {
+                    cat.files.forEach(file => {
+                      const existing = allFiles.find(f => f.path === file.path);
+                      if (existing) {
+                        existing.warnings += file.warnings;
+                      } else {
+                        allFiles.push({ path: file.path, warnings: file.warnings });
+                      }
+                    });
+                  });
+                  
+                  const topFiles = allFiles.sort((a, b) => b.warnings - a.warnings).slice(0, 10);
+                  if (topFiles.length > 0) {
+                    detailedInfo += '\\n### 🔥 Files with Most Warnings:\\n';
+                    topFiles.forEach(file => {
+                      const fileName = file.path.split('/').pop();
+                      detailedInfo += \`- **\${fileName}**: \${file.warnings} warnings\\n\`;
+                    });
+                  }
+
+                  // Priority actions
+                  if (developDetails.actionPlan && developDetails.actionPlan.highPriority && developDetails.actionPlan.highPriority.length > 0) {
+                    detailedInfo += '\\n### ⚠️ High Priority Actions:\\n';
+                    developDetails.actionPlan.highPriority.slice(0, 3).forEach(task => {
+                      detailedInfo += \`- **\${task.task}**: \${task.warningsAffected} warnings\\n\`;
+                    });
+                  }
+                }
               }
             } catch (error) {
-              console.log('Could not read develop warning details');
+              console.log('Could not read develop warning details:', error.message);
             }
 
-            // Generate detailed breakdown
-            let detailedInfo = '';
-            if (developDetails && developDetails.warningCategories) {
-              const topWarnings = developDetails.warningCategories.slice(0, 5);
-              detailedInfo += '\\n### 📋 Top Warning Categories:\\n';
-              topWarnings.forEach(cat => {
-                detailedInfo += \`- **\${cat.type}**: \${cat.count} warnings (\${cat.files.length} files)\\n\`;
-              });
-
-              // Show worst offender files
-              const allFiles = [];
-              developDetails.warningCategories.forEach(cat => {
-                cat.files.forEach(file => {
-                  const existing = allFiles.find(f => f.path === file.path);
-                  if (existing) {
-                    existing.warnings += file.warnings;
-                  } else {
-                    allFiles.push({ path: file.path, warnings: file.warnings });
-                  }
-                });
-              });
-              
-              const topFiles = allFiles.sort((a, b) => b.warnings - a.warnings).slice(0, 10);
-              if (topFiles.length > 0) {
-                detailedInfo += '\\n### 🔥 Files with Most Warnings:\\n';
-                topFiles.forEach(file => {
-                  const fileName = file.path.split('/').pop();
-                  detailedInfo += \`- **\${fileName}**: \${file.warnings} warnings\\n\`;
-                });
-              }
-
-              // Priority actions
-              if (developDetails.actionPlan && developDetails.actionPlan.highPriority && developDetails.actionPlan.highPriority.length > 0) {
-                detailedInfo += '\\n### ⚠️ High Priority Actions:\\n';
-                developDetails.actionPlan.highPriority.slice(0, 3).forEach(task => {
-                  detailedInfo += \`- **\${task.task}**: \${task.warningsAffected} warnings\\n\`;
-                });
-              }
-            }
-
-            const commentBody = \`## 📊 Lint Warnings Update - \${currentDate}\\n\\n\${branchInfo}\\n**Target:** <20 warnings\\n\\n### Status:\\n\${developWarnings < 96 ? '✅ Develop improved: -' + (96 - developWarnings) + ' from baseline (96)' : '⚠️ Develop increased: +' + (developWarnings - 96) + ' from baseline (96)'}\${detailedInfo}\\n\\n### 🎯 Focus Areas:\\n- **Function Size**: Split functions over 75 lines\\n- **Complexity**: Reduce function complexity (>15)\\n- **Unused Variables**: Remove or prefix with underscore\\n- **React Hooks**: Add missing dependencies\\n\\n*Updated automatically by GitHub Actions*\`;
+            // Replace template variables
+            const commentBody = template
+              .replace(/\\$\\{\\{ currentDate \\}\\}/g, currentDate)
+              .replace(/\\$\\{\\{ branchInfo \\}\\}/g, branchInfo)
+              .replace(/\\$\\{\\{ statusMessage \\}\\}/g, statusMessage)
+              .replace(/\\$\\{\\{ detailedInfo \\}\\}/g, detailedInfo);
 
             // Add comment to the master issue (Issue #568)
             try {
