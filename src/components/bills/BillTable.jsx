@@ -45,7 +45,7 @@ const BillTable = ({
       )}
 
       {/* Bills Table */}
-      <div className="bg-white shadow-sm rounded-lg overflow-hidden">
+      <div className="bg-white shadow-sm rounded-lg overflow-hidden border border-white/20 ring-1 ring-gray-800/10">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
