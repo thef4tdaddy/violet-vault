@@ -182,7 +182,7 @@ const StandardTabs = ({
           if (variant === 'colored' && tab.color && !isDisabled) {
             const colors = colorConfig[tab.color] || colorConfig.blue;
             tabStyles = isActive 
-              ? `${colors.bright} rounded-t-lg shadow-sm relative z-10 border-t border-l border-r ring-1 ring-gray-800/10`
+              ? `${colors.bright} rounded-t-lg shadow-sm relative z-10 border border-white/20 ring-1 ring-gray-800/10`
               : `${colors.pastel} rounded-t-lg relative border border-white/20 ring-1 ring-gray-800/10 hover:brightness-110 transition-all`;
             
             countStyles = isActive 
