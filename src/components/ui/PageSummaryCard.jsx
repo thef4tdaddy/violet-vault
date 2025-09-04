@@ -1,18 +1,20 @@
 import React from "react";
 
 /**
- * Standardized Summary Card Component
+ * Page-Level Summary Card Component
  * Based on the bill summary card design pattern with gradient backgrounds
  *
  * This component standardizes the look across all page-specific summary cards:
- * - Envelope page
- * - Debt page
+ * - Bills page
+ * - Debt page  
  * - Transactions page
+ * - Envelopes page
  * - Stats/Analytics page
  *
- * Design follows issue #545 specification using bill card pattern
+ * Distinct from main dashboard summary cards (SummaryCard.jsx) which use solid colors.
+ * Page-level cards use gradients and are for specific page metrics.
  */
-const StandardSummaryCard = ({
+const PageSummaryCard = ({
   icon: Icon,
   label,
   value,
@@ -127,4 +129,4 @@ const StandardSummaryCard = ({
   );
 };
 
-export default StandardSummaryCard;
+export default PageSummaryCard;
