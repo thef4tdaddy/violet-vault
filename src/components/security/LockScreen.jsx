@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useConfirm } from "../../hooks/common/useConfirm";
-import { Lock, Unlock, Eye, EyeOff, AlertCircle, Shield, Clock } from "lucide-react";
+import { Lock, Unlock, Eye, EyeOff, AlertCircle, Shield, Clock, UserX, RotateCcw } from "lucide-react";
 import { useSecurityManager } from "../../hooks/auth/useSecurityManager";
 import { useAuth } from "../../stores/auth/authStore";
 import shieldLogo from "../../assets/logo-512x512.png";
+import SecurityAlert from "../ui/SecurityAlert";
 
 const LockScreen = () => {
   const { isLocked, unlockApp, securityEvents } = useSecurityManager();
@@ -105,7 +106,7 @@ const LockScreen = () => {
   };
 
   return (
-    <div className="fixed inset-0 bg-purple-100/40 backdrop-blur-sm border-2 border-black flex items-center justify-center p-4 z-[9999]">
+    <div className="fixed inset-0 bg-purple-900 flex items-center justify-center p-4 z-[9999]">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div
@@ -131,16 +132,18 @@ const LockScreen = () => {
           <h1 className="text-2xl font-black text-white mb-2">
             <span className="text-3xl">V</span>IOLET <span className="text-3xl">V</span>AULT
           </h1>
-          <p className="text-purple-200">Your session has been locked for security</p>
+          <p className="text-white uppercase tracking-wider font-medium">
+            <span className="text-lg">Y</span>OUR SESSION HAS BEEN LOCKED FOR SECURITY
+          </p>
         </div>
 
         {/* Unlock Form */}
-        <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl p-6 border-2 border-black">
+        <div className="rounded-2xl p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm">
           <form onSubmit={handleUnlock} className="space-y-4">
             {/* Password Input */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-white">
-                Enter Password to Unlock
+              <label className="block text-sm font-black text-purple-900 uppercase tracking-wider">
+                <span className="text-base">E</span>NTER <span className="text-base">P</span>ASSWORD TO <span className="text-base">U</span>NLOCK
               </label>
               <div className="relative">
                 <input
@@ -166,22 +169,20 @@ const LockScreen = () => {
 
             {/* Error Message */}
             {error && (
-              <div className="flex items-center gap-2 text-red-300 bg-red-500 bg-opacity-20 p-3 rounded-lg">
-                <AlertCircle className="h-4 w-4 flex-shrink-0" />
-                <span className="text-sm">{error}</span>
-              </div>
+              <SecurityAlert 
+                type="error" 
+                message={error} 
+                variant="fullscreen"
+              />
             )}
 
             {/* Failed Attempts Warning */}
             {failedAttempts > 0 && (
-              <div className="flex items-center gap-2 text-orange-300 bg-orange-500 bg-opacity-20 p-3 rounded-lg">
-                <AlertCircle className="h-4 w-4 flex-shrink-0" />
-                <span className="text-sm">
-                  {failedAttempts} failed attempt
-                  {failedAttempts !== 1 ? "s" : ""}
-                  {failedAttempts >= 3 && " - delays are being applied for security"}
-                </span>
-              </div>
+              <SecurityAlert 
+                type="warning" 
+                message={`${failedAttempts} failed attempt${failedAttempts !== 1 ? 's' : ''}${failedAttempts >= 3 ? ' - delays are being applied for security' : ''}`}
+                variant="fullscreen"
+              />
             )}
 
             {/* Unlock Button */}
@@ -208,28 +209,43 @@ const LockScreen = () => {
           <div className="mt-6 pt-4 border-t border-white border-opacity-20">
             <div className="flex items-center gap-2 text-purple-100 text-sm">
               <Lock className="h-4 w-4" />
-              <span>Protected by Violet Vault Security</span>
+              <span className="font-black uppercase tracking-wider">
+                <span className="text-base">P</span>ROTECTED BY <span className="text-base">V</span>IOLET <span className="text-base">V</span>AULT <span className="text-base">S</span>ECURITY
+              </span>
             </div>
-            <p className="text-xs text-purple-200 mt-1">
-              Enter your budget password to continue using the application
+            <p className="text-xs text-purple-200 mt-1 uppercase tracking-wider">
+              <span className="text-sm">E</span>NTER YOUR BUDGET PASSWORD TO CONTINUE USING THE APPLICATION
             </p>
 
-            {/* Reset Link */}
-            <div className="mt-4 pt-3 border-t border-white border-opacity-20">
-              <button
-                onClick={handleReset}
-                className="text-xs text-purple-200 hover:text-white underline transition-colors"
-              >
-                Having trouble? Reset and return to login screen
-              </button>
+            {/* Reset Buttons */}
+            <div className="mt-4 pt-3 border-t border-white border-opacity-20 space-y-2">
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={handleReset}
+                  className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-black uppercase tracking-wider border-2 border-black rounded transition-colors flex items-center justify-center gap-1"
+                >
+                  <UserX className="h-3 w-3" />
+                  <span className="text-sm">S</span>TART <span className="text-sm">F</span>RESH
+                </button>
+                <button
+                  onClick={handleReset}
+                  className="px-3 py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black uppercase tracking-wider border-2 border-black rounded transition-colors flex items-center justify-center gap-1"
+                >
+                  <RotateCcw className="h-3 w-3" />
+                  <span className="text-sm">C</span>HANGE <span className="text-sm">P</span>ROFILE
+                </button>
+              </div>
+              <p className="text-xs text-purple-200 text-center">
+                HAVING TROUBLE? USE ONE OF THE OPTIONS ABOVE
+              </p>
             </div>
           </div>
         </div>
 
         {/* Footer */}
         <div className="text-center mt-6">
-          <p className="text-purple-200 text-xs">
-            Use the same password you set when first opening the app
+          <p className="text-purple-200 text-xs uppercase tracking-wider font-medium">
+            <span className="text-sm">U</span>SE THE SAME PASSWORD YOU SET WHEN FIRST OPENING THE APP
           </p>
         </div>
       </div>
