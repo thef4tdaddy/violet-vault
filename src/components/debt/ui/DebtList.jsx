@@ -36,7 +36,20 @@ const DebtCard = ({ debt, onClick, _onRecordPayment }) => {
     handleRecordPayment,
     currentBalance,
     interestRate,
-  } = {}; // useDebtCard(debt, onRecordPayment);
+  } = {
+    config: { bgColor: "bg-gray-50", textColor: "text-gray-600" },
+    IconComponent: Clock,
+    statusStyle: "text-gray-600",
+    statusText: "Active",
+    progressData: { percentage: 0 },
+    paymentInfo: {},
+    nextPaymentInfo: {},
+    relationships: [],
+    canQuickPay: false,
+    handleRecordPayment: () => {},
+    currentBalance: debt?.currentBalance || 0,
+    interestRate: debt?.interestRate || 0,
+  }; // useDebtCard(debt, onRecordPayment) is commented out
 
   return (
     <div
