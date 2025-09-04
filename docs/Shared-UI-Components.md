@@ -139,6 +139,27 @@ import StandardFilters from "../ui/StandardFilters";
 - **Benefits**: Creates professional depth, consistent visual hierarchy, and cohesive appearance
 - **Examples**: Summary cards, StandardFilters, modals, form containers
 
+**Main Container Purple Tint**: Page-level containers should use branded purple tint:
+- **Style**: `rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm`
+- **Usage**: Applied to main page containers (BillManager, DebtManager, etc.)
+- **Benefits**: Creates branded visual identity while maintaining readability
+- **Example**: BillManager main container with subtle purple background
+
+**Typography Hierarchy Standards**:
+- **Important Headers**: Use ALL CAPS with larger first letters pattern
+  - **Style**: `font-black text-black text-base` with `text-lg` first letters
+  - **Pattern**: `<span className="text-lg">B</span>ILL`
+  - **Usage**: Table headers, section headers, important labels
+- **Subtext/Descriptions**: Use dark purple for branded consistency  
+  - **Style**: `text-purple-900`
+  - **Usage**: Page descriptions, help text, secondary information
+  - **Example**: "Track and manage your recurring bills and payments"
+
+**Button Standards**: All action buttons must have hard black borders:
+- **Style**: Add `border-2 border-black` to all buttons
+- **Usage**: Primary actions, secondary actions, icon buttons
+- **Benefits**: Creates consistent visual weight and professional appearance
+
 **Glassmorphism Styling**: Use the established glassmorphism design language:
 - **Class**: `.glassmorphism` with `backdrop-filter: blur(20px)` and semi-transparent backgrounds
 - **Complete Style**: `glassmorphism rounded-lg border border-white/20 ring-1 ring-gray-800/10 shadow-lg`
