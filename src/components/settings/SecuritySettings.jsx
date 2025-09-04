@@ -18,31 +18,35 @@ import { useSecurityManager } from "../../hooks/auth/useSecurityManager";
 
 const SecuritySettings = ({ isOpen, onClose }) => {
   const {
+    isLocked,
     securitySettings,
     securityEvents,
-    updateSecuritySettings,
+    updateSettings,
     clearSecurityEvents,
-    exportSecurityEvents,
-    getSecurityStatus,
   } = useSecurityManager();
 
   const [showEvents, setShowEvents] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
 
-  const securityStatus = getSecurityStatus();
-
   const handleSettingChange = (setting, value) => {
-    updateSecuritySettings({ [setting]: value });
+    updateSettings({ [setting]: value });
+  };
+
+  const exportSecurityEvents = () => {
+    const dataStr = JSON.stringify(securityEvents, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+    const exportFileDefaultName = `security-events-${new Date().toISOString().split('T')[0]}.json`;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
   };
 
   const timeUntilAutoLock = () => {
-    if (!securityStatus.autoLockEnabled || securityStatus.isLocked) return null;
-
-    const minutes = Math.floor(securityStatus.timeUntilAutoLock / (1000 * 60));
-    const seconds = Math.floor((securityStatus.timeUntilAutoLock % (1000 * 60)) / 1000);
-
-    if (minutes > 0) return `${minutes}m ${seconds}s`;
-    return `${seconds}s`;
+    if (!securitySettings.autoLockEnabled || isLocked) return null;
+    // For now, return a simple status since we don't have time remaining calculation
+    return "Active";
   };
 
   if (!isOpen) return null;
@@ -75,12 +79,12 @@ const SecuritySettings = ({ isOpen, onClose }) => {
                 <div className="flex justify-between">
                   <span>Session Status:</span>
                   <span
-                    className={`font-medium ${securityStatus.isLocked ? "text-red-600" : "text-green-600"}`}
+                    className={`font-medium ${isLocked ? "text-red-600" : "text-green-600"}`}
                   >
-                    {securityStatus.isLocked ? "Locked" : "Active"}
+                    {isLocked ? "Locked" : "Active"}
                   </span>
                 </div>
-                {securityStatus.autoLockEnabled && !securityStatus.isLocked && (
+                {securitySettings.autoLockEnabled && !isLocked && (
                   <div className="flex justify-between">
                     <span>Auto-lock in:</span>
                     <span className="font-medium text-orange-600">
