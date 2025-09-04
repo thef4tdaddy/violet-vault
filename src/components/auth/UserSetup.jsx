@@ -201,7 +201,13 @@ const UserSetup = ({ onSetupComplete }) => {
             {isReturningUser ? (
               <span className="uppercase tracking-wider text-black">
                 <span className="text-4xl">W</span>ELCOME <span className="text-4xl">B</span>ACK,{" "}
-                <span className="inline-flex items-center text-4xl font-black" style={{ color: userColor }}>
+                <span 
+                  className="inline-flex items-center text-4xl font-black" 
+                  style={{ 
+                    color: userColor,
+                    textShadow: '2px 2px 0px black, -2px -2px 0px black, 2px -2px 0px black, -2px 2px 0px black, 0px 2px 0px black, 2px 0px 0px black, 0px -2px 0px black, -2px 0px 0px black'
+                  }}
+                >
                   {userName.toUpperCase()}
                 </span>
                 !
