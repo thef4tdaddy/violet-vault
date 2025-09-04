@@ -186,7 +186,19 @@ const UserSetup = ({ onSetupComplete }) => {
 
   return (
     <div className="min-h-screen bg-purple-900 flex items-center justify-center p-4">
-      <div className="rounded-3xl p-8 w-full max-w-md border-2 border-black bg-purple-100/40 backdrop-blur-sm">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-10">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 25% 25%, white 2px, transparent 2px), radial-gradient(circle at 75% 75%, white 2px, transparent 2px)",
+            backgroundSize: "100px 100px",
+          }}
+        />
+      </div>
+      
+      <div className="rounded-3xl p-8 w-full max-w-md border-2 border-black bg-purple-100/40 backdrop-blur-sm relative">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-8">
             <div className="inline-flex items-center justify-center w-24 h-24 bg-white rounded-full border-2 border-black p-3">
