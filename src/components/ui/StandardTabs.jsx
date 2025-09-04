@@ -8,7 +8,7 @@ import React from "react";
  * @param {string} activeTab - Currently active tab id
  * @param {Function} onTabChange - Callback when tab changes
  * @param {string} size - 'sm' | 'md' | 'lg' for different sizes
- * @param {string} variant - 'underline' | 'pills' | 'buttons' for different styles
+ * @param {string} variant - 'underline' | 'pills' | 'buttons' | 'tabs' | 'colored' for different styles
  */
 const StandardTabs = ({ 
   tabs = [], 
@@ -45,6 +45,45 @@ const StandardTabs = ({
 
   const config = sizeConfig[size];
 
+  // Color configurations for colored tabs
+  const colorConfig = {
+    blue: {
+      pastel: "bg-blue-100 text-blue-700 border-blue-200",
+      bright: "bg-blue-500 text-white border-blue-500",
+      count: { pastel: "bg-blue-200 text-blue-800", bright: "bg-blue-400 text-blue-50" }
+    },
+    green: {
+      pastel: "bg-emerald-100 text-emerald-700 border-emerald-200", 
+      bright: "bg-emerald-500 text-white border-emerald-500",
+      count: { pastel: "bg-emerald-200 text-emerald-800", bright: "bg-emerald-400 text-emerald-50" }
+    },
+    red: {
+      pastel: "bg-red-100 text-red-700 border-red-200",
+      bright: "bg-red-500 text-white border-red-500", 
+      count: { pastel: "bg-red-200 text-red-800", bright: "bg-red-400 text-red-50" }
+    },
+    amber: {
+      pastel: "bg-amber-100 text-amber-700 border-amber-200",
+      bright: "bg-amber-500 text-white border-amber-500",
+      count: { pastel: "bg-amber-200 text-amber-800", bright: "bg-amber-400 text-amber-50" }
+    },
+    purple: {
+      pastel: "bg-purple-100 text-purple-700 border-purple-200",
+      bright: "bg-purple-500 text-white border-purple-500", 
+      count: { pastel: "bg-purple-200 text-purple-800", bright: "bg-purple-400 text-purple-50" }
+    },
+    cyan: {
+      pastel: "bg-cyan-100 text-cyan-700 border-cyan-200",
+      bright: "bg-cyan-500 text-white border-cyan-500",
+      count: { pastel: "bg-cyan-200 text-cyan-800", bright: "bg-cyan-400 text-cyan-50" }
+    },
+    gray: {
+      pastel: "bg-gray-100 text-gray-700 border-gray-200",
+      bright: "bg-gray-600 text-white border-gray-600",
+      count: { pastel: "bg-gray-200 text-gray-800", bright: "bg-gray-500 text-gray-50" }
+    }
+  };
+
   // Variant-specific styling
   const getVariantStyles = (isActive, isDisabled) => {
     if (isDisabled) {
@@ -71,6 +110,10 @@ const StandardTabs = ({
         return isActive
           ? "bg-white text-blue-700 border-t-2 border-l border-r border-blue-500 rounded-t-lg shadow-sm relative z-10"
           : "bg-gray-50 text-gray-700 border border-gray-300 hover:bg-gray-100 hover:text-gray-900 rounded-t-lg relative";
+
+      case 'colored':
+        // This will be handled per-tab with individual colors
+        return "";
       
       default:
         return isActive
@@ -100,6 +143,10 @@ const StandardTabs = ({
         return isActive 
           ? "bg-blue-100 text-blue-800" 
           : "bg-gray-200 text-gray-700";
+
+      case 'colored':
+        // This will be handled per-tab with individual colors
+        return "";
       
       default:
         return isActive 
@@ -116,7 +163,7 @@ const StandardTabs = ({
 
   const navClass = variant === 'underline' 
     ? "flex space-x-8" 
-    : variant === 'tabs'
+    : variant === 'tabs' || variant === 'colored'
     ? "flex -mb-px space-x-1"
     : "flex space-x-1";
 
@@ -128,6 +175,21 @@ const StandardTabs = ({
           const isDisabled = tab.disabled || false;
           const Icon = tab.icon;
 
+          // Handle colored variant with individual tab colors
+          let tabStyles = getVariantStyles(isActive, isDisabled);
+          let countStyles = getCountStyles(isActive);
+
+          if (variant === 'colored' && tab.color && !isDisabled) {
+            const colors = colorConfig[tab.color] || colorConfig.blue;
+            tabStyles = isActive 
+              ? `${colors.bright} rounded-t-lg shadow-sm relative z-10 border-t-2 border-l border-r`
+              : `${colors.pastel} rounded-t-lg relative border hover:brightness-110 transition-all`;
+            
+            countStyles = isActive 
+              ? colors.count.bright 
+              : colors.count.pastel;
+          }
+
           return (
             <button
               key={tab.id}
@@ -135,8 +197,8 @@ const StandardTabs = ({
               disabled={isDisabled}
               className={`
                 font-medium ${config.text} ${config.padding} 
-                flex items-center gap-2 transition-colors
-                ${getVariantStyles(isActive, isDisabled)}
+                flex items-center gap-2 transition-all duration-200
+                ${tabStyles}
               `.trim()}
             >
               {Icon && <Icon className={config.iconSize} />}
@@ -145,7 +207,7 @@ const StandardTabs = ({
                 <span
                   className={`
                     ml-1 ${config.countPadding} rounded-full ${config.countText} 
-                    ${getCountStyles(isActive)}
+                    ${countStyles}
                   `.trim()}
                 >
                   {tab.count}

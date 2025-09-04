@@ -13,7 +13,7 @@ const BillViewTabs = ({ viewModes, viewMode, setViewMode, filterOptions, setFilt
         tabs={viewModes}
         activeTab={viewMode}
         onTabChange={setViewMode}
-        variant="tabs"
+        variant="colored"
         size="md"
       />
 

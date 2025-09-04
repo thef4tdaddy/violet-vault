@@ -38,19 +38,22 @@ const tabs = [
     id: "all", 
     label: "All Bills", 
     icon: FileText, 
-    count: 10 
+    count: 10,
+    color: "gray"
   },
   { 
     id: "overdue", 
     label: "Overdue", 
     icon: AlertTriangle, 
-    count: 2 
+    count: 2,
+    color: "red"
   },
   { 
     id: "upcoming", 
     label: "Upcoming", 
     icon: Clock, 
     count: 5,
+    color: "blue",
     disabled: false
   }
 ];
@@ -60,13 +63,15 @@ const tabs = [
   activeTab={activeTab}
   onTabChange={setActiveTab}
   size="md"           // 'sm' | 'md' | 'lg'
-  variant="underline" // 'underline' | 'pills' | 'buttons'
+  variant="colored"   // 'underline' | 'pills' | 'buttons' | 'tabs' | 'colored'
 />
 ```
 
 **Features:**
-- **High Contrast Text**: Uses `text-gray-700` (inactive) and `text-blue-700` (active) for WCAG compliance
-- **Multiple Variants**: Underline (default), pills, and buttons styling
+- **High Contrast Text**: Uses `text-gray-700` (inactive) and proper contrast for all variants
+- **Multiple Variants**: Underline, pills, buttons, tabs, and colored styling
+- **Colored Tabs**: Pastel-to-bright transitions matching summary card colors
+- **Available Colors**: blue, green, red, amber, purple, cyan, gray
 - **Flexible Sizing**: Small, medium, and large sizes available
 - **Icon Support**: Optional icons with proper sizing
 - **Count Badges**: Optional count display with variant-appropriate styling
