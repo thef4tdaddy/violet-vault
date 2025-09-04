@@ -239,7 +239,7 @@ jobs:
               day: 'numeric' 
             });
             
-            const issueBody = \`# 📊 Master Lint Warnings Tracking Issue
+            const issueBody = `# 📊 Master Lint Warnings Tracking Issue
 
 **This issue tracks the ongoing status of ESLint warnings across the entire codebase and is automatically updated by GitHub Actions.**
 
@@ -345,7 +345,7 @@ The workflow tracks warning trends and prevents regression by blocking PRs that 
 
 ---
 
-*This issue will remain open until we reach the target of <20 warnings total.*\`;
+*This issue will remain open until we reach the target of <20 warnings total.*`;
 
             // Update the master issue (Issue #568)
             try {
