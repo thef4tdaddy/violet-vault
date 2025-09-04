@@ -182,7 +182,7 @@ const StandardTabs = ({
           if (variant === 'colored' && tab.color && !isDisabled) {
             const colors = colorConfig[tab.color] || colorConfig.blue;
             tabStyles = isActive 
-              ? `${colors.bright} rounded-t-lg shadow-sm relative z-10 border-2 border-black !important`
+              ? `${colors.bright} rounded-t-lg shadow-sm relative z-10`
               : `${colors.pastel} rounded-t-lg relative hover:brightness-110 transition-all`;
             
             countStyles = isActive 
@@ -199,7 +199,9 @@ const StandardTabs = ({
                 font-medium ${config.text} ${config.padding} 
                 flex items-center gap-2 transition-all duration-200
                 ${tabStyles}
+                ${isActive && variant === 'colored' ? 'border-2 border-black' : ''}
               `.trim()}
+              style={isActive && variant === 'colored' ? { border: '2px solid black' } : {}}
             >
               {Icon && <Icon className={config.iconSize} />}
               {tab.label}
