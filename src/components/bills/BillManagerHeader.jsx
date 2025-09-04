@@ -30,7 +30,7 @@ const BillManagerHeader = ({
         <button
           onClick={searchNewBills}
           disabled={isSearching}
-          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center gap-2"
+          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center gap-2 border-2 border-black"
         >
           {isSearching ? (
             <RefreshCw className="h-4 w-4 animate-spin" />
@@ -42,7 +42,7 @@ const BillManagerHeader = ({
 
         <button
           onClick={handleAddNewBill}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 border-2 border-black"
         >
           <Plus className="h-4 w-4" />
           Add Bill
