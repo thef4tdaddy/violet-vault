@@ -197,21 +197,21 @@ const UserSetup = ({ onSetupComplete }) => {
               />
             </div>
           </div>
-          <h1 className="text-3xl font-black text-white mb-2">
+          <h1 className="text-3xl font-black mb-2">
             {isReturningUser ? (
-              <span className="uppercase tracking-wider">
+              <span className="uppercase tracking-wider text-black">
                 <span className="text-4xl">W</span>ELCOME <span className="text-4xl">B</span>ACK,{" "}
-                <span className="inline-flex items-center" style={{ color: userColor }}>
+                <span className="inline-flex items-center text-4xl font-black" style={{ color: userColor }}>
                   {userName.toUpperCase()}
                 </span>
                 !
               </span>
             ) : step === 1 ? (
-              <span className="uppercase tracking-wider">
+              <span className="uppercase tracking-wider text-black">
                 <span className="text-4xl">G</span>ET <span className="text-4xl">S</span>TARTED
               </span>
             ) : (
-              <span className="uppercase tracking-wider">
+              <span className="uppercase tracking-wider text-black">
                 <span className="text-4xl">S</span>ET <span className="text-4xl">U</span>P <span className="text-4xl">P</span>ROFILE
               </span>
             )}
@@ -357,8 +357,8 @@ const UserSetup = ({ onSetupComplete }) => {
         </form>
 
         <div className="text-center mt-6">
-          <p className="text-sm text-gray-500">
-            Your data is encrypted client-side for maximum security
+          <p className="text-xs text-black font-medium uppercase tracking-wider">
+            <span className="text-sm">Y</span>OUR DATA IS ENCRYPTED CLIENT-SIDE FOR MAXIMUM SECURITY
           </p>
         </div>
       </div>
