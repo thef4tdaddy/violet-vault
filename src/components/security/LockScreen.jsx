@@ -17,7 +17,7 @@ import shieldLogo from "../../assets/logo-512x512.png";
 import SecurityAlert from "../ui/SecurityAlert";
 
 const LockScreen = () => {
-  const { isLocked, unlockApp, securityEvents } = useSecurityManager();
+  const { isLocked, unlockSession, securityEvents } = useSecurityManager();
   const logout = useAuth((state) => state.logout);
   const confirm = useConfirm();
   const [password, setPassword] = useState("");
@@ -68,14 +68,18 @@ const LockScreen = () => {
     setError("");
 
     try {
-      const result = await unlockApp(password);
+      // Validate password with auth store
+      const authStore = useAuth.getState();
+      const isValidPassword = await authStore.validatePassword(password);
 
-      if (result.success) {
+      if (isValidPassword) {
+        // Password is correct, unlock the session
+        unlockSession();
         setPassword("");
         setFailedAttempts(0);
         setError("");
       } else {
-        setError(result.error || "Invalid password");
+        setError("Invalid password");
         setFailedAttempts((prev) => prev + 1);
         setPassword("");
 
@@ -84,7 +88,7 @@ const LockScreen = () => {
           await new Promise((resolve) => setTimeout(resolve, 2000));
         }
       }
-    } catch {
+    } catch (error) {
       setError("Failed to unlock application");
       setPassword("");
     } finally {
