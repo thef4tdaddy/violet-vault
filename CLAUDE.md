@@ -45,7 +45,9 @@ Key components to use:
 - **BillModalHeader/BillFormFields**: For bill modal components
 
 **Design Standards:**
-- **Hard Border Lines**: Use `border-b border-gray-200` for all major UI section separation
+- **Hard Black Borders**: Use `border border-white/20 ring-1 ring-gray-800/10` on all major UI components
+- **Glassmorphism Styling**: Apply `.glassmorphism rounded-lg` with proper borders and shadows
+- **Tab Connection**: Tabs must visually connect to content below using rounded tops and negative margins
 - **Consistent Spacing**: Standard padding and margins across components
 - **Color Theming**: Pastel-to-bright transitions matching summary card colors
 

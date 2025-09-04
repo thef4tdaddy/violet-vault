@@ -123,24 +123,60 @@ import StandardFilters from "../ui/StandardFilters";
 ```
 
 **Features:**
-- **Compact Design**: Takes minimal vertical space compared to old bulky filters
+- **Glassmorphism Design**: Professional styling with backdrop blur and hard black borders
+- **Proper Labeling**: "Filters" header with icon for clear identification
 - **Search with Icon**: Built-in search input with search icon and clear button
 - **Flexible Dropdowns**: Configure any number of select filters
 - **Smart Clear Button**: Only shows when filters are active, clears all at once
-- **Consistent Styling**: Matches form inputs across the app
-- **Hard Bottom Border**: Standard `border-b border-gray-200` for section separation
+- **Tab Connection**: Visually connects to StandardTabs when used together
+- **Rounded Corners**: Modern appearance with proper container boundaries
 
 ### Design Standards
 
-**Hard Border Lines**: All major UI sections should use consistent border styling:
-- **Standard Border**: `border-b border-gray-200` 
-- **Usage**: Separates major sections (tabs, filters, content areas)
-- **Benefits**: Creates clear visual hierarchy and consistent spacing
+**Hard Black Borders**: All major UI components must use the standardized hard black border system:
+- **Standard Border**: `border border-white/20 ring-1 ring-gray-800/10`
+- **Usage**: Applied to cards, modals, filters, summary components, and all major UI elements
+- **Benefits**: Creates professional depth, consistent visual hierarchy, and cohesive appearance
+- **Examples**: Summary cards, StandardFilters, modals, form containers
+
+**Glassmorphism Styling**: Use the established glassmorphism design language:
+- **Class**: `.glassmorphism` with `backdrop-filter: blur(20px)` and semi-transparent backgrounds
+- **Complete Style**: `glassmorphism rounded-lg border border-white/20 ring-1 ring-gray-800/10 shadow-lg`
+- **Usage**: Primary containers, filters, cards, and overlay components
+- **Benefits**: Modern aesthetic, visual depth, professional appearance
+
+**Tab Connection Pattern**: Tabs should visually connect to content below them:
+- **Tab Styling**: Rounded top corners (`rounded-t-lg`) with hard black borders
+- **Connection Method**: Use negative margins (`-mb-1`) to eliminate gaps
+- **Content Styling**: Connected content should have matching border and glassmorphism
+- **Visual Flow**: Creates seamless transition from navigation to content
+
+**Implementation Example:**
+```jsx
+// Proper tab + filter connection pattern
+<div className="space-y-0">
+  <StandardTabs
+    variant="colored"
+    tabs={tabs}
+    activeTab={activeTab}
+    onTabChange={setActiveTab}
+  />
+  
+  <StandardFilters
+    filters={filters}
+    onFilterChange={handleFilterChange}
+    filterConfigs={configs}
+    className="-mb-1" // Creates visual connection
+  />
+</div>
+```
 
 **When to Use:**
 - Use StandardFilters for all filtering UI across the app
 - Replace bulky filter sections that take excessive space
-- Ensures consistent search and filter patterns
+- Always apply hard black borders to major UI components
+- Connect tabs to content using the established pattern
+- Use glassmorphism for primary containers and overlays
 
 ### Core Modal Components
 
