@@ -35,11 +35,19 @@
 
 Key components to use:
 
+- **StandardTabs**: For all tabbed navigation with colored variants and consistent styling
+- **StandardFilters**: For compact, space-efficient filtering across all pages
+- **PageSummaryCard**: For page-specific metrics with gradient backgrounds
 - **EditLockIndicator**: For multi-user edit conflict prevention
 - **ConfirmModal** (via `useConfirm()` hook): For all confirmation dialogs
 - **UniversalConnectionManager**: For entity connection management
 - **Toast System**: For notifications instead of alerts
 - **BillModalHeader/BillFormFields**: For bill modal components
+
+**Design Standards:**
+- **Hard Border Lines**: Use `border-b border-gray-200` for all major UI section separation
+- **Consistent Spacing**: Standard padding and margins across components
+- **Color Theming**: Pastel-to-bright transitions matching summary card colors
 
 Never create custom implementations when shared components exist.
 
