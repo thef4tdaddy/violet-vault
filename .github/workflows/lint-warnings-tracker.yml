@@ -239,124 +239,31 @@ jobs:
               day: 'numeric' 
             });
             
-            const issueBody = `# 📊 Master Lint Warnings Tracking Issue
+            const commentBody = \`## 📊 Lint Warnings Update - \${currentDate}
 
-**This issue tracks the ongoing status of ESLint warnings across the entire codebase and is automatically updated by GitHub Actions.**
+**Total warnings:** \${totalWarnings} (target: <20)
 
----
+### Breakdown:
+- **Unused Variables:** \${unusedVars}
+- **React Hook Dependencies:** \${reactHooks}  
+- **Large Functions (75+ lines):** \${warningData.breakdown?.['max-lines-per-function'] || 0}
+- **High Complexity:** \${warningData.breakdown?.['complexity'] || 0}
 
-## 🎯 Current Status
-- **Total warnings:** ${totalWarnings}
-- **Target goal:** <20 warnings 
-- **Progress:** 96 → ${totalWarnings} warnings (${Math.round(((96 - totalWarnings) / 96) * 100)}% reduction ${totalWarnings < 96 ? '✅' : ''})
-- **Last updated:** ${currentDate}
+### Change from baseline (96 warnings):
+\${totalWarnings < 96 ? '✅ **Improved:** -' + (96 - totalWarnings) + ' warnings' : '⚠️ **Increased:** +' + (totalWarnings - 96) + ' warnings'}
 
-## 📈 Warning Breakdown
+*Updated automatically by GitHub Actions*\`;
 
-### By Category
-- **Unused Variables (no-unused-vars):** ${unusedVars} warnings ${unusedVars > 30 ? '🔴' : unusedVars > 15 ? '🟡' : '🟢'}
-- **React Hook Dependencies (react-hooks/exhaustive-deps):** ${reactHooks} warnings ${reactHooks > 20 ? '🔴' : reactHooks > 10 ? '🟠' : '🟢'}
-
-### 📏 File Size Tracking (Issue #569)
-- **Files 300+ lines (warnings):** ${files300Plus} files ${files300Plus > 20 ? '🔴' : files300Plus > 10 ? '🟡' : '🟢'}
-- **Files 400+ lines (errors):** ${files400Plus} files ${files400Plus > 5 ? '🔴' : files400Plus > 0 ? '🟡' : '🟢'}
-- **Graduated enforcement:** 300+ = warn, 400+ = error, 500+ = critical
-
-### 📋 Most Common Warnings
-${warningData.warningCategories?.slice(0, 5).map(cat => 
-  \`- **\${cat.type}**: \${cat.count} warnings (\${cat.files.length} files)\`
-).join('\\n') || 'No warning details available'}
-
-### By Priority
-- **🚨 Critical (Errors):** 0 ✅ (All resolved)
-- **🟡 Medium (Code Quality):** ${unusedVars} warnings
-- **🟠 Low (Dependencies):** ${reactHooks} warnings
-
----
-
-## 🏆 Recent Achievements
-
-### ✅ **Phase 1 Complete** (September 2025)
-- **Fixed 17 no-undef errors** (critical bugs eliminated)
-- **Fixed 7 syntax errors** (case-declarations + useless-escape)
-- **Eliminated all console violations** (centralized logging)
-- **Optimized ESLint configuration** (underscore variable handling)
-
----
-
-## 🎯 Action Plan
-
-### High Priority Tasks
-${warningData.actionPlan?.highPriority?.map(task => 
-  \`#### \${task.task} (\${task.warningsAffected} warnings)
-**Files:** \${task.files.join(', ')}
-**Action:** \${task.action}\`
-).join('\\n\\n') || 'No high-priority tasks identified'}
-
-### Medium Priority Tasks  
-${warningData.actionPlan?.mediumPriority?.length > 0 ? 
-  warningData.actionPlan.mediumPriority.map(task => 
-    \`- **\${task.task}**: \${task.warningsAffected} warnings in \${task.files.length} files\`
-  ).join('\\n') : '- None currently'}
-
----
-
-## 📋 Next Steps
-
-### 🎯 **Phase 2: Unused Variables (${unusedVars} warnings)**
-- [ ] Prefix future feature variables with \`_\`
-- [ ] Remove genuinely unused imports
-- [ ] Add eslint-disable comments where appropriate
-
-### 🎯 **Phase 3: React Hook Dependencies (${reactHooks} warnings)**
-- [ ] Analyze dependency chains for safety
-- [ ] Add missing dependencies where appropriate
-- [ ] Use eslint-disable with explanations for intentional omissions
-
----
-
-## 📊 Historical Progress
-
-| Date | Total | Change | Notes |
-|------|-------|--------|-------|
-| ${currentDate} | ${totalWarnings} | ${totalWarnings < 96 ? '-' + (96 - totalWarnings) : '+' + (totalWarnings - 96)} | ${totalWarnings < 70 ? 'Good progress' : 'Initial cleanup'} |
-| Sep 3, 2025 | 62 | -34 | Major cleanup: eliminated all critical errors |
-| *baseline* | 96 | - | Starting point with critical bugs |
-
----
-
-## 🤖 Automation
-
-This issue is automatically updated by:
-- **GitHub Actions workflow:** \`.github/workflows/lint-warnings-tracker.yml\`
-- **Update frequency:** Daily on develop branch, Weekly on main branch
-- **Data source:** \`.github/data/lint-warnings.json\`
-- **File size tracking:** Graduated enforcement with 300/400/500 line limits
-
-The workflow tracks warning trends and prevents regression by blocking PRs that increase warnings by >20%.
-
----
-
-## 📚 Additional Resources
-
-- **Detailed tracking:** \`docs/lint_warnings.md\`
-- **ESLint configuration:** \`configs/eslint.config.js\`
-- **Automated tracking data:** \`.github/data/lint-warnings.json\`
-
----
-
-*This issue will remain open until we reach the target of <20 warnings total.*`;
-
-            // Update the master issue (Issue #568)
+            // Add comment to the master issue (Issue #568)
             try {
-              await github.rest.issues.update({
+              await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: 568,
-                body: issueBody
+                body: commentBody
               });
               
-              console.log('✅ Successfully updated Master Lint Warnings Issue #568');
+              console.log('✅ Successfully added comment to Master Lint Warnings Issue #568');
             } catch (error) {
-              console.log('❌ Failed to update issue #568:', error.message);
+              console.log('❌ Failed to add comment to issue #568:', error.message);
             }
