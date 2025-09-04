@@ -59,8 +59,8 @@ const useTransactionOperations = (options = {}) => {
     },
     onSuccess: (data) => {
       // Invalidate related queries
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.envelopes.all() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
 
       logger.info("Transaction added successfully", { id: data.id });
     },
@@ -103,8 +103,8 @@ const useTransactionOperations = (options = {}) => {
     },
     onSuccess: (data, variables) => {
       // Invalidate related queries
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.envelopes.all() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
 
       logger.info("Transaction updated successfully", { id: variables.id });
     },
@@ -129,8 +129,8 @@ const useTransactionOperations = (options = {}) => {
     },
     onSuccess: (data) => {
       // Invalidate related queries
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.envelopes.all() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
 
       logger.info("Transaction deleted successfully", { id: data.id });
     },
@@ -197,8 +197,8 @@ const useTransactionOperations = (options = {}) => {
     },
     onSuccess: (data) => {
       // Invalidate related queries
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.envelopes.all() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
 
       logger.info("Transaction split successfully", {
         originalId: data.originalTransaction.id,
@@ -239,8 +239,8 @@ const useTransactionOperations = (options = {}) => {
     },
     onSuccess: (data) => {
       // Invalidate related queries
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.envelopes.all() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
 
       logger.info("Transfer created successfully", {
         transferId: data.transferId,
@@ -297,8 +297,8 @@ const useTransactionOperations = (options = {}) => {
     },
     onSuccess: (data, variables) => {
       // Invalidate related queries
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.envelopes.all() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactionsList() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.envelopesList() });
 
       logger.info(`Bulk ${variables.operation} completed`, { count: data.length });
     },
