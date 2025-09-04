@@ -6,6 +6,24 @@ This document contains standardized shared UI components and proven solutions fo
 
 VioletVault uses a comprehensive set of shared UI components to ensure consistency across all modals and forms:
 
+### Summary Card Components
+
+**PageSummaryCard vs SummaryCard** - Two distinct patterns:
+
+1. **PageSummaryCard** (`src/components/ui/PageSummaryCard.jsx`)
+   - **Usage**: Page-specific metrics (Bills, Debts, Transactions, etc.)
+   - **Design**: Gradient backgrounds with icons
+   - **Features**: Alert states, hover effects, interactive
+   - **Colors**: Full gradient spectrum (red, blue, green, purple, etc.)
+
+2. **SummaryCard** (`src/components/layout/SummaryCards.jsx`) 
+   - **Usage**: Main dashboard financial overview
+   - **Design**: Solid color backgrounds
+   - **Features**: Large values, click handlers for modals
+   - **Colors**: Solid colors (purple, emerald, cyan, amber)
+
+**Always use PageSummaryCard for consistent page-level metrics across the application.**
+
 ### Core Modal Components
 
 **EditLockIndicator** (`src/components/ui/EditLockIndicator.jsx`)

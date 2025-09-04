@@ -188,6 +188,11 @@ export const calculateBillTotals = (categorizedBills) => {
       (sum, b) => sum + Math.abs(b.amount || b.monthlyAmount || 0),
       0
     ),
+    // Add counts for summary cards
+    overdueCount: (categorizedBills.overdue || []).length,
+    upcomingCount: (categorizedBills.upcoming || []).length,
+    paidCount: (categorizedBills.paid || []).length,
+    totalCount: (categorizedBills.all || []).length,
   };
 };
 

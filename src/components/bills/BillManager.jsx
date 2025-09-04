@@ -11,11 +11,7 @@ import {
   DollarSign,
   AlertTriangle,
   CheckCircle,
-  Clock,
   Bell,
-  Search,
-  RefreshCw,
-  Plus,
   Settings,
   Target,
   Filter,
@@ -37,6 +33,8 @@ import ConnectionDisplay, {
   ConnectionInfo,
   UniversalConnectionManager,
 } from "../ui/ConnectionDisplay";
+import BillManagerHeader from "./BillManagerHeader";
+import BillSummaryCards from "./BillSummaryCards";
 
 const BillManager = ({
   transactions: propTransactions = [],
@@ -147,52 +145,16 @@ const BillManager = ({
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Header with Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Bill Manager</h2>
-          <p className="text-gray-600">Track and manage your recurring bills and payments</p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {isEditLocked && (
-            <div className="text-sm text-amber-600 bg-amber-50 px-3 py-1 rounded-lg flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              Editing: {currentEditor}
-            </div>
-          )}
-
-          <button
-            onClick={searchNewBills}
-            disabled={isSearching}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center gap-2"
-          >
-            {isSearching ? (
-              <RefreshCw className="h-4 w-4 animate-spin" />
-            ) : (
-              <Search className="h-4 w-4" />
-            )}
-            Discover Bills
-          </button>
-
-          <button
-            onClick={handleAddNewBill}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            Add Bill
-          </button>
-        </div>
-      </div>
+      <BillManagerHeader 
+        isEditLocked={isEditLocked}
+        currentEditor={currentEditor}
+        isSearching={isSearching}
+        searchNewBills={searchNewBills}
+        handleAddNewBill={handleAddNewBill}
+      />
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {summaryCards.map((card, index) => (
-          <div key={index} className={`${card.bg} p-4 rounded-lg`}>
-            <div className={`text-2xl font-bold ${card.color}`}>${card.value.toFixed(2)}</div>
-            <div className="text-sm text-gray-600">{card.label}</div>
-          </div>
-        ))}
-      </div>
+      <BillSummaryCards totals={totals} />
 
       {/* View Mode Tabs */}
       <div className="border-b border-gray-200">
