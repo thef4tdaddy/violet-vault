@@ -46,6 +46,11 @@ Key components to use:
 
 **Design Standards:**
 - **Hard Black Borders**: Use `border border-white/20 ring-1 ring-gray-800/10` on all major UI components
+- **Main Container Purple Tint**: Use `rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm` for page containers
+- **Typography Hierarchy**: 
+  - Important headers: `font-black text-black text-base` with `text-lg` first letters (ALL CAPS pattern)
+  - Subtext/descriptions: `text-purple-900` for branded consistency
+- **Button Standards**: All buttons must have `border-2 border-black` for consistent visual weight
 - **Glassmorphism Styling**: Apply `.glassmorphism rounded-lg` with proper borders and shadows
 - **Tab Connection**: Tabs must visually connect to content below using rounded tops and negative margins
 - **Consistent Spacing**: Standard padding and margins across components
