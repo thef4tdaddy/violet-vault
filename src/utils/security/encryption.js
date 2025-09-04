@@ -156,14 +156,20 @@ export const encryptionUtils = {
   },
 
   async generateBudgetId(masterPassword) {
-    let hash = 0;
-    for (let i = 0; i < masterPassword.length; i++) {
-      const char = masterPassword.charCodeAt(i);
-      hash = (hash << 5) - hash + char;
-      hash = hash & hash;
-    }
-    const budgetId = `budget_${Math.abs(hash).toString(16)}`;
-
+    // Use SHA-256 to generate a cryptographically secure budgetId
+    // This prevents hash collisions that were causing data corruption
+    const encoder = new TextEncoder();
+    const data = encoder.encode(`budget_seed_${masterPassword}_violet_vault`);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = new Uint8Array(hashBuffer);
+    
+    // Convert to hex string and take first 16 characters for reasonable length
+    const hashHex = Array.from(hashArray)
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+    
+    const budgetId = `budget_${hashHex.substring(0, 16)}`;
+    
     return budgetId;
   },
 
