@@ -1,9 +1,9 @@
 name: Lint Warnings Tracker
 
 on:
-  # Daily tracking for active development monitoring
+  # Hourly tracking for active development monitoring
   schedule:
-    - cron: "0 9 * * *" # Daily at 9 AM UTC
+    - cron: "0 * * * *" # Every hour
 
   # Keep PR checks for validation
   pull_request:
