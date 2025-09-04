@@ -154,11 +154,26 @@ import StandardFilters from "../ui/StandardFilters";
   - **Style**: `text-purple-900`
   - **Usage**: Page descriptions, help text, secondary information
   - **Example**: "Track and manage your recurring bills and payments"
+- **Text Borders for Colored Text**: Add black text borders for visibility
+  - **Style**: `textShadow: '2px 2px 0px black, -2px -2px 0px black, 2px -2px 0px black, -2px 2px 0px black, 0px 2px 0px black, 2px 0px 0px black, 0px -2px 0px black, -2px 0px 0px black'`
+  - **Usage**: When colored text needs visibility against complex backgrounds
+- **Perfect Text Justification**: For professional text blocks
+  - **Style**: `textAlign: 'justify', textAlignLast: 'justify'`
+  - **Usage**: Important messages, formal content that needs clean edges
 
 **Button Standards**: All action buttons must have hard black borders:
 - **Style**: Add `border-2 border-black` to all buttons
 - **Usage**: Primary actions, secondary actions, icon buttons
 - **Benefits**: Creates consistent visual weight and professional appearance
+
+**Background Pattern Standards**: Consistent texture and blur patterns:
+- **Textured Pattern**: Subtle dot pattern for sophisticated backgrounds
+  - **Style**: `backgroundImage: "radial-gradient(circle at 25% 25%, white 2px, transparent 2px), radial-gradient(circle at 75% 75%, white 2px, transparent 2px)", backgroundSize: "100px 100px"`
+  - **Overlay**: `opacity-10` for subtle texture
+  - **Usage**: Full-screen backgrounds, landing pages, authentication screens
+- **Heavy Blur Overlays**: For modal focus and emphasis
+  - **Style**: `backdrop-blur-3xl` with colored overlay (`bg-purple-900/60`, `bg-black/60`)
+  - **Usage**: Modal backgrounds, safety screens, important overlays
 
 **Glassmorphism Styling**: Use the established glassmorphism design language:
 - **Class**: `.glassmorphism` with `backdrop-filter: blur(20px)` and semi-transparent backgrounds
