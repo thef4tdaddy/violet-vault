@@ -37,9 +37,33 @@ if (
 
   // Emergency corruption recovery tool
   window.forceCloudDataReset = async () => {
-    logger.warn("🚨 Force clearing all cloud data and re-uploading from local...");
+    logger.warn("🚨 CORRUPTION FIX: Attempting to clear cloud data and re-upload from local...");
     try {
       const { cloudSyncService } = await import("./services/cloudSyncService.js");
+      
+      // CRITICAL SAFETY CHECK: Verify local data exists before clearing cloud
+      logger.info("🔍 Checking local data before clearing cloud...");
+      const localData = await cloudSyncService.fetchDexieData();
+      
+      const hasLocalData = localData && (
+        (localData.envelopes && localData.envelopes.length > 0) ||
+        (localData.transactions && localData.transactions.length > 0) ||
+        (localData.bills && localData.bills.length > 0) ||
+        (localData.debts && localData.debts.length > 0)
+      );
+      
+      if (!hasLocalData) {
+        const errorMsg = "🚨 SAFETY ABORT: No local data found! Cannot clear cloud data as this would result in total data loss. Please restore from backup first.";
+        logger.error(errorMsg);
+        return { 
+          success: false, 
+          error: errorMsg,
+          safetyAbort: true 
+        };
+      }
+      
+      logger.info("✅ Local data verified - safe to proceed with cloud reset");
+      logger.info(`📊 Found: ${localData.envelopes?.length || 0} envelopes, ${localData.transactions?.length || 0} transactions, ${localData.bills?.length || 0} bills, ${localData.debts?.length || 0} debts`);
 
       // Stop any ongoing sync
       cloudSyncService.stop();
