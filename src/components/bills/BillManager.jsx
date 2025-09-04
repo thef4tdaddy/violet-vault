@@ -145,7 +145,7 @@ const BillManager = ({
   }
 
   return (
-    <div className={`glassmorphism rounded-lg p-6 space-y-6 border border-white/20 ring-1 ring-gray-800/10 bg-purple-50/60 ${className}`}>
+    <div className={`rounded-lg p-6 space-y-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm ${className}`}>
       {/* Header with Actions */}
       <BillManagerHeader 
         isEditLocked={isEditLocked}
