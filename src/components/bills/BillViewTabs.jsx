@@ -16,6 +16,7 @@ const BillViewTabs = ({ viewModes, viewMode, setViewMode, filterOptions, setFilt
         onTabChange={setViewMode}
         variant="colored"
         size="md"
+        className="pl-4"
       />
 
       {/* Connected Filters */}
