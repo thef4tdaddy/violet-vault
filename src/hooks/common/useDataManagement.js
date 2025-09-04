@@ -76,6 +76,14 @@ const useDataManagement = () => {
           dataVersion: "2.0",
           dataSource: "dexie",
           exportedFrom: "develop-branch",
+          // CRITICAL: Include sync context to prevent corruption on import
+          budgetId: currentUser?.budgetId,
+          userColor: currentUser?.userColor,
+          syncContext: {
+            note: "This data was encrypted with a specific budgetId. Import will create new encryption context.",
+            originalBudgetId: currentUser?.budgetId,
+            exportTimestamp: Date.now(),
+          }
         },
         _dataGuide: {
           note: "For mass updates, use these primary arrays:",
@@ -184,10 +192,21 @@ const useDataManagement = () => {
           throw new Error("Invalid backup file: missing or invalid envelopes data");
         }
 
+        // Check for budgetId mismatch and warn user
+        const importBudgetId = importedData.exportMetadata?.budgetId;
+        const currentBudgetId = currentUser?.budgetId;
+        const hasBudgetIdMismatch = importBudgetId && currentBudgetId && importBudgetId !== currentBudgetId;
+        
+        let confirmMessage = `Import ${importedData.envelopes?.length || 0} envelopes, ${importedData.bills?.length || 0} bills, ${importedData.debts?.length || 0} debts, ${importedData.auditLog?.length || 0} audit entries, and ${importedData.allTransactions?.length || 0} transactions?\n\nThis will replace your current data.`;
+        
+        if (hasBudgetIdMismatch) {
+          confirmMessage += `\n\n⚠️ ENCRYPTION CONTEXT CHANGE DETECTED:\nBackup budgetId: ${importBudgetId?.substring(0, 12)}...\nCurrent budgetId: ${currentBudgetId?.substring(0, 12)}...\n\nImport will re-encrypt data with your current session context.`;
+        }
+
         // Confirm import with user
         const confirmed = await confirm({
-          title: "Import Data",
-          message: `Import ${importedData.envelopes?.length || 0} envelopes, ${importedData.bills?.length || 0} bills, ${importedData.debts?.length || 0} debts, ${importedData.auditLog?.length || 0} audit entries, and ${importedData.allTransactions?.length || 0} transactions?\n\nThis will replace your current data.`,
+          title: hasBudgetIdMismatch ? "Import Data (Encryption Context Change)" : "Import Data",
+          message: confirmMessage,
           confirmLabel: "Import Data",
           cancelLabel: "Cancel",
           destructive: true,
