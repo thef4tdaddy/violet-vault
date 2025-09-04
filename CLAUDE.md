@@ -50,7 +50,12 @@ Key components to use:
 - **Typography Hierarchy**: 
   - Important headers: `font-black text-black text-base` with `text-lg` first letters (ALL CAPS pattern)
   - Subtext/descriptions: `text-purple-900` for branded consistency
+  - Colored text borders: Use comprehensive text-shadow for visibility against complex backgrounds
+  - Perfect justification: `textAlign: 'justify', textAlignLast: 'justify'` for formal content
 - **Button Standards**: All buttons must have `border-2 border-black` for consistent visual weight
+- **Background Patterns**: 
+  - Textured patterns: Radial gradient dots with `opacity-10` overlay for sophisticated backgrounds
+  - Heavy blur overlays: `backdrop-blur-3xl` with colored backgrounds for modal focus
 - **Glassmorphism Styling**: Apply `.glassmorphism rounded-lg` with proper borders and shadows
 - **Tab Connection**: Tabs must visually connect to content below using rounded tops and negative margins
 - **Consistent Spacing**: Standard padding and margins across components
