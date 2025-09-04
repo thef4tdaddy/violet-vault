@@ -53,17 +53,19 @@ const SecuritySettings = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+      <div className="rounded-xl w-full max-w-2xl max-h-[90vh] overflow-hidden border-2 border-black bg-purple-100/40 backdrop-blur-sm">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <Shield className="h-6 w-6 text-blue-600" />
               <div>
-                <h3 className="text-lg font-semibold">Security Settings</h3>
-                <p className="text-sm text-gray-600">Configure app security and privacy options</p>
+                <h3 className="text-lg font-black text-black">
+                  <span className="text-xl">S</span>ECURITY <span className="text-xl">S</span>ETTINGS
+                </h3>
+                <p className="text-sm text-purple-900">Configure app security and privacy options</p>
               </div>
             </div>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1">
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1 border-2 border-black rounded">
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -322,7 +324,7 @@ const SecuritySettings = ({ isOpen, onClose }) => {
               <div className="text-xs text-gray-500">Security settings are automatically saved</div>
               <button
                 onClick={onClose}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 border-2 border-black"
               >
                 Done
               </button>
