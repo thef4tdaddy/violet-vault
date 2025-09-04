@@ -1,5 +1,5 @@
 import React from "react";
-import { FileText, CheckCircle } from "lucide-react";
+import { FileText, CheckCircle, Square, CheckSquare } from "lucide-react";
 
 /**
  * Bill table with bulk actions and selection
@@ -49,13 +49,18 @@ const BillTable = ({
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50 border-b-2 border-black">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <input
-                  type="checkbox"
-                  checked={selectionState.isAllSelected}
-                  onChange={selectionState.isAllSelected ? clearSelection : selectAllBills}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
+              <th className="px-6 py-3 text-center">
+                <button
+                  onClick={selectionState.isAllSelected ? clearSelection : selectAllBills}
+                  className="flex items-center justify-center w-6 h-6 mx-auto hover:bg-gray-200 rounded transition-colors"
+                  title={selectionState.isAllSelected ? "Deselect all bills" : "Select all bills"}
+                >
+                  {selectionState.isAllSelected ? (
+                    <CheckSquare className="h-5 w-5 text-blue-600" />
+                  ) : (
+                    <Square className="h-5 w-5 text-gray-400" />
+                  )}
+                </button>
               </th>
               <th className="px-6 py-3 text-left text-sm font-bold text-gray-800 tracking-wider">
                 <span className="text-base">B</span>ILL
