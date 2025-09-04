@@ -118,31 +118,36 @@ const LockScreen = () => {
           }}
         />
       </div>
+      
+      {/* Harder blur overlay for safety screen */}
+      <div className="absolute inset-0 backdrop-blur-3xl bg-black/30"></div>
 
       <div className="relative w-full max-w-md">
-        {/* Lock Icon and Title */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full mb-4 border-2 border-black p-2">
-            <img
-              src={shieldLogo}
-              alt="Violet Vault Shield"
-              className="w-full h-full object-contain"
-            />
+        {/* Main Container - Everything inside */}
+        <div className="rounded-2xl p-8 border-2 border-black bg-purple-100/40 backdrop-blur-sm text-center">
+          {/* Lock Icon and Title */}
+          <div className="mb-6">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full mb-4 border-2 border-black p-2">
+              <img
+                src={shieldLogo}
+                alt="Violet Vault Shield"
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <h1 className="text-2xl font-black text-black mb-2">
+              <span className="text-3xl">V</span>IOLET <span className="text-3xl">V</span>AULT
+            </h1>
+            <p className="text-black font-medium uppercase tracking-wider">
+              <span className="text-lg">Y</span>OUR <span className="text-lg">B</span>UDGET HAS BEEN LOCKED FOR YOUR SAFETY BECAUSE YOU LEFT THE SCREEN. <span className="text-lg">U</span>SE YOUR BUDGET PASSWORD TO GET BACK IN.
+            </p>
           </div>
-          <h1 className="text-2xl font-black text-white mb-2">
-            <span className="text-3xl">V</span>IOLET <span className="text-3xl">V</span>AULT
-          </h1>
-          <p className="text-white uppercase tracking-wider font-medium">
-            <span className="text-lg">Y</span>OUR SESSION HAS BEEN LOCKED FOR SECURITY
-          </p>
-        </div>
 
-        {/* Unlock Form */}
-        <div className="rounded-2xl p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm">
+          {/* Unlock Form */}
+          <div>
           <form onSubmit={handleUnlock} className="space-y-4">
             {/* Password Input */}
             <div className="space-y-2">
-              <label className="block text-sm font-black text-purple-900 uppercase tracking-wider">
+              <label className="block text-sm font-black text-black uppercase tracking-wider">
                 <span className="text-base">E</span>NTER <span className="text-base">P</span>ASSWORD TO <span className="text-base">U</span>NLOCK
               </label>
               <div className="relative">
@@ -185,68 +190,36 @@ const LockScreen = () => {
               />
             )}
 
-            {/* Unlock Button */}
-            <button
-              type="submit"
-              disabled={isUnlocking || !password.trim()}
-              className="w-full flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 disabled:opacity-50 text-white py-3 px-4 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-purple-300 border-2 border-black"
-            >
-              {isUnlocking ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Unlocking...
-                </>
-              ) : (
-                <>
-                  <Unlock className="h-4 w-4" />
-                  Unlock Application
-                </>
-              )}
-            </button>
+            {/* Action Buttons */}
+            <div className="space-y-3">
+              <button
+                type="submit"
+                disabled={isUnlocking || !password.trim()}
+                className="w-full flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 disabled:opacity-50 text-white py-3 px-4 rounded-lg font-black transition-colors focus:outline-none focus:ring-2 focus:ring-purple-300 border-2 border-black uppercase tracking-wider"
+              >
+                {isUnlocking ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span className="text-lg">U</span>NLOCKING...
+                  </>
+                ) : (
+                  <>
+                    <Unlock className="h-4 w-4" />
+                    <span className="text-lg">U</span>NLOCK <span className="text-lg">A</span>PPLICATION
+                  </>
+                )}
+              </button>
+              
+              <button
+                onClick={handleReset}
+                className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg font-black transition-colors border-2 border-black uppercase tracking-wider"
+              >
+                <UserX className="h-4 w-4" />
+                <span className="text-lg">L</span>OG <span className="text-lg">O</span>UT
+              </button>
+            </div>
           </form>
-
-          {/* Security Info */}
-          <div className="mt-6 pt-4 border-t border-white border-opacity-20">
-            <div className="flex items-center gap-2 text-purple-100 text-sm">
-              <Lock className="h-4 w-4" />
-              <span className="font-black uppercase tracking-wider">
-                <span className="text-base">P</span>ROTECTED BY <span className="text-base">V</span>IOLET <span className="text-base">V</span>AULT <span className="text-base">S</span>ECURITY
-              </span>
-            </div>
-            <p className="text-xs text-purple-200 mt-1 uppercase tracking-wider">
-              <span className="text-sm">E</span>NTER YOUR BUDGET PASSWORD TO CONTINUE USING THE APPLICATION
-            </p>
-
-            {/* Reset Buttons */}
-            <div className="mt-4 pt-3 border-t border-white border-opacity-20 space-y-2">
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={handleReset}
-                  className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-black uppercase tracking-wider border-2 border-black rounded transition-colors flex items-center justify-center gap-1"
-                >
-                  <UserX className="h-3 w-3" />
-                  <span className="text-sm">S</span>TART <span className="text-sm">F</span>RESH
-                </button>
-                <button
-                  onClick={handleReset}
-                  className="px-3 py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black uppercase tracking-wider border-2 border-black rounded transition-colors flex items-center justify-center gap-1"
-                >
-                  <RotateCcw className="h-3 w-3" />
-                  <span className="text-sm">C</span>HANGE <span className="text-sm">P</span>ROFILE
-                </button>
-              </div>
-              <p className="text-xs text-purple-200 text-center">
-                HAVING TROUBLE? USE ONE OF THE OPTIONS ABOVE
-              </p>
-            </div>
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="text-center mt-6">
-          <p className="text-purple-200 text-xs uppercase tracking-wider font-medium">
-            <span className="text-sm">U</span>SE THE SAME PASSWORD YOU SET WHEN FIRST OPENING THE APP
-          </p>
         </div>
       </div>
     </div>
