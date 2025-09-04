@@ -4,7 +4,6 @@ import useEditLock from "../../hooks/common/useEditLock";
 // eslint-disable-next-line no-restricted-imports -- TODO: Refactor to use useEditLock hook instead
 import { initializeEditLocks } from "../../services/editLockService";
 import { useAuth } from "../../stores/auth/authStore";
-import logger from "../../utils/common/logger";
 import EditLockIndicator from "../ui/EditLockIndicator";
 import TransactionModalHeader from "./TransactionModalHeader";
 import TransactionFormFields from "./TransactionFormFields";
@@ -32,17 +31,7 @@ const TransactionForm = ({
   }, [isOpen, budgetId, currentUser]);
 
   // Edit locking for the transaction (only when editing existing transaction)
-  const {
-    isLocked,
-    isOwnLock,
-    canEdit,
-    lockedBy,
-    timeRemaining,
-    isExpired,
-    releaseLock,
-    breakLock,
-    isLoading: lockLoading,
-  } = useEditLock("transaction", editingTransaction?.id, {
+  const editLock = useEditLock("transaction", editingTransaction?.id, {
     autoAcquire: isOpen && editingTransaction?.id, // Only auto-acquire for edits
     autoRelease: true,
     showToasts: true,
@@ -50,30 +39,10 @@ const TransactionForm = ({
 
   if (!isOpen) return null;
 
-  // Removed excessive debug logging that was spamming console (issue #463)
-
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    logger.debug("TransactionForm submit attempted", {
-      editingTransaction: !!editingTransaction,
-      formData: {
-        description: transactionForm.description?.slice(0, 50) + "...",
-        amount: transactionForm.amount,
-        envelopeId: transactionForm.envelopeId,
-        category: transactionForm.category,
-        type: transactionForm.type,
-        date: transactionForm.date,
-      },
-    });
-
     if (!transactionForm.description.trim() || !transactionForm.amount) {
-      logger.warn("Transaction form validation failed", {
-        hasDescription: !!transactionForm.description.trim(),
-        hasAmount: !!transactionForm.amount,
-        description: transactionForm.description,
-        amount: transactionForm.amount,
-      });
       globalToast.showError(
         "Please fill in description and amount",
         "Required Fields",
@@ -87,14 +56,6 @@ const TransactionForm = ({
         (env) => env.id === transactionForm.envelopeId,
       );
       if (selectedEnvelope && selectedEnvelope.envelopeType === "bill") {
-        logger.info("Creating bill payment from transaction", {
-          billId: selectedEnvelope.id,
-          billName: selectedEnvelope.name,
-          amount: Math.abs(parseFloat(transactionForm.amount)),
-          paidDate: transactionForm.date,
-        });
-
-        // Create a bill payment record
         const billPayment = {
           billId: selectedEnvelope.id,
           amount: Math.abs(parseFloat(transactionForm.amount)),
@@ -106,26 +67,13 @@ const TransactionForm = ({
       }
     }
 
-    logger.info(
-      `Transaction ${editingTransaction ? "updated" : "created"} successfully`,
-      {
-        transactionId: editingTransaction?.id,
-        amount: transactionForm.amount,
-        envelopeId: transactionForm.envelopeId,
-      },
-    );
-
     onSubmit();
   };
 
-  const resetAndClose = () => {
-    logger.debug("TransactionForm closed", {
-      wasEditing: !!editingTransaction,
-      hadData: !!(transactionForm.description || transactionForm.amount),
-    });
+  const handleClose = () => {
     // Release lock when closing
-    if (isOwnLock) {
-      releaseLock();
+    if (editLock.isOwnLock) {
+      editLock.releaseLock();
     }
     onClose();
   };
@@ -135,22 +83,22 @@ const TransactionForm = ({
       <div className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
         <TransactionModalHeader
           editingTransaction={editingTransaction}
-          onClose={resetAndClose}
+          onClose={handleClose}
         />
 
         {/* Standardized Edit Lock Indicator */}
-        {editingTransaction && (isLocked || lockLoading) && (
+        {editingTransaction && (editLock.isLocked || editLock.isLoading) && (
           <div className="mb-6">
             <EditLockIndicator
-              isLocked={isLocked && !canEdit}
-              isOwnLock={isOwnLock}
-              isLoading={lockLoading}
+              isLocked={editLock.isLocked && !editLock.canEdit}
+              isOwnLock={editLock.isOwnLock}
+              isLoading={editLock.isLoading}
               lock={{
-                userName: lockedBy,
-                expiresAt: new Date(Date.now() + (timeRemaining || 0)),
-                isExpired: isExpired,
+                userName: editLock.lockedBy,
+                expiresAt: new Date(Date.now() + (editLock.timeRemaining || 0)),
+                isExpired: editLock.isExpired,
               }}
-              onBreakLock={breakLock}
+              onBreakLock={editLock.breakLock}
               showDetails={true}
             />
           </div>
@@ -160,10 +108,10 @@ const TransactionForm = ({
           transactionForm={transactionForm}
           setTransactionForm={setTransactionForm}
           handleFormSubmit={handleSubmit}
-          onClose={resetAndClose}
-          canEdit={canEdit}
+          onClose={handleClose}
+          canEdit={editLock.canEdit}
           editingTransaction={editingTransaction}
-          lockedBy={lockedBy}
+          lockedBy={editLock.lockedBy}
           envelopes={envelopes}
           categories={categories}
           suggestEnvelope={suggestEnvelope}
