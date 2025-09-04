@@ -1,5 +1,6 @@
 import React from "react";
 import StandardTabs from "../ui/StandardTabs";
+import StandardFilters from "../ui/StandardFilters";
 
 /**
  * View mode tabs for BillManager using standardized tabs component
@@ -17,45 +18,37 @@ const BillViewTabs = ({ viewModes, viewMode, setViewMode, filterOptions, setFilt
         size="md"
       />
 
-      {/* Filters */}
-      <div className="flex flex-wrap items-center gap-4 p-4 bg-gray-50 rounded-lg">
-        <input
-          type="text"
-          placeholder="Search bills..."
-          value={filterOptions.search}
-          onChange={(e) => setFilterOptions((prev) => ({ ...prev, search: e.target.value }))}
-          className="flex-1 min-w-48 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        />
-
-        <select
-          value={filterOptions.urgency}
-          onChange={(e) => setFilterOptions((prev) => ({ ...prev, urgency: e.target.value }))}
-          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        >
-          <option value="all">All Urgency</option>
-          <option value="overdue">Overdue</option>
-          <option value="urgent">Urgent</option>
-          <option value="soon">Soon</option>
-          <option value="later">Later</option>
-        </select>
-
-        <select
-          value={filterOptions.envelope}
-          onChange={(e) => setFilterOptions((prev) => ({ ...prev, envelope: e.target.value }))}
-          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        >
-          <option value="all">All Envelopes</option>
-          <option value="connected">Connected</option>
-          <option value="unconnected">Unconnected</option>
-        </select>
-
-        <button
-          onClick={() => setFilterOptions({ search: "", urgency: "all", envelope: "all" })}
-          className="px-3 py-2 text-gray-500 hover:text-gray-700 text-sm"
-        >
-          Clear Filters
-        </button>
-      </div>
+      {/* Compact Filters */}
+      <StandardFilters
+        filters={filterOptions}
+        onFilterChange={(key, value) => setFilterOptions((prev) => ({ ...prev, [key]: value }))}
+        filterConfigs={[
+          {
+            key: "urgency",
+            type: "select",
+            defaultValue: "all",
+            options: [
+              { value: "all", label: "All Urgency" },
+              { value: "overdue", label: "Overdue" },
+              { value: "urgent", label: "Urgent" },
+              { value: "soon", label: "Soon" },
+              { value: "normal", label: "Normal" }
+            ]
+          },
+          {
+            key: "envelope", 
+            type: "select",
+            defaultValue: "all",
+            options: [
+              { value: "all", label: "All Envelopes" },
+              { value: "connected", label: "Connected" },
+              { value: "unconnected", label: "Unconnected" }
+            ]
+          }
+        ]}
+        searchPlaceholder="Search bills..."
+        size="md"
+      />
     </>
   );
 };
