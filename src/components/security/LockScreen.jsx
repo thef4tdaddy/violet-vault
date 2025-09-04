@@ -105,7 +105,7 @@ const LockScreen = () => {
   };
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-purple-900 via-purple-800 to-purple-700 flex items-center justify-center p-4 z-[9999]">
+    <div className="fixed inset-0 bg-purple-100/40 backdrop-blur-sm border-2 border-black flex items-center justify-center p-4 z-[9999]">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div
@@ -128,8 +128,10 @@ const LockScreen = () => {
               className="w-full h-full object-contain"
             />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">Violet Vault</h1>
-          <p className="text-purple-100">Your session has been locked for security</p>
+          <h1 className="text-2xl font-black text-white mb-2">
+            <span className="text-3xl">V</span>IOLET <span className="text-3xl">V</span>AULT
+          </h1>
+          <p className="text-purple-200">Your session has been locked for security</p>
         </div>
 
         {/* Unlock Form */}
@@ -149,7 +151,7 @@ const LockScreen = () => {
                   onKeyPress={handleKeyPress}
                   disabled={isUnlocking}
                   placeholder="Enter your password"
-                  className="w-full px-4 py-3 bg-white bg-opacity-20 border-2 border-black rounded-lg text-white placeholder-purple-100 focus:bg-opacity-30 focus:border-black focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
+                  className="w-full px-4 py-3 bg-white/90 border-2 border-black rounded-lg text-black placeholder-gray-500 focus:bg-white focus:border-black focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
                 />
                 <button
                   type="button"
