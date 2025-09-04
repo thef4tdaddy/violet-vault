@@ -185,38 +185,43 @@ const UserSetup = ({ onSetupComplete }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="glassmorphism rounded-3xl p-8 w-full max-w-md border-2 border-black">
+    <div className="min-h-screen bg-purple-900 flex items-center justify-center p-4">
+      <div className="rounded-3xl p-8 w-full max-w-md border-2 border-black bg-purple-100/40 backdrop-blur-sm">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-8">
-            <img
-              src={logoOnly}
-              alt="VioletVault Logo"
-              style={{ width: "96px", height: "96px", objectFit: "contain" }}
-              className="mx-auto"
-            />
+            <div className="inline-flex items-center justify-center w-24 h-24 bg-white rounded-full border-2 border-black p-3">
+              <img
+                src={logoOnly}
+                alt="VioletVault Logo"
+                className="w-full h-full object-contain"
+              />
+            </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-black text-white mb-2">
             {isReturningUser ? (
-              <span>
-                Welcome Back,{" "}
+              <span className="uppercase tracking-wider">
+                <span className="text-4xl">W</span>ELCOME <span className="text-4xl">B</span>ACK,{" "}
                 <span className="inline-flex items-center" style={{ color: userColor }}>
-                  {userName}
+                  {userName.toUpperCase()}
                 </span>
                 !
               </span>
             ) : step === 1 ? (
-              "Get Started"
+              <span className="uppercase tracking-wider">
+                <span className="text-4xl">G</span>ET <span className="text-4xl">S</span>TARTED
+              </span>
             ) : (
-              "Set Up Profile"
+              <span className="uppercase tracking-wider">
+                <span className="text-4xl">S</span>ET <span className="text-4xl">U</span>P <span className="text-4xl">P</span>ROFILE
+              </span>
             )}
           </h1>
-          <p className="text-gray-600">
+          <p className="text-purple-900 font-medium uppercase tracking-wider">
             {isReturningUser
-              ? "Enter your password to continue"
+              ? <span><span className="text-lg">E</span>NTER YOUR PASSWORD TO CONTINUE</span>
               : step === 1
-                ? "Create a secure master password to protect your data"
-                : "Choose your name and color for tracking"}
+                ? <span><span className="text-lg">C</span>REATE A SECURE MASTER PASSWORD TO PROTECT YOUR DATA</span>
+                : <span><span className="text-lg">C</span>HOOSE YOUR NAME AND COLOR FOR TRACKING</span>}
           </p>
         </div>
 
@@ -234,8 +239,8 @@ const UserSetup = ({ onSetupComplete }) => {
                     logger.debug("🔐 Password input changed");
                     setMasterPassword(e.target.value);
                   }}
-                  placeholder="Master password"
-                  className="w-full px-4 py-4 text-lg border border-purple-200 rounded-2xl focus:ring-2 focus:ring-purple-500"
+                  placeholder="MASTER PASSWORD"
+                  className="w-full px-4 py-4 text-lg border-2 border-black rounded-2xl focus:ring-2 focus:ring-purple-500 bg-white/90 placeholder-gray-500 uppercase tracking-wider font-medium"
                   disabled={isLoading}
                   required
                 />
@@ -253,9 +258,9 @@ const UserSetup = ({ onSetupComplete }) => {
                   <button
                     type="submit"
                     disabled={!masterPassword || isLoading}
-                    className="w-full btn btn-primary py-4 text-lg font-semibold rounded-2xl"
+                    className="w-full btn btn-primary py-4 text-lg font-black rounded-2xl border-2 border-black uppercase tracking-wider"
                   >
-                    {isLoading ? "Unlocking..." : "Login"}
+                    {isLoading ? <span><span className="text-xl">U</span>NLOCKING...</span> : <span><span className="text-xl">L</span>OGIN</span>}
                   </button>
                   <div className="flex gap-2">
                     <button
@@ -265,17 +270,17 @@ const UserSetup = ({ onSetupComplete }) => {
                         setStep(2);
                       }}
                       disabled={isLoading}
-                      className="flex-1 btn btn-secondary py-3 text-sm font-medium rounded-2xl"
+                      className="flex-1 py-3 text-sm font-black rounded-2xl border-2 border-black bg-orange-600 hover:bg-orange-700 text-white uppercase tracking-wider"
                     >
-                      Change Profile
+                      <span className="text-base">C</span>HANGE <span className="text-base">P</span>ROFILE
                     </button>
                     <button
                       type="button"
                       onClick={clearSavedProfile}
                       disabled={isLoading}
-                      className="flex-1 btn btn-secondary py-3 text-sm font-medium rounded-2xl"
+                      className="flex-1 py-3 text-sm font-black rounded-2xl border-2 border-black bg-red-600 hover:bg-red-700 text-white uppercase tracking-wider"
                     >
-                      Start Fresh
+                      <span className="text-base">S</span>TART <span className="text-base">F</span>RESH
                     </button>
                   </div>
                 </div>
