@@ -157,8 +157,8 @@ const StandardTabs = ({
 
   const containerClass = variant === 'underline' 
     ? "border-b border-gray-200" 
-    : variant === 'tabs'
-    ? "border-b border-gray-300"
+    : variant === 'tabs' || variant === 'colored'
+    ? "border-b border-gray-200"
     : "";
 
   const navClass = variant === 'underline' 

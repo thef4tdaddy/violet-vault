@@ -83,6 +83,65 @@ const tabs = [
 - Replace existing custom tab implementations
 - Ensures consistency across Bills, Debts, Transactions, and other pages
 
+### Standardized Filters Component
+
+**StandardFilters** (`src/components/ui/StandardFilters.jsx`)
+
+A compact, space-efficient filtering component with consistent styling:
+
+```jsx
+import StandardFilters from "../ui/StandardFilters";
+
+<StandardFilters
+  filters={filterOptions}
+  onFilterChange={(key, value) => setFilterOptions(prev => ({ ...prev, [key]: value }))}
+  filterConfigs={[
+    {
+      key: "status",
+      type: "select",
+      defaultValue: "all",
+      options: [
+        { value: "all", label: "All Status" },
+        { value: "active", label: "Active" },
+        { value: "inactive", label: "Inactive" }
+      ]
+    },
+    {
+      key: "category",
+      type: "select", 
+      defaultValue: "all",
+      options: [
+        { value: "all", label: "All Categories" },
+        { value: "bills", label: "Bills" },
+        { value: "income", label: "Income" }
+      ]
+    }
+  ]}
+  searchPlaceholder="Search items..."
+  size="md"  // 'sm' | 'md'
+/>
+```
+
+**Features:**
+- **Compact Design**: Takes minimal vertical space compared to old bulky filters
+- **Search with Icon**: Built-in search input with search icon and clear button
+- **Flexible Dropdowns**: Configure any number of select filters
+- **Smart Clear Button**: Only shows when filters are active, clears all at once
+- **Consistent Styling**: Matches form inputs across the app
+- **Hard Bottom Border**: Standard `border-b border-gray-200` for section separation
+
+### Design Standards
+
+**Hard Border Lines**: All major UI sections should use consistent border styling:
+- **Standard Border**: `border-b border-gray-200` 
+- **Usage**: Separates major sections (tabs, filters, content areas)
+- **Benefits**: Creates clear visual hierarchy and consistent spacing
+
+**When to Use:**
+- Use StandardFilters for all filtering UI across the app
+- Replace bulky filter sections that take excessive space
+- Ensures consistent search and filter patterns
+
 ### Core Modal Components
 
 **EditLockIndicator** (`src/components/ui/EditLockIndicator.jsx`)
