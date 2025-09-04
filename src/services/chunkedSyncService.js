@@ -396,7 +396,25 @@ class ChunkedSyncService {
           });
 
           // NEVER automatically clear data - this is too destructive and causes data loss
-          // Only log the error and return null to use local data instead
+          // Smart detection: avoid repeatedly trying to decrypt the same bad data
+          const errorSignature = `${this.budgetId}_${decryptError.message}`;
+          const now = Date.now();
+          
+          // Track failed decryption attempts to avoid repeated attempts
+          if (!this.decryptionFailures) {
+            this.decryptionFailures = new Map();
+          }
+          
+          const lastFailure = this.decryptionFailures.get(errorSignature);
+          const backoffTime = 5 * 60 * 1000; // 5 minutes
+          
+          if (lastFailure && (now - lastFailure) < backoffTime) {
+            logger.info("🔇 Skipping repeated decryption attempt (in backoff period)");
+            return null; // Skip without logging noise
+          }
+          
+          this.decryptionFailures.set(errorSignature, now);
+          
           const isDemoMode = this.budgetId?.includes('demo') || process.env.NODE_ENV === 'development';
           
           if (isDemoMode) {
