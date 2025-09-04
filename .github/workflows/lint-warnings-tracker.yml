@@ -255,15 +255,7 @@ jobs:
               branchInfo += `**Main Branch:** ${mainWarnings} warnings\n`;
             }
             
-            const commentBody = `## 📊 Lint Warnings Update - ${currentDate}
-
-${branchInfo}
-**Target:** <20 warnings
-
-### Status:
-${developWarnings < 96 ? '✅ Develop improved: -' + (96 - developWarnings) + ' from baseline' : '⚠️ Develop increased: +' + (developWarnings - 96) + ' from baseline'}
-
-*Updated automatically by GitHub Actions*`;
+            const commentBody = `## 📊 Lint Warnings Update - ${currentDate}\n\n${branchInfo}\n**Target:** <20 warnings\n\n### Status:\n${developWarnings < 96 ? '✅ Develop improved: -' + (96 - developWarnings) + ' from baseline' : '⚠️ Develop increased: +' + (developWarnings - 96) + ' from baseline'}\n\n*Updated automatically by GitHub Actions*`;
 
             // Add comment to the master issue (Issue #568)
             try {
