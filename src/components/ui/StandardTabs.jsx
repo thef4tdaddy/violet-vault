@@ -157,7 +157,7 @@ const StandardTabs = ({
 
   const containerClass = variant === 'underline' 
     ? "border-b border-gray-200" 
-    : variant === 'tabs' || variant === 'colored'
+    : variant === 'tabs'
     ? "border-b border-gray-200"
     : "";
 
@@ -182,8 +182,8 @@ const StandardTabs = ({
           if (variant === 'colored' && tab.color && !isDisabled) {
             const colors = colorConfig[tab.color] || colorConfig.blue;
             tabStyles = isActive 
-              ? `${colors.bright} rounded-t-lg shadow-sm relative z-10 border-t-2 border-l border-r`
-              : `${colors.pastel} rounded-t-lg relative border hover:brightness-110 transition-all`;
+              ? `${colors.bright} rounded-t-lg shadow-sm relative z-10 border-t border-l border-r ring-1 ring-gray-800/10`
+              : `${colors.pastel} rounded-t-lg relative border border-white/20 ring-1 ring-gray-800/10 hover:brightness-110 transition-all`;
             
             countStyles = isActive 
               ? colors.count.bright 
