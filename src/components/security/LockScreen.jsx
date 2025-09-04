@@ -106,7 +106,7 @@ const LockScreen = () => {
   };
 
   return (
-    <div className="fixed inset-0 bg-purple-900 flex items-center justify-center p-4 z-[9999]">
+    <div className="fixed inset-0 flex items-center justify-center p-4 z-[9999]">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div
@@ -120,7 +120,7 @@ const LockScreen = () => {
       </div>
       
       {/* Harder blur overlay for safety screen */}
-      <div className="absolute inset-0 backdrop-blur-3xl bg-black/30"></div>
+      <div className="absolute inset-0 backdrop-blur-3xl bg-black/60"></div>
 
       <div className="relative w-full max-w-md">
         {/* Main Container - Everything inside */}
@@ -137,9 +137,11 @@ const LockScreen = () => {
             <h1 className="text-2xl font-black text-black mb-2">
               <span className="text-3xl">V</span>IOLET <span className="text-3xl">V</span>AULT
             </h1>
-            <p className="text-black font-medium uppercase tracking-wider">
-              <span className="text-lg">Y</span>OUR <span className="text-lg">B</span>UDGET HAS BEEN LOCKED FOR YOUR SAFETY BECAUSE YOU LEFT THE SCREEN. <span className="text-lg">U</span>SE YOUR BUDGET PASSWORD TO GET BACK IN.
-            </p>
+            <div className="text-black font-medium uppercase tracking-wider text-justify space-y-1">
+              <p><span className="text-lg">Y</span>OUR <span className="text-lg">B</span>UDGET HAS BEEN LOCKED FOR</p>
+              <p>YOUR SAFETY BECAUSE YOU LEFT THE</p>  
+              <p>SCREEN. <span className="text-lg">U</span>SE PASSWORD TO GET BACK IN.</p>
+            </div>
           </div>
 
           {/* Unlock Form */}
@@ -200,22 +202,22 @@ const LockScreen = () => {
                 {isUnlocking ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span className="text-lg">U</span>NLOCKING...
+                    <span>UNLOCKING...</span>
                   </>
                 ) : (
                   <>
                     <Unlock className="h-4 w-4" />
-                    <span className="text-lg">U</span>NLOCK <span className="text-lg">A</span>PPLICATION
+                    <span>UNLOCK APPLICATION</span>
                   </>
                 )}
               </button>
               
               <button
-                onClick={handleReset}
+                onClick={logout}
                 className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg font-black transition-colors border-2 border-black uppercase tracking-wider"
               >
                 <UserX className="h-4 w-4" />
-                <span className="text-lg">L</span>OG <span className="text-lg">O</span>UT
+                <span>LOG OUT</span>
               </button>
             </div>
           </form>
