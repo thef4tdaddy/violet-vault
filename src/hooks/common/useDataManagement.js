@@ -246,6 +246,13 @@ const useDataManagement = () => {
           logger.info("Clearing Firebase data before import...");
           await cloudSyncService.clearAllData();
           logger.info("Firebase data cleared successfully");
+          
+          // CRITICAL: Also clear any sync metadata that might point to corrupted cloud data
+          logger.info("Clearing sync metadata to prevent corruption detection...");
+          const { budgetDb } = await import("../../db/budgetDb");
+          await budgetDb.syncMetadata.clear();
+          logger.info("Sync metadata cleared");
+          
         } catch (firebaseError) {
           logger.warn("Failed to clear Firebase data, proceeding with import", firebaseError);
           // Continue with import even if Firebase clear fails
@@ -397,29 +404,37 @@ const useDataManagement = () => {
           },
         });
 
-        showSuccessToast(`Local data imported! Now syncing to the cloud...`, "Import Complete");
+        showSuccessToast(`Local data imported! Now syncing to cloud...`, "Import Complete");
 
-        // Force push imported data TO Firebase (one-way sync from local to cloud)
+        // CRITICAL: Stop sync service and clear all corruption tracking before restart
         try {
-          logger.info("🚀 Forcing push of imported data to Firebase...");
-
-          // Wait for Dexie transaction to fully commit before syncing
-          await new Promise((resolve) => setTimeout(resolve, 500));
-          // Force sync TO Firebase without pulling FROM Firebase
-          if (cloudSyncService.forcePushToCloud) {
-            await cloudSyncService.forcePushToCloud();
-            logger.info("✅ Data successfully pushed to Firebase.");
-            showSuccessToast("Imported data synced to cloud successfully!");
-          } else {
-            // Fallback to regular sync with precaution
-            logger.warn("forcePushToCloud method not available, using regular sync");
-            await cloudSyncService.forceSync();
-            logger.info("✅ Manual sync after import completed successfully.");
-            showSuccessToast("Cloud sync initiated successfully!");
+          logger.info("🛑 Stopping sync service before clean restart...");
+          cloudSyncService.stop();
+          
+          // Wait for sync to fully stop
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+          
+          logger.info("🧹 Clearing any corruption detection state to prevent false positives...");
+          // Clear any cached corruption/failure state that might interfere
+          const { chunkedSyncService } = await import("../../services/chunkedSyncService");
+          if (chunkedSyncService.decryptionFailures) {
+            chunkedSyncService.decryptionFailures.clear();
+            logger.info("✅ Cleared decryption failure tracking");
           }
+          
+          logger.info("🚀 Force pushing imported data to Firebase with clean slate...");
+          const result = await cloudSyncService.forcePushToCloud();
+          
+          if (result.success) {
+            logger.info("✅ Imported data successfully pushed to Firebase.");
+            showSuccessToast("Import complete! Data synced to cloud successfully.");
+          } else {
+            throw new Error(result.error || "Failed to push to cloud");
+          }
+          
         } catch (syncError) {
           logger.error("Failed to push imported data to Firebase", syncError);
-          showErrorToast(`Cloud sync failed: ${syncError.message}`);
+          showErrorToast(`Cloud sync failed: ${syncError.message}. Data imported locally but may need manual cloud sync.`);
         }
 
         // Invalidate TanStack Query cache to refresh UI with new data instead of page reload
