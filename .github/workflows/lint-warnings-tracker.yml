@@ -305,22 +305,7 @@ jobs:
               }
             }
 
-            const commentBody = \`## 📊 Lint Warnings Update - \${currentDate}
-
-\${branchInfo}
-**Target:** <20 warnings
-
-### Status:
-\${developWarnings < 96 ? '✅ Develop improved: -' + (96 - developWarnings) + ' from baseline (96)' : '⚠️ Develop increased: +' + (developWarnings - 96) + ' from baseline (96)'}
-\${detailedInfo}
-
-### 🎯 Focus Areas:
-- **Function Size**: Split functions over 75 lines  
-- **Complexity**: Reduce function complexity (>15)
-- **Unused Variables**: Remove or prefix with underscore
-- **React Hooks**: Add missing dependencies
-
-*Updated automatically by GitHub Actions*\`;
+            const commentBody = \`## 📊 Lint Warnings Update - \${currentDate}\\n\\n\${branchInfo}\\n**Target:** <20 warnings\\n\\n### Status:\\n\${developWarnings < 96 ? '✅ Develop improved: -' + (96 - developWarnings) + ' from baseline (96)' : '⚠️ Develop increased: +' + (developWarnings - 96) + ' from baseline (96)'}\${detailedInfo}\\n\\n### 🎯 Focus Areas:\\n- **Function Size**: Split functions over 75 lines\\n- **Complexity**: Reduce function complexity (>15)\\n- **Unused Variables**: Remove or prefix with underscore\\n- **React Hooks**: Add missing dependencies\\n\\n*Updated automatically by GitHub Actions*\`;
 
             // Add comment to the master issue (Issue #568)
             try {
