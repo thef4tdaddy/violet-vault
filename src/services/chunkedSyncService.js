@@ -389,32 +389,24 @@ class ChunkedSyncService {
 
           manifest = JSON.parse(manifestData);
         } catch (decryptError) {
-          logger.error("❌ Failed to decrypt manifest - corrupted cloud data", {
+          logger.error("❌ Failed to decrypt manifest - may be corrupted or key mismatch", {
             error: decryptError.message,
             errorType: decryptError.name,
             budgetId: this.budgetId.substring(0, 8) + "...",
           });
 
-          // Clear corrupted data automatically (with cooldown to prevent spam)
-          logger.warn("⚠️ Manifest corruption detected - clearing corrupted cloud data");
-          const now = Date.now();
-          if (
-            !this.lastCorruptedDataClear ||
-            now - this.lastCorruptedDataClear > this.corruptedDataClearCooldown
-          ) {
-            try {
-              await this.clearCorruptedData();
-              this.lastCorruptedDataClear = now;
-              logger.info(
-                "🧹 Corrupted cloud data cleared - local data will be re-uploaded on next sync"
-              );
-            } catch (clearError) {
-              logger.error("❌ Failed to clear corrupted data", clearError);
-            }
+          // NEVER automatically clear data - this is too destructive and causes data loss
+          // Only log the error and return null to use local data instead
+          const isDemoMode = this.budgetId?.includes('demo') || process.env.NODE_ENV === 'development';
+          
+          if (isDemoMode) {
+            logger.warn("⚠️ Decryption failed in dev mode - using demo Firebase config, NOT clearing cloud data");
           } else {
-            logger.warn("⏱️ Corrupted data clear on cooldown - skipping auto-clear");
+            logger.warn("⚠️ Decryption failed - possible key mismatch or corruption, NOT auto-clearing cloud data");
+            logger.warn("💡 Use the admin console to manually clear cloud data if corruption is confirmed");
           }
-          return null; // Return null to trigger fresh upload from local data
+          
+          return null; // Return null to trigger fresh upload from local data without clearing cloud
         }
         logger.debug("Loaded manifest", {
           version: manifest.version,
