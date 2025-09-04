@@ -120,7 +120,7 @@ const LockScreen = () => {
       </div>
       
       {/* Harder blur overlay for safety screen */}
-      <div className="absolute inset-0 backdrop-blur-3xl bg-black/60"></div>
+      <div className="absolute inset-0 backdrop-blur-3xl bg-purple-900/60"></div>
 
       <div className="relative w-full max-w-md">
         {/* Main Container - Everything inside */}
@@ -137,10 +137,10 @@ const LockScreen = () => {
             <h1 className="text-2xl font-black text-black mb-2">
               <span className="text-3xl">V</span>IOLET <span className="text-3xl">V</span>AULT
             </h1>
-            <div className="text-black font-medium uppercase tracking-wider text-justify space-y-1">
-              <p><span className="text-lg">Y</span>OUR <span className="text-lg">B</span>UDGET HAS BEEN LOCKED FOR</p>
-              <p>YOUR SAFETY BECAUSE YOU LEFT THE</p>  
-              <p>SCREEN. <span className="text-lg">U</span>SE PASSWORD TO GET BACK IN.</p>
+            <div className="text-black font-medium uppercase tracking-wider text-justify space-y-1" style={{ textAlign: 'justify', textAlignLast: 'justify' }}>
+              <p style={{ textAlign: 'justify', textAlignLast: 'justify' }}><span className="text-lg">Y</span>OUR <span className="text-lg">B</span>UDGET HAS BEEN LOCKED FOR</p>
+              <p style={{ textAlign: 'justify', textAlignLast: 'justify' }}>YOUR SAFETY BECAUSE YOU LEFT THE</p>  
+              <p style={{ textAlign: 'justify', textAlignLast: 'justify' }}>SCREEN. <span className="text-lg">U</span>SE PASSWORD TO GET BACK IN.</p>
             </div>
           </div>
 
