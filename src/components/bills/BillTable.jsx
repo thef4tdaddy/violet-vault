@@ -62,19 +62,19 @@ const BillTable = ({
                   )}
                 </button>
               </th>
-              <th className="px-6 py-3 text-left text-sm font-bold text-gray-800 tracking-wider">
+              <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
                 <span className="text-base">B</span>ILL
               </th>
-              <th className="px-6 py-3 text-left text-sm font-bold text-gray-800 tracking-wider">
+              <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
                 <span className="text-base">A</span>MOUNT
               </th>
-              <th className="px-6 py-3 text-left text-sm font-bold text-gray-800 tracking-wider">
+              <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
                 <span className="text-base">D</span>UE <span className="text-base">D</span>ATE
               </th>
-              <th className="px-6 py-3 text-left text-sm font-bold text-gray-800 tracking-wider">
+              <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
                 <span className="text-base">S</span>TATUS
               </th>
-              <th className="px-6 py-3 text-right text-sm font-bold text-gray-800 tracking-wider">
+              <th className="px-6 py-3 text-right text-sm font-bold text-black tracking-wider">
                 <span className="text-base">A</span>CTIONS
               </th>
             </tr>
