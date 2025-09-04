@@ -1,5 +1,11 @@
 import React from "react";
-import { DollarSign, TrendingDown, Percent, AlertTriangle, Calendar } from "lucide-react";
+import {
+  DollarSign,
+  TrendingDown,
+  Percent,
+  AlertTriangle,
+  Calendar,
+} from "lucide-react";
 
 /**
  * Debt overview summary cards
@@ -61,7 +67,15 @@ const DebtSummaryCards = ({ stats, onDueSoonClick }) => {
   );
 };
 
-const DebtSummaryCard = ({ icon: _Icon, label, value, subtext, color, alert, onClick }) => {
+const DebtSummaryCard = ({
+  icon: _Icon,
+  label,
+  value,
+  subtext,
+  color,
+  alert,
+  onClick,
+}) => {
   const gradientClasses = {
     red: "from-red-500 to-red-600",
     orange: "from-orange-500 to-orange-600",
@@ -103,9 +117,11 @@ const DebtSummaryCard = ({ icon: _Icon, label, value, subtext, color, alert, onC
             {alert && <AlertTriangle className="h-3 w-3 ml-2 text-white" />}
           </div>
           <p className="text-2xl font-bold">{value}</p>
-          {subtext && <p className={`text-xs ${textClasses[color]} mt-2`}>{subtext}</p>}
+          {subtext && (
+            <p className={`text-xs ${textClasses[color]} mt-2`}>{subtext}</p>
+          )}
         </div>
-        <Icon className={`h-8 w-8 ${iconClasses[color]}`} />
+        <_Icon className={`h-8 w-8 ${iconClasses[color]}`} />
       </div>
     </div>
   );
