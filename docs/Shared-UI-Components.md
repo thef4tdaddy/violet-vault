@@ -24,6 +24,60 @@ VioletVault uses a comprehensive set of shared UI components to ensure consisten
 
 **Always use PageSummaryCard for consistent page-level metrics across the application.**
 
+### Standardized Tabs Component
+
+**StandardTabs** (`src/components/ui/StandardTabs.jsx`)
+
+A fully standardized tabs component with accessibility and consistent styling:
+
+```jsx
+import StandardTabs from "../ui/StandardTabs";
+
+const tabs = [
+  { 
+    id: "all", 
+    label: "All Bills", 
+    icon: FileText, 
+    count: 10 
+  },
+  { 
+    id: "overdue", 
+    label: "Overdue", 
+    icon: AlertTriangle, 
+    count: 2 
+  },
+  { 
+    id: "upcoming", 
+    label: "Upcoming", 
+    icon: Clock, 
+    count: 5,
+    disabled: false
+  }
+];
+
+<StandardTabs
+  tabs={tabs}
+  activeTab={activeTab}
+  onTabChange={setActiveTab}
+  size="md"           // 'sm' | 'md' | 'lg'
+  variant="underline" // 'underline' | 'pills' | 'buttons'
+/>
+```
+
+**Features:**
+- **High Contrast Text**: Uses `text-gray-700` (inactive) and `text-blue-700` (active) for WCAG compliance
+- **Multiple Variants**: Underline (default), pills, and buttons styling
+- **Flexible Sizing**: Small, medium, and large sizes available
+- **Icon Support**: Optional icons with proper sizing
+- **Count Badges**: Optional count display with variant-appropriate styling
+- **Disabled State**: Full support for disabled tabs
+- **Hover Effects**: Smooth transitions and hover states
+
+**When to Use:**
+- Use StandardTabs for all tabbed navigation in the app
+- Replace existing custom tab implementations
+- Ensures consistency across Bills, Debts, Transactions, and other pages
+
 ### Core Modal Components
 
 **EditLockIndicator** (`src/components/ui/EditLockIndicator.jsx`)
