@@ -8,7 +8,7 @@ import StandardFilters from "../ui/StandardFilters";
  */
 const BillViewTabs = ({ viewModes, viewMode, setViewMode, filterOptions, setFilterOptions }) => {
   return (
-    <>
+    <div className="space-y-0">
       {/* View Mode Tabs */}
       <StandardTabs
         tabs={viewModes}
@@ -18,7 +18,7 @@ const BillViewTabs = ({ viewModes, viewMode, setViewMode, filterOptions, setFilt
         size="md"
       />
 
-      {/* Compact Filters */}
+      {/* Connected Filters */}
       <StandardFilters
         filters={filterOptions}
         onFilterChange={(key, value) => setFilterOptions((prev) => ({ ...prev, [key]: value }))}
@@ -48,8 +48,9 @@ const BillViewTabs = ({ viewModes, viewMode, setViewMode, filterOptions, setFilt
         ]}
         searchPlaceholder="Search bills..."
         size="md"
+        className="-mb-1"
       />
-    </>
+    </div>
   );
 };
 
