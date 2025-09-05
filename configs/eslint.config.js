@@ -201,6 +201,13 @@ export default [
     },
   },
   {
+    // Exclusions for data management utilities that require higher complexity for logging
+    files: ["src/utils/dataManagement/validationUtils.js"],
+    rules: {
+      "complexity": "off",
+    },
+  },
+  {
     // Exclusions for core infrastructure and diagnostic files (Issue #514)
     files: [
       "**/budgetDb.js",
