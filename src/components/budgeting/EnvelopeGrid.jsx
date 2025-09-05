@@ -152,7 +152,7 @@ const UnifiedEnvelopeManager = ({
 
   return (
     <div className={`space-y-6 ${className}`}>
-      <EnvelopeSummary totals={totals} />
+      <EnvelopeSummary totals={totals} unassignedCash={unassignedCash} />
 
       <EnvelopeHeader
         filterOptions={filterOptions}

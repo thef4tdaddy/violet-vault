@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BookOpen, Plus, Upload } from "lucide-react";
 
-import TransactionSummary from "./TransactionSummary";
+import TransactionSummaryCards from "./TransactionSummaryCards";
 import StandardFilters from "../ui/StandardFilters";
 import TransactionTable from "./TransactionTable";
 import TransactionForm from "./TransactionForm";
@@ -250,7 +250,7 @@ const TransactionLedger = ({
       </div>
 
       {/* Summary Cards */}
-      <TransactionSummary transactions={transactions} />
+      <TransactionSummaryCards transactions={transactions} />
 
       {/* Filters */}
       <StandardFilters
