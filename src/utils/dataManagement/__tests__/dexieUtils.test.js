@@ -1,28 +1,60 @@
-import { clearAllDexieData, importDataToDexie } from '../dexieUtils';
-import { budgetDb } from '../../../db/budgetDb';
-import { vi } from 'vitest';
+import { clearAllDexieData, importDataToDexie } from "../dexieUtils";
+import { budgetDb } from "../../../db/budgetDb";
+import { vi } from "vitest";
 
-vi.mock('../../../db/budgetDb', () => ({
+vi.mock("../../../db/budgetDb", () => ({
   budgetDb: {
     transaction: vi.fn((mode, tables, callback) => callback()),
-    envelopes: { clear: vi.fn(), bulkAdd: vi.fn(), toCollection: vi.fn(() => ({ delete: vi.fn() })) },
-    bills: { clear: vi.fn(), bulkAdd: vi.fn(), toCollection: vi.fn(() => ({ delete: vi.fn() })) },
-    transactions: { clear: vi.fn(), bulkAdd: vi.fn(), toCollection: vi.fn(() => ({ delete: vi.fn() })) },
-    savingsGoals: { clear: vi.fn(), bulkAdd: vi.fn(), toCollection: vi.fn(() => ({ delete: vi.fn() })) },
-    debts: { clear: vi.fn(), bulkAdd: vi.fn(), toCollection: vi.fn(() => ({ delete: vi.fn() })) },
-    paycheckHistory: { clear: vi.fn(), bulkAdd: vi.fn(), toCollection: vi.fn(() => ({ delete: vi.fn() })) },
-    auditLog: { clear: vi.fn(), bulkAdd: vi.fn(), toCollection: vi.fn(() => ({ delete: vi.fn() })) },
-    budget: { clear: vi.fn(), put: vi.fn(), toCollection: vi.fn(() => ({ delete: vi.fn() })) },
+    envelopes: {
+      clear: vi.fn(),
+      bulkAdd: vi.fn(),
+      toCollection: vi.fn(() => ({ delete: vi.fn() })),
+    },
+    bills: {
+      clear: vi.fn(),
+      bulkAdd: vi.fn(),
+      toCollection: vi.fn(() => ({ delete: vi.fn() })),
+    },
+    transactions: {
+      clear: vi.fn(),
+      bulkAdd: vi.fn(),
+      toCollection: vi.fn(() => ({ delete: vi.fn() })),
+    },
+    savingsGoals: {
+      clear: vi.fn(),
+      bulkAdd: vi.fn(),
+      toCollection: vi.fn(() => ({ delete: vi.fn() })),
+    },
+    debts: {
+      clear: vi.fn(),
+      bulkAdd: vi.fn(),
+      toCollection: vi.fn(() => ({ delete: vi.fn() })),
+    },
+    paycheckHistory: {
+      clear: vi.fn(),
+      bulkAdd: vi.fn(),
+      toCollection: vi.fn(() => ({ delete: vi.fn() })),
+    },
+    auditLog: {
+      clear: vi.fn(),
+      bulkAdd: vi.fn(),
+      toCollection: vi.fn(() => ({ delete: vi.fn() })),
+    },
+    budget: {
+      clear: vi.fn(),
+      put: vi.fn(),
+      toCollection: vi.fn(() => ({ delete: vi.fn() })),
+    },
   },
 }));
 
-describe('dexieUtils', () => {
+describe("dexieUtils", () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('clearAllDexieData', () => {
-    it('should clear all tables', async () => {
+  describe("clearAllDexieData", () => {
+    it("should clear all tables", async () => {
       await clearAllDexieData();
       expect(budgetDb.envelopes.clear).toHaveBeenCalled();
       expect(budgetDb.bills.clear).toHaveBeenCalled();
@@ -35,8 +67,8 @@ describe('dexieUtils', () => {
     });
   });
 
-  describe('importDataToDexie', () => {
-    it('should import data to all tables', async () => {
+  describe("importDataToDexie", () => {
+    it("should import data to all tables", async () => {
       const data = {
         envelopes: [{ id: 1 }],
         bills: [{ id: 1 }],
@@ -49,10 +81,16 @@ describe('dexieUtils', () => {
       await importDataToDexie(data);
       expect(budgetDb.envelopes.bulkAdd).toHaveBeenCalledWith(data.envelopes);
       expect(budgetDb.bills.bulkAdd).toHaveBeenCalledWith(data.bills);
-      expect(budgetDb.transactions.bulkAdd).toHaveBeenCalledWith(data.allTransactions);
-      expect(budgetDb.savingsGoals.bulkAdd).toHaveBeenCalledWith(data.savingsGoals);
+      expect(budgetDb.transactions.bulkAdd).toHaveBeenCalledWith(
+        data.allTransactions,
+      );
+      expect(budgetDb.savingsGoals.bulkAdd).toHaveBeenCalledWith(
+        data.savingsGoals,
+      );
       expect(budgetDb.debts.bulkAdd).toHaveBeenCalledWith(data.debts);
-      expect(budgetDb.paycheckHistory.bulkAdd).toHaveBeenCalledWith(data.paycheckHistory);
+      expect(budgetDb.paycheckHistory.bulkAdd).toHaveBeenCalledWith(
+        data.paycheckHistory,
+      );
       expect(budgetDb.auditLog.bulkAdd).toHaveBeenCalledWith(data.auditLog);
       expect(budgetDb.budget.put).toHaveBeenCalled();
     });

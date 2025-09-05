@@ -5,7 +5,8 @@ const SeasonalPatternsSection = ({ seasonalPatterns }) => {
   return (
     <div className="rounded-xl p-6 border-2 border-black bg-white/90 backdrop-blur-sm shadow-xl">
       <h3 className="font-black text-black text-base mb-4">
-        <span className="text-lg">S</span>EASONAL <span className="text-lg">S</span>PENDING{" "}
+        <span className="text-lg">S</span>EASONAL{" "}
+        <span className="text-lg">S</span>PENDING{" "}
         <span className="text-lg">P</span>ATTERNS
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -19,7 +20,9 @@ const SeasonalPatternsSection = ({ seasonalPatterns }) => {
                 className="w-4 h-4 rounded border border-black"
                 style={{ backgroundColor: season.color }}
               ></div>
-              <h4 className="font-bold text-purple-900">{season.name.toUpperCase()}</h4>
+              <h4 className="font-bold text-purple-900">
+                {season.name.toUpperCase()}
+              </h4>
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">

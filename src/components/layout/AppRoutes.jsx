@@ -8,7 +8,12 @@ import { routeConfig } from "./routeConfig";
  * Renders all application routes using configuration-driven approach
  * Eliminates repetitive route definitions in MainContent
  */
-const AppRoutes = ({ budget, currentUser, totalBiweeklyNeed, setActiveView }) => {
+const AppRoutes = ({
+  budget,
+  currentUser,
+  totalBiweeklyNeed,
+  setActiveView,
+}) => {
   const commonProps = {
     budget,
     currentUser,
@@ -23,10 +28,7 @@ const AppRoutes = ({ budget, currentUser, totalBiweeklyNeed, setActiveView }) =>
           key={path}
           path={path}
           element={
-            <ViewRendererComponent
-              activeView={activeView}
-              {...commonProps}
-            />
+            <ViewRendererComponent activeView={activeView} {...commonProps} />
           }
         />
       ))}
@@ -34,10 +36,7 @@ const AppRoutes = ({ budget, currentUser, totalBiweeklyNeed, setActiveView }) =>
       <Route
         path="*"
         element={
-          <ViewRendererComponent
-            activeView="dashboard"
-            {...commonProps}
-          />
+          <ViewRendererComponent activeView="dashboard" {...commonProps} />
         }
       />
     </Routes>

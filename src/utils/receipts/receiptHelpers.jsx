@@ -2,6 +2,7 @@
  * Utility functions for receipt processing and validation
  * Handles data validation, formatting, and common calculations
  */
+import { CheckCircle, XCircle } from "lucide-react";
 
 /**
  * Validate receipt data structure
@@ -194,4 +195,36 @@ export const getReceiptFormChanges = (receiptData, transactionForm) => {
   }
 
   return changes;
+};
+
+/**
+ * Render confidence indicator for receipt data fields
+ * UI utility function extracted from ReceiptScanner
+ */
+export const renderConfidenceIndicator = (field, confidence) => {
+  const confidenceMap = {
+    high: { color: "text-green-600", icon: CheckCircle },
+    medium: { color: "text-yellow-600", icon: CheckCircle },
+    low: { color: "text-red-600", icon: XCircle },
+    none: { color: "text-gray-400", icon: XCircle },
+  };
+
+  const conf = confidenceMap[confidence] || confidenceMap.none;
+  const Icon = conf.icon;
+
+  return <Icon className={`h-4 w-4 ${conf.color}`} />;
+};
+
+/**
+ * Format file size for display
+ */
+export const formatFileSize = (bytes) => {
+  return `${Math.round(bytes / 1024)} KB`;
+};
+
+/**
+ * Validate if extracted data has minimum required fields for transaction creation
+ */
+export const hasMinimumExtractedData = (extractedData) => {
+  return extractedData && (extractedData.total || extractedData.merchant);
 };

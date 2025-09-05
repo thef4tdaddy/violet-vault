@@ -42,13 +42,13 @@ import { useLocalOnlyMode } from "../../common/useLocalOnlyMode";
 describe("useAuthenticationManager", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // Reset to default mocks
     useAuthFlow.mockReturnValue({
       isUnlocked: true,
       currentUser: { id: 1, userName: "testuser" },
       encryptionKey: "test-key",
-      budgetId: "test-budget-id", 
+      budgetId: "test-budget-id",
       salt: "test-salt",
       handleSetup: vi.fn(),
       handleLogout: vi.fn(),
@@ -104,8 +104,12 @@ describe("useAuthenticationManager", () => {
   });
 
   it("should handle local-only mode correctly", () => {
-    const localUser = { id: 2, userName: "localuser", budgetId: "local-budget" };
-    
+    const localUser = {
+      id: 2,
+      userName: "localuser",
+      budgetId: "local-budget",
+    };
+
     useLocalOnlyMode.mockReturnValue({
       isLocalOnlyMode: true,
       localOnlyUser: localUser,
@@ -128,7 +132,7 @@ describe("useAuthenticationManager", () => {
       salt: null,
       handleSetup: vi.fn(),
       handleLogout: vi.fn(),
-      handleChangePassword: vi.fn(), 
+      handleChangePassword: vi.fn(),
       handleUpdateProfile: vi.fn(),
     });
 
@@ -157,7 +161,9 @@ describe("useAuthenticationManager", () => {
       handleUpdateProfile: vi.fn(),
     });
 
-    const { result: unauthResult } = renderHook(() => useAuthenticationManager());
+    const { result: unauthResult } = renderHook(() =>
+      useAuthenticationManager(),
+    );
     expect(unauthResult.current.shouldShowAuthGateway()).toBe(true);
   });
 
@@ -177,7 +183,9 @@ describe("useAuthenticationManager", () => {
       localOnlyUser: { id: 1, userName: "localuser" },
     });
 
-    const { result: withUserResult } = renderHook(() => useAuthenticationManager());
+    const { result: withUserResult } = renderHook(() =>
+      useAuthenticationManager(),
+    );
     expect(withUserResult.current.shouldShowAuthGateway()).toBe(false);
   });
 

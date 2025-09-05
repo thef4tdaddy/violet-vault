@@ -14,7 +14,7 @@ import { useTrendAnalysis } from "../../hooks/analytics/useTrendAnalysis";
  * Refactored with component extraction and UI standards compliance
  * Features:
  * - Historical trend analysis
- * - Spending velocity tracking  
+ * - Spending velocity tracking
  * - Seasonal pattern detection
  * - Predictive forecasting
  * - Comparative analysis

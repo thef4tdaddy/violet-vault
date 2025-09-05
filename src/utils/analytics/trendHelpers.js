@@ -25,14 +25,14 @@ export const getTrendIconConfig = (trend) => {
       };
     case "decreasing":
       return {
-        bgClass: "bg-green-100", 
+        bgClass: "bg-green-100",
         iconColor: "text-green-600",
         iconType: "trending-down",
       };
     default:
       return {
         bgClass: "bg-gray-100",
-        iconColor: "text-gray-600", 
+        iconColor: "text-gray-600",
         iconType: "bar-chart",
       };
   }
@@ -81,7 +81,7 @@ export const velocityTooltipFormatter = (value, name) => [
  */
 export const CHART_COLORS = {
   INCOME: "#10B981",
-  SPENDING: "#EF4444", 
+  SPENDING: "#EF4444",
   NET: "#6366F1",
   VELOCITY: "#8B5CF6",
 };
@@ -91,7 +91,7 @@ export const CHART_COLORS = {
  */
 export const SEASON_COLORS = {
   Winter: "#3B82F6",
-  Spring: "#10B981", 
+  Spring: "#10B981",
   Summer: "#F59E0B",
   Fall: "#EF4444",
 };

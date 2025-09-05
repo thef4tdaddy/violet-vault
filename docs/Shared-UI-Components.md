@@ -16,7 +16,7 @@ VioletVault uses a comprehensive set of shared UI components to ensure consisten
    - **Features**: Alert states, hover effects, interactive
    - **Colors**: Full gradient spectrum (red, blue, green, purple, etc.)
 
-2. **SummaryCard** (`src/components/layout/SummaryCards.jsx`) 
+2. **SummaryCard** (`src/components/layout/SummaryCards.jsx`)
    - **Usage**: Main dashboard financial overview
    - **Design**: Solid color backgrounds
    - **Features**: Large values, click handlers for modals
@@ -34,40 +34,41 @@ A fully standardized tabs component with accessibility and consistent styling:
 import StandardTabs from "../ui/StandardTabs";
 
 const tabs = [
-  { 
-    id: "all", 
-    label: "All Bills", 
-    icon: FileText, 
+  {
+    id: "all",
+    label: "All Bills",
+    icon: FileText,
     count: 10,
-    color: "gray"
+    color: "gray",
   },
-  { 
-    id: "overdue", 
-    label: "Overdue", 
-    icon: AlertTriangle, 
+  {
+    id: "overdue",
+    label: "Overdue",
+    icon: AlertTriangle,
     count: 2,
-    color: "red"
+    color: "red",
   },
-  { 
-    id: "upcoming", 
-    label: "Upcoming", 
-    icon: Clock, 
+  {
+    id: "upcoming",
+    label: "Upcoming",
+    icon: Clock,
     count: 5,
     color: "blue",
-    disabled: false
-  }
+    disabled: false,
+  },
 ];
 
 <StandardTabs
   tabs={tabs}
   activeTab={activeTab}
   onTabChange={setActiveTab}
-  size="md"           // 'sm' | 'md' | 'lg'
-  variant="colored"   // 'underline' | 'pills' | 'buttons' | 'tabs' | 'colored'
-/>
+  size="md" // 'sm' | 'md' | 'lg'
+  variant="colored" // 'underline' | 'pills' | 'buttons' | 'tabs' | 'colored'
+/>;
 ```
 
 **Features:**
+
 - **High Contrast Text**: Uses `text-gray-700` (inactive) and proper contrast for all variants
 - **Multiple Variants**: Underline, pills, buttons, tabs, and colored styling
 - **Colored Tabs**: Pastel-to-bright transitions matching summary card colors
@@ -79,6 +80,7 @@ const tabs = [
 - **Hover Effects**: Smooth transitions and hover states
 
 **When to Use:**
+
 - Use StandardTabs for all tabbed navigation in the app
 - Replace existing custom tab implementations
 - Ensures consistency across Bills, Debts, Transactions, and other pages
@@ -94,7 +96,9 @@ import StandardFilters from "../ui/StandardFilters";
 
 <StandardFilters
   filters={filterOptions}
-  onFilterChange={(key, value) => setFilterOptions(prev => ({ ...prev, [key]: value }))}
+  onFilterChange={(key, value) =>
+    setFilterOptions((prev) => ({ ...prev, [key]: value }))
+  }
   filterConfigs={[
     {
       key: "status",
@@ -103,26 +107,27 @@ import StandardFilters from "../ui/StandardFilters";
       options: [
         { value: "all", label: "All Status" },
         { value: "active", label: "Active" },
-        { value: "inactive", label: "Inactive" }
-      ]
+        { value: "inactive", label: "Inactive" },
+      ],
     },
     {
       key: "category",
-      type: "select", 
+      type: "select",
       defaultValue: "all",
       options: [
         { value: "all", label: "All Categories" },
         { value: "bills", label: "Bills" },
-        { value: "income", label: "Income" }
-      ]
-    }
+        { value: "income", label: "Income" },
+      ],
+    },
   ]}
   searchPlaceholder="Search items..."
-  size="md"  // 'sm' | 'md'
-/>
+  size="md" // 'sm' | 'md'
+/>;
 ```
 
 **Features:**
+
 - **Glassmorphism Design**: Professional styling with backdrop blur and hard black borders
 - **Proper Labeling**: "Filters" header with icon for clear identification
 - **Search with Icon**: Built-in search input with search icon and clear button
@@ -134,23 +139,26 @@ import StandardFilters from "../ui/StandardFilters";
 ### Design Standards
 
 **Hard Black Borders**: All major UI components must use the standardized hard black border system:
+
 - **Standard Border**: `border border-white/20 ring-1 ring-gray-800/10`
 - **Usage**: Applied to cards, modals, filters, summary components, and all major UI elements
 - **Benefits**: Creates professional depth, consistent visual hierarchy, and cohesive appearance
 - **Examples**: Summary cards, StandardFilters, modals, form containers
 
 **Main Container Purple Tint**: Page-level containers should use branded purple tint:
+
 - **Style**: `rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm`
 - **Usage**: Applied to main page containers (BillManager, DebtManager, etc.)
 - **Benefits**: Creates branded visual identity while maintaining readability
 - **Example**: BillManager main container with subtle purple background
 
 **Typography Hierarchy Standards**:
+
 - **Important Headers**: Use ALL CAPS with larger first letters pattern
   - **Style**: `font-black text-black text-base` with `text-lg` first letters
   - **Pattern**: `<span className="text-lg">B</span>ILL`
   - **Usage**: Table headers, section headers, important labels
-- **Subtext/Descriptions**: Use dark purple for branded consistency  
+- **Subtext/Descriptions**: Use dark purple for branded consistency
   - **Style**: `text-purple-900`
   - **Usage**: Page descriptions, help text, secondary information
   - **Example**: "Track and manage your recurring bills and payments"
@@ -162,11 +170,13 @@ import StandardFilters from "../ui/StandardFilters";
   - **Usage**: Important messages, formal content that needs clean edges
 
 **Button Standards**: All action buttons must have hard black borders:
+
 - **Style**: Add `border-2 border-black` to all buttons
 - **Usage**: Primary actions, secondary actions, icon buttons
 - **Benefits**: Creates consistent visual weight and professional appearance
 
 **Background Pattern Standards**: Consistent texture and blur patterns:
+
 - **Textured Pattern**: Subtle dot pattern for sophisticated backgrounds
   - **Style**: `backgroundImage: "radial-gradient(circle at 25% 25%, white 2px, transparent 2px), radial-gradient(circle at 75% 75%, white 2px, transparent 2px)", backgroundSize: "100px 100px"`
   - **Overlay**: `opacity-10` for subtle texture
@@ -176,18 +186,21 @@ import StandardFilters from "../ui/StandardFilters";
   - **Usage**: Modal backgrounds, safety screens, important overlays
 
 **Glassmorphism Styling**: Use the established glassmorphism design language:
+
 - **Class**: `.glassmorphism` with `backdrop-filter: blur(20px)` and semi-transparent backgrounds
 - **Complete Style**: `glassmorphism rounded-lg border border-white/20 ring-1 ring-gray-800/10 shadow-lg`
 - **Usage**: Primary containers, filters, cards, and overlay components
 - **Benefits**: Modern aesthetic, visual depth, professional appearance
 
 **Tab Connection Pattern**: Tabs should visually connect to content below them:
+
 - **Tab Styling**: Rounded top corners (`rounded-t-lg`) with hard black borders
 - **Connection Method**: Use negative margins (`-mb-1`) to eliminate gaps
 - **Content Styling**: Connected content should have matching border and glassmorphism
 - **Visual Flow**: Creates seamless transition from navigation to content
 
 **Implementation Example:**
+
 ```jsx
 // Proper tab + filter connection pattern
 <div className="space-y-0">
@@ -197,7 +210,7 @@ import StandardFilters from "../ui/StandardFilters";
     activeTab={activeTab}
     onTabChange={setActiveTab}
   />
-  
+
   <StandardFilters
     filters={filters}
     onFilterChange={handleFilterChange}
@@ -208,6 +221,7 @@ import StandardFilters from "../ui/StandardFilters";
 ```
 
 **When to Use:**
+
 - Use StandardFilters for all filtering UI across the app
 - Replace bulky filter sections that take excessive space
 - Always apply hard black borders to major UI components

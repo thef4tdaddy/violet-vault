@@ -61,7 +61,9 @@ firebase
   .auth()
   .signInAnonymously()
   .then(() => console.log("✅ Anonymous auth successful"))
-  .catch((error) => console.error("❌ Auth failed:", error.code, error.message));
+  .catch((error) =>
+    console.error("❌ Auth failed:", error.code, error.message),
+  );
 ```
 
 ## Application Integration

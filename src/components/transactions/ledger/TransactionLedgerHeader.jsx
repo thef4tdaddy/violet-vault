@@ -2,11 +2,11 @@ import React from "react";
 import { BookOpen, Plus, Upload } from "lucide-react";
 import { formatLedgerSummary } from "../../../utils/transactions/ledgerHelpers";
 
-const TransactionLedgerHeader = ({ 
-  transactionCount, 
-  netCashFlow, 
-  onAddTransaction, 
-  onImportTransactions 
+const TransactionLedgerHeader = ({
+  transactionCount,
+  netCashFlow,
+  onAddTransaction,
+  onImportTransactions,
 }) => {
   return (
     <div className="flex flex-wrap md:flex-nowrap justify-between items-start md:items-center gap-4">

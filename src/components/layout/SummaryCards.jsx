@@ -8,7 +8,10 @@ import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
 import { useSavingsGoals } from "../../hooks/common/useSavingsGoals";
 import logger from "../../utils/common/logger";
 const UnassignedCashModal = lazy(() => import("../modals/UnassignedCashModal"));
-import { calculateEnvelopeData, calculateEnvelopeTotals } from "../../utils/budgeting/envelopeCalculations";
+import {
+  calculateEnvelopeData,
+  calculateEnvelopeTotals,
+} from "../../utils/budgeting/envelopeCalculations";
 
 /**
  * Summary cards component showing financial overview

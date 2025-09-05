@@ -63,11 +63,14 @@ class DeploymentManager {
 
     if (this.environment === "production" && currentBranch !== "main") {
       throw new Error(
-        `Production deployments must be from 'main' branch. Currently on: ${currentBranch}`
+        `Production deployments must be from 'main' branch. Currently on: ${currentBranch}`,
       );
     }
 
-    if (this.environment === "staging" && !["develop", "main"].includes(currentBranch)) {
+    if (
+      this.environment === "staging" &&
+      !["develop", "main"].includes(currentBranch)
+    ) {
       console.warn(`⚠️  Staging deployment from '${currentBranch}' branch`);
     }
 
@@ -75,7 +78,7 @@ class DeploymentManager {
     const { stdout: status } = await execAsync("git status --porcelain");
     if (status.trim()) {
       throw new Error(
-        "Uncommitted changes detected. Please commit or stash changes before deployment."
+        "Uncommitted changes detected. Please commit or stash changes before deployment.",
       );
     }
 
@@ -129,7 +132,9 @@ class DeploymentManager {
 
       // Create build
       const buildCommand =
-        this.environment === "production" ? "npm run build" : `npm run build:${this.environment}`;
+        this.environment === "production"
+          ? "npm run build"
+          : `npm run build:${this.environment}`;
 
       await execAsync(buildCommand, { cwd: projectRoot });
 
@@ -165,7 +170,9 @@ class DeploymentManager {
     const indexPath = path.join(this.buildPath, "index.html");
     const indexContent = fs.readFileSync(indexPath, "utf8");
     if (!indexContent.includes('<div id="root">')) {
-      throw new Error("Build validation failed: Missing root div in index.html");
+      throw new Error(
+        "Build validation failed: Missing root div in index.html",
+      );
     }
 
     console.log("✅ Build validation passed");

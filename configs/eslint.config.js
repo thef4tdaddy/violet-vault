@@ -27,7 +27,7 @@ export default [
       "vite.config.js", // Allow console in build config
       "**/logger.js", // Allow console in logger utility
       "**/debug/**", // Debug utilities that output to browser console
-      "**/debtDebugConfig.js", // Debt debugging configuration  
+      "**/debtDebugConfig.js", // Debt debugging configuration
       "**/masterSyncValidator.js", // Sync validation testing
       "**/highlight.js", // Error monitoring utility
       "src/stores/authStore.jsx", // Main Zustand store for UI/State, low priority for refactoring
@@ -76,58 +76,68 @@ export default [
       "no-case-declarations": "warn",
       "no-useless-escape": "warn",
       "react-hooks/exhaustive-deps": "warn",
-      
+
       // Block browser dialogs (Issues #502, #503, #504 enforcement)
       "no-restricted-globals": [
         "error",
         {
           name: "alert",
-          message: "Use toast notifications instead of alert(). Import { globalToast } from '../../stores/ui/toastStore' and use globalToast.showError(), globalToast.showSuccess(), etc."
+          message:
+            "Use toast notifications instead of alert(). Import { globalToast } from '../../stores/ui/toastStore' and use globalToast.showError(), globalToast.showSuccess(), etc.",
         },
         {
-          name: "confirm", 
-          message: "Use ConfirmModal instead of confirm(). Import { useConfirm } from '../../hooks/common/useConfirm' and use the returned confirm function."
+          name: "confirm",
+          message:
+            "Use ConfirmModal instead of confirm(). Import { useConfirm } from '../../hooks/common/useConfirm' and use the returned confirm function.",
         },
         {
           name: "prompt",
-          message: "Use PromptModal instead of prompt(). Import { usePrompt } from '../../hooks/common/usePrompt' and use the returned prompt function."
-        }
+          message:
+            "Use PromptModal instead of prompt(). Import { usePrompt } from '../../hooks/common/usePrompt' and use the returned prompt function.",
+        },
       ],
-      
+
       // Block React Context usage (Issue #491 enforcement)
       "no-restricted-imports": [
-        "error", 
+        "error",
         {
-          "paths": [
+          paths: [
             {
-              "name": "react",
-              "importNames": ["createContext", "useContext"],
-              "message": "Avoid React Context. For data: use TanStack Query + Dexie (see hooks in src/hooks/). For UI/auth state: use Zustand stores in src/stores/."
-            }
-          ]
-        }
+              name: "react",
+              importNames: ["createContext", "useContext"],
+              message:
+                "Avoid React Context. For data: use TanStack Query + Dexie (see hooks in src/hooks/). For UI/auth state: use Zustand stores in src/stores/.",
+            },
+          ],
+        },
       ],
-      
+
       // Graduated file size enforcement (Issue #569)
       // 300+ lines = warning, 400+ lines = error, 500+ lines = must fix
-      "max-lines": ["warn", {
-        "max": 300,
-        "skipBlankLines": true,
-        "skipComments": true
-      }],
-      
+      "max-lines": [
+        "warn",
+        {
+          max: 300,
+          skipBlankLines: true,
+          skipComments: true,
+        },
+      ],
+
       // Phase 1: Relaxed complexity rules - only warn for moderate violations
-      "complexity": ["warn", { "max": 15 }], // Warn on high complexity
+      complexity: ["warn", { max: 15 }], // Warn on high complexity
       "max-depth": ["warn", 5], // Warn on deep nesting
       "max-params": ["warn", 5], // Warn on too many parameters
       "max-statements": ["warn", 25], // Warn on long functions
-      "max-lines-per-function": ["warn", {
-        "max": 75,
-        "skipBlankLines": true,
-        "skipComments": true
-      }],
+      "max-lines-per-function": [
+        "warn",
+        {
+          max: 75,
+          skipBlankLines: true,
+          skipComments: true,
+        },
+      ],
       "max-nested-callbacks": ["warn", 4], // Warn on nested callbacks
-      
+
       // Block all console statements - use logger instead
       "no-console": "error",
     },
@@ -139,21 +149,34 @@ export default [
       "no-restricted-imports": [
         "error",
         {
-          "patterns": [
+          patterns: [
             {
-              "group": ["../services/*", "../../services/*", "../../../services/*"],
-              "message": "Components should not directly import services. Use hooks in src/hooks/ to encapsulate service calls. Utils and hooks are allowed."
+              group: ["../services/*", "../../services/*", "../../../services/*"],
+              message:
+                "Components should not directly import services. Use hooks in src/hooks/ to encapsulate service calls. Utils and hooks are allowed.",
             },
             {
-              "group": ["**/calculations/*", "**/processors/*", "**/validators/*", "**/transformers/*"],
-              "message": "Components should not import business logic utilities directly. Extract to custom hooks instead."
+              group: [
+                "**/calculations/*",
+                "**/processors/*",
+                "**/validators/*",
+                "**/transformers/*",
+              ],
+              message:
+                "Components should not import business logic utilities directly. Extract to custom hooks instead.",
             },
             {
-              "group": ["**/utils/**/calculate*", "**/utils/**/process*", "**/utils/**/validate*", "**/utils/**/transform*"],
-              "message": "Components should not import calculation/processing utilities. Use custom hooks to encapsulate business logic."
-            }
-          ]
-        }
+              group: [
+                "**/utils/**/calculate*",
+                "**/utils/**/process*",
+                "**/utils/**/validate*",
+                "**/utils/**/transform*",
+              ],
+              message:
+                "Components should not import calculation/processing utilities. Use custom hooks to encapsulate business logic.",
+            },
+          ],
+        },
       ],
     },
   },
@@ -161,22 +184,28 @@ export default [
     // Files over 400 lines need attention (Issue #569)
     files: ["**/*.{js,jsx}"],
     rules: {
-      "max-lines": ["error", {
-        "max": 400, // 400+ lines = error, needs refactoring soon
-        "skipBlankLines": true,
-        "skipComments": true
-      }],
+      "max-lines": [
+        "error",
+        {
+          max: 400, // 400+ lines = error, needs refactoring soon
+          skipBlankLines: true,
+          skipComments: true,
+        },
+      ],
     },
   },
   {
     // Files over 500 lines must be refactored (Issue #569)
     files: ["**/*.{js,jsx}"],
     rules: {
-      "max-lines": ["error", {
-        "max": 500, // 500+ lines = critical, must be refactored
-        "skipBlankLines": true,
-        "skipComments": true
-      }],
+      "max-lines": [
+        "error",
+        {
+          max: 500, // 500+ lines = critical, must be refactored
+          skipBlankLines: true,
+          skipComments: true,
+        },
+      ],
     },
   },
   {
@@ -184,7 +213,7 @@ export default [
     files: [
       "src/utils/**/calculations/**/*.js",
       "src/utils/**/strategies/**/*.js",
-      "src/utils/**/operations/**/*.js", 
+      "src/utils/**/operations/**/*.js",
       "src/utils/sync/**/*.js",
       "src/utils/security/**/*.js",
       "src/utils/query/**/*.js",
@@ -193,7 +222,7 @@ export default [
       "src/utils/budgeting/autofunding/**/*.js",
     ],
     rules: {
-      "complexity": "off", // Complex algorithms and financial calculations
+      complexity: "off", // Complex algorithms and financial calculations
       "max-depth": "off", // Deep conditional logic for business rules
       "max-statements": "off", // Data processing operations
       "max-lines-per-function": "off", // Complex calculations and transformations
@@ -204,14 +233,14 @@ export default [
     // Exclusions for data management utilities that require higher complexity for logging
     files: ["src/utils/dataManagement/validationUtils.js"],
     rules: {
-      "complexity": "off",
+      complexity: "off",
     },
   },
   {
     // Exclusions for core infrastructure and diagnostic files (Issue #514)
     files: [
       "**/budgetDb.js",
-      "**/budgetHistoryService.js", 
+      "**/budgetHistoryService.js",
       "**/chunkedSyncService.js",
       "**/budgetHistoryTracker.js",
       "**/authStore.jsx",

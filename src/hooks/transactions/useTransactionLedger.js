@@ -91,7 +91,7 @@ export const useTransactionLedger = (currentUser) => {
     1,
     Math.ceil(filteredTransactions.length / pageSize),
   );
-  
+
   const paginatedTransactions = filteredTransactions.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize,
@@ -219,10 +219,10 @@ export const useTransactionLedger = (currentUser) => {
     envelopes,
     paginatedTransactions,
     filteredTransactions,
-    
+
     // Loading states
     isLoading: transactionsLoading || envelopesLoading,
-    
+
     // Modal states
     showAddModal,
     setShowAddModal,
@@ -231,11 +231,11 @@ export const useTransactionLedger = (currentUser) => {
     editingTransaction,
     splittingTransaction,
     setSplittingTransaction,
-    
+
     // Form data
     transactionForm,
     setTransactionForm,
-    
+
     // Filter states
     searchTerm,
     dateFilter,
@@ -243,11 +243,11 @@ export const useTransactionLedger = (currentUser) => {
     envelopeFilter,
     sortBy,
     sortOrder,
-    
+
     // Pagination
     currentPage,
     totalPages,
-    
+
     // Import states
     importData,
     importStep,
@@ -255,7 +255,7 @@ export const useTransactionLedger = (currentUser) => {
     fieldMapping,
     setFieldMapping,
     importProgress,
-    
+
     // Event handlers
     handleSubmitTransaction,
     startEdit,
@@ -268,7 +268,7 @@ export const useTransactionLedger = (currentUser) => {
     handlePagination,
     handleFileUpload,
     handleImport,
-    
+
     // Operations
     deleteTransaction,
   };
