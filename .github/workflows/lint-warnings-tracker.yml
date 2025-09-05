@@ -174,7 +174,7 @@ jobs:
             <summary>View detailed warning breakdown</summary>
 
             The full warning analysis is available in the workflow summary.
-            You can also check the \`.github/data/lint-warnings.json\` file for detailed breakdown by category and file.
+            You can also check the `.`github/data/lint-warnings.json` file for detailed breakdown by category and file.
 
             </details>`;
 
@@ -220,11 +220,11 @@ jobs:
             echo "Could not checkout develop branch, trying to create it from origin"
             git checkout -b develop origin/develop 2>/dev/null || echo "Failed to create develop branch"
           }
-
+          
           # Verify we're on develop and re-install deps if needed
           CURRENT_BRANCH=$(git branch --show-current)
           echo "Current branch: $CURRENT_BRANCH"
-
+          
           if [ "$CURRENT_BRANCH" = "develop" ]; then
             echo "✅ Successfully on develop branch"
             npm ci --silent
@@ -234,7 +234,7 @@ jobs:
             echo "❌ Failed to switch to develop branch, using fallback"
             echo '{"currentStatus":{"totalWarnings":0}}' > develop-warnings.json
           fi
-
+          
           DEVELOP_WARNINGS=$(cat develop-warnings.json | jq -r '.currentStatus.totalWarnings // 0')
           echo "Develop warnings: $DEVELOP_WARNINGS"
           echo "warnings=$DEVELOP_WARNINGS" >> $GITHUB_OUTPUT
@@ -249,11 +249,11 @@ jobs:
             echo "Could not checkout main branch, trying to create it from origin"
             git checkout -b main origin/main 2>/dev/null || echo "Failed to create main branch"
           }
-
+          
           # Verify we're on main and re-install deps if needed
           CURRENT_BRANCH=$(git branch --show-current)
           echo "Current branch: $CURRENT_BRANCH"
-
+          
           if [ "$CURRENT_BRANCH" = "main" ]; then
             echo "✅ Successfully on main branch"
             npm ci --silent
@@ -263,7 +263,7 @@ jobs:
             echo "❌ Failed to switch to main branch, using fallback"
             echo '{"currentStatus":{"totalWarnings":0}}' > main-warnings.json
           fi
-
+          
           MAIN_WARNINGS=$(cat main-warnings.json | jq -r '.currentStatus.totalWarnings // 0')
           echo "Main warnings: $MAIN_WARNINGS"
           echo "warnings=$MAIN_WARNINGS" >> $GITHUB_OUTPUT
@@ -274,10 +274,46 @@ jobs:
         with:
           script: |
             const fs = require('fs');
+            
+            // First, hide previous automation comments to prevent flooding
+            try {
+              const comments = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: 568
+              });
+              
+              // Find previous automation comments (from GitHub Actions)
+              const automationComments = comments.data.filter(comment => 
+                comment.user.login === 'github-actions[bot]'
+              );
+              
+              // Hide the previous automation comments by minimizing them
+              for (const comment of automationComments) {
+                try {
+                  await github.rest.issues.updateComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    comment_id: comment.id,
+                    body: `<details>
+<summary>📊 Previous Lint Analysis (${new Date(comment.created_at).toLocaleDateString()})</summary>
 
+${comment.body}
+
+</details>`
+                  });
+                  console.log(`✅ Minimized previous comment #${comment.id}`);
+                } catch (updateError) {
+                  console.log(`⚠️ Could not minimize comment #${comment.id}:`, updateError.message);
+                }
+              }
+            } catch (error) {
+              console.log('⚠️ Could not process previous comments:', error.message);
+            }
+            
             // Load template from markdown file
             const template = fs.readFileSync('.github/data/lint-warnings-comment.md', 'utf8');
-
+            
             // Prepare template variables
             const currentDate = new Date().toLocaleDateString('en-US', { 
               year: 'numeric', 
@@ -287,10 +323,10 @@ jobs:
               minute: '2-digit',
               timeZone: 'UTC'
             });
-
+            
             const developWarnings = '${{ steps.develop_warnings.outputs.warnings }}' || '0';
             const mainWarnings = '${{ steps.main_warnings.outputs.warnings }}' || '0';
-
+            
             let branchInfo = '';
             if ('${{ steps.should_run.outputs.should_run_develop }}' === 'true') {
               branchInfo += `**Develop Branch:** ${developWarnings} warnings\n`;
@@ -298,11 +334,11 @@ jobs:
             if ('${{ steps.should_run.outputs.should_run_main }}' === 'true') {
               branchInfo += `**Main Branch:** ${mainWarnings} warnings\n`;
             }
-
+            
             const statusMessage = developWarnings < 96 
               ? `✅ Develop improved: -${96 - developWarnings} from baseline (96)`
               : `⚠️ Develop increased: +${developWarnings - 96} from baseline (96)`;
-
+            
             // Read detailed warning data for develop branch
             let detailedInfo = '';
             try {
@@ -331,7 +367,7 @@ jobs:
                   
                   const topFiles = allFiles.sort((a, b) => b.warnings - a.warnings).slice(0, 10);
                   if (topFiles.length > 0) {
-                    detailedInfo += '\n### 🔥 Files with Most Warnings:\n';
+                    detailedInfo += '\n\n### 🔥 Files with Most Warnings:\n';
                     topFiles.forEach(file => {
                       const fileName = file.path.split('/').pop();
                       detailedInfo += `- **${fileName}**: ${file.warnings} warnings\n`;
@@ -340,7 +376,7 @@ jobs:
 
                   // Priority actions
                   if (developDetails.actionPlan && developDetails.actionPlan.highPriority && developDetails.actionPlan.highPriority.length > 0) {
-                    detailedInfo += '\n### ⚠️ High Priority Actions:\n';
+                    detailedInfo += '\n\n### ⚠️ High Priority Actions:\n';
                     developDetails.actionPlan.highPriority.slice(0, 3).forEach(task => {
                       detailedInfo += `- **${task.task}**: ${task.warningsAffected} warnings\n`;
                     });
