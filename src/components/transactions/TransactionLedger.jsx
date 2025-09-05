@@ -6,7 +6,7 @@ import StandardFilters from "../ui/StandardFilters";
 import TransactionTable from "./TransactionTable";
 import TransactionForm from "./TransactionForm";
 import ImportModal from "./import/ImportModal";
-import TransactionSplitterV2 from "./TransactionSplitterV2";
+import TransactionSplitter from "./TransactionSplitter";
 
 import { useTransactionFilters } from "../../hooks/transactions/useTransactionFilters";
 import { useTransactionForm } from "../../hooks/transactions/useTransactionForm";
@@ -388,7 +388,7 @@ const TransactionLedger = ({
       />
 
       {/* Transaction Splitter Modal */}
-      <TransactionSplitterV2
+      <TransactionSplitter
         isOpen={!!splittingTransaction}
         onClose={() => setSplittingTransaction(null)}
         transaction={splittingTransaction}
