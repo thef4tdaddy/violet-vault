@@ -5,7 +5,7 @@ import {
   useActualBalance,
 } from "../budgeting/useBudgetMetadata";
 import useBills from "../bills/useBills";
-import { calculateEnvelopeSummary } from "../../utils/budgeting/envelopeCalculations";
+import { calculateEnvelopeData, calculateEnvelopeTotals } from "../../utils/budgeting/envelopeCalculations";
 
 /**
  * Centralized layout data provider hook
@@ -41,7 +41,8 @@ export const useLayoutData = () => {
 
     // Use existing utility with empty arrays for transactions and bills
     // since we're only calculating envelope-based metrics
-    return calculateEnvelopeSummary(budgetData.envelopes, [], []);
+    const processedEnvelopeData = calculateEnvelopeData(budgetData.envelopes, [], []);
+    return calculateEnvelopeTotals(processedEnvelopeData);
   }, [budgetData.envelopes]);
 
   // Filter out null/undefined transactions for safe operations
