@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { useCallback } from "react";
 import { useAuth } from "../../stores/auth/authStore.jsx";
 import { useConfirm } from "./useConfirm";

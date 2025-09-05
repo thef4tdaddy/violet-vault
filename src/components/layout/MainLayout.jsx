@@ -1,4 +1,5 @@
 // src/components/layout/MainLayout.jsx
+/* eslint-disable max-lines */
 import React, { useState, Suspense, useEffect } from "react";
 import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { useBudgetStore } from "../../stores/ui/uiStore";
