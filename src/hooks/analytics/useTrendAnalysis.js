@@ -8,8 +8,18 @@ const generateSpendingTrends = (analyticsData) => {
 
   // Mock historical data - in real implementation, this would come from analytics
   const months = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
 
   const currentMonth = new Date().getMonth();
@@ -48,11 +58,10 @@ const calculateSpendingVelocity = (spendingTrends) => {
   for (let i = 1; i < spendingTrends.length; i++) {
     const current = spendingTrends[i];
     const previous = spendingTrends[i - 1];
-    
+
     const spendingChange = current.spending - previous.spending;
-    const percentChange = previous.spending > 0 
-      ? (spendingChange / previous.spending) * 100 
-      : 0;
+    const percentChange =
+      previous.spending > 0 ? (spendingChange / previous.spending) * 100 : 0;
 
     velocity.push({
       month: current.month,
@@ -68,10 +77,15 @@ const calculateSpendingVelocity = (spendingTrends) => {
  */
 const generateCategoryTrends = (analyticsData) => {
   if (!analyticsData) return [];
-  
+
   return [
     { name: "Groceries", current: 850, previous: 780, trend: "increasing" },
-    { name: "Transportation", current: 320, previous: 380, trend: "decreasing" },
+    {
+      name: "Transportation",
+      current: 320,
+      previous: 380,
+      trend: "decreasing",
+    },
     { name: "Utilities", current: 245, previous: 250, trend: "stable" },
     { name: "Entertainment", current: 180, previous: 120, trend: "increasing" },
     { name: "Healthcare", current: 95, previous: 110, trend: "decreasing" },
@@ -83,12 +97,28 @@ const generateCategoryTrends = (analyticsData) => {
  */
 const generateSeasonalPatterns = (analyticsData) => {
   if (!analyticsData) return [];
-  
+
   return [
-    { season: "Winter", avgSpending: 2850, categories: ["Utilities", "Healthcare"] },
-    { season: "Spring", avgSpending: 2650, categories: ["Groceries", "Transportation"] },
-    { season: "Summer", avgSpending: 2950, categories: ["Entertainment", "Transportation"] },
-    { season: "Fall", avgSpending: 2750, categories: ["Groceries", "Utilities"] },
+    {
+      season: "Winter",
+      avgSpending: 2850,
+      categories: ["Utilities", "Healthcare"],
+    },
+    {
+      season: "Spring",
+      avgSpending: 2650,
+      categories: ["Groceries", "Transportation"],
+    },
+    {
+      season: "Summer",
+      avgSpending: 2950,
+      categories: ["Entertainment", "Transportation"],
+    },
+    {
+      season: "Fall",
+      avgSpending: 2750,
+      categories: ["Groceries", "Utilities"],
+    },
   ];
 };
 
@@ -97,18 +127,20 @@ const generateSeasonalPatterns = (analyticsData) => {
  */
 const generateForecastInsights = (spendingTrends) => {
   if (!spendingTrends.length) return {};
-  
+
   const currentMonthData = spendingTrends[spendingTrends.length - 4];
   const forecastData = spendingTrends.slice(-3);
-  
-  const avgForecastSpending = forecastData.reduce((sum, month) => 
-    sum + month.spending, 0) / forecastData.length;
-    
+
+  const avgForecastSpending =
+    forecastData.reduce((sum, month) => sum + month.spending, 0) /
+    forecastData.length;
+
   return {
     projectedMonthlySpending: Math.round(avgForecastSpending),
     projectedSavings: Math.round(forecastData[2].net),
     confidenceLevel: 85,
-    trendDirection: avgForecastSpending > currentMonthData.spending ? "up" : "down",
+    trendDirection:
+      avgForecastSpending > currentMonthData.spending ? "up" : "down",
   };
 };
 
@@ -119,11 +151,12 @@ const generateInsights = (_categoryTrends, _seasonalPatterns) => [
   {
     type: "warning",
     title: "Increasing Entertainment Spending",
-    description: "Entertainment costs have increased by 50% compared to last month.",
+    description:
+      "Entertainment costs have increased by 50% compared to last month.",
     action: "Consider setting a monthly entertainment budget limit.",
   },
   {
-    type: "success", 
+    type: "success",
     title: "Transportation Savings",
     description: "You've saved $60 on transportation this month.",
     action: "Great job! Consider investing these savings.",
@@ -131,8 +164,10 @@ const generateInsights = (_categoryTrends, _seasonalPatterns) => [
   {
     type: "info",
     title: "Seasonal Pattern Detected",
-    description: "Your spending typically increases by 15% during summer months.",
-    action: "Plan ahead for higher summer expenses in categories like entertainment.",
+    description:
+      "Your spending typically increases by 15% during summer months.",
+    action:
+      "Plan ahead for higher summer expenses in categories like entertainment.",
   },
 ];
 
@@ -141,24 +176,35 @@ const generateInsights = (_categoryTrends, _seasonalPatterns) => [
  * Extracts all computational logic from TrendAnalysisCharts component
  */
 export const useTrendAnalysis = (analyticsData, _timeFilter) => {
-  const spendingTrends = useMemo(() => 
-    generateSpendingTrends(analyticsData), [analyticsData]);
+  const spendingTrends = useMemo(
+    () => generateSpendingTrends(analyticsData),
+    [analyticsData],
+  );
 
-  const spendingVelocity = useMemo(() => 
-    calculateSpendingVelocity(spendingTrends), [spendingTrends]);
+  const spendingVelocity = useMemo(
+    () => calculateSpendingVelocity(spendingTrends),
+    [spendingTrends],
+  );
 
-  const categoryTrends = useMemo(() => 
-    generateCategoryTrends(analyticsData), [analyticsData]);
+  const categoryTrends = useMemo(
+    () => generateCategoryTrends(analyticsData),
+    [analyticsData],
+  );
 
-  const seasonalPatterns = useMemo(() => 
-    generateSeasonalPatterns(analyticsData), [analyticsData]);
+  const seasonalPatterns = useMemo(
+    () => generateSeasonalPatterns(analyticsData),
+    [analyticsData],
+  );
 
-  const forecastInsights = useMemo(() => 
-    generateForecastInsights(spendingTrends), [spendingTrends]);
+  const forecastInsights = useMemo(
+    () => generateForecastInsights(spendingTrends),
+    [spendingTrends],
+  );
 
-  const insights = useMemo(() => 
-    generateInsights(categoryTrends, seasonalPatterns), 
-    [categoryTrends, seasonalPatterns]);
+  const insights = useMemo(
+    () => generateInsights(categoryTrends, seasonalPatterns),
+    [categoryTrends, seasonalPatterns],
+  );
 
   return {
     spendingTrends,

@@ -1,10 +1,6 @@
 import React from "react";
 
-const TransactionPagination = ({ 
-  currentPage, 
-  totalPages, 
-  onPageChange 
-}) => {
+const TransactionPagination = ({ currentPage, totalPages, onPageChange }) => {
   return (
     <div className="flex items-center justify-between mt-4">
       <button

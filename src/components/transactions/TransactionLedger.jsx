@@ -13,7 +13,10 @@ import TransactionLedgerLoading from "./ledger/TransactionLedgerLoading";
 
 import { useTransactionLedger } from "../../hooks/transactions/useTransactionLedger";
 import { TRANSACTION_CATEGORIES } from "../../constants/categories";
-import { calculateTransactionTotals, getTransactionFilterConfigs } from "../../utils/transactions/ledgerHelpers";
+import {
+  calculateTransactionTotals,
+  getTransactionFilterConfigs,
+} from "../../utils/transactions/ledgerHelpers";
 
 const TransactionLedger = ({
   currentUser = { userName: "User", userColor: "#a855f7" },
@@ -23,10 +26,10 @@ const TransactionLedger = ({
     transactions,
     envelopes,
     paginatedTransactions,
-    
+
     // Loading states
     isLoading,
-    
+
     // Modal states
     showAddModal,
     setShowAddModal,
@@ -35,11 +38,11 @@ const TransactionLedger = ({
     editingTransaction,
     splittingTransaction,
     setSplittingTransaction,
-    
+
     // Form data
     transactionForm,
     setTransactionForm,
-    
+
     // Filter states
     searchTerm,
     dateFilter,
@@ -47,11 +50,11 @@ const TransactionLedger = ({
     envelopeFilter,
     sortBy,
     sortOrder,
-    
+
     // Pagination
     currentPage,
     totalPages,
-    
+
     // Import states
     importData,
     importStep,
@@ -59,7 +62,7 @@ const TransactionLedger = ({
     fieldMapping,
     setFieldMapping,
     importProgress,
-    
+
     // Event handlers
     handleSubmitTransaction,
     startEdit,
@@ -72,7 +75,7 @@ const TransactionLedger = ({
     handlePagination,
     handleFileUpload,
     handleImport,
-    
+
     // Operations
     deleteTransaction,
   } = useTransactionLedger(currentUser);

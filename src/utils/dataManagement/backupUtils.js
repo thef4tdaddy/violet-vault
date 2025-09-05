@@ -41,7 +41,7 @@ export const backupCurrentData = async () => {
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
     localStorage.setItem(
       `dexie_backup_${timestamp}`,
-      JSON.stringify(currentData)
+      JSON.stringify(currentData),
     );
     logger.info("Current Dexie data backed up successfully");
   } catch (backupError) {

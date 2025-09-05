@@ -11,13 +11,20 @@ const InsightsPanel = ({ forecastInsights, insights }) => {
         </div>
         <div>
           <h3 className="font-black text-black text-base mb-2">
-            <span className="text-lg">K</span>EY <span className="text-lg">I</span>NSIGHTS
+            <span className="text-lg">K</span>EY{" "}
+            <span className="text-lg">I</span>NSIGHTS
           </h3>
           <ul className="space-y-2 text-sm text-purple-900">
             <li>
               • Your spending trend is currently{" "}
-              <strong className="text-black">{forecastInsights.trend.toUpperCase()}</strong> with{" "}
-              <strong className="text-black">{forecastInsights.confidence}%</strong> confidence
+              <strong className="text-black">
+                {forecastInsights.trend.toUpperCase()}
+              </strong>{" "}
+              with{" "}
+              <strong className="text-black">
+                {forecastInsights.confidence}%
+              </strong>{" "}
+              confidence
             </li>
             <li>
               • Seasonal analysis shows highest spending in{" "}

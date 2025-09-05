@@ -14,7 +14,7 @@
 
 ## Branch Strategy
 
-- **feature/* → milestone-X.Y**: Individual features
+- **feature/\* → milestone-X.Y**: Individual features
 - **milestone-X.Y → develop**: Complete milestones only
 - **develop → main**: Production releases only
 
@@ -53,15 +53,16 @@ Key components to use:
 - **BillModalHeader/BillFormFields**: For bill modal components
 
 **Design Standards:**
+
 - **Hard Black Borders**: Use `border border-white/20 ring-1 ring-gray-800/10` on all major UI components
 - **Main Container Purple Tint**: Use `rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm` for page containers
-- **Typography Hierarchy**: 
+- **Typography Hierarchy**:
   - Important headers: `font-black text-black text-base` with `text-lg` first letters (ALL CAPS pattern)
   - Subtext/descriptions: `text-purple-900` for branded consistency
   - Colored text borders: Use comprehensive text-shadow for visibility against complex backgrounds
   - Perfect justification: `textAlign: 'justify', textAlignLast: 'justify'` for formal content
 - **Button Standards**: All buttons must have `border-2 border-black` for consistent visual weight
-- **Background Patterns**: 
+- **Background Patterns**:
   - Textured patterns: Radial gradient dots with `opacity-10` overlay for sophisticated backgrounds
   - Heavy blur overlays: `backdrop-blur-3xl` with colored backgrounds for modal focus
 - **Glassmorphism Styling**: Apply `.glassmorphism rounded-lg` with proper borders and shadows
@@ -76,6 +77,7 @@ Never create custom implementations when shared components exist.
 **COMPREHENSIVE METHODOLOGY** - See [docs/Component-Refactoring-Standards.md](docs/Component-Refactoring-Standards.md) for complete process
 
 **7-Phase Proven Process:**
+
 1. **Analysis & Planning**: Size assessment, visual documentation, extraction strategy
 2. **UI/Logic Separation**: Custom hooks, component extraction, utility functions
 3. **UI Standards Compliance**: Main containers, typography, buttons, shared components
@@ -84,7 +86,8 @@ Never create custom implementations when shared components exist.
 6. **Visual Preservation**: Pixel-perfect maintenance, responsive behavior, animations
 7. **Quality Assurance**: Pre/during/post checklists, success metrics
 
-**Proven Results:** 
+**Proven Results:**
+
 - **71% average code reduction** across 5 major components
 - **100% visual preservation** (pixel-perfect maintenance)
 - **88% record reduction** achieved (TrendAnalysisCharts: 457→55 lines)

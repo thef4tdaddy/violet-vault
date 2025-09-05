@@ -9,18 +9,21 @@ This document outlines the proven methodology for refactoring large components (
 ## 🎯 **Phase 1: Analysis & Planning**
 
 ### 1.1 Component Assessment
+
 - **Size Analysis**: Identify components over 400 lines (ESLint errors) or 300+ lines (warnings)
 - **Complexity Review**: Identify mixed UI/logic responsibilities
 - **Dependencies Mapping**: Document external hooks, services, and utilities used
 - **UI Standards Audit**: Check compliance with established design system
 
 ### 1.2 Visual Documentation
+
 - **Screenshot Current State**: Capture pixel-perfect reference of existing UI
 - **Interaction Flow**: Document all user interactions and state changes
 - **Responsive Behavior**: Note mobile/desktop layout differences
 - **Edge Cases**: Document error states, loading states, empty states
 
 ### 1.3 Extraction Strategy
+
 - **UI Components**: Identify reusable UI sections for extraction
 - **Business Logic**: Identify computational logic for custom hook extraction
 - **Shared Utilities**: Look for opportunities to use/create shared utility functions
@@ -31,6 +34,7 @@ This document outlines the proven methodology for refactoring large components (
 ## 🏗️ **Phase 2: UI/Logic Separation**
 
 ### 2.1 Custom Hook Creation
+
 ```javascript
 // Pattern: Extract all business logic to custom hooks
 // File: hooks/[domain]/use[ComponentName].js
@@ -38,30 +42,30 @@ This document outlines the proven methodology for refactoring large components (
 export const use[ComponentName] = (initialProps) => {
   // State management
   const [localState, setLocalState] = useState(initialValue);
-  
+
   // External data hooks
   const { data, isLoading } = useExternalData();
-  
+
   // Complex calculations
   const computedValues = useMemo(() => {
     return calculateComplexLogic(data);
   }, [data]);
-  
+
   // Event handlers
   const handleUserAction = useCallback((params) => {
     // Business logic here
   }, [dependencies]);
-  
+
   // Return all state and handlers
   return {
     // Data
     data,
     computedValues,
     isLoading,
-    
+
     // State
     localState,
-    
+
     // Actions
     handleUserAction,
     setLocalState,
@@ -72,6 +76,7 @@ export const use[ComponentName] = (initialProps) => {
 ### 2.2 Component Extraction Patterns
 
 #### **Modal Components Pattern**
+
 ```javascript
 // Original: LargeModal.jsx (400+ lines)
 // Extract to:
@@ -80,7 +85,8 @@ export const use[ComponentName] = (initialProps) => {
 const ModalHeader = ({ title, onClose, editLock }) => (
   <div className="flex items-center justify-between p-4 border-b-2 border-black">
     <h2 className="font-black text-black text-base">
-      <span className="text-lg">{title[0]}</span>{title.slice(1).toUpperCase()}
+      <span className="text-lg">{title[0]}</span>
+      {title.slice(1).toUpperCase()}
     </h2>
     {editLock && <EditLockIndicator {...editLock} />}
     <button onClick={onClose} className="p-2 border-2 border-black rounded-lg">
@@ -89,15 +95,14 @@ const ModalHeader = ({ title, onClose, editLock }) => (
   </div>
 );
 
-// components/[domain]/[ModalName]Fields.jsx  
+// components/[domain]/[ModalName]Fields.jsx
 const ModalFields = ({ formData, onChange, validation }) => (
-  <div className="p-4 space-y-4">
-    {/* Form fields with proper styling */}
-  </div>
+  <div className="p-4 space-y-4">{/* Form fields with proper styling */}</div>
 );
 ```
 
 #### **Dashboard Components Pattern**
+
 ```javascript
 // Original: LargeDashboard.jsx (400+ lines)
 // Extract to:
@@ -106,9 +111,12 @@ const ModalFields = ({ formData, onChange, validation }) => (
 const DashboardHeader = ({ title, actions, summary }) => (
   <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm">
     <h1 className="font-black text-black text-base mb-4">
-      <span className="text-lg">{title[0]}</span>{title.slice(1).toUpperCase()}
+      <span className="text-lg">{title[0]}</span>
+      {title.slice(1).toUpperCase()}
     </h1>
-    {summary && <div className="grid grid-cols-1 md:grid-cols-3 gap-4">{summary}</div>}
+    {summary && (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">{summary}</div>
+    )}
     {actions && <div className="flex gap-2 mt-4">{actions}</div>}
   </div>
 );
@@ -117,7 +125,8 @@ const DashboardHeader = ({ title, actions, summary }) => (
 const DashboardSection = ({ title, children, loading }) => (
   <div className="rounded-xl p-6 border-2 border-black bg-white/90 backdrop-blur-sm shadow-xl">
     <h3 className="font-black text-black text-base mb-4">
-      <span className="text-lg">{title[0]}</span>{title.slice(1).toUpperCase()}
+      <span className="text-lg">{title[0]}</span>
+      {title.slice(1).toUpperCase()}
     </h3>
     {loading ? <LoadingSpinner /> : children}
   </div>
@@ -125,6 +134,7 @@ const DashboardSection = ({ title, children, loading }) => (
 ```
 
 ### 2.3 Utility Function Extraction
+
 ```javascript
 // utils/[domain]/[featureName]Helpers.js
 
@@ -137,7 +147,7 @@ export const calculateMetrics = (data) => {
 };
 
 /**
- * Validation functions  
+ * Validation functions
  */
 export const validateFormData = (formData) => {
   const errors = [];
@@ -150,9 +160,12 @@ export const validateFormData = (formData) => {
  */
 export const formatDisplayValue = (value, type) => {
   switch (type) {
-    case 'currency': return `$${value.toLocaleString()}`;
-    case 'percent': return `${value > 0 ? '+' : ''}${value}%`;
-    default: return value;
+    case "currency":
+      return `$${value.toLocaleString()}`;
+    case "percent":
+      return `${value > 0 ? "+" : ""}${value}%`;
+    default:
+      return value;
   }
 };
 
@@ -161,14 +174,14 @@ export const formatDisplayValue = (value, type) => {
  */
 export const UI_CONSTANTS = {
   COLORS: {
-    PRIMARY: '#8B5CF6',
-    SUCCESS: '#10B981', 
-    ERROR: '#EF4444',
+    PRIMARY: "#8B5CF6",
+    SUCCESS: "#10B981",
+    ERROR: "#EF4444",
   },
   BREAKPOINTS: {
-    MOBILE: '768px',
-    TABLET: '1024px',
-  }
+    MOBILE: "768px",
+    TABLET: "1024px",
+  },
 };
 ```
 
@@ -177,13 +190,14 @@ export const UI_CONSTANTS = {
 ## 🎨 **Phase 3: UI Standards Compliance**
 
 ### 3.1 Main Container Standards
+
 ```javascript
 // Main page containers
 <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6">
   {/* Page content */}
 </div>
 
-// Card/section containers  
+// Card/section containers
 <div className="rounded-xl p-6 border-2 border-black bg-white/90 backdrop-blur-sm shadow-xl">
   {/* Section content */}
 </div>
@@ -195,6 +209,7 @@ export const UI_CONSTANTS = {
 ```
 
 ### 3.2 Typography Standards
+
 ```javascript
 // Primary headers (ALL CAPS pattern)
 <h1 className="font-black text-black text-base">
@@ -214,43 +229,45 @@ export const UI_CONSTANTS = {
 ```
 
 ### 3.3 Button Standards
+
 ```javascript
 // Primary action buttons
 <button className="px-4 py-2 border-2 border-black bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg font-bold shadow-md hover:shadow-lg transition-all">
   Action Text
 </button>
 
-// Secondary buttons  
+// Secondary buttons
 <button className="px-4 py-2 border-2 border-black bg-white/60 backdrop-blur-sm text-gray-700 rounded-lg font-bold shadow-md hover:bg-white/80 transition-all">
   Secondary Action
 </button>
 
 // Danger buttons
 <button className="px-4 py-2 border-2 border-black bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg font-bold shadow-md hover:from-red-600 hover:to-orange-600 transition-all">
-  Delete Action  
+  Delete Action
 </button>
 ```
 
 ### 3.4 Shared Component Integration
+
 ```javascript
 // Always use standardized shared components
-import StandardTabs from '../ui/StandardTabs';
-import StandardFilters from '../ui/StandardFilters'; 
-import PageSummaryCard from '../ui/PageSummaryCard';
-import EditLockIndicator from '../ui/EditLockIndicator';
-import { useConfirm } from '../ui/ConfirmModal';
-import UniversalConnectionManager from '../ui/UniversalConnectionManager';
+import StandardTabs from "../ui/StandardTabs";
+import StandardFilters from "../ui/StandardFilters";
+import PageSummaryCard from "../ui/PageSummaryCard";
+import EditLockIndicator from "../ui/EditLockIndicator";
+import { useConfirm } from "../ui/ConfirmModal";
+import UniversalConnectionManager from "../ui/UniversalConnectionManager";
 
 // Implementation
 const { confirm } = useConfirm();
 
 const handleDelete = async () => {
   const confirmed = await confirm({
-    title: 'Confirm Deletion',
-    message: 'Are you sure you want to delete this item?',
-    type: 'danger'
+    title: "Confirm Deletion",
+    message: "Are you sure you want to delete this item?",
+    type: "danger",
   });
-  
+
   if (confirmed) {
     // Perform deletion
   }
@@ -262,6 +279,7 @@ const handleDelete = async () => {
 ## 🧪 **Phase 4: Comprehensive Test Coverage**
 
 ### 4.1 Custom Hook Testing
+
 ```javascript
 // hooks/[domain]/__tests__/use[HookName].test.js
 import { renderHook, act, waitFor } from '@testing-library/react';
@@ -272,7 +290,7 @@ const createWrapper = () => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } }
   });
-  
+
   return ({ children }) => (
     <QueryClientProvider client={queryClient}>
       {children}
@@ -289,7 +307,7 @@ describe('use[HookName]', () => {
     const { result } = renderHook(() => use[HookName](), {
       wrapper: createWrapper()
     });
-    
+
     expect(result.current.data).toEqual([]);
     expect(result.current.isLoading).toBe(true);
   });
@@ -318,71 +336,73 @@ describe('use[HookName]', () => {
 });
 ```
 
-### 4.2 Utility Function Testing  
+### 4.2 Utility Function Testing
+
 ```javascript
 // utils/[domain]/__tests__/[utility].test.js
 import {
   calculateMetrics,
   validateFormData,
-  formatDisplayValue
-} from '../[utility]';
+  formatDisplayValue,
+} from "../[utility]";
 
-describe('[utility] helpers', () => {
-  describe('calculateMetrics', () => {
-    it('should calculate correct metrics for valid data', () => {
+describe("[utility] helpers", () => {
+  describe("calculateMetrics", () => {
+    it("should calculate correct metrics for valid data", () => {
       const input = [{ amount: 100 }, { amount: 200 }];
       const result = calculateMetrics(input);
-      
+
       expect(result.total).toBe(300);
       expect(result.average).toBe(150);
     });
 
-    it('should handle empty data gracefully', () => {
+    it("should handle empty data gracefully", () => {
       const result = calculateMetrics([]);
-      
+
       expect(result.total).toBe(0);
       expect(result.average).toBe(0);
     });
 
-    it('should handle invalid data gracefully', () => {
+    it("should handle invalid data gracefully", () => {
       const result = calculateMetrics(null);
-      
+
       expect(result).toEqual({ total: 0, average: 0, error: true });
     });
   });
 
-  describe('validateFormData', () => {
-    it('should validate correct form data', () => {
-      const validData = { name: 'Test', amount: 100 };
+  describe("validateFormData", () => {
+    it("should validate correct form data", () => {
+      const validData = { name: "Test", amount: 100 };
       const result = validateFormData(validData);
-      
+
       expect(result.isValid).toBe(true);
       expect(result.errors).toEqual([]);
     });
 
-    it('should return errors for invalid data', () => {
-      const invalidData = { name: '', amount: -1 };
+    it("should return errors for invalid data", () => {
+      const invalidData = { name: "", amount: -1 };
       const result = validateFormData(invalidData);
-      
+
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain('Name is required');
+      expect(result.errors).toContain("Name is required");
     });
   });
 
-  describe('formatDisplayValue', () => {
-    it('should format currency correctly', () => {
-      expect(formatDisplayValue(1234, 'currency')).toBe('$1,234');
+  describe("formatDisplayValue", () => {
+    it("should format currency correctly", () => {
+      expect(formatDisplayValue(1234, "currency")).toBe("$1,234");
     });
 
-    it('should format percentages correctly', () => {
-      expect(formatDisplayValue(5, 'percent')).toBe('+5%');
-      expect(formatDisplayValue(-5, 'percent')).toBe('-5%');
+    it("should format percentages correctly", () => {
+      expect(formatDisplayValue(5, "percent")).toBe("+5%");
+      expect(formatDisplayValue(-5, "percent")).toBe("-5%");
     });
   });
 });
 ```
 
 ### 4.3 Component Testing Strategy
+
 ```javascript
 // components/[domain]/__tests__/[Component].test.jsx
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
@@ -402,7 +422,7 @@ const createWrapper = () => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } }
   });
-  
+
   return ({ children }) => (
     <QueryClientProvider client={queryClient}>
       {children}
@@ -413,7 +433,7 @@ const createWrapper = () => {
 describe('[Component]', () => {
   it('should render correctly with data', () => {
     render(<[Component] />, { wrapper: createWrapper() });
-    
+
     expect(screen.getByText('Expected Content')).toBeInTheDocument();
   });
 
@@ -426,9 +446,9 @@ describe('[Component]', () => {
     });
 
     render(<[Component] />, { wrapper: createWrapper() });
-    
+
     fireEvent.click(screen.getByRole('button'));
-    
+
     expect(mockHandleAction).toHaveBeenCalled();
   });
 
@@ -440,7 +460,7 @@ describe('[Component]', () => {
     });
 
     render(<[Component] />, { wrapper: createWrapper() });
-    
+
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 });
@@ -451,6 +471,7 @@ describe('[Component]', () => {
 ## 🔍 **Phase 5: ESLint Compliance**
 
 ### 5.1 Function Size Limits
+
 ```javascript
 // Break down large functions into smaller, focused functions
 // Max 75 lines per function (ESLint max-lines-per-function)
@@ -460,13 +481,13 @@ const processLargeOperation = (data) => {
   // 100+ lines of mixed logic
 };
 
-// ✅ Good: Broken into focused helper functions  
+// ✅ Good: Broken into focused helper functions
 const validateInput = (data) => {
   // Validation logic only (10-15 lines)
 };
 
 const transformData = (data) => {
-  // Transformation logic only (10-15 lines)  
+  // Transformation logic only (10-15 lines)
 };
 
 const calculateResults = (data) => {
@@ -476,13 +497,14 @@ const calculateResults = (data) => {
 const processLargeOperation = (data) => {
   const validationResult = validateInput(data);
   if (!validationResult.isValid) return validationResult;
-  
+
   const transformedData = transformData(data);
   return calculateResults(transformedData);
 };
 ```
 
 ### 5.2 Unused Variables
+
 ```javascript
 // Use underscore prefix for intentionally unused parameters
 // ❌ Bad: ESLint no-unused-vars warning
@@ -499,6 +521,7 @@ const useHook = (data, _timeFilter) => {
 ```
 
 ### 5.3 Component Complexity
+
 ```javascript
 // Keep components focused on single responsibility
 // Extract complex logic to custom hooks
@@ -509,26 +532,22 @@ const ComplexComponent = () => {
   const [state1, setState1] = useState();
   const [state2, setState2] = useState();
   // ... many more state variables
-  
+
   const handleAction1 = () => {
     // Complex logic
   };
-  
+
   const handleAction2 = () => {
-    // More complex logic  
+    // More complex logic
   };
-  
-  return (
-    <div>
-      {/* Large JSX with mixed concerns */}
-    </div>
-  );
+
+  return <div>{/* Large JSX with mixed concerns */}</div>;
 };
 
 // ✅ Good: Separated concerns
 const ComplexComponent = () => {
   const hookData = useComplexLogic();
-  
+
   return (
     <div>
       <ComponentHeader {...hookData.headerProps} />
@@ -544,6 +563,7 @@ const ComplexComponent = () => {
 ## 📏 **Phase 6: Visual Preservation**
 
 ### 6.1 Pixel-Perfect Maintenance
+
 ```javascript
 // Document exact current styling
 // Before refactoring, capture:
@@ -566,6 +586,7 @@ const ComplexComponent = () => {
 ```
 
 ### 6.2 Responsive Behavior
+
 ```javascript
 // Maintain exact responsive breakpoints and behavior
 // Document grid layouts, flex behavior, and breakpoint changes
@@ -578,6 +599,7 @@ const ResponsiveComponent = () => (
 ```
 
 ### 6.3 Animation and Transitions
+
 ```javascript
 // Preserve existing animations and micro-interactions
 // Document transition durations and easing functions
@@ -594,6 +616,7 @@ const AnimatedComponent = () => (
 ## 📋 **Phase 7: Quality Assurance Checklist**
 
 ### 7.1 Pre-Refactor Checklist
+
 - [ ] Component identified (400+ lines)
 - [ ] Current functionality documented
 - [ ] Visual appearance captured (screenshots)
@@ -601,7 +624,8 @@ const AnimatedComponent = () => (
 - [ ] Test strategy planned
 - [ ] UI standards compliance plan created
 
-### 7.2 During Refactor Checklist  
+### 7.2 During Refactor Checklist
+
 - [ ] Custom hook created with all business logic
 - [ ] UI components extracted with single responsibilities
 - [ ] Shared utilities identified/created
@@ -610,17 +634,19 @@ const AnimatedComponent = () => (
 - [ ] All interactions maintained
 
 ### 7.3 Post-Refactor Checklist
+
 - [ ] Comprehensive tests written (hooks, utilities, components)
 - [ ] ESLint warnings/errors resolved
 - [ ] Visual regression testing passed
-- [ ] Functionality regression testing passed  
+- [ ] Functionality regression testing passed
 - [ ] Performance impact assessed
 - [ ] Documentation updated
 
 ### 7.4 Success Metrics
+
 - [ ] **50%+ code reduction** achieved
 - [ ] **Zero visual changes** (pixel-perfect preservation)
-- [ ] **100% functionality preservation** 
+- [ ] **100% functionality preservation**
 - [ ] **Full UI standards compliance**
 - [ ] **90%+ test coverage** for extracted code
 - [ ] **Zero ESLint errors/warnings** remaining
@@ -631,15 +657,16 @@ const AnimatedComponent = () => (
 
 ### Refactoring Success Examples
 
-| Component | Before | After | Reduction | Visual Changes | Test Coverage |
-|-----------|--------|-------|-----------|----------------|---------------|
-| AddBillModal | 492 | 172 | 65% | Zero | ✅ Complete |
-| AddDebtModal | 473 | 74 | 84% | Zero | ✅ Complete |
-| TransactionForm | 477 | 176 | 63% | Zero | ✅ Complete |
-| TransactionLedger | 403 | 173 | 57% | Zero | ✅ Complete |
-| **TrendAnalysisCharts** | **457** | **55** | **88%** | **Zero** | ✅ **Complete** |
+| Component               | Before  | After  | Reduction | Visual Changes | Test Coverage   |
+| ----------------------- | ------- | ------ | --------- | -------------- | --------------- |
+| AddBillModal            | 492     | 172    | 65%       | Zero           | ✅ Complete     |
+| AddDebtModal            | 473     | 74     | 84%       | Zero           | ✅ Complete     |
+| TransactionForm         | 477     | 176    | 63%       | Zero           | ✅ Complete     |
+| TransactionLedger       | 403     | 173    | 57%       | Zero           | ✅ Complete     |
+| **TrendAnalysisCharts** | **457** | **55** | **88%**   | **Zero**       | ✅ **Complete** |
 
 **Average Results:**
+
 - **71% code reduction**
 - **100% visual preservation**
 - **100% functionality preservation**
@@ -651,14 +678,16 @@ const AnimatedComponent = () => (
 ## 🔄 **Continuous Improvement**
 
 ### Automated Quality Gates
+
 - **ESLint**: Graduated file size enforcement (300+/400+/500+ lines)
 - **Prettier**: Automated formatting on commit
 - **Testing**: Comprehensive coverage requirements
 - **Visual Regression**: Automated screenshot comparison (when available)
 
 ### Process Evolution
+
 - **Pattern Recognition**: Document new patterns as they emerge
-- **Shared Component Library**: Continuously expand reusable components  
+- **Shared Component Library**: Continuously expand reusable components
 - **Utility Functions**: Build comprehensive utility libraries
 - **Performance Optimization**: Monitor and optimize extracted components
 

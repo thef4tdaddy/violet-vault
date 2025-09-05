@@ -70,7 +70,9 @@ class RollbackManager {
     console.log(commits);
 
     // Get the previous commit hash
-    const { stdout: lastCommit } = await execAsync('git log --format="%H" -n 2');
+    const { stdout: lastCommit } = await execAsync(
+      'git log --format="%H" -n 2',
+    );
     const commitHashes = lastCommit.trim().split("\n");
     const previousCommit = commitHashes[1];
 
@@ -91,14 +93,18 @@ class RollbackManager {
 
     // List available tags
     try {
-      const { stdout: tags } = await execAsync("git tag -l --sort=-version:refname");
+      const { stdout: tags } = await execAsync(
+        "git tag -l --sort=-version:refname",
+      );
       const tagList = tags
         .trim()
         .split("\n")
         .filter((tag) => tag);
 
       if (tagList.length === 0) {
-        throw new Error("No tags found. Create release tags for easier rollback.");
+        throw new Error(
+          "No tags found. Create release tags for easier rollback.",
+        );
       }
 
       console.log("\nAvailable tags:");
@@ -150,7 +156,9 @@ class RollbackManager {
     console.log("\nAvailable backups:");
     backups.slice(0, 5).forEach((backup, index) => {
       const stats = fs.statSync(path.join(this.backupDir, backup));
-      console.log(`  ${index + 1}. ${backup} (${stats.mtime.toLocaleDateString()})`);
+      console.log(
+        `  ${index + 1}. ${backup} (${stats.mtime.toLocaleDateString()})`,
+      );
     });
 
     console.log("\n📋 MANUAL DATA ROLLBACK REQUIRED:");
@@ -174,7 +182,9 @@ class RollbackManager {
     }
 
     // Get current commit info
-    const { stdout: commitInfo } = await execAsync('git log --format="%H %s" -n 1');
+    const { stdout: commitInfo } = await execAsync(
+      'git log --format="%H %s" -n 1',
+    );
     const currentCommit = commitInfo.trim();
 
     // Create rollback info file
@@ -186,7 +196,10 @@ class RollbackManager {
       canRestoreTo: currentCommit.split(" ")[0],
     };
 
-    const rollbackFile = path.join(this.rollbackDir, `rollback-${this.timestamp}.json`);
+    const rollbackFile = path.join(
+      this.rollbackDir,
+      `rollback-${this.timestamp}.json`,
+    );
     fs.writeFileSync(rollbackFile, JSON.stringify(rollbackInfo, null, 2));
 
     console.log(`✅ Rollback backup created: ${rollbackFile}`);
@@ -208,7 +221,9 @@ class RollbackManager {
     // Git tags
     console.log("\n🏷️  Recent Tags:");
     try {
-      const { stdout: tags } = await execAsync("git tag -l --sort=-version:refname");
+      const { stdout: tags } = await execAsync(
+        "git tag -l --sort=-version:refname",
+      );
       const tagList = tags
         .trim()
         .split("\n")
@@ -256,10 +271,10 @@ class RollbackManager {
         rollbacks.slice(0, 3).forEach((rollback) => {
           try {
             const rollbackData = JSON.parse(
-              fs.readFileSync(path.join(this.rollbackDir, rollback), "utf8")
+              fs.readFileSync(path.join(this.rollbackDir, rollback), "utf8"),
             );
             console.log(
-              `  ${rollback} (${rollbackData.currentCommit.split(" ").slice(1).join(" ")})`
+              `  ${rollback} (${rollbackData.currentCommit.split(" ").slice(1).join(" ")})`,
             );
           } catch {
             console.log(`  ${rollback} (details unavailable)`);
@@ -283,9 +298,13 @@ if (!action) {
   console.log("================================");
   console.log("\nUsage:");
   console.log("  node scripts/rollback.js list     # List rollback options");
-  console.log("  node scripts/rollback.js commit   # Rollback to previous commit");
+  console.log(
+    "  node scripts/rollback.js commit   # Rollback to previous commit",
+  );
   console.log("  node scripts/rollback.js tag      # Rollback to latest tag");
-  console.log("  node scripts/rollback.js backup   # Rollback from data backup");
+  console.log(
+    "  node scripts/rollback.js backup   # Rollback from data backup",
+  );
   process.exit(0);
 }
 

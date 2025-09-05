@@ -7,7 +7,10 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { formatCurrency, getCategoryChartColor } from "../../../utils/analytics/trendHelpers";
+import {
+  formatCurrency,
+  getCategoryChartColor,
+} from "../../../utils/analytics/trendHelpers";
 
 const CategoryTrendsSection = ({ categoryTrends }) => {
   const tooltipFormatter = (value) => [formatCurrency(value), "Amount"];
@@ -15,8 +18,8 @@ const CategoryTrendsSection = ({ categoryTrends }) => {
   return (
     <div className="rounded-xl p-6 border-2 border-black bg-white/90 backdrop-blur-sm shadow-xl">
       <h3 className="font-black text-black text-base mb-4">
-        <span className="text-lg">T</span>OP <span className="text-lg">C</span>ATEGORY{" "}
-        <span className="text-lg">T</span>RENDS
+        <span className="text-lg">T</span>OP <span className="text-lg">C</span>
+        ATEGORY <span className="text-lg">T</span>RENDS
       </h3>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {categoryTrends.map((category, index) => (

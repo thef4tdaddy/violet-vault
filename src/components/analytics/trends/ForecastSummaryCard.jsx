@@ -1,6 +1,10 @@
 import React from "react";
 import { TrendingUp, TrendingDown, BarChart3 } from "lucide-react";
-import { formatCurrency, formatPercent, getTrendIconConfig } from "../../../utils/analytics/trendHelpers";
+import {
+  formatCurrency,
+  formatPercent,
+  getTrendIconConfig,
+} from "../../../utils/analytics/trendHelpers";
 
 const ForecastSummaryCard = ({ forecastInsights }) => {
   const iconConfig = getTrendIconConfig(forecastInsights.trend);
@@ -21,7 +25,8 @@ const ForecastSummaryCard = ({ forecastInsights }) => {
       <div className="flex items-start justify-between">
         <div>
           <h3 className="font-black text-black text-base">
-            <span className="text-lg">S</span>PENDING <span className="text-lg">F</span>ORECAST
+            <span className="text-lg">S</span>PENDING{" "}
+            <span className="text-lg">F</span>ORECAST
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
             <div>
@@ -50,7 +55,9 @@ const ForecastSummaryCard = ({ forecastInsights }) => {
             </div>
           </div>
         </div>
-        <div className={`p-3 rounded-full border-2 border-black ${iconConfig.bgClass}`}>
+        <div
+          className={`p-3 rounded-full border-2 border-black ${iconConfig.bgClass}`}
+        >
           {renderTrendIcon()}
         </div>
       </div>

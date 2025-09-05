@@ -5,7 +5,10 @@ const clearTable = async (table) => {
   try {
     await table.clear();
   } catch (error) {
-    logger.warn(`Standard clear failed for ${table.name}, using individual deletion`, error);
+    logger.warn(
+      `Standard clear failed for ${table.name}, using individual deletion`,
+      error,
+    );
     await table.toCollection().delete();
   }
 };
@@ -33,16 +36,16 @@ export const clearAllDexieData = async () => {
       await clearTable(budgetDb.paycheckHistory);
       await clearTable(budgetDb.auditLog);
       await clearTable(budgetDb.budget);
-    }
+    },
   );
   logger.info("All Dexie data cleared successfully");
 };
 
 const bulkAddIfPresent = async (table, data) => {
-    if (data?.length) {
-        await table.bulkAdd(data);
-    }
-}
+  if (data?.length) {
+    await table.bulkAdd(data);
+  }
+};
 
 export const importDataToDexie = async (data) => {
   logger.info("Importing data to Dexie");
@@ -76,7 +79,7 @@ export const importDataToDexie = async (data) => {
         supplementalAccounts: data.supplementalAccounts || [],
         lastUpdated: new Date().toISOString(),
       });
-    }
+    },
   );
   logger.info("Data imported to Dexie successfully");
 };

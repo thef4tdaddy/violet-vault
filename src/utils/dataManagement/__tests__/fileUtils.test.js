@@ -1,21 +1,21 @@
-import { readFileContent } from '../fileUtils';
-import { vi } from 'vitest';
+import { readFileContent } from "../fileUtils";
+import { vi } from "vitest";
 
-describe('fileUtils', () => {
-  describe('readFileContent', () => {
-    it('should read file content successfully', async () => {
-      const file = new Blob(['test content'], { type: 'text/plain' });
+describe("fileUtils", () => {
+  describe("readFileContent", () => {
+    it("should read file content successfully", async () => {
+      const file = new Blob(["test content"], { type: "text/plain" });
       const content = await readFileContent(file);
-      expect(content).toBe('test content');
+      expect(content).toBe("test content");
     });
 
-    it('should reject if no file is provided', async () => {
-      await expect(readFileContent(null)).rejects.toThrow('No file provided.');
+    it("should reject if no file is provided", async () => {
+      await expect(readFileContent(null)).rejects.toThrow("No file provided.");
     });
 
-    it('should handle FileReader errors', async () => {
-      const file = new Blob(['test content'], { type: 'text/plain' });
-      const error = new Error('Test error');
+    it("should handle FileReader errors", async () => {
+      const file = new Blob(["test content"], { type: "text/plain" });
+      const error = new Error("Test error");
 
       const reader = {
         readAsText: vi.fn(),
@@ -23,12 +23,12 @@ describe('fileUtils', () => {
         onerror: vi.fn(),
       };
 
-      vi.spyOn(window, 'FileReader').mockImplementation(() => reader);
-      
+      vi.spyOn(window, "FileReader").mockImplementation(() => reader);
+
       const promise = readFileContent(file);
       reader.onerror(error);
 
-      await expect(promise).rejects.toThrow('Failed to read file.');
+      await expect(promise).rejects.toThrow("Failed to read file.");
     });
   });
 });

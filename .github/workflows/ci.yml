@@ -3,12 +3,12 @@ name: CI
 on:
   # Run hourly for automated formatting and linting
   schedule:
-    - cron: '0 * * * *' # Every hour at minute 0
-  
+    - cron: "0 * * * *" # Every hour at minute 0
+
   # Keep PR checks for essential validation (without auto-formatting)
   pull_request:
     branches: [main]
-  
+
   # Manual trigger option
   workflow_dispatch:
 

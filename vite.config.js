@@ -17,7 +17,9 @@ const getGitInfo = () => {
     }).trim();
 
     // Get commit hash (short)
-    const commitHash = execSync("git rev-parse HEAD", { encoding: "utf8" }).trim().substring(0, 7);
+    const commitHash = execSync("git rev-parse HEAD", { encoding: "utf8" })
+      .trim()
+      .substring(0, 7);
 
     // Get commit author date (alternative format)
     const authorDate = execSync("git log -1 --format=%aI", {
@@ -76,11 +78,21 @@ export default defineConfig(() => {
       global: {},
       // Inject git information as environment variables
       "import.meta.env.VITE_GIT_BRANCH": JSON.stringify(gitInfo.branch),
-      "import.meta.env.VITE_GIT_COMMIT_DATE": JSON.stringify(gitInfo.commitDate),
-      "import.meta.env.VITE_GIT_AUTHOR_DATE": JSON.stringify(gitInfo.authorDate),
-      "import.meta.env.VITE_GIT_COMMIT_HASH": JSON.stringify(gitInfo.commitHash),
-      "import.meta.env.VITE_GIT_COMMIT_MESSAGE": JSON.stringify(gitInfo.commitMessage),
-      "import.meta.env.VITE_BUILD_TIME": JSON.stringify(new Date().toISOString()),
+      "import.meta.env.VITE_GIT_COMMIT_DATE": JSON.stringify(
+        gitInfo.commitDate,
+      ),
+      "import.meta.env.VITE_GIT_AUTHOR_DATE": JSON.stringify(
+        gitInfo.authorDate,
+      ),
+      "import.meta.env.VITE_GIT_COMMIT_HASH": JSON.stringify(
+        gitInfo.commitHash,
+      ),
+      "import.meta.env.VITE_GIT_COMMIT_MESSAGE": JSON.stringify(
+        gitInfo.commitMessage,
+      ),
+      "import.meta.env.VITE_BUILD_TIME": JSON.stringify(
+        new Date().toISOString(),
+      ),
     },
     build: {
       chunkSizeWarningLimit: 3000, // Increased from 1000 to 3000 to accommodate large bundles
