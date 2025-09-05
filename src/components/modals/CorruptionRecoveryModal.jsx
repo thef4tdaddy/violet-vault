@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { ConfirmModal } from "../shared/ConfirmModal";
-import { useToastHelpers } from "../../hooks/ui/useToastHelpers";
-import { useDataManagement } from "../../hooks/common/useDataManagement";
+import ConfirmModal from "../ui/ConfirmModal";
+import { useToastHelpers } from "../../utils/common/toastHelpers";
+import useDataManagement from "../../hooks/common/useDataManagement";
 import logger from "../../utils/common/logger";
 
 /**
