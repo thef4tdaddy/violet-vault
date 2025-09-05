@@ -2,17 +2,14 @@ import React, { lazy, Suspense } from "react";
 import { X } from "lucide-react";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import SettingsLayout from "./layout/SettingsLayout";
-import GeneralSettingsSection from "./sections/GeneralSettingsSection";
-import AccountSettingsSection from "./sections/AccountSettingsSection";
-import SecuritySettingsSection from "./sections/SecuritySettingsSection";
-import DataManagementSection from "./sections/DataManagementSection";
 import ResetConfirmModal from "./modals/ResetConfirmModal";
+import { useSettingsModals } from "../../hooks/common/useModalManager";
 import {
-  useSettingsDashboardUI,
   useCloudSyncManager,
   useSettingsSections,
   useSettingsActions,
 } from "../../hooks/settings/useSettingsDashboard";
+import useSettingsSectionRenderer from "../../hooks/settings/useSettingsSectionRenderer";
 
 // Lazy load heavy components
 const ChangePasswordModal = lazy(() => import("../auth/ChangePasswordModal"));
@@ -42,15 +39,14 @@ const SettingsDashboard = ({
   isLocalOnlyMode = false,
   securityManager,
 }) => {
+  // Use the reusable modal manager instead of the old hook
   const {
-    activeSection,
     showPasswordModal,
     showActivityFeed,
     showLocalOnlySettings,
     showSecuritySettings,
     showResetConfirm,
     showEnvelopeChecker,
-    handleSectionChange,
     openPasswordModal,
     closePasswordModal,
     openActivityFeed,
@@ -63,7 +59,13 @@ const SettingsDashboard = ({
     closeResetConfirm,
     openEnvelopeChecker,
     closeEnvelopeChecker,
-  } = useSettingsDashboardUI();
+  } = useSettingsModals();
+
+  // Section state management
+  const [activeSection, setActiveSection] = React.useState("general");
+  const handleSectionChange = React.useCallback((sectionId) => {
+    setActiveSection(sectionId);
+  }, []);
 
   const {
     cloudSyncEnabled,
@@ -76,54 +78,34 @@ const SettingsDashboard = ({
   const { handleCreateTestHistory, handleResetConfirmAction } =
     useSettingsActions();
 
-  const renderSectionContent = () => {
-    switch (activeSection) {
-      case "general":
-        return (
-          <GeneralSettingsSection
-            isLocalOnlyMode={isLocalOnlyMode}
-            cloudSyncEnabled={cloudSyncEnabled}
-            isSyncing={isSyncing}
-            onOpenLocalOnlySettings={openLocalOnlySettings}
-            onToggleCloudSync={handleToggleCloudSync}
-            onManualSync={handleManualSync}
-          />
-        );
+  // Use the extracted section renderer hook
+  const { renderSectionContent } = useSettingsSectionRenderer({
+    // General Settings Props
+    isLocalOnlyMode,
+    cloudSyncEnabled,
+    isSyncing,
+    onOpenLocalOnlySettings: openLocalOnlySettings,
+    onToggleCloudSync: handleToggleCloudSync,
+    onManualSync: handleManualSync,
 
-      case "account":
-        return (
-          <AccountSettingsSection
-            currentUser={currentUser}
-            onOpenPasswordModal={openPasswordModal}
-            onLogout={onLogout}
-            onOpenResetConfirm={openResetConfirm}
-          />
-        );
+    // Account Settings Props
+    currentUser,
+    onOpenPasswordModal: openPasswordModal,
+    onLogout,
+    onOpenResetConfirm: openResetConfirm,
 
-      case "security":
-        return (
-          <SecuritySettingsSection
-            securityManager={securityManager}
-            onOpenSecuritySettings={openSecuritySettings}
-          />
-        );
+    // Security Settings Props
+    securityManager,
+    onOpenSecuritySettings: openSecuritySettings,
 
-      case "data":
-        return (
-          <DataManagementSection
-            onOpenEnvelopeChecker={openEnvelopeChecker}
-            onOpenActivityFeed={openActivityFeed}
-            onCreateTestHistory={handleCreateTestHistory}
-            onExport={onExport}
-            onImport={onImport}
-            onSync={onSync}
-          />
-        );
-
-      default:
-        return null;
-    }
-  };
+    // Data Management Props
+    onOpenEnvelopeChecker: openEnvelopeChecker,
+    onOpenActivityFeed: openActivityFeed,
+    onCreateTestHistory: handleCreateTestHistory,
+    onExport,
+    onImport,
+    onSync,
+  });
 
   return (
     <>
@@ -134,7 +116,7 @@ const SettingsDashboard = ({
         sections={sections}
         onSectionChange={handleSectionChange}
       >
-        {renderSectionContent()}
+        {renderSectionContent(activeSection)}
       </SettingsLayout>
 
       {/* Reset Confirmation Modal */}
