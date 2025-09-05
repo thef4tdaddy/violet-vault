@@ -3,12 +3,12 @@ import { useAnalyticsExport } from "../useAnalyticsExport";
 
 // Mock URL.createObjectURL and related methods
 global.URL = {
-  createObjectURL: jest.fn(() => "mock-url"),
-  revokeObjectURL: jest.fn(),
+  createObjectURL: vi.fn(() => "mock-url"),
+  revokeObjectURL: vi.fn(),
 };
 
 // Mock document.createElement and click
-const mockClick = jest.fn();
+const mockClick = vi.fn();
 const mockLink = {
   href: "",
   download: "",
@@ -17,16 +17,16 @@ const mockLink = {
 };
 
 global.document = {
-  createElement: jest.fn(() => mockLink),
+  createElement: vi.fn(() => mockLink),
   body: {
-    appendChild: jest.fn(),
-    removeChild: jest.fn(),
+    appendChild: vi.fn(),
+    removeChild: vi.fn(),
   },
 };
 
 describe("useAnalyticsExport", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("should export analytics data correctly", () => {

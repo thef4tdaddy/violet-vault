@@ -3,36 +3,36 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useSmartCategoryManager } from "../useSmartCategoryManager";
 
 // Mock dependencies
-jest.mock("../../../services/smartCategoryService", () => ({
+vi.mock("../../../services/smartCategoryService", () => ({
   smartCategoryService: {
-    analyzeCategoryPatterns: jest.fn(),
-    suggestCategories: jest.fn(),
-    applyCategoryMapping: jest.fn(),
-    trainCategoryModel: jest.fn(),
-    getModelAccuracy: jest.fn(),
+    analyzeCategoryPatterns: vi.fn(),
+    suggestCategories: vi.fn(),
+    applyCategoryMapping: vi.fn(),
+    trainCategoryModel: vi.fn(),
+    getModelAccuracy: vi.fn(),
   },
 }));
 
-jest.mock("../../common/useTransactions", () => ({
-  useTransactions: jest.fn(() => ({
+vi.mock("../../common/useTransactions", () => ({
+  useTransactions: vi.fn(() => ({
     transactions: [],
-    updateTransaction: jest.fn(),
+    updateTransaction: vi.fn(),
     isLoading: false,
   })),
 }));
 
-jest.mock("../../budgeting/useEnvelopes", () => ({
-  useEnvelopes: jest.fn(() => ({
+vi.mock("../../budgeting/useEnvelopes", () => ({
+  useEnvelopes: vi.fn(() => ({
     envelopes: [],
     isLoading: false,
   })),
 }));
 
-jest.mock("../../../utils/common/logger", () => ({
+vi.mock("../../../utils/common/logger", () => ({
   default: {
-    error: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
   },
 }));
 
@@ -96,11 +96,11 @@ describe("useSmartCategoryManager", () => {
   ];
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     useTransactions.mockReturnValue({
       transactions: mockTransactions,
-      updateTransaction: jest.fn(),
+      updateTransaction: vi.fn(),
       isLoading: false,
     });
 
@@ -202,7 +202,7 @@ describe("useSmartCategoryManager", () => {
   });
 
   it("should apply selected suggestions", async () => {
-    const mockUpdateTransaction = jest.fn();
+    const mockUpdateTransaction = vi.fn();
     useTransactions.mockReturnValue({
       transactions: mockTransactions,
       updateTransaction: mockUpdateTransaction,
@@ -380,7 +380,7 @@ describe("useSmartCategoryManager", () => {
   it("should handle loading states from dependencies", () => {
     useTransactions.mockReturnValue({
       transactions: [],
-      updateTransaction: jest.fn(),
+      updateTransaction: vi.fn(),
       isLoading: true,
     });
 
