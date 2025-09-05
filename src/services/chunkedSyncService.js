@@ -41,7 +41,9 @@ function bytesFromBase64(str) {
     }
     return bytes;
   } catch (error) {
-    throw new Error(`Failed to decode base64 string (length: ${str.length}): ${error.message}`);
+    throw new Error(
+      `Failed to decode base64 string (length: ${str.length}): ${error.message}`,
+    );
   }
 }
 
@@ -125,7 +127,9 @@ class ChunkedSyncService {
 
     // Calculate chunk size based on data size and item count
     let chunkSize = this.maxArrayChunkSize;
-    const sampleSize = this.calculateSize(array.slice(0, Math.min(10, array.length)));
+    const sampleSize = this.calculateSize(
+      array.slice(0, Math.min(10, array.length)),
+    );
     const avgItemSize = sampleSize / Math.min(10, array.length);
 
     if (avgItemSize > 0) {
@@ -133,7 +137,9 @@ class ChunkedSyncService {
       chunkSize = Math.min(chunkSize, Math.max(100, maxItemsForSize));
     }
 
-    logger.debug(`Chunking ${arrayName}: ${totalItems} items, ${chunkSize} per chunk`);
+    logger.debug(
+      `Chunking ${arrayName}: ${totalItems} items, ${chunkSize} per chunk`,
+    );
 
     for (let i = 0; i < totalItems; i += chunkSize) {
       const chunkIndex = Math.floor(i / chunkSize);
@@ -199,25 +205,35 @@ class ChunkedSyncService {
 
     // Warn if currentUser is undefined - check for budgetId (primary), uid (Firebase), or id (local user)
     if (!currentUser?.budgetId && !currentUser?.uid && !currentUser?.id) {
-      logger.warn("saveToCloud called with undefined currentUser identifier, using 'anonymous'", {
-        currentUser,
-        hasCurrentUser: !!currentUser,
-        currentUserKeys: currentUser ? Object.keys(currentUser) : [],
-        currentUserValues: currentUser ? Object.values(currentUser).map((v) => typeof v) : [],
-        // Show actual property names and values for debugging
-        currentUserPropsDebug: currentUser
-          ? Object.entries(currentUser).map(
-              ([k, v]) => `${k}: ${typeof v === "string" ? v.substring(0, 20) : typeof v}`
-            )
-          : [],
-        source: "chunkedSyncService",
-      });
+      logger.warn(
+        "saveToCloud called with undefined currentUser identifier, using 'anonymous'",
+        {
+          currentUser,
+          hasCurrentUser: !!currentUser,
+          currentUserKeys: currentUser ? Object.keys(currentUser) : [],
+          currentUserValues: currentUser
+            ? Object.values(currentUser).map((v) => typeof v)
+            : [],
+          // Show actual property names and values for debugging
+          currentUserPropsDebug: currentUser
+            ? Object.entries(currentUser).map(
+                ([k, v]) =>
+                  `${k}: ${typeof v === "string" ? v.substring(0, 20) : typeof v}`,
+              )
+            : [],
+          source: "chunkedSyncService",
+        },
+      );
     }
 
     try {
       logger.info("Starting chunked save to cloud", {
         dataSize: this.calculateSize(data),
-        userId: currentUser?.budgetId || currentUser?.uid || currentUser?.id || "anonymous",
+        userId:
+          currentUser?.budgetId ||
+          currentUser?.uid ||
+          currentUser?.id ||
+          "anonymous",
       });
 
       // Identify large arrays to chunk
@@ -238,7 +254,11 @@ class ChunkedSyncService {
 
       // Create manifest
       const manifest = this.createManifest(chunkMap, {
-        userId: currentUser?.budgetId || currentUser?.uid || currentUser?.id || "anonymous",
+        userId:
+          currentUser?.budgetId ||
+          currentUser?.uid ||
+          currentUser?.id ||
+          "anonymous",
         userAgent: navigator.userAgent,
         originalKeys: Object.keys(data),
       });
@@ -246,7 +266,7 @@ class ChunkedSyncService {
       // Encrypt and save manifest
       const encryptedManifest = await encryptionUtils.encrypt(
         this.safeStringify(manifest),
-        this.encryptionKey
+        this.encryptionKey,
       );
 
       // Fix: encryption utility returns 'data' property, not 'encryptedData'
@@ -258,7 +278,7 @@ class ChunkedSyncService {
           manifestKeys: encryptedManifest ? Object.keys(encryptedManifest) : [],
         });
         throw new Error(
-          `Encryption failed: missing properties - hasData: ${!!encryptedManifest?.data}, hasIv: ${!!encryptedManifest?.iv}`
+          `Encryption failed: missing properties - hasData: ${!!encryptedManifest?.data}, hasIv: ${!!encryptedManifest?.iv}`,
         );
       }
 
@@ -274,9 +294,13 @@ class ChunkedSyncService {
         _metadata: {
           version: "2.0",
           lastSync: Date.now(),
-          userId: currentUser?.budgetId || currentUser?.uid || currentUser?.id || "anonymous",
+          userId:
+            currentUser?.budgetId ||
+            currentUser?.uid ||
+            currentUser?.id ||
+            "anonymous",
           chunkedKeys: Object.keys(data).filter(
-            (key) => Array.isArray(data[key]) && data[key].length > 100
+            (key) => Array.isArray(data[key]) && data[key].length > 100,
           ),
         },
       };
@@ -295,7 +319,7 @@ class ChunkedSyncService {
         for (const [chunkId, chunkData] of batchChunks) {
           const encryptedChunk = await encryptionUtils.encrypt(
             this.safeStringify(chunkData),
-            this.encryptionKey
+            this.encryptionKey,
           );
 
           const chunkDocument = {
@@ -308,12 +332,15 @@ class ChunkedSyncService {
             timestamp: Date.now(),
           };
 
-          batch.set(doc(db, "budgets", this.budgetId, "chunks", chunkId), chunkDocument);
+          batch.set(
+            doc(db, "budgets", this.budgetId, "chunks", chunkId),
+            chunkDocument,
+          );
         }
 
         await batch.commit();
         logger.debug(
-          `Saved batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(chunkEntries.length / batchSize)}`
+          `Saved batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(chunkEntries.length / batchSize)}`,
         );
       }
 
@@ -364,17 +391,22 @@ class ChunkedSyncService {
         let manifest;
         try {
           // Validate manifest data before decryption
-          if (!mainData._manifest?.encryptedData?.data || !mainData._manifest?.encryptedData?.iv) {
+          if (
+            !mainData._manifest?.encryptedData?.data ||
+            !mainData._manifest?.encryptedData?.iv
+          ) {
             throw new Error("Missing encrypted manifest data structure");
           }
 
-          const encryptedDataBytes = bytesFromBase64(mainData._manifest.encryptedData.data);
+          const encryptedDataBytes = bytesFromBase64(
+            mainData._manifest.encryptedData.data,
+          );
           const ivBytes = bytesFromBase64(mainData._manifest.encryptedData.iv);
 
           // Check if data is too small (common corruption indicator)
           if (encryptedDataBytes.length < 16 || ivBytes.length < 12) {
             throw new Error(
-              `Corrupted manifest data: encrypted=${encryptedDataBytes.length}bytes, iv=${ivBytes.length}bytes`
+              `Corrupted manifest data: encrypted=${encryptedDataBytes.length}bytes, iv=${ivBytes.length}bytes`,
             );
           }
 
@@ -384,46 +416,62 @@ class ChunkedSyncService {
               data: encryptedDataBytes,
               iv: ivBytes,
             },
-            this.encryptionKey
+            this.encryptionKey,
           );
 
           manifest = JSON.parse(manifestData);
         } catch (decryptError) {
-          logger.error("❌ Failed to decrypt manifest - may be corrupted or key mismatch", {
-            error: decryptError.message,
-            errorType: decryptError.name,
-            budgetId: this.budgetId.substring(0, 8) + "...",
-          });
+          logger.error(
+            "❌ Failed to decrypt manifest - may be corrupted or key mismatch",
+            {
+              error: decryptError.message,
+              errorType: decryptError.name,
+              budgetId: this.budgetId.substring(0, 8) + "...",
+            },
+          );
 
           // NEVER automatically clear data - this is too destructive and causes data loss
           // Smart detection: avoid repeatedly trying to decrypt the same bad data
           const errorSignature = `${this.budgetId}_${decryptError.message}`;
           const now = Date.now();
-          
+
           // Track failed decryption attempts to avoid repeated attempts
           if (!this.decryptionFailures) {
             this.decryptionFailures = new Map();
           }
-          
+
           const lastFailure = this.decryptionFailures.get(errorSignature);
           const backoffTime = 5 * 60 * 1000; // 5 minutes
-          
-          if (lastFailure && (now - lastFailure) < backoffTime) {
-            logger.info("🔇 Skipping repeated decryption attempt (in backoff period)");
+
+          if (lastFailure && now - lastFailure < backoffTime) {
+            logger.info(
+              "🔇 Skipping repeated decryption attempt (in backoff period)",
+            );
             return null; // Skip without logging noise
           }
-          
+
           this.decryptionFailures.set(errorSignature, now);
-          
-          const isDemoMode = this.budgetId?.includes('demo') || process.env.NODE_ENV === 'development';
-          
+
+          // Check if we should trigger corruption recovery modal
+          this.checkForCorruptionPattern();
+
+          const isDemoMode =
+            this.budgetId?.includes("demo") ||
+            process.env.NODE_ENV === "development";
+
           if (isDemoMode) {
-            logger.warn("⚠️ Decryption failed in dev mode - using demo Firebase config, NOT clearing cloud data");
+            logger.warn(
+              "⚠️ Decryption failed in dev mode - using demo Firebase config, NOT clearing cloud data",
+            );
           } else {
-            logger.warn("⚠️ Decryption failed - possible key mismatch or corruption, NOT auto-clearing cloud data");
-            logger.warn("💡 Use the admin console to manually clear cloud data if corruption is confirmed");
+            logger.warn(
+              "⚠️ Decryption failed - possible key mismatch or corruption, NOT auto-clearing cloud data",
+            );
+            logger.warn(
+              "💡 Use the admin console to manually clear cloud data if corruption is confirmed",
+            );
           }
-          
+
           return null; // Return null to trigger fresh upload from local data without clearing cloud
         }
         logger.debug("Loaded manifest", {
@@ -434,7 +482,7 @@ class ChunkedSyncService {
         // Load all chunks
         const chunksQuery = query(
           collection(db, "budgets", this.budgetId, "chunks"),
-          where("budgetId", "==", this.budgetId)
+          where("budgetId", "==", this.budgetId),
         );
 
         const chunksSnapshot = await getDocs(chunksQuery);
@@ -449,16 +497,19 @@ class ChunkedSyncService {
                 data: bytesFromBase64(chunkData.encryptedData.data),
                 iv: bytesFromBase64(chunkData.encryptedData.iv),
               },
-              this.encryptionKey
+              this.encryptionKey,
             );
 
             chunks[chunkData.chunkId] = JSON.parse(decryptedChunk);
           } catch (chunkDecryptError) {
-            logger.error("❌ Failed to decrypt chunk - skipping corrupted chunk", {
-              chunkId: chunkData.chunkId,
-              error: chunkDecryptError.message,
-              errorType: chunkDecryptError.name,
-            });
+            logger.error(
+              "❌ Failed to decrypt chunk - skipping corrupted chunk",
+              {
+                chunkId: chunkData.chunkId,
+                error: chunkDecryptError.message,
+                errorType: chunkDecryptError.name,
+              },
+            );
             // Skip this chunk but continue with others
             continue;
           }
@@ -481,7 +532,9 @@ class ChunkedSyncService {
             }
 
             reconstructedData[key] = reassembledArray;
-            logger.debug(`Reassembled ${key}: ${reassembledArray.length} items`);
+            logger.debug(
+              `Reassembled ${key}: ${reassembledArray.length} items`,
+            );
           }
         }
       }
@@ -521,7 +574,7 @@ class ChunkedSyncService {
       // Delete all chunks
       const chunksQuery = query(
         collection(db, "budgets", this.budgetId, "chunks"),
-        where("budgetId", "==", this.budgetId)
+        where("budgetId", "==", this.budgetId),
       );
 
       const snapshot = await getDocs(chunksQuery);
@@ -556,7 +609,7 @@ class ChunkedSyncService {
       // Delete all chunks first
       const chunksQuery = query(
         collection(db, "budgets", this.budgetId, "chunks"),
-        where("budgetId", "==", this.budgetId)
+        where("budgetId", "==", this.budgetId),
       );
 
       const snapshot = await getDocs(chunksQuery);
@@ -602,6 +655,68 @@ class ChunkedSyncService {
       maxArrayChunkSize: this.maxArrayChunkSize,
       isInitialized: !!(this.budgetId && this.encryptionKey),
     };
+  }
+
+  /**
+   * Check for corruption patterns and trigger recovery modal if needed
+   */
+  checkForCorruptionPattern() {
+    if (!this.decryptionFailures || this.decryptionFailures.size === 0) {
+      return;
+    }
+
+    // Count recent failures (within last 10 minutes)
+    const recentThreshold = Date.now() - 10 * 60 * 1000;
+    let recentFailures = 0;
+    let hasDataTooSmallError = false;
+
+    for (const [errorSignature, timestamp] of this.decryptionFailures) {
+      if (timestamp > recentThreshold) {
+        recentFailures++;
+        if (errorSignature.includes("The provided data is too small")) {
+          hasDataTooSmallError = true;
+        }
+      }
+    }
+
+    // Trigger corruption recovery if we have multiple recent failures with "data too small" error
+    if (recentFailures >= 2 && hasDataTooSmallError) {
+      logger.warn(
+        "🚨 Corruption pattern detected - triggering recovery modal",
+        {
+          recentFailures,
+          hasDataTooSmallError,
+          totalFailures: this.decryptionFailures.size,
+        },
+      );
+
+      // Emit event for UI to show corruption recovery modal
+      this.triggerCorruptionRecovery();
+    }
+  }
+
+  /**
+   * Trigger corruption recovery modal (to be connected to UI)
+   */
+  triggerCorruptionRecovery() {
+    // Don't spam the user - only show once per session
+    if (window.corruptionModalShown) {
+      return;
+    }
+
+    window.corruptionModalShown = true;
+
+    // Emit custom event for UI components to listen to
+    const event = new CustomEvent("syncCorruptionDetected", {
+      detail: {
+        failureCount: this.decryptionFailures?.size || 0,
+        budgetId: this.budgetId?.substring(0, 8) + "...",
+        timestamp: Date.now(),
+      },
+    });
+
+    window.dispatchEvent(event);
+    logger.info("🚨 Corruption recovery event dispatched");
   }
 }
 
