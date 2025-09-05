@@ -19,6 +19,7 @@ import ChartsAndAnalytics from "./ChartsAndAnalytics";
 import TrendAnalysisCharts from "./TrendAnalysisCharts";
 import PerformanceMonitor from "./PerformanceMonitor";
 import ReportExporter from "./ReportExporter";
+import StandardTabs from "../ui/StandardTabs";
 import logger from "../../utils/common/logger";
 
 /**
@@ -37,8 +38,13 @@ const AnalyticsDashboard = () => {
   const [showExportModal, setShowExportModal] = useState(false);
 
   // Get budget data
-  const { transactions, envelopes, _savingsGoals, _actualBalance, _unassignedCash } =
-    useBudgetStore();
+  const {
+    transactions,
+    envelopes,
+    _savingsGoals,
+    _actualBalance,
+    _unassignedCash,
+  } = useBudgetStore();
 
   // Analytics data with current filters
   const analyticsQuery = useAnalytics({
@@ -58,33 +64,38 @@ const AnalyticsDashboard = () => {
   // Tab configuration
   const tabs = [
     {
-      key: "overview",
+      id: "overview",
       label: "Overview",
       icon: BarChart3,
+      color: "blue",
       description: "Financial summary and key metrics",
     },
     {
-      key: "spending",
+      id: "spending",
       label: "Spending Analysis",
       icon: TrendingDown,
+      color: "red",
       description: "Detailed spending patterns and categories",
     },
     {
-      key: "trends",
+      id: "trends",
       label: "Trends & Forecasting",
       icon: TrendingUp,
+      color: "green",
       description: "Historical trends and future projections",
     },
     {
-      key: "performance",
+      id: "performance",
       label: "Performance Monitor",
       icon: Target,
+      color: "purple",
       description: "Real-time insights and alerts",
     },
     {
-      key: "envelopes",
+      id: "envelopes",
       label: "Envelope Analysis",
       icon: Wallet,
+      color: "cyan",
       description: "Envelope health and utilization",
     },
   ];
@@ -116,15 +127,24 @@ const AnalyticsDashboard = () => {
 
     // Calculate envelope utilization
     const totalBudgeted =
-      balance.envelopeAnalysis?.reduce((sum, env) => sum + (env.monthlyBudget || 0), 0) || 0;
+      balance.envelopeAnalysis?.reduce(
+        (sum, env) => sum + (env.monthlyBudget || 0),
+        0,
+      ) || 0;
     const totalSpent =
-      balance.envelopeAnalysis?.reduce((sum, env) => sum + (env.spent || 0), 0) || 0;
-    const envelopeUtilization = totalBudgeted > 0 ? (totalSpent / totalBudgeted) * 100 : 0;
+      balance.envelopeAnalysis?.reduce(
+        (sum, env) => sum + (env.spent || 0),
+        0,
+      ) || 0;
+    const envelopeUtilization =
+      totalBudgeted > 0 ? (totalSpent / totalBudgeted) * 100 : 0;
 
     // Calculate savings progress
     const savingsProgress =
-      balance.savingsAnalysis?.reduce((sum, goal) => sum + goal.progressRate, 0) /
-      Math.max(1, balance.savingsAnalysis?.length || 1);
+      balance.savingsAnalysis?.reduce(
+        (sum, goal) => sum + goal.progressRate,
+        0,
+      ) / Math.max(1, balance.savingsAnalysis?.length || 1);
 
     // Determine balance health
     const balanceHealth = balance.balanceSummary?.isBalanced
@@ -164,18 +184,25 @@ const AnalyticsDashboard = () => {
           <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
           <h3 className="text-red-900 font-medium">Analytics Error</h3>
         </div>
-        <p className="text-red-700 mt-2">Failed to load analytics data. Please try again.</p>
+        <p className="text-red-700 mt-2">
+          Failed to load analytics data. Please try again.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-6">
+    <div className="max-w-7xl mx-auto rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
-          <p className="text-gray-600 mt-1">Comprehensive financial insights and reporting</p>
+          <h1 className="font-black text-black text-base">
+            <span className="text-lg">A</span>NALYTICS{" "}
+            <span className="text-lg">D</span>ASHBOARD
+          </h1>
+          <p className="text-purple-900 mt-1">
+            Comprehensive financial insights and reporting
+          </p>
         </div>
 
         <div className="flex items-center gap-3 mt-4 lg:mt-0">
@@ -185,7 +212,7 @@ const AnalyticsDashboard = () => {
             <select
               value={timeFilter}
               onChange={(e) => setTimeFilter(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="border-2 border-black rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             >
               {timeFilters.map((filter) => (
                 <option key={filter.key} value={filter.key}>
@@ -198,7 +225,7 @@ const AnalyticsDashboard = () => {
           {/* Export Button */}
           <button
             onClick={() => setShowExportModal(true)}
-            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 flex items-center gap-2 text-sm"
+            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 border-2 border-black flex items-center gap-2 text-sm"
           >
             <Download className="h-4 w-4" />
             Export
@@ -208,13 +235,15 @@ const AnalyticsDashboard = () => {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border-2 border-black ring-1 ring-gray-800/10 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Net Amount</p>
               <p
                 className={`text-2xl font-bold ${
-                  summaryMetrics.netAmount >= 0 ? "text-green-600" : "text-red-600"
+                  summaryMetrics.netAmount >= 0
+                    ? "text-green-600"
+                    : "text-red-600"
                 }`}
               >
                 ${Math.abs(summaryMetrics.netAmount).toLocaleString()}
@@ -228,7 +257,7 @@ const AnalyticsDashboard = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border-2 border-black ring-1 ring-gray-800/10 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Envelope Utilization</p>
@@ -240,7 +269,7 @@ const AnalyticsDashboard = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border-2 border-black ring-1 ring-gray-800/10 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Savings Progress</p>
@@ -252,7 +281,7 @@ const AnalyticsDashboard = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border-2 border-black ring-1 ring-gray-800/10 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Balance Health</p>
@@ -282,33 +311,22 @@ const AnalyticsDashboard = () => {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8 overflow-x-auto">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={`flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
-                  activeTab === tab.key
-                    ? "border-purple-500 text-purple-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-                {tab.label}
-              </button>
-            );
-          })}
-        </nav>
-      </div>
+      <StandardTabs
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        variant="colored"
+        className="border-2 border-black ring-1 ring-gray-800/10"
+      />
 
       {/* Tab Content */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         {activeTab === "overview" && (
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Financial Overview</h2>
+            <h2 className="font-black text-black text-base mb-4">
+              <span className="text-lg">F</span>INANCIAL{" "}
+              <span className="text-lg">O</span>VERVIEW
+            </h2>
             <ChartsAndAnalytics
               transactions={transactions}
               envelopes={envelopes}
@@ -319,7 +337,10 @@ const AnalyticsDashboard = () => {
 
         {activeTab === "spending" && (
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Spending Analysis</h2>
+            <h2 className="font-black text-black text-base mb-4">
+              <span className="text-lg">S</span>PENDING{" "}
+              <span className="text-lg">A</span>NALYSIS
+            </h2>
             <ChartsAndAnalytics
               transactions={transactions}
               envelopes={envelopes}
@@ -331,14 +352,23 @@ const AnalyticsDashboard = () => {
 
         {activeTab === "trends" && (
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Trends & Forecasting</h2>
-            <TrendAnalysisCharts analyticsData={analyticsQuery.data} timeFilter={timeFilter} />
+            <h2 className="font-black text-black text-base mb-4">
+              <span className="text-lg">T</span>RENDS &{" "}
+              <span className="text-lg">F</span>ORECASTING
+            </h2>
+            <TrendAnalysisCharts
+              analyticsData={analyticsQuery.data}
+              timeFilter={timeFilter}
+            />
           </div>
         )}
 
         {activeTab === "performance" && (
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Performance Monitor</h2>
+            <h2 className="font-black text-black text-base mb-4">
+              <span className="text-lg">P</span>ERFORMANCE{" "}
+              <span className="text-lg">M</span>ONITOR
+            </h2>
             <PerformanceMonitor
               analyticsData={analyticsQuery.data}
               balanceData={balanceQuery.data}
@@ -348,7 +378,10 @@ const AnalyticsDashboard = () => {
 
         {activeTab === "envelopes" && (
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Envelope Analysis</h2>
+            <h2 className="font-black text-black text-base mb-4">
+              <span className="text-lg">E</span>NVELOPE{" "}
+              <span className="text-lg">A</span>NALYSIS
+            </h2>
             <ChartsAndAnalytics
               transactions={transactions}
               envelopes={envelopes}
