@@ -1,6 +1,6 @@
 // src/components/layout/MainLayout.jsx
 import React, { useState, Suspense, useEffect } from "react";
-import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useBudgetStore } from "../../stores/ui/uiStore";
 import { useAuthenticationManager } from "../../hooks/auth";
 import { useLayoutData } from "../../hooks/layout";
@@ -18,16 +18,6 @@ import { useToastStore } from "../../stores/ui/toastStore";
 import ViewRendererComponent from "./ViewRenderer";
 import logger from "../../utils/common/logger";
 import { getVersionInfo } from "../../utils/common/version";
-import {
-  DollarSign,
-  Wallet,
-  TrendingUp,
-  Calendar,
-  Target,
-  CreditCard,
-  BookOpen,
-  BarChart3,
-} from "lucide-react";
 import NavigationTabs from "./NavigationTabs";
 import SyncStatusIndicators from "../sync/SyncStatusIndicators";
 import ConflictResolutionModal from "../sync/ConflictResolutionModal";
@@ -40,6 +30,9 @@ import OnboardingTutorial from "../onboarding/OnboardingTutorial";
 import OnboardingProgress from "../onboarding/OnboardingProgress";
 import { useOnboardingAutoComplete } from "../../hooks/common/useOnboardingAutoComplete";
 import { CorruptionRecoveryModal } from "../modals/CorruptionRecoveryModal";
+import PasswordRotationModal from "../auth/PasswordRotationModal";
+import AppRoutes from "./AppRoutes";
+import { pathToViewMap, viewToPathMap } from "./routeConfig";
 
 // Heavy components now lazy loaded in ViewRenderer
 
@@ -149,38 +142,14 @@ const Layout = ({ firebaseSync }) => {
         isLocalOnlyMode={isLocalOnlyMode}
         securityManager={securityManager}
       />
-      {showRotationModal && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="glassmorphism rounded-2xl p-6 w-full max-w-md border border-white/30 shadow-2xl">
-            <h3 className="text-xl font-semibold mb-4">Password Expired</h3>
-            <p className="text-gray-700 mb-4">
-              For security, please set a new password.
-            </p>
-            <input
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="New password"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-3"
-            />
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm password"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-            />
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={handleRotationPasswordChange}
-                className="flex-1 bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700"
-              >
-                Update Password
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <PasswordRotationModal
+        isOpen={showRotationModal}
+        newPassword={newPassword}
+        confirmPassword={confirmPassword}
+        setNewPassword={setNewPassword}
+        setConfirmPassword={setConfirmPassword}
+        onSubmit={handleRotationPasswordChange}
+      />
 
       {/* Toast Container */}
       <ToastContainer toasts={toasts} removeToast={removeToast} />
@@ -219,19 +188,6 @@ const MainContent = ({
 
   // Helper function to get current view from URL
   const getCurrentViewFromPath = (pathname) => {
-    const pathToViewMap = {
-      "/": "dashboard",
-      "/envelopes": "envelopes",
-      "/savings": "savings",
-      "/supplemental": "supplemental",
-      "/paycheck": "paycheck",
-      "/bills": "bills",
-      "/transactions": "transactions",
-      "/debts": "debts",
-      "/analytics": "analytics",
-      "/automation": "automation",
-      "/activity": "activity",
-    };
     return pathToViewMap[pathname] || "dashboard";
   };
 
@@ -240,19 +196,6 @@ const MainContent = ({
 
   // Helper function for components that still need programmatic navigation
   const setActiveView = (view) => {
-    const viewToPathMap = {
-      dashboard: "/",
-      envelopes: "/envelopes",
-      savings: "/savings",
-      supplemental: "/supplemental",
-      paycheck: "/paycheck",
-      bills: "/bills",
-      transactions: "/transactions",
-      debts: "/debts",
-      analytics: "/analytics",
-      automation: "/automation",
-      activity: "/activity",
-    };
     const path = viewToPathMap[view] || "/";
     navigate(path);
   };
@@ -333,154 +276,13 @@ const MainContent = ({
           {/* Summary Cards - Enhanced with clickable unassigned cash distribution */}
           <SummaryCards />
 
-          {/* Main Content - Now using React Router */}
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <ViewRendererComponent
-                  activeView="dashboard"
-                  budget={budget}
-                  currentUser={currentUser}
-                  totalBiweeklyNeed={totalBiweeklyNeed}
-                  setActiveView={setActiveView}
-                />
-              }
-            />
-            <Route
-              path="/envelopes"
-              element={
-                <ViewRendererComponent
-                  activeView="envelopes"
-                  budget={budget}
-                  currentUser={currentUser}
-                  totalBiweeklyNeed={totalBiweeklyNeed}
-                  setActiveView={setActiveView}
-                />
-              }
-            />
-            <Route
-              path="/savings"
-              element={
-                <ViewRendererComponent
-                  activeView="savings"
-                  budget={budget}
-                  currentUser={currentUser}
-                  totalBiweeklyNeed={totalBiweeklyNeed}
-                  setActiveView={setActiveView}
-                />
-              }
-            />
-            <Route
-              path="/supplemental"
-              element={
-                <ViewRendererComponent
-                  activeView="supplemental"
-                  budget={budget}
-                  currentUser={currentUser}
-                  totalBiweeklyNeed={totalBiweeklyNeed}
-                  setActiveView={setActiveView}
-                />
-              }
-            />
-            <Route
-              path="/paycheck"
-              element={
-                <ViewRendererComponent
-                  activeView="paycheck"
-                  budget={budget}
-                  currentUser={currentUser}
-                  totalBiweeklyNeed={totalBiweeklyNeed}
-                  setActiveView={setActiveView}
-                />
-              }
-            />
-            <Route
-              path="/bills"
-              element={
-                <ViewRendererComponent
-                  activeView="bills"
-                  budget={budget}
-                  currentUser={currentUser}
-                  totalBiweeklyNeed={totalBiweeklyNeed}
-                  setActiveView={setActiveView}
-                />
-              }
-            />
-            <Route
-              path="/transactions"
-              element={
-                <ViewRendererComponent
-                  activeView="transactions"
-                  budget={budget}
-                  currentUser={currentUser}
-                  totalBiweeklyNeed={totalBiweeklyNeed}
-                  setActiveView={setActiveView}
-                />
-              }
-            />
-            <Route
-              path="/debts"
-              element={
-                <ViewRendererComponent
-                  activeView="debts"
-                  budget={budget}
-                  currentUser={currentUser}
-                  totalBiweeklyNeed={totalBiweeklyNeed}
-                  setActiveView={setActiveView}
-                />
-              }
-            />
-            <Route
-              path="/analytics"
-              element={
-                <ViewRendererComponent
-                  activeView="analytics"
-                  budget={budget}
-                  currentUser={currentUser}
-                  totalBiweeklyNeed={totalBiweeklyNeed}
-                  setActiveView={setActiveView}
-                />
-              }
-            />
-            <Route
-              path="/automation"
-              element={
-                <ViewRendererComponent
-                  activeView="automation"
-                  budget={budget}
-                  currentUser={currentUser}
-                  totalBiweeklyNeed={totalBiweeklyNeed}
-                  setActiveView={setActiveView}
-                />
-              }
-            />
-            <Route
-              path="/activity"
-              element={
-                <ViewRendererComponent
-                  activeView="activity"
-                  budget={budget}
-                  currentUser={currentUser}
-                  totalBiweeklyNeed={totalBiweeklyNeed}
-                  setActiveView={setActiveView}
-                />
-              }
-            />
-            {/* Catch-all route redirects to dashboard */}
-            <Route
-              path="*"
-              element={
-                <ViewRendererComponent
-                  activeView="dashboard"
-                  budget={budget}
-                  currentUser={currentUser}
-                  totalBiweeklyNeed={totalBiweeklyNeed}
-                  setActiveView={setActiveView}
-                />
-              }
-            />
-          </Routes>
+          {/* Main Content - Using extracted AppRoutes component */}
+          <AppRoutes
+            budget={budget}
+            currentUser={currentUser}
+            totalBiweeklyNeed={totalBiweeklyNeed}
+            setActiveView={setActiveView}
+          />
 
           <SyncStatusIndicators isOnline={isOnline} isSyncing={isSyncing} />
           <ConflictResolutionModal

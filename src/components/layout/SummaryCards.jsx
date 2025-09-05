@@ -8,7 +8,7 @@ import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
 import { useSavingsGoals } from "../../hooks/common/useSavingsGoals";
 import logger from "../../utils/common/logger";
 const UnassignedCashModal = lazy(() => import("../modals/UnassignedCashModal"));
-import { calculateEnvelopeSummary } from "../../utils/budgeting/envelopeCalculations";
+import { calculateEnvelopeData, calculateEnvelopeTotals } from "../../utils/budgeting/envelopeCalculations";
 
 /**
  * Summary cards component showing financial overview
@@ -48,7 +48,8 @@ const SummaryCards = () => {
   });
 
   // Calculate biweekly needs using existing utility
-  const envelopeSummary = calculateEnvelopeSummary(envelopes, [], []);
+  const processedEnvelopeData = calculateEnvelopeData(envelopes, [], []);
+  const envelopeSummary = calculateEnvelopeTotals(processedEnvelopeData);
   const biweeklyRemaining = envelopeSummary.totalBiweeklyNeed;
   const biweeklyTotal = envelopeSummary.totalBiweeklyNeed; // For now, use same value - can be refined later
 
