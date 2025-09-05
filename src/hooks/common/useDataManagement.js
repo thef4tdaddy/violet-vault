@@ -12,7 +12,8 @@ import { cloudSyncService } from "../../services/cloudSyncService.js";
  */
 const useDataManagement = () => {
   const { currentUser } = useAuth();
-  const { showSuccessToast, showErrorToast, showWarningToast } = useToastHelpers();
+  const { showSuccessToast, showErrorToast, showWarningToast } =
+    useToastHelpers();
   const confirm = useConfirm();
 
   const exportData = useCallback(async () => {
@@ -53,7 +54,9 @@ const useDataManagement = () => {
         return;
       }
 
-      const pureTransactions = transactions.filter((t) => !t.type || t.type === "transaction");
+      const pureTransactions = transactions.filter(
+        (t) => !t.type || t.type === "transaction",
+      );
 
       const exportData = {
         envelopes,
@@ -83,20 +86,25 @@ const useDataManagement = () => {
             note: "This data was encrypted with a specific budgetId. Import will create new encryption context.",
             originalBudgetId: currentUser?.budgetId,
             exportTimestamp: Date.now(),
-          }
+          },
         },
         _dataGuide: {
           note: "For mass updates, use these primary arrays:",
           primaryArrays: {
-            envelopes: "Main envelope data - edit currentBalance, name, category, etc.",
+            envelopes:
+              "Main envelope data - edit currentBalance, name, category, etc.",
             bills: "Bill payment data - edit amount, dueDate, provider, etc.",
-            debts: "Debt tracking data - edit currentBalance, minimumPayment, etc.",
-            savingsGoals: "Savings goal data - edit targetAmount, currentAmount, etc.",
+            debts:
+              "Debt tracking data - edit currentBalance, minimumPayment, etc.",
+            savingsGoals:
+              "Savings goal data - edit targetAmount, currentAmount, etc.",
             paycheckHistory: "Paycheck history for trend analysis",
-            transactions: "Pure transactions only (filtered from allTransactions)",
+            transactions:
+              "Pure transactions only (filtered from allTransactions)",
             allTransactions:
               "All transactions + bills combined (auto-generated, don't edit directly)",
-            auditLog: "Change history and audit trail (generally shouldn't be edited)",
+            auditLog:
+              "Change history and audit trail (generally shouldn't be edited)",
           },
           deprecatedArrays: {
             note: "These may exist from old exports but are not actively used in v1.8+",
@@ -114,7 +122,10 @@ const useDataManagement = () => {
       const link = document.createElement("a");
       link.href = url;
 
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+      const timestamp = new Date()
+        .toISOString()
+        .replace(/[:.]/g, "-")
+        .slice(0, 19);
       link.download = `VioletVault Budget Backup ${timestamp}.json`;
 
       document.body.appendChild(link);
@@ -143,7 +154,7 @@ const useDataManagement = () => {
 
       showSuccessToast(
         `Export created with ${exportSummary} (${Math.round(dataStr.length / 1024)}KB)`,
-        "Export Completed"
+        "Export Completed",
       );
     } catch (error) {
       logger.error("Export failed", error);
@@ -179,9 +190,14 @@ const useDataManagement = () => {
         });
 
         // Build unified transaction list if missing
-        const unifiedAllTransactions = Array.isArray(importedData.allTransactions)
+        const unifiedAllTransactions = Array.isArray(
+          importedData.allTransactions,
+        )
           ? importedData.allTransactions
-          : [...(importedData.transactions || []), ...(importedData.bills || [])];
+          : [
+              ...(importedData.transactions || []),
+              ...(importedData.bills || []),
+            ];
         // Filter transactions (variable used later in validation)
         // const unifiedTransactions = unifiedAllTransactions.filter(
         //   (t) => !t.type || t.type === "transaction",
@@ -189,23 +205,30 @@ const useDataManagement = () => {
 
         // Validate the data structure
         if (!importedData.envelopes || !Array.isArray(importedData.envelopes)) {
-          throw new Error("Invalid backup file: missing or invalid envelopes data");
+          throw new Error(
+            "Invalid backup file: missing or invalid envelopes data",
+          );
         }
 
         // Check for budgetId mismatch and warn user
         const importBudgetId = importedData.exportMetadata?.budgetId;
         const currentBudgetId = currentUser?.budgetId;
-        const hasBudgetIdMismatch = importBudgetId && currentBudgetId && importBudgetId !== currentBudgetId;
-        
+        const hasBudgetIdMismatch =
+          importBudgetId &&
+          currentBudgetId &&
+          importBudgetId !== currentBudgetId;
+
         let confirmMessage = `Import ${importedData.envelopes?.length || 0} envelopes, ${importedData.bills?.length || 0} bills, ${importedData.debts?.length || 0} debts, ${importedData.auditLog?.length || 0} audit entries, and ${importedData.allTransactions?.length || 0} transactions?\n\nThis will replace your current data.`;
-        
+
         if (hasBudgetIdMismatch) {
           confirmMessage += `\n\n⚠️ ENCRYPTION CONTEXT CHANGE DETECTED:\nBackup budgetId: ${importBudgetId?.substring(0, 12)}...\nCurrent budgetId: ${currentBudgetId?.substring(0, 12)}...\n\nImport will re-encrypt data with your current session context.`;
         }
 
         // Confirm import with user
         const confirmed = await confirm({
-          title: hasBudgetIdMismatch ? "Import Data (Encryption Context Change)" : "Import Data",
+          title: hasBudgetIdMismatch
+            ? "Import Data (Encryption Context Change)"
+            : "Import Data",
           message: confirmMessage,
           confirmLabel: "Import Data",
           cancelLabel: "Cancel",
@@ -254,7 +277,10 @@ const useDataManagement = () => {
           };
 
           const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-          localStorage.setItem(`dexie_backup_${timestamp}`, JSON.stringify(currentData));
+          localStorage.setItem(
+            `dexie_backup_${timestamp}`,
+            JSON.stringify(currentData),
+          );
           logger.debug("Current Dexie data backed up");
         } catch (backupError) {
           logger.warn("Failed to create backup", backupError);
@@ -265,15 +291,30 @@ const useDataManagement = () => {
           logger.info("Clearing Firebase data before import...");
           await cloudSyncService.clearAllData();
           logger.info("Firebase data cleared successfully");
-          
+
           // CRITICAL: Also clear any sync metadata that might point to corrupted cloud data
-          logger.info("Clearing sync metadata to prevent corruption detection...");
+          logger.info(
+            "Clearing sync metadata to prevent corruption detection...",
+          );
           const { budgetDb } = await import("../../db/budgetDb");
-          await budgetDb.syncMetadata.clear();
-          logger.info("Sync metadata cleared");
-          
+          try {
+            if (budgetDb.syncMetadata) {
+              await budgetDb.syncMetadata.clear();
+              logger.info("Sync metadata cleared");
+            } else {
+              logger.info("No sync metadata table found, skipping clear");
+            }
+          } catch (syncMetadataError) {
+            logger.warn(
+              "Failed to clear sync metadata, continuing import",
+              syncMetadataError,
+            );
+          }
         } catch (firebaseError) {
-          logger.warn("Failed to clear Firebase data, proceeding with import", firebaseError);
+          logger.warn(
+            "Failed to clear Firebase data, proceeding with import",
+            firebaseError,
+          );
           // Continue with import even if Firebase clear fails
         }
 
@@ -295,49 +336,67 @@ const useDataManagement = () => {
             try {
               await budgetDb.envelopes.clear();
             } catch (error) {
-              logger.warn("Standard envelope clear failed, using individual deletion", error);
+              logger.warn(
+                "Standard envelope clear failed, using individual deletion",
+                error,
+              );
               await budgetDb.envelopes.toCollection().delete();
             }
 
             try {
               await budgetDb.bills.clear();
             } catch (error) {
-              logger.warn("Standard bill clear failed, using individual deletion", error);
+              logger.warn(
+                "Standard bill clear failed, using individual deletion",
+                error,
+              );
               await budgetDb.bills.toCollection().delete();
             }
 
             try {
               await budgetDb.transactions.clear();
             } catch (error) {
-              logger.warn("Standard transaction clear failed, using individual deletion", error);
+              logger.warn(
+                "Standard transaction clear failed, using individual deletion",
+                error,
+              );
               await budgetDb.transactions.toCollection().delete();
             }
 
             try {
               await budgetDb.savingsGoals.clear();
             } catch (error) {
-              logger.warn("Standard savings goals clear failed, using individual deletion", error);
+              logger.warn(
+                "Standard savings goals clear failed, using individual deletion",
+                error,
+              );
               await budgetDb.savingsGoals.toCollection().delete();
             }
 
             try {
               await budgetDb.debts.clear();
             } catch (error) {
-              logger.warn("Standard debt clear failed, using individual deletion", error);
+              logger.warn(
+                "Standard debt clear failed, using individual deletion",
+                error,
+              );
               await budgetDb.debts.toCollection().delete();
             }
 
             try {
               await budgetDb.paycheckHistory.clear();
             } catch (error) {
-              logger.warn("Standard paycheck clear failed, using individual deletion", error);
+              logger.warn(
+                "Standard paycheck clear failed, using individual deletion",
+                error,
+              );
               // For paycheckHistory, we need to be extra aggressive due to corrupted records
               try {
                 await budgetDb.paycheckHistory.toCollection().delete();
               } catch (individualError) {
                 logger.warn(
                   "Individual paycheck deletion failed, using manual cleanup",
-                  individualError
+                  individualError,
                 );
                 // Manual cleanup for corrupted records
                 const allPaychecks = await budgetDb.paycheckHistory.toArray();
@@ -353,10 +412,13 @@ const useDataManagement = () => {
                         .delete();
                     }
                   } catch (deleteError) {
-                    logger.error("Failed to delete individual paycheck record", {
-                      paycheck,
-                      error: deleteError.message,
-                    });
+                    logger.error(
+                      "Failed to delete individual paycheck record",
+                      {
+                        paycheck,
+                        error: deleteError.message,
+                      },
+                    );
                   }
                 }
               }
@@ -365,7 +427,10 @@ const useDataManagement = () => {
             try {
               await budgetDb.auditLog.clear();
             } catch (error) {
-              logger.warn("Standard audit log clear failed, using individual deletion", error);
+              logger.warn(
+                "Standard audit log clear failed, using individual deletion",
+                error,
+              );
               await budgetDb.auditLog.toCollection().delete();
             }
 
@@ -391,7 +456,9 @@ const useDataManagement = () => {
             }
 
             if (importedData.paycheckHistory?.length) {
-              await budgetDb.paycheckHistory.bulkAdd(importedData.paycheckHistory);
+              await budgetDb.paycheckHistory.bulkAdd(
+                importedData.paycheckHistory,
+              );
             }
 
             if (importedData.auditLog?.length) {
@@ -404,11 +471,12 @@ const useDataManagement = () => {
               unassignedCash: importedData.unassignedCash || 0,
               biweeklyAllocation: importedData.biweeklyAllocation || 0,
               actualBalance: importedData.actualBalance || 0,
-              isActualBalanceManual: importedData.isActualBalanceManual || false,
+              isActualBalanceManual:
+                importedData.isActualBalanceManual || false,
               supplementalAccounts: importedData.supplementalAccounts || [],
               lastUpdated: new Date().toISOString(),
             });
-          }
+          },
         );
 
         logger.info("Import completed successfully", {
@@ -423,37 +491,49 @@ const useDataManagement = () => {
           },
         });
 
-        showSuccessToast(`Local data imported! Now syncing to cloud...`, "Import Complete");
+        showSuccessToast(
+          `Local data imported! Now syncing to cloud...`,
+          "Import Complete",
+        );
 
         // CRITICAL: Stop sync service and clear all corruption tracking before restart
         try {
           logger.info("🛑 Stopping sync service before clean restart...");
           cloudSyncService.stop();
-          
+
           // Wait for sync to fully stop
           await new Promise((resolve) => setTimeout(resolve, 2000));
-          
-          logger.info("🧹 Clearing any corruption detection state to prevent false positives...");
+
+          logger.info(
+            "🧹 Clearing any corruption detection state to prevent false positives...",
+          );
           // Clear any cached corruption/failure state that might interfere
-          const { chunkedSyncService } = await import("../../services/chunkedSyncService");
-          if (chunkedSyncService.decryptionFailures) {
+          const { chunkedSyncService } = await import(
+            "../../services/chunkedSyncService"
+          );
+          if (chunkedSyncService && chunkedSyncService.decryptionFailures) {
             chunkedSyncService.decryptionFailures.clear();
             logger.info("✅ Cleared decryption failure tracking");
           }
-          
-          logger.info("🚀 Force pushing imported data to Firebase with clean slate...");
+
+          logger.info(
+            "🚀 Force pushing imported data to Firebase with clean slate...",
+          );
           const result = await cloudSyncService.forcePushToCloud();
-          
+
           if (result.success) {
             logger.info("✅ Imported data successfully pushed to Firebase.");
-            showSuccessToast("Import complete! Data synced to cloud successfully.");
+            showSuccessToast(
+              "Import complete! Data synced to cloud successfully.",
+            );
           } else {
             throw new Error(result.error || "Failed to push to cloud");
           }
-          
         } catch (syncError) {
           logger.error("Failed to push imported data to Firebase", syncError);
-          showErrorToast(`Cloud sync failed: ${syncError.message}. Data imported locally but may need manual cloud sync.`);
+          showErrorToast(
+            `Cloud sync failed: ${syncError.message}. Data imported locally but may need manual cloud sync.`,
+          );
         }
 
         // Invalidate TanStack Query cache to refresh UI with new data instead of page reload
@@ -461,11 +541,16 @@ const useDataManagement = () => {
           // Wait a bit more to ensure sync is complete
           await new Promise((resolve) => setTimeout(resolve, 1000));
 
-          const { queryClient } = await import("../../utils/common/queryClient");
+          const { queryClient } = await import(
+            "../../utils/common/queryClient"
+          );
           await queryClient.invalidateQueries();
           logger.info("TanStack Query cache invalidated after data import");
         } catch (error) {
-          logger.warn("Failed to invalidate query cache, falling back to page reload", error);
+          logger.warn(
+            "Failed to invalidate query cache, falling back to page reload",
+            error,
+          );
           setTimeout(() => {
             window.location.reload();
           }, 1000);
@@ -489,14 +574,18 @@ const useDataManagement = () => {
         throw error;
       }
     },
-    [showErrorToast, showSuccessToast]
+    [showErrorToast, showSuccessToast],
   );
 
   const resetEncryptionAndStartFresh = useCallback(() => {
     logger.info("Resetting encryption and starting fresh");
 
     // Clear all stored data
-    const keysToRemove = ["envelopeBudgetData", "userProfile", "passwordLastChanged"];
+    const keysToRemove = [
+      "envelopeBudgetData",
+      "userProfile",
+      "passwordLastChanged",
+    ];
 
     keysToRemove.forEach((key) => {
       localStorage.removeItem(key);
