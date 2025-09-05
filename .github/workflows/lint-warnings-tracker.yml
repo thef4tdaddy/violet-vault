@@ -214,20 +214,58 @@ jobs:
         if: steps.should_run.outputs.should_run_develop == 'true'
         id: develop_warnings
         run: |
-          git checkout develop 2>/dev/null || echo "Already on develop or branch doesn't exist"
-          npm run lint --silent > eslint-develop.txt 2>&1 || true
-          node scripts/parse-eslint-warnings.js eslint-develop.txt > develop-warnings.json 2>/dev/null || echo '{"currentStatus":{"totalWarnings":0}}' > develop-warnings.json
+          echo "🔍 Checking develop branch..."
+          git fetch origin develop:develop || echo "Could not fetch develop branch"
+          git checkout develop 2>/dev/null || { 
+            echo "Could not checkout develop branch, trying to create it from origin"
+            git checkout -b develop origin/develop 2>/dev/null || echo "Failed to create develop branch"
+          }
+          
+          # Verify we're on develop and re-install deps if needed
+          CURRENT_BRANCH=$(git branch --show-current)
+          echo "Current branch: $CURRENT_BRANCH"
+          
+          if [ "$CURRENT_BRANCH" = "develop" ]; then
+            echo "✅ Successfully on develop branch"
+            npm ci --silent
+            npm run lint --silent > eslint-develop.txt 2>&1 || true
+            node scripts/parse-eslint-warnings.js eslint-develop.txt > develop-warnings.json 2>/dev/null || echo '{"currentStatus":{"totalWarnings":0}}' > develop-warnings.json
+          else
+            echo "❌ Failed to switch to develop branch, using fallback"
+            echo '{"currentStatus":{"totalWarnings":0}}' > develop-warnings.json
+          fi
+          
           DEVELOP_WARNINGS=$(cat develop-warnings.json | jq -r '.currentStatus.totalWarnings // 0')
+          echo "Develop warnings: $DEVELOP_WARNINGS"
           echo "warnings=$DEVELOP_WARNINGS" >> $GITHUB_OUTPUT
 
       - name: Get warnings for main branch  
         if: steps.should_run.outputs.should_run_main == 'true'
         id: main_warnings
         run: |
-          git checkout main 2>/dev/null || echo "Main branch not available"
-          npm run lint --silent > eslint-main.txt 2>&1 || true
-          node scripts/parse-eslint-warnings.js eslint-main.txt > main-warnings.json 2>/dev/null || echo '{"currentStatus":{"totalWarnings":0}}' > main-warnings.json
+          echo "🔍 Checking main branch..."
+          git fetch origin main:main || echo "Could not fetch main branch"
+          git checkout main 2>/dev/null || {
+            echo "Could not checkout main branch, trying to create it from origin"
+            git checkout -b main origin/main 2>/dev/null || echo "Failed to create main branch"
+          }
+          
+          # Verify we're on main and re-install deps if needed
+          CURRENT_BRANCH=$(git branch --show-current)
+          echo "Current branch: $CURRENT_BRANCH"
+          
+          if [ "$CURRENT_BRANCH" = "main" ]; then
+            echo "✅ Successfully on main branch"
+            npm ci --silent
+            npm run lint --silent > eslint-main.txt 2>&1 || true
+            node scripts/parse-eslint-warnings.js eslint-main.txt > main-warnings.json 2>/dev/null || echo '{"currentStatus":{"totalWarnings":0}}' > main-warnings.json
+          else
+            echo "❌ Failed to switch to main branch, using fallback"
+            echo '{"currentStatus":{"totalWarnings":0}}' > main-warnings.json
+          fi
+          
           MAIN_WARNINGS=$(cat main-warnings.json | jq -r '.currentStatus.totalWarnings // 0')
+          echo "Main warnings: $MAIN_WARNINGS"
           echo "warnings=$MAIN_WARNINGS" >> $GITHUB_OUTPUT
 
       - name: Update Master Lint Warnings Issue
