@@ -58,8 +58,8 @@ export const CorruptionRecoveryModal = ({ isOpen, onClose }) => {
     <div className="space-y-4">
       <div className="text-center">
         <div className="text-6xl mb-4">⚠️</div>
-        <h3 className="text-xl font-bold text-black mb-2">
-          Sync Corruption Detected
+        <h3 className="text-xl font-black text-black mb-2">
+          SYNC CORRUPTION DETECTED
         </h3>
         <p className="text-purple-900">
           Your sync data has encryption corruption that prevents normal
@@ -67,7 +67,7 @@ export const CorruptionRecoveryModal = ({ isOpen, onClose }) => {
         </p>
       </div>
 
-      <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4">
+      <div className="bg-yellow-50 border-2 border-black rounded-lg p-4 ring-1 ring-gray-800/10">
         <h4 className="font-bold text-yellow-800 mb-2">📋 Recovery Steps:</h4>
         <ol className="list-decimal list-inside space-y-2 text-yellow-700">
           <li>
@@ -82,7 +82,7 @@ export const CorruptionRecoveryModal = ({ isOpen, onClose }) => {
         </ol>
       </div>
 
-      <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4">
+      <div className="bg-red-50 border-2 border-black rounded-lg p-4 ring-1 ring-gray-800/10">
         <h4 className="font-bold text-red-800 mb-2">⚠️ Important:</h4>
         <p className="text-red-700">
           You <strong>must export your data first</strong>. Creating a new
@@ -93,7 +93,7 @@ export const CorruptionRecoveryModal = ({ isOpen, onClose }) => {
       <div className="flex gap-3 justify-end">
         <button
           onClick={onClose}
-          className="px-4 py-2 border-2 border-gray-400 rounded-lg font-bold hover:bg-gray-50"
+          className="px-4 py-2 border-2 border-black rounded-lg font-bold hover:bg-gray-50"
         >
           Cancel
         </button>
@@ -112,8 +112,8 @@ export const CorruptionRecoveryModal = ({ isOpen, onClose }) => {
     <div className="space-y-4">
       <div className="text-center">
         <div className="text-6xl mb-4">✅</div>
-        <h3 className="text-xl font-bold text-black mb-2">
-          Data Exported Successfully
+        <h3 className="text-xl font-black text-black mb-2">
+          DATA EXPORTED SUCCESSFULLY
         </h3>
         <p className="text-purple-900">
           Your backup is saved. Now let's create a fresh profile to eliminate
@@ -121,7 +121,7 @@ export const CorruptionRecoveryModal = ({ isOpen, onClose }) => {
         </p>
       </div>
 
-      <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
+      <div className="bg-green-50 border-2 border-black rounded-lg p-4 ring-1 ring-gray-800/10">
         <h4 className="font-bold text-green-800 mb-2">✅ Backup Complete</h4>
         <p className="text-green-700">
           Your data is safely exported. Now we'll clear your current profile and
@@ -129,7 +129,7 @@ export const CorruptionRecoveryModal = ({ isOpen, onClose }) => {
         </p>
       </div>
 
-      <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+      <div className="bg-blue-50 border-2 border-black rounded-lg p-4 ring-1 ring-gray-800/10">
         <h4 className="font-bold text-blue-800 mb-2">📝 Next Steps:</h4>
         <ol className="list-decimal list-inside space-y-1 text-blue-700">
           <li>Click "Create New Profile" below</li>
@@ -144,7 +144,7 @@ export const CorruptionRecoveryModal = ({ isOpen, onClose }) => {
       <div className="flex gap-3 justify-end">
         <button
           onClick={onClose}
-          className="px-4 py-2 border-2 border-gray-400 rounded-lg font-bold hover:bg-gray-50"
+          className="px-4 py-2 border-2 border-black rounded-lg font-bold hover:bg-gray-50"
         >
           Cancel
         </button>
