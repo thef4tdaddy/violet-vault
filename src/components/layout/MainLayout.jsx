@@ -1,16 +1,14 @@
 // src/components/layout/MainLayout.jsx
-/* eslint-disable max-lines */
 import React, { useState, Suspense, useEffect } from "react";
 import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { useBudgetStore } from "../../stores/ui/uiStore";
-import useBudgetData from "../../hooks/budgeting/useBudgetData";
-import useAuthFlow from "../../hooks/auth/useAuthFlow";
+import { useAuthenticationManager } from "../../hooks/auth";
+import { useLayoutData } from "../../hooks/layout";
 import useDataManagement from "../../hooks/common/useDataManagement";
 import usePasswordRotation from "../../hooks/auth/usePasswordRotation";
 import useNetworkStatus from "../../hooks/common/useNetworkStatus";
 import useFirebaseSync from "../../hooks/sync/useFirebaseSync";
 import usePaydayPrediction from "../../hooks/budgeting/usePaydayPrediction";
-import { useLocalOnlyMode } from "../../hooks/common/useLocalOnlyMode";
 import useDataInitialization from "../../hooks/common/useDataInitialization";
 import AuthGateway from "../auth/AuthGateway";
 import Header from "../ui/Header";
@@ -31,8 +29,6 @@ import {
   BarChart3,
 } from "lucide-react";
 import NavigationTabs from "./NavigationTabs";
-import { AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/categories";
-import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
 import SyncStatusIndicators from "../sync/SyncStatusIndicators";
 import ConflictResolutionModal from "../sync/ConflictResolutionModal";
 import SummaryCards from "./SummaryCards";
@@ -40,7 +36,6 @@ import BugReportButton from "../feedback/BugReportButton";
 import LockScreen from "../security/LockScreen";
 import SecuritySettings from "../settings/SecuritySettings";
 import SettingsDashboard from "../settings/SettingsDashboard";
-import { useSecurityManager } from "../../hooks/auth/useSecurityManager";
 import OnboardingTutorial from "../onboarding/OnboardingTutorial";
 import OnboardingProgress from "../onboarding/OnboardingProgress";
 import { useOnboardingAutoComplete } from "../../hooks/common/useOnboardingAutoComplete";
@@ -51,27 +46,27 @@ import { CorruptionRecoveryModal } from "../modals/CorruptionRecoveryModal";
 const Layout = ({ firebaseSync }) => {
   logger.debug("Layout component is running");
 
-  // Security manager hook
-  const securityManager = useSecurityManager();
-
-  // Custom hooks for business logic
+  // Consolidated authentication manager
+  const auth = useAuthenticationManager();
   const {
     isUnlocked,
-    encryptionKey,
     currentUser,
-    budgetId,
-    salt,
+    isLocalOnlyMode,
+    _localOnlyUser,
+    securityContext,
     handleSetup,
     handleLogout,
     handleChangePassword,
     handleUpdateProfile,
-  } = useAuthFlow();
-
-  // Local-only mode hooks
-  const { isLocalOnlyMode, localOnlyUser } = useLocalOnlyMode();
+    shouldShowAuthGateway,
+    _internal: { securityManager },
+  } = auth;
 
   // Initialize data from Dexie to Zustand on app startup
   useDataInitialization(); // Return values not currently used
+
+  // Use centralized layout data hook
+  const layoutData = useLayoutData();
 
   const { exportData, importData, resetEncryptionAndStartFresh } =
     useDataManagement();
@@ -89,8 +84,6 @@ const Layout = ({ firebaseSync }) => {
   // Network status detection
   useNetworkStatus();
 
-  // Use firebaseSync prop directly instead of importing service
-  // const firebaseSync = useMemo(() => firebaseSync, []); // Not needed - use prop directly
   const [syncConflicts, setSyncConflicts] = useState(null);
 
   // Toast notifications from Zustand store
@@ -99,8 +92,9 @@ const Layout = ({ firebaseSync }) => {
   logger.auth("Auth hook values", {
     isUnlocked,
     hasCurrentUser: !!currentUser,
-    hasBudgetId: !!budgetId,
+    hasBudgetId: !!securityContext.budgetId,
   });
+
   // Conflict resolution function
   const resolveConflict = () => {
     setSyncConflicts(null);
@@ -112,18 +106,8 @@ const Layout = ({ firebaseSync }) => {
     // Local-only mode doesn't need further setup, let MainLayout render
   };
 
-  // Show authentication gateway if neither standard nor local-only mode is ready
-  if (!isLocalOnlyMode && (!isUnlocked || !currentUser)) {
-    return (
-      <AuthGateway
-        onSetupComplete={handleSetup}
-        onLocalOnlyReady={handleLocalOnlyReady}
-      />
-    );
-  }
-
-  // In local-only mode but user not ready yet
-  if (isLocalOnlyMode && !localOnlyUser) {
+  // Use centralized auth gateway check
+  if (shouldShowAuthGateway()) {
     return (
       <AuthGateway
         onSetupComplete={handleSetup}
@@ -133,13 +117,13 @@ const Layout = ({ firebaseSync }) => {
   }
 
   logger.budgetSync("Rendering BudgetProvider with props", {
-    hasEncryptionKey: !!encryptionKey,
+    hasEncryptionKey: !!securityContext.encryptionKey,
     hasCurrentUser: !!currentUser,
-    hasBudgetId: !!budgetId,
-    hasSalt: !!salt,
+    hasBudgetId: !!securityContext.budgetId,
+    hasSalt: !!securityContext.salt,
     currentUser: currentUser,
   });
-  logger.budgetSync("budgetId value", { budgetId });
+  logger.budgetSync("budgetId value", { budgetId: securityContext.budgetId });
 
   return (
     <>
@@ -147,9 +131,9 @@ const Layout = ({ firebaseSync }) => {
       <LockScreen />
 
       <MainContent
-        currentUser={isLocalOnlyMode ? localOnlyUser : currentUser}
-        encryptionKey={encryptionKey}
-        budgetId={isLocalOnlyMode ? localOnlyUser?.budgetId : budgetId}
+        currentUser={currentUser}
+        auth={auth}
+        layoutData={layoutData}
         onUserChange={handleLogout}
         onExport={exportData}
         onImport={importData}
@@ -206,14 +190,14 @@ const Layout = ({ firebaseSync }) => {
 
 const MainContent = ({
   currentUser,
+  auth,
+  layoutData,
   onUserChange,
   onExport,
   onImport,
   onLogout,
   onResetEncryption,
   onChangePassword,
-  encryptionKey,
-  budgetId,
   firebaseSync,
   syncConflicts,
   onResolveConflict,
@@ -227,6 +211,11 @@ const MainContent = ({
   // Get current route for view determination
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Extract data from shared hooks
+  const { securityContext } = auth;
+  const { totalBiweeklyNeed, paycheckHistory: tanStackPaycheckHistory } =
+    layoutData;
 
   // Helper function to get current view from URL
   const getCurrentViewFromPath = (pathname) => {
@@ -294,8 +283,8 @@ const MainContent = ({
   // Custom hooks for MainContent business logic
   const { handleManualSync } = useFirebaseSync(
     firebaseSync,
-    encryptionKey,
-    budgetId,
+    securityContext.encryptionKey,
+    securityContext.budgetId,
     currentUser,
   );
 
@@ -310,58 +299,11 @@ const MainContent = ({
   // Handle change password - delegate to parent component
   const handleChangePassword = onChangePassword;
 
-  // Get TanStack Query data
-  const {
-    envelopes = [],
-    // savingsGoals = [], // Not currently used
-    // unassignedCash = 0, // Not currently used
-    paycheckHistory: tanStackPaycheckHistory,
-  } = useBudgetData();
-
   // Get UI state from Zustand
   const { isOnline, isSyncing } = budget;
 
   // Payday prediction notifications using TanStack Query data
   usePaydayPrediction(tanStackPaycheckHistory, !!currentUser);
-
-  // Calculate totals - TODO: These are calculated but not currently used
-  // const totalEnvelopeBalance = Array.isArray(envelopes)
-  //   ? envelopes.reduce((sum, env) => sum + env.currentBalance, 0)
-  //   : 0;
-  // const totalSavingsBalance = Array.isArray(savingsGoals)
-  //   ? savingsGoals.reduce((sum, goal) => sum + goal.currentAmount, 0)
-  //   : 0;
-
-  // Calculate total biweekly funding need across all envelope types
-  const totalBiweeklyNeed = Array.isArray(envelopes)
-    ? envelopes.reduce((sum, env) => {
-        // Auto-classify envelope type if not set
-        const envelopeType =
-          env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
-
-        let biweeklyNeed = 0;
-        if (envelopeType === "bill" && env.biweeklyAllocation) {
-          biweeklyNeed = Math.max(
-            0,
-            env.biweeklyAllocation - env.currentBalance,
-          );
-        } else if (envelopeType === "variable" && env.monthlyBudget) {
-          const biweeklyTarget = env.monthlyBudget / BIWEEKLY_MULTIPLIER;
-          biweeklyNeed = Math.max(0, biweeklyTarget - env.currentBalance);
-        } else if (envelopeType === "savings" && env.targetAmount) {
-          const remainingToTarget = Math.max(
-            0,
-            env.targetAmount - env.currentBalance,
-          );
-          biweeklyNeed = Math.min(
-            remainingToTarget,
-            env.biweeklyAllocation || 0,
-          );
-        }
-
-        return sum + biweeklyNeed;
-      }, 0)
-    : 0;
 
   return (
     <OnboardingTutorial setActiveView={setActiveView}>
