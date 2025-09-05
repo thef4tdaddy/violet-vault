@@ -72,8 +72,13 @@ const CreateEnvelopeModal = ({
                 <Plus className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">Create Envelope</h2>
-                <p className="text-green-100 text-sm">Set up a new budget envelope</p>
+                <h2 className="font-black text-white text-base">
+                  <span className="text-lg">C</span>REATE{" "}
+                  <span className="text-lg">E</span>NVELOPE
+                </h2>
+                <p className="text-green-100 text-sm">
+                  Set up a new budget envelope
+                </p>
               </div>
             </div>
             <button
@@ -126,18 +131,22 @@ const CreateEnvelopeModal = ({
               selectedMode={formData.priority || "medium"}
               autoAllocate={formData.autoAllocate}
               onModeChange={(priority) => updateFormField("priority", priority)}
-              onAutoAllocateChange={(autoAllocate) => updateFormField("autoAllocate", autoAllocate)}
+              onAutoAllocateChange={(autoAllocate) =>
+                updateFormField("autoAllocate", autoAllocate)
+              }
               canEdit={true}
             />
 
             {/* Color Selection */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-gray-900 flex items-center">
+              <h3 className="font-black text-black text-base flex items-center">
                 <Palette className="h-4 w-4 mr-2 text-green-600" />
-                Appearance
+                <span className="text-lg">A</span>PPEARANCE
               </h3>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Color
+                </label>
                 <div className="flex gap-2 flex-wrap">
                   {[
                     "#a855f7",
@@ -175,7 +184,7 @@ const CreateEnvelopeModal = ({
             <button
               type="button"
               onClick={handleClose}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 focus:ring-2 focus:ring-green-500 transition-colors"
+              className="px-6 py-2 border-2 border-black text-gray-700 rounded-xl hover:bg-gray-50 focus:ring-2 focus:ring-green-500 transition-colors"
             >
               Cancel
             </button>
@@ -183,7 +192,7 @@ const CreateEnvelopeModal = ({
               type="button"
               onClick={handleSubmit}
               disabled={!canSubmit || isLoading}
-              className="flex items-center px-6 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 focus:ring-2 focus:ring-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center px-6 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 focus:ring-2 focus:ring-green-500 border-2 border-black disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
             >
               <Save className="h-4 w-4 mr-2" />
               {isLoading ? "Creating..." : "Create Envelope"}

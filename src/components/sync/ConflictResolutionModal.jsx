@@ -5,7 +5,11 @@ import { Sparkles } from "lucide-react";
  * Conflict resolution modal component
  * Extracted from Layout.jsx for better organization
  */
-const ConflictResolutionModal = ({ syncConflicts, onResolveConflict, onDismiss }) => {
+const ConflictResolutionModal = ({
+  syncConflicts,
+  onResolveConflict,
+  onDismiss,
+}) => {
   if (!syncConflicts?.hasConflict) return null;
 
   return (
@@ -19,17 +23,27 @@ const ConflictResolutionModal = ({ syncConflicts, onResolveConflict, onDismiss }
             </div>
           </div>
 
-          <h3 className="text-xl font-bold text-gray-900 mb-4">Sync Conflict Detected</h3>
+          <h3 className="font-black text-black text-base mb-4">
+            <span className="text-lg">S</span>YNC{" "}
+            <span className="text-lg">C</span>ONFLICT{" "}
+            <span className="text-lg">D</span>ETECTED
+          </h3>
           <p className="text-gray-600 mb-6">
-            <strong>{syncConflicts.cloudUser?.userName}</strong> made changes on another device.
-            Would you like to load their latest changes?
+            <strong>{syncConflicts.cloudUser?.userName}</strong> made changes on
+            another device. Would you like to load their latest changes?
           </p>
 
           <div className="flex gap-3">
-            <button onClick={onDismiss} className="flex-1 btn btn-secondary rounded-2xl py-3">
+            <button
+              onClick={onDismiss}
+              className="flex-1 btn btn-secondary border-2 border-black rounded-2xl py-3"
+            >
               Keep Mine
             </button>
-            <button onClick={onResolveConflict} className="flex-1 btn btn-primary rounded-2xl py-3">
+            <button
+              onClick={onResolveConflict}
+              className="flex-1 btn btn-primary border-2 border-black rounded-2xl py-3"
+            >
               Load Theirs
             </button>
           </div>
