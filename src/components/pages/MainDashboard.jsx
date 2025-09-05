@@ -36,12 +36,15 @@ const Dashboard = ({ setActiveView }) => {
   // Enhanced TanStack Query integration with optimistic updates
   const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
 
-  const { data: savingsGoals = [], isLoading: savingsLoading } = useSavingsGoals();
+  const { data: savingsGoals = [], isLoading: savingsLoading } =
+    useSavingsGoals();
 
-  const { data: transactions = [], isLoading: transactionsLoading } = useTransactions();
+  const { data: transactions = [], isLoading: transactionsLoading } =
+    useTransactions();
 
   // Use TanStack Query for budget metadata
-  const { unassignedCash, isLoading: unassignedCashLoading } = useUnassignedCash();
+  const { unassignedCash, isLoading: unassignedCashLoading } =
+    useUnassignedCash();
   const {
     actualBalance,
     updateActualBalance,
@@ -69,17 +72,27 @@ const Dashboard = ({ setActiveView }) => {
     totalVirtualBalance,
     difference,
     isBalanced,
-  } = useDashboardCalculations(envelopes, savingsGoals, unassignedCash, actualBalance);
+  } = useDashboardCalculations(
+    envelopes,
+    savingsGoals,
+    unassignedCash,
+    actualBalance,
+  );
 
   // Transaction reconciliation logic
-  const { handleReconcileTransaction, handleAutoReconcileDifference, getEnvelopeOptions } =
-    useTransactionReconciliation(reconcileTransaction, envelopes, savingsGoals);
+  const {
+    handleReconcileTransaction,
+    handleAutoReconcileDifference,
+    getEnvelopeOptions,
+  } = useTransactionReconciliation(
+    reconcileTransaction,
+    envelopes,
+    savingsGoals,
+  );
 
   // Payday management
-  const { paydayPrediction, handleProcessPaycheck, handlePrepareEnvelopes } = usePaydayManager(
-    paycheckHistory,
-    setActiveView
-  );
+  const { paydayPrediction, handleProcessPaycheck, handlePrepareEnvelopes } =
+    usePaydayManager(paycheckHistory, setActiveView);
 
   // Dashboard helpers
   const { getRecentTransactions } = useDashboardHelpers();
@@ -126,7 +139,7 @@ const Dashboard = ({ setActiveView }) => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6">
       {/* Payday Prediction */}
       {paydayPrediction && (
         <PaydayPrediction
@@ -143,16 +156,20 @@ const Dashboard = ({ setActiveView }) => {
           if (setActiveView) {
             setActiveView("debts");
           } else {
-            logger.debug("Navigate to debts requested - setActiveView not available");
+            logger.debug(
+              "Navigate to debts requested - setActiveView not available",
+            );
           }
         }}
       />
 
       {/* Account Balance Overview */}
-      <div className="glassmorphism rounded-2xl p-6 border border-white/20">
-        <h2 className="text-xl font-semibold mb-6 flex items-center">
+      <div className="glassmorphism rounded-2xl p-6 border-2 border-black ring-1 ring-gray-800/10">
+        <h2 className="font-black text-black text-base mb-6 flex items-center">
           <CreditCard className="h-5 w-5 mr-2 text-blue-600" />
-          Checking Account Dashboard
+          <span className="text-lg">C</span>HECKING{" "}
+          <span className="text-lg">A</span>CCOUNT{" "}
+          <span className="text-lg">D</span>ASHBOARD
         </h2>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -194,7 +211,11 @@ const Dashboard = ({ setActiveView }) => {
           {/* Difference */}
           <div
             className={`rounded-lg p-6 ${
-              isBalanced ? "bg-green-50" : Math.abs(difference) > 10 ? "bg-red-50" : "bg-yellow-50"
+              isBalanced
+                ? "bg-green-50"
+                : Math.abs(difference) > 10
+                  ? "bg-red-50"
+                  : "bg-yellow-50"
             }`}
           >
             <div className="flex items-center justify-between mb-4">
@@ -214,7 +235,9 @@ const Dashboard = ({ setActiveView }) => {
               ) : (
                 <AlertTriangle
                   className={`h-5 w-5 ${
-                    Math.abs(difference) > 10 ? "text-red-600" : "text-yellow-600"
+                    Math.abs(difference) > 10
+                      ? "text-red-600"
+                      : "text-yellow-600"
                   }`}
                 />
               )}
@@ -222,7 +245,11 @@ const Dashboard = ({ setActiveView }) => {
             <div className="space-y-3">
               <div
                 className={`text-2xl font-bold ${
-                  isBalanced ? "text-green-900" : difference > 0 ? "text-green-900" : "text-red-900"
+                  isBalanced
+                    ? "text-green-900"
+                    : difference > 0
+                      ? "text-green-900"
+                      : "text-red-900"
                 }`}
               >
                 {isBalanced
@@ -250,7 +277,10 @@ const Dashboard = ({ setActiveView }) => {
 
         {/* Quick Actions */}
         <div className="flex gap-3 mt-6">
-          <button onClick={openReconcileModal} className="btn btn-secondary flex items-center">
+          <button
+            onClick={openReconcileModal}
+            className="btn btn-secondary border-2 border-black flex items-center"
+          >
             <RefreshCw className="h-4 w-4 mr-2" />
             Reconcile Transaction
           </button>
@@ -274,7 +304,8 @@ const Dashboard = ({ setActiveView }) => {
                   reconcileTransaction({
                     id: Date.now(),
                     amount: difference,
-                    description: "Balance reconciliation - adjusted for discrepancy",
+                    description:
+                      "Balance reconciliation - adjusted for discrepancy",
                     type: "expense",
                     envelopeId: "unassigned",
                     date: new Date().toISOString().split("T")[0],
@@ -282,7 +313,7 @@ const Dashboard = ({ setActiveView }) => {
                   });
                 }
               }}
-              className="btn btn-secondary flex items-center"
+              className="btn btn-secondary border-2 border-black flex items-center"
             >
               <CheckCircle className="h-4 w-4 mr-2" />
               Auto-Reconcile Difference
@@ -293,8 +324,11 @@ const Dashboard = ({ setActiveView }) => {
 
       {/* Recent Transactions */}
       {recentTransactions.length > 0 && (
-        <div className="glassmorphism rounded-2xl p-6 border border-white/20">
-          <h3 className="text-lg font-semibold mb-4">Recent Transactions</h3>
+        <div className="glassmorphism rounded-2xl p-6 border-2 border-black ring-1 ring-gray-800/10">
+          <h3 className="font-black text-black text-base mb-4">
+            <span className="text-lg">R</span>ECENT{" "}
+            <span className="text-lg">T</span>RANSACTIONS
+          </h3>
           <div className="space-y-3">
             {recentTransactions.map((transaction) => (
               <div
@@ -317,13 +351,15 @@ const Dashboard = ({ setActiveView }) => {
                     <div className="font-medium">{transaction.description}</div>
                     <div className="text-sm text-gray-600">
                       {new Date(transaction.date).toLocaleDateString()}
-                      {transaction.envelopeId && transaction.envelopeId !== "unassigned" && (
-                        <span className="ml-2">
-                          →{" "}
-                          {getEnvelopeOptions().find((opt) => opt.id === transaction.envelopeId)
-                            ?.name || "Unknown"}
-                        </span>
-                      )}
+                      {transaction.envelopeId &&
+                        transaction.envelopeId !== "unassigned" && (
+                          <span className="ml-2">
+                            →{" "}
+                            {getEnvelopeOptions().find(
+                              (opt) => opt.id === transaction.envelopeId,
+                            )?.name || "Unknown"}
+                          </span>
+                        )}
                     </div>
                   </div>
                 </div>
@@ -332,7 +368,8 @@ const Dashboard = ({ setActiveView }) => {
                     transaction.amount > 0 ? "text-green-600" : "text-red-600"
                   }`}
                 >
-                  {transaction.amount > 0 ? "+" : ""}${Math.abs(transaction.amount).toFixed(2)}
+                  {transaction.amount > 0 ? "+" : ""}$
+                  {Math.abs(transaction.amount).toFixed(2)}
                 </div>
               </div>
             ))}
@@ -344,7 +381,10 @@ const Dashboard = ({ setActiveView }) => {
       {showReconcileModal && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="glassmorphism rounded-2xl p-6 w-full max-w-md border border-white/30 shadow-2xl">
-            <h3 className="text-xl font-semibold mb-4">Reconcile Transaction</h3>
+            <h3 className="font-black text-black text-base mb-4">
+              <span className="text-lg">R</span>ECONCILE{" "}
+              <span className="text-lg">T</span>RANSACTION
+            </h3>
 
             <div className="space-y-4">
               <div>
@@ -381,23 +421,31 @@ const Dashboard = ({ setActiveView }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Amount</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Amount
+                </label>
                 <input
                   type="number"
                   step="0.01"
                   value={newTransaction.amount}
-                  onChange={(e) => updateNewTransaction({ amount: e.target.value })}
+                  onChange={(e) =>
+                    updateNewTransaction({ amount: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   placeholder="0.00"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description
+                </label>
                 <input
                   type="text"
                   value={newTransaction.description}
-                  onChange={(e) => updateNewTransaction({ description: e.target.value })}
+                  onChange={(e) =>
+                    updateNewTransaction({ description: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   placeholder="What was this transaction for?"
                 />
@@ -409,7 +457,9 @@ const Dashboard = ({ setActiveView }) => {
                 </label>
                 <select
                   value={newTransaction.envelopeId}
-                  onChange={(e) => updateNewTransaction({ envelopeId: e.target.value })}
+                  onChange={(e) =>
+                    updateNewTransaction({ envelopeId: e.target.value })
+                  }
                   className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select envelope...</option>
@@ -422,11 +472,15 @@ const Dashboard = ({ setActiveView }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Date
+                </label>
                 <input
                   type="date"
                   value={newTransaction.date}
-                  onChange={(e) => updateNewTransaction({ date: e.target.value })}
+                  onChange={(e) =>
+                    updateNewTransaction({ date: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>

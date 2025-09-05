@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { BookOpen, Plus, Upload } from "lucide-react";
 
 import TransactionSummary from "./TransactionSummary";
-import TransactionFilters from "./TransactionFilters";
+import StandardFilters from "../ui/StandardFilters";
 import TransactionTable from "./TransactionTable";
 import TransactionForm from "./TransactionForm";
 import ImportModal from "./import/ImportModal";
@@ -18,7 +18,9 @@ import { useTransactions } from "../../hooks/common/useTransactions";
 import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
 import logger from "../../utils/common/logger";
 
-const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855f7" } }) => {
+const TransactionLedger = ({
+  currentUser = { userName: "User", userColor: "#a855f7" },
+}) => {
   // Enhanced TanStack Query integration with caching and optimistic updates
   const {
     transactions = [],
@@ -37,10 +39,16 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
 
   // Handle bulk import by updating both store arrays
   const handleBulkImport = (newTransactions) => {
-    logger.debug("🔄 Bulk import called with transactions:", newTransactions.length);
+    logger.debug(
+      "🔄 Bulk import called with transactions:",
+      newTransactions.length,
+    );
     const updatedAllTransactions = [...transactions, ...newTransactions];
     setAllTransactions(updatedAllTransactions);
-    logger.debug("💾 Bulk import complete. Total transactions:", updatedAllTransactions.length);
+    logger.debug(
+      "💾 Bulk import complete. Total transactions:",
+      updatedAllTransactions.length,
+    );
   };
   const [showAddModal, setShowAddModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
@@ -57,8 +65,13 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
   const pageSize = 10;
 
   // Custom hooks
-  const { transactionForm, setTransactionForm, resetForm, populateForm, createTransaction } =
-    useTransactionForm();
+  const {
+    transactionForm,
+    setTransactionForm,
+    resetForm,
+    populateForm,
+    createTransaction,
+  } = useTransactionForm();
 
   const {
     importData,
@@ -79,13 +92,16 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
     typeFilter,
     envelopeFilter,
     sortBy,
-    sortOrder
+    sortOrder,
   );
 
-  const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / pageSize));
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredTransactions.length / pageSize),
+  );
   const paginatedTransactions = filteredTransactions.slice(
     (currentPage - 1) * pageSize,
-    currentPage * pageSize
+    currentPage * pageSize,
   );
 
   useEffect(() => {
@@ -140,7 +156,10 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
         ...billEnvelope,
         lastPaidDate: billPayment.paidDate,
         lastPaidAmount: billPayment.amount,
-        currentBalance: Math.max(0, (billEnvelope.currentBalance || 0) - billPayment.amount),
+        currentBalance: Math.max(
+          0,
+          (billEnvelope.currentBalance || 0) - billPayment.amount,
+        ),
         isPaid: true,
         paidThisPeriod: true,
       };
@@ -148,7 +167,10 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
     }
   };
 
-  const handleSplitTransaction = async (originalTransaction, splitTransactions) => {
+  const handleSplitTransaction = async (
+    originalTransaction,
+    splitTransactions,
+  ) => {
     try {
       // Delete the original transaction
       deleteTransaction(originalTransaction.id);
@@ -189,20 +211,21 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
   }
 
   return (
-    <div className="space-y-6">
+    <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6">
       {/* Header */}
       <div className="flex flex-wrap md:flex-nowrap justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold flex items-center text-gray-900">
+          <h2 className="font-black text-black text-base flex items-center">
             <div className="relative mr-4">
               <div className="absolute inset-0 bg-emerald-500 rounded-2xl blur-lg opacity-30"></div>
               <div className="relative bg-emerald-500 p-3 rounded-2xl">
                 <BookOpen className="h-6 w-6 text-white" />
               </div>
             </div>
-            Transaction Ledger
+            <span className="text-lg">T</span>RANSACTION{" "}
+            <span className="text-lg">L</span>EDGER
           </h2>
-          <p className="text-gray-600 mt-1">
+          <p className="text-purple-900 mt-1">
             {transactions.length} transactions • Net: ${netCashFlow.toFixed(2)}
           </p>
         </div>
@@ -210,14 +233,14 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
         <div className="flex flex-row gap-3">
           <button
             onClick={() => setShowImportModal(true)}
-            className="btn btn-primary flex items-center"
+            className="btn btn-primary border-2 border-black flex items-center"
           >
             <Upload className="h-4 w-4 mr-2" />
             Import File
           </button>
           <button
             onClick={() => setShowAddModal(true)}
-            className="btn btn-primary flex items-center"
+            className="btn btn-primary border-2 border-black flex items-center"
             data-tour="add-transaction"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -230,20 +253,81 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
       <TransactionSummary transactions={transactions} />
 
       {/* Filters */}
-      <TransactionFilters
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        dateFilter={dateFilter}
-        setDateFilter={setDateFilter}
-        typeFilter={typeFilter}
-        setTypeFilter={setTypeFilter}
-        envelopeFilter={envelopeFilter}
-        setEnvelopeFilter={setEnvelopeFilter}
-        sortBy={sortBy}
-        setSortBy={setSortBy}
-        sortOrder={sortOrder}
-        setSortOrder={setSortOrder}
-        envelopes={envelopes}
+      <StandardFilters
+        filters={{
+          search: searchTerm,
+          dateFilter,
+          typeFilter,
+          envelopeFilter,
+          sortBy,
+          sortOrder,
+        }}
+        onFilterChange={(key, value) => {
+          switch (key) {
+            case "search":
+              setSearchTerm(value);
+              break;
+            case "dateFilter":
+              setDateFilter(value);
+              break;
+            case "typeFilter":
+              setTypeFilter(value);
+              break;
+            case "envelopeFilter":
+              setEnvelopeFilter(value);
+              break;
+            case "sortBy":
+              setSortBy(value);
+              break;
+            case "sortOrder":
+              setSortOrder(value);
+              break;
+          }
+        }}
+        filterConfigs={[
+          {
+            key: "dateFilter",
+            type: "select",
+            defaultValue: "all",
+            options: [
+              { value: "all", label: "All Time" },
+              { value: "today", label: "Today" },
+              { value: "week", label: "This Week" },
+              { value: "month", label: "This Month" },
+            ],
+          },
+          {
+            key: "typeFilter",
+            type: "select",
+            defaultValue: "all",
+            options: [
+              { value: "all", label: "All Types" },
+              { value: "income", label: "Income" },
+              { value: "expense", label: "Expenses" },
+            ],
+          },
+          {
+            key: "envelopeFilter",
+            type: "select",
+            defaultValue: "all",
+            options: [
+              { value: "all", label: "All Envelopes" },
+              { value: "", label: "Unassigned" },
+              ...envelopes.map((env) => ({ value: env.id, label: env.name })),
+            ],
+          },
+          {
+            key: "sortBy",
+            type: "select",
+            defaultValue: "date",
+            options: [
+              { value: "date", label: "Date" },
+              { value: "amount", label: "Amount" },
+              { value: "description", label: "Description" },
+            ],
+          },
+        ]}
+        searchPlaceholder="Search transactions..."
       />
 
       {/* Transactions Table */}
@@ -257,7 +341,7 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
 
       <div className="flex items-center justify-between mt-4">
         <button
-          className="btn btn-secondary"
+          className="btn btn-secondary border-2 border-black"
           disabled={currentPage === 1}
           onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
         >
@@ -267,7 +351,7 @@ const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855
           Page {currentPage} of {totalPages}
         </span>
         <button
-          className="btn btn-secondary"
+          className="btn btn-secondary border-2 border-black"
           disabled={currentPage === totalPages}
           onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
         >
