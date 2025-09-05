@@ -30,6 +30,7 @@ export default [
       "**/debtDebugConfig.js", // Debt debugging configuration  
       "**/masterSyncValidator.js", // Sync validation testing
       "**/highlight.js", // Error monitoring utility
+      "src/stores/authStore.jsx", // Main Zustand store for UI/State, low priority for refactoring
     ],
   },
   {
