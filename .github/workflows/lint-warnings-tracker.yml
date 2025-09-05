@@ -275,6 +275,45 @@ jobs:
           script: |
             const fs = require('fs');
             
+            // First, hide previous automation comments to prevent flooding
+            try {
+              const comments = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: 568
+              });
+              
+              // Find previous automation comments (from GitHub Actions)
+              const automationComments = comments.data.filter(comment => 
+                comment.user.login === 'github-actions[bot]' &&
+                (comment.body.includes('📊 **Lint Warning Analysis**') ||
+                 comment.body.includes('🚀 **Lint Warnings Report**') ||
+                 comment.body.includes('Automated lint warning tracking'))
+              );
+              
+              // Hide the previous automation comments by minimizing them
+              for (const comment of automationComments) {
+                try {
+                  await github.rest.issues.updateComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    comment_id: comment.id,
+                    body: `<details>
+<summary>📊 Previous Lint Analysis (${new Date(comment.created_at).toLocaleDateString()})</summary>
+
+${comment.body}
+
+</details>`
+                  });
+                  console.log(`✅ Minimized previous comment #${comment.id}`);
+                } catch (updateError) {
+                  console.log(`⚠️ Could not minimize comment #${comment.id}:`, updateError.message);
+                }
+              }
+            } catch (error) {
+              console.log('⚠️ Could not process previous comments:', error.message);
+            }
+            
             // Load template from markdown file
             const template = fs.readFileSync('.github/data/lint-warnings-comment.md', 'utf8');
             
