@@ -14,10 +14,14 @@ const AnalyticsSummaryCards = ({ summaryMetrics = {} }) => {
   } = summaryMetrics;
 
   // Calculate average transaction size if we have expense data
-  const avgTransaction = totalExpenses > 0 ? totalExpenses / (totalExpenses > 0 ? 1 : 1) : 0;
-  
+  const avgTransaction =
+    totalExpenses > 0 ? totalExpenses / (totalExpenses > 0 ? 1 : 1) : 0;
+
   // Calculate budget accuracy based on envelope utilization
-  const budgetAccuracy = Math.min(100, Math.max(0, 100 - Math.abs(envelopeUtilization - 100)));
+  const budgetAccuracy = Math.min(
+    100,
+    Math.max(0, 100 - Math.abs(envelopeUtilization - 100)),
+  );
 
   const cards = [
     {
@@ -41,7 +45,8 @@ const AnalyticsSummaryCards = ({ summaryMetrics = {} }) => {
       icon: Target,
       label: "Budget Accuracy",
       value: `${budgetAccuracy.toFixed(1)}%`,
-      color: budgetAccuracy > 80 ? "pink" : budgetAccuracy > 60 ? "amber" : "red",
+      color:
+        budgetAccuracy > 80 ? "pink" : budgetAccuracy > 60 ? "amber" : "red",
       subtext: "Envelope adherence",
       alert: budgetAccuracy < 60,
     },
