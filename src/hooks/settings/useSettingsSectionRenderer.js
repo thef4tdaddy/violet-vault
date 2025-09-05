@@ -38,46 +38,38 @@ export const useSettingsSectionRenderer = ({
   const renderSectionContent = (activeSection) => {
     switch (activeSection) {
       case "general":
-        return (
-          <GeneralSettingsSection
-            isLocalOnlyMode={isLocalOnlyMode}
-            cloudSyncEnabled={cloudSyncEnabled}
-            isSyncing={isSyncing}
-            onOpenLocalOnlySettings={onOpenLocalOnlySettings}
-            onToggleCloudSync={onToggleCloudSync}
-            onManualSync={onManualSync}
-          />
-        );
+        return React.createElement(GeneralSettingsSection, {
+          isLocalOnlyMode,
+          cloudSyncEnabled,
+          isSyncing,
+          onOpenLocalOnlySettings,
+          onToggleCloudSync,
+          onManualSync,
+        });
 
       case "account":
-        return (
-          <AccountSettingsSection
-            currentUser={currentUser}
-            onOpenPasswordModal={onOpenPasswordModal}
-            onLogout={onLogout}
-            onOpenResetConfirm={onOpenResetConfirm}
-          />
-        );
+        return React.createElement(AccountSettingsSection, {
+          currentUser,
+          onOpenPasswordModal,
+          onLogout,
+          onOpenResetConfirm,
+        });
 
       case "security":
-        return (
-          <SecuritySettingsSection
-            securityManager={securityManager}
-            onOpenSecuritySettings={onOpenSecuritySettings}
-          />
-        );
+        return React.createElement(SecuritySettingsSection, {
+          securityManager,
+          onOpenSecuritySettings,
+        });
 
       case "data":
-        return (
-          <DataManagementSection
-            onOpenEnvelopeChecker={onOpenEnvelopeChecker}
-            onOpenActivityFeed={onOpenActivityFeed}
-            onCreateTestHistory={onCreateTestHistory}
-            onExport={onExport}
-            onImport={onImport}
-            onSync={onSync}
-          />
-        );
+        return React.createElement(DataManagementSection, {
+          onOpenEnvelopeChecker,
+          onOpenActivityFeed,
+          onCreateTestHistory,
+          onExport,
+          onImport,
+          onSync,
+        });
 
       default:
         return null;
