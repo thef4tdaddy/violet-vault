@@ -6,7 +6,13 @@ import StandardFilters from "../ui/StandardFilters";
  * View mode tabs for BillManager using standardized tabs component
  * Pure UI component that preserves exact visual appearance
  */
-const BillViewTabs = ({ viewModes, viewMode, setViewMode, filterOptions, setFilterOptions }) => {
+const BillViewTabs = ({
+  viewModes,
+  viewMode,
+  setViewMode,
+  filterOptions,
+  setFilterOptions,
+}) => {
   return (
     <div className="space-y-0">
       {/* View Mode Tabs */}
@@ -22,7 +28,9 @@ const BillViewTabs = ({ viewModes, viewMode, setViewMode, filterOptions, setFilt
       {/* Connected Filters */}
       <StandardFilters
         filters={filterOptions}
-        onFilterChange={(key, value) => setFilterOptions((prev) => ({ ...prev, [key]: value }))}
+        onFilterChange={(key, value) =>
+          setFilterOptions((prev) => ({ ...prev, [key]: value }))
+        }
         filterConfigs={[
           {
             key: "urgency",
@@ -33,19 +41,19 @@ const BillViewTabs = ({ viewModes, viewMode, setViewMode, filterOptions, setFilt
               { value: "overdue", label: "Overdue" },
               { value: "urgent", label: "Urgent" },
               { value: "soon", label: "Soon" },
-              { value: "normal", label: "Normal" }
-            ]
+              { value: "normal", label: "Normal" },
+            ],
           },
           {
-            key: "envelope", 
+            key: "envelope",
             type: "select",
             defaultValue: "all",
             options: [
               { value: "all", label: "All Envelopes" },
               { value: "connected", label: "Connected" },
-              { value: "unconnected", label: "Unconnected" }
-            ]
-          }
+              { value: "unconnected", label: "Unconnected" },
+            ],
+          },
         ]}
         searchPlaceholder="Search bills..."
         size="md"

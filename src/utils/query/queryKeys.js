@@ -18,15 +18,32 @@ export const queryKeys = {
   envelopes: ["envelopes"],
   envelopesList: (filters = {}) => [...queryKeys.envelopes, "list", filters],
   envelopeById: (id) => [...queryKeys.envelopes, "detail", id],
-  envelopesByCategory: (category) => [...queryKeys.envelopes, "category", category],
+  envelopesByCategory: (category) => [
+    ...queryKeys.envelopes,
+    "category",
+    category,
+  ],
   envelopeBalances: () => [...queryKeys.envelopes, "balances"],
 
   // Transactions
   transactions: ["transactions"],
-  transactionsList: (filters = {}) => [...queryKeys.transactions, "list", filters],
+  transactionsList: (filters = {}) => [
+    ...queryKeys.transactions,
+    "list",
+    filters,
+  ],
   transactionById: (id) => [...queryKeys.transactions, "detail", id],
-  transactionsByDateRange: (start, end) => [...queryKeys.transactions, "dateRange", start, end],
-  transactionsByEnvelope: (envelopeId) => [...queryKeys.transactions, "envelope", envelopeId],
+  transactionsByDateRange: (start, end) => [
+    ...queryKeys.transactions,
+    "dateRange",
+    start,
+    end,
+  ],
+  transactionsByEnvelope: (envelopeId) => [
+    ...queryKeys.transactions,
+    "envelope",
+    envelopeId,
+  ],
 
   // Bills
   bills: ["bills"],
@@ -45,7 +62,11 @@ export const queryKeys = {
   analytics: ["analytics"],
   analyticsSpending: (period) => [...queryKeys.analytics, "spending", period],
   analyticsTrends: (period) => [...queryKeys.analytics, "trends", period],
-  analyticsCategories: (period) => [...queryKeys.analytics, "categories", period],
+  analyticsCategories: (period) => [
+    ...queryKeys.analytics,
+    "categories",
+    period,
+  ],
   analyticsBalance: () => [...queryKeys.analytics, "balance"],
   analyticsReport: (type, params) => [...queryKeys.analytics, type, params],
 
@@ -68,9 +89,17 @@ export const queryKeys = {
 
   // Budget History (version control)
   budgetHistory: ["budgetHistory"],
-  budgetCommits: (options = {}) => [...queryKeys.budgetHistory, "commits", options],
+  budgetCommits: (options = {}) => [
+    ...queryKeys.budgetHistory,
+    "commits",
+    options,
+  ],
   budgetCommit: (hash) => [...queryKeys.budgetHistory, "commit", hash],
-  budgetChanges: (commitHash) => [...queryKeys.budgetHistory, "changes", commitHash],
+  budgetChanges: (commitHash) => [
+    ...queryKeys.budgetHistory,
+    "changes",
+    commitHash,
+  ],
   budgetHistoryStats: () => [...queryKeys.budgetHistory, "stats"],
   budgetBranches: () => [...queryKeys.budgetHistory, "branches"],
   budgetTags: () => [...queryKeys.budgetHistory, "tags"],
@@ -125,7 +154,11 @@ export const queryKeyUtils = {
    */
   getRelatedKeys: (entityType) => {
     const related = {
-      envelopes: [queryKeys.envelopes, queryKeys.dashboard, queryKeys.budgetMetadata],
+      envelopes: [
+        queryKeys.envelopes,
+        queryKeys.dashboard,
+        queryKeys.budgetMetadata,
+      ],
       transactions: [
         queryKeys.transactions,
         queryKeys.analytics,
@@ -175,7 +208,9 @@ export const queryKeyUtils = {
    * Create hierarchical query key
    */
   createHierarchical: (...segments) => {
-    return segments.filter((segment) => segment !== null && segment !== undefined);
+    return segments.filter(
+      (segment) => segment !== null && segment !== undefined,
+    );
   },
 
   /**

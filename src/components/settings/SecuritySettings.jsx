@@ -34,12 +34,13 @@ const SecuritySettings = ({ isOpen, onClose }) => {
 
   const exportSecurityEvents = () => {
     const dataStr = JSON.stringify(securityEvents, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-    const exportFileDefaultName = `security-events-${new Date().toISOString().split('T')[0]}.json`;
-    
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
+    const dataUri =
+      "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
+    const exportFileDefaultName = `security-events-${new Date().toISOString().split("T")[0]}.json`;
+
+    const linkElement = document.createElement("a");
+    linkElement.setAttribute("href", dataUri);
+    linkElement.setAttribute("download", exportFileDefaultName);
     linkElement.click();
   };
 
@@ -60,12 +61,18 @@ const SecuritySettings = ({ isOpen, onClose }) => {
               <Shield className="h-6 w-6 text-blue-600" />
               <div>
                 <h3 className="text-lg font-black text-black">
-                  <span className="text-xl">S</span>ECURITY <span className="text-xl">S</span>ETTINGS
+                  <span className="text-xl">S</span>ECURITY{" "}
+                  <span className="text-xl">S</span>ETTINGS
                 </h3>
-                <p className="text-sm text-purple-900">Configure app security and privacy options</p>
+                <p className="text-sm text-purple-900">
+                  Configure app security and privacy options
+                </p>
               </div>
             </div>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1 border-2 border-black rounded">
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 p-1 border-2 border-black rounded"
+            >
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -113,22 +120,31 @@ const SecuritySettings = ({ isOpen, onClose }) => {
               <div className="space-y-4 pl-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Enable Auto-Lock</label>
+                    <label className="text-sm font-medium text-gray-700">
+                      Enable Auto-Lock
+                    </label>
                     <p className="text-xs text-gray-500">
                       Automatically lock the app after period of inactivity
                     </p>
                   </div>
                   <button
                     onClick={() =>
-                      handleSettingChange("autoLockEnabled", !securitySettings.autoLockEnabled)
+                      handleSettingChange(
+                        "autoLockEnabled",
+                        !securitySettings.autoLockEnabled,
+                      )
                     }
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      securitySettings.autoLockEnabled ? "bg-blue-600" : "bg-gray-200"
+                      securitySettings.autoLockEnabled
+                        ? "bg-blue-600"
+                        : "bg-gray-200"
                     }`}
                   >
                     <span
                       className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        securitySettings.autoLockEnabled ? "translate-x-6" : "translate-x-1"
+                        securitySettings.autoLockEnabled
+                          ? "translate-x-6"
+                          : "translate-x-1"
                       }`}
                     />
                   </button>
@@ -138,7 +154,8 @@ const SecuritySettings = ({ isOpen, onClose }) => {
                   <div>
                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                       <Clock className="h-4 w-4" />
-                      Auto-Lock Timeout: {securitySettings.autoLockTimeout} minutes
+                      Auto-Lock Timeout: {securitySettings.autoLockTimeout}{" "}
+                      minutes
                     </label>
                     <input
                       type="range"
@@ -146,7 +163,10 @@ const SecuritySettings = ({ isOpen, onClose }) => {
                       max="120"
                       value={securitySettings.autoLockTimeout}
                       onChange={(e) =>
-                        handleSettingChange("autoLockTimeout", parseInt(e.target.value))
+                        handleSettingChange(
+                          "autoLockTimeout",
+                          parseInt(e.target.value),
+                        )
                       }
                       className="w-full mt-2"
                     />
@@ -159,22 +179,31 @@ const SecuritySettings = ({ isOpen, onClose }) => {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Lock on Page Hide</label>
+                    <label className="text-sm font-medium text-gray-700">
+                      Lock on Page Hide
+                    </label>
                     <p className="text-xs text-gray-500">
                       Lock when switching tabs or minimizing window
                     </p>
                   </div>
                   <button
                     onClick={() =>
-                      handleSettingChange("lockOnPageHide", !securitySettings.lockOnPageHide)
+                      handleSettingChange(
+                        "lockOnPageHide",
+                        !securitySettings.lockOnPageHide,
+                      )
                     }
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      securitySettings.lockOnPageHide ? "bg-blue-600" : "bg-gray-200"
+                      securitySettings.lockOnPageHide
+                        ? "bg-blue-600"
+                        : "bg-gray-200"
                     }`}
                   >
                     <span
                       className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        securitySettings.lockOnPageHide ? "translate-x-6" : "translate-x-1"
+                        securitySettings.lockOnPageHide
+                          ? "translate-x-6"
+                          : "translate-x-1"
                       }`}
                     />
                   </button>
@@ -192,7 +221,10 @@ const SecuritySettings = ({ isOpen, onClose }) => {
               <div className="pl-6">
                 <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                   <Clock className="h-4 w-4" />
-                  Auto-Clear Timeout: {securitySettings.clipboardClearTimeout} seconds
+                  Auto-Clear Timeout: {
+                    securitySettings.clipboardClearTimeout
+                  }{" "}
+                  seconds
                 </label>
                 <p className="text-xs text-gray-500 mb-2">
                   Automatically clear clipboard after copying sensitive data
@@ -203,7 +235,10 @@ const SecuritySettings = ({ isOpen, onClose }) => {
                   max="300"
                   value={securitySettings.clipboardClearTimeout}
                   onChange={(e) =>
-                    handleSettingChange("clipboardClearTimeout", parseInt(e.target.value))
+                    handleSettingChange(
+                      "clipboardClearTimeout",
+                      parseInt(e.target.value),
+                    )
                   }
                   className="w-full"
                 />
@@ -235,16 +270,20 @@ const SecuritySettings = ({ isOpen, onClose }) => {
                     onClick={() =>
                       handleSettingChange(
                         "securityLoggingEnabled",
-                        !securitySettings.securityLoggingEnabled
+                        !securitySettings.securityLoggingEnabled,
                       )
                     }
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      securitySettings.securityLoggingEnabled ? "bg-blue-600" : "bg-gray-200"
+                      securitySettings.securityLoggingEnabled
+                        ? "bg-blue-600"
+                        : "bg-gray-200"
                     }`}
                   >
                     <span
                       className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        securitySettings.securityLoggingEnabled ? "translate-x-6" : "translate-x-1"
+                        securitySettings.securityLoggingEnabled
+                          ? "translate-x-6"
+                          : "translate-x-1"
                       }`}
                     />
                   </button>
@@ -257,8 +296,13 @@ const SecuritySettings = ({ isOpen, onClose }) => {
                         onClick={() => setShowEvents(!showEvents)}
                         className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700"
                       >
-                        {showEvents ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        {showEvents ? "Hide" : "View"} Security Events ({securityEvents.length})
+                        {showEvents ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                        {showEvents ? "Hide" : "View"} Security Events (
+                        {securityEvents.length})
                       </button>
                       <button
                         onClick={exportSecurityEvents}
@@ -285,7 +329,10 @@ const SecuritySettings = ({ isOpen, onClose }) => {
                             </p>
                           ) : (
                             securityEvents.map((event) => (
-                              <div key={event.id} className="bg-white p-2 rounded text-xs">
+                              <div
+                                key={event.id}
+                                className="bg-white p-2 rounded text-xs"
+                              >
                                 <div className="flex justify-between items-start">
                                   <div>
                                     <span
@@ -300,10 +347,14 @@ const SecuritySettings = ({ isOpen, onClose }) => {
                                     >
                                       {event.type}
                                     </span>
-                                    <p className="text-gray-600 mt-1">{event.description}</p>
+                                    <p className="text-gray-600 mt-1">
+                                      {event.description}
+                                    </p>
                                   </div>
                                   <span className="text-gray-400">
-                                    {new Date(event.timestamp).toLocaleTimeString()}
+                                    {new Date(
+                                      event.timestamp,
+                                    ).toLocaleTimeString()}
                                   </span>
                                 </div>
                               </div>
@@ -321,7 +372,9 @@ const SecuritySettings = ({ isOpen, onClose }) => {
           {/* Actions */}
           <div className="mt-6 pt-4 border-t border-gray-200">
             <div className="flex justify-between items-center">
-              <div className="text-xs text-gray-500">Security settings are automatically saved</div>
+              <div className="text-xs text-gray-500">
+                Security settings are automatically saved
+              </div>
               <button
                 onClick={onClose}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 border-2 border-black"
@@ -339,10 +392,13 @@ const SecuritySettings = ({ isOpen, onClose }) => {
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <div className="flex items-center gap-3 mb-4">
               <AlertTriangle className="h-6 w-6 text-red-500" />
-              <h4 className="font-semibold text-gray-900">Clear Security Events</h4>
+              <h4 className="font-semibold text-gray-900">
+                Clear Security Events
+              </h4>
             </div>
             <p className="text-gray-600 mb-6">
-              Are you sure you want to clear all security event logs? This action cannot be undone.
+              Are you sure you want to clear all security event logs? This
+              action cannot be undone.
             </p>
             <div className="flex gap-3">
               <button

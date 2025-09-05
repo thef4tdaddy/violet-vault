@@ -17,7 +17,8 @@ describe("Sync Integration Tests", () => {
   beforeEach(async () => {
     // Generate real test credentials
     testBudgetId = `test_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    testEncryptionKey = await encryptionUtils.generateEncryptionKey("test_password_123");
+    testEncryptionKey =
+      await encryptionUtils.generateEncryptionKey("test_password_123");
 
     // Create realistic test data
     testData = {
@@ -123,7 +124,7 @@ describe("Sync Integration Tests", () => {
         expect(retrievedEnvelopes[1].name).toBe("Gas");
         expect(retrievedEnvelopes[0].balance).toBe(500);
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
 
     it(
@@ -145,7 +146,7 @@ describe("Sync Integration Tests", () => {
         expect(transactions[0].description).toBe("Grocery Store");
         expect(transactions[0].amount).toBe(-50);
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
 
     it(
@@ -165,7 +166,11 @@ describe("Sync Integration Tests", () => {
         expect(unpaidBills[0].isPaid).toBe(false);
 
         // Mark as paid and test
-        const updatedBill = { ...testData.bills[0], isPaid: true, paidDate: new Date() };
+        const updatedBill = {
+          ...testData.bills[0],
+          isPaid: true,
+          paidDate: new Date(),
+        };
         await budgetDatabaseService.saveBills([updatedBill]);
 
         const paidBills = await budgetDatabaseService.getBills({
@@ -175,7 +180,7 @@ describe("Sync Integration Tests", () => {
         expect(paidBills).toHaveLength(1);
         expect(paidBills[0].isPaid).toBe(true);
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
 
     it(
@@ -213,7 +218,7 @@ describe("Sync Integration Tests", () => {
         expect(foodTransactions).toHaveLength(1);
         expect(foodTransactions[0].description).toBe("Grocery Store");
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
   });
 
@@ -270,7 +275,7 @@ describe("Sync Integration Tests", () => {
         const loadedData = await firebaseSyncService.loadFromCloud();
         expect(loadedData).toBeTruthy();
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
   });
 
@@ -299,7 +304,8 @@ describe("Sync Integration Tests", () => {
     });
 
     // Only test real chunked sync if Firebase is properly configured
-    (process.env.VITE_FIREBASE_PROJECT_ID && process.env.VITE_FIREBASE_PROJECT_ID !== "demo-project"
+    (process.env.VITE_FIREBASE_PROJECT_ID &&
+      process.env.VITE_FIREBASE_PROJECT_ID !== "demo-project"
       ? it
       : it.skip)(
       "should save and load chunked data from real Firebase",
@@ -325,13 +331,16 @@ describe("Sync Integration Tests", () => {
           userName: "Chunked Test User",
         };
 
-        const saveSuccess = await chunkedSyncService.saveToCloud(largeData, currentUser);
+        const saveSuccess = await chunkedSyncService.saveToCloud(
+          largeData,
+          currentUser,
+        );
         expect(saveSuccess).toBe(true);
 
         const loadedData = await chunkedSyncService.loadFromCloud();
         expect(loadedData.transactions).toHaveLength(1200);
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
   });
 
@@ -352,10 +361,13 @@ describe("Sync Integration Tests", () => {
         ]);
 
         // 2. Sync to cloud
-        const cloudSaveSuccess = await firebaseSyncService.saveToCloud(testData, {
-          userId: currentUser.uid,
-          userName: currentUser.userName,
-        });
+        const cloudSaveSuccess = await firebaseSyncService.saveToCloud(
+          testData,
+          {
+            userId: currentUser.uid,
+            userName: currentUser.userName,
+          },
+        );
         expect(cloudSaveSuccess).toBe(true);
 
         // 3. Clear local data
@@ -384,12 +396,13 @@ describe("Sync Integration Tests", () => {
         const restoredEnvelopes = await budgetDatabaseService.getEnvelopes();
         expect(restoredEnvelopes.length).toBeGreaterThan(0);
 
-        const restoredTransactions = await budgetDatabaseService.getTransactions({
-          limit: 100,
-        });
+        const restoredTransactions =
+          await budgetDatabaseService.getTransactions({
+            limit: 100,
+          });
         expect(restoredTransactions.length).toBeGreaterThan(0);
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
 
     it(
@@ -442,7 +455,7 @@ describe("Sync Integration Tests", () => {
         const syncResults = await Promise.allSettled(syncPromises);
         expect(syncResults[0].status).toBe("fulfilled");
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
   });
 
@@ -474,7 +487,7 @@ describe("Sync Integration Tests", () => {
           });
         }
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
 
     it(
@@ -501,7 +514,10 @@ describe("Sync Integration Tests", () => {
 
           // Should still return the valid envelopes
           const validEnvelopes = envelopes.filter(
-            (e) => e.name && typeof e.balance === "number" && typeof e.archived === "boolean"
+            (e) =>
+              e.name &&
+              typeof e.balance === "number" &&
+              typeof e.archived === "boolean",
           );
           expect(validEnvelopes).toHaveLength(2);
         } catch (error) {
@@ -510,7 +526,7 @@ describe("Sync Integration Tests", () => {
           expect(error).toBeInstanceOf(Error);
         }
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
   });
 });

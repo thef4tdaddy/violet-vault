@@ -144,7 +144,7 @@ describe("Bill Calculations Utilities", () => {
           amount: 100,
           daysUntilDue: 5,
           urgency: "soon",
-        })
+        }),
       );
     });
 

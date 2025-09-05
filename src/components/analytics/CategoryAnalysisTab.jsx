@@ -4,7 +4,8 @@ import { Tag, TrendingUp, TrendingDown, CreditCard } from "lucide-react";
 const CategoryAnalysisTab = ({ categoryStats }) => {
   const getFrequencyIndicator = (frequency) => {
     if (frequency > 2) return <TrendingUp className="h-4 w-4 text-green-500" />;
-    if (frequency < 0.5) return <TrendingDown className="h-4 w-4 text-red-500" />;
+    if (frequency < 0.5)
+      return <TrendingDown className="h-4 w-4 text-red-500" />;
     return <CreditCard className="h-4 w-4 text-blue-500" />;
   };
 
@@ -38,26 +39,40 @@ const CategoryAnalysisTab = ({ categoryStats }) => {
               </div>
               <div className="flex items-center gap-1">
                 {getFrequencyIndicator(stat.frequency)}
-                <span className="text-xs text-purple-800 font-bold capitalize">{stat.type}</span>
+                <span className="text-xs text-purple-800 font-bold capitalize">
+                  {stat.type}
+                </span>
               </div>
             </div>
 
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-purple-700 font-medium">Total Amount:</span>
-                <span className="font-black text-gray-900">${stat.totalAmount.toFixed(2)}</span>
+                <span className="text-purple-700 font-medium">
+                  Total Amount:
+                </span>
+                <span className="font-black text-gray-900">
+                  ${stat.totalAmount.toFixed(2)}
+                </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-purple-700 font-medium">Transactions:</span>
-                <span className="font-bold text-gray-900">{stat.transactionCount}</span>
+                <span className="text-purple-700 font-medium">
+                  Transactions:
+                </span>
+                <span className="font-bold text-gray-900">
+                  {stat.transactionCount}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-purple-700 font-medium">Avg Amount:</span>
-                <span className="font-bold text-gray-900">${stat.avgAmount.toFixed(2)}</span>
+                <span className="font-bold text-gray-900">
+                  ${stat.avgAmount.toFixed(2)}
+                </span>
               </div>
               {stat.lastUsed && (
                 <div className="flex justify-between">
-                  <span className="text-purple-700 font-medium">Last Used:</span>
+                  <span className="text-purple-700 font-medium">
+                    Last Used:
+                  </span>
                   <span className="font-bold text-gray-900">
                     {new Date(stat.lastUsed).toLocaleDateString()}
                   </span>

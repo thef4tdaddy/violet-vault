@@ -81,11 +81,17 @@ export const validateRule = (ruleConfig) => {
     errors.push("Rule name is required");
   }
 
-  if (!ruleConfig.type || !Object.values(RULE_TYPES).includes(ruleConfig.type)) {
+  if (
+    !ruleConfig.type ||
+    !Object.values(RULE_TYPES).includes(ruleConfig.type)
+  ) {
     errors.push("Valid rule type is required");
   }
 
-  if (!ruleConfig.trigger || !Object.values(TRIGGER_TYPES).includes(ruleConfig.trigger)) {
+  if (
+    !ruleConfig.trigger ||
+    !Object.values(TRIGGER_TYPES).includes(ruleConfig.trigger)
+  ) {
     errors.push("Valid trigger type is required");
   }
 
@@ -108,7 +114,10 @@ export const validateRule = (ruleConfig) => {
       break;
 
     case RULE_TYPES.CONDITIONAL:
-      if (!ruleConfig.config?.conditions || ruleConfig.config.conditions.length === 0) {
+      if (
+        !ruleConfig.config?.conditions ||
+        ruleConfig.config.conditions.length === 0
+      ) {
         errors.push("Conditional rules require at least one condition");
       }
       break;
@@ -121,7 +130,10 @@ export const validateRule = (ruleConfig) => {
   }
 
   // Target validation
-  if (ruleConfig.config?.targetType === "envelope" && !ruleConfig.config?.targetId) {
+  if (
+    ruleConfig.config?.targetType === "envelope" &&
+    !ruleConfig.config?.targetId
+  ) {
     errors.push("Single envelope rules require a target envelope");
   }
 
@@ -153,7 +165,9 @@ export const calculateFundingAmount = (rule, context) => {
 
     case RULE_TYPES.PERCENTAGE: {
       const baseAmount = getBaseAmountForPercentage(rule, context);
-      return Math.round(((baseAmount * rule.config.percentage) / 100) * 100) / 100;
+      return (
+        Math.round(((baseAmount * rule.config.percentage) / 100) * 100) / 100
+      );
     }
 
     case RULE_TYPES.PRIORITY_FILL:
@@ -209,7 +223,8 @@ export const calculatePriorityFillAmount = (rule, context) => {
   const targetEnvelope = envelopes.find((e) => e.id === rule.config.targetId);
   if (!targetEnvelope) return 0;
 
-  const needed = (targetEnvelope.monthlyAmount || 0) - (targetEnvelope.currentBalance || 0);
+  const needed =
+    (targetEnvelope.monthlyAmount || 0) - (targetEnvelope.currentBalance || 0);
   return Math.max(0, Math.min(needed, unassignedCash));
 };
 
@@ -255,7 +270,7 @@ export const filterRules = (rules, filters = {}) => {
     filtered = filtered.filter(
       (rule) =>
         (rule.name || "").toLowerCase().includes(searchTerm) ||
-        (rule.description || "").toLowerCase().includes(searchTerm)
+        (rule.description || "").toLowerCase().includes(searchTerm),
     );
   }
 

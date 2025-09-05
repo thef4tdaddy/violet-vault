@@ -21,7 +21,10 @@ const UserSetup = ({ onSetupComplete }) => {
     return Promise.race([
       asyncFn(),
       new Promise((_, reject) =>
-        setTimeout(() => reject(new Error(`Operation timed out after ${timeoutMs}ms`)), timeoutMs)
+        setTimeout(
+          () => reject(new Error(`Operation timed out after ${timeoutMs}ms`)),
+          timeoutMs,
+        ),
       ),
     ]);
   };
@@ -111,7 +114,10 @@ const UserSetup = ({ onSetupComplete }) => {
     if (isReturningUser) {
       // For returning users, try to login directly
       if (!masterPassword) {
-        globalToast.showError("Please enter your password", "Password Required");
+        globalToast.showError(
+          "Please enter your password",
+          "Password Required",
+        );
         return;
       }
 
@@ -126,7 +132,10 @@ const UserSetup = ({ onSetupComplete }) => {
         logger.debug("✅ Returning user login succeeded");
       } catch (error) {
         logger.error("❌ Login failed:", error);
-        globalToast.showError("Incorrect password. Please try again.", "Login Failed");
+        globalToast.showError(
+          "Incorrect password. Please try again.",
+          "Login Failed",
+        );
       } finally {
         setIsLoading(false);
       }
@@ -150,7 +159,10 @@ const UserSetup = ({ onSetupComplete }) => {
         masterPassword: !!masterPassword,
         userName: userName.trim(),
       });
-      globalToast.showError("Please fill in both password and name", "Required Fields");
+      globalToast.showError(
+        "Please fill in both password and name",
+        "Required Fields",
+      );
       return;
     }
 
@@ -197,7 +209,7 @@ const UserSetup = ({ onSetupComplete }) => {
           }}
         />
       </div>
-      
+
       <div className="rounded-3xl p-8 w-full max-w-md border-2 border-black bg-purple-100/40 backdrop-blur-sm relative">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-8">
@@ -212,12 +224,14 @@ const UserSetup = ({ onSetupComplete }) => {
           <h1 className="text-3xl font-black mb-2">
             {isReturningUser ? (
               <span className="uppercase tracking-wider text-black">
-                <span className="text-4xl">W</span>ELCOME <span className="text-4xl">B</span>ACK,{" "}
-                <span 
-                  className="inline-flex items-center text-4xl font-black" 
-                  style={{ 
+                <span className="text-4xl">W</span>ELCOME{" "}
+                <span className="text-4xl">B</span>ACK,{" "}
+                <span
+                  className="inline-flex items-center text-4xl font-black"
+                  style={{
                     color: userColor,
-                    textShadow: '2px 2px 0px black, -2px -2px 0px black, 2px -2px 0px black, -2px 2px 0px black, 0px 2px 0px black, 2px 0px 0px black, 0px -2px 0px black, -2px 0px 0px black'
+                    textShadow:
+                      "2px 2px 0px black, -2px -2px 0px black, 2px -2px 0px black, -2px 2px 0px black, 0px 2px 0px black, 2px 0px 0px black, 0px -2px 0px black, -2px 0px 0px black",
                   }}
                 >
                   {userName.toUpperCase()}
@@ -226,25 +240,40 @@ const UserSetup = ({ onSetupComplete }) => {
               </span>
             ) : step === 1 ? (
               <span className="uppercase tracking-wider text-black">
-                <span className="text-4xl">G</span>ET <span className="text-4xl">S</span>TARTED
+                <span className="text-4xl">G</span>ET{" "}
+                <span className="text-4xl">S</span>TARTED
               </span>
             ) : (
               <span className="uppercase tracking-wider text-black">
-                <span className="text-4xl">S</span>ET <span className="text-4xl">U</span>P <span className="text-4xl">P</span>ROFILE
+                <span className="text-4xl">S</span>ET{" "}
+                <span className="text-4xl">U</span>P{" "}
+                <span className="text-4xl">P</span>ROFILE
               </span>
             )}
           </h1>
           <p className="text-purple-900 font-medium uppercase tracking-wider">
-            {isReturningUser
-              ? <span><span className="text-lg">E</span>NTER YOUR PASSWORD TO CONTINUE</span>
-              : step === 1
-                ? <span><span className="text-lg">C</span>REATE A SECURE MASTER PASSWORD TO PROTECT YOUR DATA</span>
-                : <span><span className="text-lg">C</span>HOOSE YOUR NAME AND COLOR FOR TRACKING</span>}
+            {isReturningUser ? (
+              <span>
+                <span className="text-lg">E</span>NTER YOUR PASSWORD TO CONTINUE
+              </span>
+            ) : step === 1 ? (
+              <span>
+                <span className="text-lg">C</span>REATE A SECURE MASTER PASSWORD
+                TO PROTECT YOUR DATA
+              </span>
+            ) : (
+              <span>
+                <span className="text-lg">C</span>HOOSE YOUR NAME AND COLOR FOR
+                TRACKING
+              </span>
+            )}
           </p>
         </div>
 
         <form
-          onSubmit={isReturningUser || step === 1 ? handleStep1Continue : handleSubmit}
+          onSubmit={
+            isReturningUser || step === 1 ? handleStep1Continue : handleSubmit
+          }
           className="space-y-6"
         >
           {(step === 1 || isReturningUser) && (
@@ -267,7 +296,11 @@ const UserSetup = ({ onSetupComplete }) => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-purple-600"
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
                 </button>
               </div>
 
@@ -278,7 +311,15 @@ const UserSetup = ({ onSetupComplete }) => {
                     disabled={!masterPassword || isLoading}
                     className="w-full btn btn-primary py-4 text-lg font-black rounded-2xl border-2 border-black uppercase tracking-wider"
                   >
-                    {isLoading ? <span><span className="text-xl">U</span>NLOCKING...</span> : <span><span className="text-xl">L</span>OGIN</span>}
+                    {isLoading ? (
+                      <span>
+                        <span className="text-xl">U</span>NLOCKING...
+                      </span>
+                    ) : (
+                      <span>
+                        <span className="text-xl">L</span>OGIN
+                      </span>
+                    )}
                   </button>
                   <div className="flex gap-2">
                     <button
@@ -290,7 +331,8 @@ const UserSetup = ({ onSetupComplete }) => {
                       disabled={isLoading}
                       className="flex-1 py-3 text-sm font-black rounded-2xl border-2 border-black bg-orange-600 hover:bg-orange-700 text-white uppercase tracking-wider"
                     >
-                      <span className="text-base">C</span>HANGE <span className="text-base">P</span>ROFILE
+                      <span className="text-base">C</span>HANGE{" "}
+                      <span className="text-base">P</span>ROFILE
                     </button>
                     <button
                       type="button"
@@ -298,7 +340,8 @@ const UserSetup = ({ onSetupComplete }) => {
                       disabled={isLoading}
                       className="flex-1 py-3 text-sm font-black rounded-2xl border-2 border-black bg-red-600 hover:bg-red-700 text-white uppercase tracking-wider"
                     >
-                      <span className="text-base">S</span>TART <span className="text-base">F</span>RESH
+                      <span className="text-base">S</span>TART{" "}
+                      <span className="text-base">F</span>RESH
                     </button>
                   </div>
                 </div>
@@ -317,7 +360,9 @@ const UserSetup = ({ onSetupComplete }) => {
           {step === 2 && !isReturningUser && (
             <>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">Your Name</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Your Name
+                </label>
                 <input
                   type="text"
                   value={userName}
@@ -333,7 +378,9 @@ const UserSetup = ({ onSetupComplete }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">Your Color</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Your Color
+                </label>
                 <div className="grid grid-cols-4 gap-3">
                   {colors.map((color) => (
                     <button
@@ -376,7 +423,8 @@ const UserSetup = ({ onSetupComplete }) => {
 
         <div className="text-center mt-6">
           <p className="text-xs text-black font-medium uppercase tracking-wider">
-            <span className="text-sm">Y</span>OUR DATA IS ENCRYPTED CLIENT-SIDE FOR MAXIMUM SECURITY
+            <span className="text-sm">Y</span>OUR DATA IS ENCRYPTED CLIENT-SIDE
+            FOR MAXIMUM SECURITY
           </p>
         </div>
       </div>

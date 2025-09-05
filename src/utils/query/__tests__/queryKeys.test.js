@@ -12,8 +12,14 @@ describe("queryKeys", () => {
 
     it("should generate budget metadata keys", () => {
       expect(queryKeys.budgetMetadata).toEqual(["budgetMetadata"]);
-      expect(queryKeys.unassignedCash()).toEqual(["budgetMetadata", "unassignedCash"]);
-      expect(queryKeys.actualBalance()).toEqual(["budgetMetadata", "actualBalance"]);
+      expect(queryKeys.unassignedCash()).toEqual([
+        "budgetMetadata",
+        "unassignedCash",
+      ]);
+      expect(queryKeys.actualBalance()).toEqual([
+        "budgetMetadata",
+        "actualBalance",
+      ]);
     });
   });
 
@@ -21,22 +27,42 @@ describe("queryKeys", () => {
     it("should generate correct envelope keys", () => {
       expect(queryKeys.envelopes).toEqual(["envelopes"]);
       expect(queryKeys.envelopesList()).toEqual(["envelopes", "list", {}]);
-      expect(queryKeys.envelopeById("env1")).toEqual(["envelopes", "detail", "env1"]);
-      expect(queryKeys.envelopesByCategory("food")).toEqual(["envelopes", "category", "food"]);
+      expect(queryKeys.envelopeById("env1")).toEqual([
+        "envelopes",
+        "detail",
+        "env1",
+      ]);
+      expect(queryKeys.envelopesByCategory("food")).toEqual([
+        "envelopes",
+        "category",
+        "food",
+      ]);
       expect(queryKeys.envelopeBalances()).toEqual(["envelopes", "balances"]);
     });
 
     it("should handle envelope list filters", () => {
       const filters = { category: "food", archived: false };
-      expect(queryKeys.envelopesList(filters)).toEqual(["envelopes", "list", filters]);
+      expect(queryKeys.envelopesList(filters)).toEqual([
+        "envelopes",
+        "list",
+        filters,
+      ]);
     });
   });
 
   describe("transaction keys", () => {
     it("should generate correct transaction keys", () => {
       expect(queryKeys.transactions).toEqual(["transactions"]);
-      expect(queryKeys.transactionsList()).toEqual(["transactions", "list", {}]);
-      expect(queryKeys.transactionById("tx1")).toEqual(["transactions", "detail", "tx1"]);
+      expect(queryKeys.transactionsList()).toEqual([
+        "transactions",
+        "list",
+        {},
+      ]);
+      expect(queryKeys.transactionById("tx1")).toEqual([
+        "transactions",
+        "detail",
+        "tx1",
+      ]);
     });
 
     it("should generate date range keys", () => {
@@ -74,17 +100,36 @@ describe("queryKeys", () => {
     it("should generate correct savings goal keys", () => {
       expect(queryKeys.savingsGoals).toEqual(["savingsGoals"]);
       expect(queryKeys.savingsGoalsList()).toEqual(["savingsGoals", "list"]);
-      expect(queryKeys.savingsGoalById("goal1")).toEqual(["savingsGoals", "detail", "goal1"]);
-      expect(queryKeys.activeSavingsGoals()).toEqual(["savingsGoals", "active"]);
+      expect(queryKeys.savingsGoalById("goal1")).toEqual([
+        "savingsGoals",
+        "detail",
+        "goal1",
+      ]);
+      expect(queryKeys.activeSavingsGoals()).toEqual([
+        "savingsGoals",
+        "active",
+      ]);
     });
   });
 
   describe("analytics keys", () => {
     it("should generate correct analytics keys", () => {
       expect(queryKeys.analytics).toEqual(["analytics"]);
-      expect(queryKeys.analyticsSpending("month")).toEqual(["analytics", "spending", "month"]);
-      expect(queryKeys.analyticsTrends("week")).toEqual(["analytics", "trends", "week"]);
-      expect(queryKeys.analyticsCategories("year")).toEqual(["analytics", "categories", "year"]);
+      expect(queryKeys.analyticsSpending("month")).toEqual([
+        "analytics",
+        "spending",
+        "month",
+      ]);
+      expect(queryKeys.analyticsTrends("week")).toEqual([
+        "analytics",
+        "trends",
+        "week",
+      ]);
+      expect(queryKeys.analyticsCategories("year")).toEqual([
+        "analytics",
+        "categories",
+        "year",
+      ]);
       expect(queryKeys.analyticsBalance()).toEqual(["analytics", "balance"]);
     });
 
@@ -110,10 +155,25 @@ describe("queryKeys", () => {
   describe("history keys", () => {
     it("should generate correct budget history keys", () => {
       expect(queryKeys.budgetHistory).toEqual(["budgetHistory"]);
-      expect(queryKeys.budgetCommits()).toEqual(["budgetHistory", "commits", {}]);
-      expect(queryKeys.budgetCommit("hash123")).toEqual(["budgetHistory", "commit", "hash123"]);
-      expect(queryKeys.budgetChanges("hash123")).toEqual(["budgetHistory", "changes", "hash123"]);
-      expect(queryKeys.budgetHistoryStats()).toEqual(["budgetHistory", "stats"]);
+      expect(queryKeys.budgetCommits()).toEqual([
+        "budgetHistory",
+        "commits",
+        {},
+      ]);
+      expect(queryKeys.budgetCommit("hash123")).toEqual([
+        "budgetHistory",
+        "commit",
+        "hash123",
+      ]);
+      expect(queryKeys.budgetChanges("hash123")).toEqual([
+        "budgetHistory",
+        "changes",
+        "hash123",
+      ]);
+      expect(queryKeys.budgetHistoryStats()).toEqual([
+        "budgetHistory",
+        "stats",
+      ]);
       expect(queryKeys.budgetBranches()).toEqual(["budgetHistory", "branches"]);
       expect(queryKeys.budgetTags()).toEqual(["budgetHistory", "tags"]);
     });
@@ -133,12 +193,16 @@ describe("queryKeyUtils", () => {
   describe("getEntityKeys", () => {
     it("should return base keys for valid entity types", () => {
       expect(queryKeyUtils.getEntityKeys("envelopes")).toEqual(["envelopes"]);
-      expect(queryKeyUtils.getEntityKeys("transactions")).toEqual(["transactions"]);
+      expect(queryKeyUtils.getEntityKeys("transactions")).toEqual([
+        "transactions",
+      ]);
       expect(queryKeyUtils.getEntityKeys("bills")).toEqual(["bills"]);
     });
 
     it("should throw error for unknown entity type", () => {
-      expect(() => queryKeyUtils.getEntityKeys("unknown")).toThrow("Unknown entity type: unknown");
+      expect(() => queryKeyUtils.getEntityKeys("unknown")).toThrow(
+        "Unknown entity type: unknown",
+      );
     });
   });
 
@@ -162,7 +226,9 @@ describe("queryKeyUtils", () => {
     });
 
     it("should handle non-array inputs", () => {
-      expect(queryKeyUtils.matchesPattern("not-array", ["pattern"])).toBe(false);
+      expect(queryKeyUtils.matchesPattern("not-array", ["pattern"])).toBe(
+        false,
+      );
       expect(queryKeyUtils.matchesPattern(["key"], "not-array")).toBe(false);
     });
   });
@@ -241,9 +307,15 @@ describe("queryKeyUtils", () => {
 
   describe("getEntityType", () => {
     it("should extract entity type from query key", () => {
-      expect(queryKeyUtils.getEntityType(["envelopes", "list"])).toBe("envelopes");
-      expect(queryKeyUtils.getEntityType(["transactions"])).toBe("transactions");
-      expect(queryKeyUtils.getEntityType(["dashboard", "summary"])).toBe("dashboard");
+      expect(queryKeyUtils.getEntityType(["envelopes", "list"])).toBe(
+        "envelopes",
+      );
+      expect(queryKeyUtils.getEntityType(["transactions"])).toBe(
+        "transactions",
+      );
+      expect(queryKeyUtils.getEntityType(["dashboard", "summary"])).toBe(
+        "dashboard",
+      );
     });
 
     it("should return null for invalid query keys", () => {
@@ -255,7 +327,11 @@ describe("queryKeyUtils", () => {
 
   describe("createHierarchical", () => {
     it("should create hierarchical query key", () => {
-      const result = queryKeyUtils.createHierarchical("envelopes", "list", "active");
+      const result = queryKeyUtils.createHierarchical(
+        "envelopes",
+        "list",
+        "active",
+      );
       expect(result).toEqual(["envelopes", "list", "active"]);
     });
 
@@ -265,7 +341,7 @@ describe("queryKeyUtils", () => {
         null,
         "list",
         undefined,
-        "active"
+        "active",
       );
       expect(result).toEqual(["envelopes", "list", "active"]);
     });

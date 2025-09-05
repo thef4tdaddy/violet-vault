@@ -49,7 +49,9 @@ export function calculatePayoffProjection(debt) {
       };
     }
 
-    calculatedMonths = Math.ceil(-Math.log(logValue) / Math.log(1 + monthlyRate));
+    calculatedMonths = Math.ceil(
+      -Math.log(logValue) / Math.log(1 + monthlyRate),
+    );
   } catch {
     return {
       monthsToPayoff: null,

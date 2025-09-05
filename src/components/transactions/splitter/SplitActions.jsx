@@ -1,15 +1,15 @@
 import React from "react";
 import { Save, X, RefreshCw, AlertCircle } from "lucide-react";
 
-const SplitActions = ({ 
-  totals, 
-  hasUnsavedChanges, 
-  isSaving, 
-  onSave, 
-  onCancel 
+const SplitActions = ({
+  totals,
+  hasUnsavedChanges,
+  isSaving,
+  onSave,
+  onCancel,
 }) => {
   const { isValid, isOverAllocated, remaining } = totals;
-  
+
   const getValidationMessage = () => {
     if (isValid) return null;
     if (isOverAllocated) {
@@ -51,7 +51,7 @@ const SplitActions = ({
             <X className="h-4 w-4" />
             Cancel
           </button>
-          
+
           <button
             onClick={onSave}
             disabled={!canSave}

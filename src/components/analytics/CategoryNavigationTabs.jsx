@@ -1,11 +1,11 @@
 import React from "react";
 import { Lightbulb, BarChart3, Settings } from "lucide-react";
 
-const CategoryNavigationTabs = ({ 
-  activeTab, 
-  onTabChange, 
-  suggestionCount, 
-  categoryCount 
+const CategoryNavigationTabs = ({
+  activeTab,
+  onTabChange,
+  suggestionCount,
+  categoryCount,
 }) => {
   const tabs = [
     {
@@ -20,10 +20,10 @@ const CategoryNavigationTabs = ({
       icon: BarChart3,
       count: categoryCount,
     },
-    { 
-      id: "settings", 
-      name: "Advanced", 
-      icon: Settings 
+    {
+      id: "settings",
+      name: "Advanced",
+      icon: Settings,
     },
   ];
 

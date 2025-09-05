@@ -36,12 +36,16 @@ const TransactionSummary = ({ transactions = [] }) => {
 
       <div
         className={`bg-gradient-to-br ${
-          netCashFlow >= 0 ? "from-cyan-500 to-cyan-600" : "from-amber-500 to-amber-600"
+          netCashFlow >= 0
+            ? "from-cyan-500 to-cyan-600"
+            : "from-amber-500 to-amber-600"
         } p-4 rounded-lg text-white`}
       >
         <div className="flex items-center justify-between">
           <div>
-            <p className={`${netCashFlow >= 0 ? "text-cyan-100" : "text-amber-100"} text-sm`}>
+            <p
+              className={`${netCashFlow >= 0 ? "text-cyan-100" : "text-amber-100"} text-sm`}
+            >
               Net Cash Flow
             </p>
             <p className="text-2xl font-bold">

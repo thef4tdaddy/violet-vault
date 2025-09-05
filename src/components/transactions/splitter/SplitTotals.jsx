@@ -3,7 +3,14 @@ import { Calculator, CheckCircle, AlertCircle } from "lucide-react";
 import { formatCurrency } from "../../../utils/transactions/splitterHelpers";
 
 const SplitTotals = ({ totals }) => {
-  const { original, allocated, remaining, isValid, isOverAllocated, isUnderAllocated } = totals;
+  const {
+    original,
+    allocated,
+    remaining,
+    isValid,
+    isOverAllocated,
+    isUnderAllocated,
+  } = totals;
 
   const getStatusColor = () => {
     if (isValid) return "text-green-600";
@@ -29,12 +36,16 @@ const SplitTotals = ({ totals }) => {
       <div className="space-y-2 text-sm">
         <div className="flex justify-between">
           <span className="text-purple-800 font-medium">Original Amount:</span>
-          <span className="font-black text-gray-900">{formatCurrency(original)}</span>
+          <span className="font-black text-gray-900">
+            {formatCurrency(original)}
+          </span>
         </div>
 
         <div className="flex justify-between">
           <span className="text-purple-800 font-medium">Total Allocated:</span>
-          <span className={`font-black ${isOverAllocated ? "text-red-600" : "text-gray-900"}`}>
+          <span
+            className={`font-black ${isOverAllocated ? "text-red-600" : "text-gray-900"}`}
+          >
             {formatCurrency(allocated)}
           </span>
         </div>

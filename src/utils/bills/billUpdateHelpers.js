@@ -11,13 +11,17 @@ export const calculateUpdateSummary = (selectedBills, changes) => {
     const change = changes[bill.id];
     return (
       change &&
-      (change.amount !== change.originalAmount || change.dueDate !== change.originalDueDate)
+      (change.amount !== change.originalAmount ||
+        change.dueDate !== change.originalDueDate)
     );
   });
 
   const totalAmountChange = changedBills.reduce((sum, bill) => {
     const change = changes[bill.id];
-    return sum + (Math.abs(change?.amount || 0) - Math.abs(change?.originalAmount || 0));
+    return (
+      sum +
+      (Math.abs(change?.amount || 0) - Math.abs(change?.originalAmount || 0))
+    );
   }, 0);
 
   return {
@@ -40,7 +44,10 @@ export const validateBillChange = (originalBill, change) => {
   }
 
   // Validate amount
-  if (change.amount !== undefined && (isNaN(change.amount) || change.amount < 0)) {
+  if (
+    change.amount !== undefined &&
+    (isNaN(change.amount) || change.amount < 0)
+  ) {
     errors.push("Amount must be a positive number");
   }
 
@@ -61,7 +68,7 @@ export const validateBillChange = (originalBill, change) => {
 export const hasChanges = (change) => {
   if (!change) return false;
   return (
-    change.amount !== change.originalAmount || 
+    change.amount !== change.originalAmount ||
     change.dueDate !== change.originalDueDate
   );
 };
@@ -73,12 +80,12 @@ export const formatAmountChange = (originalAmount, newAmount) => {
   const original = Math.abs(originalAmount || 0);
   const updated = Math.abs(newAmount || 0);
   const difference = updated - original;
-  
+
   return {
     original: original.toFixed(2),
     updated: updated.toFixed(2),
     difference: difference.toFixed(2),
-    differenceFormatted: `${difference >= 0 ? '+' : ''}$${difference.toFixed(2)}`,
+    differenceFormatted: `${difference >= 0 ? "+" : ""}$${difference.toFixed(2)}`,
     hasChange: original !== updated,
   };
 };
@@ -89,7 +96,7 @@ export const formatAmountChange = (originalAmount, newAmount) => {
 export const formatDateChange = (originalDate, newDate) => {
   const original = originalDate || "Not set";
   const updated = newDate || "Not set";
-  
+
   return {
     original,
     updated,
@@ -144,7 +151,7 @@ export const transformBillsForUpdate = (selectedBills, changes) => {
  */
 export const validateAllChanges = (selectedBills, changes) => {
   const errors = [];
-  
+
   selectedBills.forEach((bill) => {
     const change = changes[bill.id];
     if (change && hasChanges(change)) {

@@ -122,7 +122,9 @@ describe("autoFundingRules", () => {
 
       const result = validateRule(rule);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("Fixed amount rules require a positive amount");
+      expect(result.errors).toContain(
+        "Fixed amount rules require a positive amount",
+      );
     });
 
     it("should validate percentage rules", () => {
@@ -135,7 +137,9 @@ describe("autoFundingRules", () => {
 
       const result = validateRule(rule);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("Percentage rules require a percentage between 0 and 100");
+      expect(result.errors).toContain(
+        "Percentage rules require a percentage between 0 and 100",
+      );
     });
 
     it("should validate conditional rules", () => {
@@ -148,7 +152,9 @@ describe("autoFundingRules", () => {
 
       const result = validateRule(rule);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("Conditional rules require at least one condition");
+      expect(result.errors).toContain(
+        "Conditional rules require at least one condition",
+      );
     });
 
     it("should validate target envelope selection", () => {
@@ -165,7 +171,9 @@ describe("autoFundingRules", () => {
 
       const result = validateRule(rule);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("Single envelope rules require a target envelope");
+      expect(result.errors).toContain(
+        "Single envelope rules require a target envelope",
+      );
     });
   });
 
@@ -260,7 +268,9 @@ describe("autoFundingRules", () => {
     });
 
     it("should return 0 for non-existent envelope", () => {
-      const rule = { config: { sourceType: "envelope", sourceId: "nonexistent" } };
+      const rule = {
+        config: { sourceType: "envelope", sourceId: "nonexistent" },
+      };
       const result = getBaseAmountForPercentage(rule, mockContext);
       expect(result).toBe(0);
     });
@@ -492,7 +502,11 @@ describe("autoFundingRules", () => {
         name: "Savings Rule",
         type: RULE_TYPES.PERCENTAGE,
         trigger: TRIGGER_TYPES.INCOME_DETECTED,
-        config: { percentage: 20, targetType: "multiple", targetIds: ["env1", "env2"] },
+        config: {
+          percentage: 20,
+          targetType: "multiple",
+          targetIds: ["env1", "env2"],
+        },
       };
 
       const summary = createRuleSummary(rule);

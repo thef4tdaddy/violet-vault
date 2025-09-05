@@ -1,5 +1,12 @@
 import React from "react";
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 import ChartContainer from "./ChartContainer";
 import { useChartConfig } from "../../hooks/common/useChartConfig";
 
@@ -39,7 +46,8 @@ const DistributionPieChart = ({
   const hasData = chartData.length > 0;
 
   // Default label formatter
-  const defaultLabelFormatter = ({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`;
+  const defaultLabelFormatter = ({ name, percent }) =>
+    `${name} ${(percent * 100).toFixed(0)}%`;
 
   const labelFunc = labelFormatter || defaultLabelFormatter;
 
@@ -49,7 +57,8 @@ const DistributionPieChart = ({
   // Enhanced data with percentage for custom rendering
   const enhancedData = chartData.map((item, index) => ({
     ...item,
-    percentage: total > 0 ? (((item[dataKey] || 0) / total) * 100).toFixed(1) : 0,
+    percentage:
+      total > 0 ? (((item[dataKey] || 0) / total) * 100).toFixed(1) : 0,
     color: item.color || chartColors[index % chartColors.length],
   }));
 
@@ -129,10 +138,13 @@ export const DistributionPieChartWithDetails = ({
 
       {/* Details List */}
       <div className="glassmorphism rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Category Details</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          Category Details
+        </h3>
         <div className="space-y-3 max-h-96 overflow-y-auto">
           {chartData.map((item, index) => {
-            const percentage = total > 0 ? ((item[dataKey] || 0) / total) * 100 : 0;
+            const percentage =
+              total > 0 ? ((item[dataKey] || 0) / total) * 100 : 0;
             return (
               <div
                 key={index}
@@ -146,15 +158,21 @@ export const DistributionPieChartWithDetails = ({
                     }}
                   />
                   <div>
-                    <div className="font-medium text-gray-900">{item[nameKey]}</div>
-                    <div className="text-sm text-gray-600">{item.count || 0} transactions</div>
+                    <div className="font-medium text-gray-900">
+                      {item[nameKey]}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {item.count || 0} transactions
+                    </div>
                   </div>
                 </div>
                 <div className="text-right">
                   <div className="font-bold text-gray-900">
                     {formatters.currency(item[dataKey])}
                   </div>
-                  <div className="text-sm text-gray-600">{percentage.toFixed(1)}%</div>
+                  <div className="text-sm text-gray-600">
+                    {percentage.toFixed(1)}%
+                  </div>
                 </div>
               </div>
             );

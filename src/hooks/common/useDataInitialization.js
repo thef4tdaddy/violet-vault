@@ -9,11 +9,13 @@ import { budgetDb } from "../../db/budgetDb";
 async function fixAutoAllocateUndefinedValues() {
   try {
     const allEnvelopes = await budgetDb.envelopes.toArray();
-    const undefinedEnvelopes = allEnvelopes.filter((env) => env.autoAllocate === undefined);
+    const undefinedEnvelopes = allEnvelopes.filter(
+      (env) => env.autoAllocate === undefined,
+    );
 
     if (undefinedEnvelopes.length > 0) {
       logger.info(
-        `🔧 Auto-fixing ${undefinedEnvelopes.length} envelopes with undefined autoAllocate (setting to true)`
+        `🔧 Auto-fixing ${undefinedEnvelopes.length} envelopes with undefined autoAllocate (setting to true)`,
       );
 
       for (const envelope of undefinedEnvelopes) {
@@ -22,7 +24,9 @@ async function fixAutoAllocateUndefinedValues() {
         });
       }
 
-      logger.info(`✅ Fixed ${undefinedEnvelopes.length} envelope autoAllocate values`);
+      logger.info(
+        `✅ Fixed ${undefinedEnvelopes.length} envelope autoAllocate values`,
+      );
     }
   } catch (error) {
     logger.error("Failed to fix autoAllocate undefined values:", error);

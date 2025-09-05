@@ -88,21 +88,21 @@ export const getStatusDescription = (syncStatus, isBackgroundSyncing) => {
  */
 export const formatLastChecked = (lastChecked) => {
   if (!lastChecked) return "Never checked";
-  
+
   try {
     const date = new Date(lastChecked);
     const now = new Date();
     const diffMs = now - date;
     const diffMins = Math.floor(diffMs / (1000 * 60));
-    
+
     if (diffMins < 1) return "Just now";
     if (diffMins === 1) return "1 minute ago";
     if (diffMins < 60) return `${diffMins} minutes ago`;
-    
+
     const diffHours = Math.floor(diffMins / 60);
     if (diffHours === 1) return "1 hour ago";
     if (diffHours < 24) return `${diffHours} hours ago`;
-    
+
     return date.toLocaleDateString();
   } catch (error) {
     return "Invalid date";
@@ -138,8 +138,10 @@ export const requiresImmediateAttention = (syncStatus) => {
  * Check if recovery actions are available
  */
 export const hasRecoveryActions = () => {
-  return typeof window !== "undefined" && 
-         (window.runMasterSyncValidation || window.forceCloudDataReset);
+  return (
+    typeof window !== "undefined" &&
+    (window.runMasterSyncValidation || window.forceCloudDataReset)
+  );
 };
 
 /**
@@ -147,7 +149,7 @@ export const hasRecoveryActions = () => {
  */
 export const formatRecoveryResult = (result) => {
   if (!result) return null;
-  
+
   if (result.success) {
     return {
       type: "success",
@@ -156,7 +158,7 @@ export const formatRecoveryResult = (result) => {
     };
   } else {
     return {
-      type: "error", 
+      type: "error",
       message: result.error || "Recovery operation failed",
       details: result.details || null,
     };
@@ -167,8 +169,9 @@ export const formatRecoveryResult = (result) => {
  * Get appropriate action button style based on status
  */
 export const getActionButtonStyle = (actionType, syncStatus) => {
-  const baseStyle = "px-3 py-2 text-sm rounded-lg border-2 border-black shadow-md hover:shadow-lg transition-all font-bold";
-  
+  const baseStyle =
+    "px-3 py-2 text-sm rounded-lg border-2 border-black shadow-md hover:shadow-lg transition-all font-bold";
+
   switch (actionType) {
     case "validate":
       return `${baseStyle} bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700`;

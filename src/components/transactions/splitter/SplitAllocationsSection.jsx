@@ -22,7 +22,7 @@ const SplitAllocationsSection = ({
           </div>
           SPLIT ALLOCATIONS ({splitAllocations.length})
         </h3>
-        
+
         <div className="flex gap-2">
           <button
             onClick={onSmartSplit}
@@ -31,7 +31,7 @@ const SplitAllocationsSection = ({
             <Target className="h-4 w-4" />
             Smart Split
           </button>
-          
+
           <button
             onClick={onAddSplit}
             className="flex items-center gap-1 px-3 py-2 text-sm bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg hover:from-emerald-600 hover:to-green-700 transition-all border-2 border-black shadow-md hover:shadow-lg font-bold"
@@ -45,19 +45,29 @@ const SplitAllocationsSection = ({
       {/* Column Headers */}
       <div className="grid grid-cols-12 gap-3 px-4 py-2 bg-gradient-to-r from-gray-100/80 to-purple-100/80 backdrop-blur-sm rounded-xl border border-gray-300 shadow-sm">
         <div className="col-span-4">
-          <span className="text-xs font-black text-gray-700 uppercase">DESCRIPTION</span>
+          <span className="text-xs font-black text-gray-700 uppercase">
+            DESCRIPTION
+          </span>
         </div>
         <div className="col-span-2">
-          <span className="text-xs font-black text-gray-700 uppercase">AMOUNT</span>
+          <span className="text-xs font-black text-gray-700 uppercase">
+            AMOUNT
+          </span>
         </div>
         <div className="col-span-3">
-          <span className="text-xs font-black text-gray-700 uppercase">CATEGORY</span>
+          <span className="text-xs font-black text-gray-700 uppercase">
+            CATEGORY
+          </span>
         </div>
         <div className="col-span-2">
-          <span className="text-xs font-black text-gray-700 uppercase">ENVELOPE</span>
+          <span className="text-xs font-black text-gray-700 uppercase">
+            ENVELOPE
+          </span>
         </div>
         <div className="col-span-1">
-          <span className="text-xs font-black text-gray-700 uppercase">ACTION</span>
+          <span className="text-xs font-black text-gray-700 uppercase">
+            ACTION
+          </span>
         </div>
       </div>
 

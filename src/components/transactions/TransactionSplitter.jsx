@@ -35,7 +35,11 @@ const TransactionSplitter = ({
   // Handle cancellation
   const handleCancel = () => {
     if (splitter.hasUnsavedChanges) {
-      if (window.confirm("You have unsaved changes. Are you sure you want to cancel?")) {
+      if (
+        window.confirm(
+          "You have unsaved changes. Are you sure you want to cancel?",
+        )
+      ) {
         onClose?.();
       }
     } else {
@@ -59,7 +63,9 @@ const TransactionSplitter = ({
   if (!isOpen || !transaction || !totals) return null;
 
   return (
-    <div className={`fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 ${className}`}>
+    <div
+      className={`fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 ${className}`}
+    >
       <div className="glassmorphism rounded-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden shadow-2xl border-2 border-black">
         <div className="flex flex-col h-full">
           <SplitterHeader

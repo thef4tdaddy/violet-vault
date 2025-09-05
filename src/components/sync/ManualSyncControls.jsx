@@ -86,7 +86,9 @@ export const ManualSyncControls = ({ className = "" }) => {
         <CardTitle className="flex items-center gap-2">
           <RefreshCw className="h-5 w-5" />
           Manual Sync Controls
-          <Badge variant={syncStatus.isServiceRunning ? "success" : "destructive"}>
+          <Badge
+            variant={syncStatus.isServiceRunning ? "success" : "destructive"}
+          >
             {syncStatus.isServiceRunning ? (
               <>
                 <Wifi className="h-3 w-3 mr-1" />
@@ -125,7 +127,9 @@ export const ManualSyncControls = ({ className = "" }) => {
         <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4" />
-            <span className="text-sm">Last sync: {formatLastSyncTime(lastSyncTime)}</span>
+            <span className="text-sm">
+              Last sync: {formatLastSyncTime(lastSyncTime)}
+            </span>
           </div>
           {lastSyncTime && (
             <Badge variant="outline">
@@ -186,15 +190,16 @@ export const ManualSyncControls = ({ className = "" }) => {
         {/* Sync Instructions */}
         <div className="text-xs text-muted-foreground space-y-1">
           <p>
-            <strong>Upload Changes:</strong> Send your local changes to the cloud for family members
-            to see
+            <strong>Upload Changes:</strong> Send your local changes to the
+            cloud for family members to see
           </p>
           <p>
-            <strong>Download Changes:</strong> Get the latest changes made by family members
+            <strong>Download Changes:</strong> Get the latest changes made by
+            family members
           </p>
           <p>
-            <strong>Full Sync:</strong> Automatically determine the best sync direction based on
-            data freshness
+            <strong>Full Sync:</strong> Automatically determine the best sync
+            direction based on data freshness
           </p>
         </div>
 

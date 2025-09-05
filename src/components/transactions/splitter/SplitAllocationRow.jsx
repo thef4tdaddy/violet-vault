@@ -32,7 +32,9 @@ const SplitAllocationRow = ({
             step="0.01"
             min="0"
             value={split.amount}
-            onChange={(e) => onUpdate(split.id, "amount", parseFloat(e.target.value) || 0)}
+            onChange={(e) =>
+              onUpdate(split.id, "amount", parseFloat(e.target.value) || 0)
+            }
             className="w-full pl-10 pr-3 py-2 text-sm border-2 border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 glassmorphism backdrop-blur-sm shadow-md focus:shadow-lg transition-all font-bold"
           />
         </div>

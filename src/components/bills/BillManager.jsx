@@ -129,7 +129,7 @@ const BillManager = ({
   const { budgetId, currentUser } = useAuth();
   const { isLocked: isEditLocked, currentEditor } = useEditLock(
     `bills-${budgetId}`,
-    currentUser?.userName || "User"
+    currentUser?.userName || "User",
   );
 
   // Loading state
@@ -145,9 +145,11 @@ const BillManager = ({
   }
 
   return (
-    <div className={`rounded-lg p-6 space-y-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm ${className}`}>
+    <div
+      className={`rounded-lg p-6 space-y-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm ${className}`}
+    >
       {/* Header with Actions */}
-      <BillManagerHeader 
+      <BillManagerHeader
         isEditLocked={isEditLocked}
         currentEditor={currentEditor}
         isSearching={isSearching}
@@ -159,7 +161,7 @@ const BillManager = ({
       <BillSummaryCards totals={totals} />
 
       {/* View Tabs and Filters */}
-      <BillViewTabs 
+      <BillViewTabs
         viewModes={viewModes}
         viewMode={viewMode}
         setViewMode={setViewMode}
@@ -237,7 +239,10 @@ const BillManager = ({
           onCreateRecurring={(bill) => {
             // Handle making a one-time bill recurring
             // TODO: Implement recurring bill functionality
-            logger.warn("Recurring bill creation not yet implemented:", bill.name);
+            logger.warn(
+              "Recurring bill creation not yet implemented:",
+              bill.name,
+            );
           }}
         />
       )}

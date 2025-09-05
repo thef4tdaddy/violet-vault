@@ -15,7 +15,14 @@ import {
   ScatterChart,
   Scatter,
 } from "recharts";
-import { TrendingUp, TrendingDown, BarChart3, Target, AlertTriangle, Info } from "lucide-react";
+import {
+  TrendingUp,
+  TrendingDown,
+  BarChart3,
+  Target,
+  AlertTriangle,
+  Info,
+} from "lucide-react";
 
 /**
  * Advanced Trend Analysis Charts for v1.10.0
@@ -82,7 +89,8 @@ const TrendAnalysisCharts = ({ analyticsData, _timeFilter }) => {
       const current = spendingTrends[i];
       const previous = spendingTrends[i - 1];
       const change = current.spending - previous.spending;
-      const percentChange = previous.spending > 0 ? (change / previous.spending) * 100 : 0;
+      const percentChange =
+        previous.spending > 0 ? (change / previous.spending) * 100 : 0;
 
       velocity.push({
         month: current.month,
@@ -104,11 +112,13 @@ const TrendAnalysisCharts = ({ analyticsData, _timeFilter }) => {
         current: data.expenses || 0,
         // Simulate historical data for trending
         trend: Array.from({ length: 6 }, (_, i) => ({
-          month: new Date(Date.now() - (5 - i) * 30 * 24 * 60 * 60 * 1000).toLocaleDateString(
-            "en-US",
-            { month: "short" }
+          month: new Date(
+            Date.now() - (5 - i) * 30 * 24 * 60 * 60 * 1000,
+          ).toLocaleDateString("en-US", { month: "short" }),
+          amount: Math.max(
+            0,
+            (data.expenses || 0) * (0.8 + Math.random() * 0.4),
           ),
-          amount: Math.max(0, (data.expenses || 0) * (0.8 + Math.random() * 0.4)),
         })),
       }))
       .sort((a, b) => b.current - a.current)
@@ -127,11 +137,16 @@ const TrendAnalysisCharts = ({ analyticsData, _timeFilter }) => {
     ];
 
     return seasons.map((season) => {
-      const seasonData = spendingTrends.filter((trend) => season.months.includes(trend.month));
+      const seasonData = spendingTrends.filter((trend) =>
+        season.months.includes(trend.month),
+      );
 
       const avgSpending =
-        seasonData.reduce((sum, data) => sum + data.spending, 0) / seasonData.length;
-      const avgIncome = seasonData.reduce((sum, data) => sum + data.income, 0) / seasonData.length;
+        seasonData.reduce((sum, data) => sum + data.spending, 0) /
+        seasonData.length;
+      const avgIncome =
+        seasonData.reduce((sum, data) => sum + data.income, 0) /
+        seasonData.length;
 
       return {
         ...season,
@@ -146,8 +161,11 @@ const TrendAnalysisCharts = ({ analyticsData, _timeFilter }) => {
   const forecastInsights = useMemo(() => {
     const recentTrends = spendingTrends.slice(-6, -3); // Last 3 months of actual data
     const avgSpending =
-      recentTrends.reduce((sum, data) => sum + data.spending, 0) / recentTrends.length;
-    const avgGrowth = spendingVelocity.slice(-3).reduce((sum, v) => sum + v.percentChange, 0) / 3;
+      recentTrends.reduce((sum, data) => sum + data.spending, 0) /
+      recentTrends.length;
+    const avgGrowth =
+      spendingVelocity.slice(-3).reduce((sum, v) => sum + v.percentChange, 0) /
+      3;
 
     const projectedNext = avgSpending * (1 + avgGrowth / 100);
     const confidence = Math.max(60, 90 - Math.abs(avgGrowth) * 2); // Lower confidence for higher volatility
@@ -156,7 +174,8 @@ const TrendAnalysisCharts = ({ analyticsData, _timeFilter }) => {
       projectedSpending: Math.round(projectedNext),
       growthRate: Math.round(avgGrowth * 10) / 10,
       confidence: Math.round(confidence),
-      trend: avgGrowth > 2 ? "increasing" : avgGrowth < -2 ? "decreasing" : "stable",
+      trend:
+        avgGrowth > 2 ? "increasing" : avgGrowth < -2 ? "decreasing" : "stable",
     };
   }, [spendingTrends, spendingVelocity]);
 
@@ -169,7 +188,9 @@ const TrendAnalysisCharts = ({ analyticsData, _timeFilter }) => {
       <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-6 border border-purple-200">
         <div className="flex items-start justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Spending Forecast</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Spending Forecast
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <p className="text-sm text-gray-600">Next Month Projection</p>
@@ -181,7 +202,9 @@ const TrendAnalysisCharts = ({ analyticsData, _timeFilter }) => {
                 <p className="text-sm text-gray-600">Growth Rate</p>
                 <p
                   className={`text-2xl font-bold ${
-                    forecastInsights.growthRate > 0 ? "text-red-600" : "text-green-600"
+                    forecastInsights.growthRate > 0
+                      ? "text-red-600"
+                      : "text-green-600"
                   }`}
                 >
                   {formatPercent(forecastInsights.growthRate)}
@@ -189,7 +212,9 @@ const TrendAnalysisCharts = ({ analyticsData, _timeFilter }) => {
               </div>
               <div>
                 <p className="text-sm text-gray-600">Confidence Level</p>
-                <p className="text-2xl font-bold text-blue-600">{forecastInsights.confidence}%</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  {forecastInsights.confidence}%
+                </p>
               </div>
             </div>
           </div>
@@ -215,7 +240,9 @@ const TrendAnalysisCharts = ({ analyticsData, _timeFilter }) => {
 
       {/* Historical Trends Chart */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">12-Month Financial Trends</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          12-Month Financial Trends
+        </h3>
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={spendingTrends}>
@@ -265,7 +292,9 @@ const TrendAnalysisCharts = ({ analyticsData, _timeFilter }) => {
 
       {/* Spending Velocity Chart */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Spending Velocity Analysis</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          Spending Velocity Analysis
+        </h3>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={spendingVelocity}>
@@ -274,7 +303,9 @@ const TrendAnalysisCharts = ({ analyticsData, _timeFilter }) => {
               <YAxis />
               <Tooltip
                 formatter={(value, name) => [
-                  name === "percentChange" ? formatPercent(value) : formatCurrency(value),
+                  name === "percentChange"
+                    ? formatPercent(value)
+                    : formatCurrency(value),
                   name === "percentChange" ? "Rate of Change" : "Amount Change",
                 ]}
               />
@@ -292,17 +323,26 @@ const TrendAnalysisCharts = ({ analyticsData, _timeFilter }) => {
 
       {/* Category Trends */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Category Trends</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          Top Category Trends
+        </h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {categoryTrends.map((category, index) => (
-            <div key={category.name} className="border border-gray-100 rounded-lg p-4">
-              <h4 className="font-medium text-gray-900 mb-2">{category.name}</h4>
+            <div
+              key={category.name}
+              className="border border-gray-100 rounded-lg p-4"
+            >
+              <h4 className="font-medium text-gray-900 mb-2">
+                {category.name}
+              </h4>
               <div className="h-32">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={category.trend}>
                     <XAxis dataKey="month" fontSize={12} />
                     <YAxis fontSize={12} />
-                    <Tooltip formatter={(value) => [formatCurrency(value), "Amount"]} />
+                    <Tooltip
+                      formatter={(value) => [formatCurrency(value), "Amount"]}
+                    />
                     <Line
                       type="monotone"
                       dataKey="amount"
@@ -320,22 +360,34 @@ const TrendAnalysisCharts = ({ analyticsData, _timeFilter }) => {
 
       {/* Seasonal Patterns */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Seasonal Spending Patterns</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          Seasonal Spending Patterns
+        </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {seasonalPatterns.map((season) => (
-            <div key={season.name} className="border border-gray-100 rounded-lg p-4">
+            <div
+              key={season.name}
+              className="border border-gray-100 rounded-lg p-4"
+            >
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-4 h-4 rounded" style={{ backgroundColor: season.color }}></div>
+                <div
+                  className="w-4 h-4 rounded"
+                  style={{ backgroundColor: season.color }}
+                ></div>
                 <h4 className="font-medium text-gray-900">{season.name}</h4>
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Avg Spending:</span>
-                  <span className="font-medium">{formatCurrency(season.avgSpending)}</span>
+                  <span className="font-medium">
+                    {formatCurrency(season.avgSpending)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Avg Income:</span>
-                  <span className="font-medium">{formatCurrency(season.avgIncome)}</span>
+                  <span className="font-medium">
+                    {formatCurrency(season.avgIncome)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Net:</span>
@@ -361,7 +413,8 @@ const TrendAnalysisCharts = ({ analyticsData, _timeFilter }) => {
             <h3 className="font-semibold text-blue-900 mb-2">Key Insights</h3>
             <ul className="space-y-2 text-sm text-blue-800">
               <li>
-                • Your spending trend is currently <strong>{forecastInsights.trend}</strong> with{" "}
+                • Your spending trend is currently{" "}
+                <strong>{forecastInsights.trend}</strong> with{" "}
                 {forecastInsights.confidence}% confidence
               </li>
               <li>
@@ -369,7 +422,7 @@ const TrendAnalysisCharts = ({ analyticsData, _timeFilter }) => {
                 <strong>
                   {
                     seasonalPatterns.reduce((max, season) =>
-                      season.avgSpending > max.avgSpending ? season : max
+                      season.avgSpending > max.avgSpending ? season : max,
                     ).name
                   }
                 </strong>
@@ -378,15 +431,19 @@ const TrendAnalysisCharts = ({ analyticsData, _timeFilter }) => {
                 • Average monthly spending velocity:{" "}
                 <strong>
                   {formatPercent(
-                    spendingVelocity.reduce((sum, v) => sum + v.percentChange, 0) /
-                      spendingVelocity.length
+                    spendingVelocity.reduce(
+                      (sum, v) => sum + v.percentChange,
+                      0,
+                    ) / spendingVelocity.length,
                   )}
                 </strong>
               </li>
               {forecastInsights.growthRate > 5 && (
                 <li className="flex items-center gap-2 text-orange-700">
                   <AlertTriangle className="h-4 w-4" />
-                  <span>High spending growth detected - consider budget review</span>
+                  <span>
+                    High spending growth detected - consider budget review
+                  </span>
                 </li>
               )}
             </ul>

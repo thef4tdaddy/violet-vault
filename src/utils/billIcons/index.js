@@ -1,7 +1,10 @@
 // Bill Icons Module - Main exports
 export { ALL_ICONS } from "./iconDefinitions.js";
 export { BILL_PROVIDER_ICONS } from "./providerMappings.js";
-export { CATEGORY_FALLBACK_ICONS, CATEGORY_PATTERNS } from "./categoryMappings.js";
+export {
+  CATEGORY_FALLBACK_ICONS,
+  CATEGORY_PATTERNS,
+} from "./categoryMappings.js";
 export {
   ICON_OPTIONS_BY_CATEGORY,
   DEFAULT_ICON_OPTIONS,

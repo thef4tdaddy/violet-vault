@@ -18,7 +18,11 @@ export const validateReceiptData = (receiptData) => {
     errors.push("Merchant name is required");
   }
 
-  if (!receiptData.total || isNaN(receiptData.total) || receiptData.total <= 0) {
+  if (
+    !receiptData.total ||
+    isNaN(receiptData.total) ||
+    receiptData.total <= 0
+  ) {
     errors.push("Valid total amount is required");
   }
 
@@ -76,7 +80,7 @@ export const formatCurrency = (amount) => {
  */
 export const formatDisplayDate = (dateString) => {
   if (!dateString) return "No date";
-  
+
   try {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat("en-US", {
@@ -94,7 +98,7 @@ export const formatDisplayDate = (dateString) => {
  */
 export const getConfidenceDescription = (confidence) => {
   if (!confidence || isNaN(confidence)) return "Unknown";
-  
+
   if (confidence >= 0.9) return "Very High";
   if (confidence >= 0.8) return "High";
   if (confidence >= 0.6) return "Medium";
@@ -107,7 +111,7 @@ export const getConfidenceDescription = (confidence) => {
  */
 export const getConfidenceColor = (confidence) => {
   if (!confidence || isNaN(confidence)) return "gray";
-  
+
   if (confidence >= 0.8) return "green";
   if (confidence >= 0.6) return "yellow";
   return "red";
@@ -137,10 +141,10 @@ export const extractReceiptSummary = (receiptData) => {
 export const isReceiptDataComplete = (receiptData) => {
   return Boolean(
     receiptData &&
-    receiptData.merchant &&
-    receiptData.total &&
-    receiptData.total > 0 &&
-    receiptData.date
+      receiptData.merchant &&
+      receiptData.total &&
+      receiptData.total > 0 &&
+      receiptData.date,
   );
 };
 
@@ -149,9 +153,13 @@ export const isReceiptDataComplete = (receiptData) => {
  */
 export const generateReceiptReference = (merchant, date, total) => {
   const merchantCode = merchant?.substring(0, 3).toUpperCase() || "RCP";
-  const dateCode = date?.replace(/-/g, "").substring(2) || new Date().toISOString().split("T")[0].replace(/-/g, "").substring(2);
-  const amountCode = Math.round(total * 100).toString().padStart(4, "0");
-  
+  const dateCode =
+    date?.replace(/-/g, "").substring(2) ||
+    new Date().toISOString().split("T")[0].replace(/-/g, "").substring(2);
+  const amountCode = Math.round(total * 100)
+    .toString()
+    .padStart(4, "0");
+
   return `${merchantCode}-${dateCode}-${amountCode}`;
 };
 

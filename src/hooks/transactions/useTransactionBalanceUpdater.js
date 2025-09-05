@@ -1,9 +1,16 @@
-import { getBudgetMetadata, setBudgetMetadata, budgetDb } from "../../db/budgetDb.js";
+import {
+  getBudgetMetadata,
+  setBudgetMetadata,
+  budgetDb,
+} from "../../db/budgetDb.js";
 import logger from "../../utils/common/logger.js";
 
 export const useTransactionBalanceUpdater = () => {
   // Helper function to update balances when transactions are added/removed
-  const updateBalancesForTransaction = async (transaction, isRemoving = false) => {
+  const updateBalancesForTransaction = async (
+    transaction,
+    isRemoving = false,
+  ) => {
     const { envelopeId, amount, type } = transaction;
     const multiplier = isRemoving ? -1 : 1; // Reverse the effect when removing
 
@@ -25,7 +32,9 @@ export const useTransactionBalanceUpdater = () => {
       if (envelopeId === "unassigned" || !envelopeId) {
         // Update unassigned cash
         const unassignedChange =
-          type === "income" ? amount * multiplier : -Math.abs(amount) * multiplier;
+          type === "income"
+            ? amount * multiplier
+            : -Math.abs(amount) * multiplier;
 
         await setBudgetMetadata({
           actualBalance: currentActualBalance + actualBalanceChange,
@@ -36,7 +45,9 @@ export const useTransactionBalanceUpdater = () => {
         const envelope = await budgetDb.envelopes.get(envelopeId);
         if (envelope) {
           const balanceChange =
-            type === "income" ? amount * multiplier : -Math.abs(amount) * multiplier;
+            type === "income"
+              ? amount * multiplier
+              : -Math.abs(amount) * multiplier;
 
           const newBalance = (envelope.currentBalance || 0) + balanceChange;
           await budgetDb.envelopes.update(envelopeId, {

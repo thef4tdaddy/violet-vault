@@ -4,7 +4,7 @@ import { Search, X, Filter } from "lucide-react";
 /**
  * Standardized compact filtering component with glassmorphism styling
  * Consistent, space-efficient filtering across all pages with proper borders and labeling
- * 
+ *
  * @param {Object} filters - Current filter values
  * @param {Function} onFilterChange - Callback for filter changes
  * @param {Array} filterConfigs - Array of filter configurations
@@ -19,19 +19,19 @@ const StandardFilters = ({
   showClearButton = true,
   searchPlaceholder = "Search...",
   size = "md",
-  className = ""
+  className = "",
 }) => {
   const sizeConfig = {
     sm: {
       input: "px-2 py-1 text-sm",
       select: "px-2 py-1 text-sm",
-      gap: "gap-2"
+      gap: "gap-2",
     },
     md: {
-      input: "px-3 py-1.5 text-sm", 
+      input: "px-3 py-1.5 text-sm",
       select: "px-3 py-1.5 text-sm",
-      gap: "gap-3"
-    }
+      gap: "gap-3",
+    },
   };
 
   const config = sizeConfig[size];
@@ -44,11 +44,11 @@ const StandardFilters = ({
     const clearedFilters = {};
     // Set search to empty string
     clearedFilters.search = "";
-    
+
     // Set all other filters to their default values
-    filterConfigs.forEach(filterConfig => {
-      if (filterConfig.type === 'select') {
-        clearedFilters[filterConfig.key] = filterConfig.defaultValue || 'all';
+    filterConfigs.forEach((filterConfig) => {
+      if (filterConfig.type === "select") {
+        clearedFilters[filterConfig.key] = filterConfig.defaultValue || "all";
       }
     });
 
@@ -61,11 +61,11 @@ const StandardFilters = ({
   // Check if any filters are active (not default values)
   const hasActiveFilters = () => {
     if (filters.search && filters.search.trim() !== "") return true;
-    
-    return filterConfigs.some(filterConfig => {
-      if (filterConfig.type === 'select') {
+
+    return filterConfigs.some((filterConfig) => {
+      if (filterConfig.type === "select") {
         const currentValue = filters[filterConfig.key];
-        const defaultValue = filterConfig.defaultValue || 'all';
+        const defaultValue = filterConfig.defaultValue || "all";
         return currentValue && currentValue !== defaultValue;
       }
       return false;
@@ -73,7 +73,9 @@ const StandardFilters = ({
   };
 
   return (
-    <div className={`glassmorphism rounded-lg p-4 border border-white/20 ring-1 ring-gray-800/10 shadow-lg ${className}`}>
+    <div
+      className={`glassmorphism rounded-lg p-4 border border-white/20 ring-1 ring-gray-800/10 shadow-lg ${className}`}
+    >
       {/* Filter Header */}
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
@@ -90,7 +92,7 @@ const StandardFilters = ({
           </button>
         )}
       </div>
-      
+
       {/* Filter Controls */}
       <div className={`flex items-center ${config.gap}`}>
         {/* Search Input */}
@@ -120,12 +122,18 @@ const StandardFilters = ({
 
         {/* Filter Dropdowns */}
         {filterConfigs.map((filterConfig) => {
-          if (filterConfig.type === 'select') {
+          if (filterConfig.type === "select") {
             return (
               <select
                 key={filterConfig.key}
-                value={filters[filterConfig.key] || filterConfig.defaultValue || 'all'}
-                onChange={(e) => handleFilterChange(filterConfig.key, e.target.value)}
+                value={
+                  filters[filterConfig.key] ||
+                  filterConfig.defaultValue ||
+                  "all"
+                }
+                onChange={(e) =>
+                  handleFilterChange(filterConfig.key, e.target.value)
+                }
                 className={`
                   ${config.select} border border-gray-300 rounded-md
                   focus:ring-1 focus:ring-blue-500 focus:border-blue-500

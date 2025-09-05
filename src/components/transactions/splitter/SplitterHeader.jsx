@@ -4,7 +4,11 @@ import { Scissors, X } from "lucide-react";
 const SplitterHeader = ({ transaction, onClose, hasUnsavedChanges }) => {
   const handleClose = () => {
     if (hasUnsavedChanges) {
-      if (window.confirm("You have unsaved changes. Are you sure you want to close?")) {
+      if (
+        window.confirm(
+          "You have unsaved changes. Are you sure you want to close?",
+        )
+      ) {
         onClose?.();
       }
     } else {
@@ -22,7 +26,8 @@ const SplitterHeader = ({ transaction, onClose, hasUnsavedChanges }) => {
           <div>
             <h2 className="text-xl font-black text-white">SPLIT TRANSACTION</h2>
             <p className="text-blue-100 text-sm font-medium">
-              {transaction.description} • ${Math.abs(transaction.amount).toFixed(2)}
+              {transaction.description} • $
+              {Math.abs(transaction.amount).toFixed(2)}
             </p>
           </div>
         </div>
