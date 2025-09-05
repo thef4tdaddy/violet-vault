@@ -10,6 +10,36 @@ import { clearAllDexieData, importDataToDexie } from "../../utils/dataManagement
 import { clearFirebaseData, forcePushToCloud } from "../../utils/dataManagement/firebaseUtils";
 import { queryClient } from "../../utils/common/queryClient";
 
+const handleConfirmation = async (confirm, validatedData, hasBudgetIdMismatch, importBudgetId, currentUser) => {
+  let confirmMessage = `Import ${validatedData.envelopes?.length || 0} envelopes, ${validatedData.bills?.length || 0} bills, ${validatedData.debts?.length || 0} debts, ${validatedData.auditLog?.length || 0} audit entries, and ${validatedData.allTransactions?.length || 0} transactions?\n\nThis will replace your current data.`;
+  if (hasBudgetIdMismatch) {
+    confirmMessage += `\n\n⚠️ ENCRYPTION CONTEXT CHANGE DETECTED:\nBackup budgetId: ${importBudgetId?.substring(0, 12)}...\nCurrent budgetId: ${currentUser?.budgetId?.substring(0, 12)}...\n\nImport will re-encrypt data with your current session context.`;
+  }
+
+  return confirm({
+    title: hasBudgetIdMismatch ? "Import Data (Encryption Context Change)" : "Import Data",
+    message: confirmMessage,
+    confirmLabel: "Import Data",
+    cancelLabel: "Cancel",
+    destructive: true,
+  });
+};
+
+const performImport = async (validatedData, showSuccessToast) => {
+  await backupCurrentData();
+  await clearFirebaseData();
+  await clearAllDexieData();
+  await importDataToDexie(validatedData);
+
+  showSuccessToast("Local data imported! Now syncing to cloud...", "Import Complete");
+
+  await forcePushToCloud();
+  showSuccessToast("Import complete! Data synced to cloud successfully.");
+
+  await queryClient.invalidateQueries();
+  logger.info("TanStack Query cache invalidated after data import");
+};
+
 export const useImportData = () => {
   const { currentUser } = useAuth();
   const { showSuccessToast, showErrorToast } = useToastHelpers();
@@ -27,36 +57,14 @@ export const useImportData = () => {
 
       const { validatedData, hasBudgetIdMismatch, importBudgetId } = validateImportedData(importedData, currentUser);
 
-      let confirmMessage = `Import ${validatedData.envelopes?.length || 0} envelopes, ${validatedData.bills?.length || 0} bills, ${validatedData.debts?.length || 0} debts, ${validatedData.auditLog?.length || 0} audit entries, and ${validatedData.allTransactions?.length || 0} transactions?\n\nThis will replace your current data.`;
-      if (hasBudgetIdMismatch) {
-        confirmMessage += `\n\n⚠️ ENCRYPTION CONTEXT CHANGE DETECTED:\nBackup budgetId: ${importBudgetId?.substring(0, 12)}...\nCurrent budgetId: ${currentUser?.budgetId?.substring(0, 12)}...\n\nImport will re-encrypt data with your current session context.`;
-      }
-
-      const confirmed = await confirm({
-        title: hasBudgetIdMismatch ? "Import Data (Encryption Context Change)" : "Import Data",
-        message: confirmMessage,
-        confirmLabel: "Import Data",
-        cancelLabel: "Cancel",
-        destructive: true,
-      });
+      const confirmed = await handleConfirmation(confirm, validatedData, hasBudgetIdMismatch, importBudgetId, currentUser);
 
       if (!confirmed) {
         logger.info("Import cancelled by user");
         return;
       }
 
-      await backupCurrentData();
-      await clearFirebaseData();
-      await clearAllDexieData();
-      await importDataToDexie(validatedData);
-
-      showSuccessToast("Local data imported! Now syncing to cloud...", "Import Complete");
-
-      await forcePushToCloud();
-      showSuccessToast("Import complete! Data synced to cloud successfully.");
-
-      await queryClient.invalidateQueries();
-      logger.info("TanStack Query cache invalidated after data import");
+      await performImport(validatedData, showSuccessToast);
 
       return {
         success: true,

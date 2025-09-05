@@ -38,6 +38,12 @@ export const clearAllDexieData = async () => {
   logger.info("All Dexie data cleared successfully");
 };
 
+const bulkAddIfPresent = async (table, data) => {
+    if (data?.length) {
+        await table.bulkAdd(data);
+    }
+}
+
 export const importDataToDexie = async (data) => {
   logger.info("Importing data to Dexie");
   await budgetDb.transaction(
@@ -53,27 +59,14 @@ export const importDataToDexie = async (data) => {
       budgetDb.budget,
     ],
     async () => {
-      if (data.envelopes?.length) {
-        await budgetDb.envelopes.bulkAdd(data.envelopes);
-      }
-      if (data.bills?.length) {
-        await budgetDb.bills.bulkAdd(data.bills);
-      }
-      if (data.allTransactions?.length) {
-        await budgetDb.transactions.bulkAdd(data.allTransactions);
-      }
-      if (data.savingsGoals?.length) {
-        await budgetDb.savingsGoals.bulkAdd(data.savingsGoals);
-      }
-      if (data.debts?.length) {
-        await budgetDb.debts.bulkAdd(data.debts);
-      }
-      if (data.paycheckHistory?.length) {
-        await budgetDb.paycheckHistory.bulkAdd(data.paycheckHistory);
-      }
-      if (data.auditLog?.length) {
-        await budgetDb.auditLog.bulkAdd(data.auditLog);
-      }
+      await bulkAddIfPresent(budgetDb.envelopes, data.envelopes);
+      await bulkAddIfPresent(budgetDb.bills, data.bills);
+      await bulkAddIfPresent(budgetDb.transactions, data.allTransactions);
+      await bulkAddIfPresent(budgetDb.savingsGoals, data.savingsGoals);
+      await bulkAddIfPresent(budgetDb.debts, data.debts);
+      await bulkAddIfPresent(budgetDb.paycheckHistory, data.paycheckHistory);
+      await bulkAddIfPresent(budgetDb.auditLog, data.auditLog);
+
       await budgetDb.budget.put({
         id: "metadata",
         unassignedCash: data.unassignedCash || 0,
