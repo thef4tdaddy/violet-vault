@@ -26,7 +26,7 @@ const TransactionSummaryCards = ({ transactions = [] }) => {
       label: "Monthly Spend",
       value: `$${totalExpenses.toFixed(2)}`,
       color: "blue",
-      subtext: `${transactions.filter(t => t.amount < 0).length} expenses`,
+      subtext: `${transactions.filter((t) => t.amount < 0).length} expenses`,
     },
     {
       key: "income",
@@ -34,7 +34,7 @@ const TransactionSummaryCards = ({ transactions = [] }) => {
       label: "Income",
       value: `$${totalIncome.toFixed(2)}`,
       color: "green",
-      subtext: `${transactions.filter(t => t.amount > 0).length} deposits`,
+      subtext: `${transactions.filter((t) => t.amount > 0).length} deposits`,
     },
     {
       key: "net-flow",
