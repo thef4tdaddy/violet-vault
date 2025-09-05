@@ -1,3 +1,5 @@
+- When you update Claude's rules, also update Gemini.
+
 - If there is a bug on main, create an issue for it, in case we are unable to fix it in the moment so there is tracking.
 - If I suggest a new feature, create a GH issue for it so it can be tracked to completion.
 - When creating issues, if its a GH issue for a bug use label "bug" , if its a new feature / enhancement use the label "enhancement" and "roadmap" on the issue
