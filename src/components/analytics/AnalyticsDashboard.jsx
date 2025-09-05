@@ -20,6 +20,7 @@ import TrendAnalysisCharts from "./TrendAnalysisCharts";
 import PerformanceMonitor from "./PerformanceMonitor";
 import ReportExporter from "./ReportExporter";
 import StandardTabs from "../ui/StandardTabs";
+import AnalyticsSummaryCards from "./AnalyticsSummaryCards";
 import logger from "../../utils/common/logger";
 
 /**
@@ -234,81 +235,7 @@ const AnalyticsDashboard = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg border-2 border-black ring-1 ring-gray-800/10 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Net Amount</p>
-              <p
-                className={`text-2xl font-bold ${
-                  summaryMetrics.netAmount >= 0
-                    ? "text-green-600"
-                    : "text-red-600"
-                }`}
-              >
-                ${Math.abs(summaryMetrics.netAmount).toLocaleString()}
-              </p>
-            </div>
-            {summaryMetrics.netAmount >= 0 ? (
-              <TrendingUp className="h-8 w-8 text-green-600" />
-            ) : (
-              <TrendingDown className="h-8 w-8 text-red-600" />
-            )}
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg border-2 border-black ring-1 ring-gray-800/10 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Envelope Utilization</p>
-              <p className="text-2xl font-bold text-blue-600">
-                {summaryMetrics.envelopeUtilization.toFixed(1)}%
-              </p>
-            </div>
-            <Wallet className="h-8 w-8 text-blue-600" />
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg border-2 border-black ring-1 ring-gray-800/10 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Savings Progress</p>
-              <p className="text-2xl font-bold text-purple-600">
-                {summaryMetrics.savingsProgress.toFixed(1)}%
-              </p>
-            </div>
-            <Target className="h-8 w-8 text-purple-600" />
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg border-2 border-black ring-1 ring-gray-800/10 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Balance Health</p>
-              <p
-                className={`text-2xl font-bold capitalize ${
-                  summaryMetrics.balanceHealth === "healthy"
-                    ? "text-green-600"
-                    : summaryMetrics.balanceHealth === "warning"
-                      ? "text-yellow-600"
-                      : "text-red-600"
-                }`}
-              >
-                {summaryMetrics.balanceHealth}
-              </p>
-            </div>
-            <DollarSign
-              className={`h-8 w-8 ${
-                summaryMetrics.balanceHealth === "healthy"
-                  ? "text-green-600"
-                  : summaryMetrics.balanceHealth === "warning"
-                    ? "text-yellow-600"
-                    : "text-red-600"
-              }`}
-            />
-          </div>
-        </div>
-      </div>
+      <AnalyticsSummaryCards summaryMetrics={summaryMetrics} />
 
       {/* Navigation Tabs */}
       <StandardTabs
