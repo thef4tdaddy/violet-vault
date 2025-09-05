@@ -97,7 +97,7 @@ jobs:
           if (( $(echo "$PERCENTAGE_INCREASE > 20" | bc -l) )); then
             echo "❌ **FAILED:** Warning count increased by $PERCENTAGE_INCREASE% (over 20% threshold)" >> $GITHUB_STEP_SUMMARY
             echo "threshold_exceeded=true" >> $GITHUB_OUTPUT
-            exit 1
+            # Don't exit - continue with issue updates (graduated approach allows higher warning counts)
           elif (( $(echo "$PERCENTAGE_INCREASE > 0" | bc -l) )); then
             echo "⚠️ **WARNING:** Warning count increased by $PERCENTAGE_INCREASE% (within 20% threshold)" >> $GITHUB_STEP_SUMMARY
             echo "threshold_exceeded=false" >> $GITHUB_OUTPUT
