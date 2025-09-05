@@ -28,6 +28,7 @@ Object.defineProperty(global, "crypto", {
       generateKey: vi.fn(),
       exportKey: vi.fn(),
       importKey: vi.fn(),
+      digest: vi.fn(), // Added this line
     },
   },
   writable: true,

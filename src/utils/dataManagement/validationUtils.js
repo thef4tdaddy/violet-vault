@@ -1,26 +1,28 @@
-      ...importedData,
+import logger from "../common/logger";
 
 const validateDataStructure = (data) => {
-    if (!data || typeof data !== "object") {
-        throw new Error("Invalid backup file: not a valid JSON object.");
-    }
+  if (!data || typeof data !== "object") {
+    throw new Error("Invalid backup file: not a valid JSON object.");
+  }
 
-    if (!data.envelopes || !Array.isArray(data.envelopes)) {
-        throw new Error("Invalid backup file: missing or invalid envelopes data.");
-    }
-}
+  if (!data.envelopes || !Array.isArray(data.envelopes)) {
+    throw new Error("Invalid backup file: missing or invalid envelopes data.");
+  }
+};
 
 const checkBudgetIdMismatch = (importedData, currentUser) => {
-    const importBudgetId = importedData.exportMetadata?.budgetId;
-    const currentBudgetId = currentUser?.budgetId;
-    return importBudgetId && currentBudgetId && importBudgetId !== currentBudgetId;
-}
+  const importBudgetId = importedData.exportMetadata?.budgetId;
+  const currentBudgetId = currentUser?.budgetId;
+  return (
+    importBudgetId && currentBudgetId && importBudgetId !== currentBudgetId
+  );
+};
 
 const unifyTransactions = (importedData) => {
-    return Array.isArray(importedData.allTransactions)
-        ? importedData.allTransactions
-        : [...(importedData.transactions || []), ...(importedData.bills || [])];
-}
+  return Array.isArray(importedData.allTransactions)
+    ? importedData.allTransactions
+    : [...(importedData.transactions || []), ...(importedData.bills || [])];
+};
 
 export const validateImportedData = (importedData, currentUser) => {
   logger.info("Validating imported data");
