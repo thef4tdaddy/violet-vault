@@ -1,7 +1,6 @@
 import React from "react";
 import { AlertTriangle, History, Download, Upload, Cloud } from "lucide-react";
-
-const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
+import { getLocalOnlyMode } from "../../../utils/settings/settingsHelpers";
 
 const DataManagementSection = ({
   onOpenEnvelopeChecker,
@@ -92,7 +91,7 @@ const DataManagementSection = ({
           </label>
         </div>
 
-        {LOCAL_ONLY_MODE && (
+        {getLocalOnlyMode() && (
           <button
             onClick={onSync}
             className="w-full flex items-center p-3 border border-blue-200 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
