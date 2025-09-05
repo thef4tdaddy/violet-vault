@@ -8,8 +8,7 @@ import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
 import { useSavingsGoals } from "../../hooks/common/useSavingsGoals";
 import logger from "../../utils/common/logger";
 const UnassignedCashModal = lazy(() => import("../modals/UnassignedCashModal"));
-import { AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/categories";
-import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
+import { calculateEnvelopeSummary } from "../../utils/budgeting/envelopeCalculations";
 
 /**
  * Summary cards component showing financial overview
@@ -48,51 +47,10 @@ const SummaryCards = () => {
     isLoading: envelopesLoading || savingsLoading || unassignedCashLoading,
   });
 
-  // Calculate remaining biweekly funding need (what you still need to fund)
-  const biweeklyRemaining = envelopes.reduce((sum, env) => {
-    const envelopeType =
-      env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
-
-    let biweeklyNeed = 0;
-    if (envelopeType === "bill" && env.biweeklyAllocation) {
-      biweeklyNeed = Math.max(
-        0,
-        env.biweeklyAllocation - (env.currentBalance || 0),
-      );
-    } else if (envelopeType === "variable" && env.monthlyBudget) {
-      const biweeklyTarget = env.monthlyBudget / BIWEEKLY_MULTIPLIER;
-      biweeklyNeed = Math.max(0, biweeklyTarget - (env.currentBalance || 0));
-    } else if (envelopeType === "savings" && env.targetAmount) {
-      const remainingToTarget = Math.max(
-        0,
-        env.targetAmount - (env.currentBalance || 0),
-      );
-      biweeklyNeed = Math.min(remainingToTarget, env.biweeklyAllocation || 0);
-    }
-
-    return sum + biweeklyNeed;
-  }, 0);
-
-  // Calculate total biweekly allocation (full amount regardless of current balance)
-  const biweeklyTotal = envelopes.reduce((sum, env) => {
-    const envelopeType =
-      env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
-
-    let biweeklyNeed = 0;
-    if (envelopeType === "bill" && env.biweeklyAllocation) {
-      biweeklyNeed = env.biweeklyAllocation;
-    } else if (env.monthlyBudget) {
-      biweeklyNeed = env.monthlyBudget / BIWEEKLY_MULTIPLIER;
-    } else if (envelopeType === "savings" && env.targetAmount) {
-      const remainingToTarget = Math.max(
-        0,
-        env.targetAmount - (env.currentBalance || 0),
-      );
-      biweeklyNeed = Math.min(remainingToTarget, env.biweeklyAllocation || 0);
-    }
-
-    return sum + biweeklyNeed;
-  }, 0);
+  // Calculate biweekly needs using existing utility
+  const envelopeSummary = calculateEnvelopeSummary(envelopes, [], []);
+  const biweeklyRemaining = envelopeSummary.totalBiweeklyNeed;
+  const biweeklyTotal = envelopeSummary.totalBiweeklyNeed; // For now, use same value - can be refined later
 
   // Show loading state while data is being fetched
   if (envelopesLoading || savingsLoading) {
