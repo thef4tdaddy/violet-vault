@@ -1,23 +1,33 @@
 import React from "react";
-import { AlertTriangle, RefreshCw, Wrench, CheckCircle, Clock, ExternalLink } from "lucide-react";
-import { 
-  formatLastChecked, 
-  getStatusDescription, 
+import {
+  AlertTriangle,
+  RefreshCw,
+  Wrench,
+  CheckCircle,
+  Clock,
+  ExternalLink,
+} from "lucide-react";
+import {
+  formatLastChecked,
+  getStatusDescription,
   getActionButtonStyle,
   formatRecoveryResult,
-  hasRecoveryActions 
+  hasRecoveryActions,
 } from "../../../utils/sync/syncHealthHelpers";
 
-const SyncHealthDetails = ({ 
+const SyncHealthDetails = ({
   syncStatus,
-  isBackgroundSyncing, 
+  isBackgroundSyncing,
   isRecovering,
   recoveryResult,
   onRefresh,
   onRunValidation,
-  onResetData 
+  onResetData,
 }) => {
-  const statusDescription = getStatusDescription(syncStatus, isBackgroundSyncing);
+  const statusDescription = getStatusDescription(
+    syncStatus,
+    isBackgroundSyncing,
+  );
   const lastCheckedText = formatLastChecked(syncStatus.lastChecked);
   const formattedRecoveryResult = formatRecoveryResult(recoveryResult);
 
@@ -42,7 +52,8 @@ const SyncHealthDetails = ({
             </div>
             <div>
               <p className="text-sm font-bold text-gray-900">
-                Current Status: <span className="text-purple-800">{syncStatus.status}</span>
+                Current Status:{" "}
+                <span className="text-purple-800">{syncStatus.status}</span>
               </p>
               <p className="text-xs text-purple-700 font-medium mt-1">
                 {statusDescription}
@@ -60,8 +71,12 @@ const SyncHealthDetails = ({
         {/* Error Details */}
         {syncStatus.error && (
           <div className="bg-gradient-to-r from-red-50/80 to-orange-50/80 backdrop-blur-sm p-3 rounded-xl border border-red-200 shadow-sm">
-            <p className="text-xs font-bold text-red-800 mb-1">ERROR DETAILS:</p>
-            <p className="text-xs text-red-700 font-medium">{syncStatus.error}</p>
+            <p className="text-xs font-bold text-red-800 mb-1">
+              ERROR DETAILS:
+            </p>
+            <p className="text-xs text-red-700 font-medium">
+              {syncStatus.error}
+            </p>
           </div>
         )}
 
@@ -69,7 +84,8 @@ const SyncHealthDetails = ({
         {syncStatus.failedTests > 0 && (
           <div className="bg-gradient-to-r from-yellow-50/80 to-orange-50/80 backdrop-blur-sm p-3 rounded-xl border border-yellow-200 shadow-sm">
             <p className="text-xs font-bold text-orange-800">
-              {syncStatus.failedTests} validation test{syncStatus.failedTests > 1 ? 's' : ''} failed
+              {syncStatus.failedTests} validation test
+              {syncStatus.failedTests > 1 ? "s" : ""} failed
             </p>
             {syncStatus.fullResults && (
               <p className="text-xs text-orange-700 font-medium mt-1">
@@ -81,19 +97,29 @@ const SyncHealthDetails = ({
 
         {/* Recovery Result */}
         {formattedRecoveryResult && (
-          <div className={`p-3 rounded-xl border shadow-sm backdrop-blur-sm ${
-            formattedRecoveryResult.type === 'success' 
-              ? 'bg-gradient-to-r from-green-50/80 to-emerald-50/80 border-green-200'
-              : 'bg-gradient-to-r from-red-50/80 to-orange-50/80 border-red-200'
-          }`}>
-            <p className={`text-xs font-bold mb-1 ${
-              formattedRecoveryResult.type === 'success' ? 'text-green-800' : 'text-red-800'
-            }`}>
+          <div
+            className={`p-3 rounded-xl border shadow-sm backdrop-blur-sm ${
+              formattedRecoveryResult.type === "success"
+                ? "bg-gradient-to-r from-green-50/80 to-emerald-50/80 border-green-200"
+                : "bg-gradient-to-r from-red-50/80 to-orange-50/80 border-red-200"
+            }`}
+          >
+            <p
+              className={`text-xs font-bold mb-1 ${
+                formattedRecoveryResult.type === "success"
+                  ? "text-green-800"
+                  : "text-red-800"
+              }`}
+            >
               RECOVERY RESULT:
             </p>
-            <p className={`text-xs font-medium ${
-              formattedRecoveryResult.type === 'success' ? 'text-green-700' : 'text-red-700'
-            }`}>
+            <p
+              className={`text-xs font-medium ${
+                formattedRecoveryResult.type === "success"
+                  ? "text-green-700"
+                  : "text-red-700"
+              }`}
+            >
               {formattedRecoveryResult.message}
             </p>
             {formattedRecoveryResult.details && (
@@ -107,16 +133,20 @@ const SyncHealthDetails = ({
         {/* Action Buttons */}
         {hasRecoveryActions() && (
           <div className="space-y-2 pt-2 border-t border-gray-200">
-            <p className="text-xs font-black text-gray-700 uppercase">ACTIONS:</p>
-            
+            <p className="text-xs font-black text-gray-700 uppercase">
+              ACTIONS:
+            </p>
+
             <div className="flex flex-col gap-2">
               <button
                 onClick={onRefresh}
                 disabled={syncStatus.isLoading}
                 className={getActionButtonStyle("refresh")}
               >
-                <RefreshCw className={`h-3 w-3 mr-2 ${syncStatus.isLoading ? 'animate-spin' : ''}`} />
-                {syncStatus.isLoading ? 'Refreshing...' : 'Refresh Status'}
+                <RefreshCw
+                  className={`h-3 w-3 mr-2 ${syncStatus.isLoading ? "animate-spin" : ""}`}
+                />
+                {syncStatus.isLoading ? "Refreshing..." : "Refresh Status"}
               </button>
 
               <button
@@ -132,8 +162,10 @@ const SyncHealthDetails = ({
                 disabled={isRecovering}
                 className={getActionButtonStyle("reset")}
               >
-                <AlertTriangle className={`h-3 w-3 mr-2 ${isRecovering ? 'animate-pulse' : ''}`} />
-                {isRecovering ? 'Resetting...' : 'Reset Cloud Data'}
+                <AlertTriangle
+                  className={`h-3 w-3 mr-2 ${isRecovering ? "animate-pulse" : ""}`}
+                />
+                {isRecovering ? "Resetting..." : "Reset Cloud Data"}
               </button>
             </div>
           </div>
@@ -142,10 +174,12 @@ const SyncHealthDetails = ({
         {/* Additional Info */}
         <div className="pt-2 border-t border-gray-200">
           <p className="text-xs text-purple-600 font-medium">
-            Background sync: {isBackgroundSyncing ? 
-              <span className="text-blue-600 font-bold">Active</span> : 
+            Background sync:{" "}
+            {isBackgroundSyncing ? (
+              <span className="text-blue-600 font-bold">Active</span>
+            ) : (
               <span className="text-gray-600">Idle</span>
-            }
+            )}
           </p>
         </div>
       </div>

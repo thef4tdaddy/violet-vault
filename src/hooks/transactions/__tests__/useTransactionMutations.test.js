@@ -59,7 +59,7 @@ describe("useTransactionMutations", () => {
           mutationFn: expect.any(Function),
           onSuccess: expect.any(Function),
           onError: expect.any(Function),
-        })
+        }),
       );
 
       expect(result.current.addTransaction).toBe(mockMutate);
@@ -82,7 +82,11 @@ describe("useTransactionMutations", () => {
 
       renderHook(() => useTransactionMutations());
 
-      const newTransaction = { id: "new", description: "New Transaction", amount: 100 };
+      const newTransaction = {
+        id: "new",
+        description: "New Transaction",
+        amount: 100,
+      };
       act(() => {
         mockOnSuccess(newTransaction);
       });
@@ -147,7 +151,11 @@ describe("useTransactionMutations", () => {
 
       renderHook(() => useTransactionMutations());
 
-      const updatedTransaction = { id: "1", description: "Updated", amount: 200 };
+      const updatedTransaction = {
+        id: "1",
+        description: "Updated",
+        amount: 200,
+      };
       act(() => {
         updateOnSuccess(updatedTransaction);
       });

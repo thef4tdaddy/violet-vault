@@ -17,7 +17,10 @@ import logger from "./utils/common/logger.js";
 import { runImmediateSyncHealthCheck } from "./utils/sync/syncHealthChecker.js";
 import syncEdgeCaseTester from "./utils/sync/syncEdgeCaseTester.js";
 import { validateAllSyncFlows } from "./utils/sync/syncFlowValidator.js";
-import { runMasterSyncValidation, getQuickSyncStatus } from "./utils/sync/masterSyncValidator.js";
+import {
+  runMasterSyncValidation,
+  getQuickSyncStatus,
+} from "./utils/sync/masterSyncValidator.js";
 import { fixAutoAllocateUndefined } from "./utils/common/fixAutoAllocateUndefined.js";
 
 if (
@@ -37,33 +40,40 @@ if (
 
   // Emergency corruption recovery tool
   window.forceCloudDataReset = async () => {
-    logger.warn("🚨 CORRUPTION FIX: Attempting to clear cloud data and re-upload from local...");
+    logger.warn(
+      "🚨 CORRUPTION FIX: Attempting to clear cloud data and re-upload from local...",
+    );
     try {
-      const { cloudSyncService } = await import("./services/cloudSyncService.js");
-      
+      const { cloudSyncService } = await import(
+        "./services/cloudSyncService.js"
+      );
+
       // CRITICAL SAFETY CHECK: Verify local data exists before clearing cloud
       logger.info("🔍 Checking local data before clearing cloud...");
       const localData = await cloudSyncService.fetchDexieData();
-      
-      const hasLocalData = localData && (
-        (localData.envelopes && localData.envelopes.length > 0) ||
-        (localData.transactions && localData.transactions.length > 0) ||
-        (localData.bills && localData.bills.length > 0) ||
-        (localData.debts && localData.debts.length > 0)
-      );
-      
+
+      const hasLocalData =
+        localData &&
+        ((localData.envelopes && localData.envelopes.length > 0) ||
+          (localData.transactions && localData.transactions.length > 0) ||
+          (localData.bills && localData.bills.length > 0) ||
+          (localData.debts && localData.debts.length > 0));
+
       if (!hasLocalData) {
-        const errorMsg = "🚨 SAFETY ABORT: No local data found! Cannot clear cloud data as this would result in total data loss. Please restore from backup first.";
+        const errorMsg =
+          "🚨 SAFETY ABORT: No local data found! Cannot clear cloud data as this would result in total data loss. Please restore from backup first.";
         logger.error(errorMsg);
-        return { 
-          success: false, 
+        return {
+          success: false,
           error: errorMsg,
-          safetyAbort: true 
+          safetyAbort: true,
         };
       }
-      
+
       logger.info("✅ Local data verified - safe to proceed with cloud reset");
-      logger.info(`📊 Found: ${localData.envelopes?.length || 0} envelopes, ${localData.transactions?.length || 0} transactions, ${localData.bills?.length || 0} bills, ${localData.debts?.length || 0} debts`);
+      logger.info(
+        `📊 Found: ${localData.envelopes?.length || 0} envelopes, ${localData.transactions?.length || 0} transactions, ${localData.bills?.length || 0} bills, ${localData.debts?.length || 0} debts`,
+      );
 
       // Stop any ongoing sync
       cloudSyncService.stop();
@@ -84,9 +94,14 @@ if (
       logger.info("🚀 Force pushed local data to cloud:", result);
 
       if (result.success) {
-        logger.info("✅ Cloud data reset completed successfully - sync will resume automatically");
+        logger.info(
+          "✅ Cloud data reset completed successfully - sync will resume automatically",
+        );
         // Don't restart sync immediately - let it happen naturally
-        return { success: true, message: "Cloud data reset completed successfully" };
+        return {
+          success: true,
+          message: "Cloud data reset completed successfully",
+        };
       } else {
         throw new Error(result.error || "Force push failed");
       }
@@ -100,7 +115,9 @@ if (
   window.clearCloudDataOnly = async () => {
     logger.info("🧹 Clearing cloud data only (no restart)...");
     try {
-      const { cloudSyncService } = await import("./services/cloudSyncService.js");
+      const { cloudSyncService } = await import(
+        "./services/cloudSyncService.js"
+      );
       cloudSyncService.stop();
       logger.info("⏸️ Stopped sync service");
 
@@ -116,8 +133,12 @@ if (
 
   // Bug report testing tools
   window.testBugReportCapture = async () => {
-    const { SystemInfoService } = await import("./services/bugReport/systemInfoService.js");
-    const { ScreenshotService } = await import("./services/bugReport/screenshotService.js");
+    const { SystemInfoService } = await import(
+      "./services/bugReport/systemInfoService.js"
+    );
+    const { ScreenshotService } = await import(
+      "./services/bugReport/screenshotService.js"
+    );
 
     logger.info("🐛 Testing bug report capture...");
 
@@ -129,8 +150,13 @@ if (
     // Test screenshot capture
     try {
       const screenshot = await ScreenshotService.captureScreenshot();
-      const info = screenshot ? ScreenshotService.getScreenshotInfo(screenshot) : null;
-      logger.info("📸 Screenshot capture:", info ? `Success (${info.sizeKB}KB)` : "Failed");
+      const info = screenshot
+        ? ScreenshotService.getScreenshotInfo(screenshot)
+        : null;
+      logger.info(
+        "📸 Screenshot capture:",
+        info ? `Success (${info.sizeKB}KB)` : "Failed",
+      );
       return {
         success: true,
         errors,
@@ -157,5 +183,5 @@ SystemInfoService.initializeErrorCapture();
 ReactDOM.createRoot(document.getElementById("root")).render(
   <QueryClientProvider client={queryClient}>
     <App />
-  </QueryClientProvider>
+  </QueryClientProvider>,
 );

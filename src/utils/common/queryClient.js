@@ -9,7 +9,10 @@ export { prefetchHelpers } from "../query/prefetchHelpers.js";
 
 export { optimisticHelpers } from "../query/optimisticHelpers.js";
 
-export { backgroundSync, networkManager } from "../query/backgroundSyncService.js";
+export {
+  backgroundSync,
+  networkManager,
+} from "../query/backgroundSyncService.js";
 
 export { queryClient };
 export default queryClient;

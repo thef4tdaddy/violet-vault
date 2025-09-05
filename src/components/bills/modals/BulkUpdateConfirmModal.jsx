@@ -1,14 +1,18 @@
 import React from "react";
 import { X } from "lucide-react";
-import { formatAmountChange, formatDateChange, hasChanges } from "../../../utils/bills/billUpdateHelpers";
+import {
+  formatAmountChange,
+  formatDateChange,
+  hasChanges,
+} from "../../../utils/bills/billUpdateHelpers";
 
-const BulkUpdateConfirmModal = ({ 
-  isOpen, 
-  onClose, 
-  onConfirm, 
-  selectedBills, 
-  changes, 
-  summary 
+const BulkUpdateConfirmModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  selectedBills,
+  changes,
+  summary,
 }) => {
   if (!isOpen) return null;
 
@@ -30,14 +34,18 @@ const BulkUpdateConfirmModal = ({
 
           <div className="space-y-4">
             <div className="bg-gradient-to-r from-blue-100/60 to-purple-100/60 backdrop-blur-sm p-4 rounded-xl border-2 border-black shadow-lg">
-              <h4 className="font-black text-purple-900 mb-2">SUMMARY OF CHANGES</h4>
+              <h4 className="font-black text-purple-900 mb-2">
+                SUMMARY OF CHANGES
+              </h4>
               <div className="text-sm text-purple-800 space-y-1">
                 <p className="font-medium">
-                  • {summary.changedBills} of {summary.totalBills} bills will be updated
+                  • {summary.changedBills} of {summary.totalBills} bills will be
+                  updated
                 </p>
                 {summary.totalAmountChange !== 0 && (
                   <p className="font-medium">
-                    • Net amount change: {summary.totalAmountChange > 0 ? "+" : ""}$
+                    • Net amount change:{" "}
+                    {summary.totalAmountChange > 0 ? "+" : ""}$
                     {summary.totalAmountChange.toFixed(2)}
                   </p>
                 )}
@@ -49,23 +57,46 @@ const BulkUpdateConfirmModal = ({
                 const change = changes[bill.id];
                 if (!change || !hasChanges(change)) return null;
 
-                const amountChange = formatAmountChange(change.originalAmount, change.amount);
-                const dateChange = formatDateChange(change.originalDueDate, change.dueDate);
+                const amountChange = formatAmountChange(
+                  change.originalAmount,
+                  change.amount,
+                );
+                const dateChange = formatDateChange(
+                  change.originalDueDate,
+                  change.dueDate,
+                );
 
                 return (
-                  <div key={bill.id} className="bg-white/60 backdrop-blur-sm p-3 rounded-xl border border-gray-200 shadow-sm">
+                  <div
+                    key={bill.id}
+                    className="bg-white/60 backdrop-blur-sm p-3 rounded-xl border border-gray-200 shadow-sm"
+                  >
                     <h5 className="font-bold text-gray-900">
                       {bill.provider || bill.description}
                     </h5>
                     <div className="text-sm text-purple-800 space-y-1 mt-1">
                       {amountChange.hasChange && (
                         <p className="font-medium">
-                          Amount: <span className="text-gray-600">${amountChange.original}</span> → <span className="text-purple-900 font-bold">${amountChange.updated}</span>
+                          Amount:{" "}
+                          <span className="text-gray-600">
+                            ${amountChange.original}
+                          </span>{" "}
+                          →{" "}
+                          <span className="text-purple-900 font-bold">
+                            ${amountChange.updated}
+                          </span>
                         </p>
                       )}
                       {dateChange.hasChange && (
                         <p className="font-medium">
-                          Due Date: <span className="text-gray-600">{dateChange.original}</span> → <span className="text-purple-900 font-bold">{dateChange.updated}</span>
+                          Due Date:{" "}
+                          <span className="text-gray-600">
+                            {dateChange.original}
+                          </span>{" "}
+                          →{" "}
+                          <span className="text-purple-900 font-bold">
+                            {dateChange.updated}
+                          </span>
                         </p>
                       )}
                     </div>

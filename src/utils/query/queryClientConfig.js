@@ -93,7 +93,9 @@ export const createQueryClient = () => {
 
           // Invalidate budget metadata if applicable
           if (["transactions", "envelopes", "bills"].includes(entityType)) {
-            mutationQueryClient.invalidateQueries({ queryKey: ["budgetMetadata"] });
+            mutationQueryClient.invalidateQueries({
+              queryKey: ["budgetMetadata"],
+            });
           }
         }
       },

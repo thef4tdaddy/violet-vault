@@ -11,7 +11,7 @@ class TransactionSplitterService {
     return envelopes.find(
       (env) =>
         env.name.toLowerCase() === categoryName.toLowerCase() ||
-        env.category?.toLowerCase() === categoryName.toLowerCase()
+        env.category?.toLowerCase() === categoryName.toLowerCase(),
     );
   }
 
@@ -28,8 +28,10 @@ class TransactionSplitterService {
         amount: Math.abs(item.totalPrice || item.price || 0),
         category: item.category?.name || transaction.category || "",
         envelopeId:
-          this.findEnvelopeForCategory(envelopes, item.category?.name || transaction.category || "")
-            ?.id || "",
+          this.findEnvelopeForCategory(
+            envelopes,
+            item.category?.name || transaction.category || "",
+          )?.id || "",
         isOriginalItem: true,
         originalItem: item,
       }));
@@ -80,7 +82,7 @@ class TransactionSplitterService {
   calculateSplitTotals(splitAllocations, originalAmount) {
     const allocated = splitAllocations.reduce(
       (sum, split) => sum + (parseFloat(split.amount) || 0),
-      0
+      0,
     );
     const remaining = originalAmount - allocated;
     const isValid = Math.abs(remaining) < 0.01; // Account for rounding errors
@@ -127,11 +129,11 @@ class TransactionSplitterService {
     if (!totals.isValid) {
       if (totals.isOverAllocated) {
         errors.push(
-          `Total splits ($${totals.allocated.toFixed(2)}) exceed original amount ($${totals.original.toFixed(2)})`
+          `Total splits ($${totals.allocated.toFixed(2)}) exceed original amount ($${totals.original.toFixed(2)})`,
         );
       } else {
         errors.push(
-          `Total splits ($${totals.allocated.toFixed(2)}) are less than original amount ($${totals.original.toFixed(2)})`
+          `Total splits ($${totals.allocated.toFixed(2)}) are less than original amount ($${totals.original.toFixed(2)})`,
         );
       }
     }
@@ -144,7 +146,8 @@ class TransactionSplitterService {
    */
   autoBalanceSplits(splitAllocations, originalAmount) {
     const totals = this.calculateSplitTotals(splitAllocations, originalAmount);
-    if (totals.isValid || splitAllocations.length === 0) return splitAllocations;
+    if (totals.isValid || splitAllocations.length === 0)
+      return splitAllocations;
 
     const difference = totals.remaining;
     const adjustmentPerSplit = difference / splitAllocations.length;
@@ -161,7 +164,8 @@ class TransactionSplitterService {
   splitEvenly(splitAllocations, originalAmount) {
     if (splitAllocations.length === 0) return splitAllocations;
 
-    const amountPerSplit = Math.round((originalAmount / splitAllocations.length) * 100) / 100;
+    const amountPerSplit =
+      Math.round((originalAmount / splitAllocations.length) * 100) / 100;
 
     return splitAllocations.map((split, index) => ({
       ...split,
@@ -180,11 +184,16 @@ class TransactionSplitterService {
       id: `${transaction.id}_split_${index}_${Date.now()}`,
       date: transaction.date,
       description: split.description.trim(),
-      amount: transaction.amount < 0 ? -Math.abs(split.amount) : Math.abs(split.amount), // Preserve original sign
+      amount:
+        transaction.amount < 0
+          ? -Math.abs(split.amount)
+          : Math.abs(split.amount), // Preserve original sign
       category: split.category.trim(),
       envelopeId: split.envelopeId || null,
       notes: `Split ${index + 1}/${splitAllocations.length} from: ${transaction.description}`,
-      source: transaction.source ? `${transaction.source}_split` : "manual_split",
+      source: transaction.source
+        ? `${transaction.source}_split`
+        : "manual_split",
       reconciled: transaction.reconciled || false,
       createdBy: transaction.createdBy || "User",
       createdAt: new Date().toISOString(),
@@ -207,7 +216,7 @@ class TransactionSplitterService {
     const totalAmount = Math.abs(transaction.amount);
     const allocated = existingSplits.reduce(
       (sum, split) => sum + (parseFloat(split.amount) || 0),
-      0
+      0,
     );
     const remaining = totalAmount - allocated;
 

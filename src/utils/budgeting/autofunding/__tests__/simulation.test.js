@@ -81,7 +81,9 @@ describe("simulation", () => {
       expect(result.simulation.rulesExecuted).toBeGreaterThan(0);
       expect(result.simulation.totalPlanned).toBeGreaterThan(0);
       expect(result.simulation.ruleResults).toHaveLength(3);
-      expect(result.simulation.remainingCash).toBeLessThan(mockContext.data.unassignedCash);
+      expect(result.simulation.remainingCash).toBeLessThan(
+        mockContext.data.unassignedCash,
+      );
     });
 
     it("should handle rules in priority order", () => {
@@ -90,7 +92,9 @@ describe("simulation", () => {
       expect(result.success).toBe(true);
 
       // Check that rules were processed in priority order (1, 2, 3)
-      const successfulRules = result.simulation.ruleResults.filter((r) => r.success);
+      const successfulRules = result.simulation.ruleResults.filter(
+        (r) => r.success,
+      );
       expect(successfulRules[0].ruleId).toBe("rule1"); // Priority 1
       expect(successfulRules[1].ruleId).toBe("rule2"); // Priority 2
     });
@@ -127,7 +131,9 @@ describe("simulation", () => {
 
       expect(result.success).toBe(true);
       expect(result.simulation.ruleResults).toHaveLength(3); // Still only 3 results
-      expect(result.simulation.ruleResults.find((r) => r.ruleId === "rule4")).toBeUndefined();
+      expect(
+        result.simulation.ruleResults.find((r) => r.ruleId === "rule4"),
+      ).toBeUndefined();
     });
 
     it("should handle empty rules array", () => {
@@ -136,7 +142,9 @@ describe("simulation", () => {
       expect(result.success).toBe(true);
       expect(result.simulation.rulesExecuted).toBe(0);
       expect(result.simulation.totalPlanned).toBe(0);
-      expect(result.simulation.remainingCash).toBe(mockContext.data.unassignedCash);
+      expect(result.simulation.remainingCash).toBe(
+        mockContext.data.unassignedCash,
+      );
     });
 
     it("should track available cash across rules", () => {
@@ -151,7 +159,9 @@ describe("simulation", () => {
         }
       });
 
-      expect(result.simulation.remainingCash).toBe(Math.max(0, expectedRemaining));
+      expect(result.simulation.remainingCash).toBe(
+        Math.max(0, expectedRemaining),
+      );
     });
   });
 
@@ -320,7 +330,9 @@ describe("simulation", () => {
 
       expect(result.success).toBe(true);
       expect(result.plan.warnings.length).toBeGreaterThan(0);
-      expect(result.plan.warnings.some((w) => w.type === "insufficient_funds")).toBe(true);
+      expect(
+        result.plan.warnings.some((w) => w.type === "insufficient_funds"),
+      ).toBe(true);
     });
   });
 
@@ -335,7 +347,9 @@ describe("simulation", () => {
       const warnings = generatePlanWarnings(simulation, mockContext);
 
       expect(warnings.some((w) => w.type === "insufficient_funds")).toBe(true);
-      expect(warnings.find((w) => w.type === "insufficient_funds").severity).toBe("high");
+      expect(
+        warnings.find((w) => w.type === "insufficient_funds").severity,
+      ).toBe("high");
     });
 
     it("should generate no execution warning", () => {
@@ -348,7 +362,9 @@ describe("simulation", () => {
       const warnings = generatePlanWarnings(simulation, mockContext);
 
       expect(warnings.some((w) => w.type === "no_execution")).toBe(true);
-      expect(warnings.find((w) => w.type === "no_execution").severity).toBe("medium");
+      expect(warnings.find((w) => w.type === "no_execution").severity).toBe(
+        "medium",
+      );
     });
 
     it("should generate low remaining cash warning", () => {
@@ -361,7 +377,9 @@ describe("simulation", () => {
       const warnings = generatePlanWarnings(simulation, mockContext);
 
       expect(warnings.some((w) => w.type === "low_remaining_cash")).toBe(true);
-      expect(warnings.find((w) => w.type === "low_remaining_cash").severity).toBe("low");
+      expect(
+        warnings.find((w) => w.type === "low_remaining_cash").severity,
+      ).toBe("low");
     });
   });
 
@@ -403,7 +421,9 @@ describe("simulation", () => {
       const result = validateTransfers(invalidTransfers, mockContext);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.some((e) => e.error.includes("not found"))).toBe(true);
+      expect(result.errors.some((e) => e.error.includes("not found"))).toBe(
+        true,
+      );
     });
 
     it("should detect negative transfer amounts", () => {
@@ -419,7 +439,9 @@ describe("simulation", () => {
       const result = validateTransfers(invalidTransfers, mockContext);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.some((e) => e.error.includes("must be positive"))).toBe(true);
+      expect(
+        result.errors.some((e) => e.error.includes("must be positive")),
+      ).toBe(true);
     });
 
     it("should detect total exceeding available cash", () => {
@@ -435,7 +457,9 @@ describe("simulation", () => {
       const result = validateTransfers(excessiveTransfers, mockContext);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.some((e) => e.error.includes("exceed available cash"))).toBe(true);
+      expect(
+        result.errors.some((e) => e.error.includes("exceed available cash")),
+      ).toBe(true);
     });
   });
 
@@ -572,7 +596,10 @@ describe("simulation", () => {
         ],
       };
 
-      const summary = generatePlanSummary(planWithMissingEnvelope, mockEnvelopes);
+      const summary = generatePlanSummary(
+        planWithMissingEnvelope,
+        mockEnvelopes,
+      );
 
       expect(summary.transfersSummary[0].to).toBe("nonexistent");
     });

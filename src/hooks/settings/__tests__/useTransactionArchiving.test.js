@@ -16,7 +16,7 @@ vi.mock("../../../utils/common/logger", () => ({
 vi.mock("../../../utils/transactionArchiving", () => ({
   createArchiver: vi.fn(() => ({
     calculateCutoffDate: vi.fn(
-      (months) => new Date(Date.now() - months * 30 * 24 * 60 * 60 * 1000)
+      (months) => new Date(Date.now() - months * 30 * 24 * 60 * 60 * 1000),
     ),
     getTransactionsForArchiving: vi.fn(() =>
       Promise.resolve([
@@ -36,7 +36,7 @@ vi.mock("../../../utils/transactionArchiving", () => ({
           envelopeId: "env2",
           date: "2023-02-01",
         },
-      ])
+      ]),
     ),
   })),
 }));
@@ -118,7 +118,9 @@ describe("useTransactionArchivingUI", () => {
     expect(result.current.previewData).toBeDefined();
     expect(result.current.previewData.totalCount).toBe(2);
     expect(result.current.previewData.categories).toHaveProperty("Food");
-    expect(result.current.previewData.categories).toHaveProperty("Entertainment");
+    expect(result.current.previewData.categories).toHaveProperty(
+      "Entertainment",
+    );
   });
 
   it("should close preview", () => {
@@ -175,10 +177,18 @@ describe("useArchivingUIHelpers", () => {
   it("should return correct urgency colors", () => {
     const { result } = renderHook(() => useArchivingUIHelpers());
 
-    expect(result.current.getUrgencyColor("high")).toBe("text-red-600 bg-red-50");
-    expect(result.current.getUrgencyColor("medium")).toBe("text-yellow-600 bg-yellow-50");
-    expect(result.current.getUrgencyColor("low")).toBe("text-green-600 bg-green-50");
-    expect(result.current.getUrgencyColor("unknown")).toBe("text-gray-600 bg-gray-50");
+    expect(result.current.getUrgencyColor("high")).toBe(
+      "text-red-600 bg-red-50",
+    );
+    expect(result.current.getUrgencyColor("medium")).toBe(
+      "text-yellow-600 bg-yellow-50",
+    );
+    expect(result.current.getUrgencyColor("low")).toBe(
+      "text-green-600 bg-green-50",
+    );
+    expect(result.current.getUrgencyColor("unknown")).toBe(
+      "text-gray-600 bg-gray-50",
+    );
   });
 
   it("should return correct urgency icons", () => {

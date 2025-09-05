@@ -8,7 +8,10 @@ export const useBudgetMetadataMutation = () => {
 
   const updateMetadataMutation = useMutation({
     mutationFn: async (updates) => {
-      logger.debug("TanStack Query: Updating budget metadata in Dexie", updates);
+      logger.debug(
+        "TanStack Query: Updating budget metadata in Dexie",
+        updates,
+      );
       await setBudgetMetadata(updates);
       return updates;
     },

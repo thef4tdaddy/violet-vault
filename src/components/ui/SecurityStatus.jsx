@@ -4,22 +4,22 @@ import { Lock, Unlock, Clock, Shield, Activity } from "lucide-react";
 /**
  * Shared security status component for displaying security state information
  * Provides consistent status indicators across security interfaces
- * 
+ *
  * @param {boolean} isLocked - Current lock state
  * @param {number} eventCount - Number of security events
  * @param {string} autoLockStatus - Auto-lock timing information
  * @param {Array} statusItems - Additional status items to display
  * @param {string} variant - 'detailed' | 'compact' for different display modes
  */
-const SecurityStatus = ({ 
-  isLocked, 
-  eventCount = 0, 
+const SecurityStatus = ({
+  isLocked,
+  eventCount = 0,
   autoLockStatus,
   statusItems = [],
   variant = "detailed",
-  className = ""
+  className = "",
 }) => {
-  const isDetailed = variant === 'detailed';
+  const isDetailed = variant === "detailed";
 
   // Standard status items that are always shown
   const defaultStatusItems = [
@@ -27,14 +27,14 @@ const SecurityStatus = ({
       label: "Session Status",
       value: isLocked ? "Locked" : "Active",
       icon: isLocked ? Lock : Unlock,
-      color: isLocked ? "text-red-600" : "text-green-600"
+      color: isLocked ? "text-red-600" : "text-green-600",
     },
     {
-      label: "Security Events", 
+      label: "Security Events",
       value: `${eventCount} recorded`,
       icon: Activity,
-      color: "text-gray-600"
-    }
+      color: "text-gray-600",
+    },
   ];
 
   // Add auto-lock status if provided
@@ -43,7 +43,7 @@ const SecurityStatus = ({
       label: "Auto-lock in",
       value: autoLockStatus,
       icon: Clock,
-      color: "text-orange-600"
+      color: "text-orange-600",
     });
   }
 
@@ -51,15 +51,15 @@ const SecurityStatus = ({
   const allStatusItems = [...defaultStatusItems, ...statusItems];
 
   const containerClasses = `
-    ${isDetailed ? 'bg-gray-50 p-4 rounded-lg border-2 border-black' : 'p-2'}
+    ${isDetailed ? "bg-gray-50 p-4 rounded-lg border-2 border-black" : "p-2"}
     ${className}
   `.trim();
 
-  const headerClasses = isDetailed 
+  const headerClasses = isDetailed
     ? "font-medium text-gray-900 mb-3 flex items-center gap-2"
     : "font-medium text-gray-700 mb-2 flex items-center gap-1";
 
-  const itemClasses = isDetailed 
+  const itemClasses = isDetailed
     ? "flex justify-between text-sm space-y-2"
     : "flex justify-between text-xs space-y-1";
 
@@ -71,7 +71,7 @@ const SecurityStatus = ({
           Current Security Status
         </h4>
       )}
-      
+
       <div className={itemClasses}>
         {allStatusItems.map((item, index) => {
           const Icon = item.icon;
@@ -81,9 +81,7 @@ const SecurityStatus = ({
                 {Icon && <Icon className="h-3 w-3 text-gray-500" />}
                 {item.label}:
               </span>
-              <span className={`font-medium ${item.color}`}>
-                {item.value}
-              </span>
+              <span className={`font-medium ${item.color}`}>{item.value}</span>
             </div>
           );
         })}

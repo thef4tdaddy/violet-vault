@@ -1,7 +1,10 @@
 import React, { useMemo } from "react";
 import { useSmartCategoryAnalysis } from "../../hooks/analytics/useSmartCategoryAnalysis";
 import { useSmartCategoryManager } from "../../hooks/analytics/useSmartCategoryManager";
-import { calculateCategoryStats, processSuggestions } from "../../utils/analytics/categoryHelpers";
+import {
+  calculateCategoryStats,
+  processSuggestions,
+} from "../../utils/analytics/categoryHelpers";
 import logger from "../../utils/common/logger";
 import CategoryManagerHeader from "./CategoryManagerHeader";
 import CategorySettingsPanel from "./CategorySettingsPanel";
@@ -37,28 +40,34 @@ const SmartCategoryManager = ({
     applySuggestion,
   } = useSmartCategoryManager(initialDateRange);
 
-  const { filteredTransactions, transactionAnalysis, billAnalysis } = useSmartCategoryAnalysis(
-    transactions,
-    bills,
-    dateRange,
-    analysisSettings
-  );
+  const { filteredTransactions, transactionAnalysis, billAnalysis } =
+    useSmartCategoryAnalysis(transactions, bills, dateRange, analysisSettings);
 
   // Process all suggestions
-  const allSuggestions = useMemo(() => 
-    processSuggestions(transactionAnalysis, billAnalysis, dismissedSuggestions, 12),
-    [transactionAnalysis, billAnalysis, dismissedSuggestions]
+  const allSuggestions = useMemo(
+    () =>
+      processSuggestions(
+        transactionAnalysis,
+        billAnalysis,
+        dismissedSuggestions,
+        12,
+      ),
+    [transactionAnalysis, billAnalysis, dismissedSuggestions],
   );
 
   // Calculate category statistics
-  const categoryStats = useMemo(() => 
-    calculateCategoryStats(filteredTransactions),
-    [filteredTransactions]
+  const categoryStats = useMemo(
+    () => calculateCategoryStats(filteredTransactions),
+    [filteredTransactions],
   );
 
   const handleApplySuggestion = async (suggestion) => {
     try {
-      const success = await applySuggestion(suggestion, onApplyToTransactions, onApplyToBills);
+      const success = await applySuggestion(
+        suggestion,
+        onApplyToTransactions,
+        onApplyToBills,
+      );
       if (success && suggestion.action.includes("add")) {
         onAddCategory?.(suggestion.data.categoryName, suggestion.category);
       } else if (success && suggestion.action.includes("remove")) {
@@ -80,11 +89,7 @@ const SmartCategoryManager = ({
           />
         );
       case "analysis":
-        return (
-          <CategoryAnalysisTab
-            categoryStats={categoryStats}
-          />
-        );
+        return <CategoryAnalysisTab categoryStats={categoryStats} />;
       case "settings":
         return (
           <CategoryAdvancedTab
@@ -100,7 +105,9 @@ const SmartCategoryManager = ({
   };
 
   return (
-    <div className={`rounded-xl p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm shadow-xl ${className}`}>
+    <div
+      className={`rounded-xl p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm shadow-xl ${className}`}
+    >
       <CategoryManagerHeader
         suggestionCount={allSuggestions.length}
         onToggleSettings={toggleSettings}

@@ -23,7 +23,12 @@ describe("conditions", () => {
     currentDate: "2024-01-15T12:00:00.000Z",
     data: {
       envelopes: [
-        { id: "env1", name: "Groceries", currentBalance: 150, monthlyAmount: 400 },
+        {
+          id: "env1",
+          name: "Groceries",
+          currentBalance: 150,
+          monthlyAmount: 400,
+        },
         { id: "env2", name: "Rent", currentBalance: 800, monthlyAmount: 1200 },
       ],
       unassignedCash: 500,
@@ -188,7 +193,9 @@ describe("conditions", () => {
         startDate: "2024-01-01T00:00:00.000Z",
         endDate: "2024-01-31T23:59:59.999Z",
       };
-      expect(evaluateDateRangeCondition(condition, "2024-01-15T12:00:00.000Z")).toBe(true);
+      expect(
+        evaluateDateRangeCondition(condition, "2024-01-15T12:00:00.000Z"),
+      ).toBe(true);
     });
 
     it("should return false if current date is before range", () => {
@@ -196,7 +203,9 @@ describe("conditions", () => {
         startDate: "2024-02-01T00:00:00.000Z",
         endDate: "2024-02-28T23:59:59.999Z",
       };
-      expect(evaluateDateRangeCondition(condition, "2024-01-15T12:00:00.000Z")).toBe(false);
+      expect(
+        evaluateDateRangeCondition(condition, "2024-01-15T12:00:00.000Z"),
+      ).toBe(false);
     });
 
     it("should return false if current date is after range", () => {
@@ -204,12 +213,16 @@ describe("conditions", () => {
         startDate: "2023-12-01T00:00:00.000Z",
         endDate: "2023-12-31T23:59:59.999Z",
       };
-      expect(evaluateDateRangeCondition(condition, "2024-01-15T12:00:00.000Z")).toBe(false);
+      expect(
+        evaluateDateRangeCondition(condition, "2024-01-15T12:00:00.000Z"),
+      ).toBe(false);
     });
 
     it("should return true if no date range specified", () => {
       const condition = {};
-      expect(evaluateDateRangeCondition(condition, "2024-01-15T12:00:00.000Z")).toBe(true);
+      expect(
+        evaluateDateRangeCondition(condition, "2024-01-15T12:00:00.000Z"),
+      ).toBe(true);
     });
 
     it("should handle edge case where current date equals start date", () => {
@@ -217,7 +230,9 @@ describe("conditions", () => {
         startDate: "2024-01-15T12:00:00.000Z",
         endDate: "2024-01-31T23:59:59.999Z",
       };
-      expect(evaluateDateRangeCondition(condition, "2024-01-15T12:00:00.000Z")).toBe(true);
+      expect(
+        evaluateDateRangeCondition(condition, "2024-01-15T12:00:00.000Z"),
+      ).toBe(true);
     });
 
     it("should handle edge case where current date equals end date", () => {
@@ -225,7 +240,9 @@ describe("conditions", () => {
         startDate: "2024-01-01T00:00:00.000Z",
         endDate: "2024-01-15T12:00:00.000Z",
       };
-      expect(evaluateDateRangeCondition(condition, "2024-01-15T12:00:00.000Z")).toBe(true);
+      expect(
+        evaluateDateRangeCondition(condition, "2024-01-15T12:00:00.000Z"),
+      ).toBe(true);
     });
   });
 
@@ -237,45 +254,67 @@ describe("conditions", () => {
 
     it("should evaluate greater_than operator", () => {
       const condition = { operator: "greater_than", value: 500 };
-      expect(evaluateTransactionAmountCondition(condition, contextWithIncome)).toBe(true);
+      expect(
+        evaluateTransactionAmountCondition(condition, contextWithIncome),
+      ).toBe(true);
 
       const condition2 = { operator: "greater_than", value: 1500 };
-      expect(evaluateTransactionAmountCondition(condition2, contextWithIncome)).toBe(false);
+      expect(
+        evaluateTransactionAmountCondition(condition2, contextWithIncome),
+      ).toBe(false);
     });
 
     it("should evaluate less_than operator", () => {
       const condition = { operator: "less_than", value: 1500 };
-      expect(evaluateTransactionAmountCondition(condition, contextWithIncome)).toBe(true);
+      expect(
+        evaluateTransactionAmountCondition(condition, contextWithIncome),
+      ).toBe(true);
 
       const condition2 = { operator: "less_than", value: 500 };
-      expect(evaluateTransactionAmountCondition(condition2, contextWithIncome)).toBe(false);
+      expect(
+        evaluateTransactionAmountCondition(condition2, contextWithIncome),
+      ).toBe(false);
     });
 
     it("should evaluate equals operator", () => {
       const condition = { operator: "equals", value: 1000 };
-      expect(evaluateTransactionAmountCondition(condition, contextWithIncome)).toBe(true);
+      expect(
+        evaluateTransactionAmountCondition(condition, contextWithIncome),
+      ).toBe(true);
 
       const condition2 = { operator: "equals", value: 999.99 };
-      expect(evaluateTransactionAmountCondition(condition2, contextWithIncome)).toBe(true);
+      expect(
+        evaluateTransactionAmountCondition(condition2, contextWithIncome),
+      ).toBe(true);
 
       const condition3 = { operator: "equals", value: 1001 };
-      expect(evaluateTransactionAmountCondition(condition3, contextWithIncome)).toBe(false);
+      expect(
+        evaluateTransactionAmountCondition(condition3, contextWithIncome),
+      ).toBe(false);
     });
 
     it("should evaluate greater_than_or_equal operator", () => {
       const condition = { operator: "greater_than_or_equal", value: 1000 };
-      expect(evaluateTransactionAmountCondition(condition, contextWithIncome)).toBe(true);
+      expect(
+        evaluateTransactionAmountCondition(condition, contextWithIncome),
+      ).toBe(true);
 
       const condition2 = { operator: "greater_than_or_equal", value: 1001 };
-      expect(evaluateTransactionAmountCondition(condition2, contextWithIncome)).toBe(false);
+      expect(
+        evaluateTransactionAmountCondition(condition2, contextWithIncome),
+      ).toBe(false);
     });
 
     it("should evaluate less_than_or_equal operator", () => {
       const condition = { operator: "less_than_or_equal", value: 1000 };
-      expect(evaluateTransactionAmountCondition(condition, contextWithIncome)).toBe(true);
+      expect(
+        evaluateTransactionAmountCondition(condition, contextWithIncome),
+      ).toBe(true);
 
       const condition2 = { operator: "less_than_or_equal", value: 999 };
-      expect(evaluateTransactionAmountCondition(condition2, contextWithIncome)).toBe(false);
+      expect(
+        evaluateTransactionAmountCondition(condition2, contextWithIncome),
+      ).toBe(false);
     });
 
     it("should return false if no income amount provided", () => {
@@ -284,12 +323,16 @@ describe("conditions", () => {
         ...mockContext,
         data: { ...mockContext.data, newIncomeAmount: undefined },
       };
-      expect(evaluateTransactionAmountCondition(condition, contextWithoutIncome)).toBe(false);
+      expect(
+        evaluateTransactionAmountCondition(condition, contextWithoutIncome),
+      ).toBe(false);
     });
 
     it("should return true for unknown operators", () => {
       const condition = { operator: "unknown", value: 500 };
-      expect(evaluateTransactionAmountCondition(condition, contextWithIncome)).toBe(true);
+      expect(
+        evaluateTransactionAmountCondition(condition, contextWithIncome),
+      ).toBe(true);
     });
   });
 
@@ -298,37 +341,55 @@ describe("conditions", () => {
 
     it("should return true if never executed", () => {
       expect(checkSchedule(TRIGGER_TYPES.WEEKLY, null, currentDate)).toBe(true);
-      expect(checkSchedule(TRIGGER_TYPES.MONTHLY, undefined, currentDate)).toBe(true);
+      expect(checkSchedule(TRIGGER_TYPES.MONTHLY, undefined, currentDate)).toBe(
+        true,
+      );
     });
 
     it("should check weekly schedule", () => {
       const lastExecuted = "2024-01-01T12:00:00.000Z"; // 14 days ago
-      expect(checkSchedule(TRIGGER_TYPES.WEEKLY, lastExecuted, currentDate)).toBe(true);
+      expect(
+        checkSchedule(TRIGGER_TYPES.WEEKLY, lastExecuted, currentDate),
+      ).toBe(true);
 
       const recentExecution = "2024-01-10T12:00:00.000Z"; // 5 days ago
-      expect(checkSchedule(TRIGGER_TYPES.WEEKLY, recentExecution, currentDate)).toBe(false);
+      expect(
+        checkSchedule(TRIGGER_TYPES.WEEKLY, recentExecution, currentDate),
+      ).toBe(false);
     });
 
     it("should check biweekly schedule", () => {
       const lastExecuted = "2024-01-01T12:00:00.000Z"; // 14 days ago
-      expect(checkSchedule(TRIGGER_TYPES.BIWEEKLY, lastExecuted, currentDate)).toBe(true);
+      expect(
+        checkSchedule(TRIGGER_TYPES.BIWEEKLY, lastExecuted, currentDate),
+      ).toBe(true);
 
       const recentExecution = "2024-01-05T12:00:00.000Z"; // 10 days ago
-      expect(checkSchedule(TRIGGER_TYPES.BIWEEKLY, recentExecution, currentDate)).toBe(false);
+      expect(
+        checkSchedule(TRIGGER_TYPES.BIWEEKLY, recentExecution, currentDate),
+      ).toBe(false);
     });
 
     it("should check monthly schedule", () => {
       const lastExecuted = "2023-12-15T12:00:00.000Z"; // 31 days ago
-      expect(checkSchedule(TRIGGER_TYPES.MONTHLY, lastExecuted, currentDate)).toBe(true);
+      expect(
+        checkSchedule(TRIGGER_TYPES.MONTHLY, lastExecuted, currentDate),
+      ).toBe(true);
 
       const recentExecution = "2024-01-01T12:00:00.000Z"; // 14 days ago
-      expect(checkSchedule(TRIGGER_TYPES.MONTHLY, recentExecution, currentDate)).toBe(false);
+      expect(
+        checkSchedule(TRIGGER_TYPES.MONTHLY, recentExecution, currentDate),
+      ).toBe(false);
     });
 
     it("should return true for manual and other trigger types", () => {
       const lastExecuted = "2024-01-14T12:00:00.000Z"; // 1 day ago
-      expect(checkSchedule(TRIGGER_TYPES.MANUAL, lastExecuted, currentDate)).toBe(true);
-      expect(checkSchedule(TRIGGER_TYPES.INCOME_DETECTED, lastExecuted, currentDate)).toBe(true);
+      expect(
+        checkSchedule(TRIGGER_TYPES.MANUAL, lastExecuted, currentDate),
+      ).toBe(true);
+      expect(
+        checkSchedule(TRIGGER_TYPES.INCOME_DETECTED, lastExecuted, currentDate),
+      ).toBe(true);
     });
   });
 
@@ -368,7 +429,10 @@ describe("conditions", () => {
 
     it("should return true for manual trigger rules regardless of context trigger", () => {
       const rule = { ...mockRule, trigger: TRIGGER_TYPES.MANUAL };
-      const context = { ...mockContext, trigger: TRIGGER_TYPES.INCOME_DETECTED };
+      const context = {
+        ...mockContext,
+        trigger: TRIGGER_TYPES.INCOME_DETECTED,
+      };
       expect(shouldRuleExecute(rule, context)).toBe(true);
     });
 
@@ -433,7 +497,9 @@ describe("conditions", () => {
     });
 
     it("should create condition with specified type", () => {
-      const condition = createDefaultCondition(CONDITION_TYPES.UNASSIGNED_ABOVE);
+      const condition = createDefaultCondition(
+        CONDITION_TYPES.UNASSIGNED_ABOVE,
+      );
       expect(condition.type).toBe(CONDITION_TYPES.UNASSIGNED_ABOVE);
     });
   });
@@ -453,7 +519,9 @@ describe("conditions", () => {
       };
       const result = validateCondition(condition);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("Balance conditions require a non-negative value");
+      expect(result.errors).toContain(
+        "Balance conditions require a non-negative value",
+      );
     });
 
     it("should validate date range conditions", () => {
@@ -474,8 +542,12 @@ describe("conditions", () => {
       };
       const result = validateCondition(condition);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("Transaction amount conditions require a value");
-      expect(result.errors).toContain("Transaction amount conditions require a valid operator");
+      expect(result.errors).toContain(
+        "Transaction amount conditions require a value",
+      );
+      expect(result.errors).toContain(
+        "Transaction amount conditions require a valid operator",
+      );
     });
 
     it("should validate complete valid condition", () => {
@@ -500,7 +572,9 @@ describe("conditions", () => {
         type: CONDITION_TYPES.BALANCE_LESS_THAN,
         value: 100,
       };
-      expect(getConditionDescription(condition, envelopes)).toBe("Unassigned cash < $100");
+      expect(getConditionDescription(condition, envelopes)).toBe(
+        "Unassigned cash < $100",
+      );
     });
 
     it("should describe BALANCE_LESS_THAN for specific envelope", () => {
@@ -509,7 +583,9 @@ describe("conditions", () => {
         envelopeId: "env1",
         value: 50,
       };
-      expect(getConditionDescription(condition, envelopes)).toBe("Groceries balance < $50");
+      expect(getConditionDescription(condition, envelopes)).toBe(
+        "Groceries balance < $50",
+      );
     });
 
     it("should describe BALANCE_GREATER_THAN conditions", () => {
@@ -517,7 +593,9 @@ describe("conditions", () => {
         type: CONDITION_TYPES.BALANCE_GREATER_THAN,
         value: 200,
       };
-      expect(getConditionDescription(condition, envelopes)).toBe("Unassigned cash > $200");
+      expect(getConditionDescription(condition, envelopes)).toBe(
+        "Unassigned cash > $200",
+      );
     });
 
     it("should describe UNASSIGNED_ABOVE conditions", () => {
@@ -525,7 +603,9 @@ describe("conditions", () => {
         type: CONDITION_TYPES.UNASSIGNED_ABOVE,
         value: 300,
       };
-      expect(getConditionDescription(condition, envelopes)).toBe("Unassigned cash > $300");
+      expect(getConditionDescription(condition, envelopes)).toBe(
+        "Unassigned cash > $300",
+      );
     });
 
     it("should describe DATE_RANGE conditions", () => {
@@ -534,7 +614,9 @@ describe("conditions", () => {
         startDate: "2024-01-01T00:00:00.000Z",
         endDate: "2024-01-31T23:59:59.999Z",
       };
-      expect(getConditionDescription(condition, envelopes)).toContain("Between");
+      expect(getConditionDescription(condition, envelopes)).toContain(
+        "Between",
+      );
     });
 
     it("should describe TRANSACTION_AMOUNT conditions", () => {
@@ -543,14 +625,18 @@ describe("conditions", () => {
         operator: "greater_than",
         value: 1000,
       };
-      expect(getConditionDescription(condition, envelopes)).toBe("Transaction amount > $1000");
+      expect(getConditionDescription(condition, envelopes)).toBe(
+        "Transaction amount > $1000",
+      );
     });
 
     it("should handle unknown condition types", () => {
       const condition = {
         type: "unknown_type",
       };
-      expect(getConditionDescription(condition, envelopes)).toBe("Unknown condition");
+      expect(getConditionDescription(condition, envelopes)).toBe(
+        "Unknown condition",
+      );
     });
 
     it("should handle missing envelope", () => {
@@ -559,7 +645,9 @@ describe("conditions", () => {
         envelopeId: "nonexistent",
         value: 100,
       };
-      expect(getConditionDescription(condition, envelopes)).toBe("Unknown Envelope balance < $100");
+      expect(getConditionDescription(condition, envelopes)).toBe(
+        "Unknown Envelope balance < $100",
+      );
     });
   });
 
@@ -589,7 +677,9 @@ describe("conditions", () => {
     });
 
     it("should filter by condition type", () => {
-      const filtered = filterConditions(conditions, { type: CONDITION_TYPES.BALANCE_LESS_THAN });
+      const filtered = filterConditions(conditions, {
+        type: CONDITION_TYPES.BALANCE_LESS_THAN,
+      });
       expect(filtered).toHaveLength(1);
       expect(filtered[0].id).toBe("1");
     });
@@ -610,7 +700,9 @@ describe("conditions", () => {
     });
 
     it("should return empty array when no matches", () => {
-      const filtered = filterConditions(conditions, { envelopeId: "nonexistent" });
+      const filtered = filterConditions(conditions, {
+        envelopeId: "nonexistent",
+      });
       expect(filtered).toHaveLength(0);
     });
   });

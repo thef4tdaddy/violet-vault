@@ -26,16 +26,30 @@ export const useSecurityManager = () => {
     unlockSession,
   } = useSecurityManagerUI();
 
-  const { logSecurityEvent, logLoginAttempt, logSessionActivity, logSecurityAction } =
-    useSecurityEventManager(securitySettings, addSecurityEvent);
+  const {
+    logSecurityEvent,
+    logLoginAttempt,
+    logSessionActivity,
+    logSecurityAction,
+  } = useSecurityEventManager(securitySettings, addSecurityEvent);
 
-  const { updateActivity, startAutoLockTimer, stopAutoLockTimer, resetAutoLockTimer } =
-    useAutoLockManager(securitySettings, isLocked, lockSession, lastActivityRef, autoLockTimerRef);
+  const {
+    updateActivity,
+    startAutoLockTimer,
+    stopAutoLockTimer,
+    resetAutoLockTimer,
+  } = useAutoLockManager(
+    securitySettings,
+    isLocked,
+    lockSession,
+    lastActivityRef,
+    autoLockTimerRef,
+  );
 
   const { secureClipboardCopy, clearClipboardTimer } = useClipboardSecurity(
     securitySettings,
     clipboardTimerRef,
-    logSecurityEvent
+    logSecurityEvent,
   );
 
   // Initialize auto-lock on mount
@@ -76,7 +90,8 @@ export const useSecurityManager = () => {
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, [securitySettings.lockOnPageHide, logSecurityEvent, lockSession]);
 
   // Enhanced security functions with logging
@@ -100,7 +115,7 @@ export const useSecurityManager = () => {
       unlockSession();
       resetAutoLockTimer();
     },
-    [unlockSession, logSecurityEvent, resetAutoLockTimer]
+    [unlockSession, logSecurityEvent, resetAutoLockTimer],
   );
 
   const updateSettings = useCallback(
@@ -114,12 +129,16 @@ export const useSecurityManager = () => {
         metadata: {
           changed: Object.keys(newSettings),
           autoLockWasEnabled: oldSettings.autoLockEnabled,
-          autoLockNowEnabled: newSettings.autoLockEnabled ?? oldSettings.autoLockEnabled,
+          autoLockNowEnabled:
+            newSettings.autoLockEnabled ?? oldSettings.autoLockEnabled,
         },
       });
 
       // Restart auto-lock timer if settings changed
-      if (newSettings.autoLockEnabled !== undefined || newSettings.autoLockTimeout !== undefined) {
+      if (
+        newSettings.autoLockEnabled !== undefined ||
+        newSettings.autoLockTimeout !== undefined
+      ) {
         if (newSettings.autoLockEnabled !== false) {
           resetAutoLockTimer();
         } else {
@@ -133,7 +152,7 @@ export const useSecurityManager = () => {
       logSecurityEvent,
       resetAutoLockTimer,
       stopAutoLockTimer,
-    ]
+    ],
   );
 
   // Activity tracking with throttling

@@ -103,7 +103,6 @@ const Dashboard = ({ setActiveView }) => {
     });
   };
 
-
   // Show loading state while TanStack queries are fetching
   if (
     envelopesLoading ||

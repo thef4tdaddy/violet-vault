@@ -30,10 +30,12 @@ const SyncHealthIndicator = () => {
   };
 
   const handleResetData = () => {
-    if (window.confirm(
-      "This will reset all cloud data and re-upload from local storage. " +
-      "This action cannot be undone. Continue?"
-    )) {
+    if (
+      window.confirm(
+        "This will reset all cloud data and re-upload from local storage. " +
+          "This action cannot be undone. Continue?",
+      )
+    ) {
       resetCloudData();
     }
   };

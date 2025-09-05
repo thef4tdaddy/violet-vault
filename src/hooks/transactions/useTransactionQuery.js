@@ -18,8 +18,10 @@ export const useTransactionQuery = (options = {}) => {
   } = options;
 
   // Get Zustand store for UI state only (transactions are managed by TanStack Query → Dexie)
-  const { transactions: zustandTransactions, allTransactions: zustandAllTransactions } =
-    useBudgetStore();
+  const {
+    transactions: zustandTransactions,
+    allTransactions: zustandAllTransactions,
+  } = useBudgetStore();
 
   // TanStack Query function - hydrates from Dexie, Dexie syncs with Firebase
   const queryFunction = async () => {
@@ -31,7 +33,10 @@ export const useTransactionQuery = (options = {}) => {
       let transactions = [];
 
       // Always fetch from Dexie (single source of truth for local data)
-      transactions = await budgetDb.transactions.orderBy("date").reverse().toArray();
+      transactions = await budgetDb.transactions
+        .orderBy("date")
+        .reverse()
+        .toArray();
 
       logger.debug("TanStack Query: Loaded from Dexie", {
         count: transactions.length,
@@ -40,7 +45,9 @@ export const useTransactionQuery = (options = {}) => {
 
       // If Dexie is empty and we have Zustand data, seed Dexie
       const zustandData =
-        zustandAllTransactions?.length > 0 ? zustandAllTransactions : zustandTransactions;
+        zustandAllTransactions?.length > 0
+          ? zustandAllTransactions
+          : zustandTransactions;
       if (transactions.length === 0 && zustandData && zustandData.length > 0) {
         logger.debug("TanStack Query: Seeding Dexie from Zustand", {
           zustandDataLength: zustandData.length,
@@ -63,20 +70,30 @@ export const useTransactionQuery = (options = {}) => {
       let filteredTransactions = transactions;
 
       if (envelopeId) {
-        filteredTransactions = filteredTransactions.filter((t) => t.envelopeId === envelopeId);
+        filteredTransactions = filteredTransactions.filter(
+          (t) => t.envelopeId === envelopeId,
+        );
       }
 
       if (category) {
-        filteredTransactions = filteredTransactions.filter((t) => t.category === category);
+        filteredTransactions = filteredTransactions.filter(
+          (t) => t.category === category,
+        );
       }
 
       if (type) {
         if (type === "income") {
-          filteredTransactions = filteredTransactions.filter((t) => t.amount > 0);
+          filteredTransactions = filteredTransactions.filter(
+            (t) => t.amount > 0,
+          );
         } else if (type === "expense") {
-          filteredTransactions = filteredTransactions.filter((t) => t.amount < 0);
+          filteredTransactions = filteredTransactions.filter(
+            (t) => t.amount < 0,
+          );
         } else if (type === "transfer") {
-          filteredTransactions = filteredTransactions.filter((t) => t.type === "transfer");
+          filteredTransactions = filteredTransactions.filter(
+            (t) => t.type === "transfer",
+          );
         }
       }
 
@@ -116,7 +133,9 @@ export const useTransactionQuery = (options = {}) => {
       });
       // Emergency fallback only when Dexie completely fails
       const zustandData =
-        zustandAllTransactions?.length > 0 ? zustandAllTransactions : zustandTransactions;
+        zustandAllTransactions?.length > 0
+          ? zustandAllTransactions
+          : zustandTransactions;
       return zustandData || [];
     }
   };

@@ -23,7 +23,10 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
     if (result.success) {
       onComplete?.(result.transaction, result.receipt);
     } else {
-      logger.error("Failed to submit receipt-to-transaction conversion:", result.error);
+      logger.error(
+        "Failed to submit receipt-to-transaction conversion:",
+        result.error,
+      );
     }
   };
 
@@ -85,7 +88,12 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
                   CONVERT RECEIPT TO TRANSACTION
                 </h2>
                 <p className="text-sm text-purple-800 font-medium mt-1">
-                  Step {step} of 3: {step === 1 ? "Review Data" : step === 2 ? "Select Envelope" : "Confirm"}
+                  Step {step} of 3:{" "}
+                  {step === 1
+                    ? "Review Data"
+                    : step === 2
+                      ? "Select Envelope"
+                      : "Confirm"}
                 </p>
               </div>
             </div>
@@ -114,7 +122,9 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
                   {stepNum < 3 && (
                     <div
                       className={`flex-1 h-3 mx-4 rounded-full border-2 border-black shadow-sm ${
-                        stepNum < step ? "bg-gradient-to-r from-purple-500 to-blue-600" : "bg-gray-200/60 backdrop-blur-sm"
+                        stepNum < step
+                          ? "bg-gradient-to-r from-purple-500 to-blue-600"
+                          : "bg-gray-200/60 backdrop-blur-sm"
                       }`}
                     />
                   )}
@@ -124,7 +134,9 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
           </div>
 
           {/* Content */}
-          <div className="mb-8 overflow-y-auto max-h-[50vh] pr-2">{renderStepContent()}</div>
+          <div className="mb-8 overflow-y-auto max-h-[50vh] pr-2">
+            {renderStepContent()}
+          </div>
 
           {/* Footer */}
           <div className="flex items-center justify-between pt-6 border-t-2 border-black">

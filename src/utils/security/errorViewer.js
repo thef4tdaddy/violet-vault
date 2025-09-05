@@ -24,7 +24,7 @@ class ErrorViewer {
     if (process.env.NODE_ENV === "development") {
       logger.info(
         "%c🔍 VioletVault Error Viewer Available",
-        "color: #8b5cf6; font-weight: bold; font-size: 14px"
+        "color: #8b5cf6; font-weight: bold; font-size: 14px",
       );
       logger.info("Use window.VioletVaultErrors.view() to see stored errors");
       logger.info("Other commands: .clear(), .export(), .count(), .latest(n)");
@@ -96,7 +96,9 @@ class ErrorViewer {
     logger.info(`📋 Latest ${n} errors:`);
     errors.forEach((error, index) => {
       const timeAgo = this.getTimeAgo(error.timestamp);
-      logger.info(`${index + 1}. ${error.failingComponent}: ${error.message} (${timeAgo})`);
+      logger.info(
+        `${index + 1}. ${error.failingComponent}: ${error.message} (${timeAgo})`,
+      );
     });
     return errors;
   }

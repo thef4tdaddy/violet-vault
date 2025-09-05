@@ -1,11 +1,9 @@
 import React from "react";
+import { DollarSign, Calendar, CheckCircle, Undo2 } from "lucide-react";
 import {
-  DollarSign,
-  Calendar,
-  CheckCircle,
-  Undo2,
-} from "lucide-react";
-import { hasChanges, formatAmountChange } from "../../utils/bills/billUpdateHelpers";
+  hasChanges,
+  formatAmountChange,
+} from "../../utils/bills/billUpdateHelpers";
 
 const BulkUpdateEditor = ({
   selectedBills,
@@ -19,7 +17,9 @@ const BulkUpdateEditor = ({
     <>
       {/* Bulk Actions */}
       <div className="bg-gradient-to-r from-gray-50/80 to-purple-50/80 backdrop-blur-sm p-4 rounded-xl mb-6 border-2 border-black shadow-lg">
-        <h4 className="font-black text-gray-900 mb-3">APPLY TO ALL SELECTED BILLS</h4>
+        <h4 className="font-black text-gray-900 mb-3">
+          APPLY TO ALL SELECTED BILLS
+        </h4>
         <div className="flex gap-3 flex-wrap">
           {(updateMode === "amounts" || updateMode === "both") && (
             <div className="flex items-center gap-2">
@@ -73,7 +73,10 @@ const BulkUpdateEditor = ({
           {selectedBills.map((bill) => {
             const change = changes[bill.id];
             const billHasChanges = hasChanges(change);
-            const amountChange = formatAmountChange(change?.originalAmount, change?.amount);
+            const amountChange = formatAmountChange(
+              change?.originalAmount,
+              change?.amount,
+            );
 
             return (
               <div
@@ -89,7 +92,9 @@ const BulkUpdateEditor = ({
                     <h5 className="font-bold text-gray-900">
                       {bill.provider || bill.description}
                     </h5>
-                    <p className="text-sm text-purple-800 font-medium">{bill.category}</p>
+                    <p className="text-sm text-purple-800 font-medium">
+                      {bill.category}
+                    </p>
                   </div>
 
                   <div className="flex items-center gap-4">
@@ -101,10 +106,16 @@ const BulkUpdateEditor = ({
                           step="0.01"
                           value={Math.abs(change?.amount || 0)}
                           onChange={(e) =>
-                            updateChange(bill.id, "amount", parseFloat(e.target.value) || 0)
+                            updateChange(
+                              bill.id,
+                              "amount",
+                              parseFloat(e.target.value) || 0,
+                            )
                           }
                           className={`w-24 px-2 py-1 border-2 border-black rounded text-sm glassmorphism backdrop-blur-sm shadow-md focus:shadow-lg transition-all ${
-                            amountChange?.hasChange ? "bg-blue-50/80" : "bg-white/60"
+                            amountChange?.hasChange
+                              ? "bg-blue-50/80"
+                              : "bg-white/60"
                           }`}
                         />
                         {amountChange?.hasChange && (
@@ -121,9 +132,13 @@ const BulkUpdateEditor = ({
                         <input
                           type="date"
                           value={change?.dueDate || ""}
-                          onChange={(e) => updateChange(bill.id, "dueDate", e.target.value)}
+                          onChange={(e) =>
+                            updateChange(bill.id, "dueDate", e.target.value)
+                          }
                           className={`px-2 py-1 border-2 border-black rounded text-sm glassmorphism backdrop-blur-sm shadow-md focus:shadow-lg transition-all ${
-                            change?.dueDate !== change?.originalDueDate ? "bg-blue-50/80" : "bg-white/60"
+                            change?.dueDate !== change?.originalDueDate
+                              ? "bg-blue-50/80"
+                              : "bg-white/60"
                           }`}
                         />
                       </div>

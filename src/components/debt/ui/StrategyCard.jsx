@@ -45,7 +45,9 @@ const StrategyCard = ({ strategy, isRecommended = false }) => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-red-600 font-medium">Total Interest</p>
-              <p className="text-lg font-bold text-red-700">${totalInterest.toFixed(2)}</p>
+              <p className="text-lg font-bold text-red-700">
+                ${totalInterest.toFixed(2)}
+              </p>
             </div>
             <DollarSign className="h-5 w-5 text-red-500" />
           </div>
@@ -55,7 +57,9 @@ const StrategyCard = ({ strategy, isRecommended = false }) => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-blue-600 font-medium">Payoff Time</p>
-              <p className="text-lg font-bold text-blue-700">{payoffTime} months</p>
+              <p className="text-lg font-bold text-blue-700">
+                {payoffTime} months
+              </p>
             </div>
             <Clock className="h-5 w-5 text-blue-500" />
           </div>
@@ -89,7 +93,9 @@ const StrategyCard = ({ strategy, isRecommended = false }) => {
                   {debt.priority}
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900 text-sm">{debt.name}</p>
+                  <p className="font-medium text-gray-900 text-sm">
+                    {debt.name}
+                  </p>
                   <p className="text-xs text-gray-600">
                     {debt.interestRate}% • ${debt.currentBalance?.toFixed(2)}
                   </p>
@@ -104,7 +110,9 @@ const StrategyCard = ({ strategy, isRecommended = false }) => {
             </div>
           ))}
           {debts.length > 5 && (
-            <p className="text-xs text-gray-500 text-center mt-2">+{debts.length - 5} more debts</p>
+            <p className="text-xs text-gray-500 text-center mt-2">
+              +{debts.length - 5} more debts
+            </p>
           )}
         </div>
       </div>

@@ -48,7 +48,9 @@ const EditLockIndicator = ({
       >
         <Lock className="h-4 w-4 text-green-600" />
         <div className="flex-1">
-          <p className="text-sm font-medium text-green-900">You are editing this record</p>
+          <p className="text-sm font-medium text-green-900">
+            You are editing this record
+          </p>
           {showDetails && timeRemaining > 0 && (
             <p className="text-xs text-green-700">
               {secondsRemaining > 60
@@ -146,7 +148,11 @@ export const CompactEditLockIndicator = ({
     <div
       className={`inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs ${className}`}
     >
-      {isExpired ? <AlertTriangle className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
+      {isExpired ? (
+        <AlertTriangle className="h-3 w-3" />
+      ) : (
+        <Lock className="h-3 w-3" />
+      )}
       <span>
         {isExpired ? "Expired" : "Locked"} by {lock?.userName || "User"}
       </span>

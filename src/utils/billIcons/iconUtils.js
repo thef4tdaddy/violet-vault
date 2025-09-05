@@ -2,7 +2,10 @@
 import { FileText } from "lucide-react";
 import { ALL_ICONS } from "./iconDefinitions.js";
 import { BILL_PROVIDER_ICONS } from "./providerMappings.js";
-import { CATEGORY_FALLBACK_ICONS, CATEGORY_PATTERNS } from "./categoryMappings.js";
+import {
+  CATEGORY_FALLBACK_ICONS,
+  CATEGORY_PATTERNS,
+} from "./categoryMappings.js";
 
 /**
  * Get appropriate icon based on provider name, description, and category

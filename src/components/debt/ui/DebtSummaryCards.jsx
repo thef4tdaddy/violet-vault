@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  DollarSign,
-  TrendingDown,
-  Percent,
-  Calendar,
-} from "lucide-react";
+import { DollarSign, TrendingDown, Percent, Calendar } from "lucide-react";
 import PageSummaryCard from "../../ui/PageSummaryCard";
 
 /**
@@ -66,6 +61,5 @@ const DebtSummaryCards = ({ stats, onDueSoonClick }) => {
     </div>
   );
 };
-
 
 export default DebtSummaryCards;

@@ -1,11 +1,15 @@
 import React from "react";
-import { getStatusColor, getStatusBackgroundColor, getStatusText } from "../../../utils/sync/syncHealthHelpers";
+import {
+  getStatusColor,
+  getStatusBackgroundColor,
+  getStatusText,
+} from "../../../utils/sync/syncHealthHelpers";
 
-const SyncStatusIndicator = ({ 
-  syncStatus, 
-  isBackgroundSyncing, 
-  onClick, 
-  showDetails 
+const SyncStatusIndicator = ({
+  syncStatus,
+  isBackgroundSyncing,
+  onClick,
+  showDetails,
 }) => {
   const getStatusIcon = () => {
     // Show spinning indicator for loading or background sync activity
@@ -67,7 +71,10 @@ const SyncStatusIndicator = ({
   };
 
   const statusColor = getStatusColor(syncStatus, isBackgroundSyncing);
-  const backgroundColor = getStatusBackgroundColor(syncStatus, isBackgroundSyncing);
+  const backgroundColor = getStatusBackgroundColor(
+    syncStatus,
+    isBackgroundSyncing,
+  );
   const statusText = getStatusText(syncStatus, isBackgroundSyncing);
 
   return (
@@ -78,12 +85,8 @@ const SyncStatusIndicator = ({
       }`}
       title={`Sync Status: ${statusText}`}
     >
-      <div className="flex items-center justify-center">
-        {getStatusIcon()}
-      </div>
-      <span className="text-sm font-bold whitespace-nowrap">
-        {statusText}
-      </span>
+      <div className="flex items-center justify-center">{getStatusIcon()}</div>
+      <span className="text-sm font-bold whitespace-nowrap">{statusText}</span>
     </button>
   );
 };

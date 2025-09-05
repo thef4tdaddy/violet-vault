@@ -126,8 +126,14 @@ describe("Transaction Operations Utilities", () => {
     });
 
     it("should determine transaction type", () => {
-      const income = prepareTransactionForStorage({ ...rawTransaction, amount: 100 });
-      const expense = prepareTransactionForStorage({ ...rawTransaction, amount: -100 });
+      const income = prepareTransactionForStorage({
+        ...rawTransaction,
+        amount: 100,
+      });
+      const expense = prepareTransactionForStorage({
+        ...rawTransaction,
+        amount: -100,
+      });
 
       expect(income.type).toBe("income");
       expect(expense.type).toBe("expense");
@@ -208,7 +214,9 @@ describe("Transaction Operations Utilities", () => {
     it("should throw on invalid data", () => {
       const invalid = { ...transferData, amount: 0 };
 
-      expect(() => createTransferPair(invalid)).toThrow("Invalid transfer data");
+      expect(() => createTransferPair(invalid)).toThrow(
+        "Invalid transfer data",
+      );
     });
   });
 

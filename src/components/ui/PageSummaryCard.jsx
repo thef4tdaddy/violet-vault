@@ -6,7 +6,7 @@ import React from "react";
  *
  * This component standardizes the look across all page-specific summary cards:
  * - Bills page
- * - Debt page  
+ * - Debt page
  * - Transactions page
  * - Envelopes page
  * - Stats/Analytics page
@@ -121,7 +121,9 @@ const PageSummaryCard = ({
         <div>
           <p className={`${config.textMain} text-sm`}>{label}</p>
           <p className={`text-2xl font-bold ${config.textValue}`}>{value}</p>
-          {subtext && <p className={`text-xs ${config.textSub} mt-2`}>{subtext}</p>}
+          {subtext && (
+            <p className={`text-xs ${config.textSub} mt-2`}>{subtext}</p>
+          )}
         </div>
         {Icon && <Icon className={`h-8 w-8 ${config.textMain}`} />}
       </div>

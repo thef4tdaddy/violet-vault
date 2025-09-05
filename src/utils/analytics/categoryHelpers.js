@@ -28,7 +28,10 @@ export const calculateCategoryStats = (filteredTransactions) => {
     stats[category].totalAmount += Math.abs(transaction.amount);
 
     const transactionDate = new Date(transaction.date);
-    if (!stats[category].lastUsed || transactionDate > stats[category].lastUsed) {
+    if (
+      !stats[category].lastUsed ||
+      transactionDate > stats[category].lastUsed
+    ) {
       stats[category].lastUsed = transactionDate;
     }
   });
@@ -40,7 +43,8 @@ export const calculateCategoryStats = (filteredTransactions) => {
 
       // Calculate frequency (transactions per month)
       if (stat.lastUsed) {
-        const monthsAgo = (new Date() - stat.lastUsed) / (1000 * 60 * 60 * 24 * 30);
+        const monthsAgo =
+          (new Date() - stat.lastUsed) / (1000 * 60 * 60 * 24 * 30);
         stat.frequency = stat.transactionCount / Math.max(1, monthsAgo);
       }
     }
@@ -52,7 +56,12 @@ export const calculateCategoryStats = (filteredTransactions) => {
 /**
  * Combine and filter suggestions based on dismissed list
  */
-export const processSuggestions = (transactionAnalysis, billAnalysis, dismissedSuggestions, maxResults = 12) => {
+export const processSuggestions = (
+  transactionAnalysis,
+  billAnalysis,
+  dismissedSuggestions,
+  maxResults = 12,
+) => {
   return [...transactionAnalysis, ...billAnalysis]
     .filter((s) => !dismissedSuggestions.has(s.id))
     .sort((a, b) => {
@@ -68,7 +77,11 @@ export const processSuggestions = (transactionAnalysis, billAnalysis, dismissedS
 /**
  * Apply suggestion to appropriate data source
  */
-export const applySuggestionToData = async (suggestion, onApplyToTransactions, onApplyToBills) => {
+export const applySuggestionToData = async (
+  suggestion,
+  onApplyToTransactions,
+  onApplyToBills,
+) => {
   try {
     if (suggestion.category === "transactions" && onApplyToTransactions) {
       await onApplyToTransactions(suggestion);
@@ -119,19 +132,19 @@ export const getFrequencyCategory = (frequency) => {
  */
 export const calculateSuggestionImpact = (suggestion) => {
   let impact = 0;
-  
+
   if (suggestion.data?.totalAmount) {
     impact += suggestion.data.totalAmount * 0.1;
   }
-  
+
   if (suggestion.data?.transactionCount) {
     impact += suggestion.data.transactionCount * 0.5;
   }
-  
+
   // Priority multiplier
   const priorityMultiplier = { high: 3, medium: 2, low: 1 };
   impact *= priorityMultiplier[suggestion.priority] || 1;
-  
+
   return Math.round(impact * 10) / 10;
 };
 
@@ -140,19 +153,21 @@ export const calculateSuggestionImpact = (suggestion) => {
  */
 export const validateCategoryName = (name) => {
   const errors = [];
-  
+
   if (!name || name.trim() === "") {
     errors.push("Category name is required");
   }
-  
+
   if (name && name.length > 50) {
     errors.push("Category name must be 50 characters or less");
   }
-  
+
   if (name && !/^[a-zA-Z0-9\s\-_]+$/.test(name)) {
-    errors.push("Category name can only contain letters, numbers, spaces, hyphens, and underscores");
+    errors.push(
+      "Category name can only contain letters, numbers, spaces, hyphens, and underscores",
+    );
   }
-  
+
   return {
     isValid: errors.length === 0,
     errors,
@@ -164,5 +179,5 @@ export const validateCategoryName = (name) => {
  */
 export const generateSuggestionId = (action, categoryName, type) => {
   const timestamp = Date.now();
-  return `${action}_${categoryName.toLowerCase().replace(/\s+/g, '_')}_${type}_${timestamp}`;
+  return `${action}_${categoryName.toLowerCase().replace(/\s+/g, "_")}_${type}_${timestamp}`;
 };
