@@ -9,7 +9,7 @@ const SplitTotals = ({ totals }) => {
     remaining,
     isValid,
     isOverAllocated,
-    isUnderAllocated,
+    isUnderAllocated: _isUnderAllocated,
   } = totals;
 
   const getStatusColor = () => {

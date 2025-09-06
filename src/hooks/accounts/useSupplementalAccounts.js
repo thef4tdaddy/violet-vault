@@ -21,7 +21,7 @@ const useSupplementalAccounts = ({
   onUpdateAccount,
   onDeleteAccount,
   onTransferToEnvelope,
-  envelopes = [],
+  envelopes: _envelopes = [],
   currentUser = { userName: "User", userColor: "#a855f7" },
 }) => {
   // UI State
