@@ -162,7 +162,7 @@ const NavButton = memo(({ active, to, icon: _Icon, label, viewKey }) => (
     }`}
     style={{ minWidth: "75px" }} // Increase minimum tap target and prevent clipping
   >
-    <Icon className="h-4 w-4 mb-1 lg:mb-0 lg:mr-2 flex-shrink-0" />
+    <_Icon className="h-4 w-4 mb-1 lg:mb-0 lg:mr-2 flex-shrink-0" />
     <span className="text-center lg:text-left leading-tight">
       {/* Responsive label display with better text truncation */}
       <span className="hidden lg:inline truncate">{label}</span>

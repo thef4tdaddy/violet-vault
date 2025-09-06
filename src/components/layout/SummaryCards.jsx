@@ -138,7 +138,7 @@ const SummaryCards = () => {
       label: "Biweekly Remaining",
       value: biweeklyRemaining,
       color: "amber",
-      subtitle: `Total allocation: $${biweeklyTotal.toFixed(2)}`,
+      subtitle: `Total allocation: ${biweeklyTotal.toFixed(2)}`,
     },
   ];
 
@@ -209,7 +209,7 @@ const SummaryCard = memo(
             className={`absolute inset-0 ${colorClasses[color]} rounded-2xl blur-lg opacity-30`}
           ></div>
           <div className={`relative ${colorClasses[color]} p-3 rounded-2xl`}>
-            <Icon className="h-6 w-6 text-white" />
+            <_Icon className="h-6 w-6 text-white" />
           </div>
         </div>
         <div>
