@@ -115,7 +115,7 @@ export const useDebtManagement = () => {
         debtsByType: {},
         totalInterestPaid: 0,
         activeDebtCount: 0,
-        totalDebtCount: debts?.length || 0,
+        totalDebtCount: 0,
         dueSoonAmount: 0,
         dueSoonCount: 0,
       };
@@ -135,7 +135,7 @@ export const useDebtManagement = () => {
     });
 
     return calculatedStats;
-  }, [enrichedDebts, debts]);
+  }, [enrichedDebts]);
 
   // Group debts by status and type for easy filtering
   const debtsByStatus = useMemo(() => {
