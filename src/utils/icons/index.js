@@ -147,7 +147,6 @@ import {
   
   // Loading & Progress
   Loader2,
-  Spinner,
   
   // Debt Types (matching constants/debts.js)
   Scale, // For Chapter 13
@@ -298,7 +297,6 @@ export const ICON_REGISTRY = {
   
   // Loading & Progress
   'Loader2': Loader2,
-  'Spinner': Spinner,
   
   // Debt Types (matching constants/debts.js)
   'Scale': Scale, // For Chapter 13
