@@ -3,7 +3,7 @@ import logger from "../common/logger";
 
 export const performanceMonitor = {
   // Track component render times
-  measureRender: (componentName, fn) => {
+  measureRender(componentName, fn) {
     if (process.env.NODE_ENV === "development") {
       const start = performance.now();
       const result = fn();
@@ -17,7 +17,7 @@ export const performanceMonitor = {
   },
 
   // Debounce function for performance
-  debounce: (func, wait) => {
+  debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
       const later = () => {
@@ -30,7 +30,7 @@ export const performanceMonitor = {
   },
 
   // Throttle function for performance
-  throttle: (func, limit) => {
+  throttle(func, limit) {
     let inThrottle;
     return function (...args) {
       if (!inThrottle) {
@@ -42,7 +42,7 @@ export const performanceMonitor = {
   },
 
   // Memory usage monitoring
-  logMemoryUsage: () => {
+  logMemoryUsage() {
     if (process.env.NODE_ENV === "development" && "memory" in performance) {
       const memInfo = performance.memory;
       logger.debug("Memory Usage", {
@@ -54,7 +54,7 @@ export const performanceMonitor = {
   },
 
   // Measure async operations
-  measureAsync: async (operationName, asyncFn) => {
+  async measureAsync(operationName, asyncFn) {
     if (process.env.NODE_ENV === "development") {
       const start = performance.now();
       const result = await asyncFn();
@@ -66,7 +66,7 @@ export const performanceMonitor = {
   },
 
   // Bundle size reporter (development only)
-  reportBundleSize: () => {
+  reportBundleSize() {
     if (process.env.NODE_ENV === "development") {
       // This will help track when components are loaded
       const loadedChunks = new Set();
