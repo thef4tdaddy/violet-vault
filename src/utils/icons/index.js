@@ -2,6 +2,7 @@
  * Centralized Icon Utility
  * All-purpose icon management for the entire application
  */
+import React from 'react';
 import {
   // Navigation & UI
   ArrowRight,
@@ -322,7 +323,7 @@ export const getIconName = (iconComponent) => {
 // Render icon with consistent props
 export const renderIcon = (iconName, props = {}) => {
   const IconComponent = getIcon(iconName);
-  return IconComponent ? <IconComponent {...props} /> : null;
+  return IconComponent ? React.createElement(IconComponent, props) : null;
 };
 
 // Common icon sizes
