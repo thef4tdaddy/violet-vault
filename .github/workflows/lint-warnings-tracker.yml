@@ -174,7 +174,7 @@ jobs:
             <summary>View detailed warning breakdown</summary>
 
             The full warning analysis is available in the workflow summary.
-            You can also check the `.`github/data/lint-warnings.json` file for detailed breakdown by category and file.
+            You can also check the \`.github/data/lint-warnings.json\` file for detailed breakdown by category and file.
 
             </details>`;
 
@@ -239,7 +239,7 @@ jobs:
           echo "Develop warnings: $DEVELOP_WARNINGS"
           echo "warnings=$DEVELOP_WARNINGS" >> $GITHUB_OUTPUT
 
-      - name: Get warnings for main branch
+      - name: Get warnings for main branch  
         if: steps.should_run.outputs.should_run_main == 'true'
         id: main_warnings
         run: |
@@ -285,7 +285,10 @@ jobs:
               
               // Find previous automation comments (from GitHub Actions)
               const automationComments = comments.data.filter(comment => 
-                comment.user.login === 'github-actions[bot]'
+                comment.user.login === 'github-actions[bot]' &&
+                (comment.body.includes('📊 **Lint Warning Analysis**') ||
+                 comment.body.includes('🚀 **Lint Warnings Report**') ||
+                 comment.body.includes('Automated lint warning tracking'))
               );
               
               // Hide the previous automation comments by minimizing them
@@ -295,12 +298,7 @@ jobs:
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     comment_id: comment.id,
-                    body: `<details>
-<summary>📊 Previous Lint Analysis (${new Date(comment.created_at).toLocaleDateString()})</summary>
-
-${comment.body}
-
-</details>`
+                    body: `<details><summary>📊 Previous Lint Analysis (${new Date(comment.created_at).toLocaleDateString()})</summary>${comment.body}</details>`
                   });
                   console.log(`✅ Minimized previous comment #${comment.id}`);
                 } catch (updateError) {
@@ -367,7 +365,7 @@ ${comment.body}
                   
                   const topFiles = allFiles.sort((a, b) => b.warnings - a.warnings).slice(0, 10);
                   if (topFiles.length > 0) {
-                    detailedInfo += '\n\n### 🔥 Files with Most Warnings:\n';
+                    detailedInfo += '\n### 🔥 Files with Most Warnings:\n';
                     topFiles.forEach(file => {
                       const fileName = file.path.split('/').pop();
                       detailedInfo += `- **${fileName}**: ${file.warnings} warnings\n`;
@@ -376,7 +374,7 @@ ${comment.body}
 
                   // Priority actions
                   if (developDetails.actionPlan && developDetails.actionPlan.highPriority && developDetails.actionPlan.highPriority.length > 0) {
-                    detailedInfo += '\n\n### ⚠️ High Priority Actions:\n';
+                    detailedInfo += '\n### ⚠️ High Priority Actions:\n';
                     developDetails.actionPlan.highPriority.slice(0, 3).forEach(task => {
                       detailedInfo += `- **${task.task}**: ${task.warningsAffected} warnings\n`;
                     });
@@ -407,3 +405,4 @@ ${comment.body}
             } catch (error) {
               console.log('❌ Failed to add comment to issue #568:', error.message);
             }
+
