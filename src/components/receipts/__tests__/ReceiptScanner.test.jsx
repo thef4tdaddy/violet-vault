@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
-import ReceiptScanner from "../ReceiptScannerRefactored";
+import ReceiptScanner from "../ReceiptScanner";
 import { useReceiptScanner } from "../../../hooks/receipts/useReceiptScanner";
 
 // Mock the custom hook
