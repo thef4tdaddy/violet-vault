@@ -9,13 +9,29 @@ import { VALIDATION_CONSTANTS } from "./constants";
 
 /**
  * Generate checksum for data integrity verification
- * @param {string|ArrayBuffer} data - Data to checksum
+ * @param {any} data - Data to checksum (will be JSON stringified if not string/ArrayBuffer)
  * @returns {Promise<string>} Checksum hash
  */
 export const generateChecksum = async (data) => {
   try {
     const encoder = new TextEncoder();
-    const dataBuffer = typeof data === "string" ? encoder.encode(data) : data;
+    let dataBuffer;
+    
+    if (data instanceof ArrayBuffer) {
+      dataBuffer = data;
+    } else if (typeof data === "string") {
+      dataBuffer = encoder.encode(data);
+    } else {
+      // Handle objects, arrays, null, undefined, etc.
+      const jsonString = JSON.stringify(data, (key, value) => {
+        if (value === undefined) return null;
+        if (typeof value === "function") return "[Function]";
+        if (value instanceof Date) return value.toISOString();
+        return value;
+      });
+      dataBuffer = encoder.encode(jsonString);
+    }
+
     const hashBuffer = await crypto.subtle.digest(
       VALIDATION_CONSTANTS.CHECKSUM_ALGORITHM,
       dataBuffer
@@ -33,19 +49,28 @@ export const generateChecksum = async (data) => {
     return hashHex;
   } catch (error) {
     logger.error("❌ Checksum generation failed", { error: error.message });
-    throw error;
+    return ""; // Return empty string on error instead of throwing
   }
 };
 
 /**
  * Validate data against expected checksum
- * @param {string|ArrayBuffer} data - Data to validate
+ * @param {any} data - Data to validate
  * @param {string} expectedChecksum - Expected checksum
  * @returns {Promise<boolean>} True if checksums match
  */
 export const validateChecksum = async (data, expectedChecksum) => {
   try {
+    if (!expectedChecksum) {
+      return false;
+    }
+    
     const actualChecksum = await generateChecksum(data);
+    
+    if (!actualChecksum) {
+      return false;
+    }
+    
     const isValid = actualChecksum === expectedChecksum;
 
     if (isValid) {
