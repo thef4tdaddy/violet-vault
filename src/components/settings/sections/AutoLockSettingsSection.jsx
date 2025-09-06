@@ -1,5 +1,5 @@
 import React from "react";
-import { Lock, Clock } from "lucide-react";
+import { getIcon } from "../../../utils/icons";
 
 /**
  * Auto-lock settings section with toggle switches and timeout slider
@@ -41,7 +41,7 @@ const AutoLockSettingsSection = ({
     <div className="glassmorphism rounded-2xl p-6 shadow-xl border-2 border-black bg-orange-50/60 backdrop-blur-3xl">
       <h4 className="font-black text-black mb-4 flex items-center gap-3 text-lg">
         <div className="glassmorphism rounded-full p-2 bg-orange-500/20 border border-orange-400">
-          <Lock className="h-5 w-5 text-orange-600" />
+          {React.createElement(getIcon('Lock'), { className: "h-5 w-5 text-orange-600" })}
         </div>
         AUTO-LOCK SETTINGS
       </h4>
@@ -62,7 +62,7 @@ const AutoLockSettingsSection = ({
           <div className="pt-4 pb-2">
             <div className="glassmorphism rounded-lg p-4 border border-orange-300 bg-white/50">
               <label className="text-sm font-black text-purple-800 flex items-center gap-2 uppercase tracking-wide mb-3">
-                <Clock className="h-4 w-4 text-orange-500" />
+                {React.createElement(getIcon('Clock'), { className: "h-4 w-4 text-orange-500" })}
                 Auto-Lock Timeout: {securitySettings.autoLockTimeout} Minutes
               </label>
               

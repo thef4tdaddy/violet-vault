@@ -1,5 +1,5 @@
 import React from "react";
-import { RotateCcw, Clock } from "lucide-react";
+import { getIcon } from "../../../utils/icons";
 
 /**
  * Clipboard security settings section  
@@ -13,14 +13,14 @@ const ClipboardSecuritySection = ({
     <div className="glassmorphism rounded-2xl p-6 shadow-xl border-2 border-black bg-purple-50/60 backdrop-blur-3xl">
       <h4 className="font-black text-black mb-4 flex items-center gap-3 text-lg">
         <div className="glassmorphism rounded-full p-2 bg-purple-500/20 border border-purple-400">
-          <RotateCcw className="h-5 w-5 text-purple-600" />
+          {React.createElement(getIcon('RotateCcw'), { className: "h-5 w-5 text-purple-600" })}
         </div>
         CLIPBOARD SECURITY
       </h4>
 
       <div className="glassmorphism rounded-lg p-4 border border-purple-300 bg-white/50">
         <label className="text-sm font-black text-purple-800 flex items-center gap-2 uppercase tracking-wide mb-3">
-          <Clock className="h-4 w-4 text-purple-500" />
+          {React.createElement(getIcon('Clock'), { className: "h-4 w-4 text-purple-500" })}
           Auto-Clear Timeout: {securitySettings.clipboardClearTimeout} Seconds
         </label>
         

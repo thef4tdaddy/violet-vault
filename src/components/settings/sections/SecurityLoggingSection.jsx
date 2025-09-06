@@ -1,5 +1,5 @@
 import React from "react";
-import { Eye, EyeOff, Download, Trash2 } from "lucide-react";
+import { getIcon } from "../../../utils/icons";
 
 /**
  * Security logging section with events display and management
@@ -49,7 +49,7 @@ const SecurityLoggingSection = ({
     <div className="glassmorphism rounded-2xl p-6 shadow-xl border-2 border-black bg-green-50/60 backdrop-blur-3xl">
       <h4 className="font-black text-black mb-4 flex items-center gap-3 text-lg">
         <div className="glassmorphism rounded-full p-2 bg-green-500/20 border border-green-400">
-          <Eye className="h-5 w-5 text-green-600" />
+          {React.createElement(getIcon('Eye'), { className: "h-5 w-5 text-green-600" })}
         </div>
         SECURITY LOGGING
       </h4>
@@ -92,11 +92,10 @@ const SecurityLoggingSection = ({
                 onClick={toggleEventsDisplay}
                 className="flex items-center gap-2 px-4 py-2 glassmorphism rounded-lg border-2 border-black shadow-md hover:shadow-lg transition-all bg-blue-500/20 hover:bg-blue-500/30 font-bold text-blue-700"
               >
-                {showEvents ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
+                {showEvents ? 
+                  React.createElement(getIcon('EyeOff'), { className: "h-4 w-4" }) : 
+                  React.createElement(getIcon('Eye'), { className: "h-4 w-4" })
+                }
                 {showEvents ? "HIDE" : "VIEW"} EVENTS ({securityEvents.length})
               </button>
               
@@ -104,7 +103,7 @@ const SecurityLoggingSection = ({
                 onClick={exportSecurityEvents}
                 className="flex items-center gap-2 px-4 py-2 glassmorphism rounded-lg border-2 border-black shadow-md hover:shadow-lg transition-all bg-green-500/20 hover:bg-green-500/30 font-bold text-green-700"
               >
-                <Download className="h-4 w-4" />
+                {React.createElement(getIcon('Download'), { className: "h-4 w-4" })}
                 EXPORT
               </button>
               
@@ -112,7 +111,7 @@ const SecurityLoggingSection = ({
                 onClick={showClearConfirmDialog}
                 className="flex items-center gap-2 px-4 py-2 glassmorphism rounded-lg border-2 border-black shadow-md hover:shadow-lg transition-all bg-red-500/20 hover:bg-red-500/30 font-bold text-red-700"
               >
-                <Trash2 className="h-4 w-4" />
+                {React.createElement(getIcon('Trash2'), { className: "h-4 w-4" })}
                 CLEAR
               </button>
             </div>
@@ -124,7 +123,7 @@ const SecurityLoggingSection = ({
                   {securityEvents.length === 0 ? (
                     <div className="text-center py-8">
                       <div className="glassmorphism rounded-full p-4 bg-gray-100/80 border border-gray-300 inline-block mb-3">
-                        <Eye className="h-8 w-8 text-gray-400" />
+                        {React.createElement(getIcon('Eye'), { className: "h-8 w-8 text-gray-400" })}
                       </div>
                       <p className="text-sm font-bold text-gray-600 uppercase tracking-wide">
                         📊 No Security Events Recorded Yet
