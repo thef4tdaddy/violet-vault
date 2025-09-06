@@ -97,8 +97,8 @@ export default defineConfig(() => {
     build: {
       chunkSizeWarningLimit: 3000, // Increased from 1000 to 3000 to accommodate large bundles
       reportCompressedSize: process.env.NODE_ENV === "production", // Enable size reporting in production
-      minify: process.env.NODE_ENV === "production" ? "terser" : false, // Enable minification in production
-      sourcemap: false, // Disable sourcemaps for faster builds
+      minify: false, // Temporarily disable minification to debug production errors
+      sourcemap: true, // Enable sourcemaps for debugging
       // Terser options for better compression
       terserOptions:
         process.env.NODE_ENV === "production"
