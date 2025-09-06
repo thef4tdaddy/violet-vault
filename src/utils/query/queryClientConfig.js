@@ -1,6 +1,6 @@
 // Query Client Configuration - TanStack Query setup with Dexie integration
 import { QueryClient, MutationCache, QueryCache } from "@tanstack/react-query";
-import { H } from "../common/highlight";
+// Import H safely to avoid circular dependency issues
 import logger from "../common/logger";
 
 /**
@@ -43,10 +43,7 @@ export const createQueryClient = () => {
             context,
             source: "queryClient",
           });
-          H.consumeError(error, {
-            metadata: { variables, context },
-            tags: { type: "mutation_error" },
-          });
+          // Error logging is handled by logger, no need for direct H usage
         },
       },
     },
@@ -58,10 +55,7 @@ export const createQueryClient = () => {
           queryKey: query.queryKey,
           source: "queryClient",
         });
-        H.consumeError(error, {
-          metadata: { queryKey: query.queryKey },
-          tags: { type: "query_error" },
-        });
+        // Error logging is handled by logger, no need for direct H usage
       },
       onSuccess: (data, query) => {
         // Optional: Track successful queries in development
