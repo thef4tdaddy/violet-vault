@@ -1,5 +1,5 @@
 import React from "react";
-import { Calculator, CheckCircle, AlertCircle } from "lucide-react";
+import { getIcon } from "../../../utils/icons";
 import { formatCurrency } from "../../../utils/transactions/splitterHelpers";
 
 const SplitTotals = ({ totals }) => {
@@ -28,7 +28,7 @@ const SplitTotals = ({ totals }) => {
     <div className="bg-gradient-to-r from-white/60 to-purple-50/60 backdrop-blur-sm border-2 border-black rounded-xl p-4 shadow-lg">
       <h4 className="font-black text-gray-900 mb-3 flex items-center">
         <div className="glassmorphism rounded-full p-1 mr-2 border border-purple-300">
-          <Calculator className="h-4 w-4 text-purple-600" />
+          {React.createElement(getIcon('Calculator'), { className: "h-4 w-4 text-purple-600" })}
         </div>
         SPLIT SUMMARY
       </h4>
@@ -59,11 +59,10 @@ const SplitTotals = ({ totals }) => {
 
         <div className="flex items-center mt-2 pt-2 border-t border-gray-200">
           <div className="glassmorphism rounded-full p-1 mr-2 border border-gray-300">
-            {isValid ? (
-              <CheckCircle className="h-4 w-4 text-green-500" />
-            ) : (
-              <AlertCircle className="h-4 w-4 text-orange-500" />
-            )}
+            {isValid ? 
+              React.createElement(getIcon('CheckCircle'), { className: "h-4 w-4 text-green-500" }) : 
+              React.createElement(getIcon('AlertCircle'), { className: "h-4 w-4 text-orange-500" })
+            }
           </div>
           <span className={`text-xs font-bold ${getStatusColor()}`}>
             {getStatusMessage()}
