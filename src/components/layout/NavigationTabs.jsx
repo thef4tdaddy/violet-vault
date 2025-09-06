@@ -1,17 +1,6 @@
 import React, { memo, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import {
-  DollarSign,
-  Wallet,
-  TrendingUp,
-  TrendingDown,
-  Calendar,
-  Target,
-  CreditCard,
-  BookOpen,
-  BarChart3,
-  Settings,
-} from "lucide-react";
+import { getIcon } from "../../utils";
 
 /**
  * Navigation tabs component for the main layout
@@ -69,55 +58,55 @@ const NavigationTabs = memo(() => {
     {
       key: "dashboard",
       path: "/",
-      icon: CreditCard,
+      icon: getIcon('CreditCard'),
       label: "Dashboard",
     },
     {
       key: "envelopes",
       path: "/envelopes",
-      icon: Wallet,
+      icon: getIcon('Wallet'),
       label: "Envelopes",
     },
     {
       key: "savings",
       path: "/savings",
-      icon: Target,
+      icon: getIcon('Target'),
       label: "Savings Goals",
     },
     {
       key: "supplemental",
       path: "/supplemental",
-      icon: CreditCard,
+      icon: getIcon('CreditCard'),
       label: "Supplemental",
     },
     {
       key: "paycheck",
       path: "/paycheck",
-      icon: DollarSign,
+      icon: getIcon('DollarSign'),
       label: "Add Paycheck",
     },
     {
       key: "bills",
       path: "/bills",
-      icon: Calendar,
+      icon: getIcon('Calendar'),
       label: "Manage Bills",
     },
     {
       key: "transactions",
       path: "/transactions",
-      icon: BookOpen,
+      icon: getIcon('BookOpen'),
       label: "Transactions",
     },
     {
       key: "debts",
       path: "/debts",
-      icon: TrendingDown,
+      icon: getIcon('TrendingDown'),
       label: "Debt Tracking",
     },
     {
       key: "analytics",
       path: "/analytics",
-      icon: BarChart3,
+      icon: getIcon('BarChart3'),
       label: "Analytics",
     },
   ];
