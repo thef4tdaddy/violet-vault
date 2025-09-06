@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { AlertTriangle, Trash2, X, CheckCircle, Info } from "lucide-react";
+import { getIcon } from "../../utils/icons";
 
 /**
  * Reusable ConfirmModal Component
