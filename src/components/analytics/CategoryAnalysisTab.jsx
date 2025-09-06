@@ -1,12 +1,12 @@
 import React from "react";
-import { Tag, TrendingUp, TrendingDown, CreditCard } from "lucide-react";
+import { getIcon } from "../../utils";
 
 const CategoryAnalysisTab = ({ categoryStats }) => {
   const getFrequencyIndicator = (frequency) => {
-    if (frequency > 2) return <TrendingUp className="h-4 w-4 text-green-500" />;
+    if (frequency > 2) return React.createElement(getIcon('TrendingUp'), { className: "h-4 w-4 text-green-500" });
     if (frequency < 0.5)
-      return <TrendingDown className="h-4 w-4 text-red-500" />;
-    return <CreditCard className="h-4 w-4 text-blue-500" />;
+      return React.createElement(getIcon('TrendingDown'), { className: "h-4 w-4 text-red-500" });
+    return React.createElement(getIcon('CreditCard'), { className: "h-4 w-4 text-blue-500" });
   };
 
   const getFrequencyColor = (frequency) => {
@@ -18,7 +18,7 @@ const CategoryAnalysisTab = ({ categoryStats }) => {
   if (categoryStats.length === 0) {
     return (
       <div className="text-center py-8 text-purple-800">
-        <Tag className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                {React.createElement(getIcon('Tag'), { className: "h-12 w-12 mx-auto mb-4 text-gray-400" })}
         <p className="font-medium">No category data available</p>
       </div>
     );
@@ -34,7 +34,7 @@ const CategoryAnalysisTab = ({ categoryStats }) => {
           >
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Tag className="h-4 w-4 text-purple-600" />
+                                {React.createElement(getIcon('Tag'), { className: "h-4 w-4 text-purple-600" })}
                 <h4 className="font-bold text-gray-900">{stat.name}</h4>
               </div>
               <div className="flex items-center gap-1">

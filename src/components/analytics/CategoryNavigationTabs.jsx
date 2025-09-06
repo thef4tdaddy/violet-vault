@@ -1,5 +1,5 @@
 import React from "react";
-import { Lightbulb, BarChart3, Settings } from "lucide-react";
+import { getIcon } from "../../utils";
 
 const CategoryNavigationTabs = ({
   activeTab,

@@ -1,5 +1,5 @@
 import React from "react";
-import { CreditCard } from "lucide-react";
+import { getIcon } from "../../utils";
 import AccountCard from "./AccountCard";
 import {
   getAccountTypeInfo,
@@ -17,7 +17,7 @@ const AccountsGrid = ({
   if (accounts.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500 bg-white/60 rounded-lg border border-white/20">
-        <CreditCard className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                {React.createElement(getIcon('CreditCard'), { className: "h-8 w-8 mx-auto mb-2 opacity-50" })}
         <p className="text-sm">No supplemental accounts added yet</p>
       </div>
     );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getIcon } from "../../utils/icons";
+import { renderIcon } from "../../utils/icons";
 
 const Toast = ({ type = "info", title, message, duration = 5000, onClose }) => {
   const [isVisible, setIsVisible] = useState(true);
@@ -44,15 +44,15 @@ const Toast = ({ type = "info", title, message, duration = 5000, onClose }) => {
 
     switch (type) {
       case "success":
-        return React.createElement(getIcon('CheckCircle'), { className: `${iconStyles} text-emerald-600` });
+        return renderIcon('CheckCircle', { className: `${iconStyles} text-emerald-600` });
       case "error":
-        return React.createElement(getIcon('AlertCircle'), { className: `${iconStyles} text-red-600` });
+        return renderIcon('AlertCircle', { className: `${iconStyles} text-red-600` });
       case "warning":
-        return React.createElement(getIcon('AlertCircle'), { className: `${iconStyles} text-amber-600` });
+        return renderIcon('AlertCircle', { className: `${iconStyles} text-amber-600` });
       case "payday":
-        return React.createElement(getIcon('Calendar'), { className: `${iconStyles} text-purple-600` });
+        return renderIcon('Calendar', { className: `${iconStyles} text-purple-600` });
       default:
-        return React.createElement(getIcon('Info'), { className: `${iconStyles} text-blue-600` });
+        return renderIcon('Info', { className: `${iconStyles} text-blue-600` });
     }
   };
 
@@ -93,7 +93,7 @@ const Toast = ({ type = "info", title, message, duration = 5000, onClose }) => {
           onClick={handleClose}
           className="ml-3 flex-shrink-0 p-1 rounded-lg hover:bg-white/20 transition-colors"
         >
-          {React.createElement(getIcon('X'), { className: "h-4 w-4 text-gray-500" })}
+          {renderIcon('X', { className: "h-4 w-4 text-gray-500" })}
         </button>
       </div>
     </div>

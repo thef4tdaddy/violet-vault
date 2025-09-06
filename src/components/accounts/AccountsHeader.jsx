@@ -1,5 +1,5 @@
 import React from "react";
-import { CreditCard, Plus, Eye, EyeOff } from "lucide-react";
+import { getIcon } from "../../utils";
 
 const AccountsHeader = ({
   totalValue,
@@ -14,7 +14,7 @@ const AccountsHeader = ({
           <div className="relative mr-3">
             <div className="absolute inset-0 bg-cyan-500 rounded-xl blur-lg opacity-30"></div>
             <div className="relative bg-cyan-500 p-2 rounded-xl">
-              <CreditCard className="h-4 w-4 text-white" />
+                            {React.createElement(getIcon('CreditCard'), { className: "h-4 w-4 text-white" })}
             </div>
           </div>
           Supplemental Accounts
@@ -32,16 +32,16 @@ const AccountsHeader = ({
           title={showBalances ? "Hide balances" : "Show balances"}
         >
           {showBalances ? (
-            <Eye className="h-4 w-4" />
+            React.createElement(getIcon('Eye'), { className: "h-4 w-4" })
           ) : (
-            <EyeOff className="h-4 w-4" />
+            React.createElement(getIcon('EyeOff'), { className: "h-4 w-4" })
           )}
         </button>
         <button
           onClick={onAddAccount}
           className="btn btn-primary border-2 border-black text-sm flex items-center"
         >
-          <Plus className="h-3 w-3 mr-1" />
+                    {React.createElement(getIcon('Plus'), { className: "h-3 w-3 mr-1" })}
           Add Account
         </button>
       </div>

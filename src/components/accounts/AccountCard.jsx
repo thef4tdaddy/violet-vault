@@ -1,5 +1,5 @@
 import React from "react";
-import { Edit3, Trash2, Zap } from "lucide-react";
+import { getIcon } from "../../utils";
 
 const AccountCard = ({
   account,
@@ -39,13 +39,13 @@ const AccountCard = ({
             onClick={() => onEdit(account)}
             className="p-1 text-gray-400 hover:text-cyan-600"
           >
-            <Edit3 className="h-3 w-3" />
+                        {React.createElement(getIcon('Edit3'), { className: "h-3 w-3" })}
           </button>
           <button
             onClick={() => onDelete(account.id)}
             className="p-1 text-gray-400 hover:text-red-600"
           >
-            <Trash2 className="h-3 w-3" />
+                        {React.createElement(getIcon('Trash2'), { className: "h-3 w-3" })}
           </button>
         </div>
       </div>
@@ -92,7 +92,7 @@ const AccountCard = ({
             onClick={() => onStartTransfer(account)}
             className="w-full btn btn-sm btn-primary border-2 border-black flex items-center justify-center"
           >
-            <Zap className="h-3 w-3 mr-1" />
+                        {React.createElement(getIcon('Zap'), { className: "h-3 w-3 mr-1" })}
             Transfer to Budget
           </button>
         </div>

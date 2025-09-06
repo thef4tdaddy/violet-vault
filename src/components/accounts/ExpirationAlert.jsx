@@ -1,5 +1,5 @@
 import React from "react";
-import { AlertCircle } from "lucide-react";
+import { getIcon } from "../../utils";
 import { calculateDaysUntilExpiration } from "../../utils/accounts";
 
 const ExpirationAlert = ({ expiringAccounts }) => {
@@ -8,7 +8,7 @@ const ExpirationAlert = ({ expiringAccounts }) => {
   return (
     <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
       <div className="flex items-start">
-        <AlertCircle className="h-4 w-4 text-orange-600 mt-0.5 mr-2 flex-shrink-0" />
+                {React.createElement(getIcon('AlertCircle'), { className: "h-4 w-4 text-orange-600 mt-0.5 mr-2 flex-shrink-0" })}
         <div>
           <p className="text-sm font-medium text-orange-800">
             {expiringAccounts.length} account

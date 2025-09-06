@@ -1,5 +1,5 @@
 import React from "react";
-import { PieChart, Calculator, Target, TrendingUp } from "lucide-react";
+import { getIcon } from "../../utils";
 import PageSummaryCard from "../ui/PageSummaryCard";
 
 /**
@@ -26,7 +26,7 @@ const AnalyticsSummaryCards = ({ summaryMetrics = {} }) => {
   const cards = [
     {
       key: "top-category",
-      icon: PieChart,
+      icon: getIcon('PieChart'),
       label: "Top Category",
       value: totalExpenses > 0 ? `$${totalExpenses.toFixed(2)}` : "$0.00",
       color: "indigo",
@@ -34,7 +34,7 @@ const AnalyticsSummaryCards = ({ summaryMetrics = {} }) => {
     },
     {
       key: "avg-transaction",
-      icon: Calculator,
+      icon: getIcon('Calculator'),
       label: "Avg Transaction",
       value: `$${avgTransaction.toFixed(2)}`,
       color: "teal",
@@ -42,7 +42,7 @@ const AnalyticsSummaryCards = ({ summaryMetrics = {} }) => {
     },
     {
       key: "budget-accuracy",
-      icon: Target,
+      icon: getIcon('Target'),
       label: "Budget Accuracy",
       value: `${budgetAccuracy.toFixed(1)}%`,
       color:
@@ -52,7 +52,7 @@ const AnalyticsSummaryCards = ({ summaryMetrics = {} }) => {
     },
     {
       key: "savings-rate",
-      icon: TrendingUp,
+      icon: getIcon('TrendingUp'),
       label: "Savings Rate",
       value: `${savingsProgress.toFixed(1)}%`,
       color: "emerald",
