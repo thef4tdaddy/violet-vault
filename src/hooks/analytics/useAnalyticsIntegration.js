@@ -2,10 +2,10 @@ import { useMemo, useCallback } from "react";
 import { useAnalyticsData } from "./useAnalyticsData";
 import { useChartConfig } from "./useChartConfig";
 import {
-  calculateFinancialMetrics,
+  _calculateFinancialMetrics,
   calculateTrends,
   prepareDataForExport,
-  filterTransactionsByDateRange,
+  _filterTransactionsByDateRange,
 } from "../../utils/common/analyticsProcessor";
 import logger from "../../utils/common/logger";
 
@@ -17,8 +17,8 @@ import logger from "../../utils/common/logger";
 export const useAnalyticsIntegration = ({
   transactions = [],
   envelopes = [],
-  bills = [],
-  savingsGoals = [],
+  bills: _bills = [],
+  savingsGoals: _savingsGoals = [],
   timeFilter = "thisMonth",
   enableExport = true,
   enableAlerts = true,

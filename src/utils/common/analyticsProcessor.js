@@ -65,7 +65,7 @@ export const calculateGrowthRate = (current, previous) => {
 };
 
 // Transaction processing
-export const filterTransactionsByDateRange = (transactions, timeFilter) => {
+export const _filterTransactionsByDateRange = (transactions, timeFilter) => {
   const dateRange = getDateRangeFilter(timeFilter);
 
   return transactions.filter((transaction) => {
@@ -275,7 +275,7 @@ export const analyzeEnvelopeHealth = (envelopes) => {
 };
 
 // Financial metrics calculation
-export const calculateFinancialMetrics = (transactions, envelopes) => {
+export const _calculateFinancialMetrics = (transactions, envelopes) => {
   const validTransactions = transactions.filter(validateTransaction);
 
   const totalIncome = validTransactions
