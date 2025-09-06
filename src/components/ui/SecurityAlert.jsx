@@ -1,5 +1,5 @@
 import React from "react";
-import { AlertCircle, CheckCircle, Info, AlertTriangle, X } from "lucide-react";
+import { getIcon as getIconFromRegistry } from "../../utils/icons";
 
 /**
  * Shared security alert component for consistent messaging across security interfaces
@@ -27,14 +27,14 @@ const SecurityAlert = ({
 
     switch (type) {
       case "error":
-        return AlertCircle;
+        return getIconFromRegistry('AlertCircle');
       case "warning":
-        return AlertTriangle;
+        return getIconFromRegistry('AlertTriangle');
       case "success":
-        return CheckCircle;
+        return getIconFromRegistry('CheckCircle');
       case "info":
       default:
-        return Info;
+        return getIconFromRegistry('Info');
     }
   };
 
@@ -95,7 +95,7 @@ const SecurityAlert = ({
           onClick={onDismiss}
           className={`ml-2 hover:opacity-75 ${colors.icon}`}
         >
-          <X className="h-3 w-3" />
+          {React.createElement(getIconFromRegistry('X'), { className: "h-3 w-3" })}
         </button>
       )}
     </div>

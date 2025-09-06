@@ -38,6 +38,7 @@ import {
   ThumbsDown,
   Star,
   Heart,
+  Tag,
   
   // Financial & Business
   DollarSign,
@@ -189,6 +190,7 @@ export const ICON_REGISTRY = {
   'thumbs-down': ThumbsDown,
   'star': Star,
   'heart': Heart,
+  'Tag': Tag,
   
   // Financial & Business
   'dollar-sign': DollarSign,

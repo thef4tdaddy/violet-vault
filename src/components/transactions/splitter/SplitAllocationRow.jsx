@@ -1,5 +1,5 @@
 import React from "react";
-import { DollarSign, X, Tag } from "lucide-react";
+import { getIcon } from "../../../utils/icons";
 
 const SplitAllocationRow = ({
   split,
@@ -26,7 +26,7 @@ const SplitAllocationRow = ({
       {/* Amount */}
       <div className="col-span-2">
         <div className="relative">
-          <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-purple-600" />
+          {React.createElement(getIcon('DollarSign'), { className: "absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-purple-600" })}
           <input
             type="number"
             step="0.01"
@@ -43,7 +43,7 @@ const SplitAllocationRow = ({
       {/* Category */}
       <div className="col-span-3">
         <div className="relative">
-          <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-purple-600" />
+          {React.createElement(getIcon('Tag'), { className: "absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-purple-600" })}
           <select
             value={split.category}
             onChange={(e) => onUpdate(split.id, "category", e.target.value)}
@@ -83,7 +83,7 @@ const SplitAllocationRow = ({
             className="p-1 text-red-500 hover:text-red-700 glassmorphism backdrop-blur-sm hover:bg-red-50 rounded border-2 border-red-200 shadow-md hover:shadow-lg transition-all"
             title="Remove split"
           >
-            <X className="h-4 w-4" />
+            {React.createElement(getIcon('X'), { className: "h-4 w-4" })}
           </button>
         )}
       </div>
