@@ -1,5 +1,5 @@
 import React, { Suspense, useCallback } from "react";
-import { Wallet, Settings } from "lucide-react";
+import { getIcon } from "../../utils";
 import { globalToast } from "../../stores/ui/toastStore";
 import Dashboard from "../pages/MainDashboard";
 import SmartEnvelopeSuggestions from "../budgeting/SmartEnvelopeSuggestions";
@@ -122,7 +122,7 @@ const ViewRenderer = ({
             className="btn btn-secondary flex items-center"
             title="Manage automatic envelope funding rules"
           >
-            <Settings className="h-4 w-4 mr-2" />
+            {React.createElement(getIcon('Settings'), { className: "h-4 w-4 mr-2" })}
             Auto-Funding
           </button>
         </div>
