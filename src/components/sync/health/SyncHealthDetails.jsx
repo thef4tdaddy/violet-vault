@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  AlertTriangle,
-  RefreshCw,
-  Wrench,
-  CheckCircle,
-  Clock,
-  ExternalLink,
-} from "lucide-react";
+import { renderIcon } from "../../../utils/icons";
 import {
   formatLastChecked,
   getStatusDescription,
@@ -32,7 +25,7 @@ const SyncHealthDetails = ({
   const formattedRecoveryResult = formatRecoveryResult(recoveryResult);
 
   return (
-    <div className="absolute right-0 top-full mt-2 w-80 glassmorphism backdrop-blur-sm border-2 border-black rounded-xl shadow-2xl z-50 overflow-hidden">
+    <div className="absolute right-0 top-full mt-2 w-80 glassmorphism backdrop-blur-sm border-2 border-black rounded-xl shadow-2xl z-[60] overflow-hidden">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-700 px-4 py-3 border-b-2 border-black">
         <h3 className="font-black text-white text-sm">SYNC HEALTH STATUS</h3>
@@ -44,11 +37,10 @@ const SyncHealthDetails = ({
         <div className="space-y-2">
           <div className="flex items-start gap-2">
             <div className="flex-shrink-0 mt-1">
-              {syncStatus.status === "HEALTHY" ? (
-                <CheckCircle className="h-4 w-4 text-green-500" />
-              ) : (
-                <AlertTriangle className="h-4 w-4 text-orange-500" />
-              )}
+              {syncStatus.status === "HEALTHY" ? 
+                renderIcon('CheckCircle', { className: "h-4 w-4 text-green-500" }) : 
+                renderIcon('AlertTriangle', { className: "h-4 w-4 text-orange-500" })
+              }
             </div>
             <div>
               <p className="text-sm font-bold text-gray-900">
@@ -63,7 +55,7 @@ const SyncHealthDetails = ({
 
           {/* Last Checked */}
           <div className="flex items-center gap-2 text-xs text-purple-600">
-            <Clock className="h-3 w-3" />
+            {renderIcon('Clock', { className: "h-3 w-3" })}
             <span className="font-medium">Last checked: {lastCheckedText}</span>
           </div>
         </div>
@@ -143,9 +135,9 @@ const SyncHealthDetails = ({
                 disabled={syncStatus.isLoading}
                 className={getActionButtonStyle("refresh")}
               >
-                <RefreshCw
-                  className={`h-3 w-3 mr-2 ${syncStatus.isLoading ? "animate-spin" : ""}`}
-                />
+                {renderIcon('RefreshCw', { 
+                  className: `h-3 w-3 mr-2 ${syncStatus.isLoading ? "animate-spin" : ""}` 
+                })}
                 {syncStatus.isLoading ? "Refreshing..." : "Refresh Status"}
               </button>
 
@@ -153,7 +145,7 @@ const SyncHealthDetails = ({
                 onClick={onRunValidation}
                 className={getActionButtonStyle("validate")}
               >
-                <Wrench className="h-3 w-3 mr-2" />
+                {renderIcon('Wrench', { className: "h-3 w-3 mr-2" })}
                 Run Full Validation
               </button>
 
