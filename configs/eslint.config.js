@@ -149,12 +149,20 @@ export default [
     },
   },
   {
-    // Component architecture enforcement (Issue #515 - prevent direct service imports in components only)
+    // Component architecture enforcement (Issue #515 - prevent direct service imports in components only)  
+    // Icon system enforcement (Issue #575 - prevent direct lucide-react imports in components)
     files: ["src/components/**/*.{js,jsx}"],
     rules: {
       "no-restricted-imports": [
         "error",
         {
+          paths: [
+            {
+              name: "lucide-react",
+              message:
+                "Use centralized icon system instead of direct lucide-react imports. Import icons from '@/utils/icons' or use { getIcon, renderIcon } from '@/utils'. See docs/ICON_MIGRATION_PLAN.md for details.",
+            },
+          ],
           patterns: [
             {
               group: ["../services/*", "../../services/*", "../../../services/*"],
