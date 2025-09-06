@@ -133,6 +133,7 @@ import {
   Cloud,
   CloudOff,
   RefreshCw,
+  RotateCcw,
   
   // Data & Analytics
   Database,
@@ -283,6 +284,7 @@ export const ICON_REGISTRY = {
   'Cloud': Cloud,
   'CloudOff': CloudOff,
   'RefreshCw': RefreshCw,
+  'RotateCcw': RotateCcw,
   
   // Data & Analytics
   'Database': Database,

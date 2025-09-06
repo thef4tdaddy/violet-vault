@@ -1,5 +1,5 @@
 import React from "react";
-import { Info } from "lucide-react";
+import { getIcon } from "../../../utils/icons";
 
 /**
  * Security status display section
@@ -15,7 +15,7 @@ const SecurityStatusSection = ({
     <div className="glassmorphism rounded-2xl p-6 shadow-xl border-2 border-black bg-purple-50/60 backdrop-blur-3xl">
       <h4 className="font-black text-black mb-4 flex items-center gap-3 text-lg">
         <div className="glassmorphism rounded-full p-2 bg-blue-500/20 border border-blue-400">
-          <Info className="h-5 w-5 text-blue-600" />
+          {React.createElement(getIcon('Info'), { className: "h-5 w-5 text-blue-600" })}
         </div>
         CURRENT SECURITY STATUS
       </h4>

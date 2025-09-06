@@ -1,5 +1,5 @@
 import React from "react";
-import { AlertTriangle, X } from "lucide-react";
+import { getIcon } from "../../../utils/icons";
 
 /**
  * Clear security events confirmation modal
@@ -19,7 +19,7 @@ const ClearConfirmationModal = ({
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="glassmorphism rounded-full p-2 bg-red-500/20 border border-red-400">
-              <AlertTriangle className="h-6 w-6 text-red-600" />
+              {React.createElement(getIcon('AlertTriangle'), { className: "h-6 w-6 text-red-600" })}
             </div>
             <h4 className="font-black text-black text-lg uppercase tracking-wide">
               CLEAR SECURITY EVENTS
@@ -29,7 +29,7 @@ const ClearConfirmationModal = ({
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 glassmorphism backdrop-blur-sm rounded-full p-2 shadow-lg hover:shadow-xl transition-all border-2 border-black"
           >
-            <X className="h-5 w-5" />
+            {React.createElement(getIcon('X'), { className: "h-5 w-5" })}
           </button>
         </div>
 
