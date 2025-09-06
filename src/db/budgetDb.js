@@ -655,29 +655,41 @@ export const migrateData = async () => {
   }
 };
 
-// Export enhanced query helpers
+// Export enhanced query helpers - use function expressions to avoid temporal dead zone
 export const queryHelpers = {
   // Envelope helpers
-  getActiveEnvelopes: () => budgetDb.getActiveEnvelopes(),
-  getEnvelopesByCategory: (category, includeArchived) =>
-    budgetDb.getEnvelopesByCategory(category, includeArchived),
+  getActiveEnvelopes() {
+    return budgetDb.getActiveEnvelopes();
+  },
+  getEnvelopesByCategory(category, includeArchived) {
+    return budgetDb.getEnvelopesByCategory(category, includeArchived);
+  },
 
   // Transaction helpers
-  getRecentTransactions: (days = 7) => {
+  getRecentTransactions(days = 7) {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
     return budgetDb.getTransactionsByDateRange(startDate, new Date());
   },
 
   // Bill helpers
-  getUpcomingBills: (days) => budgetDb.getUpcomingBills(days),
-  getOverdueBills: () => budgetDb.getOverdueBills(),
+  getUpcomingBills(days) {
+    return budgetDb.getUpcomingBills(days);
+  },
+  getOverdueBills() {
+    return budgetDb.getOverdueBills();
+  },
 
   // Savings goal helpers
-  getActiveSavingsGoals: () => budgetDb.getActiveSavingsGoals(),
-  getUpcomingDeadlines: (days) => budgetDb.getUpcomingDeadlines(days),
+  getActiveSavingsGoals() {
+    return budgetDb.getActiveSavingsGoals();
+  },
+  getUpcomingDeadlines(days) {
+    return budgetDb.getUpcomingDeadlines(days);
+  },
 
   // Analytics helpers
-  getAnalyticsData: (dateRange, includeTransfers) =>
-    budgetDb.getAnalyticsData(dateRange, includeTransfers),
+  getAnalyticsData(dateRange, includeTransfers) {
+    return budgetDb.getAnalyticsData(dateRange, includeTransfers);
+  },
 };
