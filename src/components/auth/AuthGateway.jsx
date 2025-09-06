@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Shield, ShieldOff } from "lucide-react";
+import { getIcon } from "../../utils";
 import { useLocalOnlyMode } from "../../hooks/common/useLocalOnlyMode";
 import logger from "../../utils/common/logger";
 import UserSetup from "./UserSetup";
@@ -104,7 +104,7 @@ const AuthGateway = ({ onSetupComplete, onLocalOnlyReady }) => {
               className="p-6 border border-purple-300 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all text-left group"
             >
               <div className="flex items-center mb-4">
-                <Shield className="h-8 w-8 text-purple-600 mr-3" />
+                {React.createElement(getIcon('Shield'), { className: "h-8 w-8 text-purple-600 mr-3" })}
                 <h3 className="text-xl font-semibold text-gray-900">
                   Standard Mode
                 </h3>
@@ -135,7 +135,7 @@ const AuthGateway = ({ onSetupComplete, onLocalOnlyReady }) => {
               className="p-6 border border-blue-300 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all text-left group"
             >
               <div className="flex items-center mb-4">
-                <ShieldOff className="h-8 w-8 text-blue-600 mr-3" />
+                {React.createElement(getIcon('ShieldOff'), { className: "h-8 w-8 text-blue-600 mr-3" })}
                 <h3 className="text-xl font-semibold text-gray-900">
                   Local-Only Mode
                 </h3>

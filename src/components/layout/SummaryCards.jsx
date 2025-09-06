@@ -1,5 +1,5 @@
 import React, { memo, lazy, Suspense } from "react";
-import { DollarSign, Wallet, Target, TrendingUp } from "lucide-react";
+import { getIcon } from "../../utils";
 import { useBudgetStore } from "../../stores/ui/uiStore";
 import { usePrompt } from "../../hooks/common/usePrompt";
 import { useActualBalance } from "../../hooks/budgeting/useBudgetMetadata";
@@ -108,7 +108,7 @@ const SummaryCards = () => {
   const cards = [
     {
       key: "total-cash",
-      icon: Wallet,
+      icon: getIcon('Wallet'),
       label: "Total Cash",
       value: totalCash,
       color: "purple",
@@ -117,7 +117,7 @@ const SummaryCards = () => {
     },
     {
       key: "unassigned-cash",
-      icon: TrendingUp,
+      icon: getIcon('TrendingUp'),
       label: "Unassigned Cash",
       value: unassignedCash,
       color: unassignedCash < 0 ? "red" : "emerald",
@@ -127,14 +127,14 @@ const SummaryCards = () => {
     },
     {
       key: "savings-total",
-      icon: Target,
+      icon: getIcon('Target'),
       label: "Savings Total",
       value: totalSavingsBalance,
       color: "cyan",
     },
     {
       key: "biweekly-remaining",
-      icon: DollarSign,
+      icon: getIcon('DollarSign'),
       label: "Biweekly Remaining",
       value: biweeklyRemaining,
       color: "amber",
