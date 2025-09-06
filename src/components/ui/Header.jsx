@@ -1,5 +1,5 @@
-import { useState, memo, useCallback } from "react";
-import { Settings, Monitor } from "lucide-react";
+import React, { useState, memo, useCallback } from "react";
+import { getIcon } from "../../utils";
 import UserIndicator from "../auth/UserIndicator";
 import logoWithText from "../../assets/Shield Text Logo.webp";
 import LocalOnlyModeSettings from "../auth/LocalOnlyModeSettings";
@@ -65,7 +65,7 @@ const Header = memo(
                   className="mt-2 inline-flex items-center px-3 py-1 rounded-full bg-blue-100 border border-blue-300 hover:bg-blue-200 hover:border-blue-400 transition-colors"
                   title="Click to manage Local-Only Mode settings"
                 >
-                  <Monitor className="h-3 w-3 text-blue-600 mr-1" />
+                  {React.createElement(getIcon('Monitor'), { className: "h-3 w-3 text-blue-600 mr-1" })}
                   <span className="text-xs font-medium text-blue-800">
                     Local-Only Mode
                   </span>
@@ -92,7 +92,7 @@ const Header = memo(
                 className="btn btn-primary flex items-center rounded-2xl px-3 sm:px-4 py-2 text-sm font-medium hover:shadow-lg transition-all"
                 title="Open Settings Dashboard"
               >
-                <Settings className="h-4 w-4 sm:mr-2" />
+                {React.createElement(getIcon('Settings'), { className: "h-4 w-4 sm:mr-2" })}
                 <span className="hidden sm:inline">Settings</span>
               </button>
             </div>
