@@ -165,13 +165,14 @@ const storeInitializer = (set, get) => ({
     }),
 
   // Toggle cloud sync (Firestore)
-  setCloudSyncEnabled: (enabled) =>
-    set((state) => {
+  setCloudSyncEnabled(enabled) {
+    return set((state) => {
       state.cloudSyncEnabled = enabled;
       logger.info(`Cloud sync ${enabled ? "enabled" : "disabled"}`, {
         cloudSyncEnabled: enabled,
       });
-    }),
+    });
+  },
 
   // Run migration on first use
   async runMigrationIfNeeded() {
@@ -227,7 +228,7 @@ const storeInitializer = (set, get) => ({
   },
 
   // Reset UI state only - data arrays handled by TanStack Query/Dexie
-  resetAllData: () => {
+  resetAllData() {
     logger.info("Resetting UI state");
     set((state) => {
       // Reset UI state
@@ -248,7 +249,7 @@ const storeInitializer = (set, get) => ({
   // Password validation moved to auth store
 
   // Legacy compatibility: Debt management moved to TanStack Query hooks
-  setDebts: () => {
+  setDebts() {
     logger.warn(
       "setDebts called - debts are now managed by TanStack Query/useDebts hook",
       {
