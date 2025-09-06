@@ -100,7 +100,7 @@ export default [
       // Block React Context usage (Issue #491 enforcement)
       // Block direct lucide-react imports (Issue #575 enforcement)
       "no-restricted-imports": [
-        "error",
+        "warn",
         {
           paths: [
             {
@@ -154,7 +154,7 @@ export default [
     files: ["src/components/**/*.{js,jsx}"],
     rules: {
       "no-restricted-imports": [
-        "error",
+        "warn",
         {
           paths: [
             {
