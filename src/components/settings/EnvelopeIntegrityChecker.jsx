@@ -33,7 +33,7 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
     if (isOpen) {
       scanForCorruptedEnvelopes();
     }
-  }, [isOpen]);
+  }, [isOpen, scanForCorruptedEnvelopes]);
 
   const scanForCorruptedEnvelopes = async () => {
     setIsScanning(true);

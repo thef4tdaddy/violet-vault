@@ -171,7 +171,7 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [showTutorial]);
+  }, [showTutorial, closeTutorial]);
 
   const closeTutorial = () => {
     setShowTutorial(false);
@@ -290,7 +290,7 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
       highlightElement();
       return () => removeHighlight();
     }
-  }, [currentStep, showTutorial]);
+  }, [currentStep, showTutorial, highlightElement, removeHighlight]);
 
   if (!showTutorial || isOnboarded) {
     return children;

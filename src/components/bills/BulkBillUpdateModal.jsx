@@ -39,7 +39,7 @@ const BulkBillUpdateModal = ({
     if (isOpen) {
       initializeChanges();
     }
-  }, [isOpen, selectedBills]);
+  }, [isOpen, selectedBills, initializeChanges]);
 
   const summary = useMemo(
     () => calculateUpdateSummary(selectedBills, changes),
