@@ -1,5 +1,5 @@
 import React from "react";
-import { DollarSign, Wallet, AlertTriangle, Target } from "lucide-react";
+import { getIcon } from "../../utils";
 import PageSummaryCard from "../ui/PageSummaryCard";
 
 /**
@@ -14,7 +14,7 @@ const EnvelopeSummaryCards = ({ totals = {}, unassignedCash = 0 }) => {
   const cards = [
     {
       key: "total-allocated",
-      icon: Wallet,
+      icon: getIcon('Wallet'),
       label: "Total Allocated",
       value: `$${(totals.totalAllocated || 0).toFixed(2)}`,
       color: "emerald",
@@ -22,7 +22,7 @@ const EnvelopeSummaryCards = ({ totals = {}, unassignedCash = 0 }) => {
     },
     {
       key: "unassigned-cash",
-      icon: DollarSign,
+      icon: getIcon('DollarSign'),
       label: "Unassigned Cash",
       value: `$${unassignedCash.toFixed(2)}`,
       color: unassignedCash < 0 ? "red" : "amber",
@@ -31,7 +31,7 @@ const EnvelopeSummaryCards = ({ totals = {}, unassignedCash = 0 }) => {
     },
     {
       key: "over-budget",
-      icon: AlertTriangle,
+      icon: getIcon('AlertTriangle'),
       label: "Over Budget",
       value: overBudgetEnvelopes.toString(),
       color: "red",
@@ -43,7 +43,7 @@ const EnvelopeSummaryCards = ({ totals = {}, unassignedCash = 0 }) => {
     },
     {
       key: "savings-progress",
-      icon: Target,
+      icon: getIcon('Target'),
       label: "Savings Progress",
       value: `${savingsGoalProgress.toFixed(1)}%`,
       color: "cyan",

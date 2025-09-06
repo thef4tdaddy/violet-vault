@@ -73,7 +73,6 @@ import {
   ParkingCircle,
   
   // Insurance & Protection
-  Shield,
   Umbrella,
   
   // Healthcare
@@ -124,6 +123,8 @@ import {
   BellOff,
   
   // Security
+  Shield,
+  ShieldOff,
   ShieldCheck,
   ShieldAlert,
   Fingerprint,
@@ -131,7 +132,6 @@ import {
   // Sync & Cloud
   Cloud,
   CloudOff,
-  Sync,
   RefreshCw,
   
   // Data & Analytics
@@ -225,7 +225,6 @@ export const ICON_REGISTRY = {
   'ParkingCircle': ParkingCircle,
   
   // Insurance & Protection
-  'Shield': Shield,
   'Umbrella': Umbrella,
   
   // Healthcare
@@ -276,6 +275,8 @@ export const ICON_REGISTRY = {
   'BellOff': BellOff,
   
   // Security
+  'Shield': Shield,
+  'ShieldOff': ShieldOff,
   'ShieldCheck': ShieldCheck,
   'ShieldAlert': ShieldAlert,
   'Fingerprint': Fingerprint,
@@ -283,7 +284,6 @@ export const ICON_REGISTRY = {
   // Sync & Cloud
   'Cloud': Cloud,
   'CloudOff': CloudOff,
-  'Sync': Sync,
   'RefreshCw': RefreshCw,
   
   // Data & Analytics
