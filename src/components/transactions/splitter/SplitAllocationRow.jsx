@@ -3,7 +3,7 @@ import { DollarSign, X, Tag } from "lucide-react";
 
 const SplitAllocationRow = ({
   split,
-  index,
+  index: _index,
   canRemove,
   onUpdate,
   onRemove,

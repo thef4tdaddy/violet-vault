@@ -134,7 +134,6 @@ export class VioletVaultDB extends Dexie {
         }
       });
 
-      // eslint-disable-next-line no-unused-vars
       table.hook("updating", (modifications, _primKey, _obj, _trans) => {
         modifications.lastModified = Date.now();
       });
@@ -149,7 +148,6 @@ export class VioletVaultDB extends Dexie {
     addTimestampHooks(this.debts);
 
     // Audit log hook
-    // eslint-disable-next-line no-unused-vars
     this.auditLog.hook("creating", (_primKey, obj, _trans) => {
       if (!obj.timestamp) obj.timestamp = Date.now();
     });

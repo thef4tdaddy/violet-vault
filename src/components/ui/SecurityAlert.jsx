@@ -77,7 +77,7 @@ const SecurityAlert = ({
 
   const Icon = getIcon();
   const colors = getColorScheme();
-  const isFullscreen = variant === "fullscreen";
+  const _isFullscreen = variant === "fullscreen";
 
   const containerClasses = `
     flex items-center gap-2 p-3 rounded-lg border-2 border-black
