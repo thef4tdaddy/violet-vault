@@ -1,10 +1,30 @@
-import { H } from "../common/highlight.js";
+// Dynamic import to avoid circular dependency with highlight.js
+let H = null;
 
 class Logger {
   constructor() {
     this.isDevelopment = import.meta.env.MODE === "development";
     this.isDevSite = this.getIsDevSite();
     this.debugThrottles = new Map(); // For throttling frequent debug messages
+  }
+
+  // Initialize H when needed
+  initH() {
+    if (!H) {
+      try {
+        // Use dynamic import to avoid circular dependency
+        import("../common/highlight.js")
+          .then((module) => {
+            H = module.H;
+          })
+          .catch(() => {
+            H = { track: () => {}, consumeError: () => {} }; // Fallback mock
+          });
+      } catch {
+        H = { track: () => {}, consumeError: () => {} }; // Fallback mock
+      }
+    }
+    return H || { track: () => {}, consumeError: () => {} };
   }
 
   getIsDevSite() {
@@ -37,11 +57,14 @@ class Logger {
 
     // Highlight.io tracking for all debug logs
     try {
-      H.track("debug", {
-        message: `DEBUG: ${message}`,
-        category: "debug",
-        ...data,
-      });
+      const h = this.initH();
+      if (h && h.track) {
+        h.track("debug", {
+          message: `DEBUG: ${message}`,
+          category: "debug",
+          ...data,
+        });
+      }
     } catch {
       // Silently fail if highlight.io isn't available
     }
@@ -68,11 +91,14 @@ class Logger {
     }
 
     try {
-      H.track("info", {
-        message: `INFO: ${message}`,
-        category: "app",
-        ...data,
-      });
+      const h = this.initH();
+      if (h && h.track) {
+        h.track("info", {
+          message: `INFO: ${message}`,
+          category: "app",
+          ...data,
+        });
+      }
     } catch (error) {
       console.error("Highlight.io logging failed:", error);
     }
@@ -82,27 +108,33 @@ class Logger {
   warn(message, data = {}) {
     console.warn(`⚠️ ${message}`, data);
 
-    H.track("warning", {
-      message: `WARN: ${message}`,
-      category: "app",
-      ...data,
-    });
+    const h = this.initH();
+    if (h && h.track) {
+      h.track("warning", {
+        message: `WARN: ${message}`,
+        category: "app",
+        ...data,
+      });
+    }
   }
 
   // Error-level logging
   error(message, error = null, data = {}) {
     console.error(`❌ ${message}`, error, data);
 
-    if (error instanceof Error) {
-      H.consumeError(error, {
-        metadata: { message, ...data },
-        tags: { component: "app" },
-      });
-    } else {
-      H.consumeError(new Error(message), {
-        metadata: data,
-        tags: { component: "app" },
-      });
+    const h = this.initH();
+    if (h && h.consumeError) {
+      if (error instanceof Error) {
+        h.consumeError(error, {
+          metadata: { message, ...data },
+          tags: { component: "app" },
+        });
+      } else {
+        h.consumeError(new Error(message), {
+          metadata: data,
+          tags: { component: "app" },
+        });
+      }
     }
   }
 
@@ -127,11 +159,14 @@ class Logger {
     consoleLog(`🟢 [PROD] ${message}`, data);
 
     try {
-      H.track("production", {
-        message: `PRODUCTION: ${message}`,
-        category: "production",
-        ...data,
-      });
+      const h = this.initH();
+      if (h && h.track) {
+        h.track("production", {
+          message: `PRODUCTION: ${message}`,
+          category: "production",
+          ...data,
+        });
+      }
     } catch (error) {
       console.error("Highlight.io production logging failed:", error);
     }
@@ -146,21 +181,26 @@ class Logger {
 
     // Also send to Highlight.io
     try {
-      H.track("budget-sync", {
-        message: `BUDGET-SYNC: ${message}`,
-        category: "budget-sync",
-        ...data,
-      });
-
-      // For critical budget sync issues, also send as error to ensure visibility
-      if (
-        message.includes("budgetId value") ||
-        message.includes("sync issue")
-      ) {
-        H.consumeError(new Error(`Budget Sync: ${message}`), {
-          metadata: data,
-          tags: { category: "budget-sync", critical: "true" },
+      const h = this.initH();
+      if (h && h.track) {
+        h.track("budget-sync", {
+          message: `BUDGET-SYNC: ${message}`,
+          category: "budget-sync",
+          ...data,
         });
+
+        // For critical budget sync issues, also send as error to ensure visibility
+        if (
+          message.includes("budgetId value") ||
+          message.includes("sync issue")
+        ) {
+          if (h.consumeError) {
+            h.consumeError(new Error(`Budget Sync: ${message}`), {
+              metadata: data,
+              tags: { category: "budget-sync", critical: "true" },
+            });
+          }
+        }
       }
     } catch (error) {
       console.error("Failed to log to Highlight.io:", error);
@@ -209,20 +249,25 @@ class Logger {
     console.log("🧪 Testing Highlight.io connectivity...");
 
     // Send a test event
-    H.track("test-event", {
-      message: "Test event from logger",
-      category: "test",
-      timestamp: new Date().toISOString(),
-    });
+    const h = this.initH();
+    if (h && h.track) {
+      h.track("test-event", {
+        message: "Test event from logger",
+        category: "test",
+        timestamp: new Date().toISOString(),
+      });
+    }
 
     // Send a test error
     try {
       throw new Error("Test error from logger - this is intentional");
     } catch (error) {
-      H.consumeError(error, {
-        metadata: { test: true, source: "logger" },
-        tags: { category: "test" },
-      });
+      if (h && h.consumeError) {
+        h.consumeError(error, {
+          metadata: { test: true, source: "logger" },
+          tags: { category: "test" },
+        });
+      }
     }
 
     console.log(
