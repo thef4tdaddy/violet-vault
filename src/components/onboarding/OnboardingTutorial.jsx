@@ -161,6 +161,13 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
     }
   }, [isOnboarded, preferences, getProgress]);
 
+  const closeTutorial = () => {
+    setShowTutorial(false);
+    endTutorialStep();
+    setPreference("tourCompleted", true);
+    logger.info("🏁 Tutorial closed by user");
+  };
+
   // Handle escape key to close tutorial
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -172,13 +179,6 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [showTutorial, closeTutorial]);
-
-  const closeTutorial = () => {
-    setShowTutorial(false);
-    endTutorialStep();
-    setPreference("tourCompleted", true);
-    logger.info("🏁 Tutorial closed by user");
-  };
 
   const nextStep = () => {
     const step = tutorialSteps[currentStep];
