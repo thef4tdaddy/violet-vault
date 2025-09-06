@@ -13,6 +13,12 @@ import {
 import { encryptionUtils } from "../utils/security/encryption";
 import firebaseSyncService from "./firebaseSyncService";
 import logger from "../utils/common/logger";
+import { SyncMutex } from "../utils/sync/SyncMutex";
+import {
+  validateEncryptedData,
+  validateManifest,
+  generateChecksum,
+} from "../utils/sync/validation";
 
 /**
  * Binary <-> Base64 helpers to avoid massive Function.apply() (stack overflow)
@@ -41,9 +47,7 @@ function bytesFromBase64(str) {
     }
     return bytes;
   } catch (error) {
-    throw new Error(
-      `Failed to decode base64 string (length: ${str.length}): ${error.message}`,
-    );
+    throw new Error(`Failed to decode base64 string (length: ${str.length}): ${error.message}`);
   }
 }
 
@@ -59,6 +63,10 @@ class ChunkedSyncService {
     this.maxArrayChunkSize = 1000; // Max items per array chunk
     this.lastCorruptedDataClear = null; // Track when we last cleared corrupted data
     this.corruptedDataClearCooldown = 5 * 60 * 1000; // 5 minute cooldown between clears
+
+    // GitHub Issue #576 - Prevent concurrent sync operations
+    this.syncMutex = new SyncMutex(`ChunkedSync-${Date.now()}`);
+    this.decryptionFailures = new Map(); // Track failed decryption attempts
   }
 
   /**
@@ -127,9 +135,7 @@ class ChunkedSyncService {
 
     // Calculate chunk size based on data size and item count
     let chunkSize = this.maxArrayChunkSize;
-    const sampleSize = this.calculateSize(
-      array.slice(0, Math.min(10, array.length)),
-    );
+    const sampleSize = this.calculateSize(array.slice(0, Math.min(10, array.length)));
     const avgItemSize = sampleSize / Math.min(10, array.length);
 
     if (avgItemSize > 0) {
@@ -137,9 +143,7 @@ class ChunkedSyncService {
       chunkSize = Math.min(chunkSize, Math.max(100, maxItemsForSize));
     }
 
-    logger.debug(
-      `Chunking ${arrayName}: ${totalItems} items, ${chunkSize} per chunk`,
-    );
+    logger.debug(`Chunking ${arrayName}: ${totalItems} items, ${chunkSize} per chunk`);
 
     for (let i = 0; i < totalItems; i += chunkSize) {
       const chunkIndex = Math.floor(i / chunkSize);
@@ -196,360 +200,330 @@ class ChunkedSyncService {
    * Save large dataset to cloud using chunking
    */
   async saveToCloud(data, currentUser) {
-    if (!this.budgetId || !this.encryptionKey) {
-      throw new Error("Chunked sync not initialized");
-    }
+    return this.syncMutex.execute(async () => {
+      if (!this.budgetId || !this.encryptionKey) {
+        throw new Error("Chunked sync not initialized");
+      }
 
-    const db = this._getDb();
-    const startTime = Date.now();
+      const db = this._getDb();
+      const startTime = Date.now();
 
-    // Warn if currentUser is undefined - check for budgetId (primary), uid (Firebase), or id (local user)
-    if (!currentUser?.budgetId && !currentUser?.uid && !currentUser?.id) {
-      logger.warn(
-        "saveToCloud called with undefined currentUser identifier, using 'anonymous'",
-        {
+      // Warn if currentUser is undefined - check for budgetId (primary), uid (Firebase), or id (local user)
+      if (!currentUser?.budgetId && !currentUser?.uid && !currentUser?.id) {
+        logger.warn("saveToCloud called with undefined currentUser identifier, using 'anonymous'", {
           currentUser,
           hasCurrentUser: !!currentUser,
           currentUserKeys: currentUser ? Object.keys(currentUser) : [],
-          currentUserValues: currentUser
-            ? Object.values(currentUser).map((v) => typeof v)
-            : [],
+          currentUserValues: currentUser ? Object.values(currentUser).map((v) => typeof v) : [],
           // Show actual property names and values for debugging
           currentUserPropsDebug: currentUser
             ? Object.entries(currentUser).map(
-                ([k, v]) =>
-                  `${k}: ${typeof v === "string" ? v.substring(0, 20) : typeof v}`,
+                ([k, v]) => `${k}: ${typeof v === "string" ? v.substring(0, 20) : typeof v}`
               )
             : [],
           source: "chunkedSyncService",
-        },
-      );
-    }
-
-    try {
-      logger.info("Starting chunked save to cloud", {
-        dataSize: this.calculateSize(data),
-        userId:
-          currentUser?.budgetId ||
-          currentUser?.uid ||
-          currentUser?.id ||
-          "anonymous",
-      });
-
-      // Identify large arrays to chunk
-      const chunkedData = {};
-      const chunkMap = {};
-
-      for (const [key, value] of Object.entries(data)) {
-        if (Array.isArray(value) && value.length > 100) {
-          // Chunk large arrays
-          const arrayChunks = this.chunkArray(value, key);
-          Object.assign(chunkMap, arrayChunks);
-          chunkedData[key] = { _chunked: true, _originalSize: value.length };
-        } else {
-          // Keep small data in main document
-          chunkedData[key] = value;
-        }
-      }
-
-      // Create manifest
-      const manifest = this.createManifest(chunkMap, {
-        userId:
-          currentUser?.budgetId ||
-          currentUser?.uid ||
-          currentUser?.id ||
-          "anonymous",
-        userAgent: navigator.userAgent,
-        originalKeys: Object.keys(data),
-      });
-
-      // Encrypt and save manifest
-      const encryptedManifest = await encryptionUtils.encrypt(
-        this.safeStringify(manifest),
-        this.encryptionKey,
-      );
-
-      // Fix: encryption utility returns 'data' property, not 'encryptedData'
-      if (!encryptedManifest?.data || !encryptedManifest?.iv) {
-        logger.error("❌ Encryption failed - missing properties", {
-          encryptedManifest,
-          hasData: !!encryptedManifest?.data,
-          hasIv: !!encryptedManifest?.iv,
-          manifestKeys: encryptedManifest ? Object.keys(encryptedManifest) : [],
         });
-        throw new Error(
-          `Encryption failed: missing properties - hasData: ${!!encryptedManifest?.data}, hasIv: ${!!encryptedManifest?.iv}`,
-        );
       }
 
-      const mainDocument = {
-        ...chunkedData,
-        _manifest: {
-          encryptedData: {
-            data: base64FromBytes(encryptedManifest.data), // ✅ Fixed: use 'data' property
-            iv: base64FromBytes(encryptedManifest.iv),
-          },
-          timestamp: Date.now(),
-        },
-        _metadata: {
-          version: "2.0",
-          lastSync: Date.now(),
-          userId:
-            currentUser?.budgetId ||
-            currentUser?.uid ||
-            currentUser?.id ||
-            "anonymous",
-          chunkedKeys: Object.keys(data).filter(
-            (key) => Array.isArray(data[key]) && data[key].length > 100,
-          ),
-        },
-      };
+      try {
+        logger.info("Starting chunked save to cloud", {
+          dataSize: this.calculateSize(data),
+          userId: currentUser?.budgetId || currentUser?.uid || currentUser?.id || "anonymous",
+        });
 
-      // Save main document
-      await setDoc(doc(db, "budgets", this.budgetId), mainDocument);
+        // Identify large arrays to chunk
+        const chunkedData = {};
+        const chunkMap = {};
 
-      // Save chunks in batches
-      const chunkEntries = Object.entries(chunkMap);
-      const batchSize = 500; // Firestore batch limit
+        for (const [key, value] of Object.entries(data)) {
+          if (Array.isArray(value) && value.length > 100) {
+            // Chunk large arrays
+            const arrayChunks = this.chunkArray(value, key);
+            Object.assign(chunkMap, arrayChunks);
+            chunkedData[key] = { _chunked: true, _originalSize: value.length };
+          } else {
+            // Keep small data in main document
+            chunkedData[key] = value;
+          }
+        }
 
-      for (let i = 0; i < chunkEntries.length; i += batchSize) {
-        const batch = writeBatch(db);
-        const batchChunks = chunkEntries.slice(i, i + batchSize);
+        // Create manifest
+        const manifest = this.createManifest(chunkMap, {
+          userId: currentUser?.budgetId || currentUser?.uid || currentUser?.id || "anonymous",
+          userAgent: navigator.userAgent,
+          originalKeys: Object.keys(data),
+        });
 
-        for (const [chunkId, chunkData] of batchChunks) {
-          const encryptedChunk = await encryptionUtils.encrypt(
-            this.safeStringify(chunkData),
-            this.encryptionKey,
-          );
+        // Encrypt and save manifest
+        const encryptedManifest = await encryptionUtils.encrypt(
+          this.safeStringify(manifest),
+          this.encryptionKey
+        );
 
-          const chunkDocument = {
-            encryptedData: {
-              data: base64FromBytes(encryptedChunk.encryptedData),
-              iv: base64FromBytes(encryptedChunk.iv),
-            },
-            budgetId: this.budgetId,
-            chunkId,
-            timestamp: Date.now(),
-          };
-
-          batch.set(
-            doc(db, "budgets", this.budgetId, "chunks", chunkId),
-            chunkDocument,
+        // Fix: encryption utility returns 'data' property, not 'encryptedData'
+        if (!encryptedManifest?.data || !encryptedManifest?.iv) {
+          logger.error("❌ Encryption failed - missing properties", {
+            encryptedManifest,
+            hasData: !!encryptedManifest?.data,
+            hasIv: !!encryptedManifest?.iv,
+            manifestKeys: encryptedManifest ? Object.keys(encryptedManifest) : [],
+          });
+          throw new Error(
+            `Encryption failed: missing properties - hasData: ${!!encryptedManifest?.data}, hasIv: ${!!encryptedManifest?.iv}`
           );
         }
 
-        await batch.commit();
-        logger.debug(
-          `Saved batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(chunkEntries.length / batchSize)}`,
-        );
+        const mainDocument = {
+          ...chunkedData,
+          _manifest: {
+            encryptedData: {
+              data: base64FromBytes(encryptedManifest.data), // ✅ Fixed: use 'data' property
+              iv: base64FromBytes(encryptedManifest.iv),
+            },
+            timestamp: Date.now(),
+          },
+          _metadata: {
+            version: "2.0",
+            lastSync: Date.now(),
+            userId: currentUser?.budgetId || currentUser?.uid || currentUser?.id || "anonymous",
+            chunkedKeys: Object.keys(data).filter(
+              (key) => Array.isArray(data[key]) && data[key].length > 100
+            ),
+          },
+        };
+
+        // Save main document
+        await setDoc(doc(db, "budgets", this.budgetId), mainDocument);
+
+        // Save chunks in batches
+        const chunkEntries = Object.entries(chunkMap);
+        const batchSize = 500; // Firestore batch limit
+
+        for (let i = 0; i < chunkEntries.length; i += batchSize) {
+          const batch = writeBatch(db);
+          const batchChunks = chunkEntries.slice(i, i + batchSize);
+
+          for (const [chunkId, chunkData] of batchChunks) {
+            const encryptedChunk = await encryptionUtils.encrypt(
+              this.safeStringify(chunkData),
+              this.encryptionKey
+            );
+
+            const chunkDocument = {
+              encryptedData: {
+                data: base64FromBytes(encryptedChunk.encryptedData),
+                iv: base64FromBytes(encryptedChunk.iv),
+              },
+              budgetId: this.budgetId,
+              chunkId,
+              timestamp: Date.now(),
+            };
+
+            batch.set(doc(db, "budgets", this.budgetId, "chunks", chunkId), chunkDocument);
+          }
+
+          await batch.commit();
+          logger.debug(
+            `Saved batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(chunkEntries.length / batchSize)}`
+          );
+        }
+
+        const duration = Date.now() - startTime;
+        logger.info("✅ Chunked save completed successfully", {
+          totalChunks: chunkEntries.length,
+          duration: `${duration}ms`,
+          mainDocSize: this.calculateSize(mainDocument),
+        });
+
+        return { success: true };
+      } catch (error) {
+        logger.error("❌ Chunked save failed", error);
+        throw error;
       }
-
-      const duration = Date.now() - startTime;
-      logger.info("✅ Chunked save completed successfully", {
-        totalChunks: chunkEntries.length,
-        duration: `${duration}ms`,
-        mainDocSize: this.calculateSize(mainDocument),
-      });
-
-      return { success: true };
-    } catch (error) {
-      logger.error("❌ Chunked save failed", error);
-      throw error;
-    }
+    }, "saveToCloud");
   }
 
   /**
    * Load large dataset from cloud with chunk reassembly
    */
   async loadFromCloud() {
-    if (!this.budgetId || !this.encryptionKey) {
-      throw new Error("Chunked sync not initialized");
-    }
-
-    const db = this._getDb();
-    const startTime = Date.now();
-
-    try {
-      logger.info("Starting chunked load from cloud");
-
-      // Load main document
-      const mainDoc = await getDoc(doc(db, "budgets", this.budgetId));
-      if (!mainDoc.exists()) {
-        logger.info("No cloud data found");
-        return null;
+    return this.syncMutex.execute(async () => {
+      if (!this.budgetId || !this.encryptionKey) {
+        throw new Error("Chunked sync not initialized");
       }
 
-      const mainData = mainDoc.data();
-      const reconstructedData = { ...mainData };
+      const db = this._getDb();
+      const startTime = Date.now();
 
-      // Remove internal metadata
-      delete reconstructedData._manifest;
-      delete reconstructedData._metadata;
+      try {
+        logger.info("Starting chunked load from cloud");
 
-      // Check if we have chunks to reassemble
-      if (mainData._manifest) {
-        let manifest;
-        try {
-          // Validate manifest data before decryption
-          if (
-            !mainData._manifest?.encryptedData?.data ||
-            !mainData._manifest?.encryptedData?.iv
-          ) {
-            throw new Error("Missing encrypted manifest data structure");
-          }
+        // Load main document
+        const mainDoc = await getDoc(doc(db, "budgets", this.budgetId));
+        if (!mainDoc.exists()) {
+          logger.info("No cloud data found");
+          return null;
+        }
 
-          const encryptedDataBytes = bytesFromBase64(
-            mainData._manifest.encryptedData.data,
-          );
-          const ivBytes = bytesFromBase64(mainData._manifest.encryptedData.iv);
+        const mainData = mainDoc.data();
+        const reconstructedData = { ...mainData };
 
-          // Check if data is too small (common corruption indicator)
-          if (encryptedDataBytes.length < 16 || ivBytes.length < 12) {
-            throw new Error(
-              `Corrupted manifest data: encrypted=${encryptedDataBytes.length}bytes, iv=${ivBytes.length}bytes`,
+        // Remove internal metadata
+        delete reconstructedData._manifest;
+        delete reconstructedData._metadata;
+
+        // Check if we have chunks to reassemble
+        if (mainData._manifest) {
+          let manifest;
+          try {
+            // Validate manifest data before decryption
+            if (
+              !mainData._manifest?.encryptedData?.data ||
+              !mainData._manifest?.encryptedData?.iv
+            ) {
+              throw new Error("Missing encrypted manifest data structure");
+            }
+
+            const encryptedDataBytes = bytesFromBase64(mainData._manifest.encryptedData.data);
+            const ivBytes = bytesFromBase64(mainData._manifest.encryptedData.iv);
+
+            // Check if data is too small (common corruption indicator)
+            if (encryptedDataBytes.length < 16 || ivBytes.length < 12) {
+              throw new Error(
+                `Corrupted manifest data: encrypted=${encryptedDataBytes.length}bytes, iv=${ivBytes.length}bytes`
+              );
+            }
+
+            // Decrypt manifest
+            const manifestData = await encryptionUtils.decrypt(
+              {
+                data: encryptedDataBytes,
+                iv: ivBytes,
+              },
+              this.encryptionKey
             );
-          }
 
-          // Decrypt manifest
-          const manifestData = await encryptionUtils.decrypt(
-            {
-              data: encryptedDataBytes,
-              iv: ivBytes,
-            },
-            this.encryptionKey,
-          );
-
-          manifest = JSON.parse(manifestData);
-        } catch (decryptError) {
-          logger.error(
-            "❌ Failed to decrypt manifest - may be corrupted or key mismatch",
-            {
+            manifest = JSON.parse(manifestData);
+          } catch (decryptError) {
+            logger.error("❌ Failed to decrypt manifest - may be corrupted or key mismatch", {
               error: decryptError.message,
               errorType: decryptError.name,
               budgetId: this.budgetId.substring(0, 8) + "...",
-            },
+            });
+
+            // NEVER automatically clear data - this is too destructive and causes data loss
+            // Smart detection: avoid repeatedly trying to decrypt the same bad data
+            const errorSignature = `${this.budgetId}_${decryptError.message}`;
+            const now = Date.now();
+
+            // Track failed decryption attempts to avoid repeated attempts
+            if (!this.decryptionFailures) {
+              this.decryptionFailures = new Map();
+            }
+
+            const lastFailure = this.decryptionFailures.get(errorSignature);
+            const backoffTime = 5 * 60 * 1000; // 5 minutes
+
+            if (lastFailure && now - lastFailure < backoffTime) {
+              logger.info("🔇 Skipping repeated decryption attempt (in backoff period)");
+              return null; // Skip without logging noise
+            }
+
+            this.decryptionFailures.set(errorSignature, now);
+
+            // Check if we should trigger corruption recovery modal
+            this.checkForCorruptionPattern();
+
+            const isDemoMode =
+              this.budgetId?.includes("demo") || process.env.NODE_ENV === "development";
+
+            if (isDemoMode) {
+              logger.warn(
+                "⚠️ Decryption failed in dev mode - using demo Firebase config, NOT clearing cloud data"
+              );
+            } else {
+              logger.warn(
+                "⚠️ Decryption failed - possible key mismatch or corruption, NOT auto-clearing cloud data"
+              );
+              logger.warn(
+                "💡 Use the admin console to manually clear cloud data if corruption is confirmed"
+              );
+            }
+
+            return null; // Return null to trigger fresh upload from local data without clearing cloud
+          }
+          logger.debug("Loaded manifest", {
+            version: manifest.version,
+            totalChunks: manifest.metadata.totalChunks,
+          });
+
+          // Load all chunks
+          const chunksQuery = query(
+            collection(db, "budgets", this.budgetId, "chunks"),
+            where("budgetId", "==", this.budgetId)
           );
 
-          // NEVER automatically clear data - this is too destructive and causes data loss
-          // Smart detection: avoid repeatedly trying to decrypt the same bad data
-          const errorSignature = `${this.budgetId}_${decryptError.message}`;
-          const now = Date.now();
+          const chunksSnapshot = await getDocs(chunksQuery);
+          const chunks = {};
 
-          // Track failed decryption attempts to avoid repeated attempts
-          if (!this.decryptionFailures) {
-            this.decryptionFailures = new Map();
-          }
+          // Decrypt all chunks with individual error handling
+          for (const chunkDoc of chunksSnapshot.docs) {
+            const chunkData = chunkDoc.data();
+            try {
+              const decryptedChunk = await encryptionUtils.decrypt(
+                {
+                  data: bytesFromBase64(chunkData.encryptedData.data),
+                  iv: bytesFromBase64(chunkData.encryptedData.iv),
+                },
+                this.encryptionKey
+              );
 
-          const lastFailure = this.decryptionFailures.get(errorSignature);
-          const backoffTime = 5 * 60 * 1000; // 5 minutes
-
-          if (lastFailure && now - lastFailure < backoffTime) {
-            logger.info(
-              "🔇 Skipping repeated decryption attempt (in backoff period)",
-            );
-            return null; // Skip without logging noise
-          }
-
-          this.decryptionFailures.set(errorSignature, now);
-
-          // Check if we should trigger corruption recovery modal
-          this.checkForCorruptionPattern();
-
-          const isDemoMode =
-            this.budgetId?.includes("demo") ||
-            process.env.NODE_ENV === "development";
-
-          if (isDemoMode) {
-            logger.warn(
-              "⚠️ Decryption failed in dev mode - using demo Firebase config, NOT clearing cloud data",
-            );
-          } else {
-            logger.warn(
-              "⚠️ Decryption failed - possible key mismatch or corruption, NOT auto-clearing cloud data",
-            );
-            logger.warn(
-              "💡 Use the admin console to manually clear cloud data if corruption is confirmed",
-            );
-          }
-
-          return null; // Return null to trigger fresh upload from local data without clearing cloud
-        }
-        logger.debug("Loaded manifest", {
-          version: manifest.version,
-          totalChunks: manifest.metadata.totalChunks,
-        });
-
-        // Load all chunks
-        const chunksQuery = query(
-          collection(db, "budgets", this.budgetId, "chunks"),
-          where("budgetId", "==", this.budgetId),
-        );
-
-        const chunksSnapshot = await getDocs(chunksQuery);
-        const chunks = {};
-
-        // Decrypt all chunks with individual error handling
-        for (const chunkDoc of chunksSnapshot.docs) {
-          const chunkData = chunkDoc.data();
-          try {
-            const decryptedChunk = await encryptionUtils.decrypt(
-              {
-                data: bytesFromBase64(chunkData.encryptedData.data),
-                iv: bytesFromBase64(chunkData.encryptedData.iv),
-              },
-              this.encryptionKey,
-            );
-
-            chunks[chunkData.chunkId] = JSON.parse(decryptedChunk);
-          } catch (chunkDecryptError) {
-            logger.error(
-              "❌ Failed to decrypt chunk - skipping corrupted chunk",
-              {
+              chunks[chunkData.chunkId] = JSON.parse(decryptedChunk);
+            } catch (chunkDecryptError) {
+              logger.error("❌ Failed to decrypt chunk - skipping corrupted chunk", {
                 chunkId: chunkData.chunkId,
                 error: chunkDecryptError.message,
                 errorType: chunkDecryptError.name,
-              },
-            );
-            // Skip this chunk but continue with others
-            continue;
-          }
-        }
-
-        // Reassemble chunked arrays
-        for (const [key, value] of Object.entries(reconstructedData)) {
-          if (value && typeof value === "object" && value._chunked) {
-            // Find all chunks for this key
-            const keyChunks = Object.entries(chunks)
-              .filter(([chunkId]) => chunkId.startsWith(`${key}_chunk_`))
-              .sort(([a], [b]) => a.localeCompare(b));
-
-            // Reassemble array
-            const reassembledArray = [];
-            for (const [, chunkData] of keyChunks) {
-              if (Array.isArray(chunkData)) {
-                reassembledArray.push(...chunkData);
-              }
+              });
+              // Skip this chunk but continue with others
+              continue;
             }
+          }
 
-            reconstructedData[key] = reassembledArray;
-            logger.debug(
-              `Reassembled ${key}: ${reassembledArray.length} items`,
-            );
+          // Reassemble chunked arrays
+          for (const [key, value] of Object.entries(reconstructedData)) {
+            if (value && typeof value === "object" && value._chunked) {
+              // Find all chunks for this key
+              const keyChunks = Object.entries(chunks)
+                .filter(([chunkId]) => chunkId.startsWith(`${key}_chunk_`))
+                .sort(([a], [b]) => a.localeCompare(b));
+
+              // Reassemble array
+              const reassembledArray = [];
+              for (const [, chunkData] of keyChunks) {
+                if (Array.isArray(chunkData)) {
+                  reassembledArray.push(...chunkData);
+                }
+              }
+
+              reconstructedData[key] = reassembledArray;
+              logger.debug(`Reassembled ${key}: ${reassembledArray.length} items`);
+            }
           }
         }
+
+        const duration = Date.now() - startTime;
+        logger.info("✅ Chunked load completed successfully", {
+          duration: `${duration}ms`,
+          keys: Object.keys(reconstructedData),
+        });
+
+        return reconstructedData;
+      } catch (error) {
+        logger.error("❌ Chunked load failed", error);
+        throw error;
       }
-
-      const duration = Date.now() - startTime;
-      logger.info("✅ Chunked load completed successfully", {
-        duration: `${duration}ms`,
-        keys: Object.keys(reconstructedData),
-      });
-
-      return reconstructedData;
-    } catch (error) {
-      logger.error("❌ Chunked load failed", error);
-      throw error;
-    }
+    }, "loadFromCloud");
   }
 
   /**
@@ -574,7 +548,7 @@ class ChunkedSyncService {
       // Delete all chunks
       const chunksQuery = query(
         collection(db, "budgets", this.budgetId, "chunks"),
-        where("budgetId", "==", this.budgetId),
+        where("budgetId", "==", this.budgetId)
       );
 
       const snapshot = await getDocs(chunksQuery);
@@ -609,7 +583,7 @@ class ChunkedSyncService {
       // Delete all chunks first
       const chunksQuery = query(
         collection(db, "budgets", this.budgetId, "chunks"),
-        where("budgetId", "==", this.budgetId),
+        where("budgetId", "==", this.budgetId)
       );
 
       const snapshot = await getDocs(chunksQuery);
@@ -681,14 +655,11 @@ class ChunkedSyncService {
 
     // Trigger corruption recovery if we have multiple recent failures with "data too small" error
     if (recentFailures >= 2 && hasDataTooSmallError) {
-      logger.warn(
-        "🚨 Corruption pattern detected - triggering recovery modal",
-        {
-          recentFailures,
-          hasDataTooSmallError,
-          totalFailures: this.decryptionFailures.size,
-        },
-      );
+      logger.warn("🚨 Corruption pattern detected - triggering recovery modal", {
+        recentFailures,
+        hasDataTooSmallError,
+        totalFailures: this.decryptionFailures.size,
+      });
 
       // Emit event for UI to show corruption recovery modal
       this.triggerCorruptionRecovery();
