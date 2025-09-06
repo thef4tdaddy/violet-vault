@@ -1,5 +1,5 @@
 import React from "react";
-import { X } from "lucide-react";
+import { getIcon } from "../../utils";
 
 const TransferModal = ({
   isOpen,
@@ -23,7 +23,7 @@ const TransferModal = ({
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600"
           >
-            <X className="h-5 w-5" />
+                        {React.createElement(getIcon('X'), { className: "h-5 w-5" })}
           </button>
         </div>
 

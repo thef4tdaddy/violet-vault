@@ -1,18 +1,5 @@
 import React, { useState, useMemo } from "react";
-import {
-  TrendingUp,
-  TrendingDown,
-  BarChart3,
-  Download,
-  Calendar,
-  Filter,
-  Eye,
-  AlertCircle,
-  Target,
-  DollarSign,
-  Wallet,
-  PieChart,
-} from "lucide-react";
+import { getIcon } from "../../utils";
 import { useAnalytics } from "../../hooks/analytics/useAnalytics";
 import { useBudgetStore } from "../../stores/budgetStore";
 import ChartsAndAnalytics from "./ChartsAndAnalytics";
@@ -67,35 +54,35 @@ const AnalyticsDashboard = () => {
     {
       id: "overview",
       label: "Overview",
-      icon: BarChart3,
+      icon: getIcon('BarChart3'),
       color: "blue",
       description: "Financial summary and key metrics",
     },
     {
       id: "spending",
       label: "Spending Analysis",
-      icon: TrendingDown,
+      icon: getIcon('TrendingDown'),
       color: "red",
       description: "Detailed spending patterns and categories",
     },
     {
       id: "trends",
       label: "Trends & Forecasting",
-      icon: TrendingUp,
+      icon: getIcon('TrendingUp'),
       color: "green",
       description: "Historical trends and future projections",
     },
     {
       id: "performance",
       label: "Performance Monitor",
-      icon: Target,
+      icon: getIcon('Target'),
       color: "purple",
       description: "Real-time insights and alerts",
     },
     {
       id: "envelopes",
       label: "Envelope Analysis",
-      icon: Wallet,
+      icon: getIcon('Wallet'),
       color: "cyan",
       description: "Envelope health and utilization",
     },
@@ -182,7 +169,7 @@ const AnalyticsDashboard = () => {
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-6">
         <div className="flex items-center">
-          <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
+                    {React.createElement(getIcon('AlertCircle'), { className: "h-5 w-5 text-red-600 mr-2" })}
           <h3 className="text-red-900 font-medium">Analytics Error</h3>
         </div>
         <p className="text-red-700 mt-2">
@@ -209,7 +196,7 @@ const AnalyticsDashboard = () => {
         <div className="flex items-center gap-3 mt-4 lg:mt-0">
           {/* Time Filter */}
           <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-gray-500" />
+                        {React.createElement(getIcon('Calendar'), { className: "h-4 w-4 text-gray-500" })}
             <select
               value={timeFilter}
               onChange={(e) => setTimeFilter(e.target.value)}
@@ -228,7 +215,7 @@ const AnalyticsDashboard = () => {
             onClick={() => setShowExportModal(true)}
             className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 border-2 border-black flex items-center gap-2 text-sm"
           >
-            <Download className="h-4 w-4" />
+                        {React.createElement(getIcon('Download'), { className: "h-4 w-4" })}
             Export
           </button>
         </div>

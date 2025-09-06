@@ -1,5 +1,5 @@
 import React from "react";
-import { X, Lock, Unlock } from "lucide-react";
+import { getIcon } from "../../utils";
 import EditLockIndicator from "../ui/EditLockIndicator";
 import { ACCOUNT_TYPES, ACCOUNT_COLORS } from "../../utils/accounts";
 
@@ -45,12 +45,12 @@ const AccountFormModal = ({
               >
                 {isOwnLock ? (
                   <>
-                    <Unlock className="h-3 w-3 mr-1" />
+                                        {React.createElement(getIcon('Unlock'), { className: "h-3 w-3 mr-1" })}
                     Editing
                   </>
                 ) : (
                   <>
-                    <Lock className="h-3 w-3 mr-1" />
+                                        {React.createElement(getIcon('Lock'), { className: "h-3 w-3 mr-1" })}
                     {lock?.userName}
                   </>
                 )}
@@ -68,7 +68,7 @@ const AccountFormModal = ({
                   onClick={breakLock}
                   className="bg-red-100 hover:bg-red-200 text-red-800 px-2 py-1 rounded-lg text-xs font-medium transition-colors flex items-center"
                 >
-                  <Unlock className="h-3 w-3 mr-1" />
+                                      {React.createElement(getIcon('Unlock'), { className: "h-3 w-3 mr-1" })}
                   Break
                 </button>
               )}
@@ -76,7 +76,7 @@ const AccountFormModal = ({
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600"
             >
-              <X className="h-5 w-5" />
+                            {React.createElement(getIcon('X'), { className: "h-5 w-5" })}
             </button>
           </div>
         </div>
