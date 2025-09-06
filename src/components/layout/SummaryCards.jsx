@@ -170,7 +170,7 @@ const SummaryCards = () => {
 
 const SummaryCard = memo(
   ({
-    icon: Icon,
+    icon: _Icon,
     label,
     value,
     color,

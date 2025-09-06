@@ -123,7 +123,7 @@ const BillManager = ({
   });
 
   // Generate summary cards from totals
-  const summaryCards = getSummaryCards(totals);
+  const _summaryCards = getSummaryCards(totals);
 
   // Edit lock for collaborative editing
   const { budgetId, currentUser } = useAuth();

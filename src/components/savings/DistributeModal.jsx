@@ -21,7 +21,7 @@ const DistributeModal = ({
     if (isOpen) {
       initializeDistribution();
     }
-  }, [isOpen, savingsGoals]);
+  }, [isOpen, savingsGoals, initializeDistribution]);
 
   const initializeDistribution = () => {
     const initialDistribution = {};

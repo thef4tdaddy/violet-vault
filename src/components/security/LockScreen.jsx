@@ -88,7 +88,7 @@ const LockScreen = () => {
           await new Promise((resolve) => setTimeout(resolve, 2000));
         }
       }
-    } catch (error) {
+    } catch {
       setError("Failed to unlock application");
       setPassword("");
     } finally {
@@ -104,7 +104,7 @@ const LockScreen = () => {
 
   if (!isLocked) return null;
 
-  const handleReset = async () => {
+  const _handleReset = async () => {
     const confirmed = await confirm({
       title: "Reset Session",
       message:

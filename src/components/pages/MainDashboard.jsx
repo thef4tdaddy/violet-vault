@@ -56,7 +56,7 @@ const Dashboard = ({ setActiveView }) => {
   const {
     totalEnvelopeBalance,
     totalSavingsBalance,
-    safeUnassignedCash,
+    _safeUnassignedCash,
     totalVirtualBalance,
     difference,
     isBalanced,
@@ -97,7 +97,7 @@ const Dashboard = ({ setActiveView }) => {
   };
 
   const onReconcileTransaction = () => {
-    const success = handleReconcileTransaction(newTransaction, () => {
+    const _success = handleReconcileTransaction(newTransaction, () => {
       resetNewTransaction();
       closeReconcileModal();
     });

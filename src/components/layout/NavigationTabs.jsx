@@ -161,7 +161,7 @@ const NavigationTabs = memo(() => {
   );
 });
 
-const NavButton = memo(({ active, to, icon: Icon, label, viewKey }) => (
+const NavButton = memo(({ active, to, icon: _Icon, label, viewKey }) => (
   <Link
     to={to}
     aria-current={active ? "page" : undefined}
