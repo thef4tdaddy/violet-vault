@@ -1,11 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  X,
-  ChevronRight,
-  ChevronLeft,
-  CheckCircle,
-  Target,
-} from "lucide-react";
+import { getIcon } from "../../utils/icons";
 import useOnboardingStore from "../../stores/ui/onboardingStore";
 import logger from "../../utils/common/logger";
 
@@ -317,7 +311,7 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
           {/* Header */}
           <div className="flex justify-between items-start mb-4">
             <div className="flex items-center space-x-2">
-              <Target className="w-5 h-5 text-purple-500" />
+              {React.createElement(getIcon('Target'), { className: "w-5 h-5 text-purple-500" })}
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 Step {currentStep + 1} of {tutorialSteps.length}
               </span>
@@ -327,7 +321,7 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
               className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
               title="Close tutorial"
             >
-              <X className="w-5 h-5" />
+              {React.createElement(getIcon('X'), { className: "w-5 h-5" })}
             </button>
           </div>
 
@@ -359,7 +353,7 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
                 disabled={currentStep === 0}
                 className="flex items-center space-x-1 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <ChevronLeft className="w-4 h-4" />
+                {React.createElement(getIcon('ChevronLeft'), { className: "w-4 h-4" })}
                 <span>Back</span>
               </button>
 
@@ -378,11 +372,10 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
               <span>
                 {currentStep === tutorialSteps.length - 1 ? "Finish" : "Next"}
               </span>
-              {currentStep === tutorialSteps.length - 1 ? (
-                <CheckCircle className="w-4 h-4" />
-              ) : (
-                <ChevronRight className="w-4 h-4" />
-              )}
+              {currentStep === tutorialSteps.length - 1 ? 
+                React.createElement(getIcon('CheckCircle'), { className: "w-4 h-4" }) : 
+                React.createElement(getIcon('ChevronRight'), { className: "w-4 h-4" })
+              }
             </button>
           </div>
         </div>

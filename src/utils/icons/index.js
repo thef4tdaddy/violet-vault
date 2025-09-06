@@ -39,6 +39,7 @@ import {
   Star,
   Heart,
   Tag,
+  Target,
   
   // Financial & Business
   DollarSign,
@@ -191,6 +192,7 @@ export const ICON_REGISTRY = {
   'star': Star,
   'heart': Heart,
   'Tag': Tag,
+  'Target': Target,
   
   // Financial & Business
   'dollar-sign': DollarSign,
