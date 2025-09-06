@@ -141,7 +141,6 @@ import {
   
   // Actions
   Copy,
-  Paste,
   Save,
   Share,
   ExternalLink,
@@ -293,7 +292,6 @@ export const ICON_REGISTRY = {
   
   // Actions
   'Copy': Copy,
-  'Paste': Paste,
   'Save': Save,
   'Share': Share,
   'ExternalLink': ExternalLink,

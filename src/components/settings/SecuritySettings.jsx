@@ -1,5 +1,5 @@
 import React from "react";
-import { Shield, X } from "lucide-react";
+import { getIcon } from "../../utils/icons";
 import { useSecuritySettingsLogic } from "../../hooks/security/useSecuritySettingsLogic";
 import SecurityStatusSection from "./sections/SecurityStatusSection";
 import AutoLockSettingsSection from "./sections/AutoLockSettingsSection";
@@ -32,7 +32,7 @@ const SecuritySettings = ({ isOpen, onClose }) => {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
                 <div className="glassmorphism rounded-full p-3 bg-blue-500/20 border border-blue-400">
-                  <Shield className="h-8 w-8 text-blue-600" />
+                  {React.createElement(getIcon('Shield'), { className: "h-8 w-8 text-blue-600" })}
                 </div>
                 <div>
                   <h3 className="text-2xl font-black text-black uppercase tracking-wide">
@@ -47,7 +47,7 @@ const SecuritySettings = ({ isOpen, onClose }) => {
                 onClick={onClose}
                 className="text-gray-400 hover:text-gray-600 glassmorphism backdrop-blur-sm rounded-full p-3 shadow-lg hover:shadow-xl transition-all border-2 border-black"
               >
-                <X className="h-6 w-6" />
+                {React.createElement(getIcon('x'), { className: "h-6 w-6" })}
               </button>
             </div>
 
