@@ -298,12 +298,7 @@ jobs:
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     comment_id: comment.id,
-                    body: `<details>
-<summary>📊 Previous Lint Analysis (${new Date(comment.created_at).toLocaleDateString()})</summary>
-
-${comment.body}
-
-</details>`
+                    body: `<details><summary>📊 Previous Lint Analysis (${new Date(comment.created_at).toLocaleDateString()})</summary>\n\n${comment.body}\n\n</details>`
                   });
                   console.log(`✅ Minimized previous comment #${comment.id}`);
                 } catch (updateError) {
