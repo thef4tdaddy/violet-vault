@@ -311,7 +311,7 @@ export const calculateDebtStats = (debts = []) => {
     return (
       sum +
       (debt.paymentHistory || []).reduce((historySum, payment) => {
-        return historySum + (payment.interestAmount || 0);
+        return historySum + (payment.interestPortion || 0);
       }, 0)
     );
   }, 0);
