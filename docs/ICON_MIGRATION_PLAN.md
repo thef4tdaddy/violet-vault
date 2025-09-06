@@ -4,6 +4,12 @@
 Systematic migration of 201 files from direct `lucide-react` imports to centralized icon system.
 **Goal**: Eliminate "Icon is not defined" production errors.
 
+## 🚨 ESLint Rule Now Active
+**As of this plan**: ESLint now **blocks** new direct `lucide-react` imports to prevent regressions during migration. This means:
+- ✅ **No new violations** can be introduced
+- ⚠️ **Existing files will show ESLint errors** until migrated
+- 🔧 **Migration is required** to pass linting checks
+
 ## Phase 1: Critical System Files (Priority 1) - 5 files
 **Target**: Components that load immediately on app start
 
@@ -90,6 +96,34 @@ src/hooks/settings/useSettingsDashboard.js
 ### 4.2 Receipt & Receipt Processing (20 files)
 ### 4.3 Remaining Utility Components (27 files)
 
+## ESLint Rule Enforcement
+
+### Current Rule (Active)
+ESLint now **blocks** direct `lucide-react` imports with error:
+```
+"Use centralized icon system instead of direct lucide-react imports. 
+Import icons from '@/utils/icons' or use { getIcon, renderIcon } from '@/utils'. 
+See docs/ICON_MIGRATION_PLAN.md for details."
+```
+
+### Allowed Exceptions
+Only these files can import `lucide-react` directly:
+- `src/utils/icons/index.js` - Centralized icon system
+- `src/utils/billIcons/**/*.js` - Legacy compatibility layer
+- `src/utils/receipts/receiptHelpers.jsx` - Receipt utilities
+
+### ESLint Validation Commands
+```bash
+# Check for ESLint violations
+npx eslint src/ --format=compact | grep "lucide-react"
+
+# Show specific files violating the rule
+npx eslint src/ --format=compact | grep "no-restricted-imports" | grep "lucide-react"
+
+# Count remaining violations
+npx eslint src/ --format=json | jq '.[] | select(.messages[].ruleId == "no-restricted-imports") | .filePath' | wc -l
+```
+
 ## Migration Commands
 
 ### Quick Search & Replace Patterns
@@ -134,9 +168,14 @@ npm run build 2>&1 | grep -i "icon.*not.*defined"
 
 ### Phase 4 Complete
 - [ ] All 50 remaining files migrated
-- [ ] Zero direct `lucide-react` imports outside utils
-- [ ] ESLint rule added to prevent regressions
+- [ ] Zero direct `lucide-react` imports outside allowed exceptions
+- [ ] **ESLint rule active and enforcing** (no violations when running `npx eslint src/`)
 - [ ] Documentation updated
+
+### ESLint Enforcement Validation
+- [ ] `npx eslint src/ | grep "lucide-react"` returns no violations
+- [ ] Only allowed files (`src/utils/icons/`, `src/utils/billIcons/`, receipt helpers) import lucide-react
+- [ ] All components use centralized icon system
 
 ## Testing Strategy
 

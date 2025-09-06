@@ -98,6 +98,7 @@ export default [
       ],
 
       // Block React Context usage (Issue #491 enforcement)
+      // Block direct lucide-react imports (Issue #575 enforcement)
       "no-restricted-imports": [
         "error",
         {
@@ -107,6 +108,11 @@ export default [
               importNames: ["createContext", "useContext"],
               message:
                 "Avoid React Context. For data: use TanStack Query + Dexie (see hooks in src/hooks/). For UI/auth state: use Zustand stores in src/stores/.",
+            },
+            {
+              name: "lucide-react",
+              message:
+                "Use centralized icon system instead of direct lucide-react imports. Import icons from '@/utils/icons' or use { getIcon, renderIcon } from '@/utils'. See docs/ICON_MIGRATION_PLAN.md for details.",
             },
           ],
         },
@@ -257,6 +263,17 @@ export default [
     files: ["**/logger.js", "**/errorTrackingService.js"],
     rules: {
       "no-console": "off", // Logger utility and error tracking service can use console
+    },
+  },
+  {
+    // Allow direct lucide-react imports only in centralized icon utilities (Issue #575)
+    files: [
+      "src/utils/icons/index.js", // Centralized icon system
+      "src/utils/billIcons/**/*.js", // Legacy bill icon utilities (compatibility layer)
+      "src/utils/receipts/receiptHelpers.jsx", // Receipt utilities using icons
+    ],
+    rules: {
+      "no-restricted-imports": "off", // These files can import lucide-react directly
     },
   },
 ];
