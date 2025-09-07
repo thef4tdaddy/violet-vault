@@ -4,6 +4,21 @@
       "GENERATE_SOURCEMAP": "true"
     }
   },
+  "github": {
+    "deployments": {
+      "develop": {
+        "env": {
+          "VITE_NODE_ENV": "development"
+        },
+        "buildCommand": "npm ci && VITE_NODE_ENV=development npm run build"
+      },
+      "main": {
+        "env": {
+          "VITE_NODE_ENV": "production"
+        }
+      }
+    }
+  },
   "buildCommand": "npm ci && npm run build",
   "installCommand": "npm ci",
   "headers": [
