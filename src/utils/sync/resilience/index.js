@@ -45,7 +45,7 @@ export const createSyncResilience = (options = {}) => {
      */
     async execute(operation, operationType = "sync", operationName = "unknown") {
       // Queue the operation for debouncing
-      return await syncQueue.enqueue(operationType, async (data) => {
+      return await syncQueue.enqueue(operationType, async (_data) => {
         // Execute through circuit breaker
         return await circuitBreaker.execute(async () => {
           // Execute with retry logic
