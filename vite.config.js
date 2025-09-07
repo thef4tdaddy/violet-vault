@@ -63,7 +63,8 @@ export default defineConfig(() => {
   // Enable debug mode for develop branch deployments
   const isDevelopBranch = gitInfo.branch === 'develop';
   const isProduction = process.env.NODE_ENV === 'production';
-  const enableDebugBuild = isDevelopBranch && isProduction;
+  const viteNodeEnv = process.env.VITE_NODE_ENV;
+  const enableDebugBuild = (isDevelopBranch && isProduction) || (viteNodeEnv === 'development');
 
   return {
     plugins: [react(), tailwindcss()],
