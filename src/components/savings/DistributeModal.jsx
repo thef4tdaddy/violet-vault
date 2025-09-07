@@ -1,5 +1,5 @@
 // components/savings/DistributeModal.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { X, Gift } from "lucide-react";
 import {
   SAVINGS_PRIORITIES,
@@ -16,21 +16,21 @@ const DistributeModal = ({
   const [distribution, setDistribution] = useState({});
   const [totalToDistribute, setTotalToDistribute] = useState("");
 
-  // Initialize distribution when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      initializeDistribution();
-    }
-  }, [isOpen, savingsGoals, initializeDistribution]);
-
-  const initializeDistribution = () => {
+  const initializeDistribution = useCallback(() => {
     const initialDistribution = {};
     savingsGoals.forEach((goal) => {
       initialDistribution[goal.id] = "";
     });
     setDistribution(initialDistribution);
     setTotalToDistribute("");
-  };
+  }, [savingsGoals]);
+
+  // Initialize distribution when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      initializeDistribution();
+    }
+  }, [isOpen, initializeDistribution]);
 
   const calculateDistributionTotal = () => {
     return Object.values(distribution).reduce((sum, amount) => {
