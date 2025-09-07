@@ -104,7 +104,7 @@ export const formatLastChecked = (lastChecked) => {
     if (diffHours < 24) return `${diffHours} hours ago`;
 
     return date.toLocaleDateString();
-  } catch (error) {
+  } catch {
     return "Invalid date";
   }
 };
@@ -139,8 +139,7 @@ export const requiresImmediateAttention = (syncStatus) => {
  */
 export const hasRecoveryActions = () => {
   return (
-    typeof window !== "undefined" &&
-    (window.runMasterSyncValidation || window.forceCloudDataReset)
+    typeof window !== "undefined" && (window.runMasterSyncValidation || window.forceCloudDataReset)
   );
 };
 
@@ -168,7 +167,7 @@ export const formatRecoveryResult = (result) => {
 /**
  * Get appropriate action button style based on status
  */
-export const getActionButtonStyle = (actionType, syncStatus) => {
+export const getActionButtonStyle = (actionType, _syncStatus) => {
   const baseStyle =
     "px-3 py-2 text-sm rounded-lg border-2 border-black shadow-md hover:shadow-lg transition-all font-bold";
 

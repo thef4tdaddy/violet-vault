@@ -5,14 +5,14 @@ import { getIcon } from "../../../utils/icons";
  * Security logging section with events display and management
  * Extracted from SecuritySettings.jsx with UI standards compliance
  */
-const SecurityLoggingSection = ({ 
+const SecurityLoggingSection = ({
   securitySettings,
   securityEvents,
   showEvents,
   handleSettingChange,
   toggleEventsDisplay,
   exportSecurityEvents,
-  showClearConfirmDialog
+  showClearConfirmDialog,
 }) => {
   // Security event item component
   const SecurityEventItem = ({ event }) => {
@@ -30,12 +30,12 @@ const SecurityLoggingSection = ({
       <div className="glassmorphism p-3 rounded-lg border border-gray-300 bg-white/60 shadow-sm">
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            <span className={`font-black text-xs uppercase tracking-wide px-2 py-1 rounded-full border ${getEventTypeColor(event.type)}`}>
+            <span
+              className={`font-black text-xs uppercase tracking-wide px-2 py-1 rounded-full border ${getEventTypeColor(event.type)}`}
+            >
               {event.type}
             </span>
-            <p className="text-purple-800 mt-2 text-sm font-medium">
-              {event.description}
-            </p>
+            <p className="text-purple-800 mt-2 text-sm font-medium">{event.description}</p>
           </div>
           <span className="text-xs font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded border border-gray-300 ml-3">
             {new Date(event.timestamp).toLocaleTimeString()}
@@ -49,7 +49,7 @@ const SecurityLoggingSection = ({
     <div className="glassmorphism rounded-2xl p-6 shadow-xl border-2 border-black bg-green-50/60 backdrop-blur-3xl">
       <h4 className="font-black text-black mb-4 flex items-center gap-3 text-lg">
         <div className="glassmorphism rounded-full p-2 bg-green-500/20 border border-green-400">
-          {React.createElement(getIcon('Eye'), { className: "h-5 w-5 text-green-600" })}
+          {React.createElement(getIcon("Eye"), { className: "h-5 w-5 text-green-600" })}
         </div>
         SECURITY LOGGING
       </h4>
@@ -67,7 +67,10 @@ const SecurityLoggingSection = ({
           </div>
           <button
             onClick={() =>
-              handleSettingChange("securityLoggingEnabled", !securitySettings.securityLoggingEnabled)
+              handleSettingChange(
+                "securityLoggingEnabled",
+                !securitySettings.securityLoggingEnabled
+              )
             }
             className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 shadow-lg border-2 border-black ${
               securitySettings.securityLoggingEnabled
@@ -92,26 +95,25 @@ const SecurityLoggingSection = ({
                 onClick={toggleEventsDisplay}
                 className="flex items-center gap-2 px-4 py-2 glassmorphism rounded-lg border-2 border-black shadow-md hover:shadow-lg transition-all bg-blue-500/20 hover:bg-blue-500/30 font-bold text-blue-700"
               >
-                {showEvents ? 
-                  React.createElement(getIcon('EyeOff'), { className: "h-4 w-4" }) : 
-                  React.createElement(getIcon('Eye'), { className: "h-4 w-4" })
-                }
+                {showEvents
+                  ? React.createElement(getIcon("EyeOff"), { className: "h-4 w-4" })
+                  : React.createElement(getIcon("Eye"), { className: "h-4 w-4" })}
                 {showEvents ? "HIDE" : "VIEW"} EVENTS ({securityEvents.length})
               </button>
-              
+
               <button
                 onClick={exportSecurityEvents}
                 className="flex items-center gap-2 px-4 py-2 glassmorphism rounded-lg border-2 border-black shadow-md hover:shadow-lg transition-all bg-green-500/20 hover:bg-green-500/30 font-bold text-green-700"
               >
-                {React.createElement(getIcon('Download'), { className: "h-4 w-4" })}
+                {React.createElement(getIcon("Download"), { className: "h-4 w-4" })}
                 EXPORT
               </button>
-              
+
               <button
                 onClick={showClearConfirmDialog}
                 className="flex items-center gap-2 px-4 py-2 glassmorphism rounded-lg border-2 border-black shadow-md hover:shadow-lg transition-all bg-red-500/20 hover:bg-red-500/30 font-bold text-red-700"
               >
-                {React.createElement(getIcon('Trash2'), { className: "h-4 w-4" })}
+                {React.createElement(getIcon("Trash2"), { className: "h-4 w-4" })}
                 CLEAR
               </button>
             </div>
@@ -123,7 +125,9 @@ const SecurityLoggingSection = ({
                   {securityEvents.length === 0 ? (
                     <div className="text-center py-8">
                       <div className="glassmorphism rounded-full p-4 bg-gray-100/80 border border-gray-300 inline-block mb-3">
-                        {React.createElement(getIcon('Eye'), { className: "h-8 w-8 text-gray-400" })}
+                        {React.createElement(getIcon("Eye"), {
+                          className: "h-8 w-8 text-gray-400",
+                        })}
                       </div>
                       <p className="text-sm font-bold text-gray-600 uppercase tracking-wide">
                         📊 No Security Events Recorded Yet

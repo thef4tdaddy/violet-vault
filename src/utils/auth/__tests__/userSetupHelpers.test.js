@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
-import { 
-  USER_COLORS, 
-  validateSetupData, 
-  getStepTitle, 
-  getStepSubtitle 
+import {
+  USER_COLORS,
+  validateSetupData,
+  getStepTitle,
+  getStepSubtitle,
 } from "../userSetupHelpers.jsx";
 
 describe("userSetupHelpers", () => {
@@ -24,7 +24,7 @@ describe("userSetupHelpers", () => {
     });
 
     it("should include default purple color", () => {
-      const purpleColor = USER_COLORS.find(color => color.value === "#a855f7");
+      const purpleColor = USER_COLORS.find((color) => color.value === "#a855f7");
       expect(purpleColor).toBeTruthy();
       expect(purpleColor.name).toBe("Purple");
     });
@@ -35,11 +35,11 @@ describe("userSetupHelpers", () => {
       const validData = {
         masterPassword: "password123",
         userName: "John Doe",
-        userColor: "#a855f7"
+        userColor: "#a855f7",
       };
 
       const result = validateSetupData(validData);
-      
+
       expect(result.isValid).toBe(true);
       expect(result.errors).toHaveLength(0);
     });
@@ -48,11 +48,11 @@ describe("userSetupHelpers", () => {
       const invalidData = {
         masterPassword: "",
         userName: "John Doe",
-        userColor: "#a855f7"
+        userColor: "#a855f7",
       };
 
       const result = validateSetupData(invalidData);
-      
+
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain("Master password is required");
     });
@@ -61,11 +61,11 @@ describe("userSetupHelpers", () => {
       const invalidData = {
         masterPassword: "   ",
         userName: "John Doe",
-        userColor: "#a855f7"
+        userColor: "#a855f7",
       };
 
       const result = validateSetupData(invalidData);
-      
+
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain("Master password is required");
     });
@@ -74,11 +74,11 @@ describe("userSetupHelpers", () => {
       const invalidData = {
         masterPassword: "password123",
         userName: "",
-        userColor: "#a855f7"
+        userColor: "#a855f7",
       };
 
       const result = validateSetupData(invalidData);
-      
+
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain("User name is required");
     });
@@ -87,11 +87,11 @@ describe("userSetupHelpers", () => {
       const invalidData = {
         masterPassword: "password123",
         userName: "John Doe",
-        userColor: ""
+        userColor: "",
       };
 
       const result = validateSetupData(invalidData);
-      
+
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain("User color is required");
     });
@@ -100,11 +100,11 @@ describe("userSetupHelpers", () => {
       const invalidData = {
         masterPassword: "",
         userName: "",
-        userColor: ""
+        userColor: "",
       };
 
       const result = validateSetupData(invalidData);
-      
+
       expect(result.isValid).toBe(false);
       expect(result.errors).toHaveLength(3);
     });
@@ -114,7 +114,7 @@ describe("userSetupHelpers", () => {
     it("should return welcome back message for returning user", () => {
       const title = getStepTitle(1, true, "John");
       const { container } = render(title);
-      
+
       expect(container.textContent).toContain("WELCOME BACK");
       expect(container.textContent).toContain("JOHN");
     });
@@ -122,14 +122,14 @@ describe("userSetupHelpers", () => {
     it("should return get started message for step 1", () => {
       const title = getStepTitle(1, false, "");
       const { container } = render(title);
-      
+
       expect(container.textContent).toContain("GET STARTED");
     });
 
     it("should return setup profile message for step 2", () => {
       const title = getStepTitle(2, false, "");
       const { container } = render(title);
-      
+
       expect(container.textContent).toContain("SET UP PROFILE");
     });
   });
@@ -138,21 +138,21 @@ describe("userSetupHelpers", () => {
     it("should return password prompt for returning user", () => {
       const subtitle = getStepSubtitle(1, true);
       const { container } = render(subtitle);
-      
+
       expect(container.textContent).toContain("ENTER YOUR PASSWORD TO CONTINUE");
     });
 
     it("should return password creation prompt for step 1", () => {
       const subtitle = getStepSubtitle(1, false);
       const { container } = render(subtitle);
-      
+
       expect(container.textContent).toContain("CREATE A SECURE MASTER PASSWORD");
     });
 
     it("should return profile setup prompt for step 2", () => {
       const subtitle = getStepSubtitle(2, false);
       const { container } = render(subtitle);
-      
+
       expect(container.textContent).toContain("CHOOSE YOUR NAME AND COLOR");
     });
   });

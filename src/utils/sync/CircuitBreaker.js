@@ -3,7 +3,7 @@ import logger from "../common/logger";
 /**
  * CircuitBreaker - Prevents cascade failures in sync operations
  * Implements circuit breaker pattern to protect against repeated failures
- * 
+ *
  * Addresses GitHub Issue #576 - Cloud Sync Reliability Improvements (Phase 2)
  */
 export class CircuitBreaker {
@@ -12,8 +12,8 @@ export class CircuitBreaker {
     this.failureThreshold = options.failureThreshold || 5;
     this.timeout = options.timeout || 60000; // 1 minute
     this.monitoringPeriod = options.monitoringPeriod || 60000; // 1 minute
-    
-    this.state = 'CLOSED'; // CLOSED, OPEN, HALF_OPEN
+
+    this.state = "CLOSED"; // CLOSED, OPEN, HALF_OPEN
     this.failures = 0;
     this.lastFailureTime = null;
     this.nextAttempt = null;
@@ -26,8 +26,8 @@ export class CircuitBreaker {
    */
   async execute(operation, operationName = "unknown") {
     this.totalRequests++;
-    
-    if (this.state === 'OPEN') {
+
+    if (this.state === "OPEN") {
       return this._handleOpenCircuit(operationName);
     }
 
@@ -52,7 +52,7 @@ export class CircuitBreaker {
       totalRequests: this.totalRequests,
       failureThreshold: this.failureThreshold,
       timeUntilRetry: this._getTimeUntilRetry(),
-      isHealthy: this.state === 'CLOSED',
+      isHealthy: this.state === "CLOSED",
     };
   }
 
@@ -74,11 +74,11 @@ export class CircuitBreaker {
       this._transitionToHalfOpen();
       return null; // Allow caller to retry
     }
-    
+
     const error = new Error(
       `Circuit breaker is OPEN. Next attempt in ${this._getTimeUntilRetry()}ms`
     );
-    error.code = 'CIRCUIT_BREAKER_OPEN';
+    error.code = "CIRCUIT_BREAKER_OPEN";
     throw error;
   }
 
@@ -88,7 +88,7 @@ export class CircuitBreaker {
    */
   async _executeWithMonitoring(operation, operationName) {
     const startTime = Date.now();
-    
+
     try {
       return await operation();
     } finally {
@@ -103,8 +103,8 @@ export class CircuitBreaker {
    */
   _onSuccess(operationName) {
     this.successCount++;
-    
-    if (this.state === 'HALF_OPEN') {
+
+    if (this.state === "HALF_OPEN") {
       logger.info(`✅ ${this.name}: ${operationName} succeeded, closing circuit`);
       this._transitionToClosed();
     } else if (this.failures > 0) {
@@ -120,11 +120,14 @@ export class CircuitBreaker {
   _onFailure(error, operationName) {
     this.failures++;
     this.lastFailureTime = Date.now();
-    
-    logger.warn(`⚠️ ${this.name}: ${operationName} failed (${this.failures}/${this.failureThreshold})`, {
-      error: error.message,
-      state: this.state,
-    });
+
+    logger.warn(
+      `⚠️ ${this.name}: ${operationName} failed (${this.failures}/${this.failureThreshold})`,
+      {
+        error: error.message,
+        state: this.state,
+      }
+    );
 
     if (this.failures >= this.failureThreshold) {
       this._transitionToOpen(operationName);
@@ -136,7 +139,7 @@ export class CircuitBreaker {
    * @private
    */
   _transitionToClosed() {
-    this.state = 'CLOSED';
+    this.state = "CLOSED";
     this.failures = 0;
     this.nextAttempt = null;
     logger.debug(`🔵 ${this.name}: Circuit transitioned to CLOSED`);
@@ -147,9 +150,9 @@ export class CircuitBreaker {
    * @private
    */
   _transitionToOpen(operationName) {
-    this.state = 'OPEN';
+    this.state = "OPEN";
     this.nextAttempt = Date.now() + this.timeout;
-    
+
     logger.error(`🔴 ${this.name}: Circuit opened due to ${operationName} failures`, {
       failures: this.failures,
       threshold: this.failureThreshold,
@@ -162,7 +165,7 @@ export class CircuitBreaker {
    * @private
    */
   _transitionToHalfOpen() {
-    this.state = 'HALF_OPEN';
+    this.state = "HALF_OPEN";
     logger.debug(`🟡 ${this.name}: Circuit transitioned to HALF_OPEN`);
   }
 
@@ -171,7 +174,7 @@ export class CircuitBreaker {
    * @private
    */
   _getTimeUntilRetry() {
-    if (this.state !== 'OPEN' || !this.nextAttempt) {
+    if (this.state !== "OPEN" || !this.nextAttempt) {
       return 0;
     }
     return Math.max(0, this.nextAttempt - Date.now());

@@ -35,11 +35,7 @@ const TransactionSplitter = ({
   // Handle cancellation
   const handleCancel = () => {
     if (splitter.hasUnsavedChanges) {
-      if (
-        window.confirm(
-          "You have unsaved changes. Are you sure you want to cancel?",
-        )
-      ) {
+      if (window.confirm("You have unsaved changes. Are you sure you want to cancel?")) {
         onClose?.();
       }
     } else {

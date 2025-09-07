@@ -50,10 +50,7 @@ export const useUserSetup = (onSetupComplete) => {
     return Promise.race([
       asyncFn(),
       new Promise((_, reject) =>
-        setTimeout(
-          () => reject(new Error(`Operation timed out after ${timeoutMs}ms`)),
-          timeoutMs,
-        ),
+        setTimeout(() => reject(new Error(`Operation timed out after ${timeoutMs}ms`)), timeoutMs)
       ),
     ]);
   };
@@ -104,10 +101,7 @@ export const useUserSetup = (onSetupComplete) => {
     if (isReturningUser) {
       // For returning users, try to login directly
       if (!masterPassword) {
-        globalToast.showError(
-          "Please enter your password",
-          "Password Required",
-        );
+        globalToast.showError("Please enter your password", "Password Required");
         return;
       }
 
@@ -122,7 +116,7 @@ export const useUserSetup = (onSetupComplete) => {
         logger.debug("✅ Returning user login succeeded");
       } catch (error) {
         logger.error("❌ Login failed:", error);
-        
+
         // Check if this is the new password validation error with suggestion
         if (error?.code === "INVALID_PASSWORD_OFFER_NEW_BUDGET" && error?.canCreateNew) {
           // Show confirmation dialog for creating new budget
@@ -135,11 +129,8 @@ export const useUserSetup = (onSetupComplete) => {
           }
           return; // Don't show generic error toast
         }
-        
-        globalToast.showError(
-          "Incorrect password. Please try again.",
-          "Login Failed",
-        );
+
+        globalToast.showError("Incorrect password. Please try again.", "Login Failed");
       } finally {
         setIsLoading(false);
       }
@@ -164,10 +155,7 @@ export const useUserSetup = (onSetupComplete) => {
         masterPassword: !!masterPassword,
         userName: userName.trim(),
       });
-      globalToast.showError(
-        "Please fill in both password and name",
-        "Required Fields",
-      );
+      globalToast.showError("Please fill in both password and name", "Required Fields");
       return;
     }
 
@@ -209,7 +197,7 @@ export const useUserSetup = (onSetupComplete) => {
     setMasterPassword(value);
   };
 
-  // Handle name input change  
+  // Handle name input change
   const handleNameChange = (value) => {
     logger.debug("👤 Name input changed:", value);
     setUserName(value);
@@ -217,7 +205,7 @@ export const useUserSetup = (onSetupComplete) => {
 
   // Toggle password visibility
   const togglePasswordVisibility = () => {
-    setShowPassword(prev => !prev);
+    setShowPassword((prev) => !prev);
   };
 
   // Handle returning user flow changes

@@ -36,7 +36,8 @@ describe("useSecuritySettingsLogic", () => {
 
   it("should handle setting changes", () => {
     const { result } = renderHook(() => useSecuritySettingsLogic());
-    const mockUpdateSettings = require("../../auth/useSecurityManager").useSecurityManager().updateSettings;
+    const mockUpdateSettings = require("../../auth/useSecurityManager").useSecurityManager()
+      .updateSettings;
 
     act(() => {
       result.current.handleSettingChange("autoLockEnabled", false);
@@ -97,8 +98,14 @@ describe("useSecuritySettingsLogic", () => {
     });
 
     expect(document.createElement).toHaveBeenCalledWith("a");
-    expect(mockSetAttribute).toHaveBeenCalledWith("href", expect.stringContaining("data:application/json"));
-    expect(mockSetAttribute).toHaveBeenCalledWith("download", expect.stringContaining("security-events"));
+    expect(mockSetAttribute).toHaveBeenCalledWith(
+      "href",
+      expect.stringContaining("data:application/json")
+    );
+    expect(mockSetAttribute).toHaveBeenCalledWith(
+      "download",
+      expect.stringContaining("security-events")
+    );
     expect(mockClick).toHaveBeenCalled();
   });
 });

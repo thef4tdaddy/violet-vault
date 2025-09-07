@@ -18,12 +18,9 @@ const TransactionLedgerHeader = ({
               <BookOpen className="h-6 w-6 text-white" />
             </div>
           </div>
-          <span className="text-lg">T</span>RANSACTION{" "}
-          <span className="text-lg">L</span>EDGER
+          <span className="text-lg">T</span>RANSACTION <span className="text-lg">L</span>EDGER
         </h2>
-        <p className="text-purple-900 mt-1">
-          {formatLedgerSummary(transactionCount, netCashFlow)}
-        </p>
+        <p className="text-purple-900 mt-1">{formatLedgerSummary(transactionCount, netCashFlow)}</p>
       </div>
 
       <div className="flex flex-row gap-3">

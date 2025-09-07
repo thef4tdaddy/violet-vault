@@ -9,7 +9,7 @@ const UserNameInput = ({
   value,
   onChange,
   disabled = false,
-  placeholder = "e.g., Sarah, John, etc."
+  placeholder = "e.g., Sarah, John, etc.",
 }) => {
   return (
     <div>

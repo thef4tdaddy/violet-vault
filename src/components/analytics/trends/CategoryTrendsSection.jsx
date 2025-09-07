@@ -1,16 +1,6 @@
 import React from "react";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-import {
-  formatCurrency,
-  getCategoryChartColor,
-} from "../../../utils/analytics/trendHelpers";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { formatCurrency, getCategoryChartColor } from "../../../utils/analytics/trendHelpers";
 
 const CategoryTrendsSection = ({ categoryTrends }) => {
   const tooltipFormatter = (value) => [formatCurrency(value), "Amount"];
@@ -27,9 +17,7 @@ const CategoryTrendsSection = ({ categoryTrends }) => {
             key={category.name}
             className="border-2 border-black rounded-xl p-4 bg-white/50 backdrop-blur-sm"
           >
-            <h4 className="font-bold text-purple-900 mb-2">
-              {category.name.toUpperCase()}
-            </h4>
+            <h4 className="font-bold text-purple-900 mb-2">{category.name.toUpperCase()}</h4>
             <div className="h-32">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={category.trend}>

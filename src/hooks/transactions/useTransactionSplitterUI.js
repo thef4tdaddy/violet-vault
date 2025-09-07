@@ -29,16 +29,15 @@ export const useTransactionSplitterLogic = (
   splitAllocations,
   setSplitAllocations,
   transaction,
-  envelopes,
+  envelopes
 ) => {
   // Initialize splits when transaction changes
   const initializeSplits = useCallback(() => {
     if (!transaction) return;
-    const initialSplits =
-      transactionSplitterService.initializeSplitsFromTransaction(
-        transaction,
-        envelopes,
-      );
+    const initialSplits = transactionSplitterService.initializeSplitsFromTransaction(
+      transaction,
+      envelopes
+    );
     setSplitAllocations(initialSplits);
   }, [transaction, envelopes, setSplitAllocations]);
 
@@ -47,7 +46,7 @@ export const useTransactionSplitterLogic = (
     if (!transaction) return;
     const newSplit = transactionSplitterService.createNewSplitAllocation(
       transaction,
-      splitAllocations,
+      splitAllocations
     );
     setSplitAllocations((prev) => [...prev, newSplit]);
   }, [transaction, splitAllocations, setSplitAllocations]);
@@ -60,11 +59,11 @@ export const useTransactionSplitterLogic = (
         id,
         field,
         value,
-        envelopes,
+        envelopes
       );
       setSplitAllocations(updatedSplits);
     },
-    [splitAllocations, envelopes, setSplitAllocations],
+    [splitAllocations, envelopes, setSplitAllocations]
   );
 
   // Remove split allocation
@@ -72,16 +71,15 @@ export const useTransactionSplitterLogic = (
     (id) => {
       setSplitAllocations((prev) => prev.filter((split) => split.id !== id));
     },
-    [setSplitAllocations],
+    [setSplitAllocations]
   );
 
   // Calculate split totals
   const calculateSplitTotals = useCallback(() => {
-    if (!transaction)
-      return { original: 0, allocated: 0, remaining: 0, isValid: false };
+    if (!transaction) return { original: 0, allocated: 0, remaining: 0, isValid: false };
     return transactionSplitterService.calculateSplitTotals(
       splitAllocations,
-      Math.abs(transaction.amount),
+      Math.abs(transaction.amount)
     );
   }, [splitAllocations, transaction]);
 
@@ -90,7 +88,7 @@ export const useTransactionSplitterLogic = (
     if (!transaction) return [];
     return transactionSplitterService.validateSplits(
       splitAllocations,
-      Math.abs(transaction.amount),
+      Math.abs(transaction.amount)
     );
   }, [splitAllocations, transaction]);
 
@@ -99,7 +97,7 @@ export const useTransactionSplitterLogic = (
     if (!transaction) return;
     const balancedSplits = transactionSplitterService.autoBalanceSplits(
       splitAllocations,
-      Math.abs(transaction.amount),
+      Math.abs(transaction.amount)
     );
     setSplitAllocations(balancedSplits);
   }, [splitAllocations, transaction, setSplitAllocations]);
@@ -109,7 +107,7 @@ export const useTransactionSplitterLogic = (
     if (!transaction) return;
     const evenSplits = transactionSplitterService.splitEvenly(
       splitAllocations,
-      Math.abs(transaction.amount),
+      Math.abs(transaction.amount)
     );
     setSplitAllocations(evenSplits);
   }, [splitAllocations, transaction, setSplitAllocations]);
@@ -134,14 +132,14 @@ export const useTransactionSplitterOperations = (
   transaction,
   setIsProcessing,
   onSplitTransaction,
-  onClose,
+  onClose
 ) => {
   const applySplitTransaction = useCallback(async () => {
     if (!transaction) return;
 
     const errors = transactionSplitterService.validateSplits(
       splitAllocations,
-      Math.abs(transaction.amount),
+      Math.abs(transaction.amount)
     );
 
     if (errors.length > 0) {
@@ -152,11 +150,10 @@ export const useTransactionSplitterOperations = (
 
     try {
       // Create split transactions
-      const splitTransactions =
-        transactionSplitterService.createSplitTransactions(
-          transaction,
-          splitAllocations,
-        );
+      const splitTransactions = transactionSplitterService.createSplitTransactions(
+        transaction,
+        splitAllocations
+      );
 
       // Send split transactions to parent
       await onSplitTransaction?.(transaction, splitTransactions);
@@ -170,13 +167,7 @@ export const useTransactionSplitterOperations = (
     } finally {
       setIsProcessing(false);
     }
-  }, [
-    splitAllocations,
-    transaction,
-    setIsProcessing,
-    onSplitTransaction,
-    onClose,
-  ]);
+  }, [splitAllocations, transaction, setIsProcessing, onSplitTransaction, onClose]);
 
   return {
     applySplitTransaction,

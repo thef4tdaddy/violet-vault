@@ -119,10 +119,7 @@ const PromptModal = ({
               <Icon className="h-6 w-6 text-blue-600" />
             </div>
             <div className="flex-1">
-              <h3
-                id="prompt-modal-title"
-                className="text-lg font-semibold text-gray-900"
-              >
+              <h3 id="prompt-modal-title" className="text-lg font-semibold text-gray-900">
                 {title}
               </h3>
             </div>
@@ -153,10 +150,7 @@ const PromptModal = ({
 
               {/* Validation Error */}
               {validationError && (
-                <div
-                  id="input-error"
-                  className="flex items-center text-red-600 text-sm"
-                >
+                <div id="input-error" className="flex items-center text-red-600 text-sm">
                   <AlertCircle className="h-4 w-4 mr-1" />
                   {validationError}
                 </div>

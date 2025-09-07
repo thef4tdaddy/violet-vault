@@ -59,7 +59,7 @@ describe("useTransactionMutations", () => {
           mutationFn: expect.any(Function),
           onSuccess: expect.any(Function),
           onError: expect.any(Function),
-        }),
+        })
       );
 
       expect(result.current.addTransaction).toBe(mockMutate);

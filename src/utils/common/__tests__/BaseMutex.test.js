@@ -38,10 +38,10 @@ describe("BaseMutex", () => {
 
     it("should queue operations when locked", async () => {
       await mutex.acquire("first-operation");
-      
+
       const secondOperation = mutex.acquire("second-operation");
       expect(mutex.queue.length).toBe(1);
-      
+
       mutex.release();
       await secondOperation;
       expect(mutex.currentOperation).toBe("second-operation");
@@ -49,20 +49,20 @@ describe("BaseMutex", () => {
 
     it("should handle multiple queued operations", async () => {
       await mutex.acquire("first-operation");
-      
+
       const secondPromise = mutex.acquire("second-operation");
       const thirdPromise = mutex.acquire("third-operation");
-      
+
       expect(mutex.queue.length).toBe(2);
-      
+
       mutex.release();
       await secondPromise;
-      
+
       expect(mutex.currentOperation).toBe("second-operation");
-      
+
       mutex.release();
       await thirdPromise;
-      
+
       expect(mutex.currentOperation).toBe("third-operation");
       mutex.release();
     });
@@ -71,9 +71,9 @@ describe("BaseMutex", () => {
   describe("execute wrapper", () => {
     it("should execute function with mutex protection", async () => {
       const mockFn = vi.fn().mockResolvedValue("result");
-      
+
       const result = await mutex.execute(mockFn, "wrapper-operation");
-      
+
       expect(result).toBe("result");
       expect(mockFn).toHaveBeenCalledOnce();
       expect(mutex.locked).toBe(false);
@@ -81,7 +81,7 @@ describe("BaseMutex", () => {
 
     it("should release mutex even if function throws", async () => {
       const mockFn = vi.fn().mockRejectedValue(new Error("test error"));
-      
+
       await expect(mutex.execute(mockFn, "error-operation")).rejects.toThrow("test error");
       expect(mutex.locked).toBe(false);
     });
@@ -89,7 +89,7 @@ describe("BaseMutex", () => {
     it("should prevent concurrent execution", async () => {
       const results = [];
       const slowFn = async (value) => {
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise((resolve) => setTimeout(resolve, 50));
         results.push(value);
         return value;
       };
@@ -97,7 +97,7 @@ describe("BaseMutex", () => {
       const promises = [
         mutex.execute(() => slowFn(1), "op1"),
         mutex.execute(() => slowFn(2), "op2"),
-        mutex.execute(() => slowFn(3), "op3")
+        mutex.execute(() => slowFn(3), "op3"),
       ];
 
       await Promise.all(promises);
@@ -120,13 +120,13 @@ describe("BaseMutex", () => {
 
     it("should track queue size correctly", async () => {
       await mutex.acquire("first");
-      
+
       mutex.acquire("second");
       mutex.acquire("third");
-      
+
       const status = mutex.getStatus();
       expect(status.queueLength).toBe(2);
-      
+
       mutex.release();
     });
   });
@@ -143,19 +143,21 @@ describe("BaseMutex", () => {
 
     it("should clear queue on error", async () => {
       await mutex.acquire("first");
-      
+
       const secondPromise = mutex.acquire("second");
       const thirdPromise = mutex.acquire("third");
-      
+
       // Force clear queue
       mutex.queue.length = 0;
       mutex.release();
-      
+
       // These should timeout since queue was cleared
-      await expect(Promise.race([
-        secondPromise,
-        new Promise(resolve => setTimeout(() => resolve("timeout"), 100))
-      ])).resolves.toBe("timeout");
+      await expect(
+        Promise.race([
+          secondPromise,
+          new Promise((resolve) => setTimeout(() => resolve("timeout"), 100)),
+        ])
+      ).resolves.toBe("timeout");
     }, 10000);
   });
 });

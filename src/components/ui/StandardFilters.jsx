@@ -79,7 +79,7 @@ const StandardFilters = ({
       {/* Filter Header */}
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-          {React.createElement(getIcon('Filter'), { className: "h-4 w-4" })}
+          {React.createElement(getIcon("Filter"), { className: "h-4 w-4" })}
           Filters
         </h3>
         {showClearButton && hasActiveFilters() && (
@@ -87,7 +87,7 @@ const StandardFilters = ({
             onClick={clearAllFilters}
             className="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1"
           >
-            {React.createElement(getIcon('X'), { className: "h-3 w-3" })}
+            {React.createElement(getIcon("X"), { className: "h-3 w-3" })}
             Clear All
           </button>
         )}
@@ -97,7 +97,9 @@ const StandardFilters = ({
       <div className={`flex items-center ${config.gap}`}>
         {/* Search Input */}
         <div className="relative flex-1 min-w-48">
-          {React.createElement(getIcon('Search'), { className: "absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" })}
+          {React.createElement(getIcon("Search"), {
+            className: "absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400",
+          })}
           <input
             type="text"
             placeholder={searchPlaceholder}
@@ -115,7 +117,7 @@ const StandardFilters = ({
               onClick={() => handleFilterChange("search", "")}
               className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
-              {React.createElement(getIcon('X'), { className: "h-3 w-3" })}
+              {React.createElement(getIcon("X"), { className: "h-3 w-3" })}
             </button>
           )}
         </div>
@@ -126,14 +128,8 @@ const StandardFilters = ({
             return (
               <select
                 key={filterConfig.key}
-                value={
-                  filters[filterConfig.key] ||
-                  filterConfig.defaultValue ||
-                  "all"
-                }
-                onChange={(e) =>
-                  handleFilterChange(filterConfig.key, e.target.value)
-                }
+                value={filters[filterConfig.key] || filterConfig.defaultValue || "all"}
+                onChange={(e) => handleFilterChange(filterConfig.key, e.target.value)}
                 className={`
                   ${config.select} border border-gray-300 rounded-md
                   focus:ring-1 focus:ring-blue-500 focus:border-blue-500

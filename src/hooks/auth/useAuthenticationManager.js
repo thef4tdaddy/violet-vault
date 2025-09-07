@@ -52,9 +52,7 @@ export const useAuthenticationManager = () => {
       canUnlock: !securityManager.isLocked || securityManager.canUnlock,
 
       // Authentication readiness
-      isReady: isLocalOnlyMode
-        ? !!localOnlyUser
-        : !!(authFlow.isUnlocked && authFlow.currentUser),
+      isReady: isLocalOnlyMode ? !!localOnlyUser : !!(authFlow.isUnlocked && authFlow.currentUser),
     }),
     [
       authFlow.isUnlocked,
@@ -64,7 +62,7 @@ export const useAuthenticationManager = () => {
       securityManager.isLocked,
       securityManager.canUnlock,
       authFlow.currentUser,
-    ],
+    ]
   );
 
   // Security context for components that need encryption details
@@ -75,7 +73,7 @@ export const useAuthenticationManager = () => {
       salt: authFlow.salt,
       hasValidKeys: !!(authFlow.encryptionKey && effectiveBudgetId),
     }),
-    [authFlow.encryptionKey, effectiveBudgetId, authFlow.salt],
+    [authFlow.encryptionKey, effectiveBudgetId, authFlow.salt]
   );
 
   // Core authentication operations
@@ -102,7 +100,7 @@ export const useAuthenticationManager = () => {
       securityManager.lockApp,
       securityManager.unlockSession,
       securityManager.checkSecurityStatus,
-    ],
+    ]
   );
 
   return {

@@ -76,9 +76,9 @@ describe("receiptHelpers", () => {
       const validData = {
         merchant: "Test Store",
         total: 25.99,
-        date: "2024-01-01"
+        date: "2024-01-01",
       };
-      
+
       const result = validateReceiptData(validData);
       expect(result.isValid).toBe(true);
       expect(result.errors).toHaveLength(0);
@@ -87,9 +87,9 @@ describe("receiptHelpers", () => {
     it("should reject data without merchant", () => {
       const invalidData = {
         total: 25.99,
-        date: "2024-01-01"
+        date: "2024-01-01",
       };
-      
+
       const result = validateReceiptData(invalidData);
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain("Merchant name is required");
@@ -99,9 +99,9 @@ describe("receiptHelpers", () => {
       const invalidData = {
         merchant: "Test Store",
         total: "invalid",
-        date: "2024-01-01"
+        date: "2024-01-01",
       };
-      
+
       const result = validateReceiptData(invalidData);
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain("Valid total amount is required");
@@ -111,9 +111,9 @@ describe("receiptHelpers", () => {
       const invalidData = {
         merchant: "Test Store",
         total: 25.99,
-        date: "01/01/2024"
+        date: "01/01/2024",
       };
-      
+
       const result = validateReceiptData(invalidData);
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain("Valid date in YYYY-MM-DD format is required");
@@ -143,9 +143,9 @@ describe("receiptHelpers", () => {
       const completeData = {
         merchant: "Test Store",
         total: 25.99,
-        date: "2024-01-01"
+        date: "2024-01-01",
       };
-      
+
       expect(isReceiptDataComplete(completeData)).toBe(true);
     });
 
@@ -153,9 +153,9 @@ describe("receiptHelpers", () => {
       const incompleteData = {
         merchant: "Test Store",
         total: 0,
-        date: "2024-01-01"
+        date: "2024-01-01",
       };
-      
+
       expect(isReceiptDataComplete(incompleteData)).toBe(false);
     });
 

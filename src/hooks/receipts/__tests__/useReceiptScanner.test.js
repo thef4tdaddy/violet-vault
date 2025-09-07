@@ -15,7 +15,7 @@ describe("useReceiptScanner", () => {
     mockFile = new File(["receipt content"], "receipt.jpg", { type: "image/jpeg", size: 1024 });
     mockOnReceiptProcessed.mockClear();
     processReceiptImage.mockClear();
-    
+
     // Mock URL.createObjectURL
     global.URL.createObjectURL = vi.fn(() => "mock-url");
     global.URL.revokeObjectURL = vi.fn();
@@ -49,16 +49,18 @@ describe("useReceiptScanner", () => {
 
   it("should validate file size correctly", async () => {
     const { result } = renderHook(() => useReceiptScanner(mockOnReceiptProcessed));
-    const largeFile = new File(["large content"], "large.jpg", { 
-      type: "image/jpeg", 
-      size: 11 * 1024 * 1024 // 11MB
+    const largeFile = new File(["large content"], "large.jpg", {
+      type: "image/jpeg",
+      size: 11 * 1024 * 1024, // 11MB
     });
 
     await act(async () => {
       await result.current.handleFileUpload(largeFile);
     });
 
-    expect(result.current.error).toBe("Image file is too large. Please use a file smaller than 10MB.");
+    expect(result.current.error).toBe(
+      "Image file is too large. Please use a file smaller than 10MB."
+    );
     expect(processReceiptImage).not.toHaveBeenCalled();
   });
 
@@ -66,11 +68,11 @@ describe("useReceiptScanner", () => {
     const mockResult = {
       merchant: "Test Store",
       total: 29.99,
-      confidence: { merchant: "high", total: "high" }
+      confidence: { merchant: "high", total: "high" },
     };
-    
+
     processReceiptImage.mockResolvedValue(mockResult);
-    
+
     const { result } = renderHook(() => useReceiptScanner(mockOnReceiptProcessed));
 
     await act(async () => {
@@ -82,7 +84,7 @@ describe("useReceiptScanner", () => {
       file: mockFile,
       url: "mock-url",
       name: "receipt.jpg",
-      size: 1024
+      size: 1024,
     });
     expect(result.current.extractedData).toEqual(mockResult);
     expect(result.current.error).toBeNull();
@@ -90,27 +92,29 @@ describe("useReceiptScanner", () => {
 
   it("should handle OCR processing errors", async () => {
     processReceiptImage.mockRejectedValue(new Error("OCR failed"));
-    
+
     const { result } = renderHook(() => useReceiptScanner(mockOnReceiptProcessed));
 
     await act(async () => {
       await result.current.handleFileUpload(mockFile);
     });
 
-    expect(result.current.error).toBe("Failed to process receipt. Please try again with a clearer image.");
+    expect(result.current.error).toBe(
+      "Failed to process receipt. Please try again with a clearer image."
+    );
     expect(result.current.extractedData).toBeNull();
     expect(result.current.isProcessing).toBe(false);
   });
 
   it("should handle drag and drop", async () => {
-    const mockResult = { merchant: "Store", total: 10.00 };
+    const mockResult = { merchant: "Store", total: 10.0 };
     processReceiptImage.mockResolvedValue(mockResult);
-    
+
     const { result } = renderHook(() => useReceiptScanner(mockOnReceiptProcessed));
-    
+
     const mockEvent = {
       preventDefault: vi.fn(),
-      dataTransfer: { files: [mockFile] }
+      dataTransfer: { files: [mockFile] },
     };
 
     await act(async () => {
@@ -122,11 +126,11 @@ describe("useReceiptScanner", () => {
   });
 
   it("should confirm receipt and call callback", () => {
-    const mockExtractedData = { merchant: "Store", total: 15.50 };
+    const mockExtractedData = { merchant: "Store", total: 15.5 };
     const mockUploadedImage = { url: "mock-url", name: "receipt.jpg" };
-    
+
     const { result } = renderHook(() => useReceiptScanner(mockOnReceiptProcessed));
-    
+
     // Manually set state for testing confirmation
     act(() => {
       result.current.extractedData = mockExtractedData;
@@ -145,7 +149,7 @@ describe("useReceiptScanner", () => {
 
   it("should reset scanner state", () => {
     const { result } = renderHook(() => useReceiptScanner(mockOnReceiptProcessed));
-    
+
     // Set some state
     act(() => {
       result.current.uploadedImage = { url: "mock-url" };

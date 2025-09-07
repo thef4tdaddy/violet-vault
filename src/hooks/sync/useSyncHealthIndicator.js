@@ -34,8 +34,7 @@ export const useSyncHealthIndicator = () => {
   useEffect(() => {
     // Check if sync is running by monitoring the service state
     const checkSyncActivity = () => {
-      const isRunning =
-        cloudSyncService.isRunning && cloudSyncService.activeSyncPromise;
+      const isRunning = cloudSyncService.isRunning && cloudSyncService.activeSyncPromise;
       setIsBackgroundSyncing(isRunning);
     };
 
@@ -101,9 +100,7 @@ export const useSyncHealthIndicator = () => {
         setSyncStatus({
           isHealthy: results.summary.overallStatus === "ALL_SYSTEMS_GO",
           status:
-            results.summary.overallStatus === "ALL_SYSTEMS_GO"
-              ? "HEALTHY"
-              : "ISSUES_DETECTED",
+            results.summary.overallStatus === "ALL_SYSTEMS_GO" ? "HEALTHY" : "ISSUES_DETECTED",
           failedTests: results.summary.totalFailed,
           lastChecked: new Date().toISOString(),
           isLoading: false,

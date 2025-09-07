@@ -61,8 +61,7 @@ const Layout = ({ firebaseSync }) => {
   // Use centralized layout data hook
   const layoutData = useLayoutData();
 
-  const { exportData, importData, resetEncryptionAndStartFresh } =
-    useDataManagement();
+  const { exportData, importData, resetEncryptionAndStartFresh } = useDataManagement();
 
   const {
     rotationDue,
@@ -101,12 +100,7 @@ const Layout = ({ firebaseSync }) => {
 
   // Use centralized auth gateway check
   if (shouldShowAuthGateway()) {
-    return (
-      <AuthGateway
-        onSetupComplete={handleSetup}
-        onLocalOnlyReady={handleLocalOnlyReady}
-      />
-    );
+    return <AuthGateway onSetupComplete={handleSetup} onLocalOnlyReady={handleLocalOnlyReady} />;
   }
 
   logger.budgetSync("Rendering BudgetProvider with props", {
@@ -183,8 +177,7 @@ const MainContent = ({
 
   // Extract data from shared hooks
   const { securityContext } = auth;
-  const { totalBiweeklyNeed, paycheckHistory: tanStackPaycheckHistory } =
-    layoutData;
+  const { totalBiweeklyNeed, paycheckHistory: tanStackPaycheckHistory } = layoutData;
 
   // Helper function to get current view from URL
   const getCurrentViewFromPath = (pathname) => {
@@ -206,20 +199,14 @@ const MainContent = ({
   // Listen for corruption detection events
   useEffect(() => {
     const handleCorruptionDetected = (event) => {
-      logger.warn(
-        "🚨 Corruption modal triggered by sync service",
-        event.detail,
-      );
+      logger.warn("🚨 Corruption modal triggered by sync service", event.detail);
       setShowCorruptionModal(true);
     };
 
     window.addEventListener("syncCorruptionDetected", handleCorruptionDetected);
 
     return () => {
-      window.removeEventListener(
-        "syncCorruptionDetected",
-        handleCorruptionDetected,
-      );
+      window.removeEventListener("syncCorruptionDetected", handleCorruptionDetected);
     };
   }, []);
 
@@ -228,7 +215,7 @@ const MainContent = ({
     firebaseSync,
     securityContext.encryptionKey,
     securityContext.budgetId,
-    currentUser,
+    currentUser
   );
 
   // Auto-complete onboarding steps based on user actions
@@ -306,9 +293,7 @@ const MainContent = ({
               <p className="text-xs text-gray-500 mt-1">
                 Last updated: {getVersionInfo().buildDate}
               </p>
-              <p className="text-xs text-gray-500 mt-1">
-                Built with ❤️ for secure budgeting
-              </p>
+              <p className="text-xs text-gray-500 mt-1">Built with ❤️ for secure budgeting</p>
             </div>
           </div>
         </div>

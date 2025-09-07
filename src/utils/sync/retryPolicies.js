@@ -1,7 +1,7 @@
 /**
  * Retry policies for different types of errors
  * Determines which errors should be retried vs failed immediately
- * 
+ *
  * Addresses GitHub Issue #576 - Cloud Sync Reliability Improvements (Phase 2)
  */
 
@@ -10,7 +10,7 @@
  */
 export const shouldRetryError = (error) => {
   // Network errors - always retry
-  if (error.name === 'NetworkError' || error.message.includes('fetch')) {
+  if (error.name === "NetworkError" || error.message.includes("fetch")) {
     return true;
   }
 
@@ -38,12 +38,12 @@ export const shouldRetryError = (error) => {
  */
 export const isRetryableFirebaseError = (errorCode) => {
   const retryableCodes = [
-    'unavailable',
-    'deadline-exceeded', 
-    'resource-exhausted',
-    'aborted',
-    'internal',
-    'cancelled',
+    "unavailable",
+    "deadline-exceeded",
+    "resource-exhausted",
+    "aborted",
+    "internal",
+    "cancelled",
   ];
   return retryableCodes.includes(errorCode);
 };
@@ -52,27 +52,20 @@ export const isRetryableFirebaseError = (errorCode) => {
  * Check if encryption error might be transient
  */
 export const isTransientEncryptionError = (error) => {
-  const transientMessages = [
-    'data is too small',
-    'decrypt',
-    'Invalid key',
-    'Failed to decrypt',
-  ];
-  
-  return transientMessages.some(msg => 
-    error.message && error.message.includes(msg)
-  );
+  const transientMessages = ["data is too small", "decrypt", "Invalid key", "Failed to decrypt"];
+
+  return transientMessages.some((msg) => error.message && error.message.includes(msg));
 };
 
 /**
  * Classify error for metrics and logging
  */
 export const classifyError = (error) => {
-  if (error.name === 'NetworkError') return 'network';
-  if (error.code) return 'firebase';
-  if (isTransientEncryptionError(error)) return 'encryption';
-  if (error.status) return 'http';
-  return 'unknown';
+  if (error.name === "NetworkError") return "network";
+  if (error.code) return "firebase";
+  if (isTransientEncryptionError(error)) return "encryption";
+  if (error.status) return "http";
+  return "unknown";
 };
 
 export default {

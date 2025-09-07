@@ -31,7 +31,8 @@ const ReceiptUploadArea = ({
 
           <div>
             <p className="font-black text-black text-base mb-2">
-              <span className="text-lg">U</span>PLOAD <span className="text-lg">R</span>ECEIPT <span className="text-lg">I</span>MAGE
+              <span className="text-lg">U</span>PLOAD <span className="text-lg">R</span>ECEIPT{" "}
+              <span className="text-lg">I</span>MAGE
             </p>
             <p className="text-sm text-purple-900 mb-4">
               Drag and drop an image here, or click to browse

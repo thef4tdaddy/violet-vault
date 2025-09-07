@@ -18,9 +18,9 @@ vi.mock("../components/UserSetupHeader", () => ({
 
 vi.mock("../components/PasswordInput", () => ({
   default: ({ value, onChange }) => (
-    <input 
-      data-testid="password-input" 
-      value={value} 
+    <input
+      data-testid="password-input"
+      value={value}
       onChange={(e) => onChange(e.target.value)}
       type="password"
     />
@@ -29,11 +29,7 @@ vi.mock("../components/PasswordInput", () => ({
 
 vi.mock("../components/UserNameInput", () => ({
   default: ({ value, onChange }) => (
-    <input 
-      data-testid="username-input" 
-      value={value} 
-      onChange={(e) => onChange(e.target.value)}
-    />
+    <input data-testid="username-input" value={value} onChange={(e) => onChange(e.target.value)} />
   ),
 }));
 
@@ -79,7 +75,7 @@ describe("UserSetup", () => {
 
   beforeEach(() => {
     mockOnSetupComplete = vi.fn();
-    
+
     mockHookReturn = {
       step: 1,
       masterPassword: "",
@@ -99,21 +95,23 @@ describe("UserSetup", () => {
       goBackToStep1: vi.fn(),
       setUserColor: vi.fn(),
     };
-    
+
     useUserSetup.mockReturnValue(mockHookReturn);
   });
 
   it("should render with correct structure", () => {
     render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
-    
+
     expect(screen.getByTestId("header")).toBeInTheDocument();
     expect(document.querySelector("form")).toBeInTheDocument();
-    expect(screen.getByText("OUR DATA IS ENCRYPTED CLIENT-SIDE FOR MAXIMUM SECURITY")).toBeInTheDocument();
+    expect(
+      screen.getByText("OUR DATA IS ENCRYPTED CLIENT-SIDE FOR MAXIMUM SECURITY")
+    ).toBeInTheDocument();
   });
 
   it("should show password input for step 1", () => {
     render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
-    
+
     expect(screen.getByTestId("password-input")).toBeInTheDocument();
     expect(screen.getByTestId("step-buttons")).toBeInTheDocument();
   });
@@ -122,11 +120,11 @@ describe("UserSetup", () => {
     useUserSetup.mockReturnValue({
       ...mockHookReturn,
       isReturningUser: true,
-      userName: "John"
+      userName: "John",
     });
 
     render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
-    
+
     expect(screen.getByTestId("returning-user-actions")).toBeInTheDocument();
     expect(screen.queryByTestId("step-buttons")).not.toBeInTheDocument();
   });
@@ -134,11 +132,11 @@ describe("UserSetup", () => {
   it("should show profile setup for step 2", () => {
     useUserSetup.mockReturnValue({
       ...mockHookReturn,
-      step: 2
+      step: 2,
     });
 
     render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
-    
+
     expect(screen.queryByTestId("password-input")).not.toBeInTheDocument();
     expect(screen.getByTestId("username-input")).toBeInTheDocument();
     expect(screen.getByTestId("color-picker")).toBeInTheDocument();
@@ -149,18 +147,18 @@ describe("UserSetup", () => {
     useUserSetup.mockReturnValue({
       ...mockHookReturn,
       step: 2,
-      isReturningUser: true
+      isReturningUser: true,
     });
 
     render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
-    
+
     expect(screen.queryByTestId("username-input")).not.toBeInTheDocument();
     expect(screen.queryByTestId("color-picker")).not.toBeInTheDocument();
   });
 
   it("should pass correct props to useUserSetup hook", () => {
     render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
-    
+
     expect(useUserSetup).toHaveBeenCalledWith(mockOnSetupComplete);
   });
 
@@ -170,12 +168,12 @@ describe("UserSetup", () => {
       step: 2,
       isReturningUser: true,
       userName: "Jane",
-      userColor: "#10b981"
+      userColor: "#10b981",
     };
     useUserSetup.mockReturnValue(mockValues);
 
     render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
-    
+
     const header = screen.getByTestId("header");
     expect(header).toHaveTextContent("Step 2");
     expect(header).toHaveTextContent("Returning: true");
@@ -184,15 +182,22 @@ describe("UserSetup", () => {
 
   it("should apply glassmorphism styling", () => {
     render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
-    
+
     const container = document.querySelector(".glassmorphism");
     expect(container).toBeInTheDocument();
-    expect(container).toHaveClass("rounded-lg", "p-6", "border-2", "border-black", "bg-purple-100/40", "backdrop-blur-sm");
+    expect(container).toHaveClass(
+      "rounded-lg",
+      "p-6",
+      "border-2",
+      "border-black",
+      "bg-purple-100/40",
+      "backdrop-blur-sm"
+    );
   });
 
   it("should have background pattern", () => {
     render(<UserSetup onSetupComplete={mockOnSetupComplete} />);
-    
+
     const backgroundPattern = document.querySelector('[style*="radial-gradient"]');
     expect(backgroundPattern).toBeInTheDocument();
   });

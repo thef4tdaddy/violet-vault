@@ -19,20 +19,10 @@ const gatherDataForExport = async () => {
 };
 
 const constructExportObject = (data, currentUser) => {
-  const [
-    envelopes,
-    bills,
-    transactions,
-    savingsGoals,
-    debts,
-    paycheckHistory,
-    auditLog,
-    metadata,
-  ] = data;
+  const [envelopes, bills, transactions, savingsGoals, debts, paycheckHistory, auditLog, metadata] =
+    data;
 
-  const pureTransactions = transactions.filter(
-    (t) => !t.type || t.type === "transaction",
-  );
+  const pureTransactions = transactions.filter((t) => !t.type || t.type === "transaction");
 
   return {
     envelopes,
@@ -66,18 +56,14 @@ const constructExportObject = (data, currentUser) => {
     _dataGuide: {
       note: "For mass updates, use these primary arrays:",
       primaryArrays: {
-        envelopes:
-          "Main envelope data - edit currentBalance, name, category, etc.",
+        envelopes: "Main envelope data - edit currentBalance, name, category, etc.",
         bills: "Bill payment data - edit amount, dueDate, provider, etc.",
         debts: "Debt tracking data - edit currentBalance, minimumPayment, etc.",
-        savingsGoals:
-          "Savings goal data - edit targetAmount, currentAmount, etc.",
+        savingsGoals: "Savings goal data - edit targetAmount, currentAmount, etc.",
         paycheckHistory: "Paycheck history for trend analysis",
         transactions: "Pure transactions only (filtered from allTransactions)",
-        allTransactions:
-          "All transactions + bills combined (auto-generated, don't edit directly)",
-        auditLog:
-          "Change history and audit trail (generally shouldn't be edited)",
+        allTransactions: "All transactions + bills combined (auto-generated, don't edit directly)",
+        auditLog: "Change history and audit trail (generally shouldn't be edited)",
       },
       deprecatedArrays: {
         note: "These may exist from old exports but are not actively used in v1.8+",
@@ -110,16 +96,13 @@ const triggerDownload = (exportableData) => {
 
 export const useExportData = () => {
   const { currentUser } = useAuth();
-  const { showSuccessToast, showErrorToast, showWarningToast } =
-    useToastHelpers();
+  const { showSuccessToast, showErrorToast, showWarningToast } = useToastHelpers();
 
   const exportData = useCallback(async () => {
     try {
       logger.info("Starting export process");
       const data = await gatherDataForExport();
-      const hasData = data.some((item) =>
-        Array.isArray(item) ? item.length > 0 : item,
-      );
+      const hasData = data.some((item) => (Array.isArray(item) ? item.length > 0 : item));
 
       if (!hasData) {
         showWarningToast("No data found to export", "Export Error");
@@ -148,7 +131,7 @@ export const useExportData = () => {
 
       showSuccessToast(
         `Export created with ${exportSummary} (${Math.round(fileSize / 1024)}KB)`,
-        "Export Completed",
+        "Export Completed"
       );
     } catch (error) {
       logger.error("Export failed", error);

@@ -16,10 +16,7 @@ const UpcomingPaymentsModal = ({ isOpen, onClose, upcomingPayments = [] }) => {
     });
   };
 
-  const totalUpcoming = upcomingPayments.reduce(
-    (sum, payment) => sum + (payment.amount || 0),
-    0,
-  );
+  const totalUpcoming = upcomingPayments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
@@ -27,15 +24,10 @@ const UpcomingPaymentsModal = ({ isOpen, onClose, upcomingPayments = [] }) => {
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h3 className="text-xl font-semibold text-gray-900">
-              Upcoming Payments
-            </h3>
+            <h3 className="text-xl font-semibold text-gray-900">Upcoming Payments</h3>
             <p className="text-gray-600">Next 30 days</p>
           </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             <X className="h-6 w-6" />
           </button>
         </div>
@@ -44,12 +36,8 @@ const UpcomingPaymentsModal = ({ isOpen, onClose, upcomingPayments = [] }) => {
         <div className="bg-orange-50 rounded-xl p-4 mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-orange-600 font-medium">
-                Total Upcoming
-              </p>
-              <p className="text-2xl font-bold text-orange-700">
-                ${totalUpcoming.toFixed(2)}
-              </p>
+              <p className="text-sm text-orange-600 font-medium">Total Upcoming</p>
+              <p className="text-2xl font-bold text-orange-700">${totalUpcoming.toFixed(2)}</p>
             </div>
             <DollarSign className="h-8 w-8 text-orange-500" />
           </div>
@@ -70,20 +58,14 @@ const UpcomingPaymentsModal = ({ isOpen, onClose, upcomingPayments = [] }) => {
                   className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
                 >
                   <div>
-                    <p className="font-medium text-gray-900">
-                      {payment.debtName}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      Due: {formatDate(payment.dueDate)}
-                    </p>
+                    <p className="font-medium text-gray-900">{payment.debtName}</p>
+                    <p className="text-sm text-gray-600">Due: {formatDate(payment.dueDate)}</p>
                   </div>
                   <div className="text-right">
                     <p className="font-semibold text-gray-900">
                       ${payment.amount?.toFixed(2) || "0.00"}
                     </p>
-                    <p className="text-xs text-gray-600 capitalize">
-                      {payment.type || "payment"}
-                    </p>
+                    <p className="text-xs text-gray-600 capitalize">{payment.type || "payment"}</p>
                   </div>
                 </div>
               ))}

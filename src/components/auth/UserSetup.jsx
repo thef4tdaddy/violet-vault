@@ -52,9 +52,7 @@ const UserSetup = ({ onSetupComplete }) => {
       />
 
       <form
-        onSubmit={
-          isReturningUser || step === 1 ? handleStep1Continue : handleSubmit
-        }
+        onSubmit={isReturningUser || step === 1 ? handleStep1Continue : handleSubmit}
         className="space-y-6"
       >
         {/* Password Input (Step 1 and Returning Users) */}
@@ -90,11 +88,7 @@ const UserSetup = ({ onSetupComplete }) => {
         {/* User Profile Setup (Step 2) */}
         {step === 2 && !isReturningUser && (
           <>
-            <UserNameInput
-              value={userName}
-              onChange={handleNameChange}
-              disabled={isLoading}
-            />
+            <UserNameInput value={userName} onChange={handleNameChange} disabled={isLoading} />
 
             <ColorPicker
               selectedColor={userColor}

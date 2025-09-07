@@ -5,9 +5,7 @@ import logger from "../../utils/common/logger";
 
 const ProfileSettings = ({ isOpen, onClose, currentUser, onUpdateProfile }) => {
   const [userName, setUserName] = useState(currentUser?.userName || "");
-  const [userColor, setUserColor] = useState(
-    currentUser?.userColor || "#a855f7",
-  );
+  const [userColor, setUserColor] = useState(currentUser?.userColor || "#a855f7");
   const [isLoading, setIsLoading] = useState(false);
 
   const colors = [
@@ -39,10 +37,7 @@ const ProfileSettings = ({ isOpen, onClose, currentUser, onUpdateProfile }) => {
       onClose();
     } catch (error) {
       logger.error("Failed to update profile:", error);
-      globalToast.showError(
-        `Failed to update profile: ${error.message}`,
-        "Update Failed",
-      );
+      globalToast.showError(`Failed to update profile: ${error.message}`, "Update Failed");
     } finally {
       setIsLoading(false);
     }
@@ -70,9 +65,7 @@ const ProfileSettings = ({ isOpen, onClose, currentUser, onUpdateProfile }) => {
         <div className="space-y-6">
           {/* Name Input */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">
-              Display Name
-            </label>
+            <label className="block text-sm font-semibold text-gray-700 mb-3">Display Name</label>
             <input
               type="text"
               value={userName}
@@ -111,17 +104,13 @@ const ProfileSettings = ({ isOpen, onClose, currentUser, onUpdateProfile }) => {
 
           {/* Preview */}
           <div className="bg-gray-50 rounded-lg p-4">
-            <label className="block text-xs font-semibold text-gray-500 mb-2">
-              PREVIEW
-            </label>
+            <label className="block text-xs font-semibold text-gray-500 mb-2">PREVIEW</label>
             <div className="flex items-center gap-3">
               <div
                 className="w-4 h-4 rounded-full ring-2 ring-white shadow-sm"
                 style={{ backgroundColor: userColor }}
               />
-              <span className="font-semibold text-gray-900">
-                {userName.trim() || "Your Name"}
-              </span>
+              <span className="font-semibold text-gray-900">{userName.trim() || "Your Name"}</span>
             </div>
           </div>
         </div>

@@ -114,9 +114,7 @@ const DashboardHeader = ({ title, actions, summary }) => (
       <span className="text-lg">{title[0]}</span>
       {title.slice(1).toUpperCase()}
     </h1>
-    {summary && (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">{summary}</div>
-    )}
+    {summary && <div className="grid grid-cols-1 md:grid-cols-3 gap-4">{summary}</div>}
     {actions && <div className="flex gap-2 mt-4">{actions}</div>}
   </div>
 );
@@ -340,11 +338,7 @@ describe('use[HookName]', () => {
 
 ```javascript
 // utils/[domain]/__tests__/[utility].test.js
-import {
-  calculateMetrics,
-  validateFormData,
-  formatDisplayValue,
-} from "../[utility]";
+import { calculateMetrics, validateFormData, formatDisplayValue } from "../[utility]";
 
 describe("[utility] helpers", () => {
   describe("calculateMetrics", () => {

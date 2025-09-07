@@ -48,12 +48,8 @@ export const getStepTitle = (step, isReturningUser, userName) => {
   if (isReturningUser) {
     return (
       <span className="uppercase tracking-wider text-black">
-        <span className="text-4xl">W</span>ELCOME{" "}
-        <span className="text-4xl">B</span>ACK,{" "}
-        <span className="text-4xl font-black">
-          {userName.toUpperCase()}
-        </span>
-        !
+        <span className="text-4xl">W</span>ELCOME <span className="text-4xl">B</span>ACK,{" "}
+        <span className="text-4xl font-black">{userName.toUpperCase()}</span>!
       </span>
     );
   }
@@ -61,16 +57,14 @@ export const getStepTitle = (step, isReturningUser, userName) => {
   if (step === 1) {
     return (
       <span className="uppercase tracking-wider text-black">
-        <span className="text-4xl">G</span>ET{" "}
-        <span className="text-4xl">S</span>TARTED
+        <span className="text-4xl">G</span>ET <span className="text-4xl">S</span>TARTED
       </span>
     );
   }
 
   return (
     <span className="uppercase tracking-wider text-black">
-      <span className="text-4xl">S</span>ET{" "}
-      <span className="text-4xl">U</span>P{" "}
+      <span className="text-4xl">S</span>ET <span className="text-4xl">U</span>P{" "}
       <span className="text-4xl">P</span>ROFILE
     </span>
   );
@@ -91,16 +85,14 @@ export const getStepSubtitle = (step, isReturningUser) => {
   if (step === 1) {
     return (
       <span>
-        <span className="text-lg">C</span>REATE A SECURE MASTER PASSWORD
-        TO PROTECT YOUR DATA
+        <span className="text-lg">C</span>REATE A SECURE MASTER PASSWORD TO PROTECT YOUR DATA
       </span>
     );
   }
 
   return (
     <span>
-      <span className="text-lg">C</span>HOOSE YOUR NAME AND COLOR FOR
-      TRACKING
+      <span className="text-lg">C</span>HOOSE YOUR NAME AND COLOR FOR TRACKING
     </span>
   );
 };

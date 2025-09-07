@@ -1,9 +1,6 @@
 import React from "react";
 import { Receipt } from "lucide-react";
-import {
-  DEBT_TYPE_CONFIG,
-  PAYMENT_FREQUENCIES,
-} from "../../../constants/debts";
+import { DEBT_TYPE_CONFIG, PAYMENT_FREQUENCIES } from "../../../constants/debts";
 import { UniversalConnectionManager } from "../../ui/ConnectionDisplay";
 
 /**
@@ -34,9 +31,7 @@ const DebtFormFields = ({
     <form onSubmit={handleFormSubmit} className="space-y-6">
       {/* Basic Information */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
-          Basic Information
-        </h3>
+        <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Basic Information</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -51,9 +46,7 @@ const DebtFormFields = ({
               placeholder="e.g., Chase Credit Card"
               disabled={!canEdit}
             />
-            {errors.name && (
-              <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-            )}
+            {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
           </div>
 
           <div>
@@ -68,16 +61,12 @@ const DebtFormFields = ({
               placeholder="e.g., Chase Bank"
               disabled={!canEdit}
             />
-            {errors.creditor && (
-              <p className="mt-1 text-sm text-red-600">{errors.creditor}</p>
-            )}
+            {errors.creditor && <p className="mt-1 text-sm text-red-600">{errors.creditor}</p>}
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Debt Type
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Debt Type</label>
           <select
             value={formData.type}
             onChange={(e) => setFormData({ type: e.target.value })}
@@ -95,9 +84,7 @@ const DebtFormFields = ({
 
       {/* Financial Details */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
-          Financial Details
-        </h3>
+        <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Financial Details</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -115,16 +102,12 @@ const DebtFormFields = ({
               disabled={!canEdit}
             />
             {errors.currentBalance && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.currentBalance}
-              </p>
+              <p className="mt-1 text-sm text-red-600">{errors.currentBalance}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Original Balance
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Original Balance</label>
             <input
               type="number"
               step="0.01"
@@ -136,9 +119,7 @@ const DebtFormFields = ({
               disabled={!canEdit}
             />
             {errors.originalBalance && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.originalBalance}
-              </p>
+              <p className="mt-1 text-sm text-red-600">{errors.originalBalance}</p>
             )}
           </div>
         </div>
@@ -170,9 +151,7 @@ const DebtFormFields = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Credit Limit
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Credit Limit</label>
             <input
               type="number"
               step="0.01"
@@ -192,9 +171,7 @@ const DebtFormFields = ({
 
       {/* Payment Details */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
-          Payment Information
-        </h3>
+        <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Payment Information</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -212,16 +189,12 @@ const DebtFormFields = ({
               disabled={!canEdit}
             />
             {errors.minimumPayment && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.minimumPayment}
-              </p>
+              <p className="mt-1 text-sm text-red-600">{errors.minimumPayment}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Payment Due Date
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Payment Due Date</label>
             <input
               type="date"
               value={formData.paymentDueDate}
@@ -230,17 +203,13 @@ const DebtFormFields = ({
               disabled={!canEdit}
             />
             {errors.paymentDueDate && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.paymentDueDate}
-              </p>
+              <p className="mt-1 text-sm text-red-600">{errors.paymentDueDate}</p>
             )}
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Payment Frequency
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Payment Frequency</label>
           <select
             value={formData.paymentFrequency}
             onChange={(e) => setFormData({ paymentFrequency: e.target.value })}
@@ -258,27 +227,19 @@ const DebtFormFields = ({
 
       {/* Connection Management */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
-          Payment Automation
-        </h3>
+        <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Payment Automation</h3>
 
         {/* Auto-pay toggle */}
         <div className="flex items-center justify-between p-4 bg-blue-50 rounded-xl">
           <div>
-            <h4 className="font-medium text-gray-900">
-              Automatic Bill Creation
-            </h4>
-            <p className="text-sm text-gray-600">
-              Create recurring bills for this debt's payments
-            </p>
+            <h4 className="font-medium text-gray-900">Automatic Bill Creation</h4>
+            <p className="text-sm text-gray-600">Create recurring bills for this debt's payments</p>
           </div>
           <label className="flex items-center cursor-pointer">
             <input
               type="checkbox"
               checked={formData.shouldCreateBill}
-              onChange={(e) =>
-                setFormData({ shouldCreateBill: e.target.checked })
-              }
+              onChange={(e) => setFormData({ shouldCreateBill: e.target.checked })}
               className="sr-only"
               disabled={!canEdit}
             />
@@ -325,9 +286,7 @@ const DebtFormFields = ({
               ))}
             </select>
             {errors.existingBillId && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.existingBillId}
-              </p>
+              <p className="mt-1 text-sm text-red-600">{errors.existingBillId}</p>
             )}
           </div>
         )}
@@ -335,9 +294,7 @@ const DebtFormFields = ({
 
       {/* Notes */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Notes (Optional)
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
         <textarea
           value={formData.notes}
           onChange={(e) => setFormData({ notes: e.target.value })}

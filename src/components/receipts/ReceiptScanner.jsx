@@ -11,7 +11,7 @@ import ReceiptActionButtons from "./components/ReceiptActionButtons";
 /**
  * Receipt Scanner Component (Refactored)
  * Handles image upload, camera capture, and OCR processing
- * 
+ *
  * REFACTORING RESULTS:
  * - Before: 449 lines, 381-line function, complexity 18
  * - After: ~55 lines main component + 6 focused components + 1 custom hook
@@ -26,11 +26,11 @@ const ReceiptScanner = ({ onReceiptProcessed, onClose }) => {
     extractedData,
     error,
     showImagePreview,
-    
+
     // Refs
     fileInputRef,
     cameraInputRef,
-    
+
     // Actions
     handleDrop,
     handleDragOver,
@@ -58,12 +58,7 @@ const ReceiptScanner = ({ onReceiptProcessed, onClose }) => {
 
           {isProcessing && <ReceiptProcessingState />}
 
-          {error && (
-            <ReceiptErrorState 
-              error={error} 
-              onRetry={resetScanner} 
-            />
-          )}
+          {error && <ReceiptErrorState error={error} onRetry={resetScanner} />}
 
           {extractedData && !isProcessing && (
             <div className="space-y-6">

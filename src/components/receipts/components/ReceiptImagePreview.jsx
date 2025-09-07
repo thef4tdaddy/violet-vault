@@ -6,11 +6,7 @@ import { formatFileSize } from "../../../utils/receipts/receiptHelpers.jsx";
  * Receipt Image Preview Component
  * Shows uploaded image with toggle visibility and UI standards compliance
  */
-const ReceiptImagePreview = ({ 
-  uploadedImage, 
-  showImagePreview, 
-  onTogglePreview 
-}) => {
+const ReceiptImagePreview = ({ uploadedImage, showImagePreview, onTogglePreview }) => {
   if (!uploadedImage) return null;
 
   return (
@@ -33,7 +29,8 @@ const ReceiptImagePreview = ({
               <>
                 <span className="text-base">S</span>HOW
               </>
-            )} <span className="text-base">I</span>MAGE
+            )}{" "}
+            <span className="text-base">I</span>MAGE
           </span>
         </button>
       </div>
@@ -49,7 +46,8 @@ const ReceiptImagePreview = ({
       )}
 
       <div className="text-xs text-purple-900 mt-2">
-        <span className="font-semibold">{uploadedImage.name}</span> • {formatFileSize(uploadedImage.size)}
+        <span className="font-semibold">{uploadedImage.name}</span> •{" "}
+        {formatFileSize(uploadedImage.size)}
       </div>
     </div>
   );

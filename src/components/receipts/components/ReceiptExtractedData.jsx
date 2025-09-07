@@ -11,7 +11,7 @@ import ExtractedItemsList from "./ExtractedItemsList";
 const ReceiptExtractedData = ({ extractedData }) => {
   if (!extractedData) return null;
 
-  const formatCurrency = (value) => value ? `$${value.toFixed(2)}` : null;
+  const formatCurrency = (value) => (value ? `$${value.toFixed(2)}` : null);
 
   return (
     <div className="glassmorphism rounded-lg p-4 border-2 border-black bg-green-100/40 backdrop-blur-sm">
@@ -28,7 +28,7 @@ const ReceiptExtractedData = ({ extractedData }) => {
             confidence={extractedData.confidence.merchant}
             fieldName="merchant"
           />
-          
+
           <ExtractedDataField
             label="Total Amount"
             value={extractedData.total}
@@ -36,7 +36,7 @@ const ReceiptExtractedData = ({ extractedData }) => {
             fieldName="total"
             formatter={formatCurrency}
           />
-          
+
           <ExtractedDataField
             label="Date"
             value={extractedData.date}
@@ -68,7 +68,8 @@ const ReceiptExtractedData = ({ extractedData }) => {
 
           <div className="glassmorphism rounded-lg p-2 border border-white/20 bg-gray-100/20 backdrop-blur-sm">
             <div className="text-xs text-purple-900">
-              <span className="font-semibold">Processing time:</span> {extractedData.processingTime}ms
+              <span className="font-semibold">Processing time:</span> {extractedData.processingTime}
+              ms
             </div>
           </div>
         </div>

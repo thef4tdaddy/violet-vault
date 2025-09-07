@@ -5,10 +5,7 @@ import { getIcon } from "../../../utils/icons";
  * Auto-lock settings section with toggle switches and timeout slider
  * Extracted from SecuritySettings.jsx with UI standards compliance
  */
-const AutoLockSettingsSection = ({ 
-  securitySettings, 
-  handleSettingChange 
-}) => {
+const AutoLockSettingsSection = ({ securitySettings, handleSettingChange }) => {
   // Toggle switch component for consistency
   const ToggleSwitch = ({ enabled, onChange, label, description }) => (
     <div className="flex items-center justify-between py-3">
@@ -16,16 +13,12 @@ const AutoLockSettingsSection = ({
         <label className="text-sm font-black text-purple-800 uppercase tracking-wide">
           {label}
         </label>
-        <p className="text-xs text-purple-700 mt-1 font-medium">
-          {description}
-        </p>
+        <p className="text-xs text-purple-700 mt-1 font-medium">{description}</p>
       </div>
       <button
         onClick={onChange}
         className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 shadow-lg border-2 border-black ${
-          enabled
-            ? "bg-gradient-to-r from-blue-500 to-purple-600"
-            : "bg-gray-300"
+          enabled ? "bg-gradient-to-r from-blue-500 to-purple-600" : "bg-gray-300"
         }`}
       >
         <span
@@ -41,7 +34,7 @@ const AutoLockSettingsSection = ({
     <div className="glassmorphism rounded-2xl p-6 shadow-xl border-2 border-black bg-orange-50/60 backdrop-blur-3xl">
       <h4 className="font-black text-black mb-4 flex items-center gap-3 text-lg">
         <div className="glassmorphism rounded-full p-2 bg-orange-500/20 border border-orange-400">
-          {React.createElement(getIcon('Lock'), { className: "h-5 w-5 text-orange-600" })}
+          {React.createElement(getIcon("Lock"), { className: "h-5 w-5 text-orange-600" })}
         </div>
         AUTO-LOCK SETTINGS
       </h4>
@@ -50,9 +43,7 @@ const AutoLockSettingsSection = ({
         {/* Enable Auto-Lock Toggle */}
         <ToggleSwitch
           enabled={securitySettings.autoLockEnabled}
-          onChange={() =>
-            handleSettingChange("autoLockEnabled", !securitySettings.autoLockEnabled)
-          }
+          onChange={() => handleSettingChange("autoLockEnabled", !securitySettings.autoLockEnabled)}
           label="Enable Auto-Lock"
           description="Automatically lock the app after period of inactivity"
         />
@@ -62,24 +53,22 @@ const AutoLockSettingsSection = ({
           <div className="pt-4 pb-2">
             <div className="glassmorphism rounded-lg p-4 border border-orange-300 bg-white/50">
               <label className="text-sm font-black text-purple-800 flex items-center gap-2 uppercase tracking-wide mb-3">
-                {React.createElement(getIcon('Clock'), { className: "h-4 w-4 text-orange-500" })}
+                {React.createElement(getIcon("Clock"), { className: "h-4 w-4 text-orange-500" })}
                 Auto-Lock Timeout: {securitySettings.autoLockTimeout} Minutes
               </label>
-              
+
               <input
                 type="range"
                 min="1"
                 max="120"
                 value={securitySettings.autoLockTimeout}
-                onChange={(e) =>
-                  handleSettingChange("autoLockTimeout", parseInt(e.target.value))
-                }
+                onChange={(e) => handleSettingChange("autoLockTimeout", parseInt(e.target.value))}
                 className="w-full h-3 bg-gradient-to-r from-orange-200 to-orange-400 rounded-lg appearance-none cursor-pointer slider-thumb"
                 style={{
-                  background: `linear-gradient(to right, #fb923c 0%, #fb923c ${(securitySettings.autoLockTimeout / 120) * 100}%, #fed7aa ${(securitySettings.autoLockTimeout / 120) * 100}%, #fed7aa 100%)`
+                  background: `linear-gradient(to right, #fb923c 0%, #fb923c ${(securitySettings.autoLockTimeout / 120) * 100}%, #fed7aa ${(securitySettings.autoLockTimeout / 120) * 100}%, #fed7aa 100%)`,
                 }}
               />
-              
+
               <div className="flex justify-between text-xs font-bold text-orange-700 mt-2">
                 <span>⚡ 1 MIN</span>
                 <span>🕐 2 HOURS</span>
@@ -91,9 +80,7 @@ const AutoLockSettingsSection = ({
         {/* Lock on Page Hide Toggle */}
         <ToggleSwitch
           enabled={securitySettings.lockOnPageHide}
-          onChange={() =>
-            handleSettingChange("lockOnPageHide", !securitySettings.lockOnPageHide)
-          }
+          onChange={() => handleSettingChange("lockOnPageHide", !securitySettings.lockOnPageHide)}
           label="Lock on Page Hide"
           description="Lock when switching tabs or minimizing window"
         />

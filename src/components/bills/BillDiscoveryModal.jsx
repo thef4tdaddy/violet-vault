@@ -81,7 +81,7 @@ const BillDiscoveryModal = ({
     const IconComponent = getBillIcon(
       bill.provider || "",
       bill.description || "",
-      bill.category || "",
+      bill.category || ""
     );
     return <IconComponent className="h-6 w-6" />;
   };
@@ -126,14 +126,11 @@ const BillDiscoveryModal = ({
                 Discovered Bills
               </h3>
               <p className="text-sm text-gray-600 mt-1">
-                Found {discoveredBills.length} potential recurring bills from
-                your transaction history
+                Found {discoveredBills.length} potential recurring bills from your transaction
+                history
               </p>
             </div>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
-            >
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -143,8 +140,7 @@ const BillDiscoveryModal = ({
               <Search className="h-12 w-12 mx-auto mb-3 opacity-50" />
               <p className="font-medium">No new bills discovered</p>
               <p className="text-sm mt-1">
-                Try adding more transaction history or check back later as you
-                make more purchases.
+                Try adding more transaction history or check back later as you make more purchases.
               </p>
             </div>
           ) : (
@@ -154,12 +150,8 @@ const BillDiscoveryModal = ({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className="text-sm text-blue-700">
-                      <span className="font-medium">{selectedBills.size}</span>{" "}
-                      of{" "}
-                      <span className="font-medium">
-                        {discoveredBills.length}
-                      </span>{" "}
-                      bills selected
+                      <span className="font-medium">{selectedBills.size}</span> of{" "}
+                      <span className="font-medium">{discoveredBills.length}</span> bills selected
                     </div>
                     <div className="text-sm text-blue-600">
                       Total estimated monthly: $
@@ -172,9 +164,7 @@ const BillDiscoveryModal = ({
                   <div className="flex gap-2">
                     <button
                       onClick={() => {
-                        const allIds = new Set(
-                          discoveredBills.map((b) => b.id),
-                        );
+                        const allIds = new Set(discoveredBills.map((b) => b.id));
                         setSelectedBills(allIds);
                       }}
                       className="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
@@ -215,9 +205,7 @@ const BillDiscoveryModal = ({
                             onChange={() => toggleBillSelection(bill.id)}
                             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                           />
-                          <div className="text-xl">
-                            {getBillIconComponent(bill)}
-                          </div>
+                          <div className="text-xl">{getBillIconComponent(bill)}</div>
                         </div>
 
                         {/* Bill Info */}
@@ -232,18 +220,14 @@ const BillDiscoveryModal = ({
                                   {Math.round(bill.confidence * 100)}%
                                 </span>
                               </h4>
-                              <p className="text-sm text-gray-600">
-                                {bill.category}
-                              </p>
+                              <p className="text-sm text-gray-600">{bill.category}</p>
                             </div>
 
                             <div className="text-right">
                               <p className="font-semibold text-gray-900">
                                 ${Math.abs(bill.amount).toFixed(2)}
                               </p>
-                              <p className="text-xs text-gray-500 capitalize">
-                                {bill.frequency}
-                              </p>
+                              <p className="text-xs text-gray-500 capitalize">{bill.frequency}</p>
                             </div>
                           </div>
 
@@ -268,19 +252,14 @@ const BillDiscoveryModal = ({
                               <Target className="h-4 w-4 text-gray-400" />
                               <select
                                 value={billEnvelopeMap[bill.id] || ""}
-                                onChange={(e) =>
-                                  updateBillEnvelope(bill.id, e.target.value)
-                                }
+                                onChange={(e) => updateBillEnvelope(bill.id, e.target.value)}
                                 className="text-sm px-2 py-1 border border-gray-300 rounded flex-1"
                               >
-                                <option value="">
-                                  No envelope (use unassigned cash)
-                                </option>
+                                <option value="">No envelope (use unassigned cash)</option>
                                 {availableEnvelopes.map((envelope) => (
                                   <option key={envelope.id} value={envelope.id}>
                                     {envelope.name}
-                                    {envelope.id === bill.suggestedEnvelopeId &&
-                                      " (Suggested)"}
+                                    {envelope.id === bill.suggestedEnvelopeId && " (Suggested)"}
                                   </option>
                                 ))}
                               </select>
@@ -289,8 +268,7 @@ const BillDiscoveryModal = ({
                             {bill.suggestedEnvelopeName && (
                               <p className="text-xs text-blue-600 mt-1 ml-6">
                                 💡 Suggested: {bill.suggestedEnvelopeName}(
-                                {Math.round(bill.envelopeConfidence * 100)}%
-                                match)
+                                {Math.round(bill.envelopeConfidence * 100)}% match)
                               </p>
                             )}
                           </div>
@@ -300,26 +278,18 @@ const BillDiscoveryModal = ({
                             <div className="mt-3 p-2 bg-gray-50 rounded text-xs text-gray-600">
                               <p>
                                 <strong>Sample transactions:</strong>
-                                {bill.discoveryData.sampleTransactions.map(
-                                  (txn, i) => (
-                                    <span key={i}>
-                                      {i > 0 && ", "}$
-                                      {Math.abs(txn.amount).toFixed(2)} on{" "}
-                                      {new Date(txn.date).toLocaleDateString()}
-                                    </span>
-                                  ),
-                                )}
+                                {bill.discoveryData.sampleTransactions.map((txn, i) => (
+                                  <span key={i}>
+                                    {i > 0 && ", "}${Math.abs(txn.amount).toFixed(2)} on{" "}
+                                    {new Date(txn.date).toLocaleDateString()}
+                                  </span>
+                                ))}
                               </p>
                               {bill.discoveryData.amountRange && (
                                 <p className="mt-1">
                                   <strong>Amount range:</strong> $
-                                  {Math.abs(
-                                    bill.discoveryData.amountRange[0],
-                                  ).toFixed(2)}{" "}
-                                  - $
-                                  {Math.abs(
-                                    bill.discoveryData.amountRange[1],
-                                  ).toFixed(2)}
+                                  {Math.abs(bill.discoveryData.amountRange[0]).toFixed(2)} - $
+                                  {Math.abs(bill.discoveryData.amountRange[1]).toFixed(2)}
                                 </p>
                               )}
                             </div>

@@ -20,11 +20,11 @@ describe("encryptedDataValidator", () => {
     it("should pass valid encrypted data", () => {
       const validData = {
         data: "a".repeat(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH),
-        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH)
+        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH),
       };
 
       const result = validateEncryptedData(validData, "test-operation");
-      
+
       expect(result.isValid).toBe(true);
       expect(result.errors).toHaveLength(0);
       expect(result.warnings).toHaveLength(0);
@@ -63,7 +63,7 @@ describe("encryptedDataValidator", () => {
     it("should reject data that is too small", () => {
       const tooSmallData = {
         data: "a".repeat(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH - 1),
-        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH)
+        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH),
       };
 
       const result = validateEncryptedData(tooSmallData, "too-small-data");
@@ -77,7 +77,7 @@ describe("encryptedDataValidator", () => {
     it("should reject IV that is too small", () => {
       const tooSmallIv = {
         data: "a".repeat(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH),
-        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH - 1)
+        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH - 1),
       };
 
       const result = validateEncryptedData(tooSmallIv, "too-small-iv");
@@ -91,7 +91,7 @@ describe("encryptedDataValidator", () => {
     it("should reject data that is too large", () => {
       const tooLargeData = {
         data: "a".repeat(VALIDATION_CONSTANTS.MAX_MANIFEST_SIZE + 1),
-        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH)
+        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH),
       };
 
       const result = validateEncryptedData(tooLargeData, "too-large");
@@ -105,7 +105,7 @@ describe("encryptedDataValidator", () => {
     it("should warn about large data", () => {
       const largeData = {
         data: "a".repeat(VALIDATION_CONSTANTS.LARGE_DATA_WARNING_SIZE + 1),
-        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH)
+        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH),
       };
 
       const result = validateEncryptedData(largeData, "large-warning");
@@ -123,7 +123,7 @@ describe("encryptedDataValidator", () => {
         get data() {
           throw new Error("Property access error");
         },
-        iv: "valid-iv"
+        iv: "valid-iv",
       };
 
       const result = validateEncryptedData(invalidData, "error-test");
@@ -135,7 +135,7 @@ describe("encryptedDataValidator", () => {
     it("should default operation name", () => {
       const validData = {
         data: "a".repeat(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH),
-        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH)
+        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH),
       };
 
       const result = validateEncryptedData(validData);
@@ -145,7 +145,7 @@ describe("encryptedDataValidator", () => {
     it("should handle exactly minimum sizes", () => {
       const exactMinimumData = {
         data: "a".repeat(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH),
-        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH)
+        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH),
       };
 
       const result = validateEncryptedData(exactMinimumData, "exact-minimum");
@@ -159,7 +159,7 @@ describe("encryptedDataValidator", () => {
     it("should handle exactly maximum sizes", () => {
       const exactMaximumData = {
         data: "a".repeat(VALIDATION_CONSTANTS.MAX_MANIFEST_SIZE),
-        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH)
+        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH),
       };
 
       const result = validateEncryptedData(exactMaximumData, "exact-maximum");
@@ -172,10 +172,10 @@ describe("encryptedDataValidator", () => {
   describe("logging integration", () => {
     it("should log validation failures", async () => {
       const logger = await import("../../common/logger");
-      
+
       const invalidData = {
         data: "too-short",
-        iv: "short"
+        iv: "short",
       };
 
       validateEncryptedData(invalidData, "logging-test");
@@ -185,17 +185,17 @@ describe("encryptedDataValidator", () => {
         expect.objectContaining({
           isValid: false,
           errors: expect.any(Array),
-          warnings: expect.any(Array)
+          warnings: expect.any(Array),
         })
       );
     });
 
     it("should log validation warnings", async () => {
       const logger = await import("../../common/logger");
-      
+
       const largeData = {
         data: "a".repeat(VALIDATION_CONSTANTS.LARGE_DATA_WARNING_SIZE + 1),
-        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH)
+        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH),
       };
 
       validateEncryptedData(largeData, "warning-test");
@@ -204,19 +204,17 @@ describe("encryptedDataValidator", () => {
         "⚠️ Data validation warnings for warning-test",
         expect.objectContaining({
           isValid: true,
-          warnings: expect.arrayContaining([
-            expect.stringContaining("Large encrypted data")
-          ])
+          warnings: expect.arrayContaining([expect.stringContaining("Large encrypted data")]),
         })
       );
     });
 
     it("should log successful validation", async () => {
       const logger = await import("../../common/logger");
-      
+
       const validData = {
         data: "a".repeat(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH),
-        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH)
+        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH),
       };
 
       validateEncryptedData(validData, "success-test");
@@ -225,7 +223,7 @@ describe("encryptedDataValidator", () => {
         "✅ Data validation passed for success-test",
         expect.objectContaining({
           dataLength: VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH,
-          ivLength: VALIDATION_CONSTANTS.MIN_IV_LENGTH
+          ivLength: VALIDATION_CONSTANTS.MIN_IV_LENGTH,
         })
       );
     });

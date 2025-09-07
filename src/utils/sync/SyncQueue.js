@@ -3,7 +3,7 @@ import logger from "../common/logger";
 /**
  * SyncQueue - Debounce and batch sync operations to prevent rapid-fire saves
  * Reduces Firebase quota usage and prevents overwhelming the sync system
- * 
+ *
  * Addresses GitHub Issue #576 - Cloud Sync Reliability Improvements (Phase 2)
  */
 export class SyncQueue {
@@ -12,7 +12,7 @@ export class SyncQueue {
     this.debounceMs = options.debounceMs || 2000; // 2 seconds
     this.maxBatchSize = options.maxBatchSize || 10;
     this.maxQueueAge = options.maxQueueAge || 30000; // 30 seconds
-    
+
     this.queue = new Map(); // operationType -> { operation, timestamp, resolve, reject }
     this.timers = new Map(); // operationType -> timeoutId
     this.processing = new Set(); // Currently processing operations
@@ -34,7 +34,7 @@ export class SyncQueue {
 
       this._addToQueue(operationType, queueItem);
       this._scheduleProcessing(operationType);
-      
+
       logger.debug(`📥 ${this.name}: Enqueued ${operationType}`, {
         queueSize: this.queue.size,
         debounceMs: this.debounceMs,
@@ -82,12 +82,12 @@ export class SyncQueue {
     for (const timerId of this.timers.values()) {
       clearTimeout(timerId);
     }
-    
+
     // Reject all pending operations
     for (const [operationType, item] of this.queue) {
       item.reject(new Error(`Queue cleared: ${operationType} cancelled`));
     }
-    
+
     this.queue.clear();
     this.timers.clear();
     logger.info(`🧹 ${this.name}: Queue cleared`);
@@ -104,7 +104,7 @@ export class SyncQueue {
       existing.reject(new Error(`Superseded by newer ${operationType}`));
       this.stats.superseded++;
     }
-    
+
     this.queue.set(operationType, queueItem);
     this.stats.enqueued++;
   }
@@ -123,7 +123,7 @@ export class SyncQueue {
     const timerId = setTimeout(() => {
       this._processOperation(operationType);
     }, this.debounceMs);
-    
+
     this.timers.set(operationType, timerId);
   }
 
@@ -144,10 +144,10 @@ export class SyncQueue {
     try {
       logger.debug(`⚡ ${this.name}: Processing ${operationType}`);
       const result = await item.operation(item.data);
-      
+
       item.resolve(result);
       this.stats.processed++;
-      
+
       logger.debug(`✅ ${this.name}: Completed ${operationType}`);
       return result;
     } catch (error) {
@@ -166,12 +166,12 @@ export class SyncQueue {
    */
   _getOldestItemAge() {
     if (this.queue.size === 0) return 0;
-    
+
     let oldest = Date.now();
     for (const item of this.queue.values()) {
       oldest = Math.min(oldest, item.timestamp);
     }
-    
+
     return Date.now() - oldest;
   }
 
