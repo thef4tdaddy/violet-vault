@@ -27,7 +27,7 @@ import logger from "../../utils/common/logger.js";
  * @returns {Object} Splitter state and actions
  */
 const useTransactionSplitter = (options = {}) => {
-  const { transaction, envelopes = [], onSplit } = options;
+  const { transaction, envelopes = [], onSplit } = options || {};
 
   // Core state
   const [splitAllocations, setSplitAllocations] = useState([]);
