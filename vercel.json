@@ -1,25 +1,11 @@
 {
   "build": {
     "env": {
-      "GENERATE_SOURCEMAP": "true"
+      "GENERATE_SOURCEMAP": "true",
+      "VITE_NODE_ENV": "development"
     }
   },
-  "github": {
-    "deployments": {
-      "develop": {
-        "env": {
-          "VITE_NODE_ENV": "development"
-        },
-        "buildCommand": "npm ci && VITE_NODE_ENV=development npm run build"
-      },
-      "main": {
-        "env": {
-          "VITE_NODE_ENV": "production"
-        }
-      }
-    }
-  },
-  "buildCommand": "npm ci && npm run build",
+  "buildCommand": "npm ci && npm run build:dev",
   "installCommand": "npm ci",
   "headers": [
     {
