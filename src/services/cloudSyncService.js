@@ -1,6 +1,8 @@
 import { budgetDb } from "../db/budgetDb";
 import logger from "../utils/common/logger";
 import chunkedSyncService from "./chunkedSyncService";
+import { autoBackupService } from "../utils/sync/autoBackupService";
+import { syncHealthMonitor } from "../utils/sync/syncHealthMonitor";
 
 const SYNC_INTERVAL = 5 * 60 * 1000; // 5 minutes (much more reasonable)
 const DEBOUNCE_DELAY = 10000; // 10 seconds (longer debounce to reduce noise)
@@ -61,7 +63,9 @@ class CloudSyncService {
 
   // Trigger sync immediately for critical changes (paycheck, imports, etc.)
   triggerSyncForCriticalChange(changeType) {
-    logger.info(`🚨 Critical change detected: ${changeType}, triggering immediate sync`);
+    logger.info(
+      `🚨 Critical change detected: ${changeType}, triggering immediate sync`,
+    );
     clearTimeout(this.debounceTimer);
     this.syncQueue = this.syncQueue.then(() => this.forceSync());
   }
@@ -75,8 +79,14 @@ class CloudSyncService {
     this.isSyncing = true;
     logger.info("🔄 Starting chunked data sync...");
 
+    // GitHub Issue #576 Phase 3: Track sync with health monitoring
+    const syncId = syncHealthMonitor.recordSyncStart("cloud_sync");
+
+    // GitHub Issue #576 Phase 3: Create automatic backup before sync
+    const backupId = await autoBackupService.createPreSyncBackup("cloud_sync");
+
     try {
-      // GitHub Issue #578: Validate encryption context before proceeding
+      // GitHub Issue #576 Phase 2: Enhanced encryption context validation for all users
       if (!this.config?.budgetId || !this.config?.encryptionKey) {
         logger.warn("🔐 Sync aborted - missing encryption context", {
           hasBudgetId: !!this.config?.budgetId,
@@ -85,10 +95,23 @@ class CloudSyncService {
         return { success: false, reason: "Missing encryption context" };
       }
 
+      // Additional validation for encryption key readiness
+      if (this.config.encryptionKey instanceof Promise) {
+        logger.warn("🔐 Sync aborted - encryption key not yet resolved", {
+          keyType: typeof this.config.encryptionKey,
+        });
+        return { success: false, reason: "Encryption key not ready" };
+      }
+
       // Initialize chunked Firebase sync if not already done
-      await chunkedSyncService.initialize(this.config.budgetId, this.config.encryptionKey);
+      syncHealthMonitor.updateSyncProgress(syncId, "initializing");
+      await chunkedSyncService.initialize(
+        this.config.budgetId,
+        this.config.encryptionKey,
+      );
 
       // Fetch data from Dexie for sync
+      syncHealthMonitor.updateSyncProgress(syncId, "fetching_local_data");
       const localData = await this.fetchDexieData();
 
       // Check what data exists in cloud to determine sync direction
@@ -97,20 +120,31 @@ class CloudSyncService {
         const cloudResult = await chunkedSyncService.loadFromCloud();
         cloudData = cloudResult?.data || null;
       } catch (error) {
-        // GitHub Issue #578: Handle encryption key mismatch gracefully during onboarding
+        // GitHub Issue #576 Phase 2: Universal decryption error handling for all users
         if (
           error.message?.includes("The provided data is too small") ||
-          error.message?.includes("decrypt")
+          error.message?.includes("decrypt") ||
+          error.message?.includes("key mismatch") ||
+          error.name === "OperationError"
         ) {
-          logger.warn("🔑 Decryption failed during sync - likely key mismatch or timing issue", {
-            errorMessage: error.message,
-            budgetId: this.config?.budgetId?.substring(0, 8) + "...",
-          });
+          logger.warn(
+            "🔑 Decryption failed during sync - treating as no cloud data",
+            {
+              errorMessage: error.message,
+              errorName: error.name,
+              budgetId: this.config?.budgetId?.substring(0, 8) + "...",
+              timestamp: new Date().toISOString(),
+            },
+          );
 
-          // For new users during onboarding, this is expected - no cloud data exists yet
+          // For any user, treat decryption failures as "no cloud data" scenario
+          // This prevents crashes and allows sync to continue gracefully
           cloudData = null;
         } else {
-          logger.warn("Could not load cloud data, assuming no cloud data exists", error);
+          logger.warn(
+            "Could not load cloud data, assuming no cloud data exists",
+            error,
+          );
           cloudData = null;
         }
       }
@@ -150,7 +184,9 @@ class CloudSyncService {
           try {
             const { queryClient } = await import("../utils/common/queryClient");
             await queryClient.invalidateQueries();
-            logger.info("✅ TanStack Query cache invalidated after cloud data sync");
+            logger.info(
+              "✅ TanStack Query cache invalidated after cloud data sync",
+            );
           } catch (error) {
             logger.warn("Failed to invalidate query cache after sync", error);
           }
@@ -164,7 +200,10 @@ class CloudSyncService {
         }
       } else {
         // Upload from Dexie to Firebase (default behavior)
-        result = await chunkedSyncService.saveToCloud(localData, this.config.currentUser);
+        result = await chunkedSyncService.saveToCloud(
+          localData,
+          this.config.currentUser,
+        );
       }
 
       if (result.success) {
@@ -174,16 +213,123 @@ class CloudSyncService {
         });
         await this.updateLastSyncTime();
         await this.updateUserActivity();
+
+        // GitHub Issue #576: Record successful sync
+        syncHealthMonitor.recordSyncSuccess(syncId, {
+          direction: syncDecision.direction,
+          recordsProcessed: result?.recordsProcessed || 0,
+          backupId,
+        });
       } else {
         logger.error("❌ Chunked sync failed:", result.error);
+
+        // GitHub Issue #576 Phase 3: Enhanced error detection and categorization
+        const errorCategory = this.categorizeError(result.error);
+        syncHealthMonitor.recordSyncFailure(syncId, new Error(result.error), {
+          backupId,
+          stage: "sync_execution",
+          errorCategory,
+        });
       }
       return result;
     } catch (error) {
       logger.error("❌ An unexpected error occurred during sync:", error);
+
+      // GitHub Issue #576 Phase 3: Enhanced error detection and categorization
+      const errorCategory = this.categorizeError(error.message);
+      syncHealthMonitor.recordSyncFailure(syncId, error, {
+        backupId,
+        stage: "unknown",
+        errorCategory,
+      });
+
       return { success: false, error: error.message };
     } finally {
       this.isSyncing = false;
     }
+  }
+
+  /**
+   * GitHub Issue #576 Phase 3: Categorize error for enhanced error detection
+   * @param {string} errorMessage - The error message to categorize
+   * @returns {string} - Error category
+   */
+  categorizeError(errorMessage) {
+    if (!errorMessage || typeof errorMessage !== "string") {
+      return "unknown";
+    }
+
+    const message = errorMessage.toLowerCase();
+
+    // Network-related errors
+    if (
+      message.includes("network") ||
+      message.includes("timeout") ||
+      message.includes("connection") ||
+      message.includes("fetch") ||
+      message.includes("cors") ||
+      message.includes("blocked")
+    ) {
+      return "network";
+    }
+
+    // Encryption/decryption errors
+    if (
+      message.includes("decrypt") ||
+      message.includes("encrypt") ||
+      message.includes("data is too small") ||
+      message.includes("cipher") ||
+      message.includes("key derivation") ||
+      message.includes("invalid key")
+    ) {
+      return "encryption";
+    }
+
+    // Firebase-specific errors
+    if (
+      message.includes("firebase") ||
+      message.includes("firestore") ||
+      message.includes("permission") ||
+      message.includes("quota") ||
+      message.includes("rate limit")
+    ) {
+      return "firebase";
+    }
+
+    // Data validation errors
+    if (
+      message.includes("validation") ||
+      message.includes("invalid data") ||
+      message.includes("checksum") ||
+      message.includes("corrupt") ||
+      message.includes("malformed")
+    ) {
+      return "validation";
+    }
+
+    // Storage/database errors
+    if (
+      message.includes("storage") ||
+      message.includes("database") ||
+      message.includes("indexeddb") ||
+      message.includes("dexie") ||
+      message.includes("transaction")
+    ) {
+      return "storage";
+    }
+
+    // Authentication errors
+    if (
+      message.includes("auth") ||
+      message.includes("unauthorized") ||
+      message.includes("token") ||
+      message.includes("login") ||
+      message.includes("credential")
+    ) {
+      return "authentication";
+    }
+
+    return "unknown";
   }
 
   async updateUserActivity() {
@@ -216,7 +362,7 @@ class CloudSyncService {
         "lastSyncTime",
         new Date().toISOString(),
         86400000, // 24 hours TTL
-        "sync"
+        "sync",
       );
     } catch (error) {
       logger.error("Failed to update last sync time in Dexie:", error);
@@ -234,16 +380,23 @@ class CloudSyncService {
 
   async fetchDexieData() {
     try {
-      const [envelopes, transactions, bills, debts, savingsGoals, paycheckHistory, metadata] =
-        await Promise.all([
-          budgetDb.envelopes.toArray(),
-          budgetDb.transactions.toArray(),
-          budgetDb.bills.toArray(),
-          budgetDb.debts.toArray(),
-          budgetDb.savingsGoals.toArray(),
-          budgetDb.paycheckHistory.toArray(),
-          budgetDb.budget.get("metadata"),
-        ]);
+      const [
+        envelopes,
+        transactions,
+        bills,
+        debts,
+        savingsGoals,
+        paycheckHistory,
+        metadata,
+      ] = await Promise.all([
+        budgetDb.envelopes.toArray(),
+        budgetDb.transactions.toArray(),
+        budgetDb.bills.toArray(),
+        budgetDb.debts.toArray(),
+        budgetDb.savingsGoals.toArray(),
+        budgetDb.paycheckHistory.toArray(),
+        budgetDb.budget.get("metadata"),
+      ]);
 
       return {
         envelopes: envelopes || [],
@@ -315,7 +468,7 @@ class CloudSyncService {
             supplementalAccounts: data.supplementalAccounts || [],
             lastUpdated: new Date().toISOString(),
           });
-        }
+        },
       );
 
       logger.info("✅ Cloud data saved to Dexie successfully");
@@ -426,10 +579,16 @@ class CloudSyncService {
       const localData = await this.fetchDexieData();
 
       // Initialize chunked Firebase sync if not already done
-      await chunkedSyncService.initialize(this.config.budgetId, this.config.encryptionKey);
+      await chunkedSyncService.initialize(
+        this.config.budgetId,
+        this.config.encryptionKey,
+      );
 
       // Use chunked Firebase sync to save data (one-way)
-      const result = await chunkedSyncService.saveToCloud(localData, this.config.currentUser);
+      const result = await chunkedSyncService.saveToCloud(
+        localData,
+        this.config.currentUser,
+      );
 
       if (result.success) {
         logger.info("✅ Force push to Firebase completed successfully");
@@ -455,13 +614,18 @@ class CloudSyncService {
         // If the config has a clearAllData method, use it
         await this.config.clearAllData();
         logger.info("Cloud data cleared using config method");
-      } else if (chunkedSyncService && typeof chunkedSyncService.clearAllData === "function") {
+      } else if (
+        chunkedSyncService &&
+        typeof chunkedSyncService.clearAllData === "function"
+      ) {
         // If chunkedSyncService has a clearAllData method, use it
         await chunkedSyncService.clearAllData();
         logger.info("Cloud data cleared using chunkedSyncService");
       } else {
         // If no specific clear method exists, we can't clear cloud data
-        logger.warn("No cloud data clearing method available - skipping cloud clear");
+        logger.warn(
+          "No cloud data clearing method available - skipping cloud clear",
+        );
       }
 
       // Clear local sync metadata

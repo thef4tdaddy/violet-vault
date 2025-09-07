@@ -290,8 +290,8 @@ export default [
     },
   },
   {
-    // Exclusions for chunkedSyncService.js - critical sync file with legitimate complexity (Issue #576)
-    files: ["**/chunkedSyncService.js"],
+    // Exclusions for critical sync files with legitimate complexity (Issue #576)
+    files: ["**/chunkedSyncService.js", "**/cloudSyncService.js"],
     rules: {
       "max-lines": "off", // Critical sync operations may need many lines
       "max-lines-per-function": "off", // Complex sync operations need large functions

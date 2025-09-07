@@ -48,6 +48,10 @@ export class VioletVaultDB extends Dexie {
         "++id, name, description, sourceCommitHash, headCommitHash, author, created, isActive, isMerged, [isActive], [name]",
       budgetTags:
         "++id, name, description, commitHash, tagType, author, created, [tagType+created], [commitHash]",
+
+      // GitHub Issue #576: Automatic backup storage for sync safety
+      autoBackups:
+        "id, timestamp, type, syncType, [type+timestamp], [syncType+timestamp]",
     });
 
     // Enhanced hooks for automatic timestamping across all tables

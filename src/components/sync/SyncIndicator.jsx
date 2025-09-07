@@ -1,6 +1,8 @@
 // components/SyncIndicator.jsx
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { renderIcon } from "../../utils/icons";
+import { syncHealthMonitor } from "../../utils/sync/syncHealthMonitor";
+import SyncHealthDashboard from "./SyncHealthDashboard";
 
 const SyncIndicator = ({
   isOnline,
@@ -9,7 +11,23 @@ const SyncIndicator = ({
   activeUsers = [],
   syncError = null,
   currentUser = null,
+  syncProgress = null, // GitHub Issue #576: Enhanced progress tracking
+  syncStage = null, // Current sync stage (validating, encrypting, uploading, etc.)
 }) => {
+  const [healthData, setHealthData] = useState(null);
+  const [showHealthDashboard, setShowHealthDashboard] = useState(false);
+
+  // Monitor sync health
+  useEffect(() => {
+    const updateHealth = () => {
+      const health = syncHealthMonitor.getHealthStatus();
+      setHealthData(health);
+    };
+
+    updateHealth();
+    const interval = setInterval(updateHealth, 10000); // Update every 10 seconds
+    return () => clearInterval(interval);
+  }, []);
   const formatLastSync = (timestamp) => {
     if (!timestamp) return "Never synced";
 
@@ -29,6 +47,10 @@ const SyncIndicator = ({
   };
 
   const getSyncStatus = () => {
+    // GitHub Issue #576: Enhanced status with health monitoring
+    const healthStatus = healthData?.status || 'unknown';
+    const hasHealthIssues = healthStatus !== 'healthy' && healthStatus !== 'unknown';
+    
     if (syncError) {
       // Check if it's a network blocking error
       if (syncError.includes("blocked") || syncError.includes("ad blocker")) {
@@ -38,7 +60,22 @@ const SyncIndicator = ({
     }
     if (!isOnline) return { status: "offline", color: "amber", message: "Offline" };
     if (isSyncing) return { status: "syncing", color: "cyan", message: "Syncing..." };
-    return { status: "synced", color: "emerald", message: "Synced" };
+    
+    // Health-based status for non-syncing states
+    if (hasHealthIssues) {
+      switch (healthStatus) {
+        case 'slow':
+          return { status: "slow", color: "yellow", message: "Sync slow" };
+        case 'degraded':
+          return { status: "degraded", color: "orange", message: "Sync issues" };
+        case 'unhealthy':
+          return { status: "unhealthy", color: "red", message: "Sync unhealthy" };
+        default:
+          return { status: "synced", color: "emerald", message: "Sync healthy" };
+      }
+    }
+    
+    return { status: "synced", color: "emerald", message: "Sync healthy" };
   };
 
   const { status, color, message } = getSyncStatus();
@@ -72,12 +109,56 @@ const SyncIndicator = ({
 
           <div>
             <div className={`font-semibold text-${color}-700`}>{message}</div>
+            
+            {/* GitHub Issue #576: Enhanced sync progress indicators */}
+            {isSyncing && syncStage && (
+              <div className="text-xs text-gray-500 mb-1">
+                {syncStage}
+                {syncProgress && (
+                  <span className="ml-2">
+                    {Math.round(syncProgress * 100)}%
+                  </span>
+                )}
+              </div>
+            )}
+            
+            {/* Progress Bar for active syncing */}
+            {isSyncing && syncProgress !== null && (
+              <div className="w-32 h-1 bg-gray-200 rounded-full mb-1">
+                <div 
+                  className={`h-full bg-${color}-500 rounded-full transition-all duration-300`}
+                  style={{ width: `${Math.round(syncProgress * 100)}%` }}
+                />
+              </div>
+            )}
+            
             <div className="flex items-center text-sm text-gray-600">
               {renderIcon("Clock", { className: "h-3 w-3 mr-1" })}
               <span>{formatLastSync(lastSyncTime)}</span>
             </div>
           </div>
         </div>
+
+        {/* GitHub Issue #576: Sync Health Dashboard Button */}
+        <button
+          onClick={() => setShowHealthDashboard(true)}
+          className={`flex items-center space-x-2 px-3 py-2 rounded-lg border-2 border-black transition-all ${
+            healthData?.status === 'healthy' 
+              ? 'bg-green-100 text-green-700 hover:bg-green-200' 
+              : healthData?.status === 'unhealthy'
+                ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+          }`}
+          title="View sync health details"
+        >
+          {renderIcon('Activity', { className: 'h-4 w-4' })}
+          <span className="text-xs font-bold uppercase">Health</span>
+          {healthData?.metrics && (
+            <span className="text-xs">
+              {((healthData.metrics.successfulSyncs / (healthData.metrics.successfulSyncs + healthData.metrics.failedSyncs)) * 100 || 100).toFixed(0)}%
+            </span>
+          )}
+        </button>
 
         {/* Active Users */}
         {otherActiveUsers.length > 0 && (
@@ -209,6 +290,12 @@ const SyncIndicator = ({
           </div>
         </div>
       )}
+
+      {/* GitHub Issue #576: Sync Health Dashboard Modal */}
+      <SyncHealthDashboard
+        isOpen={showHealthDashboard}
+        onClose={() => setShowHealthDashboard(false)}
+      />
     </div>
   );
 };
