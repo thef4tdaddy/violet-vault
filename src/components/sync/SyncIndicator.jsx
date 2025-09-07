@@ -1,15 +1,6 @@
 // components/SyncIndicator.jsx
 import React from "react";
-import {
-  Wifi,
-  WifiOff,
-  RefreshCw,
-  CheckCircle,
-  AlertTriangle,
-  Users,
-  Clock,
-  Zap,
-} from "lucide-react";
+import { renderIcon } from "../../utils/icons";
 
 const SyncIndicator = ({
   isOnline,
@@ -65,15 +56,15 @@ const SyncIndicator = ({
         <div className="flex items-center space-x-3">
           <div className={`relative p-2 rounded-full bg-${color}-50`}>
             {status === "syncing" ? (
-              <RefreshCw className={`h-5 w-5 text-${color}-600 animate-spin`} />
+              renderIcon('RefreshCw', { className: `h-5 w-5 text-${color}-600 animate-spin` })
             ) : status === "error" ? (
-              <AlertTriangle className={`h-5 w-5 text-${color}-600`} />
+              renderIcon('AlertTriangle', { className: `h-5 w-5 text-${color}-600` })
             ) : status === "offline" ? (
-              <WifiOff className={`h-5 w-5 text-${color}-600`} />
+              renderIcon('WifiOff', { className: `h-5 w-5 text-${color}-600` })
             ) : status === "synced" ? (
-              <CheckCircle className={`h-5 w-5 text-${color}-600`} />
+              renderIcon('CheckCircle', { className: `h-5 w-5 text-${color}-600` })
             ) : (
-              <Wifi className={`h-5 w-5 text-${color}-600`} />
+              renderIcon('Wifi', { className: `h-5 w-5 text-${color}-600` })
             )}
 
             {/* Real-time pulse for active sync */}
@@ -94,7 +85,7 @@ const SyncIndicator = ({
           <div>
             <div className={`font-semibold text-${color}-700`}>{message}</div>
             <div className="flex items-center text-sm text-gray-600">
-              <Clock className="h-3 w-3 mr-1" />
+              {renderIcon('Clock', { className: "h-3 w-3 mr-1" })}
               <span>{formatLastSync(lastSyncTime)}</span>
             </div>
           </div>
@@ -104,7 +95,7 @@ const SyncIndicator = ({
         {otherActiveUsers.length > 0 && (
           <div className="flex items-center space-x-2">
             <div className="flex items-center text-sm text-gray-600">
-              <Users className="h-4 w-4 mr-1" />
+              {renderIcon('Users', { className: "h-4 w-4 mr-1" })}
               <span>
                 {otherActiveUsers.length} other
                 {otherActiveUsers.length === 1 ? "" : "s"} online
@@ -148,7 +139,7 @@ const SyncIndicator = ({
         {/* Performance Indicator */}
         {isOnline && !syncError && (
           <div className="flex items-center space-x-1 text-xs text-gray-500">
-            <Zap className="h-3 w-3" />
+            {renderIcon('Zap', { className: "h-3 w-3" })}
             <span>Real-time</span>
           </div>
         )}
@@ -164,14 +155,14 @@ const SyncIndicator = ({
           }`}
         >
           <div className="flex items-start space-x-2">
-            <AlertTriangle
-              className={`h-4 w-4 mt-0.5 flex-shrink-0 ${
+            {renderIcon('AlertTriangle', { 
+              className: `h-4 w-4 mt-0.5 flex-shrink-0 ${
                 syncError.includes("blocked") ||
                 syncError.includes("ad blocker")
                   ? "text-orange-600"
                   : "text-rose-600"
-              }`}
-            />
+              }` 
+            })}
             <div>
               <div
                 className={`font-medium ${
@@ -230,7 +221,7 @@ const SyncIndicator = ({
       {!isOnline && (
         <div className="mt-3 p-3 bg-amber-50 rounded-lg border border-amber-200">
           <div className="flex items-start space-x-2">
-            <WifiOff className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+            {renderIcon('WifiOff', { className: "h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" })}
             <div>
               <div className="font-medium text-amber-800">Working Offline</div>
               <div className="text-sm text-amber-600 mt-1">
