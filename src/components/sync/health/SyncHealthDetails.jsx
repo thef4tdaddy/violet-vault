@@ -154,9 +154,9 @@ const SyncHealthDetails = ({
                 disabled={isRecovering}
                 className={getActionButtonStyle("reset")}
               >
-                <AlertTriangle
-                  className={`h-3 w-3 mr-2 ${isRecovering ? "animate-pulse" : ""}`}
-                />
+                {renderIcon('AlertTriangle', {
+                  className: `h-3 w-3 mr-2 ${isRecovering ? "animate-pulse" : ""}`
+                })}
                 {isRecovering ? "Resetting..." : "Reset Cloud Data"}
               </button>
             </div>
