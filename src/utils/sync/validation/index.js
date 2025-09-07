@@ -15,8 +15,10 @@ export * as checksumUtils from "./checksumUtils";
 export * as encryptedDataValidator from "./encryptedDataValidator";
 export * as manifestValidator from "./manifestValidator";
 
+import { VALIDATION_CONSTANTS as constants } from "./constants";
+
 export default {
-  VALIDATION_CONSTANTS,
+  VALIDATION_CONSTANTS: constants,
   generateChecksum: "checksumUtils",
   validateChecksum: "checksumUtils",
   validateEncryptedData: "encryptedDataValidator",
