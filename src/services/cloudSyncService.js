@@ -29,13 +29,12 @@ class CloudSyncService {
       user: config?.budgetId || "unknown",
     });
 
-    // Initial sync
+    // Initial sync only when starting
     this.scheduleSync();
 
-    // Periodic sync
-    this.syncIntervalId = setInterval(() => {
-      this.scheduleSync();
-    }, SYNC_INTERVAL);
+    // GitHub Issue #576: Replace aggressive periodic sync with change-based sync
+    // Only sync when data actually changes, not every 30 seconds
+    // The sync will be triggered by data mutations via TanStack Query optimistic updates
   }
 
   stop() {
@@ -44,7 +43,7 @@ class CloudSyncService {
     logger.production("Cloud sync service stopped", {
       user: this.config?.budgetId || "unknown",
     });
-    clearInterval(this.syncIntervalId);
+    // No more periodic sync interval to clear
     clearTimeout(this.debounceTimer);
     this.isRunning = false;
   }

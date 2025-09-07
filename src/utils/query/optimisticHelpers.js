@@ -3,6 +3,7 @@ import { budgetDb } from "../../db/budgetDb";
 import budgetDatabaseService from "../../services/budgetDatabaseService";
 import { queryKeys } from "./queryKeys";
 import logger from "../common/logger";
+import { cloudSyncService } from "../../services/cloudSyncService";
 
 /**
  * Enhanced optimistic update helpers with Dexie persistence for offline support.
@@ -41,6 +42,11 @@ export const optimisticHelpers = {
         envelopeId,
         updates,
       });
+
+      // GitHub Issue #576: Trigger change-based sync after data modification
+      if (cloudSyncService?.isRunning) {
+        cloudSyncService.scheduleSync("normal");
+      }
     } catch (error) {
       logger.warn("Failed to persist optimistic envelope update", {
         error: error.message,
@@ -73,6 +79,11 @@ export const optimisticHelpers = {
       logger.debug("Optimistic envelope addition completed", {
         envelopeId: newEnvelope.id,
       });
+
+      // GitHub Issue #576: Trigger change-based sync after data modification
+      if (cloudSyncService?.isRunning) {
+        cloudSyncService.scheduleSync("normal");
+      }
     } catch (error) {
       logger.warn("Failed to persist optimistic envelope addition", {
         error: error.message,
