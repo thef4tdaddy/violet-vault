@@ -134,6 +134,20 @@ export const useAuth = create((set, get) => ({
                 "Local data is corrupted. Please clear data and start fresh.",
             };
           }
+
+          // SECURITY FIX: Validate password BEFORE setting auth state (Issue #577)
+          logger.auth("Validating password before allowing login");
+          const passwordValid = await get().validatePassword(password);
+          if (!passwordValid) {
+            logger.auth("Password validation failed - blocking login");
+            return {
+              success: false,
+              error: "Invalid password. Please check your password and try again.",
+              code: "INVALID_PASSWORD"
+            };
+          }
+          logger.auth("Password validation successful - proceeding with login");
+
           // CRITICAL: Use deterministic key generation for cross-browser consistency
           // Instead of using saved salt, always derive from password
           const keyData = await encryptionUtils.deriveKey(password);
@@ -178,12 +192,26 @@ export const useAuth = create((set, get) => ({
             keyType: key?.constructor?.name || "unknown",
           });
 
-          const decryptedData = await encryptionUtils.decrypt(
-            encryptedData,
-            key,
-            iv,
-          );
-          logger.auth("Successfully decrypted local data.");
+          let decryptedData;
+          try {
+            decryptedData = await encryptionUtils.decrypt(
+              encryptedData,
+              key,
+              iv,
+            );
+            logger.auth("Successfully decrypted local data.");
+          } catch (decryptError) {
+            // This should not happen since we validated the password above
+            logger.error("Unexpected decryption failure after password validation", {
+              error: decryptError.message,
+              errorType: decryptError.constructor?.name
+            });
+            return {
+              success: false,
+              error: "Unable to decrypt data. Please try again or contact support.",
+              code: "DECRYPTION_FAILED"
+            };
+          }
 
           let migratedData = decryptedData;
           let currentUserData = decryptedData.currentUser;
