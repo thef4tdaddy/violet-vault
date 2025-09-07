@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useUserSetup } from "../../hooks/auth/useUserSetup";
 import UserSetupLayout from "./components/UserSetupLayout";
 import UserSetupHeader from "./components/UserSetupHeader";
@@ -7,6 +7,9 @@ import UserNameInput from "./components/UserNameInput";
 import ColorPicker from "./components/ColorPicker";
 import ReturningUserActions from "./components/ReturningUserActions";
 import StepButtons from "./components/StepButtons";
+import JoinBudgetModal from "../sharing/JoinBudgetModal";
+import { useAuth } from "../../stores/auth/authStore";
+import { renderIcon } from "../../utils";
 import logger from "../../utils/common/logger";
 
 /**
@@ -15,6 +18,9 @@ import logger from "../../utils/common/logger";
  * Reduced from 435 lines to ~120 lines with full UI/logic separation
  */
 const UserSetup = ({ onSetupComplete }) => {
+  const [showJoinModal, setShowJoinModal] = useState(false);
+  const { joinBudgetWithShareCode } = useAuth();
+
   logger.debug("🏗️ UserSetup component rendered", {
     onSetupComplete: !!onSetupComplete,
   });
@@ -42,6 +48,19 @@ const UserSetup = ({ onSetupComplete }) => {
     setUserColor,
   } = useUserSetup(onSetupComplete);
 
+  const handleJoinSuccess = async (joinData) => {
+    logger.info("Join budget successful, setting up auth", joinData);
+
+    try {
+      const result = await joinBudgetWithShareCode(joinData);
+      if (result.success) {
+        onSetupComplete(result);
+      }
+    } catch (error) {
+      logger.error("Failed to complete join budget setup", error);
+    }
+  };
+
   return (
     <UserSetupLayout>
       <UserSetupHeader
@@ -52,7 +71,9 @@ const UserSetup = ({ onSetupComplete }) => {
       />
 
       <form
-        onSubmit={isReturningUser || step === 1 ? handleStep1Continue : handleSubmit}
+        onSubmit={
+          isReturningUser || step === 1 ? handleStep1Continue : handleSubmit
+        }
         className="space-y-6"
       >
         {/* Password Input (Step 1 and Returning Users) */}
@@ -88,7 +109,11 @@ const UserSetup = ({ onSetupComplete }) => {
         {/* User Profile Setup (Step 2) */}
         {step === 2 && !isReturningUser && (
           <>
-            <UserNameInput value={userName} onChange={handleNameChange} disabled={isLoading} />
+            <UserNameInput
+              value={userName}
+              onChange={handleNameChange}
+              disabled={isLoading}
+            />
 
             <ColorPicker
               selectedColor={userColor}
@@ -106,6 +131,32 @@ const UserSetup = ({ onSetupComplete }) => {
           </>
         )}
       </form>
+
+      {/* Join Budget Option - Always visible */}
+      {step === 1 && !isReturningUser && (
+        <div className="mt-6 pt-6 border-t border-white/20">
+          <div className="text-center">
+            <p className="text-sm text-purple-900 mb-3">
+              Already have a shared budget?
+            </p>
+            <button
+              type="button"
+              onClick={() => setShowJoinModal(true)}
+              className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg font-black transition-colors border-2 border-black flex items-center justify-center gap-2"
+            >
+              {renderIcon("UserPlus", "h-4 w-4")}
+              JOIN SHARED BUDGET
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Join Budget Modal */}
+      <JoinBudgetModal
+        isOpen={showJoinModal}
+        onClose={() => setShowJoinModal(false)}
+        onJoinSuccess={handleJoinSuccess}
+      />
     </UserSetupLayout>
   );
 };

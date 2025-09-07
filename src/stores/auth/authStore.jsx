@@ -297,6 +297,89 @@ export const useAuth = create((set, get) => ({
     return Promise.race([loginPromise, timeoutPromise]);
   },
 
+  async joinBudgetWithShareCode(joinData) {
+    logger.auth("Join budget attempt started.", {
+      budgetId: joinData.budgetId?.substring(0, 8) + "...",
+      hasPassword: !!joinData.password,
+      hasUserInfo: !!joinData.userInfo,
+      sharedBy: joinData.sharedBy,
+    });
+
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(
+        () => reject(new Error("Join timeout after 10 seconds")),
+        10000,
+      ),
+    );
+
+    const joinPromise = (async () => {
+      try {
+        // Generate encryption key for this user's password
+        const keyData = await encryptionUtils.deriveKey(joinData.password);
+        const newSalt = keyData.salt;
+        const key = keyData.key;
+
+        // Use the shared budgetId (not device-unique for sharing)
+        const finalUserData = {
+          ...joinData.userInfo,
+          budgetId: joinData.budgetId, // Use shared budgetId
+          joinedVia: "shareCode",
+          sharedBy: joinData.sharedBy,
+          // Set default userName if empty or missing
+          userName: joinData.userInfo?.userName?.trim() || "Shared User",
+        };
+
+        logger.auth("Setting auth state for shared budget user.", {
+          budgetId: finalUserData.budgetId?.substring(0, 8) + "...",
+          userName: finalUserData.userName,
+          sharedBy: joinData.sharedBy,
+          joinMethod: "shareCode",
+        });
+
+        set({
+          salt: newSalt,
+          encryptionKey: key,
+          currentUser: finalUserData,
+          budgetId: finalUserData.budgetId,
+          isUnlocked: true,
+          lastActivity: Date.now(),
+        });
+
+        // Identify shared user in Highlight.io for session tracking
+        identifyUser(finalUserData.budgetId, {
+          userName: finalUserData.userName,
+          userColor: finalUserData.userColor,
+          accountType: "shared_user",
+          sharedBy: joinData.sharedBy,
+        });
+
+        // Save user profile to localStorage (with their own encryption key)
+        const profileData = {
+          userName: finalUserData.userName,
+          userColor: finalUserData.userColor,
+          joinedVia: "shareCode",
+          sharedBy: joinData.sharedBy,
+        };
+        localStorage.setItem("userProfile", JSON.stringify(profileData));
+        logger.auth("Saved shared user profile to localStorage.");
+
+        // Start background sync after successful join
+        const { startBackgroundSyncAfterLogin } = get();
+        await startBackgroundSyncAfterLogin(false); // Not a new user
+
+        return { success: true, sharedBudget: true };
+      } catch (error) {
+        logger.error("Join budget failed.", error);
+        return {
+          success: false,
+          error: "Failed to join budget. Please try again.",
+        };
+      }
+    })();
+
+    return Promise.race([joinPromise, timeoutPromise]);
+  },
+
   logout() {
     logger.auth("Logging out and clearing auth state.");
     set({
