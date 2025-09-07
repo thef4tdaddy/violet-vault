@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Upload, FileText, AlertCircle, Trash2 } from "lucide-react";
+import { renderIcon } from "../../../utils/icons";
 
 const FileUploader = ({ onFileUpload }) => {
   const [clearExisting, setClearExisting] = useState(false);
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <Upload className="mx-auto h-12 w-12 text-gray-400" />
+        {renderIcon('Upload', { className: "mx-auto h-12 w-12 text-gray-400" })}
         <h4 className="mt-4 text-lg font-medium text-gray-900">
           Upload Transaction File
         </h4>
@@ -28,7 +28,7 @@ const FileUploader = ({ onFileUpload }) => {
             htmlFor="file-upload"
             className="cursor-pointer block text-center"
           >
-            <FileText className="mx-auto h-12 w-12 text-gray-400" />
+            {renderIcon('FileText', { className: "mx-auto h-12 w-12 text-gray-400" })}
             <span className="mt-2 block text-sm font-medium text-gray-900">
               Click to upload or drag and drop
             </span>
@@ -47,7 +47,7 @@ const FileUploader = ({ onFileUpload }) => {
               className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500 focus:ring-2"
             />
             <div className="flex items-center space-x-2">
-              <Trash2 className="h-4 w-4 text-red-500" />
+              {renderIcon('Trash2', { className: "h-4 w-4 text-red-500" })}
               <span className="text-sm font-medium text-gray-900">
                 Clear existing transactions and paychecks before import
               </span>
@@ -62,7 +62,7 @@ const FileUploader = ({ onFileUpload }) => {
 
       <div className="glassmorphism rounded-lg p-4 border border-white/20">
         <div className="flex">
-          <AlertCircle className="h-5 w-5 text-blue-400" />
+          {renderIcon('AlertCircle', { className: "h-5 w-5 text-blue-400" })}
           <div className="ml-3">
             <h5 className="text-sm font-medium text-blue-800">
               Supported File Formats
