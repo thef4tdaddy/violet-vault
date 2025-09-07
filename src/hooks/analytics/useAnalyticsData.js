@@ -221,7 +221,7 @@ export const useAnalyticsData = ({
 
   // Envelope health analysis
   const envelopeHealth = useMemo(() => {
-    return safeEnvelopes.map((envelope) => {
+    return safeEnvelopes.filter(Boolean).map((envelope) => {
       const monthlyBudget = envelope.monthlyAmount || 0;
       const currentBalance = envelope.currentBalance || 0;
       const spent =

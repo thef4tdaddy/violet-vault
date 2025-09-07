@@ -23,10 +23,10 @@ export const useUserSetup = (onSetupComplete) => {
     const savedProfile = localStorage.getItem("userProfile");
     const savedData = localStorage.getItem("envelopeBudgetData");
 
-    if (savedProfile) {
+    if (savedData) {
       try {
-        const profile = JSON.parse(savedProfile);
-        logger.debug("📋 Found saved profile:", profile);
+        const profile = savedProfile ? JSON.parse(savedProfile) : {};
+        logger.debug("📋 Found saved data, treating as returning user:", profile);
         setUserName(profile.userName || "");
         setUserColor(profile.userColor || "#a855f7");
         setIsReturningUser(true);
@@ -37,10 +37,11 @@ export const useUserSetup = (onSetupComplete) => {
         });
       } catch (error) {
         logger.warn("Failed to load saved profile:", error);
-        setIsReturningUser(false);
+        // If profile is corrupted, still treat as returning user since data exists
+        setIsReturningUser(true);
       }
     } else {
-      logger.debug("📋 No saved profile found, new user");
+      logger.debug("📋 No saved data found, new user");
       setIsReturningUser(false);
     }
   }, []);
