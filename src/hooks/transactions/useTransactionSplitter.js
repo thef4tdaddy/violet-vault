@@ -50,7 +50,10 @@ const useTransactionSplitter = (options = {}) => {
         hasMetadata: !!transaction.metadata?.items,
       });
 
-      const initialSplits = initializeSplitsFromTransaction(transaction, envelopes);
+      const initialSplits = initializeSplitsFromTransaction(
+        transaction,
+        envelopes,
+      );
       setSplitAllocations(initialSplits);
       setErrors([]);
     } catch (error) {
@@ -94,7 +97,13 @@ const useTransactionSplitter = (options = {}) => {
     (splitId, field, value) => {
       try {
         setSplitAllocations((current) => {
-          const updated = updateSplitField(current, splitId, field, value, envelopes);
+          const updated = updateSplitField(
+            current,
+            splitId,
+            field,
+            value,
+            envelopes,
+          );
 
           // Clear errors when user makes changes
           if (errors.length > 0) {
@@ -105,10 +114,13 @@ const useTransactionSplitter = (options = {}) => {
         });
       } catch (error) {
         logger.error("Failed to update split", error);
-        setErrors((prev) => [...prev, "Failed to update split: " + error.message]);
+        setErrors((prev) => [
+          ...prev,
+          "Failed to update split: " + error.message,
+        ]);
       }
     },
-    [envelopes, errors.length]
+    [envelopes, errors.length],
   );
 
   /**
@@ -128,7 +140,10 @@ const useTransactionSplitter = (options = {}) => {
       });
     } catch (error) {
       logger.error("Failed to remove split", error);
-      setErrors((prev) => [...prev, "Failed to remove split: " + error.message]);
+      setErrors((prev) => [
+        ...prev,
+        "Failed to remove split: " + error.message,
+      ]);
     }
   }, []);
 
@@ -151,7 +166,10 @@ const useTransactionSplitter = (options = {}) => {
       setErrors([]);
     } catch (error) {
       logger.error("Failed to auto-balance splits", error);
-      setErrors((prev) => [...prev, "Failed to auto-balance splits: " + error.message]);
+      setErrors((prev) => [
+        ...prev,
+        "Failed to auto-balance splits: " + error.message,
+      ]);
     }
   }, [transaction]);
 
@@ -174,7 +192,10 @@ const useTransactionSplitter = (options = {}) => {
       setErrors([]);
     } catch (error) {
       logger.error("Failed to split evenly", error);
-      setErrors((prev) => [...prev, "Failed to split evenly: " + error.message]);
+      setErrors((prev) => [
+        ...prev,
+        "Failed to split evenly: " + error.message,
+      ]);
     }
   }, [transaction]);
 
@@ -183,7 +204,10 @@ const useTransactionSplitter = (options = {}) => {
    */
   const validateSplits = useCallback(() => {
     try {
-      const validationErrors = validateSplitAllocations(splitAllocations, transaction);
+      const validationErrors = validateSplitAllocations(
+        splitAllocations,
+        transaction,
+      );
       setErrors(validationErrors);
       return validationErrors.length === 0;
     } catch (error) {
@@ -211,12 +235,18 @@ const useTransactionSplitter = (options = {}) => {
       }
 
       // Prepare split transactions
-      const splitTransactions = prepareSplitTransactions(splitAllocations, transaction);
+      const splitTransactions = prepareSplitTransactions(
+        splitAllocations,
+        transaction,
+      );
 
       logger.info("Submitting transaction split", {
         originalTransactionId: transaction.id,
         splitCount: splitTransactions.length,
-        totalAmount: splitTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0),
+        totalAmount: splitTransactions.reduce(
+          (sum, t) => sum + Math.abs(t.amount),
+          0,
+        ),
       });
 
       // Call the onSplit callback if provided
@@ -227,7 +257,10 @@ const useTransactionSplitter = (options = {}) => {
       return true;
     } catch (error) {
       logger.error("Failed to submit split", error);
-      setErrors((prev) => [...prev, "Failed to submit split: " + error.message]);
+      setErrors((prev) => [
+        ...prev,
+        "Failed to submit split: " + error.message,
+      ]);
       return false;
     } finally {
       setIsProcessing(false);

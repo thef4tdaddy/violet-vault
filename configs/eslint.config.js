@@ -146,10 +146,30 @@ export default [
 
       // Block all console statements - use logger instead
       "no-console": "error",
+
+      // Block window.confirm patterns that no-restricted-globals doesn't catch
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "CallExpression[callee.object.name='window'][callee.property.name='confirm']",
+          message:
+            "Use ConfirmModal instead of window.confirm(). Import { useConfirm } from '../../hooks/common/useConfirm' and use the returned confirm function.",
+        },
+        {
+          selector: "CallExpression[callee.object.name='window'][callee.property.name='alert']",
+          message:
+            "Use toast notifications instead of window.alert(). Import { globalToast } from '../../stores/ui/toastStore' and use globalToast.showError(), globalToast.showSuccess(), etc.",
+        },
+        {
+          selector: "CallExpression[callee.object.name='window'][callee.property.name='prompt']",
+          message:
+            "Use PromptModal instead of window.prompt(). Import { usePrompt } from '../../hooks/common/usePrompt' and use the returned prompt function.",
+        },
+      ],
     },
   },
   {
-    // Component architecture enforcement (Issue #515 - prevent direct service imports in components only)  
+    // Component architecture enforcement (Issue #515 - prevent direct service imports in components only)
     // Icon system enforcement (Issue #575 - prevent direct lucide-react imports in components)
     files: ["src/components/**/*.{js,jsx}"],
     rules: {

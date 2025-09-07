@@ -17,7 +17,7 @@ export const suggestEnvelope = (description, envelopes) => {
       const match = envelopes.find(
         (env) =>
           env.category?.toLowerCase().includes(category) ||
-          env.name.toLowerCase().includes(category)
+          env.name.toLowerCase().includes(category),
       );
       if (match) return match;
     }

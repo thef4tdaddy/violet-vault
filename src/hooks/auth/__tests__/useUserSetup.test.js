@@ -162,7 +162,7 @@ describe("useUserSetup", () => {
 
     expect(globalToast.showError).toHaveBeenCalledWith(
       "Please enter your password",
-      "Password Required"
+      "Password Required",
     );
   });
 
@@ -183,7 +183,7 @@ describe("useUserSetup", () => {
 
     expect(globalToast.showError).toHaveBeenCalledWith(
       "Incorrect password. Please try again.",
-      "Login Failed"
+      "Login Failed",
     );
   });
 
@@ -197,7 +197,9 @@ describe("useUserSetup", () => {
     });
 
     await act(async () => {
-      await result.current.handleStartTrackingClick({ preventDefault: vi.fn() });
+      await result.current.handleStartTrackingClick({
+        preventDefault: vi.fn(),
+      });
     });
 
     expect(mockOnSetupComplete).toHaveBeenCalledWith({
@@ -211,12 +213,14 @@ describe("useUserSetup", () => {
     const { result } = renderHook(() => useUserSetup(mockOnSetupComplete));
 
     await act(async () => {
-      await result.current.handleStartTrackingClick({ preventDefault: vi.fn() });
+      await result.current.handleStartTrackingClick({
+        preventDefault: vi.fn(),
+      });
     });
 
     expect(globalToast.showError).toHaveBeenCalledWith(
       "Please fill in both password and name",
-      "Required Fields"
+      "Required Fields",
     );
   });
 

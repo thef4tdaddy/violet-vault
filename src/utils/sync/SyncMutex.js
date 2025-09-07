@@ -67,9 +67,12 @@ export class SyncMutex extends BaseMutex {
     this.syncMetrics.operationsCompleted++;
     this.syncMetrics.totalLockTime += duration;
     this.syncMetrics.averageLockTime = Math.round(
-      this.syncMetrics.totalLockTime / this.syncMetrics.operationsCompleted
+      this.syncMetrics.totalLockTime / this.syncMetrics.operationsCompleted,
     );
-    this.syncMetrics.maxLockTime = Math.max(this.syncMetrics.maxLockTime, duration);
+    this.syncMetrics.maxLockTime = Math.max(
+      this.syncMetrics.maxLockTime,
+      duration,
+    );
     this.syncMetrics.lastOperationTime = new Date().toISOString();
 
     // Log performance warnings for slow operations

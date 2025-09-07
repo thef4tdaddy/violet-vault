@@ -50,7 +50,10 @@ export const useUserSetup = (onSetupComplete) => {
     return Promise.race([
       asyncFn(),
       new Promise((_, reject) =>
-        setTimeout(() => reject(new Error(`Operation timed out after ${timeoutMs}ms`)), timeoutMs)
+        setTimeout(
+          () => reject(new Error(`Operation timed out after ${timeoutMs}ms`)),
+          timeoutMs,
+        ),
       ),
     ]);
   };
@@ -101,7 +104,10 @@ export const useUserSetup = (onSetupComplete) => {
     if (isReturningUser) {
       // For returning users, try to login directly
       if (!masterPassword) {
-        globalToast.showError("Please enter your password", "Password Required");
+        globalToast.showError(
+          "Please enter your password",
+          "Password Required",
+        );
         return;
       }
 
@@ -118,19 +124,22 @@ export const useUserSetup = (onSetupComplete) => {
         logger.error("❌ Login failed:", error);
 
         // Check if this is the new password validation error with suggestion
-        if (error?.code === "INVALID_PASSWORD_OFFER_NEW_BUDGET" && error?.canCreateNew) {
-          // Show confirmation dialog for creating new budget
-          if (window.confirm(`${error.error}\n\n${error.suggestion}`)) {
-            // User wants to create new budget - clear existing data and start fresh
-            logger.debug("User chose to create new budget - clearing existing data");
-            localStorage.removeItem("envelopeBudgetData");
-            localStorage.removeItem("userProfile");
-            window.location.reload(); // Refresh to start completely fresh
-          }
+        if (
+          error?.code === "INVALID_PASSWORD_OFFER_NEW_BUDGET" &&
+          error?.canCreateNew
+        ) {
+          // Show error with suggestion - let the UI handle the confirmation flow
+          globalToast.showError(
+            `${error.error}\n\n${error.suggestion}`,
+            "Password Mismatch - Create New Budget?",
+          );
           return; // Don't show generic error toast
         }
 
-        globalToast.showError("Incorrect password. Please try again.", "Login Failed");
+        globalToast.showError(
+          "Incorrect password. Please try again.",
+          "Login Failed",
+        );
       } finally {
         setIsLoading(false);
       }
@@ -155,7 +164,10 @@ export const useUserSetup = (onSetupComplete) => {
         masterPassword: !!masterPassword,
         userName: userName.trim(),
       });
-      globalToast.showError("Please fill in both password and name", "Required Fields");
+      globalToast.showError(
+        "Please fill in both password and name",
+        "Required Fields",
+      );
       return;
     }
 

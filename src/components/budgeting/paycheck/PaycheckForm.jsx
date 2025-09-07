@@ -37,14 +37,18 @@ const PaycheckForm = ({
             value={formData.amount}
             onChange={(e) => onUpdateField("amount", e.target.value)}
             className={`block w-full pl-8 pr-3 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors ${
-              errors.amount ? "border-red-300 bg-red-50" : "border-gray-300 hover:border-gray-400"
+              errors.amount
+                ? "border-red-300 bg-red-50"
+                : "border-gray-300 hover:border-gray-400"
             }`}
             placeholder="0.00"
             step="0.01"
             min="0"
           />
         </div>
-        {errors.amount && <p className="mt-1 text-sm text-red-600">{errors.amount}</p>}
+        {errors.amount && (
+          <p className="mt-1 text-sm text-red-600">{errors.amount}</p>
+        )}
       </div>
 
       {/* Payer Selection */}
@@ -72,7 +76,9 @@ const PaycheckForm = ({
             ))}
           </datalist>
         </div>
-        {errors.payerName && <p className="mt-1 text-sm text-red-600">{errors.payerName}</p>}
+        {errors.payerName && (
+          <p className="mt-1 text-sm text-red-600">{errors.payerName}</p>
+        )}
       </div>
 
       {/* Payer Statistics */}
@@ -90,7 +96,9 @@ const PaycheckForm = ({
             </div>
             <div>
               <span className="text-blue-700">Count:</span>
-              <span className="font-medium ml-2">{selectedPayerStats.count}</span>
+              <span className="font-medium ml-2">
+                {selectedPayerStats.count}
+              </span>
             </div>
             <div>
               <span className="text-blue-700">Range:</span>
@@ -103,7 +111,9 @@ const PaycheckForm = ({
               <span className="text-blue-700">Last:</span>
               <span className="font-medium ml-2">
                 {selectedPayerStats.lastPaycheckDate
-                  ? new Date(selectedPayerStats.lastPaycheckDate).toLocaleDateString()
+                  ? new Date(
+                      selectedPayerStats.lastPaycheckDate,
+                    ).toLocaleDateString()
                   : "N/A"}
               </span>
             </div>

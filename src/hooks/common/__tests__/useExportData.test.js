@@ -20,7 +20,9 @@ describe("useExportData", () => {
       showErrorToast: vi.fn(),
       showWarningToast: vi.fn(),
     });
-    budgetDb.envelopes.toArray.mockResolvedValue([{ id: 1, name: "Groceries" }]);
+    budgetDb.envelopes.toArray.mockResolvedValue([
+      { id: 1, name: "Groceries" },
+    ]);
     getBudgetMetadata.mockResolvedValue({ unassignedCash: 100 });
 
     const { result } = renderHook(() => useExportData());
@@ -28,7 +30,7 @@ describe("useExportData", () => {
 
     expect(showSuccessToast).toHaveBeenCalledWith(
       expect.stringContaining("Export created with"),
-      "Export Completed"
+      "Export Completed",
     );
   });
 
@@ -48,6 +50,9 @@ describe("useExportData", () => {
     const { result } = renderHook(() => useExportData());
     await result.current.exportData();
 
-    expect(showWarningToast).toHaveBeenCalledWith("No data found to export", "Export Error");
+    expect(showWarningToast).toHaveBeenCalledWith(
+      "No data found to export",
+      "Export Error",
+    );
   });
 });

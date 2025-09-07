@@ -9,23 +9,26 @@ import { budgetDb } from "../../db/budgetDb";
 class AutoBackupService {
   constructor() {
     this.maxBackups = 5; // Keep last 5 backups
-    this.backupPrefix = 'auto_backup_';
+    this.backupPrefix = "auto_backup_";
     this.isEnabled = true;
   }
 
   /**
    * Create automatic backup before sync operation
    */
-  async createPreSyncBackup(syncType = 'unknown') {
+  async createPreSyncBackup(syncType = "unknown") {
     if (!this.isEnabled) {
       logger.debug("Auto backup disabled, skipping");
       return null;
     }
 
     const backupId = `${this.backupPrefix}${syncType}_${Date.now()}`;
-    
+
     try {
-      logger.debug("📦 Creating automatic pre-sync backup", { backupId, syncType });
+      logger.debug("📦 Creating automatic pre-sync backup", {
+        backupId,
+        syncType,
+      });
 
       const startTime = Date.now();
       const backupData = await this.collectAllData();
@@ -33,7 +36,7 @@ class AutoBackupService {
 
       const backup = {
         id: backupId,
-        type: 'pre_sync_auto',
+        type: "pre_sync_auto",
         syncType,
         timestamp: Date.now(),
         data: backupData,
@@ -41,13 +44,13 @@ class AutoBackupService {
           totalRecords: this.countRecords(backupData),
           sizeEstimate: JSON.stringify(backupData).length,
           duration,
-          version: '1.0',
+          version: "1.0",
         },
       };
 
       // Store backup in IndexedDB
       await this.storeBackup(backup);
-      
+
       // Clean up old backups
       await this.cleanupOldBackups();
 
@@ -120,7 +123,10 @@ class AutoBackupService {
    */
   async getBackups() {
     try {
-      const backups = await budgetDb.autoBackups.orderBy('timestamp').reverse().toArray();
+      const backups = await budgetDb.autoBackups
+        .orderBy("timestamp")
+        .reverse()
+        .toArray();
       return backups;
     } catch (error) {
       logger.error("Failed to retrieve backups", error);
@@ -143,40 +149,48 @@ class AutoBackupService {
       const data = backup.data;
 
       // Restore data in transaction for consistency
-      await budgetDb.transaction('rw', [
-        budgetDb.envelopes,
-        budgetDb.transactions,
-        budgetDb.bills,
-        budgetDb.debts,
-        budgetDb.savingsGoals,
-        budgetDb.paycheckHistory,
-        budgetDb.budget,
-      ], async () => {
-        // Clear existing data
-        await budgetDb.envelopes.clear();
-        await budgetDb.transactions.clear();
-        await budgetDb.bills.clear();
-        await budgetDb.debts.clear();
-        await budgetDb.savingsGoals.clear();
-        await budgetDb.paycheckHistory.clear();
+      await budgetDb.transaction(
+        "rw",
+        [
+          budgetDb.envelopes,
+          budgetDb.transactions,
+          budgetDb.bills,
+          budgetDb.debts,
+          budgetDb.savingsGoals,
+          budgetDb.paycheckHistory,
+          budgetDb.budget,
+        ],
+        async () => {
+          // Clear existing data
+          await budgetDb.envelopes.clear();
+          await budgetDb.transactions.clear();
+          await budgetDb.bills.clear();
+          await budgetDb.debts.clear();
+          await budgetDb.savingsGoals.clear();
+          await budgetDb.paycheckHistory.clear();
 
-        // Restore data
-        if (data.envelopes?.length) await budgetDb.envelopes.bulkAdd(data.envelopes);
-        if (data.transactions?.length) await budgetDb.transactions.bulkAdd(data.transactions);
-        if (data.bills?.length) await budgetDb.bills.bulkAdd(data.bills);
-        if (data.debts?.length) await budgetDb.debts.bulkAdd(data.debts);
-        if (data.savingsGoals?.length) await budgetDb.savingsGoals.bulkAdd(data.savingsGoals);
-        if (data.paycheckHistory?.length) await budgetDb.paycheckHistory.bulkAdd(data.paycheckHistory);
+          // Restore data
+          if (data.envelopes?.length)
+            await budgetDb.envelopes.bulkAdd(data.envelopes);
+          if (data.transactions?.length)
+            await budgetDb.transactions.bulkAdd(data.transactions);
+          if (data.bills?.length) await budgetDb.bills.bulkAdd(data.bills);
+          if (data.debts?.length) await budgetDb.debts.bulkAdd(data.debts);
+          if (data.savingsGoals?.length)
+            await budgetDb.savingsGoals.bulkAdd(data.savingsGoals);
+          if (data.paycheckHistory?.length)
+            await budgetDb.paycheckHistory.bulkAdd(data.paycheckHistory);
 
-        // Restore metadata
-        if (data.metadata) {
-          await budgetDb.budget.put({
-            id: "metadata",
-            ...data.metadata,
-            lastUpdated: new Date().toISOString(),
-          });
-        }
-      });
+          // Restore metadata
+          if (data.metadata) {
+            await budgetDb.budget.put({
+              id: "metadata",
+              ...data.metadata,
+              lastUpdated: new Date().toISOString(),
+            });
+          }
+        },
+      );
 
       logger.production("✅ Successfully restored from backup", {
         backupId,
@@ -198,14 +212,17 @@ class AutoBackupService {
    */
   async cleanupOldBackups() {
     try {
-      const backups = await budgetDb.autoBackups.orderBy('timestamp').reverse().toArray();
-      
+      const backups = await budgetDb.autoBackups
+        .orderBy("timestamp")
+        .reverse()
+        .toArray();
+
       if (backups.length > this.maxBackups) {
         const toDelete = backups.slice(this.maxBackups);
-        const deleteIds = toDelete.map(b => b.id);
-        
+        const deleteIds = toDelete.map((b) => b.id);
+
         await budgetDb.autoBackups.bulkDelete(deleteIds);
-        
+
         logger.debug("🧹 Cleaned up old auto backups", {
           deleted: deleteIds.length,
           remaining: this.maxBackups,
@@ -222,12 +239,18 @@ class AutoBackupService {
   async getBackupStats() {
     try {
       const backups = await this.getBackups();
-      const totalSize = backups.reduce((sum, b) => sum + (b.metadata?.sizeEstimate || 0), 0);
-      
+      const totalSize = backups.reduce(
+        (sum, b) => sum + (b.metadata?.sizeEstimate || 0),
+        0,
+      );
+
       return {
         count: backups.length,
         totalSize: this.formatSize(totalSize),
-        oldest: backups.length > 0 ? new Date(backups[backups.length - 1].timestamp) : null,
+        oldest:
+          backups.length > 0
+            ? new Date(backups[backups.length - 1].timestamp)
+            : null,
         newest: backups.length > 0 ? new Date(backups[0].timestamp) : null,
       };
     } catch (error) {
@@ -259,11 +282,11 @@ class AutoBackupService {
    * Helper: Format byte size
    */
   formatSize(bytes) {
-    if (bytes === 0) return '0 B';
+    if (bytes === 0) return "0 B";
     const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const sizes = ["B", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   }
 
   /**
@@ -271,7 +294,7 @@ class AutoBackupService {
    */
   setEnabled(enabled) {
     this.isEnabled = enabled;
-    logger.debug(`Auto backup ${enabled ? 'enabled' : 'disabled'}`);
+    logger.debug(`Auto backup ${enabled ? "enabled" : "disabled"}`);
   }
 
   /**
@@ -283,7 +306,10 @@ class AutoBackupService {
       logger.debug("Deleted backup", { backupId });
       return true;
     } catch (error) {
-      logger.error("Failed to delete backup", { backupId, error: error.message });
+      logger.error("Failed to delete backup", {
+        backupId,
+        error: error.message,
+      });
       return false;
     }
   }

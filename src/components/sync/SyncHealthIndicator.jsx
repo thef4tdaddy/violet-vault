@@ -1,5 +1,6 @@
 import React from "react";
 import { useSyncHealthIndicator } from "../../hooks/sync/useSyncHealthIndicator";
+import { useConfirm } from "../../hooks/common/useConfirm";
 import SyncStatusIndicator from "./health/SyncStatusIndicator";
 import SyncHealthDetails from "./health/SyncHealthDetails";
 
@@ -16,6 +17,7 @@ const SyncHealthIndicator = () => {
     runFullValidation,
     resetCloudData,
   } = useSyncHealthIndicator();
+  const confirm = useConfirm();
 
   const handleToggleDetails = () => {
     setShowDetails(!showDetails);
@@ -29,13 +31,17 @@ const SyncHealthIndicator = () => {
     runFullValidation();
   };
 
-  const handleResetData = () => {
-    if (
-      window.confirm(
-        "This will reset all cloud data and re-upload from local storage. " +
-          "This action cannot be undone. Continue?"
-      )
-    ) {
+  const handleResetData = async () => {
+    const confirmed = await confirm({
+      title: "Reset Cloud Data",
+      message:
+        "This will reset all cloud data and re-upload from local storage. This action cannot be undone. Continue?",
+      confirmText: "Reset Data",
+      cancelText: "Cancel",
+      variant: "destructive",
+    });
+
+    if (confirmed) {
       resetCloudData();
     }
   };

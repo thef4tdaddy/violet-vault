@@ -21,8 +21,12 @@ const DataManagementSection = ({
         >
           <AlertTriangle className="h-5 w-5 text-purple-600 mr-3" />
           <div className="text-left">
-            <p className="font-medium text-purple-900">Envelope Integrity Checker</p>
-            <p className="text-sm text-purple-700">Detect and fix empty/corrupted envelopes</p>
+            <p className="font-medium text-purple-900">
+              Envelope Integrity Checker
+            </p>
+            <p className="text-sm text-purple-700">
+              Detect and fix empty/corrupted envelopes
+            </p>
           </div>
         </button>
 
@@ -33,7 +37,9 @@ const DataManagementSection = ({
           <History className="h-5 w-5 text-gray-600 mr-3" />
           <div className="text-left">
             <p className="font-medium text-gray-900">Activity History</p>
-            <p className="text-sm text-gray-500">View recent budget activities and changes</p>
+            <p className="text-sm text-gray-500">
+              View recent budget activities and changes
+            </p>
           </div>
         </button>
 
@@ -43,8 +49,12 @@ const DataManagementSection = ({
         >
           <History className="h-5 w-5 text-yellow-600 mr-3" />
           <div className="text-left">
-            <p className="font-medium text-yellow-900">🧪 Test Budget History</p>
-            <p className="text-sm text-yellow-700">Create test commits for family collaboration</p>
+            <p className="font-medium text-yellow-900">
+              🧪 Test Budget History
+            </p>
+            <p className="text-sm text-yellow-700">
+              Create test commits for family collaboration
+            </p>
           </div>
         </button>
 
@@ -67,11 +77,16 @@ const DataManagementSection = ({
             className="hidden"
             id="settings-import-data"
           />
-          <label htmlFor="settings-import-data" className="w-full flex items-center cursor-pointer">
+          <label
+            htmlFor="settings-import-data"
+            className="w-full flex items-center cursor-pointer"
+          >
             <Upload className="h-5 w-5 text-gray-600 mr-3" />
             <div className="text-left">
               <p className="font-medium text-gray-900">Import Data</p>
-              <p className="text-sm text-gray-500">Upload budget data from file</p>
+              <p className="text-sm text-gray-500">
+                Upload budget data from file
+              </p>
             </div>
           </label>
         </div>
@@ -84,7 +99,9 @@ const DataManagementSection = ({
             <Cloud className="h-5 w-5 text-blue-600 mr-3" />
             <div className="text-left">
               <p className="font-medium text-blue-900">Sync to Cloud</p>
-              <p className="text-sm text-blue-600">Upload your data to cloud storage</p>
+              <p className="text-sm text-blue-600">
+                Upload your data to cloud storage
+              </p>
             </div>
           </button>
         )}

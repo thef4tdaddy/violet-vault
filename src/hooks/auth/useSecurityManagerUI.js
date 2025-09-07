@@ -8,8 +8,12 @@ import logger from "../../utils/common/logger";
  */
 export const useSecurityManagerUI = () => {
   const [isLocked, setIsLocked] = useState(false);
-  const [securitySettings, setSecuritySettings] = useState(() => securityService.loadSettings());
-  const [securityEvents, setSecurityEvents] = useState(() => securityService.loadSecurityEvents());
+  const [securitySettings, setSecuritySettings] = useState(() =>
+    securityService.loadSettings(),
+  );
+  const [securityEvents, setSecurityEvents] = useState(() =>
+    securityService.loadSecurityEvents(),
+  );
 
   const lastActivityRef = useRef(Date.now());
   const autoLockTimerRef = useRef(null);
@@ -88,14 +92,16 @@ export const useSecurityEventManager = (securitySettings, addSecurityEvent) => {
         logger.error("Failed to log security event:", error);
       }
     },
-    [securitySettings.securityLoggingEnabled, addSecurityEvent]
+    [securitySettings.securityLoggingEnabled, addSecurityEvent],
   );
 
   const logLoginAttempt = useCallback(
     (success, metadata = {}) => {
       logSecurityEvent({
         type: success ? "LOGIN_SUCCESS" : "LOGIN_FAILURE",
-        description: success ? "User logged in successfully" : "Failed login attempt",
+        description: success
+          ? "User logged in successfully"
+          : "Failed login attempt",
         metadata: {
           ...metadata,
           success,
@@ -103,7 +109,7 @@ export const useSecurityEventManager = (securitySettings, addSecurityEvent) => {
         },
       });
     },
-    [logSecurityEvent]
+    [logSecurityEvent],
   );
 
   const logSessionActivity = useCallback(
@@ -118,7 +124,7 @@ export const useSecurityEventManager = (securitySettings, addSecurityEvent) => {
         },
       });
     },
-    [logSecurityEvent]
+    [logSecurityEvent],
   );
 
   const logSecurityAction = useCallback(
@@ -133,7 +139,7 @@ export const useSecurityEventManager = (securitySettings, addSecurityEvent) => {
         },
       });
     },
-    [logSecurityEvent]
+    [logSecurityEvent],
   );
 
   return {
@@ -153,7 +159,7 @@ export const useAutoLockManager = (
   isLocked,
   lockSession,
   lastActivityRef,
-  autoLockTimerRef
+  autoLockTimerRef,
 ) => {
   const updateActivity = useCallback(() => {
     lastActivityRef.current = Date.now();
@@ -173,7 +179,11 @@ export const useAutoLockManager = (
 
       if (timeSinceActivity >= timeoutMs) {
         lockSession();
-        logger.debug("Auto-lock activated after", securitySettings.autoLockTimeout, "minutes");
+        logger.debug(
+          "Auto-lock activated after",
+          securitySettings.autoLockTimeout,
+          "minutes",
+        );
       } else {
         // Restart timer for remaining time
         const remainingTime = timeoutMs - timeSinceActivity;
@@ -182,7 +192,13 @@ export const useAutoLockManager = (
         }, remainingTime);
       }
     }, timeoutMs);
-  }, [securitySettings, isLocked, lockSession, lastActivityRef, autoLockTimerRef]);
+  }, [
+    securitySettings,
+    isLocked,
+    lockSession,
+    lastActivityRef,
+    autoLockTimerRef,
+  ]);
 
   const stopAutoLockTimer = useCallback(() => {
     if (autoLockTimerRef.current) {
@@ -208,7 +224,11 @@ export const useAutoLockManager = (
  * Hook for clipboard security management
  * Extracts clipboard clearing and protection logic
  */
-export const useClipboardSecurity = (securitySettings, clipboardTimerRef, logSecurityEvent) => {
+export const useClipboardSecurity = (
+  securitySettings,
+  clipboardTimerRef,
+  logSecurityEvent,
+) => {
   const secureClipboardCopy = useCallback(
     async (text, description = "Sensitive data") => {
       try {
@@ -250,7 +270,11 @@ export const useClipboardSecurity = (securitySettings, clipboardTimerRef, logSec
         return false;
       }
     },
-    [securitySettings.clipboardClearTimeout, clipboardTimerRef, logSecurityEvent]
+    [
+      securitySettings.clipboardClearTimeout,
+      clipboardTimerRef,
+      logSecurityEvent,
+    ],
   );
 
   const clearClipboardTimer = useCallback(() => {

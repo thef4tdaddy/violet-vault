@@ -19,7 +19,8 @@ export const isEmptyEnvelope = (envelope) => {
   const hasCategory = envelope.category && envelope.category.trim().length > 0;
 
   // Additional checks for completely empty envelopes
-  const hasAmount = envelope.monthlyAmount != null || envelope.currentBalance != null;
+  const hasAmount =
+    envelope.monthlyAmount != null || envelope.currentBalance != null;
   const hasAnyContent = hasName || hasCategory || hasAmount;
 
   return !hasAnyContent || (!hasName && !hasCategory);
@@ -73,10 +74,16 @@ export const removeCorruptedEnvelopes = async (envelopeIds) => {
     logger.debug("🗑️ Removing corrupted envelopes", { ids: envelopeIds });
 
     // Get envelope details before deletion for logging
-    const envelopesToDelete = await budgetDb.envelopes.where("id").anyOf(envelopeIds).toArray();
+    const envelopesToDelete = await budgetDb.envelopes
+      .where("id")
+      .anyOf(envelopeIds)
+      .toArray();
 
     // Delete the envelopes
-    const deletedCount = await budgetDb.envelopes.where("id").anyOf(envelopeIds).delete();
+    const deletedCount = await budgetDb.envelopes
+      .where("id")
+      .anyOf(envelopeIds)
+      .delete();
 
     logger.production("Removed corrupted envelopes", {
       count: deletedCount,
@@ -90,7 +97,9 @@ export const removeCorruptedEnvelopes = async (envelopeIds) => {
 
     // Trigger cloud sync for the deletions
     if (typeof window !== "undefined" && window.cloudSyncService) {
-      window.cloudSyncService.triggerSyncForCriticalChange("envelope_integrity_cleanup");
+      window.cloudSyncService.triggerSyncForCriticalChange(
+        "envelope_integrity_cleanup",
+      );
     }
 
     return {
@@ -188,7 +197,9 @@ export const repairCorruptedEnvelopes = async (corruptedEnvelopes) => {
 
       // Trigger cloud sync
       if (typeof window !== "undefined" && window.cloudSyncService) {
-        window.cloudSyncService.triggerSyncForCriticalChange("envelope_integrity_repair");
+        window.cloudSyncService.triggerSyncForCriticalChange(
+          "envelope_integrity_repair",
+        );
       }
     }
 

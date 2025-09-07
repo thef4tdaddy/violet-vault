@@ -151,7 +151,10 @@ export const shouldRuleExecute = (rule, context) => {
   }
 
   // Check trigger compatibility
-  if (rule.trigger !== context.trigger && rule.trigger !== TRIGGER_TYPES.MANUAL) {
+  if (
+    rule.trigger !== context.trigger &&
+    rule.trigger !== TRIGGER_TYPES.MANUAL
+  ) {
     return false;
   }
 
@@ -182,7 +185,9 @@ export const shouldRuleExecute = (rule, context) => {
  * @param {string} type - Condition type
  * @returns {Object} Default condition configuration
  */
-export const createDefaultCondition = (type = CONDITION_TYPES.BALANCE_LESS_THAN) => ({
+export const createDefaultCondition = (
+  type = CONDITION_TYPES.BALANCE_LESS_THAN,
+) => ({
   id: `condition_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
   type,
   envelopeId: null,
@@ -200,7 +205,10 @@ export const createDefaultCondition = (type = CONDITION_TYPES.BALANCE_LESS_THAN)
 export const validateCondition = (condition) => {
   const errors = [];
 
-  if (!condition.type || !Object.values(CONDITION_TYPES).includes(condition.type)) {
+  if (
+    !condition.type ||
+    !Object.values(CONDITION_TYPES).includes(condition.type)
+  ) {
     errors.push("Valid condition type is required");
   }
 
@@ -208,7 +216,11 @@ export const validateCondition = (condition) => {
     case CONDITION_TYPES.BALANCE_LESS_THAN:
     case CONDITION_TYPES.BALANCE_GREATER_THAN:
     case CONDITION_TYPES.UNASSIGNED_ABOVE:
-      if (condition.value === undefined || condition.value === null || condition.value < 0) {
+      if (
+        condition.value === undefined ||
+        condition.value === null ||
+        condition.value < 0
+      ) {
         errors.push("Balance conditions require a non-negative value");
       }
       break;
@@ -310,7 +322,9 @@ export const filterConditions = (conditions, filters = {}) => {
   }
 
   if (filters.envelopeId) {
-    filtered = filtered.filter((condition) => condition.envelopeId === filters.envelopeId);
+    filtered = filtered.filter(
+      (condition) => condition.envelopeId === filters.envelopeId,
+    );
   }
 
   return filtered;

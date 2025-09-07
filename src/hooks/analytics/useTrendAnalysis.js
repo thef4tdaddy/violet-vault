@@ -60,7 +60,8 @@ const calculateSpendingVelocity = (spendingTrends) => {
     const previous = spendingTrends[i - 1];
 
     const spendingChange = current.spending - previous.spending;
-    const percentChange = previous.spending > 0 ? (spendingChange / previous.spending) * 100 : 0;
+    const percentChange =
+      previous.spending > 0 ? (spendingChange / previous.spending) * 100 : 0;
 
     velocity.push({
       month: current.month,
@@ -131,13 +132,15 @@ const generateForecastInsights = (spendingTrends) => {
   const forecastData = spendingTrends.slice(-3);
 
   const avgForecastSpending =
-    forecastData.reduce((sum, month) => sum + month.spending, 0) / forecastData.length;
+    forecastData.reduce((sum, month) => sum + month.spending, 0) /
+    forecastData.length;
 
   return {
     projectedMonthlySpending: Math.round(avgForecastSpending),
     projectedSavings: Math.round(forecastData[2].net),
     confidenceLevel: 85,
-    trendDirection: avgForecastSpending > currentMonthData.spending ? "up" : "down",
+    trendDirection:
+      avgForecastSpending > currentMonthData.spending ? "up" : "down",
   };
 };
 
@@ -148,7 +151,8 @@ const generateInsights = (_categoryTrends, _seasonalPatterns) => [
   {
     type: "warning",
     title: "Increasing Entertainment Spending",
-    description: "Entertainment costs have increased by 50% compared to last month.",
+    description:
+      "Entertainment costs have increased by 50% compared to last month.",
     action: "Consider setting a monthly entertainment budget limit.",
   },
   {
@@ -160,8 +164,10 @@ const generateInsights = (_categoryTrends, _seasonalPatterns) => [
   {
     type: "info",
     title: "Seasonal Pattern Detected",
-    description: "Your spending typically increases by 15% during summer months.",
-    action: "Plan ahead for higher summer expenses in categories like entertainment.",
+    description:
+      "Your spending typically increases by 15% during summer months.",
+    action:
+      "Plan ahead for higher summer expenses in categories like entertainment.",
   },
 ];
 
@@ -170,25 +176,34 @@ const generateInsights = (_categoryTrends, _seasonalPatterns) => [
  * Extracts all computational logic from TrendAnalysisCharts component
  */
 export const useTrendAnalysis = (analyticsData, _timeFilter) => {
-  const spendingTrends = useMemo(() => generateSpendingTrends(analyticsData), [analyticsData]);
+  const spendingTrends = useMemo(
+    () => generateSpendingTrends(analyticsData),
+    [analyticsData],
+  );
 
   const spendingVelocity = useMemo(
     () => calculateSpendingVelocity(spendingTrends),
-    [spendingTrends]
+    [spendingTrends],
   );
 
-  const categoryTrends = useMemo(() => generateCategoryTrends(analyticsData), [analyticsData]);
+  const categoryTrends = useMemo(
+    () => generateCategoryTrends(analyticsData),
+    [analyticsData],
+  );
 
-  const seasonalPatterns = useMemo(() => generateSeasonalPatterns(analyticsData), [analyticsData]);
+  const seasonalPatterns = useMemo(
+    () => generateSeasonalPatterns(analyticsData),
+    [analyticsData],
+  );
 
   const forecastInsights = useMemo(
     () => generateForecastInsights(spendingTrends),
-    [spendingTrends]
+    [spendingTrends],
   );
 
   const insights = useMemo(
     () => generateInsights(categoryTrends, seasonalPatterns),
-    [categoryTrends, seasonalPatterns]
+    [categoryTrends, seasonalPatterns],
   );
 
   return {

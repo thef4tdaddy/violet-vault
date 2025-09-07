@@ -35,7 +35,9 @@ const SecurityLoggingSection = ({
             >
               {event.type}
             </span>
-            <p className="text-purple-800 mt-2 text-sm font-medium">{event.description}</p>
+            <p className="text-purple-800 mt-2 text-sm font-medium">
+              {event.description}
+            </p>
           </div>
           <span className="text-xs font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded border border-gray-300 ml-3">
             {new Date(event.timestamp).toLocaleTimeString()}
@@ -49,7 +51,9 @@ const SecurityLoggingSection = ({
     <div className="glassmorphism rounded-2xl p-6 shadow-xl border-2 border-black bg-green-50/60 backdrop-blur-3xl">
       <h4 className="font-black text-black mb-4 flex items-center gap-3 text-lg">
         <div className="glassmorphism rounded-full p-2 bg-green-500/20 border border-green-400">
-          {React.createElement(getIcon("Eye"), { className: "h-5 w-5 text-green-600" })}
+          {React.createElement(getIcon("Eye"), {
+            className: "h-5 w-5 text-green-600",
+          })}
         </div>
         SECURITY LOGGING
       </h4>
@@ -69,7 +73,7 @@ const SecurityLoggingSection = ({
             onClick={() =>
               handleSettingChange(
                 "securityLoggingEnabled",
-                !securitySettings.securityLoggingEnabled
+                !securitySettings.securityLoggingEnabled,
               )
             }
             className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 shadow-lg border-2 border-black ${
@@ -80,7 +84,9 @@ const SecurityLoggingSection = ({
           >
             <span
               className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 border border-gray-300 ${
-                securitySettings.securityLoggingEnabled ? "translate-x-6" : "translate-x-1"
+                securitySettings.securityLoggingEnabled
+                  ? "translate-x-6"
+                  : "translate-x-1"
               }`}
             />
           </button>
@@ -96,8 +102,12 @@ const SecurityLoggingSection = ({
                 className="flex items-center gap-2 px-4 py-2 glassmorphism rounded-lg border-2 border-black shadow-md hover:shadow-lg transition-all bg-blue-500/20 hover:bg-blue-500/30 font-bold text-blue-700"
               >
                 {showEvents
-                  ? React.createElement(getIcon("EyeOff"), { className: "h-4 w-4" })
-                  : React.createElement(getIcon("Eye"), { className: "h-4 w-4" })}
+                  ? React.createElement(getIcon("EyeOff"), {
+                      className: "h-4 w-4",
+                    })
+                  : React.createElement(getIcon("Eye"), {
+                      className: "h-4 w-4",
+                    })}
                 {showEvents ? "HIDE" : "VIEW"} EVENTS ({securityEvents.length})
               </button>
 
@@ -105,7 +115,9 @@ const SecurityLoggingSection = ({
                 onClick={exportSecurityEvents}
                 className="flex items-center gap-2 px-4 py-2 glassmorphism rounded-lg border-2 border-black shadow-md hover:shadow-lg transition-all bg-green-500/20 hover:bg-green-500/30 font-bold text-green-700"
               >
-                {React.createElement(getIcon("Download"), { className: "h-4 w-4" })}
+                {React.createElement(getIcon("Download"), {
+                  className: "h-4 w-4",
+                })}
                 EXPORT
               </button>
 
@@ -113,7 +125,9 @@ const SecurityLoggingSection = ({
                 onClick={showClearConfirmDialog}
                 className="flex items-center gap-2 px-4 py-2 glassmorphism rounded-lg border-2 border-black shadow-md hover:shadow-lg transition-all bg-red-500/20 hover:bg-red-500/30 font-bold text-red-700"
               >
-                {React.createElement(getIcon("Trash2"), { className: "h-4 w-4" })}
+                {React.createElement(getIcon("Trash2"), {
+                  className: "h-4 w-4",
+                })}
                 CLEAR
               </button>
             </div>

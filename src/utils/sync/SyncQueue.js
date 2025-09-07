@@ -151,7 +151,9 @@ export class SyncQueue {
       logger.debug(`✅ ${this.name}: Completed ${operationType}`);
       return result;
     } catch (error) {
-      logger.error(`❌ ${this.name}: Failed ${operationType}`, { error: error.message });
+      logger.error(`❌ ${this.name}: Failed ${operationType}`, {
+        error: error.message,
+      });
       item.reject(error);
       this.stats.failed++;
       throw error;

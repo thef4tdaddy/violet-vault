@@ -321,7 +321,9 @@ export const getIcon = (iconName, fallback = FileText) => {
 
 // Get icon name from component (reverse lookup)
 export const getIconName = (iconComponent) => {
-  const entry = Object.entries(ICON_REGISTRY).find(([_, component]) => component === iconComponent);
+  const entry = Object.entries(ICON_REGISTRY).find(
+    ([_, component]) => component === iconComponent,
+  );
   return entry ? entry[0] : null;
 };
 

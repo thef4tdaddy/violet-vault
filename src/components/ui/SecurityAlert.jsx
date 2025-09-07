@@ -91,8 +91,13 @@ const SecurityAlert = ({
       <span className="text-sm flex-1">{message}</span>
 
       {dismissible && onDismiss && (
-        <button onClick={onDismiss} className={`ml-2 hover:opacity-75 ${colors.icon}`}>
-          {React.createElement(getIconFromRegistry("X"), { className: "h-3 w-3" })}
+        <button
+          onClick={onDismiss}
+          className={`ml-2 hover:opacity-75 ${colors.icon}`}
+        >
+          {React.createElement(getIconFromRegistry("X"), {
+            className: "h-3 w-3",
+          })}
         </button>
       )}
     </div>

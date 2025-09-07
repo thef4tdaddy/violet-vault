@@ -41,7 +41,9 @@ const SecuritySettings = ({ isOpen, onClose }) => {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
                 <div className="glassmorphism rounded-full p-3 bg-blue-500/20 border border-blue-400">
-                  {React.createElement(getIcon("Shield"), { className: "h-8 w-8 text-blue-600" })}
+                  {React.createElement(getIcon("Shield"), {
+                    className: "h-8 w-8 text-blue-600",
+                  })}
                 </div>
                 <div>
                   <h3 className="text-2xl font-black text-black uppercase tracking-wide">
@@ -63,10 +65,19 @@ const SecuritySettings = ({ isOpen, onClose }) => {
             {/* Scrollable Content */}
             <div className="space-y-6 max-h-[60vh] overflow-y-auto">
               <SecurityStatusSection
-                {...{ isLocked, securitySettings, securityEvents, timeUntilAutoLock }}
+                {...{
+                  isLocked,
+                  securitySettings,
+                  securityEvents,
+                  timeUntilAutoLock,
+                }}
               />
-              <AutoLockSettingsSection {...{ securitySettings, handleSettingChange }} />
-              <ClipboardSecuritySection {...{ securitySettings, handleSettingChange }} />
+              <AutoLockSettingsSection
+                {...{ securitySettings, handleSettingChange }}
+              />
+              <ClipboardSecuritySection
+                {...{ securitySettings, handleSettingChange }}
+              />
               <SecurityLoggingSection
                 {...{
                   securitySettings,

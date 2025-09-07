@@ -26,7 +26,9 @@ export class ReportSubmissionService {
     let successfulSubmission = null;
 
     // Sort by priority
-    const sortedProviders = [...providersToTry].sort((a, b) => a.priority - b.priority);
+    const sortedProviders = [...providersToTry].sort(
+      (a, b) => a.priority - b.priority,
+    );
 
     logger.info("Attempting bug report submission with fallbacks", {
       providersCount: sortedProviders.length,
@@ -67,7 +69,10 @@ export class ReportSubmissionService {
 
         if (result.success && !successfulSubmission) {
           successfulSubmission = result;
-          logger.info(`Bug report submitted successfully via ${provider.type}`, result);
+          logger.info(
+            `Bug report submitted successfully via ${provider.type}`,
+            result,
+          );
 
           // Continue with remaining providers for redundancy if configured
           if (!provider.redundant) {
@@ -210,7 +215,9 @@ export class ReportSubmissionService {
 
       // Also try to store in localStorage for developer access
       try {
-        const existingReports = JSON.parse(localStorage.getItem("bugReports") || "[]");
+        const existingReports = JSON.parse(
+          localStorage.getItem("bugReports") || "[]",
+        );
         existingReports.push({
           ...reportData,
           submittedAt: new Date().toISOString(),
@@ -248,7 +255,9 @@ export class ReportSubmissionService {
    */
   static getSubmissionStats() {
     try {
-      const storedReports = JSON.parse(localStorage.getItem("bugReports") || "[]");
+      const storedReports = JSON.parse(
+        localStorage.getItem("bugReports") || "[]",
+      );
 
       return {
         totalReports: storedReports.length,
@@ -258,7 +267,8 @@ export class ReportSubmissionService {
           return reportTime > oneDayAgo;
         }).length,
         oldestReport: storedReports[0]?.submittedAt || null,
-        newestReport: storedReports[storedReports.length - 1]?.submittedAt || null,
+        newestReport:
+          storedReports[storedReports.length - 1]?.submittedAt || null,
       };
     } catch (error) {
       logger.debug("Error getting submission stats", error);

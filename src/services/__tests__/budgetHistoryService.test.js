@@ -108,7 +108,9 @@ describe("BudgetHistoryService", () => {
       const mockHash = "abc123456789";
       const mockFingerprint = "device123";
 
-      encryptionUtils.generateDeviceFingerprint.mockReturnValue(mockFingerprint);
+      encryptionUtils.generateDeviceFingerprint.mockReturnValue(
+        mockFingerprint,
+      );
       encryptionUtils.generateHash.mockReturnValue(mockHash);
       budgetDb.createBudgetCommit.mockResolvedValue(true);
       budgetDb.createBudgetChanges.mockResolvedValue(true);
@@ -136,7 +138,7 @@ describe("BudgetHistoryService", () => {
           author: "Test User",
           message: "Updated unassigned cash",
           deviceFingerprint: mockFingerprint,
-        })
+        }),
       );
 
       expect(budgetDb.createBudgetChanges).toHaveBeenCalledWith([
@@ -161,9 +163,9 @@ describe("BudgetHistoryService", () => {
         afterData: {},
       };
 
-      await expect(budgetHistoryService.createCommit(commitOptions)).rejects.toThrow(
-        "Database error"
-      );
+      await expect(
+        budgetHistoryService.createCommit(commitOptions),
+      ).rejects.toThrow("Database error");
     });
   });
 
@@ -181,7 +183,8 @@ describe("BudgetHistoryService", () => {
         source: "manual",
       };
 
-      const result = await budgetHistoryService.trackUnassignedCashChange(options);
+      const result =
+        await budgetHistoryService.trackUnassignedCashChange(options);
 
       expect(result.commit.message).toContain("Updated unassigned cash from");
       expect(result.changes[0].beforeData.amount).toBe(1000);
@@ -201,7 +204,8 @@ describe("BudgetHistoryService", () => {
         source: "distribution",
       };
 
-      const result = await budgetHistoryService.trackUnassignedCashChange(options);
+      const result =
+        await budgetHistoryService.trackUnassignedCashChange(options);
 
       expect(result.commit.message).toContain("Distributed");
       expect(result.commit.message).toContain("to envelopes");
@@ -222,9 +226,12 @@ describe("BudgetHistoryService", () => {
         author: "Test User",
       };
 
-      const result = await budgetHistoryService.trackActualBalanceChange(options);
+      const result =
+        await budgetHistoryService.trackActualBalanceChange(options);
 
-      expect(result.commit.message).toContain("Updated actual balance via manual entry");
+      expect(result.commit.message).toContain(
+        "Updated actual balance via manual entry",
+      );
       expect(result.changes[0].beforeData.balance).toBe(5000);
       expect(result.changes[0].afterData.balance).toBe(5500);
       expect(result.changes[0].afterData.isManual).toBe(true);
@@ -269,7 +276,9 @@ describe("BudgetHistoryService", () => {
 
       const result = await budgetHistoryService.trackDebtChange(options);
 
-      expect(result.commit.message).toContain("Updated Credit Card balance from");
+      expect(result.commit.message).toContain(
+        "Updated Credit Card balance from",
+      );
     });
 
     it("should track debt deletion", async () => {
@@ -311,7 +320,10 @@ describe("BudgetHistoryService", () => {
 
       budgetDb.budgetChanges.where.mockReturnValue(mockQuery);
 
-      const result = await budgetHistoryService.getRecentChanges("unassignedCash", 10);
+      const result = await budgetHistoryService.getRecentChanges(
+        "unassignedCash",
+        10,
+      );
 
       expect(result).toEqual(mockChanges);
       expect(budgetDb.budgetChanges.where).toHaveBeenCalledWith("entityType");
@@ -323,7 +335,8 @@ describe("BudgetHistoryService", () => {
         throw new Error("Query failed");
       });
 
-      const result = await budgetHistoryService.getRecentChanges("unassignedCash");
+      const result =
+        await budgetHistoryService.getRecentChanges("unassignedCash");
 
       expect(result).toEqual([]);
     });
@@ -376,7 +389,7 @@ describe("BudgetHistoryService", () => {
       };
 
       await expect(budgetHistoryService.createBranch(options)).rejects.toThrow(
-        "Branch 'existing-branch' already exists"
+        "Branch 'existing-branch' already exists",
       );
     });
 
@@ -400,7 +413,7 @@ describe("BudgetHistoryService", () => {
       };
 
       await expect(budgetHistoryService.createBranch(options)).rejects.toThrow(
-        "Source commit 'invalid-commit' not found"
+        "Source commit 'invalid-commit' not found",
       );
     });
   });
@@ -454,7 +467,7 @@ describe("BudgetHistoryService", () => {
 
       const result = await budgetHistoryService.verifyDeviceConsistency(
         "Test User",
-        "fingerprint123"
+        "fingerprint123",
       );
 
       expect(result).toBe(true);
@@ -478,7 +491,7 @@ describe("BudgetHistoryService", () => {
 
       const result = await budgetHistoryService.verifyDeviceConsistency(
         "Test User",
-        "fingerprint123"
+        "fingerprint123",
       );
 
       expect(result).toBe(true);
@@ -502,7 +515,7 @@ describe("BudgetHistoryService", () => {
 
       const result = await budgetHistoryService.verifyDeviceConsistency(
         "Test User",
-        "fingerprint3"
+        "fingerprint3",
       );
 
       expect(result).toBe(true); // Should allow 3rd device
@@ -535,7 +548,9 @@ describe("BudgetHistoryService", () => {
 
       await budgetHistoryService.cleanup();
 
-      expect(budgetDb.budgetCommits.bulkDelete).toHaveBeenCalledWith(oldCommits.map((c) => c.hash));
+      expect(budgetDb.budgetCommits.bulkDelete).toHaveBeenCalledWith(
+        oldCommits.map((c) => c.hash),
+      );
     });
 
     it("should not cleanup when within limits", async () => {

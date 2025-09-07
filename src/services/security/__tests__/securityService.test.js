@@ -62,7 +62,9 @@ describe("securityService", () => {
 
       const result = securityService.loadSettings();
 
-      expect(localStorageMock.getItem).toHaveBeenCalledWith("violetVault_securitySettings");
+      expect(localStorageMock.getItem).toHaveBeenCalledWith(
+        "violetVault_securitySettings",
+      );
       expect(result.autoLockEnabled).toBe(false);
       expect(result.autoLockTimeout).toBe(30);
     });
@@ -92,7 +94,7 @@ describe("securityService", () => {
 
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         "violetVault_securitySettings",
-        JSON.stringify(settings)
+        JSON.stringify(settings),
       );
     });
 
@@ -107,7 +109,9 @@ describe("securityService", () => {
 
   describe("loadSecurityEvents", () => {
     it("should load events from localStorage", () => {
-      const events = [{ id: "1", type: "LOGIN", timestamp: "2023-01-01T00:00:00Z" }];
+      const events = [
+        { id: "1", type: "LOGIN", timestamp: "2023-01-01T00:00:00Z" },
+      ];
       localStorageMock.getItem.mockReturnValue(JSON.stringify(events));
 
       const result = securityService.loadSecurityEvents();
@@ -135,7 +139,7 @@ describe("securityService", () => {
 
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         "violetVault_securityEvents",
-        expect.stringContaining('"id":"event-50"') // Should start from event 50 (last 100)
+        expect.stringContaining('"id":"event-50"'), // Should start from event 50 (last 100)
       );
     });
   });
@@ -157,7 +161,7 @@ describe("securityService", () => {
 
     it("should handle objects with key limit", () => {
       const obj = Object.fromEntries(
-        Array.from({ length: 25 }, (_, i) => [`key${i}`, `value${i}`])
+        Array.from({ length: 25 }, (_, i) => [`key${i}`, `value${i}`]),
       );
       const result = securityService.safeSerialize(obj);
 
@@ -247,7 +251,7 @@ describe("securityService", () => {
 
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         "violetVault_securityEvents",
-        expect.stringContaining("TEST")
+        expect.stringContaining("TEST"),
       );
     });
 
@@ -265,7 +269,9 @@ describe("securityService", () => {
     it("should remove events from localStorage", () => {
       securityService.clearSecurityEvents();
 
-      expect(localStorageMock.removeItem).toHaveBeenCalledWith("violetVault_securityEvents");
+      expect(localStorageMock.removeItem).toHaveBeenCalledWith(
+        "violetVault_securityEvents",
+      );
     });
   });
 

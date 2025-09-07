@@ -1,6 +1,9 @@
 // src/hooks/useActivityLogger.js
 import { useEffect } from "react";
-import activityLogger, { ACTIVITY_TYPES, ENTITY_TYPES } from "../../services/activityLogger";
+import activityLogger, {
+  ACTIVITY_TYPES,
+  ENTITY_TYPES,
+} from "../../services/activityLogger";
 import { useAuth } from "../../stores/auth/authStore";
 
 /**
@@ -27,16 +30,21 @@ const useActivityLogger = () => {
     logEnvelopeDeleted: activityLogger.logEnvelopeDeleted.bind(activityLogger),
     logEnvelopeFunded: activityLogger.logEnvelopeFunded.bind(activityLogger),
 
-    logTransactionAdded: activityLogger.logTransactionAdded.bind(activityLogger),
-    logTransactionUpdated: activityLogger.logTransactionUpdated.bind(activityLogger),
-    logTransactionDeleted: activityLogger.logTransactionDeleted.bind(activityLogger),
-    logTransactionsImported: activityLogger.logTransactionsImported.bind(activityLogger),
+    logTransactionAdded:
+      activityLogger.logTransactionAdded.bind(activityLogger),
+    logTransactionUpdated:
+      activityLogger.logTransactionUpdated.bind(activityLogger),
+    logTransactionDeleted:
+      activityLogger.logTransactionDeleted.bind(activityLogger),
+    logTransactionsImported:
+      activityLogger.logTransactionsImported.bind(activityLogger),
 
     logBillCreated: activityLogger.logBillCreated.bind(activityLogger),
     logBillUpdated: activityLogger.logBillUpdated.bind(activityLogger),
     logBillPaid: activityLogger.logBillPaid.bind(activityLogger),
 
-    logPaycheckProcessed: activityLogger.logPaycheckProcessed.bind(activityLogger),
+    logPaycheckProcessed:
+      activityLogger.logPaycheckProcessed.bind(activityLogger),
     logPaycheckDeleted: activityLogger.logPaycheckDeleted.bind(activityLogger),
 
     logDebtCreated: activityLogger.logDebtCreated.bind(activityLogger),

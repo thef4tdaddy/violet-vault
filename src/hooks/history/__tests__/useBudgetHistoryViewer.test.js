@@ -103,8 +103,12 @@ describe("useBudgetHistoryRestore", () => {
     mockPrompt = vi.fn();
     mockRestore = vi.fn();
 
-    vi.mocked(require("../../common/useConfirm").useConfirm).mockReturnValue(mockConfirm);
-    vi.mocked(require("../../common/usePrompt").usePrompt).mockReturnValue(mockPrompt);
+    vi.mocked(require("../../common/useConfirm").useConfirm).mockReturnValue(
+      mockConfirm,
+    );
+    vi.mocked(require("../../common/usePrompt").usePrompt).mockReturnValue(
+      mockPrompt,
+    );
   });
 
   it("should handle restore cancellation at confirmation", async () => {
@@ -212,7 +216,7 @@ describe("useBudgetHistoryRestore", () => {
 
     expect(logger.default.error).toHaveBeenCalledWith(
       "Failed to restore from history:",
-      expect.any(Error)
+      expect.any(Error),
     );
   });
 });
@@ -237,15 +241,23 @@ describe("useBudgetHistoryUIHelpers", () => {
   it("should return correct author colors", () => {
     const { result } = renderHook(() => useBudgetHistoryUIHelpers());
 
-    expect(result.current.getAuthorColor("system")).toBe("bg-gray-100 text-gray-700");
-    expect(result.current.getAuthorColor("user")).toBe("bg-blue-100 text-blue-700");
-    expect(result.current.getAuthorColor("unknown")).toBe("bg-purple-100 text-purple-700");
+    expect(result.current.getAuthorColor("system")).toBe(
+      "bg-gray-100 text-gray-700",
+    );
+    expect(result.current.getAuthorColor("user")).toBe(
+      "bg-blue-100 text-blue-700",
+    );
+    expect(result.current.getAuthorColor("unknown")).toBe(
+      "bg-purple-100 text-purple-700",
+    );
   });
 
   it("should format commit hashes correctly", () => {
     const { result } = renderHook(() => useBudgetHistoryUIHelpers());
 
-    expect(result.current.formatCommitHash("abcdef1234567890")).toBe("abcdef12");
+    expect(result.current.formatCommitHash("abcdef1234567890")).toBe(
+      "abcdef12",
+    );
     expect(result.current.formatCommitHash("short")).toBe("short");
     expect(result.current.formatCommitHash(null)).toBe("");
     expect(result.current.formatCommitHash(undefined)).toBe("");

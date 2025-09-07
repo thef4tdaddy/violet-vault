@@ -1,13 +1,21 @@
 // Main useBills Hook - Orchestrates all bill-related functionality
 import { useQueryClient } from "@tanstack/react-query";
-import { useBillsQuery, useUpcomingBillsQuery, useBillQueryEvents } from "./billQueries.js";
+import {
+  useBillsQuery,
+  useUpcomingBillsQuery,
+  useBillQueryEvents,
+} from "./billQueries.js";
 import {
   useAddBillMutation,
   useUpdateBillMutation,
   useDeleteBillMutation,
   useMarkBillPaidMutation,
 } from "./billMutations.js";
-import { useBillAnalytics, useAvailableCategories, useBillUtilities } from "./billAnalytics.js";
+import {
+  useBillAnalytics,
+  useAvailableCategories,
+  useBillUtilities,
+} from "./billAnalytics.js";
 import { queryKeys } from "../../../utils/common/queryClient";
 
 /**
@@ -19,7 +27,10 @@ const useBills = (options = {}) => {
 
   // Query hooks
   const billsQuery = useBillsQuery(options);
-  const upcomingBillsQuery = useUpcomingBillsQuery(options.daysAhead || 30, billsQuery.data);
+  const upcomingBillsQuery = useUpcomingBillsQuery(
+    options.daysAhead || 30,
+    billsQuery.data,
+  );
   useBillQueryEvents();
 
   // Mutation hooks
@@ -75,7 +86,8 @@ const useBills = (options = {}) => {
 
     // Query controls
     refetch: billsQuery.refetch,
-    invalidate: () => queryClient.invalidateQueries({ queryKey: queryKeys.bills }),
+    invalidate: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.bills }),
   };
 };
 

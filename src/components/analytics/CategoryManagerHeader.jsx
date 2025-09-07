@@ -9,7 +9,9 @@ const CategoryManagerHeader = ({ suggestionCount, onToggleSettings }) => {
           <div className="relative mr-3">
             <div className="absolute inset-0 bg-emerald-500 rounded-xl blur-lg opacity-30"></div>
             <div className="relative bg-emerald-500 p-2 rounded-xl border-2 border-black shadow-md">
-              {React.createElement(getIcon("Zap"), { className: "h-5 w-5 text-white" })}
+              {React.createElement(getIcon("Zap"), {
+                className: "h-5 w-5 text-white",
+              })}
             </div>
           </div>
           SMART CATEGORY MANAGER
@@ -20,7 +22,9 @@ const CategoryManagerHeader = ({ suggestionCount, onToggleSettings }) => {
       </div>
 
       <div className="flex items-center gap-2">
-        <span className="text-sm text-purple-800 font-medium">{suggestionCount} suggestions</span>
+        <span className="text-sm text-purple-800 font-medium">
+          {suggestionCount} suggestions
+        </span>
         <button
           onClick={onToggleSettings}
           className="p-2 text-gray-400 hover:text-gray-600 glassmorphism backdrop-blur-sm rounded-lg border-2 border-black shadow-md hover:shadow-lg transition-all"

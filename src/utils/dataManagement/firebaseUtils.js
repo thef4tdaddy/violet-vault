@@ -27,14 +27,20 @@ export const forcePushToCloud = async () => {
 
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    logger.info("🧹 Clearing any corruption detection state to prevent false positives...");
-    const { chunkedSyncService } = await import("../../services/chunkedSyncService");
+    logger.info(
+      "🧹 Clearing any corruption detection state to prevent false positives...",
+    );
+    const { chunkedSyncService } = await import(
+      "../../services/chunkedSyncService"
+    );
     if (chunkedSyncService && chunkedSyncService.decryptionFailures) {
       chunkedSyncService.decryptionFailures.clear();
       logger.info("✅ Cleared decryption failure tracking");
     }
 
-    logger.info("🚀 Force pushing imported data to Firebase with clean slate...");
+    logger.info(
+      "🚀 Force pushing imported data to Firebase with clean slate...",
+    );
     const result = await cloudSyncService.forcePushToCloud();
 
     if (result.success) {

@@ -12,7 +12,10 @@ describe("useReceiptScanner", () => {
   let mockFile;
 
   beforeEach(() => {
-    mockFile = new File(["receipt content"], "receipt.jpg", { type: "image/jpeg", size: 1024 });
+    mockFile = new File(["receipt content"], "receipt.jpg", {
+      type: "image/jpeg",
+      size: 1024,
+    });
     mockOnReceiptProcessed.mockClear();
     processReceiptImage.mockClear();
 
@@ -26,7 +29,9 @@ describe("useReceiptScanner", () => {
   });
 
   it("should initialize with default state", () => {
-    const { result } = renderHook(() => useReceiptScanner(mockOnReceiptProcessed));
+    const { result } = renderHook(() =>
+      useReceiptScanner(mockOnReceiptProcessed),
+    );
 
     expect(result.current.isProcessing).toBe(false);
     expect(result.current.uploadedImage).toBeNull();
@@ -36,19 +41,27 @@ describe("useReceiptScanner", () => {
   });
 
   it("should validate file types correctly", async () => {
-    const { result } = renderHook(() => useReceiptScanner(mockOnReceiptProcessed));
-    const invalidFile = new File(["text"], "document.txt", { type: "text/plain" });
+    const { result } = renderHook(() =>
+      useReceiptScanner(mockOnReceiptProcessed),
+    );
+    const invalidFile = new File(["text"], "document.txt", {
+      type: "text/plain",
+    });
 
     await act(async () => {
       await result.current.handleFileUpload(invalidFile);
     });
 
-    expect(result.current.error).toBe("Please upload an image file (JPG, PNG, etc.)");
+    expect(result.current.error).toBe(
+      "Please upload an image file (JPG, PNG, etc.)",
+    );
     expect(processReceiptImage).not.toHaveBeenCalled();
   });
 
   it("should validate file size correctly", async () => {
-    const { result } = renderHook(() => useReceiptScanner(mockOnReceiptProcessed));
+    const { result } = renderHook(() =>
+      useReceiptScanner(mockOnReceiptProcessed),
+    );
     const largeFile = new File(["large content"], "large.jpg", {
       type: "image/jpeg",
       size: 11 * 1024 * 1024, // 11MB
@@ -59,7 +72,7 @@ describe("useReceiptScanner", () => {
     });
 
     expect(result.current.error).toBe(
-      "Image file is too large. Please use a file smaller than 10MB."
+      "Image file is too large. Please use a file smaller than 10MB.",
     );
     expect(processReceiptImage).not.toHaveBeenCalled();
   });
@@ -73,7 +86,9 @@ describe("useReceiptScanner", () => {
 
     processReceiptImage.mockResolvedValue(mockResult);
 
-    const { result } = renderHook(() => useReceiptScanner(mockOnReceiptProcessed));
+    const { result } = renderHook(() =>
+      useReceiptScanner(mockOnReceiptProcessed),
+    );
 
     await act(async () => {
       await result.current.handleFileUpload(mockFile);
@@ -93,14 +108,16 @@ describe("useReceiptScanner", () => {
   it("should handle OCR processing errors", async () => {
     processReceiptImage.mockRejectedValue(new Error("OCR failed"));
 
-    const { result } = renderHook(() => useReceiptScanner(mockOnReceiptProcessed));
+    const { result } = renderHook(() =>
+      useReceiptScanner(mockOnReceiptProcessed),
+    );
 
     await act(async () => {
       await result.current.handleFileUpload(mockFile);
     });
 
     expect(result.current.error).toBe(
-      "Failed to process receipt. Please try again with a clearer image."
+      "Failed to process receipt. Please try again with a clearer image.",
     );
     expect(result.current.extractedData).toBeNull();
     expect(result.current.isProcessing).toBe(false);
@@ -110,7 +127,9 @@ describe("useReceiptScanner", () => {
     const mockResult = { merchant: "Store", total: 10.0 };
     processReceiptImage.mockResolvedValue(mockResult);
 
-    const { result } = renderHook(() => useReceiptScanner(mockOnReceiptProcessed));
+    const { result } = renderHook(() =>
+      useReceiptScanner(mockOnReceiptProcessed),
+    );
 
     const mockEvent = {
       preventDefault: vi.fn(),
@@ -129,7 +148,9 @@ describe("useReceiptScanner", () => {
     const mockExtractedData = { merchant: "Store", total: 15.5 };
     const mockUploadedImage = { url: "mock-url", name: "receipt.jpg" };
 
-    const { result } = renderHook(() => useReceiptScanner(mockOnReceiptProcessed));
+    const { result } = renderHook(() =>
+      useReceiptScanner(mockOnReceiptProcessed),
+    );
 
     // Manually set state for testing confirmation
     act(() => {
@@ -148,7 +169,9 @@ describe("useReceiptScanner", () => {
   });
 
   it("should reset scanner state", () => {
-    const { result } = renderHook(() => useReceiptScanner(mockOnReceiptProcessed));
+    const { result } = renderHook(() =>
+      useReceiptScanner(mockOnReceiptProcessed),
+    );
 
     // Set some state
     act(() => {
@@ -172,7 +195,9 @@ describe("useReceiptScanner", () => {
   });
 
   it("should toggle image preview", () => {
-    const { result } = renderHook(() => useReceiptScanner(mockOnReceiptProcessed));
+    const { result } = renderHook(() =>
+      useReceiptScanner(mockOnReceiptProcessed),
+    );
 
     act(() => {
       result.current.toggleImagePreview();

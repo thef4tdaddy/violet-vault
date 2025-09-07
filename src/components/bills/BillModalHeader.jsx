@@ -20,7 +20,9 @@ const BillModalHeader = ({ editingBill, formData, onClose }) => {
             {editingBill ? "Edit Bill" : "Add New Bill"}
           </h2>
           <p className="text-sm text-gray-600">
-            {editingBill ? "Update bill information and settings" : "Create a new recurring bill"}
+            {editingBill
+              ? "Update bill information and settings"
+              : "Create a new recurring bill"}
           </p>
         </div>
       </div>

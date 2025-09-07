@@ -1,7 +1,12 @@
 import React from "react";
 import { getIcon } from "../../utils";
 
-const AccountsHeader = ({ totalValue, showBalances, onToggleBalances, onAddAccount }) => {
+const AccountsHeader = ({
+  totalValue,
+  showBalances,
+  onToggleBalances,
+  onAddAccount,
+}) => {
   return (
     <div className="flex justify-between items-center">
       <div>
@@ -9,13 +14,16 @@ const AccountsHeader = ({ totalValue, showBalances, onToggleBalances, onAddAccou
           <div className="relative mr-3">
             <div className="absolute inset-0 bg-cyan-500 rounded-xl blur-lg opacity-30"></div>
             <div className="relative bg-cyan-500 p-2 rounded-xl">
-              {React.createElement(getIcon("CreditCard"), { className: "h-4 w-4 text-white" })}
+              {React.createElement(getIcon("CreditCard"), {
+                className: "h-4 w-4 text-white",
+              })}
             </div>
           </div>
           Supplemental Accounts
         </h3>
         <p className="text-sm text-gray-700 mt-1 font-medium">
-          Track FSA, HSA, and other non-budget accounts • Total: ${totalValue.toFixed(2)}
+          Track FSA, HSA, and other non-budget accounts • Total: $
+          {totalValue.toFixed(2)}
         </p>
       </div>
 

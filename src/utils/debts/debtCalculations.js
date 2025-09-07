@@ -14,7 +14,11 @@ import { calculatePayoffProjection } from "./calculations/payoffProjection";
 import { calculateInterestPortion } from "./calculations/interestCalculation";
 
 // Re-export the imported functions for backward compatibility
-export { calculateNextPaymentDate, calculatePayoffProjection, calculateInterestPortion };
+export {
+  calculateNextPaymentDate,
+  calculatePayoffProjection,
+  calculateInterestPortion,
+};
 
 /**
  * Convert debt payment frequency to bill frequency
@@ -80,7 +84,7 @@ export function enrichDebt(
   debt,
   relatedBill = null,
   relatedEnvelope = null,
-  relatedTransactions = []
+  relatedTransactions = [],
 ) {
   // Calculate next payment date
   const nextPaymentDate = calculateNextPaymentDate(debt);
@@ -109,7 +113,9 @@ export function getUpcomingPayments(debts, daysAhead = 30) {
   cutoffDate.setDate(cutoffDate.getDate() + daysAhead);
 
   return debts
-    .filter((debt) => debt.status === DEBT_STATUS.ACTIVE && debt.nextPaymentDate)
+    .filter(
+      (debt) => debt.status === DEBT_STATUS.ACTIVE && debt.nextPaymentDate,
+    )
     .filter((debt) => new Date(debt.nextPaymentDate) <= cutoffDate)
     .sort((a, b) => new Date(a.nextPaymentDate) - new Date(b.nextPaymentDate));
 }
