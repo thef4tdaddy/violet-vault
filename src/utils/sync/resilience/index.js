@@ -5,10 +5,12 @@
  * Addresses GitHub Issue #576 - Cloud Sync Reliability Improvements (Phase 2)
  */
 
-// Core resilience components
-export { RetryManager } from "../RetryManager";
-export { CircuitBreaker } from "../CircuitBreaker"; 
-export { SyncQueue } from "../SyncQueue";
+// Core resilience components  
+import { RetryManager } from "../RetryManager";
+import { CircuitBreaker } from "../CircuitBreaker"; 
+import { SyncQueue } from "../SyncQueue";
+
+export { RetryManager, CircuitBreaker, SyncQueue };
 
 // Utility modules
 export { shouldRetryError, classifyError } from "../retryPolicies";
