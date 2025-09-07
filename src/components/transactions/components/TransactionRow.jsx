@@ -21,9 +21,8 @@ const TransactionRow = ({
   onHistoryClick,
 }) => {
   const envelope = findEnvelopeForTransaction(transaction, envelopes);
-  const { formatted: formattedAmount, className: amountClassName } = formatTransactionAmount(
-    transaction.amount
-  );
+  const { formatted: formattedAmount, className: amountClassName } =
+    formatTransactionAmount(transaction.amount);
   const formattedDate = formatTransactionDate(transaction.date);
   const {
     name: envelopeName,
@@ -43,20 +42,28 @@ const TransactionRow = ({
       }}
     >
       {/* Date */}
-      <td className={`${COLUMN_WIDTHS.date} px-4 py-4 text-sm text-gray-900 truncate`}>
+      <td
+        className={`${COLUMN_WIDTHS.date} px-4 py-4 text-sm text-gray-900 truncate`}
+      >
         {formattedDate}
       </td>
 
       {/* Description */}
       <td className={`${COLUMN_WIDTHS.description} px-4 py-4 text-sm`}>
-        <div className="font-medium text-gray-900 truncate">{transaction.description}</div>
+        <div className="font-medium text-gray-900 truncate">
+          {transaction.description}
+        </div>
         {transaction.notes && (
-          <div className="text-xs text-gray-500 truncate mt-1">{transaction.notes}</div>
+          <div className="text-xs text-gray-500 truncate mt-1">
+            {transaction.notes}
+          </div>
         )}
       </td>
 
       {/* Category */}
-      <td className={`${COLUMN_WIDTHS.category} px-4 py-4 text-sm text-gray-500 truncate`}>
+      <td
+        className={`${COLUMN_WIDTHS.category} px-4 py-4 text-sm text-gray-500 truncate`}
+      >
         {transaction.category || "Uncategorized"}
       </td>
 
@@ -67,13 +74,19 @@ const TransactionRow = ({
             className="w-3 h-3 rounded-full mr-2 flex-shrink-0"
             style={{ backgroundColor: envelopeColor }}
           />
-          <span className={`${envelopeClassName} truncate`}>{envelopeName}</span>
+          <span className={`${envelopeClassName} truncate`}>
+            {envelopeName}
+          </span>
         </div>
       </td>
 
       {/* Amount */}
-      <td className={`${COLUMN_WIDTHS.amount} px-4 py-4 text-right text-sm font-medium`}>
-        <span className={`${amountClassName} font-semibold`}>{formattedAmount}</span>
+      <td
+        className={`${COLUMN_WIDTHS.amount} px-4 py-4 text-right text-sm font-medium`}
+      >
+        <span className={`${amountClassName} font-semibold`}>
+          {formattedAmount}
+        </span>
       </td>
 
       {/* Actions */}

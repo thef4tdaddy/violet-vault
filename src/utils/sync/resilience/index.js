@@ -21,7 +21,9 @@ export { createRetryMetrics, formatMetrics } from "../retryMetrics";
  * Create configured resilience system for sync operations
  */
 export const createSyncResilience = (options = {}) => {
-  const retryManager = new RetryManager(options.retryManager?.name || "SyncRetry");
+  const retryManager = new RetryManager(
+    options.retryManager?.name || "SyncRetry",
+  );
   const circuitBreaker = new CircuitBreaker({
     name: "SyncCircuit",
     failureThreshold: 3, // Lower threshold for sync operations
@@ -43,7 +45,11 @@ export const createSyncResilience = (options = {}) => {
     /**
      * Execute sync operation with full resilience stack
      */
-    async execute(operation, operationType = "sync", operationName = "unknown") {
+    async execute(
+      operation,
+      operationType = "sync",
+      operationName = "unknown",
+    ) {
       // Queue the operation for debouncing
       return await syncQueue.enqueue(operationType, async (_data) => {
         // Execute through circuit breaker

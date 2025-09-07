@@ -25,7 +25,8 @@ const UserSetupLayout = ({ children }) => {
 
         <div className="text-center mt-6">
           <p className="text-xs text-black font-medium uppercase tracking-wider">
-            <span className="text-sm">Y</span>OUR DATA IS ENCRYPTED CLIENT-SIDE FOR MAXIMUM SECURITY
+            <span className="text-sm">Y</span>OUR DATA IS ENCRYPTED CLIENT-SIDE
+            FOR MAXIMUM SECURITY
           </p>
         </div>
       </div>

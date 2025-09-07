@@ -1,5 +1,6 @@
 import React from "react";
 import useTransactionSplitter from "../../hooks/transactions/useTransactionSplitter.js";
+import { useConfirm } from "../../hooks/common/useConfirm";
 import { TRANSACTION_CATEGORIES } from "../../constants/categories";
 import { calculateSplitTotals } from "../../utils/transactions/splitterHelpers";
 import logger from "../../utils/common/logger";
@@ -17,11 +18,12 @@ const TransactionSplitter = ({
   availableCategories = [],
   className = "",
 }) => {
-  const splitter = useTransactionSplitter({ 
-    transaction, 
-    envelopes, 
-    onSplit: onSave 
+  const splitter = useTransactionSplitter({
+    transaction,
+    envelopes,
+    onSplit: onSave,
   });
+  const confirm = useConfirm();
 
   // Handle saving with validation
   const handleSave = async () => {
@@ -37,9 +39,16 @@ const TransactionSplitter = ({
   };
 
   // Handle cancellation
-  const handleCancel = () => {
+  const handleCancel = async () => {
     if (splitter.hasUnsavedChanges) {
-      if (window.confirm("You have unsaved changes. Are you sure you want to cancel?")) {
+      const confirmed = await confirm({
+        title: "Unsaved Changes",
+        message: "You have unsaved changes. Are you sure you want to cancel?",
+        confirmText: "Discard Changes",
+        cancelText: "Keep Editing",
+        variant: "destructive",
+      });
+      if (confirmed) {
         onClose?.();
       }
     } else {

@@ -14,7 +14,8 @@ const UserNameInput = ({
   return (
     <div>
       <label className="block text-base font-black text-black mb-3 uppercase tracking-wider">
-        <span className="text-lg">Y</span>OUR <span className="text-lg">N</span>AME
+        <span className="text-lg">Y</span>OUR <span className="text-lg">N</span>
+        AME
       </label>
       <input
         type="text"

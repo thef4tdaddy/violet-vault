@@ -59,12 +59,13 @@ const getGitInfo = () => {
 
 export default defineConfig(() => {
   const gitInfo = getGitInfo();
-  
+
   // Enable debug mode for develop branch deployments
-  const isDevelopBranch = gitInfo.branch === 'develop';
-  const isProduction = process.env.NODE_ENV === 'production';
+  const isDevelopBranch = gitInfo.branch === "develop";
+  const isProduction = process.env.NODE_ENV === "production";
   const viteNodeEnv = process.env.VITE_NODE_ENV;
-  const enableDebugBuild = (isDevelopBranch && isProduction) || (viteNodeEnv === 'development');
+  const enableDebugBuild =
+    (isDevelopBranch && isProduction) || viteNodeEnv === "development";
 
   return {
     plugins: [react(), tailwindcss()],
@@ -104,7 +105,7 @@ export default defineConfig(() => {
       chunkSizeWarningLimit: 3000, // Increased from 1000 to 3000 to accommodate large bundles
       reportCompressedSize: isProduction, // Enable size reporting in production
       // Disable minification for develop branch to get readable error messages
-      minify: enableDebugBuild ? false : (isProduction ? "terser" : false),
+      minify: enableDebugBuild ? false : isProduction ? "terser" : false,
       // Enable sourcemaps for develop branch and development mode
       sourcemap: enableDebugBuild || !isProduction,
       // Terser options for better compression (only when minification is enabled)

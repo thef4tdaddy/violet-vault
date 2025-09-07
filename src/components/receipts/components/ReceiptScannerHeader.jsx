@@ -14,7 +14,8 @@ const ReceiptScannerHeader = ({ onClose }) => {
         </div>
         <div>
           <h2 className="font-black text-black text-base">
-            <span className="text-lg">R</span>ECEIPT <span className="text-lg">S</span>CANNER
+            <span className="text-lg">R</span>ECEIPT{" "}
+            <span className="text-lg">S</span>CANNER
           </h2>
           <p className="text-sm text-purple-900">
             Upload or capture a receipt to extract transaction details

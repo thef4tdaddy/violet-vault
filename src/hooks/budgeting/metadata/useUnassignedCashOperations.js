@@ -38,7 +38,7 @@ export const useUnassignedCashOperations = () => {
         return false;
       }
     },
-    [metadata, updateMetadataMutation, unassignedCash]
+    [metadata, updateMetadataMutation, unassignedCash],
   );
 
   return {

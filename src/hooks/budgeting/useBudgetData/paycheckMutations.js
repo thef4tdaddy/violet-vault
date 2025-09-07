@@ -5,7 +5,11 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../../../utils/common/queryClient";
-import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "../../../db/budgetDb";
+import {
+  budgetDb,
+  getBudgetMetadata,
+  setBudgetMetadata,
+} from "../../../db/budgetDb";
 import {
   calculatePaycheckBalances,
   validateBalances,
@@ -36,13 +40,14 @@ export const usePaycheckMutations = (envelopesQuery, savingsGoalsQuery) => {
 
       const currentTotalEnvelopeBalance = currentEnvelopes.reduce(
         (sum, env) => sum + (parseFloat(env.currentBalance) || 0),
-        0
+        0,
       );
       const currentTotalSavingsBalance = currentSavings.reduce(
         (sum, saving) => sum + (parseFloat(saving.currentBalance) || 0),
-        0
+        0,
       );
-      const currentVirtualBalance = currentTotalEnvelopeBalance + currentTotalSavingsBalance;
+      const currentVirtualBalance =
+        currentTotalEnvelopeBalance + currentTotalSavingsBalance;
 
       logger.info("Current balances before paycheck", {
         currentActualBalance,
@@ -69,7 +74,11 @@ export const usePaycheckMutations = (envelopesQuery, savingsGoalsQuery) => {
         })) || [];
 
       // Use centralized balance calculator to ensure consistency
-      const newBalances = calculatePaycheckBalances(currentBalances, paycheckData, allocations);
+      const newBalances = calculatePaycheckBalances(
+        currentBalances,
+        paycheckData,
+        allocations,
+      );
 
       // Validate the calculation
       const validation = validateBalances(newBalances);
@@ -182,7 +191,8 @@ export const usePaycheckMutations = (envelopesQuery, savingsGoalsQuery) => {
       // Calculate new balances by reversing the paycheck
       const newActualBalance = currentActualBalance - paycheckRecord.amount;
       const unassignedCashChange =
-        paycheckRecord.unassignedCashAfter - paycheckRecord.unassignedCashBefore;
+        paycheckRecord.unassignedCashAfter -
+        paycheckRecord.unassignedCashBefore;
       const newUnassignedCash = currentUnassignedCash - unassignedCashChange;
 
       // Update budget metadata

@@ -17,11 +17,16 @@ const DebtModalHeader = ({ isEditMode, onClose }) => {
             {isEditMode ? "Edit Debt" : "Add New Debt"}
           </h2>
           <p className="text-sm text-gray-600">
-            {isEditMode ? "Update debt information" : "Track and manage a new debt"}
+            {isEditMode
+              ? "Update debt information"
+              : "Track and manage a new debt"}
           </p>
         </div>
       </div>
-      <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+      <button
+        onClick={onClose}
+        className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+      >
         <X className="h-5 w-5 text-gray-500" />
       </button>
     </div>

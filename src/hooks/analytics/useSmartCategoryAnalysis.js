@@ -1,5 +1,8 @@
 import { useMemo } from "react";
-import { TRANSACTION_CATEGORIES, MERCHANT_CATEGORY_PATTERNS } from "../../constants/categories";
+import {
+  TRANSACTION_CATEGORIES,
+  MERCHANT_CATEGORY_PATTERNS,
+} from "../../constants/categories";
 
 /**
  * Hook for analyzing transaction patterns and suggesting categories
@@ -9,7 +12,7 @@ export const useSmartCategoryAnalysis = (
   transactions = [],
   bills = [],
   dateRange = "6months",
-  analysisSettings = {}
+  analysisSettings = {},
 ) => {
   const defaultSettings = {
     minTransactionCount: 5,
@@ -44,7 +47,11 @@ export const useSmartCategoryAnalysis = (
   const suggestBillCategory = (billName) => {
     const name = billName.toLowerCase();
 
-    if (name.includes("electric") || name.includes("power") || name.includes("utility")) {
+    if (
+      name.includes("electric") ||
+      name.includes("power") ||
+      name.includes("utility")
+    ) {
       return "Utilities";
     }
     if (name.includes("gas") || name.includes("heating")) {
@@ -53,16 +60,28 @@ export const useSmartCategoryAnalysis = (
     if (name.includes("water") || name.includes("sewer")) {
       return "Utilities";
     }
-    if (name.includes("internet") || name.includes("cable") || name.includes("phone")) {
+    if (
+      name.includes("internet") ||
+      name.includes("cable") ||
+      name.includes("phone")
+    ) {
       return "Communications";
     }
     if (name.includes("insurance")) {
       return "Insurance";
     }
-    if (name.includes("loan") || name.includes("mortgage") || name.includes("rent")) {
+    if (
+      name.includes("loan") ||
+      name.includes("mortgage") ||
+      name.includes("rent")
+    ) {
       return "Housing";
     }
-    if (name.includes("netflix") || name.includes("spotify") || name.includes("subscription")) {
+    if (
+      name.includes("netflix") ||
+      name.includes("spotify") ||
+      name.includes("subscription")
+    ) {
       return "Entertainment";
     }
 
@@ -72,11 +91,12 @@ export const useSmartCategoryAnalysis = (
   // Analyze transaction patterns for category suggestions
   const transactionAnalysis = useMemo(() => {
     const suggestions = [];
-    const { minTransactionCount, minAmount, unusedCategoryThreshold } = settings;
+    const { minTransactionCount, minAmount, unusedCategoryThreshold } =
+      settings;
 
     // 1. UNCATEGORIZED TRANSACTION ANALYSIS
     const uncategorizedTransactions = filteredTransactions.filter(
-      (t) => !t.category || t.category === "Uncategorized" || t.category === ""
+      (t) => !t.category || t.category === "Uncategorized" || t.category === "",
     );
 
     // Group by merchant/description patterns
@@ -100,13 +120,20 @@ export const useSmartCategoryAnalysis = (
 
     // Calculate averages and suggest categories
     Object.values(merchantPatterns).forEach((pattern) => {
-      if (pattern.transactions.length >= minTransactionCount && pattern.totalAmount >= minAmount) {
+      if (
+        pattern.transactions.length >= minTransactionCount &&
+        pattern.totalAmount >= minAmount
+      ) {
         pattern.avgAmount = pattern.totalAmount / pattern.transactions.length;
 
         // Try to match with known merchant patterns
         let suggestedCategory = "General";
-        for (const [category, patterns] of Object.entries(MERCHANT_CATEGORY_PATTERNS)) {
-          if (patterns.some((p) => pattern.merchant.includes(p.toLowerCase()))) {
+        for (const [category, patterns] of Object.entries(
+          MERCHANT_CATEGORY_PATTERNS,
+        )) {
+          if (
+            patterns.some((p) => pattern.merchant.includes(p.toLowerCase()))
+          ) {
             suggestedCategory = category;
             break;
           }
@@ -116,7 +143,11 @@ export const useSmartCategoryAnalysis = (
           id: `transaction_${pattern.merchant}`,
           type: "add_category",
           priority:
-            pattern.totalAmount > 200 ? "high" : pattern.totalAmount > 50 ? "medium" : "low",
+            pattern.totalAmount > 200
+              ? "high"
+              : pattern.totalAmount > 50
+                ? "medium"
+                : "low",
           category: "transaction",
           title: `Categorize "${pattern.merchant}" transactions`,
           description: `${pattern.transactions.length} transactions totaling $${pattern.totalAmount.toFixed(2)}`,
@@ -140,11 +171,15 @@ export const useSmartCategoryAnalysis = (
 
     TRANSACTION_CATEGORIES.forEach((category) => {
       const recentUsage = filteredTransactions.filter(
-        (t) => t.category === category && new Date(t.date) >= recentDate
+        (t) => t.category === category && new Date(t.date) >= recentDate,
       );
       const totalUsage = transactions.filter((t) => t.category === category);
 
-      if (recentUsage.length === 0 && totalUsage.length > 0 && totalUsage.length < 10) {
+      if (
+        recentUsage.length === 0 &&
+        totalUsage.length > 0 &&
+        totalUsage.length < 10
+      ) {
         suggestions.push({
           id: `unused_category_${category}`,
           type: "remove_category",
@@ -190,7 +225,10 @@ export const useSmartCategoryAnalysis = (
     });
 
     // Suggest specific bill categories if many bills are uncategorized
-    if (billsByCategory["Uncategorized"] && billsByCategory["Uncategorized"].count >= 3) {
+    if (
+      billsByCategory["Uncategorized"] &&
+      billsByCategory["Uncategorized"].count >= 3
+    ) {
       const uncategorizedBills = billsByCategory["Uncategorized"].bills;
 
       // Analyze bill types
@@ -205,34 +243,43 @@ export const useSmartCategoryAnalysis = (
         }
       });
 
-      Object.entries(billTypePatterns).forEach(([categoryType, billsInType]) => {
-        if (billsInType.length >= 2) {
-          const totalAmount = billsInType.reduce((sum, bill) => sum + (bill.amount || 0), 0);
+      Object.entries(billTypePatterns).forEach(
+        ([categoryType, billsInType]) => {
+          if (billsInType.length >= 2) {
+            const totalAmount = billsInType.reduce(
+              (sum, bill) => sum + (bill.amount || 0),
+              0,
+            );
 
-          suggestions.push({
-            id: `bill_category_${categoryType}`,
-            type: "add_category",
-            priority: totalAmount > 100 ? "high" : "medium",
-            category: "bill",
-            title: `Add "${categoryType}" Bill Category`,
-            description: `${billsInType.length} bills need this category`,
-            reasoning: `Bills: ${billsInType.map((b) => b.name).join(", ")}`,
-            suggestedCategory: categoryType,
-            affectedTransactions: billsInType.length,
-            impact: totalAmount,
-            action: "add_bill_category",
-            data: {
-              categoryName: categoryType,
-              billIds: billsInType.map((b) => b.id),
-            },
-          });
-        }
-      });
+            suggestions.push({
+              id: `bill_category_${categoryType}`,
+              type: "add_category",
+              priority: totalAmount > 100 ? "high" : "medium",
+              category: "bill",
+              title: `Add "${categoryType}" Bill Category`,
+              description: `${billsInType.length} bills need this category`,
+              reasoning: `Bills: ${billsInType.map((b) => b.name).join(", ")}`,
+              suggestedCategory: categoryType,
+              affectedTransactions: billsInType.length,
+              impact: totalAmount,
+              action: "add_bill_category",
+              data: {
+                categoryName: categoryType,
+                billIds: billsInType.map((b) => b.id),
+              },
+            });
+          }
+        },
+      );
     }
 
     // 2. BILL CATEGORY OPTIMIZATION
     Object.entries(billsByCategory).forEach(([category, data]) => {
-      if (category !== "Uncategorized" && data.count === 1 && data.totalAmount < minAmount) {
+      if (
+        category !== "Uncategorized" &&
+        data.count === 1 &&
+        data.totalAmount < minAmount
+      ) {
         suggestions.push({
           id: `optimize_bill_category_${category}`,
           type: "remove_category",

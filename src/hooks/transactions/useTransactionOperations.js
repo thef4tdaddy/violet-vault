@@ -18,7 +18,9 @@ import logger from "../../utils/common/logger.js";
 // Helper to trigger sync for transaction changes
 const triggerTransactionSync = (changeType) => {
   if (typeof window !== "undefined" && window.cloudSyncService) {
-    window.cloudSyncService.triggerSyncForCriticalChange(`transaction_${changeType}`);
+    window.cloudSyncService.triggerSyncForCriticalChange(
+      `transaction_${changeType}`,
+    );
   }
 };
 
@@ -42,7 +44,9 @@ const useTransactionOperations = (options = {}) => {
       // Validate transaction data
       const validation = validateTransactionData(transactionData);
       if (!validation.isValid) {
-        throw new Error("Invalid transaction data: " + validation.errors.join(", "));
+        throw new Error(
+          "Invalid transaction data: " + validation.errors.join(", "),
+        );
       }
 
       // Auto-categorize if no category provided
@@ -89,7 +93,9 @@ const useTransactionOperations = (options = {}) => {
       // Validate updated data
       const validation = validateTransactionData(updatedData);
       if (!validation.isValid) {
-        throw new Error("Invalid transaction data: " + validation.errors.join(", "));
+        throw new Error(
+          "Invalid transaction data: " + validation.errors.join(", "),
+        );
       }
 
       // Prepare for storage
@@ -154,7 +160,9 @@ const useTransactionOperations = (options = {}) => {
       for (const splitTxn of splitTransactions) {
         const validation = validateTransactionData(splitTxn);
         if (!validation.isValid) {
-          throw new Error(`Invalid split transaction data: ${validation.errors.join(", ")}`);
+          throw new Error(
+            `Invalid split transaction data: ${validation.errors.join(", ")}`,
+          );
         }
       }
 
@@ -174,7 +182,10 @@ const useTransactionOperations = (options = {}) => {
           },
         };
 
-        await budgetDb.updateTransaction(originalTransaction.id, updatedOriginal);
+        await budgetDb.updateTransaction(
+          originalTransaction.id,
+          updatedOriginal,
+        );
 
         // Add all split transactions
         for (const splitTxn of splitTransactions) {
@@ -223,10 +234,10 @@ const useTransactionOperations = (options = {}) => {
 
       // Add both transactions
       const outgoingResult = await budgetDb.addTransaction(
-        prepareTransactionForStorage(outgoingTxn)
+        prepareTransactionForStorage(outgoingTxn),
       );
       const incomingResult = await budgetDb.addTransaction(
-        prepareTransactionForStorage(incomingTxn)
+        prepareTransactionForStorage(incomingTxn),
       );
 
       triggerTransactionSync("transfer");
@@ -283,7 +294,10 @@ const useTransactionOperations = (options = {}) => {
 
         case "categorize":
           for (const txn of transactions) {
-            const categorized = categorizeTransaction({ ...txn, ...updates }, categoryRules);
+            const categorized = categorizeTransaction(
+              { ...txn, ...updates },
+              categoryRules,
+            );
             const prepared = prepareTransactionForStorage(categorized);
             const result = await budgetDb.updateTransaction(txn.id, prepared);
             results.push(result);
@@ -316,21 +330,21 @@ const useTransactionOperations = (options = {}) => {
     (transactionData) => {
       return addTransactionMutation.mutateAsync(transactionData);
     },
-    [addTransactionMutation]
+    [addTransactionMutation],
   );
 
   const updateTransaction = useCallback(
     (id, updates) => {
       return updateTransactionMutation.mutateAsync({ id, updates });
     },
-    [updateTransactionMutation]
+    [updateTransactionMutation],
   );
 
   const deleteTransaction = useCallback(
     (transactionId) => {
       return deleteTransactionMutation.mutateAsync(transactionId);
     },
-    [deleteTransactionMutation]
+    [deleteTransactionMutation],
   );
 
   const splitTransaction = useCallback(
@@ -340,14 +354,14 @@ const useTransactionOperations = (options = {}) => {
         splitTransactions,
       });
     },
-    [splitTransactionMutation]
+    [splitTransactionMutation],
   );
 
   const transferFunds = useCallback(
     (transferData) => {
       return transferFundsMutation.mutateAsync(transferData);
     },
-    [transferFundsMutation]
+    [transferFundsMutation],
   );
 
   const bulkOperation = useCallback(
@@ -358,7 +372,7 @@ const useTransactionOperations = (options = {}) => {
         updates,
       });
     },
-    [bulkOperationMutation]
+    [bulkOperationMutation],
   );
 
   return {

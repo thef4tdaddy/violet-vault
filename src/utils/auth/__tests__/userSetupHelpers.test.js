@@ -24,7 +24,9 @@ describe("userSetupHelpers", () => {
     });
 
     it("should include default purple color", () => {
-      const purpleColor = USER_COLORS.find((color) => color.value === "#a855f7");
+      const purpleColor = USER_COLORS.find(
+        (color) => color.value === "#a855f7",
+      );
       expect(purpleColor).toBeTruthy();
       expect(purpleColor.name).toBe("Purple");
     });
@@ -139,14 +141,18 @@ describe("userSetupHelpers", () => {
       const subtitle = getStepSubtitle(1, true);
       const { container } = render(subtitle);
 
-      expect(container.textContent).toContain("ENTER YOUR PASSWORD TO CONTINUE");
+      expect(container.textContent).toContain(
+        "ENTER YOUR PASSWORD TO CONTINUE",
+      );
     });
 
     it("should return password creation prompt for step 1", () => {
       const subtitle = getStepSubtitle(1, false);
       const { container } = render(subtitle);
 
-      expect(container.textContent).toContain("CREATE A SECURE MASTER PASSWORD");
+      expect(container.textContent).toContain(
+        "CREATE A SECURE MASTER PASSWORD",
+      );
     });
 
     it("should return profile setup prompt for step 2", () => {

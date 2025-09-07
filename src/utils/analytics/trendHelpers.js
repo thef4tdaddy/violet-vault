@@ -63,7 +63,10 @@ export const getChartConfig = (height = "100%") => ({
 /**
  * Common tooltip formatter for currency values
  */
-export const currencyTooltipFormatter = (value, name) => [formatCurrency(value), name];
+export const currencyTooltipFormatter = (value, name) => [
+  formatCurrency(value),
+  name,
+];
 
 /**
  * Tooltip formatter for percentage change

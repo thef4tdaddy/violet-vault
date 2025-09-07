@@ -3,6 +3,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { renderIcon } from "../../utils";
 import { budgetSharingService } from "../../utils/sharing/budgetSharingService";
 import { useAuth } from "../../stores/auth/authStore";
+import { useConfirm } from "../../hooks/common/useConfirm";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
 import logger from "../../utils/common/logger";
 
@@ -17,6 +18,7 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
 
   const { currentUser, encryptionKey } = useAuth();
   const { showSuccessToast, showErrorToast } = useToastHelpers();
+  const confirm = useConfirm();
 
   useEffect(() => {
     if (isOpen && !shareData) {
@@ -81,9 +83,14 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
   const deactivateCode = async () => {
     if (!shareData?.shareCode) return;
 
-    const confirmed = window.confirm(
-      "Are you sure you want to deactivate this share code? No one will be able to use it after this.",
-    );
+    const confirmed = await confirm({
+      title: "Deactivate Share Code",
+      message:
+        "Are you sure you want to deactivate this share code? No one will be able to use it after this.",
+      confirmText: "Deactivate",
+      cancelText: "Cancel",
+      variant: "destructive",
+    });
     if (!confirmed) return;
 
     try {

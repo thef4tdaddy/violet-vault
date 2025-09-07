@@ -10,7 +10,8 @@ const ColorPicker = ({ selectedColor, onColorChange, disabled = false }) => {
   return (
     <div>
       <label className="block text-base font-black text-black mb-3 uppercase tracking-wider">
-        <span className="text-lg">Y</span>OUR <span className="text-lg">C</span>OLOR
+        <span className="text-lg">Y</span>OUR <span className="text-lg">C</span>
+        OLOR
       </label>
       <div className="grid grid-cols-4 gap-3">
         {USER_COLORS.map((color) => (

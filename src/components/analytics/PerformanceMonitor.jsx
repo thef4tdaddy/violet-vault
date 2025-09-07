@@ -66,7 +66,9 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
             <Icon className="h-5 w-5 text-gray-600 mr-2" />
             <span className="font-medium text-gray-900">{title}</span>
           </div>
-          <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getScoreColor(score)}`}>
+          <span
+            className={`px-3 py-1 rounded-full text-sm font-semibold ${getScoreColor(score)}`}
+          >
             {score}/100
           </span>
         </div>
@@ -99,7 +101,9 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
             </div>
             Performance Monitor
           </h3>
-          <p className="text-gray-600 mt-1">Real-time financial health tracking</p>
+          <p className="text-gray-600 mt-1">
+            Real-time financial health tracking
+          </p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -111,7 +115,11 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
                 : "text-gray-400 bg-gray-100 hover:bg-gray-200"
             }`}
           >
-            {alertsEnabled ? <Bell className="h-4 w-4" /> : <BellOff className="h-4 w-4" />}
+            {alertsEnabled ? (
+              <Bell className="h-4 w-4" />
+            ) : (
+              <BellOff className="h-4 w-4" />
+            )}
           </button>
 
           <div className="flex items-center gap-1 text-sm text-gray-500">
@@ -125,9 +133,13 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
       <div className="mb-8">
         <div className="text-center">
           <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-r from-purple-500 to-blue-600 text-white mb-4">
-            <span className="text-2xl font-bold">{performanceMetrics.overallScore}</span>
+            <span className="text-2xl font-bold">
+              {performanceMetrics.overallScore}
+            </span>
           </div>
-          <h4 className="text-lg font-semibold text-gray-900 mb-2">Overall Financial Health</h4>
+          <h4 className="text-lg font-semibold text-gray-900 mb-2">
+            Overall Financial Health
+          </h4>
           <p className="text-gray-600 max-w-md mx-auto">
             {performanceMetrics.overallScore >= 90
               ? "Excellent financial management with strong performance across all areas"
@@ -210,7 +222,9 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
         <div className="space-y-4">
           {performanceHistory.length > 0 ? (
             <div className="bg-white/60 rounded-lg p-4 border border-white/20">
-              <h4 className="font-medium text-gray-900 mb-3">Performance Trend</h4>
+              <h4 className="font-medium text-gray-900 mb-3">
+                Performance Trend
+              </h4>
               <div className="flex items-end gap-1 h-20">
                 {performanceHistory.slice(-20).map((entry, index) => (
                   <div
@@ -263,10 +277,14 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
                   </div>
                   <p className="text-gray-600 text-sm mb-2">{alert.message}</p>
                   {alert.action && (
-                    <p className="text-purple-600 text-sm font-medium">💡 {alert.action}</p>
+                    <p className="text-purple-600 text-sm font-medium">
+                      💡 {alert.action}
+                    </p>
                   )}
                   {alert.details && (
-                    <p className="text-gray-500 text-xs mt-2">Affected: {alert.details}</p>
+                    <p className="text-gray-500 text-xs mt-2">
+                      Affected: {alert.details}
+                    </p>
                   )}
                 </div>
               </div>
@@ -290,16 +308,28 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
                 className="bg-white/60 rounded-lg p-4 border border-white/20 flex items-start"
               >
                 <div className="mr-3 mt-0.5">
-                  {rec.type === "success" && <CheckCircle className="h-5 w-5 text-green-500" />}
-                  {rec.type === "info" && <TrendingUp className="h-5 w-5 text-blue-500" />}
-                  {rec.type === "warning" && <AlertTriangle className="h-5 w-5 text-yellow-500" />}
-                  {rec.type === "tip" && <Zap className="h-5 w-5 text-purple-500" />}
+                  {rec.type === "success" && (
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                  )}
+                  {rec.type === "info" && (
+                    <TrendingUp className="h-5 w-5 text-blue-500" />
+                  )}
+                  {rec.type === "warning" && (
+                    <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                  )}
+                  {rec.type === "tip" && (
+                    <Zap className="h-5 w-5 text-purple-500" />
+                  )}
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-medium text-gray-900 mb-2">{rec.title}</h4>
+                  <h4 className="font-medium text-gray-900 mb-2">
+                    {rec.title}
+                  </h4>
                   <p className="text-gray-600 text-sm mb-2">{rec.message}</p>
                   {rec.action && (
-                    <p className="text-purple-600 text-sm font-medium">🎯 {rec.action}</p>
+                    <p className="text-purple-600 text-sm font-medium">
+                      🎯 {rec.action}
+                    </p>
                   )}
                 </div>
               </div>

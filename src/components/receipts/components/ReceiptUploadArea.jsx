@@ -31,7 +31,8 @@ const ReceiptUploadArea = ({
 
           <div>
             <p className="font-black text-black text-base mb-2">
-              <span className="text-lg">U</span>PLOAD <span className="text-lg">R</span>ECEIPT{" "}
+              <span className="text-lg">U</span>PLOAD{" "}
+              <span className="text-lg">R</span>ECEIPT{" "}
               <span className="text-lg">I</span>MAGE
             </p>
             <p className="text-sm text-purple-900 mb-4">
@@ -45,7 +46,8 @@ const ReceiptUploadArea = ({
               className="glassmorphism px-6 py-2 bg-purple-600/80 text-white rounded-lg hover:bg-purple-700/80 transition-colors border-2 border-black backdrop-blur-sm"
             >
               <span className="font-black text-white">
-                <span className="text-base">B</span>ROWSE <span className="text-base">F</span>ILES
+                <span className="text-base">B</span>ROWSE{" "}
+                <span className="text-base">F</span>ILES
               </span>
             </button>
             <button
@@ -53,7 +55,8 @@ const ReceiptUploadArea = ({
               className="glassmorphism px-6 py-2 bg-blue-600/80 text-white rounded-lg hover:bg-blue-700/80 transition-colors border-2 border-black backdrop-blur-sm"
             >
               <span className="font-black text-white">
-                <span className="text-base">T</span>AKE <span className="text-base">P</span>HOTO
+                <span className="text-base">T</span>AKE{" "}
+                <span className="text-base">P</span>HOTO
               </span>
             </button>
           </div>

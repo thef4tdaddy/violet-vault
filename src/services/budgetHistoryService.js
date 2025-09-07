@@ -46,7 +46,8 @@ class BudgetHistoryService {
 
     try {
       const timestamp = Date.now();
-      const fingerprint = deviceFingerprint || encryptionUtils.generateDeviceFingerprint();
+      const fingerprint =
+        deviceFingerprint || encryptionUtils.generateDeviceFingerprint();
 
       // Create commit data for hashing
       const commitData = {
@@ -116,7 +117,12 @@ class BudgetHistoryService {
    * Track unassigned cash changes
    */
   async trackUnassignedCashChange(options) {
-    const { previousAmount, newAmount, author = "Unknown User", source = "manual" } = options;
+    const {
+      previousAmount,
+      newAmount,
+      author = "Unknown User",
+      source = "manual",
+    } = options;
 
     const description =
       source === "distribution"
@@ -138,7 +144,12 @@ class BudgetHistoryService {
    * Track actual balance changes
    */
   async trackActualBalanceChange(options) {
-    const { previousBalance, newBalance, isManual = true, author = "Unknown User" } = options;
+    const {
+      previousBalance,
+      newBalance,
+      isManual = true,
+      author = "Unknown User",
+    } = options;
 
     const source = isManual ? "manual entry" : "automatic calculation";
     const description = `Updated actual balance via ${source} from ${this._formatCurrency(previousBalance)} to ${this._formatCurrency(newBalance)}`;
@@ -158,7 +169,13 @@ class BudgetHistoryService {
    * Track debt changes
    */
   async trackDebtChange(options) {
-    const { debtId, changeType, previousData, newData, author = "Unknown User" } = options;
+    const {
+      debtId,
+      changeType,
+      previousData,
+      newData,
+      author = "Unknown User",
+    } = options;
 
     let description = "";
 
@@ -252,11 +269,19 @@ class BudgetHistoryService {
    * Branch Management
    */
   async createBranch(options) {
-    const { fromCommitHash, branchName, description = "", author = "Unknown User" } = options;
+    const {
+      fromCommitHash,
+      branchName,
+      description = "",
+      author = "Unknown User",
+    } = options;
 
     try {
       // Check if branch exists
-      const existingBranch = await budgetDb.budgetBranches.where("name").equals(branchName).first();
+      const existingBranch = await budgetDb.budgetBranches
+        .where("name")
+        .equals(branchName)
+        .first();
 
       if (existingBranch) {
         throw new Error(`Branch '${branchName}' already exists`);
@@ -306,9 +331,12 @@ class BudgetHistoryService {
       });
 
       // Activate target branch
-      const updatedCount = await budgetDb.budgetBranches.where("name").equals(branchName).modify({
-        isActive: true,
-      });
+      const updatedCount = await budgetDb.budgetBranches
+        .where("name")
+        .equals(branchName)
+        .modify({
+          isActive: true,
+        });
 
       if (updatedCount === 0) {
         throw new Error(`Branch '${branchName}' not found`);
@@ -345,14 +373,20 @@ class BudgetHistoryService {
 
     try {
       // Check if tag exists
-      const existingTag = await budgetDb.budgetTags.where("name").equals(tagName).first();
+      const existingTag = await budgetDb.budgetTags
+        .where("name")
+        .equals(tagName)
+        .first();
 
       if (existingTag) {
         throw new Error(`Tag '${tagName}' already exists`);
       }
 
       // Verify commit exists
-      const commit = await budgetDb.budgetCommits.where("hash").equals(commitHash).first();
+      const commit = await budgetDb.budgetCommits
+        .where("hash")
+        .equals(commitHash)
+        .first();
 
       if (!commit) {
         throw new Error(`Commit '${commitHash}' not found`);
@@ -404,12 +438,12 @@ class BudgetHistoryService {
       };
 
       const signature = encryptionUtils.generateHash(
-        JSON.stringify(signaturePayload) + deviceFingerprint
+        JSON.stringify(signaturePayload) + deviceFingerprint,
       );
 
       const isDeviceConsistent = await this.verifyDeviceConsistency(
         commitData.author,
-        deviceFingerprint
+        deviceFingerprint,
       );
 
       return {
@@ -438,7 +472,11 @@ class BudgetHistoryService {
       }
 
       const knownFingerprints = [
-        ...new Set(recentCommits.map((c) => c.deviceFingerprint).filter((f) => f && f !== "")),
+        ...new Set(
+          recentCommits
+            .map((c) => c.deviceFingerprint)
+            .filter((f) => f && f !== ""),
+        ),
       ];
 
       if (knownFingerprints.length <= this.maxDevicesPerAuthor) {
@@ -468,7 +506,9 @@ class BudgetHistoryService {
       ]);
 
       const commitHashes = new Set(commits.map((c) => c.hash));
-      const recentChanges = changes.filter((c) => commitHashes.has(c.commitHash));
+      const recentChanges = changes.filter((c) =>
+        commitHashes.has(c.commitHash),
+      );
 
       const patterns = {
         totalChanges: recentChanges.length,
@@ -490,7 +530,8 @@ class BudgetHistoryService {
 
       // Author activity
       commits.forEach((commit) => {
-        patterns.authorActivity[commit.author] = (patterns.authorActivity[commit.author] || 0) + 1;
+        patterns.authorActivity[commit.author] =
+          (patterns.authorActivity[commit.author] || 0) + 1;
       });
 
       // Daily activity
@@ -501,7 +542,8 @@ class BudgetHistoryService {
 
       // Calculate averages
       const days = Object.keys(patterns.dailyActivity).length;
-      patterns.averageChangesPerDay = days > 0 ? recentChanges.length / days : 0;
+      patterns.averageChangesPerDay =
+        days > 0 ? recentChanges.length / days : 0;
 
       // Most active hour
       const hourCounts = {};
@@ -511,8 +553,9 @@ class BudgetHistoryService {
       });
 
       patterns.mostActiveHour = Object.keys(hourCounts).reduce(
-        (maxHour, hour) => (hourCounts[hour] > (hourCounts[maxHour] || 0) ? hour : maxHour),
-        null
+        (maxHour, hour) =>
+          hourCounts[hour] > (hourCounts[maxHour] || 0) ? hour : maxHour,
+        null,
       );
 
       return patterns;

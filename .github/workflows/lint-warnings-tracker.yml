@@ -220,11 +220,11 @@ jobs:
             echo "Could not checkout develop branch, trying to create it from origin"
             git checkout -b develop origin/develop 2>/dev/null || echo "Failed to create develop branch"
           }
-          
+
           # Verify we're on develop and re-install deps if needed
           CURRENT_BRANCH=$(git branch --show-current)
           echo "Current branch: $CURRENT_BRANCH"
-          
+
           if [ "$CURRENT_BRANCH" = "develop" ]; then
             echo "✅ Successfully on develop branch"
             npm ci --silent
@@ -234,12 +234,12 @@ jobs:
             echo "❌ Failed to switch to develop branch, using fallback"
             echo '{"currentStatus":{"totalWarnings":0}}' > develop-warnings.json
           fi
-          
+
           DEVELOP_WARNINGS=$(cat develop-warnings.json | jq -r '.currentStatus.totalWarnings // 0')
           echo "Develop warnings: $DEVELOP_WARNINGS"
           echo "warnings=$DEVELOP_WARNINGS" >> $GITHUB_OUTPUT
 
-      - name: Get warnings for main branch  
+      - name: Get warnings for main branch
         if: steps.should_run.outputs.should_run_main == 'true'
         id: main_warnings
         run: |
@@ -249,11 +249,11 @@ jobs:
             echo "Could not checkout main branch, trying to create it from origin"
             git checkout -b main origin/main 2>/dev/null || echo "Failed to create main branch"
           }
-          
+
           # Verify we're on main and re-install deps if needed
           CURRENT_BRANCH=$(git branch --show-current)
           echo "Current branch: $CURRENT_BRANCH"
-          
+
           if [ "$CURRENT_BRANCH" = "main" ]; then
             echo "✅ Successfully on main branch"
             npm ci --silent
@@ -263,7 +263,7 @@ jobs:
             echo "❌ Failed to switch to main branch, using fallback"
             echo '{"currentStatus":{"totalWarnings":0}}' > main-warnings.json
           fi
-          
+
           MAIN_WARNINGS=$(cat main-warnings.json | jq -r '.currentStatus.totalWarnings // 0')
           echo "Main warnings: $MAIN_WARNINGS"
           echo "warnings=$MAIN_WARNINGS" >> $GITHUB_OUTPUT
@@ -274,7 +274,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            
+
             // First, hide previous automation comments to prevent flooding
             try {
               const comments = await github.rest.issues.listComments({
@@ -308,10 +308,10 @@ jobs:
             } catch (error) {
               console.log('⚠️ Could not process previous comments:', error.message);
             }
-            
+
             // Load template from markdown file
             const template = fs.readFileSync('.github/data/lint-warnings-comment.md', 'utf8');
-            
+
             // Prepare template variables
             const currentDate = new Date().toLocaleDateString('en-US', { 
               year: 'numeric', 
@@ -321,10 +321,10 @@ jobs:
               minute: '2-digit',
               timeZone: 'UTC'
             });
-            
+
             const developWarnings = '${{ steps.develop_warnings.outputs.warnings }}' || '0';
             const mainWarnings = '${{ steps.main_warnings.outputs.warnings }}' || '0';
-            
+
             let branchInfo = '';
             if ('${{ steps.should_run.outputs.should_run_develop }}' === 'true') {
               branchInfo += `**Develop Branch:** ${developWarnings} warnings\n`;
@@ -332,11 +332,11 @@ jobs:
             if ('${{ steps.should_run.outputs.should_run_main }}' === 'true') {
               branchInfo += `**Main Branch:** ${mainWarnings} warnings\n`;
             }
-            
+
             const statusMessage = developWarnings < 96 
               ? `✅ Develop improved: -${96 - developWarnings} from baseline (96)`
               : `⚠️ Develop increased: +${developWarnings - 96} from baseline (96)`;
-            
+
             // Read detailed warning data for develop branch
             let detailedInfo = '';
             try {

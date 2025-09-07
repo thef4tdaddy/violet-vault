@@ -25,13 +25,19 @@ const useAuthFlow = () => {
   const handleSetup = useCallback(
     async (userData) => {
       logger.auth("Layout handleSetup called", { hasUserData: !!userData });
-      logger.auth("🚨 DEBUG VERSION 2: useAuthFlow.js with debug logging is running!");
+      logger.auth(
+        "🚨 DEBUG VERSION 2: useAuthFlow.js with debug logging is running!",
+      );
       try {
         // ALWAYS generate budgetId deterministically from password for cross-device sync
-        const { encryptionUtils } = await import("../../utils/security/encryption");
+        const { encryptionUtils } = await import(
+          "../../utils/security/encryption"
+        );
 
         // Debug: Track source of budget ID problem
-        const generatedBudgetId = await encryptionUtils.generateBudgetId(userData.password);
+        const generatedBudgetId = await encryptionUtils.generateBudgetId(
+          userData.password,
+        );
         logger.auth("🔍 DEBUG: useAuthFlow budget ID investigation", {
           originalUserDataBudgetId: userData.budgetId || "none",
           generatedBudgetId,
@@ -84,7 +90,7 @@ const useAuthFlow = () => {
         showErrorToast(`Setup error: ${error.message}`, "Setup Error");
       }
     },
-    [login, showErrorToast]
+    [login, showErrorToast],
   );
 
   const handleLogout = useCallback(() => {
@@ -95,12 +101,15 @@ const useAuthFlow = () => {
     async (oldPass, newPass) => {
       const result = await changePassword(oldPass, newPass);
       if (!result.success) {
-        showErrorToast(`Password change failed: ${result.error}`, "Password Change Failed");
+        showErrorToast(
+          `Password change failed: ${result.error}`,
+          "Password Change Failed",
+        );
       } else {
         showSuccessToast("Password updated successfully", "Password Changed");
       }
     },
-    [changePassword, showErrorToast, showSuccessToast]
+    [changePassword, showErrorToast, showSuccessToast],
   );
 
   const handleUpdateProfile = useCallback(
@@ -110,7 +119,7 @@ const useAuthFlow = () => {
         throw new Error(result.error);
       }
     },
-    [updateProfile]
+    [updateProfile],
   );
 
   return {

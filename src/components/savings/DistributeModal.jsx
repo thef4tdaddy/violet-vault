@@ -43,7 +43,11 @@ const DistributeModal = ({
     if (!amount || amount <= 0) return;
 
     // Use the proportional distribution strategy from utils
-    const autoDistribution = calculateGoalDistribution(savingsGoals, amount, "proportional");
+    const autoDistribution = calculateGoalDistribution(
+      savingsGoals,
+      amount,
+      "proportional",
+    );
 
     setDistribution(autoDistribution);
   };
@@ -79,14 +83,18 @@ const DistributeModal = ({
   if (!isOpen) return null;
 
   const distributionTotal = calculateDistributionTotal();
-  const isValidDistribution = distributionTotal > 0 && distributionTotal <= unassignedCash;
+  const isValidDistribution =
+    distributionTotal > 0 && distributionTotal <= unassignedCash;
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="glassmorphism rounded-2xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-white/30 shadow-2xl">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xl font-semibold">Distribute Unassigned Cash</h3>
-          <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
+          <button
+            onClick={handleClose}
+            className="text-gray-400 hover:text-gray-600"
+          >
             <X className="h-6 w-6" />
           </button>
         </div>
@@ -94,8 +102,12 @@ const DistributeModal = ({
         {/* Available Cash Display */}
         <div className="mb-6 p-4 bg-green-50 rounded-lg">
           <div className="flex items-center justify-between">
-            <span className="font-medium text-green-800">Available Unassigned Cash:</span>
-            <span className="text-xl font-bold text-green-600">${unassignedCash.toFixed(2)}</span>
+            <span className="font-medium text-green-800">
+              Available Unassigned Cash:
+            </span>
+            <span className="text-xl font-bold text-green-600">
+              ${unassignedCash.toFixed(2)}
+            </span>
           </div>
         </div>
 
@@ -119,7 +131,9 @@ const DistributeModal = ({
             <div className="flex items-end">
               <button
                 onClick={handleAutoDistribute}
-                disabled={!totalToDistribute || parseFloat(totalToDistribute) <= 0}
+                disabled={
+                  !totalToDistribute || parseFloat(totalToDistribute) <= 0
+                }
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 Auto-Distribute
@@ -130,13 +144,18 @@ const DistributeModal = ({
           {/* Individual Goal Distribution */}
           {savingsGoals.map((goal) => {
             const remaining = goal.targetAmount - goal.currentAmount;
-            const priority = SAVINGS_PRIORITIES.find((p) => p.value === goal.priority);
+            const priority = SAVINGS_PRIORITIES.find(
+              (p) => p.value === goal.priority,
+            );
 
             return (
               <div key={goal.id} className="border rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center space-x-3">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: goal.color }} />
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: goal.color }}
+                    />
                     <div>
                       <span className="font-medium">{goal.name}</span>
                       {priority && (
@@ -149,7 +168,9 @@ const DistributeModal = ({
                       )}
                     </div>
                   </div>
-                  <span className="text-sm text-gray-600">Need: ${remaining.toFixed(2)}</span>
+                  <span className="text-sm text-gray-600">
+                    Need: ${remaining.toFixed(2)}
+                  </span>
                 </div>
                 <input
                   type="number"
@@ -174,15 +195,20 @@ const DistributeModal = ({
         <div className="border-t pt-4 mb-6">
           <div className="flex justify-between items-center">
             <span className="font-medium">Total to Distribute:</span>
-            <span className="text-lg font-bold">${distributionTotal.toFixed(2)}</span>
+            <span className="text-lg font-bold">
+              ${distributionTotal.toFixed(2)}
+            </span>
           </div>
           {distributionTotal > unassignedCash && (
             <p className="text-red-600 text-sm mt-1">
-              Exceeds available cash by ${(distributionTotal - unassignedCash).toFixed(2)}
+              Exceeds available cash by $
+              {(distributionTotal - unassignedCash).toFixed(2)}
             </p>
           )}
           {distributionTotal > 0 && distributionTotal <= unassignedCash && (
-            <p className="text-green-600 text-sm mt-1">✓ Valid distribution amount</p>
+            <p className="text-green-600 text-sm mt-1">
+              ✓ Valid distribution amount
+            </p>
           )}
         </div>
 
