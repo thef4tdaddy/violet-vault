@@ -34,14 +34,9 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
       try {
         _setIsLoading(true);
         
-        // GitHub Issue #576 Phase 2: Add delay for new users to prevent race conditions
-        const authState = JSON.parse(localStorage.getItem("authState") || "{}");
-        const isNewUser = !authState.lastSyncTime || Date.now() - new Date(authState.lastSyncTime).getTime() < 300000; // 5 minutes
-        
-        if (isNewUser) {
-          logger.info("🔄 New user detected - adding sync delay to prevent race conditions");
-          await new Promise(resolve => setTimeout(resolve, 2000)); // 2s delay for new users
-        }
+        // GitHub Issue #576 Phase 2: Add delay for ALL users to prevent race conditions
+        logger.info("🔄 Adding sync delay to prevent race conditions for all users");
+        await new Promise(resolve => setTimeout(resolve, 2000)); // 2s delay for all users
         
         const syncResult = await firebaseSync.forceSync();
         if (syncResult && syncResult.success) {
