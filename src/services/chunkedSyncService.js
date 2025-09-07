@@ -15,8 +15,8 @@ import firebaseSyncService from "./firebaseSyncService";
 import logger from "../utils/common/logger";
 import { SyncMutex } from "../utils/sync/SyncMutex";
 import {
-  validateEncryptedData,
-  validateManifest,
+  validateEncryptedData as _validateEncryptedData,
+  validateManifest as _validateManifest,
   generateChecksum,
 } from "../utils/sync/validation";
 import { createSyncResilience } from "../utils/sync/resilience";
@@ -178,9 +178,10 @@ class ChunkedSyncService {
   }
 
   /**
-   * Create manifest with chunk information
+   * Create manifest with chunk information and validation checksums
+   * GitHub Issue #576 Phase 1: Enhanced data validation
    */
-  createManifest(chunkMap, metadata = {}) {
+  async createManifest(chunkMap, metadata = {}) {
     const manifest = {
       version: "2.0",
       timestamp: Date.now(),
@@ -190,18 +191,36 @@ class ChunkedSyncService {
         totalSize: 0,
         ...metadata,
       },
+      validation: {
+        manifestChecksum: "", // Will be calculated after chunk processing
+        minChunkSize: 16, // Minimum encrypted chunk size
+        minIVSize: 12, // Minimum IV size
+      },
     };
 
     for (const [chunkId, data] of Object.entries(chunkMap)) {
       const size = this.calculateSize(data);
+      const dataString = this.safeStringify(data);
+      const checksum = await generateChecksum(dataString);
+      
       manifest.chunks[chunkId] = {
         size,
         itemCount: Array.isArray(data) ? data.length : 1,
         type: Array.isArray(data) ? "array" : "object",
+        checksum, // GitHub Issue #576: Add chunk checksum for validation
       };
       manifest.metadata.totalSize += size;
       manifest.metadata.totalChunks++;
     }
+
+    // Generate manifest checksum for integrity validation
+    const manifestString = JSON.stringify({
+      version: manifest.version,
+      timestamp: manifest.timestamp,
+      chunks: manifest.chunks,
+      metadata: manifest.metadata,
+    });
+    manifest.validation.manifestChecksum = await generateChecksum(manifestString);
 
     logger.debug("Created manifest", {
       totalChunks: manifest.metadata.totalChunks,
@@ -263,7 +282,7 @@ class ChunkedSyncService {
         }
 
         // Create manifest
-        const manifest = this.createManifest(chunkMap, {
+        const manifest = await this.createManifest(chunkMap, {
           userId: currentUser?.budgetId || currentUser?.uid || currentUser?.id || "anonymous",
           userAgent: navigator.userAgent,
           originalKeys: Object.keys(data),
@@ -323,10 +342,19 @@ class ChunkedSyncService {
           const batchChunks = chunkEntries.slice(i, i + batchSize);
 
           for (const [chunkId, chunkData] of batchChunks) {
-            const encryptedChunk = await encryptionUtils.encrypt(
-              this.safeStringify(chunkData),
-              this.encryptionKey
-            );
+            const chunkDataString = this.safeStringify(chunkData);
+            const encryptedChunk = await encryptionUtils.encrypt(chunkDataString, this.encryptionKey);
+
+            // GitHub Issue #576 Phase 1: Enhanced validation before save
+            const encryptedDataBytes = base64FromBytes(encryptedChunk.encryptedData);
+            const ivBytes = base64FromBytes(encryptedChunk.iv);
+            
+            if (encryptedDataBytes.length < 16) {
+              throw new Error(`Encrypted data too small: ${encryptedDataBytes.length} bytes`);
+            }
+            if (ivBytes.length < 12) {
+              throw new Error(`IV too small: ${ivBytes.length} bytes`);
+            }
 
             const chunkDocument = {
               encryptedData: {
@@ -336,6 +364,10 @@ class ChunkedSyncService {
               budgetId: this.budgetId,
               chunkId,
               timestamp: Date.now(),
+              validation: {
+                originalSize: chunkDataString.length,
+                checksum: await generateChecksum(chunkDataString),
+              },
             };
 
             batch.set(doc(db, "budgets", this.budgetId, "chunks", chunkId), chunkDocument);
@@ -502,13 +534,35 @@ class ChunkedSyncService {
           for (const chunkDoc of chunksSnapshot.docs) {
             const chunkData = chunkDoc.data();
             try {
+              // GitHub Issue #576 Phase 1: Pre-decryption validation
+              const encryptedDataBytes = bytesFromBase64(chunkData.encryptedData.data);
+              const ivBytes = bytesFromBase64(chunkData.encryptedData.iv);
+              
+              if (encryptedDataBytes.length < 16) {
+                throw new Error(`Corrupted chunk ${chunkData.chunkId}: encrypted data too small (${encryptedDataBytes.length} bytes)`);
+              }
+              if (ivBytes.length < 12) {
+                throw new Error(`Corrupted chunk ${chunkData.chunkId}: IV too small (${ivBytes.length} bytes)`);
+              }
+
               const decryptedChunk = await encryptionUtils.decrypt(
                 {
-                  data: bytesFromBase64(chunkData.encryptedData.data),
-                  iv: bytesFromBase64(chunkData.encryptedData.iv),
+                  data: encryptedDataBytes,
+                  iv: ivBytes,
                 },
                 this.encryptionKey
               );
+
+              // Post-decryption validation if checksum exists
+              if (chunkData.validation?.checksum) {
+                const actualChecksum = await generateChecksum(decryptedChunk);
+                if (actualChecksum !== chunkData.validation.checksum) {
+                  logger.warn(`Checksum mismatch for chunk ${chunkData.chunkId}`, {
+                    expected: chunkData.validation.checksum,
+                    actual: actualChecksum,
+                  });
+                }
+              }
 
               chunks[chunkData.chunkId] = JSON.parse(decryptedChunk);
             } catch (chunkDecryptError) {

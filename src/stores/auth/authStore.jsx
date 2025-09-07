@@ -8,7 +8,7 @@ import { identifyUser } from "../../utils/common/highlight";
  * Compare two Uint8Array objects byte-wise for equality
  * More reliable than JSON.stringify comparison
  */
-function compareUint8Arrays(a, b) {
+function _compareUint8Arrays(a, b) {
   if (a.length !== b.length) return false;
   for (let i = 0; i < a.length; i++) {
     if (a[i] !== b[i]) return false;
@@ -299,12 +299,14 @@ export const useAuth = create((set, get) => ({
     try {
       logger.auth("Starting background sync after successful login", { isNewUser });
 
-      // GitHub Issue #578: Add delay for new users to avoid race condition during onboarding
-      // This prevents background sync from conflicting with initial encryption setup
-      if (isNewUser) {
-        logger.auth("⏱️ New user detected - adding sync delay to avoid race condition");
-        await new Promise((resolve) => setTimeout(resolve, 3000)); // 3 second delay
-      }
+      // GitHub Issue #576 Phase 2: Universal race condition prevention for ALL users
+      // Different delays based on user type to ensure encryption context is ready
+      const syncDelay = isNewUser ? 3000 : 1500; // 3s for new users, 1.5s for returning users
+      logger.auth(`⏱️ Adding universal sync delay to prevent race conditions (${syncDelay}ms)`, {
+        isNewUser,
+        delayMs: syncDelay,
+      });
+      await new Promise((resolve) => setTimeout(resolve, syncDelay));
 
       // Import UI store to access startBackgroundSync
       const { useBudgetStore } = await import("../ui/uiStore");
@@ -458,7 +460,7 @@ export const useAuth = create((set, get) => ({
           // So we'll use a simple approach: try to derive a key and assume it's valid
           // This is less secure but necessary when no encrypted data exists yet
           const saltArray = new Uint8Array(authState.salt);
-          const testKey = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
+          const _testKey = await encryptionUtils.deriveKeyFromSalt(password, saltArray);
 
           logger.auth("validatePassword: Key derived successfully for no-data case");
           logger.production("Password validation successful", {
