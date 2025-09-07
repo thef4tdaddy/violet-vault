@@ -72,13 +72,21 @@ const useAuthFlow = () => {
           }
         } else {
           logger.error("❌ Setup failed:", result.error);
-          showErrorToast(
-            `Setup failed: ${result.error}`,
-            "Account Setup Failed",
-          );
+          // Throw error so useUserSetup can handle enhanced password validation UI
+          const error = new Error(result.error);
+          error.code = result.code;
+          error.canCreateNew = result.canCreateNew;
+          error.suggestion = result.suggestion;
+          throw error;
         }
       } catch (error) {
         logger.error("❌ Setup error:", error);
+        
+        // If this is our enhanced password validation error, re-throw it
+        if (error.code === "INVALID_PASSWORD_OFFER_NEW_BUDGET") {
+          throw error;
+        }
+        
         showErrorToast(`Setup error: ${error.message}`, "Setup Error");
       }
     },

@@ -139,11 +139,13 @@ export const useAuth = create((set, get) => ({
           logger.auth("Validating password before allowing login");
           const passwordValid = await get().validatePassword(password);
           if (!passwordValid) {
-            logger.auth("Password validation failed - blocking login");
+            logger.auth("Password validation failed - offering new budget creation");
             return {
               success: false,
-              error: "Invalid password. Please check your password and try again.",
-              code: "INVALID_PASSWORD"
+              error: "This password doesn't match the existing budget.",
+              suggestion: "Would you like to create a new budget instead?",
+              code: "INVALID_PASSWORD_OFFER_NEW_BUDGET",
+              canCreateNew: true
             };
           }
           logger.auth("Password validation successful - proceeding with login");
