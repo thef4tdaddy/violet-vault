@@ -29,36 +29,9 @@ const useFirebaseSync = (firebaseSync, encryptionKey, budgetId, currentUser) => 
     };
     firebaseSync.start(config);
 
-    // Auto-load data from cloud using force sync
-    const loadCloudData = async () => {
-      try {
-        _setIsLoading(true);
-        
-        // GitHub Issue #576 Phase 2: Add delay for ALL users to prevent race conditions
-        logger.info("🔄 Adding sync delay to prevent race conditions for all users");
-        await new Promise(resolve => setTimeout(resolve, 2000)); // 2s delay for all users
-        
-        const syncResult = await firebaseSync.forceSync();
-        if (syncResult && syncResult.success) {
-          logger.info("✅ Chunked sync completed:", syncResult);
-          showSuccessToast("Data synced from cloud successfully");
-
-          // The cloudSyncService handles syncing data to Dexie automatically
-          // TanStack Query will pick up the changes from Dexie
-
-          // Update non-Dexie Zustand state if needed
-          // These would need to be handled separately since they're not in Dexie
-
-          logger.info("🔄 Chunked Firebase → Dexie sync completed");
-        }
-      } catch (error) {
-        logger.warn("Failed to load cloud data:", error.message);
-      } finally {
-        _setIsLoading(false);
-      }
-    };
-
-    loadCloudData();
+    // GitHub Issue #576: Remove aggressive auto-sync - let change-based sync handle it
+    // The cloudSyncService will handle initial sync and subsequent syncs based on data changes
+    // No need for immediate sync on every component mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firebaseSync, budgetId, encryptionKey]); // Remove budget from deps to prevent load loop
 
