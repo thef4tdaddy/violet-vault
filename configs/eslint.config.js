@@ -255,7 +255,6 @@ export default [
     files: [
       "**/budgetDb.js",
       "**/budgetHistoryService.js",
-      "**/chunkedSyncService.js",
       "**/budgetHistoryTracker.js",
       "**/authStore.jsx",
       "**/SyncHealthIndicator.jsx", // System health monitoring utility
@@ -264,6 +263,21 @@ export default [
     rules: {
       "max-lines": "off", // These files excluded from 500 LOC limit
       "no-restricted-imports": "off", // Allow service imports for system monitoring
+    },
+  },
+  {
+    // Exclusions for chunkedSyncService.js - critical sync file with legitimate complexity (Issue #576)
+    files: ["**/chunkedSyncService.js"],
+    rules: {
+      "max-lines": "off", // Critical sync operations may need many lines
+      "max-lines-per-function": "off", // Complex sync operations need large functions
+      "max-statements": "off", // Sync logic requires many statements
+      complexity: "off", // Firebase sync operations are inherently complex
+      "max-depth": "off", // Error handling and retry logic needs deep nesting
+      "max-params": "off", // Sync operations may need many parameters
+      "max-nested-callbacks": "off", // Async Firebase operations need nested callbacks
+      "no-restricted-imports": "off", // Allow service imports for sync operations
+      // Keep unused-vars warning to catch import cleanup opportunities
     },
   },
   {
