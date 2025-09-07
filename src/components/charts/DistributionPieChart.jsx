@@ -52,15 +52,19 @@ const DistributionPieChart = ({
   const labelFunc = labelFormatter || defaultLabelFormatter;
 
   // Calculate total for percentage display
-  const total = chartData.reduce((sum, item) => sum + (item[dataKey] || 0), 0);
+  const total = chartData
+    .filter((item) => item != null) // Filter out null/undefined items
+    .reduce((sum, item) => sum + (item[dataKey] || 0), 0);
 
   // Enhanced data with percentage for custom rendering
-  const enhancedData = chartData.map((item, index) => ({
-    ...item,
-    percentage:
-      total > 0 ? (((item[dataKey] || 0) / total) * 100).toFixed(1) : 0,
-    color: item.color || chartColors[index % chartColors.length],
-  }));
+  const enhancedData = chartData
+    .filter((item) => item != null) // Filter out null/undefined items
+    .map((item, index) => ({
+      ...item,
+      percentage:
+        total > 0 ? (((item[dataKey] || 0) / total) * 100).toFixed(1) : 0,
+      color: item.color || chartColors[index % chartColors.length],
+    }));
 
   return (
     <ChartContainer
@@ -91,9 +95,11 @@ const DistributionPieChart = ({
               endAngle={chartTypeConfigs.pie.endAngle}
               {...props}
             >
-              {enhancedData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
+              {enhancedData
+                .filter((entry) => entry != null) // Additional safety filter
+                .map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
             </Pie>
             <Tooltip content={<TooltipComponent />} />
             {showLegend && <Legend />}
