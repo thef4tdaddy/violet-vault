@@ -299,9 +299,9 @@ export const useAuth = create((set, get) => ({
     try {
       logger.auth("Starting background sync after successful login", { isNewUser });
 
-      // GitHub Issue #576 Phase 2: Universal race condition prevention for ALL users
-      // Different delays based on user type to ensure encryption context is ready
-      const syncDelay = isNewUser ? 3000 : 1500; // 3s for new users, 1.5s for returning users
+      // GitHub Issue #576 Phase 2: Universal race condition prevention for ALL users  
+      // Same delay for all users to prevent race conditions
+      const syncDelay = 2500; // 2.5s for all users to ensure encryption context is ready
       logger.auth(`⏱️ Adding universal sync delay to prevent race conditions (${syncDelay}ms)`, {
         isNewUser,
         delayMs: syncDelay,
