@@ -122,6 +122,20 @@ export const useUserSetup = (onSetupComplete) => {
         logger.debug("✅ Returning user login succeeded");
       } catch (error) {
         logger.error("❌ Login failed:", error);
+        
+        // Check if this is the new password validation error with suggestion
+        if (error?.code === "INVALID_PASSWORD_OFFER_NEW_BUDGET" && error?.canCreateNew) {
+          // Show confirmation dialog for creating new budget
+          if (window.confirm(`${error.error}\n\n${error.suggestion}`)) {
+            // User wants to create new budget - clear existing data and start fresh
+            logger.debug("User chose to create new budget - clearing existing data");
+            localStorage.removeItem("envelopeBudgetData");
+            localStorage.removeItem("userProfile");
+            window.location.reload(); // Refresh to start completely fresh
+          }
+          return; // Don't show generic error toast
+        }
+        
         globalToast.showError(
           "Incorrect password. Please try again.",
           "Login Failed",

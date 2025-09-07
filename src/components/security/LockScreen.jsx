@@ -79,6 +79,16 @@ const LockScreen = () => {
         setFailedAttempts(0);
         setError("");
       } else {
+        // Enhanced error message for wrong password
+        if (window.confirm("That isn't the correct password for this budget.\n\nWould you like to log out and start a new budget?")) {
+          // User wants to create new budget - logout and clear data
+          localStorage.removeItem("envelopeBudgetData");
+          localStorage.removeItem("userProfile");
+          logout();
+          window.location.reload();
+          return;
+        }
+        
         setError("Invalid password");
         setFailedAttempts((prev) => prev + 1);
         setPassword("");
