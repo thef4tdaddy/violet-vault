@@ -81,6 +81,13 @@ class ChunkedSyncService {
    * Initialize chunked sync
    */
   async initialize(budgetId, encryptionKey) {
+    // GitHub Issue #578: Add validation for initialization parameters
+    if (!budgetId || !encryptionKey) {
+      throw new Error(
+        `Invalid initialization parameters - budgetId: ${!!budgetId}, encryptionKey: ${!!encryptionKey}`
+      );
+    }
+
     this.budgetId = budgetId;
     this.encryptionKey = encryptionKey;
 
@@ -486,7 +493,7 @@ class ChunkedSyncService {
 
           const chunksSnapshot = await this.resilience.execute(
             () => getDocs(chunksQuery),
-            "loadChunks", 
+            "loadChunks",
             "loadChunks"
           );
           const chunks = {};
@@ -657,7 +664,7 @@ class ChunkedSyncService {
 
     // Add Phase 2 resilience metrics
     const resilienceStatus = this.resilience?.getStatus();
-    
+
     return {
       ...baseStats,
       resilience: resilienceStatus,

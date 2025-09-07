@@ -33,11 +33,7 @@ describe("ledgerHelpers", () => {
     });
 
     it("should handle only expense transactions", () => {
-      const transactions = [
-        { amount: -300 },
-        { amount: -150 },
-        { amount: -50 },
-      ];
+      const transactions = [{ amount: -300 }, { amount: -150 }, { amount: -50 }];
 
       const result = calculateTransactionTotals(transactions);
 

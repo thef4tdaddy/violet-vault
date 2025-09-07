@@ -43,18 +43,13 @@ const TransactionForm = ({
     e.preventDefault();
 
     if (!transactionForm.description.trim() || !transactionForm.amount) {
-      globalToast.showError(
-        "Please fill in description and amount",
-        "Required Fields",
-      );
+      globalToast.showError("Please fill in description and amount", "Required Fields");
       return;
     }
 
     // Handle bill payment if transaction is assigned to a bill envelope
     if (transactionForm.envelopeId && onPayBill) {
-      const selectedEnvelope = envelopes.find(
-        (env) => env.id === transactionForm.envelopeId,
-      );
+      const selectedEnvelope = envelopes.find((env) => env.id === transactionForm.envelopeId);
       if (selectedEnvelope && selectedEnvelope.envelopeType === "bill") {
         const billPayment = {
           billId: selectedEnvelope.id,
@@ -81,10 +76,7 @@ const TransactionForm = ({
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
-        <TransactionModalHeader
-          editingTransaction={editingTransaction}
-          onClose={handleClose}
-        />
+        <TransactionModalHeader editingTransaction={editingTransaction} onClose={handleClose} />
 
         {/* Standardized Edit Lock Indicator */}
         {editingTransaction && (editLock.isLocked || editLock.isLoading) && (

@@ -24,9 +24,7 @@ const Toast = ({ type = "info", title, message, duration = 5000, onClose }) => {
     const baseStyles =
       "transform transition-all duration-300 ease-in-out glassmorphism rounded-2xl p-4 max-w-md shadow-2xl border border-white/30";
 
-    const visibilityStyles = isVisible
-      ? "translate-x-0 opacity-100"
-      : "translate-x-full opacity-0";
+    const visibilityStyles = isVisible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0";
 
     const typeStyles = {
       success: "bg-emerald-50/90 border-emerald-200/50",
@@ -44,15 +42,15 @@ const Toast = ({ type = "info", title, message, duration = 5000, onClose }) => {
 
     switch (type) {
       case "success":
-        return renderIcon('CheckCircle', { className: `${iconStyles} text-emerald-600` });
+        return renderIcon("CheckCircle", { className: `${iconStyles} text-emerald-600` });
       case "error":
-        return renderIcon('AlertCircle', { className: `${iconStyles} text-red-600` });
+        return renderIcon("AlertCircle", { className: `${iconStyles} text-red-600` });
       case "warning":
-        return renderIcon('AlertCircle', { className: `${iconStyles} text-amber-600` });
+        return renderIcon("AlertCircle", { className: `${iconStyles} text-amber-600` });
       case "payday":
-        return renderIcon('Calendar', { className: `${iconStyles} text-purple-600` });
+        return renderIcon("Calendar", { className: `${iconStyles} text-purple-600` });
       default:
-        return renderIcon('Info', { className: `${iconStyles} text-blue-600` });
+        return renderIcon("Info", { className: `${iconStyles} text-blue-600` });
     }
   };
 
@@ -76,15 +74,9 @@ const Toast = ({ type = "info", title, message, duration = 5000, onClose }) => {
       <div className="flex items-start">
         {getIcon()}
         <div className="flex-1 min-w-0">
-          {title && (
-            <h4 className={`font-semibold text-sm ${getTextColor()}`}>
-              {title}
-            </h4>
-          )}
+          {title && <h4 className={`font-semibold text-sm ${getTextColor()}`}>{title}</h4>}
           {message && (
-            <p
-              className={`text-sm ${title ? "mt-1" : ""} ${getTextColor()} opacity-90`}
-            >
+            <p className={`text-sm ${title ? "mt-1" : ""} ${getTextColor()} opacity-90`}>
               {message}
             </p>
           )}
@@ -93,7 +85,7 @@ const Toast = ({ type = "info", title, message, duration = 5000, onClose }) => {
           onClick={handleClose}
           className="ml-3 flex-shrink-0 p-1 rounded-lg hover:bg-white/20 transition-colors"
         >
-          {renderIcon('X', { className: "h-4 w-4 text-gray-500" })}
+          {renderIcon("X", { className: "h-4 w-4 text-gray-500" })}
         </button>
       </div>
     </div>
@@ -104,11 +96,7 @@ const ToastContainer = ({ toasts, removeToast }) => {
   return (
     <div className="fixed top-4 right-4 z-50 space-y-3">
       {toasts.map((toast) => (
-        <Toast
-          key={toast.id}
-          {...toast}
-          onClose={() => removeToast(toast.id)}
-        />
+        <Toast key={toast.id} {...toast} onClose={() => removeToast(toast.id)} />
       ))}
     </div>
   );

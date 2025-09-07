@@ -31,7 +31,7 @@ export const prefetchHelpers = {
           // Fallback to direct database query
           const cached = await budgetDb.getEnvelopesByCategory(
             filters.category,
-            filters.includeArchived,
+            filters.includeArchived
           );
 
           if (cached && cached.length > 0) {
@@ -58,10 +58,7 @@ export const prefetchHelpers = {
   prefetchTransactions: async (queryClient, dateRange, options = {}) => {
     try {
       return await queryClient.prefetchQuery({
-        queryKey: queryKeys.transactionsByDateRange(
-          dateRange.start,
-          dateRange.end,
-        ),
+        queryKey: queryKeys.transactionsByDateRange(dateRange.start, dateRange.end),
         queryFn: async () => {
           // Use database service for consistent querying
           const transactions = await budgetDatabaseService.getTransactions({
@@ -75,10 +72,7 @@ export const prefetchHelpers = {
           }
 
           // Fallback to direct database query
-          const cached = await budgetDb.getTransactionsByDateRange(
-            dateRange.start,
-            dateRange.end,
-          );
+          const cached = await budgetDb.getTransactionsByDateRange(dateRange.start, dateRange.end);
 
           if (cached && cached.length > 0) {
             return cached.slice(0, options.limit || 1000);
@@ -180,19 +174,18 @@ export const prefetchHelpers = {
           }
 
           // Generate dashboard data from current database state
-          const [envelopes, recentTransactions, upcomingBills, metadata] =
-            await Promise.all([
-              budgetDatabaseService.getEnvelopes({ useCache: false }),
-              budgetDatabaseService.getTransactions({
-                limit: 10,
-                useCache: false,
-              }),
-              budgetDatabaseService.getBills({
-                isPaid: false,
-                daysAhead: 7,
-              }),
-              budgetDatabaseService.getBudgetMetadata(),
-            ]);
+          const [envelopes, recentTransactions, upcomingBills, metadata] = await Promise.all([
+            budgetDatabaseService.getEnvelopes({ useCache: false }),
+            budgetDatabaseService.getTransactions({
+              limit: 10,
+              useCache: false,
+            }),
+            budgetDatabaseService.getBills({
+              isPaid: false,
+              daysAhead: 7,
+            }),
+            budgetDatabaseService.getBudgetMetadata(),
+          ]);
 
           const dashboardData = {
             totalEnvelopes: envelopes.length,
@@ -208,7 +201,7 @@ export const prefetchHelpers = {
           await budgetDb.setCachedValue(
             "dashboard_summary",
             dashboardData,
-            60 * 1000, // 1 minute TTL
+            60 * 1000 // 1 minute TTL
           );
 
           return dashboardData;
@@ -252,7 +245,7 @@ export const prefetchHelpers = {
 
           const analyticsData = await budgetDatabaseService.getAnalyticsData(
             { start: startDate, end: now },
-            { includeTransfers: false, useCache: true },
+            { includeTransfers: false, useCache: true }
           );
 
           if (analyticsData) {
@@ -293,7 +286,7 @@ export const prefetchHelpers = {
             start: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
             end: new Date(),
           },
-          { limit: 20 },
+          { limit: 20 }
         ),
       ];
 
@@ -301,7 +294,7 @@ export const prefetchHelpers = {
       const successful = results.filter((r) => r.status === "fulfilled").length;
 
       logger.info(
-        `Dashboard bundle prefetch completed: ${successful}/${results.length} successful`,
+        `Dashboard bundle prefetch completed: ${successful}/${results.length} successful`
       );
       return results;
     } catch (error) {
@@ -313,7 +306,7 @@ export const prefetchHelpers = {
   /**
    * Smart prefetch based on user navigation patterns
    */
-  smartPrefetch: async (queryClient, currentRoute, userHistory = []) => {
+  smartPrefetch: async (queryClient, currentRoute, _userHistory = []) => {
     const prefetchMap = {
       "/": ["dashboard", "envelopes", "bills"],
       "/envelopes": ["envelopes", "transactions"],

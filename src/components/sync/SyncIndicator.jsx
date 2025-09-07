@@ -36,18 +36,14 @@ const SyncIndicator = ({
       }
       return { status: "error", color: "rose", message: "Sync error" };
     }
-    if (!isOnline)
-      return { status: "offline", color: "amber", message: "Offline" };
-    if (isSyncing)
-      return { status: "syncing", color: "cyan", message: "Syncing..." };
+    if (!isOnline) return { status: "offline", color: "amber", message: "Offline" };
+    if (isSyncing) return { status: "syncing", color: "cyan", message: "Syncing..." };
     return { status: "synced", color: "emerald", message: "Synced" };
   };
 
   const { status, color, message } = getSyncStatus();
 
-  const otherActiveUsers = activeUsers.filter(
-    (user) => currentUser && user.id !== currentUser.id,
-  );
+  const otherActiveUsers = activeUsers.filter((user) => currentUser && user.id !== currentUser.id);
 
   return (
     <div className="glassmorphism rounded-xl p-4 mb-6">
@@ -55,29 +51,21 @@ const SyncIndicator = ({
         {/* Sync Status */}
         <div className="flex items-center space-x-3">
           <div className={`relative p-2 rounded-full bg-${color}-50`}>
-            {status === "syncing" ? (
-              renderIcon('RefreshCw', { className: `h-5 w-5 text-${color}-600 animate-spin` })
-            ) : status === "error" ? (
-              renderIcon('AlertTriangle', { className: `h-5 w-5 text-${color}-600` })
-            ) : status === "offline" ? (
-              renderIcon('WifiOff', { className: `h-5 w-5 text-${color}-600` })
-            ) : status === "synced" ? (
-              renderIcon('CheckCircle', { className: `h-5 w-5 text-${color}-600` })
-            ) : (
-              renderIcon('Wifi', { className: `h-5 w-5 text-${color}-600` })
-            )}
+            {status === "syncing"
+              ? renderIcon("RefreshCw", { className: `h-5 w-5 text-${color}-600 animate-spin` })
+              : status === "error"
+                ? renderIcon("AlertTriangle", { className: `h-5 w-5 text-${color}-600` })
+                : status === "offline"
+                  ? renderIcon("WifiOff", { className: `h-5 w-5 text-${color}-600` })
+                  : status === "synced"
+                    ? renderIcon("CheckCircle", { className: `h-5 w-5 text-${color}-600` })
+                    : renderIcon("Wifi", { className: `h-5 w-5 text-${color}-600` })}
 
             {/* Real-time pulse for active sync */}
             {(isSyncing || otherActiveUsers.length > 0) && (
-              <div
-                className={`absolute -top-1 -right-1 h-3 w-3 bg-${color}-500 rounded-full`}
-              >
-                <div
-                  className={`absolute inset-0 bg-${color}-500 rounded-full animate-ping`}
-                />
-                <div
-                  className={`absolute inset-0 bg-${color}-500 rounded-full`}
-                />
+              <div className={`absolute -top-1 -right-1 h-3 w-3 bg-${color}-500 rounded-full`}>
+                <div className={`absolute inset-0 bg-${color}-500 rounded-full animate-ping`} />
+                <div className={`absolute inset-0 bg-${color}-500 rounded-full`} />
               </div>
             )}
           </div>
@@ -85,7 +73,7 @@ const SyncIndicator = ({
           <div>
             <div className={`font-semibold text-${color}-700`}>{message}</div>
             <div className="flex items-center text-sm text-gray-600">
-              {renderIcon('Clock', { className: "h-3 w-3 mr-1" })}
+              {renderIcon("Clock", { className: "h-3 w-3 mr-1" })}
               <span>{formatLastSync(lastSyncTime)}</span>
             </div>
           </div>
@@ -95,7 +83,7 @@ const SyncIndicator = ({
         {otherActiveUsers.length > 0 && (
           <div className="flex items-center space-x-2">
             <div className="flex items-center text-sm text-gray-600">
-              {renderIcon('Users', { className: "h-4 w-4 mr-1" })}
+              {renderIcon("Users", { className: "h-4 w-4 mr-1" })}
               <span>
                 {otherActiveUsers.length} other
                 {otherActiveUsers.length === 1 ? "" : "s"} online
@@ -139,7 +127,7 @@ const SyncIndicator = ({
         {/* Performance Indicator */}
         {isOnline && !syncError && (
           <div className="flex items-center space-x-1 text-xs text-gray-500">
-            {renderIcon('Zap', { className: "h-3 w-3" })}
+            {renderIcon("Zap", { className: "h-3 w-3" })}
             <span>Real-time</span>
           </div>
         )}
@@ -155,44 +143,37 @@ const SyncIndicator = ({
           }`}
         >
           <div className="flex items-start space-x-2">
-            {renderIcon('AlertTriangle', { 
+            {renderIcon("AlertTriangle", {
               className: `h-4 w-4 mt-0.5 flex-shrink-0 ${
-                syncError.includes("blocked") ||
-                syncError.includes("ad blocker")
+                syncError.includes("blocked") || syncError.includes("ad blocker")
                   ? "text-orange-600"
                   : "text-rose-600"
-              }` 
+              }`,
             })}
             <div>
               <div
                 className={`font-medium ${
-                  syncError.includes("blocked") ||
-                  syncError.includes("ad blocker")
+                  syncError.includes("blocked") || syncError.includes("ad blocker")
                     ? "text-orange-800"
                     : "text-rose-800"
                 }`}
               >
-                {syncError.includes("blocked") ||
-                syncError.includes("ad blocker")
+                {syncError.includes("blocked") || syncError.includes("ad blocker")
                   ? "Sync Blocked by Browser"
                   : "Sync Error"}
               </div>
               <div
                 className={`text-sm mt-1 ${
-                  syncError.includes("blocked") ||
-                  syncError.includes("ad blocker")
+                  syncError.includes("blocked") || syncError.includes("ad blocker")
                     ? "text-orange-600"
                     : "text-rose-600"
                 }`}
               >
-                {typeof syncError === "string"
-                  ? syncError
-                  : "Failed to sync with cloud"}
+                {typeof syncError === "string" ? syncError : "Failed to sync with cloud"}
               </div>
 
               {/* Show specific help for blocking errors */}
-              {(syncError.includes("blocked") ||
-                syncError.includes("ad blocker")) && (
+              {(syncError.includes("blocked") || syncError.includes("ad blocker")) && (
                 <div className="mt-2 text-xs text-orange-700">
                   <div className="font-medium mb-1">To fix this:</div>
                   <ul className="list-disc list-inside space-y-1">
@@ -204,10 +185,7 @@ const SyncIndicator = ({
               )}
 
               {/* Regular retry button for non-blocking errors */}
-              {!(
-                syncError.includes("blocked") ||
-                syncError.includes("ad blocker")
-              ) && (
+              {!(syncError.includes("blocked") || syncError.includes("ad blocker")) && (
                 <button className="text-sm text-rose-700 underline mt-2 hover:text-rose-800">
                   Retry sync
                 </button>
@@ -221,12 +199,11 @@ const SyncIndicator = ({
       {!isOnline && (
         <div className="mt-3 p-3 bg-amber-50 rounded-lg border border-amber-200">
           <div className="flex items-start space-x-2">
-            {renderIcon('WifiOff', { className: "h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" })}
+            {renderIcon("WifiOff", { className: "h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" })}
             <div>
               <div className="font-medium text-amber-800">Working Offline</div>
               <div className="text-sm text-amber-600 mt-1">
-                Your changes are saved locally and will sync when you're back
-                online.
+                Your changes are saved locally and will sync when you're back online.
               </div>
             </div>
           </div>

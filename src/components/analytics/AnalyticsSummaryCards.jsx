@@ -7,26 +7,18 @@ import PageSummaryCard from "../ui/PageSummaryCard";
  * Displays key analytics metrics with consistent styling
  */
 const AnalyticsSummaryCards = ({ summaryMetrics = {} }) => {
-  const {
-    totalExpenses = 0,
-    envelopeUtilization = 0,
-    savingsProgress = 0,
-  } = summaryMetrics;
+  const { totalExpenses = 0, envelopeUtilization = 0, savingsProgress = 0 } = summaryMetrics;
 
   // Calculate average transaction size if we have expense data
-  const avgTransaction =
-    totalExpenses > 0 ? totalExpenses / (totalExpenses > 0 ? 1 : 1) : 0;
+  const avgTransaction = totalExpenses > 0 ? totalExpenses / (totalExpenses > 0 ? 1 : 1) : 0;
 
   // Calculate budget accuracy based on envelope utilization
-  const budgetAccuracy = Math.min(
-    100,
-    Math.max(0, 100 - Math.abs(envelopeUtilization - 100)),
-  );
+  const budgetAccuracy = Math.min(100, Math.max(0, 100 - Math.abs(envelopeUtilization - 100)));
 
   const cards = [
     {
       key: "top-category",
-      icon: getIcon('PieChart'),
+      icon: getIcon("PieChart"),
       label: "Top Category",
       value: totalExpenses > 0 ? `$${totalExpenses.toFixed(2)}` : "$0.00",
       color: "indigo",
@@ -34,7 +26,7 @@ const AnalyticsSummaryCards = ({ summaryMetrics = {} }) => {
     },
     {
       key: "avg-transaction",
-      icon: getIcon('Calculator'),
+      icon: getIcon("Calculator"),
       label: "Avg Transaction",
       value: `$${avgTransaction.toFixed(2)}`,
       color: "teal",
@@ -42,17 +34,16 @@ const AnalyticsSummaryCards = ({ summaryMetrics = {} }) => {
     },
     {
       key: "budget-accuracy",
-      icon: getIcon('Target'),
+      icon: getIcon("Target"),
       label: "Budget Accuracy",
       value: `${budgetAccuracy.toFixed(1)}%`,
-      color:
-        budgetAccuracy > 80 ? "pink" : budgetAccuracy > 60 ? "amber" : "red",
+      color: budgetAccuracy > 80 ? "pink" : budgetAccuracy > 60 ? "amber" : "red",
       subtext: "Envelope adherence",
       alert: budgetAccuracy < 60,
     },
     {
       key: "savings-rate",
-      icon: getIcon('TrendingUp'),
+      icon: getIcon("TrendingUp"),
       label: "Savings Rate",
       value: `${savingsProgress.toFixed(1)}%`,
       color: "emerald",

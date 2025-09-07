@@ -26,9 +26,7 @@ const AccountSettingsSection = ({
           <Key className="h-5 w-5 text-gray-600 mr-3" />
           <div className="text-left">
             <p className="font-medium text-gray-900">Change Password</p>
-            <p className="text-sm text-gray-500">
-              Update your encryption password
-            </p>
+            <p className="text-sm text-gray-500">Update your encryption password</p>
           </div>
         </button>
 
@@ -37,9 +35,7 @@ const AccountSettingsSection = ({
             <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 mr-3" />
             <div className="flex-1">
               <h4 className="font-medium text-red-900">Danger Zone</h4>
-              <p className="text-sm text-red-700 mt-1">
-                These actions cannot be undone.
-              </p>
+              <p className="text-sm text-red-700 mt-1">These actions cannot be undone.</p>
               <div className="mt-3 space-y-2">
                 <button
                   onClick={onLogout}

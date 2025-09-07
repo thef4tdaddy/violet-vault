@@ -14,7 +14,7 @@ const EnvelopeSummaryCards = ({ totals = {}, unassignedCash = 0 }) => {
   const cards = [
     {
       key: "total-allocated",
-      icon: getIcon('Wallet'),
+      icon: getIcon("Wallet"),
       label: "Total Allocated",
       value: `$${(totals.totalAllocated || 0).toFixed(2)}`,
       color: "emerald",
@@ -22,7 +22,7 @@ const EnvelopeSummaryCards = ({ totals = {}, unassignedCash = 0 }) => {
     },
     {
       key: "unassigned-cash",
-      icon: getIcon('DollarSign'),
+      icon: getIcon("DollarSign"),
       label: "Unassigned Cash",
       value: `$${unassignedCash.toFixed(2)}`,
       color: unassignedCash < 0 ? "red" : "amber",
@@ -31,19 +31,16 @@ const EnvelopeSummaryCards = ({ totals = {}, unassignedCash = 0 }) => {
     },
     {
       key: "over-budget",
-      icon: getIcon('AlertTriangle'),
+      icon: getIcon("AlertTriangle"),
       label: "Over Budget",
       value: overBudgetEnvelopes.toString(),
       color: "red",
-      subtext:
-        overBudgetEnvelopes > 0
-          ? `${overBudgetEnvelopes} envelopes`
-          : "All on track",
+      subtext: overBudgetEnvelopes > 0 ? `${overBudgetEnvelopes} envelopes` : "All on track",
       alert: overBudgetEnvelopes > 0,
     },
     {
       key: "savings-progress",
-      icon: getIcon('Target'),
+      icon: getIcon("Target"),
       label: "Savings Progress",
       value: `${savingsGoalProgress.toFixed(1)}%`,
       color: "cyan",

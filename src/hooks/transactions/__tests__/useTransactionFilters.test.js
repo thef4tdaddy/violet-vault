@@ -67,9 +67,7 @@ describe("useTransactionFilters", () => {
   });
 
   it("should return transactions when no filters applied", () => {
-    const { result } = renderHook(() =>
-      useTransactionFilters(mockTransactions, defaultFilters),
-    );
+    const { result } = renderHook(() => useTransactionFilters(mockTransactions, defaultFilters));
 
     expect(result.current).toEqual(mockTransactions);
     expect(applyDateFilter).toHaveBeenCalledWith(mockTransactions, "all");
@@ -87,7 +85,7 @@ describe("useTransactionFilters", () => {
       useTransactionFilters(mockTransactions, {
         ...defaultFilters,
         dateFilter: "month",
-      }),
+      })
     );
 
     expect(applyDateFilter).toHaveBeenCalledWith(mockTransactions, "month");
@@ -103,7 +101,7 @@ describe("useTransactionFilters", () => {
       useTransactionFilters(mockTransactions, {
         ...defaultFilters,
         typeFilter: "income",
-      }),
+      })
     );
 
     expect(applyTypeFilter).toHaveBeenCalledWith(mockTransactions, "income");
@@ -120,7 +118,7 @@ describe("useTransactionFilters", () => {
       useTransactionFilters(mockTransactions, {
         ...defaultFilters,
         envelopeFilter: "env1",
-      }),
+      })
     );
 
     expect(applyEnvelopeFilter).toHaveBeenCalledWith(mockTransactions, "env1");
@@ -138,7 +136,7 @@ describe("useTransactionFilters", () => {
       useTransactionFilters(mockTransactions, {
         ...defaultFilters,
         searchTerm: "grocery",
-      }),
+      })
     );
 
     expect(applySearchFilter).toHaveBeenCalledWith(mockTransactions, "grocery");
@@ -158,14 +156,10 @@ describe("useTransactionFilters", () => {
         ...defaultFilters,
         sortBy: "amount",
         sortOrder: "asc",
-      }),
+      })
     );
 
-    expect(applySorting).toHaveBeenCalledWith(
-      mockTransactions,
-      "amount",
-      "asc",
-    );
+    expect(applySorting).toHaveBeenCalledWith(mockTransactions, "amount", "asc");
     expect(result.current).toEqual(sorted);
   });
 
@@ -191,7 +185,7 @@ describe("useTransactionFilters", () => {
         searchTerm: "grocery",
         sortBy: "date",
         sortOrder: "desc",
-      }),
+      })
     );
 
     expect(applyDateFilter).toHaveBeenCalledWith(mockTransactions, "week");
@@ -203,18 +197,14 @@ describe("useTransactionFilters", () => {
   });
 
   it("should handle empty transactions array", () => {
-    const { result } = renderHook(() =>
-      useTransactionFilters([], defaultFilters),
-    );
+    const { result } = renderHook(() => useTransactionFilters([], defaultFilters));
 
     expect(result.current).toEqual([]);
     expect(applyDateFilter).toHaveBeenCalledWith([], "all");
   });
 
   it("should handle null/undefined transactions", () => {
-    const { result } = renderHook(() =>
-      useTransactionFilters(null, defaultFilters),
-    );
+    const { result } = renderHook(() => useTransactionFilters(null, defaultFilters));
 
     expect(result.current).toEqual([]);
     expect(applyDateFilter).toHaveBeenCalledWith([], "all");
@@ -228,14 +218,13 @@ describe("useTransactionFilters", () => {
     applySorting.mockReturnValue(mockTransactions);
 
     const { result, rerender } = renderHook(
-      ({ transactions, filters }) =>
-        useTransactionFilters(transactions, filters),
+      ({ transactions, filters }) => useTransactionFilters(transactions, filters),
       {
         initialProps: {
           transactions: mockTransactions,
           filters: defaultFilters,
         },
-      },
+      }
     );
 
     const firstResult = result.current;
@@ -257,14 +246,13 @@ describe("useTransactionFilters", () => {
     applySorting.mockReturnValue(mockTransactions);
 
     const { result, rerender } = renderHook(
-      ({ transactions, filters }) =>
-        useTransactionFilters(transactions, filters),
+      ({ transactions, filters }) => useTransactionFilters(transactions, filters),
       {
         initialProps: {
           transactions: mockTransactions,
           filters: defaultFilters,
         },
-      },
+      }
     );
 
     const firstResult = result.current;
@@ -298,14 +286,13 @@ describe("useTransactionFilters", () => {
     applySorting.mockReturnValue(mockTransactions);
 
     const { result, rerender } = renderHook(
-      ({ transactions, filters }) =>
-        useTransactionFilters(transactions, filters),
+      ({ transactions, filters }) => useTransactionFilters(transactions, filters),
       {
         initialProps: {
           transactions: mockTransactions,
           filters: defaultFilters,
         },
-      },
+      }
     );
 
     const firstResult = result.current;

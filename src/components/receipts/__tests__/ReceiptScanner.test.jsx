@@ -11,51 +11,58 @@ vi.mock("../../../hooks/receipts/useReceiptScanner");
 vi.mock("../components/ReceiptScannerHeader", () => ({
   default: ({ onClose }) => (
     <div data-testid="receipt-header">
-      <button onClick={onClose} data-testid="close-button">Close</button>
+      <button onClick={onClose} data-testid="close-button">
+        Close
+      </button>
     </div>
-  )
+  ),
 }));
 
 vi.mock("../components/ReceiptUploadArea", () => ({
   default: ({ onDrop }) => (
-    <div data-testid="upload-area" onDrop={onDrop}>Upload Area</div>
-  )
+    <div data-testid="upload-area" onDrop={onDrop}>
+      Upload Area
+    </div>
+  ),
 }));
 
 vi.mock("../components/ReceiptProcessingState", () => ({
-  default: () => <div data-testid="processing-state">Processing...</div>
+  default: () => <div data-testid="processing-state">Processing...</div>,
 }));
 
 vi.mock("../components/ReceiptErrorState", () => ({
   default: ({ error, onRetry }) => (
     <div data-testid="error-state">
       <span>Error: {error}</span>
-      <button onClick={onRetry} data-testid="retry-button">Retry</button>
+      <button onClick={onRetry} data-testid="retry-button">
+        Retry
+      </button>
     </div>
-  )
+  ),
 }));
 
 vi.mock("../components/ReceiptImagePreview", () => ({
-  default: ({ uploadedImage }) => (
-    uploadedImage ? <div data-testid="image-preview">Image: {uploadedImage.name}</div> : null
-  )
+  default: ({ uploadedImage }) =>
+    uploadedImage ? <div data-testid="image-preview">Image: {uploadedImage.name}</div> : null,
 }));
 
 vi.mock("../components/ReceiptExtractedData", () => ({
   default: ({ extractedData }) => (
-    <div data-testid="extracted-data">
-      Merchant: {extractedData?.merchant || "None"}
-    </div>
-  )
+    <div data-testid="extracted-data">Merchant: {extractedData?.merchant || "None"}</div>
+  ),
 }));
 
 vi.mock("../components/ReceiptActionButtons", () => ({
   default: ({ onReset, onConfirm }) => (
     <div data-testid="action-buttons">
-      <button onClick={onReset} data-testid="reset-button">Reset</button>
-      <button onClick={onConfirm} data-testid="confirm-button">Confirm</button>
+      <button onClick={onReset} data-testid="reset-button">
+        Reset
+      </button>
+      <button onClick={onConfirm} data-testid="confirm-button">
+        Confirm
+      </button>
     </div>
-  )
+  ),
 }));
 
 describe("ReceiptScanner", () => {
@@ -204,7 +211,14 @@ describe("ReceiptScanner", () => {
     expect(modal).toHaveClass("fixed", "inset-0", "bg-black/50", "backdrop-blur-sm");
 
     const container = screen.getByTestId("receipt-header").closest(".glassmorphism");
-    expect(container).toHaveClass("glassmorphism", "rounded-lg", "border-2", "border-black", "bg-purple-100/40", "backdrop-blur-3xl");
+    expect(container).toHaveClass(
+      "glassmorphism",
+      "rounded-lg",
+      "border-2",
+      "border-black",
+      "bg-purple-100/40",
+      "backdrop-blur-3xl"
+    );
   });
 
   it("should hide upload area when image is uploaded", () => {

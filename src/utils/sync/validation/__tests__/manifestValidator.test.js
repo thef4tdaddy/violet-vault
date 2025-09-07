@@ -22,9 +22,9 @@ describe("manifestValidator", () => {
         version: "2.0",
         timestamp: Date.now(),
         chunks: {
-          "chunk1": { size: 1000, itemCount: 10 },
-          "chunk2": { size: 2000, itemCount: 20 }
-        }
+          chunk1: { size: 1000, itemCount: 10 },
+          chunk2: { size: 2000, itemCount: 20 },
+        },
       };
 
       const result = validateManifest(validManifest, "test-operation");
@@ -47,26 +47,37 @@ describe("manifestValidator", () => {
     });
 
     it("should reject manifest missing required properties", () => {
-      const missingVersionResult = validateManifest({
-        timestamp: Date.now(),
-        chunks: {}
-      }, "missing-version");
+      const missingVersionResult = validateManifest(
+        {
+          timestamp: Date.now(),
+          chunks: {},
+        },
+        "missing-version"
+      );
 
-      const missingTimestampResult = validateManifest({
-        version: "2.0",
-        chunks: {}
-      }, "missing-timestamp");
+      const missingTimestampResult = validateManifest(
+        {
+          version: "2.0",
+          chunks: {},
+        },
+        "missing-timestamp"
+      );
 
-      const missingChunksResult = validateManifest({
-        version: "2.0",
-        timestamp: Date.now()
-      }, "missing-chunks");
+      const missingChunksResult = validateManifest(
+        {
+          version: "2.0",
+          timestamp: Date.now(),
+        },
+        "missing-chunks"
+      );
 
       expect(missingVersionResult.isValid).toBe(false);
       expect(missingVersionResult.errors).toContain("Missing required manifest property: version");
 
       expect(missingTimestampResult.isValid).toBe(false);
-      expect(missingTimestampResult.errors).toContain("Missing required manifest property: timestamp");
+      expect(missingTimestampResult.errors).toContain(
+        "Missing required manifest property: timestamp"
+      );
 
       expect(missingChunksResult.isValid).toBe(false);
       expect(missingChunksResult.errors).toContain("Missing required manifest property: chunks");
@@ -78,7 +89,7 @@ describe("manifestValidator", () => {
       const manifest = {
         version: 2.0, // Should be string
         timestamp: Date.now(),
-        chunks: {}
+        chunks: {},
       };
 
       const result = validateManifest(manifest, "version-type-test");
@@ -91,7 +102,7 @@ describe("manifestValidator", () => {
       const manifest = {
         version: "2.0",
         timestamp: Date.now(),
-        chunks: {}
+        chunks: {},
       };
 
       const result = validateManifest(manifest, "valid-version");
@@ -102,7 +113,7 @@ describe("manifestValidator", () => {
     it("should handle missing version gracefully", () => {
       const manifest = {
         timestamp: Date.now(),
-        chunks: {}
+        chunks: {},
       };
 
       const result = validateManifest(manifest, "no-version");
@@ -117,7 +128,7 @@ describe("manifestValidator", () => {
       const manifest = {
         version: "2.0",
         timestamp: "2023-01-01", // Should be number
-        chunks: {}
+        chunks: {},
       };
 
       const result = validateManifest(manifest, "timestamp-type-test");
@@ -131,7 +142,7 @@ describe("manifestValidator", () => {
       const manifest = {
         version: "2.0",
         timestamp: futureTime,
-        chunks: {}
+        chunks: {},
       };
 
       const result = validateManifest(manifest, "future-timestamp");
@@ -146,22 +157,20 @@ describe("manifestValidator", () => {
       const manifest = {
         version: "2.0",
         timestamp: oldTime,
-        chunks: {}
+        chunks: {},
       };
 
       const result = validateManifest(manifest, "old-timestamp");
 
       expect(result.isValid).toBe(true);
-      expect(result.warnings).toContainEqual(
-        expect.stringContaining("Manifest is old:")
-      );
+      expect(result.warnings).toContainEqual(expect.stringContaining("Manifest is old:"));
     });
 
     it("should accept recent valid timestamp", () => {
       const manifest = {
         version: "2.0",
         timestamp: Date.now() - 1000, // 1 second ago
-        chunks: {}
+        chunks: {},
       };
 
       const result = validateManifest(manifest, "valid-timestamp");
@@ -173,7 +182,7 @@ describe("manifestValidator", () => {
     it("should handle missing timestamp gracefully", () => {
       const manifest = {
         version: "2.0",
-        chunks: {}
+        chunks: {},
       };
 
       const result = validateManifest(manifest, "no-timestamp");
@@ -188,7 +197,7 @@ describe("manifestValidator", () => {
       const manifest = {
         version: "2.0",
         timestamp: Date.now(),
-        chunks: "not-an-object"
+        chunks: "not-an-object",
       };
 
       const result = validateManifest(manifest, "chunks-type-test");
@@ -201,7 +210,7 @@ describe("manifestValidator", () => {
       const manifest = {
         version: "2.0",
         timestamp: Date.now(),
-        chunks: {}
+        chunks: {},
       };
 
       const result = validateManifest(manifest, "empty-chunks");
@@ -215,10 +224,10 @@ describe("manifestValidator", () => {
         version: "2.0",
         timestamp: Date.now(),
         chunks: {
-          "chunk1": { size: 100 },
-          "chunk2": { size: 200 },
-          "chunk3": { size: 300 }
-        }
+          chunk1: { size: 100 },
+          chunk2: { size: 200 },
+          chunk3: { size: 300 },
+        },
       };
 
       const result = validateManifest(manifest, "chunk-count");
@@ -233,7 +242,7 @@ describe("manifestValidator", () => {
       const validManifest = {
         version: "2.0",
         timestamp: Date.now(),
-        chunks: {}
+        chunks: {},
       };
 
       const result = validateManifest(validManifest);
@@ -246,8 +255,8 @@ describe("manifestValidator", () => {
         version: "2.0",
         timestamp: Date.now(),
         chunks: {
-          "test": { size: 100, data: "test-data" }
-        }
+          test: { size: 100, data: "test-data" },
+        },
       };
 
       const result = validateManifest(manifest, "size-test");
@@ -262,19 +271,19 @@ describe("manifestValidator", () => {
         version: "2.0",
         timestamp: Date.now(),
         chunks: {
-          "transactions_chunk_001": {
+          transactions_chunk_001: {
             size: 15000,
             itemCount: 100,
             type: "array",
-            metadata: { compressed: true }
+            metadata: { compressed: true },
           },
-          "envelopes_chunk_001": {
+          envelopes_chunk_001: {
             size: 8000,
             itemCount: 50,
             type: "array",
-            metadata: { compressed: false }
-          }
-        }
+            metadata: { compressed: false },
+          },
+        },
       };
 
       const result = validateManifest(manifest, "complex-chunks");
@@ -290,7 +299,7 @@ describe("manifestValidator", () => {
       const manifest = {
         version: "2.0",
         timestamp: futureTime,
-        chunks: {}
+        chunks: {},
       };
 
       const result = validateManifest(manifest, "clock-skew-ok");
@@ -304,7 +313,7 @@ describe("manifestValidator", () => {
       const manifest = {
         version: "2.0",
         timestamp: futureTime,
-        chunks: {}
+        chunks: {},
       };
 
       const result = validateManifest(manifest, "clock-skew-exceeded");
@@ -320,7 +329,7 @@ describe("manifestValidator", () => {
 
       const invalidManifest = {
         version: 123, // Wrong type
-        chunks: "not-object" // Wrong type
+        chunks: "not-object", // Wrong type
       };
 
       validateManifest(invalidManifest, "logging-failure-test");
@@ -329,7 +338,7 @@ describe("manifestValidator", () => {
         "❌ Manifest validation failed for logging-failure-test",
         expect.objectContaining({
           isValid: false,
-          errors: expect.any(Array)
+          errors: expect.any(Array),
         })
       );
     });
@@ -341,7 +350,7 @@ describe("manifestValidator", () => {
       const manifest = {
         version: "2.0",
         timestamp: futureTime,
-        chunks: {}
+        chunks: {},
       };
 
       validateManifest(manifest, "logging-warning-test");
@@ -350,9 +359,7 @@ describe("manifestValidator", () => {
         "⚠️ Manifest validation warnings for logging-warning-test",
         expect.objectContaining({
           isValid: true,
-          warnings: expect.arrayContaining([
-            "Manifest timestamp is in the future"
-          ])
+          warnings: expect.arrayContaining(["Manifest timestamp is in the future"]),
         })
       );
     });
@@ -364,8 +371,8 @@ describe("manifestValidator", () => {
         version: "2.0",
         timestamp: Date.now(),
         chunks: {
-          "test": { size: 100 }
-        }
+          test: { size: 100 },
+        },
       };
 
       validateManifest(validManifest, "logging-success-test");
@@ -374,7 +381,7 @@ describe("manifestValidator", () => {
         "✅ Manifest validation passed for logging-success-test",
         expect.objectContaining({
           chunkCount: 1,
-          manifestSize: expect.any(Number)
+          manifestSize: expect.any(Number),
         })
       );
     });

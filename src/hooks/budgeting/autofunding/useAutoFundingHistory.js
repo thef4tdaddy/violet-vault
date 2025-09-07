@@ -6,10 +6,7 @@ import logger from "../../../utils/common/logger";
  * Hook for managing auto-funding execution history and undo operations
  * Extracted from useAutoFunding.js for Issue #506
  */
-export const useAutoFundingHistory = (
-  initialHistory = [],
-  initialUndoStack = [],
-) => {
+export const useAutoFundingHistory = (initialHistory = [], initialUndoStack = []) => {
   const budget = useBudgetStore();
   const [executionHistory, setExecutionHistory] = useState(initialHistory);
   const [undoStack, setUndoStack] = useState(initialUndoStack);
@@ -55,8 +52,7 @@ export const useAutoFundingHistory = (
             });
           } else {
             // Multiple target transfers (split remainder)
-            const amountPerEnvelope =
-              result.amount / result.targetEnvelopes.length;
+            const amountPerEnvelope = result.amount / result.targetEnvelopes.length;
             result.targetEnvelopes.forEach((envelopeId) => {
               undoableTransfers.push({
                 fromEnvelopeId: "unassigned",
@@ -105,27 +101,27 @@ export const useAutoFundingHistory = (
         // Apply filters
         if (filters.trigger) {
           filteredHistory = filteredHistory.filter(
-            (execution) => execution.trigger === filters.trigger,
+            (execution) => execution.trigger === filters.trigger
           );
         }
 
         if (filters.successful !== undefined) {
           filteredHistory = filteredHistory.filter(
-            (execution) => (execution.success !== false) === filters.successful,
+            (execution) => (execution.success !== false) === filters.successful
           );
         }
 
         if (filters.dateFrom) {
           const fromDate = new Date(filters.dateFrom);
           filteredHistory = filteredHistory.filter(
-            (execution) => new Date(execution.executedAt) >= fromDate,
+            (execution) => new Date(execution.executedAt) >= fromDate
           );
         }
 
         if (filters.dateTo) {
           const toDate = new Date(filters.dateTo);
           filteredHistory = filteredHistory.filter(
-            (execution) => new Date(execution.executedAt) <= toDate,
+            (execution) => new Date(execution.executedAt) <= toDate
           );
         }
 
@@ -136,7 +132,7 @@ export const useAutoFundingHistory = (
         return [];
       }
     },
-    [executionHistory],
+    [executionHistory]
   );
 
   // Get execution by ID
@@ -144,7 +140,7 @@ export const useAutoFundingHistory = (
     (executionId) => {
       return executionHistory.find((execution) => execution.id === executionId);
     },
-    [executionHistory],
+    [executionHistory]
   );
 
   // Clear execution history
@@ -169,16 +165,10 @@ export const useAutoFundingHistory = (
 
     return {
       totalUndoable: undoableItems.length,
-      totalAmount: undoableItems.reduce(
-        (sum, item) => sum + item.totalAmount,
-        0,
-      ),
+      totalAmount: undoableItems.reduce((sum, item) => sum + item.totalAmount, 0),
       oldestUndoable:
-        undoableItems.length > 0
-          ? undoableItems[undoableItems.length - 1].executedAt
-          : null,
-      newestUndoable:
-        undoableItems.length > 0 ? undoableItems[0].executedAt : null,
+        undoableItems.length > 0 ? undoableItems[undoableItems.length - 1].executedAt : null,
+      newestUndoable: undoableItems.length > 0 ? undoableItems[0].executedAt : null,
     };
   }, [getUndoableExecutions]);
 
@@ -195,9 +185,7 @@ export const useAutoFundingHistory = (
   // Undo a specific execution by ID
   const undoExecution = useCallback(
     async (executionId) => {
-      const undoItem = undoStack.find(
-        (item) => item.executionId === executionId && item.canUndo,
-      );
+      const undoItem = undoStack.find((item) => item.executionId === executionId && item.canUndo);
 
       if (!undoItem) {
         throw new Error(`Execution ${executionId} is not undoable`);
@@ -220,8 +208,8 @@ export const useAutoFundingHistory = (
           prevStack.map((item) =>
             item.executionId === executionId
               ? { ...item, canUndo: false, undoneAt: new Date().toISOString() }
-              : item,
-          ),
+              : item
+          )
         );
 
         // Add undo record to execution history
@@ -267,7 +255,7 @@ export const useAutoFundingHistory = (
         throw new Error(`Failed to undo execution: ${error.message}`);
       }
     },
-    [undoStack, addToHistory],
+    [undoStack, addToHistory]
   );
 
   // Reverse a single transfer
@@ -279,7 +267,7 @@ export const useAutoFundingHistory = (
           transfer.toEnvelopeId,
           transfer.fromEnvelopeId,
           transfer.amount,
-          `Undo: ${transfer.description}`,
+          `Undo: ${transfer.description}`
         );
 
         logger.debug("Transfer reversed", {
@@ -295,7 +283,7 @@ export const useAutoFundingHistory = (
         throw error;
       }
     },
-    [budget],
+    [budget]
   );
 
   // Get execution statistics
@@ -303,18 +291,15 @@ export const useAutoFundingHistory = (
     try {
       const totalExecutions = executionHistory.length;
       const successfulExecutions = executionHistory.filter(
-        (execution) => execution.success !== false,
+        (execution) => execution.success !== false
       );
       const totalFunded = executionHistory.reduce(
         (sum, execution) => sum + Math.max(0, execution.totalFunded || 0),
-        0,
+        0
       );
       const totalReversed = executionHistory
         .filter((execution) => execution.isUndo)
-        .reduce(
-          (sum, execution) => sum + Math.abs(execution.totalFunded || 0),
-          0,
-        );
+        .reduce((sum, execution) => sum + Math.abs(execution.totalFunded || 0), 0);
 
       // Group by trigger
       const byTrigger = executionHistory.reduce((acc, execution) => {
@@ -327,7 +312,7 @@ export const useAutoFundingHistory = (
       last30Days.setDate(last30Days.getDate() - 30);
 
       const recentExecutions = executionHistory.filter(
-        (execution) => new Date(execution.executedAt) >= last30Days,
+        (execution) => new Date(execution.executedAt) >= last30Days
       );
 
       return {
@@ -341,9 +326,7 @@ export const useAutoFundingHistory = (
         recentExecutions: recentExecutions.length,
         lastExecution: executionHistory[0] || null,
         averageFundingPerExecution:
-          successfulExecutions.length > 0
-            ? totalFunded / successfulExecutions.length
-            : 0,
+          successfulExecutions.length > 0 ? totalFunded / successfulExecutions.length : 0,
       };
     } catch (error) {
       logger.error("Failed to get execution statistics", error);
@@ -372,14 +355,10 @@ export const useAutoFundingHistory = (
       undoDate.setDate(undoDate.getDate() - maxUndoAge);
 
       setExecutionHistory((prevHistory) =>
-        prevHistory.filter(
-          (execution) => new Date(execution.executedAt) > historyDate,
-        ),
+        prevHistory.filter((execution) => new Date(execution.executedAt) > historyDate)
       );
 
-      setUndoStack((prevStack) =>
-        prevStack.filter((item) => new Date(item.executedAt) > undoDate),
-      );
+      setUndoStack((prevStack) => prevStack.filter((item) => new Date(item.executedAt) > undoDate));
 
       logger.info("History cleanup completed", {
         maxHistoryAge,
@@ -396,26 +375,21 @@ export const useAutoFundingHistory = (
   const exportHistory = useCallback(
     (options = {}) => {
       try {
-        const {
-          includeUndoStack = true,
-          dateFrom,
-          dateTo,
-          format = "json",
-        } = options;
+        const { includeUndoStack = true, dateFrom, dateTo, format = "json" } = options;
 
         let historyToExport = [...executionHistory];
 
         if (dateFrom) {
           const fromDate = new Date(dateFrom);
           historyToExport = historyToExport.filter(
-            (execution) => new Date(execution.executedAt) >= fromDate,
+            (execution) => new Date(execution.executedAt) >= fromDate
           );
         }
 
         if (dateTo) {
           const toDate = new Date(dateTo);
           historyToExport = historyToExport.filter(
-            (execution) => new Date(execution.executedAt) <= toDate,
+            (execution) => new Date(execution.executedAt) <= toDate
           );
         }
 
@@ -449,7 +423,7 @@ export const useAutoFundingHistory = (
               execution.rulesExecuted || 0,
               execution.totalFunded || 0,
               execution.success !== false ? "true" : "false",
-            ].join(","),
+            ].join(",")
           );
 
           return {
@@ -470,7 +444,7 @@ export const useAutoFundingHistory = (
         throw error;
       }
     },
-    [executionHistory, undoStack],
+    [executionHistory, undoStack]
   );
 
   return {

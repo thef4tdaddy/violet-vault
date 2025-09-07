@@ -1,12 +1,12 @@
 import logger from "../common/logger";
 import { shouldRetryError } from "./retryPolicies";
-import { calculateRetryDelay, delay } from "./retryUtils";
+import { calculateRetryDelay } from "./retryUtils";
 import { createRetryMetrics, updateRetryMetrics, formatMetrics } from "./retryMetrics";
 
 /**
  * RetryManager - Smart retry logic with exponential backoff
  * Handles transient failures in cloud sync operations
- * 
+ *
  * Addresses GitHub Issue #576 - Cloud Sync Reliability Improvements (Phase 2)
  */
 export class RetryManager {
@@ -21,7 +21,7 @@ export class RetryManager {
   async execute(operation, options = {}) {
     const config = this._buildRetryConfig(options);
     this.retryMetrics.totalOperations++;
-    
+
     for (let attempt = 1; attempt <= config.maxRetries; attempt++) {
       try {
         const result = await this._attemptOperation(operation, config, attempt);
@@ -45,9 +45,9 @@ export class RetryManager {
 
     for (const { operation, name } of operations) {
       try {
-        const result = await this.execute(operation, { 
-          ...options, 
-          operationName: name || "batch-operation" 
+        const result = await this.execute(operation, {
+          ...options,
+          operationName: name || "batch-operation",
         });
         results.push({ success: true, result, operation: name });
       } catch (error) {
@@ -93,7 +93,9 @@ export class RetryManager {
    * @private
    */
   async _attemptOperation(operation, config, attempt) {
-    logger.debug(`🔄 ${this.name}: ${config.operationName} attempt ${attempt}/${config.maxRetries}`);
+    logger.debug(
+      `🔄 ${this.name}: ${config.operationName} attempt ${attempt}/${config.maxRetries}`
+    );
     return await operation();
   }
 
@@ -108,7 +110,7 @@ export class RetryManager {
 
   /**
    * Handle operation failure and determine retry
-   * @private  
+   * @private
    */
   async _handleFailure(error, config, attempt) {
     logger.warn(`⚠️ ${this.name}: ${config.operationName} failed on attempt ${attempt}`, {
@@ -119,13 +121,15 @@ export class RetryManager {
     });
 
     if (attempt === config.maxRetries || !shouldRetryError(error)) {
-      logger.error(`❌ ${this.name}: ${config.operationName} failed after ${config.maxRetries} attempts`);
+      logger.error(
+        `❌ ${this.name}: ${config.operationName} failed after ${config.maxRetries} attempts`
+      );
       return false;
     }
 
     const delay = calculateRetryDelay(attempt, config);
     logger.debug(`⏳ ${this.name}: Waiting ${delay}ms before retry ${attempt + 1}`);
-    
+
     await delay(delay);
     return true;
   }

@@ -95,8 +95,7 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
     {
       id: "link-bills",
       title: "Link Bills to Envelopes 🔗",
-      description:
-        "Connect your bills to envelopes so they're automatically budgeted for.",
+      description: "Connect your bills to envelopes so they're automatically budgeted for.",
       target: "[data-tour='envelope-grid']",
       position: "top",
       action: () => startTutorialStep("linkedEnvelopes"),
@@ -113,8 +112,7 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
     {
       id: "track-spending",
       title: "Track Your Spending 💳",
-      description:
-        "Finally, let's go to the Transactions page to track where your money goes.",
+      description: "Finally, let's go to the Transactions page to track where your money goes.",
       target: null,
       position: "center",
       action: () => {
@@ -311,7 +309,7 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
           {/* Header */}
           <div className="flex justify-between items-start mb-4">
             <div className="flex items-center space-x-2">
-              {React.createElement(getIcon('Target'), { className: "w-5 h-5 text-purple-500" })}
+              {React.createElement(getIcon("Target"), { className: "w-5 h-5 text-purple-500" })}
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 Step {currentStep + 1} of {tutorialSteps.length}
               </span>
@@ -321,7 +319,7 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
               className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
               title="Close tutorial"
             >
-              {React.createElement(getIcon('X'), { className: "w-5 h-5" })}
+              {React.createElement(getIcon("X"), { className: "w-5 h-5" })}
             </button>
           </div>
 
@@ -340,9 +338,7 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               {step.title}
             </h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              {step.description}
-            </p>
+            <p className="text-gray-600 dark:text-gray-300">{step.description}</p>
           </div>
 
           {/* Actions */}
@@ -353,7 +349,7 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
                 disabled={currentStep === 0}
                 className="flex items-center space-x-1 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {React.createElement(getIcon('ChevronLeft'), { className: "w-4 h-4" })}
+                {React.createElement(getIcon("ChevronLeft"), { className: "w-4 h-4" })}
                 <span>Back</span>
               </button>
 
@@ -369,13 +365,10 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
               onClick={nextStep}
               className="flex items-center space-x-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
             >
-              <span>
-                {currentStep === tutorialSteps.length - 1 ? "Finish" : "Next"}
-              </span>
-              {currentStep === tutorialSteps.length - 1 ? 
-                React.createElement(getIcon('CheckCircle'), { className: "w-4 h-4" }) : 
-                React.createElement(getIcon('ChevronRight'), { className: "w-4 h-4" })
-              }
+              <span>{currentStep === tutorialSteps.length - 1 ? "Finish" : "Next"}</span>
+              {currentStep === tutorialSteps.length - 1
+                ? React.createElement(getIcon("CheckCircle"), { className: "w-4 h-4" })
+                : React.createElement(getIcon("ChevronRight"), { className: "w-4 h-4" })}
             </button>
           </div>
         </div>

@@ -16,13 +16,7 @@ import { useReportExporter } from "../../hooks/analytics/useReportExporter";
  * Report Exporter for v1.10.0
  * Pure UI component - all logic extracted to useReportExporter hook
  */
-const ReportExporter = ({
-  analyticsData,
-  balanceData,
-  timeFilter,
-  onExport,
-  onClose,
-}) => {
+const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onClose }) => {
   const {
     exportFormat,
     exportOptions,
@@ -67,14 +61,7 @@ const ReportExporter = ({
       key: "detailed",
       name: "Detailed Analysis",
       description: "Comprehensive report with all data",
-      includes: [
-        "summary",
-        "charts",
-        "transactions",
-        "envelopes",
-        "savings",
-        "insights",
-      ],
+      includes: ["summary", "charts", "transactions", "envelopes", "savings", "insights"],
     },
     {
       key: "budget",
@@ -115,9 +102,7 @@ const ReportExporter = ({
               <Download className="h-6 w-6 mr-3 text-blue-600" />
               Export Report
             </h2>
-            <p className="text-gray-600 mt-1">
-              Generate comprehensive analytics reports
-            </p>
+            <p className="text-gray-600 mt-1">Generate comprehensive analytics reports</p>
           </div>
           <button
             onClick={onClose}
@@ -132,9 +117,7 @@ const ReportExporter = ({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Export Format Selection */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Export Format
-              </h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Export Format</h3>
               <div className="space-y-3">
                 {exportFormats.map((format) => (
                   <div
@@ -154,12 +137,8 @@ const ReportExporter = ({
                     <div className="flex items-start">
                       <format.icon className="h-6 w-6 text-blue-600 mt-0.5 mr-3 flex-shrink-0" />
                       <div>
-                        <h4 className="font-medium text-gray-900">
-                          {format.label}
-                        </h4>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {format.description}
-                        </p>
+                        <h4 className="font-medium text-gray-900">{format.label}</h4>
+                        <p className="text-sm text-gray-600 mt-1">{format.description}</p>
                       </div>
                     </div>
                   </div>
@@ -168,9 +147,7 @@ const ReportExporter = ({
 
               {/* Quick Templates */}
               <div className="mt-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Quick Templates
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Templates</h3>
                 <div className="grid grid-cols-1 gap-3">
                   {reportTemplates.map((template) => (
                     <button
@@ -179,12 +156,8 @@ const ReportExporter = ({
                       className="text-left border border-gray-200 rounded-lg p-3 hover:border-gray-300 hover:bg-gray-50 transition-colors"
                       disabled={isExporting}
                     >
-                      <div className="font-medium text-gray-900">
-                        {template.name}
-                      </div>
-                      <div className="text-sm text-gray-600 mt-1">
-                        {template.description}
-                      </div>
+                      <div className="font-medium text-gray-900">{template.name}</div>
+                      <div className="text-sm text-gray-600 mt-1">{template.description}</div>
                       <div className="flex flex-wrap gap-1 mt-2">
                         {template.includes.map((include) => (
                           <span
@@ -203,9 +176,7 @@ const ReportExporter = ({
 
             {/* Export Options */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Include in Report
-              </h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Include in Report</h3>
               <div className="space-y-4">
                 {[
                   {
@@ -246,16 +217,12 @@ const ReportExporter = ({
                     <input
                       type="checkbox"
                       checked={exportOptions[option.key]}
-                      onChange={(e) =>
-                        handleOptionChange(option.key, e.target.checked)
-                      }
+                      onChange={(e) => handleOptionChange(option.key, e.target.checked)}
                       className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
                       disabled={isExporting}
                     />
                     <option.icon className="h-5 w-5 text-gray-500 ml-3 mr-3" />
-                    <span className="font-medium text-gray-900">
-                      {option.label}
-                    </span>
+                    <span className="font-medium text-gray-900">{option.label}</span>
                   </label>
                 ))}
               </div>
@@ -267,12 +234,8 @@ const ReportExporter = ({
                   Report Period
                 </h4>
                 <div className="bg-gray-50 rounded-lg p-3">
-                  <span className="text-sm text-gray-600">
-                    Current filter:{" "}
-                  </span>
-                  <span className="font-medium text-gray-900">
-                    {timeFilter}
-                  </span>
+                  <span className="text-sm text-gray-600">Current filter: </span>
+                  <span className="font-medium text-gray-900">{timeFilter}</span>
                 </div>
               </div>
             </div>

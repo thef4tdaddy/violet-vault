@@ -1,9 +1,6 @@
 // Bill Mutation Functions - CRUD operations and data modifications
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  queryKeys,
-  optimisticHelpers,
-} from "../../../utils/common/queryClient";
+import { queryKeys, optimisticHelpers } from "../../../utils/common/queryClient";
 import { budgetDb } from "../../../db/budgetDb";
 import logger from "../../../utils/common/logger";
 
@@ -187,8 +184,7 @@ export const useMarkBillPaidMutation = () => {
       const paymentTransaction = {
         id: `${billId}_payment_${Date.now()}`,
         date: paymentDate,
-        description:
-          bill.provider || bill.description || bill.name || "Bill Payment",
+        description: bill.provider || bill.description || bill.name || "Bill Payment",
         amount: -Math.abs(paidAmount), // Negative for expense
         envelopeId: envelopeId || "unassigned",
         category: bill.category || "Bills & Utilities",

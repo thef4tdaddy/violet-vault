@@ -13,7 +13,7 @@ const StepButtons = ({
   isLoading,
   canContinue,
   canStartTracking,
-  showBackButton = true
+  showBackButton = true,
 }) => {
   // Step 1 continue button (for new users)
   if (step === 1) {

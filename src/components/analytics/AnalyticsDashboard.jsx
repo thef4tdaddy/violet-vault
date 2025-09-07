@@ -26,13 +26,8 @@ const AnalyticsDashboard = () => {
   const [showExportModal, setShowExportModal] = useState(false);
 
   // Get budget data
-  const {
-    transactions,
-    envelopes,
-    _savingsGoals,
-    _actualBalance,
-    _unassignedCash,
-  } = useBudgetStore();
+  const { transactions, envelopes, _savingsGoals, _actualBalance, _unassignedCash } =
+    useBudgetStore();
 
   // Analytics data with current filters
   const analyticsQuery = useAnalytics({
@@ -54,35 +49,35 @@ const AnalyticsDashboard = () => {
     {
       id: "overview",
       label: "Overview",
-      icon: getIcon('BarChart3'),
+      icon: getIcon("BarChart3"),
       color: "blue",
       description: "Financial summary and key metrics",
     },
     {
       id: "spending",
       label: "Spending Analysis",
-      icon: getIcon('TrendingDown'),
+      icon: getIcon("TrendingDown"),
       color: "red",
       description: "Detailed spending patterns and categories",
     },
     {
       id: "trends",
       label: "Trends & Forecasting",
-      icon: getIcon('TrendingUp'),
+      icon: getIcon("TrendingUp"),
       color: "green",
       description: "Historical trends and future projections",
     },
     {
       id: "performance",
       label: "Performance Monitor",
-      icon: getIcon('Target'),
+      icon: getIcon("Target"),
       color: "purple",
       description: "Real-time insights and alerts",
     },
     {
       id: "envelopes",
       label: "Envelope Analysis",
-      icon: getIcon('Wallet'),
+      icon: getIcon("Wallet"),
       color: "cyan",
       description: "Envelope health and utilization",
     },
@@ -115,24 +110,15 @@ const AnalyticsDashboard = () => {
 
     // Calculate envelope utilization
     const totalBudgeted =
-      balance.envelopeAnalysis?.reduce(
-        (sum, env) => sum + (env.monthlyBudget || 0),
-        0,
-      ) || 0;
+      balance.envelopeAnalysis?.reduce((sum, env) => sum + (env.monthlyBudget || 0), 0) || 0;
     const totalSpent =
-      balance.envelopeAnalysis?.reduce(
-        (sum, env) => sum + (env.spent || 0),
-        0,
-      ) || 0;
-    const envelopeUtilization =
-      totalBudgeted > 0 ? (totalSpent / totalBudgeted) * 100 : 0;
+      balance.envelopeAnalysis?.reduce((sum, env) => sum + (env.spent || 0), 0) || 0;
+    const envelopeUtilization = totalBudgeted > 0 ? (totalSpent / totalBudgeted) * 100 : 0;
 
     // Calculate savings progress
     const savingsProgress =
-      balance.savingsAnalysis?.reduce(
-        (sum, goal) => sum + goal.progressRate,
-        0,
-      ) / Math.max(1, balance.savingsAnalysis?.length || 1);
+      balance.savingsAnalysis?.reduce((sum, goal) => sum + goal.progressRate, 0) /
+      Math.max(1, balance.savingsAnalysis?.length || 1);
 
     // Determine balance health
     const balanceHealth = balance.balanceSummary?.isBalanced
@@ -169,12 +155,10 @@ const AnalyticsDashboard = () => {
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-6">
         <div className="flex items-center">
-                    {React.createElement(getIcon('AlertCircle'), { className: "h-5 w-5 text-red-600 mr-2" })}
+          {React.createElement(getIcon("AlertCircle"), { className: "h-5 w-5 text-red-600 mr-2" })}
           <h3 className="text-red-900 font-medium">Analytics Error</h3>
         </div>
-        <p className="text-red-700 mt-2">
-          Failed to load analytics data. Please try again.
-        </p>
+        <p className="text-red-700 mt-2">Failed to load analytics data. Please try again.</p>
       </div>
     );
   }
@@ -185,18 +169,15 @@ const AnalyticsDashboard = () => {
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="font-black text-black text-base">
-            <span className="text-lg">A</span>NALYTICS{" "}
-            <span className="text-lg">D</span>ASHBOARD
+            <span className="text-lg">A</span>NALYTICS <span className="text-lg">D</span>ASHBOARD
           </h1>
-          <p className="text-purple-900 mt-1">
-            Comprehensive financial insights and reporting
-          </p>
+          <p className="text-purple-900 mt-1">Comprehensive financial insights and reporting</p>
         </div>
 
         <div className="flex items-center gap-3 mt-4 lg:mt-0">
           {/* Time Filter */}
           <div className="flex items-center gap-2">
-                        {React.createElement(getIcon('Calendar'), { className: "h-4 w-4 text-gray-500" })}
+            {React.createElement(getIcon("Calendar"), { className: "h-4 w-4 text-gray-500" })}
             <select
               value={timeFilter}
               onChange={(e) => setTimeFilter(e.target.value)}
@@ -215,7 +196,7 @@ const AnalyticsDashboard = () => {
             onClick={() => setShowExportModal(true)}
             className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 border-2 border-black flex items-center gap-2 text-sm"
           >
-                        {React.createElement(getIcon('Download'), { className: "h-4 w-4" })}
+            {React.createElement(getIcon("Download"), { className: "h-4 w-4" })}
             Export
           </button>
         </div>
@@ -238,8 +219,7 @@ const AnalyticsDashboard = () => {
         {activeTab === "overview" && (
           <div>
             <h2 className="font-black text-black text-base mb-4">
-              <span className="text-lg">F</span>INANCIAL{" "}
-              <span className="text-lg">O</span>VERVIEW
+              <span className="text-lg">F</span>INANCIAL <span className="text-lg">O</span>VERVIEW
             </h2>
             <ChartsAndAnalytics
               transactions={transactions}
@@ -252,8 +232,7 @@ const AnalyticsDashboard = () => {
         {activeTab === "spending" && (
           <div>
             <h2 className="font-black text-black text-base mb-4">
-              <span className="text-lg">S</span>PENDING{" "}
-              <span className="text-lg">A</span>NALYSIS
+              <span className="text-lg">S</span>PENDING <span className="text-lg">A</span>NALYSIS
             </h2>
             <ChartsAndAnalytics
               transactions={transactions}
@@ -267,21 +246,16 @@ const AnalyticsDashboard = () => {
         {activeTab === "trends" && (
           <div>
             <h2 className="font-black text-black text-base mb-4">
-              <span className="text-lg">T</span>RENDS &{" "}
-              <span className="text-lg">F</span>ORECASTING
+              <span className="text-lg">T</span>RENDS & <span className="text-lg">F</span>ORECASTING
             </h2>
-            <TrendAnalysisCharts
-              analyticsData={analyticsQuery.data}
-              timeFilter={timeFilter}
-            />
+            <TrendAnalysisCharts analyticsData={analyticsQuery.data} timeFilter={timeFilter} />
           </div>
         )}
 
         {activeTab === "performance" && (
           <div>
             <h2 className="font-black text-black text-base mb-4">
-              <span className="text-lg">P</span>ERFORMANCE{" "}
-              <span className="text-lg">M</span>ONITOR
+              <span className="text-lg">P</span>ERFORMANCE <span className="text-lg">M</span>ONITOR
             </h2>
             <PerformanceMonitor
               analyticsData={analyticsQuery.data}
@@ -293,8 +267,7 @@ const AnalyticsDashboard = () => {
         {activeTab === "envelopes" && (
           <div>
             <h2 className="font-black text-black text-base mb-4">
-              <span className="text-lg">E</span>NVELOPE{" "}
-              <span className="text-lg">A</span>NALYSIS
+              <span className="text-lg">E</span>NVELOPE <span className="text-lg">A</span>NALYSIS
             </h2>
             <ChartsAndAnalytics
               transactions={transactions}

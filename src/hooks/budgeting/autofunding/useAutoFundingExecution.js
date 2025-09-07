@@ -74,7 +74,7 @@ export const useAutoFundingExecution = () => {
         setIsExecuting(false);
       }
     },
-    [budget, isExecuting],
+    [budget, isExecuting]
   );
 
   // Core execution logic with priority handling
@@ -84,9 +84,7 @@ export const useAutoFundingExecution = () => {
 
     try {
       // Filter and sort rules by priority
-      const executableRules = rules.filter((rule) =>
-        shouldRuleExecute(rule, context),
-      );
+      const executableRules = rules.filter((rule) => shouldRuleExecute(rule, context));
       const sortedRules = sortRulesByPriority(executableRules);
 
       logger.debug("Filtered executable rules", {
@@ -165,54 +163,48 @@ export const useAutoFundingExecution = () => {
   }, []);
 
   // Execute a single rule
-  const executeSingleRule = useCallback(
-    async (rule, context, availableCash) => {
-      logger.debug("Executing single rule", {
-        ruleId: rule.id,
-        name: rule.name,
-        priority: rule.priority,
-        availableCash,
-      });
+  const executeSingleRule = useCallback(async (rule, context, availableCash) => {
+    logger.debug("Executing single rule", {
+      ruleId: rule.id,
+      name: rule.name,
+      priority: rule.priority,
+      availableCash,
+    });
 
-      // Calculate funding amount considering available cash
-      const fundingAmount = calculateFundingAmount(rule, {
-        ...context,
-        data: { ...context.data, unassignedCash: availableCash },
-      });
+    // Calculate funding amount considering available cash
+    const fundingAmount = calculateFundingAmount(rule, {
+      ...context,
+      data: { ...context.data, unassignedCash: availableCash },
+    });
 
-      if (fundingAmount <= 0) {
-        return {
-          ruleId: rule.id,
-          ruleName: rule.name,
-          success: false,
-          error:
-            availableCash <= 0
-              ? "No funds available"
-              : "Amount calculated as zero",
-          amount: 0,
-          executedAt: new Date().toISOString(),
-        };
-      }
-
-      // Plan and execute transfers
-      const plannedTransfers = planRuleTransfers(rule, fundingAmount);
-
-      for (const transfer of plannedTransfers) {
-        await executeTransfer(transfer);
-      }
-
+    if (fundingAmount <= 0) {
       return {
         ruleId: rule.id,
         ruleName: rule.name,
-        success: true,
-        amount: fundingAmount,
-        transfers: plannedTransfers.length,
-        targetEnvelopes: plannedTransfers.map((t) => t.toEnvelopeId),
+        success: false,
+        error: availableCash <= 0 ? "No funds available" : "Amount calculated as zero",
+        amount: 0,
         executedAt: new Date().toISOString(),
       };
-    },
-    [],
-  );
+    }
+
+    // Plan and execute transfers
+    const plannedTransfers = planRuleTransfers(rule, fundingAmount);
+
+    for (const transfer of plannedTransfers) {
+      await executeTransfer(transfer);
+    }
+
+    return {
+      ruleId: rule.id,
+      ruleName: rule.name,
+      success: true,
+      amount: fundingAmount,
+      transfers: plannedTransfers.length,
+      targetEnvelopes: plannedTransfers.map((t) => t.toEnvelopeId),
+      executedAt: new Date().toISOString(),
+    };
+  }, []);
 
   // Execute a single transfer using the budget store
   const executeTransfer = useCallback(
@@ -222,7 +214,7 @@ export const useAutoFundingExecution = () => {
           transfer.fromEnvelopeId,
           transfer.toEnvelopeId,
           transfer.amount,
-          transfer.description,
+          transfer.description
         );
 
         logger.debug("Transfer executed", transfer);
@@ -231,7 +223,7 @@ export const useAutoFundingExecution = () => {
         throw error;
       }
     },
-    [budget],
+    [budget]
   );
 
   // Simulate rule execution without making actual transfers
@@ -255,7 +247,7 @@ export const useAutoFundingExecution = () => {
         return { success: false, error: error.message };
       }
     },
-    [budget],
+    [budget]
   );
 
   // Create detailed execution plan
@@ -279,7 +271,7 @@ export const useAutoFundingExecution = () => {
         return { success: false, error: error.message };
       }
     },
-    [budget],
+    [budget]
   );
 
   // Validate planned transfers
@@ -300,7 +292,7 @@ export const useAutoFundingExecution = () => {
         return { isValid: false, errors: [{ error: error.message }] };
       }
     },
-    [budget],
+    [budget]
   );
 
   // Calculate impact of transfers on envelope balances
@@ -325,7 +317,7 @@ export const useAutoFundingExecution = () => {
         };
       }
     },
-    [budget],
+    [budget]
   );
 
   // Check if rules can execute with current budget state
@@ -342,12 +334,9 @@ export const useAutoFundingExecution = () => {
           },
         };
 
-        const executableRules = rules.filter((rule) =>
-          shouldRuleExecute(rule, context),
-        );
+        const executableRules = rules.filter((rule) => shouldRuleExecute(rule, context));
         return {
-          canExecute:
-            executableRules.length > 0 && context.data.unassignedCash > 0,
+          canExecute: executableRules.length > 0 && context.data.unassignedCash > 0,
           executableCount: executableRules.length,
           totalRules: rules.length,
           availableCash: context.data.unassignedCash,
@@ -368,7 +357,7 @@ export const useAutoFundingExecution = () => {
         };
       }
     },
-    [budget],
+    [budget]
   );
 
   // Get execution summary for display

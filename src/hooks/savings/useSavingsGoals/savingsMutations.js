@@ -1,18 +1,13 @@
 // Savings Goals Mutation Functions - CRUD operations and data modifications
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  queryKeys,
-  optimisticHelpers,
-} from "../../../utils/common/queryClient";
+import { queryKeys, optimisticHelpers } from "../../../utils/common/queryClient";
 import { budgetDb } from "../../../db/budgetDb";
 import logger from "../../../utils/common/logger";
 
 // Helper to trigger sync for savings goal changes
 const triggerSavingsGoalSync = (changeType) => {
   if (typeof window !== "undefined" && window.cloudSyncService) {
-    window.cloudSyncService.triggerSyncForCriticalChange(
-      `savings_goal_${changeType}`,
-    );
+    window.cloudSyncService.triggerSyncForCriticalChange(`savings_goal_${changeType}`);
   }
 };
 
@@ -164,8 +159,7 @@ export const useAddContributionMutation = () => {
         throw new Error("Invalid contribution amount");
       }
 
-      const updatedCurrentAmount =
-        (goal.currentAmount || 0) + contributionAmount;
+      const updatedCurrentAmount = (goal.currentAmount || 0) + contributionAmount;
 
       const updatedGoal = {
         ...goal,
@@ -238,7 +232,7 @@ export const useDistributeFundsMutation = () => {
       const results = [];
       const totalAmount = Object.values(distribution).reduce(
         (sum, amount) => sum + (parseFloat(amount) || 0),
-        0,
+        0
       );
 
       if (totalAmount <= 0) {
@@ -256,8 +250,7 @@ export const useDistributeFundsMutation = () => {
           continue;
         }
 
-        const updatedCurrentAmount =
-          (goal.currentAmount || 0) + contributionAmount;
+        const updatedCurrentAmount = (goal.currentAmount || 0) + contributionAmount;
 
         const updatedGoal = {
           ...goal,

@@ -1,7 +1,7 @@
 /**
  * Retry utility functions for delay calculation and timing
  * Handles exponential backoff, jitter, and delay logic
- * 
+ *
  * Addresses GitHub Issue #576 - Cloud Sync Reliability Improvements (Phase 2)
  */
 
@@ -9,17 +9,10 @@
  * Calculate delay with exponential backoff and jitter
  */
 export const calculateRetryDelay = (attempt, options = {}) => {
-  const {
-    baseDelay = 1000,
-    maxDelay = 16000,
-    jitter = true,
-  } = options;
+  const { baseDelay = 1000, maxDelay = 16000, jitter = true } = options;
 
-  const exponentialDelay = Math.min(
-    baseDelay * Math.pow(2, attempt - 1), 
-    maxDelay
-  );
-  
+  const exponentialDelay = Math.min(baseDelay * Math.pow(2, attempt - 1), maxDelay);
+
   if (!jitter) {
     return exponentialDelay;
   }
@@ -34,7 +27,7 @@ export const addJitter = (delay) => {
   // Add ±25% variance to prevent thundering herd
   const jitterRange = delay * 0.25;
   const jitterOffset = (Math.random() - 0.5) * 2 * jitterRange;
-  
+
   return Math.max(100, Math.round(delay + jitterOffset));
 };
 
@@ -42,7 +35,7 @@ export const addJitter = (delay) => {
  * Promise-based delay utility
  */
 export const delay = (ms) => {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
 /**

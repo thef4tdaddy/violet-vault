@@ -1,13 +1,7 @@
 import React from "react";
 import { Save, X, RefreshCw, AlertCircle } from "lucide-react";
 
-const SplitActions = ({
-  totals,
-  hasUnsavedChanges,
-  isSaving,
-  onSave,
-  onCancel,
-}) => {
+const SplitActions = ({ totals, hasUnsavedChanges, isSaving, onSave, onCancel }) => {
   const { isValid, isOverAllocated, remaining } = totals;
 
   const getValidationMessage = () => {
@@ -27,9 +21,7 @@ const SplitActions = ({
         <div className="mb-4 p-3 bg-gradient-to-r from-orange-50/80 to-red-50/80 backdrop-blur-sm border-2 border-orange-300 rounded-xl shadow-md">
           <div className="flex items-center">
             <AlertCircle className="h-5 w-5 text-orange-600 mr-2" />
-            <span className="text-sm font-bold text-orange-800">
-              {getValidationMessage()}
-            </span>
+            <span className="text-sm font-bold text-orange-800">{getValidationMessage()}</span>
           </div>
         </div>
       )}

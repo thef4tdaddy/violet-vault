@@ -6,28 +6,25 @@ import { useSecurityManager } from "../auth/useSecurityManager";
  * Extracted from 427-line SecuritySettings.jsx for better maintainability
  */
 export const useSecuritySettingsLogic = () => {
-  const {
-    isLocked,
-    securitySettings,
-    securityEvents,
-    updateSettings,
-    clearSecurityEvents,
-  } = useSecurityManager();
+  const { isLocked, securitySettings, securityEvents, updateSettings, clearSecurityEvents } =
+    useSecurityManager();
 
   // Local state for UI interactions
   const [showEvents, setShowEvents] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   // Setting change handler
-  const handleSettingChange = useCallback((setting, value) => {
-    updateSettings({ [setting]: value });
-  }, [updateSettings]);
+  const handleSettingChange = useCallback(
+    (setting, value) => {
+      updateSettings({ [setting]: value });
+    },
+    [updateSettings]
+  );
 
   // Export security events to JSON file
   const exportSecurityEvents = useCallback(() => {
     const dataStr = JSON.stringify(securityEvents, null, 2);
-    const dataUri =
-      "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
+    const dataUri = "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
     const exportFileDefaultName = `security-events-${new Date().toISOString().split("T")[0]}.json`;
 
     const linkElement = document.createElement("a");
@@ -45,7 +42,7 @@ export const useSecuritySettingsLogic = () => {
 
   // Toggle events display
   const toggleEventsDisplay = useCallback(() => {
-    setShowEvents(prev => !prev);
+    setShowEvents((prev) => !prev);
   }, []);
 
   // Show clear confirmation dialog
@@ -70,11 +67,11 @@ export const useSecuritySettingsLogic = () => {
     isLocked,
     securitySettings,
     securityEvents,
-    
+
     // UI state
     showEvents,
     showClearConfirm,
-    
+
     // Actions
     handleSettingChange,
     exportSecurityEvents,

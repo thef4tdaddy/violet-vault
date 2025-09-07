@@ -7,7 +7,7 @@ import {
   validateManifest,
   checksumUtils,
   encryptedDataValidator,
-  manifestValidator
+  manifestValidator,
 } from "../index";
 
 describe("validation index exports", () => {
@@ -53,7 +53,7 @@ describe("validation index exports", () => {
       const testData = { test: "data", number: 123 };
       const checksum = await generateChecksum(testData);
       const isValid = await validateChecksum(testData, checksum);
-      
+
       expect(typeof checksum).toBe("string");
       expect(isValid).toBe(true);
     });
@@ -61,13 +61,13 @@ describe("validation index exports", () => {
     it("should work with exported validation functions", () => {
       const validEncryptedData = {
         data: "a".repeat(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH),
-        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH)
+        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH),
       };
 
       const validManifest = {
         version: "2.0",
         timestamp: Date.now(),
-        chunks: {}
+        chunks: {},
       };
 
       const encryptedResult = validateEncryptedData(validEncryptedData, "test");
@@ -79,7 +79,7 @@ describe("validation index exports", () => {
 
     it("should work with namespace exports", async () => {
       const testData = { namespace: "test" };
-      
+
       // Test checksumUtils namespace
       const checksum = await checksumUtils.generateChecksum(testData);
       const isValid = await checksumUtils.validateChecksum(testData, checksum);
@@ -88,16 +88,19 @@ describe("validation index exports", () => {
       // Test encryptedDataValidator namespace
       const encryptedData = {
         data: "a".repeat(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH),
-        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH)
+        iv: "b".repeat(VALIDATION_CONSTANTS.MIN_IV_LENGTH),
       };
-      const encryptedResult = encryptedDataValidator.validateEncryptedData(encryptedData, "namespace-test");
+      const encryptedResult = encryptedDataValidator.validateEncryptedData(
+        encryptedData,
+        "namespace-test"
+      );
       expect(encryptedResult.isValid).toBe(true);
 
       // Test manifestValidator namespace
       const manifest = {
         version: "2.0",
         timestamp: Date.now(),
-        chunks: {}
+        chunks: {},
       };
       const manifestResult = manifestValidator.validateManifest(manifest, "namespace-test");
       expect(manifestResult.isValid).toBe(true);
@@ -108,17 +111,23 @@ describe("validation index exports", () => {
     it("should have valid constant values", () => {
       expect(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH).toBeGreaterThan(0);
       expect(VALIDATION_CONSTANTS.MIN_IV_LENGTH).toBeGreaterThan(0);
-      expect(VALIDATION_CONSTANTS.MAX_MANIFEST_SIZE).toBeGreaterThan(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH);
-      expect(VALIDATION_CONSTANTS.LARGE_DATA_WARNING_SIZE).toBeGreaterThan(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH);
+      expect(VALIDATION_CONSTANTS.MAX_MANIFEST_SIZE).toBeGreaterThan(
+        VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH
+      );
+      expect(VALIDATION_CONSTANTS.LARGE_DATA_WARNING_SIZE).toBeGreaterThan(
+        VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH
+      );
       expect(VALIDATION_CONSTANTS.MAX_DATA_AGE_HOURS).toBeGreaterThan(0);
       expect(VALIDATION_CONSTANTS.CLOCK_SKEW_TOLERANCE).toBeGreaterThan(0);
     });
 
     it("should have consistent size relationships", () => {
-      expect(VALIDATION_CONSTANTS.LARGE_DATA_WARNING_SIZE)
-        .toBeLessThan(VALIDATION_CONSTANTS.MAX_MANIFEST_SIZE);
-      expect(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH)
-        .toBeLessThan(VALIDATION_CONSTANTS.LARGE_DATA_WARNING_SIZE);
+      expect(VALIDATION_CONSTANTS.LARGE_DATA_WARNING_SIZE).toBeLessThan(
+        VALIDATION_CONSTANTS.MAX_MANIFEST_SIZE
+      );
+      expect(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH).toBeLessThan(
+        VALIDATION_CONSTANTS.LARGE_DATA_WARNING_SIZE
+      );
     });
   });
 });

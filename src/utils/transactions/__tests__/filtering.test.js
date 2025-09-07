@@ -66,9 +66,7 @@ describe("filtering utilities", () => {
     it("should return all transactions when no date range provided", () => {
       expect(filterByDateRange(mockTransactions)).toEqual(mockTransactions);
       expect(filterByDateRange(mockTransactions, {})).toEqual(mockTransactions);
-      expect(filterByDateRange(mockTransactions, null)).toEqual(
-        mockTransactions,
-      );
+      expect(filterByDateRange(mockTransactions, null)).toEqual(mockTransactions);
     });
 
     it("should filter by start date only", () => {
@@ -96,14 +94,11 @@ describe("filtering utilities", () => {
 
     it("should handle invalid dates gracefully", () => {
       const logger = require("../../common/logger.js").default;
-      const result = filterByDateRange(
-        [{ ...mockTransactions[0], date: "invalid-date" }],
-        { start: "2023-09-01" },
-      );
+      const result = filterByDateRange([{ ...mockTransactions[0], date: "invalid-date" }], {
+        start: "2023-09-01",
+      });
       expect(logger.error).toHaveBeenCalled();
-      expect(result).toEqual([
-        { ...mockTransactions[0], date: "invalid-date" },
-      ]);
+      expect(result).toEqual([{ ...mockTransactions[0], date: "invalid-date" }]);
     });
 
     it("should handle empty transactions array", () => {
@@ -115,9 +110,7 @@ describe("filtering utilities", () => {
     it("should return all transactions when no envelope ID provided", () => {
       expect(filterByEnvelope(mockTransactions)).toEqual(mockTransactions);
       expect(filterByEnvelope(mockTransactions, "")).toEqual(mockTransactions);
-      expect(filterByEnvelope(mockTransactions, null)).toEqual(
-        mockTransactions,
-      );
+      expect(filterByEnvelope(mockTransactions, null)).toEqual(mockTransactions);
     });
 
     it("should filter by envelope ID", () => {
@@ -136,9 +129,7 @@ describe("filtering utilities", () => {
     it("should return all transactions when no category provided", () => {
       expect(filterByCategory(mockTransactions)).toEqual(mockTransactions);
       expect(filterByCategory(mockTransactions, "")).toEqual(mockTransactions);
-      expect(filterByCategory(mockTransactions, null)).toEqual(
-        mockTransactions,
-      );
+      expect(filterByCategory(mockTransactions, null)).toEqual(mockTransactions);
     });
 
     it("should filter by category (case insensitive)", () => {
@@ -363,11 +354,7 @@ describe("filtering utilities", () => {
 
     it("should group by day", () => {
       const result = groupTransactionsByDate(mockTransactions, "day");
-      expect(Object.keys(result)).toEqual([
-        "2023-09-01",
-        "2023-08-15",
-        "2023-09-02",
-      ]);
+      expect(Object.keys(result)).toEqual(["2023-09-01", "2023-08-15", "2023-09-02"]);
     });
 
     it("should group by year", () => {
@@ -391,12 +378,7 @@ describe("filtering utilities", () => {
   describe("groupTransactionsByCategory", () => {
     it("should group transactions by category", () => {
       const result = groupTransactionsByCategory(mockTransactions);
-      expect(Object.keys(result)).toEqual([
-        "Groceries",
-        "Income",
-        "Transportation",
-        "Dining",
-      ]);
+      expect(Object.keys(result)).toEqual(["Groceries", "Income", "Transportation", "Dining"]);
       expect(result["Groceries"]).toHaveLength(1);
     });
 

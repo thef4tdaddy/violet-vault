@@ -12,10 +12,7 @@ import {
   getIconNameForStorage,
 } from "../../utils/common/billIcons";
 import { toMonthly } from "../../utils/common/frequencyCalculations";
-import {
-  BIWEEKLY_MULTIPLIER,
-  convertToBiweekly,
-} from "../../constants/frequency";
+import { BIWEEKLY_MULTIPLIER, convertToBiweekly } from "../../constants/frequency";
 import { getBillCategories } from "../../constants/categories";
 import logger from "../../utils/common/logger";
 
@@ -39,11 +36,7 @@ const getInitialFormData = (bill = null) => {
         bill.iconName ||
         getIconNameForStorage(
           bill.icon ||
-            getBillIcon(
-              bill.name || bill.provider || "",
-              bill.notes || "",
-              bill.category || "",
-            ),
+            getBillIcon(bill.name || bill.provider || "", bill.notes || "", bill.category || "")
         ),
     };
   }
@@ -106,19 +99,12 @@ export const useBillForm = ({
 
   // Suggest icon based on form data
   const suggestedIconName = useMemo(() => {
-    const suggestedIcon = getBillIcon(
-      formData.name,
-      formData.notes,
-      formData.category,
-    );
+    const suggestedIcon = getBillIcon(formData.name, formData.notes, formData.category);
     return getIconNameForStorage(suggestedIcon);
   }, [formData.name, formData.notes, formData.category]);
 
   // Icon suggestions for current category
-  const iconSuggestions = useMemo(
-    () => getBillIconOptions(formData.category),
-    [formData.category],
-  );
+  const iconSuggestions = useMemo(() => getBillIconOptions(formData.category), [formData.category]);
 
   // Available categories
   const categories = useMemo(() => getBillCategories(), []);
@@ -126,23 +112,16 @@ export const useBillForm = ({
   // Business Logic Functions
   const calculateBiweeklyAmount = useCallback(
     (amount, frequency, customFrequency = 1) => {
-      const monthlyAmount = calculateMonthlyAmount(
-        amount,
-        frequency,
-        customFrequency,
-      );
+      const monthlyAmount = calculateMonthlyAmount(amount, frequency, customFrequency);
       return convertToBiweekly(monthlyAmount);
     },
-    [calculateMonthlyAmount],
+    [calculateMonthlyAmount]
   );
 
-  const calculateMonthlyAmount = useCallback(
-    (amount, frequency, customFrequency = 1) => {
-      const numAmount = parseFloat(amount) || 0;
-      return toMonthly(numAmount, frequency, customFrequency);
-    },
-    [],
-  );
+  const calculateMonthlyAmount = useCallback((amount, frequency, customFrequency = 1) => {
+    const numAmount = parseFloat(amount) || 0;
+    return toMonthly(numAmount, frequency, customFrequency);
+  }, []);
 
   const getNextDueDate = useCallback((frequency, dueDate) => {
     if (!dueDate) return "";
@@ -226,12 +205,12 @@ export const useBillForm = ({
         const monthlyAmount = calculateMonthlyAmount(
           formData.amount,
           formData.frequency,
-          formData.customFrequency,
+          formData.customFrequency
         );
         const biweeklyAmount = calculateBiweeklyAmount(
           formData.amount,
           formData.frequency,
-          formData.customFrequency,
+          formData.customFrequency
         );
 
         const billData = {
@@ -287,7 +266,7 @@ export const useBillForm = ({
       onUpdateBill,
       onClose,
       onError,
-    ],
+    ]
   );
 
   // Delete Bill

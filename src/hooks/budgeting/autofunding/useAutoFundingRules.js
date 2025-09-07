@@ -22,9 +22,7 @@ export const useAutoFundingRules = (initialRules = []) => {
     try {
       const validation = validateRule(ruleConfig);
       if (!validation.isValid) {
-        throw new Error(
-          `Invalid rule configuration: ${validation.errors.join(", ")}`,
-        );
+        throw new Error(`Invalid rule configuration: ${validation.errors.join(", ")}`);
       }
 
       const newRule = {
@@ -65,9 +63,7 @@ export const useAutoFundingRules = (initialRules = []) => {
 
           const validation = validateRule(updatedRule);
           if (!validation.isValid) {
-            throw new Error(
-              `Invalid rule configuration: ${validation.errors.join(", ")}`,
-            );
+            throw new Error(`Invalid rule configuration: ${validation.errors.join(", ")}`);
           }
 
           const newRules = [...prevRules];
@@ -86,7 +82,7 @@ export const useAutoFundingRules = (initialRules = []) => {
         throw error;
       }
     },
-    [rules],
+    [rules]
   );
 
   // Delete rule
@@ -124,7 +120,7 @@ export const useAutoFundingRules = (initialRules = []) => {
         throw error;
       }
     },
-    [rules, updateRule],
+    [rules, updateRule]
   );
 
   // Duplicate rule
@@ -150,7 +146,7 @@ export const useAutoFundingRules = (initialRules = []) => {
         throw error;
       }
     },
-    [rules, addRule],
+    [rules, addRule]
   );
 
   // Get rules with filtering and sorting
@@ -169,7 +165,7 @@ export const useAutoFundingRules = (initialRules = []) => {
         return rules;
       }
     },
-    [rules],
+    [rules]
   );
 
   // Get executable rules for a given context
@@ -182,7 +178,7 @@ export const useAutoFundingRules = (initialRules = []) => {
         return [];
       }
     },
-    [rules],
+    [rules]
   );
 
   // Get rule by ID
@@ -190,7 +186,7 @@ export const useAutoFundingRules = (initialRules = []) => {
     (ruleId) => {
       return rules.find((rule) => rule.id === ruleId);
     },
-    [rules],
+    [rules]
   );
 
   // Get rules by type
@@ -198,7 +194,7 @@ export const useAutoFundingRules = (initialRules = []) => {
     (type) => {
       return rules.filter((rule) => rule.type === type);
     },
-    [rules],
+    [rules]
   );
 
   // Get rules by trigger
@@ -206,7 +202,7 @@ export const useAutoFundingRules = (initialRules = []) => {
     (trigger) => {
       return rules.filter((rule) => rule.trigger === trigger);
     },
-    [rules],
+    [rules]
   );
 
   // Create rule summaries for display
@@ -223,7 +219,7 @@ export const useAutoFundingRules = (initialRules = []) => {
         return [];
       }
     },
-    [rules],
+    [rules]
   );
 
   // Validate all rules
@@ -249,9 +245,7 @@ export const useAutoFundingRules = (initialRules = []) => {
 
         // Update priorities based on position in the array
         ruleIds.forEach((ruleId, index) => {
-          const ruleIndex = reorderedRules.findIndex(
-            (rule) => rule.id === ruleId,
-          );
+          const ruleIndex = reorderedRules.findIndex((rule) => rule.id === ruleId);
           if (ruleIndex !== -1) {
             reorderedRules[ruleIndex] = {
               ...reorderedRules[ruleIndex],
@@ -295,8 +289,8 @@ export const useAutoFundingRules = (initialRules = []) => {
         prevRules.map((rule) =>
           ruleIds.includes(rule.id)
             ? { ...rule, ...updates, updatedAt: new Date().toISOString() }
-            : rule,
-        ),
+            : rule
+        )
       );
 
       logger.info("Bulk rule update completed", {
@@ -311,9 +305,7 @@ export const useAutoFundingRules = (initialRules = []) => {
 
   const bulkDeleteRules = useCallback((ruleIds) => {
     try {
-      setRules((prevRules) =>
-        prevRules.filter((rule) => !ruleIds.includes(rule.id)),
-      );
+      setRules((prevRules) => prevRules.filter((rule) => !ruleIds.includes(rule.id)));
 
       logger.info("Bulk rule deletion completed", { ruleIds });
     } catch (error) {
@@ -333,7 +325,7 @@ export const useAutoFundingRules = (initialRules = []) => {
         throw error;
       }
     },
-    [bulkUpdateRules],
+    [bulkUpdateRules]
   );
 
   // Reset rules to initial state

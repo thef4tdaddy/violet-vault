@@ -16,7 +16,7 @@ export const generateChecksum = async (data) => {
   try {
     const encoder = new TextEncoder();
     let dataBuffer;
-    
+
     if (data instanceof ArrayBuffer) {
       dataBuffer = data;
     } else if (typeof data === "string") {
@@ -64,13 +64,13 @@ export const validateChecksum = async (data, expectedChecksum) => {
     if (!expectedChecksum) {
       return false;
     }
-    
+
     const actualChecksum = await generateChecksum(data);
-    
+
     if (!actualChecksum) {
       return false;
     }
-    
+
     const isValid = actualChecksum === expectedChecksum;
 
     if (isValid) {

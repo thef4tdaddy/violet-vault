@@ -161,9 +161,7 @@ describe("useAuthenticationManager", () => {
       handleUpdateProfile: vi.fn(),
     });
 
-    const { result: unauthResult } = renderHook(() =>
-      useAuthenticationManager(),
-    );
+    const { result: unauthResult } = renderHook(() => useAuthenticationManager());
     expect(unauthResult.current.shouldShowAuthGateway()).toBe(true);
   });
 
@@ -183,9 +181,7 @@ describe("useAuthenticationManager", () => {
       localOnlyUser: { id: 1, userName: "localuser" },
     });
 
-    const { result: withUserResult } = renderHook(() =>
-      useAuthenticationManager(),
-    );
+    const { result: withUserResult } = renderHook(() => useAuthenticationManager());
     expect(withUserResult.current.shouldShowAuthGateway()).toBe(false);
   });
 

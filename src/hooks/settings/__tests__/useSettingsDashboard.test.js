@@ -122,9 +122,9 @@ describe("useCloudSyncManager", () => {
   };
 
   beforeEach(() => {
-    vi.mocked(
-      require("../../../stores/ui/uiStore").useBudgetStore,
-    ).mockReturnValue(mockUseBudgetStore);
+    vi.mocked(require("../../../stores/ui/uiStore").useBudgetStore).mockReturnValue(
+      mockUseBudgetStore
+    );
   });
 
   it("should initialize with store values", () => {
@@ -147,9 +147,7 @@ describe("useCloudSyncManager", () => {
   it("should handle manual sync", async () => {
     // Set up sync enabled state
     mockUseBudgetStore.cloudSyncEnabled = true;
-    const { cloudSyncService } = await import(
-      "../../../services/cloudSyncService"
-    );
+    const { cloudSyncService } = await import("../../../services/cloudSyncService");
     cloudSyncService.forceSync.mockResolvedValue({ success: true });
 
     const { result } = renderHook(() => useCloudSyncManager());
@@ -169,9 +167,7 @@ describe("useCloudSyncManager", () => {
       await result.current.handleManualSync();
     });
 
-    const { cloudSyncService } = await import(
-      "../../../services/cloudSyncService"
-    );
+    const { cloudSyncService } = await import("../../../services/cloudSyncService");
     expect(cloudSyncService.forceSync).not.toHaveBeenCalled();
   });
 });
@@ -202,9 +198,7 @@ describe("useSettingsSections", () => {
 
 describe("useSettingsActions", () => {
   it("should handle test history creation success", async () => {
-    const { createTestBudgetHistory } = await import(
-      "../../../utils/common/testBudgetHistory"
-    );
+    const { createTestBudgetHistory } = await import("../../../utils/common/testBudgetHistory");
     const { globalToast } = await import("../../../stores/ui/toastStore");
 
     createTestBudgetHistory.mockResolvedValue();
@@ -218,14 +212,12 @@ describe("useSettingsActions", () => {
     expect(createTestBudgetHistory).toHaveBeenCalled();
     expect(globalToast.showSuccess).toHaveBeenCalledWith(
       "✅ Test budget history created! Check console for details.",
-      "Test History Created",
+      "Test History Created"
     );
   });
 
   it("should handle test history creation failure", async () => {
-    const { createTestBudgetHistory } = await import(
-      "../../../utils/common/testBudgetHistory"
-    );
+    const { createTestBudgetHistory } = await import("../../../utils/common/testBudgetHistory");
     const { globalToast } = await import("../../../stores/ui/toastStore");
 
     const error = new Error("Test error");
@@ -239,7 +231,7 @@ describe("useSettingsActions", () => {
 
     expect(globalToast.showError).toHaveBeenCalledWith(
       "❌ Failed to create test history: Test error",
-      "Test Failed",
+      "Test Failed"
     );
   });
 
@@ -248,10 +240,7 @@ describe("useSettingsActions", () => {
     const mockOnClose = vi.fn();
     const mockOnResetEncryption = vi.fn();
 
-    const resetAction = result.current.handleResetConfirmAction(
-      mockOnClose,
-      mockOnResetEncryption,
-    );
+    const resetAction = result.current.handleResetConfirmAction(mockOnClose, mockOnResetEncryption);
 
     act(() => {
       resetAction();

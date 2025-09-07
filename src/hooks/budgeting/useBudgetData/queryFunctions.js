@@ -42,10 +42,7 @@ export const queryFunctions = {
 
   paycheckHistory: async () => {
     try {
-      const cachedPaychecks = await budgetDb.paycheckHistory
-        .orderBy("date")
-        .reverse()
-        .toArray();
+      const cachedPaychecks = await budgetDb.paycheckHistory.orderBy("date").reverse().toArray();
       return cachedPaychecks || [];
     } catch (error) {
       logger.warn("Failed to fetch paycheck history from Dexie", error);
@@ -69,13 +66,9 @@ export const queryFunctions = {
 
     // Safe calculation with NaN prevention
     const safeEnvelopes = Array.isArray(cachedEnvelopes) ? cachedEnvelopes : [];
-    const safeSavingsGoals = Array.isArray(cachedSavingsGoals)
-      ? cachedSavingsGoals
-      : [];
+    const safeSavingsGoals = Array.isArray(cachedSavingsGoals) ? cachedSavingsGoals : [];
     const safeBills = Array.isArray(cachedBills) ? cachedBills : [];
-    const safeTransactions = Array.isArray(cachedTransactions)
-      ? cachedTransactions
-      : [];
+    const safeTransactions = Array.isArray(cachedTransactions) ? cachedTransactions : [];
 
     const totalEnvelopeBalance = safeEnvelopes.reduce((sum, env) => {
       const balance = parseFloat(env?.currentBalance) || 0;
@@ -92,9 +85,7 @@ export const queryFunctions = {
     const actualBalanceValue = parseFloat(budgetMetadata?.actualBalance) || 0;
 
     const summary = {
-      totalEnvelopeBalance: isNaN(totalEnvelopeBalance)
-        ? 0
-        : totalEnvelopeBalance,
+      totalEnvelopeBalance: isNaN(totalEnvelopeBalance) ? 0 : totalEnvelopeBalance,
       totalSavingsBalance: isNaN(totalSavingsBalance) ? 0 : totalSavingsBalance,
       unassignedCash: isNaN(unassignedCashValue) ? 0 : unassignedCashValue,
       actualBalance: isNaN(actualBalanceValue) ? 0 : actualBalanceValue,
@@ -109,9 +100,7 @@ export const queryFunctions = {
 
     // Calculate difference for balance reconciliation with NaN protection
     summary.virtualBalance =
-      summary.totalEnvelopeBalance +
-      summary.totalSavingsBalance +
-      summary.unassignedCash;
+      summary.totalEnvelopeBalance + summary.totalSavingsBalance + summary.unassignedCash;
     summary.balanceDifference = summary.actualBalance - summary.virtualBalance;
 
     return summary;

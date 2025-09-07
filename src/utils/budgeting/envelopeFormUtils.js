@@ -8,10 +8,7 @@ import {
   ENVELOPE_TYPE_CONFIG,
   getEnvelopeCategories,
 } from "../../constants/categories";
-import {
-  toBiweekly,
-  getFrequencyOptions,
-} from "../common/frequencyCalculations";
+import { toBiweekly, getFrequencyOptions } from "../common/frequencyCalculations";
 
 /**
  * Creates default envelope form data
@@ -44,7 +41,7 @@ export const createDefaultEnvelopeForm = () => ({
 export const validateEnvelopeForm = (
   formData,
   existingEnvelopes = [],
-  editingEnvelopeId = null,
+  editingEnvelopeId = null
 ) => {
   const errors = {};
 
@@ -58,7 +55,7 @@ export const validateEnvelopeForm = (
     const nameExists = existingEnvelopes.some(
       (envelope) =>
         envelope.name.toLowerCase() === formData.name.trim().toLowerCase() &&
-        envelope.id !== editingEnvelopeId,
+        envelope.id !== editingEnvelopeId
     );
     if (nameExists) {
       errors.name = "An envelope with this name already exists";
@@ -87,10 +84,7 @@ export const validateEnvelopeForm = (
   if (formData.envelopeType === ENVELOPE_TYPES.SINKING_FUND) {
     if (!formData.targetAmount) {
       errors.targetAmount = "Target amount is required for sinking funds";
-    } else if (
-      isNaN(formData.targetAmount) ||
-      parseFloat(formData.targetAmount) <= 0
-    ) {
+    } else if (isNaN(formData.targetAmount) || parseFloat(formData.targetAmount) <= 0) {
       errors.targetAmount = "Target amount must be a positive number";
     } else if (parseFloat(formData.targetAmount) > 1000000) {
       errors.targetAmount = "Target amount cannot exceed $1,000,000";
@@ -159,10 +153,7 @@ export const calculateEnvelopeAmounts = (formData) => {
   let monthlyBudget = monthlyAmount;
 
   // For sinking funds, calculate monthly amount needed to reach target
-  if (
-    formData.envelopeType === ENVELOPE_TYPES.SINKING_FUND &&
-    targetAmount > 0
-  ) {
+  if (formData.envelopeType === ENVELOPE_TYPES.SINKING_FUND && targetAmount > 0) {
     // If target date is provided, calculate based on time remaining
     // Otherwise, use the monthly amount as-is
     monthlyBudget = monthlyAmount;
@@ -280,10 +271,7 @@ export const calculateEnvelopeProgress = (envelope) => {
 
   if (targetAmount <= 0) return null;
 
-  const progressPercentage = Math.min(
-    (currentBalance / targetAmount) * 100,
-    100,
-  );
+  const progressPercentage = Math.min((currentBalance / targetAmount) * 100, 100);
   const remainingAmount = Math.max(targetAmount - currentBalance, 0);
   const isComplete = currentBalance >= targetAmount;
 
@@ -349,9 +337,7 @@ export const validateEnvelopeTypeChange = (newType, envelope) => {
     newType !== ENVELOPE_TYPES.SINKING_FUND
   ) {
     if (envelope.targetAmount > 0) {
-      warnings.push(
-        "Changing from sinking fund will remove target amount tracking",
-      );
+      warnings.push("Changing from sinking fund will remove target amount tracking");
     }
   }
 

@@ -10,7 +10,7 @@ const BillSummaryCards = ({ totals = {} }) => {
   const cards = [
     {
       key: "total-bills",
-      icon: getIcon('DollarSign'),
+      icon: getIcon("DollarSign"),
       label: "Total Bills",
       value: `$${(totals.total || 0).toFixed(2)}`,
       color: "blue",
@@ -18,7 +18,7 @@ const BillSummaryCards = ({ totals = {} }) => {
     },
     {
       key: "overdue",
-      icon: getIcon('AlertTriangle'),
+      icon: getIcon("AlertTriangle"),
       label: "Overdue",
       value: `$${(totals.overdue || 0).toFixed(2)}`,
       color: "red",
@@ -27,7 +27,7 @@ const BillSummaryCards = ({ totals = {} }) => {
     },
     {
       key: "paid",
-      icon: getIcon('CheckCircle'),
+      icon: getIcon("CheckCircle"),
       label: "Paid",
       value: `$${(totals.paid || 0).toFixed(2)}`,
       color: "green",
@@ -35,7 +35,7 @@ const BillSummaryCards = ({ totals = {} }) => {
     },
     {
       key: "upcoming",
-      icon: getIcon('Clock'),
+      icon: getIcon("Clock"),
       label: "Upcoming",
       value: `$${(totals.upcoming || 0).toFixed(2)}`,
       color: "amber",

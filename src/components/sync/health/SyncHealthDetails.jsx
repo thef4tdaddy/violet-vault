@@ -17,10 +17,7 @@ const SyncHealthDetails = ({
   onRunValidation,
   onResetData,
 }) => {
-  const statusDescription = getStatusDescription(
-    syncStatus,
-    isBackgroundSyncing,
-  );
+  const statusDescription = getStatusDescription(syncStatus, isBackgroundSyncing);
   const lastCheckedText = formatLastChecked(syncStatus.lastChecked);
   const formattedRecoveryResult = formatRecoveryResult(recoveryResult);
 
@@ -37,25 +34,21 @@ const SyncHealthDetails = ({
         <div className="space-y-2">
           <div className="flex items-start gap-2">
             <div className="flex-shrink-0 mt-1">
-              {syncStatus.status === "HEALTHY" ? 
-                renderIcon('CheckCircle', { className: "h-4 w-4 text-green-500" }) : 
-                renderIcon('AlertTriangle', { className: "h-4 w-4 text-orange-500" })
-              }
+              {syncStatus.status === "HEALTHY"
+                ? renderIcon("CheckCircle", { className: "h-4 w-4 text-green-500" })
+                : renderIcon("AlertTriangle", { className: "h-4 w-4 text-orange-500" })}
             </div>
             <div>
               <p className="text-sm font-bold text-gray-900">
-                Current Status:{" "}
-                <span className="text-purple-800">{syncStatus.status}</span>
+                Current Status: <span className="text-purple-800">{syncStatus.status}</span>
               </p>
-              <p className="text-xs text-purple-700 font-medium mt-1">
-                {statusDescription}
-              </p>
+              <p className="text-xs text-purple-700 font-medium mt-1">{statusDescription}</p>
             </div>
           </div>
 
           {/* Last Checked */}
           <div className="flex items-center gap-2 text-xs text-purple-600">
-            {renderIcon('Clock', { className: "h-3 w-3" })}
+            {renderIcon("Clock", { className: "h-3 w-3" })}
             <span className="font-medium">Last checked: {lastCheckedText}</span>
           </div>
         </div>
@@ -63,12 +56,8 @@ const SyncHealthDetails = ({
         {/* Error Details */}
         {syncStatus.error && (
           <div className="bg-gradient-to-r from-red-50/80 to-orange-50/80 backdrop-blur-sm p-3 rounded-xl border border-red-200 shadow-sm">
-            <p className="text-xs font-bold text-red-800 mb-1">
-              ERROR DETAILS:
-            </p>
-            <p className="text-xs text-red-700 font-medium">
-              {syncStatus.error}
-            </p>
+            <p className="text-xs font-bold text-red-800 mb-1">ERROR DETAILS:</p>
+            <p className="text-xs text-red-700 font-medium">{syncStatus.error}</p>
           </div>
         )}
 
@@ -98,18 +87,14 @@ const SyncHealthDetails = ({
           >
             <p
               className={`text-xs font-bold mb-1 ${
-                formattedRecoveryResult.type === "success"
-                  ? "text-green-800"
-                  : "text-red-800"
+                formattedRecoveryResult.type === "success" ? "text-green-800" : "text-red-800"
               }`}
             >
               RECOVERY RESULT:
             </p>
             <p
               className={`text-xs font-medium ${
-                formattedRecoveryResult.type === "success"
-                  ? "text-green-700"
-                  : "text-red-700"
+                formattedRecoveryResult.type === "success" ? "text-green-700" : "text-red-700"
               }`}
             >
               {formattedRecoveryResult.message}
@@ -125,9 +110,7 @@ const SyncHealthDetails = ({
         {/* Action Buttons */}
         {hasRecoveryActions() && (
           <div className="space-y-2 pt-2 border-t border-gray-200">
-            <p className="text-xs font-black text-gray-700 uppercase">
-              ACTIONS:
-            </p>
+            <p className="text-xs font-black text-gray-700 uppercase">ACTIONS:</p>
 
             <div className="flex flex-col gap-2">
               <button
@@ -135,17 +118,14 @@ const SyncHealthDetails = ({
                 disabled={syncStatus.isLoading}
                 className={getActionButtonStyle("refresh")}
               >
-                {renderIcon('RefreshCw', { 
-                  className: `h-3 w-3 mr-2 ${syncStatus.isLoading ? "animate-spin" : ""}` 
+                {renderIcon("RefreshCw", {
+                  className: `h-3 w-3 mr-2 ${syncStatus.isLoading ? "animate-spin" : ""}`,
                 })}
                 {syncStatus.isLoading ? "Refreshing..." : "Refresh Status"}
               </button>
 
-              <button
-                onClick={onRunValidation}
-                className={getActionButtonStyle("validate")}
-              >
-                {renderIcon('Wrench', { className: "h-3 w-3 mr-2" })}
+              <button onClick={onRunValidation} className={getActionButtonStyle("validate")}>
+                {renderIcon("Wrench", { className: "h-3 w-3 mr-2" })}
                 Run Full Validation
               </button>
 
@@ -154,8 +134,8 @@ const SyncHealthDetails = ({
                 disabled={isRecovering}
                 className={getActionButtonStyle("reset")}
               >
-                {renderIcon('AlertTriangle', {
-                  className: `h-3 w-3 mr-2 ${isRecovering ? "animate-pulse" : ""}`
+                {renderIcon("AlertTriangle", {
+                  className: `h-3 w-3 mr-2 ${isRecovering ? "animate-pulse" : ""}`,
                 })}
                 {isRecovering ? "Resetting..." : "Reset Cloud Data"}
               </button>

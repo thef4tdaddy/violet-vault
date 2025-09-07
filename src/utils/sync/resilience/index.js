@@ -1,13 +1,13 @@
 /**
  * Phase 2 Sync Resilience Components
  * Export all resilience improvements for cloud sync reliability
- * 
+ *
  * Addresses GitHub Issue #576 - Cloud Sync Reliability Improvements (Phase 2)
  */
 
-// Core resilience components  
+// Core resilience components
 import { RetryManager } from "../RetryManager";
-import { CircuitBreaker } from "../CircuitBreaker"; 
+import { CircuitBreaker } from "../CircuitBreaker";
 import { SyncQueue } from "../SyncQueue";
 
 export { RetryManager, CircuitBreaker, SyncQueue };
@@ -29,7 +29,7 @@ export const createSyncResilience = (options = {}) => {
     ...options.circuitBreaker,
   });
   const syncQueue = new SyncQueue({
-    name: "SyncQueue", 
+    name: "SyncQueue",
     debounceMs: 1500, // Shorter debounce for sync
     maxQueueAge: 15000, // 15 seconds max age
     ...options.syncQueue,
@@ -39,7 +39,7 @@ export const createSyncResilience = (options = {}) => {
     retryManager,
     circuitBreaker,
     syncQueue,
-    
+
     /**
      * Execute sync operation with full resilience stack
      */
