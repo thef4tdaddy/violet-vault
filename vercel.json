@@ -6,6 +6,9 @@
   },
   "buildCommand": "npm ci && npm run build",
   "installCommand": "npm ci",
+  "preview": {
+    "buildCommand": "npm ci && npm run build:dev"
+  },
   "headers": [
     {
       "source": "/assets/(.*)",
