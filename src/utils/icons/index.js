@@ -182,10 +182,15 @@ export const ICON_REGISTRY = {
   // Status & Feedback
   check: Check,
   "check-circle": CheckCircle,
+  CheckCircle: CheckCircle, // PascalCase alias
   "x-circle": XCircle,
+  XCircle: XCircle, // PascalCase alias
   "alert-circle": AlertCircle,
+  AlertCircle: AlertCircle, // PascalCase alias
   "alert-triangle": AlertTriangle,
+  AlertTriangle: AlertTriangle, // PascalCase alias
   info: Info,
+  Info: Info, // PascalCase alias
   eye: Eye,
   "eye-off": EyeOff,
   "thumbs-up": ThumbsUp,

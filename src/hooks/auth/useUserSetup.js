@@ -114,11 +114,8 @@ export const useUserSetup = (onSetupComplete) => {
       setIsLoading(true);
       try {
         logger.debug("🚀 Attempting login for returning user...");
-        await onSetupComplete({
-          password: masterPassword,
-          userName,
-          userColor,
-        });
+        // For returning users, only pass password to trigger existing user validation path
+        await onSetupComplete(masterPassword);
         logger.debug("✅ Returning user login succeeded");
       } catch (error) {
         logger.error("❌ Login failed:", error);

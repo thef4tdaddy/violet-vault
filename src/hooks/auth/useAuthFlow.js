@@ -23,20 +23,48 @@ const useAuthFlow = () => {
   const { showSuccessToast, showErrorToast } = useToastHelpers();
 
   const handleSetup = useCallback(
-    async (userData) => {
-      logger.auth("Layout handleSetup called", { hasUserData: !!userData });
+    async (userDataOrPassword) => {
+      // Handle both new user (object) and existing user (string) scenarios
+      const isExistingUser = typeof userDataOrPassword === 'string';
+      const password = isExistingUser ? userDataOrPassword : userDataOrPassword.password;
+      const userData = isExistingUser ? null : userDataOrPassword;
+      
+      logger.auth("Layout handleSetup called", { 
+        hasUserData: !!userData,
+        isExistingUser,
+        hasPassword: !!password 
+      });
       logger.auth(
         "🚨 DEBUG VERSION 2: useAuthFlow.js with debug logging is running!",
       );
       try {
-        // ALWAYS generate budgetId deterministically from password for cross-device sync
+        // For existing users, skip budgetId generation and go straight to login
+        if (isExistingUser) {
+          logger.auth("Existing user login - calling login with password only");
+          const result = await login(password, null);
+          logger.auth("Existing user login result", { success: !!result });
+          
+          if (result.success) {
+            logger.production("Existing user login successful");
+            return result;
+          } else {
+            logger.error("❌ Existing user login failed:", result.error);
+            const error = new Error(result.error);
+            error.code = result.code;
+            error.canCreateNew = result.canCreateNew;
+            error.suggestion = result.suggestion;
+            throw error;
+          }
+        }
+
+        // New user path - generate budgetId and setup new account
         const { encryptionUtils } = await import(
           "../../utils/security/encryption"
         );
 
         // Debug: Track source of budget ID problem
         const generatedBudgetId = await encryptionUtils.generateBudgetId(
-          userData.password,
+          password,
         );
         logger.auth("🔍 DEBUG: useAuthFlow budget ID investigation", {
           originalUserDataBudgetId: userData.budgetId || "none",
@@ -52,11 +80,11 @@ const useAuthFlow = () => {
 
         logger.auth("Calling login", {
           hasUserData: !!userDataWithId,
-          hasPassword: !!userData.password,
+          hasPassword: !!password,
           budgetId: userDataWithId.budgetId,
         });
 
-        const result = await login(userData.password, userDataWithId);
+        const result = await login(password, userDataWithId);
         logger.auth("Login result", { success: !!result });
 
         if (result.success) {
