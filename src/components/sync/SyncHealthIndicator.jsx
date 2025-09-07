@@ -41,7 +41,7 @@ const SyncHealthIndicator = () => {
   };
 
   return (
-    <div className="relative inline-block" ref={dropdownRef}>
+    <div className="relative inline-block z-[9998]" ref={dropdownRef}>
       <SyncStatusIndicator
         syncStatus={syncStatus}
         isBackgroundSyncing={isBackgroundSyncing}
