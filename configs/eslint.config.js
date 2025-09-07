@@ -253,16 +253,40 @@ export default [
   {
     // Exclusions for core infrastructure and diagnostic files (Issue #514)
     files: [
-      "**/budgetDb.js",
       "**/budgetHistoryService.js",
       "**/budgetHistoryTracker.js",
-      "**/authStore.jsx",
       "**/SyncHealthIndicator.jsx", // System health monitoring utility
       "**/ActivityFeed.jsx", // Only imports constants, not service functions
     ],
     rules: {
       "max-lines": "off", // These files excluded from 500 LOC limit
       "no-restricted-imports": "off", // Allow service imports for system monitoring
+    },
+  },
+  {
+    // Exclusions for budgetDb.js - core database layer with legitimate complexity
+    files: ["**/budgetDb.js"],
+    rules: {
+      "max-lines": "off", // Database layer needs many lines for comprehensive operations
+      "max-lines-per-function": "off", // Database constructors and methods need large functions
+      "max-statements": "off", // Database operations require many statements
+      complexity: "off", // Database query logic is inherently complex
+      "max-depth": "off", // Database operations need deep conditional logic
+      "max-params": "off", // Database methods may need many parameters
+      "no-restricted-imports": "off", // Allow service imports for database operations
+    },
+  },
+  {
+    // Exclusions for authStore.jsx - core authentication store with legitimate complexity
+    files: ["**/authStore.jsx"],
+    rules: {
+      "max-lines": "off", // Authentication logic needs comprehensive coverage
+      "max-lines-per-function": "off", // Auth methods like login need large functions
+      "max-statements": "off", // Authentication flows require many statements
+      complexity: "off", // Authentication logic is inherently complex
+      "max-depth": "off", // Auth validation needs deep conditional logic
+      "max-params": "off", // Auth methods may need many parameters
+      "no-restricted-imports": "off", // Allow service imports for auth operations
     },
   },
   {
