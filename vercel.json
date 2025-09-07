@@ -1,11 +1,10 @@
 {
   "build": {
     "env": {
-      "GENERATE_SOURCEMAP": "true",
-      "VITE_NODE_ENV": "development"
+      "GENERATE_SOURCEMAP": "true"
     }
   },
-  "buildCommand": "npm ci && npm run build:dev",
+  "buildCommand": "npm ci && npm run build",
   "installCommand": "npm ci",
   "headers": [
     {

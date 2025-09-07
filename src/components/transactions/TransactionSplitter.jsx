@@ -17,7 +17,11 @@ const TransactionSplitter = ({
   availableCategories = [],
   className = "",
 }) => {
-  const splitter = useTransactionSplitter(transaction);
+  const splitter = useTransactionSplitter({ 
+    transaction, 
+    envelopes, 
+    onSplit: onSave 
+  });
 
   // Handle saving with validation
   const handleSave = async () => {
