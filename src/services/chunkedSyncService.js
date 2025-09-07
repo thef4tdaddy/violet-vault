@@ -19,6 +19,7 @@ import {
   validateManifest,
   generateChecksum,
 } from "../utils/sync/validation";
+import { createSyncResilience } from "../utils/sync/resilience";
 
 /**
  * Binary <-> Base64 helpers to avoid massive Function.apply() (stack overflow)
@@ -64,9 +65,16 @@ class ChunkedSyncService {
     this.lastCorruptedDataClear = null; // Track when we last cleared corrupted data
     this.corruptedDataClearCooldown = 5 * 60 * 1000; // 5 minute cooldown between clears
 
-    // GitHub Issue #576 - Prevent concurrent sync operations
+    // GitHub Issue #576 - Phase 1: Prevent concurrent sync operations
     this.syncMutex = new SyncMutex(`ChunkedSync-${Date.now()}`);
     this.decryptionFailures = new Map(); // Track failed decryption attempts
+
+    // GitHub Issue #576 - Phase 2: Resilience improvements
+    this.resilience = createSyncResilience({
+      retryManager: { name: "ChunkedSyncRetry" },
+      circuitBreaker: { name: "ChunkedSyncCircuit", failureThreshold: 3 },
+      syncQueue: { name: "ChunkedSyncQueue", debounceMs: 1500 },
+    });
   }
 
   /**
@@ -292,8 +300,12 @@ class ChunkedSyncService {
           },
         };
 
-        // Save main document
-        await setDoc(doc(db, "budgets", this.budgetId), mainDocument);
+        // Save main document with resilience
+        await this.resilience.execute(
+          () => setDoc(doc(db, "budgets", this.budgetId), mainDocument),
+          "saveMainDocument",
+          "saveMainDocument"
+        );
 
         // Save chunks in batches
         const chunkEntries = Object.entries(chunkMap);
@@ -322,7 +334,12 @@ class ChunkedSyncService {
             batch.set(doc(db, "budgets", this.budgetId, "chunks", chunkId), chunkDocument);
           }
 
-          await batch.commit();
+          // Commit batch with resilience
+          await this.resilience.execute(
+            () => batch.commit(),
+            "saveChunkBatch",
+            `saveChunkBatch-${Math.floor(i / batchSize) + 1}`
+          );
           logger.debug(
             `Saved batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(chunkEntries.length / batchSize)}`
           );
@@ -358,8 +375,12 @@ class ChunkedSyncService {
       try {
         logger.info("Starting chunked load from cloud");
 
-        // Load main document
-        const mainDoc = await getDoc(doc(db, "budgets", this.budgetId));
+        // Load main document with resilience
+        const mainDoc = await this.resilience.execute(
+          () => getDoc(doc(db, "budgets", this.budgetId)),
+          "loadMainDocument",
+          "loadMainDocument"
+        );
         if (!mainDoc.exists()) {
           logger.info("No cloud data found");
           return null;
@@ -463,7 +484,11 @@ class ChunkedSyncService {
             where("budgetId", "==", this.budgetId)
           );
 
-          const chunksSnapshot = await getDocs(chunksQuery);
+          const chunksSnapshot = await this.resilience.execute(
+            () => getDocs(chunksQuery),
+            "loadChunks", 
+            "loadChunks"
+          );
           const chunks = {};
 
           // Decrypt all chunks with individual error handling
@@ -621,13 +646,30 @@ class ChunkedSyncService {
   }
 
   /**
-   * Get sync statistics
+   * Get sync statistics including resilience metrics
    */
   getStats() {
-    return {
+    const baseStats = {
       maxChunkSize: this.maxChunkSize,
       maxArrayChunkSize: this.maxArrayChunkSize,
       isInitialized: !!(this.budgetId && this.encryptionKey),
+    };
+
+    // Add Phase 2 resilience metrics
+    const resilienceStatus = this.resilience?.getStatus();
+    
+    return {
+      ...baseStats,
+      resilience: resilienceStatus,
+      phase1: {
+        mutexEnabled: !!this.syncMutex,
+        validationEnabled: true,
+      },
+      phase2: {
+        retryEnabled: !!resilienceStatus?.retry,
+        circuitBreakerEnabled: !!resilienceStatus?.circuit,
+        queueEnabled: !!resilienceStatus?.queue,
+      },
     };
   }
 
