@@ -175,7 +175,7 @@ export class BugReportService {
       reportVersion: "2.0.0",
     };
 
-    return BugReportAPIService.prepareReportData(reportData);
+    return reportData;
   }
 
   /**
