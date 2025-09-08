@@ -21,7 +21,7 @@ export const useUnassignedCash = () => {
   } = useQuery({
     queryKey: [...queryKeys.budgetMetadata, "unassignedCash"],
     queryFn: async () => {
-      logger.debug("TanStack Query: Fetching unassigned cash from Dexie");
+      // Removed noisy debug log - query runs constantly
       let metadata = await getBudgetMetadata();
 
       // Initialize metadata record if it doesn't exist (same as main hook)
@@ -45,9 +45,7 @@ export const useUnassignedCash = () => {
       }
 
       const result = await getUnassignedCash();
-      logger.debug("TanStack Query: Unassigned cash loaded", {
-        amount: result,
-      });
+      // Removed noisy debug log - fires constantly
       return result;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes

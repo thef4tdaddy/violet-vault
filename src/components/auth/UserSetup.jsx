@@ -21,9 +21,7 @@ const UserSetup = ({ onSetupComplete }) => {
   const [showJoinModal, setShowJoinModal] = useState(false);
   const { joinBudgetWithShareCode } = useAuth();
 
-  logger.debug("🏗️ UserSetup component rendered", {
-    onSetupComplete: !!onSetupComplete,
-  });
+  // Removed noisy debug log - component renders on every prop change/keystroke
 
   const {
     // State

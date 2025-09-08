@@ -35,16 +35,7 @@ const SummaryCards = () => {
   );
   const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
 
-  // Debug logging to compare with Dashboard
-  logger.debug("🔍 SummaryCards Debug:", {
-    envelopesCount: envelopes.length,
-    totalEnvelopeBalance,
-    totalSavingsBalance,
-    unassignedCash,
-    totalCash,
-    firstEnvelope: envelopes[0],
-    isLoading: envelopesLoading || savingsLoading || unassignedCashLoading,
-  });
+  // Removed noisy debug log - component renders frequently
 
   // Calculate biweekly needs using existing utility
   const processedEnvelopeData = calculateEnvelopeData(envelopes, [], []);

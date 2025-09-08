@@ -10,15 +10,7 @@ import logger from "../../../utils/common/logger";
 const DebtSummaryWidget = ({ onNavigateToDebts }) => {
   const { debtStats, debts } = useDebtManagement();
 
-  // Add debug logging to understand what's happening
-  logger.debug("💰 DebtSummaryWidget Debug:", {
-    debtStats,
-    debtsCount: debts?.length || 0,
-    totalDebtCount: debtStats?.totalDebtCount || 0,
-    isStatsValid: !!debtStats,
-    totalDebt: debtStats?.totalDebt || 0,
-    activeDebtCount: debtStats?.activeDebtCount || 0,
-  });
+  // Removed noisy debug log - component renders frequently
 
   // Don't show widget if no debts exist
   if (!debtStats || debtStats.totalDebtCount === 0) {

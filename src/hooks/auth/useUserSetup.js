@@ -204,13 +204,13 @@ export const useUserSetup = (onSetupComplete) => {
 
   // Handle password input change
   const handlePasswordChange = (value) => {
-    logger.debug("🔐 Password input changed");
+    // Removed noisy debug log - fires on every keystroke
     setMasterPassword(value);
   };
 
   // Handle name input change
   const handleNameChange = (value) => {
-    logger.debug("👤 Name input changed:", value);
+    // Removed noisy debug log - fires on every keystroke
     setUserName(value);
   };
 
