@@ -15,7 +15,7 @@ const ShareCodeDisplay = ({ shareCode, onCreateBudget, onBack, isLoading }) => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      console.error('Failed to copy share code:', error);
+      // Handle clipboard copy failure silently in UI
     }
   };
 
@@ -36,20 +36,21 @@ Instructions:
 Generated: ${new Date().toLocaleDateString()}
 `;
 
-    const blob = new Blob([content], { type: 'text/plain' });
+    const blob = new Blob([content], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `violet-vault-share-code-${new Date().toISOString().split('T')[0]}.txt`;
+    a.download = `violet-vault-share-code-${new Date().toISOString().split("T")[0]}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
 
-  const displayCode = shareCode.split(' ').map(word => 
-    word.charAt(0).toUpperCase() + word.slice(1)
-  ).join(' ');
+  const displayCode = shareCode
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 
   return (
     <div className="space-y-6">
@@ -60,7 +61,8 @@ Generated: ${new Date().toLocaleDateString()}
           <h3 className="font-bold">CRITICAL: Save Your Share Code</h3>
         </div>
         <p className="text-red-700 text-sm">
-          You need this code to access your budget on other devices. If you lose it, you cannot recover your budget!
+          You need this code to access your budget on other devices. If you lose it, you cannot
+          recover your budget!
         </p>
       </div>
 
@@ -69,7 +71,8 @@ Generated: ${new Date().toLocaleDateString()}
         <div className="text-center">
           <h2 className="text-xl font-bold text-gray-900 mb-2">Your Budget Share Code</h2>
           <p className="text-sm text-gray-600">
-            Write this down or save it safely - you'll need it to access your budget from other devices
+            Write this down or save it safely - you'll need it to access your budget from other
+            devices
           </p>
         </div>
 
@@ -77,7 +80,7 @@ Generated: ${new Date().toLocaleDateString()}
           <div className="text-2xl font-mono font-bold text-purple-900 tracking-wider mb-4 select-all">
             🔑 {displayCode}
           </div>
-          
+
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
@@ -88,7 +91,7 @@ Generated: ${new Date().toLocaleDateString()}
               {renderIcon(copied ? "Check" : "Copy", "w-4 h-4")}
               <span>{copied ? "Copied!" : "Copy Code"}</span>
             </button>
-            
+
             <button
               type="button"
               onClick={handleDownload}
@@ -123,7 +126,7 @@ Generated: ${new Date().toLocaleDateString()}
           {renderIcon("ArrowLeft", "w-4 h-4 mr-2")}
           Back
         </button>
-        
+
         <button
           type="button"
           onClick={onCreateBudget}

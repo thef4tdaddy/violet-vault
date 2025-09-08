@@ -2,11 +2,11 @@
  * Word-based Share Code Utilities
  * Generates human-readable 4-word share codes for deterministic budget IDs
  * Replaces device-specific budget ID system with user-controlled share codes
- * 
+ *
  * Created for GitHub Issue #588
  */
-import * as bip39 from 'bip39';
-import logger from '../common/logger';
+import * as bip39 from "bip39";
+import logger from "../common/logger";
 
 export const shareCodeUtils = {
   /**
@@ -18,18 +18,18 @@ export const shareCodeUtils = {
       // Generate 128 bits of entropy (16 bytes) for 12-word mnemonic
       // We'll use only the first 4 words for simplicity
       const mnemonic = bip39.generateMnemonic(128);
-      const words = mnemonic.split(' ').slice(0, 4);
-      const shareCode = words.join(' ');
-      
-      logger.info('Generated new share code', {
+      const words = mnemonic.split(" ").slice(0, 4);
+      const shareCode = words.join(" ");
+
+      logger.info("Generated new share code", {
         wordCount: words.length,
-        preview: words[0] + ' ' + words[1] + ' ...'
+        preview: words[0] + " " + words[1] + " ...",
       });
-      
+
       return shareCode;
     } catch (error) {
-      logger.error('Failed to generate share code', error);
-      throw new Error('Share code generation failed');
+      logger.error("Failed to generate share code", error);
+      throw new Error("Share code generation failed");
     }
   },
 
@@ -39,12 +39,12 @@ export const shareCodeUtils = {
    * @returns {boolean} True if valid 4-word format
    */
   validateShareCode(shareCode) {
-    if (!shareCode || typeof shareCode !== 'string') {
+    if (!shareCode || typeof shareCode !== "string") {
       return false;
     }
 
-    const words = shareCode.trim().split(' ');
-    
+    const words = shareCode.trim().split(" ");
+
     // Must be exactly 4 words
     if (words.length !== 4) {
       return false;
@@ -52,7 +52,7 @@ export const shareCodeUtils = {
 
     // Each word must be valid BIP39 word
     const wordlist = bip39.getDefaultWordlist();
-    return words.every(word => wordlist.includes(word.toLowerCase()));
+    return words.every((word) => wordlist.includes(word.toLowerCase()));
   },
 
   /**
@@ -61,12 +61,9 @@ export const shareCodeUtils = {
    * @returns {string} Normalized share code
    */
   normalizeShareCode(shareCode) {
-    if (!shareCode) return '';
-    
-    return shareCode
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, ' '); // Replace multiple spaces with single space
+    if (!shareCode) return "";
+
+    return shareCode.toLowerCase().trim().replace(/\s+/g, " "); // Replace multiple spaces with single space
   },
 
   /**
@@ -77,38 +74,38 @@ export const shareCodeUtils = {
    */
   async generateBudgetId(password, shareCode) {
     if (!password || !shareCode) {
-      throw new Error('Both password and share code are required for budget ID generation');
+      throw new Error("Both password and share code are required for budget ID generation");
     }
 
     const normalizedShareCode = this.normalizeShareCode(shareCode);
-    
+
     if (!this.validateShareCode(normalizedShareCode)) {
-      throw new Error('Invalid share code format - must be exactly 4 valid words');
+      throw new Error("Invalid share code format - must be exactly 4 valid words");
     }
 
     try {
       // Use SHA-256 with password + normalized share code for deterministic budget ID
       const encoder = new TextEncoder();
       const data = encoder.encode(`budget_seed_${password}_${normalizedShareCode}_violet_vault`);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
       const hashArray = new Uint8Array(hashBuffer);
 
       // Convert to hex string and take first 16 characters for reasonable length
       const hashHex = Array.from(hashArray)
-        .map(b => b.toString(16).padStart(2, '0'))
-        .join('');
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
 
       const budgetId = `budget_${hashHex.substring(0, 16)}`;
 
-      logger.info('Generated deterministic budget ID', {
-        budgetIdPreview: budgetId.substring(0, 10) + '...',
-        shareCodePreview: normalizedShareCode.split(' ').slice(0, 2).join(' ') + ' ...'
+      logger.info("Generated deterministic budget ID", {
+        budgetIdPreview: budgetId.substring(0, 10) + "...",
+        shareCodePreview: normalizedShareCode.split(" ").slice(0, 2).join(" ") + " ...",
       });
 
       return budgetId;
     } catch (error) {
-      logger.error('Budget ID generation failed', error);
-      throw new Error('Failed to generate budget ID from share code');
+      logger.error("Budget ID generation failed", error);
+      throw new Error("Failed to generate budget ID from share code");
     }
   },
 
@@ -119,13 +116,13 @@ export const shareCodeUtils = {
    */
   generateQRData(shareCode) {
     const normalizedShareCode = this.normalizeShareCode(shareCode);
-    
+
     if (!this.validateShareCode(normalizedShareCode)) {
-      throw new Error('Invalid share code for QR generation');
+      throw new Error("Invalid share code for QR generation");
     }
 
     // Format: VV-SHARE-words (compatible with existing QR system)
-    return `VV-SHARE-${normalizedShareCode.replace(/\s+/g, '-')}`;
+    return `VV-SHARE-${normalizedShareCode.replace(/\s+/g, "-")}`;
   },
 
   /**
@@ -134,7 +131,7 @@ export const shareCodeUtils = {
    * @returns {string|null} Share code or null if invalid
    */
   parseQRData(qrData) {
-    if (!qrData || typeof qrData !== 'string') {
+    if (!qrData || typeof qrData !== "string") {
       return null;
     }
 
@@ -143,8 +140,8 @@ export const shareCodeUtils = {
       return null;
     }
 
-    const shareCode = match[1].replace(/-/g, ' ');
-    
+    const shareCode = match[1].replace(/-/g, " ");
+
     if (this.validateShareCode(shareCode)) {
       return this.normalizeShareCode(shareCode);
     }
@@ -159,17 +156,17 @@ export const shareCodeUtils = {
    */
   formatForDisplay(shareCode) {
     const normalized = this.normalizeShareCode(shareCode);
-    
+
     if (!this.validateShareCode(normalized)) {
       return shareCode; // Return as-is if invalid
     }
 
     // Capitalize first letter of each word for display
     return normalized
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  }
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  },
 };
 
 export default shareCodeUtils;
