@@ -8,10 +8,8 @@
  * Created for GitHub Issue #588/#357
  */
 import * as pako from "pako";
-import msgpack from "msgpack5";
+import { encode, decode } from "@msgpack/msgpack";
 import logger from "../common/logger.js";
-
-const msgpackInstance = msgpack();
 
 export const optimizedSerialization = {
   /**
@@ -32,7 +30,7 @@ export const optimizedSerialization = {
       const compressedSize = compressed.length;
 
       // Step 3: Pack with MessagePack for efficient binary representation
-      const packed = msgpackInstance.encode(compressed);
+      const packed = encode(compressed);
       const finalSize = packed.length;
 
       const duration = performance.now() - startTime;
@@ -63,7 +61,7 @@ export const optimizedSerialization = {
       const startTime = performance.now();
 
       // Step 1: Unpack MessagePack to get compressed data
-      const compressed = msgpackInstance.decode(packedData);
+      const compressed = decode(packedData);
 
       // Step 2: Decompress gzip to get JSON string
       const jsonString = pako.ungzip(compressed, { to: "string" });
@@ -100,7 +98,7 @@ export const optimizedSerialization = {
       const compressedSize = compressed.length;
 
       // Test MessagePack
-      const packed = msgpackInstance.encode(compressed);
+      const packed = encode(compressed);
       const finalSize = packed.length;
 
       return {
