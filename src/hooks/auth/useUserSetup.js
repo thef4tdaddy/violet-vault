@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
-import { budgetDb } from "../../utils/db/budgetDbConfig";
+import { budgetDb } from "../../db/budgetDb";
 
 /**
  * User Setup Hook
