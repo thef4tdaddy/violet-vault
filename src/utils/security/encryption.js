@@ -184,6 +184,24 @@ export const encryptionUtils = {
     return budgetId;
   },
 
+  async generateLegacyBudgetId(masterPassword) {
+    // Legacy budget ID generation (pre-device ID) for migration support
+    // Used to decrypt data that was encrypted before device-unique budget IDs
+    const encoder = new TextEncoder();
+    const data = encoder.encode(`budget_seed_${masterPassword}_violet_vault`);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashArray = new Uint8Array(hashBuffer);
+
+    // Convert to hex string and take first 16 characters for reasonable length
+    const hashHex = Array.from(hashArray)
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+
+    const budgetId = `budget_${hashHex.substring(0, 16)}`;
+
+    return budgetId;
+  },
+
   generateHash(data) {
     let hash = 0;
     const str = typeof data === "string" ? data : JSON.stringify(data);
