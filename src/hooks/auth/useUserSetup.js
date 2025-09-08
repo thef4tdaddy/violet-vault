@@ -124,6 +124,15 @@ export const useUserSetup = (onSetupComplete) => {
           return; // Don't show generic error toast
         }
 
+        // Check if this is the no data found error with suggestion to start over
+        if (error?.code === "NO_DATA_FOUND_OFFER_NEW_BUDGET" && error?.canCreateNew) {
+          globalToast.showError(
+            `${error.error}\n\n${error.suggestion}`,
+            "No Data Found - Start Over?"
+          );
+          return; // Don't show generic error toast
+        }
+
         globalToast.showError("Incorrect password. Please try again.", "Login Failed");
       } finally {
         setIsLoading(false);
@@ -177,8 +186,9 @@ export const useUserSetup = (onSetupComplete) => {
 
   // Clear saved profile and start fresh
   const clearSavedProfile = () => {
-    logger.debug("🗑️ Clearing saved profile");
+    logger.debug("🗑️ Clearing saved profile and budget data");
     localStorage.removeItem("userProfile");
+    localStorage.removeItem("envelopeBudgetData"); // Also clear budget data to prevent lockout
     setUserName("");
     setUserColor("#a855f7");
     setStep(1);

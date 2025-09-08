@@ -108,7 +108,10 @@ export const useAuth = create((set, get) => ({
             logger.warn("No saved data found in localStorage for existing user.");
             return {
               success: false,
-              error: "No saved data found. Try creating a new budget.",
+              error: "No budget data found for this password.",
+              suggestion: "Would you like to start fresh with a new budget?",
+              code: "NO_DATA_FOUND_OFFER_NEW_BUDGET",
+              canCreateNew: true,
             };
           }
 
