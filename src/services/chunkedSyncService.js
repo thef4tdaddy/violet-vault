@@ -60,8 +60,9 @@ class ChunkedSyncService {
   constructor() {
     this.budgetId = null;
     this.encryptionKey = null;
-    this.maxChunkSize = 800 * 1024; // 800KB per chunk (under Firestore 1MB limit)
-    this.maxArrayChunkSize = 1000; // Max items per array chunk
+    // Optimized for compression - much more aggressive chunk sizes
+    this.maxChunkSize = 900 * 1024; // 900KB per chunk (compression should keep us under 1MB)
+    this.maxArrayChunkSize = 5000; // 5x larger chunks since compression reduces size dramatically
     this.lastCorruptedDataClear = null; // Track when we last cleared corrupted data
     this.corruptedDataClearCooldown = 5 * 60 * 1000; // 5 minute cooldown between clears
 
@@ -125,9 +126,34 @@ class ChunkedSyncService {
   }
 
   /**
-   * Calculate data size in bytes
+   * Calculate estimated compressed data size in bytes
+   * Uses compression analysis to get realistic size estimates
    */
-  calculateSize(data) {
+  async calculateSize(data) {
+    try {
+      // Dynamic import for optimization utilities
+      const { optimizedSerialization } = await import(
+        "../utils/security/optimizedSerialization.js"
+      );
+
+      // Get compression analysis for size estimation
+      const analysis = optimizedSerialization.analyzeCompression(data);
+
+      if (analysis) {
+        // Return compressed size estimate (more realistic for chunking decisions)
+        logger.debug("Using compressed size estimate", {
+          originalSize: analysis.originalSize,
+          compressedSize: analysis.finalSize,
+          reduction: analysis.totalReduction.toFixed(2) + "x",
+        });
+        return analysis.finalSize;
+      }
+    } catch (error) {
+      // Fallback to original method if compression analysis fails
+      logger.debug("Compression analysis failed, using JSON size", error);
+    }
+
+    // Fallback: original JSON size calculation
     const jsonString = this.safeStringify(data);
     return new Blob([jsonString]).size;
   }
@@ -135,7 +161,7 @@ class ChunkedSyncService {
   /**
    * Chunk large arrays into smaller pieces
    */
-  chunkArray(array, arrayName) {
+  async chunkArray(array, arrayName) {
     if (!Array.isArray(array)) {
       return { [arrayName]: array };
     }
@@ -150,7 +176,8 @@ class ChunkedSyncService {
 
     // Calculate chunk size based on data size and item count
     let chunkSize = this.maxArrayChunkSize;
-    const sampleSize = this.calculateSize(array.slice(0, Math.min(10, array.length)));
+    const sampleData = array.slice(0, Math.min(10, array.length));
+    const sampleSize = await this.calculateSize(sampleData);
     const avgItemSize = sampleSize / Math.min(10, array.length);
 
     if (avgItemSize > 0) {
@@ -288,9 +315,9 @@ class ChunkedSyncService {
           originalKeys: Object.keys(data),
         });
 
-        // Encrypt and save manifest
-        const encryptedManifest = await encryptionUtils.encrypt(
-          this.safeStringify(manifest),
+        // Encrypt and save manifest with optimization
+        const encryptedManifest = await encryptionUtils.encryptOptimized(
+          manifest,
           this.encryptionKey
         );
 
@@ -342,14 +369,13 @@ class ChunkedSyncService {
           const batchChunks = chunkEntries.slice(i, i + batchSize);
 
           for (const [chunkId, chunkData] of batchChunks) {
-            const chunkDataString = this.safeStringify(chunkData);
-            const encryptedChunk = await encryptionUtils.encrypt(
-              chunkDataString,
+            const encryptedChunk = await encryptionUtils.encryptOptimized(
+              chunkData,
               this.encryptionKey
             );
 
             // GitHub Issue #576 Phase 1: Enhanced validation before save
-            const encryptedDataBytes = base64FromBytes(encryptedChunk.encryptedData);
+            const encryptedDataBytes = base64FromBytes(encryptedChunk.data);
             const ivBytes = base64FromBytes(encryptedChunk.iv);
 
             if (encryptedDataBytes.length < 16) {
@@ -361,16 +387,19 @@ class ChunkedSyncService {
 
             const chunkDocument = {
               encryptedData: {
-                data: base64FromBytes(encryptedChunk.encryptedData),
+                data: base64FromBytes(encryptedChunk.data),
                 iv: base64FromBytes(encryptedChunk.iv),
               },
               budgetId: this.budgetId,
               chunkId,
               timestamp: Date.now(),
               validation: {
-                originalSize: chunkDataString.length,
-                checksum: await generateChecksum(chunkDataString),
+                originalSize:
+                  encryptedChunk.metadata?.originalSize || JSON.stringify(chunkData).length,
+                checksum: await generateChecksum(JSON.stringify(chunkData)),
               },
+              // Add compression metadata
+              metadata: encryptedChunk.metadata || {},
             };
 
             batch.set(doc(db, "budgets", this.budgetId, "chunks", chunkId), chunkDocument);
@@ -457,16 +486,12 @@ class ChunkedSyncService {
               );
             }
 
-            // Decrypt manifest
-            const manifestData = await encryptionUtils.decrypt(
-              {
-                data: encryptedDataBytes,
-                iv: ivBytes,
-              },
-              this.encryptionKey
+            // Decrypt manifest with optimization support
+            manifest = await encryptionUtils.decryptOptimized(
+              encryptedDataBytes,
+              this.encryptionKey,
+              ivBytes
             );
-
-            manifest = JSON.parse(manifestData);
           } catch (decryptError) {
             logger.error("❌ Failed to decrypt manifest - may be corrupted or key mismatch", {
               error: decryptError.message,
@@ -552,17 +577,16 @@ class ChunkedSyncService {
                 );
               }
 
-              const decryptedChunk = await encryptionUtils.decrypt(
-                {
-                  data: encryptedDataBytes,
-                  iv: ivBytes,
-                },
-                this.encryptionKey
+              // Decrypt chunk with optimization support
+              const decryptedChunkData = await encryptionUtils.decryptOptimized(
+                encryptedDataBytes,
+                this.encryptionKey,
+                ivBytes
               );
 
               // Post-decryption validation if checksum exists
               if (chunkData.validation?.checksum) {
-                const actualChecksum = await generateChecksum(decryptedChunk);
+                const actualChecksum = await generateChecksum(JSON.stringify(decryptedChunkData));
                 if (actualChecksum !== chunkData.validation.checksum) {
                   logger.warn(`Checksum mismatch for chunk ${chunkData.chunkId}`, {
                     expected: chunkData.validation.checksum,
@@ -571,7 +595,7 @@ class ChunkedSyncService {
                 }
               }
 
-              chunks[chunkData.chunkId] = JSON.parse(decryptedChunk);
+              chunks[chunkData.chunkId] = decryptedChunkData;
             } catch (chunkDecryptError) {
               logger.error("❌ Failed to decrypt chunk - skipping corrupted chunk", {
                 chunkId: chunkData.chunkId,
@@ -710,13 +734,13 @@ class ChunkedSyncService {
    */
   async clearAllData() {
     logger.info("🧹 Clearing all cloud data (full reset)");
-    
+
     // Handle case where budgetId is not set (e.g., during import before initialization)
     if (!this.budgetId) {
       logger.warn("Budget ID not set - skipping cloud data clear (likely during import)");
       return { success: true, message: "Skipped cloud clear - no budget ID set" };
     }
-    
+
     return await this.clearCorruptedData();
   }
 

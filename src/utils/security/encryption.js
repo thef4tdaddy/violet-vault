@@ -1,4 +1,5 @@
 import logger from "../common/logger";
+import { optimizedSerialization } from "./optimizedSerialization";
 
 export const encryptionUtils = {
   async deriveKey(password) {
@@ -165,7 +166,7 @@ export const encryptionUtils = {
     // Import and validate share code
     const { shareCodeUtils } = await import("./shareCodeUtils");
     const normalizedShareCode = shareCodeUtils.normalizeShareCode(shareCode);
-    
+
     if (!shareCodeUtils.validateShareCode(normalizedShareCode)) {
       throw new Error("Invalid share code format - must be exactly 4 valid words");
     }
@@ -187,7 +188,7 @@ export const encryptionUtils = {
 
     logger.info("Generated deterministic budget ID", {
       budgetIdPreview: budgetId.substring(0, 10) + "...",
-      shareCodePreview: normalizedShareCode.split(' ').slice(0, 2).join(' ') + ' ...'
+      shareCodePreview: normalizedShareCode.split(" ").slice(0, 2).join(" ") + " ...",
     });
 
     return budgetId;
@@ -209,6 +210,95 @@ export const encryptionUtils = {
     const budgetId = `budget_${hashHex.substring(0, 16)}`;
 
     return budgetId;
+  },
+
+  /**
+   * Optimized encryption with compression for Firebase storage
+   * Pipeline: Object → Compress → Encrypt → Base64
+   * Reduces storage overhead from 12x to 4-6x
+   */
+  async encryptOptimized(data, key) {
+    try {
+      const startTime = performance.now();
+
+      // Step 1: Analyze compression potential
+      const analysis = optimizedSerialization.analyzeCompression(data);
+      logger.debug("Compression analysis", {
+        originalSize: analysis.originalSize,
+        expectedReduction: analysis.totalReduction.toFixed(2) + "x",
+        spaceSaved: analysis.spaceSavedPercent + "%",
+      });
+
+      // Step 2: Serialize with compression and MessagePack
+      const compressedData = optimizedSerialization.serialize(data);
+
+      // Step 3: Encrypt the compressed binary data
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const encrypted = await crypto.subtle.encrypt(
+        { name: "AES-GCM", iv: iv },
+        key,
+        compressedData
+      );
+
+      const duration = performance.now() - startTime;
+
+      logger.info("Optimized encryption complete", {
+        originalSize: analysis.originalSize,
+        compressedSize: compressedData.length,
+        encryptedSize: encrypted.byteLength,
+        compressionRatio: (analysis.originalSize / compressedData.length).toFixed(2) + "x",
+        totalReduction: (analysis.originalSize / encrypted.byteLength).toFixed(2) + "x",
+        duration: Math.round(duration) + "ms",
+      });
+
+      return {
+        data: Array.from(new Uint8Array(encrypted)),
+        iv: Array.from(iv),
+        metadata: {
+          compressionRatio: analysis.totalReduction,
+          originalSize: analysis.originalSize,
+          compressedSize: compressedData.length,
+          encryptedSize: encrypted.byteLength,
+          optimized: true,
+        },
+      };
+    } catch (error) {
+      logger.error("Optimized encryption failed", error);
+      throw new Error(`Optimized encryption failed: ${error.message}`);
+    }
+  },
+
+  /**
+   * Optimized decryption for compressed data
+   * Pipeline: Base64 → Decrypt → Decompress → Object
+   */
+  async decryptOptimized(encryptedData, key, iv) {
+    try {
+      const startTime = performance.now();
+
+      // Step 1: Decrypt to get compressed binary data
+      const decrypted = await crypto.subtle.decrypt(
+        { name: "AES-GCM", iv: new Uint8Array(iv) },
+        key,
+        new Uint8Array(encryptedData)
+      );
+
+      // Step 2: Deserialize (decompress + MessagePack decode + JSON parse)
+      const data = optimizedSerialization.deserialize(new Uint8Array(decrypted));
+
+      const duration = performance.now() - startTime;
+
+      logger.debug("Optimized decryption complete", {
+        encryptedSize: encryptedData.length,
+        decryptedSize: decrypted.byteLength,
+        duration: Math.round(duration) + "ms",
+      });
+
+      return data;
+    } catch (error) {
+      logger.error("Optimized decryption failed", error);
+      throw new Error(`Optimized decryption failed: ${error.message}`);
+    }
   },
 
   generateHash(data) {

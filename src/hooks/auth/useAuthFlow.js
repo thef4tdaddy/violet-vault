@@ -61,14 +61,14 @@ const useAuthFlow = () => {
         // NEW: Generate share code and deterministic budget ID
         // This replaces the device-specific system with user-controlled share codes
         const { shareCodeUtils } = await import("../../utils/security/shareCodeUtils");
-        
+
         // For new users, generate a fresh share code
         const shareCode = shareCodeUtils.generateShareCode();
         const budgetId = await encryptionUtils.generateBudgetId(password, shareCode);
-        
+
         logger.auth("🔍 Generated new budget with share code system", {
           budgetIdPreview: budgetId.substring(0, 10) + "...",
-          shareCodePreview: shareCode.split(' ').slice(0, 2).join(' ') + ' ...',
+          shareCodePreview: shareCode.split(" ").slice(0, 2).join(" ") + " ...",
           userDataKeys: Object.keys(userData),
           envMode: import.meta?.env?.MODE || "unknown",
         });

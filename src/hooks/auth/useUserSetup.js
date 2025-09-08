@@ -32,17 +32,17 @@ export const useUserSetup = (onSetupComplete) => {
           logger.debug("📋 Found saved profile:", profile);
           setUserName(profile.userName || "");
           setUserColor(profile.userColor || "#a855f7");
-          
+
           // Check for budget data in localStorage first, then Dexie
           let hasBudgetData = !!savedData;
-          
+
           if (!hasBudgetData) {
             try {
               // Check Dexie for budget data
               const envelopeCount = await budgetDb.envelopes.count();
               const billCount = await budgetDb.bills.count();
               hasBudgetData = envelopeCount > 0 || billCount > 0;
-              
+
               if (hasBudgetData) {
                 logger.debug("📋 Found budget data in Dexie", { envelopeCount, billCount });
               }
@@ -50,7 +50,7 @@ export const useUserSetup = (onSetupComplete) => {
               logger.warn("Failed to check Dexie for budget data:", dexieError);
             }
           }
-          
+
           // Only treat as returning user if BOTH profile AND budget data exist
           if (hasBudgetData) {
             setIsReturningUser(true);
@@ -199,11 +199,11 @@ export const useUserSetup = (onSetupComplete) => {
       // Generate share code for Step 3
       const { shareCodeUtils } = await import("../../utils/security/shareCodeUtils");
       const generatedShareCode = shareCodeUtils.generateShareCode();
-      
+
       logger.debug("🔑 Generated share code for new budget", {
-        shareCodePreview: generatedShareCode.split(' ').slice(0, 2).join(' ') + ' ...'
+        shareCodePreview: generatedShareCode.split(" ").slice(0, 2).join(" ") + " ...",
       });
-      
+
       setShareCode(generatedShareCode);
       setStep(3); // Move to share code display step
 

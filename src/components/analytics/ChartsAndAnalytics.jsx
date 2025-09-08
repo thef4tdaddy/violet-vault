@@ -257,60 +257,71 @@ const ChartsAnalytics = ({
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {envelopeHealth.filter(envelope => envelope != null).map((envelope, index) => (
-                <div key={envelope.name || index} className="bg-white/60 rounded-lg p-4 border border-white/20">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center">
-                      <div
-                        className="w-3 h-3 rounded-full mr-2"
-                        style={{ backgroundColor: envelope.color || '#8B5CF6' }}
-                      />
-                      <span className="font-medium text-gray-900">{envelope.name || 'Unknown Envelope'}</span>
-                    </div>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        envelope.status === "critical"
-                          ? "bg-red-100 text-red-800"
-                          : envelope.status === "warning"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : envelope.status === "overfunded"
-                              ? "bg-blue-100 text-blue-800"
-                              : "bg-green-100 text-green-800"
-                      }`}
+                {envelopeHealth
+                  .filter((envelope) => envelope != null)
+                  .map((envelope, index) => (
+                    <div
+                      key={envelope.name || index}
+                      className="bg-white/60 rounded-lg p-4 border border-white/20"
                     >
-                      {envelope.status || 'unknown'}
-                    </span>
-                  </div>
-                  <div className="space-y-1 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Balance:</span>
-                      <span className="font-medium">${(envelope.currentBalance || 0).toFixed(2)}</span>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center">
+                          <div
+                            className="w-3 h-3 rounded-full mr-2"
+                            style={{ backgroundColor: envelope.color || "#8B5CF6" }}
+                          />
+                          <span className="font-medium text-gray-900">
+                            {envelope.name || "Unknown Envelope"}
+                          </span>
+                        </div>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            envelope.status === "critical"
+                              ? "bg-red-100 text-red-800"
+                              : envelope.status === "warning"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : envelope.status === "overfunded"
+                                  ? "bg-blue-100 text-blue-800"
+                                  : "bg-green-100 text-green-800"
+                          }`}
+                        >
+                          {envelope.status || "unknown"}
+                        </span>
+                      </div>
+                      <div className="space-y-1 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Balance:</span>
+                          <span className="font-medium">
+                            ${(envelope.currentBalance || 0).toFixed(2)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Budget:</span>
+                          <span className="font-medium">
+                            ${(envelope.monthlyBudget || 0).toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="mt-2">
+                        <div className="bg-gray-200 rounded-full h-2">
+                          <div
+                            className={`h-2 rounded-full ${
+                              envelope.status === "critical"
+                                ? "bg-red-500"
+                                : envelope.status === "warning"
+                                  ? "bg-yellow-500"
+                                  : envelope.status === "overfunded"
+                                    ? "bg-blue-500"
+                                    : "bg-green-500"
+                            }`}
+                            style={{
+                              width: `${Math.min(100, envelope.healthScore || 0)}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Budget:</span>
-                      <span className="font-medium">${(envelope.monthlyBudget || 0).toFixed(2)}</span>
-                    </div>
-                  </div>
-                  <div className="mt-2">
-                    <div className="bg-gray-200 rounded-full h-2">
-                      <div
-                        className={`h-2 rounded-full ${
-                          envelope.status === "critical"
-                            ? "bg-red-500"
-                            : envelope.status === "warning"
-                              ? "bg-yellow-500"
-                              : envelope.status === "overfunded"
-                                ? "bg-blue-500"
-                                : "bg-green-500"
-                        }`}
-                        style={{
-                          width: `${Math.min(100, envelope.healthScore || 0)}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-                ))}
+                  ))}
               </div>
             )}
           </div>
