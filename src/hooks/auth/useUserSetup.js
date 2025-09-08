@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
+import { budgetDb } from "../../utils/db/budgetDbConfig";
 
 /**
  * User Setup Hook
@@ -19,37 +20,60 @@ export const useUserSetup = (onSetupComplete) => {
 
   // Load saved user profile on component mount
   useEffect(() => {
-    logger.debug("🔍 UserSetup mounted, checking for saved profile");
-    const savedProfile = localStorage.getItem("userProfile");
-    const savedData = localStorage.getItem("envelopeBudgetData");
+    const checkUserData = async () => {
+      logger.debug("🔍 UserSetup mounted, checking for saved profile");
+      const savedProfile = localStorage.getItem("userProfile");
+      const savedData = localStorage.getItem("envelopeBudgetData");
 
-    if (savedProfile) {
-      try {
-        const profile = JSON.parse(savedProfile);
-        logger.debug("📋 Found saved profile:", profile);
-        setUserName(profile.userName || "");
-        setUserColor(profile.userColor || "#a855f7");
-        
-        // Only treat as returning user if BOTH profile AND budget data exist
-        if (savedData) {
-          setIsReturningUser(true);
-          logger.debug("👋 Returning user detected", {
-            hasProfile: !!savedProfile,
-            hasData: !!savedData,
-            userName: profile.userName,
-          });
-        } else {
-          logger.debug("📋 Profile found but no budget data - treating as new user");
+      if (savedProfile) {
+        try {
+          const profile = JSON.parse(savedProfile);
+          logger.debug("📋 Found saved profile:", profile);
+          setUserName(profile.userName || "");
+          setUserColor(profile.userColor || "#a855f7");
+          
+          // Check for budget data in localStorage first, then Dexie
+          let hasBudgetData = !!savedData;
+          
+          if (!hasBudgetData) {
+            try {
+              // Check Dexie for budget data
+              const envelopeCount = await budgetDb.envelopes.count();
+              const billCount = await budgetDb.bills.count();
+              hasBudgetData = envelopeCount > 0 || billCount > 0;
+              
+              if (hasBudgetData) {
+                logger.debug("📋 Found budget data in Dexie", { envelopeCount, billCount });
+              }
+            } catch (dexieError) {
+              logger.warn("Failed to check Dexie for budget data:", dexieError);
+            }
+          }
+          
+          // Only treat as returning user if BOTH profile AND budget data exist
+          if (hasBudgetData) {
+            setIsReturningUser(true);
+            logger.debug("👋 Returning user detected", {
+              hasProfile: !!savedProfile,
+              hasLocalStorageData: !!savedData,
+              hasDexieData: hasBudgetData && !savedData,
+              userName: profile.userName,
+            });
+          } else {
+            logger.debug("📋 Profile found but no budget data - treating as new user");
+            setIsReturningUser(false);
+          }
+        } catch (error) {
+          logger.warn("Failed to load saved profile:", error);
           setIsReturningUser(false);
         }
-      } catch (error) {
-        logger.warn("Failed to load saved profile:", error);
+      } else {
+        logger.debug("📋 No saved profile found, new user");
         setIsReturningUser(false);
       }
-    } else {
-      logger.debug("📋 No saved profile found, new user");
-      setIsReturningUser(false);
-    }
+    };
+
+    checkUserData();
   }, []);
 
   // Timeout utility to prevent hanging operations
