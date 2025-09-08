@@ -12,8 +12,7 @@ export const usePerformanceMonitor = (analyticsData, balanceData) => {
 
   // Calculate budget adherence score
   const calculateBudgetAdherence = (analytics, balance) => {
-    if (!balance.envelopeAnalysis || balance.envelopeAnalysis.length === 0)
-      return 0;
+    if (!balance.envelopeAnalysis || balance.envelopeAnalysis.length === 0) return 0;
 
     const adherenceScores = balance.envelopeAnalysis.map((envelope) => {
       const budget = envelope.monthlyBudget || 0;
@@ -29,8 +28,7 @@ export const usePerformanceMonitor = (analyticsData, balanceData) => {
     });
 
     return Math.round(
-      adherenceScores.reduce((sum, score) => sum + score, 0) /
-        adherenceScores.length,
+      adherenceScores.reduce((sum, score) => sum + score, 0) / adherenceScores.length
     );
   };
 
@@ -39,10 +37,7 @@ export const usePerformanceMonitor = (analyticsData, balanceData) => {
     if (!analytics.totalIncome || analytics.totalIncome === 0) return 0;
 
     const savingsAmount =
-      balance.savingsGoals?.reduce(
-        (total, goal) => total + (goal.currentAmount || 0),
-        0,
-      ) || 0;
+      balance.savingsGoals?.reduce((total, goal) => total + (goal.currentAmount || 0), 0) || 0;
 
     const savingsRate = (savingsAmount / analytics.totalIncome) * 100;
 
@@ -55,16 +50,10 @@ export const usePerformanceMonitor = (analyticsData, balanceData) => {
 
   // Calculate spending efficiency score
   const calculateSpendingEfficiency = (analytics) => {
-    if (
-      !analytics.categoryBreakdown ||
-      analytics.categoryBreakdown.length === 0
-    )
-      return 0;
+    if (!analytics.categoryBreakdown || analytics.categoryBreakdown.length === 0) return 0;
 
     // Calculate spending distribution (Gini coefficient-like measure)
-    const amounts = analytics.categoryBreakdown.map((cat) =>
-      Math.abs(cat.amount),
-    );
+    const amounts = analytics.categoryBreakdown.map((cat) => Math.abs(cat.amount));
     const totalSpending = amounts.reduce((sum, amount) => sum + amount, 0);
 
     if (totalSpending === 0) return 100;
@@ -198,8 +187,7 @@ export const usePerformanceMonitor = (analyticsData, balanceData) => {
       recommendations.push({
         type: "warning",
         title: "Financial Health Needs Attention",
-        message:
-          "Several areas require improvement for better financial stability",
+        message: "Several areas require improvement for better financial stability",
         action: "Prioritize budget planning and expense tracking",
       });
     }
@@ -209,8 +197,7 @@ export const usePerformanceMonitor = (analyticsData, balanceData) => {
       recommendations.push({
         type: "tip",
         title: "Improve Budget Adherence",
-        message:
-          "Set more realistic budget amounts based on historical spending",
+        message: "Set more realistic budget amounts based on historical spending",
         action: "Use the Smart Envelope Suggestions feature",
       });
     }
@@ -251,10 +238,7 @@ export const usePerformanceMonitor = (analyticsData, balanceData) => {
     }
 
     // Calculate individual metrics
-    const budgetAdherence = calculateBudgetAdherence(
-      analyticsData,
-      balanceData,
-    );
+    const budgetAdherence = calculateBudgetAdherence(analyticsData, balanceData);
     const savingsRate = calculateSavingsRate(analyticsData, balanceData);
     const spendingEfficiency = calculateSpendingEfficiency(analyticsData);
     const balanceStability = calculateBalanceStability(balanceData);
@@ -263,7 +247,7 @@ export const usePerformanceMonitor = (analyticsData, balanceData) => {
       budgetAdherence * 0.3 +
         savingsRate * 0.25 +
         spendingEfficiency * 0.25 +
-        balanceStability * 0.2,
+        balanceStability * 0.2
     );
 
     // Generate alerts and recommendations

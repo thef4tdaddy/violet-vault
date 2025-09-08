@@ -36,9 +36,7 @@ vi.mock("../../../utils/common/logger", () => ({
   },
 }));
 
-const {
-  smartCategoryService,
-} = require("../../../services/smartCategoryService");
+const { smartCategoryService } = require("../../../services/smartCategoryService");
 const { useTransactions } = require("../../common/useTransactions");
 const { useEnvelopes } = require("../../budgeting/useEnvelopes");
 
@@ -136,7 +134,7 @@ describe("useSmartCategoryManager", () => {
 
     expect(smartCategoryService.suggestCategories).toHaveBeenCalledWith(
       mockTransactions,
-      mockEnvelopes,
+      mockEnvelopes
     );
     expect(result.current.suggestions).toEqual(mockSuggestions);
     expect(result.current.isAnalyzing).toBe(false);
@@ -229,7 +227,7 @@ describe("useSmartCategoryManager", () => {
 
     expect(smartCategoryService.applyCategoryMapping).toHaveBeenCalledWith(
       mockSuggestions.filter((s) => ["1", "2"].includes(s.transactionId)),
-      mockUpdateTransaction,
+      mockUpdateTransaction
     );
     expect(result.current.isApplying).toBe(false);
   });
@@ -269,9 +267,7 @@ describe("useSmartCategoryManager", () => {
       await result.current.trainModel();
     });
 
-    expect(smartCategoryService.trainCategoryModel).toHaveBeenCalledWith(
-      mockTransactions,
-    );
+    expect(smartCategoryService.trainCategoryModel).toHaveBeenCalledWith(mockTransactions);
   });
 
   it("should get current model accuracy", async () => {
@@ -304,9 +300,7 @@ describe("useSmartCategoryManager", () => {
       recommendedEnvelopes: ["Restaurants", "Entertainment"],
     };
 
-    smartCategoryService.analyzeCategoryPatterns.mockResolvedValue(
-      mockPatterns,
-    );
+    smartCategoryService.analyzeCategoryPatterns.mockResolvedValue(mockPatterns);
 
     const { result } = renderHook(() => useSmartCategoryManager(), {
       wrapper: createWrapper(),

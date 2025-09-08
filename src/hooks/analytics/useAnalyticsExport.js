@@ -6,13 +6,7 @@ import { useCallback } from "react";
  */
 export const useAnalyticsExport = () => {
   const exportAnalyticsData = useCallback((data, currentUser) => {
-    const {
-      dateRange,
-      metrics,
-      monthlyTrends,
-      envelopeSpending,
-      categoryBreakdown,
-    } = data;
+    const { dateRange, metrics, monthlyTrends, envelopeSpending, categoryBreakdown } = data;
 
     const dataToExport = {
       dateRange,

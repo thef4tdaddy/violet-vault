@@ -72,12 +72,8 @@ const SecuritySettings = ({ isOpen, onClose }) => {
                   timeUntilAutoLock,
                 }}
               />
-              <AutoLockSettingsSection
-                {...{ securitySettings, handleSettingChange }}
-              />
-              <ClipboardSecuritySection
-                {...{ securitySettings, handleSettingChange }}
-              />
+              <AutoLockSettingsSection {...{ securitySettings, handleSettingChange }} />
+              <ClipboardSecuritySection {...{ securitySettings, handleSettingChange }} />
               <SecurityLoggingSection
                 {...{
                   securitySettings,

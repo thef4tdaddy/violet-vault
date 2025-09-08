@@ -34,10 +34,8 @@ export const useBillManager = ({
   onError,
 } = {}) => {
   // Data fetching hooks
-  const { data: tanStackTransactions = [], isLoading: transactionsLoading } =
-    useTransactions();
-  const { envelopes: tanStackEnvelopes = [], isLoading: envelopesLoading } =
-    useEnvelopes();
+  const { data: tanStackTransactions = [], isLoading: transactionsLoading } = useTransactions();
+  const { envelopes: tanStackEnvelopes = [], isLoading: envelopesLoading } = useEnvelopes();
   const {
     bills: tanStackBills = [],
     addBill,
@@ -77,7 +75,7 @@ export const useBillManager = ({
         : tanStackTransactions.length
           ? tanStackTransactions
           : budget.allTransactions || [],
-    [propTransactions, tanStackTransactions, budget.allTransactions],
+    [propTransactions, tanStackTransactions, budget.allTransactions]
   );
 
   const envelopes = useMemo(() => {
@@ -95,15 +93,11 @@ export const useBillManager = ({
   const bills = useMemo(() => {
     // Get bills from transactions (existing bills marked in transactions)
     const billsFromTransactions = transactions.filter(
-      (t) => t.isBill || t.type === "bill" || t.category === "bill",
+      (t) => t.isBill || t.type === "bill" || t.category === "bill"
     );
 
     // Combine with TanStack bills and Zustand fallback
-    const allBills = [
-      ...tanStackBills,
-      ...(budget.bills || []),
-      ...billsFromTransactions,
-    ];
+    const allBills = [...tanStackBills, ...(budget.bills || []), ...billsFromTransactions];
 
     // Remove duplicates by ID
     const combinedBills = [];
@@ -145,15 +139,11 @@ export const useBillManager = ({
   }, [bills]);
 
   // Calculate totals for each category
-  const totals = useMemo(
-    () => calculateBillTotals(categorizedBills),
-    [categorizedBills],
-  );
+  const totals = useMemo(() => calculateBillTotals(categorizedBills), [categorizedBills]);
 
   // Apply filters to bills
   const filteredBills = useMemo(() => {
-    const billsToFilter =
-      categorizedBills[viewMode] || categorizedBills.all || [];
+    const billsToFilter = categorizedBills[viewMode] || categorizedBills.all || [];
     const result = filterBills(billsToFilter, filterOptions);
     return result;
   }, [categorizedBills, viewMode, filterOptions]);
@@ -173,11 +163,7 @@ export const useBillManager = ({
     setIsSearching(true);
     try {
       // Use real bill discovery logic
-      const suggestions = generateBillSuggestions(
-        transactions,
-        bills,
-        envelopes,
-      );
+      const suggestions = generateBillSuggestions(transactions, bills, envelopes);
       setDiscoveredBills(suggestions);
       setShowDiscoveryModal(true);
 
@@ -209,7 +195,7 @@ export const useBillManager = ({
         onError?.(error.message || "Failed to add discovered bills");
       }
     },
-    [addBill, onCreateRecurringBill, onError],
+    [addBill, onCreateRecurringBill, onError]
   );
 
   const handleBulkUpdate = useCallback(
@@ -220,7 +206,7 @@ export const useBillManager = ({
         setSelectedBills(new Set());
       }
     },
-    [billOperations],
+    [billOperations]
   );
 
   // UI State Actions

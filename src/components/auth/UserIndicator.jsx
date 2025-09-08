@@ -4,10 +4,7 @@ import ProfileSettings from "./ProfileSettings";
 import KeyManagementSettings from "./KeyManagementSettings";
 
 const UserButton = memo(({ onClick, icon: Icon, label }) => (
-  <button
-    onClick={onClick}
-    className="btn btn-secondary flex items-center rounded-xl"
-  >
+  <button onClick={onClick} className="btn btn-secondary flex items-center rounded-xl">
     {Icon && <Icon className="h-4 w-4 mr-2" />}
     {label}
   </button>
@@ -46,10 +43,7 @@ const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
           {showDropdown && (
             <>
               {/* Backdrop */}
-              <div
-                className="fixed inset-0 z-40"
-                onClick={() => setShowDropdown(false)}
-              />
+              <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
               {/* Dropdown Menu */}
               <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-xl shadow-xl border border-gray-200 ring-1 ring-gray-800/10 py-2 min-w-[180px]">
                 <button

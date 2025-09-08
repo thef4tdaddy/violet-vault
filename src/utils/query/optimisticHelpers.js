@@ -28,7 +28,7 @@ export const optimisticHelpers = {
         return old.map((envelope) =>
           envelope.id === envelopeId
             ? { ...envelope, ...updates, lastModified: Date.now() }
-            : envelope,
+            : envelope
         );
       });
 
@@ -128,27 +128,21 @@ export const optimisticHelpers = {
   updateTransaction: async (queryClient, transactionId, updates) => {
     try {
       // Update TanStack Query cache - single transaction
-      queryClient.setQueryData(
-        queryKeys.transactionById(transactionId),
-        (old) => ({
-          ...old,
-          ...updates,
-          lastModified: Date.now(),
-        }),
-      );
+      queryClient.setQueryData(queryKeys.transactionById(transactionId), (old) => ({
+        ...old,
+        ...updates,
+        lastModified: Date.now(),
+      }));
 
       // Update TanStack Query cache - transaction lists
-      queryClient.setQueriesData(
-        { queryKey: queryKeys.transactions },
-        (old) => {
-          if (!old) return old;
-          return old.map((transaction) =>
-            transaction.id === transactionId
-              ? { ...transaction, ...updates, lastModified: Date.now() }
-              : transaction,
-          );
-        },
-      );
+      queryClient.setQueriesData({ queryKey: queryKeys.transactions }, (old) => {
+        if (!old) return old;
+        return old.map((transaction) =>
+          transaction.id === transactionId
+            ? { ...transaction, ...updates, lastModified: Date.now() }
+            : transaction
+        );
+      });
 
       // Update database
       await budgetDb.transactions.update(transactionId, {
@@ -181,13 +175,10 @@ export const optimisticHelpers = {
       };
 
       // Update TanStack Query cache - transaction lists
-      queryClient.setQueriesData(
-        { queryKey: queryKeys.transactions },
-        (old) => {
-          if (!old) return [transactionWithTimestamp];
-          return [transactionWithTimestamp, ...old];
-        },
-      );
+      queryClient.setQueriesData({ queryKey: queryKeys.transactions }, (old) => {
+        if (!old) return [transactionWithTimestamp];
+        return [transactionWithTimestamp, ...old];
+      });
 
       // Add to database
       await budgetDb.transactions.add(transactionWithTimestamp);
@@ -224,9 +215,7 @@ export const optimisticHelpers = {
       queryClient.setQueriesData({ queryKey: queryKeys.bills }, (old) => {
         if (!old) return old;
         return old.map((bill) =>
-          bill.id === billId
-            ? { ...bill, ...updates, lastModified: Date.now() }
-            : bill,
+          bill.id === billId ? { ...bill, ...updates, lastModified: Date.now() } : bill
         );
       });
 
@@ -260,17 +249,11 @@ export const optimisticHelpers = {
 
       // Update specific metadata queries
       if (updates.unassignedCash !== undefined) {
-        queryClient.setQueryData(
-          queryKeys.unassignedCash(),
-          updates.unassignedCash,
-        );
+        queryClient.setQueryData(queryKeys.unassignedCash(), updates.unassignedCash);
       }
 
       if (updates.actualBalance !== undefined) {
-        queryClient.setQueryData(
-          queryKeys.actualBalance(),
-          updates.actualBalance,
-        );
+        queryClient.setQueryData(queryKeys.actualBalance(), updates.actualBalance);
       }
 
       // Update database
@@ -299,22 +282,14 @@ export const optimisticHelpers = {
       // Process envelope updates
       for (const envelope of envelopes) {
         if (envelope.id) {
-          await optimisticHelpers.updateEnvelope(
-            queryClient,
-            envelope.id,
-            envelope,
-          );
+          await optimisticHelpers.updateEnvelope(queryClient, envelope.id, envelope);
         }
       }
 
       // Process transaction updates
       for (const transaction of transactions) {
         if (transaction.id) {
-          await optimisticHelpers.updateTransaction(
-            queryClient,
-            transaction.id,
-            transaction,
-          );
+          await optimisticHelpers.updateTransaction(queryClient, transaction.id, transaction);
         }
       }
 
@@ -362,10 +337,7 @@ export const optimisticHelpers = {
   /**
    * Create mutation config with automatic optimistic updates
    */
-  createOptimisticMutation: (
-    queryClient,
-    { mutationKey, queryKey, updateFn, rollbackFn },
-  ) => {
+  createOptimisticMutation: (queryClient, { mutationKey, queryKey, updateFn, rollbackFn }) => {
     return {
       mutationKey,
       onMutate: async (variables) => {

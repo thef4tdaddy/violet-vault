@@ -36,10 +36,7 @@ export class ErrorTrackingService {
       const rejectionHandler = (event) => {
         this.addError({
           type: "unhandledRejection",
-          message:
-            event.reason?.message ||
-            String(event.reason) ||
-            "Unhandled promise rejection",
+          message: event.reason?.message || String(event.reason) || "Unhandled promise rejection",
           stack: event.reason?.stack || "No stack trace",
           timestamp: new Date().toISOString(),
         });
@@ -51,7 +48,7 @@ export class ErrorTrackingService {
       // Store listeners for cleanup
       this.errorListeners.push(
         { type: "error", handler: errorHandler },
-        { type: "unhandledrejection", handler: rejectionHandler },
+        { type: "unhandledrejection", handler: rejectionHandler }
       );
 
       // Intercept console methods to capture logs
@@ -97,16 +94,10 @@ export class ErrorTrackingService {
       const logEntry = {
         level,
         message: args
-          .map((arg) =>
-            typeof arg === "object"
-              ? JSON.stringify(arg, null, 2)
-              : String(arg),
-          )
+          .map((arg) => (typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg)))
           .join(" "),
         timestamp: new Date().toISOString(),
-        args: args.map((arg) =>
-          typeof arg === "object" ? "[Object]" : String(arg),
-        ),
+        args: args.map((arg) => (typeof arg === "object" ? "[Object]" : String(arg))),
       };
 
       this.consoleLogs.push(logEntry);
@@ -222,10 +213,10 @@ export class ErrorTrackingService {
     const oneDayAgo = now - 24 * 60 * 60 * 1000;
 
     const recentErrorsHour = this.recentErrors.filter(
-      (error) => new Date(error.timestamp).getTime() > oneHourAgo,
+      (error) => new Date(error.timestamp).getTime() > oneHourAgo
     );
     const recentErrorsDay = this.recentErrors.filter(
-      (error) => new Date(error.timestamp).getTime() > oneDayAgo,
+      (error) => new Date(error.timestamp).getTime() > oneDayAgo
     );
 
     return {

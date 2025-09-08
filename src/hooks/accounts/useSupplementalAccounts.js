@@ -114,7 +114,7 @@ const useSupplementalAccounts = ({
     if (editingAccount && !canEdit) {
       globalToast.showError(
         "Cannot save changes - account is locked by another user",
-        "Account Locked",
+        "Account Locked"
       );
       return;
     }
@@ -194,7 +194,7 @@ const useSupplementalAccounts = ({
       transferringAccount.id,
       transferForm.envelopeId,
       amount,
-      transferForm.description,
+      transferForm.description
     );
 
     setShowTransferModal(false);

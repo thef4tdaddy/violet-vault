@@ -25,25 +25,23 @@ const useAuthFlow = () => {
   const handleSetup = useCallback(
     async (userDataOrPassword) => {
       // Handle both new user (object) and existing user (string) scenarios
-      const isExistingUser = typeof userDataOrPassword === 'string';
+      const isExistingUser = typeof userDataOrPassword === "string";
       const password = isExistingUser ? userDataOrPassword : userDataOrPassword.password;
       const userData = isExistingUser ? null : userDataOrPassword;
-      
-      logger.auth("Layout handleSetup called", { 
+
+      logger.auth("Layout handleSetup called", {
         hasUserData: !!userData,
         isExistingUser,
-        hasPassword: !!password 
+        hasPassword: !!password,
       });
-      logger.auth(
-        "🚨 DEBUG VERSION 2: useAuthFlow.js with debug logging is running!",
-      );
+      logger.auth("🚨 DEBUG VERSION 2: useAuthFlow.js with debug logging is running!");
       try {
         // For existing users, skip budgetId generation and go straight to login
         if (isExistingUser) {
           logger.auth("Existing user login - calling login with password only");
           const result = await login(password, null);
           logger.auth("Existing user login result", { success: !!result });
-          
+
           if (result.success) {
             logger.production("Existing user login successful");
             return result;
@@ -58,14 +56,10 @@ const useAuthFlow = () => {
         }
 
         // New user path - generate budgetId and setup new account
-        const { encryptionUtils } = await import(
-          "../../utils/security/encryption"
-        );
+        const { encryptionUtils } = await import("../../utils/security/encryption");
 
         // Debug: Track source of budget ID problem
-        const generatedBudgetId = await encryptionUtils.generateBudgetId(
-          password,
-        );
+        const generatedBudgetId = await encryptionUtils.generateBudgetId(password);
         logger.auth("🔍 DEBUG: useAuthFlow budget ID investigation", {
           originalUserDataBudgetId: userData.budgetId || "none",
           generatedBudgetId,
@@ -118,7 +112,7 @@ const useAuthFlow = () => {
         showErrorToast(`Setup error: ${error.message}`, "Setup Error");
       }
     },
-    [login, showErrorToast],
+    [login, showErrorToast]
   );
 
   const handleLogout = useCallback(() => {
@@ -129,15 +123,12 @@ const useAuthFlow = () => {
     async (oldPass, newPass) => {
       const result = await changePassword(oldPass, newPass);
       if (!result.success) {
-        showErrorToast(
-          `Password change failed: ${result.error}`,
-          "Password Change Failed",
-        );
+        showErrorToast(`Password change failed: ${result.error}`, "Password Change Failed");
       } else {
         showSuccessToast("Password updated successfully", "Password Changed");
       }
     },
-    [changePassword, showErrorToast, showSuccessToast],
+    [changePassword, showErrorToast, showSuccessToast]
   );
 
   const handleUpdateProfile = useCallback(
@@ -147,7 +138,7 @@ const useAuthFlow = () => {
         throw new Error(result.error);
       }
     },
-    [updateProfile],
+    [updateProfile]
   );
 
   return {

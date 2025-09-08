@@ -19,8 +19,7 @@ import {
  */
 const SummaryCards = () => {
   const { openUnassignedCashModal } = useBudgetStore();
-  const { unassignedCash, isLoading: unassignedCashLoading } =
-    useUnassignedCash();
+  const { unassignedCash, isLoading: unassignedCashLoading } = useUnassignedCash();
   const { actualBalance, updateActualBalance } = useActualBalance();
   const prompt = usePrompt();
 
@@ -29,13 +28,10 @@ const SummaryCards = () => {
   const { savingsGoals = [], isLoading: savingsLoading } = useSavingsGoals();
 
   // Calculate totals from hook data
-  const totalEnvelopeBalance = envelopes.reduce(
-    (sum, env) => sum + (env.currentBalance || 0),
-    0,
-  );
+  const totalEnvelopeBalance = envelopes.reduce((sum, env) => sum + (env.currentBalance || 0), 0);
   const totalSavingsBalance = savingsGoals.reduce(
     (sum, goal) => sum + (goal.currentAmount || 0),
-    0,
+    0
   );
   const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
 
@@ -169,17 +165,7 @@ const SummaryCards = () => {
 };
 
 const SummaryCard = memo(
-  ({
-    icon: _Icon,
-    label,
-    value,
-    color,
-    onClick,
-    clickable,
-    isNegative,
-    subtitle,
-    dataTour,
-  }) => {
+  ({ icon: _Icon, label, value, color, onClick, clickable, isNegative, subtitle, dataTour }) => {
     const colorClasses = {
       purple: "bg-purple-500",
       emerald: "bg-emerald-500",
@@ -216,14 +202,10 @@ const SummaryCard = memo(
           <p className="text-sm font-semibold text-gray-600 mb-1">
             {label}
             {clickable && !isNegative && (
-              <span className="ml-1 text-xs text-gray-400">
-                (click to distribute)
-              </span>
+              <span className="ml-1 text-xs text-gray-400">(click to distribute)</span>
             )}
             {isNegative && (
-              <span className="ml-1 text-xs text-red-500">
-                (overspending - click to address)
-              </span>
+              <span className="ml-1 text-xs text-red-500">(overspending - click to address)</span>
             )}
           </p>
           <p
@@ -251,7 +233,7 @@ const SummaryCard = memo(
         {cardContent}
       </div>
     );
-  },
+  }
 );
 
 export default memo(SummaryCards);

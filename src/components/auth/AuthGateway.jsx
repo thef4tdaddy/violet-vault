@@ -9,8 +9,7 @@ import LocalOnlySetup from "./LocalOnlySetup";
  * AuthGateway - Decides between standard auth, local-only mode, or mode selection
  */
 const AuthGateway = ({ onSetupComplete, onLocalOnlyReady }) => {
-  const { isLocalOnlyMode, localOnlyUser, checkLocalOnlyMode } =
-    useLocalOnlyMode();
+  const { isLocalOnlyMode, localOnlyUser, checkLocalOnlyMode } = useLocalOnlyMode();
   const [authMode, setAuthMode] = useState(null); // null, 'standard', 'local-only'
   const [isCheckingLocalMode, setIsCheckingLocalMode] = useState(true);
 
@@ -88,12 +87,8 @@ const AuthGateway = ({ onSetupComplete, onLocalOnlyReady }) => {
       <div className="glassmorphism rounded-2xl w-full max-w-2xl border-2 border-black shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 p-6 border-b border-white/20 text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome to VioletVault
-          </h1>
-          <p className="text-gray-600">
-            Choose how you'd like to manage your budget
-          </p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to VioletVault</h1>
+          <p className="text-gray-600">Choose how you'd like to manage your budget</p>
         </div>
 
         <div className="p-8">
@@ -107,9 +102,7 @@ const AuthGateway = ({ onSetupComplete, onLocalOnlyReady }) => {
                 {React.createElement(getIcon("Shield"), {
                   className: "h-8 w-8 text-purple-600 mr-3",
                 })}
-                <h3 className="text-xl font-semibold text-gray-900">
-                  Standard Mode
-                </h3>
+                <h3 className="text-xl font-semibold text-gray-900">Standard Mode</h3>
               </div>
               <div className="space-y-3 text-sm text-gray-700">
                 <div className="flex items-start">
@@ -140,9 +133,7 @@ const AuthGateway = ({ onSetupComplete, onLocalOnlyReady }) => {
                 {React.createElement(getIcon("ShieldOff"), {
                   className: "h-8 w-8 text-blue-600 mr-3",
                 })}
-                <h3 className="text-xl font-semibold text-gray-900">
-                  Local-Only Mode
-                </h3>
+                <h3 className="text-xl font-semibold text-gray-900">Local-Only Mode</h3>
               </div>
               <div className="space-y-3 text-sm text-gray-700">
                 <div className="flex items-start">
@@ -169,8 +160,8 @@ const AuthGateway = ({ onSetupComplete, onLocalOnlyReady }) => {
             <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-600">
               <p className="font-medium mb-1">Not sure which to choose?</p>
               <p>
-                Standard Mode is recommended for most users. You can export your
-                data and switch modes later.
+                Standard Mode is recommended for most users. You can export your data and switch
+                modes later.
               </p>
             </div>
           </div>

@@ -39,9 +39,7 @@ describe("validation index exports", () => {
 
     it("should export encryptedDataValidator namespace", () => {
       expect(encryptedDataValidator).toBeDefined();
-      expect(typeof encryptedDataValidator.validateEncryptedData).toBe(
-        "function",
-      );
+      expect(typeof encryptedDataValidator.validateEncryptedData).toBe("function");
     });
 
     it("should export manifestValidator namespace", () => {
@@ -94,7 +92,7 @@ describe("validation index exports", () => {
       };
       const encryptedResult = encryptedDataValidator.validateEncryptedData(
         encryptedData,
-        "namespace-test",
+        "namespace-test"
       );
       expect(encryptedResult.isValid).toBe(true);
 
@@ -104,10 +102,7 @@ describe("validation index exports", () => {
         timestamp: Date.now(),
         chunks: {},
       };
-      const manifestResult = manifestValidator.validateManifest(
-        manifest,
-        "namespace-test",
-      );
+      const manifestResult = manifestValidator.validateManifest(manifest, "namespace-test");
       expect(manifestResult.isValid).toBe(true);
     });
   });
@@ -117,10 +112,10 @@ describe("validation index exports", () => {
       expect(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH).toBeGreaterThan(0);
       expect(VALIDATION_CONSTANTS.MIN_IV_LENGTH).toBeGreaterThan(0);
       expect(VALIDATION_CONSTANTS.MAX_MANIFEST_SIZE).toBeGreaterThan(
-        VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH,
+        VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH
       );
       expect(VALIDATION_CONSTANTS.LARGE_DATA_WARNING_SIZE).toBeGreaterThan(
-        VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH,
+        VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH
       );
       expect(VALIDATION_CONSTANTS.MAX_DATA_AGE_HOURS).toBeGreaterThan(0);
       expect(VALIDATION_CONSTANTS.CLOCK_SKEW_TOLERANCE).toBeGreaterThan(0);
@@ -128,10 +123,10 @@ describe("validation index exports", () => {
 
     it("should have consistent size relationships", () => {
       expect(VALIDATION_CONSTANTS.LARGE_DATA_WARNING_SIZE).toBeLessThan(
-        VALIDATION_CONSTANTS.MAX_MANIFEST_SIZE,
+        VALIDATION_CONSTANTS.MAX_MANIFEST_SIZE
       );
       expect(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH).toBeLessThan(
-        VALIDATION_CONSTANTS.LARGE_DATA_WARNING_SIZE,
+        VALIDATION_CONSTANTS.LARGE_DATA_WARNING_SIZE
       );
     });
   });

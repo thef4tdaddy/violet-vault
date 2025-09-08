@@ -154,7 +154,7 @@ export const calculateAccountTotals = (accounts = []) => {
 
   const totalValue = activeAccounts.reduce(
     (sum, account) => sum + (account.currentBalance || 0),
-    0,
+    0
   );
 
   const expiringAccounts = accounts.filter((account) => {
@@ -164,7 +164,7 @@ export const calculateAccountTotals = (accounts = []) => {
 
   const totalAnnualContributions = activeAccounts.reduce(
     (sum, account) => sum + (account.annualContribution || 0),
-    0,
+    0
   );
 
   return {
@@ -206,10 +206,8 @@ export const getExpirationStatus = (daysUntil) => {
   if (daysUntil === null) return { text: "", color: "text-gray-500" };
   if (daysUntil < 0) return { text: "Expired", color: "text-red-600" };
   if (daysUntil === 0) return { text: "Expires Today", color: "text-red-600" };
-  if (daysUntil <= 30)
-    return { text: `${daysUntil} days left`, color: "text-orange-600" };
-  if (daysUntil <= 90)
-    return { text: `${daysUntil} days left`, color: "text-yellow-600" };
+  if (daysUntil <= 30) return { text: `${daysUntil} days left`, color: "text-orange-600" };
+  if (daysUntil <= 90) return { text: `${daysUntil} days left`, color: "text-yellow-600" };
   return { text: `${daysUntil} days left`, color: "text-green-600" };
 };
 
@@ -273,9 +271,7 @@ export const checkTransferEligibility = (account) => {
   }
 
   // Check if account is expired
-  const daysUntilExpiration = calculateDaysUntilExpiration(
-    account.expirationDate,
-  );
+  const daysUntilExpiration = calculateDaysUntilExpiration(account.expirationDate);
   if (daysUntilExpiration !== null && daysUntilExpiration < 0) {
     return {
       isEligible: false,

@@ -35,10 +35,7 @@ const EnvelopeSummaryCards = ({ totals = {}, unassignedCash = 0 }) => {
       label: "Over Budget",
       value: overBudgetEnvelopes.toString(),
       color: "red",
-      subtext:
-        overBudgetEnvelopes > 0
-          ? `${overBudgetEnvelopes} envelopes`
-          : "All on track",
+      subtext: overBudgetEnvelopes > 0 ? `${overBudgetEnvelopes} envelopes` : "All on track",
       alert: overBudgetEnvelopes > 0,
     },
     {
