@@ -29,12 +29,19 @@ export const useUserSetup = (onSetupComplete) => {
         logger.debug("📋 Found saved profile:", profile);
         setUserName(profile.userName || "");
         setUserColor(profile.userColor || "#a855f7");
-        setIsReturningUser(true);
-        logger.debug("👋 Returning user detected", {
-          hasProfile: !!savedProfile,
-          hasData: !!savedData,
-          userName: profile.userName,
-        });
+        
+        // Only treat as returning user if BOTH profile AND budget data exist
+        if (savedData) {
+          setIsReturningUser(true);
+          logger.debug("👋 Returning user detected", {
+            hasProfile: !!savedProfile,
+            hasData: !!savedData,
+            userName: profile.userName,
+          });
+        } else {
+          logger.debug("📋 Profile found but no budget data - treating as new user");
+          setIsReturningUser(false);
+        }
       } catch (error) {
         logger.warn("Failed to load saved profile:", error);
         setIsReturningUser(false);
