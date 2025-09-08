@@ -106,29 +106,29 @@ const ChartsAnalytics = ({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard
           title="Total Income"
-          value={`$${metrics.totalIncome.toFixed(2)}`}
-          subtitle={`${filteredTransactions.filter((t) => t.amount > 0).length} transactions`}
+          value={`$${(metrics?.totalIncome || 0).toFixed(2)}`}
+          subtitle={`${filteredTransactions?.filter((t) => t?.amount > 0)?.length || 0} transactions`}
           icon={TrendingUp}
           color="emerald"
         />
         <MetricCard
           title="Total Expenses"
-          value={`$${metrics.totalExpenses.toFixed(2)}`}
-          subtitle={`${filteredTransactions.filter((t) => t.amount < 0).length} transactions`}
+          value={`$${(metrics?.totalExpenses || 0).toFixed(2)}`}
+          subtitle={`${filteredTransactions?.filter((t) => t?.amount < 0)?.length || 0} transactions`}
           icon={TrendingDown}
           color="red"
         />
         <MetricCard
           title="Net Cash Flow"
-          value={`${metrics.netCashFlow >= 0 ? "+" : ""}$${metrics.netCashFlow.toFixed(2)}`}
-          subtitle={`${metrics.savingsRate.toFixed(1)}% savings rate`}
+          value={`${(metrics?.netCashFlow || 0) >= 0 ? "+" : ""}$${(metrics?.netCashFlow || 0).toFixed(2)}`}
+          subtitle={`${(metrics?.savingsRate || 0).toFixed(1)}% savings rate`}
           icon={DollarSign}
-          color={metrics.netCashFlow >= 0 ? "cyan" : "amber"}
+          color={(metrics?.netCashFlow || 0) >= 0 ? "cyan" : "amber"}
         />
         <MetricCard
           title="Avg Monthly Expenses"
-          value={`$${metrics.avgMonthlyExpenses.toFixed(2)}`}
-          subtitle={`${monthlyTrends.length} months of data`}
+          value={`$${(metrics?.avgMonthlyExpenses || 0).toFixed(2)}`}
+          subtitle={`${monthlyTrends?.length || 0} months of data`}
           icon={Wallet}
           color="purple"
         />
@@ -163,12 +163,12 @@ const ChartsAnalytics = ({
       {activeTab === "overview" && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Monthly Cash Flow */}
-          <CashFlowChart title="Monthly Cash Flow" data={monthlyTrends} height={300} />
+          <CashFlowChart title="Monthly Cash Flow" data={monthlyTrends || []} height={300} />
 
           {/* Top Spending Envelopes */}
           <DistributionPieChart
             title="Top Spending Envelopes"
-            data={envelopeSpending?.slice(0, 8)}
+            data={envelopeSpending?.slice(0, 8) || []}
             dataKey="amount"
             nameKey="name"
             height={300}
@@ -202,7 +202,7 @@ const ChartsAnalytics = ({
 
             {chartType === "line" && (
               <TrendLineChart
-                data={monthlyTrends}
+                data={monthlyTrends || []}
                 lines={[
                   { dataKey: "income", name: "Income", color: "#10b981" },
                   { dataKey: "expenses", name: "Expenses", color: "#ef4444" },
@@ -214,7 +214,7 @@ const ChartsAnalytics = ({
 
             {chartType === "bar" && (
               <CategoryBarChart
-                data={monthlyTrends}
+                data={monthlyTrends || []}
                 bars={[
                   { dataKey: "income", name: "Income", fill: "#10b981" },
                   { dataKey: "expenses", name: "Expenses", fill: "#ef4444" },
@@ -226,7 +226,7 @@ const ChartsAnalytics = ({
 
             {chartType === "area" && (
               <CashFlowChart
-                data={monthlyTrends}
+                data={monthlyTrends || []}
                 height={400}
                 emptyMessage="No data available for the selected period"
               />
@@ -236,7 +236,7 @@ const ChartsAnalytics = ({
           {/* Weekly Spending Patterns */}
           <CategoryBarChart
             title="Weekly Spending Patterns"
-            data={weeklyPatterns}
+            data={weeklyPatterns || []}
             bars={[{ dataKey: "amount", name: "Amount Spent", fill: "#a855f7" }]}
             height={300}
             emptyMessage="No weekly spending data available"
@@ -249,16 +249,23 @@ const ChartsAnalytics = ({
           {/* Envelope Health Overview */}
           <div className="glassmorphism rounded-xl p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Envelope Health</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {envelopeHealth.map((envelope, index) => (
-                <div key={index} className="bg-white/60 rounded-lg p-4 border border-white/20">
+            {envelopeHealth.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <Wallet className="h-12 w-12 mx-auto mb-3 text-gray-400" />
+                <p>No envelopes to display</p>
+                <p className="text-sm">Create some envelopes to see their health status</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {envelopeHealth.filter(envelope => envelope != null).map((envelope, index) => (
+                <div key={envelope.name || index} className="bg-white/60 rounded-lg p-4 border border-white/20">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center">
                       <div
                         className="w-3 h-3 rounded-full mr-2"
-                        style={{ backgroundColor: envelope.color }}
+                        style={{ backgroundColor: envelope.color || '#8B5CF6' }}
                       />
-                      <span className="font-medium text-gray-900">{envelope.name}</span>
+                      <span className="font-medium text-gray-900">{envelope.name || 'Unknown Envelope'}</span>
                     </div>
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -271,17 +278,17 @@ const ChartsAnalytics = ({
                               : "bg-green-100 text-green-800"
                       }`}
                     >
-                      {envelope.status}
+                      {envelope.status || 'unknown'}
                     </span>
                   </div>
                   <div className="space-y-1 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Balance:</span>
-                      <span className="font-medium">${envelope.currentBalance.toFixed(2)}</span>
+                      <span className="font-medium">${(envelope.currentBalance || 0).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Budget:</span>
-                      <span className="font-medium">${envelope.monthlyBudget.toFixed(2)}</span>
+                      <span className="font-medium">${(envelope.monthlyBudget || 0).toFixed(2)}</span>
                     </div>
                   </div>
                   <div className="mt-2">
@@ -297,25 +304,26 @@ const ChartsAnalytics = ({
                                 : "bg-green-500"
                         }`}
                         style={{
-                          width: `${Math.min(100, envelope.healthScore)}%`,
+                          width: `${Math.min(100, envelope.healthScore || 0)}%`,
                         }}
                       />
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Budget vs Actual */}
-          <BudgetVsActualChart data={budgetVsActual} height={400} />
+          <BudgetVsActualChart data={budgetVsActual || []} height={400} />
         </div>
       )}
 
       {activeTab === "categories" && (
         <DistributionPieChartWithDetails
           title="Spending by Category"
-          data={categoryBreakdown}
+          data={categoryBreakdown || []}
           dataKey="amount"
           nameKey="name"
           maxItems={8}
