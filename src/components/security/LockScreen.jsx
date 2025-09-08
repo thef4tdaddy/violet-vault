@@ -79,6 +79,9 @@ const LockScreen = () => {
         setFailedAttempts(0);
         setError("");
       } else {
+        // Reset loading state immediately to unblock the UI
+        setIsUnlocking(false);
+        
         // Enhanced error message for wrong password
         const shouldCreateNew = await confirm({
           title: "Incorrect Password",
