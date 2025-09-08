@@ -58,18 +58,49 @@ const useAuthFlow = () => {
         // New user path - generate budgetId and setup new account
         const { encryptionUtils } = await import("../../utils/security/encryption");
 
-        // Debug: Track source of budget ID problem
-        const generatedBudgetId = await encryptionUtils.generateBudgetId(password);
+        // Budget ID migration support - try new format first, fallback to legacy
+        const modernBudgetId = await encryptionUtils.generateBudgetId(password);
+        const legacyBudgetId = await encryptionUtils.generateLegacyBudgetId(password);
+        
+        let finalBudgetId = modernBudgetId;
+        
+        // Check if there's cloud data with legacy budget ID that we need to migrate
+        // This happens when users have data from before device-unique budget IDs
+        try {
+          const { chunkedSyncService } = await import("../../services/chunkedSyncService");
+          const { key: encryptionKey } = await encryptionUtils.deriveKey(password);
+          
+          // Try to access cloud data with modern budget ID first
+          await chunkedSyncService.initialize(modernBudgetId, encryptionKey);
+          const cloudData = await chunkedSyncService.loadFromCloud();
+          
+          if (!cloudData) {
+            // No data with modern ID, try legacy ID
+            logger.auth("No cloud data found with modern budget ID, trying legacy format");
+            await chunkedSyncService.initialize(legacyBudgetId, encryptionKey);
+            const legacyCloudData = await chunkedSyncService.loadFromCloud();
+            
+            if (legacyCloudData) {
+              logger.auth("Found cloud data with legacy budget ID - using legacy format for compatibility");
+              finalBudgetId = legacyBudgetId;
+            }
+          }
+        } catch (error) {
+          logger.warn("Budget ID migration check failed, using modern format", error);
+        }
+
         logger.auth("🔍 DEBUG: useAuthFlow budget ID investigation", {
           originalUserDataBudgetId: userData.budgetId || "none",
-          generatedBudgetId,
+          modernBudgetId,
+          legacyBudgetId, 
+          finalBudgetId,
           userDataKeys: Object.keys(userData),
           envMode: import.meta?.env?.MODE || "unknown",
         });
 
         const userDataWithId = {
           ...userData,
-          budgetId: generatedBudgetId,
+          budgetId: finalBudgetId,
         };
 
         logger.auth("Calling login", {
