@@ -155,22 +155,26 @@ export const encryptionUtils = {
     return Math.abs(hash).toString(16);
   },
 
-  async generateBudgetId(masterPassword) {
-    // SECURITY FIX: Device-unique budgetId to prevent password collision attacks
-    // Generate or retrieve persistent device identifier
-    let deviceId = localStorage.getItem("violetVault_deviceId");
-    if (!deviceId) {
-      deviceId = crypto.randomUUID();
-      localStorage.setItem("violetVault_deviceId", deviceId);
-      logger.info("Generated new device identifier for budget isolation", {
-        deviceIdPreview: deviceId.substring(0, 8) + "...",
-      });
+  async generateBudgetId(masterPassword, shareCode) {
+    // NEW: Deterministic budget ID using password + share code
+    // Replaces device-specific system with user-controlled share codes
+    if (!shareCode) {
+      throw new Error("Share code is required for deterministic budget ID generation");
     }
 
-    // Use SHA-256 with password + deviceId to ensure device-unique budgetIds
-    // Same password on different devices = different budgetIds (prevents collisions)
+    // Import and validate share code
+    const { shareCodeUtils } = await import("./shareCodeUtils");
+    const normalizedShareCode = shareCodeUtils.normalizeShareCode(shareCode);
+    
+    if (!shareCodeUtils.validateShareCode(normalizedShareCode)) {
+      throw new Error("Invalid share code format - must be exactly 4 valid words");
+    }
+
+    // Use SHA-256 with password + share code for deterministic cross-device budget ID
     const encoder = new TextEncoder();
-    const data = encoder.encode(`budget_seed_${masterPassword}_${deviceId}_violet_vault`);
+    const data = encoder.encode(
+      `budget_seed_${masterPassword}_${normalizedShareCode}_violet_vault`
+    );
     const hashBuffer = await crypto.subtle.digest("SHA-256", data);
     const hashArray = new Uint8Array(hashBuffer);
 
@@ -180,6 +184,11 @@ export const encryptionUtils = {
       .join("");
 
     const budgetId = `budget_${hashHex.substring(0, 16)}`;
+
+    logger.info("Generated deterministic budget ID", {
+      budgetIdPreview: budgetId.substring(0, 10) + "...",
+      shareCodePreview: normalizedShareCode.split(' ').slice(0, 2).join(' ') + ' ...'
+    });
 
     return budgetId;
   },

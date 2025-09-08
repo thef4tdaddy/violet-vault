@@ -7,6 +7,7 @@ import UserNameInput from "./components/UserNameInput";
 import ColorPicker from "./components/ColorPicker";
 import ReturningUserActions from "./components/ReturningUserActions";
 import StepButtons from "./components/StepButtons";
+import ShareCodeDisplay from "./components/ShareCodeDisplay";
 import JoinBudgetModal from "../sharing/JoinBudgetModal";
 import { useAuth } from "../../stores/auth/authStore";
 import { renderIcon } from "../../utils";
@@ -32,17 +33,20 @@ const UserSetup = ({ onSetupComplete }) => {
     showPassword,
     isLoading,
     isReturningUser,
+    shareCode,
 
     // Actions
     handleSubmit,
     handleStep1Continue,
     handleStartTrackingClick,
+    handleCreateBudget,
     clearSavedProfile,
     handlePasswordChange,
     handleNameChange,
     togglePasswordVisibility,
     switchToChangeProfile,
     goBackToStep1,
+    goBackToStep2,
     setUserColor,
   } = useUserSetup(onSetupComplete);
 
@@ -121,6 +125,16 @@ const UserSetup = ({ onSetupComplete }) => {
               canStartTracking={!!userName.trim()}
             />
           </>
+        )}
+
+        {/* Share Code Display (Step 3) */}
+        {step === 3 && !isReturningUser && (
+          <ShareCodeDisplay
+            shareCode={shareCode}
+            onCreateBudget={handleCreateBudget}
+            onBack={goBackToStep2}
+            isLoading={isLoading}
+          />
         )}
       </form>
 

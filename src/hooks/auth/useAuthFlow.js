@@ -58,49 +58,27 @@ const useAuthFlow = () => {
         // New user path - generate budgetId and setup new account
         const { encryptionUtils } = await import("../../utils/security/encryption");
 
-        // Budget ID migration support - try new format first, fallback to legacy
-        const modernBudgetId = await encryptionUtils.generateBudgetId(password);
-        const legacyBudgetId = await encryptionUtils.generateLegacyBudgetId(password);
+        // NEW: Generate share code and deterministic budget ID
+        // This replaces the device-specific system with user-controlled share codes
+        const { shareCodeUtils } = await import("../../utils/security/shareCodeUtils");
         
-        let finalBudgetId = modernBudgetId;
+        // For new users, generate a fresh share code
+        const shareCode = shareCodeUtils.generateShareCode();
+        const budgetId = await encryptionUtils.generateBudgetId(password, shareCode);
         
-        // Check if there's cloud data with legacy budget ID that we need to migrate
-        // This happens when users have data from before device-unique budget IDs
-        try {
-          const { chunkedSyncService } = await import("../../services/chunkedSyncService");
-          const { key: encryptionKey } = await encryptionUtils.deriveKey(password);
-          
-          // Try to access cloud data with modern budget ID first
-          await chunkedSyncService.initialize(modernBudgetId, encryptionKey);
-          const cloudData = await chunkedSyncService.loadFromCloud();
-          
-          if (!cloudData) {
-            // No data with modern ID, try legacy ID
-            logger.auth("No cloud data found with modern budget ID, trying legacy format");
-            await chunkedSyncService.initialize(legacyBudgetId, encryptionKey);
-            const legacyCloudData = await chunkedSyncService.loadFromCloud();
-            
-            if (legacyCloudData) {
-              logger.auth("Found cloud data with legacy budget ID - using legacy format for compatibility");
-              finalBudgetId = legacyBudgetId;
-            }
-          }
-        } catch (error) {
-          logger.warn("Budget ID migration check failed, using modern format", error);
-        }
-
-        logger.auth("🔍 DEBUG: useAuthFlow budget ID investigation", {
-          originalUserDataBudgetId: userData.budgetId || "none",
-          modernBudgetId,
-          legacyBudgetId, 
-          finalBudgetId,
+        logger.auth("🔍 Generated new budget with share code system", {
+          budgetIdPreview: budgetId.substring(0, 10) + "...",
+          shareCodePreview: shareCode.split(' ').slice(0, 2).join(' ') + ' ...',
           userDataKeys: Object.keys(userData),
           envMode: import.meta?.env?.MODE || "unknown",
         });
 
+        // Store share code for user display
+        userData.shareCode = shareCode;
+
         const userDataWithId = {
           ...userData,
-          budgetId: finalBudgetId,
+          budgetId: budgetId,
         };
 
         logger.auth("Calling login", {
