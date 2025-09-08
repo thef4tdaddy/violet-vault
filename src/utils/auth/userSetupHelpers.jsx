@@ -62,10 +62,19 @@ export const getStepTitle = (step, isReturningUser, userName) => {
     );
   }
 
+  if (step === 2) {
+    return (
+      <span className="uppercase tracking-wider text-black">
+        <span className="text-4xl">S</span>ET <span className="text-4xl">U</span>P{" "}
+        <span className="text-4xl">P</span>ROFILE
+      </span>
+    );
+  }
+
   return (
     <span className="uppercase tracking-wider text-black">
-      <span className="text-4xl">S</span>ET <span className="text-4xl">U</span>P{" "}
-      <span className="text-4xl">P</span>ROFILE
+      <span className="text-4xl">S</span>AVE <span className="text-4xl">Y</span>OUR{" "}
+      <span className="text-4xl">C</span>ODE
     </span>
   );
 };
@@ -90,9 +99,17 @@ export const getStepSubtitle = (step, isReturningUser) => {
     );
   }
 
+  if (step === 2) {
+    return (
+      <span>
+        <span className="text-lg">C</span>HOOSE YOUR NAME AND COLOR FOR TRACKING
+      </span>
+    );
+  }
+
   return (
     <span>
-      <span className="text-lg">C</span>HOOSE YOUR NAME AND COLOR FOR TRACKING
+      <span className="text-lg">S</span>AVE THIS CODE TO ACCESS YOUR BUDGET ON OTHER DEVICES
     </span>
   );
 };

@@ -17,6 +17,7 @@ export const useUserSetup = (onSetupComplete) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isReturningUser, setIsReturningUser] = useState(false);
+  const [shareCode, setShareCode] = useState("");
 
   // Load saved user profile on component mount
   useEffect(() => {
@@ -174,10 +175,10 @@ export const useUserSetup = (onSetupComplete) => {
     }
   };
 
-  // Handle start tracking button click (step 2 alternative submission)
+  // Handle start tracking button click (step 2 -> step 3)
   const handleStartTrackingClick = async (e) => {
     e.preventDefault();
-    logger.debug("🎯 Start Tracking button clicked:", {
+    logger.debug("🎯 Continue to Share Code step clicked:", {
       step,
       masterPassword: !!masterPassword,
       userName: userName.trim(),
@@ -185,7 +186,7 @@ export const useUserSetup = (onSetupComplete) => {
     });
 
     if (!masterPassword || !userName.trim()) {
-      logger.warn("⚠️ Validation failed on Start Tracking:", {
+      logger.warn("⚠️ Validation failed on Continue:", {
         masterPassword: !!masterPassword,
         userName: userName.trim(),
       });
@@ -195,7 +196,40 @@ export const useUserSetup = (onSetupComplete) => {
 
     setIsLoading(true);
     try {
-      logger.debug("🚀 Calling onSetupComplete from Start Tracking...");
+      // Generate share code for Step 3
+      const { shareCodeUtils } = await import("../../utils/security/shareCodeUtils");
+      const generatedShareCode = shareCodeUtils.generateShareCode();
+      
+      logger.debug("🔑 Generated share code for new budget", {
+        shareCodePreview: generatedShareCode.split(' ').slice(0, 2).join(' ') + ' ...'
+      });
+      
+      setShareCode(generatedShareCode);
+      setStep(3); // Move to share code display step
+
+      logger.debug("✅ Moved to Step 3 (Share Code Display)");
+    } catch (error) {
+      logger.error("❌ Setup failed from Start Tracking:", error);
+      globalToast.showError(`Setup failed: ${error.message}`, "Setup Failed");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle final "Create Budget" button click (step 3)
+  const handleCreateBudget = async (e) => {
+    e.preventDefault();
+    logger.debug("🚀 Create Budget button clicked:", {
+      step,
+      masterPassword: !!masterPassword,
+      userName: userName.trim(),
+      userColor,
+      shareCode: !!shareCode,
+    });
+
+    setIsLoading(true);
+    try {
+      logger.debug("🚀 Calling onSetupComplete with share code...");
 
       // Add timeout protection
       await handleWithTimeout(async () => {
@@ -203,12 +237,13 @@ export const useUserSetup = (onSetupComplete) => {
           password: masterPassword,
           userName: userName.trim(),
           userColor,
+          shareCode, // Pass the generated share code
         });
       }, 10000);
 
-      logger.debug("✅ onSetupComplete succeeded from Start Tracking");
+      logger.debug("✅ onSetupComplete succeeded with share code");
     } catch (error) {
-      logger.error("❌ Setup failed from Start Tracking:", error);
+      logger.error("❌ Setup failed with share code:", error);
       globalToast.showError(`Setup failed: ${error.message}`, "Setup Failed");
     } finally {
       setIsLoading(false);
@@ -254,6 +289,11 @@ export const useUserSetup = (onSetupComplete) => {
     setStep(1);
   };
 
+  // Navigate back to step 2 from step 3
+  const goBackToStep2 = () => {
+    setStep(2);
+  };
+
   return {
     // State
     step,
@@ -263,17 +303,20 @@ export const useUserSetup = (onSetupComplete) => {
     showPassword,
     isLoading,
     isReturningUser,
+    shareCode,
 
     // Actions
     handleSubmit,
     handleStep1Continue,
     handleStartTrackingClick,
+    handleCreateBudget,
     clearSavedProfile,
     handlePasswordChange,
     handleNameChange,
     togglePasswordVisibility,
     switchToChangeProfile,
     goBackToStep1,
+    goBackToStep2,
     setUserColor,
 
     // Utilities
