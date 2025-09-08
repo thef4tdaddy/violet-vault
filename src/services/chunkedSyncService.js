@@ -710,6 +710,13 @@ class ChunkedSyncService {
    */
   async clearAllData() {
     logger.info("🧹 Clearing all cloud data (full reset)");
+    
+    // Handle case where budgetId is not set (e.g., during import before initialization)
+    if (!this.budgetId) {
+      logger.warn("Budget ID not set - skipping cloud data clear (likely during import)");
+      return { success: true, message: "Skipped cloud clear - no budget ID set" };
+    }
+    
     return await this.clearCorruptedData();
   }
 
