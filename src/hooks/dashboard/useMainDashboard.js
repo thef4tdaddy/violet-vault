@@ -85,17 +85,7 @@ export const useDashboardCalculations = (
     const difference = actualBalance - totalVirtualBalance;
     const isBalanced = Math.abs(difference) < 0.01; // Allow for rounding differences
 
-    // Debug logging
-    logger.debug("📊 Dashboard Debug:", {
-      envelopesCount: envelopes.length,
-      totalEnvelopeBalance,
-      totalSavingsBalance,
-      unassignedCash,
-      totalVirtualBalance,
-      actualBalance,
-      difference,
-      isBalanced,
-    });
+    // Removed noisy debug log - this calculation runs constantly
 
     return {
       totalEnvelopeBalance,

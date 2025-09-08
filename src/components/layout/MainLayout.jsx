@@ -37,7 +37,7 @@ import { pathToViewMap, viewToPathMap } from "./routeConfig";
 // Heavy components now lazy loaded in ViewRenderer
 
 const Layout = ({ firebaseSync }) => {
-  logger.debug("Layout component is running");
+  // Removed noisy debug log - layout renders constantly
 
   // Consolidated authentication manager
   const auth = useAuthenticationManager();
