@@ -111,7 +111,7 @@ export const useKeyManagementOperations = () => {
     if (!password || password.length < 8) {
       globalToast.showError(
         "Export password must be at least 8 characters long",
-        "Password Too Short",
+        "Password Too Short"
       );
       return false;
     }
@@ -121,17 +121,14 @@ export const useKeyManagementOperations = () => {
   const validateImportRequirements = useCallback(
     (keyFileData, importPassword, vaultPassword, validation) => {
       if (!validation.valid) {
-        globalToast.showError(
-          `Invalid key file: ${validation.error}`,
-          "Invalid Key File",
-        );
+        globalToast.showError(`Invalid key file: ${validation.error}`, "Invalid Key File");
         return false;
       }
 
       if (validation.type === "protected" && !importPassword) {
         globalToast.showError(
           "This key file is password protected. Please enter the export password.",
-          "Password Required",
+          "Password Required"
         );
         return false;
       }
@@ -139,14 +136,14 @@ export const useKeyManagementOperations = () => {
       if (!vaultPassword) {
         globalToast.showError(
           "Please enter your vault password to complete the import.",
-          "Vault Password Required",
+          "Vault Password Required"
         );
         return false;
       }
 
       return true;
     },
-    [],
+    []
   );
 
   const handleFileRead = useCallback(async (file) => {
@@ -157,7 +154,7 @@ export const useKeyManagementOperations = () => {
       logger.error("Failed to read key file:", err);
       globalToast.showError(
         "Failed to read key file. Please check the file format.",
-        "File Read Error",
+        "File Read Error"
       );
       throw err;
     }
@@ -165,17 +162,14 @@ export const useKeyManagementOperations = () => {
 
   const handleImportError = useCallback((err) => {
     logger.error("Import failed:", err);
-    globalToast.showError(
-      "Import failed: " + (err.message || "Unknown error"),
-      "Import Failed",
-    );
+    globalToast.showError("Import failed: " + (err.message || "Unknown error"), "Import Failed");
   }, []);
 
   const handleOperationError = useCallback((operation, err) => {
     logger.error(`${operation} failed:`, err);
     globalToast.showError(
       `${operation} failed: ${err.message || "Unknown error"}`,
-      `${operation} Failed`,
+      `${operation} Failed`
     );
   }, []);
 

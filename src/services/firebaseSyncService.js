@@ -1,13 +1,6 @@
 // Firebase Sync Service - Core synchronization operations
 import { initializeApp } from "firebase/app";
-import {
-  getFirestore,
-  doc,
-  setDoc,
-  getDoc,
-  onSnapshot,
-  serverTimestamp,
-} from "firebase/firestore";
+import { getFirestore, doc, setDoc, getDoc, onSnapshot, serverTimestamp } from "firebase/firestore";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
 import { encryptionUtils } from "../utils/security/encryption";
 import { firebaseConfig } from "../utils/common/firebaseConfig";
@@ -172,10 +165,7 @@ class FirebaseSyncService {
       }
 
       // Encrypt the data
-      const encryptedData = await encryptionUtils.encrypt(
-        JSON.stringify(data),
-        this.encryptionKey,
-      );
+      const encryptedData = await encryptionUtils.encrypt(JSON.stringify(data), this.encryptionKey);
 
       const syncData = {
         encryptedData,
@@ -231,7 +221,7 @@ class FirebaseSyncService {
       // Decrypt the data
       const decryptedData = await encryptionUtils.decrypt(
         cloudData.encryptedData,
-        this.encryptionKey,
+        this.encryptionKey
       );
 
       const parsedData = JSON.parse(decryptedData);
@@ -266,7 +256,7 @@ class FirebaseSyncService {
       (error) => {
         logger.error("Real-time sync error", error);
         this._notifyListeners("sync_error", { error, operation: "realtime" });
-      },
+      }
     );
 
     logger.info("Real-time sync setup complete");

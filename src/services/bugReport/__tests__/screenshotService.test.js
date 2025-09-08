@@ -27,8 +27,7 @@ describe("ScreenshotService", () => {
       // Mock mobile user agent
       Object.defineProperty(navigator, "userAgent", {
         writable: true,
-        value:
-          "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15",
+        value: "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15",
       });
 
       expect(ScreenshotService.detectMobileDevice()).toBe(true);
@@ -141,8 +140,7 @@ describe("ScreenshotService", () => {
     it("should compress screenshot with default options", async () => {
       const testDataUrl = "data:image/png;base64,test";
 
-      const compressed =
-        await ScreenshotService.compressScreenshot(testDataUrl);
+      const compressed = await ScreenshotService.compressScreenshot(testDataUrl);
 
       expect(compressed).toBe("data:image/jpeg;base64,compressed");
       expect(mockCanvas.toDataURL).toHaveBeenCalledWith("image/jpeg", 0.7);
@@ -186,8 +184,7 @@ describe("ScreenshotService", () => {
         sizeKB: 100,
       });
 
-      const result =
-        await ScreenshotService.autoCompressScreenshot(smallDataUrl);
+      const result = await ScreenshotService.autoCompressScreenshot(smallDataUrl);
       expect(result).toBe(smallDataUrl);
     });
 
@@ -198,22 +195,16 @@ describe("ScreenshotService", () => {
         sizeKB: 300,
       });
 
-      vi.spyOn(ScreenshotService, "compressScreenshot").mockResolvedValue(
-        "compressed",
-      );
+      vi.spyOn(ScreenshotService, "compressScreenshot").mockResolvedValue("compressed");
 
-      const result =
-        await ScreenshotService.autoCompressScreenshot(mediumDataUrl);
+      const result = await ScreenshotService.autoCompressScreenshot(mediumDataUrl);
       expect(result).toBe("compressed");
-      expect(ScreenshotService.compressScreenshot).toHaveBeenCalledWith(
-        mediumDataUrl,
-        {
-          quality: 0.8,
-          maxWidth: 1920,
-          maxHeight: 1080,
-          format: "jpeg",
-        },
-      );
+      expect(ScreenshotService.compressScreenshot).toHaveBeenCalledWith(mediumDataUrl, {
+        quality: 0.8,
+        maxWidth: 1920,
+        maxHeight: 1080,
+        format: "jpeg",
+      });
     });
 
     it("should apply moderate compression for large screenshots", async () => {
@@ -223,21 +214,16 @@ describe("ScreenshotService", () => {
         sizeKB: 700,
       });
 
-      vi.spyOn(ScreenshotService, "compressScreenshot").mockResolvedValue(
-        "compressed",
-      );
+      vi.spyOn(ScreenshotService, "compressScreenshot").mockResolvedValue("compressed");
 
       await ScreenshotService.autoCompressScreenshot(largeDataUrl);
 
-      expect(ScreenshotService.compressScreenshot).toHaveBeenCalledWith(
-        largeDataUrl,
-        {
-          quality: 0.6,
-          maxWidth: 1600,
-          maxHeight: 900,
-          format: "jpeg",
-        },
-      );
+      expect(ScreenshotService.compressScreenshot).toHaveBeenCalledWith(largeDataUrl, {
+        quality: 0.6,
+        maxWidth: 1600,
+        maxHeight: 900,
+        format: "jpeg",
+      });
     });
 
     it("should apply aggressive compression for very large screenshots", async () => {
@@ -247,21 +233,16 @@ describe("ScreenshotService", () => {
         sizeKB: 1500,
       });
 
-      vi.spyOn(ScreenshotService, "compressScreenshot").mockResolvedValue(
-        "compressed",
-      );
+      vi.spyOn(ScreenshotService, "compressScreenshot").mockResolvedValue("compressed");
 
       await ScreenshotService.autoCompressScreenshot(veryLargeDataUrl);
 
-      expect(ScreenshotService.compressScreenshot).toHaveBeenCalledWith(
-        veryLargeDataUrl,
-        {
-          quality: 0.5,
-          maxWidth: 1280,
-          maxHeight: 720,
-          format: "jpeg",
-        },
-      );
+      expect(ScreenshotService.compressScreenshot).toHaveBeenCalledWith(veryLargeDataUrl, {
+        quality: 0.5,
+        maxWidth: 1280,
+        maxHeight: 720,
+        format: "jpeg",
+      });
     });
   });
 

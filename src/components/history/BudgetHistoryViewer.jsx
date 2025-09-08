@@ -60,10 +60,7 @@ const BudgetHistoryViewer = ({ onClose }) => {
                 <AlertTriangle className="h-5 w-5 mr-2 text-red-600" />
                 History Error
               </h2>
-              <button
-                onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 text-xl"
-              >
+              <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">
                 ✕
               </button>
             </div>

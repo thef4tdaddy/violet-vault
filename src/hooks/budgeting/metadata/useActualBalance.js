@@ -1,11 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { queryKeys } from "../../../utils/common/queryClient";
-import {
-  getBudgetMetadata,
-  setBudgetMetadata,
-  getActualBalance,
-} from "../../../db/budgetDb";
+import { getBudgetMetadata, setBudgetMetadata, getActualBalance } from "../../../db/budgetDb";
 import BudgetHistoryTracker from "../../../utils/common/budgetHistoryTracker";
 import logger from "../../../utils/common/logger";
 
@@ -26,7 +22,7 @@ export const useActualBalance = () => {
       // Initialize metadata record if it doesn't exist (same as main hook)
       if (!metadata) {
         logger.debug(
-          "TanStack Query: No metadata found in useActualBalance, initializing with defaults",
+          "TanStack Query: No metadata found in useActualBalance, initializing with defaults"
         );
         const defaultMetadata = {
           unassignedCash: 0,
@@ -39,7 +35,7 @@ export const useActualBalance = () => {
         metadata = defaultMetadata;
         logger.debug(
           "TanStack Query: Budget metadata initialized in useActualBalance",
-          defaultMetadata,
+          defaultMetadata
         );
       }
 
@@ -133,7 +129,7 @@ export const useActualBalance = () => {
         return false;
       }
     },
-    [updateActualBalanceMutation, balanceData.actualBalance],
+    [updateActualBalanceMutation, balanceData.actualBalance]
   );
 
   // Utility functions (same as original useActualBalance hook)
@@ -142,17 +138,15 @@ export const useActualBalance = () => {
       if (!balanceData.isActualBalanceManual || !calculatedBalance) return 0;
       return (balanceData.actualBalance || 0) - calculatedBalance;
     },
-    [balanceData.actualBalance, balanceData.isActualBalanceManual],
+    [balanceData.actualBalance, balanceData.isActualBalanceManual]
   );
 
   const shouldConfirmChange = useCallback(
     (newBalance, threshold = 500) => {
-      const changeAmount = Math.abs(
-        newBalance - (balanceData.actualBalance || 0),
-      );
+      const changeAmount = Math.abs(newBalance - (balanceData.actualBalance || 0));
       return changeAmount >= threshold;
     },
-    [balanceData.actualBalance],
+    [balanceData.actualBalance]
   );
 
   const formatBalance = useCallback((balance, options = {}) => {

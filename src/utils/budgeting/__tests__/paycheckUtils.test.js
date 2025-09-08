@@ -39,9 +39,7 @@ describe("paycheckUtils", () => {
       const result = validatePaycheckForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.amount).toBe(
-        "Paycheck amount must be a positive number",
-      );
+      expect(result.errors.amount).toBe("Paycheck amount must be a positive number");
     });
 
     it("should validate amount maximum", () => {
@@ -49,9 +47,7 @@ describe("paycheckUtils", () => {
       const result = validatePaycheckForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.amount).toBe(
-        "Paycheck amount cannot exceed $1,000,000",
-      );
+      expect(result.errors.amount).toBe("Paycheck amount cannot exceed $1,000,000");
     });
 
     it("should require payer name", () => {
@@ -67,9 +63,7 @@ describe("paycheckUtils", () => {
       const result = validatePaycheckForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.payerName).toBe(
-        "Payer name must be less than 100 characters",
-      );
+      expect(result.errors.payerName).toBe("Payer name must be less than 100 characters");
     });
 
     it("should validate allocation mode", () => {
@@ -179,11 +173,7 @@ describe("paycheckUtils", () => {
     ];
 
     it("should calculate standard allocations", () => {
-      const result = calculateEnvelopeAllocations(
-        1000,
-        mockEnvelopes,
-        "allocate",
-      );
+      const result = calculateEnvelopeAllocations(1000, mockEnvelopes, "allocate");
 
       expect(result.allocations).toHaveLength(2);
       expect(result.totalAllocated).toBeCloseTo(276.92, 1); // ~184.62 + ~92.31
@@ -192,11 +182,7 @@ describe("paycheckUtils", () => {
     });
 
     it("should calculate leftover distribution", () => {
-      const result = calculateEnvelopeAllocations(
-        1000,
-        mockEnvelopes,
-        "leftover",
-      );
+      const result = calculateEnvelopeAllocations(1000, mockEnvelopes, "leftover");
 
       expect(result.allocations).toHaveLength(2);
       expect(result.totalAllocated).toBe(1000); // Full amount distributed
@@ -214,24 +200,14 @@ describe("paycheckUtils", () => {
     });
 
     it("should filter out non-auto-allocate envelopes", () => {
-      const result = calculateEnvelopeAllocations(
-        1000,
-        mockEnvelopes,
-        "allocate",
-      );
+      const result = calculateEnvelopeAllocations(1000, mockEnvelopes, "allocate");
 
-      const savingsAllocation = result.allocations.find(
-        (a) => a.envelopeId === "env3",
-      );
+      const savingsAllocation = result.allocations.find((a) => a.envelopeId === "env3");
       expect(savingsAllocation).toBeUndefined();
     });
 
     it("should sort allocations by priority", () => {
-      const result = calculateEnvelopeAllocations(
-        1000,
-        mockEnvelopes,
-        "allocate",
-      );
+      const result = calculateEnvelopeAllocations(1000, mockEnvelopes, "allocate");
 
       // Should be sorted by priority: critical > high > medium > low
       expect(result.allocations[0].priority).toBe("critical");
@@ -257,11 +233,7 @@ describe("paycheckUtils", () => {
     const currentUser = { userName: "Test User" };
 
     it("should create paycheck transaction object", () => {
-      const result = createPaycheckTransaction(
-        formData,
-        allocations,
-        currentUser,
-      );
+      const result = createPaycheckTransaction(formData, allocations, currentUser);
 
       expect(result).toMatchObject({
         amount: 1000,

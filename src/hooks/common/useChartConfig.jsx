@@ -20,7 +20,7 @@ export const useChartConfig = () => {
       "#84cc16",
       "#6366f1",
     ],
-    [],
+    []
   );
 
   // Custom tooltip component
@@ -61,7 +61,7 @@ export const useChartConfig = () => {
         bottom: 5,
       },
     }),
-    [],
+    []
   );
 
   // Chart type configurations
@@ -91,7 +91,7 @@ export const useChartConfig = () => {
         endAngle: 450,
       },
     }),
-    [],
+    []
   );
 
   // Color scheme utilities
@@ -106,12 +106,9 @@ export const useChartConfig = () => {
         actual: "#06b6d4",
       };
 
-      return (
-        categoryColors[category?.toLowerCase()] ||
-        chartColors[index % chartColors.length]
-      );
+      return categoryColors[category?.toLowerCase()] || chartColors[index % chartColors.length];
     },
-    [chartColors],
+    [chartColors]
   );
 
   // Status color utilities
@@ -123,9 +120,7 @@ export const useChartConfig = () => {
       overfunded: type === "text" ? "text-blue-600" : "bg-blue-100",
     };
 
-    return (
-      colors[status] || (type === "text" ? "text-gray-600" : "bg-gray-100")
-    );
+    return colors[status] || (type === "text" ? "text-gray-600" : "bg-gray-100");
   }, []);
 
   // Chart animation configurations
@@ -135,7 +130,7 @@ export const useChartConfig = () => {
       duration: 800,
       type: "ease-in-out",
     }),
-    [],
+    []
   );
 
   // Export utilities
@@ -166,7 +161,7 @@ export const useChartConfig = () => {
         });
       },
     }),
-    [],
+    []
   );
 
   // Responsive breakpoint utilities
@@ -189,9 +184,7 @@ export const useChartConfig = () => {
       },
     };
 
-    return (
-      heights[breakpoint]?.[chartType] || heights[breakpoint]?.default || 300
-    );
+    return heights[breakpoint]?.[chartType] || heights[breakpoint]?.default || 300;
   }, []);
 
   return {

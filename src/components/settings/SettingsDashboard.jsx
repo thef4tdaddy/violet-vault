@@ -14,13 +14,9 @@ import useSettingsSectionRenderer from "../../hooks/settings/useSettingsSectionR
 // Lazy load heavy components
 const ChangePasswordModal = lazy(() => import("../auth/ChangePasswordModal"));
 const ActivityFeed = lazy(() => import("../activity/ActivityFeed"));
-const LocalOnlyModeSettings = lazy(
-  () => import("../auth/LocalOnlyModeSettings"),
-);
+const LocalOnlyModeSettings = lazy(() => import("../auth/LocalOnlyModeSettings"));
 const SecuritySettings = lazy(() => import("./SecuritySettings"));
-const EnvelopeIntegrityChecker = lazy(
-  () => import("./EnvelopeIntegrityChecker"),
-);
+const EnvelopeIntegrityChecker = lazy(() => import("./EnvelopeIntegrityChecker"));
 
 /**
  * Unified Settings Dashboard - Refactored with extracted components
@@ -67,16 +63,11 @@ const SettingsDashboard = ({
     setActiveSection(sectionId);
   }, []);
 
-  const {
-    cloudSyncEnabled,
-    isSyncing,
-    handleToggleCloudSync,
-    handleManualSync,
-  } = useCloudSyncManager();
+  const { cloudSyncEnabled, isSyncing, handleToggleCloudSync, handleManualSync } =
+    useCloudSyncManager();
 
   const { sections } = useSettingsSections();
-  const { handleCreateTestHistory, handleResetConfirmAction } =
-    useSettingsActions();
+  const { handleCreateTestHistory, handleResetConfirmAction } = useSettingsActions();
 
   // Use the extracted section renderer hook
   const { renderSectionContent } = useSettingsSectionRenderer({
@@ -168,18 +159,12 @@ const SettingsDashboard = ({
 
         {/* Security Settings */}
         {showSecuritySettings && securityManager && (
-          <SecuritySettings
-            isOpen={showSecuritySettings}
-            onClose={closeSecuritySettings}
-          />
+          <SecuritySettings isOpen={showSecuritySettings} onClose={closeSecuritySettings} />
         )}
 
         {/* Envelope Integrity Checker */}
         {showEnvelopeChecker && (
-          <EnvelopeIntegrityChecker
-            isOpen={showEnvelopeChecker}
-            onClose={closeEnvelopeChecker}
-          />
+          <EnvelopeIntegrityChecker isOpen={showEnvelopeChecker} onClose={closeEnvelopeChecker} />
         )}
       </Suspense>
     </>

@@ -12,7 +12,7 @@ export const encryptionUtils = {
       encoder.encode(password),
       { name: "PBKDF2" },
       false,
-      ["deriveBits", "deriveKey"],
+      ["deriveBits", "deriveKey"]
     );
 
     const key = await crypto.subtle.deriveKey(
@@ -25,7 +25,7 @@ export const encryptionUtils = {
       keyMaterial,
       { name: "AES-GCM", length: 256 },
       true,
-      ["encrypt", "decrypt"],
+      ["encrypt", "decrypt"]
     );
 
     return key;
@@ -38,7 +38,7 @@ export const encryptionUtils = {
       encoder.encode(password),
       { name: "PBKDF2" },
       false,
-      ["deriveBits", "deriveKey"],
+      ["deriveBits", "deriveKey"]
     );
 
     // Generate deterministic salt from password to ensure same password = same key
@@ -56,7 +56,7 @@ export const encryptionUtils = {
       keyMaterial,
       { name: "AES-GCM", length: 256 },
       true,
-      ["encrypt", "decrypt"],
+      ["encrypt", "decrypt"]
     );
 
     return { key, salt };
@@ -72,7 +72,7 @@ export const encryptionUtils = {
     const encrypted = await crypto.subtle.encrypt(
       { name: "AES-GCM", iv: iv },
       key,
-      encoder.encode(stringData),
+      encoder.encode(stringData)
     );
 
     return {
@@ -99,7 +99,7 @@ export const encryptionUtils = {
       const decrypted = await crypto.subtle.decrypt(
         { name: "AES-GCM", iv: new Uint8Array(iv) },
         key,
-        new Uint8Array(encryptedData),
+        new Uint8Array(encryptedData)
       );
 
       const decoder = new TextDecoder();
@@ -121,7 +121,7 @@ export const encryptionUtils = {
     const decrypted = await crypto.subtle.decrypt(
       { name: "AES-GCM", iv: new Uint8Array(iv) },
       key,
-      new Uint8Array(encryptedData),
+      new Uint8Array(encryptedData)
     );
 
     const decoder = new TextDecoder();
@@ -170,9 +170,7 @@ export const encryptionUtils = {
     // Use SHA-256 with password + deviceId to ensure device-unique budgetIds
     // Same password on different devices = different budgetIds (prevents collisions)
     const encoder = new TextEncoder();
-    const data = encoder.encode(
-      `budget_seed_${masterPassword}_${deviceId}_violet_vault`,
-    );
+    const data = encoder.encode(`budget_seed_${masterPassword}_${deviceId}_violet_vault`);
     const hashBuffer = await crypto.subtle.digest("SHA-256", data);
     const hashArray = new Uint8Array(hashBuffer);
 

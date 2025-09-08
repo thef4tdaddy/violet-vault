@@ -38,10 +38,7 @@ vi.mock("../../../utils/budgeting/envelopeCalculations", () => ({
 
 // Import mocked dependencies
 import useBudgetData from "../../budgeting/useBudgetData";
-import {
-  useUnassignedCash,
-  useActualBalance,
-} from "../../budgeting/useBudgetMetadata";
+import { useUnassignedCash, useActualBalance } from "../../budgeting/useBudgetMetadata";
 import useBills from "../../bills/useBills";
 import { calculateEnvelopeSummary } from "../../../utils/budgeting/envelopeCalculations";
 
@@ -101,9 +98,7 @@ describe("useLayoutData", () => {
     const { result } = renderHook(() => useLayoutData());
 
     expect(result.current.transactions).toHaveLength(2);
-    expect(
-      result.current.transactions.every((t) => typeof t.amount === "number"),
-    ).toBe(true);
+    expect(result.current.transactions.every((t) => typeof t.amount === "number")).toBe(true);
   });
 
   it("should call all required hooks", () => {
@@ -130,11 +125,7 @@ describe("useLayoutData", () => {
 
     renderHook(() => useLayoutData());
 
-    expect(calculateEnvelopeSummary).toHaveBeenCalledWith(
-      mockEnvelopes,
-      [],
-      [],
-    );
+    expect(calculateEnvelopeSummary).toHaveBeenCalledWith(mockEnvelopes, [], []);
   });
 
   it("should handle loading states correctly", () => {

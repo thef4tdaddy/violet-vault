@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  CreditCard,
-  CheckCircle,
-  AlertTriangle,
-  Wallet,
-  RefreshCw,
-} from "lucide-react";
+import { CreditCard, CheckCircle, AlertTriangle, Wallet, RefreshCw } from "lucide-react";
 import EditableBalance from "../ui/EditableBalance";
 
 const AccountBalanceOverview = ({
@@ -24,8 +18,7 @@ const AccountBalanceOverview = ({
     <div className="glassmorphism rounded-2xl p-6 border-2 border-black ring-1 ring-gray-800/10">
       <h2 className="font-black text-black text-base mb-6 flex items-center">
         <CreditCard className="h-5 w-5 mr-2 text-blue-600" />
-        <span className="text-lg">C</span>HECKING{" "}
-        <span className="text-lg">A</span>CCOUNT{" "}
+        <span className="text-lg">C</span>HECKING <span className="text-lg">A</span>CCOUNT{" "}
         <span className="text-lg">D</span>ASHBOARD
       </h2>
 
@@ -68,11 +61,7 @@ const AccountBalanceOverview = ({
         {/* Difference */}
         <div
           className={`rounded-lg p-6 ${
-            isBalanced
-              ? "bg-green-50"
-              : Math.abs(difference) > 10
-                ? "bg-red-50"
-                : "bg-yellow-50"
+            isBalanced ? "bg-green-50" : Math.abs(difference) > 10 ? "bg-red-50" : "bg-yellow-50"
           }`}
         >
           <div className="flex items-center justify-between mb-4">
@@ -100,11 +89,7 @@ const AccountBalanceOverview = ({
           <div className="space-y-3">
             <div
               className={`text-2xl font-bold ${
-                isBalanced
-                  ? "text-green-900"
-                  : difference > 0
-                    ? "text-green-900"
-                    : "text-red-900"
+                isBalanced ? "text-green-900" : difference > 0 ? "text-green-900" : "text-red-900"
               }`}
             >
               {isBalanced

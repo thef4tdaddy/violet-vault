@@ -40,9 +40,7 @@ export const budgetSharingService = {
       const qrData = JSON.stringify({
         type: "violetVault_share",
         shareCode,
-        budgetName: currentUser?.userName
-          ? `${currentUser.userName}'s Budget`
-          : "Shared Budget",
+        budgetName: currentUser?.userName ? `${currentUser.userName}'s Budget` : "Shared Budget",
         version: "1.0",
       });
 

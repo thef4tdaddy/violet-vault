@@ -10,14 +10,12 @@ const ResetConfirmModal = ({ isOpen, onClose, onConfirm }) => {
         <div className="flex items-center gap-3 mb-4">
           <AlertTriangle className="h-6 w-6 text-red-500" />
           <h4 className="font-black text-black text-base">
-            <span className="text-lg">C</span>ONFIRM{" "}
-            <span className="text-lg">D</span>ATA{" "}
+            <span className="text-lg">C</span>ONFIRM <span className="text-lg">D</span>ATA{" "}
             <span className="text-lg">R</span>ESET
           </h4>
         </div>
         <p className="text-purple-900 mb-6">
-          This will permanently delete all your budget data. This action cannot
-          be undone.
+          This will permanently delete all your budget data. This action cannot be undone.
         </p>
         <div className="flex gap-3">
           <button

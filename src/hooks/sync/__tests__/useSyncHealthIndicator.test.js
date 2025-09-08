@@ -20,9 +20,7 @@ jest.mock("../../../utils/common/logger", () => ({
   },
 }));
 
-const {
-  getQuickSyncStatus,
-} = require("../../../utils/sync/masterSyncValidator");
+const { getQuickSyncStatus } = require("../../../utils/sync/masterSyncValidator");
 
 describe("useSyncHealthIndicator", () => {
   beforeEach(() => {
@@ -103,8 +101,7 @@ describe("useSyncHealthIndicator", () => {
   });
 
   it("should monitor background sync activity", () => {
-    const cloudSyncService =
-      require("../../../services/cloudSyncService").cloudSyncService;
+    const cloudSyncService = require("../../../services/cloudSyncService").cloudSyncService;
 
     const { result } = renderHook(() => useSyncHealthIndicator());
 
@@ -146,9 +143,7 @@ describe("useSyncHealthIndicator", () => {
     };
 
     // Mock window.runMasterSyncValidation
-    global.window.runMasterSyncValidation = jest
-      .fn()
-      .mockResolvedValue(mockResults);
+    global.window.runMasterSyncValidation = jest.fn().mockResolvedValue(mockResults);
 
     const { result } = renderHook(() => useSyncHealthIndicator());
 

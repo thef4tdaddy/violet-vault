@@ -41,9 +41,7 @@ const BillFormFields = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Bill Name */}
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Bill Name *
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Bill Name *</label>
           <input
             type="text"
             value={formData.name}
@@ -59,9 +57,7 @@ const BillFormFields = ({
 
         {/* Amount */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Amount *
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Amount *</label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <span className="text-gray-500 sm:text-sm">$</span>
@@ -84,9 +80,7 @@ const BillFormFields = ({
 
         {/* Due Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Due Date *
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Due Date *</label>
           <input
             type="date"
             value={formData.dueDate}
@@ -101,9 +95,7 @@ const BillFormFields = ({
 
         {/* Frequency */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Frequency
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Frequency</label>
           <select
             value={formData.frequency}
             onChange={(e) => updateField("frequency", e.target.value)}
@@ -122,9 +114,7 @@ const BillFormFields = ({
 
         {/* Category */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Category
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
           <select
             value={formData.category}
             onChange={(e) => updateField("category", e.target.value)}
@@ -165,9 +155,7 @@ const BillFormFields = ({
                 onClick={() => updateField("iconName", iconName)}
                 disabled={editingBill && !canEdit}
                 className={`p-3 rounded-lg border-2 hover:border-blue-300 focus:ring-2 focus:ring-blue-500 transition-colors ${
-                  isSelected
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 hover:bg-gray-50"
+                  isSelected ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:bg-gray-50"
                 } ${editingBill && !canEdit ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                 title={iconName}
               >
@@ -191,9 +179,7 @@ const BillFormFields = ({
 
       {/* Notes */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Notes
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
         <textarea
           value={formData.notes}
           onChange={(e) => updateField("notes", e.target.value)}
@@ -233,11 +219,7 @@ const BillFormFields = ({
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 border-2 border-black disabled:opacity-50 flex items-center"
           >
             <Save className="h-4 w-4 mr-2" />
-            {isSubmitting
-              ? "Saving..."
-              : editingBill
-                ? "Update Bill"
-                : "Add Bill"}
+            {isSubmitting ? "Saving..." : editingBill ? "Update Bill" : "Add Bill"}
           </button>
         </div>
       </div>

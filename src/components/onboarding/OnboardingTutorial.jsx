@@ -95,8 +95,7 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
     {
       id: "link-bills",
       title: "Link Bills to Envelopes 🔗",
-      description:
-        "Connect your bills to envelopes so they're automatically budgeted for.",
+      description: "Connect your bills to envelopes so they're automatically budgeted for.",
       target: "[data-tour='envelope-grid']",
       position: "top",
       action: () => startTutorialStep("linkedEnvelopes"),
@@ -113,8 +112,7 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
     {
       id: "track-spending",
       title: "Track Your Spending 💳",
-      description:
-        "Finally, let's go to the Transactions page to track where your money goes.",
+      description: "Finally, let's go to the Transactions page to track where your money goes.",
       target: null,
       position: "center",
       action: () => {
@@ -342,9 +340,7 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               {step.title}
             </h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              {step.description}
-            </p>
+            <p className="text-gray-600 dark:text-gray-300">{step.description}</p>
           </div>
 
           {/* Actions */}
@@ -373,9 +369,7 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
               onClick={nextStep}
               className="flex items-center space-x-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
             >
-              <span>
-                {currentStep === tutorialSteps.length - 1 ? "Finish" : "Next"}
-              </span>
+              <span>{currentStep === tutorialSteps.length - 1 ? "Finish" : "Next"}</span>
               {currentStep === tutorialSteps.length - 1
                 ? React.createElement(getIcon("CheckCircle"), {
                     className: "w-4 h-4",

@@ -2,14 +2,8 @@ import React from "react";
 import { Package, DollarSign, ArrowRight } from "lucide-react";
 import { formatCurrency } from "../../../utils/receipts/receiptHelpers";
 
-const EnvelopeSelectionStep = ({
-  transactionForm,
-  envelopes,
-  handleFormChange,
-}) => {
-  const selectedEnvelope = envelopes.find(
-    (env) => env.id === transactionForm.envelopeId,
-  );
+const EnvelopeSelectionStep = ({ transactionForm, envelopes, handleFormChange }) => {
+  const selectedEnvelope = envelopes.find((env) => env.id === transactionForm.envelopeId);
 
   return (
     <div className="space-y-6">
@@ -25,12 +19,8 @@ const EnvelopeSelectionStep = ({
         <h4 className="font-black text-gray-900 mb-3">TRANSACTION SUMMARY</h4>
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-purple-800">
-              Description:
-            </span>
-            <span className="font-bold text-gray-900">
-              {transactionForm.description}
-            </span>
+            <span className="text-sm font-medium text-purple-800">Description:</span>
+            <span className="font-bold text-gray-900">{transactionForm.description}</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-sm font-medium text-purple-800">Amount:</span>
@@ -40,17 +30,11 @@ const EnvelopeSelectionStep = ({
           </div>
           <div className="flex justify-between items-center">
             <span className="text-sm font-medium text-purple-800">Date:</span>
-            <span className="font-bold text-gray-900">
-              {transactionForm.date}
-            </span>
+            <span className="font-bold text-gray-900">{transactionForm.date}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-purple-800">
-              Category:
-            </span>
-            <span className="font-bold text-gray-900 capitalize">
-              {transactionForm.category}
-            </span>
+            <span className="text-sm font-medium text-purple-800">Category:</span>
+            <span className="font-bold text-gray-900 capitalize">{transactionForm.category}</span>
           </div>
         </div>
       </div>
@@ -76,14 +60,10 @@ const EnvelopeSelectionStep = ({
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <h5 className="font-bold text-gray-900">{envelope.name}</h5>
-                  <p className="text-sm text-purple-800 font-medium">
-                    {envelope.category}
-                  </p>
+                  <p className="text-sm text-purple-800 font-medium">{envelope.category}</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm text-purple-800 font-medium">
-                    Available:
-                  </div>
+                  <div className="text-sm text-purple-800 font-medium">Available:</div>
                   <div className="font-black text-gray-900">
                     {formatCurrency(envelope.allocated - envelope.spent)}
                   </div>
@@ -108,9 +88,7 @@ const EnvelopeSelectionStep = ({
         {envelopes.length === 0 && (
           <div className="text-center py-8 text-gray-500 bg-gray-50/80 backdrop-blur-sm rounded-xl border-2 border-black">
             <Package className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-            <p className="font-medium">
-              No envelopes available. Create an envelope first.
-            </p>
+            <p className="font-medium">No envelopes available. Create an envelope first.</p>
           </div>
         )}
       </div>
@@ -121,33 +99,22 @@ const EnvelopeSelectionStep = ({
           <h4 className="font-black text-gray-900 mb-3">ENVELOPE IMPACT</h4>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-orange-800 font-medium">
-                Current Available:
-              </span>
+              <span className="text-orange-800 font-medium">Current Available:</span>
               <span className="font-bold text-gray-900">
-                {formatCurrency(
-                  selectedEnvelope.allocated - selectedEnvelope.spent,
-                )}
+                {formatCurrency(selectedEnvelope.allocated - selectedEnvelope.spent)}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-orange-800 font-medium">
-                After Transaction:
-              </span>
+              <span className="text-orange-800 font-medium">After Transaction:</span>
               <span
                 className={`font-bold ${
-                  selectedEnvelope.allocated -
-                    selectedEnvelope.spent -
-                    transactionForm.amount >=
-                  0
+                  selectedEnvelope.allocated - selectedEnvelope.spent - transactionForm.amount >= 0
                     ? "text-green-700"
                     : "text-red-700"
                 }`}
               >
                 {formatCurrency(
-                  selectedEnvelope.allocated -
-                    selectedEnvelope.spent -
-                    transactionForm.amount,
+                  selectedEnvelope.allocated - selectedEnvelope.spent - transactionForm.amount
                 )}
               </span>
             </div>

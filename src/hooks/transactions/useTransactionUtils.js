@@ -4,17 +4,17 @@ export const useTransactionUtils = (transactions = []) => {
   // Utility functions
   const getTransactionById = useCallback(
     (id) => transactions.find((t) => t.id === id),
-    [transactions],
+    [transactions]
   );
 
   const getTransactionsByEnvelope = useCallback(
     (envId) => transactions.filter((t) => t.envelopeId === envId),
-    [transactions],
+    [transactions]
   );
 
   const getTransactionsByCategory = useCallback(
     (cat) => transactions.filter((t) => t.category === cat),
-    [transactions],
+    [transactions]
   );
 
   const getAvailableCategories = useCallback(() => {

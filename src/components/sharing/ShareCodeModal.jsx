@@ -28,9 +28,7 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
 
   const generateShareCode = async () => {
     if (!currentUser?.budgetId) {
-      showErrorToast(
-        "Cannot generate share code - user not properly authenticated",
-      );
+      showErrorToast("Cannot generate share code - user not properly authenticated");
       return;
     }
 
@@ -41,7 +39,7 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
       const result = await budgetSharingService.generateShareCode(
         currentUser.budgetId,
         "dummy_password", // TODO: Improve this in future
-        currentUser,
+        currentUser
       );
 
       setShareData(result);
@@ -113,8 +111,7 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-black text-black">
-              <span className="text-2xl">S</span>HARE{" "}
-              <span className="text-2xl">B</span>UDGET
+              <span className="text-2xl">S</span>HARE <span className="text-2xl">B</span>UDGET
             </h2>
             <button
               onClick={onClose}
@@ -174,9 +171,7 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
                         : "bg-purple-600 hover:bg-purple-700 text-white"
                     }`}
                   >
-                    {copied
-                      ? renderIcon("Check", "h-5 w-5")
-                      : renderIcon("Copy", "h-5 w-5")}
+                    {copied ? renderIcon("Check", "h-5 w-5") : renderIcon("Copy", "h-5 w-5")}
                   </button>
                 </div>
               </div>
@@ -207,12 +202,9 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
                 <div className="flex items-start gap-3">
                   {renderIcon("Clock", "h-5 w-5 text-amber-600 mt-0.5")}
                   <div>
-                    <h4 className="font-black text-amber-800 text-sm">
-                      EXPIRES IN 24 HOURS
-                    </h4>
+                    <h4 className="font-black text-amber-800 text-sm">EXPIRES IN 24 HOURS</h4>
                     <p className="text-xs text-amber-700 mt-1">
-                      Share codes automatically expire for security. Generate a
-                      new one if needed.
+                      Share codes automatically expire for security. Generate a new one if needed.
                     </p>
                     <p className="text-xs text-amber-600 mt-2">
                       Expires: {new Date(shareData.expiresAt).toLocaleString()}
@@ -223,15 +215,11 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
 
               {/* Instructions */}
               <div className="bg-purple-50 border-2 border-purple-300 rounded-lg p-4">
-                <h4 className="font-black text-purple-800 text-sm mb-2">
-                  HOW TO USE
-                </h4>
+                <h4 className="font-black text-purple-800 text-sm mb-2">HOW TO USE</h4>
                 <ol className="text-xs text-purple-700 space-y-1">
                   <li>1. Share the code or QR image with trusted users</li>
                   <li>2. They'll scan the QR code or enter the share code</li>
-                  <li>
-                    3. They'll set their own password for local encryption
-                  </li>
+                  <li>3. They'll set their own password for local encryption</li>
                   <li>4. Both of you can now sync to the same budget</li>
                 </ol>
               </div>

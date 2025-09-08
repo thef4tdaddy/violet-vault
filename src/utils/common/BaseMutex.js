@@ -45,9 +45,7 @@ export class BaseMutex {
     }
 
     const duration = Date.now() - this.lockStartTime;
-    logger.debug(
-      `🔓 ${this.name}: ${this.currentOperation} released (${duration}ms)`,
-    );
+    logger.debug(`🔓 ${this.name}: ${this.currentOperation} released (${duration}ms)`);
 
     this.locked = false;
     this.currentOperation = null;

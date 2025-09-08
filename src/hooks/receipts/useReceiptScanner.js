@@ -79,15 +79,13 @@ export const useReceiptScanner = (onReceiptProcessed) => {
         });
       } catch (error) {
         logger.error("❌ Receipt processing failed:", error);
-        setError(
-          "Failed to process receipt. Please try again with a clearer image.",
-        );
+        setError("Failed to process receipt. Please try again with a clearer image.");
         setExtractedData(null);
       } finally {
         setIsProcessing(false);
       }
     },
-    [validateFile],
+    [validateFile]
   );
 
   // Handle drag and drop
@@ -99,7 +97,7 @@ export const useReceiptScanner = (onReceiptProcessed) => {
         handleFileUpload(files[0]);
       }
     },
-    [handleFileUpload],
+    [handleFileUpload]
   );
 
   const handleDragOver = useCallback((e) => {
@@ -113,7 +111,7 @@ export const useReceiptScanner = (onReceiptProcessed) => {
         handleFileUpload(e.target.files[0]);
       }
     },
-    [handleFileUpload],
+    [handleFileUpload]
   );
 
   // Confirm and create transaction
