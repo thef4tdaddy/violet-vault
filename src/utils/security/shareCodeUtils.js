@@ -44,19 +44,30 @@ export const shareCodeUtils = {
    */
   validateShareCode(shareCode) {
     if (!shareCode || typeof shareCode !== "string") {
+      logger.debug("Share code validation failed - invalid input", { shareCode, type: typeof shareCode });
       return false;
     }
 
     const words = shareCode.trim().split(" ");
+    logger.debug("Share code validation - word split", { words, length: words.length });
 
     // Must be exactly 4 words
     if (words.length !== 4) {
+      logger.debug("Share code validation failed - wrong word count", { expected: 4, actual: words.length });
       return false;
     }
 
     // Each word must be valid BIP39 word
     const wordlist = bip39.getDefaultWordlist();
-    return words.every((word) => wordlist.includes(word.toLowerCase()));
+    const invalidWords = words.filter((word) => !wordlist.includes(word.toLowerCase()));
+    
+    if (invalidWords.length > 0) {
+      logger.debug("Share code validation failed - invalid words", { invalidWords, allWords: words });
+      return false;
+    }
+
+    logger.debug("Share code validation passed", { words });
+    return true;
   },
 
   /**
