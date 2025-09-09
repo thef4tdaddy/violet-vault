@@ -184,24 +184,10 @@ const SyncHealthIndicator = () => {
   };
 
   const runFullValidation = async () => {
-    if (typeof window !== "undefined" && window.runMasterSyncValidation) {
-      logger.info("🚀 Running full sync validation from UI...");
-      try {
-        const results = await window.runMasterSyncValidation();
-        // Update status based on results
-        setSyncStatus({
-          isHealthy: results.summary.overallStatus === "ALL_SYSTEMS_GO",
-          status:
-            results.summary.overallStatus === "ALL_SYSTEMS_GO" ? "HEALTHY" : "ISSUES_DETECTED",
-          failedTests: results.summary.totalFailed,
-          lastChecked: new Date().toISOString(),
-          isLoading: false,
-          fullResults: results,
-        });
-      } catch (error) {
-        logger.error("Full validation failed:", error);
-      }
-    }
+    logger.warn("🚫 Sync validation functions are currently hanging and non-functional");
+    // TODO: Fix hanging sync validation functions
+    // The window.runMasterSyncValidation and related functions hang indefinitely
+    // and never resolve their promises. This needs investigation.
   };
 
   return (

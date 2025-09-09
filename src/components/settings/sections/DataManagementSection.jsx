@@ -99,10 +99,9 @@ const DataManagementSection = ({
           
           {/* Debug Info */}
           <div className="mb-3 p-2 bg-gray-100 rounded text-xs">
-            <p>Available functions: {Object.keys(window).filter(k => k.includes('Sync') || k.includes('sync')).join(', ')}</p>
-            <p>getQuickSyncStatus: {typeof window.getQuickSyncStatus}</p>
-            <p>runMasterSyncValidation: {typeof window.runMasterSyncValidation}</p>
-            <p>forceCloudDataReset: {typeof window.forceCloudDataReset}</p>
+            <p><strong>SYNC FUNCTIONS ARE HANGING - THEY NEVER RESOLVE</strong></p>
+            <p>Available: {Object.keys(window).filter(k => k.includes('Sync') || k.includes('sync')).join(', ')}</p>
+            <p>These functions exist but get stuck in async operations and never complete.</p>
           </div>
           
           <div className="space-y-3">
