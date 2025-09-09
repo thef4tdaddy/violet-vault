@@ -97,6 +97,14 @@ const DataManagementSection = ({
             Sync Health Tools
           </h4>
           
+          {/* Debug Info */}
+          <div className="mb-3 p-2 bg-gray-100 rounded text-xs">
+            <p>Available functions: {Object.keys(window).filter(k => k.includes('Sync') || k.includes('sync')).join(', ')}</p>
+            <p>getQuickSyncStatus: {typeof window.getQuickSyncStatus}</p>
+            <p>runMasterSyncValidation: {typeof window.runMasterSyncValidation}</p>
+            <p>forceCloudDataReset: {typeof window.forceCloudDataReset}</p>
+          </div>
+          
           <div className="space-y-3">
             <button
               onClick={async () => {
