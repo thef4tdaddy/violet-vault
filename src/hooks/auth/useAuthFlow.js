@@ -93,14 +93,16 @@ const useAuthFlow = () => {
           "../../utils/security/encryption"
         );
 
-        // NEW: Generate share code and deterministic budget ID
+        // NEW: Use provided share code for deterministic budget ID
         // This replaces the device-specific system with user-controlled share codes
-        const { shareCodeUtils } = await import(
-          "../../utils/security/shareCodeUtils"
-        );
 
-        // For new users, generate a fresh share code
-        const shareCode = shareCodeUtils.generateShareCode();
+        // Use the share code that was generated and shown to the user in Step 3
+        const shareCode = userData.shareCode;
+        if (!shareCode) {
+          throw new Error(
+            "Share code missing from user data - should be provided by setup flow",
+          );
+        }
         const budgetId = await encryptionUtils.generateBudgetId(
           password,
           shareCode,

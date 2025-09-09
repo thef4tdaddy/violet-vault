@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { renderIcon } from "../../utils";
-import { shareCodeUtils } from "../../utils/security/shareCodeUtils";
+import { shareCodeManager } from "../../utils/auth/shareCodeManager";
 import { useAuth } from "../../stores/auth/authStore";
 import { useConfirm } from "../../hooks/common/useConfirm";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
@@ -39,8 +39,8 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
       setIsGenerating(true);
       try {
         const shareCode = currentUser.shareCode;
-        const displayCode = shareCodeUtils.formatForDisplay(shareCode);
-        const qrData = shareCodeUtils.generateQRData(shareCode, currentUser);
+        const displayCode = shareCodeManager.formatForDisplay(shareCode);
+        const qrData = shareCodeManager.generateQRData(shareCode, currentUser);
 
         const result = {
           shareCode: displayCode,
@@ -79,9 +79,9 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
     setIsGenerating(true);
     try {
       // Generate a new 4-word BIP39 share code
-      const shareCode = shareCodeUtils.generateShareCode();
-      const displayCode = shareCodeUtils.formatForDisplay(shareCode);
-      const qrData = shareCodeUtils.generateQRData(shareCode, currentUser);
+      const shareCode = shareCodeManager.generateShareCode();
+      const displayCode = shareCodeManager.formatForDisplay(shareCode);
+      const qrData = shareCodeManager.generateQRData(shareCode, currentUser);
 
       const result = {
         shareCode: displayCode,
