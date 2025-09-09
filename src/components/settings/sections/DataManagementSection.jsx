@@ -100,9 +100,23 @@ const DataManagementSection = ({
           <div className="space-y-3">
             <button
               onClick={() => {
-                console.log("🔄 Settings: Refresh Sync Status clicked");
+                console.log("🔄 Settings: Button click detected!");
+                console.log("🔄 Settings: window object:", typeof window);
+                console.log("🔄 Settings: window.getQuickSyncStatus exists:", typeof window.getQuickSyncStatus);
+                console.log("🔄 Settings: All window functions:", Object.keys(window).filter(key => key.includes('Sync') || key.includes('sync')));
+                
                 if (window.getQuickSyncStatus) {
-                  window.getQuickSyncStatus().then(result => console.log("🔄 Result:", result));
+                  console.log("🔄 Settings: Calling window.getQuickSyncStatus...");
+                  try {
+                    const result = window.getQuickSyncStatus();
+                    console.log("🔄 Settings: Direct result:", result);
+                    if (result && typeof result.then === 'function') {
+                      result.then(finalResult => console.log("🔄 Settings: Promise result:", finalResult))
+                            .catch(error => console.log("🔄 Settings: Promise error:", error));
+                    }
+                  } catch (error) {
+                    console.log("🔄 Settings: Function call error:", error);
+                  }
                 } else {
                   console.log("🔄 ERROR: window.getQuickSyncStatus not found");
                 }
