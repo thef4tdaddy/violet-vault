@@ -26,7 +26,8 @@ export const useAutoFundingData = () => {
         logger.info("Auto-funding data loaded from localStorage", {
           rulesCount: data.rules?.length || 0,
           historyCount: data.executionHistory?.length || 0,
-          undoableCount: data.undoStack?.filter((item) => item.canUndo).length || 0,
+          undoableCount:
+            data.undoStack?.filter((item) => item.canUndo).length || 0,
         });
       }
 
@@ -237,7 +238,10 @@ export const useAutoFundingData = () => {
         currentSize,
         usedSpace,
         availableSpace: Math.max(0, storageQuota - usedSpace),
-        healthScore: Math.min(100, Math.max(0, 100 - (usedSpace / storageQuota) * 100)),
+        healthScore: Math.min(
+          100,
+          Math.max(0, 100 - (usedSpace / storageQuota) * 100),
+        ),
       };
     } catch (error) {
       logger.error("Storage health check failed", error);
@@ -312,7 +316,7 @@ export const useAutoFundingData = () => {
 
       return () => clearInterval(autoSaveInterval);
     },
-    [hasUnsavedChanges, saveData]
+    [hasUnsavedChanges, saveData],
   );
 
   return {

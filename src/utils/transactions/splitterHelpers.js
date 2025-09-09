@@ -19,7 +19,10 @@ export const formatCurrency = (amount) => {
  */
 export const calculateSplitTotals = (originalAmount, splitAllocations) => {
   const original = Math.abs(originalAmount);
-  const allocated = splitAllocations.reduce((sum, split) => sum + Math.abs(split.amount || 0), 0);
+  const allocated = splitAllocations.reduce(
+    (sum, split) => sum + Math.abs(split.amount || 0),
+    0,
+  );
   const remaining = original - allocated;
 
   const isValid = Math.abs(remaining) < 0.01; // Allow for floating point precision
@@ -95,7 +98,10 @@ export const generateSplitId = () => {
 /**
  * Create new split allocation with defaults
  */
-export const createNewSplitAllocation = (defaultCategory = "", defaultAmount = 0) => ({
+export const createNewSplitAllocation = (
+  defaultCategory = "",
+  defaultAmount = 0,
+) => ({
   id: generateSplitId(),
   description: "",
   amount: defaultAmount,
@@ -106,7 +112,11 @@ export const createNewSplitAllocation = (defaultCategory = "", defaultAmount = 0
 /**
  * Smart split algorithm - distribute amount evenly with intelligent defaults
  */
-export const performSmartSplit = (originalAmount, numSplits = 2, availableCategories = []) => {
+export const performSmartSplit = (
+  originalAmount,
+  numSplits = 2,
+  availableCategories = [],
+) => {
   const amountPerSplit = Math.abs(originalAmount) / numSplits;
   const splits = [];
 
@@ -168,7 +178,10 @@ export const hasUnsavedChanges = (currentSplits, originalSplits) => {
 /**
  * Prepare splits for save - clean and validate data
  */
-export const prepareSplitsForSave = (splitAllocations, originalTransactionId) => {
+export const prepareSplitsForSave = (
+  splitAllocations,
+  originalTransactionId,
+) => {
   return splitAllocations.map((split) => ({
     id: split.id,
     originalTransactionId,
@@ -184,8 +197,13 @@ export const prepareSplitsForSave = (splitAllocations, originalTransactionId) =>
  * Calculate split statistics for display
  */
 export const calculateSplitStatistics = (splitAllocations) => {
-  const total = splitAllocations.reduce((sum, split) => sum + Math.abs(split.amount || 0), 0);
-  const categories = [...new Set(splitAllocations.map((s) => s.category).filter(Boolean))];
+  const total = splitAllocations.reduce(
+    (sum, split) => sum + Math.abs(split.amount || 0),
+    0,
+  );
+  const categories = [
+    ...new Set(splitAllocations.map((s) => s.category).filter(Boolean)),
+  ];
   const withEnvelopes = splitAllocations.filter((s) => s.envelopeId).length;
 
   return {
@@ -193,6 +211,7 @@ export const calculateSplitStatistics = (splitAllocations) => {
     splitCount: splitAllocations.length,
     categoryCount: categories.length,
     envelopeCount: withEnvelopes,
-    averageAmount: splitAllocations.length > 0 ? total / splitAllocations.length : 0,
+    averageAmount:
+      splitAllocations.length > 0 ? total / splitAllocations.length : 0,
   };
 };

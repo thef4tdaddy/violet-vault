@@ -6,17 +6,28 @@ import logger from "../../utils/common/logger";
  * Business logic hook for bill detail modal operations
  * Extracted from UI component following Issue #152 pattern
  */
-export const useBillDetail = (bill, onDelete, onMarkPaid, onClose, onEdit, onCreateRecurring) => {
+export const useBillDetail = (
+  bill,
+  onDelete,
+  onMarkPaid,
+  onClose,
+  onEdit,
+  onCreateRecurring,
+) => {
   // Form state
   const [showPaymentForm, setShowPaymentForm] = useState(false);
-  const [paymentAmount, setPaymentAmount] = useState(bill?.amount?.toString() || "");
+  const [paymentAmount, setPaymentAmount] = useState(
+    bill?.amount?.toString() || "",
+  );
 
   const confirm = useConfirm();
 
   // Computed values
   const daysUntilDue = useMemo(() => {
     if (!bill?.dueDate) return null;
-    return Math.ceil((new Date(bill.dueDate) - new Date()) / (1000 * 60 * 60 * 24));
+    return Math.ceil(
+      (new Date(bill.dueDate) - new Date()) / (1000 * 60 * 60 * 24),
+    );
   }, [bill?.dueDate]);
 
   const isOverdue = useMemo(() => {

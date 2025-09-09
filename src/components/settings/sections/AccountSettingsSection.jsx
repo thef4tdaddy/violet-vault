@@ -54,7 +54,9 @@ const AccountSettingsSection = ({
               {renderIcon("Share", "h-5 w-5 text-blue-600 mr-3")}
               <div className="text-left">
                 <p className="font-medium text-gray-900">Share Your Budget</p>
-                <p className="text-sm text-gray-500">Generate a share code for others to join</p>
+                <p className="text-sm text-gray-500">
+                  Generate a share code for others to join
+                </p>
               </div>
             </button>
 
@@ -65,7 +67,9 @@ const AccountSettingsSection = ({
               {renderIcon("UserPlus", "h-5 w-5 text-green-600 mr-3")}
               <div className="text-left">
                 <p className="font-medium text-gray-900">Join Shared Budget</p>
-                <p className="text-sm text-gray-500">Enter a share code to join someone's budget</p>
+                <p className="text-sm text-gray-500">
+                  Enter a share code to join someone's budget
+                </p>
               </div>
             </button>
           </div>
@@ -78,7 +82,9 @@ const AccountSettingsSection = ({
           {renderIcon("Key", "h-5 w-5 text-gray-600 mr-3")}
           <div className="text-left">
             <p className="font-medium text-gray-900">Change Password</p>
-            <p className="text-sm text-gray-500">Update your encryption password</p>
+            <p className="text-sm text-gray-500">
+              Update your encryption password
+            </p>
           </div>
         </button>
 
@@ -87,7 +93,9 @@ const AccountSettingsSection = ({
             {renderIcon("AlertTriangle", "h-5 w-5 text-red-600 mt-0.5 mr-3")}
             <div className="flex-1">
               <h4 className="font-medium text-red-900">Danger Zone</h4>
-              <p className="text-sm text-red-700 mt-1">These actions cannot be undone.</p>
+              <p className="text-sm text-red-700 mt-1">
+                These actions cannot be undone.
+              </p>
               <div className="mt-3 space-y-2">
                 <button
                   onClick={onLogout}
@@ -108,7 +116,10 @@ const AccountSettingsSection = ({
       </div>
 
       {/* Share Code Modal */}
-      <ShareCodeModal isOpen={showShareModal} onClose={() => setShowShareModal(false)} />
+      <ShareCodeModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+      />
 
       {/* Join Budget Modal */}
       <JoinBudgetModal

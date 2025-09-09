@@ -13,7 +13,9 @@ const validateDataStructure = (data) => {
 const checkBudgetIdMismatch = (importedData, currentUser) => {
   const importBudgetId = importedData.exportMetadata?.budgetId;
   const currentBudgetId = currentUser?.budgetId;
-  return importBudgetId && currentBudgetId && importBudgetId !== currentBudgetId;
+  return (
+    importBudgetId && currentBudgetId && importBudgetId !== currentBudgetId
+  );
 };
 
 const unifyTransactions = (importedData) => {

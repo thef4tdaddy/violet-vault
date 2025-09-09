@@ -11,13 +11,17 @@ export const calculateUpdateSummary = (selectedBills, changes) => {
     const change = changes[bill.id];
     return (
       change &&
-      (change.amount !== change.originalAmount || change.dueDate !== change.originalDueDate)
+      (change.amount !== change.originalAmount ||
+        change.dueDate !== change.originalDueDate)
     );
   });
 
   const totalAmountChange = changedBills.reduce((sum, bill) => {
     const change = changes[bill.id];
-    return sum + (Math.abs(change?.amount || 0) - Math.abs(change?.originalAmount || 0));
+    return (
+      sum +
+      (Math.abs(change?.amount || 0) - Math.abs(change?.originalAmount || 0))
+    );
   }, 0);
 
   return {
@@ -40,7 +44,10 @@ export const validateBillChange = (originalBill, change) => {
   }
 
   // Validate amount
-  if (change.amount !== undefined && (isNaN(change.amount) || change.amount < 0)) {
+  if (
+    change.amount !== undefined &&
+    (isNaN(change.amount) || change.amount < 0)
+  ) {
     errors.push("Amount must be a positive number");
   }
 
@@ -60,7 +67,10 @@ export const validateBillChange = (originalBill, change) => {
  */
 export const hasChanges = (change) => {
   if (!change) return false;
-  return change.amount !== change.originalAmount || change.dueDate !== change.originalDueDate;
+  return (
+    change.amount !== change.originalAmount ||
+    change.dueDate !== change.originalDueDate
+  );
 };
 
 /**

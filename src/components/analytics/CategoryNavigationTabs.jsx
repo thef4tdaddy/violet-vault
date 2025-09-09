@@ -1,7 +1,12 @@
 import React from "react";
 import { getIcon } from "../../utils";
 
-const CategoryNavigationTabs = ({ activeTab, onTabChange, suggestionCount, categoryCount }) => {
+const CategoryNavigationTabs = ({
+  activeTab,
+  onTabChange,
+  suggestionCount,
+  categoryCount,
+}) => {
   const tabs = [
     {
       id: "suggestions",

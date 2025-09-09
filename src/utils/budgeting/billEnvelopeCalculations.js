@@ -27,7 +27,9 @@ export const calculateBillEnvelopeNeeds = (envelope, bills = []) => {
   }
 
   // Find bills linked to this envelope
-  const linkedBills = bills.filter((bill) => bill.envelopeId === envelope.id && !bill.isPaid);
+  const linkedBills = bills.filter(
+    (bill) => bill.envelopeId === envelope.id && !bill.isPaid,
+  );
 
   // Get the next upcoming bill (earliest due date)
   const upcomingBills = linkedBills
@@ -35,7 +37,9 @@ export const calculateBillEnvelopeNeeds = (envelope, bills = []) => {
     .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
 
   const nextBill = upcomingBills[0];
-  const nextBillAmount = nextBill ? nextBill.amount || nextBill.estimatedAmount || 0 : 0;
+  const nextBillAmount = nextBill
+    ? nextBill.amount || nextBill.estimatedAmount || 0
+    : 0;
   const nextBillDate = nextBill ? new Date(nextBill.dueDate) : null;
 
   // Calculate days until next bill
@@ -52,7 +56,8 @@ export const calculateBillEnvelopeNeeds = (envelope, bills = []) => {
 
   // For bill envelopes, target should be the actual bill amount, not biweekly * multiplier
   // The biweekly allocation is how much to save per paycheck, target is the bill amount
-  const targetMonthlyAmount = nextBillAmount || biweeklyAllocation * BIWEEKLY_MULTIPLIER;
+  const targetMonthlyAmount =
+    nextBillAmount || biweeklyAllocation * BIWEEKLY_MULTIPLIER;
 
   // Calculate remaining to fund for next bill
   const remainingToFund = Math.max(0, nextBillAmount - currentBalance);
@@ -122,7 +127,8 @@ export const calculateBillEnvelopePriority = (envelope, bills = []) => {
     };
   }
 
-  const { remainingToFund, daysUntilNextBill, isFullyFunded, nextBillAmount } = calculations;
+  const { remainingToFund, daysUntilNextBill, isFullyFunded, nextBillAmount } =
+    calculations;
 
   if (isFullyFunded) {
     return {
@@ -141,7 +147,8 @@ export const calculateBillEnvelopePriority = (envelope, bills = []) => {
   }
 
   // Calculate urgency based on days and funding gap
-  const fundingGapPercent = nextBillAmount > 0 ? (remainingToFund / nextBillAmount) * 100 : 0;
+  const fundingGapPercent =
+    nextBillAmount > 0 ? (remainingToFund / nextBillAmount) * 100 : 0;
 
   if (daysUntilNextBill <= 3 && remainingToFund > 0) {
     return {
@@ -189,7 +196,11 @@ export const calculateBillEnvelopePriority = (envelope, bills = []) => {
  * @param {number} availableCash - Available unassigned cash
  * @returns {Object} Funding recommendation
  */
-export const getRecommendedBillFunding = (envelope, bills = [], availableCash = 0) => {
+export const getRecommendedBillFunding = (
+  envelope,
+  bills = [],
+  availableCash = 0,
+) => {
   const calculations = calculateBillEnvelopeNeeds(envelope, bills);
   const priority = calculateBillEnvelopePriority(envelope, bills);
 
@@ -207,7 +218,10 @@ export const getRecommendedBillFunding = (envelope, bills = [], availableCash = 
   }
 
   // For critical/high priority, recommend full remaining amount if available
-  if (priority.priorityLevel === "critical" || priority.priorityLevel === "high") {
+  if (
+    priority.priorityLevel === "critical" ||
+    priority.priorityLevel === "high"
+  ) {
     const recommendedAmount = Math.min(remainingToFund, availableCash);
     return {
       recommendedAmount,
@@ -222,7 +236,7 @@ export const getRecommendedBillFunding = (envelope, bills = [], availableCash = 
     const biweeklyAmount = biweeklyAllocation || 0;
     const recommendedAmount = Math.min(
       Math.max(biweeklyAmount, remainingToFund * 0.5),
-      availableCash
+      availableCash,
     );
     return {
       recommendedAmount,
@@ -232,7 +246,10 @@ export const getRecommendedBillFunding = (envelope, bills = [], availableCash = 
   }
 
   // Low priority - minimal funding
-  const minimalFunding = Math.min(biweeklyAllocation || 25, availableCash * 0.1);
+  const minimalFunding = Math.min(
+    biweeklyAllocation || 25,
+    availableCash * 0.1,
+  );
   return {
     recommendedAmount: minimalFunding,
     reason: "Low priority - minimal funding suggested",
@@ -320,7 +337,7 @@ export const getBillEnvelopeDisplayInfo = (envelope, bills = []) => {
           const cycleDays = frequencyDays[nextBill.frequency] || 30;
           const progressThroughCycle = Math.max(
             0,
-            Math.min(1, (cycleDays - daysUntilNextBill) / cycleDays)
+            Math.min(1, (cycleDays - daysUntilNextBill) / cycleDays),
           );
           const expectedFunding = targetAmount * progressThroughCycle;
 

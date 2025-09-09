@@ -412,7 +412,8 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
                     </button>
                   </div>
                   <p className="text-xs text-gray-600 mt-1">
-                    Enter the same password the budget creator used when they first created the budget.
+                    Enter the same password the budget creator used when they
+                    first created the budget.
                   </p>
                 </div>
               </div>

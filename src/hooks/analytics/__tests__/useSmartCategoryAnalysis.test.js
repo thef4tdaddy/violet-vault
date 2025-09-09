@@ -46,7 +46,7 @@ describe("useSmartCategoryAnalysis", () => {
       useSmartCategoryAnalysis(mockTransactions, mockBills, "30", {
         minTransactionCount: 2,
         minAmount: 20,
-      })
+      }),
     );
 
     expect(result.current.transactionAnalysis).toBeDefined();
@@ -54,7 +54,7 @@ describe("useSmartCategoryAnalysis", () => {
 
     // Should suggest categorizing Amazon transactions
     const amazonSuggestion = result.current.transactionAnalysis.find(
-      (suggestion) => suggestion.id === "transaction_amazon"
+      (suggestion) => suggestion.id === "transaction_amazon",
     );
     expect(amazonSuggestion).toBeDefined();
     expect(amazonSuggestion?.affectedTransactions).toBe(2);
@@ -62,7 +62,7 @@ describe("useSmartCategoryAnalysis", () => {
 
   it("should analyze bill patterns correctly", () => {
     const { result } = renderHook(() =>
-      useSmartCategoryAnalysis(mockTransactions, mockBills, "30")
+      useSmartCategoryAnalysis(mockTransactions, mockBills, "30"),
     );
 
     expect(result.current.billAnalysis).toBeDefined();
@@ -70,7 +70,7 @@ describe("useSmartCategoryAnalysis", () => {
 
     // Should suggest utility categories for electric bill
     const utilitySuggestion = result.current.billAnalysis.find(
-      (suggestion) => suggestion.suggestedCategory === "Utilities"
+      (suggestion) => suggestion.suggestedCategory === "Utilities",
     );
     expect(utilitySuggestion).toBeDefined();
   });
@@ -85,27 +85,45 @@ describe("useSmartCategoryAnalysis", () => {
     };
 
     const { result } = renderHook(() =>
-      useSmartCategoryAnalysis([...mockTransactions, oldTransaction], mockBills, "30")
+      useSmartCategoryAnalysis(
+        [...mockTransactions, oldTransaction],
+        mockBills,
+        "30",
+      ),
     );
 
     // Old transaction should be filtered out
     expect(result.current.filteredTransactions).toHaveLength(3);
-    expect(result.current.filteredTransactions.find((t) => t.id === 4)).toBeUndefined();
+    expect(
+      result.current.filteredTransactions.find((t) => t.id === 4),
+    ).toBeUndefined();
   });
 
   it("should extract merchant names correctly", () => {
-    const { result } = renderHook(() => useSmartCategoryAnalysis(mockTransactions, mockBills));
+    const { result } = renderHook(() =>
+      useSmartCategoryAnalysis(mockTransactions, mockBills),
+    );
 
-    const merchantName = result.current.extractMerchantName("Amazon Purchase #12345");
+    const merchantName = result.current.extractMerchantName(
+      "Amazon Purchase #12345",
+    );
     expect(merchantName).toBe("amazon purchase");
   });
 
   it("should suggest bill categories correctly", () => {
-    const { result } = renderHook(() => useSmartCategoryAnalysis(mockTransactions, mockBills));
+    const { result } = renderHook(() =>
+      useSmartCategoryAnalysis(mockTransactions, mockBills),
+    );
 
-    expect(result.current.suggestBillCategory("Electric Power Company")).toBe("Utilities");
-    expect(result.current.suggestBillCategory("Internet Service Provider")).toBe("Communications");
-    expect(result.current.suggestBillCategory("Netflix Streaming")).toBe("Entertainment");
+    expect(result.current.suggestBillCategory("Electric Power Company")).toBe(
+      "Utilities",
+    );
+    expect(
+      result.current.suggestBillCategory("Internet Service Provider"),
+    ).toBe("Communications");
+    expect(result.current.suggestBillCategory("Netflix Streaming")).toBe(
+      "Entertainment",
+    );
     expect(result.current.suggestBillCategory("Unknown Bill")).toBeNull();
   });
 
@@ -122,7 +140,7 @@ describe("useSmartCategoryAnalysis", () => {
       useSmartCategoryAnalysis(mockTransactions, mockBills, "30", {
         minTransactionCount: 10, // Very high threshold
         minAmount: 1000,
-      })
+      }),
     );
 
     // With high thresholds, no suggestions should be generated

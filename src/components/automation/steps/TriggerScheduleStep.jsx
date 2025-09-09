@@ -48,20 +48,26 @@ const TriggerScheduleStep = ({ ruleData, updateRuleData }) => {
               <div className="flex items-start gap-3">
                 <Icon
                   className={`h-5 w-5 mt-0.5 ${
-                    ruleData.trigger === type ? "text-blue-600" : "text-gray-600"
+                    ruleData.trigger === type
+                      ? "text-blue-600"
+                      : "text-gray-600"
                   }`}
                 />
                 <div>
                   <h4
                     className={`font-medium ${
-                      ruleData.trigger === type ? "text-blue-900" : "text-gray-900"
+                      ruleData.trigger === type
+                        ? "text-blue-900"
+                        : "text-gray-900"
                     }`}
                   >
                     {title}
                   </h4>
                   <p
                     className={`text-sm mt-1 ${
-                      ruleData.trigger === type ? "text-blue-700" : "text-gray-600"
+                      ruleData.trigger === type
+                        ? "text-blue-700"
+                        : "text-gray-600"
                     }`}
                   >
                     {description}

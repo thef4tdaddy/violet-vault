@@ -134,7 +134,7 @@ describe("useSecurityEventManager", () => {
 
   it("should log security events when enabled", () => {
     const { result } = renderHook(() =>
-      useSecurityEventManager(mockSettings, mockAddSecurityEvent)
+      useSecurityEventManager(mockSettings, mockAddSecurityEvent),
     );
 
     act(() => {
@@ -153,7 +153,7 @@ describe("useSecurityEventManager", () => {
   it("should not log events when disabled", () => {
     const disabledSettings = { securityLoggingEnabled: false };
     const { result } = renderHook(() =>
-      useSecurityEventManager(disabledSettings, mockAddSecurityEvent)
+      useSecurityEventManager(disabledSettings, mockAddSecurityEvent),
     );
 
     act(() => {
@@ -168,7 +168,7 @@ describe("useSecurityEventManager", () => {
 
   it("should log login attempts", () => {
     const { result } = renderHook(() =>
-      useSecurityEventManager(mockSettings, mockAddSecurityEvent)
+      useSecurityEventManager(mockSettings, mockAddSecurityEvent),
     );
 
     act(() => {
@@ -183,13 +183,13 @@ describe("useSecurityEventManager", () => {
           success: true,
           ip: "127.0.0.1",
         }),
-      })
+      }),
     );
   });
 
   it("should log session activity", () => {
     const { result } = renderHook(() =>
-      useSecurityEventManager(mockSettings, mockAddSecurityEvent)
+      useSecurityEventManager(mockSettings, mockAddSecurityEvent),
     );
 
     act(() => {
@@ -204,13 +204,13 @@ describe("useSecurityEventManager", () => {
           activity: "page_view",
           page: "/dashboard",
         }),
-      })
+      }),
     );
   });
 
   it("should log security actions", () => {
     const { result } = renderHook(() =>
-      useSecurityEventManager(mockSettings, mockAddSecurityEvent)
+      useSecurityEventManager(mockSettings, mockAddSecurityEvent),
     );
 
     act(() => {
@@ -225,7 +225,7 @@ describe("useSecurityEventManager", () => {
           action: "password_change",
           method: "manual",
         }),
-      })
+      }),
     );
   });
 });
@@ -256,8 +256,8 @@ describe("useAutoLockManager", () => {
         mockIsLocked,
         mockLockSession,
         mockLastActivityRef,
-        mockAutoLockTimerRef
-      )
+        mockAutoLockTimerRef,
+      ),
     );
 
     const initialTime = mockLastActivityRef.current;
@@ -277,8 +277,8 @@ describe("useAutoLockManager", () => {
         mockIsLocked,
         mockLockSession,
         mockLastActivityRef,
-        mockAutoLockTimerRef
-      )
+        mockAutoLockTimerRef,
+      ),
     );
 
     act(() => {
@@ -295,8 +295,8 @@ describe("useAutoLockManager", () => {
         mockIsLocked,
         mockLockSession,
         mockLastActivityRef,
-        mockAutoLockTimerRef
-      )
+        mockAutoLockTimerRef,
+      ),
     );
 
     // Start timer first
@@ -321,8 +321,8 @@ describe("useAutoLockManager", () => {
         mockIsLocked,
         mockLockSession,
         mockLastActivityRef,
-        mockAutoLockTimerRef
-      )
+        mockAutoLockTimerRef,
+      ),
     );
 
     act(() => {
@@ -344,8 +344,8 @@ describe("useAutoLockManager", () => {
         mockIsLocked,
         mockLockSession,
         mockLastActivityRef,
-        mockAutoLockTimerRef
-      )
+        mockAutoLockTimerRef,
+      ),
     );
 
     act(() => {
@@ -363,8 +363,8 @@ describe("useAutoLockManager", () => {
         mockIsLocked,
         mockLockSession,
         mockLastActivityRef,
-        mockAutoLockTimerRef
-      )
+        mockAutoLockTimerRef,
+      ),
     );
 
     act(() => {
@@ -393,11 +393,18 @@ describe("useClipboardSecurity", () => {
 
   it("should copy text to clipboard securely", async () => {
     const { result } = renderHook(() =>
-      useClipboardSecurity(mockSettings, mockClipboardTimerRef, mockLogSecurityEvent)
+      useClipboardSecurity(
+        mockSettings,
+        mockClipboardTimerRef,
+        mockLogSecurityEvent,
+      ),
     );
 
     await act(async () => {
-      const success = await result.current.secureClipboardCopy("secret text", "test data");
+      const success = await result.current.secureClipboardCopy(
+        "secret text",
+        "test data",
+      );
       expect(success).toBe(true);
     });
 
@@ -410,7 +417,7 @@ describe("useClipboardSecurity", () => {
           description: "test data",
           length: 11,
         }),
-      })
+      }),
     );
   });
 
@@ -418,7 +425,11 @@ describe("useClipboardSecurity", () => {
     navigator.clipboard.readText.mockResolvedValueOnce("secret text");
 
     const { result } = renderHook(() =>
-      useClipboardSecurity(mockSettings, mockClipboardTimerRef, mockLogSecurityEvent)
+      useClipboardSecurity(
+        mockSettings,
+        mockClipboardTimerRef,
+        mockLogSecurityEvent,
+      ),
     );
 
     await act(async () => {
@@ -439,15 +450,21 @@ describe("useClipboardSecurity", () => {
       expect.objectContaining({
         type: "CLIPBOARD_CLEAR",
         description: "Clipboard automatically cleared",
-      })
+      }),
     );
   });
 
   it("should handle clipboard copy errors", async () => {
-    navigator.clipboard.writeText.mockRejectedValueOnce(new Error("Clipboard error"));
+    navigator.clipboard.writeText.mockRejectedValueOnce(
+      new Error("Clipboard error"),
+    );
 
     const { result } = renderHook(() =>
-      useClipboardSecurity(mockSettings, mockClipboardTimerRef, mockLogSecurityEvent)
+      useClipboardSecurity(
+        mockSettings,
+        mockClipboardTimerRef,
+        mockLogSecurityEvent,
+      ),
     );
 
     await act(async () => {
@@ -460,7 +477,11 @@ describe("useClipboardSecurity", () => {
 
   it("should clear clipboard timer", () => {
     const { result } = renderHook(() =>
-      useClipboardSecurity(mockSettings, mockClipboardTimerRef, mockLogSecurityEvent)
+      useClipboardSecurity(
+        mockSettings,
+        mockClipboardTimerRef,
+        mockLogSecurityEvent,
+      ),
     );
 
     // Set a mock timer
@@ -477,7 +498,11 @@ describe("useClipboardSecurity", () => {
     navigator.clipboard.readText.mockResolvedValueOnce("different text"); // Different from what was copied
 
     const { result } = renderHook(() =>
-      useClipboardSecurity(mockSettings, mockClipboardTimerRef, mockLogSecurityEvent)
+      useClipboardSecurity(
+        mockSettings,
+        mockClipboardTimerRef,
+        mockLogSecurityEvent,
+      ),
     );
 
     await act(async () => {

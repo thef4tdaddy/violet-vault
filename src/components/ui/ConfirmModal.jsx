@@ -96,10 +96,17 @@ const ConfirmModal = ({
               <Icon className={`h-6 w-6 ${colorScheme.iconColor}`} />
             </div>
             <div className="flex-1">
-              <h3 id="confirm-modal-title" className="font-black text-black text-base">
+              <h3
+                id="confirm-modal-title"
+                className="font-black text-black text-base"
+              >
                 {title}
               </h3>
-              {destructive && <p className="text-sm text-red-600">This action cannot be undone</p>}
+              {destructive && (
+                <p className="text-sm text-red-600">
+                  This action cannot be undone
+                </p>
+              )}
             </div>
           </div>
 
@@ -128,7 +135,9 @@ const ConfirmModal = ({
               onClick={onConfirm}
               disabled={isLoading}
               className={`px-4 py-2 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed transition-colors ${
-                isLoading ? colorScheme.confirmBtnDisabled : `${colorScheme.confirmBtn}`
+                isLoading
+                  ? colorScheme.confirmBtnDisabled
+                  : `${colorScheme.confirmBtn}`
               }`}
             >
               {isLoading ? (

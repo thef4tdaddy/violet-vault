@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { parseCSV, parseOFX, autoDetectFieldMapping } from "../../utils/transactions/fileParser";
+import {
+  parseCSV,
+  parseOFX,
+  autoDetectFieldMapping,
+} from "../../utils/transactions/fileParser";
 // TODO: Re-implement auto-funding for transaction imports using new modular architecture
 // import { useAutoFunding } from "../budgeting/autofunding";
 import { globalToast } from "../../stores/ui/toastStore";
@@ -32,7 +36,7 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
         } else {
           globalToast.showError(
             "Unsupported file type. Please use CSV or OFX files.",
-            "Unsupported File"
+            "Unsupported File",
           );
           return;
         }
@@ -45,7 +49,10 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
         setImportStep(2);
         setFieldMapping(autoDetectFieldMapping(parsedData));
       } catch (error) {
-        globalToast.showError("Error parsing file: " + error.message, "Parse Error");
+        globalToast.showError(
+          "Error parsing file: " + error.message,
+          "Parse Error",
+        );
       }
     };
 
@@ -54,10 +61,14 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
   };
 
   const handleImport = async () => {
-    if (!fieldMapping.date || !fieldMapping.description || !fieldMapping.amount) {
+    if (
+      !fieldMapping.date ||
+      !fieldMapping.description ||
+      !fieldMapping.amount
+    ) {
       globalToast.showError(
         "Please map at least Date, Description, and Amount fields",
-        "Mapping Required"
+        "Mapping Required",
       );
       return;
     }
@@ -89,7 +100,10 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
         });
       } catch (error) {
         logger.error("Failed to clear existing data", error);
-        globalToast.showError("Failed to clear existing data. Import cancelled.", "Clear Failed");
+        globalToast.showError(
+          "Failed to clear existing data. Import cancelled.",
+          "Clear Failed",
+        );
         return;
       }
     }
@@ -103,11 +117,14 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
       setImportProgress((i / dataArray.length) * 100);
 
       try {
-        const amount = parseFloat(row[fieldMapping.amount]?.replace(/[$,]/g, "") || "0");
+        const amount = parseFloat(
+          row[fieldMapping.amount]?.replace(/[$,]/g, "") || "0",
+        );
 
         const transaction = {
           id: `import_${Date.now()}_${i}_${Math.random().toString(36).substr(2, 9)}`,
-          date: row[fieldMapping.date] || new Date().toISOString().split("T")[0],
+          date:
+            row[fieldMapping.date] || new Date().toISOString().split("T")[0],
           description: row[fieldMapping.description] || "Imported Transaction",
           amount,
           category: row[fieldMapping.category] || "Imported",
@@ -139,7 +156,9 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
 
     // Process auto-funding for income transactions
     const autoFundingPromises = [];
-    const incomeTransactions = processedTransactions.filter((t) => t.amount > 0);
+    const incomeTransactions = processedTransactions.filter(
+      (t) => t.amount > 0,
+    );
 
     if (incomeTransactions.length > 0 && budget) {
       logger.info("Processing auto-funding for imported income transactions", {
@@ -171,20 +190,25 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
     resetImport();
 
     // Enhanced success message including auto-funding results
-    const incomeCount = processedTransactions.filter((t) => t.amount >= 0).length;
-    const expenseCount = processedTransactions.filter((t) => t.amount < 0).length;
+    const incomeCount = processedTransactions.filter(
+      (t) => t.amount >= 0,
+    ).length;
+    const expenseCount = processedTransactions.filter(
+      (t) => t.amount < 0,
+    ).length;
 
     let message = importData.clearExisting
       ? `🗑️ Cleared existing data and imported ${processedTransactions.length} transactions!\n`
       : `Successfully imported ${processedTransactions.length} transactions!\n`;
 
     message +=
-      `• ${incomeCount} income transactions\n` + `• ${expenseCount} expense transactions\n\n`;
+      `• ${incomeCount} income transactions\n` +
+      `• ${expenseCount} expense transactions\n\n`;
 
     if (autoFundingPromises.length > 0) {
       const totalAutoFunded = autoFundingPromises.reduce(
         (sum, result) => sum + result.result.execution.totalFunded,
-        0
+        0,
       );
       message +=
         `🤖 Auto-funding executed for ${autoFundingPromises.length} income transactions:\n` +

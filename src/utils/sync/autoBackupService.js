@@ -75,16 +75,23 @@ class AutoBackupService {
    * Collect all data for backup
    */
   async collectAllData() {
-    const [envelopes, transactions, bills, debts, savingsGoals, paycheckHistory, metadata] =
-      await Promise.all([
-        budgetDb.envelopes.toArray(),
-        budgetDb.transactions.toArray(),
-        budgetDb.bills.toArray(),
-        budgetDb.debts.toArray(),
-        budgetDb.savingsGoals.toArray(),
-        budgetDb.paycheckHistory.toArray(),
-        budgetDb.budget.get("metadata"),
-      ]);
+    const [
+      envelopes,
+      transactions,
+      bills,
+      debts,
+      savingsGoals,
+      paycheckHistory,
+      metadata,
+    ] = await Promise.all([
+      budgetDb.envelopes.toArray(),
+      budgetDb.transactions.toArray(),
+      budgetDb.bills.toArray(),
+      budgetDb.debts.toArray(),
+      budgetDb.savingsGoals.toArray(),
+      budgetDb.paycheckHistory.toArray(),
+      budgetDb.budget.get("metadata"),
+    ]);
 
     return {
       envelopes: envelopes || [],
@@ -116,7 +123,10 @@ class AutoBackupService {
    */
   async getBackups() {
     try {
-      const backups = await budgetDb.autoBackups.orderBy("timestamp").reverse().toArray();
+      const backups = await budgetDb.autoBackups
+        .orderBy("timestamp")
+        .reverse()
+        .toArray();
       return backups;
     } catch (error) {
       logger.error("Failed to retrieve backups", error);
@@ -160,11 +170,14 @@ class AutoBackupService {
           await budgetDb.paycheckHistory.clear();
 
           // Restore data
-          if (data.envelopes?.length) await budgetDb.envelopes.bulkAdd(data.envelopes);
-          if (data.transactions?.length) await budgetDb.transactions.bulkAdd(data.transactions);
+          if (data.envelopes?.length)
+            await budgetDb.envelopes.bulkAdd(data.envelopes);
+          if (data.transactions?.length)
+            await budgetDb.transactions.bulkAdd(data.transactions);
           if (data.bills?.length) await budgetDb.bills.bulkAdd(data.bills);
           if (data.debts?.length) await budgetDb.debts.bulkAdd(data.debts);
-          if (data.savingsGoals?.length) await budgetDb.savingsGoals.bulkAdd(data.savingsGoals);
+          if (data.savingsGoals?.length)
+            await budgetDb.savingsGoals.bulkAdd(data.savingsGoals);
           if (data.paycheckHistory?.length)
             await budgetDb.paycheckHistory.bulkAdd(data.paycheckHistory);
 
@@ -176,7 +189,7 @@ class AutoBackupService {
               lastUpdated: new Date().toISOString(),
             });
           }
-        }
+        },
       );
 
       logger.production("✅ Successfully restored from backup", {
@@ -199,7 +212,10 @@ class AutoBackupService {
    */
   async cleanupOldBackups() {
     try {
-      const backups = await budgetDb.autoBackups.orderBy("timestamp").reverse().toArray();
+      const backups = await budgetDb.autoBackups
+        .orderBy("timestamp")
+        .reverse()
+        .toArray();
 
       if (backups.length > this.maxBackups) {
         const toDelete = backups.slice(this.maxBackups);
@@ -223,12 +239,18 @@ class AutoBackupService {
   async getBackupStats() {
     try {
       const backups = await this.getBackups();
-      const totalSize = backups.reduce((sum, b) => sum + (b.metadata?.sizeEstimate || 0), 0);
+      const totalSize = backups.reduce(
+        (sum, b) => sum + (b.metadata?.sizeEstimate || 0),
+        0,
+      );
 
       return {
         count: backups.length,
         totalSize: this.formatSize(totalSize),
-        oldest: backups.length > 0 ? new Date(backups[backups.length - 1].timestamp) : null,
+        oldest:
+          backups.length > 0
+            ? new Date(backups[backups.length - 1].timestamp)
+            : null,
         newest: backups.length > 0 ? new Date(backups[0].timestamp) : null,
       };
     } catch (error) {

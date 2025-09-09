@@ -1,5 +1,12 @@
 import React from "react";
-import { X, Edit, Trash2, DollarSign, Calendar, TrendingDown } from "lucide-react";
+import {
+  X,
+  Edit,
+  Trash2,
+  DollarSign,
+  Calendar,
+  TrendingDown,
+} from "lucide-react";
 import { useDebtDetailModal } from "../../../hooks/debts/useDebtDetailModal";
 import { UniversalConnectionManager } from "../../ui/ConnectionDisplay";
 import DebtProgressBar from "../ui/DebtProgressBar";
@@ -32,7 +39,14 @@ const DebtDetailModal = ({
     handleEdit,
     handleShowPaymentForm,
     handleCancelPayment,
-  } = useDebtDetailModal(debt, isOpen, onClose, onDelete, onRecordPayment, onEdit);
+  } = useDebtDetailModal(
+    debt,
+    isOpen,
+    onClose,
+    onDelete,
+    onRecordPayment,
+    onEdit,
+  );
 
   if (!isOpen || !debt) return null;
 
@@ -47,7 +61,10 @@ const DebtDetailModal = ({
               {debt.creditor} • {debt.type}
             </p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
             <X className="h-6 w-6" />
           </button>
         </div>
@@ -57,7 +74,9 @@ const DebtDetailModal = ({
           <div className="bg-red-50 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-red-600 font-medium">Current Balance</p>
+                <p className="text-sm text-red-600 font-medium">
+                  Current Balance
+                </p>
                 <p className="text-2xl font-bold text-red-700">
                   ${debt.currentBalance?.toFixed(2) || "0.00"}
                 </p>
@@ -69,7 +88,9 @@ const DebtDetailModal = ({
           <div className="bg-orange-50 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-orange-600 font-medium">Monthly Payment</p>
+                <p className="text-sm text-orange-600 font-medium">
+                  Monthly Payment
+                </p>
                 <p className="text-2xl font-bold text-orange-700">
                   ${debt.minimumPayment?.toFixed(2) || "0.00"}
                 </p>
@@ -81,7 +102,9 @@ const DebtDetailModal = ({
           <div className="bg-purple-50 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-purple-600 font-medium">Interest Rate</p>
+                <p className="text-sm text-purple-600 font-medium">
+                  Interest Rate
+                </p>
                 <p className="text-2xl font-bold text-purple-700">
                   {debt.interestRate?.toFixed(2) || "0.00"}%
                 </p>
@@ -97,19 +120,27 @@ const DebtDetailModal = ({
         {/* Payoff Information */}
         {payoffDisplay && (
           <div className="bg-blue-50 rounded-xl p-4 mb-6">
-            <h4 className="font-medium text-blue-900 mb-3">Payoff Projection</h4>
+            <h4 className="font-medium text-blue-900 mb-3">
+              Payoff Projection
+            </h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
               <div>
                 <p className="text-blue-600">Expected Payoff</p>
-                <p className="font-semibold text-blue-900">{payoffDisplay.expectedPayoff}</p>
+                <p className="font-semibold text-blue-900">
+                  {payoffDisplay.expectedPayoff}
+                </p>
               </div>
               <div>
                 <p className="text-blue-600">Total Interest</p>
-                <p className="font-semibold text-blue-900">${payoffDisplay.totalInterest}</p>
+                <p className="font-semibold text-blue-900">
+                  ${payoffDisplay.totalInterest}
+                </p>
               </div>
               <div>
                 <p className="text-blue-600">Payoff Date</p>
-                <p className="font-semibold text-blue-900">{payoffDisplay.payoffDate}</p>
+                <p className="font-semibold text-blue-900">
+                  {payoffDisplay.payoffDate}
+                </p>
               </div>
             </div>
           </div>
@@ -134,12 +165,20 @@ const DebtDetailModal = ({
                   className="flex justify-between items-center bg-gray-50 rounded-lg p-2"
                 >
                   <div>
-                    <p className="text-sm font-medium">${payment.formattedAmount}</p>
-                    <p className="text-xs text-gray-600">{payment.displayDate}</p>
+                    <p className="text-sm font-medium">
+                      ${payment.formattedAmount}
+                    </p>
+                    <p className="text-xs text-gray-600">
+                      {payment.displayDate}
+                    </p>
                   </div>
                   <div className="text-right text-xs text-gray-600">
-                    {payment.principalDisplay && <p>Principal: ${payment.principalDisplay}</p>}
-                    {payment.interestDisplay && <p>Interest: ${payment.interestDisplay}</p>}
+                    {payment.principalDisplay && (
+                      <p>Principal: ${payment.principalDisplay}</p>
+                    )}
+                    {payment.interestDisplay && (
+                      <p>Interest: ${payment.interestDisplay}</p>
+                    )}
                   </div>
                 </div>
               ))}
