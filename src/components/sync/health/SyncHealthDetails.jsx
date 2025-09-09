@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React from "react";
 import { renderIcon } from "../../../utils/icons";
 import {
@@ -14,20 +13,16 @@ const SyncHealthDetails = ({
   isBackgroundSyncing,
   isRecovering,
   recoveryResult,
-  onRefresh: _onRefresh,
-  onRunValidation: _onRunValidation,
-  onResetData: _onResetData,
+  onRefresh,
+  onRunValidation,
+  onResetData,
 }) => {
-  const statusDescription = getStatusDescription(
-    syncStatus,
-    isBackgroundSyncing,
-  );
+  const statusDescription = getStatusDescription(syncStatus, isBackgroundSyncing);
   const lastCheckedText = formatLastChecked(syncStatus.lastChecked);
   const formattedRecoveryResult = formatRecoveryResult(recoveryResult);
 
   return (
-    <div className="absolute right-0 top-full mt-2 w-80 glassmorphism backdrop-blur-sm border-2 border-black rounded-xl shadow-2xl overflow-hidden"
-    >
+    <div className="absolute right-0 top-full mt-2 w-80 glassmorphism backdrop-blur-sm border-2 border-black rounded-xl shadow-2xl z-[9999] overflow-hidden">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-700 px-4 py-3 border-b-2 border-black">
         <h3 className="font-black text-white text-sm">SYNC HEALTH STATUS</h3>
@@ -49,12 +44,9 @@ const SyncHealthDetails = ({
             </div>
             <div>
               <p className="text-sm font-bold text-gray-900">
-                Current Status:{" "}
-                <span className="text-purple-800">{syncStatus.status}</span>
+                Current Status: <span className="text-purple-800">{syncStatus.status}</span>
               </p>
-              <p className="text-xs text-purple-700 font-medium mt-1">
-                {statusDescription}
-              </p>
+              <p className="text-xs text-purple-700 font-medium mt-1">{statusDescription}</p>
             </div>
           </div>
 
@@ -68,12 +60,8 @@ const SyncHealthDetails = ({
         {/* Error Details */}
         {syncStatus.error && (
           <div className="bg-gradient-to-r from-red-50/80 to-orange-50/80 backdrop-blur-sm p-3 rounded-xl border border-red-200 shadow-sm">
-            <p className="text-xs font-bold text-red-800 mb-1">
-              ERROR DETAILS:
-            </p>
-            <p className="text-xs text-red-700 font-medium">
-              {syncStatus.error}
-            </p>
+            <p className="text-xs font-bold text-red-800 mb-1">ERROR DETAILS:</p>
+            <p className="text-xs text-red-700 font-medium">{syncStatus.error}</p>
           </div>
         )}
 
@@ -103,18 +91,14 @@ const SyncHealthDetails = ({
           >
             <p
               className={`text-xs font-bold mb-1 ${
-                formattedRecoveryResult.type === "success"
-                  ? "text-green-800"
-                  : "text-red-800"
+                formattedRecoveryResult.type === "success" ? "text-green-800" : "text-red-800"
               }`}
             >
               RECOVERY RESULT:
             </p>
             <p
               className={`text-xs font-medium ${
-                formattedRecoveryResult.type === "success"
-                  ? "text-green-700"
-                  : "text-red-700"
+                formattedRecoveryResult.type === "success" ? "text-green-700" : "text-red-700"
               }`}
             >
               {formattedRecoveryResult.message}
@@ -130,20 +114,11 @@ const SyncHealthDetails = ({
         {/* Action Buttons */}
         {hasRecoveryActions() && (
           <div className="space-y-2 pt-2 border-t border-gray-200">
-            <p className="text-xs font-black text-gray-700 uppercase">
-              ACTIONS:
-            </p>
+            <p className="text-xs font-black text-gray-700 uppercase">ACTIONS:</p>
 
             <div className="flex flex-col gap-2">
               <button
-                onClick={() => {
-                  console.log("🔄 DIRECT TEST: Button clicked, calling window.getQuickSyncStatus");
-                  if (window.getQuickSyncStatus) {
-                    window.getQuickSyncStatus().then(result => console.log("🔄 RESULT:", result));
-                  } else {
-                    console.log("🔄 ERROR: window.getQuickSyncStatus not found");
-                  }
-                }}
+                onClick={onRefresh}
                 disabled={syncStatus.isLoading}
                 className={getActionButtonStyle("refresh")}
               >
@@ -153,33 +128,13 @@ const SyncHealthDetails = ({
                 {syncStatus.isLoading ? "Refreshing..." : "Refresh Status"}
               </button>
 
-              <button
-                onClick={() => {
-                  console.log("🚀 DIRECT TEST: Button clicked, calling window.runMasterSyncValidation");
-                  if (window.runMasterSyncValidation) {
-                    window.runMasterSyncValidation().then(result => console.log("🚀 RESULT:", result));
-                  } else {
-                    console.log("🚀 ERROR: window.runMasterSyncValidation not found");
-                  }
-                }}
-                className={getActionButtonStyle("validate")}
-              >
+              <button onClick={onRunValidation} className={getActionButtonStyle("validate")}>
                 {renderIcon("Wrench", { className: "h-3 w-3 mr-2" })}
                 Run Full Validation
               </button>
 
               <button
-                onClick={() => {
-                  console.log("🧹 DIRECT TEST: Button clicked, calling window.forceCloudDataReset");
-                  if (window.forceCloudDataReset) {
-                    // eslint-disable-next-line no-restricted-globals
-                    if (confirm("Reset cloud data? This cannot be undone.")) {
-                      window.forceCloudDataReset().then(result => console.log("🧹 RESULT:", result));
-                    }
-                  } else {
-                    console.log("🧹 ERROR: window.forceCloudDataReset not found");
-                  }
-                }}
+                onClick={onResetData}
                 disabled={isRecovering}
                 className={getActionButtonStyle("reset")}
               >
