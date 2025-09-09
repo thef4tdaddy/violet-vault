@@ -5,8 +5,6 @@ on:
     branches: [develop]
     paths:
       - '.github/workflows/lint-warnings-tracker.yml'
-      - '.github/data/lint-warnings-comment.md'
-      - 'scripts/parse-eslint-warnings.js'
   
   # Manual trigger option
   workflow_dispatch:
@@ -41,60 +39,42 @@ jobs:
           # Fetch latest main branch
           git fetch origin main
           
-          # Compare lint tracker files
-          FILES_TO_SYNC=(
-            ".github/workflows/lint-warnings-tracker.yml"
-            ".github/data/lint-warnings-comment.md"
-            "scripts/parse-eslint-warnings.js"
-          )
+          # Compare lint tracker workflows
+          DEVELOP_FILE=".github/workflows/lint-warnings-tracker.yml"
           
-          CHANGES_DETECTED=false
+          if [ ! -f "$DEVELOP_FILE" ]; then
+            echo "❌ Lint tracker workflow not found on develop branch"
+            exit 1
+          fi
           
-          for FILE in "${FILES_TO_SYNC[@]}"; do
-            if [ ! -f "$FILE" ]; then
-              echo "❌ File $FILE not found on develop branch"
-              continue
-            fi
-            
-            # Get main branch version of the file
-            git show origin/main:$FILE > "main-$(basename $FILE)" 2>/dev/null || echo "# File not found on main" > "main-$(basename $FILE)"
-            
-            # Compare files
-            if ! diff -q "$FILE" "main-$(basename $FILE)" > /dev/null; then
-              echo "🔄 Changes detected in $FILE"
-              CHANGES_DETECTED=true
-            fi
-          done
+          # Get main branch version of the file
+          git show origin/main:$DEVELOP_FILE > main-lint-tracker.yml 2>/dev/null || echo "# File not found on main" > main-lint-tracker.yml
           
-          if [ "$CHANGES_DETECTED" = true ]; then
+          # Compare files
+          if ! diff -q "$DEVELOP_FILE" main-lint-tracker.yml > /dev/null; then
             echo "🔄 Differences detected! Syncing workflow from develop to main..."
             
             # Checkout main branch
             git checkout main
             git pull origin main
             
-            # Copy the files from develop
-            for FILE in "${FILES_TO_SYNC[@]}"; do
-              if [ -f "$FILE" ]; then
-                git checkout develop -- "$FILE"
-                echo "✅ Synced $FILE"
-              fi
-            done
+            # Copy the file from develop
+            git checkout develop -- "$DEVELOP_FILE"
             
             # Check if there are actually changes to commit
             if [ -n "$(git diff --name-only)" ]; then
               echo "📝 Committing updated lint tracker workflow..."
               
-              git add "${FILES_TO_SYNC[@]}"
+              git add "$DEVELOP_FILE"
               git commit -m "$(cat <<'EOF'
-sync: update lint tracker system from develop
+sync: update lint-warnings-tracker workflow from develop
 
 This automated sync ensures parity between main and develop branches
 for the lint tracking system.
 
 Source: develop branch
 Target: main branch
-Files: workflow, template, parser script
+Action: Sync lint-warnings-tracker.yml
 
 🤖 Generated with automated sync action
 
@@ -111,16 +91,11 @@ EOF
             echo "🔧 Force sync requested - updating main even without detected changes"
             git checkout main
             git pull origin main
-            
-            for FILE in "${FILES_TO_SYNC[@]}"; do
-              if [ -f "$FILE" ]; then
-                git checkout develop -- "$FILE"
-              fi
-            done
+            git checkout develop -- "$DEVELOP_FILE"
             
             if [ -n "$(git diff --name-only)" ]; then
-              git add "${FILES_TO_SYNC[@]}"
-              git commit -m "sync: force update lint tracker system from develop"
+              git add "$DEVELOP_FILE"
+              git commit -m "sync: force update lint-warnings-tracker workflow from develop"
               git push origin main
               echo "✅ Force sync completed!"
             else
@@ -147,10 +122,7 @@ EOF
 
 ${wasPerformed ? '✅ **Sync Performed**: Lint tracker workflow updated on main branch from develop' : 'ℹ️ **No Sync Needed**: Workflows are already identical between branches'}
 
-**Monitored Files**: 
-- \`.github/workflows/lint-warnings-tracker.yml\`
-- \`.github/data/lint-warnings-comment.md\`  
-- \`scripts/parse-eslint-warnings.js\`
+**Monitored File**: \`.github/workflows/lint-warnings-tracker.yml\`
 **Source Branch**: develop  
 **Target Branch**: main
 **Trigger**: ${context.eventName === 'workflow_dispatch' ? 'Manual' : 'Automatic (file change detected)'}
