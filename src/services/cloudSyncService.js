@@ -527,9 +527,18 @@ class CloudSyncService {
       return { direction: "toFirestore" };
     }
 
-    // If neither has data, nothing to sync
+    // If neither has data, check for shared budget scenario
     if (!hasCloudData && !hasLocalData) {
-      return { direction: "toFirestore" }; // Default to upload empty state
+      // For shared budget users, prefer download to avoid destroying shared data
+      // Even if cloud appears empty, there might be a timing issue or Firebase rules blocking access
+      const isSharedBudgetUser = this.isSharedBudgetUser();
+      if (isSharedBudgetUser) {
+        logger.info(
+          "🔄 Shared budget user with empty data - preferring download to prevent data loss",
+        );
+        return { direction: "fromFirestore" };
+      }
+      return { direction: "toFirestore" }; // Default to upload empty state for new budgets
     }
 
     // Both have data - use timestamps to determine direction
@@ -548,6 +557,14 @@ class CloudSyncService {
     } else {
       return { direction: "bidirectional" }; // Same timestamp, need full sync
     }
+  }
+
+  /**
+   * Check if current user is a shared budget user
+   * @returns {boolean} True if user joined via share code
+   */
+  isSharedBudgetUser() {
+    return this.config?.currentUser?.joinedVia === "shareCode";
   }
 
   getStatus() {
