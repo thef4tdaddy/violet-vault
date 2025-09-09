@@ -287,7 +287,8 @@ jobs:
               // Find previous automation comments (from GitHub Actions)
               const automationComments = comments.data.filter(comment => 
                 comment.user.login === 'github-actions[bot]' &&
-                (comment.body.includes('📊 Lint Warnings Update') ||
+                (comment.body.includes('## 📊 Lint Warnings Update') ||
+                 comment.body.includes('📊 Lint Warnings Update') ||
                  comment.body.includes('📊 **Lint Warning Analysis**') ||
                  comment.body.includes('🚀 **Lint Warnings Report**') ||
                  comment.body.includes('Automated lint warning tracking'))
@@ -315,7 +316,7 @@ jobs:
             const template = fs.readFileSync('.github/data/lint-warnings-comment.md', 'utf8');
 
             // Prepare template variables with Americas/Chicago timezone
-            const currentDateTime = new Date().toLocaleString('en-US', { 
+            const currentDate = new Date().toLocaleString('en-US', { 
               year: 'numeric', 
               month: 'long', 
               day: 'numeric',
@@ -324,7 +325,6 @@ jobs:
               timeZone: 'America/Chicago',
               timeZoneName: 'short'
             });
-            const currentDate = currentDateTime;
 
             const developWarnings = '${{ steps.develop_warnings.outputs.warnings }}' || '0';
             const mainWarnings = '${{ steps.main_warnings.outputs.warnings }}' || '0';
@@ -344,7 +344,8 @@ jobs:
               const lastAutomationComment = comments.data
                 .filter(comment => 
                   comment.user.login === 'github-actions[bot]' &&
-                  comment.body.includes('📊 Lint Warnings Update')
+                  (comment.body.includes('## 📊 Lint Warnings Update') ||
+                   comment.body.includes('📊 Lint Warnings Update'))
                 )
                 .pop(); // Get the most recent one
               
