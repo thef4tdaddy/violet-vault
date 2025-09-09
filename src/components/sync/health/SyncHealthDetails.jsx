@@ -25,7 +25,10 @@ const SyncHealthDetails = ({
   const formattedRecoveryResult = formatRecoveryResult(recoveryResult);
 
   return (
-    <div className="absolute right-0 top-full mt-2 w-80 glassmorphism backdrop-blur-sm border-2 border-black rounded-xl shadow-2xl overflow-hidden" style={{zIndex: 999999}}>
+    <div
+      className="absolute right-0 top-full mt-2 w-80 glassmorphism backdrop-blur-sm border-2 border-black rounded-xl shadow-2xl overflow-hidden"
+      style={{ zIndex: 999999 }}
+    >
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-700 px-4 py-3 border-b-2 border-black">
         <h3 className="font-black text-white text-sm">SYNC HEALTH STATUS</h3>
@@ -134,10 +137,7 @@ const SyncHealthDetails = ({
 
             <div className="flex flex-col gap-2">
               <button
-                onClick={() => {
-                  logger.info("🔄 Refresh button clicked in SyncHealthDetails");
-                  onRefresh();
-                }}
+                onClick={onRefresh}
                 disabled={syncStatus.isLoading}
                 className={getActionButtonStyle("refresh")}
               >
@@ -148,12 +148,7 @@ const SyncHealthDetails = ({
               </button>
 
               <button
-                onClick={() => {
-                  logger.info(
-                    "🚀 Full validation button clicked in SyncHealthDetails",
-                  );
-                  onRunValidation();
-                }}
+                onClick={onRunValidation}
                 className={getActionButtonStyle("validate")}
               >
                 {renderIcon("Wrench", { className: "h-3 w-3 mr-2" })}
