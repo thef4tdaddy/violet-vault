@@ -63,8 +63,13 @@ export const useSyncHealthIndicator = () => {
     };
 
     if (showDetails) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("keydown", handleKeyDown);
+      // Use setTimeout to delay event listener registration
+      // This prevents immediate closure when clicking buttons
+      setTimeout(() => {
+        document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener("keydown", handleKeyDown);
+      }, 100);
+
       return () => {
         document.removeEventListener("mousedown", handleClickOutside);
         document.removeEventListener("keydown", handleKeyDown);
