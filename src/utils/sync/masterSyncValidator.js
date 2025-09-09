@@ -322,14 +322,8 @@ if (typeof window !== "undefined") {
   window.runMasterSyncValidation = runMasterSyncValidation;
   window.getQuickSyncStatus = getQuickSyncStatus;
 
-  // Add helpful console message
-  console.log("🚀 SYNC VALIDATION TOOLS LOADED!");
-  console.log("Run these commands in console:");
-  console.log("• runMasterSyncValidation() - Complete validation suite");
-  console.log("• runSyncHealthCheck() - Quick health check");
-  console.log("• validateAllSyncFlows() - Flow validation only");
-  console.log("• runSyncEdgeCaseTests() - Edge case testing only");
-  console.log("• getQuickSyncStatus() - Quick status check");
+  // Sync validation tools are now available via sync health dropdown
+  // Console commands still available for debugging: runMasterSyncValidation(), etc.
 }
 
 export default runMasterSyncValidation;

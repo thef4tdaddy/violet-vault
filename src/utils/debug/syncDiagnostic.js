@@ -207,5 +207,6 @@ export const runSyncDiagnostic = async () => {
 // Auto-run if in browser console
 if (typeof window !== "undefined") {
   window.runSyncDiagnostic = runSyncDiagnostic;
-  console.log("🔧 Sync diagnostic tool loaded! Run: runSyncDiagnostic()");
+  // Sync diagnostic tool available via sync health dropdown
+  // Console command: runSyncDiagnostic()
 }

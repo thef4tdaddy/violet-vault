@@ -272,7 +272,6 @@ if (typeof window !== "undefined") {
   window.runDataDiagnostic = runDataDiagnostic;
   window.cleanupCorruptedPaychecks = cleanupCorruptedPaychecks;
   window.inspectPaycheckRecords = inspectPaycheckRecords;
-  console.log("🔧 Data diagnostic tool loaded! Run: runDataDiagnostic()");
-  console.log("🧹 Paycheck cleanup tool loaded! Run: cleanupCorruptedPaychecks()");
-  console.log("🔍 Paycheck inspector loaded! Run: inspectPaycheckRecords()");
+  // Data diagnostic tools available via sync health dropdown
+  // Console commands: runDataDiagnostic(), cleanupCorruptedPaychecks(), inspectPaycheckRecords()
 }
