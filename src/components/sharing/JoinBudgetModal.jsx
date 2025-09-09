@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { renderIcon } from "../../utils";
-import { budgetSharingService } from "../../utils/sharing/budgetSharingService";
+import { shareCodeUtils } from "../../utils/security/shareCodeUtils";
 import { useToastHelpers } from "../../utils/common/toastHelpers";
 import logger from "../../utils/common/logger";
 
@@ -26,7 +26,7 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
     if (isOpen) {
       const urlParams = new URLSearchParams(window.location.search);
       const urlShareCode = urlParams.get("share");
-      if (urlShareCode && urlShareCode.match(/^VV-[A-Z0-9]{4}-[A-Z0-9]{4}$/)) {
+      if (urlShareCode && shareCodeUtils.validateShareCode(urlShareCode)) {
         setShareCode(urlShareCode);
         validateShareCode(urlShareCode);
       }
@@ -53,18 +53,29 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
     logger.info("Validating share code", { code: code.trim() });
     setIsValidating(true);
     try {
-      const result = await budgetSharingService.validateShareCode(
-        code.toUpperCase().trim(),
-      );
-      logger.info("Share code validation result", result);
+      const normalizedCode = shareCodeUtils.normalizeShareCode(code.trim());
+      const isValid = shareCodeUtils.validateShareCode(normalizedCode);
 
-      if (result.valid) {
-        setShareInfo(result.shareData);
+      logger.info("Share code validation result", {
+        originalCode: code,
+        normalizedCode,
+        isValid,
+      });
+
+      if (isValid) {
+        setShareInfo({
+          createdBy: "Unknown User", // BIP39 codes don't store creator info
+          createdAt: Date.now(),
+          expiresAt: Date.now() + 365 * 24 * 60 * 60 * 1000, // 1 year
+          userCount: 1,
+        });
         setStep(2);
         showSuccessToast("Share code is valid! Now set your password.");
       } else {
-        logger.warn("Share code validation failed", result);
-        showErrorToast(result.error || "Invalid share code");
+        logger.warn("Share code validation failed", { normalizedCode });
+        showErrorToast(
+          "Invalid share code format. Please enter 4 valid words.",
+        );
         setShareInfo(null);
       }
     } catch (error) {
@@ -84,6 +95,16 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
 
     setIsJoining(true);
     try {
+      const normalizedShareCode = shareCodeUtils.normalizeShareCode(
+        shareCode.trim(),
+      );
+
+      // Generate deterministic budget ID from password and share code
+      const budgetId = await shareCodeUtils.generateBudgetId(
+        password,
+        normalizedShareCode,
+      );
+
       const userInfo = {
         id: `user_${Date.now()}`,
         userName: userName.trim(),
@@ -92,33 +113,32 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
         joinedAt: Date.now(),
       };
 
-      const result = await budgetSharingService.joinBudgetWithCode(
-        shareCode.toUpperCase().trim(),
-        password,
-        userInfo,
-      );
+      logger.info("Generated budget ID for join", {
+        budgetIdPreview: budgetId.substring(0, 10) + "...",
+        shareCodePreview:
+          normalizedShareCode.split(" ").slice(0, 2).join(" ") + " ...",
+      });
 
-      if (result.success) {
-        showSuccessToast(`Successfully joined ${result.sharedBy}'s budget!`);
+      showSuccessToast(`Successfully joined shared budget!`);
 
-        // Call parent success handler with the joined budget info
-        if (onJoinSuccess) {
-          onJoinSuccess({
-            budgetId: result.budgetId,
-            password,
-            userInfo,
-            sharedBy: result.sharedBy,
-            userCount: result.userCount,
-          });
-        }
-
-        onClose();
-
-        // Clear URL parameter
-        const url = new URL(window.location);
-        url.searchParams.delete("share");
-        window.history.replaceState({}, "", url);
+      // Call parent success handler with the joined budget info
+      if (onJoinSuccess) {
+        onJoinSuccess({
+          budgetId,
+          password,
+          userInfo,
+          shareCode: normalizedShareCode,
+          sharedBy: "Shared Budget", // BIP39 codes don't store creator info
+          userCount: 1,
+        });
       }
+
+      onClose();
+
+      // Clear URL parameter
+      const url = new URL(window.location);
+      url.searchParams.delete("share");
+      window.history.replaceState({}, "", url);
     } catch (error) {
       logger.error("Failed to join budget", error);
       showErrorToast(error.message || "Failed to join budget");
@@ -188,11 +208,11 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
                       type="text"
                       value={shareCode}
                       onChange={(e) =>
-                        setShareCode(e.target.value.toUpperCase())
+                        setShareCode(e.target.value.toLowerCase())
                       }
-                      placeholder="VV-XXXX-XXXX"
-                      className="flex-1 px-4 py-3 bg-white border-2 border-black rounded-lg text-lg font-mono text-center tracking-wider uppercase"
-                      maxLength={11}
+                      placeholder="enter four words"
+                      className="flex-1 px-4 py-3 bg-white border-2 border-black rounded-lg text-sm text-center tracking-wide lowercase"
+                      maxLength={50}
                     />
                     <button
                       onClick={handleQRScan}

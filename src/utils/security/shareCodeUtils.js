@@ -27,15 +27,17 @@ export const shareCodeUtils = {
 
       // Validate that our own generated words are valid
       const wordlist = bip39.wordlists.english;
-      const invalidGenerated = words.filter((word) => !wordlist.includes(word.toLowerCase()));
-      
+      const invalidGenerated = words.filter(
+        (word) => !wordlist.includes(word.toLowerCase()),
+      );
+
       logger.info("Generated new share code", {
         wordCount: words.length,
         preview: words[0] + " " + words[1] + " ...",
         actualWords: words,
         generatedValid: invalidGenerated.length === 0,
         invalidGenerated,
-        wordlistLength: wordlist?.length
+        wordlistLength: wordlist?.length,
       });
 
       return shareCode;
@@ -52,39 +54,50 @@ export const shareCodeUtils = {
    */
   validateShareCode(shareCode) {
     if (!shareCode || typeof shareCode !== "string") {
-      logger.debug("Share code validation failed - invalid input", { shareCode, type: typeof shareCode });
+      logger.debug("Share code validation failed - invalid input", {
+        shareCode,
+        type: typeof shareCode,
+      });
       return false;
     }
 
     const words = shareCode.trim().split(" ");
-    logger.debug("Share code validation - word split", { words, length: words.length });
+    logger.debug("Share code validation - word split", {
+      words,
+      length: words.length,
+    });
 
     // Must be exactly 4 words
     if (words.length !== 4) {
-      logger.debug("Share code validation failed - wrong word count", { expected: 4, actual: words.length });
+      logger.debug("Share code validation failed - wrong word count", {
+        expected: 4,
+        actual: words.length,
+      });
       return false;
     }
 
     // Each word must be valid BIP39 word - use proper wordlist access
     const wordlist = bip39.wordlists.english;
-    logger.debug("BIP39 wordlist info", { 
-      wordlistType: typeof wordlist, 
+    logger.debug("BIP39 wordlist info", {
+      wordlistType: typeof wordlist,
       isArray: Array.isArray(wordlist),
       length: wordlist?.length,
       firstFew: wordlist?.slice(0, 5),
-      sampleWord: wordlist?.includes('abandon') // 'abandon' is first BIP39 word
+      sampleWord: wordlist?.includes("abandon"), // 'abandon' is first BIP39 word
     });
-    
-    const invalidWords = words.filter((word) => !wordlist.includes(word.toLowerCase()));
-    
+
+    const invalidWords = words.filter(
+      (word) => !wordlist.includes(word.toLowerCase()),
+    );
+
     if (invalidWords.length > 0) {
-      logger.debug("Share code validation failed - invalid words", { 
-        invalidWords, 
+      logger.debug("Share code validation failed - invalid words", {
+        invalidWords,
         allWords: words,
-        wordlistIncludes: words.map(word => ({
+        wordlistIncludes: words.map((word) => ({
           word: word.toLowerCase(),
-          inList: wordlist.includes(word.toLowerCase())
-        }))
+          inList: wordlist.includes(word.toLowerCase()),
+        })),
       });
       return false;
     }
@@ -112,19 +125,25 @@ export const shareCodeUtils = {
    */
   async generateBudgetId(password, shareCode) {
     if (!password || !shareCode) {
-      throw new Error("Both password and share code are required for budget ID generation");
+      throw new Error(
+        "Both password and share code are required for budget ID generation",
+      );
     }
 
     const normalizedShareCode = this.normalizeShareCode(shareCode);
 
     if (!this.validateShareCode(normalizedShareCode)) {
-      throw new Error("Invalid share code format - must be exactly 4 valid words");
+      throw new Error(
+        "Invalid share code format - must be exactly 4 valid words",
+      );
     }
 
     try {
       // Use SHA-256 with password + normalized share code for deterministic budget ID
       const encoder = new TextEncoder();
-      const data = encoder.encode(`budget_seed_${password}_${normalizedShareCode}_violet_vault`);
+      const data = encoder.encode(
+        `budget_seed_${password}_${normalizedShareCode}_violet_vault`,
+      );
       const hashBuffer = await crypto.subtle.digest("SHA-256", data);
       const hashArray = new Uint8Array(hashBuffer);
 
@@ -137,7 +156,8 @@ export const shareCodeUtils = {
 
       logger.info("Generated deterministic budget ID", {
         budgetIdPreview: budgetId.substring(0, 10) + "...",
-        shareCodePreview: normalizedShareCode.split(" ").slice(0, 2).join(" ") + " ...",
+        shareCodePreview:
+          normalizedShareCode.split(" ").slice(0, 2).join(" ") + " ...",
       });
 
       return budgetId;
