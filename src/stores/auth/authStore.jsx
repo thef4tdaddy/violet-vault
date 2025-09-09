@@ -60,7 +60,12 @@ export const useAuth = create((set, get) => ({
           logger.auth("Generated/restored key and salt for user.");
 
           // ALWAYS use deterministic budgetId generation for cross-browser consistency
-          const deterministicBudgetId = await encryptionUtils.generateBudgetId(password);
+          // Use share code from userData for deterministic budget ID
+          const shareCode = userData.shareCode;
+          if (!shareCode) {
+            throw new Error("Share code missing from user data during login");
+          }
+          const deterministicBudgetId = await encryptionUtils.generateBudgetId(password, shareCode);
 
           const finalUserData = {
             ...userData,
@@ -204,28 +209,11 @@ export const useAuth = create((set, get) => ({
           let migratedData = decryptedData;
           let currentUserData = decryptedData.currentUser;
 
-          if (!currentUserData || !currentUserData.budgetId) {
-            logger.auth("Migrating legacy data structure.");
-            const newBudgetId = encryptionUtils.generateBudgetId(password);
-            currentUserData = {
-              ...currentUserData,
-              budgetId: newBudgetId,
-              userName: currentUserData?.userName || "Legacy User",
-              userColor: currentUserData?.userColor || "#a855f7",
-              id: currentUserData?.id || `user_${Date.now()}`,
-            };
-            migratedData = { ...decryptedData, currentUser: currentUserData };
-
-            const encrypted = await encryptionUtils.encrypt(migratedData, key);
-            localStorage.setItem(
-              "envelopeBudgetData",
-              JSON.stringify({
-                encryptedData: encrypted.data,
-                salt: Array.from(deterministicSalt),
-                iv: encrypted.iv,
-              })
-            );
-            logger.auth("Data migration complete and saved.", { newBudgetId });
+          if (!currentUserData || !currentUserData.budgetId || !currentUserData.shareCode) {
+            logger.auth("Legacy data detected - clearing for fresh start with share code system.");
+            // Clear legacy data - all budgets now require share codes
+            localStorage.removeItem("envelopeBudgetData");
+            throw new Error("Legacy data cleared - please create a new budget with share code system");
           }
 
           logger.auth("Setting auth state for existing user.", {
