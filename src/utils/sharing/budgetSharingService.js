@@ -237,14 +237,14 @@ export const budgetSharingService = {
   },
 
   /**
-   * Generate random 8-character code (e.g., "VV-A1B2-C3D4")
+   * Generate random 11-character code (e.g., "VV-A1B2-C3D4")
    * @private
    */
   _generateRandomCode() {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     const sections = [];
 
-    // Generate 3 sections of 4 characters each
+    // Generate 2 sections of 4 characters each
     for (let section = 0; section < 2; section++) {
       let sectionCode = "";
       for (let i = 0; i < 4; i++) {
