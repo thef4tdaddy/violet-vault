@@ -25,7 +25,7 @@ const SyncHealthDetails = ({
   const formattedRecoveryResult = formatRecoveryResult(recoveryResult);
 
   return (
-    <div className="absolute right-0 top-full mt-16 w-80 glassmorphism backdrop-blur-sm border-2 border-black rounded-xl shadow-2xl z-[9999] overflow-hidden">
+    <div className="absolute right-0 bottom-full mb-2 w-80 glassmorphism backdrop-blur-sm border-2 border-black rounded-xl shadow-2xl z-[9999] overflow-hidden">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-700 px-4 py-3 border-b-2 border-black">
         <h3 className="font-black text-white text-sm">SYNC HEALTH STATUS</h3>

@@ -34,7 +34,8 @@ export const useSyncHealthIndicator = () => {
   useEffect(() => {
     // Check if sync is running by monitoring the service state
     const checkSyncActivity = () => {
-      const isRunning = cloudSyncService.isRunning && cloudSyncService.activeSyncPromise;
+      const isRunning =
+        cloudSyncService.isRunning && cloudSyncService.activeSyncPromise;
       setIsBackgroundSyncing(isRunning);
     };
 
@@ -72,15 +73,17 @@ export const useSyncHealthIndicator = () => {
   }, [showDetails]);
 
   const checkSyncHealth = async () => {
+    logger.info("🔄 Sync Health: Checking sync health...");
     try {
       setSyncStatus((prev) => ({ ...prev, isLoading: true }));
       const health = await getQuickSyncStatus();
+      logger.info("✅ Sync Health: Health check completed", health);
       setSyncStatus({
         ...health,
         isLoading: false,
       });
     } catch (error) {
-      logger.error("Failed to check sync health:", error);
+      logger.error("❌ Sync Health: Failed to check sync health:", error);
       setSyncStatus({
         isHealthy: false,
         status: "ERROR",
@@ -92,15 +95,22 @@ export const useSyncHealthIndicator = () => {
   };
 
   const runFullValidation = async () => {
+    logger.info("🚀 Sync Health UI: Full validation button clicked");
     if (typeof window !== "undefined" && window.runMasterSyncValidation) {
       logger.info("🚀 Running full sync validation from UI...");
       try {
         const results = await window.runMasterSyncValidation();
+        logger.info(
+          "✅ Sync Health: Full validation completed",
+          results.summary,
+        );
         // Update status based on results
         setSyncStatus({
           isHealthy: results.summary.overallStatus === "ALL_SYSTEMS_GO",
           status:
-            results.summary.overallStatus === "ALL_SYSTEMS_GO" ? "HEALTHY" : "ISSUES_DETECTED",
+            results.summary.overallStatus === "ALL_SYSTEMS_GO"
+              ? "HEALTHY"
+              : "ISSUES_DETECTED",
           failedTests: results.summary.totalFailed,
           lastChecked: new Date().toISOString(),
           isLoading: false,
@@ -109,10 +119,15 @@ export const useSyncHealthIndicator = () => {
       } catch (error) {
         logger.error("Full validation failed:", error);
       }
+    } else {
+      logger.warn(
+        "🚨 Sync Health: runMasterSyncValidation not available on window",
+      );
     }
   };
 
   const resetCloudData = async () => {
+    logger.info("🧹 Sync Health UI: Reset cloud data button clicked");
     if (typeof window !== "undefined" && window.forceCloudDataReset) {
       setIsRecovering(true);
       setRecoveryResult(null);
@@ -120,6 +135,7 @@ export const useSyncHealthIndicator = () => {
       try {
         logger.info("🧹 Resetting cloud data from UI...");
         const result = await window.forceCloudDataReset();
+        logger.info("✅ Sync Health: Cloud data reset completed", result);
 
         setRecoveryResult(result);
 
@@ -134,6 +150,10 @@ export const useSyncHealthIndicator = () => {
       } finally {
         setIsRecovering(false);
       }
+    } else {
+      logger.warn(
+        "🚨 Sync Health: forceCloudDataReset not available on window",
+      );
     }
   };
 
