@@ -393,14 +393,14 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
 
                 <div>
                   <label className="block text-sm font-black text-black uppercase tracking-wider mb-2">
-                    Your Password *
+                    Budget Password *
                   </label>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Choose a secure password"
+                      placeholder="Enter the budget password"
                       className="w-full px-4 py-3 bg-white border-2 border-black rounded-lg pr-12"
                     />
                     <button
@@ -412,8 +412,7 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
                     </button>
                   </div>
                   <p className="text-xs text-gray-600 mt-1">
-                    This encrypts your local data. Different from the share
-                    code!
+                    Enter the same password the budget creator used when they first created the budget.
                   </p>
                 </div>
               </div>
