@@ -25,6 +25,7 @@ const LockScreen = () => {
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [error, setError] = useState("");
   const [failedAttempts, setFailedAttempts] = useState(0);
+  const [pendingConfirm, setPendingConfirm] = useState(null);
   const passwordInputRef = useRef(null);
 
   // Count recent failed attempts from security events
@@ -33,7 +34,7 @@ const LockScreen = () => {
       const recentFailures = securityEvents.filter(
         (event) =>
           event.type === "FAILED_UNLOCK" &&
-          Date.now() - new Date(event.timestamp).getTime() < 5 * 60 * 1000 // last 5 minutes
+          Date.now() - new Date(event.timestamp).getTime() < 5 * 60 * 1000, // last 5 minutes
       ).length;
       setFailedAttempts(recentFailures);
     }
@@ -74,6 +75,12 @@ const LockScreen = () => {
 
       if (isValidPassword) {
         // Password is correct, unlock the session
+        // Cancel any pending confirmation modals to prevent race condition
+        if (pendingConfirm) {
+          pendingConfirm.cancel();
+          setPendingConfirm(null);
+        }
+
         unlockSession();
         setPassword("");
         setFailedAttempts(0);
@@ -83,14 +90,33 @@ const LockScreen = () => {
         setIsUnlocking(false);
 
         // Enhanced error message for wrong password
-        const shouldCreateNew = await confirm({
-          title: "Incorrect Password",
-          message:
-            "That isn't the correct password for this budget.\n\nWould you like to log out and start a new budget?",
-          confirmText: "Start New Budget",
-          cancelText: "Try Again",
-          variant: "destructive",
+        // Wrap confirmation in a cancellable promise to prevent race conditions
+        const confirmPromise = new Promise((resolve, reject) => {
+          const originalConfirm = confirm({
+            title: "Incorrect Password",
+            message:
+              "That isn't the correct password for this budget.\n\nWould you like to log out and start a new budget?",
+            confirmText: "Start New Budget",
+            cancelText: "Try Again",
+            variant: "destructive",
+          });
+
+          originalConfirm.then(resolve).catch(reject);
+
+          // Store cancellation function
+          setPendingConfirm({
+            cancel: () => {
+              resolve(false); // Resolve as cancelled
+            },
+          });
         });
+
+        let shouldCreateNew;
+        try {
+          shouldCreateNew = await confirmPromise;
+        } finally {
+          setPendingConfirm(null);
+        }
 
         if (shouldCreateNew) {
           // User wants to create new budget - logout and clear data
@@ -171,21 +197,23 @@ const LockScreen = () => {
               />
             </div>
             <h1 className="text-2xl font-black text-black mb-2">
-              <span className="text-3xl">V</span>IOLET <span className="text-3xl">V</span>AULT
+              <span className="text-3xl">V</span>IOLET{" "}
+              <span className="text-3xl">V</span>AULT
             </h1>
             <div
               className="text-black font-medium uppercase tracking-wider text-justify space-y-1"
               style={{ textAlign: "justify", textAlignLast: "justify" }}
             >
               <p style={{ textAlign: "justify", textAlignLast: "justify" }}>
-                <span className="text-lg">Y</span>OUR <span className="text-lg">B</span>UDGET HAS
-                BEEN LOCKED FOR
+                <span className="text-lg">Y</span>OUR{" "}
+                <span className="text-lg">B</span>UDGET HAS BEEN LOCKED FOR
               </p>
               <p style={{ textAlign: "justify", textAlignLast: "justify" }}>
                 YOUR SAFETY BECAUSE YOU LEFT THE
               </p>
               <p style={{ textAlign: "justify", textAlignLast: "justify" }}>
-                SCREEN. <span className="text-lg">U</span>SE PASSWORD TO GET BACK IN.
+                SCREEN. <span className="text-lg">U</span>SE PASSWORD TO GET
+                BACK IN.
               </p>
             </div>
           </div>
@@ -196,7 +224,8 @@ const LockScreen = () => {
               {/* Password Input */}
               <div className="space-y-2">
                 <label className="block text-sm font-black text-black uppercase tracking-wider">
-                  <span className="text-base">E</span>NTER <span className="text-base">P</span>
+                  <span className="text-base">E</span>NTER{" "}
+                  <span className="text-base">P</span>
                   ASSWORD TO <span className="text-base">U</span>NLOCK
                 </label>
                 <div className="relative">
@@ -216,13 +245,23 @@ const LockScreen = () => {
                     disabled={isUnlocking}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-100 hover:text-white disabled:opacity-50"
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
                   </button>
                 </div>
               </div>
 
               {/* Error Message */}
-              {error && <SecurityAlert type="error" message={error} variant="fullscreen" />}
+              {error && (
+                <SecurityAlert
+                  type="error"
+                  message={error}
+                  variant="fullscreen"
+                />
+              )}
 
               {/* Failed Attempts Warning */}
               {failedAttempts > 0 && (
