@@ -86,7 +86,8 @@ jobs:
               echo "📝 Committing updated lint tracker workflow..."
               
               git add "${FILES_TO_SYNC[@]}"
-              git commit -m "sync: update lint tracker system from develop
+              git commit -m "$(cat <<'EOF'
+sync: update lint tracker system from develop
 
 This automated sync ensures parity between main and develop branches
 for the lint tracking system.
@@ -97,7 +98,9 @@ Files: workflow, template, parser script
 
 🤖 Generated with automated sync action
 
-Co-Authored-By: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+Co-Authored-By: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+EOF
+)"
               
               git push origin main
               echo "✅ Successfully synced lint tracker workflow to main branch!"
