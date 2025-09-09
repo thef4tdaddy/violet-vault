@@ -77,18 +77,6 @@ export class BaseMutex {
   /**
    * Execute a function with mutex protection
    */
-  async execute(fn, operationName = "unnamed") {
-    await this.acquire(operationName);
-    try {
-      return await fn();
-    } finally {
-      this.release();
-    }
-  }
-
-  /**
-   * Execute a function with mutex protection
-   */
   async execute(fn, operationName = "unknown") {
     logger.debug(`🔧 ${this.name}: Starting execute for ${operationName}`);
 
