@@ -39,16 +39,38 @@ const SyncHealthIndicator = () => {
 
   const handleRefresh = () => {
     logger.info("🔄 Sync Health UI: Refresh button clicked");
-    checkSyncHealth();
+    logger.info("🔄 Sync Health UI: checkSyncHealth function type:", typeof checkSyncHealth);
+    
+    // Test if the function exists and is callable
+    if (typeof checkSyncHealth === 'function') {
+      logger.info("🔄 Sync Health UI: Calling checkSyncHealth...");
+      checkSyncHealth();
+      logger.info("🔄 Sync Health UI: checkSyncHealth called successfully");
+    } else {
+      logger.error("🔄 Sync Health UI: checkSyncHealth is not a function!", checkSyncHealth);
+    }
   };
 
   const handleRunValidation = () => {
     logger.info("🚀 Sync Health UI: Validation button clicked");
-    runFullValidation();
+    logger.info("🚀 Sync Health UI: runFullValidation function type:", typeof runFullValidation);
+    logger.info("🚀 Sync Health UI: window.runMasterSyncValidation available:", typeof window.runMasterSyncValidation);
+    
+    // Test if the function exists and is callable
+    if (typeof runFullValidation === 'function') {
+      logger.info("🚀 Sync Health UI: Calling runFullValidation...");
+      runFullValidation();
+      logger.info("🚀 Sync Health UI: runFullValidation called successfully");
+    } else {
+      logger.error("🚀 Sync Health UI: runFullValidation is not a function!", runFullValidation);
+    }
   };
 
   const handleResetData = async () => {
     logger.info("🧹 Sync Health UI: Reset button clicked - showing confirmation");
+    logger.info("🧹 Sync Health UI: resetCloudData function type:", typeof resetCloudData);
+    logger.info("🧹 Sync Health UI: window.forceCloudDataReset available:", typeof window.forceCloudDataReset);
+    
     const confirmed = await confirm({
       title: "Reset Cloud Data",
       message:
@@ -60,7 +82,13 @@ const SyncHealthIndicator = () => {
 
     if (confirmed) {
       logger.info("🧹 Sync Health UI: Reset confirmed - calling resetCloudData");
-      resetCloudData();
+      if (typeof resetCloudData === 'function') {
+        logger.info("🧹 Sync Health UI: Calling resetCloudData...");
+        resetCloudData();
+        logger.info("🧹 Sync Health UI: resetCloudData called successfully");
+      } else {
+        logger.error("🧹 Sync Health UI: resetCloudData is not a function!", resetCloudData);
+      }
     } else {
       logger.info("🧹 Sync Health UI: Reset cancelled");
     }

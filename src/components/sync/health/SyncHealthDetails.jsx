@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { renderIcon } from "../../../utils/icons";
 import {
   formatLastChecked,
@@ -7,6 +7,7 @@ import {
   formatRecoveryResult,
   hasRecoveryActions,
 } from "../../../utils/sync/syncHealthHelpers";
+import logger from "../../../utils/common/logger";
 
 const SyncHealthDetails = ({
   syncStatus,
@@ -20,15 +21,32 @@ const SyncHealthDetails = ({
 }) => {
   const [position, setPosition] = useState({ top: 0, right: 0 });
 
-  useEffect(() => {
+  const updatePosition = useCallback(() => {
     if (buttonRef?.current) {
       const buttonRect = buttonRef.current.getBoundingClientRect();
       setPosition({
-        top: buttonRect.bottom + window.scrollY + 8, // 8px gap below button
-        right: window.innerWidth - buttonRect.right + window.scrollX, // Align right edge
+        top: buttonRect.bottom + 8, // 8px gap below button, no need for scrollY with fixed positioning
+        right: window.innerWidth - buttonRect.right, // Align right edge, no need for scrollX with fixed positioning
       });
     }
   }, [buttonRef]);
+
+  useEffect(() => {
+    updatePosition();
+  }, [updatePosition]);
+
+  // Update position on scroll and resize to keep dropdown anchored to button
+  useEffect(() => {
+    updatePosition(); // Initial positioning
+    
+    window.addEventListener('scroll', updatePosition, true); // Capture phase to catch all scroll events
+    window.addEventListener('resize', updatePosition);
+    
+    return () => {
+      window.removeEventListener('scroll', updatePosition, true);
+      window.removeEventListener('resize', updatePosition);
+    };
+  }, [updatePosition]);
 
   // Handle clicks outside dropdown and escape key to close it
   useEffect(() => {
@@ -190,7 +208,10 @@ const SyncHealthDetails = ({
 
             <div className="flex flex-col gap-2">
               <button
-                onClick={onRefresh}
+                onClick={() => {
+                  logger.info("🔄 Button clicked - calling onRefresh");
+                  onRefresh();
+                }}
                 disabled={syncStatus.isLoading}
                 className={getActionButtonStyle("refresh")}
               >
@@ -201,7 +222,10 @@ const SyncHealthDetails = ({
               </button>
 
               <button
-                onClick={onRunValidation}
+                onClick={() => {
+                  logger.info("🚀 Validation button clicked - calling onRunValidation");
+                  onRunValidation();
+                }}
                 className={getActionButtonStyle("validate")}
               >
                 {renderIcon("Wrench", { className: "h-3 w-3 mr-2" })}
@@ -209,7 +233,10 @@ const SyncHealthDetails = ({
               </button>
 
               <button
-                onClick={onResetData}
+                onClick={() => {
+                  logger.info("🧹 Reset button clicked - calling onResetData");
+                  onResetData();
+                }}
                 disabled={isRecovering}
                 className={getActionButtonStyle("reset")}
               >
