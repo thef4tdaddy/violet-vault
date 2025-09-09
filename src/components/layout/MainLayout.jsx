@@ -81,11 +81,14 @@ const Layout = ({ firebaseSync }) => {
   // Toast notifications from Zustand store
   const { toasts, removeToast } = useToastStore();
 
-  logger.auth("Auth hook values", {
-    isUnlocked,
-    hasCurrentUser: !!currentUser,
-    hasBudgetId: !!securityContext.budgetId,
-  });
+  // Log auth state changes only (not on every render)
+  useEffect(() => {
+    logger.auth("Auth hook values", {
+      isUnlocked,
+      hasCurrentUser: !!currentUser,
+      hasBudgetId: !!securityContext.budgetId,
+    });
+  }, [isUnlocked, currentUser, securityContext.budgetId]);
 
   // Conflict resolution function
   const resolveConflict = () => {
