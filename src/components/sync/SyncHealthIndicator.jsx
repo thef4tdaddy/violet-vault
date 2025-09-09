@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { getQuickSyncStatus } from "../../utils/masterSyncValidator";
+import { getQuickSyncStatus } from "../../utils/sync/masterSyncValidator";
 import { cloudSyncService } from "../../services/cloudSyncService";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 
 const SyncHealthIndicator = () => {
   const [syncStatus, setSyncStatus] = useState({
