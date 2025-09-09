@@ -14,6 +14,7 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
   const [userName, setUserName] = useState("");
   const [userColor, setUserColor] = useState("#a855f7");
   const [shareInfo, setShareInfo] = useState(null);
+  const [creatorInfo, setCreatorInfo] = useState(null);
   const [isValidating, setIsValidating] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -40,6 +41,7 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
       setPassword("");
       setUserName("");
       setShareInfo(null);
+      setCreatorInfo(null);
       setStep(1);
     }
   }, [isOpen]);
@@ -64,11 +66,15 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
 
       if (isValid) {
         setShareInfo({
-          createdBy: "Unknown User", // BIP39 codes don't store creator info
+          createdBy: "Shared Budget", // BIP39 codes are deterministic for any user
           createdAt: Date.now(),
           expiresAt: Date.now() + 365 * 24 * 60 * 60 * 1000, // 1 year
-          userCount: 1,
+          userCount: "Multiple users can join",
         });
+
+        // Clear any previous creator info
+        setCreatorInfo(null);
+
         setStep(2);
         showSuccessToast("Share code is valid! Now set your password.");
       } else {
@@ -147,10 +153,34 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
     }
   };
 
+  const processQRData = (qrData) => {
+    try {
+      const parsed = shareCodeUtils.parseQRData(qrData);
+      if (parsed && parsed.shareCode) {
+        setShareCode(parsed.shareCode);
+
+        // Set creator info if available
+        if (parsed.createdBy) {
+          setCreatorInfo({
+            userName: parsed.createdBy,
+            userColor: parsed.creatorColor || "#a855f7",
+            createdAt: parsed.createdAt,
+          });
+        }
+
+        validateShareCode(parsed.shareCode);
+        return true;
+      }
+    } catch (error) {
+      logger.warn("Failed to parse QR data", error);
+    }
+    return false;
+  };
+
   const handleQRScan = () => {
     // TODO: Implement camera-based QR scanning
     showErrorToast(
-      "QR scanning not yet implemented. Please enter the share code manually.",
+      "QR scanning not yet implemented. Please enter the share code manually or paste QR data.",
     );
   };
 
@@ -268,15 +298,41 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
                     <h4 className="font-black text-green-800 text-sm">
                       VALID SHARE CODE
                     </h4>
-                    <p className="text-xs text-green-700 mt-1">
-                      Created by: <strong>{shareInfo.createdBy}</strong>
-                    </p>
-                    <p className="text-xs text-green-700">
-                      Users: {shareInfo.userCount}
-                    </p>
-                    <p className="text-xs text-green-600 mt-2">
-                      Expires: {new Date(shareInfo.expiresAt).toLocaleString()}
-                    </p>
+                    {creatorInfo ? (
+                      <>
+                        <p className="text-xs text-green-700 mt-1">
+                          Created by:{" "}
+                          <strong style={{ color: creatorInfo.userColor }}>
+                            {creatorInfo.userName}
+                          </strong>
+                        </p>
+                        <p className="text-xs text-green-700">
+                          {creatorInfo.createdAt && (
+                            <>
+                              Shared:{" "}
+                              {new Date(
+                                creatorInfo.createdAt,
+                              ).toLocaleDateString()}
+                            </>
+                          )}
+                        </p>
+                        <p className="text-xs text-green-600 mt-2">
+                          Enter the same password they used to join their budget
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-xs text-green-700 mt-1">
+                          Type: <strong>Deterministic Budget</strong>
+                        </p>
+                        <p className="text-xs text-green-700">
+                          Access: {shareInfo.userCount}
+                        </p>
+                        <p className="text-xs text-green-600 mt-2">
+                          Same code + password = same budget across devices
+                        </p>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -287,14 +343,28 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
                   <label className="block text-sm font-black text-black uppercase tracking-wider mb-2">
                     Your Display Name *
                   </label>
-                  <input
-                    type="text"
-                    value={userName}
-                    onChange={(e) => setUserName(e.target.value)}
-                    placeholder="Enter your name"
-                    className="w-full px-4 py-3 bg-white border-2 border-black rounded-lg"
-                    maxLength={50}
-                  />
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      value={userName}
+                      onChange={(e) => setUserName(e.target.value)}
+                      placeholder="Enter your name"
+                      className="w-full px-4 py-3 bg-white border-2 border-black rounded-lg"
+                      maxLength={50}
+                    />
+                    {creatorInfo && !userName && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setUserName(creatorInfo.userName);
+                          setUserColor(creatorInfo.userColor);
+                        }}
+                        className="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded-lg border border-blue-300 transition-colors"
+                      >
+                        Use {creatorInfo.userName}'s profile
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <div>

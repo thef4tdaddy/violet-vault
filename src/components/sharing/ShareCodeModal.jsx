@@ -39,7 +39,7 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
       // Generate a new 4-word BIP39 share code
       const shareCode = shareCodeUtils.generateShareCode();
       const displayCode = shareCodeUtils.formatForDisplay(shareCode);
-      const qrData = shareCodeUtils.generateQRData(shareCode);
+      const qrData = shareCodeUtils.generateQRData(shareCode, currentUser);
 
       const result = {
         shareCode: displayCode,

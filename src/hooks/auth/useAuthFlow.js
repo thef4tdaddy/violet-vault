@@ -24,19 +24,29 @@ const useAuthFlow = () => {
 
   const handleSetup = useCallback(
     async (userDataOrPassword) => {
-      // Handle both new user (object) and existing user (string) scenarios
+      // Handle three scenarios:
+      // 1. Existing user login (string password)
+      // 2. Shared budget join (object with budgetId)
+      // 3. New user setup (object without budgetId)
       const isExistingUser = typeof userDataOrPassword === "string";
-      const password = isExistingUser ? userDataOrPassword : userDataOrPassword.password;
+      const isSharedBudgetJoin =
+        typeof userDataOrPassword === "object" && userDataOrPassword?.budgetId;
+      const password = isExistingUser
+        ? userDataOrPassword
+        : userDataOrPassword.password;
       const userData = isExistingUser ? null : userDataOrPassword;
 
       logger.auth("Layout handleSetup called", {
         hasUserData: !!userData,
         isExistingUser,
+        isSharedBudgetJoin,
         hasPassword: !!password,
       });
-      logger.auth("🚨 DEBUG VERSION 2: useAuthFlow.js with debug logging is running!");
+      logger.auth(
+        "🚨 DEBUG VERSION 2: useAuthFlow.js with debug logging is running!",
+      );
       try {
-        // For existing users, skip budgetId generation and go straight to login
+        // For existing users and shared budget joins, use existing data
         if (isExistingUser) {
           logger.auth("Existing user login - calling login with password only");
           const result = await login(password, null);
@@ -55,16 +65,46 @@ const useAuthFlow = () => {
           }
         }
 
+        // For shared budget joins, use the provided budgetId without generating new one
+        if (isSharedBudgetJoin) {
+          logger.auth("Shared budget join - using provided budgetId", {
+            budgetId: userData.budgetId?.substring(0, 10) + "...",
+            sharedBy: userData.sharedBy,
+          });
+
+          const result = await login(password, userData);
+          logger.auth("Shared budget join result", { success: !!result });
+
+          if (result.success) {
+            logger.production("Shared budget join successful", {
+              budgetId: userData.budgetId?.substring(0, 8) + "...",
+            });
+            return result;
+          } else {
+            logger.error("❌ Shared budget join failed:", result.error);
+            const error = new Error(result.error);
+            error.code = result.code;
+            throw error;
+          }
+        }
+
         // New user path - generate budgetId and setup new account
-        const { encryptionUtils } = await import("../../utils/security/encryption");
+        const { encryptionUtils } = await import(
+          "../../utils/security/encryption"
+        );
 
         // NEW: Generate share code and deterministic budget ID
         // This replaces the device-specific system with user-controlled share codes
-        const { shareCodeUtils } = await import("../../utils/security/shareCodeUtils");
+        const { shareCodeUtils } = await import(
+          "../../utils/security/shareCodeUtils"
+        );
 
         // For new users, generate a fresh share code
         const shareCode = shareCodeUtils.generateShareCode();
-        const budgetId = await encryptionUtils.generateBudgetId(password, shareCode);
+        const budgetId = await encryptionUtils.generateBudgetId(
+          password,
+          shareCode,
+        );
 
         logger.auth("🔍 Generated new budget with share code system", {
           budgetIdPreview: budgetId.substring(0, 10) + "...",
@@ -121,7 +161,7 @@ const useAuthFlow = () => {
         showErrorToast(`Setup error: ${error.message}`, "Setup Error");
       }
     },
-    [login, showErrorToast]
+    [login, showErrorToast],
   );
 
   const handleLogout = useCallback(() => {
@@ -132,12 +172,15 @@ const useAuthFlow = () => {
     async (oldPass, newPass) => {
       const result = await changePassword(oldPass, newPass);
       if (!result.success) {
-        showErrorToast(`Password change failed: ${result.error}`, "Password Change Failed");
+        showErrorToast(
+          `Password change failed: ${result.error}`,
+          "Password Change Failed",
+        );
       } else {
         showSuccessToast("Password updated successfully", "Password Changed");
       }
     },
-    [changePassword, showErrorToast, showSuccessToast]
+    [changePassword, showErrorToast, showSuccessToast],
   );
 
   const handleUpdateProfile = useCallback(
@@ -147,7 +190,7 @@ const useAuthFlow = () => {
         throw new Error(result.error);
       }
     },
-    [updateProfile]
+    [updateProfile],
   );
 
   return {
