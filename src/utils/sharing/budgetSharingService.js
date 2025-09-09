@@ -9,6 +9,38 @@ import logger from "../common/logger";
  */
 export const budgetSharingService = {
   /**
+   * Debug function to list all share codes in localStorage
+   * @returns {Array} List of share codes
+   */
+  debugListShareCodes() {
+    const shareCodes = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith("violetVault_shareCode_")) {
+        const shareCode = key.replace("violetVault_shareCode_", "");
+        const shareDataStr = localStorage.getItem(key);
+        try {
+          const shareData = JSON.parse(shareDataStr);
+          shareCodes.push({
+            code: shareCode,
+            createdBy: shareData.createdBy,
+            createdAt: new Date(shareData.createdAt).toLocaleString(),
+            expiresAt: new Date(shareData.expiresAt).toLocaleString(),
+            isActive: shareData.isActive,
+            userCount: shareData.usedBy?.length + 1 || 1,
+          });
+        } catch (e) {
+          logger.warn("Failed to parse share code data", {
+            key,
+            error: e.message,
+          });
+        }
+      }
+    }
+    logger.info("Available share codes", shareCodes);
+    return shareCodes;
+  },
+  /**
    * Generate a shareable code for the current budget
    * @param {string} budgetId - The current user's budgetId
    * @param {string} masterPassword - The master password for verification
@@ -40,7 +72,9 @@ export const budgetSharingService = {
       const qrData = JSON.stringify({
         type: "violetVault_share",
         shareCode,
-        budgetName: currentUser?.userName ? `${currentUser.userName}'s Budget` : "Shared Budget",
+        budgetName: currentUser?.userName
+          ? `${currentUser.userName}'s Budget`
+          : "Shared Budget",
         version: "1.0",
       });
 
@@ -129,10 +163,21 @@ export const budgetSharingService = {
    */
   async validateShareCode(shareCode) {
     try {
+      logger.info("validateShareCode called", { shareCode });
+
+      // Debug: List all available share codes
+      this.debugListShareCodes();
+
       const shareKey = `violetVault_shareCode_${shareCode}`;
+      logger.info("Looking for localStorage key", { shareKey });
       const shareDataStr = localStorage.getItem(shareKey);
+      logger.info("localStorage lookup result", {
+        found: !!shareDataStr,
+        shareDataStr,
+      });
 
       if (!shareDataStr) {
+        logger.warn("Share code not found in localStorage", { shareKey });
         return { valid: false, error: "Share code not found" };
       }
 

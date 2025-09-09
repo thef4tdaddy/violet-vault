@@ -45,17 +45,25 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
   }, [isOpen]);
 
   const validateShareCode = async (code = shareCode) => {
-    if (!code.trim()) return;
+    if (!code.trim()) {
+      logger.warn("validateShareCode called with empty code");
+      return;
+    }
 
+    logger.info("Validating share code", { code: code.trim() });
     setIsValidating(true);
     try {
-      const result = await budgetSharingService.validateShareCode(code.toUpperCase().trim());
+      const result = await budgetSharingService.validateShareCode(
+        code.toUpperCase().trim(),
+      );
+      logger.info("Share code validation result", result);
 
       if (result.valid) {
         setShareInfo(result.shareData);
         setStep(2);
         showSuccessToast("Share code is valid! Now set your password.");
       } else {
+        logger.warn("Share code validation failed", result);
         showErrorToast(result.error || "Invalid share code");
         setShareInfo(null);
       }
@@ -87,7 +95,7 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
       const result = await budgetSharingService.joinBudgetWithCode(
         shareCode.toUpperCase().trim(),
         password,
-        userInfo
+        userInfo,
       );
 
       if (result.success) {
@@ -121,7 +129,9 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
 
   const handleQRScan = () => {
     // TODO: Implement camera-based QR scanning
-    showErrorToast("QR scanning not yet implemented. Please enter the share code manually.");
+    showErrorToast(
+      "QR scanning not yet implemented. Please enter the share code manually.",
+    );
   };
 
   const generateRandomColor = () => {
@@ -148,7 +158,8 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-black text-black">
-              <span className="text-2xl">J</span>OIN <span className="text-2xl">B</span>UDGET
+              <span className="text-2xl">J</span>OIN{" "}
+              <span className="text-2xl">B</span>UDGET
             </h2>
             <button
               onClick={onClose}
@@ -176,7 +187,9 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
                     <input
                       type="text"
                       value={shareCode}
-                      onChange={(e) => setShareCode(e.target.value.toUpperCase())}
+                      onChange={(e) =>
+                        setShareCode(e.target.value.toUpperCase())
+                      }
                       placeholder="VV-XXXX-XXXX"
                       className="flex-1 px-4 py-3 bg-white border-2 border-black rounded-lg text-lg font-mono text-center tracking-wider uppercase"
                       maxLength={11}
@@ -211,7 +224,9 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
               </div>
 
               <div className="bg-purple-50 border-2 border-purple-300 rounded-lg p-4">
-                <h4 className="font-black text-purple-800 text-sm mb-2">HOW TO JOIN</h4>
+                <h4 className="font-black text-purple-800 text-sm mb-2">
+                  HOW TO JOIN
+                </h4>
                 <ol className="text-xs text-purple-700 space-y-1">
                   <li>1. Get a share code from the budget owner</li>
                   <li>2. Enter the code above or scan their QR code</li>
@@ -230,11 +245,15 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
                 <div className="flex items-start gap-3">
                   {renderIcon("CheckCircle", "h-5 w-5 text-green-600 mt-0.5")}
                   <div>
-                    <h4 className="font-black text-green-800 text-sm">VALID SHARE CODE</h4>
+                    <h4 className="font-black text-green-800 text-sm">
+                      VALID SHARE CODE
+                    </h4>
                     <p className="text-xs text-green-700 mt-1">
                       Created by: <strong>{shareInfo.createdBy}</strong>
                     </p>
-                    <p className="text-xs text-green-700">Users: {shareInfo.userCount}</p>
+                    <p className="text-xs text-green-700">
+                      Users: {shareInfo.userCount}
+                    </p>
                     <p className="text-xs text-green-600 mt-2">
                       Expires: {new Date(shareInfo.expiresAt).toLocaleString()}
                     </p>
@@ -303,7 +322,8 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
                     </button>
                   </div>
                   <p className="text-xs text-gray-600 mt-1">
-                    This encrypts your local data. Different from the share code!
+                    This encrypts your local data. Different from the share
+                    code!
                   </p>
                 </div>
               </div>
@@ -319,7 +339,9 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
                 </button>
                 <button
                   onClick={handleJoinBudget}
-                  disabled={!shareCode || !password || !userName.trim() || isJoining}
+                  disabled={
+                    !shareCode || !password || !userName.trim() || isJoining
+                  }
                   className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white py-3 px-4 rounded-lg font-black transition-colors border-2 border-black disabled:opacity-50"
                 >
                   {isJoining ? (
