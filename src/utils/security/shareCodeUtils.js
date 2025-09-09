@@ -26,7 +26,7 @@ export const shareCodeUtils = {
       const shareCode = words.join(" ");
 
       // Validate that our own generated words are valid
-      const wordlist = bip39.getDefaultWordlist();
+      const wordlist = bip39.wordlists.english;
       const invalidGenerated = words.filter((word) => !wordlist.includes(word.toLowerCase()));
       
       logger.info("Generated new share code", {
@@ -65,8 +65,8 @@ export const shareCodeUtils = {
       return false;
     }
 
-    // Each word must be valid BIP39 word
-    const wordlist = bip39.getDefaultWordlist();
+    // Each word must be valid BIP39 word - use proper wordlist access
+    const wordlist = bip39.wordlists.english;
     logger.debug("BIP39 wordlist info", { 
       wordlistType: typeof wordlist, 
       isArray: Array.isArray(wordlist),
