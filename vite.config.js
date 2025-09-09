@@ -73,6 +73,9 @@ export default defineConfig(() => {
     // "Invalid hook call" errors during development
     resolve: {
       dedupe: ["react", "react-dom"],
+      alias: {
+        buffer: "buffer",
+      },
     },
     // Increase memory limits and optimize for build performance
     server: {
@@ -82,7 +85,7 @@ export default defineConfig(() => {
     },
     define: {
       "process.env": {},
-      global: {},
+      global: "globalThis",
       // Inject git information as environment variables
       "import.meta.env.VITE_GIT_BRANCH": JSON.stringify(gitInfo.branch),
       "import.meta.env.VITE_GIT_COMMIT_DATE": JSON.stringify(
