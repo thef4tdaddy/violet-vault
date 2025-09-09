@@ -16,15 +16,57 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const { currentUser, encryptionKey } = useAuth();
+  const { currentUser, encryptionKey, updateProfile } = useAuth();
   const { showSuccessToast, showErrorToast } = useToastHelpers();
   const confirm = useConfirm();
 
   useEffect(() => {
     if (isOpen && !shareData) {
-      generateShareCode();
+      loadExistingShareCode();
     }
   }, [isOpen]);
+
+  const loadExistingShareCode = async () => {
+    if (!currentUser?.userName) {
+      showErrorToast(
+        "Cannot load share code - user not properly authenticated",
+      );
+      return;
+    }
+
+    // Check if user already has a share code
+    if (currentUser.shareCode) {
+      setIsGenerating(true);
+      try {
+        const shareCode = currentUser.shareCode;
+        const displayCode = shareCodeUtils.formatForDisplay(shareCode);
+        const qrData = shareCodeUtils.generateQRData(shareCode, currentUser);
+
+        const result = {
+          shareCode: displayCode,
+          qrData,
+          shareUrl: `${window.location.origin}?share=${encodeURIComponent(shareCode)}`,
+          expiresAt: Date.now() + 365 * 24 * 60 * 60 * 1000, // 1 year
+        };
+
+        setShareData(result);
+
+        logger.info("Loaded existing BIP39 share code", {
+          shareCodePreview: shareCode.split(" ").slice(0, 2).join(" ") + " ...",
+          displayCode: displayCode.split(" ").slice(0, 2).join(" ") + " ...",
+        });
+      } catch (error) {
+        logger.error("Failed to load existing share code", error);
+        // Fall back to generating a new one
+        await generateShareCode();
+      } finally {
+        setIsGenerating(false);
+      }
+    } else {
+      // No existing share code, generate a new one
+      await generateShareCode();
+    }
+  };
 
   const generateShareCode = async () => {
     if (!currentUser?.userName) {
@@ -49,6 +91,21 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
       };
 
       setShareData(result);
+
+      // Save the share code to the user profile for persistence
+      try {
+        await updateProfile({
+          ...currentUser,
+          shareCode: shareCode,
+        });
+        logger.info("Share code saved to user profile for persistence");
+      } catch (error) {
+        logger.error("Failed to save share code to user profile", error);
+        showErrorToast(
+          "Share code generated but failed to save. It may not persist across sessions.",
+        );
+      }
+
       showSuccessToast("Share code generated successfully!");
 
       logger.info("Generated BIP39 share code", {
