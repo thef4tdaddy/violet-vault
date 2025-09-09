@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
+/* eslint-disable no-console */
+import React from "react";
 import { renderIcon } from "../../../utils/icons";
 import {
   formatLastChecked,
@@ -7,82 +8,16 @@ import {
   formatRecoveryResult,
   hasRecoveryActions,
 } from "../../../utils/sync/syncHealthHelpers";
-import logger from "../../../utils/common/logger";
 
 const SyncHealthDetails = ({
   syncStatus,
   isBackgroundSyncing,
   isRecovering,
   recoveryResult,
-  onRefresh,
-  onRunValidation,
-  onResetData,
-  buttonRef,
+  onRefresh: _onRefresh,
+  onRunValidation: _onRunValidation,
+  onResetData: _onResetData,
 }) => {
-  const [position, setPosition] = useState({ top: 0, right: 0 });
-
-  const updatePosition = useCallback(() => {
-    if (buttonRef?.current) {
-      const buttonRect = buttonRef.current.getBoundingClientRect();
-      setPosition({
-        top: buttonRect.bottom + 8, // 8px gap below button, no need for scrollY with fixed positioning
-        right: window.innerWidth - buttonRect.right, // Align right edge, no need for scrollX with fixed positioning
-      });
-    }
-  }, [buttonRef]);
-
-  useEffect(() => {
-    updatePosition();
-  }, [updatePosition]);
-
-  // Update position on scroll and resize to keep dropdown anchored to button
-  useEffect(() => {
-    updatePosition(); // Initial positioning
-    
-    window.addEventListener('scroll', updatePosition, true); // Capture phase to catch all scroll events
-    window.addEventListener('resize', updatePosition);
-    
-    return () => {
-      window.removeEventListener('scroll', updatePosition, true);
-      window.removeEventListener('resize', updatePosition);
-    };
-  }, [updatePosition]);
-
-  // Handle clicks outside dropdown and escape key to close it
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (buttonRef?.current && !buttonRef.current.contains(event.target)) {
-        // Check if click is on the dropdown itself
-        const dropdown = event.target.closest('[data-sync-dropdown="true"]');
-        if (!dropdown) {
-          // Click outside - close dropdown by clearing showDetails
-          // We need to signal parent to close
-          if (onRefresh) {
-            // Use a custom event to signal close
-            window.dispatchEvent(new CustomEvent('closeSyncDropdown'));
-          }
-        }
-      }
-    };
-
-    const handleKeyDown = (event) => {
-      if (event.key === "Escape") {
-        window.dispatchEvent(new CustomEvent('closeSyncDropdown'));
-      }
-    };
-
-    // Use setTimeout to delay event listener registration
-    // This prevents immediate closure when clicking buttons
-    setTimeout(() => {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("keydown", handleKeyDown);
-    }, 100);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [buttonRef, onRefresh]);
   const statusDescription = getStatusDescription(
     syncStatus,
     isBackgroundSyncing,
@@ -91,14 +26,7 @@ const SyncHealthDetails = ({
   const formattedRecoveryResult = formatRecoveryResult(recoveryResult);
 
   return (
-    <div
-      data-sync-dropdown="true"
-      className="fixed w-80 glassmorphism backdrop-blur-sm border-2 border-black rounded-xl shadow-2xl overflow-hidden"
-      style={{ 
-        top: position.top,
-        right: position.right,
-        zIndex: 999999 
-      }}
+    <div className="absolute right-0 top-full mt-2 w-80 glassmorphism backdrop-blur-sm border-2 border-black rounded-xl shadow-2xl overflow-hidden"
     >
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-700 px-4 py-3 border-b-2 border-black">
@@ -209,8 +137,12 @@ const SyncHealthDetails = ({
             <div className="flex flex-col gap-2">
               <button
                 onClick={() => {
-                  logger.info("🔄 Button clicked - calling onRefresh");
-                  onRefresh();
+                  console.log("🔄 DIRECT TEST: Button clicked, calling window.getQuickSyncStatus");
+                  if (window.getQuickSyncStatus) {
+                    window.getQuickSyncStatus().then(result => console.log("🔄 RESULT:", result));
+                  } else {
+                    console.log("🔄 ERROR: window.getQuickSyncStatus not found");
+                  }
                 }}
                 disabled={syncStatus.isLoading}
                 className={getActionButtonStyle("refresh")}
@@ -223,8 +155,12 @@ const SyncHealthDetails = ({
 
               <button
                 onClick={() => {
-                  logger.info("🚀 Validation button clicked - calling onRunValidation");
-                  onRunValidation();
+                  console.log("🚀 DIRECT TEST: Button clicked, calling window.runMasterSyncValidation");
+                  if (window.runMasterSyncValidation) {
+                    window.runMasterSyncValidation().then(result => console.log("🚀 RESULT:", result));
+                  } else {
+                    console.log("🚀 ERROR: window.runMasterSyncValidation not found");
+                  }
                 }}
                 className={getActionButtonStyle("validate")}
               >
@@ -234,8 +170,15 @@ const SyncHealthDetails = ({
 
               <button
                 onClick={() => {
-                  logger.info("🧹 Reset button clicked - calling onResetData");
-                  onResetData();
+                  console.log("🧹 DIRECT TEST: Button clicked, calling window.forceCloudDataReset");
+                  if (window.forceCloudDataReset) {
+                    // eslint-disable-next-line no-restricted-globals
+                    if (confirm("Reset cloud data? This cannot be undone.")) {
+                      window.forceCloudDataReset().then(result => console.log("🧹 RESULT:", result));
+                    }
+                  } else {
+                    console.log("🧹 ERROR: window.forceCloudDataReset not found");
+                  }
                 }}
                 disabled={isRecovering}
                 className={getActionButtonStyle("reset")}
