@@ -325,12 +325,70 @@ jobs:
             const developWarnings = '${{ steps.develop_warnings.outputs.warnings }}' || '0';
             const mainWarnings = '${{ steps.main_warnings.outputs.warnings }}' || '0';
 
+            // Get previous warnings from the last comment to calculate delta
+            let previousDevelopWarnings = null;
+            let previousMainWarnings = null;
+
+            try {
+              const comments = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: 568
+              });
+              
+              // Find the most recent automation comment to get previous values
+              const lastAutomationComment = comments.data
+                .filter(comment => 
+                  comment.user.login === 'github-actions[bot]' &&
+                  comment.body.includes('📊 **Lint Warning Analysis**')
+                )
+                .pop(); // Get the most recent one
+              
+              if (lastAutomationComment) {
+                const devMatch = lastAutomationComment.body.match(/\*\*Develop Branch:\*\* (\d+) warnings/);
+                const mainMatch = lastAutomationComment.body.match(/\*\*Main Branch:\*\* (\d+) warnings/);
+                
+                if (devMatch) previousDevelopWarnings = parseInt(devMatch[1]);
+                if (mainMatch) previousMainWarnings = parseInt(mainMatch[1]);
+              }
+            } catch (error) {
+              console.log('Could not fetch previous warnings for delta calculation:', error.message);
+            }
+
+            // Calculate deltas
+            const developDelta = previousDevelopWarnings !== null ? 
+              parseInt(developWarnings) - previousDevelopWarnings : null;
+            const mainDelta = previousMainWarnings !== null ? 
+              parseInt(mainWarnings) - previousMainWarnings : null;
+
+            // Check if we should skip posting (no changes)
+            const shouldSkipPost = (
+              ('${{ steps.should_run.outputs.should_run_develop }}' === 'true' && developDelta === 0) &&
+              ('${{ steps.should_run.outputs.should_run_main }}' === 'true' && mainDelta === 0)
+            ) || (
+              ('${{ steps.should_run.outputs.should_run_develop }}' === 'true' && !('${{ steps.should_run.outputs.should_run_main }}' === 'true') && developDelta === 0) ||
+              ('${{ steps.should_run.outputs.should_run_main }}' === 'true' && !('${{ steps.should_run.outputs.should_run_develop }}' === 'true') && mainDelta === 0)
+            );
+
+            if (shouldSkipPost) {
+              console.log('🔇 Skipping comment - no changes in warning counts');
+              console.log(`Develop: ${previousDevelopWarnings} → ${developWarnings} (Δ: ${developDelta})`);
+              console.log(`Main: ${previousMainWarnings} → ${mainWarnings} (Δ: ${mainDelta})`);
+              return;
+            }
+
             let branchInfo = '';
             if ('${{ steps.should_run.outputs.should_run_develop }}' === 'true') {
-              branchInfo += `**Develop Branch:** ${developWarnings} warnings\n`;
+              const deltaText = developDelta !== null ? 
+                (developDelta > 0 ? ` (+${developDelta})` : 
+                 developDelta < 0 ? ` (${developDelta})` : ' (no change)') : '';
+              branchInfo += `**Develop Branch:** ${developWarnings} warnings${deltaText}\n`;
             }
             if ('${{ steps.should_run.outputs.should_run_main }}' === 'true') {
-              branchInfo += `**Main Branch:** ${mainWarnings} warnings\n`;
+              const deltaText = mainDelta !== null ? 
+                (mainDelta > 0 ? ` (+${mainDelta})` : 
+                 mainDelta < 0 ? ` (${mainDelta})` : ' (no change)') : '';
+              branchInfo += `**Main Branch:** ${mainWarnings} warnings${deltaText}\n`;
             }
 
             const statusMessage = developWarnings < 96 
