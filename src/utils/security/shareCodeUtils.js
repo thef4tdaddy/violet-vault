@@ -170,38 +170,75 @@ export const shareCodeUtils = {
   /**
    * Generate QR code data for share code
    * @param {string} shareCode - The 4-word share code
+   * @param {Object} creatorInfo - Optional creator profile info
    * @returns {string} QR code data string
    */
-  generateQRData(shareCode) {
+  generateQRData(shareCode, creatorInfo = null) {
     const normalizedShareCode = this.normalizeShareCode(shareCode);
 
     if (!this.validateShareCode(normalizedShareCode)) {
       throw new Error("Invalid share code for QR generation");
     }
 
-    // Format: VV-SHARE-words (compatible with existing QR system)
-    return `VV-SHARE-${normalizedShareCode.replace(/\s+/g, "-")}`;
+    // Enhanced format with optional creator info
+    const qrData = {
+      type: "violetVault_share",
+      shareCode: normalizedShareCode,
+      version: "2.0",
+    };
+
+    // Add creator info if provided
+    if (creatorInfo?.userName) {
+      qrData.createdBy = creatorInfo.userName;
+      qrData.creatorColor = creatorInfo.userColor;
+      qrData.createdAt = Date.now();
+    }
+
+    return JSON.stringify(qrData);
   },
 
   /**
    * Parse share code from QR data
    * @param {string} qrData - QR code data string
-   * @returns {string|null} Share code or null if invalid
+   * @returns {Object|null} Share code data or null if invalid
    */
   parseQRData(qrData) {
     if (!qrData || typeof qrData !== "string") {
       return null;
     }
 
-    const match = qrData.match(/^VV-SHARE-(.+)$/);
-    if (!match) {
-      return null;
+    // Try parsing as JSON (new format)
+    try {
+      const parsed = JSON.parse(qrData);
+      if (parsed.type === "violetVault_share" && parsed.shareCode) {
+        const shareCode = this.normalizeShareCode(parsed.shareCode);
+        if (this.validateShareCode(shareCode)) {
+          return {
+            shareCode,
+            createdBy: parsed.createdBy || null,
+            creatorColor: parsed.creatorColor || null,
+            createdAt: parsed.createdAt || null,
+            version: parsed.version || "2.0",
+          };
+        }
+      }
+    } catch {
+      // Fall through to legacy format
     }
 
-    const shareCode = match[1].replace(/-/g, " ");
-
-    if (this.validateShareCode(shareCode)) {
-      return this.normalizeShareCode(shareCode);
+    // Legacy format: VV-SHARE-words
+    const match = qrData.match(/^VV-SHARE-(.+)$/);
+    if (match) {
+      const shareCode = match[1].replace(/-/g, " ");
+      if (this.validateShareCode(shareCode)) {
+        return {
+          shareCode: this.normalizeShareCode(shareCode),
+          createdBy: null,
+          creatorColor: null,
+          createdAt: null,
+          version: "1.0",
+        };
+      }
     }
 
     return null;
