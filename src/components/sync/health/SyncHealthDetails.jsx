@@ -134,7 +134,10 @@ const SyncHealthDetails = ({
 
             <div className="flex flex-col gap-2">
               <button
-                onClick={onRefresh}
+                onClick={() => {
+                  logger.info("🔄 Refresh button clicked in SyncHealthDetails");
+                  onRefresh();
+                }}
                 disabled={syncStatus.isLoading}
                 className={getActionButtonStyle("refresh")}
               >
@@ -145,7 +148,12 @@ const SyncHealthDetails = ({
               </button>
 
               <button
-                onClick={onRunValidation}
+                onClick={() => {
+                  logger.info(
+                    "🚀 Full validation button clicked in SyncHealthDetails",
+                  );
+                  onRunValidation();
+                }}
                 className={getActionButtonStyle("validate")}
               >
                 {renderIcon("Wrench", { className: "h-3 w-3 mr-2" })}
