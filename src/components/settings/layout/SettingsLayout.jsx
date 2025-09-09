@@ -13,7 +13,7 @@ const SettingsLayout = ({
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl relative">
+      <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm w-full max-w-4xl max-h-[90vh] shadow-2xl relative flex flex-col">
         {/* Close Button - Top Right Corner */}
         <button
           onClick={onClose}
@@ -22,7 +22,7 @@ const SettingsLayout = ({
           <X className="h-5 w-5" />
         </button>
 
-        <div className="flex h-full">
+        <div className="flex flex-1 min-h-0">
           {/* Sidebar */}
           <div className="w-64 glassmorphism border-r-2 border-black flex-shrink-0 rounded-l-lg">
             <div className="p-6">
@@ -56,7 +56,7 @@ const SettingsLayout = ({
           </div>
 
           {/* Main Content */}
-          <div className="flex-1 overflow-y-auto glassmorphism rounded-r-lg">
+          <div className="flex-1 overflow-y-auto glassmorphism rounded-r-lg min-h-0">
             <div className="p-6">{children}</div>
           </div>
         </div>
