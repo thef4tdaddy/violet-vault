@@ -6,7 +6,11 @@
  * Created for GitHub Issue #588
  */
 import * as bip39 from "bip39";
+import { Buffer } from "buffer";
 import logger from "../common/logger";
+
+// Make Buffer available globally for BIP39
+globalThis.Buffer = Buffer;
 
 export const shareCodeUtils = {
   /**
