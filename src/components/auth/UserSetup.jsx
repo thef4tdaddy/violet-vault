@@ -56,7 +56,10 @@ const UserSetup = ({ onSetupComplete }) => {
     try {
       const result = await joinBudgetWithShareCode(joinData);
       if (result.success) {
-        onSetupComplete(result);
+        // Don't call onSetupComplete for shared budget joins -
+        // the auth state is already set by joinBudgetWithShareCode
+        logger.auth("Shared budget join completed - auth state already set");
+        // The AuthGateway will automatically hide once shouldShowAuthGateway returns false
       }
     } catch (error) {
       logger.error("Failed to complete join budget setup", error);
@@ -73,7 +76,9 @@ const UserSetup = ({ onSetupComplete }) => {
       />
 
       <form
-        onSubmit={isReturningUser || step === 1 ? handleStep1Continue : handleSubmit}
+        onSubmit={
+          isReturningUser || step === 1 ? handleStep1Continue : handleSubmit
+        }
         className="space-y-6"
       >
         {/* Password Input (Step 1 and Returning Users) */}
@@ -109,7 +114,11 @@ const UserSetup = ({ onSetupComplete }) => {
         {/* User Profile Setup (Step 2) */}
         {step === 2 && !isReturningUser && (
           <>
-            <UserNameInput value={userName} onChange={handleNameChange} disabled={isLoading} />
+            <UserNameInput
+              value={userName}
+              onChange={handleNameChange}
+              disabled={isLoading}
+            />
 
             <ColorPicker
               selectedColor={userColor}
@@ -142,7 +151,9 @@ const UserSetup = ({ onSetupComplete }) => {
       {step === 1 && !isReturningUser && (
         <div className="mt-6 pt-6 border-t border-white/20">
           <div className="text-center">
-            <p className="text-sm text-purple-900 mb-3">Already have a shared budget?</p>
+            <p className="text-sm text-purple-900 mb-3">
+              Already have a shared budget?
+            </p>
             <button
               type="button"
               onClick={() => setShowJoinModal(true)}
