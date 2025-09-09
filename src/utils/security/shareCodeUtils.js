@@ -25,9 +25,17 @@ export const shareCodeUtils = {
       const words = mnemonic.split(" ").slice(0, 4);
       const shareCode = words.join(" ");
 
+      // Validate that our own generated words are valid
+      const wordlist = bip39.getDefaultWordlist();
+      const invalidGenerated = words.filter((word) => !wordlist.includes(word.toLowerCase()));
+      
       logger.info("Generated new share code", {
         wordCount: words.length,
         preview: words[0] + " " + words[1] + " ...",
+        actualWords: words,
+        generatedValid: invalidGenerated.length === 0,
+        invalidGenerated,
+        wordlistLength: wordlist?.length
       });
 
       return shareCode;
@@ -59,10 +67,25 @@ export const shareCodeUtils = {
 
     // Each word must be valid BIP39 word
     const wordlist = bip39.getDefaultWordlist();
+    logger.debug("BIP39 wordlist info", { 
+      wordlistType: typeof wordlist, 
+      isArray: Array.isArray(wordlist),
+      length: wordlist?.length,
+      firstFew: wordlist?.slice(0, 5),
+      sampleWord: wordlist?.includes('abandon') // 'abandon' is first BIP39 word
+    });
+    
     const invalidWords = words.filter((word) => !wordlist.includes(word.toLowerCase()));
     
     if (invalidWords.length > 0) {
-      logger.debug("Share code validation failed - invalid words", { invalidWords, allWords: words });
+      logger.debug("Share code validation failed - invalid words", { 
+        invalidWords, 
+        allWords: words,
+        wordlistIncludes: words.map(word => ({
+          word: word.toLowerCase(),
+          inList: wordlist.includes(word.toLowerCase())
+        }))
+      });
       return false;
     }
 
