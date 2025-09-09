@@ -101,6 +101,38 @@ export const useAuth = create((set, get) => ({
           localStorage.setItem("userProfile", JSON.stringify(profileData));
           logger.auth("Saved user profile to localStorage.");
 
+          // Create initial empty budget data with user info and save to localStorage
+          const initialBudgetData = {
+            currentUser: finalUserData,
+            envelopes: [],
+            bills: [],
+            transactions: [],
+            actualBalance: { amount: 0, isManual: false },
+            unassignedCash: 0,
+            metadata: {
+              version: '2.0.0',
+              createdAt: new Date().toISOString(),
+              lastModified: new Date().toISOString(),
+              shareCodeSystem: true
+            }
+          };
+
+          // Encrypt and save the initial budget data to localStorage
+          const encrypted = await encryptionUtils.encrypt(initialBudgetData, key);
+          localStorage.setItem(
+            "envelopeBudgetData",
+            JSON.stringify({
+              encryptedData: encrypted.data,
+              salt: Array.from(newSalt),
+              iv: encrypted.iv,
+            })
+          );
+
+          logger.auth("New budget created and saved with share code system.", {
+            budgetId: finalUserData.budgetId,
+            shareCodePreview: shareCode.split(' ').slice(0, 2).join(' ') + ' ...'
+          });
+
           // Start background sync after successful login (new user path)
           const { startBackgroundSyncAfterLogin } = get();
           await startBackgroundSyncAfterLogin(true); // Pass true for new user
