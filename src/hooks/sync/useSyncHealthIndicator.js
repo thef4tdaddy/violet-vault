@@ -48,34 +48,7 @@ export const useSyncHealthIndicator = () => {
     return () => clearInterval(activityInterval);
   }, []);
 
-  // Handle clicks outside dropdown and escape key to close it
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowDetails(false);
-      }
-    };
-
-    const handleKeyDown = (event) => {
-      if (event.key === "Escape") {
-        setShowDetails(false);
-      }
-    };
-
-    if (showDetails) {
-      // Use setTimeout to delay event listener registration
-      // This prevents immediate closure when clicking buttons
-      setTimeout(() => {
-        document.addEventListener("mousedown", handleClickOutside);
-        document.addEventListener("keydown", handleKeyDown);
-      }, 100);
-
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-        document.removeEventListener("keydown", handleKeyDown);
-      };
-    }
-  }, [showDetails]);
+  // Click-outside handling is now managed in SyncHealthDetails component since it's portaled
 
   const checkSyncHealth = async () => {
     logger.info("🔄 Sync Health: Checking sync health...");

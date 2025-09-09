@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useSyncHealthIndicator } from "../../hooks/sync/useSyncHealthIndicator";
 import { useConfirm } from "../../hooks/common/useConfirm";
 import SyncStatusIndicator from "./health/SyncStatusIndicator";
 import SyncHealthDetails from "./health/SyncHealthDetails";
+import logger from "../../utils/common/logger";
 
 const SyncHealthIndicator = () => {
   const {
@@ -19,19 +21,34 @@ const SyncHealthIndicator = () => {
   } = useSyncHealthIndicator();
   const confirm = useConfirm();
 
+  // Listen for close events from the portaled dropdown
+  useEffect(() => {
+    const handleCloseDropdown = () => {
+      setShowDetails(false);
+    };
+
+    window.addEventListener('closeSyncDropdown', handleCloseDropdown);
+    return () => {
+      window.removeEventListener('closeSyncDropdown', handleCloseDropdown);
+    };
+  }, [setShowDetails]);
+
   const handleToggleDetails = () => {
     setShowDetails(!showDetails);
   };
 
   const handleRefresh = () => {
+    logger.info("🔄 Sync Health UI: Refresh button clicked");
     checkSyncHealth();
   };
 
   const handleRunValidation = () => {
+    logger.info("🚀 Sync Health UI: Validation button clicked");
     runFullValidation();
   };
 
   const handleResetData = async () => {
+    logger.info("🧹 Sync Health UI: Reset button clicked - showing confirmation");
     const confirmed = await confirm({
       title: "Reset Cloud Data",
       message:
@@ -42,20 +59,25 @@ const SyncHealthIndicator = () => {
     });
 
     if (confirmed) {
+      logger.info("🧹 Sync Health UI: Reset confirmed - calling resetCloudData");
       resetCloudData();
+    } else {
+      logger.info("🧹 Sync Health UI: Reset cancelled");
     }
   };
 
   return (
-    <div className="relative inline-block z-[99999]" ref={dropdownRef}>
-      <SyncStatusIndicator
-        syncStatus={syncStatus}
-        isBackgroundSyncing={isBackgroundSyncing}
-        onClick={handleToggleDetails}
-        showDetails={showDetails}
-      />
+    <>
+      <div className="relative inline-block" ref={dropdownRef}>
+        <SyncStatusIndicator
+          syncStatus={syncStatus}
+          isBackgroundSyncing={isBackgroundSyncing}
+          onClick={handleToggleDetails}
+          showDetails={showDetails}
+        />
+      </div>
 
-      {showDetails && (
+      {showDetails && createPortal(
         <SyncHealthDetails
           syncStatus={syncStatus}
           isBackgroundSyncing={isBackgroundSyncing}
@@ -64,9 +86,11 @@ const SyncHealthIndicator = () => {
           onRefresh={handleRefresh}
           onRunValidation={handleRunValidation}
           onResetData={handleResetData}
-        />
+          buttonRef={dropdownRef}
+        />,
+        document.body
       )}
-    </div>
+    </>
   );
 };
 

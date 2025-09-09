@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { renderIcon } from "../../../utils/icons";
 import {
   formatLastChecked,
@@ -16,7 +16,55 @@ const SyncHealthDetails = ({
   onRefresh,
   onRunValidation,
   onResetData,
+  buttonRef,
 }) => {
+  const [position, setPosition] = useState({ top: 0, right: 0 });
+
+  useEffect(() => {
+    if (buttonRef?.current) {
+      const buttonRect = buttonRef.current.getBoundingClientRect();
+      setPosition({
+        top: buttonRect.bottom + window.scrollY + 8, // 8px gap below button
+        right: window.innerWidth - buttonRect.right + window.scrollX, // Align right edge
+      });
+    }
+  }, [buttonRef]);
+
+  // Handle clicks outside dropdown and escape key to close it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (buttonRef?.current && !buttonRef.current.contains(event.target)) {
+        // Check if click is on the dropdown itself
+        const dropdown = event.target.closest('[data-sync-dropdown="true"]');
+        if (!dropdown) {
+          // Click outside - close dropdown by clearing showDetails
+          // We need to signal parent to close
+          if (onRefresh) {
+            // Use a custom event to signal close
+            window.dispatchEvent(new CustomEvent('closeSyncDropdown'));
+          }
+        }
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        window.dispatchEvent(new CustomEvent('closeSyncDropdown'));
+      }
+    };
+
+    // Use setTimeout to delay event listener registration
+    // This prevents immediate closure when clicking buttons
+    setTimeout(() => {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleKeyDown);
+    }, 100);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [buttonRef, onRefresh]);
   const statusDescription = getStatusDescription(
     syncStatus,
     isBackgroundSyncing,
@@ -26,8 +74,13 @@ const SyncHealthDetails = ({
 
   return (
     <div
-      className="absolute right-0 top-full mt-2 w-80 glassmorphism backdrop-blur-sm border-2 border-black rounded-xl shadow-2xl overflow-hidden"
-      style={{ zIndex: 999999 }}
+      data-sync-dropdown="true"
+      className="fixed w-80 glassmorphism backdrop-blur-sm border-2 border-black rounded-xl shadow-2xl overflow-hidden"
+      style={{ 
+        top: position.top,
+        right: position.right,
+        zIndex: 999999 
+      }}
     >
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-700 px-4 py-3 border-b-2 border-black">
