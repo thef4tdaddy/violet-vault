@@ -17,22 +17,35 @@ export class BaseMutex {
   }
 
   /**
-   * Acquire the mutex lock
+   * Acquire the mutex lock with timeout
    */
-  async acquire(operationName = "unknown") {
-    return new Promise((resolve) => {
-      if (this.locked) {
-        logger.debug(`🔒 ${this.name}: ${operationName} queued`, {
-          currentOperation: this.currentOperation,
-          queueLength: this.queue.length + 1,
-        });
-        this.queue.push({ resolve, operationName });
-        return;
-      }
+  async acquire(operationName = "unknown", timeoutMs = 60000) {
+    return Promise.race([
+      new Promise((resolve) => {
+        if (this.locked) {
+          logger.debug(`🔒 ${this.name}: ${operationName} queued`, {
+            currentOperation: this.currentOperation,
+            queueLength: this.queue.length + 1,
+          });
+          this.queue.push({ resolve, operationName });
+          return;
+        }
 
-      this._lock(operationName);
-      resolve();
-    });
+        this._lock(operationName);
+        resolve();
+      }),
+      new Promise((_, reject) =>
+        setTimeout(
+          () =>
+            reject(
+              new Error(
+                `Mutex acquire timed out for ${operationName} after ${timeoutMs}ms`,
+              ),
+            ),
+          timeoutMs,
+        ),
+      ),
+    ]);
   }
 
   /**
@@ -45,7 +58,9 @@ export class BaseMutex {
     }
 
     const duration = Date.now() - this.lockStartTime;
-    logger.debug(`🔓 ${this.name}: ${this.currentOperation} released (${duration}ms)`);
+    logger.debug(
+      `🔓 ${this.name}: ${this.currentOperation} released (${duration}ms)`,
+    );
 
     this.locked = false;
     this.currentOperation = null;
@@ -68,6 +83,37 @@ export class BaseMutex {
       return await fn();
     } finally {
       this.release();
+    }
+  }
+
+  /**
+   * Execute a function with mutex protection
+   */
+  async execute(fn, operationName = "unknown") {
+    logger.debug(`🔧 ${this.name}: Starting execute for ${operationName}`);
+
+    await this.acquire(operationName);
+    logger.debug(`🔧 ${this.name}: Acquired lock for ${operationName}`);
+
+    try {
+      logger.debug(
+        `🔧 ${this.name}: About to call function for ${operationName}`,
+      );
+      const result = await fn();
+      logger.debug(`🔧 ${this.name}: Function completed for ${operationName}`);
+      return result;
+    } catch (error) {
+      logger.error(
+        `🔧 ${this.name}: Function failed for ${operationName}:`,
+        error,
+      );
+      throw error;
+    } finally {
+      logger.debug(
+        `🔧 ${this.name}: About to release lock for ${operationName}`,
+      );
+      this.release();
+      logger.debug(`🔧 ${this.name}: Lock released for ${operationName}`);
     }
   }
 

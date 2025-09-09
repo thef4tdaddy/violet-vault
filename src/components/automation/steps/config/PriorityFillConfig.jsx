@@ -5,7 +5,9 @@ const PriorityFillConfig = ({ ruleData, updateConfig, envelopes, errors }) => {
   return (
     <>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Target Envelope *</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Target Envelope *
+        </label>
         <select
           value={ruleData.config.targetId || ""}
           onChange={(e) => updateConfig({ targetId: e.target.value })}
@@ -17,7 +19,7 @@ const PriorityFillConfig = ({ ruleData, updateConfig, envelopes, errors }) => {
           {envelopes.map((envelope) => {
             const remaining = Math.max(
               0,
-              (envelope.monthlyAmount || 0) - (envelope.currentBalance || 0)
+              (envelope.monthlyAmount || 0) - (envelope.currentBalance || 0),
             );
             return (
               <option key={envelope.id} value={envelope.id}>
@@ -35,15 +37,17 @@ const PriorityFillConfig = ({ ruleData, updateConfig, envelopes, errors }) => {
           </p>
         )}
         <p className="text-sm text-gray-600 mt-2">
-          This rule will fill the selected envelope to its monthly target amount before other rules
-          execute.
+          This rule will fill the selected envelope to its monthly target amount
+          before other rules execute.
         </p>
       </div>
 
       {ruleData.config.targetId && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           {(() => {
-            const envelope = envelopes.find((e) => e.id === ruleData.config.targetId);
+            const envelope = envelopes.find(
+              (e) => e.id === ruleData.config.targetId,
+            );
             if (!envelope) return null;
 
             const current = envelope.currentBalance || 0;
@@ -53,7 +57,9 @@ const PriorityFillConfig = ({ ruleData, updateConfig, envelopes, errors }) => {
 
             return (
               <>
-                <h4 className="font-medium text-blue-900 mb-2">Envelope Status</h4>
+                <h4 className="font-medium text-blue-900 mb-2">
+                  Envelope Status
+                </h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-blue-700">Current Balance:</span>
@@ -65,11 +71,15 @@ const PriorityFillConfig = ({ ruleData, updateConfig, envelopes, errors }) => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-blue-700">Amount Needed:</span>
-                    <span className="font-medium text-orange-600">${needed.toFixed(2)}</span>
+                    <span className="font-medium text-orange-600">
+                      ${needed.toFixed(2)}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-blue-700">Fill Progress:</span>
-                    <span className="font-medium">{fillPercentage.toFixed(1)}%</span>
+                    <span className="font-medium">
+                      {fillPercentage.toFixed(1)}%
+                    </span>
                   </div>
                 </div>
               </>

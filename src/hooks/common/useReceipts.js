@@ -30,7 +30,10 @@ const useReceipts = () => {
 
   const queryFunction = async () => {
     try {
-      const receipts = await budgetDb.receipts.orderBy("date").reverse().toArray();
+      const receipts = await budgetDb.receipts
+        .orderBy("date")
+        .reverse()
+        .toArray();
       return receipts || [];
     } catch (error) {
       logger.warn("Dexie query failed", {
@@ -120,21 +123,26 @@ const useReceipts = () => {
   });
 
   // Utility functions
-  const getReceiptById = (id) => (receiptsQuery.data || []).find((r) => r.id === id);
+  const getReceiptById = (id) =>
+    (receiptsQuery.data || []).find((r) => r.id === id);
 
   const getReceiptsByMerchant = (merchant) =>
     (receiptsQuery.data || []).filter(
-      (r) => r.merchant && r.merchant.toLowerCase().includes(merchant.toLowerCase())
+      (r) =>
+        r.merchant && r.merchant.toLowerCase().includes(merchant.toLowerCase()),
     );
 
   const getReceiptsByDateRange = (startDate, endDate) =>
     (receiptsQuery.data || []).filter((r) => {
       if (!r.date) return false;
       const receiptDate = new Date(r.date);
-      return receiptDate >= new Date(startDate) && receiptDate <= new Date(endDate);
+      return (
+        receiptDate >= new Date(startDate) && receiptDate <= new Date(endDate)
+      );
     });
 
-  const getUnlinkedReceipts = () => (receiptsQuery.data || []).filter((r) => !r.transactionId);
+  const getUnlinkedReceipts = () =>
+    (receiptsQuery.data || []).filter((r) => !r.transactionId);
 
   const getReceiptsForTransaction = (transactionId) =>
     (receiptsQuery.data || []).filter((r) => r.transactionId === transactionId);
@@ -163,7 +171,8 @@ const useReceipts = () => {
     getReceiptsForTransaction,
 
     refetch: receiptsQuery.refetch,
-    invalidate: () => queryClient.invalidateQueries({ queryKey: queryKeys.receipts }),
+    invalidate: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.receipts }),
   };
 };
 

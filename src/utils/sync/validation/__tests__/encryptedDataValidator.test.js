@@ -28,31 +28,50 @@ describe("encryptedDataValidator", () => {
       expect(result.isValid).toBe(true);
       expect(result.errors).toHaveLength(0);
       expect(result.warnings).toHaveLength(0);
-      expect(result.dataLength).toBe(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH);
+      expect(result.dataLength).toBe(
+        VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH,
+      );
       expect(result.ivLength).toBe(VALIDATION_CONSTANTS.MIN_IV_LENGTH);
     });
 
     it("should reject null/undefined data", () => {
       const nullResult = validateEncryptedData(null, "null-test");
-      const undefinedResult = validateEncryptedData(undefined, "undefined-test");
+      const undefinedResult = validateEncryptedData(
+        undefined,
+        "undefined-test",
+      );
 
       expect(nullResult.isValid).toBe(false);
-      expect(nullResult.errors).toContain("Encrypted data object is null or undefined");
+      expect(nullResult.errors).toContain(
+        "Encrypted data object is null or undefined",
+      );
 
       expect(undefinedResult.isValid).toBe(false);
-      expect(undefinedResult.errors).toContain("Encrypted data object is null or undefined");
+      expect(undefinedResult.errors).toContain(
+        "Encrypted data object is null or undefined",
+      );
     });
 
     it("should reject data missing properties", () => {
-      const missingDataResult = validateEncryptedData({ iv: "test" }, "missing-data");
-      const missingIvResult = validateEncryptedData({ data: "test" }, "missing-iv");
+      const missingDataResult = validateEncryptedData(
+        { iv: "test" },
+        "missing-data",
+      );
+      const missingIvResult = validateEncryptedData(
+        { data: "test" },
+        "missing-iv",
+      );
       const emptyObjectResult = validateEncryptedData({}, "empty");
 
       expect(missingDataResult.isValid).toBe(false);
-      expect(missingDataResult.errors).toContain("Missing encrypted data property");
+      expect(missingDataResult.errors).toContain(
+        "Missing encrypted data property",
+      );
 
       expect(missingIvResult.isValid).toBe(false);
-      expect(missingIvResult.errors).toContain("Missing initialization vector (IV) property");
+      expect(missingIvResult.errors).toContain(
+        "Missing initialization vector (IV) property",
+      );
 
       expect(emptyObjectResult.isValid).toBe(false);
       expect(emptyObjectResult.errors).toHaveLength(2);
@@ -70,7 +89,7 @@ describe("encryptedDataValidator", () => {
 
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain(
-        `Encrypted data too small: ${VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH - 1} bytes (minimum: ${VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH})`
+        `Encrypted data too small: ${VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH - 1} bytes (minimum: ${VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH})`,
       );
     });
 
@@ -84,7 +103,7 @@ describe("encryptedDataValidator", () => {
 
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain(
-        `IV too small: ${VALIDATION_CONSTANTS.MIN_IV_LENGTH - 1} bytes (minimum: ${VALIDATION_CONSTANTS.MIN_IV_LENGTH})`
+        `IV too small: ${VALIDATION_CONSTANTS.MIN_IV_LENGTH - 1} bytes (minimum: ${VALIDATION_CONSTANTS.MIN_IV_LENGTH})`,
       );
     });
 
@@ -98,7 +117,7 @@ describe("encryptedDataValidator", () => {
 
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain(
-        `Encrypted data too large: ${VALIDATION_CONSTANTS.MAX_MANIFEST_SIZE + 1} bytes (maximum: ${VALIDATION_CONSTANTS.MAX_MANIFEST_SIZE})`
+        `Encrypted data too large: ${VALIDATION_CONSTANTS.MAX_MANIFEST_SIZE + 1} bytes (maximum: ${VALIDATION_CONSTANTS.MAX_MANIFEST_SIZE})`,
       );
     });
 
@@ -112,7 +131,7 @@ describe("encryptedDataValidator", () => {
 
       expect(result.isValid).toBe(true);
       expect(result.warnings).toContain(
-        `Large encrypted data: ${VALIDATION_CONSTANTS.LARGE_DATA_WARNING_SIZE + 1} bytes`
+        `Large encrypted data: ${VALIDATION_CONSTANTS.LARGE_DATA_WARNING_SIZE + 1} bytes`,
       );
     });
   });
@@ -129,7 +148,9 @@ describe("encryptedDataValidator", () => {
       const result = validateEncryptedData(invalidData, "error-test");
 
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("Data validation error: Property access error");
+      expect(result.errors).toContain(
+        "Data validation error: Property access error",
+      );
     });
 
     it("should default operation name", () => {
@@ -152,7 +173,9 @@ describe("encryptedDataValidator", () => {
 
       expect(result.isValid).toBe(true);
       expect(result.errors).toHaveLength(0);
-      expect(result.dataLength).toBe(VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH);
+      expect(result.dataLength).toBe(
+        VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH,
+      );
       expect(result.ivLength).toBe(VALIDATION_CONSTANTS.MIN_IV_LENGTH);
     });
 
@@ -186,7 +209,7 @@ describe("encryptedDataValidator", () => {
           isValid: false,
           errors: expect.any(Array),
           warnings: expect.any(Array),
-        })
+        }),
       );
     });
 
@@ -204,8 +227,10 @@ describe("encryptedDataValidator", () => {
         "⚠️ Data validation warnings for warning-test",
         expect.objectContaining({
           isValid: true,
-          warnings: expect.arrayContaining([expect.stringContaining("Large encrypted data")]),
-        })
+          warnings: expect.arrayContaining([
+            expect.stringContaining("Large encrypted data"),
+          ]),
+        }),
       );
     });
 
@@ -224,7 +249,7 @@ describe("encryptedDataValidator", () => {
         expect.objectContaining({
           dataLength: VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH,
           ivLength: VALIDATION_CONSTANTS.MIN_IV_LENGTH,
-        })
+        }),
       );
     });
   });

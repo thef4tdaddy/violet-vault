@@ -28,7 +28,10 @@ export class BrowserInfoService {
         const match = userAgent.match(/Firefox\/([0-9.]+)/);
         browserVersion = match ? match[1] : "";
         engine = "Gecko";
-      } else if (userAgent.includes("Safari/") && !userAgent.includes("Chrome/")) {
+      } else if (
+        userAgent.includes("Safari/") &&
+        !userAgent.includes("Chrome/")
+      ) {
         browserName = "Safari";
         const match = userAgent.match(/Version\/([0-9.]+)/);
         browserVersion = match ? match[1] : "";
@@ -82,7 +85,12 @@ export class BrowserInfoService {
       // Check for permissions API support
       if ("permissions" in navigator) {
         // Note: We can't query all permissions synchronously, so we check what we can
-        const permissionsToCheck = ["clipboard-write", "camera", "microphone", "notifications"];
+        const permissionsToCheck = [
+          "clipboard-write",
+          "camera",
+          "microphone",
+          "notifications",
+        ];
 
         // This would need to be async to actually query, but for bug reports we just note availability
         permissions.apiSupported = true;

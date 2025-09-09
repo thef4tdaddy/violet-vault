@@ -8,7 +8,9 @@ export const performanceMonitor = {
       const start = performance.now();
       const result = fn();
       const end = performance.now();
-      logger.debug(`${componentName} render time: ${(end - start).toFixed(2)}ms`);
+      logger.debug(
+        `${componentName} render time: ${(end - start).toFixed(2)}ms`,
+      );
       return result;
     }
     return fn();
@@ -85,7 +87,8 @@ export const performanceMonitor = {
 
 // React hook for performance monitoring
 export const usePerformanceMonitor = (componentName) => {
-  const measureRender = (fn) => performanceMonitor.measureRender(componentName, fn);
+  const measureRender = (fn) =>
+    performanceMonitor.measureRender(componentName, fn);
 
   return {
     measureRender,

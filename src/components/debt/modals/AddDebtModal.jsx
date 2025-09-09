@@ -35,7 +35,8 @@ const AddDebtModal = ({ isOpen, onClose, onSubmit, debt = null }) => {
         <DebtModalHeader isEditMode={isEditMode} onClose={handleClose} />
 
         {/* Standardized Edit Lock Indicator */}
-        {(editLock.shouldShowEditLockWarning || editLock.shouldShowOwnLockIndicator) && (
+        {(editLock.shouldShowEditLockWarning ||
+          editLock.shouldShowOwnLockIndicator) && (
           <div className="mb-6">
             <EditLockIndicator
               isLocked={editLock.shouldShowEditLockWarning}

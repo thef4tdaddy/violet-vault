@@ -44,7 +44,9 @@ describe("useTransactionAnalytics", () => {
 
   describe("calculateCategoryTotals", () => {
     it("should calculate totals by category", () => {
-      const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
+      const { result } = renderHook(() =>
+        useTransactionAnalytics(mockTransactions),
+      );
 
       const categoryTotals = result.current.calculateCategoryTotals();
 
@@ -62,7 +64,9 @@ describe("useTransactionAnalytics", () => {
     });
 
     it("should exclude income from expense calculations", () => {
-      const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
+      const { result } = renderHook(() =>
+        useTransactionAnalytics(mockTransactions),
+      );
 
       const categoryTotals = result.current.calculateCategoryTotals({
         excludeIncome: true,
@@ -76,7 +80,9 @@ describe("useTransactionAnalytics", () => {
 
   describe("calculateMonthlyTrends", () => {
     it("should calculate monthly spending trends", () => {
-      const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
+      const { result } = renderHook(() =>
+        useTransactionAnalytics(mockTransactions),
+      );
 
       const trends = result.current.calculateMonthlyTrends();
 
@@ -98,7 +104,9 @@ describe("useTransactionAnalytics", () => {
         },
       ];
 
-      const { result } = renderHook(() => useTransactionAnalytics(multiMonthTransactions));
+      const { result } = renderHook(() =>
+        useTransactionAnalytics(multiMonthTransactions),
+      );
 
       const trends = result.current.calculateMonthlyTrends();
 
@@ -111,7 +119,9 @@ describe("useTransactionAnalytics", () => {
 
   describe("getTopCategories", () => {
     it("should return top spending categories", () => {
-      const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
+      const { result } = renderHook(() =>
+        useTransactionAnalytics(mockTransactions),
+      );
 
       const topCategories = result.current.getTopCategories(2);
 
@@ -123,7 +133,9 @@ describe("useTransactionAnalytics", () => {
     });
 
     it("should limit results to specified count", () => {
-      const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
+      const { result } = renderHook(() =>
+        useTransactionAnalytics(mockTransactions),
+      );
 
       const topCategories = result.current.getTopCategories(1);
 
@@ -132,7 +144,9 @@ describe("useTransactionAnalytics", () => {
     });
 
     it("should include percentage of total spending", () => {
-      const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
+      const { result } = renderHook(() =>
+        useTransactionAnalytics(mockTransactions),
+      );
 
       const topCategories = result.current.getTopCategories();
 
@@ -143,7 +157,9 @@ describe("useTransactionAnalytics", () => {
 
   describe("calculateAverageTransactionAmount", () => {
     it("should calculate average transaction amounts", () => {
-      const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
+      const { result } = renderHook(() =>
+        useTransactionAnalytics(mockTransactions),
+      );
 
       const averages = result.current.calculateAverageTransactionAmount();
 
@@ -153,8 +169,12 @@ describe("useTransactionAnalytics", () => {
     });
 
     it("should handle transactions with only expenses", () => {
-      const expenseOnlyTransactions = mockTransactions.filter((t) => t.amount < 0);
-      const { result } = renderHook(() => useTransactionAnalytics(expenseOnlyTransactions));
+      const expenseOnlyTransactions = mockTransactions.filter(
+        (t) => t.amount < 0,
+      );
+      const { result } = renderHook(() =>
+        useTransactionAnalytics(expenseOnlyTransactions),
+      );
 
       const averages = result.current.calculateAverageTransactionAmount();
 
@@ -165,7 +185,9 @@ describe("useTransactionAnalytics", () => {
 
   describe("getSpendingInsights", () => {
     it("should generate spending insights", () => {
-      const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
+      const { result } = renderHook(() =>
+        useTransactionAnalytics(mockTransactions),
+      );
 
       const insights = result.current.getSpendingInsights();
 
@@ -179,7 +201,9 @@ describe("useTransactionAnalytics", () => {
     });
 
     it("should identify unusual spending patterns", () => {
-      const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
+      const { result } = renderHook(() =>
+        useTransactionAnalytics(mockTransactions),
+      );
 
       const insights = result.current.getSpendingInsights();
 
@@ -191,7 +215,9 @@ describe("useTransactionAnalytics", () => {
 
   describe("filterByDateRange", () => {
     it("should filter transactions by date range", () => {
-      const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
+      const { result } = renderHook(() =>
+        useTransactionAnalytics(mockTransactions),
+      );
 
       const filtered = result.current.filterByDateRange({
         startDate: "2024-01-10",
@@ -203,7 +229,9 @@ describe("useTransactionAnalytics", () => {
     });
 
     it("should handle invalid date range", () => {
-      const { result } = renderHook(() => useTransactionAnalytics(mockTransactions));
+      const { result } = renderHook(() =>
+        useTransactionAnalytics(mockTransactions),
+      );
 
       const filtered = result.current.filterByDateRange({
         startDate: "2024-01-20",
@@ -218,7 +246,7 @@ describe("useTransactionAnalytics", () => {
     it("should recalculate analytics when transactions change", () => {
       const { result, rerender } = renderHook(
         ({ transactions }) => useTransactionAnalytics(transactions),
-        { initialProps: { transactions: mockTransactions } }
+        { initialProps: { transactions: mockTransactions } },
       );
 
       const initialCategoryTotals = result.current.calculateCategoryTotals();
@@ -250,7 +278,9 @@ describe("useTransactionAnalytics", () => {
         { id: "2", description: "Valid", amount: 100, date: "2024-01-01" },
       ];
 
-      const { result } = renderHook(() => useTransactionAnalytics(malformedTransactions));
+      const { result } = renderHook(() =>
+        useTransactionAnalytics(malformedTransactions),
+      );
 
       // Should not throw and should handle valid transactions
       const categoryTotals = result.current.calculateCategoryTotals();

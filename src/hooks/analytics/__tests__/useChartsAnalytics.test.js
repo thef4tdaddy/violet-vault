@@ -11,7 +11,9 @@ describe("useChartsAnalytics", () => {
   });
 
   it("should initialize with custom values", () => {
-    const { result } = renderHook(() => useChartsAnalytics("3months", "trends"));
+    const { result } = renderHook(() =>
+      useChartsAnalytics("3months", "trends"),
+    );
 
     expect(result.current.activeTab).toBe("trends");
     expect(result.current.dateRange).toBe("3months");

@@ -23,7 +23,10 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
     if (result.success) {
       onComplete?.(result.transaction, result.receipt);
     } else {
-      logger.error("Failed to submit receipt-to-transaction conversion:", result.error);
+      logger.error(
+        "Failed to submit receipt-to-transaction conversion:",
+        result.error,
+      );
     }
   };
 
@@ -81,10 +84,16 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
                 <Receipt className="h-6 w-6 text-purple-600" />
               </div>
               <div>
-                <h2 className="text-xl font-black text-black">CONVERT RECEIPT TO TRANSACTION</h2>
+                <h2 className="text-xl font-black text-black">
+                  CONVERT RECEIPT TO TRANSACTION
+                </h2>
                 <p className="text-sm text-purple-800 font-medium mt-1">
                   Step {step} of 3:{" "}
-                  {step === 1 ? "Review Data" : step === 2 ? "Select Envelope" : "Confirm"}
+                  {step === 1
+                    ? "Review Data"
+                    : step === 2
+                      ? "Select Envelope"
+                      : "Confirm"}
                 </p>
               </div>
             </div>
@@ -125,7 +134,9 @@ const ReceiptToTransactionModal = ({ receiptData, onClose, onComplete }) => {
           </div>
 
           {/* Content */}
-          <div className="mb-8 overflow-y-auto max-h-[50vh] pr-2">{renderStepContent()}</div>
+          <div className="mb-8 overflow-y-auto max-h-[50vh] pr-2">
+            {renderStepContent()}
+          </div>
 
           {/* Footer */}
           <div className="flex items-center justify-between pt-6 border-t-2 border-black">

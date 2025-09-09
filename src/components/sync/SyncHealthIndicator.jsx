@@ -28,7 +28,8 @@ const SyncHealthIndicator = () => {
   useEffect(() => {
     // Check if sync is running by monitoring the service state
     const checkSyncActivity = () => {
-      const isRunning = cloudSyncService.isRunning && cloudSyncService.activeSyncPromise;
+      const isRunning =
+        cloudSyncService.isRunning && cloudSyncService.activeSyncPromise;
       setIsBackgroundSyncing(isRunning);
     };
 
@@ -115,7 +116,10 @@ const SyncHealthIndicator = () => {
             fill="none"
             opacity="0.25"
           />
-          <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          <path
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+          />
         </svg>
       );
     }
@@ -184,10 +188,56 @@ const SyncHealthIndicator = () => {
   };
 
   const runFullValidation = async () => {
-    logger.warn("🚫 Sync validation functions are currently hanging and non-functional");
-    // TODO: Fix hanging sync validation functions
-    // The window.runMasterSyncValidation and related functions hang indefinitely
-    // and never resolve their promises. This needs investigation.
+    logger.info("🚀 Sync Health UI: Running full validation...");
+    if (typeof window !== "undefined" && window.runMasterSyncValidation) {
+      try {
+        setSyncStatus((prev) => ({ ...prev, isLoading: true }));
+        const results = await Promise.race([
+          window.runMasterSyncValidation(),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Validation timed out")), 30000),
+          ),
+        ]);
+
+        logger.info(
+          "✅ Sync Health: Full validation completed",
+          results.summary,
+        );
+
+        // Update status based on results
+        setSyncStatus({
+          isHealthy: results.summary.overallStatus === "ALL_SYSTEMS_GO",
+          status:
+            results.summary.overallStatus === "ALL_SYSTEMS_GO"
+              ? "HEALTHY"
+              : "ISSUES_DETECTED",
+          failedTests: results.summary.totalFailed,
+          lastChecked: new Date().toISOString(),
+          isLoading: false,
+          fullResults: results,
+        });
+      } catch (error) {
+        logger.error("❌ Full validation failed:", error);
+        setSyncStatus({
+          isHealthy: false,
+          status: "ERROR",
+          error: error.message.includes("timed out")
+            ? "Validation timed out after 30 seconds"
+            : error.message,
+          lastChecked: new Date().toISOString(),
+          isLoading: false,
+        });
+      }
+    } else {
+      logger.warn(
+        "🚨 Sync Health: runMasterSyncValidation not available on window",
+      );
+      setSyncStatus((prev) => ({
+        ...prev,
+        error: "Validation function not available",
+        isLoading: false,
+      }));
+    }
   };
 
   return (
@@ -218,7 +268,12 @@ const SyncHealthIndicator = () => {
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                 title="Close"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -231,19 +286,27 @@ const SyncHealthIndicator = () => {
 
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600 dark:text-gray-300">Overall Status:</span>
+                <span className="text-sm text-gray-600 dark:text-gray-300">
+                  Overall Status:
+                </span>
                 <span className={`text-sm font-medium ${getStatusColor()}`}>
                   {syncStatus.status}
                 </span>
               </div>
 
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600 dark:text-gray-300">Background Sync:</span>
+                <span className="text-sm text-gray-600 dark:text-gray-300">
+                  Background Sync:
+                </span>
                 <span
                   className={`text-sm font-medium flex items-center space-x-1 ${isBackgroundSyncing ? "text-blue-500" : "text-gray-500"}`}
                 >
                   {isBackgroundSyncing && (
-                    <svg className="w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <svg
+                      className="w-3 h-3 animate-spin"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
                       <circle
                         cx="12"
                         cy="12"
@@ -253,7 +316,10 @@ const SyncHealthIndicator = () => {
                         fill="none"
                         opacity="0.25"
                       />
-                      <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      <path
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                      />
                     </svg>
                   )}
                   <span>{isBackgroundSyncing ? "Active" : "Idle"}</span>
@@ -262,14 +328,20 @@ const SyncHealthIndicator = () => {
 
               {syncStatus.failedTests > 0 && (
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600 dark:text-gray-300">Failed Tests:</span>
-                  <span className="text-sm font-medium text-red-500">{syncStatus.failedTests}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-300">
+                    Failed Tests:
+                  </span>
+                  <span className="text-sm font-medium text-red-500">
+                    {syncStatus.failedTests}
+                  </span>
                 </div>
               )}
 
               {syncStatus.lastChecked && (
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600 dark:text-gray-300">Last Checked:</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-300">
+                    Last Checked:
+                  </span>
                   <span className="text-sm text-gray-900 dark:text-gray-100">
                     {new Date(syncStatus.lastChecked).toLocaleTimeString()}
                   </span>
@@ -278,7 +350,9 @@ const SyncHealthIndicator = () => {
 
               {syncStatus.error && (
                 <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 rounded border-l-4 border-red-500">
-                  <p className="text-sm text-red-700 dark:text-red-300">{syncStatus.error}</p>
+                  <p className="text-sm text-red-700 dark:text-red-300">
+                    {syncStatus.error}
+                  </p>
                 </div>
               )}
             </div>
@@ -302,7 +376,8 @@ const SyncHealthIndicator = () => {
 
             <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Console commands: runSyncHealthCheck(), runMasterSyncValidation()
+                Console commands: runSyncHealthCheck(),
+                runMasterSyncValidation()
               </p>
             </div>
           </div>

@@ -1,5 +1,12 @@
 import React from "react";
-import { X, CheckCircle, Sparkles, Receipt, Target, CreditCard } from "lucide-react";
+import {
+  X,
+  CheckCircle,
+  Sparkles,
+  Receipt,
+  Target,
+  CreditCard,
+} from "lucide-react";
 import useConnectionManager from "../../hooks/common/useConnectionManager";
 
 /**
@@ -20,12 +27,14 @@ const ConnectionDisplay = ({
   // Theme configurations for different contexts
   const themes = {
     purple: {
-      container: "bg-gradient-to-r from-purple-50 to-violet-50 border-2 border-purple-300",
+      container:
+        "bg-gradient-to-r from-purple-50 to-violet-50 border-2 border-purple-300",
       titleText: "text-purple-800",
       iconColor: "text-purple-600",
     },
     green: {
-      container: "bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-300",
+      container:
+        "bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-300",
       titleText: "text-green-800",
       iconColor: "text-green-600",
     },
@@ -39,10 +48,18 @@ const ConnectionDisplay = ({
   const currentTheme = themes[theme] || themes.purple;
 
   return (
-    <div className={`${currentTheme.container} rounded-xl p-6 mb-4 ${className}`}>
+    <div
+      className={`${currentTheme.container} rounded-xl p-6 mb-4 ${className}`}
+    >
       <div className="flex items-center justify-between mb-4">
-        <label className={`block text-lg font-bold ${currentTheme.titleText} flex items-center`}>
-          {IconComponent && <IconComponent className={`h-6 w-6 mr-3 ${currentTheme.iconColor}`} />}
+        <label
+          className={`block text-lg font-bold ${currentTheme.titleText} flex items-center`}
+        >
+          {IconComponent && (
+            <IconComponent
+              className={`h-6 w-6 mr-3 ${currentTheme.iconColor}`}
+            />
+          )}
           🔗 {title}
         </label>
         {onDisconnect && (
@@ -103,13 +120,23 @@ export const ConnectionItem = ({
   const currentTheme = themes[theme] || themes.purple;
 
   return (
-    <div className={`flex items-center p-3 bg-white rounded-lg border ${currentTheme.border}`}>
-      {IconComponent && <IconComponent className={`h-5 w-5 mr-3 ${currentTheme.iconColor}`} />}
+    <div
+      className={`flex items-center p-3 bg-white rounded-lg border ${currentTheme.border}`}
+    >
+      {IconComponent && (
+        <IconComponent className={`h-5 w-5 mr-3 ${currentTheme.iconColor}`} />
+      )}
       <div className="flex-1">
         <div className={`font-medium ${currentTheme.titleColor}`}>{title}</div>
-        {details && <div className={`text-sm ${currentTheme.detailColor}`}>{details}</div>}
+        {details && (
+          <div className={`text-sm ${currentTheme.detailColor}`}>{details}</div>
+        )}
       </div>
-      {badge && <div className={badgeColors[badgeColor] || badgeColors.purple}>{badge}</div>}
+      {badge && (
+        <div className={badgeColors[badgeColor] || badgeColors.purple}>
+          {badge}
+        </div>
+      )}
     </div>
   );
 };
@@ -117,7 +144,11 @@ export const ConnectionItem = ({
 /**
  * Sub-component for connection info/help text
  */
-export const ConnectionInfo = ({ children, className = "", theme = "purple" }) => {
+export const ConnectionInfo = ({
+  children,
+  className = "",
+  theme = "purple",
+}) => {
   const themes = {
     purple: "bg-purple-100 border border-purple-300 text-purple-700",
     green: "bg-green-100 border border-green-300 text-green-700",
@@ -192,7 +223,11 @@ export const UniversalConnectionManager = ({
 
       {/* Show selection dropdown when no connection exists or when explicitly requested */}
       {showSelector && (!hasConnections || entityType === "envelope") && (
-        <ConnectionDisplay title={config.selectTitle} icon={Sparkles} theme={theme}>
+        <ConnectionDisplay
+          title={config.selectTitle}
+          icon={Sparkles}
+          theme={theme}
+        >
           <select
             value={selectedConnectionId || ""}
             onChange={(e) => handleSelectionChange(e.target.value)}
@@ -202,11 +237,14 @@ export const UniversalConnectionManager = ({
             }`}
           >
             <option value="">
-              {hasAvailableOptions ? config.selectPrompt : `No ${config.connectionType}s available`}
+              {hasAvailableOptions
+                ? config.selectPrompt
+                : `No ${config.connectionType}s available`}
             </option>
             {availableOptions.map((option) => (
               <option key={option.id} value={option.id}>
-                {option.name || option.provider} - ${parseFloat(option.amount || 0).toFixed(2)} (
+                {option.name || option.provider} - $
+                {parseFloat(option.amount || 0).toFixed(2)} (
                 {option.frequency || "monthly"})
               </option>
             ))}
@@ -234,8 +272,8 @@ export const UniversalConnectionManager = ({
 
           {!hasAvailableOptions && (
             <ConnectionInfo theme="yellow">
-              ⚠️ No {config.connectionType}s found. Create {config.connectionType}s first to connect
-              them.
+              ⚠️ No {config.connectionType}s found. Create{" "}
+              {config.connectionType}s first to connect them.
             </ConnectionInfo>
           )}
         </ConnectionDisplay>

@@ -125,7 +125,10 @@ export class OCRProcessor {
       tax: [/tax:?\s*\$?(\d+\.\d{2})/i, /sales\s*tax:?\s*\$?(\d+\.\d{2})/i],
 
       // Subtotal patterns
-      subtotal: [/sub\s*total:?\s*\$?(\d+\.\d{2})/i, /subtotal:?\s*\$?(\d+\.\d{2})/i],
+      subtotal: [
+        /sub\s*total:?\s*\$?(\d+\.\d{2})/i,
+        /subtotal:?\s*\$?(\d+\.\d{2})/i,
+      ],
     };
 
     const extracted = {

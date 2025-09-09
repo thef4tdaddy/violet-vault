@@ -44,15 +44,26 @@ export const useTransactionLedger = (currentUser) => {
 
   // Handle bulk import by updating both store arrays
   const handleBulkImport = (newTransactions) => {
-    logger.debug("🔄 Bulk import called with transactions:", newTransactions.length);
+    logger.debug(
+      "🔄 Bulk import called with transactions:",
+      newTransactions.length,
+    );
     const updatedAllTransactions = [...transactions, ...newTransactions];
     setAllTransactions(updatedAllTransactions);
-    logger.debug("💾 Bulk import complete. Total transactions:", updatedAllTransactions.length);
+    logger.debug(
+      "💾 Bulk import complete. Total transactions:",
+      updatedAllTransactions.length,
+    );
   };
 
   // Custom hooks
-  const { transactionForm, setTransactionForm, resetForm, populateForm, createTransaction } =
-    useTransactionForm();
+  const {
+    transactionForm,
+    setTransactionForm,
+    resetForm,
+    populateForm,
+    createTransaction,
+  } = useTransactionForm();
 
   const {
     importData,
@@ -73,14 +84,17 @@ export const useTransactionLedger = (currentUser) => {
     typeFilter,
     envelopeFilter,
     sortBy,
-    sortOrder
+    sortOrder,
   );
 
-  const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / pageSize));
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredTransactions.length / pageSize),
+  );
 
   const paginatedTransactions = filteredTransactions.slice(
     (currentPage - 1) * pageSize,
-    currentPage * pageSize
+    currentPage * pageSize,
   );
 
   // Reset pagination when filters change
@@ -137,7 +151,10 @@ export const useTransactionLedger = (currentUser) => {
         ...billEnvelope,
         lastPaidDate: billPayment.paidDate,
         lastPaidAmount: billPayment.amount,
-        currentBalance: Math.max(0, (billEnvelope.currentBalance || 0) - billPayment.amount),
+        currentBalance: Math.max(
+          0,
+          (billEnvelope.currentBalance || 0) - billPayment.amount,
+        ),
         isPaid: true,
         paidThisPeriod: true,
       };
@@ -145,7 +162,10 @@ export const useTransactionLedger = (currentUser) => {
     }
   };
 
-  const handleSplitTransaction = async (originalTransaction, splitTransactions) => {
+  const handleSplitTransaction = async (
+    originalTransaction,
+    splitTransactions,
+  ) => {
     try {
       // Delete the original transaction
       deleteTransaction(originalTransaction.id);

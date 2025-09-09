@@ -69,7 +69,10 @@ class SecurityService {
     try {
       // Limit to last 100 events to prevent storage bloat
       const limitedEvents = events.slice(-100);
-      localStorage.setItem(this.storageKeys.events, JSON.stringify(limitedEvents));
+      localStorage.setItem(
+        this.storageKeys.events,
+        JSON.stringify(limitedEvents),
+      );
     } catch (error) {
       logger.error("Failed to save security events:", error);
     }
@@ -83,12 +86,18 @@ class SecurityService {
 
     if (obj === null || obj === undefined) return obj;
 
-    if (typeof obj === "string" || typeof obj === "number" || typeof obj === "boolean") {
+    if (
+      typeof obj === "string" ||
+      typeof obj === "number" ||
+      typeof obj === "boolean"
+    ) {
       return obj;
     }
 
     if (Array.isArray(obj)) {
-      return obj.slice(0, 10).map((item) => this.safeSerialize(item, maxDepth, currentDepth + 1));
+      return obj
+        .slice(0, 10)
+        .map((item) => this.safeSerialize(item, maxDepth, currentDepth + 1));
     }
 
     if (typeof obj === "object") {
@@ -120,7 +129,10 @@ class SecurityService {
       // Safely extract only the primitive values from event to avoid circular references
       const safeEvent = {
         type: typeof event.type === "string" ? event.type : "UNKNOWN",
-        description: typeof event.description === "string" ? event.description : "Security event",
+        description:
+          typeof event.description === "string"
+            ? event.description
+            : "Security event",
       };
 
       // Create base metadata
@@ -148,14 +160,20 @@ class SecurityService {
       JSON.stringify(securityEvent);
       return securityEvent;
     } catch (error) {
-      logger.warn("Failed to create security event, using minimal version:", error);
+      logger.warn(
+        "Failed to create security event, using minimal version:",
+        error,
+      );
 
       // Use minimal version if serialization fails
       return {
         id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         timestamp: new Date().toISOString(),
         type: typeof event.type === "string" ? event.type : "UNKNOWN",
-        description: typeof event.description === "string" ? event.description : "Security event",
+        description:
+          typeof event.description === "string"
+            ? event.description
+            : "Security event",
         metadata: { error: "Serialization failed" },
       };
     }
@@ -237,8 +255,14 @@ class SecurityService {
       };
 
       const now = new Date();
-      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const weekStart = new Date(todayStart.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const todayStart = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+      );
+      const weekStart = new Date(
+        todayStart.getTime() - 7 * 24 * 60 * 60 * 1000,
+      );
 
       events.forEach((event) => {
         const eventDate = new Date(event.timestamp);

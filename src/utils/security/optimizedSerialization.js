@@ -108,7 +108,9 @@ export const optimizedSerialization = {
         compressionRatio: originalSize / compressedSize,
         totalReduction: originalSize / finalSize,
         spaceSaved: originalSize - finalSize,
-        spaceSavedPercent: Math.round(((originalSize - finalSize) / originalSize) * 100),
+        spaceSavedPercent: Math.round(
+          ((originalSize - finalSize) / originalSize) * 100,
+        ),
       };
     } catch (error) {
       logger.error("Compression analysis failed", error);
@@ -203,7 +205,9 @@ export const optimizedSerialization = {
         totalTime: Math.round(totalTime),
         base64Size: base64.length,
         analysis,
-        verified: isIdentical ? "✅ Data integrity confirmed" : "❌ Data corruption detected",
+        verified: isIdentical
+          ? "✅ Data integrity confirmed"
+          : "❌ Data corruption detected",
       };
     } catch (error) {
       logger.error("Pipeline test failed", error);

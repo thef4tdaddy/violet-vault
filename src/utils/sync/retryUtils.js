@@ -11,7 +11,10 @@
 export const calculateRetryDelay = (attempt, options = {}) => {
   const { baseDelay = 1000, maxDelay = 16000, jitter = true } = options;
 
-  const exponentialDelay = Math.min(baseDelay * Math.pow(2, attempt - 1), maxDelay);
+  const exponentialDelay = Math.min(
+    baseDelay * Math.pow(2, attempt - 1),
+    maxDelay,
+  );
 
   if (!jitter) {
     return exponentialDelay;

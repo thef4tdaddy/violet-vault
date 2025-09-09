@@ -46,7 +46,9 @@ export const filterByEnvelope = (transactions = [], envelopeId) => {
   if (!envelopeId) return transactions;
 
   try {
-    return transactions.filter((transaction) => transaction.envelopeId === envelopeId);
+    return transactions.filter(
+      (transaction) => transaction.envelopeId === envelopeId,
+    );
   } catch (error) {
     logger.error("Error filtering transactions by envelope", error);
     return transactions;
@@ -64,7 +66,8 @@ export const filterByCategory = (transactions = [], category) => {
 
   try {
     return transactions.filter(
-      (transaction) => transaction.category?.toLowerCase() === category.toLowerCase()
+      (transaction) =>
+        transaction.category?.toLowerCase() === category.toLowerCase(),
     );
   } catch (error) {
     logger.error("Error filtering transactions by category", error);
@@ -138,7 +141,11 @@ export const filterBySearch = (transactions = [], searchQuery) => {
  * @param {string} sortOrder - Sort order (asc or desc)
  * @returns {Array} Sorted transactions
  */
-export const sortTransactions = (transactions = [], sortBy = "date", sortOrder = "desc") => {
+export const sortTransactions = (
+  transactions = [],
+  sortBy = "date",
+  sortOrder = "desc",
+) => {
   try {
     return [...transactions].sort((a, b) => {
       let aValue, bValue;
@@ -246,7 +253,10 @@ export const processTransactions = (transactions = [], options = {}) => {
  * @param {string} groupBy - Grouping period (day, week, month, year)
  * @returns {Object} Grouped transactions
  */
-export const groupTransactionsByDate = (transactions = [], groupBy = "month") => {
+export const groupTransactionsByDate = (
+  transactions = [],
+  groupBy = "month",
+) => {
   try {
     const groups = {};
 

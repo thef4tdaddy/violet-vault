@@ -1,5 +1,12 @@
 import React from "react";
-import { TrendingUp, TrendingDown, BarChart3, DollarSign, Download, Wallet } from "lucide-react";
+import {
+  TrendingUp,
+  TrendingDown,
+  BarChart3,
+  DollarSign,
+  Download,
+  Wallet,
+} from "lucide-react";
 import {
   TrendLineChart,
   CategoryBarChart,
@@ -58,7 +65,7 @@ const ChartsAnalytics = ({
         envelopeSpending,
         categoryBreakdown,
       },
-      currentUser
+      currentUser,
     );
   };
 
@@ -76,7 +83,9 @@ const ChartsAnalytics = ({
             </div>
             Analytics & Reports
           </h2>
-          <p className="text-gray-800 mt-1">Financial insights and spending patterns</p>
+          <p className="text-gray-800 mt-1">
+            Financial insights and spending patterns
+          </p>
         </div>
 
         <div className="flex gap-3">
@@ -163,7 +172,11 @@ const ChartsAnalytics = ({
       {activeTab === "overview" && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Monthly Cash Flow */}
-          <CashFlowChart title="Monthly Cash Flow" data={monthlyTrends || []} height={300} />
+          <CashFlowChart
+            title="Monthly Cash Flow"
+            data={monthlyTrends || []}
+            height={300}
+          />
 
           {/* Top Spending Envelopes */}
           <DistributionPieChart
@@ -182,7 +195,9 @@ const ChartsAnalytics = ({
           {/* Spending Trends Chart */}
           <div className="glassmorphism rounded-xl p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Spending Trends</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Spending Trends
+              </h3>
               <div className="flex gap-2">
                 {["line", "bar", "area"].map((type) => (
                   <button
@@ -237,7 +252,9 @@ const ChartsAnalytics = ({
           <CategoryBarChart
             title="Weekly Spending Patterns"
             data={weeklyPatterns || []}
-            bars={[{ dataKey: "amount", name: "Amount Spent", fill: "#a855f7" }]}
+            bars={[
+              { dataKey: "amount", name: "Amount Spent", fill: "#a855f7" },
+            ]}
             height={300}
             emptyMessage="No weekly spending data available"
           />
@@ -248,12 +265,16 @@ const ChartsAnalytics = ({
         <div className="space-y-6">
           {/* Envelope Health Overview */}
           <div className="glassmorphism rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Envelope Health</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Envelope Health
+            </h3>
             {envelopeHealth.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 <Wallet className="h-12 w-12 mx-auto mb-3 text-gray-400" />
                 <p>No envelopes to display</p>
-                <p className="text-sm">Create some envelopes to see their health status</p>
+                <p className="text-sm">
+                  Create some envelopes to see their health status
+                </p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -268,7 +289,9 @@ const ChartsAnalytics = ({
                         <div className="flex items-center">
                           <div
                             className="w-3 h-3 rounded-full mr-2"
-                            style={{ backgroundColor: envelope.color || "#8B5CF6" }}
+                            style={{
+                              backgroundColor: envelope.color || "#8B5CF6",
+                            }}
                           />
                           <span className="font-medium text-gray-900">
                             {envelope.name || "Unknown Envelope"}

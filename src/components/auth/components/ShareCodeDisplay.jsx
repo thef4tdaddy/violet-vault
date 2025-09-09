@@ -61,18 +61,20 @@ Generated: ${new Date().toLocaleDateString()}
           <h3 className="font-bold">CRITICAL: Save Your Share Code</h3>
         </div>
         <p className="text-red-700 text-sm">
-          You need this code to access your budget on other devices. If you lose it, you cannot
-          recover your budget!
+          You need this code to access your budget on other devices. If you lose
+          it, you cannot recover your budget!
         </p>
       </div>
 
       {/* Share Code Display */}
       <div className="space-y-4">
         <div className="text-center">
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Your Budget Share Code</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">
+            Your Budget Share Code
+          </h2>
           <p className="text-sm text-gray-600">
-            Write this down or save it safely - you'll need it to access your budget from other
-            devices
+            Write this down or save it safely - you'll need it to access your
+            budget from other devices
           </p>
         </div>
 
@@ -106,10 +108,14 @@ Generated: ${new Date().toLocaleDateString()}
 
       {/* Instructions */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h4 className="font-semibold text-blue-900 mb-2">How to use your share code:</h4>
+        <h4 className="font-semibold text-blue-900 mb-2">
+          How to use your share code:
+        </h4>
         <ul className="text-sm text-blue-800 space-y-1">
           <li>• Keep this code private and secure (like a password)</li>
-          <li>• To access your budget: enter your password + this share code</li>
+          <li>
+            • To access your budget: enter your password + this share code
+          </li>
           <li>• Same code works on all your devices</li>
           <li>• No more device-specific lockouts!</li>
         </ul>

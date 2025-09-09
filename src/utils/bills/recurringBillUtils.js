@@ -54,8 +54,15 @@ export const processRecurringBill = (bill, updateBillFn) => {
   const processedBill = { ...bill };
 
   // Handle recurring bill logic - reset paid bills when their next cycle arrives
-  if (processedBill.isPaid && processedBill.paidDate && processedBill.frequency) {
-    const nextDueDate = calculateNextDueDate(processedBill.paidDate, processedBill.frequency);
+  if (
+    processedBill.isPaid &&
+    processedBill.paidDate &&
+    processedBill.frequency
+  ) {
+    const nextDueDate = calculateNextDueDate(
+      processedBill.paidDate,
+      processedBill.frequency,
+    );
     const today = new Date();
 
     // If today is on or after the next due date, reset the bill to unpaid
@@ -69,7 +76,7 @@ export const processRecurringBill = (bill, updateBillFn) => {
         try {
           updateBillFn(processedBill);
           logger.info(
-            `Reset recurring bill ${processedBill.id} - next due: ${processedBill.dueDate}`
+            `Reset recurring bill ${processedBill.id} - next due: ${processedBill.dueDate}`,
           );
         } catch (error) {
           logger.warn("Failed to reset recurring bill", error);

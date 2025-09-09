@@ -9,7 +9,9 @@ const PaymentImpactTable = ({ paymentImpact = [] }) => {
   if (!paymentImpact.length) {
     return (
       <div className="bg-white rounded-xl p-6 border border-gray-200">
-        <p className="text-gray-500 text-center">No payment impact data available</p>
+        <p className="text-gray-500 text-center">
+          No payment impact data available
+        </p>
       </div>
     );
   }
@@ -54,7 +56,9 @@ const PaymentImpactTable = ({ paymentImpact = [] }) => {
                   <td className="px-4 py-3">
                     <div className="flex items-center">
                       <DollarSign className="h-4 w-4 text-green-500 mr-1" />
-                      <span className="font-medium text-gray-900">+${scenario.extraPayment}</span>
+                      <span className="font-medium text-gray-900">
+                        +${scenario.extraPayment}
+                      </span>
                     </div>
                   </td>
                   <td className="px-4 py-3 text-center">
@@ -78,7 +82,9 @@ const PaymentImpactTable = ({ paymentImpact = [] }) => {
                 </tr>
                 {/* Snowball row */}
                 <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-50/50"}>
-                  <td className="px-4 py-3">{/* Empty cell for alignment */}</td>
+                  <td className="px-4 py-3">
+                    {/* Empty cell for alignment */}
+                  </td>
                   <td className="px-4 py-3 text-center">
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                       Snowball
@@ -107,9 +113,10 @@ const PaymentImpactTable = ({ paymentImpact = [] }) => {
       {/* Footer */}
       <div className="p-4 bg-blue-50 border-t border-blue-200">
         <p className="text-xs text-blue-700">
-          💡 <strong>Pro Tip:</strong> Even small extra payments can significantly reduce your debt
-          payoff time and interest costs. Consider rounding up payments or applying windfalls to
-          accelerate your debt freedom.
+          💡 <strong>Pro Tip:</strong> Even small extra payments can
+          significantly reduce your debt payoff time and interest costs.
+          Consider rounding up payments or applying windfalls to accelerate your
+          debt freedom.
         </p>
       </div>
     </div>

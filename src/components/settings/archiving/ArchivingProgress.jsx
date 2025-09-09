@@ -6,7 +6,9 @@ const ArchivingProgress = ({ isArchiving, archivingProgress }) => {
 
   return (
     <div className="bg-white rounded-xl p-6 border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Archiving in Progress</h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        Archiving in Progress
+      </h3>
 
       <div className="space-y-4">
         <div>

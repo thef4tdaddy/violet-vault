@@ -17,7 +17,8 @@ const ReceiptExtractedData = ({ extractedData }) => {
     <div className="glassmorphism rounded-lg p-4 border-2 border-black bg-green-100/40 backdrop-blur-sm">
       <h3 className="font-black text-black text-base mb-4 flex items-center gap-2">
         <CheckCircle className="h-5 w-5 text-green-900" />
-        <span className="text-lg">E</span>XTRACTED <span className="text-lg">I</span>NFORMATION
+        <span className="text-lg">E</span>XTRACTED{" "}
+        <span className="text-lg">I</span>NFORMATION
       </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -68,7 +69,8 @@ const ReceiptExtractedData = ({ extractedData }) => {
 
           <div className="glassmorphism rounded-lg p-2 border border-white/20 bg-gray-100/20 backdrop-blur-sm">
             <div className="text-xs text-purple-900">
-              <span className="font-semibold">Processing time:</span> {extractedData.processingTime}
+              <span className="font-semibold">Processing time:</span>{" "}
+              {extractedData.processingTime}
               ms
             </div>
           </div>

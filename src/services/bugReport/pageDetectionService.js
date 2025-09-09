@@ -18,13 +18,21 @@ export class PageDetectionService {
       // Check URL path patterns
       if (path.includes("/bills") || hash.includes("bills")) return "bills";
       if (path.includes("/debt") || hash.includes("debt")) return "debt";
-      if (path.includes("/envelope") || path.includes("/budget") || hash.includes("envelope"))
+      if (
+        path.includes("/envelope") ||
+        path.includes("/budget") ||
+        hash.includes("envelope")
+      )
         return "envelope";
-      if (path.includes("/transaction") || hash.includes("transaction")) return "transaction";
+      if (path.includes("/transaction") || hash.includes("transaction"))
+        return "transaction";
       if (path.includes("/saving") || hash.includes("saving")) return "savings";
-      if (path.includes("/analytic") || hash.includes("analytic")) return "analytics";
-      if (path.includes("/setting") || hash.includes("setting")) return "settings";
-      if (path.includes("/onboard") || hash.includes("onboard")) return "onboarding";
+      if (path.includes("/analytic") || hash.includes("analytic"))
+        return "analytics";
+      if (path.includes("/setting") || hash.includes("setting"))
+        return "settings";
+      if (path.includes("/onboard") || hash.includes("onboard"))
+        return "onboarding";
 
       // Check for active navigation indicators (now with proper aria-current and data attributes)
       const activeNav = document.querySelector('[aria-current="page"]');
@@ -65,7 +73,8 @@ export class PageDetectionService {
       const title = document.title?.toLowerCase();
       if (title?.includes("bill")) return "bills";
       if (title?.includes("debt")) return "debt";
-      if (title?.includes("envelope") || title?.includes("budget")) return "envelope";
+      if (title?.includes("envelope") || title?.includes("budget"))
+        return "envelope";
       if (title?.includes("transaction")) return "transaction";
       if (title?.includes("saving")) return "savings";
       if (title?.includes("analytic")) return "analytics";
@@ -205,7 +214,9 @@ export class PageDetectionService {
    */
   static extractMainHeading() {
     try {
-      const mainHeading = document.querySelector("main h1, section h1, .content h1, h1");
+      const mainHeading = document.querySelector(
+        "main h1, section h1, .content h1, h1",
+      );
       return mainHeading ? mainHeading.textContent?.trim() : null;
     } catch (error) {
       return null;
@@ -224,7 +235,11 @@ export class PageDetectionService {
 
       let location = currentPage;
 
-      if (screenTitle && screenTitle !== document.title && screenTitle !== "Unknown") {
+      if (
+        screenTitle &&
+        screenTitle !== document.title &&
+        screenTitle !== "Unknown"
+      ) {
         location += ` > ${screenTitle}`;
       }
 

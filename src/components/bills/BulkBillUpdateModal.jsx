@@ -1,5 +1,12 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { DollarSign, Calendar, X, Edit3, Clock, AlertTriangle } from "lucide-react";
+import {
+  DollarSign,
+  Calendar,
+  X,
+  Edit3,
+  Clock,
+  AlertTriangle,
+} from "lucide-react";
 import { useBulkBillUpdate } from "../../hooks/bills/useBulkBillUpdate";
 import {
   calculateUpdateSummary,
@@ -8,7 +15,13 @@ import {
 import BulkUpdateConfirmModal from "./modals/BulkUpdateConfirmModal";
 import BulkUpdateEditor from "./BulkUpdateEditor";
 
-const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBills, onError }) => {
+const BulkBillUpdateModal = ({
+  isOpen,
+  onClose,
+  selectedBills = [],
+  onUpdateBills,
+  onError,
+}) => {
   const [updateMode, setUpdateMode] = useState("amounts");
 
   const {
@@ -30,7 +43,7 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
 
   const summary = useMemo(
     () => calculateUpdateSummary(selectedBills, changes),
-    [selectedBills, changes]
+    [selectedBills, changes],
   );
 
   const handleSubmit = () => {
@@ -70,9 +83,12 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h3 className="text-lg font-black text-black">BULK UPDATE BILLS</h3>
+                  <h3 className="text-lg font-black text-black">
+                    BULK UPDATE BILLS
+                  </h3>
                   <p className="text-sm text-purple-800 mt-1 font-medium">
-                    Update amounts and due dates for {selectedBills.length} selected bills
+                    Update amounts and due dates for {selectedBills.length}{" "}
+                    selected bills
                   </p>
                 </div>
                 <button
@@ -149,7 +165,9 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
                     ) : (
                       <div className="flex items-center gap-2 glassmorphism backdrop-blur-sm px-3 py-2 rounded-lg border border-gray-200">
                         <Clock className="h-4 w-4 text-gray-500" />
-                        <span className="font-medium text-gray-600">No changes made yet</span>
+                        <span className="font-medium text-gray-600">
+                          No changes made yet
+                        </span>
                       </div>
                     )}
                   </div>

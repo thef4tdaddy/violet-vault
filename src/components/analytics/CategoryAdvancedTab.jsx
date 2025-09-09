@@ -37,7 +37,9 @@ const CategoryAdvancedTab = ({
       <div className="bg-gradient-to-r from-white/60 to-purple-50/60 backdrop-blur-sm rounded-xl p-4 border-2 border-black shadow-lg">
         <h4 className="font-black text-gray-900 mb-4">DISMISSED SUGGESTIONS</h4>
         {dismissedSuggestions.size === 0 ? (
-          <p className="text-purple-800 font-medium text-sm">No dismissed suggestions</p>
+          <p className="text-purple-800 font-medium text-sm">
+            No dismissed suggestions
+          </p>
         ) : (
           <div className="space-y-2">
             {Array.from(dismissedSuggestions).map((suggestionId) => (
@@ -45,7 +47,9 @@ const CategoryAdvancedTab = ({
                 key={suggestionId}
                 className="flex items-center justify-between p-2 bg-gradient-to-r from-gray-50/80 to-purple-50/80 backdrop-blur-sm rounded border border-gray-200 shadow-sm"
               >
-                <span className="text-sm text-purple-800 font-medium">{suggestionId}</span>
+                <span className="text-sm text-purple-800 font-medium">
+                  {suggestionId}
+                </span>
                 <button
                   onClick={() => onUndismissSuggestion(suggestionId)}
                   className="text-emerald-600 hover:text-emerald-800 text-sm font-bold border border-emerald-300 px-2 py-1 rounded hover:bg-emerald-50 transition-all"

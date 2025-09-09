@@ -161,7 +161,9 @@ describe("useBulkBillUpdate", () => {
     });
 
     expect(result.current.bulkOperation).toEqual(operation);
-    expect(validateBulkOperation).toHaveBeenCalledWith(operation, [mockBills[0]]);
+    expect(validateBulkOperation).toHaveBeenCalledWith(operation, [
+      mockBills[0],
+    ]);
   });
 
   it("should handle validation errors", () => {
@@ -241,7 +243,10 @@ describe("useBulkBillUpdate", () => {
 
   it("should track progress during bulk operations", async () => {
     mockUpdateBill.mockImplementation(
-      (id) => new Promise((resolve) => setTimeout(() => resolve({ success: true }), 100))
+      (id) =>
+        new Promise((resolve) =>
+          setTimeout(() => resolve({ success: true }), 100),
+        ),
     );
 
     const { result } = renderHook(() => useBulkBillUpdate(mockBills), {
@@ -380,7 +385,9 @@ describe("useBulkBillUpdate", () => {
 
     // Select overdue bills only
     act(() => {
-      result.current.selectBillsByPredicate((bill) => bill.status === "overdue");
+      result.current.selectBillsByPredicate(
+        (bill) => bill.status === "overdue",
+      );
     });
 
     expect(result.current.selectedBills).toEqual(["bill3"]);

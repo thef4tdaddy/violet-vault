@@ -162,7 +162,7 @@ describe("useUserSetup", () => {
 
     expect(globalToast.showError).toHaveBeenCalledWith(
       "Please enter your password",
-      "Password Required"
+      "Password Required",
     );
   });
 
@@ -183,7 +183,7 @@ describe("useUserSetup", () => {
 
     expect(globalToast.showError).toHaveBeenCalledWith(
       "Incorrect password. Please try again.",
-      "Login Failed"
+      "Login Failed",
     );
   });
 
@@ -220,7 +220,7 @@ describe("useUserSetup", () => {
 
     expect(globalToast.showError).toHaveBeenCalledWith(
       "Please fill in both password and name",
-      "Required Fields"
+      "Required Fields",
     );
   });
 

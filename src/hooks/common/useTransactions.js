@@ -75,7 +75,8 @@ const useTransactions = (options = {}) => {
 
     // Query controls
     refetch,
-    invalidate: () => queryClient.invalidateQueries({ queryKey: queryKeys.transactions }),
+    invalidate: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions }),
   };
 };
 

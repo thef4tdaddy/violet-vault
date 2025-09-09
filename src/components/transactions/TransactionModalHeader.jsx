@@ -27,7 +27,10 @@ const TransactionModalHeader = ({ editingTransaction, onClose }) => {
           </p>
         </div>
       </div>
-      <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+      <button
+        onClick={onClose}
+        className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+      >
         <X className="h-5 w-5 text-gray-500" />
       </button>
     </div>
