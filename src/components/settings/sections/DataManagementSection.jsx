@@ -99,26 +99,13 @@ const DataManagementSection = ({
           
           <div className="space-y-3">
             <button
-              onClick={() => {
-                console.log("🔄 Settings: Button click detected!");
-                console.log("🔄 Settings: window object:", typeof window);
-                console.log("🔄 Settings: window.getQuickSyncStatus exists:", typeof window.getQuickSyncStatus);
-                console.log("🔄 Settings: All window functions:", Object.keys(window).filter(key => key.includes('Sync') || key.includes('sync')));
-                
-                if (window.getQuickSyncStatus) {
-                  console.log("🔄 Settings: Calling window.getQuickSyncStatus...");
-                  try {
-                    const result = window.getQuickSyncStatus();
-                    console.log("🔄 Settings: Direct result:", result);
-                    if (result && typeof result.then === 'function') {
-                      result.then(finalResult => console.log("🔄 Settings: Promise result:", finalResult))
-                            .catch(error => console.log("🔄 Settings: Promise error:", error));
-                    }
-                  } catch (error) {
-                    console.log("🔄 Settings: Function call error:", error);
-                  }
-                } else {
-                  console.log("🔄 ERROR: window.getQuickSyncStatus not found");
+              onClick={async () => {
+                console.log("🔄 TESTING: window.getQuickSyncStatus");
+                try {
+                  const result = await window.getQuickSyncStatus();
+                  console.log("🔄 SUCCESS:", result);
+                } catch (error) {
+                  console.error("🔄 ERROR:", error);
                 }
               }}
               className="w-full flex items-center p-3 border border-green-200 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
@@ -131,12 +118,13 @@ const DataManagementSection = ({
             </button>
 
             <button
-              onClick={() => {
-                console.log("🚀 Settings: Run Full Validation clicked");
-                if (window.runMasterSyncValidation) {
-                  window.runMasterSyncValidation().then(result => console.log("🚀 Result:", result));
-                } else {
-                  console.log("🚀 ERROR: window.runMasterSyncValidation not found");
+              onClick={async () => {
+                console.log("🚀 TESTING: window.runMasterSyncValidation");
+                try {
+                  const result = await window.runMasterSyncValidation();
+                  console.log("🚀 SUCCESS:", result);
+                } catch (error) {
+                  console.error("🚀 ERROR:", error);
                 }
               }}
               className="w-full flex items-center p-3 border border-blue-200 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
@@ -149,15 +137,16 @@ const DataManagementSection = ({
             </button>
 
             <button
-              onClick={() => {
-                console.log("🧹 Settings: Reset Cloud Data clicked");
-                if (window.forceCloudDataReset) {
-                  // eslint-disable-next-line no-restricted-globals
-                  if (confirm("⚠️ Reset Cloud Data?\n\nThis will:\n• Clear all cloud data\n• Re-upload from local storage\n• Cannot be undone\n\nContinue?")) {
-                    window.forceCloudDataReset().then(result => console.log("🧹 Result:", result));
+              onClick={async () => {
+                console.log("🧹 TESTING: window.forceCloudDataReset");
+                // eslint-disable-next-line no-restricted-globals
+                if (confirm("⚠️ Reset Cloud Data? This cannot be undone!")) {
+                  try {
+                    const result = await window.forceCloudDataReset();
+                    console.log("🧹 SUCCESS:", result);
+                  } catch (error) {
+                    console.error("🧹 ERROR:", error);
                   }
-                } else {
-                  console.log("🧹 ERROR: window.forceCloudDataReset not found");
                 }
               }}
               className="w-full flex items-center p-3 border border-red-200 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
