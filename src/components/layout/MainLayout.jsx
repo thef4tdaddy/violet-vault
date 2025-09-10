@@ -38,7 +38,7 @@ import { pathToViewMap, viewToPathMap } from "./routeConfig";
 
 // Heavy components now lazy loaded in ViewRenderer
 
-const Layout = ({ firebaseSync }) => {
+const MainLayout = ({ firebaseSync }) => {
   // Removed noisy debug log - layout renders constantly
 
   // Consolidated authentication manager
@@ -125,7 +125,7 @@ const Layout = ({ firebaseSync }) => {
       hasEncryptionKey: !!securityContext.encryptionKey,
       hasCurrentUser: !!currentUser,
       hasBudgetId: !!securityContext.budgetId,
-      budgetId: securityContext.budgetId?.slice(0, 10) + '...',
+      budgetId: securityContext.budgetId?.slice(0, 10) + "...",
     });
     MainLayout._lastLogKey = logKey;
   }
@@ -410,4 +410,4 @@ const MainContent = ({
 
 // SummaryCard component removed - now using enhanced SummaryCards component with clickable functionality
 
-export default Layout;
+export default MainLayout;
