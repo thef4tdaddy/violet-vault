@@ -179,12 +179,18 @@ const OnboardingTutorial = ({ children }) => {
 
   const nextStep = () => {
     const step = tutorialSteps[currentStep];
-    if (step?.action) {
-      step.action();
-    }
 
     if (currentStep < tutorialSteps.length - 1) {
-      setCurrentStep(currentStep + 1);
+      // For steps that involve navigation, delay the step increment
+      if (step?.action) {
+        step.action();
+        // Add delay for navigation to complete before highlighting next element
+        setTimeout(() => {
+          setCurrentStep(currentStep + 1);
+        }, 200);
+      } else {
+        setCurrentStep(currentStep + 1);
+      }
     } else {
       // Tutorial completed
       markStepComplete("accountSetup");
@@ -293,11 +299,28 @@ const OnboardingTutorial = ({ children }) => {
   const highlightElement = () => {
     const element = getCurrentStepElement();
     if (element) {
+      // Apply visual highlighting
       element.style.position = "relative";
       element.style.zIndex = "1001";
       element.style.border = "2px solid #a855f7";
       element.style.borderRadius = "8px";
       element.style.boxShadow = "0 0 0 4px rgba(168, 85, 247, 0.2)";
+
+      // Scroll element into view with smooth animation
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "center",
+      });
+
+      // Additional focusing for better accessibility
+      if (element.focus) {
+        try {
+          element.focus({ preventScroll: true });
+        } catch (e) {
+          // Some elements can't be focused, that's okay
+        }
+      }
     }
   };
 
@@ -312,13 +335,20 @@ const OnboardingTutorial = ({ children }) => {
     }
   };
 
-  // Highlight current element
+  // Highlight current element with delay for navigation transitions
   useEffect(() => {
     if (showTutorial) {
-      highlightElement();
-      return () => removeHighlight();
+      // Add small delay to allow for route navigation and DOM updates
+      const timer = setTimeout(() => {
+        highlightElement();
+      }, 300);
+
+      return () => {
+        clearTimeout(timer);
+        removeHighlight();
+      };
     }
-  }, [currentStep, showTutorial, highlightElement, removeHighlight]);
+  }, [currentStep, showTutorial]);
 
   if (!showTutorial || isOnboarded) {
     return children;
