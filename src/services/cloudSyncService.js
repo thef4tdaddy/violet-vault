@@ -564,7 +564,28 @@ class CloudSyncService {
    * @returns {boolean} True if user joined via share code
    */
   isSharedBudgetUser() {
-    return this.config?.currentUser?.joinedVia === "shareCode";
+    const currentUser = this.config?.currentUser;
+    logger.debug("🔍 [SYNC] Checking if shared budget user", {
+      hasConfig: !!this.config,
+      hasCurrentUser: !!currentUser,
+      joinedVia: currentUser?.joinedVia,
+      sharedBy: currentUser?.sharedBy,
+      userKeys: currentUser ? Object.keys(currentUser) : [],
+    });
+    
+    // Check multiple ways a shared budget user might be identified
+    const isSharedViaJoinedVia = currentUser?.joinedVia === "shareCode";
+    const isSharedViaSharedBy = !!currentUser?.sharedBy;
+    const isSharedUser = isSharedViaJoinedVia || isSharedViaSharedBy;
+    
+    logger.info(`🔄 Shared budget user detection: ${isSharedUser}`, {
+      joinedVia: currentUser?.joinedVia,
+      sharedBy: currentUser?.sharedBy,
+      isSharedViaJoinedVia,
+      isSharedViaSharedBy,
+    });
+    
+    return isSharedUser;
   }
 
   getStatus() {
