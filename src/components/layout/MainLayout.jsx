@@ -29,6 +29,7 @@ import SettingsDashboard from "../settings/SettingsDashboard";
 import OnboardingTutorial from "../onboarding/OnboardingTutorial";
 import OnboardingProgress from "../onboarding/OnboardingProgress";
 import { useOnboardingAutoComplete } from "../../hooks/common/useOnboardingAutoComplete";
+import useOnboardingStore from "../../stores/ui/onboardingStore";
 import { CorruptionRecoveryModal } from "../modals/CorruptionRecoveryModal";
 import PasswordRotationModal from "../auth/PasswordRotationModal";
 import LocalDataSecurityWarning from "../security/LocalDataSecurityWarning";
@@ -55,6 +56,10 @@ const Layout = ({ firebaseSync }) => {
     shouldShowAuthGateway,
     _internal: { securityManager },
   } = auth;
+
+  // Onboarding state - prevent security warning during tutorial
+  const onboardingStore = useOnboardingStore();
+  const isOnboarded = onboardingStore.isOnboarded;
 
   // Initialize data from Dexie to Zustand on app startup
   useDataInitialization(); // Return values not currently used
@@ -220,8 +225,9 @@ const MainContent = ({
   const openDataSettings = () => openSettings("data");
 
   // Show security warning for authenticated users who haven't acknowledged it
+  // But don't show during onboarding tutorial to avoid conflicts
   useEffect(() => {
-    if (auth.isUnlocked && auth.currentUser) {
+    if (auth.isUnlocked && auth.currentUser && isOnboarded) {
       const hasAcknowledged = localStorage.getItem(
         "localDataSecurityAcknowledged",
       );
@@ -233,7 +239,7 @@ const MainContent = ({
         return () => clearTimeout(timer);
       }
     }
-  }, [auth.isUnlocked, auth.currentUser]);
+  }, [auth.isUnlocked, auth.currentUser, isOnboarded]);
 
   // Listen for corruption detection events
   useEffect(() => {
