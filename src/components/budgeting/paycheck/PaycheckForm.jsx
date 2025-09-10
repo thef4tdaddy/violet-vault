@@ -127,38 +127,72 @@ const PaycheckForm = ({
           <Target className="h-4 w-4 inline mr-1 text-green-600" />
           Allocation Mode
         </label>
-        <div className="space-y-3">
-          <label className="flex items-center">
-            <input
-              type="radio"
-              name="allocationMode"
-              value="allocate"
-              checked={formData.allocationMode === "allocate"}
-              onChange={(e) => onUpdateField("allocationMode", e.target.value)}
-              className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
-            />
-            <span className="ml-3 text-sm">
-              <span className="font-medium">Standard Allocation</span>
-              <span className="block text-gray-500">
+        <div className="grid grid-cols-1 gap-3">
+          <label className="grid grid-cols-[auto_1fr] gap-3 items-start cursor-pointer">
+            <div className="relative grid place-items-center">
+              <input
+                type="radio"
+                name="allocationMode"
+                value="allocate"
+                checked={formData.allocationMode === "allocate"}
+                onChange={(e) =>
+                  onUpdateField("allocationMode", e.target.value)
+                }
+                className="sr-only"
+              />
+              <div
+                className={`w-5 h-5 rounded-full border-2 border-black grid place-items-center transition-colors ${
+                  formData.allocationMode === "allocate"
+                    ? "bg-green-600"
+                    : "bg-white hover:bg-gray-50"
+                }`}
+              >
+                {formData.allocationMode === "allocate" && (
+                  <div className="w-2 h-2 rounded-full bg-white"></div>
+                )}
+              </div>
+            </div>
+            <div className="text-sm">
+              <div className="font-medium text-gray-900">
+                Standard Allocation
+              </div>
+              <div className="text-gray-600 mt-1">
                 Allocate based on envelope monthly amounts (biweekly conversion)
-              </span>
-            </span>
+              </div>
+            </div>
           </label>
-          <label className="flex items-center">
-            <input
-              type="radio"
-              name="allocationMode"
-              value="leftover"
-              checked={formData.allocationMode === "leftover"}
-              onChange={(e) => onUpdateField("allocationMode", e.target.value)}
-              className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
-            />
-            <span className="ml-3 text-sm">
-              <span className="font-medium">Proportional Distribution</span>
-              <span className="block text-gray-500">
+          <label className="grid grid-cols-[auto_1fr] gap-3 items-start cursor-pointer">
+            <div className="relative grid place-items-center">
+              <input
+                type="radio"
+                name="allocationMode"
+                value="leftover"
+                checked={formData.allocationMode === "leftover"}
+                onChange={(e) =>
+                  onUpdateField("allocationMode", e.target.value)
+                }
+                className="sr-only"
+              />
+              <div
+                className={`w-5 h-5 rounded-full border-2 border-black grid place-items-center transition-colors ${
+                  formData.allocationMode === "leftover"
+                    ? "bg-green-600"
+                    : "bg-white hover:bg-gray-50"
+                }`}
+              >
+                {formData.allocationMode === "leftover" && (
+                  <div className="w-2 h-2 rounded-full bg-white"></div>
+                )}
+              </div>
+            </div>
+            <div className="text-sm">
+              <div className="font-medium text-gray-900">
+                Proportional Distribution
+              </div>
+              <div className="text-gray-600 mt-1">
                 Distribute entire paycheck proportionally across envelopes
-              </span>
-            </span>
+              </div>
+            </div>
           </label>
         </div>
       </div>
