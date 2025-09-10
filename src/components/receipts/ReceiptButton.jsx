@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Camera, Receipt as ReceiptIcon } from "lucide-react";
+import { getIcon } from "../../utils";
 import ReceiptScanner from "./ReceiptScanner";
 import ReceiptToTransactionModal from "./ReceiptToTransactionModal";
 import { preloadOCR } from "../../utils/common/ocrProcessor";
@@ -73,7 +73,7 @@ const ReceiptButton = ({ onTransactionCreated, variant = "primary" }) => {
             disabled={isPreloading}
             className={`${baseClasses} px-4 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50`}
           >
-            <Camera className="h-4 w-4" />
+            {React.createElement(getIcon("Camera"), { className: "h-4 w-4" })}
             {isPreloading ? "Loading..." : "Scan Receipt"}
           </button>
         );
@@ -86,7 +86,7 @@ const ReceiptButton = ({ onTransactionCreated, variant = "primary" }) => {
             className={`${baseClasses} p-2 text-purple-600 hover:bg-purple-50 rounded-xl`}
             title="Scan Receipt"
           >
-            <Camera className="h-5 w-5" />
+            {React.createElement(getIcon("Camera"), { className: "h-5 w-5" })}
           </button>
         );
 
@@ -98,7 +98,7 @@ const ReceiptButton = ({ onTransactionCreated, variant = "primary" }) => {
             className={`${baseClasses} fixed bottom-20 right-6 w-14 h-14 bg-purple-600 text-white rounded-full shadow-lg hover:bg-purple-700 hover:shadow-xl z-40`}
             title="Scan Receipt"
           >
-            <ReceiptIcon className="h-6 w-6" />
+            {React.createElement(getIcon("Receipt"), { className: "h-6 w-6" })}
           </button>
         );
 
@@ -109,7 +109,7 @@ const ReceiptButton = ({ onTransactionCreated, variant = "primary" }) => {
             disabled={isPreloading}
             className={`${baseClasses} px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700`}
           >
-            <Camera className="h-5 w-5" />
+            {React.createElement(getIcon("Camera"), { className: "h-5 w-5" })}
             {isPreloading ? "Loading OCR..." : "Scan Receipt"}
           </button>
         );
