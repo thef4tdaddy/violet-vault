@@ -278,6 +278,7 @@ export const calculateEnvelopeTotals = (envelopeData) => {
       }
 
       acc.totalBiweeklyNeed += biweeklyNeed;
+      acc.envelopeCount += 1;
 
       return acc;
     },
@@ -288,6 +289,7 @@ export const calculateEnvelopeTotals = (envelopeData) => {
       totalUpcoming: 0,
       totalBiweeklyNeed: 0,
       billsDueCount: 0,
+      envelopeCount: 0,
     },
   );
 };

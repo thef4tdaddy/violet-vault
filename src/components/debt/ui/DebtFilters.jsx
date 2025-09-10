@@ -69,7 +69,7 @@ const DebtFilters = ({
                 className="glassmorphism w-full px-3 py-2 border border-white/20 rounded-lg text-sm focus:ring-2 focus:ring-purple-500"
               >
                 <option value="all">All Types</option>
-                {Object.values(debtTypes).map((type) => {
+                {Object.values(debtTypes || {}).map((type) => {
                   const config = DEBT_TYPE_CONFIG[type];
                   const count = debtsByType[type]?.length || 0;
                   return (
