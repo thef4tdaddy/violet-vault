@@ -118,14 +118,17 @@ const Layout = ({ firebaseSync }) => {
     );
   }
 
-  logger.budgetSync("Rendering BudgetProvider with props", {
-    hasEncryptionKey: !!securityContext.encryptionKey,
-    hasCurrentUser: !!currentUser,
-    hasBudgetId: !!securityContext.budgetId,
-    hasSalt: !!securityContext.salt,
-    currentUser: currentUser,
-  });
-  logger.budgetSync("budgetId value", { budgetId: securityContext.budgetId });
+  // Log budget sync state only on significant changes to reduce console spam
+  const logKey = `${!!securityContext.encryptionKey}-${!!currentUser}-${!!securityContext.budgetId}`;
+  if (!MainLayout._lastLogKey || MainLayout._lastLogKey !== logKey) {
+    logger.budgetSync("BudgetProvider state changed", {
+      hasEncryptionKey: !!securityContext.encryptionKey,
+      hasCurrentUser: !!currentUser,
+      hasBudgetId: !!securityContext.budgetId,
+      budgetId: securityContext.budgetId?.slice(0, 10) + '...',
+    });
+    MainLayout._lastLogKey = logKey;
+  }
 
   return (
     <>

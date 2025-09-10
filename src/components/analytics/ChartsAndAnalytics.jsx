@@ -174,14 +174,14 @@ const ChartsAnalytics = ({
           {/* Monthly Cash Flow */}
           <CashFlowChart
             title="Monthly Cash Flow"
-            data={monthlyTrends || []}
+            data={(monthlyTrends || []).filter(Boolean)}
             height={300}
           />
 
           {/* Top Spending Envelopes */}
           <DistributionPieChart
             title="Top Spending Envelopes"
-            data={envelopeSpending?.slice(0, 8) || []}
+            data={(envelopeSpending || []).filter(Boolean).slice(0, 8)}
             dataKey="amount"
             nameKey="name"
             height={300}
@@ -217,7 +217,7 @@ const ChartsAnalytics = ({
 
             {chartType === "line" && (
               <TrendLineChart
-                data={monthlyTrends || []}
+                data={(monthlyTrends || []).filter(Boolean)}
                 lines={[
                   { dataKey: "income", name: "Income", color: "#10b981" },
                   { dataKey: "expenses", name: "Expenses", color: "#ef4444" },
@@ -229,7 +229,7 @@ const ChartsAnalytics = ({
 
             {chartType === "bar" && (
               <CategoryBarChart
-                data={monthlyTrends || []}
+                data={(monthlyTrends || []).filter(Boolean)}
                 bars={[
                   { dataKey: "income", name: "Income", fill: "#10b981" },
                   { dataKey: "expenses", name: "Expenses", fill: "#ef4444" },
@@ -241,7 +241,7 @@ const ChartsAnalytics = ({
 
             {chartType === "area" && (
               <CashFlowChart
-                data={monthlyTrends || []}
+                data={(monthlyTrends || []).filter(Boolean)}
                 height={400}
                 emptyMessage="No data available for the selected period"
               />

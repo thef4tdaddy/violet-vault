@@ -20,7 +20,7 @@ export const useActualBalance = () => {
   } = useQuery({
     queryKey: [...queryKeys.budgetMetadata, "actualBalance"],
     queryFn: async () => {
-      logger.debug("TanStack Query: Fetching actual balance from Dexie");
+      // Reduced console spam - only log significant events
       let metadata = await getBudgetMetadata();
 
       // Initialize metadata record if it doesn't exist (same as main hook)
@@ -47,7 +47,7 @@ export const useActualBalance = () => {
         actualBalance: await getActualBalance(),
         isActualBalanceManual: metadata?.isActualBalanceManual || false,
       };
-      logger.debug("TanStack Query: Actual balance loaded", result);
+      // Only log if there are issues or significant changes
       return result;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
