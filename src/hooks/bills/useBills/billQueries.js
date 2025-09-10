@@ -18,7 +18,7 @@ export const useBillQueryFunction = (options = {}) => {
   } = options;
 
   return useCallback(async () => {
-    logger.debug("TanStack Query: Fetching bills from Dexie");
+    // Fetch bills from Dexie (reduced logging)
 
     let bills = [];
 
@@ -26,14 +26,10 @@ export const useBillQueryFunction = (options = {}) => {
       // Always fetch from Dexie (single source of truth for local data)
       bills = await budgetDb.bills.toArray();
 
-      logger.debug("TanStack Query: Loaded from Dexie", {
-        count: bills.length,
-        firstBill: bills[0],
-        billTitles: bills
-          .map((b) => b.name || b.title || b.billName || "No Name")
-          .slice(0, 3),
-        billStructure: bills[0] ? Object.keys(bills[0]) : "No bills",
-      });
+      // Only log if there are bills or issues
+      if (bills.length > 0) {
+        logger.debug("TanStack Query: Bills loaded", { count: bills.length });
+      }
     } catch (error) {
       logger.error("TanStack Query: Dexie fetch failed", error);
       return [];
