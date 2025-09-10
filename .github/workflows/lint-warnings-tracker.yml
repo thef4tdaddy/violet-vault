@@ -276,7 +276,10 @@ jobs:
           script: |
             const fs = require('fs');
 
-            // First, hide previous automation comments to prevent flooding
+            // First, get previous warnings from the last comment BEFORE hiding anything
+            let previousDevelopWarnings = null;
+            let previousMainWarnings = null;
+
             try {
               const comments = await github.rest.issues.listComments({
                 owner: context.repo.owner,
@@ -284,28 +287,60 @@ jobs:
                 issue_number: 568
               });
               
-              // Find previous automation comments (from GitHub Actions)
+              // Find the most recent automation comment to get previous values
+              const lastAutomationComment = comments.data
+                .filter(comment => 
+                  comment.user.login === 'github-actions[bot]' &&
+                  (comment.body.includes('## 📊 Lint Warnings Update') ||
+                   comment.body.includes('📊 Lint Warnings Update')) &&
+                  !comment.body.startsWith('<details>')
+                )
+                .pop(); // Get the most recent one
+              
+              if (lastAutomationComment) {
+                console.log('📋 Found previous comment for delta calculation');
+                const devMatch = lastAutomationComment.body.match(/\*\*Develop Branch:\*\* (\d+) warnings/);
+                const mainMatch = lastAutomationComment.body.match(/\*\*Main Branch:\*\* (\d+) warnings/);
+                
+                if (devMatch) previousDevelopWarnings = parseInt(devMatch[1]);
+                if (mainMatch) previousMainWarnings = parseInt(mainMatch[1]);
+                
+                console.log(`Previous values: Develop=${previousDevelopWarnings}, Main=${previousMainWarnings}`);
+              } else {
+                console.log('⚠️ No previous automation comment found for delta calculation');
+              }
+
+              // Now hide previous automation comments using GitHub's native hide outdated functionality
               const automationComments = comments.data.filter(comment => 
                 comment.user.login === 'github-actions[bot]' &&
                 (comment.body.includes('## 📊 Lint Warnings Update') ||
                  comment.body.includes('📊 Lint Warnings Update') ||
                  comment.body.includes('📊 **Lint Warning Analysis**') ||
                  comment.body.includes('🚀 **Lint Warnings Report**') ||
-                 comment.body.includes('Automated lint warning tracking'))
+                 comment.body.includes('Automated lint warning tracking')) &&
+                !comment.body.startsWith('<details>')
               );
               
-              // Hide the previous automation comments by minimizing them
+              // Hide the previous automation comments using GitHub's native hide functionality
               for (const comment of automationComments) {
                 try {
-                  await github.rest.issues.updateComment({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    comment_id: comment.id,
-                    body: `<details><summary>📊 Previous Lint Analysis (${new Date(comment.created_at).toLocaleDateString()})</summary>\n\n${comment.body}\n\n</details>`
+                  await github.graphql(`
+                    mutation($commentId: ID!) {
+                      minimizeComment(input: {
+                        subjectId: $commentId
+                        classifier: OUTDATED
+                      }) {
+                        minimizedComment {
+                          isMinimized
+                        }
+                      }
+                    }
+                  `, {
+                    commentId: comment.node_id
                   });
-                  console.log(`✅ Minimized previous comment #${comment.id}`);
+                  console.log(`✅ Marked comment #${comment.id} as outdated`);
                 } catch (updateError) {
-                  console.log(`⚠️ Could not minimize comment #${comment.id}:`, updateError.message);
+                  console.log(`⚠️ Could not hide comment #${comment.id}:`, updateError.message);
                 }
               }
             } catch (error) {
@@ -329,42 +364,6 @@ jobs:
             const developWarnings = '${{ steps.develop_warnings.outputs.warnings }}' || '0';
             const mainWarnings = '${{ steps.main_warnings.outputs.warnings }}' || '0';
 
-            // Get previous warnings from the last comment to calculate delta
-            let previousDevelopWarnings = null;
-            let previousMainWarnings = null;
-
-            try {
-              const comments = await github.rest.issues.listComments({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: 568
-              });
-              
-              // Find the most recent automation comment to get previous values
-              const lastAutomationComment = comments.data
-                .filter(comment => 
-                  comment.user.login === 'github-actions[bot]' &&
-                  (comment.body.includes('## 📊 Lint Warnings Update') ||
-                   comment.body.includes('📊 Lint Warnings Update'))
-                )
-                .pop(); // Get the most recent one
-              
-              if (lastAutomationComment) {
-                console.log('📋 Found previous comment for delta calculation');
-                const devMatch = lastAutomationComment.body.match(/\*\*Develop Branch:\*\* (\d+) warnings/);
-                const mainMatch = lastAutomationComment.body.match(/\*\*Main Branch:\*\* (\d+) warnings/);
-                
-                if (devMatch) previousDevelopWarnings = parseInt(devMatch[1]);
-                if (mainMatch) previousMainWarnings = parseInt(mainMatch[1]);
-                
-                console.log(`Previous values: Develop=${previousDevelopWarnings}, Main=${previousMainWarnings}`);
-              } else {
-                console.log('⚠️ No previous automation comment found for delta calculation');
-              }
-            } catch (error) {
-              console.log('Could not fetch previous warnings for delta calculation:', error.message);
-            }
-
             // Calculate deltas
             const developDelta = previousDevelopWarnings !== null ? 
               parseInt(developWarnings) - previousDevelopWarnings : null;
@@ -377,10 +376,13 @@ jobs:
             const runningDevelop = '${{ steps.should_run.outputs.should_run_develop }}' === 'true';
             const runningMain = '${{ steps.should_run.outputs.should_run_main }}' === 'true';
 
+            // Only skip if we have valid previous data and there are truly no changes
             const shouldSkipPost = (
-              (runningDevelop && developDelta === 0 && !runningMain) ||
-              (runningMain && mainDelta === 0 && !runningDevelop) ||
-              (runningDevelop && runningMain && developDelta === 0 && mainDelta === 0)
+              (runningDevelop && !runningMain && previousDevelopWarnings !== null && developDelta === 0) ||
+              (runningMain && !runningDevelop && previousMainWarnings !== null && mainDelta === 0) ||
+              (runningDevelop && runningMain && 
+               previousDevelopWarnings !== null && previousMainWarnings !== null &&
+               developDelta === 0 && mainDelta === 0)
             );
 
             if (shouldSkipPost) {
@@ -389,6 +391,11 @@ jobs:
               console.log(`Main: ${previousMainWarnings} → ${mainWarnings} (Δ: ${mainDelta})`);
               return;
             }
+
+            console.log('📝 Posting comment - changes detected or first run');
+            console.log(`Running: Develop=${runningDevelop}, Main=${runningMain}`);
+            console.log(`Develop: ${previousDevelopWarnings} → ${developWarnings} (Δ: ${developDelta})`);
+            console.log(`Main: ${previousMainWarnings} → ${mainWarnings} (Δ: ${mainDelta})`);
 
             let branchInfo = '';
             if ('${{ steps.should_run.outputs.should_run_develop }}' === 'true') {
