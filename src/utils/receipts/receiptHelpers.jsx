@@ -3,7 +3,7 @@
  * Handles data validation, formatting, and common calculations
  */
 import React from "react";
-import { getIcon } from "../common/iconUtils";
+import { getIcon } from "../index";
 
 /**
  * Validate receipt data structure
