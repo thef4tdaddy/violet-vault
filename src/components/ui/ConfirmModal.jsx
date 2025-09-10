@@ -80,7 +80,7 @@ const ConfirmModal = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]"
+      className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[10000]"
       role="dialog"
       aria-modal="true"
       aria-labelledby="confirm-modal-title"
