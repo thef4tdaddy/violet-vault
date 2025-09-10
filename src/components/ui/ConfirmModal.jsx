@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import { getIcon } from "../../utils/icons";
-import { Trash2, AlertTriangle } from "lucide-react";
 
 /**
  * Reusable ConfirmModal Component
@@ -57,8 +56,8 @@ const ConfirmModal = ({
   // Icon selection based on type and destructive state
   const getModalIcon = () => {
     if (icon) return icon;
-    if (destructive) return Trash2;
-    return AlertTriangle;
+    if (destructive) return getIcon("Trash2");
+    return getIcon("AlertTriangle");
   };
 
   const Icon = getModalIcon();
@@ -93,7 +92,7 @@ const ConfirmModal = ({
             <div
               className={`w-12 h-12 ${colorScheme.iconBg} rounded-full flex items-center justify-center mr-4`}
             >
-              <Icon className={`h-6 w-6 ${colorScheme.iconColor}`} />
+              {React.createElement(Icon, { className: `h-6 w-6 ${colorScheme.iconColor}` })}
             </div>
             <div className="flex-1">
               <h3

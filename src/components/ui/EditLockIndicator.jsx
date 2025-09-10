@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Lock, Clock, AlertTriangle, User } from "lucide-react";
+import { getIcon } from "../../utils";
 
 /**
  * Standardized Edit Lock Indicator Component
@@ -46,7 +46,7 @@ const EditLockIndicator = ({
       <div
         className={`flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg ${className}`}
       >
-        <Lock className="h-4 w-4 text-green-600" />
+        {React.createElement(getIcon("Lock"), { className: "h-4 w-4 text-green-600" })}
         <div className="flex-1">
           <p className="text-sm font-medium text-green-900">
             You are editing this record
@@ -70,9 +70,9 @@ const EditLockIndicator = ({
     >
       <div className="flex-shrink-0">
         {isExpired ? (
-          <AlertTriangle className="h-5 w-5 text-red-600" />
+          React.createElement(getIcon("AlertTriangle"), { className: "h-5 w-5 text-red-600" })
         ) : (
-          <Lock className="h-5 w-5 text-red-600" />
+          React.createElement(getIcon("Lock"), { className: "h-5 w-5 text-red-600" })
         )}
       </div>
 
@@ -84,13 +84,13 @@ const EditLockIndicator = ({
         {showDetails && (
           <div className="mt-1 space-y-1">
             <div className="flex items-center gap-2 text-xs text-red-700">
-              <User className="h-3 w-3" />
+              {React.createElement(getIcon("User"), { className: "h-3 w-3" })}
               <span>by {lock?.userName || "Unknown User"}</span>
             </div>
 
             {!isExpired && timeRemaining > 0 && (
               <div className="flex items-center gap-2 text-xs text-red-700">
-                <Clock className="h-3 w-3" />
+                {React.createElement(getIcon("Clock"), { className: "h-3 w-3" })}
                 <span>
                   {secondsRemaining > 60
                     ? `${minutesRemaining} minute${minutesRemaining !== 1 ? "s" : ""} remaining`
@@ -138,7 +138,7 @@ export const CompactEditLockIndicator = ({
       <div
         className={`inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs ${className}`}
       >
-        <Lock className="h-3 w-3" />
+        {React.createElement(getIcon("Lock"), { className: "h-3 w-3" })}
         <span>Editing</span>
       </div>
     );
@@ -149,9 +149,9 @@ export const CompactEditLockIndicator = ({
       className={`inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs ${className}`}
     >
       {isExpired ? (
-        <AlertTriangle className="h-3 w-3" />
+        React.createElement(getIcon("AlertTriangle"), { className: "h-3 w-3" })
       ) : (
-        <Lock className="h-3 w-3" />
+        React.createElement(getIcon("Lock"), { className: "h-3 w-3" })
       )}
       <span>
         {isExpired ? "Expired" : "Locked"} by {lock?.userName || "User"}

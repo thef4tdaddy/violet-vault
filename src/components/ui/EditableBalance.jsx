@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Edit3, Check, X, AlertTriangle } from "lucide-react";
+import { getIcon } from "../../utils";
 
 const EditableBalance = ({
   value,
@@ -101,7 +101,7 @@ const EditableBalance = ({
       >
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-medium text-yellow-800 flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5" />
+            {React.createElement(getIcon("AlertTriangle"), { className: "h-5 w-5" })}
             Confirm Large Change
           </h3>
         </div>
@@ -127,14 +127,14 @@ const EditableBalance = ({
               onClick={() => confirmSave(pendingValue)}
               className="flex items-center gap-1 px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
             >
-              <Check className="h-4 w-4" />
+              {React.createElement(getIcon("Check"), { className: "h-4 w-4" })}
               Confirm
             </button>
             <button
               onClick={handleCancel}
               className="flex items-center gap-1 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm"
             >
-              <X className="h-4 w-4" />
+              {React.createElement(getIcon("X"), { className: "h-4 w-4" })}
               Cancel
             </button>
           </div>
@@ -172,14 +172,14 @@ const EditableBalance = ({
                 className="p-2 bg-green-600 text-white rounded-md hover:bg-green-700"
                 title="Save"
               >
-                <Check className="h-4 w-4" />
+                {React.createElement(getIcon("Check"), { className: "h-4 w-4" })}
               </button>
               <button
                 onClick={handleCancel}
                 className="p-2 bg-red-600 text-white rounded-md hover:bg-red-700"
                 title="Cancel"
               >
-                <X className="h-4 w-4" />
+                {React.createElement(getIcon("X"), { className: "h-4 w-4" })}
               </button>
             </div>
           </div>
@@ -202,7 +202,7 @@ const EditableBalance = ({
           {isManuallySet && (
             <span className="text-xs text-gray-500">(Manual)</span>
           )}
-          <Edit3 className="h-4 w-4 opacity-0 group-hover:opacity-50 transition-opacity" />
+          {React.createElement(getIcon("Edit3"), { className: "h-4 w-4 opacity-0 group-hover:opacity-50 transition-opacity" })}
         </h3>
       </div>
 
@@ -212,7 +212,7 @@ const EditableBalance = ({
         >
           {formatNumber(value)}
           <div className="opacity-0 group-hover:opacity-50 transition-opacity">
-            <Edit3 className="h-5 w-5" />
+            {React.createElement(getIcon("Edit3"), { className: "h-5 w-5" })}
           </div>
         </div>
         <p className="text-sm text-gray-600 group-hover:text-gray-800">

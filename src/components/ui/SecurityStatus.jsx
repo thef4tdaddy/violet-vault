@@ -1,5 +1,5 @@
 import React from "react";
-import { Lock, Unlock, Clock, Shield, Activity } from "lucide-react";
+import { getIcon } from "../../utils";
 
 /**
  * Shared security status component for displaying security state information
@@ -26,13 +26,13 @@ const SecurityStatus = ({
     {
       label: "Session Status",
       value: isLocked ? "Locked" : "Active",
-      icon: isLocked ? Lock : Unlock,
+      icon: isLocked ? getIcon("Lock") : getIcon("Unlock"),
       color: isLocked ? "text-red-600" : "text-green-600",
     },
     {
       label: "Security Events",
       value: `${eventCount} recorded`,
-      icon: Activity,
+      icon: getIcon("Activity"),
       color: "text-gray-600",
     },
   ];
@@ -42,7 +42,7 @@ const SecurityStatus = ({
     defaultStatusItems.splice(1, 0, {
       label: "Auto-lock in",
       value: autoLockStatus,
-      icon: Clock,
+      icon: getIcon("Clock"),
       color: "text-orange-600",
     });
   }
@@ -67,18 +67,17 @@ const SecurityStatus = ({
     <div className={containerClasses}>
       {isDetailed && (
         <h4 className={headerClasses}>
-          <Shield className="h-4 w-4 text-blue-500" />
+          {React.createElement(getIcon("Shield"), { className: "h-4 w-4 text-blue-500" })}
           Current Security Status
         </h4>
       )}
 
       <div className={itemClasses}>
         {allStatusItems.map((item, index) => {
-          const Icon = item.icon;
           return (
             <div key={index} className="flex justify-between items-center">
               <span className="flex items-center gap-1">
-                {Icon && <Icon className="h-3 w-3 text-gray-500" />}
+                {item.icon && React.createElement(item.icon, { className: "h-3 w-3 text-gray-500" })}
                 {item.label}:
               </span>
               <span className={`font-medium ${item.color}`}>{item.value}</span>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Camera, Upload } from "lucide-react";
+import { getIcon } from "../../../utils";
 
 /**
  * Receipt Upload Area Component
@@ -22,10 +22,10 @@ const ReceiptUploadArea = ({
         <div className="space-y-4">
           <div className="flex justify-center space-x-4">
             <div className="glassmorphism p-3 rounded-lg border-2 border-black bg-purple-200/40">
-              <Upload className="h-8 w-8 text-purple-900" />
+              {React.createElement(getIcon("Upload"), { className: "h-8 w-8 text-purple-900" })}
             </div>
             <div className="glassmorphism p-3 rounded-lg border-2 border-black bg-blue-100/40">
-              <Camera className="h-8 w-8 text-blue-900" />
+              {React.createElement(getIcon("Camera"), { className: "h-8 w-8 text-blue-900" })}
             </div>
           </div>
 

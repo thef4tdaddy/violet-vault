@@ -1,5 +1,5 @@
 import React from "react";
-import { CheckCircle } from "lucide-react";
+import { getIcon } from "../../../utils";
 import ExtractedDataField from "./ExtractedDataField";
 import ExtractedItemsList from "./ExtractedItemsList";
 
@@ -16,7 +16,7 @@ const ReceiptExtractedData = ({ extractedData }) => {
   return (
     <div className="glassmorphism rounded-lg p-4 border-2 border-black bg-green-100/40 backdrop-blur-sm">
       <h3 className="font-black text-black text-base mb-4 flex items-center gap-2">
-        <CheckCircle className="h-5 w-5 text-green-900" />
+        {React.createElement(getIcon("CheckCircle"), { className: "h-5 w-5 text-green-900" })}
         <span className="text-lg">E</span>XTRACTED{" "}
         <span className="text-lg">I</span>NFORMATION
       </h3>
