@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { getQuickSyncStatus } from "../../utils/sync/masterSyncValidator";
 import { cloudSyncService } from "../../services/cloudSyncService";
 import logger from "../../utils/common/logger";
 
-const SyncHealthIndicator = () => {
+const SyncHealthIndicator = ({ onOpenSettings }) => {
   const [syncStatus, setSyncStatus] = useState({
     isHealthy: null,
     status: "CHECKING",
@@ -11,9 +11,7 @@ const SyncHealthIndicator = () => {
     isLoading: true,
   });
 
-  const [showDetails, setShowDetails] = useState(false);
   const [isBackgroundSyncing, setIsBackgroundSyncing] = useState(false);
-  const dropdownRef = useRef(null);
 
   // Check sync health on component mount and periodically
   useEffect(() => {
@@ -41,30 +39,6 @@ const SyncHealthIndicator = () => {
 
     return () => clearInterval(activityInterval);
   }, []);
-
-  // Handle clicks outside dropdown and escape key to close it
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowDetails(false);
-      }
-    };
-
-    const handleKeyDown = (event) => {
-      if (event.key === "Escape") {
-        setShowDetails(false);
-      }
-    };
-
-    if (showDetails) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("keydown", handleKeyDown);
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-        document.removeEventListener("keydown", handleKeyDown);
-      };
-    }
-  }, [showDetails]);
 
   const checkSyncHealth = async () => {
     try {
@@ -187,202 +161,17 @@ const SyncHealthIndicator = () => {
     }
   };
 
-  const runFullValidation = async () => {
-    logger.info("🚀 Sync Health UI: Running full validation...");
-    if (typeof window !== "undefined" && window.runMasterSyncValidation) {
-      try {
-        setSyncStatus((prev) => ({ ...prev, isLoading: true }));
-        const results = await Promise.race([
-          window.runMasterSyncValidation(),
-          new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("Validation timed out")), 30000),
-          ),
-        ]);
-
-        logger.info(
-          "✅ Sync Health: Full validation completed",
-          results.summary,
-        );
-
-        // Update status based on results
-        setSyncStatus({
-          isHealthy: results.summary.overallStatus === "ALL_SYSTEMS_GO",
-          status:
-            results.summary.overallStatus === "ALL_SYSTEMS_GO"
-              ? "HEALTHY"
-              : "ISSUES_DETECTED",
-          failedTests: results.summary.totalFailed,
-          lastChecked: new Date().toISOString(),
-          isLoading: false,
-          fullResults: results,
-        });
-      } catch (error) {
-        logger.error("❌ Full validation failed:", error);
-        setSyncStatus({
-          isHealthy: false,
-          status: "ERROR",
-          error: error.message.includes("timed out")
-            ? "Validation timed out after 30 seconds"
-            : error.message,
-          lastChecked: new Date().toISOString(),
-          isLoading: false,
-        });
-      }
-    } else {
-      logger.warn(
-        "🚨 Sync Health: runMasterSyncValidation not available on window",
-      );
-      setSyncStatus((prev) => ({
-        ...prev,
-        error: "Validation function not available",
-        isLoading: false,
-      }));
-    }
-  };
-
   return (
     <div className="relative">
       {/* Main Health Indicator */}
       <button
-        onClick={() => setShowDetails(!showDetails)}
+        onClick={onOpenSettings}
         className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 ${getStatusColor()} hover:bg-gray-100 dark:hover:bg-gray-800`}
-        title={`Sync Status: ${syncStatus.status}${isBackgroundSyncing ? " (Syncing...)" : ""} - Click for details`}
+        title={`Sync Status: ${syncStatus.status}${isBackgroundSyncing ? " (Syncing...)" : ""} - Click to open sync tools`}
       >
         {getStatusIcon()}
         <span className="text-sm font-medium">{getStatusText()}</span>
       </button>
-
-      {/* Details Dropdown */}
-      {showDetails && (
-        <div
-          ref={dropdownRef}
-          className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50"
-        >
-          <div className="p-4">
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Sync Health Status
-              </h3>
-              <button
-                onClick={() => setShowDetails(false)}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                title="Close"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600 dark:text-gray-300">
-                  Overall Status:
-                </span>
-                <span className={`text-sm font-medium ${getStatusColor()}`}>
-                  {syncStatus.status}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600 dark:text-gray-300">
-                  Background Sync:
-                </span>
-                <span
-                  className={`text-sm font-medium flex items-center space-x-1 ${isBackgroundSyncing ? "text-blue-500" : "text-gray-500"}`}
-                >
-                  {isBackgroundSyncing && (
-                    <svg
-                      className="w-3 h-3 animate-spin"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                    >
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        fill="none"
-                        opacity="0.25"
-                      />
-                      <path
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                      />
-                    </svg>
-                  )}
-                  <span>{isBackgroundSyncing ? "Active" : "Idle"}</span>
-                </span>
-              </div>
-
-              {syncStatus.failedTests > 0 && (
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
-                    Failed Tests:
-                  </span>
-                  <span className="text-sm font-medium text-red-500">
-                    {syncStatus.failedTests}
-                  </span>
-                </div>
-              )}
-
-              {syncStatus.lastChecked && (
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
-                    Last Checked:
-                  </span>
-                  <span className="text-sm text-gray-900 dark:text-gray-100">
-                    {new Date(syncStatus.lastChecked).toLocaleTimeString()}
-                  </span>
-                </div>
-              )}
-
-              {syncStatus.error && (
-                <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 rounded border-l-4 border-red-500">
-                  <p className="text-sm text-red-700 dark:text-red-300">
-                    {syncStatus.error}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <div className="mt-4 flex space-x-2">
-              <button
-                onClick={checkSyncHealth}
-                disabled={syncStatus.isLoading}
-                className="flex-1 px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {syncStatus.isLoading ? "Checking..." : "Recheck"}
-              </button>
-
-              <button
-                onClick={runFullValidation}
-                className="flex-1 px-3 py-2 text-sm bg-purple-500 text-white rounded hover:bg-purple-600"
-              >
-                Full Test
-              </button>
-            </div>
-
-            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Console commands: runSyncHealthCheck(),
-                runMasterSyncValidation()
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
