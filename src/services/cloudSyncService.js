@@ -117,7 +117,19 @@ class CloudSyncService {
       let cloudData;
       try {
         const cloudResult = await chunkedSyncService.loadFromCloud();
-        cloudData = cloudResult?.data || null;
+        cloudData = cloudResult || null;
+        logger.debug("📊 CloudSyncService received data from chunkedSyncService", {
+          hasData: !!cloudData,
+          keys: cloudData ? Object.keys(cloudData) : [],
+          arrayLengths: cloudData ? {
+            envelopes: cloudData.envelopes?.length || 0,
+            transactions: cloudData.transactions?.length || 0,
+            bills: cloudData.bills?.length || 0,
+            paycheckHistory: cloudData.paycheckHistory?.length || 0,
+            savingsGoals: cloudData.savingsGoals?.length || 0,
+            debts: cloudData.debts?.length || 0,
+          } : null,
+        });
       } catch (error) {
         // GitHub Issue #576 Phase 2: Universal decryption error handling for all users
         if (
@@ -175,9 +187,9 @@ class CloudSyncService {
       if (syncDecision.direction === "fromFirestore") {
         // Download from Firebase to Dexie
         const cloudResult = await chunkedSyncService.loadFromCloud();
-        if (cloudResult.data) {
+        if (cloudResult) {
           // Save the loaded data to Dexie
-          await this.saveToDexie(cloudResult.data);
+          await this.saveToDexie(cloudResult);
 
           // Invalidate TanStack Query cache to refresh UI immediately
           try {
