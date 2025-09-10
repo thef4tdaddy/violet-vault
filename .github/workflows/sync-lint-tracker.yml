@@ -66,21 +66,18 @@ jobs:
               echo "📝 Committing updated lint tracker workflow..."
               
               git add "$DEVELOP_FILE"
-              git commit -m "$(cat <<'EOF'
-sync: update lint-warnings-tracker workflow from develop
+              git commit -m "sync: update lint-warnings-tracker workflow from develop
 
 This automated sync ensures parity between main and develop branches
 for the lint tracking system.
 
-Source: develop branch
+Source: develop branch  
 Target: main branch
 Action: Sync lint-warnings-tracker.yml
 
 🤖 Generated with automated sync action
 
-Co-Authored-By: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
-EOF
-)"
+Co-Authored-By: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
               
               git push origin main
               echo "✅ Successfully synced lint tracker workflow to main branch!"
