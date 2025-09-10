@@ -221,7 +221,7 @@ const MainContent = ({
 
   // Show security warning for authenticated users who haven't acknowledged it
   useEffect(() => {
-    if (isUnlocked && currentUser) {
+    if (auth.isUnlocked && auth.currentUser) {
       const hasAcknowledged = localStorage.getItem(
         "localDataSecurityAcknowledged",
       );
@@ -233,7 +233,7 @@ const MainContent = ({
         return () => clearTimeout(timer);
       }
     }
-  }, [isUnlocked, currentUser]);
+  }, [auth.isUnlocked, auth.currentUser]);
 
   // Listen for corruption detection events
   useEffect(() => {
