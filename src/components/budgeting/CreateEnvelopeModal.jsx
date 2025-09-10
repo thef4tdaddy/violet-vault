@@ -97,6 +97,7 @@ const CreateEnvelopeModal = ({
             <EnvelopeTypeSelector
               selectedType={formData.envelopeType}
               onTypeChange={(type) => updateFormField("envelopeType", type)}
+              excludeTypes={["SAVINGS"]}
               canEdit={true}
             />
 
