@@ -35,7 +35,7 @@ export const useTransactionMutations = () => {
       };
 
       // Apply optimistic update and save to Dexie
-      await optimisticHelpers.addTransaction(newTransaction);
+      await optimisticHelpers.addTransaction(queryClient, newTransaction);
 
       // Save to Dexie (single source of truth for transactions)
       await budgetDb.transactions.put(newTransaction);
@@ -73,7 +73,7 @@ export const useTransactionMutations = () => {
       };
 
       // Apply optimistic update and save to Dexie
-      await optimisticHelpers.addTransaction(reconciledTransaction);
+      await optimisticHelpers.addTransaction(queryClient, reconciledTransaction);
 
       // Save to Dexie (single source of truth for transactions)
       await budgetDb.transactions.put(reconciledTransaction);
@@ -102,7 +102,7 @@ export const useTransactionMutations = () => {
       const transaction = await budgetDb.transactions.get(transactionId);
 
       // Apply optimistic update using helper
-      await optimisticHelpers.removeTransaction(transactionId);
+      await optimisticHelpers.removeTransaction(queryClient, transactionId);
 
       // Delete from Dexie (single source of truth for transactions)
       await budgetDb.transactions.delete(transactionId);
@@ -142,7 +142,7 @@ export const useTransactionMutations = () => {
       };
 
       // Apply optimistic update using helper
-      await optimisticHelpers.updateTransaction(id, updatedTransaction);
+      await optimisticHelpers.updateTransaction(queryClient, id, updatedTransaction);
 
       // Update in Dexie (single source of truth for transactions)
       await budgetDb.transactions.update(id, updatedTransaction);
