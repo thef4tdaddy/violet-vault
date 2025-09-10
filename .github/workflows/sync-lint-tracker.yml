@@ -71,7 +71,7 @@ jobs:
 This automated sync ensures parity between main and develop branches
 for the lint tracking system.
 
-Source: develop branch  
+Source: develop branch
 Target: main branch
 Action: Sync lint-warnings-tracker.yml
 
