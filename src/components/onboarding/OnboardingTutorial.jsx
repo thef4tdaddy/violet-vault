@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { getIcon } from "../../utils/icons";
 import useOnboardingStore from "../../stores/ui/onboardingStore";
 import logger from "../../utils/common/logger";
@@ -6,7 +7,8 @@ import logger from "../../utils/common/logger";
 /**
  * OnboardingTutorial - Provides guided tours and contextual hints for new users
  */
-const OnboardingTutorial = ({ children, setActiveView }) => {
+const OnboardingTutorial = ({ children }) => {
+  const navigate = useNavigate();
   const {
     isOnboarded,
     // currentTutorialStep, // Available for future use
@@ -54,7 +56,7 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
       position: "bottom",
       action: () => {
         startTutorialStep("firstDebts");
-        if (setActiveView) setActiveView("debts");
+        navigate("/debts");
       },
     },
     {
@@ -66,7 +68,7 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
       position: "bottom",
       action: () => {
         startTutorialStep("firstBills");
-        if (setActiveView) setActiveView("bills");
+        navigate("/bills");
       },
     },
     {
@@ -78,7 +80,7 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
       position: "bottom",
       action: () => {
         startTutorialStep("firstPaycheck");
-        if (setActiveView) setActiveView("paycheck");
+        navigate("/paycheck");
       },
     },
     {
@@ -90,7 +92,7 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
       position: "bottom",
       action: () => {
         startTutorialStep("firstEnvelope");
-        if (setActiveView) setActiveView("envelopes");
+        navigate("/envelopes");
       },
     },
     {
@@ -120,7 +122,7 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
       position: "bottom",
       action: () => {
         startTutorialStep("firstTransaction");
-        if (setActiveView) setActiveView("transactions");
+        navigate("/transactions");
       },
     },
     {
