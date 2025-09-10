@@ -190,6 +190,10 @@ const MainContent = ({
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Onboarding state - prevent security warning during tutorial
+  const onboardingStore = useOnboardingStore();
+  const isOnboarded = onboardingStore.isOnboarded;
+
   // Extract data from shared hooks
   const { securityContext } = auth;
   const { totalBiweeklyNeed, paycheckHistory: tanStackPaycheckHistory } =
