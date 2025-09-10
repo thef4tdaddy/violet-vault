@@ -1,5 +1,5 @@
 import React from "react";
-import { Building, DollarSign, Calendar, FileText } from "lucide-react";
+import { getIcon } from "../../../utils";
 import { formatCurrency } from "../../../utils/receipts/receiptHelpers";
 
 const ReceiptDataStep = ({
@@ -19,7 +19,7 @@ const ReceiptDataStep = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-bold text-gray-900 mb-2">
-            <Building className="h-4 w-4 inline mr-2 text-purple-600" />
+            {React.createElement(getIcon("Building"), { className: "h-4 w-4 inline mr-2 text-purple-600" })}
             MERCHANT/DESCRIPTION
           </label>
           <input
@@ -33,7 +33,7 @@ const ReceiptDataStep = ({
 
         <div>
           <label className="block text-sm font-bold text-gray-900 mb-2">
-            <DollarSign className="h-4 w-4 inline mr-2 text-purple-600" />
+            {React.createElement(getIcon("DollarSign"), { className: "h-4 w-4 inline mr-2 text-purple-600" })}
             AMOUNT
           </label>
           <input
@@ -50,7 +50,7 @@ const ReceiptDataStep = ({
 
         <div>
           <label className="block text-sm font-bold text-gray-900 mb-2">
-            <Calendar className="h-4 w-4 inline mr-2 text-purple-600" />
+            {React.createElement(getIcon("Calendar"), { className: "h-4 w-4 inline mr-2 text-purple-600" })}
             DATE
           </label>
           <input
@@ -84,7 +84,7 @@ const ReceiptDataStep = ({
 
       <div>
         <label className="block text-sm font-bold text-gray-900 mb-2">
-          <FileText className="h-4 w-4 inline mr-2 text-purple-600" />
+          {React.createElement(getIcon("FileText"), { className: "h-4 w-4 inline mr-2 text-purple-600" })}
           NOTES (OPTIONAL)
         </label>
         <textarea
