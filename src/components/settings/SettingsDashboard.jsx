@@ -38,6 +38,7 @@ const SettingsDashboard = ({
   currentUser,
   isLocalOnlyMode = false,
   securityManager,
+  initialSection = "general",
 }) => {
   // Use the reusable modal manager instead of the old hook
   const {
@@ -62,7 +63,15 @@ const SettingsDashboard = ({
   } = useSettingsModals();
 
   // Section state management
-  const [activeSection, setActiveSection] = React.useState("general");
+  const [activeSection, setActiveSection] = React.useState(initialSection);
+
+  // Update active section when initialSection changes (e.g., opening to specific section)
+  React.useEffect(() => {
+    if (isOpen) {
+      setActiveSection(initialSection);
+    }
+  }, [isOpen, initialSection]);
+
   const handleSectionChange = React.useCallback((sectionId) => {
     setActiveSection(sectionId);
   }, []);

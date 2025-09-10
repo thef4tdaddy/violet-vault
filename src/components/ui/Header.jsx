@@ -14,6 +14,7 @@ const Header = memo(
     onUpdateProfile,
     isLocalOnlyMode = false,
     onShowSettings,
+    onShowDataSettings,
   }) => {
     const [showLocalOnlySettings, setShowLocalOnlySettings] = useState(false);
 
@@ -88,7 +89,7 @@ const Header = memo(
               {!isLocalOnlyMode && (
                 <SyncHealthIndicator
                   data-tour="sync-indicator"
-                  onOpenSettings={onShowSettings}
+                  onOpenSettings={onShowDataSettings}
                 />
               )}
 

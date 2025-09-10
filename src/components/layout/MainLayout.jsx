@@ -204,7 +204,18 @@ const MainContent = ({
   };
   const [showSecuritySettings, setShowSecuritySettings] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [settingsInitialSection, setSettingsInitialSection] =
+    useState("general");
   const [showCorruptionModal, setShowCorruptionModal] = useState(false);
+
+  // Functions to open settings to specific sections
+  const openSettings = (section = "general") => {
+    setSettingsInitialSection(section);
+    setShowSettingsModal(true);
+  };
+
+  const openGeneralSettings = () => openSettings("general");
+  const openDataSettings = () => openSettings("data");
 
   // Listen for corruption detection events
   useEffect(() => {
@@ -261,7 +272,8 @@ const MainContent = ({
               onUserChange={onUserChange}
               onUpdateProfile={onUpdateProfile}
               isLocalOnlyMode={isLocalOnlyMode}
-              onShowSettings={() => setShowSettingsModal(true)}
+              onShowSettings={openGeneralSettings}
+              onShowDataSettings={openDataSettings}
             />
           </div>
           {rotationDue && (
@@ -327,6 +339,7 @@ const MainContent = ({
           <SettingsDashboard
             isOpen={showSettingsModal}
             onClose={() => setShowSettingsModal(false)}
+            initialSection={settingsInitialSection}
             onExport={onExport}
             onImport={handleImport}
             onLogout={onLogout}
