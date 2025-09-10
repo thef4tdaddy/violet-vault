@@ -351,15 +351,22 @@ jobs:
             const template = fs.readFileSync('.github/data/lint-warnings-comment.md', 'utf8');
 
             // Prepare template variables with Americas/Chicago timezone
-            const currentDate = new Date().toLocaleString('en-US', { 
+            const now = new Date();
+            
+            // Convert UTC to Central Time (UTC-6 standard, UTC-5 daylight)
+            const chicagoTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Chicago"}));
+            
+            const currentDate = chicagoTime.toLocaleString('en-US', { 
               year: 'numeric', 
               month: 'long', 
               day: 'numeric',
               hour: '2-digit',
               minute: '2-digit',
-              timeZone: 'America/Chicago',
               timeZoneName: 'short'
             });
+            
+            console.log(`UTC Time: ${now.toISOString()}`);
+            console.log(`Chicago Time: ${currentDate}`);
 
             const developWarnings = '${{ steps.develop_warnings.outputs.warnings }}' || '0';
             const mainWarnings = '${{ steps.main_warnings.outputs.warnings }}' || '0';
