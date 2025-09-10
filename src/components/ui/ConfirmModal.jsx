@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { getIcon } from "../../utils/icons";
+import { getIcon } from "../../utils";
 
 /**
  * Reusable ConfirmModal Component
