@@ -49,9 +49,9 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
       id: "add-debts",
       title: "Add Your Debts (Optional) 💳",
       description:
-        "Let's go to the Debt Tracking page to add credit cards, loans, and other debts.",
-      target: null,
-      position: "center",
+        "Click on the Debts tab to add credit cards, loans, and other debts. You can track balances and payoff progress.",
+      target: "[data-tab='debts']",
+      position: "bottom",
       action: () => {
         startTutorialStep("firstDebts");
         if (setActiveView) setActiveView("debts");
@@ -61,9 +61,9 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
       id: "add-bills",
       title: "Set Up Recurring Bills (Optional) 📋",
       description:
-        "Now let's go to the Bills page to add recurring expenses like rent and utilities.",
-      target: null,
-      position: "center",
+        "Click on the Bills tab to add recurring expenses like rent and utilities. These will help with automated budgeting.",
+      target: "[data-tab='bills']",
+      position: "bottom",
       action: () => {
         startTutorialStep("firstBills");
         if (setActiveView) setActiveView("bills");
@@ -72,9 +72,10 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
     {
       id: "add-paycheck",
       title: "Add Your Paycheck 💰",
-      description: "Let's go to the Paycheck page to add your income source.",
-      target: null,
-      position: "center",
+      description:
+        "Click on the Paycheck tab to set up your income sources and funding schedule.",
+      target: "[data-tab='paycheck']",
+      position: "bottom",
       action: () => {
         startTutorialStep("firstPaycheck");
         if (setActiveView) setActiveView("paycheck");
@@ -84,9 +85,9 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
       id: "create-envelope",
       title: "Create Budget Envelopes 📮",
       description:
-        "Now let's go to the Envelopes page to create categories for your money like groceries, rent, savings.",
-      target: null,
-      position: "center",
+        "Click on the Envelopes tab to create categories for your money like groceries, rent, and savings.",
+      target: "[data-tab='envelopes']",
+      position: "bottom",
       action: () => {
         startTutorialStep("firstEnvelope");
         if (setActiveView) setActiveView("envelopes");
@@ -114,9 +115,9 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
       id: "track-spending",
       title: "Track Your Spending 💳",
       description:
-        "Finally, let's go to the Transactions page to track where your money goes.",
-      target: null,
-      position: "center",
+        "Click on the Transactions tab to track where your money goes and manage your spending history.",
+      target: "[data-tab='transactions']",
+      position: "bottom",
       action: () => {
         startTutorialStep("firstTransaction");
         if (setActiveView) setActiveView("transactions");
@@ -221,39 +222,70 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
 
     const rect = element.getBoundingClientRect();
     const position = step.position || "bottom";
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // Calculate base position
+    let top, left, transform;
 
     switch (position) {
       case "top":
-        return {
-          top: rect.top - 10,
-          left: rect.left + rect.width / 2,
-          transform: "translate(-50%, -100%)",
-        };
+        top = rect.top - 10;
+        left = rect.left + rect.width / 2;
+        transform = "translate(-50%, -100%)";
+        break;
       case "bottom":
-        return {
-          top: rect.bottom + 10,
-          left: rect.left + rect.width / 2,
-          transform: "translate(-50%, 0)",
-        };
+        top = rect.bottom + 10;
+        left = rect.left + rect.width / 2;
+        transform = "translate(-50%, 0)";
+        break;
       case "left":
-        return {
-          top: rect.top + rect.height / 2,
-          left: rect.left - 10,
-          transform: "translate(-100%, -50%)",
-        };
+        top = rect.top + rect.height / 2;
+        left = rect.left - 10;
+        transform = "translate(-100%, -50%)";
+        break;
       case "right":
-        return {
-          top: rect.top + rect.height / 2,
-          left: rect.right + 10,
-          transform: "translate(0, -50%)",
-        };
+        top = rect.top + rect.height / 2;
+        left = rect.right + 10;
+        transform = "translate(0, -50%)";
+        break;
       default:
-        return {
-          top: rect.bottom + 10,
-          left: rect.left + rect.width / 2,
-          transform: "translate(-50%, 0)",
-        };
+        top = rect.bottom + 10;
+        left = rect.left + rect.width / 2;
+        transform = "translate(-50%, 0)";
     }
+
+    // Ensure tooltip stays within viewport bounds
+    const tooltipWidth = 384; // max-w-md (24rem = 384px)
+    const tooltipHeight = 300; // Estimated tooltip height
+
+    // Adjust horizontal position if too close to edges
+    if (left - tooltipWidth / 2 < 20) {
+      left = tooltipWidth / 2 + 20;
+      transform = transform.replace("translate(-50%", "translate(-50%");
+    } else if (left + tooltipWidth / 2 > viewportWidth - 20) {
+      left = viewportWidth - tooltipWidth / 2 - 20;
+      transform = transform.replace("translate(-50%", "translate(-50%");
+    }
+
+    // Adjust vertical position if too close to edges
+    if (top < 20) {
+      top = 20;
+      if (position === "top") {
+        transform = transform
+          .replace("translate(", "translate(")
+          .replace("-100%)", "0%)");
+      }
+    } else if (top + tooltipHeight > viewportHeight - 20) {
+      top = viewportHeight - tooltipHeight - 20;
+      if (position === "bottom") {
+        transform = transform
+          .replace("translate(", "translate(")
+          .replace("0%)", "-100%)");
+      }
+    }
+
+    return { top, left, transform };
   };
 
   const highlightElement = () => {
@@ -297,11 +329,24 @@ const OnboardingTutorial = ({ children, setActiveView }) => {
     <>
       {children}
 
-      {/* Tutorial Overlay */}
+      {/* Tutorial Overlay with Spotlight Effect */}
       <div
         ref={overlayRef}
-        className="fixed inset-0 bg-black bg-opacity-50 z-1000 flex items-center justify-center"
-        style={{ zIndex: 1000 }}
+        className="fixed inset-0 z-1000"
+        style={{
+          zIndex: 1000,
+          background: getCurrentStepElement()
+            ? (() => {
+                const rect = getCurrentStepElement().getBoundingClientRect();
+                const padding = 8;
+                return `
+                  radial-gradient(ellipse at ${rect.left + rect.width / 2}px ${rect.top + rect.height / 2}px, 
+                    transparent ${Math.max(rect.width, rect.height) / 2 + padding}px, 
+                    rgba(0,0,0,0.7) ${Math.max(rect.width, rect.height) / 2 + padding + 20}px)
+                `;
+              })()
+            : "rgba(0,0,0,0.5)",
+        }}
       >
         {/* Tutorial Tooltip */}
         <div

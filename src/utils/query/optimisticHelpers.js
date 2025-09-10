@@ -209,6 +209,43 @@ export const optimisticHelpers = {
   },
 
   /**
+   * Remove transaction optimistically
+   */
+  removeTransaction: async (queryClient, transactionId) => {
+    try {
+      // Update TanStack Query cache - transaction lists
+      queryClient.setQueriesData(
+        { queryKey: queryKeys.transactions },
+        (old) => {
+          if (!old) return old;
+          return old.filter((transaction) => transaction.id !== transactionId);
+        },
+      );
+
+      // Remove from cache - single transaction
+      queryClient.removeQueries({
+        queryKey: queryKeys.transactionById(transactionId),
+      });
+
+      // Remove from database
+      await budgetDb.transactions.delete(transactionId);
+
+      logger.debug("Optimistic transaction removal completed", { transactionId });
+
+      // GitHub Issue #576: Trigger change-based sync after data modification
+      if (cloudSyncService?.isRunning) {
+        cloudSyncService.scheduleSync("normal");
+      }
+    } catch (error) {
+      logger.warn("Failed to persist optimistic transaction removal", {
+        error: error.message,
+        transactionId,
+        source: "optimisticHelpers",
+      });
+    }
+  },
+
+  /**
    * Update bill optimistically
    */
   updateBill: async (queryClient, billId, updates) => {

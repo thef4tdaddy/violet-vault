@@ -272,14 +272,46 @@ export const useUserSetup = (onSetupComplete) => {
   };
 
   // Clear saved profile and start fresh
-  const clearSavedProfile = () => {
+  const clearSavedProfile = async () => {
     logger.debug("🗑️ Clearing saved profile and budget data");
+
+    // Clear localStorage data
     localStorage.removeItem("userProfile");
-    localStorage.removeItem("envelopeBudgetData"); // Also clear budget data to prevent lockout
+    localStorage.removeItem("envelopeBudgetData");
+
+    // Clear IndexedDB/Dexie data
+    try {
+      logger.debug("🗑️ Clearing Dexie database data");
+      await budgetDb.clear();
+      logger.debug("✅ Successfully cleared Dexie database");
+    } catch (error) {
+      logger.error("❌ Failed to clear Dexie database:", error);
+      globalToast.showError(
+        "Failed to clear local data completely. Some data may persist.",
+        "Clear Data Warning",
+      );
+    }
+
+    // Clear additional localStorage keys that might persist user data
+    const keysToRemove = [
+      "localDataSecurityAcknowledged",
+      "localDataSecurityAcknowledgedAt",
+      "envelopeBudgetLastSync",
+      "cloudSyncEnabled",
+      "userSettings",
+    ];
+
+    keysToRemove.forEach((key) => {
+      localStorage.removeItem(key);
+      logger.debug(`🗑️ Cleared localStorage key: ${key}`);
+    });
+
     setUserName("");
     setUserColor("#a855f7");
     setStep(1);
     setIsReturningUser(false);
+
+    logger.debug("✅ Start Fresh complete - all user data cleared");
   };
 
   // Handle password input change
