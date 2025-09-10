@@ -2,7 +2,8 @@
  * Utility functions for receipt processing and validation
  * Handles data validation, formatting, and common calculations
  */
-import { CheckCircle, XCircle } from "lucide-react";
+import React from "react";
+import { getIcon } from "../common/iconUtils";
 
 /**
  * Validate receipt data structure
@@ -203,16 +204,15 @@ export const getReceiptFormChanges = (receiptData, transactionForm) => {
  */
 export const renderConfidenceIndicator = (field, confidence) => {
   const confidenceMap = {
-    high: { color: "text-green-600", icon: CheckCircle },
-    medium: { color: "text-yellow-600", icon: CheckCircle },
-    low: { color: "text-red-600", icon: XCircle },
-    none: { color: "text-gray-400", icon: XCircle },
+    high: { color: "text-green-600", iconName: "CheckCircle" },
+    medium: { color: "text-yellow-600", iconName: "CheckCircle" },
+    low: { color: "text-red-600", iconName: "XCircle" },
+    none: { color: "text-gray-400", iconName: "XCircle" },
   };
 
   const conf = confidenceMap[confidence] || confidenceMap.none;
-  const Icon = conf.icon;
 
-  return <Icon className={`h-4 w-4 ${conf.color}`} />;
+  return React.createElement(getIcon(conf.iconName), { className: `h-4 w-4 ${conf.color}` });
 };
 
 /**

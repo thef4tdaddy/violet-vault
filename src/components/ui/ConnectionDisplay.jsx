@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  X,
-  CheckCircle,
-  Sparkles,
-  Receipt,
-  Target,
-  CreditCard,
-} from "lucide-react";
+import { getIcon } from "../../utils";
 import useConnectionManager from "../../hooks/common/useConnectionManager";
 
 /**
@@ -68,7 +61,7 @@ const ConnectionDisplay = ({
             onClick={onDisconnect}
             className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded-lg transition-colors flex items-center"
           >
-            <X className="h-3 w-3 mr-1" />
+            {React.createElement(getIcon("X"), { className: "h-3 w-3 mr-1" })}
             Disconnect
           </button>
         )}
@@ -198,7 +191,7 @@ export const UniversalConnectionManager = ({
       {hasConnections && (
         <ConnectionDisplay
           title={config.displayTitle}
-          icon={entityType === "envelope" ? Receipt : Target}
+          icon={entityType === "envelope" ? getIcon("Receipt") : getIcon("Target")}
           theme={theme}
           onDisconnect={canEdit ? handleDisconnect : undefined}
         >
@@ -206,7 +199,7 @@ export const UniversalConnectionManager = ({
             {currentConnections.map((connection) => (
               <ConnectionItem
                 key={connection.id}
-                icon={CheckCircle}
+                icon={getIcon("CheckCircle")}
                 title={connection.name || connection.provider || "Unnamed"}
                 details={
                   connection.amount
@@ -225,7 +218,7 @@ export const UniversalConnectionManager = ({
       {showSelector && (!hasConnections || entityType === "envelope") && (
         <ConnectionDisplay
           title={config.selectTitle}
-          icon={Sparkles}
+          icon={getIcon("Sparkles")}
           theme={theme}
         >
           <select

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { HelpCircle } from "lucide-react";
+import { getIcon } from "../../utils";
 
 const HelpTooltip = ({ content, title, position = "top" }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -31,7 +31,7 @@ const HelpTooltip = ({ content, title, position = "top" }) => {
         aria-label="Help information"
         type="button"
       >
-        <HelpCircle className="h-4 w-4" />
+        {React.createElement(getIcon("HelpCircle"), { className: "h-4 w-4" })}
       </button>
 
       {isVisible && (

@@ -1,5 +1,5 @@
 import React from "react";
-import { Eye } from "lucide-react";
+import { getIcon } from "../../../utils";
 import { formatFileSize } from "../../../utils/receipts/receiptHelpers.jsx";
 
 /**
@@ -24,7 +24,7 @@ const ReceiptImagePreview = ({
           onClick={onTogglePreview}
           className="glassmorphism flex items-center gap-2 px-3 py-2 rounded-lg border-2 border-black bg-purple-200/40 hover:bg-purple-300/40 transition-colors backdrop-blur-sm"
         >
-          <Eye className="h-4 w-4 text-purple-900" />
+          {React.createElement(getIcon("Eye"), { className: "h-4 w-4 text-purple-900" })}
           <span className="font-black text-purple-900 text-sm">
             {showImagePreview ? (
               <>

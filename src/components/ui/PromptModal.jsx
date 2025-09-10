@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { AlertCircle, Type, X, CheckCircle } from "lucide-react";
+import { getIcon } from "../../utils";
 
 /**
  * Reusable PromptModal Component
@@ -96,12 +96,12 @@ const PromptModal = ({
   if (!isOpen) return null;
 
   // Icon selection
-  const getIcon = () => {
+  const getModalIcon = () => {
     if (icon) return icon;
-    return Type;
+    return getIcon("Type");
   };
 
-  const Icon = getIcon();
+  const Icon = getModalIcon();
 
   return (
     <div
@@ -116,7 +116,7 @@ const PromptModal = ({
           {/* Header */}
           <div className="flex items-center mb-4">
             <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-              <Icon className="h-6 w-6 text-blue-600" />
+              {React.createElement(Icon, { className: "h-6 w-6 text-blue-600" })}
             </div>
             <div className="flex-1">
               <h3
@@ -157,7 +157,7 @@ const PromptModal = ({
                   id="input-error"
                   className="flex items-center text-red-600 text-sm"
                 >
-                  <AlertCircle className="h-4 w-4 mr-1" />
+                  {React.createElement(getIcon("AlertCircle"), { className: "h-4 w-4 mr-1" })}
                   {validationError}
                 </div>
               )}

@@ -1,5 +1,5 @@
 import React from "react";
-import { Shield, X } from "lucide-react";
+import { getIcon } from "../../utils";
 
 /**
  * Shared security header component for lock screens and security settings
@@ -42,9 +42,9 @@ const SecurityHeader = ({
   return (
     <div className={`flex items-center justify-between ${className}`}>
       <div className="flex items-center gap-3">
-        <Shield
-          className={`h-6 w-6 ${variant === "fullscreen" ? "text-white" : "text-blue-600"}`}
-        />
+        {React.createElement(getIcon("Shield"), {
+          className: `h-6 w-6 ${variant === "fullscreen" ? "text-white" : "text-blue-600"}`
+        })}
         <div>
           <h3 className={headerStyles}>{formatTitle(title)}</h3>
           {subtitle && <p className={subtitleStyles}>{subtitle}</p>}
@@ -56,7 +56,7 @@ const SecurityHeader = ({
           onClick={onClose}
           className="text-gray-400 hover:text-gray-600 p-1 border-2 border-black rounded"
         >
-          <X className="h-5 w-5" />
+          {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
         </button>
       )}
     </div>
