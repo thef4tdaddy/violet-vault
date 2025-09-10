@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import SettingsLayout from "./layout/SettingsLayout";
 import ResetConfirmModal from "./modals/ResetConfirmModal";
+import LocalDataSecurityWarning from "../security/LocalDataSecurityWarning";
 import { useSettingsModals } from "../../hooks/common/useModalManager";
 import {
   useCloudSyncManager,
@@ -65,6 +66,10 @@ const SettingsDashboard = ({
   // Section state management
   const [activeSection, setActiveSection] = React.useState(initialSection);
 
+  // Local data security modal state (not in useSettingsModals to avoid circular dependency with MainLayout)
+  const [showLocalDataSecurity, setShowLocalDataSecurity] =
+    React.useState(false);
+
   // Update active section when initialSection changes (e.g., opening to specific section)
   React.useEffect(() => {
     if (isOpen) {
@@ -74,6 +79,10 @@ const SettingsDashboard = ({
 
   const handleSectionChange = React.useCallback((sectionId) => {
     setActiveSection(sectionId);
+  }, []);
+
+  const handleShowLocalDataSecurity = React.useCallback(() => {
+    setShowLocalDataSecurity(true);
   }, []);
 
   const {
@@ -106,6 +115,7 @@ const SettingsDashboard = ({
     // Security Settings Props
     securityManager,
     onOpenSecuritySettings: openSecuritySettings,
+    onShowLocalDataSecurity: handleShowLocalDataSecurity,
 
     // Data Management Props
     onOpenEnvelopeChecker: openEnvelopeChecker,
@@ -188,6 +198,14 @@ const SettingsDashboard = ({
           <EnvelopeIntegrityChecker
             isOpen={showEnvelopeChecker}
             onClose={closeEnvelopeChecker}
+          />
+        )}
+
+        {/* Local Data Security Warning */}
+        {showLocalDataSecurity && (
+          <LocalDataSecurityWarning
+            onClose={() => setShowLocalDataSecurity(false)}
+            onAcknowledge={() => setShowLocalDataSecurity(false)}
           />
         )}
       </Suspense>

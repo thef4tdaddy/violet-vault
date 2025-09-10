@@ -31,6 +31,7 @@ import OnboardingProgress from "../onboarding/OnboardingProgress";
 import { useOnboardingAutoComplete } from "../../hooks/common/useOnboardingAutoComplete";
 import { CorruptionRecoveryModal } from "../modals/CorruptionRecoveryModal";
 import PasswordRotationModal from "../auth/PasswordRotationModal";
+import LocalDataSecurityWarning from "../security/LocalDataSecurityWarning";
 import AppRoutes from "./AppRoutes";
 import { pathToViewMap, viewToPathMap } from "./routeConfig";
 
@@ -207,6 +208,7 @@ const MainContent = ({
   const [settingsInitialSection, setSettingsInitialSection] =
     useState("general");
   const [showCorruptionModal, setShowCorruptionModal] = useState(false);
+  const [showSecurityWarning, setShowSecurityWarning] = useState(false);
 
   // Functions to open settings to specific sections
   const openSettings = (section = "general") => {
@@ -216,6 +218,22 @@ const MainContent = ({
 
   const openGeneralSettings = () => openSettings("general");
   const openDataSettings = () => openSettings("data");
+
+  // Show security warning for authenticated users who haven't acknowledged it
+  useEffect(() => {
+    if (isUnlocked && currentUser) {
+      const hasAcknowledged = localStorage.getItem(
+        "localDataSecurityAcknowledged",
+      );
+      if (!hasAcknowledged) {
+        // Small delay to let the UI settle after login
+        const timer = setTimeout(() => {
+          setShowSecurityWarning(true);
+        }, 1000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isUnlocked, currentUser]);
 
   // Listen for corruption detection events
   useEffect(() => {
@@ -364,6 +382,14 @@ const MainContent = ({
           isOpen={showCorruptionModal}
           onClose={() => setShowCorruptionModal(false)}
         />
+
+        {/* Local Data Security Warning */}
+        {showSecurityWarning && (
+          <LocalDataSecurityWarning
+            onClose={() => setShowSecurityWarning(false)}
+            onAcknowledge={() => setShowSecurityWarning(false)}
+          />
+        )}
       </div>
     </OnboardingTutorial>
   );

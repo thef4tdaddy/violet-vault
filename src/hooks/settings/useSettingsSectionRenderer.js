@@ -26,6 +26,7 @@ export const useSettingsSectionRenderer = ({
   // Security Settings Props
   securityManager,
   onOpenSecuritySettings,
+  onShowLocalDataSecurity,
 
   // Data Management Props
   onOpenEnvelopeChecker,
@@ -59,6 +60,7 @@ export const useSettingsSectionRenderer = ({
         return React.createElement(SecuritySettingsSection, {
           securityManager,
           onOpenSecuritySettings,
+          onShowLocalDataSecurity,
         });
 
       case "data":
