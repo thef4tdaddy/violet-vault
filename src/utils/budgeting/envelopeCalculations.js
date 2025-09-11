@@ -243,7 +243,7 @@ export const calculateEnvelopeTotals = (envelopeData) => {
       const envelopeType =
         env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
 
-      acc.totalAllocated += env.allocated || 0;
+      acc.totalAllocated += env.currentBalance || 0;
       acc.totalSpent += env.totalSpent || 0;
       acc.totalBalance += env.currentBalance || 0;
       acc.totalUpcoming += env.totalUpcoming || 0;
