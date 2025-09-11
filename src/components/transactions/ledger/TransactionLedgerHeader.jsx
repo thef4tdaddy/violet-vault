@@ -1,5 +1,5 @@
 import React from "react";
-import { BookOpen, Plus, Upload } from "lucide-react";
+import { getIcon } from "../../../utils";
 import { formatLedgerSummary } from "../../../utils/transactions/ledgerHelpers";
 
 const TransactionLedgerHeader = ({
@@ -15,7 +15,9 @@ const TransactionLedgerHeader = ({
           <div className="relative mr-4">
             <div className="absolute inset-0 bg-emerald-500 rounded-2xl blur-lg opacity-30"></div>
             <div className="relative bg-emerald-500 p-3 rounded-2xl">
-              <BookOpen className="h-6 w-6 text-white" />
+              {React.createElement(getIcon("BookOpen"), {
+                className: "h-6 w-6 text-white",
+              })}
             </div>
           </div>
           <span className="text-lg">T</span>RANSACTION{" "}
@@ -31,7 +33,9 @@ const TransactionLedgerHeader = ({
           onClick={onImportTransactions}
           className="btn btn-primary border-2 border-black flex items-center"
         >
-          <Upload className="h-4 w-4 mr-2" />
+          {React.createElement(getIcon("Upload"), {
+            className: "h-4 w-4 mr-2",
+          })}
           Import File
         </button>
         <button
@@ -39,7 +43,7 @@ const TransactionLedgerHeader = ({
           className="btn btn-primary border-2 border-black flex items-center"
           data-tour="add-transaction"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          {React.createElement(getIcon("Plus"), { className: "h-4 w-4 mr-2" })}
           Add Transaction
         </button>
       </div>
