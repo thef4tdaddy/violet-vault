@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useConfirm } from "../common/useConfirm";
 import { globalToast } from "../../stores/ui/toastStore";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 
 /**
  * Custom hook for paycheck history management
