@@ -92,7 +92,9 @@ const ConfirmModal = ({
             <div
               className={`w-12 h-12 ${colorScheme.iconBg} rounded-full flex items-center justify-center mr-4`}
             >
-              {React.createElement(Icon, { className: `h-6 w-6 ${colorScheme.iconColor}` })}
+              {React.createElement(Icon, {
+                className: `h-6 w-6 ${colorScheme.iconColor}`,
+              })}
             </div>
             <div className="flex-1">
               <h3

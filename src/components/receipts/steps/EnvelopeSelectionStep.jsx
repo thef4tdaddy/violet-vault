@@ -58,7 +58,9 @@ const EnvelopeSelectionStep = ({
       {/* Envelope Selection */}
       <div className="space-y-4">
         <label className="block text-sm font-bold text-gray-900 mb-2">
-          {React.createElement(getIcon("Package"), { className: "h-4 w-4 inline mr-2 text-purple-600" })}
+          {React.createElement(getIcon("Package"), {
+            className: "h-4 w-4 inline mr-2 text-purple-600",
+          })}
           CHOOSE ENVELOPE
         </label>
 
@@ -90,7 +92,9 @@ const EnvelopeSelectionStep = ({
                 </div>
                 {transactionForm.envelopeId === envelope.id && (
                   <div className="ml-3 glassmorphism rounded-full p-1 border border-purple-300">
-                    {React.createElement(getIcon("ArrowRight"), { className: "h-4 w-4 text-purple-600" })}
+                    {React.createElement(getIcon("ArrowRight"), {
+                      className: "h-4 w-4 text-purple-600",
+                    })}
                   </div>
                 )}
               </div>
@@ -107,7 +111,9 @@ const EnvelopeSelectionStep = ({
 
         {envelopes.length === 0 && (
           <div className="text-center py-8 text-gray-500 bg-gray-50/80 backdrop-blur-sm rounded-xl border-2 border-black">
-            {React.createElement(getIcon("Package"), { className: "h-8 w-8 mx-auto mb-2 text-gray-400" })}
+            {React.createElement(getIcon("Package"), {
+              className: "h-8 w-8 mx-auto mb-2 text-gray-400",
+            })}
             <p className="font-medium">
               No envelopes available. Create an envelope first.
             </p>

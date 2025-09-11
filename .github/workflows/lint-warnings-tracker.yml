@@ -352,10 +352,10 @@ jobs:
 
             // Prepare template variables with Americas/Chicago timezone
             const now = new Date();
-            
+
             // Convert UTC to Central Time (UTC-6 standard, UTC-5 daylight)
             const chicagoTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Chicago"}));
-            
+
             const currentDate = chicagoTime.toLocaleString('en-US', { 
               year: 'numeric', 
               month: 'long', 
@@ -364,7 +364,7 @@ jobs:
               minute: '2-digit',
               timeZoneName: 'short'
             });
-            
+
             console.log(`UTC Time: ${now.toISOString()}`);
             console.log(`Chicago Time: ${currentDate}`);
 

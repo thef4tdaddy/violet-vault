@@ -71,7 +71,9 @@ const ChartsAnalytics = ({
             <div className="relative mr-4">
               <div className="absolute inset-0 bg-cyan-500 rounded-2xl blur-lg opacity-30"></div>
               <div className="relative bg-cyan-500 p-3 rounded-2xl">
-                {React.createElement(getIcon("BarChart3"), { className: "h-6 w-6 text-white" })}
+                {React.createElement(getIcon("BarChart3"), {
+                  className: "h-6 w-6 text-white",
+                })}
               </div>
             </div>
             Analytics & Reports
@@ -98,7 +100,9 @@ const ChartsAnalytics = ({
             onClick={handleExport}
             className="btn btn-secondary border-2 border-black flex items-center rounded-xl px-4 py-2"
           >
-            {React.createElement(getIcon("Download"), { className: "h-4 w-4 mr-2" })}
+            {React.createElement(getIcon("Download"), {
+              className: "h-4 w-4 mr-2",
+            })}
             Export
           </button>
         </div>
@@ -154,7 +158,9 @@ const ChartsAnalytics = ({
                   : "border-transparent text-gray-600 hover:text-cyan-600 hover:bg-cyan-50/30"
               }`}
             >
-              {React.createElement(getIcon(tab.icon), { className: "h-4 w-4 inline mr-2" })}
+              {React.createElement(getIcon(tab.icon), {
+                className: "h-4 w-4 inline mr-2",
+              })}
               {tab.name}
             </button>
           ))}
@@ -263,7 +269,9 @@ const ChartsAnalytics = ({
             </h3>
             {envelopeHealth.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
-                {React.createElement(getIcon("Wallet"), { className: "h-12 w-12 mx-auto mb-3 text-gray-400" })}
+                {React.createElement(getIcon("Wallet"), {
+                  className: "h-12 w-12 mx-auto mb-3 text-gray-400",
+                })}
                 <p>No envelopes to display</p>
                 <p className="text-sm">
                   Create some envelopes to see their health status

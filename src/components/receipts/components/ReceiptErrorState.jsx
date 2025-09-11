@@ -9,7 +9,9 @@ const ReceiptErrorState = ({ error, onRetry }) => {
   return (
     <div className="glassmorphism rounded-lg p-4 mb-4 border-2 border-black bg-red-100/40 backdrop-blur-sm">
       <div className="flex items-center gap-3">
-        {React.createElement(getIcon("XCircle"), { className: "h-5 w-5 text-red-900" })}
+        {React.createElement(getIcon("XCircle"), {
+          className: "h-5 w-5 text-red-900",
+        })}
         <p className="font-black text-black text-base">
           <span className="text-lg">P</span>ROCESSING{" "}
           <span className="text-lg">F</span>AILED

@@ -57,10 +57,12 @@ const DebtDashboard = () => {
             <div className="relative mr-4">
               <div className="absolute inset-0 bg-red-500 rounded-2xl blur-lg opacity-30"></div>
               <div className="relative bg-red-500 p-3 rounded-2xl">
-                {React.createElement(getIcon("CreditCard"), { className: "h-6 w-6 text-white" })}
+                {React.createElement(getIcon("CreditCard"), {
+                  className: "h-6 w-6 text-white",
+                })}
               </div>
             </div>
-            <span className="text-lg">D</span>EBT {" "}
+            <span className="text-lg">D</span>EBT{" "}
             <span className="text-lg">T</span>RACKING
           </h2>
           <p className="text-purple-900 mt-1">
@@ -75,7 +77,9 @@ const DebtDashboard = () => {
             className="btn btn-primary border-2 border-black flex items-center"
             data-tour="add-debt"
           >
-            {React.createElement(getIcon("Plus"), { className: "h-4 w-4 mr-2" })}
+            {React.createElement(getIcon("Plus"), {
+              className: "h-4 w-4 mr-2",
+            })}
             Add Debt
           </button>
         </div>
@@ -96,73 +100,79 @@ const DebtDashboard = () => {
         <div className="p-6">
           {activeTab === "overview" && (
             <div className="space-y-6">
-          {/* Summary Cards */}
-          {isDebtFeatureEnabled("ENABLE_DEBT_SUMMARY_CARDS") ? (
-            <DebtSummaryCards
-              stats={debtStats}
-              onDueSoonClick={() => setShowUpcomingPaymentsModal(true)}
-            />
-          ) : (
-            <div className="rounded-lg border border-gray-200 p-6 text-center">
-              <p className="text-gray-500">
-                Summary Cards disabled for debugging
-              </p>
-            </div>
-          )}
-
-          {/* Filters and Controls */}
-          {isDebtFeatureEnabled("ENABLE_DEBT_FILTERS") && (
-            <DebtFilters
-              filterOptions={filterOptions}
-              setFilterOptions={setFilterOptions}
-            />
-          )}
-
-          {/* Debt List */}
-          {isDebtFeatureEnabled("ENABLE_DEBT_LIST") ? (
-            <div className="rounded-lg border border-gray-200">
-              <div className="p-4 border-b bg-gray-50 rounded-t-lg">
-                <h3 className="font-black text-black text-base flex items-center">
-                  {React.createElement(getIcon("TrendingDown"), { className: "h-4 w-4 mr-2 text-red-600" })}
-                  <span className="text-lg">Y</span>OUR {" "}
-                  <span className="text-lg">D</span>EBTS ({filteredDebts.length}
-                  )
-                </h3>
-              </div>
-
-              {filteredDebts.length === 0 ? (
-                <div className="text-center py-12">
-                  {React.createElement(getIcon("CreditCard"), { className: "h-12 w-12 mx-auto text-gray-300 mb-4" })}
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    No Debts Found
-                  </h3>
-                  <p className="text-gray-500 mb-4">
-                    Start tracking your debts to get insights into your debt
-                    payoff journey.
-                  </p>
-                  <button
-                    onClick={handleAddDebt}
-                    className="btn btn-primary border-2 border-black"
-                  >
-                    {React.createElement(getIcon("Plus"), { className: "h-4 w-4 mr-2" })}
-                    Add Your First Debt
-                  </button>
-                </div>
+              {/* Summary Cards */}
+              {isDebtFeatureEnabled("ENABLE_DEBT_SUMMARY_CARDS") ? (
+                <DebtSummaryCards
+                  stats={debtStats}
+                  onDueSoonClick={() => setShowUpcomingPaymentsModal(true)}
+                />
               ) : (
-                <DebtList
-                  debts={filteredDebts}
-                  onDebtClick={handleDebtClick}
-                  onRecordPayment={handleRecordPayment}
+                <div className="rounded-lg border border-gray-200 p-6 text-center">
+                  <p className="text-gray-500">
+                    Summary Cards disabled for debugging
+                  </p>
+                </div>
+              )}
+
+              {/* Filters and Controls */}
+              {isDebtFeatureEnabled("ENABLE_DEBT_FILTERS") && (
+                <DebtFilters
+                  filterOptions={filterOptions}
+                  setFilterOptions={setFilterOptions}
                 />
               )}
-            </div>
-          ) : (
-            <div className="rounded-lg border border-gray-200 p-6 text-center">
-              <p className="text-purple-900">
-                Debt List disabled for debugging
-              </p>
-            </div>
-          )}
+
+              {/* Debt List */}
+              {isDebtFeatureEnabled("ENABLE_DEBT_LIST") ? (
+                <div className="rounded-lg border border-gray-200">
+                  <div className="p-4 border-b bg-gray-50 rounded-t-lg">
+                    <h3 className="font-black text-black text-base flex items-center">
+                      {React.createElement(getIcon("TrendingDown"), {
+                        className: "h-4 w-4 mr-2 text-red-600",
+                      })}
+                      <span className="text-lg">Y</span>OUR{" "}
+                      <span className="text-lg">D</span>EBTS (
+                      {filteredDebts.length})
+                    </h3>
+                  </div>
+
+                  {filteredDebts.length === 0 ? (
+                    <div className="text-center py-12">
+                      {React.createElement(getIcon("CreditCard"), {
+                        className: "h-12 w-12 mx-auto text-gray-300 mb-4",
+                      })}
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        No Debts Found
+                      </h3>
+                      <p className="text-gray-500 mb-4">
+                        Start tracking your debts to get insights into your debt
+                        payoff journey.
+                      </p>
+                      <button
+                        onClick={handleAddDebt}
+                        className="btn btn-primary border-2 border-black"
+                      >
+                        {React.createElement(getIcon("Plus"), {
+                          className: "h-4 w-4 mr-2",
+                        })}
+                        Add Your First Debt
+                      </button>
+                    </div>
+                  ) : (
+                    <DebtList
+                      debts={filteredDebts}
+                      onDebtClick={handleDebtClick}
+                      onRecordPayment={handleRecordPayment}
+                    />
+                  )}
+                </div>
+              ) : (
+                <div className="rounded-lg border border-gray-200 p-6 text-center">
+                  <p className="text-purple-900">
+                    Debt List disabled for debugging
+                  </p>
+                </div>
+              )}
             </div>
           )}
 

@@ -101,7 +101,9 @@ const EditableBalance = ({
       >
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-medium text-yellow-800 flex items-center gap-2">
-            {React.createElement(getIcon("AlertTriangle"), { className: "h-5 w-5" })}
+            {React.createElement(getIcon("AlertTriangle"), {
+              className: "h-5 w-5",
+            })}
             Confirm Large Change
           </h3>
         </div>
@@ -172,7 +174,9 @@ const EditableBalance = ({
                 className="p-2 bg-green-600 text-white rounded-md hover:bg-green-700"
                 title="Save"
               >
-                {React.createElement(getIcon("Check"), { className: "h-4 w-4" })}
+                {React.createElement(getIcon("Check"), {
+                  className: "h-4 w-4",
+                })}
               </button>
               <button
                 onClick={handleCancel}
@@ -202,7 +206,10 @@ const EditableBalance = ({
           {isManuallySet && (
             <span className="text-xs text-gray-500">(Manual)</span>
           )}
-          {React.createElement(getIcon("Edit3"), { className: "h-4 w-4 opacity-0 group-hover:opacity-50 transition-opacity" })}
+          {React.createElement(getIcon("Edit3"), {
+            className:
+              "h-4 w-4 opacity-0 group-hover:opacity-50 transition-opacity",
+          })}
         </h3>
       </div>
 

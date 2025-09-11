@@ -230,7 +230,9 @@ export const optimisticHelpers = {
       // Remove from database
       await budgetDb.transactions.delete(transactionId);
 
-      logger.debug("Optimistic transaction removal completed", { transactionId });
+      logger.debug("Optimistic transaction removal completed", {
+        transactionId,
+      });
 
       // GitHub Issue #576: Trigger change-based sync after data modification
       if (cloudSyncService?.isRunning) {

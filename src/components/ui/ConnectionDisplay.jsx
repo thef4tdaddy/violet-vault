@@ -191,7 +191,9 @@ export const UniversalConnectionManager = ({
       {hasConnections && (
         <ConnectionDisplay
           title={config.displayTitle}
-          icon={entityType === "envelope" ? getIcon("Receipt") : getIcon("Target")}
+          icon={
+            entityType === "envelope" ? getIcon("Receipt") : getIcon("Target")
+          }
           theme={theme}
           onDisconnect={canEdit ? handleDisconnect : undefined}
         >
