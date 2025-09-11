@@ -1,38 +1,60 @@
 import { useState, useEffect, useRef } from "react";
 import { globalToast } from "../../stores/ui/toastStore";
-import { getUniquePayers, getPayerPrediction } from "../../utils/budgeting/paycheckAllocationUtils";
+import {
+  getUniquePayers,
+  getPayerPrediction,
+} from "../../utils/budgeting/paycheckAllocationUtils";
 import logger from "../../utils/logger";
+
+/**
+ * Hook to initialize new payer state for first-time users
+ */
+const useInitializeNewPayerState = (
+  uniquePayersLength,
+  setShowAddNewPayer,
+  initialRender,
+) => {
+  useEffect(() => {
+    if (initialRender.current) {
+      const hasNoPaychecks = uniquePayersLength === 0;
+      setShowAddNewPayer(hasNoPaychecks);
+      initialRender.current = false;
+    }
+  }, [uniquePayersLength, setShowAddNewPayer, initialRender]);
+};
 
 /**
  * Custom hook for paycheck form state management
  * Handles all form-related state and logic
  */
-export const usePaycheckForm = ({ paycheckHistory, currentUser, onProcessPaycheck }) => {
+export const usePaycheckForm = ({
+  paycheckHistory,
+  currentUser,
+  onProcessPaycheck,
+}) => {
   // Form state
   const [paycheckAmount, setPaycheckAmount] = useState("");
   const [payerName, setPayerName] = useState(currentUser?.userName || "");
   const [allocationMode, setAllocationMode] = useState("allocate");
   const [isProcessing, setIsProcessing] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
-  
+
   // Payer management state
   const [newPayerName, setNewPayerName] = useState("");
   const [tempPayers, setTempPayers] = useState([]);
   const [showAddNewPayer, setShowAddNewPayer] = useState(false);
-  
+
   const initialRender = useRef(true);
 
   // Computed values
   const uniquePayers = getUniquePayers(paycheckHistory, tempPayers);
 
   // Initialize add new payer state for new users
-  useEffect(() => {
-    if (initialRender.current) {
-      const hasNoPaychecks = uniquePayers.length === 0;
-      setShowAddNewPayer(hasNoPaychecks);
-      initialRender.current = false;
-    }
-  }, [uniquePayers.length]);
+  useInitializeNewPayerState(
+    uniquePayers.length,
+    setShowAddNewPayer,
+    initialRender,
+  );
 
   // Form handlers
   const handlePayerChange = (selectedPayer) => {
@@ -47,18 +69,18 @@ export const usePaycheckForm = ({ paycheckHistory, currentUser, onProcessPaychec
 
   const handleAddNewPayer = () => {
     if (newPayerName.trim()) {
-      const trimmedName = newPayerName.trim();
-
-      // Add to temp payers list so it shows in dropdown (session-only, not persisted)
-      setTempPayers((prev) => [...prev, trimmedName]);
-
-      // Set as current selection
-      setPayerName(trimmedName);
-      setNewPayerName("");
-
-      // Hide the add new payer form and show dropdown
-      setShowAddNewPayer(false);
+      addNewPayerToList(newPayerName.trim());
     }
+  };
+
+  const addNewPayerToList = (trimmedName) => {
+    // Add to temp payers list so it shows in dropdown (session-only, not persisted)
+    setTempPayers((prev) => [...prev, trimmedName]);
+    // Set as current selection
+    setPayerName(trimmedName);
+    setNewPayerName("");
+    // Hide the add new payer form and show dropdown
+    setShowAddNewPayer(false);
   };
 
   const handleAmountChange = (value) => {
@@ -81,14 +103,7 @@ export const usePaycheckForm = ({ paycheckHistory, currentUser, onProcessPaychec
       });
 
       logger.debug("Paycheck processed:", result);
-
-      // Clean up temp payers - once a paycheck is processed, the payer is now in history
-      const processedPayerName = payerName.trim();
-      setTempPayers((prev) => prev.filter((name) => name !== processedPayerName));
-
-      setPaycheckAmount("");
-      setShowPreview(false);
-      
+      handlePostProcessCleanup(payerName.trim());
       globalToast.showSuccess("Paycheck processed successfully!");
     } catch (error) {
       logger.error("Failed to process paycheck:", error);
@@ -96,6 +111,13 @@ export const usePaycheckForm = ({ paycheckHistory, currentUser, onProcessPaychec
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handlePostProcessCleanup = (processedPayerName) => {
+    // Clean up temp payers - once a paycheck is processed, the payer is now in history
+    setTempPayers((prev) => prev.filter((name) => name !== processedPayerName));
+    setPaycheckAmount("");
+    setShowPreview(false);
   };
 
   const resetForm = () => {
@@ -128,7 +150,7 @@ export const usePaycheckForm = ({ paycheckHistory, currentUser, onProcessPaychec
     setNewPayerName,
     setShowPreview,
     setShowAddNewPayer,
-    
+
     // Actions
     handlePayerChange,
     handleAddNewPayer,

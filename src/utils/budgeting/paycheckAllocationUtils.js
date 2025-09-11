@@ -6,7 +6,11 @@ import logger from "../logger";
  * Calculate paycheck allocation across envelopes
  * Pure function for calculating how to distribute paycheck funds
  */
-export const calculatePaycheckAllocation = (amount, allocationMode, envelopes) => {
+export const calculatePaycheckAllocation = (
+  amount,
+  allocationMode,
+  envelopes,
+) => {
   const numAmount = parseFloat(amount) || 0;
   if (numAmount <= 0) return null;
 
@@ -38,7 +42,10 @@ const calculateEnvelopeAllocations = (amount, envelopes) => {
 
   // First, allocate to bill envelopes (higher priority)
   billEnvelopes.forEach((envelope) => {
-    const allocation = calculateBillEnvelopeAllocation(envelope, remainingAmount);
+    const allocation = calculateBillEnvelopeAllocation(
+      envelope,
+      remainingAmount,
+    );
     if (allocation > 0) {
       allocations[envelope.id] = allocation;
       remainingAmount -= allocation;
@@ -48,7 +55,10 @@ const calculateEnvelopeAllocations = (amount, envelopes) => {
 
   // Then, allocate to variable expense envelopes
   variableEnvelopes.forEach((envelope) => {
-    const allocation = calculateVariableEnvelopeAllocation(envelope, remainingAmount);
+    const allocation = calculateVariableEnvelopeAllocation(
+      envelope,
+      remainingAmount,
+    );
     if (allocation > 0) {
       allocations[envelope.id] = allocation;
       remainingAmount -= allocation;
@@ -56,7 +66,15 @@ const calculateEnvelopeAllocations = (amount, envelopes) => {
     }
   });
 
-  return buildAllocationResult(amount, allocations, totalAllocated, remainingAmount, billEnvelopes, variableEnvelopes, envelopes);
+  return buildAllocationResult({
+    amount,
+    allocations,
+    totalAllocated,
+    remainingAmount,
+    billEnvelopes,
+    variableEnvelopes,
+    envelopes,
+  });
 };
 
 /**
@@ -67,7 +85,7 @@ const filterBillEnvelopes = (envelopes) => {
     (envelope) =>
       envelope.autoAllocate &&
       (envelope.envelopeType === ENVELOPE_TYPES.BILL ||
-        BILL_CATEGORIES.includes(envelope.category))
+        BILL_CATEGORIES.includes(envelope.category)),
   );
 };
 
@@ -79,7 +97,7 @@ const filterVariableEnvelopes = (envelopes) => {
     (envelope) =>
       envelope.autoAllocate &&
       envelope.envelopeType === ENVELOPE_TYPES.VARIABLE &&
-      envelope.monthlyBudget > 0
+      envelope.monthlyBudget > 0,
   );
 };
 
@@ -87,7 +105,10 @@ const filterVariableEnvelopes = (envelopes) => {
  * Calculate allocation for a bill envelope
  */
 const calculateBillEnvelopeAllocation = (envelope, remainingAmount) => {
-  const needed = Math.max(0, envelope.biweeklyAllocation - envelope.currentBalance);
+  const needed = Math.max(
+    0,
+    envelope.biweeklyAllocation - envelope.currentBalance,
+  );
   const allocation = Math.min(needed, remainingAmount);
 
   logger.debug(`Bill envelope allocation: ${envelope.name}`, {
@@ -153,7 +174,16 @@ const logAllocationDebug = (envelopes, billEnvelopes, variableEnvelopes) => {
 /**
  * Build the final allocation result object
  */
-const buildAllocationResult = (amount, allocations, totalAllocated, remainingAmount, billEnvelopes, variableEnvelopes, envelopes) => {
+const buildAllocationResult = (resultData) => {
+  const {
+    amount,
+    allocations,
+    totalAllocated,
+    remainingAmount,
+    billEnvelopes,
+    variableEnvelopes,
+    envelopes,
+  } = resultData;
   const billCount = billEnvelopes.length;
   const variableCount = variableEnvelopes.length;
   const allocatedCount = Object.keys(allocations).length;
@@ -192,7 +222,9 @@ export const getPayerPrediction = (payer, paycheckHistory) => {
 
   if (payerPaychecks.length === 0) return null;
 
-  const average = payerPaychecks.reduce((sum, amount) => sum + amount, 0) / payerPaychecks.length;
+  const average =
+    payerPaychecks.reduce((sum, amount) => sum + amount, 0) /
+    payerPaychecks.length;
   const mostRecent = payerPaychecks[0];
 
   return {
