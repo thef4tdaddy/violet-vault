@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { renderIcon } from "../../utils";
 import { shareCodeUtils } from "../../utils/security/shareCodeUtils";
-import { useToastHelpers } from "../../utils/common/toastHelpers";
-import logger from "../../utils/common/logger";
+import { useShareCodeValidation } from "../../hooks/sharing/useShareCodeValidation";
+import { useBudgetJoining } from "../../hooks/sharing/useBudgetJoining";
+import { useQRCodeProcessing } from "../../hooks/sharing/useQRCodeProcessing";
+import { generateRandomColor } from "../../utils/sharing/colorUtils";
+import ShareCodeStep from "./steps/ShareCodeStep";
+import UserSetupStep from "./steps/UserSetupStep";
 
 /**
  * Join Budget Modal - Enter share codes or scan QR codes to join budgets
+ * Refactored to use custom hooks and step components for better maintainability
  * Addresses GitHub Issue #580 - Two-factor authentication for joining
  */
 const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
@@ -13,14 +18,21 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
   const [password, setPassword] = useState("");
   const [userName, setUserName] = useState("");
   const [userColor, setUserColor] = useState("#a855f7");
-  const [shareInfo, setShareInfo] = useState(null);
-  const [creatorInfo, setCreatorInfo] = useState(null);
-  const [isValidating, setIsValidating] = useState(false);
-  const [isJoining, setIsJoining] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [step, setStep] = useState(1); // 1: Enter code, 2: Set password, 3: Join
 
-  const { showSuccessToast, showErrorToast } = useToastHelpers();
+  // Custom hooks for business logic
+  const {
+    shareInfo,
+    creatorInfo,
+    isValidating,
+    validateShareCode,
+    resetValidation,
+  } = useShareCodeValidation();
+
+  const { isJoining, joinBudget } = useBudgetJoining();
+
+  const { processQRData, handleQRScan } = useQRCodeProcessing();
 
   // Check URL for share code on mount
   useEffect(() => {
@@ -32,7 +44,7 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
         validateShareCode(urlShareCode);
       }
     }
-  }, [isOpen]);
+  }, [isOpen, validateShareCode]);
 
   // Reset state when modal opens/closes
   useEffect(() => {
@@ -40,163 +52,40 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
       setShareCode("");
       setPassword("");
       setUserName("");
-      setShareInfo(null);
-      setCreatorInfo(null);
       setStep(1);
+      resetValidation();
     }
-  }, [isOpen]);
+  }, [isOpen, resetValidation]);
 
-  const validateShareCode = async (code = shareCode) => {
-    if (!code.trim()) {
-      logger.warn("validateShareCode called with empty code");
-      return;
-    }
-
-    logger.info("Validating share code", { code: code.trim() });
-    setIsValidating(true);
-    try {
-      const normalizedCode = shareCodeUtils.normalizeShareCode(code.trim());
-      const isValid = shareCodeUtils.validateShareCode(normalizedCode);
-
-      logger.info("Share code validation result", {
-        originalCode: code,
-        normalizedCode,
-        isValid,
-      });
-
-      if (isValid) {
-        setShareInfo({
-          createdBy: "Shared Budget", // BIP39 codes are deterministic for any user
-          createdAt: Date.now(),
-          expiresAt: Date.now() + 365 * 24 * 60 * 60 * 1000, // 1 year
-          userCount: "Multiple users can join",
-        });
-
-        // Clear any previous creator info
-        setCreatorInfo(null);
-
-        setStep(2);
-        showSuccessToast("Share code is valid! Now set your password.");
-      } else {
-        logger.warn("Share code validation failed", { normalizedCode });
-        showErrorToast(
-          "Invalid share code format. Please enter 4 valid words.",
-        );
-        setShareInfo(null);
-      }
-    } catch (error) {
-      logger.error("Failed to validate share code", error);
-      showErrorToast("Failed to validate share code");
-      setShareInfo(null);
-    } finally {
-      setIsValidating(false);
+  // Handlers for step actions
+  const handleValidateCode = async () => {
+    const isValid = await validateShareCode(shareCode);
+    if (isValid) {
+      setStep(2);
     }
   };
 
   const handleJoinBudget = async () => {
-    if (!shareCode || !password || !userName.trim()) {
-      showErrorToast("Please fill in all required fields");
-      return;
-    }
-
-    setIsJoining(true);
-    try {
-      const normalizedShareCode = shareCodeUtils.normalizeShareCode(
-        shareCode.trim(),
-      );
-
-      // Generate deterministic budget ID from password and share code
-      const budgetId = await shareCodeUtils.generateBudgetId(
-        password,
-        normalizedShareCode,
-      );
-
-      const userInfo = {
-        id: `user_${Date.now()}`,
-        userName: userName.trim(),
-        userColor,
-        joinedVia: "shareCode",
-        joinedAt: Date.now(),
-      };
-
-      logger.info("Generated budget ID for join", {
-        budgetIdPreview: budgetId.substring(0, 10) + "...",
-        shareCodePreview:
-          normalizedShareCode.split(" ").slice(0, 2).join(" ") + " ...",
-      });
-
-      showSuccessToast(`Successfully joined shared budget!`);
-
-      // Call parent success handler with the joined budget info
-      if (onJoinSuccess) {
-        onJoinSuccess({
-          budgetId,
-          password,
-          userInfo,
-          shareCode: normalizedShareCode,
-          sharedBy: "Shared Budget", // BIP39 codes don't store creator info
-          userCount: 1,
-        });
-      }
-
-      onClose();
-
-      // Clear URL parameter
-      const url = new URL(window.location);
-      url.searchParams.delete("share");
-      window.history.replaceState({}, "", url);
-    } catch (error) {
-      logger.error("Failed to join budget", error);
-      showErrorToast(error.message || "Failed to join budget");
-    } finally {
-      setIsJoining(false);
-    }
-  };
-
-  const processQRData = (qrData) => {
-    try {
-      const parsed = shareCodeUtils.parseQRData(qrData);
-      if (parsed && parsed.shareCode) {
-        setShareCode(parsed.shareCode);
-
-        // Set creator info if available
-        if (parsed.createdBy) {
-          setCreatorInfo({
-            userName: parsed.createdBy,
-            userColor: parsed.creatorColor || "#a855f7",
-            createdAt: parsed.createdAt,
-          });
-        }
-
-        validateShareCode(parsed.shareCode);
-        return true;
-      }
-    } catch (error) {
-      logger.warn("Failed to parse QR data", error);
-    }
-    return false;
-  };
-
-  const handleQRScan = () => {
-    // TODO: Implement camera-based QR scanning
-    showErrorToast(
-      "QR scanning not yet implemented. Please enter the share code manually or paste QR data.",
+    await joinBudget(
+      shareCode,
+      password,
+      userName,
+      userColor,
+      onJoinSuccess,
+      onClose,
     );
   };
 
-  const generateRandomColor = () => {
-    const colors = [
-      "#ef4444", // red
-      "#f97316", // orange
-      "#eab308", // yellow
-      "#22c55e", // green
-      "#06b6d4", // cyan
-      "#3b82f6", // blue
-      "#a855f7", // purple
-      "#ec4899", // pink
-    ];
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
-    setUserColor(randomColor);
+  const handleProcessQRData = (qrData) => {
+    return processQRData(qrData, setShareCode, creatorInfo, validateShareCode);
+  };
+
+  const handleGenerateRandomColor = () => {
+    setUserColor(generateRandomColor());
+  };
+
+  const handleBack = () => {
+    setStep(1);
   };
 
   if (!isOpen) return null;
@@ -227,227 +116,32 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
         <div className="p-6 space-y-6">
           {/* Step 1: Enter Share Code */}
           {step === 1 && (
-            <>
-              <div>
-                <label className="block text-sm font-black text-black uppercase tracking-wider mb-2">
-                  Share Code or QR Code
-                </label>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={shareCode}
-                      onChange={(e) =>
-                        setShareCode(e.target.value.toLowerCase())
-                      }
-                      placeholder="enter four words"
-                      className="flex-1 px-4 py-3 bg-white border-2 border-black rounded-lg text-sm text-center tracking-wide lowercase"
-                      maxLength={50}
-                    />
-                    <button
-                      onClick={handleQRScan}
-                      className="px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-black transition-colors border-2 border-black"
-                      title="Scan QR Code"
-                    >
-                      {renderIcon("QrCode", "h-5 w-5")}
-                    </button>
-                  </div>
-
-                  <button
-                    onClick={() => validateShareCode()}
-                    disabled={!shareCode.trim() || isValidating}
-                    className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white py-3 px-4 rounded-lg font-black transition-colors border-2 border-black disabled:opacity-50"
-                  >
-                    {isValidating ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin inline mr-2" />
-                        VALIDATING...
-                      </>
-                    ) : (
-                      <>
-                        {renderIcon("Search", "h-4 w-4 mr-2")}
-                        VALIDATE CODE
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <div className="bg-purple-50 border-2 border-purple-300 rounded-lg p-4">
-                <h4 className="font-black text-purple-800 text-sm mb-2">
-                  HOW TO JOIN
-                </h4>
-                <ol className="text-xs text-purple-700 space-y-1">
-                  <li>1. Get a share code from the budget owner</li>
-                  <li>2. Enter the code above or scan their QR code</li>
-                  <li>3. Set your own password for local encryption</li>
-                  <li>4. Choose your display name and color</li>
-                </ol>
-              </div>
-            </>
+            <ShareCodeStep
+              shareCode={shareCode}
+              setShareCode={setShareCode}
+              onValidate={handleValidateCode}
+              onQRScan={handleQRScan}
+              isValidating={isValidating}
+            />
           )}
 
-          {/* Step 2: Share Code Info & Password Setup */}
+          {/* Step 2: Set Password & User Details */}
           {step === 2 && shareInfo && (
-            <>
-              {/* Share Info */}
-              <div className="bg-green-50 border-2 border-green-300 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  {renderIcon("CheckCircle", "h-5 w-5 text-green-600 mt-0.5")}
-                  <div>
-                    <h4 className="font-black text-green-800 text-sm">
-                      VALID SHARE CODE
-                    </h4>
-                    {creatorInfo ? (
-                      <>
-                        <p className="text-xs text-green-700 mt-1">
-                          Created by:{" "}
-                          <strong style={{ color: creatorInfo.userColor }}>
-                            {creatorInfo.userName}
-                          </strong>
-                        </p>
-                        <p className="text-xs text-green-700">
-                          {creatorInfo.createdAt && (
-                            <>
-                              Shared:{" "}
-                              {new Date(
-                                creatorInfo.createdAt,
-                              ).toLocaleDateString()}
-                            </>
-                          )}
-                        </p>
-                        <p className="text-xs text-green-600 mt-2">
-                          Enter the same password they used to join their budget
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <p className="text-xs text-green-700 mt-1">
-                          Type: <strong>Deterministic Budget</strong>
-                        </p>
-                        <p className="text-xs text-green-700">
-                          Access: {shareInfo.userCount}
-                        </p>
-                        <p className="text-xs text-green-600 mt-2">
-                          Same code + password = same budget across devices
-                        </p>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* User Setup */}
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-black text-black uppercase tracking-wider mb-2">
-                    Your Display Name *
-                  </label>
-                  <div className="space-y-2">
-                    <input
-                      type="text"
-                      value={userName}
-                      onChange={(e) => setUserName(e.target.value)}
-                      placeholder="Enter your name"
-                      className="w-full px-4 py-3 bg-white border-2 border-black rounded-lg"
-                      maxLength={50}
-                    />
-                    {creatorInfo && !userName && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setUserName(creatorInfo.userName);
-                          setUserColor(creatorInfo.userColor);
-                        }}
-                        className="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded-lg border border-blue-300 transition-colors"
-                      >
-                        Use {creatorInfo.userName}'s profile
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-black text-black uppercase tracking-wider mb-2">
-                    Your Color
-                  </label>
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-12 h-12 rounded-full border-2 border-black"
-                      style={{ backgroundColor: userColor }}
-                    />
-                    <input
-                      type="color"
-                      value={userColor}
-                      onChange={(e) => setUserColor(e.target.value)}
-                      className="w-16 h-12 rounded border-2 border-black cursor-pointer"
-                    />
-                    <button
-                      onClick={generateRandomColor}
-                      className="px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded font-black transition-colors border-2 border-black text-xs"
-                    >
-                      RANDOM
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-black text-black uppercase tracking-wider mb-2">
-                    Budget Password *
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter the budget password"
-                      className="w-full px-4 py-3 bg-white border-2 border-black rounded-lg pr-12"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-black"
-                    >
-                      {renderIcon(showPassword ? "EyeOff" : "Eye", "h-5 w-5")}
-                    </button>
-                  </div>
-                  <p className="text-xs text-gray-600 mt-1">
-                    Enter the same password the budget creator used when they
-                    first created the budget.
-                  </p>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setStep(1)}
-                  className="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-3 px-4 rounded-lg font-black transition-colors border-2 border-black"
-                >
-                  {renderIcon("ArrowLeft", "h-4 w-4 mr-2")}
-                  BACK
-                </button>
-                <button
-                  onClick={handleJoinBudget}
-                  disabled={
-                    !shareCode || !password || !userName.trim() || isJoining
-                  }
-                  className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white py-3 px-4 rounded-lg font-black transition-colors border-2 border-black disabled:opacity-50"
-                >
-                  {isJoining ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin inline mr-2" />
-                      JOINING...
-                    </>
-                  ) : (
-                    <>
-                      {renderIcon("UserPlus", "h-4 w-4 mr-2")}
-                      JOIN BUDGET
-                    </>
-                  )}
-                </button>
-              </div>
-            </>
+            <UserSetupStep
+              shareInfo={shareInfo}
+              creatorInfo={creatorInfo}
+              password={password}
+              setPassword={setPassword}
+              showPassword={showPassword}
+              setShowPassword={setShowPassword}
+              userName={userName}
+              setUserName={setUserName}
+              userColor={userColor}
+              onGenerateRandomColor={handleGenerateRandomColor}
+              onJoin={handleJoinBudget}
+              onBack={handleBack}
+              isJoining={isJoining}
+            />
           )}
         </div>
       </div>
