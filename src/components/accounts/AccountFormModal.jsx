@@ -21,12 +21,12 @@ const AccountFormModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-purple-900/20 backdrop-blur-3xl flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto border-2 border-black shadow-2xl">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-3 flex-1">
-            <h3 className="text-lg font-semibold">
-              {editingAccount ? "Edit Account" : "Add Supplemental Account"}
+            <h3 className="font-black text-black text-base">
+              <span className="text-lg">{editingAccount ? "E" : "A"}</span>{editingAccount ? "DIT" : "DD"} <span className="text-lg">{editingAccount ? "A" : "S"}</span>{editingAccount ? "CCOUNT" : "UPPLEMENTAL ACCOUNT"}
             </h3>
             {/* Edit Lock Status for existing accounts */}
             {editingAccount && lockLoading && (
@@ -100,7 +100,7 @@ const AccountFormModal = ({
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-purple-900 mb-2">
               Account Name *
             </label>
             <input
@@ -110,14 +110,14 @@ const AccountFormModal = ({
                 setAccountForm({ ...accountForm, name: e.target.value })
               }
               disabled={editingAccount && !canEdit}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+              className="w-full px-3 py-2 border-2 border-black rounded-lg focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
               placeholder="e.g., Health FSA 2024"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-purple-900 mb-2">
               Account Type *
             </label>
             <select
@@ -126,7 +126,7 @@ const AccountFormModal = ({
                 setAccountForm({ ...accountForm, type: e.target.value })
               }
               disabled={editingAccount && !canEdit}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+              className="w-full px-3 py-2 border-2 border-black rounded-lg focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
             >
               {ACCOUNT_TYPES.map((type) => (
                 <option key={type.value} value={type.value}>
@@ -138,7 +138,7 @@ const AccountFormModal = ({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-purple-900 mb-2">
                 Current Balance *
               </label>
               <input
@@ -152,14 +152,14 @@ const AccountFormModal = ({
                   })
                 }
                 disabled={editingAccount && !canEdit}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full px-3 py-2 border-2 border-black rounded-lg focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 placeholder="0.00"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-purple-900 mb-2">
                 Annual Contribution
               </label>
               <input
@@ -173,14 +173,14 @@ const AccountFormModal = ({
                   })
                 }
                 disabled={editingAccount && !canEdit}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full px-3 py-2 border-2 border-black rounded-lg focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 placeholder="0.00"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-purple-900 mb-2">
               Expiration Date (Optional)
             </label>
             <input
@@ -193,12 +193,12 @@ const AccountFormModal = ({
                 })
               }
               disabled={editingAccount && !canEdit}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+              className="w-full px-3 py-2 border-2 border-black rounded-lg focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-purple-900 mb-2">
               Color
             </label>
             <div className="flex gap-2 flex-wrap">
@@ -209,8 +209,8 @@ const AccountFormModal = ({
                   onClick={() => setAccountForm({ ...accountForm, color })}
                   className={`w-6 h-6 rounded-lg border-2 transition-all ${
                     accountForm.color === color
-                      ? "border-gray-800 scale-110"
-                      : "border-gray-200 hover:border-gray-400"
+                      ? "border-black scale-110 ring-2 ring-purple-500"
+                      : "border-gray-200 hover:border-black"
                   }`}
                   style={{ backgroundColor: color }}
                 />
@@ -219,7 +219,7 @@ const AccountFormModal = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-purple-900 mb-2">
               Description (Optional)
             </label>
             <textarea
@@ -232,7 +232,7 @@ const AccountFormModal = ({
               }
               rows={2}
               disabled={editingAccount && !canEdit}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+              className="w-full px-3 py-2 border-2 border-black rounded-lg focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
               placeholder="Notes about this account..."
             />
           </div>
@@ -249,11 +249,11 @@ const AccountFormModal = ({
                 })
               }
               disabled={editingAccount && !canEdit}
-              className="h-4 w-4 text-cyan-600 focus:ring-cyan-500 border-gray-300 rounded disabled:cursor-not-allowed"
+              className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-2 border-black rounded disabled:cursor-not-allowed"
             />
             <label
               htmlFor="isActive"
-              className="ml-2 block text-sm text-gray-900"
+              className="ml-2 block text-sm font-medium text-purple-900"
             >
               Account is active
             </label>
