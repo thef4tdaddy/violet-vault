@@ -1,187 +1,59 @@
-// components/Dashboard.jsx
 import React from "react";
-import logger from "../../utils/common/logger";
-import PaydayPrediction from "../budgeting/PaydayPrediction";
-import AccountBalanceOverview from "../dashboard/AccountBalanceOverview";
-import RecentTransactionsWidget from "../dashboard/RecentTransactionsWidget";
-import ReconcileTransactionModal from "../dashboard/ReconcileTransactionModal";
-import { useActualBalance } from "../../hooks/budgeting/useBudgetMetadata";
-import { useUnassignedCash } from "../../hooks/budgeting/useBudgetMetadata";
-import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
-import { useSavingsGoals } from "../../hooks/common/useSavingsGoals";
-import { useTransactions } from "../../hooks/common/useTransactions";
-import useBudgetData from "../../hooks/budgeting/useBudgetData";
-import DebtSummaryWidget from "../debt/ui/DebtSummaryWidget";
-import {
-  useMainDashboardUI,
-  useDashboardCalculations,
-  useTransactionReconciliation,
-  usePaydayManager,
-  useDashboardHelpers,
-} from "../../hooks/dashboard/useMainDashboard";
+import { getIcon } from "../../utils";
+import { useLayoutData } from "../../hooks/layout/useLayoutData";
+import BalanceSummaryRow from "../dashboard/BalanceSummaryRow";
+import PaydayBanner from "../dashboard/PaydayBanner";
+import NavigationTabs from "../dashboard/NavigationTabs";
+import DashboardMiddleSection from "../dashboard/DashboardMiddleSection";
+import DebtTrackerSection from "../dashboard/DebtTrackerSection";
+import ActivitySnapshotSection from "../dashboard/ActivitySnapshotSection";
+import InsightsSection from "../dashboard/InsightsSection";
+import DashboardFooter from "../dashboard/DashboardFooter";
 
-const Dashboard = ({ setActiveView }) => {
-  // Enhanced TanStack Query integration with optimistic updates
-  const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
-
-  const { data: savingsGoals = [], isLoading: savingsLoading } =
-    useSavingsGoals();
-
-  const { data: transactions = [], isLoading: transactionsLoading } =
-    useTransactions();
-
-  // Use TanStack Query for budget metadata
-  const { unassignedCash, isLoading: unassignedCashLoading } =
-    useUnassignedCash();
-  const {
-    actualBalance,
-    updateActualBalance,
-    isLoading: actualBalanceLoading,
-  } = useActualBalance();
-
-  // Get reconcileTransaction and paycheckHistory from useBudgetData
-  const { reconcileTransaction, paycheckHistory } = useBudgetData();
-
-  // UI state management
-  const {
-    showReconcileModal,
-    newTransaction,
-    openReconcileModal,
-    closeReconcileModal,
-    updateNewTransaction,
-    resetNewTransaction,
-  } = useMainDashboardUI();
-
-  // Dashboard calculations
-  const {
-    totalEnvelopeBalance,
-    totalSavingsBalance,
-    _safeUnassignedCash,
-    totalVirtualBalance,
-    difference,
-    isBalanced,
-  } = useDashboardCalculations(
-    envelopes,
-    savingsGoals,
-    unassignedCash,
-    actualBalance,
-  );
-
-  // Transaction reconciliation logic
-  const {
-    handleReconcileTransaction,
-    handleAutoReconcileDifference,
-    getEnvelopeOptions,
-  } = useTransactionReconciliation(
-    reconcileTransaction,
-    envelopes,
-    savingsGoals,
-  );
-
-  // Payday management
-  const { paydayPrediction, handleProcessPaycheck, handlePrepareEnvelopes } =
-    usePaydayManager(paycheckHistory, setActiveView);
-
-  // Dashboard helpers
-  const { getRecentTransactions } = useDashboardHelpers();
-
-  // Get recent transactions
-  const recentTransactions = getRecentTransactions(transactions, 10);
-
-  const handleUpdateBalance = async (newBalance) => {
-    await updateActualBalance(newBalance, {
-      isManual: true,
-      author: "Family Member", // Generic name for family budgeting
-    });
-    // No need to call setActualBalance since TanStack Query will handle the update
-  };
-
-  const onReconcileTransaction = () => {
-    const _success = handleReconcileTransaction(newTransaction, () => {
-      resetNewTransaction();
-      closeReconcileModal();
-    });
-  };
-
-  // Show loading state while TanStack queries are fetching
-  if (
-    envelopesLoading ||
-    savingsLoading ||
-    transactionsLoading ||
-    unassignedCashLoading ||
-    actualBalanceLoading
-  ) {
-    return (
-      <div className="space-y-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/2 mb-6"></div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="h-32 bg-gray-200 rounded"></div>
-            <div className="h-32 bg-gray-200 rounded"></div>
-            <div className="h-32 bg-gray-200 rounded"></div>
-          </div>
-          <div className="h-96 bg-gray-200 rounded"></div>
-        </div>
-      </div>
-    );
-  }
+/**
+ * Redesigned Main Dashboard - Issue #499
+ *
+ * Features:
+ * - Balance summary cards (Actual, Virtual, Unassigned, Difference)
+ * - Full-width Next Payday banner
+ * - Middle section with Biweekly Status, Envelope Spending, Quick Add
+ * - Debt Tracker with progress bars
+ * - Activity Snapshot (transactions, bills, paychecks)
+ * - Insights with AI-driven suggestions
+ * - Responsive layout (desktop grid, mobile stacked)
+ */
+const MainDashboard = ({ setActiveView }) => {
+  const layoutData = useLayoutData();
 
   return (
-    <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6">
-      {/* Payday Prediction */}
-      {paydayPrediction && (
-        <PaydayPrediction
-          prediction={paydayPrediction}
-          className="mb-6"
-          onProcessPaycheck={handleProcessPaycheck}
-          onPrepareEnvelopes={handlePrepareEnvelopes}
-        />
-      )}
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+      {/* Header - handled by parent layout */}
 
-      {/* Debt Summary Widget */}
-      <DebtSummaryWidget
-        onNavigateToDebts={() => {
-          if (setActiveView) {
-            setActiveView("debts");
-          } else {
-            logger.debug(
-              "Navigate to debts requested - setActiveView not available",
-            );
-          }
-        }}
-      />
+      {/* Balance Summary Row */}
+      <BalanceSummaryRow layoutData={layoutData} />
 
-      {/* Account Balance Overview */}
-      <AccountBalanceOverview
-        actualBalance={actualBalance}
-        totalVirtualBalance={totalVirtualBalance}
-        totalEnvelopeBalance={totalEnvelopeBalance}
-        totalSavingsBalance={totalSavingsBalance}
-        unassignedCash={unassignedCash}
-        difference={difference}
-        isBalanced={isBalanced}
-        onUpdateBalance={handleUpdateBalance}
-        onOpenReconcileModal={openReconcileModal}
-        onAutoReconcileDifference={handleAutoReconcileDifference}
-      />
+      {/* Full-width Payday Banner */}
+      <PaydayBanner />
 
-      {/* Recent Transactions */}
-      <RecentTransactionsWidget
-        transactions={recentTransactions}
-        getEnvelopeOptions={getEnvelopeOptions}
-      />
+      {/* Navigation Tabs */}
+      <NavigationTabs setActiveView={setActiveView} />
 
-      {/* Reconcile Transaction Modal */}
-      <ReconcileTransactionModal
-        isOpen={showReconcileModal}
-        onClose={closeReconcileModal}
-        newTransaction={newTransaction}
-        onUpdateTransaction={updateNewTransaction}
-        onReconcile={onReconcileTransaction}
-        getEnvelopeOptions={getEnvelopeOptions}
-      />
+      {/* Middle Section - Biweekly Status, Envelope Spending, Quick Add */}
+      <DashboardMiddleSection setActiveView={setActiveView} />
+
+      {/* Debt Tracker Section */}
+      <DebtTrackerSection setActiveView={setActiveView} />
+
+      {/* Activity Snapshot Section */}
+      <ActivitySnapshotSection setActiveView={setActiveView} />
+
+      {/* Insights Section */}
+      <InsightsSection />
+
+      {/* Footer */}
+      <DashboardFooter />
     </div>
   );
 };
 
-export default React.memo(Dashboard);
+export default MainDashboard;
