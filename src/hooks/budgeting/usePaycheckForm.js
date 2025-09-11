@@ -4,7 +4,7 @@ import {
   getUniquePayers,
   getPayerPrediction,
 } from "../../utils/budgeting/paycheckAllocationUtils";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 
 /**
  * Hook to initialize new payer state for first-time users
