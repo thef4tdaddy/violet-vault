@@ -1,5 +1,5 @@
 import React from "react";
-import { Tag, Plus, Target, RefreshCw } from "lucide-react";
+import { getIcon } from "../../../utils";
 import SplitAllocationRow from "./SplitAllocationRow";
 
 const SplitAllocationsSection = ({
@@ -18,7 +18,9 @@ const SplitAllocationsSection = ({
       <div className="flex items-center justify-between">
         <h3 className="font-black text-gray-900 flex items-center">
           <div className="glassmorphism rounded-full p-1 mr-2 border border-purple-300">
-            <Tag className="h-4 w-4 text-purple-600" />
+            {React.createElement(getIcon("Tag"), {
+              className: "h-4 w-4 text-purple-600",
+            })}
           </div>
           SPLIT ALLOCATIONS ({splitAllocations.length})
         </h3>
@@ -28,7 +30,7 @@ const SplitAllocationsSection = ({
             onClick={onSmartSplit}
             className="flex items-center gap-1 px-3 py-2 text-sm bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg hover:from-purple-600 hover:to-blue-700 transition-all border-2 border-black shadow-md hover:shadow-lg font-bold"
           >
-            <Target className="h-4 w-4" />
+            {React.createElement(getIcon("Target"), { className: "h-4 w-4" })}
             Smart Split
           </button>
 
@@ -36,7 +38,7 @@ const SplitAllocationsSection = ({
             onClick={onAddSplit}
             className="flex items-center gap-1 px-3 py-2 text-sm bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg hover:from-emerald-600 hover:to-green-700 transition-all border-2 border-black shadow-md hover:shadow-lg font-bold"
           >
-            <Plus className="h-4 w-4" />
+            {React.createElement(getIcon("Plus"), { className: "h-4 w-4" })}
             Add Split
           </button>
         </div>
@@ -94,7 +96,9 @@ const SplitAllocationsSection = ({
             onClick={onAutoBalance}
             className="flex items-center gap-2 px-4 py-2 text-sm bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:from-orange-600 hover:to-red-600 transition-all border-2 border-black shadow-md hover:shadow-lg font-bold"
           >
-            <RefreshCw className="h-4 w-4" />
+            {React.createElement(getIcon("RefreshCw"), {
+              className: "h-4 w-4",
+            })}
             Auto Balance Remaining ${Math.abs(0).toFixed(2)}
           </button>
         </div>

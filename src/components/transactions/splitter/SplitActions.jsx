@@ -1,5 +1,5 @@
 import React from "react";
-import { Save, X, RefreshCw, AlertCircle } from "lucide-react";
+import { getIcon } from "../../../utils";
 
 const SplitActions = ({
   totals,
@@ -26,7 +26,9 @@ const SplitActions = ({
       {!isValid && (
         <div className="mb-4 p-3 bg-gradient-to-r from-orange-50/80 to-red-50/80 backdrop-blur-sm border-2 border-orange-300 rounded-xl shadow-md">
           <div className="flex items-center">
-            <AlertCircle className="h-5 w-5 text-orange-600 mr-2" />
+            {React.createElement(getIcon("AlertCircle"), {
+              className: "h-5 w-5 text-orange-600 mr-2",
+            })}
             <span className="text-sm font-bold text-orange-800">
               {getValidationMessage()}
             </span>
@@ -48,7 +50,7 @@ const SplitActions = ({
             onClick={onCancel}
             className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-gray-200/80 rounded-lg hover:bg-gray-300/80 transition-all border-2 border-black shadow-md hover:shadow-lg font-bold"
           >
-            <X className="h-4 w-4" />
+            {React.createElement(getIcon("X"), { className: "h-4 w-4" })}
             Cancel
           </button>
 
@@ -61,11 +63,11 @@ const SplitActions = ({
                 : "bg-gray-400 cursor-not-allowed"
             }`}
           >
-            {isSaving ? (
-              <RefreshCw className="h-4 w-4 animate-spin" />
-            ) : (
-              <Save className="h-4 w-4" />
-            )}
+            {isSaving
+              ? React.createElement(getIcon("RefreshCw"), {
+                  className: "h-4 w-4 animate-spin",
+                })
+              : React.createElement(getIcon("Save"), { className: "h-4 w-4" })}
             {isSaving ? "Saving..." : "Save Split"}
           </button>
         </div>
