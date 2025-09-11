@@ -68,13 +68,32 @@ export default {
 
       try {
         // Parse the bug report data
-        const bugReport = await request.json();
+        const payload = await request.json();
+
+        // Handle nested structure from frontend (data field contains actual bug report)
+        const bugReport = payload.data || payload;
+        
+        // Debug log to understand the structure
+        console.log("Payload structure:", {
+          hasData: !!payload.data,
+          hasTitle: !!bugReport.title,
+          hasDescription: !!bugReport.description,
+          payloadType: payload.type,
+          payloadKeys: Object.keys(payload),
+          bugReportKeys: Object.keys(bugReport || {}),
+        });
 
         // Validate required fields (either title or description required)
         if (!bugReport.title && !bugReport.description) {
           return new Response(
             JSON.stringify({
               error: "Either title or description is required",
+              received: {
+                hasTitle: !!bugReport.title,
+                hasDescription: !!bugReport.description,
+                payloadStructure: Object.keys(payload),
+                bugReportStructure: Object.keys(bugReport || {}),
+              }
             }),
             {
               status: 400,
