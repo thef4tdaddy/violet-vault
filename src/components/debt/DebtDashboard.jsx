@@ -1,5 +1,5 @@
 import React from "react";
-import { CreditCard, Plus, TrendingDown, Target } from "lucide-react";
+import { getIcon } from "../../utils";
 import { useDebtDashboard } from "../../hooks/debts/useDebtDashboard";
 import { isDebtFeatureEnabled } from "../../utils/debts/debtDebugConfig";
 import DebtSummaryCards from "./ui/DebtSummaryCards";
@@ -39,11 +39,11 @@ const DebtDashboard = () => {
 
   // Tab configuration
   const tabs = [
-    { id: "overview", label: "Overview", icon: CreditCard, color: "red" },
+    { id: "overview", label: "Overview", icon: "CreditCard", color: "red" },
     {
       id: "strategies",
       label: "Payoff Strategies",
-      icon: Target,
+      icon: "Target",
       color: "purple",
     },
   ];
@@ -57,10 +57,10 @@ const DebtDashboard = () => {
             <div className="relative mr-4">
               <div className="absolute inset-0 bg-red-500 rounded-2xl blur-lg opacity-30"></div>
               <div className="relative bg-red-500 p-3 rounded-2xl">
-                <CreditCard className="h-6 w-6 text-white" />
+                {React.createElement(getIcon("CreditCard"), { className: "h-6 w-6 text-white" })}
               </div>
             </div>
-            <span className="text-lg">D</span>EBT{" "}
+            <span className="text-lg">D</span>EBT {" "}
             <span className="text-lg">T</span>RACKING
           </h2>
           <p className="text-purple-900 mt-1">
@@ -75,24 +75,27 @@ const DebtDashboard = () => {
             className="btn btn-primary border-2 border-black flex items-center"
             data-tour="add-debt"
           >
-            <Plus className="h-4 w-4 mr-2" />
+            {React.createElement(getIcon("Plus"), { className: "h-4 w-4 mr-2" })}
             Add Debt
           </button>
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <StandardTabs
-        tabs={tabs}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        variant="colored"
-        className="border-2 border-black ring-1 ring-gray-800/10"
-      />
+      {/* Tab Content with connected navigation */}
+      <div className="bg-white rounded-xl shadow-sm border-2 border-black ring-1 ring-gray-800/10">
+        {/* Tab Navigation */}
+        <StandardTabs
+          tabs={tabs}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          variant="colored"
+          className="border-b border-gray-200"
+        />
 
-      {/* Tab Content */}
-      {activeTab === "overview" && (
-        <>
+        {/* Tab Content */}
+        <div className="p-6">
+          {activeTab === "overview" && (
+            <div className="space-y-6">
           {/* Summary Cards */}
           {isDebtFeatureEnabled("ENABLE_DEBT_SUMMARY_CARDS") ? (
             <DebtSummaryCards
@@ -100,7 +103,7 @@ const DebtDashboard = () => {
               onDueSoonClick={() => setShowUpcomingPaymentsModal(true)}
             />
           ) : (
-            <div className="bg-white rounded-xl p-6 text-center border-2 border-black ring-1 ring-gray-800/10">
+            <div className="rounded-lg border border-gray-200 p-6 text-center">
               <p className="text-gray-500">
                 Summary Cards disabled for debugging
               </p>
@@ -117,11 +120,11 @@ const DebtDashboard = () => {
 
           {/* Debt List */}
           {isDebtFeatureEnabled("ENABLE_DEBT_LIST") ? (
-            <div className="bg-white rounded-xl shadow-sm border-2 border-black ring-1 ring-gray-800/10">
-              <div className="p-4 border-b">
+            <div className="rounded-lg border border-gray-200">
+              <div className="p-4 border-b bg-gray-50 rounded-t-lg">
                 <h3 className="font-black text-black text-base flex items-center">
-                  <TrendingDown className="h-4 w-4 mr-2 text-red-600" />
-                  <span className="text-lg">Y</span>OUR{" "}
+                  {React.createElement(getIcon("TrendingDown"), { className: "h-4 w-4 mr-2 text-red-600" })}
+                  <span className="text-lg">Y</span>OUR {" "}
                   <span className="text-lg">D</span>EBTS ({filteredDebts.length}
                   )
                 </h3>
@@ -129,7 +132,7 @@ const DebtDashboard = () => {
 
               {filteredDebts.length === 0 ? (
                 <div className="text-center py-12">
-                  <CreditCard className="h-12 w-12 mx-auto text-gray-300 mb-4" />
+                  {React.createElement(getIcon("CreditCard"), { className: "h-12 w-12 mx-auto text-gray-300 mb-4" })}
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
                     No Debts Found
                   </h3>
@@ -141,7 +144,7 @@ const DebtDashboard = () => {
                     onClick={handleAddDebt}
                     className="btn btn-primary border-2 border-black"
                   >
-                    <Plus className="h-4 w-4 mr-2" />
+                    {React.createElement(getIcon("Plus"), { className: "h-4 w-4 mr-2" })}
                     Add Your First Debt
                   </button>
                 </div>
@@ -154,23 +157,25 @@ const DebtDashboard = () => {
               )}
             </div>
           ) : (
-            <div className="bg-white rounded-xl p-6 text-center border-2 border-black ring-1 ring-gray-800/10">
+            <div className="rounded-lg border border-gray-200 p-6 text-center">
               <p className="text-purple-900">
                 Debt List disabled for debugging
               </p>
             </div>
           )}
-        </>
-      )}
+            </div>
+          )}
 
-      {/* Strategies Tab */}
-      {activeTab === "strategies" && (
-        <div className="glassmorphism rounded-2xl p-6 text-center">
-          <p className="text-gray-600">
-            Debt strategies temporarily disabled for debugging
-          </p>
+          {/* Strategies Tab */}
+          {activeTab === "strategies" && (
+            <div className="text-center">
+              <p className="text-gray-600">
+                Debt strategies temporarily disabled for debugging
+              </p>
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Modals */}
       {isDebtFeatureEnabled("ENABLE_ADD_DEBT_MODAL") && (
