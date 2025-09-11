@@ -114,19 +114,36 @@ const ViewRenderer = ({
   const views = {
     dashboard: <Dashboard setActiveView={setActiveView} />,
     envelopes: (
-      <div className="space-y-6">
-        {/* Auto-Funding Access Button */}
-        <div className="flex justify-end mb-4">
-          <button
-            onClick={() => setActiveView("automation")}
-            className="btn btn-secondary flex items-center"
-            title="Manage automatic envelope funding rules"
-          >
-            {React.createElement(getIcon("Settings"), {
-              className: "h-4 w-4 mr-2",
-            })}
-            Auto-Funding
-          </button>
+      <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="font-black text-black text-base flex items-center">
+              <div className="relative mr-4">
+                <div className="absolute inset-0 bg-purple-500 rounded-2xl blur-lg opacity-30"></div>
+                <div className="relative bg-purple-500 p-3 rounded-2xl">
+                  {React.createElement(getIcon("Wallet"), { className: "h-6 w-6 text-white" })}
+                </div>
+              </div>
+              <span className="text-lg">E</span>NVELOPE <span className="text-lg">M</span>ANAGEMENT
+            </h2>
+            <p className="text-purple-900 mt-1">
+              Organize and track your budget allocations • {envelopes?.length || 0} envelopes
+            </p>
+          </div>
+
+          <div className="flex flex-row gap-3">
+            <button
+              onClick={() => setActiveView("automation")}
+              className="btn btn-secondary border-2 border-black flex items-center"
+              title="Manage automatic envelope funding rules"
+            >
+              {React.createElement(getIcon("Settings"), {
+                className: "h-4 w-4 mr-2",
+              })}
+              Auto-Funding
+            </button>
+          </div>
         </div>
 
         <SmartEnvelopeSuggestions
