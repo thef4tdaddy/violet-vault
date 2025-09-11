@@ -43,7 +43,7 @@ const SecurityHeader = ({
     <div className={`flex items-center justify-between ${className}`}>
       <div className="flex items-center gap-3">
         {React.createElement(getIcon("Shield"), {
-          className: `h-6 w-6 ${variant === "fullscreen" ? "text-white" : "text-blue-600"}`
+          className: `h-6 w-6 ${variant === "fullscreen" ? "text-white" : "text-blue-600"}`,
         })}
         <div>
           <h3 className={headerStyles}>{formatTitle(title)}</h3>

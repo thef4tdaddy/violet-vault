@@ -9,7 +9,9 @@ const ReceiptProcessingState = () => {
   return (
     <div className="text-center py-8">
       <div className="glassmorphism p-4 rounded-lg inline-block mb-4 border-2 border-black bg-purple-200/40 backdrop-blur-sm">
-        {React.createElement(getIcon("Loader2"), { className: "h-8 w-8 text-purple-900 animate-spin" })}
+        {React.createElement(getIcon("Loader2"), {
+          className: "h-8 w-8 text-purple-900 animate-spin",
+        })}
       </div>
       <p className="font-black text-black text-base">
         <span className="text-lg">P</span>ROCESSING{" "}

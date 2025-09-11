@@ -212,7 +212,9 @@ export const renderConfidenceIndicator = (field, confidence) => {
 
   const conf = confidenceMap[confidence] || confidenceMap.none;
 
-  return React.createElement(getIcon(conf.iconName), { className: `h-4 w-4 ${conf.color}` });
+  return React.createElement(getIcon(conf.iconName), {
+    className: `h-4 w-4 ${conf.color}`,
+  });
 };
 
 /**

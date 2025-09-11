@@ -737,10 +737,15 @@ class ChunkedSyncService {
         logger.info("✅ Chunked load completed successfully", {
           duration: `${duration}ms`,
           keys: Object.keys(reconstructedData),
-          dataStructure: Object.entries(reconstructedData).reduce((acc, [key, value]) => {
-            acc[key] = Array.isArray(value) ? `array[${value.length}]` : typeof value;
-            return acc;
-          }, {}),
+          dataStructure: Object.entries(reconstructedData).reduce(
+            (acc, [key, value]) => {
+              acc[key] = Array.isArray(value)
+                ? `array[${value.length}]`
+                : typeof value;
+              return acc;
+            },
+            {},
+          ),
         });
 
         return reconstructedData;

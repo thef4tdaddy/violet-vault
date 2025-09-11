@@ -15,7 +15,9 @@ const ConfirmationStep = ({ receiptData, transactionForm, envelopes }) => {
     <div className="space-y-6">
       <div className="text-center">
         <div className="glassmorphism rounded-full p-4 w-16 h-16 mx-auto mb-4 border-2 border-green-300">
-          {React.createElement(getIcon("Check"), { className: "h-8 w-8 text-green-600 mx-auto" })}
+          {React.createElement(getIcon("Check"), {
+            className: "h-8 w-8 text-green-600 mx-auto",
+          })}
         </div>
         <h3 className="text-lg font-black text-black">CONFIRM TRANSACTION</h3>
         <p className="text-sm text-purple-800 font-medium mt-2">
@@ -26,7 +28,9 @@ const ConfirmationStep = ({ receiptData, transactionForm, envelopes }) => {
       {/* Transaction Details */}
       <div className="bg-gradient-to-r from-green-50/80 to-blue-50/80 backdrop-blur-sm rounded-xl p-6 border-2 border-black shadow-lg">
         <h4 className="font-black text-gray-900 mb-4 flex items-center">
-          {React.createElement(getIcon("Receipt"), { className: "h-5 w-5 mr-2 text-green-600" })}
+          {React.createElement(getIcon("Receipt"), {
+            className: "h-5 w-5 mr-2 text-green-600",
+          })}
           TRANSACTION DETAILS
         </h4>
 
@@ -42,7 +46,9 @@ const ConfirmationStep = ({ receiptData, transactionForm, envelopes }) => {
 
           <div className="flex justify-between items-center">
             <span className="text-sm font-medium text-gray-700 flex items-center">
-              {React.createElement(getIcon("DollarSign"), { className: "h-4 w-4 mr-1" })}
+              {React.createElement(getIcon("DollarSign"), {
+                className: "h-4 w-4 mr-1",
+              })}
               Amount:
             </span>
             <span className="font-black text-xl text-gray-900">
@@ -52,7 +58,9 @@ const ConfirmationStep = ({ receiptData, transactionForm, envelopes }) => {
 
           <div className="flex justify-between items-center">
             <span className="text-sm font-medium text-gray-700 flex items-center">
-              {React.createElement(getIcon("Calendar"), { className: "h-4 w-4 mr-1" })}
+              {React.createElement(getIcon("Calendar"), {
+                className: "h-4 w-4 mr-1",
+              })}
               Date:
             </span>
             <span className="font-bold text-gray-900">
@@ -84,7 +92,9 @@ const ConfirmationStep = ({ receiptData, transactionForm, envelopes }) => {
       {selectedEnvelope && (
         <div className="bg-gradient-to-r from-purple-50/80 to-pink-50/80 backdrop-blur-sm rounded-xl p-6 border-2 border-black shadow-lg">
           <h4 className="font-black text-gray-900 mb-4 flex items-center">
-            {React.createElement(getIcon("Package"), { className: "h-5 w-5 mr-2 text-purple-600" })}
+            {React.createElement(getIcon("Package"), {
+              className: "h-5 w-5 mr-2 text-purple-600",
+            })}
             ENVELOPE ASSIGNMENT
           </h4>
 

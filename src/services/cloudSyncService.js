@@ -118,18 +118,23 @@ class CloudSyncService {
       try {
         const cloudResult = await chunkedSyncService.loadFromCloud();
         cloudData = cloudResult || null;
-        logger.debug("📊 CloudSyncService received data from chunkedSyncService", {
-          hasData: !!cloudData,
-          keys: cloudData ? Object.keys(cloudData) : [],
-          arrayLengths: cloudData ? {
-            envelopes: cloudData.envelopes?.length || 0,
-            transactions: cloudData.transactions?.length || 0,
-            bills: cloudData.bills?.length || 0,
-            paycheckHistory: cloudData.paycheckHistory?.length || 0,
-            savingsGoals: cloudData.savingsGoals?.length || 0,
-            debts: cloudData.debts?.length || 0,
-          } : null,
-        });
+        logger.debug(
+          "📊 CloudSyncService received data from chunkedSyncService",
+          {
+            hasData: !!cloudData,
+            keys: cloudData ? Object.keys(cloudData) : [],
+            arrayLengths: cloudData
+              ? {
+                  envelopes: cloudData.envelopes?.length || 0,
+                  transactions: cloudData.transactions?.length || 0,
+                  bills: cloudData.bills?.length || 0,
+                  paycheckHistory: cloudData.paycheckHistory?.length || 0,
+                  savingsGoals: cloudData.savingsGoals?.length || 0,
+                  debts: cloudData.debts?.length || 0,
+                }
+              : null,
+          },
+        );
       } catch (error) {
         // GitHub Issue #576 Phase 2: Universal decryption error handling for all users
         if (
@@ -584,19 +589,19 @@ class CloudSyncService {
       sharedBy: currentUser?.sharedBy,
       userKeys: currentUser ? Object.keys(currentUser) : [],
     });
-    
+
     // Check multiple ways a shared budget user might be identified
     const isSharedViaJoinedVia = currentUser?.joinedVia === "shareCode";
     const isSharedViaSharedBy = !!currentUser?.sharedBy;
     const isSharedUser = isSharedViaJoinedVia || isSharedViaSharedBy;
-    
+
     logger.info(`🔄 Shared budget user detection: ${isSharedUser}`, {
       joinedVia: currentUser?.joinedVia,
       sharedBy: currentUser?.sharedBy,
       isSharedViaJoinedVia,
       isSharedViaSharedBy,
     });
-    
+
     return isSharedUser;
   }
 
