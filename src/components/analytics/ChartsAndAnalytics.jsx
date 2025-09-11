@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  TrendingUp,
-  TrendingDown,
-  BarChart3,
-  DollarSign,
-  Download,
-  Wallet,
-} from "lucide-react";
+import { getIcon } from "../../utils";
 import {
   TrendLineChart,
   CategoryBarChart,
@@ -78,7 +71,7 @@ const ChartsAnalytics = ({
             <div className="relative mr-4">
               <div className="absolute inset-0 bg-cyan-500 rounded-2xl blur-lg opacity-30"></div>
               <div className="relative bg-cyan-500 p-3 rounded-2xl">
-                <BarChart3 className="h-6 w-6 text-white" />
+                {React.createElement(getIcon("BarChart3"), { className: "h-6 w-6 text-white" })}
               </div>
             </div>
             Analytics & Reports
@@ -105,7 +98,7 @@ const ChartsAnalytics = ({
             onClick={handleExport}
             className="btn btn-secondary border-2 border-black flex items-center rounded-xl px-4 py-2"
           >
-            <Download className="h-4 w-4 mr-2" />
+            {React.createElement(getIcon("Download"), { className: "h-4 w-4 mr-2" })}
             Export
           </button>
         </div>
@@ -117,28 +110,28 @@ const ChartsAnalytics = ({
           title="Total Income"
           value={`$${(metrics?.totalIncome || 0).toFixed(2)}`}
           subtitle={`${filteredTransactions?.filter((t) => t?.amount > 0)?.length || 0} transactions`}
-          icon={TrendingUp}
+          icon={getIcon("TrendingUp")}
           color="emerald"
         />
         <MetricCard
           title="Total Expenses"
           value={`$${(metrics?.totalExpenses || 0).toFixed(2)}`}
           subtitle={`${filteredTransactions?.filter((t) => t?.amount < 0)?.length || 0} transactions`}
-          icon={TrendingDown}
+          icon={getIcon("TrendingDown")}
           color="red"
         />
         <MetricCard
           title="Net Cash Flow"
           value={`${(metrics?.netCashFlow || 0) >= 0 ? "+" : ""}$${(metrics?.netCashFlow || 0).toFixed(2)}`}
           subtitle={`${(metrics?.savingsRate || 0).toFixed(1)}% savings rate`}
-          icon={DollarSign}
+          icon={getIcon("DollarSign")}
           color={(metrics?.netCashFlow || 0) >= 0 ? "cyan" : "amber"}
         />
         <MetricCard
           title="Avg Monthly Expenses"
           value={`$${(metrics?.avgMonthlyExpenses || 0).toFixed(2)}`}
           subtitle={`${monthlyTrends?.length || 0} months of data`}
-          icon={Wallet}
+          icon={getIcon("Wallet")}
           color="purple"
         />
       </div>
@@ -147,10 +140,10 @@ const ChartsAnalytics = ({
       <div className="glassmorphism rounded-xl">
         <nav className="flex border-b border-white/20">
           {[
-            { id: "overview", name: "Overview", icon: BarChart3 },
-            { id: "trends", name: "Trends", icon: TrendingUp },
-            { id: "envelopes", name: "Envelopes", icon: Wallet },
-            { id: "categories", name: "Categories", icon: BarChart3 },
+            { id: "overview", name: "Overview", icon: "BarChart3" },
+            { id: "trends", name: "Trends", icon: "TrendingUp" },
+            { id: "envelopes", name: "Envelopes", icon: "Wallet" },
+            { id: "categories", name: "Categories", icon: "BarChart3" },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -161,7 +154,7 @@ const ChartsAnalytics = ({
                   : "border-transparent text-gray-600 hover:text-cyan-600 hover:bg-cyan-50/30"
               }`}
             >
-              <tab.icon className="h-4 w-4 inline mr-2" />
+              {React.createElement(getIcon(tab.icon), { className: "h-4 w-4 inline mr-2" })}
               {tab.name}
             </button>
           ))}
@@ -270,7 +263,7 @@ const ChartsAnalytics = ({
             </h3>
             {envelopeHealth.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
-                <Wallet className="h-12 w-12 mx-auto mb-3 text-gray-400" />
+                {React.createElement(getIcon("Wallet"), { className: "h-12 w-12 mx-auto mb-3 text-gray-400" })}
                 <p>No envelopes to display</p>
                 <p className="text-sm">
                   Create some envelopes to see their health status
