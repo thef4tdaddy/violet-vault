@@ -4,6 +4,7 @@
  * Extracted from contextAnalysisService.js for Issue #513
  */
 import logger from "../../utils/common/logger";
+import { identifyCurrentPage as detectCurrentPage } from "../../utils/pageDetection/pageIdentifier";
 
 export class PageDetectionService {
   /**
@@ -11,76 +12,7 @@ export class PageDetectionService {
    * @returns {string} Current page identifier
    */
   static identifyCurrentPage() {
-    try {
-      const path = window.location.pathname;
-      const hash = window.location.hash;
-
-      // Check URL path patterns
-      if (path.includes("/bills") || hash.includes("bills")) return "bills";
-      if (path.includes("/debt") || hash.includes("debt")) return "debt";
-      if (path.includes("/envelope") || path.includes("/budget") || hash.includes("envelope"))
-        return "envelope";
-      if (path.includes("/transaction") || hash.includes("transaction")) return "transaction";
-      if (path.includes("/saving") || hash.includes("saving")) return "savings";
-      if (path.includes("/analytic") || hash.includes("analytic")) return "analytics";
-      if (path.includes("/setting") || hash.includes("setting")) return "settings";
-      if (path.includes("/onboard") || hash.includes("onboard")) return "onboarding";
-
-      // Check for active navigation indicators (now with proper aria-current and data attributes)
-      const activeNav = document.querySelector('[aria-current="page"]');
-      if (activeNav) {
-        // First try the data-view attribute (most reliable)
-        const viewKey = activeNav.getAttribute("data-view");
-        if (viewKey) {
-          // Map view keys to standard page names
-          const viewMapping = {
-            bills: "bills",
-            debts: "debt",
-            envelopes: "envelope",
-            transactions: "transaction",
-            savings: "savings",
-            analytics: "analytics",
-            dashboard: "dashboard",
-            supplemental: "supplemental",
-            paycheck: "paycheck",
-          };
-          const mappedView = viewMapping[viewKey];
-          if (mappedView) return mappedView;
-        }
-
-        // Fallback to text-based detection
-        const navText = activeNav.textContent?.toLowerCase().trim();
-        if (navText?.includes("bill")) return "bills";
-        if (navText?.includes("debt")) return "debt";
-        if (navText?.includes("envelope")) return "envelope";
-        if (navText?.includes("transaction")) return "transaction";
-        if (navText?.includes("saving")) return "savings";
-        if (navText?.includes("analytic")) return "analytics";
-        if (navText?.includes("dashboard")) return "dashboard";
-        if (navText?.includes("supplemental")) return "supplemental";
-        if (navText?.includes("paycheck")) return "paycheck";
-      }
-
-      // Check document title
-      const title = document.title?.toLowerCase();
-      if (title?.includes("bill")) return "bills";
-      if (title?.includes("debt")) return "debt";
-      if (title?.includes("envelope") || title?.includes("budget")) return "envelope";
-      if (title?.includes("transaction")) return "transaction";
-      if (title?.includes("saving")) return "savings";
-      if (title?.includes("analytic")) return "analytics";
-      if (title?.includes("setting")) return "settings";
-
-      // Fallback to checking main content areas
-      if (document.querySelector('[class*="bill"]')) return "bills";
-      if (document.querySelector('[class*="debt"]')) return "debt";
-      if (document.querySelector('[class*="envelope"]')) return "envelope";
-
-      return "unknown";
-    } catch (error) {
-      logger.warn("Error identifying current page", error);
-      return "unknown";
-    }
+    return detectCurrentPage();
   }
 
   /**
@@ -161,7 +93,7 @@ export class PageDetectionService {
       }
 
       return document.title || "Unknown";
-    } catch (error) {
+    } catch (_error) {
       return "Unknown";
     }
   }
@@ -194,7 +126,7 @@ export class PageDetectionService {
       }
 
       return breadcrumbs;
-    } catch (error) {
+    } catch (_error) {
       return [];
     }
   }
@@ -205,9 +137,11 @@ export class PageDetectionService {
    */
   static extractMainHeading() {
     try {
-      const mainHeading = document.querySelector("main h1, section h1, .content h1, h1");
+      const mainHeading = document.querySelector(
+        "main h1, section h1, .content h1, h1",
+      );
       return mainHeading ? mainHeading.textContent?.trim() : null;
-    } catch (error) {
+    } catch (_error) {
       return null;
     }
   }
@@ -224,7 +158,11 @@ export class PageDetectionService {
 
       let location = currentPage;
 
-      if (screenTitle && screenTitle !== document.title && screenTitle !== "Unknown") {
+      if (
+        screenTitle &&
+        screenTitle !== document.title &&
+        screenTitle !== "Unknown"
+      ) {
         location += ` > ${screenTitle}`;
       }
 
@@ -233,7 +171,7 @@ export class PageDetectionService {
       }
 
       return location;
-    } catch (error) {
+    } catch (_error) {
       return "Unknown";
     }
   }
@@ -263,7 +201,7 @@ export class PageDetectionService {
       }
 
       return null;
-    } catch (error) {
+    } catch (_error) {
       return null;
     }
   }
