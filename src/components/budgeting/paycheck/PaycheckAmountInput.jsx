@@ -5,11 +5,7 @@ import { getIcon } from "../../../utils";
  * Paycheck amount input component
  * Handles amount input with proper styling and validation
  */
-const PaycheckAmountInput = ({
-  value,
-  onChange,
-  disabled = false,
-}) => {
+const PaycheckAmountInput = ({ value, onChange, disabled = false }) => {
   return (
     <div>
       <label className="block text-sm font-semibold text-purple-900 mb-3">

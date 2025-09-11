@@ -28,9 +28,7 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
 
   const loadExistingShareCode = async () => {
     if (!currentUser?.userName) {
-      showErrorToast(
-        "Cannot load share code - user not properly authenticated",
-      );
+      showErrorToast("Cannot load share code - user not properly authenticated");
       return;
     }
 
@@ -70,9 +68,7 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
 
   const generateShareCode = async () => {
     if (!currentUser?.userName) {
-      showErrorToast(
-        "Cannot generate share code - user not properly authenticated",
-      );
+      showErrorToast("Cannot generate share code - user not properly authenticated");
       return;
     }
 
@@ -102,7 +98,7 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
       } catch (error) {
         logger.error("Failed to save share code to user profile", error);
         showErrorToast(
-          "Share code generated but failed to save. It may not persist across sessions.",
+          "Share code generated but failed to save. It may not persist across sessions."
         );
       }
 
@@ -149,8 +145,7 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
   const generateNewCode = async () => {
     const confirmed = await confirm({
       title: "Generate New Share Code",
-      message:
-        "This will generate a completely new share code. Are you sure you want to continue?",
+      message: "This will generate a completely new share code. Are you sure you want to continue?",
       confirmText: "Generate New",
       cancelText: "Cancel",
       variant: "default",
@@ -169,8 +164,7 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-black text-black">
-              <span className="text-2xl">S</span>HARE{" "}
-              <span className="text-2xl">B</span>UDGET
+              <span className="text-2xl">S</span>HARE <span className="text-2xl">B</span>UDGET
             </h2>
             <button
               onClick={onClose}
@@ -230,9 +224,7 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
                         : "bg-purple-600 hover:bg-purple-700 text-white"
                     }`}
                   >
-                    {copied
-                      ? renderIcon("Check", "h-5 w-5")
-                      : renderIcon("Copy", "h-5 w-5")}
+                    {copied ? renderIcon("Check", "h-5 w-5") : renderIcon("Copy", "h-5 w-5")}
                   </button>
                 </div>
               </div>
@@ -263,12 +255,10 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
                 <div className="flex items-start gap-3">
                   {renderIcon("Shield", "h-5 w-5 text-green-600 mt-0.5")}
                   <div>
-                    <h4 className="font-black text-green-800 text-sm">
-                      DETERMINISTIC BUDGET
-                    </h4>
+                    <h4 className="font-black text-green-800 text-sm">DETERMINISTIC BUDGET</h4>
                     <p className="text-xs text-green-700 mt-1">
-                      This 4-word code creates the same budget for anyone who
-                      uses it with the correct password.
+                      This 4-word code creates the same budget for anyone who uses it with the
+                      correct password.
                     </p>
                     <p className="text-xs text-green-600 mt-2">
                       Code never expires - share with trusted users only
@@ -279,15 +269,11 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
 
               {/* Instructions */}
               <div className="bg-purple-50 border-2 border-purple-300 rounded-lg p-4">
-                <h4 className="font-black text-purple-800 text-sm mb-2">
-                  HOW TO USE
-                </h4>
+                <h4 className="font-black text-purple-800 text-sm mb-2">HOW TO USE</h4>
                 <ol className="text-xs text-purple-700 space-y-1">
                   <li>1. Share the code or QR image with trusted users</li>
                   <li>2. They'll scan the QR code or enter the share code</li>
-                  <li>
-                    3. They'll set their own password for local encryption
-                  </li>
+                  <li>3. They'll set their own password for local encryption</li>
                   <li>4. Both of you can now sync to the same budget</li>
                 </ol>
               </div>

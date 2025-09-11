@@ -21,9 +21,7 @@ describe("useTrendAnalysis", () => {
   });
 
   it("should generate 12 months of spending trends", () => {
-    const { result } = renderHook(() =>
-      useTrendAnalysis(mockAnalyticsData, "all"),
-    );
+    const { result } = renderHook(() => useTrendAnalysis(mockAnalyticsData, "all"));
 
     expect(result.current.spendingTrends).toHaveLength(12);
 
@@ -38,9 +36,7 @@ describe("useTrendAnalysis", () => {
   });
 
   it("should generate spending velocity data", () => {
-    const { result } = renderHook(() =>
-      useTrendAnalysis(mockAnalyticsData, "all"),
-    );
+    const { result } = renderHook(() => useTrendAnalysis(mockAnalyticsData, "all"));
 
     expect(result.current.spendingVelocity).toHaveLength(11); // 12 trends - 1 for velocity calculation
 
@@ -53,9 +49,7 @@ describe("useTrendAnalysis", () => {
   });
 
   it("should generate top 5 category trends", () => {
-    const { result } = renderHook(() =>
-      useTrendAnalysis(mockAnalyticsData, "all"),
-    );
+    const { result } = renderHook(() => useTrendAnalysis(mockAnalyticsData, "all"));
 
     expect(result.current.categoryTrends).toHaveLength(5);
 
@@ -71,9 +65,7 @@ describe("useTrendAnalysis", () => {
   });
 
   it("should generate seasonal patterns for 4 seasons", () => {
-    const { result } = renderHook(() =>
-      useTrendAnalysis(mockAnalyticsData, "all"),
-    );
+    const { result } = renderHook(() => useTrendAnalysis(mockAnalyticsData, "all"));
 
     expect(result.current.seasonalPatterns).toHaveLength(4);
 
@@ -91,9 +83,7 @@ describe("useTrendAnalysis", () => {
   });
 
   it("should generate forecast insights", () => {
-    const { result } = renderHook(() =>
-      useTrendAnalysis(mockAnalyticsData, "all"),
-    );
+    const { result } = renderHook(() => useTrendAnalysis(mockAnalyticsData, "all"));
 
     const insights = result.current.forecastInsights;
     expect(insights).toHaveProperty("projectedSpending");
@@ -109,9 +99,7 @@ describe("useTrendAnalysis", () => {
   });
 
   it("should generate derived insights", () => {
-    const { result } = renderHook(() =>
-      useTrendAnalysis(mockAnalyticsData, "all"),
-    );
+    const { result } = renderHook(() => useTrendAnalysis(mockAnalyticsData, "all"));
 
     const insights = result.current.insights;
     expect(insights).toHaveProperty("highestSpendingSeason");
@@ -124,9 +112,7 @@ describe("useTrendAnalysis", () => {
   });
 
   it("should mark last 3 months as forecast", () => {
-    const { result } = renderHook(() =>
-      useTrendAnalysis(mockAnalyticsData, "all"),
-    );
+    const { result } = renderHook(() => useTrendAnalysis(mockAnalyticsData, "all"));
 
     const trends = result.current.spendingTrends;
     const forecastCount = trends.filter((t) => t.forecast).length;

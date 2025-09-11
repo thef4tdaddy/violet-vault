@@ -64,7 +64,7 @@ export const useSmartCategoryManager = (initialDateRange = "6months") => {
         return false;
       }
     },
-    [handleDismissSuggestion],
+    [handleDismissSuggestion]
   );
 
   return {

@@ -27,7 +27,7 @@ export const useUnassignedCash = () => {
       // Initialize metadata record if it doesn't exist (same as main hook)
       if (!metadata) {
         logger.debug(
-          "TanStack Query: No metadata found in useUnassignedCash, initializing with defaults",
+          "TanStack Query: No metadata found in useUnassignedCash, initializing with defaults"
         );
         const defaultMetadata = {
           unassignedCash: 0,
@@ -40,7 +40,7 @@ export const useUnassignedCash = () => {
         metadata = defaultMetadata;
         logger.debug(
           "TanStack Query: Budget metadata initialized in useUnassignedCash",
-          defaultMetadata,
+          defaultMetadata
         );
       }
 
@@ -98,7 +98,7 @@ export const useUnassignedCash = () => {
         return false;
       }
     },
-    [updateUnassignedCashMutation, unassignedCash],
+    [updateUnassignedCashMutation, unassignedCash]
   );
 
   return {

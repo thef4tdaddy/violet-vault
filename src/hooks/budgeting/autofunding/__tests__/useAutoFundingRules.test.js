@@ -5,10 +5,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useAutoFundingRules } from "../useAutoFundingRules.js";
-import {
-  RULE_TYPES,
-  TRIGGER_TYPES,
-} from "../../../../utils/budgeting/autofunding/rules.js";
+import { RULE_TYPES, TRIGGER_TYPES } from "../../../../utils/budgeting/autofunding/rules.js";
 
 // Mock logger to avoid console output in tests
 vi.mock("../../../../utils/common/logger", () => ({
@@ -68,9 +65,7 @@ describe("useAutoFundingRules", () => {
         hookResult.result.current.updateRule(ruleId, { name: "Updated Rule" });
       });
 
-      const updatedRule = hookResult.result.current.rules.find(
-        (r) => r.id === ruleId,
-      );
+      const updatedRule = hookResult.result.current.rules.find((r) => r.id === ruleId);
       expect(updatedRule.name).toBe("Updated Rule");
       expect(updatedRule.updatedAt).toBeDefined();
     });
@@ -104,9 +99,7 @@ describe("useAutoFundingRules", () => {
         ruleId = newRule.id;
       });
 
-      const initialRule = hookResult.result.current.rules.find(
-        (r) => r.id === ruleId,
-      );
+      const initialRule = hookResult.result.current.rules.find((r) => r.id === ruleId);
       expect(initialRule.enabled).toBe(true); // Default is enabled
 
       // Toggle rule
@@ -114,9 +107,7 @@ describe("useAutoFundingRules", () => {
         hookResult.result.current.toggleRule(ruleId);
       });
 
-      const toggledRule = hookResult.result.current.rules.find(
-        (r) => r.id === ruleId,
-      );
+      const toggledRule = hookResult.result.current.rules.find((r) => r.id === ruleId);
       expect(toggledRule.enabled).toBe(false);
     });
 
@@ -214,26 +205,18 @@ describe("useAutoFundingRules", () => {
     });
 
     it("should get rules by type", () => {
-      const fixedAmountRules = hookResult.result.current.getRulesByType(
-        RULE_TYPES.FIXED_AMOUNT,
-      );
+      const fixedAmountRules = hookResult.result.current.getRulesByType(RULE_TYPES.FIXED_AMOUNT);
       expect(fixedAmountRules).toHaveLength(2);
 
-      const percentageRules = hookResult.result.current.getRulesByType(
-        RULE_TYPES.PERCENTAGE,
-      );
+      const percentageRules = hookResult.result.current.getRulesByType(RULE_TYPES.PERCENTAGE);
       expect(percentageRules).toHaveLength(1);
     });
 
     it("should get rules by trigger", () => {
-      const manualRules = hookResult.result.current.getRulesByTrigger(
-        TRIGGER_TYPES.MANUAL,
-      );
+      const manualRules = hookResult.result.current.getRulesByTrigger(TRIGGER_TYPES.MANUAL);
       expect(manualRules).toHaveLength(2);
 
-      const weeklyRules = hookResult.result.current.getRulesByTrigger(
-        TRIGGER_TYPES.WEEKLY,
-      );
+      const weeklyRules = hookResult.result.current.getRulesByTrigger(TRIGGER_TYPES.WEEKLY);
       expect(weeklyRules).toHaveLength(1);
     });
 
@@ -304,10 +287,7 @@ describe("useAutoFundingRules", () => {
 
     it("should bulk toggle rules", () => {
       act(() => {
-        hookResult.result.current.bulkToggleRules(
-          [ruleIds[0], ruleIds[1]],
-          false,
-        );
+        hookResult.result.current.bulkToggleRules([ruleIds[0], ruleIds[1]], false);
       });
 
       const rules = hookResult.result.current.rules;
@@ -385,11 +365,7 @@ describe("useAutoFundingRules", () => {
     it("should update rule priorities when reordering", () => {
       act(() => {
         // Reorder: Rule 1, Rule 3, Rule 2
-        hookResult.result.current.reorderRules([
-          ruleIds[0],
-          ruleIds[2],
-          ruleIds[1],
-        ]);
+        hookResult.result.current.reorderRules([ruleIds[0], ruleIds[2], ruleIds[1]]);
       });
 
       const rules = hookResult.result.current.rules;

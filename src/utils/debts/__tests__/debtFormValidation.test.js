@@ -17,12 +17,8 @@ describe("validateDebtFormData", () => {
       expect(result.isValid).toBe(false);
       expect(result.errors.name).toBe("Debt name is required");
       expect(result.errors.creditor).toBe("Creditor name is required");
-      expect(result.errors.currentBalance).toBe(
-        "Valid current balance is required",
-      );
-      expect(result.errors.minimumPayment).toBe(
-        "Valid minimum payment is required",
-      );
+      expect(result.errors.currentBalance).toBe("Valid current balance is required");
+      expect(result.errors.minimumPayment).toBe("Valid minimum payment is required");
     });
 
     test("should pass validation with valid data", () => {
@@ -58,15 +54,9 @@ describe("validateDebtFormData", () => {
 
       const result = validateDebtFormData(formData);
 
-      expect(result.errors.currentBalance).toBe(
-        "Valid current balance is required",
-      );
-      expect(result.errors.originalBalance).toBe(
-        "Original balance must be positive",
-      );
-      expect(result.errors.minimumPayment).toBe(
-        "Valid minimum payment is required",
-      );
+      expect(result.errors.currentBalance).toBe("Valid current balance is required");
+      expect(result.errors.originalBalance).toBe("Original balance must be positive");
+      expect(result.errors.minimumPayment).toBe("Valid minimum payment is required");
     });
 
     test("should validate interest rate range", () => {
@@ -80,9 +70,7 @@ describe("validateDebtFormData", () => {
 
       const result = validateDebtFormData(formData);
 
-      expect(result.errors.interestRate).toBe(
-        "Interest rate must be between 0 and 100",
-      );
+      expect(result.errors.interestRate).toBe("Interest rate must be between 0 and 100");
     });
 
     test("should handle zero interest rate", () => {
@@ -114,7 +102,7 @@ describe("validateDebtFormData", () => {
       const result = validateDebtFormData(formData);
 
       expect(result.warnings).toContain(
-        "Minimum payment is less than 1% of balance - this will take very long to pay off",
+        "Minimum payment is less than 1% of balance - this will take very long to pay off"
       );
     });
 
@@ -130,7 +118,7 @@ describe("validateDebtFormData", () => {
       const result = validateDebtFormData(formData);
 
       expect(result.warnings).toContain(
-        "Minimum payment is more than 50% of balance - verify this is correct",
+        "Minimum payment is more than 50% of balance - verify this is correct"
       );
     });
 
@@ -146,7 +134,7 @@ describe("validateDebtFormData", () => {
       const result = validateDebtFormData(formData);
 
       expect(result.warnings).toContain(
-        "Interest rate is very high - consider debt consolidation options",
+        "Interest rate is very high - consider debt consolidation options"
       );
     });
 
@@ -163,7 +151,7 @@ describe("validateDebtFormData", () => {
       const result = validateDebtFormData(formData);
 
       expect(result.warnings).toContain(
-        "Current balance is higher than original balance - interest and fees may have accrued",
+        "Current balance is higher than original balance - interest and fees may have accrued"
       );
     });
   });
@@ -359,9 +347,7 @@ describe("formatDebtMetrics", () => {
 
     const formatted = formatDebtMetrics(metrics);
 
-    expect(formatted.payoffTime).toBe(
-      "Payment insufficient (covers interest only)",
-    );
+    expect(formatted.payoffTime).toBe("Payment insufficient (covers interest only)");
     expect(formatted.totalInterest).toBe("N/A");
     expect(formatted.isPaymentSufficient).toBe(false);
   });

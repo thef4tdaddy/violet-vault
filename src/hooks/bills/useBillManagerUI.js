@@ -55,7 +55,7 @@ export const useBillManagerUI = ({
         color: "gray",
       },
     ],
-    [categorizedBills, bills],
+    [categorizedBills, bills]
   );
 
   // Bill selection logic
@@ -69,7 +69,7 @@ export const useBillManagerUI = ({
       }
       setSelectedBills(newSelection);
     },
-    [selectedBills, setSelectedBills],
+    [selectedBills, setSelectedBills]
   );
 
   const selectAllBills = useCallback(() => {
@@ -92,7 +92,7 @@ export const useBillManagerUI = ({
       setEditingBill(bill);
       setShowAddBillModal(true);
     },
-    [setEditingBill, setShowAddBillModal],
+    [setEditingBill, setShowAddBillModal]
   );
 
   const handleCloseModal = useCallback(() => {
@@ -104,7 +104,7 @@ export const useBillManagerUI = ({
     (bill) => {
       setHistoryBill(bill);
     },
-    [setHistoryBill],
+    [setHistoryBill]
   );
 
   // Bill display logic
@@ -125,8 +125,7 @@ export const useBillManagerUI = ({
   // Selection state helpers
   const selectionState = useMemo(() => {
     const hasSelection = selectedBills.size > 0;
-    const isAllSelected =
-      filteredBills.length > 0 && selectedBills.size === filteredBills.length;
+    const isAllSelected = filteredBills.length > 0 && selectedBills.size === filteredBills.length;
 
     return {
       hasSelection,
@@ -179,9 +178,7 @@ export const useBillManagerUI = ({
       const urgencyColors = getUrgencyColors(bill.urgency);
       const isSelected = selectedBills.has(bill.id);
 
-      const dueDateDisplay = bill.dueDate
-        ? new Date(bill.dueDate).toLocaleDateString()
-        : "Not set";
+      const dueDateDisplay = bill.dueDate ? new Date(bill.dueDate).toLocaleDateString() : "Not set";
 
       const daysDisplay =
         bill.daysUntilDue !== null
@@ -200,7 +197,7 @@ export const useBillManagerUI = ({
         amount: Math.abs(bill.amount).toFixed(2),
       };
     },
-    [getBillIcon, getUrgencyColors, selectedBills],
+    [getBillIcon, getUrgencyColors, selectedBills]
   );
 
   return {

@@ -53,10 +53,7 @@ const PaycheckPayerSelector = ({
 
           {/* Show prediction info for selected payer */}
           {payerName && getPayerPrediction(payerName) && (
-            <PayerPredictionInfo 
-              payerName={payerName} 
-              prediction={getPayerPrediction(payerName)} 
-            />
+            <PayerPredictionInfo payerName={payerName} prediction={getPayerPrediction(payerName)} />
           )}
         </div>
       ) : (
@@ -78,7 +75,9 @@ const PaycheckPayerSelector = ({
 const PayerPredictionInfo = ({ payerName, prediction }) => (
   <div className="glassmorphism p-4 rounded-xl border border-blue-200/50 bg-blue-50/20">
     <div className="text-sm text-gray-600">
-      {React.createElement(getIcon("TrendingUp"), { className: "h-4 w-4 inline mr-2 text-blue-500" })}
+      {React.createElement(getIcon("TrendingUp"), {
+        className: "h-4 w-4 inline mr-2 text-blue-500",
+      })}
       <strong>{payerName}'s History:</strong>
       {` Avg: $${prediction.average.toFixed(2)} • Last: $${prediction.mostRecent.toFixed(2)} (${prediction.count} paychecks)`}
     </div>
@@ -88,12 +87,12 @@ const PayerPredictionInfo = ({ payerName, prediction }) => (
 /**
  * Add new payer form component
  */
-const AddNewPayerForm = ({ 
-  uniquePayers, 
-  newPayerName, 
-  onNewPayerNameChange, 
-  onAddNewPayer, 
-  onToggleAddNewPayer 
+const AddNewPayerForm = ({
+  uniquePayers,
+  newPayerName,
+  onNewPayerNameChange,
+  onAddNewPayer,
+  onToggleAddNewPayer,
 }) => (
   <div className="space-y-3">
     {uniquePayers.length === 0 && (

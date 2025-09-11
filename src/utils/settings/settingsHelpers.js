@@ -174,11 +174,7 @@ export const sanitizeSettingsForExport = (settings) => {
 
   const removeSensitiveData = (obj) => {
     for (const key in obj) {
-      if (
-        sensitiveKeys.some((sensitive) =>
-          key.toLowerCase().includes(sensitive.toLowerCase()),
-        )
-      ) {
+      if (sensitiveKeys.some((sensitive) => key.toLowerCase().includes(sensitive.toLowerCase()))) {
         delete obj[key];
       } else if (typeof obj[key] === "object" && obj[key] !== null) {
         removeSensitiveData(obj[key]);

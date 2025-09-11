@@ -58,7 +58,7 @@ const ChartsAnalytics = ({
         envelopeSpending,
         categoryBreakdown,
       },
-      currentUser,
+      currentUser
     );
   };
 
@@ -78,9 +78,7 @@ const ChartsAnalytics = ({
             </div>
             Analytics & Reports
           </h2>
-          <p className="text-gray-800 mt-1">
-            Financial insights and spending patterns
-          </p>
+          <p className="text-gray-800 mt-1">Financial insights and spending patterns</p>
         </div>
 
         <div className="flex gap-3">
@@ -194,9 +192,7 @@ const ChartsAnalytics = ({
           {/* Spending Trends Chart */}
           <div className="glassmorphism rounded-xl p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Spending Trends
-              </h3>
+              <h3 className="text-lg font-semibold text-gray-900">Spending Trends</h3>
               <div className="flex gap-2">
                 {["line", "bar", "area"].map((type) => (
                   <button
@@ -251,9 +247,7 @@ const ChartsAnalytics = ({
           <CategoryBarChart
             title="Weekly Spending Patterns"
             data={weeklyPatterns || []}
-            bars={[
-              { dataKey: "amount", name: "Amount Spent", fill: "#a855f7" },
-            ]}
+            bars={[{ dataKey: "amount", name: "Amount Spent", fill: "#a855f7" }]}
             height={300}
             emptyMessage="No weekly spending data available"
           />
@@ -264,18 +258,14 @@ const ChartsAnalytics = ({
         <div className="space-y-6">
           {/* Envelope Health Overview */}
           <div className="glassmorphism rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Envelope Health
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Envelope Health</h3>
             {envelopeHealth.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 {React.createElement(getIcon("Wallet"), {
                   className: "h-12 w-12 mx-auto mb-3 text-gray-400",
                 })}
                 <p>No envelopes to display</p>
-                <p className="text-sm">
-                  Create some envelopes to see their health status
-                </p>
+                <p className="text-sm">Create some envelopes to see their health status</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

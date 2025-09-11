@@ -34,7 +34,7 @@ export const useModalManager = (initialModals = {}) => {
     (modalName) => {
       return Boolean(modals[modalName]);
     },
-    [modals],
+    [modals]
   );
 
   const getOpenModalsCount = useCallback(() => {

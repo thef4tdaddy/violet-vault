@@ -18,9 +18,7 @@ export const validateTransaction = (transaction) => {
 };
 
 export const validateEnvelope = (envelope) => {
-  return (
-    envelope && typeof envelope === "object" && envelope.id && envelope.name
-  );
+  return envelope && typeof envelope === "object" && envelope.id && envelope.name;
 };
 
 // Date utilities
@@ -107,16 +105,11 @@ export const groupTransactionsByMonth = (transactions) => {
         grouped[monthKey].expenses += Math.abs(transaction.amount);
       }
 
-      grouped[monthKey].net =
-        grouped[monthKey].income - grouped[monthKey].expenses;
+      grouped[monthKey].net = grouped[monthKey].income - grouped[monthKey].expenses;
       grouped[monthKey].transactionCount++;
       grouped[monthKey].transactions.push(transaction);
     } catch (error) {
-      logger.warn(
-        "Error processing transaction in grouping:",
-        transaction,
-        error,
-      );
+      logger.warn("Error processing transaction in grouping:", transaction, error);
     }
   });
 
@@ -148,8 +141,7 @@ export const groupTransactionsByCategory = (transactions) => {
       categories[category].expenses += Math.abs(transaction.amount);
     }
 
-    categories[category].net =
-      categories[category].income - categories[category].expenses;
+    categories[category].net = categories[category].income - categories[category].expenses;
     categories[category].count++;
     categories[category].transactions.push(transaction);
   });
@@ -158,15 +150,7 @@ export const groupTransactionsByCategory = (transactions) => {
 };
 
 export const groupTransactionsByWeekday = (transactions) => {
-  const days = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
+  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
   const patterns = days.map((day, index) => ({
     day,
@@ -190,8 +174,7 @@ export const groupTransactionsByWeekday = (transactions) => {
           patterns[dayIndex].expenses += Math.abs(transaction.amount);
         }
 
-        patterns[dayIndex].net =
-          patterns[dayIndex].income - patterns[dayIndex].expenses;
+        patterns[dayIndex].net = patterns[dayIndex].income - patterns[dayIndex].expenses;
         patterns[dayIndex].count++;
         patterns[dayIndex].transactions.push(transaction);
       }
@@ -208,11 +191,7 @@ export const analyzeEnvelopeSpending = (transactions, envelopes) => {
   const spending = {};
 
   transactions.forEach((transaction) => {
-    if (
-      !validateTransaction(transaction) ||
-      transaction.amount >= 0 ||
-      !transaction.envelopeId
-    ) {
+    if (!validateTransaction(transaction) || transaction.amount >= 0 || !transaction.envelopeId) {
       return;
     }
 
@@ -250,8 +229,7 @@ export const analyzeEnvelopeHealth = (envelopes) => {
   return envelopes.filter(validateEnvelope).map((envelope) => {
     const monthlyBudget = envelope.monthlyAmount || 0;
     const currentBalance = envelope.currentBalance || 0;
-    const spent =
-      envelope.spendingHistory?.reduce((sum, s) => sum + s.amount, 0) || 0;
+    const spent = envelope.spendingHistory?.reduce((sum, s) => sum + s.amount, 0) || 0;
 
     const healthScore = safeDivision(currentBalance, monthlyBudget, 1) * 100;
     let status = "healthy";
@@ -296,7 +274,7 @@ export const _calculateFinancialMetrics = (transactions, envelopes) => {
       ? safeDivision(
           monthlyData.reduce((sum, m) => sum + m.income, 0),
           monthlyData.length,
-          0,
+          0
         )
       : 0;
 
@@ -305,7 +283,7 @@ export const _calculateFinancialMetrics = (transactions, envelopes) => {
       ? safeDivision(
           monthlyData.reduce((sum, m) => sum + m.expenses, 0),
           monthlyData.length,
-          0,
+          0
         )
       : 0;
 
@@ -318,8 +296,7 @@ export const _calculateFinancialMetrics = (transactions, envelopes) => {
     .filter(validateEnvelope)
     .reduce((sum, env) => sum + (env.currentBalance || 0), 0);
 
-  const budgetUtilization =
-    safeDivision(totalExpenses, totalEnvelopeBudget, 0) * 100;
+  const budgetUtilization = safeDivision(totalExpenses, totalEnvelopeBudget, 0) * 100;
 
   return {
     totalIncome,
@@ -376,22 +353,13 @@ export const calculateTrends = (monthlyData) => {
 
 // Export processing
 export const prepareDataForExport = (analyticsData, format = "csv") => {
-  const { monthlyTrends, categoryBreakdown, envelopeSpending, metrics } =
-    analyticsData;
+  const { monthlyTrends, categoryBreakdown, envelopeSpending, metrics } = analyticsData;
 
   if (format === "csv") {
     const csvData = [];
 
     // Headers
-    csvData.push([
-      "Type",
-      "Period/Name",
-      "Income",
-      "Expenses",
-      "Net",
-      "Count",
-      "Category",
-    ]);
+    csvData.push(["Type", "Period/Name", "Income", "Expenses", "Net", "Count", "Category"]);
 
     // Monthly data
     monthlyTrends.forEach((month) => {

@@ -37,13 +37,9 @@ export class BaseMutex {
       new Promise((_, reject) =>
         setTimeout(
           () =>
-            reject(
-              new Error(
-                `Mutex acquire timed out for ${operationName} after ${timeoutMs}ms`,
-              ),
-            ),
-          timeoutMs,
-        ),
+            reject(new Error(`Mutex acquire timed out for ${operationName} after ${timeoutMs}ms`)),
+          timeoutMs
+        )
       ),
     ]);
   }
@@ -58,9 +54,7 @@ export class BaseMutex {
     }
 
     const duration = Date.now() - this.lockStartTime;
-    logger.debug(
-      `🔓 ${this.name}: ${this.currentOperation} released (${duration}ms)`,
-    );
+    logger.debug(`🔓 ${this.name}: ${this.currentOperation} released (${duration}ms)`);
 
     this.locked = false;
     this.currentOperation = null;
@@ -84,22 +78,15 @@ export class BaseMutex {
     logger.debug(`🔧 ${this.name}: Acquired lock for ${operationName}`);
 
     try {
-      logger.debug(
-        `🔧 ${this.name}: About to call function for ${operationName}`,
-      );
+      logger.debug(`🔧 ${this.name}: About to call function for ${operationName}`);
       const result = await fn();
       logger.debug(`🔧 ${this.name}: Function completed for ${operationName}`);
       return result;
     } catch (error) {
-      logger.error(
-        `🔧 ${this.name}: Function failed for ${operationName}:`,
-        error,
-      );
+      logger.error(`🔧 ${this.name}: Function failed for ${operationName}:`, error);
       throw error;
     } finally {
-      logger.debug(
-        `🔧 ${this.name}: About to release lock for ${operationName}`,
-      );
+      logger.debug(`🔧 ${this.name}: About to release lock for ${operationName}`);
       this.release();
       logger.debug(`🔧 ${this.name}: Lock released for ${operationName}`);
     }

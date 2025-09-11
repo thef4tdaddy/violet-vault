@@ -6,9 +6,7 @@ export const useTransactionAnalytics = (transactions = []) => {
       .filter((t) => t.amount > 0)
       .reduce((sum, t) => sum + t.amount, 0);
     const totalExpenses = Math.abs(
-      transactions
-        .filter((t) => t.amount < 0)
-        .reduce((sum, t) => sum + t.amount, 0),
+      transactions.filter((t) => t.amount < 0).reduce((sum, t) => sum + t.amount, 0)
     );
     const netAmount = transactions.reduce((sum, t) => sum + t.amount, 0);
     const transactionCount = transactions.length;

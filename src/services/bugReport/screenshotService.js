@@ -35,10 +35,7 @@ export class ScreenshotService {
         try {
           screenshot = await this.captureWithHtml2Canvas();
         } catch (error) {
-          logger.warn(
-            "html2canvas capture failed, using final fallback",
-            error,
-          );
+          logger.warn("html2canvas capture failed, using final fallback", error);
           screenshot = await this.captureFallbackMethod();
         }
       }
@@ -61,9 +58,8 @@ export class ScreenshotService {
    */
   static detectMobileDevice() {
     return (
-      /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-        navigator.userAgent,
-      ) || window.innerWidth <= 768
+      /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+      window.innerWidth <= 768
     );
   }
 
@@ -72,9 +68,7 @@ export class ScreenshotService {
    * @returns {Promise<string>}
    */
   static async captureWithDisplayMedia() {
-    logger.debug(
-      "Attempting native screen capture API (user interaction required)",
-    );
+    logger.debug("Attempting native screen capture API (user interaction required)");
 
     // This requires user permission and interaction
     const stream = await navigator.mediaDevices.getDisplayMedia({
@@ -121,10 +115,7 @@ export class ScreenshotService {
     logger.debug("Attempting html2canvas screen capture");
 
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(
-        () => reject(new Error("Screenshot timeout after 10 seconds")),
-        10000,
-      ),
+      setTimeout(() => reject(new Error("Screenshot timeout after 10 seconds")), 10000)
     );
 
     // Dynamically import html2canvas
@@ -165,7 +156,7 @@ export class ScreenshotService {
         onclone: (clonedDoc) => {
           // Remove potentially problematic elements
           const problematicElements = clonedDoc.querySelectorAll(
-            "iframe, embed, object, canvas[data-html2canvas-ignore]",
+            "iframe, embed, object, canvas[data-html2canvas-ignore]"
           );
           problematicElements.forEach((el) => el.remove());
         },
@@ -209,15 +200,9 @@ export class ScreenshotService {
       ctx.fillText(window.location.href, canvas.width / 2, 80);
 
       // Try to capture some visual elements
-      const activeTab = document.querySelector(
-        "[aria-selected='true'], .active, .selected",
-      );
+      const activeTab = document.querySelector("[aria-selected='true'], .active, .selected");
       if (activeTab) {
-        ctx.fillText(
-          `Active Tab: ${activeTab.textContent?.trim()}`,
-          canvas.width / 2,
-          110,
-        );
+        ctx.fillText(`Active Tab: ${activeTab.textContent?.trim()}`, canvas.width / 2, 110);
       }
 
       const fallbackDataUrl = canvas.toDataURL("image/png", 0.8);
@@ -241,12 +226,7 @@ export class ScreenshotService {
    */
   static async compressScreenshot(dataUrl, options = {}) {
     try {
-      const {
-        quality = 0.7,
-        maxWidth = 1920,
-        maxHeight = 1080,
-        format = "jpeg",
-      } = options;
+      const { quality = 0.7, maxWidth = 1920, maxHeight = 1080, format = "jpeg" } = options;
 
       logger.debug("Compressing screenshot", {
         quality,
