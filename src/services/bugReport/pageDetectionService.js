@@ -93,7 +93,7 @@ export class PageDetectionService {
       }
 
       return document.title || "Unknown";
-    } catch (_error) {
+    } catch {
       return "Unknown";
     }
   }
@@ -126,7 +126,7 @@ export class PageDetectionService {
       }
 
       return breadcrumbs;
-    } catch (_error) {
+    } catch {
       return [];
     }
   }
@@ -141,7 +141,7 @@ export class PageDetectionService {
         "main h1, section h1, .content h1, h1",
       );
       return mainHeading ? mainHeading.textContent?.trim() : null;
-    } catch (_error) {
+    } catch {
       return null;
     }
   }
@@ -171,7 +171,7 @@ export class PageDetectionService {
       }
 
       return location;
-    } catch (_error) {
+    } catch {
       return "Unknown";
     }
   }
@@ -201,7 +201,7 @@ export class PageDetectionService {
       }
 
       return null;
-    } catch (_error) {
+    } catch {
       return null;
     }
   }
