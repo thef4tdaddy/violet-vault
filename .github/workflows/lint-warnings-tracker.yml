@@ -29,6 +29,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # For scheduled runs, use develop branch to get latest workflow logic
+          ref: ${{ github.event_name == 'schedule' && 'develop' || github.ref }}
+          # This ensures scheduled runs get the latest delta calculation logic
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -174,7 +177,7 @@ jobs:
             <summary>View detailed warning breakdown</summary>
 
             The full warning analysis is available in the workflow summary.
-            You can also check the `.`github/data/lint-warnings.json` file for detailed breakdown by category and file.
+            You can also check the \`.github/data/lint-warnings.json\` file for detailed breakdown by category and file.
 
             </details>`;
 
@@ -197,8 +200,9 @@ jobs:
             echo "should_run_develop=true" >> $GITHUB_OUTPUT
             echo "📅 Running hourly check for develop branch"
             
-            # Run on main branch daily at 9 AM UTC
-            if [ "$HOUR" == "09" ]; then
+            # Run on main branch daily at 9 AM CST (15 UTC during DST, 14 UTC during standard time)
+            # For simplicity, using 15 UTC which is 9 AM CDT (summer time)
+            if [ "$HOUR" == "15" ]; then
               echo "should_run_main=true" >> $GITHUB_OUTPUT
               echo "📅 Running daily check for main branch"
             else
@@ -220,11 +224,11 @@ jobs:
             echo "Could not checkout develop branch, trying to create it from origin"
             git checkout -b develop origin/develop 2>/dev/null || echo "Failed to create develop branch"
           }
-          
+
           # Verify we're on develop and re-install deps if needed
           CURRENT_BRANCH=$(git branch --show-current)
           echo "Current branch: $CURRENT_BRANCH"
-          
+
           if [ "$CURRENT_BRANCH" = "develop" ]; then
             echo "✅ Successfully on develop branch"
             npm ci --silent
@@ -234,12 +238,12 @@ jobs:
             echo "❌ Failed to switch to develop branch, using fallback"
             echo '{"currentStatus":{"totalWarnings":0}}' > develop-warnings.json
           fi
-          
+
           DEVELOP_WARNINGS=$(cat develop-warnings.json | jq -r '.currentStatus.totalWarnings // 0')
           echo "Develop warnings: $DEVELOP_WARNINGS"
           echo "warnings=$DEVELOP_WARNINGS" >> $GITHUB_OUTPUT
 
-      - name: Get warnings for main branch  
+      - name: Get warnings for main branch
         if: steps.should_run.outputs.should_run_main == 'true'
         id: main_warnings
         run: |
@@ -249,11 +253,11 @@ jobs:
             echo "Could not checkout main branch, trying to create it from origin"
             git checkout -b main origin/main 2>/dev/null || echo "Failed to create main branch"
           }
-          
+
           # Verify we're on main and re-install deps if needed
           CURRENT_BRANCH=$(git branch --show-current)
           echo "Current branch: $CURRENT_BRANCH"
-          
+
           if [ "$CURRENT_BRANCH" = "main" ]; then
             echo "✅ Successfully on main branch"
             npm ci --silent
@@ -263,7 +267,7 @@ jobs:
             echo "❌ Failed to switch to main branch, using fallback"
             echo '{"currentStatus":{"totalWarnings":0}}' > main-warnings.json
           fi
-          
+
           MAIN_WARNINGS=$(cat main-warnings.json | jq -r '.currentStatus.totalWarnings // 0')
           echo "Main warnings: $MAIN_WARNINGS"
           echo "warnings=$MAIN_WARNINGS" >> $GITHUB_OUTPUT
@@ -274,8 +278,11 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            
-            // First, hide previous automation comments to prevent flooding
+
+            // First, get previous warnings from the last comment BEFORE hiding anything
+            let previousDevelopWarnings = null;
+            let previousMainWarnings = null;
+
             try {
               const comments = await github.rest.issues.listComments({
                 owner: context.repo.owner,
@@ -283,57 +290,141 @@ jobs:
                 issue_number: 568
               });
               
-              // Find previous automation comments (from GitHub Actions)
+              // Find the most recent automation comment to get previous values
+              const lastAutomationComment = comments.data
+                .filter(comment => 
+                  comment.user.login === 'github-actions[bot]' &&
+                  (comment.body.includes('## 📊 Lint Warnings Update') ||
+                   comment.body.includes('📊 Lint Warnings Update')) &&
+                  !comment.body.startsWith('<details>')
+                )
+                .pop(); // Get the most recent one
+              
+              if (lastAutomationComment) {
+                console.log('📋 Found previous comment for delta calculation');
+                const devMatch = lastAutomationComment.body.match(/\*\*Develop Branch:\*\* (\d+) warnings/);
+                const mainMatch = lastAutomationComment.body.match(/\*\*Main Branch:\*\* (\d+) warnings/);
+                
+                if (devMatch) previousDevelopWarnings = parseInt(devMatch[1]);
+                if (mainMatch) previousMainWarnings = parseInt(mainMatch[1]);
+                
+                console.log(`Previous values: Develop=${previousDevelopWarnings}, Main=${previousMainWarnings}`);
+              } else {
+                console.log('⚠️ No previous automation comment found for delta calculation');
+              }
+
+              // Now hide previous automation comments using GitHub's native hide outdated functionality
               const automationComments = comments.data.filter(comment => 
-                comment.user.login === 'github-actions[bot]'
+                comment.user.login === 'github-actions[bot]' &&
+                (comment.body.includes('## 📊 Lint Warnings Update') ||
+                 comment.body.includes('📊 Lint Warnings Update') ||
+                 comment.body.includes('📊 **Lint Warning Analysis**') ||
+                 comment.body.includes('🚀 **Lint Warnings Report**') ||
+                 comment.body.includes('Automated lint warning tracking')) &&
+                !comment.body.startsWith('<details>')
               );
               
-              // Hide the previous automation comments by minimizing them
+              // Hide the previous automation comments using GitHub's native hide functionality
               for (const comment of automationComments) {
                 try {
-                  await github.rest.issues.updateComment({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    comment_id: comment.id,
-                    body: `<details><summary>📊 Previous Lint Analysis (${new Date(comment.created_at).toLocaleDateString()})</summary>\n\n${comment.body}\n\n</details>`
+                  await github.graphql(`
+                    mutation($commentId: ID!) {
+                      minimizeComment(input: {
+                        subjectId: $commentId
+                        classifier: OUTDATED
+                      }) {
+                        minimizedComment {
+                          isMinimized
+                        }
+                      }
+                    }
+                  `, {
+                    commentId: comment.node_id
                   });
-                  console.log(`✅ Minimized previous comment #${comment.id}`);
+                  console.log(`✅ Marked comment #${comment.id} as outdated`);
                 } catch (updateError) {
-                  console.log(`⚠️ Could not minimize comment #${comment.id}:`, updateError.message);
+                  console.log(`⚠️ Could not hide comment #${comment.id}:`, updateError.message);
                 }
               }
             } catch (error) {
               console.log('⚠️ Could not process previous comments:', error.message);
             }
-            
+
             // Load template from markdown file
             const template = fs.readFileSync('.github/data/lint-warnings-comment.md', 'utf8');
-            
-            // Prepare template variables
-            const currentDate = new Date().toLocaleDateString('en-US', { 
+
+            // Prepare template variables with Americas/Chicago timezone
+            const now = new Date();
+
+            // Convert UTC to Central Time (UTC-6 standard, UTC-5 daylight)
+            const chicagoTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Chicago"}));
+
+            const currentDate = chicagoTime.toLocaleString('en-US', { 
               year: 'numeric', 
               month: 'long', 
               day: 'numeric',
               hour: '2-digit',
               minute: '2-digit',
-              timeZone: 'UTC'
+              timeZoneName: 'short'
             });
-            
+
+            console.log(`UTC Time: ${now.toISOString()}`);
+            console.log(`Chicago Time: ${currentDate}`);
+
             const developWarnings = '${{ steps.develop_warnings.outputs.warnings }}' || '0';
             const mainWarnings = '${{ steps.main_warnings.outputs.warnings }}' || '0';
-            
+
+            // Calculate deltas
+            const developDelta = previousDevelopWarnings !== null ? 
+              parseInt(developWarnings) - previousDevelopWarnings : null;
+            const mainDelta = previousMainWarnings !== null ? 
+              parseInt(mainWarnings) - previousMainWarnings : null;
+
+            console.log(`Delta calculation: Develop Δ=${developDelta}, Main Δ=${mainDelta}`);
+
+            // Check if we should skip posting (no changes)
+            const runningDevelop = '${{ steps.should_run.outputs.should_run_develop }}' === 'true';
+            const runningMain = '${{ steps.should_run.outputs.should_run_main }}' === 'true';
+
+            // Only skip if we have valid previous data and there are truly no changes
+            const shouldSkipPost = (
+              (runningDevelop && !runningMain && previousDevelopWarnings !== null && developDelta === 0) ||
+              (runningMain && !runningDevelop && previousMainWarnings !== null && mainDelta === 0) ||
+              (runningDevelop && runningMain && 
+               previousDevelopWarnings !== null && previousMainWarnings !== null &&
+               developDelta === 0 && mainDelta === 0)
+            );
+
+            if (shouldSkipPost) {
+              console.log('🔇 Skipping comment - no changes in warning counts');
+              console.log(`Develop: ${previousDevelopWarnings} → ${developWarnings} (Δ: ${developDelta})`);
+              console.log(`Main: ${previousMainWarnings} → ${mainWarnings} (Δ: ${mainDelta})`);
+              return;
+            }
+
+            console.log('📝 Posting comment - changes detected or first run');
+            console.log(`Running: Develop=${runningDevelop}, Main=${runningMain}`);
+            console.log(`Develop: ${previousDevelopWarnings} → ${developWarnings} (Δ: ${developDelta})`);
+            console.log(`Main: ${previousMainWarnings} → ${mainWarnings} (Δ: ${mainDelta})`);
+
             let branchInfo = '';
             if ('${{ steps.should_run.outputs.should_run_develop }}' === 'true') {
-              branchInfo += `**Develop Branch:** ${developWarnings} warnings\n`;
+              const deltaText = developDelta !== null ? 
+                (developDelta > 0 ? ` (+${developDelta})` : 
+                 developDelta < 0 ? ` (${developDelta})` : ' (no change)') : '';
+              branchInfo += `**Develop Branch:** ${developWarnings} warnings${deltaText}\n`;
             }
             if ('${{ steps.should_run.outputs.should_run_main }}' === 'true') {
-              branchInfo += `**Main Branch:** ${mainWarnings} warnings\n`;
+              const deltaText = mainDelta !== null ? 
+                (mainDelta > 0 ? ` (+${mainDelta})` : 
+                 mainDelta < 0 ? ` (${mainDelta})` : ' (no change)') : '';
+              branchInfo += `**Main Branch:** ${mainWarnings} warnings${deltaText}\n`;
             }
-            
+
             const statusMessage = developWarnings < 96 
               ? `✅ Develop improved: -${96 - developWarnings} from baseline (96)`
               : `⚠️ Develop increased: +${developWarnings - 96} from baseline (96)`;
-            
+
             // Read detailed warning data for develop branch
             let detailedInfo = '';
             try {
@@ -362,7 +453,7 @@ jobs:
                   
                   const topFiles = allFiles.sort((a, b) => b.warnings - a.warnings).slice(0, 10);
                   if (topFiles.length > 0) {
-                    detailedInfo += '\n\n### 🔥 Files with Most Warnings:\n';
+                    detailedInfo += '\n### 🔥 Files with Most Warnings:\n';
                     topFiles.forEach(file => {
                       const fileName = file.path.split('/').pop();
                       detailedInfo += `- **${fileName}**: ${file.warnings} warnings\n`;
@@ -371,7 +462,7 @@ jobs:
 
                   // Priority actions
                   if (developDetails.actionPlan && developDetails.actionPlan.highPriority && developDetails.actionPlan.highPriority.length > 0) {
-                    detailedInfo += '\n\n### ⚠️ High Priority Actions:\n';
+                    detailedInfo += '\n### ⚠️ High Priority Actions:\n';
                     developDetails.actionPlan.highPriority.slice(0, 3).forEach(task => {
                       detailedInfo += `- **${task.task}**: ${task.warningsAffected} warnings\n`;
                     });
