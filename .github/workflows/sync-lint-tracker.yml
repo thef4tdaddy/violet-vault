@@ -12,7 +12,7 @@ on:
       force_sync:
         description: 'Force sync even if no changes detected'
         required: false
-        default: 'false'
+        default: false
         type: boolean
 
 jobs:
@@ -66,18 +66,7 @@ jobs:
               echo "📝 Committing updated lint tracker workflow..."
               
               git add "$DEVELOP_FILE"
-              git commit -m "sync: update lint-warnings-tracker workflow from develop
-
-This automated sync ensures parity between main and develop branches
-for the lint tracking system.
-
-Source: develop branch
-Target: main branch
-Action: Sync lint-warnings-tracker.yml
-
-🤖 Generated with automated sync action
-
-Co-Authored-By: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+              git commit -m "sync: update lint-warnings-tracker workflow from develop [automated]"
               
               git push origin main
               echo "✅ Successfully synced lint tracker workflow to main branch!"
@@ -92,7 +81,7 @@ Co-Authored-By: github-actions[bot] <41898282+github-actions[bot]@users.noreply.
             
             if [ -n "$(git diff --name-only)" ]; then
               git add "$DEVELOP_FILE"
-              git commit -m "sync: force update lint-warnings-tracker workflow from develop"
+              git commit -m "sync: force update lint-warnings-tracker workflow from develop [automated]"
               git push origin main
               echo "✅ Force sync completed!"
             else
@@ -112,19 +101,9 @@ Co-Authored-By: github-actions[bot] <41898282+github-actions[bot]@users.noreply.
             // Check if sync was needed/performed
             const wasPerformed = process.env.GITHUB_STEP_SUMMARY?.includes('Successfully synced') || false;
             
-            const comment = `🔄 **Lint Tracker Workflow Sync Status** - ${new Date().toLocaleString('en-US', { 
-              timeZone: 'America/Chicago',
-              timeZoneName: 'short'
-            })}
-
-${wasPerformed ? '✅ **Sync Performed**: Lint tracker workflow updated on main branch from develop' : 'ℹ️ **No Sync Needed**: Workflows are already identical between branches'}
-
-**Monitored File**: \`.github/workflows/lint-warnings-tracker.yml\`
-**Source Branch**: develop  
-**Target Branch**: main
-**Trigger**: ${context.eventName === 'workflow_dispatch' ? 'Manual' : 'Automatic (file change detected)'}
-
-This ensures both branches have identical lint tracking capabilities with latest features and bug fixes.`;
+            const syncStatus = wasPerformed ? '✅ Sync Performed' : 'ℹ️ No Sync Needed';
+            const trigger = context.eventName === 'workflow_dispatch' ? 'Manual' : 'Automatic';
+            const comment = '🔄 **Lint Tracker Workflow Sync Status** - ' + new Date().toLocaleString('en-US', { timeZone: 'America/Chicago', timeZoneName: 'short' }) + '\n\n' + syncStatus + ': Lint tracker workflow sync completed\n\n**Monitored File**: `.github/workflows/lint-warnings-tracker.yml`\n**Trigger**: ' + trigger;
 
             // Post to issue #573 about the action improvements  
             try {
