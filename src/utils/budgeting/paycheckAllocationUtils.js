@@ -1,6 +1,6 @@
 import { BILL_CATEGORIES, ENVELOPE_TYPES } from "../../constants/categories";
 import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
-import logger from "../logger";
+import logger from "../common/logger";
 
 /**
  * Calculate paycheck allocation across envelopes
