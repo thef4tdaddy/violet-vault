@@ -291,14 +291,16 @@ jobs:
               });
               
               // Find the most recent automation comment to get previous values
+              // Look for both non-minimized and recent minimized comments
               const lastAutomationComment = comments.data
                 .filter(comment => 
                   comment.user.login === 'github-actions[bot]' &&
                   (comment.body.includes('## 📊 Lint Warnings Update') ||
-                   comment.body.includes('📊 Lint Warnings Update')) &&
-                  !comment.body.startsWith('<details>')
+                   comment.body.includes('📊 Lint Warnings Update') ||
+                   comment.body.includes('**Develop Branch:**') ||
+                   comment.body.includes('**Main Branch:**'))
                 )
-                .pop(); // Get the most recent one
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0]; // Get the most recent one by date
               
               if (lastAutomationComment) {
                 console.log('📋 Found previous comment for delta calculation');
@@ -320,8 +322,11 @@ jobs:
                  comment.body.includes('📊 Lint Warnings Update') ||
                  comment.body.includes('📊 **Lint Warning Analysis**') ||
                  comment.body.includes('🚀 **Lint Warnings Report**') ||
-                 comment.body.includes('Automated lint warning tracking')) &&
-                !comment.body.startsWith('<details>')
+                 comment.body.includes('Automated lint warning tracking') ||
+                 comment.body.includes('**Develop Branch:**') ||
+                 comment.body.includes('**Main Branch:**')) &&
+                !comment.body.startsWith('<details>') &&
+                comment.id !== lastAutomationComment?.id // Don't hide the comment we just used for delta calculation
               );
               
               // Hide the previous automation comments using GitHub's native hide functionality
