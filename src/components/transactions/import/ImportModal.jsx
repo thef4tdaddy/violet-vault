@@ -1,5 +1,5 @@
 import React from "react";
-import { X } from "lucide-react";
+import { getIcon } from "../../../utils";
 import FileUploader from "./FileUploader";
 import FieldMapper from "./FieldMapper";
 import ImportProgress from "./ImportProgress";
@@ -34,7 +34,7 @@ const ImportModal = ({
             onClick={handleClose}
             className="text-gray-400 hover:text-gray-600"
           >
-            <X className="h-6 w-6" />
+            {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
           </button>
         </div>
 

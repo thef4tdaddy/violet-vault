@@ -1,5 +1,5 @@
 import React from "react";
-import { Edit3, Trash2, Scissors, History } from "lucide-react";
+import { getIcon } from "../../../utils";
 import {
   COLUMN_WIDTHS,
   findEnvelopeForTransaction,
@@ -98,7 +98,7 @@ const TransactionRow = ({
               className="p-1 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded transition-colors"
               title="Split transaction"
             >
-              <Scissors className="h-4 w-4" />
+              {React.createElement(getIcon("Scissors"), { className: "h-4 w-4" })}
             </button>
           )}
           <button
@@ -106,21 +106,21 @@ const TransactionRow = ({
             className="p-1 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
             title="View history"
           >
-            <History className="h-4 w-4" />
+            {React.createElement(getIcon("History"), { className: "h-4 w-4" })}
           </button>
           <button
             onClick={() => onEdit(transaction)}
             className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
             title="Edit transaction"
           >
-            <Edit3 className="h-4 w-4" />
+            {React.createElement(getIcon("Edit3"), { className: "h-4 w-4" })}
           </button>
           <button
             onClick={() => onDeleteClick(transaction)}
             className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
             title="Delete transaction"
           >
-            <Trash2 className="h-4 w-4" />
+            {React.createElement(getIcon("Trash2"), { className: "h-4 w-4" })}
           </button>
         </div>
       </td>
