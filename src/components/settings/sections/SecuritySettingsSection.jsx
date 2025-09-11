@@ -20,9 +20,7 @@ const SecuritySettingsSection = ({
               <Lock className="h-5 w-5 text-gray-600 mr-3" />
               <div className="text-left">
                 <p className="font-medium text-gray-900">Lock Application</p>
-                <p className="text-sm text-gray-500">
-                  Immediately lock the app
-                </p>
+                <p className="text-sm text-gray-500">Immediately lock the app</p>
               </div>
             </button>
 
@@ -33,9 +31,7 @@ const SecuritySettingsSection = ({
               <Shield className="h-5 w-5 text-gray-600 mr-3" />
               <div className="text-left">
                 <p className="font-medium text-gray-900">Advanced Security</p>
-                <p className="text-sm text-gray-500">
-                  Auto-lock, logging, and privacy
-                </p>
+                <p className="text-sm text-gray-500">Auto-lock, logging, and privacy</p>
               </div>
             </button>
 

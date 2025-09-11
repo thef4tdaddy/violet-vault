@@ -24,11 +24,7 @@ const StepNavigation = ({ currentStep, onStepChange }) => {
             }`}
             onClick={() => onStepChange?.(step.number)}
           >
-            {step.number < currentStep ? (
-              <Check className="h-4 w-4" />
-            ) : (
-              step.number
-            )}
+            {step.number < currentStep ? <Check className="h-4 w-4" /> : step.number}
           </div>
         ))}
       </div>

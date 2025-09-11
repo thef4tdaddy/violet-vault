@@ -7,12 +7,7 @@ import {
   SAVINGS_COLORS,
 } from "../../utils/savings/savingsFormUtils";
 
-const AddEditGoalModal = ({
-  isOpen,
-  onClose,
-  onSubmit,
-  editingGoal = null,
-}) => {
+const AddEditGoalModal = ({ isOpen, onClose, onSubmit, editingGoal = null }) => {
   const [formData, setFormData] = useState({
     name: "",
     targetAmount: "",
@@ -57,11 +52,7 @@ const AddEditGoalModal = ({
     e.preventDefault();
 
     // Basic validation
-    if (
-      !formData.name.trim() ||
-      !formData.targetAmount ||
-      parseFloat(formData.targetAmount) <= 0
-    ) {
+    if (!formData.name.trim() || !formData.targetAmount || parseFloat(formData.targetAmount) <= 0) {
       return;
     }
 
@@ -102,10 +93,7 @@ const AddEditGoalModal = ({
           <h3 className="text-xl font-semibold">
             {editingGoal ? "Edit Savings Goal" : "Add New Savings Goal"}
           </h3>
-          <button
-            onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
+          <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
             <X className="h-6 w-6" />
           </button>
         </div>
@@ -114,15 +102,11 @@ const AddEditGoalModal = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Goal Name */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Goal Name *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Goal Name *</label>
               <input
                 type="text"
                 value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                 placeholder="e.g., Emergency Fund, Vacation, New Car"
                 required
@@ -138,9 +122,7 @@ const AddEditGoalModal = ({
                 type="number"
                 step="0.01"
                 value={formData.targetAmount}
-                onChange={(e) =>
-                  setFormData({ ...formData, targetAmount: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, targetAmount: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                 placeholder="0.00"
                 required
@@ -149,9 +131,7 @@ const AddEditGoalModal = ({
 
             {/* Current Amount */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Current Amount
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Current Amount</label>
               <input
                 type="number"
                 step="0.01"
@@ -175,23 +155,17 @@ const AddEditGoalModal = ({
               <input
                 type="date"
                 value={formData.targetDate}
-                onChange={(e) =>
-                  setFormData({ ...formData, targetDate: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, targetDate: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
               />
             </div>
 
             {/* Priority */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Priority
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
               <select
                 value={formData.priority}
-                onChange={(e) =>
-                  setFormData({ ...formData, priority: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
               >
                 {SAVINGS_PRIORITIES.map((priority) => (
@@ -204,14 +178,10 @@ const AddEditGoalModal = ({
 
             {/* Category */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Category
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
               <select
                 value={formData.category}
-                onChange={(e) =>
-                  setFormData({ ...formData, category: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
               >
                 {SAVINGS_CATEGORIES.map((category) => (
@@ -224,9 +194,7 @@ const AddEditGoalModal = ({
 
             {/* Color */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Color
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
               <div className="flex gap-2 flex-wrap">
                 {SAVINGS_COLORS.map((color) => (
                   <button
@@ -234,9 +202,7 @@ const AddEditGoalModal = ({
                     type="button"
                     onClick={() => setFormData({ ...formData, color })}
                     className={`w-8 h-8 rounded-full border-2 ${
-                      formData.color === color
-                        ? "border-gray-800"
-                        : "border-gray-300"
+                      formData.color === color ? "border-gray-800" : "border-gray-300"
                     }`}
                     style={{ backgroundColor: color }}
                   />
@@ -251,9 +217,7 @@ const AddEditGoalModal = ({
               </label>
               <textarea
                 value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                 rows="3"
                 placeholder="Add any additional details about this savings goal..."

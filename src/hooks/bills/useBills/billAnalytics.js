@@ -7,9 +7,7 @@ import { useMemo } from "react";
 export const useBillAnalytics = (bills = []) => {
   return useMemo(() => {
     const now = new Date();
-    const thirtyDaysFromNow = new Date(
-      now.getTime() + 30 * 24 * 60 * 60 * 1000,
-    );
+    const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
     // Basic counts
     const totalBills = bills.length;
@@ -33,16 +31,12 @@ export const useBillAnalytics = (bills = []) => {
     });
 
     // Amount calculations
-    const totalAmount = bills.reduce(
-      (sum, bill) => sum + (parseFloat(bill.amount) || 0),
-      0,
-    );
+    const totalAmount = bills.reduce((sum, bill) => sum + (parseFloat(bill.amount) || 0), 0);
     const paidAmount = bills
       .filter((bill) => bill.isPaid)
       .reduce(
-        (sum, bill) =>
-          sum + (parseFloat(bill.paidAmount) || parseFloat(bill.amount) || 0),
-        0,
+        (sum, bill) => sum + (parseFloat(bill.paidAmount) || parseFloat(bill.amount) || 0),
+        0
       );
     const unpaidAmount = bills
       .filter((bill) => !bill.isPaid)
@@ -51,13 +45,13 @@ export const useBillAnalytics = (bills = []) => {
     // Overdue amount
     const overdueAmount = overdueBills.reduce(
       (sum, bill) => sum + (parseFloat(bill.amount) || 0),
-      0,
+      0
     );
 
     // Upcoming amount (next 30 days)
     const upcomingAmount = upcomingBills.reduce(
       (sum, bill) => sum + (parseFloat(bill.amount) || 0),
-      0,
+      0
     );
 
     // Category breakdown
@@ -99,9 +93,7 @@ export const useBillAnalytics = (bills = []) => {
  */
 export const useAvailableCategories = (bills = []) => {
   return useMemo(() => {
-    const categories = [
-      ...new Set(bills.map((bill) => bill.category).filter(Boolean)),
-    ];
+    const categories = [...new Set(bills.map((bill) => bill.category).filter(Boolean))];
     return categories.sort();
   }, [bills]);
 };
@@ -134,9 +126,7 @@ export const useBillUtilities = (bills = []) => {
             return dueDate < now;
           });
         case "upcoming": {
-          const thirtyDaysFromNow = new Date(
-            now.getTime() + 30 * 24 * 60 * 60 * 1000,
-          );
+          const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
           return bills.filter((bill) => {
             if (bill.isPaid) return false;
             if (!bill.dueDate) return false;

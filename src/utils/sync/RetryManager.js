@@ -1,11 +1,7 @@
 import logger from "../common/logger";
 import { shouldRetryError } from "./retryPolicies";
 import { calculateRetryDelay } from "./retryUtils";
-import {
-  createRetryMetrics,
-  updateRetryMetrics,
-  formatMetrics,
-} from "./retryMetrics";
+import { createRetryMetrics, updateRetryMetrics, formatMetrics } from "./retryMetrics";
 
 /**
  * RetryManager - Smart retry logic with exponential backoff
@@ -32,11 +28,7 @@ export class RetryManager {
         this._trackSuccess(attempt);
         return result;
       } catch (error) {
-        const shouldContinue = await this._handleFailure(
-          error,
-          config,
-          attempt,
-        );
+        const shouldContinue = await this._handleFailure(error, config, attempt);
         if (!shouldContinue) {
           throw error;
         }
@@ -102,7 +94,7 @@ export class RetryManager {
    */
   async _attemptOperation(operation, config, attempt) {
     logger.debug(
-      `🔄 ${this.name}: ${config.operationName} attempt ${attempt}/${config.maxRetries}`,
+      `🔄 ${this.name}: ${config.operationName} attempt ${attempt}/${config.maxRetries}`
     );
     return await operation();
   }
@@ -121,27 +113,22 @@ export class RetryManager {
    * @private
    */
   async _handleFailure(error, config, attempt) {
-    logger.warn(
-      `⚠️ ${this.name}: ${config.operationName} failed on attempt ${attempt}`,
-      {
-        error: error.message,
-        errorType: error.constructor.name,
-        attempt,
-        maxRetries: config.maxRetries,
-      },
-    );
+    logger.warn(`⚠️ ${this.name}: ${config.operationName} failed on attempt ${attempt}`, {
+      error: error.message,
+      errorType: error.constructor.name,
+      attempt,
+      maxRetries: config.maxRetries,
+    });
 
     if (attempt === config.maxRetries || !shouldRetryError(error)) {
       logger.error(
-        `❌ ${this.name}: ${config.operationName} failed after ${config.maxRetries} attempts`,
+        `❌ ${this.name}: ${config.operationName} failed after ${config.maxRetries} attempts`
       );
       return false;
     }
 
     const delay = calculateRetryDelay(attempt, config);
-    logger.debug(
-      `⏳ ${this.name}: Waiting ${delay}ms before retry ${attempt + 1}`,
-    );
+    logger.debug(`⏳ ${this.name}: Waiting ${delay}ms before retry ${attempt + 1}`);
 
     await delay(delay);
     return true;

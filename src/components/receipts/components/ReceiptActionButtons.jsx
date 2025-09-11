@@ -13,8 +13,7 @@ const ReceiptActionButtons = ({ extractedData, onReset, onConfirm }) => {
         className="glassmorphism flex-1 px-6 py-3 rounded-lg transition-colors border-2 border-black bg-gray-200/40 hover:bg-gray-300/40 backdrop-blur-sm"
       >
         <span className="font-black text-black">
-          <span className="text-base">S</span>CAN{" "}
-          <span className="text-base">A</span>NOTHER
+          <span className="text-base">S</span>CAN <span className="text-base">A</span>NOTHER
         </span>
       </button>
       <button
@@ -23,8 +22,7 @@ const ReceiptActionButtons = ({ extractedData, onReset, onConfirm }) => {
         disabled={!hasMinimumExtractedData(extractedData)}
       >
         <span className="font-black text-white">
-          <span className="text-base">C</span>REATE{" "}
-          <span className="text-base">T</span>RANSACTION
+          <span className="text-base">C</span>REATE <span className="text-base">T</span>RANSACTION
         </span>
       </button>
     </div>

@@ -49,20 +49,20 @@ const _validateDataSizes = (encryptedData, operation, errors, warnings) => {
     // Check minimum sizes (prevents "data too small" errors)
     if (dataLength < VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH) {
       errors.push(
-        `Encrypted data too small: ${dataLength} bytes (minimum: ${VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH})`,
+        `Encrypted data too small: ${dataLength} bytes (minimum: ${VALIDATION_CONSTANTS.MIN_ENCRYPTED_DATA_LENGTH})`
       );
     }
 
     if (ivLength < VALIDATION_CONSTANTS.MIN_IV_LENGTH) {
       errors.push(
-        `IV too small: ${ivLength} bytes (minimum: ${VALIDATION_CONSTANTS.MIN_IV_LENGTH})`,
+        `IV too small: ${ivLength} bytes (minimum: ${VALIDATION_CONSTANTS.MIN_IV_LENGTH})`
       );
     }
 
     // Check maximum sizes (prevent memory exhaustion)
     if (dataLength > VALIDATION_CONSTANTS.MAX_MANIFEST_SIZE) {
       errors.push(
-        `Encrypted data too large: ${dataLength} bytes (maximum: ${VALIDATION_CONSTANTS.MAX_MANIFEST_SIZE})`,
+        `Encrypted data too large: ${dataLength} bytes (maximum: ${VALIDATION_CONSTANTS.MAX_MANIFEST_SIZE})`
       );
     }
 

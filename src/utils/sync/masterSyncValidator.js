@@ -20,13 +20,11 @@ const runCorruptionDetectionAndRecovery = async () => {
       name: "Recovery Function Availability",
       description: "Check if corruption recovery tools are available",
       status:
-        typeof window !== "undefined" &&
-        typeof window.forceCloudDataReset === "function"
+        typeof window !== "undefined" && typeof window.forceCloudDataReset === "function"
           ? "passed"
           : "failed",
       details:
-        typeof window !== "undefined" &&
-        typeof window.forceCloudDataReset === "function"
+        typeof window !== "undefined" && typeof window.forceCloudDataReset === "function"
           ? "✅ Recovery function available"
           : "❌ Recovery function not available",
     });
@@ -152,9 +150,7 @@ const runCorruptionDetectionAndRecovery = async () => {
   const passedCount = results.filter((r) => r.status === "passed").length;
   const failedCount = results.filter((r) => r.status === "failed").length;
 
-  logger.info(
-    `🚨 Corruption check complete: ${passedCount}✅ ${failedCount}❌`,
-  );
+  logger.info(`🚨 Corruption check complete: ${passedCount}✅ ${failedCount}❌`);
   if (failedCount > 0) {
     logger.warn("⚠️  Corruption issues detected - check results for details");
   } else {
@@ -203,9 +199,7 @@ export const runMasterSyncValidation = async () => {
     };
 
     // Skip the hanging phases for now - they all depend on the problematic sync functions
-    logger.info(
-      "\n⚠️  SKIPPING PHASES 2-4: These phases contain hanging functions",
-    );
+    logger.info("\n⚠️  SKIPPING PHASES 2-4: These phases contain hanging functions");
     logger.info("- Flow Validation (uses hanging sync operations)");
     logger.info("- Edge Case Testing (uses hanging sync operations)");
     logger.info("- Corruption Detection (uses hanging sync operations)");
@@ -235,24 +229,18 @@ export const runMasterSyncValidation = async () => {
   const healthFailed = allResults.healthCheck?.failed || 0;
 
   // Count flow validation results
-  const flowPassed =
-    allResults.flowValidation?.filter((r) => r.status.includes("✅")).length ||
-    0;
+  const flowPassed = allResults.flowValidation?.filter((r) => r.status.includes("✅")).length || 0;
   const flowFailed = allResults.flowValidation?.length - flowPassed || 0;
 
   // Count edge case results
-  const edgePassed =
-    allResults.edgeCases?.filter((r) => r.status === "passed").length || 0;
-  const edgeFailed =
-    allResults.edgeCases?.filter((r) => r.status === "failed").length || 0;
+  const edgePassed = allResults.edgeCases?.filter((r) => r.status === "passed").length || 0;
+  const edgeFailed = allResults.edgeCases?.filter((r) => r.status === "failed").length || 0;
 
   // Count corruption check results
   const corruptionPassed =
-    allResults.corruptionCheck?.filter((r) => r.status === "passed").length ||
-    0;
+    allResults.corruptionCheck?.filter((r) => r.status === "passed").length || 0;
   const corruptionFailed =
-    allResults.corruptionCheck?.filter((r) => r.status === "failed").length ||
-    0;
+    allResults.corruptionCheck?.filter((r) => r.status === "failed").length || 0;
 
   allResults.summary = {
     totalTests:
@@ -285,7 +273,7 @@ export const runMasterSyncValidation = async () => {
   logger.info("=".repeat(60));
 
   const passRate = Math.round(
-    (allResults.summary.totalPassed / allResults.summary.totalTests) * 100,
+    (allResults.summary.totalPassed / allResults.summary.totalTests) * 100
   );
 
   logger.info("📊 FINAL SUMMARY:", {
@@ -302,24 +290,18 @@ export const runMasterSyncValidation = async () => {
   logger.info(`🔧 Health Check: ${healthPassed}✅ ${healthFailed}❌`);
   logger.info(`🔄 Flow Validation: ${flowPassed}✅ ${flowFailed}❌`);
   logger.info(`🧪 Edge Cases: ${edgePassed}✅ ${edgeFailed}❌`);
-  logger.info(
-    `🚨 Corruption Check: ${corruptionPassed}✅ ${corruptionFailed}❌`,
-  );
+  logger.info(`🚨 Corruption Check: ${corruptionPassed}✅ ${corruptionFailed}❌`);
 
   // Final Status
   if (allResults.summary.overallStatus === "ALL_SYSTEMS_GO") {
     logger.info("🎉 🎉 🎉 ALL SYSTEMS GO! 🎉 🎉 🎉");
-    logger.info(
-      "✅ Sync system is fully validated and ready for production use.",
-    );
+    logger.info("✅ Sync system is fully validated and ready for production use.");
     logger.info("✅ All data flows working correctly.");
     logger.info("✅ All edge cases handled properly.");
     logger.info("✅ No critical issues detected.");
   } else {
     logger.warn("⚠️  ISSUES DETECTED IN SYNC SYSTEM");
-    logger.warn(
-      `❌ ${allResults.summary.totalFailed} test(s) failed validation.`,
-    );
+    logger.warn(`❌ ${allResults.summary.totalFailed} test(s) failed validation.`);
     logger.warn("🔍 Please review failed tests above for details.");
     logger.warn("🛠️  Address issues before using sync in production.");
   }
@@ -354,9 +336,7 @@ export const getQuickSyncStatus = async () => {
 
     // Check 2: Cloud sync service availability
     try {
-      const { cloudSyncService } = await import(
-        "../../services/cloudSyncService"
-      );
+      const { cloudSyncService } = await import("../../services/cloudSyncService");
       const isRunning = Boolean(cloudSyncService);
       checks.push({
         name: "Cloud Sync Service",
@@ -374,11 +354,8 @@ export const getQuickSyncStatus = async () => {
     }
 
     // Check 3: Window functions availability
-    const windowFunctions = [
-      "runMasterSyncValidation",
-      "forceCloudDataReset",
-    ].filter(
-      (fn) => typeof window !== "undefined" && typeof window[fn] === "function",
+    const windowFunctions = ["runMasterSyncValidation", "forceCloudDataReset"].filter(
+      (fn) => typeof window !== "undefined" && typeof window[fn] === "function"
     );
     checks.push({
       name: "Window Functions",
@@ -389,9 +366,7 @@ export const getQuickSyncStatus = async () => {
 
     const isHealthy = failed === 0;
 
-    logger.info(
-      `🔧 Quick status: ${isHealthy ? "HEALTHY" : "ISSUES_DETECTED"} (${failed} failed)`,
-    );
+    logger.info(`🔧 Quick status: ${isHealthy ? "HEALTHY" : "ISSUES_DETECTED"} (${failed} failed)`);
 
     return {
       isHealthy,

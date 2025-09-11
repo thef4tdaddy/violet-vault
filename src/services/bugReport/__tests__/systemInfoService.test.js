@@ -155,8 +155,7 @@ describe("SystemInfoService", () => {
     });
 
     it("should return false for non-existent storage type", () => {
-      const available =
-        SystemInfoService.isStorageAvailable("nonExistentStorage");
+      const available = SystemInfoService.isStorageAvailable("nonExistentStorage");
       expect(available).toBe(false);
     });
   });

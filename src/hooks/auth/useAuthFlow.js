@@ -31,9 +31,7 @@ const useAuthFlow = () => {
       const isExistingUser = typeof userDataOrPassword === "string";
       const isSharedBudgetJoin =
         typeof userDataOrPassword === "object" && userDataOrPassword?.budgetId;
-      const password = isExistingUser
-        ? userDataOrPassword
-        : userDataOrPassword.password;
+      const password = isExistingUser ? userDataOrPassword : userDataOrPassword.password;
       const userData = isExistingUser ? null : userDataOrPassword;
 
       logger.auth("Layout handleSetup called", {
@@ -42,9 +40,7 @@ const useAuthFlow = () => {
         isSharedBudgetJoin,
         hasPassword: !!password,
       });
-      logger.auth(
-        "🚨 DEBUG VERSION 2: useAuthFlow.js with debug logging is running!",
-      );
+      logger.auth("🚨 DEBUG VERSION 2: useAuthFlow.js with debug logging is running!");
       try {
         // For existing users and shared budget joins, use existing data
         if (isExistingUser) {
@@ -89,9 +85,7 @@ const useAuthFlow = () => {
         }
 
         // New user path - generate budgetId and setup new account
-        const { encryptionUtils } = await import(
-          "../../utils/security/encryption"
-        );
+        const { encryptionUtils } = await import("../../utils/security/encryption");
 
         // NEW: Use provided share code for deterministic budget ID
         // This replaces the device-specific system with user-controlled share codes
@@ -99,14 +93,9 @@ const useAuthFlow = () => {
         // Use the share code that was generated and shown to the user in Step 3
         const shareCode = userData.shareCode;
         if (!shareCode) {
-          throw new Error(
-            "Share code missing from user data - should be provided by setup flow",
-          );
+          throw new Error("Share code missing from user data - should be provided by setup flow");
         }
-        const budgetId = await encryptionUtils.generateBudgetId(
-          password,
-          shareCode,
-        );
+        const budgetId = await encryptionUtils.generateBudgetId(password, shareCode);
 
         logger.auth("🔍 Generated new budget with share code system", {
           budgetIdPreview: budgetId.substring(0, 10) + "...",
@@ -163,7 +152,7 @@ const useAuthFlow = () => {
         showErrorToast(`Setup error: ${error.message}`, "Setup Error");
       }
     },
-    [login, showErrorToast],
+    [login, showErrorToast]
   );
 
   const handleLogout = useCallback(() => {
@@ -174,15 +163,12 @@ const useAuthFlow = () => {
     async (oldPass, newPass) => {
       const result = await changePassword(oldPass, newPass);
       if (!result.success) {
-        showErrorToast(
-          `Password change failed: ${result.error}`,
-          "Password Change Failed",
-        );
+        showErrorToast(`Password change failed: ${result.error}`, "Password Change Failed");
       } else {
         showSuccessToast("Password updated successfully", "Password Changed");
       }
     },
-    [changePassword, showErrorToast, showSuccessToast],
+    [changePassword, showErrorToast, showSuccessToast]
   );
 
   const handleUpdateProfile = useCallback(
@@ -192,7 +178,7 @@ const useAuthFlow = () => {
         throw new Error(result.error);
       }
     },
-    [updateProfile],
+    [updateProfile]
   );
 
   return {

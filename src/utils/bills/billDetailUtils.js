@@ -10,11 +10,7 @@
  * @param {number} customFrequency - Custom frequency multiplier
  * @returns {Date|null} Next due date or null if not applicable
  */
-export const calculateNextDueDate = (
-  currentDueDate,
-  frequency,
-  customFrequency = 1,
-) => {
+export const calculateNextDueDate = (currentDueDate, frequency, customFrequency = 1) => {
   if (!currentDueDate || frequency === "once") return null;
 
   const current = new Date(currentDueDate);
@@ -86,13 +82,9 @@ export const getBillPaymentStats = (bill) => {
   }
 
   const payments = bill.paymentHistory;
-  const totalPaid = payments.reduce(
-    (sum, payment) => sum + (payment.amount || 0),
-    0,
-  );
+  const totalPaid = payments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
   const paymentCount = payments.length;
-  const lastPayment =
-    payments.length > 0 ? payments[payments.length - 1] : null;
+  const lastPayment = payments.length > 0 ? payments[payments.length - 1] : null;
   const averagePayment = paymentCount > 0 ? totalPaid / paymentCount : 0;
 
   return {
@@ -112,9 +104,7 @@ export const billNeedsAttention = (bill) => {
   if (bill.status === "paid") return false;
   if (!bill.dueDate) return false;
 
-  const daysUntilDue = Math.ceil(
-    (new Date(bill.dueDate) - new Date()) / (1000 * 60 * 60 * 24),
-  );
+  const daysUntilDue = Math.ceil((new Date(bill.dueDate) - new Date()) / (1000 * 60 * 60 * 24));
   return daysUntilDue < 0 || (daysUntilDue <= 3 && daysUntilDue >= 0);
 };
 
@@ -127,9 +117,7 @@ export const getBillUrgencyScore = (bill) => {
   if (bill.status === "paid") return 0;
   if (!bill.dueDate) return 1;
 
-  const daysUntilDue = Math.ceil(
-    (new Date(bill.dueDate) - new Date()) / (1000 * 60 * 60 * 24),
-  );
+  const daysUntilDue = Math.ceil((new Date(bill.dueDate) - new Date()) / (1000 * 60 * 60 * 24));
 
   if (daysUntilDue < 0) return 100 + Math.abs(daysUntilDue); // Overdue bills get highest priority
   if (daysUntilDue <= 3) return 50 + (3 - daysUntilDue); // Due soon bills

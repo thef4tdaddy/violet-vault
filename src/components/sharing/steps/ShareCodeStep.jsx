@@ -5,13 +5,7 @@ import { renderIcon } from "../../../utils";
  * Share Code Step - Step 1 of join budget flow
  * Extracted from JoinBudgetModal to reduce complexity
  */
-const ShareCodeStep = ({
-  shareCode,
-  setShareCode,
-  onValidate,
-  onQRScan,
-  isValidating,
-}) => {
+const ShareCodeStep = ({ shareCode, setShareCode, onValidate, onQRScan, isValidating }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     onValidate();
@@ -42,9 +36,7 @@ const ShareCodeStep = ({
             </button>
           </div>
 
-          <p className="text-xs text-purple-900">
-            Enter 4 BIP39 words or scan a QR code
-          </p>
+          <p className="text-xs text-purple-900">Enter 4 BIP39 words or scan a QR code</p>
         </div>
       </div>
 

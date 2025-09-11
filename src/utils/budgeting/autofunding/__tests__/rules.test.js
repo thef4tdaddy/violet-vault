@@ -122,9 +122,7 @@ describe("autoFundingRules", () => {
 
       const result = validateRule(rule);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain(
-        "Fixed amount rules require a positive amount",
-      );
+      expect(result.errors).toContain("Fixed amount rules require a positive amount");
     });
 
     it("should validate percentage rules", () => {
@@ -137,9 +135,7 @@ describe("autoFundingRules", () => {
 
       const result = validateRule(rule);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain(
-        "Percentage rules require a percentage between 0 and 100",
-      );
+      expect(result.errors).toContain("Percentage rules require a percentage between 0 and 100");
     });
 
     it("should validate conditional rules", () => {
@@ -152,9 +148,7 @@ describe("autoFundingRules", () => {
 
       const result = validateRule(rule);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain(
-        "Conditional rules require at least one condition",
-      );
+      expect(result.errors).toContain("Conditional rules require at least one condition");
     });
 
     it("should validate target envelope selection", () => {
@@ -171,9 +165,7 @@ describe("autoFundingRules", () => {
 
       const result = validateRule(rule);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain(
-        "Single envelope rules require a target envelope",
-      );
+      expect(result.errors).toContain("Single envelope rules require a target envelope");
     });
   });
 

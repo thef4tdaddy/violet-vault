@@ -12,8 +12,7 @@ const GeneralSettingsSection = ({
   return (
     <div className="space-y-6">
       <h3 className="font-black text-black text-base">
-        <span className="text-lg">G</span>ENERAL{" "}
-        <span className="text-lg">S</span>ETTINGS
+        <span className="text-lg">G</span>ENERAL <span className="text-lg">S</span>ETTINGS
       </h3>
 
       {isLocalOnlyMode && (
@@ -41,9 +40,7 @@ const GeneralSettingsSection = ({
           <h4 className="font-medium text-purple-900">Cloud Sync</h4>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-purple-900">
-                Sync your data across devices
-              </p>
+              <p className="text-sm text-purple-900">Sync your data across devices</p>
               <p className="text-xs text-purple-700 mt-1">
                 Status: {cloudSyncEnabled ? "Enabled" : "Disabled"}
               </p>
@@ -69,9 +66,7 @@ const GeneralSettingsSection = ({
                 disabled={isSyncing}
                 className="flex items-center px-3 py-2 text-sm border-2 border-black bg-purple-200/60 rounded-lg hover:bg-purple-300/60 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <RefreshCw
-                  className={`h-4 w-4 mr-2 ${isSyncing ? "animate-spin" : ""}`}
-                />
+                <RefreshCw className={`h-4 w-4 mr-2 ${isSyncing ? "animate-spin" : ""}`} />
                 {isSyncing ? "Syncing..." : "Sync Now"}
               </button>
             </div>

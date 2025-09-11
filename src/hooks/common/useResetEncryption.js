@@ -5,11 +5,7 @@ export const useResetEncryption = () => {
   const resetEncryptionAndStartFresh = useCallback(() => {
     logger.info("Resetting encryption and starting fresh");
 
-    const keysToRemove = [
-      "envelopeBudgetData",
-      "userProfile",
-      "passwordLastChanged",
-    ];
+    const keysToRemove = ["envelopeBudgetData", "userProfile", "passwordLastChanged"];
 
     keysToRemove.forEach((key) => {
       localStorage.removeItem(key);

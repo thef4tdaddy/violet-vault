@@ -16,19 +16,14 @@ const HistoryHeader = ({ onClose }) => {
             position="right"
           />
         </h2>
-        <p className="text-gray-600 mt-1">
-          View and restore previous versions of your budget
-        </p>
+        <p className="text-gray-600 mt-1">View and restore previous versions of your budget</p>
 
         {/* Integrity Status Indicator */}
         <div className="mt-3">
           <IntegrityStatusIndicator />
         </div>
       </div>
-      <button
-        onClick={onClose}
-        className="text-gray-400 hover:text-gray-600 text-xl"
-      >
+      <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">
         ✕
       </button>
     </div>

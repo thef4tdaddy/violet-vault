@@ -26,7 +26,10 @@ const AccountFormModal = ({
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-3 flex-1">
             <h3 className="font-black text-black text-base">
-              <span className="text-lg">{editingAccount ? "E" : "A"}</span>{editingAccount ? "DIT" : "DD"} <span className="text-lg">{editingAccount ? "A" : "S"}</span>{editingAccount ? "CCOUNT" : "UPPLEMENTAL ACCOUNT"}
+              <span className="text-lg">{editingAccount ? "E" : "A"}</span>
+              {editingAccount ? "DIT" : "DD"}{" "}
+              <span className="text-lg">{editingAccount ? "A" : "S"}</span>
+              {editingAccount ? "CCOUNT" : "UPPLEMENTAL ACCOUNT"}
             </h3>
             {/* Edit Lock Status for existing accounts */}
             {editingAccount && lockLoading && (
@@ -78,10 +81,7 @@ const AccountFormModal = ({
                   Break
                 </button>
               )}
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
-            >
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
               {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
             </button>
           </div>
@@ -106,9 +106,7 @@ const AccountFormModal = ({
             <input
               type="text"
               value={accountForm.name}
-              onChange={(e) =>
-                setAccountForm({ ...accountForm, name: e.target.value })
-              }
+              onChange={(e) => setAccountForm({ ...accountForm, name: e.target.value })}
               disabled={editingAccount && !canEdit}
               className="w-full px-3 py-2 border-2 border-black rounded-lg focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
               placeholder="e.g., Health FSA 2024"
@@ -122,9 +120,7 @@ const AccountFormModal = ({
             </label>
             <select
               value={accountForm.type}
-              onChange={(e) =>
-                setAccountForm({ ...accountForm, type: e.target.value })
-              }
+              onChange={(e) => setAccountForm({ ...accountForm, type: e.target.value })}
               disabled={editingAccount && !canEdit}
               className="w-full px-3 py-2 border-2 border-black rounded-lg focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
             >
@@ -198,9 +194,7 @@ const AccountFormModal = ({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-purple-900 mb-2">
-              Color
-            </label>
+            <label className="block text-sm font-semibold text-purple-900 mb-2">Color</label>
             <div className="flex gap-2 flex-wrap">
               {ACCOUNT_COLORS.map((color) => (
                 <button
@@ -251,20 +245,14 @@ const AccountFormModal = ({
               disabled={editingAccount && !canEdit}
               className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-2 border-black rounded disabled:cursor-not-allowed"
             />
-            <label
-              htmlFor="isActive"
-              className="ml-2 block text-sm font-medium text-purple-900"
-            >
+            <label htmlFor="isActive" className="ml-2 block text-sm font-medium text-purple-900">
               Account is active
             </label>
           </div>
         </div>
 
         <div className="flex gap-3 mt-6">
-          <button
-            onClick={onClose}
-            className="flex-1 btn btn-secondary border-2 border-black"
-          >
+          <button onClick={onClose} className="flex-1 btn btn-secondary border-2 border-black">
             Cancel
           </button>
           <button

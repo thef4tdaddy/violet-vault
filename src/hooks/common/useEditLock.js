@@ -24,35 +24,28 @@ const useEditLock = (recordType, recordId, options = {}) => {
   useEffect(() => {
     if (!recordType || !recordId) return;
 
-    const unwatch = editLockService.watchLock(
-      recordType,
-      recordId,
-      (lockDoc) => {
-        setLock(lockDoc);
-        setIsLocked(!!lockDoc);
-        // Check ownership directly from the lock document using same ID logic as service
-        const currentUserId =
-          editLockService.currentUser?.id ||
-          editLockService.currentUser?.budgetId ||
-          `user_${editLockService.currentUser?.userName?.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase()}` ||
-          "anonymous";
-        setIsOwnLock(
-          lockDoc && currentUserId && lockDoc.userId === currentUserId,
-        );
+    const unwatch = editLockService.watchLock(recordType, recordId, (lockDoc) => {
+      setLock(lockDoc);
+      setIsLocked(!!lockDoc);
+      // Check ownership directly from the lock document using same ID logic as service
+      const currentUserId =
+        editLockService.currentUser?.id ||
+        editLockService.currentUser?.budgetId ||
+        `user_${editLockService.currentUser?.userName?.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase()}` ||
+        "anonymous";
+      setIsOwnLock(lockDoc && currentUserId && lockDoc.userId === currentUserId);
 
-        logger.debug("🔐 Lock state updated", {
-          recordType,
-          recordId,
-          hasLock: !!lockDoc,
-          lockUserId: lockDoc?.userId,
-          currentUserId,
-          lockUserName: lockDoc?.userName,
-          lockExpiresAt: lockDoc?.expiresAt,
-          isOwnLock:
-            lockDoc && currentUserId && lockDoc.userId === currentUserId,
-        });
-      },
-    );
+      logger.debug("🔐 Lock state updated", {
+        recordType,
+        recordId,
+        hasLock: !!lockDoc,
+        lockUserId: lockDoc?.userId,
+        currentUserId,
+        lockUserName: lockDoc?.userName,
+        lockExpiresAt: lockDoc?.expiresAt,
+        isOwnLock: lockDoc && currentUserId && lockDoc.userId === currentUserId,
+      });
+    });
 
     return () => {
       unwatch();
@@ -61,12 +54,7 @@ const useEditLock = (recordType, recordId, options = {}) => {
 
   // Auto-acquire lock if requested
   useEffect(() => {
-    if (
-      autoAcquire &&
-      recordType &&
-      recordId &&
-      (!isLocked || (!isOwnLock && lock))
-    ) {
+    if (autoAcquire && recordType && recordId && (!isLocked || (!isOwnLock && lock))) {
       acquireLock();
     }
   }, [autoAcquire, recordType, recordId, isLocked, isOwnLock, lock]);
@@ -191,15 +179,10 @@ const useEditLock = (recordType, recordId, options = {}) => {
 
     // Computed values
     timeRemaining: lock?.expiresAt
-      ? Math.max(
-          0,
-          (lock.expiresAt.toDate ? lock.expiresAt.toDate() : lock.expiresAt) -
-            new Date(),
-        )
+      ? Math.max(0, (lock.expiresAt.toDate ? lock.expiresAt.toDate() : lock.expiresAt) - new Date())
       : 0,
     isExpired: lock?.expiresAt
-      ? (lock.expiresAt.toDate ? lock.expiresAt.toDate() : lock.expiresAt) <=
-        new Date()
+      ? (lock.expiresAt.toDate ? lock.expiresAt.toDate() : lock.expiresAt) <= new Date()
       : false,
   };
 };

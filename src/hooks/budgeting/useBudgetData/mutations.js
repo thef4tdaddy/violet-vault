@@ -3,15 +3,8 @@
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  queryKeys,
-  optimisticHelpers,
-} from "../../../utils/common/queryClient";
-import {
-  budgetDb,
-  getBudgetMetadata,
-  setBudgetMetadata,
-} from "../../../db/budgetDb";
+import { queryKeys, optimisticHelpers } from "../../../utils/common/queryClient";
+import { budgetDb, getBudgetMetadata, setBudgetMetadata } from "../../../db/budgetDb";
 import logger from "../../../utils/common/logger.js";
 
 export const useBudgetMutations = () => {
@@ -91,18 +84,13 @@ export const useBudgetMutations = () => {
 
       // If this transaction is linked to a paycheck, delete the paycheck too
       if (transaction.paycheckId) {
-        logger.info(
-          "Transaction is linked to paycheck, deleting paycheck too",
-          {
-            transactionId,
-            paycheckId: transaction.paycheckId,
-          },
-        );
+        logger.info("Transaction is linked to paycheck, deleting paycheck too", {
+          transactionId,
+          paycheckId: transaction.paycheckId,
+        });
 
         try {
-          const paycheckRecord = await budgetDb.paycheckHistory.get(
-            transaction.paycheckId,
-          );
+          const paycheckRecord = await budgetDb.paycheckHistory.get(transaction.paycheckId);
           if (paycheckRecord) {
             // Reverse the balance changes
             const currentMetadata = await getBudgetMetadata();
@@ -110,13 +98,10 @@ export const useBudgetMutations = () => {
             const currentUnassignedCash = currentMetadata?.unassignedCash || 0;
 
             // Calculate new balances by reversing the paycheck
-            const newActualBalance =
-              currentActualBalance - paycheckRecord.amount;
+            const newActualBalance = currentActualBalance - paycheckRecord.amount;
             const unassignedCashChange =
-              paycheckRecord.unassignedCashAfter -
-              paycheckRecord.unassignedCashBefore;
-            const newUnassignedCash =
-              currentUnassignedCash - unassignedCashChange;
+              paycheckRecord.unassignedCashAfter - paycheckRecord.unassignedCashBefore;
+            const newUnassignedCash = currentUnassignedCash - unassignedCashChange;
 
             // Update budget metadata
             await setBudgetMetadata({
@@ -127,12 +112,9 @@ export const useBudgetMutations = () => {
             // Reverse envelope allocations if any
             if (paycheckRecord.envelopeAllocations?.length > 0) {
               for (const allocation of paycheckRecord.envelopeAllocations) {
-                const envelope = await budgetDb.envelopes.get(
-                  allocation.envelopeId,
-                );
+                const envelope = await budgetDb.envelopes.get(allocation.envelopeId);
                 if (envelope) {
-                  const newBalance =
-                    envelope.currentBalance - allocation.amount;
+                  const newBalance = envelope.currentBalance - allocation.amount;
                   await budgetDb.envelopes.update(allocation.envelopeId, {
                     currentBalance: Math.max(0, newBalance),
                   });

@@ -5,11 +5,7 @@ import { getIcon } from "../../../utils";
  * Paycheck allocation mode selector component
  * Radio button selection for allocation strategy
  */
-const PaycheckAllocationModes = ({
-  allocationMode,
-  onChange,
-  disabled = false,
-}) => {
+const PaycheckAllocationModes = ({ allocationMode, onChange, disabled = false }) => {
   return (
     <div>
       <label className="block text-sm font-semibold text-purple-900 mb-4">

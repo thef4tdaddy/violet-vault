@@ -152,8 +152,7 @@ describe("useTransactionUtils", () => {
     it("should calculate correct totals", () => {
       const { result } = renderHook(() => useTransactionUtils());
 
-      const totals =
-        result.current.calculateTransactionTotals(mockTransactions);
+      const totals = result.current.calculateTransactionTotals(mockTransactions);
 
       expect(totals.income).toBe(3000.0);
       expect(totals.expenses).toBe(85.25);
@@ -180,8 +179,7 @@ describe("useTransactionUtils", () => {
 
       const { result } = renderHook(() => useTransactionUtils());
 
-      const totals =
-        result.current.calculateTransactionTotals(incomeTransactions);
+      const totals = result.current.calculateTransactionTotals(incomeTransactions);
 
       expect(totals.income).toBe(1500);
       expect(totals.expenses).toBe(0);
@@ -193,8 +191,7 @@ describe("useTransactionUtils", () => {
     it("should group transactions by category", () => {
       const { result } = renderHook(() => useTransactionUtils());
 
-      const grouped =
-        result.current.groupTransactionsByCategory(mockTransactions);
+      const grouped = result.current.groupTransactionsByCategory(mockTransactions);
 
       expect(Object.keys(grouped)).toHaveLength(3);
       expect(grouped["Food"]).toHaveLength(1);
@@ -210,9 +207,7 @@ describe("useTransactionUtils", () => {
 
       const { result } = renderHook(() => useTransactionUtils());
 
-      const grouped = result.current.groupTransactionsByCategory(
-        transactionsWithoutCategory,
-      );
+      const grouped = result.current.groupTransactionsByCategory(transactionsWithoutCategory);
 
       expect(grouped["Uncategorized"]).toHaveLength(1);
       expect(grouped["Food"]).toHaveLength(1);
