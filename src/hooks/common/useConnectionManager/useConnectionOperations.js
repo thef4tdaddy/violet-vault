@@ -2,14 +2,55 @@
  * Connection operations logic for useConnectionManager
  * Extracted for better maintainability and ESLint compliance
  */
-import { budgetDb } from "../../../db/budgetDb";
 import useToast from "../useToast";
 import logger from "../../../utils/common/logger";
+
+const connectBill = async (entityId, targetId, envelopes, updateBill, addToast) => {
+  const targetEnvelope = envelopes.find((e) => e.id === targetId);
+  if (!targetEnvelope) throw new Error("Target envelope not found");
+
+  await updateBill(entityId, { envelopeId: targetId });
+
+  addToast({
+    type: "success",
+    title: "Connection Created",
+    message: `Bill connected to ${targetEnvelope.name}`,
+    duration: 3000,
+  });
+};
+
+const connectEnvelope = async (entityId, targetId, bills, updateBill, addToast) => {
+  const targetBill = bills.find((b) => b.id === targetId);
+  if (!targetBill) throw new Error("Target bill not found");
+
+  await updateBill(targetId, { envelopeId: entityId });
+
+  addToast({
+    type: "success",
+    title: "Connection Created",
+    message: `Connected to ${targetBill.provider}`,
+    duration: 3000,
+  });
+};
+
+const connectDebt = async (entityId, targetId, envelopes, updateDebt, addToast) => {
+  const targetEnvelopeForDebt = envelopes.find((e) => e.id === targetId);
+  if (!targetEnvelopeForDebt) throw new Error("Target envelope not found");
+
+  await updateDebt({ id: entityId, updates: { envelopeId: targetId } });
+
+  addToast({
+    type: "success",
+    title: "Connection Created",
+    message: `Debt connected to ${targetEnvelopeForDebt.name}`,
+    duration: 3000,
+  });
+};
 
 export const useConnectionOperations = () => {
   const { addToast } = useToast();
 
-  const handleConnect = async (entityType, entityId, targetId, currentEntity, envelopes, bills, debts, updateBill, updateDebt) => {
+  const handleConnect = async (entityType, entityId, targetId, currentEntity, envelopes, bills, _debts, updateBill, updateDebt) => {
     if (!targetId || !currentEntity) return { success: false };
 
     logger.debug("🔗 Creating connection", {
@@ -21,51 +62,15 @@ export const useConnectionOperations = () => {
 
     try {
       switch (entityType) {
-        case "bill": {
-          const targetEnvelope = envelopes.find((e) => e.id === targetId);
-          if (!targetEnvelope) throw new Error("Target envelope not found");
-
-          await updateBill(entityId, { envelopeId: targetId });
-
-          addToast({
-            type: "success",
-            title: "Connection Created",
-            message: `Bill connected to ${targetEnvelope.name}`,
-            duration: 3000,
-          });
+        case "bill":
+          await connectBill(entityId, targetId, envelopes, updateBill, addToast);
           break;
-        }
-
-        case "envelope": {
-          const targetBill = bills.find((b) => b.id === targetId);
-          if (!targetBill) throw new Error("Target bill not found");
-
-          await updateBill(targetId, { envelopeId: entityId });
-
-          addToast({
-            type: "success",
-            title: "Connection Created",
-            message: `Connected to ${targetBill.provider}`,
-            duration: 3000,
-          });
+        case "envelope":
+          await connectEnvelope(entityId, targetId, bills, updateBill, addToast);
           break;
-        }
-
-        case "debt": {
-          const targetEnvelopeForDebt = envelopes.find((e) => e.id === targetId);
-          if (!targetEnvelopeForDebt) throw new Error("Target envelope not found");
-
-          await updateDebt({ id: entityId, updates: { envelopeId: targetId } });
-
-          addToast({
-            type: "success",
-            title: "Connection Created",
-            message: `Debt connected to ${targetEnvelopeForDebt.name}`,
-            duration: 3000,
-          });
+        case "debt":
+          await connectDebt(entityId, targetId, envelopes, updateDebt, addToast);
           break;
-        }
-
         default:
           throw new Error(`Unknown entity type: ${entityType}`);
       }

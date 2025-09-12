@@ -47,72 +47,35 @@ const useConnectionManager = (entityType, entityId) => {
     debts
   );
 
-  // Handle connection creation with extracted operations
-  const handleConnectWrapper = async (targetId) => {
+  // Connection operations with state management
+  const connectWithState = async (targetId) => {
     if (!targetId || !currentEntity) return { success: false };
-
+    
     setIsConnecting(true);
     try {
-      const result = await handleConnect(
-        entityType,
-        entityId,
-        targetId,
-        currentEntity,
-        envelopes,
-        bills,
-        debts,
-        updateBill,
-        updateDebt
-      );
-      
-      if (result.success) {
-        setSelectedConnectionId("");
-      }
-      
+      const result = await handleConnect(entityType, entityId, targetId, currentEntity, envelopes, bills, debts, updateBill, updateDebt);
+      if (result.success) setSelectedConnectionId("");
       return result;
     } finally {
       setIsConnecting(false);
     }
   };
 
-  // Handle connection removal with extracted operations
-  const handleDisconnectWrapper = async () => {
+  const disconnectWithState = async () => {
     if (!currentEntity || currentConnections.length === 0) return { success: false };
-
+    
     setIsConnecting(true);
     try {
-      const result = await handleDisconnect(
-        entityType,
-        entityId,
-        currentConnections,
-        updateBill,
-        updateDebt
-      );
-      return result;
+      return await handleDisconnect(entityType, entityId, currentConnections, updateBill, updateDebt);
     } finally {
       setIsConnecting(false);
     }
   };
 
-  // Auto-populate envelope details when connecting to a bill
-  const handleAutoPopulateWrapper = async (billId) => {
-    await handleAutoPopulate(
-      entityType,
-      entityId,
-      billId,
-      bills,
-      currentEntity,
-      updateEnvelope
-    );
-  };
-
-  // Handle selection change with auto-populate logic
   const handleSelectionChange = async (targetId) => {
     setSelectedConnectionId(targetId);
-
-    // Auto-populate envelope when bill is selected
     if (entityType === "envelope" && targetId) {
-      await handleAutoPopulateWrapper(targetId);
+      await handleAutoPopulate(entityType, entityId, targetId, bills, currentEntity, updateEnvelope);
     }
   };
 
@@ -126,8 +89,8 @@ const useConnectionManager = (entityType, entityId) => {
     hasAvailableOptions,
 
     // Actions
-    handleConnect: () => handleConnectWrapper(selectedConnectionId),
-    handleDisconnect: handleDisconnectWrapper,
+    handleConnect: () => connectWithState(selectedConnectionId),
+    handleDisconnect: disconnectWithState,
     handleSelectionChange,
 
     // Utilities
