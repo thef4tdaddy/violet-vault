@@ -29,7 +29,11 @@ export const usePaycheckOperations = () => {
       const { budgetDb, getBudgetMetadata, setBudgetMetadata } = await import("../../db/budgetDb");
 
       // Calculate new balances and handle envelope reversals
-      const balances = await calculateReversedBalances(paycheckToDelete, budgetDb, getBudgetMetadata);
+      const balances = await calculateReversedBalances(
+        paycheckToDelete,
+        budgetDb,
+        getBudgetMetadata
+      );
 
       // Update budget metadata
       logger.info("Updating budget metadata", {

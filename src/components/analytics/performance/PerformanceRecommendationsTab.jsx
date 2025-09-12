@@ -33,17 +33,11 @@ const PerformanceRecommendationsTab = ({ recommendations }) => {
             key={index}
             className="bg-white/60 rounded-lg p-4 border border-white/20 flex items-start"
           >
-            <div className="mr-3 mt-0.5">
-              {renderRecommendationIcon(rec.type)}
-            </div>
+            <div className="mr-3 mt-0.5">{renderRecommendationIcon(rec.type)}</div>
             <div className="flex-1">
               <h4 className="font-medium text-gray-900 mb-2">{rec.title}</h4>
               <p className="text-gray-600 text-sm mb-2">{rec.message}</p>
-              {rec.action && (
-                <p className="text-purple-600 text-sm font-medium">
-                  🎯 {rec.action}
-                </p>
-              )}
+              {rec.action && <p className="text-purple-600 text-sm font-medium">🎯 {rec.action}</p>}
             </div>
           </div>
         ))

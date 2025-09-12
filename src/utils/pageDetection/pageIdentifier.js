@@ -2,11 +2,7 @@
  * Main page identification logic
  * Extracted from pageDetectionService.js to reduce complexity
  */
-import {
-  checkUrlPatterns,
-  checkTitlePatterns,
-  checkDomClassPatterns,
-} from "./pagePatterns.js";
+import { checkUrlPatterns, checkTitlePatterns, checkDomClassPatterns } from "./pagePatterns.js";
 import { detectFromActiveNavigation } from "./navigationDetector.js";
 import logger from "../common/logger.js";
 
@@ -16,10 +12,7 @@ import logger from "../common/logger.js";
 export const identifyCurrentPage = () => {
   try {
     // Strategy 1: URL path patterns (most reliable)
-    const urlResult = checkUrlPatterns(
-      window.location.pathname,
-      window.location.hash,
-    );
+    const urlResult = checkUrlPatterns(window.location.pathname, window.location.hash);
     if (urlResult) return urlResult;
 
     // Strategy 2: Active navigation indicators

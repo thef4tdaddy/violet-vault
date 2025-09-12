@@ -38,22 +38,26 @@ const useConnectionManager = (entityType, entityId) => {
   }, [entityType, entityId, bills, envelopes, debts]);
 
   // Get connection data using extracted hook
-  const { currentConnections, availableOptions, hasConnections, hasAvailableOptions } = useConnectionData(
-    entityType,
-    entityId,
-    currentEntity,
-    bills,
-    envelopes,
-    debts
-  );
+  const { currentConnections, availableOptions, hasConnections, hasAvailableOptions } =
+    useConnectionData(entityType, entityId, currentEntity, bills, envelopes, debts);
 
   // Connection operations with state management
   const connectWithState = async (targetId) => {
     if (!targetId || !currentEntity) return { success: false };
-    
+
     setIsConnecting(true);
     try {
-      const result = await handleConnect(entityType, entityId, targetId, currentEntity, envelopes, bills, debts, updateBill, updateDebt);
+      const result = await handleConnect(
+        entityType,
+        entityId,
+        targetId,
+        currentEntity,
+        envelopes,
+        bills,
+        debts,
+        updateBill,
+        updateDebt
+      );
       if (result.success) setSelectedConnectionId("");
       return result;
     } finally {
@@ -63,10 +67,16 @@ const useConnectionManager = (entityType, entityId) => {
 
   const disconnectWithState = async () => {
     if (!currentEntity || currentConnections.length === 0) return { success: false };
-    
+
     setIsConnecting(true);
     try {
-      return await handleDisconnect(entityType, entityId, currentConnections, updateBill, updateDebt);
+      return await handleDisconnect(
+        entityType,
+        entityId,
+        currentConnections,
+        updateBill,
+        updateDebt
+      );
     } finally {
       setIsConnecting(false);
     }
@@ -75,7 +85,14 @@ const useConnectionManager = (entityType, entityId) => {
   const handleSelectionChange = async (targetId) => {
     setSelectedConnectionId(targetId);
     if (entityType === "envelope" && targetId) {
-      await handleAutoPopulate(entityType, entityId, targetId, bills, currentEntity, updateEnvelope);
+      await handleAutoPopulate(
+        entityType,
+        entityId,
+        targetId,
+        bills,
+        currentEntity,
+        updateEnvelope
+      );
     }
   };
 

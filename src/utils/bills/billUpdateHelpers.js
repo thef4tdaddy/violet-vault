@@ -30,11 +30,7 @@ export const executeBillUpdate = async (bill, updateFunctions) => {
 /**
  * Process bulk operation with error tracking
  */
-export const processBulkOperation = async (
-  items,
-  operationName,
-  operationFn,
-) => {
+export const processBulkOperation = async (items, operationName, operationFn) => {
   let successCount = 0;
   let errorCount = 0;
   const errors = [];
@@ -73,17 +69,13 @@ export const calculateUpdateSummary = (selectedBills, changes) => {
     const change = changes[bill.id];
     return (
       change &&
-      (change.amount !== change.originalAmount ||
-        change.dueDate !== change.originalDueDate)
+      (change.amount !== change.originalAmount || change.dueDate !== change.originalDueDate)
     );
   });
 
   const totalAmountChange = changedBills.reduce((sum, bill) => {
     const change = changes[bill.id];
-    return (
-      sum +
-      (Math.abs(change?.amount || 0) - Math.abs(change?.originalAmount || 0))
-    );
+    return sum + (Math.abs(change?.amount || 0) - Math.abs(change?.originalAmount || 0));
   }, 0);
 
   return {
@@ -99,10 +91,7 @@ export const calculateUpdateSummary = (selectedBills, changes) => {
  */
 export const hasChanges = (change) => {
   if (!change) return false;
-  return (
-    change.amount !== change.originalAmount ||
-    change.dueDate !== change.originalDueDate
-  );
+  return change.amount !== change.originalAmount || change.dueDate !== change.originalDueDate;
 };
 
 /**
