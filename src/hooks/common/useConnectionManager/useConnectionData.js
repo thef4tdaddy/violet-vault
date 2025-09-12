@@ -4,7 +4,7 @@
  */
 import { useMemo } from "react";
 
-export const useConnectionData = (entityType, entityId, currentEntity, bills, envelopes, debts) => {
+export const useConnectionData = (entityType, entityId, currentEntity, bills, envelopes, _debts) => {
   // Get current connections based on entity type
   const currentConnections = useMemo(() => {
     if (!currentEntity) return [];
@@ -26,7 +26,7 @@ export const useConnectionData = (entityType, entityId, currentEntity, bills, en
       default:
         return [];
     }
-  }, [entityType, entityId, currentEntity, bills, envelopes, debts]);
+  }, [entityType, entityId, currentEntity, bills, envelopes]);
 
   // Get available options for new connections
   const availableOptions = useMemo(() => {
@@ -43,7 +43,7 @@ export const useConnectionData = (entityType, entityId, currentEntity, bills, en
       default:
         return [];
     }
-  }, [entityType, entityId, bills, envelopes, debts]);
+  }, [entityType, entityId, bills, envelopes]);
 
   return {
     currentConnections,
