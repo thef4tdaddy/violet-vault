@@ -14,6 +14,13 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { firebaseConfig } from "../utils/common/firebaseConfig";
 import logger from "../utils/common/logger";
+import {
+  validateLockPrerequisites,
+  createLockDocument,
+  handleExistingLock,
+  createExtendedLock,
+  handleLockError,
+} from "../utils/services/editLockHelpers";
 
 // Initialize Firebase app and firestore instance
 const app = initializeApp(firebaseConfig);
@@ -49,64 +56,37 @@ class EditLockService {
    * Attempt to acquire an edit lock
    */
   async acquireLock(recordType, recordId, options = {}) {
-    if (!this.budgetId || !this.currentUser) {
-      logger.warn("EditLockService not initialized");
-      return { success: false, reason: "not_initialized" };
-    }
-
-    // Check Firebase authentication
-    if (!auth.currentUser) {
-      logger.warn("❌ Edit locks unavailable - Firebase not authenticated");
-      return { success: true, reason: "locks_disabled" };
+    // Validate prerequisites
+    const validation = validateLockPrerequisites(this.budgetId, this.currentUser, auth);
+    if (!validation.valid) {
+      return validation.degraded 
+        ? { success: true, reason: validation.reason }
+        : { success: false, reason: validation.reason };
     }
 
     const lockId = `${recordType}_${recordId}`;
-    // Generate consistent user ID if not available
-    const userId =
-      this.currentUser.id ||
-      this.currentUser.budgetId ||
-      `user_${this.currentUser.userName?.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase()}` ||
-      "anonymous";
-
-    const lockDoc = {
-      recordType,
-      recordId,
-      budgetId: this.budgetId, // Add budgetId for context
-      userId: userId,
-      userName: this.currentUser.userName || "Unknown User",
-      acquiredAt: serverTimestamp(),
-      expiresAt: new Date(Date.now() + (options.duration || 60000)), // 60 seconds default
-      lastActivity: serverTimestamp(),
-      lockId,
-    };
+    const lockDoc = createLockDocument(recordType, recordId, this.budgetId, this.currentUser, options);
 
     try {
-      // Check for existing lock
+      // Check for existing lock and determine action
       const existingLock = await this.getLock(recordType, recordId);
-      if (existingLock && existingLock.userId !== this.currentUser.id) {
-        // Check if lock is expired
-        if (existingLock.expiresAt.toDate() > new Date()) {
-          return {
-            success: false,
-            reason: "locked_by_other",
-            lockedBy: existingLock.userName,
-            expiresAt: existingLock.expiresAt.toDate(),
-          };
-        } else {
-          // Lock expired, clean it up
-          await this.releaseLock(recordType, recordId);
-        }
-      } else if (existingLock && existingLock.userId === this.currentUser.id) {
-        // User already owns this lock - extend it and continue
+      const lockAction = await handleExistingLock(
+        existingLock,
+        this.currentUser,
+        () => this.releaseLock(recordType, recordId)
+      );
+
+      if (lockAction.action === "blocked") {
+        return lockAction.result;
+      }
+
+      if (lockAction.action === "extend_existing") {
+        // User already owns this lock - extend it
         logger.debug("🔓 Extending existing lock owned by current user", {
           recordType,
           recordId,
         });
-        const extendedLock = {
-          ...lockDoc, // Use the new lockDoc structure instead of existing
-          expiresAt: new Date(Date.now() + (options.duration || 60000)),
-          lastActivity: serverTimestamp(),
-        };
+        const extendedLock = createExtendedLock(lockDoc, options);
         await setDoc(doc(firestore, "locks", lockId), extendedLock);
         this.locks.set(lockId, extendedLock);
         this.startHeartbeat(lockId);
@@ -117,13 +97,9 @@ class EditLockService {
         };
       }
 
-      // Acquire the lock - using correct path per security rules
+      // Acquire new lock
       await setDoc(doc(firestore, "locks", lockId), lockDoc);
-
-      // Cache locally
       this.locks.set(lockId, lockDoc);
-
-      // Start heartbeat to extend lock while active
       this.startHeartbeat(lockId);
 
       logger.info("🔒 Lock acquired", {
@@ -134,22 +110,7 @@ class EditLockService {
 
       return { success: true, lockDoc };
     } catch (error) {
-      // Handle Firebase permission errors gracefully
-      if (
-        error.code === "permission-denied" ||
-        error.message?.includes("Missing or insufficient permissions")
-      ) {
-        logger.warn("❌ Edit locks unavailable - insufficient Firebase permissions", {
-          userId: this.currentUser?.id,
-          budgetId: this.budgetId?.slice(0, 8),
-        });
-        // Return success but indicate locks are disabled
-        return { success: true, reason: "locks_disabled", lockDoc: null };
-      }
-
-      logger.error("❌ Failed to acquire lock", error);
-      // For any other error, also gracefully degrade
-      return { success: true, reason: "locks_disabled", error: error.message };
+      return handleLockError(error, this.currentUser, this.budgetId);
     }
   }
 
@@ -339,7 +300,7 @@ class EditLockService {
    */
   cleanup() {
     // Stop all heartbeats
-    for (const [lockId, heartbeatInterval] of this.heartbeatIntervals) {
+    for (const [_lockId, heartbeatInterval] of this.heartbeatIntervals) {
       clearInterval(heartbeatInterval);
     }
     this.heartbeatIntervals.clear();
