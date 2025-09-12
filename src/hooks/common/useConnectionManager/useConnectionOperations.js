@@ -5,7 +5,13 @@
 import useToast from "../useToast";
 import logger from "../../../utils/common/logger";
 
-const connectBill = async (entityId, targetId, envelopes, updateBill, addToast) => {
+const connectBill = async (
+  entityId,
+  targetId,
+  envelopes,
+  updateBill,
+  addToast,
+) => {
   const targetEnvelope = envelopes.find((e) => e.id === targetId);
   if (!targetEnvelope) throw new Error("Target envelope not found");
 
@@ -19,7 +25,13 @@ const connectBill = async (entityId, targetId, envelopes, updateBill, addToast) 
   });
 };
 
-const connectEnvelope = async (entityId, targetId, bills, updateBill, addToast) => {
+const connectEnvelope = async (
+  entityId,
+  targetId,
+  bills,
+  updateBill,
+  addToast,
+) => {
   const targetBill = bills.find((b) => b.id === targetId);
   if (!targetBill) throw new Error("Target bill not found");
 
@@ -33,7 +45,13 @@ const connectEnvelope = async (entityId, targetId, bills, updateBill, addToast) 
   });
 };
 
-const connectDebt = async (entityId, targetId, envelopes, updateDebt, addToast) => {
+const connectDebt = async (
+  entityId,
+  targetId,
+  envelopes,
+  updateDebt,
+  addToast,
+) => {
   const targetEnvelopeForDebt = envelopes.find((e) => e.id === targetId);
   if (!targetEnvelopeForDebt) throw new Error("Target envelope not found");
 
@@ -50,7 +68,17 @@ const connectDebt = async (entityId, targetId, envelopes, updateDebt, addToast) 
 export const useConnectionOperations = () => {
   const { addToast } = useToast();
 
-  const handleConnect = async (entityType, entityId, targetId, currentEntity, envelopes, bills, _debts, updateBill, updateDebt) => {
+  const handleConnect = async (
+    entityType,
+    entityId,
+    targetId,
+    currentEntity,
+    envelopes,
+    bills,
+    _debts,
+    updateBill,
+    updateDebt,
+  ) => {
     if (!targetId || !currentEntity) return { success: false };
 
     logger.debug("🔗 Creating connection", {
@@ -63,13 +91,31 @@ export const useConnectionOperations = () => {
     try {
       switch (entityType) {
         case "bill":
-          await connectBill(entityId, targetId, envelopes, updateBill, addToast);
+          await connectBill(
+            entityId,
+            targetId,
+            envelopes,
+            updateBill,
+            addToast,
+          );
           break;
         case "envelope":
-          await connectEnvelope(entityId, targetId, bills, updateBill, addToast);
+          await connectEnvelope(
+            entityId,
+            targetId,
+            bills,
+            updateBill,
+            addToast,
+          );
           break;
         case "debt":
-          await connectDebt(entityId, targetId, envelopes, updateDebt, addToast);
+          await connectDebt(
+            entityId,
+            targetId,
+            envelopes,
+            updateDebt,
+            addToast,
+          );
           break;
         default:
           throw new Error(`Unknown entity type: ${entityType}`);
@@ -97,7 +143,13 @@ export const useConnectionOperations = () => {
     }
   };
 
-  const handleDisconnect = async (entityType, entityId, currentConnections, updateBill, updateDebt) => {
+  const handleDisconnect = async (
+    entityType,
+    entityId,
+    currentConnections,
+    updateBill,
+    updateDebt,
+  ) => {
     if (currentConnections.length === 0) return { success: false };
 
     logger.debug("🔗 Removing connection", {
@@ -122,7 +174,9 @@ export const useConnectionOperations = () => {
         case "envelope": {
           const connectedBillIds = currentConnections.map((c) => c.id);
           await Promise.all(
-            connectedBillIds.map((billId) => updateBill(billId, { envelopeId: null }))
+            connectedBillIds.map((billId) =>
+              updateBill(billId, { envelopeId: null }),
+            ),
           );
 
           addToast({

@@ -8,7 +8,14 @@ import logger from "../../../utils/common/logger";
 export const useAutoPopulate = () => {
   const { addToast } = useToast();
 
-  const handleAutoPopulate = async (entityType, entityId, billId, bills, currentEntity, updateEnvelope) => {
+  const handleAutoPopulate = async (
+    entityType,
+    entityId,
+    billId,
+    bills,
+    currentEntity,
+    updateEnvelope,
+  ) => {
     if (entityType !== "envelope" || !billId) return;
 
     const targetBill = bills.find((b) => b.id === billId);
