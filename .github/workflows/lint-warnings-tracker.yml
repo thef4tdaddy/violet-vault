@@ -263,50 +263,59 @@ jobs:
                 issue_number: 568
               });
               
-              // Find the most recent bot comment (check body content, not just user)
-              const lastBotComment = comments.data
+              // Find the most recent VISIBLE bot comment (not hidden in <details>)
+              const visibleBotComments = comments.data
                 .filter(comment => 
-                  comment.user.login === 'github-actions[bot]' && (
-                    comment.body.includes('**Develop Branch:**') || 
-                    comment.body.includes('**Main Branch:**') ||
-                    comment.body.includes('📊 Lint Warnings Update')
-                  )
+                  comment.user.login === 'github-actions[bot]' && 
+                  !comment.body.includes('<details><summary>') && // Not hidden
+                  (comment.body.includes('**Develop Branch:**') || 
+                   comment.body.includes('**Main Branch:**') ||
+                   comment.body.includes('📊 Lint Warnings Update'))
                 )
-                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+              
+              const lastBotComment = visibleBotComments[0];
               
               if (lastBotComment) {
                 console.log('📋 Found previous comment for delta calculation');
+                console.log(`Comment created: ${lastBotComment.created_at}`);
+                console.log(`Comment preview: ${lastBotComment.body.substring(0, 200)}...`);
                 
-                // More robust regex patterns to extract warning counts
-                const devMatch = lastBotComment.body.match(/\*\*Develop Branch:\*\*\s*(\d+)\s*warnings/i);
-                const mainMatch = lastBotComment.body.match(/\*\*Main Branch:\*\*\s*(\d+)\s*warnings/i);
+                // Enhanced regex patterns to handle different formats
+                const devMatch = lastBotComment.body.match(/\*\*Develop Branch:\*\*[^\d]*(\d+)\s*warnings/i) ||
+                                lastBotComment.body.match(/Develop[^\d]*(\d+)\s*warnings/i);
+                const mainMatch = lastBotComment.body.match(/\*\*Main Branch:\*\*[^\d]*(\d+)\s*warnings/i) ||
+                               lastBotComment.body.match(/Main[^\d]*(\d+)\s*warnings/i);
                 
                 if (devMatch) previousDevelopWarnings = parseInt(devMatch[1]);
                 if (mainMatch) previousMainWarnings = parseInt(mainMatch[1]);
                 
                 console.log(`Previous values extracted: Develop=${previousDevelopWarnings}, Main=${previousMainWarnings}`);
               } else {
-                console.log('⚠️ No previous bot comment found - this is likely the first run');
+                console.log('⚠️ No previous visible bot comment found - this is likely the first run');
               }
 
-              // Hide previous automation comments by wrapping in details/summary
-              const automationComments = comments.data.filter(comment => 
-                comment.user.login === 'github-actions[bot]' &&
-                (comment.body.includes('📊 Lint Warnings Update') ||
-                 comment.body.includes('**Develop Branch:**') ||
-                 comment.body.includes('**Main Branch:**')) &&
-                !comment.body.startsWith('<details>') &&
-                comment.id !== lastBotComment?.id // Don't hide the comment we just used
-              );
+              // Hide previous automation comments (keep only the last one visible)
+              const automationComments = comments.data
+                .filter(comment => 
+                  comment.user.login === 'github-actions[bot]' &&
+                  (comment.body.includes('📊 Lint Warnings Update') ||
+                   comment.body.includes('**Develop Branch:**') ||
+                   comment.body.includes('**Main Branch:**')) &&
+                  !comment.body.includes('<details><summary>') // Not already hidden
+                )
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)); // Newest first
               
-              // Hide previous comments using simple REST API update (more reliable than GraphQL)
-              for (const comment of automationComments) {
+              // Hide all except the most recent (which we'll use for delta calculation)
+              const commentsToHide = automationComments.slice(1); // Skip the first (newest) one
+              
+              for (const comment of commentsToHide) {
                 try {
                   await github.rest.issues.updateComment({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     comment_id: comment.id,
-                    body: `<details><summary>📊 Previous Lint Warnings Update (outdated)</summary>\n\n${comment.body}\n\n</details>`
+                    body: `<details><summary>📊 Previous Lint Update (${new Date(comment.created_at).toLocaleDateString()})</summary>\n\n${comment.body}\n\n</details>`
                   });
                   console.log(`✅ Minimized comment #${comment.id}`);
                 } catch (updateError) {
@@ -323,15 +332,13 @@ jobs:
             // Prepare template variables with Americas/Chicago timezone
             const now = new Date();
 
-            // Convert UTC to Central Time (UTC-6 standard, UTC-5 daylight)
-            const chicagoTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Chicago"}));
-
-            const currentDate = chicagoTime.toLocaleString('en-US', { 
+            const currentDate = now.toLocaleString('en-US', { 
               year: 'numeric', 
               month: 'long', 
               day: 'numeric',
               hour: '2-digit',
               minute: '2-digit',
+              timeZone: 'America/Chicago',
               timeZoneName: 'short'
             });
 
@@ -366,8 +373,9 @@ jobs:
 
             console.log('📝 Posting comment - changes detected or first run');
             console.log(`Running: Develop=${runningDevelop}, Main=${runningMain}`);
-            console.log(`Develop: ${previousDevelopWarnings} → ${developWarnings} (Δ: ${developDelta})`);
-            console.log(`Main: ${previousMainWarnings} → ${mainWarnings} (Δ: ${mainDelta})`);
+            console.log(`Current values: Develop=${developWarnings}, Main=${mainWarnings}`);
+            console.log(`Previous values: Develop=${previousDevelopWarnings}, Main=${previousMainWarnings}`);
+            console.log(`Delta calculation: Develop Δ=${developDelta}, Main Δ=${mainDelta}`);
 
             let branchInfo = '';
             if ('${{ steps.should_run.outputs.should_run_develop }}' === 'true') {
