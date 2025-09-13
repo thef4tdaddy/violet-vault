@@ -120,7 +120,7 @@ export class GitHubAPIService {
     if (reportData.screenshot) {
       // GitHub Issues can't display base64 data URLs directly
       // Instead, provide information about the screenshot
-      const screenshotInfo = reportData.screenshot.includes("data:image")
+      const _screenshotInfo = reportData.screenshot.includes("data:image")
         ? "Screenshot captured (base64 data - view in bug report tool)"
         : reportData.screenshot;
 

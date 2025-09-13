@@ -175,7 +175,7 @@ export class ContextAnalysisService {
         total: headings.length,
         hasH1: !!document.querySelector("h1"),
       };
-    } catch (error) {
+    } catch {
       return { counts: {}, total: 0, hasH1: false };
     }
   }
@@ -208,7 +208,7 @@ export class ContextAnalysisService {
         unlabeled,
         labelPercentage: inputs.length > 0 ? Math.round((labeled / inputs.length) * 100) : 0,
       };
-    } catch (error) {
+    } catch {
       return { total: 0, labeled: 0, unlabeled: 0, labelPercentage: 0 };
     }
   }
@@ -234,7 +234,7 @@ export class ContextAnalysisService {
         withoutAlt,
         altPercentage: images.length > 0 ? Math.round((withAlt / images.length) * 100) : 0,
       };
-    } catch (error) {
+    } catch {
       return { total: 0, withAlt: 0, withoutAlt: 0, altPercentage: 0 };
     }
   }

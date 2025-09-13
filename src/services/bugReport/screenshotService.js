@@ -17,7 +17,7 @@ export class ScreenshotService {
 
     try {
       // Check if we're on mobile - use simpler approach
-      const isMobile = this.detectMobileDevice();
+      const _isMobile = this.detectMobileDevice();
 
       let screenshot = null;
 
@@ -165,7 +165,7 @@ export class ScreenshotService {
       const fallbackDataUrl = fallbackCanvas.toDataURL("image/png", 0.3);
       logger.info("Fallback screenshot captured successfully");
       return fallbackDataUrl;
-    } catch (error) {
+    } catch {
       logger.warn("Fallback html2canvas failed, using manual canvas method");
       return await this.captureManualCanvas();
     }

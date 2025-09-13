@@ -81,7 +81,7 @@ export const applySuggestionToData = async (suggestion, onApplyToTransactions, o
       await onApplyToBills(suggestion);
     }
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
 };

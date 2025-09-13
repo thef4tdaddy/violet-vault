@@ -9,7 +9,7 @@ import { suggestBillCategory } from "./categoryPatterns";
  */
 export const analyzeBillCategorization = (bills, settings) => {
   const suggestions = [];
-  const { minAmount } = settings;
+  const { _minAmount } = settings;
 
   // Group bills by category
   const billsByCategory = {};
