@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { CheckCircle, Circle, ChevronDown, ChevronUp, Trophy } from "lucide-react";
+import { getIcon } from "../../utils";
 import useOnboardingStore from "../../stores/ui/onboardingStore";
 
 /**
@@ -104,7 +104,7 @@ const OnboardingProgress = () => {
       >
         <div className="flex items-center space-x-3">
           <div className="flex items-center space-x-2">
-            <Trophy className="w-5 h-5 text-purple-500" />
+            {React.createElement(getIcon("Trophy"), { className: "w-5 h-5 text-purple-500" })}
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Getting Started</h3>
           </div>
 
@@ -130,7 +130,7 @@ const OnboardingProgress = () => {
             </span>
           )}
           <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-            {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+            {isExpanded ? React.createElement(getIcon("ChevronUp"), { className: "w-5 h-5" }) : React.createElement(getIcon("ChevronDown"), { className: "w-5 h-5" })}
           </button>
         </div>
       </div>
@@ -169,9 +169,9 @@ const OnboardingProgress = () => {
                   >
                     <div className="flex-shrink-0 mt-0.5">
                       {step.completed ? (
-                        <CheckCircle className="w-5 h-5 text-green-500" />
+                        React.createElement(getIcon("CheckCircle"), { className: "w-5 h-5 text-green-500" })
                       ) : (
-                        <Circle className="w-5 h-5 text-gray-400" />
+                        React.createElement(getIcon("Circle"), { className: "w-5 h-5 text-gray-400" })
                       )}
                     </div>
 
@@ -228,7 +228,7 @@ const OnboardingProgress = () => {
 
             {progress.percentage === 100 && (
               <div className="flex items-center space-x-2 text-green-600 dark:text-green-400">
-                <Trophy className="w-4 h-4" />
+                {React.createElement(getIcon("Trophy"), { className: "w-4 h-4" })}
                 <span className="text-sm font-medium">Congratulations! Setup complete!</span>
               </div>
             )}
