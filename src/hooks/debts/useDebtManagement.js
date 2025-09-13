@@ -30,7 +30,7 @@ export const useDebtManagement = () => {
   const { envelopes = [], createEnvelope } = useEnvelopes();
   const { transactions = [], createTransaction } = useTransactions();
 
-  const debts = debtsHook?.debts || [];
+  const debts = useMemo(() => debtsHook?.debts || [], [debtsHook?.debts]);
   const createDebtData = debtsHook?.addDebtAsync;
   const updateDebtData = debtsHook?.updateDebtAsync;
   const deleteDebtData = debtsHook?.deleteDebtAsync;
