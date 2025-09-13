@@ -141,9 +141,9 @@ const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = n
 
             {/* Expand/Collapse Icon */}
             {isExpanded ? (
-              {React.createElement(getIcon("ChevronUp"), { className: "h-5 w-5 text-gray-400" })}
+              React.createElement(getIcon("ChevronUp"), { className: "h-5 w-5 text-gray-400" })
             ) : (
-              {React.createElement(getIcon("ChevronDown"), { className: "h-5 w-5 text-gray-400" })}
+              React.createElement(getIcon("ChevronDown"), { className: "h-5 w-5 text-gray-400" })
             )}
           </div>
         </div>
