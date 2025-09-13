@@ -1,5 +1,5 @@
 import React from "react";
-import { FileText, CheckCircle, Square, CheckSquare } from "lucide-react";
+import { getIcon } from "../../utils";
 
 /**
  * Bill table with bulk actions and selection

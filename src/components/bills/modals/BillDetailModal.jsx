@@ -1,17 +1,5 @@
 import React from "react";
-import {
-  X,
-  Edit,
-  Trash2,
-  DollarSign,
-  Calendar,
-  Receipt,
-  Clock,
-  AlertTriangle,
-  CheckCircle,
-  Target,
-  Bell,
-} from "lucide-react";
+import { getIcon } from "../../../utils";
 import { getIconByName } from "../../../utils/common/billIcons";
 import { getFrequencyDisplayText } from "../../../utils/common/frequencyCalculations";
 import { formatBillAmount, getBillStatusIcon } from "../../../utils/bills/billDetailUtils";

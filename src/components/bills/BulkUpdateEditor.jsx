@@ -1,5 +1,5 @@
 import React from "react";
-import { DollarSign, Calendar, CheckCircle, Undo2 } from "lucide-react";
+import { getIcon } from "../../utils";
 import { hasChanges, formatAmountChange } from "../../utils/bills/billUpdateHelpers";
 
 const BulkUpdateEditor = ({
@@ -19,7 +19,7 @@ const BulkUpdateEditor = ({
           {(updateMode === "amounts" || updateMode === "both") && (
             <div className="flex items-center gap-2">
               <div className="glassmorphism rounded-full p-2 border border-gray-300">
-                <DollarSign className="h-4 w-4 text-purple-600" />
+                {React.createElement(getIcon("DollarSign"), { className: "h-4 w-4 text-purple-600" })}
               </div>
               <input
                 type="number"
@@ -38,7 +38,7 @@ const BulkUpdateEditor = ({
           {(updateMode === "dates" || updateMode === "both") && (
             <div className="flex items-center gap-2">
               <div className="glassmorphism rounded-full p-2 border border-gray-300">
-                <Calendar className="h-4 w-4 text-purple-600" />
+                {React.createElement(getIcon("Calendar"), { className: "h-4 w-4 text-purple-600" })}
               </div>
               <input
                 type="date"

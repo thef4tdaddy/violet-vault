@@ -1,5 +1,5 @@
 import React from "react";
-import { X } from "lucide-react";
+import { getIcon } from "../../../utils";
 import {
   formatAmountChange,
   formatDateChange,
@@ -26,7 +26,7 @@ const BulkUpdateConfirmModal = ({
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 glassmorphism backdrop-blur-sm rounded-full p-2 shadow-lg hover:shadow-xl transition-all border-2 border-black"
             >
-              <X className="h-5 w-5" />
+              {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
             </button>
           </div>
 

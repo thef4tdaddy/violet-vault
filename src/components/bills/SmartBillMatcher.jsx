@@ -1,6 +1,6 @@
 // components/SmartBillMatcher.jsx
 import React, { useState, useEffect } from "react";
-import { Search, Target, Zap, CheckCircle } from "lucide-react";
+import { getIcon } from "../../utils";
 
 const SmartBillMatcher = ({ bills, envelopes, onSuggestEnvelope, searchQuery }) => {
   const [suggestions, setSuggestions] = useState([]);
