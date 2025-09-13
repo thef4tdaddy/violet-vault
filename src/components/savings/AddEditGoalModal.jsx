@@ -1,6 +1,6 @@
 // components/savings/AddEditGoalModal.jsx
 import React, { useState, useEffect } from "react";
-import { X, Save } from "lucide-react";
+import { getIcon } from "../../utils";
 import {
   SAVINGS_CATEGORIES,
   SAVINGS_PRIORITIES,
@@ -94,7 +94,7 @@ const AddEditGoalModal = ({ isOpen, onClose, onSubmit, editingGoal = null }) => 
             {editingGoal ? "Edit Savings Goal" : "Add New Savings Goal"}
           </h3>
           <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
-            <X className="h-6 w-6" />
+            {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
           </button>
         </div>
 
@@ -238,7 +238,7 @@ const AddEditGoalModal = ({ isOpen, onClose, onSubmit, editingGoal = null }) => 
               type="submit"
               className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center space-x-2"
             >
-              <Save className="h-4 w-4" />
+              {React.createElement(getIcon("Save"), { className: "h-4 w-4" })}
               <span>{editingGoal ? "Update Goal" : "Create Goal"}</span>
             </button>
           </div>

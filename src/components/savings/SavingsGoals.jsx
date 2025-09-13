@@ -1,6 +1,6 @@
 // components/SavingsGoals.jsx
 import React from "react";
-import { Plus, Gift } from "lucide-react";
+import { getIcon } from "../../utils";
 
 // Import the new modular components
 import SavingsSummaryCard from "./SavingsSummaryCard";
@@ -49,7 +49,7 @@ const SavingsGoals = ({
             onClick={openAddForm}
             className="flex items-center space-x-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
           >
-            <Plus className="h-4 w-4" />
+            {React.createElement(getIcon("Plus"), { className: "h-4 w-4" })}
             <span>Add Goal</span>
           </button>
 
@@ -59,7 +59,7 @@ const SavingsGoals = ({
               onClick={openDistributeModal}
               className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
             >
-              <Gift className="h-4 w-4" />
+              {React.createElement(getIcon("Gift"), { className: "h-4 w-4" })}
               <span>Distribute Cash (${unassignedCash.toFixed(2)})</span>
             </button>
           )}
