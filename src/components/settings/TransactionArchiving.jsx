@@ -1,5 +1,5 @@
 import React from "react";
-import { RefreshCw, CheckCircle } from "lucide-react";
+import { getIcon } from "../../utils";
 import useTransactionArchiving from "../../hooks/transactions/useTransactionArchiving";
 import {
   useTransactionArchivingUI,
@@ -64,7 +64,7 @@ const TransactionArchiving = () => {
       <div className="bg-white rounded-xl p-6 border border-gray-200">
         <div className="flex items-center space-x-3 mb-4">
           <div className="animate-spin">
-            <RefreshCw className="h-5 w-5 text-purple-600" />
+            {React.createElement(getIcon("RefreshCw"), { className: "h-5 w-5 text-purple-600" })}
           </div>
           <h3 className="text-lg font-semibold text-gray-900">
             Loading Transaction Archive Information...
@@ -119,7 +119,7 @@ const TransactionArchiving = () => {
       {!needsArchiving && !isLoading && (
         <div className="bg-white rounded-xl p-6 border border-gray-200">
           <div className="text-center py-8">
-            <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-4" />
+            {React.createElement(getIcon("CheckCircle"), { className: "h-12 w-12 text-green-600 mx-auto mb-4" })}
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No Archiving Needed</h3>
             <p className="text-gray-600">
               Your transaction data is well-optimized. Check back when you have more historical

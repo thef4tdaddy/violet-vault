@@ -1,5 +1,5 @@
 import React from "react";
-import { Lock, Shield, AlertTriangle } from "lucide-react";
+import { getIcon } from "../../../utils";
 
 const SecuritySettingsSection = ({
   securityManager,
@@ -17,7 +17,7 @@ const SecuritySettingsSection = ({
               onClick={securityManager.lockApp}
               className="w-full flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              <Lock className="h-5 w-5 text-gray-600 mr-3" />
+              {React.createElement(getIcon("Lock"), { className: "h-5 w-5 text-gray-600 mr-3" })}
               <div className="text-left">
                 <p className="font-medium text-gray-900">Lock Application</p>
                 <p className="text-sm text-gray-500">Immediately lock the app</p>
@@ -28,7 +28,7 @@ const SecuritySettingsSection = ({
               onClick={onOpenSecuritySettings}
               className="w-full flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              <Shield className="h-5 w-5 text-gray-600 mr-3" />
+              {React.createElement(getIcon("Shield"), { className: "h-5 w-5 text-gray-600 mr-3" })}
               <div className="text-left">
                 <p className="font-medium text-gray-900">Advanced Security</p>
                 <p className="text-sm text-gray-500">Auto-lock, logging, and privacy</p>
@@ -39,7 +39,7 @@ const SecuritySettingsSection = ({
               onClick={onShowLocalDataSecurity}
               className="w-full flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              <AlertTriangle className="h-5 w-5 text-yellow-600 mr-3" />
+              {React.createElement(getIcon("AlertTriangle"), { className: "h-5 w-5 text-yellow-600 mr-3" })}
               <div className="text-left">
                 <p className="font-medium text-gray-900">Local Data Security</p>
                 <p className="text-sm text-gray-500">

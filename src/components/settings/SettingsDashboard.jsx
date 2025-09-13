@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from "react";
-import { X } from "lucide-react";
+import { getIcon } from "../../utils";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import SettingsLayout from "./layout/SettingsLayout";
 import ResetConfirmModal from "./modals/ResetConfirmModal";
@@ -153,7 +153,7 @@ const SettingsDashboard = ({
                 onClick={closeActivityFeed}
                 className="absolute top-4 right-4 z-10 text-gray-400 hover:text-gray-600 glassmorphism backdrop-blur-sm rounded-full p-2 shadow-lg hover:shadow-xl transition-all border-2 border-black"
               >
-                <X className="h-5 w-5" />
+                {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
               </button>
               <div className="p-6 overflow-y-auto max-h-[calc(90vh-48px)]">
                 <ActivityFeed />
