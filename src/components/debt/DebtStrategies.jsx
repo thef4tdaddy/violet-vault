@@ -73,7 +73,7 @@ const DebtStrategies = ({ debts }) => {
       {insights.length > 0 && (
         <div className="space-y-3">
           {insights.map((insight, index) => {
-            const Icon = insight.type === "warning" ? AlertCircle : Info;
+            const iconName = insight.type === "warning" ? "AlertCircle" : "Info";
             const colorClass =
               insight.type === "warning"
                 ? "border-orange-200 bg-orange-50"
@@ -84,7 +84,7 @@ const DebtStrategies = ({ debts }) => {
             return (
               <div key={index} className={`rounded-xl p-4 border ${colorClass}`}>
                 <div className="flex items-start gap-3">
-                  <Icon className={`w-5 h-5 ${iconClass} flex-shrink-0 mt-0.5`} />
+                  {React.createElement(getIcon(iconName), { className: `w-5 h-5 ${iconClass} flex-shrink-0 mt-0.5` })}
                   <div>
                     <h4 className={`font-medium ${textClass}`}>{insight.title}</h4>
                     <p className={`text-sm ${textClass} mt-1`}>{insight.message}</p>
