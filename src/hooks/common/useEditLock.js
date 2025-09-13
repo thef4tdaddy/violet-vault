@@ -57,7 +57,7 @@ const useEditLock = (recordType, recordId, options = {}) => {
     if (autoAcquire && recordType && recordId && (!isLocked || (!isOwnLock && lock))) {
       acquireLock();
     }
-  }, [autoAcquire, recordType, recordId, isLocked, isOwnLock, lock]);
+  }, [autoAcquire, recordType, recordId, isLocked, isOwnLock, lock, acquireLock]);
 
   // Auto-release lock on unmount
   useEffect(() => {
