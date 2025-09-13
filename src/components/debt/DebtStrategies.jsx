@@ -1,5 +1,5 @@
 import React from "react";
-import { Target, Lightbulb, CheckCircle, AlertCircle, Info } from "lucide-react";
+import { getIcon } from "../../utils";
 import { useDebtStrategies } from "../../hooks/debts/useDebtStrategies";
 import StrategyCard from "./ui/StrategyCard";
 import PaymentImpactTable from "./ui/PaymentImpactTable";
@@ -22,7 +22,7 @@ const DebtStrategies = ({ debts }) => {
   if (!hasDebts) {
     return (
       <div className="bg-white rounded-xl p-8 text-center border border-gray-200">
-        <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
+        {React.createElement(getIcon("CheckCircle"), { className: "w-12 h-12 text-green-500 mx-auto mb-3" })}
         <h3 className="text-lg font-semibold text-gray-800 mb-2">No Active Debts!</h3>
         <p className="text-gray-600">
           Congratulations! You don't have any active debts to strategize about.
@@ -36,7 +36,7 @@ const DebtStrategies = ({ debts }) => {
       {/* Header */}
       <div className="bg-white rounded-xl p-6 border border-gray-200">
         <div className="flex items-center gap-3 mb-4">
-          <Target className="w-6 h-6 text-purple-600" />
+          {React.createElement(getIcon("Target"), { className: "w-6 h-6 text-purple-600" })}
           <h2 className="text-xl font-semibold text-gray-900">Debt Payoff Strategies</h2>
         </div>
         <p className="text-gray-600">
@@ -60,7 +60,7 @@ const DebtStrategies = ({ debts }) => {
       {recommendation && (
         <div className="bg-white rounded-xl p-6 border border-gray-200">
           <div className="flex items-center gap-3 mb-4">
-            <Lightbulb className="w-5 h-5 text-yellow-500" />
+            {React.createElement(getIcon("Lightbulb"), { className: "w-5 h-5 text-yellow-500" })}
             <h3 className="font-semibold text-gray-900">Our Recommendation</h3>
           </div>
           <div className="bg-blue-50 rounded-lg p-4">
