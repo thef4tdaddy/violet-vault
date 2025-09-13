@@ -4,7 +4,7 @@ import {
   useBudgetHistory,
   useBudgetCommitDetails,
 } from "../../hooks/budgeting/useBudgetHistoryQuery";
-import { AlertTriangle } from "lucide-react";
+import { getIcon } from "../../utils";
 import {
   useBudgetHistoryViewerUI,
   useBudgetHistoryRestore,
@@ -57,7 +57,7 @@ const BudgetHistoryViewer = ({ onClose }) => {
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-gray-900 flex items-center">
-                <AlertTriangle className="h-5 w-5 mr-2 text-red-600" />
+                {React.createElement(getIcon("AlertTriangle"), { className: "h-5 w-5 mr-2 text-red-600" })}
                 History Error
               </h2>
               <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">

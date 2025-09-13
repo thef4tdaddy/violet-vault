@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Shield,
-  ShieldAlert,
-  ShieldX,
-  AlertTriangle,
-  CheckCircle,
-  Eye,
-  RefreshCw,
-} from "lucide-react";
+import { getIcon } from "../../utils";
 import logger from "../../utils/common/logger";
 
 const IntegrityStatusIndicator = ({ className = "" }) => {
@@ -60,14 +52,14 @@ const IntegrityStatusIndicator = ({ className = "" }) => {
 
   const getStatusIcon = () => {
     if (!integrityStatus) {
-      return <Shield className="h-5 w-5 text-gray-400" />;
+      return React.createElement(getIcon("Shield"), { className: "h-5 w-5 text-gray-400" });
     }
 
     if (integrityStatus.valid) {
-      return <CheckCircle className="h-5 w-5 text-green-600" />;
+      return React.createElement(getIcon("CheckCircle"), { className: "h-5 w-5 text-green-600" });
     }
 
-    return <ShieldX className="h-5 w-5 text-red-600" />;
+    return React.createElement(getIcon("ShieldX"), { className: "h-5 w-5 text-red-600" });
   };
 
   const getStatusColor = () => {
@@ -118,7 +110,7 @@ const IntegrityStatusIndicator = ({ className = "" }) => {
           className="p-1 hover:bg-white/50 rounded"
           title="View details"
         >
-          <Eye className="h-4 w-4" />
+          {React.createElement(getIcon("Eye"), { className: "h-4 w-4" })}
         </button>
 
         <button
@@ -127,7 +119,7 @@ const IntegrityStatusIndicator = ({ className = "" }) => {
           className="p-1 hover:bg-white/50 rounded disabled:opacity-50"
           title="Perform security scan"
         >
-          <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+          {React.createElement(getIcon("RefreshCw"), { className: `h-4 w-4 ${isLoading ? "animate-spin" : ""}` })}
         </button>
       </div>
 
@@ -139,7 +131,7 @@ const IntegrityStatusIndicator = ({ className = "" }) => {
               key={index}
               className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg"
             >
-              <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
+              {React.createElement(getIcon("AlertTriangle"), { className: "h-5 w-5 text-red-600 mt-0.5" })}
               <div className="flex-1">
                 <h4 className="text-sm font-medium text-red-900">{warning.title}</h4>
                 <p className="text-sm text-red-700 mt-1">{warning.message}</p>
