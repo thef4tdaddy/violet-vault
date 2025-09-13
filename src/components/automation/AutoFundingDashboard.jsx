@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useConfirm } from "../../hooks/common/useConfirm";
 import { globalToast } from "../../stores/ui/toastStore";
-import { X } from "lucide-react";
+import { getIcon } from "../../utils";
 import AutoFundingRuleBuilder from "./AutoFundingRuleBuilder";
 import RulesTab from "./tabs/RulesTab";
 import HistoryTab from "./tabs/HistoryTab";
@@ -146,7 +146,9 @@ const AutoFundingDashboard = ({ isOpen, onClose }) => {
                   onClick={onClose}
                   className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg"
                 >
-                  <X className="h-5 w-5" />
+                  {React.createElement(getIcon("X"), {
+                    className: "h-5 w-5",
+                  })}
                 </button>
               </div>
 
