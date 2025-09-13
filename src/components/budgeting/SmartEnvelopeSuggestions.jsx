@@ -1,5 +1,5 @@
 import React from "react";
-import { Zap, Settings, ChevronDown, ChevronUp } from "lucide-react";
+import { getIcon } from "../../utils";
 import useSmartSuggestions from "../../hooks/budgeting/useSmartSuggestions";
 import SuggestionsList from "./suggestions/SuggestionsList";
 import SuggestionSettings from "./suggestions/SuggestionSettings";

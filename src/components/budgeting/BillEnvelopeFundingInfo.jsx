@@ -1,14 +1,5 @@
 import React, { memo } from "react";
-import {
-  AlertTriangle,
-  Clock,
-  Calendar,
-  CheckCircle,
-  DollarSign,
-  TrendingUp,
-  Target,
-  Receipt,
-} from "lucide-react";
+import { getIcon } from "../../utils";
 import { getBillEnvelopeDisplayInfo } from "../../utils/budgeting/billEnvelopeCalculations";
 
 /**
@@ -36,21 +27,14 @@ const BillEnvelopeFundingInfo = memo(({ envelope, bills = [], showDetails = fals
     displayText,
   } = displayInfo;
 
-  const IconComponent =
-    {
-      AlertTriangle,
-      Clock,
-      Calendar,
-      CheckCircle,
-      DollarSign,
-    }[status.icon] || DollarSign;
+  const iconName = status.icon || "DollarSign";
 
   return (
     <div className={`${status.bgColor} border border-${status.color}-200 rounded-lg p-3`}>
       {/* Header with status */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center space-x-2">
-          <IconComponent className={`h-4 w-4 ${status.textColor}`} />
+          {React.createElement(getIcon(iconName), { className: `h-4 w-4 ${status.textColor}` })}
           <span className={`text-sm font-medium ${status.textColor}`}>
             {displayText.primaryStatus}
           </span>

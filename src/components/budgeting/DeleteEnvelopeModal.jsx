@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Trash2 } from "lucide-react";
+import { getIcon } from "../../utils";
 
 const DeleteEnvelopeModal = ({
   isOpen,
@@ -28,7 +28,7 @@ const DeleteEnvelopeModal = ({
         <div className="p-6">
           <div className="flex items-center mb-4">
             <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
-              <Trash2 className="h-6 w-6 text-red-600" />
+              {React.createElement(getIcon("Trash2"), { className: "h-6 w-6 text-red-600" })}
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900">Delete Envelope</h3>
@@ -119,7 +119,7 @@ const DeleteEnvelopeModal = ({
               className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center justify-center"
               disabled={isDeleting}
             >
-              <Trash2 className="h-4 w-4 mr-2" />
+              {React.createElement(getIcon("Trash2"), { className: "h-4 w-4 mr-2" })}
               {isDeleting ? "Deleting..." : "Delete Envelope"}
             </button>
           </div>
