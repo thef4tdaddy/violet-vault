@@ -1,5 +1,5 @@
 import React from "react";
-import { Monitor, RefreshCw } from "lucide-react";
+import { getIcon } from "../../../utils";
 
 const GeneralSettingsSection = ({
   isLocalOnlyMode,
@@ -18,7 +18,7 @@ const GeneralSettingsSection = ({
       {isLocalOnlyMode && (
         <div className="glassmorphism rounded-lg p-4 border-2 border-black ring-1 ring-gray-800/10 bg-blue-100/60">
           <div className="flex items-start">
-            <Monitor className="h-5 w-5 text-blue-600 mt-0.5 mr-3" />
+            {React.createElement(getIcon("Monitor"), { className: "h-5 w-5 text-blue-600 mt-0.5 mr-3" })}
             <div>
               <h4 className="font-medium text-purple-900">Local-Only Mode</h4>
               <p className="text-sm text-purple-700 mt-1">
@@ -66,7 +66,7 @@ const GeneralSettingsSection = ({
                 disabled={isSyncing}
                 className="flex items-center px-3 py-2 text-sm border-2 border-black bg-purple-200/60 rounded-lg hover:bg-purple-300/60 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <RefreshCw className={`h-4 w-4 mr-2 ${isSyncing ? "animate-spin" : ""}`} />
+                {React.createElement(getIcon("RefreshCw"), { className: `h-4 w-4 mr-2 ${isSyncing ? "animate-spin" : ""}` })}
                 {isSyncing ? "Syncing..." : "Sync Now"}
               </button>
             </div>
