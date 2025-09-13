@@ -168,7 +168,7 @@ const usePaycheckProcessor = ({
     } finally {
       setIsLoading(false);
     }
-  }, [formData, currentAllocations, currentUser, onAddPaycheck, paycheckHistory, validateForm]);
+  }, [formData, currentAllocations, currentUser, onAddPaycheck, paycheckHistory, validateForm, resetForm]);
 
   // Reset form to default state
   const resetForm = useCallback(() => {
