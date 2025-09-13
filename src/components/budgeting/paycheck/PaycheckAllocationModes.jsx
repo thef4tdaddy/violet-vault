@@ -5,11 +5,17 @@ import { getIcon } from "../../../utils";
  * Paycheck allocation mode selector component
  * Radio button selection for allocation strategy
  */
-const PaycheckAllocationModes = ({ allocationMode, onChange, disabled = false }) => {
+const PaycheckAllocationModes = ({
+  allocationMode,
+  onChange,
+  disabled = false,
+}) => {
   return (
     <div>
       <label className="block text-sm font-semibold text-purple-900 mb-4">
-        {React.createElement(getIcon("Calculator"), { className: "h-4 w-4 inline mr-2" })}
+        {React.createElement(getIcon("Calculator"), {
+          className: "h-4 w-4 inline mr-2",
+        })}
         How should this be allocated?
       </label>
       <div className="space-y-4">
@@ -66,7 +72,9 @@ const AllocationModeOption = ({
       />
       <div>
         <div className="flex items-center mb-2">
-          {React.createElement(getIcon(icon), { className: `h-5 w-5 mr-3 ${iconColor}` })}
+          {React.createElement(getIcon(icon), {
+            className: `h-5 w-5 mr-3 ${iconColor}`,
+          })}
           <span className="font-semibold text-gray-900">{title}</span>
         </div>
         <p className="text-sm text-gray-600">{description}</p>

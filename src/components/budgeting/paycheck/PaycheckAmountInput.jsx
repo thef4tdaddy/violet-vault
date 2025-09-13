@@ -9,7 +9,9 @@ const PaycheckAmountInput = ({ value, onChange, disabled = false }) => {
   return (
     <div>
       <label className="block text-sm font-semibold text-purple-900 mb-3">
-        {React.createElement(getIcon("DollarSign"), { className: "h-4 w-4 inline mr-2" })}
+        {React.createElement(getIcon("DollarSign"), {
+          className: "h-4 w-4 inline mr-2",
+        })}
         Paycheck Amount
       </label>
       <input

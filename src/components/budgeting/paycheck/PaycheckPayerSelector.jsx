@@ -20,7 +20,9 @@ const PaycheckPayerSelector = ({
   return (
     <div>
       <label className="block text-sm font-semibold text-purple-900 mb-3">
-        {React.createElement(getIcon("User"), { className: "h-4 w-4 inline mr-2" })}
+        {React.createElement(getIcon("User"), {
+          className: "h-4 w-4 inline mr-2",
+        })}
         Whose Paycheck?
       </label>
 
@@ -44,7 +46,8 @@ const PaycheckPayerSelector = ({
               const prediction = getPayerPrediction(payer);
               return (
                 <option key={payer} value={payer}>
-                  {payer} {prediction ? `(avg: $${prediction.average.toFixed(2)})` : ""}
+                  {payer}{" "}
+                  {prediction ? `(avg: $${prediction.average.toFixed(2)})` : ""}
                 </option>
               );
             })}
@@ -53,7 +56,10 @@ const PaycheckPayerSelector = ({
 
           {/* Show prediction info for selected payer */}
           {payerName && getPayerPrediction(payerName) && (
-            <PayerPredictionInfo payerName={payerName} prediction={getPayerPrediction(payerName)} />
+            <PayerPredictionInfo
+              payerName={payerName}
+              prediction={getPayerPrediction(payerName)}
+            />
           )}
         </div>
       ) : (
@@ -98,8 +104,11 @@ const AddNewPayerForm = ({
     {uniquePayers.length === 0 && (
       <div className="glassmorphism p-4 rounded-xl border border-blue-200/50 bg-blue-50/20 mb-4">
         <div className="text-sm text-gray-600">
-          {React.createElement(getIcon("User"), { className: "h-4 w-4 inline mr-2 text-blue-500" })}
-          <strong>First paycheck?</strong> Let's start by adding who this paycheck is for.
+          {React.createElement(getIcon("User"), {
+            className: "h-4 w-4 inline mr-2 text-blue-500",
+          })}
+          <strong>First paycheck?</strong> Let's start by adding who this
+          paycheck is for.
         </div>
       </div>
     )}

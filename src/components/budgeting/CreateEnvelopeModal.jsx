@@ -73,9 +73,12 @@ const CreateEnvelopeModal = ({
               </div>
               <div>
                 <h2 className="font-black text-white text-base">
-                  <span className="text-lg">C</span>REATE <span className="text-lg">E</span>NVELOPE
+                  <span className="text-lg">C</span>REATE{" "}
+                  <span className="text-lg">E</span>NVELOPE
                 </h2>
-                <p className="text-green-100 text-sm">Set up a new budget envelope</p>
+                <p className="text-green-100 text-sm">
+                  Set up a new budget envelope
+                </p>
               </div>
             </div>
             <button
@@ -129,7 +132,9 @@ const CreateEnvelopeModal = ({
               selectedMode={formData.priority || "medium"}
               autoAllocate={formData.autoAllocate}
               onModeChange={(priority) => updateFormField("priority", priority)}
-              onAutoAllocateChange={(autoAllocate) => updateFormField("autoAllocate", autoAllocate)}
+              onAutoAllocateChange={(autoAllocate) =>
+                updateFormField("autoAllocate", autoAllocate)
+              }
               canEdit={true}
             />
 
@@ -140,7 +145,9 @@ const CreateEnvelopeModal = ({
                 <span className="text-lg">A</span>PPEARANCE
               </h3>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Color
+                </label>
                 <div className="flex gap-2 flex-wrap">
                   {[
                     "#a855f7",
