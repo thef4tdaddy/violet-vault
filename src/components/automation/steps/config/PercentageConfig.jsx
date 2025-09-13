@@ -1,5 +1,5 @@
 import React from "react";
-import { AlertCircle } from "lucide-react";
+import { getIcon } from "../../../../utils";
 
 const PercentageConfig = ({ ruleData, updateConfig, envelopes, errors }) => {
   return (
@@ -28,7 +28,7 @@ const PercentageConfig = ({ ruleData, updateConfig, envelopes, errors }) => {
         </div>
         {errors.percentage && (
           <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-            <AlertCircle className="h-4 w-4" />
+            {React.createElement(getIcon("AlertCircle"), { className: "h-4 w-4" })}
             {errors.percentage}
           </p>
         )}
@@ -53,7 +53,7 @@ const PercentageConfig = ({ ruleData, updateConfig, envelopes, errors }) => {
         </select>
         {errors.targetId && (
           <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-            <AlertCircle className="h-4 w-4" />
+            {React.createElement(getIcon("AlertCircle"), { className: "h-4 w-4" })}
             {errors.targetId}
           </p>
         )}

@@ -1,5 +1,5 @@
 import React from "react";
-import { DollarSign, Percent, Target, ArrowRight, AlertCircle } from "lucide-react";
+import { getIcon } from "../../../utils";
 import { RULE_TYPES } from "../../../utils/budgeting/autofunding";
 
 const RuleTypeStep = ({ ruleData, updateRuleData, errors }) => {
@@ -18,7 +18,7 @@ const RuleTypeStep = ({ ruleData, updateRuleData, errors }) => {
         />
         {errors.name && (
           <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-            <AlertCircle className="h-4 w-4" />
+            {React.createElement(getIcon("AlertCircle"), { className: "h-4 w-4" })}
             {errors.name}
           </p>
         )}
@@ -43,29 +43,29 @@ const RuleTypeStep = ({ ruleData, updateRuleData, errors }) => {
           {[
             {
               type: RULE_TYPES.FIXED_AMOUNT,
-              icon: DollarSign,
+              icon: "DollarSign",
               title: "Fixed Amount",
               description: "Move a specific dollar amount to an envelope",
             },
             {
               type: RULE_TYPES.PERCENTAGE,
-              icon: Percent,
+              icon: "Percent",
               title: "Percentage",
               description: "Move a percentage of available funds",
             },
             {
               type: RULE_TYPES.SPLIT_REMAINDER,
-              icon: Target,
+              icon: "Target",
               title: "Split Remainder",
               description: "Divide remaining funds across multiple envelopes",
             },
             {
               type: RULE_TYPES.PRIORITY_FILL,
-              icon: ArrowRight,
+              icon: "ArrowRight",
               title: "Priority Fill",
               description: "Fill envelope to target amount before others",
             },
-          ].map(({ type, icon: _Icon, title, description }) => (
+          ].map(({ type, icon, title, description }) => (
             <div
               key={type}
               onClick={() => updateRuleData({ type })}
@@ -76,11 +76,11 @@ const RuleTypeStep = ({ ruleData, updateRuleData, errors }) => {
               }`}
             >
               <div className="flex items-start gap-3">
-                <Icon
-                  className={`h-5 w-5 mt-0.5 ${
+                {React.createElement(getIcon(icon), {
+                  className: `h-5 w-5 mt-0.5 ${
                     ruleData.type === type ? "text-blue-600" : "text-gray-600"
-                  }`}
-                />
+                  }`
+                })}
                 <div>
                   <h4
                     className={`font-medium ${
@@ -103,7 +103,7 @@ const RuleTypeStep = ({ ruleData, updateRuleData, errors }) => {
         </div>
         {errors.type && (
           <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
-            <AlertCircle className="h-4 w-4" />
+            {React.createElement(getIcon("AlertCircle"), { className: "h-4 w-4" })}
             {errors.type}
           </p>
         )}
