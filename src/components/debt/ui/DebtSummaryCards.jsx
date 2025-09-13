@@ -1,5 +1,4 @@
 import React from "react";
-import { DollarSign, TrendingDown, Percent, Calendar } from "lucide-react";
 import PageSummaryCard from "../../ui/PageSummaryCard";
 
 /**
@@ -10,7 +9,7 @@ const DebtSummaryCards = ({ stats, onDueSoonClick }) => {
   const cards = [
     {
       key: "total-debt",
-      icon: DollarSign,
+      icon: "DollarSign",
       label: "Total Debt",
       value: `$${stats.totalDebt.toFixed(2)}`,
       color: "red",
@@ -18,7 +17,7 @@ const DebtSummaryCards = ({ stats, onDueSoonClick }) => {
     },
     {
       key: "monthly-payments",
-      icon: TrendingDown,
+      icon: "TrendingDown",
       label: "Monthly Payments",
       value: `$${stats.totalMonthlyPayments.toFixed(2)}`,
       color: "orange",
@@ -26,7 +25,7 @@ const DebtSummaryCards = ({ stats, onDueSoonClick }) => {
     },
     {
       key: "average-rate",
-      icon: Percent,
+      icon: "Percent",
       label: "Avg Interest Rate",
       value: `${stats.averageInterestRate.toFixed(2)}%`,
       color: "purple",
@@ -34,7 +33,7 @@ const DebtSummaryCards = ({ stats, onDueSoonClick }) => {
     },
     {
       key: "due-soon",
-      icon: Calendar,
+      icon: "Calendar",
       label: "Due Soon",
       value: `$${stats.dueSoonAmount.toFixed(2)}`,
       color: "yellow",
