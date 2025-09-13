@@ -52,7 +52,7 @@ export const useHistoryExport = () => {
       logger.error("Failed to export history", error);
       throw error;
     }
-  }, []);
+  }, [exportToCsv, generateFilename]);
 
   const exportToCsv = useCallback((historyToExport) => {
     const csvHeaders = [
@@ -80,7 +80,7 @@ export const useHistoryExport = () => {
       content: [csvHeaders, ...csvRows].join("\n"),
       filename: generateFilename("csv"),
     };
-  }, []);
+  }, [generateFilename]);
 
   const generateFilename = useCallback((format) => {
     const dateStr = new Date().toISOString().split("T")[0];
