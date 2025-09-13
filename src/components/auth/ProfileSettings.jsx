@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X, User, Palette, Save } from "lucide-react";
+import { getIcon } from "../../utils";
 import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
 
@@ -50,7 +50,9 @@ const ProfileSettings = ({ isOpen, onClose, currentUser, onUpdateProfile }) => {
       <div className="glassmorphism rounded-2xl p-6 w-full max-w-md border border-white/30 shadow-2xl">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-semibold flex items-center">
-            <User className="h-5 w-5 mr-2 text-purple-600" />
+            {React.createElement(getIcon("User"), {
+              className: "h-5 w-5 mr-2 text-purple-600",
+            })}
             Profile Settings
           </h3>
           <button
@@ -58,7 +60,9 @@ const ProfileSettings = ({ isOpen, onClose, currentUser, onUpdateProfile }) => {
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             disabled={isLoading}
           >
-            <X className="h-5 w-5 text-gray-500" />
+            {React.createElement(getIcon("X"), {
+              className: "h-5 w-5 text-gray-500",
+            })}
           </button>
         </div>
 
@@ -80,7 +84,9 @@ const ProfileSettings = ({ isOpen, onClose, currentUser, onUpdateProfile }) => {
           {/* Color Selection */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-3">
-              <Palette className="h-4 w-4 inline mr-1" />
+              {React.createElement(getIcon("Palette"), {
+                className: "h-4 w-4 inline mr-1",
+              })}
               Profile Color
             </label>
             <div className="grid grid-cols-4 gap-3">
@@ -133,7 +139,9 @@ const ProfileSettings = ({ isOpen, onClose, currentUser, onUpdateProfile }) => {
               <div className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" />
             ) : (
               <>
-                <Save className="h-4 w-4 mr-2" />
+                {React.createElement(getIcon("Save"), {
+                  className: "h-4 w-4 mr-2",
+                })}
                 Save Changes
               </>
             )}

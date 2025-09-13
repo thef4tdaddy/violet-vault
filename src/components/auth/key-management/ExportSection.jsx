@@ -1,4 +1,5 @@
-import { Copy, Download, QrCode, CheckCircle, Lock } from "lucide-react";
+import React from "react";
+import { getIcon } from "../../../utils";
 import PasswordField from "./PasswordField";
 
 const ExportSection = ({
@@ -26,9 +27,13 @@ const ExportSection = ({
           >
             <div className="flex items-center justify-center mb-2">
               {copiedToClipboard ? (
-                <CheckCircle className="h-5 w-5 text-green-600" />
+                React.createElement(getIcon("CheckCircle"), {
+                  className: "h-5 w-5 text-green-600",
+                })
               ) : (
-                <Copy className="h-5 w-5 text-purple-600" />
+                React.createElement(getIcon("Copy"), {
+                  className: "h-5 w-5 text-purple-600",
+                })
               )}
             </div>
             <div className="text-sm font-medium text-gray-900">
@@ -42,7 +47,9 @@ const ExportSection = ({
             disabled={loading}
             className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors disabled:opacity-50"
           >
-            <Download className="h-5 w-5 text-purple-600 mx-auto mb-2" />
+            {React.createElement(getIcon("Download"), {
+              className: "h-5 w-5 text-purple-600 mx-auto mb-2",
+            })}
             <div className="text-sm font-medium text-gray-900">Download File</div>
             <div className="text-xs text-gray-500 mt-1">Unprotected</div>
           </button>
@@ -52,7 +59,9 @@ const ExportSection = ({
             disabled={loading}
             className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors disabled:opacity-50"
           >
-            <QrCode className="h-5 w-5 text-purple-600 mx-auto mb-2" />
+            {React.createElement(getIcon("QrCode"), {
+              className: "h-5 w-5 text-purple-600 mx-auto mb-2",
+            })}
             <div className="text-sm font-medium text-gray-900">Generate QR Code</div>
             <div className="text-xs text-gray-500 mt-1">For mobile</div>
           </button>
@@ -80,7 +89,9 @@ const ExportSection = ({
             disabled={loading || !exportPassword}
             className="w-full flex items-center justify-center px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
-            <Lock className="h-4 w-4 mr-2" />
+            {React.createElement(getIcon("Lock"), {
+              className: "h-4 w-4 mr-2",
+            })}
             Download Protected File
           </button>
         </div>
