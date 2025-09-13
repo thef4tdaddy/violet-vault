@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Search, ChevronDown, ChevronUp, Filter } from "lucide-react";
+import { getIcon } from "../../utils";
 
 const TransactionFilters = ({
   searchTerm,
@@ -27,7 +27,7 @@ const TransactionFilters = ({
       {/* Mobile Header - Always Visible */}
       <div className="flex items-center justify-between p-4 md:hidden">
         <div className="flex items-center space-x-2">
-          <Filter className="h-4 w-4 text-gray-600" />
+          {React.createElement(getIcon("Filter"), { className: "h-4 w-4 text-gray-600" })}
           <span className="text-sm font-medium text-gray-700">Search & Filters</span>
           {hasActiveFilters && (
             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
@@ -40,9 +40,9 @@ const TransactionFilters = ({
           className="p-1 rounded-lg hover:bg-white/50 transition-colors"
         >
           {isExpanded ? (
-            <ChevronUp className="h-4 w-4 text-gray-600" />
+            {React.createElement(getIcon("ChevronUp"), { className: "h-4 w-4 text-gray-600" })}
           ) : (
-            <ChevronDown className="h-4 w-4 text-gray-600" />
+            {React.createElement(getIcon("ChevronDown"), { className: "h-4 w-4 text-gray-600" })}
           )}
         </button>
       </div>
@@ -55,7 +55,7 @@ const TransactionFilters = ({
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              {React.createElement(getIcon("Search"), { className: "absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" })}
               <input
                 type="text"
                 value={searchTerm}
@@ -127,9 +127,9 @@ const TransactionFilters = ({
                 className="glassmorphism px-3 py-2 border border-white/20 rounded-lg hover:shadow-lg"
               >
                 {sortOrder === "asc" ? (
-                  <ChevronUp className="h-4 w-4" />
+                  {React.createElement(getIcon("ChevronUp"), { className: "h-4 w-4" })}
                 ) : (
-                  <ChevronDown className="h-4 w-4" />
+                  {React.createElement(getIcon("ChevronDown"), { className: "h-4 w-4" })}
                 )}
               </button>
             </div>
