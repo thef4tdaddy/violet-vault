@@ -96,7 +96,7 @@ export const useUndoOperations = (initialUndoStack = [], addToHistory) => {
     }
 
     return await undoExecution(undoableExecutions[0].executionId);
-  }, [getUndoableExecutions]);
+  }, [getUndoableExecutions, undoExecution]);
 
   // Reverse a single transfer
   const reverseTransfer = useCallback(
