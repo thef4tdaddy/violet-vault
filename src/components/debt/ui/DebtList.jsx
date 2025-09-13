@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowRight, Calendar, Clock } from "lucide-react";
+import { getIcon } from "../../../utils";
 // import { useDebtCard } from "../../../hooks/debts/useDebtCard";
 import DebtCardProgressBar from "./DebtCardProgressBar";
 
@@ -38,7 +38,7 @@ const DebtCard = ({ debt, onClick, _onRecordPayment }) => {
     interestRate,
   } = {
     config: { bgColor: "bg-gray-50", textColor: "text-gray-600" },
-    IconComponent: Clock,
+    IconComponent: "Clock",
     statusStyle: "text-gray-600",
     statusText: "Active",
     progressData: { percentage: 0 },
@@ -114,9 +114,9 @@ const DebtCard = ({ debt, onClick, _onRecordPayment }) => {
                   {nextPaymentInfo.hasIcon && (
                     <span className="flex items-center">
                       {nextPaymentInfo.type === "next_payment" ? (
-                        <Calendar className="h-3 w-3 mr-1" />
+                        React.createElement(getIcon("Calendar"), { className: "h-3 w-3 mr-1" })
                       ) : (
-                        <Clock className="h-3 w-3 mr-1" />
+                        React.createElement(getIcon("Clock"), { className: "h-3 w-3 mr-1" })
                       )}
                       {nextPaymentInfo.value}
                     </span>
@@ -157,7 +157,7 @@ const DebtCard = ({ debt, onClick, _onRecordPayment }) => {
               <span className="sm:hidden">Pay</span>
             </button>
           )}
-          <ArrowRight className="h-4 w-4 md:h-5 md:w-5 text-gray-400" />
+          {React.createElement(getIcon("ArrowRight"), { className: "h-4 w-4 md:h-5 md:w-5 text-gray-400" })}
         </div>
       </div>
     </div>

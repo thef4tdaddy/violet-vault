@@ -1,5 +1,5 @@
 import React from "react";
-import { TrendingUp, Calendar, DollarSign } from "lucide-react";
+import { getIcon } from "../../../utils";
 
 /**
  * Table component for showing payment impact analysis
@@ -19,7 +19,7 @@ const PaymentImpactTable = ({ paymentImpact = [] }) => {
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-          <TrendingUp className="h-5 w-5 mr-2" />
+          {React.createElement(getIcon("TrendingUp"), { className: "h-5 w-5 mr-2" })}
           Extra Payment Impact
         </h3>
         <p className="text-sm text-gray-600 mt-1">
@@ -53,7 +53,7 @@ const PaymentImpactTable = ({ paymentImpact = [] }) => {
                 <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-50/50"}>
                   <td className="px-4 py-3">
                     <div className="flex items-center">
-                      <DollarSign className="h-4 w-4 text-green-500 mr-1" />
+                      {React.createElement(getIcon("DollarSign"), { className: "h-4 w-4 text-green-500 mr-1" })}
                       <span className="font-medium text-gray-900">+${scenario.extraPayment}</span>
                     </div>
                   </td>
@@ -64,7 +64,7 @@ const PaymentImpactTable = ({ paymentImpact = [] }) => {
                   </td>
                   <td className="px-4 py-3 text-center">
                     <div className="flex items-center justify-center">
-                      <Calendar className="h-3 w-3 text-blue-500 mr-1" />
+                      {React.createElement(getIcon("Calendar"), { className: "h-3 w-3 text-blue-500 mr-1" })}
                       <span className="text-sm font-medium text-blue-600">
                         {scenario.avalanche.timeSavings || 0} months
                       </span>
@@ -86,7 +86,7 @@ const PaymentImpactTable = ({ paymentImpact = [] }) => {
                   </td>
                   <td className="px-4 py-3 text-center">
                     <div className="flex items-center justify-center">
-                      <Calendar className="h-3 w-3 text-blue-500 mr-1" />
+                      {React.createElement(getIcon("Calendar"), { className: "h-3 w-3 text-blue-500 mr-1" })}
                       <span className="text-sm font-medium text-blue-600">
                         {scenario.snowball.timeSavings || 0} months
                       </span>
