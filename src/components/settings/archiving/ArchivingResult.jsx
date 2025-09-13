@@ -1,5 +1,5 @@
 import React from "react";
-import { CheckCircle, AlertTriangle } from "lucide-react";
+import { getIcon } from "../../../utils";
 
 const ArchivingResult = ({ lastResult }) => {
   if (!lastResult) return null;
@@ -11,9 +11,9 @@ const ArchivingResult = ({ lastResult }) => {
       <div className={`p-4 rounded-lg ${lastResult.success ? "bg-green-50" : "bg-red-50"}`}>
         <div className="flex items-start space-x-3">
           {lastResult.success ? (
-            <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+            React.createElement(getIcon("CheckCircle"), { className: "h-5 w-5 text-green-600 mt-0.5" })
           ) : (
-            <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
+            React.createElement(getIcon("AlertTriangle"), { className: "h-5 w-5 text-red-600 mt-0.5" })
           )}
           <div>
             <p className={`font-medium ${lastResult.success ? "text-green-800" : "text-red-800"}`}>

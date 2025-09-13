@@ -1,5 +1,5 @@
 import React from "react";
-import { Database, Clock, AlertTriangle } from "lucide-react";
+import { getIcon } from "../../../utils";
 
 const ArchivingStatusOverview = ({
   archivingStatus,
@@ -22,7 +22,7 @@ const ArchivingStatusOverview = ({
                 {archivingStatus.currentStats.totalTransactions.toLocaleString()}
               </p>
             </div>
-            <Database className="h-8 w-8 text-blue-600" />
+            {React.createElement(getIcon("Database"), { className: "h-8 w-8 text-blue-600" })}
           </div>
         </div>
 
@@ -34,7 +34,7 @@ const ArchivingStatusOverview = ({
                 {archivingStatus.currentStats.oldTransactions.toLocaleString()}
               </p>
             </div>
-            <Clock className="h-8 w-8 text-yellow-600" />
+            {React.createElement(getIcon("Clock"), { className: "h-8 w-8 text-yellow-600" })}
           </div>
         </div>
 
@@ -46,7 +46,7 @@ const ArchivingStatusOverview = ({
                 {archivingStatus.currentStats.veryOldTransactions.toLocaleString()}
               </p>
             </div>
-            <AlertTriangle className="h-8 w-8 text-red-600" />
+            {React.createElement(getIcon("AlertTriangle"), { className: "h-8 w-8 text-red-600" })}
           </div>
         </div>
       </div>

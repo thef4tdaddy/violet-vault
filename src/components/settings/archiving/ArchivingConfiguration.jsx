@@ -1,5 +1,5 @@
 import React from "react";
-import { Settings, Info } from "lucide-react";
+import { getIcon } from "../../../utils";
 
 const ArchivingConfiguration = ({
   selectedPeriod,
@@ -40,7 +40,7 @@ const ArchivingConfiguration = ({
 
         <div className="bg-blue-50 p-4 rounded-lg">
           <div className="flex items-start space-x-3">
-            <Info className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+            {React.createElement(getIcon("Info"), { className: "h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" })}
             <div className="text-sm text-blue-800">
               <p className="font-medium mb-1">What happens during archiving:</p>
               <ul className="list-disc list-inside space-y-1">
@@ -59,7 +59,7 @@ const ArchivingConfiguration = ({
             onClick={toggleAdvancedOptions}
             className="flex items-center space-x-2 text-sm text-purple-600 hover:text-purple-700"
           >
-            <Settings className="h-4 w-4" />
+            {React.createElement(getIcon("Settings"), { className: "h-4 w-4" })}
             <span>Advanced Options</span>
           </button>
 
