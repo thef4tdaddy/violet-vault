@@ -1,5 +1,5 @@
 import React from "react";
-import { Clock, RefreshCw, Search, Plus } from "lucide-react";
+import { getIcon } from "../../utils";
 
 /**
  * Header section for BillManager
@@ -22,7 +22,7 @@ const BillManagerHeader = ({
       <div className="flex items-center gap-2">
         {isEditLocked && (
           <div className="text-sm text-amber-600 bg-amber-50 px-3 py-1 rounded-lg flex items-center gap-2">
-            <Clock className="h-4 w-4" />
+            {React.createElement(getIcon("Clock"), { className: "h-4 w-4" })}
             Editing: {currentEditor}
           </div>
         )}
@@ -33,9 +33,9 @@ const BillManagerHeader = ({
           className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center gap-2 border-2 border-black"
         >
           {isSearching ? (
-            <RefreshCw className="h-4 w-4 animate-spin" />
+            React.createElement(getIcon("RefreshCw"), { className: "h-4 w-4 animate-spin" })
           ) : (
-            <Search className="h-4 w-4" />
+            React.createElement(getIcon("Search"), { className: "h-4 w-4" })
           )}
           Discover Bills
         </button>
@@ -44,7 +44,7 @@ const BillManagerHeader = ({
           onClick={handleAddNewBill}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 border-2 border-black"
         >
-          <Plus className="h-4 w-4" />
+          {React.createElement(getIcon("Plus"), { className: "h-4 w-4" })}
           Add Bill
         </button>
       </div>

@@ -1,17 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Search,
-  CheckCircle,
-  X,
-  Calendar,
-  DollarSign,
-  Target,
-  AlertTriangle,
-  Clock,
-  TrendingUp,
-  Zap,
-  Plus,
-} from "lucide-react";
+import { getIcon } from "../../utils";
 import { getBillIcon, getIconByName } from "../../utils/common/billIcons";
 
 const BillDiscoveryModal = ({
@@ -66,10 +54,10 @@ const BillDiscoveryModal = ({
   };
 
   const getConfidenceIcon = (confidence) => {
-    if (confidence >= 0.8) return CheckCircle;
-    if (confidence >= 0.6) return Target;
-    if (confidence >= 0.4) return Clock;
-    return AlertTriangle;
+    if (confidence >= 0.8) return "CheckCircle";
+    if (confidence >= 0.6) return "Target";
+    if (confidence >= 0.4) return "Clock";
+    return "AlertTriangle";
   };
 
   const getBillIconComponent = (bill) => {
@@ -122,7 +110,7 @@ const BillDiscoveryModal = ({
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-lg font-semibold flex items-center">
-                <Search className="h-5 w-5 mr-2 text-blue-600" />
+                {React.createElement(getIcon("Search"), { className: "h-5 w-5 mr-2 text-blue-600" })}
                 Discovered Bills
               </h3>
               <p className="text-sm text-gray-600 mt-1">
@@ -131,13 +119,13 @@ const BillDiscoveryModal = ({
               </p>
             </div>
             <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-              <X className="h-5 w-5" />
+              {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
             </button>
           </div>
 
           {discoveredBills.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
-              <Search className="h-12 w-12 mx-auto mb-3 opacity-50" />
+              {React.createElement(getIcon("Search"), { className: "h-12 w-12 mx-auto mb-3 opacity-50" })}
               <p className="font-medium">No new bills discovered</p>
               <p className="text-sm mt-1">
                 Try adding more transaction history or check back later as you make more purchases.
@@ -185,7 +173,7 @@ const BillDiscoveryModal = ({
               <div className="overflow-y-auto max-h-96 space-y-3">
                 {discoveredBills.map((bill) => {
                   const isSelected = selectedBills.has(bill.id);
-                  const ConfidenceIcon = getConfidenceIcon(bill.confidence);
+                  const confidenceIconName = getConfidenceIcon(bill.confidence);
 
                   return (
                     <div
@@ -233,15 +221,15 @@ const BillDiscoveryModal = ({
 
                           <div className="mt-2 flex items-center gap-4 text-sm text-gray-600">
                             <div className="flex items-center gap-1">
-                              <Calendar className="h-3 w-3" />
+                              {React.createElement(getIcon("Calendar"), { className: "h-3 w-3" })}
                               Due: {new Date(bill.dueDate).toLocaleDateString()}
                             </div>
                             <div className="flex items-center gap-1">
-                              <TrendingUp className="h-3 w-3" />
+                              {React.createElement(getIcon("TrendingUp"), { className: "h-3 w-3" })}
                               {bill.discoveryData.transactionCount} transactions
                             </div>
                             <div className="flex items-center gap-1">
-                              <Zap className="h-3 w-3" />
+                              {React.createElement(getIcon("Zap"), { className: "h-3 w-3" })}
                               Every ~{bill.discoveryData.avgInterval} days
                             </div>
                           </div>
@@ -249,7 +237,7 @@ const BillDiscoveryModal = ({
                           {/* Envelope Assignment */}
                           <div className="mt-3">
                             <div className="flex items-center gap-2">
-                              <Target className="h-4 w-4 text-gray-400" />
+                              {React.createElement(getIcon("Target"), { className: "h-4 w-4 text-gray-400" })}
                               <select
                                 value={billEnvelopeMap[bill.id] || ""}
                                 onChange={(e) => updateBillEnvelope(bill.id, e.target.value)}
@@ -321,12 +309,12 @@ const BillDiscoveryModal = ({
                     >
                       {isProcessing ? (
                         <>
-                          <Clock className="h-4 w-4 mr-2 animate-spin" />
+                          {React.createElement(getIcon("Clock"), { className: "h-4 w-4 mr-2 animate-spin" })}
                           Adding...
                         </>
                       ) : (
                         <>
-                          <Plus className="h-4 w-4 mr-2" />
+                          {React.createElement(getIcon("Plus"), { className: "h-4 w-4 mr-2" })}
                           Add {selectedBills.size} Bills
                         </>
                       )}
