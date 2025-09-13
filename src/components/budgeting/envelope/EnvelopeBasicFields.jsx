@@ -2,19 +2,28 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import { getEnvelopeCategories } from "../../../constants/categories";
 
-const EnvelopeBasicFields = ({ formData, onUpdateField, errors = {}, canEdit = true }) => {
+const EnvelopeBasicFields = ({
+  formData,
+  onUpdateField,
+  errors = {},
+  canEdit = true,
+}) => {
   const categories = getEnvelopeCategories();
 
   return (
     <div className="space-y-4">
       <h3 className="font-semibold text-gray-900 flex items-center">
-        {React.createElement(getIcon("Tag"), { className: "h-4 w-4 mr-2 text-blue-600" })}
+        {React.createElement(getIcon("Tag"), {
+          className: "h-4 w-4 mr-2 text-blue-600",
+        })}
         Basic Information
       </h3>
 
       {/* Envelope Name */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Envelope Name *</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Envelope Name *
+        </label>
         <input
           type="text"
           value={formData.name || ""}
@@ -28,7 +37,9 @@ const EnvelopeBasicFields = ({ formData, onUpdateField, errors = {}, canEdit = t
         />
         {errors.name && (
           <p className="mt-1 text-sm text-red-600 flex items-center">
-            {React.createElement(getIcon("AlertCircle"), { className: "h-3 w-3 mr-1" })}
+            {React.createElement(getIcon("AlertCircle"), {
+              className: "h-3 w-3 mr-1",
+            })}
             {errors.name}
           </p>
         )}
@@ -36,7 +47,9 @@ const EnvelopeBasicFields = ({ formData, onUpdateField, errors = {}, canEdit = t
 
       {/* Category */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Category *
+        </label>
         <select
           value={formData.category || ""}
           onChange={(e) => onUpdateField("category", e.target.value)}
@@ -54,7 +67,9 @@ const EnvelopeBasicFields = ({ formData, onUpdateField, errors = {}, canEdit = t
         </select>
         {errors.category && (
           <p className="mt-1 text-sm text-red-600 flex items-center">
-            {React.createElement(getIcon("AlertCircle"), { className: "h-3 w-3 mr-1" })}
+            {React.createElement(getIcon("AlertCircle"), {
+              className: "h-3 w-3 mr-1",
+            })}
             {errors.category}
           </p>
         )}
@@ -78,7 +93,9 @@ const EnvelopeBasicFields = ({ formData, onUpdateField, errors = {}, canEdit = t
         />
         {errors.description && (
           <p className="mt-1 text-sm text-red-600 flex items-center">
-            {React.createElement(getIcon("AlertCircle"), { className: "h-3 w-3 mr-1" })}
+            {React.createElement(getIcon("AlertCircle"), {
+              className: "h-3 w-3 mr-1",
+            })}
             {errors.description}
           </p>
         )}

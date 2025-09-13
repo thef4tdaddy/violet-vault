@@ -34,7 +34,11 @@ const PaycheckProcessor = ({
 
   // Calculate allocation preview
   const preview = formHook.showPreview
-    ? calculatePaycheckAllocation(formHook.paycheckAmount, formHook.allocationMode, envelopes)
+    ? calculatePaycheckAllocation(
+        formHook.paycheckAmount,
+        formHook.allocationMode,
+        envelopes,
+      )
     : null;
 
   return (
@@ -74,10 +78,13 @@ const PaycheckHeader = () => (
     <div className="relative mr-4">
       <div className="absolute inset-0 bg-emerald-500 rounded-2xl blur-lg opacity-30"></div>
       <div className="relative bg-emerald-500 p-3 rounded-2xl">
-        {React.createElement(getIcon("DollarSign"), { className: "h-6 w-6 text-white" })}
+        {React.createElement(getIcon("DollarSign"), {
+          className: "h-6 w-6 text-white",
+        })}
       </div>
     </div>
-    <span className="text-lg">A</span>DD <span className="text-lg">P</span>AYCHECK
+    <span className="text-lg">A</span>DD <span className="text-lg">P</span>
+    AYCHECK
   </h2>
 );
 
@@ -125,7 +132,9 @@ const PaycheckFormButtons = ({ formHook }) => (
       disabled={!formHook.canSubmit}
       className="flex-1 btn btn-secondary py-4 text-lg font-semibold rounded-2xl border-2 border-black"
     >
-      {React.createElement(getIcon("Calculator"), { className: "h-5 w-5 mr-2" })}
+      {React.createElement(getIcon("Calculator"), {
+        className: "h-5 w-5 mr-2",
+      })}
       Preview Allocation
     </button>
 
@@ -143,7 +152,9 @@ const PaycheckFormButtons = ({ formHook }) => (
           </div>
         ) : (
           <>
-            {React.createElement(getIcon("CheckCircle"), { className: "h-5 w-5 mr-2" })}
+            {React.createElement(getIcon("CheckCircle"), {
+              className: "h-5 w-5 mr-2",
+            })}
             Confirm & Process
           </>
         )}
