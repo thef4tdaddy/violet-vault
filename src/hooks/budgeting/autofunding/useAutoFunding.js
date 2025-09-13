@@ -45,7 +45,7 @@ export const useAutoFunding = () => {
     if (dataHook.isInitialized) {
       initializeSystem();
     }
-  }, [dataHook.isInitialized]);
+  }, [dataHook.isInitialized, dataHook, rulesHook]);
 
   // Auto-save functionality
   useEffect(() => {
@@ -62,6 +62,7 @@ export const useAutoFunding = () => {
   }, [
     dataHook.isInitialized,
     dataHook.hasUnsavedChanges,
+    dataHook,
     rulesHook.rules,
     historyHook.executionHistory,
     historyHook.undoStack,
