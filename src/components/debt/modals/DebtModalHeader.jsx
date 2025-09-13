@@ -1,5 +1,5 @@
 import React from "react";
-import { X, CreditCard } from "lucide-react";
+import { getIcon } from "../../../utils";
 
 /**
  * Header section for AddDebtModal
@@ -10,7 +10,7 @@ const DebtModalHeader = ({ isEditMode, onClose }) => {
     <div className="flex justify-between items-center mb-6">
       <div className="flex items-center gap-3">
         <div className="p-2 bg-red-100 rounded-xl">
-          <CreditCard className="h-6 w-6 text-red-600" />
+          {React.createElement(getIcon("CreditCard"), { className: "h-6 w-6 text-red-600" })}
         </div>
         <div>
           <h2 className="text-xl font-bold text-gray-900">
@@ -22,7 +22,7 @@ const DebtModalHeader = ({ isEditMode, onClose }) => {
         </div>
       </div>
       <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-        <X className="h-5 w-5 text-gray-500" />
+        {React.createElement(getIcon("X"), { className: "h-5 w-5 text-gray-500" })}
       </button>
     </div>
   );

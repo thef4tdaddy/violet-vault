@@ -1,5 +1,5 @@
 import React from "react";
-import { X, Calendar, DollarSign } from "lucide-react";
+import { getIcon } from "../../../utils";
 
 /**
  * Modal for displaying upcoming debt payments
@@ -28,7 +28,7 @@ const UpcomingPaymentsModal = ({ isOpen, onClose, upcomingPayments = [] }) => {
             <p className="text-gray-600">Next 30 days</p>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
-            <X className="h-6 w-6" />
+            {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
           </button>
         </div>
 
@@ -39,7 +39,7 @@ const UpcomingPaymentsModal = ({ isOpen, onClose, upcomingPayments = [] }) => {
               <p className="text-sm text-orange-600 font-medium">Total Upcoming</p>
               <p className="text-2xl font-bold text-orange-700">${totalUpcoming.toFixed(2)}</p>
             </div>
-            <DollarSign className="h-8 w-8 text-orange-500" />
+            {React.createElement(getIcon("DollarSign"), { className: "h-8 w-8 text-orange-500" })}
           </div>
         </div>
 
@@ -47,7 +47,7 @@ const UpcomingPaymentsModal = ({ isOpen, onClose, upcomingPayments = [] }) => {
         <div className="overflow-y-auto max-h-96">
           {upcomingPayments.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              {React.createElement(getIcon("Calendar"), { className: "h-12 w-12 mx-auto mb-4 opacity-50" })}
               <p>No upcoming payments in the next 30 days</p>
             </div>
           ) : (
