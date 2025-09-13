@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { getIcon } from "../../../utils";
 
 const GRADIENT_CLASSES = {
   red: "from-red-500 to-red-600",
@@ -68,9 +68,13 @@ const MetricCard = ({ title, value, subtitle, icon, trend, color = "purple" }) =
       {trend !== undefined && trend !== null && (
         <div className="mt-3 flex items-center text-sm">
           {trend > 0 ? (
-            <ArrowUpRight className="h-4 w-4 text-white mr-1" />
+            React.createElement(getIcon("ArrowUpRight"), {
+              className: "h-4 w-4 text-white mr-1",
+            })
           ) : (
-            <ArrowDownRight className="h-4 w-4 text-white mr-1" />
+            React.createElement(getIcon("ArrowDownRight"), {
+              className: "h-4 w-4 text-white mr-1",
+            })
           )}
           <span className="text-white">{Math.abs(trend).toFixed(1)}% vs last period</span>
         </div>

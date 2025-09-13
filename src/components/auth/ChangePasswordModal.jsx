@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X } from "lucide-react";
+import { getIcon } from "../../utils";
 
 const ChangePasswordModal = ({ isOpen, onClose, onChangePassword }) => {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -45,7 +45,9 @@ const ChangePasswordModal = ({ isOpen, onClose, onChangePassword }) => {
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold">Change Password</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-            <X className="h-5 w-5" />
+            {React.createElement(getIcon("X"), {
+              className: "h-5 w-5",
+            })}
           </button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
