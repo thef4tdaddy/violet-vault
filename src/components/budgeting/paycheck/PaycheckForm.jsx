@@ -1,5 +1,5 @@
 import React from "react";
-import { DollarSign, User, Target, RotateCcw } from "lucide-react";
+import { getIcon } from "../../../utils";
 
 const PaycheckForm = ({
   formData,
@@ -25,7 +25,9 @@ const PaycheckForm = ({
       {/* Amount Input */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          <DollarSign className="h-4 w-4 inline mr-1 text-green-600" />
+          {React.createElement(getIcon("DollarSign"), {
+            className: "h-4 w-4 inline mr-1 text-green-600",
+          })}
           Paycheck Amount
         </label>
         <div className="relative">
@@ -37,20 +39,26 @@ const PaycheckForm = ({
             value={formData.amount}
             onChange={(e) => onUpdateField("amount", e.target.value)}
             className={`block w-full pl-8 pr-3 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors ${
-              errors.amount ? "border-red-300 bg-red-50" : "border-gray-300 hover:border-gray-400"
+              errors.amount
+                ? "border-red-300 bg-red-50"
+                : "border-gray-300 hover:border-gray-400"
             }`}
             placeholder="0.00"
             step="0.01"
             min="0"
           />
         </div>
-        {errors.amount && <p className="mt-1 text-sm text-red-600">{errors.amount}</p>}
+        {errors.amount && (
+          <p className="mt-1 text-sm text-red-600">{errors.amount}</p>
+        )}
       </div>
 
       {/* Payer Selection */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          <User className="h-4 w-4 inline mr-1 text-green-600" />
+          {React.createElement(getIcon("User"), {
+            className: "h-4 w-4 inline mr-1 text-green-600",
+          })}
           Payer
         </label>
         <div className="relative">
@@ -72,7 +80,9 @@ const PaycheckForm = ({
             ))}
           </datalist>
         </div>
-        {errors.payerName && <p className="mt-1 text-sm text-red-600">{errors.payerName}</p>}
+        {errors.payerName && (
+          <p className="mt-1 text-sm text-red-600">{errors.payerName}</p>
+        )}
       </div>
 
       {/* Payer Statistics */}
@@ -90,7 +100,9 @@ const PaycheckForm = ({
             </div>
             <div>
               <span className="text-blue-700">Count:</span>
-              <span className="font-medium ml-2">{selectedPayerStats.count}</span>
+              <span className="font-medium ml-2">
+                {selectedPayerStats.count}
+              </span>
             </div>
             <div>
               <span className="text-blue-700">Range:</span>
@@ -103,7 +115,9 @@ const PaycheckForm = ({
               <span className="text-blue-700">Last:</span>
               <span className="font-medium ml-2">
                 {selectedPayerStats.lastPaycheckDate
-                  ? new Date(selectedPayerStats.lastPaycheckDate).toLocaleDateString()
+                  ? new Date(
+                      selectedPayerStats.lastPaycheckDate,
+                    ).toLocaleDateString()
                   : "N/A"}
               </span>
             </div>
@@ -114,7 +128,9 @@ const PaycheckForm = ({
       {/* Allocation Mode */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-3">
-          <Target className="h-4 w-4 inline mr-1 text-green-600" />
+          {React.createElement(getIcon("Target"), {
+            className: "h-4 w-4 inline mr-1 text-green-600",
+          })}
           Allocation Mode
         </label>
         <div className="grid grid-cols-1 gap-3">
@@ -125,7 +141,9 @@ const PaycheckForm = ({
                 name="allocationMode"
                 value="allocate"
                 checked={formData.allocationMode === "allocate"}
-                onChange={(e) => onUpdateField("allocationMode", e.target.value)}
+                onChange={(e) =>
+                  onUpdateField("allocationMode", e.target.value)
+                }
                 className="sr-only"
               />
               <div
@@ -141,7 +159,9 @@ const PaycheckForm = ({
               </div>
             </div>
             <div className="text-sm">
-              <div className="font-medium text-gray-900">Standard Allocation</div>
+              <div className="font-medium text-gray-900">
+                Standard Allocation
+              </div>
               <div className="text-gray-600 mt-1">
                 Allocate based on envelope monthly amounts (biweekly conversion)
               </div>
@@ -154,7 +174,9 @@ const PaycheckForm = ({
                 name="allocationMode"
                 value="leftover"
                 checked={formData.allocationMode === "leftover"}
-                onChange={(e) => onUpdateField("allocationMode", e.target.value)}
+                onChange={(e) =>
+                  onUpdateField("allocationMode", e.target.value)
+                }
                 className="sr-only"
               />
               <div
@@ -170,7 +192,9 @@ const PaycheckForm = ({
               </div>
             </div>
             <div className="text-sm">
-              <div className="font-medium text-gray-900">Proportional Distribution</div>
+              <div className="font-medium text-gray-900">
+                Proportional Distribution
+              </div>
               <div className="text-gray-600 mt-1">
                 Distribute entire paycheck proportionally across envelopes
               </div>
@@ -187,7 +211,9 @@ const PaycheckForm = ({
           disabled={!canSubmit}
           className="flex-1 flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 focus:ring-2 focus:ring-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
         >
-          <DollarSign className="h-4 w-4 mr-2" />
+          {React.createElement(getIcon("DollarSign"), {
+            className: "h-4 w-4 mr-2",
+          })}
           {isLoading ? "Processing..." : "Process Paycheck"}
         </button>
         <button
@@ -195,7 +221,7 @@ const PaycheckForm = ({
           onClick={onReset}
           className="px-4 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 focus:ring-2 focus:ring-green-500 transition-colors"
         >
-          <RotateCcw className="h-4 w-4" />
+          {React.createElement(getIcon("RotateCcw"), { className: "h-4 w-4" })}
         </button>
       </div>
 

@@ -1,12 +1,18 @@
 import React from "react";
-import { Clock, TrendingUp, User, Calendar } from "lucide-react";
+import { getIcon } from "../../../utils";
 import { formatPaycheckAmount } from "../../../utils/budgeting/paycheckUtils";
 
-const PaycheckHistory = ({ paycheckHistory = [], paycheckStats, onSelectPaycheck = () => {} }) => {
+const PaycheckHistory = ({
+  paycheckHistory = [],
+  paycheckStats,
+  onSelectPaycheck = () => {},
+}) => {
   if (paycheckHistory.length === 0) {
     return (
       <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 text-center">
-        <Clock className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+        {React.createElement(getIcon("Clock"), {
+          className: "h-8 w-8 mx-auto text-gray-400 mb-2",
+        })}
         <p className="text-gray-500">No paycheck history available</p>
         <p className="text-gray-400 text-sm mt-1">
           Process your first paycheck to see history here
@@ -32,7 +38,9 @@ const PaycheckHistory = ({ paycheckHistory = [], paycheckStats, onSelectPaycheck
   };
 
   const getModeColor = (mode) => {
-    return mode === "allocate" ? "text-green-600 bg-green-50" : "text-blue-600 bg-blue-50";
+    return mode === "allocate"
+      ? "text-green-600 bg-green-50"
+      : "text-blue-600 bg-blue-50";
   };
 
   return (
@@ -41,13 +49,17 @@ const PaycheckHistory = ({ paycheckHistory = [], paycheckStats, onSelectPaycheck
       {paycheckStats && paycheckStats.count > 0 && (
         <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-gray-200 rounded-xl p-4">
           <h3 className="font-semibold text-gray-900 flex items-center mb-3">
-            <TrendingUp className="h-4 w-4 mr-2 text-green-600" />
+            {React.createElement(getIcon("TrendingUp"), {
+              className: "h-4 w-4 mr-2 text-green-600",
+            })}
             Paycheck Statistics
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div>
               <span className="text-gray-600 block">Total Processed</span>
-              <span className="font-bold text-gray-900">{paycheckStats.count}</span>
+              <span className="font-bold text-gray-900">
+                {paycheckStats.count}
+              </span>
             </div>
             <div>
               <span className="text-gray-600 block">Average Amount</span>
@@ -75,7 +87,9 @@ const PaycheckHistory = ({ paycheckHistory = [], paycheckStats, onSelectPaycheck
       {/* Recent History */}
       <div className="space-y-3">
         <h4 className="font-medium text-gray-900 flex items-center">
-          <Clock className="h-4 w-4 mr-2 text-green-600" />
+          {React.createElement(getIcon("Clock"), {
+            className: "h-4 w-4 mr-2 text-green-600",
+          })}
           Recent Paychecks ({Math.min(10, paycheckHistory.length)} most recent)
         </h4>
 
@@ -88,8 +102,12 @@ const PaycheckHistory = ({ paycheckHistory = [], paycheckStats, onSelectPaycheck
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center">
-                  <User className="h-4 w-4 text-gray-500 mr-2" />
-                  <span className="font-medium text-gray-900">{paycheck.payerName}</span>
+                  {React.createElement(getIcon("User"), {
+                    className: "h-4 w-4 text-gray-500 mr-2",
+                  })}
+                  <span className="font-medium text-gray-900">
+                    {paycheck.payerName}
+                  </span>
                   <span
                     className={`ml-2 px-2 py-1 text-xs rounded-md ${getModeColor(paycheck.allocationMode)}`}
                   >
@@ -103,7 +121,9 @@ const PaycheckHistory = ({ paycheckHistory = [], paycheckStats, onSelectPaycheck
 
               <div className="flex items-center justify-between text-sm text-gray-600">
                 <div className="flex items-center">
-                  <Calendar className="h-3 w-3 mr-1" />
+                  {React.createElement(getIcon("Calendar"), {
+                    className: "h-3 w-3 mr-1",
+                  })}
                   <span>{formatDate(paycheck.processedAt)}</span>
                   <span className="ml-3">by {paycheck.processedBy}</span>
                 </div>
@@ -113,7 +133,8 @@ const PaycheckHistory = ({ paycheckHistory = [], paycheckStats, onSelectPaycheck
                   </span>
                   {paycheck.remainingAmount > 0 && (
                     <span className="text-blue-600 ml-2">
-                      ({formatPaycheckAmount(paycheck.remainingAmount)} remaining)
+                      ({formatPaycheckAmount(paycheck.remainingAmount)}{" "}
+                      remaining)
                     </span>
                   )}
                 </div>

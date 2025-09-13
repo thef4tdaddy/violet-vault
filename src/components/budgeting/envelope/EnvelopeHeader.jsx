@@ -1,5 +1,5 @@
 import React from "react";
-import { Filter, Plus } from "lucide-react";
+import { getIcon } from "../../../utils";
 import { ENVELOPE_TYPES } from "../../../constants/categories";
 
 const EnvelopeHeader = ({
@@ -16,7 +16,11 @@ const EnvelopeHeader = ({
           <div className="relative mr-4">
             <div className="absolute inset-0 bg-purple-500 rounded-2xl blur-lg opacity-30"></div>
             <div className="relative bg-purple-500 p-3 rounded-2xl">
-              <svg className="h-6 w-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <svg
+                className="h-6 w-6 text-white"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
                 <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
                 <path
                   fillRule="evenodd"
@@ -28,12 +32,16 @@ const EnvelopeHeader = ({
           </div>
           Budget Envelopes
         </h2>
-        <p className="text-gray-600 mt-1">Organize your money into spending categories</p>
+        <p className="text-gray-600 mt-1">
+          Organize your money into spending categories
+        </p>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-gray-500" />
+          {React.createElement(getIcon("Filter"), {
+            className: "h-4 w-4 text-gray-500",
+          })}
           <select
             value={filterOptions.envelopeType}
             onChange={(e) =>
@@ -97,7 +105,7 @@ const EnvelopeHeader = ({
           className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 flex items-center text-sm"
           data-tour="add-envelope"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          {React.createElement(getIcon("Plus"), { className: "h-4 w-4 mr-2" })}
           Add Envelope
         </button>
       </div>

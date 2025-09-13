@@ -1,5 +1,5 @@
 import React from "react";
-import { AlertTriangle, Lightbulb, Target, Eye } from "lucide-react";
+import { getIcon } from "../../../utils";
 import SuggestionCard from "./SuggestionCard";
 
 const SuggestionsList = ({
@@ -11,7 +11,9 @@ const SuggestionsList = ({
   if (!suggestions || suggestions.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">
-        <Eye className="h-12 w-12 mx-auto mb-3 opacity-30" />
+        {React.createElement(getIcon("Eye"), {
+          className: "h-12 w-12 mx-auto mb-3 opacity-30",
+        })}
         <p className="font-medium">No suggestions available</p>
         <p className="text-sm mt-1">
           Your budget looks well-organized! Check back after more transactions.
@@ -32,21 +34,21 @@ const SuggestionsList = ({
   const priorityConfig = {
     high: {
       label: "High Priority",
-      icon: AlertTriangle,
+      icon: "AlertTriangle",
       color: "text-red-600",
       bgColor: "bg-red-50",
       borderColor: "border-red-200",
     },
     medium: {
       label: "Medium Priority",
-      icon: Lightbulb,
+      icon: "Lightbulb",
       color: "text-amber-600",
       bgColor: "bg-amber-50",
       borderColor: "border-amber-200",
     },
     low: {
       label: "Low Priority",
-      icon: Target,
+      icon: "Target",
       color: "text-blue-600",
       bgColor: "bg-blue-50",
       borderColor: "border-blue-200",
@@ -57,10 +59,10 @@ const SuggestionsList = ({
     <div className="space-y-4">
       {["high", "medium", "low"].map((priority) => {
         const prioritySuggestions = groupedSuggestions[priority];
-        if (!prioritySuggestions || prioritySuggestions.length === 0) return null;
+        if (!prioritySuggestions || prioritySuggestions.length === 0)
+          return null;
 
         const config = priorityConfig[priority];
-        const PriorityIcon = config.icon;
 
         return (
           <div key={priority} className="space-y-3">
@@ -68,7 +70,9 @@ const SuggestionsList = ({
               <div
                 className={`flex items-center px-3 py-2 rounded-lg ${config.bgColor} ${config.borderColor} border`}
               >
-                <PriorityIcon className={`h-4 w-4 mr-2 ${config.color}`} />
+                {React.createElement(getIcon(config.icon), {
+                  className: `h-4 w-4 mr-2 ${config.color}`,
+                })}
                 <h4 className={`font-medium ${config.color}`}>
                   {config.label} ({prioritySuggestions.length})
                 </h4>
@@ -97,7 +101,8 @@ const SuggestionsList = ({
         <div className="text-center py-4 border-t border-gray-200 mt-6">
           <p className="text-sm text-gray-600">
             Showing {suggestions.length} suggestion
-            {suggestions.length !== 1 ? "s" : ""} based on your recent spending patterns
+            {suggestions.length !== 1 ? "s" : ""} based on your recent spending
+            patterns
           </p>
         </div>
       )}

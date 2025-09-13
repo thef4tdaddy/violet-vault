@@ -1,5 +1,5 @@
 import React from "react";
-import { X, Edit, Unlock, Lock, User, Clock } from "lucide-react";
+import { getIcon } from "../../../utils";
 import EditLockIndicator from "../../ui/EditLockIndicator";
 
 const EnvelopeModalHeader = ({
@@ -20,7 +20,9 @@ const EnvelopeModalHeader = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center flex-1">
             <div className="bg-white/20 p-2 rounded-xl mr-3">
-              <Edit className="h-5 w-5 text-white" />
+              {React.createElement(getIcon("Edit"), {
+                className: "h-5 w-5 text-white",
+              })}
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-3">
@@ -44,7 +46,9 @@ const EnvelopeModalHeader = ({
                 onClick={onBreakLock}
                 className="bg-red-500/20 hover:bg-red-500/30 text-red-100 px-3 py-1 rounded-lg text-xs font-medium transition-colors flex items-center"
               >
-                <Unlock className="h-3 w-3 mr-1" />
+                {React.createElement(getIcon("Unlock"), {
+                  className: "h-3 w-3 mr-1",
+                })}
                 Break Lock
               </button>
             )}
@@ -52,7 +56,7 @@ const EnvelopeModalHeader = ({
               onClick={onClose}
               className="text-white/80 hover:text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
             >
-              <X className="h-5 w-5" />
+              {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
             </button>
           </div>
         </div>
