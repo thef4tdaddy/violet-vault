@@ -81,7 +81,7 @@ export const useOnboardingAutoComplete = () => {
       logger.info("🎯 Auto-completing firstBills step - bill added:", bills[0].description);
       markStepComplete("firstBills");
     }
-  }, [bills.length, shouldAutoComplete, isStepComplete, markStepComplete]);
+  }, [bills, shouldAutoComplete, isStepComplete, markStepComplete]);
 
   // Auto-complete transaction step when first expense transaction is added
   useEffect(() => {
