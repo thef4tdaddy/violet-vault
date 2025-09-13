@@ -136,9 +136,9 @@ export const ManualSyncControls = ({ className = "" }) => {
             className="flex items-center gap-2"
           >
             {isUploadingSyncInProgress ? (
-              {React.createElement(getIcon("RefreshCw"), { className: "h-4 w-4 animate-spin" })}
+              React.createElement(getIcon("RefreshCw"), { className: "h-4 w-4 animate-spin" })
             ) : (
-              {React.createElement(getIcon("Upload"), { className: "h-4 w-4" })}
+              React.createElement(getIcon("Upload"), { className: "h-4 w-4" })
             )}
             Upload Changes
           </Button>
@@ -151,9 +151,9 @@ export const ManualSyncControls = ({ className = "" }) => {
             className="flex items-center gap-2"
           >
             {isDownloadingSyncInProgress ? (
-              {React.createElement(getIcon("RefreshCw"), { className: "h-4 w-4 animate-spin" })}
+              React.createElement(getIcon("RefreshCw"), { className: "h-4 w-4 animate-spin" })
             ) : (
-              {React.createElement(getIcon("Download"), { className: "h-4 w-4" })}
+              React.createElement(getIcon("Download"), { className: "h-4 w-4" })
             )}
             Download Changes
           </Button>
@@ -166,9 +166,9 @@ export const ManualSyncControls = ({ className = "" }) => {
             className="flex items-center gap-2"
           >
             {isSyncInProgress ? (
-              {React.createElement(getIcon("RefreshCw"), { className: "h-4 w-4 animate-spin" })}
+              React.createElement(getIcon("RefreshCw"), { className: "h-4 w-4 animate-spin" })
             ) : (
-              {React.createElement(getIcon("RefreshCw"), { className: "h-4 w-4" })}
+              React.createElement(getIcon("RefreshCw"), { className: "h-4 w-4" })
             )}
             Full Sync
           </Button>
