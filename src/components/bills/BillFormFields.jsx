@@ -1,5 +1,5 @@
 import React from "react";
-import { Sparkles, Save } from "lucide-react";
+import { getIcon } from "../../utils";
 import { getIconByName } from "../../utils/common/billIcons";
 import { getFrequencyOptions } from "../../utils/common/frequencyCalculations";
 import { UniversalConnectionManager } from "../ui/ConnectionDisplay";
@@ -139,7 +139,7 @@ const BillFormFields = ({
           Bill Icon
           {suggestedIconName && (
             <span className="ml-2 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
-              <Sparkles className="h-3 w-3 inline mr-1" />
+              {React.createElement(getIcon("Sparkles"), { className: "h-3 w-3 inline mr-1" })}
               Suggested: {suggestedIconName}
             </span>
           )}
@@ -218,7 +218,7 @@ const BillFormFields = ({
             disabled={isSubmitting || (editingBill && !canEdit)}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 border-2 border-black disabled:opacity-50 flex items-center"
           >
-            <Save className="h-4 w-4 mr-2" />
+            {React.createElement(getIcon("Save"), { className: "h-4 w-4 mr-2" })}
             {isSubmitting ? "Saving..." : editingBill ? "Update Bill" : "Add Bill"}
           </button>
         </div>
