@@ -1,5 +1,5 @@
 import React from "react";
-import { FileText, GitCommit, RotateCcw } from "lucide-react";
+import { getIcon } from "../../../utils";
 
 const ChangeDetails = ({
   selectedCommit,
@@ -14,7 +14,7 @@ const ChangeDetails = ({
 
       {!selectedCommit && (
         <div className="text-center py-8 text-gray-500">
-          <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
+          {React.createElement(getIcon("FileText"), { className: "h-12 w-12 mx-auto mb-3 opacity-50" })}
           <p>Select a change to view details</p>
         </div>
       )}
@@ -30,7 +30,7 @@ const ChangeDetails = ({
         <div className="border rounded-lg p-4 bg-white">
           <div className="mb-4">
             <div className="flex items-center gap-2 mb-2">
-              <GitCommit className="h-5 w-5 text-gray-600" />
+              {React.createElement(getIcon("GitCommit"), { className: "h-5 w-5 text-gray-600" })}
               <span className="font-mono text-sm text-gray-600">
                 {commitDetails.commit.hash?.substring(0, 8)}
               </span>
@@ -99,7 +99,7 @@ const ChangeDetails = ({
               onClick={() => handleRestoreFromHistory(selectedCommit)}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center text-sm"
             >
-              <RotateCcw className="h-4 w-4 mr-2" />
+              {React.createElement(getIcon("RotateCcw"), { className: "h-4 w-4 mr-2" })}
               Restore to This State
             </button>
           </div>

@@ -1,5 +1,5 @@
 import React from "react";
-import { History, GitCommit, Calendar, RotateCcw, ChevronDown, ChevronRight } from "lucide-react";
+import { getIcon } from "../../../utils";
 
 const HistoryList = ({
   loading,
@@ -24,7 +24,7 @@ const HistoryList = ({
 
       {!loading && history.length === 0 && (
         <div className="text-center py-8 text-gray-500">
-          <History className="h-12 w-12 mx-auto mb-3 opacity-50" />
+          {React.createElement(getIcon("History"), { className: "h-12 w-12 mx-auto mb-3 opacity-50" })}
           <p>No history available</p>
           <p className="text-sm mt-1">History will appear as you make changes to your budget</p>
         </div>
@@ -45,7 +45,7 @@ const HistoryList = ({
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <GitCommit className="h-4 w-4 text-gray-600" />
+                    {React.createElement(getIcon("GitCommit"), { className: "h-4 w-4 text-gray-600" })}
                     <span className="font-mono text-sm text-gray-600">{commit.shortHash}</span>
                     <span
                       className={`px-2 py-1 rounded-full text-xs ${getAuthorColor(commit.author)}`}
@@ -57,7 +57,7 @@ const HistoryList = ({
                   <p className="text-sm font-medium text-gray-900 mb-1">{commit.message}</p>
 
                   <div className="flex items-center text-xs text-gray-500">
-                    <Calendar className="h-3 w-3 mr-1" />
+                    {React.createElement(getIcon("Calendar"), { className: "h-3 w-3 mr-1" })}
                     {new Date(commit.timestamp).toLocaleString()}
                   </div>
                 </div>
@@ -71,7 +71,7 @@ const HistoryList = ({
                     className="text-gray-400 hover:text-blue-600 p-1 rounded"
                     title="Restore to this state"
                   >
-                    <RotateCcw className="h-4 w-4" />
+                    {React.createElement(getIcon("RotateCcw"), { className: "h-4 w-4" })}
                   </button>
 
                   <button
@@ -82,9 +82,9 @@ const HistoryList = ({
                     className="text-gray-400 hover:text-gray-600 p-1 rounded"
                   >
                     {expandedCommits.has(commit.hash) ? (
-                      <ChevronDown className="h-4 w-4" />
+                      React.createElement(getIcon("ChevronDown"), { className: "h-4 w-4" })
                     ) : (
-                      <ChevronRight className="h-4 w-4" />
+                      React.createElement(getIcon("ChevronRight"), { className: "h-4 w-4" })
                     )}
                   </button>
                 </div>
