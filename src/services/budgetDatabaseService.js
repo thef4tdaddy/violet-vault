@@ -187,7 +187,7 @@ class BudgetDatabaseService {
    * Savings Goals operations with status optimization
    */
   async getSavingsGoals(options = {}) {
-    const { category, isCompleted, isPaused, priority } = options;
+    const { category, isCompleted, _isPaused, priority } = options;
 
     try {
       if (category) {

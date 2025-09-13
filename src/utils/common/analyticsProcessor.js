@@ -71,7 +71,7 @@ export const _filterTransactionsByDateRange = (transactions, timeFilter) => {
 
     try {
       return new Date(transaction.date) >= dateRange;
-    } catch (error) {
+    } catch {
       logger.warn("Invalid date in transaction:", transaction.date);
       return false;
     }
@@ -178,7 +178,7 @@ export const groupTransactionsByWeekday = (transactions) => {
         patterns[dayIndex].count++;
         patterns[dayIndex].transactions.push(transaction);
       }
-    } catch (error) {
+    } catch {
       logger.warn("Invalid date in weekday patterns:", transaction.date);
     }
   });

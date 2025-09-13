@@ -186,7 +186,7 @@ export const isValidAccountColor = (color) => {
  * @returns {string} Icon component name
  */
 export const getAccountIconName = (type) => {
-  const typeInfo = getAccountTypeInfo(type);
+  const _typeInfo = getAccountTypeInfo(type);
 
   // Map account types to Lucide icon names
   const iconMap = {

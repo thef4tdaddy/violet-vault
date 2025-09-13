@@ -101,7 +101,7 @@ class SecurityService {
         try {
           safeObj[key] = this.safeSerialize(value, maxDepth, currentDepth + 1);
           keyCount++;
-        } catch (err) {
+        } catch {
           safeObj[key] = "[Serialization Error]";
         }
       }
