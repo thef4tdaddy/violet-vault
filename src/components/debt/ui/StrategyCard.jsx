@@ -1,5 +1,5 @@
 import React from "react";
-import { TrendingDown, Clock, DollarSign } from "lucide-react";
+import { getIcon } from "../../../utils";
 
 /**
  * Card component for displaying debt payoff strategy details
@@ -47,7 +47,7 @@ const StrategyCard = ({ strategy, isRecommended = false }) => {
               <p className="text-xs text-red-600 font-medium">Total Interest</p>
               <p className="text-lg font-bold text-red-700">${totalInterest.toFixed(2)}</p>
             </div>
-            <DollarSign className="h-5 w-5 text-red-500" />
+            {React.createElement(getIcon("DollarSign"), { className: "h-5 w-5 text-red-500" })}
           </div>
         </div>
 
@@ -57,7 +57,7 @@ const StrategyCard = ({ strategy, isRecommended = false }) => {
               <p className="text-xs text-blue-600 font-medium">Payoff Time</p>
               <p className="text-lg font-bold text-blue-700">{payoffTime} months</p>
             </div>
-            <Clock className="h-5 w-5 text-blue-500" />
+            {React.createElement(getIcon("Clock"), { className: "h-5 w-5 text-blue-500" })}
           </div>
         </div>
       </div>
@@ -65,7 +65,7 @@ const StrategyCard = ({ strategy, isRecommended = false }) => {
       {/* Debt Priority Order */}
       <div>
         <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
-          <TrendingDown className="h-4 w-4 mr-1" />
+          {React.createElement(getIcon("TrendingDown"), { className: "h-4 w-4 mr-1" })}
           Priority Order
         </h4>
         <div className="space-y-2 max-h-48 overflow-y-auto">

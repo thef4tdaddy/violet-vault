@@ -1,5 +1,5 @@
 import React from "react";
-import { TrendingDown, ArrowRight } from "lucide-react";
+import { getIcon } from "../../../utils";
 import { useDebtManagement } from "../../../hooks/debts/useDebtManagement";
 import _logger from "../../../utils/common/logger";
 
@@ -24,7 +24,7 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
           <div className="relative mr-3">
             <div className="absolute inset-0 bg-red-500 rounded-2xl blur-lg opacity-30"></div>
             <div className="relative bg-red-500 p-2 rounded-2xl">
-              <TrendingDown className="h-4 w-4 text-white" />
+              {React.createElement(getIcon("TrendingDown"), { className: "h-4 w-4 text-white" })}
             </div>
           </div>
           Debt Summary
@@ -36,7 +36,7 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
             className="text-base text-blue-600 hover:text-blue-700 flex items-center font-medium"
           >
             View All
-            <ArrowRight className="h-4 w-4 ml-1" />
+            {React.createElement(getIcon("ArrowRight"), { className: "h-4 w-4 ml-1" })}
           </button>
         )}
       </div>

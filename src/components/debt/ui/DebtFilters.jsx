@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Filter, ChevronDown, ChevronUp } from "lucide-react";
+import { getIcon } from "../../../utils";
 import { DEBT_TYPE_CONFIG } from "../../../constants/debts";
 
 /**
@@ -28,7 +28,7 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes, debtsByType }
       {/* Header - Always Visible */}
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center space-x-2">
-          <Filter className="h-4 w-4 text-gray-600" />
+          {React.createElement(getIcon("Filter"), { className: "h-4 w-4 text-gray-600" })}
           <span className="text-sm font-medium text-gray-700">Filters & Sorting</span>
           {hasActiveFilters && (
             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
@@ -41,9 +41,9 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes, debtsByType }
           className="p-1 rounded-lg hover:bg-white/50 transition-colors"
         >
           {isExpanded ? (
-            <ChevronUp className="h-4 w-4 text-gray-600" />
+            React.createElement(getIcon("ChevronUp"), { className: "h-4 w-4 text-gray-600" })
           ) : (
-            <ChevronDown className="h-4 w-4 text-gray-600" />
+            React.createElement(getIcon("ChevronDown"), { className: "h-4 w-4 text-gray-600" })
           )}
         </button>
       </div>
