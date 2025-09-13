@@ -1,5 +1,5 @@
 import React from "react";
-import { DollarSign, AlertCircle, Target } from "lucide-react";
+import { getIcon } from "../../../utils";
 import { ENVELOPE_TYPES } from "../../../constants/categories";
 import { getFrequencyOptions } from "../../../utils/common/frequencyCalculations";
 
@@ -26,14 +26,18 @@ const EnvelopeBudgetFields = ({
   return (
     <div className="space-y-4">
       <h3 className="font-semibold text-gray-900 flex items-center">
-        <DollarSign className="h-4 w-4 mr-2 text-blue-600" />
+        {React.createElement(getIcon("DollarSign"), {
+          className: "h-4 w-4 mr-2 text-blue-600",
+        })}
         {getSectionTitle()}
       </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Monthly Amount */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Monthly Amount *</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Monthly Amount *
+          </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <span className="text-gray-500 sm:text-sm">$</span>
@@ -44,7 +48,9 @@ const EnvelopeBudgetFields = ({
               onChange={(e) => onUpdateField("monthlyAmount", e.target.value)}
               disabled={!canEdit}
               className={`w-full pl-8 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                errors.monthlyAmount ? "border-red-300 bg-red-50" : "border-gray-300"
+                errors.monthlyAmount
+                  ? "border-red-300 bg-red-50"
+                  : "border-gray-300"
               } ${!canEdit ? "bg-gray-100 cursor-not-allowed" : ""}`}
               placeholder="0.00"
               min="0"
@@ -53,7 +59,9 @@ const EnvelopeBudgetFields = ({
           </div>
           {errors.monthlyAmount && (
             <p className="mt-1 text-sm text-red-600 flex items-center">
-              <AlertCircle className="h-3 w-3 mr-1" />
+              {React.createElement(getIcon("AlertCircle"), {
+                className: "h-3 w-3 mr-1",
+              })}
               {errors.monthlyAmount}
             </p>
           )}
@@ -66,7 +74,9 @@ const EnvelopeBudgetFields = ({
 
         {/* Current Balance */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Current Balance</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Current Balance
+          </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <span className="text-gray-500 sm:text-sm">$</span>
@@ -77,7 +87,9 @@ const EnvelopeBudgetFields = ({
               onChange={(e) => onUpdateField("currentBalance", e.target.value)}
               disabled={!canEdit}
               className={`w-full pl-8 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                errors.currentBalance ? "border-red-300 bg-red-50" : "border-gray-300"
+                errors.currentBalance
+                  ? "border-red-300 bg-red-50"
+                  : "border-gray-300"
               } ${!canEdit ? "bg-gray-100 cursor-not-allowed" : ""}`}
               placeholder="0.00"
               step="0.01"
@@ -85,7 +97,9 @@ const EnvelopeBudgetFields = ({
           </div>
           {errors.currentBalance && (
             <p className="mt-1 text-sm text-red-600 flex items-center">
-              <AlertCircle className="h-3 w-3 mr-1" />
+              {React.createElement(getIcon("AlertCircle"), {
+                className: "h-3 w-3 mr-1",
+              })}
               {errors.currentBalance}
             </p>
           )}
@@ -96,7 +110,9 @@ const EnvelopeBudgetFields = ({
       {formData.envelopeType === ENVELOPE_TYPES.SINKING_FUND && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            <Target className="h-4 w-4 inline mr-1" />
+            {React.createElement(getIcon("Target"), {
+              className: "h-4 w-4 inline mr-1",
+            })}
             Target Amount *
           </label>
           <div className="relative">
@@ -109,7 +125,9 @@ const EnvelopeBudgetFields = ({
               onChange={(e) => onUpdateField("targetAmount", e.target.value)}
               disabled={!canEdit}
               className={`w-full pl-8 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                errors.targetAmount ? "border-red-300 bg-red-50" : "border-gray-300"
+                errors.targetAmount
+                  ? "border-red-300 bg-red-50"
+                  : "border-gray-300"
               } ${!canEdit ? "bg-gray-100 cursor-not-allowed" : ""}`}
               placeholder="0.00"
               min="0"
@@ -118,7 +136,9 @@ const EnvelopeBudgetFields = ({
           </div>
           {errors.targetAmount && (
             <p className="mt-1 text-sm text-red-600 flex items-center">
-              <AlertCircle className="h-3 w-3 mr-1" />
+              {React.createElement(getIcon("AlertCircle"), {
+                className: "h-3 w-3 mr-1",
+              })}
               {errors.targetAmount}
             </p>
           )}
@@ -128,7 +148,9 @@ const EnvelopeBudgetFields = ({
       {/* Payment Frequency (for bills) */}
       {formData.envelopeType === ENVELOPE_TYPES.BILL && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Payment Frequency</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Payment Frequency
+          </label>
           <select
             value={formData.frequency || "monthly"}
             onChange={(e) => onUpdateField("frequency", e.target.value)}
@@ -145,7 +167,9 @@ const EnvelopeBudgetFields = ({
           </select>
           {errors.frequency && (
             <p className="mt-1 text-sm text-red-600 flex items-center">
-              <AlertCircle className="h-3 w-3 mr-1" />
+              {React.createElement(getIcon("AlertCircle"), {
+                className: "h-3 w-3 mr-1",
+              })}
               {errors.frequency}
             </p>
           )}

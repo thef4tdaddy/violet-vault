@@ -1,14 +1,20 @@
 import React from "react";
-import { Sparkles, Settings } from "lucide-react";
+import { getIcon } from "../../../utils";
 
 /**
  * Shared component for allocation mode selection using radio buttons
  * Follows the CSS Grid pattern from docs/UI-Component-Patterns.md
  */
-const AllocationModeSelector = ({ autoAllocate, onAutoAllocateChange, disabled = false }) => {
+const AllocationModeSelector = ({
+  autoAllocate,
+  onAutoAllocateChange,
+  disabled = false,
+}) => {
   return (
     <div className="space-y-3">
-      <label className="block text-sm font-medium text-gray-700">Paycheck Allocation</label>
+      <label className="block text-sm font-medium text-gray-700">
+        Paycheck Allocation
+      </label>
 
       <div className="space-y-2">
         {/* Auto-allocate option */}
@@ -26,11 +32,14 @@ const AllocationModeSelector = ({ autoAllocate, onAutoAllocateChange, disabled =
             />
             <div>
               <div className="flex items-center mb-1">
-                <Sparkles className="h-4 w-4 mr-2 text-purple-600" />
+                {React.createElement(getIcon("Sparkles"), {
+                  className: "h-4 w-4 mr-2 text-purple-600",
+                })}
                 <span className="font-medium text-sm">Auto-allocate</span>
               </div>
               <p className="text-xs text-gray-600 leading-tight">
-                Automatically allocate funds from paychecks based on envelope priority
+                Automatically allocate funds from paychecks based on envelope
+                priority
               </p>
             </div>
           </div>
@@ -51,7 +60,9 @@ const AllocationModeSelector = ({ autoAllocate, onAutoAllocateChange, disabled =
             />
             <div>
               <div className="flex items-center mb-1">
-                <Settings className="h-4 w-4 mr-2 text-gray-600" />
+                {React.createElement(getIcon("Settings"), {
+                  className: "h-4 w-4 mr-2 text-gray-600",
+                })}
                 <span className="font-medium text-sm">Manual allocation</span>
               </div>
               <p className="text-xs text-gray-600 leading-tight">
