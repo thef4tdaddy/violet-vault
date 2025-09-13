@@ -1,16 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useConfirm } from "../../hooks/common/useConfirm";
-import {
-  Lock,
-  Unlock,
-  Eye,
-  EyeOff,
-  AlertCircle,
-  Shield,
-  Clock,
-  UserX,
-  RotateCcw,
-} from "lucide-react";
+import { getIcon } from "../../utils";
 import { useSecurityManager } from "../../hooks/auth/useSecurityManager";
 import { useAuth } from "../../stores/auth/authStore";
 import shieldLogo from "../../assets/logo-512x512.png";
@@ -242,7 +232,7 @@ const LockScreen = () => {
                     disabled={isUnlocking}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-100 hover:text-white disabled:opacity-50"
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {React.createElement(getIcon(showPassword ? "EyeOff" : "Eye"), { className: "h-5 w-5" })}
                   </button>
                 </div>
               </div>
@@ -273,7 +263,7 @@ const LockScreen = () => {
                     </>
                   ) : (
                     <>
-                      <Unlock className="h-4 w-4" />
+                      {React.createElement(getIcon("Unlock"), { className: "h-4 w-4" })}
                       <span>UNLOCK APPLICATION</span>
                     </>
                   )}
@@ -283,7 +273,7 @@ const LockScreen = () => {
                   onClick={logout}
                   className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg font-black transition-colors border-2 border-black uppercase tracking-wider"
                 >
-                  <UserX className="h-4 w-4" />
+                  {React.createElement(getIcon("UserX"), { className: "h-4 w-4" })}
                   <span>LOG OUT</span>
                 </button>
               </div>

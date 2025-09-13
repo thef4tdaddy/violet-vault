@@ -1,13 +1,12 @@
 // src/components/activity/ActivityFeed.jsx
 import React, { useState, useEffect } from "react";
-import { Activity, Clock, User, Filter } from "lucide-react";
+import { getIcon } from "../../utils";
 import useActivityLogger from "../../hooks/common/useActivityLogger";
 import { ENTITY_TYPES } from "../../services/activityLogger";
 import logger from "../../utils/common/logger";
 import { formatActivityDescription } from "../../utils/activity/activityFormatters";
 import { getActivityIconInfo } from "../../utils/activity/activityIcons";
 import { formatTimestamp } from "../../utils/activity/timeFormatters";
-import { getIcon } from "../../utils/icons";
 
 /**
  * Activity Feed Component - Level 1 Budget History UI
@@ -45,8 +44,8 @@ const ActivityFeed = () => {
 
   // Filter options
   const filterOptions = [
-    { value: "all", label: "All Activity", icon: Activity },
-    { value: ENTITY_TYPES.ENVELOPE, label: "Envelopes", icon: getIcon("Wallet") },
+    { value: "all", label: "All Activity", icon: "Activity" },
+    { value: ENTITY_TYPES.ENVELOPE, label: "Envelopes", icon: "Wallet" },
     {
       value: ENTITY_TYPES.TRANSACTION,
       label: "Transactions",
@@ -87,7 +86,7 @@ const ActivityFeed = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <Filter className="h-4 w-4 text-gray-500" />
+            {React.createElement(getIcon("Filter"), { className: "h-4 w-4 text-gray-500" })}
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
@@ -131,12 +130,12 @@ const ActivityFeed = () => {
 
                   <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
                     <div className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
+                      {React.createElement(getIcon("Clock"), { className: "h-3 w-3" })}
                       {formatTimestamp(activity.timestamp)}
                     </div>
 
                     <div className="flex items-center gap-1">
-                      <User className="h-3 w-3" />
+                      {React.createElement(getIcon("User"), { className: "h-3 w-3" })}
                       {activity.userName || "Unknown User"}
                     </div>
 
