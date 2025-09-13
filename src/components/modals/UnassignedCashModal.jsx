@@ -1,16 +1,5 @@
 import React, { memo, lazy, Suspense } from "react";
-import {
-  X,
-  DollarSign,
-  Users,
-  Percent,
-  RotateCcw,
-  CheckCircle,
-  AlertTriangle,
-  Loader2,
-  Clock,
-  Receipt,
-} from "lucide-react";
+import { getIcon } from "../../utils";
 import { useBudgetStore } from "../../stores/ui/uiStore";
 import useUnassignedCashDistribution from "../../hooks/budgeting/useUnassignedCashDistribution";
 import { ENVELOPE_TYPES } from "../../constants/categories";
@@ -142,7 +131,7 @@ const UnassignedCashModal = () => {
             disabled={isProcessing}
             className="text-gray-400 hover:text-gray-600 disabled:opacity-50 p-1"
           >
-            <X className="h-5 w-5" />
+            {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
           </button>
         </div>
 
@@ -170,19 +159,19 @@ const UnassignedCashModal = () => {
               <div className="flex items-center justify-center">
                 {isOverDistributed ? (
                   <div className="flex items-center text-red-600">
-                    <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    {React.createElement(getIcon("AlertTriangle"), { className: "h-3 w-3 sm:h-4 sm:w-4 mr-1" })}
                     <span className="text-xs sm:text-sm font-medium">
                       {unassignedCash < 0 ? "Increasing" : "Over"}
                     </span>
                   </div>
                 ) : hasDistributions ? (
                   <div className="flex items-center text-green-600">
-                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    {React.createElement(getIcon("CheckCircle"), { className: "h-3 w-3 sm:h-4 sm:w-4 mr-1" })}
                     <span className="text-xs sm:text-sm font-medium">Ready</span>
                   </div>
                 ) : (
                   <div className="flex items-center text-gray-500">
-                    <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    {React.createElement(getIcon("DollarSign"), { className: "h-3 w-3 sm:h-4 sm:w-4 mr-1" })}
                     <span className="text-xs sm:text-sm font-medium">None</span>
                   </div>
                 )}
@@ -199,7 +188,7 @@ const UnassignedCashModal = () => {
             className="btn btn-primary border-2 border-black flex items-center text-sm disabled:opacity-50"
             title="Smart distribution based on bill due dates and funding needs"
           >
-            <Receipt className="h-4 w-4 mr-2" />
+            {React.createElement(getIcon("Receipt"), { className: "h-4 w-4 mr-2" })}
             Smart Bills First
           </button>
           <button
@@ -207,7 +196,7 @@ const UnassignedCashModal = () => {
             disabled={isProcessing || envelopes.length === 0}
             className="btn btn-secondary border-2 border-black flex items-center text-sm disabled:opacity-50"
           >
-            <Users className="h-4 w-4 mr-2" />
+            {React.createElement(getIcon("Users"), { className: "h-4 w-4 mr-2" })}
             Distribute Equally
           </button>
           <button
@@ -215,7 +204,7 @@ const UnassignedCashModal = () => {
             disabled={isProcessing || envelopes.length === 0}
             className="btn btn-secondary border-2 border-black flex items-center text-sm disabled:opacity-50"
           >
-            <Percent className="h-4 w-4 mr-2" />
+            {React.createElement(getIcon("Percent"), { className: "h-4 w-4 mr-2" })}
             Distribute Proportionally
           </button>
           <button
@@ -223,7 +212,7 @@ const UnassignedCashModal = () => {
             disabled={isProcessing || !hasDistributions}
             className="btn btn-secondary border-2 border-black flex items-center text-sm disabled:opacity-50"
           >
-            <RotateCcw className="h-4 w-4 mr-2" />
+            {React.createElement(getIcon("RotateCcw"), { className: "h-4 w-4 mr-2" })}
             Clear All
           </button>
         </div>
@@ -236,7 +225,7 @@ const UnassignedCashModal = () => {
 
           {envelopes.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              <DollarSign className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              {React.createElement(getIcon("DollarSign"), { className: "h-8 w-8 mx-auto mb-2 opacity-50" })}
               <p className="text-sm">No envelopes available for distribution</p>
             </div>
           ) : (
@@ -290,7 +279,7 @@ const UnassignedCashModal = () => {
           >
             {isProcessing ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                {React.createElement(getIcon("Loader2"), { className: "h-4 w-4 mr-2 animate-spin" })}
                 Distributing...
               </>
             ) : (

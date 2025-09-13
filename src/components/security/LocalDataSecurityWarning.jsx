@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { X, Shield, AlertTriangle, Lock, Unlock } from "lucide-react";
 import { getIcon } from "../../utils";
 import logger from "../../utils/common/logger";
 
@@ -63,7 +62,7 @@ const LocalDataSecurityWarning = ({ onClose, onAcknowledge }) => {
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
             title="Close"
           >
-            <X className="w-6 h-6" />
+            {React.createElement(getIcon("X"), { className: "w-6 h-6" })}
           </button>
         </div>
 
@@ -72,7 +71,7 @@ const LocalDataSecurityWarning = ({ onClose, onAcknowledge }) => {
           {/* Security Status */}
           <div className="space-y-4">
             <div className="flex items-start space-x-4 p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-              <Lock className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+              {React.createElement(getIcon("Lock"), { className: "w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" })}
               <div>
                 <h3 className="font-semibold text-green-800 dark:text-green-200">
                   ✅ ENCRYPTED & SECURE
@@ -93,7 +92,7 @@ const LocalDataSecurityWarning = ({ onClose, onAcknowledge }) => {
             </div>
 
             <div className="flex items-start space-x-4 p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
-              <Unlock className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+              {React.createElement(getIcon("Unlock"), { className: "w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" })}
               <div>
                 <h3 className="font-semibold text-yellow-800 dark:text-yellow-200">
                   ⚠️ UNENCRYPTED (LOCAL DEVICE ONLY)
@@ -114,7 +113,7 @@ const LocalDataSecurityWarning = ({ onClose, onAcknowledge }) => {
           {/* What This Means */}
           <div className="space-y-3">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center">
-              <AlertTriangle className="w-5 h-5 text-orange-500 mr-2" />
+              {React.createElement(getIcon("AlertTriangle"), { className: "w-5 h-5 text-orange-500 mr-2" })}
               What This Means for You
             </h3>
 

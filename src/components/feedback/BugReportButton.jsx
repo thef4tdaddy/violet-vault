@@ -1,5 +1,5 @@
 import React from "react";
-import { Bug, Camera, Send, X, AlertCircle } from "lucide-react";
+import { getIcon } from "../../utils";
 import useBugReportV2 from "../../hooks/common/useBugReportV2";
 import useToast from "../../hooks/common/useToast";
 import logger from "../../utils/common/logger";
@@ -82,7 +82,7 @@ const BugReportButton = () => {
         title="Report a Problem"
         data-bug-report="true"
       >
-        <Bug className="h-5 w-5" />
+        {React.createElement(getIcon("Bug"), { className: "h-5 w-5" })}
       </button>
 
       {/* Bug Report Modal */}
@@ -97,11 +97,11 @@ const BugReportButton = () => {
           >
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center">
-                <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
+                {React.createElement(getIcon("AlertCircle"), { className: "h-5 w-5 text-red-500 mr-2" })}
                 <h3 className="text-lg font-semibold text-gray-900">Report a Problem</h3>
               </div>
               <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">
-                <X className="h-5 w-5" />
+                {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
               </button>
             </div>
 
@@ -211,7 +211,7 @@ const BugReportButton = () => {
                       className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
                       title="Automatically capture screenshot using html2canvas"
                     >
-                      <Camera className="h-4 w-4 mr-1" />
+                      {React.createElement(getIcon("Camera"), { className: "h-4 w-4 mr-1" })}
                       Auto Capture
                     </button>
                     <button
@@ -261,7 +261,7 @@ const BugReportButton = () => {
                       className="text-sm text-green-600 hover:text-green-800 flex items-center"
                       title="Use browser's native screen capture (requires permission)"
                     >
-                      <Camera className="h-4 w-4 mr-1" />
+                      {React.createElement(getIcon("Camera"), { className: "h-4 w-4 mr-1" })}
                       Screen Capture
                     </button>
                   </div>
@@ -295,7 +295,7 @@ const BugReportButton = () => {
                       className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
                       title="Remove screenshot"
                     >
-                      <X className="h-3 w-3" />
+                      {React.createElement(getIcon("X"), { className: "h-3 w-3" })}
                     </button>
                   </div>
                   <div className="flex justify-between items-center mt-2">
@@ -329,7 +329,7 @@ const BugReportButton = () => {
                   </>
                 ) : (
                   <>
-                    <Send className="h-4 w-4 mr-2" />
+                    {React.createElement(getIcon("Send"), { className: "h-4 w-4 mr-2" })}
                     Submit Report
                   </>
                 )}
