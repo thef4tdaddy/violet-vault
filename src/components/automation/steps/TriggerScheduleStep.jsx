@@ -1,5 +1,5 @@
 import React from "react";
-import { Play, Plus, Calendar, Clock } from "lucide-react";
+import { getIcon } from "../../../utils";
 import { TRIGGER_TYPES } from "../../../utils/budgeting/autofunding";
 
 const TriggerScheduleStep = ({ ruleData, updateRuleData }) => {
@@ -13,29 +13,29 @@ const TriggerScheduleStep = ({ ruleData, updateRuleData }) => {
           {[
             {
               type: TRIGGER_TYPES.MANUAL,
-              icon: Play,
+              icon: "Play",
               title: "Manual",
               description: 'Run when you click "Execute Rules"',
             },
             {
               type: TRIGGER_TYPES.INCOME_DETECTED,
-              icon: Plus,
+              icon: "Plus",
               title: "Income Detected",
               description: "Run when new income is added",
             },
             {
               type: TRIGGER_TYPES.MONTHLY,
-              icon: Calendar,
+              icon: "Calendar",
               title: "Monthly",
               description: "Run automatically every month",
             },
             {
               type: TRIGGER_TYPES.BIWEEKLY,
-              icon: Clock,
+              icon: "Clock",
               title: "Biweekly",
               description: "Run automatically every two weeks",
             },
-          ].map(({ type, icon: _Icon, title, description }) => (
+          ].map(({ type, icon, title, description }) => (
             <div
               key={type}
               onClick={() => updateRuleData({ trigger: type })}
@@ -46,11 +46,11 @@ const TriggerScheduleStep = ({ ruleData, updateRuleData }) => {
               }`}
             >
               <div className="flex items-start gap-3">
-                <Icon
-                  className={`h-5 w-5 mt-0.5 ${
+                {React.createElement(getIcon(icon), {
+                  className: `h-5 w-5 mt-0.5 ${
                     ruleData.trigger === type ? "text-blue-600" : "text-gray-600"
-                  }`}
-                />
+                  }`
+                })}
                 <div>
                   <h4
                     className={`font-medium ${

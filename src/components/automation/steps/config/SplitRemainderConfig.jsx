@@ -1,5 +1,5 @@
 import React from "react";
-import { AlertCircle } from "lucide-react";
+import { getIcon } from "../../../../utils";
 
 const SplitRemainderConfig = ({
   ruleData,
@@ -53,7 +53,7 @@ const SplitRemainderConfig = ({
         </div>
         {errors.targetIds && (
           <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
-            <AlertCircle className="h-4 w-4" />
+            {React.createElement(getIcon("AlertCircle"), { className: "h-4 w-4" })}
             {errors.targetIds}
           </p>
         )}
