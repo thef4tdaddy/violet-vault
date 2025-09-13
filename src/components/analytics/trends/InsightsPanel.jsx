@@ -1,5 +1,5 @@
 import React from "react";
-import { Target, AlertTriangle } from "lucide-react";
+import { getIcon } from "../../../utils";
 import { formatPercent } from "../../../utils/analytics/trendHelpers";
 
 const InsightsPanel = ({ forecastInsights, insights }) => {
@@ -7,7 +7,9 @@ const InsightsPanel = ({ forecastInsights, insights }) => {
     <div className="rounded-xl p-6 border-2 border-black bg-blue-100/40 backdrop-blur-sm shadow-xl">
       <div className="flex items-start gap-3">
         <div className="p-2 rounded-full border-2 border-black bg-blue-500">
-          <Target className="h-5 w-5 text-white" />
+          {React.createElement(getIcon("Target"), {
+            className: "h-5 w-5 text-white",
+          })}
         </div>
         <div>
           <h3 className="font-black text-black text-base mb-2">
@@ -30,7 +32,9 @@ const InsightsPanel = ({ forecastInsights, insights }) => {
             {insights.hasHighGrowth && (
               <li className="flex items-center gap-2 text-orange-700">
                 <div className="p-1 rounded border border-orange-700">
-                  <AlertTriangle className="h-4 w-4" />
+                  {React.createElement(getIcon("AlertTriangle"), {
+                    className: "h-4 w-4",
+                  })}
                 </div>
                 <span className="font-bold">
                   HIGH SPENDING GROWTH DETECTED - CONSIDER BUDGET REVIEW
