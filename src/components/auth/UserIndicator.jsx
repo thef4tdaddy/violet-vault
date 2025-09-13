@@ -1,5 +1,5 @@
 import React, { memo, useState } from "react";
-import { User, ChevronDown, Settings, Key } from "lucide-react";
+import { getIcon } from "../../utils";
 import ProfileSettings from "./ProfileSettings";
 import KeyManagementSettings from "./KeyManagementSettings";
 
@@ -31,7 +31,9 @@ const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
               className="w-3 h-3 rounded-full mr-3 shadow-sm ring-2 ring-white/50"
               style={{ backgroundColor: currentUser?.userColor || "#a855f7" }}
             />
-            <User className="h-4 w-4 text-gray-700 mr-2" />
+            {React.createElement(getIcon("User"), {
+              className: "h-4 w-4 text-gray-700 mr-2",
+            })}
             <span className="font-semibold text-gray-900 text-sm">
               {currentUser?.userName || "Anonymous"}
             </span>
@@ -53,7 +55,9 @@ const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
                   }}
                   className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                 >
-                  <Settings className="h-4 w-4 mr-3" />
+                  {React.createElement(getIcon("Settings"), {
+                    className: "h-4 w-4 mr-3",
+                  })}
                   Profile Settings
                 </button>
                 <button
@@ -63,7 +67,9 @@ const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
                   }}
                   className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                 >
-                  <Key className="h-4 w-4 mr-3" />
+                  {React.createElement(getIcon("Key"), {
+                    className: "h-4 w-4 mr-3",
+                  })}
                   Backup Key
                 </button>
                 <div className="border-t border-gray-100 my-1"></div>
@@ -74,7 +80,9 @@ const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
                   }}
                   className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                 >
-                  <User className="h-4 w-4 mr-3" />
+                  {React.createElement(getIcon("User"), {
+                    className: "h-4 w-4 mr-3",
+                  })}
                   Switch User
                 </button>
               </div>

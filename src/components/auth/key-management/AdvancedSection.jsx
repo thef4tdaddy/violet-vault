@@ -1,4 +1,5 @@
-import { Info, Key, FileText, ExternalLink } from "lucide-react";
+import React from "react";
+import { getIcon } from "../../../utils";
 
 const AdvancedSection = ({ showAdvanced, keyFingerprint, onToggleAdvanced }) => {
   return (
@@ -7,7 +8,9 @@ const AdvancedSection = ({ showAdvanced, keyFingerprint, onToggleAdvanced }) => 
         onClick={onToggleAdvanced}
         className="flex items-center text-sm text-gray-600 hover:text-gray-900"
       >
-        <Info className="h-4 w-4 mr-1" />
+        {React.createElement(getIcon("Info"), {
+          className: "h-4 w-4 mr-1",
+        })}
         Advanced Options & Security Info
       </button>
 
@@ -16,7 +19,9 @@ const AdvancedSection = ({ showAdvanced, keyFingerprint, onToggleAdvanced }) => 
           {/* Key Fingerprint */}
           <div>
             <div className="flex items-center mb-2">
-              <Key className="h-4 w-4 text-gray-500 mr-2" />
+              {React.createElement(getIcon("Key"), {
+                className: "h-4 w-4 text-gray-500 mr-2",
+              })}
               <h5 className="text-sm font-medium text-gray-900">Current Key Fingerprint</h5>
             </div>
             <code className="text-xs bg-white p-2 rounded border font-mono text-purple-600 block">
@@ -27,7 +32,9 @@ const AdvancedSection = ({ showAdvanced, keyFingerprint, onToggleAdvanced }) => 
           {/* Security Notice */}
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
             <div className="flex items-start">
-              <FileText className="h-4 w-4 text-yellow-600 mr-2 mt-0.5 flex-shrink-0" />
+              {React.createElement(getIcon("FileText"), {
+                className: "h-4 w-4 text-yellow-600 mr-2 mt-0.5 flex-shrink-0",
+              })}
               <div className="text-sm text-yellow-800">
                 <p className="font-medium mb-1">Security Notice</p>
                 <p>
@@ -45,7 +52,9 @@ const AdvancedSection = ({ showAdvanced, keyFingerprint, onToggleAdvanced }) => 
               className="inline-flex items-center text-sm text-purple-600 hover:text-purple-700"
               onClick={(e) => e.preventDefault()}
             >
-              <ExternalLink className="h-3 w-3 mr-1" />
+              {React.createElement(getIcon("ExternalLink"), {
+                className: "h-3 w-3 mr-1",
+              })}
               Learn more about key management
             </a>
           </div>
