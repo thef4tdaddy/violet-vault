@@ -1,5 +1,5 @@
 import React from "react";
-import { Sparkles } from "lucide-react";
+import { getIcon } from "../../utils";
 
 /**
  * Conflict resolution modal component
@@ -15,7 +15,7 @@ const ConflictResolutionModal = ({ syncConflicts, onResolveConflict, onDismiss }
           <div className="relative mx-auto mb-6 w-16 h-16">
             <div className="absolute inset-0 bg-amber-500 rounded-2xl blur-lg opacity-30"></div>
             <div className="relative bg-amber-500 p-4 rounded-2xl">
-              <Sparkles className="h-8 w-8 text-white" />
+              {React.createElement(getIcon("Sparkles"), { className: "h-8 w-8 text-white" })}
             </div>
           </div>
 
