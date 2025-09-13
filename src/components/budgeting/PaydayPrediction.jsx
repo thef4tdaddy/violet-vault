@@ -1,5 +1,5 @@
 import React from "react";
-import { Calendar, TrendingUp, Clock, AlertCircle, DollarSign, Zap } from "lucide-react";
+import { getIcon } from "../../utils";
 import { formatPaydayPrediction, getDaysUntilPayday } from "../../utils/budgeting/paydayPredictor";
 
 const PaydayPrediction = ({
@@ -32,11 +32,11 @@ const PaydayPrediction = ({
     return "bg-gray-50 border-gray-200";
   };
 
-  const getIcon = () => {
-    if (daysUntil === 0) return <Calendar className="h-5 w-5 text-purple-600" />;
-    if (daysUntil === 1) return <TrendingUp className="h-5 w-5 text-emerald-600" />;
-    if (daysUntil >= 2 && daysUntil <= 7) return <Clock className="h-5 w-5 text-amber-600" />;
-    return <Calendar className="h-5 w-5 text-gray-600" />;
+  const getPaydayIcon = () => {
+    if (daysUntil === 0) return React.createElement(getIcon("Calendar"), { className: "h-5 w-5 text-purple-600" });
+    if (daysUntil === 1) return React.createElement(getIcon("TrendingUp"), { className: "h-5 w-5 text-emerald-600" });
+    if (daysUntil >= 2 && daysUntil <= 7) return React.createElement(getIcon("Clock"), { className: "h-5 w-5 text-amber-600" });
+    return React.createElement(getIcon("Calendar"), { className: "h-5 w-5 text-gray-600" });
   };
 
   const confidenceColor = getConfidenceColor();
@@ -45,7 +45,7 @@ const PaydayPrediction = ({
     <div className={`glassmorphism rounded-2xl p-4 border ${getUrgencyStyle()} ${className}`}>
       <div className="flex items-start justify-between">
         <div className="flex items-start space-x-3">
-          <div className="flex-shrink-0 mt-0.5">{getIcon()}</div>
+          <div className="flex-shrink-0 mt-0.5">{getPaydayIcon()}</div>
           <div className="flex-1 min-w-0">
             <h4 className="font-semibold text-gray-900 text-sm">Next Payday Prediction</h4>
             <p className="text-sm text-gray-700 mt-1">{formattedPrediction.displayText}</p>

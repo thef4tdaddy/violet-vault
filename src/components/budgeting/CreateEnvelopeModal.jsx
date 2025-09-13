@@ -1,5 +1,5 @@
 import React from "react";
-import { Save, Plus, X, Palette } from "lucide-react";
+import { getIcon } from "../../utils";
 import useEnvelopeForm from "../../hooks/budgeting/useEnvelopeForm";
 import EnvelopeTypeSelector from "./shared/EnvelopeTypeSelector";
 import EnvelopeBasicFields from "./envelope/EnvelopeBasicFields";

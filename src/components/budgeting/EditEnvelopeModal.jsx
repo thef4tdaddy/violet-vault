@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Save, Trash2 } from "lucide-react";
+import { getIcon } from "../../utils";
 import useEnvelopeEdit from "../../hooks/budgeting/useEnvelopeEdit";
 import logger from "../../utils/common/logger";
 import EnvelopeModalHeader from "./envelope/EnvelopeModalHeader";

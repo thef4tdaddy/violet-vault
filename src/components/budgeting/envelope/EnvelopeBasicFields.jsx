@@ -1,5 +1,5 @@
 import React from "react";
-import { Tag, AlertCircle } from "lucide-react";
+import { getIcon } from "../../../utils";
 import { getEnvelopeCategories } from "../../../constants/categories";
 
 const EnvelopeBasicFields = ({ formData, onUpdateField, errors = {}, canEdit = true }) => {
@@ -8,7 +8,7 @@ const EnvelopeBasicFields = ({ formData, onUpdateField, errors = {}, canEdit = t
   return (
     <div className="space-y-4">
       <h3 className="font-semibold text-gray-900 flex items-center">
-        <Tag className="h-4 w-4 mr-2 text-blue-600" />
+        {React.createElement(getIcon("Tag"), { className: "h-4 w-4 mr-2 text-blue-600" })}
         Basic Information
       </h3>
 
@@ -28,7 +28,7 @@ const EnvelopeBasicFields = ({ formData, onUpdateField, errors = {}, canEdit = t
         />
         {errors.name && (
           <p className="mt-1 text-sm text-red-600 flex items-center">
-            <AlertCircle className="h-3 w-3 mr-1" />
+            {React.createElement(getIcon("AlertCircle"), { className: "h-3 w-3 mr-1" })}
             {errors.name}
           </p>
         )}
@@ -54,7 +54,7 @@ const EnvelopeBasicFields = ({ formData, onUpdateField, errors = {}, canEdit = t
         </select>
         {errors.category && (
           <p className="mt-1 text-sm text-red-600 flex items-center">
-            <AlertCircle className="h-3 w-3 mr-1" />
+            {React.createElement(getIcon("AlertCircle"), { className: "h-3 w-3 mr-1" })}
             {errors.category}
           </p>
         )}
@@ -78,7 +78,7 @@ const EnvelopeBasicFields = ({ formData, onUpdateField, errors = {}, canEdit = t
         />
         {errors.description && (
           <p className="mt-1 text-sm text-red-600 flex items-center">
-            <AlertCircle className="h-3 w-3 mr-1" />
+            {React.createElement(getIcon("AlertCircle"), { className: "h-3 w-3 mr-1" })}
             {errors.description}
           </p>
         )}
