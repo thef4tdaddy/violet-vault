@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import useOnboardingStore from "../../../stores/ui/onboardingStore";
 import logger from "../../../utils/common/logger";
@@ -12,7 +12,7 @@ export const useTutorialSteps = () => {
   const { startTutorialStep } = useOnboardingStore();
 
   // Tutorial steps configuration
-  const tutorialSteps = [
+  const tutorialSteps = useMemo(() => [
     {
       id: "welcome",
       title: "Welcome to VioletVault! 🎉",
@@ -118,13 +118,13 @@ export const useTutorialSteps = () => {
       position: "bottom",
       action: () => startTutorialStep("syncExplained"),
     },
-  ];
+  ], [navigate, startTutorialStep]);
 
   const getCurrentStepElement = useCallback((currentStep) => {
     const step = tutorialSteps[currentStep];
     if (!step?.target) return null;
     return document.querySelector(step.target);
-  }, []);
+  }, [tutorialSteps]);
 
   return {
     tutorialSteps,
