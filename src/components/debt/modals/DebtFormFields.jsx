@@ -1,5 +1,4 @@
 import React from "react";
-import { Receipt } from "lucide-react";
 import { DEBT_TYPE_CONFIG, PAYMENT_FREQUENCIES } from "../../../constants/debts";
 import { UniversalConnectionManager } from "../../ui/ConnectionDisplay";
 

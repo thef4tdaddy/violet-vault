@@ -1,5 +1,5 @@
 import React from "react";
-import { X, Edit, Trash2, DollarSign, Calendar, TrendingDown } from "lucide-react";
+import { getIcon } from "../../../utils";
 import { useDebtDetailModal } from "../../../hooks/debts/useDebtDetailModal";
 import { UniversalConnectionManager } from "../../ui/ConnectionDisplay";
 import DebtProgressBar from "../ui/DebtProgressBar";
@@ -48,7 +48,7 @@ const DebtDetailModal = ({
             </p>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
-            <X className="h-6 w-6" />
+            {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
           </button>
         </div>
 
@@ -62,7 +62,7 @@ const DebtDetailModal = ({
                   ${debt.currentBalance?.toFixed(2) || "0.00"}
                 </p>
               </div>
-              <TrendingDown className="h-8 w-8 text-red-500" />
+              {React.createElement(getIcon("TrendingDown"), { className: "h-8 w-8 text-red-500" })}
             </div>
           </div>
 
@@ -74,7 +74,7 @@ const DebtDetailModal = ({
                   ${debt.minimumPayment?.toFixed(2) || "0.00"}
                 </p>
               </div>
-              <Calendar className="h-8 w-8 text-orange-500" />
+              {React.createElement(getIcon("Calendar"), { className: "h-8 w-8 text-orange-500" })}
             </div>
           </div>
 
@@ -86,7 +86,7 @@ const DebtDetailModal = ({
                   {debt.interestRate?.toFixed(2) || "0.00"}%
                 </p>
               </div>
-              <DollarSign className="h-8 w-8 text-purple-500" />
+              {React.createElement(getIcon("DollarSign"), { className: "h-8 w-8 text-purple-500" })}
             </div>
           </div>
         </div>
@@ -170,14 +170,14 @@ const DebtDetailModal = ({
             onClick={handleEdit}
             className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 flex items-center justify-center"
           >
-            <Edit className="h-4 w-4 mr-2" />
+            {React.createElement(getIcon("Edit"), { className: "h-4 w-4 mr-2" })}
             Edit Debt
           </button>
           <button
             onClick={handleDelete}
             className="flex-1 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 flex items-center justify-center"
           >
-            <Trash2 className="h-4 w-4 mr-2" />
+            {React.createElement(getIcon("Trash2"), { className: "h-4 w-4 mr-2" })}
             Delete
           </button>
         </div>
