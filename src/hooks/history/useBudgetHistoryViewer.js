@@ -1,5 +1,5 @@
-import { useState, useCallback } from "react";
-import { Plus, Minus, Edit3, FileText } from "lucide-react";
+import React, { useState, useCallback } from "react";
+import { getIcon } from "../../utils";
 import { useConfirm } from "../common/useConfirm";
 import { usePrompt } from "../common/usePrompt";
 import logger from "../../utils/common/logger";
@@ -122,13 +122,13 @@ export const useBudgetHistoryUIHelpers = () => {
   const getChangeIcon = useCallback((changeType) => {
     switch (changeType) {
       case "add":
-        return <Plus className="h-3 w-3 text-green-600" />;
+        return React.createElement(getIcon("Plus"), { className: "h-3 w-3 text-green-600" });
       case "delete":
-        return <Minus className="h-3 w-3 text-red-600" />;
+        return React.createElement(getIcon("Minus"), { className: "h-3 w-3 text-red-600" });
       case "modify":
-        return <Edit3 className="h-3 w-3 text-blue-600" />;
+        return React.createElement(getIcon("Edit3"), { className: "h-3 w-3 text-blue-600" });
       default:
-        return <FileText className="h-3 w-3 text-gray-600" />;
+        return React.createElement(getIcon("FileText"), { className: "h-3 w-3 text-gray-600" });
     }
   }, []);
 

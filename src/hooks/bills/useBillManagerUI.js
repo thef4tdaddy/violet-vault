@@ -5,7 +5,6 @@
  * Handles UI-specific business logic like selection, modal management, and display rules
  */
 import { useCallback, useMemo } from "react";
-import { FileText, Calendar, AlertTriangle, CheckCircle } from "lucide-react";
 import { getIconByName } from "../../utils/common/billIcons";
 
 /**
@@ -30,28 +29,28 @@ export const useBillManagerUI = ({
         id: "upcoming",
         label: "Upcoming",
         count: categorizedBills.upcoming?.length || 0,
-        icon: Calendar,
+        icon: "Calendar",
         color: "blue",
       },
       {
         id: "overdue",
         label: "Overdue",
         count: categorizedBills.overdue?.length || 0,
-        icon: AlertTriangle,
+        icon: "AlertTriangle",
         color: "red",
       },
       {
         id: "paid",
         label: "Paid",
         count: categorizedBills.paid?.length || 0,
-        icon: CheckCircle,
+        icon: "CheckCircle",
         color: "green",
       },
       {
         id: "all",
         label: "All Bills",
         count: bills?.length || 0,
-        icon: FileText,
+        icon: "FileText",
         color: "gray",
       },
     ],
@@ -109,7 +108,7 @@ export const useBillManagerUI = ({
 
   // Bill display logic
   const getBillIcon = useCallback((bill) => {
-    return getIconByName(bill.iconName) || FileText;
+    return getIconByName(bill.iconName) || "FileText";
   }, []);
 
   const getUrgencyColors = useCallback((urgency) => {
