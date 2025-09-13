@@ -1,15 +1,5 @@
 import React from "react";
-import {
-  Download,
-  FileText,
-  Image,
-  Table,
-  X,
-  Calendar,
-  DollarSign,
-  Settings,
-  CheckCircle,
-} from "lucide-react";
+import { getIcon } from "../../utils";
 import { useReportExporter } from "../../hooks/analytics/useReportExporter";
 
 /**
@@ -32,20 +22,20 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
     {
       key: "pdf",
       label: "PDF Report",
-      icon: FileText,
+      icon: "FileText",
       description: "Comprehensive report with charts and analysis",
       recommended: true,
     },
     {
       key: "csv",
       label: "CSV Data",
-      icon: Table,
+      icon: "Table",
       description: "Raw data export for spreadsheet analysis",
     },
     {
       key: "png",
       label: "Chart Images",
-      icon: Image,
+      icon: "Image",
       description: "Export charts as PNG images",
     },
   ];
@@ -99,7 +89,9 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
         <div className="flex items-center justify-between p-6 border-b">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-              <Download className="h-6 w-6 mr-3 text-blue-600" />
+              {React.createElement(getIcon("Download"), {
+                className: "h-6 w-6 mr-3 text-blue-600",
+              })}
               Export Report
             </h2>
             <p className="text-gray-600 mt-1">Generate comprehensive analytics reports</p>
@@ -109,7 +101,9 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
             disabled={isExporting}
           >
-            <X className="h-5 w-5" />
+            {React.createElement(getIcon("X"), {
+              className: "h-5 w-5",
+            })}
           </button>
         </div>
 
@@ -135,7 +129,9 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
                       </span>
                     )}
                     <div className="flex items-start">
-                      <format.icon className="h-6 w-6 text-blue-600 mt-0.5 mr-3 flex-shrink-0" />
+                      {React.createElement(getIcon(format.icon), {
+                        className: "h-6 w-6 text-blue-600 mt-0.5 mr-3 flex-shrink-0",
+                      })}
                       <div>
                         <h4 className="font-medium text-gray-900">{format.label}</h4>
                         <p className="text-sm text-gray-600 mt-1">{format.description}</p>
@@ -182,32 +178,32 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
                   {
                     key: "includeSummary",
                     label: "Financial Summary",
-                    icon: DollarSign,
+                    icon: "DollarSign",
                   },
                   {
                     key: "includeCharts",
                     label: "Charts & Visualizations",
-                    icon: Image,
+                    icon: "Image",
                   },
                   {
                     key: "includeTransactions",
                     label: "Transaction Details",
-                    icon: Table,
+                    icon: "Table",
                   },
                   {
                     key: "includeEnvelopes",
                     label: "Envelope Analysis",
-                    icon: FileText,
+                    icon: "FileText",
                   },
                   {
                     key: "includeSavings",
                     label: "Savings Goals",
-                    icon: CheckCircle,
+                    icon: "CheckCircle",
                   },
                   {
                     key: "includeInsights",
                     label: "AI Insights",
-                    icon: Settings,
+                    icon: "Settings",
                   },
                 ].map((option) => (
                   <label
@@ -221,7 +217,9 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
                       className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
                       disabled={isExporting}
                     />
-                    <option.icon className="h-5 w-5 text-gray-500 ml-3 mr-3" />
+                    {React.createElement(getIcon(option.icon), {
+                      className: "h-5 w-5 text-gray-500 ml-3 mr-3",
+                    })}
                     <span className="font-medium text-gray-900">{option.label}</span>
                   </label>
                 ))}
@@ -230,7 +228,9 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
               {/* Date Range */}
               <div className="mt-6">
                 <h4 className="font-medium text-gray-900 mb-3 flex items-center">
-                  <Calendar className="h-4 w-4 mr-2" />
+                  {React.createElement(getIcon("Calendar"), {
+                    className: "h-4 w-4 mr-2",
+                  })}
                   Report Period
                 </h4>
                 <div className="bg-gray-50 rounded-lg p-3">
@@ -245,7 +245,9 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
         {/* Footer */}
         <div className="flex items-center justify-between p-6 border-t bg-gray-50">
           <div className="flex items-center text-sm text-gray-600">
-            <FileText className="h-4 w-4 mr-2" />
+            {React.createElement(getIcon("FileText"), {
+              className: "h-4 w-4 mr-2",
+            })}
             {exportFormat.toUpperCase()} export selected
           </div>
 
@@ -283,7 +285,9 @@ const ReportExporter = ({ analyticsData, balanceData, timeFilter, onExport, onCl
                 </>
               ) : (
                 <>
-                  <Download className="h-4 w-4 mr-2" />
+                  {React.createElement(getIcon("Download"), {
+                    className: "h-4 w-4 mr-2",
+                  })}
                   Export Report
                 </>
               )}

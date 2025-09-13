@@ -1,42 +1,46 @@
 import React from "react";
-import {
-  CheckCircle,
-  X,
-  RefreshCw,
-  AlertCircle,
-  Lightbulb,
-  Target,
-  Zap,
-  Plus,
-  Minus,
-  Archive,
-  Tag,
-} from "lucide-react";
+import { getIcon } from "../../utils";
 
 const CategorySuggestionsTab = ({ suggestions, onApplySuggestion, onDismissSuggestion }) => {
   const getPriorityIcon = (priority) => {
     switch (priority) {
       case "high":
-        return <AlertCircle className="h-4 w-4 text-red-500" />;
+        return React.createElement(getIcon("AlertCircle"), {
+          className: "h-4 w-4 text-red-500",
+        });
       case "medium":
-        return <Lightbulb className="h-4 w-4 text-amber-500" />;
+        return React.createElement(getIcon("Lightbulb"), {
+          className: "h-4 w-4 text-amber-500",
+        });
       case "low":
-        return <Target className="h-4 w-4 text-blue-500" />;
+        return React.createElement(getIcon("Target"), {
+          className: "h-4 w-4 text-blue-500",
+        });
       default:
-        return <Zap className="h-4 w-4 text-gray-500" />;
+        return React.createElement(getIcon("Zap"), {
+          className: "h-4 w-4 text-gray-500",
+        });
     }
   };
 
   const getActionIcon = (type) => {
     switch (type) {
       case "add_category":
-        return <Plus className="h-3 w-3" />;
+        return React.createElement(getIcon("Plus"), {
+          className: "h-3 w-3",
+        });
       case "remove_category":
-        return <Minus className="h-3 w-3" />;
+        return React.createElement(getIcon("Minus"), {
+          className: "h-3 w-3",
+        });
       case "consolidate_categories":
-        return <Archive className="h-3 w-3" />;
+        return React.createElement(getIcon("Archive"), {
+          className: "h-3 w-3",
+        });
       default:
-        return <Tag className="h-3 w-3" />;
+        return React.createElement(getIcon("Tag"), {
+          className: "h-3 w-3",
+        });
     }
   };
 
@@ -44,7 +48,9 @@ const CategorySuggestionsTab = ({ suggestions, onApplySuggestion, onDismissSugge
     return (
       <div className="text-center py-8 text-purple-800">
         <div className="glassmorphism rounded-full p-4 w-20 h-20 mx-auto mb-4 border-2 border-green-300">
-          <CheckCircle className="h-12 w-12 text-green-600 mx-auto" />
+          {React.createElement(getIcon("CheckCircle"), {
+            className: "h-12 w-12 text-green-600 mx-auto",
+          })}
         </div>
         <p className="text-lg font-black text-black">ALL OPTIMIZED!</p>
         <p className="font-medium">No category suggestions at this time.</p>
@@ -79,7 +85,9 @@ const CategorySuggestionsTab = ({ suggestions, onApplySuggestion, onDismissSugge
                 onClick={() => onDismissSuggestion(suggestion.id)}
                 className="p-1 text-gray-400 hover:text-gray-600 glassmorphism backdrop-blur-sm rounded border border-gray-300 shadow-sm hover:shadow-md transition-all"
               >
-                <X className="h-3 w-3" />
+                {React.createElement(getIcon("X"), {
+                  className: "h-3 w-3",
+                })}
               </button>
             </div>
           </div>
