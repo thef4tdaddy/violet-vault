@@ -1,5 +1,5 @@
 import React from "react";
-import { Archive, BarChart3 } from "lucide-react";
+import { getIcon } from "../../../utils";
 
 const ArchivingActionButtons = ({
   needsArchiving,
@@ -31,7 +31,7 @@ const ArchivingActionButtons = ({
               disabled={isArchiving}
               className="btn btn-secondary flex items-center space-x-2"
             >
-              <BarChart3 className="h-4 w-4" />
+              {React.createElement(getIcon("BarChart3"), { className: "h-4 w-4" })}
               <span>Preview First</span>
             </button>
           )}
@@ -47,7 +47,7 @@ const ArchivingActionButtons = ({
             className={`btn ${confirmArchiving ? "btn-danger" : "btn-primary"} flex items-center space-x-2`}
             disabled={isArchiving}
           >
-            <Archive className="h-4 w-4" />
+            {React.createElement(getIcon("Archive"), { className: "h-4 w-4" })}
             <span>{confirmArchiving ? "Confirm Archive" : "Start Archiving"}</span>
           </button>
         </div>

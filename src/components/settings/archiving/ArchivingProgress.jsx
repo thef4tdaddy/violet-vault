@@ -1,5 +1,5 @@
 import React from "react";
-import { RefreshCw } from "lucide-react";
+import { getIcon } from "../../../utils";
 
 const ArchivingProgress = ({ isArchiving, archivingProgress }) => {
   if (!isArchiving || !archivingProgress) return null;
@@ -23,7 +23,7 @@ const ArchivingProgress = ({ isArchiving, archivingProgress }) => {
         </div>
 
         <div className="flex items-center space-x-2 text-sm text-gray-600">
-          <RefreshCw className="h-4 w-4 animate-spin" />
+          {React.createElement(getIcon("RefreshCw"), { className: "h-4 w-4 animate-spin" })}
           <span>Please wait while we archive your transactions...</span>
         </div>
       </div>
