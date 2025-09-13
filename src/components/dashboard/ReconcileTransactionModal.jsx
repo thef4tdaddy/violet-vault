@@ -1,5 +1,5 @@
 import React from "react";
-import { Plus, Minus } from "lucide-react";
+import { getIcon } from "../../utils";
 
 const ReconcileTransactionModal = ({
   isOpen,
@@ -31,7 +31,7 @@ const ReconcileTransactionModal = ({
                     : "border-gray-200 hover:border-red-300"
                 }`}
               >
-                <Minus className="h-5 w-5 mx-auto mb-1" />
+                {React.createElement(getIcon("Minus"), { className: "h-5 w-5 mx-auto mb-1" })}
                 <span className="text-sm">Expense</span>
               </button>
 
@@ -44,7 +44,7 @@ const ReconcileTransactionModal = ({
                     : "border-gray-200 hover:border-green-300"
                 }`}
               >
-                <Plus className="h-5 w-5 mx-auto mb-1" />
+                {React.createElement(getIcon("Plus"), { className: "h-5 w-5 mx-auto mb-1" })}
                 <span className="text-sm">Income</span>
               </button>
             </div>

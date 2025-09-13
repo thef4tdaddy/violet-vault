@@ -1,5 +1,5 @@
 import React from "react";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { getIcon } from "../../utils";
 
 const RecentTransactionsWidget = ({ transactions = [], getEnvelopeOptions = () => [] }) => {
   if (transactions.length === 0) {
@@ -23,11 +23,9 @@ const RecentTransactionsWidget = ({ transactions = [], getEnvelopeOptions = () =
                   transaction.amount > 0 ? "bg-green-100" : "bg-red-100"
                 }`}
               >
-                {transaction.amount > 0 ? (
-                  <TrendingUp className="h-4 w-4 text-green-600" />
-                ) : (
-                  <TrendingDown className="h-4 w-4 text-red-600" />
-                )}
+                {React.createElement(getIcon(transaction.amount > 0 ? "TrendingUp" : "TrendingDown"), {
+                  className: `h-4 w-4 ${transaction.amount > 0 ? "text-green-600" : "text-red-600"}`
+                })}
               </div>
               <div>
                 <div className="font-medium">{transaction.description}</div>
