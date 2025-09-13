@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { DollarSign, Calendar, X, Edit3, Clock, AlertTriangle } from "lucide-react";
+import { getIcon } from "../../utils";
 import { useBulkBillUpdate } from "../../hooks/bills/useBulkBillUpdate";
 import {
   calculateUpdateSummary,
