@@ -1,5 +1,5 @@
 import React from "react";
-import { TrendingUp, TrendingDown, BarChart3 } from "lucide-react";
+import { getIcon } from "../../../utils";
 import {
   formatCurrency,
   formatPercent,
@@ -12,11 +12,17 @@ const ForecastSummaryCard = ({ forecastInsights }) => {
   const renderTrendIcon = () => {
     switch (iconConfig.iconType) {
       case "trending-up":
-        return <TrendingUp className={`h-6 w-6 ${iconConfig.iconColor}`} />;
+        return React.createElement(getIcon("TrendingUp"), {
+          className: `h-6 w-6 ${iconConfig.iconColor}`,
+        });
       case "trending-down":
-        return <TrendingDown className={`h-6 w-6 ${iconConfig.iconColor}`} />;
+        return React.createElement(getIcon("TrendingDown"), {
+          className: `h-6 w-6 ${iconConfig.iconColor}`,
+        });
       default:
-        return <BarChart3 className={`h-6 w-6 ${iconConfig.iconColor}`} />;
+        return React.createElement(getIcon("BarChart3"), {
+          className: `h-6 w-6 ${iconConfig.iconColor}`,
+        });
     }
   };
 

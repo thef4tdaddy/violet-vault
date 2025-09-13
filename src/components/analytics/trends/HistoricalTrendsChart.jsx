@@ -11,7 +11,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { Info } from "lucide-react";
+import { getIcon } from "../../../utils";
 import { formatCurrency, CHART_COLORS } from "../../../utils/analytics/trendHelpers";
 
 const HistoricalTrendsChart = ({ spendingTrends }) => {
@@ -62,7 +62,9 @@ const HistoricalTrendsChart = ({ spendingTrends }) => {
           ></div>
           <span>Forecasted Data</span>
         </div>
-        <Info className="h-4 w-4" />
+        {React.createElement(getIcon("Info"), {
+          className: "h-4 w-4",
+        })}
         <span>Last 3 months are projected based on historical trends</span>
       </div>
     </div>
