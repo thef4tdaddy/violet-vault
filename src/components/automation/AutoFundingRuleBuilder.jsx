@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, Check } from "lucide-react";
+import { getIcon } from "../../utils";
 import { createDefaultRule, validateRule } from "../../utils/budgeting/autofunding";
 import RuleTypeStep from "./steps/RuleTypeStep";
 import TriggerScheduleStep from "./steps/TriggerScheduleStep";
@@ -116,7 +116,9 @@ const AutoFundingRuleBuilder = ({
                 </h3>
               </div>
               <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1">
-                <X className="h-6 w-6" />
+                {React.createElement(getIcon("X"), {
+                  className: "h-6 w-6",
+                })}
               </button>
             </div>
             <StepNavigation currentStep={step} />
@@ -165,7 +167,9 @@ const AutoFundingRuleBuilder = ({
                     onClick={handleSave}
                     className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
                   >
-                    <Check className="h-4 w-4" />
+                    {React.createElement(getIcon("Check"), {
+                      className: "h-4 w-4",
+                    })}
                     {editingRule ? "Update Rule" : "Create Rule"}
                   </button>
                 )}

@@ -1,5 +1,5 @@
 import React from "react";
-import { Settings } from "lucide-react";
+import { getIcon } from "../../../utils";
 import { RULE_TYPES, TRIGGER_TYPES } from "../../../utils/budgeting/autofunding";
 
 const ReviewStep = ({ ruleData, envelopes }) => {
@@ -7,7 +7,9 @@ const ReviewStep = ({ ruleData, envelopes }) => {
     <div className="space-y-6">
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
         <h4 className="font-medium text-blue-900 mb-4 flex items-center gap-2">
-          <Settings className="h-5 w-5" />
+          {React.createElement(getIcon("Settings"), {
+            className: "h-5 w-5",
+          })}
           Rule Summary
         </h4>
 

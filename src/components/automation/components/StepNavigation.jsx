@@ -1,5 +1,5 @@
 import React from "react";
-import { Check } from "lucide-react";
+import { getIcon } from "../../../utils";
 
 const StepNavigation = ({ currentStep, onStepChange }) => {
   const steps = [
@@ -24,7 +24,12 @@ const StepNavigation = ({ currentStep, onStepChange }) => {
             }`}
             onClick={() => onStepChange?.(step.number)}
           >
-            {step.number < currentStep ? <Check className="h-4 w-4" /> : step.number}
+            {step.number < currentStep ? 
+              React.createElement(getIcon("Check"), {
+                className: "h-4 w-4",
+              }) : 
+              step.number
+            }
           </div>
         ))}
       </div>

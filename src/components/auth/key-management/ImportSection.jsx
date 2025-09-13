@@ -1,4 +1,5 @@
-import { Upload, CheckCircle, AlertTriangle } from "lucide-react";
+import React from "react";
+import { getIcon } from "../../../utils";
 import PasswordField from "./PasswordField";
 
 const ImportSection = ({
@@ -22,7 +23,9 @@ const ImportSection = ({
           onClick={() => fileInputRef.current?.click()}
           className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-purple-400 hover:bg-purple-50 cursor-pointer transition-colors"
         >
-          <Upload className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+          {React.createElement(getIcon("Upload"), {
+            className: "h-8 w-8 text-gray-400 mx-auto mb-3",
+          })}
           <p className="text-sm text-gray-600 mb-2">Click to select your key file</p>
           <p className="text-xs text-gray-500">Supports both protected and unprotected key files</p>
         </div>
@@ -70,9 +73,13 @@ const ImportSection = ({
         >
           <div className="flex items-start">
             {importResult.success ? (
-              <CheckCircle className="h-5 w-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
+              React.createElement(getIcon("CheckCircle"), {
+                className: "h-5 w-5 text-green-600 mr-3 mt-0.5 flex-shrink-0",
+              })
             ) : (
-              <AlertTriangle className="h-5 w-5 text-red-600 mr-3 mt-0.5 flex-shrink-0" />
+              React.createElement(getIcon("AlertTriangle"), {
+                className: "h-5 w-5 text-red-600 mr-3 mt-0.5 flex-shrink-0",
+              })
             )}
             <div>
               <p

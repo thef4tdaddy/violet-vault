@@ -1,4 +1,5 @@
-import { Download, Upload } from "lucide-react";
+import React from "react";
+import { getIcon } from "../../../utils";
 
 const TabNavigation = ({ activeTab, onTabChange }) => {
   return (
@@ -11,7 +12,9 @@ const TabNavigation = ({ activeTab, onTabChange }) => {
             : "text-gray-600 hover:text-gray-900"
         }`}
       >
-        <Download className="h-4 w-4 inline mr-2" />
+        {React.createElement(getIcon("Download"), {
+          className: "h-4 w-4 inline mr-2",
+        })}
         Export Key
       </button>
       <button
@@ -22,7 +25,9 @@ const TabNavigation = ({ activeTab, onTabChange }) => {
             : "text-gray-600 hover:text-gray-900"
         }`}
       >
-        <Upload className="h-4 w-4 inline mr-2" />
+        {React.createElement(getIcon("Upload"), {
+          className: "h-4 w-4 inline mr-2",
+        })}
         Import Key
       </button>
     </div>
