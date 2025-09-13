@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  PlusCircle,
-  Wallet,
-  CreditCard,
-  Calendar,
-  DollarSign,
-  ArrowRight,
-  Lightbulb,
-} from "lucide-react";
+import { getIcon } from "../../utils";
 import useOnboardingStore from "../../stores/ui/onboardingStore";
 
 /**
@@ -23,7 +15,7 @@ const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
 
   const hintConfigs = {
     bankBalance: {
-      icon: Wallet,
+      icon: "Wallet",
       title: "Set Your Bank Balance",
       message:
         "Start by entering your current actual bank account balance. This helps you track your real money.",
@@ -39,7 +31,7 @@ const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
     },
 
     debts: {
-      icon: CreditCard,
+      icon: "CreditCard",
       title: "Track Your Debts",
       message:
         "Add credit cards, loans, and other debts to get a complete picture of your finances.",
@@ -60,7 +52,7 @@ const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
     },
 
     bills: {
-      icon: Calendar,
+      icon: "Calendar",
       title: "Set Up Recurring Bills",
       message: "Add bills like rent, utilities, and subscriptions to plan for upcoming expenses.",
       actions: [
@@ -80,7 +72,7 @@ const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
     },
 
     paycheck: {
-      icon: DollarSign,
+      icon: "DollarSign",
       title: "Add Your First Paycheck",
       message:
         "Your paycheck is the foundation of envelope budgeting. Add your income to get started.",
@@ -96,7 +88,7 @@ const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
     },
 
     envelopes: {
-      icon: PlusCircle,
+      icon: "PlusCircle",
       title: "Create Your First Envelope",
       message:
         "Envelopes are budget categories like groceries, rent, or savings. Create one to start organizing your money.",
@@ -112,7 +104,7 @@ const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
     },
 
     transactions: {
-      icon: ArrowRight,
+      icon: "ArrowRight",
       title: "Track Your First Expense",
       message:
         "Record spending to see where your money goes and keep your envelope balances accurate.",
@@ -128,7 +120,7 @@ const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
     },
 
     linkedEnvelopes: {
-      icon: ArrowRight,
+      icon: "ArrowRight",
       title: "Link Bills to Envelopes",
       message:
         "Connect your bills to envelopes so the amounts are automatically budgeted for each month.",
@@ -159,7 +151,7 @@ const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
     return null;
   }
 
-  const Icon = config.icon;
+  // Dynamic icon rendering
   const colorClasses = {
     blue: "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-700 dark:text-blue-300",
     red: "bg-red-50 border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-700 dark:text-red-300",
@@ -190,14 +182,14 @@ const EmptyStateHints = ({ type, onAction, customMessage, customActions }) => {
         {/* Icon */}
         <div className="flex-shrink-0">
           <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-gray-800 shadow-sm">
-            <Icon className={`w-5 h-5 text-${config.color}-500`} />
+            {React.createElement(getIcon(config.icon), { className: `w-5 h-5 text-${config.color}-500` })}
           </div>
         </div>
 
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-2 mb-2">
-            <Lightbulb className="w-4 h-4" />
+            {React.createElement(getIcon("Lightbulb"), { className: "w-4 h-4" })}
             <h3 className="text-lg font-semibold">{customMessage?.title || config.title}</h3>
           </div>
 
