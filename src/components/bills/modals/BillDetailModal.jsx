@@ -37,12 +37,7 @@ const BillDetailModal = ({
 
   // Get UI components
   const BillIcon = getIconByName(bill.iconName || "Receipt");
-  const StatusIcon = {
-    CheckCircle,
-    AlertTriangle,
-    Clock,
-    Bell,
-  }[getBillStatusIcon(bill.status, statusInfo.isOverdue, statusInfo.isDueSoon)];
+  const statusIconName = getBillStatusIcon(bill.status, statusInfo.isOverdue, statusInfo.isDueSoon);
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
@@ -70,7 +65,7 @@ const BillDetailModal = ({
           <div
             className={`inline-flex items-center gap-2 px-3 py-2 rounded-full ${statusInfo.classes.bg} ${statusInfo.classes.border} border`}
           >
-            <StatusIcon className={`h-4 w-4 ${statusInfo.classes.icon}`} />
+            {React.createElement(getIcon(statusIconName), { className: `h-4 w-4 ${statusInfo.classes.icon}` })}
             <span className={`text-sm font-medium ${statusInfo.classes.text}`}>
               {statusInfo.text}
             </span>
@@ -111,7 +106,7 @@ const BillDetailModal = ({
                   {getFrequencyDisplayText(bill.frequency, bill.customFrequency)}
                 </p>
               </div>
-              <Clock className="h-8 w-8 text-green-500" />
+              {React.createElement(getIcon("Clock"), { className: "h-8 w-8 text-green-500" })}
             </div>
           </div>
         </div>
@@ -175,7 +170,7 @@ const BillDetailModal = ({
                       </p>
                     </div>
                     <div className="text-right">
-                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      {React.createElement(getIcon("CheckCircle"), { className: "h-4 w-4 text-green-500" })}
                     </div>
                   </div>
                 ))}

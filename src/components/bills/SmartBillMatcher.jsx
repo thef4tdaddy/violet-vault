@@ -156,9 +156,9 @@ const SmartBillMatcher = ({ bills, envelopes, onSuggestEnvelope, searchQuery }) 
   };
 
   const getConfidenceIcon = (confidence) => {
-    if (confidence >= 90) return CheckCircle;
-    if (confidence >= 70) return Target;
-    return Zap;
+    if (confidence >= 90) return "CheckCircle";
+    if (confidence >= 70) return "Target";
+    return "Zap";
   };
 
   if (!searchQuery || suggestions.length === 0) {
