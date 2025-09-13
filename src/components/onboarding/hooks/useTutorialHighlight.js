@@ -25,7 +25,7 @@ export const useTutorialHighlight = () => {
       if (element.focus) {
         try {
           element.focus({ preventScroll: true });
-        } catch (e) {
+        } catch {
           // Some elements can't be focused, that's okay
         }
       }

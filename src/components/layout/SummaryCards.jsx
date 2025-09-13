@@ -6,7 +6,7 @@ import { useActualBalance } from "../../hooks/budgeting/useBudgetMetadata";
 import { useUnassignedCash } from "../../hooks/budgeting/useBudgetMetadata";
 import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
 import { useSavingsGoals } from "../../hooks/common/useSavingsGoals";
-import logger from "../../utils/common/logger";
+import _logger from "../../utils/common/logger";
 const UnassignedCashModal = lazy(() => import("../modals/UnassignedCashModal"));
 import {
   calculateEnvelopeData,
@@ -19,7 +19,7 @@ import {
  */
 const SummaryCards = () => {
   const { openUnassignedCashModal } = useBudgetStore();
-  const { unassignedCash, isLoading: unassignedCashLoading } = useUnassignedCash();
+  const { unassignedCash, isLoading: _unassignedCashLoading } = useUnassignedCash();
   const { actualBalance, updateActualBalance } = useActualBalance();
   const prompt = usePrompt();
 

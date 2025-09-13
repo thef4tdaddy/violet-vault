@@ -1,24 +1,24 @@
 import React from "react";
-import { getIcon } from "../../utils";
+import { getIcon } from "../../utils/icons";
 
 const CategoryNavigationTabs = ({ activeTab, onTabChange, suggestionCount, categoryCount }) => {
   const tabs = [
     {
       id: "suggestions",
-      name: "Suggestions",
-      icon: Lightbulb,
+      name: "Suggestions", 
+      icon: getIcon("info") || getIcon("lightbulb"), // Using info as fallback if lightbulb not available
       count: suggestionCount,
     },
     {
-      id: "analysis",
+      id: "analysis", 
       name: "Analysis",
-      icon: BarChart3,
+      icon: getIcon("BarChart3"),
       count: categoryCount,
     },
     {
       id: "settings",
-      name: "Advanced",
-      icon: Settings,
+      name: "Advanced", 
+      icon: getIcon("settings"),
     },
   ];
 

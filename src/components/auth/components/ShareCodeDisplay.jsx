@@ -14,7 +14,7 @@ const ShareCodeDisplay = ({ shareCode, onCreateBudget, onBack, isLoading }) => {
       await navigator.clipboard.writeText(shareCode);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
+    } catch {
       // Handle clipboard copy failure silently in UI
     }
   };

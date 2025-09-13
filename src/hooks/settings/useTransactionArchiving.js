@@ -115,7 +115,7 @@ export const useTransactionArchivingUI = () => {
  */
 export const useTransactionArchivingProcess = () => {
   const handleArchive = useCallback(async (selectedPeriod, executeArchiving, callbacks = {}) => {
-    const { onSuccess, onError, onReset } = callbacks;
+    const { onSuccess, onError, _onReset } = callbacks;
 
     try {
       await executeArchiving(selectedPeriod);

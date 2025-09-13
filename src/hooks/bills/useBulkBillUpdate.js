@@ -4,7 +4,7 @@ import { useState } from "react";
  * Hook for managing bulk bill update operations
  * Handles change tracking, validation, and state management for bulk operations
  */
-export const useBulkBillUpdate = (selectedBills = [], isOpen) => {
+export const useBulkBillUpdate = (selectedBills = [], _isOpen) => {
   const [changes, setChanges] = useState({});
   const [showConfirmation, setShowConfirmation] = useState(false);
 

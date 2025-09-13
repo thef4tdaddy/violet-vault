@@ -5,7 +5,7 @@
  * Created for Issue #508 to ensure zero regressions
  */
 import useTransactionsV2 from "../transactions/useTransactionsV2.js";
-import logger from "../../utils/common/logger.js";
+import _logger from "../../utils/common/logger.js";
 
 /**
  * Compatibility wrapper that maintains the exact same API as the original useTransactions
