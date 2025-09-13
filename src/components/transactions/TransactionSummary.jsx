@@ -1,5 +1,5 @@
 import React from "react";
-import { TrendingUp, TrendingDown, DollarSign } from "lucide-react";
+import { getIcon } from "../../utils";
 
 const TransactionSummary = ({ transactions = [] }) => {
   const totalIncome = transactions
@@ -20,7 +20,7 @@ const TransactionSummary = ({ transactions = [] }) => {
             <p className="text-emerald-100 text-sm">Total Income</p>
             <p className="text-2xl font-bold">${totalIncome.toFixed(2)}</p>
           </div>
-          <TrendingUp className="h-8 w-8 text-emerald-200" />
+          {React.createElement(getIcon("TrendingUp"), { className: "h-8 w-8 text-emerald-200" })}
         </div>
       </div>
 
@@ -30,7 +30,7 @@ const TransactionSummary = ({ transactions = [] }) => {
             <p className="text-red-100 text-sm">Total Expenses</p>
             <p className="text-2xl font-bold">${totalExpenses.toFixed(2)}</p>
           </div>
-          <TrendingDown className="h-8 w-8 text-red-200" />
+          {React.createElement(getIcon("TrendingDown"), { className: "h-8 w-8 text-red-200" })}
         </div>
       </div>
 
@@ -48,9 +48,9 @@ const TransactionSummary = ({ transactions = [] }) => {
               {netCashFlow >= 0 ? "+" : ""}${netCashFlow.toFixed(2)}
             </p>
           </div>
-          <DollarSign
-            className={`h-8 w-8 ${netCashFlow >= 0 ? "text-cyan-200" : "text-amber-200"}`}
-          />
+          {React.createElement(getIcon("DollarSign"), {
+            className: `h-8 w-8 ${netCashFlow >= 0 ? "text-cyan-200" : "text-amber-200"}`
+          })}
         </div>
       </div>
     </div>

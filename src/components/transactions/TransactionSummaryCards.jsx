@@ -1,5 +1,5 @@
 import React from "react";
-import { TrendingUp, TrendingDown, BarChart, Hash } from "lucide-react";
+import { getIcon } from "../../utils";
 import PageSummaryCard from "../ui/PageSummaryCard";
 
 /**
@@ -22,7 +22,7 @@ const TransactionSummaryCards = ({ transactions = [] }) => {
   const cards = [
     {
       key: "monthly-spend",
-      icon: TrendingDown,
+      icon: "TrendingDown",
       label: "Monthly Spend",
       value: `$${totalExpenses.toFixed(2)}`,
       color: "blue",
@@ -30,7 +30,7 @@ const TransactionSummaryCards = ({ transactions = [] }) => {
     },
     {
       key: "income",
-      icon: TrendingUp,
+      icon: "TrendingUp",
       label: "Income",
       value: `$${totalIncome.toFixed(2)}`,
       color: "green",
@@ -38,7 +38,7 @@ const TransactionSummaryCards = ({ transactions = [] }) => {
     },
     {
       key: "net-flow",
-      icon: BarChart,
+      icon: "BarChart",
       label: "Net Flow",
       value: `${netCashFlow >= 0 ? "+" : ""}$${netCashFlow.toFixed(2)}`,
       color: netCashFlow >= 0 ? "purple" : "amber",
@@ -47,7 +47,7 @@ const TransactionSummaryCards = ({ transactions = [] }) => {
     },
     {
       key: "transaction-count",
-      icon: Hash,
+      icon: "Hash",
       label: "Transactions",
       value: transactionCount.toString(),
       color: "gray",

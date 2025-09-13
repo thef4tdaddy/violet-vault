@@ -1,5 +1,5 @@
 import React from "react";
-import { X, TrendingDown, TrendingUp } from "lucide-react";
+import { getIcon } from "../../utils";
 
 /**
  * Header section for TransactionForm
@@ -10,11 +10,9 @@ const TransactionModalHeader = ({ editingTransaction, onClose }) => {
     <div className="flex justify-between items-center mb-6">
       <div className="flex items-center gap-3 flex-1">
         <div className="p-2 bg-emerald-100 rounded-xl">
-          {editingTransaction ? (
-            <TrendingDown className="h-6 w-6 text-emerald-600" />
-          ) : (
-            <TrendingUp className="h-6 w-6 text-emerald-600" />
-          )}
+          {React.createElement(getIcon(editingTransaction ? "TrendingDown" : "TrendingUp"), {
+            className: "h-6 w-6 text-emerald-600"
+          })}
         </div>
         <div>
           <h2 className="text-xl font-bold text-gray-900">
@@ -28,7 +26,7 @@ const TransactionModalHeader = ({ editingTransaction, onClose }) => {
         </div>
       </div>
       <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-        <X className="h-5 w-5 text-gray-500" />
+        {React.createElement(getIcon("X"), { className: "h-5 w-5 text-gray-500" })}
       </button>
     </div>
   );

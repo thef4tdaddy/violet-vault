@@ -1,5 +1,5 @@
 import React from "react";
-import { TrendingDown, TrendingUp, Zap, Lock } from "lucide-react";
+import { getIcon } from "../../utils";
 import ReceiptButton from "../receipts/ReceiptButton";
 import logger from "../../utils/common/logger";
 
@@ -69,7 +69,7 @@ const TransactionFormFields = ({
                   : "border-gray-200 hover:border-red-300"
               } ${editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""}`}
             >
-              <TrendingDown className="h-4 w-4 mx-auto mb-1" />
+              {React.createElement(getIcon("TrendingDown"), { className: "h-4 w-4 mx-auto mb-1" })}
               <span className="text-sm">Expense</span>
             </button>
             <button
@@ -87,7 +87,7 @@ const TransactionFormFields = ({
                   : "border-gray-200 hover:border-emerald-300"
               } ${editingTransaction && !canEdit ? "bg-gray-100 cursor-not-allowed" : ""}`}
             >
-              <TrendingUp className="h-4 w-4 mx-auto mb-1" />
+              {React.createElement(getIcon("TrendingUp"), { className: "h-4 w-4 mx-auto mb-1" })}
               <span className="text-sm">Income</span>
             </button>
           </div>
@@ -214,7 +214,7 @@ const TransactionFormFields = ({
                   }
                   className="text-sm text-emerald-600 hover:text-emerald-700 flex items-center"
                 >
-                  <Zap className="h-3 w-3 mr-1" />
+                  {React.createElement(getIcon("Zap"), { className: "h-3 w-3 mr-1" })}
                   Suggested: {suggested.name}
                 </button>
               ) : null;
@@ -299,7 +299,7 @@ const TransactionFormFields = ({
         >
           {editingTransaction && !canEdit ? (
             <>
-              <Lock className="h-4 w-4 mr-2" />
+              {React.createElement(getIcon("Lock"), { className: "h-4 w-4 mr-2" })}
               Locked by {lockedBy}
             </>
           ) : editingTransaction ? (
