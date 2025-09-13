@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { getIcon } from "../../utils";
 
 /**
@@ -57,7 +57,7 @@ const PromptModal = ({
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, isLoading, inputValue]);
+  }, [isOpen, isLoading, handleConfirm, onCancel]);
 
   const handleInputChange = (e) => {
     const value = e.target.value;
@@ -69,7 +69,7 @@ const PromptModal = ({
     }
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = useCallback(() => {
     // Validate required field
     if (isRequired && !inputValue.trim()) {
       setValidationError("This field is required");
@@ -87,7 +87,7 @@ const PromptModal = ({
 
     // Call onConfirm with the input value
     onConfirm?.(inputValue);
-  };
+  }, [inputValue, isRequired, validation, onConfirm]);
 
   const handleCancel = () => {
     onCancel?.(null);
