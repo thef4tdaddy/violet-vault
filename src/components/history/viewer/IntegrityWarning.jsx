@@ -1,5 +1,5 @@
 import React from "react";
-import { ShieldAlert, Shield } from "lucide-react";
+import { getIcon } from "../../../utils";
 
 const IntegrityWarning = ({ integrityCheck, showIntegrityDetails, toggleIntegrityDetails }) => {
   if (!integrityCheck) return null;
@@ -9,7 +9,7 @@ const IntegrityWarning = ({ integrityCheck, showIntegrityDetails, toggleIntegrit
     return (
       <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-3">
         <div className="flex items-center">
-          <Shield className="h-4 w-4 text-green-600 mr-2" />
+          {React.createElement(getIcon("Shield"), { className: "h-4 w-4 text-green-600 mr-2" })}
           <div className="text-sm text-green-800">
             <strong>✓ History Verified:</strong> {integrityCheck.message}
           </div>
@@ -23,7 +23,7 @@ const IntegrityWarning = ({ integrityCheck, showIntegrityDetails, toggleIntegrit
     return (
       <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
         <div className="flex items-start">
-          <ShieldAlert className="h-5 w-5 text-red-600 mr-3 mt-0.5 flex-shrink-0" />
+          {React.createElement(getIcon("ShieldAlert"), { className: "h-5 w-5 text-red-600 mr-3 mt-0.5 flex-shrink-0" })}
           <div className="flex-1">
             <h3 className="font-medium text-red-900 mb-2">History Integrity Warning</h3>
             <p className="text-sm text-red-800 mb-3">{integrityCheck.message}</p>

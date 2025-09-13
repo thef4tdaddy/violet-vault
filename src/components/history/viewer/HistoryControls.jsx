@@ -1,5 +1,5 @@
 import React from "react";
-import { Shield, Download } from "lucide-react";
+import { getIcon } from "../../../utils";
 import { globalToast } from "../../../stores/ui/toastStore";
 
 const HistoryControls = ({ filter, updateFilter, loading, exportHistory }) => {
@@ -43,7 +43,7 @@ const HistoryControls = ({ filter, updateFilter, loading, exportHistory }) => {
           disabled={loading}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 flex items-center text-sm"
         >
-          <Shield className="h-4 w-4 mr-2" />
+          {React.createElement(getIcon("Shield"), { className: "h-4 w-4 mr-2" })}
           Verify Integrity
         </button>
 
@@ -52,7 +52,7 @@ const HistoryControls = ({ filter, updateFilter, loading, exportHistory }) => {
           disabled={loading}
           className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400 flex items-center text-sm"
         >
-          <Download className="h-4 w-4 mr-2" />
+          {React.createElement(getIcon("Download"), { className: "h-4 w-4 mr-2" })}
           Export
         </button>
       </div>

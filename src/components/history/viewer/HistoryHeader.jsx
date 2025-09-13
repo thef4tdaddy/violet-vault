@@ -1,5 +1,5 @@
 import React from "react";
-import { History } from "lucide-react";
+import { getIcon } from "../../../utils";
 import IntegrityStatusIndicator from "../IntegrityStatusIndicator";
 import HelpTooltip from "../../ui/HelpTooltip";
 
@@ -8,7 +8,7 @@ const HistoryHeader = ({ onClose }) => {
     <div className="flex items-center justify-between mb-6">
       <div className="flex-1">
         <h2 className="text-2xl font-semibold text-gray-900 flex items-center">
-          <History className="h-6 w-6 mr-3 text-blue-600" />
+          {React.createElement(getIcon("History"), { className: "h-6 w-6 mr-3 text-blue-600" })}
           Change History
           <HelpTooltip
             title="Budget History"
