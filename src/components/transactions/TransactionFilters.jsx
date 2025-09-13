@@ -40,9 +40,9 @@ const TransactionFilters = ({
           className="p-1 rounded-lg hover:bg-white/50 transition-colors"
         >
           {isExpanded ? (
-            {React.createElement(getIcon("ChevronUp"), { className: "h-4 w-4 text-gray-600" })}
+            React.createElement(getIcon("ChevronUp"), { className: "h-4 w-4 text-gray-600" })
           ) : (
-            {React.createElement(getIcon("ChevronDown"), { className: "h-4 w-4 text-gray-600" })}
+            React.createElement(getIcon("ChevronDown"), { className: "h-4 w-4 text-gray-600" })
           )}
         </button>
       </div>
@@ -127,9 +127,9 @@ const TransactionFilters = ({
                 className="glassmorphism px-3 py-2 border border-white/20 rounded-lg hover:shadow-lg"
               >
                 {sortOrder === "asc" ? (
-                  {React.createElement(getIcon("ChevronUp"), { className: "h-4 w-4" })}
+                  React.createElement(getIcon("ChevronUp"), { className: "h-4 w-4" })
                 ) : (
-                  {React.createElement(getIcon("ChevronDown"), { className: "h-4 w-4" })}
+                  React.createElement(getIcon("ChevronDown"), { className: "h-4 w-4" })
                 )}
               </button>
             </div>
