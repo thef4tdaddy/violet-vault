@@ -1,6 +1,6 @@
 // components/savings/SavingsSummaryCard.jsx
 import React from "react";
-import { Target, TrendingUp, DollarSign } from "lucide-react";
+import { getIcon } from "../../utils";
 
 const SavingsSummaryCard = ({ savingsGoals = [] }) => {
   // Calculate summary statistics
@@ -24,7 +24,7 @@ const SavingsSummaryCard = ({ savingsGoals = [] }) => {
     <div className="glassmorphism rounded-2xl p-6 mb-6 border border-white/20">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold flex items-center space-x-3">
-          <Target className="h-8 w-8 text-purple-600" />
+          {React.createElement(getIcon("Target"), { className: "h-8 w-8 text-purple-600" })}
           <span>Savings Goals</span>
         </h2>
         <div className="text-right">
@@ -37,7 +37,7 @@ const SavingsSummaryCard = ({ savingsGoals = [] }) => {
         {/* Overall Progress */}
         <div className="bg-white/50 rounded-xl p-4 backdrop-blur-sm">
           <div className="flex items-center space-x-3 mb-2">
-            <TrendingUp className="h-5 w-5 text-blue-600" />
+            {React.createElement(getIcon("TrendingUp"), { className: "h-5 w-5 text-blue-600" })}
             <span className="font-medium">Overall Progress</span>
           </div>
           <div className="text-2xl font-bold text-blue-600">{overallProgress.toFixed(1)}%</div>
@@ -64,7 +64,7 @@ const SavingsSummaryCard = ({ savingsGoals = [] }) => {
         {/* Target Amount */}
         <div className="bg-white/50 rounded-xl p-4 backdrop-blur-sm">
           <div className="flex items-center space-x-3 mb-2">
-            <DollarSign className="h-5 w-5 text-green-600" />
+            {React.createElement(getIcon("DollarSign"), { className: "h-5 w-5 text-green-600" })}
             <span className="font-medium">Target Amount</span>
           </div>
           <div className="text-2xl font-bold text-green-600">${totalTargets.toFixed(2)}</div>

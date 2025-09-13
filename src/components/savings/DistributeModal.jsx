@@ -1,6 +1,6 @@
 // components/savings/DistributeModal.jsx
 import React, { useState, useEffect, useCallback } from "react";
-import { X, Gift } from "lucide-react";
+import { getIcon } from "../../utils";
 import {
   SAVINGS_PRIORITIES,
   calculateGoalDistribution,
@@ -87,7 +87,7 @@ const DistributeModal = ({
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xl font-semibold">Distribute Unassigned Cash</h3>
           <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
-            <X className="h-6 w-6" />
+            {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
           </button>
         </div>
 
@@ -199,7 +199,7 @@ const DistributeModal = ({
             disabled={!isValidDistribution}
             className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center space-x-2"
           >
-            <Gift className="h-4 w-4" />
+            {React.createElement(getIcon("Gift"), { className: "h-4 w-4" })}
             <span>Distribute Funds</span>
           </button>
         </div>
