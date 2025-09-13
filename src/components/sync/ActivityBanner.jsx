@@ -1,17 +1,6 @@
 // components/ActivityBanner.jsx
 import React, { useState, useEffect } from "react";
-import {
-  Activity,
-  Eye,
-  Edit3,
-  DollarSign,
-  Trash2,
-  ArrowRightLeft,
-  Clock,
-  ChevronDown,
-  ChevronUp,
-  Users,
-} from "lucide-react";
+import { getIcon } from "../../utils";
 
 const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = null }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -30,18 +19,18 @@ const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = n
     switch (type) {
       case "envelope_update":
       case "envelope_create":
-        return <DollarSign className="h-3 w-3" />;
+        return React.createElement(getIcon("DollarSign"), { className: "h-3 w-3" });
       case "envelope_delete":
-        return <Trash2 className="h-3 w-3" />;
+        return React.createElement(getIcon("Trash2"), { className: "h-3 w-3" });
       case "bill_create":
       case "bill_update":
-        return <Edit3 className="h-3 w-3" />;
+        return React.createElement(getIcon("Edit3"), { className: "h-3 w-3" });
       case "transfer":
-        return <ArrowRightLeft className="h-3 w-3" />;
+        return React.createElement(getIcon("ArrowRightLeft"), { className: "h-3 w-3" });
       case "view":
-        return <Eye className="h-3 w-3" />;
+        return React.createElement(getIcon("Eye"), { className: "h-3 w-3" });
       default:
-        return <Activity className="h-3 w-3" />;
+        return React.createElement(getIcon("Activity"), { className: "h-3 w-3" });
     }
   };
 
@@ -152,9 +141,9 @@ const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = n
 
             {/* Expand/Collapse Icon */}
             {isExpanded ? (
-              <ChevronUp className="h-5 w-5 text-gray-400" />
+              {React.createElement(getIcon("ChevronUp"), { className: "h-5 w-5 text-gray-400" })}
             ) : (
-              <ChevronDown className="h-5 w-5 text-gray-400" />
+              {React.createElement(getIcon("ChevronDown"), { className: "h-5 w-5 text-gray-400" })}
             )}
           </div>
         </div>
@@ -167,7 +156,7 @@ const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = n
           {otherActiveUsers.length > 0 && (
             <div className="p-4 bg-gradient-to-r from-purple-50 to-cyan-50">
               <div className="flex items-center mb-3">
-                <Users className="h-4 w-4 text-purple-600 mr-2" />
+                {React.createElement(getIcon("Users"), { className: "h-4 w-4 text-purple-600 mr-2" })}
                 <span className="font-medium text-purple-900">Currently Online</span>
               </div>
 
@@ -199,7 +188,7 @@ const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = n
           {displayedActivities.length > 0 && (
             <div className="p-4">
               <div className="flex items-center mb-3">
-                <Clock className="h-4 w-4 text-gray-600 mr-2" />
+                {React.createElement(getIcon("Clock"), { className: "h-4 w-4 text-gray-600 mr-2" })}
                 <span className="font-medium text-gray-900">Recent Activity</span>
               </div>
 
