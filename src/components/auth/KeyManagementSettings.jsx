@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { X, Shield, AlertTriangle, CheckCircle } from "lucide-react";
+import { getIcon } from "../../utils";
 // eslint-disable-next-line no-restricted-imports -- TODO: Refactor to use hooks instead of direct service calls
 import { keyManagementService } from "../../services/keys/keyManagementService";
 import {
@@ -137,14 +137,18 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <Shield className="h-6 w-6 text-purple-600 mr-3" />
+              {React.createElement(getIcon("Shield"), {
+                className: "h-6 w-6 text-purple-600 mr-3",
+              })}
               <h2 className="text-xl font-semibold text-gray-900">Key Management</h2>
             </div>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 transition-colors"
             >
-              <X className="h-6 w-6" />
+              {React.createElement(getIcon("X"), {
+                className: "h-6 w-6",
+              })}
             </button>
           </div>
         </div>
@@ -153,7 +157,9 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
           {/* Security Warning */}
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
             <div className="flex items-start">
-              <AlertTriangle className="h-5 w-5 text-amber-600 mr-3 mt-0.5 flex-shrink-0" />
+              {React.createElement(getIcon("AlertTriangle"), {
+                className: "h-5 w-5 text-amber-600 mr-3 mt-0.5 flex-shrink-0",
+              })}
               <div className="text-sm">
                 <p className="text-amber-800 font-medium mb-1">Critical Security Information</p>
                 <p className="text-amber-700">
@@ -168,7 +174,9 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
           {keyFingerprint && (
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
               <div className="flex items-center">
-                <Shield className="h-4 w-4 text-green-600 mr-2" />
+                {React.createElement(getIcon("Shield"), {
+                  className: "h-4 w-4 text-green-600 mr-2",
+                })}
                 <div className="text-sm">
                   <p className="text-green-800 font-medium">Current Key</p>
                   <p className="text-green-700 font-mono text-xs mt-1">
@@ -183,7 +191,9 @@ const KeyManagementSettings = ({ isOpen, onClose }) => {
           {importResult && (
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
               <div className="flex items-start">
-                <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5" />
+                {React.createElement(getIcon("CheckCircle"), {
+                  className: "h-4 w-4 text-green-600 mr-2 mt-0.5",
+                })}
                 <div className="text-sm">
                   <p className="text-green-800 font-medium">Key Import Successful</p>
                   <p className="text-green-700 mt-1">
