@@ -1,5 +1,4 @@
 import { useState, useCallback } from "react";
-import { Settings, User, Shield, Cloud } from "lucide-react";
 import { useBudgetStore } from "../../stores/ui/uiStore";
 import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
@@ -192,10 +191,10 @@ export const useCloudSyncManager = () => {
  */
 export const useSettingsSections = () => {
   const sections = [
-    { id: "general", label: "General", icon: Settings },
-    { id: "account", label: "Account", icon: User },
-    { id: "security", label: "Security", icon: Shield },
-    { id: "data", label: "Data", icon: Cloud },
+    { id: "general", label: "General", icon: "Settings" },
+    { id: "account", label: "Account", icon: "User" },
+    { id: "security", label: "Security", icon: "Shield" },
+    { id: "data", label: "Data", icon: "Cloud" },
   ];
 
   return { sections };
