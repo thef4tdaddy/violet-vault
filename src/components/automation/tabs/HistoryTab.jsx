@@ -1,21 +1,12 @@
 import React from "react";
-import {
-  History,
-  CheckCircle,
-  AlertTriangle,
-  TrendingUp,
-  Calendar,
-  RotateCcw,
-  Eye,
-  EyeOff,
-} from "lucide-react";
+import { getIcon } from "../../../utils";
 
 const HistoryTab = ({ executionHistory, showExecutionDetails, onToggleDetails }) => {
   return (
     <div className="space-y-4">
       {executionHistory.length === 0 ? (
         <div className="text-center py-12">
-          <History className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          {React.createElement(getIcon("History"), { className: "h-12 w-12 text-gray-400 mx-auto mb-4" })}
           <h3 className="text-lg font-medium text-gray-900 mb-2">No Execution History</h3>
           <p className="text-gray-600 max-w-sm mx-auto">
             Your rule execution history will appear here once you start running auto-funding rules.
@@ -33,9 +24,9 @@ const HistoryTab = ({ executionHistory, showExecutionDetails, onToggleDetails })
                     }`}
                   >
                     {execution.success ? (
-                      <CheckCircle className="h-5 w-5" />
+                      React.createElement(getIcon("CheckCircle"), { className: "h-5 w-5" })
                     ) : (
-                      <AlertTriangle className="h-5 w-5" />
+                      React.createElement(getIcon("AlertTriangle"), { className: "h-5 w-5" })
                     )}
                   </div>
                   <div>

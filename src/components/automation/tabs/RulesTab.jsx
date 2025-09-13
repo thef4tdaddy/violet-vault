@@ -1,17 +1,5 @@
 import React from "react";
-import {
-  Plus,
-  Play,
-  Edit3,
-  Trash2,
-  Eye,
-  EyeOff,
-  DollarSign,
-  Percent,
-  Target,
-  ArrowRight,
-  Settings,
-} from "lucide-react";
+import { getIcon } from "../../../utils";
 import { RULE_TYPES, TRIGGER_TYPES } from "../../../utils/budgeting/autofunding";
 
 const RulesTab = ({
@@ -26,15 +14,15 @@ const RulesTab = ({
   const getRuleTypeIcon = (type) => {
     switch (type) {
       case RULE_TYPES.FIXED_AMOUNT:
-        return DollarSign;
+        return "DollarSign";
       case RULE_TYPES.PERCENTAGE:
-        return Percent;
+        return "Percent";
       case RULE_TYPES.SPLIT_REMAINDER:
-        return Target;
+        return "Target";
       case RULE_TYPES.PRIORITY_FILL:
-        return ArrowRight;
+        return "ArrowRight";
       default:
-        return Settings;
+        return "Settings";
     }
   };
 
@@ -127,7 +115,7 @@ const RulesTab = ({
       ) : (
         <div className="space-y-3">
           {rules.map((rule) => {
-            const Icon = getRuleTypeIcon(rule.type);
+            const iconName = getRuleTypeIcon(rule.type);
             const colorClasses = getRuleTypeColor(rule.type);
 
             return (
@@ -140,7 +128,7 @@ const RulesTab = ({
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3 flex-1">
                     <div className={`p-2 rounded-lg ${colorClasses}`}>
-                      <Icon className="h-5 w-5" />
+                      {React.createElement(getIcon(iconName), { className: "h-5 w-5" })}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-1">
