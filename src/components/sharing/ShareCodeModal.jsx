@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { renderIcon } from "../../utils";
 import { shareCodeManager } from "../../utils/auth/shareCodeManager";
