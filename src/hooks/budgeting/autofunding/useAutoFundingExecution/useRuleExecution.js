@@ -11,7 +11,7 @@ import logger from "../../../../utils/common/logger";
  * Hook for core rule execution logic
  * Extracted from useAutoFundingExecution.js for better maintainability
  */
-export const useRuleExecution = (budget) => {
+export const useRuleExecution = (_budget) => {
   // Execute a single rule
   const executeSingleRule = useCallback(async (rule, context, availableCash, executeTransfer) => {
     logger.debug("Executing single rule", {

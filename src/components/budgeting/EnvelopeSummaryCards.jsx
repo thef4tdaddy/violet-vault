@@ -6,7 +6,7 @@ import PageSummaryCard from "../ui/PageSummaryCard";
  * Envelope summary cards using standardized PageSummaryCard component
  * Restored to original format matching user requirements
  */
-const EnvelopeSummaryCards = ({ totals = {}, unassignedCash = 0 }) => {
+const EnvelopeSummaryCards = ({ totals = {}, _unassignedCash = 0 }) => {
   // Calculate balance after bills
   const balanceAfterBills = (totals.totalBalance || 0) - (totals.totalUpcoming || 0);
 

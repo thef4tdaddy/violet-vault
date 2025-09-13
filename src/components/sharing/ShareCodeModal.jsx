@@ -16,7 +16,7 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const { currentUser, encryptionKey, updateProfile } = useAuth();
+  const { currentUser, _encryptionKey, updateProfile } = useAuth();
   const { showSuccessToast, showErrorToast } = useToastHelpers();
   const confirm = useConfirm();
 

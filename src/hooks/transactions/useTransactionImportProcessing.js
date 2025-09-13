@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { globalToast } from "../../stores/ui/toastStore";
+import { globalToast as _globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
 
 /**

@@ -15,7 +15,7 @@ export const useDebtDashboard = () => {
     updateDebt,
     deleteDebt,
     recordPayment,
-    linkDebtToBill,
+    _linkDebtToBill,
     getUpcomingPayments,
   } = useDebtManagement();
 

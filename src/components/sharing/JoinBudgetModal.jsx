@@ -64,7 +64,7 @@ const JoinBudgetModal = ({ isOpen, onClose, onJoinSuccess }) => {
     await joinBudget(shareCode, password, userName, userColor, onJoinSuccess, onClose);
   };
 
-  const handleProcessQRData = (qrData) => {
+  const _handleProcessQRData = (qrData) => {
     return processQRData(qrData, setShareCode, creatorInfo, validateShareCode);
   };
 
