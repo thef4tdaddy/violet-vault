@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { AlertTriangle, CheckCircle, Trash2, Wrench, RefreshCw, FileText, X } from "lucide-react";
+import React, { useState, useEffect, useCallback } from "react";
+import { getIcon } from "../../utils";
 import {
   removeCorruptedEnvelopes,
   repairCorruptedEnvelopes,
@@ -21,13 +21,7 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
   const { addToast } = useToast();
   const confirm = useConfirm();
 
-  useEffect(() => {
-    if (isOpen) {
-      scanForCorruptedEnvelopes();
-    }
-  }, [isOpen, scanForCorruptedEnvelopes]);
-
-  const scanForCorruptedEnvelopes = async () => {
+  const scanForCorruptedEnvelopes = useCallback(async () => {
     setIsScanning(true);
     try {
       logger.debug("🔍 Scanning envelopes for integrity issues...");
@@ -60,7 +54,13 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
     } finally {
       setIsScanning(false);
     }
-  };
+  }, [addToast]);
+
+  useEffect(() => {
+    if (isOpen) {
+      scanForCorruptedEnvelopes();
+    }
+  }, [isOpen, scanForCorruptedEnvelopes]);
 
   const handleSelectEnvelope = (envelopeId) => {
     const newSelected = new Set(selectedEnvelopes);
@@ -179,14 +179,18 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center">
-            <FileText className="h-6 w-6 text-purple-600 mr-3" />
+            {React.createElement(getIcon("FileText"), {
+              className: "h-6 w-6 text-purple-600 mr-3",
+            })}
             <div>
               <h2 className="text-xl font-bold text-gray-900">Envelope Integrity Checker</h2>
               <p className="text-sm text-gray-600">Detect and fix corrupted envelopes</p>
             </div>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-            <X className="h-5 w-5" />
+            {React.createElement(getIcon("X"), {
+              className: "h-5 w-5",
+            })}
           </button>
         </div>
 
@@ -197,7 +201,9 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <div className="flex items-center">
-                  <CheckCircle className="h-8 w-8 text-green-600" />
+                  {React.createElement(getIcon("CheckCircle"), {
+                    className: "h-8 w-8 text-green-600",
+                  })}
                   <div className="ml-3">
                     <p className="text-2xl font-bold text-green-900">{report.healthy}</p>
                     <p className="text-sm text-green-700">Healthy Envelopes</p>
@@ -207,7 +213,9 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
 
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                 <div className="flex items-center">
-                  <AlertTriangle className="h-8 w-8 text-yellow-600" />
+                  {React.createElement(getIcon("AlertTriangle"), {
+                    className: "h-8 w-8 text-yellow-600",
+                  })}
                   <div className="ml-3">
                     <p className="text-2xl font-bold text-yellow-900">{report.corrupted}</p>
                     <p className="text-sm text-yellow-700">Issues Found</p>
@@ -217,7 +225,9 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-center">
-                  <FileText className="h-8 w-8 text-blue-600" />
+                  {React.createElement(getIcon("FileText"), {
+                    className: "h-8 w-8 text-blue-600",
+                  })}
                   <div className="ml-3">
                     <p className="text-2xl font-bold text-blue-900">{report.total}</p>
                     <p className="text-sm text-blue-700">Total Envelopes</p>
@@ -230,7 +240,9 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
           {/* Scanning State */}
           {isScanning && (
             <div className="text-center py-8">
-              <RefreshCw className="h-8 w-8 text-purple-600 animate-spin mx-auto mb-3" />
+              {React.createElement(getIcon("RefreshCw"), {
+                className: "h-8 w-8 text-purple-600 animate-spin mx-auto mb-3",
+              })}
               <p className="text-gray-600">Scanning envelopes for integrity issues...</p>
             </div>
           )}
@@ -240,7 +252,9 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
             <>
               {report.corrupted === 0 ? (
                 <div className="text-center py-8">
-                  <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
+                  {React.createElement(getIcon("CheckCircle"), {
+                    className: "h-16 w-16 text-green-600 mx-auto mb-4",
+                  })}
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">
                     All Envelopes Healthy!
                   </h3>
@@ -265,7 +279,9 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
                       disabled={selectedEnvelopes.size === 0 || isProcessing}
                       className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                     >
-                      <Wrench className="h-4 w-4 mr-2" />
+                      {React.createElement(getIcon("Wrench"), {
+                        className: "h-4 w-4 mr-2",
+                      })}
                       Repair Selected ({selectedEnvelopes.size})
                     </button>
 
@@ -274,7 +290,9 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
                       disabled={selectedEnvelopes.size === 0 || isProcessing}
                       className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                     >
-                      <Trash2 className="h-4 w-4 mr-2" />
+                      {React.createElement(getIcon("Trash2"), {
+                        className: "h-4 w-4 mr-2",
+                      })}
                       Remove Selected ({selectedEnvelopes.size})
                     </button>
 
@@ -283,7 +301,9 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
                       disabled={isProcessing || isScanning}
                       className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                     >
-                      <RefreshCw className="h-4 w-4 mr-2" />
+                      {React.createElement(getIcon("RefreshCw"), {
+                        className: "h-4 w-4 mr-2",
+                      })}
                       Rescan
                     </button>
                   </div>
@@ -291,7 +311,9 @@ const EnvelopeIntegrityChecker = ({ isOpen, onClose }) => {
                   {/* Corrupted Envelopes List */}
                   <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                     <h3 className="font-semibold text-yellow-900 mb-3 flex items-center">
-                      <AlertTriangle className="h-5 w-5 mr-2" />
+                      {React.createElement(getIcon("AlertTriangle"), {
+                        className: "h-5 w-5 mr-2",
+                      })}
                       Corrupted Envelopes ({report.corrupted})
                     </h3>
 

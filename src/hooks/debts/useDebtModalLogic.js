@@ -68,13 +68,7 @@ export const useDebtModalLogic = (debt, isOpen, onSubmit, onClose) => {
       return formatDebtMetrics(metrics);
     }
     return null;
-  }, [
-    debtFormHook.formData.currentBalance,
-    debtFormHook.formData.originalBalance,
-    debtFormHook.formData.interestRate,
-    debtFormHook.formData.minimumPayment,
-    debtFormHook.formData.paymentFrequency,
-  ]);
+  }, [debtFormHook]);
 
   // Handle form submission
   const handleFormSubmit = async (e) => {
