@@ -117,7 +117,7 @@ const useSmartSuggestions = ({
         globalToast.showError(error.message || "Failed to apply suggestion", "Application Error");
       }
     },
-    [onCreateEnvelope, onUpdateEnvelope]
+    [onCreateEnvelope, onUpdateEnvelope, handleDismissSuggestion]
   );
 
   // Dismiss suggestion
