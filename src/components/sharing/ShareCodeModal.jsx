@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { renderIcon } from "../../utils";
 import { shareCodeManager } from "../../utils/auth/shareCodeManager";
@@ -24,7 +24,8 @@ const ShareCodeModal = ({ isOpen, onClose }) => {
     if (isOpen && !shareData) {
       loadExistingShareCode();
     }
-  }, [isOpen]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, shareData]);
 
   const loadExistingShareCode = async () => {
     if (!currentUser?.userName) {
