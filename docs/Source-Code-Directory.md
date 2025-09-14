@@ -1,7 +1,7 @@
 # VioletVault Source Code Directory
 
-**Last Updated:** August 21, 2025  
-**Branch:** develop (v1.9.0 completed - Security & Compliance)
+**Last Updated:** September 14, 2025
+**Branch:** develop (v1.10.0 nearly complete - Visualization & Reports)
 
 This document provides a comprehensive overview of the `/src/` directory structure and the purpose of each file and folder.
 
