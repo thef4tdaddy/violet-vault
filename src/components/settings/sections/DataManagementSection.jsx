@@ -1,7 +1,18 @@
 /* eslint-disable no-console */
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { getIcon } from "../../../utils";
 import { getLocalOnlyMode } from "../../../utils/settings/settingsHelpers";
+
+// Check if we're in development mode
+const isDevelopmentMode = () => {
+  return (
+    typeof window !== "undefined" &&
+    (import.meta.env.MODE === "development" ||
+      window.location.hostname.includes("dev.") ||
+      window.location.hostname.includes("localhost") ||
+      window.location.hostname === "127.0.0.1")
+  );
+};
 
 const DataManagementSection = ({
   onOpenEnvelopeChecker,
@@ -99,21 +110,24 @@ const DataManagementSection = ({
             Sync Health Tools
           </h4>
 
-          {/* Debug Info */}
-          <div className="mb-3 p-2 bg-gray-100 rounded text-xs">
-            <p>
-              <strong>SYNC FUNCTIONS ARE HANGING - THEY NEVER RESOLVE</strong>
-            </p>
-            <p>
-              Available:{" "}
-              {Object.keys(window)
-                .filter((k) => k.includes("Sync") || k.includes("sync"))
-                .join(", ")}
-            </p>
-            <p>These functions exist but get stuck in async operations and never complete.</p>
-          </div>
+          {/* Debug Info - Development Mode Only */}
+          {isDevelopmentMode() && (
+            <div className="mb-3 p-2 bg-gray-100 rounded text-xs">
+              <p>
+                <strong>SYNC FUNCTIONS ARE HANGING - THEY NEVER RESOLVE</strong>
+              </p>
+              <p>
+                Available:{" "}
+                {Object.keys(window)
+                  .filter((k) => k.includes("Sync") || k.includes("sync"))
+                  .join(", ")}
+              </p>
+              <p>These functions exist but get stuck in async operations and never complete.</p>
+            </div>
+          )}
 
           <div className="space-y-3">
+            {/* Always Available - Refresh Sync Status */}
             <button
               onClick={async () => {
                 console.log("🔄 TESTING: window.getQuickSyncStatus");
@@ -135,48 +149,62 @@ const DataManagementSection = ({
               </div>
             </button>
 
-            <button
-              onClick={async () => {
-                console.log("🚀 TESTING: window.runMasterSyncValidation");
-                try {
-                  const result = await window.runMasterSyncValidation();
-                  console.log("🚀 SUCCESS:", result);
-                } catch (error) {
-                  console.error("🚀 ERROR:", error);
-                }
-              }}
-              className="w-full flex items-center p-3 border border-blue-200 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
-            >
-              {React.createElement(getIcon("Wrench"), { className: "h-4 w-4 text-blue-600 mr-3" })}
-              <div className="text-left">
-                <p className="font-medium text-blue-900">Run Full Sync Validation</p>
-                <p className="text-xs text-blue-700">Comprehensive sync system check</p>
-              </div>
-            </button>
+            {/* Development Mode Only - Advanced Debug Tools */}
+            {isDevelopmentMode() && (
+              <>
+                <button
+                  onClick={async () => {
+                    console.log("🚀 TESTING: window.runMasterSyncValidation");
+                    try {
+                      const result = await window.runMasterSyncValidation();
+                      console.log("🚀 SUCCESS:", result);
+                    } catch (error) {
+                      console.error("🚀 ERROR:", error);
+                    }
+                  }}
+                  className="w-full flex items-center p-3 border border-blue-200 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                >
+                  {React.createElement(getIcon("Wrench"), { className: "h-4 w-4 text-blue-600 mr-3" })}
+                  <div className="text-left">
+                    <p className="font-medium text-blue-900">🧪 Run Full Sync Validation</p>
+                    <p className="text-xs text-blue-700">Comprehensive sync system check (Dev Only)</p>
+                  </div>
+                </button>
 
-            <button
-              onClick={async () => {
-                console.log("🧹 TESTING: window.forceCloudDataReset");
-                // eslint-disable-next-line no-restricted-globals
-                if (confirm("⚠️ Reset Cloud Data? This cannot be undone!")) {
-                  try {
-                    const result = await window.forceCloudDataReset();
-                    console.log("🧹 SUCCESS:", result);
-                  } catch (error) {
-                    console.error("🧹 ERROR:", error);
-                  }
-                }
-              }}
-              className="w-full flex items-center p-3 border border-red-200 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
-            >
-              {React.createElement(getIcon("AlertTriangle"), {
-                className: "h-4 w-4 text-red-600 mr-3",
-              })}
-              <div className="text-left">
-                <p className="font-medium text-red-900">🚨 Reset Cloud Data</p>
-                <p className="text-xs text-red-700">Emergency recovery: clear and re-upload</p>
+                <button
+                  onClick={async () => {
+                    console.log("🧹 TESTING: window.forceCloudDataReset");
+                    // eslint-disable-next-line no-restricted-globals
+                    if (confirm("⚠️ Reset Cloud Data? This cannot be undone!")) {
+                      try {
+                        const result = await window.forceCloudDataReset();
+                        console.log("🧹 SUCCESS:", result);
+                      } catch (error) {
+                        console.error("🧹 ERROR:", error);
+                      }
+                    }
+                  }}
+                  className="w-full flex items-center p-3 border border-red-200 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
+                >
+                  {React.createElement(getIcon("AlertTriangle"), {
+                    className: "h-4 w-4 text-red-600 mr-3",
+                  })}
+                  <div className="text-left">
+                    <p className="font-medium text-red-900">🚨 Reset Cloud Data</p>
+                    <p className="text-xs text-red-700">Emergency recovery: clear and re-upload (Dev Only)</p>
+                  </div>
+                </button>
+              </>
+            )}
+
+            {/* Production Mode - Simple message about advanced tools */}
+            {!isDevelopmentMode() && (
+              <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="text-sm text-gray-600">
+                  Additional sync debugging tools are available in development mode.
+                </p>
               </div>
-            </button>
+            )}
           </div>
         </div>
       </div>
