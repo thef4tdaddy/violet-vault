@@ -119,7 +119,9 @@ const IntegrityStatusIndicator = ({ className = "" }) => {
           className="p-1 hover:bg-white/50 rounded disabled:opacity-50"
           title="Perform security scan"
         >
-          {React.createElement(getIcon("RefreshCw"), { className: `h-4 w-4 ${isLoading ? "animate-spin" : ""}` })}
+          {React.createElement(getIcon("RefreshCw"), {
+            className: `h-4 w-4 ${isLoading ? "animate-spin" : ""}`,
+          })}
         </button>
       </div>
 
@@ -131,7 +133,9 @@ const IntegrityStatusIndicator = ({ className = "" }) => {
               key={index}
               className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg"
             >
-              {React.createElement(getIcon("AlertTriangle"), { className: "h-5 w-5 text-red-600 mt-0.5" })}
+              {React.createElement(getIcon("AlertTriangle"), {
+                className: "h-5 w-5 text-red-600 mt-0.5",
+              })}
               <div className="flex-1">
                 <h4 className="text-sm font-medium text-red-900">{warning.title}</h4>
                 <p className="text-sm text-red-700 mt-1">{warning.message}</p>

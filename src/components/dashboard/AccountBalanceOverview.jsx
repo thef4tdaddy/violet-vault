@@ -76,15 +76,13 @@ const AccountBalanceOverview = ({
             >
               Difference
             </h3>
-            {isBalanced ? (
-              React.createElement(getIcon("CheckCircle"), { className: "h-5 w-5 text-green-600" })
-            ) : (
-              React.createElement(getIcon("AlertTriangle"), {
-                className: `h-5 w-5 ${
-                  Math.abs(difference) > 10 ? "text-red-600" : "text-yellow-600"
-                }`
-              })
-            )}
+            {isBalanced
+              ? React.createElement(getIcon("CheckCircle"), { className: "h-5 w-5 text-green-600" })
+              : React.createElement(getIcon("AlertTriangle"), {
+                  className: `h-5 w-5 ${
+                    Math.abs(difference) > 10 ? "text-red-600" : "text-yellow-600"
+                  }`,
+                })}
           </div>
           <div className="space-y-3">
             <div

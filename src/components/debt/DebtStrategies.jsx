@@ -22,7 +22,9 @@ const DebtStrategies = ({ debts }) => {
   if (!hasDebts) {
     return (
       <div className="bg-white rounded-xl p-8 text-center border border-gray-200">
-        {React.createElement(getIcon("CheckCircle"), { className: "w-12 h-12 text-green-500 mx-auto mb-3" })}
+        {React.createElement(getIcon("CheckCircle"), {
+          className: "w-12 h-12 text-green-500 mx-auto mb-3",
+        })}
         <h3 className="text-lg font-semibold text-gray-800 mb-2">No Active Debts!</h3>
         <p className="text-gray-600">
           Congratulations! You don't have any active debts to strategize about.
@@ -84,7 +86,9 @@ const DebtStrategies = ({ debts }) => {
             return (
               <div key={index} className={`rounded-xl p-4 border ${colorClass}`}>
                 <div className="flex items-start gap-3">
-                  {React.createElement(getIcon(iconName), { className: `w-5 h-5 ${iconClass} flex-shrink-0 mt-0.5` })}
+                  {React.createElement(getIcon(iconName), {
+                    className: `w-5 h-5 ${iconClass} flex-shrink-0 mt-0.5`,
+                  })}
                   <div>
                     <h4 className={`font-medium ${textClass}`}>{insight.title}</h4>
                     <p className={`text-sm ${textClass} mt-1`}>{insight.message}</p>

@@ -55,19 +55,19 @@ export const handleSharedBudgetJoin = async (password, userData, login) => {
  */
 export const generateNewUserBudgetId = async (password, shareCode) => {
   const { encryptionUtils } = await import("../security/encryption");
-  
+
   if (!shareCode) {
     throw new Error("Share code missing from user data - should be provided by setup flow");
   }
-  
+
   const budgetId = await encryptionUtils.generateBudgetId(password, shareCode);
-  
+
   logger.auth("🔍 Generated new budget with share code system", {
     budgetIdPreview: budgetId.substring(0, 10) + "...",
     shareCodePreview: shareCode.split(" ").slice(0, 2).join(" ") + " ...",
     envMode: import.meta?.env?.MODE || "unknown",
   });
-  
+
   return budgetId;
 };
 
@@ -76,7 +76,7 @@ export const generateNewUserBudgetId = async (password, shareCode) => {
  */
 export const handleNewUserSetup = async (password, userData, login) => {
   const budgetId = await generateNewUserBudgetId(password, userData.shareCode);
-  
+
   const userDataWithId = {
     ...userData,
     budgetId: budgetId,
@@ -101,7 +101,7 @@ export const handleNewUserSetup = async (password, userData, login) => {
     if (!localStorage.getItem("passwordLastChanged")) {
       localStorage.setItem("passwordLastChanged", Date.now().toString());
     }
-    
+
     return result;
   } else {
     logger.error("❌ Setup failed:", result.error);

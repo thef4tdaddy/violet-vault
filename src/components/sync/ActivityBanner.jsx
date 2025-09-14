@@ -140,11 +140,9 @@ const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = n
             )}
 
             {/* Expand/Collapse Icon */}
-            {isExpanded ? (
-              React.createElement(getIcon("ChevronUp"), { className: "h-5 w-5 text-gray-400" })
-            ) : (
-              React.createElement(getIcon("ChevronDown"), { className: "h-5 w-5 text-gray-400" })
-            )}
+            {isExpanded
+              ? React.createElement(getIcon("ChevronUp"), { className: "h-5 w-5 text-gray-400" })
+              : React.createElement(getIcon("ChevronDown"), { className: "h-5 w-5 text-gray-400" })}
           </div>
         </div>
       </div>
@@ -156,7 +154,9 @@ const ActivityBanner = ({ activeUsers = [], recentActivity = [], currentUser = n
           {otherActiveUsers.length > 0 && (
             <div className="p-4 bg-gradient-to-r from-purple-50 to-cyan-50">
               <div className="flex items-center mb-3">
-                {React.createElement(getIcon("Users"), { className: "h-4 w-4 text-purple-600 mr-2" })}
+                {React.createElement(getIcon("Users"), {
+                  className: "h-4 w-4 text-purple-600 mr-2",
+                })}
                 <span className="font-medium text-purple-900">Currently Online</span>
               </div>
 

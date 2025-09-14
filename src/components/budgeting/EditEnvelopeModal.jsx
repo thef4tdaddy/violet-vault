@@ -94,9 +94,7 @@ const EditEnvelopeModal = ({
                 <EnvelopeTypeSelector
                   selectedType={formData.envelopeType}
                   onTypeChange={(type) => updateFormField("envelopeType", type)}
-                  excludeTypes={
-                    formData.envelopeType === "SAVINGS" ? [] : ["SAVINGS"]
-                  }
+                  excludeTypes={formData.envelopeType === "SAVINGS" ? [] : ["SAVINGS"]}
                   canEdit={canEdit}
                 />
               )}
@@ -132,21 +130,15 @@ const EditEnvelopeModal = ({
 
               {/* Additional Settings */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-gray-900">
-                  Additional Settings
-                </h3>
+                <h3 className="font-semibold text-gray-900">Additional Settings</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Priority */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Priority
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
                     <select
                       value={formData.priority || "medium"}
-                      onChange={(e) =>
-                        updateFormField("priority", e.target.value)
-                      }
+                      onChange={(e) => updateFormField("priority", e.target.value)}
                       disabled={!canEdit}
                       className={`w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                         !canEdit ? "bg-gray-100 cursor-not-allowed" : ""
@@ -165,16 +157,11 @@ const EditEnvelopeModal = ({
                       type="checkbox"
                       id="autoAllocate"
                       checked={formData.autoAllocate !== false}
-                      onChange={(e) =>
-                        updateFormField("autoAllocate", e.target.checked)
-                      }
+                      onChange={(e) => updateFormField("autoAllocate", e.target.checked)}
                       disabled={!canEdit}
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded disabled:cursor-not-allowed"
                     />
-                    <label
-                      htmlFor="autoAllocate"
-                      className="ml-2 block text-sm text-gray-900"
-                    >
+                    <label htmlFor="autoAllocate" className="ml-2 block text-sm text-gray-900">
                       Auto-allocate funds
                     </label>
                   </div>

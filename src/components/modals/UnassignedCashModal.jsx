@@ -159,19 +159,25 @@ const UnassignedCashModal = () => {
               <div className="flex items-center justify-center">
                 {isOverDistributed ? (
                   <div className="flex items-center text-red-600">
-                    {React.createElement(getIcon("AlertTriangle"), { className: "h-3 w-3 sm:h-4 sm:w-4 mr-1" })}
+                    {React.createElement(getIcon("AlertTriangle"), {
+                      className: "h-3 w-3 sm:h-4 sm:w-4 mr-1",
+                    })}
                     <span className="text-xs sm:text-sm font-medium">
                       {unassignedCash < 0 ? "Increasing" : "Over"}
                     </span>
                   </div>
                 ) : hasDistributions ? (
                   <div className="flex items-center text-green-600">
-                    {React.createElement(getIcon("CheckCircle"), { className: "h-3 w-3 sm:h-4 sm:w-4 mr-1" })}
+                    {React.createElement(getIcon("CheckCircle"), {
+                      className: "h-3 w-3 sm:h-4 sm:w-4 mr-1",
+                    })}
                     <span className="text-xs sm:text-sm font-medium">Ready</span>
                   </div>
                 ) : (
                   <div className="flex items-center text-gray-500">
-                    {React.createElement(getIcon("DollarSign"), { className: "h-3 w-3 sm:h-4 sm:w-4 mr-1" })}
+                    {React.createElement(getIcon("DollarSign"), {
+                      className: "h-3 w-3 sm:h-4 sm:w-4 mr-1",
+                    })}
                     <span className="text-xs sm:text-sm font-medium">None</span>
                   </div>
                 )}
@@ -225,7 +231,9 @@ const UnassignedCashModal = () => {
 
           {envelopes.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              {React.createElement(getIcon("DollarSign"), { className: "h-8 w-8 mx-auto mb-2 opacity-50" })}
+              {React.createElement(getIcon("DollarSign"), {
+                className: "h-8 w-8 mx-auto mb-2 opacity-50",
+              })}
               <p className="text-sm">No envelopes available for distribution</p>
             </div>
           ) : (
@@ -279,7 +287,9 @@ const UnassignedCashModal = () => {
           >
             {isProcessing ? (
               <>
-                {React.createElement(getIcon("Loader2"), { className: "h-4 w-4 mr-2 animate-spin" })}
+                {React.createElement(getIcon("Loader2"), {
+                  className: "h-4 w-4 mr-2 animate-spin",
+                })}
                 Distributing...
               </>
             ) : (

@@ -15,7 +15,9 @@ const ArchivingPreviewResults = ({ showPreview, previewData, onClosePreview }) =
 
       {previewData.totalCount === 0 ? (
         <div className="text-center py-8">
-          {React.createElement(getIcon("CheckCircle"), { className: "h-12 w-12 text-green-600 mx-auto mb-4" })}
+          {React.createElement(getIcon("CheckCircle"), {
+            className: "h-12 w-12 text-green-600 mx-auto mb-4",
+          })}
           <p className="text-gray-600">
             No transactions found for archiving with the selected period.
           </p>
@@ -95,7 +97,9 @@ const ArchivingPreviewResults = ({ showPreview, previewData, onClosePreview }) =
           {/* Storage Impact */}
           <div className="bg-yellow-50 p-4 rounded-lg">
             <div className="flex items-start space-x-3">
-              {React.createElement(getIcon("HardDrive"), { className: "h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" })}
+              {React.createElement(getIcon("HardDrive"), {
+                className: "h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0",
+              })}
               <div>
                 <p className="font-medium text-yellow-800">Estimated Storage Impact</p>
                 <p className="text-sm text-yellow-700 mt-1">

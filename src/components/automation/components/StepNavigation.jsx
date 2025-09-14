@@ -24,12 +24,11 @@ const StepNavigation = ({ currentStep, onStepChange }) => {
             }`}
             onClick={() => onStepChange?.(step.number)}
           >
-            {step.number < currentStep ? 
-              React.createElement(getIcon("Check"), {
-                className: "h-4 w-4",
-              }) : 
-              step.number
-            }
+            {step.number < currentStep
+              ? React.createElement(getIcon("Check"), {
+                  className: "h-4 w-4",
+                })
+              : step.number}
           </div>
         ))}
       </div>

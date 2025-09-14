@@ -14,7 +14,9 @@ const ChangeDetails = ({
 
       {!selectedCommit && (
         <div className="text-center py-8 text-gray-500">
-          {React.createElement(getIcon("FileText"), { className: "h-12 w-12 mx-auto mb-3 opacity-50" })}
+          {React.createElement(getIcon("FileText"), {
+            className: "h-12 w-12 mx-auto mb-3 opacity-50",
+          })}
           <p>Select a change to view details</p>
         </div>
       )}

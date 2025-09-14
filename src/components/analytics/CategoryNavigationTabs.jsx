@@ -5,19 +5,19 @@ const CategoryNavigationTabs = ({ activeTab, onTabChange, suggestionCount, categ
   const tabs = [
     {
       id: "suggestions",
-      name: "Suggestions", 
+      name: "Suggestions",
       icon: getIcon("info") || getIcon("lightbulb"), // Using info as fallback if lightbulb not available
       count: suggestionCount,
     },
     {
-      id: "analysis", 
+      id: "analysis",
       name: "Analysis",
       icon: getIcon("BarChart3"),
       count: categoryCount,
     },
     {
       id: "settings",
-      name: "Advanced", 
+      name: "Advanced",
       icon: getIcon("settings"),
     },
   ];

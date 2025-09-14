@@ -51,7 +51,9 @@ const ChartContainer = ({
         </div>
         <div className="flex items-center justify-center text-red-500" style={{ height }}>
           <div className="text-center">
-            {React.createElement(getIcon("BarChart3"), { className: "h-12 w-12 mx-auto mb-3 opacity-50" })}
+            {React.createElement(getIcon("BarChart3"), {
+              className: "h-12 w-12 mx-auto mb-3 opacity-50",
+            })}
             <p className="font-medium">Error loading chart</p>
             <p className="text-sm text-gray-500 mt-1">{error.message || error}</p>
           </div>
@@ -83,7 +85,9 @@ const ChartContainer = ({
         ) : (
           <div className="flex items-center justify-center h-full text-gray-500">
             <div className="text-center">
-              {React.createElement(getIcon("BarChart3"), { className: "h-12 w-12 mx-auto mb-3 opacity-50" })}
+              {React.createElement(getIcon("BarChart3"), {
+                className: "h-12 w-12 mx-auto mb-3 opacity-50",
+              })}
               <p>{emptyMessage}</p>
             </div>
           </div>

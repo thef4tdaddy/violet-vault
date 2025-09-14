@@ -59,21 +59,25 @@ class EditLockService {
     // Validate prerequisites
     const validation = validateLockPrerequisites(this.budgetId, this.currentUser, auth);
     if (!validation.valid) {
-      return validation.degraded 
+      return validation.degraded
         ? { success: true, reason: validation.reason }
         : { success: false, reason: validation.reason };
     }
 
     const lockId = `${recordType}_${recordId}`;
-    const lockDoc = createLockDocument(recordType, recordId, this.budgetId, this.currentUser, options);
+    const lockDoc = createLockDocument(
+      recordType,
+      recordId,
+      this.budgetId,
+      this.currentUser,
+      options
+    );
 
     try {
       // Check for existing lock and determine action
       const existingLock = await this.getLock(recordType, recordId);
-      const lockAction = await handleExistingLock(
-        existingLock,
-        this.currentUser,
-        () => this.releaseLock(recordType, recordId)
+      const lockAction = await handleExistingLock(existingLock, this.currentUser, () =>
+        this.releaseLock(recordType, recordId)
       );
 
       if (lockAction.action === "blocked") {

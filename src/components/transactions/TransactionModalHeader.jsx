@@ -11,7 +11,7 @@ const TransactionModalHeader = ({ editingTransaction, onClose }) => {
       <div className="flex items-center gap-3 flex-1">
         <div className="p-2 bg-emerald-100 rounded-xl">
           {React.createElement(getIcon(editingTransaction ? "TrendingDown" : "TrendingUp"), {
-            className: "h-6 w-6 text-emerald-600"
+            className: "h-6 w-6 text-emerald-600",
           })}
         </div>
         <div>

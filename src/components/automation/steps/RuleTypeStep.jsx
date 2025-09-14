@@ -79,7 +79,7 @@ const RuleTypeStep = ({ ruleData, updateRuleData, errors }) => {
                 {React.createElement(getIcon(icon), {
                   className: `h-5 w-5 mt-0.5 ${
                     ruleData.type === type ? "text-blue-600" : "text-gray-600"
-                  }`
+                  }`,
                 })}
                 <div>
                   <h4

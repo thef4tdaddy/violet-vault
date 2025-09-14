@@ -66,6 +66,7 @@ export default defineConfig(() => {
   const viteNodeEnv = process.env.VITE_NODE_ENV;
   const enableDebugBuild =
     (isDevelopBranch && isProduction) || viteNodeEnv === "development";
+  const isDevelopmentMode = viteNodeEnv === "development" || !isProduction;
 
   return {
     plugins: [react(), tailwindcss()],
@@ -107,10 +108,11 @@ export default defineConfig(() => {
     build: {
       chunkSizeWarningLimit: 1000, // Reset to default for better monitoring
       reportCompressedSize: isProduction, // Enable size reporting in production
-      // Disable minification for develop branch to get readable error messages
-      minify: enableDebugBuild ? false : isProduction ? "terser" : false,
-      // Enable sourcemaps for develop branch and development mode
-      sourcemap: enableDebugBuild || !isProduction,
+      // Development mode: No minification for fast builds and readable errors
+      // Production mode: Ultra-conservative terser minification to prevent temporal dead zone errors
+      minify: isDevelopmentMode ? false : "terser",
+      // Enable sourcemaps for development and debug builds
+      sourcemap: enableDebugBuild || isDevelopmentMode,
       // Manual chunk splitting for optimal bundle sizes
       rollupOptions: {
         output: {
@@ -135,40 +137,40 @@ export default defineConfig(() => {
           propertyReadSideEffects: false,
         },
       },
-      // Terser options for better compression (only when minification is enabled)
-      terserOptions:
-        isProduction && !enableDebugBuild
-          ? {
-              compress: {
-                drop_console: false, // Keep console for Highlight.io
-                drop_debugger: true,
-                pure_funcs: ["console.debug"], // Remove debug statements
-                // Ultra-conservative settings to prevent temporal dead zone errors
-                sequences: false,
-                join_vars: false,
-                conditionals: false,
-                dead_code: false,
-                evaluate: false,
-                if_return: false,
-                loops: false,
-                reduce_vars: false,
-                unused: false,
-                hoist_vars: false,
-                hoist_funs: false,
-                side_effects: false,
-              },
-              mangle: {
-                // Extremely conservative variable mangling
-                keep_fnames: true,
-                keep_classnames: true,
-                reserved: ['$', '_', 'global', 'globalThis', 'React', 'useState', 'useEffect', 'useCallback', 'useRef'],
-              },
-            }
-          : {},
+      // Terser options - only applied to production builds (when minify: "terser")
+      terserOptions: isDevelopmentMode
+        ? {} // No terser options in development (minify is false anyway)
+        : {
+            compress: {
+              drop_console: false, // Keep console for Highlight.io
+              drop_debugger: true,
+              pure_funcs: ["console.debug"], // Remove debug statements
+              // Ultra-conservative settings to prevent temporal dead zone errors
+              sequences: false,
+              join_vars: false,
+              conditionals: false,
+              dead_code: false,
+              evaluate: false,
+              if_return: false,
+              loops: false,
+              reduce_vars: false,
+              unused: false,
+              hoist_vars: false,
+              hoist_funs: false,
+              side_effects: false,
+            },
+            mangle: {
+              // Extremely conservative variable mangling
+              keep_fnames: true,
+              keep_classnames: true,
+              reserved: ['$', '_', 'global', 'globalThis', 'React', 'useState', 'useEffect', 'useCallback', 'useRef'],
+            },
+          },
     },
     esbuild: {
-      // Only drop debugger statements in production (but not in develop branch debug builds)
-      drop: isProduction && !enableDebugBuild ? ["debugger"] : [],
+      // Development mode: Keep everything for debugging
+      // Production mode: Only drop debugger statements (but not in develop branch debug builds)
+      drop: isDevelopmentMode ? [] : (isProduction && !enableDebugBuild ? ["debugger"] : []),
     },
   };
 });

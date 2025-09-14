@@ -130,7 +130,9 @@ const OnboardingProgress = () => {
             </span>
           )}
           <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-            {isExpanded ? React.createElement(getIcon("ChevronUp"), { className: "w-5 h-5" }) : React.createElement(getIcon("ChevronDown"), { className: "w-5 h-5" })}
+            {isExpanded
+              ? React.createElement(getIcon("ChevronUp"), { className: "w-5 h-5" })
+              : React.createElement(getIcon("ChevronDown"), { className: "w-5 h-5" })}
           </button>
         </div>
       </div>
@@ -168,11 +170,13 @@ const OnboardingProgress = () => {
                     }`}
                   >
                     <div className="flex-shrink-0 mt-0.5">
-                      {step.completed ? (
-                        React.createElement(getIcon("CheckCircle"), { className: "w-5 h-5 text-green-500" })
-                      ) : (
-                        React.createElement(getIcon("Circle"), { className: "w-5 h-5 text-gray-400" })
-                      )}
+                      {step.completed
+                        ? React.createElement(getIcon("CheckCircle"), {
+                            className: "w-5 h-5 text-green-500",
+                          })
+                        : React.createElement(getIcon("Circle"), {
+                            className: "w-5 h-5 text-gray-400",
+                          })}
                     </div>
 
                     <div className="flex-1 min-w-0">

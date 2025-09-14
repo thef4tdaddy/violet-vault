@@ -39,7 +39,9 @@ const SecuritySettingsSection = ({
               onClick={onShowLocalDataSecurity}
               className="w-full flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              {React.createElement(getIcon("AlertTriangle"), { className: "h-5 w-5 text-yellow-600 mr-3" })}
+              {React.createElement(getIcon("AlertTriangle"), {
+                className: "h-5 w-5 text-yellow-600 mr-3",
+              })}
               <div className="text-left">
                 <p className="font-medium text-gray-900">Local Data Security</p>
                 <p className="text-sm text-gray-500">

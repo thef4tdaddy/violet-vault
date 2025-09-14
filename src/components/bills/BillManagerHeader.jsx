@@ -32,11 +32,9 @@ const BillManagerHeader = ({
           disabled={isSearching}
           className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center gap-2 border-2 border-black"
         >
-          {isSearching ? (
-            React.createElement(getIcon("RefreshCw"), { className: "h-4 w-4 animate-spin" })
-          ) : (
-            React.createElement(getIcon("Search"), { className: "h-4 w-4" })
-          )}
+          {isSearching
+            ? React.createElement(getIcon("RefreshCw"), { className: "h-4 w-4 animate-spin" })
+            : React.createElement(getIcon("Search"), { className: "h-4 w-4" })}
           Discover Bills
         </button>
 

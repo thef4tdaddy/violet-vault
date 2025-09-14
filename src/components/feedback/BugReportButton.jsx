@@ -97,7 +97,9 @@ const BugReportButton = () => {
           >
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center">
-                {React.createElement(getIcon("AlertCircle"), { className: "h-5 w-5 text-red-500 mr-2" })}
+                {React.createElement(getIcon("AlertCircle"), {
+                  className: "h-5 w-5 text-red-500 mr-2",
+                })}
                 <h3 className="text-lg font-semibold text-gray-900">Report a Problem</h3>
               </div>
               <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">
