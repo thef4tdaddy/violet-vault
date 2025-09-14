@@ -45,42 +45,15 @@ jobs:
       - name: Run ESLint and capture warnings
         id: lint
         run: |
-          # Run ESLint and capture both stdout and stderr
-          npm run lint --silent > eslint-output.txt 2>&1 || true
+          # Run ESLint with JSON format for reliable parsing
+          npx eslint --config configs/eslint.config.js . --ext .js,.jsx,.ts,.tsx --format json > eslint-output.json 2>/dev/null || true
 
-          # Parse the output to extract warnings
-          node scripts/parse-eslint-warnings.js eslint-output.txt > new-warnings.json
-
-          # Get current warning count from existing file
-          CURRENT_COUNT=$(if [ -f "./.github/data/lint-warnings.json" ]; then 
-            cat .github/data/lint-warnings.json | jq -r '.currentStatus.totalWarnings // 0'
-          else 
-            echo 0
-          fi)
-
-          # Get new warning count
-          NEW_COUNT=$(if [ -f "./new-warnings.json" ]; then 
-            cat new-warnings.json | jq -r '.currentStatus.totalWarnings // 0'
-          else 
-            echo 0
-          fi)
-
-          echo "current_count=$CURRENT_COUNT" >> $GITHUB_OUTPUT
+          # Count warnings from JSON output (more reliable than text parsing)
+          NEW_COUNT=$(cat eslint-output.json | jq '[.[] | .messages[] | select(.severity == 1)] | length')
           echo "new_count=$NEW_COUNT" >> $GITHUB_OUTPUT
 
-          # Calculate percentage increase
-          PERCENTAGE_INCREASE=$(node -e "
-            const current = $CURRENT_COUNT;
-            const newCount = $NEW_COUNT;
-            if (current === 0) {
-              console.log(newCount > 0 ? 100 : 0);
-            } else {
-              const increase = ((newCount - current) / current) * 100;
-              console.log(Math.round(increase * 100) / 100);
-            }
-          ")
-
-          echo "percentage_increase=$PERCENTAGE_INCREASE" >> $GITHUB_OUTPUT
+          # For backward compatibility, also create the parsed warnings file
+          node scripts/parse-eslint-warnings.js <(npx eslint --config configs/eslint.config.js . --ext .js,.jsx,.ts,.tsx 2>/dev/null || echo "") > new-warnings.json 2>/dev/null || echo '{"currentStatus":{"totalWarnings":0}}' > new-warnings.json
 
       - name: Check warning increase threshold
         id: check_threshold
@@ -279,7 +252,7 @@ jobs:
           script: |
             const fs = require('fs');
 
-            // First, get previous warnings from the last comment BEFORE hiding anything
+            // Get previous warnings from the last comment BEFORE hiding anything  
             let previousDevelopWarnings = null;
             let previousMainWarnings = null;
 
@@ -290,52 +263,59 @@ jobs:
                 issue_number: 568
               });
               
-              // Find the most recent automation comment to get previous values
-              // Look for both non-minimized and recent minimized comments
-              const lastAutomationComment = comments.data
-                .filter(comment => 
+              // Find the most recent bot comment for delta calculation
+              const visibleBotComments = comments.data
+                .filter(comment =>
                   comment.user.login === 'github-actions[bot]' &&
-                  (comment.body.includes('## 📊 Lint Warnings Update') ||
-                   comment.body.includes('📊 Lint Warnings Update') ||
-                   comment.body.includes('**Develop Branch:**') ||
-                   comment.body.includes('**Main Branch:**'))
+                  (comment.body.includes('**Develop Branch:**') ||
+                   comment.body.includes('**Main Branch:**') ||
+                   comment.body.includes('📊 Lint Warnings Update'))
                 )
-                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0]; // Get the most recent one by date
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
               
-              if (lastAutomationComment) {
+              const lastBotComment = visibleBotComments[0];
+              
+              if (lastBotComment) {
                 console.log('📋 Found previous comment for delta calculation');
-                const devMatch = lastAutomationComment.body.match(/\*\*Develop Branch:\*\* (\d+) warnings/);
-                const mainMatch = lastAutomationComment.body.match(/\*\*Main Branch:\*\* (\d+) warnings/);
+                console.log(`Comment created: ${lastBotComment.created_at}`);
+                console.log(`Comment preview: ${lastBotComment.body.substring(0, 200)}...`);
+                
+                // Improved regex patterns to extract warning counts
+                const devMatch = lastBotComment.body.match(/\*\*Develop Branch:\*\*\s*(\d+)\s*warnings/i) ||
+                                lastBotComment.body.match(/Develop[^:]*:\s*(\d+)\s*warnings/i) ||
+                                lastBotComment.body.match(/Develop.*?(\d+)\s*warnings/i);
+                const mainMatch = lastBotComment.body.match(/\*\*Main Branch:\*\*\s*(\d+)\s*warnings/i) ||
+                                 lastBotComment.body.match(/Main[^:]*:\s*(\d+)\s*warnings/i) ||
+                                 lastBotComment.body.match(/Main.*?(\d+)\s*warnings/i);
                 
                 if (devMatch) previousDevelopWarnings = parseInt(devMatch[1]);
                 if (mainMatch) previousMainWarnings = parseInt(mainMatch[1]);
                 
-                console.log(`Previous values: Develop=${previousDevelopWarnings}, Main=${previousMainWarnings}`);
+                console.log(`Previous values extracted: Develop=${previousDevelopWarnings}, Main=${previousMainWarnings}`);
               } else {
-                console.log('⚠️ No previous automation comment found for delta calculation');
+                console.log('⚠️ No previous visible bot comment found - this is likely the first run');
               }
 
-              // Now hide previous automation comments using GitHub's native hide outdated functionality
-              const automationComments = comments.data.filter(comment => 
-                comment.user.login === 'github-actions[bot]' &&
-                (comment.body.includes('## 📊 Lint Warnings Update') ||
-                 comment.body.includes('📊 Lint Warnings Update') ||
-                 comment.body.includes('📊 **Lint Warning Analysis**') ||
-                 comment.body.includes('🚀 **Lint Warnings Report**') ||
-                 comment.body.includes('Automated lint warning tracking') ||
-                 comment.body.includes('**Develop Branch:**') ||
-                 comment.body.includes('**Main Branch:**')) &&
-                !comment.body.startsWith('<details>') &&
-                comment.id !== lastAutomationComment?.id // Don't hide the comment we just used for delta calculation
-              );
-              
-              // Hide the previous automation comments using GitHub's native hide functionality
-              for (const comment of automationComments) {
+              // Minimize previous automation comments using GitHub's native hide feature
+              const automationComments = comments.data
+                .filter(comment =>
+                  comment.user.login === 'github-actions[bot]' &&
+                  (comment.body.includes('📊 Lint Warnings Update') ||
+                   comment.body.includes('**Develop Branch:**') ||
+                   comment.body.includes('**Main Branch:**'))
+                )
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)); // Newest first
+
+              // Hide all except the most recent using GitHub's minimize feature
+              const commentsToHide = automationComments.slice(1); // Skip the first (newest) one
+
+              for (const comment of commentsToHide) {
                 try {
+                  // Use GitHub's native comment minimization API
                   await github.graphql(`
-                    mutation($commentId: ID!) {
+                    mutation {
                       minimizeComment(input: {
-                        subjectId: $commentId
+                        subjectId: "${comment.node_id}"
                         classifier: OUTDATED
                       }) {
                         minimizedComment {
@@ -343,12 +323,10 @@ jobs:
                         }
                       }
                     }
-                  `, {
-                    commentId: comment.node_id
-                  });
-                  console.log(`✅ Marked comment #${comment.id} as outdated`);
+                  `);
+                  console.log(`✅ Minimized comment #${comment.id} as outdated`);
                 } catch (updateError) {
-                  console.log(`⚠️ Could not hide comment #${comment.id}:`, updateError.message);
+                  console.log(`⚠️ Could not minimize comment #${comment.id}: ${updateError.message}`);
                 }
               }
             } catch (error) {
@@ -361,15 +339,13 @@ jobs:
             // Prepare template variables with Americas/Chicago timezone
             const now = new Date();
 
-            // Convert UTC to Central Time (UTC-6 standard, UTC-5 daylight)
-            const chicagoTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Chicago"}));
-
-            const currentDate = chicagoTime.toLocaleString('en-US', { 
+            const currentDate = now.toLocaleString('en-US', { 
               year: 'numeric', 
               month: 'long', 
               day: 'numeric',
               hour: '2-digit',
               minute: '2-digit',
+              timeZone: 'America/Chicago',
               timeZoneName: 'short'
             });
 
@@ -379,28 +355,26 @@ jobs:
             const developWarnings = '${{ steps.develop_warnings.outputs.warnings }}' || '0';
             const mainWarnings = '${{ steps.main_warnings.outputs.warnings }}' || '0';
 
-            // Calculate deltas
-            const developDelta = previousDevelopWarnings !== null ? 
-              parseInt(developWarnings) - previousDevelopWarnings : null;
-            const mainDelta = previousMainWarnings !== null ? 
-              parseInt(mainWarnings) - previousMainWarnings : null;
+            // Calculate deltas (change from previous)
+            const developDelta = previousDevelopWarnings !== null ? developWarnings - previousDevelopWarnings : null;
+            const mainDelta = previousMainWarnings !== null ? mainWarnings - previousMainWarnings : null;
 
             console.log(`Delta calculation: Develop Δ=${developDelta}, Main Δ=${mainDelta}`);
 
-            // Check if we should skip posting (no changes)
+            // Check if we should skip posting (no meaningful changes)
             const runningDevelop = '${{ steps.should_run.outputs.should_run_develop }}' === 'true';
             const runningMain = '${{ steps.should_run.outputs.should_run_main }}' === 'true';
 
-            // Only skip if we have valid previous data and there are truly no changes
-            const shouldSkipPost = (
-              (runningDevelop && !runningMain && previousDevelopWarnings !== null && developDelta === 0) ||
-              (runningMain && !runningDevelop && previousMainWarnings !== null && mainDelta === 0) ||
-              (runningDevelop && runningMain && 
-               previousDevelopWarnings !== null && previousMainWarnings !== null &&
-               developDelta === 0 && mainDelta === 0)
+            // Check if there are actual changes in warning counts
+            const hasChanges = (
+              (runningDevelop && previousDevelopWarnings !== null && developDelta !== 0) ||
+              (runningMain && previousMainWarnings !== null && mainDelta !== 0) ||
+              // Always post on first run when we have no previous data
+              (runningDevelop && previousDevelopWarnings === null) ||
+              (runningMain && previousMainWarnings === null)
             );
 
-            if (shouldSkipPost) {
+            if (!hasChanges) {
               console.log('🔇 Skipping comment - no changes in warning counts');
               console.log(`Develop: ${previousDevelopWarnings} → ${developWarnings} (Δ: ${developDelta})`);
               console.log(`Main: ${previousMainWarnings} → ${mainWarnings} (Δ: ${mainDelta})`);
@@ -409,8 +383,9 @@ jobs:
 
             console.log('📝 Posting comment - changes detected or first run');
             console.log(`Running: Develop=${runningDevelop}, Main=${runningMain}`);
-            console.log(`Develop: ${previousDevelopWarnings} → ${developWarnings} (Δ: ${developDelta})`);
-            console.log(`Main: ${previousMainWarnings} → ${mainWarnings} (Δ: ${mainDelta})`);
+            console.log(`Current values: Develop=${developWarnings}, Main=${mainWarnings}`);
+            console.log(`Previous values: Develop=${previousDevelopWarnings}, Main=${previousMainWarnings}`);
+            console.log(`Delta calculation: Develop Δ=${developDelta}, Main Δ=${mainDelta}`);
 
             let branchInfo = '';
             if ('${{ steps.should_run.outputs.should_run_develop }}' === 'true') {
