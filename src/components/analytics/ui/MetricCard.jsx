@@ -67,15 +67,13 @@ const MetricCard = ({ title, value, subtitle, icon, trend, color = "purple" }) =
       </div>
       {trend !== undefined && trend !== null && (
         <div className="mt-3 flex items-center text-sm">
-          {trend > 0 ? (
-            React.createElement(getIcon("ArrowUpRight"), {
-              className: "h-4 w-4 text-white mr-1",
-            })
-          ) : (
-            React.createElement(getIcon("ArrowDownRight"), {
-              className: "h-4 w-4 text-white mr-1",
-            })
-          )}
+          {trend > 0
+            ? React.createElement(getIcon("ArrowUpRight"), {
+                className: "h-4 w-4 text-white mr-1",
+              })
+            : React.createElement(getIcon("ArrowDownRight"), {
+                className: "h-4 w-4 text-white mr-1",
+              })}
           <span className="text-white">{Math.abs(trend).toFixed(1)}% vs last period</span>
         </div>
       )}

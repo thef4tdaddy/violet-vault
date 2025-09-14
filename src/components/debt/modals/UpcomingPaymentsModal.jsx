@@ -47,7 +47,9 @@ const UpcomingPaymentsModal = ({ isOpen, onClose, upcomingPayments = [] }) => {
         <div className="overflow-y-auto max-h-96">
           {upcomingPayments.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              {React.createElement(getIcon("Calendar"), { className: "h-12 w-12 mx-auto mb-4 opacity-50" })}
+              {React.createElement(getIcon("Calendar"), {
+                className: "h-12 w-12 mx-auto mb-4 opacity-50",
+              })}
               <p>No upcoming payments in the next 30 days</p>
             </div>
           ) : (

@@ -40,11 +40,9 @@ const DebtFilters = ({ filterOptions, setFilterOptions, debtTypes, debtsByType }
           onClick={() => setIsExpanded(!isExpanded)}
           className="p-1 rounded-lg hover:bg-white/50 transition-colors"
         >
-          {isExpanded ? (
-            React.createElement(getIcon("ChevronUp"), { className: "h-4 w-4 text-gray-600" })
-          ) : (
-            React.createElement(getIcon("ChevronDown"), { className: "h-4 w-4 text-gray-600" })
-          )}
+          {isExpanded
+            ? React.createElement(getIcon("ChevronUp"), { className: "h-4 w-4 text-gray-600" })
+            : React.createElement(getIcon("ChevronDown"), { className: "h-4 w-4 text-gray-600" })}
         </button>
       </div>
 

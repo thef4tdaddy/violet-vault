@@ -53,7 +53,9 @@ const PaymentImpactTable = ({ paymentImpact = [] }) => {
                 <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-50/50"}>
                   <td className="px-4 py-3">
                     <div className="flex items-center">
-                      {React.createElement(getIcon("DollarSign"), { className: "h-4 w-4 text-green-500 mr-1" })}
+                      {React.createElement(getIcon("DollarSign"), {
+                        className: "h-4 w-4 text-green-500 mr-1",
+                      })}
                       <span className="font-medium text-gray-900">+${scenario.extraPayment}</span>
                     </div>
                   </td>
@@ -64,7 +66,9 @@ const PaymentImpactTable = ({ paymentImpact = [] }) => {
                   </td>
                   <td className="px-4 py-3 text-center">
                     <div className="flex items-center justify-center">
-                      {React.createElement(getIcon("Calendar"), { className: "h-3 w-3 text-blue-500 mr-1" })}
+                      {React.createElement(getIcon("Calendar"), {
+                        className: "h-3 w-3 text-blue-500 mr-1",
+                      })}
                       <span className="text-sm font-medium text-blue-600">
                         {scenario.avalanche.timeSavings || 0} months
                       </span>
@@ -86,7 +90,9 @@ const PaymentImpactTable = ({ paymentImpact = [] }) => {
                   </td>
                   <td className="px-4 py-3 text-center">
                     <div className="flex items-center justify-center">
-                      {React.createElement(getIcon("Calendar"), { className: "h-3 w-3 text-blue-500 mr-1" })}
+                      {React.createElement(getIcon("Calendar"), {
+                        className: "h-3 w-3 text-blue-500 mr-1",
+                      })}
                       <span className="text-sm font-medium text-blue-600">
                         {scenario.snowball.timeSavings || 0} months
                       </span>

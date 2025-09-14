@@ -135,11 +135,9 @@ export const ManualSyncControls = ({ className = "" }) => {
             variant="outline"
             className="flex items-center gap-2"
           >
-            {isUploadingSyncInProgress ? (
-              React.createElement(getIcon("RefreshCw"), { className: "h-4 w-4 animate-spin" })
-            ) : (
-              React.createElement(getIcon("Upload"), { className: "h-4 w-4" })
-            )}
+            {isUploadingSyncInProgress
+              ? React.createElement(getIcon("RefreshCw"), { className: "h-4 w-4 animate-spin" })
+              : React.createElement(getIcon("Upload"), { className: "h-4 w-4" })}
             Upload Changes
           </Button>
 
@@ -150,11 +148,9 @@ export const ManualSyncControls = ({ className = "" }) => {
             variant="outline"
             className="flex items-center gap-2"
           >
-            {isDownloadingSyncInProgress ? (
-              React.createElement(getIcon("RefreshCw"), { className: "h-4 w-4 animate-spin" })
-            ) : (
-              React.createElement(getIcon("Download"), { className: "h-4 w-4" })
-            )}
+            {isDownloadingSyncInProgress
+              ? React.createElement(getIcon("RefreshCw"), { className: "h-4 w-4 animate-spin" })
+              : React.createElement(getIcon("Download"), { className: "h-4 w-4" })}
             Download Changes
           </Button>
 
@@ -165,11 +161,9 @@ export const ManualSyncControls = ({ className = "" }) => {
             variant="default"
             className="flex items-center gap-2"
           >
-            {isSyncInProgress ? (
-              React.createElement(getIcon("RefreshCw"), { className: "h-4 w-4 animate-spin" })
-            ) : (
-              React.createElement(getIcon("RefreshCw"), { className: "h-4 w-4" })
-            )}
+            {isSyncInProgress
+              ? React.createElement(getIcon("RefreshCw"), { className: "h-4 w-4 animate-spin" })
+              : React.createElement(getIcon("RefreshCw"), { className: "h-4 w-4" })}
             Full Sync
           </Button>
         </div>

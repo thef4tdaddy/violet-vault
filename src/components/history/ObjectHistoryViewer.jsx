@@ -87,7 +87,9 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-xl font-semibold text-gray-900 flex items-center">
-                {React.createElement(getIcon("History"), { className: "h-5 w-5 mr-3 text-blue-600" })}
+                {React.createElement(getIcon("History"), {
+                  className: "h-5 w-5 mr-3 text-blue-600",
+                })}
                 {objectType} History: {objectName}
               </h2>
               <p className="text-gray-600 mt-1 text-sm">
@@ -110,7 +112,9 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
           {/* No History */}
           {!isLoading && relevantHistory.length === 0 && (
             <div className="text-center py-8 text-gray-500">
-              {React.createElement(getIcon("History"), { className: "h-12 w-12 mx-auto mb-3 opacity-50" })}
+              {React.createElement(getIcon("History"), {
+                className: "h-12 w-12 mx-auto mb-3 opacity-50",
+              })}
               <p className="font-medium">No history found</p>
               <p className="text-sm mt-1">
                 This {objectType.toLowerCase()} hasn't been modified yet or budget history is not
@@ -124,7 +128,9 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
             <div className="space-y-4">
               <div className="bg-blue-50 p-3 rounded-lg">
                 <div className="flex items-center">
-                  {React.createElement(getIcon("GitCommit"), { className: "h-4 w-4 text-blue-600 mr-2" })}
+                  {React.createElement(getIcon("GitCommit"), {
+                    className: "h-4 w-4 text-blue-600 mr-2",
+                  })}
                   <div className="text-sm text-blue-800">
                     <strong>Found {relevantHistory.length} related changes</strong> for this{" "}
                     {objectType.toLowerCase()}
@@ -142,7 +148,9 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          {React.createElement(getIcon("GitCommit"), { className: "h-4 w-4 text-gray-600" })}
+                          {React.createElement(getIcon("GitCommit"), {
+                            className: "h-4 w-4 text-gray-600",
+                          })}
                           <span className="font-mono text-sm text-gray-600">
                             {commit.hash?.substring(0, 8) || "unknown"}
                           </span>
@@ -169,11 +177,9 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
                         onClick={() => toggleCommitExpanded(commit.hash)}
                         className="text-gray-400 hover:text-gray-600 p-1 rounded"
                       >
-                        {expandedCommits.has(commit.hash) ? (
-                          React.createElement(getIcon("ChevronDown"), { className: "h-4 w-4" })
-                        ) : (
-                          React.createElement(getIcon("ChevronRight"), { className: "h-4 w-4" })
-                        )}
+                        {expandedCommits.has(commit.hash)
+                          ? React.createElement(getIcon("ChevronDown"), { className: "h-4 w-4" })
+                          : React.createElement(getIcon("ChevronRight"), { className: "h-4 w-4" })}
                       </button>
                     </div>
 

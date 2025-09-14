@@ -110,7 +110,9 @@ const BillDiscoveryModal = ({
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-lg font-semibold flex items-center">
-                {React.createElement(getIcon("Search"), { className: "h-5 w-5 mr-2 text-blue-600" })}
+                {React.createElement(getIcon("Search"), {
+                  className: "h-5 w-5 mr-2 text-blue-600",
+                })}
                 Discovered Bills
               </h3>
               <p className="text-sm text-gray-600 mt-1">
@@ -125,7 +127,9 @@ const BillDiscoveryModal = ({
 
           {discoveredBills.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
-              {React.createElement(getIcon("Search"), { className: "h-12 w-12 mx-auto mb-3 opacity-50" })}
+              {React.createElement(getIcon("Search"), {
+                className: "h-12 w-12 mx-auto mb-3 opacity-50",
+              })}
               <p className="font-medium">No new bills discovered</p>
               <p className="text-sm mt-1">
                 Try adding more transaction history or check back later as you make more purchases.
@@ -237,7 +241,9 @@ const BillDiscoveryModal = ({
                           {/* Envelope Assignment */}
                           <div className="mt-3">
                             <div className="flex items-center gap-2">
-                              {React.createElement(getIcon("Target"), { className: "h-4 w-4 text-gray-400" })}
+                              {React.createElement(getIcon("Target"), {
+                                className: "h-4 w-4 text-gray-400",
+                              })}
                               <select
                                 value={billEnvelopeMap[bill.id] || ""}
                                 onChange={(e) => updateBillEnvelope(bill.id, e.target.value)}
@@ -309,7 +315,9 @@ const BillDiscoveryModal = ({
                     >
                       {isProcessing ? (
                         <>
-                          {React.createElement(getIcon("Clock"), { className: "h-4 w-4 mr-2 animate-spin" })}
+                          {React.createElement(getIcon("Clock"), {
+                            className: "h-4 w-4 mr-2 animate-spin",
+                          })}
                           Adding...
                         </>
                       ) : (

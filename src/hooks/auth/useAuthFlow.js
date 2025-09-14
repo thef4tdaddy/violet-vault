@@ -46,7 +46,7 @@ const useAuthFlow = () => {
         hasPassword: !!password,
       });
       logger.auth("🚨 DEBUG VERSION 2: useAuthFlow.js with debug logging is running!");
-      
+
       try {
         if (isExistingUser) {
           return await handleExistingUserLogin(password, login);

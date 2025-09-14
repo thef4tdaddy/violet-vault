@@ -40,7 +40,9 @@ const ArchivingConfiguration = ({
 
         <div className="bg-blue-50 p-4 rounded-lg">
           <div className="flex items-start space-x-3">
-            {React.createElement(getIcon("Info"), { className: "h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" })}
+            {React.createElement(getIcon("Info"), {
+              className: "h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0",
+            })}
             <div className="text-sm text-blue-800">
               <p className="font-medium mb-1">What happens during archiving:</p>
               <ul className="list-disc list-inside space-y-1">

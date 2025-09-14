@@ -33,14 +33,13 @@ const PasswordField = ({
           onClick={onToggleVisibility}
           className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600"
         >
-          {showPassword ? 
-            React.createElement(getIcon("EyeOff"), {
-              className: "h-4 w-4",
-            }) : 
-            React.createElement(getIcon("Eye"), {
-              className: "h-4 w-4",
-            })
-          }
+          {showPassword
+            ? React.createElement(getIcon("EyeOff"), {
+                className: "h-4 w-4",
+              })
+            : React.createElement(getIcon("Eye"), {
+                className: "h-4 w-4",
+              })}
         </button>
       </div>
     </div>

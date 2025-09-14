@@ -39,11 +39,9 @@ const TransactionFilters = ({
           onClick={() => setIsExpanded(!isExpanded)}
           className="p-1 rounded-lg hover:bg-white/50 transition-colors"
         >
-          {isExpanded ? (
-            React.createElement(getIcon("ChevronUp"), { className: "h-4 w-4 text-gray-600" })
-          ) : (
-            React.createElement(getIcon("ChevronDown"), { className: "h-4 w-4 text-gray-600" })
-          )}
+          {isExpanded
+            ? React.createElement(getIcon("ChevronUp"), { className: "h-4 w-4 text-gray-600" })
+            : React.createElement(getIcon("ChevronDown"), { className: "h-4 w-4 text-gray-600" })}
         </button>
       </div>
 
@@ -55,7 +53,10 @@ const TransactionFilters = ({
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
             <div className="relative">
-              {React.createElement(getIcon("Search"), { className: "absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" })}
+              {React.createElement(getIcon("Search"), {
+                className:
+                  "absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400",
+              })}
               <input
                 type="text"
                 value={searchTerm}
@@ -126,11 +127,9 @@ const TransactionFilters = ({
                 onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
                 className="glassmorphism px-3 py-2 border border-white/20 rounded-lg hover:shadow-lg"
               >
-                {sortOrder === "asc" ? (
-                  React.createElement(getIcon("ChevronUp"), { className: "h-4 w-4" })
-                ) : (
-                  React.createElement(getIcon("ChevronDown"), { className: "h-4 w-4" })
-                )}
+                {sortOrder === "asc"
+                  ? React.createElement(getIcon("ChevronUp"), { className: "h-4 w-4" })
+                  : React.createElement(getIcon("ChevronDown"), { className: "h-4 w-4" })}
               </button>
             </div>
           </div>

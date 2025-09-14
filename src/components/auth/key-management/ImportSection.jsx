@@ -72,15 +72,13 @@ const ImportSection = ({
           }`}
         >
           <div className="flex items-start">
-            {importResult.success ? (
-              React.createElement(getIcon("CheckCircle"), {
-                className: "h-5 w-5 text-green-600 mr-3 mt-0.5 flex-shrink-0",
-              })
-            ) : (
-              React.createElement(getIcon("AlertTriangle"), {
-                className: "h-5 w-5 text-red-600 mr-3 mt-0.5 flex-shrink-0",
-              })
-            )}
+            {importResult.success
+              ? React.createElement(getIcon("CheckCircle"), {
+                  className: "h-5 w-5 text-green-600 mr-3 mt-0.5 flex-shrink-0",
+                })
+              : React.createElement(getIcon("AlertTriangle"), {
+                  className: "h-5 w-5 text-red-600 mr-3 mt-0.5 flex-shrink-0",
+                })}
             <div>
               <p
                 className={`text-sm font-medium ${

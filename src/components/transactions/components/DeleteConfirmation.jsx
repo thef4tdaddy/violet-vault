@@ -19,7 +19,9 @@ const DeleteConfirmation = ({ transaction, onConfirm, onCancel, virtualRow }) =>
       <td colSpan="6" className="px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center text-red-700">
-            {React.createElement(getIcon("AlertTriangle"), { className: "h-5 w-5 mr-2 flex-shrink-0" })}
+            {React.createElement(getIcon("AlertTriangle"), {
+              className: "h-5 w-5 mr-2 flex-shrink-0",
+            })}
             <span className="font-medium">Delete "{transaction.description}"?</span>
           </div>
           <div className="flex gap-2 flex-shrink-0">

@@ -232,7 +232,9 @@ const LockScreen = () => {
                     disabled={isUnlocking}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-100 hover:text-white disabled:opacity-50"
                   >
-                    {React.createElement(getIcon(showPassword ? "EyeOff" : "Eye"), { className: "h-5 w-5" })}
+                    {React.createElement(getIcon(showPassword ? "EyeOff" : "Eye"), {
+                      className: "h-5 w-5",
+                    })}
                   </button>
                 </div>
               </div>

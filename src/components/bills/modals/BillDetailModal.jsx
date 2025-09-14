@@ -65,7 +65,9 @@ const BillDetailModal = ({
           <div
             className={`inline-flex items-center gap-2 px-3 py-2 rounded-full ${statusInfo.classes.bg} ${statusInfo.classes.border} border`}
           >
-            {React.createElement(getIcon(statusIconName), { className: `h-4 w-4 ${statusInfo.classes.icon}` })}
+            {React.createElement(getIcon(statusIconName), {
+              className: `h-4 w-4 ${statusInfo.classes.icon}`,
+            })}
             <span className={`text-sm font-medium ${statusInfo.classes.text}`}>
               {statusInfo.text}
             </span>
@@ -170,7 +172,9 @@ const BillDetailModal = ({
                       </p>
                     </div>
                     <div className="text-right">
-                      {React.createElement(getIcon("CheckCircle"), { className: "h-4 w-4 text-green-500" })}
+                      {React.createElement(getIcon("CheckCircle"), {
+                        className: "h-4 w-4 text-green-500",
+                      })}
                     </div>
                   </div>
                 ))}

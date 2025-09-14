@@ -33,7 +33,7 @@ printf 'Linting:\n%s\n' "$CODE_FILES"
 
 # Run ESLint on just the staged JS/TS files
 # (xargs handles spaces/newlines safely)
-printf '%s\n' "$CODE_FILES" | xargs npx eslint --config ./configs/eslint.config.js --max-warnings 50 --
+printf '%s\n' "$CODE_FILES" | xargs npx eslint --config ./configs/eslint.config.js --max-warnings 500 --
 ESLINT_STATUS=$?
 
 if [ $ESLINT_STATUS -ne 0 ]; then

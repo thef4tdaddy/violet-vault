@@ -20,7 +20,9 @@ const DataManagementSection = ({
           onClick={onOpenEnvelopeChecker}
           className="w-full flex items-center p-3 border border-purple-200 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
         >
-          {React.createElement(getIcon("AlertTriangle"), { className: "h-5 w-5 text-purple-600 mr-3" })}
+          {React.createElement(getIcon("AlertTriangle"), {
+            className: "h-5 w-5 text-purple-600 mr-3",
+          })}
           <div className="text-left">
             <p className="font-medium text-purple-900">Envelope Integrity Checker</p>
             <p className="text-sm text-purple-700">Detect and fix empty/corrupted envelopes</p>
@@ -124,7 +126,9 @@ const DataManagementSection = ({
               }}
               className="w-full flex items-center p-3 border border-green-200 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
             >
-              {React.createElement(getIcon("RefreshCw"), { className: "h-4 w-4 text-green-600 mr-3" })}
+              {React.createElement(getIcon("RefreshCw"), {
+                className: "h-4 w-4 text-green-600 mr-3",
+              })}
               <div className="text-left">
                 <p className="font-medium text-green-900">Refresh Sync Status</p>
                 <p className="text-xs text-green-700">Check current sync health</p>
@@ -165,7 +169,9 @@ const DataManagementSection = ({
               }}
               className="w-full flex items-center p-3 border border-red-200 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
             >
-              {React.createElement(getIcon("AlertTriangle"), { className: "h-4 w-4 text-red-600 mr-3" })}
+              {React.createElement(getIcon("AlertTriangle"), {
+                className: "h-4 w-4 text-red-600 mr-3",
+              })}
               <div className="text-left">
                 <p className="font-medium text-red-900">🚨 Reset Cloud Data</p>
                 <p className="text-xs text-red-700">Emergency recovery: clear and re-upload</p>

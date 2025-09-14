@@ -119,7 +119,9 @@ const TransactionArchiving = () => {
       {!needsArchiving && !isLoading && (
         <div className="bg-white rounded-xl p-6 border border-gray-200">
           <div className="text-center py-8">
-            {React.createElement(getIcon("CheckCircle"), { className: "h-12 w-12 text-green-600 mx-auto mb-4" })}
+            {React.createElement(getIcon("CheckCircle"), {
+              className: "h-12 w-12 text-green-600 mx-auto mb-4",
+            })}
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No Archiving Needed</h3>
             <p className="text-gray-600">
               Your transaction data is well-optimized. Check back when you have more historical

@@ -39,9 +39,6 @@ const ActivityFeed = () => {
     }
   };
 
-
-
-
   // Filter options
   const filterOptions = [
     { value: "all", label: "All Activity", icon: "Activity" },

@@ -49,7 +49,7 @@ const TransactionSummary = ({ transactions = [] }) => {
             </p>
           </div>
           {React.createElement(getIcon("DollarSign"), {
-            className: `h-8 w-8 ${netCashFlow >= 0 ? "text-cyan-200" : "text-amber-200"}`
+            className: `h-8 w-8 ${netCashFlow >= 0 ? "text-cyan-200" : "text-amber-200"}`,
           })}
         </div>
       </div>

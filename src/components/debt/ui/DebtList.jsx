@@ -113,11 +113,9 @@ const DebtCard = ({ debt, onClick, _onRecordPayment }) => {
                 <p className="text-sm md:text-base font-semibold text-gray-900">
                   {nextPaymentInfo.hasIcon && (
                     <span className="flex items-center">
-                      {nextPaymentInfo.type === "next_payment" ? (
-                        React.createElement(getIcon("Calendar"), { className: "h-3 w-3 mr-1" })
-                      ) : (
-                        React.createElement(getIcon("Clock"), { className: "h-3 w-3 mr-1" })
-                      )}
+                      {nextPaymentInfo.type === "next_payment"
+                        ? React.createElement(getIcon("Calendar"), { className: "h-3 w-3 mr-1" })
+                        : React.createElement(getIcon("Clock"), { className: "h-3 w-3 mr-1" })}
                       {nextPaymentInfo.value}
                     </span>
                   )}
@@ -157,7 +155,9 @@ const DebtCard = ({ debt, onClick, _onRecordPayment }) => {
               <span className="sm:hidden">Pay</span>
             </button>
           )}
-          {React.createElement(getIcon("ArrowRight"), { className: "h-4 w-4 md:h-5 md:w-5 text-gray-400" })}
+          {React.createElement(getIcon("ArrowRight"), {
+            className: "h-4 w-4 md:h-5 md:w-5 text-gray-400",
+          })}
         </div>
       </div>
     </div>

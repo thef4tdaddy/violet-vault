@@ -26,15 +26,13 @@ const ExportSection = ({
             className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors disabled:opacity-50"
           >
             <div className="flex items-center justify-center mb-2">
-              {copiedToClipboard ? (
-                React.createElement(getIcon("CheckCircle"), {
-                  className: "h-5 w-5 text-green-600",
-                })
-              ) : (
-                React.createElement(getIcon("Copy"), {
-                  className: "h-5 w-5 text-purple-600",
-                })
-              )}
+              {copiedToClipboard
+                ? React.createElement(getIcon("CheckCircle"), {
+                    className: "h-5 w-5 text-green-600",
+                  })
+                : React.createElement(getIcon("Copy"), {
+                    className: "h-5 w-5 text-purple-600",
+                  })}
             </div>
             <div className="text-sm font-medium text-gray-900">
               {copiedToClipboard ? "Copied!" : "Copy to Clipboard"}

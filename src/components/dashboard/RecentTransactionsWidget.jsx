@@ -23,9 +23,12 @@ const RecentTransactionsWidget = ({ transactions = [], getEnvelopeOptions = () =
                   transaction.amount > 0 ? "bg-green-100" : "bg-red-100"
                 }`}
               >
-                {React.createElement(getIcon(transaction.amount > 0 ? "TrendingUp" : "TrendingDown"), {
-                  className: `h-4 w-4 ${transaction.amount > 0 ? "text-green-600" : "text-red-600"}`
-                })}
+                {React.createElement(
+                  getIcon(transaction.amount > 0 ? "TrendingUp" : "TrendingDown"),
+                  {
+                    className: `h-4 w-4 ${transaction.amount > 0 ? "text-green-600" : "text-red-600"}`,
+                  }
+                )}
               </div>
               <div>
                 <div className="font-medium">{transaction.description}</div>
