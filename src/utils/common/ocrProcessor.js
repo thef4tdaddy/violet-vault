@@ -1,4 +1,4 @@
-import Tesseract from "tesseract.js";
+// Tesseract.js loaded dynamically to reduce main bundle size
 import logger from "../common/logger";
 
 /**
@@ -19,6 +19,8 @@ export class OCRProcessor {
 
     try {
       logger.info("🔍 Initializing OCR worker...");
+      // Dynamic import to avoid adding tesseract.js to main bundle
+      const Tesseract = (await import("tesseract.js")).default;
       this.worker = await Tesseract.createWorker();
 
       await this.worker.loadLanguage("eng");
