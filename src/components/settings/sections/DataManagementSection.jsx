@@ -112,17 +112,17 @@ const DataManagementSection = ({
 
           {/* Debug Info - Development Mode Only */}
           {isDevelopmentMode() && (
-            <div className="mb-3 p-2 bg-gray-100 rounded text-xs">
-              <p>
-                <strong>SYNC FUNCTIONS ARE HANGING - THEY NEVER RESOLVE</strong>
-              </p>
-              <p>
-                Available:{" "}
+            <div className="mb-3 p-2 bg-blue-50 rounded text-xs border border-blue-200">
+              <p className="font-semibold text-blue-800 mb-1">🛠️ Development Sync Tools</p>
+              <p className="text-blue-700">
+                Available Functions:{" "}
                 {Object.keys(window)
                   .filter((k) => k.includes("Sync") || k.includes("sync"))
                   .join(", ")}
               </p>
-              <p>These functions exist but get stuck in async operations and never complete.</p>
+              <p className="text-blue-600 mt-1">
+                Advanced sync debugging and validation tools for development and testing.
+              </p>
             </div>
           )}
 
