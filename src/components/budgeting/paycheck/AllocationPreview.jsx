@@ -1,8 +1,13 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
-const AllocationPreview = ({ allocationPreview, hasAmount, allocationMode }) => {
-  const { allocations, totalAllocated, remainingAmount, allocationRate } = allocationPreview;
+const AllocationPreview = ({
+  allocationPreview,
+  hasAmount,
+  allocationMode,
+}) => {
+  const { allocations, totalAllocated, remainingAmount, allocationRate } =
+    allocationPreview;
 
   if (!hasAmount) {
     return (
@@ -10,7 +15,9 @@ const AllocationPreview = ({ allocationPreview, hasAmount, allocationMode }) => 
         {React.createElement(getIcon("Target"), {
           className: "h-8 w-8 mx-auto text-gray-400 mb-2",
         })}
-        <p className="text-gray-500">Enter a paycheck amount to see allocation preview</p>
+        <p className="text-gray-500">
+          Enter a paycheck amount to see allocation preview
+        </p>
       </div>
     );
   }
@@ -21,9 +28,12 @@ const AllocationPreview = ({ allocationPreview, hasAmount, allocationMode }) => 
         {React.createElement(getIcon("AlertCircle"), {
           className: "h-8 w-8 mx-auto text-yellow-600 mb-2",
         })}
-        <p className="text-yellow-800 font-medium mb-1">No Auto-Allocating Envelopes</p>
+        <p className="text-yellow-800 font-medium mb-1">
+          No Auto-Allocating Envelopes
+        </p>
         <p className="text-yellow-700 text-sm">
-          Create envelopes with auto-allocation enabled to see allocation preview
+          Create envelopes with auto-allocation enabled to see allocation
+          preview
         </p>
       </div>
     );
@@ -78,11 +88,15 @@ const AllocationPreview = ({ allocationPreview, hasAmount, allocationMode }) => 
         <div className="grid grid-cols-3 gap-4 text-sm">
           <div>
             <span className="text-green-700 block">Total Allocated</span>
-            <span className="font-bold text-green-900">${totalAllocated.toFixed(2)}</span>
+            <span className="font-bold text-green-900">
+              ${totalAllocated.toFixed(2)}
+            </span>
           </div>
           <div>
             <span className="text-green-700 block">Remaining</span>
-            <span className="font-bold text-green-900">${remainingAmount.toFixed(2)}</span>
+            <span className="font-bold text-green-900">
+              ${remainingAmount.toFixed(2)}
+            </span>
           </div>
           <div>
             <span className="text-green-700 block">Allocation Rate</span>
@@ -112,17 +126,24 @@ const AllocationPreview = ({ allocationPreview, hasAmount, allocationMode }) => 
                   </span>
                 </div>
                 <div className="text-sm text-gray-500">
-                  Monthly: ${allocation.monthlyAmount?.toFixed(2) || "0.00"} • Type:{" "}
-                  {allocation.envelopeType}
+                  Monthly: ${allocation.monthlyAmount?.toFixed(2) || "0.00"} •
+                  Type: {allocation.envelopeType}
                 </div>
               </div>
               <div className="text-right">
-                <div className="font-bold text-gray-900">${allocation.amount.toFixed(2)}</div>
-                {allocationMode === "allocate" && allocation.monthlyAmount > 0 && (
-                  <div className="text-xs text-gray-500">
-                    {((allocation.amount / allocation.monthlyAmount) * 100).toFixed(0)}% of monthly
-                  </div>
-                )}
+                <div className="font-bold text-gray-900">
+                  ${allocation.amount.toFixed(2)}
+                </div>
+                {allocationMode === "allocate" &&
+                  allocation.monthlyAmount > 0 && (
+                    <div className="text-xs text-gray-500">
+                      {(
+                        (allocation.amount / allocation.monthlyAmount) *
+                        100
+                      ).toFixed(0)}
+                      % of monthly
+                    </div>
+                  )}
               </div>
             </div>
           ))}
@@ -141,7 +162,8 @@ const AllocationPreview = ({ allocationPreview, hasAmount, allocationMode }) => 
                 ${remainingAmount.toFixed(2)} will go to unassigned funds
               </p>
               <p className="text-xs text-blue-700">
-                Consider creating additional envelopes or adjusting allocation amounts
+                Consider creating additional envelopes or adjusting allocation
+                amounts
               </p>
             </div>
           </div>

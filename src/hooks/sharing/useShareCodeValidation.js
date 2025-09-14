@@ -46,7 +46,9 @@ export const useShareCodeValidation = () => {
         return true;
       } else {
         logger.warn("Share code validation failed", { normalizedCode });
-        showErrorToast("Invalid share code format. Please enter 4 valid words.");
+        showErrorToast(
+          "Invalid share code format. Please enter 4 valid words.",
+        );
         setShareInfo(null);
         return false;
       }

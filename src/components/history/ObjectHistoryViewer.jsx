@@ -28,7 +28,9 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
         commit.message &&
         (commit.message.toLowerCase().includes(objectType.toLowerCase()) ||
           commit.message.includes(objectId) ||
-          commit.message.toLowerCase().includes(objectName?.toLowerCase() || ""))
+          commit.message
+            .toLowerCase()
+            .includes(objectName?.toLowerCase() || ""))
       );
     });
 
@@ -50,13 +52,21 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
   const _getChangeIcon = (changeType) => {
     switch (changeType) {
       case "add":
-        return React.createElement(getIcon("Plus"), { className: "h-3 w-3 text-green-600" });
+        return React.createElement(getIcon("Plus"), {
+          className: "h-3 w-3 text-green-600",
+        });
       case "delete":
-        return React.createElement(getIcon("Minus"), { className: "h-3 w-3 text-red-600" });
+        return React.createElement(getIcon("Minus"), {
+          className: "h-3 w-3 text-red-600",
+        });
       case "modify":
-        return React.createElement(getIcon("Edit3"), { className: "h-3 w-3 text-blue-600" });
+        return React.createElement(getIcon("Edit3"), {
+          className: "h-3 w-3 text-blue-600",
+        });
       default:
-        return React.createElement(getIcon("GitCommit"), { className: "h-3 w-3 text-gray-600" });
+        return React.createElement(getIcon("GitCommit"), {
+          className: "h-3 w-3 text-gray-600",
+        });
     }
   };
 
@@ -96,7 +106,10 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
                 Complete change history for this {objectType.toLowerCase()}
               </p>
             </div>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 text-xl"
+            >
               {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
             </button>
           </div>
@@ -117,8 +130,8 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
               })}
               <p className="font-medium">No history found</p>
               <p className="text-sm mt-1">
-                This {objectType.toLowerCase()} hasn't been modified yet or budget history is not
-                initialized
+                This {objectType.toLowerCase()} hasn't been modified yet or
+                budget history is not initialized
               </p>
             </div>
           )}
@@ -132,8 +145,10 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
                     className: "h-4 w-4 text-blue-600 mr-2",
                   })}
                   <div className="text-sm text-blue-800">
-                    <strong>Found {relevantHistory.length} related changes</strong> for this{" "}
-                    {objectType.toLowerCase()}
+                    <strong>
+                      Found {relevantHistory.length} related changes
+                    </strong>{" "}
+                    for this {objectType.toLowerCase()}
                   </div>
                 </div>
               </div>
@@ -166,7 +181,9 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
                         </p>
 
                         <div className="flex items-center text-xs text-gray-500">
-                          {React.createElement(getIcon("Calendar"), { className: "h-3 w-3 mr-1" })}
+                          {React.createElement(getIcon("Calendar"), {
+                            className: "h-3 w-3 mr-1",
+                          })}
                           {commit.timestamp
                             ? new Date(commit.timestamp).toLocaleString()
                             : "Unknown time"}
@@ -178,15 +195,20 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
                         className="text-gray-400 hover:text-gray-600 p-1 rounded"
                       >
                         {expandedCommits.has(commit.hash)
-                          ? React.createElement(getIcon("ChevronDown"), { className: "h-4 w-4" })
-                          : React.createElement(getIcon("ChevronRight"), { className: "h-4 w-4" })}
+                          ? React.createElement(getIcon("ChevronDown"), {
+                              className: "h-4 w-4",
+                            })
+                          : React.createElement(getIcon("ChevronRight"), {
+                              className: "h-4 w-4",
+                            })}
                       </button>
                     </div>
 
                     {/* Basic commit info */}
                     <div className="mb-3">
                       <div className="text-sm text-gray-700">
-                        This commit may have affected the {objectType.toLowerCase()}
+                        This commit may have affected the{" "}
+                        {objectType.toLowerCase()}
                       </div>
                     </div>
 
@@ -198,11 +220,13 @@ const ObjectHistoryViewer = ({ objectId, objectType, objectName, onClose }) => {
                             <strong>Commit Hash:</strong> {commit.hash}
                           </div>
                           <div className="text-sm text-gray-600 mt-1">
-                            <strong>Device:</strong> {commit.deviceFingerprint || "Unknown"}
+                            <strong>Device:</strong>{" "}
+                            {commit.deviceFingerprint || "Unknown"}
                           </div>
                           {commit.parentHash && (
                             <div className="text-sm text-gray-600 mt-1">
-                              <strong>Parent:</strong> {commit.parentHash.substring(0, 8)}
+                              <strong>Parent:</strong>{" "}
+                              {commit.parentHash.substring(0, 8)}
                             </div>
                           )}
                         </div>

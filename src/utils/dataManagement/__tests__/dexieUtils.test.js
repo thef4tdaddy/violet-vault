@@ -81,10 +81,16 @@ describe("dexieUtils", () => {
       await importDataToDexie(data);
       expect(budgetDb.envelopes.bulkAdd).toHaveBeenCalledWith(data.envelopes);
       expect(budgetDb.bills.bulkAdd).toHaveBeenCalledWith(data.bills);
-      expect(budgetDb.transactions.bulkAdd).toHaveBeenCalledWith(data.allTransactions);
-      expect(budgetDb.savingsGoals.bulkAdd).toHaveBeenCalledWith(data.savingsGoals);
+      expect(budgetDb.transactions.bulkAdd).toHaveBeenCalledWith(
+        data.allTransactions,
+      );
+      expect(budgetDb.savingsGoals.bulkAdd).toHaveBeenCalledWith(
+        data.savingsGoals,
+      );
       expect(budgetDb.debts.bulkAdd).toHaveBeenCalledWith(data.debts);
-      expect(budgetDb.paycheckHistory.bulkAdd).toHaveBeenCalledWith(data.paycheckHistory);
+      expect(budgetDb.paycheckHistory.bulkAdd).toHaveBeenCalledWith(
+        data.paycheckHistory,
+      );
       expect(budgetDb.auditLog.bulkAdd).toHaveBeenCalledWith(data.auditLog);
       expect(budgetDb.budget.put).toHaveBeenCalled();
     });

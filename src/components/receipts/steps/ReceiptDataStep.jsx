@@ -2,7 +2,11 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import { formatCurrency } from "../../../utils/receipts/receiptHelpers";
 
-const ReceiptDataStep = ({ receiptData, transactionForm, handleFormChange }) => {
+const ReceiptDataStep = ({
+  receiptData,
+  transactionForm,
+  handleFormChange,
+}) => {
   return (
     <div className="space-y-6">
       <div>
@@ -40,7 +44,9 @@ const ReceiptDataStep = ({ receiptData, transactionForm, handleFormChange }) => 
             type="number"
             step="0.01"
             value={transactionForm.amount}
-            onChange={(e) => handleFormChange("amount", parseFloat(e.target.value) || 0)}
+            onChange={(e) =>
+              handleFormChange("amount", parseFloat(e.target.value) || 0)
+            }
             className="w-full px-4 py-2 border-2 border-black rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 glassmorphism backdrop-blur-sm shadow-md focus:shadow-lg transition-all"
             placeholder="0.00"
           />
@@ -62,7 +68,9 @@ const ReceiptDataStep = ({ receiptData, transactionForm, handleFormChange }) => 
         </div>
 
         <div>
-          <label className="block text-sm font-bold text-gray-900 mb-2">CATEGORY</label>
+          <label className="block text-sm font-bold text-gray-900 mb-2">
+            CATEGORY
+          </label>
           <select
             value={transactionForm.category}
             onChange={(e) => handleFormChange("category", e.target.value)}
@@ -102,7 +110,10 @@ const ReceiptDataStep = ({ receiptData, transactionForm, handleFormChange }) => 
           <h4 className="font-black text-gray-900 mb-3">ITEMS FOUND</h4>
           <div className="max-h-32 overflow-y-auto space-y-1">
             {receiptData.items.slice(0, 5).map((item, index) => (
-              <div key={index} className="flex justify-between text-sm text-purple-800 font-medium">
+              <div
+                key={index}
+                className="flex justify-between text-sm text-purple-800 font-medium"
+              >
                 <span>{item.description}</span>
                 <span className="font-bold">{formatCurrency(item.amount)}</span>
               </div>

@@ -23,7 +23,10 @@ const PerformanceMonitor = ({ analyticsData, balanceData }) => {
 
   return (
     <div className="glassmorphism rounded-xl p-6">
-      <PerformanceHeader alertsEnabled={alertsEnabled} setAlertsEnabled={setAlertsEnabled} />
+      <PerformanceHeader
+        alertsEnabled={alertsEnabled}
+        setAlertsEnabled={setAlertsEnabled}
+      />
 
       <OverallScore score={performanceMetrics.overallScore} />
 

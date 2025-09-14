@@ -56,7 +56,12 @@ const SuggestionSettings = ({
             <input
               type="number"
               value={settings.minAmount}
-              onChange={(e) => handleSettingChange("minAmount", parseFloat(e.target.value) || 0)}
+              onChange={(e) =>
+                handleSettingChange(
+                  "minAmount",
+                  parseFloat(e.target.value) || 0,
+                )
+              }
               className="block w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm"
               placeholder="50"
               min="0"
@@ -76,7 +81,12 @@ const SuggestionSettings = ({
           <input
             type="number"
             value={settings.minTransactions}
-            onChange={(e) => handleSettingChange("minTransactions", parseInt(e.target.value) || 1)}
+            onChange={(e) =>
+              handleSettingChange(
+                "minTransactions",
+                parseInt(e.target.value) || 1,
+              )
+            }
             className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm"
             placeholder="3"
             min="1"
@@ -97,7 +107,10 @@ const SuggestionSettings = ({
               type="number"
               value={settings.overspendingThreshold}
               onChange={(e) =>
-                handleSettingChange("overspendingThreshold", parseFloat(e.target.value) || 1)
+                handleSettingChange(
+                  "overspendingThreshold",
+                  parseFloat(e.target.value) || 1,
+                )
               }
               className="block w-full pr-8 pl-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm"
               placeholder="1.2"
@@ -116,13 +129,18 @@ const SuggestionSettings = ({
 
         {/* Buffer Percentage */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Suggestion Buffer</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Suggestion Buffer
+          </label>
           <div className="relative">
             <input
               type="number"
               value={settings.bufferPercentage}
               onChange={(e) =>
-                handleSettingChange("bufferPercentage", parseFloat(e.target.value) || 1)
+                handleSettingChange(
+                  "bufferPercentage",
+                  parseFloat(e.target.value) || 1,
+                )
               }
               className="block w-full pr-8 pl-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm"
               placeholder="1.1"
@@ -134,22 +152,30 @@ const SuggestionSettings = ({
               <span className="text-gray-500 text-sm">x</span>
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-1">Buffer multiplier for suggested amounts</p>
+          <p className="text-xs text-gray-500 mt-1">
+            Buffer multiplier for suggested amounts
+          </p>
         </div>
       </div>
 
       {/* Statistics */}
       {suggestionStats && (
         <div className="bg-white rounded-lg p-3 border border-gray-200">
-          <h5 className="font-medium text-gray-900 mb-2 text-sm">Current Analysis</h5>
+          <h5 className="font-medium text-gray-900 mb-2 text-sm">
+            Current Analysis
+          </h5>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
             <div>
               <span className="text-gray-600 block">Total</span>
-              <span className="font-bold text-gray-900">{suggestionStats.totalSuggestions}</span>
+              <span className="font-bold text-gray-900">
+                {suggestionStats.totalSuggestions}
+              </span>
             </div>
             <div>
               <span className="text-gray-600 block">High Priority</span>
-              <span className="font-bold text-red-600">{suggestionStats.priorityCounts.high}</span>
+              <span className="font-bold text-red-600">
+                {suggestionStats.priorityCounts.high}
+              </span>
             </div>
             <div>
               <span className="text-gray-600 block">Medium Priority</span>
@@ -159,13 +185,17 @@ const SuggestionSettings = ({
             </div>
             <div>
               <span className="text-gray-600 block">Low Priority</span>
-              <span className="font-bold text-blue-600">{suggestionStats.priorityCounts.low}</span>
+              <span className="font-bold text-blue-600">
+                {suggestionStats.priorityCounts.low}
+              </span>
             </div>
           </div>
 
           {suggestionStats.potentialSavings > 0 && (
             <div className="mt-2 pt-2 border-t border-gray-100">
-              <span className="text-gray-600 text-xs">Potential Monthly Savings: </span>
+              <span className="text-gray-600 text-xs">
+                Potential Monthly Savings:{" "}
+              </span>
               <span className="font-bold text-green-600 text-xs">
                 ${suggestionStats.potentialSavings.toFixed(0)}
               </span>

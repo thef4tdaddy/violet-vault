@@ -24,7 +24,10 @@ export const validateTransactionData = (transactionData) => {
       errors.push("Description is required");
     }
 
-    if (transactionData.amount === undefined || transactionData.amount === null) {
+    if (
+      transactionData.amount === undefined ||
+      transactionData.amount === null
+    ) {
       errors.push("Amount is required");
     } else if (isNaN(transactionData.amount) || transactionData.amount === 0) {
       errors.push("Amount must be a non-zero number");
@@ -40,15 +43,24 @@ export const validateTransactionData = (transactionData) => {
     }
 
     // Optional but validated if present
-    if (transactionData.category && typeof transactionData.category !== "string") {
+    if (
+      transactionData.category &&
+      typeof transactionData.category !== "string"
+    ) {
       errors.push("Category must be a string");
     }
 
-    if (transactionData.account && typeof transactionData.account !== "string") {
+    if (
+      transactionData.account &&
+      typeof transactionData.account !== "string"
+    ) {
       errors.push("Account must be a string");
     }
 
-    if (transactionData.envelopeId && typeof transactionData.envelopeId !== "string") {
+    if (
+      transactionData.envelopeId &&
+      typeof transactionData.envelopeId !== "string"
+    ) {
       errors.push("Envelope ID must be a string");
     }
 
@@ -75,7 +87,9 @@ export const prepareTransactionForStorage = (transactionData) => {
     const now = new Date().toISOString();
 
     const prepared = {
-      id: transactionData.id || `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id:
+        transactionData.id ||
+        `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       description: (transactionData.description || "").trim(),
       amount: parseFloat(transactionData.amount) || 0,
       date: new Date(transactionData.date).toISOString(),
@@ -151,7 +165,8 @@ export const createTransferPair = (transferData) => {
 
     const outgoingTransaction = {
       id: `${transferId}_out`,
-      description: transferData.description || `Transfer to ${transferData.toAccount}`,
+      description:
+        transferData.description || `Transfer to ${transferData.toAccount}`,
       amount: -amount, // Negative for outgoing
       date: new Date(transferData.date).toISOString(),
       category: "Transfer",
@@ -172,7 +187,8 @@ export const createTransferPair = (transferData) => {
 
     const incomingTransaction = {
       id: `${transferId}_in`,
-      description: transferData.description || `Transfer from ${transferData.fromAccount}`,
+      description:
+        transferData.description || `Transfer from ${transferData.fromAccount}`,
       amount: amount, // Positive for incoming
       date: new Date(transferData.date).toISOString(),
       category: "Transfer",
@@ -216,7 +232,7 @@ export const categorizeTransaction = (transaction, categoryRules = []) => {
     for (const rule of categoryRules) {
       if (rule.keywords && Array.isArray(rule.keywords)) {
         const matches = rule.keywords.some((keyword) =>
-          description.includes(keyword.toLowerCase())
+          description.includes(keyword.toLowerCase()),
         );
 
         if (matches) {
@@ -248,7 +264,9 @@ export const categorizeTransaction = (transaction, categoryRules = []) => {
     ];
 
     for (const rule of defaultRules) {
-      const matches = rule.keywords.some((keyword) => description.includes(keyword));
+      const matches = rule.keywords.some((keyword) =>
+        description.includes(keyword),
+      );
 
       if (matches) {
         return {
@@ -297,11 +315,14 @@ export const mergeDuplicateTransactions = (transactions = [], options = {}) => {
 
       for (const existing of processed) {
         // Check if transactions are similar enough to be duplicates
-        const timeDiff = Math.abs(new Date(transaction.date) - new Date(existing.date));
+        const timeDiff = Math.abs(
+          new Date(transaction.date) - new Date(existing.date),
+        );
         const amountDiff = Math.abs(transaction.amount - existing.amount);
         const sameDescription =
           !checkDescription || transaction.description === existing.description;
-        const sameAccount = !checkAccount || transaction.account === existing.account;
+        const sameAccount =
+          !checkAccount || transaction.account === existing.account;
 
         if (
           timeDiff <= timeWindowMs &&
@@ -332,7 +353,9 @@ export const mergeDuplicateTransactions = (transactions = [], options = {}) => {
       }
     }
 
-    logger.debug(`Merged duplicates: ${transactions.length} -> ${processed.length}`);
+    logger.debug(
+      `Merged duplicates: ${transactions.length} -> ${processed.length}`,
+    );
     return processed;
   } catch (error) {
     logger.error("Error merging duplicate transactions", error);
@@ -346,7 +369,10 @@ export const mergeDuplicateTransactions = (transactions = [], options = {}) => {
  * @param {number} startingBalance - Starting account balance
  * @returns {Array} Transactions with running balance added
  */
-export const calculateRunningBalance = (transactions = [], startingBalance = 0) => {
+export const calculateRunningBalance = (
+  transactions = [],
+  startingBalance = 0,
+) => {
   try {
     let runningBalance = startingBalance;
 
@@ -372,7 +398,11 @@ export const calculateRunningBalance = (transactions = [], startingBalance = 0) 
  */
 export const formatTransactionForDisplay = (transaction, options = {}) => {
   try {
-    const { currency = "USD", dateFormat = "short", includeTime = false } = options;
+    const {
+      currency = "USD",
+      dateFormat = "short",
+      includeTime = false,
+    } = options;
 
     const formatted = { ...transaction };
 
@@ -383,7 +413,9 @@ export const formatTransactionForDisplay = (transaction, options = {}) => {
     }).format(Math.abs(transaction.amount));
 
     formatted.amountDisplay =
-      transaction.amount < 0 ? `-${formatted.formattedAmount}` : formatted.formattedAmount;
+      transaction.amount < 0
+        ? `-${formatted.formattedAmount}`
+        : formatted.formattedAmount;
 
     // Format date
     const date = new Date(transaction.date);

@@ -85,7 +85,9 @@ We use comprehensive mocking for external dependencies:
 ```javascript
 // Service method testing with mocked dependencies
 it("should get envelopes by category", async () => {
-  const mockEnvelopes = [{ id: "1", name: "Food", category: "expenses", archived: false }];
+  const mockEnvelopes = [
+    { id: "1", name: "Food", category: "expenses", archived: false },
+  ];
 
   budgetDb.getEnvelopesByCategory.mockResolvedValue(mockEnvelopes);
 
@@ -95,7 +97,10 @@ it("should get envelopes by category", async () => {
   });
 
   expect(result).toEqual(mockEnvelopes);
-  expect(budgetDb.getEnvelopesByCategory).toHaveBeenCalledWith("expenses", false);
+  expect(budgetDb.getEnvelopesByCategory).toHaveBeenCalledWith(
+    "expenses",
+    false,
+  );
 });
 ```
 
@@ -225,8 +230,16 @@ describe("envelope keys", () => {
   it("should generate correct envelope keys", () => {
     expect(queryKeys.envelopes).toEqual(["envelopes"]);
     expect(queryKeys.envelopesList()).toEqual(["envelopes", "list", {}]);
-    expect(queryKeys.envelopeById("env1")).toEqual(["envelopes", "detail", "env1"]);
-    expect(queryKeys.envelopesByCategory("food")).toEqual(["envelopes", "category", "food"]);
+    expect(queryKeys.envelopeById("env1")).toEqual([
+      "envelopes",
+      "detail",
+      "env1",
+    ]);
+    expect(queryKeys.envelopesByCategory("food")).toEqual([
+      "envelopes",
+      "category",
+      "food",
+    ]);
   });
 });
 ```
@@ -267,11 +280,14 @@ it("should fall back to direct database query", async () => {
     return await queryFn();
   });
 
-  const result = await prefetchHelpers.prefetchEnvelopes(mockQueryClient, filters);
+  const result = await prefetchHelpers.prefetchEnvelopes(
+    mockQueryClient,
+    filters,
+  );
 
   expect(budgetDb.getEnvelopesByCategory).toHaveBeenCalledWith(
     filters.category,
-    filters.includeArchived
+    filters.includeArchived,
   );
   expect(result).toEqual(mockEnvelopes);
 });
@@ -323,7 +339,7 @@ it("should update envelope optimistically", async () => {
   // Should update individual envelope query
   expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
     queryKeys.envelopeById(envelopeId),
-    expect.any(Function)
+    expect.any(Function),
   );
 
   // Should update database
@@ -332,7 +348,7 @@ it("should update envelope optimistically", async () => {
     expect.objectContaining({
       ...updates,
       lastModified: expect.any(Number),
-    })
+    }),
   );
 });
 ```
@@ -401,7 +417,9 @@ describe("Bill Processing", () => {
       await result.current.processPayment(mockBill.id, 100);
     });
 
-    expect(result.current.bills.find((b) => b.id === "bill1").isPaid).toBe(true);
+    expect(result.current.bills.find((b) => b.id === "bill1").isPaid).toBe(
+      true,
+    );
     expect(mockInvalidateQueries).toHaveBeenCalledWith(["bills"]);
   });
 });
@@ -483,7 +501,8 @@ export const firebaseConfig = {
 };
 
 // Tests adapt based on configuration
-const isUsingDemoConfig = process.env.VITE_FIREBASE_PROJECT_ID === "demo-project";
+const isUsingDemoConfig =
+  process.env.VITE_FIREBASE_PROJECT_ID === "demo-project";
 (isUsingDemoConfig ? it.skip : it)("should save to real Firebase", async () => {
   // Only runs with real Firebase credentials
 });
@@ -654,7 +673,9 @@ it("should handle initialization errors", async () => {
   const error = new Error("Database connection failed");
   budgetDb.open.mockRejectedValue(error);
 
-  await expect(budgetDatabaseService.initialize()).rejects.toThrow("Database connection failed");
+  await expect(budgetDatabaseService.initialize()).rejects.toThrow(
+    "Database connection failed",
+  );
 });
 ```
 

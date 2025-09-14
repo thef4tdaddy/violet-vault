@@ -2,7 +2,12 @@ import React from "react";
 import { getIcon } from "../../../utils";
 import { getEnvelopeCategories } from "../../../constants/categories";
 
-const EnvelopeBasicFields = ({ formData, onUpdateField, errors = {}, canEdit = true }) => {
+const EnvelopeBasicFields = ({
+  formData,
+  onUpdateField,
+  errors = {},
+  canEdit = true,
+}) => {
   const categories = getEnvelopeCategories();
 
   return (
@@ -16,7 +21,9 @@ const EnvelopeBasicFields = ({ formData, onUpdateField, errors = {}, canEdit = t
 
       {/* Envelope Name */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Envelope Name *</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Envelope Name *
+        </label>
         <input
           type="text"
           value={formData.name || ""}
@@ -40,7 +47,9 @@ const EnvelopeBasicFields = ({ formData, onUpdateField, errors = {}, canEdit = t
 
       {/* Category */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Category *
+        </label>
         <select
           value={formData.category || ""}
           onChange={(e) => onUpdateField("category", e.target.value)}

@@ -28,7 +28,10 @@ export const analyzeBillCategorization = (bills, settings) => {
   });
 
   // Analyze uncategorized bills for category suggestions
-  if (billsByCategory["Uncategorized"] && billsByCategory["Uncategorized"].count >= 3) {
+  if (
+    billsByCategory["Uncategorized"] &&
+    billsByCategory["Uncategorized"].count >= 3
+  ) {
     const uncategorizedBills = billsByCategory["Uncategorized"].bills;
 
     // Group by suggested bill type
@@ -46,7 +49,10 @@ export const analyzeBillCategorization = (bills, settings) => {
     // Create suggestions for each bill type with multiple bills
     Object.entries(billTypePatterns).forEach(([categoryType, billsInType]) => {
       if (billsInType.length >= 2) {
-        const totalAmount = billsInType.reduce((sum, bill) => sum + (bill.amount || 0), 0);
+        const totalAmount = billsInType.reduce(
+          (sum, bill) => sum + (bill.amount || 0),
+          0,
+        );
 
         suggestions.push({
           id: `bill_category_${categoryType}`,
@@ -97,7 +103,11 @@ export const analyzeBillCategoryOptimization = (bills, settings) => {
 
   // Suggest removing categories with single small bills
   Object.entries(billsByCategory).forEach(([category, data]) => {
-    if (category !== "Uncategorized" && data.count === 1 && data.totalAmount < minAmount) {
+    if (
+      category !== "Uncategorized" &&
+      data.count === 1 &&
+      data.totalAmount < minAmount
+    ) {
       suggestions.push({
         id: `optimize_bill_category_${category}`,
         type: "remove_category",

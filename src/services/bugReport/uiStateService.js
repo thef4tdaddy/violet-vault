@@ -63,7 +63,7 @@ export class UIStateService {
               title: title || "Untitled Modal",
               type,
               hasCloseButton: !!element.querySelector(
-                '[class*="close"], button[aria-label*="close" i]'
+                '[class*="close"], button[aria-label*="close" i]',
               ),
               hasForm: !!element.querySelector("form"),
               selector,
@@ -86,7 +86,11 @@ export class UIStateService {
   static getActiveDrawers() {
     try {
       const drawers = [];
-      const drawerSelectors = ['[class*="drawer"]', '[class*="sidebar"]', '[class*="offcanvas"]'];
+      const drawerSelectors = [
+        '[class*="drawer"]',
+        '[class*="sidebar"]',
+        '[class*="offcanvas"]',
+      ];
 
       drawerSelectors.forEach((selector) => {
         const elements = document.querySelectorAll(selector);
@@ -161,7 +165,9 @@ export class UIStateService {
             inputCount: inputs.length,
             buttonCount: buttons.length,
             isValid: form.checkValidity?.() || null,
-            title: this.extractElementTitle(form) || `Form with ${inputs.length} inputs`,
+            title:
+              this.extractElementTitle(form) ||
+              `Form with ${inputs.length} inputs`,
           });
         }
       });
@@ -180,7 +186,9 @@ export class UIStateService {
   static getButtonStates() {
     try {
       const buttons = [];
-      const visibleButtons = document.querySelectorAll('button:not([style*="display: none"])');
+      const visibleButtons = document.querySelectorAll(
+        'button:not([style*="display: none"])',
+      );
 
       // Limit to prevent overwhelming data
       const buttonSample = Array.from(visibleButtons).slice(0, 20);
@@ -211,7 +219,9 @@ export class UIStateService {
   static getInputStates() {
     try {
       const inputs = [];
-      const inputElements = document.querySelectorAll("input, textarea, select");
+      const inputElements = document.querySelectorAll(
+        "input, textarea, select",
+      );
 
       // Sample to prevent too much data
       const inputSample = Array.from(inputElements).slice(0, 15);
@@ -294,7 +304,10 @@ export class UIStateService {
           .forEach((element) => {
             if (this.isElementVisible(element)) {
               interactions.push({
-                text: element.textContent?.trim()?.substring(0, 30) || element.alt || "Interactive",
+                text:
+                  element.textContent?.trim()?.substring(0, 30) ||
+                  element.alt ||
+                  "Interactive",
                 type: this.getInteractionType(element),
                 href: element.href || null,
               });
@@ -332,7 +345,14 @@ export class UIStateService {
    */
   static extractElementTitle(element) {
     // Try various approaches to get element title
-    const titleSelectors = ["h1", "h2", "h3", '[class*="title"]', "legend", "label"];
+    const titleSelectors = [
+      "h1",
+      "h2",
+      "h3",
+      '[class*="title"]',
+      "legend",
+      "label",
+    ];
 
     for (const selector of titleSelectors) {
       const titleEl = element.querySelector(selector);

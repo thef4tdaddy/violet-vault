@@ -9,12 +9,16 @@ import SupplementalAccounts from "../accounts/SupplementalAccounts";
 import PaycheckProcessor from "../budgeting/PaycheckProcessor";
 import BillManager from "../bills/BillManager";
 import TransactionLedger from "../transactions/TransactionLedger";
-const ChartsAndAnalytics = React.lazy(() => import("../analytics/ChartsAndAnalytics"));
+const ChartsAndAnalytics = React.lazy(
+  () => import("../analytics/ChartsAndAnalytics"),
+);
 // Temporarily disable lazy loading due to chunk loading error
 // const DebtDashboard = React.lazy(() => import("../debt/DebtDashboard"));
 import DebtDashboard from "../debt/DebtDashboard";
 import { isDebtFeatureEnabled } from "../../utils/debts/debtDebugConfig";
-const AutoFundingView = React.lazy(() => import("../automation/AutoFundingView"));
+const AutoFundingView = React.lazy(
+  () => import("../automation/AutoFundingView"),
+);
 const ActivityFeed = React.lazy(() => import("../activity/ActivityFeed"));
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { ErrorBoundary } from "@highlight-run/react";
@@ -26,7 +30,13 @@ import logger from "../../utils/common/logger";
  * ViewRenderer component for handling main content switching
  * Extracted from Layout.jsx for better organization
  */
-const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setActiveView }) => {
+const ViewRenderer = ({
+  activeView,
+  budget,
+  currentUser,
+  totalBiweeklyNeed,
+  setActiveView,
+}) => {
   // Use centralized layout data hook
   const layoutData = useLayoutData();
   const {
@@ -75,10 +85,13 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
       try {
         // Use TanStack Query updateBill for proper bill persistence with envelope assignment
         tanStackUpdateBill({ id: updatedBill.id, updates: updatedBill });
-        logger.debug("ViewRenderer TanStack updateBill completed successfully", {
-          billId: updatedBill.id,
-          envelopeId: updatedBill.envelopeId,
-        });
+        logger.debug(
+          "ViewRenderer TanStack updateBill completed successfully",
+          {
+            billId: updatedBill.id,
+            envelopeId: updatedBill.envelopeId,
+          },
+        );
       } catch (error) {
         logger.error("Error in ViewRenderer handleUpdateBill", error, {
           billId: updatedBill.id,
@@ -86,7 +99,7 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
         });
       }
     },
-    [tanStackUpdateBill]
+    [tanStackUpdateBill],
   );
 
   // Debug log to verify function creation - only on dev sites
@@ -109,13 +122,17 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
               <div className="relative mr-4">
                 <div className="absolute inset-0 bg-purple-500 rounded-2xl blur-lg opacity-30"></div>
                 <div className="relative bg-purple-500 p-3 rounded-2xl">
-                  {React.createElement(getIcon("Wallet"), { className: "h-6 w-6 text-white" })}
+                  {React.createElement(getIcon("Wallet"), {
+                    className: "h-6 w-6 text-white",
+                  })}
                 </div>
               </div>
-              <span className="text-lg">E</span>NVELOPE <span className="text-lg">M</span>ANAGEMENT
+              <span className="text-lg">E</span>NVELOPE{" "}
+              <span className="text-lg">M</span>ANAGEMENT
             </h2>
             <p className="text-purple-900 mt-1">
-              Organize and track your budget allocations • {envelopes?.length || 0} envelopes
+              Organize and track your budget allocations •{" "}
+              {envelopes?.length || 0} envelopes
             </p>
           </div>
 
@@ -172,7 +189,9 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
         envelopes={envelopes}
         paycheckHistory={tanStackPaycheckHistory}
         onProcessPaycheck={tanStackProcessPaycheck}
-        onDeletePaycheck={(paycheckId) => handleDeletePaycheck(paycheckId, tanStackPaycheckHistory)}
+        onDeletePaycheck={(paycheckId) =>
+          handleDeletePaycheck(paycheckId, tanStackPaycheckHistory)
+        }
         currentUser={currentUser}
       />
     ),
@@ -210,7 +229,9 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
             createdAt: new Date().toISOString(),
           };
           tanStackAddBill(bill);
-          logger.debug("✅ Bill stored successfully - no transaction created until paid");
+          logger.debug(
+            "✅ Bill stored successfully - no transaction created until paid",
+          );
         }}
         onSearchNewBills={async () => {
           try {
@@ -218,13 +239,13 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
             // For now, we'll show a placeholder notification
             globalToast.showInfo(
               "Bill search feature would integrate with email parsing services to automatically detect new bills from your inbox.",
-              "Feature Coming Soon"
+              "Feature Coming Soon",
             );
           } catch (error) {
             logger.error("Failed to search for new bills:", error);
             globalToast.showError(
               "Failed to search for new bills. Please try again.",
-              "Search Failed"
+              "Search Failed",
             );
           }
         }}
@@ -254,7 +275,8 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
           Debt Dashboard Temporarily Disabled
         </h2>
         <p className="text-gray-600 mb-4">
-          The debt dashboard is currently disabled for debugging the temporal dead zone error.
+          The debt dashboard is currently disabled for debugging the temporal
+          dead zone error.
         </p>
         <p className="text-sm text-gray-500">
           Debug configuration can be adjusted in src/utils/debtDebugConfig.js
@@ -275,7 +297,9 @@ const ViewRenderer = ({ activeView, budget, currentUser, totalBiweeklyNeed, setA
 
   return (
     <ErrorBoundary>
-      <Suspense fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}>
+      <Suspense
+        fallback={<LoadingSpinner message={`Loading ${activeView}...`} />}
+      >
         {views[activeView]}
       </Suspense>
     </ErrorBoundary>

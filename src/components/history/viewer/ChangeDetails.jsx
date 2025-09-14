@@ -10,7 +10,9 @@ const ChangeDetails = ({
 }) => {
   return (
     <div>
-      <h3 className="text-lg font-semibold text-gray-900 mb-3">Change Details</h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-3">
+        Change Details
+      </h3>
 
       {!selectedCommit && (
         <div className="text-center py-8 text-gray-500">
@@ -32,20 +34,25 @@ const ChangeDetails = ({
         <div className="border rounded-lg p-4 bg-white">
           <div className="mb-4">
             <div className="flex items-center gap-2 mb-2">
-              {React.createElement(getIcon("GitCommit"), { className: "h-5 w-5 text-gray-600" })}
+              {React.createElement(getIcon("GitCommit"), {
+                className: "h-5 w-5 text-gray-600",
+              })}
               <span className="font-mono text-sm text-gray-600">
                 {commitDetails.commit.hash?.substring(0, 8)}
               </span>
             </div>
 
-            <h4 className="font-medium text-gray-900 mb-1">{commitDetails.commit.message}</h4>
+            <h4 className="font-medium text-gray-900 mb-1">
+              {commitDetails.commit.message}
+            </h4>
 
             <div className="text-sm text-gray-600 space-y-1">
               <p>
                 <strong>Author:</strong> {commitDetails.commit.author}
               </p>
               <p>
-                <strong>Date:</strong> {new Date(commitDetails.commit.timestamp).toLocaleString()}
+                <strong>Date:</strong>{" "}
+                {new Date(commitDetails.commit.timestamp).toLocaleString()}
               </p>
               {commitDetails.commit.parentHash && (
                 <p>
@@ -77,13 +84,15 @@ const ChangeDetails = ({
                     {getChangeIcon(change.type)}
                     <div className="flex-1">
                       <p className="font-medium">
-                        {change.description || `${change.changeType} ${change.entityType}`}
+                        {change.description ||
+                          `${change.changeType} ${change.entityType}`}
                       </p>
                       {change.diff && (
                         <div className="mt-1 text-xs text-gray-600">
                           {Object.keys(change.diff).map((field) => (
                             <div key={field}>
-                              <strong>{field}:</strong> {JSON.stringify(change.diff[field].from)} →{" "}
+                              <strong>{field}:</strong>{" "}
+                              {JSON.stringify(change.diff[field].from)} →{" "}
                               {JSON.stringify(change.diff[field].to)}
                             </div>
                           ))}
@@ -101,7 +110,9 @@ const ChangeDetails = ({
               onClick={() => handleRestoreFromHistory(selectedCommit)}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center text-sm"
             >
-              {React.createElement(getIcon("RotateCcw"), { className: "h-4 w-4 mr-2" })}
+              {React.createElement(getIcon("RotateCcw"), {
+                className: "h-4 w-4 mr-2",
+              })}
               Restore to This State
             </button>
           </div>

@@ -177,7 +177,11 @@ export const processSavingsGoalFormData = (formData, editingGoal = null) => {
 /**
  * Calculate suggested target date based on current savings rate
  */
-export const suggestTargetDate = (targetAmount, currentAmount, monthlySavings) => {
+export const suggestTargetDate = (
+  targetAmount,
+  currentAmount,
+  monthlySavings,
+) => {
   if (!monthlySavings || monthlySavings <= 0) return null;
 
   const remainingAmount = Math.max(0, targetAmount - currentAmount);
@@ -195,7 +199,7 @@ export const suggestTargetDate = (targetAmount, currentAmount, monthlySavings) =
 export const calculateGoalDistribution = (
   goals,
   totalAmount,
-  distributionStrategy = "proportional"
+  distributionStrategy = "proportional",
 ) => {
   if (!totalAmount || totalAmount <= 0) return {};
 
@@ -239,7 +243,8 @@ export const calculateGoalDistribution = (
         activeGoals.forEach((goal) => {
           const monthlyNeeded = goal.monthlyNeeded || 0;
           const proportion = monthlyNeeded / totalMonthlyNeeded;
-          distribution[goal.id] = Math.round(totalAmount * proportion * 100) / 100;
+          distribution[goal.id] =
+            Math.round(totalAmount * proportion * 100) / 100;
         });
       } else {
         // Fall back to equal distribution
@@ -262,7 +267,8 @@ export const calculateGoalDistribution = (
         activeGoals.forEach((goal) => {
           const remaining = goal.remainingAmount || 0;
           const proportion = remaining / totalRemaining;
-          distribution[goal.id] = Math.round(totalAmount * proportion * 100) / 100;
+          distribution[goal.id] =
+            Math.round(totalAmount * proportion * 100) / 100;
         });
       } else {
         // Fall back to equal distribution
@@ -281,10 +287,17 @@ export const calculateGoalDistribution = (
 /**
  * Validate distribution amounts
  */
-export const validateDistribution = (distribution, totalAmount, tolerance = 0.01) => {
-  const distributionTotal = Object.values(distribution).reduce((sum, amount) => {
-    return sum + (parseFloat(amount) || 0);
-  }, 0);
+export const validateDistribution = (
+  distribution,
+  totalAmount,
+  tolerance = 0.01,
+) => {
+  const distributionTotal = Object.values(distribution).reduce(
+    (sum, amount) => {
+      return sum + (parseFloat(amount) || 0);
+    },
+    0,
+  );
 
   const difference = Math.abs(distributionTotal - totalAmount);
 

@@ -64,7 +64,9 @@ const TransactionArchiving = () => {
       <div className="bg-white rounded-xl p-6 border border-gray-200">
         <div className="flex items-center space-x-3 mb-4">
           <div className="animate-spin">
-            {React.createElement(getIcon("RefreshCw"), { className: "h-5 w-5 text-purple-600" })}
+            {React.createElement(getIcon("RefreshCw"), {
+              className: "h-5 w-5 text-purple-600",
+            })}
           </div>
           <h3 className="text-lg font-semibold text-gray-900">
             Loading Transaction Archive Information...
@@ -101,7 +103,10 @@ const TransactionArchiving = () => {
         onClosePreview={closePreview}
       />
 
-      <ArchivingProgress isArchiving={isArchiving} archivingProgress={archivingProgress} />
+      <ArchivingProgress
+        isArchiving={isArchiving}
+        archivingProgress={archivingProgress}
+      />
 
       <ArchivingActionButtons
         needsArchiving={needsArchiving}
@@ -122,10 +127,12 @@ const TransactionArchiving = () => {
             {React.createElement(getIcon("CheckCircle"), {
               className: "h-12 w-12 text-green-600 mx-auto mb-4",
             })}
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No Archiving Needed</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              No Archiving Needed
+            </h3>
             <p className="text-gray-600">
-              Your transaction data is well-optimized. Check back when you have more historical
-              data.
+              Your transaction data is well-optimized. Check back when you have
+              more historical data.
             </p>
           </div>
         </div>

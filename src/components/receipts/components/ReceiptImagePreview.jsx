@@ -6,14 +6,19 @@ import { formatFileSize } from "../../../utils/receipts/receiptHelpers.jsx";
  * Receipt Image Preview Component
  * Shows uploaded image with toggle visibility and UI standards compliance
  */
-const ReceiptImagePreview = ({ uploadedImage, showImagePreview, onTogglePreview }) => {
+const ReceiptImagePreview = ({
+  uploadedImage,
+  showImagePreview,
+  onTogglePreview,
+}) => {
   if (!uploadedImage) return null;
 
   return (
     <div className="glassmorphism rounded-lg p-4 border-2 border-black bg-purple-100/40 backdrop-blur-sm">
       <div className="flex justify-between items-center mb-3">
         <h3 className="font-black text-black text-base">
-          <span className="text-lg">S</span>CANNED <span className="text-lg">R</span>ECEIPT
+          <span className="text-lg">S</span>CANNED{" "}
+          <span className="text-lg">R</span>ECEIPT
         </h3>
         <button
           onClick={onTogglePreview}

@@ -27,14 +27,24 @@ export function validateDebtFormData(formData) {
     errors.currentBalance = "Valid current balance is required";
   }
 
-  const originalBalance = formData.originalBalance ? parseFloat(formData.originalBalance) : null;
-  if (originalBalance !== null && (isNaN(originalBalance) || originalBalance < 0)) {
+  const originalBalance = formData.originalBalance
+    ? parseFloat(formData.originalBalance)
+    : null;
+  if (
+    originalBalance !== null &&
+    (isNaN(originalBalance) || originalBalance < 0)
+  ) {
     errors.originalBalance = "Original balance must be positive";
   }
 
   // Interest rate validation
-  const interestRate = formData.interestRate ? parseFloat(formData.interestRate) : 0;
-  if (formData.interestRate && (isNaN(interestRate) || interestRate < 0 || interestRate > 100)) {
+  const interestRate = formData.interestRate
+    ? parseFloat(formData.interestRate)
+    : 0;
+  if (
+    formData.interestRate &&
+    (isNaN(interestRate) || interestRate < 0 || interestRate > 100)
+  ) {
     errors.interestRate = "Interest rate must be between 0 and 100";
   }
 
@@ -50,22 +60,26 @@ export function validateDebtFormData(formData) {
 
     if (minimumPaymentPercent < 1) {
       warnings.push(
-        "Minimum payment is less than 1% of balance - this will take very long to pay off"
+        "Minimum payment is less than 1% of balance - this will take very long to pay off",
       );
     } else if (minimumPaymentPercent > 50) {
-      warnings.push("Minimum payment is more than 50% of balance - verify this is correct");
+      warnings.push(
+        "Minimum payment is more than 50% of balance - verify this is correct",
+      );
     }
   }
 
   // Interest rate warnings
   if (interestRate > 25) {
-    warnings.push("Interest rate is very high - consider debt consolidation options");
+    warnings.push(
+      "Interest rate is very high - consider debt consolidation options",
+    );
   }
 
   // Original vs current balance warnings
   if (originalBalance !== null && currentBalance > originalBalance) {
     warnings.push(
-      "Current balance is higher than original balance - interest and fees may have accrued"
+      "Current balance is higher than original balance - interest and fees may have accrued",
     );
   }
 
@@ -164,8 +178,10 @@ export function calculateDebtMetrics(debtData) {
   return {
     totalPaid,
     paymentToBalanceRatio,
-    monthsToPayoff: monthsToPayoff === Infinity ? null : Math.ceil(monthsToPayoff),
-    totalInterest: totalInterest === Infinity ? null : Math.max(0, totalInterest),
+    monthsToPayoff:
+      monthsToPayoff === Infinity ? null : Math.ceil(monthsToPayoff),
+    totalInterest:
+      totalInterest === Infinity ? null : Math.max(0, totalInterest),
     isPaymentSufficient: monthsToPayoff !== Infinity,
     monthlyInterestCost: currentBalance * (interestRate / 100 / 12),
   };
@@ -181,7 +197,12 @@ export function formatDebtMetrics(metrics) {
     return null;
   }
 
-  const { monthsToPayoff, totalInterest, isPaymentSufficient, monthlyInterestCost } = metrics;
+  const {
+    monthsToPayoff,
+    totalInterest,
+    isPaymentSufficient,
+    monthlyInterestCost,
+  } = metrics;
 
   let payoffTimeDisplay = "Unable to calculate";
   if (isPaymentSufficient && monthsToPayoff) {

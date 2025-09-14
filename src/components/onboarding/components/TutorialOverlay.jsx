@@ -72,7 +72,9 @@ const TutorialOverlay = ({
 
         {/* Content */}
         <div className="mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{step.title}</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            {step.title}
+          </h3>
           <p className="text-gray-600 dark:text-gray-300">{step.description}</p>
         </div>
 
@@ -102,7 +104,9 @@ const TutorialOverlay = ({
             onClick={onNext}
             className="flex items-center space-x-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
           >
-            <span>{currentStep === tutorialStepsLength - 1 ? "Finish" : "Next"}</span>
+            <span>
+              {currentStep === tutorialStepsLength - 1 ? "Finish" : "Next"}
+            </span>
             {currentStep === tutorialStepsLength - 1
               ? React.createElement(getIcon("CheckCircle"), {
                   className: "w-4 h-4",

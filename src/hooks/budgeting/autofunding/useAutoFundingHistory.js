@@ -9,10 +9,16 @@ import logger from "../../../utils/common/logger";
  * Hook for managing auto-funding execution history and undo operations
  * Refactored to use focused sub-hooks for better maintainability
  */
-export const useAutoFundingHistory = (initialHistory = [], initialUndoStack = []) => {
+export const useAutoFundingHistory = (
+  initialHistory = [],
+  initialUndoStack = [],
+) => {
   // Use focused hooks for specific functionality
   const historyHook = useExecutionHistory(initialHistory);
-  const undoHook = useUndoOperations(initialUndoStack, historyHook.addToHistory);
+  const undoHook = useUndoOperations(
+    initialUndoStack,
+    historyHook.addToHistory,
+  );
   const statisticsHook = useExecutionStatistics();
   const exportHook = useHistoryExport();
 
@@ -40,7 +46,7 @@ export const useAutoFundingHistory = (initialHistory = [], initialUndoStack = []
         logger.error("Failed to cleanup history", error);
       }
     },
-    [historyHook, undoHook]
+    [historyHook, undoHook],
   );
 
   return {
@@ -68,6 +74,10 @@ export const useAutoFundingHistory = (initialHistory = [], initialUndoStack = []
 
     // Import/Export
     exportHistory: (options) =>
-      exportHook.exportHistory(historyHook.executionHistory, undoHook.undoStack, options),
+      exportHook.exportHistory(
+        historyHook.executionHistory,
+        undoHook.undoStack,
+        options,
+      ),
   };
 };

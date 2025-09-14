@@ -10,8 +10,8 @@ const ExtractedItemsList = ({ items }) => {
   return (
     <div className="mt-4 pt-4 border-t-2 border-black">
       <h4 className="font-black text-black text-sm mb-3">
-        <span className="text-base">I</span>TEMS <span className="text-base">F</span>OUND (
-        {items.length})
+        <span className="text-base">I</span>TEMS{" "}
+        <span className="text-base">F</span>OUND ({items.length})
       </h4>
       <div className="glassmorphism rounded-lg p-3 border border-white/20 bg-white/20 backdrop-blur-sm max-h-32 overflow-y-auto">
         <div className="space-y-1">
@@ -23,7 +23,9 @@ const ExtractedItemsList = ({ items }) => {
               <span className="text-purple-900 truncate flex-1 font-medium">
                 {item.description}
               </span>
-              <span className="font-black text-black ml-2">${item.amount.toFixed(2)}</span>
+              <span className="font-black text-black ml-2">
+                ${item.amount.toFixed(2)}
+              </span>
             </div>
           ))}
           {items.length > 5 && (

@@ -46,7 +46,8 @@ const PaycheckPayerSelector = ({
               const prediction = getPayerPrediction(payer);
               return (
                 <option key={payer} value={payer}>
-                  {payer} {prediction ? `(avg: $${prediction.average.toFixed(2)})` : ""}
+                  {payer}{" "}
+                  {prediction ? `(avg: $${prediction.average.toFixed(2)})` : ""}
                 </option>
               );
             })}
@@ -55,7 +56,10 @@ const PaycheckPayerSelector = ({
 
           {/* Show prediction info for selected payer */}
           {payerName && getPayerPrediction(payerName) && (
-            <PayerPredictionInfo payerName={payerName} prediction={getPayerPrediction(payerName)} />
+            <PayerPredictionInfo
+              payerName={payerName}
+              prediction={getPayerPrediction(payerName)}
+            />
           )}
         </div>
       ) : (
@@ -103,7 +107,8 @@ const AddNewPayerForm = ({
           {React.createElement(getIcon("User"), {
             className: "h-4 w-4 inline mr-2 text-blue-500",
           })}
-          <strong>First paycheck?</strong> Let's start by adding who this paycheck is for.
+          <strong>First paycheck?</strong> Let's start by adding who this
+          paycheck is for.
         </div>
       </div>
     )}

@@ -12,8 +12,10 @@ const useBugReport = () => {
   const [includeScreenshot, setIncludeScreenshot] = useState(true);
 
   // Use focused sub-hooks
-  const { screenshot, setScreenshot, captureScreenshot } = useBugReportScreenshot();
-  const { isSubmitting, submitReport: submitBugReport } = useBugReportSubmission();
+  const { screenshot, setScreenshot, captureScreenshot } =
+    useBugReportScreenshot();
+  const { isSubmitting, submitReport: submitBugReport } =
+    useBugReportSubmission();
 
   const submitReport = async () => {
     if (!description.trim()) return false;

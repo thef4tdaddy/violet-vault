@@ -7,7 +7,9 @@ const HistoryControls = ({ filter, updateFilter, loading, exportHistory }) => {
     <div className="flex items-center justify-between mb-6 p-4 bg-gray-50 rounded-lg">
       <div className="flex items-center gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Filter by Author</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Filter by Author
+          </label>
           <select
             value={filter.author}
             onChange={(e) => updateFilter({ author: e.target.value })}
@@ -20,7 +22,9 @@ const HistoryControls = ({ filter, updateFilter, loading, exportHistory }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Limit</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Limit
+          </label>
           <select
             value={filter.limit}
             onChange={(e) => updateFilter({ limit: parseInt(e.target.value) })}
@@ -38,12 +42,17 @@ const HistoryControls = ({ filter, updateFilter, loading, exportHistory }) => {
         <button
           onClick={() => {
             // Integrity verification will be implemented in future version
-            globalToast.showInfo("Integrity verification coming soon!", "Feature Coming Soon");
+            globalToast.showInfo(
+              "Integrity verification coming soon!",
+              "Feature Coming Soon",
+            );
           }}
           disabled={loading}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 flex items-center text-sm"
         >
-          {React.createElement(getIcon("Shield"), { className: "h-4 w-4 mr-2" })}
+          {React.createElement(getIcon("Shield"), {
+            className: "h-4 w-4 mr-2",
+          })}
           Verify Integrity
         </button>
 
@@ -52,7 +61,9 @@ const HistoryControls = ({ filter, updateFilter, loading, exportHistory }) => {
           disabled={loading}
           className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400 flex items-center text-sm"
         >
-          {React.createElement(getIcon("Download"), { className: "h-4 w-4 mr-2" })}
+          {React.createElement(getIcon("Download"), {
+            className: "h-4 w-4 mr-2",
+          })}
           Export
         </button>
       </div>

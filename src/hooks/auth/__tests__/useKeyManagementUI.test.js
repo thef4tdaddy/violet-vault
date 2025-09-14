@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { useKeyManagementUI, useKeyManagementOperations } from "../useKeyManagementUI";
+import {
+  useKeyManagementUI,
+  useKeyManagementOperations,
+} from "../useKeyManagementUI";
 
 // Mock dependencies
 vi.mock("../../../stores/ui/toastStore", () => ({
@@ -150,7 +153,8 @@ describe("useKeyManagementOperations", () => {
     it("should accept strong passwords", () => {
       const { result } = renderHook(() => useKeyManagementOperations());
 
-      const isValid = result.current.validateExportPassword("strongpassword123");
+      const isValid =
+        result.current.validateExportPassword("strongpassword123");
 
       expect(isValid).toBe(true);
     });
@@ -164,7 +168,7 @@ describe("useKeyManagementOperations", () => {
       expect(isValid).toBe(false);
       expect(globalToast.showError).toHaveBeenCalledWith(
         "Export password must be at least 8 characters long",
-        "Password Too Short"
+        "Password Too Short",
       );
     });
 
@@ -190,7 +194,7 @@ describe("useKeyManagementOperations", () => {
         keyFileData,
         null,
         "vaultpassword",
-        validation
+        validation,
       );
 
       expect(isValid).toBe(true);
@@ -206,13 +210,13 @@ describe("useKeyManagementOperations", () => {
         {},
         null,
         "vaultpassword",
-        validation
+        validation,
       );
 
       expect(isValid).toBe(false);
       expect(globalToast.showError).toHaveBeenCalledWith(
         "Invalid key file: Invalid format",
-        "Invalid Key File"
+        "Invalid Key File",
       );
     });
 
@@ -226,13 +230,13 @@ describe("useKeyManagementOperations", () => {
         {},
         "", // Empty import password
         "vaultpassword",
-        validation
+        validation,
       );
 
       expect(isValid).toBe(false);
       expect(globalToast.showError).toHaveBeenCalledWith(
         "This key file is password protected. Please enter the export password.",
-        "Password Required"
+        "Password Required",
       );
     });
 
@@ -246,13 +250,13 @@ describe("useKeyManagementOperations", () => {
         {},
         null,
         "", // Empty vault password
-        validation
+        validation,
       );
 
       expect(isValid).toBe(false);
       expect(globalToast.showError).toHaveBeenCalledWith(
         "Please enter your vault password to complete the import.",
-        "Vault Password Required"
+        "Vault Password Required",
       );
     });
   });
@@ -262,7 +266,9 @@ describe("useKeyManagementOperations", () => {
       const { result } = renderHook(() => useKeyManagementOperations());
 
       const mockFile = {
-        text: vi.fn(() => Promise.resolve('{"type":"unprotected","key":[1,2,3]}')),
+        text: vi.fn(() =>
+          Promise.resolve('{"type":"unprotected","key":[1,2,3]}'),
+        ),
       };
 
       const data = await result.current.handleFileRead(mockFile);
@@ -281,10 +287,12 @@ describe("useKeyManagementOperations", () => {
         text: vi.fn(() => Promise.reject(new Error("File read error"))),
       };
 
-      await expect(result.current.handleFileRead(mockFile)).rejects.toThrow("File read error");
+      await expect(result.current.handleFileRead(mockFile)).rejects.toThrow(
+        "File read error",
+      );
       expect(globalToast.showError).toHaveBeenCalledWith(
         "Failed to read key file. Please check the file format.",
-        "File Read Error"
+        "File Read Error",
       );
     });
 
@@ -311,10 +319,13 @@ describe("useKeyManagementOperations", () => {
 
       result.current.handleImportError(error);
 
-      expect(logger.default.error).toHaveBeenCalledWith("Import failed:", error);
+      expect(logger.default.error).toHaveBeenCalledWith(
+        "Import failed:",
+        error,
+      );
       expect(globalToast.showError).toHaveBeenCalledWith(
         "Import failed: Import failed",
-        "Import Failed"
+        "Import Failed",
       );
     });
 
@@ -328,7 +339,7 @@ describe("useKeyManagementOperations", () => {
 
       expect(globalToast.showError).toHaveBeenCalledWith(
         "Import failed: Unknown error",
-        "Import Failed"
+        "Import Failed",
       );
     });
   });
@@ -343,10 +354,13 @@ describe("useKeyManagementOperations", () => {
 
       result.current.handleOperationError("Test operation", error);
 
-      expect(logger.default.error).toHaveBeenCalledWith("Test operation failed:", error);
+      expect(logger.default.error).toHaveBeenCalledWith(
+        "Test operation failed:",
+        error,
+      );
       expect(globalToast.showError).toHaveBeenCalledWith(
         "Test operation failed: Operation failed",
-        "Test operation Failed"
+        "Test operation Failed",
       );
     });
   });

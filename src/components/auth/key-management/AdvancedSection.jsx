@@ -1,7 +1,11 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
-const AdvancedSection = ({ showAdvanced, keyFingerprint, onToggleAdvanced }) => {
+const AdvancedSection = ({
+  showAdvanced,
+  keyFingerprint,
+  onToggleAdvanced,
+}) => {
   return (
     <div>
       <button
@@ -22,7 +26,9 @@ const AdvancedSection = ({ showAdvanced, keyFingerprint, onToggleAdvanced }) => 
               {React.createElement(getIcon("Key"), {
                 className: "h-4 w-4 text-gray-500 mr-2",
               })}
-              <h5 className="text-sm font-medium text-gray-900">Current Key Fingerprint</h5>
+              <h5 className="text-sm font-medium text-gray-900">
+                Current Key Fingerprint
+              </h5>
             </div>
             <code className="text-xs bg-white p-2 rounded border font-mono text-purple-600 block">
               {keyFingerprint || "Loading..."}
@@ -38,8 +44,8 @@ const AdvancedSection = ({ showAdvanced, keyFingerprint, onToggleAdvanced }) => 
               <div className="text-sm text-yellow-800">
                 <p className="font-medium mb-1">Security Notice</p>
                 <p>
-                  Your encryption key is unique to your vault. Keep it secure and create backups.
-                  Without it, your data cannot be recovered.
+                  Your encryption key is unique to your vault. Keep it secure
+                  and create backups. Without it, your data cannot be recovered.
                 </p>
               </div>
             </div>

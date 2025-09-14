@@ -3,6 +3,7 @@ import GeneralSettingsSection from "../../components/settings/sections/GeneralSe
 import AccountSettingsSection from "../../components/settings/sections/AccountSettingsSection";
 import SecuritySettingsSection from "../../components/settings/sections/SecuritySettingsSection";
 import DataManagementSection from "../../components/settings/sections/DataManagementSection";
+import DevToolsSection from "../../components/settings/sections/DevToolsSection";
 
 /**
  * Hook to handle settings section rendering logic
@@ -29,12 +30,14 @@ export const useSettingsSectionRenderer = ({
   onShowLocalDataSecurity,
 
   // Data Management Props
-  onOpenEnvelopeChecker,
   onOpenActivityFeed,
-  onCreateTestHistory,
   onExport,
   onImport,
   onSync,
+
+  // Dev Tools Props
+  onOpenEnvelopeChecker,
+  onCreateTestHistory,
 }) => {
   const renderSectionContent = (activeSection) => {
     switch (activeSection) {
@@ -65,12 +68,16 @@ export const useSettingsSectionRenderer = ({
 
       case "data":
         return React.createElement(DataManagementSection, {
-          onOpenEnvelopeChecker,
           onOpenActivityFeed,
-          onCreateTestHistory,
           onExport,
           onImport,
           onSync,
+        });
+
+      case "devtools":
+        return React.createElement(DevToolsSection, {
+          onOpenEnvelopeChecker,
+          onCreateTestHistory,
         });
 
       default:

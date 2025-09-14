@@ -5,7 +5,11 @@ import { getIcon } from "../../../utils";
  * Analytics header component with title and controls
  * Extracted from ChartsAndAnalytics.jsx to reduce complexity
  */
-const AnalyticsHeader = ({ dateRange, handleDateRangeChange, handleExport }) => {
+const AnalyticsHeader = ({
+  dateRange,
+  handleDateRangeChange,
+  handleExport,
+}) => {
   return (
     <div className="flex justify-between items-center">
       <div>
@@ -20,7 +24,9 @@ const AnalyticsHeader = ({ dateRange, handleDateRangeChange, handleExport }) => 
           </div>
           Analytics & Reports
         </h2>
-        <p className="text-gray-800 mt-1">Financial insights and spending patterns</p>
+        <p className="text-gray-800 mt-1">
+          Financial insights and spending patterns
+        </p>
       </div>
 
       <div className="flex gap-3">

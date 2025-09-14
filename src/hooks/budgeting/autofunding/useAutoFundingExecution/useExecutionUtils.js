@@ -22,7 +22,7 @@ export const useExecutionUtils = (budget) => {
           transfer.fromEnvelopeId,
           transfer.toEnvelopeId,
           transfer.amount,
-          transfer.description
+          transfer.description,
         );
 
         logger.debug("Transfer executed", transfer);
@@ -31,7 +31,7 @@ export const useExecutionUtils = (budget) => {
         throw error;
       }
     },
-    [budget]
+    [budget],
   );
 
   // Simulate rule execution without making actual transfers
@@ -55,7 +55,7 @@ export const useExecutionUtils = (budget) => {
         return { success: false, error: error.message };
       }
     },
-    [budget]
+    [budget],
   );
 
   // Create detailed execution plan
@@ -79,7 +79,7 @@ export const useExecutionUtils = (budget) => {
         return { success: false, error: error.message };
       }
     },
-    [budget]
+    [budget],
   );
 
   // Validate planned transfers
@@ -100,7 +100,7 @@ export const useExecutionUtils = (budget) => {
         return { isValid: false, errors: [{ error: error.message }] };
       }
     },
-    [budget]
+    [budget],
   );
 
   // Calculate impact of transfers on envelope balances
@@ -125,7 +125,7 @@ export const useExecutionUtils = (budget) => {
         };
       }
     },
-    [budget]
+    [budget],
   );
 
   // Check if rules can execute with current budget state
@@ -142,9 +142,12 @@ export const useExecutionUtils = (budget) => {
           },
         };
 
-        const executableRules = rules.filter((rule) => shouldRuleExecute(rule, context));
+        const executableRules = rules.filter((rule) =>
+          shouldRuleExecute(rule, context),
+        );
         return {
-          canExecute: executableRules.length > 0 && context.data.unassignedCash > 0,
+          canExecute:
+            executableRules.length > 0 && context.data.unassignedCash > 0,
           executableCount: executableRules.length,
           totalRules: rules.length,
           availableCash: context.data.unassignedCash,
@@ -165,7 +168,7 @@ export const useExecutionUtils = (budget) => {
         };
       }
     },
-    [budget]
+    [budget],
   );
 
   return {

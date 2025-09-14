@@ -45,9 +45,13 @@ const StrategyCard = ({ strategy, isRecommended = false }) => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-red-600 font-medium">Total Interest</p>
-              <p className="text-lg font-bold text-red-700">${totalInterest.toFixed(2)}</p>
+              <p className="text-lg font-bold text-red-700">
+                ${totalInterest.toFixed(2)}
+              </p>
             </div>
-            {React.createElement(getIcon("DollarSign"), { className: "h-5 w-5 text-red-500" })}
+            {React.createElement(getIcon("DollarSign"), {
+              className: "h-5 w-5 text-red-500",
+            })}
           </div>
         </div>
 
@@ -55,9 +59,13 @@ const StrategyCard = ({ strategy, isRecommended = false }) => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-blue-600 font-medium">Payoff Time</p>
-              <p className="text-lg font-bold text-blue-700">{payoffTime} months</p>
+              <p className="text-lg font-bold text-blue-700">
+                {payoffTime} months
+              </p>
             </div>
-            {React.createElement(getIcon("Clock"), { className: "h-5 w-5 text-blue-500" })}
+            {React.createElement(getIcon("Clock"), {
+              className: "h-5 w-5 text-blue-500",
+            })}
           </div>
         </div>
       </div>
@@ -65,7 +73,9 @@ const StrategyCard = ({ strategy, isRecommended = false }) => {
       {/* Debt Priority Order */}
       <div>
         <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
-          {React.createElement(getIcon("TrendingDown"), { className: "h-4 w-4 mr-1" })}
+          {React.createElement(getIcon("TrendingDown"), {
+            className: "h-4 w-4 mr-1",
+          })}
           Priority Order
         </h4>
         <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -89,7 +99,9 @@ const StrategyCard = ({ strategy, isRecommended = false }) => {
                   {debt.priority}
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900 text-sm">{debt.name}</p>
+                  <p className="font-medium text-gray-900 text-sm">
+                    {debt.name}
+                  </p>
                   <p className="text-xs text-gray-600">
                     {debt.interestRate}% • ${debt.currentBalance?.toFixed(2)}
                   </p>
@@ -104,7 +116,9 @@ const StrategyCard = ({ strategy, isRecommended = false }) => {
             </div>
           ))}
           {debts.length > 5 && (
-            <p className="text-xs text-gray-500 text-center mt-2">+{debts.length - 5} more debts</p>
+            <p className="text-xs text-gray-500 text-center mt-2">
+              +{debts.length - 5} more debts
+            </p>
           )}
         </div>
       </div>

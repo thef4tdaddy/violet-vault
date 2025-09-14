@@ -259,9 +259,11 @@ tbody tr:hover {
 }
 
 /* Main dashboard cards and summary components */
-div[class*="bg-white"][class*="rounded-lg"][class*="p-"]:not([class*="text-"]):not(
-    [class*="w-2"]
-  ):not([class*="h-2"]):not([class*="h-3"]):not([class*="h-4"]) {
+div[class*="bg-white"][class*="rounded-lg"][class*="p-"]:not(
+    [class*="text-"]
+  ):not([class*="w-2"]):not([class*="h-2"]):not([class*="h-3"]):not(
+    [class*="h-4"]
+  ) {
   border: 2px solid rgba(0, 0, 0, 1) !important;
 }
 
@@ -275,7 +277,9 @@ div[role="dialog"],
 /* Major grid containers for envelope/bill cards */
 .grid[class*="grid-cols"] > div[class*="p-6"],
 .grid[class*="grid-cols"]
-  > div[class*="p-4"]:not([class*="h-2"]):not([class*="h-3"]):not([class*="h-4"]) {
+  > div[class*="p-4"]:not([class*="h-2"]):not([class*="h-3"]):not(
+    [class*="h-4"]
+  ) {
   border: 2px solid rgba(0, 0, 0, 1) !important;
 }
 

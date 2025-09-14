@@ -7,7 +7,15 @@
  * Bill category pattern mappings
  */
 export const BILL_CATEGORY_PATTERNS = {
-  Utilities: ["electric", "power", "utility", "gas", "heating", "water", "sewer"],
+  Utilities: [
+    "electric",
+    "power",
+    "utility",
+    "gas",
+    "heating",
+    "water",
+    "sewer",
+  ],
   Communications: ["internet", "cable", "phone"],
   Insurance: ["insurance"],
   Housing: ["loan", "mortgage", "rent"],

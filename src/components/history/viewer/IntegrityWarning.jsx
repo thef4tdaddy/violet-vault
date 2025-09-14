@@ -1,7 +1,11 @@
 import React from "react";
 import { getIcon } from "../../../utils";
 
-const IntegrityWarning = ({ integrityCheck, showIntegrityDetails, toggleIntegrityDetails }) => {
+const IntegrityWarning = ({
+  integrityCheck,
+  showIntegrityDetails,
+  toggleIntegrityDetails,
+}) => {
   if (!integrityCheck) return null;
 
   // Integrity Success
@@ -9,7 +13,9 @@ const IntegrityWarning = ({ integrityCheck, showIntegrityDetails, toggleIntegrit
     return (
       <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-3">
         <div className="flex items-center">
-          {React.createElement(getIcon("Shield"), { className: "h-4 w-4 text-green-600 mr-2" })}
+          {React.createElement(getIcon("Shield"), {
+            className: "h-4 w-4 text-green-600 mr-2",
+          })}
           <div className="text-sm text-green-800">
             <strong>✓ History Verified:</strong> {integrityCheck.message}
           </div>
@@ -27,8 +33,12 @@ const IntegrityWarning = ({ integrityCheck, showIntegrityDetails, toggleIntegrit
             className: "h-5 w-5 text-red-600 mr-3 mt-0.5 flex-shrink-0",
           })}
           <div className="flex-1">
-            <h3 className="font-medium text-red-900 mb-2">History Integrity Warning</h3>
-            <p className="text-sm text-red-800 mb-3">{integrityCheck.message}</p>
+            <h3 className="font-medium text-red-900 mb-2">
+              History Integrity Warning
+            </h3>
+            <p className="text-sm text-red-800 mb-3">
+              {integrityCheck.message}
+            </p>
 
             {integrityCheck.details && (
               <div className="space-y-2">
@@ -43,15 +53,19 @@ const IntegrityWarning = ({ integrityCheck, showIntegrityDetails, toggleIntegrit
                   <div className="bg-red-100 p-3 rounded border border-red-200 text-sm">
                     <div className="space-y-2">
                       <div>
-                        <strong>Broken at commit:</strong> {integrityCheck.brokenAt}
+                        <strong>Broken at commit:</strong>{" "}
+                        {integrityCheck.brokenAt}
                       </div>
 
                       {integrityCheck.details.lastValidCommit && (
                         <div>
                           <strong>Last valid commit:</strong>
                           <div className="ml-2 font-mono text-xs">
-                            {integrityCheck.details.lastValidCommit.hash.substring(0, 8)} -
-                            {integrityCheck.details.lastValidCommit.message}
+                            {integrityCheck.details.lastValidCommit.hash.substring(
+                              0,
+                              8,
+                            )}{" "}
+                            -{integrityCheck.details.lastValidCommit.message}
                           </div>
                         </div>
                       )}
@@ -60,8 +74,8 @@ const IntegrityWarning = ({ integrityCheck, showIntegrityDetails, toggleIntegrit
                         <div>
                           <strong>Suspicious commit:</strong>
                           <div className="ml-2 font-mono text-xs">
-                            {integrityCheck.details.suspiciousCommit.shortHash} -
-                            {integrityCheck.details.suspiciousCommit.message}
+                            {integrityCheck.details.suspiciousCommit.shortHash}{" "}
+                            -{integrityCheck.details.suspiciousCommit.message}
                           </div>
                         </div>
                       )}
@@ -72,8 +86,8 @@ const IntegrityWarning = ({ integrityCheck, showIntegrityDetails, toggleIntegrit
             )}
 
             <div className="mt-3 text-xs text-red-700">
-              ⚠️ Your budget history may have been tampered with. Consider exporting your data and
-              investigating recent changes.
+              ⚠️ Your budget history may have been tampered with. Consider
+              exporting your data and investigating recent changes.
             </div>
           </div>
         </div>

@@ -18,7 +18,9 @@ import {
   getTransactionFilterConfigs,
 } from "../../utils/transactions/ledgerHelpers";
 
-const TransactionLedger = ({ currentUser = { userName: "User", userColor: "#a855f7" } }) => {
+const TransactionLedger = ({
+  currentUser = { userName: "User", userColor: "#a855f7" },
+}) => {
   const {
     // Data
     transactions,

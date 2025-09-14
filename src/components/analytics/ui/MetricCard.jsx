@@ -46,7 +46,14 @@ const ICON_CLASSES = {
   gray: "text-gray-200",
 };
 
-const MetricCard = ({ title, value, subtitle, icon, trend, color = "purple" }) => {
+const MetricCard = ({
+  title,
+  value,
+  subtitle,
+  icon,
+  trend,
+  color = "purple",
+}) => {
   const Icon = icon;
 
   return (
@@ -55,15 +62,23 @@ const MetricCard = ({ title, value, subtitle, icon, trend, color = "purple" }) =
     >
       <div className="flex items-center justify-between">
         <div>
-          <p className={`${TEXT_CLASSES[color] || TEXT_CLASSES.purple} text-sm`}>{title}</p>
+          <p
+            className={`${TEXT_CLASSES[color] || TEXT_CLASSES.purple} text-sm`}
+          >
+            {title}
+          </p>
           <p className="text-2xl font-bold">{value}</p>
           {subtitle && (
-            <p className={`text-xs ${TEXT_CLASSES[color] || TEXT_CLASSES.purple} mt-2`}>
+            <p
+              className={`text-xs ${TEXT_CLASSES[color] || TEXT_CLASSES.purple} mt-2`}
+            >
               {subtitle}
             </p>
           )}
         </div>
-        <Icon className={`h-8 w-8 ${ICON_CLASSES[color] || ICON_CLASSES.purple}`} />
+        <Icon
+          className={`h-8 w-8 ${ICON_CLASSES[color] || ICON_CLASSES.purple}`}
+        />
       </div>
       {trend !== undefined && trend !== null && (
         <div className="mt-3 flex items-center text-sm">
@@ -74,7 +89,9 @@ const MetricCard = ({ title, value, subtitle, icon, trend, color = "purple" }) =
             : React.createElement(getIcon("ArrowDownRight"), {
                 className: "h-4 w-4 text-white mr-1",
               })}
-          <span className="text-white">{Math.abs(trend).toFixed(1)}% vs last period</span>
+          <span className="text-white">
+            {Math.abs(trend).toFixed(1)}% vs last period
+          </span>
         </div>
       )}
     </div>

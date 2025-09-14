@@ -68,7 +68,8 @@ export class GitHubAPIService {
   static formatGitHubIssueBody(reportData) {
     // Check if description contains multiple steps/todos for checklist formatting
     const description = reportData.description || "No description provided";
-    const formattedDescription = this.formatDescriptionWithChecklists(description);
+    const formattedDescription =
+      this.formatDescriptionWithChecklists(description);
 
     const sections = [
       "## Bug Description",
@@ -91,20 +92,24 @@ export class GitHubAPIService {
         "## 📍 User Location",
         `**URL:** ${reportData.contextInfo.url || window.location.href}`,
         `**Page Context:** ${reportData.contextInfo.userLocation}`,
-        ""
+        "",
       );
     }
 
     // Add environment info
     if (reportData.systemInfo) {
-      sections.push("## Environment", this.formatEnvironmentInfo(reportData.systemInfo), "");
+      sections.push(
+        "## Environment",
+        this.formatEnvironmentInfo(reportData.systemInfo),
+        "",
+      );
     }
 
     // Add console logs with better formatting
     sections.push(
       "## Console Logs & Errors",
       this.formatConsoleLogsForGitHub(reportData.systemInfo?.errors),
-      ""
+      "",
     );
 
     if (reportData.logs && reportData.logs.length > 0) {
@@ -113,7 +118,7 @@ export class GitHubAPIService {
         "```",
         reportData.logs.slice(-20).join("\n"), // Last 20 log entries
         "```",
-        ""
+        "",
       );
     }
 
@@ -129,7 +134,7 @@ export class GitHubAPIService {
         reportData.screenshot.startsWith("data:image")
           ? `📸 Screenshot captured (${reportData.screenshot.length} chars) - available in original bug report data`
           : `![Bug Screenshot](${reportData.screenshot})`,
-        ""
+        "",
       );
     }
 
@@ -139,7 +144,7 @@ export class GitHubAPIService {
         `[View Session Recording](${reportData.sessionUrl})`,
         "",
         "**Note:** Session replay may contain sensitive information. Review before sharing.",
-        ""
+        "",
       );
     }
 
@@ -149,7 +154,7 @@ export class GitHubAPIService {
       `**Reporter:** Automated Bug Reporter`,
       `**Timestamp:** ${new Date().toISOString()}`,
       "",
-      "_This issue was automatically generated from a user bug report._"
+      "_This issue was automatically generated from a user bug report._",
     );
 
     return sections.join("\n");
@@ -189,7 +194,9 @@ export class GitHubAPIService {
 
     // Also detect "and" separated items in single lines
     if (!hasMultipleItems && description.includes(" and ")) {
-      const parts = description.split(" and ").filter((part) => part.trim().length > 0);
+      const parts = description
+        .split(" and ")
+        .filter((part) => part.trim().length > 0);
       if (parts.length > 1) {
         formatted = parts.map((part) => `- [ ] ${part.trim()}`).join("\n");
         hasMultipleItems = true;
@@ -213,12 +220,16 @@ export class GitHubAPIService {
 
     // Browser info
     if (systemInfo.browser) {
-      sections.push(`- **Browser:** ${systemInfo.browser.name} ${systemInfo.browser.version}`);
+      sections.push(
+        `- **Browser:** ${systemInfo.browser.name} ${systemInfo.browser.version}`,
+      );
     }
 
     // Viewport
     if (systemInfo.viewport) {
-      sections.push(`- **Viewport:** ${systemInfo.viewport.width}x${systemInfo.viewport.height}`);
+      sections.push(
+        `- **Viewport:** ${systemInfo.viewport.width}x${systemInfo.viewport.height}`,
+      );
     }
 
     // User agent (truncated)
@@ -232,11 +243,15 @@ export class GitHubAPIService {
 
     // Memory usage if available
     if (systemInfo.performance?.memory) {
-      const memMB = Math.round(systemInfo.performance.memory.usedJSHeapSize / 1024 / 1024);
+      const memMB = Math.round(
+        systemInfo.performance.memory.usedJSHeapSize / 1024 / 1024,
+      );
       sections.push(`- **Memory Usage:** ${memMB}MB used`);
     }
 
-    sections.push(`- **Timestamp:** ${systemInfo.timestamp || new Date().toISOString()}`);
+    sections.push(
+      `- **Timestamp:** ${systemInfo.timestamp || new Date().toISOString()}`,
+    );
 
     return sections.join("\n");
   }
@@ -278,15 +293,20 @@ export class GitHubAPIService {
           "```javascript",
           `${error.type || "Error"}: ${error.message || "Unknown error"}`,
           error.stack ? `Stack: ${error.stack}` : "",
-          error.filename ? `File: ${error.filename} (Line: ${error.lineno || "?"})` : "",
+          error.filename
+            ? `File: ${error.filename} (Line: ${error.lineno || "?"})`
+            : "",
           `Time: ${error.timestamp || "Unknown"}`,
           "```",
-          ""
+          "",
         );
       });
 
       if (errors.recentErrors.length > 3) {
-        sections.push(`_... and ${errors.recentErrors.length - 3} more errors_`, "");
+        sections.push(
+          `_... and ${errors.recentErrors.length - 3} more errors_`,
+          "",
+        );
       }
     }
 
@@ -306,7 +326,8 @@ export class GitHubAPIService {
         .join("\n");
 
       // Check if logs contain code-like patterns
-      const hasCodePatterns = /(\{|\}|function|=>|const|let|var|import|export)/.test(logText);
+      const hasCodePatterns =
+        /(\{|\}|function|=>|const|let|var|import|export)/.test(logText);
       const codeType = hasCodePatterns ? "javascript" : "text";
 
       sections.push(`\`\`\`${codeType}`, logText, "```", "");
