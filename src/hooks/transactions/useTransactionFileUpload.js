@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { parseCSV, parseOFX, autoDetectFieldMapping } from "../../utils/transactions/fileParser";
+import {
+  parseCSV,
+  parseOFX,
+  autoDetectFieldMapping,
+} from "../../utils/transactions/fileParser";
 import { globalToast } from "../../stores/ui/toastStore";
 
 /**
@@ -31,7 +35,7 @@ export const useTransactionFileUpload = () => {
         } else {
           globalToast.showError(
             "Unsupported file type. Please use CSV or OFX files.",
-            "Unsupported File"
+            "Unsupported File",
           );
           return;
         }
@@ -44,7 +48,10 @@ export const useTransactionFileUpload = () => {
         setImportStep(2);
         setFieldMapping(autoDetectFieldMapping(parsedData));
       } catch (error) {
-        globalToast.showError("Error parsing file: " + error.message, "Parse Error");
+        globalToast.showError(
+          "Error parsing file: " + error.message,
+          "Parse Error",
+        );
       }
     };
 

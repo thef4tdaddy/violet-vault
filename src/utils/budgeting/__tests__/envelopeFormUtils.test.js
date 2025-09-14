@@ -70,7 +70,9 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.name).toBe("Envelope name must be less than 50 characters");
+      expect(result.errors.name).toBe(
+        "Envelope name must be less than 50 characters",
+      );
     });
 
     it("should detect duplicate names", () => {
@@ -79,7 +81,9 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData, existingEnvelopes);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.name).toBe("An envelope with this name already exists");
+      expect(result.errors.name).toBe(
+        "An envelope with this name already exists",
+      );
     });
 
     it("should allow same name when editing existing envelope", () => {
@@ -96,7 +100,9 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.monthlyAmount).toBe("Monthly amount must be a positive number");
+      expect(result.errors.monthlyAmount).toBe(
+        "Monthly amount must be a positive number",
+      );
     });
 
     it("should validate monthly amount maximum", () => {
@@ -104,7 +110,9 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.monthlyAmount).toBe("Monthly amount cannot exceed $100,000");
+      expect(result.errors.monthlyAmount).toBe(
+        "Monthly amount cannot exceed $100,000",
+      );
     });
 
     it("should require target amount for sinking funds", () => {
@@ -116,7 +124,9 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.targetAmount).toBe("Target amount is required for sinking funds");
+      expect(result.errors.targetAmount).toBe(
+        "Target amount is required for sinking funds",
+      );
     });
 
     it("should validate target amount format", () => {
@@ -128,7 +138,9 @@ describe("envelopeFormUtils", () => {
       const result = validateEnvelopeForm(formData);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors.targetAmount).toBe("Target amount must be a positive number");
+      expect(result.errors.targetAmount).toBe(
+        "Target amount must be a positive number",
+      );
     });
 
     it("should require category", () => {
@@ -350,17 +362,23 @@ describe("envelopeFormUtils", () => {
         envelopeType: ENVELOPE_TYPES.SINKING_FUND,
         targetAmount: 1000,
       };
-      const result = validateEnvelopeTypeChange(ENVELOPE_TYPES.VARIABLE, envelope);
+      const result = validateEnvelopeTypeChange(
+        ENVELOPE_TYPES.VARIABLE,
+        envelope,
+      );
 
       expect(result.isValid).toBe(true);
       expect(result.warnings).toContain(
-        "Changing from sinking fund will remove target amount tracking"
+        "Changing from sinking fund will remove target amount tracking",
       );
     });
 
     it("should error when changing to sinking fund without target", () => {
       const envelope = { envelopeType: ENVELOPE_TYPES.VARIABLE };
-      const result = validateEnvelopeTypeChange(ENVELOPE_TYPES.SINKING_FUND, envelope);
+      const result = validateEnvelopeTypeChange(
+        ENVELOPE_TYPES.SINKING_FUND,
+        envelope,
+      );
 
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain("Sinking funds require a target amount");

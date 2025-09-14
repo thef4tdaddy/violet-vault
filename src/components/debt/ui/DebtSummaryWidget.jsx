@@ -24,7 +24,9 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
           <div className="relative mr-3">
             <div className="absolute inset-0 bg-red-500 rounded-2xl blur-lg opacity-30"></div>
             <div className="relative bg-red-500 p-2 rounded-2xl">
-              {React.createElement(getIcon("TrendingDown"), { className: "h-4 w-4 text-white" })}
+              {React.createElement(getIcon("TrendingDown"), {
+                className: "h-4 w-4 text-white",
+              })}
             </div>
           </div>
           Debt Summary
@@ -36,7 +38,9 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
             className="text-base text-blue-600 hover:text-blue-700 flex items-center font-medium"
           >
             View All
-            {React.createElement(getIcon("ArrowRight"), { className: "h-4 w-4 ml-1" })}
+            {React.createElement(getIcon("ArrowRight"), {
+              className: "h-4 w-4 ml-1",
+            })}
           </button>
         )}
       </div>
@@ -45,12 +49,18 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
         {/* Key Metrics */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <p className="text-base font-medium text-gray-600 mb-1">Total Debt</p>
-            <p className="text-2xl font-bold text-red-600">${debtStats.totalDebt.toFixed(2)}</p>
+            <p className="text-base font-medium text-gray-600 mb-1">
+              Total Debt
+            </p>
+            <p className="text-2xl font-bold text-red-600">
+              ${debtStats.totalDebt.toFixed(2)}
+            </p>
           </div>
 
           <div>
-            <p className="text-base font-medium text-gray-600 mb-1">Monthly Payments</p>
+            <p className="text-base font-medium text-gray-600 mb-1">
+              Monthly Payments
+            </p>
             <p className="text-2xl font-bold text-orange-600">
               ${debtStats.totalMonthlyPayments.toFixed(2)}
             </p>
@@ -60,7 +70,9 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
         {/* Average Interest Rate */}
         {debtStats.averageInterestRate > 0 && (
           <div>
-            <p className="text-base font-medium text-gray-600 mb-1">Avg Interest Rate</p>
+            <p className="text-base font-medium text-gray-600 mb-1">
+              Avg Interest Rate
+            </p>
             <p className="text-lg font-bold text-purple-600">
               {debtStats.averageInterestRate.toFixed(2)}% APR
             </p>

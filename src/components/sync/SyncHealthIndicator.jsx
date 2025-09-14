@@ -26,7 +26,8 @@ const SyncHealthIndicator = ({ onOpenSettings }) => {
   useEffect(() => {
     // Check if sync is running by monitoring the service state
     const checkSyncActivity = () => {
-      const isRunning = cloudSyncService.isRunning && cloudSyncService.activeSyncPromise;
+      const isRunning =
+        cloudSyncService.isRunning && cloudSyncService.activeSyncPromise;
       setIsBackgroundSyncing(isRunning);
     };
 
@@ -89,7 +90,10 @@ const SyncHealthIndicator = ({ onOpenSettings }) => {
             fill="none"
             opacity="0.25"
           />
-          <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          <path
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+          />
         </svg>
       );
     }

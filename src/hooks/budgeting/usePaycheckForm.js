@@ -1,12 +1,19 @@
 import { useState, useEffect, useRef } from "react";
 import { globalToast } from "../../stores/ui/toastStore";
-import { getUniquePayers, getPayerPrediction } from "../../utils/budgeting/paycheckAllocationUtils";
+import {
+  getUniquePayers,
+  getPayerPrediction,
+} from "../../utils/budgeting/paycheckAllocationUtils";
 import logger from "../../utils/common/logger";
 
 /**
  * Hook to initialize new payer state for first-time users
  */
-const useInitializeNewPayerState = (uniquePayersLength, setShowAddNewPayer, initialRender) => {
+const useInitializeNewPayerState = (
+  uniquePayersLength,
+  setShowAddNewPayer,
+  initialRender,
+) => {
   useEffect(() => {
     if (initialRender.current) {
       const hasNoPaychecks = uniquePayersLength === 0;
@@ -20,7 +27,11 @@ const useInitializeNewPayerState = (uniquePayersLength, setShowAddNewPayer, init
  * Custom hook for paycheck form state management
  * Handles all form-related state and logic
  */
-export const usePaycheckForm = ({ paycheckHistory, currentUser, onProcessPaycheck }) => {
+export const usePaycheckForm = ({
+  paycheckHistory,
+  currentUser,
+  onProcessPaycheck,
+}) => {
   // Form state
   const [paycheckAmount, setPaycheckAmount] = useState("");
   const [payerName, setPayerName] = useState(currentUser?.userName || "");
@@ -39,7 +50,11 @@ export const usePaycheckForm = ({ paycheckHistory, currentUser, onProcessPaychec
   const uniquePayers = getUniquePayers(paycheckHistory, tempPayers);
 
   // Initialize add new payer state for new users
-  useInitializeNewPayerState(uniquePayers.length, setShowAddNewPayer, initialRender);
+  useInitializeNewPayerState(
+    uniquePayers.length,
+    setShowAddNewPayer,
+    initialRender,
+  );
 
   // Form handlers
   const handlePayerChange = (selectedPayer) => {

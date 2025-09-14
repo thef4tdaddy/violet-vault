@@ -59,7 +59,8 @@ const SuggestionsList = ({
     <div className="space-y-4">
       {["high", "medium", "low"].map((priority) => {
         const prioritySuggestions = groupedSuggestions[priority];
-        if (!prioritySuggestions || prioritySuggestions.length === 0) return null;
+        if (!prioritySuggestions || prioritySuggestions.length === 0)
+          return null;
 
         const config = priorityConfig[priority];
 
@@ -100,7 +101,8 @@ const SuggestionsList = ({
         <div className="text-center py-4 border-t border-gray-200 mt-6">
           <p className="text-sm text-gray-600">
             Showing {suggestions.length} suggestion
-            {suggestions.length !== 1 ? "s" : ""} based on your recent spending patterns
+            {suggestions.length !== 1 ? "s" : ""} based on your recent spending
+            patterns
           </p>
         </div>
       )}

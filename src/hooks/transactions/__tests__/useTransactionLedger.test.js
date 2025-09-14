@@ -178,7 +178,9 @@ describe("useTransactionLedger", () => {
 
   it("should calculate total pages correctly", () => {
     // Mock filtered transactions
-    require("../useTransactionFilters").useTransactionFilters.mockReturnValue(new Array(25)); // 25 items
+    require("../useTransactionFilters").useTransactionFilters.mockReturnValue(
+      new Array(25),
+    ); // 25 items
 
     const { result } = renderHook(() => useTransactionLedger(mockCurrentUser), {
       wrapper: createWrapper(),

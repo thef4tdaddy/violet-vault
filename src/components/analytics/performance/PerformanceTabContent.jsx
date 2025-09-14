@@ -7,7 +7,11 @@ import PerformanceRecommendationsTab from "./PerformanceRecommendationsTab";
  * PerformanceTabContent component - renders active tab content
  * Extracted from PerformanceMonitor.jsx for better organization
  */
-const PerformanceTabContent = ({ selectedMetric, performanceHistory, performanceMetrics }) => {
+const PerformanceTabContent = ({
+  selectedMetric,
+  performanceHistory,
+  performanceMetrics,
+}) => {
   switch (selectedMetric) {
     case "overview":
       return <PerformanceOverviewTab performanceHistory={performanceHistory} />;
@@ -16,7 +20,11 @@ const PerformanceTabContent = ({ selectedMetric, performanceHistory, performance
       return <PerformanceAlertsTab alerts={performanceMetrics.alerts} />;
 
     case "recommendations":
-      return <PerformanceRecommendationsTab recommendations={performanceMetrics.recommendations} />;
+      return (
+        <PerformanceRecommendationsTab
+          recommendations={performanceMetrics.recommendations}
+        />
+      );
 
     default:
       return <PerformanceOverviewTab performanceHistory={performanceHistory} />;

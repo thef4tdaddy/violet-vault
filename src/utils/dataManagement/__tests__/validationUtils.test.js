@@ -6,14 +6,14 @@ describe("validationUtils", () => {
 
     it("should throw an error for invalid JSON", () => {
       expect(() => validateImportedData(null, currentUser)).toThrow(
-        "Invalid backup file: not a valid JSON object."
+        "Invalid backup file: not a valid JSON object.",
       );
     });
 
     it("should throw an error for missing envelopes data", () => {
       const importedData = { bills: [] };
       expect(() => validateImportedData(importedData, currentUser)).toThrow(
-        "Invalid backup file: missing or invalid envelopes data."
+        "Invalid backup file: missing or invalid envelopes data.",
       );
     });
 
@@ -26,7 +26,7 @@ describe("validationUtils", () => {
       };
       const { validatedData, hasBudgetIdMismatch } = validateImportedData(
         importedData,
-        currentUser
+        currentUser,
       );
       expect(validatedData).toBeDefined();
       expect(hasBudgetIdMismatch).toBe(false);
@@ -37,7 +37,10 @@ describe("validationUtils", () => {
         envelopes: [],
         exportMetadata: { budgetId: "456" },
       };
-      const { hasBudgetIdMismatch } = validateImportedData(importedData, currentUser);
+      const { hasBudgetIdMismatch } = validateImportedData(
+        importedData,
+        currentUser,
+      );
       expect(hasBudgetIdMismatch).toBe(true);
     });
   });

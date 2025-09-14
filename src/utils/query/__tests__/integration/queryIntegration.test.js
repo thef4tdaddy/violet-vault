@@ -78,7 +78,12 @@ describe("Query Integration Tests", () => {
         amount: -Math.random() * 100 - 10, // $10-$110 expenses
         description: `Transaction ${i + 1}`,
         envelopeId: i % 3 === 0 ? "env1" : i % 3 === 1 ? "env2" : "env3",
-        category: i % 3 === 0 ? "expenses" : i % 3 === 1 ? "transportation" : "deprecated",
+        category:
+          i % 3 === 0
+            ? "expenses"
+            : i % 3 === 1
+              ? "transportation"
+              : "deprecated",
         date: new Date(Date.now() - i * 3600000).toISOString(), // 1 hour intervals
         type: "expense",
         lastModified: Date.now() - i * 1000,
@@ -177,7 +182,11 @@ describe("Query Integration Tests", () => {
     it("should generate consistent query keys", () => {
       // Test basic key generation
       const envelopeListKey = queryKeys.envelopesList({ category: "expenses" });
-      expect(envelopeListKey).toEqual(["envelopes", "list", { category: "expenses" }]);
+      expect(envelopeListKey).toEqual([
+        "envelopes",
+        "list",
+        { category: "expenses" },
+      ]);
 
       // Test key utilities
       expect(queryKeyUtils.getEntityType(envelopeListKey)).toBe("envelopes");
@@ -185,8 +194,12 @@ describe("Query Integration Tests", () => {
       expect(queryKeyUtils.isValidQueryKey(envelopeListKey)).toBe(true);
 
       // Test key matching
-      expect(queryKeyUtils.matchesPattern(envelopeListKey, ["envelopes"])).toBe(true);
-      expect(queryKeyUtils.matchesPattern(envelopeListKey, ["transactions"])).toBe(false);
+      expect(queryKeyUtils.matchesPattern(envelopeListKey, ["envelopes"])).toBe(
+        true,
+      );
+      expect(
+        queryKeyUtils.matchesPattern(envelopeListKey, ["transactions"]),
+      ).toBe(false);
     });
 
     it("should create hierarchical keys correctly", () => {
@@ -195,10 +208,15 @@ describe("Query Integration Tests", () => {
         "spending",
         "monthly",
         null, // Should be filtered out
-        "2024"
+        "2024",
       );
 
-      expect(hierarchicalKey).toEqual(["analytics", "spending", "monthly", "2024"]);
+      expect(hierarchicalKey).toEqual([
+        "analytics",
+        "spending",
+        "monthly",
+        "2024",
+      ]);
     });
 
     it("should get related keys for invalidation", () => {
@@ -229,15 +247,17 @@ describe("Query Integration Tests", () => {
         const cachedEnvelopes = queryClient.getQueryData(
           queryKeys.envelopesList({
             includeArchived: false,
-          })
+          }),
         );
 
         expect(cachedEnvelopes).toBeTruthy();
         expect(cachedEnvelopes).toHaveLength(2); // Only non-archived
-        expect(cachedEnvelopes.find((e) => e.name === "Food & Dining")).toBeTruthy();
+        expect(
+          cachedEnvelopes.find((e) => e.name === "Food & Dining"),
+        ).toBeTruthy();
         expect(cachedEnvelopes.find((e) => e.archived === true)).toBeFalsy();
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
 
     it(
@@ -252,11 +272,11 @@ describe("Query Integration Tests", () => {
             start: yesterday,
             end: tomorrow,
           },
-          { limit: 25 }
+          { limit: 25 },
         );
 
         const cachedTransactions = queryClient.getQueryData(
-          queryKeys.transactionsByDateRange(yesterday, tomorrow)
+          queryKeys.transactionsByDateRange(yesterday, tomorrow),
         );
 
         expect(cachedTransactions).toBeTruthy();
@@ -270,7 +290,7 @@ describe("Query Integration Tests", () => {
           expect(txDate.getTime()).toBeLessThanOrEqual(tomorrow.getTime());
         });
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
 
     it(
@@ -285,18 +305,22 @@ describe("Query Integration Tests", () => {
           queryKeys.billsList({
             isPaid: false,
             daysAhead: 30,
-          })
+          }),
         );
 
         expect(cachedBills).toBeTruthy();
         expect(cachedBills).toHaveLength(3); // All bills are unpaid in test data
 
         // Should include overdue bills
-        const overdueBill = cachedBills.find((bill) => bill.name === "Phone Bill");
+        const overdueBill = cachedBills.find(
+          (bill) => bill.name === "Phone Bill",
+        );
         expect(overdueBill).toBeTruthy();
-        expect(new Date(overdueBill.dueDate).getTime()).toBeLessThan(Date.now());
+        expect(new Date(overdueBill.dueDate).getTime()).toBeLessThan(
+          Date.now(),
+        );
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
 
     it(
@@ -304,7 +328,9 @@ describe("Query Integration Tests", () => {
       async () => {
         await prefetchHelpers.prefetchDashboard(queryClient);
 
-        const dashboardData = queryClient.getQueryData(queryKeys.dashboardSummary());
+        const dashboardData = queryClient.getQueryData(
+          queryKeys.dashboardSummary(),
+        );
 
         expect(dashboardData).toBeTruthy();
         expect(dashboardData.totalEnvelopes).toBe(3);
@@ -314,27 +340,34 @@ describe("Query Integration Tests", () => {
         expect(dashboardData.actualBalance).toBe(8750.25);
         expect(dashboardData.lastUpdated).toBeTruthy();
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
 
     it(
       "should prefetch bundle of related data",
       async () => {
-        const results = await prefetchHelpers.prefetchDashboardBundle(queryClient);
+        const results =
+          await prefetchHelpers.prefetchDashboardBundle(queryClient);
 
         expect(results).toHaveLength(4);
 
         // Verify all prefetch operations completed
-        const fulfilledCount = results.filter((r) => r.status === "fulfilled").length;
+        const fulfilledCount = results.filter(
+          (r) => r.status === "fulfilled",
+        ).length;
         expect(fulfilledCount).toBeGreaterThanOrEqual(3); // Allow for some failures in test env
 
         // Check that data exists in cache
-        expect(queryClient.getQueryData(queryKeys.dashboardSummary())).toBeTruthy();
         expect(
-          queryClient.getQueryData(queryKeys.envelopesList({ includeArchived: false }))
+          queryClient.getQueryData(queryKeys.dashboardSummary()),
+        ).toBeTruthy();
+        expect(
+          queryClient.getQueryData(
+            queryKeys.envelopesList({ includeArchived: false }),
+          ),
         ).toBeTruthy();
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
   });
 
@@ -344,11 +377,16 @@ describe("Query Integration Tests", () => {
       async () => {
         // Get initial envelope data
         const initialEnvelopes = await budgetDatabaseService.getEnvelopes();
-        const foodEnvelope = initialEnvelopes.find((e) => e.name === "Food & Dining");
+        const foodEnvelope = initialEnvelopes.find(
+          (e) => e.name === "Food & Dining",
+        );
 
         // Set initial cache state
         queryClient.setQueryData(queryKeys.envelopesList(), initialEnvelopes);
-        queryClient.setQueryData(queryKeys.envelopeById(foodEnvelope.id), foodEnvelope);
+        queryClient.setQueryData(
+          queryKeys.envelopeById(foodEnvelope.id),
+          foodEnvelope,
+        );
 
         // Perform optimistic update
         const updates = {
@@ -356,21 +394,29 @@ describe("Query Integration Tests", () => {
           name: "Food & Groceries",
         };
 
-        await optimisticHelpers.updateEnvelope(queryClient, foodEnvelope.id, updates);
+        await optimisticHelpers.updateEnvelope(
+          queryClient,
+          foodEnvelope.id,
+          updates,
+        );
 
         // Check cache was updated
-        const cachedEnvelope = queryClient.getQueryData(queryKeys.envelopeById(foodEnvelope.id));
+        const cachedEnvelope = queryClient.getQueryData(
+          queryKeys.envelopeById(foodEnvelope.id),
+        );
         expect(cachedEnvelope.balance).toBe(300.0);
         expect(cachedEnvelope.name).toBe("Food & Groceries");
         expect(cachedEnvelope.lastModified).toBeTruthy();
 
         // Check database was updated
         const dbEnvelopes = await budgetDatabaseService.getEnvelopes();
-        const updatedEnvelope = dbEnvelopes.find((e) => e.id === foodEnvelope.id);
+        const updatedEnvelope = dbEnvelopes.find(
+          (e) => e.id === foodEnvelope.id,
+        );
         expect(updatedEnvelope.balance).toBe(300.0);
         expect(updatedEnvelope.name).toBe("Food & Groceries");
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
 
     it(
@@ -391,7 +437,9 @@ describe("Query Integration Tests", () => {
         await optimisticHelpers.addEnvelope(queryClient, newEnvelope);
 
         // Check cache was updated
-        const cachedEnvelopes = queryClient.getQueryData(queryKeys.envelopesList());
+        const cachedEnvelopes = queryClient.getQueryData(
+          queryKeys.envelopesList(),
+        );
         expect(cachedEnvelopes).toHaveLength(4); // 3 original + 1 new
         expect(cachedEnvelopes[0].id).toBe("env_new"); // Should be first (newly added)
 
@@ -401,18 +449,23 @@ describe("Query Integration Tests", () => {
         expect(addedEnvelope).toBeTruthy();
         expect(addedEnvelope.name).toBe("Entertainment");
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
 
     it(
       "should handle batch updates correctly",
       async () => {
         const initialEnvelopes = await budgetDatabaseService.getEnvelopes();
-        const initialTransactions = await budgetDatabaseService.getTransactions({ limit: 10 });
+        const initialTransactions = await budgetDatabaseService.getTransactions(
+          { limit: 10 },
+        );
 
         // Set initial cache
         queryClient.setQueryData(queryKeys.envelopesList(), initialEnvelopes);
-        queryClient.setQueryData(queryKeys.transactionsList(), initialTransactions);
+        queryClient.setQueryData(
+          queryKeys.transactionsList(),
+          initialTransactions,
+        );
 
         const batchUpdates = {
           envelopes: [
@@ -427,16 +480,23 @@ describe("Query Integration Tests", () => {
 
         // Verify envelope updates in database
         const updatedEnvelopes = await budgetDatabaseService.getEnvelopes();
-        expect(updatedEnvelopes.find((e) => e.id === initialEnvelopes[0].id).balance).toBe(999.99);
-        expect(updatedEnvelopes.find((e) => e.id === initialEnvelopes[1].id).balance).toBe(888.88);
+        expect(
+          updatedEnvelopes.find((e) => e.id === initialEnvelopes[0].id).balance,
+        ).toBe(999.99);
+        expect(
+          updatedEnvelopes.find((e) => e.id === initialEnvelopes[1].id).balance,
+        ).toBe(888.88);
 
         // Verify transaction updates in database
-        const updatedTransactions = await budgetDatabaseService.getTransactions({ limit: 10 });
-        expect(updatedTransactions.find((t) => t.id === initialTransactions[0].id).amount).toBe(
-          -123.45
+        const updatedTransactions = await budgetDatabaseService.getTransactions(
+          { limit: 10 },
         );
+        expect(
+          updatedTransactions.find((t) => t.id === initialTransactions[0].id)
+            .amount,
+        ).toBe(-123.45);
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
 
     it(
@@ -446,11 +506,16 @@ describe("Query Integration Tests", () => {
         const testEnvelope = initialEnvelopes[0];
 
         // Set cache with original data
-        queryClient.setQueryData(queryKeys.envelopeById(testEnvelope.id), testEnvelope);
+        queryClient.setQueryData(
+          queryKeys.envelopeById(testEnvelope.id),
+          testEnvelope,
+        );
 
         // Mock database failure
         const originalUpdate = budgetDb.envelopes.update;
-        budgetDb.envelopes.update = vi.fn().mockRejectedValue(new Error("Database error"));
+        budgetDb.envelopes.update = vi
+          .fn()
+          .mockRejectedValue(new Error("Database error"));
 
         try {
           // This should still update cache but log database error
@@ -459,7 +524,9 @@ describe("Query Integration Tests", () => {
           });
 
           // Cache should still be updated (optimistic)
-          const cachedEnvelope = queryClient.getQueryData(queryKeys.envelopeById(testEnvelope.id));
+          const cachedEnvelope = queryClient.getQueryData(
+            queryKeys.envelopeById(testEnvelope.id),
+          );
           expect(cachedEnvelope.balance).toBe(99999);
 
           // But database should remain unchanged
@@ -471,7 +538,7 @@ describe("Query Integration Tests", () => {
           budgetDb.envelopes.update = originalUpdate;
         }
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
   });
 
@@ -494,7 +561,7 @@ describe("Query Integration Tests", () => {
         expect(typeof stats.fetchingQueries).toBe("number");
         expect(typeof stats.errorQueries).toBe("number");
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
 
     it(
@@ -506,7 +573,9 @@ describe("Query Integration Tests", () => {
         queryClient.setQueryData(queryKeys.budgetMetadata, { cash: 1000 });
 
         // Verify data exists
-        expect(queryClient.getQueryData(queryKeys.envelopesList())).toBeTruthy();
+        expect(
+          queryClient.getQueryData(queryKeys.envelopesList()),
+        ).toBeTruthy();
 
         // Batch invalidate envelope-related queries
         const relatedKeys = queryKeyUtils.getRelatedKeys("envelopes");
@@ -517,10 +586,12 @@ describe("Query Integration Tests", () => {
         const allQueries = cache.getAll();
 
         // Queries should still exist but be marked as stale
-        const envelopeQuery = allQueries.find((q) => q.queryKey[0] === "envelopes");
+        const envelopeQuery = allQueries.find(
+          (q) => q.queryKey[0] === "envelopes",
+        );
         expect(envelopeQuery).toBeTruthy();
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
 
     it(
@@ -541,7 +612,7 @@ describe("Query Integration Tests", () => {
         queryClientUtils.clearEntityCache("test");
         expect(queryClientUtils.hasQueryData(queryKey)).toBe(false);
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
   });
 
@@ -579,7 +650,7 @@ describe("Query Integration Tests", () => {
         expect(queryTime).toBeLessThan(1000); // 1 second
         expect(limitedResults).toHaveLength(50);
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
 
     it(
@@ -597,7 +668,7 @@ describe("Query Integration Tests", () => {
         const finalStats = queryClientUtils.getCacheStats();
         expect(finalStats.totalQueries).toBe(0);
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
 
     it(
@@ -618,14 +689,16 @@ describe("Query Integration Tests", () => {
         const results = await Promise.allSettled(concurrentOperations);
 
         // Most operations should succeed
-        const successCount = results.filter((r) => r.status === "fulfilled").length;
+        const successCount = results.filter(
+          (r) => r.status === "fulfilled",
+        ).length;
         expect(successCount).toBeGreaterThanOrEqual(3);
 
         // Cache should contain data from successful operations
         const stats = queryClientUtils.getCacheStats();
         expect(stats.totalQueries).toBeGreaterThan(0);
       },
-      TEST_TIMEOUT
+      TEST_TIMEOUT,
     );
   });
 });

@@ -20,7 +20,11 @@ export const validateReceiptData = (receiptData) => {
     errors.push("Merchant name is required");
   }
 
-  if (!receiptData.total || isNaN(receiptData.total) || receiptData.total <= 0) {
+  if (
+    !receiptData.total ||
+    isNaN(receiptData.total) ||
+    receiptData.total <= 0
+  ) {
     errors.push("Valid total amount is required");
   }
 
@@ -142,7 +146,7 @@ export const isReceiptDataComplete = (receiptData) => {
       receiptData.merchant &&
       receiptData.total &&
       receiptData.total > 0 &&
-      receiptData.date
+      receiptData.date,
   );
 };
 

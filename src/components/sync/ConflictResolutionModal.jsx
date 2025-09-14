@@ -5,7 +5,11 @@ import { getIcon } from "../../utils";
  * Conflict resolution modal component
  * Extracted from Layout.jsx for better organization
  */
-const ConflictResolutionModal = ({ syncConflicts, onResolveConflict, onDismiss }) => {
+const ConflictResolutionModal = ({
+  syncConflicts,
+  onResolveConflict,
+  onDismiss,
+}) => {
   if (!syncConflicts?.hasConflict) return null;
 
   return (
@@ -15,17 +19,20 @@ const ConflictResolutionModal = ({ syncConflicts, onResolveConflict, onDismiss }
           <div className="relative mx-auto mb-6 w-16 h-16">
             <div className="absolute inset-0 bg-amber-500 rounded-2xl blur-lg opacity-30"></div>
             <div className="relative bg-amber-500 p-4 rounded-2xl">
-              {React.createElement(getIcon("Sparkles"), { className: "h-8 w-8 text-white" })}
+              {React.createElement(getIcon("Sparkles"), {
+                className: "h-8 w-8 text-white",
+              })}
             </div>
           </div>
 
           <h3 className="font-black text-black text-base mb-4">
-            <span className="text-lg">S</span>YNC <span className="text-lg">C</span>ONFLICT{" "}
+            <span className="text-lg">S</span>YNC{" "}
+            <span className="text-lg">C</span>ONFLICT{" "}
             <span className="text-lg">D</span>ETECTED
           </h3>
           <p className="text-gray-600 mb-6">
-            <strong>{syncConflicts.cloudUser?.userName}</strong> made changes on another device.
-            Would you like to load their latest changes?
+            <strong>{syncConflicts.cloudUser?.userName}</strong> made changes on
+            another device. Would you like to load their latest changes?
           </p>
 
           <div className="flex gap-3">

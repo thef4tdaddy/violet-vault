@@ -98,7 +98,8 @@ const StandardFilters = ({
         {/* Search Input */}
         <div className="relative flex-1 min-w-48">
           {React.createElement(getIcon("Search"), {
-            className: "absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400",
+            className:
+              "absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400",
           })}
           <input
             type="text"
@@ -128,8 +129,14 @@ const StandardFilters = ({
             return (
               <select
                 key={filterConfig.key}
-                value={filters[filterConfig.key] || filterConfig.defaultValue || "all"}
-                onChange={(e) => handleFilterChange(filterConfig.key, e.target.value)}
+                value={
+                  filters[filterConfig.key] ||
+                  filterConfig.defaultValue ||
+                  "all"
+                }
+                onChange={(e) =>
+                  handleFilterChange(filterConfig.key, e.target.value)
+                }
                 className={`
                   ${config.select} border border-gray-300 rounded-md
                   focus:ring-1 focus:ring-blue-500 focus:border-blue-500

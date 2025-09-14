@@ -70,10 +70,15 @@ export class ContextAnalysisService {
         domContentLoaded: navigation
           ? navigation.domContentLoadedEventEnd - navigation.fetchStart
           : null,
-        loadComplete: navigation ? navigation.loadEventEnd - navigation.fetchStart : null,
-        firstPaint: paintEntries.find((entry) => entry.name === "first-paint")?.startTime || null,
+        loadComplete: navigation
+          ? navigation.loadEventEnd - navigation.fetchStart
+          : null,
+        firstPaint:
+          paintEntries.find((entry) => entry.name === "first-paint")
+            ?.startTime || null,
         firstContentfulPaint:
-          paintEntries.find((entry) => entry.name === "first-contentful-paint")?.startTime || null,
+          paintEntries.find((entry) => entry.name === "first-contentful-paint")
+            ?.startTime || null,
         resourceCount: perf.getEntries?.()?.length || 0,
       };
     } catch (error) {
@@ -99,7 +104,7 @@ export class ContextAnalysisService {
           : null,
         headingStructure: this.getHeadingStructure(),
         landmarksCount: document.querySelectorAll(
-          '[role="main"], [role="navigation"], [role="banner"], [role="contentinfo"]'
+          '[role="main"], [role="navigation"], [role="banner"], [role="contentinfo"]',
         ).length,
         formLabels: this.checkFormLabels(),
         altTexts: this.checkImageAltTexts(),
@@ -121,11 +126,13 @@ export class ContextAnalysisService {
       return {
         available: true,
         formsWithData: document.querySelectorAll(
-          'form input[value]:not([value=""]), form textarea:not(:empty), form select option:checked'
+          'form input[value]:not([value=""]), form textarea:not(:empty), form select option:checked',
         ).length,
         tablesWithData: document.querySelectorAll("table tbody tr").length,
         listsWithData: document.querySelectorAll("ul li, ol li").length,
-        loadingStates: document.querySelectorAll('[aria-busy="true"], [class*="loading"]').length,
+        loadingStates: document.querySelectorAll(
+          '[aria-busy="true"], [class*="loading"]',
+        ).length,
       };
     } catch (error) {
       logger.debug("Error getting data state", error);
@@ -143,9 +150,11 @@ export class ContextAnalysisService {
       return {
         availableActions: UIStateService.getVisibleInteractions(),
         hasActiveForm: !!document.querySelector("form:focus-within"),
-        hasOpenModal: !!document.querySelector('[role="dialog"]:not([style*="display: none"])'),
+        hasOpenModal: !!document.querySelector(
+          '[role="dialog"]:not([style*="display: none"])',
+        ),
         keyboardNavigable: document.querySelectorAll(
-          "[tabindex], button, input, select, textarea, a[href]"
+          "[tabindex], button, input, select, textarea, a[href]",
         ).length,
       };
     } catch (error) {
@@ -206,7 +215,8 @@ export class ContextAnalysisService {
         total: inputs.length,
         labeled,
         unlabeled,
-        labelPercentage: inputs.length > 0 ? Math.round((labeled / inputs.length) * 100) : 0,
+        labelPercentage:
+          inputs.length > 0 ? Math.round((labeled / inputs.length) * 100) : 0,
       };
     } catch {
       return { total: 0, labeled: 0, unlabeled: 0, labelPercentage: 0 };
@@ -232,7 +242,8 @@ export class ContextAnalysisService {
         total: images.length,
         withAlt,
         withoutAlt,
-        altPercentage: images.length > 0 ? Math.round((withAlt / images.length) * 100) : 0,
+        altPercentage:
+          images.length > 0 ? Math.round((withAlt / images.length) * 100) : 0,
       };
     } catch {
       return { total: 0, withAlt: 0, withoutAlt: 0, altPercentage: 0 };

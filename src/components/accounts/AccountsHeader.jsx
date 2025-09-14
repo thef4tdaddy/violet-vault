@@ -1,7 +1,12 @@
 import React from "react";
 import { getIcon } from "../../utils";
 
-const AccountsHeader = ({ totalValue, showBalances, onToggleBalances, onAddAccount }) => {
+const AccountsHeader = ({
+  totalValue,
+  showBalances,
+  onToggleBalances,
+  onAddAccount,
+}) => {
   return (
     <div className="flex justify-between items-center">
       <div>
@@ -14,10 +19,12 @@ const AccountsHeader = ({ totalValue, showBalances, onToggleBalances, onAddAccou
               })}
             </div>
           </div>
-          <span className="text-lg">S</span>UPPLEMENTAL <span className="text-lg">A</span>CCOUNTS
+          <span className="text-lg">S</span>UPPLEMENTAL{" "}
+          <span className="text-lg">A</span>CCOUNTS
         </h3>
         <p className="text-sm text-purple-900 mt-1 font-medium">
-          Track FSA, HSA, and other non-budget accounts • Total: ${totalValue.toFixed(2)}
+          Track FSA, HSA, and other non-budget accounts • Total: $
+          {totalValue.toFixed(2)}
         </p>
       </div>
 
@@ -25,7 +32,9 @@ const AccountsHeader = ({ totalValue, showBalances, onToggleBalances, onAddAccou
         <button
           onClick={onToggleBalances}
           className="p-2 text-gray-600 hover:text-cyan-600 rounded-lg hover:bg-cyan-50 border-2 border-transparent hover:border-cyan-200"
-          title={showBalances ? "Hide account balances" : "Show account balances"}
+          title={
+            showBalances ? "Hide account balances" : "Show account balances"
+          }
         >
           {showBalances
             ? React.createElement(getIcon("Eye"), { className: "h-4 w-4" })

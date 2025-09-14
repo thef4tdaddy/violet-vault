@@ -5777,17 +5777,13 @@
       {
         "task": "Fix no-undef warnings",
         "warningsAffected": 3,
-        "files": [
-          "CategoryNavigationTabs.jsx"
-        ],
+        "files": ["CategoryNavigationTabs.jsx"],
         "action": "Review and fix no-undef violations"
       },
       {
         "task": "Fix max-depth warnings",
         "warningsAffected": 1,
-        "files": [
-          "mutations.js"
-        ],
+        "files": ["mutations.js"],
         "action": "Reduce nesting depth - use early returns or extract nested logic"
       }
     ]

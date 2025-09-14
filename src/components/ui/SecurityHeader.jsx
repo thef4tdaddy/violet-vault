@@ -23,7 +23,9 @@ const SecurityHeader = ({
     return words.map((word, wordIndex) => (
       <React.Fragment key={wordIndex}>
         {wordIndex > 0 && " "}
-        <span className={variant === "fullscreen" ? "text-3xl" : "text-xl"}>{word[0]}</span>
+        <span className={variant === "fullscreen" ? "text-3xl" : "text-xl"}>
+          {word[0]}
+        </span>
         {word.slice(1)}
       </React.Fragment>
     ));
@@ -34,7 +36,8 @@ const SecurityHeader = ({
       ? "text-2xl font-black text-white mb-2"
       : "text-lg font-black text-black";
 
-  const subtitleStyles = variant === "fullscreen" ? "text-purple-200" : "text-sm text-purple-900";
+  const subtitleStyles =
+    variant === "fullscreen" ? "text-purple-200" : "text-sm text-purple-900";
 
   return (
     <div className={`flex items-center justify-between ${className}`}>

@@ -63,18 +63,22 @@ describe("optimisticHelpers", () => {
 
       budgetDb.envelopes.update.mockResolvedValue(true);
 
-      await optimisticHelpers.updateEnvelope(mockQueryClient, envelopeId, updates);
+      await optimisticHelpers.updateEnvelope(
+        mockQueryClient,
+        envelopeId,
+        updates,
+      );
 
       // Should update individual envelope query
       expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
         queryKeys.envelopeById(envelopeId),
-        expect.any(Function)
+        expect.any(Function),
       );
 
       // Should update envelope list query
       expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
         queryKeys.envelopesList(),
-        expect.any(Function)
+        expect.any(Function),
       );
 
       // Should update database
@@ -83,7 +87,7 @@ describe("optimisticHelpers", () => {
         expect.objectContaining({
           ...updates,
           lastModified: expect.any(Number),
-        })
+        }),
       );
     });
 
@@ -95,7 +99,11 @@ describe("optimisticHelpers", () => {
       budgetDb.envelopes.update.mockRejectedValue(error);
 
       // Should not throw error
-      await optimisticHelpers.updateEnvelope(mockQueryClient, envelopeId, updates);
+      await optimisticHelpers.updateEnvelope(
+        mockQueryClient,
+        envelopeId,
+        updates,
+      );
 
       expect(mockQueryClient.setQueryData).toHaveBeenCalled();
     });
@@ -109,17 +117,24 @@ describe("optimisticHelpers", () => {
       ];
 
       mockQueryClient.setQueryData.mockImplementation((key, updater) => {
-        if (key === queryKeys.envelopesList() && typeof updater === "function") {
+        if (
+          key === queryKeys.envelopesList() &&
+          typeof updater === "function"
+        ) {
           return updater(existingEnvelopes);
         }
         return updater;
       });
 
-      await optimisticHelpers.updateEnvelope(mockQueryClient, envelopeId, updates);
+      await optimisticHelpers.updateEnvelope(
+        mockQueryClient,
+        envelopeId,
+        updates,
+      );
 
       // Verify the updater function works correctly
       const updateFn = mockQueryClient.setQueryData.mock.calls.find(
-        (call) => call[0] === queryKeys.envelopesList()
+        (call) => call[0] === queryKeys.envelopesList(),
       )[1];
 
       const updatedList = updateFn(existingEnvelopes);
@@ -154,7 +169,7 @@ describe("optimisticHelpers", () => {
 
       expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
         queryKeys.envelopesList(),
-        expect.any(Function)
+        expect.any(Function),
       );
 
       expect(budgetDb.envelopes.add).toHaveBeenCalledWith(
@@ -162,7 +177,7 @@ describe("optimisticHelpers", () => {
           ...newEnvelope,
           createdAt: expect.any(Number),
           lastModified: expect.any(Number),
-        })
+        }),
       );
     });
 
@@ -212,7 +227,7 @@ describe("optimisticHelpers", () => {
 
       expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
         queryKeys.envelopesList(),
-        expect.any(Function)
+        expect.any(Function),
       );
 
       expect(mockQueryClient.removeQueries).toHaveBeenCalledWith({
@@ -243,16 +258,20 @@ describe("optimisticHelpers", () => {
 
       budgetDb.transactions.update.mockResolvedValue(true);
 
-      await optimisticHelpers.updateTransaction(mockQueryClient, transactionId, updates);
+      await optimisticHelpers.updateTransaction(
+        mockQueryClient,
+        transactionId,
+        updates,
+      );
 
       expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
         queryKeys.transactionById(transactionId),
-        expect.any(Function)
+        expect.any(Function),
       );
 
       expect(mockQueryClient.setQueriesData).toHaveBeenCalledWith(
         { queryKey: queryKeys.transactions },
-        expect.any(Function)
+        expect.any(Function),
       );
 
       expect(budgetDb.transactions.update).toHaveBeenCalledWith(
@@ -260,7 +279,7 @@ describe("optimisticHelpers", () => {
         expect.objectContaining({
           ...updates,
           lastModified: expect.any(Number),
-        })
+        }),
       );
     });
   });
@@ -280,7 +299,7 @@ describe("optimisticHelpers", () => {
 
       expect(mockQueryClient.setQueriesData).toHaveBeenCalledWith(
         { queryKey: queryKeys.transactions },
-        expect.any(Function)
+        expect.any(Function),
       );
 
       expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
@@ -296,7 +315,7 @@ describe("optimisticHelpers", () => {
           ...newTransaction,
           createdAt: expect.any(Number),
           lastModified: expect.any(Number),
-        })
+        }),
       );
     });
   });
@@ -312,12 +331,12 @@ describe("optimisticHelpers", () => {
 
       expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
         queryKeys.billById(billId),
-        expect.any(Function)
+        expect.any(Function),
       );
 
       expect(mockQueryClient.setQueriesData).toHaveBeenCalledWith(
         { queryKey: queryKeys.bills },
-        expect.any(Function)
+        expect.any(Function),
       );
 
       expect(budgetDb.bills.update).toHaveBeenCalledWith(
@@ -325,7 +344,7 @@ describe("optimisticHelpers", () => {
         expect.objectContaining({
           ...updates,
           lastModified: expect.any(Number),
-        })
+        }),
       );
     });
   });
@@ -340,24 +359,26 @@ describe("optimisticHelpers", () => {
 
       expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
         queryKeys.budgetMetadata,
-        expect.any(Function)
+        expect.any(Function),
       );
 
       expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
         queryKeys.unassignedCash(),
-        updates.unassignedCash
+        updates.unassignedCash,
       );
 
       expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
         queryKeys.actualBalance(),
-        updates.actualBalance
+        updates.actualBalance,
       );
 
       expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
         queryKey: queryKeys.dashboard,
       });
 
-      expect(budgetDatabaseService.saveBudgetMetadata).toHaveBeenCalledWith(updates);
+      expect(budgetDatabaseService.saveBudgetMetadata).toHaveBeenCalledWith(
+        updates,
+      );
     });
 
     it("should handle partial metadata updates", async () => {
@@ -367,12 +388,12 @@ describe("optimisticHelpers", () => {
 
       expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
         queryKeys.unassignedCash(),
-        updates.unassignedCash
+        updates.unassignedCash,
       );
 
       // Should not call actualBalance setter if not in updates
       const actualBalanceCalls = mockQueryClient.setQueryData.mock.calls.filter(
-        (call) => call[0] === queryKeys.actualBalance()
+        (call) => call[0] === queryKeys.actualBalance(),
       );
       expect(actualBalanceCalls).toHaveLength(0);
     });
@@ -393,20 +414,32 @@ describe("optimisticHelpers", () => {
 
       await optimisticHelpers.batchUpdate(mockQueryClient, updates);
 
-      expect(optimisticHelpers.updateEnvelope).toHaveBeenCalledWith(mockQueryClient, "env1", {
-        id: "env1",
-        balance: 500,
-      });
+      expect(optimisticHelpers.updateEnvelope).toHaveBeenCalledWith(
+        mockQueryClient,
+        "env1",
+        {
+          id: "env1",
+          balance: 500,
+        },
+      );
 
-      expect(optimisticHelpers.updateTransaction).toHaveBeenCalledWith(mockQueryClient, "tx1", {
-        id: "tx1",
-        amount: 150,
-      });
+      expect(optimisticHelpers.updateTransaction).toHaveBeenCalledWith(
+        mockQueryClient,
+        "tx1",
+        {
+          id: "tx1",
+          amount: 150,
+        },
+      );
 
-      expect(optimisticHelpers.updateBill).toHaveBeenCalledWith(mockQueryClient, "bill1", {
-        id: "bill1",
-        isPaid: true,
-      });
+      expect(optimisticHelpers.updateBill).toHaveBeenCalledWith(
+        mockQueryClient,
+        "bill1",
+        {
+          id: "bill1",
+          isPaid: true,
+        },
+      );
 
       expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
         queryKey: queryKeys.dashboard,
@@ -437,15 +470,26 @@ describe("optimisticHelpers", () => {
       const queryKey = ["envelopes", "list"];
       const previousData = [{ id: "env1", name: "Food" }];
 
-      await optimisticHelpers.rollbackUpdate(mockQueryClient, queryKey, previousData);
+      await optimisticHelpers.rollbackUpdate(
+        mockQueryClient,
+        queryKey,
+        previousData,
+      );
 
-      expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(queryKey, previousData);
+      expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
+        queryKey,
+        previousData,
+      );
     });
 
     it("should invalidate when no previous data", async () => {
       const queryKey = ["envelopes", "list"];
 
-      await optimisticHelpers.rollbackUpdate(mockQueryClient, queryKey, undefined);
+      await optimisticHelpers.rollbackUpdate(
+        mockQueryClient,
+        queryKey,
+        undefined,
+      );
 
       expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
         queryKey,
@@ -460,12 +504,15 @@ describe("optimisticHelpers", () => {
       const updateFn = vi.fn((old, variables) => [...old, variables.newItem]);
       const rollbackFn = vi.fn();
 
-      const config = optimisticHelpers.createOptimisticMutation(mockQueryClient, {
-        mutationKey,
-        queryKey,
-        updateFn,
-        rollbackFn,
-      });
+      const config = optimisticHelpers.createOptimisticMutation(
+        mockQueryClient,
+        {
+          mutationKey,
+          queryKey,
+          updateFn,
+          rollbackFn,
+        },
+      );
 
       expect(config).toHaveProperty("mutationKey", mutationKey);
       expect(config).toHaveProperty("onMutate");
@@ -484,18 +531,24 @@ describe("optimisticHelpers", () => {
       mockQueryClient.cancelQueries.mockResolvedValue();
       mockQueryClient.getQueryData.mockReturnValue(previousData);
 
-      const config = optimisticHelpers.createOptimisticMutation(mockQueryClient, {
-        mutationKey: ["test"],
-        queryKey,
-        updateFn,
-      });
+      const config = optimisticHelpers.createOptimisticMutation(
+        mockQueryClient,
+        {
+          mutationKey: ["test"],
+          queryKey,
+          updateFn,
+        },
+      );
 
       const variables = { newItem: { id: "env2" } };
       const context = await config.onMutate(variables);
 
       expect(mockQueryClient.cancelQueries).toHaveBeenCalledWith({ queryKey });
       expect(mockQueryClient.getQueryData).toHaveBeenCalledWith(queryKey);
-      expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(queryKey, expect.any(Function));
+      expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
+        queryKey,
+        expect.any(Function),
+      );
       expect(context.previousData).toEqual(previousData);
     });
 
@@ -504,11 +557,14 @@ describe("optimisticHelpers", () => {
       const previousData = [{ id: "env1" }];
       const rollbackFn = vi.fn();
 
-      const config = optimisticHelpers.createOptimisticMutation(mockQueryClient, {
-        mutationKey: ["test"],
-        queryKey,
-        rollbackFn,
-      });
+      const config = optimisticHelpers.createOptimisticMutation(
+        mockQueryClient,
+        {
+          mutationKey: ["test"],
+          queryKey,
+          rollbackFn,
+        },
+      );
 
       const error = new Error("Mutation failed");
       const variables = { id: "env1" };
@@ -516,17 +572,23 @@ describe("optimisticHelpers", () => {
 
       config.onError(error, variables, context);
 
-      expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(queryKey, previousData);
+      expect(mockQueryClient.setQueryData).toHaveBeenCalledWith(
+        queryKey,
+        previousData,
+      );
       expect(rollbackFn).toHaveBeenCalledWith(error, variables, context);
     });
 
     it("should handle onSettled correctly", () => {
       const queryKey = ["envelopes", "list"];
 
-      const config = optimisticHelpers.createOptimisticMutation(mockQueryClient, {
-        mutationKey: ["test"],
-        queryKey,
-      });
+      const config = optimisticHelpers.createOptimisticMutation(
+        mockQueryClient,
+        {
+          mutationKey: ["test"],
+          queryKey,
+        },
+      );
 
       config.onSettled();
 

@@ -11,7 +11,9 @@ const HealthTab = ({ envelopeHealth, budgetVsActual }) => {
       {/* Envelope Health Overview */}
       {envelopeHealth && envelopeHealth.length > 0 && (
         <div className="glassmorphism rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Envelope Health Status</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Envelope Health Status
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {envelopeHealth
               .filter(Boolean)
@@ -22,7 +24,9 @@ const HealthTab = ({ envelopeHealth, budgetVsActual }) => {
                   className="bg-white/60 rounded-lg p-4 border border-gray-200"
                 >
                   <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-medium text-gray-900 text-sm">{envelope.name}</h4>
+                    <h4 className="font-medium text-gray-900 text-sm">
+                      {envelope.name}
+                    </h4>
                     <span
                       className={`px-2 py-1 text-xs rounded-full font-medium ${
                         envelope.status === "critical"

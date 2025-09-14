@@ -7,10 +7,14 @@ const ArchivingHeader = ({ onRefresh, isLoading }) => {
       <div className="flex items-start justify-between">
         <div className="flex items-center space-x-3">
           <div className="bg-purple-100 p-3 rounded-lg">
-            {React.createElement(getIcon("Archive"), { className: "h-6 w-6 text-purple-600" })}
+            {React.createElement(getIcon("Archive"), {
+              className: "h-6 w-6 text-purple-600",
+            })}
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Transaction Archiving</h2>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Transaction Archiving
+            </h2>
             <p className="text-gray-600 mt-1">
               Archive old transactions while preserving analytics data
             </p>

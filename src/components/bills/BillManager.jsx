@@ -117,7 +117,7 @@ const BillManager = ({
   const { budgetId, currentUser } = useAuth();
   const { isLocked: isEditLocked, currentEditor } = useEditLock(
     `bills-${budgetId}`,
-    currentUser?.userName || "User"
+    currentUser?.userName || "User",
   );
 
   // Loading state
@@ -227,7 +227,10 @@ const BillManager = ({
           onCreateRecurring={(bill) => {
             // Handle making a one-time bill recurring
             // TODO: Implement recurring bill functionality
-            logger.warn("Recurring bill creation not yet implemented:", bill.name);
+            logger.warn(
+              "Recurring bill creation not yet implemented:",
+              bill.name,
+            );
           }}
         />
       )}

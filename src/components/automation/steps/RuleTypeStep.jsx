@@ -6,7 +6,9 @@ const RuleTypeStep = ({ ruleData, updateRuleData, errors }) => {
   return (
     <div className="space-y-6">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Rule Name *</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Rule Name *
+        </label>
         <input
           type="text"
           value={ruleData.name}
@@ -18,7 +20,9 @@ const RuleTypeStep = ({ ruleData, updateRuleData, errors }) => {
         />
         {errors.name && (
           <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-            {React.createElement(getIcon("AlertCircle"), { className: "h-4 w-4" })}
+            {React.createElement(getIcon("AlertCircle"), {
+              className: "h-4 w-4",
+            })}
             {errors.name}
           </p>
         )}
@@ -38,7 +42,9 @@ const RuleTypeStep = ({ ruleData, updateRuleData, errors }) => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-3">Rule Type *</label>
+        <label className="block text-sm font-medium text-gray-700 mb-3">
+          Rule Type *
+        </label>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
             {
@@ -103,7 +109,9 @@ const RuleTypeStep = ({ ruleData, updateRuleData, errors }) => {
         </div>
         {errors.type && (
           <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
-            {React.createElement(getIcon("AlertCircle"), { className: "h-4 w-4" })}
+            {React.createElement(getIcon("AlertCircle"), {
+              className: "h-4 w-4",
+            })}
             {errors.type}
           </p>
         )}

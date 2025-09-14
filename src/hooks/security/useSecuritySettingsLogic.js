@@ -6,8 +6,13 @@ import { useSecurityManager } from "../auth/useSecurityManager";
  * Extracted from 427-line SecuritySettings.jsx for better maintainability
  */
 export const useSecuritySettingsLogic = () => {
-  const { isLocked, securitySettings, securityEvents, updateSettings, clearSecurityEvents } =
-    useSecurityManager();
+  const {
+    isLocked,
+    securitySettings,
+    securityEvents,
+    updateSettings,
+    clearSecurityEvents,
+  } = useSecurityManager();
 
   // Local state for UI interactions
   const [showEvents, setShowEvents] = useState(false);
@@ -18,13 +23,14 @@ export const useSecuritySettingsLogic = () => {
     (setting, value) => {
       updateSettings({ [setting]: value });
     },
-    [updateSettings]
+    [updateSettings],
   );
 
   // Export security events to JSON file
   const exportSecurityEvents = useCallback(() => {
     const dataStr = JSON.stringify(securityEvents, null, 2);
-    const dataUri = "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
+    const dataUri =
+      "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
     const exportFileDefaultName = `security-events-${new Date().toISOString().split("T")[0]}.json`;
 
     const linkElement = document.createElement("a");

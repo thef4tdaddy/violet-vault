@@ -5,13 +5,20 @@ import { TrendLineChart, CategoryBarChart } from "../../charts";
  * Trends tab content for analytics
  * Extracted from ChartsAndAnalytics.jsx to reduce complexity
  */
-const TrendsTab = ({ chartType, handleChartTypeChange, monthlyTrends, weeklyPatterns }) => {
+const TrendsTab = ({
+  chartType,
+  handleChartTypeChange,
+  monthlyTrends,
+  weeklyPatterns,
+}) => {
   return (
     <div className="space-y-6">
       {/* Spending Trends Chart */}
       <div className="glassmorphism rounded-xl p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Spending Trends</h3>
+          <h3 className="text-lg font-semibold text-gray-900">
+            Spending Trends
+          </h3>
           <div className="flex gap-2">
             {["line", "bar", "area"].map((type) => (
               <button
@@ -39,7 +46,9 @@ const TrendsTab = ({ chartType, handleChartTypeChange, monthlyTrends, weeklyPatt
       {/* Weekly Patterns */}
       {weeklyPatterns && weeklyPatterns.length > 0 && (
         <div className="glassmorphism rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Weekly Spending Patterns</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Weekly Spending Patterns
+          </h3>
           <CategoryBarChart
             data={weeklyPatterns.filter(Boolean)}
             height={300}

@@ -28,7 +28,9 @@ const SettingsLayout = ({
             <div className="p-6">
               <div className="flex items-center mb-6">
                 <h2 className="font-black text-black text-base flex items-center">
-                  {React.createElement(getIcon("Settings"), { className: "h-5 w-5 mr-2" })}
+                  {React.createElement(getIcon("Settings"), {
+                    className: "h-5 w-5 mr-2",
+                  })}
                   <span className="text-lg">S</span>ETTINGS
                 </h2>
               </div>
@@ -46,7 +48,9 @@ const SettingsLayout = ({
                           : "bg-white/60 text-purple-900 hover:bg-white/80"
                       }`}
                     >
-                      {React.createElement(getIcon(section.icon), { className: "h-4 w-4 mr-3" })}
+                      {React.createElement(getIcon(section.icon), {
+                        className: "h-4 w-4 mr-3",
+                      })}
                       {section.label}
                     </button>
                   );

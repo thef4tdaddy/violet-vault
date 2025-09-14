@@ -28,14 +28,18 @@ const PercentageConfig = ({ ruleData, updateConfig, envelopes, errors }) => {
         </div>
         {errors.percentage && (
           <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-            {React.createElement(getIcon("AlertCircle"), { className: "h-4 w-4" })}
+            {React.createElement(getIcon("AlertCircle"), {
+              className: "h-4 w-4",
+            })}
             {errors.percentage}
           </p>
         )}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Target Envelope *</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Target Envelope *
+        </label>
         <select
           value={ruleData.config.targetId || ""}
           onChange={(e) => updateConfig({ targetId: e.target.value })}
@@ -53,7 +57,9 @@ const PercentageConfig = ({ ruleData, updateConfig, envelopes, errors }) => {
         </select>
         {errors.targetId && (
           <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-            {React.createElement(getIcon("AlertCircle"), { className: "h-4 w-4" })}
+            {React.createElement(getIcon("AlertCircle"), {
+              className: "h-4 w-4",
+            })}
             {errors.targetId}
           </p>
         )}

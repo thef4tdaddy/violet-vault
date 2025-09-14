@@ -72,7 +72,7 @@ export default {
 
         // Handle nested structure from frontend (data field contains actual bug report)
         const bugReport = payload.data || payload;
-        
+
         // Debug log to understand the structure
         console.log("Payload structure:", {
           hasData: !!payload.data,
@@ -93,7 +93,7 @@ export default {
                 hasDescription: !!bugReport.description,
                 payloadStructure: Object.keys(payload),
                 bugReportStructure: Object.keys(bugReport || {}),
-              }
+              },
             }),
             {
               status: 400,

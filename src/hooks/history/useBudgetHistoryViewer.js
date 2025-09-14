@@ -106,7 +106,7 @@ export const useBudgetHistoryRestore = (restore) => {
         logger.error("Failed to restore from history:", err);
       }
     },
-    [confirm, prompt, restore]
+    [confirm, prompt, restore],
   );
 
   return {
@@ -122,13 +122,21 @@ export const useBudgetHistoryUIHelpers = () => {
   const getChangeIcon = useCallback((changeType) => {
     switch (changeType) {
       case "add":
-        return React.createElement(getIcon("Plus"), { className: "h-3 w-3 text-green-600" });
+        return React.createElement(getIcon("Plus"), {
+          className: "h-3 w-3 text-green-600",
+        });
       case "delete":
-        return React.createElement(getIcon("Minus"), { className: "h-3 w-3 text-red-600" });
+        return React.createElement(getIcon("Minus"), {
+          className: "h-3 w-3 text-red-600",
+        });
       case "modify":
-        return React.createElement(getIcon("Edit3"), { className: "h-3 w-3 text-blue-600" });
+        return React.createElement(getIcon("Edit3"), {
+          className: "h-3 w-3 text-blue-600",
+        });
       default:
-        return React.createElement(getIcon("FileText"), { className: "h-3 w-3 text-gray-600" });
+        return React.createElement(getIcon("FileText"), {
+          className: "h-3 w-3 text-gray-600",
+        });
     }
   }, []);
 

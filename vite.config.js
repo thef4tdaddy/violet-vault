@@ -118,22 +118,30 @@ export default defineConfig(() => {
         output: {
           manualChunks: {
             // Vendor chunk for React ecosystem
-            'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+            "react-vendor": ["react", "react-dom", "react-router-dom"],
             // Firebase chunk (lazy loaded)
-            'firebase-vendor': ['firebase/app', 'firebase/firestore', 'firebase/auth'],
+            "firebase-vendor": [
+              "firebase/app",
+              "firebase/firestore",
+              "firebase/auth",
+            ],
             // Data libraries chunk
-            'data-vendor': ['@tanstack/react-query', 'dexie', 'zustand'],
+            "data-vendor": ["@tanstack/react-query", "dexie", "zustand"],
             // UI/Utils chunk
-            'ui-vendor': ['lucide-react', 'tailwindcss', '@tanstack/react-virtual'],
+            "ui-vendor": [
+              "lucide-react",
+              "tailwindcss",
+              "@tanstack/react-virtual",
+            ],
             // Crypto/Security chunk
-            'crypto-vendor': ['bip39', '@msgpack/msgpack', 'pako'],
+            "crypto-vendor": ["bip39", "@msgpack/msgpack", "pako"],
             // PDF/QR chunk (lazy loaded)
-            'export-vendor': ['jspdf', 'qrcode', 'qrcode.react'],
+            "export-vendor": ["jspdf", "qrcode", "qrcode.react"],
           },
         },
         // Enhanced tree-shaking (less aggressive to avoid temporal dead zone errors)
         treeshake: {
-          moduleSideEffects: ['**/*.css', '**/*.scss', '**/*.sass'],
+          moduleSideEffects: ["**/*.css", "**/*.scss", "**/*.sass"],
           propertyReadSideEffects: false,
         },
       },
@@ -163,14 +171,28 @@ export default defineConfig(() => {
               // Extremely conservative variable mangling
               keep_fnames: true,
               keep_classnames: true,
-              reserved: ['$', '_', 'global', 'globalThis', 'React', 'useState', 'useEffect', 'useCallback', 'useRef'],
+              reserved: [
+                "$",
+                "_",
+                "global",
+                "globalThis",
+                "React",
+                "useState",
+                "useEffect",
+                "useCallback",
+                "useRef",
+              ],
             },
           },
     },
     esbuild: {
       // Development mode: Keep everything for debugging
       // Production mode: Only drop debugger statements (but not in develop branch debug builds)
-      drop: isDevelopmentMode ? [] : (isProduction && !enableDebugBuild ? ["debugger"] : []),
+      drop: isDevelopmentMode
+        ? []
+        : isProduction && !enableDebugBuild
+          ? ["debugger"]
+          : [],
     },
   };
 });

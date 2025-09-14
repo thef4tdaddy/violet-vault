@@ -6,7 +6,9 @@ const ArchivingProgress = ({ isArchiving, archivingProgress }) => {
 
   return (
     <div className="bg-white rounded-xl p-6 border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Archiving in Progress</h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        Archiving in Progress
+      </h3>
 
       <div className="space-y-4">
         <div>
@@ -23,7 +25,9 @@ const ArchivingProgress = ({ isArchiving, archivingProgress }) => {
         </div>
 
         <div className="flex items-center space-x-2 text-sm text-gray-600">
-          {React.createElement(getIcon("RefreshCw"), { className: "h-4 w-4 animate-spin" })}
+          {React.createElement(getIcon("RefreshCw"), {
+            className: "h-4 w-4 animate-spin",
+          })}
           <span>Please wait while we archive your transactions...</span>
         </div>
       </div>

@@ -24,9 +24,11 @@ export class PerformanceInfoService {
         available: true,
         timing: {
           navigationStart: navigation?.fetchStart || 0,
-          domContentLoaded: navigation?.domContentLoadedEventEnd - navigation?.fetchStart || 0,
+          domContentLoaded:
+            navigation?.domContentLoadedEventEnd - navigation?.fetchStart || 0,
           loadComplete: navigation?.loadEventEnd - navigation?.fetchStart || 0,
-          domInteractive: navigation?.domInteractive - navigation?.fetchStart || 0,
+          domInteractive:
+            navigation?.domInteractive - navigation?.fetchStart || 0,
         },
         memory: memory
           ? {
@@ -206,7 +208,9 @@ export class PerformanceInfoService {
 
       // Network Information API (if available)
       const connection =
-        navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        navigator.connection ||
+        navigator.mozConnection ||
+        navigator.webkitConnection;
       if (connection) {
         networkInfo.effectiveType = connection.effectiveType;
         networkInfo.downlink = connection.downlink;
@@ -234,7 +238,9 @@ export class PerformanceInfoService {
   static getConnectionInfo() {
     try {
       const connection =
-        navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        navigator.connection ||
+        navigator.mozConnection ||
+        navigator.webkitConnection;
       if (!connection) return null;
 
       return {

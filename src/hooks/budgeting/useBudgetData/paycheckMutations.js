@@ -15,7 +15,11 @@ export const usePaycheckMutations = (envelopesQuery, savingsGoalsQuery) => {
   const processPaycheckMutation = useMutation({
     mutationKey: ["paychecks", "process"],
     mutationFn: async (paycheckData) => {
-      return await processPaycheck(paycheckData, envelopesQuery, savingsGoalsQuery);
+      return await processPaycheck(
+        paycheckData,
+        envelopesQuery,
+        savingsGoalsQuery,
+      );
     },
     onSuccess: () => {
       // Invalidate all related queries

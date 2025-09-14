@@ -5,7 +5,9 @@ const FixedAmountConfig = ({ ruleData, updateConfig, envelopes, errors }) => {
   return (
     <>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Amount to Transfer *</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Amount to Transfer *
+        </label>
         <div className="flex items-center gap-2">
           <span className="text-gray-500">$</span>
           <input
@@ -25,14 +27,18 @@ const FixedAmountConfig = ({ ruleData, updateConfig, envelopes, errors }) => {
         </div>
         {errors.amount && (
           <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-            {React.createElement(getIcon("AlertCircle"), { className: "h-4 w-4" })}
+            {React.createElement(getIcon("AlertCircle"), {
+              className: "h-4 w-4",
+            })}
             {errors.amount}
           </p>
         )}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Target Envelope *</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Target Envelope *
+        </label>
         <select
           value={ruleData.config.targetId || ""}
           onChange={(e) => updateConfig({ targetId: e.target.value })}
@@ -50,7 +56,9 @@ const FixedAmountConfig = ({ ruleData, updateConfig, envelopes, errors }) => {
         </select>
         {errors.targetId && (
           <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-            {React.createElement(getIcon("AlertCircle"), { className: "h-4 w-4" })}
+            {React.createElement(getIcon("AlertCircle"), {
+              className: "h-4 w-4",
+            })}
             {errors.targetId}
           </p>
         )}

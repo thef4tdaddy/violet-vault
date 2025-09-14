@@ -2,7 +2,9 @@ import React, { Suspense } from "react";
 import { getIcon } from "../../../utils";
 
 // Lazy load the history viewer for better performance
-const ObjectHistoryViewer = React.lazy(() => import("../../history/ObjectHistoryViewer"));
+const ObjectHistoryViewer = React.lazy(
+  () => import("../../history/ObjectHistoryViewer"),
+);
 
 const EnvelopeHistoryModal = ({ isOpen = false, onClose, envelope }) => {
   if (!isOpen || !envelope) return null;
@@ -26,7 +28,10 @@ const EnvelopeHistoryModal = ({ isOpen = false, onClose, envelope }) => {
             })}
             Envelope History: {envelope.name}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
             {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
           </button>
         </div>

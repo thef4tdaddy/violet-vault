@@ -25,19 +25,40 @@ export const getActionIconInfo = (action) => {
 export const getEntityIconInfo = (entityType) => {
   switch (entityType) {
     case ENTITY_TYPES.ENVELOPE:
-      return { component: getIcon("Wallet"), className: "h-4 w-4 text-purple-600" };
+      return {
+        component: getIcon("Wallet"),
+        className: "h-4 w-4 text-purple-600",
+      };
     case ENTITY_TYPES.TRANSACTION:
-      return { component: getIcon("arrow-right"), className: "h-4 w-4 text-gray-600" };
+      return {
+        component: getIcon("arrow-right"),
+        className: "h-4 w-4 text-gray-600",
+      };
     case ENTITY_TYPES.BILL:
-      return { component: getIcon("Receipt"), className: "h-4 w-4 text-orange-600" };
+      return {
+        component: getIcon("Receipt"),
+        className: "h-4 w-4 text-orange-600",
+      };
     case ENTITY_TYPES.PAYCHECK:
-      return { component: getIcon("DollarSign"), className: "h-4 w-4 text-emerald-600" };
+      return {
+        component: getIcon("DollarSign"),
+        className: "h-4 w-4 text-emerald-600",
+      };
     case ENTITY_TYPES.DEBT:
-      return { component: getIcon("CreditCard"), className: "h-4 w-4 text-red-600" };
+      return {
+        component: getIcon("CreditCard"),
+        className: "h-4 w-4 text-red-600",
+      };
     case ENTITY_TYPES.SAVINGS_GOAL:
-      return { component: getIcon("piggy-bank"), className: "h-4 w-4 text-blue-600" };
+      return {
+        component: getIcon("piggy-bank"),
+        className: "h-4 w-4 text-blue-600",
+      };
     default:
-      return { component: getIcon("activity"), className: "h-4 w-4 text-gray-600" };
+      return {
+        component: getIcon("activity"),
+        className: "h-4 w-4 text-gray-600",
+      };
   }
 };
 
