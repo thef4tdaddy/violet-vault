@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 // html2canvas loaded dynamically to reduce bundle size
-import jsPDF from "jspdf";
+// jsPDF loaded dynamically to reduce bundle size
 import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
 
@@ -26,6 +26,8 @@ export const useReportExporter = () => {
     async (analyticsData, balanceData, timeFilter) => {
       setExportProgress(10);
 
+      // Dynamic import to avoid adding jsPDF to main bundle
+      const jsPDF = (await import("jspdf")).default;
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "mm",

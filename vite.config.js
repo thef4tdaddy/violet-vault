@@ -105,12 +105,36 @@ export default defineConfig(() => {
       ),
     },
     build: {
-      chunkSizeWarningLimit: 3000, // Increased from 1000 to 3000 to accommodate large bundles
+      chunkSizeWarningLimit: 1000, // Reset to default for better monitoring
       reportCompressedSize: isProduction, // Enable size reporting in production
       // Disable minification for develop branch to get readable error messages
       minify: enableDebugBuild ? false : isProduction ? "terser" : false,
       // Enable sourcemaps for develop branch and development mode
       sourcemap: enableDebugBuild || !isProduction,
+      // Manual chunk splitting for optimal bundle sizes
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            // Vendor chunk for React ecosystem
+            'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+            // Firebase chunk (lazy loaded)
+            'firebase-vendor': ['firebase/app', 'firebase/firestore', 'firebase/auth'],
+            // Data libraries chunk
+            'data-vendor': ['@tanstack/react-query', 'dexie', 'zustand'],
+            // UI/Utils chunk
+            'ui-vendor': ['lucide-react', 'tailwindcss', '@tanstack/react-virtual'],
+            // Crypto/Security chunk
+            'crypto-vendor': ['bip39', '@msgpack/msgpack', 'pako'],
+            // PDF/QR chunk (lazy loaded)
+            'export-vendor': ['jspdf', 'qrcode', 'qrcode.react'],
+          },
+        },
+        // Enhanced tree-shaking
+        treeshake: {
+          moduleSideEffects: false,
+          propertyReadSideEffects: false,
+        },
+      },
       // Terser options for better compression (only when minification is enabled)
       terserOptions:
         isProduction && !enableDebugBuild
