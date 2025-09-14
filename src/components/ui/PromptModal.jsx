@@ -29,46 +29,7 @@ const PromptModal = ({
   const [inputValue, setInputValue] = useState(defaultValue);
   const [validationError, setValidationError] = useState("");
 
-  // Focus management - focus input when modal opens
-  useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select(); // Select existing text for easy replacement
-    }
-    // Reset input value when modal opens
-    if (isOpen) {
-      setInputValue(defaultValue);
-      setValidationError("");
-    }
-  }, [isOpen, defaultValue]);
-
-  // Keyboard handling
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape" && !isLoading) {
-        onCancel?.();
-      }
-      if (e.key === "Enter" && !isLoading) {
-        handleConfirm();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, isLoading, handleConfirm, onCancel]);
-
-  const handleInputChange = (e) => {
-    const value = e.target.value;
-    setInputValue(value);
-
-    // Clear validation error when user starts typing
-    if (validationError) {
-      setValidationError("");
-    }
-  };
-
+  // Define handlers first to avoid temporal dead zone issues
   const handleConfirm = useCallback(() => {
     // Validate required field
     if (isRequired && !inputValue.trim()) {
@@ -89,9 +50,49 @@ const PromptModal = ({
     onConfirm?.(inputValue);
   }, [inputValue, isRequired, validation, onConfirm]);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     onCancel?.(null);
+  }, [onCancel]);
+
+  // Focus management - focus input when modal opens
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select(); // Select existing text for easy replacement
+    }
+    // Reset input value when modal opens
+    if (isOpen) {
+      setInputValue(defaultValue);
+      setValidationError("");
+    }
+  }, [isOpen, defaultValue]);
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setInputValue(value);
+
+    // Clear validation error when user starts typing
+    if (validationError) {
+      setValidationError("");
+    }
   };
+
+  // Keyboard handling - now placed after handlers are defined
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape" && !isLoading) {
+        handleCancel();
+      }
+      if (e.key === "Enter" && !isLoading) {
+        handleConfirm();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, isLoading, handleConfirm, handleCancel]);
 
   if (!isOpen) return null;
 
