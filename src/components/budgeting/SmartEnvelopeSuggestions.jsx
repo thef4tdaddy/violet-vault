@@ -60,7 +60,9 @@ const SmartEnvelopeSuggestions = ({
           <div className={`relative ${isCollapsed ? "mr-2" : "mr-3"}`}>
             <div className="absolute inset-0 bg-amber-500 rounded-xl blur-lg opacity-30"></div>
             <div className={`relative bg-amber-500 rounded-xl ${isCollapsed ? "p-1.5" : "p-2"}`}>
-              <Zap className={`text-white ${isCollapsed ? "h-3 w-3" : "h-4 w-4"}`} />
+              {React.createElement(getIcon("Zap"), {
+                className: `text-white ${isCollapsed ? "h-3 w-3" : "h-4 w-4"}`,
+              })}
             </div>
           </div>
           Smart Suggestions
@@ -70,7 +72,9 @@ const SmartEnvelopeSuggestions = ({
             </span>
           )}
           <div className="ml-2 transition-transform duration-200 group-hover:scale-110">
-            {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+            {React.createElement(getIcon(isCollapsed ? "ChevronDown" : "ChevronUp"), {
+              className: "h-4 w-4",
+            })}
           </div>
         </button>
 

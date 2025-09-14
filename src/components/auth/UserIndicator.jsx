@@ -37,9 +37,9 @@ const UserIndicator = memo(({ currentUser, onUserChange, onUpdateProfile }) => {
             <span className="font-semibold text-gray-900 text-sm">
               {currentUser?.userName || "Anonymous"}
             </span>
-            <ChevronDown
-              className={`h-4 w-4 text-gray-500 ml-2 transition-transform ${showDropdown ? "rotate-180" : ""}`}
-            />
+            {React.createElement(getIcon("ChevronDown"), {
+              className: `h-4 w-4 text-gray-500 ml-2 transition-transform ${showDropdown ? "rotate-180" : ""}`,
+            })}
           </button>
 
           {showDropdown && (
