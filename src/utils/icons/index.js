@@ -40,6 +40,7 @@ import {
   Heart,
   Tag,
   Target,
+  Bug,
 
   // Financial & Business
   DollarSign,
@@ -169,6 +170,7 @@ export const ICON_REGISTRY = {
   "chevron-down": ChevronDown,
   menu: Menu,
   x: X,
+  X: X, // PascalCase alias for close buttons
   plus: Plus,
   minus: Minus,
   edit: Edit,
@@ -199,6 +201,8 @@ export const ICON_REGISTRY = {
   heart: Heart,
   Tag: Tag,
   Target: Target,
+  bug: Bug,
+  Bug: Bug, // PascalCase alias
 
   // Financial & Business
   "dollar-sign": DollarSign,
