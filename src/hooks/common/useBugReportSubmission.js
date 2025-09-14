@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { H } from "../../utils/common/highlight.js";
+// Dynamic import of Highlight.io to avoid bundle size impact
 import { BugReportAPIService } from "../../services/bugReport/apiService";
 import { SystemInfoService } from "../../services/bugReport/systemInfoService";
 import { getCurrentPageContext } from "../../utils/bugReport/pageContextHelper";
@@ -14,6 +14,9 @@ export const useBugReportSubmission = () => {
 
   const getHighlightSessionUrl = async () => {
     try {
+      // Dynamic import to avoid adding highlight.run to main bundle
+      const { H } = await import("../../utils/common/highlight.js");
+
       if (typeof H.getSessionMetadata === "function") {
         const sessionMetadata = await Promise.resolve(H.getSessionMetadata());
         return sessionMetadata?.sessionUrl || sessionMetadata?.url;

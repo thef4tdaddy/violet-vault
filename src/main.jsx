@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
-import { initHighlight } from "./utils/common/highlight.js";
+// Highlight.run now loaded lazily via HighlightLoader component
 import { QueryClientProvider } from "@tanstack/react-query";
 import queryClient from "./utils/common/queryClient";
 import { SystemInfoService } from "./services/bugReport/systemInfoService.js";
@@ -155,7 +155,7 @@ if (
   };
 }
 
-initHighlight();
+// Highlight.run initialization moved to lazy loader in App.jsx
 
 // Initialize console log and error capture for bug reports
 SystemInfoService.initializeErrorCapture();

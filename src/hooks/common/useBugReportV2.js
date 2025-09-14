@@ -5,7 +5,7 @@
  */
 import { useState } from "react";
 import BugReportService from "../../services/bugReport/index.js";
-import { H } from "../../utils/common/highlight.js";
+// Dynamic import of Highlight.io to avoid bundle size impact
 import logger from "../../utils/common/logger.js";
 
 /**
