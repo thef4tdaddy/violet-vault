@@ -129,9 +129,9 @@ export default defineConfig(() => {
             'export-vendor': ['jspdf', 'qrcode', 'qrcode.react'],
           },
         },
-        // Enhanced tree-shaking
+        // Enhanced tree-shaking (less aggressive to avoid temporal dead zone errors)
         treeshake: {
-          moduleSideEffects: false,
+          moduleSideEffects: ['**/*.css', '**/*.scss', '**/*.sass'],
           propertyReadSideEffects: false,
         },
       },
@@ -143,6 +143,14 @@ export default defineConfig(() => {
                 drop_console: false, // Keep console for Highlight.io
                 drop_debugger: true,
                 pure_funcs: ["console.debug"], // Remove debug statements
+                // Less aggressive settings to prevent temporal dead zone errors
+                sequences: false,
+                join_vars: false,
+              },
+              mangle: {
+                // More conservative variable mangling
+                keep_fnames: true,
+                reserved: ['$', '_', 'global', 'globalThis'],
               },
             }
           : {},
