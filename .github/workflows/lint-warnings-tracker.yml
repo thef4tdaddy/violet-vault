@@ -365,10 +365,13 @@ jobs:
             const runningDevelop = '${{ steps.should_run.outputs.should_run_develop }}' === 'true';
             const runningMain = '${{ steps.should_run.outputs.should_run_main }}' === 'true';
 
-            // Only skip if we have previous data AND there are no changes
+            // Check if there are actual changes in warning counts
             const hasChanges = (
-              (runningDevelop && (previousDevelopWarnings === null || developDelta !== 0)) ||
-              (runningMain && (previousMainWarnings === null || mainDelta !== 0))
+              (runningDevelop && previousDevelopWarnings !== null && developDelta !== 0) ||
+              (runningMain && previousMainWarnings !== null && mainDelta !== 0) ||
+              // Always post on first run when we have no previous data
+              (runningDevelop && previousDevelopWarnings === null) ||
+              (runningMain && previousMainWarnings === null)
             );
 
             if (!hasChanges) {
