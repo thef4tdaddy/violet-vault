@@ -143,14 +143,25 @@ export default defineConfig(() => {
                 drop_console: false, // Keep console for Highlight.io
                 drop_debugger: true,
                 pure_funcs: ["console.debug"], // Remove debug statements
-                // Less aggressive settings to prevent temporal dead zone errors
+                // Ultra-conservative settings to prevent temporal dead zone errors
                 sequences: false,
                 join_vars: false,
+                conditionals: false,
+                dead_code: false,
+                evaluate: false,
+                if_return: false,
+                loops: false,
+                reduce_vars: false,
+                unused: false,
+                hoist_vars: false,
+                hoist_funs: false,
+                side_effects: false,
               },
               mangle: {
-                // More conservative variable mangling
+                // Extremely conservative variable mangling
                 keep_fnames: true,
-                reserved: ['$', '_', 'global', 'globalThis'],
+                keep_classnames: true,
+                reserved: ['$', '_', 'global', 'globalThis', 'React', 'useState', 'useEffect', 'useCallback', 'useRef'],
               },
             }
           : {},
