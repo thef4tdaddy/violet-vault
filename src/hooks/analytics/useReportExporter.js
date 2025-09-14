@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import html2canvas from "html2canvas";
+// html2canvas loaded dynamically to reduce bundle size
 import jsPDF from "jspdf";
 import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
@@ -249,6 +249,8 @@ export const useReportExporter = () => {
       setExportProgress(20 + (i * 60) / chartElements.length);
 
       try {
+        // Dynamic import to avoid adding html2canvas to main bundle
+        const html2canvas = (await import("html2canvas")).default;
         const canvas = await html2canvas(element, {
           backgroundColor: "#ffffff",
           scale: 2,
