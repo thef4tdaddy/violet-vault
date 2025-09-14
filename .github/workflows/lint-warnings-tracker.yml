@@ -263,12 +263,11 @@ jobs:
                 issue_number: 568
               });
               
-              // Find the most recent VISIBLE bot comment (not hidden in <details>)
+              // Find the most recent bot comment for delta calculation
               const visibleBotComments = comments.data
-                .filter(comment => 
-                  comment.user.login === 'github-actions[bot]' && 
-                  !comment.body.includes('<details><summary>') && // Not hidden
-                  (comment.body.includes('**Develop Branch:**') || 
+                .filter(comment =>
+                  comment.user.login === 'github-actions[bot]' &&
+                  (comment.body.includes('**Develop Branch:**') ||
                    comment.body.includes('**Main Branch:**') ||
                    comment.body.includes('📊 Lint Warnings Update'))
                 )
@@ -281,11 +280,13 @@ jobs:
                 console.log(`Comment created: ${lastBotComment.created_at}`);
                 console.log(`Comment preview: ${lastBotComment.body.substring(0, 200)}...`);
                 
-                // Enhanced regex patterns to handle different formats
-                const devMatch = lastBotComment.body.match(/\*\*Develop Branch:\*\*[^\d]*(\d+)\s*warnings/i) ||
-                                lastBotComment.body.match(/Develop[^\d]*(\d+)\s*warnings/i);
-                const mainMatch = lastBotComment.body.match(/\*\*Main Branch:\*\*[^\d]*(\d+)\s*warnings/i) ||
-                               lastBotComment.body.match(/Main[^\d]*(\d+)\s*warnings/i);
+                // Improved regex patterns to extract warning counts
+                const devMatch = lastBotComment.body.match(/\*\*Develop Branch:\*\*\s*(\d+)\s*warnings/i) ||
+                                lastBotComment.body.match(/Develop[^:]*:\s*(\d+)\s*warnings/i) ||
+                                lastBotComment.body.match(/Develop.*?(\d+)\s*warnings/i);
+                const mainMatch = lastBotComment.body.match(/\*\*Main Branch:\*\*\s*(\d+)\s*warnings/i) ||
+                                 lastBotComment.body.match(/Main[^:]*:\s*(\d+)\s*warnings/i) ||
+                                 lastBotComment.body.match(/Main.*?(\d+)\s*warnings/i);
                 
                 if (devMatch) previousDevelopWarnings = parseInt(devMatch[1]);
                 if (mainMatch) previousMainWarnings = parseInt(mainMatch[1]);
@@ -295,29 +296,35 @@ jobs:
                 console.log('⚠️ No previous visible bot comment found - this is likely the first run');
               }
 
-              // Hide previous automation comments (keep only the last one visible)
+              // Minimize previous automation comments using GitHub's native hide feature
               const automationComments = comments.data
-                .filter(comment => 
+                .filter(comment =>
                   comment.user.login === 'github-actions[bot]' &&
                   (comment.body.includes('📊 Lint Warnings Update') ||
                    comment.body.includes('**Develop Branch:**') ||
-                   comment.body.includes('**Main Branch:**')) &&
-                  !comment.body.includes('<details><summary>') // Not already hidden
+                   comment.body.includes('**Main Branch:**'))
                 )
                 .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)); // Newest first
-              
-              // Hide all except the most recent (which we'll use for delta calculation)
+
+              // Hide all except the most recent using GitHub's minimize feature
               const commentsToHide = automationComments.slice(1); // Skip the first (newest) one
-              
+
               for (const comment of commentsToHide) {
                 try {
-                  await github.rest.issues.updateComment({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    comment_id: comment.id,
-                    body: `<details><summary>📊 Previous Lint Update (${new Date(comment.created_at).toLocaleDateString()})</summary>\n\n${comment.body}\n\n</details>`
-                  });
-                  console.log(`✅ Minimized comment #${comment.id}`);
+                  // Use GitHub's native comment minimization API
+                  await github.graphql(`
+                    mutation {
+                      minimizeComment(input: {
+                        subjectId: "${comment.node_id}"
+                        classifier: OUTDATED
+                      }) {
+                        minimizedComment {
+                          isMinimized
+                        }
+                      }
+                    }
+                  `);
+                  console.log(`✅ Minimized comment #${comment.id} as outdated`);
                 } catch (updateError) {
                   console.log(`⚠️ Could not minimize comment #${comment.id}: ${updateError.message}`);
                 }
