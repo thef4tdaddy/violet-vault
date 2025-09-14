@@ -61,8 +61,8 @@ jobs:
             # Copy the file from develop
             git checkout develop -- "$DEVELOP_FILE"
             
-            # Check if there are actually changes to commit
-            if [ -n "$(git diff --name-only)" ]; then
+            # Check if there are actually changes to commit (check staged changes)
+            if [ -n "$(git diff --cached --name-only)" ]; then
               echo "📝 Committing updated lint tracker workflow..."
               
               git add "$DEVELOP_FILE"
@@ -79,7 +79,7 @@ jobs:
             git pull origin main
             git checkout develop -- "$DEVELOP_FILE"
             
-            if [ -n "$(git diff --name-only)" ]; then
+            if [ -n "$(git diff --cached --name-only)" ]; then
               git add "$DEVELOP_FILE"
               git commit -m "sync: force update lint-warnings-tracker workflow from develop [automated]"
               git push origin main
