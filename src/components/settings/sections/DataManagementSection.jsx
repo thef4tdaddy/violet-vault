@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { getIcon } from "../../../utils";
 import { getLocalOnlyMode } from "../../../utils/settings/settingsHelpers";
 
