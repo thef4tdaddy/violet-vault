@@ -74,7 +74,9 @@ const ActivityFeed = () => {
               <div className="relative mr-4">
                 <div className="absolute inset-0 bg-indigo-500 rounded-2xl blur-lg opacity-30"></div>
                 <div className="relative bg-indigo-500 p-3 rounded-2xl">
-                  <Activity className="h-6 w-6 text-white" />
+                  {React.createElement(getIcon("Activity"), {
+                    className: "h-6 w-6 text-white",
+                  })}
                 </div>
               </div>
               Activity History
@@ -101,7 +103,9 @@ const ActivityFeed = () => {
         {/* Activity List */}
         {activities.length === 0 ? (
           <div className="text-center py-12">
-            <Activity className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+            {React.createElement(getIcon("Activity"), {
+              className: "h-16 w-16 mx-auto mb-4 text-gray-300",
+            })}
             <h3 className="text-lg font-medium text-gray-900 mb-2">No Activity Yet</h3>
             <p className="text-gray-500">Start using your budget to see activity history here</p>
           </div>
