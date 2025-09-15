@@ -828,20 +828,43 @@ async function generateSmartLabels(
     }
   }
 
-  // URL-based labeling for specific pages (enhanced)
-  if (urlPath.includes("/debt") || pageContext?.page === "debt")
+  // Enhanced router-aware labeling (Issue #347)
+  const routeInfo = pageContext?.route || {};
+  const currentView = routeInfo.currentView || pageContext?.page;
+
+  // Use enhanced router information for more accurate labeling
+  if (currentView === "debts" || urlPath.includes("/debt"))
     addLabelIfExists("debt");
-  else if (urlPath.includes("/envelope") || pageContext?.page === "envelope")
+  else if (currentView === "envelopes" || urlPath.includes("/envelope"))
     addLabelIfExists("envelope");
-  else if (
-    urlPath.includes("/transaction") ||
-    pageContext?.page === "transaction"
-  )
+  else if (currentView === "transactions" || urlPath.includes("/transaction"))
     addLabelIfExists("transaction");
-  else if (urlPath.includes("/savings") || pageContext?.page === "savings")
+  else if (currentView === "savings" || urlPath.includes("/savings"))
     addLabelIfExists("savings");
-  else if (urlPath.includes("/analytics") || pageContext?.page === "analytics")
+  else if (currentView === "analytics" || urlPath.includes("/analytics"))
     addLabelIfExists("analytics");
+  else if (currentView === "bills" || urlPath.includes("/bills"))
+    addLabelIfExists("bills");
+  else if (currentView === "automation" || urlPath.includes("/automation"))
+    addLabelIfExists("automation");
+  else if (currentView === "paycheck" || urlPath.includes("/paycheck"))
+    addLabelIfExists("paycheck");
+  else if (currentView === "supplemental" || urlPath.includes("/supplemental"))
+    addLabelIfExists("supplemental");
+  else if (currentView === "activity" || urlPath.includes("/activity"))
+    addLabelIfExists("activity");
+
+  // Add route type labels for better categorization
+  if (routeInfo.routeType === "marketing") {
+    addLabelIfExists("marketing");
+  } else if (routeInfo.routeType === "app") {
+    addLabelIfExists("app");
+  }
+
+  // Add build target label
+  if (routeInfo.buildTarget === "pwa") {
+    addLabelIfExists("pwa");
+  }
 
   // Device/Browser specific - be truthful about what browser reports
   if (reportEnv?.userAgent) {
@@ -1241,12 +1264,25 @@ async function createGitHubIssue(data, env) {
     issueBody += `## Severity\n\n${severityEmoji[severity] || "🟡"} **${severity.toUpperCase()}**\n\n`;
   }
 
-  // Add user location prominently at the top
+  // Add enhanced user location prominently at the top (Issue #347)
   if (reportEnv?.pageContext) {
     issueBody += `## 📍 User Location\n`;
-    issueBody += `**Page:** ${reportEnv.pageContext.page || "unknown"}\n`;
+
+    // Use enhanced router-aware location if available
+    const routeInfo = reportEnv.pageContext.route || {};
+    const currentView = routeInfo.currentView || reportEnv.pageContext.page || "unknown";
+
+    issueBody += `**Page:** ${currentView}\n`;
     issueBody += `**Screen:** ${reportEnv.pageContext.screenTitle || "Unknown"}\n`;
     issueBody += `**URL:** ${reportEnv.url}\n`;
+
+    // Add enhanced router context
+    if (routeInfo.routeType) {
+      issueBody += `**Route Type:** ${routeInfo.routeType}\n`;
+    }
+    if (routeInfo.buildTarget) {
+      issueBody += `**Build Target:** ${routeInfo.buildTarget}\n`;
+    }
 
     if (
       reportEnv.pageContext.visibleModals &&
