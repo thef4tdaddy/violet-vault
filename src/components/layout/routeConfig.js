@@ -6,75 +6,80 @@
 
 export const routeConfig = [
   {
-    path: "/",
+    path: "/app",
     activeView: "dashboard",
   },
   {
-    path: "/envelopes",
+    path: "/app/dashboard",
+    activeView: "dashboard",
+  },
+  {
+    path: "/app/envelopes",
     activeView: "envelopes",
   },
   {
-    path: "/savings",
+    path: "/app/savings",
     activeView: "savings",
   },
   {
-    path: "/supplemental",
+    path: "/app/supplemental",
     activeView: "supplemental",
   },
   {
-    path: "/paycheck",
+    path: "/app/paycheck",
     activeView: "paycheck",
   },
   {
-    path: "/bills",
+    path: "/app/bills",
     activeView: "bills",
   },
   {
-    path: "/transactions",
+    path: "/app/transactions",
     activeView: "transactions",
   },
   {
-    path: "/debts",
+    path: "/app/debts",
     activeView: "debts",
   },
   {
-    path: "/analytics",
+    path: "/app/analytics",
     activeView: "analytics",
   },
   {
-    path: "/automation",
+    path: "/app/automation",
     activeView: "automation",
   },
   {
-    path: "/activity",
+    path: "/app/activity",
     activeView: "activity",
   },
 ];
 
 export const pathToViewMap = {
-  "/": "dashboard",
-  "/envelopes": "envelopes",
-  "/savings": "savings",
-  "/supplemental": "supplemental",
-  "/paycheck": "paycheck",
-  "/bills": "bills",
-  "/transactions": "transactions",
-  "/debts": "debts",
-  "/analytics": "analytics",
-  "/automation": "automation",
-  "/activity": "activity",
+  "/app": "dashboard",
+  "/app/dashboard": "dashboard",
+  "/app/envelopes": "envelopes",
+  "/app/savings": "savings",
+  "/app/supplemental": "supplemental",
+  "/app/paycheck": "paycheck",
+  "/app/bills": "bills",
+  "/app/transactions": "transactions",
+  "/app/debts": "debts",
+  "/app/analytics": "analytics",
+  "/app/automation": "automation",
+  "/app/activity": "activity",
 };
 
 export const viewToPathMap = {
-  dashboard: "/",
-  envelopes: "/envelopes",
-  savings: "/savings",
-  supplemental: "/supplemental",
-  paycheck: "/paycheck",
-  bills: "/bills",
-  transactions: "/transactions",
-  debts: "/debts",
-  analytics: "/analytics",
-  automation: "/automation",
-  activity: "/activity",
+  dashboard: "/app/dashboard",
+  envelopes: "/app/envelopes",
+  savings: "/app/savings",
+  supplemental: "/app/supplemental",
+  paycheck: "/app/paycheck",
+  bills: "/app/bills",
+  transactions: "/app/transactions",
+  debts: "/app/debts",
+  analytics: "/app/analytics",
+  automation: "/app/automation",
+  activity: "/app/activity",
 };
