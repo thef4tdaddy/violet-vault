@@ -1,17 +1,28 @@
-## 📊 Lint Warnings Update - ${{ currentDate }}
+# 📊 Lint Warnings Update - ${{ currentDate }}
+
+## Current Status
 
 ${{ branchInfo }}
-**Target:** <20 warnings
 
-### Status:
+### 📈 Progress Analysis
+${{ statusMessage }}
 
-${{ statusMessage }}${{ detailedInfo }}
+${{ detailedInfo }}
 
-### 🎯 Focus Areas:
+---
 
-- **Function Size**: Split functions over 75 lines
-- **Complexity**: Reduce function complexity (>15)
-- **Unused Variables**: Remove or prefix with underscore
-- **React Hooks**: Add missing dependencies
+## 📋 Action Items
 
-_Updated automatically by GitHub Actions_
+- Monitor warning trends across both branches
+- Focus on high-impact files with most warnings
+- Address priority categories first for maximum impact
+- Consider refactoring patterns that generate multiple warnings
+
+## 🔗 Related Resources
+
+- **Full lint data**: [.github/data/lint-warnings.json](.github/data/lint-warnings.json)  
+- **Parsing script**: [scripts/parse-eslint-warnings.js](scripts/parse-eslint-warnings.js)
+- **Workflow config**: [.github/workflows/lint-warnings-tracker.yml](.github/workflows/lint-warnings-tracker.yml)
+
+---
+*🤖 Automated tracking via GitHub Actions*
