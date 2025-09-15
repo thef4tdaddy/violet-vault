@@ -350,18 +350,19 @@ _Reusable UI elements_
 
 _Modal dialog components_
 
-| Component                   | Purpose                          |
-| --------------------------- | -------------------------------- |
-| `PasswordRotationModal.jsx` | Password rotation security modal |
-
-### **Modals** (`/modals/`)
-
-_Modal dialog components_
-
 | Component                   | Purpose                                  |
 | --------------------------- | ---------------------------------------- |
+| `CorruptionRecoveryModal.jsx` | Data corruption recovery interface      |
 | `PasswordRotationModal.jsx` | Password rotation security modal         |
 | `UnassignedCashModal.jsx`   | Cash distribution modal |
+
+### **Monitoring** (`/monitoring/`)
+
+_Performance and system monitoring components_
+
+| Component              | Purpose                                    |
+| ---------------------- | ------------------------------------------ |
+| `HighlightLoader.jsx`  | Error highlighting and debugging component |
 
 ## 🪝 Hooks Directory (`/hooks/`)
 
@@ -454,7 +455,8 @@ _Utility functions and services_
 | `masterSyncValidator.js`      | Master sync validation utilities                             |
 | `paydayPredictor.js`          | Payday prediction algorithms with enhanced recommendations                    |
 | `performance.js`              | Performance monitoring utilities                                              |
-| `queryClient.js`              | **Enhanced v1.9.0** - TanStack Query + Dexie integration with offline support |
+| `performanceUtils.js`         | Additional performance optimization utilities                                 |
+| `queryClient.js`              | TanStack Query + Dexie integration with offline support |
 | `syncDiagnostic.js`           | Sync diagnostic utilities                                    |
 | `syncEdgeCaseTester.js`       | Sync edge case testing utilities                             |
 | `syncFlowValidator.js`        | Sync flow validation utilities                               |
@@ -472,6 +474,12 @@ _Utility functions and services_
 | `envelopeMatching.js`     | Envelope matching and categorization      |
 | `envelopeStyles.js`       | Envelope styling and theming utilities    |
 | `index.js`                | Budgeting utilities barrel export         |
+
+#### **Icon System Utilities** (`/utils/icons/`) - **NEW in v1.10.0**
+
+| Utility    | Purpose                                    |
+| ---------- | ------------------------------------------ |
+| `index.js` | Centralized icon management system export |
 
 ## 💾 Database Directory (`/db/`)
 
@@ -552,7 +560,7 @@ _Testing utilities and test files_
 - ✅ Password rotation security system fully connected to Zustand (#88)
 - ✅ Debt tracking Phase 1 foundation (#115)
 
-#### **v1.9.0 In Progress - Enhanced Data Layer:**
+#### **Enhanced Data Layer:**
 
 - ✅ **Phase 1 Complete:** TanStack Query + Dexie integration foundation
   - Consolidated duplicate query clients into unified enhanced version
@@ -586,14 +594,16 @@ _Testing utilities and test files_
 
 ---
 
-## 📊 Architecture Summary (v1.9.0)
+## 📊 Architecture Summary
 
-### **File Statistics**
+### **File Statistics (v1.10.0)**
 
-- **Total Files:** ~200+ files (66% increase from v1.8.0)
-- **Lines of Code:** ~25,000+ lines (significant expansion)
-- **New Components:** 35+ new components/hooks/services in v1.9.0
-- **New Directories:** `/activity/`, `/automation/`, `/debt/`, `/feedback/`, `/history/`, `/onboarding/`, `/security/`, `/services/`, `/test/`
+- **Total Files:** 696 files (comprehensive modular architecture)
+- **Lines of Code:** ~40,000+ lines (extensive feature coverage)
+- **React Components:** 150+ components across 27 major functional areas
+- **Custom Hooks:** 25+ specialized business logic hooks
+- **Utility Functions:** 30+ helper utilities and services
+- **Major Directories:** 27 component categories, hooks, stores, services, utils, constants, test
 
 ### **Technology Stack**
 
@@ -605,7 +615,7 @@ _Testing utilities and test files_
 - **Testing:** Vitest + Testing Library
 - **Build:** Vite with optimized chunking and lazy loading
 
-### **v1.9.0 Architecture Enhancements**
+### **Recent Architecture Enhancements**
 
 - **🔐 Security & Compliance:** Edit locking, activity logging, integrity monitoring
 - **📊 Enhanced Data Layer:** TanStack Query integration with offline support
