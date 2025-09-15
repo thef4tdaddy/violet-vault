@@ -36,9 +36,7 @@ const useAuthFlow = () => {
       const isExistingUser = typeof userDataOrPassword === "string";
       const isSharedBudgetJoin =
         typeof userDataOrPassword === "object" && userDataOrPassword?.budgetId;
-      const password = isExistingUser
-        ? userDataOrPassword
-        : userDataOrPassword.password;
+      const password = isExistingUser ? userDataOrPassword : userDataOrPassword.password;
       const userData = isExistingUser ? null : userDataOrPassword;
 
       logger.auth("Layout handleSetup called", {
@@ -47,9 +45,7 @@ const useAuthFlow = () => {
         isSharedBudgetJoin,
         hasPassword: !!password,
       });
-      logger.auth(
-        "🚨 DEBUG VERSION 2: useAuthFlow.js with debug logging is running!",
-      );
+      logger.auth("🚨 DEBUG VERSION 2: useAuthFlow.js with debug logging is running!");
 
       try {
         if (isExistingUser) {
@@ -73,7 +69,7 @@ const useAuthFlow = () => {
         showErrorToast(`Setup error: ${error.message}`, "Setup Error");
       }
     },
-    [login, showErrorToast],
+    [login, showErrorToast]
   );
 
   const handleLogout = useCallback(() => {
@@ -84,15 +80,12 @@ const useAuthFlow = () => {
     async (oldPass, newPass) => {
       const result = await changePassword(oldPass, newPass);
       if (!result.success) {
-        showErrorToast(
-          `Password change failed: ${result.error}`,
-          "Password Change Failed",
-        );
+        showErrorToast(`Password change failed: ${result.error}`, "Password Change Failed");
       } else {
         showSuccessToast("Password updated successfully", "Password Changed");
       }
     },
-    [changePassword, showErrorToast, showSuccessToast],
+    [changePassword, showErrorToast, showSuccessToast]
   );
 
   const handleUpdateProfile = useCallback(
@@ -102,7 +95,7 @@ const useAuthFlow = () => {
         throw new Error(result.error);
       }
     },
-    [updateProfile],
+    [updateProfile]
   );
 
   return {

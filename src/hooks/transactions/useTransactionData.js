@@ -61,19 +61,14 @@ const useTransactionData = (options = {}) => {
 
       try {
         // Get all transactions from database
-        const allTransactions = await budgetDb.transactions
-          .orderBy("date")
-          .reverse()
-          .toArray();
+        const allTransactions = await budgetDb.transactions.orderBy("date").reverse().toArray();
 
         if (!Array.isArray(allTransactions)) {
           logger.warn("No transactions returned from database");
           return [];
         }
 
-        logger.debug(
-          `Retrieved ${allTransactions.length} transactions from database`,
-        );
+        logger.debug(`Retrieved ${allTransactions.length} transactions from database`);
         return allTransactions;
       } catch (error) {
         logger.error("Error fetching transactions", error);
@@ -103,9 +98,7 @@ const useTransactionData = (options = {}) => {
         limit,
       });
 
-      logger.debug(
-        `Processed ${processed.length} transactions after filtering`,
-      );
+      logger.debug(`Processed ${processed.length} transactions after filtering`);
       return processed;
     } catch (error) {
       logger.error("Error processing transactions", error);
@@ -165,9 +158,7 @@ const useTransactionData = (options = {}) => {
     if (!processedTransactions.length) return [];
 
     try {
-      return processedTransactions
-        .sort((a, b) => new Date(b.date) - new Date(a.date))
-        .slice(0, 10);
+      return processedTransactions.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10);
     } catch (error) {
       logger.error("Error getting recent transactions", error);
       return processedTransactions.slice(0, 10);
@@ -199,9 +190,7 @@ const useTransactionData = (options = {}) => {
    * Split transactions only
    */
   const splitTransactions = useMemo(() => {
-    return processedTransactions.filter(
-      (txn) => txn.isSplit || txn.parentTransactionId,
-    );
+    return processedTransactions.filter((txn) => txn.isSplit || txn.parentTransactionId);
   }, [processedTransactions]);
 
   /**
@@ -209,7 +198,7 @@ const useTransactionData = (options = {}) => {
    */
   const uncategorizedTransactions = useMemo(() => {
     return processedTransactions.filter(
-      (txn) => !txn.category || txn.category.toLowerCase() === "uncategorized",
+      (txn) => !txn.category || txn.category.toLowerCase() === "uncategorized"
     );
   }, [processedTransactions]);
 
@@ -230,9 +219,7 @@ const useTransactionData = (options = {}) => {
    */
   const getTransactionsByEnvelope = useMemo(() => {
     return (envelopeId) => {
-      return processedTransactions.filter(
-        (txn) => txn.envelopeId === envelopeId,
-      );
+      return processedTransactions.filter((txn) => txn.envelopeId === envelopeId);
     };
   }, [processedTransactions]);
 
@@ -242,7 +229,7 @@ const useTransactionData = (options = {}) => {
   const getTransactionsByCategory = useMemo(() => {
     return (categoryName) => {
       return processedTransactions.filter(
-        (txn) => txn.category?.toLowerCase() === categoryName.toLowerCase(),
+        (txn) => txn.category?.toLowerCase() === categoryName.toLowerCase()
       );
     };
   }, [processedTransactions]);
@@ -274,15 +261,8 @@ const useTransactionData = (options = {}) => {
   /**
    * Filter state helpers
    */
-  const hasActiveFilters = !!(
-    dateRange ||
-    envelopeId ||
-    category ||
-    type ||
-    searchQuery
-  );
-  const isFilteredResult =
-    processedTransactions.length !== transactionsQuery.data?.length;
+  const hasActiveFilters = !!(dateRange || envelopeId || category || type || searchQuery);
+  const isFilteredResult = processedTransactions.length !== transactionsQuery.data?.length;
 
   return {
     // Query state

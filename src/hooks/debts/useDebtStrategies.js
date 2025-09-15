@@ -8,18 +8,15 @@ import { useMemo } from "react";
 export const useDebtStrategies = (debts = []) => {
   // Filter to active debts only
   const activeDebts = useMemo(() => {
-    return debts.filter(
-      (debt) => debt.status === "active" && debt.currentBalance > 0,
-    );
+    return debts.filter((debt) => debt.status === "active" && debt.currentBalance > 0);
   }, [debts]);
 
   // Calculate Avalanche Strategy (highest interest rate first)
   const avalancheStrategy = useMemo(() => {
-    if (!activeDebts.length)
-      return { debts: [], totalInterest: 0, payoffTime: 0 };
+    if (!activeDebts.length) return { debts: [], totalInterest: 0, payoffTime: 0 };
 
     const sortedDebts = [...activeDebts].sort(
-      (a, b) => (b.interestRate || 0) - (a.interestRate || 0),
+      (a, b) => (b.interestRate || 0) - (a.interestRate || 0)
     );
 
     let totalInterest = 0;
@@ -45,18 +42,16 @@ export const useDebtStrategies = (debts = []) => {
       totalInterest,
       payoffTime: totalTime,
       name: "Debt Avalanche",
-      description:
-        "Pay minimum on all debts, put extra toward highest interest rate debt",
+      description: "Pay minimum on all debts, put extra toward highest interest rate debt",
     };
   }, [activeDebts]);
 
   // Calculate Snowball Strategy (lowest balance first)
   const snowballStrategy = useMemo(() => {
-    if (!activeDebts.length)
-      return { debts: [], totalInterest: 0, payoffTime: 0 };
+    if (!activeDebts.length) return { debts: [], totalInterest: 0, payoffTime: 0 };
 
     const sortedDebts = [...activeDebts].sort(
-      (a, b) => (a.currentBalance || 0) - (b.currentBalance || 0),
+      (a, b) => (a.currentBalance || 0) - (b.currentBalance || 0)
     );
 
     let totalInterest = 0;
@@ -82,8 +77,7 @@ export const useDebtStrategies = (debts = []) => {
       totalInterest,
       payoffTime: totalTime,
       name: "Debt Snowball",
-      description:
-        "Pay minimum on all debts, put extra toward lowest balance debt",
+      description: "Pay minimum on all debts, put extra toward lowest balance debt",
     };
   }, [activeDebts]);
 
@@ -91,10 +85,8 @@ export const useDebtStrategies = (debts = []) => {
   const recommendation = useMemo(() => {
     if (!activeDebts.length) return null;
 
-    const interestSavings =
-      snowballStrategy.totalInterest - avalancheStrategy.totalInterest;
-    const timeDifference =
-      snowballStrategy.payoffTime - avalancheStrategy.payoffTime;
+    const interestSavings = snowballStrategy.totalInterest - avalancheStrategy.totalInterest;
+    const timeDifference = snowballStrategy.payoffTime - avalancheStrategy.payoffTime;
 
     if (Math.abs(interestSavings) < 100 && Math.abs(timeDifference) <= 2) {
       return {
@@ -132,11 +124,11 @@ export const useDebtStrategies = (debts = []) => {
     return scenarios.map((extraPayment) => {
       const avalancheWithExtra = calculateStrategyWithExtraPayment(
         avalancheStrategy.debts[0],
-        extraPayment,
+        extraPayment
       );
       const snowballWithExtra = calculateStrategyWithExtraPayment(
         snowballStrategy.debts[0],
-        extraPayment,
+        extraPayment
       );
 
       return {
@@ -152,16 +144,11 @@ export const useDebtStrategies = (debts = []) => {
     if (!activeDebts.length) return [];
 
     const insights = [];
-    const highInterestDebts = activeDebts.filter(
-      (debt) => (debt.interestRate || 0) > 15,
-    );
-    const totalBalance = activeDebts.reduce(
-      (sum, debt) => sum + (debt.currentBalance || 0),
-      0,
-    );
+    const highInterestDebts = activeDebts.filter((debt) => (debt.interestRate || 0) > 15);
+    const totalBalance = activeDebts.reduce((sum, debt) => sum + (debt.currentBalance || 0), 0);
     const totalMinimumPayments = activeDebts.reduce(
       (sum, debt) => sum + (debt.minimumPayment || 0),
-      0,
+      0
     );
 
     if (highInterestDebts.length > 0) {
@@ -181,9 +168,7 @@ export const useDebtStrategies = (debts = []) => {
       });
     }
 
-    const creditCardDebts = activeDebts.filter(
-      (debt) => debt.type === "credit_card",
-    );
+    const creditCardDebts = activeDebts.filter((debt) => debt.type === "credit_card");
     if (creditCardDebts.length > 2) {
       insights.push({
         type: "tip",
@@ -235,9 +220,8 @@ function calculatePayoffTime(debt) {
   if (minimumPayment <= monthlyInterest) return 999; // Impossible to pay off
 
   const months =
-    Math.log(
-      1 + (currentBalance * monthlyRate) / (minimumPayment - monthlyInterest),
-    ) / Math.log(1 + monthlyRate);
+    Math.log(1 + (currentBalance * monthlyRate) / (minimumPayment - monthlyInterest)) /
+    Math.log(1 + monthlyRate);
   return Math.ceil(months);
 }
 

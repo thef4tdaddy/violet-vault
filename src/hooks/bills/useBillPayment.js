@@ -6,13 +6,7 @@ import { executeBillUpdate } from "../../utils/bills/billUpdateHelpers";
  * Hook for individual bill payment operations
  * Extracted from useBillOperations.js to reduce complexity
  */
-export const useBillPayment = ({
-  bills,
-  envelopes,
-  budget,
-  updateBill,
-  onUpdateBill,
-}) => {
+export const useBillPayment = ({ bills, envelopes, budget, updateBill, onUpdateBill }) => {
   /**
    * Validate envelope balance for bill payment
    */
@@ -29,7 +23,7 @@ export const useBillPayment = ({
 
         if (availableBalance < billAmount) {
           throw new Error(
-            `Insufficient funds in envelope "${envelope.name}". Available: $${availableBalance.toFixed(2)}, Required: $${billAmount.toFixed(2)}`,
+            `Insufficient funds in envelope "${envelope.name}". Available: $${availableBalance.toFixed(2)}, Required: $${billAmount.toFixed(2)}`
           );
         }
       } else {
@@ -38,12 +32,12 @@ export const useBillPayment = ({
 
         if (unassignedCash < billAmount) {
           throw new Error(
-            `Insufficient unassigned cash. Available: $${unassignedCash.toFixed(2)}, Required: $${billAmount.toFixed(2)}`,
+            `Insufficient unassigned cash. Available: $${unassignedCash.toFixed(2)}, Required: $${billAmount.toFixed(2)}`
           );
         }
       }
     },
-    [envelopes, budget],
+    [envelopes, budget]
   );
 
   /**
@@ -104,7 +98,7 @@ export const useBillPayment = ({
         throw error;
       }
     },
-    [bills, validatePaymentFunds, updateBill, onUpdateBill, budget],
+    [bills, validatePaymentFunds, updateBill, onUpdateBill, budget]
   );
 
   return {

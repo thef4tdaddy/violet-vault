@@ -49,14 +49,11 @@ export const useTransactionImportProcessing = (currentUser) => {
       setImportProgress((i / dataArray.length) * 100);
 
       try {
-        const amount = parseFloat(
-          row[fieldMapping.amount]?.replace(/[$,]/g, "") || "0",
-        );
+        const amount = parseFloat(row[fieldMapping.amount]?.replace(/[$,]/g, "") || "0");
 
         const transaction = {
           id: `import_${Date.now()}_${i}_${Math.random().toString(36).substr(2, 9)}`,
-          date:
-            row[fieldMapping.date] || new Date().toISOString().split("T")[0],
+          date: row[fieldMapping.date] || new Date().toISOString().split("T")[0],
           description: row[fieldMapping.description] || "Imported Transaction",
           amount,
           category: row[fieldMapping.category] || "Imported",
@@ -86,30 +83,21 @@ export const useTransactionImportProcessing = (currentUser) => {
     return processedTransactions;
   };
 
-  const generateSuccessMessage = (
-    processedTransactions,
-    importData,
-    autoFundingPromises,
-  ) => {
-    const incomeCount = processedTransactions.filter(
-      (t) => t.amount >= 0,
-    ).length;
-    const expenseCount = processedTransactions.filter(
-      (t) => t.amount < 0,
-    ).length;
+  const generateSuccessMessage = (processedTransactions, importData, autoFundingPromises) => {
+    const incomeCount = processedTransactions.filter((t) => t.amount >= 0).length;
+    const expenseCount = processedTransactions.filter((t) => t.amount < 0).length;
 
     let message = importData.clearExisting
       ? `🗑️ Cleared existing data and imported ${processedTransactions.length} transactions!\n`
       : `Successfully imported ${processedTransactions.length} transactions!\n`;
 
     message +=
-      `• ${incomeCount} income transactions\n` +
-      `• ${expenseCount} expense transactions\n\n`;
+      `• ${incomeCount} income transactions\n` + `• ${expenseCount} expense transactions\n\n`;
 
     if (autoFundingPromises.length > 0) {
       const totalAutoFunded = autoFundingPromises.reduce(
         (sum, result) => sum + result.result.execution.totalFunded,
-        0,
+        0
       );
       message +=
         `🤖 Auto-funding executed for ${autoFundingPromises.length} income transactions:\n` +

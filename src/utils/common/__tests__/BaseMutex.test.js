@@ -82,9 +82,7 @@ describe("BaseMutex", () => {
     it("should release mutex even if function throws", async () => {
       const mockFn = vi.fn().mockRejectedValue(new Error("test error"));
 
-      await expect(mutex.execute(mockFn, "error-operation")).rejects.toThrow(
-        "test error",
-      );
+      await expect(mutex.execute(mockFn, "error-operation")).rejects.toThrow("test error");
       expect(mutex.locked).toBe(false);
     });
 
@@ -158,7 +156,7 @@ describe("BaseMutex", () => {
         Promise.race([
           secondPromise,
           new Promise((resolve) => setTimeout(() => resolve("timeout"), 100)),
-        ]),
+        ])
       ).resolves.toBe("timeout");
     }, 10000);
   });

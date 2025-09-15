@@ -6,14 +6,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useConfirm } from "../common/useConfirm";
 
-export const useDebtDetailModal = (
-  debt,
-  isOpen,
-  onClose,
-  onDelete,
-  onRecordPayment,
-  onEdit,
-) => {
+export const useDebtDetailModal = (debt, isOpen, onClose, onDelete, onRecordPayment, onEdit) => {
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState("");
   const confirm = useConfirm();
@@ -31,9 +24,7 @@ export const useDebtDetailModal = (
       return { percentage: 0, hasProgress: false };
     }
 
-    const percentage =
-      ((debt.originalBalance - debt.currentBalance) / debt.originalBalance) *
-      100;
+    const percentage = ((debt.originalBalance - debt.currentBalance) / debt.originalBalance) * 100;
     return {
       percentage: Math.max(0, Math.min(percentage, 100)),
       hasProgress: true,
@@ -55,9 +46,7 @@ export const useDebtDetailModal = (
           ? `${monthsToPayoff} months`
           : "Insufficient data",
       totalInterest: totalInterest?.toFixed(2) || "N/A",
-      payoffDate: payoffDate
-        ? new Date(payoffDate).toLocaleDateString()
-        : "N/A",
+      payoffDate: payoffDate ? new Date(payoffDate).toLocaleDateString() : "N/A",
     };
   }, [debt?.payoffInfo]);
 

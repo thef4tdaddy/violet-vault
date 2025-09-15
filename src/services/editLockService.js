@@ -57,11 +57,7 @@ class EditLockService {
    */
   async acquireLock(recordType, recordId, options = {}) {
     // Validate prerequisites
-    const validation = validateLockPrerequisites(
-      this.budgetId,
-      this.currentUser,
-      auth,
-    );
+    const validation = validateLockPrerequisites(this.budgetId, this.currentUser, auth);
     if (!validation.valid) {
       return validation.degraded
         ? { success: true, reason: validation.reason }
@@ -74,16 +70,14 @@ class EditLockService {
       recordId,
       this.budgetId,
       this.currentUser,
-      options,
+      options
     );
 
     try {
       // Check for existing lock and determine action
       const existingLock = await this.getLock(recordType, recordId);
-      const lockAction = await handleExistingLock(
-        existingLock,
-        this.currentUser,
-        () => this.releaseLock(recordType, recordId),
+      const lockAction = await handleExistingLock(existingLock, this.currentUser, () =>
+        this.releaseLock(recordType, recordId)
       );
 
       if (lockAction.action === "blocked") {
@@ -148,13 +142,10 @@ class EditLockService {
         error.code === "permission-denied" ||
         error.message?.includes("Missing or insufficient permissions")
       ) {
-        logger.warn(
-          "❌ Failed to release lock - insufficient permissions (continuing anyway)",
-          {
-            recordType,
-            recordId,
-          },
-        );
+        logger.warn("❌ Failed to release lock - insufficient permissions (continuing anyway)", {
+          recordType,
+          recordId,
+        });
         // Remove from local cache even if Firebase failed
         this.locks.delete(lockId);
         this.stopHeartbeat(lockId);
@@ -176,7 +167,7 @@ class EditLockService {
         collection(firestore, "locks"),
         where("recordType", "==", recordType),
         where("recordId", "==", recordId),
-        where("budgetId", "==", this.budgetId), // Filter by current budget
+        where("budgetId", "==", this.budgetId) // Filter by current budget
       );
 
       const snapshot = await getDocs(q);
@@ -213,7 +204,7 @@ class EditLockService {
       collection(firestore, "locks"),
       where("recordType", "==", recordType),
       where("recordId", "==", recordId),
-      where("budgetId", "==", this.budgetId), // Filter by current budget
+      where("budgetId", "==", this.budgetId) // Filter by current budget
     );
 
     const unsubscribe = onSnapshot(
@@ -228,7 +219,7 @@ class EditLockService {
       (error) => {
         logger.error("Lock listener error", error);
         callback(null);
-      },
+      }
     );
 
     this.lockListeners.set(lockId, unsubscribe);
@@ -263,7 +254,7 @@ class EditLockService {
             lastActivity: serverTimestamp(),
             expiresAt: new Date(Date.now() + 60000), // Extend by 60 seconds
           },
-          { merge: true },
+          { merge: true }
         );
 
         // Update local cache

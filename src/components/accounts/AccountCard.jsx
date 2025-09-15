@@ -15,14 +15,9 @@ const AccountCard = ({
     <div className="bg-white/80 backdrop-blur-lg rounded-lg p-4 border border-white/20 hover:bg-white/90 transition-all">
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center">
-          <div
-            className="w-3 h-3 rounded-full mr-2"
-            style={{ backgroundColor: account.color }}
-          />
+          <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: account.color }} />
           <div>
-            <h4 className="font-medium text-gray-900 text-sm">
-              {account.name}
-            </h4>
+            <h4 className="font-medium text-gray-900 text-sm">{account.name}</h4>
             <p className="text-xs text-gray-600">
               {typeInfo.icon} {typeInfo.label}
             </p>
@@ -35,10 +30,7 @@ const AccountCard = ({
               Inactive
             </span>
           )}
-          <button
-            onClick={() => onEdit(account)}
-            className="p-1 text-gray-400 hover:text-cyan-600"
-          >
+          <button onClick={() => onEdit(account)} className="p-1 text-gray-400 hover:text-cyan-600">
             {React.createElement(getIcon("Edit3"), { className: "h-3 w-3" })}
           </button>
           <button
@@ -62,9 +54,7 @@ const AccountCard = ({
           <div className="flex justify-between items-center">
             <span className="text-xs text-gray-600">Annual Contribution:</span>
             <span className="text-xs text-gray-700">
-              {showBalances
-                ? `$${account.annualContribution.toFixed(2)}`
-                : "••••"}
+              {showBalances ? `$${account.annualContribution.toFixed(2)}` : "••••"}
             </span>
           </div>
         )}
@@ -80,9 +70,7 @@ const AccountCard = ({
       </div>
 
       {account.description && (
-        <p className="text-xs text-gray-500 mt-2 italic">
-          {account.description}
-        </p>
+        <p className="text-xs text-gray-500 mt-2 italic">{account.description}</p>
       )}
 
       {/* Transfer Button */}

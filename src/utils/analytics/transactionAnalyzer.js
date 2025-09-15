@@ -2,10 +2,7 @@
  * Transaction pattern analysis utilities
  * Extracted from useSmartCategoryAnalysis.js to reduce complexity
  */
-import {
-  MERCHANT_CATEGORY_PATTERNS,
-  TRANSACTION_CATEGORIES,
-} from "../../constants/categories";
+import { MERCHANT_CATEGORY_PATTERNS, TRANSACTION_CATEGORIES } from "../../constants/categories";
 import { extractMerchantName } from "./categoryPatterns";
 
 /**
@@ -17,7 +14,7 @@ export const analyzeUncategorizedTransactions = (transactions, settings) => {
 
   // Group uncategorized transactions by merchant
   const uncategorizedTransactions = transactions.filter(
-    (t) => !t.category || t.category === "Uncategorized" || t.category === "",
+    (t) => !t.category || t.category === "Uncategorized" || t.category === ""
   );
 
   const merchantPatterns = {};
@@ -40,17 +37,12 @@ export const analyzeUncategorizedTransactions = (transactions, settings) => {
 
   // Generate suggestions for qualifying merchant patterns
   Object.values(merchantPatterns).forEach((pattern) => {
-    if (
-      pattern.transactions.length >= minTransactionCount &&
-      pattern.totalAmount >= minAmount
-    ) {
+    if (pattern.transactions.length >= minTransactionCount && pattern.totalAmount >= minAmount) {
       pattern.avgAmount = pattern.totalAmount / pattern.transactions.length;
 
       // Find suggested category from merchant patterns
       let suggestedCategory = "General";
-      for (const [category, patterns] of Object.entries(
-        MERCHANT_CATEGORY_PATTERNS,
-      )) {
+      for (const [category, patterns] of Object.entries(MERCHANT_CATEGORY_PATTERNS)) {
         if (patterns.some((p) => pattern.merchant.includes(p.toLowerCase()))) {
           suggestedCategory = category;
           break;
@@ -60,12 +52,7 @@ export const analyzeUncategorizedTransactions = (transactions, settings) => {
       suggestions.push({
         id: `transaction_${pattern.merchant}`,
         type: "add_category",
-        priority:
-          pattern.totalAmount > 200
-            ? "high"
-            : pattern.totalAmount > 50
-              ? "medium"
-              : "low",
+        priority: pattern.totalAmount > 200 ? "high" : pattern.totalAmount > 50 ? "medium" : "low",
         category: "transaction",
         title: `Categorize "${pattern.merchant}" transactions`,
         description: `${pattern.transactions.length} transactions totaling $${pattern.totalAmount.toFixed(2)}`,
@@ -89,11 +76,7 @@ export const analyzeUncategorizedTransactions = (transactions, settings) => {
 /**
  * Analyze unused categories and suggest removal
  */
-export const analyzeUnusedCategories = (
-  transactions,
-  filteredTransactions,
-  settings,
-) => {
+export const analyzeUnusedCategories = (transactions, filteredTransactions, settings) => {
   const suggestions = [];
   const { unusedCategoryThreshold } = settings;
 
@@ -102,15 +85,11 @@ export const analyzeUnusedCategories = (
 
   TRANSACTION_CATEGORIES.forEach((category) => {
     const recentUsage = filteredTransactions.filter(
-      (t) => t.category === category && new Date(t.date) >= recentDate,
+      (t) => t.category === category && new Date(t.date) >= recentDate
     );
     const totalUsage = transactions.filter((t) => t.category === category);
 
-    if (
-      recentUsage.length === 0 &&
-      totalUsage.length > 0 &&
-      totalUsage.length < 10
-    ) {
+    if (recentUsage.length === 0 && totalUsage.length > 0 && totalUsage.length < 10) {
       suggestions.push({
         id: `unused_category_${category}`,
         type: "remove_category",

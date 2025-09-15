@@ -1,10 +1,6 @@
 import React from "react";
 
-const CategorySettingsPanel = ({
-  isVisible,
-  analysisSettings,
-  onSettingsChange,
-}) => {
+const CategorySettingsPanel = ({ isVisible, analysisSettings, onSettingsChange }) => {
   if (!isVisible) return null;
 
   return (
@@ -12,9 +8,7 @@ const CategorySettingsPanel = ({
       <h4 className="font-black text-gray-900 mb-4">ANALYSIS SETTINGS</h4>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
         <div>
-          <label className="block text-purple-800 font-bold mb-1">
-            MIN TRANSACTIONS
-          </label>
+          <label className="block text-purple-800 font-bold mb-1">MIN TRANSACTIONS</label>
           <input
             type="number"
             value={analysisSettings.minTransactionCount}
@@ -29,9 +23,7 @@ const CategorySettingsPanel = ({
           />
         </div>
         <div>
-          <label className="block text-purple-800 font-bold mb-1">
-            MIN AMOUNT ($)
-          </label>
+          <label className="block text-purple-800 font-bold mb-1">MIN AMOUNT ($)</label>
           <input
             type="number"
             value={analysisSettings.minAmount}
@@ -46,9 +38,7 @@ const CategorySettingsPanel = ({
           />
         </div>
         <div>
-          <label className="block text-purple-800 font-bold mb-1">
-            UNUSED THRESHOLD (MONTHS)
-          </label>
+          <label className="block text-purple-800 font-bold mb-1">UNUSED THRESHOLD (MONTHS)</label>
           <input
             type="number"
             value={analysisSettings.unusedCategoryThreshold}

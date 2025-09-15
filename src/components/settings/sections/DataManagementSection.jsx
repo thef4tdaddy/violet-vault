@@ -15,12 +15,7 @@ const isDevelopmentMode = () => {
   );
 };
 
-const DataManagementSection = ({
-  onOpenActivityFeed,
-  onExport,
-  onImport,
-  onSync,
-}) => {
+const DataManagementSection = ({ onOpenActivityFeed, onExport, onImport, onSync }) => {
   const confirm = useConfirm();
   return (
     <div className="space-y-6">
@@ -36,9 +31,7 @@ const DataManagementSection = ({
           })}
           <div className="text-left">
             <p className="font-medium text-gray-900">Activity History</p>
-            <p className="text-sm text-gray-500">
-              View recent budget activities and changes
-            </p>
+            <p className="text-sm text-gray-500">View recent budget activities and changes</p>
           </div>
         </button>
 
@@ -63,18 +56,13 @@ const DataManagementSection = ({
             className="hidden"
             id="settings-import-data"
           />
-          <label
-            htmlFor="settings-import-data"
-            className="w-full flex items-center cursor-pointer"
-          >
+          <label htmlFor="settings-import-data" className="w-full flex items-center cursor-pointer">
             {React.createElement(getIcon("Upload"), {
               className: "h-5 w-5 text-gray-600 mr-3",
             })}
             <div className="text-left">
               <p className="font-medium text-gray-900">Import Data</p>
-              <p className="text-sm text-gray-500">
-                Upload budget data from file
-              </p>
+              <p className="text-sm text-gray-500">Upload budget data from file</p>
             </div>
           </label>
         </div>
@@ -89,9 +77,7 @@ const DataManagementSection = ({
             })}
             <div className="text-left">
               <p className="font-medium text-blue-900">Sync to Cloud</p>
-              <p className="text-sm text-blue-600">
-                Upload your data to cloud storage
-              </p>
+              <p className="text-sm text-blue-600">Upload your data to cloud storage</p>
             </div>
           </button>
         )}
@@ -108,9 +94,7 @@ const DataManagementSection = ({
           {/* Debug Info - Development Mode Only */}
           {isDevelopmentMode() && (
             <div className="mb-3 p-2 bg-blue-50 rounded text-xs border border-blue-200">
-              <p className="font-semibold text-blue-800 mb-1">
-                🛠️ Development Sync Tools
-              </p>
+              <p className="font-semibold text-blue-800 mb-1">🛠️ Development Sync Tools</p>
               <p className="text-blue-700">
                 Available Functions:{" "}
                 {Object.keys(window)
@@ -118,8 +102,7 @@ const DataManagementSection = ({
                   .join(", ")}
               </p>
               <p className="text-blue-600 mt-1">
-                Advanced sync debugging and validation tools for development and
-                testing.
+                Advanced sync debugging and validation tools for development and testing.
               </p>
             </div>
           )}
@@ -142,12 +125,8 @@ const DataManagementSection = ({
                 className: "h-4 w-4 text-green-600 mr-3",
               })}
               <div className="text-left">
-                <p className="font-medium text-green-900">
-                  Refresh Sync Status
-                </p>
-                <p className="text-xs text-green-700">
-                  Check current sync health
-                </p>
+                <p className="font-medium text-green-900">Refresh Sync Status</p>
+                <p className="text-xs text-green-700">Check current sync health</p>
               </div>
             </button>
 
@@ -170,9 +149,7 @@ const DataManagementSection = ({
                     className: "h-4 w-4 text-blue-600 mr-3",
                   })}
                   <div className="text-left">
-                    <p className="font-medium text-blue-900">
-                      🧪 Run Full Sync Validation
-                    </p>
+                    <p className="font-medium text-blue-900">🧪 Run Full Sync Validation</p>
                     <p className="text-xs text-blue-700">
                       Comprehensive sync system check (Dev Only)
                     </p>
@@ -203,9 +180,7 @@ const DataManagementSection = ({
                     className: "h-4 w-4 text-red-600 mr-3",
                   })}
                   <div className="text-left">
-                    <p className="font-medium text-red-900">
-                      🚨 Reset Cloud Data
-                    </p>
+                    <p className="font-medium text-red-900">🚨 Reset Cloud Data</p>
                     <p className="text-xs text-red-700">
                       Emergency recovery: clear and re-upload (Dev Only)
                     </p>
@@ -218,8 +193,7 @@ const DataManagementSection = ({
             {!isDevelopmentMode() && (
               <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                 <p className="text-sm text-gray-600">
-                  Additional sync debugging tools are available in development
-                  mode.
+                  Additional sync debugging tools are available in development mode.
                 </p>
               </div>
             )}

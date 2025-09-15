@@ -13,8 +13,7 @@ const ReceiptErrorState = ({ error, onRetry }) => {
           className: "h-5 w-5 text-red-900",
         })}
         <p className="font-black text-black text-base">
-          <span className="text-lg">P</span>ROCESSING{" "}
-          <span className="text-lg">F</span>AILED
+          <span className="text-lg">P</span>ROCESSING <span className="text-lg">F</span>AILED
         </p>
       </div>
       <p className="text-red-900 text-sm mt-2">{error}</p>
@@ -23,8 +22,7 @@ const ReceiptErrorState = ({ error, onRetry }) => {
         className="glassmorphism mt-3 px-4 py-2 rounded-lg border-2 border-black bg-red-200/40 hover:bg-red-300/40 transition-colors backdrop-blur-sm"
       >
         <span className="font-black text-black text-sm">
-          <span className="text-base">T</span>RY{" "}
-          <span className="text-base">A</span>GAIN
+          <span className="text-base">T</span>RY <span className="text-base">A</span>GAIN
         </span>
       </button>
     </div>

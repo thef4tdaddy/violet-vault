@@ -19,48 +19,26 @@ describe("syncHealthHelpers", () => {
     });
 
     it("should return appropriate colors for each status", () => {
-      expect(getStatusColor({ status: "HEALTHY" }, false)).toBe(
-        "text-green-500",
-      );
-      expect(getStatusColor({ status: "ISSUES_DETECTED" }, false)).toBe(
-        "text-yellow-500",
-      );
+      expect(getStatusColor({ status: "HEALTHY" }, false)).toBe("text-green-500");
+      expect(getStatusColor({ status: "ISSUES_DETECTED" }, false)).toBe("text-yellow-500");
       expect(getStatusColor({ status: "ERROR" }, false)).toBe("text-red-500");
-      expect(getStatusColor({ status: "CRITICAL_FAILURE" }, false)).toBe(
-        "text-red-500",
-      );
-      expect(getStatusColor({ status: "UNKNOWN" }, false)).toBe(
-        "text-gray-400",
-      );
+      expect(getStatusColor({ status: "CRITICAL_FAILURE" }, false)).toBe("text-red-500");
+      expect(getStatusColor({ status: "UNKNOWN" }, false)).toBe("text-gray-400");
     });
   });
 
   describe("getStatusBackgroundColor", () => {
     it("should return blue background for loading states", () => {
-      expect(getStatusBackgroundColor({ isLoading: true }, false)).toBe(
-        "bg-blue-100",
-      );
-      expect(getStatusBackgroundColor({ status: "HEALTHY" }, true)).toBe(
-        "bg-blue-100",
-      );
+      expect(getStatusBackgroundColor({ isLoading: true }, false)).toBe("bg-blue-100");
+      expect(getStatusBackgroundColor({ status: "HEALTHY" }, true)).toBe("bg-blue-100");
     });
 
     it("should return appropriate background colors for each status", () => {
-      expect(getStatusBackgroundColor({ status: "HEALTHY" }, false)).toBe(
-        "bg-green-100",
-      );
-      expect(
-        getStatusBackgroundColor({ status: "ISSUES_DETECTED" }, false),
-      ).toBe("bg-yellow-100");
-      expect(getStatusBackgroundColor({ status: "ERROR" }, false)).toBe(
-        "bg-red-100",
-      );
-      expect(
-        getStatusBackgroundColor({ status: "CRITICAL_FAILURE" }, false),
-      ).toBe("bg-red-100");
-      expect(getStatusBackgroundColor({ status: "UNKNOWN" }, false)).toBe(
-        "bg-gray-100",
-      );
+      expect(getStatusBackgroundColor({ status: "HEALTHY" }, false)).toBe("bg-green-100");
+      expect(getStatusBackgroundColor({ status: "ISSUES_DETECTED" }, false)).toBe("bg-yellow-100");
+      expect(getStatusBackgroundColor({ status: "ERROR" }, false)).toBe("bg-red-100");
+      expect(getStatusBackgroundColor({ status: "CRITICAL_FAILURE" }, false)).toBe("bg-red-100");
+      expect(getStatusBackgroundColor({ status: "UNKNOWN" }, false)).toBe("bg-gray-100");
     });
   });
 
@@ -72,16 +50,10 @@ describe("syncHealthHelpers", () => {
 
     it("should return appropriate text for each status", () => {
       expect(getStatusText({ status: "HEALTHY" }, false)).toBe("Sync Healthy");
-      expect(
-        getStatusText({ status: "ISSUES_DETECTED", failedTests: 3 }, false),
-      ).toBe("3 Issues");
-      expect(getStatusText({ status: "ISSUES_DETECTED" }, false)).toBe(
-        "0 Issues",
-      );
+      expect(getStatusText({ status: "ISSUES_DETECTED", failedTests: 3 }, false)).toBe("3 Issues");
+      expect(getStatusText({ status: "ISSUES_DETECTED" }, false)).toBe("0 Issues");
       expect(getStatusText({ status: "ERROR" }, false)).toBe("Sync Error");
-      expect(getStatusText({ status: "CRITICAL_FAILURE" }, false)).toBe(
-        "Critical Error",
-      );
+      expect(getStatusText({ status: "CRITICAL_FAILURE" }, false)).toBe("Critical Error");
       expect(getStatusText({ status: "UNKNOWN" }, false)).toBe("Unknown");
     });
   });
@@ -89,32 +61,27 @@ describe("syncHealthHelpers", () => {
   describe("getStatusDescription", () => {
     it("should return appropriate descriptions for loading and syncing states", () => {
       expect(getStatusDescription({ isLoading: true }, false)).toBe(
-        "Checking sync health status...",
+        "Checking sync health status..."
       );
       expect(getStatusDescription({ status: "HEALTHY" }, true)).toBe(
-        "Background sync operation in progress...",
+        "Background sync operation in progress..."
       );
     });
 
     it("should return appropriate descriptions for each status", () => {
       expect(getStatusDescription({ status: "HEALTHY" }, false)).toBe(
-        "All sync systems are functioning normally",
+        "All sync systems are functioning normally"
       );
-      expect(
-        getStatusDescription(
-          { status: "ISSUES_DETECTED", failedTests: 2 },
-          false,
-        ),
-      ).toBe("2 sync issues detected that may need attention");
+      expect(getStatusDescription({ status: "ISSUES_DETECTED", failedTests: 2 }, false)).toBe(
+        "2 sync issues detected that may need attention"
+      );
       expect(getStatusDescription({ status: "ERROR" }, false)).toBe(
-        "Sync error detected - some operations may not be working",
+        "Sync error detected - some operations may not be working"
       );
       expect(getStatusDescription({ status: "CRITICAL_FAILURE" }, false)).toBe(
-        "Critical sync failure - immediate attention required",
+        "Critical sync failure - immediate attention required"
       );
-      expect(getStatusDescription({ status: "UNKNOWN" }, false)).toBe(
-        "Sync status unknown",
-      );
+      expect(getStatusDescription({ status: "UNKNOWN" }, false)).toBe("Sync status unknown");
     });
   });
 
@@ -131,14 +98,10 @@ describe("syncHealthHelpers", () => {
 
     it("should format minutes correctly", () => {
       const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-      expect(formatLastChecked(fiveMinutesAgo.toISOString())).toBe(
-        "5 minutes ago",
-      );
+      expect(formatLastChecked(fiveMinutesAgo.toISOString())).toBe("5 minutes ago");
 
       const oneMinuteAgo = new Date(Date.now() - 1 * 60 * 1000);
-      expect(formatLastChecked(oneMinuteAgo.toISOString())).toBe(
-        "1 minute ago",
-      );
+      expect(formatLastChecked(oneMinuteAgo.toISOString())).toBe("1 minute ago");
     });
 
     it("should format hours correctly", () => {
@@ -162,9 +125,7 @@ describe("syncHealthHelpers", () => {
 
   describe("getStatusPriority", () => {
     it("should return correct priority for each status", () => {
-      expect(getStatusPriority({ status: "CRITICAL_FAILURE" })).toBe(
-        "critical",
-      );
+      expect(getStatusPriority({ status: "CRITICAL_FAILURE" })).toBe("critical");
       expect(getStatusPriority({ status: "ERROR" })).toBe("high");
       expect(getStatusPriority({ status: "ISSUES_DETECTED" })).toBe("medium");
       expect(getStatusPriority({ status: "HEALTHY" })).toBe("low");
@@ -175,16 +136,12 @@ describe("syncHealthHelpers", () => {
   describe("requiresImmediateAttention", () => {
     it("should return true for error states", () => {
       expect(requiresImmediateAttention({ status: "ERROR" })).toBe(true);
-      expect(requiresImmediateAttention({ status: "CRITICAL_FAILURE" })).toBe(
-        true,
-      );
+      expect(requiresImmediateAttention({ status: "CRITICAL_FAILURE" })).toBe(true);
     });
 
     it("should return false for non-error states", () => {
       expect(requiresImmediateAttention({ status: "HEALTHY" })).toBe(false);
-      expect(requiresImmediateAttention({ status: "ISSUES_DETECTED" })).toBe(
-        false,
-      );
+      expect(requiresImmediateAttention({ status: "ISSUES_DETECTED" })).toBe(false);
       expect(requiresImmediateAttention({ status: "UNKNOWN" })).toBe(false);
     });
   });
@@ -256,11 +213,9 @@ describe("syncHealthHelpers", () => {
       const failedResult = { success: false };
 
       expect(formatRecoveryResult(successResult).message).toBe(
-        "Recovery operation completed successfully",
+        "Recovery operation completed successfully"
       );
-      expect(formatRecoveryResult(failedResult).message).toBe(
-        "Recovery operation failed",
-      );
+      expect(formatRecoveryResult(failedResult).message).toBe("Recovery operation failed");
     });
   });
 
@@ -271,28 +226,28 @@ describe("syncHealthHelpers", () => {
     it("should return validate button style", () => {
       const style = getActionButtonStyle("validate");
       expect(style).toBe(
-        `${baseStyle} bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700`,
+        `${baseStyle} bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700`
       );
     });
 
     it("should return reset button style", () => {
       const style = getActionButtonStyle("reset");
       expect(style).toBe(
-        `${baseStyle} bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600`,
+        `${baseStyle} bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600`
       );
     });
 
     it("should return refresh button style", () => {
       const style = getActionButtonStyle("refresh");
       expect(style).toBe(
-        `${baseStyle} bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:from-emerald-600 hover:to-green-700`,
+        `${baseStyle} bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:from-emerald-600 hover:to-green-700`
       );
     });
 
     it("should return default button style for unknown types", () => {
       const style = getActionButtonStyle("unknown");
       expect(style).toBe(
-        `${baseStyle} bg-white/60 backdrop-blur-sm text-gray-700 hover:bg-white/80`,
+        `${baseStyle} bg-white/60 backdrop-blur-sm text-gray-700 hover:bg-white/80`
       );
     });
   });

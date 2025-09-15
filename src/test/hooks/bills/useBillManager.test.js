@@ -132,11 +132,9 @@ describe("useBillManager Hook", () => {
   describe("Data Resolution", () => {
     it("should prioritize prop data over hook data", () => {
       const useTransactions = vi.mocked(
-        require("../../../hooks/common/useTransactions").useTransactions,
+        require("../../../hooks/common/useTransactions").useTransactions
       );
-      const useEnvelopes = vi.mocked(
-        require("../../../hooks/budgeting/useEnvelopes").useEnvelopes,
-      );
+      const useEnvelopes = vi.mocked(require("../../../hooks/budgeting/useEnvelopes").useEnvelopes);
 
       useTransactions.mockReturnValue({
         data: [{ id: "hook-transaction" }],
@@ -162,11 +160,9 @@ describe("useBillManager Hook", () => {
 
     it("should fall back to hook data when props are empty", () => {
       const useTransactions = vi.mocked(
-        require("../../../hooks/common/useTransactions").useTransactions,
+        require("../../../hooks/common/useTransactions").useTransactions
       );
-      const useEnvelopes = vi.mocked(
-        require("../../../hooks/budgeting/useEnvelopes").useEnvelopes,
-      );
+      const useEnvelopes = vi.mocked(require("../../../hooks/budgeting/useEnvelopes").useEnvelopes);
 
       useTransactions.mockReturnValue({
         data: [{ id: "hook-transaction" }],
@@ -187,12 +183,9 @@ describe("useBillManager Hook", () => {
 
   describe("Bill Processing", () => {
     it("should process bills with calculations", () => {
-      const useBills = vi.mocked(
-        require("../../../hooks/bills/useBills").default,
-      );
+      const useBills = vi.mocked(require("../../../hooks/bills/useBills").default);
       const processBillCalculations = vi.mocked(
-        require("../../../utils/bills/billCalculations")
-          .processBillCalculations,
+        require("../../../utils/bills/billCalculations").processBillCalculations
       );
 
       useBills.mockReturnValue({
@@ -207,7 +200,7 @@ describe("useBillManager Hook", () => {
       const { result } = renderHook(() => useBillManager(mockProps));
 
       expect(processBillCalculations).toHaveBeenCalledWith(
-        expect.objectContaining({ id: "bill-1", name: "Test Bill" }),
+        expect.objectContaining({ id: "bill-1", name: "Test Bill" })
       );
       expect(result.current.bills).toEqual([
         expect.objectContaining({
@@ -249,7 +242,7 @@ describe("useBillManager Hook", () => {
 
     it("should handle search errors", async () => {
       const generateBillSuggestions = vi.mocked(
-        require("../../../utils/common/billDiscovery").generateBillSuggestions,
+        require("../../../utils/common/billDiscovery").generateBillSuggestions
       );
       generateBillSuggestions.mockImplementation(() => {
         throw new Error("Search failed");
@@ -266,9 +259,7 @@ describe("useBillManager Hook", () => {
     });
 
     it("should add discovered bills", async () => {
-      const useBills = vi.mocked(
-        require("../../../hooks/bills/useBills").default,
-      );
+      const useBills = vi.mocked(require("../../../hooks/bills/useBills").default);
       const mockAddBill = vi.fn();
 
       useBills.mockReturnValue({
@@ -345,9 +336,7 @@ describe("useBillManager Hook", () => {
         result.current.setSelectedBills(new Set(["bill-1", "bill-2"]));
       });
 
-      expect(result.current.selectedBills).toEqual(
-        new Set(["bill-1", "bill-2"]),
-      );
+      expect(result.current.selectedBills).toEqual(new Set(["bill-1", "bill-2"]));
     });
 
     it("should manage modal states", () => {
@@ -384,14 +373,10 @@ describe("useBillManager Hook", () => {
   describe("Loading States", () => {
     it("should aggregate loading states from hooks", () => {
       const useTransactions = vi.mocked(
-        require("../../../hooks/common/useTransactions").useTransactions,
+        require("../../../hooks/common/useTransactions").useTransactions
       );
-      const useEnvelopes = vi.mocked(
-        require("../../../hooks/budgeting/useEnvelopes").useEnvelopes,
-      );
-      const useBills = vi.mocked(
-        require("../../../hooks/bills/useBills").default,
-      );
+      const useEnvelopes = vi.mocked(require("../../../hooks/budgeting/useEnvelopes").useEnvelopes);
+      const useBills = vi.mocked(require("../../../hooks/bills/useBills").default);
 
       useTransactions.mockReturnValue({
         data: [],
@@ -421,7 +406,7 @@ describe("useBillManager Hook", () => {
   describe("Error Handling", () => {
     it("should handle errors in bill discovery", async () => {
       const generateBillSuggestions = vi.mocked(
-        require("../../../utils/common/billDiscovery").generateBillSuggestions,
+        require("../../../utils/common/billDiscovery").generateBillSuggestions
       );
 
       generateBillSuggestions.mockImplementation(() => {
@@ -438,9 +423,7 @@ describe("useBillManager Hook", () => {
     });
 
     it("should handle errors when adding discovered bills", async () => {
-      const useBills = vi.mocked(
-        require("../../../hooks/bills/useBills").default,
-      );
+      const useBills = vi.mocked(require("../../../hooks/bills/useBills").default);
       const mockAddBill = vi.fn().mockRejectedValue(new Error("Add failed"));
 
       useBills.mockReturnValue({
@@ -467,9 +450,7 @@ describe("useBillManager Hook", () => {
       const { result } = renderHook(() => useBillManager(mockProps));
 
       expect(result.current.billOperations).toBeDefined();
-      expect(typeof result.current.billOperations.handleBulkUpdate).toBe(
-        "function",
-      );
+      expect(typeof result.current.billOperations.handleBulkUpdate).toBe("function");
       expect(typeof result.current.billOperations.markAsPaid).toBe("function");
     });
   });

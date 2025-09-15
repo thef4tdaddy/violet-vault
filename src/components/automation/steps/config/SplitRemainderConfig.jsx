@@ -11,16 +11,13 @@ const SplitRemainderConfig = ({
   return (
     <>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-3">
-          Target Envelopes *
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-3">Target Envelopes *</label>
         <p className="text-sm text-gray-600 mb-4">
           Select multiple envelopes to split the remaining funds between:
         </p>
         <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-lg">
           {envelopes.map((envelope) => {
-            const isSelected =
-              ruleData.config.targetIds?.includes(envelope.id) || false;
+            const isSelected = ruleData.config.targetIds?.includes(envelope.id) || false;
             return (
               <div
                 key={envelope.id}
@@ -38,12 +35,9 @@ const SplitRemainderConfig = ({
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
                     <div>
-                      <p className="font-medium text-gray-900">
-                        {envelope.name}
-                      </p>
+                      <p className="font-medium text-gray-900">{envelope.name}</p>
                       <p className="text-sm text-gray-600">
-                        Current: $
-                        {envelope.currentBalance?.toFixed(2) || "0.00"}
+                        Current: ${envelope.currentBalance?.toFixed(2) || "0.00"}
                         {envelope.monthlyAmount && (
                           <span className="text-gray-500 ml-2">
                             / ${envelope.monthlyAmount.toFixed(2)} monthly

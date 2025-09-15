@@ -44,9 +44,7 @@ describe("useTransactionBalanceUpdater", () => {
     expect(result.current.isUpdating).toBe(false);
     expect(result.current.updateError).toBe(null);
     expect(typeof result.current.updateBalanceForTransaction).toBe("function");
-    expect(typeof result.current.updateBalanceForMultipleTransactions).toBe(
-      "function",
-    );
+    expect(typeof result.current.updateBalanceForMultipleTransactions).toBe("function");
   });
 
   describe("updateBalanceForTransaction", () => {
@@ -67,15 +65,12 @@ describe("useTransactionBalanceUpdater", () => {
 
       let updateResult;
       await act(async () => {
-        updateResult =
-          await result.current.updateBalanceForTransaction(mockTransaction);
+        updateResult = await result.current.updateBalanceForTransaction(mockTransaction);
       });
 
       expect(updateResult.success).toBe(true);
       expect(updateResult.newBalance).toBe(949.75);
-      expect(
-        mockBudgetDatabaseService.updateBudgetBalance,
-      ).toHaveBeenCalledWith({
+      expect(mockBudgetDatabaseService.updateBudgetBalance).toHaveBeenCalledWith({
         transactionAmount: -50.25,
         category: "Food",
         transactionId: "1",
@@ -90,16 +85,13 @@ describe("useTransactionBalanceUpdater", () => {
       };
 
       const mockError = new Error("Database update failed");
-      mockBudgetDatabaseService.updateBudgetBalance.mockRejectedValue(
-        mockError,
-      );
+      mockBudgetDatabaseService.updateBudgetBalance.mockRejectedValue(mockError);
 
       const { result } = renderHook(() => useTransactionBalanceUpdater());
 
       let updateResult;
       await act(async () => {
-        updateResult =
-          await result.current.updateBalanceForTransaction(mockTransaction);
+        updateResult = await result.current.updateBalanceForTransaction(mockTransaction);
       });
 
       expect(updateResult.success).toBe(false);
@@ -117,9 +109,7 @@ describe("useTransactionBalanceUpdater", () => {
 
       expect(updateResult.success).toBe(false);
       expect(updateResult.error).toBeInstanceOf(Error);
-      expect(updateResult.error.message).toContain(
-        "Transaction data is required",
-      );
+      expect(updateResult.error.message).toContain("Transaction data is required");
     });
 
     it("should set loading state during update", async () => {
@@ -130,10 +120,7 @@ describe("useTransactionBalanceUpdater", () => {
       };
 
       mockBudgetDatabaseService.updateBudgetBalance.mockImplementation(
-        () =>
-          new Promise((resolve) =>
-            setTimeout(() => resolve({ success: true }), 100),
-          ),
+        () => new Promise((resolve) => setTimeout(() => resolve({ success: true }), 100))
       );
 
       const { result } = renderHook(() => useTransactionBalanceUpdater());
@@ -168,19 +155,14 @@ describe("useTransactionBalanceUpdater", () => {
 
       let updateResult;
       await act(async () => {
-        updateResult =
-          await result.current.updateBalanceForMultipleTransactions(
-            mockTransactions,
-          );
+        updateResult = await result.current.updateBalanceForMultipleTransactions(mockTransactions);
       });
 
       expect(updateResult.success).toBe(true);
       expect(updateResult.successCount).toBe(3);
       expect(updateResult.failureCount).toBe(0);
       expect(updateResult.finalBalance).toBe(1058.75);
-      expect(
-        mockBudgetDatabaseService.updateBudgetBalance,
-      ).toHaveBeenCalledTimes(3);
+      expect(mockBudgetDatabaseService.updateBudgetBalance).toHaveBeenCalledTimes(3);
     });
 
     it("should handle partial failures in batch updates", async () => {
@@ -199,10 +181,7 @@ describe("useTransactionBalanceUpdater", () => {
 
       let updateResult;
       await act(async () => {
-        updateResult =
-          await result.current.updateBalanceForMultipleTransactions(
-            mockTransactions,
-          );
+        updateResult = await result.current.updateBalanceForMultipleTransactions(mockTransactions);
       });
 
       expect(updateResult.success).toBe(false); // Overall failure due to partial failures
@@ -217,16 +196,13 @@ describe("useTransactionBalanceUpdater", () => {
 
       let updateResult;
       await act(async () => {
-        updateResult =
-          await result.current.updateBalanceForMultipleTransactions([]);
+        updateResult = await result.current.updateBalanceForMultipleTransactions([]);
       });
 
       expect(updateResult.success).toBe(true);
       expect(updateResult.successCount).toBe(0);
       expect(updateResult.failureCount).toBe(0);
-      expect(
-        mockBudgetDatabaseService.updateBudgetBalance,
-      ).not.toHaveBeenCalled();
+      expect(mockBudgetDatabaseService.updateBudgetBalance).not.toHaveBeenCalled();
     });
   });
 
@@ -249,9 +225,7 @@ describe("useTransactionBalanceUpdater", () => {
         await result.current.updateBalanceForTransaction(mockTransaction);
       });
 
-      expect(
-        mockBudgetDatabaseService.updateBudgetBalance,
-      ).toHaveBeenCalledWith({
+      expect(mockBudgetDatabaseService.updateBudgetBalance).toHaveBeenCalledWith({
         transactionAmount: -75.25,
         category: "Food",
         transactionId: "1",
@@ -276,9 +250,7 @@ describe("useTransactionBalanceUpdater", () => {
         await result.current.updateBalanceForTransaction(mockTransaction);
       });
 
-      expect(
-        mockBudgetDatabaseService.updateBudgetBalance,
-      ).toHaveBeenCalledWith({
+      expect(mockBudgetDatabaseService.updateBudgetBalance).toHaveBeenCalledWith({
         transactionAmount: 500.0,
         category: "Income",
         transactionId: "1",
@@ -295,9 +267,7 @@ describe("useTransactionBalanceUpdater", () => {
       };
 
       // First call fails
-      mockBudgetDatabaseService.updateBudgetBalance.mockRejectedValueOnce(
-        new Error("First error"),
-      );
+      mockBudgetDatabaseService.updateBudgetBalance.mockRejectedValueOnce(new Error("First error"));
 
       const { result } = renderHook(() => useTransactionBalanceUpdater());
 
@@ -346,9 +316,7 @@ describe("useTransactionBalanceUpdater", () => {
       });
 
       // Both updates should have been processed
-      expect(
-        mockBudgetDatabaseService.updateBudgetBalance,
-      ).toHaveBeenCalledTimes(2);
+      expect(mockBudgetDatabaseService.updateBudgetBalance).toHaveBeenCalledTimes(2);
     });
   });
 });

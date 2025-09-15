@@ -62,8 +62,7 @@ const ReceiptButton = ({ onTransactionCreated, variant = "primary" }) => {
 
   // Render different button styles based on variant
   const renderButton = () => {
-    const baseClasses =
-      "flex items-center gap-2 transition-colors disabled:opacity-50";
+    const baseClasses = "flex items-center gap-2 transition-colors disabled:opacity-50";
 
     switch (variant) {
       case "secondary":
@@ -122,10 +121,7 @@ const ReceiptButton = ({ onTransactionCreated, variant = "primary" }) => {
 
       {/* Receipt Scanner Modal */}
       {showScanner && (
-        <ReceiptScanner
-          onReceiptProcessed={handleReceiptProcessed}
-          onClose={handleCloseScanner}
-        />
+        <ReceiptScanner onReceiptProcessed={handleReceiptProcessed} onClose={handleCloseScanner} />
       )}
 
       {/* Receipt to Transaction Modal */}

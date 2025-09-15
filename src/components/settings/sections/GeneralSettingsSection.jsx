@@ -12,8 +12,7 @@ const GeneralSettingsSection = ({
   return (
     <div className="space-y-6">
       <h3 className="font-black text-black text-base">
-        <span className="text-lg">G</span>ENERAL{" "}
-        <span className="text-lg">S</span>ETTINGS
+        <span className="text-lg">G</span>ENERAL <span className="text-lg">S</span>ETTINGS
       </h3>
 
       {isLocalOnlyMode && (
@@ -43,9 +42,7 @@ const GeneralSettingsSection = ({
           <h4 className="font-medium text-purple-900">Cloud Sync</h4>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-purple-900">
-                Sync your data across devices
-              </p>
+              <p className="text-sm text-purple-900">Sync your data across devices</p>
               <p className="text-xs text-purple-700 mt-1">
                 Status: {cloudSyncEnabled ? "Enabled" : "Disabled"}
               </p>

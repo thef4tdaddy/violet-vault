@@ -24,10 +24,7 @@ export const useBillValidation = (envelopes = []) => {
         errors.push("Invalid due date format");
       }
 
-      if (
-        bill.envelopeId &&
-        !envelopes.find((env) => env.id === bill.envelopeId)
-      ) {
+      if (bill.envelopeId && !envelopes.find((env) => env.id === bill.envelopeId)) {
         errors.push("Assigned envelope does not exist");
       }
 
@@ -36,7 +33,7 @@ export const useBillValidation = (envelopes = []) => {
         errors,
       };
     },
-    [envelopes],
+    [envelopes]
   );
 
   /**
@@ -48,7 +45,7 @@ export const useBillValidation = (envelopes = []) => {
       type,
       changes,
     }),
-    [],
+    []
   );
 
   return {

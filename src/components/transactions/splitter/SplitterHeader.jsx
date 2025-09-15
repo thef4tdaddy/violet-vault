@@ -32,8 +32,7 @@ const SplitterHeader = ({ transaction, onClose, hasUnsavedChanges }) => {
           <div>
             <h2 className="text-xl font-black text-white">SPLIT TRANSACTION</h2>
             <p className="text-blue-100 text-sm font-medium">
-              {transaction.description} • $
-              {Math.abs(transaction.amount).toFixed(2)}
+              {transaction.description} • ${Math.abs(transaction.amount).toFixed(2)}
             </p>
           </div>
         </div>

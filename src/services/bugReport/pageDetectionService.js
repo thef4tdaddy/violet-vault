@@ -137,9 +137,7 @@ export class PageDetectionService {
    */
   static extractMainHeading() {
     try {
-      const mainHeading = document.querySelector(
-        "main h1, section h1, .content h1, h1",
-      );
+      const mainHeading = document.querySelector("main h1, section h1, .content h1, h1");
       return mainHeading ? mainHeading.textContent?.trim() : null;
     } catch {
       return null;
@@ -158,11 +156,7 @@ export class PageDetectionService {
 
       let location = currentPage;
 
-      if (
-        screenTitle &&
-        screenTitle !== document.title &&
-        screenTitle !== "Unknown"
-      ) {
+      if (screenTitle && screenTitle !== document.title && screenTitle !== "Unknown") {
         location += ` > ${screenTitle}`;
       }
 
