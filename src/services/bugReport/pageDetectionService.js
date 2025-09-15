@@ -1,10 +1,12 @@
 /**
  * Page Detection Service
  * Handles page identification and route analysis
+ * Enhanced with React Router integration for Issue #347
  * Extracted from contextAnalysisService.js for Issue #513
  */
 import logger from "../../utils/common/logger";
 import { identifyCurrentPage as detectCurrentPage } from "../../utils/pageDetection/pageIdentifier";
+import { pathToViewMap } from "../../components/layout/routeConfig";
 
 export class PageDetectionService {
   /**
@@ -16,20 +18,35 @@ export class PageDetectionService {
   }
 
   /**
-   * Get detailed route information
+   * Get detailed route information with React Router awareness
    * @returns {Object} Route information
    */
   static getRouteInfo() {
     try {
       const url = new URL(window.location.href);
+      const pathname = url.pathname;
+
+      // Enhanced route analysis using route configuration
+      const currentView = pathToViewMap[pathname] || "unknown";
+      const isAppRoute = Object.keys(pathToViewMap).includes(pathname) || pathname.startsWith("/app");
+      const isMarketingRoute = !isAppRoute && !pathname.startsWith("/app");
+
+      // Check build environment for PWA detection
+      const isPWA = typeof process !== 'undefined' && process.env?.REACT_APP_BUILD_TARGET === "pwa";
 
       return {
-        pathname: url.pathname,
+        pathname,
         search: url.search,
         hash: url.hash,
         searchParams: Object.fromEntries(url.searchParams),
-        segments: url.pathname.split("/").filter(Boolean),
+        segments: pathname.split("/").filter(Boolean),
         currentPage: this.identifyCurrentPage(),
+        // Enhanced router information
+        currentView,
+        isAppRoute,
+        isMarketingRoute,
+        buildTarget: isPWA ? "pwa" : "web",
+        routeType: isAppRoute ? "app" : "marketing",
       };
     } catch (error) {
       logger.warn("Error collecting route info", error);
@@ -40,6 +57,11 @@ export class PageDetectionService {
         searchParams: {},
         segments: [],
         currentPage: "unknown",
+        currentView: "unknown",
+        isAppRoute: false,
+        isMarketingRoute: false,
+        buildTarget: "web",
+        routeType: "unknown",
       };
     }
   }
@@ -147,17 +169,44 @@ export class PageDetectionService {
   }
 
   /**
-   * Get user's location within the app with hierarchy
+   * Get user's location within the app with hierarchy (Router-enhanced)
    * @returns {string} User location string
    */
   static getUserLocation() {
     try {
-      const currentPage = this.identifyCurrentPage();
+      const routeInfo = this.getRouteInfo();
       const screenTitle = this.extractScreenTitle();
       const activeModal = this.getActiveModalTitle();
 
-      let location = currentPage;
+      // Start with router-aware location
+      let location;
 
+      if (routeInfo.isMarketingRoute) {
+        location = `Marketing: ${routeInfo.pathname}`;
+      } else if (routeInfo.isAppRoute) {
+        // Convert view to user-friendly name
+        const viewNames = {
+          dashboard: "Dashboard",
+          envelopes: "Envelopes",
+          savings: "Savings Goals",
+          supplemental: "Supplemental Accounts",
+          paycheck: "Paycheck Processor",
+          bills: "Bills & Payments",
+          transactions: "Transaction Ledger",
+          debts: "Debt Management",
+          analytics: "Analytics & Reports",
+          automation: "Automation Rules",
+          activity: "Activity History",
+        };
+
+        const viewName = viewNames[routeInfo.currentView] || routeInfo.currentView;
+        location = routeInfo.buildTarget === "pwa" ? `PWA: ${viewName}` : `App: ${viewName}`;
+      } else {
+        // Fallback to legacy detection
+        location = this.identifyCurrentPage();
+      }
+
+      // Add screen title if different
       if (
         screenTitle &&
         screenTitle !== document.title &&
@@ -166,6 +215,7 @@ export class PageDetectionService {
         location += ` > ${screenTitle}`;
       }
 
+      // Add modal context
       if (activeModal) {
         location += ` > ${activeModal}`;
       }
