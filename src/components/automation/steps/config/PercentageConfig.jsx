@@ -37,9 +37,7 @@ const PercentageConfig = ({ ruleData, updateConfig, envelopes, errors }) => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Target Envelope *
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Target Envelope *</label>
         <select
           value={ruleData.config.targetId || ""}
           onChange={(e) => updateConfig({ targetId: e.target.value })}

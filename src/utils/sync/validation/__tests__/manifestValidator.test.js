@@ -52,7 +52,7 @@ describe("manifestValidator", () => {
           timestamp: Date.now(),
           chunks: {},
         },
-        "missing-version",
+        "missing-version"
       );
 
       const missingTimestampResult = validateManifest(
@@ -60,7 +60,7 @@ describe("manifestValidator", () => {
           version: "2.0",
           chunks: {},
         },
-        "missing-timestamp",
+        "missing-timestamp"
       );
 
       const missingChunksResult = validateManifest(
@@ -68,23 +68,19 @@ describe("manifestValidator", () => {
           version: "2.0",
           timestamp: Date.now(),
         },
-        "missing-chunks",
+        "missing-chunks"
       );
 
       expect(missingVersionResult.isValid).toBe(false);
-      expect(missingVersionResult.errors).toContain(
-        "Missing required manifest property: version",
-      );
+      expect(missingVersionResult.errors).toContain("Missing required manifest property: version");
 
       expect(missingTimestampResult.isValid).toBe(false);
       expect(missingTimestampResult.errors).toContain(
-        "Missing required manifest property: timestamp",
+        "Missing required manifest property: timestamp"
       );
 
       expect(missingChunksResult.isValid).toBe(false);
-      expect(missingChunksResult.errors).toContain(
-        "Missing required manifest property: chunks",
-      );
+      expect(missingChunksResult.errors).toContain("Missing required manifest property: chunks");
     });
   });
 
@@ -123,9 +119,7 @@ describe("manifestValidator", () => {
       const result = validateManifest(manifest, "no-version");
 
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain(
-        "Missing required manifest property: version",
-      );
+      expect(result.errors).toContain("Missing required manifest property: version");
     });
   });
 
@@ -144,8 +138,7 @@ describe("manifestValidator", () => {
     });
 
     it("should warn about future timestamp", () => {
-      const futureTime =
-        Date.now() + VALIDATION_CONSTANTS.CLOCK_SKEW_TOLERANCE + 1000;
+      const futureTime = Date.now() + VALIDATION_CONSTANTS.CLOCK_SKEW_TOLERANCE + 1000;
       const manifest = {
         version: "2.0",
         timestamp: futureTime,
@@ -170,9 +163,7 @@ describe("manifestValidator", () => {
       const result = validateManifest(manifest, "old-timestamp");
 
       expect(result.isValid).toBe(true);
-      expect(result.warnings).toContainEqual(
-        expect.stringContaining("Manifest is old:"),
-      );
+      expect(result.warnings).toContainEqual(expect.stringContaining("Manifest is old:"));
     });
 
     it("should accept recent valid timestamp", () => {
@@ -197,9 +188,7 @@ describe("manifestValidator", () => {
       const result = validateManifest(manifest, "no-timestamp");
 
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain(
-        "Missing required manifest property: timestamp",
-      );
+      expect(result.errors).toContain("Missing required manifest property: timestamp");
     });
   });
 
@@ -306,8 +295,7 @@ describe("manifestValidator", () => {
 
   describe("clock skew tolerance", () => {
     it("should accept timestamp within clock skew tolerance", () => {
-      const futureTime =
-        Date.now() + VALIDATION_CONSTANTS.CLOCK_SKEW_TOLERANCE - 1000;
+      const futureTime = Date.now() + VALIDATION_CONSTANTS.CLOCK_SKEW_TOLERANCE - 1000;
       const manifest = {
         version: "2.0",
         timestamp: futureTime,
@@ -321,8 +309,7 @@ describe("manifestValidator", () => {
     });
 
     it("should warn about timestamp beyond clock skew tolerance", () => {
-      const futureTime =
-        Date.now() + VALIDATION_CONSTANTS.CLOCK_SKEW_TOLERANCE + 1000;
+      const futureTime = Date.now() + VALIDATION_CONSTANTS.CLOCK_SKEW_TOLERANCE + 1000;
       const manifest = {
         version: "2.0",
         timestamp: futureTime,
@@ -352,15 +339,14 @@ describe("manifestValidator", () => {
         expect.objectContaining({
           isValid: false,
           errors: expect.any(Array),
-        }),
+        })
       );
     });
 
     it("should log validation warnings", async () => {
       const logger = await import("../../common/logger");
 
-      const futureTime =
-        Date.now() + VALIDATION_CONSTANTS.CLOCK_SKEW_TOLERANCE + 1000;
+      const futureTime = Date.now() + VALIDATION_CONSTANTS.CLOCK_SKEW_TOLERANCE + 1000;
       const manifest = {
         version: "2.0",
         timestamp: futureTime,
@@ -373,10 +359,8 @@ describe("manifestValidator", () => {
         "⚠️ Manifest validation warnings for logging-warning-test",
         expect.objectContaining({
           isValid: true,
-          warnings: expect.arrayContaining([
-            "Manifest timestamp is in the future",
-          ]),
-        }),
+          warnings: expect.arrayContaining(["Manifest timestamp is in the future"]),
+        })
       );
     });
 
@@ -398,7 +382,7 @@ describe("manifestValidator", () => {
         expect.objectContaining({
           chunkCount: 1,
           manifestSize: expect.any(Number),
-        }),
+        })
       );
     });
   });

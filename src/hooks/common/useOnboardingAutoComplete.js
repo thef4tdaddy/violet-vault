@@ -10,8 +10,7 @@ import logger from "../../utils/common/logger";
  * Hook that automatically detects user actions and marks onboarding steps as complete
  */
 export const useOnboardingAutoComplete = () => {
-  const { markStepComplete, isStepComplete, preferences, isOnboarded } =
-    useOnboardingStore();
+  const { markStepComplete, isStepComplete, preferences, isOnboarded } = useOnboardingStore();
 
   const { envelopes = [] } = useEnvelopes();
   const { bills = [] } = useBills();
@@ -45,10 +44,7 @@ export const useOnboardingAutoComplete = () => {
       actualBalance !== undefined &&
       !isStepComplete("firstBankBalance")
     ) {
-      logger.info(
-        "🎯 Auto-completing firstBankBalance step - actual balance set:",
-        actualBalance,
-      );
+      logger.info("🎯 Auto-completing firstBankBalance step - actual balance set:", actualBalance);
       markStepComplete("firstBankBalance");
     }
   }, [actualBalance, shouldAutoComplete, isStepComplete, markStepComplete]);
@@ -71,7 +67,7 @@ export const useOnboardingAutoComplete = () => {
     if (userCreatedEnvelopes.length > 0 && !isStepComplete("firstEnvelope")) {
       logger.info(
         "🎯 Auto-completing firstEnvelope step - user envelope created:",
-        userCreatedEnvelopes[0].name,
+        userCreatedEnvelopes[0].name
       );
       markStepComplete("firstEnvelope");
     }
@@ -82,10 +78,7 @@ export const useOnboardingAutoComplete = () => {
     if (!shouldAutoComplete) return;
 
     if (bills.length > 0 && !isStepComplete("firstBills")) {
-      logger.info(
-        "🎯 Auto-completing firstBills step - bill added:",
-        bills[0].description,
-      );
+      logger.info("🎯 Auto-completing firstBills step - bill added:", bills[0].description);
       markStepComplete("firstBills");
     }
   }, [bills, shouldAutoComplete, isStepComplete, markStepComplete]);
@@ -95,13 +88,13 @@ export const useOnboardingAutoComplete = () => {
     if (!shouldAutoComplete) return;
 
     const expenseTransactions = transactions.filter(
-      (t) => t && typeof t.amount === "number" && t.amount < 0,
+      (t) => t && typeof t.amount === "number" && t.amount < 0
     );
 
     if (expenseTransactions.length > 0 && !isStepComplete("firstTransaction")) {
       logger.info(
         "🎯 Auto-completing firstTransaction step - expense recorded:",
-        expenseTransactions[0].description,
+        expenseTransactions[0].description
       );
       markStepComplete("firstTransaction");
     }
@@ -118,13 +111,13 @@ export const useOnboardingAutoComplete = () => {
         t.amount > 0 &&
         (t.type === "income" ||
           t.category?.toLowerCase().includes("paycheck") ||
-          t.category?.toLowerCase().includes("salary")),
+          t.category?.toLowerCase().includes("salary"))
     );
 
     if (incomeTransactions.length > 0 && !isStepComplete("firstPaycheck")) {
       logger.info(
         "🎯 Auto-completing firstPaycheck step - income recorded:",
-        incomeTransactions[0].description,
+        incomeTransactions[0].description
       );
       markStepComplete("firstPaycheck");
     }
@@ -139,7 +132,7 @@ export const useOnboardingAutoComplete = () => {
     if (linkedBills.length > 0 && !isStepComplete("linkedEnvelopes")) {
       logger.info(
         "🎯 Auto-completing linkedEnvelopes step - bill linked to envelope:",
-        linkedBills[0].description,
+        linkedBills[0].description
       );
       markStepComplete("linkedEnvelopes");
     }
@@ -154,7 +147,7 @@ export const useOnboardingAutoComplete = () => {
     if (fundedEnvelopes.length > 0 && !isStepComplete("firstAllocation")) {
       logger.info(
         "🎯 Auto-completing firstAllocation step - envelope funded:",
-        fundedEnvelopes[0].name,
+        fundedEnvelopes[0].name
       );
       markStepComplete("firstAllocation");
     }

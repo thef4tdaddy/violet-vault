@@ -3,11 +3,7 @@
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  queryKeys,
-  optimisticHelpers,
-  prefetchHelpers,
-} from "../../../utils/common/queryClient";
+import { queryKeys, optimisticHelpers, prefetchHelpers } from "../../../utils/common/queryClient";
 import { budgetDb } from "../../../db/budgetDb";
 import logger from "../../../utils/common/logger.js";
 
@@ -18,8 +14,7 @@ export const useBudgetUtilities = () => {
   const prefetchData = {
     envelopes: (filters) => prefetchHelpers.prefetchEnvelopes(filters),
     dashboard: () => prefetchHelpers.prefetchDashboard(),
-    transactions: (dateRange) =>
-      prefetchHelpers.prefetchTransactions(dateRange),
+    transactions: (dateRange) => prefetchHelpers.prefetchTransactions(dateRange),
   };
 
   // Sync utilities

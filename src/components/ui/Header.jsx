@@ -39,9 +39,7 @@ const Header = memo(
                   ? "border-orange-500" // Local development
                   : window.location.hostname.includes("dev.f4tdaddy.com") ||
                       (window.location.hostname.includes("vercel.app") &&
-                        !window.location.hostname.includes(
-                          "violet-vault-production",
-                        ))
+                        !window.location.hostname.includes("violet-vault-production"))
                     ? "border-red-500" // Preview/staging environments
                     : "border-purple-600" // Production
               }`}
@@ -69,9 +67,7 @@ const Header = memo(
                   {React.createElement(getIcon("Monitor"), {
                     className: "h-3 w-3 text-blue-600 mr-1",
                   })}
-                  <span className="text-xs font-medium text-blue-800">
-                    Local-Only Mode
-                  </span>
+                  <span className="text-xs font-medium text-blue-800">Local-Only Mode</span>
                 </button>
               )}
             </div>
@@ -121,7 +117,7 @@ const Header = memo(
         )}
       </div>
     );
-  },
+  }
 );
 
 export default Header;

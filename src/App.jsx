@@ -9,9 +9,7 @@ import ConfirmProvider from "./components/ui/ConfirmProvider";
 import PromptProvider from "./components/ui/PromptProvider";
 
 // Lazy load monitoring to reduce main bundle size
-const HighlightLoader = React.lazy(
-  () => import("./components/monitoring/HighlightLoader"),
-);
+const HighlightLoader = React.lazy(() => import("./components/monitoring/HighlightLoader"));
 
 const App = () => (
   <BrowserRouter>

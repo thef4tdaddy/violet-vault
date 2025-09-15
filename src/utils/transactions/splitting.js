@@ -18,7 +18,7 @@ export const findEnvelopeForCategory = (envelopes, categoryName) => {
     envelopes.find(
       (env) =>
         env.name.toLowerCase() === categoryName.toLowerCase() ||
-        env.category?.toLowerCase() === categoryName.toLowerCase(),
+        env.category?.toLowerCase() === categoryName.toLowerCase()
     ) || null
   );
 };
@@ -29,10 +29,7 @@ export const findEnvelopeForCategory = (envelopes, categoryName) => {
  * @param {Array} envelopes - Available envelopes
  * @returns {Array} Initial split allocations
  */
-export const initializeSplitsFromTransaction = (
-  transaction,
-  envelopes = [],
-) => {
+export const initializeSplitsFromTransaction = (transaction, envelopes = []) => {
   try {
     if (!transaction) return [];
 
@@ -49,10 +46,8 @@ export const initializeSplitsFromTransaction = (
         amount: Math.abs(item.totalPrice || item.price || 0),
         category: item.category?.name || transaction.category || "",
         envelopeId:
-          findEnvelopeForCategory(
-            envelopes,
-            item.category?.name || transaction.category || "",
-          )?.id || "",
+          findEnvelopeForCategory(envelopes, item.category?.name || transaction.category || "")
+            ?.id || "",
         isOriginalItem: true,
         originalItem: item,
       }));
@@ -109,11 +104,7 @@ export const initializeSplitsFromTransaction = (
  */
 export const calculateSplitTotals = (transaction, splitAllocations = []) => {
   try {
-    if (
-      !transaction ||
-      transaction.amount === null ||
-      transaction.amount === undefined
-    ) {
+    if (!transaction || transaction.amount === null || transaction.amount === undefined) {
       return {
         original: 0,
         allocated: 0,
@@ -127,7 +118,7 @@ export const calculateSplitTotals = (transaction, splitAllocations = []) => {
     const originalAmount = Math.abs(transaction.amount);
     const allocated = splitAllocations.reduce(
       (sum, split) => sum + (parseFloat(split.amount) || 0),
-      0,
+      0
     );
     const remaining = originalAmount - allocated;
 
@@ -159,10 +150,7 @@ export const calculateSplitTotals = (transaction, splitAllocations = []) => {
  * @param {Object} transaction - Original transaction
  * @returns {Array} Array of error messages
  */
-export const validateSplitAllocations = (
-  splitAllocations = [],
-  transaction,
-) => {
+export const validateSplitAllocations = (splitAllocations = [], transaction) => {
   const errors = [];
 
   try {
@@ -182,11 +170,11 @@ export const validateSplitAllocations = (
     if (!totals.isValid) {
       if (totals.isOverAllocated) {
         errors.push(
-          `Total splits ($${totals.allocated.toFixed(2)}) exceed original amount ($${totals.original.toFixed(2)})`,
+          `Total splits ($${totals.allocated.toFixed(2)}) exceed original amount ($${totals.original.toFixed(2)})`
         );
       } else {
         errors.push(
-          `Total splits ($${totals.allocated.toFixed(2)}) are less than original amount ($${totals.original.toFixed(2)})`,
+          `Total splits ($${totals.allocated.toFixed(2)}) are less than original amount ($${totals.original.toFixed(2)})`
         );
       }
     }
@@ -241,8 +229,7 @@ export const splitEvenly = (splitAllocations = [], transaction) => {
     if (splitAllocations.length === 0) return splitAllocations;
 
     const originalAmount = Math.abs(transaction.amount);
-    const amountPerSplit =
-      Math.round((originalAmount / splitAllocations.length) * 100) / 100;
+    const amountPerSplit = Math.round((originalAmount / splitAllocations.length) * 100) / 100;
 
     logger.debug("Splitting evenly", {
       originalAmount,
@@ -255,11 +242,8 @@ export const splitEvenly = (splitAllocations = [], transaction) => {
       // Adjust last split to handle rounding differences
       amount:
         index === splitAllocations.length - 1
-          ? Math.round(
-              (originalAmount -
-                amountPerSplit * (splitAllocations.length - 1)) *
-                100,
-            ) / 100
+          ? Math.round((originalAmount - amountPerSplit * (splitAllocations.length - 1)) * 100) /
+            100
           : amountPerSplit,
     }));
   } catch (error) {
@@ -280,7 +264,7 @@ export const addNewSplit = (currentSplits = [], transaction, defaults = {}) => {
     const totalAmount = Math.abs(transaction.amount);
     const allocated = currentSplits.reduce(
       (sum, split) => sum + (parseFloat(split.amount) || 0),
-      0,
+      0
     );
     const remaining = totalAmount - allocated;
 
@@ -315,13 +299,7 @@ export const addNewSplit = (currentSplits = [], transaction, defaults = {}) => {
  * @param {Array} envelopes - Available envelopes (for category matching)
  * @returns {Array} Updated split allocations
  */
-export const updateSplitField = (
-  currentSplits = [],
-  splitId,
-  field,
-  value,
-  envelopes = [],
-) => {
+export const updateSplitField = (currentSplits = [], splitId, field, value, envelopes = []) => {
   try {
     return currentSplits.map((split) => {
       if (split.id === splitId) {
@@ -370,10 +348,7 @@ export const removeSplit = (currentSplits = [], splitId) => {
  * @param {Object} originalTransaction - Original transaction being split
  * @returns {Array} Prepared transactions for submission
  */
-export const prepareSplitTransactions = (
-  splitAllocations = [],
-  originalTransaction,
-) => {
+export const prepareSplitTransactions = (splitAllocations = [], originalTransaction) => {
   try {
     return splitAllocations.map((split, index) => ({
       id: `${originalTransaction.id}_split_${index}`,
@@ -415,10 +390,7 @@ export const prepareSplitTransactions = (
 export const getSplitSummary = (splitAllocations = [], transaction) => {
   try {
     const totals = calculateSplitTotals(transaction, splitAllocations);
-    const validationErrors = validateSplitAllocations(
-      splitAllocations,
-      transaction,
-    );
+    const validationErrors = validateSplitAllocations(splitAllocations, transaction);
 
     return {
       totalSplits: splitAllocations.length,
@@ -428,10 +400,7 @@ export const getSplitSummary = (splitAllocations = [], transaction) => {
       isValid: validationErrors.length === 0 && totals.isValid,
       isBalanced: totals.isValid,
       validationErrors,
-      canSubmit:
-        validationErrors.length === 0 &&
-        totals.isValid &&
-        splitAllocations.length > 0,
+      canSubmit: validationErrors.length === 0 && totals.isValid && splitAllocations.length > 0,
     };
   } catch (error) {
     logger.error("Error getting split summary", error);

@@ -39,9 +39,7 @@ describe("useDebtForm", () => {
 
       expect(result.current.formData.name).toBe("");
       expect(result.current.formData.type).toBe(DEBT_TYPES.PERSONAL);
-      expect(result.current.formData.paymentFrequency).toBe(
-        PAYMENT_FREQUENCIES.MONTHLY,
-      );
+      expect(result.current.formData.paymentFrequency).toBe(PAYMENT_FREQUENCIES.MONTHLY);
       expect(result.current.formData.createBill).toBe(true);
       expect(result.current.isEditMode).toBe(false);
     });
@@ -62,12 +60,10 @@ describe("useDebtForm", () => {
 
     test("should set payment method based on connected bill", () => {
       const { result } = renderHook(() =>
-        useDebtForm(mockDebt, true, mockConnectedBill, mockConnectedEnvelope),
+        useDebtForm(mockDebt, true, mockConnectedBill, mockConnectedEnvelope)
       );
 
-      expect(result.current.formData.paymentMethod).toBe(
-        "connect_existing_bill",
-      );
+      expect(result.current.formData.paymentMethod).toBe("connect_existing_bill");
       expect(result.current.formData.existingBillId).toBe("bill-1");
     });
   });
@@ -83,12 +79,8 @@ describe("useDebtForm", () => {
 
       expect(result.current.errors.name).toBe("Debt name is required");
       expect(result.current.errors.creditor).toBe("Creditor name is required");
-      expect(result.current.errors.currentBalance).toBe(
-        "Valid current balance is required",
-      );
-      expect(result.current.errors.minimumPayment).toBe(
-        "Valid minimum payment is required",
-      );
+      expect(result.current.errors.currentBalance).toBe("Valid current balance is required");
+      expect(result.current.errors.minimumPayment).toBe("Valid minimum payment is required");
     });
 
     test("should validate numeric fields", () => {
@@ -110,18 +102,10 @@ describe("useDebtForm", () => {
         expect(isValid).toBe(false);
       });
 
-      expect(result.current.errors.currentBalance).toBe(
-        "Valid current balance is required",
-      );
-      expect(result.current.errors.originalBalance).toBe(
-        "Original balance must be positive",
-      );
-      expect(result.current.errors.interestRate).toBe(
-        "Interest rate must be between 0 and 100",
-      );
-      expect(result.current.errors.minimumPayment).toBe(
-        "Valid minimum payment is required",
-      );
+      expect(result.current.errors.currentBalance).toBe("Valid current balance is required");
+      expect(result.current.errors.originalBalance).toBe("Original balance must be positive");
+      expect(result.current.errors.interestRate).toBe("Interest rate must be between 0 and 100");
+      expect(result.current.errors.minimumPayment).toBe("Valid minimum payment is required");
     });
 
     test("should pass validation with valid data", () => {
@@ -166,9 +150,7 @@ describe("useDebtForm", () => {
         expect(isValid).toBe(false);
       });
 
-      expect(result.current.errors.existingBillId).toBe(
-        "Please select a bill to connect",
-      );
+      expect(result.current.errors.existingBillId).toBe("Please select a bill to connect");
     });
   });
 
@@ -257,14 +239,12 @@ describe("useDebtForm", () => {
           creditor: "Test Bank",
           currentBalance: 5000,
           minimumPayment: 150,
-        }),
+        })
       );
     });
 
     test("should handle submission error", async () => {
-      const mockOnSubmit = jest
-        .fn()
-        .mockRejectedValue(new Error("Submission failed"));
+      const mockOnSubmit = jest.fn().mockRejectedValue(new Error("Submission failed"));
       const { result } = renderHook(() => useDebtForm(null, true));
 
       act(() => {
@@ -282,9 +262,7 @@ describe("useDebtForm", () => {
       });
 
       expect(submissionResult).toBe(false);
-      expect(result.current.errors.submit).toBe(
-        "Failed to create debt. Please try again.",
-      );
+      expect(result.current.errors.submit).toBe("Failed to create debt. Please try again.");
     });
 
     test("should not submit if validation fails", async () => {
@@ -333,9 +311,7 @@ describe("useDebtForm", () => {
     test("should handle submitting state", async () => {
       const mockOnSubmit = jest
         .fn()
-        .mockImplementation(
-          () => new Promise((resolve) => setTimeout(resolve, 100)),
-        );
+        .mockImplementation(() => new Promise((resolve) => setTimeout(resolve, 100)));
       const { result } = renderHook(() => useDebtForm(null, true));
 
       act(() => {

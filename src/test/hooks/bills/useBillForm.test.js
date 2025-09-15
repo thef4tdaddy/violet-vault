@@ -116,9 +116,7 @@ describe("useBillForm Hook", () => {
         iconName: "Zap",
       };
 
-      const { result } = renderHook(() =>
-        useBillForm({ ...mockProps, editingBill }),
-      );
+      const { result } = renderHook(() => useBillForm({ ...mockProps, editingBill }));
 
       expect(result.current.formData.name).toBe("Electric Bill");
       expect(result.current.formData.amount).toBe(120.5);
@@ -162,9 +160,7 @@ describe("useBillForm Hook", () => {
         result.current.updateField("dueDate", "2024-01-15");
       });
 
-      expect(result.current.validationErrors).toContain(
-        "Valid amount is required",
-      );
+      expect(result.current.validationErrors).toContain("Valid amount is required");
     });
   });
 
@@ -224,7 +220,7 @@ describe("useBillForm Hook", () => {
           amount: 100.5,
           frequency: "monthly",
           dueDate: "2024-01-15",
-        }),
+        })
       );
       expect(mockProps.onClose).toHaveBeenCalled();
     });
@@ -240,9 +236,7 @@ describe("useBillForm Hook", () => {
         createdAt: "2024-01-01T00:00:00Z",
       };
 
-      const { result } = renderHook(() =>
-        useBillForm({ ...mockProps, editingBill }),
-      );
+      const { result } = renderHook(() => useBillForm({ ...mockProps, editingBill }));
 
       // Update form
       act(() => {
@@ -260,7 +254,7 @@ describe("useBillForm Hook", () => {
           id: "existing-bill-123",
           amount: 85,
           updatedAt: expect.any(String),
-        }),
+        })
       );
     });
 
@@ -273,7 +267,7 @@ describe("useBillForm Hook", () => {
       });
 
       expect(mockProps.onError).toHaveBeenCalledWith(
-        "Bill name is required, Valid amount is required, Due date is required",
+        "Bill name is required, Valid amount is required, Due date is required"
       );
       expect(mockProps.onAddBill).not.toHaveBeenCalled();
     });
@@ -305,26 +299,19 @@ describe("useBillForm Hook", () => {
   describe("Bill Deletion", () => {
     it("should handle bill deletion", async () => {
       const editingBill = { id: "bill-to-delete", name: "Delete Me" };
-      const { result } = renderHook(() =>
-        useBillForm({ ...mockProps, editingBill }),
-      );
+      const { result } = renderHook(() => useBillForm({ ...mockProps, editingBill }));
 
       await act(async () => {
         await result.current.handleDelete();
       });
 
-      expect(mockProps.onDeleteBill).toHaveBeenCalledWith(
-        "bill-to-delete",
-        false,
-      );
+      expect(mockProps.onDeleteBill).toHaveBeenCalledWith("bill-to-delete", false);
       expect(mockProps.onClose).toHaveBeenCalled();
     });
 
     it("should handle deletion with envelope removal", async () => {
       const editingBill = { id: "bill-to-delete", name: "Delete Me" };
-      const { result } = renderHook(() =>
-        useBillForm({ ...mockProps, editingBill }),
-      );
+      const { result } = renderHook(() => useBillForm({ ...mockProps, editingBill }));
 
       act(() => {
         result.current.setDeleteEnvelopeToo(true);
@@ -334,10 +321,7 @@ describe("useBillForm Hook", () => {
         await result.current.handleDelete();
       });
 
-      expect(mockProps.onDeleteBill).toHaveBeenCalledWith(
-        "bill-to-delete",
-        true,
-      );
+      expect(mockProps.onDeleteBill).toHaveBeenCalledWith("bill-to-delete", true);
     });
 
     it("should not delete if no editing bill", async () => {
@@ -355,22 +339,14 @@ describe("useBillForm Hook", () => {
     it("should calculate monthly amount correctly", () => {
       const { result } = renderHook(() => useBillForm(mockProps));
 
-      const monthlyAmount = result.current.calculateMonthlyAmount(
-        "100",
-        "weekly",
-        1,
-      );
+      const monthlyAmount = result.current.calculateMonthlyAmount("100", "weekly", 1);
       expect(monthlyAmount).toBe(433); // 100 * 4.33
     });
 
     it("should calculate biweekly amount correctly", () => {
       const { result } = renderHook(() => useBillForm(mockProps));
 
-      const biweeklyAmount = result.current.calculateBiweeklyAmount(
-        "217",
-        "monthly",
-        1,
-      );
+      const biweeklyAmount = result.current.calculateBiweeklyAmount("217", "monthly", 1);
       expect(biweeklyAmount).toBe(100); // 217 / 2.17
     });
 
@@ -414,9 +390,7 @@ describe("useBillForm Hook", () => {
         category: "Bills",
       };
 
-      const { result } = renderHook(() =>
-        useBillForm({ ...mockProps, editingBill }),
-      );
+      const { result } = renderHook(() => useBillForm({ ...mockProps, editingBill }));
 
       // Modify form
       act(() => {
@@ -451,11 +425,7 @@ describe("useBillForm Hook", () => {
     it("should provide categories", () => {
       const { result } = renderHook(() => useBillForm(mockProps));
 
-      expect(result.current.categories).toEqual([
-        "Bills",
-        "Utilities",
-        "Insurance",
-      ]);
+      expect(result.current.categories).toEqual(["Bills", "Utilities", "Insurance"]);
     });
   });
 });

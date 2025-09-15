@@ -28,22 +28,18 @@ export const useUndoOperations = (initialUndoStack = [], addToHistory) => {
               fromEnvelopeId: executionRecord.sourceEnvelopeId || "unassigned",
               toEnvelopeId: result.targetEnvelopes[0].id,
               amount: result.amount,
-              description:
-                result.description || `Auto-funding: ${result.ruleName}`,
+              description: result.description || `Auto-funding: ${result.ruleName}`,
               executedAt: executionRecord.executedAt,
             });
           } else {
             // Multiple target transfers - split amount
-            const amountPerTarget =
-              result.amount / result.targetEnvelopes.length;
+            const amountPerTarget = result.amount / result.targetEnvelopes.length;
             result.targetEnvelopes.forEach((envelope) => {
               undoableTransfers.push({
-                fromEnvelopeId:
-                  executionRecord.sourceEnvelopeId || "unassigned",
+                fromEnvelopeId: executionRecord.sourceEnvelopeId || "unassigned",
                 toEnvelopeId: envelope.id,
                 amount: amountPerTarget,
-                description:
-                  result.description || `Auto-funding: ${result.ruleName}`,
+                description: result.description || `Auto-funding: ${result.ruleName}`,
                 executedAt: executionRecord.executedAt,
               });
             });
@@ -85,16 +81,10 @@ export const useUndoOperations = (initialUndoStack = [], addToHistory) => {
 
     return {
       totalUndoable: undoableItems.length,
-      totalAmount: undoableItems.reduce(
-        (sum, item) => sum + item.totalAmount,
-        0,
-      ),
+      totalAmount: undoableItems.reduce((sum, item) => sum + item.totalAmount, 0),
       oldestUndoable:
-        undoableItems.length > 0
-          ? undoableItems[undoableItems.length - 1].executedAt
-          : null,
-      newestUndoable:
-        undoableItems.length > 0 ? undoableItems[0].executedAt : null,
+        undoableItems.length > 0 ? undoableItems[undoableItems.length - 1].executedAt : null,
+      newestUndoable: undoableItems.length > 0 ? undoableItems[0].executedAt : null,
     };
   }, [getUndoableExecutions]);
 
@@ -117,7 +107,7 @@ export const useUndoOperations = (initialUndoStack = [], addToHistory) => {
           transfer.toEnvelopeId,
           transfer.fromEnvelopeId,
           transfer.amount,
-          `Undo: ${transfer.description}`,
+          `Undo: ${transfer.description}`
         );
 
         logger.debug("Transfer reversed", {
@@ -133,15 +123,13 @@ export const useUndoOperations = (initialUndoStack = [], addToHistory) => {
         throw error;
       }
     },
-    [budget],
+    [budget]
   );
 
   // Undo a specific execution by ID
   const undoExecution = useCallback(
     async (executionId) => {
-      const undoItem = undoStack.find(
-        (item) => item.executionId === executionId && item.canUndo,
-      );
+      const undoItem = undoStack.find((item) => item.executionId === executionId && item.canUndo);
 
       if (!undoItem) {
         throw new Error(`Execution ${executionId} is not undoable`);
@@ -164,8 +152,8 @@ export const useUndoOperations = (initialUndoStack = [], addToHistory) => {
           prevStack.map((item) =>
             item.executionId === executionId
               ? { ...item, canUndo: false, undoneAt: new Date().toISOString() }
-              : item,
-          ),
+              : item
+          )
         );
 
         // Add undo record to execution history
@@ -211,7 +199,7 @@ export const useUndoOperations = (initialUndoStack = [], addToHistory) => {
         throw new Error(`Failed to undo execution: ${error.message}`);
       }
     },
-    [undoStack, addToHistory, reverseTransfer],
+    [undoStack, addToHistory, reverseTransfer]
   );
 
   return {

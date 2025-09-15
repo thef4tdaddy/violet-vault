@@ -17,9 +17,7 @@ export const useBudgetMetadataQuery = () => {
 
       // Initialize metadata record if it doesn't exist (new users or clean installs)
       if (!result) {
-        logger.debug(
-          "TanStack Query: No metadata found, initializing with defaults",
-        );
+        logger.debug("TanStack Query: No metadata found, initializing with defaults");
         const defaultMetadata = {
           unassignedCash: 0,
           actualBalance: 0,
@@ -30,10 +28,7 @@ export const useBudgetMetadataQuery = () => {
         await setBudgetMetadata(defaultMetadata);
         result = defaultMetadata;
 
-        logger.debug(
-          "TanStack Query: Budget metadata initialized with defaults",
-          defaultMetadata,
-        );
+        logger.debug("TanStack Query: Budget metadata initialized with defaults", defaultMetadata);
       }
 
       logger.debug("TanStack Query: Budget metadata loaded", {

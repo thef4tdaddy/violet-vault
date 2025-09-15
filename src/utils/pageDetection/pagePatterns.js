@@ -74,11 +74,7 @@ export const DOM_CLASS_PATTERNS = [
  */
 export const checkUrlPatterns = (path, hash) => {
   for (const { patterns, page } of PAGE_URL_PATTERNS) {
-    if (
-      patterns.some(
-        (pattern) => path.includes(pattern) || hash.includes(pattern),
-      )
-    ) {
+    if (patterns.some((pattern) => path.includes(pattern) || hash.includes(pattern))) {
       return page;
     }
   }

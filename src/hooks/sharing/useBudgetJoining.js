@@ -12,14 +12,7 @@ export const useBudgetJoining = () => {
 
   const { showSuccessToast, showErrorToast } = useToastHelpers();
 
-  const joinBudget = async (
-    shareCode,
-    password,
-    userName,
-    userColor,
-    onJoinSuccess,
-    onClose,
-  ) => {
+  const joinBudget = async (shareCode, password, userName, userColor, onJoinSuccess, onClose) => {
     if (!shareCode || !password || !userName.trim()) {
       showErrorToast("Please fill in all required fields");
       return false;
@@ -27,15 +20,10 @@ export const useBudgetJoining = () => {
 
     setIsJoining(true);
     try {
-      const normalizedShareCode = shareCodeUtils.normalizeShareCode(
-        shareCode.trim(),
-      );
+      const normalizedShareCode = shareCodeUtils.normalizeShareCode(shareCode.trim());
 
       // Generate deterministic budget ID from password and share code
-      const budgetId = await shareCodeUtils.generateBudgetId(
-        password,
-        normalizedShareCode,
-      );
+      const budgetId = await shareCodeUtils.generateBudgetId(password, normalizedShareCode);
 
       const userInfo = {
         id: `user_${Date.now()}`,
@@ -47,8 +35,7 @@ export const useBudgetJoining = () => {
 
       logger.info("Generated budget ID for join", {
         budgetIdPreview: budgetId.substring(0, 10) + "...",
-        shareCodePreview:
-          normalizedShareCode.split(" ").slice(0, 2).join(" ") + " ...",
+        shareCodePreview: normalizedShareCode.split(" ").slice(0, 2).join(" ") + " ...",
       });
 
       showSuccessToast("Successfully joined shared budget!");

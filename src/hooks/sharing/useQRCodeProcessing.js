@@ -9,12 +9,7 @@ import logger from "../../utils/common/logger";
 export const useQRCodeProcessing = () => {
   const { showErrorToast } = useToastHelpers();
 
-  const processQRData = (
-    qrData,
-    setShareCode,
-    setCreatorInfo,
-    validateShareCode,
-  ) => {
+  const processQRData = (qrData, setShareCode, setCreatorInfo, validateShareCode) => {
     try {
       const parsed = shareCodeUtils.parseQRData(qrData);
       if (parsed && parsed.shareCode) {
@@ -41,7 +36,7 @@ export const useQRCodeProcessing = () => {
   const handleQRScan = () => {
     // TODO: Implement camera-based QR scanning
     showErrorToast(
-      "QR scanning not yet implemented. Please enter the share code manually or paste QR data.",
+      "QR scanning not yet implemented. Please enter the share code manually or paste QR data."
     );
   };
 

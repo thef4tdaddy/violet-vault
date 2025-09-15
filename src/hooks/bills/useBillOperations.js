@@ -16,8 +16,7 @@ export const useBillOperations = ({
   budget,
 }) => {
   // Use focused sub-hooks
-  const { validateBillData, createModificationHistory } =
-    useBillValidation(envelopes);
+  const { validateBillData, createModificationHistory } = useBillValidation(envelopes);
   const { handlePayBill } = useBillPayment({
     bills,
     envelopes,
@@ -33,17 +32,13 @@ export const useBillOperations = ({
   });
 
   // Use wrapper functions with error handling and processing state
-  const {
-    wrappedHandleBulkUpdate,
-    wrappedHandlePayBill,
-    wrappedHandleBulkPayment,
-    isProcessing,
-  } = useBillOperationWrappers({
-    handleBulkUpdate,
-    handlePayBill,
-    handleBulkPayment,
-    onError,
-  });
+  const { wrappedHandleBulkUpdate, wrappedHandlePayBill, wrappedHandleBulkPayment, isProcessing } =
+    useBillOperationWrappers({
+      handleBulkUpdate,
+      handlePayBill,
+      handleBulkPayment,
+      onError,
+    });
 
   return {
     // Operations

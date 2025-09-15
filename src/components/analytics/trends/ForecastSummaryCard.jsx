@@ -31,8 +31,7 @@ const ForecastSummaryCard = ({ forecastInsights }) => {
       <div className="flex items-start justify-between">
         <div>
           <h3 className="font-black text-black text-base">
-            <span className="text-lg">S</span>PENDING{" "}
-            <span className="text-lg">F</span>ORECAST
+            <span className="text-lg">S</span>PENDING <span className="text-lg">F</span>ORECAST
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
             <div>
@@ -45,9 +44,7 @@ const ForecastSummaryCard = ({ forecastInsights }) => {
               <p className="text-sm text-purple-900">Growth Rate</p>
               <p
                 className={`text-2xl font-bold ${
-                  forecastInsights.growthRate > 0
-                    ? "text-red-600"
-                    : "text-green-600"
+                  forecastInsights.growthRate > 0 ? "text-red-600" : "text-green-600"
                 }`}
               >
                 {formatPercent(forecastInsights.growthRate)}
@@ -55,15 +52,11 @@ const ForecastSummaryCard = ({ forecastInsights }) => {
             </div>
             <div>
               <p className="text-sm text-purple-900">Confidence Level</p>
-              <p className="text-2xl font-bold text-blue-600">
-                {forecastInsights.confidence}%
-              </p>
+              <p className="text-2xl font-bold text-blue-600">{forecastInsights.confidence}%</p>
             </div>
           </div>
         </div>
-        <div
-          className={`p-3 rounded-full border-2 border-black ${iconConfig.bgClass}`}
-        >
+        <div className={`p-3 rounded-full border-2 border-black ${iconConfig.bgClass}`}>
           {renderTrendIcon()}
         </div>
       </div>

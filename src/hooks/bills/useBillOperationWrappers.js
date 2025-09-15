@@ -35,7 +35,7 @@ export const useBillOperationWrappers = ({
         setIsProcessing(false);
       }
     },
-    [handleBulkUpdate, onError],
+    [handleBulkUpdate, onError]
   );
 
   const wrappedHandlePayBill = useCallback(
@@ -55,7 +55,7 @@ export const useBillOperationWrappers = ({
         setIsProcessing(false);
       }
     },
-    [handlePayBill, onError],
+    [handlePayBill, onError]
   );
 
   const wrappedHandleBulkPayment = useCallback(
@@ -81,7 +81,7 @@ export const useBillOperationWrappers = ({
         setIsProcessing(false);
       }
     },
-    [handleBulkPayment, onError],
+    [handleBulkPayment, onError]
   );
 
   return {
