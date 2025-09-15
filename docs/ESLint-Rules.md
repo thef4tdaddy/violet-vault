@@ -1,6 +1,36 @@
+# ESLint Rules Documentation
+
+**Last Updated:** September 15, 2025
+**Branch:** develop (v1.10.0 - Code Architecture & Refactoring)
+**Current Status:** 355 warnings (ongoing reduction as part of issue #569)
+
 This document outlines the ESLint rules configured for the project, providing a quick reference for developers.
 
+## 🎯 V1.10.0 Code Quality Focus
+
+The v1.10.0 milestone includes ongoing component refactoring to reduce lint warnings:
+- **Target:** Components under 75 lines per function
+- **Current Progress:** Major UI stabilization completed, function-level refactoring in progress
+- **Key Issue:** [#569 - Refactor Large Components Near 500 LOC Limit](https://github.com/thef4tdaddy/violet-vault/issues/569)
+
+## 📊 Current Warning Breakdown
+
+**Total Warnings:** 355 (as of v1.10.0)
+
+**Most Common Issues:**
+- `max-lines-per-function`: Functions exceeding 75-line limit (primary focus of #569)
+- `complexity`: Functions with complexity above 15
+- `max-statements`: Functions with too many statements (>25)
+- `no-unused-vars`: Unused variables (requires underscore prefix for future-use variables)
+
+**Resolution Strategy:**
+- Extract UI components for large functions
+- Use custom hooks for business logic
+- Apply component refactoring standards from [Component-Refactoring-Standards.md](Component-Refactoring-Standards.md)
+
 ---
+
+## 📋 ESLint Rule Reference
 
 ### General Rules (`files: "**/*.{js,jsx}"`)
 
