@@ -4,6 +4,12 @@ description: Create a recurring issue for milestone closeout checklist
 on:
   milestone:
     types: [created]
+  workflow_dispatch:
+    inputs:
+      milestone_title:
+        description: 'Milestone title to update documentation for'
+        required: true
+        type: string
 
 permissions:
   issues: write
@@ -16,12 +22,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Create the recurring milestone issue
+      - name: Create or update the recurring milestone issue
         uses: peter-evans/create-issue-from-file@v5
         with:
-          title: "📋 Milestone Closeout Checklist for milestone: ${{ github.event.milestone.title }}"
+          title: "📋 Update docs & roadmap for milestone: ${{ github.event.milestone.title || inputs.milestone_title }}"
           content-filepath: .github/data/milestone-closeout-checklist.md
           milestone: ${{ github.event.milestone.number }}
           labels: "recurring,docs,maintenance,roadmap"
+          update-existing: true
           search-existing: open
-          search-terms: "Update docs & roadmap for milestone: ${{ github.event.milestone.title }}"
+          search-terms: "Update docs & roadmap for milestone: ${{ github.event.milestone.title || inputs.milestone_title }}"

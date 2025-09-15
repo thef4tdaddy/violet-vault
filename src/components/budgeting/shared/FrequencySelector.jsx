@@ -1,6 +1,6 @@
 import React from "react";
-import { Calendar } from "lucide-react";
-import { getFrequencyOptions } from "../../../utils/frequencyCalculations";
+import { getIcon } from "../../../utils";
+import { getFrequencyOptions } from "../../../utils/common/frequencyCalculations";
 
 /**
  * Shared component for frequency selection
@@ -18,10 +18,14 @@ const FrequencySelector = ({
 
   return (
     <div className={className}>
-      <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+      <label className="block text-sm font-medium text-gray-700 mb-2">
+        {label}
+      </label>
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Calendar className="h-4 w-4 text-gray-400" />
+          {React.createElement(getIcon("Calendar"), {
+            className: "h-4 w-4 text-gray-400",
+          })}
         </div>
         <select
           value={selectedFrequency}

@@ -1,12 +1,12 @@
 import React from "react";
-import { Edit3, Trash2, Scissors, History } from "lucide-react";
+import { getIcon } from "../../../utils";
 import {
   COLUMN_WIDTHS,
   findEnvelopeForTransaction,
   formatTransactionAmount,
   formatTransactionDate,
   getEnvelopeDisplay,
-} from "../utils/tableHelpers";
+} from "../../../utils/transactions/tableHelpers";
 
 /**
  * Individual transaction row component - pure UI component
@@ -21,9 +21,8 @@ const TransactionRow = ({
   onHistoryClick,
 }) => {
   const envelope = findEnvelopeForTransaction(transaction, envelopes);
-  const { formatted: formattedAmount, className: amountClassName } = formatTransactionAmount(
-    transaction.amount
-  );
+  const { formatted: formattedAmount, className: amountClassName } =
+    formatTransactionAmount(transaction.amount);
   const formattedDate = formatTransactionDate(transaction.date);
   const {
     name: envelopeName,
@@ -43,20 +42,28 @@ const TransactionRow = ({
       }}
     >
       {/* Date */}
-      <td className={`${COLUMN_WIDTHS.date} px-4 py-4 text-sm text-gray-900 truncate`}>
+      <td
+        className={`${COLUMN_WIDTHS.date} px-4 py-4 text-sm text-gray-900 truncate`}
+      >
         {formattedDate}
       </td>
 
       {/* Description */}
       <td className={`${COLUMN_WIDTHS.description} px-4 py-4 text-sm`}>
-        <div className="font-medium text-gray-900 truncate">{transaction.description}</div>
+        <div className="font-medium text-gray-900 truncate">
+          {transaction.description}
+        </div>
         {transaction.notes && (
-          <div className="text-xs text-gray-500 truncate mt-1">{transaction.notes}</div>
+          <div className="text-xs text-gray-500 truncate mt-1">
+            {transaction.notes}
+          </div>
         )}
       </td>
 
       {/* Category */}
-      <td className={`${COLUMN_WIDTHS.category} px-4 py-4 text-sm text-gray-500 truncate`}>
+      <td
+        className={`${COLUMN_WIDTHS.category} px-4 py-4 text-sm text-gray-500 truncate`}
+      >
         {transaction.category || "Uncategorized"}
       </td>
 
@@ -67,13 +74,19 @@ const TransactionRow = ({
             className="w-3 h-3 rounded-full mr-2 flex-shrink-0"
             style={{ backgroundColor: envelopeColor }}
           />
-          <span className={`${envelopeClassName} truncate`}>{envelopeName}</span>
+          <span className={`${envelopeClassName} truncate`}>
+            {envelopeName}
+          </span>
         </div>
       </td>
 
       {/* Amount */}
-      <td className={`${COLUMN_WIDTHS.amount} px-4 py-4 text-right text-sm font-medium`}>
-        <span className={`${amountClassName} font-semibold`}>{formattedAmount}</span>
+      <td
+        className={`${COLUMN_WIDTHS.amount} px-4 py-4 text-right text-sm font-medium`}
+      >
+        <span className={`${amountClassName} font-semibold`}>
+          {formattedAmount}
+        </span>
       </td>
 
       {/* Actions */}
@@ -85,7 +98,9 @@ const TransactionRow = ({
               className="p-1 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded transition-colors"
               title="Split transaction"
             >
-              <Scissors className="h-4 w-4" />
+              {React.createElement(getIcon("Scissors"), {
+                className: "h-4 w-4",
+              })}
             </button>
           )}
           <button
@@ -93,21 +108,21 @@ const TransactionRow = ({
             className="p-1 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
             title="View history"
           >
-            <History className="h-4 w-4" />
+            {React.createElement(getIcon("History"), { className: "h-4 w-4" })}
           </button>
           <button
             onClick={() => onEdit(transaction)}
             className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
             title="Edit transaction"
           >
-            <Edit3 className="h-4 w-4" />
+            {React.createElement(getIcon("Edit3"), { className: "h-4 w-4" })}
           </button>
           <button
             onClick={() => onDeleteClick(transaction)}
             className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
             title="Delete transaction"
           >
-            <Trash2 className="h-4 w-4" />
+            {React.createElement(getIcon("Trash2"), { className: "h-4 w-4" })}
           </button>
         </div>
       </td>

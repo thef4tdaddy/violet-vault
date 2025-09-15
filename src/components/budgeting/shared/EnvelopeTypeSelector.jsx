@@ -1,6 +1,9 @@
 import React from "react";
-import { FileText, TrendingUp, Target, CheckCircle } from "lucide-react";
-import { ENVELOPE_TYPES, ENVELOPE_TYPE_CONFIG } from "../../../constants/categories";
+import { getIcon } from "../../../utils";
+import {
+  ENVELOPE_TYPES,
+  ENVELOPE_TYPE_CONFIG,
+} from "../../../constants/categories";
 
 /**
  * Shared component for envelope type selection
@@ -12,23 +15,25 @@ const EnvelopeTypeSelector = ({
   excludeTypes = [],
   disabled = false,
 }) => {
-  const getIconComponent = (type) => {
+  const getIconName = (type) => {
     switch (type) {
       case ENVELOPE_TYPES.BILL:
-        return FileText;
+        return "FileText";
       case ENVELOPE_TYPES.VARIABLE:
-        return TrendingUp;
+        return "TrendingUp";
       case ENVELOPE_TYPES.SAVINGS:
-        return Target;
+        return "Target";
       default:
-        return Target;
+        return "Target";
     }
   };
 
   return (
     <div className="space-y-4">
       <h3 className="font-semibold text-gray-900 flex items-center">
-        <Target className="h-4 w-4 mr-2 text-blue-600" />
+        {React.createElement(getIcon("Target"), {
+          className: "h-4 w-4 mr-2 text-blue-600",
+        })}
         Envelope Type
       </h3>
 
@@ -36,7 +41,7 @@ const EnvelopeTypeSelector = ({
         {Object.entries(ENVELOPE_TYPE_CONFIG)
           .filter(([type]) => !excludeTypes.includes(type))
           .map(([type, config]) => {
-            const IconComponent = getIconComponent(type);
+            const iconName = getIconName(type);
             const isSelected = selectedType === type;
 
             return (
@@ -67,16 +72,18 @@ const EnvelopeTypeSelector = ({
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center mb-2">
-                      <IconComponent
-                        className={`h-5 w-5 mr-3 ${isSelected ? config.textColor : "text-gray-500"}`}
-                      />
+                      {React.createElement(getIcon(iconName), {
+                        className: `h-5 w-5 mr-3 ${isSelected ? config.textColor : "text-gray-500"}`,
+                      })}
                       <span
                         className={`text-lg font-bold ${isSelected ? config.textColor : "text-gray-800"}`}
                       >
                         {config.name}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 leading-relaxed">{config.description}</p>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      {config.description}
+                    </p>
                   </div>
                 </div>
               </button>

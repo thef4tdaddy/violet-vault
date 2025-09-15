@@ -1,14 +1,17 @@
 import React, { memo, lazy, Suspense } from "react";
-import { DollarSign, Wallet, Target, TrendingUp } from "lucide-react";
-import { useBudgetStore } from "../../stores/uiStore";
-import { useActualBalance } from "../../hooks/useBudgetMetadata";
-import { useUnassignedCash } from "../../hooks/useBudgetMetadata";
-import { useEnvelopes } from "../../hooks/useEnvelopes";
-import { useSavingsGoals } from "../../hooks/useSavingsGoals";
-import logger from "../../utils/logger";
+import { getIcon } from "../../utils";
+import { useBudgetStore } from "../../stores/ui/uiStore";
+import { usePrompt } from "../../hooks/common/usePrompt";
+import { useActualBalance } from "../../hooks/budgeting/useBudgetMetadata";
+import { useUnassignedCash } from "../../hooks/budgeting/useBudgetMetadata";
+import { useEnvelopes } from "../../hooks/budgeting/useEnvelopes";
+import { useSavingsGoals } from "../../hooks/common/useSavingsGoals";
+import _logger from "../../utils/common/logger";
 const UnassignedCashModal = lazy(() => import("../modals/UnassignedCashModal"));
-import { AUTO_CLASSIFY_ENVELOPE_TYPE } from "../../constants/categories";
-import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
+import {
+  calculateEnvelopeData,
+  calculateEnvelopeTotals,
+} from "../../utils/budgeting/envelopeCalculations";
 
 /**
  * Summary cards component showing financial overview
@@ -16,66 +19,33 @@ import { BIWEEKLY_MULTIPLIER } from "../../constants/frequency";
  */
 const SummaryCards = () => {
   const { openUnassignedCashModal } = useBudgetStore();
-  const { unassignedCash, isLoading: unassignedCashLoading } = useUnassignedCash();
+  const { unassignedCash, isLoading: _unassignedCashLoading } =
+    useUnassignedCash();
   const { actualBalance, updateActualBalance } = useActualBalance();
+  const prompt = usePrompt();
 
   // Get data from TanStack Query hooks (same pattern as Dashboard)
   const { envelopes = [], isLoading: envelopesLoading } = useEnvelopes();
   const { savingsGoals = [], isLoading: savingsLoading } = useSavingsGoals();
 
   // Calculate totals from hook data
-  const totalEnvelopeBalance = envelopes.reduce((sum, env) => sum + (env.currentBalance || 0), 0);
+  const totalEnvelopeBalance = envelopes.reduce(
+    (sum, env) => sum + (env.currentBalance || 0),
+    0,
+  );
   const totalSavingsBalance = savingsGoals.reduce(
     (sum, goal) => sum + (goal.currentAmount || 0),
-    0
+    0,
   );
   const totalCash = totalEnvelopeBalance + totalSavingsBalance + unassignedCash;
 
-  // Debug logging to compare with Dashboard
-  logger.debug("🔍 SummaryCards Debug:", {
-    envelopesCount: envelopes.length,
-    totalEnvelopeBalance,
-    totalSavingsBalance,
-    unassignedCash,
-    totalCash,
-    firstEnvelope: envelopes[0],
-    isLoading: envelopesLoading || savingsLoading || unassignedCashLoading,
-  });
+  // Removed noisy debug log - component renders frequently
 
-  // Calculate remaining biweekly funding need (what you still need to fund)
-  const biweeklyRemaining = envelopes.reduce((sum, env) => {
-    const envelopeType = env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
-
-    let biweeklyNeed = 0;
-    if (envelopeType === "bill" && env.biweeklyAllocation) {
-      biweeklyNeed = Math.max(0, env.biweeklyAllocation - (env.currentBalance || 0));
-    } else if (envelopeType === "variable" && env.monthlyBudget) {
-      const biweeklyTarget = env.monthlyBudget / BIWEEKLY_MULTIPLIER;
-      biweeklyNeed = Math.max(0, biweeklyTarget - (env.currentBalance || 0));
-    } else if (envelopeType === "savings" && env.targetAmount) {
-      const remainingToTarget = Math.max(0, env.targetAmount - (env.currentBalance || 0));
-      biweeklyNeed = Math.min(remainingToTarget, env.biweeklyAllocation || 0);
-    }
-
-    return sum + biweeklyNeed;
-  }, 0);
-
-  // Calculate total biweekly allocation (full amount regardless of current balance)
-  const biweeklyTotal = envelopes.reduce((sum, env) => {
-    const envelopeType = env.envelopeType || AUTO_CLASSIFY_ENVELOPE_TYPE(env.category);
-
-    let biweeklyNeed = 0;
-    if (envelopeType === "bill" && env.biweeklyAllocation) {
-      biweeklyNeed = env.biweeklyAllocation;
-    } else if (env.monthlyBudget) {
-      biweeklyNeed = env.monthlyBudget / BIWEEKLY_MULTIPLIER;
-    } else if (envelopeType === "savings" && env.targetAmount) {
-      const remainingToTarget = Math.max(0, env.targetAmount - (env.currentBalance || 0));
-      biweeklyNeed = Math.min(remainingToTarget, env.biweeklyAllocation || 0);
-    }
-
-    return sum + biweeklyNeed;
-  }, 0);
+  // Calculate biweekly needs using existing utility
+  const processedEnvelopeData = calculateEnvelopeData(envelopes, [], []);
+  const envelopeSummary = calculateEnvelopeTotals(processedEnvelopeData);
+  const biweeklyRemaining = envelopeSummary.totalBiweeklyNeed;
+  const biweeklyTotal = envelopeSummary.totalBiweeklyNeed; // For now, use same value - can be refined later
 
   // Show loading state while data is being fetched
   if (envelopesLoading || savingsLoading) {
@@ -102,12 +72,23 @@ const SummaryCards = () => {
   }
 
   // Handler for setting actual balance
-  const handleSetActualBalance = () => {
-    const newBalance = prompt(
-      "Enter your current bank account balance:",
-      actualBalance?.toString() || "0"
-    );
-    if (newBalance !== null && !isNaN(parseFloat(newBalance))) {
+  const handleSetActualBalance = async () => {
+    const newBalance = await prompt({
+      title: "Set Actual Balance",
+      message: "Enter your current bank account balance:",
+      defaultValue: actualBalance?.toString() || "0",
+      inputType: "number",
+      placeholder: "0.00",
+      validation: (value) => {
+        const num = parseFloat(value);
+        if (isNaN(num)) {
+          return { valid: false, error: "Please enter a valid number" };
+        }
+        return { valid: true };
+      },
+    });
+
+    if (newBalance !== null) {
       updateActualBalance(parseFloat(newBalance), {
         isManual: true,
         author: "User",
@@ -118,7 +99,7 @@ const SummaryCards = () => {
   const cards = [
     {
       key: "total-cash",
-      icon: Wallet,
+      icon: getIcon("Wallet"),
       label: "Total Cash",
       value: totalCash,
       color: "purple",
@@ -127,7 +108,7 @@ const SummaryCards = () => {
     },
     {
       key: "unassigned-cash",
-      icon: TrendingUp,
+      icon: getIcon("TrendingUp"),
       label: "Unassigned Cash",
       value: unassignedCash,
       color: unassignedCash < 0 ? "red" : "emerald",
@@ -137,18 +118,18 @@ const SummaryCards = () => {
     },
     {
       key: "savings-total",
-      icon: Target,
+      icon: getIcon("Target"),
       label: "Savings Total",
       value: totalSavingsBalance,
       color: "cyan",
     },
     {
       key: "biweekly-remaining",
-      icon: DollarSign,
+      icon: getIcon("DollarSign"),
       label: "Biweekly Remaining",
       value: biweeklyRemaining,
       color: "amber",
-      subtitle: `Total allocation: $${biweeklyTotal.toFixed(2)}`,
+      subtitle: `Total allocation: ${biweeklyTotal.toFixed(2)}`,
     },
   ];
 
@@ -179,7 +160,17 @@ const SummaryCards = () => {
 };
 
 const SummaryCard = memo(
-  ({ icon: Icon, label, value, color, onClick, clickable, isNegative, subtitle, dataTour }) => {
+  ({
+    icon: _Icon,
+    label,
+    value,
+    color,
+    onClick,
+    clickable,
+    isNegative,
+    subtitle,
+    dataTour,
+  }) => {
     const colorClasses = {
       purple: "bg-purple-500",
       emerald: "bg-emerald-500",
@@ -209,17 +200,21 @@ const SummaryCard = memo(
             className={`absolute inset-0 ${colorClasses[color]} rounded-2xl blur-lg opacity-30`}
           ></div>
           <div className={`relative ${colorClasses[color]} p-3 rounded-2xl`}>
-            <Icon className="h-6 w-6 text-white" />
+            <_Icon className="h-6 w-6 text-white" />
           </div>
         </div>
         <div>
           <p className="text-sm font-semibold text-gray-600 mb-1">
             {label}
             {clickable && !isNegative && (
-              <span className="ml-1 text-xs text-gray-400">(click to distribute)</span>
+              <span className="ml-1 text-xs text-gray-400">
+                (click to distribute)
+              </span>
             )}
             {isNegative && (
-              <span className="ml-1 text-xs text-red-500">(overspending - click to address)</span>
+              <span className="ml-1 text-xs text-red-500">
+                (overspending - click to address)
+              </span>
             )}
           </p>
           <p
@@ -247,7 +242,7 @@ const SummaryCard = memo(
         {cardContent}
       </div>
     );
-  }
+  },
 );
 
 export default memo(SummaryCards);

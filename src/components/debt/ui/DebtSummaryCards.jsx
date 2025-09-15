@@ -1,5 +1,5 @@
 import React from "react";
-import { DollarSign, TrendingDown, Percent, AlertTriangle, Calendar } from "lucide-react";
+import PageSummaryCard from "../../ui/PageSummaryCard";
 
 /**
  * Debt overview summary cards
@@ -9,7 +9,7 @@ const DebtSummaryCards = ({ stats, onDueSoonClick }) => {
   const cards = [
     {
       key: "total-debt",
-      icon: DollarSign,
+      icon: "DollarSign",
       label: "Total Debt",
       value: `$${stats.totalDebt.toFixed(2)}`,
       color: "red",
@@ -17,7 +17,7 @@ const DebtSummaryCards = ({ stats, onDueSoonClick }) => {
     },
     {
       key: "monthly-payments",
-      icon: TrendingDown,
+      icon: "TrendingDown",
       label: "Monthly Payments",
       value: `$${stats.totalMonthlyPayments.toFixed(2)}`,
       color: "orange",
@@ -25,7 +25,7 @@ const DebtSummaryCards = ({ stats, onDueSoonClick }) => {
     },
     {
       key: "average-rate",
-      icon: Percent,
+      icon: "Percent",
       label: "Avg Interest Rate",
       value: `${stats.averageInterestRate.toFixed(2)}%`,
       color: "purple",
@@ -33,7 +33,7 @@ const DebtSummaryCards = ({ stats, onDueSoonClick }) => {
     },
     {
       key: "due-soon",
-      icon: Calendar,
+      icon: "Calendar",
       label: "Due Soon",
       value: `$${stats.dueSoonAmount.toFixed(2)}`,
       color: "yellow",
@@ -44,9 +44,9 @@ const DebtSummaryCards = ({ stats, onDueSoonClick }) => {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {cards.map((card) => (
-        <DebtSummaryCard
+        <PageSummaryCard
           key={card.key}
           icon={card.icon}
           label={card.label}
@@ -57,54 +57,6 @@ const DebtSummaryCards = ({ stats, onDueSoonClick }) => {
           onClick={card.onClick}
         />
       ))}
-    </div>
-  );
-};
-
-const DebtSummaryCard = ({ icon: Icon, label, value, subtext, color, alert, onClick }) => {
-  const colorClasses = {
-    red: "bg-red-500",
-    orange: "bg-orange-500",
-    purple: "bg-purple-500",
-    amber: "bg-amber-500",
-    yellow: "bg-yellow-500",
-    emerald: "bg-emerald-500",
-  };
-
-  const textColorClasses = {
-    red: "text-red-600",
-    orange: "text-orange-600",
-    purple: "text-purple-600",
-    amber: "text-amber-600",
-    yellow: "text-yellow-600",
-    emerald: "text-emerald-600",
-  };
-
-  return (
-    <div
-      className={`glassmorphism rounded-3xl p-6 border-2 transition-all duration-200 ${
-        alert ? "border-amber-200 bg-amber-50/50" : "border-white/20"
-      } hover:shadow-lg ${onClick ? "cursor-pointer hover:scale-105" : ""}`}
-      onClick={onClick}
-    >
-      <div className="flex items-center">
-        <div className="relative mr-4">
-          <div
-            className={`absolute inset-0 ${colorClasses[color]} rounded-2xl blur-lg opacity-30`}
-          ></div>
-          <div className={`relative ${colorClasses[color]} p-3 rounded-2xl`}>
-            <Icon className="h-6 w-6 text-white" />
-          </div>
-        </div>
-        <div className="flex-1">
-          <div className="flex items-center">
-            <p className="text-sm font-semibold text-gray-600 mb-1">{label}</p>
-            {alert && <AlertTriangle className="h-3 w-3 ml-2 text-amber-500" />}
-          </div>
-          <p className={`text-2xl font-bold ${textColorClasses[color]}`}>{value}</p>
-          {subtext && <p className="text-xs text-gray-500 mt-1">{subtext}</p>}
-        </div>
-      </div>
     </div>
   );
 };

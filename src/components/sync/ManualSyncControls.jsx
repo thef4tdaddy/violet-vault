@@ -3,17 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  Upload,
-  Download,
-  RefreshCw,
-  Wifi,
-  WifiOff,
-  Clock,
-  AlertCircle,
-  CheckCircle,
-} from "lucide-react";
-import useManualSync from "../../hooks/useManualSync";
+import { getIcon } from "../../utils";
+import useManualSync from "../../hooks/common/useManualSync";
+import logger from "../../utils/common/logger";
 
 /**
  * Manual sync controls component for family budget collaboration
@@ -39,9 +31,9 @@ export const ManualSyncControls = ({ className = "" }) => {
     clearSyncError();
     const result = await forceUploadSync();
     if (result.success) {
-      console.log("✅ Upload sync completed:", result.message);
+      logger.info("✅ Upload sync completed:", result.message);
     } else {
-      console.error("❌ Upload sync failed:", result.error);
+      logger.error("❌ Upload sync failed:", result.error);
     }
   };
 
@@ -49,9 +41,9 @@ export const ManualSyncControls = ({ className = "" }) => {
     clearSyncError();
     const result = await forceDownloadSync();
     if (result.success) {
-      console.log("✅ Download sync completed:", result.message);
+      logger.info("✅ Download sync completed:", result.message);
     } else {
-      console.error("❌ Download sync failed:", result.error);
+      logger.error("❌ Download sync failed:", result.error);
     }
   };
 
@@ -59,9 +51,9 @@ export const ManualSyncControls = ({ className = "" }) => {
     clearSyncError();
     const result = await forceFullSync();
     if (result.success) {
-      console.log("✅ Full sync completed:", result.message);
+      logger.info("✅ Full sync completed:", result.message);
     } else {
-      console.error("❌ Full sync failed:", result.error);
+      logger.error("❌ Full sync failed:", result.error);
     }
   };
 
@@ -83,17 +75,23 @@ export const ManualSyncControls = ({ className = "" }) => {
     <Card className={`w-full max-w-2xl ${className}`}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <RefreshCw className="h-5 w-5" />
+          {React.createElement(getIcon("RefreshCw"), { className: "h-5 w-5" })}
           Manual Sync Controls
-          <Badge variant={syncStatus.isServiceRunning ? "success" : "destructive"}>
+          <Badge
+            variant={syncStatus.isServiceRunning ? "success" : "destructive"}
+          >
             {syncStatus.isServiceRunning ? (
               <>
-                <Wifi className="h-3 w-3 mr-1" />
+                {React.createElement(getIcon("Wifi"), {
+                  className: "h-3 w-3 mr-1",
+                })}
                 Connected
               </>
             ) : (
               <>
-                <WifiOff className="h-3 w-3 mr-1" />
+                {React.createElement(getIcon("WifiOff"), {
+                  className: "h-3 w-3 mr-1",
+                })}
                 Disconnected
               </>
             )}
@@ -105,7 +103,9 @@ export const ManualSyncControls = ({ className = "" }) => {
         {/* Sync Error Alert */}
         {syncError && (
           <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
+            {React.createElement(getIcon("AlertCircle"), {
+              className: "h-4 w-4",
+            })}
             <AlertDescription>
               {syncError}
               <Button
@@ -123,12 +123,16 @@ export const ManualSyncControls = ({ className = "" }) => {
         {/* Sync Status Info */}
         <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
           <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4" />
-            <span className="text-sm">Last sync: {formatLastSyncTime(lastSyncTime)}</span>
+            {React.createElement(getIcon("Clock"), { className: "h-4 w-4" })}
+            <span className="text-sm">
+              Last sync: {formatLastSyncTime(lastSyncTime)}
+            </span>
           </div>
           {lastSyncTime && (
             <Badge variant="outline">
-              <CheckCircle className="h-3 w-3 mr-1" />
+              {React.createElement(getIcon("CheckCircle"), {
+                className: "h-3 w-3 mr-1",
+              })}
               Synced
             </Badge>
           )}
@@ -143,11 +147,13 @@ export const ManualSyncControls = ({ className = "" }) => {
             variant="outline"
             className="flex items-center gap-2"
           >
-            {isUploadingSyncInProgress ? (
-              <RefreshCw className="h-4 w-4 animate-spin" />
-            ) : (
-              <Upload className="h-4 w-4" />
-            )}
+            {isUploadingSyncInProgress
+              ? React.createElement(getIcon("RefreshCw"), {
+                  className: "h-4 w-4 animate-spin",
+                })
+              : React.createElement(getIcon("Upload"), {
+                  className: "h-4 w-4",
+                })}
             Upload Changes
           </Button>
 
@@ -158,11 +164,13 @@ export const ManualSyncControls = ({ className = "" }) => {
             variant="outline"
             className="flex items-center gap-2"
           >
-            {isDownloadingSyncInProgress ? (
-              <RefreshCw className="h-4 w-4 animate-spin" />
-            ) : (
-              <Download className="h-4 w-4" />
-            )}
+            {isDownloadingSyncInProgress
+              ? React.createElement(getIcon("RefreshCw"), {
+                  className: "h-4 w-4 animate-spin",
+                })
+              : React.createElement(getIcon("Download"), {
+                  className: "h-4 w-4",
+                })}
             Download Changes
           </Button>
 
@@ -173,11 +181,13 @@ export const ManualSyncControls = ({ className = "" }) => {
             variant="default"
             className="flex items-center gap-2"
           >
-            {isSyncInProgress ? (
-              <RefreshCw className="h-4 w-4 animate-spin" />
-            ) : (
-              <RefreshCw className="h-4 w-4" />
-            )}
+            {isSyncInProgress
+              ? React.createElement(getIcon("RefreshCw"), {
+                  className: "h-4 w-4 animate-spin",
+                })
+              : React.createElement(getIcon("RefreshCw"), {
+                  className: "h-4 w-4",
+                })}
             Full Sync
           </Button>
         </div>
@@ -185,15 +195,16 @@ export const ManualSyncControls = ({ className = "" }) => {
         {/* Sync Instructions */}
         <div className="text-xs text-muted-foreground space-y-1">
           <p>
-            <strong>Upload Changes:</strong> Send your local changes to the cloud for family members
-            to see
+            <strong>Upload Changes:</strong> Send your local changes to the
+            cloud for family members to see
           </p>
           <p>
-            <strong>Download Changes:</strong> Get the latest changes made by family members
+            <strong>Download Changes:</strong> Get the latest changes made by
+            family members
           </p>
           <p>
-            <strong>Full Sync:</strong> Automatically determine the best sync direction based on
-            data freshness
+            <strong>Full Sync:</strong> Automatically determine the best sync
+            direction based on data freshness
           </p>
         </div>
 

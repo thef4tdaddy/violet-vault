@@ -1,24 +1,16 @@
 import React from "react";
-import { TrendingDown, ArrowRight } from "lucide-react";
-import { useDebtManagement } from "../../../hooks/useDebtManagement";
-import logger from "../../../utils/logger";
+import { getIcon } from "../../../utils";
+import { useDebtManagement } from "../../../hooks/debts/useDebtManagement";
+import _logger from "../../../utils/common/logger";
 
 /**
  * Small debt summary widget for dashboard
  * Shows key debt metrics
  */
 const DebtSummaryWidget = ({ onNavigateToDebts }) => {
-  const { debtStats, debts } = useDebtManagement();
+  const { debtStats, _debts } = useDebtManagement();
 
-  // Add debug logging to understand what's happening
-  logger.debug("💰 DebtSummaryWidget Debug:", {
-    debtStats,
-    debtsCount: debts?.length || 0,
-    totalDebtCount: debtStats?.totalDebtCount || 0,
-    isStatsValid: !!debtStats,
-    totalDebt: debtStats?.totalDebt || 0,
-    activeDebtCount: debtStats?.activeDebtCount || 0,
-  });
+  // Removed noisy debug log - component renders frequently
 
   // Don't show widget if no debts exist
   if (!debtStats || debtStats.totalDebtCount === 0) {
@@ -32,7 +24,9 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
           <div className="relative mr-3">
             <div className="absolute inset-0 bg-red-500 rounded-2xl blur-lg opacity-30"></div>
             <div className="relative bg-red-500 p-2 rounded-2xl">
-              <TrendingDown className="h-4 w-4 text-white" />
+              {React.createElement(getIcon("TrendingDown"), {
+                className: "h-4 w-4 text-white",
+              })}
             </div>
           </div>
           Debt Summary
@@ -44,7 +38,9 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
             className="text-base text-blue-600 hover:text-blue-700 flex items-center font-medium"
           >
             View All
-            <ArrowRight className="h-4 w-4 ml-1" />
+            {React.createElement(getIcon("ArrowRight"), {
+              className: "h-4 w-4 ml-1",
+            })}
           </button>
         )}
       </div>
@@ -53,12 +49,18 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
         {/* Key Metrics */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <p className="text-base font-medium text-gray-600 mb-1">Total Debt</p>
-            <p className="text-2xl font-bold text-red-600">${debtStats.totalDebt.toFixed(2)}</p>
+            <p className="text-base font-medium text-gray-600 mb-1">
+              Total Debt
+            </p>
+            <p className="text-2xl font-bold text-red-600">
+              ${debtStats.totalDebt.toFixed(2)}
+            </p>
           </div>
 
           <div>
-            <p className="text-base font-medium text-gray-600 mb-1">Monthly Payments</p>
+            <p className="text-base font-medium text-gray-600 mb-1">
+              Monthly Payments
+            </p>
             <p className="text-2xl font-bold text-orange-600">
               ${debtStats.totalMonthlyPayments.toFixed(2)}
             </p>
@@ -68,7 +70,9 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
         {/* Average Interest Rate */}
         {debtStats.averageInterestRate > 0 && (
           <div>
-            <p className="text-base font-medium text-gray-600 mb-1">Avg Interest Rate</p>
+            <p className="text-base font-medium text-gray-600 mb-1">
+              Avg Interest Rate
+            </p>
             <p className="text-lg font-bold text-purple-600">
               {debtStats.averageInterestRate.toFixed(2)}% APR
             </p>

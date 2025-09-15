@@ -1,19 +1,9 @@
 import React, { useState } from "react";
-import {
-  Shield,
-  ShieldOff,
-  Eye,
-  EyeOff,
-  Download,
-  Upload,
-  Trash2,
-  AlertTriangle,
-  Palette,
-  User,
-} from "lucide-react";
-import { useLocalOnlyMode } from "../../hooks/useLocalOnlyMode";
+import { globalToast } from "../../stores/ui/toastStore";
+import { getIcon } from "../../utils";
+import { useLocalOnlyMode } from "../../hooks/common/useLocalOnlyMode";
 import logoOnly from "../../assets/icon-512x512.png";
-import logger from "../../utils/logger";
+import logger from "../../utils/common/logger";
 
 const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
   const {
@@ -60,7 +50,7 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
 
   const handleImportAndStart = async () => {
     if (!importFile) {
-      alert("Please select a file to import");
+      globalToast.showError("Please select a file to import", "File Required");
       return;
     }
 
@@ -71,7 +61,10 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
 
       const validation = validateImportFile(fileData);
       if (!validation.valid) {
-        alert(`Invalid import file: ${validation.error}`);
+        globalToast.showError(
+          `Invalid import file: ${validation.error}`,
+          "Invalid File",
+        );
         return;
       }
 
@@ -80,7 +73,7 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
       onModeSelected("local-only");
     } catch (err) {
       logger.error("Failed to import and start:", err);
-      alert(`Import failed: ${err.message}`);
+      globalToast.showError(`Import failed: ${err.message}`, "Import Failed");
     }
   };
 
@@ -88,10 +81,15 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="glassmorphism rounded-2xl p-8 w-full max-w-md text-center border border-white/30 shadow-2xl">
-          <ShieldOff className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Local-Only Mode Unavailable</h2>
+          {React.createElement(getIcon("ShieldOff"), {
+            className: "h-16 w-16 text-red-500 mx-auto mb-4",
+          })}
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Local-Only Mode Unavailable
+          </h2>
           <p className="text-gray-600 mb-6">
-            Your browser doesn't support the features required for local-only mode.
+            Your browser doesn't support the features required for local-only
+            mode.
           </p>
           <button
             onClick={onSwitchToAuth}
@@ -112,8 +110,12 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
           <div className="flex items-center justify-center mb-4">
             <img src={logoOnly} alt="VioletVault" className="h-16 w-16 mr-4" />
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Local-Only Mode</h1>
-              <p className="text-gray-600">Privacy-first budgeting without cloud sync</p>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Local-Only Mode
+              </h1>
+              <p className="text-gray-600">
+                Privacy-first budgeting without cloud sync
+              </p>
             </div>
           </div>
         </div>
@@ -123,7 +125,9 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
               <div className="flex items-start">
-                <AlertTriangle className="h-4 w-4 text-red-600 mr-2 mt-0.5" />
+                {React.createElement(getIcon("AlertTriangle"), {
+                  className: "h-4 w-4 text-red-600 mr-2 mt-0.5",
+                })}
                 <div className="text-sm text-red-800">{error}</div>
               </div>
             </div>
@@ -134,9 +138,13 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
             <div className="space-y-6">
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-start">
-                  <Shield className="h-5 w-5 text-blue-600 mr-3 mt-0.5" />
+                  {React.createElement(getIcon("Shield"), {
+                    className: "h-5 w-5 text-blue-600 mr-3 mt-0.5",
+                  })}
                   <div className="text-sm">
-                    <p className="text-blue-900 font-medium mb-2">Complete Privacy</p>
+                    <p className="text-blue-900 font-medium mb-2">
+                      Complete Privacy
+                    </p>
                     <ul className="text-blue-800 space-y-1 text-sm">
                       <li>• No cloud sync or account required</li>
                       <li>• All data stored locally on your device</li>
@@ -149,9 +157,13 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
 
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
                 <div className="flex items-start">
-                  <AlertTriangle className="h-5 w-5 text-amber-600 mr-3 mt-0.5" />
+                  {React.createElement(getIcon("AlertTriangle"), {
+                    className: "h-5 w-5 text-amber-600 mr-3 mt-0.5",
+                  })}
                   <div className="text-sm">
-                    <p className="text-amber-900 font-medium mb-2">Important Limitations</p>
+                    <p className="text-amber-900 font-medium mb-2">
+                      Important Limitations
+                    </p>
                     <ul className="text-amber-800 space-y-1 text-sm">
                       <li>• Data is not backed up automatically</li>
                       <li>• Clearing browser data will delete your budget</li>
@@ -168,9 +180,13 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
                   disabled={loading}
                   className="p-4 border border-purple-300 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors disabled:opacity-50 text-left"
                 >
-                  <User className="h-6 w-6 text-purple-600 mb-2" />
+                  {React.createElement(getIcon("User"), {
+                    className: "h-6 w-6 text-purple-600 mb-2",
+                  })}
                   <div className="font-medium text-gray-900">Start Fresh</div>
-                  <div className="text-sm text-gray-600">Create a new local-only budget</div>
+                  <div className="text-sm text-gray-600">
+                    Create a new local-only budget
+                  </div>
                 </button>
 
                 <button
@@ -178,9 +194,13 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
                   disabled={loading}
                   className="p-4 border border-green-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors disabled:opacity-50 text-left"
                 >
-                  <Upload className="h-6 w-6 text-green-600 mb-2" />
+                  {React.createElement(getIcon("Upload"), {
+                    className: "h-6 w-6 text-green-600 mb-2",
+                  })}
                   <div className="font-medium text-gray-900">Import Data</div>
-                  <div className="text-sm text-gray-600">Restore from previous export</div>
+                  <div className="text-sm text-gray-600">
+                    Restore from previous export
+                  </div>
                 </button>
               </div>
 
@@ -199,7 +219,9 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
           {step === "customize" && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Customize Your Profile</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Customize Your Profile
+                </h3>
 
                 <div className="space-y-4">
                   <div>
@@ -218,7 +240,9 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-3">
-                      <Palette className="h-4 w-4 inline mr-1" />
+                      {React.createElement(getIcon("Palette"), {
+                        className: "h-4 w-4 inline mr-1",
+                      })}
                       Profile Color
                     </label>
                     <div className="grid grid-cols-4 gap-3">
@@ -278,12 +302,17 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
           {step === "import" && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Import Previous Data</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Import Previous Data
+                </h3>
 
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-400 transition-colors">
-                  <Upload className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+                  {React.createElement(getIcon("Upload"), {
+                    className: "h-8 w-8 text-gray-400 mx-auto mb-3",
+                  })}
                   <div className="text-sm text-gray-600 mb-3">
-                    Select a previously exported VioletVault local-only backup file
+                    Select a previously exported VioletVault local-only backup
+                    file
                   </div>
                   <input
                     type="file"
@@ -299,7 +328,9 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
                     Select File
                   </label>
                   {importFile && (
-                    <div className="mt-3 text-sm text-green-600">✓ {importFile.name} selected</div>
+                    <div className="mt-3 text-sm text-green-600">
+                      ✓ {importFile.name} selected
+                    </div>
                   )}
                 </div>
 
@@ -308,8 +339,9 @@ const LocalOnlySetup = ({ onModeSelected, onSwitchToAuth }) => {
                     <div className="text-sm text-blue-800">
                       <p className="font-medium mb-1">Import Process</p>
                       <p>
-                        This will restore your envelopes, transactions, and settings from the backup
-                        file. Your existing local data (if any) will be replaced.
+                        This will restore your envelopes, transactions, and
+                        settings from the backup file. Your existing local data
+                        (if any) will be replaced.
                       </p>
                     </div>
                   </div>

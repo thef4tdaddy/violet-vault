@@ -2,7 +2,7 @@
 
 **A comprehensive cash management system** with advanced envelope budgeting, intelligent automation, and professional-grade infrastructure. Bringing the traditional cash envelope method into the digital age with end-to-end encryption, smart distribution, and real-time collaboration.
 
-🎯 **Recent improvements:** v1.9.0 Security & Compliance milestone completed with smart deletion modals, data integrity enhancements, and comprehensive auto-funding system.
+🎯 **Current Status:** v1.10.0 Code Architecture & Refactoring milestone 90% complete - Major UI stabilization across all pages, performance optimizations, centralized icon system, and enhanced security warnings.
 
 [![CI](https://github.com/thef4tdaddy/violet-vault/workflows/CI/badge.svg)](https://github.com/thef4tdaddy/violet-vault/actions)
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
@@ -140,61 +140,26 @@ npm run format:check # Check code formatting
 
 ## 🏗️ Project Structure
 
+VioletVault is organized into a comprehensive modular architecture with **696 files** across major functional areas:
+
 ```
 src/
-├── components/                     # React components
-│   ├── analytics/                     # Analytics & insights
-│   │   ├── ChartsAndAnalytics.jsx        # Financial analytics dashboard
-│   │   └── SmartCategoryManager.jsx      # AI category optimization
-│   ├── budgeting/                     # Advanced budget management
-│   │   ├── CreateEnvelopeModal.jsx       # Advanced envelope creation with auto-funding
-│   │   ├── EditEnvelopeModal.jsx         # Enhanced envelope editing
-│   │   ├── EnvelopeGrid.jsx              # Smart envelope visualization
-│   │   ├── PaycheckProcessor.jsx         # Intelligent paycheck allocation
-│   │   ├── PaydayPrediction.jsx          # Expected payday forecasting
-│   │   └── SmartEnvelopeSuggestions.jsx  # AI recommendations (collapsible)
-│   ├── bills/                         # Enhanced bill management
-│   │   ├── AddBillModal.jsx             # Redesigned bill creation modal
-│   │   └── BillManager.jsx              # Bill tracking with compact layouts
-│   ├── feedback/                      # Professional bug reporting
-│   │   └── BugReportButton.jsx          # Integrated bug reporter with screenshots
-│   ├── layout/                        # Modern layout architecture
-│   │   ├── MainLayout.jsx               # Refactored responsive layout
-│   │   ├── NavigationTabs.jsx           # Enhanced tab navigation
-│   │   ├── SummaryCards.jsx             # Improved summary displays
-│   │   └── ViewRenderer.jsx             # Smart view rendering logic
-│   ├── modals/                        # Smart modal system
-│   │   └── UnassignedCashModal.jsx      # One-click cash distribution
-│   ├── savings/                       # Advanced savings management
-│   │   └── SavingsGoals.jsx             # Goal tracking with automation
-│   ├── transactions/                  # Enhanced transaction system
-│   │   ├── TransactionLedger.jsx        # Optimized transaction history
-│   │   └── TransactionSplitter.jsx      # Advanced transaction splitting
-│   └── ui/                           # Enhanced UI components
-│       ├── EditableBalance.jsx          # Real-time balance editing
-│       ├── Header.jsx                   # Improved header with better spacing
-│       └── VersionFooter.jsx            # Smart environment detection
-├── hooks/                          # Custom React hooks
-│   ├── useActualBalance.js             # Balance calculation logic
-│   ├── useBugReport.js                 # Bug reporting functionality
-│   └── useUnassignedCashDistribution.js # Cash distribution logic
-├── stores/                         # Modern Zustand state management
-│   ├── authStore.jsx                   # Unified authentication store
-│   └── budgetStore.js                  # Enhanced budget state management
-├── utils/                          # Advanced utility functions
-│   ├── encryption.js                   # Client-side encryption
-│   ├── firebaseConfig.js              # Firebase configuration
-│   ├── firebaseSync.js                # Enhanced cloud synchronization
-│   ├── frequencyCalculations.js       # Payment frequency utilities
-│   ├── paydayPredictor.js             # Paycheck prediction algorithms
-│   └── version.js                     # Smart version management with caching
-└── App.jsx                         # Main application entry point
-
-cloudflare-worker/                  # Professional bug reporting backend
-├── bug-report-worker.js               # Main worker with GitHub integration
-├── wrangler.toml                      # Cloudflare configuration
-└── README.md                          # Worker setup and deployment guide
+├── components/           # React components (27 major categories)
+│   ├── analytics/           # Financial analytics & reporting
+│   ├── automation/          # Auto-funding and smart rules
+│   ├── budgeting/           # Envelope management system
+│   ├── bills/              # Bill tracking and management
+│   ├── auth/               # Authentication and security
+│   ├── settings/           # Configuration and preferences
+│   └── [22 more categories]
+├── hooks/               # Custom React hooks
+├── stores/              # Zustand state management
+├── services/            # Business logic and API services
+├── utils/               # Utility functions and helpers
+└── App.jsx              # Main application entry point
 ```
+
+📋 **For complete directory structure and file descriptions**, see [Source Code Directory](docs/Source-Code-Directory.md)
 
 ## 🔐 Security
 
@@ -215,6 +180,7 @@ VioletVault takes your financial privacy seriously:
 
 ### Technical Documentation
 
+- **[🎨 Shared UI Components](docs/Shared-UI-Components.md)** - Standardized components and design patterns
 - **[🏗️ Milestones](docs/MILESTONES.md)** - Release planning and milestone tracking
 - **[🧪 Testing Strategy](docs/Testing-Strategy.md)** - Comprehensive testing approach
 - **[⚠️ Lint Warnings](docs/LINT_WARNINGS.md)** - ESLint warning tracking and resolution

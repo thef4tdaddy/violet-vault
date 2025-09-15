@@ -1,13 +1,19 @@
 import React from "react";
-import { RefreshCw } from "lucide-react";
+import { getIcon } from "../../../utils";
 
 const ImportProgress = ({ importData, importProgress }) => {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <RefreshCw className="mx-auto h-12 w-12 text-emerald-600 animate-spin" />
-        <h4 className="mt-4 text-lg font-medium text-gray-900">Importing Transactions</h4>
-        <p className="mt-2 text-sm text-gray-600">Processing {importData.length} transactions...</p>
+        {React.createElement(getIcon("RefreshCw"), {
+          className: "mx-auto h-12 w-12 text-emerald-600 animate-spin",
+        })}
+        <h4 className="mt-4 text-lg font-medium text-gray-900">
+          Importing Transactions
+        </h4>
+        <p className="mt-2 text-sm text-gray-600">
+          Processing {importData.length} transactions...
+        </p>
       </div>
 
       <div className="bg-gray-200 rounded-full h-3">
@@ -17,7 +23,9 @@ const ImportProgress = ({ importData, importProgress }) => {
         />
       </div>
 
-      <p className="text-center text-sm text-gray-600">{Math.round(importProgress)}% complete</p>
+      <p className="text-center text-sm text-gray-600">
+        {Math.round(importProgress)}% complete
+      </p>
     </div>
   );
 };
