@@ -76,6 +76,10 @@ Never create custom implementations when shared components exist.
 
 **COMPREHENSIVE METHODOLOGY** - See [docs/Component-Refactoring-Standards.md](docs/Component-Refactoring-Standards.md) for complete process
 
+**ALWAYS LOOK FOR REFACTORING OPPORTUNITIES** - See [docs/Refactoring-Opportunities-Guide.md](docs/Refactoring-Opportunities-Guide.md)
+
+**Key Principle:** Refactor components while doing regular development work for double value
+
 **7-Phase Proven Process:**
 
 1. **Analysis & Planning**: Size assessment, visual documentation, extraction strategy
