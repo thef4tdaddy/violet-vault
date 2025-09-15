@@ -1,8 +1,10 @@
 import React, { Suspense } from "react";
-import { X, History } from "lucide-react";
+import { getIcon } from "../../../utils";
 
 // Lazy load the history viewer for better performance
-const ObjectHistoryViewer = React.lazy(() => import("../../history/ObjectHistoryViewer"));
+const ObjectHistoryViewer = React.lazy(
+  () => import("../../history/ObjectHistoryViewer"),
+);
 
 const EnvelopeHistoryModal = ({ isOpen = false, onClose, envelope }) => {
   if (!isOpen || !envelope) return null;
@@ -21,11 +23,16 @@ const EnvelopeHistoryModal = ({ isOpen = false, onClose, envelope }) => {
       <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
         <div className="flex justify-between items-center p-6 border-b">
           <h2 className="text-xl font-semibold text-gray-900 flex items-center">
-            <History className="h-5 w-5 mr-2 text-purple-600" />
+            {React.createElement(getIcon("History"), {
+              className: "h-5 w-5 mr-2 text-purple-600",
+            })}
             Envelope History: {envelope.name}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
-            <X className="h-6 w-6" />
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
           </button>
         </div>
 

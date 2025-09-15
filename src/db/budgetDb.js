@@ -1,4 +1,5 @@
 import { Dexie } from "dexie";
+import logger from "../utils/common/logger";
 
 export class VioletVaultDB extends Dexie {
   constructor() {
@@ -10,7 +11,8 @@ export class VioletVaultDB extends Dexie {
       budget: "id, lastModified, version",
 
       // Envelopes table with compound indexes for common queries
-      envelopes: "id, name, category, archived, lastModified, [category+archived], [category+name]",
+      envelopes:
+        "id, name, category, archived, lastModified, [category+archived], [category+name]",
 
       // Transactions table with comprehensive indexing for analytics and filtering
       transactions:
@@ -36,7 +38,8 @@ export class VioletVaultDB extends Dexie {
       cache: "key, value, expiresAt, category, [category+expiresAt]",
 
       // Debts table for debt tracking
-      debts: "id, name, creditor, type, status, currentBalance, minimumPayment, lastModified",
+      debts:
+        "id, name, creditor, type, status, currentBalance, minimumPayment, lastModified",
 
       // Budget History Tracking tables
       budgetCommits:
@@ -47,6 +50,10 @@ export class VioletVaultDB extends Dexie {
         "++id, name, description, sourceCommitHash, headCommitHash, author, created, isActive, isMerged, [isActive], [name]",
       budgetTags:
         "++id, name, description, commitHash, tagType, author, created, [tagType+created], [commitHash]",
+
+      // GitHub Issue #576: Automatic backup storage for sync safety
+      autoBackups:
+        "id, timestamp, type, syncType, [type+timestamp], [syncType+timestamp]",
     });
 
     // Enhanced hooks for automatic timestamping across all tables
@@ -63,7 +70,7 @@ export class VioletVaultDB extends Dexie {
             error.message.includes("read only property") ||
             error.message.includes("Cannot assign to read only")
           ) {
-            console.log("🔧 Handling readonly/frozen object from Firebase", {
+            logger.debug("🔧 Handling readonly/frozen object from Firebase", {
               errorType: error.message,
               objectId: obj.id,
               objectKeys: Object.keys(obj),
@@ -77,7 +84,10 @@ export class VioletVaultDB extends Dexie {
               try {
                 extensibleObj[key] = obj[key];
               } catch (copyError) {
-                console.warn(`Failed to copy property ${key}:`, copyError.message);
+                logger.warn(
+                  `Failed to copy property ${key}:`,
+                  copyError.message,
+                );
               }
             });
 
@@ -105,11 +115,17 @@ export class VioletVaultDB extends Dexie {
                   try {
                     obj[key] = extensibleObj[key];
                   } catch (setError) {
-                    console.warn(`Failed to set property ${key}:`, setError.message);
+                    logger.warn(
+                      `Failed to set property ${key}:`,
+                      setError.message,
+                    );
                   }
                 });
               } catch (finalError) {
-                console.warn("Complete object replacement failed:", finalError.message);
+                logger.warn(
+                  "Complete object replacement failed:",
+                  finalError.message,
+                );
                 // As a last resort, try to modify the transaction
                 if (typeof trans.source === "object" && trans.source !== null) {
                   trans.source = extensibleObj;
@@ -122,7 +138,6 @@ export class VioletVaultDB extends Dexie {
         }
       });
 
-      // eslint-disable-next-line no-unused-vars
       table.hook("updating", (modifications, _primKey, _obj, _trans) => {
         modifications.lastModified = Date.now();
       });
@@ -137,7 +152,6 @@ export class VioletVaultDB extends Dexie {
     addTimestampHooks(this.debts);
 
     // Audit log hook
-    // eslint-disable-next-line no-unused-vars
     this.auditLog.hook("creating", (_primKey, obj, _trans) => {
       if (!obj.timestamp) obj.timestamp = Date.now();
     });
@@ -181,7 +195,11 @@ export class VioletVaultDB extends Dexie {
     // 5 minutes default
     const cached = await this.cache.get(key);
     const now = Date.now();
-    if (cached && cached.expiresAt > now && now - (cached.expiresAt - maxAge) < maxAge) {
+    if (
+      cached &&
+      cached.expiresAt > now &&
+      now - (cached.expiresAt - maxAge) < maxAge
+    ) {
       return cached.value;
     }
     return null;
@@ -196,7 +214,10 @@ export class VioletVaultDB extends Dexie {
 
     if (!result) {
       if (includeArchived) {
-        result = await this.envelopes.where("category").equals(category).toArray();
+        result = await this.envelopes
+          .where("category")
+          .equals(category)
+          .toArray();
       } else {
         result = await this.envelopes
           .where("[category+archived]")
@@ -226,22 +247,40 @@ export class VioletVaultDB extends Dexie {
     if (dateRange) {
       return this.transactions
         .where("[envelopeId+date]")
-        .between([envelopeId, dateRange.start], [envelopeId, dateRange.end], true, true)
+        .between(
+          [envelopeId, dateRange.start],
+          [envelopeId, dateRange.end],
+          true,
+          true,
+        )
         .reverse()
         .toArray();
     }
-    return this.transactions.where("envelopeId").equals(envelopeId).reverse().toArray();
+    return this.transactions
+      .where("envelopeId")
+      .equals(envelopeId)
+      .reverse()
+      .toArray();
   }
 
   async getTransactionsByCategory(category, dateRange = null) {
     if (dateRange) {
       return this.transactions
         .where("[category+date]")
-        .between([category, dateRange.start], [category, dateRange.end], true, true)
+        .between(
+          [category, dateRange.start],
+          [category, dateRange.end],
+          true,
+          true,
+        )
         .reverse()
         .toArray();
     }
-    return this.transactions.where("category").equals(category).reverse().toArray();
+    return this.transactions
+      .where("category")
+      .equals(category)
+      .reverse()
+      .toArray();
   }
 
   async getTransactionsByType(type, dateRange = null) {
@@ -298,7 +337,10 @@ export class VioletVaultDB extends Dexie {
 
   // Savings Goals queries with status and priority optimization
   async getActiveSavingsGoals() {
-    return this.savingsGoals.where("[isCompleted+isPaused]").equals([false, false]).toArray();
+    return this.savingsGoals
+      .where("[isCompleted+isPaused]")
+      .equals([false, false])
+      .toArray();
   }
 
   async getCompletedSavingsGoals() {
@@ -325,11 +367,18 @@ export class VioletVaultDB extends Dexie {
 
   // Paycheck History queries for trend analysis
   async getPaycheckHistory(limit = 50) {
-    return this.paycheckHistory.orderBy("date").reverse().limit(limit).toArray();
+    return this.paycheckHistory
+      .orderBy("date")
+      .reverse()
+      .limit(limit)
+      .toArray();
   }
 
   async getPaychecksByDateRange(startDate, endDate) {
-    return this.paycheckHistory.where("date").between(startDate, endDate, true, true).toArray();
+    return this.paycheckHistory
+      .where("date")
+      .between(startDate, endDate, true, true)
+      .toArray();
   }
 
   async getPaychecksBySource(source) {
@@ -340,7 +389,13 @@ export class VioletVaultDB extends Dexie {
   async batchUpdate(updates) {
     return this.transaction(
       "rw",
-      [this.envelopes, this.transactions, this.bills, this.savingsGoals, this.paycheckHistory],
+      [
+        this.envelopes,
+        this.transactions,
+        this.bills,
+        this.savingsGoals,
+        this.paycheckHistory,
+      ],
       async () => {
         const promises = updates.map((update) => {
           switch (update.type) {
@@ -359,7 +414,7 @@ export class VioletVaultDB extends Dexie {
           }
         });
         return Promise.all(promises);
-      }
+      },
     );
   }
 
@@ -382,9 +437,14 @@ export class VioletVaultDB extends Dexie {
 
   // Analytics helper queries
   async getAnalyticsData(dateRange, includeTransfers = false) {
-    const transactions = await this.getTransactionsByDateRange(dateRange.start, dateRange.end);
+    const transactions = await this.getTransactionsByDateRange(
+      dateRange.start,
+      dateRange.end,
+    );
 
-    return includeTransfers ? transactions : transactions.filter((t) => t.type !== "transfer");
+    return includeTransfers
+      ? transactions
+      : transactions.filter((t) => t.type !== "transfer");
   }
 
   async getCategorySpending(category, dateRange) {
@@ -399,7 +459,10 @@ export class VioletVaultDB extends Dexie {
   async cleanupCache(category = null) {
     const now = Date.now();
     if (category) {
-      await this.cache.where("[category+expiresAt]").below([category, now]).delete();
+      await this.cache
+        .where("[category+expiresAt]")
+        .below([category, now])
+        .delete();
     } else {
       await this.cache.where("expiresAt").below(now).delete();
     }
@@ -437,15 +500,21 @@ export class VioletVaultDB extends Dexie {
 
   // Data integrity and statistics
   async getDatabaseStats() {
-    const [envelopeCount, transactionCount, billCount, goalCount, paycheckCount, cacheCount] =
-      await Promise.all([
-        this.envelopes.count(),
-        this.transactions.count(),
-        this.bills.count(),
-        this.savingsGoals.count(),
-        this.paycheckHistory.count(),
-        this.cache.count(),
-      ]);
+    const [
+      envelopeCount,
+      transactionCount,
+      billCount,
+      goalCount,
+      paycheckCount,
+      cacheCount,
+    ] = await Promise.all([
+      this.envelopes.count(),
+      this.transactions.count(),
+      this.bills.count(),
+      this.savingsGoals.count(),
+      this.paycheckHistory.count(),
+      this.cache.count(),
+    ]);
 
     return {
       envelopes: envelopeCount,
@@ -506,7 +575,7 @@ export const setEncryptedData = async (data) => {
       ...data,
     });
   } catch (err) {
-    console.error("Budget Dexie save error", err);
+    logger.error("Budget Dexie save error", err);
   }
 };
 
@@ -527,7 +596,7 @@ export const setBudgetMetadata = async (metadata) => {
       ...metadata,
     });
   } catch (err) {
-    console.error("Failed to save budget metadata:", err);
+    logger.error("Failed to save budget metadata:", err);
     throw err;
   }
 };
@@ -582,37 +651,49 @@ export const migrateData = async () => {
   try {
     // Check if migration is needed by looking for new tables
     const stats = await budgetDb.getDatabaseStats();
-    console.log("Database migration completed. Stats:", stats);
+    logger.info("Database migration completed. Stats:", stats);
     return stats;
   } catch (error) {
-    console.error("Database migration failed:", error);
+    logger.error("Database migration failed:", error);
     throw error;
   }
 };
 
-// Export enhanced query helpers
+// Export enhanced query helpers - use function expressions to avoid temporal dead zone
 export const queryHelpers = {
   // Envelope helpers
-  getActiveEnvelopes: () => budgetDb.getActiveEnvelopes(),
-  getEnvelopesByCategory: (category, includeArchived) =>
-    budgetDb.getEnvelopesByCategory(category, includeArchived),
+  getActiveEnvelopes() {
+    return budgetDb.getActiveEnvelopes();
+  },
+  getEnvelopesByCategory(category, includeArchived) {
+    return budgetDb.getEnvelopesByCategory(category, includeArchived);
+  },
 
   // Transaction helpers
-  getRecentTransactions: (days = 7) => {
+  getRecentTransactions(days = 7) {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
     return budgetDb.getTransactionsByDateRange(startDate, new Date());
   },
 
   // Bill helpers
-  getUpcomingBills: (days) => budgetDb.getUpcomingBills(days),
-  getOverdueBills: () => budgetDb.getOverdueBills(),
+  getUpcomingBills(days) {
+    return budgetDb.getUpcomingBills(days);
+  },
+  getOverdueBills() {
+    return budgetDb.getOverdueBills();
+  },
 
   // Savings goal helpers
-  getActiveSavingsGoals: () => budgetDb.getActiveSavingsGoals(),
-  getUpcomingDeadlines: (days) => budgetDb.getUpcomingDeadlines(days),
+  getActiveSavingsGoals() {
+    return budgetDb.getActiveSavingsGoals();
+  },
+  getUpcomingDeadlines(days) {
+    return budgetDb.getUpcomingDeadlines(days);
+  },
 
   // Analytics helpers
-  getAnalyticsData: (dateRange, includeTransfers) =>
-    budgetDb.getAnalyticsData(dateRange, includeTransfers),
+  getAnalyticsData(dateRange, includeTransfers) {
+    return budgetDb.getAnalyticsData(dateRange, includeTransfers);
+  },
 };

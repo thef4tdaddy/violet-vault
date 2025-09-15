@@ -27,6 +27,17 @@ try {
       targetWarnings: 17,
       errors: warnings.errorCount,
     },
+    fileSizeTracking: {
+      files300Plus:
+        warnings.categories.find(
+          (c) => c.type === "max-lines" && c.severity === "warning",
+        )?.count || 0,
+      files400Plus:
+        warnings.categories.find(
+          (c) => c.type === "max-lines" && c.severity === "error",
+        )?.count || 0,
+      refactoringTarget: "Files over 300 lines should be refactored",
+    },
     warningCategories: warnings.categories,
     actionPlan: generateActionPlan(warnings.categories),
     commands: {
@@ -66,7 +77,9 @@ function parseESLintOutput(output) {
     if (inSummary) continue;
 
     // Match file paths (absolute or relative)
-    const fileMatch = line.match(/^\/.*?\.(js|jsx|ts|tsx)$|^[^/\s].*?\.(js|jsx|ts|tsx)$/);
+    const fileMatch = line.match(
+      /^\/.*?\.(js|jsx|ts|tsx)$|^[^/\s].*?\.(js|jsx|ts|tsx)$/,
+    );
     if (fileMatch) {
       currentFile = fileMatch[0];
       // Convert absolute paths to relative paths
@@ -81,7 +94,7 @@ function parseESLintOutput(output) {
 
     // Match warning/error lines with format: "  line:col  level  message  rule"
     const issueMatch = line.match(
-      /^\s*(\d+):(\d+)\s+(warning|error)\s+(.*?)\s+([\w-]+(?:\/[\w-]+)*)$/
+      /^\s*(\d+):(\d+)\s+(warning|error)\s+(.*?)\s+([\w-]+(?:\/[\w-]+)*)$/,
     );
     if (issueMatch && currentFile) {
       const [, lineNum, col, level, message, rule] = issueMatch;
@@ -153,11 +166,13 @@ function parseESLintOutput(output) {
     totalCount: warnings.length,
     errorCount: errors.length,
     categories: categories,
-    warningsByFile: Array.from(warningsByFile.entries()).map(([file, fileWarnings]) => ({
-      file,
-      count: fileWarnings.length,
-      warnings: fileWarnings,
-    })),
+    warningsByFile: Array.from(warningsByFile.entries()).map(
+      ([file, fileWarnings]) => ({
+        file,
+        count: fileWarnings.length,
+        warnings: fileWarnings,
+      }),
+    ),
   };
 }
 
@@ -177,10 +192,22 @@ function generateActionPlan(categories) {
     };
 
     // Categorize by priority based on rule type and count
-    if (category.type.includes("no-unused-vars") && category.count > 5) {
+    if (category.type === "max-lines" && category.severity === "error") {
+      // Files over 400/500 lines - critical refactoring needed
+      actionPlan.highPriority.push(action);
+    } else if (category.type.includes("no-unused-vars") && category.count > 5) {
       actionPlan.highPriority.push(action);
     } else if (category.type.includes("react-hooks")) {
       actionPlan.highPriority.push(action);
+    } else if (category.type === "complexity" && category.count > 5) {
+      // High complexity violations need attention
+      actionPlan.mediumPriority.push(action);
+    } else if (
+      category.type === "max-lines" &&
+      category.severity === "warning"
+    ) {
+      // Files 300-400 lines - moderate priority
+      actionPlan.mediumPriority.push(action);
     } else if (category.type.includes("react-refresh")) {
       actionPlan.lowPriority.push(action);
     } else if (category.count > 3) {
@@ -195,14 +222,29 @@ function generateActionPlan(categories) {
 
 function getActionForRule(rule) {
   const actionMap = {
-    "no-unused-vars": "Remove unused variables or prefix with underscore if intentionally unused",
-    "react-hooks/exhaustive-deps": "Add missing dependencies to useEffect dependency array",
+    "no-unused-vars":
+      "Remove unused variables or prefix with underscore if intentionally unused",
+    "react-hooks/exhaustive-deps":
+      "Add missing dependencies to useEffect dependency array",
     "react-refresh/only-export-components":
       "Refactor to separate component and non-component exports",
-    "prefer-const": "Use const instead of let for variables that are never reassigned",
+    "prefer-const":
+      "Use const instead of let for variables that are never reassigned",
     "no-console": "Remove console statements or add eslint-disable comment",
     "no-debugger": "Remove debugger statements",
     "no-unreachable": "Remove unreachable code after return/throw statements",
+    "max-lines":
+      "Refactor large file - split into smaller components or extract utilities",
+    complexity:
+      "Reduce function complexity - extract smaller functions or simplify logic",
+    "max-lines-per-function":
+      "Split large function into smaller, focused functions",
+    "max-depth":
+      "Reduce nesting depth - use early returns or extract nested logic",
+    "max-params":
+      "Reduce function parameters - use object parameters or split function",
+    "max-statements":
+      "Split long function into smaller functions with single responsibilities",
   };
 
   return actionMap[rule] || `Review and fix ${rule} violations`;

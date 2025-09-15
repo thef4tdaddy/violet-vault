@@ -1,11 +1,17 @@
 import React from "react";
-import useTransactionTable from "./hooks/useTransactionTable";
+import useTransactionTable from "../../hooks/transactions/useTransactionTable";
 import TransactionRow from "./components/TransactionRow";
 import DeleteConfirmation from "./components/DeleteConfirmation";
 import ObjectHistoryViewer from "../history/ObjectHistoryViewer";
-import { COLUMN_WIDTHS } from "./utils/tableHelpers";
+import { COLUMN_WIDTHS } from "../../utils/transactions/tableHelpers";
 
-const TransactionTable = ({ transactions = [], envelopes = [], onEdit, onDelete, onSplit }) => {
+const TransactionTable = ({
+  transactions = [],
+  envelopes = [],
+  onEdit,
+  onDelete,
+  onSplit,
+}) => {
   const {
     parentRef,
     rowVirtualizer,

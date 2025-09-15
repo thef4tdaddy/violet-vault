@@ -51,7 +51,10 @@ CURRENT BACKUP LOCATION: ${backupDir}
 `;
 
 // Create backup instructions file
-const instructionsFile = path.join(backupDir, `backup-instructions-${timestamp}.txt`);
+const instructionsFile = path.join(
+  backupDir,
+  `backup-instructions-${timestamp}.txt`,
+);
 fs.writeFileSync(instructionsFile, backupInstructions);
 
 console.log("📝 Backup instructions created:", instructionsFile);

@@ -1,22 +1,13 @@
 import React, { memo, useEffect, useRef } from "react";
-import {
-  DollarSign,
-  Wallet,
-  TrendingUp,
-  TrendingDown,
-  Calendar,
-  Target,
-  CreditCard,
-  BookOpen,
-  BarChart3,
-  Settings,
-} from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import { getIcon } from "../../utils";
 
 /**
  * Navigation tabs component for the main layout
- * Extracted from Layout.jsx for better organization
+ * Now using React Router for proper URL-based navigation
  */
-const NavigationTabs = memo(({ activeView, onViewChange }) => {
+const NavigationTabs = memo(() => {
+  const location = useLocation();
   const navRef = useRef(null);
   const leftFadeRef = useRef(null);
   const rightFadeRef = useRef(null);
@@ -66,50 +57,67 @@ const NavigationTabs = memo(({ activeView, onViewChange }) => {
   const tabs = [
     {
       key: "dashboard",
-      icon: CreditCard,
+      path: "/",
+      icon: getIcon("CreditCard"),
       label: "Dashboard",
     },
     {
       key: "envelopes",
-      icon: Wallet,
+      path: "/envelopes",
+      icon: getIcon("Wallet"),
       label: "Envelopes",
     },
     {
       key: "savings",
-      icon: Target,
+      path: "/savings",
+      icon: getIcon("Target"),
       label: "Savings Goals",
     },
     {
       key: "supplemental",
-      icon: CreditCard,
+      path: "/supplemental",
+      icon: getIcon("CreditCard"),
       label: "Supplemental",
     },
     {
       key: "paycheck",
-      icon: DollarSign,
+      path: "/paycheck",
+      icon: getIcon("DollarSign"),
       label: "Add Paycheck",
     },
     {
       key: "bills",
-      icon: Calendar,
+      path: "/bills",
+      icon: getIcon("Calendar"),
       label: "Manage Bills",
     },
     {
       key: "transactions",
-      icon: BookOpen,
+      path: "/transactions",
+      icon: getIcon("BookOpen"),
       label: "Transactions",
     },
     {
       key: "debts",
-      icon: TrendingDown,
+      path: "/debts",
+      icon: getIcon("TrendingDown"),
       label: "Debt Tracking",
     },
     {
       key: "analytics",
-      icon: BarChart3,
+      path: "/analytics",
+      icon: getIcon("BarChart3"),
       label: "Analytics",
     },
   ];
+
+  // Get current active view from URL
+  const getCurrentView = () => {
+    const currentTab = tabs.find((tab) => tab.path === location.pathname);
+    return currentTab?.key || "dashboard";
+  };
+
+  const activeView = getCurrentView();
 
   return (
     <div className="glassmorphism rounded-3xl mb-6 lg:shadow-xl border border-white/20 ring-1 ring-gray-800/10 fixed bottom-2 left-2 right-2 lg:static z-50 overflow-hidden relative lg:mb-6 mb-0 lg:rounded-3xl rounded-2xl">
@@ -121,9 +129,10 @@ const NavigationTabs = memo(({ activeView, onViewChange }) => {
           <NavButton
             key={tab.key}
             active={activeView === tab.key}
-            onClick={() => onViewChange(tab.key)}
+            to={tab.path}
             icon={tab.icon}
             label={tab.label}
+            viewKey={tab.key}
           />
         ))}
       </nav>
@@ -141,9 +150,12 @@ const NavigationTabs = memo(({ activeView, onViewChange }) => {
   );
 });
 
-const NavButton = memo(({ active, onClick, icon: Icon, label }) => (
-  <button
-    onClick={onClick}
+const NavButton = memo(({ active, to, icon: _Icon, label, viewKey }) => (
+  <Link
+    to={to}
+    aria-current={active ? "page" : undefined}
+    data-view={viewKey}
+    data-tab={viewKey}
     className={`flex-shrink-0 lg:flex-1 flex flex-col items-center lg:flex-row lg:px-4 px-2 py-2 text-xs lg:text-sm font-medium transition-colors relative border border-black/10 ${
       active
         ? "border-t-2 lg:border-b-2 border-purple-500 text-purple-600 bg-purple-50/50 border-purple-400 ring-1 ring-purple-300"
@@ -151,7 +163,7 @@ const NavButton = memo(({ active, onClick, icon: Icon, label }) => (
     }`}
     style={{ minWidth: "75px" }} // Increase minimum tap target and prevent clipping
   >
-    <Icon className="h-4 w-4 mb-1 lg:mb-0 lg:mr-2 flex-shrink-0" />
+    <_Icon className="h-4 w-4 mb-1 lg:mb-0 lg:mr-2 flex-shrink-0" />
     <span className="text-center lg:text-left leading-tight">
       {/* Responsive label display with better text truncation */}
       <span className="hidden lg:inline truncate">{label}</span>
@@ -188,7 +200,7 @@ const NavButton = memo(({ active, onClick, icon: Icon, label }) => (
                     : label.split(" ")[0]}
       </span>
     </span>
-  </button>
+  </Link>
 ));
 
 export default NavigationTabs;

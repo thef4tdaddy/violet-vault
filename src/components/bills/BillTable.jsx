@@ -1,49 +1,192 @@
 import React from "react";
+import { getIcon } from "../../utils";
 
-const BillTable = ({ bills, activeTab }) => {
-  const currentBills = bills[activeTab] || [];
-
-  if (currentBills.length === 0) {
-    return (
-      <div className="text-center py-8 text-gray-500">
-        No {activeTab === "monthly" ? "monthly" : "longer term"} bills added yet
-      </div>
-    );
-  }
-
+/**
+ * Bill table with bulk actions and selection
+ * Pure UI component that preserves exact visual appearance
+ */
+const BillTable = ({
+  filteredBills,
+  selectionState,
+  clearSelection,
+  selectAllBills,
+  toggleBillSelection,
+  setShowBulkUpdateModal,
+  setShowBillDetail,
+  getBillDisplayData,
+  billOperations,
+  categorizedBills,
+  viewMode,
+}) => {
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full">
-        <thead>
-          <tr className="bg-gray-50">
-            <th className="text-left p-3 font-medium text-gray-700">Account</th>
-            <th className="text-left p-3 font-medium text-gray-700">Amount</th>
-            <th className="text-left p-3 font-medium text-gray-700">Frequency</th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentBills.map((bill) => (
-            <tr key={bill.id} className="border-t border-gray-200">
-              <td className="p-3 font-medium">
-                <div className="flex items-center gap-2">
-                  {/* Color indicator */}
-                  {bill.color && (
-                    <div
-                      className="w-3 h-3 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: bill.color }}
-                      title={`Color: ${bill.color}`}
-                    />
+    <>
+      {/* Bulk Actions */}
+      {selectionState.hasSelection && (
+        <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+          <span className="text-sm text-blue-700">
+            {selectionState.selectedCount} bill
+            {selectionState.selectedCount > 1 ? "s" : ""} selected
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowBulkUpdateModal(true)}
+              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+            >
+              Bulk Update
+            </button>
+            <button
+              onClick={clearSelection}
+              className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Bills Table */}
+      <div className="bg-white shadow-sm rounded-lg overflow-hidden border-2 border-black">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50 border-b-2 border-black">
+            <tr>
+              <th className="px-6 py-3 text-center">
+                <button
+                  onClick={
+                    selectionState.isAllSelected
+                      ? clearSelection
+                      : selectAllBills
+                  }
+                  className="flex items-center justify-center w-6 h-6 mx-auto hover:bg-gray-200 rounded transition-colors"
+                  title={
+                    selectionState.isAllSelected
+                      ? "Deselect all bills"
+                      : "Select all bills"
+                  }
+                >
+                  {selectionState.isAllSelected ? (
+                    <CheckSquare className="h-5 w-5 text-blue-600" />
+                  ) : (
+                    <Square className="h-5 w-5 text-gray-400" />
                   )}
-                  {bill.name}
-                </div>
-              </td>
-              <td className="p-3">${bill.amount?.toFixed(2) || "0.00"}</td>
-              <td className="p-3">{bill.frequency || "Monthly"}</td>
+                </button>
+              </th>
+              <th className="px-6 py-3 text-left text-base font-black text-black tracking-wider">
+                <span className="text-lg">B</span>ILL
+              </th>
+              <th className="px-6 py-3 text-left text-base font-black text-black tracking-wider">
+                <span className="text-lg">A</span>MOUNT
+              </th>
+              <th className="px-6 py-3 text-left text-base font-black text-black tracking-wider">
+                <span className="text-lg">D</span>UE{" "}
+                <span className="text-lg">D</span>ATE
+              </th>
+              <th className="px-6 py-3 text-left text-base font-black text-black tracking-wider">
+                <span className="text-lg">S</span>TATUS
+              </th>
+              <th className="px-6 py-3 text-right text-base font-black text-black tracking-wider">
+                <span className="text-lg">A</span>CTIONS
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {filteredBills.map((bill) => {
+              const displayData = getBillDisplayData(bill);
+
+              return (
+                <tr
+                  key={bill.id}
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() => setShowBillDetail(bill)}
+                >
+                  <td
+                    className="px-6 py-4 whitespace-nowrap"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={displayData.isSelected}
+                      onChange={() => toggleBillSelection(bill.id)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <displayData.Icon className="h-5 w-5 text-gray-400 mr-3" />
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {bill.name}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {bill.category}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    ${displayData.amount}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {displayData.dueDateDisplay}
+                    {displayData.daysDisplay && (
+                      <div className="text-xs text-gray-500">
+                        {displayData.daysDisplay}
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${displayData.urgencyColors}`}
+                    >
+                      {displayData.statusText}
+                    </span>
+                  </td>
+                  <td
+                    className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="flex items-center justify-end gap-2">
+                      {!bill.isPaid && (
+                        <button
+                          onClick={() => billOperations.handlePayBill(bill.id)}
+                          className="px-3 py-1.5 bg-green-100 text-green-800 rounded-lg hover:bg-green-200 transition-colors font-medium text-xs flex items-center gap-1.5"
+                          title="Mark as Paid"
+                        >
+                          <CheckCircle className="h-3.5 w-3.5" />
+                          Pay
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+
+        {filteredBills.length === 0 && (
+          <div className="text-center py-12 text-gray-500">
+            <FileText className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">
+              No bills found
+            </h3>
+            <p className="mt-1 text-sm text-gray-500">
+              {viewMode === "all"
+                ? "Get started by adding a new bill."
+                : "Try switching to a different view or adjusting filters."}
+            </p>
+            <div className="mt-4 text-xs text-gray-400 font-mono">
+              DEBUG: Bills={filteredBills.length}, Categorized=
+              {JSON.stringify(
+                Object.keys(categorizedBills).map(
+                  (k) => `${k}:${categorizedBills[k]?.length || 0}`,
+                ),
+              )}
+              , ViewMode={viewMode}
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 

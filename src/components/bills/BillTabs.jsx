@@ -1,5 +1,5 @@
 import React from "react";
-import { Calendar, Clock } from "lucide-react";
+import { getIcon } from "../../utils";
 
 const BillTabs = ({ activeTab, onTabChange, bills }) => {
   return (
@@ -13,7 +13,9 @@ const BillTabs = ({ activeTab, onTabChange, bills }) => {
               : "border-transparent text-gray-500 hover:text-gray-700"
           }`}
         >
-          <Calendar className="h-4 w-4 inline mr-2" />
+          {React.createElement(getIcon("Calendar"), {
+            className: "h-4 w-4 inline mr-2",
+          })}
           Monthly Bills ({bills.monthly?.length || 0})
         </button>
         <button
@@ -24,7 +26,9 @@ const BillTabs = ({ activeTab, onTabChange, bills }) => {
               : "border-transparent text-gray-500 hover:text-gray-700"
           }`}
         >
-          <Clock className="h-4 w-4 inline mr-2" />
+          {React.createElement(getIcon("Clock"), {
+            className: "h-4 w-4 inline mr-2",
+          })}
           Longer Term Bills ({bills.longerTerm?.length || 0})
         </button>
       </nav>

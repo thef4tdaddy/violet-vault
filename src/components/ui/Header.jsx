@@ -1,5 +1,5 @@
-import { useState, memo, useCallback } from "react";
-import { Settings, Monitor } from "lucide-react";
+import React, { useState, memo, useCallback } from "react";
+import { getIcon } from "../../utils";
 import UserIndicator from "../auth/UserIndicator";
 import logoWithText from "../../assets/Shield Text Logo.webp";
 import LocalOnlyModeSettings from "../auth/LocalOnlyModeSettings";
@@ -8,7 +8,14 @@ import SyncHealthIndicator from "../sync/SyncHealthIndicator";
 const LOCAL_ONLY_MODE = import.meta.env.VITE_LOCAL_ONLY_MODE === "true";
 
 const Header = memo(
-  ({ currentUser, onUserChange, onUpdateProfile, isLocalOnlyMode = false, onShowSettings }) => {
+  ({
+    currentUser,
+    onUserChange,
+    onUpdateProfile,
+    isLocalOnlyMode = false,
+    onShowSettings,
+    onShowDataSettings,
+  }) => {
     const [showLocalOnlySettings, setShowLocalOnlySettings] = useState(false);
 
     const handleToggleLocalOnlySettings = useCallback(() => {
@@ -32,7 +39,9 @@ const Header = memo(
                   ? "border-orange-500" // Local development
                   : window.location.hostname.includes("dev.f4tdaddy.com") ||
                       (window.location.hostname.includes("vercel.app") &&
-                        !window.location.hostname.includes("violet-vault-production"))
+                        !window.location.hostname.includes(
+                          "violet-vault-production",
+                        ))
                     ? "border-red-500" // Preview/staging environments
                     : "border-purple-600" // Production
               }`}
@@ -57,8 +66,12 @@ const Header = memo(
                   className="mt-2 inline-flex items-center px-3 py-1 rounded-full bg-blue-100 border border-blue-300 hover:bg-blue-200 hover:border-blue-400 transition-colors"
                   title="Click to manage Local-Only Mode settings"
                 >
-                  <Monitor className="h-3 w-3 text-blue-600 mr-1" />
-                  <span className="text-xs font-medium text-blue-800">Local-Only Mode</span>
+                  {React.createElement(getIcon("Monitor"), {
+                    className: "h-3 w-3 text-blue-600 mr-1",
+                  })}
+                  <span className="text-xs font-medium text-blue-800">
+                    Local-Only Mode
+                  </span>
                 </button>
               )}
             </div>
@@ -73,14 +86,21 @@ const Header = memo(
             />
 
             <div className="flex gap-2 sm:gap-3 items-center justify-center flex-wrap">
-              {!isLocalOnlyMode && <SyncHealthIndicator data-tour="sync-indicator" />}
+              {!isLocalOnlyMode && (
+                <SyncHealthIndicator
+                  data-tour="sync-indicator"
+                  onOpenSettings={onShowDataSettings}
+                />
+              )}
 
               <button
                 onClick={onShowSettings}
                 className="btn btn-primary flex items-center rounded-2xl px-3 sm:px-4 py-2 text-sm font-medium hover:shadow-lg transition-all"
                 title="Open Settings Dashboard"
               >
-                <Settings className="h-4 w-4 sm:mr-2" />
+                {React.createElement(getIcon("Settings"), {
+                  className: "h-4 w-4 sm:mr-2",
+                })}
                 <span className="hidden sm:inline">Settings</span>
               </button>
             </div>
@@ -101,7 +121,7 @@ const Header = memo(
         )}
       </div>
     );
-  }
+  },
 );
 
 export default Header;

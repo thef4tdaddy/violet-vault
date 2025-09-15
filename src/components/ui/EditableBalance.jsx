@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Edit3, Check, X, AlertTriangle } from "lucide-react";
+import { getIcon } from "../../utils";
 
 const EditableBalance = ({
   value,
@@ -96,23 +96,31 @@ const EditableBalance = ({
     const isIncrease = changeAmount > 0;
 
     return (
-      <div className={`${bgClass} rounded-lg p-6 border-2 border-yellow-300 ${className}`}>
+      <div
+        className={`${bgClass} rounded-lg p-6 border-2 border-yellow-300 ${className}`}
+      >
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-medium text-yellow-800 flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5" />
+            {React.createElement(getIcon("AlertTriangle"), {
+              className: "h-5 w-5",
+            })}
             Confirm Large Change
           </h3>
         </div>
 
         <div className="space-y-4">
           <div className="text-sm text-yellow-700">
-            <p>You're about to {isIncrease ? "increase" : "decrease"} your balance by:</p>
+            <p>
+              You're about to {isIncrease ? "increase" : "decrease"} your
+              balance by:
+            </p>
             <p className="font-bold text-lg">
               {isIncrease ? "+" : ""}
               {formatNumber(changeAmount)}
             </p>
             <p className="mt-2">
-              From: {formatNumber(currentValue)} → To: {formatNumber(pendingValue)}
+              From: {formatNumber(currentValue)} → To:{" "}
+              {formatNumber(pendingValue)}
             </p>
           </div>
 
@@ -121,14 +129,14 @@ const EditableBalance = ({
               onClick={() => confirmSave(pendingValue)}
               className="flex items-center gap-1 px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
             >
-              <Check className="h-4 w-4" />
+              {React.createElement(getIcon("Check"), { className: "h-4 w-4" })}
               Confirm
             </button>
             <button
               onClick={handleCancel}
               className="flex items-center gap-1 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm"
             >
-              <X className="h-4 w-4" />
+              {React.createElement(getIcon("X"), { className: "h-4 w-4" })}
               Cancel
             </button>
           </div>
@@ -142,7 +150,10 @@ const EditableBalance = ({
       <div className={`${bgClass} rounded-lg p-6 ${className}`}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-medium text-gray-700">
-            {title} {isManuallySet && <span className="text-xs text-gray-500">(Manual)</span>}
+            {title}{" "}
+            {isManuallySet && (
+              <span className="text-xs text-gray-500">(Manual)</span>
+            )}
           </h3>
         </div>
 
@@ -163,14 +174,16 @@ const EditableBalance = ({
                 className="p-2 bg-green-600 text-white rounded-md hover:bg-green-700"
                 title="Save"
               >
-                <Check className="h-4 w-4" />
+                {React.createElement(getIcon("Check"), {
+                  className: "h-4 w-4",
+                })}
               </button>
               <button
                 onClick={handleCancel}
                 className="p-2 bg-red-600 text-white rounded-md hover:bg-red-700"
                 title="Cancel"
               >
-                <X className="h-4 w-4" />
+                {React.createElement(getIcon("X"), { className: "h-4 w-4" })}
               </button>
             </div>
           </div>
@@ -190,19 +203,28 @@ const EditableBalance = ({
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-medium text-gray-700 flex items-center gap-2">
           {title}
-          {isManuallySet && <span className="text-xs text-gray-500">(Manual)</span>}
-          <Edit3 className="h-4 w-4 opacity-0 group-hover:opacity-50 transition-opacity" />
+          {isManuallySet && (
+            <span className="text-xs text-gray-500">(Manual)</span>
+          )}
+          {React.createElement(getIcon("Edit3"), {
+            className:
+              "h-4 w-4 opacity-0 group-hover:opacity-50 transition-opacity",
+          })}
         </h3>
       </div>
 
       <div className="space-y-3">
-        <div className={`text-2xl font-bold ${colorClass} flex items-center justify-between`}>
+        <div
+          className={`text-2xl font-bold ${colorClass} flex items-center justify-between`}
+        >
           {formatNumber(value)}
           <div className="opacity-0 group-hover:opacity-50 transition-opacity">
-            <Edit3 className="h-5 w-5" />
+            {React.createElement(getIcon("Edit3"), { className: "h-5 w-5" })}
           </div>
         </div>
-        <p className="text-sm text-gray-600 group-hover:text-gray-800">{subtitle}</p>
+        <p className="text-sm text-gray-600 group-hover:text-gray-800">
+          {subtitle}
+        </p>
       </div>
     </div>
   );

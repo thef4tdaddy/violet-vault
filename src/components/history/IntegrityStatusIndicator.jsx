@@ -1,14 +1,6 @@
 import React, { useState, useEffect } from "react";
-import {
-  Shield,
-  ShieldAlert,
-  ShieldX,
-  AlertTriangle,
-  CheckCircle,
-  Eye,
-  RefreshCw,
-} from "lucide-react";
-import logger from "../../utils/logger";
+import { getIcon } from "../../utils";
+import logger from "../../utils/common/logger";
 
 const IntegrityStatusIndicator = ({ className = "" }) => {
   const [integrityStatus, setIntegrityStatus] = useState({
@@ -47,7 +39,9 @@ const IntegrityStatusIndicator = ({ className = "" }) => {
           message: "Budget history integrity verified",
         },
         warnings: [],
-        recommendations: ["Integrity checking will be enhanced in future versions"],
+        recommendations: [
+          "Integrity checking will be enhanced in future versions",
+        ],
       };
       setSecurityReport(report);
       setIntegrityStatus(report.integrity);
@@ -60,19 +54,26 @@ const IntegrityStatusIndicator = ({ className = "" }) => {
 
   const getStatusIcon = () => {
     if (!integrityStatus) {
-      return <Shield className="h-5 w-5 text-gray-400" />;
+      return React.createElement(getIcon("Shield"), {
+        className: "h-5 w-5 text-gray-400",
+      });
     }
 
     if (integrityStatus.valid) {
-      return <CheckCircle className="h-5 w-5 text-green-600" />;
+      return React.createElement(getIcon("CheckCircle"), {
+        className: "h-5 w-5 text-green-600",
+      });
     }
 
-    return <ShieldX className="h-5 w-5 text-red-600" />;
+    return React.createElement(getIcon("ShieldX"), {
+      className: "h-5 w-5 text-red-600",
+    });
   };
 
   const getStatusColor = () => {
     if (!integrityStatus) return "text-gray-500 bg-gray-100";
-    if (integrityStatus.valid) return "text-green-700 bg-green-100 border-green-200";
+    if (integrityStatus.valid)
+      return "text-green-700 bg-green-100 border-green-200";
     return "text-red-700 bg-red-100 border-red-200";
   };
 
@@ -118,7 +119,7 @@ const IntegrityStatusIndicator = ({ className = "" }) => {
           className="p-1 hover:bg-white/50 rounded"
           title="View details"
         >
-          <Eye className="h-4 w-4" />
+          {React.createElement(getIcon("Eye"), { className: "h-4 w-4" })}
         </button>
 
         <button
@@ -127,7 +128,9 @@ const IntegrityStatusIndicator = ({ className = "" }) => {
           className="p-1 hover:bg-white/50 rounded disabled:opacity-50"
           title="Perform security scan"
         >
-          <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+          {React.createElement(getIcon("RefreshCw"), {
+            className: `h-4 w-4 ${isLoading ? "animate-spin" : ""}`,
+          })}
         </button>
       </div>
 
@@ -139,11 +142,17 @@ const IntegrityStatusIndicator = ({ className = "" }) => {
               key={index}
               className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg"
             >
-              <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
+              {React.createElement(getIcon("AlertTriangle"), {
+                className: "h-5 w-5 text-red-600 mt-0.5",
+              })}
               <div className="flex-1">
-                <h4 className="text-sm font-medium text-red-900">{warning.title}</h4>
+                <h4 className="text-sm font-medium text-red-900">
+                  {warning.title}
+                </h4>
                 <p className="text-sm text-red-700 mt-1">{warning.message}</p>
-                <p className="text-xs text-red-600 mt-2 font-medium">{warning.recommendation}</p>
+                <p className="text-xs text-red-600 mt-2 font-medium">
+                  {warning.recommendation}
+                </p>
               </div>
             </div>
           ))}
@@ -153,12 +162,16 @@ const IntegrityStatusIndicator = ({ className = "" }) => {
       {/* Detailed Security Report */}
       {showDetails && (
         <div className="mt-4 p-4 bg-white border border-gray-200 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">Security Status Details</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-3">
+            Security Status Details
+          </h3>
 
           {/* Integrity Status */}
           {integrityStatus && (
             <div className="mb-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-2">Hash Chain Integrity</h4>
+              <h4 className="text-sm font-medium text-gray-700 mb-2">
+                Hash Chain Integrity
+              </h4>
               <div className="bg-gray-50 p-3 rounded-lg">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
@@ -171,12 +184,16 @@ const IntegrityStatusIndicator = ({ className = "" }) => {
                   </div>
                   <div>
                     <span className="text-gray-600">Total Commits:</span>
-                    <span className="ml-2 font-medium">{integrityStatus.totalCommits}</span>
+                    <span className="ml-2 font-medium">
+                      {integrityStatus.totalCommits}
+                    </span>
                   </div>
                   {integrityStatus.verifiedCommits !== undefined && (
                     <div>
                       <span className="text-gray-600">Verified:</span>
-                      <span className="ml-2 font-medium">{integrityStatus.verifiedCommits}</span>
+                      <span className="ml-2 font-medium">
+                        {integrityStatus.verifiedCommits}
+                      </span>
                     </div>
                   )}
                   {integrityStatus.brokenAt !== null && (
@@ -188,7 +205,9 @@ const IntegrityStatusIndicator = ({ className = "" }) => {
                     </div>
                   )}
                 </div>
-                <p className="text-sm text-gray-600 mt-2">{integrityStatus.message}</p>
+                <p className="text-sm text-gray-600 mt-2">
+                  {integrityStatus.message}
+                </p>
               </div>
             </div>
           )}
@@ -196,8 +215,12 @@ const IntegrityStatusIndicator = ({ className = "" }) => {
           {/* Security Report */}
           {securityReport && (
             <div className="mb-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-2">Advanced Security Analysis</h4>
-              <div className={`p-3 rounded-lg border ${getSecurityStatusColor()}`}>
+              <h4 className="text-sm font-medium text-gray-700 mb-2">
+                Advanced Security Analysis
+              </h4>
+              <div
+                className={`p-3 rounded-lg border ${getSecurityStatusColor()}`}
+              >
                 <div className="grid grid-cols-2 gap-4 text-sm mb-3">
                   <div>
                     <span className="text-gray-600">Overall Status:</span>
@@ -230,20 +253,22 @@ const IntegrityStatusIndicator = ({ className = "" }) => {
                         Security Indicators:
                       </h5>
                       <div className="space-y-1">
-                        {securityReport.tamperDetection.indicators.map((indicator, index) => (
-                          <div key={index} className="text-xs">
-                            <span
-                              className={`inline-block w-2 h-2 rounded-full mr-2 ${
-                                indicator.severity === "high"
-                                  ? "bg-red-500"
-                                  : indicator.severity === "medium"
-                                    ? "bg-yellow-500"
-                                    : "bg-blue-500"
-                              }`}
-                            ></span>
-                            {indicator.description}
-                          </div>
-                        ))}
+                        {securityReport.tamperDetection.indicators.map(
+                          (indicator, index) => (
+                            <div key={index} className="text-xs">
+                              <span
+                                className={`inline-block w-2 h-2 rounded-full mr-2 ${
+                                  indicator.severity === "high"
+                                    ? "bg-red-500"
+                                    : indicator.severity === "medium"
+                                      ? "bg-yellow-500"
+                                      : "bg-blue-500"
+                                }`}
+                              ></span>
+                              {indicator.description}
+                            </div>
+                          ),
+                        )}
                       </div>
                     </div>
                   )}
@@ -252,13 +277,17 @@ const IntegrityStatusIndicator = ({ className = "" }) => {
                 {securityReport.tamperDetection &&
                   securityReport.tamperDetection.recommendations.length > 0 && (
                     <div className="mt-3 pt-3 border-t border-gray-200">
-                      <h5 className="text-xs font-medium text-gray-700 mb-2">Recommendations:</h5>
+                      <h5 className="text-xs font-medium text-gray-700 mb-2">
+                        Recommendations:
+                      </h5>
                       <div className="space-y-1">
-                        {securityReport.tamperDetection.recommendations.map((rec, index) => (
-                          <div key={index} className="text-xs text-gray-600">
-                            • {rec}
-                          </div>
-                        ))}
+                        {securityReport.tamperDetection.recommendations.map(
+                          (rec, index) => (
+                            <div key={index} className="text-xs text-gray-600">
+                              • {rec}
+                            </div>
+                          ),
+                        )}
                       </div>
                     </div>
                   )}
@@ -268,7 +297,9 @@ const IntegrityStatusIndicator = ({ className = "" }) => {
 
           <div className="text-xs text-gray-500">
             Last checked:{" "}
-            {securityReport ? new Date(securityReport.timestamp).toLocaleString() : "Never"}
+            {securityReport
+              ? new Date(securityReport.timestamp).toLocaleString()
+              : "Never"}
           </div>
         </div>
       )}
