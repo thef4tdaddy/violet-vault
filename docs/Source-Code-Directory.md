@@ -9,6 +9,7 @@ This document provides an overview of the `/src/` directory structure. Given the
 ## 🎯 **V1.10.0 Milestone Achievements**
 
 The v1.10.0 "Code Architecture & Refactoring" milestone focused on:
+
 - ✅ **Performance Optimization**: Build time improvements and icon system centralization
 - ✅ **UI Stabilization**: Fixed major issues across Analytics, Debt, Paycheck, and Envelope pages
 - ✅ **Security Enhancements**: Local data encryption warnings and enhanced settings
@@ -82,7 +83,7 @@ _Account management and tracking_
 | -------------------------- | ----------------------------------------------- |
 | `SupplementalAccounts.jsx` | Additional account management with edit locking |
 
-### **Activity** (`/activity/`) - 
+### **Activity** (`/activity/`) -
 
 _Budget history and activity tracking_
 
@@ -90,7 +91,7 @@ _Budget history and activity tracking_
 | ------------------ | ---------------------------------------------------- |
 | `ActivityFeed.jsx` | Level 1 Budget History - chronological activity list |
 
-### **Automation** (`/automation/`) - 
+### **Automation** (`/automation/`) -
 
 _Auto-funding rules and intelligent budgeting_
 
@@ -139,15 +140,15 @@ _Envelope budgeting system components_
 
 _Bill tracking and payment management_
 
-| Component                 | Purpose                                             |
-| ------------------------- | --------------------------------------------------- |
-| `AddBillModal.jsx`        | Modal for adding/editing bills with edit locking    |
-| `BillDiscoveryModal.jsx`  | Automated bill discovery interface |
-| `BillManager.jsx`         | Main bill management interface                      |
-| `BillTable.jsx`           | Tabular display of bills                            |
-| `BillTabs.jsx`            | Tab navigation for bill categories                  |
-| `BulkBillUpdateModal.jsx` | Bulk operations for bills          |
-| `SmartBillMatcher.jsx`    | Automatic bill detection and matching               |
+| Component                 | Purpose                                          |
+| ------------------------- | ------------------------------------------------ |
+| `AddBillModal.jsx`        | Modal for adding/editing bills with edit locking |
+| `BillDiscoveryModal.jsx`  | Automated bill discovery interface               |
+| `BillManager.jsx`         | Main bill management interface                   |
+| `BillTable.jsx`           | Tabular display of bills                         |
+| `BillTabs.jsx`            | Tab navigation for bill categories               |
+| `BulkBillUpdateModal.jsx` | Bulk operations for bills                        |
+| `SmartBillMatcher.jsx`    | Automatic bill detection and matching            |
 
 ### **Debt Management** (`/debt/`)
 
@@ -174,7 +175,7 @@ _Debt tracking and payoff strategies_
 | `DebtSummaryCards.jsx`  | Summary cards for debt metrics |
 | `DebtSummaryWidget.jsx` | Widget for debt overview       |
 
-### **Feedback & Support** (`/feedback/`) - 
+### **Feedback & Support** (`/feedback/`) -
 
 _User feedback and bug reporting_
 
@@ -182,7 +183,7 @@ _User feedback and bug reporting_
 | --------------------- | ------------------------------------- |
 | `BugReportButton.jsx` | Bug reporting with screenshot capture |
 
-### **History & Audit** (`/history/`) - 
+### **History & Audit** (`/history/`) -
 
 _Budget history and integrity monitoring_
 
@@ -192,7 +193,7 @@ _Budget history and integrity monitoring_
 | `IntegrityStatusIndicator.jsx` | Security integrity status display   |
 | `ObjectHistoryViewer.jsx`      | Object-level change history viewer  |
 
-### **Onboarding** (`/onboarding/`) - 
+### **Onboarding** (`/onboarding/`) -
 
 _User onboarding and tutorial system_
 
@@ -210,7 +211,7 @@ _Savings goal tracking and management_
 | ------------------ | ---------------------------------- |
 | `SavingsGoals.jsx` | Savings goals management interface |
 
-### **Security** (`/security/`) - 
+### **Security** (`/security/`) -
 
 _Security and access control_
 
@@ -222,25 +223,25 @@ _Security and access control_
 
 _Application settings and configuration_
 
-| Component                  | Purpose                                         |
-| -------------------------- | ----------------------------------------------- |
-| `SecuritySettings.jsx`     | Security configuration interface                |
-| `SettingsDashboard.jsx`    | Main settings dashboard                         |
-| `TransactionArchiving.jsx` | Transaction archiving settings |
+| Component                  | Purpose                          |
+| -------------------------- | -------------------------------- |
+| `SecuritySettings.jsx`     | Security configuration interface |
+| `SettingsDashboard.jsx`    | Main settings dashboard          |
+| `TransactionArchiving.jsx` | Transaction archiving settings   |
 
 ### **Sync Components** (`/sync/`)
 
 _Multi-device synchronization and real-time collaboration_
 
-| Component                     | Purpose                                 |
-| ----------------------------- | --------------------------------------- |
-| `ActivityBanner.jsx`          | Real-time user activity notifications   |
-| `ConflictResolutionModal.jsx` | Sync conflict resolution interface      |
-| `ManualSyncControls.jsx`      | Manual sync controls   |
-| `SyncHealthIndicator.jsx`     | Sync health monitoring |
-| `SyncIndicator.jsx`           | Sync status indicator                   |
-| `SyncStatusIndicators.jsx`    | Multiple sync status displays           |
-| `TeamActivitySync.jsx`        | Real-time team activity sync            |
+| Component                     | Purpose                               |
+| ----------------------------- | ------------------------------------- |
+| `ActivityBanner.jsx`          | Real-time user activity notifications |
+| `ConflictResolutionModal.jsx` | Sync conflict resolution interface    |
+| `ManualSyncControls.jsx`      | Manual sync controls                  |
+| `SyncHealthIndicator.jsx`     | Sync health monitoring                |
+| `SyncIndicator.jsx`           | Sync status indicator                 |
+| `SyncStatusIndicators.jsx`    | Multiple sync status displays         |
+| `TeamActivitySync.jsx`        | Real-time team activity sync          |
 
 ### **Transactions** (`/transactions/`)
 
@@ -255,7 +256,7 @@ _Transaction management and analysis_
 | `TransactionSummary.jsx`  | Transaction summary and totals                         |
 | `TransactionTable.jsx`    | Tabular transaction display                            |
 
-#### **Transaction Components** (`/transactions/components/`) - 
+#### **Transaction Components** (`/transactions/components/`) -
 
 | Component                | Purpose                              |
 | ------------------------ | ------------------------------------ |
@@ -264,12 +265,12 @@ _Transaction management and analysis_
 
 #### **Transaction Hooks** (`/transactions/hooks/`)
 
-| Hook                       | Purpose                                 |
-| -------------------------- | --------------------------------------- |
-| `useTransactionFilters.js` | Transaction filtering logic             |
-| `useTransactionForm.js`    | Transaction form state management       |
-| `useTransactionImport.js`  | Transaction import functionality        |
-| `useTransactionTable.js`   | Table state management |
+| Hook                       | Purpose                           |
+| -------------------------- | --------------------------------- |
+| `useTransactionFilters.js` | Transaction filtering logic       |
+| `useTransactionForm.js`    | Transaction form state management |
+| `useTransactionImport.js`  | Transaction import functionality  |
+| `useTransactionTable.js`   | Table state management            |
 
 #### **Transaction Import** (`/transactions/import/`)
 
@@ -283,26 +284,26 @@ _Transaction management and analysis_
 
 #### **Transaction Utils** (`/transactions/utils/`)
 
-| Utility               | Purpose                                  |
-| --------------------- | ---------------------------------------- |
-| `envelopeMatching.js` | Auto-categorization logic                |
-| `fileParser.js`       | CSV/file parsing utilities               |
-| `tableHelpers.js`     | Table utility functions |
+| Utility               | Purpose                    |
+| --------------------- | -------------------------- |
+| `envelopeMatching.js` | Auto-categorization logic  |
+| `fileParser.js`       | CSV/file parsing utilities |
+| `tableHelpers.js`     | Table utility functions    |
 
 ### **UI Components** (`/ui/`)
 
 _Reusable UI elements and common components_
 
-| Component               | Purpose                                          |
-| ----------------------- | ------------------------------------------------ |
-| `EditLockIndicator.jsx` | Edit lock status indicator      |
-| `EditableBalance.jsx`   | Inline editable balance display |
-| `Header.jsx`            | Application header component                     |
-| `HelpTooltip.jsx`       | Help and information tooltips   |
-| `LoadingSpinner.jsx`    | Loading state indicator                          |
-| `Toast.jsx`             | Toast notification system                        |
-| `VersionFooter.jsx`     | App version display                              |
-| `VirtualList.jsx`       | Performance-optimized list rendering             |
+| Component               | Purpose                              |
+| ----------------------- | ------------------------------------ |
+| `EditLockIndicator.jsx` | Edit lock status indicator           |
+| `EditableBalance.jsx`   | Inline editable balance display      |
+| `Header.jsx`            | Application header component         |
+| `HelpTooltip.jsx`       | Help and information tooltips        |
+| `LoadingSpinner.jsx`    | Loading state indicator              |
+| `Toast.jsx`             | Toast notification system            |
+| `VersionFooter.jsx`     | App version display                  |
+| `VirtualList.jsx`       | Performance-optimized list rendering |
 
 ### **Analytics** (`/analytics/`)
 
@@ -350,57 +351,57 @@ _Reusable UI elements_
 
 _Modal dialog components_
 
-| Component                   | Purpose                                  |
-| --------------------------- | ---------------------------------------- |
-| `CorruptionRecoveryModal.jsx` | Data corruption recovery interface      |
-| `PasswordRotationModal.jsx` | Password rotation security modal         |
-| `UnassignedCashModal.jsx`   | Cash distribution modal |
+| Component                     | Purpose                            |
+| ----------------------------- | ---------------------------------- |
+| `CorruptionRecoveryModal.jsx` | Data corruption recovery interface |
+| `PasswordRotationModal.jsx`   | Password rotation security modal   |
+| `UnassignedCashModal.jsx`     | Cash distribution modal            |
 
 ### **Monitoring** (`/monitoring/`)
 
 _Performance and system monitoring components_
 
-| Component              | Purpose                                    |
-| ---------------------- | ------------------------------------------ |
-| `HighlightLoader.jsx`  | Error highlighting and debugging component |
+| Component             | Purpose                                    |
+| --------------------- | ------------------------------------------ |
+| `HighlightLoader.jsx` | Error highlighting and debugging component |
 
 ## 🪝 Hooks Directory (`/hooks/`)
 
 _Custom React hooks for business logic_
 
-| Hook                               | Purpose                                                        |
-| ---------------------------------- | -------------------------------------------------------------- |
-| `useActivityLogger.js`             | Budget activity logging                       |
-| `useActualBalance.js`              | Bank account balance management and reconciliation             |
-| `useAnalytics.js`                  | Financial analytics and reporting             |
-| `useAuthFlow.js`                   | Authentication flow management                                 |
-| `useAutoFunding.js`                | Auto-funding rules management                 |
-| `useBillOperations.js`             | Bill CRUD operations                          |
-| `useBills.js`                      | Bill management hook                          |
-| `useBudgetData.js`                 | Unified TanStack Query + Zustand + Dexie hook |
-| `useBudgetHistoryQuery.js`         | Budget history querying                       |
-| `useBudgetMetadata.js`             | Budget metadata management                    |
-| `useBugReport.js`                  | Bug reporting functionality                   |
-| `useDataInitialization.js`         | Data initialization and migration             |
-| `useDataManagement.js`             | Import/export operations                                       |
-| `useDebtManagement.js`             | Debt tracking and payoff strategies           |
-| `useDebts.js`                      | Debt management hook                          |
-| `useEditLock.js`                   | Cross-browser edit locking                    |
-| `useEnvelopes.js`                  | Specialized envelope management               |
-| `useFirebaseSync.js`               | Firebase synchronization and activity management               |
-| `useKeyManagement.js`              | Encryption key management                     |
-| `useLocalOnlyMode.js`              | Local-only operation mode                     |
-| `useManualSync.js`                 | Manual sync controls                          |
-| `useNetworkStatus.js`              | Network status management (online/offline detection)           |
-| `useOnboardingAutoComplete.js`     | Automatic onboarding completion               |
-| `usePasswordRotation.js`           | Password security and rotation                                 |
-| `usePaydayPrediction.js`           | Payday prediction and notifications                            |
-| `useSavingsGoals.js`               | Savings goal management                       |
-| `useSecurityManager.js`            | Security settings management                  |
-| `useToast.js`                      | Toast notification management                                  |
-| `useTransactionArchiving.js`       | Transaction archiving functionality           |
-| `useTransactions.js`               | Advanced transaction queries with analytics   |
-| `useUnassignedCashDistribution.js` | Unassigned cash distribution                  |
+| Hook                               | Purpose                                              |
+| ---------------------------------- | ---------------------------------------------------- |
+| `useActivityLogger.js`             | Budget activity logging                              |
+| `useActualBalance.js`              | Bank account balance management and reconciliation   |
+| `useAnalytics.js`                  | Financial analytics and reporting                    |
+| `useAuthFlow.js`                   | Authentication flow management                       |
+| `useAutoFunding.js`                | Auto-funding rules management                        |
+| `useBillOperations.js`             | Bill CRUD operations                                 |
+| `useBills.js`                      | Bill management hook                                 |
+| `useBudgetData.js`                 | Unified TanStack Query + Zustand + Dexie hook        |
+| `useBudgetHistoryQuery.js`         | Budget history querying                              |
+| `useBudgetMetadata.js`             | Budget metadata management                           |
+| `useBugReport.js`                  | Bug reporting functionality                          |
+| `useDataInitialization.js`         | Data initialization and migration                    |
+| `useDataManagement.js`             | Import/export operations                             |
+| `useDebtManagement.js`             | Debt tracking and payoff strategies                  |
+| `useDebts.js`                      | Debt management hook                                 |
+| `useEditLock.js`                   | Cross-browser edit locking                           |
+| `useEnvelopes.js`                  | Specialized envelope management                      |
+| `useFirebaseSync.js`               | Firebase synchronization and activity management     |
+| `useKeyManagement.js`              | Encryption key management                            |
+| `useLocalOnlyMode.js`              | Local-only operation mode                            |
+| `useManualSync.js`                 | Manual sync controls                                 |
+| `useNetworkStatus.js`              | Network status management (online/offline detection) |
+| `useOnboardingAutoComplete.js`     | Automatic onboarding completion                      |
+| `usePasswordRotation.js`           | Password security and rotation                       |
+| `usePaydayPrediction.js`           | Payday prediction and notifications                  |
+| `useSavingsGoals.js`               | Savings goal management                              |
+| `useSecurityManager.js`            | Security settings management                         |
+| `useToast.js`                      | Toast notification management                        |
+| `useTransactionArchiving.js`       | Transaction archiving functionality                  |
+| `useTransactions.js`               | Advanced transaction queries with analytics          |
+| `useUnassignedCashDistribution.js` | Unassigned cash distribution                         |
 
 ## 🏪 Stores Directory (`/stores/`)
 
@@ -410,10 +411,10 @@ _Zustand state management stores_
 | -------------------- | ------------------------------------------------- |
 | `authStore.jsx`      | Authentication state management (renamed for JSX) |
 | `budgetStore.js`     | Main budget data state management (Zustand store) |
-| `onboardingStore.js` | Onboarding progress state        |
-| `toastStore.js`      | Toast notification state         |
+| `onboardingStore.js` | Onboarding progress state                         |
+| `toastStore.js`      | Toast notification state                          |
 
-## 🔧 Services Directory (`/services/`) - 
+## 🔧 Services Directory (`/services/`) -
 
 _Business logic services and utilities_
 
@@ -431,42 +432,42 @@ _Business logic services and utilities_
 
 _Utility functions and services_
 
-| Utility                       | Purpose                                                                       |
-| ----------------------------- | ----------------------------------------------------------------------------- |
-| `autoFundingEngine.js`        | Auto-funding rules processing engine                         |
-| `billDiscovery.js`            | Automated bill discovery algorithms                          |
-| `billEnvelopeCalculations.js` | Bill-to-envelope calculation utilities                       |
-| `billIcons.js`                | Bill categorization icons                                                     |
-| `budgetHistoryTracker.js`     | Budget history tracking utilities                            |
-| `chunkedFirebaseSync.js`      | Chunked Firebase synchronization                             |
-| `dataDiagnostic.js`           | Data integrity diagnostic utilities                          |
-| `debugTools.js`               | Development debugging utilities                              |
-| `debtStrategies.js`           | Debt payoff strategy calculations                            |
-| `encryption.js`               | Data encryption/decryption utilities                                          |
-| `errorViewer.js`              | Error visualization utilities                                |
-| `firebaseConfig.js`           | Firebase configuration                                                        |
-| `firebaseSync.js`             | Firebase synchronization service                                              |
-| `fixMetadata.js`              | Metadata repair utilities                                    |
-| `frequencyCalculations.js`    | Frequency conversion utilities                               |
-| `highlight.js`                | Error highlighting and debugging utilities                                    |
-| `keyExport.js`                | Encryption key export utilities                              |
-| `lazyImport.js`               | Dynamic import utilities                                     |
-| `logger.js`                   | Application logging utilities                                                 |
-| `masterSyncValidator.js`      | Master sync validation utilities                             |
-| `paydayPredictor.js`          | Payday prediction algorithms with enhanced recommendations                    |
-| `performance.js`              | Performance monitoring utilities                                              |
-| `performanceUtils.js`         | Additional performance optimization utilities                                 |
-| `queryClient.js`              | TanStack Query + Dexie integration with offline support |
-| `syncDiagnostic.js`           | Sync diagnostic utilities                                    |
-| `syncEdgeCaseTester.js`       | Sync edge case testing utilities                             |
-| `syncFlowValidator.js`        | Sync flow validation utilities                               |
-| `syncHealthChecker.js`        | Sync health monitoring utilities                             |
-| `testBudgetHistory.js`        | Budget history testing utilities                             |
-| `toastHelpers.js`             | Toast notification helper functions                          |
-| `transactionArchiving.js`     | Transaction archiving utilities                              |
-| `version.js`                  | Application version management                                                |
+| Utility                       | Purpose                                                    |
+| ----------------------------- | ---------------------------------------------------------- |
+| `autoFundingEngine.js`        | Auto-funding rules processing engine                       |
+| `billDiscovery.js`            | Automated bill discovery algorithms                        |
+| `billEnvelopeCalculations.js` | Bill-to-envelope calculation utilities                     |
+| `billIcons.js`                | Bill categorization icons                                  |
+| `budgetHistoryTracker.js`     | Budget history tracking utilities                          |
+| `chunkedFirebaseSync.js`      | Chunked Firebase synchronization                           |
+| `dataDiagnostic.js`           | Data integrity diagnostic utilities                        |
+| `debugTools.js`               | Development debugging utilities                            |
+| `debtStrategies.js`           | Debt payoff strategy calculations                          |
+| `encryption.js`               | Data encryption/decryption utilities                       |
+| `errorViewer.js`              | Error visualization utilities                              |
+| `firebaseConfig.js`           | Firebase configuration                                     |
+| `firebaseSync.js`             | Firebase synchronization service                           |
+| `fixMetadata.js`              | Metadata repair utilities                                  |
+| `frequencyCalculations.js`    | Frequency conversion utilities                             |
+| `highlight.js`                | Error highlighting and debugging utilities                 |
+| `keyExport.js`                | Encryption key export utilities                            |
+| `lazyImport.js`               | Dynamic import utilities                                   |
+| `logger.js`                   | Application logging utilities                              |
+| `masterSyncValidator.js`      | Master sync validation utilities                           |
+| `paydayPredictor.js`          | Payday prediction algorithms with enhanced recommendations |
+| `performance.js`              | Performance monitoring utilities                           |
+| `performanceUtils.js`         | Additional performance optimization utilities              |
+| `queryClient.js`              | TanStack Query + Dexie integration with offline support    |
+| `syncDiagnostic.js`           | Sync diagnostic utilities                                  |
+| `syncEdgeCaseTester.js`       | Sync edge case testing utilities                           |
+| `syncFlowValidator.js`        | Sync flow validation utilities                             |
+| `syncHealthChecker.js`        | Sync health monitoring utilities                           |
+| `testBudgetHistory.js`        | Budget history testing utilities                           |
+| `toastHelpers.js`             | Toast notification helper functions                        |
+| `transactionArchiving.js`     | Transaction archiving utilities                            |
+| `version.js`                  | Application version management                             |
 
-#### **Budgeting Utilities** (`/utils/budgeting/`) - 
+#### **Budgeting Utilities** (`/utils/budgeting/`) -
 
 | Utility                   | Purpose                                   |
 | ------------------------- | ----------------------------------------- |
@@ -477,8 +478,8 @@ _Utility functions and services_
 
 #### **Icon System Utilities** (`/utils/icons/`) - **NEW in v1.10.0**
 
-| Utility    | Purpose                                    |
-| ---------- | ------------------------------------------ |
+| Utility    | Purpose                                   |
+| ---------- | ----------------------------------------- |
 | `index.js` | Centralized icon management system export |
 
 ## 💾 Database Directory (`/db/`)
@@ -493,13 +494,13 @@ _Local database management_
 
 _Application constants and configurations_
 
-| File            | Purpose                                          |
-| --------------- | ------------------------------------------------ |
-| `categories.js` | Transaction and bill categories                  |
+| File            | Purpose                         |
+| --------------- | ------------------------------- |
+| `categories.js` | Transaction and bill categories |
 | `debts.js`      | Debt-related constants          |
 | `frequency.js`  | Frequency calculation constants |
 
-## 🧪 Test Directory (`/test/`) - 
+## 🧪 Test Directory (`/test/`) -
 
 _Testing utilities and test files_
 
