@@ -10,6 +10,9 @@ import { SystemInfoService } from "./services/bugReport/systemInfoService.js";
 // Initialize Firebase at app startup
 import "./services/chunkedSyncService.js";
 
+// Initialize PWA background sync for offline operations
+import "./utils/pwa/backgroundSync.js";
+
 // Expose diagnostic tools for debugging
 import { runDataDiagnostic } from "./utils/debug/dataDiagnostic.js";
 import { runSyncDiagnostic } from "./utils/debug/syncDiagnostic.js";
@@ -37,6 +40,9 @@ if (
   window.runMasterSyncValidation = runMasterSyncValidation;
   window.getQuickSyncStatus = getQuickSyncStatus;
   window.fixAutoAllocateUndefined = fixAutoAllocateUndefined;
+
+  // PWA Background Sync debugging (imported via module side effects)
+  // Access via window.backgroundSyncManager (exposed in backgroundSync.js)
 
   // Emergency corruption recovery tool
   window.forceCloudDataReset = async () => {
