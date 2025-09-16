@@ -24,6 +24,7 @@ const EnvelopeEditModal = lazy(() => import("./EditEnvelopeModal"));
 const EnvelopeHistoryModal = lazy(
   () => import("./envelope/EnvelopeHistoryModal"),
 );
+const QuickFundModal = lazy(() => import("../modals/QuickFundModal"));
 
 const UnifiedEnvelopeManager = ({
   envelopes: propEnvelopes = [],
@@ -99,6 +100,11 @@ const UnifiedEnvelopeManager = ({
   const [historyEnvelope, setHistoryEnvelope] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingEnvelope, setEditingEnvelope] = useState(null);
+  const [quickFundModal, setQuickFundModal] = useState({
+    isOpen: false,
+    envelope: null,
+    suggestedAmount: 0,
+  });
   const [filterOptions, setFilterOptions] = useState({
     timeRange: "current_month",
     showEmpty: true,
@@ -125,6 +131,41 @@ const UnifiedEnvelopeManager = ({
     setSelectedEnvelopeId(
       envelopeId === selectedEnvelopeId ? null : envelopeId,
     );
+  };
+
+  const handleQuickFund = (envelopeId, suggestedAmount) => {
+    const envelope = envelopeData.find((env) => env.id === envelopeId);
+    if (envelope) {
+      setQuickFundModal({
+        isOpen: true,
+        envelope,
+        suggestedAmount,
+      });
+    }
+  };
+
+  const handleQuickFundConfirm = async (envelopeId, amount) => {
+    try {
+      await updateEnvelope({
+        envelopeId,
+        updates: {
+          allocated:
+            (envelopeData.find((env) => env.id === envelopeId)?.allocated ||
+              0) + amount,
+        },
+      });
+      logger.info(`Quick funded $${amount} to envelope ${envelopeId}`);
+    } catch (error) {
+      logger.error("Failed to quick fund envelope:", error);
+    }
+  };
+
+  const closeQuickFundModal = () => {
+    setQuickFundModal({
+      isOpen: false,
+      envelope: null,
+      suggestedAmount: 0,
+    });
   };
 
   const handleEnvelopeEdit = (envelope) => {
@@ -189,8 +230,10 @@ const UnifiedEnvelopeManager = ({
             onSelect={handleEnvelopeSelect}
             onEdit={handleEnvelopeEdit}
             onViewHistory={handleViewHistory}
+            onQuickFund={handleQuickFund}
             isSelected={selectedEnvelopeId === envelope.id}
             bills={bills}
+            unassignedCash={unassignedCash}
           />
         ))}
       </div>
@@ -251,6 +294,17 @@ const UnifiedEnvelopeManager = ({
             isOpen={!!historyEnvelope}
             onClose={() => setHistoryEnvelope(null)}
             envelope={historyEnvelope}
+          />
+        )}
+
+        {quickFundModal.isOpen && (
+          <QuickFundModal
+            isOpen={quickFundModal.isOpen}
+            onClose={closeQuickFundModal}
+            onConfirm={handleQuickFundConfirm}
+            envelope={quickFundModal.envelope}
+            suggestedAmount={quickFundModal.suggestedAmount}
+            unassignedCash={unassignedCash}
           />
         )}
       </Suspense>
