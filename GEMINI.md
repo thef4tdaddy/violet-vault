@@ -6,7 +6,7 @@
 
 ## Branch Strategy
 
-- **feature/* → milestone-X.Y**: Individual features
+- **feature/\* → milestone-X.Y**: Individual features
 - **milestone-X.Y → develop**: Complete milestones only
 - **develop → main**: Production releases only
 

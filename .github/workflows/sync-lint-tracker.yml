@@ -4,13 +4,13 @@ on:
   push:
     branches: [develop]
     paths:
-      - '.github/workflows/lint-warnings-tracker.yml'
-  
+      - ".github/workflows/lint-warnings-tracker.yml"
+
   # Manual trigger option
   workflow_dispatch:
     inputs:
       force_sync:
-        description: 'Force sync even if no changes detected'
+        description: "Force sync even if no changes detected"
         required: false
         default: false
         type: boolean
@@ -18,7 +18,7 @@ on:
 jobs:
   sync-workflow:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout develop branch
         uses: actions/checkout@v4
@@ -35,21 +35,21 @@ jobs:
       - name: Check for differences and sync
         run: |
           echo "🔍 Checking for differences between develop and main lint tracker workflows..."
-          
+
           # Fetch latest main branch
           git fetch origin main
-          
+
           # Compare lint tracker workflows
           DEVELOP_FILE=".github/workflows/lint-warnings-tracker.yml"
-          
+
           if [ ! -f "$DEVELOP_FILE" ]; then
             echo "❌ Lint tracker workflow not found on develop branch"
             exit 1
           fi
-          
+
           # Get main branch version of the file
           git show origin/main:$DEVELOP_FILE > main-lint-tracker.yml 2>/dev/null || echo "# File not found on main" > main-lint-tracker.yml
-          
+
           # Compare files
           if ! diff -q "$DEVELOP_FILE" main-lint-tracker.yml > /dev/null; then
             echo "🔄 Differences detected! Syncing workflow from develop to main..."
@@ -97,10 +97,10 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            
+
             // Check if sync was needed/performed
             const wasPerformed = process.env.GITHUB_STEP_SUMMARY?.includes('Successfully synced') || false;
-            
+
             const syncStatus = wasPerformed ? '✅ Sync Performed' : 'ℹ️ No Sync Needed';
             const trigger = context.eventName === 'workflow_dispatch' ? 'Manual' : 'Automatic';
             const comment = '🔄 **Lint Tracker Workflow Sync Status** - ' + new Date().toLocaleString('en-US', { timeZone: 'America/Chicago', timeZoneName: 'short' }) + '\n\n' + syncStatus + ': Lint tracker workflow sync completed\n\n**Monitored File**: `.github/workflows/lint-warnings-tracker.yml`\n**Trigger**: ' + trigger;

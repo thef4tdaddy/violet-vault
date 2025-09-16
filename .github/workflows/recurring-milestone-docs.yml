@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       milestone_title:
-        description: 'Milestone title to update documentation for'
+        description: "Milestone title to update documentation for"
         required: true
         type: string
 

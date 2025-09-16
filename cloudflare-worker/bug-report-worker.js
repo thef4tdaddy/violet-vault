@@ -1270,7 +1270,8 @@ async function createGitHubIssue(data, env) {
 
     // Use enhanced router-aware location if available
     const routeInfo = reportEnv.pageContext.route || {};
-    const currentView = routeInfo.currentView || reportEnv.pageContext.page || "unknown";
+    const currentView =
+      routeInfo.currentView || reportEnv.pageContext.page || "unknown";
 
     issueBody += `**Page:** ${currentView}\n`;
     issueBody += `**Screen:** ${reportEnv.pageContext.screenTitle || "Unknown"}\n`;
