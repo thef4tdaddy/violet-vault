@@ -77,9 +77,9 @@ export default defineConfig(() => {
         registerType: "autoUpdate",
         includeAssets: [
           "favicon.ico",
-          "icon-192x192.png",
-          "icon-512x512.png",
-          "apple-touch-icon.png",
+          "images/icon-192x192.png",
+          "images/icon-512x512.png",
+          "images/favicon.ico",
         ],
         manifest: {
           name: "Violet Vault - Budget Management",
