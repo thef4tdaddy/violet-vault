@@ -124,7 +124,7 @@ const NavigationTabs = memo(() => {
     <div className="glassmorphism rounded-3xl mb-6 lg:shadow-xl border border-white/20 ring-1 ring-gray-800/10 fixed bottom-2 left-2 right-2 lg:static z-50 overflow-hidden relative lg:mb-6 mb-0 lg:rounded-3xl rounded-2xl">
       <nav
         ref={navRef}
-        className="flex justify-evenly lg:justify-around overflow-x-auto scrollbar-hide pb-safe px-1 lg:px-0 gap-1 lg:gap-0 py-2 lg:py-0"
+        className="flex justify-evenly lg:justify-around overflow-x-auto scrollbar-hide pb-safe px-1 lg:px-0 gap-1 lg:gap-0 py-3 lg:py-2"
       >
         {tabs.map((tab) => (
           <NavButton
@@ -159,14 +159,14 @@ const NavButton = memo(({ active, to, icon: _Icon, label, viewKey }) => (
     data-tab={viewKey}
     onClick={() => hapticFeedback(10, "light")}
     className={getButtonClasses(
-      `flex-shrink-0 lg:flex-1 flex flex-col items-center lg:flex-row lg:px-4 px-2 py-2 text-xs lg:text-sm font-medium border border-black/10 ${
+      `flex-shrink-0 lg:flex-1 flex flex-col items-center lg:flex-row lg:px-4 px-3 py-3 text-xs lg:text-sm font-medium border border-black/10 ${
         active
           ? "border-t-2 lg:border-b-2 border-purple-500 text-purple-600 bg-purple-50/50 border-purple-400 ring-1 ring-purple-300"
           : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30 hover:border-purple-200"
       }`,
       "tab",
     )}
-    style={{ minWidth: "75px" }} // Increase minimum tap target and prevent clipping
+    style={{ minWidth: "80px", minHeight: "44px" }} // Increase minimum tap target for accessibility
   >
     <_Icon className="h-4 w-4 mb-1 lg:mb-0 lg:mr-2 flex-shrink-0" />
     <span className="text-center lg:text-left leading-tight">
