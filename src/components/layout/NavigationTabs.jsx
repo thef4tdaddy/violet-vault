@@ -1,6 +1,7 @@
 import React, { memo, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { getIcon } from "../../utils";
+import { getButtonClasses, hapticFeedback } from "../../utils/ui/touchFeedback";
 
 /**
  * Navigation tabs component for the main layout
@@ -156,11 +157,15 @@ const NavButton = memo(({ active, to, icon: _Icon, label, viewKey }) => (
     aria-current={active ? "page" : undefined}
     data-view={viewKey}
     data-tab={viewKey}
-    className={`flex-shrink-0 lg:flex-1 flex flex-col items-center lg:flex-row lg:px-4 px-2 py-2 text-xs lg:text-sm font-medium transition-colors relative border border-black/10 ${
-      active
-        ? "border-t-2 lg:border-b-2 border-purple-500 text-purple-600 bg-purple-50/50 border-purple-400 ring-1 ring-purple-300"
-        : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30 hover:border-purple-200"
-    }`}
+    onClick={() => hapticFeedback(10, "light")}
+    className={getButtonClasses(
+      `flex-shrink-0 lg:flex-1 flex flex-col items-center lg:flex-row lg:px-4 px-2 py-2 text-xs lg:text-sm font-medium border border-black/10 ${
+        active
+          ? "border-t-2 lg:border-b-2 border-purple-500 text-purple-600 bg-purple-50/50 border-purple-400 ring-1 ring-purple-300"
+          : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30 hover:border-purple-200"
+      }`,
+      "tab",
+    )}
     style={{ minWidth: "75px" }} // Increase minimum tap target and prevent clipping
   >
     <_Icon className="h-4 w-4 mb-1 lg:mb-0 lg:mr-2 flex-shrink-0" />

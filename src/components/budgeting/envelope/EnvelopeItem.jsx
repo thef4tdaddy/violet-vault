@@ -5,6 +5,10 @@ import { getStatusStyle, getUtilizationColor } from "../../../utils/budgeting";
 import { ENVELOPE_TYPES } from "../../../constants/categories";
 import { getBillEnvelopeDisplayInfo } from "../../../utils/budgeting/billEnvelopeCalculations";
 import { BIWEEKLY_MULTIPLIER } from "../../../constants/frequency";
+import {
+  getButtonClasses,
+  withHapticFeedback,
+} from "../../../utils/ui/touchFeedback";
 
 // Lazy load the bill funding info component
 const BillEnvelopeFundingInfo = React.lazy(
@@ -137,23 +141,29 @@ const EnvelopeItem = ({
   return (
     <div
       {...swipeHandlers}
-      className={`relative p-6 rounded-lg border-2 transition-all cursor-pointer hover:shadow-lg ${getStatusStyle(envelope)} ${
-        isSelected ? "ring-2 ring-purple-500" : ""
-      } ${swipeState.isSwipeActive ? "select-none" : ""}`}
+      className={getButtonClasses(
+        `relative p-6 rounded-lg border-2 cursor-pointer hover:shadow-lg ${getStatusStyle(envelope)} ${
+          isSelected ? "ring-2 ring-purple-500" : ""
+        } ${swipeState.isSwipeActive ? "select-none" : ""}`,
+        "card",
+      )}
       style={swipeStyles}
     >
       {/* Header - Always visible */}
       <div
         className="flex justify-between items-start mb-4"
-        onClick={() => onSelect?.(envelope.id)}
+        onClick={withHapticFeedback(() => onSelect?.(envelope.id), "light")}
       >
         {/* Mobile collapse button */}
         <button
-          onClick={(e) => {
+          onClick={withHapticFeedback((e) => {
             e.stopPropagation();
             setIsCollapsed(!isCollapsed);
-          }}
-          className="md:hidden flex-shrink-0 mr-2 p-1 text-gray-400 hover:text-blue-600 transition-colors"
+          }, "light")}
+          className={getButtonClasses(
+            "md:hidden flex-shrink-0 mr-2 p-1 text-gray-400 hover:text-blue-600",
+            "small",
+          )}
           aria-label={isCollapsed ? "Expand envelope" : "Collapse envelope"}
         >
           {React.createElement(
@@ -192,20 +202,26 @@ const EnvelopeItem = ({
 
           <div className="flex gap-1">
             <button
-              onClick={(e) => {
+              onClick={withHapticFeedback((e) => {
                 e.stopPropagation();
                 onEdit?.(envelope);
-              }}
-              className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+              }, "light")}
+              className={getButtonClasses(
+                "p-1 text-gray-400 hover:text-blue-600",
+                "small",
+              )}
             >
               {React.createElement(getIcon("Edit"), { className: "h-4 w-4" })}
             </button>
             <button
-              onClick={(e) => {
+              onClick={withHapticFeedback((e) => {
                 e.stopPropagation();
                 onViewHistory?.(envelope);
-              }}
-              className="p-1 text-gray-400 hover:text-green-600 transition-colors"
+              }, "light")}
+              className={getButtonClasses(
+                "p-1 text-gray-400 hover:text-green-600",
+                "small",
+              )}
             >
               {React.createElement(getIcon("History"), {
                 className: "h-4 w-4",
