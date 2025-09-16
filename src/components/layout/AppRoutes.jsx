@@ -2,6 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import ViewRendererComponent from "./ViewRenderer";
 import LandingPage from "../marketing/LandingPage";
+import OfflinePage from "../pwa/OfflinePage";
 import { routeConfig } from "./routeConfig";
 
 /**
@@ -26,6 +27,9 @@ const AppRoutes = ({
     <Routes>
       {/* Landing page route */}
       <Route path="/" element={<LandingPage />} />
+
+      {/* Offline fallback route */}
+      <Route path="/offline" element={<OfflinePage />} />
 
       {/* App routes under /app prefix */}
       {routeConfig.map(({ path, activeView }) => (

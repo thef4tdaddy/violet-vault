@@ -113,26 +113,60 @@ export default defineConfig(() => {
         },
         workbox: {
           globPatterns: ["**/*.{js,css,html,ico,png,svg,webp}"],
+          // Define offline fallback
+          offlineFallback: {
+            pageFallback: "/offline",
+          },
           runtimeCaching: [
+            // Cache app routes for offline use
             {
-              urlPattern: /^https:\/\/api\./,
+              urlPattern: /^https:\/\/[^\/]+\/app/,
+              handler: "StaleWhileRevalidate",
+              options: {
+                cacheName: "app-routes-cache",
+                expiration: {
+                  maxEntries: 20,
+                  maxAgeSeconds: 24 * 60 * 60, // 1 day
+                },
+              },
+            },
+            // Cache API calls with network-first strategy
+            {
+              urlPattern: /^https:\/\/.*\.googleapis\.com\//,
               handler: "NetworkFirst",
               options: {
-                cacheName: "api-cache",
-                networkTimeoutSeconds: 10,
+                cacheName: "firebase-api-cache",
+                networkTimeoutSeconds: 5,
+                expiration: {
+                  maxEntries: 100,
+                  maxAgeSeconds: 60 * 60, // 1 hour
+                },
                 cacheableResponse: {
                   statuses: [0, 200],
                 },
               },
             },
+            // Cache static assets
             {
-              urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
+              urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/,
               handler: "CacheFirst",
               options: {
                 cacheName: "images-cache",
                 expiration: {
-                  maxEntries: 50,
+                  maxEntries: 100,
                   maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+                },
+              },
+            },
+            // Cache JS/CSS with stale-while-revalidate
+            {
+              urlPattern: /\.(?:js|css)$/,
+              handler: "StaleWhileRevalidate",
+              options: {
+                cacheName: "static-resources",
+                expiration: {
+                  maxEntries: 50,
+                  maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
                 },
               },
             },
