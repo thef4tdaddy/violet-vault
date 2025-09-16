@@ -1,5 +1,8 @@
 import React from "react";
-import { getIcon } from "../../utils";
+import {
+  getButtonClasses,
+  withHapticFeedback,
+} from "../../utils/ui/touchFeedback";
 
 const QuickFundForm = ({
   envelope,
@@ -70,8 +73,14 @@ const QuickFundForm = ({
             {quickAmounts.map((quickAmount) => (
               <button
                 key={quickAmount}
-                onClick={() => handleQuickAmounts(quickAmount)}
-                className="py-2 px-3 text-sm font-medium border-2 border-black bg-white rounded-lg hover:bg-purple-50 transition-colors"
+                onClick={withHapticFeedback(
+                  () => handleQuickAmounts(quickAmount),
+                  "light",
+                )}
+                className={getButtonClasses(
+                  "py-2 px-3 text-sm font-medium border-2 border-black bg-white rounded-lg hover:bg-purple-50",
+                  "small",
+                )}
               >
                 ${quickAmount}
               </button>
@@ -95,16 +104,22 @@ const QuickFundForm = ({
       {/* Actions */}
       <div className="space-y-3">
         <button
-          onClick={onConfirm}
+          onClick={withHapticFeedback(onConfirm, "confirm")}
           disabled={amount <= 0}
-          className="w-full bg-gradient-to-r from-green-600 to-blue-600 text-white font-bold py-3 px-6 rounded-lg border-2 border-black shadow-lg hover:from-green-700 hover:to-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className={getButtonClasses(
+            "w-full bg-gradient-to-r from-green-600 to-blue-600 text-white font-bold py-3 px-6 rounded-lg border-2 border-black shadow-lg hover:from-green-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed",
+            "primary",
+          )}
         >
           Fund ${amount.toFixed(2)}
         </button>
 
         <button
-          onClick={onClose}
-          className="w-full bg-white text-gray-600 font-bold py-3 px-6 rounded-lg border-2 border-black shadow-lg hover:bg-gray-50 transition-colors"
+          onClick={withHapticFeedback(onClose, "light")}
+          className={getButtonClasses(
+            "w-full bg-white text-gray-600 font-bold py-3 px-6 rounded-lg border-2 border-black shadow-lg hover:bg-gray-50",
+            "secondary",
+          )}
         >
           Cancel
         </button>
