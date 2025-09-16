@@ -1,4 +1,5 @@
 import React, { Suspense, useState } from "react";
+import { useSwipeable } from "react-swipeable";
 import { getIcon } from "../../../utils";
 import { getStatusStyle, getUtilizationColor } from "../../../utils/budgeting";
 import { ENVELOPE_TYPES } from "../../../constants/categories";
@@ -15,10 +16,17 @@ const EnvelopeItem = ({
   onSelect,
   onEdit,
   onViewHistory,
+  onQuickFund,
   isSelected,
   bills = [],
+  unassignedCash = 0,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [swipeState, setSwipeState] = useState({
+    isSwipeActive: false,
+    swipeDirection: null,
+    swipeProgress: 0,
+  });
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -36,6 +44,56 @@ const EnvelopeItem = ({
         });
     }
   };
+
+  // Swipe gesture handlers
+  const handleSwipeStart = () => {
+    setSwipeState((prev) => ({ ...prev, isSwipeActive: true }));
+  };
+
+  const handleSwipeMove = (eventData) => {
+    if (!swipeState.isSwipeActive) return;
+
+    const threshold = 100; // pixels to trigger action
+    const progress = Math.min(Math.abs(eventData.deltaX) / threshold, 1);
+    const direction = eventData.deltaX > 0 ? "right" : "left";
+
+    setSwipeState((prev) => ({
+      ...prev,
+      swipeDirection: direction,
+      swipeProgress: progress,
+    }));
+  };
+
+  const handleSwipeEnd = (eventData) => {
+    const threshold = 100;
+    const isSignificantSwipe = Math.abs(eventData.deltaX) > threshold;
+
+    if (isSignificantSwipe && unassignedCash > 0) {
+      // Calculate suggested amount based on swipe intensity
+      const swipeIntensity = Math.min(Math.abs(eventData.deltaX) / 200, 1);
+      const baseAmount = Math.min(unassignedCash * 0.1, 50); // 10% of unassigned or $50 max
+      const suggestedAmount = Math.max(baseAmount * (0.5 + swipeIntensity), 5); // Min $5
+
+      // Trigger quick fund modal
+      onQuickFund?.(envelope.id, Math.round(suggestedAmount * 100) / 100);
+    }
+
+    // Reset swipe state
+    setSwipeState({
+      isSwipeActive: false,
+      swipeDirection: null,
+      swipeProgress: 0,
+    });
+  };
+
+  // Swipeable handlers
+  const swipeHandlers = useSwipeable({
+    onSwipeStart: handleSwipeStart,
+    onSwiping: handleSwipeMove,
+    onSwiped: handleSwipeEnd,
+    preventScrollOnSwipe: true,
+    trackMouse: true, // Enable mouse support for testing
+  });
 
   // Get utilization color - use sophisticated logic for bill envelopes
   const utilizationColorClass =
@@ -63,11 +121,26 @@ const EnvelopeItem = ({
       : // Non-bill envelopes use original function
         getUtilizationColor(envelope.utilizationRate, envelope.status);
 
+  // Dynamic styles based on swipe state
+  const swipeStyles = swipeState.isSwipeActive
+    ? {
+        transform: `translateX(${swipeState.swipeProgress * 10}px)`,
+        opacity: 1 - swipeState.swipeProgress * 0.2,
+        transition: "none",
+      }
+    : {
+        transform: "translateX(0)",
+        opacity: 1,
+        transition: "all 0.2s ease-out",
+      };
+
   return (
     <div
-      className={`p-6 rounded-lg border-2 transition-all cursor-pointer hover:shadow-lg ${getStatusStyle(envelope)} ${
+      {...swipeHandlers}
+      className={`relative p-6 rounded-lg border-2 transition-all cursor-pointer hover:shadow-lg ${getStatusStyle(envelope)} ${
         isSelected ? "ring-2 ring-purple-500" : ""
-      }`}
+      } ${swipeState.isSwipeActive ? "select-none" : ""}`}
+      style={swipeStyles}
     >
       {/* Header - Always visible */}
       <div
@@ -402,6 +475,32 @@ const EnvelopeItem = ({
         )}
       </div>{" "}
       {/* End collapsible content */}
+      {/* Swipe Indicator Overlay */}
+      {swipeState.isSwipeActive &&
+        swipeState.swipeProgress > 0.2 &&
+        unassignedCash > 0 && (
+          <div className="absolute inset-0 bg-green-500/20 rounded-lg flex items-center justify-center pointer-events-none">
+            <div className="bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2">
+              {React.createElement(getIcon("DollarSign"), {
+                className: "w-5 h-5",
+              })}
+              <span className="font-medium">Swipe to Fund</span>
+            </div>
+          </div>
+        )}
+      {/* No Cash Indicator */}
+      {swipeState.isSwipeActive &&
+        swipeState.swipeProgress > 0.2 &&
+        unassignedCash <= 0 && (
+          <div className="absolute inset-0 bg-red-500/20 rounded-lg flex items-center justify-center pointer-events-none">
+            <div className="bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2">
+              {React.createElement(getIcon("AlertCircle"), {
+                className: "w-5 h-5",
+              })}
+              <span className="font-medium">No Unassigned Cash</span>
+            </div>
+          </div>
+        )}
     </div>
   );
 };
