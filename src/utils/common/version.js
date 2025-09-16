@@ -15,6 +15,7 @@ let versionCache = {
 
 // Cache key for localStorage
 const CACHE_KEY = "violet-vault-version-cache";
+const LAST_SEEN_VERSION_KEY = "violet-vault-last-seen-version";
 
 // Initialize cache from localStorage on load
 const initializeCache = () => {
@@ -431,6 +432,63 @@ export const getCacheStatus = () => {
   };
 };
 
+// Last seen version management for patch notes detection
+export const getLastSeenVersion = () => {
+  try {
+    return localStorage.getItem(LAST_SEEN_VERSION_KEY);
+  } catch (error) {
+    logger.warn("Failed to get last seen version:", error);
+    return null;
+  }
+};
+
+export const setLastSeenVersion = (version) => {
+  try {
+    localStorage.setItem(LAST_SEEN_VERSION_KEY, version);
+    logger.debug("Updated last seen version", { version });
+  } catch (error) {
+    logger.warn("Failed to set last seen version:", error);
+  }
+};
+
+export const checkForVersionUpdate = () => {
+  const currentVersion = APP_VERSION;
+  const lastSeenVersion = getLastSeenVersion();
+
+  // First time user or no previous version stored
+  if (!lastSeenVersion) {
+    logger.debug("No last seen version found - first time user");
+    setLastSeenVersion(currentVersion);
+    return {
+      isFirstTime: true,
+      hasUpdate: false,
+      currentVersion,
+      lastSeenVersion: null,
+    };
+  }
+
+  const hasUpdate = currentVersion !== lastSeenVersion;
+
+  if (hasUpdate) {
+    logger.info("Version update detected", {
+      currentVersion,
+      lastSeenVersion,
+    });
+  }
+
+  return {
+    isFirstTime: false,
+    hasUpdate,
+    currentVersion,
+    lastSeenVersion,
+  };
+};
+
+export const markVersionAsSeen = () => {
+  setLastSeenVersion(APP_VERSION);
+  logger.debug("Marked current version as seen", { version: APP_VERSION });
+};
+
 // Development utility for testing version transitions
 export const simulateVersionTransition = (newTargetVersion) => {
   logger.debug("Simulating version transition", {
@@ -454,6 +512,27 @@ export const simulateVersionTransition = (newTargetVersion) => {
     "Simulated transition complete. Run getVersionInfoAsync() to test.",
   );
   return newTargetVersion;
+};
+
+// Development utility for testing patch notes
+export const simulatePatchNotesUpdate = (fromVersion, toVersion = APP_VERSION) => {
+  logger.debug("Simulating patch notes update", {
+    fromVersion,
+    toVersion,
+  });
+
+  // Set the last seen version to simulate an update
+  setLastSeenVersion(fromVersion);
+
+  // Clear version cache to force fresh data
+  clearVersionCache();
+
+  logger.info("Patch notes simulation ready. Reload app to see patch notes popup.", {
+    lastSeenVersion: fromVersion,
+    currentVersion: toVersion,
+  });
+
+  return { fromVersion, toVersion };
 };
 
 // Quick check for current milestone status

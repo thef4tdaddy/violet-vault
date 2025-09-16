@@ -1,4 +1,5 @@
 import logger from "../common/logger";
+import { checkForVersionUpdate } from "../common/version";
 
 /**
  * PWA Manager
@@ -24,6 +25,9 @@ class PWAManager {
     await this.registerServiceWorker();
     this.setupInstallPrompt();
     this.setupUpdateDetection();
+
+    // Check for version updates (patch notes)
+    this.checkForVersionUpdate();
 
     this.isInitialized = true;
     logger.info('🔧 PWA Manager initialized successfully');
@@ -189,6 +193,36 @@ class PWAManager {
       isIOS,
       canPromptInstall: isInstallable && !isStandalone && !isIOS,
     };
+  }
+
+  /**
+   * Check for version updates and show patch notes if needed
+   */
+  checkForVersionUpdate() {
+    try {
+      const versionCheck = checkForVersionUpdate();
+
+      if (versionCheck.hasUpdate) {
+        logger.info('🎉 Version update detected, showing patch notes', {
+          fromVersion: versionCheck.lastSeenVersion,
+          toVersion: versionCheck.currentVersion,
+        });
+
+        // Show patch notes after a short delay to allow app to fully load
+        setTimeout(() => {
+          this.uiStore.loadPatchNotesForUpdate(
+            versionCheck.lastSeenVersion,
+            versionCheck.currentVersion
+          );
+        }, 2000); // 2 second delay
+      } else if (versionCheck.isFirstTime) {
+        logger.info('👋 First time user detected, not showing patch notes');
+      } else {
+        logger.debug('✅ No version update, current version already seen');
+      }
+    } catch (error) {
+      logger.error('❌ Failed to check for version update:', error);
+    }
   }
 
   /**

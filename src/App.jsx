@@ -9,6 +9,7 @@ import ConfirmProvider from "./components/ui/ConfirmProvider";
 import PromptProvider from "./components/ui/PromptProvider";
 import UpdateAvailableModal from "./components/pwa/UpdateAvailableModal";
 import InstallPromptModal from "./components/pwa/InstallPromptModal";
+import PatchNotesModal from "./components/pwa/PatchNotesModal";
 import pwaManager from "./utils/pwa/pwaManager";
 import useUiStore from "./stores/ui/uiStore";
 
@@ -39,6 +40,7 @@ const App = () => {
           {/* PWA Modals */}
           <UpdateAvailableModal />
           <InstallPromptModal />
+          <PatchNotesModal />
 
           {/* Load monitoring system after main app renders */}
           <Suspense fallback={null}>

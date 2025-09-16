@@ -110,6 +110,11 @@ const storeInitializer = (set, get) => ({
   showInstallPrompt: false,
   installPromptEvent: null, // Store the beforeinstallprompt event
 
+  // Patch Notes Management
+  showPatchNotes: false,
+  patchNotesData: null,
+  loadingPatchNotes: false,
+
   // NOTE: Data arrays (envelopes, transactions, etc.) are now handled by TanStack Query → Dexie
   // Zustand only contains UI state and app settings
 
@@ -264,6 +269,57 @@ const storeInitializer = (set, get) => ({
     }
   },
 
+  // Patch Notes Management
+  showPatchNotesModal: (patchNotesData) =>
+    set((state) => {
+      state.showPatchNotes = true;
+      state.patchNotesData = patchNotesData;
+      logger.info('Showing patch notes modal', { version: patchNotesData?.version });
+    }),
+
+  hidePatchNotesModal: () =>
+    set((state) => {
+      state.showPatchNotes = false;
+      state.patchNotesData = null;
+    }),
+
+  setLoadingPatchNotes: (loading) =>
+    set((state) => {
+      state.loadingPatchNotes = loading;
+    }),
+
+  // Load and show patch notes for version update
+  async loadPatchNotesForUpdate(fromVersion, toVersion) {
+    set((state) => {
+      state.loadingPatchNotes = true;
+    });
+
+    try {
+      const { default: patchNotesManager } = await import('../../utils/pwa/patchNotesManager');
+      const patchNotes = await patchNotesManager.getPatchNotesForVersion(toVersion);
+
+      set((state) => {
+        state.loadingPatchNotes = false;
+        state.showPatchNotes = true;
+        state.patchNotesData = {
+          ...patchNotes,
+          fromVersion,
+          toVersion,
+          isUpdate: true
+        };
+      });
+
+      logger.info('Loaded patch notes for update', { fromVersion, toVersion });
+      return patchNotes;
+    } catch (error) {
+      logger.error('Failed to load patch notes', error);
+      set((state) => {
+        state.loadingPatchNotes = false;
+      });
+      return null;
+    }
+  },
+
   // Run migration on first use
   async runMigrationIfNeeded() {
     try {
@@ -374,6 +430,8 @@ if (LOCAL_ONLY_MODE) {
           // PWA state (excluding non-serializable installPromptEvent)
           updateAvailable: state.updateAvailable,
           showInstallPrompt: state.showInstallPrompt,
+          // Patch notes state (excluding runtime data)
+          showPatchNotes: state.showPatchNotes,
         }),
       }),
       { name: "violet-vault-ui-devtools" },
