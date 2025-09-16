@@ -44,6 +44,12 @@ if (
   // PWA Background Sync debugging (imported via module side effects)
   // Access via window.backgroundSyncManager (exposed in backgroundSync.js)
 
+  // Service Worker Diagnostics
+  window.swDiagnostics = async () => {
+    const { default: swDiagnostics } = await import('./utils/pwa/serviceWorkerDiagnostics.js');
+    return await swDiagnostics.getFullDiagnostics();
+  };
+
   // Emergency corruption recovery tool
   window.forceCloudDataReset = async () => {
     logger.warn(

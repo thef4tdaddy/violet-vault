@@ -110,6 +110,78 @@ export default defineConfig(() => {
               purpose: "any maskable",
             },
           ],
+          // App Shortcuts for quick actions
+          shortcuts: [
+            {
+              name: "Add Transaction",
+              short_name: "Add Transaction",
+              description: "Quickly add a new transaction",
+              url: "/app/transactions/add",
+              icons: [
+                {
+                  src: "/images/icon-192x192.png",
+                  sizes: "192x192",
+                  type: "image/png"
+                }
+              ]
+            },
+            {
+              name: "View Budget",
+              short_name: "Budget",
+              description: "View your budget overview",
+              url: "/app/budget",
+              icons: [
+                {
+                  src: "/images/icon-192x192.png",
+                  sizes: "192x192",
+                  type: "image/png"
+                }
+              ]
+            },
+            {
+              name: "Bill Manager",
+              short_name: "Bills",
+              description: "Manage your bills and reminders",
+              url: "/app/bills",
+              icons: [
+                {
+                  src: "/images/icon-192x192.png",
+                  sizes: "192x192",
+                  type: "image/png"
+                }
+              ]
+            },
+            {
+              name: "Analytics",
+              short_name: "Analytics",
+              description: "View spending analytics and trends",
+              url: "/app/analytics",
+              icons: [
+                {
+                  src: "/images/icon-192x192.png",
+                  sizes: "192x192",
+                  type: "image/png"
+                }
+              ]
+            }
+          ],
+          // Share Target API for financial data
+          share_target: {
+            action: "/app/import",
+            method: "POST",
+            enctype: "multipart/form-data",
+            params: {
+              title: "title",
+              text: "text",
+              url: "url",
+              files: [
+                {
+                  name: "files",
+                  accept: [".csv", ".json", ".pdf", "text/csv", "application/json", "application/pdf"]
+                }
+              ]
+            }
+          },
         },
         workbox: {
           globPatterns: ["**/*.{js,css,html,ico,png,svg,webp}"],
@@ -124,35 +196,61 @@ export default defineConfig(() => {
           skipWaiting: true,
           clientsClaim: true,
           runtimeCaching: [
-            // Cache app routes for offline use
+            // App Shell - Cache first for instant loading
             {
               urlPattern: /^https:\/\/[^\/]+\/app/,
-              handler: "StaleWhileRevalidate",
+              handler: "CacheFirst",
               options: {
-                cacheName: "app-routes-cache",
+                cacheName: "app-shell-cache",
                 expiration: {
-                  maxEntries: 20,
-                  maxAgeSeconds: 24 * 60 * 60, // 1 day
-                },
-              },
-            },
-            // Cache API calls with network-first strategy
-            {
-              urlPattern: /^https:\/\/.*\.googleapis\.com\//,
-              handler: "NetworkFirst",
-              options: {
-                cacheName: "firebase-api-cache",
-                networkTimeoutSeconds: 5,
-                expiration: {
-                  maxEntries: 100,
-                  maxAgeSeconds: 60 * 60, // 1 hour
+                  maxEntries: 25,
+                  maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
                 },
                 cacheableResponse: {
                   statuses: [0, 200],
                 },
               },
             },
-            // Cache static assets
+            // API calls - Network first with offline fallback
+            {
+              urlPattern: /^https:\/\/.*\.googleapis\.com\//,
+              handler: "NetworkFirst",
+              options: {
+                cacheName: "firebase-api-cache",
+                networkTimeoutSeconds: 3,
+                expiration: {
+                  maxEntries: 150,
+                  maxAgeSeconds: 2 * 60 * 60, // 2 hours
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+                plugins: [
+                  {
+                    cacheKeyWillBeUsed: async ({ request }) => {
+                      // Normalize Firebase API URLs for better caching
+                      const url = new URL(request.url);
+                      url.searchParams.delete('auth');
+                      return url.href;
+                    },
+                  },
+                ],
+              },
+            },
+            // Firebase Auth - Network first with short cache
+            {
+              urlPattern: /^https:\/\/securetoken\.googleapis\.com\//,
+              handler: "NetworkFirst",
+              options: {
+                cacheName: "firebase-auth-cache",
+                networkTimeoutSeconds: 2,
+                expiration: {
+                  maxEntries: 10,
+                  maxAgeSeconds: 15 * 60, // 15 minutes
+                },
+              },
+            },
+            // Static Images - Cache first, long expiry
             {
               urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/,
               handler: "CacheFirst",
@@ -162,17 +260,60 @@ export default defineConfig(() => {
                   maxEntries: 100,
                   maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
                 },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
               },
             },
-            // Cache JS/CSS with stale-while-revalidate
+            // JS/CSS Resources - Stale while revalidate
             {
-              urlPattern: /\.(?:js|css)$/,
+              urlPattern: /\.(?:js|css|woff2?|ttf|eot)$/,
               handler: "StaleWhileRevalidate",
               options: {
                 cacheName: "static-resources",
                 expiration: {
+                  maxEntries: 60,
+                  maxAgeSeconds: 14 * 24 * 60 * 60, // 14 days
+                },
+              },
+            },
+            // Fonts - Cache first with long expiry
+            {
+              urlPattern: /^https:\/\/fonts\.(?:googleapis|gstatic)\.com\//,
+              handler: "CacheFirst",
+              options: {
+                cacheName: "google-fonts",
+                expiration: {
+                  maxEntries: 20,
+                  maxAgeSeconds: 60 * 24 * 60 * 60, // 60 days
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+            // CDN Resources - Stale while revalidate
+            {
+              urlPattern: /^https:\/\/cdn\./,
+              handler: "StaleWhileRevalidate",
+              options: {
+                cacheName: "cdn-cache",
+                expiration: {
                   maxEntries: 50,
                   maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
+                },
+              },
+            },
+            // CHANGELOG and other docs - Network first with fallback
+            {
+              urlPattern: /\/(CHANGELOG\.md|patch-notes\.json|manifest\.json)$/,
+              handler: "NetworkFirst",
+              options: {
+                cacheName: "docs-cache",
+                networkTimeoutSeconds: 5,
+                expiration: {
+                  maxEntries: 10,
+                  maxAgeSeconds: 24 * 60 * 60, // 1 day
                 },
               },
             },
