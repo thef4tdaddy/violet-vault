@@ -75,6 +75,10 @@ export default defineConfig(() => {
       tailwindcss(),
       VitePWA({
         registerType: "autoUpdate",
+        devOptions: {
+          enabled: true, // Enable PWA in development mode
+          type: "module",
+        },
         includeAssets: [
           "favicon.ico",
           "images/icon-192x192.png",
