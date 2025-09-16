@@ -94,13 +94,13 @@ export default defineConfig(() => {
           categories: ["finance", "productivity", "business"],
           icons: [
             {
-              src: "icon-192x192.png",
+              src: "/images/icon-192x192.png",
               sizes: "192x192",
               type: "image/png",
               purpose: "any maskable",
             },
             {
-              src: "icon-512x512.png",
+              src: "/images/icon-512x512.png",
               sizes: "512x512",
               type: "image/png",
               purpose: "any maskable",
