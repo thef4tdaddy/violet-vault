@@ -515,7 +515,10 @@ export const simulateVersionTransition = (newTargetVersion) => {
 };
 
 // Development utility for testing patch notes
-export const simulatePatchNotesUpdate = (fromVersion, toVersion = APP_VERSION) => {
+export const simulatePatchNotesUpdate = (
+  fromVersion,
+  toVersion = APP_VERSION,
+) => {
   logger.debug("Simulating patch notes update", {
     fromVersion,
     toVersion,
@@ -527,10 +530,13 @@ export const simulatePatchNotesUpdate = (fromVersion, toVersion = APP_VERSION) =
   // Clear version cache to force fresh data
   clearVersionCache();
 
-  logger.info("Patch notes simulation ready. Reload app to see patch notes popup.", {
-    lastSeenVersion: fromVersion,
-    currentVersion: toVersion,
-  });
+  logger.info(
+    "Patch notes simulation ready. Reload app to see patch notes popup.",
+    {
+      lastSeenVersion: fromVersion,
+      currentVersion: toVersion,
+    },
+  );
 
   return { fromVersion, toVersion };
 };

@@ -16,7 +16,7 @@ const ShareTargetHandler = () => {
 
   useEffect(() => {
     // Check if this is a share target request
-    if (location.pathname === '/app/import' && location.search) {
+    if (location.pathname === "/app/import" && location.search) {
       handleSharedContent();
     }
   }, [location]);
@@ -28,11 +28,11 @@ const ShareTargetHandler = () => {
     try {
       // Check for URL parameters from share target
       const urlParams = new URLSearchParams(location.search);
-      const title = urlParams.get('title');
-      const text = urlParams.get('text');
-      const url = urlParams.get('url');
+      const title = urlParams.get("title");
+      const text = urlParams.get("text");
+      const url = urlParams.get("url");
 
-      logger.info('Share target data received', { title, text, url });
+      logger.info("Share target data received", { title, text, url });
 
       const data = {
         title,
@@ -42,7 +42,7 @@ const ShareTargetHandler = () => {
       };
 
       // Check if there are files in the form data (for POST requests)
-      if (window.location.href.includes('files=')) {
+      if (window.location.href.includes("files=")) {
         data.hasFiles = true;
       }
 
@@ -50,34 +50,33 @@ const ShareTargetHandler = () => {
 
       // Auto-redirect to appropriate section after showing preview
       setTimeout(() => {
-        if (data.hasFiles || (data.text && data.text.includes('csv'))) {
+        if (data.hasFiles || (data.text && data.text.includes("csv"))) {
           // Likely financial data file
-          navigate('/app/transactions', {
+          navigate("/app/transactions", {
             state: {
               importData: data,
-              showImport: true
-            }
+              showImport: true,
+            },
           });
-        } else if (data.url && data.url.includes('bank')) {
+        } else if (data.url && data.url.includes("bank")) {
           // Bank or financial URL
-          navigate('/app/settings', {
+          navigate("/app/settings", {
             state: {
-              importUrl: data.url
-            }
+              importUrl: data.url,
+            },
           });
         } else {
           // General text or other data
-          navigate('/app/transactions', {
+          navigate("/app/transactions", {
             state: {
-              importText: data.text
-            }
+              importText: data.text,
+            },
           });
         }
       }, 3000);
-
     } catch (error) {
-      logger.error('Failed to process shared content:', error);
-      setError('Failed to process shared content. Please try again.');
+      logger.error("Failed to process shared content:", error);
+      setError("Failed to process shared content. Please try again.");
     } finally {
       setIsProcessing(false);
     }
@@ -101,7 +100,10 @@ const ShareTargetHandler = () => {
             </div>
 
             <h2 className="font-black text-black text-xl mb-3">
-              <span className="text-2xl">E</span>RROR <span className="text-2xl">P</span>ROCESSING <span className="text-2xl">S</span>HARED <span className="text-2xl">D</span>ATA
+              <span className="text-2xl">E</span>RROR{" "}
+              <span className="text-2xl">P</span>ROCESSING{" "}
+              <span className="text-2xl">S</span>HARED{" "}
+              <span className="text-2xl">D</span>ATA
             </h2>
 
             <p className="text-gray-700 mb-4 text-sm leading-relaxed">
@@ -109,7 +111,7 @@ const ShareTargetHandler = () => {
             </p>
 
             <button
-              onClick={() => navigate('/app')}
+              onClick={() => navigate("/app")}
               className="w-full bg-purple-600 text-white font-bold py-3 px-6 rounded-lg border-2 border-black shadow-lg hover:bg-purple-700 transition-colors"
             >
               Return to App
@@ -143,7 +145,9 @@ const ShareTargetHandler = () => {
               </div>
 
               <h2 className="font-black text-black text-xl mb-3">
-                <span className="text-2xl">P</span>ROCESSING <span className="text-2xl">S</span>HARED <span className="text-2xl">D</span>ATA
+                <span className="text-2xl">P</span>ROCESSING{" "}
+                <span className="text-2xl">S</span>HARED{" "}
+                <span className="text-2xl">D</span>ATA
               </h2>
 
               <p className="text-gray-700 text-sm leading-relaxed">
@@ -157,14 +161,18 @@ const ShareTargetHandler = () => {
               </div>
 
               <h2 className="font-black text-black text-xl mb-3">
-                <span className="text-2xl">S</span>HARED <span className="text-2xl">D</span>ATA <span className="text-2xl">R</span>ECEIVED
+                <span className="text-2xl">S</span>HARED{" "}
+                <span className="text-2xl">D</span>ATA{" "}
+                <span className="text-2xl">R</span>ECEIVED
               </h2>
 
               <div className="text-left text-sm space-y-2 mb-4">
                 {sharedData.title && (
                   <div>
                     <span className="font-medium text-gray-600">Title:</span>
-                    <span className="ml-2 text-gray-800">{sharedData.title}</span>
+                    <span className="ml-2 text-gray-800">
+                      {sharedData.title}
+                    </span>
                   </div>
                 )}
 
@@ -174,8 +182,7 @@ const ShareTargetHandler = () => {
                     <span className="ml-2 text-gray-800 break-words">
                       {sharedData.text.length > 100
                         ? `${sharedData.text.substring(0, 100)}...`
-                        : sharedData.text
-                      }
+                        : sharedData.text}
                     </span>
                   </div>
                 )}
@@ -208,7 +215,7 @@ const ShareTargetHandler = () => {
         {sharedData && !isProcessing && (
           <div className="space-y-3">
             <button
-              onClick={() => handleManualNavigation('/app/transactions')}
+              onClick={() => handleManualNavigation("/app/transactions")}
               className="w-full bg-purple-600 text-white font-bold py-3 px-6 rounded-lg border-2 border-black shadow-lg hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2"
             >
               {getIcon("credit-card", "w-4 h-4")}
@@ -216,7 +223,7 @@ const ShareTargetHandler = () => {
             </button>
 
             <button
-              onClick={() => handleManualNavigation('/app/settings')}
+              onClick={() => handleManualNavigation("/app/settings")}
               className="w-full bg-white text-purple-600 font-bold py-3 px-6 rounded-lg border-2 border-black shadow-lg hover:bg-gray-50 transition-colors flex items-center justify-center space-x-2"
             >
               {getIcon("settings", "w-4 h-4")}

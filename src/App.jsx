@@ -10,6 +10,7 @@ import PromptProvider from "./components/ui/PromptProvider";
 import UpdateAvailableModal from "./components/pwa/UpdateAvailableModal";
 import InstallPromptModal from "./components/pwa/InstallPromptModal";
 import PatchNotesModal from "./components/pwa/PatchNotesModal";
+import OfflineStatusIndicator from "./components/pwa/OfflineStatusIndicator";
 import pwaManager from "./utils/pwa/pwaManager";
 import useUiStore from "./stores/ui/uiStore";
 
@@ -41,6 +42,9 @@ const App = () => {
           <UpdateAvailableModal />
           <InstallPromptModal />
           <PatchNotesModal />
+
+          {/* PWA Status Indicators */}
+          <OfflineStatusIndicator />
 
           {/* Load monitoring system after main app renders */}
           <Suspense fallback={null}>

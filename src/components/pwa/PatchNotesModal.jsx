@@ -27,17 +27,20 @@ const PatchNotesModal = () => {
     // Open GitHub releases page in new tab
     const repoUrl = "https://github.com/thef4tdaddy/violet-vault";
     const releaseUrl = `${repoUrl}/releases/tag/v${patchNotesData.version}`;
-    window.open(releaseUrl, '_blank');
+    window.open(releaseUrl, "_blank");
   };
 
   const getChangeIcon = (type) => {
     switch (type) {
-      case 'feature':
+      case "feature":
         return getIcon("plus-circle", "w-4 h-4 text-green-600 flex-shrink-0");
-      case 'fix':
+      case "fix":
         return getIcon("check-circle", "w-4 h-4 text-blue-600 flex-shrink-0");
-      case 'breaking':
-        return getIcon("alert-triangle", "w-4 h-4 text-orange-600 flex-shrink-0");
+      case "breaking":
+        return getIcon(
+          "alert-triangle",
+          "w-4 h-4 text-orange-600 flex-shrink-0",
+        );
       default:
         return getIcon("arrow-right", "w-4 h-4 text-purple-600 flex-shrink-0");
     }
@@ -45,14 +48,14 @@ const PatchNotesModal = () => {
 
   const getChangeColor = (type) => {
     switch (type) {
-      case 'feature':
-        return 'text-green-700';
-      case 'fix':
-        return 'text-blue-700';
-      case 'breaking':
-        return 'text-orange-700';
+      case "feature":
+        return "text-green-700";
+      case "fix":
+        return "text-blue-700";
+      case "breaking":
+        return "text-orange-700";
       default:
-        return 'text-gray-700';
+        return "text-gray-700";
     }
   };
 
@@ -61,24 +64,37 @@ const PatchNotesModal = () => {
 
   // Add features first
   if (patchNotesData.features?.length > 0) {
-    highlights.push(...patchNotesData.features.slice(0, 3).map(text => ({ type: 'feature', text })));
+    highlights.push(
+      ...patchNotesData.features
+        .slice(0, 3)
+        .map((text) => ({ type: "feature", text })),
+    );
   }
 
   // Add fixes if we have room
   if (highlights.length < 4 && patchNotesData.fixes?.length > 0) {
     const remaining = 4 - highlights.length;
-    highlights.push(...patchNotesData.fixes.slice(0, remaining).map(text => ({ type: 'fix', text })));
+    highlights.push(
+      ...patchNotesData.fixes
+        .slice(0, remaining)
+        .map((text) => ({ type: "fix", text })),
+    );
   }
 
   // Add other changes if we still have room
   if (highlights.length < 4 && patchNotesData.other?.length > 0) {
     const remaining = 4 - highlights.length;
-    highlights.push(...patchNotesData.other.slice(0, remaining).map(text => ({ type: 'other', text })));
+    highlights.push(
+      ...patchNotesData.other
+        .slice(0, remaining)
+        .map((text) => ({ type: "other", text })),
+    );
   }
 
-  const totalChanges = (patchNotesData.features?.length || 0) +
-                      (patchNotesData.fixes?.length || 0) +
-                      (patchNotesData.other?.length || 0);
+  const totalChanges =
+    (patchNotesData.features?.length || 0) +
+    (patchNotesData.fixes?.length || 0) +
+    (patchNotesData.other?.length || 0);
 
   if (loadingPatchNotes) {
     return (
@@ -103,7 +119,8 @@ const PatchNotesModal = () => {
           </div>
 
           <h2 className="font-black text-black text-xl mb-2">
-            🎉 <span className="text-2xl">W</span>HAT'S <span className="text-2xl">N</span>EW
+            🎉 <span className="text-2xl">W</span>HAT'S{" "}
+            <span className="text-2xl">N</span>EW
           </h2>
 
           <div className="flex items-center justify-center space-x-2 mb-2">
@@ -132,9 +149,7 @@ const PatchNotesModal = () => {
               {highlights.map((item, index) => (
                 <div key={index} className="flex items-start space-x-2">
                   {getChangeIcon(item.type)}
-                  <span className={getChangeColor(item.type)}>
-                    {item.text}
-                  </span>
+                  <span className={getChangeColor(item.type)}>{item.text}</span>
                 </div>
               ))}
             </div>
@@ -142,7 +157,8 @@ const PatchNotesModal = () => {
             {totalChanges > highlights.length && (
               <div className="mt-3 pt-2 border-t border-purple-200">
                 <p className="text-xs text-purple-600 font-medium">
-                  + {totalChanges - highlights.length} more improvement{totalChanges - highlights.length !== 1 ? 's' : ''}
+                  + {totalChanges - highlights.length} more improvement
+                  {totalChanges - highlights.length !== 1 ? "s" : ""}
                 </p>
               </div>
             )}
@@ -155,8 +171,9 @@ const PatchNotesModal = () => {
             <div className="flex items-center space-x-2 text-sm">
               {getIcon("arrow-up", "w-4 h-4 text-blue-600")}
               <span className="text-blue-700">
-                Updated from <span className="font-mono">{patchNotesData.fromVersion}</span> to{" "}
-                <span className="font-mono">{patchNotesData.toVersion}</span>
+                Updated from{" "}
+                <span className="font-mono">{patchNotesData.fromVersion}</span>{" "}
+                to <span className="font-mono">{patchNotesData.toVersion}</span>
               </span>
             </div>
           </div>
@@ -168,7 +185,8 @@ const PatchNotesModal = () => {
             <div className="flex items-start space-x-2 text-sm">
               {getIcon("info", "w-4 h-4 text-yellow-600 flex-shrink-0 mt-0.5")}
               <span className="text-yellow-700">
-                Full release notes are being loaded. The information above shows general improvements.
+                Full release notes are being loaded. The information above shows
+                general improvements.
               </span>
             </div>
           </div>
@@ -195,7 +213,8 @@ const PatchNotesModal = () => {
         {/* Footer */}
         <div className="mt-4 text-center">
           <p className="text-xs text-gray-500">
-            Thanks for using VioletVault! We're constantly improving your budgeting experience.
+            Thanks for using VioletVault! We're constantly improving your
+            budgeting experience.
           </p>
         </div>
       </div>

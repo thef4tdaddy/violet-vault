@@ -46,8 +46,18 @@ if (
 
   // Service Worker Diagnostics
   window.swDiagnostics = async () => {
-    const { default: swDiagnostics } = await import('./utils/pwa/serviceWorkerDiagnostics.js');
+    const { default: swDiagnostics } = await import(
+      "./utils/pwa/serviceWorkerDiagnostics.js"
+    );
     return await swDiagnostics.getFullDiagnostics();
+  };
+
+  // Offline Data Validation
+  window.offlineReadiness = async () => {
+    const { default: offlineDataValidator } = await import(
+      "./utils/pwa/offlineDataValidator.js"
+    );
+    return await offlineDataValidator.getOfflineReadinessReport();
   };
 
   // Emergency corruption recovery tool

@@ -88,7 +88,8 @@ export default defineConfig(() => {
         manifest: {
           name: "Violet Vault - Budget Management",
           short_name: "Violet Vault",
-          description: "Secure envelope-based budgeting app for financial freedom",
+          description:
+            "Secure envelope-based budgeting app for financial freedom",
           theme_color: "#8B5CF6",
           background_color: "#ffffff",
           display: "standalone",
@@ -121,9 +122,9 @@ export default defineConfig(() => {
                 {
                   src: "/images/icon-192x192.png",
                   sizes: "192x192",
-                  type: "image/png"
-                }
-              ]
+                  type: "image/png",
+                },
+              ],
             },
             {
               name: "View Budget",
@@ -134,9 +135,9 @@ export default defineConfig(() => {
                 {
                   src: "/images/icon-192x192.png",
                   sizes: "192x192",
-                  type: "image/png"
-                }
-              ]
+                  type: "image/png",
+                },
+              ],
             },
             {
               name: "Bill Manager",
@@ -147,9 +148,9 @@ export default defineConfig(() => {
                 {
                   src: "/images/icon-192x192.png",
                   sizes: "192x192",
-                  type: "image/png"
-                }
-              ]
+                  type: "image/png",
+                },
+              ],
             },
             {
               name: "Analytics",
@@ -160,10 +161,10 @@ export default defineConfig(() => {
                 {
                   src: "/images/icon-192x192.png",
                   sizes: "192x192",
-                  type: "image/png"
-                }
-              ]
-            }
+                  type: "image/png",
+                },
+              ],
+            },
           ],
           // Share Target API for financial data
           share_target: {
@@ -177,10 +178,17 @@ export default defineConfig(() => {
               files: [
                 {
                   name: "files",
-                  accept: [".csv", ".json", ".pdf", "text/csv", "application/json", "application/pdf"]
-                }
-              ]
-            }
+                  accept: [
+                    ".csv",
+                    ".json",
+                    ".pdf",
+                    "text/csv",
+                    "application/json",
+                    "application/pdf",
+                  ],
+                },
+              ],
+            },
           },
         },
         workbox: {
@@ -189,13 +197,27 @@ export default defineConfig(() => {
           navigateFallback: "/offline",
           navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
           // Background sync configuration
-          additionalManifestEntries: [
-            { url: "/offline", revision: null },
-          ],
+          additionalManifestEntries: [{ url: "/offline", revision: null }],
           // Skip waiting handling
           skipWaiting: true,
           clientsClaim: true,
           runtimeCaching: [
+            // Critical App Routes - Cache first for offline access
+            {
+              urlPattern:
+                /^https:\/\/[^\/]+\/app\/(dashboard|budget|envelopes|transactions|bills|analytics)(?:\/.*)?$/,
+              handler: "CacheFirst",
+              options: {
+                cacheName: "critical-routes-cache",
+                expiration: {
+                  maxEntries: 30,
+                  maxAgeSeconds: 14 * 24 * 60 * 60, // 14 days
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
             // App Shell - Cache first for instant loading
             {
               urlPattern: /^https:\/\/[^\/]+\/app/,
@@ -211,7 +233,34 @@ export default defineConfig(() => {
                 },
               },
             },
-            // API calls - Network first with offline fallback
+            // Firebase Budget Data - Optimized for offline access
+            {
+              urlPattern:
+                /^https:\/\/.*\.googleapis\.com\/.*\/(envelopes|transactions|bills|budget)/,
+              handler: "NetworkFirst",
+              options: {
+                cacheName: "budget-data-cache",
+                networkTimeoutSeconds: 2,
+                expiration: {
+                  maxEntries: 200,
+                  maxAgeSeconds: 6 * 60 * 60, // 6 hours for budget data
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+                plugins: [
+                  {
+                    cacheKeyWillBeUsed: async ({ request }) => {
+                      // Normalize Firebase API URLs for better caching
+                      const url = new URL(request.url);
+                      url.searchParams.delete("auth");
+                      return url.href;
+                    },
+                  },
+                ],
+              },
+            },
+            // Other Firebase API calls - Network first with shorter cache
             {
               urlPattern: /^https:\/\/.*\.googleapis\.com\//,
               handler: "NetworkFirst",
@@ -230,7 +279,7 @@ export default defineConfig(() => {
                     cacheKeyWillBeUsed: async ({ request }) => {
                       // Normalize Firebase API URLs for better caching
                       const url = new URL(request.url);
-                      url.searchParams.delete('auth');
+                      url.searchParams.delete("auth");
                       return url.href;
                     },
                   },
