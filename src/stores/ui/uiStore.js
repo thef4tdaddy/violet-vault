@@ -104,6 +104,12 @@ const storeInitializer = (set, get) => ({
   dataLoaded: false,
   cloudSyncEnabled: true, // Toggle for Firestore cloud sync (default enabled)
 
+  // PWA Update Management
+  updateAvailable: false,
+  isUpdating: false,
+  showInstallPrompt: false,
+  installPromptEvent: null, // Store the beforeinstallprompt event
+
   // NOTE: Data arrays (envelopes, transactions, etc.) are now handled by TanStack Query → Dexie
   // Zustand only contains UI state and app settings
 
@@ -172,6 +178,90 @@ const storeInitializer = (set, get) => ({
         cloudSyncEnabled: enabled,
       });
     });
+  },
+
+  // PWA Update Management
+  setUpdateAvailable: (available) =>
+    set((state) => {
+      state.updateAvailable = available;
+      logger.info(`PWA update ${available ? "available" : "not available"}`, {
+        updateAvailable: available,
+      });
+    }),
+
+  setIsUpdating: (updating) =>
+    set((state) => {
+      state.isUpdating = updating;
+    }),
+
+  showInstallModal: () =>
+    set((state) => {
+      state.showInstallPrompt = true;
+    }),
+
+  hideInstallModal: () =>
+    set((state) => {
+      state.showInstallPrompt = false;
+    }),
+
+  setInstallPromptEvent: (event) =>
+    set((state) => {
+      state.installPromptEvent = event;
+    }),
+
+  // PWA Update Action
+  async updateApp() {
+    const state = get();
+    if (!state.updateAvailable) return;
+
+    set((state) => {
+      state.isUpdating = true;
+    });
+
+    try {
+      // Trigger service worker update
+      if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (registration && registration.waiting) {
+          // Signal the waiting service worker to skip waiting
+          registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+        } else {
+          // Fallback to window reload
+          window.location.reload();
+        }
+      } else {
+        window.location.reload();
+      }
+    } catch (error) {
+      logger.error('Failed to update app', error);
+      set((state) => {
+        state.isUpdating = false;
+      });
+    }
+  },
+
+  // PWA Install Action
+  async installApp() {
+    const state = get();
+    if (!state.installPromptEvent) return false;
+
+    try {
+      const promptEvent = state.installPromptEvent;
+      const result = await promptEvent.prompt();
+
+      logger.info('PWA install prompt result', { outcome: result.outcome });
+
+      // Clear the install prompt event
+      set((state) => {
+        state.installPromptEvent = null;
+        state.showInstallPrompt = false;
+      });
+
+      return result.outcome === 'accepted';
+    } catch (error) {
+      logger.error('Failed to install PWA', error);
+      return false;
+    }
   },
 
   // Run migration on first use
@@ -281,6 +371,9 @@ if (LOCAL_ONLY_MODE) {
           isOnline: state.isOnline,
           isUnassignedCashModalOpen: state.isUnassignedCashModalOpen,
           dataLoaded: state.dataLoaded,
+          // PWA state (excluding non-serializable installPromptEvent)
+          updateAvailable: state.updateAvailable,
+          showInstallPrompt: state.showInstallPrompt,
         }),
       }),
       { name: "violet-vault-ui-devtools" },
