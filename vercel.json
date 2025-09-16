@@ -44,6 +44,18 @@
   ],
   "rewrites": [
     {
+      "source": "/manifest.webmanifest",
+      "destination": "/manifest.webmanifest"
+    },
+    {
+      "source": "/sw.js",
+      "destination": "/sw.js"
+    },
+    {
+      "source": "/workbox-*.js",
+      "destination": "/workbox-*.js"
+    },
+    {
       "source": "/((?!api/|assets/|favicon.ico|manifest.webmanifest|sw.js|workbox-.*\\.js).*)",
       "destination": "/index.html"
     }
