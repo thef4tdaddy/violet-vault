@@ -117,6 +117,10 @@ export default defineConfig(() => {
           offlineFallback: {
             pageFallback: "/offline",
           },
+          // Background sync configuration
+          additionalManifestEntries: [
+            { url: "/offline", revision: null },
+          ],
           runtimeCaching: [
             // Cache app routes for offline use
             {
