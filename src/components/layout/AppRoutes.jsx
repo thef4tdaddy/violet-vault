@@ -38,14 +38,6 @@ const AppRoutes = ({
         />
       ))}
 
-      {/* Catch-all for unknown /app routes redirects to app dashboard */}
-      <Route
-        path="/app/*"
-        element={
-          <ViewRendererComponent activeView="dashboard" {...commonProps} />
-        }
-      />
-
       {/* Catch-all for everything else goes to landing */}
       <Route path="*" element={<LandingPage />} />
     </Routes>
