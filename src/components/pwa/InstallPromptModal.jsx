@@ -7,20 +7,20 @@ import useUiStore from "../../stores/ui/uiStore";
  * Shows when the app can be installed as a PWA
  */
 const InstallPromptModal = () => {
-  const { showInstallPrompt, hideInstallModal, installApp } = useUiStore();
+  const { showInstallPrompt, dismissInstallPrompt, installApp } = useUiStore();
 
   if (!showInstallPrompt) return null;
 
   const handleInstall = async () => {
     const success = await installApp();
     if (!success) {
-      // If install failed, just hide the modal
-      hideInstallModal();
+      // If install failed, just dismiss with tracking
+      dismissInstallPrompt();
     }
   };
 
   const handleDismiss = () => {
-    hideInstallModal();
+    dismissInstallPrompt();
   };
 
   // Check if this is iOS (different install process)

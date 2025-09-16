@@ -90,8 +90,8 @@ export default defineConfig(() => {
           short_name: "Violet Vault",
           description:
             "Secure envelope-based budgeting app for financial freedom",
-          theme_color: "#8B5CF6",
-          background_color: "#ffffff",
+          theme_color: "#8B5CF6", // Purple-500 for brand consistency
+          background_color: "#F3F4F6", // Gray-100 for better contrast and branding
           display: "standalone",
           orientation: "portrait-primary",
           scope: "/",
