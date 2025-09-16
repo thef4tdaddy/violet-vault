@@ -1,0 +1,220 @@
+import logger from "../common/logger";
+
+/**
+ * PWA Manager
+ * Handles service worker registration, update detection, and install prompts
+ */
+
+class PWAManager {
+  constructor() {
+    this.registration = null;
+    this.uiStore = null;
+    this.isInitialized = false;
+  }
+
+  /**
+   * Initialize PWA Manager with UI store
+   */
+  async initialize(uiStore) {
+    if (this.isInitialized) return;
+
+    this.uiStore = uiStore;
+
+    // Register service worker and set up event listeners
+    await this.registerServiceWorker();
+    this.setupInstallPrompt();
+    this.setupUpdateDetection();
+
+    this.isInitialized = true;
+    logger.info('🔧 PWA Manager initialized successfully');
+  }
+
+  /**
+   * Register the service worker
+   */
+  async registerServiceWorker() {
+    if (!('serviceWorker' in navigator)) {
+      logger.warn('Service Worker not supported in this browser');
+      return;
+    }
+
+    try {
+      // Let Vite PWA plugin handle the registration automatically
+      // We just need to get the registration for update detection
+      this.registration = await navigator.serviceWorker.getRegistration();
+
+      if (this.registration) {
+        logger.info('📱 Service Worker registration found', {
+          scope: this.registration.scope,
+          state: this.registration.active?.state,
+        });
+
+        // Listen for service worker updates
+        this.registration.addEventListener('updatefound', () => {
+          logger.info('🆕 Service Worker update found');
+          this.handleUpdateFound();
+        });
+
+        // Check if there's already a waiting service worker
+        if (this.registration.waiting) {
+          logger.info('⏳ Service Worker already waiting');
+          this.uiStore.setUpdateAvailable(true);
+        }
+      } else {
+        logger.info('⏳ Waiting for service worker registration...');
+        // Wait for registration to be available
+        setTimeout(() => this.registerServiceWorker(), 1000);
+      }
+    } catch (error) {
+      logger.error('❌ Service Worker registration failed', error);
+    }
+  }
+
+  /**
+   * Handle service worker update found
+   */
+  handleUpdateFound() {
+    if (!this.registration) return;
+
+    const newWorker = this.registration.installing;
+    if (!newWorker) return;
+
+    newWorker.addEventListener('statechange', () => {
+      logger.info('🔄 Service Worker state changed', { state: newWorker.state });
+
+      if (newWorker.state === 'installed') {
+        if (navigator.serviceWorker.controller) {
+          // New service worker is ready to activate
+          logger.info('✅ New service worker installed and ready');
+          this.uiStore.setUpdateAvailable(true);
+        } else {
+          // First time install
+          logger.info('🎉 Service worker installed for the first time');
+        }
+      }
+    });
+  }
+
+  /**
+   * Set up install prompt detection
+   */
+  setupInstallPrompt() {
+    // Listen for the beforeinstallprompt event
+    window.addEventListener('beforeinstallprompt', (event) => {
+      // Prevent the mini-infobar from appearing on mobile
+      event.preventDefault();
+
+      logger.info('📱 PWA install prompt available');
+
+      // Store the event for later use
+      this.uiStore.setInstallPromptEvent(event);
+
+      // Show install prompt after a delay to not be intrusive
+      setTimeout(() => {
+        this.uiStore.showInstallModal();
+      }, 3000); // 3 second delay
+    });
+
+    // Listen for app installation
+    window.addEventListener('appinstalled', () => {
+      logger.info('🎉 PWA was installed successfully');
+      this.uiStore.setInstallPromptEvent(null);
+      this.uiStore.hideInstallModal();
+    });
+
+    // Check if app is already installed
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      logger.info('📱 PWA is already installed and running in standalone mode');
+    }
+  }
+
+  /**
+   * Set up update detection and handling
+   */
+  setupUpdateDetection() {
+    // Listen for service worker controlling the page
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      logger.info('🔄 Service worker controller changed - reloading page');
+      window.location.reload();
+    });
+
+    // Handle messages from service worker
+    navigator.serviceWorker.addEventListener('message', (event) => {
+      const { type, payload } = event.data;
+
+      switch (type) {
+        case 'UPDATE_AVAILABLE':
+          logger.info('📡 Received update available message from service worker');
+          this.uiStore.setUpdateAvailable(true);
+          break;
+        case 'UPDATE_INSTALLED':
+          logger.info('✅ Update installed, app will refresh');
+          break;
+        default:
+          logger.debug('📡 Received message from service worker', { type, payload });
+      }
+    });
+  }
+
+  /**
+   * Check for updates manually
+   */
+  async checkForUpdates() {
+    if (!this.registration) {
+      logger.warn('No service worker registration found');
+      return false;
+    }
+
+    try {
+      logger.info('🔍 Manually checking for updates...');
+      await this.registration.update();
+      return true;
+    } catch (error) {
+      logger.error('❌ Manual update check failed', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get PWA installation status
+   */
+  getInstallationStatus() {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    const isInstallable = !!this.uiStore?.installPromptEvent;
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+    return {
+      isInstalled: isStandalone,
+      isInstallable: isInstallable && !isStandalone,
+      isIOS,
+      canPromptInstall: isInstallable && !isStandalone && !isIOS,
+    };
+  }
+
+  /**
+   * Get current PWA status for debugging
+   */
+  getStatus() {
+    const installStatus = this.getInstallationStatus();
+
+    return {
+      isInitialized: this.isInitialized,
+      hasRegistration: !!this.registration,
+      registrationScope: this.registration?.scope,
+      serviceWorkerState: this.registration?.active?.state,
+      hasWaitingWorker: !!this.registration?.waiting,
+      updateAvailable: this.uiStore?.updateAvailable || false,
+      ...installStatus,
+    };
+  }
+}
+
+// Create singleton instance
+const pwaManager = new PWAManager();
+
+// Expose to window for debugging
+if (typeof window !== 'undefined') {
+  window.pwaManager = pwaManager;
+}
+
+export default pwaManager;

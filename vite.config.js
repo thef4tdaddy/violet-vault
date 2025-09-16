@@ -74,7 +74,7 @@ export default defineConfig(() => {
       react(),
       tailwindcss(),
       VitePWA({
-        registerType: "autoUpdate",
+        registerType: "prompt", // Changed from autoUpdate to prompt for manual control
         devOptions: {
           enabled: true, // Enable PWA in development mode
           type: "module",
@@ -113,14 +113,16 @@ export default defineConfig(() => {
         },
         workbox: {
           globPatterns: ["**/*.{js,css,html,ico,png,svg,webp}"],
-          // Define offline fallback
-          offlineFallback: {
-            pageFallback: "/offline",
-          },
+          // Define offline navigation fallback
+          navigateFallback: "/offline",
+          navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
           // Background sync configuration
           additionalManifestEntries: [
             { url: "/offline", revision: null },
           ],
+          // Skip waiting handling
+          skipWaiting: true,
+          clientsClaim: true,
           runtimeCaching: [
             // Cache app routes for offline use
             {
