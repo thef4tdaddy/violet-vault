@@ -115,10 +115,31 @@ class PWAManager {
       // Store the event for later use
       this.uiStore.setInstallPromptEvent(event);
 
+      // Check if user has dismissed install prompt recently
+      const lastDismissed = localStorage.getItem("pwa_install_last_dismissed");
+      const dismissCooldown = 24 * 60 * 60 * 1000; // 24 hours
+
+      if (
+        lastDismissed &&
+        Date.now() - parseInt(lastDismissed) < dismissCooldown
+      ) {
+        logger.info(
+          "Install prompt dismissed recently, skipping automatic prompt",
+        );
+        return;
+      }
+
       // Show install prompt after a delay to not be intrusive
+      // Longer delay if user has used the app before
+      const hasUsedApp = localStorage.getItem("pwa_analytics") !== null;
+      const delay = hasUsedApp ? 10000 : 5000; // 10s for returning users, 5s for new users
+
       setTimeout(() => {
-        this.uiStore.showInstallModal();
-      }, 3000); // 3 second delay
+        // Double-check that the prompt is still available
+        if (this.uiStore.getState().installPromptEvent) {
+          this.uiStore.showInstallModal();
+        }
+      }, delay);
     });
 
     // Listen for app installation

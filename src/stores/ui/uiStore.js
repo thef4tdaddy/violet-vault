@@ -256,6 +256,28 @@ const storeInitializer = (set, get) => ({
 
       logger.info("PWA install prompt result", { outcome: result.outcome });
 
+      // Track user choice for analytics
+      const userChoice = result.outcome;
+      const analytics = {
+        action: "pwa_install_prompt",
+        choice: userChoice,
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+        platform: navigator.platform,
+      };
+
+      // Store analytics locally (could be enhanced to send to analytics service)
+      const existingAnalytics = JSON.parse(
+        localStorage.getItem("pwa_analytics") || "[]",
+      );
+      existingAnalytics.push(analytics);
+      localStorage.setItem(
+        "pwa_analytics",
+        JSON.stringify(existingAnalytics.slice(-50)),
+      ); // Keep last 50 events
+
+      logger.info("PWA install choice tracked", analytics);
+
       // Clear the install prompt event
       set((state) => {
         state.installPromptEvent = null;
@@ -267,6 +289,57 @@ const storeInitializer = (set, get) => ({
       logger.error("Failed to install PWA", error);
       return false;
     }
+  },
+
+  // Manual PWA Install (for settings)
+  async manualInstall() {
+    const state = get();
+
+    // Check if already installed
+    if (window.matchMedia("(display-mode: standalone)").matches) {
+      logger.info("PWA is already installed");
+      return { success: false, reason: "already_installed" };
+    }
+
+    // Check if install prompt is available
+    if (!state.installPromptEvent) {
+      logger.warn("No install prompt event available");
+      return { success: false, reason: "not_available" };
+    }
+
+    // Use the regular install method
+    const success = await get().installApp();
+    return { success, reason: success ? "installed" : "declined" };
+  },
+
+  // Track install prompt dismissal
+  dismissInstallPrompt() {
+    const now = Date.now();
+    const analytics = {
+      action: "pwa_install_prompt_dismissed",
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      platform: navigator.platform,
+    };
+
+    // Store analytics
+    const existingAnalytics = JSON.parse(
+      localStorage.getItem("pwa_analytics") || "[]",
+    );
+    existingAnalytics.push(analytics);
+    localStorage.setItem(
+      "pwa_analytics",
+      JSON.stringify(existingAnalytics.slice(-50)),
+    );
+
+    // Store dismissal timestamp for cooldown
+    localStorage.setItem("pwa_install_last_dismissed", now.toString());
+
+    logger.info("PWA install prompt dismissed", analytics);
+
+    set((state) => {
+      state.showInstallPrompt = false;
+    });
   },
 
   // Patch Notes Management
