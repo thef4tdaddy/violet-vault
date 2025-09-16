@@ -28,11 +28,15 @@ export class PageDetectionService {
 
       // Enhanced route analysis using route configuration
       const currentView = pathToViewMap[pathname] || "unknown";
-      const isAppRoute = Object.keys(pathToViewMap).includes(pathname) || pathname.startsWith("/app");
+      const isAppRoute =
+        Object.keys(pathToViewMap).includes(pathname) ||
+        pathname.startsWith("/app");
       const isMarketingRoute = !isAppRoute && !pathname.startsWith("/app");
 
       // Check build environment for PWA detection
-      const isPWA = typeof process !== 'undefined' && process.env?.REACT_APP_BUILD_TARGET === "pwa";
+      const isPWA =
+        typeof process !== "undefined" &&
+        process.env?.REACT_APP_BUILD_TARGET === "pwa";
 
       return {
         pathname,
@@ -199,8 +203,12 @@ export class PageDetectionService {
           activity: "Activity History",
         };
 
-        const viewName = viewNames[routeInfo.currentView] || routeInfo.currentView;
-        location = routeInfo.buildTarget === "pwa" ? `PWA: ${viewName}` : `App: ${viewName}`;
+        const viewName =
+          viewNames[routeInfo.currentView] || routeInfo.currentView;
+        location =
+          routeInfo.buildTarget === "pwa"
+            ? `PWA: ${viewName}`
+            : `App: ${viewName}`;
       } else {
         // Fallback to legacy detection
         location = this.identifyCurrentPage();

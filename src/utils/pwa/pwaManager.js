@@ -30,15 +30,15 @@ class PWAManager {
     this.checkForVersionUpdate();
 
     this.isInitialized = true;
-    logger.info('🔧 PWA Manager initialized successfully');
+    logger.info("🔧 PWA Manager initialized successfully");
   }
 
   /**
    * Register the service worker
    */
   async registerServiceWorker() {
-    if (!('serviceWorker' in navigator)) {
-      logger.warn('Service Worker not supported in this browser');
+    if (!("serviceWorker" in navigator)) {
+      logger.warn("Service Worker not supported in this browser");
       return;
     }
 
@@ -48,29 +48,29 @@ class PWAManager {
       this.registration = await navigator.serviceWorker.getRegistration();
 
       if (this.registration) {
-        logger.info('📱 Service Worker registration found', {
+        logger.info("📱 Service Worker registration found", {
           scope: this.registration.scope,
           state: this.registration.active?.state,
         });
 
         // Listen for service worker updates
-        this.registration.addEventListener('updatefound', () => {
-          logger.info('🆕 Service Worker update found');
+        this.registration.addEventListener("updatefound", () => {
+          logger.info("🆕 Service Worker update found");
           this.handleUpdateFound();
         });
 
         // Check if there's already a waiting service worker
         if (this.registration.waiting) {
-          logger.info('⏳ Service Worker already waiting');
+          logger.info("⏳ Service Worker already waiting");
           this.uiStore.setUpdateAvailable(true);
         }
       } else {
-        logger.info('⏳ Waiting for service worker registration...');
+        logger.info("⏳ Waiting for service worker registration...");
         // Wait for registration to be available
         setTimeout(() => this.registerServiceWorker(), 1000);
       }
     } catch (error) {
-      logger.error('❌ Service Worker registration failed', error);
+      logger.error("❌ Service Worker registration failed", error);
     }
   }
 
@@ -83,17 +83,19 @@ class PWAManager {
     const newWorker = this.registration.installing;
     if (!newWorker) return;
 
-    newWorker.addEventListener('statechange', () => {
-      logger.info('🔄 Service Worker state changed', { state: newWorker.state });
+    newWorker.addEventListener("statechange", () => {
+      logger.info("🔄 Service Worker state changed", {
+        state: newWorker.state,
+      });
 
-      if (newWorker.state === 'installed') {
+      if (newWorker.state === "installed") {
         if (navigator.serviceWorker.controller) {
           // New service worker is ready to activate
-          logger.info('✅ New service worker installed and ready');
+          logger.info("✅ New service worker installed and ready");
           this.uiStore.setUpdateAvailable(true);
         } else {
           // First time install
-          logger.info('🎉 Service worker installed for the first time');
+          logger.info("🎉 Service worker installed for the first time");
         }
       }
     });
@@ -104,11 +106,11 @@ class PWAManager {
    */
   setupInstallPrompt() {
     // Listen for the beforeinstallprompt event
-    window.addEventListener('beforeinstallprompt', (event) => {
+    window.addEventListener("beforeinstallprompt", (event) => {
       // Prevent the mini-infobar from appearing on mobile
       event.preventDefault();
 
-      logger.info('📱 PWA install prompt available');
+      logger.info("📱 PWA install prompt available");
 
       // Store the event for later use
       this.uiStore.setInstallPromptEvent(event);
@@ -120,15 +122,15 @@ class PWAManager {
     });
 
     // Listen for app installation
-    window.addEventListener('appinstalled', () => {
-      logger.info('🎉 PWA was installed successfully');
+    window.addEventListener("appinstalled", () => {
+      logger.info("🎉 PWA was installed successfully");
       this.uiStore.setInstallPromptEvent(null);
       this.uiStore.hideInstallModal();
     });
 
     // Check if app is already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      logger.info('📱 PWA is already installed and running in standalone mode');
+    if (window.matchMedia("(display-mode: standalone)").matches) {
+      logger.info("📱 PWA is already installed and running in standalone mode");
     }
   }
 
@@ -137,25 +139,30 @@ class PWAManager {
    */
   setupUpdateDetection() {
     // Listen for service worker controlling the page
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      logger.info('🔄 Service worker controller changed - reloading page');
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      logger.info("🔄 Service worker controller changed - reloading page");
       window.location.reload();
     });
 
     // Handle messages from service worker
-    navigator.serviceWorker.addEventListener('message', (event) => {
+    navigator.serviceWorker.addEventListener("message", (event) => {
       const { type, payload } = event.data;
 
       switch (type) {
-        case 'UPDATE_AVAILABLE':
-          logger.info('📡 Received update available message from service worker');
+        case "UPDATE_AVAILABLE":
+          logger.info(
+            "📡 Received update available message from service worker",
+          );
           this.uiStore.setUpdateAvailable(true);
           break;
-        case 'UPDATE_INSTALLED':
-          logger.info('✅ Update installed, app will refresh');
+        case "UPDATE_INSTALLED":
+          logger.info("✅ Update installed, app will refresh");
           break;
         default:
-          logger.debug('📡 Received message from service worker', { type, payload });
+          logger.debug("📡 Received message from service worker", {
+            type,
+            payload,
+          });
       }
     });
   }
@@ -165,16 +172,16 @@ class PWAManager {
    */
   async checkForUpdates() {
     if (!this.registration) {
-      logger.warn('No service worker registration found');
+      logger.warn("No service worker registration found");
       return false;
     }
 
     try {
-      logger.info('🔍 Manually checking for updates...');
+      logger.info("🔍 Manually checking for updates...");
       await this.registration.update();
       return true;
     } catch (error) {
-      logger.error('❌ Manual update check failed', error);
+      logger.error("❌ Manual update check failed", error);
       return false;
     }
   }
@@ -183,7 +190,9 @@ class PWAManager {
    * Get PWA installation status
    */
   getInstallationStatus() {
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    const isStandalone = window.matchMedia(
+      "(display-mode: standalone)",
+    ).matches;
     const isInstallable = !!this.uiStore?.installPromptEvent;
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
@@ -203,7 +212,7 @@ class PWAManager {
       const versionCheck = checkForVersionUpdate();
 
       if (versionCheck.hasUpdate) {
-        logger.info('🎉 Version update detected, showing patch notes', {
+        logger.info("🎉 Version update detected, showing patch notes", {
           fromVersion: versionCheck.lastSeenVersion,
           toVersion: versionCheck.currentVersion,
         });
@@ -212,16 +221,16 @@ class PWAManager {
         setTimeout(() => {
           this.uiStore.loadPatchNotesForUpdate(
             versionCheck.lastSeenVersion,
-            versionCheck.currentVersion
+            versionCheck.currentVersion,
           );
         }, 2000); // 2 second delay
       } else if (versionCheck.isFirstTime) {
-        logger.info('👋 First time user detected, not showing patch notes');
+        logger.info("👋 First time user detected, not showing patch notes");
       } else {
-        logger.debug('✅ No version update, current version already seen');
+        logger.debug("✅ No version update, current version already seen");
       }
     } catch (error) {
-      logger.error('❌ Failed to check for version update:', error);
+      logger.error("❌ Failed to check for version update:", error);
     }
   }
 
@@ -247,7 +256,7 @@ class PWAManager {
 const pwaManager = new PWAManager();
 
 // Expose to window for debugging
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.pwaManager = pwaManager;
 }
 

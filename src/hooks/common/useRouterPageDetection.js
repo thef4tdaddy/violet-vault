@@ -22,7 +22,9 @@ export const useRouterPageDetection = () => {
     const currentView = pathToViewMap[pathname] || "unknown";
 
     // Determine if this is an app route or potential marketing route
-    const isAppRoute = Object.keys(pathToViewMap).includes(pathname) || pathname.startsWith("/app");
+    const isAppRoute =
+      Object.keys(pathToViewMap).includes(pathname) ||
+      pathname.startsWith("/app");
     const isMarketingRoute = !isAppRoute && !pathname.startsWith("/app");
 
     // For PWA, everything is considered an app route

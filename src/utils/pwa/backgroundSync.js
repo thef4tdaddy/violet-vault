@@ -7,13 +7,13 @@ import logger from "../common/logger";
 
 class BackgroundSyncManager {
   constructor() {
-    this.syncQueue = 'violet-vault-sync-queue';
+    this.syncQueue = "violet-vault-sync-queue";
     this.isOnline = navigator.onLine;
     this.pendingOperations = [];
 
     // Listen for online/offline events
-    window.addEventListener('online', this.handleOnline.bind(this));
-    window.addEventListener('offline', this.handleOffline.bind(this));
+    window.addEventListener("online", this.handleOnline.bind(this));
+    window.addEventListener("offline", this.handleOffline.bind(this));
 
     // Initialize from stored operations
     this.loadPendingOperations();
@@ -40,7 +40,7 @@ class BackgroundSyncManager {
     this.pendingOperations.push(queuedOperation);
     await this.savePendingOperations();
 
-    logger.info('📤 Background Sync: Operation queued', {
+    logger.info("📤 Background Sync: Operation queued", {
       operationType: operation.type,
       operationId: queuedOperation.id,
       isOnline: this.isOnline,
@@ -62,7 +62,7 @@ class BackgroundSyncManager {
       return;
     }
 
-    logger.info('🔄 Background Sync: Starting sync', {
+    logger.info("🔄 Background Sync: Starting sync", {
       operationCount: this.pendingOperations.length,
     });
 
@@ -74,7 +74,7 @@ class BackgroundSyncManager {
       try {
         await this.executeOperation(operation);
         successfulOperations.push(operation);
-        logger.info('✅ Background Sync: Operation successful', {
+        logger.info("✅ Background Sync: Operation successful", {
           operationType: operation.type,
           operationId: operation.id,
         });
@@ -83,14 +83,18 @@ class BackgroundSyncManager {
         operation.lastError = error.message;
 
         if (operation.retryCount >= operation.maxRetries) {
-          logger.error('❌ Background Sync: Operation failed permanently', error, {
-            operationType: operation.type,
-            operationId: operation.id,
-            retryCount: operation.retryCount,
-          });
+          logger.error(
+            "❌ Background Sync: Operation failed permanently",
+            error,
+            {
+              operationType: operation.type,
+              operationId: operation.id,
+              retryCount: operation.retryCount,
+            },
+          );
           failedOperations.push(operation);
         } else {
-          logger.warn('⚠️ Background Sync: Operation failed, will retry', {
+          logger.warn("⚠️ Background Sync: Operation failed, will retry", {
             operationType: operation.type,
             operationId: operation.id,
             retryCount: operation.retryCount,
@@ -103,17 +107,17 @@ class BackgroundSyncManager {
 
     // Remove successful operations from queue
     this.pendingOperations = this.pendingOperations.filter(
-      op => !successfulOperations.some(success => success.id === op.id)
+      (op) => !successfulOperations.some((success) => success.id === op.id),
     );
 
     // Remove permanently failed operations
     this.pendingOperations = this.pendingOperations.filter(
-      op => !failedOperations.some(failed => failed.id === op.id)
+      (op) => !failedOperations.some((failed) => failed.id === op.id),
     );
 
     await this.savePendingOperations();
 
-    logger.info('🔄 Background Sync: Sync completed', {
+    logger.info("🔄 Background Sync: Sync completed", {
       successful: successfulOperations.length,
       failed: failedOperations.length,
       remaining: this.pendingOperations.length,
@@ -129,7 +133,7 @@ class BackgroundSyncManager {
     const response = await fetch(url, {
       method,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...headers,
       },
       body: data ? JSON.stringify(data) : undefined,
@@ -147,7 +151,7 @@ class BackgroundSyncManager {
    */
   async handleOnline() {
     this.isOnline = true;
-    logger.info('🌐 Background Sync: Device came online', {
+    logger.info("🌐 Background Sync: Device came online", {
       pendingOperations: this.pendingOperations.length,
     });
 
@@ -162,7 +166,7 @@ class BackgroundSyncManager {
    */
   handleOffline() {
     this.isOnline = false;
-    logger.info('📱 Background Sync: Device went offline', {
+    logger.info("📱 Background Sync: Device went offline", {
       pendingOperations: this.pendingOperations.length,
     });
   }
@@ -172,9 +176,15 @@ class BackgroundSyncManager {
    */
   async savePendingOperations() {
     try {
-      localStorage.setItem(this.syncQueue, JSON.stringify(this.pendingOperations));
+      localStorage.setItem(
+        this.syncQueue,
+        JSON.stringify(this.pendingOperations),
+      );
     } catch (error) {
-      logger.error('❌ Background Sync: Failed to save pending operations', error);
+      logger.error(
+        "❌ Background Sync: Failed to save pending operations",
+        error,
+      );
     }
   }
 
@@ -186,12 +196,15 @@ class BackgroundSyncManager {
       const stored = localStorage.getItem(this.syncQueue);
       if (stored) {
         this.pendingOperations = JSON.parse(stored);
-        logger.info('📥 Background Sync: Loaded pending operations', {
+        logger.info("📥 Background Sync: Loaded pending operations", {
           operationCount: this.pendingOperations.length,
         });
       }
     } catch (error) {
-      logger.error('❌ Background Sync: Failed to load pending operations', error);
+      logger.error(
+        "❌ Background Sync: Failed to load pending operations",
+        error,
+      );
       this.pendingOperations = [];
     }
   }
@@ -203,7 +216,7 @@ class BackgroundSyncManager {
     return {
       isOnline: this.isOnline,
       pendingCount: this.pendingOperations.length,
-      pendingOperations: this.pendingOperations.map(op => ({
+      pendingOperations: this.pendingOperations.map((op) => ({
         id: op.id,
         type: op.type,
         timestamp: op.timestamp,
@@ -219,7 +232,7 @@ class BackgroundSyncManager {
   clearPendingOperations() {
     this.pendingOperations = [];
     this.savePendingOperations();
-    logger.info('🧹 Background Sync: Cleared all pending operations');
+    logger.info("🧹 Background Sync: Cleared all pending operations");
   }
 }
 
@@ -227,7 +240,7 @@ class BackgroundSyncManager {
 const backgroundSyncManager = new BackgroundSyncManager();
 
 // Expose to window for debugging
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.backgroundSyncManager = backgroundSyncManager;
 }
 

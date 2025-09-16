@@ -9,14 +9,14 @@ class ServiceWorkerDiagnostics {
   constructor() {
     this.isInitialized = false;
     this.cacheNames = [
-      'app-shell-cache',
-      'firebase-api-cache',
-      'firebase-auth-cache',
-      'images-cache',
-      'static-resources',
-      'google-fonts',
-      'cdn-cache',
-      'docs-cache'
+      "app-shell-cache",
+      "firebase-api-cache",
+      "firebase-auth-cache",
+      "images-cache",
+      "static-resources",
+      "google-fonts",
+      "cdn-cache",
+      "docs-cache",
     ];
   }
 
@@ -27,11 +27,11 @@ class ServiceWorkerDiagnostics {
     if (this.isInitialized) return;
 
     // Check if service worker and cache APIs are available
-    if ('serviceWorker' in navigator && 'caches' in window) {
+    if ("serviceWorker" in navigator && "caches" in window) {
       this.isInitialized = true;
-      logger.info('🔧 Service Worker Diagnostics initialized');
+      logger.info("🔧 Service Worker Diagnostics initialized");
     } else {
-      logger.warn('⚠️ Service Worker or Cache API not available');
+      logger.warn("⚠️ Service Worker or Cache API not available");
       return false;
     }
 
@@ -52,7 +52,7 @@ class ServiceWorkerDiagnostics {
       totalSize: 0,
       cacheDetails: {},
       recommendations: [],
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
 
     try {
@@ -77,7 +77,7 @@ class ServiceWorkerDiagnostics {
               entries.push({
                 url: request.url,
                 size: blob.size,
-                type: response.headers.get('content-type') || 'unknown'
+                type: response.headers.get("content-type") || "unknown",
               });
             }
           } catch (error) {
@@ -86,13 +86,14 @@ class ServiceWorkerDiagnostics {
         }
 
         // Estimate total cache size
-        const estimatedSize = keys.length > 0 ? (cacheSize / sampleKeys.length) * keys.length : 0;
+        const estimatedSize =
+          keys.length > 0 ? (cacheSize / sampleKeys.length) * keys.length : 0;
 
         report.cacheDetails[cacheName] = {
           entries: keys.length,
           estimatedSize,
           sampleEntries: entries,
-          isKnownCache: this.cacheNames.includes(cacheName)
+          isKnownCache: this.cacheNames.includes(cacheName),
         };
 
         report.totalEntries += keys.length;
@@ -102,15 +103,15 @@ class ServiceWorkerDiagnostics {
       // Generate recommendations
       this.generateRecommendations(report);
 
-      logger.info('📊 Cache health report generated', {
+      logger.info("📊 Cache health report generated", {
         totalCaches: report.totalCaches,
         totalEntries: report.totalEntries,
-        totalSizeMB: Math.round(report.totalSize / 1024 / 1024 * 100) / 100
+        totalSizeMB: Math.round((report.totalSize / 1024 / 1024) * 100) / 100,
       });
 
       return report;
     } catch (error) {
-      logger.error('❌ Failed to generate cache health report', error);
+      logger.error("❌ Failed to generate cache health report", error);
       return { ...report, error: error.message };
     }
   }
@@ -124,39 +125,40 @@ class ServiceWorkerDiagnostics {
 
     if (report.totalSize > sizeLimitMB * 1024 * 1024) {
       report.recommendations.push({
-        type: 'warning',
+        type: "warning",
         message: `Total cache size (${Math.round(report.totalSize / 1024 / 1024)}MB) exceeds recommended limit (${sizeLimitMB}MB)`,
-        action: 'Consider reducing cache expiration times or clearing old caches'
+        action:
+          "Consider reducing cache expiration times or clearing old caches",
       });
     }
 
     if (report.totalEntries > entryLimit) {
       report.recommendations.push({
-        type: 'warning',
+        type: "warning",
         message: `Total cache entries (${report.totalEntries}) exceeds recommended limit (${entryLimit})`,
-        action: 'Review cache strategies and consider more aggressive cleanup'
+        action: "Review cache strategies and consider more aggressive cleanup",
       });
     }
 
     // Check for unknown caches
     const unknownCaches = Object.keys(report.cacheDetails).filter(
-      name => !report.cacheDetails[name].isKnownCache
+      (name) => !report.cacheDetails[name].isKnownCache,
     );
 
     if (unknownCaches.length > 0) {
       report.recommendations.push({
-        type: 'info',
-        message: `Found ${unknownCaches.length} unknown cache(s): ${unknownCaches.join(', ')}`,
-        action: 'Review if these caches are needed'
+        type: "info",
+        message: `Found ${unknownCaches.length} unknown cache(s): ${unknownCaches.join(", ")}`,
+        action: "Review if these caches are needed",
       });
     }
 
     // Performance recommendations
     if (report.totalCaches > 10) {
       report.recommendations.push({
-        type: 'optimization',
-        message: 'Large number of caches detected',
-        action: 'Consider consolidating related caches for better performance'
+        type: "optimization",
+        message: "Large number of caches detected",
+        action: "Consider consolidating related caches for better performance",
       });
     }
   }
@@ -186,13 +188,17 @@ class ServiceWorkerDiagnostics {
     try {
       const cacheNames = await caches.keys();
       const results = await Promise.allSettled(
-        cacheNames.map(name => caches.delete(name))
+        cacheNames.map((name) => caches.delete(name)),
       );
 
-      const successful = results.filter(r => r.status === 'fulfilled' && r.value).length;
+      const successful = results.filter(
+        (r) => r.status === "fulfilled" && r.value,
+      ).length;
       const failed = results.length - successful;
 
-      logger.info(`🧹 Cache cleanup completed: ${successful} cleared, ${failed} failed`);
+      logger.info(
+        `🧹 Cache cleanup completed: ${successful} cleared, ${failed} failed`,
+      );
 
       return {
         total: results.length,
@@ -200,12 +206,12 @@ class ServiceWorkerDiagnostics {
         failed,
         details: results.map((result, index) => ({
           cacheName: cacheNames[index],
-          success: result.status === 'fulfilled' && result.value,
-          error: result.status === 'rejected' ? result.reason?.message : null
-        }))
+          success: result.status === "fulfilled" && result.value,
+          error: result.status === "rejected" ? result.reason?.message : null,
+        })),
       };
     } catch (error) {
-      logger.error('❌ Failed to clear all caches', error);
+      logger.error("❌ Failed to clear all caches", error);
       throw error;
     }
   }
@@ -214,7 +220,7 @@ class ServiceWorkerDiagnostics {
    * Get service worker status
    */
   async getServiceWorkerStatus() {
-    if (!('serviceWorker' in navigator)) {
+    if (!("serviceWorker" in navigator)) {
       return { supported: false };
     }
 
@@ -225,7 +231,7 @@ class ServiceWorkerDiagnostics {
         return {
           supported: true,
           registered: false,
-          message: 'Service worker not registered'
+          message: "Service worker not registered",
         };
       }
 
@@ -255,10 +261,10 @@ class ServiceWorkerDiagnostics {
 
       return status;
     } catch (error) {
-      logger.error('❌ Failed to get service worker status', error);
+      logger.error("❌ Failed to get service worker status", error);
       return {
         supported: true,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -267,22 +273,22 @@ class ServiceWorkerDiagnostics {
    * Test cache performance
    */
   async testCachePerformance() {
-    const testUrl = window.location.origin + '/test-cache-performance';
-    const testData = new Response('test data for cache performance', {
-      headers: { 'Content-Type': 'text/plain' }
+    const testUrl = window.location.origin + "/test-cache-performance";
+    const testData = new Response("test data for cache performance", {
+      headers: { "Content-Type": "text/plain" },
     });
 
     const results = {
       writeTime: 0,
       readTime: 0,
       deleteTime: 0,
-      success: false
+      success: false,
     };
 
     try {
       // Test cache write
       const writeStart = performance.now();
-      const cache = await caches.open('performance-test-cache');
+      const cache = await caches.open("performance-test-cache");
       await cache.put(testUrl, testData.clone());
       results.writeTime = performance.now() - writeStart;
 
@@ -294,21 +300,21 @@ class ServiceWorkerDiagnostics {
 
       // Test cache delete
       const deleteStart = performance.now();
-      await caches.delete('performance-test-cache');
+      await caches.delete("performance-test-cache");
       results.deleteTime = performance.now() - deleteStart;
 
       results.success = true;
-      results.totalTime = results.writeTime + results.readTime + results.deleteTime;
+      results.totalTime =
+        results.writeTime + results.readTime + results.deleteTime;
 
-      logger.info('⚡ Cache performance test completed', {
+      logger.info("⚡ Cache performance test completed", {
         writeMs: Math.round(results.writeTime * 100) / 100,
         readMs: Math.round(results.readTime * 100) / 100,
         deleteMs: Math.round(results.deleteTime * 100) / 100,
-        totalMs: Math.round(results.totalTime * 100) / 100
+        totalMs: Math.round(results.totalTime * 100) / 100,
       });
-
     } catch (error) {
-      logger.error('❌ Cache performance test failed', error);
+      logger.error("❌ Cache performance test failed", error);
       results.error = error.message;
     }
 
@@ -322,18 +328,27 @@ class ServiceWorkerDiagnostics {
     const [cacheHealth, swStatus, performance] = await Promise.allSettled([
       this.getCacheHealth(),
       this.getServiceWorkerStatus(),
-      this.testCachePerformance()
+      this.testCachePerformance(),
     ]);
 
     return {
       timestamp: new Date().toISOString(),
-      cacheHealth: cacheHealth.status === 'fulfilled' ? cacheHealth.value : { error: cacheHealth.reason?.message },
-      serviceWorker: swStatus.status === 'fulfilled' ? swStatus.value : { error: swStatus.reason?.message },
-      performance: performance.status === 'fulfilled' ? performance.value : { error: performance.reason?.message },
+      cacheHealth:
+        cacheHealth.status === "fulfilled"
+          ? cacheHealth.value
+          : { error: cacheHealth.reason?.message },
+      serviceWorker:
+        swStatus.status === "fulfilled"
+          ? swStatus.value
+          : { error: swStatus.reason?.message },
+      performance:
+        performance.status === "fulfilled"
+          ? performance.value
+          : { error: performance.reason?.message },
       userAgent: navigator.userAgent,
       online: navigator.onLine,
       cookieEnabled: navigator.cookieEnabled,
-      storageQuota: await this.getStorageQuota()
+      storageQuota: await this.getStorageQuota(),
     };
   }
 
@@ -341,14 +356,14 @@ class ServiceWorkerDiagnostics {
    * Get storage quota information
    */
   async getStorageQuota() {
-    if ('storage' in navigator && 'estimate' in navigator.storage) {
+    if ("storage" in navigator && "estimate" in navigator.storage) {
       try {
         const estimate = await navigator.storage.estimate();
         return {
           quota: estimate.quota,
           usage: estimate.usage,
           available: estimate.quota - estimate.usage,
-          usagePercent: Math.round((estimate.usage / estimate.quota) * 100)
+          usagePercent: Math.round((estimate.usage / estimate.quota) * 100),
         };
       } catch (error) {
         return { error: error.message };
@@ -362,7 +377,7 @@ class ServiceWorkerDiagnostics {
 const swDiagnostics = new ServiceWorkerDiagnostics();
 
 // Expose to window for debugging
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.swDiagnostics = swDiagnostics;
 }
 

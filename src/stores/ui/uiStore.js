@@ -225,11 +225,11 @@ const storeInitializer = (set, get) => ({
 
     try {
       // Trigger service worker update
-      if ('serviceWorker' in navigator) {
+      if ("serviceWorker" in navigator) {
         const registration = await navigator.serviceWorker.getRegistration();
         if (registration && registration.waiting) {
           // Signal the waiting service worker to skip waiting
-          registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+          registration.waiting.postMessage({ type: "SKIP_WAITING" });
         } else {
           // Fallback to window reload
           window.location.reload();
@@ -238,7 +238,7 @@ const storeInitializer = (set, get) => ({
         window.location.reload();
       }
     } catch (error) {
-      logger.error('Failed to update app', error);
+      logger.error("Failed to update app", error);
       set((state) => {
         state.isUpdating = false;
       });
@@ -254,7 +254,7 @@ const storeInitializer = (set, get) => ({
       const promptEvent = state.installPromptEvent;
       const result = await promptEvent.prompt();
 
-      logger.info('PWA install prompt result', { outcome: result.outcome });
+      logger.info("PWA install prompt result", { outcome: result.outcome });
 
       // Clear the install prompt event
       set((state) => {
@@ -262,9 +262,9 @@ const storeInitializer = (set, get) => ({
         state.showInstallPrompt = false;
       });
 
-      return result.outcome === 'accepted';
+      return result.outcome === "accepted";
     } catch (error) {
-      logger.error('Failed to install PWA', error);
+      logger.error("Failed to install PWA", error);
       return false;
     }
   },
@@ -274,7 +274,9 @@ const storeInitializer = (set, get) => ({
     set((state) => {
       state.showPatchNotes = true;
       state.patchNotesData = patchNotesData;
-      logger.info('Showing patch notes modal', { version: patchNotesData?.version });
+      logger.info("Showing patch notes modal", {
+        version: patchNotesData?.version,
+      });
     }),
 
   hidePatchNotesModal: () =>
@@ -295,8 +297,11 @@ const storeInitializer = (set, get) => ({
     });
 
     try {
-      const { default: patchNotesManager } = await import('../../utils/pwa/patchNotesManager');
-      const patchNotes = await patchNotesManager.getPatchNotesForVersion(toVersion);
+      const { default: patchNotesManager } = await import(
+        "../../utils/pwa/patchNotesManager"
+      );
+      const patchNotes =
+        await patchNotesManager.getPatchNotesForVersion(toVersion);
 
       set((state) => {
         state.loadingPatchNotes = false;
@@ -305,14 +310,14 @@ const storeInitializer = (set, get) => ({
           ...patchNotes,
           fromVersion,
           toVersion,
-          isUpdate: true
+          isUpdate: true,
         };
       });
 
-      logger.info('Loaded patch notes for update', { fromVersion, toVersion });
+      logger.info("Loaded patch notes for update", { fromVersion, toVersion });
       return patchNotes;
     } catch (error) {
-      logger.error('Failed to load patch notes', error);
+      logger.error("Failed to load patch notes", error);
       set((state) => {
         state.loadingPatchNotes = false;
       });
