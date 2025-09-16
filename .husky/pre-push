@@ -3,8 +3,8 @@
 
 echo "🔍 Running full ESLint check before push..."
 
-# Run ESLint on all files (not just staged)
-npm run lint
+# Run ESLint with cache and parallel processing for better performance
+npx eslint . --config ./configs/eslint.config.js --max-warnings 1000 --cache --cache-location .eslintcache
 
 if [ $? -ne 0 ]; then
   echo "❌ ESLint failed! Push aborted."
