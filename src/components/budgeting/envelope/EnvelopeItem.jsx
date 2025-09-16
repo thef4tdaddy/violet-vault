@@ -161,7 +161,7 @@ const EnvelopeItem = ({
             setIsCollapsed(!isCollapsed);
           }, "light")}
           className={getButtonClasses(
-            "md:hidden flex-shrink-0 mr-2 p-1 text-gray-400 hover:text-blue-600",
+            "md:hidden flex-shrink-0 mr-2 p-2 text-gray-400 hover:text-blue-600",
             "small",
           )}
           aria-label={isCollapsed ? "Expand envelope" : "Collapse envelope"}
@@ -207,7 +207,7 @@ const EnvelopeItem = ({
                 onEdit?.(envelope);
               }, "light")}
               className={getButtonClasses(
-                "p-1 text-gray-400 hover:text-blue-600",
+                "p-2 text-gray-400 hover:text-blue-600 min-h-[44px] min-w-[44px] flex items-center justify-center",
                 "small",
               )}
             >
@@ -219,7 +219,7 @@ const EnvelopeItem = ({
                 onViewHistory?.(envelope);
               }, "light")}
               className={getButtonClasses(
-                "p-1 text-gray-400 hover:text-green-600",
+                "p-2 text-gray-400 hover:text-green-600 min-h-[44px] min-w-[44px] flex items-center justify-center",
                 "small",
               )}
             >

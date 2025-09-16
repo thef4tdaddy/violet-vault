@@ -12,6 +12,9 @@ import { useSavingsGoals } from "../../hooks/common/useSavingsGoals";
 import { useTransactions } from "../../hooks/common/useTransactions";
 import useBudgetData from "../../hooks/budgeting/useBudgetData";
 import DebtSummaryWidget from "../debt/ui/DebtSummaryWidget";
+import PullToRefreshIndicator from "../mobile/PullToRefreshIndicator";
+import usePullToRefresh from "../../hooks/mobile/usePullToRefresh";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   useMainDashboardUI,
   useDashboardCalculations,
@@ -88,6 +91,30 @@ const Dashboard = ({ setActiveView }) => {
   // Get recent transactions
   const recentTransactions = getRecentTransactions(transactions, 10);
 
+  // Pull-to-refresh functionality
+  const queryClient = useQueryClient();
+  const refreshData = async () => {
+    await queryClient.invalidateQueries({ queryKey: ["envelopes"] });
+    await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    await queryClient.invalidateQueries({ queryKey: ["savingsGoals"] });
+    await queryClient.invalidateQueries({ queryKey: ["budgetMetadata"] });
+    await queryClient.invalidateQueries({ queryKey: ["bills"] });
+  };
+
+  const {
+    isPulling,
+    isRefreshing,
+    pullProgress,
+    pullRotation,
+    isReady,
+    touchHandlers,
+    containerRef,
+    pullStyles,
+  } = usePullToRefresh(refreshData, {
+    threshold: 80,
+    enabled: true,
+  });
+
   const handleUpdateBalance = async (newBalance) => {
     await updateActualBalance(newBalance, {
       isManual: true,
@@ -127,7 +154,20 @@ const Dashboard = ({ setActiveView }) => {
   }
 
   return (
-    <div className="rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6">
+    <div
+      ref={containerRef}
+      {...touchHandlers}
+      className="relative rounded-lg p-6 border-2 border-black bg-purple-100/40 backdrop-blur-sm space-y-6 overflow-hidden"
+      style={pullStyles}
+    >
+      {/* Pull-to-refresh indicator */}
+      <PullToRefreshIndicator
+        isVisible={isPulling || isRefreshing}
+        isRefreshing={isRefreshing}
+        pullProgress={pullProgress}
+        pullRotation={pullRotation}
+        isReady={isReady}
+      />
       {/* Payday Prediction */}
       {paydayPrediction && (
         <PaydayPrediction
