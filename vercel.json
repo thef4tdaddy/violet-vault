@@ -44,7 +44,7 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!api/|assets/|favicon.ico).*)",
+      "source": "/((?!api/|assets/|favicon.ico|manifest.webmanifest|sw.js|workbox-.*\\.js).*)",
       "destination": "/index.html"
     }
   ]
