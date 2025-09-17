@@ -29,9 +29,7 @@ const MarketingLayout = ({ children }) => {
                 <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold">V</span>
                 </div>
-                <span className="font-black text-black text-xl">
-                  VIOLET VAULT
-                </span>
+                <span className="font-black text-black text-xl">VIOLET VAULT</span>
               </Link>
             </div>
 
@@ -67,17 +65,13 @@ const MarketingLayout = ({ children }) => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {children}
-      </main>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">{children}</main>
 
       {/* Footer */}
       <footer className="glassmorphism border-2 border-black bg-white/90 backdrop-blur-sm mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
-            <p className="text-purple-900">
-              © 2025 Violet Vault. Built for financial freedom.
-            </p>
+            <p className="text-purple-900">© 2025 Violet Vault. Built for financial freedom.</p>
           </div>
         </div>
       </footer>
