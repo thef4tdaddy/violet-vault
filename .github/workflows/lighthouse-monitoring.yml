@@ -265,23 +265,21 @@ jobs:
             const targetUrl = process.env.TARGET_URL;
             const branchName = process.env.BRANCH_NAME;
 
-            // Check for existing open Lighthouse issues to prevent duplicates
+            // Determine branch-specific label
+            const branchLabel = branchName === 'develop' ? 'dev branch' : 'production-build';
+
+            // Check for existing open Lighthouse issues for this specific branch
             const existingIssues = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
-              labels: 'lighthouse,monitoring',
-              per_page: 10
+              labels: `lighthouse,monitoring,${branchLabel}`,
+              per_page: 5
             });
 
-            // Check if there's any existing open issue with same failed pages content
-            const duplicateIssue = existingIssues.data.find(issue => {
-              const isSameContent = issue.body && issue.body.includes(failedPages.split('\n')[0]);
-              return isSameContent;
-            });
-
-            if (duplicateIssue) {
-              console.log(`✅ Skipping duplicate issue - similar open issue exists: #${duplicateIssue.number}`);
+            if (existingIssues.data.length > 0) {
+              const existingIssue = existingIssues.data[0];
+              console.log(`✅ Skipping duplicate issue - open Lighthouse issue exists for ${branchName}: #${existingIssue.number}`);
 
               // Update existing issue with latest report link
               const updateBody = `\n\n---\n**Latest Report Update:** ${new Date().toISOString()}\n📊 [View latest reports](${context.payload.repository.html_url}/actions/runs/${context.runId})`;
@@ -289,7 +287,7 @@ jobs:
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: duplicateIssue.number,
+                issue_number: existingIssue.number,
                 body: updateBody
               });
 
@@ -329,9 +327,9 @@ jobs:
             github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `🚨 Lighthouse Optimization Needed - ${new Date().toISOString().split('T')[0]}`,
+              title: `🚨 Lighthouse Optimization Needed - ${branchName} - ${new Date().toISOString().split('T')[0]}`,
               body: issueBody,
-              labels: ['performance', 'lighthouse', 'monitoring']
+              labels: ['performance', 'lighthouse', 'monitoring', branchLabel]
             });
 
   # Send notification summary
