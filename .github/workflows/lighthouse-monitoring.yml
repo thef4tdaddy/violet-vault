@@ -265,6 +265,28 @@ jobs:
             const targetUrl = process.env.TARGET_URL;
             const branchName = process.env.BRANCH_NAME;
 
+            // Check for existing open Lighthouse issues to prevent duplicates
+            const existingIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'lighthouse,monitoring',
+              per_page: 10
+            });
+
+            // Check if there's a recent issue (within 24 hours) with same failed pages
+            const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+            const recentIssue = existingIssues.data.find(issue => {
+              const issueDate = new Date(issue.created_at);
+              const isSameContent = issue.body && issue.body.includes(failedPages.split('\n')[0]);
+              return issueDate > oneDayAgo && isSameContent;
+            });
+
+            if (recentIssue) {
+              console.log(`✅ Skipping duplicate issue - similar issue exists: #${recentIssue.number}`);
+              return;
+            }
+
             const issueBody = [
               "## 🔦 Lighthouse Score Optimization Alert",
               "",
