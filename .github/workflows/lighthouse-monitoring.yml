@@ -1,13 +1,12 @@
 name: "🔦 Lighthouse Performance Monitoring"
 
 on:
-  # Run every 2 hours on develop
+  # Different schedules for different branches
   schedule:
-    - cron: "0 */2 * * *" # Every 2 hours for develop
-    # TODO: Enable main branch monitoring when production has dev auth bypass
-    # - cron: "0 6 * * *"    # Daily at 6 AM for main
+    - cron: "0 */3 * * *" # Every 3 hours for develop (frequent changes)
+    - cron: "0 8,20 * * *" # Twice daily for main (less frequent changes)
 
-  # Allow manual trigger
+  # Allow manual trigger with branch selection
   workflow_dispatch:
     inputs:
       target_url:
@@ -15,17 +14,29 @@ on:
         required: false
         default: "https://dev.f4tdaddy.com"
         type: string
+      branch_to_test:
+        description: "Branch to test (main or develop)"
+        required: false
+        default: "develop"
+        type: choice
+        options:
+          - develop
+          - main
 
 jobs:
   lighthouse-audit:
     runs-on: ubuntu-latest
-    # Always run when triggered from main (scheduled) or manually
+    strategy:
+      matrix:
+        # Determine which branch to test based on schedule or manual input
+        test_branch: ${{ github.event_name == 'workflow_dispatch' && fromJSON(format('["{0}"]', github.event.inputs.branch_to_test)) || (github.event.schedule == '0 */3 * * *' && fromJSON('["develop"]')) || fromJSON('["main"]') }}
 
     steps:
-      - name: "🏗️ Checkout develop branch for testing"
+      - name: "🏗️ Checkout ${{ matrix.test_branch }} branch for testing"
         uses: actions/checkout@v4
         with:
-          ref: develop # Always test the develop branch
+          ref: ${{ matrix.test_branch }}
+          fetch-depth: 0 # Need history for proper commit info
 
       - name: "🔧 Setup Node.js"
         uses: actions/setup-node@v4
@@ -46,7 +57,6 @@ jobs:
 
       - name: "🔐 Authenticate with dev auth bypass"
         run: |
-          # For now, only targeting dev environment
           TARGET_URL="${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}"
           echo "🔐 Authenticating with $TARGET_URL..."
 
@@ -60,7 +70,6 @@ jobs:
 
       - name: "🔦 Run Lighthouse on authenticated pages"
         run: |
-          # For now, only targeting dev environment
           TARGET_URL="${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}"
 
           # Pages to test (authenticated)
@@ -91,7 +100,7 @@ jobs:
           echo "" >> lighthouse-results/SUMMARY.md
           echo "**Generated:** $(date -u)" >> lighthouse-results/SUMMARY.md
           echo "**Target:** ${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}" >> lighthouse-results/SUMMARY.md
-          echo "**Branch:** develop (tested from ${{ github.ref_name }})" >> lighthouse-results/SUMMARY.md
+          echo "**Branch:** ${{ matrix.test_branch }}" >> lighthouse-results/SUMMARY.md
           echo "**Commit:** ${{ github.sha }}" >> lighthouse-results/SUMMARY.md
           echo "" >> lighthouse-results/SUMMARY.md
 
@@ -118,7 +127,7 @@ jobs:
       - name: "📤 Upload Lighthouse reports"
         uses: actions/upload-artifact@v4
         with:
-          name: lighthouse-reports-${{ github.run_number }}
+          name: lighthouse-reports-${{ matrix.test_branch }}-${{ github.run_number }}
           path: lighthouse-results/
           retention-days: 30
 
@@ -127,7 +136,7 @@ jobs:
           # Create timestamped directory for this run
           TIMESTAMP=$(date -u +"%Y-%m-%d_%H-%M-%S")
           BRANCH_NAME="lighthouse-reports"
-          REPORT_DIR="reports/${TIMESTAMP}"
+          REPORT_DIR="reports/${{ matrix.test_branch }}/${TIMESTAMP}"
 
           # Configure git
           git config user.name "github-actions[bot]"
@@ -157,17 +166,18 @@ jobs:
           EOF
 
           # Add this run to the index
-          echo "### $(date -u '+%Y-%m-%d %H:%M:%S UTC') - develop (tested from ${{ github.ref_name }})" >> README.md
+          echo "### $(date -u '+%Y-%m-%d %H:%M:%S UTC') - ${{ matrix.test_branch }}" >> README.md
           echo "" >> README.md
           echo "**Commit:** [\`${{ github.sha }}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})" >> README.md
           echo "**Workflow:** [View Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> README.md
+          echo "**Reports:** [Browse Reports](https://github.com/${{ github.repository }}/tree/$BRANCH_NAME/$REPORT_DIR)" >> README.md
           echo "" >> README.md
 
           # Add report links
           for file in "$REPORT_DIR"/*.html; do
             if [ -f "$file" ]; then
               PAGE=$(basename "$file" .report.html)
-              echo "- [${PAGE} Report](./$REPORT_DIR/$(basename "$file"))" >> README.md
+              echo "- [${PAGE} Report](https://github.com/${{ github.repository }}/blob/$BRANCH_NAME/$REPORT_DIR/$(basename "$file"))" >> README.md
             fi
           done
 
@@ -180,42 +190,28 @@ jobs:
 
           # Commit if there are changes
           if ! git diff --staged --quiet; then
-            git commit -m "📊 Lighthouse reports for ${{ github.ref_name }} - $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+            git commit -m "📊 Lighthouse reports for ${{ matrix.test_branch }} - $(date -u '+%Y-%m-%d %H:%M:%S UTC')
 
           Generated from commit ${{ github.sha }}
           Workflow run: ${{ github.run_id }}"
 
             git push origin $BRANCH_NAME
             echo "✅ Reports pushed to $BRANCH_NAME branch"
+            echo "reports_url=https://github.com/${{ github.repository }}/tree/$BRANCH_NAME/$REPORT_DIR" >> $GITHUB_OUTPUT
           else
             echo "ℹ️ No changes to commit"
           fi
+        id: reports
 
-      - name: "💬 Comment results on latest commit (if on PR)"
-        if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const summary = fs.readFileSync('lighthouse-results/SUMMARY.md', 'utf8');
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `## 🔦 Lighthouse Performance Report\n\n${summary}\n\n📊 [View detailed reports](${context.payload.repository.html_url}/actions/runs/${context.runId})`
-            });
-
-      - name: "🚨 Check for performance regressions"
+      - name: "🚨 Check for performance issues and create GitHub issues"
         run: |
           FAILED_PAGES=""
+          REPORTS_URL="${{ steps.reports.outputs.reports_url }}"
 
           for file in lighthouse-results/*.json; do
             if [ -f "$file" ]; then
               PAGE=$(basename "$file" .json)
               PERFORMANCE=$(jq -r '.categories.performance.score * 100 | floor' "$file" 2>/dev/null || echo "0")
-
-              # Get all category scores
               ACCESSIBILITY=$(jq -r '.categories.accessibility.score * 100 | floor' "$file" 2>/dev/null || echo "0")
               BEST_PRACTICES=$(jq -r '.categories."best-practices".score * 100 | floor' "$file" 2>/dev/null || echo "0")
               SEO=$(jq -r '.categories.seo.score * 100 | floor' "$file" 2>/dev/null || echo "0")
@@ -236,7 +232,7 @@ jobs:
               fi
 
               if [ -n "$ISSUES" ]; then
-                FAILED_PAGES="$FAILED_PAGES\n- $PAGE: $ISSUES"
+                FAILED_PAGES="$FAILED_PAGES\n- **$PAGE**: $ISSUES"
               fi
             fi
           done
@@ -248,6 +244,7 @@ jobs:
             echo "failed_pages<<EOF" >> $GITHUB_OUTPUT
             echo -e "$FAILED_PAGES" >> $GITHUB_OUTPUT
             echo "EOF" >> $GITHUB_OUTPUT
+            echo "reports_url=$REPORTS_URL" >> $GITHUB_OUTPUT
           else
             echo "✅ All pages achieve 100% scores across all categories"
             echo "performance_issues=false" >> $GITHUB_OUTPUT
@@ -260,53 +257,62 @@ jobs:
         env:
           FAILED_PAGES: ${{ steps.check_performance.outputs.failed_pages }}
           TARGET_URL: ${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}
-          BRANCH_NAME: ${{ github.ref_name }}
+          BRANCH_NAME: ${{ matrix.test_branch }}
+          REPORTS_URL: ${{ steps.check_performance.outputs.reports_url }}
         with:
           script: |
             const failedPages = process.env.FAILED_PAGES;
             const targetUrl = process.env.TARGET_URL;
             const branchName = process.env.BRANCH_NAME;
+            const reportsUrl = process.env.REPORTS_URL;
 
             // Check for existing open Lighthouse issues to prevent duplicates
             const existingIssues = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
-              labels: 'lighthouse,monitoring',
-              per_page: 10
+              labels: 'lighthouse,performance',
+              per_page: 20
             });
 
-            // Check if there's a recent issue (within 24 hours) with same failed pages
+            // Check if there's a recent issue (within 24 hours) for the same branch
             const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
             const recentIssue = existingIssues.data.find(issue => {
               const issueDate = new Date(issue.created_at);
-              const isSameContent = issue.body && issue.body.includes(failedPages.split('\n')[0]);
-              return issueDate > oneDayAgo && isSameContent;
+              const isSameBranch = issue.title.includes(`[${branchName}]`);
+              return issueDate > oneDayAgo && isSameBranch;
             });
 
             if (recentIssue) {
-              console.log(`✅ Skipping duplicate issue - similar issue exists: #${recentIssue.number}`);
+              console.log(`✅ Skipping duplicate issue - similar issue exists for ${branchName}: #${recentIssue.number}`);
               return;
             }
 
+            // Determine proper labels based on branch
+            const labels = branchName === 'main'
+              ? ['performance', 'lighthouse', 'monitoring', 'production', 'bug']
+              : ['performance', 'lighthouse', 'monitoring', 'development', 'enhancement'];
+
             const issueBody = [
-              "## 🔦 Lighthouse Score Optimization Alert",
+              `## 🔦 Lighthouse Score Optimization Alert [${branchName}]`,
               "",
               `**Date:** ${new Date().toISOString()}`,
               `**Target:** ${targetUrl}`,
-              `**Branch:** develop (tested from ${branchName})`,
+              `**Branch:** ${branchName}`,
+              `**Commit:** [\`${context.sha}\`](${context.payload.repository.html_url}/commit/${context.sha})`,
               "",
               "### 🚨 Pages Not Achieving 100% Scores:",
               failedPages,
               "",
-              "### 📊 Full Report",
-              `[View complete Lighthouse reports](${context.payload.repository.html_url}/actions/runs/${context.runId})`,
+              "### 📊 Full Reports",
+              `**GitHub Actions Run:** [View Run](${context.payload.repository.html_url}/actions/runs/${context.runId})`,
+              reportsUrl ? `**Detailed Reports:** [Browse Reports](${reportsUrl})` : "",
               "",
               "### 🔧 Next Steps",
-              "1. Review the detailed Lighthouse reports",
-              "2. Identify specific optimization opportunities",
-              "3. Fix accessibility, performance, SEO, or best practice issues",
-              "4. Re-run monitoring to verify 100% scores",
+              "1. Review the detailed Lighthouse reports linked above",
+              "2. Identify specific optimization opportunities for each failing category",
+              "3. Implement fixes for accessibility, performance, SEO, or best practice issues",
+              "4. Re-run monitoring to verify 100% scores achieved",
               "",
               "### 🎯 Goal",
               "Achieve 100% scores across all categories:",
@@ -319,24 +325,27 @@ jobs:
               "*This issue was automatically created by Lighthouse monitoring workflow*"
             ].join('\n');
 
-            github.rest.issues.create({
+            const issueTitle = `🚨 Lighthouse Optimization Needed [${branchName}] - ${new Date().toISOString().split('T')[0]}`;
+
+            await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `🚨 Lighthouse Optimization Needed - ${new Date().toISOString().split('T')[0]}`,
+              title: issueTitle,
               body: issueBody,
-              labels: ['performance', 'lighthouse', 'monitoring']
+              labels: labels
             });
+
+            console.log(`✅ Created Lighthouse optimization issue for ${branchName} branch`);
 
   # Send notification summary
   notify:
     needs: lighthouse-audit
     runs-on: ubuntu-latest
-    if: always() # Always run notification regardless of trigger branch
+    if: always()
 
     steps:
       - name: "📊 Workflow Summary"
         run: |
-          # For now, only targeting dev environment
           TARGET_URL="${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}"
 
           echo "## 🔦 Lighthouse Monitoring Complete" >> $GITHUB_STEP_SUMMARY
