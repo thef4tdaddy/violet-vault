@@ -1,10 +1,11 @@
 name: "🔦 Lighthouse Performance Monitoring"
 
 on:
-  # Run every 2 hours on develop, daily on main
+  # Run every 2 hours on develop
   schedule:
     - cron: "0 */2 * * *"  # Every 2 hours for develop
-    - cron: "0 6 * * *"    # Daily at 6 AM for main
+    # TODO: Enable main branch monitoring when production has dev auth bypass
+    # - cron: "0 6 * * *"    # Daily at 6 AM for main
 
   # Allow manual trigger
   workflow_dispatch:
@@ -18,7 +19,7 @@ on:
 jobs:
   lighthouse-audit:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main' # Run on develop and main
+    if: github.ref == 'refs/heads/develop' # Only run on develop branch for now
 
     steps:
       - name: "🏗️ Checkout code"
@@ -43,12 +44,8 @@ jobs:
 
       - name: "🔐 Authenticate with dev auth bypass"
         run: |
-          # Set target URL based on branch
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            TARGET_URL="${{ github.event.inputs.target_url || 'https://violet-vault.vercel.app' }}"
-          else
-            TARGET_URL="${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}"
-          fi
+          # For now, only targeting dev environment
+          TARGET_URL="${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}"
           echo "🔐 Authenticating with $TARGET_URL..."
 
           # Authenticate and get cookies
@@ -61,12 +58,8 @@ jobs:
 
       - name: "🔦 Run Lighthouse on authenticated pages"
         run: |
-          # Set target URL based on branch
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            TARGET_URL="${{ github.event.inputs.target_url || 'https://violet-vault.vercel.app' }}"
-          else
-            TARGET_URL="${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}"
-          fi
+          # For now, only targeting dev environment
+          TARGET_URL="${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}"
 
           # Pages to test (authenticated)
           PAGES=(
@@ -95,11 +88,7 @@ jobs:
           echo "# 🔦 Lighthouse Performance Report" > lighthouse-results/SUMMARY.md
           echo "" >> lighthouse-results/SUMMARY.md
           echo "**Generated:** $(date -u)" >> lighthouse-results/SUMMARY.md
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            echo "**Target:** ${{ github.event.inputs.target_url || 'https://violet-vault.vercel.app' }}" >> lighthouse-results/SUMMARY.md
-          else
-            echo "**Target:** ${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}" >> lighthouse-results/SUMMARY.md
-          fi
+          echo "**Target:** ${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}" >> lighthouse-results/SUMMARY.md
           echo "**Branch:** ${{ github.ref_name }}" >> lighthouse-results/SUMMARY.md
           echo "**Commit:** ${{ github.sha }}" >> lighthouse-results/SUMMARY.md
           echo "" >> lighthouse-results/SUMMARY.md
@@ -189,7 +178,7 @@ jobs:
               body: `## 🔦 Lighthouse Performance Alert
 
 **Date:** ${new Date().toISOString()}
-**Target:** \${process.env.TARGET_URL || '${{ github.event.inputs.target_url || (github.ref == 'refs/heads/main' ? 'https://violet-vault.vercel.app' : 'https://dev.f4tdaddy.com') }}'}
+**Target:** ${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}
 **Branch:** ${{ github.ref_name }}
 
 ### 🚨 Pages Below 80% Performance Threshold:
@@ -213,17 +202,13 @@ ${failedPages}
   notify:
     needs: lighthouse-audit
     runs-on: ubuntu-latest
-    if: always() && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')
+    if: always() && github.ref == 'refs/heads/develop'
 
     steps:
       - name: "📊 Workflow Summary"
         run: |
-          # Set target URL based on branch
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            TARGET_URL="${{ github.event.inputs.target_url || 'https://violet-vault.vercel.app' }}"
-          else
-            TARGET_URL="${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}"
-          fi
+          # For now, only targeting dev environment
+          TARGET_URL="${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}"
 
           echo "## 🔦 Lighthouse Monitoring Complete" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
