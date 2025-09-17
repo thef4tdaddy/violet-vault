@@ -119,70 +119,70 @@ if (
     return await offlineDataValidator.getOfflineReadinessReport();
   };
 
+  // Helper functions for cloud data reset
+  const validateLocalDataExists = (localData) => {
+    if (!localData) return false;
+
+    return (
+      (localData.envelopes && localData.envelopes.length > 0) ||
+      (localData.transactions && localData.transactions.length > 0) ||
+      (localData.bills && localData.bills.length > 0) ||
+      (localData.debts && localData.debts.length > 0)
+    );
+  };
+
+  const logLocalDataStats = (localData) => {
+    logger.info(
+      `📊 Found: ${localData.envelopes?.length || 0} envelopes, ${localData.transactions?.length || 0} transactions, ${localData.bills?.length || 0} bills, ${localData.debts?.length || 0} debts`,
+    );
+  };
+
+  const performCloudReset = async (cloudSyncService) => {
+    // Stop sync, clear cloud data, and force push local data
+    cloudSyncService.stop();
+    logger.info("⏸️ Stopped background sync");
+
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await cloudSyncService.clearAllData();
+    logger.info("🧹 Cleared all cloud data");
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const result = await cloudSyncService.forcePushToCloud();
+    logger.info("🚀 Force pushed local data to cloud:", result);
+
+    return result;
+  };
+
   // Emergency corruption recovery tool
   window.forceCloudDataReset = async () => {
     logger.warn(
       "🚨 CORRUPTION FIX: Attempting to clear cloud data and re-upload from local...",
     );
+
     try {
-      const { cloudSyncService } = await import(
-        "./services/cloudSyncService.js"
-      );
+      const { cloudSyncService } = await import("./services/cloudSyncService.js");
 
       // CRITICAL SAFETY CHECK: Verify local data exists before clearing cloud
       logger.info("🔍 Checking local data before clearing cloud...");
       const localData = await cloudSyncService.fetchDexieData();
 
-      const hasLocalData =
-        localData &&
-        ((localData.envelopes && localData.envelopes.length > 0) ||
-          (localData.transactions && localData.transactions.length > 0) ||
-          (localData.bills && localData.bills.length > 0) ||
-          (localData.debts && localData.debts.length > 0));
-
-      if (!hasLocalData) {
+      if (!validateLocalDataExists(localData)) {
         const errorMsg =
           "🚨 SAFETY ABORT: No local data found! Cannot clear cloud data as this would result in total data loss. Please restore from backup first.";
         logger.error(errorMsg);
-        return {
-          success: false,
-          error: errorMsg,
-          safetyAbort: true,
-        };
+        return { success: false, error: errorMsg, safetyAbort: true };
       }
 
       logger.info("✅ Local data verified - safe to proceed with cloud reset");
-      logger.info(
-        `📊 Found: ${localData.envelopes?.length || 0} envelopes, ${localData.transactions?.length || 0} transactions, ${localData.bills?.length || 0} bills, ${localData.debts?.length || 0} debts`,
-      );
+      logLocalDataStats(localData);
 
-      // Stop any ongoing sync
-      cloudSyncService.stop();
-      logger.info("⏸️ Stopped background sync");
-
-      // Wait a moment for sync to fully stop
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      // Clear all cloud data completely
-      await cloudSyncService.clearAllData();
-      logger.info("🧹 Cleared all cloud data");
-
-      // Wait for clearing to complete
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Force push local data to cloud (bypasses corruption checks)
-      const result = await cloudSyncService.forcePushToCloud();
-      logger.info("🚀 Force pushed local data to cloud:", result);
+      const result = await performCloudReset(cloudSyncService);
 
       if (result.success) {
         logger.info(
           "✅ Cloud data reset completed successfully - sync will resume automatically",
         );
-        // Don't restart sync immediately - let it happen naturally
-        return {
-          success: true,
-          message: "Cloud data reset completed successfully",
-        };
+        return { success: true, message: "Cloud data reset completed successfully" };
       } else {
         throw new Error(result.error || "Force push failed");
       }
