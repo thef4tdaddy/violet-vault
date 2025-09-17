@@ -266,25 +266,32 @@ jobs:
             const branchName = process.env.BRANCH_NAME;
             const reportsUrl = process.env.REPORTS_URL;
 
-            // Check for existing open Lighthouse issues to prevent duplicates
+            // Determine branch-specific label
+            const branchLabel = branchName === 'develop' ? 'dev branch' : 'production-build';
+
+            // Check for existing open Lighthouse issues for this specific branch
             const existingIssues = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
-              labels: 'lighthouse,performance',
-              per_page: 20
+              labels: `lighthouse,monitoring,${branchLabel}`,
+              per_page: 5
             });
 
-            // Check if there's a recent issue (within 24 hours) for the same branch
-            const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-            const recentIssue = existingIssues.data.find(issue => {
-              const issueDate = new Date(issue.created_at);
-              const isSameBranch = issue.title.includes(`[${branchName}]`);
-              return issueDate > oneDayAgo && isSameBranch;
-            });
+            if (existingIssues.data.length > 0) {
+              const existingIssue = existingIssues.data[0];
+              console.log(`✅ Skipping duplicate issue - open Lighthouse issue exists for ${branchName}: #${existingIssue.number}`);
 
-            if (recentIssue) {
-              console.log(`✅ Skipping duplicate issue - similar issue exists for ${branchName}: #${recentIssue.number}`);
+              // Update existing issue with latest report link
+              const updateBody = `\n\n---\n**Latest Report Update:** ${new Date().toISOString()}\n📊 [View latest reports](${context.payload.repository.html_url}/actions/runs/${context.runId})`;
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssue.number,
+                body: updateBody
+              });
+
               return;
             }
 
@@ -332,7 +339,7 @@ jobs:
               repo: context.repo.repo,
               title: issueTitle,
               body: issueBody,
-              labels: labels
+              labels: ['performance', 'lighthouse', 'monitoring', branchLabel]
             });
 
             console.log(`✅ Created Lighthouse optimization issue for ${branchName} branch`);
