@@ -57,7 +57,6 @@ import "./utils/pwa/backgroundSync.js";
 // Expose diagnostic tools for debugging
 import { runDataDiagnostic } from "./utils/debug/dataDiagnostic.js";
 import { runSyncDiagnostic } from "./utils/debug/syncDiagnostic.js";
-import logger from "./utils/common/logger.js";
 import { runImmediateSyncHealthCheck } from "./utils/sync/syncHealthChecker.js";
 import syncEdgeCaseTester from "./utils/sync/syncEdgeCaseTester.js";
 import { validateAllSyncFlows } from "./utils/sync/syncFlowValidator.js";
