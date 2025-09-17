@@ -3,7 +3,7 @@ name: "🔦 Lighthouse Performance Monitoring"
 on:
   # Run every 2 hours on develop
   schedule:
-    - cron: "0 */2 * * *"  # Every 2 hours for develop
+    - cron: "0 */2 * * *" # Every 2 hours for develop
     # TODO: Enable main branch monitoring when production has dev auth bypass
     # - cron: "0 6 * * *"    # Daily at 6 AM for main
 
@@ -19,11 +19,13 @@ on:
 jobs:
   lighthouse-audit:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main' # Run on both develop and main branches
+    # Always run when triggered from main (scheduled) or manually
 
     steps:
-      - name: "🏗️ Checkout code"
+      - name: "🏗️ Checkout develop branch for testing"
         uses: actions/checkout@v4
+        with:
+          ref: develop # Always test the develop branch
 
       - name: "🔧 Setup Node.js"
         uses: actions/setup-node@v4
@@ -89,7 +91,7 @@ jobs:
           echo "" >> lighthouse-results/SUMMARY.md
           echo "**Generated:** $(date -u)" >> lighthouse-results/SUMMARY.md
           echo "**Target:** ${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}" >> lighthouse-results/SUMMARY.md
-          echo "**Branch:** ${{ github.ref_name }}" >> lighthouse-results/SUMMARY.md
+          echo "**Branch:** develop (tested from ${{ github.ref_name }})" >> lighthouse-results/SUMMARY.md
           echo "**Commit:** ${{ github.sha }}" >> lighthouse-results/SUMMARY.md
           echo "" >> lighthouse-results/SUMMARY.md
 
@@ -155,7 +157,7 @@ jobs:
           EOF
 
           # Add this run to the index
-          echo "### $(date -u '+%Y-%m-%d %H:%M:%S UTC') - ${{ github.ref_name }}" >> README.md
+          echo "### $(date -u '+%Y-%m-%d %H:%M:%S UTC') - develop (tested from ${{ github.ref_name }})" >> README.md
           echo "" >> README.md
           echo "**Commit:** [\`${{ github.sha }}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})" >> README.md
           echo "**Workflow:** [View Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> README.md
@@ -292,7 +294,7 @@ jobs:
               "",
               `**Date:** ${new Date().toISOString()}`,
               `**Target:** ${targetUrl}`,
-              `**Branch:** ${branchName}`,
+              `**Branch:** develop (tested from ${branchName})`,
               "",
               "### 🚨 Pages Not Achieving 100% Scores:",
               failedPages,
@@ -329,7 +331,7 @@ jobs:
   notify:
     needs: lighthouse-audit
     runs-on: ubuntu-latest
-    if: always() && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')
+    if: always() # Always run notification regardless of trigger branch
 
     steps:
       - name: "📊 Workflow Summary"
