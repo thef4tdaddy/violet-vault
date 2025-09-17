@@ -406,37 +406,80 @@ export default defineConfig(() => {
       ),
     },
     build: {
+      // Issue 619: Serve Modern JS to Modern Browsers
+      target: "esnext",
       chunkSizeWarningLimit: 1000, // Reset to default for better monitoring
       reportCompressedSize: isProduction, // Enable size reporting in production
       // Development mode: No minification for fast builds and readable errors
-      // Production mode: Ultra-conservative terser minification to prevent temporal dead zone errors
+      // Production mode: Terser minification for all production builds (Issue 618)
       minify: isDevelopmentMode ? false : "terser",
       // Enable sourcemaps for development and debug builds
       sourcemap: enableDebugBuild || isDevelopmentMode,
-      // Manual chunk splitting for optimal bundle sizes
+      // Manual chunk splitting for optimal bundle sizes (Issue 617: Code Splitting)
       rollupOptions: {
         output: {
-          manualChunks: {
-            // Vendor chunk for React ecosystem
-            "react-vendor": ["react", "react-dom", "react-router-dom"],
-            // Firebase chunk (lazy loaded)
-            "firebase-vendor": [
-              "firebase/app",
-              "firebase/firestore",
-              "firebase/auth",
-            ],
-            // Data libraries chunk
-            "data-vendor": ["@tanstack/react-query", "dexie", "zustand"],
-            // UI/Utils chunk
-            "ui-vendor": [
-              "lucide-react",
-              "tailwindcss",
-              "@tanstack/react-virtual",
-            ],
-            // Crypto/Security chunk
-            "crypto-vendor": ["bip39", "@msgpack/msgpack", "pako"],
-            // PDF/QR chunk (lazy loaded)
-            "export-vendor": ["jspdf", "qrcode", "qrcode.react"],
+          manualChunks: (id) => {
+            // Route-based chunking for better code splitting (Issue 617)
+            if (id.includes("/pages/") || id.includes("/components/pages/")) {
+              if (id.includes("login") || id.includes("auth"))
+                return "auth-pages";
+              if (id.includes("dashboard")) return "dashboard-pages";
+              if (id.includes("budget") || id.includes("envelope"))
+                return "budget-pages";
+              if (id.includes("transaction")) return "transaction-pages";
+              if (id.includes("bill")) return "bill-pages";
+              if (id.includes("analytics") || id.includes("chart"))
+                return "analytics-pages";
+              if (id.includes("settings") || id.includes("profile"))
+                return "settings-pages";
+              return "other-pages";
+            }
+
+            // Vendor chunks
+            if (id.includes("node_modules")) {
+              // React ecosystem
+              if (
+                id.includes("react") ||
+                id.includes("react-dom") ||
+                id.includes("react-router")
+              ) {
+                return "react-vendor";
+              }
+              // Firebase (lazy loaded)
+              if (id.includes("firebase")) {
+                return "firebase-vendor";
+              }
+              // Data libraries
+              if (
+                id.includes("@tanstack/react-query") ||
+                id.includes("dexie") ||
+                id.includes("zustand")
+              ) {
+                return "data-vendor";
+              }
+              // UI/Utils
+              if (
+                id.includes("lucide-react") ||
+                id.includes("tailwindcss") ||
+                id.includes("@tanstack/react-virtual")
+              ) {
+                return "ui-vendor";
+              }
+              // Crypto/Security
+              if (
+                id.includes("bip39") ||
+                id.includes("@msgpack/msgpack") ||
+                id.includes("pako")
+              ) {
+                return "crypto-vendor";
+              }
+              // PDF/QR (lazy loaded)
+              if (id.includes("jspdf") || id.includes("qrcode")) {
+                return "export-vendor";
+              }
+              // Other node_modules
+              return "vendor";
+            }
           },
         },
         // Enhanced tree-shaking (less aggressive to avoid temporal dead zone errors)
