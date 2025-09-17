@@ -19,7 +19,7 @@ on:
 jobs:
   lighthouse-audit:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop' # Only run on develop branch for now
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main' # Run on both develop and main branches
 
     steps:
       - name: "🏗️ Checkout code"
@@ -329,7 +329,7 @@ jobs:
   notify:
     needs: lighthouse-audit
     runs-on: ubuntu-latest
-    if: always() && github.ref == 'refs/heads/develop'
+    if: always() && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')
 
     steps:
       - name: "📊 Workflow Summary"
