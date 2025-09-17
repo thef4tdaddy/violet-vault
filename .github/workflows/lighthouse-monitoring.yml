@@ -274,16 +274,25 @@ jobs:
               per_page: 10
             });
 
-            // Check if there's a recent issue (within 24 hours) with same failed pages
-            const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-            const recentIssue = existingIssues.data.find(issue => {
-              const issueDate = new Date(issue.created_at);
+            // Check if there's any existing open issue with same failed pages content
+            const duplicateIssue = existingIssues.data.find(issue => {
               const isSameContent = issue.body && issue.body.includes(failedPages.split('\n')[0]);
-              return issueDate > oneDayAgo && isSameContent;
+              return isSameContent;
             });
 
-            if (recentIssue) {
-              console.log(`✅ Skipping duplicate issue - similar issue exists: #${recentIssue.number}`);
+            if (duplicateIssue) {
+              console.log(`✅ Skipping duplicate issue - similar open issue exists: #${duplicateIssue.number}`);
+
+              // Update existing issue with latest report link
+              const updateBody = `\n\n---\n**Latest Report Update:** ${new Date().toISOString()}\n📊 [View latest reports](${context.payload.repository.html_url}/actions/runs/${context.runId})`;
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: duplicateIssue.number,
+                body: updateBody
+              });
+
               return;
             }
 
