@@ -12,18 +12,20 @@ import logger from "./utils/common/logger.js";
 // This prevents Firebase from being in the initial JS bundle for bots/crawlers
 if (typeof window !== "undefined") {
   const loadSyncServices = () => {
-    import("./services/chunkedSyncService.js").catch(error => {
+    import("./services/chunkedSyncService.js").catch((error) => {
       logger.warn("Firebase sync services failed to load:", error);
     });
   };
 
   const setupEventListeners = (loadOnce) => {
-    const events = ['click', 'keydown', 'touchstart', 'mousemove'];
+    const events = ["click", "keydown", "touchstart", "mousemove"];
     const cleanup = () => {
-      events.forEach(event => document.removeEventListener(event, loadOnce));
+      events.forEach((event) => document.removeEventListener(event, loadOnce));
     };
 
-    events.forEach(event => document.addEventListener(event, loadOnce, { once: true }));
+    events.forEach((event) =>
+      document.addEventListener(event, loadOnce, { once: true }),
+    );
 
     // Fallback: load after 3 seconds if no user interaction
     setTimeout(() => {
@@ -53,6 +55,23 @@ if (typeof window !== "undefined") {
 
 // Initialize PWA background sync for offline operations
 import "./utils/pwa/backgroundSync.js";
+
+// Initialize touch feedback for mobile interactions
+import { initializeTouchFeedback } from "./utils/ui/touchFeedback.js";
+
+// Initialize touch feedback after DOM is ready
+if (typeof window !== "undefined") {
+  document.addEventListener("DOMContentLoaded", () => {
+    initializeTouchFeedback();
+  });
+
+  // Fallback if DOM is already loaded
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeTouchFeedback);
+  } else {
+    initializeTouchFeedback();
+  }
+}
 
 // Expose diagnostic tools for debugging
 import { runDataDiagnostic } from "./utils/debug/dataDiagnostic.js";
