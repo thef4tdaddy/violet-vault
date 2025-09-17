@@ -32,6 +32,7 @@ const PasswordField = ({
           type="button"
           onClick={onToggleVisibility}
           className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600"
+          aria-label={showPassword ? "Hide password" : "Show password"}
         >
           {showPassword
             ? React.createElement(getIcon("EyeOff"), {
