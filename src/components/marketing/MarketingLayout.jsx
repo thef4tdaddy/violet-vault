@@ -55,7 +55,10 @@ const MarketingLayout = ({ children }) => {
 
             {/* Mobile Menu Button */}
             <div className="md:hidden">
-              <button className="border-2 border-black bg-white/80 p-2 rounded-md">
+              <button
+                className="border-2 border-black bg-white/80 p-2 rounded-md"
+                aria-label="Open mobile menu"
+              >
                 {getIcon("menu", "w-6 h-6")}
               </button>
             </div>

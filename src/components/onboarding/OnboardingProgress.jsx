@@ -138,7 +138,10 @@ const OnboardingProgress = () => {
               Complete!
             </span>
           )}
-          <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+          <button
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            aria-label={isExpanded ? "Collapse onboarding progress" : "Expand onboarding progress"}
+          >
             {isExpanded
               ? React.createElement(getIcon("ChevronUp"), {
                   className: "w-5 h-5",

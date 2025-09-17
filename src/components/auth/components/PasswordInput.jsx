@@ -30,6 +30,7 @@ const PasswordInput = ({
         onClick={onToggleVisibility}
         className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-purple-600"
         disabled={disabled}
+        aria-label={showPassword ? "Hide password" : "Show password"}
       >
         {showPassword
           ? React.createElement(getIcon("EyeOff"), {
