@@ -1,14 +1,14 @@
 import React, { Suspense, useState } from "react";
-import { useSwipeable } from "react-swipeable";
 import { getIcon } from "../../../utils";
 import { getStatusStyle, getUtilizationColor } from "../../../utils/budgeting";
 import { ENVELOPE_TYPES } from "../../../constants/categories";
 import { getBillEnvelopeDisplayInfo } from "../../../utils/budgeting/billEnvelopeCalculations";
-import { BIWEEKLY_MULTIPLIER } from "../../../constants/frequency";
-import {
-  getButtonClasses,
-  withHapticFeedback,
-} from "../../../utils/ui/touchFeedback";
+import { getButtonClasses, withHapticFeedback } from "../../../utils/ui/touchFeedback";
+import { useEnvelopeSwipeGestures } from "../../../hooks/useEnvelopeSwipeGestures";
+import SwipeIndicatorOverlay from "./SwipeIndicatorOverlay";
+import EnvelopeActivitySummary from "./EnvelopeActivitySummary";
+import EnvelopeStatusDisplay from "./EnvelopeStatusDisplay";
+import EnvelopeActions from "./EnvelopeActions";
 
 // Lazy load the bill funding info component
 const BillEnvelopeFundingInfo = React.lazy(
@@ -26,10 +26,13 @@ const EnvelopeItem = ({
   unassignedCash = 0,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [swipeState, setSwipeState] = useState({
-    isSwipeActive: false,
-    swipeDirection: null,
-    swipeProgress: 0,
+
+  // Enhanced swipe gesture handling
+  const { swipeState, swipeHandlers, swipeStyles } = useEnvelopeSwipeGestures({
+    envelopeId: envelope.id,
+    unassignedCash,
+    onQuickFund,
+    onViewHistory,
   });
 
   const getStatusIcon = (status) => {
@@ -49,55 +52,6 @@ const EnvelopeItem = ({
     }
   };
 
-  // Swipe gesture handlers
-  const handleSwipeStart = () => {
-    setSwipeState((prev) => ({ ...prev, isSwipeActive: true }));
-  };
-
-  const handleSwipeMove = (eventData) => {
-    if (!swipeState.isSwipeActive) return;
-
-    const threshold = 100; // pixels to trigger action
-    const progress = Math.min(Math.abs(eventData.deltaX) / threshold, 1);
-    const direction = eventData.deltaX > 0 ? "right" : "left";
-
-    setSwipeState((prev) => ({
-      ...prev,
-      swipeDirection: direction,
-      swipeProgress: progress,
-    }));
-  };
-
-  const handleSwipeEnd = (eventData) => {
-    const threshold = 100;
-    const isSignificantSwipe = Math.abs(eventData.deltaX) > threshold;
-
-    if (isSignificantSwipe && unassignedCash > 0) {
-      // Calculate suggested amount based on swipe intensity
-      const swipeIntensity = Math.min(Math.abs(eventData.deltaX) / 200, 1);
-      const baseAmount = Math.min(unassignedCash * 0.1, 50); // 10% of unassigned or $50 max
-      const suggestedAmount = Math.max(baseAmount * (0.5 + swipeIntensity), 5); // Min $5
-
-      // Trigger quick fund modal
-      onQuickFund?.(envelope.id, Math.round(suggestedAmount * 100) / 100);
-    }
-
-    // Reset swipe state
-    setSwipeState({
-      isSwipeActive: false,
-      swipeDirection: null,
-      swipeProgress: 0,
-    });
-  };
-
-  // Swipeable handlers
-  const swipeHandlers = useSwipeable({
-    onSwipeStart: handleSwipeStart,
-    onSwiping: handleSwipeMove,
-    onSwiped: handleSwipeEnd,
-    preventScrollOnSwipe: true,
-    trackMouse: true, // Enable mouse support for testing
-  });
 
   // Get utilization color - use sophisticated logic for bill envelopes
   const utilizationColorClass =
@@ -125,18 +79,6 @@ const EnvelopeItem = ({
       : // Non-bill envelopes use original function
         getUtilizationColor(envelope.utilizationRate, envelope.status);
 
-  // Dynamic styles based on swipe state
-  const swipeStyles = swipeState.isSwipeActive
-    ? {
-        transform: `translateX(${swipeState.swipeProgress * 10}px)`,
-        opacity: 1 - swipeState.swipeProgress * 0.2,
-        transition: "none",
-      }
-    : {
-        transform: "translateX(0)",
-        opacity: 1,
-        transition: "all 0.2s ease-out",
-      };
 
   return (
     <div
@@ -334,58 +276,7 @@ const EnvelopeItem = ({
         </div>
 
         {/* Activity Summary - Different display for Variable vs Bill envelopes */}
-        {envelope.envelopeType === ENVELOPE_TYPES.VARIABLE ? (
-          <div className="grid grid-cols-3 gap-4 py-4">
-            <div className="text-center bg-red-50 rounded-lg p-4 border border-red-100">
-              <p className="text-sm font-medium text-red-700 mb-2">
-                Spent (30d)
-              </p>
-              <p className="text-2xl font-bold text-red-600">
-                ${envelope.totalSpent.toFixed(2)}
-              </p>
-            </div>
-            <div className="text-center bg-blue-50 rounded-lg p-4 border border-blue-100">
-              <p className="text-sm font-medium text-blue-700 mb-2">
-                Monthly Budget
-              </p>
-              <p className="text-2xl font-bold text-blue-600">
-                ${(envelope.monthlyBudget || 0).toFixed(2)}
-              </p>
-            </div>
-            <div className="text-center bg-green-50 rounded-lg p-4 border border-green-100">
-              <p className="text-sm font-medium text-green-700 mb-2">
-                Biweekly
-              </p>
-              <p className="text-2xl font-bold text-green-600">
-                $
-                {((envelope.monthlyBudget || 0) / BIWEEKLY_MULTIPLIER).toFixed(
-                  2,
-                )}
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-3 gap-2 text-xs">
-            <div className="text-center">
-              <p className="text-gray-500">Spent</p>
-              <p className="font-medium text-red-600">
-                ${envelope.totalSpent.toFixed(2)}
-              </p>
-            </div>
-            <div className="text-center">
-              <p className="text-gray-500">Upcoming</p>
-              <p className="font-medium text-orange-600">
-                ${envelope.totalUpcoming.toFixed(2)}
-              </p>
-            </div>
-            <div className="text-center">
-              <p className="text-gray-500">Overdue</p>
-              <p className="font-medium text-red-700">
-                ${envelope.totalOverdue.toFixed(2)}
-              </p>
-            </div>
-          </div>
-        )}
+        <EnvelopeActivitySummary envelope={envelope} />
 
         {/* Minimal Bill Info for Bill Envelopes - most info already shown above */}
         {envelope.envelopeType === ENVELOPE_TYPES.BILL && bills.length > 0 && (
@@ -491,32 +382,8 @@ const EnvelopeItem = ({
         )}
       </div>{" "}
       {/* End collapsible content */}
-      {/* Swipe Indicator Overlay */}
-      {swipeState.isSwipeActive &&
-        swipeState.swipeProgress > 0.2 &&
-        unassignedCash > 0 && (
-          <div className="absolute inset-0 bg-green-500/20 rounded-lg flex items-center justify-center pointer-events-none">
-            <div className="bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2">
-              {React.createElement(getIcon("DollarSign"), {
-                className: "w-5 h-5",
-              })}
-              <span className="font-medium">Swipe to Fund</span>
-            </div>
-          </div>
-        )}
-      {/* No Cash Indicator */}
-      {swipeState.isSwipeActive &&
-        swipeState.swipeProgress > 0.2 &&
-        unassignedCash <= 0 && (
-          <div className="absolute inset-0 bg-red-500/20 rounded-lg flex items-center justify-center pointer-events-none">
-            <div className="bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2">
-              {React.createElement(getIcon("AlertCircle"), {
-                className: "w-5 h-5",
-              })}
-              <span className="font-medium">No Unassigned Cash</span>
-            </div>
-          </div>
-        )}
+      {/* Enhanced Swipe Indicator Overlays */}
+      <SwipeIndicatorOverlay swipeState={swipeState} unassignedCash={unassignedCash} />
     </div>
   );
 };
