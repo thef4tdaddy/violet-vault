@@ -6,9 +6,50 @@ import "./index.css";
 import { QueryClientProvider } from "@tanstack/react-query";
 import queryClient from "./utils/common/queryClient";
 import { SystemInfoService } from "./services/bugReport/systemInfoService.js";
+import logger from "./utils/common/logger.js";
 
-// Initialize Firebase at app startup
-import "./services/chunkedSyncService.js";
+// Firebase sync services loaded conditionally to reduce initial bundle size
+// This prevents Firebase from being in the initial JS bundle for bots/crawlers
+if (typeof window !== "undefined") {
+  const loadSyncServices = () => {
+    import("./services/chunkedSyncService.js").catch(error => {
+      logger.warn("Firebase sync services failed to load:", error);
+    });
+  };
+
+  const setupEventListeners = (loadOnce) => {
+    const events = ['click', 'keydown', 'touchstart', 'mousemove'];
+    const cleanup = () => {
+      events.forEach(event => document.removeEventListener(event, loadOnce));
+    };
+
+    events.forEach(event => document.addEventListener(event, loadOnce, { once: true }));
+
+    // Fallback: load after 3 seconds if no user interaction
+    setTimeout(() => {
+      cleanup();
+      loadOnce();
+    }, 3000);
+  };
+
+  const initSyncServicesLazy = () => {
+    const isBot = /bot|crawler|spider|scraper/i.test(navigator.userAgent);
+
+    if (!isBot) {
+      let loaded = false;
+      const loadOnce = () => {
+        if (!loaded) {
+          loaded = true;
+          loadSyncServices();
+        }
+      };
+
+      setupEventListeners(loadOnce);
+    }
+  };
+
+  initSyncServicesLazy();
+}
 
 // Initialize PWA background sync for offline operations
 import "./utils/pwa/backgroundSync.js";
