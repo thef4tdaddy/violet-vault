@@ -28,10 +28,6 @@ const EnvelopeStatusDisplay = ({ envelope, bills, utilizationColorClass }) => {
     }
   };
 
-  const getToggleIcon = (isCollapsed) =>
-    React.createElement(getIcon(isCollapsed ? "ChevronDown" : "ChevronUp"), {
-      className: "h-4 w-4",
-    });
 
   const renderBalanceInfo = () => {
     if (envelope.envelopeType === ENVELOPE_TYPES.BILL) {
