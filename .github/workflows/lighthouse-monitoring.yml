@@ -213,27 +213,46 @@ jobs:
               PAGE=$(basename "$file" .json)
               PERFORMANCE=$(jq -r '.categories.performance.score * 100 | floor' "$file" 2>/dev/null || echo "0")
 
-              # Alert if performance is below 80%
-              if [ "$PERFORMANCE" -lt 80 ] && [ "$PERFORMANCE" != "N/A" ]; then
-                FAILED_PAGES="$FAILED_PAGES\n- $PAGE: $PERFORMANCE%"
+              # Get all category scores
+              ACCESSIBILITY=$(jq -r '.categories.accessibility.score * 100 | floor' "$file" 2>/dev/null || echo "0")
+              BEST_PRACTICES=$(jq -r '.categories."best-practices".score * 100 | floor' "$file" 2>/dev/null || echo "0")
+              SEO=$(jq -r '.categories.seo.score * 100 | floor' "$file" 2>/dev/null || echo "0")
+
+              # Alert if any category is not 100%
+              ISSUES=""
+              if [ "$PERFORMANCE" -lt 100 ] && [ "$PERFORMANCE" != "N/A" ]; then
+                ISSUES="$ISSUES Performance: $PERFORMANCE%"
+              fi
+              if [ "$ACCESSIBILITY" -lt 100 ] && [ "$ACCESSIBILITY" != "N/A" ]; then
+                ISSUES="$ISSUES${ISSUES:+, }Accessibility: $ACCESSIBILITY%"
+              fi
+              if [ "$BEST_PRACTICES" -lt 100 ] && [ "$BEST_PRACTICES" != "N/A" ]; then
+                ISSUES="$ISSUES${ISSUES:+, }Best Practices: $BEST_PRACTICES%"
+              fi
+              if [ "$SEO" -lt 100 ] && [ "$SEO" != "N/A" ]; then
+                ISSUES="$ISSUES${ISSUES:+, }SEO: $SEO%"
+              fi
+
+              if [ -n "$ISSUES" ]; then
+                FAILED_PAGES="$FAILED_PAGES\n- $PAGE: $ISSUES"
               fi
             fi
           done
 
           if [ -n "$FAILED_PAGES" ]; then
-            echo "🚨 Performance regressions detected:"
+            echo "🚨 Lighthouse score issues detected:"
             echo -e "$FAILED_PAGES"
             echo "performance_issues=true" >> $GITHUB_OUTPUT
             echo "failed_pages<<EOF" >> $GITHUB_OUTPUT
             echo -e "$FAILED_PAGES" >> $GITHUB_OUTPUT
             echo "EOF" >> $GITHUB_OUTPUT
           else
-            echo "✅ All pages passed performance checks"
+            echo "✅ All pages achieve 100% scores across all categories"
             echo "performance_issues=false" >> $GITHUB_OUTPUT
           fi
         id: check_performance
 
-      - name: "📧 Create issue for performance regressions"
+      - name: "📧 Create issue for Lighthouse score improvements"
         if: steps.check_performance.outputs.performance_issues == 'true'
         uses: actions/github-script@v7
         env:
@@ -247,13 +266,13 @@ jobs:
             const branchName = process.env.BRANCH_NAME;
 
             const issueBody = [
-              "## 🔦 Lighthouse Performance Alert",
+              "## 🔦 Lighthouse Score Optimization Alert",
               "",
               `**Date:** ${new Date().toISOString()}`,
               `**Target:** ${targetUrl}`,
               `**Branch:** ${branchName}`,
               "",
-              "### 🚨 Pages Below 80% Performance Threshold:",
+              "### 🚨 Pages Not Achieving 100% Scores:",
               failedPages,
               "",
               "### 📊 Full Report",
@@ -261,9 +280,16 @@ jobs:
               "",
               "### 🔧 Next Steps",
               "1. Review the detailed Lighthouse reports",
-              "2. Identify performance bottlenecks",
-              "3. Optimize affected pages",
-              "4. Re-run monitoring to verify fixes",
+              "2. Identify specific optimization opportunities",
+              "3. Fix accessibility, performance, SEO, or best practice issues",
+              "4. Re-run monitoring to verify 100% scores",
+              "",
+              "### 🎯 Goal",
+              "Achieve 100% scores across all categories:",
+              "- Performance: 100%",
+              "- Accessibility: 100%",
+              "- Best Practices: 100%",
+              "- SEO: 100%",
               "",
               "---",
               "*This issue was automatically created by Lighthouse monitoring workflow*"
@@ -272,7 +298,7 @@ jobs:
             github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `🚨 Performance Regression Detected - ${new Date().toISOString().split('T')[0]}`,
+              title: `🚨 Lighthouse Optimization Needed - ${new Date().toISOString().split('T')[0]}`,
               body: issueBody,
               labels: ['performance', 'lighthouse', 'monitoring']
             });
