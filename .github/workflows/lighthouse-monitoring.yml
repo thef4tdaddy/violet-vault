@@ -1,0 +1,234 @@
+name: "🔦 Lighthouse Performance Monitoring"
+
+on:
+  # Run every 2 hours on develop, daily on main
+  schedule:
+    - cron: "0 */2 * * *"  # Every 2 hours for develop
+    - cron: "0 6 * * *"    # Daily at 6 AM for main
+
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: "Target URL to test"
+        required: false
+        default: "https://dev.f4tdaddy.com"
+        type: string
+
+jobs:
+  lighthouse-audit:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main' # Run on develop and main
+
+    steps:
+      - name: "🏗️ Checkout code"
+        uses: actions/checkout@v4
+
+      - name: "🔧 Setup Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: "📦 Install dependencies"
+        run: npm ci
+
+      - name: "🎫 Generate dev auth token"
+        id: auth
+        run: |
+          TOKEN=$(DEV_AUTH_SECRET="${{ secrets.DEV_AUTH_SECRET }}" node scripts/generate-dev-auth-token.js | grep -A1 "🔗 Token:" | tail -1)
+          echo "token=$TOKEN" >> $GITHUB_OUTPUT
+        env:
+          DEV_AUTH_SECRET: ${{ secrets.DEV_AUTH_SECRET }}
+
+      - name: "🔐 Authenticate with dev auth bypass"
+        run: |
+          # Set target URL based on branch
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            TARGET_URL="${{ github.event.inputs.target_url || 'https://violet-vault.vercel.app' }}"
+          else
+            TARGET_URL="${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}"
+          fi
+          echo "🔐 Authenticating with $TARGET_URL..."
+
+          # Authenticate and get cookies
+          curl -c cookies.txt -b cookies.txt -L "$TARGET_URL/__dev_auth?token=${{ steps.auth.outputs.token }}&target=/dashboard"
+
+          echo "✅ Authentication complete"
+
+      - name: "📂 Create lighthouse directory"
+        run: mkdir -p lighthouse-results
+
+      - name: "🔦 Run Lighthouse on authenticated pages"
+        run: |
+          # Set target URL based on branch
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            TARGET_URL="${{ github.event.inputs.target_url || 'https://violet-vault.vercel.app' }}"
+          else
+            TARGET_URL="${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}"
+          fi
+
+          # Pages to test (authenticated)
+          PAGES=(
+            "/dashboard"
+            "/envelopes"
+            "/transactions"
+            "/bills"
+            "/savings"
+            "/analytics"
+          )
+
+          for PAGE in "${PAGES[@]}"; do
+            echo "🔦 Testing $TARGET_URL$PAGE"
+
+            npx lighthouse "$TARGET_URL$PAGE" \
+              --chrome-flags="--headless --no-sandbox --disable-gpu" \
+              --output=html \
+              --output=json \
+              --output-path="./lighthouse-results/$(echo $PAGE | sed 's/\//-/g')" \
+              --preset=desktop \
+              --quiet || echo "⚠️ Lighthouse failed for $PAGE"
+          done
+
+      - name: "📊 Generate summary report"
+        run: |
+          echo "# 🔦 Lighthouse Performance Report" > lighthouse-results/SUMMARY.md
+          echo "" >> lighthouse-results/SUMMARY.md
+          echo "**Generated:** $(date -u)" >> lighthouse-results/SUMMARY.md
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "**Target:** ${{ github.event.inputs.target_url || 'https://violet-vault.vercel.app' }}" >> lighthouse-results/SUMMARY.md
+          else
+            echo "**Target:** ${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}" >> lighthouse-results/SUMMARY.md
+          fi
+          echo "**Branch:** ${{ github.ref_name }}" >> lighthouse-results/SUMMARY.md
+          echo "**Commit:** ${{ github.sha }}" >> lighthouse-results/SUMMARY.md
+          echo "" >> lighthouse-results/SUMMARY.md
+
+          # Parse JSON results and create summary
+          for file in lighthouse-results/*.json; do
+            if [ -f "$file" ]; then
+              PAGE=$(basename "$file" .json)
+              PERFORMANCE=$(jq -r '.categories.performance.score * 100 | floor' "$file" 2>/dev/null || echo "N/A")
+              ACCESSIBILITY=$(jq -r '.categories.accessibility.score * 100 | floor' "$file" 2>/dev/null || echo "N/A")
+              BEST_PRACTICES=$(jq -r '.categories["best-practices"].score * 100 | floor' "$file" 2>/dev/null || echo "N/A")
+              SEO=$(jq -r '.categories.seo.score * 100 | floor' "$file" 2>/dev/null || echo "N/A")
+
+              echo "## 📄 Page: $PAGE" >> lighthouse-results/SUMMARY.md
+              echo "| Metric | Score |" >> lighthouse-results/SUMMARY.md
+              echo "|--------|-------|" >> lighthouse-results/SUMMARY.md
+              echo "| 🚀 Performance | $PERFORMANCE% |" >> lighthouse-results/SUMMARY.md
+              echo "| ♿ Accessibility | $ACCESSIBILITY% |" >> lighthouse-results/SUMMARY.md
+              echo "| ✅ Best Practices | $BEST_PRACTICES% |" >> lighthouse-results/SUMMARY.md
+              echo "| 🔍 SEO | $SEO% |" >> lighthouse-results/SUMMARY.md
+              echo "" >> lighthouse-results/SUMMARY.md
+            fi
+          done
+
+      - name: "📤 Upload Lighthouse reports"
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports-${{ github.run_number }}
+          path: lighthouse-results/
+          retention-days: 30
+
+      - name: "💬 Comment results on latest commit (if on PR)"
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('lighthouse-results/SUMMARY.md', 'utf8');
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 🔦 Lighthouse Performance Report\n\n${summary}\n\n📊 [View detailed reports](${context.payload.repository.html_url}/actions/runs/${context.runId})`
+            });
+
+      - name: "🚨 Check for performance regressions"
+        run: |
+          FAILED_PAGES=""
+
+          for file in lighthouse-results/*.json; do
+            if [ -f "$file" ]; then
+              PAGE=$(basename "$file" .json)
+              PERFORMANCE=$(jq -r '.categories.performance.score * 100 | floor' "$file" 2>/dev/null || echo "0")
+
+              # Alert if performance is below 80%
+              if [ "$PERFORMANCE" -lt 80 ] && [ "$PERFORMANCE" != "N/A" ]; then
+                FAILED_PAGES="$FAILED_PAGES\n- $PAGE: $PERFORMANCE%"
+              fi
+            fi
+          done
+
+          if [ -n "$FAILED_PAGES" ]; then
+            echo "🚨 Performance regressions detected:"
+            echo -e "$FAILED_PAGES"
+            echo "performance_issues=true" >> $GITHUB_OUTPUT
+            echo "failed_pages<<EOF" >> $GITHUB_OUTPUT
+            echo -e "$FAILED_PAGES" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "✅ All pages passed performance checks"
+            echo "performance_issues=false" >> $GITHUB_OUTPUT
+          fi
+        id: check_performance
+
+      - name: "📧 Create issue for performance regressions"
+        if: steps.check_performance.outputs.performance_issues == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const failedPages = `${{ steps.check_performance.outputs.failed_pages }}`;
+
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🚨 Performance Regression Detected - ${new Date().toISOString().split('T')[0]}`,
+              body: `## 🔦 Lighthouse Performance Alert
+
+**Date:** ${new Date().toISOString()}
+**Target:** \${process.env.TARGET_URL || '${{ github.event.inputs.target_url || (github.ref == 'refs/heads/main' ? 'https://violet-vault.vercel.app' : 'https://dev.f4tdaddy.com') }}'}
+**Branch:** ${{ github.ref_name }}
+
+### 🚨 Pages Below 80% Performance Threshold:
+${failedPages}
+
+### 📊 Full Report
+[View complete Lighthouse reports](${context.payload.repository.html_url}/actions/runs/${context.runId})
+
+### 🔧 Next Steps
+1. Review the detailed Lighthouse reports
+2. Identify performance bottlenecks
+3. Optimize affected pages
+4. Re-run monitoring to verify fixes
+
+---
+*This issue was automatically created by Lighthouse monitoring workflow*`,
+              labels: ['performance', 'lighthouse', 'monitoring']
+            });
+
+  # Send notification summary
+  notify:
+    needs: lighthouse-audit
+    runs-on: ubuntu-latest
+    if: always() && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')
+
+    steps:
+      - name: "📊 Workflow Summary"
+        run: |
+          # Set target URL based on branch
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            TARGET_URL="${{ github.event.inputs.target_url || 'https://violet-vault.vercel.app' }}"
+          else
+            TARGET_URL="${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}"
+          fi
+
+          echo "## 🔦 Lighthouse Monitoring Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ${{ needs.lighthouse-audit.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Target:** $TARGET_URL" >> $GITHUB_STEP_SUMMARY
+          echo "**Time:** $(date -u)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📊 [View Reports](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
