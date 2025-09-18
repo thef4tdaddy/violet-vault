@@ -34,6 +34,41 @@ jobs:
       - name: "📦 Install dependencies"
         run: npm ci
 
+      - name: "🧪 Run test suite"
+        run: |
+          echo "🧪 Running Vitest test suite..."
+
+          # Initialize test results tracking
+          TEST_FAILURES=""
+          TEST_SUCCESS_COUNT=0
+          TEST_TOTAL_COUNT=0
+          TEST_PASSED=true
+
+          # Run tests and capture results
+          if npm run test 2>&1 | tee test-output.log; then
+            echo "✅ All tests passed"
+            TEST_SUCCESS_COUNT=$(grep -o "passed" test-output.log | wc -l || echo "0")
+            TEST_TOTAL_COUNT=$TEST_SUCCESS_COUNT
+          else
+            echo "❌ Some tests failed"
+            TEST_PASSED=false
+
+            # Extract test statistics from output
+            TEST_TOTAL_COUNT=$(grep -E "Tests:|Test Files:" test-output.log | head -1 | grep -o '[0-9]\+' | head -1 || echo "0")
+            TEST_SUCCESS_COUNT=$(grep -o "passed" test-output.log | wc -l || echo "0")
+
+            # Capture failed test information
+            TEST_FAILURES=$(grep -A 5 -B 5 "FAIL\|✕\|failed" test-output.log || echo "Test failures detected but details not captured")
+          fi
+
+          # Store results for later steps
+          echo "TEST_PASSED=$TEST_PASSED" >> $GITHUB_ENV
+          echo "TEST_SUCCESS_COUNT=$TEST_SUCCESS_COUNT" >> $GITHUB_ENV
+          echo "TEST_TOTAL_COUNT=$TEST_TOTAL_COUNT" >> $GITHUB_ENV
+          echo "TEST_FAILURES<<EOF" >> $GITHUB_ENV
+          echo "$TEST_FAILURES" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
       - name: "🎫 Generate dev auth token"
         id: auth
         run: |
@@ -110,6 +145,25 @@ jobs:
           echo "**Commit:** ${{ github.sha }}" >> lighthouse-results/SUMMARY.md
           echo "" >> lighthouse-results/SUMMARY.md
 
+          # Add test results summary
+          echo "## 🧪 Test Results" >> lighthouse-results/SUMMARY.md
+          echo "" >> lighthouse-results/SUMMARY.md
+          if [ "$TEST_PASSED" = "true" ]; then
+            echo "✅ **All tests passed** ($TEST_SUCCESS_COUNT/$TEST_TOTAL_COUNT)" >> lighthouse-results/SUMMARY.md
+          else
+            echo "❌ **Some tests failed** ($TEST_SUCCESS_COUNT/$TEST_TOTAL_COUNT)" >> lighthouse-results/SUMMARY.md
+            echo "" >> lighthouse-results/SUMMARY.md
+            echo "### Failed Tests:" >> lighthouse-results/SUMMARY.md
+            echo '```' >> lighthouse-results/SUMMARY.md
+            echo "$TEST_FAILURES" >> lighthouse-results/SUMMARY.md
+            echo '```' >> lighthouse-results/SUMMARY.md
+          fi
+          echo "" >> lighthouse-results/SUMMARY.md
+
+          # Add lighthouse results summary
+          echo "## 🔦 Lighthouse Results" >> lighthouse-results/SUMMARY.md
+          echo "" >> lighthouse-results/SUMMARY.md
+
           # Parse JSON results and create summary
           for file in lighthouse-results/*.json; do
             if [ -f "$file" ]; then
@@ -165,10 +219,10 @@ jobs:
             echo "⚠️ No lighthouse results found to copy"
           fi
 
-          # Create failure report if there were any failures
-          if [ "$SUCCESS_COUNT" -lt "$TOTAL_COUNT" ]; then
-            cat > "$REPORT_DIR/lighthouse-failures.md" << EOF
-          # 🚨 Lighthouse Test Failures
+          # Create failure report if there were any failures (lighthouse or tests)
+          if [ "$SUCCESS_COUNT" -lt "$TOTAL_COUNT" ] || [ "$TEST_PASSED" != "true" ]; then
+            cat > "$REPORT_DIR/test-and-lighthouse-failures.md" << EOF
+          # 🚨 Test & Lighthouse Failure Report
 
           **Date:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')
           **Branch:** ${{ github.ref_name }}
@@ -176,15 +230,43 @@ jobs:
           **Node.js Version:** $(node --version)
           **Workflow Run:** [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
 
-          ## 📊 Summary
-          - **Total Pages Tested:** $TOTAL_COUNT
-          - **Successful Tests:** $SUCCESS_COUNT
-          - **Failed Tests:** $((TOTAL_COUNT - SUCCESS_COUNT))
+          ## 🧪 Test Results Summary
+          - **Total Tests:** $TEST_TOTAL_COUNT
+          - **Passed Tests:** $TEST_SUCCESS_COUNT
+          - **Failed Tests:** $((TEST_TOTAL_COUNT - TEST_SUCCESS_COUNT))
+          - **Test Status:** $([ "$TEST_PASSED" = "true" ] && echo "✅ PASSED" || echo "❌ FAILED")
 
-          ## ❌ Failed Pages
+          $([ "$TEST_PASSED" != "true" ] && cat << TESTEOF
+
+          ### ❌ Test Failures
+          \`\`\`
+          $TEST_FAILURES
+          \`\`\`
+          TESTEOF
+          )
+
+          ## 🔦 Lighthouse Results Summary
+          - **Total Pages Tested:** $TOTAL_COUNT
+          - **Successful Scans:** $SUCCESS_COUNT
+          - **Failed Scans:** $((TOTAL_COUNT - SUCCESS_COUNT))
+          - **Lighthouse Status:** $([ "$SUCCESS_COUNT" -eq "$TOTAL_COUNT" ] && echo "✅ PASSED" || echo "❌ FAILED")
+
+          $([ "$SUCCESS_COUNT" -lt "$TOTAL_COUNT" ] && cat << LHEOF
+
+          ### ❌ Failed Lighthouse Pages
           $LIGHTHOUSE_FAILURES
+          LHEOF
+          )
 
           ## 🔍 Possible Causes
+
+          ### Test Failures
+          1. **Code Changes**: Recent code changes may have broken existing functionality
+          2. **Dependency Issues**: Package updates or missing dependencies
+          3. **Environment Issues**: Mock setup or test environment configuration
+          4. **API Changes**: Breaking changes in external APIs or internal interfaces
+
+          ### Lighthouse Failures
           1. **Node.js Compatibility**: Check if Node.js version supports all dependencies
           2. **Authentication Issues**: Dev auth token may have expired or be invalid
           3. **Network Connectivity**: Target URL may be unreachable or slow
@@ -193,6 +275,14 @@ jobs:
           6. **Chrome Dependencies**: Headless Chrome may be missing required dependencies
 
           ## 🛠️ Debugging Steps
+
+          ### For Test Failures
+          1. Run tests locally: \`npm run test\`
+          2. Check for recent code changes that might affect tests
+          3. Verify all mocks and test setup are correct
+          4. Review test output for specific error messages
+
+          ### For Lighthouse Failures
           1. Check workflow logs for specific error messages
           2. Verify target URL is accessible
           3. Test authentication flow manually
@@ -200,7 +290,7 @@ jobs:
           5. Review Node.js and dependency versions
 
           ---
-          *This failure report was automatically generated by the Lighthouse monitoring workflow*
+          *This report was automatically generated by the enhanced Lighthouse + Test monitoring workflow*
           EOF
           fi
 
@@ -223,8 +313,8 @@ jobs:
           echo "" >> README.md
 
           # Add report links
-          if [ -f "$REPORT_DIR/lighthouse-failures.md" ]; then
-            echo "**❌ [View Failure Report](./$REPORT_DIR/lighthouse-failures.md)**" >> README.md
+          if [ -f "$REPORT_DIR/test-and-lighthouse-failures.md" ]; then
+            echo "**❌ [View Test & Lighthouse Failure Report](./$REPORT_DIR/test-and-lighthouse-failures.md)**" >> README.md
             echo "" >> README.md
           fi
 
@@ -270,10 +360,13 @@ jobs:
               body: `## 🔦 Lighthouse Performance Report\n\n${summary}\n\n📊 [View detailed reports](${context.payload.repository.html_url}/actions/runs/${context.runId})`
             });
 
-      - name: "🚨 Check for performance regressions"
+      - name: "🚨 Check for performance regressions and test failures"
         run: |
           FAILED_PAGES=""
+          LIGHTHOUSE_ISSUES=false
+          OVERALL_ISSUES=false
 
+          # Check lighthouse results
           for file in lighthouse-results/*.json; do
             if [ -f "$file" ]; then
               PAGE=$(basename "$file" .json)
@@ -301,51 +394,79 @@ jobs:
 
               if [ -n "$ISSUES" ]; then
                 FAILED_PAGES="$FAILED_PAGES\n- $PAGE: $ISSUES"
+                LIGHTHOUSE_ISSUES=true
               fi
             fi
           done
 
-          if [ -n "$FAILED_PAGES" ]; then
-            echo "🚨 Lighthouse score issues detected:"
-            echo -e "$FAILED_PAGES"
-            echo "performance_issues=true" >> $GITHUB_OUTPUT
-            echo "failed_pages<<EOF" >> $GITHUB_OUTPUT
-            echo -e "$FAILED_PAGES" >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
+          # Check for any issues (lighthouse or tests)
+          if [ "$LIGHTHOUSE_ISSUES" = "true" ] || [ "$TEST_PASSED" != "true" ]; then
+            OVERALL_ISSUES=true
+            echo "🚨 Issues detected:"
+            if [ "$TEST_PASSED" != "true" ]; then
+              echo "  - ❌ Test failures: $((TEST_TOTAL_COUNT - TEST_SUCCESS_COUNT))/$TEST_TOTAL_COUNT tests failed"
+            fi
+            if [ "$LIGHTHOUSE_ISSUES" = "true" ]; then
+              echo "  - ❌ Lighthouse score issues:"
+              echo -e "$FAILED_PAGES"
+            fi
           else
-            echo "✅ All pages achieve 100% scores across all categories"
-            echo "performance_issues=false" >> $GITHUB_OUTPUT
+            echo "✅ All tests pass and all pages achieve 100% lighthouse scores"
           fi
-        id: check_performance
 
-      - name: "📧 Create issue for Lighthouse score improvements"
-        if: steps.check_performance.outputs.performance_issues == 'true'
+          # Set outputs
+          echo "overall_issues=$OVERALL_ISSUES" >> $GITHUB_OUTPUT
+          echo "lighthouse_issues=$LIGHTHOUSE_ISSUES" >> $GITHUB_OUTPUT
+          echo "test_failures=$([[ "$TEST_PASSED" != "true" ]] && echo true || echo false)" >> $GITHUB_OUTPUT
+          echo "failed_pages<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$FAILED_PAGES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        id: check_issues
+
+      - name: "📧 Create issue for test/lighthouse failures"
+        if: steps.check_issues.outputs.overall_issues == 'true'
         uses: actions/github-script@v7
         env:
-          FAILED_PAGES: ${{ steps.check_performance.outputs.failed_pages }}
+          FAILED_PAGES: ${{ steps.check_issues.outputs.failed_pages }}
           TARGET_URL: ${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}
           BRANCH_NAME: ${{ github.ref_name }}
+          LIGHTHOUSE_ISSUES: ${{ steps.check_issues.outputs.lighthouse_issues }}
+          TEST_FAILURES: ${{ steps.check_issues.outputs.test_failures }}
+          TEST_PASSED: ${{ env.TEST_PASSED }}
+          TEST_SUCCESS_COUNT: ${{ env.TEST_SUCCESS_COUNT }}
+          TEST_TOTAL_COUNT: ${{ env.TEST_TOTAL_COUNT }}
         with:
           script: |
             const failedPages = process.env.FAILED_PAGES;
             const targetUrl = process.env.TARGET_URL;
             const branchName = process.env.BRANCH_NAME;
+            const hasLighthouseIssues = process.env.LIGHTHOUSE_ISSUES === 'true';
+            const hasTestFailures = process.env.TEST_FAILURES === 'true';
+            const testPassed = process.env.TEST_PASSED === 'true';
+            const testSuccessCount = process.env.TEST_SUCCESS_COUNT || '0';
+            const testTotalCount = process.env.TEST_TOTAL_COUNT || '0';
 
-            // Determine branch-specific label
+            // Determine branch-specific label and issue type
             const branchLabel = branchName === 'develop' ? 'dev branch' : 'production-build';
+            const issueType = hasTestFailures && hasLighthouseIssues ? 'test-lighthouse' :
+                            hasTestFailures ? 'test' : 'lighthouse';
 
-            // Check for existing open Lighthouse issues for this specific branch
+            // Check for existing open issues for this specific branch and type
+            const searchLabels = hasTestFailures ?
+              `monitoring,${branchLabel},test` :
+              `monitoring,${branchLabel},lighthouse`;
+
             const existingIssues = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
-              labels: `lighthouse,monitoring,${branchLabel}`,
+              labels: searchLabels,
               per_page: 5
             });
 
             if (existingIssues.data.length > 0) {
               const existingIssue = existingIssues.data[0];
-              console.log(`✅ Skipping duplicate issue - open Lighthouse issue exists for ${branchName}: #${existingIssue.number}`);
+              console.log(`✅ Skipping duplicate issue - open ${issueType} issue exists for ${branchName}: #${existingIssue.number}`);
 
               // Update existing issue with latest report link
               const updateBody = `\n\n---\n**Latest Report Update:** ${new Date().toISOString()}\n📊 [View latest reports](${context.payload.repository.html_url}/actions/runs/${context.runId})`;
@@ -360,42 +481,111 @@ jobs:
               return;
             }
 
-            const issueBody = [
-              "## 🔦 Lighthouse Score Optimization Alert",
-              "",
-              `**Date:** ${new Date().toISOString()}`,
-              `**Target:** ${targetUrl}`,
-              `**Branch:** ${branchName}`,
-              "",
-              "### 🚨 Pages Not Achieving 100% Scores:",
-              failedPages,
+            // Build issue title and body based on failure type
+            let issueTitle;
+            let issueBody = [];
+
+            if (hasTestFailures && hasLighthouseIssues) {
+              issueTitle = `🚨 Test & Lighthouse Failures - ${branchName} - ${new Date().toISOString().split('T')[0]}`;
+              issueBody = [
+                "## 🚨 Test & Lighthouse Failure Alert",
+                "",
+                `**Date:** ${new Date().toISOString()}`,
+                `**Target:** ${targetUrl}`,
+                `**Branch:** ${branchName}`,
+                "",
+                "### 🧪 Test Results",
+                `- **Status:** ❌ FAILED`,
+                `- **Passed:** ${testSuccessCount}/${testTotalCount}`,
+                `- **Failed:** ${testTotalCount - testSuccessCount}`,
+                "",
+                "### 🔦 Lighthouse Results",
+                "🚨 Pages Not Achieving 100% Scores:",
+                failedPages
+              ];
+            } else if (hasTestFailures) {
+              issueTitle = `🧪 Test Failures - ${branchName} - ${new Date().toISOString().split('T')[0]}`;
+              issueBody = [
+                "## 🧪 Test Failure Alert",
+                "",
+                `**Date:** ${new Date().toISOString()}`,
+                `**Target:** ${targetUrl}`,
+                `**Branch:** ${branchName}`,
+                "",
+                "### 🚨 Test Results",
+                `- **Status:** ❌ FAILED`,
+                `- **Passed:** ${testSuccessCount}/${testTotalCount}`,
+                `- **Failed:** ${testTotalCount - testSuccessCount}`
+              ];
+            } else {
+              issueTitle = `🔦 Lighthouse Optimization Needed - ${branchName} - ${new Date().toISOString().split('T')[0]}`;
+              issueBody = [
+                "## 🔦 Lighthouse Score Optimization Alert",
+                "",
+                `**Date:** ${new Date().toISOString()}`,
+                `**Target:** ${targetUrl}`,
+                `**Branch:** ${branchName}`,
+                "",
+                "### 🚨 Pages Not Achieving 100% Scores:",
+                failedPages
+              ];
+            }
+
+            // Common sections
+            issueBody.push(
               "",
               "### 📊 Full Report",
-              `[View complete Lighthouse reports](${context.payload.repository.html_url}/actions/runs/${context.runId})`,
+              `[View complete test & lighthouse reports](${context.payload.repository.html_url}/actions/runs/${context.runId})`,
               "",
-              "### 🔧 Next Steps",
-              "1. Review the detailed Lighthouse reports",
-              "2. Identify specific optimization opportunities",
-              "3. Fix accessibility, performance, SEO, or best practice issues",
-              "4. Re-run monitoring to verify 100% scores",
-              "",
-              "### 🎯 Goal",
-              "Achieve 100% scores across all categories:",
-              "- Performance: 100%",
-              "- Accessibility: 100%",
-              "- Best Practices: 100%",
-              "- SEO: 100%",
+              "### 🔧 Next Steps"
+            );
+
+            if (hasTestFailures) {
+              issueBody.push(
+                "#### For Test Failures:",
+                "1. Run tests locally: `npm run test`",
+                "2. Review failed test output for specific error messages",
+                "3. Check for recent code changes that might affect tests",
+                "4. Verify all mocks and test setup are correct",
+                ""
+              );
+            }
+
+            if (hasLighthouseIssues) {
+              issueBody.push(
+                "#### For Lighthouse Issues:",
+                "1. Review the detailed Lighthouse reports",
+                "2. Identify specific optimization opportunities",
+                "3. Fix accessibility, performance, SEO, or best practice issues",
+                "4. Re-run monitoring to verify 100% scores",
+                ""
+              );
+            }
+
+            issueBody.push(
+              "### 🎯 Goals",
+              hasTestFailures ? "- ✅ All tests must pass" : "",
+              hasLighthouseIssues ? "- 🔦 Achieve 100% scores across all Lighthouse categories:" : "",
+              hasLighthouseIssues ? "  - Performance: 100%" : "",
+              hasLighthouseIssues ? "  - Accessibility: 100%" : "",
+              hasLighthouseIssues ? "  - Best Practices: 100%" : "",
+              hasLighthouseIssues ? "  - SEO: 100%" : "",
               "",
               "---",
-              "*This issue was automatically created by Lighthouse monitoring workflow*"
-            ].join('\n');
+              "*This issue was automatically created by the enhanced Test + Lighthouse monitoring workflow*"
+            );
+
+            // Set appropriate labels
+            const labels = ['monitoring', branchLabel];
+            if (hasTestFailures) labels.push('test', 'bug');
+            if (hasLighthouseIssues) labels.push('lighthouse', 'performance');
 
             github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `🚨 Lighthouse Optimization Needed - ${branchName} - ${new Date().toISOString().split('T')[0]}`,
-              body: issueBody,
-              labels: ['performance', 'lighthouse', 'monitoring', branchLabel]
+              title: issueTitle,
+              body: issueBody.filter(line => line !== "").join('\n'),
+              labels: labels
             });
 
   # Send notification summary
