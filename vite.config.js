@@ -71,47 +71,6 @@ export default defineConfig(() => {
 
   return {
     plugins: [
-      // Fix crypto module compatibility with proper CommonJS exports polyfill
-      {
-        name: 'crypto-exports-polyfill',
-        transformIndexHtml(html) {
-          return html.replace(
-            '<head>',
-            `<head>
-              <script>
-                // Critical fix for crypto modules CommonJS compatibility
-                (function() {
-                  // Create global CommonJS environment
-                  const globalExports = {};
-
-                  // Set up global exports and module before any modules load
-                  window.exports = globalExports;
-                  globalThis.exports = globalExports;
-                  window.module = { exports: globalExports };
-                  globalThis.module = window.module;
-
-                  // Set up minimal require function
-                  window.require = function(id) {
-                    console.warn('require() called for:', id);
-                    return globalExports;
-                  };
-                  globalThis.require = window.require;
-
-                  // Wrap Object.defineProperty to redirect undefined targets to our exports
-                  const originalDefineProperty = Object.defineProperty;
-                  Object.defineProperty = function(obj, prop, descriptor) {
-                    // If trying to set properties on undefined/null, use our global exports
-                    if (obj == null) {
-                      console.warn('defineProperty on null/undefined redirected to global exports for:', prop);
-                      return originalDefineProperty.call(this, globalExports, prop, descriptor);
-                    }
-                    return originalDefineProperty.call(this, obj, prop, descriptor);
-                  };
-                })();
-              </script>`
-          );
-        }
-      },
       react(),
       tailwindcss(),
       VitePWA({
@@ -417,12 +376,6 @@ export default defineConfig(() => {
       dedupe: ["react", "react-dom"],
       alias: {
         buffer: "buffer",
-        // Use crypto-browserify polyfill for Node.js crypto
-        crypto: "crypto-browserify",
-        "node:crypto": "crypto-browserify",
-        stream: "stream-browserify",
-        util: "util",
-        process: "process",
       },
     },
     // Increase memory limits and optimize for build performance
@@ -431,20 +384,9 @@ export default defineConfig(() => {
         overlay: false, // Disable error overlay for better performance
       },
     },
-    optimizeDeps: {
-      include: [
-        "crypto-browserify",
-        "stream-browserify",
-        "util",
-        "process",
-        "buffer",
-        "bip39",
-      ],
-    },
     define: {
       "process.env": {},
       global: "globalThis",
-      Buffer: ["buffer", "Buffer"],
       // Inject git information as environment variables
       "import.meta.env.VITE_GIT_BRANCH": JSON.stringify(gitInfo.branch),
       "import.meta.env.VITE_GIT_COMMIT_DATE": JSON.stringify(
@@ -476,73 +418,27 @@ export default defineConfig(() => {
       // Manual chunk splitting for optimal bundle sizes (Issue 617: Code Splitting)
       rollupOptions: {
         output: {
-          manualChunks: (id) => {
-            // Route-based chunking for better code splitting (Issue 617)
-            if (id.includes("/pages/") || id.includes("/components/pages/")) {
-              if (id.includes("login") || id.includes("auth"))
-                return "auth-pages";
-              if (id.includes("dashboard")) return "dashboard-pages";
-              if (id.includes("budget") || id.includes("envelope"))
-                return "budget-pages";
-              if (id.includes("transaction")) return "transaction-pages";
-              if (id.includes("bill")) return "bill-pages";
-              if (id.includes("analytics") || id.includes("chart"))
-                return "analytics-pages";
-              if (id.includes("settings") || id.includes("profile"))
-                return "settings-pages";
-              return "other-pages";
-            }
-
-            // Vendor chunks
-            if (id.includes("node_modules")) {
-              // React ecosystem
-              if (
-                id.includes("react") ||
-                id.includes("react-dom") ||
-                id.includes("react-router")
-              ) {
-                return "react-vendor";
-              }
-              // Firebase (lazy loaded)
-              if (id.includes("firebase")) {
-                return "firebase-vendor";
-              }
-              // Data libraries
-              if (
-                id.includes("@tanstack/react-query") ||
-                id.includes("dexie") ||
-                id.includes("zustand")
-              ) {
-                return "data-vendor";
-              }
-              // UI/Utils
-              if (
-                id.includes("lucide-react") ||
-                id.includes("tailwindcss") ||
-                id.includes("@tanstack/react-virtual")
-              ) {
-                return "ui-vendor";
-              }
-              // Crypto/Security - Force separate chunks for problematic crypto modules
-              if (id.includes("bip39")) {
-                return "bip39-vendor";
-              }
-              if (id.includes("crypto-browserify")) {
-                return "crypto-browserify-vendor";
-              }
-              if (
-                id.includes("@msgpack/msgpack") ||
-                id.includes("pako")
-              ) {
-                return "crypto-vendor";
-              }
-              // PDF/QR (lazy loaded)
-              if (id.includes("jspdf") || id.includes("qrcode")) {
-                return "export-vendor";
-              }
-              // Other node_modules
-              return "vendor";
-            }
+          manualChunks: {
+            // Vendor chunk for React ecosystem
+            "react-vendor": ["react", "react-dom", "react-router-dom"],
+            // Firebase chunk (lazy loaded)
+            "firebase-vendor": [
+              "firebase/app",
+              "firebase/firestore",
+              "firebase/auth",
+            ],
+            // Data libraries chunk
+            "data-vendor": ["@tanstack/react-query", "dexie", "zustand"],
+            // UI/Utils chunk
+            "ui-vendor": [
+              "lucide-react",
+              "tailwindcss",
+              "@tanstack/react-virtual",
+            ],
+            // Crypto/Security chunk - simple static config
+            "crypto-vendor": ["bip39", "@msgpack/msgpack", "pako"],
+            // PDF/QR chunk (lazy loaded)
+            "export-vendor": ["jspdf", "qrcode", "qrcode.react"],
           },
         },
         // Enhanced tree-shaking (less aggressive to avoid temporal dead zone errors)
