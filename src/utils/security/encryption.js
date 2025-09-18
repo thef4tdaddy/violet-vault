@@ -1,5 +1,6 @@
 import logger from "../common/logger";
 import { optimizedSerialization } from "./optimizedSerialization";
+import { safeCryptoOperation, getRandomBytes, getCrypto } from "./cryptoCompat";
 
 export const encryptionUtils = {
   async deriveKey(password) {
@@ -8,7 +9,8 @@ export const encryptionUtils = {
 
   async deriveKeyFromSalt(password, salt) {
     const encoder = new TextEncoder();
-    const keyMaterial = await crypto.subtle.importKey(
+    const keyMaterial = await safeCryptoOperation(
+      "importKey",
       "raw",
       encoder.encode(password),
       { name: "PBKDF2" },
@@ -16,7 +18,8 @@ export const encryptionUtils = {
       ["deriveBits", "deriveKey"],
     );
 
-    const key = await crypto.subtle.deriveKey(
+    const key = await safeCryptoOperation(
+      "deriveKey",
       {
         name: "PBKDF2",
         salt: salt,
