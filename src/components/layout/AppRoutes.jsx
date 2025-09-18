@@ -4,6 +4,7 @@ import ViewRendererComponent from "./ViewRenderer";
 import LandingPage from "../marketing/LandingPage";
 import OfflinePage from "../pwa/OfflinePage";
 import ShareTargetHandler from "../pwa/ShareTargetHandler";
+import DevAuthBypass from "../dev/DevAuthBypass";
 import { routeConfig } from "./routeConfig";
 
 /**
@@ -34,6 +35,9 @@ const AppRoutes = ({
 
       {/* Share Target API route */}
       <Route path="/app/import" element={<ShareTargetHandler />} />
+
+      {/* Dev auth bypass route */}
+      <Route path="/__dev_auth" element={<DevAuthBypass />} />
 
       {/* App routes under /app prefix */}
       {routeConfig.map(({ path, activeView }) => (
