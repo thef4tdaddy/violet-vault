@@ -79,35 +79,31 @@ export default defineConfig(() => {
             '<head>',
             `<head>
               <script>
-                // Critical fix for crypto modules Object.defineProperty errors
+                // Critical fix for crypto modules CommonJS compatibility
                 (function() {
-                  // Ensure global exports object exists for CommonJS modules
-                  if (typeof exports === 'undefined') {
-                    window.exports = {};
-                    globalThis.exports = window.exports;
-                  }
+                  // Create global CommonJS environment
+                  const globalExports = {};
 
-                  // Ensure module object exists
-                  if (typeof module === 'undefined') {
-                    window.module = { exports: window.exports };
-                    globalThis.module = window.module;
-                  }
+                  // Set up global exports and module before any modules load
+                  window.exports = globalExports;
+                  globalThis.exports = globalExports;
+                  window.module = { exports: globalExports };
+                  globalThis.module = window.module;
 
-                  // Ensure require function exists (minimal implementation)
-                  if (typeof require === 'undefined') {
-                    window.require = function(id) {
-                      console.warn('require() called for:', id);
-                      return {};
-                    };
-                    globalThis.require = window.require;
-                  }
+                  // Set up minimal require function
+                  window.require = function(id) {
+                    console.warn('require() called for:', id);
+                    return globalExports;
+                  };
+                  globalThis.require = window.require;
 
-                  // Wrap Object.defineProperty to handle null/undefined objects safely
+                  // Wrap Object.defineProperty to redirect undefined targets to our exports
                   const originalDefineProperty = Object.defineProperty;
                   Object.defineProperty = function(obj, prop, descriptor) {
-                    if (obj == null || (typeof obj !== 'object' && typeof obj !== 'function')) {
-                      console.warn('defineProperty called on non-object:', obj, 'property:', prop);
-                      return obj;
+                    // If trying to set properties on undefined/null, use our global exports
+                    if (obj == null) {
+                      console.warn('defineProperty on null/undefined redirected to global exports for:', prop);
+                      return originalDefineProperty.call(this, globalExports, prop, descriptor);
                     }
                     return originalDefineProperty.call(this, obj, prop, descriptor);
                   };
