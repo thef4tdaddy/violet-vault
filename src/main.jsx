@@ -7,6 +7,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import queryClient from "./utils/common/queryClient";
 import { SystemInfoService } from "./services/bugReport/systemInfoService.js";
 import logger from "./utils/common/logger.js";
+import { initializeCrypto } from "./utils/security/cryptoCompat.js";
 
 // Firebase sync services loaded conditionally to reduce initial bundle size
 // This prevents Firebase from being in the initial JS bundle for bots/crawlers
@@ -257,6 +258,9 @@ if (
 }
 
 // Highlight.run initialization moved to lazy loader in App.jsx
+
+// Initialize crypto compatibility layer
+initializeCrypto();
 
 // Initialize console log and error capture for bug reports
 SystemInfoService.initializeErrorCapture();
