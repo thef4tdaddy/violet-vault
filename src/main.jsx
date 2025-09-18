@@ -164,7 +164,9 @@ if (
     );
 
     try {
-      const { cloudSyncService } = await import("./services/cloudSyncService.js");
+      const { cloudSyncService } = await import(
+        "./services/cloudSyncService.js"
+      );
 
       // CRITICAL SAFETY CHECK: Verify local data exists before clearing cloud
       logger.info("🔍 Checking local data before clearing cloud...");
@@ -186,7 +188,10 @@ if (
         logger.info(
           "✅ Cloud data reset completed successfully - sync will resume automatically",
         );
-        return { success: true, message: "Cloud data reset completed successfully" };
+        return {
+          success: true,
+          message: "Cloud data reset completed successfully",
+        };
       } else {
         throw new Error(result.error || "Force push failed");
       }
