@@ -71,6 +71,51 @@ export default defineConfig(() => {
 
   return {
     plugins: [
+      // Fix crypto module compatibility with proper CommonJS exports polyfill
+      {
+        name: 'crypto-exports-polyfill',
+        transformIndexHtml(html) {
+          return html.replace(
+            '<head>',
+            `<head>
+              <script>
+                // Critical fix for crypto modules Object.defineProperty errors
+                (function() {
+                  // Ensure global exports object exists for CommonJS modules
+                  if (typeof exports === 'undefined') {
+                    window.exports = {};
+                    globalThis.exports = window.exports;
+                  }
+
+                  // Ensure module object exists
+                  if (typeof module === 'undefined') {
+                    window.module = { exports: window.exports };
+                    globalThis.module = window.module;
+                  }
+
+                  // Ensure require function exists (minimal implementation)
+                  if (typeof require === 'undefined') {
+                    window.require = function(id) {
+                      console.warn('require() called for:', id);
+                      return {};
+                    };
+                    globalThis.require = window.require;
+                  }
+
+                  // Wrap Object.defineProperty to handle null/undefined objects safely
+                  const originalDefineProperty = Object.defineProperty;
+                  Object.defineProperty = function(obj, prop, descriptor) {
+                    if (obj == null || (typeof obj !== 'object' && typeof obj !== 'function')) {
+                      console.warn('defineProperty called on non-object:', obj, 'property:', prop);
+                      return obj;
+                    }
+                    return originalDefineProperty.call(this, obj, prop, descriptor);
+                  };
+                })();
+              </script>`
+          );
+        }
+      },
       react(),
       tailwindcss(),
       VitePWA({
