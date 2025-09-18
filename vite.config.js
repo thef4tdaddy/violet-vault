@@ -397,12 +397,13 @@ export default defineConfig(() => {
         "util",
         "process",
         "buffer",
-        "bip39"
-      ]
+        "bip39",
+      ],
     },
     define: {
       "process.env": {},
       global: "globalThis",
+      Buffer: ["buffer", "Buffer"],
       // Inject git information as environment variables
       "import.meta.env.VITE_GIT_BRANCH": JSON.stringify(gitInfo.branch),
       "import.meta.env.VITE_GIT_COMMIT_DATE": JSON.stringify(
@@ -481,9 +482,14 @@ export default defineConfig(() => {
               ) {
                 return "ui-vendor";
               }
-              // Crypto/Security
+              // Crypto/Security - Force separate chunks for problematic crypto modules
+              if (id.includes("bip39")) {
+                return "bip39-vendor";
+              }
+              if (id.includes("crypto-browserify")) {
+                return "crypto-browserify-vendor";
+              }
               if (
-                id.includes("bip39") ||
                 id.includes("@msgpack/msgpack") ||
                 id.includes("pako")
               ) {
