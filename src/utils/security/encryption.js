@@ -37,7 +37,8 @@ export const encryptionUtils = {
 
   async generateKey(password) {
     const encoder = new TextEncoder();
-    const keyMaterial = await crypto.subtle.importKey(
+    const keyMaterial = await safeCryptoOperation(
+      "importKey",
       "raw",
       encoder.encode(password),
       { name: "PBKDF2" },
@@ -47,10 +48,11 @@ export const encryptionUtils = {
 
     // Generate deterministic salt from password to ensure same password = same key
     const passwordBytes = encoder.encode(password + "VioletVault_Salt");
-    const saltHash = await crypto.subtle.digest("SHA-256", passwordBytes);
+    const saltHash = await safeCryptoOperation("digest", "SHA-256", passwordBytes);
     const salt = new Uint8Array(saltHash.slice(0, 16));
 
-    const key = await crypto.subtle.deriveKey(
+    const key = await safeCryptoOperation(
+      "deriveKey",
       {
         name: "PBKDF2",
         salt: salt,
@@ -68,12 +70,13 @@ export const encryptionUtils = {
 
   async encrypt(data, key) {
     const encoder = new TextEncoder();
-    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const iv = getRandomBytes(12);
 
     // Handle both string data (already JSON stringified) and object data
     const stringData = typeof data === "string" ? data : JSON.stringify(data);
 
-    const encrypted = await crypto.subtle.encrypt(
+    const encrypted = await safeCryptoOperation(
+      "encrypt",
       { name: "AES-GCM", iv: iv },
       key,
       encoder.encode(stringData),
@@ -100,7 +103,8 @@ export const encryptionUtils = {
         ivLength: iv?.length,
       });
 
-      const decrypted = await crypto.subtle.decrypt(
+      const decrypted = await safeCryptoOperation(
+        "decrypt",
         { name: "AES-GCM", iv: new Uint8Array(iv) },
         key,
         new Uint8Array(encryptedData),
@@ -122,7 +126,8 @@ export const encryptionUtils = {
   },
 
   async decryptRaw(encryptedData, key, iv) {
-    const decrypted = await crypto.subtle.decrypt(
+    const decrypted = await safeCryptoOperation(
+      "decrypt",
       { name: "AES-GCM", iv: new Uint8Array(iv) },
       key,
       new Uint8Array(encryptedData),
@@ -183,7 +188,7 @@ export const encryptionUtils = {
     const data = encoder.encode(
       `budget_seed_${masterPassword}_${normalizedShareCode}_violet_vault`,
     );
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashBuffer = await safeCryptoOperation("digest", "SHA-256", data);
     const hashArray = new Uint8Array(hashBuffer);
 
     // Convert to hex string and take first 16 characters for reasonable length
@@ -225,8 +230,9 @@ export const encryptionUtils = {
       const compressedData = optimizedSerialization.serialize(data);
 
       // Step 3: Encrypt the compressed binary data
-      const iv = crypto.getRandomValues(new Uint8Array(12));
-      const encrypted = await crypto.subtle.encrypt(
+      const iv = getRandomBytes(12);
+      const encrypted = await safeCryptoOperation(
+        "encrypt",
         { name: "AES-GCM", iv: iv },
         key,
         compressedData,
@@ -271,7 +277,8 @@ export const encryptionUtils = {
       const startTime = performance.now();
 
       // Step 1: Decrypt to get compressed binary data
-      const decrypted = await crypto.subtle.decrypt(
+      const decrypted = await safeCryptoOperation(
+        "decrypt",
         { name: "AES-GCM", iv: new Uint8Array(iv) },
         key,
         new Uint8Array(encryptedData),
