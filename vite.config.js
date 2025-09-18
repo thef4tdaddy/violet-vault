@@ -379,6 +379,9 @@ export default defineConfig(() => {
         // Use crypto-browserify polyfill for Node.js crypto
         crypto: "crypto-browserify",
         "node:crypto": "crypto-browserify",
+        stream: "stream-browserify",
+        util: "util",
+        process: "process",
       },
     },
     // Increase memory limits and optimize for build performance
@@ -390,6 +393,9 @@ export default defineConfig(() => {
     define: {
       "process.env": {},
       global: "globalThis",
+      // Add Buffer and process globals for crypto-browserify
+      Buffer: "Buffer",
+      process: "process",
       // Inject git information as environment variables
       "import.meta.env.VITE_GIT_BRANCH": JSON.stringify(gitInfo.branch),
       "import.meta.env.VITE_GIT_COMMIT_DATE": JSON.stringify(
