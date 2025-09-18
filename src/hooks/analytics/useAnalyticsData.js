@@ -14,12 +14,9 @@ export const useAnalyticsData = ({
   // Validate and sanitize props to prevent runtime errors
   const safeTransactions = useMemo(
     () => (Array.isArray(transactions) ? transactions : []),
-    [transactions],
+    [transactions]
   );
-  const safeEnvelopes = useMemo(
-    () => (Array.isArray(envelopes) ? envelopes : []),
-    [envelopes],
-  );
+  const safeEnvelopes = useMemo(() => (Array.isArray(envelopes) ? envelopes : []), [envelopes]);
 
   // Date validation helper
   const isValidDate = useMemo(
@@ -28,7 +25,7 @@ export const useAnalyticsData = ({
       const date = new Date(dateString);
       return date instanceof Date && !isNaN(date) && date.getFullYear() > 1900;
     },
-    [],
+    []
   );
 
   // Safe division helper
@@ -101,21 +98,15 @@ export const useAnalyticsData = ({
           grouped[monthKey].expenses += Math.abs(transaction.amount);
         }
 
-        grouped[monthKey].net =
-          grouped[monthKey].income - grouped[monthKey].expenses;
+        grouped[monthKey].net = grouped[monthKey].income - grouped[monthKey].expenses;
         grouped[monthKey].transactionCount++;
       } catch {
-        logger.warn(
-          "Error processing transaction in monthlyTrends:",
-          transaction,
-        );
+        logger.warn("Error processing transaction in monthlyTrends:", transaction);
         return;
       }
     });
 
-    const results = Object.values(grouped).sort((a, b) =>
-      a.month.localeCompare(b.month),
-    );
+    const results = Object.values(grouped).sort((a, b) => a.month.localeCompare(b.month));
 
     // Ensure we always return an array, even if empty
     return results.length > 0
@@ -137,9 +128,7 @@ export const useAnalyticsData = ({
 
     filteredTransactions.forEach((transaction) => {
       if (transaction.amount < 0 && transaction.envelopeId) {
-        const envelope = safeEnvelopes.find(
-          (e) => e.id === transaction.envelopeId,
-        );
+        const envelope = safeEnvelopes.find((e) => e.id === transaction.envelopeId);
         const envelopeName = envelope ? envelope.name : "Unknown Envelope";
 
         if (!spending[envelopeName]) {
@@ -187,23 +176,11 @@ export const useAnalyticsData = ({
 
   // Weekly spending patterns
   const weeklyPatterns = useMemo(() => {
-    const days = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
+    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const patterns = days.map((day) => ({ day, amount: 0, count: 0 }));
 
     filteredTransactions.forEach((transaction) => {
-      if (
-        transaction &&
-        transaction.amount < 0 &&
-        isValidDate(transaction.date)
-      ) {
+      if (transaction && transaction.amount < 0 && isValidDate(transaction.date)) {
         try {
           const dayIndex = new Date(transaction.date).getDay();
           if (dayIndex >= 0 && dayIndex < 7) {
@@ -224,8 +201,7 @@ export const useAnalyticsData = ({
     return safeEnvelopes.filter(Boolean).map((envelope) => {
       const monthlyBudget = envelope.monthlyAmount || 0;
       const currentBalance = envelope.currentBalance || 0;
-      const spent =
-        envelope.spendingHistory?.reduce((sum, s) => sum + s.amount, 0) || 0;
+      const spent = envelope.spendingHistory?.reduce((sum, s) => sum + s.amount, 0) || 0;
 
       const healthScore = safeDivision(currentBalance, monthlyBudget, 1) * 100;
       let status = "healthy";
@@ -261,18 +237,14 @@ export const useAnalyticsData = ({
 
     filteredTransactions.forEach((transaction) => {
       if (transaction.amount < 0 && transaction.envelopeId) {
-        const envelope = safeEnvelopes.find(
-          (e) => e.id === transaction.envelopeId,
-        );
+        const envelope = safeEnvelopes.find((e) => e.id === transaction.envelopeId);
         if (envelope && analysis[envelope.name]) {
           analysis[envelope.name].actual += Math.abs(transaction.amount);
         }
       }
     });
 
-    return Object.values(analysis).filter(
-      (item) => item.budgeted > 0 || item.actual > 0,
-    );
+    return Object.values(analysis).filter((item) => item.budgeted > 0 || item.actual > 0);
   }, [filteredTransactions, safeEnvelopes]);
 
   // Financial metrics
@@ -285,15 +257,14 @@ export const useAnalyticsData = ({
       .filter((t) => t.amount < 0)
       .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
-    const savingsRate =
-      safeDivision(totalIncome - totalExpenses, totalIncome, 0) * 100;
+    const savingsRate = safeDivision(totalIncome - totalExpenses, totalIncome, 0) * 100;
 
     const avgMonthlyIncome =
       monthlyTrends.length > 0
         ? safeDivision(
             monthlyTrends.reduce((sum, m) => sum + m.income, 0),
             monthlyTrends.length,
-            0,
+            0
           )
         : 0;
 
@@ -302,7 +273,7 @@ export const useAnalyticsData = ({
         ? safeDivision(
             monthlyTrends.reduce((sum, m) => sum + m.expenses, 0),
             monthlyTrends.length,
-            0,
+            0
           )
         : 0;
 

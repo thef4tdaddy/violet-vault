@@ -15,9 +15,7 @@ import pwaManager from "./utils/pwa/pwaManager";
 import useUiStore from "./stores/ui/uiStore";
 
 // Lazy load monitoring to reduce main bundle size
-const HighlightLoader = React.lazy(
-  () => import("./components/monitoring/HighlightLoader"),
-);
+const HighlightLoader = React.lazy(() => import("./components/monitoring/HighlightLoader"));
 
 const App = () => {
   // Initialize PWA manager

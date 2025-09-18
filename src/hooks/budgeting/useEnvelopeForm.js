@@ -74,7 +74,7 @@ const useEnvelopeForm = ({
         return newData;
       });
     },
-    [errors, envelope],
+    [errors, envelope]
   );
 
   // Batch form update
@@ -85,11 +85,7 @@ const useEnvelopeForm = ({
 
   // Form validation
   const validateForm = useCallback(() => {
-    const validation = validateEnvelopeForm(
-      formData,
-      existingEnvelopes,
-      envelope?.id,
-    );
+    const validation = validateEnvelopeForm(formData, existingEnvelopes, envelope?.id);
     setErrors(validation.errors);
     return validation.isValid;
   }, [formData, existingEnvelopes, envelope?.id]);
@@ -115,10 +111,7 @@ const useEnvelopeForm = ({
 
       // Validate form
       if (!validateForm()) {
-        globalToast.showError(
-          "Please fix the form errors before saving",
-          "Validation Error",
-        );
+        globalToast.showError("Please fix the form errors before saving", "Validation Error");
         return false;
       }
 
@@ -136,10 +129,7 @@ const useEnvelopeForm = ({
       return true;
     } catch (error) {
       logger.error("Error saving envelope", error);
-      globalToast.showError(
-        error.message || "Failed to save envelope",
-        "Save Error",
-      );
+      globalToast.showError(error.message || "Failed to save envelope", "Save Error");
       return false;
     } finally {
       setIsLoading(false);
@@ -152,7 +142,7 @@ const useEnvelopeForm = ({
       // Show warning toast about unsaved changes - let the UI handle confirmation
       globalToast.showError(
         "You have unsaved changes that will be lost if you close now.",
-        "Unsaved Changes Warning",
+        "Unsaved Changes Warning"
       );
       // For now, prevent closing - the component should handle this with proper confirmation modal
       return;
@@ -166,8 +156,7 @@ const useEnvelopeForm = ({
   const hasRequiredFields = formData.name?.trim() && formData.category;
 
   // Check if form is submittable (has required fields and no errors)
-  const canSubmit =
-    hasRequiredFields && Object.keys(errors).length === 0 && !isLoading;
+  const canSubmit = hasRequiredFields && Object.keys(errors).length === 0 && !isLoading;
 
   return {
     // Form state

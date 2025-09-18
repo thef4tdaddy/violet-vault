@@ -48,9 +48,7 @@ const ExportSection = ({
             {React.createElement(getIcon("Download"), {
               className: "h-5 w-5 text-purple-600 mx-auto mb-2",
             })}
-            <div className="text-sm font-medium text-gray-900">
-              Download File
-            </div>
+            <div className="text-sm font-medium text-gray-900">Download File</div>
             <div className="text-xs text-gray-500 mt-1">Unprotected</div>
           </button>
 
@@ -62,9 +60,7 @@ const ExportSection = ({
             {React.createElement(getIcon("QrCode"), {
               className: "h-5 w-5 text-purple-600 mx-auto mb-2",
             })}
-            <div className="text-sm font-medium text-gray-900">
-              Generate QR Code
-            </div>
+            <div className="text-sm font-medium text-gray-900">Generate QR Code</div>
             <div className="text-xs text-gray-500 mt-1">For mobile</div>
           </button>
         </div>
@@ -72,9 +68,7 @@ const ExportSection = ({
 
       {/* Protected Export */}
       <div>
-        <h4 className="font-medium text-gray-900 mb-4">
-          Password-Protected Export
-        </h4>
+        <h4 className="font-medium text-gray-900 mb-4">Password-Protected Export</h4>
         <div className="space-y-4">
           <PasswordField
             label="Export Password"

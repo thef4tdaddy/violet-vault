@@ -10,26 +10,21 @@ export const useHistoryExport = () => {
   const exportHistory = useCallback(
     (executionHistory, undoStack, options = {}) => {
       try {
-        const {
-          includeUndoStack = true,
-          dateFrom,
-          dateTo,
-          format = "json",
-        } = options;
+        const { includeUndoStack = true, dateFrom, dateTo, format = "json" } = options;
 
         let historyToExport = [...executionHistory];
 
         if (dateFrom) {
           const fromDate = new Date(dateFrom);
           historyToExport = historyToExport.filter(
-            (execution) => new Date(execution.executedAt) >= fromDate,
+            (execution) => new Date(execution.executedAt) >= fromDate
           );
         }
 
         if (dateTo) {
           const toDate = new Date(dateTo);
           historyToExport = historyToExport.filter(
-            (execution) => new Date(execution.executedAt) <= toDate,
+            (execution) => new Date(execution.executedAt) <= toDate
           );
         }
 
@@ -59,7 +54,7 @@ export const useHistoryExport = () => {
         throw error;
       }
     },
-    [exportToCsv, generateFilename],
+    [exportToCsv, generateFilename]
   );
 
   const exportToCsv = useCallback(
@@ -81,7 +76,7 @@ export const useHistoryExport = () => {
           execution.rulesExecuted || 0,
           execution.totalFunded || 0,
           execution.success !== false ? "true" : "false",
-        ].join(","),
+        ].join(",")
       );
 
       return {
@@ -90,7 +85,7 @@ export const useHistoryExport = () => {
         filename: generateFilename("csv"),
       };
     },
-    [generateFilename],
+    [generateFilename]
   );
 
   const generateFilename = useCallback((format) => {

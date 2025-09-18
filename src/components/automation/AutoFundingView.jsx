@@ -12,15 +12,8 @@ import logger from "../../utils/common/logger";
 const AutoFundingView = () => {
   const confirm = useConfirm();
   const budget = useBudgetStore();
-  const {
-    rules,
-    executeRules,
-    addRule,
-    updateRule,
-    deleteRule,
-    toggleRule,
-    getHistory,
-  } = useAutoFunding();
+  const { rules, executeRules, addRule, updateRule, deleteRule, toggleRule, getHistory } =
+    useAutoFunding();
   const [showRuleBuilder, setShowRuleBuilder] = useState(false);
   const [editingRule, setEditingRule] = useState(null);
   const [activeTab, setActiveTab] = useState("rules");
@@ -50,25 +43,19 @@ const AutoFundingView = () => {
       setShowRuleBuilder(false);
       setEditingRule(null);
       globalToast.showSuccess(
-        editingRule
-          ? "Rule updated successfully!"
-          : "Rule created successfully!",
-        "Success",
+        editingRule ? "Rule updated successfully!" : "Rule created successfully!",
+        "Success"
       );
     } catch (error) {
       logger.error("Failed to save rule", error);
-      globalToast.showError(
-        "Failed to save rule: " + error.message,
-        "Save Failed",
-      );
+      globalToast.showError("Failed to save rule: " + error.message, "Save Failed");
     }
   };
 
   const handleDeleteRule = async (ruleId) => {
     const confirmed = await confirm({
       title: "Delete Auto-Funding Rule",
-      message:
-        "Are you sure you want to delete this rule? This action cannot be undone.",
+      message: "Are you sure you want to delete this rule? This action cannot be undone.",
       confirmLabel: "Delete Rule",
       cancelLabel: "Cancel",
       destructive: true,
@@ -80,10 +67,7 @@ const AutoFundingView = () => {
         globalToast.showSuccess("Rule deleted successfully!", "Success");
       } catch (error) {
         logger.error("Failed to delete rule", error);
-        globalToast.showError(
-          "Failed to delete rule: " + error.message,
-          "Delete Failed",
-        );
+        globalToast.showError("Failed to delete rule: " + error.message, "Delete Failed");
       }
     }
   };
@@ -93,10 +77,7 @@ const AutoFundingView = () => {
       toggleRule(ruleId);
     } catch (error) {
       logger.error("Failed to toggle rule", error);
-      globalToast.showError(
-        "Failed to toggle rule: " + error.message,
-        "Toggle Failed",
-      );
+      globalToast.showError("Failed to toggle rule: " + error.message, "Toggle Failed");
     }
   };
 
@@ -124,26 +105,20 @@ const AutoFundingView = () => {
         if (totalFunded > 0) {
           globalToast.showSuccess(
             `Successfully executed ${rulesExecuted} rules and funded $${totalFunded.toFixed(2)} total!`,
-            "Auto-Funding Complete",
+            "Auto-Funding Complete"
           );
         } else {
           globalToast.showWarning(
             "Rules executed but no funds were transferred. Check your rules and available balances.",
-            "No Funds Transferred",
+            "No Funds Transferred"
           );
         }
       } else {
-        globalToast.showError(
-          "Failed to execute rules: " + result.error,
-          "Execution Failed",
-        );
+        globalToast.showError("Failed to execute rules: " + result.error, "Execution Failed");
       }
     } catch (error) {
       logger.error("Failed to execute rules", error);
-      globalToast.showError(
-        "Failed to execute rules: " + error.message,
-        "Execution Failed",
-      );
+      globalToast.showError("Failed to execute rules: " + error.message, "Execution Failed");
     } finally {
       setIsExecuting(false);
     }

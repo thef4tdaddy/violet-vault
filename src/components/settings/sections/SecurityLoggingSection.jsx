@@ -35,9 +35,7 @@ const SecurityLoggingSection = ({
             >
               {event.type}
             </span>
-            <p className="text-purple-800 mt-2 text-sm font-medium">
-              {event.description}
-            </p>
+            <p className="text-purple-800 mt-2 text-sm font-medium">{event.description}</p>
           </div>
           <span className="text-xs font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded border border-gray-300 ml-3">
             {new Date(event.timestamp).toLocaleTimeString()}
@@ -73,7 +71,7 @@ const SecurityLoggingSection = ({
             onClick={() =>
               handleSettingChange(
                 "securityLoggingEnabled",
-                !securitySettings.securityLoggingEnabled,
+                !securitySettings.securityLoggingEnabled
               )
             }
             className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 shadow-lg border-2 border-black ${
@@ -84,9 +82,7 @@ const SecurityLoggingSection = ({
           >
             <span
               className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 border border-gray-300 ${
-                securitySettings.securityLoggingEnabled
-                  ? "translate-x-6"
-                  : "translate-x-1"
+                securitySettings.securityLoggingEnabled ? "translate-x-6" : "translate-x-1"
               }`}
             />
           </button>

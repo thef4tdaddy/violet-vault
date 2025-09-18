@@ -15,15 +15,12 @@ const ReconcileTransactionModal = ({
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="glassmorphism rounded-2xl p-6 w-full max-w-md border border-white/30 shadow-2xl">
         <h3 className="font-black text-black text-base mb-4">
-          <span className="text-lg">R</span>ECONCILE{" "}
-          <span className="text-lg">T</span>RANSACTION
+          <span className="text-lg">R</span>ECONCILE <span className="text-lg">T</span>RANSACTION
         </h3>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Transaction Type
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Transaction Type</label>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
@@ -58,9 +55,7 @@ const ReconcileTransactionModal = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Amount
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Amount</label>
             <input
               type="number"
               step="0.01"
@@ -72,15 +67,11 @@ const ReconcileTransactionModal = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
             <input
               type="text"
               value={newTransaction.description}
-              onChange={(e) =>
-                onUpdateTransaction({ description: e.target.value })
-              }
+              onChange={(e) => onUpdateTransaction({ description: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               placeholder="What was this transaction for?"
             />
@@ -92,9 +83,7 @@ const ReconcileTransactionModal = ({
             </label>
             <select
               value={newTransaction.envelopeId}
-              onChange={(e) =>
-                onUpdateTransaction({ envelopeId: e.target.value })
-              }
+              onChange={(e) => onUpdateTransaction({ envelopeId: e.target.value })}
               className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select envelope...</option>
@@ -107,9 +96,7 @@ const ReconcileTransactionModal = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Date
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
             <input
               type="date"
               value={newTransaction.date}

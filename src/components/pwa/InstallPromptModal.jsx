@@ -36,14 +36,13 @@ const InstallPromptModal = () => {
           </div>
 
           <h2 className="font-black text-black text-xl mb-2">
-            📱 <span className="text-2xl">I</span>NSTALL{" "}
-            <span className="text-2xl">V</span>IOLET
+            📱 <span className="text-2xl">I</span>NSTALL <span className="text-2xl">V</span>IOLET
             <span className="text-2xl">V</span>AULT
           </h2>
 
           <p className="text-purple-900 text-sm leading-relaxed">
-            Install VioletVault on your device for a better experience with
-            offline access and quick launch.
+            Install VioletVault on your device for a better experience with offline access and quick
+            launch.
           </p>
         </div>
 
@@ -60,9 +59,7 @@ const InstallPromptModal = () => {
             </div>
             <div className="flex items-center space-x-2">
               {getIcon("zap", "w-4 h-4 text-purple-600 flex-shrink-0")}
-              <span className="text-gray-700">
-                Faster loading and performance
-              </span>
+              <span className="text-gray-700">Faster loading and performance</span>
             </div>
             <div className="flex items-center space-x-2">
               {getIcon("home", "w-4 h-4 text-purple-600 flex-shrink-0")}
@@ -79,9 +76,7 @@ const InstallPromptModal = () => {
               <div className="text-gray-700">
                 <p className="font-medium mb-1">To install on iOS:</p>
                 <ol className="list-decimal list-inside space-y-1 text-xs">
-                  <li>
-                    Tap the Share button {getIcon("share", "w-3 h-3 inline")}
-                  </li>
+                  <li>Tap the Share button {getIcon("share", "w-3 h-3 inline")}</li>
                   <li>Select "Add to Home Screen"</li>
                   <li>Tap "Add" to confirm</li>
                 </ol>

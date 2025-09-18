@@ -234,9 +234,7 @@ describe("useModalManager", () => {
     });
 
     const openModalNames = result.current.getOpenModalNames();
-    expect(openModalNames).toEqual(
-      expect.arrayContaining(["modal1", "modal2", "modal3"]),
-    );
+    expect(openModalNames).toEqual(expect.arrayContaining(["modal1", "modal2", "modal3"]));
     expect(openModalNames).toHaveLength(3);
   });
 

@@ -72,11 +72,7 @@ export const useAutoFunding = () => {
   const executeRules = useCallback(
     async (trigger = TRIGGER_TYPES.MANUAL, triggerData = {}) => {
       try {
-        const result = await executionHook.executeRules(
-          rulesHook.rules,
-          trigger,
-          triggerData,
-        );
+        const result = await executionHook.executeRules(rulesHook.rules, trigger, triggerData);
 
         if (result.success) {
           // Add to history
@@ -93,9 +89,7 @@ export const useAutoFunding = () => {
             .forEach((ruleResult) => {
               rulesHook.updateRule(ruleResult.ruleId, {
                 lastExecuted: result.execution.executedAt,
-                executionCount:
-                  (rulesHook.getRuleById(ruleResult.ruleId)?.executionCount ||
-                    0) + 1,
+                executionCount: (rulesHook.getRuleById(ruleResult.ruleId)?.executionCount || 0) + 1,
               });
             });
 
@@ -109,7 +103,7 @@ export const useAutoFunding = () => {
         return { success: false, error: error.message };
       }
     },
-    [rulesHook, executionHook, historyHook, dataHook],
+    [rulesHook, executionHook, historyHook, dataHook]
   );
 
   // Handle transaction-based auto-funding triggers
@@ -121,14 +115,11 @@ export const useAutoFunding = () => {
 
       try {
         // Check if transaction looks like income (simplified logic)
-        const isLikelyIncome =
-          transaction.amount > 0 && transaction.amount >= 100;
+        const isLikelyIncome = transaction.amount > 0 && transaction.amount >= 100;
 
         if (isLikelyIncome) {
           // Get rules that should trigger on income detection
-          const incomeRules = rulesHook.getRulesByTrigger(
-            TRIGGER_TYPES.INCOME_DETECTED,
-          );
+          const incomeRules = rulesHook.getRulesByTrigger(TRIGGER_TYPES.INCOME_DETECTED);
 
           if (incomeRules.length > 0) {
             const result = await executeRules(TRIGGER_TYPES.INCOME_DETECTED, {
@@ -149,12 +140,7 @@ export const useAutoFunding = () => {
         logger.error("Error handling transaction-based auto-funding", error);
       }
     },
-    [
-      dataHook.isInitialized,
-      executionHook.isExecuting,
-      rulesHook,
-      executeRules,
-    ],
+    [dataHook.isInitialized, executionHook.isExecuting, rulesHook, executeRules]
   );
 
   // Periodic check for scheduled rules
@@ -230,7 +216,7 @@ export const useAutoFunding = () => {
         throw error;
       }
     },
-    [historyHook, dataHook],
+    [historyHook, dataHook]
   );
 
   // Export all data with current state
@@ -268,7 +254,7 @@ export const useAutoFunding = () => {
         throw error;
       }
     },
-    [dataHook, rulesHook],
+    [dataHook, rulesHook]
   );
 
   // Get comprehensive statistics

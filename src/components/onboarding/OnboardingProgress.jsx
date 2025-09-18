@@ -6,13 +6,8 @@ import useOnboardingStore from "../../stores/ui/onboardingStore";
  * OnboardingProgress - Shows progress checklist for new users
  */
 const OnboardingProgress = () => {
-  const {
-    isOnboarded,
-    tutorialProgress,
-    getProgress,
-    preferences,
-    setPreference,
-  } = useOnboardingStore();
+  const { isOnboarded, tutorialProgress, getProgress, preferences, setPreference } =
+    useOnboardingStore();
 
   const [isExpanded, setIsExpanded] = useState(!isOnboarded);
 
@@ -112,9 +107,7 @@ const OnboardingProgress = () => {
             {React.createElement(getIcon("Trophy"), {
               className: "w-5 h-5 text-purple-500",
             })}
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Getting Started
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Getting Started</h3>
           </div>
 
           {progress.percentage > 0 && (
@@ -169,7 +162,7 @@ const OnboardingProgress = () => {
                 if (!groups[category]) groups[category] = [];
                 groups[category].push(step);
                 return groups;
-              }, {}),
+              }, {})
             ).map(([category, categorySteps]) => (
               <div key={category} className="space-y-2">
                 <h4 className="text-sm font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wide">
@@ -251,9 +244,7 @@ const OnboardingProgress = () => {
                 {React.createElement(getIcon("Trophy"), {
                   className: "w-4 h-4",
                 })}
-                <span className="text-sm font-medium">
-                  Congratulations! Setup complete!
-                </span>
+                <span className="text-sm font-medium">Congratulations! Setup complete!</span>
               </div>
             )}
           </div>

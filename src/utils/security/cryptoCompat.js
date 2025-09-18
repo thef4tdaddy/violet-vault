@@ -6,7 +6,7 @@
  * Related to Epic #158 - Mobile UI/UX Enhancements
  */
 
-import logger from '../common/logger';
+import logger from "../common/logger";
 
 /**
  * Check if Web Crypto API is available
@@ -15,12 +15,12 @@ import logger from '../common/logger';
 export const isCryptoSupported = () => {
   try {
     return !!(
-      typeof crypto !== 'undefined' &&
+      typeof crypto !== "undefined" &&
       crypto.subtle &&
-      typeof crypto.subtle.encrypt === 'function'
+      typeof crypto.subtle.encrypt === "function"
     );
   } catch (error) {
-    logger.warn('Crypto availability check failed:', error);
+    logger.warn("Crypto availability check failed:", error);
     return false;
   }
 };
@@ -31,23 +31,23 @@ export const isCryptoSupported = () => {
  */
 export const getCrypto = () => {
   try {
-    if (typeof crypto !== 'undefined' && crypto.subtle) {
+    if (typeof crypto !== "undefined" && crypto.subtle) {
       return crypto;
     }
 
     // Fallback for environments where crypto is not available
-    if (typeof globalThis !== 'undefined' && globalThis.crypto) {
+    if (typeof globalThis !== "undefined" && globalThis.crypto) {
       return globalThis.crypto;
     }
 
-    if (typeof window !== 'undefined' && window.crypto) {
+    if (typeof window !== "undefined" && window.crypto) {
       return window.crypto;
     }
 
-    logger.warn('Web Crypto API not available in this environment');
+    logger.warn("Web Crypto API not available in this environment");
     return null;
   } catch (error) {
-    logger.error('Failed to access crypto:', error);
+    logger.error("Failed to access crypto:", error);
     return null;
   }
 };
@@ -62,11 +62,11 @@ export const safeCryptoOperation = async (operation, ...args) => {
   try {
     const cryptoInstance = getCrypto();
     if (!cryptoInstance || !cryptoInstance.subtle) {
-      throw new Error('Web Crypto API not available');
+      throw new Error("Web Crypto API not available");
     }
 
     const subtleCrypto = cryptoInstance.subtle;
-    if (typeof subtleCrypto[operation] !== 'function') {
+    if (typeof subtleCrypto[operation] !== "function") {
       throw new Error(`Crypto operation '${operation}' not supported`);
     }
 
@@ -92,14 +92,14 @@ export const getRandomBytes = (length) => {
     }
 
     // Fallback to Math.random (less secure but functional)
-    logger.warn('Using fallback random generation - less secure');
+    logger.warn("Using fallback random generation - less secure");
     const array = new Uint8Array(length);
     for (let i = 0; i < length; i++) {
       array[i] = Math.floor(Math.random() * 256);
     }
     return array;
   } catch (error) {
-    logger.error('Random bytes generation failed:', error);
+    logger.error("Random bytes generation failed:", error);
     // Last resort fallback
     const array = new Uint8Array(length);
     for (let i = 0; i < length; i++) {
@@ -116,17 +116,17 @@ export const getRandomBytes = (length) => {
  */
 export const isSecureContext = () => {
   try {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       return (
         window.isSecureContext ||
-        window.location.protocol === 'https:' ||
-        window.location.hostname === 'localhost' ||
-        window.location.hostname === '127.0.0.1'
+        window.location.protocol === "https:" ||
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
       );
     }
     return true; // Assume secure in non-browser environments
   } catch (error) {
-    logger.warn('Secure context check failed:', error);
+    logger.warn("Secure context check failed:", error);
     return false;
   }
 };
@@ -140,16 +140,16 @@ export const initializeCrypto = () => {
   const isSecure = isSecureContext();
 
   if (!isSecure) {
-    logger.warn('Crypto operations may be limited in non-secure context');
+    logger.warn("Crypto operations may be limited in non-secure context");
   }
 
   if (!isSupported) {
-    logger.warn('Web Crypto API not fully supported - some features may be limited');
+    logger.warn("Web Crypto API not fully supported - some features may be limited");
   }
 
-  logger.info('Crypto compatibility layer initialized', {
+  logger.info("Crypto compatibility layer initialized", {
     supported: isSupported,
-    secure: isSecure
+    secure: isSecure,
   });
 
   return { supported: isSupported, secure: isSecure };
@@ -161,5 +161,5 @@ export default {
   safeCryptoOperation,
   getRandomBytes,
   isSecureContext,
-  initializeCrypto
+  initializeCrypto,
 };

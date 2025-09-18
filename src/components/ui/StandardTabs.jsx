@@ -146,33 +146,23 @@ const StandardTabs = ({
   const getCountStyles = (isActive) => {
     switch (variant) {
       case "underline":
-        return isActive
-          ? "bg-blue-100 text-blue-700"
-          : "bg-gray-200 text-gray-800";
+        return isActive ? "bg-blue-100 text-blue-700" : "bg-gray-200 text-gray-800";
 
       case "pills":
-        return isActive
-          ? "bg-blue-200 text-blue-800"
-          : "bg-gray-300 text-gray-700";
+        return isActive ? "bg-blue-200 text-blue-800" : "bg-gray-300 text-gray-700";
 
       case "buttons":
-        return isActive
-          ? "bg-blue-500 text-blue-100"
-          : "bg-gray-100 text-gray-600";
+        return isActive ? "bg-blue-500 text-blue-100" : "bg-gray-100 text-gray-600";
 
       case "tabs":
-        return isActive
-          ? "bg-blue-100 text-blue-800"
-          : "bg-gray-200 text-gray-700";
+        return isActive ? "bg-blue-100 text-blue-800" : "bg-gray-200 text-gray-700";
 
       case "colored":
         // This will be handled per-tab with individual colors
         return "";
 
       default:
-        return isActive
-          ? "bg-blue-100 text-blue-700"
-          : "bg-gray-200 text-gray-800";
+        return isActive ? "bg-blue-100 text-blue-700" : "bg-gray-200 text-gray-800";
     }
   };
 
@@ -222,11 +212,7 @@ const StandardTabs = ({
                 ${tabStyles}
                 ${isActive && variant === "colored" ? "border-2 border-black" : ""}
               `.trim()}
-              style={
-                isActive && variant === "colored"
-                  ? { border: "2px solid black" }
-                  : {}
-              }
+              style={isActive && variant === "colored" ? { border: "2px solid black" } : {}}
             >
               {Icon && <Icon className={config.iconSize} />}
               {tab.label}

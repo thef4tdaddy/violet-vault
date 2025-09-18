@@ -26,14 +26,10 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
   } = useTransactionImportProcessing(currentUser);
 
   const handleImport = async () => {
-    if (
-      !fieldMapping.date ||
-      !fieldMapping.description ||
-      !fieldMapping.amount
-    ) {
+    if (!fieldMapping.date || !fieldMapping.description || !fieldMapping.amount) {
       globalToast.showError(
         "Please map at least Date, Description, and Amount fields",
-        "Mapping Required",
+        "Mapping Required"
       );
       return;
     }
@@ -43,10 +39,7 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
       try {
         await clearExistingData();
       } catch {
-        globalToast.showError(
-          "Failed to clear existing data. Import cancelled.",
-          "Clear Failed",
-        );
+        globalToast.showError("Failed to clear existing data. Import cancelled.", "Clear Failed");
         return;
       }
     }
@@ -54,19 +47,14 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
     setImportStep(3);
 
     // Process transactions
-    const processedTransactions = await processTransactions(
-      importData,
-      fieldMapping,
-    );
+    const processedTransactions = await processTransactions(importData, fieldMapping);
 
     // Import transactions first
     onBulkImport(processedTransactions);
 
     // Process auto-funding for income transactions
     const autoFundingPromises = [];
-    const incomeTransactions = processedTransactions.filter(
-      (t) => t.amount > 0,
-    );
+    const incomeTransactions = processedTransactions.filter((t) => t.amount > 0);
 
     if (incomeTransactions.length > 0 && budget) {
       logger.info("Processing auto-funding for imported income transactions", {
@@ -80,11 +68,7 @@ export const useTransactionImport = (currentUser, onBulkImport, budget) => {
     resetImport();
 
     // Enhanced success message including auto-funding results
-    const message = generateSuccessMessage(
-      processedTransactions,
-      importData,
-      autoFundingPromises,
-    );
+    const message = generateSuccessMessage(processedTransactions, importData, autoFundingPromises);
     globalToast.showInfo(message, "Import Update");
   };
 

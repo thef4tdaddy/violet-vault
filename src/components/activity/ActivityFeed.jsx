@@ -62,9 +62,7 @@ const ActivityFeed = () => {
       <div className="glassmorphism rounded-3xl p-8">
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-          <span className="ml-3 text-gray-600">
-            Loading activity history...
-          </span>
+          <span className="ml-3 text-gray-600">Loading activity history...</span>
         </div>
       </div>
     );
@@ -87,9 +85,7 @@ const ActivityFeed = () => {
               </div>
               Activity History
             </h2>
-            <p className="text-gray-600 mt-1">
-              Track all changes and actions in your budget
-            </p>
+            <p className="text-gray-600 mt-1">Track all changes and actions in your budget</p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -116,12 +112,8 @@ const ActivityFeed = () => {
             {React.createElement(getIcon("Activity"), {
               className: "h-16 w-16 mx-auto mb-4 text-gray-300",
             })}
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No Activity Yet
-            </h3>
-            <p className="text-gray-500">
-              Start using your budget to see activity history here
-            </p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No Activity Yet</h3>
+            <p className="text-gray-500">Start using your budget to see activity history here</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -132,10 +124,7 @@ const ActivityFeed = () => {
               >
                 <div className="flex-shrink-0 p-2 bg-white rounded-lg border border-gray-200">
                   {(() => {
-                    const iconInfo = getActivityIconInfo(
-                      activity.action,
-                      activity.entityType,
-                    );
+                    const iconInfo = getActivityIconInfo(activity.action, activity.entityType);
                     const IconComponent = iconInfo.component;
                     return <IconComponent className={iconInfo.className} />;
                   })()}

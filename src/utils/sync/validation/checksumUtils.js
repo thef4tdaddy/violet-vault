@@ -34,7 +34,7 @@ export const generateChecksum = async (data) => {
 
     const hashBuffer = await crypto.subtle.digest(
       VALIDATION_CONSTANTS.CHECKSUM_ALGORITHM,
-      dataBuffer,
+      dataBuffer
     );
     const hashArray = new Uint8Array(hashBuffer);
     const hashHex = Array.from(hashArray)

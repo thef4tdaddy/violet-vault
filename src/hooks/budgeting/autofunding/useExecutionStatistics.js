@@ -11,18 +11,15 @@ export const useExecutionStatistics = () => {
     try {
       const totalExecutions = executionHistory.length;
       const successfulExecutions = executionHistory.filter(
-        (execution) => execution.success !== false,
+        (execution) => execution.success !== false
       );
       const totalFunded = executionHistory.reduce(
         (sum, execution) => sum + Math.max(0, execution.totalFunded || 0),
-        0,
+        0
       );
       const totalReversed = executionHistory
         .filter((execution) => execution.isUndo)
-        .reduce(
-          (sum, execution) => sum + Math.abs(execution.totalFunded || 0),
-          0,
-        );
+        .reduce((sum, execution) => sum + Math.abs(execution.totalFunded || 0), 0);
 
       // Group by trigger
       const byTrigger = executionHistory.reduce((acc, execution) => {
@@ -35,7 +32,7 @@ export const useExecutionStatistics = () => {
       last30Days.setDate(last30Days.getDate() - 30);
 
       const recentExecutions = executionHistory.filter(
-        (execution) => new Date(execution.executedAt) >= last30Days,
+        (execution) => new Date(execution.executedAt) >= last30Days
       );
 
       return {
@@ -49,9 +46,7 @@ export const useExecutionStatistics = () => {
         recentExecutions: recentExecutions.length,
         lastExecution: executionHistory[0] || null,
         averageFundingPerExecution:
-          successfulExecutions.length > 0
-            ? totalFunded / successfulExecutions.length
-            : 0,
+          successfulExecutions.length > 0 ? totalFunded / successfulExecutions.length : 0,
       };
     } catch (error) {
       logger.error("Failed to get execution statistics", error);

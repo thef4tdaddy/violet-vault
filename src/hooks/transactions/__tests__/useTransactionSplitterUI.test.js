@@ -61,9 +61,7 @@ describe("useTransactionSplitterUI", () => {
 
   describe("initialization", () => {
     it("should initialize with default state", () => {
-      const { result } = renderHook(() =>
-        useTransactionSplitterUI(defaultProps),
-      );
+      const { result } = renderHook(() => useTransactionSplitterUI(defaultProps));
 
       expect(result.current.splits).toHaveLength(2); // Default to 2 splits
       expect(result.current.isProcessing).toBe(false);
@@ -72,9 +70,7 @@ describe("useTransactionSplitterUI", () => {
     });
 
     it("should initialize splits with equal amounts", () => {
-      const { result } = renderHook(() =>
-        useTransactionSplitterUI(defaultProps),
-      );
+      const { result } = renderHook(() => useTransactionSplitterUI(defaultProps));
 
       expect(result.current.splits[0].amount).toBe("60.25");
       expect(result.current.splits[1].amount).toBe("60.25");
@@ -88,9 +84,7 @@ describe("useTransactionSplitterUI", () => {
         initialSplitCount: 3,
       };
 
-      const { result } = renderHook(() =>
-        useTransactionSplitterUI(propsWithSplitCount),
-      );
+      const { result } = renderHook(() => useTransactionSplitterUI(propsWithSplitCount));
 
       expect(result.current.splits).toHaveLength(3);
       expect(result.current.splits[0].amount).toBe("40.17");
@@ -101,9 +95,7 @@ describe("useTransactionSplitterUI", () => {
 
   describe("split management", () => {
     it("should add a new split", () => {
-      const { result } = renderHook(() =>
-        useTransactionSplitterUI(defaultProps),
-      );
+      const { result } = renderHook(() => useTransactionSplitterUI(defaultProps));
 
       act(() => {
         result.current.addSplit();
@@ -115,9 +107,7 @@ describe("useTransactionSplitterUI", () => {
     });
 
     it("should remove a split", () => {
-      const { result } = renderHook(() =>
-        useTransactionSplitterUI(defaultProps),
-      );
+      const { result } = renderHook(() => useTransactionSplitterUI(defaultProps));
 
       act(() => {
         result.current.addSplit(); // Add third split
@@ -133,9 +123,7 @@ describe("useTransactionSplitterUI", () => {
     });
 
     it("should not remove split if only 2 remain", () => {
-      const { result } = renderHook(() =>
-        useTransactionSplitterUI(defaultProps),
-      );
+      const { result } = renderHook(() => useTransactionSplitterUI(defaultProps));
 
       act(() => {
         result.current.removeSplit(0);
@@ -145,9 +133,7 @@ describe("useTransactionSplitterUI", () => {
     });
 
     it("should update split field", () => {
-      const { result } = renderHook(() =>
-        useTransactionSplitterUI(defaultProps),
-      );
+      const { result } = renderHook(() => useTransactionSplitterUI(defaultProps));
 
       act(() => {
         result.current.updateSplitField(0, "description", "Vegetables");
@@ -163,9 +149,7 @@ describe("useTransactionSplitterUI", () => {
         splitCount: 2,
       });
 
-      const { result } = renderHook(() =>
-        useTransactionSplitterUI(defaultProps),
-      );
+      const { result } = renderHook(() => useTransactionSplitterUI(defaultProps));
 
       act(() => {
         result.current.updateSplitField(0, "amount", "100.00");
@@ -178,9 +162,7 @@ describe("useTransactionSplitterUI", () => {
 
   describe("split distribution", () => {
     it("should distribute amount evenly across splits", () => {
-      const { result } = renderHook(() =>
-        useTransactionSplitterUI(defaultProps),
-      );
+      const { result } = renderHook(() => useTransactionSplitterUI(defaultProps));
 
       act(() => {
         result.current.addSplit();
@@ -193,9 +175,7 @@ describe("useTransactionSplitterUI", () => {
     });
 
     it("should distribute amount by percentage", () => {
-      const { result } = renderHook(() =>
-        useTransactionSplitterUI(defaultProps),
-      );
+      const { result } = renderHook(() => useTransactionSplitterUI(defaultProps));
 
       const percentages = [70, 30]; // 70% and 30%
 
@@ -208,9 +188,7 @@ describe("useTransactionSplitterUI", () => {
     });
 
     it("should clear all split amounts", () => {
-      const { result } = renderHook(() =>
-        useTransactionSplitterUI(defaultProps),
-      );
+      const { result } = renderHook(() => useTransactionSplitterUI(defaultProps));
 
       act(() => {
         result.current.clearAllAmounts();
@@ -223,9 +201,7 @@ describe("useTransactionSplitterUI", () => {
 
   describe("validation", () => {
     it("should validate splits correctly", () => {
-      const { result } = renderHook(() =>
-        useTransactionSplitterUI(defaultProps),
-      );
+      const { result } = renderHook(() => useTransactionSplitterUI(defaultProps));
 
       let isValid;
       act(() => {
@@ -233,9 +209,10 @@ describe("useTransactionSplitterUI", () => {
       });
 
       expect(isValid).toBe(true);
-      expect(
-        mockTransactionSplitterService.validateSplitData,
-      ).toHaveBeenCalledWith(result.current.splits, mockTransaction.amount);
+      expect(mockTransactionSplitterService.validateSplitData).toHaveBeenCalledWith(
+        result.current.splits,
+        mockTransaction.amount
+      );
     });
 
     it("should handle validation errors", () => {
@@ -247,9 +224,7 @@ describe("useTransactionSplitterUI", () => {
         },
       });
 
-      const { result } = renderHook(() =>
-        useTransactionSplitterUI(defaultProps),
-      );
+      const { result } = renderHook(() => useTransactionSplitterUI(defaultProps));
 
       let isValid;
       act(() => {
@@ -272,34 +247,29 @@ describe("useTransactionSplitterUI", () => {
         ],
       });
 
-      const { result } = renderHook(() =>
-        useTransactionSplitterUI(defaultProps),
-      );
+      const { result } = renderHook(() => useTransactionSplitterUI(defaultProps));
 
       await act(async () => {
         await result.current.handleSubmit();
       });
 
-      expect(
-        mockTransactionSplitterService.splitTransaction,
-      ).toHaveBeenCalledWith(mockTransaction, result.current.splits);
+      expect(mockTransactionSplitterService.splitTransaction).toHaveBeenCalledWith(
+        mockTransaction,
+        result.current.splits
+      );
       expect(mockOnSplitComplete).toHaveBeenCalledWith(
         expect.objectContaining({
           success: true,
           transactions: expect.any(Array),
-        }),
+        })
       );
     });
 
     it("should handle split submission errors", async () => {
       const mockError = new Error("Split failed");
-      mockTransactionSplitterService.splitTransaction.mockRejectedValue(
-        mockError,
-      );
+      mockTransactionSplitterService.splitTransaction.mockRejectedValue(mockError);
 
-      const { result } = renderHook(() =>
-        useTransactionSplitterUI(defaultProps),
-      );
+      const { result } = renderHook(() => useTransactionSplitterUI(defaultProps));
 
       await act(async () => {
         await result.current.handleSubmit();
@@ -315,17 +285,13 @@ describe("useTransactionSplitterUI", () => {
         errors: { totalMismatch: "Amounts don't match" },
       });
 
-      const { result } = renderHook(() =>
-        useTransactionSplitterUI(defaultProps),
-      );
+      const { result } = renderHook(() => useTransactionSplitterUI(defaultProps));
 
       await act(async () => {
         await result.current.handleSubmit();
       });
 
-      expect(
-        mockTransactionSplitterService.splitTransaction,
-      ).not.toHaveBeenCalled();
+      expect(mockTransactionSplitterService.splitTransaction).not.toHaveBeenCalled();
       expect(mockOnSplitComplete).not.toHaveBeenCalled();
     });
 
@@ -337,9 +303,7 @@ describe("useTransactionSplitterUI", () => {
 
       mockTransactionSplitterService.splitTransaction.mockReturnValue(promise);
 
-      const { result } = renderHook(() =>
-        useTransactionSplitterUI(defaultProps),
-      );
+      const { result } = renderHook(() => useTransactionSplitterUI(defaultProps));
 
       const submitPromise = act(async () => {
         result.current.handleSubmit();
@@ -356,9 +320,7 @@ describe("useTransactionSplitterUI", () => {
 
   describe("form reset and cancellation", () => {
     it("should reset form to initial state", () => {
-      const { result } = renderHook(() =>
-        useTransactionSplitterUI(defaultProps),
-      );
+      const { result } = renderHook(() => useTransactionSplitterUI(defaultProps));
 
       // Modify form state
       act(() => {
@@ -380,9 +342,7 @@ describe("useTransactionSplitterUI", () => {
     });
 
     it("should handle cancel action", () => {
-      const { result } = renderHook(() =>
-        useTransactionSplitterUI(defaultProps),
-      );
+      const { result } = renderHook(() => useTransactionSplitterUI(defaultProps));
 
       act(() => {
         result.current.handleCancel();
@@ -397,9 +357,7 @@ describe("useTransactionSplitterUI", () => {
         errors: { split0: "Error message" },
       });
 
-      const { result } = renderHook(() =>
-        useTransactionSplitterUI(defaultProps),
-      );
+      const { result } = renderHook(() => useTransactionSplitterUI(defaultProps));
 
       // Trigger validation error
       act(() => {
@@ -429,9 +387,7 @@ describe("useTransactionSplitterUI", () => {
         transaction: zeroAmountTransaction,
       };
 
-      const { result } = renderHook(() =>
-        useTransactionSplitterUI(propsWithZeroAmount),
-      );
+      const { result } = renderHook(() => useTransactionSplitterUI(propsWithZeroAmount));
 
       expect(result.current.splits[0].amount).toBe("0.00");
       expect(result.current.splits[1].amount).toBe("0.00");
@@ -448,9 +404,7 @@ describe("useTransactionSplitterUI", () => {
         transaction: smallAmountTransaction,
       };
 
-      const { result } = renderHook(() =>
-        useTransactionSplitterUI(propsWithSmallAmount),
-      );
+      const { result } = renderHook(() => useTransactionSplitterUI(propsWithSmallAmount));
 
       expect(result.current.splits[0].amount).toBe("0.02");
       expect(result.current.splits[1].amount).toBe("0.01");

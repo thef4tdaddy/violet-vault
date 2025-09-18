@@ -7,12 +7,7 @@ import logger from "../../utils/common/logger";
 /**
  * Custom hook for managing savings goals UI actions and modal states
  */
-const useSavingsGoalsActions = ({
-  onAddGoal,
-  onUpdateGoal,
-  onDeleteGoal,
-  onDistributeToGoals,
-}) => {
+const useSavingsGoalsActions = ({ onAddGoal, onUpdateGoal, onDeleteGoal, onDistributeToGoals }) => {
   // Modal state management
   const [showAddForm, setShowAddForm] = useState(false);
   const [showDistributeModal, setShowDistributeModal] = useState(false);
@@ -35,9 +30,7 @@ const useSavingsGoalsActions = ({
         setShowAddForm(false);
       }
     } catch (error) {
-      globalToast.error(
-        goalId ? "Failed to update savings goal" : "Failed to add savings goal",
-      );
+      globalToast.error(goalId ? "Failed to update savings goal" : "Failed to add savings goal");
       logger.error("Error saving goal:", error);
     }
   };

@@ -172,8 +172,7 @@ class SyncHealthMonitor {
       const totalTime = this.recentSyncs
         .filter((s) => s.duration)
         .reduce((sum, s) => sum + s.duration, 0);
-      this.metrics.averageSyncTime =
-        totalTime / Math.min(totalSyncs, this.recentSyncs.length);
+      this.metrics.averageSyncTime = totalTime / Math.min(totalSyncs, this.recentSyncs.length);
     }
 
     this.metrics.errorRate = this.getErrorRate();

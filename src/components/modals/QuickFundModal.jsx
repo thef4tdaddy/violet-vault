@@ -60,8 +60,7 @@ const QuickFundModal = ({
           </div>
 
           <h2 className="font-black text-black text-xl mb-2">
-            💰 <span className="text-2xl">Q</span>UICK{" "}
-            <span className="text-2xl">F</span>UND
+            💰 <span className="text-2xl">Q</span>UICK <span className="text-2xl">F</span>UND
           </h2>
 
           <p className="text-purple-900 text-sm leading-relaxed">
