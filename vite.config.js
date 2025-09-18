@@ -376,6 +376,9 @@ export default defineConfig(() => {
       dedupe: ["react", "react-dom"],
       alias: {
         buffer: "buffer",
+        // Use crypto-browserify polyfill for Node.js crypto
+        crypto: "crypto-browserify",
+        "node:crypto": "crypto-browserify",
       },
     },
     // Increase memory limits and optimize for build performance
