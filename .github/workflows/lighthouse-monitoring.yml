@@ -28,7 +28,7 @@ jobs:
       - name: "🔧 Setup Node.js"
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "20"
           cache: "npm"
 
       - name: "📦 Install dependencies"
@@ -125,7 +125,7 @@ jobs:
           # Create timestamped directory for this run
           TIMESTAMP=$(date -u +"%Y-%m-%d_%H-%M-%S")
           BRANCH_NAME="lighthouse-reports"
-          REPORT_DIR="reports/${TIMESTAMP}"
+          REPORT_DIR="reports/${{ github.ref_name }}/${TIMESTAMP}"
 
           # Configure git
           git config user.name "github-actions[bot]"
@@ -141,8 +141,13 @@ jobs:
           # Create report directory structure
           mkdir -p "$REPORT_DIR"
 
-          # Copy reports to timestamped directory
-          cp -r lighthouse-results/* "$REPORT_DIR/"
+          # Copy reports to timestamped directory (if any exist)
+          if [ "$(ls -A lighthouse-results/ 2>/dev/null)" ]; then
+            cp -r lighthouse-results/* "$REPORT_DIR/"
+          else
+            echo "⚠️ No lighthouse results found to copy"
+            echo "lighthouse-run-failed" > "$REPORT_DIR/lighthouse-failed.txt"
+          fi
 
           # Create/update index with latest reports
           cat > README.md << 'EOF'
@@ -159,6 +164,7 @@ jobs:
           echo "" >> README.md
           echo "**Commit:** [\`${{ github.sha }}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})" >> README.md
           echo "**Workflow:** [View Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> README.md
+          echo "**Reports:** [Browse Reports](${{ github.server_url }}/${{ github.repository }}/tree/lighthouse-reports/$REPORT_DIR)" >> README.md
           echo "" >> README.md
 
           # Add report links
