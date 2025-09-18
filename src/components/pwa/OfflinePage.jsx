@@ -20,39 +20,30 @@ const OfflinePage = () => {
             <span className="text-white font-black text-3xl">V</span>
           </div>
           <h1 className="font-black text-black text-3xl mb-2">
-            <span className="text-4xl">V</span>IOLET{" "}
-            <span className="text-4xl">V</span>AULT
+            <span className="text-4xl">V</span>IOLET <span className="text-4xl">V</span>AULT
           </h1>
         </div>
 
         {/* Offline Message */}
         <div className="glassmorphism rounded-lg p-6 border-2 border-black bg-white/80 backdrop-blur-sm mb-6">
-          <div className="mb-4">
-            {getIcon("wifi-off", "w-12 h-12 mx-auto text-gray-600 mb-4")}
-          </div>
+          <div className="mb-4">{getIcon("wifi-off", "w-12 h-12 mx-auto text-gray-600 mb-4")}</div>
 
           <h2 className="font-black text-black text-xl mb-3">
-            <span className="text-2xl">Y</span>OU'RE{" "}
-            <span className="text-2xl">O</span>FFLINE
+            <span className="text-2xl">Y</span>OU'RE <span className="text-2xl">O</span>FFLINE
           </h2>
 
           <p className="text-gray-700 mb-4 text-sm leading-relaxed">
-            This page isn't available offline, but your core budgeting features
-            still work.
+            This page isn't available offline, but your core budgeting features still work.
           </p>
 
           <div className="space-y-3 text-left text-sm">
             <div className="flex items-center space-x-2">
               {getIcon("pie-chart", "w-4 h-4 text-green-600 flex-shrink-0")}
-              <span className="text-gray-700">
-                View your budget and envelopes
-              </span>
+              <span className="text-gray-700">View your budget and envelopes</span>
             </div>
             <div className="flex items-center space-x-2">
               {getIcon("credit-card", "w-4 h-4 text-green-600 flex-shrink-0")}
-              <span className="text-gray-700">
-                Add transactions (queued for sync)
-              </span>
+              <span className="text-gray-700">Add transactions (queued for sync)</span>
             </div>
             <div className="flex items-center space-x-2">
               {getIcon("list", "w-4 h-4 text-green-600 flex-shrink-0")}
@@ -64,15 +55,11 @@ const OfflinePage = () => {
             </div>
             <div className="flex items-center space-x-2">
               {getIcon("bar-chart", "w-4 h-4 text-green-600 flex-shrink-0")}
-              <span className="text-gray-700">
-                View analytics and spending trends
-              </span>
+              <span className="text-gray-700">View analytics and spending trends</span>
             </div>
             <div className="flex items-center space-x-2">
               {getIcon("target", "w-4 h-4 text-green-600 flex-shrink-0")}
-              <span className="text-gray-700">
-                Track savings goals progress
-              </span>
+              <span className="text-gray-700">Track savings goals progress</span>
             </div>
           </div>
         </div>

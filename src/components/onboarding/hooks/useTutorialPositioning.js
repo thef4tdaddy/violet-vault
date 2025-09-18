@@ -66,16 +66,12 @@ export const useTutorialPositioning = () => {
     if (top < 20) {
       top = 20;
       if (position === "top") {
-        transform = transform
-          .replace("translate(", "translate(")
-          .replace("-100%)", "0%)");
+        transform = transform.replace("translate(", "translate(").replace("-100%)", "0%)");
       }
     } else if (top + tooltipHeight > viewportHeight - 20) {
       top = viewportHeight - tooltipHeight - 20;
       if (position === "bottom") {
-        transform = transform
-          .replace("translate(", "translate(")
-          .replace("0%)", "-100%)");
+        transform = transform.replace("translate(", "translate(").replace("0%)", "-100%)");
       }
     }
 

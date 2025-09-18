@@ -13,54 +13,48 @@ import logger from "../../../../utils/common/logger";
  */
 export const useRuleExecution = (_budget) => {
   // Execute a single rule
-  const executeSingleRule = useCallback(
-    async (rule, context, availableCash, executeTransfer) => {
-      logger.debug("Executing single rule", {
-        ruleId: rule.id,
-        name: rule.name,
-        priority: rule.priority,
-        availableCash,
-      });
+  const executeSingleRule = useCallback(async (rule, context, availableCash, executeTransfer) => {
+    logger.debug("Executing single rule", {
+      ruleId: rule.id,
+      name: rule.name,
+      priority: rule.priority,
+      availableCash,
+    });
 
-      // Calculate funding amount considering available cash
-      const fundingAmount = calculateFundingAmount(rule, {
-        ...context,
-        data: { ...context.data, unassignedCash: availableCash },
-      });
+    // Calculate funding amount considering available cash
+    const fundingAmount = calculateFundingAmount(rule, {
+      ...context,
+      data: { ...context.data, unassignedCash: availableCash },
+    });
 
-      if (fundingAmount <= 0) {
-        return {
-          ruleId: rule.id,
-          ruleName: rule.name,
-          success: false,
-          error:
-            availableCash <= 0
-              ? "No funds available"
-              : "Amount calculated as zero",
-          amount: 0,
-          executedAt: new Date().toISOString(),
-        };
-      }
-
-      // Plan and execute transfers
-      const plannedTransfers = planRuleTransfers(rule, fundingAmount);
-
-      for (const transfer of plannedTransfers) {
-        await executeTransfer(transfer);
-      }
-
+    if (fundingAmount <= 0) {
       return {
         ruleId: rule.id,
         ruleName: rule.name,
-        success: true,
-        amount: fundingAmount,
-        transfers: plannedTransfers.length,
-        targetEnvelopes: plannedTransfers.map((t) => t.toEnvelopeId),
+        success: false,
+        error: availableCash <= 0 ? "No funds available" : "Amount calculated as zero",
+        amount: 0,
         executedAt: new Date().toISOString(),
       };
-    },
-    [],
-  );
+    }
+
+    // Plan and execute transfers
+    const plannedTransfers = planRuleTransfers(rule, fundingAmount);
+
+    for (const transfer of plannedTransfers) {
+      await executeTransfer(transfer);
+    }
+
+    return {
+      ruleId: rule.id,
+      ruleName: rule.name,
+      success: true,
+      amount: fundingAmount,
+      transfers: plannedTransfers.length,
+      targetEnvelopes: plannedTransfers.map((t) => t.toEnvelopeId),
+      executedAt: new Date().toISOString(),
+    };
+  }, []);
 
   // Core execution logic with priority handling
   const executeRulesWithContext = useCallback(
@@ -70,9 +64,7 @@ export const useRuleExecution = (_budget) => {
 
       try {
         // Filter and sort rules by priority
-        const executableRules = rules.filter((rule) =>
-          shouldRuleExecute(rule, context),
-        );
+        const executableRules = rules.filter((rule) => shouldRuleExecute(rule, context));
         const sortedRules = sortRulesByPriority(executableRules);
 
         logger.debug("Filtered executable rules", {
@@ -87,12 +79,7 @@ export const useRuleExecution = (_budget) => {
         // Execute each rule in priority order
         for (const rule of sortedRules) {
           try {
-            const result = await executeSingleRule(
-              rule,
-              context,
-              remainingCash,
-              executeTransfer,
-            );
+            const result = await executeSingleRule(rule, context, remainingCash, executeTransfer);
 
             executionResults.push(result);
 
@@ -154,7 +141,7 @@ export const useRuleExecution = (_budget) => {
         };
       }
     },
-    [executeSingleRule],
+    [executeSingleRule]
   );
 
   return {

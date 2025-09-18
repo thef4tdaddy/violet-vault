@@ -5,12 +5,7 @@ import {
   getStatusText,
 } from "../../../utils/sync/syncHealthHelpers";
 
-const SyncStatusIndicator = ({
-  syncStatus,
-  isBackgroundSyncing,
-  onClick,
-  showDetails,
-}) => {
+const SyncStatusIndicator = ({ syncStatus, isBackgroundSyncing, onClick, showDetails }) => {
   const getStatusIcon = () => {
     // Show spinning indicator for loading or background sync activity
     if (syncStatus.isLoading || isBackgroundSyncing) {
@@ -71,10 +66,7 @@ const SyncStatusIndicator = ({
   };
 
   const statusColor = getStatusColor(syncStatus, isBackgroundSyncing);
-  const backgroundColor = getStatusBackgroundColor(
-    syncStatus,
-    isBackgroundSyncing,
-  );
+  const backgroundColor = getStatusBackgroundColor(syncStatus, isBackgroundSyncing);
   const statusText = getStatusText(syncStatus, isBackgroundSyncing);
 
   return (

@@ -4,8 +4,7 @@ import { useBudgetMetadataMutation } from "./useBudgetMetadataMutation";
 import logger from "../../../utils/common/logger";
 
 export const useBudgetMetadataUtils = () => {
-  const { metadata, actualBalance, isActualBalanceManual } =
-    useBudgetMetadataQuery();
+  const { metadata, actualBalance, isActualBalanceManual } = useBudgetMetadataQuery();
   const { mutation: updateMetadataMutation } = useBudgetMetadataMutation();
 
   const setBiweeklyAllocation = useCallback(
@@ -26,7 +25,7 @@ export const useBudgetMetadataUtils = () => {
         return false;
       }
     },
-    [metadata, updateMetadataMutation],
+    [metadata, updateMetadataMutation]
   );
 
   const getBalanceDifference = useCallback(
@@ -34,7 +33,7 @@ export const useBudgetMetadataUtils = () => {
       if (!isActualBalanceManual || !calculatedBalance) return 0;
       return actualBalance - calculatedBalance;
     },
-    [actualBalance, isActualBalanceManual],
+    [actualBalance, isActualBalanceManual]
   );
 
   const shouldConfirmChange = useCallback(
@@ -42,7 +41,7 @@ export const useBudgetMetadataUtils = () => {
       const changeAmount = Math.abs(newBalance - actualBalance);
       return changeAmount >= threshold;
     },
-    [actualBalance],
+    [actualBalance]
   );
 
   const formatBalance = useCallback((balance, options = {}) => {

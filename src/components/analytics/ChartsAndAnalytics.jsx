@@ -50,7 +50,7 @@ const ChartsAnalytics = ({
         envelopeSpending,
         categoryBreakdown,
       },
-      currentUser,
+      currentUser
     );
   };
 

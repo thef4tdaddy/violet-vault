@@ -27,17 +27,14 @@ const SplitAllocationRow = ({
       <div className="col-span-2">
         <div className="relative">
           {React.createElement(getIcon("DollarSign"), {
-            className:
-              "absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-purple-600",
+            className: "absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-purple-600",
           })}
           <input
             type="number"
             step="0.01"
             min="0"
             value={split.amount}
-            onChange={(e) =>
-              onUpdate(split.id, "amount", parseFloat(e.target.value) || 0)
-            }
+            onChange={(e) => onUpdate(split.id, "amount", parseFloat(e.target.value) || 0)}
             className="w-full pl-10 pr-3 py-2 text-sm border-2 border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 glassmorphism backdrop-blur-sm shadow-md focus:shadow-lg transition-all font-bold"
           />
         </div>
@@ -47,8 +44,7 @@ const SplitAllocationRow = ({
       <div className="col-span-3">
         <div className="relative">
           {React.createElement(getIcon("Tag"), {
-            className:
-              "absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-purple-600",
+            className: "absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-purple-600",
           })}
           <select
             value={split.category}

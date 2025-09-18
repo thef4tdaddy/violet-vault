@@ -2,10 +2,7 @@ import { useMemo } from "react";
 import { useTransactionFiltering } from "./useTransactionFiltering";
 import { useTransactionAnalysis } from "./useTransactionAnalysis";
 import { useBillAnalysis } from "./useBillAnalysis";
-import {
-  extractMerchantName,
-  suggestBillCategory,
-} from "../../utils/analytics/categoryPatterns";
+import { extractMerchantName, suggestBillCategory } from "../../utils/analytics/categoryPatterns";
 
 /**
  * Hook for analyzing transaction patterns and suggesting categories
@@ -15,7 +12,7 @@ export const useSmartCategoryAnalysis = (
   transactions = [],
   bills = [],
   dateRange = "6months",
-  analysisSettings = {},
+  analysisSettings = {}
 ) => {
   // Memoize settings to fix dependency issues
   const settings = useMemo(() => {
@@ -31,11 +28,7 @@ export const useSmartCategoryAnalysis = (
 
   // Use focused hooks for analysis
   const filteredTransactions = useTransactionFiltering(transactions, dateRange);
-  const transactionAnalysis = useTransactionAnalysis(
-    filteredTransactions,
-    transactions,
-    settings,
-  );
+  const transactionAnalysis = useTransactionAnalysis(filteredTransactions, transactions, settings);
   const billAnalysis = useBillAnalysis(bills, settings);
 
   return {

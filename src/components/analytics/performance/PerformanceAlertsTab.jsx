@@ -51,14 +51,10 @@ const PerformanceAlertsTab = ({ alerts }) => {
               </div>
               <p className="text-gray-600 text-sm mb-2">{alert.message}</p>
               {alert.action && (
-                <p className="text-purple-600 text-sm font-medium">
-                  💡 {alert.action}
-                </p>
+                <p className="text-purple-600 text-sm font-medium">💡 {alert.action}</p>
               )}
               {alert.details && (
-                <p className="text-gray-500 text-xs mt-2">
-                  Affected: {alert.details}
-                </p>
+                <p className="text-gray-500 text-xs mt-2">Affected: {alert.details}</p>
               )}
             </div>
           </div>

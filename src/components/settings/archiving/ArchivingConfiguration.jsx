@@ -10,9 +10,7 @@ const ArchivingConfiguration = ({
 }) => {
   return (
     <div className="bg-white rounded-xl p-6 border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">
-        Archive Configuration
-      </h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">Archive Configuration</h3>
 
       <div className="space-y-4">
         <div>
@@ -36,8 +34,7 @@ const ArchivingConfiguration = ({
             <option value={60}>60 months (5 years)</option>
           </select>
           <p className="text-xs text-gray-500 mt-1">
-            Transactions older than this period will be archived but analytics
-            will be preserved
+            Transactions older than this period will be archived but analytics will be preserved
           </p>
         </div>
 
@@ -78,10 +75,7 @@ const ArchivingConfiguration = ({
                   disabled={true}
                   className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                 />
-                <label
-                  htmlFor="preserveAnalytics"
-                  className="text-sm text-gray-700"
-                >
+                <label htmlFor="preserveAnalytics" className="text-sm text-gray-700">
                   Preserve analytics data (recommended)
                 </label>
               </div>
@@ -93,10 +87,7 @@ const ArchivingConfiguration = ({
                   disabled={true}
                   className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                 />
-                <label
-                  htmlFor="optimizeDatabase"
-                  className="text-sm text-gray-700"
-                >
+                <label htmlFor="optimizeDatabase" className="text-sm text-gray-700">
                   Optimize database after archiving
                 </label>
               </div>

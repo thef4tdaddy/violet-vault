@@ -34,11 +34,7 @@ const PaycheckProcessor = ({
 
   // Calculate allocation preview
   const preview = formHook.showPreview
-    ? calculatePaycheckAllocation(
-        formHook.paycheckAmount,
-        formHook.allocationMode,
-        envelopes,
-      )
+    ? calculatePaycheckAllocation(formHook.paycheckAmount, formHook.allocationMode, envelopes)
     : null;
 
   return (

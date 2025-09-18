@@ -164,7 +164,7 @@ const NavButton = memo(({ active, to, icon: _Icon, label, viewKey }) => (
           ? "border-t-2 lg:border-b-2 border-purple-500 text-purple-600 bg-purple-50/50 border-purple-400 ring-1 ring-purple-300"
           : "border-transparent text-gray-600 hover:text-purple-600 hover:bg-purple-50/30 hover:border-purple-200"
       }`,
-      "tab",
+      "tab"
     )}
     style={{ minWidth: "80px", minHeight: "44px" }} // Increase minimum tap target for accessibility
   >

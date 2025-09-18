@@ -62,7 +62,7 @@ vi.mock(
       VITE_BUG_REPORT_ENDPOINT: "https://api.test.com/bug-reports",
     },
   }),
-  { virtual: true },
+  { virtual: true }
 );
 
 describe("BugReportService", () => {
@@ -72,9 +72,7 @@ describe("BugReportService", () => {
     // Set up default mock implementations
     ScreenshotService.captureScreenshot.mockResolvedValue("screenshot-data");
     ScreenshotService.getScreenshotInfo.mockReturnValue({ sizeKB: 100 });
-    ScreenshotService.autoCompressScreenshot.mockImplementation((data) =>
-      Promise.resolve(data),
-    );
+    ScreenshotService.autoCompressScreenshot.mockImplementation((data) => Promise.resolve(data));
 
     SystemInfoService.collectSystemInfo.mockResolvedValue({
       browser: { userAgent: "test-agent" },
@@ -145,23 +143,19 @@ describe("BugReportService", () => {
       };
 
       await expect(BugReportService.submitBugReport(options)).rejects.toThrow(
-        "Invalid report data: Title is required",
+        "Invalid report data: Title is required"
       );
     });
 
     it("should handle submission failures gracefully", async () => {
-      BugReportAPIService.submitWithFallbacks.mockRejectedValue(
-        new Error("Submission failed"),
-      );
+      BugReportAPIService.submitWithFallbacks.mockRejectedValue(new Error("Submission failed"));
 
       const options = {
         title: "Test Bug",
         description: "Test description",
       };
 
-      await expect(BugReportService.submitBugReport(options)).rejects.toThrow(
-        "Submission failed",
-      );
+      await expect(BugReportService.submitBugReport(options)).rejects.toThrow("Submission failed");
     });
   });
 
@@ -182,9 +176,7 @@ describe("BugReportService", () => {
     });
 
     it("should handle data collection failures", async () => {
-      SystemInfoService.collectSystemInfo.mockRejectedValue(
-        new Error("Collection failed"),
-      );
+      SystemInfoService.collectSystemInfo.mockRejectedValue(new Error("Collection failed"));
       SystemInfoService.getFallbackSystemInfo.mockReturnValue({
         fallback: true,
       });
@@ -210,15 +202,11 @@ describe("BugReportService", () => {
 
       expect(screenshot).toBe("large-screenshot");
       expect(ScreenshotService.captureScreenshot).toHaveBeenCalled();
-      expect(ScreenshotService.getScreenshotInfo).toHaveBeenCalledWith(
-        "large-screenshot",
-      );
+      expect(ScreenshotService.getScreenshotInfo).toHaveBeenCalledWith("large-screenshot");
     });
 
     it("should handle screenshot capture failure", async () => {
-      ScreenshotService.captureScreenshot.mockRejectedValue(
-        new Error("Capture failed"),
-      );
+      ScreenshotService.captureScreenshot.mockRejectedValue(new Error("Capture failed"));
 
       const screenshot = await BugReportService.captureScreenshotSafely();
 
@@ -236,10 +224,7 @@ describe("BugReportService", () => {
         submissionId: "test-456",
       });
 
-      const result = await BugReportService.submitWithProperScreenshotHandling(
-        reportData,
-        [],
-      );
+      const result = await BugReportService.submitWithProperScreenshotHandling(reportData, []);
 
       expect(result.screenshotStatus).toBeDefined();
       expect(result.screenshotStatus.captured).toBe(true);
@@ -253,10 +238,7 @@ describe("BugReportService", () => {
 
       await BugReportService.submitWithProperScreenshotHandling(reportData, []);
 
-      expect(BugReportAPIService.submitWithFallbacks).toHaveBeenCalledWith(
-        reportData,
-        [],
-      );
+      expect(BugReportAPIService.submitWithFallbacks).toHaveBeenCalledWith(reportData, []);
     });
   });
 
@@ -267,9 +249,7 @@ describe("BugReportService", () => {
         submissionId: "quick-123",
       });
 
-      const result = await BugReportService.quickReport(
-        "Quick bug description",
-      );
+      const result = await BugReportService.quickReport("Quick bug description");
 
       expect(result.success).toBe(true);
       expect(result.submissionId).toBe("quick-123");
@@ -313,9 +293,7 @@ describe("BugReportService", () => {
 
       await BugReportService.saveReportLocally(options, error);
 
-      const savedReports = JSON.parse(
-        localStorage.getItem("violet-vault-bug-reports"),
-      );
+      const savedReports = JSON.parse(localStorage.getItem("violet-vault-bug-reports"));
       expect(savedReports).toHaveLength(1);
       expect(savedReports[0].title).toBe("Local Bug");
       expect(savedReports[0].error).toBe("Submission failed");
@@ -326,13 +304,11 @@ describe("BugReportService", () => {
       for (let i = 0; i < 11; i++) {
         await BugReportService.saveReportLocally(
           { title: `Bug ${i}`, description: `Description ${i}` },
-          new Error("Test error"),
+          new Error("Test error")
         );
       }
 
-      const savedReports = JSON.parse(
-        localStorage.getItem("violet-vault-bug-reports"),
-      );
+      const savedReports = JSON.parse(localStorage.getItem("violet-vault-bug-reports"));
       expect(savedReports).toHaveLength(10);
       expect(savedReports[0].title).toBe("Bug 1"); // First report should be removed
     });
@@ -376,10 +352,7 @@ describe("BugReportService", () => {
 
     it("should retrieve local reports", () => {
       const testReports = [{ title: "Test Report", timestamp: "2023-01-01" }];
-      localStorage.setItem(
-        "violet-vault-bug-reports",
-        JSON.stringify(testReports),
-      );
+      localStorage.setItem("violet-vault-bug-reports", JSON.stringify(testReports));
 
       const reports = BugReportService.getLocalReports();
 
@@ -387,10 +360,7 @@ describe("BugReportService", () => {
     });
 
     it("should clear local reports", () => {
-      localStorage.setItem(
-        "violet-vault-bug-reports",
-        JSON.stringify([{ title: "Test" }]),
-      );
+      localStorage.setItem("violet-vault-bug-reports", JSON.stringify([{ title: "Test" }]));
 
       BugReportService.clearLocalReports();
 

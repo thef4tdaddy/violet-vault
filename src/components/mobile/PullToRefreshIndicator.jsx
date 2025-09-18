@@ -25,9 +25,7 @@ const PullToRefreshIndicator = ({
     >
       <div className="bg-white/90 backdrop-blur-sm rounded-full p-3 border-2 border-black shadow-lg">
         {isRefreshing ? (
-          <div className="animate-spin">
-            {getIcon("RotateCw", "w-6 h-6 text-purple-600")}
-          </div>
+          <div className="animate-spin">{getIcon("RotateCw", "w-6 h-6 text-purple-600")}</div>
         ) : (
           <div
             className={`transition-transform duration-200 ${
@@ -45,11 +43,7 @@ const PullToRefreshIndicator = ({
       {/* Status text */}
       <div className="absolute top-16 left-0 right-0 text-center">
         <p className="text-sm font-medium text-gray-700">
-          {isRefreshing
-            ? "Refreshing..."
-            : isReady
-              ? "Release to refresh"
-              : "Pull to refresh"}
+          {isRefreshing ? "Refreshing..." : isReady ? "Release to refresh" : "Pull to refresh"}
         </p>
       </div>
     </div>

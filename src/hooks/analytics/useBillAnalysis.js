@@ -10,14 +10,8 @@ import {
 
 export const useBillAnalysis = (bills, settings) => {
   return useMemo(() => {
-    const categorizationSuggestions = analyzeBillCategorization(
-      bills,
-      settings,
-    );
-    const optimizationSuggestions = analyzeBillCategoryOptimization(
-      bills,
-      settings,
-    );
+    const categorizationSuggestions = analyzeBillCategorization(bills, settings);
+    const optimizationSuggestions = analyzeBillCategoryOptimization(bills, settings);
 
     return [...categorizationSuggestions, ...optimizationSuggestions];
   }, [bills, settings]);

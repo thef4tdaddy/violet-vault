@@ -52,16 +52,9 @@ export const isRetryableFirebaseError = (errorCode) => {
  * Check if encryption error might be transient
  */
 export const isTransientEncryptionError = (error) => {
-  const transientMessages = [
-    "data is too small",
-    "decrypt",
-    "Invalid key",
-    "Failed to decrypt",
-  ];
+  const transientMessages = ["data is too small", "decrypt", "Invalid key", "Failed to decrypt"];
 
-  return transientMessages.some(
-    (msg) => error.message && error.message.includes(msg),
-  );
+  return transientMessages.some((msg) => error.message && error.message.includes(msg));
 };
 
 /**

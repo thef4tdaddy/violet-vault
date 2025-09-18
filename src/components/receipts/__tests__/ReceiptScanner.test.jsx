@@ -43,16 +43,12 @@ vi.mock("../components/ReceiptErrorState", () => ({
 
 vi.mock("../components/ReceiptImagePreview", () => ({
   default: ({ uploadedImage }) =>
-    uploadedImage ? (
-      <div data-testid="image-preview">Image: {uploadedImage.name}</div>
-    ) : null,
+    uploadedImage ? <div data-testid="image-preview">Image: {uploadedImage.name}</div> : null,
 }));
 
 vi.mock("../components/ReceiptExtractedData", () => ({
   default: ({ extractedData }) => (
-    <div data-testid="extracted-data">
-      Merchant: {extractedData?.merchant || "None"}
-    </div>
+    <div data-testid="extracted-data">Merchant: {extractedData?.merchant || "None"}</div>
   ),
 }));
 
@@ -212,23 +208,16 @@ describe("ReceiptScanner", () => {
     render(<ReceiptScanner {...mockProps} />);
 
     const modal = screen.getByRole("generic").closest(".fixed");
-    expect(modal).toHaveClass(
-      "fixed",
-      "inset-0",
-      "bg-black/50",
-      "backdrop-blur-sm",
-    );
+    expect(modal).toHaveClass("fixed", "inset-0", "bg-black/50", "backdrop-blur-sm");
 
-    const container = screen
-      .getByTestId("receipt-header")
-      .closest(".glassmorphism");
+    const container = screen.getByTestId("receipt-header").closest(".glassmorphism");
     expect(container).toHaveClass(
       "glassmorphism",
       "rounded-lg",
       "border-2",
       "border-black",
       "bg-purple-100/40",
-      "backdrop-blur-3xl",
+      "backdrop-blur-3xl"
     );
   });
 
@@ -246,8 +235,6 @@ describe("ReceiptScanner", () => {
   it("should pass correct props to useReceiptScanner hook", () => {
     render(<ReceiptScanner {...mockProps} />);
 
-    expect(useReceiptScanner).toHaveBeenCalledWith(
-      mockProps.onReceiptProcessed,
-    );
+    expect(useReceiptScanner).toHaveBeenCalledWith(mockProps.onReceiptProcessed);
   });
 });

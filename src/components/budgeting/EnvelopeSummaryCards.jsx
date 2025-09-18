@@ -8,8 +8,7 @@ import PageSummaryCard from "../ui/PageSummaryCard";
  */
 const EnvelopeSummaryCards = ({ totals = {}, _unassignedCash = 0 }) => {
   // Calculate balance after bills
-  const balanceAfterBills =
-    (totals.totalBalance || 0) - (totals.totalUpcoming || 0);
+  const balanceAfterBills = (totals.totalBalance || 0) - (totals.totalUpcoming || 0);
 
   const cards = [
     {

@@ -37,9 +37,7 @@ jest.mock("../../../hooks/security/useSecuritySettingsLogic", () => ({
 // Mock all section components
 jest.mock("../sections/SecurityStatusSection", () => {
   return function SecurityStatusSection() {
-    return (
-      <div data-testid="security-status-section">Security Status Section</div>
-    );
+    return <div data-testid="security-status-section">Security Status Section</div>;
   };
 });
 
@@ -113,9 +111,7 @@ describe("SecuritySettings (Refactored)", () => {
     render(<SecuritySettings {...defaultProps} />);
 
     expect(screen.getByText("SECURITY SETTINGS")).toBeInTheDocument();
-    expect(
-      screen.getByText("🔐 Configure app security and privacy options"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("🔐 Configure app security and privacy options")).toBeInTheDocument();
   });
 
   it("should apply correct styling classes", () => {
@@ -131,9 +127,7 @@ describe("SecuritySettings (Refactored)", () => {
     render(<SecuritySettings {...defaultProps} />);
 
     // Verify the modal structure
-    const modal = screen
-      .getByText("SECURITY SETTINGS")
-      .closest(".glassmorphism");
+    const modal = screen.getByText("SECURITY SETTINGS").closest(".glassmorphism");
     expect(modal).toHaveClass("rounded-3xl");
     expect(modal).toHaveClass("border-2", "border-black");
   });

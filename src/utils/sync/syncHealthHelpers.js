@@ -139,8 +139,7 @@ export const requiresImmediateAttention = (syncStatus) => {
  */
 export const hasRecoveryActions = () => {
   return (
-    typeof window !== "undefined" &&
-    (window.runMasterSyncValidation || window.forceCloudDataReset)
+    typeof window !== "undefined" && (window.runMasterSyncValidation || window.forceCloudDataReset)
   );
 };
 

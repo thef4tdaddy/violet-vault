@@ -10,73 +10,31 @@ import { getBillIcon } from "./billIcons.js";
  */
 export const BILL_PATTERNS = {
   utilities: {
-    keywords: [
-      "electric",
-      "electricity",
-      "power",
-      "gas",
-      "water",
-      "sewer",
-      "utility",
-      "energy",
-    ],
+    keywords: ["electric", "electricity", "power", "gas", "water", "sewer", "utility", "energy"],
     category: "Utilities",
     recurring: true,
     confidence: 0.9,
   },
   internet: {
-    keywords: [
-      "internet",
-      "wifi",
-      "broadband",
-      "comcast",
-      "verizon",
-      "att",
-      "spectrum",
-      "cox",
-    ],
+    keywords: ["internet", "wifi", "broadband", "comcast", "verizon", "att", "spectrum", "cox"],
     category: "Internet & Phone",
     recurring: true,
     confidence: 0.9,
   },
   phone: {
-    keywords: [
-      "mobile",
-      "cell",
-      "wireless",
-      "phone",
-      "tmobile",
-      "sprint",
-      "verizon",
-      "att",
-    ],
+    keywords: ["mobile", "cell", "wireless", "phone", "tmobile", "sprint", "verizon", "att"],
     category: "Internet & Phone",
     recurring: true,
     confidence: 0.85,
   },
   streaming: {
-    keywords: [
-      "netflix",
-      "spotify",
-      "disney",
-      "hulu",
-      "prime",
-      "apple music",
-      "youtube premium",
-    ],
+    keywords: ["netflix", "spotify", "disney", "hulu", "prime", "apple music", "youtube premium"],
     category: "Entertainment",
     recurring: true,
     confidence: 0.95,
   },
   insurance: {
-    keywords: [
-      "insurance",
-      "state farm",
-      "geico",
-      "progressive",
-      "allstate",
-      "farmers",
-    ],
+    keywords: ["insurance", "state farm", "geico", "progressive", "allstate", "farmers"],
     category: "Insurance",
     recurring: true,
     confidence: 0.9,
@@ -88,13 +46,7 @@ export const BILL_PATTERNS = {
     confidence: 0.95,
   },
   mortgage: {
-    keywords: [
-      "mortgage",
-      "loan payment",
-      "wells fargo",
-      "chase",
-      "bank of america",
-    ],
+    keywords: ["mortgage", "loan payment", "wells fargo", "chase", "bank of america"],
     category: "Housing",
     recurring: true,
     confidence: 0.9,
@@ -104,23 +56,16 @@ export const BILL_PATTERNS = {
 /**
  * Analyze transactions to find potential recurring bills
  */
-export const analyzeTransactionsForBills = (
-  transactions,
-  existingBills = [],
-) => {
+export const analyzeTransactionsForBills = (transactions, existingBills = []) => {
   const potentialBills = [];
   const existingBillDescriptions = new Set(
-    existingBills.map(
-      (bill) => bill.description?.toLowerCase() || bill.provider?.toLowerCase(),
-    ),
+    existingBills.map((bill) => bill.description?.toLowerCase() || bill.provider?.toLowerCase())
   );
 
   // Group similar transactions by description/merchant
   const transactionGroups = groupSimilarTransactions(transactions);
 
-  for (const [groupKey, transactionGroup] of Object.entries(
-    transactionGroups,
-  )) {
+  for (const [groupKey, transactionGroup] of Object.entries(transactionGroups)) {
     // Skip if we already have this bill
     if (existingBillDescriptions.has(groupKey.toLowerCase())) {
       continue;
@@ -134,9 +79,7 @@ export const analyzeTransactionsForBills = (
   }
 
   // Sort by confidence and limit results
-  return potentialBills
-    .sort((a, b) => b.confidence - a.confidence)
-    .slice(0, 10);
+  return potentialBills.sort((a, b) => b.confidence - a.confidence).slice(0, 10);
 };
 
 /**
@@ -148,9 +91,7 @@ const groupSimilarTransactions = (transactions) => {
   transactions.forEach((transaction) => {
     if (!transaction.amount || transaction.amount >= 0) return; // Only negative amounts (expenses)
 
-    const normalizedDesc = normalizeTransactionDescription(
-      transaction.description,
-    );
+    const normalizedDesc = normalizeTransactionDescription(transaction.description);
     if (!normalizedDesc) return;
 
     if (!groups[normalizedDesc]) {
@@ -199,8 +140,7 @@ const analyzeTransactionGroup = (transactions, groupKey) => {
     intervals.push(daysDiff);
   }
 
-  const avgInterval =
-    intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length;
+  const avgInterval = intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length;
 
   // Determine if it's truly recurring (monthly, weekly, etc.)
   const isMonthlyRecurring = avgInterval >= 25 && avgInterval <= 35;
@@ -213,8 +153,7 @@ const analyzeTransactionGroup = (transactions, groupKey) => {
 
   // Calculate average amount
   const amounts = transactions.map((t) => Math.abs(t.amount));
-  const avgAmount =
-    amounts.reduce((sum, amount) => sum + amount, 0) / amounts.length;
+  const avgAmount = amounts.reduce((sum, amount) => sum + amount, 0) / amounts.length;
   const amountVariation = Math.max(...amounts) - Math.min(...amounts);
 
   // Pattern matching for bill type
@@ -252,11 +191,7 @@ const analyzeTransactionGroup = (transactions, groupKey) => {
     amount: Math.round(avgAmount * 100) / 100,
     dueDate: nextDueDate.toISOString().split("T")[0],
     category: detectedPattern?.category || "Bills & Utilities",
-    frequency: isMonthlyRecurring
-      ? "monthly"
-      : isWeeklyRecurring
-        ? "weekly"
-        : "biweekly",
+    frequency: isMonthlyRecurring ? "monthly" : isWeeklyRecurring ? "weekly" : "biweekly",
     confidence,
     source: "auto_discovery",
     discoveryData: {
@@ -271,8 +206,7 @@ const analyzeTransactionGroup = (transactions, groupKey) => {
       })),
     },
     iconName:
-      detectedPattern?.iconName ||
-      getBillIcon(groupKey, "", detectedPattern?.category || "").name,
+      detectedPattern?.iconName || getBillIcon(groupKey, "", detectedPattern?.category || "").name,
     metadata: {
       detectedPattern: detectedPattern?.keywords || [],
       confidence: confidence,
@@ -288,9 +222,7 @@ const detectBillPattern = (description) => {
   const lowerDesc = description.toLowerCase();
 
   for (const [patternName, pattern] of Object.entries(BILL_PATTERNS)) {
-    const matchedKeywords = pattern.keywords.filter((keyword) =>
-      lowerDesc.includes(keyword),
-    );
+    const matchedKeywords = pattern.keywords.filter((keyword) => lowerDesc.includes(keyword));
 
     if (matchedKeywords.length > 0) {
       return {
@@ -361,9 +293,7 @@ const findBestEnvelopeForBill = (bill, envelopes) => {
     const billWords = billDesc.split(" ");
     const envelopeWords = envelopeName.split(" ");
     const commonWords = billWords.filter(
-      (word) =>
-        word.length > 3 &&
-        envelopeWords.some((envWord) => envWord.includes(word)),
+      (word) => word.length > 3 && envelopeWords.some((envWord) => envWord.includes(word))
     );
     score += commonWords.length * 0.3;
 

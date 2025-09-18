@@ -49,18 +49,12 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
         {/* Key Metrics */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <p className="text-base font-medium text-gray-600 mb-1">
-              Total Debt
-            </p>
-            <p className="text-2xl font-bold text-red-600">
-              ${debtStats.totalDebt.toFixed(2)}
-            </p>
+            <p className="text-base font-medium text-gray-600 mb-1">Total Debt</p>
+            <p className="text-2xl font-bold text-red-600">${debtStats.totalDebt.toFixed(2)}</p>
           </div>
 
           <div>
-            <p className="text-base font-medium text-gray-600 mb-1">
-              Monthly Payments
-            </p>
+            <p className="text-base font-medium text-gray-600 mb-1">Monthly Payments</p>
             <p className="text-2xl font-bold text-orange-600">
               ${debtStats.totalMonthlyPayments.toFixed(2)}
             </p>
@@ -70,9 +64,7 @@ const DebtSummaryWidget = ({ onNavigateToDebts }) => {
         {/* Average Interest Rate */}
         {debtStats.averageInterestRate > 0 && (
           <div>
-            <p className="text-base font-medium text-gray-600 mb-1">
-              Avg Interest Rate
-            </p>
+            <p className="text-base font-medium text-gray-600 mb-1">Avg Interest Rate</p>
             <p className="text-lg font-bold text-purple-600">
               {debtStats.averageInterestRate.toFixed(2)}% APR
             </p>

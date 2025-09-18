@@ -25,9 +25,7 @@ export const useBugReportScreenshot = () => {
         });
         return screenshotData;
       } else {
-        logger.warn(
-          "ScreenshotService returned null, screenshot capture failed",
-        );
+        logger.warn("ScreenshotService returned null, screenshot capture failed");
         return null;
       }
     } catch (error) {
