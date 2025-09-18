@@ -390,12 +390,19 @@ export default defineConfig(() => {
         overlay: false, // Disable error overlay for better performance
       },
     },
+    optimizeDeps: {
+      include: [
+        "crypto-browserify",
+        "stream-browserify",
+        "util",
+        "process",
+        "buffer",
+        "bip39"
+      ]
+    },
     define: {
       "process.env": {},
       global: "globalThis",
-      // Add Buffer and process globals for crypto-browserify
-      Buffer: "Buffer",
-      process: "process",
       // Inject git information as environment variables
       "import.meta.env.VITE_GIT_BRANCH": JSON.stringify(gitInfo.branch),
       "import.meta.env.VITE_GIT_COMMIT_DATE": JSON.stringify(
@@ -496,6 +503,8 @@ export default defineConfig(() => {
           moduleSideEffects: ["**/*.css", "**/*.scss", "**/*.sass"],
           propertyReadSideEffects: false,
         },
+        // Add external dependencies to prevent crypto issues
+        external: [],
       },
       // Terser options - only applied to production builds (when minify: "terser")
       terserOptions: isDevelopmentMode
