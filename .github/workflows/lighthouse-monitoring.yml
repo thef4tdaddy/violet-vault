@@ -212,6 +212,57 @@ jobs:
           # Create report directory structure
           mkdir -p "$REPORT_DIR"
 
+          # Archive old reports (older than 7 days)
+          echo "🗄️ Archiving reports older than 7 days..."
+          CUTOFF_DATE=$(date -u -d '7 days ago' '+%Y-%m-%d_%H-%M-%S' 2>/dev/null || date -u -v-7d '+%Y-%m-%d_%H-%M-%S' 2>/dev/null || echo "")
+
+          if [ -n "$CUTOFF_DATE" ]; then
+            # Find and archive old report directories
+            for branch_dir in reports/*/; do
+              if [ -d "$branch_dir" ]; then
+                branch_name=$(basename "$branch_dir")
+                echo "Checking branch: $branch_name"
+
+                # Count total reports before cleanup
+                TOTAL_REPORTS=$(find "$branch_dir" -type d -name "20*" | wc -l || echo "0")
+
+                # Find old directories to archive
+                OLD_DIRS=$(find "$branch_dir" -type d -name "20*" | while read dir; do
+                  dir_date=$(basename "$dir")
+                  if [ "$dir_date" \< "$CUTOFF_DATE" ]; then
+                    echo "$dir"
+                  fi
+                done)
+
+                if [ -n "$OLD_DIRS" ]; then
+                  echo "Archiving old reports for $branch_name..."
+
+                  # Create archive directory
+                  ARCHIVE_DIR="archived/$branch_name"
+                  mkdir -p "$ARCHIVE_DIR"
+
+                  # Move old directories to archive
+                  echo "$OLD_DIRS" | while read old_dir; do
+                    if [ -d "$old_dir" ]; then
+                      echo "  Archiving: $(basename "$old_dir")"
+                      mv "$old_dir" "$ARCHIVE_DIR/"
+                    fi
+                  done
+
+                  # Count remaining reports
+                  REMAINING_REPORTS=$(find "$branch_dir" -type d -name "20*" | wc -l || echo "0")
+                  ARCHIVED_COUNT=$((TOTAL_REPORTS - REMAINING_REPORTS))
+
+                  echo "  ✅ Archived $ARCHIVED_COUNT reports, keeping $REMAINING_REPORTS recent reports"
+                else
+                  echo "  ✅ No old reports to archive for $branch_name"
+                fi
+              fi
+            done
+          else
+            echo "  ⚠️ Could not determine cutoff date for archiving"
+          fi
+
           # Copy reports to timestamped directory (if any exist)
           if [ "$(ls -A lighthouse-results/ 2>/dev/null)" ]; then
             cp -r lighthouse-results/* "$REPORT_DIR/"
@@ -300,9 +351,31 @@ jobs:
 
           Automated performance monitoring reports for Violet Vault.
 
+          **📋 Retention Policy:** Reports are automatically archived after 7 days to keep this branch manageable.
+
           ## Latest Reports
 
           EOF
+
+          # Add archiving summary if archives exist
+          if [ -d "archived" ] && [ "$(ls -A archived/ 2>/dev/null)" ]; then
+            echo "" >> README.md
+            echo "## 🗄️ Archived Reports" >> README.md
+            echo "" >> README.md
+            echo "Older reports (>7 days) are archived to maintain performance:" >> README.md
+            echo "" >> README.md
+
+            for archive_branch in archived/*/; do
+              if [ -d "$archive_branch" ]; then
+                branch_name=$(basename "$archive_branch")
+                archive_count=$(find "$archive_branch" -type d -name "20*" | wc -l || echo "0")
+                if [ "$archive_count" -gt 0 ]; then
+                  echo "- **$branch_name**: $archive_count archived reports" >> README.md
+                fi
+              fi
+            done
+            echo "" >> README.md
+          fi
 
           # Add this run to the index
           echo "### $(date -u '+%Y-%m-%d %H:%M:%S UTC') - ${{ github.ref_name }}" >> README.md
