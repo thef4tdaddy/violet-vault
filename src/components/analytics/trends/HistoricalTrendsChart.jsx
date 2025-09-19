@@ -29,30 +29,30 @@ const HistoricalTrendsChart = ({ spendingTrends = [] }) => {
         {hasData ? (
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={spendingTrends}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip formatter={tooltipFormatter} labelFormatter={(month) => `Month: ${month}`} />
-            <Legend />
-            <Area
-              type="monotone"
-              dataKey="income"
-              fill={CHART_COLORS.INCOME}
-              fillOpacity={0.3}
-              stroke={CHART_COLORS.INCOME}
-              name="Income"
-            />
-            <Bar dataKey="spending" fill={CHART_COLORS.SPENDING} name="Spending" />
-            <Line
-              type="monotone"
-              dataKey="net"
-              stroke={CHART_COLORS.NET}
-              strokeWidth={3}
-              strokeDasharray={(entry) => (entry?.forecast ? "5 5" : "none")}
-              name="Net Amount"
-            />
-          </ComposedChart>
-        </ResponsiveContainer>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip formatter={tooltipFormatter} labelFormatter={(month) => `Month: ${month}`} />
+              <Legend />
+              <Area
+                type="monotone"
+                dataKey="income"
+                fill={CHART_COLORS.INCOME}
+                fillOpacity={0.3}
+                stroke={CHART_COLORS.INCOME}
+                name="Income"
+              />
+              <Bar dataKey="spending" fill={CHART_COLORS.SPENDING} name="Spending" />
+              <Line
+                type="monotone"
+                dataKey="net"
+                stroke={CHART_COLORS.NET}
+                strokeWidth={3}
+                strokeDasharray={(entry) => (entry?.forecast ? "5 5" : "none")}
+                name="Net Amount"
+              />
+            </ComposedChart>
+          </ResponsiveContainer>
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-gray-500">
             {React.createElement(getIcon("BarChart3"), {
@@ -65,20 +65,20 @@ const HistoricalTrendsChart = ({ spendingTrends = [] }) => {
       </div>
       {hasData && (
         <div className="mt-4 flex items-center gap-4 text-sm text-purple-900">
-        <div className="flex items-center gap-2">
-          <div
-            className="w-3 h-3 bg-gray-400 rounded border border-black"
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(45deg, transparent, transparent 2px, white 2px, white 4px)",
-            }}
-          ></div>
-          <span>Forecasted Data</span>
-        </div>
-        {React.createElement(getIcon("Info"), {
-          className: "h-4 w-4",
-        })}
-        <span>Last 3 months are projected based on historical trends</span>
+          <div className="flex items-center gap-2">
+            <div
+              className="w-3 h-3 bg-gray-400 rounded border border-black"
+              style={{
+                backgroundImage:
+                  "repeating-linear-gradient(45deg, transparent, transparent 2px, white 2px, white 4px)",
+              }}
+            ></div>
+            <span>Forecasted Data</span>
+          </div>
+          {React.createElement(getIcon("Info"), {
+            className: "h-4 w-4",
+          })}
+          <span>Last 3 months are projected based on historical trends</span>
         </div>
       )}
     </div>

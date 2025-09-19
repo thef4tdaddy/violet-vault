@@ -64,7 +64,9 @@ const HomePage = () => {
             className="glassmorphism rounded-lg p-6 border-2 border-black bg-white/80 backdrop-blur-sm text-center"
           >
             <div className="w-16 h-16 mx-auto mb-4 bg-purple-100 rounded-full flex items-center justify-center border-2 border-black">
-              {React.createElement(getIcon(icon.charAt(0).toUpperCase() + icon.slice(1)), { className: "w-8 h-8 text-purple-600" })}
+              {React.createElement(getIcon(icon.charAt(0).toUpperCase() + icon.slice(1)), {
+                className: "w-8 h-8 text-purple-600",
+              })}
             </div>
             <h3 className="font-black text-black text-base mb-3">
               <span className="text-lg">{title.charAt(0)}</span>
