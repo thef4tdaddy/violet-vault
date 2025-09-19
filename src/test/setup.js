@@ -19,6 +19,27 @@ const mockGetRandomValues = vi.fn((array) => {
   return array;
 });
 
+// Mock crypto.subtle.digest with proper implementation
+const mockDigest = vi.fn(async (algorithm, data) => {
+  // Create a simple deterministic hash for testing
+  let hash = 0;
+  const uint8Array = new Uint8Array(data);
+  for (let i = 0; i < uint8Array.length; i++) {
+    hash = (hash * 31 + uint8Array[i]) % 0xffffffff;
+  }
+
+  // Convert to a 32-byte array (256 bits for SHA-256)
+  const result = new ArrayBuffer(32);
+  const view = new DataView(result);
+
+  // Fill with deterministic pattern based on hash
+  for (let i = 0; i < 8; i++) {
+    view.setUint32(i * 4, hash + i, false);
+  }
+
+  return result;
+});
+
 Object.defineProperty(global, "crypto", {
   value: {
     getRandomValues: mockGetRandomValues,
@@ -28,7 +49,7 @@ Object.defineProperty(global, "crypto", {
       generateKey: vi.fn(),
       exportKey: vi.fn(),
       importKey: vi.fn(),
-      digest: vi.fn(), // Added this line
+      digest: mockDigest,
     },
   },
   writable: true,
