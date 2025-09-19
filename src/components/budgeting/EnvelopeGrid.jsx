@@ -122,7 +122,6 @@ const UnifiedEnvelopeManager = ({
   const {
     isPulling,
     isRefreshing,
-    pullDistance,
     pullProgress,
     isReady,
     touchHandlers,
