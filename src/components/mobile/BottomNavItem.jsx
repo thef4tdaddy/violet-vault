@@ -6,7 +6,7 @@ import { hapticFeedback } from "../../utils/ui/touchFeedback";
  * Individual navigation item for bottom navigation bar
  * Touch-optimized with haptic feedback and smooth animations
  */
-const BottomNavItem = ({ to, icon: Icon, label, isActive }) => {
+const BottomNavItem = ({ to, icon: _Icon, label, isActive }) => {
   const handleClick = () => {
     hapticFeedback("light");
   };
@@ -30,7 +30,7 @@ const BottomNavItem = ({ to, icon: Icon, label, isActive }) => {
           ${isActive ? "scale-110" : "scale-100"}
         `}
       >
-        <Icon className="w-5 h-5" />
+        <_Icon className="w-5 h-5" />
       </div>
 
       {/* Label with conditional visibility */}

@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { getIcon } from "../../utils";
 import { useBulkBillUpdate } from "../../hooks/bills/useBulkBillUpdate";
 import {
   calculateUpdateSummary,
