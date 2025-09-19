@@ -1,0 +1,285 @@
+import React, { useState } from "react";
+import { getIcon } from "../../../utils";
+import { useFirebaseMessaging } from "../../../hooks/notifications/useFirebaseMessaging";
+import logger from "../../../utils/common/logger";
+
+/**
+ * Notification Settings Section
+ * Manages push notification preferences and FCM token
+ */
+const NotificationSettingsSection = () => {
+  const {
+    isInitialized,
+    isLoading,
+    token,
+    permissionStatus,
+    error,
+    requestPermissionAndGetToken,
+    clearToken,
+    handlePermissionDenied,
+    handlePromptDismissed,
+    sendTestMessage,
+    isAvailable,
+    hasToken,
+    canRequestPermission,
+    isSupported,
+    getServiceStatus,
+  } = useFirebaseMessaging();
+
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [isTestingMessage, setIsTestingMessage] = useState(false);
+
+  // Handle enable notifications
+  const handleEnableNotifications = async () => {
+    try {
+      const result = await requestPermissionAndGetToken();
+
+      if (result.success) {
+        logger.info("✅ Notifications enabled successfully");
+      } else {
+        logger.warn("❌ Failed to enable notifications:", result.reason);
+
+        if (result.reason === "permission_denied") {
+          handlePermissionDenied();
+        }
+      }
+    } catch (err) {
+      logger.error("Error enabling notifications:", err);
+    }
+  };
+
+  // Handle disable notifications
+  const handleDisableNotifications = () => {
+    clearToken();
+    logger.info("🔕 Notifications disabled");
+  };
+
+  // Handle test message
+  const handleTestMessage = async () => {
+    setIsTestingMessage(true);
+    try {
+      const success = await sendTestMessage();
+      if (success) {
+        logger.info("🧪 Test message token logged - check console");
+      }
+    } catch (err) {
+      logger.error("Failed to send test message:", err);
+    } finally {
+      setIsTestingMessage(false);
+    }
+  };
+
+  // Render permission status indicator
+  const renderPermissionStatus = () => {
+    if (!permissionStatus) return null;
+
+    const { status, granted, denied, isSupported: supported } = permissionStatus;
+
+    if (!supported) {
+      return (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex items-start space-x-3">
+            {getIcon("alert-triangle", "w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5")}
+            <div>
+              <p className="font-medium text-yellow-800">Not Supported</p>
+              <p className="text-sm text-yellow-700 mt-1">
+                Push notifications are not supported in your current browser or device.
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (granted) {
+      return (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="flex items-start space-x-3">
+            {getIcon("check-circle", "w-5 h-5 text-green-600 flex-shrink-0 mt-0.5")}
+            <div className="flex-1">
+              <p className="font-medium text-green-800">Notifications Enabled</p>
+              <p className="text-sm text-green-700 mt-1">
+                You'll receive push notifications for important updates.
+              </p>
+              {hasToken && (
+                <p className="text-xs text-green-600 mt-2 font-mono">
+                  Token: {token.substring(0, 20)}...
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (denied) {
+      return (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-start space-x-3">
+            {getIcon("x-circle", "w-5 h-5 text-red-600 flex-shrink-0 mt-0.5")}
+            <div>
+              <p className="font-medium text-red-800">Notifications Blocked</p>
+              <p className="text-sm text-red-700 mt-1">
+                Notifications have been blocked. To enable them, you'll need to update your browser
+                settings.
+              </p>
+              {permissionStatus.instructions && (
+                <div className="mt-3 p-3 bg-red-100 rounded border">
+                  <p className="font-medium text-red-800 text-sm">
+                    Instructions for {permissionStatus.instructions.browser}:
+                  </p>
+                  <ol className="list-decimal list-inside text-sm text-red-700 mt-2 space-y-1">
+                    {permissionStatus.instructions.steps.map((step, index) => (
+                      <li key={index}>{step}</li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Default/not requested
+    return (
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="flex items-start space-x-3">
+          {getIcon("bell", "w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5")}
+          <div>
+            <p className="font-medium text-blue-800">Enable Notifications</p>
+            <p className="text-sm text-blue-700 mt-1">
+              Get notified about important budget updates, bill reminders, and account activity.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render advanced debugging info
+  const renderAdvancedInfo = () => {
+    if (!showAdvanced) return null;
+
+    const status = getServiceStatus();
+
+    return (
+      <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
+        <h4 className="font-medium text-gray-900 mb-3">Debug Information</h4>
+        <div className="space-y-2 text-sm font-mono">
+          <div>Service Status: {JSON.stringify(status, null, 2)}</div>
+          <div>Permission Status: {JSON.stringify(permissionStatus, null, 2)}</div>
+          {error && <div className="text-red-600">Error: {error}</div>}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h3 className="font-black text-black text-base">
+          🔔 <span className="text-lg">N</span>OTIFICATION <span className="text-lg">S</span>ETTINGS
+        </h3>
+        <p className="text-purple-900 text-sm mt-1">
+          Manage push notifications and alerts for your budget management.
+        </p>
+      </div>
+
+      {/* Initialization Status */}
+      {!isInitialized && !isLoading && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex items-center space-x-2">
+            {getIcon("loader", "w-4 h-4 text-yellow-600 animate-spin")}
+            <span className="text-yellow-800 text-sm">Initializing notification service...</span>
+          </div>
+        </div>
+      )}
+
+      {/* Permission Status */}
+      {renderPermissionStatus()}
+
+      {/* Action Buttons */}
+      {isSupported && (
+        <div className="flex flex-wrap gap-3">
+          {!hasToken && canRequestPermission && (
+            <button
+              onClick={handleEnableNotifications}
+              disabled={isLoading}
+              className="bg-purple-600 text-white px-4 py-2 rounded-lg border-2 border-black shadow-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+            >
+              {isLoading ? getIcon("loader", "w-4 h-4 animate-spin") : getIcon("bell", "w-4 h-4")}
+              <span>Enable Notifications</span>
+            </button>
+          )}
+
+          {hasToken && (
+            <>
+              <button
+                onClick={handleDisableNotifications}
+                className="bg-gray-600 text-white px-4 py-2 rounded-lg border-2 border-black shadow-lg hover:bg-gray-700 flex items-center space-x-2"
+              >
+                {getIcon("bell-off", "w-4 h-4")}
+                <span>Disable Notifications</span>
+              </button>
+
+              <button
+                onClick={handleTestMessage}
+                disabled={isTestingMessage}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg border-2 border-black shadow-lg hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
+              >
+                {isTestingMessage
+                  ? getIcon("loader", "w-4 h-4 animate-spin")
+                  : getIcon("send", "w-4 h-4")}
+                <span>Test Message</span>
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Notification Preferences */}
+      {hasToken && (
+        <div className="bg-white rounded-lg border-2 border-black p-4">
+          <h4 className="font-bold text-gray-900 mb-3">Notification Preferences</h4>
+          <div className="space-y-3">
+            <label className="flex items-center space-x-3">
+              <input type="checkbox" defaultChecked className="w-4 h-4 text-purple-600" />
+              <span className="text-sm text-gray-700">Bill payment reminders</span>
+            </label>
+            <label className="flex items-center space-x-3">
+              <input type="checkbox" defaultChecked className="w-4 h-4 text-purple-600" />
+              <span className="text-sm text-gray-700">Budget alerts and warnings</span>
+            </label>
+            <label className="flex items-center space-x-3">
+              <input type="checkbox" defaultChecked className="w-4 h-4 text-purple-600" />
+              <span className="text-sm text-gray-700">Account activity notifications</span>
+            </label>
+            <label className="flex items-center space-x-3">
+              <input type="checkbox" className="w-4 h-4 text-purple-600" />
+              <span className="text-sm text-gray-700">Weekly budget summaries</span>
+            </label>
+          </div>
+        </div>
+      )}
+
+      {/* Advanced Debug Toggle */}
+      <div className="pt-4 border-t border-gray-200">
+        <button
+          onClick={() => setShowAdvanced(!showAdvanced)}
+          className="text-sm text-gray-500 hover:text-gray-700 flex items-center space-x-1"
+        >
+          {getIcon(
+            "chevron-right",
+            `w-4 h-4 transition-transform ${showAdvanced ? "rotate-90" : ""}`
+          )}
+          <span>Advanced Debug Info</span>
+        </button>
+        {renderAdvancedInfo()}
+      </div>
+    </div>
+  );
+};
+
+export default NotificationSettingsSection;
