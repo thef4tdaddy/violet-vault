@@ -61,7 +61,7 @@ const DebtCard = ({ debt, onClick, _onRecordPayment }) => {
           {/* Icon and Type */}
           <div className="flex-shrink-0">
             <div className={`p-3 rounded-2xl ${config.bgColor}`}>
-              <IconComponent className={`h-6 w-6 ${config.textColor}`} />
+              {React.createElement(getIcon(IconComponent), { className: `h-6 w-6 ${config.textColor}` })}
             </div>
           </div>
 

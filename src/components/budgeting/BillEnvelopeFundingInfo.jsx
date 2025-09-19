@@ -116,7 +116,7 @@ const BillEnvelopeFundingInfo = memo(({ envelope, bills = [], showDetails = fals
         <div className="mt-3 pt-2 border-t border-gray-200">
           <div className="grid grid-cols-2 gap-2 text-xs mb-2">
             <div className="flex items-center space-x-1">
-              <Receipt className="h-3 w-3 text-gray-400" />
+              {React.createElement(getIcon('Receipt'), { className: 'h-3 w-3 text-gray-400' })}
               <span className="text-gray-600">
                 {displayInfo.linkedBills} linked bill
                 {displayInfo.linkedBills !== 1 ? "s" : ""}
@@ -124,7 +124,7 @@ const BillEnvelopeFundingInfo = memo(({ envelope, bills = [], showDetails = fals
             </div>
             {upcomingBillsAmount > 0 && (
               <div className="flex items-center space-x-1">
-                <Target className="h-3 w-3 text-gray-400" />
+                {React.createElement(getIcon('Target'), { className: 'h-3 w-3 text-gray-400' })}
                 <span className="text-gray-600">${upcomingBillsAmount.toFixed(2)} due (30d)</span>
               </div>
             )}
@@ -134,7 +134,7 @@ const BillEnvelopeFundingInfo = memo(({ envelope, bills = [], showDetails = fals
           {remainingToFund > 0 && targetMonthlyAmount > 0 && (
             <div className="bg-blue-50 p-2 rounded text-xs">
               <div className="flex items-center space-x-1 mb-1">
-                <TrendingUp className="h-3 w-3 text-blue-600" />
+                {React.createElement(getIcon('TrendingUp'), { className: 'h-3 w-3 text-blue-600' })}
                 <span className="font-medium text-blue-700">Funding Recommendations</span>
               </div>
               <div className="text-blue-600 space-y-1">
@@ -158,7 +158,7 @@ const BillEnvelopeFundingInfo = memo(({ envelope, bills = [], showDetails = fals
           {currentBalance > targetMonthlyAmount && targetMonthlyAmount > 0 && (
             <div className="bg-green-50 p-2 rounded text-xs">
               <div className="flex items-center space-x-1 mb-1">
-                <CheckCircle className="h-3 w-3 text-green-600" />
+                {React.createElement(getIcon('CheckCircle'), { className: 'h-3 w-3 text-green-600' })}
                 <span className="font-medium text-green-700">Well Funded</span>
               </div>
               <div className="text-green-600">
