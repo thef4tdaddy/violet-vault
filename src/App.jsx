@@ -13,18 +13,22 @@ import PatchNotesModal from "./components/pwa/PatchNotesModal";
 import OfflineStatusIndicator from "./components/pwa/OfflineStatusIndicator";
 import pwaManager from "./utils/pwa/pwaManager";
 import useUiStore from "./stores/ui/uiStore";
+import { initializeTouchFeedback } from "./utils/ui/touchFeedback";
 
 // Lazy load monitoring to reduce main bundle size
 const HighlightLoader = React.lazy(() => import("./components/monitoring/HighlightLoader"));
 
 const App = () => {
-  // Initialize PWA manager
+  // Initialize PWA manager and touch feedback
   useEffect(() => {
     const initializePWA = async () => {
       await pwaManager.initialize(useUiStore.getState());
     };
 
     initializePWA();
+
+    // Initialize haptic feedback for mobile interactions
+    initializeTouchFeedback();
   }, []);
 
   return (

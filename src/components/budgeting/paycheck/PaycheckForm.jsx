@@ -1,5 +1,6 @@
 import React from "react";
 import { getIcon } from "../../../utils";
+import { useTouchFeedback } from "../../../utils/ui/touchFeedback";
 
 const PaycheckForm = ({
   formData,
@@ -13,6 +14,9 @@ const PaycheckForm = ({
   onProcess,
   onReset,
 }) => {
+  // Enhanced haptic feedback for success actions
+  const successFeedback = useTouchFeedback("success", "success");
+
   const handlePayerChange = (payerName) => {
     onUpdateField("payerName", payerName);
     if (payerName && !formData.amount) {
@@ -189,9 +193,9 @@ const PaycheckForm = ({
       <div className="flex gap-3 pt-4">
         <button
           type="button"
-          onClick={onProcess}
+          onClick={successFeedback.onClick(onProcess)}
           disabled={!canSubmit}
-          className="flex-1 flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 focus:ring-2 focus:ring-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          className={`flex-1 flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 focus:ring-2 focus:ring-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors border-2 border-black ${successFeedback.className}`}
         >
           {React.createElement(getIcon("DollarSign"), {
             className: "h-4 w-4 mr-2",

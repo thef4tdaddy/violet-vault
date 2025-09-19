@@ -1,5 +1,6 @@
 import React from "react";
 import { getIcon } from "../../utils";
+import { useTouchFeedback } from "../../utils/ui/touchFeedback";
 
 const TransferModal = ({
   isOpen,
@@ -10,6 +11,9 @@ const TransferModal = ({
   setTransferForm,
   envelopes,
 }) => {
+  // Enhanced haptic feedback for transfer confirmation
+  const confirmFeedback = useTouchFeedback("confirm", "success");
+
   if (!isOpen || !transferringAccount) return null;
 
   return (
@@ -92,7 +96,10 @@ const TransferModal = ({
           <button onClick={onClose} className="flex-1 btn btn-secondary border-2 border-black">
             Cancel
           </button>
-          <button onClick={onTransfer} className="flex-1 btn btn-primary border-2 border-black">
+          <button
+            onClick={confirmFeedback.onClick(onTransfer)}
+            className={`flex-1 btn btn-primary border-2 border-black ${confirmFeedback.className}`}
+          >
             Transfer ${transferForm.amount || "0.00"}
           </button>
         </div>
