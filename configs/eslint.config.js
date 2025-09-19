@@ -149,7 +149,7 @@ export default [
 
       // Block window.confirm patterns that no-restricted-globals doesn't catch
       "no-restricted-syntax": [
-        "error",
+        "warn", // Temporarily warn instead of error for icon rule rollout
         {
           selector: "CallExpression[callee.object.name='window'][callee.property.name='confirm']",
           message:
