@@ -24,19 +24,19 @@ const VelocityChart = ({ spendingVelocity = [] }) => {
         {hasData ? (
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={spendingVelocity}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip formatter={velocityTooltipFormatter} />
-            <Area
-              type="monotone"
-              dataKey="percentChange"
-              fill={CHART_COLORS.VELOCITY}
-              fillOpacity={0.6}
-              stroke={CHART_COLORS.VELOCITY}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip formatter={velocityTooltipFormatter} />
+              <Area
+                type="monotone"
+                dataKey="percentChange"
+                fill={CHART_COLORS.VELOCITY}
+                fillOpacity={0.6}
+                stroke={CHART_COLORS.VELOCITY}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-gray-500">
             {React.createElement(getIcon("TrendingUp"), {

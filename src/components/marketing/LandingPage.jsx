@@ -65,7 +65,9 @@ const LandingPage = () => {
               className="glassmorphism rounded-lg p-4 border-2 border-black bg-white/60 backdrop-blur-sm"
             >
               <div className="w-12 h-12 mx-auto mb-2 bg-purple-100 rounded-full flex items-center justify-center border-2 border-black">
-                {React.createElement(getIcon(icon.charAt(0).toUpperCase() + icon.slice(1)), { className: "w-6 h-6 text-purple-600" })}
+                {React.createElement(getIcon(icon.charAt(0).toUpperCase() + icon.slice(1)), {
+                  className: "w-6 h-6 text-purple-600",
+                })}
               </div>
               <h3 className="font-black text-black text-sm mb-1">
                 <span className="text-base">{title.charAt(0)}</span>

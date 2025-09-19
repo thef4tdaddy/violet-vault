@@ -55,11 +55,13 @@ const BillTable = ({
                   className="flex items-center justify-center w-6 h-6 mx-auto hover:bg-gray-200 rounded transition-colors"
                   title={selectionState.isAllSelected ? "Deselect all bills" : "Select all bills"}
                 >
-                  {selectionState.isAllSelected ? (
-                    React.createElement(getIcon("CheckSquare"), { className: "h-5 w-5 text-blue-600" })
-                  ) : (
-                    React.createElement(getIcon("Square"), { className: "h-5 w-5 text-gray-400" })
-                  )}
+                  {selectionState.isAllSelected
+                    ? React.createElement(getIcon("CheckSquare"), {
+                        className: "h-5 w-5 text-blue-600",
+                      })
+                    : React.createElement(getIcon("Square"), {
+                        className: "h-5 w-5 text-gray-400",
+                      })}
                 </button>
               </th>
               <th className="px-6 py-3 text-left text-base font-black text-black tracking-wider">

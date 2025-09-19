@@ -7,12 +7,7 @@ import BottomNavItem from "./BottomNavItem";
  * Mobile-first navigation with thumb-friendly positioning and smooth animations
  */
 const BottomNavigationBar = () => {
-  const {
-    isVisible,
-    getVisibleItems,
-    isItemActive,
-    shouldShowScrollHint,
-  } = useBottomNavigation();
+  const { isVisible, getVisibleItems, isItemActive, shouldShowScrollHint } = useBottomNavigation();
 
   const navRef = useRef(null);
   const leftFadeRef = useRef(null);
@@ -68,8 +63,8 @@ const BottomNavigationBar = () => {
         sm:hidden
       "
       style={{
-        paddingBottom: 'max(env(safe-area-inset-bottom), 20px)',
-        height: '80px',
+        paddingBottom: "max(env(safe-area-inset-bottom), 20px)",
+        height: "80px",
       }}
     >
       {/* Main navigation container */}
@@ -83,7 +78,7 @@ const BottomNavigationBar = () => {
             gap-1
           "
           style={{
-            scrollBehavior: 'smooth',
+            scrollBehavior: "smooth",
           }}
         >
           {visibleItems.map((item) => (
@@ -124,7 +119,7 @@ const BottomNavigationBar = () => {
       </div>
 
       {/* Hardware acceleration hint */}
-      <div className="hidden" style={{ transform: 'translateZ(0)' }} />
+      <div className="hidden" style={{ transform: "translateZ(0)" }} />
     </div>
   );
 };
