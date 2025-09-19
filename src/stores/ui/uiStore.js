@@ -210,6 +210,12 @@ const storeInitializer = (set, get) => ({
     });
 
     try {
+      // Clear the modal state before updating
+      set((state) => {
+        state.updateAvailable = false;
+        state.isUpdating = false;
+      });
+
       // Trigger service worker update
       if ("serviceWorker" in navigator) {
         const registration = await navigator.serviceWorker.getRegistration();
@@ -227,6 +233,7 @@ const storeInitializer = (set, get) => ({
       logger.error("Failed to update app", error);
       set((state) => {
         state.isUpdating = false;
+        state.updateAvailable = true; // Keep the modal available on error
       });
     }
   },
