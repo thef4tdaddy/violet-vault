@@ -87,7 +87,7 @@ const SecurityAlert = ({
 
   return (
     <div className={containerClasses}>
-      <Icon className={`h-4 w-4 flex-shrink-0 ${colors.icon}`} />
+            {React.createElement(Icon, { className: `h-4 w-4 flex-shrink-0 ${colors.icon}` })}
       <span className="text-sm flex-1">{message}</span>
 
       {dismissible && onDismiss && (

@@ -214,7 +214,7 @@ const StandardTabs = ({
               `.trim()}
               style={isActive && variant === "colored" ? { border: "2px solid black" } : {}}
             >
-              {Icon && <Icon className={config.iconSize} />}
+              {Icon && React.createElement(Icon, { className: config.iconSize })}
               {tab.label}
               {tab.count !== undefined && tab.count !== null && (
                 <span

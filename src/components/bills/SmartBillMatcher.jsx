@@ -1,5 +1,6 @@
 // components/SmartBillMatcher.jsx
 import React, { useState, useEffect } from "react";
+import { getIcon } from "../../utils";
 
 const SmartBillMatcher = ({ bills, envelopes, onSuggestEnvelope, searchQuery }) => {
   const [suggestions, setSuggestions] = useState([]);
@@ -167,7 +168,7 @@ const SmartBillMatcher = ({ bills, envelopes, onSuggestEnvelope, searchQuery }) 
   return (
     <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-4 mt-2">
       <div className="flex items-center mb-3">
-        <Search className="h-4 w-4 mr-2 text-gray-500" />
+        {React.createElement(getIcon("Search"), { className: "h-4 w-4 mr-2 text-gray-500" })}
         <span className="text-sm font-medium text-gray-700">
           Smart envelope suggestions for "{searchQuery}"
         </span>
@@ -175,7 +176,7 @@ const SmartBillMatcher = ({ bills, envelopes, onSuggestEnvelope, searchQuery }) 
 
       <div className="space-y-2">
         {suggestions.map((suggestion, index) => {
-          const ConfidenceIcon = getConfidenceIcon(suggestion.confidence);
+          const confidenceIconName = getConfidenceIcon(suggestion.confidence);
 
           return (
             <button
@@ -202,7 +203,7 @@ const SmartBillMatcher = ({ bills, envelopes, onSuggestEnvelope, searchQuery }) 
                 >
                   {suggestion.confidence}%
                 </span>
-                <ConfidenceIcon className="h-4 w-4 text-gray-400" />
+                {React.createElement(getIcon(confidenceIconName), { className: "h-4 w-4 text-gray-400" })}
               </div>
             </button>
           );

@@ -302,7 +302,7 @@ const UnassignedCashModal = () => {
               </>
             ) : (
               <>
-                <CheckCircle className="h-4 w-4 mr-2" />
+                {React.createElement(getIcon('CheckCircle'), { className: 'h-4 w-4 mr-2' })}
                 Distribute ${totalDistributed.toFixed(2)}
               </>
             )}
@@ -313,7 +313,7 @@ const UnassignedCashModal = () => {
         {isOverDistributed && (
           <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
             <div className="flex items-center text-red-700">
-              <AlertTriangle className="h-4 w-4 mr-2" />
+              {React.createElement(getIcon('AlertTriangle'), { className: 'h-4 w-4 mr-2' })}
               <span className="text-sm">
                 Distribution exceeds available cash by $
                 {(totalDistributed - unassignedCash).toFixed(2)}

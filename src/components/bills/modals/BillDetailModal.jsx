@@ -46,7 +46,7 @@ const BillDetailModal = ({
         <div className="flex justify-between items-start mb-6">
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-xl ${statusInfo.classes.bg}`}>
-              <BillIcon className={`h-6 w-6 ${statusInfo.classes.icon}`} />
+              {React.createElement(BillIcon, { className: `h-6 w-6 ${statusInfo.classes.icon}` })}
             </div>
             <div>
               <h3 className="text-xl font-semibold text-gray-900">{bill.name}</h3>
@@ -56,7 +56,7 @@ const BillDetailModal = ({
             </div>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
-            <X className="h-6 w-6" />
+            {React.createElement(getIcon("X"), { className: "h-6 w-6" })}
           </button>
         </div>
 
@@ -84,7 +84,7 @@ const BillDetailModal = ({
                   ${formatBillAmount(bill.amount)}
                 </p>
               </div>
-              <DollarSign className="h-8 w-8 text-purple-500" />
+              {React.createElement(getIcon("DollarSign"), { className: "h-8 w-8 text-purple-500" })}
             </div>
           </div>
 
@@ -96,7 +96,7 @@ const BillDetailModal = ({
                   {bill.dueDate ? new Date(bill.dueDate).toLocaleDateString() : "Not set"}
                 </p>
               </div>
-              <Calendar className="h-8 w-8 text-blue-500" />
+              {React.createElement(getIcon("Calendar"), { className: "h-8 w-8 text-blue-500" })}
             </div>
           </div>
 
@@ -241,7 +241,7 @@ const BillDetailModal = ({
               onClick={handleCreateRecurring}
               className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 flex items-center justify-center"
             >
-              <Target className="h-4 w-4 mr-2" />
+              {React.createElement(getIcon("Target"), { className: "h-4 w-4 mr-2" })}
               Make Recurring
             </button>
           )}
@@ -250,7 +250,7 @@ const BillDetailModal = ({
             onClick={handleEdit}
             className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 flex items-center justify-center"
           >
-            <Edit className="h-4 w-4 mr-2" />
+            {React.createElement(getIcon("Edit"), { className: "h-4 w-4 mr-2" })}
             Edit Bill
           </button>
 
@@ -258,7 +258,7 @@ const BillDetailModal = ({
             onClick={handleDelete}
             className="flex-1 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 flex items-center justify-center"
           >
-            <Trash2 className="h-4 w-4 mr-2" />
+            {React.createElement(getIcon("Trash2"), { className: "h-4 w-4 mr-2" })}
             Delete
           </button>
         </div>
