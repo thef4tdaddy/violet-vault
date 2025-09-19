@@ -135,7 +135,9 @@ const BillTable = ({
                           className="px-3 py-1.5 bg-green-100 text-green-800 rounded-lg hover:bg-green-200 transition-colors font-medium text-xs flex items-center gap-1.5"
                           title="Mark as Paid"
                         >
-                          <CheckCircle className="h-3.5 w-3.5" />
+                          {React.createElement(getIcon("CheckCircle"), {
+                            className: "h-3.5 w-3.5",
+                          })}
                           Pay
                         </button>
                       )}
@@ -149,7 +151,9 @@ const BillTable = ({
 
         {filteredBills.length === 0 && (
           <div className="text-center py-12 text-gray-500">
-            <FileText className="mx-auto h-12 w-12 text-gray-400" />
+            {React.createElement(getIcon("FileText"), {
+              className: "mx-auto h-12 w-12 text-gray-400",
+            })}
             <h3 className="mt-2 text-sm font-medium text-gray-900">No bills found</h3>
             <p className="mt-1 text-sm text-gray-500">
               {viewMode === "all"

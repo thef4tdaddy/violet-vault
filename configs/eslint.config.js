@@ -170,6 +170,11 @@ export default [
           message:
             "Invalid getIcon usage. Use React.createElement(getIcon('IconName'), { className: 'classes' }) instead of getIcon('icon-name', 'classes'). See docs/ICON_MIGRATION_PLAN.md for proper usage.",
         },
+        {
+          selector: "JSXElement[openingElement.name.name=/^[A-Z][a-zA-Z]*$/][openingElement.attributes.0.name.name='className']",
+          message:
+            "Direct icon usage detected. Use React.createElement(getIcon('IconName'), { className: 'classes' }) instead of <IconName className='classes' />. Import getIcon from utils and follow the centralized icon system.",
+        },
       ],
     },
   },
