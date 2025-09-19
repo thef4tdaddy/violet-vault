@@ -5,7 +5,7 @@ import KeyManagementSettings from "./KeyManagementSettings";
 
 const UserButton = memo(({ onClick, icon: Icon, label }) => (
   <button onClick={onClick} className="btn btn-secondary flex items-center rounded-xl">
-    {Icon && <Icon className="h-4 w-4 mr-2" />}
+    {Icon && React.createElement(Icon, { className: "h-4 w-4 mr-2" })}
     {label}
   </button>
 ));

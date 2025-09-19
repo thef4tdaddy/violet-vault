@@ -50,13 +50,13 @@ const HistoryTab = ({ executionHistory, showExecutionDetails, onToggleDetails })
                     </div>
                     <div className="flex items-center gap-4 text-sm text-gray-600">
                       <span className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
+                        {React.createElement(getIcon("Calendar"), { className: "h-3 w-3" })}
                         {new Date(execution.executedAt).toLocaleString()}
                       </span>
                       {execution.success && (
                         <>
                           <span className="flex items-center gap-1">
-                            <TrendingUp className="h-3 w-3" />$
+                            {React.createElement(getIcon("TrendingUp"), { className: "h-3 w-3" })}$
                             {execution.totalFunded?.toFixed(2) || "0.00"} funded
                           </span>
                           <span>{execution.rulesExecuted || 0} rules</span>
@@ -71,11 +71,10 @@ const HistoryTab = ({ executionHistory, showExecutionDetails, onToggleDetails })
                   }
                   className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
                 >
-                  {showExecutionDetails === execution.id ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
+                  {showExecutionDetails === execution.id ?
+                    React.createElement(getIcon("EyeOff"), { className: "h-4 w-4" }) :
+                    React.createElement(getIcon("Eye"), { className: "h-4 w-4" })
+                  }
                 </button>
               </div>
 
@@ -108,7 +107,7 @@ const HistoryTab = ({ executionHistory, showExecutionDetails, onToggleDetails })
 
                   <div className="mt-3 flex justify-end">
                     <button className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1">
-                      <RotateCcw className="h-3 w-3" />
+                      {React.createElement(getIcon("RotateCcw"), { className: "h-3 w-3" })}
                       Revert Changes
                     </button>
                   </div>
