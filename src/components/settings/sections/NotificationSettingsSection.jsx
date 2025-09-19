@@ -69,7 +69,9 @@ const NotificationSettingsSection = () => {
       return (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <div className="flex items-start space-x-3">
-            {getIcon("alert-triangle", "w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5")}
+            {React.createElement(getIcon("AlertTriangle"), {
+              className: "w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5",
+            })}
             <div>
               <p className="font-medium text-yellow-800">Not Supported</p>
               <p className="text-sm text-yellow-700 mt-1">
@@ -85,9 +87,13 @@ const NotificationSettingsSection = () => {
       return (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
           <div className="flex items-start space-x-3">
-            {getIcon("check-circle", "w-5 h-5 text-green-600 flex-shrink-0 mt-0.5")}
+            {React.createElement(getIcon("CheckCircle"), {
+              className: "w-5 h-5 text-green-600 flex-shrink-0 mt-0.5",
+            })}
             <div className="flex-1">
-              <p className="font-medium text-green-800">Notifications Enabled</p>
+              <p className="font-medium text-green-800">
+                Notifications Enabled
+              </p>
               <p className="text-sm text-green-700 mt-1">
                 You'll receive push notifications for important updates.
               </p>
@@ -101,7 +107,9 @@ const NotificationSettingsSection = () => {
       return (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="flex items-start space-x-3">
-            {getIcon("x-circle", "w-5 h-5 text-red-600 flex-shrink-0 mt-0.5")}
+            {React.createElement(getIcon("XCircle"), {
+              className: "w-5 h-5 text-red-600 flex-shrink-0 mt-0.5",
+            })}
             <div>
               <p className="font-medium text-red-800">Notifications Blocked</p>
               <p className="text-sm text-red-700 mt-1">
@@ -116,7 +124,9 @@ const NotificationSettingsSection = () => {
     return (
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <div className="flex items-start space-x-3">
-          {getIcon("bell", "w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5")}
+          {React.createElement(getIcon("Bell"), {
+            className: "w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5",
+          })}
           <div>
             <p className="font-medium text-blue-800">Enable Notifications</p>
             <p className="text-sm text-blue-700 mt-1">
@@ -132,7 +142,8 @@ const NotificationSettingsSection = () => {
     <div className="space-y-6">
       <div>
         <h3 className="font-black text-black text-base">
-          🔔 <span className="text-lg">N</span>OTIFICATION <span className="text-lg">S</span>ETTINGS
+          🔔 <span className="text-lg">N</span>OTIFICATION{" "}
+          <span className="text-lg">S</span>ETTINGS
         </h3>
         <p className="text-purple-900 text-sm mt-1">
           Manage push notifications and alerts for your budget management.
@@ -142,8 +153,12 @@ const NotificationSettingsSection = () => {
       {!isInitialized && !isLoading && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <div className="flex items-center space-x-2">
-            {getIcon("loader", "w-4 h-4 text-yellow-600 animate-spin")}
-            <span className="text-yellow-800 text-sm">Initializing notification service...</span>
+            {React.createElement(getIcon("Loader"), {
+              className: "w-4 h-4 text-yellow-600 animate-spin",
+            })}
+            <span className="text-yellow-800 text-sm">
+              Initializing notification service...
+            </span>
           </div>
         </div>
       )}
@@ -158,7 +173,13 @@ const NotificationSettingsSection = () => {
               disabled={isLoading}
               className="bg-purple-600 text-white px-4 py-2 rounded-lg border-2 border-black shadow-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
             >
-              {isLoading ? getIcon("loader", "w-4 h-4 animate-spin") : getIcon("bell", "w-4 h-4")}
+              {isLoading
+                ? React.createElement(getIcon("Loader"), {
+                    className: "w-4 h-4 animate-spin",
+                  })
+                : React.createElement(getIcon("Bell"), {
+                    className: "w-4 h-4",
+                  })}
               <span>Enable Notifications</span>
             </button>
           )}
@@ -169,7 +190,9 @@ const NotificationSettingsSection = () => {
                 onClick={handleDisableNotifications}
                 className="bg-gray-600 text-white px-4 py-2 rounded-lg border-2 border-black shadow-lg hover:bg-gray-700 flex items-center space-x-2"
               >
-                {getIcon("bell-off", "w-4 h-4")}
+                {React.createElement(getIcon("BellOff"), {
+                  className: "w-4 h-4",
+                })}
                 <span>Disable Notifications</span>
               </button>
 
@@ -179,8 +202,12 @@ const NotificationSettingsSection = () => {
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg border-2 border-black shadow-lg hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
               >
                 {isTestingMessage
-                  ? getIcon("loader", "w-4 h-4 animate-spin")
-                  : getIcon("send", "w-4 h-4")}
+                  ? React.createElement(getIcon("Loader"), {
+                      className: "w-4 h-4 animate-spin",
+                    })
+                  : React.createElement(getIcon("Send"), {
+                      className: "w-4 h-4",
+                    })}
                 <span>Test Message</span>
               </button>
             </>
@@ -190,19 +217,39 @@ const NotificationSettingsSection = () => {
 
       {hasToken && (
         <div className="bg-white rounded-lg border-2 border-black p-4">
-          <h4 className="font-bold text-gray-900 mb-3">Notification Preferences</h4>
+          <h4 className="font-bold text-gray-900 mb-3">
+            Notification Preferences
+          </h4>
           <div className="space-y-3">
             <label className="flex items-center space-x-3">
-              <input type="checkbox" defaultChecked className="w-4 h-4 text-purple-600" />
-              <span className="text-sm text-gray-700">Bill payment reminders</span>
+              <input
+                type="checkbox"
+                defaultChecked
+                className="w-4 h-4 text-purple-600"
+              />
+              <span className="text-sm text-gray-700">
+                Bill payment reminders
+              </span>
             </label>
             <label className="flex items-center space-x-3">
-              <input type="checkbox" defaultChecked className="w-4 h-4 text-purple-600" />
-              <span className="text-sm text-gray-700">Budget alerts and warnings</span>
+              <input
+                type="checkbox"
+                defaultChecked
+                className="w-4 h-4 text-purple-600"
+              />
+              <span className="text-sm text-gray-700">
+                Budget alerts and warnings
+              </span>
             </label>
             <label className="flex items-center space-x-3">
-              <input type="checkbox" defaultChecked className="w-4 h-4 text-purple-600" />
-              <span className="text-sm text-gray-700">Account activity notifications</span>
+              <input
+                type="checkbox"
+                defaultChecked
+                className="w-4 h-4 text-purple-600"
+              />
+              <span className="text-sm text-gray-700">
+                Account activity notifications
+              </span>
             </label>
           </div>
         </div>
@@ -213,18 +260,23 @@ const NotificationSettingsSection = () => {
           onClick={() => setShowAdvanced(!showAdvanced)}
           className="text-sm text-gray-500 hover:text-gray-700 flex items-center space-x-1"
         >
-          {getIcon(
-            "chevron-right",
-            `w-4 h-4 transition-transform ${showAdvanced ? "rotate-90" : ""}`
-          )}
+          {React.createElement(getIcon("ChevronRight"), {
+            className: `w-4 h-4 transition-transform ${showAdvanced ? "rotate-90" : ""}`,
+          })}
           <span>Advanced Debug Info</span>
         </button>
         {showAdvanced && (
           <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
-            <h4 className="font-medium text-gray-900 mb-3">Debug Information</h4>
+            <h4 className="font-medium text-gray-900 mb-3">
+              Debug Information
+            </h4>
             <div className="space-y-2 text-sm font-mono">
-              <div>Service Status: {JSON.stringify(getServiceStatus(), null, 2)}</div>
-              <div>Permission Status: {JSON.stringify(permissionStatus, null, 2)}</div>
+              <div>
+                Service Status: {JSON.stringify(getServiceStatus(), null, 2)}
+              </div>
+              <div>
+                Permission Status: {JSON.stringify(permissionStatus, null, 2)}
+              </div>
               {error && <div className="text-red-600">Error: {error}</div>}
             </div>
           </div>
