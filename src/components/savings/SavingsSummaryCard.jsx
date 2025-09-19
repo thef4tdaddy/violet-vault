@@ -56,7 +56,9 @@ const SavingsSummaryCard = ({ savingsGoals = [] }) => {
         {/* Total Goals */}
         <div className="bg-white/50 rounded-xl p-4 backdrop-blur-sm">
           <div className="flex items-center space-x-3 mb-2">
-            <Target className="h-5 w-5 text-purple-600" />
+            {React.createElement(getIcon("Target"), {
+              className: "h-5 w-5 text-purple-600",
+            })}
             <span className="font-medium">Goals</span>
           </div>
           <div className="text-2xl font-bold text-purple-600">{savingsGoals.length}</div>
@@ -82,7 +84,9 @@ const SavingsSummaryCard = ({ savingsGoals = [] }) => {
 
       {savingsGoals.length === 0 && (
         <div className="text-center text-gray-500 mt-4">
-          <Target className="h-12 w-12 mx-auto mb-3 opacity-50" />
+          {React.createElement(getIcon("Target"), {
+            className: "h-12 w-12 mx-auto mb-3 opacity-50",
+          })}
           <p>No savings goals yet. Create your first goal to get started!</p>
         </div>
       )}
