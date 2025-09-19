@@ -66,6 +66,17 @@ const useSmartSuggestions = ({
     setAnalysisSettings(DEFAULT_ANALYSIS_SETTINGS);
   }, []);
 
+  // Dismiss suggestion
+  const handleDismissSuggestion = useCallback(
+    (suggestionId) => {
+      setDismissedSuggestions((prev) => new Set([...prev, suggestionId]));
+      onDismissSuggestion?.(suggestionId);
+
+      globalToast.showInfo("Suggestion dismissed", "Dismissed");
+    },
+    [onDismissSuggestion]
+  );
+
   // Apply suggestion action
   const handleApplySuggestion = useCallback(
     async (suggestion) => {
@@ -118,17 +129,6 @@ const useSmartSuggestions = ({
       }
     },
     [onCreateEnvelope, onUpdateEnvelope, handleDismissSuggestion]
-  );
-
-  // Dismiss suggestion
-  const handleDismissSuggestion = useCallback(
-    (suggestionId) => {
-      setDismissedSuggestions((prev) => new Set([...prev, suggestionId]));
-      onDismissSuggestion?.(suggestionId);
-
-      globalToast.showInfo("Suggestion dismissed", "Dismissed");
-    },
-    [onDismissSuggestion]
   );
 
   // Clear all dismissed suggestions
