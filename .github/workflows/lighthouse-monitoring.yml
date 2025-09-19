@@ -35,6 +35,7 @@ jobs:
         run: npm ci
 
       - name: "🧪 Run test suite"
+        continue-on-error: true
         run: |
           echo "🧪 Running Vitest test suite..."
 
@@ -44,30 +45,48 @@ jobs:
           TEST_TOTAL_COUNT=0
           TEST_PASSED=true
 
-          # Run tests and capture results
-          if npm run test 2>&1 | tee test-output.log; then
+          # Run tests and capture results (continue on error to ensure lighthouse runs)
+          set +e  # Don't exit on error
+          npm run test -- --reporter=verbose --reporter=json --outputFile=test-results.json 2>&1 | tee test-output.log
+          TEST_EXIT_CODE=$?
+          set -e  # Re-enable exit on error
+
+          if [ $TEST_EXIT_CODE -eq 0 ]; then
             echo "✅ All tests passed"
             TEST_SUCCESS_COUNT=$(grep -o "passed" test-output.log | wc -l || echo "0")
             TEST_TOTAL_COUNT=$TEST_SUCCESS_COUNT
           else
-            echo "❌ Some tests failed"
+            echo "❌ Some tests failed (exit code: $TEST_EXIT_CODE)"
             TEST_PASSED=false
 
             # Extract test statistics from output
             TEST_TOTAL_COUNT=$(grep -E "Tests:|Test Files:" test-output.log | head -1 | grep -o '[0-9]\+' | head -1 || echo "0")
             TEST_SUCCESS_COUNT=$(grep -o "passed" test-output.log | wc -l || echo "0")
 
-            # Capture failed test information
-            TEST_FAILURES=$(grep -A 5 -B 5 "FAIL\|✕\|failed" test-output.log || echo "Test failures detected but details not captured")
+            # Capture failed test information with more context
+            echo "🔍 Extracting detailed test failure information..."
+            TEST_FAILURES=$(grep -A 10 -B 5 "FAIL\|✕\|failed\|Error:" test-output.log | head -100 || echo "Test failures detected but details not captured")
+
+            # Also capture specific error patterns
+            echo "📋 Failed test summary:" > test-failures-detailed.log
+            echo "========================" >> test-failures-detailed.log
+            grep -E "(FAIL|✕|failed|Error:|expect.*received)" test-output.log >> test-failures-detailed.log 2>/dev/null || echo "No specific patterns found" >> test-failures-detailed.log
+            echo "" >> test-failures-detailed.log
+            echo "Full test output (last 200 lines):" >> test-failures-detailed.log
+            echo "====================================" >> test-failures-detailed.log
+            tail -200 test-output.log >> test-failures-detailed.log
           fi
 
           # Store results for later steps
           echo "TEST_PASSED=$TEST_PASSED" >> $GITHUB_ENV
           echo "TEST_SUCCESS_COUNT=$TEST_SUCCESS_COUNT" >> $GITHUB_ENV
           echo "TEST_TOTAL_COUNT=$TEST_TOTAL_COUNT" >> $GITHUB_ENV
+          echo "TEST_EXIT_CODE=$TEST_EXIT_CODE" >> $GITHUB_ENV
           echo "TEST_FAILURES<<EOF" >> $GITHUB_ENV
           echo "$TEST_FAILURES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
+
+          echo "🔄 Test suite complete - continuing with lighthouse tests regardless of test results"
 
       - name: "🎫 Generate dev auth token"
         id: auth
@@ -88,10 +107,44 @@ jobs:
 
           echo "✅ Authentication complete"
 
-      - name: "📂 Create lighthouse directory"
-        run: mkdir -p lighthouse-results
+      - name: "📂 Create lighthouse directory and copy test reports"
+        run: |
+          mkdir -p lighthouse-results
+
+          # Copy test reports to lighthouse results for unified reporting
+          echo "📋 Copying test reports to lighthouse results..."
+          cp test-output.log lighthouse-results/ 2>/dev/null || echo "No test-output.log found"
+          cp test-results.json lighthouse-results/ 2>/dev/null || echo "No test-results.json found"
+          cp test-failures-detailed.log lighthouse-results/ 2>/dev/null || echo "No test-failures-detailed.log found"
+
+          # Create a test summary file
+          cat > lighthouse-results/test-summary.md << EOF
+          # 🧪 Test Execution Summary
+
+          **Status:** $([ "$TEST_PASSED" = "true" ] && echo "✅ PASSED" || echo "❌ FAILED")
+          **Passed:** $TEST_SUCCESS_COUNT tests
+          **Total:** $TEST_TOTAL_COUNT tests
+          **Exit Code:** $TEST_EXIT_CODE
+          **Generated:** $(date -u)
+
+          ## Files Available
+          - [test-output.log](./test-output.log) - Complete test execution log
+          - [test-results.json](./test-results.json) - JSON test results (if generated)
+          - [test-failures-detailed.log](./test-failures-detailed.log) - Detailed failure analysis (if failures occurred)
+
+          $([ "$TEST_PASSED" != "true" ] && cat << TESTEOF
+
+          ## ❌ Test Failures Detected
+          Tests failed during execution. Check the detailed logs above for specific error messages and stack traces.
+
+          TESTEOF
+          )
+          EOF
+
+          echo "✅ Test reports prepared for inclusion in final reports"
 
       - name: "🔦 Run Lighthouse on authenticated pages"
+        continue-on-error: true
         run: |
           # For now, only targeting dev environment
           TARGET_URL="${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}"
@@ -145,7 +198,7 @@ jobs:
           echo "**Commit:** ${{ github.sha }}" >> lighthouse-results/SUMMARY.md
           echo "" >> lighthouse-results/SUMMARY.md
 
-          # Add test results summary
+          # Add test results summary with links to detailed reports
           echo "## 🧪 Test Results" >> lighthouse-results/SUMMARY.md
           echo "" >> lighthouse-results/SUMMARY.md
           if [ "$TEST_PASSED" = "true" ]; then
@@ -153,10 +206,20 @@ jobs:
           else
             echo "❌ **Some tests failed** ($TEST_SUCCESS_COUNT/$TEST_TOTAL_COUNT)" >> lighthouse-results/SUMMARY.md
             echo "" >> lighthouse-results/SUMMARY.md
-            echo "### Failed Tests:" >> lighthouse-results/SUMMARY.md
+            echo "### 📋 Test Reports Available:" >> lighthouse-results/SUMMARY.md
+            echo "- [📄 Complete Test Output](./test-output.log)" >> lighthouse-results/SUMMARY.md
+            echo "- [📊 Test Summary](./test-summary.md)" >> lighthouse-results/SUMMARY.md
+            echo "- [🔍 Detailed Failure Analysis](./test-failures-detailed.log)" >> lighthouse-results/SUMMARY.md
+            if [ -f "lighthouse-results/test-results.json" ]; then
+              echo "- [📄 JSON Test Results](./test-results.json)" >> lighthouse-results/SUMMARY.md
+            fi
+            echo "" >> lighthouse-results/SUMMARY.md
+            echo "### Quick Failure Summary:" >> lighthouse-results/SUMMARY.md
             echo '```' >> lighthouse-results/SUMMARY.md
-            echo "$TEST_FAILURES" >> lighthouse-results/SUMMARY.md
+            echo "$TEST_FAILURES" | head -20 >> lighthouse-results/SUMMARY.md
             echo '```' >> lighthouse-results/SUMMARY.md
+            echo "" >> lighthouse-results/SUMMARY.md
+            echo "*See detailed reports above for complete failure information*" >> lighthouse-results/SUMMARY.md
           fi
           echo "" >> lighthouse-results/SUMMARY.md
 
@@ -391,12 +454,36 @@ jobs:
             echo "" >> README.md
           fi
 
-          for file in "$REPORT_DIR"/*.html; do
-            if [ -f "$file" ]; then
-              PAGE=$(basename "$file" .report.html)
-              echo "- [${PAGE} Report](./$REPORT_DIR/$(basename "$file"))" >> README.md
+          # Add test reports section
+          if [ -f "$REPORT_DIR/test-summary.md" ]; then
+            echo "#### 🧪 Test Reports" >> README.md
+            echo "- [📊 Test Summary](./$REPORT_DIR/test-summary.md)" >> README.md
+            if [ -f "$REPORT_DIR/test-output.log" ]; then
+              echo "- [📄 Complete Test Log](./$REPORT_DIR/test-output.log)" >> README.md
             fi
-          done
+            if [ -f "$REPORT_DIR/test-failures-detailed.log" ]; then
+              echo "- [🔍 Detailed Failure Analysis](./$REPORT_DIR/test-failures-detailed.log)" >> README.md
+            fi
+            echo "" >> README.md
+          fi
+
+          # Add lighthouse reports section
+          if [ "$(ls "$REPORT_DIR"/*.html 2>/dev/null)" ]; then
+            echo "#### 🔦 Lighthouse Reports" >> README.md
+            for file in "$REPORT_DIR"/*.html; do
+              if [ -f "$file" ]; then
+                PAGE=$(basename "$file" .report.html)
+                echo "- [${PAGE} Report](./$REPORT_DIR/$(basename "$file"))" >> README.md
+              fi
+            done
+            echo "" >> README.md
+          fi
+
+          # Add main summary report
+          if [ -f "$REPORT_DIR/SUMMARY.md" ]; then
+            echo "#### 📋 [Complete Summary Report](./$REPORT_DIR/SUMMARY.md)" >> README.md
+            echo "" >> README.md
+          fi
 
           echo "" >> README.md
           echo "---" >> README.md
@@ -660,6 +747,59 @@ jobs:
               body: issueBody.filter(line => line !== "").join('\n'),
               labels: labels
             });
+
+      - name: "📋 Final Workflow Status"
+        run: |
+          echo "## 🔦 Lighthouse Monitoring Workflow Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Target:** ${{ github.event.inputs.target_url || 'https://dev.f4tdaddy.com' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Time:** $(date -u)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Test Results Summary
+          echo "### 🧪 Test Results" >> $GITHUB_STEP_SUMMARY
+          if [ "$TEST_PASSED" = "true" ]; then
+            echo "✅ **Tests:** All $TEST_SUCCESS_COUNT tests passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Tests:** $((TEST_TOTAL_COUNT - TEST_SUCCESS_COUNT))/$TEST_TOTAL_COUNT tests failed (Exit code: $TEST_EXIT_CODE)" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Lighthouse Results Summary
+          echo "### 🔦 Lighthouse Results" >> $GITHUB_STEP_SUMMARY
+          if [ "$SUCCESS_COUNT" -eq "$TOTAL_COUNT" ] && [ "$TOTAL_COUNT" -gt 0 ]; then
+            echo "✅ **Lighthouse:** All $SUCCESS_COUNT/$TOTAL_COUNT pages scanned successfully" >> $GITHUB_STEP_SUMMARY
+          elif [ "$TOTAL_COUNT" -gt 0 ]; then
+            echo "⚠️ **Lighthouse:** $SUCCESS_COUNT/$TOTAL_COUNT pages scanned successfully" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Lighthouse:** No pages were scanned" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Overall Status
+          echo "### 📊 Overall Status" >> $GITHUB_STEP_SUMMARY
+          if [ "$SUCCESS_COUNT" -eq "$TOTAL_COUNT" ] && [ "$TOTAL_COUNT" -gt 0 ]; then
+            echo "✅ **Lighthouse monitoring completed successfully**" >> $GITHUB_STEP_SUMMARY
+            if [ "$TEST_PASSED" != "true" ]; then
+              echo "⚠️ Note: Test failures detected but lighthouse tests completed successfully" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "❌ **Lighthouse monitoring failed**" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📊 [View detailed reports](${{ github.server_url }}/${{ github.repository }}/tree/lighthouse-reports)" >> $GITHUB_STEP_SUMMARY
+
+          # Only fail the workflow if lighthouse completely failed
+          if [ "$TOTAL_COUNT" -eq 0 ]; then
+            echo "🚨 No lighthouse tests were executed - failing workflow"
+            exit 1
+          elif [ "$SUCCESS_COUNT" -lt "$TOTAL_COUNT" ]; then
+            echo "⚠️ Some lighthouse tests failed - this is informational only"
+            echo "The workflow will continue to pass as lighthouse partially succeeded"
+          else
+            echo "✅ All lighthouse tests passed - workflow succeeds"
+          fi
 
   # Send notification summary
   notify:
