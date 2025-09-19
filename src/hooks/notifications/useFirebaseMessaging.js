@@ -4,7 +4,6 @@ import {
   getPermissionStatusForUI,
   requestNotificationPermission,
   trackPermissionDenial,
-  trackPromptDismissal,
 } from "../../utils/notifications/permissionUtils";
 import logger from "../../utils/common/logger";
 
@@ -157,10 +156,8 @@ export const useFirebaseMessaging = () => {
     // Actions
     initialize,
     requestPermissionAndGetToken,
-    refreshToken,
     clearToken,
     handlePermissionDenied,
-    handlePromptDismissed,
     sendTestMessage,
     updatePermissionStatus,
 

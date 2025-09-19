@@ -11,7 +11,6 @@ const NotificationSettingsSection = () => {
   const {
     isInitialized,
     isLoading,
-    token,
     permissionStatus,
     error,
     requestPermissionAndGetToken,
