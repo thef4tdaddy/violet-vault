@@ -71,7 +71,6 @@ export const useFirebaseMessaging = () => {
     setError(null);
 
     try {
-      // Request permission using utility function
       const permissionResult = await requestNotificationPermission();
       updatePermissionStatus();
 
@@ -82,9 +81,7 @@ export const useFirebaseMessaging = () => {
         return permissionResult;
       }
 
-      // Get FCM token
       const tokenResult = await firebaseMessagingService.requestPermissionAndGetToken();
-
       if (tokenResult.success && tokenResult.token) {
         setToken(tokenResult.token);
         logger.info("📱 FCM token obtained successfully");
@@ -100,39 +97,11 @@ export const useFirebaseMessaging = () => {
     }
   }, [isInitialized, initialize, updatePermissionStatus]);
 
-  // Refresh token if needed
-  const refreshToken = useCallback(async () => {
-    if (!isInitialized) return false;
-
-    setIsLoading(true);
-    try {
-      const success = await firebaseMessagingService.refreshTokenIfNeeded();
-      if (success) {
-        const newToken = firebaseMessagingService.getCurrentToken();
-        setToken(newToken);
-      }
-      return success;
-    } catch (err) {
-      logger.error("Failed to refresh FCM token", err);
-      setError(err.message);
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [isInitialized]);
-
   // Handle permission denial gracefully
   const handlePermissionDenied = useCallback(() => {
     trackPermissionDenial();
     updatePermissionStatus();
     logger.info("User denied notification permission");
-  }, [updatePermissionStatus]);
-
-  // Handle prompt dismissal
-  const handlePromptDismissed = useCallback(() => {
-    trackPromptDismissal();
-    updatePermissionStatus();
-    logger.info("User dismissed notification prompt");
   }, [updatePermissionStatus]);
 
   // Clear token and reset
@@ -148,7 +117,6 @@ export const useFirebaseMessaging = () => {
       logger.warn("No FCM token available for test message");
       return false;
     }
-
     return await firebaseMessagingService.sendTestMessage();
   }, [token]);
 
