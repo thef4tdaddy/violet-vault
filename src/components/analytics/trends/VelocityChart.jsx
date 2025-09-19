@@ -9,8 +9,11 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { velocityTooltipFormatter, CHART_COLORS } from "../../../utils/analytics/trendHelpers";
+import { getIcon } from "../../../utils";
 
-const VelocityChart = ({ spendingVelocity }) => {
+const VelocityChart = ({ spendingVelocity = [] }) => {
+  const hasData = spendingVelocity && spendingVelocity.length > 0;
+
   return (
     <div className="rounded-xl p-6 border-2 border-black bg-white/90 backdrop-blur-sm shadow-xl">
       <h3 className="font-black text-black text-base mb-4">
@@ -18,8 +21,9 @@ const VelocityChart = ({ spendingVelocity }) => {
         <span className="text-lg">A</span>NALYSIS
       </h3>
       <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={spendingVelocity}>
+        {hasData ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={spendingVelocity}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="month" />
             <YAxis />
@@ -33,6 +37,15 @@ const VelocityChart = ({ spendingVelocity }) => {
             />
           </AreaChart>
         </ResponsiveContainer>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full text-gray-500">
+            {React.createElement(getIcon("TrendingUp"), {
+              className: "h-12 w-12 mb-4 opacity-50",
+            })}
+            <p className="text-lg font-medium">No Velocity Data</p>
+            <p className="text-sm">Need at least 2 months of data to calculate velocity</p>
+          </div>
+        )}
       </div>
     </div>
   );
