@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { getIcon } from "../../utils";
 import useEnvelopeForm from "../../hooks/budgeting/useEnvelopeForm";
+import SlideUpModal from "../mobile/SlideUpModal";
 import EnvelopeTypeSelector from "./shared/EnvelopeTypeSelector";
 import EnvelopeBasicFields from "./envelope/EnvelopeBasicFields";
 import EnvelopeBudgetFields from "./envelope/EnvelopeBudgetFields";
@@ -15,7 +16,21 @@ const CreateEnvelopeModal = ({
   existingEnvelopes = [],
   allBills = [],
   currentUser = { userName: "User", userColor: "#a855f7" },
+  _forceMobileMode = false, // Internal prop for testing
 }) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect screen size
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 640); // Tailwind's sm breakpoint
+    };
+
+    checkIsMobile();
+    window.addEventListener("resize", checkIsMobile);
+    return () => window.removeEventListener("resize", checkIsMobile);
+  }, []);
+
   const {
     // Form state
     formData,
@@ -61,6 +76,122 @@ const CreateEnvelopeModal = ({
 
   if (!isOpen) return null;
 
+  // Extract the modal content into a component for reuse
+  const ModalContent = () => (
+    <div className="space-y-6">
+      {/* Envelope Type Selection */}
+      <EnvelopeTypeSelector
+        selectedType={formData.envelopeType}
+        onChange={(type) => updateFormField("envelopeType", type)}
+        disabled={isLoading}
+      />
+
+      {/* Basic Fields */}
+      <EnvelopeBasicFields
+        formData={formData}
+        errors={errors}
+        onChange={updateFormField}
+        disabled={isLoading}
+      />
+
+      {/* Budget Fields */}
+      <EnvelopeBudgetFields
+        formData={formData}
+        errors={errors}
+        calculatedAmounts={calculatedAmounts}
+        onChange={updateFormField}
+        disabled={isLoading}
+        showBiweeklyPreview={true}
+      />
+
+      {/* Allocation Mode */}
+      <AllocationModeSelector
+        selectedMode={formData.allocationMode}
+        onChange={(mode) => updateFormField("allocationMode", mode)}
+        disabled={isLoading}
+      />
+
+      {/* Bill Connection */}
+      {allBills.length > 0 && (
+        <BillConnectionSelector
+          bills={allBills}
+          selectedBillId={formData.billId}
+          onChange={handleBillSelection}
+          onCreateBill={onCreateBill}
+          disabled={isLoading}
+        />
+      )}
+
+      {/* Color Selection */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Envelope Color</label>
+        <div className="grid grid-cols-8 gap-2">
+          {[
+            "#ef4444", // red
+            "#f97316", // orange
+            "#eab308", // yellow
+            "#22c55e", // green
+            "#06b6d4", // cyan
+            "#3b82f6", // blue
+            "#8b5cf6", // violet
+            "#ec4899", // pink
+          ].map((color) => (
+            <button
+              key={color}
+              type="button"
+              onClick={() => updateFormField("color", color)}
+              className={`w-8 h-8 rounded-lg border-2 transition-all ${
+                formData.color === color
+                  ? "border-gray-800 scale-110"
+                  : "border-gray-200 hover:border-gray-400"
+              }`}
+              style={{ backgroundColor: color }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex justify-end gap-3 pt-4">
+        <button
+          type="button"
+          onClick={handleClose}
+          className="px-6 py-2 border-2 border-black text-gray-700 rounded-xl hover:bg-gray-50 focus:ring-2 focus:ring-green-500 transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          onClick={handleSubmit}
+          disabled={!canSubmit || isLoading}
+          className="flex items-center px-6 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 focus:ring-2 focus:ring-green-500 border-2 border-black disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+        >
+          {React.createElement(getIcon("Save"), { className: "h-4 w-4 mr-2" })}
+          {isLoading ? "Creating..." : "Create Envelope"}
+        </button>
+      </div>
+    </div>
+  );
+
+  // Mobile slide-up modal
+  if (isMobile || _forceMobileMode) {
+    return (
+      <SlideUpModal
+        isOpen={isOpen}
+        onClose={handleClose}
+        title="Create Envelope"
+        height="auto"
+        showHandle={true}
+        backdrop={true}
+      >
+        <div className="px-6 pb-6">
+          <ModalContent />
+        </div>
+      </SlideUpModal>
+    );
+  }
+
+  // Desktop centered modal
   return (
     <div className="fixed inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[95vh] overflow-hidden shadow-2xl flex flex-col">
@@ -69,7 +200,7 @@ const CreateEnvelopeModal = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <div className="bg-white/20 p-2 rounded-xl mr-3">
-                <Plus className="h-5 w-5 text-white" />
+                {React.createElement(getIcon("Plus"), { className: "h-5 w-5 text-white" })}
               </div>
               <div>
                 <h2 className="font-black text-white text-base">
@@ -82,116 +213,14 @@ const CreateEnvelopeModal = ({
               onClick={handleClose}
               className="text-white/80 hover:text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
             >
-              <X className="h-5 w-5" />
+              {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
             </button>
           </div>
         </div>
 
         {/* Form Content */}
         <div className="flex-1 p-6 overflow-y-auto">
-          <div className="space-y-6">
-            {/* Envelope Type Selection */}
-            <EnvelopeTypeSelector
-              selectedType={formData.envelopeType}
-              onTypeChange={(type) => updateFormField("envelopeType", type)}
-              excludeTypes={["SAVINGS"]}
-              canEdit={true}
-            />
-
-            {/* Bill Connection (Optional) */}
-            <BillConnectionSelector
-              selectedBillId=""
-              onBillSelection={handleBillSelection}
-              allBills={allBills}
-              onCreateBill={onCreateBill}
-              canEdit={true}
-            />
-
-            {/* Basic Information */}
-            <EnvelopeBasicFields
-              formData={formData}
-              onUpdateField={updateFormField}
-              errors={errors}
-              canEdit={true}
-            />
-
-            {/* Budget Settings */}
-            <EnvelopeBudgetFields
-              formData={formData}
-              onUpdateField={updateFormField}
-              errors={errors}
-              calculatedAmounts={calculatedAmounts}
-              canEdit={true}
-            />
-
-            {/* Allocation Mode */}
-            <AllocationModeSelector
-              selectedMode={formData.priority || "medium"}
-              autoAllocate={formData.autoAllocate}
-              onModeChange={(priority) => updateFormField("priority", priority)}
-              onAutoAllocateChange={(autoAllocate) => updateFormField("autoAllocate", autoAllocate)}
-              canEdit={true}
-            />
-
-            {/* Color Selection */}
-            <div className="space-y-4">
-              <h3 className="font-black text-black text-base flex items-center">
-                <Palette className="h-4 w-4 mr-2 text-green-600" />
-                <span className="text-lg">A</span>PPEARANCE
-              </h3>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
-                <div className="flex gap-2 flex-wrap">
-                  {[
-                    "#a855f7",
-                    "#3b82f6",
-                    "#10b981",
-                    "#f59e0b",
-                    "#ef4444",
-                    "#8b5cf6",
-                    "#06b6d4",
-                    "#84cc16",
-                    "#f97316",
-                    "#ec4899",
-                  ].map((color) => (
-                    <button
-                      key={color}
-                      type="button"
-                      onClick={() => updateFormField("color", color)}
-                      className={`w-8 h-8 rounded-lg border-2 transition-all ${
-                        formData.color === color
-                          ? "border-gray-800 scale-110"
-                          : "border-gray-200 hover:border-gray-400"
-                      }`}
-                      style={{ backgroundColor: color }}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="border-t bg-gray-50 px-6 py-4">
-          <div className="flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={handleClose}
-              className="px-6 py-2 border-2 border-black text-gray-700 rounded-xl hover:bg-gray-50 focus:ring-2 focus:ring-green-500 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={!canSubmit || isLoading}
-              className="flex items-center px-6 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 focus:ring-2 focus:ring-green-500 border-2 border-black disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-            >
-              <Save className="h-4 w-4 mr-2" />
-              {isLoading ? "Creating..." : "Create Envelope"}
-            </button>
-          </div>
+          <ModalContent />
         </div>
       </div>
     </div>
