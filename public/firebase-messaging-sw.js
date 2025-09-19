@@ -1,11 +1,7 @@
 // Firebase Messaging Service Worker
 // Handles background push notifications when the app is not in focus
 
-importScripts('https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/10.13.0/firebase-messaging-compat.js');
-
-// Initialize Firebase in service worker
-// Note: This config will be replaced with actual values during build
+// Skip initialization if using demo config to prevent conflicts
 const firebaseConfig = {
   apiKey: "demo-api-key",
   authDomain: "demo-project.firebaseapp.com",
@@ -16,15 +12,26 @@ const firebaseConfig = {
   measurementId: "G-ABCDEF"
 };
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+// Only initialize Firebase if we have real config (not demo)
+if (firebaseConfig.projectId !== "demo-project") {
+  importScripts('https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js');
+  importScripts('https://www.gstatic.com/firebasejs/10.13.0/firebase-messaging-compat.js');
 
-// Initialize Firebase Messaging
-const messaging = firebase.messaging();
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
 
-// Handle background messages
-messaging.onBackgroundMessage((payload) => {
-  console.log('[firebase-messaging-sw.js] Received background message:', payload);
+  // Initialize Firebase Messaging
+  const messaging = firebase.messaging();
+} else {
+  console.log('[firebase-messaging-sw.js] Skipping Firebase initialization (demo config detected)');
+  // Create mock messaging object to prevent errors
+  const messaging = null;
+}
+
+// Handle background messages (only if messaging is initialized)
+if (messaging) {
+  messaging.onBackgroundMessage((payload) => {
+    console.log('[firebase-messaging-sw.js] Received background message:', payload);
 
   const { notification, data } = payload;
 
@@ -60,7 +67,8 @@ messaging.onBackgroundMessage((payload) => {
 
   // Show the notification
   return self.registration.showNotification(notificationTitle, notificationOptions);
-});
+  });
+}
 
 // Handle notification clicks
 self.addEventListener('notificationclick', (event) => {
