@@ -52,22 +52,6 @@ const useEditLock = (recordType, recordId, options = {}) => {
     };
   }, [recordType, recordId]);
 
-  // Auto-acquire lock if requested
-  useEffect(() => {
-    if (autoAcquire && recordType && recordId && (!isLocked || (!isOwnLock && lock))) {
-      acquireLock();
-    }
-  }, [autoAcquire, recordType, recordId, isLocked, isOwnLock, lock, acquireLock]);
-
-  // Auto-release lock on unmount
-  useEffect(() => {
-    return () => {
-      if (autoRelease && isOwnLock) {
-        editLockService.releaseLock(recordType, recordId);
-      }
-    };
-  }, [autoRelease, recordType, recordId, isOwnLock]);
-
   /**
    * Acquire edit lock
    */
@@ -107,6 +91,22 @@ const useEditLock = (recordType, recordId, options = {}) => {
 
     return result;
   }, [recordType, recordId, showToasts, addToast]);
+
+  // Auto-acquire lock if requested
+  useEffect(() => {
+    if (autoAcquire && recordType && recordId && (!isLocked || (!isOwnLock && lock))) {
+      acquireLock();
+    }
+  }, [autoAcquire, recordType, recordId, isLocked, isOwnLock, lock, acquireLock]);
+
+  // Auto-release lock on unmount
+  useEffect(() => {
+    return () => {
+      if (autoRelease && isOwnLock) {
+        editLockService.releaseLock(recordType, recordId);
+      }
+    };
+  }, [autoRelease, recordType, recordId, isOwnLock]);
 
   /**
    * Release edit lock
