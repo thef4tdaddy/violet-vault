@@ -14,8 +14,10 @@ import {
 import { getIcon } from "../../../utils";
 import { formatCurrency, CHART_COLORS } from "../../../utils/analytics/trendHelpers";
 
-const HistoricalTrendsChart = ({ spendingTrends }) => {
+const HistoricalTrendsChart = ({ spendingTrends = [] }) => {
   const tooltipFormatter = (value, name) => [formatCurrency(value), name];
+
+  const hasData = spendingTrends && spendingTrends.length > 0;
 
   return (
     <div className="rounded-xl p-6 border-2 border-black bg-white/90 backdrop-blur-sm shadow-xl">
@@ -24,8 +26,9 @@ const HistoricalTrendsChart = ({ spendingTrends }) => {
         <span className="text-lg">T</span>RENDS
       </h3>
       <div className="h-80">
-        <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={spendingTrends}>
+        {hasData ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart data={spendingTrends}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="month" />
             <YAxis />
@@ -50,8 +53,18 @@ const HistoricalTrendsChart = ({ spendingTrends }) => {
             />
           </ComposedChart>
         </ResponsiveContainer>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full text-gray-500">
+            {React.createElement(getIcon("BarChart3"), {
+              className: "h-12 w-12 mb-4 opacity-50",
+            })}
+            <p className="text-lg font-medium">No Data Available</p>
+            <p className="text-sm">Add some transactions to see your financial trends</p>
+          </div>
+        )}
       </div>
-      <div className="mt-4 flex items-center gap-4 text-sm text-purple-900">
+      {hasData && (
+        <div className="mt-4 flex items-center gap-4 text-sm text-purple-900">
         <div className="flex items-center gap-2">
           <div
             className="w-3 h-3 bg-gray-400 rounded border border-black"
@@ -66,7 +79,8 @@ const HistoricalTrendsChart = ({ spendingTrends }) => {
           className: "h-4 w-4",
         })}
         <span>Last 3 months are projected based on historical trends</span>
-      </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -54,6 +54,8 @@ const generateSpendingTrends = (analyticsData) => {
  * Calculate spending velocity (rate of change)
  */
 const calculateSpendingVelocity = (spendingTrends) => {
+  if (!spendingTrends || spendingTrends.length < 2) return [];
+
   const velocity = [];
   for (let i = 1; i < spendingTrends.length; i++) {
     const current = spendingTrends[i];
@@ -125,7 +127,7 @@ const generateSeasonalPatterns = (analyticsData) => {
  * Generate forecast insights
  */
 const generateForecastInsights = (spendingTrends) => {
-  if (!spendingTrends.length) return {};
+  if (!spendingTrends || spendingTrends.length < 4) return {};
 
   const currentMonthData = spendingTrends[spendingTrends.length - 4];
   const forecastData = spendingTrends.slice(-3);
