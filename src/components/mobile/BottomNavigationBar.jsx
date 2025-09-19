@@ -8,8 +8,6 @@ import BottomNavItem from "./BottomNavItem";
  */
 const BottomNavigationBar = () => {
   const {
-    navigationItems,
-    activeItem,
     isVisible,
     getVisibleItems,
     isItemActive,
