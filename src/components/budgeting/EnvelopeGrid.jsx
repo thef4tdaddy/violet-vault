@@ -17,6 +17,9 @@ import EnvelopeItem from "./envelope/EnvelopeItem";
 import UnassignedCashEnvelope from "./envelope/UnassignedCashEnvelope";
 import EmptyStateHints from "../onboarding/EmptyStateHints";
 import logger from "../../utils/common/logger";
+import PullToRefreshIndicator from "../mobile/PullToRefreshIndicator";
+import usePullToRefresh from "../../hooks/mobile/usePullToRefresh";
+import { useQueryClient } from "@tanstack/react-query";
 
 // Lazy load modals for better performance
 const EnvelopeCreateModal = lazy(() => import("./CreateEnvelopeModal"));
@@ -101,6 +104,35 @@ const UnifiedEnvelopeManager = ({
     showEmpty: true,
     sortBy: "usage_desc",
     envelopeType: "all",
+  });
+
+  // Pull-to-refresh functionality for envelope data
+  const queryClient = useQueryClient();
+
+  const refreshEnvelopeData = async () => {
+    // Invalidate and refetch all envelope-related queries
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["envelopes"] }),
+      queryClient.invalidateQueries({ queryKey: ["transactions"] }),
+      queryClient.invalidateQueries({ queryKey: ["bills"] }),
+      queryClient.invalidateQueries({ queryKey: ["unassignedCash"] }),
+    ]);
+  };
+
+  const {
+    isPulling,
+    isRefreshing,
+    pullDistance,
+    pullProgress,
+    isReady,
+    touchHandlers,
+    containerRef,
+    pullStyles,
+    pullRotation,
+  } = usePullToRefresh(refreshEnvelopeData, {
+    threshold: 80,
+    resistance: 2.5,
+    enabled: true,
   });
 
   // Calculate envelope data using utility functions
@@ -190,7 +222,21 @@ const UnifiedEnvelopeManager = ({
   }
 
   return (
-    <div className={`space-y-6 ${className}`}>
+    <div
+      ref={containerRef}
+      {...touchHandlers}
+      className={`space-y-6 ${className} relative`}
+      style={pullStyles}
+    >
+      {/* Pull-to-refresh indicator */}
+      <PullToRefreshIndicator
+        isPulling={isPulling}
+        isRefreshing={isRefreshing}
+        pullProgress={pullProgress}
+        isReady={isReady}
+        pullRotation={pullRotation}
+      />
+
       <EnvelopeSummary totals={totals} unassignedCash={unassignedCash} />
 
       <EnvelopeHeader
