@@ -75,7 +75,8 @@ const GeneralSettingsSection = ({
   return (
     <div className="space-y-6">
       <h3 className="font-black text-black text-base">
-        <span className="text-lg">G</span>ENERAL <span className="text-lg">S</span>ETTINGS
+        <span className="text-lg">G</span>ENERAL{" "}
+        <span className="text-lg">S</span>ETTINGS
       </h3>
 
       {isLocalOnlyMode && (
@@ -105,7 +106,9 @@ const GeneralSettingsSection = ({
           <h4 className="font-medium text-purple-900">Cloud Sync</h4>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-purple-900">Sync your data across devices</p>
+              <p className="text-sm text-purple-900">
+                Sync your data across devices
+              </p>
               <p className="text-xs text-purple-700 mt-1">
                 Status: {cloudSyncEnabled ? "Enabled" : "Disabled"}
               </p>
@@ -144,28 +147,40 @@ const GeneralSettingsSection = ({
       {/* PWA Install Section */}
       <div className="glassmorphism rounded-lg p-4 border-2 border-black ring-1 ring-gray-800/10 space-y-4">
         <h4 className="font-medium text-purple-900 flex items-center space-x-2">
-          {getIcon("smartphone", "w-5 h-5 text-purple-600")}
+          {React.createElement(getIcon("Smartphone"), {
+            className: "w-5 h-5 text-purple-600",
+          })}
           <span>Progressive Web App</span>
         </h4>
 
         {pwaStatus.isInstalled ? (
           <div className="flex items-start space-x-3">
-            {getIcon("check-circle", "w-5 h-5 text-green-600 mt-0.5 flex-shrink-0")}
+            {React.createElement(getIcon("CheckCircle"), {
+              className: "w-5 h-5 text-green-600 mt-0.5 flex-shrink-0",
+            })}
             <div>
-              <p className="text-sm text-purple-900 font-medium">App is installed</p>
+              <p className="text-sm text-purple-900 font-medium">
+                App is installed
+              </p>
               <p className="text-xs text-purple-700 mt-1">
-                VioletVault is installed and running as a native app with offline support.
+                VioletVault is installed and running as a native app with
+                offline support.
               </p>
             </div>
           </div>
         ) : (
           <div className="space-y-3">
             <div className="flex items-start space-x-3">
-              {getIcon("download", "w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0")}
+              {React.createElement(getIcon("Download"), {
+                className: "w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0",
+              })}
               <div className="flex-1">
-                <p className="text-sm text-purple-900 font-medium">Install VioletVault as an app</p>
+                <p className="text-sm text-purple-900 font-medium">
+                  Install VioletVault as an app
+                </p>
                 <p className="text-xs text-purple-700 mt-1">
-                  Get faster loading, offline access, and a native app experience.
+                  Get faster loading, offline access, and a native app
+                  experience.
                 </p>
               </div>
             </div>
@@ -173,11 +188,20 @@ const GeneralSettingsSection = ({
             {pwaStatus.isIOS ? (
               <div className="bg-blue-50/60 rounded-lg p-3 border border-blue-200">
                 <div className="flex items-start space-x-2 text-sm">
-                  {getIcon("info", "w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5")}
+                  {React.createElement(getIcon("Info"), {
+                    className: "w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5",
+                  })}
                   <div className="text-gray-700">
-                    <p className="font-medium mb-1">To install on iOS Safari:</p>
+                    <p className="font-medium mb-1">
+                      To install on iOS Safari:
+                    </p>
                     <ol className="list-decimal list-inside space-y-1 text-xs">
-                      <li>Tap the Share button {getIcon("share", "w-3 h-3 inline")}</li>
+                      <li>
+                        Tap the Share button{" "}
+                        {React.createElement(getIcon("Share"), {
+                          className: "w-3 h-3 inline",
+                        })}
+                      </li>
                       <li>Select "Add to Home Screen"</li>
                       <li>Tap "Add" to confirm</li>
                     </ol>
@@ -192,38 +216,51 @@ const GeneralSettingsSection = ({
               >
                 {isInstalling ? (
                   <>
-                    {getIcon("loader", "w-4 h-4 mr-2 animate-spin")}
+                    {React.createElement(getIcon("Loader"), {
+                      className: "w-4 h-4 mr-2 animate-spin",
+                    })}
                     Installing...
                   </>
                 ) : (
                   <>
-                    {getIcon("download", "w-4 h-4 mr-2")}
+                    {React.createElement(getIcon("Download"), {
+                      className: "w-4 h-4 mr-2",
+                    })}
                     Install App
                   </>
                 )}
               </button>
             ) : (
               <p className="text-xs text-gray-500 italic">
-                Installation not available in this browser or app is already installed.
+                Installation not available in this browser or app is already
+                installed.
               </p>
             )}
 
             {/* Installation benefits */}
             <div className="grid grid-cols-2 gap-2 mt-3">
               <div className="flex items-center space-x-2 text-xs text-gray-600">
-                {getIcon("wifi-off", "w-3 h-3 text-green-600")}
+                {React.createElement(getIcon("WifiOff"), {
+                  className: "w-3 h-3 text-green-600",
+                })}
                 <span>Offline access</span>
               </div>
               <div className="flex items-center space-x-2 text-xs text-gray-600">
-                {getIcon("zap", "w-3 h-3 text-green-600")}
+                {React.createElement(getIcon("Zap"), {
+                  className: "w-3 h-3 text-green-600",
+                })}
                 <span>Faster loading</span>
               </div>
               <div className="flex items-center space-x-2 text-xs text-gray-600">
-                {getIcon("home", "w-3 h-3 text-green-600")}
+                {React.createElement(getIcon("Home"), {
+                  className: "w-3 h-3 text-green-600",
+                })}
                 <span>Home screen icon</span>
               </div>
               <div className="flex items-center space-x-2 text-xs text-gray-600">
-                {getIcon("bell", "w-3 h-3 text-green-600")}
+                {React.createElement(getIcon("Bell"), {
+                  className: "w-3 h-3 text-green-600",
+                })}
                 <span>Native experience</span>
               </div>
             </div>

@@ -36,13 +36,14 @@ const InstallPromptModal = () => {
           </div>
 
           <h2 className="font-black text-black text-xl mb-2">
-            📱 <span className="text-2xl">I</span>NSTALL <span className="text-2xl">V</span>IOLET
+            📱 <span className="text-2xl">I</span>NSTALL{" "}
+            <span className="text-2xl">V</span>IOLET
             <span className="text-2xl">V</span>AULT
           </h2>
 
           <p className="text-purple-900 text-sm leading-relaxed">
-            Install VioletVault on your device for a better experience with offline access and quick
-            launch.
+            Install VioletVault on your device for a better experience with
+            offline access and quick launch.
           </p>
         </div>
 
@@ -50,19 +51,29 @@ const InstallPromptModal = () => {
         <div className="bg-purple-50/60 rounded-lg p-4 mb-6 border border-purple-200">
           <div className="space-y-2 text-sm">
             <div className="flex items-center space-x-2">
-              {getIcon("smartphone", "w-4 h-4 text-purple-600 flex-shrink-0")}
+              {React.createElement(getIcon("Smartphone"), {
+                className: "w-4 h-4 text-purple-600 flex-shrink-0",
+              })}
               <span className="text-gray-700">Works like a native app</span>
             </div>
             <div className="flex items-center space-x-2">
-              {getIcon("wifi-off", "w-4 h-4 text-purple-600 flex-shrink-0")}
+              {React.createElement(getIcon("WifiOff"), {
+                className: "w-4 h-4 text-purple-600 flex-shrink-0",
+              })}
               <span className="text-gray-700">Full offline functionality</span>
             </div>
             <div className="flex items-center space-x-2">
-              {getIcon("zap", "w-4 h-4 text-purple-600 flex-shrink-0")}
-              <span className="text-gray-700">Faster loading and performance</span>
+              {React.createElement(getIcon("Zap"), {
+                className: "w-4 h-4 text-purple-600 flex-shrink-0",
+              })}
+              <span className="text-gray-700">
+                Faster loading and performance
+              </span>
             </div>
             <div className="flex items-center space-x-2">
-              {getIcon("home", "w-4 h-4 text-purple-600 flex-shrink-0")}
+              {React.createElement(getIcon("Home"), {
+                className: "w-4 h-4 text-purple-600 flex-shrink-0",
+              })}
               <span className="text-gray-700">Add to home screen</span>
             </div>
           </div>
@@ -72,11 +83,18 @@ const InstallPromptModal = () => {
         {isIOS && (
           <div className="bg-blue-50/60 rounded-lg p-4 mb-6 border border-blue-200">
             <div className="flex items-start space-x-2 text-sm">
-              {getIcon("info", "w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5")}
+              {React.createElement(getIcon("Info"), {
+                className: "w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5",
+              })}
               <div className="text-gray-700">
                 <p className="font-medium mb-1">To install on iOS:</p>
                 <ol className="list-decimal list-inside space-y-1 text-xs">
-                  <li>Tap the Share button {getIcon("share", "w-3 h-3 inline")}</li>
+                  <li>
+                    Tap the Share button{" "}
+                    {React.createElement(getIcon("Share"), {
+                      className: "w-3 h-3 inline",
+                    })}
+                  </li>
                   <li>Select "Add to Home Screen"</li>
                   <li>Tap "Add" to confirm</li>
                 </ol>
@@ -92,7 +110,9 @@ const InstallPromptModal = () => {
               onClick={handleInstall}
               className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold py-3 px-6 rounded-lg border-2 border-black shadow-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-200 flex items-center justify-center space-x-2"
             >
-              {getIcon("download", "w-4 h-4")}
+              {React.createElement(getIcon("Download"), {
+                className: "w-4 h-4",
+              })}
               <span>Install App</span>
             </button>
           )}

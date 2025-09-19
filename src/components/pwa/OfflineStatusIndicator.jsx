@@ -63,7 +63,8 @@ const OfflineStatusIndicator = () => {
 
   const getStatusText = () => {
     if (!isOnline) return "Offline";
-    if (syncStatus.pendingCount > 0) return `Syncing ${syncStatus.pendingCount}`;
+    if (syncStatus.pendingCount > 0)
+      return `Syncing ${syncStatus.pendingCount}`;
     return "Online";
   };
 
@@ -85,7 +86,10 @@ const OfflineStatusIndicator = () => {
   if (isOnline && syncStatus.pendingCount === 0 && !showDetails) {
     // Only show minimal indicator when everything is working normally
     return (
-      <div className="fixed bottom-4 right-4 z-30 cursor-pointer" onClick={handleToggleDetails}>
+      <div
+        className="fixed bottom-4 right-4 z-30 cursor-pointer"
+        onClick={handleToggleDetails}
+      >
         <div
           className={`w-3 h-3 rounded-full ${getStatusColor()} shadow-lg transition-all duration-300 hover:scale-125`}
         ></div>
@@ -100,11 +104,17 @@ const OfflineStatusIndicator = () => {
         className="flex items-center space-x-2 bg-black/80 text-white px-3 py-2 rounded-lg shadow-lg backdrop-blur-sm cursor-pointer transition-all duration-300 hover:bg-black/90"
         onClick={handleToggleDetails}
       >
-        <div className={`w-2 h-2 rounded-full ${getStatusColor()} animate-pulse`}></div>
+        <div
+          className={`w-2 h-2 rounded-full ${getStatusColor()} animate-pulse`}
+        ></div>
         <span className="text-sm font-medium">{getStatusText()}</span>
 
         {syncStatus.pendingCount > 0 && (
-          <div className="animate-spin">{getIcon("refresh-cw", "w-3 h-3")}</div>
+          <div className="animate-spin">
+            {React.createElement(getIcon("RefreshCw"), {
+              className: "w-3 h-3",
+            })}
+          </div>
         )}
       </div>
 
@@ -114,14 +124,16 @@ const OfflineStatusIndicator = () => {
           {/* Header */}
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-bold text-black text-sm">
-              {getIcon("wifi", "w-4 h-4 inline mr-1")}
+              {React.createElement(getIcon("Wifi"), {
+                className: "w-4 h-4 inline mr-1",
+              })}
               Connection Status
             </h3>
             <button
               onClick={() => setShowDetails(false)}
               className="text-gray-400 hover:text-gray-600"
             >
-              {getIcon("x", "w-4 h-4")}
+              {React.createElement(getIcon("X"), { className: "w-4 h-4" })}
             </button>
           </div>
 
@@ -130,7 +142,9 @@ const OfflineStatusIndicator = () => {
             <div className="flex items-center justify-between">
               <span className="text-gray-600">Status:</span>
               <div className="flex items-center space-x-1">
-                <div className={`w-2 h-2 rounded-full ${getStatusColor()}`}></div>
+                <div
+                  className={`w-2 h-2 rounded-full ${getStatusColor()}`}
+                ></div>
                 <span className="font-medium">{getStatusText()}</span>
               </div>
             </div>
@@ -138,7 +152,9 @@ const OfflineStatusIndicator = () => {
             {syncStatus.pendingCount > 0 && (
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Pending Operations:</span>
-                <span className="font-medium text-yellow-600">{syncStatus.pendingCount}</span>
+                <span className="font-medium text-yellow-600">
+                  {syncStatus.pendingCount}
+                </span>
               </div>
             )}
 
@@ -152,24 +168,34 @@ const OfflineStatusIndicator = () => {
           {!isOnline && (
             <div className="mt-4 pt-3 border-t border-gray-200">
               <h4 className="font-medium text-black text-sm mb-2 flex items-center">
-                {getIcon("check-circle", "w-4 h-4 text-green-600 mr-1")}
+                {React.createElement(getIcon("CheckCircle"), {
+                  className: "w-4 h-4 text-green-600 mr-1",
+                })}
                 Available Offline
               </h4>
               <div className="space-y-1 text-xs text-gray-600">
                 <div className="flex items-center space-x-1">
-                  {getIcon("pie-chart", "w-3 h-3")}
+                  {React.createElement(getIcon("PieChart"), {
+                    className: "w-3 h-3",
+                  })}
                   <span>View budget and envelopes</span>
                 </div>
                 <div className="flex items-center space-x-1">
-                  {getIcon("credit-card", "w-3 h-3")}
+                  {React.createElement(getIcon("CreditCard"), {
+                    className: "w-3 h-3",
+                  })}
                   <span>Add transactions (queued for sync)</span>
                 </div>
                 <div className="flex items-center space-x-1">
-                  {getIcon("list", "w-3 h-3")}
+                  {React.createElement(getIcon("List"), {
+                    className: "w-3 h-3",
+                  })}
                   <span>Review transaction history</span>
                 </div>
                 <div className="flex items-center space-x-1">
-                  {getIcon("bar-chart", "w-3 h-3")}
+                  {React.createElement(getIcon("BarChart"), {
+                    className: "w-3 h-3",
+                  })}
                   <span>View analytics and trends</span>
                 </div>
               </div>
@@ -177,32 +203,37 @@ const OfflineStatusIndicator = () => {
           )}
 
           {/* Pending Operations Details */}
-          {syncStatus.pendingOperations && syncStatus.pendingOperations.length > 0 && (
-            <div className="mt-4 pt-3 border-t border-gray-200">
-              <h4 className="font-medium text-black text-sm mb-2 flex items-center">
-                {getIcon("clock", "w-4 h-4 text-yellow-600 mr-1")}
-                Pending Operations
-              </h4>
-              <div className="max-h-24 overflow-y-auto space-y-1">
-                {syncStatus.pendingOperations.slice(0, 3).map((op, index) => (
-                  <div
-                    key={op.id || index}
-                    className="text-xs text-gray-600 flex items-center justify-between"
-                  >
-                    <span>{op.type || "Operation"}</span>
-                    <span className="text-yellow-600">
-                      {op.retryCount > 0 ? `Retry ${op.retryCount}` : "Queued"}
-                    </span>
-                  </div>
-                ))}
-                {syncStatus.pendingOperations.length > 3 && (
-                  <div className="text-xs text-gray-500">
-                    +{syncStatus.pendingOperations.length - 3} more...
-                  </div>
-                )}
+          {syncStatus.pendingOperations &&
+            syncStatus.pendingOperations.length > 0 && (
+              <div className="mt-4 pt-3 border-t border-gray-200">
+                <h4 className="font-medium text-black text-sm mb-2 flex items-center">
+                  {React.createElement(getIcon("Clock"), {
+                    className: "w-4 h-4 text-yellow-600 mr-1",
+                  })}
+                  Pending Operations
+                </h4>
+                <div className="max-h-24 overflow-y-auto space-y-1">
+                  {syncStatus.pendingOperations.slice(0, 3).map((op, index) => (
+                    <div
+                      key={op.id || index}
+                      className="text-xs text-gray-600 flex items-center justify-between"
+                    >
+                      <span>{op.type || "Operation"}</span>
+                      <span className="text-yellow-600">
+                        {op.retryCount > 0
+                          ? `Retry ${op.retryCount}`
+                          : "Queued"}
+                      </span>
+                    </div>
+                  ))}
+                  {syncStatus.pendingOperations.length > 3 && (
+                    <div className="text-xs text-gray-500">
+                      +{syncStatus.pendingOperations.length - 3} more...
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* Actions */}
           <div className="mt-4 pt-3 border-t border-gray-200 flex space-x-2">

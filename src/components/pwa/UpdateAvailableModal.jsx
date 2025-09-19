@@ -7,7 +7,8 @@ import useUiStore from "../../stores/ui/uiStore";
  * Shows when a new version of the PWA is available
  */
 const UpdateAvailableModal = () => {
-  const { updateAvailable, isUpdating, setUpdateAvailable, updateApp } = useUiStore();
+  const { updateAvailable, isUpdating, setUpdateAvailable, updateApp } =
+    useUiStore();
 
   if (!updateAvailable) return null;
 
@@ -25,17 +26,20 @@ const UpdateAvailableModal = () => {
         {/* Header */}
         <div className="text-center mb-6">
           <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center border-2 border-black shadow-xl">
-            {getIcon("download", "w-8 h-8 text-white")}
+            {React.createElement(getIcon("Download"), {
+              className: "w-8 h-8 text-white",
+            })}
           </div>
 
           <h2 className="font-black text-black text-xl mb-2">
-            🚀 <span className="text-2xl">N</span>EW <span className="text-2xl">V</span>ERSION{" "}
+            🚀 <span className="text-2xl">N</span>EW{" "}
+            <span className="text-2xl">V</span>ERSION{" "}
             <span className="text-2xl">R</span>EADY!
           </h2>
 
           <p className="text-purple-900 text-sm leading-relaxed">
-            We've updated VioletVault with new features and fixes. Update now to get the latest
-            improvements.
+            We've updated VioletVault with new features and fixes. Update now to
+            get the latest improvements.
           </p>
         </div>
 
@@ -43,16 +47,24 @@ const UpdateAvailableModal = () => {
         <div className="bg-purple-50/60 rounded-lg p-4 mb-6 border border-purple-200">
           <div className="space-y-2 text-sm">
             <div className="flex items-center space-x-2">
-              {getIcon("check-circle", "w-4 h-4 text-green-600 flex-shrink-0")}
+              {React.createElement(getIcon("CheckCircle"), {
+                className: "w-4 h-4 text-green-600 flex-shrink-0",
+              })}
               <span className="text-gray-700">Latest security updates</span>
             </div>
             <div className="flex items-center space-x-2">
-              {getIcon("check-circle", "w-4 h-4 text-green-600 flex-shrink-0")}
+              {React.createElement(getIcon("CheckCircle"), {
+                className: "w-4 h-4 text-green-600 flex-shrink-0",
+              })}
               <span className="text-gray-700">Performance improvements</span>
             </div>
             <div className="flex items-center space-x-2">
-              {getIcon("check-circle", "w-4 h-4 text-green-600 flex-shrink-0")}
-              <span className="text-gray-700">Enhanced offline functionality</span>
+              {React.createElement(getIcon("CheckCircle"), {
+                className: "w-4 h-4 text-green-600 flex-shrink-0",
+              })}
+              <span className="text-gray-700">
+                Enhanced offline functionality
+              </span>
             </div>
           </div>
         </div>
@@ -71,7 +83,9 @@ const UpdateAvailableModal = () => {
               </>
             ) : (
               <>
-                {getIcon("refresh-cw", "w-4 h-4")}
+                {React.createElement(getIcon("RefreshCw"), {
+                  className: "w-4 h-4",
+                })}
                 <span>Update Now</span>
               </>
             )}
