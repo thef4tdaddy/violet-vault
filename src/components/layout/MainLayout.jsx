@@ -36,6 +36,7 @@ import LocalDataSecurityWarning from "../security/LocalDataSecurityWarning";
 import AppRoutes from "./AppRoutes";
 import { pathToViewMap, viewToPathMap } from "./routeConfig";
 import FloatingActionButton from "../mobile/FloatingActionButton";
+import BottomNavigationBar from "../mobile/BottomNavigationBar";
 
 // Heavy components now lazy loaded in ViewRenderer
 
@@ -378,6 +379,9 @@ const MainContent = ({
 
           {/* Floating Action Button - Mobile Only */}
           <FloatingActionButton onAction={handleFABAction} />
+
+          {/* Bottom Navigation Bar - Mobile Only */}
+          <BottomNavigationBar />
 
           {/* Version Footer */}
           <div className="mt-8 text-center">
