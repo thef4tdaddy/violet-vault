@@ -63,7 +63,9 @@ const MetricCard = ({ title, value, subtitle, icon, trend, color = "purple" }) =
             </p>
           )}
         </div>
-        <Icon className={`h-8 w-8 ${ICON_CLASSES[color] || ICON_CLASSES.purple}`} />
+        {React.createElement(Icon, {
+          className: `h-8 w-8 ${ICON_CLASSES[color] || ICON_CLASSES.purple}`,
+        })}
       </div>
       {trend !== undefined && trend !== null && (
         <div className="mt-3 flex items-center text-sm">

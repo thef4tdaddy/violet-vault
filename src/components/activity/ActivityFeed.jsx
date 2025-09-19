@@ -126,7 +126,7 @@ const ActivityFeed = () => {
                   {(() => {
                     const iconInfo = getActivityIconInfo(activity.action, activity.entityType);
                     const IconComponent = iconInfo.component;
-                    return <IconComponent className={iconInfo.className} />;
+                    return React.createElement(IconComponent, { className: iconInfo.className });
                   })()}
                 </div>
 
