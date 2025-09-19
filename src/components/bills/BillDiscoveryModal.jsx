@@ -63,7 +63,7 @@ const BillDiscoveryModal = ({
   const getBillIconComponent = (bill) => {
     if (bill.iconName && typeof bill.iconName === "string") {
       const IconComponent = getIconByName(bill.iconName);
-      return <IconComponent className="h-6 w-6" />;
+      return React.createElement(IconComponent, { className: "h-6 w-6" });
     }
 
     const IconComponent = getBillIcon(
@@ -71,7 +71,7 @@ const BillDiscoveryModal = ({
       bill.description || "",
       bill.category || ""
     );
-    return <IconComponent className="h-6 w-6" />;
+    return React.createElement(IconComponent, { className: "h-6 w-6" });
   };
 
   const handleAddSelected = async () => {
