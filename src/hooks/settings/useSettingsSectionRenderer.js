@@ -3,6 +3,7 @@ import GeneralSettingsSection from "../../components/settings/sections/GeneralSe
 import AccountSettingsSection from "../../components/settings/sections/AccountSettingsSection";
 import SecuritySettingsSection from "../../components/settings/sections/SecuritySettingsSection";
 import DataManagementSection from "../../components/settings/sections/DataManagementSection";
+import NotificationSettingsSection from "../../components/settings/sections/NotificationSettingsSection";
 import DevToolsSection from "../../components/settings/sections/DevToolsSection";
 
 /**
@@ -73,6 +74,9 @@ export const useSettingsSectionRenderer = ({
           onImport,
           onSync,
         });
+
+      case "notifications":
+        return React.createElement(NotificationSettingsSection);
 
       case "devtools":
         return React.createElement(DevToolsSection, {

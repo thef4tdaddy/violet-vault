@@ -206,6 +206,7 @@ export const useSettingsSections = () => {
     { id: "account", label: "Account", icon: "User" },
     { id: "security", label: "Security", icon: "Shield" },
     { id: "data", label: "Data", icon: "Cloud" },
+    { id: "notifications", label: "Notifications", icon: "Bell" },
   ];
 
   // Add Dev Tools section in development mode only
