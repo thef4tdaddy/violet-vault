@@ -35,6 +35,7 @@ import PasswordRotationModal from "../auth/PasswordRotationModal";
 import LocalDataSecurityWarning from "../security/LocalDataSecurityWarning";
 import AppRoutes from "./AppRoutes";
 import { pathToViewMap, viewToPathMap } from "./routeConfig";
+import FloatingActionButton from "../mobile/FloatingActionButton";
 
 // Heavy components now lazy loaded in ViewRenderer
 
@@ -277,6 +278,45 @@ const MainContent = ({
   // Payday prediction notifications using TanStack Query data
   usePaydayPrediction(tanStackPaycheckHistory, !!currentUser);
 
+  // FAB action handler (Phase 1: Basic logging, will connect to modals in Phase 4)
+  const handleFABAction = (actionType, actionConfig) => {
+    logger.info(`FAB action triggered: ${actionType}`, { actionConfig });
+
+    // Phase 1: Basic action handling - will be expanded in Phase 4
+    switch (actionType) {
+      case "openCreateEnvelopeModal":
+        // TODO: Connect to CreateEnvelopeModal in Phase 4
+        logger.info("Create Envelope FAB action - modal integration pending");
+        break;
+      case "openPaycheckModal":
+        // TODO: Connect to PaycheckProcessor modal wrapper in Phase 4
+        logger.info("Add Paycheck FAB action - modal integration pending");
+        break;
+      case "openAddBillModal":
+        // TODO: Connect to AddBillModal in Phase 4
+        logger.info("Add Bill FAB action - modal integration pending");
+        break;
+      case "openAddGoalModal":
+        // TODO: Connect to AddEditGoalModal in Phase 4
+        logger.info("New Goal FAB action - modal integration pending");
+        break;
+      case "openTransactionModal":
+        // TODO: Connect to TransactionModal in Phase 4
+        logger.info("Add Transaction FAB action - modal integration pending");
+        break;
+      case "openAddDebtModal":
+        // TODO: Connect to AddDebtModal in Phase 4
+        logger.info("Add Debt FAB action - modal integration pending");
+        break;
+      case "openNewRuleModal":
+        // TODO: Connect to AutoFunding rule modal in Phase 4
+        logger.info("New Rule FAB action - modal integration pending");
+        break;
+      default:
+        logger.warn(`Unknown FAB action: ${actionType}`);
+    }
+  };
+
   return (
     <OnboardingTutorial setActiveView={setActiveView}>
       <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 p-4 sm:px-6 md:px-8 overflow-x-hidden pb-20 lg:pb-0">
@@ -323,6 +363,9 @@ const MainContent = ({
 
           {/* Bug Report Button */}
           <BugReportButton />
+
+          {/* Floating Action Button - Mobile Only */}
+          <FloatingActionButton onAction={handleFABAction} />
 
           {/* Version Footer */}
           <div className="mt-8 text-center">
