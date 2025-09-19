@@ -5,7 +5,6 @@
  * Reduced from 1,156 LOC to ~400 LOC by extracting business logic
  */
 import React from "react";
-import { getIcon } from "../../utils";
 import { useBillManager } from "../../hooks/bills/useBillManager";
 import { useBillManagerUI } from "../../hooks/bills/useBillManagerUI";
 import useEditLock from "../../hooks/common/useEditLock";

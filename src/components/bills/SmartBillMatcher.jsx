@@ -1,6 +1,5 @@
 // components/SmartBillMatcher.jsx
 import React, { useState, useEffect } from "react";
-import { getIcon } from "../../utils";
 
 const SmartBillMatcher = ({ bills, envelopes, onSuggestEnvelope, searchQuery }) => {
   const [suggestions, setSuggestions] = useState([]);
