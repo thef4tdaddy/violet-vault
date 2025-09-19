@@ -29,7 +29,7 @@ export const useChartConfig = () => {
       return (
         <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
           <p className="font-semibold text-gray-900 mb-2">{label}</p>
-          {payload.map((entry, index) => (
+          {payload.filter(entry => entry != null).map((entry, index) => (
             <p key={index} style={{ color: entry.color }} className="text-sm">
               {entry.name}: ${entry.value?.toFixed(2)}
             </p>
