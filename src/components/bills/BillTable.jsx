@@ -56,9 +56,9 @@ const BillTable = ({
                   title={selectionState.isAllSelected ? "Deselect all bills" : "Select all bills"}
                 >
                   {selectionState.isAllSelected ? (
-                    <CheckSquare className="h-5 w-5 text-blue-600" />
+                    React.createElement(getIcon("CheckSquare"), { className: "h-5 w-5 text-blue-600" })
                   ) : (
-                    <Square className="h-5 w-5 text-gray-400" />
+                    React.createElement(getIcon("Square"), { className: "h-5 w-5 text-gray-400" })
                   )}
                 </button>
               </th>
