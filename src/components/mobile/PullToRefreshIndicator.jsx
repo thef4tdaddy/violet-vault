@@ -25,7 +25,7 @@ const PullToRefreshIndicator = ({
     >
       <div className="bg-white/90 backdrop-blur-sm rounded-full p-3 border-2 border-black shadow-lg">
         {isRefreshing ? (
-          <div className="animate-spin">{getIcon("RotateCw", "w-6 h-6 text-purple-600")}</div>
+          <div className="animate-spin">{React.createElement(getIcon("RotateCw"), { className: "w-6 h-6 text-purple-600" })}</div>
         ) : (
           <div
             className={`transition-transform duration-200 ${
@@ -35,7 +35,7 @@ const PullToRefreshIndicator = ({
               transform: `rotate(${pullRotation}deg)`,
             }}
           >
-            {getIcon("ArrowDown", "w-6 h-6")}
+            {React.createElement(getIcon("ArrowDown"), { className: "w-6 h-6" })}
           </div>
         )}
       </div>

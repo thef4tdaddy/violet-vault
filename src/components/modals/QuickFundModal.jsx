@@ -56,7 +56,7 @@ const QuickFundModal = ({
         {/* Header */}
         <div className="text-center mb-6">
           <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center border-2 border-black shadow-xl">
-            {getIcon("DollarSign", "w-8 h-8 text-white")}
+            {React.createElement(getIcon("DollarSign"), { className: "w-8 h-8 text-white" })}
           </div>
 
           <h2 className="font-black text-black text-xl mb-2">

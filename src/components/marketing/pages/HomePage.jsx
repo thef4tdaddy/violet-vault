@@ -23,14 +23,14 @@ const HomePage = () => {
               to="/app"
               className="glassmorphism rounded-lg px-8 py-4 border-2 border-black bg-purple-600 text-white font-bold text-lg hover:bg-purple-700 transition-colors"
             >
-              {getIcon("arrowRight", "w-5 h-5 inline mr-2")}
+              {React.createElement(getIcon("ArrowRight"), { className: "w-5 h-5 inline mr-2" })}
               START BUDGETING FREE
             </Link>
             <Link
               to="/features"
               className="glassmorphism rounded-lg px-8 py-4 border-2 border-black bg-white/80 text-black font-bold text-lg hover:bg-purple-100 transition-colors"
             >
-              {getIcon("star", "w-5 h-5 inline mr-2")}
+              {React.createElement(getIcon("Star"), { className: "w-5 h-5 inline mr-2" })}
               EXPLORE FEATURES
             </Link>
           </div>
@@ -64,7 +64,7 @@ const HomePage = () => {
             className="glassmorphism rounded-lg p-6 border-2 border-black bg-white/80 backdrop-blur-sm text-center"
           >
             <div className="w-16 h-16 mx-auto mb-4 bg-purple-100 rounded-full flex items-center justify-center border-2 border-black">
-              {getIcon(icon, "w-8 h-8 text-purple-600")}
+              {React.createElement(getIcon(icon.charAt(0).toUpperCase() + icon.slice(1)), { className: "w-8 h-8 text-purple-600" })}
             </div>
             <h3 className="font-black text-black text-base mb-3">
               <span className="text-lg">{title.charAt(0)}</span>
@@ -89,7 +89,7 @@ const HomePage = () => {
             to="/app"
             className="glassmorphism rounded-lg px-8 py-4 border-2 border-black bg-purple-600 text-white font-bold text-lg hover:bg-purple-700 transition-colors inline-flex items-center"
           >
-            {getIcon("arrowRight", "w-5 h-5 mr-2")}
+            {React.createElement(getIcon("ArrowRight"), { className: "w-5 h-5 mr-2" })}
             LAUNCH YOUR BUDGET
           </Link>
         </div>
