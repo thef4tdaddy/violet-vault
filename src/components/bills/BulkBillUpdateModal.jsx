@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import { getIcon } from "../../utils";
 import { useBulkBillUpdate } from "../../hooks/bills/useBulkBillUpdate";
 import {
   calculateUpdateSummary,
@@ -78,7 +79,7 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
                   onClick={onClose}
                   className="text-gray-400 hover:text-gray-600 glassmorphism backdrop-blur-sm rounded-full p-2 shadow-lg hover:shadow-xl transition-all border-2 border-black"
                 >
-                  <X className="h-5 w-5" />
+                  {React.createElement(getIcon("X"), { className: "h-5 w-5" })}
                 </button>
               </div>
 
@@ -92,7 +93,7 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
                       : "bg-white/60 backdrop-blur-sm text-gray-700 hover:bg-white/80"
                   }`}
                 >
-                  <DollarSign className="h-4 w-4 mr-2" />
+                  {React.createElement(getIcon("DollarSign"), { className: "h-4 w-4 mr-2" })}
                   Amounts Only
                 </button>
                 <button
@@ -103,7 +104,7 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
                       : "bg-white/60 backdrop-blur-sm text-gray-700 hover:bg-white/80"
                   }`}
                 >
-                  <Calendar className="h-4 w-4 mr-2" />
+                  {React.createElement(getIcon("Calendar"), { className: "h-4 w-4 mr-2" })}
                   Due Dates Only
                 </button>
                 <button
@@ -114,7 +115,7 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
                       : "bg-white/60 backdrop-blur-sm text-gray-700 hover:bg-white/80"
                   }`}
                 >
-                  <Edit3 className="h-4 w-4 mr-2" />
+                  {React.createElement(getIcon("Edit3"), { className: "h-4 w-4 mr-2" })}
                   Both
                 </button>
               </div>
@@ -134,7 +135,7 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
                   <div className="text-sm text-purple-800">
                     {summary.hasChanges ? (
                       <div className="flex items-center gap-2 glassmorphism backdrop-blur-sm px-3 py-2 rounded-lg border border-orange-200">
-                        <AlertTriangle className="h-4 w-4 text-orange-600" />
+                        {React.createElement(getIcon("AlertTriangle"), { className: "h-4 w-4 text-orange-600" })}
                         <span className="font-bold">
                           {summary.changedBills} bills have changes
                           {summary.totalAmountChange !== 0 && (
@@ -147,7 +148,7 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
                       </div>
                     ) : (
                       <div className="flex items-center gap-2 glassmorphism backdrop-blur-sm px-3 py-2 rounded-lg border border-gray-200">
-                        <Clock className="h-4 w-4 text-gray-500" />
+                        {React.createElement(getIcon("Clock"), { className: "h-4 w-4 text-gray-500" })}
                         <span className="font-medium text-gray-600">No changes made yet</span>
                       </div>
                     )}
