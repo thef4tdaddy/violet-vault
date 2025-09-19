@@ -26,6 +26,12 @@ class FirebaseMessagingService {
    */
   async initialize() {
     try {
+      // Skip FCM initialization if using demo Firebase config to prevent service worker conflicts
+      if (firebaseConfig.projectId === "demo-project") {
+        logger.info("📱 Skipping FCM initialization (demo Firebase config detected)");
+        return false;
+      }
+
       // Check if messaging is supported in this browser
       const supported = await isSupported();
       if (!supported) {
