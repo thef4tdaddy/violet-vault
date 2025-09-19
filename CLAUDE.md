@@ -118,3 +118,40 @@ Never create custom implementations when shared components exist.
 3. **Low Priority**: Style/formatting, import order, prop validation
 
 **Standard Process:** Extract UI components for size violations, use strategy patterns for complexity, add underscore prefix for future-use variables, verify no new warnings introduced, maintain build stability and functionality.
+
+## Feature Implementation Workflow
+
+**For ALL feature implementation requests, follow this mandatory workflow:**
+
+### 1. **Issue Analysis & Expansion**
+- **ALWAYS** check if GitHub issue exists first
+- If exists: Read thoroughly and expand with detailed technical analysis
+- If missing: Create comprehensive issue with proper labels/milestones
+- Add technical specifications and acceptance criteria
+- Use labels: "enhancement" and "roadmap" for new features
+
+### 2. **Sub-Issue Creation**
+- Break down complex features into manageable sub-issues
+- Each sub-issue should be independently completable
+- Link sub-issues to parent epic for tracking
+- Assign appropriate labels (enhancement, mobile, UX, etc.)
+
+### 3. **Implementation Planning**
+- Create detailed technical plan in issue comments
+- Define architecture, components, and integration points
+- Map out phase-by-phase implementation strategy
+- Identify dependencies and potential blockers
+- Set success criteria and testing requirements
+
+### 4. **Pre-Implementation Checklist**
+- ✅ Issue properly documented and expanded
+- ✅ Sub-issues created if needed
+- ✅ Implementation plan commented on issue
+- ✅ Architecture decisions documented
+- ✅ Integration points identified
+- **ONLY THEN proceed with actual coding**
+
+**Example Pattern:**
+- Read/create GitHub issue → Expand with analysis → Create technical plan → Comment plan → Break into sub-issues if complex → Begin development
+
+**This ensures proper planning, documentation, and tracking before diving into code.**
