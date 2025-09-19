@@ -42,6 +42,10 @@ import FloatingActionButton from "../mobile/FloatingActionButton";
 const MainLayout = ({ firebaseSync }) => {
   // Removed noisy debug log - layout renders constantly
 
+  // Navigation hooks for post-login redirect
+  const location = useLocation();
+  const navigate = useNavigate();
+
   // Consolidated authentication manager
   const auth = useAuthenticationManager();
   const {
@@ -107,6 +111,14 @@ const MainLayout = ({ firebaseSync }) => {
     logger.debug("Local-only mode ready with user", { userId: localUser.id });
     // Local-only mode doesn't need further setup, let MainLayout render
   };
+
+  // Navigation effect - redirect to dashboard after successful authentication
+  useEffect(() => {
+    if (isUnlocked && currentUser && location.pathname === "/") {
+      logger.auth("User logged in but on landing page, redirecting to dashboard");
+      navigate("/app/dashboard");
+    }
+  }, [isUnlocked, currentUser, location.pathname, navigate]);
 
   // Use centralized auth gateway check
   if (shouldShowAuthGateway()) {
