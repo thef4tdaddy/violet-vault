@@ -83,7 +83,7 @@ const RulesTab = ({
           onClick={onCreateRule}
           className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
         >
-          <Plus className="h-5 w-5" />
+          {React.createElement(getIcon("Plus"), { className: "h-5 w-5" })}
           Create New Rule
         </button>
       </div>
@@ -96,7 +96,7 @@ const RulesTab = ({
             disabled={isExecuting}
             className="inline-flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Play className="h-4 w-4" />
+            {React.createElement(getIcon("Play"), { className: "h-4 w-4" })}
             {isExecuting ? "Executing..." : "Execute All Rules"}
           </button>
         </div>
@@ -105,7 +105,7 @@ const RulesTab = ({
       {/* Rules List */}
       {rules.length === 0 ? (
         <div className="text-center py-12">
-          <Settings className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          {React.createElement(getIcon("Settings"), { className: "h-12 w-12 text-gray-400 mx-auto mb-4" })}
           <h3 className="text-lg font-medium text-gray-900 mb-2">No Auto-Funding Rules</h3>
           <p className="text-gray-600 mb-6 max-w-sm mx-auto">
             Create your first rule to automate envelope funding based on your preferences and
@@ -177,21 +177,24 @@ const RulesTab = ({
                       className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
                       title={rule.enabled ? "Disable rule" : "Enable rule"}
                     >
-                      {rule.enabled ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                      {rule.enabled ?
+                        React.createElement(getIcon("Eye"), { className: "h-4 w-4" }) :
+                        React.createElement(getIcon("EyeOff"), { className: "h-4 w-4" })
+                      }
                     </button>
                     <button
                       onClick={() => onEditRule(rule)}
                       className="p-2 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50"
                       title="Edit rule"
                     >
-                      <Edit3 className="h-4 w-4" />
+                      {React.createElement(getIcon("Edit3"), { className: "h-4 w-4" })}
                     </button>
                     <button
                       onClick={() => onDeleteRule(rule.id)}
                       className="p-2 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50"
                       title="Delete rule"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      {React.createElement(getIcon("Trash2"), { className: "h-4 w-4" })}
                     </button>
                   </div>
                 </div>
