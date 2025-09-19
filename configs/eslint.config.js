@@ -165,6 +165,11 @@ export default [
           message:
             "Use PromptModal instead of window.prompt(). Import { usePrompt } from '../../hooks/common/usePrompt' and use the returned prompt function.",
         },
+        {
+          selector: "CallExpression[callee.name='getIcon'] > Literal:nth-child(2)",
+          message:
+            "Invalid getIcon usage. Use React.createElement(getIcon('IconName'), { className: 'classes' }) instead of getIcon('icon-name', 'classes'). See docs/ICON_MIGRATION_PLAN.md for proper usage.",
+        },
       ],
     },
   },
