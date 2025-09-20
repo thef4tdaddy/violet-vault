@@ -7,7 +7,7 @@ import logger from "../../utils/common/logger";
  */
 const useOnboardingStore = create(
   persist(
-    (set, _get) => ({
+    (set, get) => ({
       // Onboarding completion status
       isOnboarded: false,
 
@@ -38,33 +38,20 @@ const useOnboardingStore = create(
       // Actions
       markStepComplete: (step) => {
         logger.info(`✅ Onboarding step completed: ${step}`);
-
-        set((state) => {
-          const newTutorialProgress = {
+        set((state) => ({
+          tutorialProgress: {
             ...state.tutorialProgress,
             [step]: true,
-          };
+          },
+        }));
 
-          // Check if all steps are complete
-          const allStepsComplete = Object.values(newTutorialProgress).every(Boolean);
+        // Check if all steps are complete
+        const { tutorialProgress } = get();
+        const allStepsComplete = Object.values(tutorialProgress).every(Boolean);
 
-          if (allStepsComplete) {
-            // Auto-complete onboarding if all steps are done
-            return {
-              tutorialProgress: newTutorialProgress,
-              isOnboarded: true,
-              currentTutorialStep: null,
-              preferences: {
-                ...state.preferences,
-                tourCompleted: true,
-              },
-            };
-          }
-
-          return {
-            tutorialProgress: newTutorialProgress,
-          };
-        });
+        if (allStepsComplete) {
+          get().completeOnboarding();
+        }
       },
 
       startTutorialStep: (step) => {
@@ -78,14 +65,14 @@ const useOnboardingStore = create(
 
       completeOnboarding: () => {
         logger.info("🎉 Onboarding completed!");
-        set((state) => ({
+        set({
           isOnboarded: true,
           currentTutorialStep: null,
           preferences: {
-            ...state.preferences,
+            ...get().preferences,
             tourCompleted: true,
           },
-        }));
+        });
       },
 
       resetOnboarding: () => {
@@ -121,6 +108,27 @@ const useOnboardingStore = create(
           },
         }));
       },
+
+      // Helper methods
+      isStepComplete: (step) => {
+        return get().tutorialProgress[step] || false;
+      },
+
+      shouldShowHint: (step) => {
+        const { preferences, tutorialProgress, isOnboarded } = get();
+        return preferences.showHints && !isOnboarded && !tutorialProgress[step];
+      },
+
+      getProgress: () => {
+        const { tutorialProgress } = get();
+        const completedSteps = Object.values(tutorialProgress).filter(Boolean).length;
+        const totalSteps = Object.keys(tutorialProgress).length;
+        return {
+          completed: completedSteps,
+          total: totalSteps,
+          percentage: Math.round((completedSteps / totalSteps) * 100),
+        };
+      },
     }),
     {
       name: "violet-vault-onboarding",
@@ -128,40 +136,5 @@ const useOnboardingStore = create(
     }
   )
 );
-
-/**
- * Helper functions for onboarding store (external to avoid get() calls)
- */
-export const onboardingHelpers = {
-  /**
-   * Check if a tutorial step is complete
-   */
-  isStepComplete: (step) => {
-    const state = useOnboardingStore.getState();
-    return state.tutorialProgress[step] || false;
-  },
-
-  /**
-   * Check if a hint should be shown for a step
-   */
-  shouldShowHint: (step) => {
-    const { preferences, tutorialProgress, isOnboarded } = useOnboardingStore.getState();
-    return preferences.showHints && !isOnboarded && !tutorialProgress[step];
-  },
-
-  /**
-   * Get onboarding progress statistics
-   */
-  getProgress: () => {
-    const { tutorialProgress } = useOnboardingStore.getState();
-    const completedSteps = Object.values(tutorialProgress).filter(Boolean).length;
-    const totalSteps = Object.keys(tutorialProgress).length;
-    return {
-      completed: completedSteps,
-      total: totalSteps,
-      percentage: Math.round((completedSteps / totalSteps) * 100),
-    };
-  },
-};
 
 export default useOnboardingStore;
