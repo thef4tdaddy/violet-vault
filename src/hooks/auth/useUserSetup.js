@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { globalToast } from "../../stores/ui/toastStore";
 import logger from "../../utils/common/logger";
-import { budgetDb } from "../../db/budgetDb";
+import { budgetDb, clearData } from "../../db/budgetDb";
 
 /**
  * User Setup Hook
@@ -260,7 +260,7 @@ export const useUserSetup = (onSetupComplete) => {
     // Clear IndexedDB/Dexie data
     try {
       logger.debug("🗑️ Clearing Dexie database data");
-      await budgetDb.clear();
+      await clearData();
       logger.debug("✅ Successfully cleared Dexie database");
     } catch (error) {
       logger.error("❌ Failed to clear Dexie database:", error);
