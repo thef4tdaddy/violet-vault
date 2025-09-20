@@ -55,6 +55,92 @@ const getAllSecondaryActions = (state) => {
 };
 
 /**
+ * Create store actions object
+ */
+const createStoreActions = (set, _get) => ({
+  setCurrentScreen: (screenId) => {
+    set((state) => {
+      state.currentScreen = screenId;
+      state.isExpanded = false;
+    });
+  },
+
+  setVisibility: (visible) => {
+    set((state) => {
+      state.isVisible = visible;
+      if (!visible) {
+        state.isExpanded = false;
+      }
+    });
+  },
+
+  setExpanded: (expanded) => {
+    set((state) => {
+      state.isExpanded = expanded;
+    });
+  },
+
+  toggleExpanded: () => {
+    set((state) => {
+      state.isExpanded = !state.isExpanded;
+    });
+  },
+});
+
+/**
+ * Create action management methods
+ */
+const createActionManagement = (set, _get) => ({
+  registerPrimaryAction: (screenId, action) => {
+    set((state) => {
+      state.primaryActions.set(screenId, action);
+    });
+    logger.debug(`FAB: Registered primary action for ${screenId}`, { action: action.label });
+  },
+
+  unregisterPrimaryAction: (screenId) => {
+    set((state) => {
+      state.primaryActions.delete(screenId);
+    });
+    logger.debug(`FAB: Unregistered primary action for ${screenId}`);
+  },
+
+  registerSecondaryAction: (action) => {
+    if (!action.id) {
+      logger.warn("FAB: Secondary action must have an id", action);
+      return;
+    }
+
+    set((state) => {
+      state.secondaryActions.set(action.id, action);
+    });
+    logger.debug(`FAB: Registered secondary action ${action.id}`, { action: action.label });
+  },
+
+  unregisterSecondaryAction: (actionId) => {
+    set((state) => {
+      state.secondaryActions.delete(actionId);
+    });
+    logger.debug(`FAB: Unregistered secondary action ${actionId}`);
+  },
+
+  setDefaultActionHandler: (actionId, handler) => {
+    set((state) => {
+      if (state.defaultSecondaryActions[actionId]) {
+        state.defaultSecondaryActions[actionId].action = handler;
+      }
+    });
+  },
+
+  clearScreenActions: (screenId) => {
+    set((state) => {
+      state.primaryActions.delete(screenId);
+    });
+    logger.debug(`FAB: Cleared actions for ${screenId}`);
+  },
+});
+
+/**
  * Check if FAB should be shown
  */
 const getShouldShowFAB = (state) => {
@@ -72,120 +158,48 @@ const getShouldShowFAB = (state) => {
 export const useFABStore = create(
   subscribeWithSelector(
     devtools(
-      immer((set, get) => ({
-        // Core state
-        isVisible: true,
-        isExpanded: false,
-        currentScreen: "dashboard",
+      immer((set, get) => {
+        const storeActions = createStoreActions(set, get);
+        const actionManagement = createActionManagement(set, get);
 
-        // Actions registry
-        primaryActions: new Map(), // Map<screenId, action>
-        secondaryActions: new Map(), // Map<actionId, action>
+        return {
+          // Core state
+          isVisible: true,
+          isExpanded: false,
+          currentScreen: "dashboard",
 
-        // Default secondary actions
-        defaultSecondaryActions: getDefaultSecondaryActions(),
+          // Actions registry
+          primaryActions: new Map(),
+          secondaryActions: new Map(),
 
-        // Actions
-        setCurrentScreen: (screenId) => {
-          set((state) => {
-            state.currentScreen = screenId;
-            state.isExpanded = false; // Auto-collapse on screen change
-          });
-        },
+          // Default secondary actions
+          defaultSecondaryActions: getDefaultSecondaryActions(),
 
-        setVisibility: (visible) => {
-          set((state) => {
-            state.isVisible = visible;
-            if (!visible) {
-              state.isExpanded = false;
-            }
-          });
-        },
+          // Spread all actions
+          ...storeActions,
+          ...actionManagement,
 
-        setExpanded: (expanded) => {
-          set((state) => {
-            state.isExpanded = expanded;
-          });
-        },
+          // Getters (computed values)
+          getCurrentPrimaryAction: () => getCurrentPrimaryAction(get()),
+          getAllSecondaryActions: () => getAllSecondaryActions(get()),
+          getShouldShowFAB: () => getShouldShowFAB(get()),
 
-        toggleExpanded: () => {
-          set((state) => {
-            state.isExpanded = !state.isExpanded;
-          });
-        },
-
-        // Primary action management
-        registerPrimaryAction: (screenId, action) => {
-          set((state) => {
-            state.primaryActions.set(screenId, action);
-          });
-          logger.debug(`FAB: Registered primary action for ${screenId}`, { action: action.label });
-        },
-
-        unregisterPrimaryAction: (screenId) => {
-          set((state) => {
-            state.primaryActions.delete(screenId);
-          });
-          logger.debug(`FAB: Unregistered primary action for ${screenId}`);
-        },
-
-        // Secondary action management
-        registerSecondaryAction: (action) => {
-          if (!action.id) {
-            logger.warn("FAB: Secondary action must have an id", action);
-            return;
-          }
-
-          set((state) => {
-            state.secondaryActions.set(action.id, action);
-          });
-          logger.debug(`FAB: Registered secondary action ${action.id}`, { action: action.label });
-        },
-
-        unregisterSecondaryAction: (actionId) => {
-          set((state) => {
-            state.secondaryActions.delete(actionId);
-          });
-          logger.debug(`FAB: Unregistered secondary action ${actionId}`);
-        },
-
-        // Set default action handlers (like bug report)
-        setDefaultActionHandler: (actionId, handler) => {
-          set((state) => {
-            if (state.defaultSecondaryActions[actionId]) {
-              state.defaultSecondaryActions[actionId].action = handler;
-            }
-          });
-        },
-
-        // Clear all actions for current screen
-        clearScreenActions: (screenId) => {
-          set((state) => {
-            state.primaryActions.delete(screenId);
-          });
-          logger.debug(`FAB: Cleared actions for ${screenId}`);
-        },
-
-        // Getters (computed values)
-        getCurrentPrimaryAction: () => getCurrentPrimaryAction(get()),
-        getAllSecondaryActions: () => getAllSecondaryActions(get()),
-        getShouldShowFAB: () => getShouldShowFAB(get()),
-
-        // Debug method
-        getDebugInfo: () => {
-          const state = get();
-          return {
-            currentScreen: state.currentScreen,
-            isVisible: state.isVisible,
-            isExpanded: state.isExpanded,
-            primaryActionsCount: state.primaryActions.size,
-            secondaryActionsCount: state.secondaryActions.size,
-            defaultActionsWithHandlers: Object.values(state.defaultSecondaryActions).filter(
-              (a) => a.action !== null
-            ).length,
-          };
-        },
-      })),
+          // Debug method
+          getDebugInfo: () => {
+            const state = get();
+            return {
+              currentScreen: state.currentScreen,
+              isVisible: state.isVisible,
+              isExpanded: state.isExpanded,
+              primaryActionsCount: state.primaryActions.size,
+              secondaryActionsCount: state.secondaryActions.size,
+              defaultActionsWithHandlers: Object.values(state.defaultSecondaryActions).filter(
+                (a) => a.action !== null
+              ).length,
+            };
+          },
+        };
+      }),
       {
         name: "fab-store",
         // Only store non-function values in devtools
