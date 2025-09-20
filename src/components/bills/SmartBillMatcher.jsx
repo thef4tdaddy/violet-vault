@@ -203,7 +203,9 @@ const SmartBillMatcher = ({ bills, envelopes, onSuggestEnvelope, searchQuery }) 
                 >
                   {suggestion.confidence}%
                 </span>
-                {React.createElement(getIcon(confidenceIconName), { className: "h-4 w-4 text-gray-400" })}
+                {React.createElement(getIcon(confidenceIconName), {
+                  className: "h-4 w-4 text-gray-400",
+                })}
               </div>
             </button>
           );

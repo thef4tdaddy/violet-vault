@@ -84,7 +84,10 @@ const PaydayPrediction = ({
         </div>
         {prediction.confidence < 60 && (
           <div className="flex-shrink-0 ml-2">
-            {React.createElement(getIcon('AlertCircle'), { className: 'h-4 w-4 text-amber-500', title: 'Low confidence prediction' })}
+            {React.createElement(getIcon("AlertCircle"), {
+              className: "h-4 w-4 text-amber-500",
+              title: "Low confidence prediction",
+            })}
           </div>
         )}
       </div>
@@ -94,7 +97,7 @@ const PaydayPrediction = ({
         <div className="mt-4 pt-4 border-t border-gray-200">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center">
-              {React.createElement(getIcon('Zap'), { className: 'h-4 w-4 text-purple-600 mr-2' })}
+              {React.createElement(getIcon("Zap"), { className: "h-4 w-4 text-purple-600 mr-2" })}
               <span className="text-sm font-semibold text-purple-700">
                 {daysUntil === 0 ? "Payday Actions" : "Get Ready for Payday"}
               </span>
@@ -106,7 +109,9 @@ const PaydayPrediction = ({
               <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    {React.createElement(getIcon('DollarSign'), { className: 'h-4 w-4 text-purple-600 mr-2' })}
+                    {React.createElement(getIcon("DollarSign"), {
+                      className: "h-4 w-4 text-purple-600 mr-2",
+                    })}
                     <span className="text-sm font-medium text-purple-800">
                       Process Today's Paycheck
                     </span>
@@ -130,7 +135,9 @@ const PaydayPrediction = ({
               <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-200">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    {React.createElement(getIcon('TrendingUp'), { className: 'h-4 w-4 text-emerald-600 mr-2' })}
+                    {React.createElement(getIcon("TrendingUp"), {
+                      className: "h-4 w-4 text-emerald-600 mr-2",
+                    })}
                     <span className="text-sm font-medium text-emerald-800">Payday Tomorrow!</span>
                   </div>
                   {onPrepareEnvelopes && (
@@ -152,7 +159,9 @@ const PaydayPrediction = ({
               <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    {React.createElement(getIcon('Calendar'), { className: 'h-4 w-4 text-amber-600 mr-2' })}
+                    {React.createElement(getIcon("Calendar"), {
+                      className: "h-4 w-4 text-amber-600 mr-2",
+                    })}
                     <span className="text-sm font-medium text-amber-800">
                       Payday in {daysUntil} days
                     </span>

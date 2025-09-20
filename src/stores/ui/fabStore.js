@@ -40,14 +40,14 @@ const getAllSecondaryActions = (state) => {
   const actions = [];
 
   // Add default actions that have handlers
-  Object.values(defaultSecondaryActions).forEach(action => {
+  Object.values(defaultSecondaryActions).forEach((action) => {
     if (action.action) {
       actions.push(action);
     }
   });
 
   // Add custom secondary actions
-  secondaryActions.forEach(action => {
+  secondaryActions.forEach((action) => {
     actions.push(action);
   });
 
@@ -180,8 +180,9 @@ export const useFABStore = create(
             isExpanded: state.isExpanded,
             primaryActionsCount: state.primaryActions.size,
             secondaryActionsCount: state.secondaryActions.size,
-            defaultActionsWithHandlers: Object.values(state.defaultSecondaryActions)
-              .filter(a => a.action !== null).length,
+            defaultActionsWithHandlers: Object.values(state.defaultSecondaryActions).filter(
+              (a) => a.action !== null
+            ).length,
           };
         },
       })),

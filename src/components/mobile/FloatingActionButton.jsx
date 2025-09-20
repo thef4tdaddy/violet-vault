@@ -52,7 +52,7 @@ const MainFABButton = ({ primaryAction, isExpanded, onPrimaryClick, onToggleClic
       title={isExpanded ? "Close menu" : primaryAction?.label || "More actions"}
       style={{ width: "56px", height: "56px" }}
     >
-      {React.createElement(getIcon(isExpanded ? "X" : (primaryAction?.icon || "Plus")), {
+      {React.createElement(getIcon(isExpanded ? "X" : primaryAction?.icon || "Plus"), {
         className: "h-6 w-6",
       })}
     </button>
@@ -76,12 +76,7 @@ const MainFABButton = ({ primaryAction, isExpanded, onPrimaryClick, onToggleClic
  */
 const FloatingActionButton = () => {
   // Get FAB state from Zustand store
-  const {
-    isExpanded,
-    shouldShowFAB,
-    primaryAction,
-    secondaryActions,
-  } = useFABSelectors();
+  const { isExpanded, shouldShowFAB, primaryAction, secondaryActions } = useFABSelectors();
 
   // Get FAB actions from Zustand store
   const { setExpanded } = useFABActions();
@@ -124,11 +119,7 @@ const FloatingActionButton = () => {
       {isExpanded && secondaryActions.length > 0 && (
         <div className="absolute bottom-16 right-0 flex flex-col gap-3 mb-2">
           {secondaryActions.map((action, index) => (
-            <SecondaryActionButton
-              key={action.id || action.label}
-              action={action}
-              index={index}
-            />
+            <SecondaryActionButton key={action.id || action.label} action={action} index={index} />
           ))}
         </div>
       )}
@@ -143,10 +134,7 @@ const FloatingActionButton = () => {
 
       {/* Backdrop (close on click outside) */}
       {isExpanded && (
-        <div
-          className="fixed inset-0 bg-transparent -z-10"
-          onClick={handleBackdropClick}
-        />
+        <div className="fixed inset-0 bg-transparent -z-10" onClick={handleBackdropClick} />
       )}
     </div>
   );

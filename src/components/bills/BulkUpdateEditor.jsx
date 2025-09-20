@@ -92,7 +92,9 @@ const BulkUpdateEditor = ({
                   <div className="flex items-center gap-4">
                     {(updateMode === "amounts" || updateMode === "both") && (
                       <div className="flex items-center gap-2">
-                        {React.createElement(getIcon("DollarSign"), { className: "h-4 w-4 text-purple-600" })}
+                        {React.createElement(getIcon("DollarSign"), {
+                          className: "h-4 w-4 text-purple-600",
+                        })}
                         <input
                           type="number"
                           step="0.01"
@@ -114,7 +116,9 @@ const BulkUpdateEditor = ({
 
                     {(updateMode === "dates" || updateMode === "both") && (
                       <div className="flex items-center gap-2">
-                        {React.createElement(getIcon("Calendar"), { className: "h-4 w-4 text-purple-600" })}
+                        {React.createElement(getIcon("Calendar"), {
+                          className: "h-4 w-4 text-purple-600",
+                        })}
                         <input
                           type="date"
                           value={change?.dueDate || ""}
@@ -130,7 +134,9 @@ const BulkUpdateEditor = ({
 
                     {billHasChanges && (
                       <div className="glassmorphism rounded-full p-1 border border-blue-300">
-                        {React.createElement(getIcon("CheckCircle"), { className: "h-4 w-4 text-blue-600" })}
+                        {React.createElement(getIcon("CheckCircle"), {
+                          className: "h-4 w-4 text-blue-600",
+                        })}
                       </div>
                     )}
                   </div>

@@ -135,7 +135,9 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
                   <div className="text-sm text-purple-800">
                     {summary.hasChanges ? (
                       <div className="flex items-center gap-2 glassmorphism backdrop-blur-sm px-3 py-2 rounded-lg border border-orange-200">
-                        {React.createElement(getIcon("AlertTriangle"), { className: "h-4 w-4 text-orange-600" })}
+                        {React.createElement(getIcon("AlertTriangle"), {
+                          className: "h-4 w-4 text-orange-600",
+                        })}
                         <span className="font-bold">
                           {summary.changedBills} bills have changes
                           {summary.totalAmountChange !== 0 && (
@@ -148,7 +150,9 @@ const BulkBillUpdateModal = ({ isOpen, onClose, selectedBills = [], onUpdateBill
                       </div>
                     ) : (
                       <div className="flex items-center gap-2 glassmorphism backdrop-blur-sm px-3 py-2 rounded-lg border border-gray-200">
-                        {React.createElement(getIcon("Clock"), { className: "h-4 w-4 text-gray-500" })}
+                        {React.createElement(getIcon("Clock"), {
+                          className: "h-4 w-4 text-gray-500",
+                        })}
                         <span className="font-medium text-gray-600">No changes made yet</span>
                       </div>
                     )}
