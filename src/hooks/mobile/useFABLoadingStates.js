@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { useToast } from "../common/useToast";
+import useToast from "../common/useToast";
 import logger from "../../utils/common/logger";
 
 /**
@@ -8,7 +8,7 @@ import logger from "../../utils/common/logger";
  */
 export const useFABLoadingStates = () => {
   const [loadingActions, setLoadingActions] = useState(new Set());
-  const { showToast } = useToast();
+  const { showError } = useToast();
 
   // Check if a specific action is loading
   const isActionLoading = useCallback((actionId) => {
@@ -60,12 +60,11 @@ export const useFABLoadingStates = () => {
         });
 
         // Show error toast
-        showToast({
-          type: "error",
-          title: `${actionLabel} Failed`,
-          message: error.message || "An unexpected error occurred",
-          duration: 5000,
-        });
+        showError(
+          `${actionLabel} Failed`,
+          error.message || "An unexpected error occurred",
+          5000
+        );
 
         // Re-throw for component error boundaries if needed
         throw error;
@@ -74,7 +73,7 @@ export const useFABLoadingStates = () => {
         stopLoading(actionId);
       }
     };
-  }, [isActionLoading, startLoading, stopLoading, showToast]);
+  }, [isActionLoading, startLoading, stopLoading, showError]);
 
   // Create a loading wrapper for FAB actions
   const createLoadingAction = useCallback((actionId, actionFn, actionLabel) => {
