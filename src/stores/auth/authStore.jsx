@@ -17,7 +17,7 @@ function _compareUint8Arrays(a, b) {
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const useAuth = create((set, get) => ({
+export const useAuth = create((set, _get) => ({
   isUnlocked: false,
   encryptionKey: null,
   salt: null,
@@ -135,7 +135,7 @@ export const useAuth = create((set, get) => ({
 
           // Start background sync after successful login (new user path)
           // Safe external store access (prevents React error #185)
-          const { startBackgroundSyncAfterLogin } = useAuthStore.getState();
+          const { startBackgroundSyncAfterLogin } = useAuth.getState();
           await startBackgroundSyncAfterLogin(true); // Pass true for new user
 
           return { success: true };
@@ -169,7 +169,7 @@ export const useAuth = create((set, get) => ({
           // SECURITY FIX: Validate password BEFORE setting auth state (Issue #577)
           logger.auth("Validating password before allowing login");
           // Safe external store access (prevents React error #185)
-          const passwordValid = await useAuthStore.getState().validatePassword(password);
+          const passwordValid = await useAuth.getState().validatePassword(password);
           if (!passwordValid) {
             logger.auth("Password validation failed - offering new budget creation");
             return {
@@ -282,7 +282,7 @@ export const useAuth = create((set, get) => ({
 
           // Start background sync after successful login
           // Safe external store access (prevents React error #185)
-          const { startBackgroundSyncAfterLogin } = useAuthStore.getState();
+          const { startBackgroundSyncAfterLogin } = useAuth.getState();
           await startBackgroundSyncAfterLogin();
 
           return { success: true, data: migratedData };
@@ -385,7 +385,7 @@ export const useAuth = create((set, get) => ({
 
         // Start background sync after successful join
         // Safe external store access (prevents React error #185)
-        const { startBackgroundSyncAfterLogin } = useAuthStore.getState();
+        const { startBackgroundSyncAfterLogin } = useAuth.getState();
         await startBackgroundSyncAfterLogin(false); // Not a new user
 
         return { success: true, sharedBudget: true };

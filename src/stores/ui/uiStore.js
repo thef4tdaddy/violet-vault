@@ -79,7 +79,7 @@ const migrateOldData = async () => {
 
 // UI Store configuration - handles UI state, settings, and app preferences
 // Data arrays are handled by TanStack Query → Dexie architecture
-const storeInitializer = (set, get) => ({
+const storeInitializer = (set, _get) => ({
   // UI State and Settings
   biweeklyAllocation: 0,
   // Unassigned cash modal state
