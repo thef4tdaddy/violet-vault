@@ -7,125 +7,121 @@ import logger from "../../utils/common/logger";
  */
 const useOnboardingStore = create(
   persist(
-    (set, _get) => {
-      const store = {
-        // Onboarding completion status
-        isOnboarded: false,
+    (set, _get) => ({
+      // Onboarding completion status
+      isOnboarded: false,
 
-        // Tutorial progress tracking
-        tutorialProgress: {
-          accountSetup: false,
-          firstBankBalance: false,
-          firstPaycheck: false,
-          firstDebts: false,
-          firstBills: false,
-          firstEnvelope: false,
-          linkedEnvelopes: false,
-          firstAllocation: false,
-          firstTransaction: false,
-          syncExplained: false,
-        },
+      // Tutorial progress tracking
+      tutorialProgress: {
+        accountSetup: false,
+        firstBankBalance: false,
+        firstPaycheck: false,
+        firstDebts: false,
+        firstBills: false,
+        firstEnvelope: false,
+        linkedEnvelopes: false,
+        firstAllocation: false,
+        firstTransaction: false,
+        syncExplained: false,
+      },
 
-        // Current tutorial step (null when not in tutorial)
-        currentTutorialStep: null,
+      // Current tutorial step (null when not in tutorial)
+      currentTutorialStep: null,
 
-        // Tutorial preferences
-        preferences: {
-          showHints: true,
-          skipEmptyStateHelp: false,
-          tourCompleted: false,
-        },
+      // Tutorial preferences
+      preferences: {
+        showHints: true,
+        skipEmptyStateHelp: false,
+        tourCompleted: false,
+      },
 
-        // Actions
-        markStepComplete: (step) => {
-          logger.info(`✅ Onboarding step completed: ${step}`);
+      // Actions
+      markStepComplete: (step) => {
+        logger.info(`✅ Onboarding step completed: ${step}`);
 
-          set((state) => {
-            const newTutorialProgress = {
-              ...state.tutorialProgress,
-              [step]: true,
-            };
+        set((state) => {
+          const newTutorialProgress = {
+            ...state.tutorialProgress,
+            [step]: true,
+          };
 
-            // Check if all steps are complete
-            const allStepsComplete = Object.values(newTutorialProgress).every(Boolean);
+          // Check if all steps are complete
+          const allStepsComplete = Object.values(newTutorialProgress).every(Boolean);
 
-            if (allStepsComplete) {
-              // Auto-complete onboarding if all steps are done
-              return {
-                tutorialProgress: newTutorialProgress,
-                isOnboarded: true,
-                currentTutorialStep: null,
-                preferences: {
-                  ...state.preferences,
-                  tourCompleted: true,
-                },
-              };
-            }
-
+          if (allStepsComplete) {
+            // Auto-complete onboarding if all steps are done
             return {
               tutorialProgress: newTutorialProgress,
+              isOnboarded: true,
+              currentTutorialStep: null,
+              preferences: {
+                ...state.preferences,
+                tourCompleted: true,
+              },
             };
-          });
-        },
+          }
 
-        startTutorialStep: (step) => {
-          logger.info(`🎯 Starting tutorial step: ${step}`);
-          set({ currentTutorialStep: step });
-        },
+          return {
+            tutorialProgress: newTutorialProgress,
+          };
+        });
+      },
 
-        endTutorialStep: () => {
-          set({ currentTutorialStep: null });
-        },
+      startTutorialStep: (step) => {
+        logger.info(`🎯 Starting tutorial step: ${step}`);
+        set({ currentTutorialStep: step });
+      },
 
-        completeOnboarding: () => {
-          logger.info("🎉 Onboarding completed!");
-          set((state) => ({
-            isOnboarded: true,
-            currentTutorialStep: null,
-            preferences: {
-              ...state.preferences,
-              tourCompleted: true,
-            },
-          }));
-        },
+      endTutorialStep: () => {
+        set({ currentTutorialStep: null });
+      },
 
-        resetOnboarding: () => {
-          logger.info("🔄 Resetting onboarding progress");
-          set({
-            isOnboarded: false,
-            tutorialProgress: {
-              accountSetup: false,
-              firstBankBalance: false,
-              firstPaycheck: false,
-              firstDebts: false,
-              firstBills: false,
-              firstEnvelope: false,
-              linkedEnvelopes: false,
-              firstAllocation: false,
-              firstTransaction: false,
-              syncExplained: false,
-            },
-            currentTutorialStep: null,
-            preferences: {
-              showHints: true,
-              skipEmptyStateHelp: false,
-              tourCompleted: false,
-            },
-          });
-        },
+      completeOnboarding: () => {
+        logger.info("🎉 Onboarding completed!");
+        set((state) => ({
+          isOnboarded: true,
+          currentTutorialStep: null,
+          preferences: {
+            ...state.preferences,
+            tourCompleted: true,
+          },
+        }));
+      },
 
-        setPreference: (key, value) => {
-          set((state) => ({
-            preferences: {
-              ...state.preferences,
-              [key]: value,
-            },
-          }));
-        },
-      };
+      resetOnboarding: () => {
+        logger.info("🔄 Resetting onboarding progress");
+        set({
+          isOnboarded: false,
+          tutorialProgress: {
+            accountSetup: false,
+            firstBankBalance: false,
+            firstPaycheck: false,
+            firstDebts: false,
+            firstBills: false,
+            firstEnvelope: false,
+            linkedEnvelopes: false,
+            firstAllocation: false,
+            firstTransaction: false,
+            syncExplained: false,
+          },
+          currentTutorialStep: null,
+          preferences: {
+            showHints: true,
+            skipEmptyStateHelp: false,
+            tourCompleted: false,
+          },
+        });
+      },
 
-      return store;
-    },
+      setPreference: (key, value) => {
+        set((state) => ({
+          preferences: {
+            ...state.preferences,
+            [key]: value,
+          },
+        }));
+      },
+    }),
     {
       name: "violet-vault-onboarding",
       version: 1,
