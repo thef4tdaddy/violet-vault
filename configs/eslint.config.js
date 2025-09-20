@@ -2,6 +2,7 @@ import js from "@eslint/js";
 import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
+import zustandSafePatterns from "./eslint-rules/zustand-safe-patterns.js";
 
 export default [
   {
@@ -26,6 +27,7 @@ export default [
       "cloudflare-worker/**", // Allow console in worker
       "vite.config.js", // Allow console in build config
       "**/logger.js", // Allow console in logger utility
+      "configs/eslint-rules/**", // Exclude custom ESLint rule definitions
       "**/debug/**", // Debug utilities that output to browser console
       "**/debtDebugConfig.js", // Debt debugging configuration
       "**/masterSyncValidator.js", // Sync validation testing
@@ -66,6 +68,7 @@ export default [
     plugins: {
       "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
+      "zustand-safe-patterns": zustandSafePatterns,
     },
     rules: {
       ...js.configs.recommended.rules,
@@ -146,6 +149,13 @@ export default [
 
       // Block all console statements - use logger instead
       "no-console": "error",
+
+      // 🏗️ Zustand Store Safety Rules (Issue #658-659) - Start with 'warn' for gradual adoption
+      // TODO: Upgrade to 'error' after completing store refactors in #660-662
+      "zustand-safe-patterns/zustand-no-get-in-actions": "warn", // Prevent React error #185
+      "zustand-safe-patterns/zustand-store-reference-pattern": "warn", // Safe async patterns
+      "zustand-safe-patterns/zustand-selective-subscriptions": "warn", // Performance optimization
+      "zustand-safe-patterns/zustand-no-conditional-subscriptions": "warn", // Memory leak prevention
 
       // Block window.confirm patterns that no-restricted-globals doesn't catch
       "no-restricted-syntax": [
