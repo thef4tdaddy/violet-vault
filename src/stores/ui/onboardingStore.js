@@ -3,26 +3,28 @@ import { persist } from "zustand/middleware";
 import logger from "../../utils/common/logger";
 
 /**
- * Onboarding Store - Tracks user onboarding progress and tutorial state
+ * 🚨 TEMPORARILY SIMPLIFIED Onboarding Store
+ * Minimal implementation to prevent React error #185 while we implement proper architecture
+ * This removes all get() calls that were causing infinite render loops
  */
 const useOnboardingStore = create(
   persist(
-    (set, get) => ({
+    (set, _get) => ({
       // Onboarding completion status
-      isOnboarded: false,
+      isOnboarded: true, // 🚨 TEMP: Set to true to skip onboarding functionality
 
-      // Tutorial progress tracking
+      // Tutorial progress tracking (simplified)
       tutorialProgress: {
-        accountSetup: false,
-        firstBankBalance: false,
-        firstPaycheck: false,
-        firstDebts: false,
-        firstBills: false,
-        firstEnvelope: false,
-        linkedEnvelopes: false,
-        firstAllocation: false,
-        firstTransaction: false,
-        syncExplained: false,
+        accountSetup: true,
+        firstBankBalance: true,
+        firstPaycheck: true,
+        firstDebts: true,
+        firstBills: true,
+        firstEnvelope: true,
+        linkedEnvelopes: true,
+        firstAllocation: true,
+        firstTransaction: true,
+        syncExplained: true,
       },
 
       // Current tutorial step (null when not in tutorial)
@@ -30,103 +32,55 @@ const useOnboardingStore = create(
 
       // Tutorial preferences
       preferences: {
-        showHints: true,
-        skipEmptyStateHelp: false,
-        tourCompleted: false,
+        showHints: false, // 🚨 TEMP: Disable hints
+        skipEmptyStateHelp: true, // 🚨 TEMP: Skip help
+        tourCompleted: true, // 🚨 TEMP: Mark as completed
       },
 
-      // Actions
+      // 🚨 SIMPLIFIED ACTIONS - No get() calls
       markStepComplete: (step) => {
-        logger.info(`✅ Onboarding step completed: ${step}`);
-        set((state) => ({
-          tutorialProgress: {
-            ...state.tutorialProgress,
-            [step]: true,
-          },
-        }));
-
-        // Check if all steps are complete
-        const { tutorialProgress } = get();
-        const allStepsComplete = Object.values(tutorialProgress).every(Boolean);
-
-        if (allStepsComplete) {
-          get().completeOnboarding();
-        }
+        logger.info(`✅ Onboarding step completed: ${step} (TEMP DISABLED)`);
+        // Do nothing - onboarding disabled
       },
 
       startTutorialStep: (step) => {
-        logger.info(`🎯 Starting tutorial step: ${step}`);
-        set({ currentTutorialStep: step });
+        logger.info(`🎯 Starting tutorial step: ${step} (TEMP DISABLED)`);
+        // Do nothing - onboarding disabled
       },
 
       endTutorialStep: () => {
-        set({ currentTutorialStep: null });
+        // Do nothing - onboarding disabled
       },
 
       completeOnboarding: () => {
-        logger.info("🎉 Onboarding completed!");
-        set({
-          isOnboarded: true,
-          currentTutorialStep: null,
-          preferences: {
-            ...get().preferences,
-            tourCompleted: true,
-          },
-        });
+        logger.info("🎉 Onboarding completed! (TEMP DISABLED)");
+        // Do nothing - onboarding disabled
       },
 
       resetOnboarding: () => {
-        logger.info("🔄 Resetting onboarding progress");
-        set({
-          isOnboarded: false,
-          tutorialProgress: {
-            accountSetup: false,
-            firstBankBalance: false,
-            firstPaycheck: false,
-            firstDebts: false,
-            firstBills: false,
-            firstEnvelope: false,
-            linkedEnvelopes: false,
-            firstAllocation: false,
-            firstTransaction: false,
-            syncExplained: false,
-          },
-          currentTutorialStep: null,
-          preferences: {
-            showHints: true,
-            skipEmptyStateHelp: false,
-            tourCompleted: false,
-          },
-        });
+        logger.info("🔄 Resetting onboarding progress (TEMP DISABLED)");
+        // Do nothing - onboarding disabled
       },
 
       setPreference: (key, value) => {
-        set((state) => ({
-          preferences: {
-            ...state.preferences,
-            [key]: value,
-          },
-        }));
+        logger.info(`Setting preference ${key} = ${value} (TEMP DISABLED)`);
+        // Do nothing - onboarding disabled
       },
 
-      // Helper methods
+      // 🚨 TEMP: Simplified helper methods that don't use get()
       isStepComplete: (step) => {
-        return get().tutorialProgress[step] || false;
+        return true; // All steps "complete"
       },
 
       shouldShowHint: (step) => {
-        const { preferences, tutorialProgress, isOnboarded } = get();
-        return preferences.showHints && !isOnboarded && !tutorialProgress[step];
+        return false; // No hints
       },
 
       getProgress: () => {
-        const { tutorialProgress } = get();
-        const completedSteps = Object.values(tutorialProgress).filter(Boolean).length;
-        const totalSteps = Object.keys(tutorialProgress).length;
         return {
-          completed: completedSteps,
-          total: totalSteps,
-          percentage: Math.round((completedSteps / totalSteps) * 100),
+          completed: 10,
+          total: 10,
+          percentage: 100,
         };
       },
     }),
