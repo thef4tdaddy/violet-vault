@@ -202,7 +202,8 @@ const storeInitializer = (set, get) => ({
 
   // PWA Update Action
   async updateApp() {
-    const state = get();
+    // Safe external store access (prevents React error #185)
+    const state = useBudgetStore.getState();
     if (!state.updateAvailable) return;
 
     set((state) => {
@@ -240,7 +241,8 @@ const storeInitializer = (set, get) => ({
 
   // PWA Install Action
   async installApp() {
-    const state = get();
+    // Safe external store access (prevents React error #185)
+    const state = useBudgetStore.getState();
     if (!state.installPromptEvent) return false;
 
     try {
@@ -281,7 +283,8 @@ const storeInitializer = (set, get) => ({
 
   // Manual PWA Install (for settings)
   async manualInstall() {
-    const state = get();
+    // Safe external store access (prevents React error #185)
+    const state = useBudgetStore.getState();
 
     // Check if already installed
     if (window.matchMedia("(display-mode: standalone)").matches) {
@@ -295,8 +298,8 @@ const storeInitializer = (set, get) => ({
       return { success: false, reason: "not_available" };
     }
 
-    // Use the regular install method
-    const success = await get().installApp();
+    // Use the regular install method - safe external store access
+    const success = await useBudgetStore.getState().installApp();
     return { success, reason: success ? "installed" : "declined" };
   },
 
@@ -390,7 +393,8 @@ const storeInitializer = (set, get) => ({
   // Start background sync service
   async startBackgroundSync() {
     try {
-      const state = get();
+      // Safe external store access (prevents React error #185)
+      const state = useBudgetStore.getState();
       if (!state.cloudSyncEnabled) {
         logger.info("Cloud sync disabled - skipping background sync start");
         return;

@@ -183,7 +183,8 @@ export const useFABStore = create(
 
           // Debug method
           getDebugInfo: () => {
-            const state = get();
+            // Safe external store access (prevents React error #185)
+            const state = useFABStore.getState();
             return {
               currentScreen: state.currentScreen,
               isVisible: state.isVisible,
