@@ -42,7 +42,10 @@ const ConnectionDisplay = ({
     <div className={`${currentTheme.container} rounded-xl p-6 mb-4 ${className}`}>
       <div className="flex items-center justify-between mb-4">
         <label className={`block text-lg font-bold ${currentTheme.titleText} flex items-center`}>
-          {IconComponent && React.createElement(IconComponent, { className: `h-6 w-6 mr-3 ${currentTheme.iconColor}` })}
+          {IconComponent &&
+            React.createElement(IconComponent, {
+              className: `h-6 w-6 mr-3 ${currentTheme.iconColor}`,
+            })}
           🔗 {title}
         </label>
         {onDisconnect && (
@@ -104,7 +107,8 @@ export const ConnectionItem = ({
 
   return (
     <div className={`flex items-center p-3 bg-white rounded-lg border ${currentTheme.border}`}>
-      {IconComponent && React.createElement(IconComponent, { className: `h-5 w-5 mr-3 ${currentTheme.iconColor}` })}
+      {IconComponent &&
+        React.createElement(IconComponent, { className: `h-5 w-5 mr-3 ${currentTheme.iconColor}` })}
       <div className="flex-1">
         <div className={`font-medium ${currentTheme.titleColor}`}>{title}</div>
         {details && <div className={`text-sm ${currentTheme.detailColor}`}>{details}</div>}

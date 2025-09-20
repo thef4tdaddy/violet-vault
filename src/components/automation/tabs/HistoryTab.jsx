@@ -71,10 +71,9 @@ const HistoryTab = ({ executionHistory, showExecutionDetails, onToggleDetails })
                   }
                   className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
                 >
-                  {showExecutionDetails === execution.id ?
-                    React.createElement(getIcon("EyeOff"), { className: "h-4 w-4" }) :
-                    React.createElement(getIcon("Eye"), { className: "h-4 w-4" })
-                  }
+                  {showExecutionDetails === execution.id
+                    ? React.createElement(getIcon("EyeOff"), { className: "h-4 w-4" })
+                    : React.createElement(getIcon("Eye"), { className: "h-4 w-4" })}
                 </button>
               </div>
 

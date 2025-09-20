@@ -43,7 +43,7 @@ export const useRegisterFABActions = ({
   useEffect(() => {
     const actionIds = [];
 
-    secondaryActions.forEach(action => {
+    secondaryActions.forEach((action) => {
       if (action.id) {
         registerSecondaryAction(action);
         actionIds.push(action.id);
@@ -51,7 +51,7 @@ export const useRegisterFABActions = ({
     });
 
     return () => {
-      actionIds.forEach(id => {
+      actionIds.forEach((id) => {
         unregisterSecondaryAction(id);
       });
     };

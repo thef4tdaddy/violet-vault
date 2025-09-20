@@ -181,7 +181,7 @@ const EditEnvelopeModal = ({
                     onClick={handleDeleteClick}
                     className="flex items-center px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 focus:ring-2 focus:ring-red-500 transition-colors"
                   >
-                    {React.createElement(getIcon('Trash2'), { className: 'h-4 w-4 mr-2' })}
+                    {React.createElement(getIcon("Trash2"), { className: "h-4 w-4 mr-2" })}
                     Delete Envelope
                   </button>
                 )}
@@ -202,7 +202,7 @@ const EditEnvelopeModal = ({
                   disabled={!canSubmit || isLoading}
                   className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
                 >
-                  {React.createElement(getIcon('Save'), { className: 'h-4 w-4 mr-2' })}
+                  {React.createElement(getIcon("Save"), { className: "h-4 w-4 mr-2" })}
                   {isLoading ? "Saving..." : "Save Changes"}
                 </button>
               </div>
