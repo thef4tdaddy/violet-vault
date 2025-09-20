@@ -48,6 +48,10 @@ const MainLayout = ({ firebaseSync }) => {
   // Bug report functionality for FAB
   const { openModal: openBugReport } = useBugReportV2();
 
+  // 🚨 TEMPORARY: Disable FAB to fix React error #185 while implementing proper architecture
+  // eslint-disable-next-line no-unused-vars
+  const ENABLE_FAB = false;
+
   // Navigation hooks for post-login redirect
   const location = useLocation();
   const navigate = useNavigate();
@@ -298,14 +302,14 @@ const MainContent = ({
   // Payday prediction notifications using TanStack Query data
   usePaydayPrediction(tanStackPaycheckHistory, !!currentUser);
 
-  // FAB integration - set up default action handlers
-  useSetFABDefaults({
+  // FAB integration - set up default action handlers (TEMPORARILY DISABLED)
+  useSetFABDefaults(ENABLE_FAB ? {
     "bug-report": openBugReport,
     "manual-sync": handleManualSync,
-  });
+  } : {});
 
   // Sync FAB screen with current route
-  useSyncFABScreen(getCurrentViewFromPath(location.pathname));
+  useSyncFABScreen(ENABLE_FAB ? getCurrentViewFromPath(location.pathname) : null);
 
   return (
     <OnboardingTutorial setActiveView={setActiveView}>
@@ -354,8 +358,8 @@ const MainContent = ({
           {/* Bug Report Button */}
           <BugReportButton />
 
-          {/* Floating Action Button - Mobile Only */}
-          <FloatingActionButton />
+          {/* Floating Action Button - Mobile Only (TEMPORARILY DISABLED) */}
+          {ENABLE_FAB && <FloatingActionButton />}
 
           {/* Bottom Navigation Bar - Mobile Only */}
           <BottomNavigationBar />
