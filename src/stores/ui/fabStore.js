@@ -179,10 +179,7 @@ export const useFABStore = create(
           ...storeActions,
           ...actionManagement,
 
-          // Getters (computed values)
-          getCurrentPrimaryAction: () => getCurrentPrimaryAction(get()),
-          getAllSecondaryActions: () => getAllSecondaryActions(get()),
-          getShouldShowFAB: () => getShouldShowFAB(get()),
+          // Computed values are now accessed directly in selectors
 
           // Debug method
           getDebugInfo: () => {
@@ -221,9 +218,9 @@ export const useFABSelectors = () => {
   const currentScreen = useFABStore((state) => state.currentScreen);
   const isVisible = useFABStore((state) => state.isVisible);
   const isExpanded = useFABStore((state) => state.isExpanded);
-  const shouldShowFAB = useFABStore((state) => state.getShouldShowFAB());
-  const primaryAction = useFABStore((state) => state.getCurrentPrimaryAction());
-  const secondaryActions = useFABStore((state) => state.getAllSecondaryActions());
+  const shouldShowFAB = useFABStore((state) => getShouldShowFAB(state));
+  const primaryAction = useFABStore((state) => getCurrentPrimaryAction(state));
+  const secondaryActions = useFABStore((state) => getAllSecondaryActions(state));
 
   return {
     currentScreen,
