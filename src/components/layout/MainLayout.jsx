@@ -36,12 +36,17 @@ import LocalDataSecurityWarning from "../security/LocalDataSecurityWarning";
 import AppRoutes from "./AppRoutes";
 import { pathToViewMap, viewToPathMap } from "./routeConfig";
 import FloatingActionButton from "../mobile/FloatingActionButton";
+import { useSetFABDefaults, useSyncFABScreen } from "../../hooks/common/useFABActions";
+import useBugReportV2 from "../../hooks/common/useBugReportV2";
 import BottomNavigationBar from "../mobile/BottomNavigationBar";
 
 // Heavy components now lazy loaded in ViewRenderer
 
 const MainLayout = ({ firebaseSync }) => {
   // Removed noisy debug log - layout renders constantly
+
+  // Bug report functionality for FAB
+  const { openModal: openBugReport } = useBugReportV2();
 
   // Navigation hooks for post-login redirect
   const location = useLocation();
@@ -161,6 +166,7 @@ const MainLayout = ({ firebaseSync }) => {
         onUpdateProfile={handleUpdateProfile}
         isLocalOnlyMode={isLocalOnlyMode}
         securityManager={securityManager}
+        openBugReport={openBugReport}
       />
       <PasswordRotationModal
         isOpen={showRotationModal}
@@ -195,6 +201,7 @@ const MainContent = ({
   onUpdateProfile,
   isLocalOnlyMode = false,
   securityManager,
+  openBugReport,
 }) => {
   const budget = useBudgetStore();
   // Get current route for view determination
@@ -291,44 +298,14 @@ const MainContent = ({
   // Payday prediction notifications using TanStack Query data
   usePaydayPrediction(tanStackPaycheckHistory, !!currentUser);
 
-  // FAB action handler (Phase 1: Basic logging, will connect to modals in Phase 4)
-  const handleFABAction = (actionType, actionConfig) => {
-    logger.info(`FAB action triggered: ${actionType}`, { actionConfig });
+  // FAB integration - set up default action handlers
+  useSetFABDefaults({
+    "bug-report": openBugReport,
+    "manual-sync": handleManualSync,
+  });
 
-    // Phase 1: Basic action handling - will be expanded in Phase 4
-    switch (actionType) {
-      case "openCreateEnvelopeModal":
-        // TODO: Connect to CreateEnvelopeModal in Phase 4
-        logger.info("Create Envelope FAB action - modal integration pending");
-        break;
-      case "openPaycheckModal":
-        // TODO: Connect to PaycheckProcessor modal wrapper in Phase 4
-        logger.info("Add Paycheck FAB action - modal integration pending");
-        break;
-      case "openAddBillModal":
-        // TODO: Connect to AddBillModal in Phase 4
-        logger.info("Add Bill FAB action - modal integration pending");
-        break;
-      case "openAddGoalModal":
-        // TODO: Connect to AddEditGoalModal in Phase 4
-        logger.info("New Goal FAB action - modal integration pending");
-        break;
-      case "openTransactionModal":
-        // TODO: Connect to TransactionModal in Phase 4
-        logger.info("Add Transaction FAB action - modal integration pending");
-        break;
-      case "openAddDebtModal":
-        // TODO: Connect to AddDebtModal in Phase 4
-        logger.info("Add Debt FAB action - modal integration pending");
-        break;
-      case "openNewRuleModal":
-        // TODO: Connect to AutoFunding rule modal in Phase 4
-        logger.info("New Rule FAB action - modal integration pending");
-        break;
-      default:
-        logger.warn(`Unknown FAB action: ${actionType}`);
-    }
-  };
+  // Sync FAB screen with current route
+  useSyncFABScreen(getCurrentViewFromPath(location.pathname));
 
   return (
     <OnboardingTutorial setActiveView={setActiveView}>
@@ -378,7 +355,7 @@ const MainContent = ({
           <BugReportButton />
 
           {/* Floating Action Button - Mobile Only */}
-          <FloatingActionButton onAction={handleFABAction} />
+          <FloatingActionButton />
 
           {/* Bottom Navigation Bar - Mobile Only */}
           <BottomNavigationBar />
